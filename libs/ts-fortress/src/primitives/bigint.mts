@@ -60,8 +60,8 @@ export function bigint(
   }
 
   return attachConstraints(
-    // The constraints are what the refinement checks, and they are on the
-    // type itself, so it describes itself as the primitive it refines.
+    // The constraints are what the refinement checks, and they are on the type
+    // itself, so it describes itself as the primitive it refines.
     withStructure(
       refine({
         baseType,
@@ -113,8 +113,8 @@ export type BigintTypeConstraints = Constraints;
 
 /**
  * The constraint values carried by a {@link bigint} type created with the
- * constraints `C`: every key of {@link BigintTypeConstraints}, taking the
- * value `C` gives it and `undefined` for the keys `C` leaves out.
+ * constraints `C`: every key of {@link BigintTypeConstraints}, taking the value
+ * `C` gives it and `undefined` for the keys `C` leaves out.
  */
 export type BigintConstraintsOf<C extends BigintTypeConstraints> =
   FillConstraints<Required<Constraints>, C>;

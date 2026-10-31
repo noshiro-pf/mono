@@ -30,11 +30,11 @@ type ChildObservableConfig<A, P extends NonEmptyUnknownList> = Readonly<{
   parents: Wrap<P>;
 
   /**
-   * Defaults to one more than the deepest parent. An update reaches
-   * observables in ascending depth, so an observable `tryUpdate` reads with
-   * `getSnapshot` without being its child (`withCurrentValueFrom`'s second
-   * source) has to be shallower than this one too, or this one reads its value
-   * from before the update: pass `1 + Math.max(...)` over both then.
+   * Defaults to one more than the deepest parent. An update reaches observables
+   * in ascending depth, so an observable `tryUpdate` reads with `getSnapshot`
+   * without being its child (`withCurrentValueFrom`'s second source) has to be
+   * shallower than this one too, or this one reads its value from before the
+   * update: pass `1 + Math.max(...)` over both then.
    */
   depth?: number;
 
@@ -45,9 +45,9 @@ type ChildObservableConfig<A, P extends NonEmptyUnknownList> = Readonly<{
  * An observable derived from `parents` that emits, if at all, in the same
  * update as they do (`map`, `filter`, `combine`, …).
  *
- * A subclass overrides `tryUpdate`, and, when it holds something to
- * release, `teardown`; its constructor ends with `this.attach()`, once
- * everything `tryUpdate` and `teardown` read is in place.
+ * A subclass overrides `tryUpdate`, and, when it holds something to release,
+ * `teardown`; its constructor ends with `this.attach()`, once everything
+ * `tryUpdate` and `teardown` read is in place.
  */
 export class SyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   extends ObservableBaseClass<A, 'sync child', number>
@@ -107,10 +107,9 @@ export class SyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   }
 
   /**
-   * Whether this observable can emit nothing more although some parent is
-   * still live, asked whenever a parent completes. `true` completes it then,
-   * as all parents completing does (`zip` once a completed source's queue is
-   * empty).
+   * Whether this observable can emit nothing more although some parent is still
+   * live, asked whenever a parent completes. `true` completes it then, as all
+   * parents completing does (`zip` once a completed source's queue is empty).
    */
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   canEmitNoMore(): boolean {
@@ -118,8 +117,8 @@ export class SyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   }
 
   /**
-   * Completes this observable once the update now propagating has reached
-   * every descendant, so that they see the value just passed on first.
+   * Completes this observable once the update now propagating has reached every
+   * descendant, so that they see the value just passed on first.
    */
   protected completeAfterPropagation(): void {
     runAfterPropagation(() => {
@@ -129,8 +128,8 @@ export class SyncChildObservableClass<A, const P extends NonEmptyUnknownList>
 }
 
 /**
- * An observable derived from `parents` that may emit later, in an update of
- * its own, through `startUpdate` (`debounce`, `switchMap`). It may also emit
+ * An observable derived from `parents` that may emit later, in an update of its
+ * own, through `startUpdate` (`debounce`, `switchMap`). It may also emit
  * synchronously with `setNext`, as a sync child does. A subclass may also
  * override `flush`, to pass on at completion what it still holds.
  */
@@ -204,13 +203,13 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
    * `mergeMap` returned.
    *
    * If the inner observable already holds a value (`just(x)`, a state), it
-   * emits that value synchronously while being subscribed. That first value
-   * is emitted with `updateToken`, the token of the update that ran the
-   * projection, so it joins the propagation in progress like a sync
-   * operator's value would. Starting an update of its own instead would
-   * reach the nodes below before the current update reached this
-   * observable's siblings: a node reading both would see the new inner value
-   * beside stale sibling values (a glitch), and would emit twice.
+   * emits that value synchronously while being subscribed. That first value is
+   * emitted with `updateToken`, the token of the update that ran the
+   * projection, so it joins the propagation in progress like a sync operator's
+   * value would. Starting an update of its own instead would reach the nodes
+   * below before the current update reached this observable's siblings: a node
+   * reading both would see the new inner value beside stale sibling values (a
+   * glitch), and would emit twice.
    *
    * Values the inner observable emits later start updates of their own.
    */
@@ -236,8 +235,8 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
 
 /**
  * A sync child that always holds a value: a subclass passes a `Some` as its
- * `initialValue`. It differs from its base only in the types of
- * `getSnapshot` and `pipe`.
+ * `initialValue`. It differs from its base only in the types of `getSnapshot`
+ * and `pipe`.
  */
 export class InitializedSyncChildObservableClass<
   A,
@@ -266,8 +265,8 @@ export class InitializedSyncChildObservableClass<
 /* helpers */
 
 /**
- * Called by a parent that has completed: whether no live parent is left, or
- * no value can come from the live ones.
+ * Called by a parent that has completed: whether no live parent is left, or no
+ * value can come from the live ones.
  */
 const shouldComplete = (
   child: ChildNode & Readonly<{ canEmitNoMore: () => boolean }>,
@@ -321,10 +320,10 @@ const detectCircularDependency = (child: ChildNode): void => {
 
   for (const parent of child.parents) {
     if (hasCircularDependencyFrom(parent, mut_visited, mut_inPath)) {
-      // A programming error (invariant violation), not a recoverable
-      // failure. `panic` marks the error it throws, so the `Result` /
-      // `AsyncResult` boundaries rethrow it rather than turning an invariant
-      // violation into an `Err` a caller might handle (Sumi D-48 / D-53).
+      // A programming error (invariant violation), not a recoverable failure.
+      // `panic` marks the error it throws, so the `Result` / `AsyncResult`
+      // boundaries rethrow it rather than turning an invariant violation into
+      // an `Err` a caller might handle (Sumi D-48 / D-53).
       panic(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );
@@ -344,9 +343,9 @@ const registerChild = (child: ChildNode): void => {
 };
 
 /**
- * Undoes {@link registerChild} for a completed child: its parents forget it,
- * so that no update puts it in its queue again. Without this a completed
- * node stayed reachable for as long as its root lived (#2134).
+ * Undoes {@link registerChild} for a completed child: its parents forget it, so
+ * that no update puts it in its queue again. Without this a completed node
+ * stayed reachable for as long as its root lived (#2134).
  */
 const unregisterChild = (child: ChildNode): void => {
   for (const p of child.parents) {

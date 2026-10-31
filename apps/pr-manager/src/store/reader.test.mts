@@ -216,9 +216,9 @@ describe(createReader, () => {
     assert.strictEqual(reader.nowMs.getSnapshot().value, 9_000);
   });
 
-  // The failure this is here to prevent: a tab that came back was read at
-  // once and then again at whatever point the old period had reached, which
-  // could be a second later.
+  // The failure this is here to prevent: a tab that came back was read at once
+  // and then again at whatever point the old period had reached, which could be
+  // a second later.
   test('a tab that comes back polls from the read it came back to', () => {
     const { reader, loads, timers, visibility } = setup(TOKEN_A);
 
@@ -296,8 +296,8 @@ describe(createReader, () => {
   });
 
   // A poll answers every fifteen seconds whether or not anything changed.
-  // What it writes is only what changed, so nothing drawn from the rest is
-  // told anything, let alone handed a new object.
+  // What it writes is only what changed, so nothing drawn from the rest is told
+  // anything, let alone handed a new object.
   test('a read that answers the same writes the time of reading and nothing else', async () => {
     const { reader, loads, timers, clock } = setup(TOKEN_A);
 
@@ -1364,8 +1364,8 @@ const shown = (
   }) as const;
 
 /**
- * Listens to everything the page draws from, and answers with the names of
- * what has been written since, sorted.
+ * Listens to everything the page draws from, and answers with the names of what
+ * has been written since, sorted.
  */
 const recordWrites = (reader: Reader): (() => readonly string[]) => {
   const mut_written: string[] = [];

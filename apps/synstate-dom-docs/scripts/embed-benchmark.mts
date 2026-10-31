@@ -9,10 +9,10 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
 /**
  * Embeds `apps/synstate-dom-benchmark/RESULTS.md` into the benchmark pages.
  *
- * RESULTS.md is written by that app's `pnpm run benchmark`, by hand, and is
- * the only record of a run. The pages carry no number of their own: every
- * figure on them sits between a pair of `<!-- benchmark:<key> -->` markers and
- * is rewritten from RESULTS.md here, so that a re-run reaches the site by
+ * RESULTS.md is written by that app's `pnpm run benchmark`, by hand, and is the
+ * only record of a run. The pages carry no number of their own: every figure on
+ * them sits between a pair of `<!-- benchmark:<key> -->` markers and is
+ * rewritten from RESULTS.md here, so that a re-run reaches the site by
  * `pnpm run gen` rather than by someone remembering which sentence quoted it.
  *
  * The table is parsed rather than copied, so that the Japanese page can name
@@ -89,8 +89,8 @@ type Results = Readonly<{
 }>;
 
 /**
- * One of RESULTS.md's tables of medians. A scenario's median is `NaN` where
- * the library rendered the wrong figures, which RESULTS.md writes `wrong`.
+ * One of RESULTS.md's tables of medians. A scenario's median is `NaN` where the
+ * library rendered the wrong figures, which RESULTS.md writes `wrong`.
  */
 type Table = Readonly<{
   libraries: readonly string[];
@@ -218,9 +218,9 @@ const parseResults = (markdown: string): Result<Results, string> => {
     );
   }
 
-  // The medians of the operations, the first table, and those of the
-  // scenarios, the first table after their heading. RESULTS.md's ratio tables
-  // are recomputed below, so that the Japanese page can head them in
+  // The medians of the operations, the first table, and those of the scenarios,
+  // the first table after their heading. RESULTS.md's ratio tables are
+  // recomputed below, so that the Japanese page can head them in
   // Japanese.
   const lines = markdown.split('\n').map((line) => line.trim());
 

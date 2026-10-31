@@ -58,11 +58,10 @@ export type BenchmarkEnvironment = Readonly<{
    * Day precision. A re-measurement is a new fact and should show in the diff;
    * the time of day is not one, and would churn these files for nothing.
    *
-   * `BENCHMARK_MEASURED_ON` (`YYYY-MM-DD`) when set, today in UTC
-   * otherwise. Each scenario runs in a process of its own and the tables must
-   * agree on one date (`scripts/measurement-checks.mts`), so a pass that
-   * crosses midnight would stamp two; the benchmark workflow sets it once for
-   * the whole pass.
+   * `BENCHMARK_MEASURED_ON` (`YYYY-MM-DD`) when set, today in UTC otherwise.
+   * Each scenario runs in a process of its own and the tables must agree on one
+   * date (`scripts/measurement-checks.mts`), so a pass that crosses midnight
+   * would stamp two; the benchmark workflow sets it once for the whole pass.
    */
   measuredOn: string;
 

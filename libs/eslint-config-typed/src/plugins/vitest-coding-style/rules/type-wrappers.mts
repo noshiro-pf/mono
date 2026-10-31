@@ -3,8 +3,8 @@ import { isTypeWrapper } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 
 /**
- * Whether `node` is what a call calls, looking through the type wrappers
- * around it: `assert.deepEqual!(a, b)` and
+ * Whether `node` is what a call calls, looking through the type wrappers around
+ * it: `assert.deepEqual!(a, b)` and
  * `(assert.deepEqual satisfies unknown)(a, b)` call `assert.deepEqual`.
  */
 export const isCalleeOfCall = (

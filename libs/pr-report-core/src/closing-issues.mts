@@ -19,15 +19,14 @@ export type ClosingIssueNode = Readonly<{
 /**
  * The closing issues that belong to `repo`, in GitHub's order.
  *
- * **Only this repository's.** A pull request can close an issue anywhere,
- * and a report lists each as `#N` — which for another repository's issue
- * names a different issue of this one, and for a private repository's may
- * put a title the report's reader cannot see into a report someone else
- * reads. The body parser `pr-report` falls back on without a token draws the
- * same line.
+ * **Only this repository's.** A pull request can close an issue anywhere, and a
+ * report lists each as `#N` — which for another repository's issue names a
+ * different issue of this one, and for a private repository's may put a title
+ * the report's reader cannot see into a report someone else reads. The body
+ * parser `pr-report` falls back on without a token draws the same line.
  *
- * `null` entries are skipped rather than rejected: one issue the token may
- * not see is no reason to lose the rest.
+ * `null` entries are skipped rather than rejected: one issue the token may not
+ * see is no reason to lose the rest.
  */
 export const closingIssuesIn = (
   repo: RepoRef,
@@ -55,21 +54,21 @@ export const closingIssuesIn = (
 };
 
 /**
- * The issues of `repo` a pull request body closes by keyword, as GitHub
- * itself read the body: first appearance order, each once.
+ * The issues of `repo` a pull request body closes by keyword, as GitHub itself
+ * read the body: first appearance order, each once.
  *
  * **Read from GitHub's rendering, not from the text.** GitHub wraps each
- * closing keyword it recognized in `<span class="issue-keyword">` and puts
- * the reference right after it, and it does so whatever the base branch.
- * `closingIssuesReferences` does not: it links a keyword only on a pull
- * request into the default branch, so a stacked one lists nothing until the
- * layers below it merge. Which spellings count, whether a reference inside
- * code or after a comma is closed, is GitHub's to decide, and this takes its
- * decision rather than copying the grammar. A body cannot forge the mark:
+ * closing keyword it recognized in `<span class="issue-keyword">` and puts the
+ * reference right after it, and it does so whatever the base branch.
+ * `closingIssuesReferences` does not: it links a keyword only on a pull request
+ * into the default branch, so a stacked one lists nothing until the layers
+ * below it merge. Which spellings count, whether a reference inside code or
+ * after a comma is closed, is GitHub's to decide, and this takes its decision
+ * rather than copying the grammar. A body cannot forge the mark:
  * GitHub strips `class` from HTML written in one.
  *
- * A reference to another repository's issue, or to a pull request, is left
- * out, for the reasons {@link closingIssuesIn} gives.
+ * A reference to another repository's issue, or to a pull request, is left out,
+ * for the reasons {@link closingIssuesIn} gives.
  */
 export const closingKeywordIssuesIn = (
   repo: RepoRef,

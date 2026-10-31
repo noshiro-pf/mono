@@ -18,8 +18,8 @@ import { createState } from './create-state.mjs';
  * import { useObservableValue } from 'synstate-react-hooks';
  *
  * // Menu drawer open/close state.
- * // setTrue and setFalse can be passed directly as callbacks
- * // — no need to create wrapper functions like `() => setState(true)`.
+ * // setTrue and setFalse can be passed directly as callbacks — no need to
+ * // create wrapper functions like `() => setState(true)`.
  * const [menuOpen$, { setTrue: openMenu, setFalse: closeMenu }] =
  *   createBooleanState(false);
  *

@@ -13,8 +13,8 @@ import type { DomainState, NodeRef } from './types.mjs';
  * order, the cycle {@link findCycle} reports.
  *
  * Among the nodes free to come next, the one earliest in the order of
- * `listNodes` (tasks in input order, then milestones) comes first, so the
- * order stays as close to the input as the dependencies allow.
+ * `listNodes` (tasks in input order, then milestones) comes first, so the order
+ * stays as close to the input as the dependencies allow.
  */
 export const topologicalOrder = (
   state: DomainState,

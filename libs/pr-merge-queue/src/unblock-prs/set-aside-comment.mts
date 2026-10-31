@@ -1,8 +1,8 @@
 /**
- * The prose of the comment a pull request gets when this script sets it
- * aside, and of the one line it is rewritten to once that is over.
- * `pr-report-core`'s `set-aside.mts` wraps it in the record the script and
- * the page read back; nothing reads the prose.
+ * The prose of the comment a pull request gets when this script sets it aside,
+ * and of the one line it is rewritten to once that is over.
+ * `pr-report-core`'s `set-aside.mts` wraps it in the record the script and the
+ * page read back; nothing reads the prose.
  */
 
 import {
@@ -17,8 +17,8 @@ import { lastLines } from './util.mjs';
 
 /**
  * What a reader needs without the terminal this ran in: the reason and its
- * sentence, each failed check with its run, what the command printed —
- * folded, and cut to its end — and what will take it off.
+ * sentence, each failed check with its run, what the command printed — folded,
+ * and cut to its end — and what will take it off.
  */
 export const setAsideCommentBody = (
   skip: SkipRecord,
@@ -105,9 +105,8 @@ const stays = (reason: SkipRecord['reason'], defaultBranch: string): string =>
 export type ResolvedBy = 'base-moved' | 'pushed' | 'retry';
 
 /**
- * How much of what a command printed the comment keeps, from its end, where
- * git says what stopped it. GitHub takes a comment of up to 65,536
- * characters.
+ * How much of what a command printed the comment keeps, from its end, where git
+ * says what stopped it. GitHub takes a comment of up to 65,536 characters.
  */
 const OUTPUT_LINES = 60;
 
@@ -134,8 +133,8 @@ const fenced = (text: string): string => {
 };
 
 /**
- * A sentence built from what git and GitHub said, as literal text: file
- * names carry underscores, and nothing in it should mention anyone.
+ * A sentence built from what git and GitHub said, as literal text: file names
+ * carry underscores, and nothing in it should mention anyone.
  */
 const escapeMarkdown = (text: string): string =>
   text.replaceAll(/[\\`*_[\]<>|~@]/gu, String.raw`\$&`);

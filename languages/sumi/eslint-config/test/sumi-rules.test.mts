@@ -14,10 +14,10 @@ const configs = eslintConfigForSumi({
 });
 
 /**
- * Resolves the entry a rule ends up with after flat-config merging
- * (last-wins). The Sumi override block is appended last and unscoped, so for
- * every overridden rule the effective entry must be exactly the Sumi one —
- * this catches a regression where the override block stops being last, or a
+ * Resolves the entry a rule ends up with after flat-config merging (last-wins).
+ * The Sumi override block is appended last and unscoped, so for every
+ * overridden rule the effective entry must be exactly the Sumi one — this
+ * catches a regression where the override block stops being last, or a
  * base-config change re-overrides a Sumi rule.
  */
 const effectiveRuleEntry = (ruleId: string): RuleEntry | undefined =>

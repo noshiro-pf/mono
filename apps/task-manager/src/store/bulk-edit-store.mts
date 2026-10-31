@@ -2,8 +2,8 @@
  * The dialog of 「一括編集」: what to change in every node selected on the
  * DAG at once — the progress and the labels of the tasks among them, and
  * the group of all of them. Every field starts at 「変更しない」, and
- * nothing is written until `save`, which writes every node it changes in
- * one go (`dataStore.editNodes`).
+ * nothing is written until `save`, which writes every node it changes in one go
+ * (`dataStore.editNodes`).
  */
 
 import { createState, type InitializedObservable } from 'synstate';

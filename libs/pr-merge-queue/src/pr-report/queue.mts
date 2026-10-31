@@ -15,11 +15,11 @@ import { readRequiredContexts } from './repo-settings.mjs';
  * Who moves each open pull request in the queue next (`pr-report-core`'s
  * `queue-owner.mts`), from what `pr-report` reads.
  *
- * Every command a session runs on the queue decides through here — the
- * `owner` in `pr-report --format json`, `claim-pr`, `push-fixed-pr`,
+ * Every command a session runs on the queue decides through here — the `owner`
+ * in `pr-report --format json`, `claim-pr`, `push-fixed-pr`,
  * `report-unowned-prs` and a repository's own `rebuild` scripts — so none of
- * them can come to a different answer from the others, and the worker asks
- * the same function with the same facts read through `gh`.
+ * them can come to a different answer from the others, and the worker asks the
+ * same function with the same facts read through `gh`.
  */
 export const ownersOf = (
   decided: DecidedEntries,
@@ -59,10 +59,10 @@ export type QueueState = Readonly<{
 }>;
 
 /**
- * Reads the open pull requests, this account's comments on them and the
- * owner of each, for a command that acts on the queue. It needs a token
- * whose account is the one `unblock-prs` writes as: without one no comment
- * is trusted, and there is no owner to read.
+ * Reads the open pull requests, this account's comments on them and the owner
+ * of each, for a command that acts on the queue. It needs a token whose account
+ * is the one `unblock-prs` writes as: without one no comment is trusted, and
+ * there is no owner to read.
  */
 export const readQueueState = async (
   repoOption?: string,

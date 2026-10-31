@@ -20,13 +20,13 @@ type Options = readonly [];
 type MessageIds = 'preferMapTo';
 
 /**
- * `map` passes on a result only when it is not `Object.is` the one it holds,
- * so `click$.pipe(map(() => true))` emits on the first click and on none
- * after it. `mapTo(true)` emits on every one. A `map` given `equals` is left
- * alone: its author has said how results compare.
+ * `map` passes on a result only when it is not `Object.is` the one it holds, so
+ * `click$.pipe(map(() => true))` emits on the first click and on none after it.
+ * `mapTo(true)` emits on every one. A `map` given `equals` is left alone: its
+ * author has said how results compare.
  *
- * Only a body that is the same value every time it runs is reported — a
- * literal other than a regular expression, `undefined`, or a `const` or an
+ * Only a body that is the same value every time it runs is reported — a literal
+ * other than a regular expression, `undefined`, or a `const` or an
  * import — because `mapTo` evaluates its value once.
  */
 export const preferMapTo: TSESLint.RuleModule<MessageIds, Options> = {
@@ -80,8 +80,8 @@ export const preferMapTo: TSESLint.RuleModule<MessageIds, Options> = {
 
         const argumentRange = getRangeWithParens(sourceCode, argument);
 
-        // The function around the body goes; a comment there would go with
-        // it. One around the callee is `buildCalleeRewriter`'s to refuse.
+        // The function around the body goes; a comment there would go with it.
+        // One around the callee is `buildCalleeRewriter`'s to refuse.
         const calleeRewrite = hasCommentWithin(sourceCode, node, [
           [argumentRange[0], body.range[0]],
           [body.range[1], argumentRange[1]],
@@ -160,8 +160,8 @@ const isConstantBinding = (
 };
 
 /**
- * Whether `expression`, read through its type wrappers, is the same value
- * each time it is evaluated: a literal other than a regular expression (each
+ * Whether `expression`, read through its type wrappers, is the same value each
+ * time it is evaluated: a literal other than a regular expression (each
  * evaluation of which makes a new object), a template literal with no
  * expression, `undefined`, a `const` or an import, or `-`, `+`, `!` or `void`
  * of one of those.

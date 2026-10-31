@@ -4,8 +4,8 @@ import { issuesViewStore } from '../store/index.mjs';
 
 /**
  * The list or the DAG: two buttons side by side, the pressed one
- * (`aria-pressed`) being what the block shows — the theme switch's
- * segmented control (`theme-switch.tsx`), for the same reasons.
+ * (`aria-pressed`) being what the block shows — the theme switch's segmented
+ * control (`theme-switch.tsx`), for the same reasons.
  */
 export const IssuesViewSwitch = (): JSX.Element => (
   <fieldset

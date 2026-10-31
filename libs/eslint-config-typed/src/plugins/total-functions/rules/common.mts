@@ -70,8 +70,8 @@ export const isLiteral = (
       Arr.isEmpty(sourceNode.properties)
     : // empty object literal: []
       //
-      // TODO: handle recursive case for both arrays and objects and
-      // permit literals such as string and numbers as properties
+      // TODO: handle recursive case for both arrays and objects and permit
+      // literals such as string and numbers as properties
       sourceNode.type === AST_NODE_TYPES.ArrayExpression &&
         Arr.isEmpty(sourceNode.elements);
 };

@@ -9,9 +9,9 @@ import { runCheck } from '../src/index.mjs';
 const projectRootPath = path.resolve(import.meta.dirname, '..');
 
 /**
- * End to end: a throwaway project per case, its tsconfig extending the base
- * one by path (a package name would need a node_modules), and the real
- * native tsc and oxlint spawned.
+ * End to end: a throwaway project per case, its tsconfig extending the base one
+ * by path (a package name would need a node_modules), and the real native tsc
+ * and oxlint spawned.
  */
 const baseTsconfigPath = path.join(projectRootPath, 'tsconfig.base.json');
 
@@ -96,8 +96,8 @@ describe(runCheck, () => {
     assert.strictEqual(result.value.ok, false);
 
     assert.deepStrictEqual(
-      // The full path, not the basename: the compiler prints paths relative
-      // to its working directory, which is not this test's.
+      // The full path, not the basename: the compiler prints paths relative to
+      // its working directory, which is not this test's.
       result.value.typeCheck.diagnostics.map((d) => [
         d.filename,
         d.line,

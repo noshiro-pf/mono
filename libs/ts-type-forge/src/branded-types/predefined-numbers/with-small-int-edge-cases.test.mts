@@ -56,11 +56,11 @@ import type { Uint16 } from './uint16.mjs';
 
   // WithSmallInt<never> behavior:
   // Since CastToInt<never> = never (asserted inline in src/branded-types/small-int.mts),
-  // WithSmallInt passes never to WithSmallIntImpl. The behavior depends on
-  // how TypeScript handles never in conditional types. This is a known edge
-  // case where WithSmallInt<never> might not produce never. For practical
-  // purposes, this is acceptable since never types shouldn't occur in real
-  // usage of integer types.
+  // WithSmallInt passes never to WithSmallIntImpl. The behavior depends on how
+  // TypeScript handles never in conditional types. This is a known edge case
+  // where WithSmallInt<never> might not produce never. For practical purposes,
+  // this is acceptable since never types shouldn't occur in real usage of
+  // integer types.
 }
 
 // Test edge case: custom branded integer type

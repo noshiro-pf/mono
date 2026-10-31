@@ -53,8 +53,8 @@ export type BenchmarkStats = Readonly<{
 /**
  * Renders one measurement as the Markdown table shows it.
  *
- * Shared rather than repeated per runner so that the timeout spelling — which
- * a reader sees and which `null` stands for in the JSON — has one definition.
+ * Shared rather than repeated per runner so that the timeout spelling — which a
+ * reader sees and which `null` stands for in the JSON — has one definition.
  */
 export const formatBenchmarkCell = (
   value: number | null,
@@ -71,8 +71,8 @@ export const formatBenchmarkCell = (
  *
  * The last column divides each median by SynState's, so that a reader of a
  * table with no chart beside it sees how many times as long each library took
- * without doing the division — the figure the home page quotes from the
- * derived chain. SynState's row reads `1.00×`.
+ * without doing the division — the figure the home page quotes from the derived
+ * chain. SynState's row reads `1.00×`.
  */
 export const renderStatsTable = (rows: readonly BenchmarkStats[]): string => {
   const synState = rows.find((r) => plainLabel(r.label) === 'SynState');
@@ -205,18 +205,18 @@ const padCell = (
 /**
  * Pads a pipe table's cells so that its columns line up.
  *
- * The runners build their tables by hand, and a column wide enough for one
- * run is not wide enough for the next: a re-measurement that pushed
- * `Ops/sec` from seven digits to eight left the pipes ragged, and both
- * `check:md` (MD060, table-column-style) and Prettier rejected the file. The
- * pass that would have fixed it is `pnpm run fmt`, which is exactly the step a
+ * The runners build their tables by hand, and a column wide enough for one run
+ * is not wide enough for the next: a re-measurement that pushed `Ops/sec` from
+ * seven digits to eight left the pipes ragged, and both `check:md` (MD060,
+ * table-column-style) and Prettier rejected the file. The pass that would have
+ * fixed it is `pnpm run fmt`, which is exactly the step a
  * re-measurement commit forgets — it had to be remembered twice before this
  * moved here.
  *
  * What it writes is what Prettier writes, verified cell for cell against
  * `prettier --write` on all five results files: each column as wide as its
- * widest cell and at least three, the separator filled with dashes carrying
- * the alignment's colons, and every cell padded to its column's alignment.
+ * widest cell and at least three, the separator filled with dashes carrying the
+ * alignment's colons, and every cell padded to its column's alignment.
  * So `fmt` over a freshly generated file is a no-op rather than a diff.
  *
  * Widths are counted in code units, which is right while every cell is a
@@ -288,12 +288,12 @@ const toHundredths = (value: number): number =>
 /**
  * Brings the JSON into line with the table rendered beside it.
  *
- * Two differences would otherwise creep in. A runner labels its own row for
- * the table — `**SynState**` — and that emphasis is a rendering choice, not
- * part of the library's name. And a raw measurement carries every digit the
- * clock produced, so the JSON would disagree with the table it was written
- * with and would churn the diff on every run; each value is rounded to the
- * precision its table column shows, and a sweep's values to one digit more.
+ * Two differences would otherwise creep in. A runner labels its own row for the
+ * table — `**SynState**` — and that emphasis is a rendering choice, not part of
+ * the library's name. And a raw measurement carries every digit the clock
+ * produced, so the JSON would disagree with the table it was written with and
+ * would churn the diff on every run; each value is rounded to the precision its
+ * table column shows, and a sweep's values to one digit more.
  * A sweep's cell shows tenths of a millisecond, and the fastest row of the
  * cascaded diamond is a few tenths: it is the denominator of that scenario's
  * ratios, which a tenth would move by up to half.

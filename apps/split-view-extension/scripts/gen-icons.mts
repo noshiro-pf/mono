@@ -10,15 +10,15 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  *
  * PNG, because that is the only thing the manifest's `icons` takes, and drawn
  * here rather than kept as four hand-made files so that the shape has one
- * definition — `extensionIcon`, which the tab's favicon draws too. There is
- * no image library in the dependency tree and no need for one: the icon is a
- * rounded square with four panes in it, which is arithmetic, and `node:zlib`
- * is the only thing a PNG needs beyond that.
+ * definition — `extensionIcon`, which the tab's favicon draws too. There is no
+ * image library in the dependency tree and no need for one: the icon is a
+ * rounded square with four panes in it, which is arithmetic, and `node:zlib` is
+ * the only thing a PNG needs beyond that.
  *
  * The four panes are the layout the extension opens in, and they are what has
- * to survive being drawn at 16px — hence 2x2 rather than anything cleverer,
- * and hence the supersampling, which is what keeps the corners from looking
- * chewed at that size.
+ * to survive being drawn at 16px — hence 2x2 rather than anything cleverer, and
+ * hence the supersampling, which is what keeps the corners from looking chewed
+ * at that size.
  */
 const main = (): void => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -51,8 +51,8 @@ const subsampleStep = Num.div(1, samples);
  * What one subsample contributes to the pixel it is in.
  *
  * Guarded rather than written as `1 / 16`, so that it follows `samples`: the
- * safe divide takes a literal or a number known to be non-zero, and the
- * product of two constants is neither as far as the types are concerned.
+ * safe divide takes a literal or a number known to be non-zero, and the product
+ * of two constants is neither as far as the types are concerned.
  */
 const subsampleCount = samples ** 2;
 

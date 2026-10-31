@@ -85,8 +85,8 @@ export const preferArrIsMinLengthArray: TSESLint.RuleModule<
         mut_nodesToFix.push({
           node,
           arrayExpression,
-          // The literal or constant itself: a wrapper such as `as number`
-          // would only widen the length the guard narrows to.
+          // The literal or constant itself: a wrapper such as `as number` would
+          // only widen the length the guard narrows to.
           lengthExpression: skipTypeWrappers(valueSide),
         });
       },

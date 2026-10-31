@@ -2,30 +2,30 @@
  * How the issues block shows the open issues: as the list, or as the DAG of
  * what each waits for (`Start-After:`).
  *
- * The DAG leaves out what is done (`omitDone`), so that what is left to do
- * is all it lays out — what is done is closed or merged, and is read only
- * for how an issue that names it stands; what is labelled `pending`
- * (`omitPending`) when it is switched off, since what is held back for now
- * is not what is left to do; and the issues the priorities, `pending`
- * and `in progress` leave out (`omitFilteredIssues`), which both views read
- * (`issues-list-store.mts`), with how many issues each of them has drawn of
- * how many are open. The view starts as `initial`, which the page reads off
- * the query string as it opens (`issues-view-settings.mts`), and every
- * change is handed to `save` from `start` on.
+ * The DAG leaves out what is done (`omitDone`), so that what is left to do is
+ * all it lays out — what is done is closed or merged, and is read only for how
+ * an issue that names it stands; what is labelled `pending` (`omitPending`)
+ * when it is switched off, since what is held back for now is not what is left
+ * to do; and the issues the priorities, `pending` and `in progress` leave out
+ * (`omitFilteredIssues`), which both views read (`issues-list-store.mts`), with
+ * how many issues each of them has drawn of how many are open. The view starts
+ * as `initial`, which the page reads off the query string as it opens
+ * (`issues-view-settings.mts`), and every change is handed to `save` from
+ * `start` on.
  *
  * Every open issue is read, in either view: the first thirty come with the
- * report, so that the block has something to show as soon as the rest of
- * the page does, and each page that is left is asked for as soon as the one
- * before has come in. The DAG needs all of them, because a graph of the most
- * recently updated thirty draws an edge to an issue it does not list as if
- * that issue declared nothing; and the list's priorities and labels
+ * report, so that the block has something to show as soon as the rest of the
+ * page does, and each page that is left is asked for as soon as the one before
+ * has come in. The DAG needs all of them, because a graph of the most recently
+ * updated thirty draws an edge to an issue it does not list as if that issue
+ * declared nothing; and the list's priorities and labels
  * (`issues-list-store.mts`) would otherwise filter and sort a page rather
  * than what is open. A page that failed is not asked for again on its own;
  * the button under the block is still there for that.
  *
- * How large the DAG is drawn (`dag-zoom.mts`) is kept the same way, under
- * a parameter of its own: it starts at `initialZoom`, and every change is
- * handed to `saveZoom`.
+ * How large the DAG is drawn (`dag-zoom.mts`) is kept the same way, under a
+ * parameter of its own: it starts at `initialZoom`, and every change is handed
+ * to `saveZoom`.
  *
  * The fit is a way of drawing rather than a scale, so that it keeps the whole
  * graph in the box as the box is resized and as the graph gains or loses nodes,
@@ -36,10 +36,10 @@
  * arrangement, and the natural size puts them back in the default one.
  *
  * The whole graph is {@link createIssueGraph}'s, which the list reads each
- * issue's start state off too. The graph the DAG draws, and where each of
- * its nodes goes, are derived here from it and those switches, and passed
- * on only when they changed: a poll that moved a pull request's checks
- * changes the entries, not the graph, and lays nothing out again.
+ * issue's start state off too. The graph the DAG draws, and where each of its
+ * nodes goes, are derived here from it and those switches, and passed on only
+ * when they changed: a poll that moved a pull request's checks changes the
+ * entries, not the graph, and lays nothing out again.
  */
 
 import {
@@ -119,9 +119,9 @@ export type IssuesViewStore = Readonly<{
   graph: InitializedObservable<IssueGraph>;
   layout: InitializedObservable<IssueGraphLayout>;
   /**
-   * How many open issues the DAG draws, of how many there are, in all, for
-   * each priority, for `pending` and for `in progress`, counted as the list
-   * counts its own.
+   * How many open issues the DAG draws, of how many there are, in all, for each
+   * priority, for `pending` and for `in progress`, counted as the list counts
+   * its own.
    */
   counts: InitializedObservable<IssueFilterCounts>;
   /** What the layout's units are multiplied by to draw the DAG. */
@@ -138,8 +138,8 @@ export type IssuesViewStore = Readonly<{
   /** Back to the natural size. */
   resetZoom: () => void;
   /**
-   * Saves every change, and reads every page of the open issues, from now
-   * on; returns what stops both.
+   * Saves every change, and reads every page of the open issues, from now on;
+   * returns what stops both.
    */
   start: () => () => void;
 }>;
@@ -207,9 +207,9 @@ export const createIssuesViewStore = (
 
   const parts = graph.pipe(map(layoutConnected));
 
-  // While fitted, where the nodes with no edge go follows the box; a zoom
-  // from the fit keeps where they went, so that the graph only grows or
-  // shrinks, and 100% puts them back under the rest.
+  // While fitted, where the nodes with no edge go follows the box; a zoom from
+  // the fit keeps where they went, so that the graph only grows or shrinks, and
+  // 100% puts them back under the rest.
   const [kept, setKept] = createState<GridPlacement | undefined>(undefined);
 
   const placement = combine([parts, zoom, dagBox, kept])
@@ -264,11 +264,10 @@ export const createIssuesViewStore = (
 };
 
 /**
- * The open issues as the graph of what each waits for (`issue-graph.mts`),
- * what is done included, since that is why an issue reads as ready: what
- * the DAG draws from (`createIssuesViewStore`) and what the list reads each
- * issue's start state off (`issues-list-store.mts`). Passed on only when it
- * changed.
+ * The open issues as the graph of what each waits for (`issue-graph.mts`), what
+ * is done included, since that is why an issue reads as ready: what the DAG
+ * draws from (`createIssuesViewStore`) and what the list reads each issue's
+ * start state off (`issues-list-store.mts`). Passed on only when it changed.
  */
 export const createIssueGraph = ({
   issues,

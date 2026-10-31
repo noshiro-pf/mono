@@ -16,8 +16,8 @@ import {
 /**
  * Narrows a primitive type by a predicate.
  *
- * The constraint values the base type carries (see
- * {@link WithConstraints}) are carried over to the refined type, so that
+ * The constraint values the base type carries (see {@link WithConstraints}) are
+ * carried over to the refined type, so that
  * `t.refine({ baseType: t.number(0, { min: 0, max: 10 }), ... }).constraints`
  * still reads `min` and `max`. `C` is inferred from `baseType.constraints`;
  * refining a base type that carries none adds no `constraints` property.

@@ -115,8 +115,8 @@ const isChainOperand = (
   parenthesesDepth(sourceCode, node) === 0;
 
 /**
- * The operands of the `&&` chain `node`, left to right. A parenthesized `&&`
- * is one operand: its halves cannot be replaced without its parentheses.
+ * The operands of the `&&` chain `node`, left to right. A parenthesized `&&` is
+ * one operand: its halves cannot be replaced without its parentheses.
  */
 const chainOperands = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -179,8 +179,8 @@ const getTypeofObjectIdentifierName = (
 
 /**
  * `u` of `u !== null`, in either operand order. `u != null` also excludes
- * `undefined`, which `typeof u === 'object'` has already excluded, so it is
- * the same check here.
+ * `undefined`, which `typeof u === 'object'` has already excluded, so it is the
+ * same check here.
  */
 const getNonNullCheckIdentifierName = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -207,8 +207,8 @@ const getNonNullCheckIdentifierName = (
 };
 
 /**
- * The name of `u` when `typeofCheck` is `typeof u === 'object'` and
- * `nullCheck` is `u !== null` for the same `u`.
+ * The name of `u` when `typeofCheck` is `typeof u === 'object'` and `nullCheck`
+ * is `u !== null` for the same `u`.
  */
 const pairIdentifierName = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

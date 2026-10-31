@@ -26,8 +26,8 @@ const transformerFactories = {
 } as const;
 
 /**
- * The names `--transformer` accepts, in the order `--help` lists them. They
- * are the transformers' own `name` fields, which is also what a
+ * The names `--transformer` accepts, in the order `--help` lists them. They are
+ * the transformers' own `name` fields, which is also what a
  * `transformer-ignore` comment names. `satisfies` ties the list to the
  * factories above: a name with no factory does not compile.
  */

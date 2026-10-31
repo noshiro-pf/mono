@@ -11,10 +11,10 @@ import { projectRootPath } from '../project-root-path.mjs';
  * pin wherever it is run from, and corepack walks up past a manifest without
  * the field until it finds one. A member's copy is therefore dead, and
  * `pnpm-update.yml` — whose `pnpm self-update` rewrites the root's alone —
- * leaves it to rot, so eleven packages, most of them published, went on
- * naming `pnpm@11.20.0` long after the repository moved to 12. Packages
- * imported from standalone repositories are how one arrives; delete it there
- * rather than teaching the update to keep it in step.
+ * leaves it to rot, so eleven packages, most of them published, went on naming
+ * `pnpm@11.20.0` long after the repository moved to 12. Packages imported from
+ * standalone repositories are how one arrives; delete it there rather than
+ * teaching the update to keep it in step.
  */
 export const checkPackageManager = async (): Promise<
   Result<number, string>

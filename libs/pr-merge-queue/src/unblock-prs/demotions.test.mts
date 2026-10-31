@@ -27,9 +27,9 @@ describe(afterWatch, () => {
     }
   });
 
-  // The watch may end on a head this run pushed — a fixer's diff amended
-  // onto the branch — and a demotion that stayed on the old head would be
-  // cleared by the next survey as if someone else had pushed.
+  // The watch may end on a head this run pushed — a fixer's diff amended onto
+  // the branch — and a demotion that stayed on the old head would be cleared by
+  // the next survey as if someone else had pushed.
   test('keeps a demotion on the head the watch ended on', () => {
     assert.deepStrictEqual(
       afterWatch(
@@ -70,9 +70,9 @@ describe(pruneDemotions, () => {
     [3, 'a'.repeat(40)],
   ]);
 
-  // The base moving is not among what clears it: that is exactly when a
-  // pull request that sat green is rebased again, and the point of the
-  // demotion is that it waits behind the rest when that happens.
+  // The base moving is not among what clears it: that is exactly when a pull
+  // request that sat green is rebased again, and the point of the demotion is
+  // that it waits behind the rest when that happens.
   test('keeps a demotion for as long as nobody else pushes', () => {
     const kept = pruneDemotions(demoted, [
       pullRequest({ number: 1 }),

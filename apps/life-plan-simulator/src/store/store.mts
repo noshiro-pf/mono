@@ -3,8 +3,8 @@ import { createPlanStore } from './plan-store.mjs';
 import { createSessionStore } from './session-store.mjs';
 import { createThemeStore } from './theme-store.mjs';
 
-// The page's one instance of each store. The factories take what they need,
-// so that the tests can build their own.
+// The page's one instance of each store. The factories take what they need, so
+// that the tests can build their own.
 
 export const sessionStore = createSessionStore();
 
@@ -55,8 +55,8 @@ export const themeStore = createThemeStore({
       try {
         localStorage.setItem(themeKey, setting);
       } catch {
-        // Storage may be unavailable (private mode); the system's theme is
-        // used next time.
+        // Storage may be unavailable (private mode); the system's theme is used
+        // next time.
       }
     },
   },

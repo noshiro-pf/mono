@@ -30,8 +30,8 @@ if (import.meta.vitest !== undefined) {
   test('diamond-dependency benchmark (RxJS)', () => {
     const result = runBenchmark(1000);
 
-    // RxJS combineLatest causes glitches in diamond dependencies,
-    // but the final value is still correct.
+    // RxJS combineLatest causes glitches in diamond dependencies, but the final
+    // value is still correct.
     assert.strictEqual(result, 1000 * 5);
   });
 }

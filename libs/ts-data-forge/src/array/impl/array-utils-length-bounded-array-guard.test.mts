@@ -166,8 +166,8 @@ describe(isFixedLengthArray, () => {
 
     expectType<typeof value, FixedLengthArray<4, number>>('!<=');
 
-    // `length` is narrowed to the literal and in-range indexed access does
-    // not include `undefined` (even under `noUncheckedIndexedAccess`)
+    // `length` is narrowed to the literal and in-range indexed access does not
+    // include `undefined` (even under `noUncheckedIndexedAccess`)
     const _len = value.length;
 
     expectType<typeof _len, 3>('=');

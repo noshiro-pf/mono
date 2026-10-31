@@ -7,27 +7,26 @@ import type { Entry } from './load-report.mjs';
  * conversation on the right at 7:3. When the pull request closes an issue or
  * names the Claude Code session it was written in, the right half is shared
  * with it at 1:1 — the conversation beside the issue, the session beside the
- * conversation — and with both, the issue beside the conversation stacked
- * over the session. The session is next to the diff unless the issue is
- * there too.
+ * conversation — and with both, the issue beside the conversation stacked over
+ * the session. The session is next to the diff unless the issue is there too.
  *
  * Only the first issue and the first session are shown. A pull request that
  * names several is rare enough that another pane, narrower than anything is
  * readable in, is not worth drawing for it.
  *
  * The conversation and the issue are shown at 75% when they share the right
- * half, so that more of each fits in a pane narrower than GitHub lays them
- * out for; the conversation alone in the right 30% is wide enough to stay at
- * 100%, as the diff and the session always do.
+ * half, so that more of each fits in a pane narrower than GitHub lays them out
+ * for; the conversation alone in the right 30% is wide enough to stay at 100%,
+ * as the diff and the session always do.
  *
  * The tab is titled `#<number> <title>`, as a tab of the pull request on
  * GitHub would be with the number first.
  *
- * Every link names the same saved split view, `ws=pr-manager`, so that
- * opening one pull request after another replaces what that entry holds
- * rather than adding an entry per pull request to the extension's list. A tab
- * already open on an earlier pull request keeps showing it: the extension
- * shows what a tab's own URL describes, over what is saved.
+ * Every link names the same saved split view, `ws=pr-manager`, so that opening
+ * one pull request after another replaces what that entry holds rather than
+ * adding an entry per pull request to the extension's list. A tab already open
+ * on an earlier pull request keeps showing it: the extension shows what a tab's
+ * own URL describes, over what is saved.
  */
 export const splitViewUrl = (entry: SplitViewSource): string => {
   const issueUrl = entry.linkedIssues[0]?.url;
@@ -102,9 +101,9 @@ const extensionId = 'nifmgpafbfpgpcijgmfpcoonjbalbkhf';
 
 /**
  * Reachable from this page only because the extension's manifest lists
- * `split.html` in `web_accessible_resources` for `noshiro-pf.github.io` and,
- * in its development build only, for this app's dev server port. From any
- * other origin Chrome blocks the navigation with `ERR_BLOCKED_BY_CLIENT`.
+ * `split.html` in `web_accessible_resources` for `noshiro-pf.github.io` and, in
+ * its development build only, for this app's dev server port. From any other
+ * origin Chrome blocks the navigation with `ERR_BLOCKED_BY_CLIENT`.
  */
 const splitViewPageUrl =
   `chrome-extension://${extensionId}/split.html` as const;
@@ -121,11 +120,11 @@ const diffQuery = 'w=1&show-viewed-files=false';
 
 /**
  * The diff, the middle column and the right column at 2:1:1, as the diff and
- * the middle column in the left three quarters beside the right column, so
- * that closing the middle pane widens the diff. The ratios are not 75% and
- * 2/3 because of the 6px gutters: these keep each column within 2px of the
- * width it had as half the page beside a halved right half, at window widths
- * from 1024px to 3840px.
+ * the middle column in the left three quarters beside the right column, so that
+ * closing the middle pane widens the diff. The ratios are not 75% and 2/3
+ * because of the 6px gutters: these keep each column within 2px of the width it
+ * had as half the page beside a halved right half, at window widths from 1024px
+ * to 3840px.
  */
 const threeColumns = 'r75.1r66.8ppp';
 

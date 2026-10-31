@@ -1,40 +1,39 @@
 /**
- * The DAG's layout: the automatic one, computed by ELK, and the arrangement
- * — the direction and where the reader put each node — drawn over it.
+ * The DAG's layout: the automatic one, computed by ELK, and the arrangement —
+ * the direction and where the reader put each node — drawn over it.
  *
- * ELK runs asynchronously, and only when the DAG is shown and its structure
- * or direction has changed since the last run (`layoutKey`). A progress
- * change, a renamed task, a tick of the clock or a node moved by hand lays
- * nothing out again. While a new layout is being computed the previous one
- * stays on screen; a result that has been overtaken by a newer request is
- * dropped.
+ * ELK runs asynchronously, and only when the DAG is shown and its structure or
+ * direction has changed since the last run (`layoutKey`). A progress change, a
+ * renamed task, a tick of the clock or a node moved by hand lays nothing out
+ * again. While a new layout is being computed the previous one stays on screen;
+ * a result that has been overtaken by a newer request is dropped.
  *
- * Every change to the arrangement is saved with every node where it is
- * shown — put by hand, or by ELK if it never was — so that what is on the
+ * Every change to the arrangement is saved with every node where it is shown —
+ * put by hand, or by ELK if it never was — so that what is on the
  * screen is what is stored (at 「大」, spread out: see below), and a node
- * never moves because ELK, laying out
- * a changed graph or a new direction, would put it elsewhere. Until the
- * reader changes something nothing is written, and the direction follows the
- * screen. A drag is saved when it is dropped; the arrow keys, after a pause.
+ * never moves because ELK, laying out a changed graph or a new direction, would
+ * put it elsewhere. Until the reader changes something nothing is written, and
+ * the direction follows the screen. A drag is saved when it is dropped; the
+ * arrow keys, after a pause.
  *
  * The exception is a DAG that 「自動整列」 left as it was: when a node or an
  * edge is added or removed, and nothing has moved since, ELK's layout of the
  * changed graph is applied as 「自動整列」 applies it, so that it stays laid
- * out. Otherwise a node new to the graph is put beside the nodes it is
- * joined to and clear of every other (`placeNodes`), and saved there.
+ * out. Otherwise a node new to the graph is put beside the nodes it is joined
+ * to and clear of every other (`placeNodes`), and saved there.
  *
- * The nodes move to their places in a short animation, which is never
- * saved: from a grid, in the order they were made, the first time the DAG
+ * The nodes move to their places in a short animation, which is never saved:
+ * from a grid, in the order they were made, the first time the DAG
  * is shown with something in it; from where they were, after 「自動整列」 or
  * when a layout saved elsewhere arrives while the DAG is shown — not for a
  * drag, the arrow keys or a change of direction alone. While it plays,
- * `animatedPositions` says where each node is drawn; a press on the canvas
- * ends it (`finishAnimation`). Whether it plays at all is the reader's
+ * `animatedPositions` says where each node is drawn; a press on the canvas ends
+ * it (`finishAnimation`). Whether it plays at all is the reader's
  * animation setting: 「自動」 leaves it out for a reader who asks the system
  * for less motion, 「オン」 and 「オフ」 decide regardless. Whatever the
- * setting, it stops with every node in its place as soon as its frames come
- * too slowly (`dag/frame-budget.mts`): a device that cannot keep up is
- * better served by the end state at once.
+ * setting, it stops with every node in its place as soon as its frames come too
+ * slowly (`dag/frame-budget.mts`): a device that cannot keep up is better
+ * served by the end state at once.
  *
  * The view mode (`view-model/dag-view-mode.mts`) says where the nodes are
  * drawn: in 「DAG」 as above; in 「アーク」 the tasks, in a column in the
@@ -42,8 +41,8 @@
  * `dag/arc-layout.mts`); in 「タイル」 the tasks alone, in that order, in
  * rows as wide as the canvas (`tileNodes`), which the canvas reports
  * (`setTileWidth`) — a new width moves them to their new rows in the same
- * animation. The order is worked out again whenever the order chosen, the
- * data or the time (`stateTime`, for an order by status) changes; in
+ * animation. The order is worked out again whenever the order chosen, the data
+ * or the time (`stateTime`, for an order by status) changes; in
  * 「アーク」 and 「タイル」, a new order moves the nodes to their new places
  * in the same animation, which asks for no fit and writes nothing.
  * Changing the mode moves the nodes from where they are drawn to where the
@@ -64,8 +63,8 @@
  * stay clear; a move made at 「大」 is saved gathered back. Nothing is saved
  * for a new size.
  *
- * ELK lays out the milestones that have a date in order of date: the graph
- * it is given has an edge from each to those of the next date
+ * ELK lays out the milestones that have a date in order of date: the graph it
+ * is given has an edge from each to those of the next date
  * (`withChronologicalEdges`), which the DAG draws dashed. A date changed
  * changes the structure, and so lays the DAG out again as any edge does.
  *
@@ -76,12 +75,12 @@
  *
  * The groups (`dag/group-frames.mts`) are drawn in 「DAG」 alone, as frames
  * round their nodes: ELK lays each one out as a whole, and a new node is put
- * beside the others of its group. Every change to the arrangement saves
- * where each frame is, which is where an empty one stays. A node dropped
- * into another frame, or out of every frame, is moved to that group, or to
- * none (`dropNode`), and a frame dragged by its title moves its nodes with
- * it (`moveGroup`). A node moved to another group in its dialog is put
- * again, as a new node is, beside the others of its new group.
+ * beside the others of its group. Every change to the arrangement saves where
+ * each frame is, which is where an empty one stays. A node dropped into another
+ * frame, or out of every frame, is moved to that group, or to none
+ * (`dropNode`), and a frame dragged by its title moves its nodes with it
+ * (`moveGroup`). A node moved to another group in its dialog is put again, as a
+ * new node is, beside the others of its new group.
  */
 
 import {
@@ -164,8 +163,8 @@ export type DagLayoutState = Readonly<
 >;
 
 /**
- * `H` is whatever `setTimer` hands back for `clearTimer` to take, and `F`
- * what `requestFrame` hands back for `cancelFrame`.
+ * `H` is whatever `setTimer` hands back for `clearTimer` to take, and `F` what
+ * `requestFrame` hands back for `cancelFrame`.
  */
 export type DagLayoutDeps<H, F> = Readonly<{
   state: InitializedObservable<DomainState>;
@@ -193,8 +192,8 @@ export type DagLayoutDeps<H, F> = Readonly<{
   animationMs: number;
   now: () => number;
   /**
-   * Calls `callback` before the next frame is drawn. The time between these,
-   * by `now`, is what judges whether the animation is too slow to go on.
+   * Calls `callback` before the next frame is drawn. The time between these, by
+   * `now`, is what judges whether the animation is too slow to go on.
    */
   requestFrame: (callback: () => void) => F;
   cancelFrame: (handle: F) => void;
@@ -206,8 +205,8 @@ export type DagLayoutDeps<H, F> = Readonly<{
    */
   diagramSort: InitializedObservable<readonly SortSpec[]>;
   /**
-   * The time the page shows the state at (`clock-store.mts`), which a
-   * task's status, and so an order by status, depends on.
+   * The time the page shows the state at (`clock-store.mts`), which a task's
+   * status, and so an order by status, depends on.
    */
   stateTime: InitializedObservable<number>;
   /** How big the nodes are drawn, in every mode. */
@@ -237,8 +236,8 @@ export type DagLayoutStore = Readonly<{
     ReadonlyMap<GraphNodeId, Point> | undefined
   >;
   /**
-   * How opaque each node that one of two view modes does not draw is, while
-   * the nodes move from one mode to the other, and `undefined` otherwise:
+   * How opaque each node that one of two view modes does not draw is, while the
+   * nodes move from one mode to the other, and `undefined` otherwise:
    * whether the view is changing mode.
    */
   animatedOpacities: InitializedObservable<
@@ -265,16 +264,15 @@ export type DagLayoutStore = Readonly<{
   /** Puts every node moving to its place there at once. */
   finishAnimation: () => void;
   /**
-   * Every group, with the nodes in it that are drawn
-   * (`dag/group-frames.mts`).
+   * Every group, with the nodes in it that are drawn (`dag/group-frames.mts`).
    */
   membership: InitializedObservable<readonly LayoutGroup[]>;
   /** A node dropped at `position`, which is saved at once. */
   moveNode: (id: GraphNodeId, position: Point) => void;
   /**
-   * A node dropped at `position` into the group `into`, or into none: saved
-   * at once, and moved to that group if it was not in it. The frame of the
-   * group it leaves stays where it was if nothing is left in it.
+   * A node dropped at `position` into the group `into`, or into none: saved at
+   * once, and moved to that group if it was not in it. The frame of the group
+   * it leaves stays where it was if nothing is left in it.
    */
   dropNode: (
     id: GraphNodeId,
@@ -282,13 +280,13 @@ export type DagLayoutStore = Readonly<{
     into: GroupId | undefined,
   ) => void;
   /**
-   * The frame of the group `id` dragged to `position`, its top-left
-   * corner: its nodes moved as far, and saved at once.
+   * The frame of the group `id` dragged to `position`, its top-left corner: its
+   * nodes moved as far, and saved at once.
    */
   moveGroup: (id: GroupId, position: Point) => void;
   /**
-   * The nodes `ids` — those selected — dragged together by `delta`: saved
-   * at once, each staying in its group, whose frame follows it.
+   * The nodes `ids` — those selected — dragged together by `delta`: saved at
+   * once, each staying in its group, whose frame follows it.
    */
   moveNodes: (ids: readonly GraphNodeId[], delta: Point) => void;
   /** A node moved by `delta` with the keys, saved after a pause. */
@@ -304,13 +302,13 @@ export type DagLayoutStore = Readonly<{
 export const createDagLayoutStore = <H, F>(
   deps: DagLayoutDeps<H, F>,
 ): DagLayoutStore => {
-  // What the store hands out is kept in these variables, which everything
-  // below reads and writes as it goes, and handed out as observables derived
-  // from them (`published`). A change of an input is followed by a node
-  // derived from that input, not by a subscriber of it: written from a
-  // subscriber, the observables would be written while that change is still
-  // propagating. What the store does on its own — an action, a frame, a
-  // timer, a layout coming back — is handed out by `publish`.
+  // What the store hands out is kept in these variables, which everything below
+  // reads and writes as it goes, and handed out as observables derived from
+  // them (`published`). A change of an input is followed by a node derived from
+  // that input, not by a subscriber of it: written from a subscriber, the
+  // observables would be written while that change is still propagating. What
+  // the store does on its own — an action, a frame, a timer, a layout coming
+  // back — is handed out by `publish`.
   let mut_autoLayout: DagLayoutState = { type: 'idle' } as const;
 
   // The arrangement as stored, which is as made at 「標準」.
@@ -319,9 +317,9 @@ export const createDagLayoutStore = <H, F>(
     deps.defaultDirection.getSnapshot().value,
   );
 
-  // The node size `mut_arrangement` is drawn at: that of the automatic
-  // layout drawn with it, so that a new size moves nothing before ELK has
-  // laid the graph out at it, and then everything together (`resize`).
+  // The node size `mut_arrangement` is drawn at: that of the automatic layout
+  // drawn with it, so that a new size moves nothing before ELK has laid the
+  // graph out at it, and then everything together (`resize`).
   let mut_drawnAt: NodeSize = deps.nodeSize.getSnapshot().value;
 
   // `mut_stored` as drawn at `mut_drawnAt`, spread out at 「大」
@@ -344,9 +342,9 @@ export const createDagLayoutStore = <H, F>(
 
   const [acted, publish] = createEventEmitter();
 
-  // While `start` has been called and its stop has not. The inputs are
-  // followed only then: what follows them is derived from this, so that
-  // stopping disposes it.
+  // While `start` has been called and its stop has not. The inputs are followed
+  // only then: what follows them is derived from this, so that stopping
+  // disposes it.
   const [started, setStarted] = createState(false);
 
   const whileStarted = (
@@ -409,8 +407,8 @@ export const createDagLayoutStore = <H, F>(
    * Where the nodes of the DAG move from once the layout being computed is
    * there, and `undefined` while none waits for it: where the DAG drew them
    * before the node size changed, or where the view drew them as it was
-   * switched to the DAG — before ELK had laid it out once, or while it lays
-   * out a node added since, or the graph at a new size.
+   * switched to the DAG — before ELK had laid it out once, or while it lays out
+   * a node added since, or the graph at a new size.
    */
   let mut_awaitingFrom: ReadonlyMap<GraphNodeId, Point> | undefined = undefined;
 
@@ -442,9 +440,9 @@ export const createDagLayoutStore = <H, F>(
   let mut_introduced = false;
 
   /**
-   * The group each node dropped into another one was moved to, until the
-   * graph is laid out with it there: a node that changes group otherwise is
-   * put again (`followStructure`).
+   * The group each node dropped into another one was moved to, until the graph
+   * is laid out with it there: a node that changes group otherwise is put again
+   * (`followStructure`).
    */
   const mut_dropped = new Map<GraphNodeId, GroupId | undefined>();
 
@@ -460,9 +458,9 @@ export const createDagLayoutStore = <H, F>(
   };
 
   /**
-   * Every node of the layout on screen, at the current size — which the
-   * layout may not have been made at yet — where the DAG draws it with
-   * `positions` stored (`placeNodes`).
+   * Every node of the layout on screen, at the current size — which the layout
+   * may not have been made at yet — where the DAG draws it with `positions`
+   * stored (`placeNodes`).
    */
   const placedWith = (
     positions: ReadonlyMap<GraphNodeId, Point>,
@@ -500,11 +498,11 @@ export const createDagLayoutStore = <H, F>(
     );
 
   /**
-   * `next` with a position for every node there is: where it was put, or
-   * where the DAG draws it now — or, for the nodes `replaced`, where it
-   * draws them with `next`; and for every group of `members` — those there
-   * are, unless given — where its frame is drawn. Positions of nodes and
-   * groups that are gone are dropped here.
+   * `next` with a position for every node there is: where it was put, or where
+   * the DAG draws it now — or, for the nodes `replaced`, where it draws them
+   * with `next`; and for every group of `members` — those there are, unless
+   * given — where its frame is drawn. Positions of nodes and groups that are
+   * gone are dropped here.
    */
   const frozen = (
     next: DagLayout,
@@ -643,9 +641,9 @@ export const createDagLayoutStore = <H, F>(
     );
 
   /**
-   * The nodes moving from `from` — or from where they are drawn, if they
-   * are moving already — to `to`, and those of `fade` fading as it says, or
-   * from how opaque they are drawn.
+   * The nodes moving from `from` — or from where they are drawn, if they are
+   * moving already — to `to`, and those of `fade` fading as it says, or from
+   * how opaque they are drawn.
    */
   const animate = (
     from: ReadonlyMap<GraphNodeId, Point>,
@@ -807,14 +805,14 @@ export const createDagLayoutStore = <H, F>(
 
   /**
    * The graph laid out as `laidOut` after a change to its structure, the
-   * direction and the node size staying as they were for `previous`, the
-   * layout on screen until now. If the DAG was drawn as ELK laid out
+   * direction and the node size staying as they were for `previous`, the layout
+   * on screen until now. If the DAG was drawn as ELK laid out
    * `previous` — no node moved since 「自動整列」, or since the last such
    * change — it is laid out again, as 「自動整列」 does. Otherwise every node
-   * new to the graph that was never put anywhere is saved where the DAG
-   * draws it, clear of the others (`placeNodes`), so that it stays there
-   * however ELK lays out the graph next — and so is every node that moved
-   * to another group, other than by a drop, put again as if it were new.
+   * new to the graph that was never put anywhere is saved where the DAG draws
+   * it, clear of the others (`placeNodes`), so that it stays there however ELK
+   * lays out the graph next — and so is every node that moved to another group,
+   * other than by a drop, put again as if it were new.
    * So is a new group's frame. Nothing is written while nothing ever was.
    */
   const followStructure = (
@@ -889,15 +887,15 @@ export const createDagLayoutStore = <H, F>(
   };
 
   /**
-   * From where `previous` draws the nodes to where `next` does. A node only
-   * one of them draws stays where that one draws it, and fades out or in; a
-   * node neither draws is not drawn.
+   * From where `previous` draws the nodes to where `next` does. A node only one
+   * of them draws stays where that one draws it, and fades out or in; a node
+   * neither draws is not drawn.
    *
    * The exception is the DAG while ELK lays it out — for the first time, or
-   * with a node added, or at a new size: a node of `previous` the DAG does
-   * not draw yet is one it will draw, and stays where it is, not faded,
-   * until the layout is there; the nodes then move to it from where this
-   * left them (`moveAwaited`).
+   * with a node added, or at a new size: a node of `previous` the DAG does not
+   * draw yet is one it will draw, and stays where it is, not faded, until the
+   * layout is there; the nodes then move to it from where this left them
+   * (`moveAwaited`).
    */
   const switchMode = (previous: DagViewMode, next: DagViewMode): void => {
     const dag = positionsOf(placed());
@@ -924,8 +922,8 @@ export const createDagLayoutStore = <H, F>(
 
     const to = onlyOf(overriding(overriding(dag, before), after), either);
 
-    // A node fading out stays where it was drawn, and one fading in is
-    // already where it is going.
+    // A node fading out stays where it was drawn, and one fading in is already
+    // where it is going.
     animate(onlyOf(overriding(overriding(dag, after), before), either), to, {
       from: new Map(fading.map((id) => [id, before.has(id) ? 1 : 0])),
       to: new Map(fading.map((id) => [id, after.has(id) ? 1 : 0])),
@@ -969,8 +967,8 @@ export const createDagLayoutStore = <H, F>(
   };
 
   /**
-   * From where `mode` drew the nodes in the `previous` order to where they
-   * are in the `next`, if `mode` is shown. The view stays where it is.
+   * From where `mode` drew the nodes in the `previous` order to where they are
+   * in the `next`, if `mode` is shown. The view stays where it is.
    */
   const reorder = (
     mode: 'arc' | 'tile',
@@ -1320,8 +1318,7 @@ export const createDagLayoutStore = <H, F>(
           followStructure(previous, laidOut);
         }
 
-        // A node new to the graph, from where it would be put
-        // (`placeNodes`).
+        // A node new to the graph, from where it would be put (`placeNodes`).
         const before =
           drawnBefore !== undefined && mut_arrangeRequested
             ? new Map(

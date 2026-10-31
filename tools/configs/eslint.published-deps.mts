@@ -12,13 +12,12 @@ import { projectRootPath } from '../scripts/project-root-path.mjs';
  * repository-wide config cannot answer.
  *
  * **What a package publishes may import.** The repository-wide config allows a
- * file to import anything the package declares, in any group. That is right
- * for tests and scripts, but it lets a module under `src/` import a
- * devDependency — which resolves during development and then fails for
- * consumers, who never install it. Two packages shipped that way before this
- * check existed: `github-settings-as-code` imported `ts-repo-utils` from
- * fourteen modules, and `eslint-config-typed` imported a type from
- * `@eslint/core`.
+ * file to import anything the package declares, in any group. That is right for
+ * tests and scripts, but it lets a module under `src/` import a devDependency —
+ * which resolves during development and then fails for consumers, who never
+ * install it. Two packages shipped that way before this check existed:
+ * `github-settings-as-code` imported `ts-repo-utils` from fourteen modules, and
+ * `eslint-config-typed` imported a type from `@eslint/core`.
  *
  * **What `eslint.config.mts` imports.** `eslint-config-typed` ignores those
  * files by default, so the repository-wide pass never sees them and the
@@ -67,8 +66,8 @@ const workspacePackageDirs = ['libs', 'apps'].flatMap((group) => {
 
 const publishedPackageDirs = workspacePackageDirs.filter(isPublishedPackage);
 
-// The root has an `eslint.config.mts` of its own, and it is a package
-// directory for this purpose even though nothing publishes it.
+// The root has an `eslint.config.mts` of its own, and it is a package directory
+// for this purpose even though nothing publishes it.
 const eslintConfigPackageDirs =
   Arr.toUnshifted(projectRootPath)(workspacePackageDirs);
 
@@ -102,9 +101,8 @@ export default [
           'import-x/no-extraneous-dependencies': [
             'error',
             {
-              // One package per config object: passing every package
-              // directory would let a dependency declared anywhere satisfy
-              // everywhere.
+              // One package per config object: passing every package directory
+              // would let a dependency declared anywhere satisfy everywhere.
               packageDir: [dir],
               // The point of this pass — what a package publishes may only
               // reach for what its consumers are given.

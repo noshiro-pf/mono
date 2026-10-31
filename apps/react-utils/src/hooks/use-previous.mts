@@ -5,8 +5,8 @@ import * as React from 'react';
  *
  * The usual spelling of this keeps the value in a ref and writes it from an
  * effect, but the React Compiler rejects reading a ref during render. State
- * says the same thing and is allowed. One difference follows from that: the
- * ref version returned the value from the previous *render*, this returns the
+ * says the same thing and is allowed. One difference follows from that: the ref
+ * version returned the value from the previous *render*, this returns the
  * previous *distinct* value, so a render that changed nothing no longer makes
  * the two equal.
  */

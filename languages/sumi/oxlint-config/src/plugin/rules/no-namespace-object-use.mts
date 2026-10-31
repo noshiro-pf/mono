@@ -3,10 +3,10 @@ import type { DeepReadonly } from 'ts-type-forge';
 import { createRule } from './create-rule.mjs';
 
 /**
- * `modules/no-namespace-object-use` — `import * as ns` is allowed, but `ns`
- * may only be used through property access (`ns.foo`, and `ns.Foo` in a
- * type). Passing, spreading, aliasing or `typeof`-ing the namespace object
- * itself is not tree-shakable and is banned (Sumi spec/modules.md, D-28).
+ * `modules/no-namespace-object-use` — `import * as ns` is allowed, but `ns` may
+ * only be used through property access (`ns.foo`, and `ns.Foo` in a type).
+ * Passing, spreading, aliasing or `typeof`-ing the namespace object itself is
+ * not tree-shakable and is banned (Sumi spec/modules.md, D-28).
  */
 export const noNamespaceObjectUse = createRule({
   meta: {

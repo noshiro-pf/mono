@@ -211,8 +211,8 @@ export const workspaceEntryOf = (
   registry.entries.find((entry) => entry.id === id);
 
 /**
- * The name a new workspace gets: `split-view-<n>` for the smallest `n` no
- * entry is already named after.
+ * The name a new workspace gets: `split-view-<n>` for the smallest `n` no entry
+ * is already named after.
  *
  * The smallest unused number rather than "one more than the count", so that
  * creating a workspace after deleting one reuses the short name instead of
@@ -297,16 +297,16 @@ export const saveWorkspaceRegistry = async (
  * `fromUrl` wins when it names a workspace, registered or not — a `?ws=` that
  * is not in the list is *added* to it rather than refused, because such a URL
  * is a bookmark, a restored session, or the smoke test, and losing the layout
- * it names would be the one unrecoverable outcome. An entry added here is
- * named by `fromUrl.name` when the URL gave one; an entry already on the list
- * keeps its name, which is the list's to change and not a link's. The list is
- * written back only when this changed it.
+ * it names would be the one unrecoverable outcome. An entry added here is named
+ * by `fromUrl.name` when the URL gave one; an entry already on the list keeps
+ * its name, which is the list's to change and not a link's. The list is written
+ * back only when this changed it.
  *
  * `activate` is whether the workspace becomes the list's active one. A tab
- * loading behind the one on screen — every tab but one when the split views
- * are all opened at once — passes `false`, so that "where I was last" stays
- * the one being looked at rather than whichever tab finished loading last. It
- * takes its turn when it is shown.
+ * loading behind the one on screen — every tab but one when the split views are
+ * all opened at once — passes `false`, so that "where I was last" stays the one
+ * being looked at rather than whichever tab finished loading last. It takes its
+ * turn when it is shown.
  */
 export const resolveWorkspace = async (
   fromUrl: Readonly<{

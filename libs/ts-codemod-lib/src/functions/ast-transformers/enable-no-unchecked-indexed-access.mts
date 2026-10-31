@@ -9,15 +9,15 @@ const TRANSFORMER_NAME = 'enable-no-unchecked-indexed-access';
 /**
  * Appends `!` to the index accesses that turning on the
  * [`noUncheckedIndexedAccess`](https://www.typescriptlang.org/tsconfig/#noUncheckedIndexedAccess)
- * compiler option would turn into type errors, as a stopgap while the option
- * is being enabled.
+ * compiler option would turn into type errors, as a stopgap while the option is
+ * being enabled.
  *
  * The rewrite is driven by the type checker rather than by syntax: the file is
  * checked twice, once with `noUncheckedIndexedAccess` off and once with it on,
  * and `!` is appended only where the option is what added `undefined` to the
  * expression's type. Consequently an index whose presence the type already
- * guarantees keeps its access untouched — `[T, T][1]`, `[T, T, ...T[]][0]`,
- * and `({ a: T })['a']` are all left as they are, as is an element type that
+ * guarantees keeps its access untouched — `[T, T][1]`, `[T, T, ...T[]][0]`, and
+ * `({ a: T })['a']` are all left as they are, as is an element type that
  * contained `undefined` to begin with.
  *
  * Both spellings of an index read are covered, because the option widens both:
@@ -31,10 +31,10 @@ const TRANSFORMER_NAME = 'enable-no-unchecked-indexed-access';
  * on its own — which is how {@link transformSourceCode} drives every
  * transformer here — resolves neither a type from another module nor a
  * narrowing that depends on an imported type guard, and the latter produces
- * assertions a whole-program check does not need. Most of those are reported
- * by `@typescript-eslint/no-unnecessary-type-assertion`, whose fixer removes
- * them; what no rule can see is an assertion that makes a later check dead,
- * as the `if` of `const v = xs[0]!; if (v === undefined) …` now is.
+ * assertions a whole-program check does not need. Most of those are reported by
+ * `@typescript-eslint/no-unnecessary-type-assertion`, whose fixer removes them;
+ * what no rule can see is an assertion that makes a later check dead, as the
+ * `if` of `const v = xs[0]!; if (v === undefined) …` now is.
  *
  * @example
  *
@@ -91,9 +91,9 @@ export const enableNoUncheckedIndexedAccessTransformer = (
         return;
       }
 
-      // One text edit for the whole file: `insertText` forgets every
-      // descendant node, so inserting one `!` at a time would reparse the
-      // file once per assertion.
+      // One text edit for the whole file: `insertText` forgets every descendant
+      // node, so inserting one `!` at a time would reparse the file once per
+      // assertion.
       sourceAst.replaceText(
         [0, sourceAst.getEnd()],
         insertNonNullAssertions(sourceAst.getFullText(), positions),
@@ -142,9 +142,9 @@ const typeIncludesUndefined = (
   (type.isUnion() && type.getUnionTypes().some((t) => t.isUndefined()));
 
 /**
- * Whether the position the access sits in already accepts `undefined`, in
- * which case `noUncheckedIndexedAccess` reports nothing there and the
- * assertion would only be noise.
+ * Whether the position the access sits in already accepts `undefined`, in which
+ * case `noUncheckedIndexedAccess` reports nothing there and the assertion would
+ * only be noise.
  */
 const contextAcceptsUndefined = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -218,9 +218,9 @@ const isInOptionalChain = (node: tsm.Node): boolean => {
 /**
  * `xs[0]!`, `xs[0] as T`, `<T>xs[0]`, `xs[0]?.foo`, `xs[0]?.()`, `xs[0]?.[1]`.
  *
- * `outer` is `node` with its parentheses (see
- * {@link outermostParenthesized}); a chain continues from the access itself
- * but is guarded from the outside of the parentheses (`(xs[0])?.foo`).
+ * `outer` is `node` with its parentheses (see {@link outermostParenthesized});
+ * a chain continues from the access itself but is guarded from the outside of
+ * the parentheses (`(xs[0])?.foo`).
  */
 const isAlreadyAssertedOrGuarded = (
   node: tsm.Node,
@@ -239,8 +239,8 @@ const isAlreadyAssertedOrGuarded = (
     return true;
   }
 
-  // Only the object of the optional chain is guarded; an index argument such
-  // as the `xs[0]` of `m?.[xs[0]]` is not.
+  // Only the object of the optional chain is guarded; an index argument such as
+  // the `xs[0]` of `m?.[xs[0]]` is not.
   return (
     (parent.isKind(tsm.SyntaxKind.PropertyAccessExpression) ||
       parent.isKind(tsm.SyntaxKind.ElementAccessExpression) ||
@@ -261,9 +261,9 @@ const isAssignmentOperatorKind = (kind: tsm.SyntaxKind): boolean =>
 
 /**
  * Positions that write the value rather than read it, where `!` cannot be
- * appended at all: an assignment target is not an expression (`xs[0]! = 1`
- * does not parse as an assignment), and `delete xs[0]!` and `xs[0]!++` are
- * equally invalid.
+ * appended at all: an assignment target is not an expression (`xs[0]! = 1` does
+ * not parse as an assignment), and `delete xs[0]!` and `xs[0]!++` are equally
+ * invalid.
  *
  * `xs[0] += 1` is the one case this leaves a type error behind: its left-hand
  * side is read as well as written, so `noUncheckedIndexedAccess` reports it,
@@ -350,9 +350,9 @@ const isTestedForAbsence = (node: tsm.Node, parent: tsm.Node): boolean => {
  * meaningful.
  *
  * Note that most write positions need no rule of their own: TypeScript gives
- * the target of an assignment the element type without `undefined`, so the
- * type comparison in {@link collectAssertionPositions} already passes them
- * over. The exceptions handled here are the ones it does widen.
+ * the target of an assignment the element type without `undefined`, so the type
+ * comparison in {@link collectAssertionPositions} already passes them over. The
+ * exceptions handled here are the ones it does widen.
  *
  * The position is that of the outermost parenthesis around the access:
  * `(xs[0]) === undefined` tests the value exactly as `xs[0] === undefined`
@@ -378,9 +378,8 @@ const isAssertableReadPosition = (
 };
 
 /**
- * Returns the positions at which a `!` has to be inserted, i.e. the end
- * offsets of the reads whose type `noUncheckedIndexedAccess` widens with
- * `undefined`.
+ * Returns the positions at which a `!` has to be inserted, i.e. the end offsets
+ * of the reads whose type `noUncheckedIndexedAccess` widens with `undefined`.
  */
 const collectAssertionPositions = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -403,19 +402,19 @@ const collectAssertionPositions = (
   const originalOptions = project.getCompilerOptions();
 
   try {
-    // With the option on first, because that narrows the candidates down to
-    // the few reads worth checking a second time. `strictNullChecks` comes
-    // with it: `noUncheckedIndexedAccess` does nothing without it, and the
-    // project handed to the transformer may not have it on.
+    // With the option on first, because that narrows the candidates down to the
+    // few reads worth checking a second time. `strictNullChecks` comes with it:
+    // `noUncheckedIndexedAccess` does nothing without it, and the project
+    // handed to the transformer may not have it on.
     project.compilerOptions.set({
       strictNullChecks: true,
       noUncheckedIndexedAccess: true,
     });
 
-    // The type asked is the access's own, so an `as`, `satisfies` or `!` on
-    // its object is already in it. That is the type the option's error is
-    // reported against, and the `!` appended has no run-time effect for the
-    // unwrapped object to contradict.
+    // The type asked is the access's own, so an `as`, `satisfies` or `!` on its
+    // object is already in it. That is the type the option's error is reported
+    // against, and the `!` appended has no run-time effect for the unwrapped
+    // object to contradict.
     const widened = candidates.filter(
       (node) =>
         typeIncludesUndefined(node.getType()) &&

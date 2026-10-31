@@ -1,6 +1,6 @@
 // Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding. The observables are classes (why is on
-// `ObservableBaseClass` below), so those four rules are waived here (D-63).
+// `mut_` binding. The observables are classes (why is on `ObservableBaseClass`
+// below), so those four rules are waived here (D-63).
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
@@ -35,25 +35,23 @@ import { enqueueChildren } from './propagation-state.mjs';
 /**
  * The base of every observable, and the reason an observable is a class.
  *
- * A node is created for every derived value of a UI, so creating one has to
- * be cheap, and most of its cost was its methods: each observable used to be
- * a set of closures made for it, a dozen or more per node (#2421). Sharing
- * the methods among all nodes removes that cost, and a shared method has to
- * read the node it is called on from `this`. Once `this` is unavoidable, a
- * class is the plainest way to say it: the methods live once on the
- * prototype, `this` is typed, a creator or operator is a subclass that
- * overrides `tryUpdate` (and `flush` / `teardown` where it holds something),
- * and assigning every field in the constructor gives the nodes of one class
- * one shape for V8. The collections (`children`, subscribers) are made when
- * the first one arrives.
+ * A node is created for every derived value of a UI, so creating one has to be
+ * cheap, and most of its cost was its methods: each observable used to be a set
+ * of closures made for it, a dozen or more per node (#2421). Sharing the
+ * methods among all nodes removes that cost, and a shared method has to read
+ * the node it is called on from `this`. Once `this` is unavoidable, a class is
+ * the plainest way to say it: the methods live once on the prototype, `this` is
+ * typed, a creator or operator is a subclass that overrides `tryUpdate` (and
+ * `flush` / `teardown` where it holds something), and assigning every field in
+ * the constructor gives the nodes of one class one shape for V8. The
+ * collections (`children`, subscribers) are made when the first one arrives.
  *
  * The methods read the observable they are called on, so taking one off it
  * (`const { subscribe } = obs$`) is not supported.
  *
- * A node reaches another node only through its methods and its public
- * fields, never through a `#private` one: the other node may be an instance
- * of another copy of synstate in the same program, whose classes are not
- * these.
+ * A node reaches another node only through its methods and its public fields,
+ * never through a `#private` one: the other node may be an instance of another
+ * copy of synstate in the same program, whose classes are not these.
  */
 export class ObservableBaseClass<
   A,
@@ -144,8 +142,8 @@ export class ObservableBaseClass<
   }
 
   addChild(child: ChildNode): void {
-    // A set, not an array: a completed child removes itself, and that has to
-    // be O(1) for a UI that creates and completes derived nodes on every mount.
+    // A set, not an array: a completed child removes itself, and that has to be
+    // O(1) for a UI that creates and completes derived nodes on every mount.
     if (this.#mut_children === undefined) {
       this.#mut_children = new Set<ChildNode>([child]);
     } else {
@@ -158,10 +156,10 @@ export class ObservableBaseClass<
   }
 
   /**
-   * Stores `nextValue` as the current value, queues the children for the
-   * update `updateToken`, and notifies subscribers. The children are queued
-   * first, so that a child a subscriber creates, which starts from this
-   * value, is not visited for it again.
+   * Stores `nextValue` as the current value, queues the children for the update
+   * `updateToken`, and notifies subscribers. The children are queued first, so
+   * that a child a subscriber creates, which starts from this value, is not
+   * visited for it again.
    */
   protected setNext(nextValue: A, updateToken: UpdateToken): void {
     this.#mut_updateToken = updateToken;
@@ -180,11 +178,11 @@ export class ObservableBaseClass<
   }
 
   /**
-   * Stores `nextValue` and returns `true` when nothing observes this
-   * observable — no child to queue and no subscriber to call — so that the
-   * caller need not open an update; returns `false`, storing nothing,
-   * otherwise. The value still gets a token of its own, so that whoever
-   * stored the last one sees that it emitted.
+   * Stores `nextValue` and returns `true` when nothing observes this observable
+   * — no child to queue and no subscriber to call — so that the caller need not
+   * open an update; returns `false`, storing nothing, otherwise. The value
+   * still gets a token of its own, so that whoever stored the last one sees
+   * that it emitted.
    */
   protected setNextIfUnobserved(nextValue: A): boolean {
     if (this.hasChild || this.hasSubscriber) {
@@ -220,9 +218,9 @@ export class ObservableBaseClass<
 
   /**
    * Completes the observable: an async child first passes on what it still
-   * holds (`flush`), then it is disposed. Completing never reaches the
-   * parents: an upstream observable may be shared, and only whoever owns it
-   * decides when it ends (#2133).
+   * holds (`flush`), then it is disposed. Completing never reaches the parents:
+   * an upstream observable may be shared, and only whoever owns it decides when
+   * it ends (#2133).
    */
   complete(): void {
     if (this.#mut_isCompleted) {
@@ -235,8 +233,8 @@ export class ObservableBaseClass<
   }
 
   /**
-   * Completes the observable without passing on anything it still holds,
-   * runs its teardown, and takes it out of the graph.
+   * Completes the observable without passing on anything it still holds, runs
+   * its teardown, and takes it out of the graph.
    */
   dispose(): void {
     // A completed node is reached again through every parent that completes
@@ -275,8 +273,8 @@ export class ObservableBaseClass<
   }
 
   /**
-   * Passes on what the observable still holds, at the beginning of
-   * `complete()` and never in `dispose()` (`debounce`'s pending value).
+   * Passes on what the observable still holds, at the beginning of `complete()`
+   * and never in `dispose()` (`debounce`'s pending value).
    */
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   protected flush(): void {}

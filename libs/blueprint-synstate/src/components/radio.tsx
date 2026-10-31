@@ -136,9 +136,9 @@ export const RadioGroup = <T extends string>({
           onChange={(event) => {
             onValueChange(option.value);
 
-            // The browser has checked this button already. When the owner
-            // did not take its value, no binding runs, so the buttons are
-            // set back to the value here: none checked if it is no option's.
+            // The browser has checked this button already. When the owner did
+            // not take its value, no binding runs, so the buttons are set back
+            // to the value here: none checked if it is no option's.
             const current = toObservable(value).getSnapshot().value;
 
             if (current === option.value) {

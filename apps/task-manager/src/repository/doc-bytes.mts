@@ -4,8 +4,8 @@ import { Arr, isNumber, isRecord, isString } from 'ts-data-forge';
  * How many bytes Firestore counts a value as stored
  * (https://firebase.google.com/docs/firestore/storage-size): a string its
  * UTF-8 bytes and one, a number eight, a boolean or `null` one, a map each
- * key as a string plus its value, an array its elements. Values of other
- * kinds, which these documents do not hold, count as nothing.
+ * key as a string plus its value, an array its elements. Values of other kinds,
+ * which these documents do not hold, count as nothing.
  */
 export const docBytes = (value: unknown): number =>
   Arr.isArray(value)

@@ -29,10 +29,10 @@ type Props = Readonly<{
 }>;
 
 /**
- * One dependency as an editable row: on which node, of which type (a task
- * can be waited on until it is done, or until it has started; a milestone
- * until it is reached), and how long after. The type's slot is kept for
- * every row so that choosing a source does not move the fields around.
+ * One dependency as an editable row: on which node, of which type (a task can
+ * be waited on until it is done, or until it has started; a milestone until it
+ * is reached), and how long after. The type's slot is kept for every row so
+ * that choosing a source does not move the fields around.
  * Below the fields, whether the dependency holds, or why the row cannot be
  * saved.
  */

@@ -5,9 +5,10 @@ import type { ESLintFlatConfig, ESLintPlugin } from './types.mjs';
 /**
  * Every rule this plugin ships, at `error`.
  *
- * The `satisfies` clause below is keyed off {@link tsDataForgeRules}, so leaving a
- * rule out, naming one that does not exist, or setting one to anything
- * but `error` fails to type-check. That is the whole check; no test repeats it.
+ * The `satisfies` clause below is keyed off {@link tsDataForgeRules}, so
+ * leaving a rule out, naming one that does not exist, or setting one to
+ * anything but `error` fails to type-check. That is the whole check; no test
+ * repeats it.
  */
 const recommendedRules = {
   'ts-data-forge/prefer-canonical-array-slicing': 'error',

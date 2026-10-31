@@ -26,9 +26,9 @@ import { fixturesRootPath, listFixtures } from '../src/index.mjs';
  * Two lint engines because a rule needs one or the other, never both: the
  * oxlint preset (@sumi-lang/oxlint-config) for what syntax settles, and the
  * Sumi checker (@sumi-lang/checker, D-55) on TypeScript 7's own API for what
- * needs the type checker. The corpus does not care which produced a
- * diagnostic — that is the point of the neutral IDs — so the lists are merged
- * before anything is compared.
+ * needs the type checker. The corpus does not care which produced a diagnostic
+ * — that is the point of the neutral IDs — so the lists are merged before
+ * anything is compared.
  *
  * The native compiler is the third engine, under the fixed compilerOptions of
  * `fixtures/tsconfig.json`, and reports as `compiler/<code>`. It is what
@@ -40,8 +40,8 @@ import { fixturesRootPath, listFixtures } from '../src/index.mjs';
 /**
  * Neutral IDs that have fixtures but no implementation in either engine yet
  * (fixtures are written first — TDD for 🆕 rules). Listed explicitly, like an
- * `@ts-expect-error`: an entry whose rule becomes implemented fails the
- * "still unimplemented" check below and has to be removed.
+ * `@ts-expect-error`: an entry whose rule becomes implemented fails the "still
+ * unimplemented" check below and has to be removed.
  */
 const knownUnimplementedRuleIds: ReadonlySet<string> = new Set<string>();
 
@@ -163,9 +163,9 @@ describe('engines', () => {
   });
 
   test('oxlint ran without loader or type-aware failures', () => {
-    // A failed JS-plugin load or a missing tsgolint prints to stderr and
-    // yields no diagnostics at all — which would make every invalid fixture
-    // fail confusingly, so it is asserted first.
+    // A failed JS-plugin load or a missing tsgolint prints to stderr and yields
+    // no diagnostics at all — which would make every invalid fixture fail
+    // confusingly, so it is asserted first.
     assert.strictEqual(run.stderr.replaceAll(/^warning:.*$/gmu, '').trim(), '');
   });
 

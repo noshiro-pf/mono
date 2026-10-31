@@ -8,9 +8,9 @@ const libDir = `${path.dirname(
 
 /**
  * The names TypeScript's standard library declares in the type space
- * (`interface` / `type` / `class` / `enum` / `namespace`) for the given
- * `lib` entries, following `/// <reference lib="..." />` transitively — the
- * same closure `compilerOptions.lib` produces. Read once per process.
+ * (`interface` / `type` / `class` / `enum` / `namespace`) for the given `lib`
+ * entries, following `/// <reference lib="..." />` transitively — the same
+ * closure `compilerOptions.lib` produces. Read once per process.
  */
 export const globalTypeNames = (
   libs: readonly string[],
@@ -79,7 +79,7 @@ const mut_cache = new Map<string, ReadonlySet<string>>();
 
 const referenceLibRegex = /^\/\/\/\s*<reference\s+lib="([^"]+)"\s*\/>/gmu;
 
-// The lib files are machine-formatted with single spaces, so the pattern
-// needs no variable-length whitespace (and stays linear-time).
+// The lib files are machine-formatted with single spaces, so the pattern needs
+// no variable-length whitespace (and stays linear-time).
 const typeDeclarationRegex =
   /^(?:declare )?(?:interface|type|class|enum|namespace) ([A-Za-z_$][\w$]*)/gmu;

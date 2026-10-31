@@ -456,10 +456,10 @@ type RequiredBase = {
  */
 {
   // Class instance types are the fixture on purpose — they are the shape that
-  // gets no implicit index signature and survives this repo's autofixes. Do
-  // not "simplify" them into object type aliases: those do get one, and the
-  // assertions would then pass under either spelling. (`interface` works too
-  // in principle, but `consistent-type-definitions` rewrites it into an alias.)
+  // gets no implicit index signature and survives this repo's autofixes. Do not
+  // "simplify" them into object type aliases: those do get one, and the
+  // assertions would then pass under either spelling. (`interface` works too in
+  // principle, but `consistent-type-definitions` rewrites it into an alias.)
   class Mut {
     x: number = 0;
     y: readonly string[] = [];

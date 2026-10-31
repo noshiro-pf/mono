@@ -138,8 +138,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
 
   /**
    * Checks if all elements in the set satisfy a type predicate. Narrows the
-   * type of elements in the set if the predicate returns true for all
-   * elements.
+   * type of elements in the set if the predicate returns true for all elements.
    *
    *
    * @example

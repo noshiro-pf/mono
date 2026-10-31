@@ -1,7 +1,7 @@
 /**
  * The dependency DAG as nodes and edges, for a renderer to lay out. An edge
- * runs from the node depended on to the node that depends on it. Node ids
- * are stable strings, so a renderer can key on them across rebuilds.
+ * runs from the node depended on to the node that depends on it. Node ids are
+ * stable strings, so a renderer can key on them across rebuilds.
  */
 
 import type { DeepReadonly } from 'ts-type-forge';
@@ -16,8 +16,8 @@ import {
 /**
  * Nodes: every task in input order, then every milestone. Edges: one per
  * dependency, in node order and then dependency order, with the id
- * `<dependent node id>#<index of the dependency>`. A dependency on a node
- * that does not exist has no edge.
+ * `<dependent node id>#<index of the dependency>`. A dependency on a node that
+ * does not exist has no edge.
  */
 export const buildDependencyGraph = (state: DomainState): DependencyGraph => {
   const nodes = listNodes(state);

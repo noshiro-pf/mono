@@ -64,8 +64,8 @@ export const preferAssertIsTrueOverNegatedAssertIsFalseRule: TSESLint.RuleModule
             node: arg,
             messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse',
             // The method name and the negated argument are rewritten
-            // separately, so the receiver keeps the name it has here. A
-            // wrapper around the negation is dropped with it: it describes the
+            // separately, so the receiver keeps the name it has here. A wrapper
+            // around the negation is dropped with it: it describes the
             // negation's type, not the operand's.
             fix: (fixer) => [
               fixer.replaceText(property, 'isTrue'),

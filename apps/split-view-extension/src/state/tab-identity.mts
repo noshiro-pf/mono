@@ -16,11 +16,11 @@ export const tabTitleOf = (position: number, workspaceName: string): string =>
  * What follows the number in the tab's title.
  *
  * The title the split view was opened with, when it has one. Otherwise the
- * title of the first pane in tree order — the top left, which is where a
- * reader looks first — so that the tab says what is on screen, as an ordinary
- * tab does. The split view's name only while that pane has reported nothing:
- * before its page has loaded, for an empty pane, and for a page the frame
- * agent cannot run in.
+ * title of the first pane in tree order — the top left, which is where a reader
+ * looks first — so that the tab says what is on screen, as an ordinary tab
+ * does. The split view's name only while that pane has reported nothing:
+ * before its page has loaded, for an empty pane, and for a page the frame agent
+ * cannot run in.
  */
 export const tabLabelOf = (
   state: WorkspaceState,
@@ -38,8 +38,8 @@ export const tabLabelOf = (
  * The colour of the favicon for a position, from a fixed cycle.
  *
  * Fixed rather than derived from the name, so that renaming a workspace does
- * not change the icon the user has learned to look for, and saturated enough
- * to carry white text at 16px on both a light and a dark tab strip.
+ * not change the icon the user has learned to look for, and saturated enough to
+ * carry white text at 16px on both a light and a dark tab strip.
  */
 export const accentColorOf = (position: number): string =>
   accentColors[(Math.max(1, position) - 1) % accentColors.length] ?? '#4f7fd9';
@@ -128,8 +128,8 @@ export const faviconDataUri = (position: number): string | undefined => {
   mut_context.textBaseline = 'alphabetic';
 
   // Centred on the glyphs' own ink rather than on `textBaseline = 'middle'`,
-  // which centres the font's em box and leaves a digit sitting low by an
-  // amount that depends on the platform's font.
+  // which centres the font's em box and leaves a digit sitting low by an amount
+  // that depends on the platform's font.
   const metrics = mut_context.measureText(label);
 
   const x = Num.div(faviconPx, 2);
@@ -223,8 +223,8 @@ const accentColors = [
 ] as const;
 
 /**
- * The rounded square of the extension's icon, as `scripts/gen-icons.mts`
- * draws it into `public/icons/`.
+ * The rounded square of the extension's icon, as `scripts/gen-icons.mts` draws
+ * it into `public/icons/`.
  */
 const extensionIconSquareOf = ({ x, y, size }: IconPlacement): RoundRect => {
   const inset = Math.round(extensionIcon.squareInset * size);

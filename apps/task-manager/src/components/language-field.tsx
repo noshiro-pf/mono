@@ -15,12 +15,12 @@ import { projectFileStore, sessionStore } from '../store/index.mjs';
 
 /**
  * The language of the whole page: following the browser, or one of the
- * languages, each under its own name; the pressed one is what decides the
- * page now, the URL's `?lang=` before what is kept. Choosing one keeps it
- * on this device and loads the page again by it (`chooseLang`) — the one
- * pressed too, when only the URL asked for it, so that it is kept. Not
- * while an import is being written or a sign-in or sign-out is under way,
- * which a reload would cut short.
+ * languages, each under its own name; the pressed one is what decides the page
+ * now, the URL's `?lang=` before what is kept. Choosing one keeps it on this
+ * device and loads the page again by it (`chooseLang`) — the one pressed too,
+ * when only the URL asked for it, so that it is kept. Not while an import is
+ * being written or a sign-in or sign-out is under way, which a reload would cut
+ * short.
  */
 export const LanguageField = (): JSX.Element => (
   <fieldset

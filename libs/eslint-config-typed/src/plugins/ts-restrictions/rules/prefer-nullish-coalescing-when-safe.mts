@@ -32,8 +32,8 @@ type FalsyValueTag = 'emptyString' | 'false' | 'zero' | 'zeroBigInt';
  * - `falsyValues` — which falsy non-nullish values the type may hold.
  * - `nullable` — whether the type may be `null` / `undefined`.
  *
- * `'unsafe'` means the type may hold falsy values the analysis cannot
- * enumerate (`any`, `unknown`, non-literal `number` because of `NaN`, the
+ * `'unsafe'` means the type may hold falsy values the analysis cannot enumerate
+ * (`any`, `unknown`, non-literal `number` because of `NaN`, the
  * member-less `{}` type, …), so no replacement should be attempted.
  */
 type TypeSummary = Readonly<{
@@ -112,9 +112,9 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
 
     const compilerOptions = parserServices.program.getCompilerOptions();
 
-    // Without `strictNullChecks`, `null` / `undefined` are erased from the
-    // type system, so the analysis below cannot tell whether the left-hand
-    // side is nullable. Disable the rule entirely (matching typescript-eslint's
+    // Without `strictNullChecks`, `null` / `undefined` are erased from the type
+    // system, so the analysis below cannot tell whether the left-hand side is
+    // nullable. Disable the rule entirely (matching typescript-eslint's
     // type-aware nullish rules).
     const strictNullChecks =
       compilerOptions.strictNullChecks ?? compilerOptions.strict ?? false;
@@ -147,15 +147,15 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         return 'unsafe';
       }
 
-      // `boolean` is itself the union `true | false`, so it is decomposed
-      // here as well.
+      // `boolean` is itself the union `true | false`, so it is decomposed here
+      // as well.
       if (type.isUnion()) {
         return combineUnionSummaries(type.types.map(summarizeType));
       }
 
       // A deferred type (type parameter, indexed access, conditional, …) is
-      // reduced to its base constraint; one with no resolvable constraint
-      // could be instantiated with anything, so it is unsafe.
+      // reduced to its base constraint; one with no resolvable constraint could
+      // be instantiated with anything, so it is unsafe.
       if ((flags & DEFERRED_TYPE_FLAGS) !== 0) {
         const constraint = checker.getBaseConstraintOfType(type);
 
@@ -285,9 +285,9 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
     };
 
     /**
-     * An object type with at least one member (property, signature or index)
-     * is treated as never falsy. The member-less `{}` (and `Object`) accepts
-     * every non-nullish value including falsy primitives, so it is unsafe.
+     * An object type with at least one member (property, signature or index) is
+     * treated as never falsy. The member-less `{}` (and `Object`) accepts every
+     * non-nullish value including falsy primitives, so it is unsafe.
      */
     const summarizeObjectLikeType = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -321,9 +321,9 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         return false;
       }
 
-      // A literal is its value whatever it is cast to (`'' as string` is
-      // `''`); any other expression has to have the literal's type at every
-      // layer (`e as string` is the author saying `e` may be another string).
+      // A literal is its value whatever it is cast to (`'' as string` is `''`);
+      // any other expression has to have the literal's type at every layer
+      // (`e as string` is the author saying `e` may be another string).
       return (
         right.type === AST_NODE_TYPES.Identifier
           ? getLayerTypes(wrappedRight)
@@ -363,9 +363,9 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
 
     /**
      * Decides whether the falsy non-nullish case of the left-hand side is
-     * harmless (see the rule-level doc comment for the proof): it either
-     * cannot happen at all, or it yields exactly the right-hand side value
-     * with no skippable side effect. This is the shared precondition of both
+     * harmless (see the rule-level doc comment for the proof): it either cannot
+     * happen at all, or it yields exactly the right-hand side value with no
+     * skippable side effect. This is the shared precondition of both
      * rewrites — `||` → `??` on a nullable left-hand side, and removing
      * `|| <fallback>` on a never-nullish one.
      */
@@ -406,11 +406,11 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         if (!summary.nullable) {
           // A never-nullish left-hand side makes the whole `|| <fallback>`
           // redundant: `??` would never take its right-hand side, so the
-          // expression is just the left-hand side — remove the tail instead
-          // of rewriting the operator. (In the singleton-match case the old
-          // code did evaluate the side-effect-free right-hand side and
-          // returned that equal value; in the no-falsy-value case it never
-          // evaluated it at all, so any right-hand side may be dropped.)
+          // expression is just the left-hand side — remove the tail instead of
+          // rewriting the operator. (In the singleton-match case the old code
+          // did evaluate the side-effect-free right-hand side and returned that
+          // equal value; in the no-falsy-value case it never evaluated it at
+          // all, so any right-hand side may be dropped.)
           context.report({
             node,
             messageId: 'removeUnnecessaryLogicalOr',
@@ -446,11 +446,11 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         }
 
         // `??` cannot be mixed with `&&` / `||` without parentheses, so an
-        // unparenthesized `||` directly inside another logical expression
-        // (e.g. the inner `a || b` of `a || b || c`) cannot be rewritten in
-        // place. The outer expression is still handled, parenthesizing this
-        // one as its operand. (The removal branch above has no such
-        // constraint: dropping `|| <fallback>` is valid in any context.)
+        // unparenthesized `||` directly inside another logical expression (e.g.
+        // the inner `a || b` of `a || b || c`) cannot be rewritten in place.
+        // The outer expression is still handled, parenthesizing this one as its
+        // operand. (The removal branch above has no such constraint: dropping
+        // `|| <fallback>` is valid in any context.)
         const { parent } = node;
 
         if (
@@ -523,8 +523,8 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
 
         // When the falsy non-nullish case is reachable (the singleton-match
         // case), `||=` assigns where `??=` does not. On a property that
-        // difference is observable (setters, `Proxy` traps, frozen objects),
-        // so only plain identifier targets are rewritten there.
+        // difference is observable (setters, `Proxy` traps, frozen objects), so
+        // only plain identifier targets are rewritten there.
         if (
           summary.falsyValues.size > 0 &&
           skipTypeWrappers(node.left).type !== AST_NODE_TYPES.Identifier

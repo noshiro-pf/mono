@@ -1,8 +1,8 @@
 /**
- * A task as its form holds it while it is being edited — every field a
- * string the way an input gives it back — and the task that results when the
- * form is saved. Nothing is written until then. The dependencies are not
- * part of it: the dialog holds them as rows (`dependency-edit.mts`).
+ * A task as its form holds it while it is being edited — every field a string
+ * the way an input gives it back — and the task that results when the form is
+ * saved. Nothing is written until then. The dependencies are not part of it:
+ * the dialog holds them as rows (`dependency-edit.mts`).
  */
 
 import { Num, Result } from 'ts-data-forge';
@@ -38,8 +38,8 @@ export const taskToDraft = (task: Task, timeZone?: string): TaskDraft =>
 /**
  * `task` with the draft applied at `now`, or a message saying which field is
  * wrong. The progress goes through `setProgress`, so starting and finishing
- * stamp their times; `updatedAt` becomes `now`. The dependencies are left
- * as they are on `task`.
+ * stamp their times; `updatedAt` becomes `now`. The dependencies are left as
+ * they are on `task`.
  */
 export const applyTaskDraft = (
   task: Task,

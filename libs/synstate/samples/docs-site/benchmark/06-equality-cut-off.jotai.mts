@@ -5,8 +5,8 @@ import { Arr, asUint32 } from 'ts-data-forge';
 export const runBenchmark = (k: number, width: number): number => {
   const sourceAtom = atom(0);
 
-  // Equal to its previous value on 999 updates in 1000. A derived atom
-  // compares its result with `Object.is` and does not change when it is equal.
+  // Equal to its previous value on 999 updates in 1000. A derived atom compares
+  // its result with `Object.is` and does not change when it is equal.
   const bucketAtom = atom((get) => Math.floor(get(sourceAtom) / 1000));
 
   const store = createStore();

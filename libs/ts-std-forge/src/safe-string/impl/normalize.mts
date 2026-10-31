@@ -7,12 +7,12 @@ export type NormalizationForm = 'NFC' | 'NFD' | 'NFKC' | 'NFKD';
  * Normalizes a string to a Unicode normalization form.
  *
  * `String.prototype.normalize` throws a `RangeError` only when `form` is not
- * one of `'NFC'`, `'NFD'`, `'NFKC'`, `'NFKD'`. With `form` typed as that
- * union the failure is unrepresentable at compile time, so the function is
- * total and returns the string directly — wrapping it in a `Result` would
- * force every caller to unwrap an error that cannot occur. A caller holding
- * a dynamic string must narrow it to {@link NormalizationForm} first; one
- * that defeats the type system gets the raw `RangeError`, by design.
+ * one of `'NFC'`, `'NFD'`, `'NFKC'`, `'NFKD'`. With `form` typed as that union
+ * the failure is unrepresentable at compile time, so the function is total and
+ * returns the string directly — wrapping it in a `Result` would force every
+ * caller to unwrap an error that cannot occur. A caller holding a dynamic
+ * string must narrow it to {@link NormalizationForm} first; one that defeats
+ * the type system gets the raw `RangeError`, by design.
  *
  * @example
  *

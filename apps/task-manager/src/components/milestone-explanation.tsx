@@ -7,8 +7,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * What a milestone is for, at the top of its dialog: in full while one is
- * being created, folded away once it exists.
+ * What a milestone is for, at the top of its dialog: in full while one is being
+ * created, folded away once it exists.
  */
 export const MilestoneExplanation = ({ collapsed }: Props): JSX.Element => (
   <If

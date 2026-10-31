@@ -3,18 +3,18 @@
  * (`repository/project-file.mts`).
  *
  * Reading a file replaces the project with it, keeping the file's ids and
- * dates, in two steps: `openFile` reads it and asks — or shows why it cannot
- * be read — and `confirm` first exports the project as it stands, as a
- * backup, then replaces it. What replacing writes may not fit one batch,
- * so a failure part-way through can leave the project part replaced; the
- * error then names the backup that restores it. Firestore confirms the
- * writes only once the server has them, which offline is never, so the
- * dialog can be closed while they are sent; they go on.
+ * dates, in two steps: `openFile` reads it and asks — or shows why it cannot be
+ * read — and `confirm` first exports the project as it stands, as a backup,
+ * then replaces it. What replacing writes may not fit one batch, so a failure
+ * part-way through can leave the project part replaced; the error then names
+ * the backup that restores it. Firestore confirms the writes only once the
+ * server has them, which offline is never, so the dialog can be closed while
+ * they are sent; they go on.
  *
- * Neither runs until the whole project has loaded — its groups and layout
- * as well as its nodes: before that, what is exported would be short, and
- * an import would not delete what it has not seen. What it has not seen,
- * a document that could not be read, it leaves where it is.
+ * Neither runs until the whole project has loaded — its groups and layout as
+ * well as its nodes: before that, what is exported would be short, and an
+ * import would not delete what it has not seen. What it has not seen, a
+ * document that could not be read, it leaves where it is.
  */
 
 import { createState, map, type InitializedObservable } from 'synstate';
@@ -64,8 +64,8 @@ export type ProjectFileStore = Readonly<{
   /** Whether an import's writes are still being sent, the dialog closed or not. */
   importing: InitializedObservable<boolean>;
   /**
-   * Starts following the project's loading: when it starts over — signing
-   * out, or in as somebody else — what was asked about it is dropped.
+   * Starts following the project's loading: when it starts over — signing out,
+   * or in as somebody else — what was asked about it is dropped.
    * Returns what stops it.
    */
   start: () => () => void;
@@ -90,9 +90,8 @@ export const createProjectFileStore = (
   const [importState, setImportState, { getSnapshot }] =
     createState<ProjectImport>({ type: 'idle' });
 
-  // The import whose writes are still being sent, by its `importing`, if
-  // any: another one then would delete what this one writes, or the other
-  // way round.
+  // The import whose writes are still being sent, by its `importing`, if any:
+  // another one then would delete what this one writes, or the other way round.
   const [writing, setWriting, { getSnapshot: getWriting }] = createState<
     ProjectImport | undefined
   >(undefined);
@@ -116,8 +115,8 @@ export const createProjectFileStore = (
   };
 
   /**
-   * Hands the reader `snapshot` as a file named after `prefix`: its name,
-   * or why the browser could not make it.
+   * Hands the reader `snapshot` as a file named after `prefix`: its name, or
+   * why the browser could not make it.
    */
   const download = (
     snapshot: ProjectSnapshot,
@@ -248,8 +247,8 @@ export const createProjectFileStore = (
           return;
         }
 
-        // A sign-out stops the writes of the session it ends, whether or
-        // not their promise ever settles.
+        // A sign-out stops the writes of the session it ends, whether or not
+        // their promise ever settles.
         setWriting(undefined);
 
         setImportState({ type: 'idle' });

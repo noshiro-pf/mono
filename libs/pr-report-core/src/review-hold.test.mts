@@ -123,9 +123,9 @@ describe(reviewHold, () => {
     );
   });
 
-  // A changed file past what could be read might be owned, but "might" is not
-  // a reason to hold the queue: the watch still catches a pull request that
-  // goes green and does not merge.
+  // A changed file past what could be read might be owned, but "might" is not a
+  // reason to hold the queue: the watch still catches a pull request that goes
+  // green and does not merge.
   test('holds nothing it cannot be sure of', () => {
     assert.isUndefined(
       reviewHold(

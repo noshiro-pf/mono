@@ -16,8 +16,8 @@ import {
  * Packs the same staging copy as `pack.mts`, signed, as a `.crx`.
  *
  * An item with **verified CRX upload** turned on will not take a zip: every
- * upload has to be a CRX signed with the key whose public half is registered
- * on the account.
+ * upload has to be a CRX signed with the key whose public half is registered on
+ * the account.
  *
  * The signing is done by Chrome itself — `--pack-extension`, the reference
  * implementation of the format — rather than by assembling a CRX3 header here.
@@ -192,9 +192,9 @@ const report = (
   console.log(`  signed with ${key.source}`);
 
   if (manifestKey === undefined) {
-    // No `key` in the manifest, which is the state this package ships in —
-    // see `store-package.mts`. The unpacked build's id follows its path, so
-    // there is nothing here to agree or disagree with.
+    // No `key` in the manifest, which is the state this package ships in — see
+    // `store-package.mts`. The unpacked build's id follows its path, so there
+    // is nothing here to agree or disagree with.
     console.log(`  id ${signedId}`);
 
     return;

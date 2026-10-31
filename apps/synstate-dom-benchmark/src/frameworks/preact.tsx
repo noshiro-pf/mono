@@ -10,8 +10,8 @@ import {
 } from '../table-state.mjs';
 
 /**
- * Preact without Signals, written as the React implementation is: the table
- * is one state, re-rendered with keys, and each row is a `memo` component.
+ * Preact without Signals, written as the React implementation is: the table is
+ * one state, re-rendered with keys, and each row is a `memo` component.
  * Preact renders a state change in a microtask, which the harness waits for.
  */
 export const preact: Framework = {

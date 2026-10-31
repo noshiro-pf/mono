@@ -1,16 +1,16 @@
 /**
- * What a repository says about itself in `.github/unblock-prs.json`: the
- * parts of the run that depend on how its CI is laid out.
+ * What a repository says about itself in `.github/unblock-prs.json`: the parts
+ * of the run that depend on how its CI is laid out.
  *
- * The auto-fix, and the branches the repository generates rather than
- * writes. The labels, `Merge-After:` and the version pull request's branch
+ * The auto-fix, and the branches the repository generates rather than writes.
+ * The labels, `Merge-After:` and the version pull request's branch
  * (`changeset-release/<base>`) are conventions the PR Manager page reads too,
  * from repositories it has no configuration for, so they are fixed in
  * `pr-report-core` rather than set per repository. A repository without the
  * file gets everything but the auto-fix, and has no generated branches.
  *
- * The file's JSON Schema, `config.schema.json` beside this module, is
- * generated from {@link ConfigFileSchema}; a test holds it to the output.
+ * The file's JSON Schema, `config.schema.json` beside this module, is generated
+ * from {@link ConfigFileSchema}; a test holds it to the output.
  */
 
 import * as fs from 'node:fs/promises';
@@ -23,9 +23,8 @@ import { readJsonFile, repoRoot } from '../lib/index.mjs';
 export const CONFIG_PATH = '.github/unblock-prs.json';
 
 /**
- * The repository's configuration, or `undefined` when it has none. A file
- * that is there but wrong stops the run: guessing would run commands nobody
- * wrote.
+ * The repository's configuration, or `undefined` when it has none. A file that
+ * is there but wrong stops the run: guessing would run commands nobody wrote.
  */
 export const readConfig = async (
   root?: string,
@@ -99,8 +98,8 @@ const regex = (): t.Type<string> => t.annotate(t.string(), { format: 'regex' });
 
 /**
  * The file as written. The descriptions are the file's documentation: they are
- * what `config.schema.json`, generated from this by `gen:config-schema`,
- * shows in an editor.
+ * what `config.schema.json`, generated from this by `gen:config-schema`, shows
+ * in an editor.
  */
 export const ConfigFileSchema = t.annotate(
   t.strictRecord({

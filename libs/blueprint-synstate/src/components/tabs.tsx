@@ -35,8 +35,8 @@ type Props<T extends string> = Readonly<{
 
 /**
  * Blueprint's `Tabs`, with `renderActiveTabPanelOnly`: the titles in
- * `div.bp6-tab-list`, and the chosen tab's panel alone, built when it is
- * chosen and disposed when another is. No sliding indicator (`animate` off):
+ * `div.bp6-tab-list`, and the chosen tab's panel alone, built when it is chosen
+ * and disposed when another is. No sliding indicator (`animate` off):
  * the chosen title is underlined by Blueprint's style sheet.
  *
  * Only the chosen title is in the tab order. The arrow keys move the focus

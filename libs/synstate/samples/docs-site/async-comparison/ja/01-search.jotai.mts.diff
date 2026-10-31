@@ -17,8 +17,8 @@
  export const createSearch = () => {
    const store = createStore();
  
--  // A primitive atom ignores a write equal to its value,
--  // so a query that did not change triggers nothing.
+-  // A primitive atom ignores a write equal to its value, so a query that did
+-  // not change triggers nothing.
 +  // プリミティブ atom は今の値と等しい書き込みを無視するので、
 +  // 変わっていないクエリは何も引き起こさない。
    const debouncedQueryAtom = atom('');
@@ -32,9 +32,9 @@
      }, debounceMs);
    };
  
--  // Jotai aborts `signal` when a dependency changes and the atom is
--  // read again, and ignores the promise it returned. Unsubscribing does
--  // not abort it, so disposal brings a signal of its own.
+-  // Jotai aborts `signal` when a dependency changes and the atom is read again,
+-  // and ignores the promise it returned. Unsubscribing does not abort it, so
+-  // disposal brings a signal of its own.
 +  // 依存が変わって atom が再び読まれると、Jotai は `signal` を中断し、
 +  // 返された Promise を無視する。購読解除では中断されないので、
 +  // 破棄用に別の signal を用意する。
@@ -45,8 +45,8 @@
      },
    );
  
--  // An async atom suspends; unwrap turns the pending promise into a
--  // fallback value, which carries no query of its own.
+-  // An async atom suspends; unwrap turns the pending promise into a fallback
+-  // value, which carries no query of its own.
 +  // 非同期 atom はサスペンドする。unwrap は保留中の Promise を
 +  // フォールバック値に置き換えるが、それはクエリを持たない。
    const unwrappedAtom = unwrap(resultAtom, () => undefined);
@@ -56,8 +56,8 @@
        },
    );
  
--  // Nothing is computed, and no request sent, until an atom is
--  // subscribed to (useAtomValue in a component does this).
+-  // Nothing is computed, and no request sent, until an atom is subscribed to
+-  // (useAtomValue in a component does this).
 +  // atom が購読されるまで何も計算されず、リクエストも送られない
 +  // （コンポーネントでは useAtomValue がこれを行う）。
    const unsubscribe = store.sub(searchStateAtom, () => {});

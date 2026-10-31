@@ -10,8 +10,8 @@ describe(isSameRepo, () => {
     );
   });
 
-  // `pr-report --repo` run in another repository's checkout must not judge
-  // the pull requests by that checkout's ruleset.
+  // `pr-report --repo` run in another repository's checkout must not judge the
+  // pull requests by that checkout's ruleset.
   test('is not another repository', () => {
     assert.isFalse(
       isSameRepo(

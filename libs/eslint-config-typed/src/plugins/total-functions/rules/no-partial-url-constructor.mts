@@ -6,9 +6,8 @@ import { createRule, typeSymbolName } from './common.mjs';
 /**
  * An ESLint rule to ban the partial URL construction.
  *
- * The constructor and literal arguments are read through `as`, `satisfies`,
- * `!` and `<T>`: the constructor is URL's if the type at any wrapper layer
- * says so.
+ * The constructor and literal arguments are read through `as`, `satisfies`, `!`
+ * and `<T>`: the constructor is URL's if the type at any wrapper layer says so.
  */
 
 export const noPartialUrlConstructor = createRule({

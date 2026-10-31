@@ -11,11 +11,11 @@ type Props = Readonly<{
 }>;
 
 /**
- * A group: a frame with rounded corners round its nodes, drawn under them,
- * and its title along the top. The title is what is grabbed to drag the
- * frame, with its nodes, and what a tap, or Enter or Space when focused,
- * opens the group's dialog with; inside the frame, a press pans as one on
- * the background does. An empty group is drawn the same, round nothing.
+ * A group: a frame with rounded corners round its nodes, drawn under them, and
+ * its title along the top. The title is what is grabbed to drag the frame, with
+ * its nodes, and what a tap, or Enter or Space when focused, opens the group's
+ * dialog with; inside the frame, a press pans as one on the background does. An
+ * empty group is drawn the same, round nothing.
  */
 export const DagGroupFrame = ({ record }: Props): JSX.Element => {
   const { id } = record.getSnapshot().value.frame;

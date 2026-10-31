@@ -13,8 +13,8 @@ import {
  * ts-type-forge type as a global so consumers can opt-in to ambient
  * access via `/// <reference types="ts-type-forge/global" />`.
  *
- * Importing the package by name keeps named-only access without
- * polluting the global namespace.
+ * Importing the package by name keeps named-only access without polluting the
+ * global namespace.
  */
 export const genGlobal = async (
   srcDir: string,
@@ -120,9 +120,9 @@ export const genGlobal = async (
 };
 
 /**
- * `TSTypeForgeInternals_`-prefixed types are part of the named-import
- * surface but should not pollute the ambient declarations. They stay
- * reachable as `import { TSTypeForgeInternals_X } from 'ts-type-forge'`.
+ * `TSTypeForgeInternals_`-prefixed types are part of the named-import surface
+ * but should not pollute the ambient declarations. They stay reachable as
+ * `import { TSTypeForgeInternals_X } from 'ts-type-forge'`.
  */
 const isInternalName = (name: string): boolean =>
   name.startsWith('TSTypeForgeInternals_');

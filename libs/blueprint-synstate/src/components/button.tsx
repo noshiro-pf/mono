@@ -45,8 +45,8 @@ export type ButtonProps = Readonly<{
 }>;
 
 /**
- * Blueprint's `Button`: a `<button type="button">` with the icon, the text
- * in `span.bp6-button-text` and the end icon, as Blueprint draws them.
+ * Blueprint's `Button`: a `<button type="button">` with the icon, the text in
+ * `span.bp6-button-text` and the end icon, as Blueprint draws them.
  *
  * `disabled` also sets `bp6-disabled`, which Blueprint's style sheets draw a
  * disabled button by. No `loading` spinner.

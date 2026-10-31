@@ -4,8 +4,8 @@ import * as path from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
-// This package lives in apps/ while the packages it measures live in libs/,
-// so they are no longer siblings.
+// This package lives in apps/ while the packages it measures live in libs/, so
+// they are no longer siblings.
 const synstateDistPath = path.resolve(
   workspaceRootPath,
   '../../libs/synstate/dist/index.mjs',
@@ -98,11 +98,11 @@ const embedBundleSize = async (): Promise<void> => {
   // Measure synstate
   console.info('Measuring bundle size for synstate...');
 
-  // Every runtime dependency is external: the number is meant to be the size
-  // of this package, not of its dependency tree inlined. `ts-std-forge`
-  // joined the list when synstate took the panic path from it (Sumi D-48) —
-  // leaving it out measured all of ts-std-forge as if it were synstate's own
-  // code and reported 8.7 kB against an actual 4.7 kB.
+  // Every runtime dependency is external: the number is meant to be the size of
+  // this package, not of its dependency tree inlined. `ts-std-forge` joined the
+  // list when synstate took the panic path from it (Sumi D-48) — leaving it out
+  // measured all of ts-std-forge as if it were synstate's own code and reported
+  // 8.7 kB against an actual 4.7 kB.
   const synstate = await measureBundleSize(synstateDistPath, [
     'ts-data-forge',
     'ts-std-forge',

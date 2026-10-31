@@ -120,6 +120,50 @@ namespace NoNegatedComparison {
 }
 
 /**
+ * @description Disallow a comment paragraph wrapped unevenly: a line with room for the first word of the line after it
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | layout     |
+ *  | deprecated | false      |
+ *  | fixable    | whitespace |
+ *  ```
+ */
+namespace NoRaggedCommentWrap {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "printWidth": {
+   *         "type": "integer",
+   *         "minimum": 1,
+   *         "description": "The width to wrap comments at (default: the nearest JSON Prettier configuration's `printWidth`, else 80)"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * The width to wrap comments at (default: the nearest JSON Prettier configuration's `printWidth`, else 80)
+     */
+    printWidth?: number;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
  * @description Disallow type assertions with specified type names
  *
  *  ```md
@@ -508,6 +552,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/function-order': FunctionOrder.RuleEntry;
   'ts-restrictions/jsx-boolean-logical-operands': JsxBooleanLogicalOperands.RuleEntry;
   'ts-restrictions/no-negated-comparison': NoNegatedComparison.RuleEntry;
+  'ts-restrictions/no-ragged-comment-wrap': NoRaggedCommentWrap.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.RuleEntry;
   'ts-restrictions/no-string-spread': NoStringSpread.RuleEntry;
@@ -526,6 +571,7 @@ export type EslintTsRestrictionsRules = Readonly<{
 
 export type EslintTsRestrictionsRulesOption = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.Options;
+  'ts-restrictions/no-ragged-comment-wrap': NoRaggedCommentWrap.Options;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.Options;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.Options;
   'ts-restrictions/prefer-ternary': PreferTernary.Options;

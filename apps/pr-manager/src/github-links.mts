@@ -18,9 +18,9 @@ export const openPullRequestsUrl = (source: ReportSource): string =>
   searchUrl(source, 'pulls', 'is:pr is:open');
 
 /**
- * The search the merged block reads ({@link mergedSearch}), for a window
- * ending at `nowMs`. A day is as fine as search goes, so this may list a few
- * more than the block, merged earlier on the day the window starts.
+ * The search the merged block reads ({@link mergedSearch}), for a window ending
+ * at `nowMs`. A day is as fine as search goes, so this may list a few more than
+ * the block, merged earlier on the day the window starts.
  */
 export const mergedPullRequestsUrl = (
   source: ReportSource,

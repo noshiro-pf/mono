@@ -701,8 +701,8 @@ describe('release-binaries', () => {
         },
       }) as const;
 
-    // A key the file does not define survives a move: JSON has no comments,
-    // so a note is a field, and a rewrite must not drop it.
+    // A key the file does not define survives a move: JSON has no comments, so
+    // a note is a field, and a rewrite must not drop it.
     const moves = (version: string, digest: string) => {
       const base = pin('owner/moves', version, digest);
 
@@ -813,8 +813,8 @@ describe('release-binaries', () => {
           ],
         },
       ],
-      // The newest mature release re-uploaded a file yesterday; the one
-      // before it is taken instead of nothing.
+      // The newest mature release re-uploaded a file yesterday; the one before
+      // it is taken instead of nothing.
       'owner/fallback': [
         {
           tag_name: 'v1.0.2',
@@ -955,8 +955,8 @@ describe('release-binaries', () => {
 });
 
 describe('release-binaries --to', () => {
-  // Every step spawns `node`, a dozen in all, which outlasts the default 5 s
-  // on a loaded runner.
+  // Every step spawns `node`, a dozen in all, which outlasts the default 5 s on
+  // a loaded runner.
   test(
     'moves the one tool named to the version given, across its line, under the same hold',
     { timeout: 30_000 },
@@ -1185,8 +1185,8 @@ describe('release-binaries --to', () => {
           'jump (owner/jump): v2.0.0 unchanged (--to)\n',
         );
 
-        // A digest that differs on the same version is refused: the upload
-        // was replaced, which is reported rather than re-pinned.
+        // A digest that differs on the same version is refused: the upload was
+        // replaced, which is reported rather than re-pinned.
         const replacedPins = {
           ...before,
           jump: pin('owner/jump', '2.0.0', '9'),

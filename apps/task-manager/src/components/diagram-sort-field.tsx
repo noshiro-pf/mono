@@ -5,8 +5,8 @@ import { SortEditor } from './sort-editor.js';
 
 /**
  * 「並び順」: the order of the tasks in 「アーク」 and 「タイル」, one for
- * both and apart from the list's, edited with the list's sort editor. With
- * no keys, by title ascending. Kept on this device.
+ * both and apart from the list's, edited with the list's sort editor. With no
+ * keys, by title ascending. Kept on this device.
  */
 export const DiagramSortField = (): JSX.Element => (
   <fieldset

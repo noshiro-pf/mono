@@ -7,23 +7,23 @@
  * domain, which Safari's storage partitioning (and so every browser on iOS)
  * keeps from the page, and the sign-in silently does nothing.
  *
- * **Offline**: Firestore keeps its cache in IndexedDB, shared between tabs,
- * so the data opens without a network and writes made offline are sent
- * when it is back.
+ * **Offline**: Firestore keeps its cache in IndexedDB, shared between tabs, so
+ * the data opens without a network and writes made offline are sent when it is
+ * back.
  *
  * **Signing out deletes that cache**, which would otherwise leave the data
- * readable on a shared device. An instance can delete its cache only once
- * it has been terminated, and a terminated one cannot be used again, so
- * every sign-out — here, in another tab, or the one a page starts with —
- * terminates the instance, deletes the cache and starts a new one, which a
+ * readable on a shared device. An instance can delete its cache only once it
+ * has been terminated, and a terminated one cannot be used again, so every
+ * sign-out — here, in another tab, or the one a page starts with — terminates
+ * the instance, deletes the cache and starts a new one, which a
  * sign-in waits for. Another tab still holding the cache terminates its own
  * instance when asked to delete it.
  *
- * **Emulators**: a development build connects Auth and Firestore to the
- * local emulators unless told otherwise (`emulator-mode.mts`). It then keeps
- * the Firestore cache in memory: the IndexedDB cache is keyed by project,
- * not by server, so the emulator's data and the real project's, both opened
- * from `localhost`, would otherwise share one cache.
+ * **Emulators**: a development build connects Auth and Firestore to the local
+ * emulators unless told otherwise (`emulator-mode.mts`). It then keeps the
+ * Firestore cache in memory: the IndexedDB cache is keyed by project, not by
+ * server, so the emulator's data and the real project's, both opened from
+ * `localhost`, would otherwise share one cache.
  */
 
 import { initializeApp } from 'firebase/app';

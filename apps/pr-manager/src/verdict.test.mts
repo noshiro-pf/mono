@@ -16,8 +16,8 @@ describe(presentVerdict, () => {
     }
   });
 
-  // Four verdicts that look alike is the failure this is guarding against,
-  // and it is the one a reader would put down to their own eyesight.
+  // Four verdicts that look alike is the failure this is guarding against, and
+  // it is the one a reader would put down to their own eyesight.
   test('draws something different for each of them', () => {
     const icons = (['failing', 'passed', 'paused', 'pending'] as const).map(
       (verdict) => presentVerdict(verdict).icon,
@@ -51,8 +51,8 @@ const checks: ChecksSummary = {
 
 describe(describeCheckCounts, () => {
   test('counts each state, worst first, leaving out the empty ones', () => {
-    // A context nothing has reported on yet is still coming, so it is
-    // counted with the pending ones.
+    // A context nothing has reported on yet is still coming, so it is counted
+    // with the pending ones.
     expect(describeCheckCounts(checks)).toBe(
       '1\u{2717} 1\u{2026} 1\u{2013} 2\u{2713}',
     );
@@ -83,8 +83,8 @@ describe(describeCheckBreakdown, () => {
   });
 
   // #2103, stacked on another pull request's branch: the three
-  // `lint-pull-request.yml` contexts run on pull requests into `main` only,
-  // and were listed as pending under a verdict that had passed.
+  // `lint-pull-request.yml` contexts run on pull requests into `main` only, and
+  // were listed as pending under a verdict that had passed.
   test('says which contexts do not run on a stacked base', () => {
     const stacked: ChecksSummary = {
       verdict: 'passed',

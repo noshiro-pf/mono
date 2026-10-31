@@ -2,8 +2,8 @@ import type { None, Some } from '../../../adt-types.mjs';
 import type { UnknownOptional } from '../optional.mjs';
 
 /**
- * Extracts the value type `S` from an {@link Some}<S>. If the
- * {@link Optional} is {@link None}, resolves to `never`.
+ * Extracts the value type `S` from an {@link Some}<S>. If the {@link Optional}
+ * is {@link None}, resolves to `never`.
  *
  * @template O The {@link UnknownOptional} type to unwrap.
  */

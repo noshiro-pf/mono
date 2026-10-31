@@ -33,9 +33,9 @@ if (import.meta.vitest !== undefined) {
 
     // embed-sample-code-ignore-below
 
-    // In RxJS, when counterObservable emits a new value,
-    // combineLatest (which subscribes to multipliedBy10 first) updates
-    // that slot before multipliedBy1000 has recalculated.
+    // In RxJS, when counterObservable emits a new value, combineLatest (which
+    // subscribes to multipliedBy10 first) updates that slot before
+    // multipliedBy1000 has recalculated.
     // This causes glitches — inconsistent intermediate states:
     //
     //   counter: 0 → multipliedBy10: 0,   multipliedBy1000: 0,    sum: 0+0 = 0       ✓

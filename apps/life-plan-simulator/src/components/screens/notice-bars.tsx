@@ -3,9 +3,9 @@ import { constant, If, view, type JSX } from 'synstate-dom';
 import { planStore, sessionStore } from '../../store/index.mjs';
 
 /**
- * Asks what to do when a sign-out stopped because writes made offline could
- * not be sent: signing out deletes them with the rest of the data kept on
- * this device.
+ * Asks what to do when a sign-out stopped because writes made offline could not
+ * be sent: signing out deletes them with the rest of the data kept on this
+ * device.
  */
 export const UnsentWritesBar = (): JSX.Element => (
   <If

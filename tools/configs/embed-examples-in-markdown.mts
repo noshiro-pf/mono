@@ -31,10 +31,10 @@ export type EmbedExamplesInMarkdownOptions = Readonly<{
  * Embeds sample code into the JavaScript / TypeScript fences of markdown
  * documents — a package's README, usually, from its `samples/readme`.
  *
- * Every such fence has to be backed by a sample; see
- * {@link fenceStartRegex} for what counts as one. A package's
- * `scripts/cmd/embed-examples.mts` is the mapping and nothing else; this is
- * the code that was copied into all thirteen of them.
+ * Every such fence has to be backed by a sample; see {@link fenceStartRegex}
+ * for what counts as one. A package's `scripts/cmd/embed-examples.mts` is the
+ * mapping and nothing else; this is the code that was copied into all thirteen
+ * of them.
  */
 export const embedExamplesInMarkdown = async ({
   documents,

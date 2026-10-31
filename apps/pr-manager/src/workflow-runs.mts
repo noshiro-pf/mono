@@ -5,21 +5,21 @@
  * ({@link actionsQueryUrl}).
  *
  * **REST rather than GraphQL**, because GraphQL has no way to list a
- * repository's workflow runs by state: a run is reached there only through
- * the commit or the check suite it belongs to. REST lists them by one state
- * at a time, so a read is {@link RUN_STATES} requests, sent at once.
+ * repository's workflow runs by state: a run is reached there only through the
+ * commit or the check suite it belongs to. REST lists them by one state at a
+ * time, so a read is {@link RUN_STATES} requests, sent at once.
  *
  * **What it costs is REST's budget, not GraphQL's** — two separate 5,000 an
  * hour on a personal token — so it is never added to the budget the header
  * shows (`rate-limit.mts`). Each request goes out as `no-cache` rather than
  * `no-store`: the browser keeps the answer and asks GitHub whether it has
- * changed, and GitHub does not count a `304` against the budget. A state
- * with nothing in it, which is most of them most of the time, answers the
- * same every read.
+ * changed, and GitHub does not count a `304` against the budget. A state with
+ * nothing in it, which is most of them most of the time, answers the same every
+ * read.
  *
- * **Read beside the report, not as a part of it** (`store/reader.mts`): a
- * read of this that fails says so in its own block and leaves the merge
- * order alone, since it is a different API with a different budget.
+ * **Read beside the report, not as a part of it** (`store/reader.mts`): a read
+ * of this that fails says so in its own block and leaves the merge order alone,
+ * since it is a different API with a different budget.
  */
 
 import { Arr, isRecord, Json, Result } from 'ts-data-forge';
@@ -28,9 +28,9 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import { repositoryUrl, type ReportSource } from './constants.mjs';
 
 /**
- * The states the Actions tab's filter names, in the order the block's
- * badges explain them. `neutral` and `stale` are conclusions rather than
- * states, which REST's `status` parameter takes all the same.
+ * The states the Actions tab's filter names, in the order the block's badges
+ * explain them. `neutral` and `stale` are conclusions rather than states, which
+ * REST's `status` parameter takes all the same.
  */
 export type RunState =
   | 'in_progress'
@@ -73,8 +73,8 @@ export type WorkflowRunList = Readonly<{
   /** Newest first, as the Actions tab lists them. */
   runs: readonly WorkflowRun[];
   /**
-   * How many GitHub says there are, which is more than {@link runs} only
-   * when a state has more than {@link RUNS_PER_STATE}.
+   * How many GitHub says there are, which is more than {@link runs} only when a
+   * state has more than {@link RUNS_PER_STATE}.
    */
   totalCount: number;
 }>;
@@ -105,8 +105,8 @@ export const RUNS_PER_STATE = 100;
 
 /**
  * Every run in one of {@link RUN_STATES}, or a sentence a reader can act on.
- * One state that fails fails the read: a list missing a state would be read
- * as nothing being in it.
+ * One state that fails fails the read: a list missing a state would be read as
+ * nothing being in it.
  */
 export const loadWorkflowRuns = async (
   source: ReportSource,
@@ -132,8 +132,8 @@ export const loadWorkflowRuns = async (
     }
   });
 
-  // A run that changed state between two of the requests can be met in
-  // both; it is listed once, under the first state that found it.
+  // A run that changed state between two of the requests can be met in both; it
+  // is listed once, under the first state that found it.
   const runs = Arr.uniqBy(
     lists.flatMap(({ runs: listed }) => listed),
     ({ id }) => id,
@@ -252,8 +252,8 @@ const RunsPageSchema = t.record({
 });
 
 /**
- * Written as a wrapper rather than handed over bare, because `fetch`
- * detached from the global it belongs to is not callable in every engine.
+ * Written as a wrapper rather than handed over bare, because `fetch` detached
+ * from the global it belongs to is not callable in every engine.
  */
 const askGitHub: RestFetch = async (route, init) => fetch(route, init);
 

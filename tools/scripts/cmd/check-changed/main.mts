@@ -24,8 +24,8 @@ import {
 } from './plan.mjs';
 
 /**
- * Runs the checks a diff needs, and only those. README.md beside this file
- * says what runs when, and what is left to CI.
+ * Runs the checks a diff needs, and only those. README.md beside this file says
+ * what runs when, and what is left to CI.
  */
 const main = async (): Promise<number> => {
   const options = parseOptions();
@@ -130,8 +130,8 @@ const main = async (): Promise<number> => {
     ? ({ ran: [], failures: [], notes: [] } as const)
     : await runPlan({
         plan,
-        // Read when a coverage report is, not now: the formatter, the
-        // fixers and the codemod run first and move the lines.
+        // Read when a coverage report is, not now: the formatter, the fixers
+        // and the codemod run first and move the lines.
         readChangedLines: options.coverage
           ? async () => collectAddedLines(base)
           : undefined,
@@ -255,10 +255,11 @@ const reportCoverage = async ({
 
 /**
  * Runs `pnpm` with the step's arguments, its output passed straight through.
- * A coverage step gets Vitest's options appended, which `pnpm run` hands on
- * to the last command of the script — `vitest` in the `check:test` of every
- * package with a `check:test:cov`, and in `check:root:test`. The reporter is narrowed to `lcov` and written to a
- * temporary directory, so a package's own `coverage/` is left alone.
+ * A coverage step gets Vitest's options appended, which `pnpm run` hands on to
+ * the last command of the script — `vitest` in the `check:test` of every
+ * package with a `check:test:cov`, and in `check:root:test`. The reporter is
+ * narrowed to `lcov` and written to a temporary directory, so a package's own
+ * `coverage/` is left alone.
  */
 const runPnpm = async (
   step: Step,
@@ -328,9 +329,9 @@ const git = (args: readonly string[], input?: string): string => {
 };
 
 /**
- * Every path `git status` reports, with a hash of what is on disk, so that
- * two snapshots tell which files a step wrote — including a file that was
- * already modified before it ran, which `git status` alone cannot.
+ * Every path `git status` reports, with a hash of what is on disk, so that two
+ * snapshots tell which files a step wrote — including a file that was already
+ * modified before it ran, which `git status` alone cannot.
  */
 const snapshotTree = (): ReadonlyMap<string, string> => {
   const files = splitZ(
@@ -343,9 +344,9 @@ const snapshotTree = (): ReadonlyMap<string, string> => {
     ]),
   ).map((entry) => entry.slice(STATUS_PREFIX_LENGTH));
 
-  // One `git hash-object` for all of them. It fails as a whole on a path
-  // that is not a regular file — deleted, or the `dir/` of an untracked
-  // nested repository — so those are set apart first.
+  // One `git hash-object` for all of them. It fails as a whole on a path that
+  // is not a regular file — deleted, or the `dir/` of an untracked nested
+  // repository — so those are set apart first.
   const hashed = files.filter(isRegularFile);
 
   const hashes = Arr.isEmpty(hashed)
@@ -384,14 +385,14 @@ const describe = (step: Step): string => {
 };
 
 /**
- * Runs the steps one after another, all of them whatever fails, and says
- * what each wrote to the tree: a generator that wrote anything fails the run,
- * since that is the diff CI's `assert-repo-is-clean` would fail on with no
- * hint which generator wrote it.
+ * Runs the steps one after another, all of them whatever fails, and says what
+ * each wrote to the tree: a generator that wrote anything fails the run, since
+ * that is the diff CI's `assert-repo-is-clean` would fail on with no hint which
+ * generator wrote it.
  *
- * Only what is still changed at the end is reported. The codemod reprints
- * every file it reads, and the formatter after it puts most of them back; a
- * step's write that a later step undid is not something to review.
+ * Only what is still changed at the end is reported. The codemod reprints every
+ * file it reads, and the formatter after it puts most of them back; a step's
+ * write that a later step undid is not something to review.
  */
 const runPlan = async ({
   plan,
@@ -459,8 +460,8 @@ const runPlan = async ({
       console.info(`\n=== ${index + 1}/${plan.length} ${describe(step)}\n`);
 
       // Every step is watched, not only the generators and fixers:
-      // `check:root:lint` runs `eslint --fix`, and a check that writes is
-      // worth knowing about whatever its name says.
+      // `check:root:lint` runs `eslint --fix`, and a check that writes is worth
+      // knowing about whatever its name says.
       const before = latestSnapshot();
 
       const reportsDirectory =
@@ -671,8 +672,8 @@ const collectAddedLines = async (
       '-c',
       'core.quotePath=false',
       'diff',
-      // Whatever path prefixes the user's git config asks diffs for, the
-      // parser reads `+++ b/<path>`.
+      // Whatever path prefixes the user's git config asks diffs for, the parser
+      // reads `+++ b/<path>`.
       '--src-prefix=a/',
       '--dst-prefix=b/',
       '-U0',

@@ -9,8 +9,8 @@ import {
   type Finding,
 } from './parse.mjs';
 
-// The fixtures are shortened from real descriptions of merged pull requests
-// in this repository; each keeps the shape it exercises.
+// The fixtures are shortened from real descriptions of merged pull requests in
+// this repository; each keeps the shape it exercises.
 
 const summary = (
   findings: readonly Finding[],

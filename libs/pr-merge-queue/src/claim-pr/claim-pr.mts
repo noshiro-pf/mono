@@ -40,8 +40,8 @@ export const CLAIM_PR_HELP = [
 
 /**
  * Claims a pull request `unblock-prs` set aside, before fixing it, so that the
- * script and every other session leave it alone meanwhile
- * (`pr-report-core`'s `claim.mts` says what a claim is and how long it lasts).
+ * script and every other session leave it alone meanwhile (`pr-report-core`'s
+ * `claim.mts` says what a claim is and how long it lasts).
  *
  * ```sh
  * claim-pr 2154 --by <session URL>            # claim, or renew
@@ -49,14 +49,14 @@ export const CLAIM_PR_HELP = [
  * ```
  *
  * A claim is refused for a pull request whose owner (`pr-report-core`'s
- * `queue-owner.mts`, read through `pr-report/queue.mts` as every other
- * command reads it) is not a skill — the worker is about to act on it, or a
+ * `queue-owner.mts`, read through `pr-report/queue.mts` as every other command
+ * reads it) is not a skill — the worker is about to act on it, or a
  * person has to — and for one someone else holds. A push to the branch ends the claim by itself;
- * `--release` is for giving up without one. It prints what it did, and exits
- * 1 when it did not get the claim.
+ * `--release` is for giving up without one. It prints what it did, and exits 1
+ * when it did not get the claim.
  *
- * It writes as the token's account, which has to be the one `unblock-prs`
- * runs as: both trust only comments their own account wrote.
+ * It writes as the token's account, which has to be the one `unblock-prs` runs
+ * as: both trust only comments their own account wrote.
  */
 export const claimPr = async (
   args: ClaimArgs,
@@ -92,8 +92,8 @@ export const claimPr = async (
 
 /**
  * What to do about a claim by `by`, given who owns the pull request and what
- * its comments say now: write it (over `commentId` when there is one to edit
- * in place), or refuse and why.
+ * its comments say now: write it (over `commentId` when there is one to edit in
+ * place), or refuse and why.
  */
 export const decideClaim = (
   owner: QueueOwner | undefined,
@@ -162,8 +162,8 @@ export type ClaimArgs = Readonly<{
 }>;
 
 /**
- * The head, and what this account's comments say about it against the tip
- * of the default branch, which is what a set-aside is recorded against.
+ * The head, and what this account's comments say about it against the tip of
+ * the default branch, which is what a set-aside is recorded against.
  */
 const readPullRequest = async (
   context: ApiContext,
@@ -197,8 +197,8 @@ const readPullRequest = async (
     return tip;
   }
 
-  // The first page, oldest first: both comments are edited in place, so
-  // they stay where they were first posted.
+  // The first page, oldest first: both comments are edited in place, so they
+  // stay where they were first posted.
   const comments = await rest(
     context,
     'GET',
@@ -306,9 +306,9 @@ const claim = async (
     return written;
   }
 
-  // Two claimants writing at once both see nothing to refuse. Whichever
-  // claim reads back afterwards is the one that holds — the oldest comment,
-  // last written — and the other learns it lost here.
+  // Two claimants writing at once both see nothing to refuse. Whichever claim
+  // reads back afterwards is the one that holds — the oldest comment, last
+  // written — and the other learns it lost here.
   await new Promise((resolve) => {
     setTimeout(resolve, READ_BACK_DELAY_MS);
   });

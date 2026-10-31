@@ -4,21 +4,21 @@ import { ExternalLink } from './external-link.js';
 import { followOpen } from './follow-open.mjs';
 
 /**
- * The "How to use" button and the dialog it opens: what a repository writes
- * for the page to say more — the `Merge-After:` and `Start-After:` lines and
- * the labels it reads — and a link to the README, which says the rest.
+ * The "How to use" button and the dialog it opens: what a repository writes for
+ * the page to say more — the `Merge-After:` and `Start-After:` lines and the
+ * labels it reads — and a link to the README, which says the rest.
  *
- * A summary of the README's "What your repository can add", kept to the
- * rules a reader acts on while looking at the page; the README stays the
- * whole of it. The merge queue gets the outline of its setup and a link to
+ * A summary of the README's "What your repository can add", kept to the rules a
+ * reader acts on while looking at the page; the README stays the whole of it.
+ * The merge queue gets the outline of its setup and a link to
  * `pr-merge-queue`'s README, which has each step.
  *
  * A native `<dialog>` opened modal, as the other header dialogs are
- * (`view-settings.tsx`). Nothing else reads whether it is open, so the state
- * is the component's own rather than a store's. It needs no token: it is
- * what a reader who has not given one yet may want first. The README link
- * is the first thing in it, because opening focuses the first control: one
- * at the bottom would open the dialog scrolled to its end.
+ * (`view-settings.tsx`). Nothing else reads whether it is open, so the state is
+ * the component's own rather than a store's. It needs no token: it is what a
+ * reader who has not given one yet may want first. The README link is the first
+ * thing in it, because opening focuses the first control: one at the bottom
+ * would open the dialog scrolled to its end.
  */
 export const HowToUse = (): JSX.Element => {
   const [open$, setOpen] = createState(false);

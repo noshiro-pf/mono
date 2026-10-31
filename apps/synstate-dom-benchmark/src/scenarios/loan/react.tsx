@@ -12,9 +12,9 @@ import {
 } from './model.mjs';
 
 /**
- * The inputs are one state, and the render computes every figure from them in
- * a loop, in a `useMemo`; there is no graph to propagate through. Each change
- * is rendered with `flushSync`, as a click handler's update is.
+ * The inputs are one state, and the render computes every figure from them in a
+ * loop, in a `useMemo`; there is no graph to propagate through. Each change is
+ * rendered with `flushSync`, as a click handler's update is.
  */
 export const reactLoan: ScenarioFramework<LoanApp> = {
   name: 'React',

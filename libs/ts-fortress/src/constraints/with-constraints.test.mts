@@ -251,8 +251,8 @@ describe(attachConstraints, () => {
 
     // An accessor descriptor owns `get`; the data descriptor a spread would
     // have produced owns `value` instead, holding the evaluated default. The
-    // key is tested rather than the function so that reading it does not
-    // itself call the getter.
+    // key is tested rather than the function so that reading it does not itself
+    // call the getter.
     assert.isTrue(isRecord(descriptor) && hasKey(descriptor, 'get'));
 
     assert.deepStrictEqual(attached.defaultValue, { x: 1, y: 2 });

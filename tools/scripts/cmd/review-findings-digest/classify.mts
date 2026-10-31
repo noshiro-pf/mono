@@ -10,8 +10,8 @@ type Category = Readonly<{ id: string; label: string; pattern: RegExp }>;
 /**
  * The classes of review finding the digest counts, each recognized by a
  * keyword pattern over the finding's text. A finding may fall in several;
- * one that matches none is listed verbatim under "other", which is where a
- * new class shows up first — add it here once it recurs.
+ * one that matches none is listed verbatim under "other", which is where a new
+ * class shows up first — add it here once it recurs.
  *
  * These are keywords, not understanding: they over- and under-count, and the
  * counts are a pointer for whoever reads the digest, never a gate.

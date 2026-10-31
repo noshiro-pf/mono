@@ -16,10 +16,10 @@ type MessageIds = 'requireMutPrefix';
  * mutated, so an unprefixed draft is otherwise reported on every line that
  * writes to it, with a message that does not say the fix is a rename.
  *
- * The recipe is the second argument of `produce` / `produceWithPatches` when
- * it is a function literal, and otherwise the first when that one is (the
- * curried form). A destructured draft and one that is never referenced are
- * left alone; a draft with a default value is reported.
+ * The recipe is the second argument of `produce` / `produceWithPatches` when it
+ * is a function literal, and otherwise the first when that one is (the curried
+ * form). A destructured draft and one that is never referenced are left alone;
+ * a draft with a default value is reported.
  *
  * The fix renames the parameter and its references. It is withheld when it
  * could change the code's meaning or add shadowing; `canRename` lists the
@@ -147,8 +147,8 @@ const findRecipe = (
 
   // immer curries when the base is a function and the recipe is not, and the
   // curried form takes at most an initial state after it. A recipe passed by
-  // name cannot be told from an initial state, so a function literal second
-  // is the recipe, and otherwise a function literal first.
+  // name cannot be told from an initial state, so a function literal second is
+  // the recipe, and otherwise a function literal first.
   return second !== undefined && isFunctionNode(second)
     ? second
     : first !== undefined &&

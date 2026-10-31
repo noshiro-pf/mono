@@ -28,9 +28,8 @@ export const eslintConfigForPreact = (
           ignore: [
             ...eslintReactRules['react/no-unknown-property'][1].ignore,
             // Preact writes a prop to the DOM under the name it is spelled
-            // with. On an SVG element it becomes an attribute, and an
-            // attribute `tabIndex` is not `tabindex`, so the element cannot
-            // take focus.
+            // with. On an SVG element it becomes an attribute, and an attribute
+            // `tabIndex` is not `tabindex`, so the element cannot take focus.
             'tabindex',
             // Preact takes the DOM's own event names; `onDoubleClick` is
             // React's spelling and listens for an event that never fires.

@@ -12,20 +12,20 @@ import { pagesAppBase } from '../../../tools/configs/pages-apps.mjs';
 /**
  * What the page is allowed to talk to, written into the built `index.html`.
  *
- * A reader may paste a GitHub token into this page, and `connect-src` is
- * what keeps that from becoming a way to send it somewhere else: with one
- * host named and `default-src 'none'` behind it, no script this bundle ever
- * comes to contain can reach anywhere but `api.github.com`. That is a
- * property of the page rather than a promise about its code, which is the
- * only kind worth making about a secret somebody else typed in.
+ * A reader may paste a GitHub token into this page, and `connect-src` is what
+ * keeps that from becoming a way to send it somewhere else: with one host named
+ * and `default-src 'none'` behind it, no script this bundle ever comes to
+ * contain can reach anywhere but `api.github.com`. That is a property of the
+ * page rather than a promise about its code, which is the only kind worth
+ * making about a secret somebody else typed in.
  *
- * `'unsafe-inline'` for styles and not for scripts, which is the asymmetry
- * that matters: the label chips and the ahead/behind bars carry `style`
- * attributes computed from the report, and an inline style cannot fetch
- * anything under this policy. `img-src data:` is for the SVG a chip may
- * inline. `frame-ancestors` is left out because a `<meta>` policy is not
- * allowed to set it — it needs a real header, and GitHub Pages sends
- * `X-Frame-Options: deny` on its own.
+ * `'unsafe-inline'` for styles and not for scripts, which is the asymmetry that
+ * matters: the label chips and the ahead/behind bars carry `style` attributes
+ * computed from the report, and an inline style cannot fetch anything under
+ * this policy. `img-src data:` is for the SVG a chip may inline.
+ * `frame-ancestors` is left out because a `<meta>` policy is not allowed to set
+ * it — it needs a real header, and GitHub Pages sends `X-Frame-Options: deny`
+ * on its own.
  *
  * Build-only, because the dev server's HMR talks to it over a websocket,
  * which `connect-src` would then have to name, and a policy loosened for that
@@ -75,12 +75,12 @@ const plugins: PluginOption[] = Array.from(
 );
 
 /**
- * A name for this build's sources, which the report kept for the next visit
- * is keyed by (`src/report-cache.mts`): a report is the page's own shape, so
- * one kept by other code is not read. A hash of the sources that shape it —
- * this app's and `pr-report-core`'s — rather than of the moment, so that the
- * same sources build the same bundle, and a deploy that changed neither
- * keeps every report kept before it.
+ * A name for this build's sources, which the report kept for the next visit is
+ * keyed by (`src/report-cache.mts`): a report is the page's own shape, so one
+ * kept by other code is not read. A hash of the sources that shape it — this
+ * app's and `pr-report-core`'s — rather than of the moment, so that the same
+ * sources build the same bundle, and a deploy that changed neither keeps every
+ * report kept before it.
  */
 const sourcesHash = (dirs: readonly string[]): string => {
   const hash = createHash('sha256');

@@ -54,8 +54,8 @@ describe(createState, () => {
   });
 
   // What `equals` is for: whatever reads the state, directly or through
-  // anything derived from it, is told only of a real change, and an equal
-  // value written over the current one leaves the object that is there.
+  // anything derived from it, is told only of a real change, and an equal value
+  // written over the current one leaves the object that is there.
   test('keeps the current object when `equals` finds the next one equal to it', () => {
     const [state, setState, { getSnapshot }] = createState<readonly number[]>(
       [1, 2],

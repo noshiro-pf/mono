@@ -17,18 +17,18 @@ import { projectRootPath } from '../project-root-path.mjs';
  * text once it is released.
  *
  * A changeset's body is copied verbatim into the `CHANGELOG.md` of every
- * package its front matter names, and each of those changelogs is checked
- * under the configuration cspell finds by walking up from that package's
- * directory. The changeset file itself sits at the repository root, where
- * only the root configuration applies — so a word a package's own
- * `cspell.config.yaml` allows fails while the changeset exists, and a word
- * only the root allows passes there and fails once released. Neither is the
- * question worth asking; what matters is the destination.
+ * package its front matter names, and each of those changelogs is checked under
+ * the configuration cspell finds by walking up from that package's directory.
+ * The changeset file itself sits at the repository root, where only the root
+ * configuration applies — so a word a package's own `cspell.config.yaml` allows
+ * fails while the changeset exists, and a word only the root allows passes
+ * there and fails once released. Neither is the question worth asking; what
+ * matters is the destination.
  *
  * So each changeset is checked once per named package, under that package's
  * configuration, and has to pass under **all** of them: the one body reaches
- * every named package's changelog, so a word is only safe if every one of
- * those configurations accepts it.
+ * every named package's changelog, so a word is only safe if every one of those
+ * configurations accepts it.
  *
  * Everything else in the directory — `README.md`, `config.json`, a `pre.json`
  * during a pre-release — has no destination and is checked under the root
@@ -85,13 +85,13 @@ export const cspellChangeset = async (): Promise<Result<number, string>> => {
     );
   }
 
-  // One cspell run per distinct configuration, over every file that has to
-  // pass under it. A changeset naming several packages appears in several
-  // groups, which is what makes "all of them" the condition.
+  // One cspell run per distinct configuration, over every file that has to pass
+  // under it. A changeset naming several packages appears in several groups,
+  // which is what makes "all of them" the condition.
   //
   // Sequentially, so that each report follows the command line naming the
-  // configuration it came from. Run concurrently they interleave, and with
-  // one report per configuration there is nothing left to tell them apart.
+  // configuration it came from. Run concurrently they interleave, and with one
+  // report per configuration there is nothing left to tell them apart.
   const failed = await Arr.uniq(plans.flatMap(({ configs }) => configs)).reduce<
     Promise<readonly string[]>
   >(async (accPromise, config) => {
@@ -134,10 +134,10 @@ const CHANGESET_DIR_NAME = '.changeset';
 const ROOT_CSPELL_CONFIG = path.resolve(projectRootPath, '.cspell.config.yaml');
 
 /**
- * The configuration filenames cspell looks for in a directory, in its own
- * order of preference. Taken from cspell-lib's `searchPlaces`, minus the
- * `.vscode/` and `.config/` locations and the JavaScript ones, none of which
- * this repository uses. A package that grows one of these instead of the
+ * The configuration filenames cspell looks for in a directory, in its own order
+ * of preference. Taken from cspell-lib's `searchPlaces`, minus the `.vscode/`
+ * and `.config/` locations and the JavaScript ones, none of which this
+ * repository uses. A package that grows one of these instead of the
  * `cspell.config.yaml` everything uses today still resolves correctly.
  */
 const CSPELL_CONFIG_FILENAMES = [
@@ -201,8 +201,8 @@ const runCspell = async (
 };
 
 /**
- * The package names in a changeset's front matter, or none when the file has
- * no front matter — `README.md` and `config.json` land here.
+ * The package names in a changeset's front matter, or none when the file has no
+ * front matter — `README.md` and `config.json` land here.
  */
 const readChangesetPackageNames = async (
   file: string,
@@ -257,8 +257,8 @@ const ancestorsToRoot = (dir: string): readonly string[] => {
 
 const fileExists = async (filePath: string): Promise<boolean> => {
   // Not `.then(onOk, onErr)`: eslint --fix rewrites that pair into
-  // `.catch(() => false).then(() => true)`, which answers true for every
-  // path and silently resolves every package to the first candidate.
+  // `.catch(() => false).then(() => true)`, which answers true for every path
+  // and silently resolves every package to the first candidate.
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const stats = await fs.stat(filePath).catch(() => undefined);
 

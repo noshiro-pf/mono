@@ -29,8 +29,8 @@ export const createPreactSignalsSpringAdapter = (): SpringAdapter => {
       // A `computed` is not given its own previous value, so each stage's
       // position is a signal, and one effect advances the whole chain in a
       // single batch when the head moves, as the MobX adapter's `reaction`
-      // does, then emits the points. `peek` reads a stage without
-      // subscribing the effect to it, so the effect runs once per move.
+      // does, then emits the points. `peek` reads a stage without subscribing
+      // the effect to it, so the effect runs once per move.
       mut_disposers.push(
         effect(() => {
           const headPos = head.value;

@@ -11,8 +11,8 @@ const box = (
   crossEnd: number,
 ): AxisBox => ({ mainStart, mainEnd, crossStart, crossEnd }) as const;
 
-// Two edges that come up to the line at 100 and go back down off it, one
-// round the other: `outer` from 60 to 300, `inner` from 100 to 250.
+// Two edges that come up to the line at 100 and go back down off it, one round
+// the other: `outer` from 60 to 300, `inner` from 100 to 250.
 const outer = [
   at(0, 0),
   at(60, 0),
@@ -139,8 +139,8 @@ describe(separateLanes, () => {
 });
 
 describe(orderPorts, () => {
-  // The target's side from 20 to 80 across, its ports at 40 and 60: the
-  // edge from above given the lower port, the one from below the upper.
+  // The target's side from 20 to 80 across, its ports at 40 and 60: the edge
+  // from above given the lower port, the one from below the upper.
   const fromAbove = [at(0, 0), at(376, 0), at(376, 60), at(400, 60)] as const;
 
   const fromBelow = [

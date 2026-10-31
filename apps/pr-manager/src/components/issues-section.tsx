@@ -31,25 +31,25 @@ import { Timestamp } from './timestamp.js';
  * priority or by start state, and narrowed by priority and `pending`
  * (`issues-summary.tsx`) and by start state, label and a search of the titles
  * (`issues-list-filters.tsx`). Each row says how the issue stands for being
- * started and what it waits for (`issue-start-row.tsx`). The DAG is narrowed
- * by the priorities and `pending` alone, which lead either view with how many
- * issues are shown of how many are open: what an issue drawn waits on is
- * drawn, whatever its priority (`omitFilteredIssues`).
+ * started and what it waits for (`issue-start-row.tsx`). The DAG is narrowed by
+ * the priorities and `pending` alone, which lead either view with how many
+ * issues are shown of how many are open: what an issue drawn waits on is drawn,
+ * whatever its priority (`omitFilteredIssues`).
  *
  * Last, because it is the one section that is not about the queue: a reader
  * asks "what is in flight" first and "what is waiting to be started" second.
- * Rows rather than the cards the pull requests get — an issue has no branch,
- * no checks and no place in a merge order, and a card shaped like a pull
- * request's would spend most of its height saying so.
+ * Rows rather than the cards the pull requests get — an issue has no branch, no
+ * checks and no place in a merge order, and a card shaped like a pull request's
+ * would spend most of its height saying so.
  *
- * The list starts at the most recently updated few, which come with the
- * report, and the rest are read a page at a time after them
- * (`issues-view-store.mts`), each added as it comes in. The button under it
- * is there while some are not listed, for a page that failed.
+ * The list starts at the most recently updated few, which come with the report,
+ * and the rest are read a page at a time after them (`issues-view-store.mts`),
+ * each added as it comes in. The button under it is there while some are not
+ * listed, for a page that failed.
  *
  * Or, switched to it, the DAG of what each waits for (`issue-dag.tsx`), with
- * the zoom at the other end of the row from the List / DAG switch. What is
- * done — closed as completed, or merged — it never draws.
+ * the zoom at the other end of the row from the List / DAG switch. What is done
+ * — closed as completed, or merged — it never draws.
  */
 export const IssuesSection = (): JSX.Element => {
   const issues$ = reader.issues;

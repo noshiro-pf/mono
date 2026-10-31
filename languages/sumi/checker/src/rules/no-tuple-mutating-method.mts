@@ -13,8 +13,8 @@ import type { Rule } from '../engine/index.mjs';
  *
  * A tuple type states a length and a type per position, and TypeScript keeps
  * neither once one of these methods runs. A mutable tuple inherits from
- * `Array`, so all nine are callable on one, and the type goes on describing
- * the value as it was:
+ * `Array`, so all nine are callable on one, and the type goes on describing the
+ * value as it was:
  *
  * ```ts
  * const mut_pair: [number, string] = [1, 'a'];
@@ -27,8 +27,8 @@ import type { Rule } from '../engine/index.mjs';
  * ```
  *
  * Every one of those is accepted by TypeScript today (measured). Assigning to
- * `length` is the only part it refuses, because a tuple's `length` is a
- * literal type.
+ * `length` is the only part it refuses, because a tuple's `length` is a literal
+ * type.
  *
  * Assigning to an element (`mut_pair[0] = 9`) stays legal: that is checked
  * against the type of *that slot*, so it cannot put a value where it does not
@@ -42,14 +42,13 @@ import type { Rule } from '../engine/index.mjs';
  * **On a homogeneous tuple some of these are sound**, and they are reported
  * anyway. `[number, number].reverse()` cannot put a value in the wrong slot,
  * but making the rule depend on whether the element types happen to coincide
- * would make it a question to work out per call site rather than a property
- * of tuples. **A tuple with a rest element is reported too**, though its
- * length is `number`: `push` on `[number, ...string[]]` accepts
- * `number | string` — the element type of the `Array` it inherits from — and
- * so can append a number where the type says every later element is a
- * string. The copying forms — `toSorted`, `toReversed`, `with` — return an
- * array and are untouched, which is the shape to reach for when the order is
- * what varies.
+ * would make it a question to work out per call site rather than a property of
+ * tuples. **A tuple with a rest element is reported too**, though its length is
+ * `number`: `push` on `[number, ...string[]]` accepts `number | string` — the
+ * element type of the `Array` it inherits from — and so can append a number
+ * where the type says every later element is a string. The copying forms —
+ * `toSorted`, `toReversed`, `with` — return an array and are untouched, which
+ * is the shape to reach for when the order is what varies.
  */
 export const noTupleMutatingMethod: Rule = {
   ruleId: 'mutation/no-tuple-mutating-method',
@@ -83,8 +82,8 @@ export const noTupleMutatingMethod: Rule = {
       return;
     }
 
-    // `Array` rather than `ReadonlyArray`: a readonly tuple does not have
-    // these members at all, so tsc has already refused the call.
+    // `Array` rather than `ReadonlyArray`: a readonly tuple does not have these
+    // members at all, so tsc has already refused the call.
     if (!ownersOf(checker, callee).includes('Array')) {
       return;
     }
@@ -129,10 +128,10 @@ const mutatorMessages: ReadonlyRecord<string, string | undefined> = {
 } as const;
 
 /**
- * Whether the receiver is a tuple — or a union in which any member is, since
- * a call on `[number, number] | number[]` can land on the tuple; or an
- * intersection with one and no array, which is how a branded tuple is
- * written; or a type parameter constrained to one.
+ * Whether the receiver is a tuple — or a union in which any member is, since a
+ * call on `[number, number] | number[]` can land on the tuple; or an
+ * intersection with one and no array, which is how a branded tuple is written;
+ * or a type parameter constrained to one.
  *
  * A tuple arrives as a *type reference* whose target is the tuple, so
  * `isTupleType()` on the type itself answers `false` and the target has to be

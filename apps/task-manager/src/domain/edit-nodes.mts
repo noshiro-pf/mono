@@ -13,10 +13,10 @@ import type {
 
 /**
  * The nodes `refs` of `state` with `edit` made to each, all stamped `now`:
- * the progress (as `setProgress` sets it) and the labels of the tasks
- * among them, and the group of every one. A milestone has no progress and
- * no labels, and only its group changes. Only the nodes that change are
- * returned, each once; a node that is gone is left out.
+ * the progress (as `setProgress` sets it) and the labels of the tasks among
+ * them, and the group of every one. A milestone has no progress and no labels,
+ * and only its group changes. Only the nodes that change are returned, each
+ * once; a node that is gone is left out.
  */
 export const editNodes = (
   state: DomainState,
@@ -77,14 +77,14 @@ export type NodeEdit = DeepReadonly<{
   /** The progress of every task; `undefined` leaves each as it is. */
   progress: Progress | undefined;
   /**
-   * Given to every task that lacks them, after those it has; not one it has
-   * in another case or width (`sameLabel`).
+   * Given to every task that lacks them, after those it has; not one it has in
+   * another case or width (`sameLabel`).
    */
   addLabels: string[];
   /**
-   * Taken off every task that has them, spelled as it has them — unless
-   * also in `addLabels`, which wins. Taking a label off and adding it in
-   * another case changes its case.
+   * Taken off every task that has them, spelled as it has them — unless also in
+   * `addLabels`, which wins. Taking a label off and adding it in another case
+   * changes its case.
    */
   removeLabels: string[];
   /** The group of every node, `to` none or a group; `undefined` leaves it. */

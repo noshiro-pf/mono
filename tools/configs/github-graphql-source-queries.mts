@@ -4,25 +4,24 @@ import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
 
 /**
- * The GraphQL written in the files under `srcDir` that none of `sent`
- * contains, each as `<file>:<line> <its first line>`, `<file>` relative to
- * `srcDir`. Test files are left out.
+ * The GraphQL written in the files under `srcDir` that none of `sent` contains,
+ * each as `<file>:<line> <its first line>`, `<file>` relative to `srcDir`. Test
+ * files are left out.
  *
  * The `github-graphql.test.mts` in `libs/pr-merge-queue` and in
  * `apps/pr-manager` validate the requests they are given, so a query none of
- * them carries is validated by nothing short of GitHub. This names it, so
- * that registering a query is not a step someone has to remember.
+ * them carries is validated by nothing short of GitHub. This names it, so that
+ * registering a query is not a step someone has to remember.
  *
  * GraphQL here is a string, or a template literal, that begins an operation
  * (`query Name(`, `mutation (`, `query ${name}(`) or binds an argument to a
- * variable (`pullRequest(number: $`, `, after: $`), as a field built per
- * alias does. One in an array is the array, joined. It is contained
- * in a request when its fixed text appears in it in order, whitespace
- * ignored, whatever the substitutions and the elements that are not literals
- * turned into. A part of a query that is neither — a list of fields in a
- * constant, a branch that only adds a field — is seen only through the query
- * it is spliced into, and a branch never taken by a test request is not seen
- * at all.
+ * variable (`pullRequest(number: $`, `, after: $`), as a field built per alias
+ * does. One in an array is the array, joined. It is contained in a request when
+ * its fixed text appears in it in order, whitespace ignored, whatever the
+ * substitutions and the elements that are not literals turned into. A part of a
+ * query that is neither — a list of fields in a constant, a branch that only
+ * adds a field — is seen only through the query it is spliced into, and a
+ * branch never taken by a test request is not seen at all.
  */
 export const queriesNotSent = (
   srcDir: string,
@@ -49,8 +48,8 @@ type SourceQuery = Readonly<{
   /** As written, a substitution shown as `…`. */
   firstLine: string;
   /**
-   * Its fixed text without whitespace, split where a substitution or an
-   * element that is not a literal goes.
+   * Its fixed text without whitespace, split where a substitution or an element
+   * that is not a literal goes.
    */
   pieces: readonly string[];
 }>;
@@ -146,8 +145,8 @@ const ownerOf = (piece: ts.Node): ts.Node =>
       : piece;
 
 /**
- * What is checked as one query: the array `piece` is an element of,
- * otherwise the literal it is part of.
+ * What is checked as one query: the array `piece` is an element of, otherwise
+ * the literal it is part of.
  */
 const constructOf = (piece: ts.Node): ts.Node => {
   const owner = outermost(ownerOf(piece));
@@ -157,8 +156,8 @@ const constructOf = (piece: ts.Node): ts.Node => {
 
 /**
  * The text of a literal, a template literal or an array of them joined by
- * newlines, with `undefined` where a substitution or an element that is not
- * a literal goes.
+ * newlines, with `undefined` where a substitution or an element that is not a
+ * literal goes.
  */
 const fragmentsOf = (node: ts.Node): readonly (string | undefined)[] => {
   const inner = innermost(node);

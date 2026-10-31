@@ -166,8 +166,8 @@ export const eslintUnicornRules = {
   /**
    * Since v76 it also rewrites a ternary with one boolean literal branch, with
    * no option to leave that part out. It turns `{a ? false : <X />}` into the
-   * `&&` that ts-restrictions/jsx-boolean-logical-operands rejects, and
-   * inverts a comparison that may be `NaN`. The boolean branches are
+   * `&&` that ts-restrictions/jsx-boolean-logical-operands rejects, and inverts
+   * a comparison that may be `NaN`. The boolean branches are
    * ts-restrictions/prefer-logical-over-boolean-ternary's, a nullish check
    * guarding an access is ts-restrictions/prefer-optional-chain-over-ternary's,
    * and `a ? a : b` is no-unneeded-ternary's for an identifier.
@@ -406,8 +406,8 @@ export const eslintUnicornRules = {
   'unicorn/no-misrefactored-assignment': 'error',
   'unicorn/no-missing-local-resource': 'error',
   'unicorn/no-multiple-promise-resolver-calls': 'error',
-  // Reports standard API parameter names such as `deleteCount`
-  // (`Array#splice`) as if they had to be functions.
+  // Reports standard API parameter names such as `deleteCount` (`Array#splice`)
+  // as if they had to be functions.
   'unicorn/no-non-function-verb-prefix': 'off',
   'unicorn/no-nonstandard-builtin-properties': 'error',
   'unicorn/no-repeated-call-wrappers': 'error',
@@ -420,8 +420,8 @@ export const eslintUnicornRules = {
    * Off since v77, which also reports the array around a kept element in the
    * filter-and-map idiom `xs.flatMap((x) => (keep(x) ? [f(x)] : []))` and
    * wants the bare element instead. Both branches returning an array is what
-   * says the callback is filtering here, so the rewrite reads worse, and it
-   * has no fix and no option to leave that part out.
+   * says the callback is filtering here, so the rewrite reads worse, and it has
+   * no fix and no option to leave that part out.
    */
   'unicorn/no-unnecessary-array-flat-map': 'off',
   'unicorn/no-unnecessary-boolean-comparison': 'error',
@@ -581,10 +581,10 @@ export const eslintUnicornRules = {
   'unicorn/prefer-temporal-conversion': 'error',
 
   /**
-   * Off, though the plugin recommends it. Guards here are written one
-   * condition at a time, each under the comment saying why it exits; the fix
-   * cannot merge guards with a comment between them, so it left about sixty
-   * reports to rewrite by hand into one condition that no longer says why.
+   * Off, though the plugin recommends it. Guards here are written one condition
+   * at a time, each under the comment saying why it exits; the fix cannot merge
+   * guards with a comment between them, so it left about sixty reports to
+   * rewrite by hand into one condition that no longer says why.
    */
   'unicorn/prefer-combined-guards': 'off',
 
@@ -616,9 +616,9 @@ export const eslintUnicornRules = {
   'unicorn/no-invalid-url-protocol-comparison': 'error',
   'unicorn/no-prevent-default-in-passive-listener': 'error',
   /**
-   * Off. It judges a parameter by the callers it sees today, so it reports
-   * the parameters samples and test fixtures exist to show, and a helper
-   * called twice with the same argument loses one.
+   * Off. It judges a parameter by the callers it sees today, so it reports the
+   * parameters samples and test fixtures exist to show, and a helper called
+   * twice with the same argument loses one.
    */
   'unicorn/no-unnecessary-parameters': 'off',
   'unicorn/no-unsafe-json-serialization': 'error',

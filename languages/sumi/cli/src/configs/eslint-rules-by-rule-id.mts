@@ -23,8 +23,8 @@ export const eslintRulesByRuleId: ReadonlyMap<string, readonly string[]> =
     ['banned-syntax/no-void-operator', ['no-void']],
     ['banned-syntax/no-comma-operator', ['no-sequences']],
     ['banned-syntax/no-implicit-coercion', ['no-implicit-coercion']],
-    // The base config's no-restricted-globals list is wider than D-21
-    // (browser globals, `eval`); only the unicorn rule is fully covered.
+    // The base config's no-restricted-globals list is wider than D-21 (browser
+    // globals, `eval`); only the unicorn rule is fully covered.
     [
       'banned-syntax/no-bare-number-globals',
       ['unicorn/prefer-number-properties'],

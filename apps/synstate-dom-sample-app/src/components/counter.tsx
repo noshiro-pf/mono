@@ -4,8 +4,8 @@ import { constant, view, type JSX } from 'synstate-dom';
 // Called once. Only the text node and the `disabled` attribute bound to
 // `count$` change afterwards.
 export const Counter = (): JSX.Element => {
-  // State created inside a component belongs to the scope it is mounted in
-  // and is disposed with it.
+  // State created inside a component belongs to the scope it is mounted in and
+  // is disposed with it.
   const [count$, , { updateState: updateCount, resetState: resetCount }] =
     createState(0);
 

@@ -40,33 +40,33 @@ import {
  * ruleset covers, the moment nothing held it, into the layer below. So
  * `skip-ci` holds the checks and nothing is armed until the queue says so.
  *
- * Every step is skipped when it is already done, so a run that failed part
- * way through is finished by running it again rather than unpicked.
+ * Every step is skipped when it is already done, so a run that failed part way
+ * through is finished by running it again rather than unpicked.
  *
  * **`auto-rebase` goes on every layer, stacked or not.** `unblock-prs` keeps
  * only a pull request based on the default branch on its tip, so on a layer
- * above it does nothing until the layer below merges and GitHub moves this
- * one onto the default branch — the moment it is needed, and one at which
- * nothing would add it. It goes on after `skip-ci`, so that its own `labeled`
- * run finds the checks held.
+ * above it does nothing until the layer below merges and GitHub moves this one
+ * onto the default branch — the moment it is needed, and one at which nothing
+ * would add it. It goes on after `skip-ci`, so that its own `labeled` run finds
+ * the checks held.
  *
  * **A `--base` other than the default branch stacks it** on the open pull
  * request that branch is from, which has to exist and which the branch has to
  * contain, and declares that one with `Merge-After:` as well.
  *
  * **What the issues it closes start after is declared too**: the open pull
- * requests their `Start-After:` comes to (`docs/issue-start-after.md`),
- * written into the body's `Merge-After:` once GitHub has read which issues
- * the body closes. The readers inherit it without, so the body is saying
- * what they already derive.
+ * requests their `Start-After:` comes to (`docs/issue-start-after.md`), written
+ * into the body's `Merge-After:` once GitHub has read which issues the body
+ * closes. The readers inherit it without, so the body is saying what they
+ * already derive.
  *
- * **`--merge-before` declares the order from the other end**, for work found
- * to come first after the pull request that needs it was opened: this one's
- * number is written into the `Merge-After:` of each pull request named, and
- * a line saying so into this one's body. The declaration stays where every
- * reader looks for why a pull request waits — in the body of the one that
- * waits — so there is no second syntax to read. The pull requests named are
- * checked to be open before anything is pushed.
+ * **`--merge-before` declares the order from the other end**, for work found to
+ * come first after the pull request that needs it was opened: this one's number
+ * is written into the `Merge-After:` of each pull request named, and a line
+ * saying so into this one's body. The declaration stays where every reader
+ * looks for why a pull request waits — in the body of the one that waits — so
+ * there is no second syntax to read. The pull requests named are checked to be
+ * open before anything is pushed.
  */
 export const openPullRequest = async (
   options: Options,
@@ -187,10 +187,10 @@ export const openPullRequest = async (
 };
 
 /**
- * Writes into the body, as `Merge-After:`, the open pull requests the issues
- * it closes start after (`docs/issue-start-after.md`), once the body exists
- * for GitHub to say which issues those are. A run on a body that says them
- * already writes nothing.
+ * Writes into the body, as `Merge-After:`, the open pull requests the issues it
+ * closes start after (`docs/issue-start-after.md`), once the body exists for
+ * GitHub to say which issues those are. A run on a body that says them already
+ * writes nothing.
  */
 const carryStartAfter = async (
   api: ApiContext,
@@ -227,9 +227,9 @@ const carryStartAfter = async (
 };
 
 /**
- * Refuses a `--merge-before` that names what this one merges after — the
- * layer it is stacked on included, which `parseOptions` cannot see — or a
- * pull request that is not open, before anything is pushed.
+ * Refuses a `--merge-before` that names what this one merges after — the layer
+ * it is stacked on included, which `parseOptions` cannot see — or a pull
+ * request that is not open, before anything is pushed.
  */
 const checkSuccessors = async (
   api: ApiContext,
@@ -256,8 +256,8 @@ const checkSuccessors = async (
 
 /**
  * Writes `prNumber` into the `Merge-After:` of each `--merge-before` pull
- * request, read again now rather than when it was checked, so that an edit
- * made in between is kept. One that names it already is left as it is.
+ * request, read again now rather than when it was checked, so that an edit made
+ * in between is kept. One that names it already is left as it is.
  */
 const declareBefore = async (
   api: ApiContext,
@@ -305,9 +305,9 @@ const declareBefore = async (
 };
 
 /**
- * The pull request a new one onto `base` is stacked on, having checked that
- * the branch is on its tip. Asked before anything is pushed, so that a base
- * nothing will recognize as a stack is refused rather than opened.
+ * The pull request a new one onto `base` is stacked on, having checked that the
+ * branch is on its tip. Asked before anything is pushed, so that a base nothing
+ * will recognize as a stack is refused rather than opened.
  */
 const stackOn = async (
   api: ApiContext,

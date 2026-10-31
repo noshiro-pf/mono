@@ -47,10 +47,10 @@ export const noPartialStringNormalize = createRule({
 
     /**
      * `true` when every value `node` may evaluate to is one of the four forms
-     * or `undefined`, by the type of the value itself. A conditional or
-     * logical expression is judged by its operands, so a cast in one of them
-     * (`cond ? 'NFC' : (form as 'NFD')`) cannot vouch for it as the type of
-     * the whole would.
+     * or `undefined`, by the type of the value itself. A conditional or logical
+     * expression is judged by its operands, so a cast in one of them
+     * (`cond ? 'NFC' : (form as 'NFD')`) cannot vouch for it as the type of the
+     * whole would.
      */
     const isSafeForm = (node: TSESTree.Expression): boolean => {
       const expression = skipTypeWrappers(node);
@@ -84,8 +84,8 @@ export const noPartialStringNormalize = createRule({
           return;
         }
 
-        // We only care if this call is on a string object — as the value's
-        // own type or as any type it is asserted to have on the way.
+        // We only care if this call is on a string object — as the value's own
+        // type or as any type it is asserted to have on the way.
 
         if (
           typeWrapperLayers(callee.object).every(
@@ -110,8 +110,8 @@ export const noPartialStringNormalize = createRule({
         // const foo = ""[n]("");
         //
         // A computed key is read through its type wrappers
-        // (`""["normalize" satisfies string]`, `""[n!]`), and is a normalize
-        // if the type at any of them says it may be.
+        // (`""["normalize" satisfies string]`, `""[n!]`), and is a normalize if
+        // the type at any of them says it may be.
         const isNormalize = callee.computed
           ? typeWrapperLayers(callee.property).some((key) =>
               key.type === AST_NODE_TYPES.Literal

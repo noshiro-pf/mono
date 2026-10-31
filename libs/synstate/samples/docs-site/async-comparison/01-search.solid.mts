@@ -20,12 +20,12 @@ export const createSearch = () =>
   createRoot((dispose) => {
     const [query, setQuery] = createSignal('');
 
-    // A signal ignores a write equal to its value,
-    // so a query that did not change triggers nothing.
+    // A signal ignores a write equal to its value, so a query that did not
+    // change triggers nothing.
     const [debouncedQuery, setDebouncedQuery] = createSignal('');
 
-    // There is no debounce; an effect whose cleanup clears the timer
-    // runs again on every keystroke.
+    // There is no debounce; an effect whose cleanup clears the timer runs again
+    // on every keystroke.
     createEffect(() => {
       const q = query().trim();
 
@@ -37,8 +37,8 @@ export const createSearch = () =>
     });
 
     // createResource ignores a stale response but hands the fetcher no
-    // AbortSignal. One controller per query, aborted by the cleanup that
-    // runs when the query changes and when the root is disposed:
+    // AbortSignal. One controller per query, aborted by the cleanup that runs
+    // when the query changes and when the root is disposed:
     const signal = createMemo(() => {
       debouncedQuery();
 

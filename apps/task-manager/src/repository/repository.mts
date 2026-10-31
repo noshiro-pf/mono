@@ -1,7 +1,7 @@
 /**
- * Where the tasks and milestones of one project are kept, with their groups
- * and the layout of its DAG: Firestore when signed in (`firebase/`), memory in the tests and
- * the demo (`memory-repository.mts`). The store sees only this.
+ * Where the tasks and milestones of one project are kept, with their groups and
+ * the layout of its DAG: Firestore when signed in (`firebase/`), memory in the
+ * tests and the demo (`memory-repository.mts`). The store sees only this.
  */
 
 import type { DeepReadonly } from 'ts-type-forge';
@@ -28,36 +28,36 @@ export type Repository = Readonly<{
   /** Creates or replaces the milestone with its id. */
   putMilestone: (milestone: Milestone) => Promise<void>;
   /**
-   * Deletes the nodes `refs` and writes the nodes `cleanup` names — those
-   * whose dependencies on them were removed (see `removeNodes`) — all
-   * together, so that nothing is left depending on a node that is gone.
+   * Deletes the nodes `refs` and writes the nodes `cleanup` names — those whose
+   * dependencies on them were removed (see `removeNodes`) — all together, so
+   * that nothing is left depending on a node that is gone.
    */
   deleteNodes: (
     refs: readonly NodeRef[],
     cleanup: NodeCleanup,
   ) => Promise<void>;
   /**
-   * Creates or replaces every task and milestone `nodes` names, all
-   * together: those edited at once (see `editNodes`).
+   * Creates or replaces every task and milestone `nodes` names, all together:
+   * those edited at once (see `editNodes`).
    */
   putNodes: (nodes: NodeCleanup) => Promise<void>;
   /**
-   * Hands `observer.next` every group once they have loaded, in creation
-   * order, and again on every change after, local writes included. Returns
-   * what stops it.
+   * Hands `observer.next` every group once they have loaded, in creation order,
+   * and again on every change after, local writes included. Returns what stops
+   * it.
    */
   subscribeGroups: (observer: GroupsObserver) => () => void;
   /** Creates or replaces the group with its id. */
   putGroup: (group: Group) => Promise<void>;
   /**
-   * Deletes the group `id` and writes the nodes `cleanup` names — those
-   * that were in it (see `removeGroup`) — all together.
+   * Deletes the group `id` and writes the nodes `cleanup` names — those that
+   * were in it (see `removeGroup`) — all together.
    */
   deleteGroup: (id: GroupId, cleanup: NodeCleanup) => Promise<void>;
   /**
-   * Hands `observer.next` the DAG's layout once it has loaded — `undefined`
-   * if there is none, or the stored one is invalid — and again on every
-   * change after, local writes included. Returns what stops it.
+   * Hands `observer.next` the DAG's layout once it has loaded — `undefined` if
+   * there is none, or the stored one is invalid — and again on every change
+   * after, local writes included. Returns what stops it.
    */
   subscribeDagLayout: (observer: DagLayoutObserver) => () => void;
   /** Replaces the DAG's layout, stamped `updatedAt`. */
@@ -66,12 +66,11 @@ export type Repository = Readonly<{
    * Replaces the project `previous` — as this repository handed it to its
    * subscribers — with `next`, keeping `next`'s ids: what `next` has is
    * written, then what only `previous` has is deleted; the layout, stamped
-   * `updatedAt`, is written if `next` has one, and deleted if only
-   * `previous` has. A document never handed on, one that could not be read,
-   * is otherwise left as it is. More writes
-   * than one batch takes are split (`api/firestore-io.mts`), so a failure
-   * can leave part of it written — never what is deleted before what is
-   * written — and the promise then rejects.
+   * `updatedAt`, is written if `next` has one, and deleted if only `previous`
+   * has. A document never handed on, one that could not be read, is otherwise
+   * left as it is. More writes than one batch takes are split
+   * (`api/firestore-io.mts`), so a failure can leave part of it written — never
+   * what is deleted before what is written — and the promise then rejects.
    */
   replaceProject: (
     next: ProjectSnapshot,
@@ -103,8 +102,8 @@ export type NodeCleanup = DeepReadonly<{
 /** Signing in and out, and the repository of whoever is signed in. */
 export type Backend = Readonly<{
   /**
-   * Hands `listener` the session as soon as it is known, and again whenever
-   * it changes. Returns what stops it.
+   * Hands `listener` the session as soon as it is known, and again whenever it
+   * changes. Returns what stops it.
    */
   watchSession: (listener: (session: BackendSession) => void) => () => void;
   signIn: () => Promise<void>;

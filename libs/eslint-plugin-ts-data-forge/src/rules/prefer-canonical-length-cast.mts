@@ -288,10 +288,10 @@ const matchesBounds = (
 /**
  * Removes the length arguments the rewrite drops. Each removal runs from the
  * first token after the delimiter before the dropped argument (the call's `(`
- * or the previous comma) up to the first token after the comma that follows
- * it. Parentheses the source put around the dropped argument, the comma,
- * whitespace and any comments in between go with it; parentheses around the
- * next argument stay. The ranges never overlap.
+ * or the previous comma) up to the first token after the comma that follows it.
+ * Parentheses the source put around the dropped argument, the comma, whitespace
+ * and any comments in between go with it; parentheses around the next argument
+ * stay. The ranges never overlap.
  */
 const dropBoundsFix = (
   fixer: TSESLint.RuleFixer,
@@ -303,13 +303,13 @@ const dropBoundsFix = (
   rewrite: CastRewrite,
 ): readonly TSESLint.RuleFix[] =>
   rewrite.bounds.flatMap((_, index) => {
-    // Read before the `includes` below, not after. The strict standard
-    // library types `includes` as `searchElement is T` — that is what lets a
-    // literal union narrow a wider value — but the predicate applies to the
-    // false branch too, and here `keep` is `readonly number[]` against a
-    // `number`, so `index` narrows to `never` past the guard and `index + 1`
-    // stops type-checking. A false `includes` means "not in this array", not
-    // "not of this type".
+    // Read before the `includes` below, not after. The strict standard library
+    // types `includes` as `searchElement is T` — that is what lets a literal
+    // union narrow a wider value — but the predicate applies to the false
+    // branch too, and here `keep` is `readonly number[]` against a `number`, so
+    // `index` narrows to `never` past the guard and `index + 1` stops
+    // type-checking. A false `includes` means "not in this array", not "not of
+    // this type".
     const dropped = node.arguments[index];
 
     const previous = node.arguments[index - 1];

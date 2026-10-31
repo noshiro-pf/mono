@@ -13,8 +13,8 @@ import { Arr, Num, Result } from 'ts-data-forge';
  * this — so a pull request that slows propagation down says so in its own run
  * instead of being found months later by someone re-reading a table.
  *
- * Only SynState's rows are reported as the answer. Every other library's row
- * is there to calibrate: the two measurements come from different runner
+ * Only SynState's rows are reported as the answer. Every other library's row is
+ * there to calibrate: the two measurements come from different runner
  * instances, so if RxJS and Jotai moved by the same fraction as SynState, the
  * machine moved and not the code.
  */

@@ -34,8 +34,8 @@ export const IMPORT_STYLE_SCHEMA_PROPERTY: JsonSchema = {
  *
  * Returns `undefined` when the name is already bound to something else (a local
  * alias, an import from another module, or another ts-type-forge export
- * imported under the name) — rewriting to it would then silently
- * resolve to the wrong declaration, which is exactly what happens inside
+ * imported under the name) — rewriting to it would then silently resolve to the
+ * wrong declaration, which is exactly what happens inside
  * ts-type-forge's own sources.
  */
 export const resolveTypeName = (

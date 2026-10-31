@@ -4,8 +4,8 @@ import type { ClaimComment, QueueComment } from 'pr-report-core';
 import type { ResultEvent } from './claude.mjs';
 
 /**
- * What a session that ran comes to for its pull request, from its result
- * and the claim comment read once it ended.
+ * What a session that ran comes to for its pull request, from its result and
+ * the claim comment read once it ended.
  *
  * - `taken`: someone else holds a claim on it — they got there first. It is
  *   theirs until they push or let go, and handed on again after that.
@@ -17,8 +17,8 @@ import type { ResultEvent } from './claude.mjs';
  *   set-aside moves, so that no pull request is paid for twice as it stands.
  *
  * `releaseClaim` is whether the claim the session took is still standing:
- * it ran out or was stopped before it pushed or released, and holding the
- * pull request for the rest of two hours helps nobody.
+ * it ran out or was stopped before it pushed or released, and holding the pull
+ * request for the rest of two hours helps nobody.
  */
 export const judgeSession = (
   result: ResultEvent | undefined,

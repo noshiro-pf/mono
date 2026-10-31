@@ -61,10 +61,10 @@ import { isArrangeable, type NodeSize } from '../view-model/index.mjs';
 /**
  * What the canvas draws (`dag-canvas.tsx`), derived from the stores and the
  * canvas's own state: where every node, frame and edge is, and how each is
- * drawn. Each list the canvas renders with `For` is of records reused from
- * the previous value wherever nothing in them changed, so that a row is
- * updated only when what it draws is different — a drag moves the nodes it
- * moves, and a pan none.
+ * drawn. Each list the canvas renders with `For` is of records reused from the
+ * previous value wherever nothing in them changed, so that a row is updated
+ * only when what it draws is different — a drag moves the nodes it moves, and a
+ * pan none.
  *
  * Made in the canvas, so that none of it is computed while the graph is not
  * shown.
@@ -178,8 +178,8 @@ export const createDagCanvasScene = ({
     }),
   );
 
-  // While they move, the nodes moving, wherever they are going; otherwise
-  // the nodes of the mode, where it draws them.
+  // While they move, the nodes moving, wherever they are going; otherwise the
+  // nodes of the mode, where it draws them.
   const shown = combine([
     anyMode,
     placed,
@@ -264,8 +264,7 @@ export const createDagCanvasScene = ({
     ),
   );
 
-  // The group a node being dragged would be dropped into, and the one it
-  // is in.
+  // The group a node being dragged would be dropped into, and the one it is in.
   const dropTargets = combine([
     dragged,
     drags,
@@ -379,8 +378,8 @@ export const createDagCanvasScene = ({
     ),
   );
 
-  // While a lasso is drawn, the nodes it closes round so far, which are
-  // drawn selected in place of those that are.
+  // While a lasso is drawn, the nodes it closes round so far, which are drawn
+  // selected in place of those that are.
   const drawnSelection = combine([lasso, selection, placed]).pipe(
     map(([points, selected, placedNodes]): ReadonlySet<GraphNodeId> =>
       points === undefined
@@ -389,8 +388,8 @@ export const createDagCanvasScene = ({
     ),
   );
 
-  // The edge selected, while it is drawn as it was when clicked: not once
-  // it is gone or has moved, nor while anything is dragged or moves.
+  // The edge selected, while it is drawn as it was when clicked: not once it is
+  // gone or has moved, nor while anything is dragged or moves.
   const shownSelectedEdge = combine([
     selectedEdge,
     edgesHidden,
@@ -686,8 +685,8 @@ export type DagNodeRecord<V extends NodeView = NodeView> = Readonly<{
   /** Brought forward or dimmed by the arc diagram's highlight. */
   highlight: HighlightState;
   /**
-   * Outside the filter, and drawn faint: there only as what a node in it
-   * waits for or is waited for by (`dag/node-filter.mts`).
+   * Outside the filter, and drawn faint: there only as what a node in it waits
+   * for or is waited for by (`dag/node-filter.mts`).
    */
   outside: boolean;
   /** While it fades out of or into a view mode; `undefined` for opaque. */
@@ -761,9 +760,8 @@ export type FitTarget = Readonly<
 >;
 
 /**
- * The edge clicked: its id, its path then — for it to stop being selected
- * once it is drawn anywhere else — and where it was clicked, in content
- * coordinates.
+ * The edge clicked: its id, its path then — for it to stop being selected once
+ * it is drawn anywhere else — and where it was clicked, in content coordinates.
  */
 export type SelectedEdge = Readonly<{ id: string; path: string; at: Point }>;
 
@@ -801,15 +799,15 @@ export const reachAt = (scale: number): ConnectReach =>
 const GRAPH_MARGIN = 24;
 
 /**
- * How near a node's outline, on the screen, a mouse or pen shows its handle
- * — outside the node, where an arrow dropped still joins it, and inside it,
- * where the rest is for moving it.
+ * How near a node's outline, on the screen, a mouse or pen shows its handle —
+ * outside the node, where an arrow dropped still joins it, and inside it, where
+ * the rest is for moving it.
  */
 const HANDLE_REACH_PX = { outside: 10, inside: 5 } as const;
 
 /**
- * How long routing the edges for one move of a drag may take before the
- * rest of the drag stops doing it: most of a frame.
+ * How long routing the edges for one move of a drag may take before the rest of
+ * the drag stops doing it: most of a frame.
  */
 const DRAG_ROUTING_BUDGET_MS = 10;
 
@@ -826,8 +824,8 @@ type SceneInputs = Readonly<{
   /** The lasso being drawn, in content coordinates. */
   lasso: InitializedObservable<readonly Point[] | undefined>;
   /**
-   * Where the view was when the mode changed, for it to follow the nodes
-   * from there; `undefined` when it is where it is going.
+   * Where the view was when the mode changed, for it to follow the nodes from
+   * there; `undefined` when it is where it is going.
    */
   viewFrom: InitializedObservable<ViewTransform | undefined>;
   /** The node pointed at or focused, for the arc diagram's highlight. */
@@ -845,8 +843,8 @@ type MovingNodes = Readonly<{
 type GroupDrag = MovingNodes & Readonly<{ id: GroupId }>;
 
 /**
- * The nodes moving with the one dragged: the group dragged by its title, or
- * the nodes selected when one of them is dragged with another selected.
+ * The nodes moving with the one dragged: the group dragged by its title, or the
+ * nodes selected when one of them is dragged with another selected.
  */
 type Drags = Readonly<{
   group: GroupDrag | undefined;
@@ -855,8 +853,8 @@ type Drags = Readonly<{
 }>;
 
 /**
- * The group a node being dragged would go into if dropped now, and the one
- * it is in; `undefined` for none.
+ * The group a node being dragged would go into if dropped now, and the one it
+ * is in; `undefined` for none.
  */
 type NodeDropTargets = Readonly<{
   into: GroupId | undefined;
@@ -919,9 +917,9 @@ const selectionDragOf = (
 };
 
 /**
- * Makes the function that hands back, for each record, the one it handed
- * back last time under the same key when the two are equal, so that `For`
- * updates the rows whose records changed and no other.
+ * Makes the function that hands back, for each record, the one it handed back
+ * last time under the same key when the two are equal, so that `For` updates
+ * the rows whose records changed and no other.
  */
 const createRecordCache = <R, K>(
   keyOf: (record: R) => K,

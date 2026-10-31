@@ -4,10 +4,10 @@ import type { FixedLengthTuple } from 'ts-type-forge';
 export type ExtractSampleCodeOptions = Readonly<{
   /**
    * Also drop lines that open with `// transformer-ignore-next-line`. The
-   * synstate family and `apps/synstate-docs` want that — the codemod
-   * directives their samples carry are noise in a rendered document — and it
-   * cannot be unconditional, because `ts-codemod-lib`'s samples are _about_
-   * that directive and stripping it would gut them.
+   * synstate family and `apps/synstate-docs` want that — the codemod directives
+   * their samples carry are noise in a rendered document — and it cannot be
+   * unconditional, because `ts-codemod-lib`'s samples are _about_ that
+   * directive and stripping it would gut them.
    */
   stripTransformerDirectives?: boolean;
 }>;

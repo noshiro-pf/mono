@@ -11,9 +11,8 @@ import type { MutableRecord, ReadonlyRecord, StrictOmit } from 'ts-type-forge';
 import type { ReleaseBinaryPin } from '../lib/release-binaries.mjs';
 
 /**
- * The three updates `pnpm-update.yml` makes that pnpm's own
- * `minimumReleaseAge` does not reach, held to the same age it applies to npm
- * dependencies.
+ * The three updates `pnpm-update.yml` makes that pnpm's own `minimumReleaseAge`
+ * does not reach, held to the same age it applies to npm dependencies.
  *
  * ```sh
  * node ./tools/scripts/cmd/mature-updates.mts pnpm              # pnpm itself
@@ -30,71 +29,70 @@ import type { ReleaseBinaryPin } from '../lib/release-binaries.mjs';
  * the hold made the job succeed at `self-update` and die one step later with
  * `ERR_PNPM_NO_MATURE_MATCHING_VERSION`, every day until the release matured
  * (2026-09-11, pnpm 12.4.1 one day old). Excluding `pnpm` from the hold would
- * exempt the one package that runs every install script in the tree; this
- * picks a version the hold already accepts instead and hands it to
+ * exempt the one package that runs every install script in the tree; this picks
+ * a version the hold already accepts instead and hands it to
  * `pnpm self-update <version>`, which is idempotent when the pin already says
  * so. The standalone pnpm binary does not reproduce the failure — it switches
  * versions by another route — which is why a local `pnpm self-update` passes;
- * CI runs the JS build that `pnpm/action-setup` installs with npm, and that
- * one adds the `pnpm` npm package to switch, `@pnpm/exe.*` optional
- * dependencies and all.
+ * CI runs the JS build that `pnpm/action-setup` installs with npm, and that one
+ * adds the `pnpm` npm package to switch, `@pnpm/exe.*` optional dependencies
+ * and all.
  *
  * **`actions`** moves every `uses: owner/repo@<sha> # vX.Y.Z` pin in the
  * workflows (`.github/workflows/*.yml`) and in the composite actions they call
- * (an `action.yml` at any depth under `.github/actions/`) to the newest
- * release of the same major that is older than the hold. A pin anywhere else
- * is not read, and nothing says so: it simply stops moving.
+ * (an `action.yml` at any depth under `.github/actions/`) to the newest release
+ * of the same major that is older than the hold. A pin anywhere else is not
+ * read, and nothing says so: it simply stops moving.
  * `pnpm update --include-github-actions` cannot apply the hold: it resolves
  * action versions from `git ls-remote` refs, which carry a tag name and a SHA
- * but no publication date. GitHub's Releases API carries
- * `published_at`, so that is what this reads, and the tag is resolved to its
- * commit through the Commits API — the same SHA pin pnpm writes. A major
- * still waits for a human, as before; it is reported, not taken. Set
- * `GH_TOKEN` (the workflow passes `GITHUB_TOKEN`) or the unauthenticated
- * rate limit, shared across a runner's whole IP range, will be hit.
+ * but no publication date. GitHub's Releases API carries `published_at`, so
+ * that is what this reads, and the tag is resolved to its commit through the
+ * Commits API — the same SHA pin pnpm writes. A major still waits for a human,
+ * as before; it is reported, not taken. Set `GH_TOKEN` (the workflow passes
+ * `GITHUB_TOKEN`) or the unauthenticated rate limit, shared across a runner's
+ * whole IP range, will be hit.
  *
- * **`release-binaries`** moves each tool in `tools/configs/release-binaries.json`
- * (actionlint and shellcheck, which `check:root:actionlint` downloads) to the
- * newest release older than the hold, within its line: the range a caret
- * draws, so the major, or for a `0.x` version the minor (a `0.0.x` one never
- * moves on its own). So actionlint 1.x moves on its own and 2.0 waits for a
- * human; shellcheck 0.11.x moves on its own and 0.12 waits. The tag is
- * `v<version>`, and each platform's new SHA-256 is the `digest` the Releases
+ * **`release-binaries`** moves each tool in
+ * `tools/configs/release-binaries.json` (actionlint and shellcheck, which
+ * `check:root:actionlint` downloads) to the newest release older than the hold,
+ * within its line: the range a caret draws, so the major, or for a `0.x`
+ * version the minor (a `0.0.x` one never moves on its own). So actionlint 1.x
+ * moves on its own and 2.0 waits for a human; shellcheck 0.11.x moves on its
+ * own and 0.12 waits. The tag is `v<version>`, and each platform's new SHA-256
+ * is the `digest` the Releases
  * API reports for that asset. The hold applies to each asset's upload too,
- * since a file can be replaced long after its release was published. A
- * release that cannot be taken — an asset missing or without a digest (a
- * warning), or uploaded too recently — gives way to the next one down the
- * line, never to an unverified pin. A new tool goes in the file with the same
- * shape and needs nothing here.
+ * since a file can be replaced long after its release was published. A release
+ * that cannot be taken — an asset missing or without a digest (a warning), or
+ * uploaded too recently — gives way to the next one down the line, never to an
+ * unverified pin. A new tool goes in the file with the same shape and needs
+ * nothing here.
  *
  * **`release-binaries --to <tool>@<x.y.z>`** is the move that waits for a
  * human: it pins that one tool to that version, in any line (actionlint 2.0,
  * shellcheck 0.12, or back down), with every platform's digest read from the
  * Releases API as above, and leaves every other tool as it is. The hold still
  * applies — the release and each asset must be older than the cutoff, and a
- * prerelease is refused — and anything it refuses fails the run with the
- * file untouched, since a person asked for exactly that version. The same
- * version again changes nothing, and refuses a digest that differs from the
+ * prerelease is refused — and anything it refuses fails the run with the file
+ * untouched, since a person asked for exactly that version. The same version
+ * again changes nothing, and refuses a digest that differs from the
  * API's: a replaced upload is exactly what a pin is there to notice, and is
- * reported rather than re-pinned. A release that renamed its assets needs
- * the `name` templates in the file edited first; the refusal names the asset
- * it looked for. A pin moved
- * down is moved up again by the next scheduled run, to the newest mature
- * release of the line it is now on: the file records no hold.
+ * reported rather than re-pinned. A release that renamed its assets needs the
+ * `name` templates in the file edited first; the refusal names the asset it
+ * looked for. A pin moved down is moved up again by the next scheduled run, to
+ * the newest mature release of the line it is now on: the file records no hold.
  *
  * **Run with `node`, not `tsx`.** The workflow calls this before
  * `pnpm install`, so nothing from `node_modules` exists yet — no `tsx`, no
  * `ts-repo-utils`, no `ts-data-forge`. Node runs `.mts` directly by stripping
  * the types, which is why this file imports only `node:*` modules at runtime
  * and uses only erasable syntax (no `enum`, no parameter properties, no
- * namespaces). The same constraint is why version segments stay digit
- * strings compared by length and then lexically (the `ts-data-forge` rules
- * object to `Number()` and `parseInt`, and the helper they want is not there
- * to import), and why the `eslint-disable` lines below exist. `Temporal` is
- * what Node 26 has, so the script needs the Node the workflow runs on
- * (`volta.node`), not the floor of the compatibility matrix. The test runs the
- * file under `node` against a fake `pnpm` and a fake GitHub API to keep all
- * of this true.
+ * namespaces). The same constraint is why version segments stay digit strings
+ * compared by length and then lexically (the `ts-data-forge` rules object to
+ * `Number()` and `parseInt`, and the helper they want is not there to import),
+ * and why the `eslint-disable` lines below exist. `Temporal` is what Node 26
+ * has, so the script needs the Node the workflow runs on (`volta.node`), not
+ * the floor of the compatibility matrix. The test runs the file under `node`
+ * against a fake `pnpm` and a fake GitHub API to keep all of this true.
  *
  * `pnpm config get` reads `minimumReleaseAge` from `pnpm-workspace.yaml`, so
  * the cutoff cannot disagree with the one the next install applies.
@@ -295,12 +293,12 @@ export const selectMatureRelease = (
 };
 
 /**
- * The line a release-binary pin moves within: the range a caret puts around
- * it. Its major; for a `0.x` version, `0.<minor>`; for a `0.0.x` one, the
- * version itself, which then never moves on its own.
+ * The line a release-binary pin moves within: the range a caret puts around it.
+ * Its major; for a `0.x` version, `0.<minor>`; for a `0.0.x` one, the version
+ * itself, which then never moves on its own.
  *
- * `pnpm-update.yml`'s `commit` job repeats this rule inline in jq to check
- * the pins it is handed, together with the `v<version>` tag and what
+ * `pnpm-update.yml`'s `commit` job repeats this rule inline in jq to check the
+ * pins it is handed, together with the `v<version>` tag and what
  * {@link readAssetDigests} accepts; change that jq with any of them.
  */
 export const releaseLine = ({ major, minor, patch }: StableVersion): string =>
@@ -313,8 +311,8 @@ export const releaseLine = ({ major, minor, patch }: StableVersion): string =>
 /**
  * `uses: owner/repo[/path]@<40-hex sha> # vX.Y.Z` — the shape
  * `pnpm update --include-github-actions` writes and the only one this moves.
- * A local workflow (`./…`), a bare tag, or a pin without the version comment
- * is left alone.
+ * A local workflow (`./…`), a bare tag, or a pin without the version comment is
+ * left alone.
  */
 export const parseActionPinLine = (
   line: string,
@@ -553,16 +551,16 @@ export const updateReleaseBinaryPins = async (
   for (const { name, pin, raw } of tools) {
     const currentTag = `v${pin.version}` as const;
 
-    // Only `v<version>` tags: that is the tag the download URL is built
-    // from (`tools/scripts/lib/release-binaries.mts`).
+    // Only `v<version>` tags: that is the tag the download URL is built from
+    // (`tools/scripts/lib/release-binaries.mts`).
     const fetched = await api.releases(pin.repository, currentTag);
 
     const releases = fetched.filter(({ tag }) => tag.startsWith('v'));
 
     const move = findMove(name, pin, releases, cutoff);
 
-    // The move actually made, and everything newer on the line as held back
-    // — what the hold kept and what `findMove` could not take, the lines it
+    // The move actually made, and everything newer on the line as held back —
+    // what the hold kept and what `findMove` could not take, the lines it
     // printed saying why. With no cutoff, nothing newer is taken.
     console.log(
       describeMove(`${name} (${pin.repository})`, currentTag, {
@@ -639,8 +637,8 @@ const isPublishedBy = (release: Release, cutoff: number): boolean => {
 };
 
 /**
- * Digit strings, as the regex captured them. Semver forbids leading zeros, so
- * a longer run is a larger number and equal-length runs compare lexically.
+ * Digit strings, as the regex captured them. Semver forbids leading zeros, so a
+ * longer run is a larger number and equal-length runs compare lexically.
  */
 export type StableVersion = Readonly<{
   major: string;
@@ -701,9 +699,9 @@ const isRepositorySegment = (segment: string): boolean =>
 /**
  * Where a pin can be: the workflows, which GitHub reads from
  * `.github/workflows/` alone, and the composite actions, which can live
- * anywhere in the tree and are kept under `.github/actions/` so that this
- * finds them. `pnpm-update.yml` allows the same two sets of paths in the patch
- * its `commit` job applies; a third place has to be added to both.
+ * anywhere in the tree and are kept under `.github/actions/` so that this finds
+ * them. `pnpm-update.yml` allows the same two sets of paths in the patch its
+ * `commit` job applies; a third place has to be added to both.
  */
 const listPinnedFiles = (githubDir: string): readonly string[] => {
   const workflowsDir = path.join(githubDir, 'workflows');
@@ -797,8 +795,8 @@ const parseRelease = (raw: ReadonlyRecord<string, unknown>): Release =>
 
 /**
  * Not `libs/pr-merge-queue/src/lib/github-api.mts`, which every other command calls the
- * API through: it imports `ts-data-forge`, and this runs before
- * `pnpm install` (see `main`). The token is read in the same order.
+ * API through: it imports `ts-data-forge`, and this runs before `pnpm install`
+ * (see `main`). The token is read in the same order.
  */
 const createGitHubApi = (): GitHubApi => {
   const baseUrl = (
@@ -919,8 +917,8 @@ const createGitHubApi = (): GitHubApi => {
     },
 
     releaseByTag: async (repo, tag) => {
-      // `tag` is `v<x.y.z>`, which needs no escaping. A draft has no tag
-      // route, so it answers 404 like a release that does not exist.
+      // `tag` is `v<x.y.z>`, which needs no escaping. A draft has no tag route,
+      // so it answers 404 like a release that does not exist.
       const route = `/repos/${repo}/releases/tags/${tag}` as const;
 
       const answer = await request(
@@ -945,22 +943,21 @@ const createGitHubApi = (): GitHubApi => {
 };
 
 /**
- * Releases come newest first, and the ones that matter are the ones newer
- * than the current pin; paging stops once a page reaches it. This cap is for
- * a repository that never does — 1,000 releases is more than any action here
- * has.
+ * Releases come newest first, and the ones that matter are the ones newer than
+ * the current pin; paging stops once a page reaches it. This cap is for a
+ * repository that never does — 1,000 releases is more than any action here has.
  */
 const maxReleasePages = 10;
 
 /**
- * The SHA-256 of each of `pin`'s assets in `release`, by platform, or why
- * the move cannot be made: an asset the release does not carry or one with
- * no digest (both a warning, since they need a person), or one uploaded after
- * `cutoff`. A release's files can be uploaded or
- * replaced long after it was published, so the hold applies to each of them
- * as well as to the release. `pnpm-update.yml`'s `commit` job checks the
- * pins against the same rule (see {@link releaseLine}), more strictly: one
- * asset per name, and the hold read only from `pnpm-workspace.yaml`'s
+ * The SHA-256 of each of `pin`'s assets in `release`, by platform, or why the
+ * move cannot be made: an asset the release does not carry or one with no
+ * digest (both a warning, since they need a person), or one uploaded after
+ * `cutoff`. A release's files can be uploaded or replaced long after it was
+ * published, so the hold applies to each of them as well as to the release.
+ * `pnpm-update.yml`'s `commit` job checks the pins against the same rule (see
+ * {@link releaseLine}), more strictly: one asset per name, and the hold read
+ * only from `pnpm-workspace.yaml`'s
  * top-level key, refusing the pins when it is not there.
  */
 const readAssetDigests = (
@@ -1072,8 +1069,8 @@ const writePins = (
 };
 
 /**
- * `raw` with its version and digests replaced and everything else, a key
- * this does not know included, as it was.
+ * `raw` with its version and digests replaced and everything else, a key this
+ * does not know included, as it was.
  */
 const movePin = (
   raw: ReadonlyRecord<string, unknown>,
@@ -1098,10 +1095,10 @@ const movePin = (
 /**
  * `release-binaries --to`: the one tool named pinned to the release
  * `v<version>`, every other tool left as it is, or why it cannot be, which
- * leaves the file untouched: no tool of that name, no such published release
- * (a draft has none), a prerelease, the release or one of its assets
- * ({@link readAssetDigests}) younger than the hold, or the pinned version
- * whose files were uploaded again.
+ * leaves the file untouched: no tool of that name, no such published release (a
+ * draft has none), a prerelease, the release or one of its assets
+ * ({@link readAssetDigests}) younger than the hold, or the pinned version whose
+ * files were uploaded again.
  */
 const pinByHand = async (
   configPath: string,
@@ -1144,8 +1141,8 @@ const pinByHand = async (
 
   const currentTag = `v${pin.version}` as const;
 
-  // The same version with another digest is an upload replaced since it
-  // was pinned, which is worth reporting, not re-pinning
+  // The same version with another digest is an upload replaced since it was
+  // pinned, which is worth reporting, not re-pinning
   // (`tools/scripts/lib/release-binaries.mts`).
   const replaced =
     currentTag === tag
@@ -1250,9 +1247,9 @@ const parseReleaseBinaryPin = (raw: unknown): ReleaseBinaryPin | undefined => {
  * Each tool's pin, read for what this needs, and its JSON as written, which a
  * move rewrites. Not `parseReleaseBinaryPins` from
  * `../lib/release-binaries.mts`, which `check:root:actionlint` reads the file
- * with: that module imports packages that are not installed when this runs
- * (see the header). Its stricter check of the digests is what fails a
- * malformed file.
+ * with: that module imports packages that are not installed when this runs (see
+ * the header). Its stricter check of the digests is what fails a malformed
+ * file.
  */
 const parseReleaseBinaryPins = (
   json: unknown,

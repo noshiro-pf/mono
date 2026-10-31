@@ -10,23 +10,22 @@ import {
 import { issuesViewStore } from '../store/index.mjs';
 
 /**
- * The DAG's scrolling box (`issue-dag.tsx`), measured for the fit and kept
- * over the same part of the graph through a zoom: a `ref` to hand the box,
- * and what it is to be handed as its `onScroll`. Called while the DAG is
- * mounted; what it listens to is released with the scope it was called in.
+ * The DAG's scrolling box (`issue-dag.tsx`), measured for the fit and kept over
+ * the same part of the graph through a zoom: a `ref` to hand the box, and what
+ * it is to be handed as its `onScroll`. Called while the DAG is mounted; what
+ * it listens to is released with the scope it was called in.
  *
- * The room the box has is what it shows across, and down either what it
- * shows, in a block that scrolls (`index.css`), where its height is the
- * block's whatever it holds, or elsewhere its `max-height`, since there it is
- * only as tall as the graph and a graph drawn smaller would otherwise find a
- * smaller box to fit into each time. It is measured once it is laid out and
- * again as the box or the window is resized, which is what the `max-height`
- * follows.
+ * The room the box has is what it shows across, and down either what it shows,
+ * in a block that scrolls (`index.css`), where its height is the block's
+ * whatever it holds, or elsewhere its `max-height`, since there it is only as
+ * tall as the graph and a graph drawn smaller would otherwise find a smaller
+ * box to fit into each time. It is measured once it is laid out and again as
+ * the box or the window is resized, which is what the `max-height` follows.
  *
- * The point of the graph at the middle of the box is noted on every scroll,
- * and put back at the middle when the scale changes, before the browser
- * draws the new size: a zoom reads as one about what is being looked at,
- * not about the graph's top left corner.
+ * The point of the graph at the middle of the box is noted on every scroll, and
+ * put back at the middle when the scale changes, before the browser draws the
+ * new size: a zoom reads as one about what is being looked at, not about the
+ * graph's top left corner.
  */
 export const dagBox = (
   scale$: InitializedObservable<number>,
@@ -65,8 +64,8 @@ export const dagBox = (
     note(mut_state.box);
   };
 
-  // Its first answer comes once the box is laid out, which is when there is
-  // a size to read: the `ref` is called before the box is in the document.
+  // Its first answer comes once the box is laid out, which is when there is a
+  // size to read: the `ref` is called before the box is in the document.
   const observer = new ResizeObserver(measure);
 
   window.addEventListener('resize', measure);
@@ -91,8 +90,8 @@ export const dagBox = (
         ),
       );
 
-      // Where the browser let it go, which a graph drawn smaller can stop
-      // short of.
+      // Where the browser let it go, which a graph drawn smaller can stop short
+      // of.
       note(box);
     });
   });
@@ -141,8 +140,8 @@ const pixelsOf = (computed: string): number | undefined => {
 const roomOf = (box: HTMLDivElement): Size => {
   const style = getComputedStyle(box);
 
-  // `none` in a block that scrolls; a length in pixels elsewhere, which is
-  // how a computed `70vh` reads.
+  // `none` in a block that scrolls; a length in pixels elsewhere, which is how
+  // a computed `70vh` reads.
   const maxHeight = pixelsOf(style.maxHeight);
 
   return {

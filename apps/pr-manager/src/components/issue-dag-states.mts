@@ -7,8 +7,8 @@ import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import type { IssueGraphNode, IssueNodeState } from '../issue-graph.mjs';
 
 /**
- * In the order the legend lists them: what can be done first. What is done
- * is not among them, since the DAG never draws it.
+ * In the order the legend lists them: what can be done first. What is done is
+ * not among them, since the DAG never draws it.
  */
 export const legendStates = [
   'free',
@@ -39,8 +39,8 @@ export const stateLabels = {
 
 /**
  * `#2225 Title — Waiting: … — Priority: high — Pending`, for the tooltip.
- * An `in-progress` or `planned` label the state does not already say — on
- * one that waits, say — is a line of its own, as `pending` is.
+ * An `in-progress` or `planned` label the state does not already say — on one
+ * that waits, say — is a line of its own, as `pending` is.
  */
 export const describeNode = (node: IssueGraphNode): string =>
   [

@@ -6,9 +6,9 @@ import { issuesViewStore } from '../store/index.mjs';
 /**
  * How large the DAG is drawn (`dag-zoom.mts`): a zoom out and a zoom in on
  * either side of the scale it is drawn at, then the fit and the natural size,
- * shaped as the List / DAG switch is (`issues-view-switch.tsx`), the one
- * the DAG is drawn by pressed. A zoom leaves neither pressed; one that can go
- * no further is disabled. Not drawn while there is no graph to zoom.
+ * shaped as the List / DAG switch is (`issues-view-switch.tsx`), the one the
+ * DAG is drawn by pressed. A zoom leaves neither pressed; one that can go no
+ * further is disabled. Not drawn while there is no graph to zoom.
  */
 export const IssueDagZoom = (): JSX.Element => (
   <If

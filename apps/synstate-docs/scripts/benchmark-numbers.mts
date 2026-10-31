@@ -19,37 +19,37 @@ import {
  * Every number the benchmark prose quotes, keyed by what it stands for.
  *
  * The tables beside this prose have been generated since they were written;
- * the sentences around them were not, so a re-measurement updated the table
- * and left the paragraph under it describing the previous run. That is how the
- * cascaded diamond section came to say Jotai grows faster than $O(N)$ while
- * the table above it showed a flat row.
+ * the sentences around them were not, so a re-measurement updated the table and
+ * left the paragraph under it describing the previous run. That is how the
+ * cascaded diamond section came to say Jotai grows faster than $O(N)$ while the
+ * table above it showed a flat row.
  *
  * What is keyed here is a number the measurements decide: a value read off a
  * row, a ratio between two of them, an index the data picks out (where RxJS
  * first times out, up to which branch count SynState beats Jotai), and the
- * constants the runners drove the scenarios with. A parameter value that
- * merely names a point the prose chose to talk about — "$K=1000$, $M=200$" —
- * is part of the sentence and stays written in it.
+ * constants the runners drove the scenarios with. A parameter value that merely
+ * names a point the prose chose to talk about — "$K=1000$, $M=200$" — is part
+ * of the sentence and stays written in it.
  *
  * `embed-benchmark.mts` writes these into the `{/* bench:<key> *\/}` markers in
- * both language versions of `benchmark.mdx`, so one entry keeps the English
- * and the Japanese page saying the same thing. A key that no marker uses, and
- * a marker naming a key that is not here, are both errors — see that file.
+ * both language versions of `benchmark.mdx`, so one entry keeps the English and
+ * the Japanese page saying the same thing. A key that no marker uses, and a
+ * marker naming a key that is not here, are both errors — see that file.
  *
  * A few entries carry a whole `$…$` expression rather than a bare number.
  * KaTeX takes what is between the dollars literally, so a marker cannot sit
  * inside one: the comment would render as italic letters. Where the number is
  * inside math, the marker wraps the math.
  *
- * A marker cannot go in a heading either. Starlight derives the anchor from
- * the heading's raw text, so the marker's own key is spelled into the `id` —
+ * A marker cannot go in a heading either. Starlight derives the anchor from the
+ * heading's raw text, so the marker's own key is spelled into the `id` —
  * measured, and the anchor it produced was neither readable nor stable. The
  * heading that quoted a ratio says "Why Jotai Is Slower" instead, and the
  * number it used to carry is in the paragraph below it, where a marker works.
  *
  * An entry is language-neutral wherever it can be. The one kind that cannot is
- * a scenario the data picks out — which one a library does worst in — since
- * the cell has to name it in the page's language; such an entry carries one
+ * a scenario the data picks out — which one a library does worst in — since the
+ * cell has to name it in the page's language; such an entry carries one
  * spelling per language, and `embed-benchmark.mts` takes the page's.
  *
  * The per-library table's ratio cells carry their own markup, the `×` and the
@@ -59,8 +59,8 @@ import {
 export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
   ({
     // Where the numbers on this page were measured. Bare facts rather than a
-    // sentence: a marker's value is written once and spliced into both
-    // language versions, so it must carry no English of its own.
+    // sentence: a marker's value is written once and spliced into both language
+    // versions, so it must carry no English of its own.
     'environment/runner': environmentFact((e) =>
       e.runner === 'github-actions'
         ? `GitHub Actions ${e.runnerImage ?? 'standard runner'}`
@@ -76,8 +76,8 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     ),
     'environment/measured-on': environmentFact((e) => e.measuredOn),
 
-    // Scenario: Single State — the one scenario every library takes part in,
-    // so the one that quotes each of them against SynState.
+    // Scenario: Single State — the one scenario every library takes part in, so
+    // the one that quotes each of them against SynState.
     'single-state/zustand-over-synstate': factor(
       median(singleState, 'Zustand'),
       median(singleState, 'SynState'),
@@ -134,8 +134,8 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       median(diamond, 'SynState'),
     ),
 
-    // The comparative words around the small-graph figures (see
-    // `compared`): which side of SynState a library falls on is what a
+    // The comparative words around the small-graph figures (see `compared`):
+    // which side of SynState a library falls on is what a
     // re-measurement moves, so the word is derived with the number.
     'compare/derived-chain/rxjs-speed': compared(
       'RxJS against SynState in the derived chain',
@@ -313,8 +313,8 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     'cascaded-diamond/redux-end-median': ms(
       endMedians(cascadedDiamond, 'Redux')[1],
     ),
-    // The median over N rather than the ratio at N=20, where SynState's row
-    // is a few tenths of a millisecond and one point of it is noise.
+    // The median over N rather than the ratio at N=20, where SynState's row is
+    // a few tenths of a millisecond and one point of it is noise.
     'cascaded-diamond/redux-over-synstate-typical': factor(
       medianRatio(reduxOverSynStateCascaded()),
       1,
@@ -337,8 +337,7 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       endMedians(cascadedDiamond, 'Preact Signals')[1],
     ),
     // The bound the sentence on Solid and Preact Signals states for every N:
-    // the slowest point of either row, rounded up, so it holds by
-    // construction.
+    // the slowest point of either row, rounded up, so it holds by construction.
     'cascaded-diamond/solid-and-preact-signals-max': msAtLeast(
       Math.max(
         ...everyPoint(cascadedDiamond, 'Solid', 'Preact Signals').flat(),
@@ -446,8 +445,8 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     ),
     'cut-off/rxjs-start-median': ms(endMedians(equalityCutOff, 'RxJS')[0]),
     'cut-off/rxjs-end-median': ms(endMedians(equalityCutOff, 'RxJS')[1]),
-    // The libraries that reach every view on every update, equal bucket or
-    // not, and the RxJS row written without `distinctUntilChanged`.
+    // The libraries that reach every view on every update, equal bucket or not,
+    // and the RxJS row written without `distinctUntilChanged`.
     'compare/cut-off/visiting-rows-trend': growsToLastMeasured(
       'the Preact Signals, Solid, MobX, Jotai and Redux cut-off rows',
       equalityCutOff,
@@ -494,9 +493,9 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       rowSpread(derivedChain, slowestRow(derivedChain)),
       1,
     ),
-    // A diamond is where a library without an ordering step emits glitches,
-    // so the summary marks such a fastest row and its footnote names the
-    // fastest of the libraries that do not.
+    // A diamond is where a library without an ordering step emits glitches, so
+    // the summary marks such a fastest row and its footnote names the fastest
+    // of the libraries that do not.
     'summary/diamond-fastest': glitchMarked(fastestRow(diamond)),
     'summary/diamond-fastest-glitch-free': fastestRow(
       diamond,
@@ -666,10 +665,10 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     // that sum the benchmark up in a sentence.
     'summary/fastest-by-scenario': fastestByScenario(),
 
-    // Summary: for each library, the summary row where it is furthest from
-    // that row's fastest library, among the rows that measured it. Which row
-    // that is is what a re-measurement can change, so the scenario is derived
-    // too; and so is the mark on a library some rows did not measure.
+    // Summary: for each library, the summary row where it is furthest from that
+    // row's fastest library, among the rows that measured it. Which row that is
+    // is what a re-measurement can change, so the scenario is derived too; and
+    // so is the mark on a library some rows did not measure.
     ...worstCaseRows(),
 
     // Summary: how each library's cost grows when the deep chain gets four
@@ -741,11 +740,11 @@ type StatsData = Readonly<{
 const singleState: StatsData = singleStateJson;
 
 /**
- * The derived chain. The headline on the introduction and the landing page
- * used to be read from it ("N× faster than Jotai and M× faster than Redux"),
- * and later set worst cases side by side; it now quotes no number, because
- * one ratio chosen for its gap says more about the choice than about the
- * libraries, and the benchmark page sets every scenario out.
+ * The derived chain. The headline on the introduction and the landing page used
+ * to be read from it ("N× faster than Jotai and M× faster than Redux"), and
+ * later set worst cases side by side; it now quotes no number, because one
+ * ratio chosen for its gap says more about the choice than about the libraries,
+ * and the benchmark page sets every scenario out.
  */
 const derivedChain: StatsData = derivedChainJson;
 
@@ -818,10 +817,10 @@ const DYNAMIC_SUBSCRIPTIONS: readonly string[] = [
 const STOPPING_AT_THE_BUCKET: readonly string[] = ['SynState', 'RxJS'] as const;
 
 /**
- * The cut-off rows whose libraries compare the bucket too, but reach every
- * view on every update first: the pull-based ones mark each view and its
- * subscriber before the bucket is recomputed, and Redux calls every
- * subscriber, whose selector then finds its input unchanged.
+ * The cut-off rows whose libraries compare the bucket too, but reach every view
+ * on every update first: the pull-based ones mark each view and its subscriber
+ * before the bucket is recomputed, and Redux calls every subscriber, whose
+ * selector then finds its input unchanged.
  */
 const VISITING_EVERY_VIEW: readonly string[] = [
   'Preact Signals',
@@ -851,10 +850,10 @@ const row = (
 
 /**
  * What the row holds at one point of the sweep: the measurement, or `null`
- * where the runner gave up on it. A timeout is a result the prose reads —
- * which library stopped completing, and from where — so the comparisons below
- * ask for the nullable value and decide what it means, and only {@link at},
- * for a number a sentence quotes outright, insists on one.
+ * where the runner gave up on it. A timeout is a result the prose reads — which
+ * library stopped completing, and from where — so the comparisons below ask for
+ * the nullable value and decide what it means, and only {@link at}, for a
+ * number a sentence quotes outright, insists on one.
  */
 const valueAt = (
   data: SeriesData,
@@ -882,9 +881,9 @@ const nsPerUpdate = (totalMs: number, updateCount: number): number =>
   divide(totalMs * NS_PER_MS, updateCount);
 
 /**
- * Whether {@link factor} prints `value` with one decimal: below 10 once
- * rounded to that decimal, the way `toFixed` rounds it, so that 9.96 prints as
- * `10` rather than `10.0`.
+ * Whether {@link factor} prints `value` with one decimal: below 10 once rounded
+ * to that decimal, the way `toFixed` rounds it, so that 9.96 prints as `10`
+ * rather than `10.0`.
  */
 const inSingleDigits = (value: number): boolean =>
   value < 10 && value.toFixed(1) !== '10.0';
@@ -909,8 +908,8 @@ const count = (value: number): string => {
 };
 
 /**
- * A ratio as the summary quotes it: one decimal below 10, where "3.6×" and
- * "4×" say different things, and whole numbers above it, as {@link ratio}.
+ * A ratio as the summary quotes it: one decimal below 10, where "3.6×" and "4×"
+ * say different things, and whole numbers above it, as {@link ratio}.
  */
 const factor = (numerator: number, denominator: number): string => {
   const value = divide(numerator, denominator);
@@ -920,8 +919,8 @@ const factor = (numerator: number, denominator: number): string => {
 
 /**
  * A per-update cost as the per-library table prints it, in nanoseconds,
- * microseconds or milliseconds, whichever keeps the figure under 1,000, with
- * a tenth below 10. Each bound is read off the rounded figure, so that 999.6 ns
+ * microseconds or milliseconds, whichever keeps the figure under 1,000, with a
+ * tenth below 10. Each bound is read off the rounded figure, so that 999.6 ns
  * prints as `1.0 µs`, never `1000 ns`.
  */
 const durationNs = (ns: number): string =>
@@ -942,10 +941,10 @@ const updates = (data: SeriesData | StatsData): number => {
 };
 
 /**
- * The most a write to the inactive branch costs any of `labels` at any B of
- * the fan-out, per update, as the per-library table prints a duration: the
- * sentence quotes it as a bound ("16 ns or less"), so a point that timed out
- * is an error rather than left out.
+ * The most a write to the inactive branch costs any of `labels` at any B of the
+ * fan-out, per update, as the per-library table prints a duration: the sentence
+ * quotes it as a bound ("16 ns or less"), so a point that timed out is an error
+ * rather than left out.
  */
 const fanOutWriteCostAtMost = (labels: readonly string[]): string =>
   durationNs(
@@ -985,10 +984,10 @@ const lastMeasuredLabel = (data: SeriesData, label: string): string => {
  *
  * Not the sweep's largest, which is what the prose used to name: SynState's
  * fan-out row is the one that grows with $B$, so it is the row the timeout
- * catches first, and on a machine slower than the one the committed tables
- * came from the last point is a timeout rather than a measurement. Read off
- * the data — as {@link rxjsLastLabel} is for the same reason — the sentence
- * quotes the largest branch count that was actually measured, and names it.
+ * catches first, and on a machine slower than the one the committed tables came
+ * from the last point is a timeout rather than a measurement. Read off the data
+ * — as {@link rxjsLastLabel} is for the same reason — the sentence quotes the
+ * largest branch count that was actually measured, and names it.
  */
 const fanOutLastLabel = (): string =>
   lastMeasuredLabel(conditionalFanOut, SYNSTATE_NAIVE);
@@ -1004,9 +1003,9 @@ const at = (data: SeriesData, label: string, xLabel: string): number => {
 };
 
 /**
- * What a write to the inactive branch costs `label` in the fan-out, per
- * update, at the point the summary reads the scenario at, as the per-library
- * table prints a duration.
+ * What a write to the inactive branch costs `label` in the fan-out, per update,
+ * at the point the summary reads the scenario at, as the per-library table
+ * prints a duration.
  */
 const fanOutWriteCostAtLast = (label: string): string =>
   durationNs(
@@ -1044,8 +1043,8 @@ const cutOffSummaryLabel = (): string => {
  * The cut-off row's name. Its point is the widest view count every row
  * finished, so that each cell of the row is a measured ratio rather than a
  * lower bound; several rows time out before the sweep ends, and a slower
- * machine can move the point, so the summary table's first column reads it
- * from here too.
+ * machine can move the point, so the summary table's first column reads it from
+ * here too.
  */
 const cutOffSummaryName = (): Localized =>
   ({
@@ -1201,8 +1200,8 @@ const pointSpread = (data: SeriesData, label: string, xLabel: string): number =>
  * The rows of a sweep the summary's slowest column leaves out: the naive forms
  * (`isNaiveForm`, the same test that dashes them in the chart) — in the
  * fan-out SynState and RxJS written with a `derive` / `combineLatest` over
- * every branch, which the summary replaces with their `switchMap` forms, and
- * in the cut-off RxJS written without `distinctUntilChanged`.
+ * every branch, which the summary replaces with their `switchMap` forms, and in
+ * the cut-off RxJS written without `distinctUntilChanged`.
  */
 const naiveLabels = (data: SeriesData): readonly string[] =>
   data.series.map((s) => s.label).filter(isNaiveForm);
@@ -1215,9 +1214,9 @@ const libraryNameOf = (label: string): string =>
   label.replace(/\s*\(.*\)$/u, '');
 
 /**
- * A sweep read at one point. `forms` names, for a library measured in more
- * than one form, the row the summary counts for it; that row stands for the
- * library in `libraries`, since no row of such a library carries its bare name.
+ * A sweep read at one point. `forms` names, for a library measured in more than
+ * one form, the row the summary counts for it; that row stands for the library
+ * in `libraries`, since no row of such a library carries its bare name.
  */
 const seriesScenario = (
   name: Localized,
@@ -1436,11 +1435,10 @@ const fastestByScenario = (): Localized => {
 };
 
 /**
- * One library's measurement beside another's at every point of a sweep. A
- * point either did not complete is an error rather than left out: a sentence
- * about every point would otherwise skip the one where the two are furthest
- * apart, and a median across the sweep would be taken over fewer points than
- * it says.
+ * One library's measurement beside another's at every point of a sweep. A point
+ * either did not complete is an error rather than left out: a sentence about
+ * every point would otherwise skip the one where the two are furthest apart,
+ * and a median across the sweep would be taken over fewer points than it says.
  */
 const everyPoint = (
   data: SeriesData,
@@ -1568,9 +1566,9 @@ const trendBetween = (
 /**
  * `wording` for a sentence that says each of `labels` grows across the sweep,
  * judged from its first point to the last one it finished — several of these
- * rows time out before the end, so {@link rowTrend}'s end medians do not
- * exist for them. A single first point is enough here: the rows the sentence
- * covers grow by tens of times, far beyond what one noisy point moves.
+ * rows time out before the end, so {@link rowTrend}'s end medians do not exist
+ * for them. A single first point is enough here: the rows the sentence covers
+ * grow by tens of times, far beyond what one noisy point moves.
  */
 const growsToLastMeasured = (
   sentence: string,
@@ -1616,9 +1614,9 @@ const ms = (value: number): string =>
 
 /**
  * For each row that grows with W, what the cut-off section quotes: its time
- * with one view, the widest view count it finished and its time there, and
- * the slope between the two — what one more view adds to one update, which is
- * what such a library spends reaching a view it then leaves as it was.
+ * with one view, the widest view count it finished and its time there, and the
+ * slope between the two — what one more view adds to one update, which is what
+ * such a library spends reaching a view it then leaves as it was.
  */
 const cutOffVisitingRows = (): ReadonlyRecord<string, string> =>
   Object.fromEntries(
@@ -1655,10 +1653,10 @@ const cutOffVisitingRows = (): ReadonlyRecord<string, string> =>
 const MS_TENTHS_BELOW = 100;
 
 /**
- * `value` as {@link ms} prints it, rounded up rather than to the nearest, for
- * a bound the sentence states: "at or below 1.4 ms" of a row whose slowest
- * point is 1.32 ms. Read through a fixed number of decimals first, so that
- * `1.3 * 10` coming out as `13.000000000000002` does not round it up a step.
+ * `value` as {@link ms} prints it, rounded up rather than to the nearest, for a
+ * bound the sentence states: "at or below 1.4 ms" of a row whose slowest point
+ * is 1.32 ms. Read through a fixed number of decimals first, so that `1.3 * 10`
+ * coming out as `13.000000000000002` does not round it up a step.
  */
 const msAtLeast = (value: number): string => {
   const scale = value < MS_TENTHS_BELOW ? 10 : 1;
@@ -1676,12 +1674,12 @@ const ratio = (numerator: number, denominator: number): string =>
   count(Math.round(divide(numerator, denominator)));
 
 /**
- * Where one measurement falls against another, in the steps the prose has
- * words for. Judged on the larger of the ratio and its inverse, as
- * {@link factor} prints it, so that "X against Y" and "Y against X" always
- * land on mirrored steps — the page compares in both directions. A ratio
- * above 1 changes step where its printed figure does; one below 1 is judged
- * from the other side, so a printed 0.8× can fall on either side of `level`:
+ * Where one measurement falls against another, in the steps the prose has words
+ * for. Judged on the larger of the ratio and its inverse, as {@link factor}
+ * prints it, so that "X against Y" and "Y against X" always land on mirrored
+ * steps — the page compares in both directions. A ratio above 1 changes step
+ * where its printed figure does; one below 1 is judged from the other side, so
+ * a printed 0.8× can fall on either side of `level`:
  * symmetry is the property the prose needs, since it compares both ways.
  *
  * - `level`: within {@link LEVEL_WITHIN}× either way (up to 1.2× as printed,
@@ -1749,10 +1747,10 @@ const relationIndex = (numerator: number, denominator: number): number => {
 const LEVEL = RELATIONS.indexOf('level');
 
 /**
- * The relations a pair may be in once a re-measurement's noise is allowed
- * for: its own, and those of the ratio moved {@link EDGE_BAND}× either way.
- * Two relations only where the ratio sits that close to an edge between
- * steps, as indices in {@link RELATIONS}, lower first.
+ * The relations a pair may be in once a re-measurement's noise is allowed for:
+ * its own, and those of the ratio moved {@link EDGE_BAND}× either way.
+ * Two relations only where the ratio sits that close to an edge between steps,
+ * as indices in {@link RELATIONS}, lower first.
  */
 const relationRange = ([numerator, denominator]: FixedLengthTuple<
   2,
@@ -1767,9 +1765,9 @@ const relationRange = ([numerator, denominator]: FixedLengthTuple<
 type RelationRange = Readonly<{ low: number; nominal: number; high: number }>;
 
 /**
- * How far either side of an edge between steps a measurement counts as on
- * both. A step's edges are hard — 1.2× is `level`, 1.21× `above` — and a pair
- * sitting on one changed step from one re-measurement to the next: CI measured
+ * How far either side of an edge between steps a measurement counts as on both.
+ * A step's edges are hard — 1.2× is `level`, 1.21× `above` — and a pair sitting
+ * on one changed step from one re-measurement to the next: CI measured
  * Redux against SynState in the deep chain as `below..level` once, with the
  * same code the committed tables had as `below`. A tenth either way is about
  * the median run-to-run move of one library after the runner is divided out
@@ -1815,8 +1813,8 @@ const spanText = (
 /**
  * Whether each pair can be given a relation within its range so that, between
  * them, the lowest is `low` and the highest `high`: every range meets
- * `low..high`, and — for a span of two steps or more — one pair can take
- * `low` while another takes `high`.
+ * `low..high`, and — for a span of two steps or more — one pair can take `low`
+ * while another takes `high`.
  */
 const spanReachable = (
   ranges: readonly RelationRange[],
@@ -1843,24 +1841,24 @@ const spanReachable = (
 
 /**
  * The words a sentence uses for how the `pairs` (numerator, denominator)
- * compare, keyed by their {@link Relation} — one, or the span `low..high`
- * when the pairs fall in several (`'level..above'`: level in some, above in
- * the rest).
+ * compare, keyed by their {@link Relation} — one, or the span `low..high` when
+ * the pairs fall in several (`'level..above'`: level in some, above in the
+ * rest).
  *
- * The numbers beside a comparative have been derived for a while; the word
- * was typed in, so a re-measurement that moved a library from ahead of
+ * The numbers beside a comparative have been derived for a while; the word was
+ * typed in, so a re-measurement that moved a library from ahead of
  * SynState to level with it left "faster than" in front of a 0.9×. Here a
  * sentence states which relations it has words for, and a measurement in any
  * other is an error naming the sentence: the data now say something the
  * sentence cannot, and it has to be rewritten rather than reworded by hand.
  *
- * A pair within {@link EDGE_BAND} of an edge may be read on either side of
- * it. The span the pairs fall in as measured wins where the sentence has words
- * for it; otherwise the nearest span the band allows that it has words for,
- * so that a near tie the sentence already covers on one side cannot fail it.
- * Of two equally near, the one closer to `level`: the band is there for a
- * near tie, and a near tie is the weaker claim; then the lower, so that the
- * order a words table is written in decides nothing.
+ * A pair within {@link EDGE_BAND} of an edge may be read on either side of it.
+ * The span the pairs fall in as measured wins where the sentence has words for
+ * it; otherwise the nearest span the band allows that it has words for, so that
+ * a near tie the sentence already covers on one side cannot fail it.
+ * Of two equally near, the one closer to `level`: the band is there for a near
+ * tie, and a near tie is the weaker claim; then the lower, so that the order a
+ * words table is written in decides nothing.
  */
 const compared = (
   sentence: string,
@@ -2175,9 +2173,8 @@ const rowTrend = (
 
   const { trend, wording } = trendBetween(sentence, start, end, words);
 
-  // The two medians, as `ms` prints them: a flat row must not show them
-  // further apart than a flat row may be, nor a growing one show the later
-  // one lower.
+  // The two medians, as `ms` prints them: a flat row must not show them further
+  // apart than a flat row may be, nor a growing one show the later one lower.
   const [from, to] = [shownMs(start), shownMs(end)] as const;
 
   const shownFlat =
@@ -2200,8 +2197,8 @@ const rowTrend = (
 
 /**
  * {@link rowTrend} for each of `labels`, for a sentence that says the same of
- * all of them: each row has to be in a trend `words` has wording for, and
- * they have to share it.
+ * all of them: each row has to be in a trend `words` has wording for, and they
+ * have to share it.
  */
 const rowsTrend = (
   sentence: string,
@@ -2234,12 +2231,12 @@ const FLAT_WITHIN = 2;
  * floor, for a sentence about how two rows compare across a sweep. Below it,
  * one re-measurement on a shared runner has put a point several times off its
  * neighbors, and the deep chain's $K=100$ points are under 1.5 ms on both
- * sides, so their ratio is noise; read at the floor, two such points are
- * level. Every point is kept, and a side that grows past the floor is compared
- * with the other side's floor, so a real gap at a point the sentence covers
- * still shows, as at least its ratio to the floor: 4 ms against 0.4 ms is
- * judged as 4 against 1.5. What is lost is how far below the floor the faster
- * side was, which is what the noise there does not tell.
+ * sides, so their ratio is noise; read at the floor, two such points are level.
+ * Every point is kept, and a side that grows past the floor is compared with
+ * the other side's floor, so a real gap at a point the sentence covers still
+ * shows, as at least its ratio to the floor: 4 ms against 0.4 ms is judged as 4
+ * against 1.5. What is lost is how far below the floor the faster side was,
+ * which is what the noise there does not tell.
  */
 const floored = (
   pairs: readonly FixedLengthTuple<2, number>[],
@@ -2294,9 +2291,9 @@ const summarySynStateSpreads = (): readonly number[] =>
   summaryScenarios().map((s) => s.spread('SynState'));
 
 /**
- * One row of the summary table, as the per-library table reads it: the name
- * the row is linked by, the library that leads it, and where any library
- * stands against that one at the point of the sweep the row names.
+ * One row of the summary table, as the per-library table reads it: the name the
+ * row is linked by, the library that leads it, and where any library stands
+ * against that one at the point of the sweep the row names.
  */
 type SummaryScenario = Readonly<{
   name: Localized;
@@ -2307,21 +2304,21 @@ type SummaryScenario = Readonly<{
   /** The fastest row's label, with the summary's footnote mark if any. */
   fastest: () => string;
   /**
-   * The library that leads, unmarked: for a library measured in more than
-   * one form, naive ones included, its name rather than the form's label.
+   * The library that leads, unmarked: for a library measured in more than one
+   * form, naive ones included, its name rather than the form's label.
    */
   leader: () => string;
   spread: (library: string) => number;
   /**
-   * The slowest row's spread, as the summary's slowest column reads it: a
-   * sweep leaves its naive forms out ({@link naiveLabels}); a single-point
-   * scenario has none.
+   * The slowest row's spread, as the summary's slowest column reads it: a sweep
+   * leaves its naive forms out ({@link naiveLabels}); a single-point scenario
+   * has none.
    */
   slowestSpread: () => number;
   timedOut: (library: string) => boolean;
   /**
-   * What one update costs `library` and the fastest library, in nanoseconds,
-   * or `undefined` where the scenario's time is not a per-update cost (the
+   * What one update costs `library` and the fastest library, in nanoseconds, or
+   * `undefined` where the scenario's time is not a per-update cost (the
    * cascaded diamond spreads building its graph over too few updates). Where
    * `library` timed out, its cost is the timeout's, a lower bound.
    */
@@ -2515,9 +2512,9 @@ const GLITCHING_LIBRARIES: readonly string[] = ['RxJS'] as const;
 
 /**
  * The library's typical cost across the sweep, for a row the prose calls
- * constant. The median rather than the mean, so that one slow first point —
- * the branch counts are measured in one process, warmest last — does not move
- * the figure the sentence quotes as "regardless of B".
+ * constant. The median rather than the mean, so that one slow first point — the
+ * branch counts are measured in one process, warmest last — does not move the
+ * figure the sentence quotes as "regardless of B".
  */
 const typical = (data: SeriesData, label: string): number => {
   const value = medianOf(row(data, label).values.filter((v) => v !== null));
@@ -2530,8 +2527,8 @@ const typical = (data: SeriesData, label: string): number => {
 };
 
 /**
- * The slope of SynState's naive fan-out row in nanoseconds, which is the figure that
- * makes "linear in B" concrete: the largest measured branch count's cost
+ * The slope of SynState's naive fan-out row in nanoseconds, which is the figure
+ * that makes "linear in B" concrete: the largest measured branch count's cost
  * spread over its branches and over the updates the runner drove.
  */
 const nsPerBranchPerUpdate = (): string =>

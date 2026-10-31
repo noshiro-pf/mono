@@ -32,9 +32,9 @@ export const mapInSequence = async <T, R>(
 
 /**
  * Waits for one macrotask, which lets VanJS's and Preact's microtask renders
- * run, then forces layout. Every implementation pays the
- * same wait, so it shifts the timings equally rather than favouring the ones
- * that update synchronously.
+ * run, then forces layout. Every implementation pays the same wait, so it
+ * shifts the timings equally rather than favouring the ones that update
+ * synchronously.
  */
 export const settle = async (container: HTMLElement): Promise<void> => {
   await new Promise<void>((resolve) => {
@@ -59,8 +59,8 @@ export const median = (samples: readonly number[]): number => {
  * Like {@link settle}, but waits for the next task through a `MessageChannel`
  * rather than a `setTimeout`, which the browser holds back to 4 ms once
  * timeouts are nested. Every library here has rendered by then: VanJS and
- * Preact render in a microtask, the others synchronously. The scenarios use
- * it, because a change there costs less than that 4 ms.
+ * Preact render in a microtask, the others synchronously. The scenarios use it,
+ * because a change there costs less than that 4 ms.
  */
 export const settleUnclamped = async (
   container: HTMLElement,

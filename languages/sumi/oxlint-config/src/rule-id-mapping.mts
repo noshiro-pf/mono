@@ -99,8 +99,8 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map<
   // mutation
   ['sumi(no-let-without-mut-prefix)', 'mutation/no-let-without-mut-prefix'],
   ['eslint(prefer-const)', 'mutation/prefer-const'],
-  // Declaring a global's name (D-19) and shadowing a user binding (D-27)
-  // are one rule to the engine; both surface under this ID.
+  // Declaring a global's name (D-19) and shadowing a user binding (D-27) are
+  // one rule to the engine; both surface under this ID.
   ['eslint(no-shadow)', 'mutation/no-shadow'],
 
   // readonly
@@ -122,15 +122,15 @@ export const implementedRuleIds: ReadonlySet<string> = new Set(
 );
 
 /**
- * The neutral ID for one engine diagnostic code — the single normalization
- * both the conformance corpus and `sumi check` compare markers against.
+ * The neutral ID for one engine diagnostic code — the single normalization both
+ * the conformance corpus and `sumi check` compare markers against.
  *
- * A TypeScript diagnostic that tsgolint passes through arrives as
- * `TS(<code>)`, and is the corpus's `compiler/<code>`: a diagnostic of the
- * fixed compilerOptions rather than of a lint rule
+ * A TypeScript diagnostic that tsgolint passes through arrives as `TS(<code>)`,
+ * and is the corpus's `compiler/<code>`: a diagnostic of the fixed
+ * compilerOptions rather than of a lint rule
  * (languages/sumi/docs/conformance-corpus.md). Anything the mapping does not
- * know becomes `unmapped:<code>`, which the corpus asserts never appears —
- * an unmapped code is a preset that grew a rule the mapping has not heard of.
+ * know becomes `unmapped:<code>`, which the corpus asserts never appears — an
+ * unmapped code is a preset that grew a rule the mapping has not heard of.
  */
 export const toRuleId = (code: string): string => {
   const compiler = /^TS\((\d+)\)$/u.exec(code);

@@ -22,11 +22,11 @@ export type Bundle = Readonly<{
  *
  * A release used to carry one tarball per built-in library (~107 per flavor,
  * ~214 per version), then one per flavor. Nobody installed them separately —
- * `libReplacement` loads the whole closure of whatever `lib` is set to — so
- * the split bought the consumer nothing while costing a package name, a first
- * publish, and a trusted-publisher setup each. One package per TypeScript
- * minor carries both flavors, and the consumer picks between them with the
- * `paths` entry they had to write anyway.
+ * `libReplacement` loads the whole closure of whatever `lib` is set to — so the
+ * split bought the consumer nothing while costing a package name, a first
+ * publish, and a trusted-publisher setup each. One package per TypeScript minor
+ * carries both flavors, and the consumer picks between them with the `paths`
+ * entry they had to write anyway.
  */
 export const collectBundle = async (
   versionRoot: string,
@@ -62,19 +62,19 @@ export const collectBundle = async (
  * Nothing is staged or rearranged: `output/lib` is the package as it ships.
  * That is a requirement rather than a tidiness preference — a consuming
  * repository points `paths` at `node_modules/<pkg>/libs/*`, and when this
- * repository is a workspace of that one, the path resolves through a symlink
- * to this very directory. A layout assembled at pack time would exist only
- * inside the tarball.
+ * repository is a workspace of that one, the path resolves through a symlink to
+ * this very directory. A layout assembled at pack time would exist only inside
+ * the tarball.
  *
  * The nesting under `libs/` is what TypeScript asks for.
- * `getLibraryNameFromLibFileName` turns `lib.es2015.symbol.wellknown.d.ts`
- * into `@typescript/lib-es2015/symbol-wellknown` — the first component after
- * the group is a path segment, the rest are joined with `-` — so one wildcard
- * covers group libs and sub-libs alike. Flattening
- * `es2015/symbol-wellknown` to `es2015-symbol-wellknown` looks equivalent and
- * is not: TypeScript never asks for that name, so every sub-lib would quietly
- * keep the stock declarations. Measured with `--traceResolution`: nested
- * resolves 88 of 88 lookups, flattened only 15.
+ * `getLibraryNameFromLibFileName` turns `lib.es2015.symbol.wellknown.d.ts` into
+ * `@typescript/lib-es2015/symbol-wellknown` — the first component after the
+ * group is a path segment, the rest are joined with `-` — so one wildcard
+ * covers group libs and sub-libs alike. Flattening `es2015/symbol-wellknown` to
+ * `es2015-symbol-wellknown` looks equivalent and is not: TypeScript never asks
+ * for that name, so every sub-lib would quietly keep the stock declarations.
+ * Measured with `--traceResolution`: nested resolves 88 of 88 lookups,
+ * flattened only 15.
  */
 export const packBundle = async (
   bundle: Bundle,

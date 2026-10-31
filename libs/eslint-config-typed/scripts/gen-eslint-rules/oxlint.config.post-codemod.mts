@@ -11,8 +11,8 @@ import { castDeepMutable } from 'ts-data-forge';
 export default defineConfig({
   plugins: ['typescript'],
   jsPlugins: ['./oxlint-plugin-ts-type-forge.mts', '@stylistic/eslint-plugin'],
-  // `no-duplicate-type-constituents` needs type information, which oxlint
-  // gets from `oxlint-tsgolint`.
+  // `no-duplicate-type-constituents` needs type information, which oxlint gets
+  // from `oxlint-tsgolint`.
   options: { typeAware: true },
   // oxlint turns `correctness` on by default; only the rules listed here run.
   categories: { correctness: 'off' },

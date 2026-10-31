@@ -65,14 +65,14 @@ export const removeRow = (
 
 /**
  * Each row of `dependent`'s dialog checked, in order. A row with no source is
- * empty and left out. Otherwise it is wrong when its source no longer
- * exists, when an earlier row has the same source (one edge per pair keeps
- * the graph readable), when the edge would close a cycle — which the
- * evaluator cannot resolve and which would leave everything on it blocked
- * for good — or when its lag is not a number of zero or more.
+ * empty and left out. Otherwise it is wrong when its source no longer exists,
+ * when an earlier row has the same source (one edge per pair keeps the graph
+ * readable), when the edge would close a cycle — which the evaluator cannot
+ * resolve and which would leave everything on it blocked for good — or when its
+ * lag is not a number of zero or more.
  *
- * The cycle check reads the stored state. Every edge the rows describe
- * points into `dependent`, so no path out of it runs through them.
+ * The cycle check reads the stored state. Every edge the rows describe points
+ * into `dependent`, so no path out of it runs through them.
  */
 export const validateRows = (
   state: DomainState,
@@ -148,8 +148,8 @@ export const validDependencies = (
   });
 
 /**
- * What saving the rows writes: their dependencies, or the rows that are
- * wrong (see {@link validateRows}).
+ * What saving the rows writes: their dependencies, or the rows that are wrong
+ * (see {@link validateRows}).
  */
 export const dependenciesFromRows = (
   state: DomainState,
@@ -203,9 +203,9 @@ export const dependencySourceOptions = (
 
 /**
  * The options one row's `<select>` offers: without the done tasks unless
- * `showDone` — a task that is done rarely starts to be waited for — but
- * always with the one the row has chosen, so that a dependency on a task
- * since done still reads as what it is.
+ * `showDone` — a task that is done rarely starts to be waited for — but always
+ * with the one the row has chosen, so that a dependency on a task since done
+ * still reads as what it is.
  */
 export const shownSourceOptions = (
   options: readonly SourceOption[],
@@ -233,8 +233,8 @@ export const describeDependency = (
 };
 
 /**
- * The value of the source `<select>` as a node id, or `''` for anything
- * else — the placeholder, or a value that is not a node id.
+ * The value of the source `<select>` as a node id, or `''` for anything else —
+ * the placeholder, or a value that is not a node id.
  */
 export const parseSourceValue = (value: string): GraphNodeId | '' =>
   GraphNodeIdCodec.is(value) ? value : '';
@@ -277,9 +277,9 @@ export type SourceOption = DeepReadonly<{
 
 /**
  * The dependencies of the node in its dialog are edited as rows, one per
- * dependency, each holding its fields the way the inputs give them back. A
- * row means nothing until it is saved, and what is typed into one is saved
- * without a separate step to add it.
+ * dependency, each holding its fields the way the inputs give them back. A row
+ * means nothing until it is saved, and what is typed into one is saved without
+ * a separate step to add it.
  */
 export type DependencyRow = DeepReadonly<{
   /** Stable for as long as the row exists; the key of its element. */

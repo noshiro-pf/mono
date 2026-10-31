@@ -92,9 +92,9 @@ const buildPaths = (packageRoot: string) =>
           $: `${output}/lib-files` as const,
         },
         /**
-         * Branded flat intermediates, mirroring `lib-files`. The declarations
-         * a consumer sees end up in `output/lib/libs-branded`; this is what
-         * feeds them, and the input of the branded cross-version diffs.
+         * Branded flat intermediates, mirroring `lib-files`. The declarations a
+         * consumer sees end up in `output/lib/libs-branded`; this is what feeds
+         * them, and the input of the branded cross-version diffs.
          */
         libFilesBranded: {
           $: `${output}/lib-files-branded` as const,

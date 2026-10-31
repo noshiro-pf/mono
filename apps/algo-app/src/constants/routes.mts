@@ -13,8 +13,8 @@ export const params = {
 } as const;
 
 /**
- * The page of the room `roomId`: where a player joins it, or, with
- * `playerId`, the game as that player.
+ * The page of the room `roomId`: where a player joins it, or, with `playerId`,
+ * the game as that player.
  */
 export const roomPage = (roomId: string, playerId?: string): string => {
   const query = new URLSearchParams({

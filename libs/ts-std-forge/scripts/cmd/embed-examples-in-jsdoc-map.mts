@@ -5,8 +5,8 @@ type SourceFileMapping = Readonly<{
 
 /**
  * Mapping from source files to their sample code files. Moved here with the
- * algebraic data type core (Sumi D-49 stage 2). Sample files should be
- * listed in the order they appear in the source file's JSDoc.
+ * algebraic data type core (Sumi D-49 stage 2). Sample files should be listed
+ * in the order they appear in the source file's JSDoc.
  *
  * HOW TO USE:
  *

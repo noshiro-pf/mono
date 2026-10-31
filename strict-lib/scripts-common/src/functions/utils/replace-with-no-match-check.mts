@@ -29,10 +29,10 @@ export const replaceWithNoMatchCheck =
     >,
   ): ((target: string) => string) =>
   (target) => {
-    // Strings are matched via a whitespace-flexible regex rather than a
-    // literal substring, since oxfmt may re-wrap long type signatures
-    // (e.g. onto multiple lines with indentation) between when a pattern was
-    // authored and when it is matched against freshly-fetched lib files.
+    // Strings are matched via a whitespace-flexible regex rather than a literal
+    // substring, since oxfmt may re-wrap long type signatures (e.g. onto
+    // multiple lines with indentation) between when a pattern was authored and
+    // when it is matched against freshly-fetched lib files.
     const effectiveSearchValue =
       typeof searchValue === 'string'
         ? flexibleWhitespaceRegExp(searchValue)
@@ -197,12 +197,12 @@ const flexibleWhitespaceRegExp = (text: string): RegExp => {
     })
     .join('');
 
-  // Dropping whitespace during tokenization also drops any word boundary
-  // that the original (untokenized) leading/trailing whitespace used to
-  // provide. Without restoring it, a pattern like `'  var '` degrades to a
-  // bare `var` regex that matches inside unrelated identifiers such as
-  // `variant`. Middle tokens don't need this: two word-char runs can never
-  // be adjacent in the token stream (tokenize always merges a maximal
+  // Dropping whitespace during tokenization also drops any word boundary that
+  // the original (untokenized) leading/trailing whitespace used to provide.
+  // Without restoring it, a pattern like `'  var '` degrades to a bare `var`
+  // regex that matches inside unrelated identifiers such as `variant`. Middle
+  // tokens don't need this: two word-char runs can never be adjacent in the
+  // token stream (tokenize always merges a maximal
   // word-char run into a single token), so a word token in the middle is
   // already bounded by whatever punctuation token follows/precedes it.
   const firstToken = tokens[0];

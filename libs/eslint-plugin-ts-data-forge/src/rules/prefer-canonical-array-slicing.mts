@@ -87,8 +87,8 @@ const asNegatedPositiveIntegerLiteral = (
 
 /**
  * Whether re-reading the expression is free of side effects (a plain variable
- * or a non-computed property chain, type wrappers aside). Required for
- * patterns that reference the receiver twice, such as
+ * or a non-computed property chain, type wrappers aside). Required for patterns
+ * that reference the receiver twice, such as
  * `xs.filter((_, i) => i < xs.length - 1)`.
  */
 const isSimpleReference = (wrapped: TSESTree.Node): boolean => {
@@ -213,8 +213,8 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
     const checker = parserServices.program.getTypeChecker();
 
     /**
-     * The in-scope way to reference the `Arr` namespace, the name the
-     * reference starts with, and the edits that bring it into scope: a value
+     * The in-scope way to reference the `Arr` namespace, the name the reference
+     * starts with, and the edits that bring it into scope: a value
      * import of `Arr` (possibly aliased), a namespace import member, or `Arr`
      * bound by {@link bindValueImports}, which adds it to an existing import or
      * drops `type` from one. `undefined` when none can: `import type { Arr }`
@@ -235,8 +235,8 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
     const arrRef = arrTarget?.ref ?? 'Arr';
 
     /**
-     * Deferred (non-concrete) types are reduced to their base constraint
-     * before checking; `any` / `unknown` are conservatively not array-like.
+     * Deferred (non-concrete) types are reduced to their base constraint before
+     * checking; `any` / `unknown` are conservatively not array-like.
      */
     const isArrayOrTupleType = (type: ts.Type): boolean => {
       if ((type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) !== 0) {
@@ -398,8 +398,8 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
 
     /**
      * Matches an index-only filter callback (`(_, i) => <comparison>`) and
-     * classifies the comparison. Both a leading index (`i >= 1`) and a
-     * trailing index (`1 <= i`) operand order are accepted.
+     * classifies the comparison. Both a leading index (`i >= 1`) and a trailing
+     * index (`1 <= i`) operand order are accepted.
      */
     const classifyFilterCallback = (
       callback: TSESTree.CallExpressionArgument,
@@ -471,10 +471,10 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
         return undefined;
       }
 
-      // The element parameter must not participate in the comparison (only
-      // the index side and a receiver-independent bound are recognized, so
-      // reaching here with an element reference is impossible for literals,
-      // but `xs.length - N` needs a stable receiver).
+      // The element parameter must not participate in the comparison (only the
+      // index side and a receiver-independent bound are recognized, so reaching
+      // here with an element reference is impossible for literals, but
+      // `xs.length - N` needs a stable receiver).
       const n = asNonNegativeIntegerLiteral(other);
 
       if (n !== undefined) {
@@ -724,8 +724,8 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
           return;
         }
 
-        // The receiver must be an array or tuple (not a string / typed array
-        // / other object that happens to share the method name).
+        // The receiver must be an array or tuple (not a string / typed array /
+        // other object that happens to share the method name).
         if (!holdsThroughWrappers(receiver, isArrayOrTupleType)) {
           return;
         }
@@ -798,8 +798,8 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
               return;
             }
 
-            // `xs.concat(item)` appends only when `item` can never be an
-            // array (otherwise `concat` would flatten it).
+            // `xs.concat(item)` appends only when `item` can never be an array
+            // (otherwise `concat` would flatten it).
             if (holdsThroughWrappers(arg, isDefinitelyNotArrayType)) {
               report(
                 node,
@@ -839,8 +839,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
               : [undefined, undefined, undefined];
 
         // `spread`, `item`, and `fn` are set together (all from the same
-        // tuple), so checking `spread` also guarantees the others are
-        // defined.
+        // tuple), so checking `spread` also guarantees the others are defined.
         if (spread === undefined) {
           return;
         }

@@ -100,8 +100,8 @@ describe('should-run', () => {
     });
 
     test('should match patterns against repository-relative paths', async () => {
-      // Every pattern kind at once: an exact file name, a directory prefix,
-      // an extension glob, and a glob with a wildcard segment. All four are
+      // Every pattern kind at once: an exact file name, a directory prefix, an
+      // extension glob, and a glob with a wildcard segment. All four are
       // relative to the repository root, so a file outside `docs/` is not
       // ignored by the `docs/` pattern even though its own path contains it.
       const result = await withChangedFiles(

@@ -121,8 +121,8 @@ const main = async (): Promise<void> => {
       return poll();
     };
 
-    // The same, for the tab's title, which follows a pane's page only once
-    // the frame has reported it.
+    // The same, for the tab's title, which follows a pane's page only once the
+    // frame has reported it.
     const titleSettlesTo = async (
       suffix: string,
       timeout: number,
@@ -170,8 +170,8 @@ const main = async (): Promise<void> => {
 
     await page.waitForSelector('.pane', { timeout: 10_000 });
 
-    // Only a `build:dev` build carries the build label; a production one
-    // leaves it out, along with the rest of the diagnostics.
+    // Only a `build:dev` build carries the build label; a production one leaves
+    // it out, along with the rest of the diagnostics.
     const buildLabel =
       (await page.locator('.top-bar__build').count()) === 0
         ? ''
@@ -386,8 +386,8 @@ const main = async (): Promise<void> => {
     // And a page on that origin which registers a worker on every visit — what
     // a real one does — is loaded once and left alone. It used to be loaded
     // twice: the clear that keeps the worker away from the *next* navigation
-    // was followed by a reload, about 40ms after the page arrived, and the
-    // page that came back registered another worker for the next one to find.
+    // was followed by a reload, about 40ms after the page arrived, and the page
+    // that came back registered another worker for the next one to find.
     await address.fill(`http://localhost:${serverPort.toString()}/sw-loop`);
 
     await address.press('Enter');
@@ -525,8 +525,8 @@ const main = async (): Promise<void> => {
       (await page.locator('link#split-view-favicon').getAttribute('href')) ??
       '';
 
-    // A second split view, which opens in a tab of its own and leaves this
-    // one where it was.
+    // A second split view, which opens in a tab of its own and leaves this one
+    // where it was.
     const [createdTab] = await Promise.all([
       context.waitForEvent('page', { timeout: 8000 }),
       page.locator('.top-bar__button[title*="Add a split view"]').click(),
@@ -594,8 +594,8 @@ const main = async (): Promise<void> => {
     // Editing the list, in the popover: rename, export, delete.
     await page.locator('.top-bar__button[title*="Rename, reorder"]').click();
 
-    // Deliberately not ASCII: a name is the user's text, whatever the UI's
-    // own language is.
+    // Deliberately not ASCII: a name is the user's text, whatever the UI's own
+    // language is.
     await page.locator('.workspace-popover__input').fill('検証');
 
     await page.locator('.workspace-popover button[type="submit"]').click();
@@ -621,8 +621,8 @@ const main = async (): Promise<void> => {
       .catch(() => '');
 
     // --- opening every saved split view at once -------------------------
-    // Still in the popover. Two are saved and one of them is open here, so
-    // this should open exactly one tab.
+    // Still in the popover. Two are saved and one of them is open here, so this
+    // should open exactly one tab.
     await page.locator('.top-bar__button[title*="Open every saved"]').click();
 
     await page.waitForTimeout(2000);
@@ -735,9 +735,9 @@ const main = async (): Promise<void> => {
       .inputValue();
 
     // --- zooming one pane -----------------------------------------------
-    // One pane, so that the zoom controls are in the toolbar rather than in
-    // the overflow menu. The menu is what the service-worker section above
-    // went through, at a fifth of the window wide.
+    // One pane, so that the zoom controls are in the toolbar rather than in the
+    // overflow menu. The menu is what the service-worker section above went
+    // through, at a fifth of the window wide.
     await page.locator('.top-bar__button[title*="One pane"]').click();
 
     await page.waitForTimeout(500);
@@ -915,8 +915,8 @@ const main = async (): Promise<void> => {
 
     // --- a split view described by its URL ------------------------------
     // The query says what to show: the layout, the addresses and the zoom.
-    // With no `ws=` it is a new split view, named by the URL; and from then
-    // on the page writes the whole view back into the address bar, so the
+    // With no `ws=` it is a new split view, named by the URL; and from then on
+    // the page writes the whole view back into the address bar, so the
     // URL is always a link to what is on screen.
     const optionsBeforeLink = await workspaceOptionCount();
 
@@ -966,9 +966,9 @@ const main = async (): Promise<void> => {
 
     const urlAfterLink = page.url();
 
-    // A navigation inside a pane reaches the address bar of the tab, once
-    // the page has heard of it and saved. Retried as the first click-through
-    // is, for the same reason.
+    // A navigation inside a pane reaches the address bar of the tab, once the
+    // page has heard of it and saved. Retried as the first click-through is,
+    // for the same reason.
     const linkThrough = async (attempt: number): Promise<boolean> => {
       await page
         .locator('.pane iframe')
@@ -1399,8 +1399,8 @@ const startPageServer = async (): Promise<
   // network, and it registers a worker on every visit which then answers the
   // *same* address from its cache — a response no rule can reach, so the load
   // after it is blocked. A pane on an always-clear origin used to answer that
-  // by clearing the worker out of the page it had just loaded and reloading
-  // it, which the site answered by registering another one.
+  // by clearing the worker out of the page it had just loaded and reloading it,
+  // which the site answered by registering another one.
   const loopPage = [
     '<!doctype html><html lang="en"><head><title>SW Loop</title></head><body>',
     '<h1 id="sw-loop">sw loop</h1>',

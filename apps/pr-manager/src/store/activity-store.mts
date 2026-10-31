@@ -2,16 +2,16 @@
  * The week's activity dialog: whether it is open, and the week and today it
  * shows (`weekly-activity.mts`).
  *
- * **Read when it is opened, not with the report**: a reader who never opens
- * the dialog should not pay a search a poll for it. The week's counts are of
- * days that have ended, but today's are still moving, so every opening reads
- * again — one query, both together. On the day it was read, what is held is
- * shown meanwhile rather than "Counting…", since only today can differ.
+ * **Read when it is opened, not with the report**: a reader who never opens the
+ * dialog should not pay a search a poll for it. The week's counts are of days
+ * that have ended, but today's are still moving, so every opening reads again —
+ * one query, both together. On the day it was read, what is held is shown
+ * meanwhile rather than "Counting…", since only today can differ.
  *
- * **Midnight moves the week on.** A timer set for the next local midnight
- * reads the new week then if the dialog is open, and otherwise forgets the
- * old one, so the next opening reads it. A tab asleep past midnight fires the
- * timer late; opening the dialog checks the day itself, so that cannot show
+ * **Midnight moves the week on.** A timer set for the next local midnight reads
+ * the new week then if the dialog is open, and otherwise forgets the old one,
+ * so the next opening reads it. A tab asleep past midnight fires the timer
+ * late; opening the dialog checks the day itself, so that cannot show
  * yesterday's week.
  */
 

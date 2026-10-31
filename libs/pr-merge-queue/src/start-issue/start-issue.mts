@@ -41,19 +41,18 @@ export const START_ISSUE_HELP = [
  * start-issue 2701 --release  # take in-progress off: the work is dropped
  * ```
  *
- * It refuses — exits 1 and says why — an issue already labelled
- * `in-progress`, or one an open pull request closes by a closing keyword,
- * since someone may be on it. That is a question for a person, not for the
- * session that ran it: `--force` is the answer they give.
+ * It refuses — exits 1 and says why — an issue already labelled `in-progress`,
+ * or one an open pull request closes by a closing keyword, since someone may be
+ * on it. That is a question for a person, not for the session that ran it:
+ * `--force` is the answer they give.
  *
- * Only closing keywords count as an open pull request closing the issue: a
- * pull request linked in the Development sidebar alone is GraphQL's to tell,
- * and the page shows it as in progress all the same.
+ * Only closing keywords count as an open pull request closing the issue: a pull
+ * request linked in the Development sidebar alone is GraphQL's to tell, and the
+ * page shows it as in progress all the same.
  *
  * Two sessions starting the same issue within the same second both get it:
- * a label has no order to read back, as a claim comment has. What this
- * guards against is the usual case, an issue picked up hours after someone
- * else did.
+ * a label has no order to read back, as a claim comment has. What this guards
+ * against is the usual case, an issue picked up hours after someone else did.
  */
 export const startIssue = async (
   args: StartIssueArgs,
@@ -102,8 +101,8 @@ export const startIssue = async (
     );
   }
 
-  // `planned` first: should the second write fail, a rerun finds the issue
-  // as it was rather than refuses it as someone else's.
+  // `planned` first: should the second write fail, a rerun finds the issue as
+  // it was rather than refuses it as someone else's.
   if (decided.removePlanned) {
     const removed = await removeLabel(
       context.value,
@@ -244,9 +243,9 @@ const release = async (
 };
 
 /**
- * The open pull requests whose bodies close `issue` by a closing keyword,
- * read from GitHub's rendering as `open-pr` reads them. The first hundred
- * only, as there: a repository with more open than that has other problems.
+ * The open pull requests whose bodies close `issue` by a closing keyword, read
+ * from GitHub's rendering as `open-pr` reads them. The first hundred only, as
+ * there: a repository with more open than that has other problems.
  */
 const openPullsClosing = async (
   context: ApiContext,

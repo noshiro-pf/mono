@@ -6,8 +6,8 @@
  * runs, which is what server rendering needs and not what the deep chain
  * benchmark (`scripts/benchmark/run-deep-chain.mts`) measures. That runner
  * loads these adapters in Node, and the spring demo's through
- * `spring-demo/index.mts`, so their Solid adapters import the client build,
- * the one a bundler picks for the browser, by its path. A browser application
+ * `spring-demo/index.mts`, so their Solid adapters import the client build, the
+ * one a bundler picks for the browser, by its path. A browser application
  * imports the same functions from `solid-js`.
  *
  * `libs/synstate/samples/docs-site/benchmark/solid-js-client.mts` is the same

@@ -9,8 +9,8 @@ import type { AsyncResult } from '../async-result.mjs';
  * `AsyncResult` resolves to `Err` with the mapped error.
  *
  * Passing `mapError` is what gives the error channel a concrete type `E`.
- * Omitting it carries the rejection reason through untouched, leaving the
- * error channel as `unknown` — the same contract as `Result.fromPromise`.
+ * Omitting it carries the rejection reason through untouched, leaving the error
+ * channel as `unknown` — the same contract as `Result.fromPromise`.
  *
  * @example
  *

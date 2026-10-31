@@ -18,10 +18,10 @@ type Props = Readonly<{ tip: InitializedObservable<QueueTipContent> }>;
 
 /**
  * The tooltip of the queue box pointed at or focused (`queue-section.tsx`):
- * the title, and the detail on a second line. One for the whole block,
- * under the row and never wider than it, rather than one per box, which a
- * box would cut off at the edge of a block that scrolls on its own. Hidden
- * from a screen reader, which reads the same words in the box itself.
+ * the title, and the detail on a second line. One for the whole block, under
+ * the row and never wider than it, rather than one per box, which a box would
+ * cut off at the edge of a block that scrolls on its own. Hidden from a screen
+ * reader, which reads the same words in the box itself.
  */
 export const QueueTip = ({ tip }: Props): JSX.Element => (
   <span

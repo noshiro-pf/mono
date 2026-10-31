@@ -3,9 +3,9 @@ import { headerStore } from '../store/index.mjs';
 import { BadgeIcon } from './badge-icon.js';
 
 /**
- * Folds the header into the toolbar and back: the last of the header's
- * actions, in the same place either way, so that a second press undoes the
- * first without the pointer moving.
+ * Folds the header into the toolbar and back: the last of the header's actions,
+ * in the same place either way, so that a second press undoes the first without
+ * the pointer moving.
  *
  * A disclosure button: the label names what it shows, which does not change,
  * and `aria-expanded` says whether it is shown. The chevron points where the

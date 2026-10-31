@@ -32,8 +32,8 @@ export const DepGraph = React.memo<Props>((props) => {
 
   const maxRow = Math.max(...props.nodes.map((n) => n.row), 0);
 
-  // Extend SVG dimensions to include edge via-waypoints that may lie
-  // outside the node grid.
+  // Extend SVG dimensions to include edge via-waypoints that may lie outside
+  // the node grid.
   const viaPixels: readonly Vec2[] = props.edges.flatMap((e) =>
     (e.via ?? []).map((v) => getGridPixelCenter(v.col, v.row, styles)),
   );

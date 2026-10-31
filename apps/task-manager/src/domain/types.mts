@@ -18,8 +18,8 @@ export const TaskIdCodec = t.brandedString({
 });
 
 /**
- * Brands `s` as a {@link TaskId}. Not `TaskIdCodec.cast`, which throws a
- * plain `Error`.
+ * Brands `s` as a {@link TaskId}. Not `TaskIdCodec.cast`, which throws a plain
+ * `Error`.
  *
  * @throws {TypeError} When `s` is empty.
  */
@@ -162,9 +162,9 @@ export const MilestoneRefCodec = t.record({
 
 /*
  * The two kinds of dependency go unnamed: a union whose members' names are
- * short enough to list reports only that list for a value that matches
- * none, while the structural names that `record` makes up are long enough
- * for it to report how the closest member failed instead.
+ * short enough to list reports only that list for a value that matches none,
+ * while the structural names that `record` makes up are long enough for it to
+ * report how the closest member failed instead.
  */
 
 export const TaskDependencyCodec = t.record({
@@ -193,8 +193,8 @@ export const TaskCodec = t.record(
     priority: PriorityCodec,
     dueDate: OptionalFiniteNumberCodec,
     /**
-     * Whether `dueDate` is a day rather than a time: then it is the end of
-     * that day (23:59:59.999), on the wall clock it was set on.
+     * Whether `dueDate` is a day rather than a time: then it is the end of that
+     * day (23:59:59.999), on the wall clock it was set on.
      */
     dueAllDay: t.boolean(),
     createdAt: FiniteNumberCodec,
@@ -224,8 +224,8 @@ export const MilestoneCodec = t.record(
     updatedAt: FiniteNumberCodec,
     date: OptionalFiniteNumberCodec,
     /**
-     * Whether `date` is a day rather than a time: then it is the start of
-     * that day, on the wall clock it was set on.
+     * Whether `date` is a day rather than a time: then it is the start of that
+     * day, on the wall clock it was set on.
      */
     dateAllDay: t.boolean(),
     requiresManualCheck: t.boolean(),
@@ -239,9 +239,9 @@ export const MilestoneCodec = t.record(
 );
 
 /**
- * Tasks and milestones drawn together in one frame on the DAG. A node is
- * in one group at most — its own `groupId` says which — and a group has no
- * part in what holds: it depends on nothing, and nothing depends on it.
+ * Tasks and milestones drawn together in one frame on the DAG. A node is in one
+ * group at most — its own `groupId` says which — and a group has no part in
+ * what holds: it depends on nothing, and nothing depends on it.
  */
 export const GroupCodec = t.record(
   {
@@ -276,8 +276,8 @@ export type MilestoneDependency = t.TypeOf<typeof MilestoneDependencyCodec>;
 export type Task = t.TypeOf<typeof TaskCodec>;
 
 /**
- * A point that tasks can wait for, reached once every one of its components
- * is: a `date` (a date gate), a manual check (a blocker, resolved by setting
+ * A point that tasks can wait for, reached once every one of its components is:
+ * a `date` (a date gate), a manual check (a blocker, resolved by setting
  * `checkedAt`), its `dependencies` (an aggregate) — or any combination. One
  * with none of them is reached when it is created.
  */

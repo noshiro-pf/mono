@@ -18,16 +18,16 @@ import { RunStateIcon } from './run-state-icon.js';
 
 /**
  * `unblock-prs`'s queue, as one row of boxes under the merge order: the pull
- * request it is running at the head, by the base it merges into, then the
- * ones it would pick next in that order, then the ones whose turn has not
- * come. What is set aside, claimed or otherwise not the worker's to move is
- * drawn outside the row, on its own.
+ * request it is running at the head, by the base it merges into, then the ones
+ * it would pick next in that order, then the ones whose turn has not come. What
+ * is set aside, claimed or otherwise not the worker's to move is drawn outside
+ * the row, on its own.
  *
- * Every box is the same width, however many there are, so the whole queue
- * is always in view; the number shrinks with the box. The title is in the
- * tooltip, and the rest of what is known about a pull request is in its
- * card in the merge order, so a box says only its number, its priority and
- * a word on why it waits.
+ * Every box is the same width, however many there are, so the whole queue is
+ * always in view; the number shrinks with the box. The title is in the tooltip,
+ * and the rest of what is known about a pull request is in its card in the
+ * merge order, so a box says only its number, its priority and a word on why it
+ * waits.
  */
 export const QueueSection = (): JSX.Element => {
   // `undefined` while what it is decided from is still being read.

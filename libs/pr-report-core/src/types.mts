@@ -14,23 +14,22 @@ export type RepoRef = Readonly<{ owner: string; name: string }>;
  * What one context has reported on a head commit.
  *
  * `skipped` is its own state rather than a kind of `passed`. GitHub counts a
- * skip as met, and so does the verdict — but once the two are one word a
- * reader cannot tell them apart, and the aggregate that skipped may be from a
- * round that was superseded by one about to fail.
+ * skip as met, and so does the verdict — but once the two are one word a reader
+ * cannot tell them apart, and the aggregate that skipped may be from a round
+ * that was superseded by one about to fail.
  */
 export type ContextState = 'failed' | 'passed' | 'pending' | 'skipped';
 
 export type ChecksSummary = Readonly<{
   /**
-   * `paused` is `skip-ci`: the gated jobs boot no runner and
-   * `no-skip-ci-label` sits `pending` by design, so neither "pending" nor
-   * "failing" describes it.
+   * `paused` is `skip-ci`: the gated jobs boot no runner and `no-skip-ci-label`
+   * sits `pending` by design, so neither "pending" nor "failing" describes it.
    */
   verdict: 'failing' | 'passed' | 'paused' | 'pending';
   /**
    * Every required context by what it reported. These four,
-   * {@link ChecksSummary.missing} and {@link ChecksSummary.notRun} are
-   * disjoint and cover the required list.
+   * {@link ChecksSummary.missing} and {@link ChecksSummary.notRun} are disjoint
+   * and cover the required list.
    */
   passed: readonly string[];
   failed: readonly string[];
@@ -44,9 +43,9 @@ export type ChecksSummary = Readonly<{
   missing: readonly string[];
   /**
    * Required contexts with nothing reported, on a pull request whose base the
-   * ruleset does not cover — a stacked one. A workflow may run on pull
-   * requests into `main` only, and then its contexts never come here; nothing
-   * waits for them, since GitHub requires nothing of this base either.
+   * ruleset does not cover — a stacked one. A workflow may run on pull requests
+   * into `main` only, and then its contexts never come here; nothing waits for
+   * them, since GitHub requires nothing of this base either.
    */
   notRun: readonly string[];
   /** How many contexts the verdict was reached over. */
@@ -86,28 +85,28 @@ export type PullRequestFacts = Readonly<{
   labels: readonly Label[];
   /**
    * Whether auto-merge is armed. Separate from `merge-queued`, which is the
-   * author saying a pull request is to be landed: the label is the request
-   * and this is the mechanism, which `unblock-prs` arms when it picks the
-   * pull request.
+   * author saying a pull request is to be landed: the label is the request and
+   * this is the mechanism, which `unblock-prs` arms when it picks the pull
+   * request.
    */
   autoMerge: boolean;
   headRef: string;
   headSha: string;
   baseRef: string;
   /**
-   * Whether the head branch lives in a fork, which keeps it from being read
-   * as the parent of a stacked pull request. See `stack.mts`.
+   * Whether the head branch lives in a fork, which keeps it from being read as
+   * the parent of a stacked pull request. See `stack.mts`.
    */
   fromFork: boolean;
   url: string;
   /**
-   * When anything about the pull request last changed — a label, a comment,
-   * an edit — which is why it is not {@link PullRequestFacts.headCommittedAt}.
+   * When anything about the pull request last changed — a label, a comment, an
+   * edit — which is why it is not {@link PullRequestFacts.headCommittedAt}.
    */
   updatedAt: string;
   /**
-   * When the head commit was made, which is when the branch was last pushed
-   * to as nearly as GitHub records it. Undefined when it could not be read.
+   * When the head commit was made, which is when the branch was last pushed to
+   * as nearly as GitHub records it. Undefined when it could not be read.
    */
   headCommittedAt: string | undefined;
   /** Undefined when the comparison could not be read. */
@@ -115,8 +114,8 @@ export type PullRequestFacts = Readonly<{
   /** What every context reported on the head commit, required or not. */
   reported: ReadonlyMap<string, ContextState>;
   /**
-   * Whether any check run on the head commit has not finished, required or
-   * not. See `anyRunInProgress` for why the required ones are not enough.
+   * Whether any check run on the head commit has not finished, required or not.
+   * See `anyRunInProgress` for why the required ones are not enough.
    */
   checksRunning: boolean;
   linkedIssues: readonly LinkedIssue[];
@@ -132,8 +131,8 @@ export type ReportEntry = PullRequestFacts &
      */
     stackedOn: number | undefined;
     /**
-     * The open pull requests it merges after because an issue it closes
-     * starts after them (`start-after.mts`'s `inheritStartAfter`), less what
+     * The open pull requests it merges after because an issue it closes starts
+     * after them (`start-after.mts`'s `inheritStartAfter`), less what
      * `mergeAfter` and `stackedOn` already say.
      */
     inheritedMergeAfter: readonly number[];
@@ -153,9 +152,9 @@ export type ReportEntry = PullRequestFacts &
 
 /**
  * One pull request in the merge order. `repeated` marks the second and later
- * appearances of a pull request with more than one predecessor — declared,
- * or the one it is stacked on: it is drawn under each of them, but expanded
- * under the first only.
+ * appearances of a pull request with more than one predecessor — declared, or
+ * the one it is stacked on: it is drawn under each of them, but expanded under
+ * the first only.
  */
 export type TreeNode = Readonly<{
   number: number;
@@ -166,8 +165,8 @@ export type TreeNode = Readonly<{
 /**
  * One pull request that has already landed, for the section that says what
  * shipped. Nothing that is true of an open pull request — a merge order, a
- * check verdict, a distance from its base — is true of one that has merged,
- * so it is its own shape rather than an entry with the fields blanked.
+ * check verdict, a distance from its base — is true of one that has merged, so
+ * it is its own shape rather than an entry with the fields blanked.
  */
 export type MergedPullRequest = Readonly<{
   number: number;
@@ -202,8 +201,8 @@ export type OpenIssue = Readonly<{
    */
   startAfter: readonly number[];
   /**
-   * What a `Merge-After:` in its body names. That line is not read on an
-   * issue, and is shown as a slip to fix: `Start-After:` is the issue's.
+   * What a `Merge-After:` in its body names. That line is not read on an issue,
+   * and is shown as a slip to fix: `Start-After:` is the issue's.
    */
   misplacedMergeAfter: readonly number[];
 }>;
@@ -224,8 +223,8 @@ export type IssueDeclarations = Readonly<{
   /** Each issue's `Start-After:`; an issue not in it declares nothing. */
   startAfter: ReadonlyMap<number, readonly number[]>;
   /**
-   * The numbers known to be open issues, beyond the ones an open pull
-   * request links as open. Decides only what is said not to be started.
+   * The numbers known to be open issues, beyond the ones an open pull request
+   * links as open. Decides only what is said not to be started.
    */
   open: ReadonlySet<number>;
 }>;

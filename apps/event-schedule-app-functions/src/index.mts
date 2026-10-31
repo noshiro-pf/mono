@@ -142,8 +142,8 @@ export const verifyEmail = regionSelected.https.onCall(
 );
 
 /**
- * Error reports are mailed from the same account as the notifications, so
- * they get a budget of their own; a report over it goes to the function's log
+ * Error reports are mailed from the same account as the notifications, so they
+ * get a budget of their own; a report over it goes to the function's log
  * instead. The budget is per instance, hence `maxInstances: 1`.
  */
 const sendReportMailBudget = createMailBudget({

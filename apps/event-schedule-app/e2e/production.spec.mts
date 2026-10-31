@@ -17,8 +17,8 @@ import type { DeepReadonly } from 'ts-type-forge';
 //   were before; a run that failed in between is put right by the next.
 //
 // The event is anonymous, so its id is all it takes to edit it, which is why
-// the id is a secret and the config keeps no trace. Its notifications are
-// off, so the answers sent here mail no one.
+// the id is a secret and the config keeps no trace. Its notifications are off,
+// so the answers sent here mail no one.
 //
 // Imports nothing from the workspace at run time (a type is erased): the daily
 // job builds nothing (see `configs/playwright.production.config.mts`).
@@ -109,8 +109,8 @@ test.describe('the fixture event', () => {
 });
 
 /**
- * Throws rather than skipping when the secret is missing, so that a run
- * without it fails instead of passing having tested only the top page.
+ * Throws rather than skipping when the secret is missing, so that a run without
+ * it fails instead of passing having tested only the top page.
  */
 const fixtureEventPath = (suffix: '' | 'edit/'): string => {
   const eventId = process.env['EVENT_SCHEDULE_APP_E2E_EVENT_ID'];

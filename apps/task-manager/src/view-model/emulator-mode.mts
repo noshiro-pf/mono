@@ -1,15 +1,15 @@
 /**
- * Where a development build reaches the Firebase emulators, or `undefined`
- * when it uses the real project.
+ * Where a development build reaches the Firebase emulators, or `undefined` when
+ * it uses the real project.
  *
- * `flag` is `VITE_FIREBASE_EMULATORS`, which `.env.development` sets to
- * `true`; a `.env.development.local` (untracked) or the command line can set
- * it to anything else to use the real project. `firebase-backend.mts` also
- * requires `import.meta.env.DEV`, so a production build never connects.
+ * `flag` is `VITE_FIREBASE_EMULATORS`, which `.env.development` sets to `true`;
+ * a `.env.development.local` (untracked) or the command line can set it to
+ * anything else to use the real project. `firebase-backend.mts` also requires
+ * `import.meta.env.DEV`, so a production build never connects.
  *
  * The host is the one the page was opened from rather than `localhost`, so a
- * phone opening the development server by its LAN address reaches the
- * emulators on the same machine. The ports are `firebase.json`'s.
+ * phone opening the development server by its LAN address reaches the emulators
+ * on the same machine. The ports are `firebase.json`'s.
  */
 export const emulatorEndpoints = (
   flag: string | undefined,

@@ -134,8 +134,8 @@ const problemOf = (
   relativePath: string,
   content: string,
 ): Problem | undefined => {
-  // These files are JSONC. `parseConfigFileTextToJson` is what tsc itself
-  // reads them with, so a commented-out entry is not taken for one.
+  // These files are JSONC. `parseConfigFileTextToJson` is what tsc itself reads
+  // them with, so a commented-out entry is not taken for one.
   const parsed: unknown = ts.parseConfigFileTextToJson(
     relativePath,
     content,

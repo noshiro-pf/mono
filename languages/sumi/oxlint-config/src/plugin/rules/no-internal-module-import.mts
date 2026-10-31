@@ -119,8 +119,8 @@ const staticSpecifierOf = (
 
 /**
  * `./a/b.mjs` reaches; `./a.mjs`, `../a.mjs` and `./a/index.mjs` do not.
- * Leading `.` / `..` segments are the walk to the base directory and are
- * not counted.
+ * Leading `.` / `..` segments are the walk to the base directory and are not
+ * counted.
  */
 const reachesIntoDirectory = (specifier: string): boolean => {
   const segments = specifier

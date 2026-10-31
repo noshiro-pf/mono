@@ -37,8 +37,8 @@ describe(isVersionPullRequest, () => {
     );
   });
 
-  // Its title is `pr-title` from `release.yml`, which anyone may reuse, and
-  // its number changes with every release. The branch is the only handle.
+  // Its title is `pr-title` from `release.yml`, which anyone may reuse, and its
+  // number changes with every release. The branch is the only handle.
   test('does not take another branch for it by its title', () => {
     assert.isFalse(
       isVersionPullRequest(

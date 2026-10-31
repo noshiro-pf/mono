@@ -3,8 +3,8 @@
  * `Start-After:` declarations (`docs/issue-start-after.md`), for the issues
  * block's DAG.
  *
- * The nodes are every listed issue, everything their declarations name, and
- * the open pull requests that close a listed issue. An edge runs from what is
+ * The nodes are every listed issue, everything their declarations name, and the
+ * open pull requests that close a listed issue. An edge runs from what is
  * waited for to what waits — a `Start-After:` — or from an issue to a pull
  * request that closes it, which is the work on that issue under way. How an
  * issue stands is `pr-report-core`'s `decideStartStates`; this adds where
@@ -48,8 +48,8 @@ export type IssueGraphNode = Readonly<{
   url: string;
   state: IssueNodeState;
   /**
-   * The one `priority:*` label it carries. Only a listed issue and an open
-   * pull request have their labels read; anything else is `none`.
+   * The one `priority:*` label it carries. Only a listed issue and an open pull
+   * request have their labels read; anything else is `none`.
    */
   priority: Priority;
   /**
@@ -58,10 +58,10 @@ export type IssueGraphNode = Readonly<{
    */
   pending: boolean;
   /**
-   * What its `in-progress` or `planned` label says
-   * (`pr-report-core`'s `progressOf`, with no pull request), read where the
-   * priority is and `none` elsewhere: the state shows it only when the issue
-   * is startable, and the tooltip says it whatever the state.
+   * What its `in-progress` or `planned` label says (`pr-report-core`'s
+   * `progressOf`, with no pull request), read where the priority is and `none`
+   * elsewhere: the state shows it only when the issue is startable, and the
+   * tooltip says it whatever the state.
    */
   marked: IssueProgress;
 }>;
@@ -70,8 +70,8 @@ export type IssueGraphEdge = Readonly<{
   from: number;
   to: number;
   /**
-   * `start-after` from what is waited for to the issue waiting; `closes`
-   * from an issue to a pull request that closes it.
+   * `start-after` from what is waited for to the issue waiting; `closes` from
+   * an issue to a pull request that closes it.
    */
   kind: 'closes' | 'start-after';
 }>;
@@ -221,8 +221,8 @@ export type IssueStart = Readonly<{
 }>;
 
 /**
- * Each listed issue's {@link IssueStart}, read off the whole graph — what
- * is done included, since that is why an issue reads as ready.
+ * Each listed issue's {@link IssueStart}, read off the whole graph — what is
+ * done included, since that is why an issue reads as ready.
  */
 export const issueStartsOf = (
   graph: IssueGraph,
@@ -266,40 +266,40 @@ export const isListedIssue = (node: IssueGraphNode): boolean =>
   isIssueStartState(node.state);
 
 /**
- * The graph without what is done — closed as completed, or merged — and
- * without the edges that run from it, which are the waits already over.
+ * The graph without what is done — closed as completed, or merged — and without
+ * the edges that run from it, which are the waits already over.
  *
- * What closed unfinished stays: the issue waiting on it needs a look, and
- * the node is why. The graph given is handed back when nothing in it is
- * done, so a graph that is not changed by this is not laid out again.
+ * What closed unfinished stays: the issue waiting on it needs a look, and the
+ * node is why. The graph given is handed back when nothing in it is done, so a
+ * graph that is not changed by this is not laid out again.
  */
 export const omitDone = (graph: IssueGraph): IssueGraph =>
   omitNodes(graph, ({ state }) => state === 'done');
 
 /**
- * The graph without what is labelled `pending`, the edges that run from it
- * or to it, and what is left with no edge for it (see {@link omitNodes}).
- * How the rest stands is left as it was: an issue waiting on one still
- * waits, which its tooltip says. The graph given is handed back when
- * nothing in it is pending.
+ * The graph without what is labelled `pending`, the edges that run from it or
+ * to it, and what is left with no edge for it (see {@link omitNodes}).
+ * How the rest stands is left as it was: an issue waiting on one still waits,
+ * which its tooltip says. The graph given is handed back when nothing in it is
+ * pending.
  */
 export const omitPending = (graph: IssueGraph): IssueGraph =>
   omitNodes(graph, ({ pending }) => pending);
 
 /**
- * The graph without the listed issues `filter` leaves out by their priority,
- * by whether they are pending or by whether they are in progress
- * (`issue-filter.mts`, which the list reads
- * the same one from), save those an issue left in waits on, and without
- * what is left with no edge for them (see {@link omitNodes}).
+ * The graph without the listed issues `filter` leaves out by their priority, by
+ * whether they are pending or by whether they are in progress
+ * (`issue-filter.mts`, which the list reads the same one from), save those an
+ * issue left in waits on, and without what is left with no edge for them (see
+ * {@link omitNodes}).
  *
  * An issue left out that one left in waits on is kept, as what that one waits
  * on is kept when it is not a listed issue: it is why that issue waits. It is
  * drawn without what it waits on in turn or the pull requests that close it,
  * save what is drawn for another, since it is there for the other's sake, and
- * it is not counted among the issues shown (`countIssueFilter`). Only a
- * listed issue is left out by `filter`, since nothing else here has its labels
- * read for a reason of its own; what is pending is taken out whatever it is by
+ * it is not counted among the issues shown (`countIssueFilter`). Only a listed
+ * issue is left out by `filter`, since nothing else here has its labels read
+ * for a reason of its own; what is pending is taken out whatever it is by
  * {@link omitPending}, while it is switched off. The graph given is handed back
  * when `filter` leaves out no listed issue.
  */
@@ -342,9 +342,9 @@ export const omitFilteredIssues = (
     Array.from(filtered).filter((number) => !kept.has(number)),
   );
 
-  // What is not a listed issue is drawn for an issue drawn for its own
-  // sake: one that waits on it, or one it closes. A kept issue brings
-  // nothing of its own.
+  // What is not a listed issue is drawn for an issue drawn for its own sake:
+  // one that waits on it, or one it closes. A kept issue brings nothing of its
+  // own.
   const anchored = new Set(
     graph.edges.flatMap(({ from, to, kind }) =>
       kind === 'start-after'
@@ -381,8 +381,8 @@ const isIssueStartState = (state: IssueNodeState): state is IssueStartState =>
   state !== 'unknown';
 
 /**
- * `nodes` and `edges`, less what is not a listed issue and is linked by none
- * of `edges`: such a node is drawn only for the issues it is linked to.
+ * `nodes` and `edges`, less what is not a listed issue and is linked by none of
+ * `edges`: such a node is drawn only for the issues it is linked to.
  */
 const withLinked = (
   nodes: readonly IssueGraphNode[],
@@ -399,11 +399,11 @@ const withLinked = (
 };
 
 /**
- * The graph without what `omitted` says, the edges that run from it or to
- * it, and what is not a listed issue and is left with no edge: what only
- * the nodes taken out name, and an open pull request that closes only
- * them. Such a node is drawn only for the issues it is linked to. The graph
- * given is handed back when nothing is taken out.
+ * The graph without what `omitted` says, the edges that run from it or to it,
+ * and what is not a listed issue and is left with no edge: what only the nodes
+ * taken out name, and an open pull request that closes only them. Such a node
+ * is drawn only for the issues it is linked to. The graph given is handed back
+ * when nothing is taken out.
  */
 const omitNodes = (
   graph: IssueGraph,

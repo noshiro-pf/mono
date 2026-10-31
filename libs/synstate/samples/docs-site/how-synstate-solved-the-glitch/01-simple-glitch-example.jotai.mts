@@ -6,8 +6,8 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     // Jotai supports diamond dependencies natively through derived atoms.
     // Derived atoms are lazily evaluated — when a subscriber reads `sumAtom`,
-    // it triggers recomputation of both dependencies,
-    // so all values are always consistent.
+    // it triggers recomputation of both dependencies, so all values are always
+    // consistent.
 
     const counterAtom = atom(0);
 
@@ -51,8 +51,8 @@ if (import.meta.vitest !== undefined) {
       }, 100);
     });
 
-    // Jotai derived atoms are lazily evaluated (like MobX computed),
-    // so diamond dependencies are always consistent — no glitch.
+    // Jotai derived atoms are lazily evaluated (like MobX computed), so diamond
+    // dependencies are always consistent — no glitch.
     assert.deepStrictEqual(valueHistory, [0, 1010, 2020, 3030, 4040]);
 
     // embed-sample-code-ignore-below

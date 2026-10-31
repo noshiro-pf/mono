@@ -11,8 +11,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * One pull request outside the queue (`queue-section.tsx`): its number, why
- * in a word, and whose it is to move.
+ * One pull request outside the queue (`queue-section.tsx`): its number, why in
+ * a word, and whose it is to move.
  */
 export const QueueOutsideBox = ({
   node$,

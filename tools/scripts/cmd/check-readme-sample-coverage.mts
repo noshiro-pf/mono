@@ -17,17 +17,17 @@ import { listLibraryDirs } from '../lib/repo-files.mjs';
  * code fence and nothing embeds a sample into it.
  *
  * `embedExamplesInMarkdown` in `tools/configs/embed-examples-in-markdown.mts`
- * fails when a README has a fence that no sample backs — but only for a
- * package whose `scripts/cmd/embed-examples.mts` names that README and whose
- * `doc` script reaches it, `doc` being what `ws:doc` runs and
- * `style-check (ws:doc)` asserts the tree is clean after. A package that never
- * opted in is not a package that passes: its fences are hand-written, never
+ * fails when a README has a fence that no sample backs — but only for a package
+ * whose `scripts/cmd/embed-examples.mts` names that README and whose `doc`
+ * script reaches it, `doc` being what `ws:doc` runs and `style-check (ws:doc)`
+ * asserts the tree is clean after. A package that never opted in is not a
+ * package that passes: its fences are hand-written, never
  * type-checked, and nothing reports it. That is how `ts-type-forge`'s README
  * came to call functions that do not exist, and how four ESLint plugin READMEs
  * and both `better-*-use-state` READMEs went unchecked altogether.
  *
- * This asks only whether the check runs, never whether it would pass — the
- * same division as `check-example-coverage.mts`, for the same reason.
+ * This asks only whether the check runs, never whether it would pass — the same
+ * division as `check-example-coverage.mts`, for the same reason.
  */
 export const checkReadmeSampleCoverage = async (): Promise<
   Result<Readonly<{ packages: number; withFences: number }>, string>
@@ -120,8 +120,8 @@ const readDocScript = async (
 };
 
 /**
- * What is missing between a package's README fences and the embedder that
- * would fill and check them, or `undefined` when the wiring is whole.
+ * What is missing between a package's README fences and the embedder that would
+ * fill and check them, or `undefined` when the wiring is whole.
  *
  * "Reaches it from `doc`" is read the ways the repository writes it: a `doc`
  * script that chains `gen:readme` (the `synstate` family) or runs the embed

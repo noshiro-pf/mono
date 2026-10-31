@@ -118,9 +118,9 @@ export const readNodeSupportConfig = async (): Promise<
 /**
  * Validates the parsed contents of `node-support.json`.
  *
- * Exported for the unit tests: it is the only part of this file that is a
- * pure function of its input, and it is where every rejection message the
- * config can produce is decided.
+ * Exported for the unit tests: it is the only part of this file that is a pure
+ * function of its input, and it is where every rejection message the config can
+ * produce is decided.
  */
 export const parseNodeSupportConfig = (
   parsed: unknown,
@@ -535,8 +535,8 @@ const checkEnginesNode = (
   const declared = readStringAt(manifest.parsed, ['engines', 'node']);
 
   // A package that makes no claim has none to get wrong. Requiring `engines`
-  // everywhere would mean adding it to thirty private applications that
-  // nobody installs.
+  // everywhere would mean adding it to thirty private applications that nobody
+  // installs.
   if (declared === undefined || declared === expected.enginesNode) {
     return [];
   }
@@ -574,8 +574,8 @@ const checkVoltaNode = (
  *
  * Nothing declares it today, and adopting it is a bigger decision than it
  * looks: pnpm implements only `onFail: "download"` — `error`, `warn` and
- * `ignore` are read and ignored — and under `download` it treats the runtime
- * as a dependency, writing `node@runtime:^X.Y.Z` into `pnpm-lock.yaml` and
+ * `ignore` are read and ignored — and under `download` it treats the runtime as
+ * a dependency, writing `node@runtime:^X.Y.Z` into `pnpm-lock.yaml` and
  * fetching Node itself on every install. So the field is either inert here or
  * it changes how the repository installs, and neither belongs in a check that
  * is meant to keep three existing fields honest.
@@ -636,9 +636,9 @@ const checkManifest = (
  * `volta.node === targets.current`, and `volta.node` is what
  * `node-version-file: 'package.json'` resolves to in every other workflow — so
  * the `code-check (ws:check:test:cov:shard-*)` entries run the same Vitest
- * suite on the same Node already, with coverage on top of it. A `current`
- * entry in the matrix was that suite a second time, and `ws:build` in front of
- * it a second time.
+ * suite on the same Node already, with coverage on top of it. A `current` entry
+ * in the matrix was that suite a second time, and `ws:build` in front of it a
+ * second time.
  *
  * What the two that remain are for is covered nowhere else: `minimum` is the
  * only job that runs on the floor `engines.node` promises, and `lts` the only
@@ -745,8 +745,8 @@ const readJsonFile = async (
 
 const applyFixes = async (violations: readonly Violation[]): Promise<void> => {
   // One file can carry more than one violation — `engines.node` and
-  // `volta.node` in the same manifest — so the fixes are grouped and applied
-  // in one pass per file rather than each overwriting the last.
+  // `volta.node` in the same manifest — so the fixes are grouped and applied in
+  // one pass per file rather than each overwriting the last.
   const mut_byFile = new Map<string, readonly Violation['fix'][]>();
 
   for (const { fix } of violations) {

@@ -8,10 +8,10 @@ import {
 
 /**
  * `validationErrorToMessage` renders the offending value inline only while it
- * fits in `maxLengthToPrintActualValue`; past that budget the value is
- * replaced by a description of it. These tests compare both renderings of the
- * same error side by side so every format that depends on the budget can be
- * read off a single table.
+ * fits in `maxLengthToPrintActualValue`; past that budget the value is replaced
+ * by a description of it. These tests compare both renderings of the same error
+ * side by side so every format that depends on the budget can be read off a
+ * single table.
  */
 
 /** Budget large enough to print every value used below. */
@@ -39,9 +39,9 @@ const errorOf = ({
 
 describe(validationErrorToMessage, () => {
   describe('how the offending value is rendered', () => {
-    // Only the value rendering varies here, so every row is checked against
-    // the same surrounding message. `typeof` reports a bare `object` for null
-    // and for every container, hence the individual names.
+    // Only the value rendering varies here, so every row is checked against the
+    // same surrounding message. `typeof` reports a bare `object` for null and
+    // for every container, hence the individual names.
     test.each([
       {
         actualValue: 'purple',
@@ -111,11 +111,11 @@ describe(validationErrorToMessage, () => {
   });
 
   describe('message formats that depend on the print budget', () => {
-    // A type that accepts several shapes cannot rely on the runtime type
-    // alone once the value is omitted — `<string>` reads as acceptable for a
-    // union of string literals — so those messages state why the value was
-    // rejected instead. The `key` / `value` wording of record and Map entries
-    // does not interact with the budget and is covered by the codec tests.
+    // A type that accepts several shapes cannot rely on the runtime type alone
+    // once the value is omitted — `<string>` reads as acceptable for a union of
+    // string literals — so those messages state why the value was rejected
+    // instead. The `key` / `value` wording of record and Map entries does not
+    // interact with the budget and is covered by the codec tests.
     test.each([
       {
         name: 'no details',

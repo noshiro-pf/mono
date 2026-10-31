@@ -31,15 +31,15 @@ type Props = Readonly<{
 }>;
 
 /**
- * Labels, typed one at a time. Each one is a chip with a button that
- * removes it; a comma or Enter adds what is typed in the box, and so does
- * submitting the form, so that a label typed and not ended is still saved.
- * Backspace in the empty box removes the last chip. A label already there
- * in another case is not added again, and one typed that is in use in
- * another case is added as spelled in use. While something is typed, the labels
- * in use that start with it, then those that contain it, are listed under
- * the box to choose from — by the up and down keys and Enter, or by a tap —
- * and Escape closes the list.
+ * Labels, typed one at a time. Each one is a chip with a button that removes
+ * it; a comma or Enter adds what is typed in the box, and so does submitting
+ * the form, so that a label typed and not ended is still saved.
+ * Backspace in the empty box removes the last chip. A label already there in
+ * another case is not added again, and one typed that is in use in another case
+ * is added as spelled in use. While something is typed, the labels in use that
+ * start with it, then those that contain it, are listed under the box to choose
+ * from — by the up and down keys and Enter, or by a tap — and Escape closes the
+ * list.
  *
  * What an IME composes is not taken apart at a comma until it is ended.
  * The list is laid over the form, so that opening and closing it moves nothing a press may be on, and
@@ -62,9 +62,9 @@ export const LabelInput = ({
 
   const [typed$, setTyped] = createState('');
 
-  // The suggestion the keys have moved to, if any — by its label, which
-  // stays put as the labels in use change — and whether the list may be
-  // shown: while the box has focus and Escape has not closed it.
+  // The suggestion the keys have moved to, if any — by its label, which stays
+  // put as the labels in use change — and whether the list may be shown: while
+  // the box has focus and Escape has not closed it.
   const [active$, setActive] = createState<string | undefined>(undefined);
 
   const [open$, setOpen] = createState(false);
@@ -89,8 +89,8 @@ export const LabelInput = ({
 
   let mut_box: HTMLInputElement | undefined = undefined;
 
-  // What the last press in the box was made with: a click does not say in
-  // every browser.
+  // What the last press in the box was made with: a click does not say in every
+  // browser.
   let mut_pointerType = '';
 
   let mut_list: HTMLUListElement | undefined = undefined;
@@ -117,8 +117,8 @@ export const LabelInput = ({
   };
 
   /**
-   * Adds the labels a comma has ended, spelled as in use, and leaves the
-   * rest in the box.
+   * Adds the labels a comma has ended, spelled as in use, and leaves the rest
+   * in the box.
    */
   const follow = (text: string): void => {
     const { ended, rest } = splitTypedLabels(text);
@@ -168,8 +168,8 @@ export const LabelInput = ({
     afterUpdate(close);
   };
 
-  // What is typed is added when the form is submitted, before the form's
-  // own handler saves it — a capturing listener on the target runs first —
+  // What is typed is added when the form is submitted, before the form's own
+  // handler saves it — a capturing listener on the target runs first —
   // however it is submitted: Enter in another box, a tap on 保存, or a key
   // an IME sends Enter as.
   const onSubmit = (): void => {
@@ -194,8 +194,8 @@ export const LabelInput = ({
     pressed: KeyboardEvent & Readonly<{ currentTarget: HTMLInputElement }>,
   ): void => {
     // A key that ends an IME's composition is the IME's: Safari sends the
-    // Enter that confirms one after `compositionend`, as key code 229 —
-    // which a phone's keyboard may give its other keys too.
+    // Enter that confirms one after `compositionend`, as key code 229 — which a
+    // phone's keyboard may give its other keys too.
     if (
       pressed.isComposing ||
       (pressed.key === 'Enter' &&
@@ -244,8 +244,8 @@ export const LabelInput = ({
       }
 
       case 'Enter': {
-        // Held down, the Enter that added a label does not go on to submit
-        // the form; with nothing typed, Enter submits it as in any box.
+        // Held down, the Enter that added a label does not go on to submit the
+        // form; with nothing typed, Enter submits it as in any box.
         if (pressed.repeat) {
           pressed.preventDefault();
 
@@ -350,9 +350,9 @@ export const LabelInput = ({
                 onClick={(clicked) => {
                   remove(clicked.currentTarget.value);
 
-                  // The button goes with its chip: the focus goes back to
-                  // the box rather than to the top of the dialog — but not
-                  // on a tap, which would bring up a phone's keyboard.
+                  // The button goes with its chip: the focus goes back to the
+                  // box rather than to the top of the dialog — but not on a
+                  // tap, which would bring up a phone's keyboard.
                   if (mut_pointerType !== 'touch' || clicked.detail === 0) {
                     mut_box?.focus();
                   }
@@ -433,8 +433,8 @@ export const LabelInput = ({
             aria-label={constant(m.labels.suggestions(caption))}
             class={constant('label-suggestions')}
             id={constant(listId)}
-            // A press on it, between its options too, keeps the focus, and
-            // the list, in the box.
+            // A press on it, between its options too, keeps the focus, and the
+            // list, in the box.
             onMouseDown={(pressed) => {
               pressed.preventDefault();
             }}
@@ -460,8 +460,8 @@ export const LabelInput = ({
                   data-e2e={constant('label-suggestion')}
                   id={view(option$, (option) => option.id)}
                   role={constant('option')}
-                  // Focusable, so that the focus a tap may take from the
-                  // box stays in the list (`onBlur`).
+                  // Focusable, so that the focus a tap may take from the box
+                  // stays in the list (`onBlur`).
                   tabIndex={constant(-1)}
                   onBlur={onBlur}
                   onClick={() => {

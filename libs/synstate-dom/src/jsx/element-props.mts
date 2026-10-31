@@ -43,8 +43,8 @@ export type StyleObject = ReadonlyRecord<string, Bindable<string | undefined>>;
 
 /**
  * The props of an HTML element: the common ones, one `Bindable` per writable
- * primitive DOM property of `E` (`id`, `disabled`, `value`, `tabIndex`, …),
- * and one handler per event of `HTMLElementEventMap`.
+ * primitive DOM property of `E` (`id`, `disabled`, `value`, `tabIndex`, …), and
+ * one handler per event of `HTMLElementEventMap`.
  *
  * An attribute, `aria-*` and `data-*` included, also takes `undefined`, which
  * removes it: a value that comes and goes is an observable of `T | undefined`

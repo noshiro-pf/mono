@@ -24,8 +24,8 @@ import { judgeSession, mayHaveSpent } from './verdict.mjs';
 
 /**
  * Runs the `unblock-prs` skill beside the worker the way `/loop` does in a
- * session, but on the Claude API and without a person: each round surveys
- * the queue with the commands' own reading of it (`surveyQueue`), and starts
+ * session, but on the Claude API and without a person: each round surveys the
+ * queue with the commands' own reading of it (`surveyQueue`), and starts
  * `claude -p` on the skill only when a pull request is the skill's to fix.
  * A round that finds nothing costs GitHub requests and no tokens.
  *
@@ -35,18 +35,18 @@ import { judgeSession, mayHaveSpent } from './verdict.mjs';
  * run-unblock-prs-skill --max-budget-usd 5 --dry-run  # say what it would run
  * ```
  *
- * **One pull request per round**, so that the budget is per pull request
- * and what a round was handed is exactly what it tried: a round that runs
- * out on the first of two would otherwise leave the second marked as tried.
+ * **One pull request per round**, so that the budget is per pull request and
+ * what a round was handed is exactly what it tried: a round that runs out on
+ * the first of two would otherwise leave the second marked as tried.
  * After a round that ran, the next starts at once on the queue as read after
  * the session; after one that found nothing, it waits `--interval-min`.
  *
- * What the session may do is `claude.mts`'s; what it is told besides the
- * skill is `roundInstructions` there. A pull request nobody owns is filed by
- * `report-unowned-prs` from here, which needs no model. It stops for good
- * when Claude Code cannot be run as asked — not on the API key, no such
- * skill, no `claude` — since every later round would meet the same; a start
- * that fails after sessions have run is taken as a passing fault instead.
+ * What the session may do is `claude.mts`'s; what it is told besides the skill
+ * is `roundInstructions` there. A pull request nobody owns is filed by
+ * `report-unowned-prs` from here, which needs no model. It stops for good when
+ * Claude Code cannot be run as asked — not on the API key, no such skill, no
+ * `claude` — since every later round would meet the same; a start that fails
+ * after sessions have run is taken as a passing fault instead.
  */
 export const runUnblockPrsSkill = async (
   options: Options,
@@ -70,8 +70,8 @@ export const runUnblockPrsSkill = async (
 
   installStopHandlers();
 
-  // What a restart forgets: `Candidate` keys a session has had its try at,
-  // and the pull requests nobody owns handed to `report-unowned-prs` already.
+  // What a restart forgets: `Candidate` keys a session has had its try at, and
+  // the pull requests nobody owns handed to `report-unowned-prs` already.
   const mut_attempted = new Set<string>();
 
   const mut_reported = new Set<number>();
@@ -106,11 +106,11 @@ export const runUnblockPrsSkill = async (
       mut_lastNotes = '';
     }
 
-    // What a round that waits is waiting on, said again only when it
-    // changes: the log is read afterwards, for what the sessions did, not
-    // for the same wait every ten minutes. A round that ran says nothing of
-    // it, since the queue it surveyed is a session old; the next round,
-    // started at once, says it fresh.
+    // What a round that waits is waiting on, said again only when it changes:
+    // the log is read afterwards, for what the sessions did, not for the same
+    // wait every ten minutes. A round that ran says nothing of it, since the
+    // queue it surveyed is a session old; the next round, started at once, says
+    // it fresh.
     const waiting =
       Result.isOk(round) && !round.value.ran ? round.value.notes : undefined;
 
@@ -162,17 +162,17 @@ type RoundResult = Result<
 type RoundError = Readonly<{ fatal: boolean; message: string }>;
 
 /**
- * Three. A key stops a pull request from being paid for twice as it stands,
- * but a fix that is pushed and fails again stands differently each time,
- * and nobody is watching the loop that makes: after this many sessions on
- * one pull request, it waits for a person, or for this command to restart.
+ * Three. A key stops a pull request from being paid for twice as it stands, but
+ * a fix that is pushed and fails again stands differently each time, and nobody
+ * is watching the loop that makes: after this many sessions on one pull
+ * request, it waits for a person, or for this command to restart.
  */
 const MAX_SESSIONS_PER_PR = 3;
 
 /**
- * The skill as this repository links it (`.claude/skills/unblock-prs`), or
- * else as the plugin installs it. `checkInit` says which the session has when
- * this guesses wrong.
+ * The skill as this repository links it (`.claude/skills/unblock-prs`), or else
+ * as the plugin installs it. `checkInit` says which the session has when this
+ * guesses wrong.
  */
 const defaultSkill = async (root: string): Promise<string> => {
   const linked = await Result.fromPromise(
@@ -248,9 +248,9 @@ const runRound = async (
 
   const survey = surveyQueue(state.value, mut_attempted);
 
-  // Bounded by the queue as it stands, not by how long this has run: a key
-  // goes once its pull request has closed or its head has moved, not when
-  // one survey happens to read it differently.
+  // Bounded by the queue as it stands, not by how long this has run: a key goes
+  // once its pull request has closed or its head has moved, not when one survey
+  // happens to read it differently.
   const prefixes = state.value.decided.entries.map(({ number, headSha }) =>
     keyPrefix(number, headSha),
   );
@@ -277,8 +277,8 @@ const runRound = async (
         : `report-unowned-prs: ${reported.value}`,
     );
 
-    // It reports a filing that failed in its text rather than as an error,
-    // one line per pull request; that one is tried again next time.
+    // It reports a filing that failed in its text rather than as an error, one
+    // line per pull request; that one is tried again next time.
     if (Result.isOk(reported) && !options.dryRun) {
       for (const number of survey.unowned) {
         if (!reported.value.includes(`#${number}: could not file`)) {
@@ -346,8 +346,8 @@ const runRound = async (
     path.join(WORKTREE_ROOT, 'run-unblock-prs-skill-'),
   );
 
-  // After the last await before the session: a stop that came before it has
-  // no session to be passed on to.
+  // After the last await before the session: a stop that came before it has no
+  // session to be passed on to.
   if (stopRequested()) {
     await removeDir(workDir);
 
@@ -379,8 +379,8 @@ const runRound = async (
   // session that may have spent leaves behind is always settled.
   const outcome = await runClaude(root, args, env, skill);
 
-  // A session that may have spent is not handed the same pull request
-  // again, and counts towards MAX_SESSIONS_PER_PR whatever comes of it.
+  // A session that may have spent is not handed the same pull request again,
+  // and counts towards MAX_SESSIONS_PER_PR whatever comes of it.
   if (outcome.kind === 'ran' && mayHaveSpent(outcome.result)) {
     mut_attempted.add(next.key);
 
@@ -395,9 +395,9 @@ const runRound = async (
       return idle;
     }
 
-    // What `checkInit` refuses is the configuration, and every round would
-    // meet it again. A start that fails once sessions have run is more
-    // likely a passing fault, and the next look tries again.
+    // What `checkInit` refuses is the configuration, and every round would meet
+    // it again. A start that fails once sessions have run is more likely a
+    // passing fault, and the next look tries again.
     return Result.err({
       fatal: outcome.cause === 'init' || !anySessionRan,
       message: outcome.message,

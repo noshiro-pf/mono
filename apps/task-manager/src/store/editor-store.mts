@@ -1,14 +1,14 @@
 /**
- * The dialog of one task or milestone: which node, its draft, and what is
- * wrong with it. Nothing is written until `save` — and then onto the node as
- * it is stored at that moment, so a change that arrived from another tab
- * while the dialog was open is kept for every field the form does not show.
+ * The dialog of one task or milestone: which node, its draft, and what is wrong
+ * with it. Nothing is written until `save` — and then onto the node as it is
+ * stored at that moment, so a change that arrived from another tab while the
+ * dialog was open is kept for every field the form does not show.
  *
- * What a draft means is `view-model/task-draft.mts` and
- * `milestone-draft.mts`; the dependencies are edited as rows, which are
+ * What a draft means is `view-model/task-draft.mts` and `milestone-draft.mts`;
+ * the dependencies are edited as rows, which are
  * `view-model/dependency-edit.mts`. A row is saved as it is typed, with no
- * separate step to add it, and a row that is wrong holds the save back —
- * the dialog shows why under the row.
+ * separate step to add it, and a row that is wrong holds the save back — the
+ * dialog shows why under the row.
  */
 
 import { createState, type InitializedObservable } from 'synstate';
@@ -49,8 +49,8 @@ type EditorCommon = DeepReadonly<{
   /** Why the last `save` was refused, for a reason other than a row. */
   error: string | undefined;
   /**
-   * The dependencies as they are being edited: one row per dependency the
-   * node had when the dialog opened, then an empty one to fill in.
+   * The dependencies as they are being edited: one row per dependency the node
+   * had when the dialog opened, then an empty one to fill in.
    */
   rows: DependencyRow[];
   confirmingDelete: boolean;
@@ -107,9 +107,9 @@ export type EditorStore = Readonly<{
   ) => void;
   removeDependencyRow: (key: number) => void;
   /**
-   * Writes the draft and the rows' dependencies, and closes. Does nothing
-   * while a row is wrong (the rows say why); otherwise says what is wrong
-   * with the draft.
+   * Writes the draft and the rows' dependencies, and closes. Does nothing while
+   * a row is wrong (the rows say why); otherwise says what is wrong with the
+   * draft.
    */
   save: () => void;
   requestDelete: () => void;

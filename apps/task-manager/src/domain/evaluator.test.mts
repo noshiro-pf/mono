@@ -22,8 +22,8 @@ const context = buildEvaluationContext({
       startedAt: 1000,
       completedAt: 3000,
     }),
-    // Inconsistent on purpose: a completedAt left behind on a task that is
-    // no longer done is not read.
+    // Inconsistent on purpose: a completedAt left behind on a task that is no
+    // longer done is not read.
     createTask({
       id: reopened,
       title: 'Reopened',

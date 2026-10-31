@@ -5,8 +5,8 @@ import { Arr, Num, Result } from 'ts-data-forge';
  * Line hits from an `lcov.info`, by repository-relative path.
  *
  * Vitest writes `SF:` relative to the package it ran in, and
- * `normalize-coverage-paths.mts` rewrites that to name the package; an
- * absolute path is possible too. All three are resolved to the same
+ * `normalize-coverage-paths.mts` rewrites that to name the package; an absolute
+ * path is possible too. All three are resolved to the same
  * repository-relative path, so a report reads the same whichever wrote it.
  *
  * Only `DA:<line>,<hits>` records are read. A line with no `DA` record is not
@@ -86,8 +86,8 @@ export const parseLcov = ({
  * executable, with zero hits, that the diff added or changed.
  *
  * A changed file the report does not mention at all is left out, because
- * absence means the coverage `include` does not reach it (a script, a
- * config, a test), not that nothing runs it.
+ * absence means the coverage `include` does not reach it (a script, a config, a
+ * test), not that nothing runs it.
  */
 export const uncoveredChangedLines = ({
   changedLines,

@@ -7,10 +7,10 @@ import { Arr, Num, Result } from 'ts-data-forge';
  * findings it lists with what was done about each.
  *
  * The section is free prose, so this is a reading of the shapes the
- * descriptions here actually take, not a grammar: bullets under a
- * `Fixed:` / `Dismissed:` / `Deferred to #N:` paragraph or a bold label,
- * bullets that carry their own label, and `Fixed: a, b, c.` sentences. What
- * it misreads costs a line in a digest a person reads, nothing more.
+ * descriptions here actually take, not a grammar: bullets under a `Fixed:` /
+ * `Dismissed:` / `Deferred to #N:` paragraph or a bold label, bullets that
+ * carry their own label, and `Fixed: a, b, c.` sentences. What it misreads
+ * costs a line in a digest a person reads, nothing more.
  */
 export const parseReview = (body: string): ReviewRecord | undefined => {
   const section = extractReviewSection(body);
@@ -30,8 +30,8 @@ export const parseReview = (body: string): ReviewRecord | undefined => {
 
 /**
  * The `## Review` heading and the lines under it, up to the next `#` or `##`
- * heading, the `Claude-Session:` / `Merge-After:` / `Start-After:` trailers,
- * a `---` rule or the generated-with footer — whichever comes first.
+ * heading, the `Claude-Session:` / `Merge-After:` / `Start-After:` trailers, a
+ * `---` rule or the generated-with footer — whichever comes first.
  * A heading may carry a suffix (`## Review (\`/code-review xhigh\`)`,
  * `## Review findings not fixed`); `### ` sub-headings stay in the section.
  * A heading inside a code fence neither starts nor ends it.
@@ -73,11 +73,11 @@ export const levelsIn = (text: string): readonly string[] =>
   );
 
 /**
- * The number of review rounds a text states, summed over every statement of
- * one ("Seven rounds before opening; three rounds on the amend" is ten), or
+ * The number of review rounds a text states, summed over every statement of one
+ * ("Seven rounds before opening; three rounds on the amend" is ten), or
  * `undefined` when it states none ("for several rounds", "until a round found
- * nothing new"). A sentence that counts rounds ("two rounds") is read for
- * those alone, so "ran it three times: two rounds and one round" is three.
+ * nothing new"). A sentence that counts rounds ("two rounds") is read for those
+ * alone, so "ran it three times: two rounds and one round" is three.
  */
 export const roundsIn = (text: string): number | undefined => {
   const counts = text.split(SENTENCE_BREAK).flatMap((sentence) => {
@@ -278,9 +278,9 @@ const ROUNDS =
 
 /**
  * "I ran `/code-review high` three times", "it ran twice more" — the count
- * right after "I ran", "it ran" or "`/code-review high` ran", so "ran the
- * flaky test 5 times" and "the hook ran 3 times" are not one. Not "once", which says "once more" about
- * anything but a review far more often.
+ * right after "I ran", "it ran" or "`/code-review high` ran", so "ran the flaky
+ * test 5 times" and "the hook ran 3 times" are not one. Not "once", which says
+ * "once more" about anything but a review far more often.
  */
 const TIMES =
   /(?:\b(?:I|it|we)|`\/code-review (?:low|medium|high|xhigh|max|ultra)`) ran(?: it| `\/code-review (?:low|medium|high|xhigh|max|ultra)`)? (twice|thrice|(?:\d+|[a-z]+)(?= times\b))/giu;
@@ -323,8 +323,8 @@ const LABEL_GAP = /^[^\n.:]{0,60}:/u;
 const POSTFIX_FIXED = /: ([^:]+?) (?:are|were) (?:all )?fixed\b/gu;
 
 /**
- * What {@link sentenceFrom} reads: a code span whole (so nothing in it
- * counts), a bracket, or a period that a sentence could end at.
+ * What {@link sentenceFrom} reads: a code span whole (so nothing in it counts),
+ * a bracket, or a period that a sentence could end at.
  */
 const SENTENCE_TOKEN = /`[^`]*`|[()[\]]|\.(?=\s+[\dA-Z"*_`])/gu;
 
@@ -366,9 +366,9 @@ const countsIn = (text: string, pattern: RegExp): readonly number[] =>
   ).filter((count) => count !== undefined);
 
 /**
- * Whether each line is inside a code fence, the fence lines included. A
- * fence holds commands or output, never a heading that ends the section or a
- * bullet that is a finding.
+ * Whether each line is inside a code fence, the fence lines included. A fence
+ * holds commands or output, never a heading that ends the section or a bullet
+ * that is a finding.
  */
 const insideFences = (lines: readonly string[]): readonly boolean[] => {
   /** The opening fence, which only a run of its character as long closes. */
@@ -434,8 +434,8 @@ const issuesIn = (text: string): readonly number[] =>
   ).filter((n) => n > 0);
 
 /**
- * A finding. A deferred one is given the issues its text names, or else
- * those of the label it sits under (`labelIssues`).
+ * A finding. A deferred one is given the issues its text names, or else those
+ * of the label it sits under (`labelIssues`).
  */
 const makeFinding = (
   disposition: Disposition,
@@ -465,10 +465,10 @@ const isFinding = ({ text }: Finding): boolean =>
 const ROUND_LABEL = /^(?:round|pass) \w+: /iu;
 
 /**
- * The section's lines as bullets and paragraphs. A line indented under a
- * bullet continues it, even after a blank line; any other line continues the
- * paragraph it follows until a blank line ends it. Table rows and code
- * fences are skipped.
+ * The section's lines as bullets and paragraphs. A line indented under a bullet
+ * continues it, even after a blank line; any other line continues the paragraph
+ * it follows until a blank line ends it. Table rows and code fences are
+ * skipped.
  */
 const blocksOf = (lines: readonly string[]): readonly Block[] => {
   const mut_blocks: Block[] = [];
@@ -543,8 +543,8 @@ const depthAfter = (token: string, depth: number): number =>
 /**
  * The text from `start` to the end of its sentence: a period followed by a
  * capital, a digit, emphasis, a quote or a code span, or the end of the
- * paragraph. Periods inside parentheses, brackets or code spans do not end
- * it — unless a bracket is never closed, when the first period does.
+ * paragraph. Periods inside parentheses, brackets or code spans do not end it —
+ * unless a bracket is never closed, when the first period does.
  */
 const sentenceFrom = (text: string, start: number): string => {
   const rest = text.slice(start);
@@ -592,13 +592,13 @@ const splitTopLevel = (
 };
 
 /**
- * A running-text list split into its items: on top-level semicolons when
- * there are any; else, for fixed findings, on top-level commas, which is how
- * those are listed ("Fixed: a, b, and c"). A dismissed or deferred finding
- * comes with its reason, so a comma there is inside one finding. What follows
- * a dash in an item is its reason: `text` leaves it out, `whole` keeps it. A
- * leading "and" or "plus" is dropped, and a clause that only goes on about
- * the item before it ("…, which …") stays with it.
+ * A running-text list split into its items: on top-level semicolons when there
+ * are any; else, for fixed findings, on top-level commas, which is how those
+ * are listed ("Fixed: a, b, and c"). A dismissed or deferred finding comes with
+ * its reason, so a comma there is inside one finding. What follows a dash in an
+ * item is its reason: `text` leaves it out, `whole` keeps it. A leading "and"
+ * or "plus" is dropped, and a clause that only goes on about the item before it
+ * ("…, which …") stays with it.
  */
 const splitList = (
   list: string,

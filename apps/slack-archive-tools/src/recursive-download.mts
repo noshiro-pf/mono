@@ -53,9 +53,9 @@ export const main = async (): Promise<void> => {
 
   for (const file of jsonFiles) {
     // Re-rooting the path under a different directory. `replace` did this by
-    // swapping the prefix, which `unicorn/no-unsafe-string-replacement`
-    // rejects — a non-literal replacement can carry `$&` and friends. Saying
-    // it with `path` is both safe and clearer about the intent.
+    // swapping the prefix, which `unicorn/no-unsafe-string-replacement` rejects
+    // — a non-literal replacement can carry `$&` and friends. Saying it with
+    // `path` is both safe and clearer about the intent.
     const subPath = path.relative(srcDir, file.parentPath);
 
     const distSubDir = path.join(distDir, subPath);
@@ -103,8 +103,8 @@ export const main = async (): Promise<void> => {
 
     // `JSON.stringify` returns `undefined` for `undefined`, a function or a
     // symbol, and `ts-data-forge`'s `Json.stringify` says so in its type.
-    // `value` came out of `Json.parse`, so it is never one of those — but
-    // there is nothing to write if it somehow is.
+    // `value` came out of `Json.parse`, so it is never one of those — but there
+    // is nothing to write if it somehow is.
     if (contentStr.value === undefined) {
       return;
     }

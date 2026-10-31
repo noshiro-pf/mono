@@ -72,8 +72,8 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
 
   const fill: Type<T>['fill'] = (a) => (is(a) ? a : defaultType.fill(a));
 
-  // Decided on first use rather than here: a member may be a `recursion`
-  // whose definition refers to the binding this intersection initializes.
+  // Decided on first use rather than here: a member may be a `recursion` whose
+  // definition refers to the binding this intersection initializes.
   const isRecordIntersection = memoizeFunction((): boolean =>
     types.every((t) => recordViewOf(t) !== undefined),
   );
@@ -81,9 +81,9 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
   const prune: Type<T>['prune'] = (a) =>
     isRecordIntersection()
       ? // A value path is represented by a record intersection if it is
-        // represented by any member, so the pruned members are merged
-        // (deeply; see `mergePruned`). Every member is a record type here,
-        // so each pruned result is a record.
+        // represented by any member, so the pruned members are merged (deeply;
+        // see `mergePruned`). Every member is a record type here, so each
+        // pruned result is a record.
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
         (types.map((t) => t.prune(a)).reduce(mergePruned, {}) as T)
       : // Non-record intersections (e.g. branded primitives) have no excess

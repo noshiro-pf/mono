@@ -5,16 +5,16 @@ import type { TypeAnnotations, TypeOf, UnknownType } from '../type.mjs';
  * description, a JSON Schema `format`, examples, or a deprecation mark, which
  * `toJsonSchema` writes out under the keywords of the same names.
  *
- * Everything else is kept as it is — validation, `fill` / `prune`, the
- * default value, `constraints`, a record's `shape`, and the `optional` marker,
- * so `t.annotate(t.optional(x), ...)` and `t.optional(t.annotate(x, ...))` are
- * the same record member. A key given again replaces the earlier value.
+ * Everything else is kept as it is — validation, `fill` / `prune`, the default
+ * value, `constraints`, a record's `shape`, and the `optional` marker, so
+ * `t.annotate(t.optional(x), ...)` and `t.optional(t.annotate(x, ...))` are the
+ * same record member. A key given again replaces the earlier value.
  *
- * Annotations never change what is valid: a `format` describes the values,
- * and the type alone decides which are accepted. A type built from an
- * annotated type, such as a `pick` of an annotated record or a `union` with an
- * annotated member, carries its own annotations, not those of what it was
- * built from; the members keep theirs.
+ * Annotations never change what is valid: a `format` describes the values, and
+ * the type alone decides which are accepted. A type built from an annotated
+ * type, such as a `pick` of an annotated record or a `union` with an annotated
+ * member, carries its own annotations, not those of what it was built from; the
+ * members keep theirs.
  *
  * @example
  * ```ts

@@ -17,8 +17,8 @@ export type UnframeableKind =
 /**
  * Recognizes those addresses, from the address alone.
  *
- * Worth doing separately from waiting for the frame to answer, because for
- * most of them there is nothing to wait for: measured, `chrome://version`,
+ * Worth doing separately from waiting for the frame to answer, because for most
+ * of them there is nothing to wait for: measured, `chrome://version`,
  * `view-source:` and `file:` are refused before a navigation starts, so the
  * frame keeps whatever it was showing and never fires `load`. The Web Store is
  * the exception — it loads an error page like any framing refusal would — and

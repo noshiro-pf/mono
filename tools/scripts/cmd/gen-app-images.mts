@@ -15,17 +15,17 @@ import {
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
- * Draws a browser app's `public/apple-touch-icon.png` and
- * `public/og-image.png` from its `public/favicon.svg` and what its
- * `index.html` says: `og:title`, `og:description`.
+ * Draws a browser app's `public/apple-touch-icon.png` and `public/og-image.png`
+ * from its `public/favicon.svg` and what its `index.html` says: `og:title`,
+ * `og:description`.
  *
  * Run by hand, when the icon or the text changes — not part of `gen`: a
  * Chromium or font update would otherwise dirty the tree with byte-level
- * differences. It draws only what the page links to: the touch icon when it
- * has `<link rel="apple-touch-icon">` and a `favicon.svg` to draw it from
- * (an app whose icon is a raster drawing keeps the PNG it has), the card
- * when it has `og:image`. The text is set in Noto Sans JP from Google Fonts,
- * so this needs the network.
+ * differences. It draws only what the page links to: the touch icon when it has
+ * `<link rel="apple-touch-icon">` and a `favicon.svg` to draw it from (an app
+ * whose icon is a raster drawing keeps the PNG it has), the card when it has
+ * `og:image`. The text is set in Noto Sans JP from Google Fonts, so this needs
+ * the network.
  */
 export const genAppImages = async (
   appDir: string,
@@ -111,8 +111,8 @@ export const genAppImages = async (
 };
 
 /**
- * `favicon.svg` with the corners of its background square taken off: iOS
- * rounds a touch icon itself, and a transparent corner is filled with black.
+ * `favicon.svg` with the corners of its background square taken off: iOS rounds
+ * a touch icon itself, and a transparent corner is filled with black.
  * The background is the first `<rect>` spanning the whole 32×32 view box.
  */
 export const squareCorners = (svg: string): Result<string, string> =>
@@ -175,8 +175,8 @@ const escapeHtml = (text: string): string =>
 /**
  * The card #2551 drew for life-plan-simulator by hand, made repeatable: the
  * icon on the left and the name and a line about the app beside it, on the
- * light grey of a GitHub page. No screenshot, nothing personal — the
- * repository is public.
+ * light grey of a GitHub page. No screenshot, nothing personal — the repository
+ * is public.
  */
 const renderCard = async (
   page: DeepReadonly<Page>,
@@ -221,9 +221,9 @@ const renderCard = async (
   `);
 
   // Google Fonts splits Noto Sans JP into subsets by `unicode-range`, and a
-  // browser fetches one only when text asks for it; `document.fonts.ready`
-  // can resolve before layout has asked. So each face is loaded for the very
-  // text it sets, and then checked for it.
+  // browser fetches one only when text asks for it; `document.fonts.ready` can
+  // resolve before layout has asked. So each face is loaded for the very text
+  // it sets, and then checked for it.
   const loaded = await page.evaluate(
     async (faces: readonly (readonly [font: string, text: string])[]) => {
       await document.querySelector('img')?.decode();

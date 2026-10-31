@@ -5,10 +5,9 @@ import {
 } from './embed-examples-in-markdown.mjs';
 
 /**
- * The fixtures are written as arrays of lines rather than as `dedent`
- * literals, as in `embed-examples-utils.test.mts`: the indentation of a fence
- * nested in a list item is part of what is being tested, and `dedent` exists
- * to remove it.
+ * The fixtures are written as arrays of lines rather than as `dedent` literals,
+ * as in `embed-examples-utils.test.mts`: the indentation of a fence nested in a
+ * list item is part of what is being tested, and `dedent` exists to remove it.
  */
 describe('countSampleBackedFences', () => {
   test('counts every spelling of JavaScript and TypeScript', () => {

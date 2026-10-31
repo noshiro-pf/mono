@@ -1,17 +1,17 @@
 /**
- * Fitting a title into a node of the issue DAG, where SVG text neither
- * wraps nor clips by itself. Widths are estimated in units of a narrow
- * character, a CJK character or an emoji being two — close enough for a
- * label, and it needs no font measurement, so it is done before anything is
- * drawn. The same estimate as the task manager's DAG
+ * Fitting a title into a node of the issue DAG, where SVG text neither wraps
+ * nor clips by itself. Widths are estimated in units of a narrow character, a
+ * CJK character or an emoji being two — close enough for a label, and it needs
+ * no font measurement, so it is done before anything is drawn. The same
+ * estimate as the task manager's DAG
  * (`apps/task-manager/src/dag/truncate.mts`).
  */
 
 /**
- * `title` in at most `maxLines` lines of at most `unitsPerLine`, the last
- * one cut with `…` if the title does not fit. A line is broken after a space
- * when one is in its later part, so that a word stays whole; otherwise
- * between any two characters, which is how Japanese breaks anyway.
+ * `title` in at most `maxLines` lines of at most `unitsPerLine`, the last one
+ * cut with `…` if the title does not fit. A line is broken after a space when
+ * one is in its later part, so that a word stays whole; otherwise between any
+ * two characters, which is how Japanese breaks anyway.
  */
 import { Arr } from 'ts-data-forge';
 
@@ -61,8 +61,8 @@ export const wrapTitle = (
 
 /**
  * How wide the pill that carries `#number` over a node's top edge is drawn:
- * its digits in 10px bold, which `font-variant-numeric: tabular-nums` makes
- * as wide as one another, with the same room either side.
+ * its digits in 10px bold, which `font-variant-numeric: tabular-nums` makes as
+ * wide as one another, with the same room either side.
  */
 export const numberPillWidth = (number: number): number =>
   2 * NUMBER_PILL_PADDING + NUMBER_CHAR_WIDTH * `#${number}`.length;

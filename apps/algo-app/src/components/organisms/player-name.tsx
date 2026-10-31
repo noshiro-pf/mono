@@ -41,8 +41,8 @@ export const PlayerName = ({
 };
 
 /**
- * Only 0 and 90 were ever handled; the other two are drawn as they are, as
- * they always were.
+ * Only 0 and 90 were ever handled; the other two are drawn as they are, as they
+ * always were.
  */
 const rotateStyleOf = (
   rotate: 0 | 90 | 180 | 270,

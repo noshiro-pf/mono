@@ -25,8 +25,8 @@ export const mountInto = (
 };
 
 /**
- * A value held as the app holds it: what `onChange` is called with becomes
- * the value, and every call is kept.
+ * A value held as the app holds it: what `onChange` is called with becomes the
+ * value, and every call is kept.
  */
 export const controlled = (
   initial: string,
@@ -120,8 +120,8 @@ export const press = (
   );
 
 /**
- * Stops the clock at 2026-10-23 14:05 local time for the rest of the test,
- * so that today, and the range the pickers default to, are known.
+ * Stops the clock at 2026-10-23 14:05 local time for the rest of the test, so
+ * that today, and the range the pickers default to, are known.
  */
 export const fixNow = (): void => {
   vi.useFakeTimers({ toFake: ['Date'] });

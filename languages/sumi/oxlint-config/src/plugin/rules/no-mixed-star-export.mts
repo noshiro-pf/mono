@@ -64,8 +64,8 @@ export const noMixedStarExport = createRule({
 
 /**
  * `export * from` / `export type * from`, and nothing that names an export.
- * oxlint passes `null` where the typings say `undefined`, so `exported` is
- * read as `unknown`.
+ * oxlint passes `null` where the typings say `undefined`, so `exported` is read
+ * as `unknown`.
  */
 const isStarExport = (
   statement: DeepReadonly<TSESTree.ProgramStatement>,

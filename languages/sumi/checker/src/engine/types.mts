@@ -9,9 +9,9 @@ import type { Checker } from 'typescript-native/unstable/sync';
  * What a rule is given for one node.
  *
  * `checker` is the TypeScript 7 checker, which talks to the compiler over a
- * channel: a `Type` is a handle, and every method on it is a round trip. Ask
- * it only about nodes the syntax already selected — the pass walks every node
- * of every file, and querying each one would pay for the whole program.
+ * channel: a `Type` is a handle, and every method on it is a round trip. Ask it
+ * only about nodes the syntax already selected — the pass walks every node of
+ * every file, and querying each one would pay for the whole program.
  */
 export type RuleContext = Readonly<{
   checker: Checker;
@@ -21,9 +21,9 @@ export type RuleContext = Readonly<{
    * Reports `node` under the rule's own neutral ID, naming one of the rule's
    * `messages`. `data` fills the `{{placeholder}}`s in that message.
    *
-   * The ID rather than the prose so that a test can pin *which* message a
-   * rule produced -- the conformance corpus compares rule IDs and lines and
-   * never looks at the text.
+   * The ID rather than the prose so that a test can pin *which* message a rule
+   * produced -- the conformance corpus compares rule IDs and lines and never
+   * looks at the text.
    */
   report: (
     node: TsNode,

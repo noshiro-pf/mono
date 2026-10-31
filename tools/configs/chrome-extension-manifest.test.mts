@@ -39,8 +39,8 @@ describe('manifestWithVersion', () => {
   });
 
   test('rejects a manifest that declares a version of its own', () => {
-    // Two sources would drift: the one changesets bumps, and the one a
-    // person remembers to edit.
+    // Two sources would drift: the one changesets bumps, and the one a person
+    // remembers to edit.
     assert.throws(
       () => manifestWithVersion({ ...manifest, version: '0.3.0' }, '0.4.0'),
       /package\.json/u,

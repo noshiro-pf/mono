@@ -1,7 +1,7 @@
 /**
- * The room the page shows: which one it is, what the database says of it and
- * of its actions, and who this player is in it. Creating and joining a room
- * are here too, since both end with the player's name.
+ * The room the page shows: which one it is, what the database says of it and of
+ * its actions, and who this player is in it. Creating and joining a room are
+ * here too, since both end with the player's name.
  *
  * The database is `deps.api`, so nothing here talks to Firestore itself.
  */
@@ -30,8 +30,8 @@ export type RoomStore = Readonly<{
   setRoomId: (roomId: string) => void;
   myName: InitializedObservable<string | undefined>;
   /**
-   * Names this player, for a page opened as one: the name lives in memory
-   * only, so a reload knows it only from the page's query.
+   * Names this player, for a page opened as one: the name lives in memory only,
+   * so a reload knows it only from the page's query.
    */
   setMyName: (myName: string) => void;
   createRoom: Readonly<{

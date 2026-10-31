@@ -1,6 +1,6 @@
 // Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
-// so those rules are waived here (D-63).
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why), so
+// those rules are waived here (D-63).
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
@@ -22,9 +22,9 @@ import type {
  * Unlike `switchMap`, does not cancel previous inner observables.
  *
  * Each projection runs in a scope of its own (see `createScope`): what it
- * creates is disposed when `mergeMap` completes. An observable it only
- * returns — one created outside the projection and shared with others — is
- * unsubscribed and left running.
+ * creates is disposed when `mergeMap` completes. An observable it only returns
+ * — one created outside the projection and shared with others — is unsubscribed
+ * and left running.
  *
  * @template A - The type of values from the source
  * @template B - The type of values from the projected observable

@@ -3,8 +3,8 @@
  *
  * Read again when the state changes (a task just marked done has to unblock
  * what waits for it with the time it was marked, not the time of the last
- * tick), when the page comes back into view, and when the next change the
- * clock alone makes is due — `nextTickDelay`, which never waits longer than
+ * tick), when the page comes back into view, and when the next change the clock
+ * alone makes is due — `nextTickDelay`, which never waits longer than
  * `maxDelayMs`. Between those nothing can change, so nothing is re-rendered.
  */
 
@@ -46,9 +46,9 @@ export const createClockStore = <H,>(deps: ClockDeps<H>): ClockStore => {
 
   const [timerFired, fireTimer] = createEventEmitter();
 
-  // Once on starting, then on every change of the state and every wake. Read
-  // as part of the update that asks for it, rather than written from a
-  // subscriber of it, which would be a write while that update propagates.
+  // Once on starting, then on every change of the state and every wake. Read as
+  // part of the update that asks for it, rather than written from a subscriber
+  // of it, which would be a write while that update propagates.
   const listened = started.pipe(
     switchMap((isStarted) =>
       isStarted
@@ -74,8 +74,8 @@ export const createClockStore = <H,>(deps: ClockDeps<H>): ClockStore => {
 
     setStarted(true);
 
-    // Subscribed after starting, so that its first call is the time just
-    // read rather than the one the store was made with.
+    // Subscribed after starting, so that its first call is the time just read
+    // rather than the one the store was made with.
     const nowSubscription = now.subscribe((current) => {
       clearTimer();
 

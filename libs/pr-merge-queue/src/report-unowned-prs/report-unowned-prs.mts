@@ -23,21 +23,21 @@ export const REPORT_UNOWNED_PRS_HELP = [
  *
  * Every pull request in the queue is the worker's, a skill's or a person's
  * (`pr-report-core`'s `queue-owner.mts`); `none` means the rules met a state
- * they do not cover, and a pull request in it waits for nothing that will
- * come. That is a bug in the queue's tooling, not in the pull request, so it
- * is reported as one — once per pull request, found again by a hidden line
- * in the body of an open issue this account wrote — rather than left for
- * someone to notice the queue has stopped.
+ * they do not cover, and a pull request in it waits for nothing that will come.
+ * That is a bug in the queue's tooling, not in the pull request, so it is
+ * reported as one — once per pull request, found again by a hidden line in the
+ * body of an open issue this account wrote — rather than left for someone to
+ * notice the queue has stopped.
  *
  * ```sh
  * report-unowned-prs            # file what is not filed yet
  * report-unowned-prs --dry-run  # say what it would file
  * ```
  *
- * The `/unblock-prs` skill runs it on every round. It reads the owners as
- * every other command does (`pr-report/queue.mts`) and writes as the token's
- * account, which has to be the one `unblock-prs` runs as. A caller that has
- * just read the queue passes what it read as `read`.
+ * The `/unblock-prs` skill runs it on every round. It reads the owners as every
+ * other command does (`pr-report/queue.mts`) and writes as the token's account,
+ * which has to be the one `unblock-prs` runs as. A caller that has just read
+ * the queue passes what it read as `read`.
  */
 export const reportUnownedPrs = async (
   dryRun: boolean,
@@ -71,8 +71,8 @@ export const reportUnownedPrs = async (
     return Result.err(`cannot read who the token is: ${viewer.value}`);
   }
 
-  // Issues and pull requests come from one endpoint; a pull request has no
-  // body this marker could be in that this account wrote as an issue.
+  // Issues and pull requests come from one endpoint; a pull request has no body
+  // this marker could be in that this account wrote as an issue.
   const listed = await rest(api.value, 'GET', '/issues', IssueListSchema, {
     query: { state: 'open', creator: viewer.value, per_page: '100' },
   });
@@ -121,8 +121,8 @@ export const reportUnownedPrs = async (
 
 /**
  * What to file for each pull request nobody owns, given the open issues this
- * account wrote: one already carrying the pull request's marker is reported
- * and not filed again.
+ * account wrote: one already carrying the pull request's marker is reported and
+ * not filed again.
  */
 export const planUnownedReports = (
   unowned: readonly Readonly<{

@@ -1,8 +1,8 @@
 import { hasKey, isRecord } from 'ts-data-forge';
 
 /**
- * Tags every `chrome.runtime` message between the GitHub content script and
- * the service worker.
+ * Tags every `chrome.runtime` message between the GitHub content script and the
+ * service worker.
  */
 export const githubMessageTag = 'split-view/github/v1';
 
@@ -46,8 +46,8 @@ export type GitHubMessage = Readonly<
 
 /**
  * Validates a message. Only this extension's own scripts can send one — the
- * manifest has no `externally_connectable` — but what they pass on was read
- * off a web page, so the receiver checks the addresses again all the same.
+ * manifest has no `externally_connectable` — but what they pass on was read off
+ * a web page, so the receiver checks the addresses again all the same.
  */
 export const asGitHubMessage = (value: unknown): GitHubMessage | undefined => {
   if (

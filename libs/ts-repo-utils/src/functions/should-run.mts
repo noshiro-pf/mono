@@ -197,8 +197,8 @@ const defaultTypeCheckPathsIgnore = [
 ] as const;
 
 /**
- * Expands the trailing-slash shorthand for a directory into the glob
- * micromatch needs. Every other pattern is already one.
+ * Expands the trailing-slash shorthand for a directory into the glob micromatch
+ * needs. Every other pattern is already one.
  */
 const toMatchPattern = (pattern: string): string =>
   pattern.endsWith('/') ? (`${pattern}**` as const) : pattern;

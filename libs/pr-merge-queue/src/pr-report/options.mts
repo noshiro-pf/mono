@@ -21,22 +21,22 @@ export type Options = Readonly<{
 
 /**
  * A week, so that a report read on a Monday still covers the Friday. Long
- * enough to answer "what landed since I last looked" and short enough that
- * the section stays a list rather than an archive.
+ * enough to answer "what landed since I last looked" and short enough that the
+ * section stays a list rather than an archive.
  */
 export const DEFAULT_MERGED_DAYS = 7;
 
 /**
- * A cap as well as a window, and a matter of reading rather than of
- * fitting. Twenty is more than enough to answer "did the thing I queued go in", which is what
- * the section is for, and past that the section stops being a list and
+ * A cap as well as a window, and a matter of reading rather than of fitting.
+ * Twenty is more than enough to answer "did the thing I queued go in", which is
+ * what the section is for, and past that the section stops being a list and
  * starts being an archive.
  */
 export const DEFAULT_MERGED_LIMIT = 20;
 
 /**
- * Enough to see what is open without the section becoming the report. The
- * page asks for the same number.
+ * Enough to see what is open without the section becoming the report. The page
+ * asks for the same number.
  */
 export const DEFAULT_ISSUES_LIMIT = 30;
 
@@ -130,10 +130,10 @@ export const parseOptions = (
 };
 
 /**
- * Typed as a set of plain strings so that the membership test takes the
- * string it is narrowing. `FORMATS.includes(value)` does not compile against
- * the strict standard library, whose `includes` accepts only the element
- * type — which is the very thing being established here.
+ * Typed as a set of plain strings so that the membership test takes the string
+ * it is narrowing. `FORMATS.includes(value)` does not compile against the
+ * strict standard library, whose `includes` accepts only the element type —
+ * which is the very thing being established here.
  */
 const FORMAT_SET: ReadonlySet<string> = new Set(FORMATS);
 

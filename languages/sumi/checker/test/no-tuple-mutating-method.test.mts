@@ -197,9 +197,9 @@ describe(`${noTupleMutatingMethod.ruleId} through type wrappers`, () => {
         ],
       },
       {
-        // The receiver is a tuple if any layer of it is one: a cast to an
-        // array does not stop the call growing the tuple underneath, and a
-        // cast to a tuple is the author saying the value is one.
+        // The receiver is a tuple if any layer of it is one: a cast to an array
+        // does not stop the call growing the tuple underneath, and a cast to a
+        // tuple is the author saying the value is one.
         name: 'a tuple at some layer',
         code: dedent`
           const mut_widened: [number, string] = [1, 'a'];

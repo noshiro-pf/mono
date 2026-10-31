@@ -87,8 +87,8 @@ const add = (): void => {
 // `For` keeps one row per key: a row's function runs once, and reordering
 // `todos$` moves the row's nodes rather than recreating them.
 const TodoApp = (): JSX.Element => {
-    // A derivation only this view reads is created here, inside the component,
-    // so it exists only while the view is mounted.
+    // A derivation only this view reads is created here, inside the component, so
+    // it exists only while the view is mounted.
     const remaining$ = todos$.pipe(
         map((todos) => todos.filter((t) => !t.done).length),
     );

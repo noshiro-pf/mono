@@ -13,8 +13,8 @@ export type BlockPlacement = Readonly<{
   /** Present in the `fill` mode only, and then always. */
   share: number | undefined;
   /**
-   * In the `fill` mode, the block under this one, whose height the line
-   * between them shares; absent for the last of a column, which has none.
+   * In the `fill` mode, the block under this one, whose height the line between
+   * them shares; absent for the last of a column, which has none.
    */
   next: BlockId | undefined;
   /** The share of {@link BlockPlacement.next}. */
@@ -29,20 +29,20 @@ type Props = Readonly<{
 
 /**
  * One block: what it holds, and the line under it to drag its height by (a
- * double click there gives the natural height back), drawn as the line
- * between two columns is. In the `fill` mode the line is the one between this
- * block and the next, and moves height from one to the other (a double click
- * evens the two); the last block of a column has none, and reaches the
- * column's end. Where a block goes is the Layout dialog's: an order set once
- * and seldom changed has no need of a drag.
+ * double click there gives the natural height back), drawn as the line between
+ * two columns is. In the `fill` mode the line is the one between this block and
+ * the next, and moves height from one to the other (a double click evens the
+ * two); the last block of a column has none, and reaches the column's end.
+ * Where a block goes is the Layout dialog's: an order set once and seldom
+ * changed has no need of a drag.
  *
- * **Pointer events, not the HTML drag and drop API**, which draws its own
- * ghost image and does not work with touch. The pointer is captured where the
- * drag starts, so one that leaves the window still ends where it is released.
+ * **Pointer events, not the HTML drag and drop API**, which draws its own ghost
+ * image and does not work with touch. The pointer is captured where the drag
+ * starts, so one that leaves the window still ends where it is released.
  *
  * The line is pointer-only, and hidden from assistive technology for it: the
- * layout settings change a block's height with buttons, which is the
- * keyboard's way to the same thing.
+ * layout settings change a block's height with buttons, which is the keyboard's
+ * way to the same thing.
  */
 export const LayoutBlock = ({
   id,
@@ -85,9 +85,9 @@ export const LayoutBlock = ({
       return;
     }
 
-    // The blocks share their column's height by their shares and nothing
-    // else (`index.css`), so their heights as drawn are in the ratio of
-    // their shares, which is what `withBoundaryAt` relies on.
+    // The blocks share their column's height by their shares and nothing else
+    // (`index.css`), so their heights as drawn are in the ratio of their
+    // shares, which is what `withBoundaryAt` relies on.
     const { block } = mut_elements;
 
     if (block === undefined || next === undefined || nextShare === undefined) {

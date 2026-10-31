@@ -3,8 +3,8 @@ import { restrictCastMutable } from '../src/index.mjs';
 import { testRule } from './rule-tester.mjs';
 
 // The cases cannot import ts-data-forge (they are compiled in a temporary
-// directory), so each declares the escape under its real name. The rule goes
-// by the name the reference resolves to.
+// directory), so each declares the escape under its real name. The rule goes by
+// the name the reference resolves to.
 const castMutableDeclaration = dedent`
   type MutableOf<T> = { -readonly [K in keyof T]: T[K] };
 

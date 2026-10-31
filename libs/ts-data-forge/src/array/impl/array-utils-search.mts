@@ -468,9 +468,9 @@ const findImpl = <E,>(
   // Left as a comment rather than asserted. This pinned the shape of the
   // standard library's `findIndex`, and the shape differs between the stock
   // library and the strict one — `(value, index, obj: this) => boolean` there
-  // against `(value, index, arr: readonly E[]) => unknown` here. `src` ships
-  // to consumers so that "Go to Definition" reaches it, so an assertion that
-  // only holds under one of them shows up as an error in their editor.
+  // against `(value, index, arr: readonly E[]) => unknown` here. `src` ships to
+  // consumers so that "Go to Definition" reaches it, so an assertion that only
+  // holds under one of them shows up as an error in their editor.
   //
   // expectType<
   //   Parameters<typeof array.findIndex>[0],
@@ -500,9 +500,9 @@ const findLastImpl = <E,>(
   // Left as a comment rather than asserted. This pinned the shape of the
   // standard library's `findIndex`, and the shape differs between the stock
   // library and the strict one — `(value, index, obj: this) => boolean` there
-  // against `(value, index, arr: readonly E[]) => unknown` here. `src` ships
-  // to consumers so that "Go to Definition" reaches it, so an assertion that
-  // only holds under one of them shows up as an error in their editor.
+  // against `(value, index, arr: readonly E[]) => unknown` here. `src` ships to
+  // consumers so that "Go to Definition" reaches it, so an assertion that only
+  // holds under one of them shows up as an error in their editor.
   //
   // expectType<
   //   Parameters<typeof array.findIndex>[0],

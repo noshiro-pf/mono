@@ -54,8 +54,8 @@ describe(arrangeForest, () => {
   });
 
   test('a repeated pull request is expanded where it is first drawn after the hidden ones are gone', () => {
-    // 1 and 2 both before 3; 3 is expanded under 1. With 1 hidden, 3 is
-    // lifted to the top level after 2, so it is expanded under 2 instead.
+    // 1 and 2 both before 3; 3 is expanded under 1. With 1 hidden, 3 is lifted
+    // to the top level after 2, so it is expanded under 2 instead.
     assert.deepStrictEqual(
       arrangeForest(DIAMOND, { shown: (n) => n !== 1, rank: () => 0 }),
       [node(2, [node(3, [node(5)])]), node(3, [], true)],
@@ -427,8 +427,8 @@ describe(statusFiltersOf, () => {
     );
   });
 
-  // Nothing is queued or set aside without `unblock-prs`, and a count that
-  // is always nought is a switch that does nothing.
+  // Nothing is queued or set aside without `unblock-prs`, and a count that is
+  // always nought is a switch that does nothing.
   test('leaves out the queue’s own statuses where it is not', () => {
     assert.deepStrictEqual(
       statusFiltersOf({ queue: false, codeOwnerReview: true }),

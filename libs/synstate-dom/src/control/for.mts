@@ -31,8 +31,8 @@ import { longestIncreasingSubsequence } from './longest-increasing-subsequence.m
  * nodes; the rows that stay are moved as little as the longest increasing
  * subsequence allows.
  *
- * `key` is required, as in React; `(_, i) => i` matches rows by position. A
- * key that appears twice is reported with `console.error`, and its later
+ * `key` is required, as in React; `(_, i) => i` matches rows by position. A key
+ * that appears twice is reported with `console.error`, and its later
  * occurrences are rebuilt on every update.
  */
 export const For = <T,>({
@@ -57,8 +57,8 @@ export const For = <T,>({
     );
 
     // `index$` is a node of its own in every row, visited on every update of
-    // `items`; a `children` that declares no second parameter is not given
-    // one, as Solid's `For` does.
+    // `items`; a `children` that declares no second parameter is not given one,
+    // as Solid's `For` does.
     const usesIndex = children.length >= 2;
 
     const callChildren: BivariantHack<
@@ -132,8 +132,8 @@ export const For = <T,>({
     /**
      * When no key stays, takes every row's nodes out in one range, rather than
      * one by one as each row's scope is disposed: clearing or replacing the
-     * whole list is then one DOM operation. The scopes are disposed after,
-     * and find their nodes already detached.
+     * whole list is then one DOM operation. The scopes are disposed after, and
+     * find their nodes already detached.
      */
     const removeAllAtOnceIfEveryKeyGoes = (
       previousOrder: readonly unknown[],
@@ -295,12 +295,12 @@ const toEntries = <T,>(
 };
 
 /**
- * One field of a row's entry, as a single child of `entries$`, where
- * `map`, `filter`, `withInitialValue` and `skipIfNoChange` would make four:
+ * One field of a row's entry, as a single child of `entries$`, where `map`,
+ * `filter`, `withInitialValue` and `skipIfNoChange` would make four:
  * creating and disposing a row costs roughly its number of nodes.
  *
- * A row whose key has gone keeps its last value; its scope is disposed in
- * the same update.
+ * A row whose key has gone keeps its last value; its scope is disposed in the
+ * same update.
  */
 const rowField = <T, A>(
   entries$: Observable<Entries<T>>,

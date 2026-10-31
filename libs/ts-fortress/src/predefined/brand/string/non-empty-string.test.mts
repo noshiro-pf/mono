@@ -18,8 +18,8 @@ describe(nonEmptyString, () => {
 
   expectType<typeof baseType.defaultValue, NonEmptyStringType>('=');
 
-  // The other string brand types in this directory never produce empty
-  // strings, so they must also be assignable to `NonEmptyString`.
+  // The other string brand types in this directory never produce empty strings,
+  // so they must also be assignable to `NonEmptyString`.
   expectType<Email, NonEmptyString>('<=');
 
   expectType<Iso8601, NonEmptyString>('<=');

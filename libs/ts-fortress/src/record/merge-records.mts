@@ -58,8 +58,8 @@ export const mergeRecords = <
     );
   }
 
-  // For merging records (which is an intersection operation),
-  // we need to create the cartesian product of all variants
+  // For merging records (which is an intersection operation), we need to create
+  // the cartesian product of all variants
   // For example: {a} & ({b} | {c}) = ({a} & {b}) | ({a} & {c})
   const allCombinations = Arr.cartesianProduct(expandedShapesPerType);
 
@@ -73,9 +73,9 @@ export const mergeRecords = <
 
   // If there's only one merged shape, return it directly
   if (Arr.isFixedLengthTuple(1, mergedShapes)) {
-    // The merged shape is assembled at runtime, so the `shape` carrier
-    // `record` returns cannot describe it; widen it away before casting to the
-    // computed result type.
+    // The merged shape is assembled at runtime, so the `shape` carrier `record`
+    // returns cannot describe it; widen it away before casting to the computed
+    // result type.
     const merged: Type<UnknownRecord> = record(mergedShapes[0], {
       typeName: typeNameFilled,
       excessProperty,

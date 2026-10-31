@@ -6,9 +6,9 @@ import type { Context } from '../context.mjs';
 import { transformDeclarationFile } from './codemod/transform-dts.mjs';
 
 /**
- * Declaration files kept mutable, mirroring the `!(lib.dom|lib.webworker)`
- * glob that the ESLint `functional/prefer-readonly-type` rule was scoped to in
- * the now-removed `defineGenEslintConfig`.
+ * Declaration files kept mutable, mirroring the `!(lib.dom|lib.webworker)` glob
+ * that the ESLint `functional/prefer-readonly-type` rule was scoped to in the
+ * now-removed `defineGenEslintConfig`.
  */
 const readonlyExcludedFiles: ReadonlySet<string> = new Set<string>([
   'lib.dom.d.ts',

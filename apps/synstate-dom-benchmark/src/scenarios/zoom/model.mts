@@ -12,9 +12,9 @@ import type { Cells } from '../scenario.mjs';
  * reaches the {@link placeCount} labels. The screen shows the zoom, the level
  * and the number of labels shown, and the first {@link shownPlaces} places.
  *
- * The signal-based implementations make one derived value for the level and
- * one per label; React and Preact compute the labels in a loop, again only
- * when the level changes.
+ * The signal-based implementations make one derived value for the level and one
+ * per label; React and Preact compute the labels in a loop, again only when the
+ * level changes.
  */
 export type ZoomApp = Readonly<{
   setZoom: (zoom: number) => void;

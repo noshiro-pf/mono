@@ -1,16 +1,16 @@
 /**
  * Cascaded Diamond Benchmark
  *
- * Measures the exponential O(2^N) blowup of RxJS's combineLatest
- * with cascaded diamond dependencies.
+ * Measures the exponential O(2^N) blowup of RxJS's combineLatest with cascaded
+ * diamond dependencies.
  *
  * Graph topology (N=3):
  *   source → left₁, right₁ → combineLatest₁
  *          → left₂, right₂ → combineLatest₂
  *          → left₃, right₃ → combineLatest₃ → subscriber
  *
- * Each combineLatest doubles the emission count, producing 2^N
- * subscriber calls per source update in RxJS.
+ * Each combineLatest doubles the emission count, producing 2^N subscriber calls
+ * per source update in RxJS.
  */
 import * as path from 'node:path';
 import { range } from 'ts-data-forge';

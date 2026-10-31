@@ -65,11 +65,10 @@ export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
 
 // SyncChildObservable
 
-// The helpers stay in a namespace so their names do not crowd the module
-// scope. A namespace holding only types is erasable, so it passes
-// `erasableSyntaxOnly` (TS1294); the `expectType` assertions are call
-// statements, which is why they sit below it rather than beside the types
-// they check.
+// The helpers stay in a namespace so their names do not crowd the module scope.
+// A namespace holding only types is erasable, so it passes `erasableSyntaxOnly`
+// (TS1294); the `expectType` assertions are call statements, which is why they
+// sit below it rather than beside the types they check.
 namespace SynStateInternals {
   type Cast<A> = A extends NonEmptyUnknownList ? A : never;
 

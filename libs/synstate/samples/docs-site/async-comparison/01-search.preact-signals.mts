@@ -12,14 +12,14 @@ import { testSearch } from './search-test-suite.mjs';
 export const createSearch = () => {
   const query = signal('');
 
-  // A signal ignores a write equal to its value,
-  // so a query that did not change triggers nothing.
+  // A signal ignores a write equal to its value, so a query that did not change
+  // triggers nothing.
   const debouncedQuery = signal('');
 
   const searchState = signal<SearchState>(idleState);
 
-  // There is no debounce; an effect whose cleanup clears the timer
-  // runs again on every keystroke.
+  // There is no debounce; an effect whose cleanup clears the timer runs again
+  // on every keystroke.
   const disposeDebounce = effect(() => {
     const q = query.value.trim();
 

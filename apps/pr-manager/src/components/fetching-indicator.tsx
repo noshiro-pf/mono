@@ -9,16 +9,15 @@ type Props = Readonly<{
 
 /**
  * Beside when the report on screen was read, while a newer read is out
- * (`reader.fetching`): a ring turning and "Updating…". What is shown may be
- * the report kept from the last visit or the last poll, minutes old, and
- * without this a reader cannot tell a page about to change from one that has
- * stopped.
+ * (`reader.fetching`): a ring turning and "Updating…". What is shown may be the
+ * report kept from the last visit or the last poll, minutes old, and without
+ * this a reader cannot tell a page about to change from one that has stopped.
  *
- * In the accent colour rather than the status amber, which on this page
- * means a workflow run going. While no read is out it is hidden rather than
- * taken away (`index.css`): every poll would otherwise add a line and take
- * it away again on a screen narrow enough to wrap it onto one of its own,
- * moving the whole page by it.
+ * In the accent colour rather than the status amber, which on this page means a
+ * workflow run going. While no read is out it is hidden rather than taken away
+ * (`index.css`): every poll would otherwise add a line and take it away again
+ * on a screen narrow enough to wrap it onto one of its own, moving the whole
+ * page by it.
  */
 export const FetchingIndicator = ({ compact }: Props): JSX.Element => (
   <span

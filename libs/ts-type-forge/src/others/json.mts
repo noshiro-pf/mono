@@ -65,8 +65,8 @@ export type MutableJsonValue =
  * where keys are strings and values are JSON values.
  *
  * Use this type for representing parsed JSON data that should not be modified,
- * such as configuration files, API responses that should remain unchanged,
- * or when enforcing immutability in your application.
+ * such as configuration files, API responses that should remain unchanged, or
+ * when enforcing immutability in your application.
  *
  * @example
  * ```ts

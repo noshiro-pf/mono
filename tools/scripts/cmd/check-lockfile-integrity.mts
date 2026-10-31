@@ -21,8 +21,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  * - every `dependencies` / `optionalDependencies` entry of a snapshot does too;
  * - every snapshot, peer suffix removed, has its entry in `packages:`.
  *
- * The file holds two YAML documents — the package manager's own lockfile
- * first, then the workspace's — and each is checked against itself.
+ * The file holds two YAML documents — the package manager's own lockfile first,
+ * then the workspace's — and each is checked against itself.
  */
 export const checkLockfileIntegrity = async (): Promise<
   Result<number, string>
@@ -286,9 +286,9 @@ const scanLine = (
 };
 
 /**
- * One pass over a document, remembering the key last seen at each indent
- * that matters: the section at 0, the importer or snapshot at 2, its field at
- * 4 and, under an importer, the dependency name at 6.
+ * One pass over a document, remembering the key last seen at each indent that
+ * matters: the section at 0, the importer or snapshot at 2, its field at 4 and,
+ * under an importer, the dependency name at 6.
  */
 const scanDocument = (
   lines: readonly DocumentLine[],

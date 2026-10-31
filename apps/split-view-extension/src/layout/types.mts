@@ -97,12 +97,12 @@ export type PaneState = Readonly<{
    * How far this pane's page is scaled, `1` being unzoomed.
    *
    * It is applied by the *page*, as `zoom` on the `iframe` — which Chrome
-   * propagates into the frame as an effective zoom, so the framed site is
-   * laid out for the viewport it appears to have *and rasterized at that
-   * scale*. A `transform` would do the layout part and not the second: the
-   * frame's own renderer would draw at 1x and the compositor would stretch
-   * it, which is visibly soft. Neither needs the content script, so a page
-   * that will not run one can still be zoomed.
+   * propagates into the frame as an effective zoom, so the framed site is laid
+   * out for the viewport it appears to have *and rasterized at that scale*. A
+   * `transform` would do the layout part and not the second: the frame's own
+   * renderer would draw at 1x and the compositor would stretch it, which is
+   * visibly soft. Neither needs the content script, so a page that will not run
+   * one can still be zoomed.
    */
   zoom: number;
 
@@ -122,9 +122,9 @@ export type WorkspaceState = Readonly<{
   nextPaneId: PaneId;
   activePaneId: PaneId | undefined;
   /**
-   * What the tab is called, when the split view was opened with a title of
-   * its own — `title=` in its URL, which is how the PR Manager names one after
-   * the pull request. Absent, the tab follows the first pane's page. Optional
+   * What the tab is called, when the split view was opened with a title of its
+   * own — `title=` in its URL, which is how the PR Manager names one after the
+   * pull request. Absent, the tab follows the first pane's page. Optional
    * rather than `| undefined` so that every record saved before it existed is
    * still one of these.
    */

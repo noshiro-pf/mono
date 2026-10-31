@@ -84,9 +84,9 @@ const logStep = async ({
   mut_step.current += 1;
 };
 
-// We use `spawn` with `stdio: 'inherit'` so that the (potentially huge)
-// gen pipeline output streams directly through, instead of being buffered
-// by `child_process.exec` (which caps at 1MB by default).
+// We use `spawn` with `stdio: 'inherit'` so that the (potentially huge) gen
+// pipeline output streams directly through, instead of being buffered by
+// `child_process.exec` (which caps at 1MB by default).
 const runCmdStep = (cmd: string, errorMsg: string): Promise<void> =>
   new Promise((resolve) => {
     const child = spawn(cmd, {

@@ -8,8 +8,8 @@ type Props = Readonly<{
  * An SVG `<title>`: an element's tooltip, and its accessible description.
  *
  * Written out rather than as `<title>` in JSX, which synstate-dom creates as
- * the HTML element of the same name wherever it appears — one a browser
- * neither shows nor reads inside an `<svg>`.
+ * the HTML element of the same name wherever it appears — one a browser neither
+ * shows nor reads inside an `<svg>`.
  */
 export const SvgTitle = ({ children }: Props): JSX.Element =>
   mountable(() => {

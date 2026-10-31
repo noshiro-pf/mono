@@ -42,8 +42,7 @@ export const isPanicError = (value: unknown): value is PanicError =>
 
 /**
  * Builds a fresh panic error. `panic(message)` throws what this returns;
- * call it directly only when the error has to be produced without being
- * thrown.
+ * call it directly only when the error has to be produced without being thrown.
  *
  * @param message What went wrong.
  * @param options `cause`: the underlying value, attached as `Error.cause`.
@@ -65,10 +64,10 @@ export const createPanicError = (
  * points at where the failure happened, not at the panic — survive.
  * `panic(error)` is this plus the throw.
  *
- * An error that cannot take the mark is wrapped instead: the result is a
- * fresh panic carrying it as `cause`. The test is extensibility, not
- * `Object.isFrozen`: a sealed error (`Object.seal` / `preventExtensions`)
- * keeps `message` and `stack` writable, so `isFrozen` is `false` for it while
+ * An error that cannot take the mark is wrapped instead: the result is a fresh
+ * panic carrying it as `cause`. The test is extensibility, not
+ * `Object.isFrozen`: a sealed error (`Object.seal` / `preventExtensions`) keeps
+ * `message` and `stack` writable, so `isFrozen` is `false` for it while
  * `Object.assign` still throws a `TypeError` on the new property.
  */
 export const markAsPanic = (

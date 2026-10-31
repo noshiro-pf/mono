@@ -4,8 +4,8 @@ import { layoutStore } from '../store/index.mjs';
 
 type Props = Readonly<{
   /**
-   * The line before the middle column, or the one before the right: `0` or
-   * `1` with three columns, and `0` either way with two. Resolved when it is
+   * The line before the middle column, or the one before the right: `0` or `1`
+   * with three columns, and `0` either way with two. Resolved when it is
    * dragged, so that going from two columns to three keeps the line drawn.
    */
   position: 'first' | 'last';
@@ -15,10 +15,10 @@ type Props = Readonly<{
  * A line between two columns, dragged to share the width differently, and
  * double-clicked to even the two columns beside it.
  *
- * A drag reads the pointer against the whole layout's box, so the line
- * follows the pointer rather than a distance moved. Pointer-only, and hidden
- * from assistive technology for it: the keyboard's way to the same thing is
- * the sliders in the layout settings, which are real controls rather than a
+ * A drag reads the pointer against the whole layout's box, so the line follows
+ * the pointer rather than a distance moved. Pointer-only, and hidden from
+ * assistive technology for it: the keyboard's way to the same thing is the
+ * sliders in the layout settings, which are real controls rather than a
  * `separator` that would have to be taught to be one.
  */
 export const ColumnDivider = ({ position }: Props): JSX.Element => {

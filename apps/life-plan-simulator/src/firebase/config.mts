@@ -1,8 +1,8 @@
 /**
  * The Firebase web app's configuration. Public by design — it names the
- * project, it does not grant anything: what a signed-in user may read and
- * write is decided by `firestore.rules`, and which sites may sign in by the
- * project's authorized domains.
+ * project, it does not grant anything: what a signed-in user may read and write
+ * is decided by `firestore.rules`, and which sites may sign in by the project's
+ * authorized domains.
  *
  * No `measurementId`: Analytics is not used.
  */

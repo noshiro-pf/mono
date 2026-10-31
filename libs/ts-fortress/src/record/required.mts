@@ -21,8 +21,8 @@ import { isOptionalProperty, type RequiredPropertyType } from './optional.mjs';
 import { record } from './record.mjs';
 
 /**
- * Creates a Required type. If keysToBeRequired is set, only those keys are
- * made required, otherwise, all properties are made required.
+ * Creates a Required type. If keysToBeRequired is set, only those keys are made
+ * required, otherwise, all properties are made required.
  */
 export const required = <
   const R extends UnknownRecord,

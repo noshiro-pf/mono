@@ -17,8 +17,8 @@ import {
 export const createSearchView = (): SearchView => {
   const [query, setQuery] = createState('a');
 
-  // A newer query completes the previous inner observable,
-  // which cancels its request.
+  // A newer query completes the previous inner observable, which cancels its
+  // request.
   const searchState = query.pipe(
     switchMap((q) =>
       timer(answerMs)

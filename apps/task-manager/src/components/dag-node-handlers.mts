@@ -9,9 +9,9 @@ import { dagLayoutStore, editorStore } from '../store/index.mjs';
 
 /**
  * What a node of the DAG does: a tap, or Enter or Space when it is focused,
- * opens it; an arrow key moves it (further with Shift), which is saved once
- * the keys pause — when `isMovable` says so, which it does in the view modes
- * the reader arranges. Dragging it is the canvas's (`dag-canvas.tsx`).
+ * opens it; an arrow key moves it (further with Shift), which is saved once the
+ * keys pause — when `isMovable` says so, which it does in the view modes the
+ * reader arranges. Dragging it is the canvas's (`dag-canvas.tsx`).
  */
 export const dagNodeHandlers = (
   ref: NodeRef,
@@ -48,8 +48,8 @@ export const dagNodeHandlers = (
 
 /**
  * The node `target` is part of, by its `data-node-id`; `undefined` off one.
- * The canvas finds the node an event came from this way, so the nodes need
- * no handlers for it.
+ * The canvas finds the node an event came from this way, so the nodes need no
+ * handlers for it.
  */
 export const nodeIdOf = (
   target: EventTarget | null,

@@ -12,17 +12,17 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * A dependency bump publishes nothing on its own — changesets decide releases
  * here (see CLAUDE.md, "Releases") — so a run that moved a published package's
- * *runtime* dependencies has to say so, or the fix ships to nobody. What
- * counts as runtime is `dependencies`, `peerDependencies` and
- * `optionalDependencies`: those three are what a consumer installs.
+ * *runtime* dependencies has to say so, or the fix ships to nobody. What counts
+ * as runtime is `dependencies`, `peerDependencies` and `optionalDependencies`:
+ * those three are what a consumer installs.
  * `devDependencies` moving is invisible to them.
  *
  * ## Why this is a step of its own, before the token
  *
  * It used to be a `node <<'NODE'` heredoc inside the workflow's last step,
- * which is the step that holds the GitHub App token. Length was not the
- * problem — the problem is that everything in that step runs with the token in
- * its environment, so the less that happens there the better, and none of this
+ * which is the step that holds the GitHub App token. Length was not the problem
+ * — the problem is that everything in that step runs with the token in its
+ * environment, so the less that happens there the better, and none of this
  * needs the token. Reading `package.json` files and writing a changeset is
  * exactly the work that belongs before it.
  *

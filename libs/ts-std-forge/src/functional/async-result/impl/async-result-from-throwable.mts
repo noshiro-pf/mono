@@ -5,8 +5,7 @@ import type { AsyncResult } from '../async-result.mjs';
 /**
  * Wraps a function returning a `Promise` in an `AsyncResult`. Both a
  * synchronous `throw` while calling `fn` and an asynchronous rejection of the
- * returned Promise are caught, passed through `mapError`, and carried as
- * `Err`.
+ * returned Promise are caught, passed through `mapError`, and carried as `Err`.
  *
  * Passing `mapError` is what gives the error channel a concrete type `E`.
  * Omitting it carries the thrown value through untouched, leaving the error

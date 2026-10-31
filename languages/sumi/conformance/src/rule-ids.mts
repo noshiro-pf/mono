@@ -2,8 +2,8 @@
  * Neutral rule IDs of the subset language (`<spec-area>/<rule>`).
  *
  * This registry is the executable counterpart of
- * `languages/sumi/docs/enforcement-map.md`: fixtures may only expect IDs
- * listed here (plus `compiler/<code>` for diagnostics of the fixed
+ * `languages/sumi/docs/enforcement-map.md`: fixtures may only expect IDs listed
+ * here (plus `compiler/<code>` for diagnostics of the fixed
  * compilerOptions). Engine mappings (neutral ID → ESLint rule names / tsc
  * codes) will live next to each engine's runner (Phase 1).
  */

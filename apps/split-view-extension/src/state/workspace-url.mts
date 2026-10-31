@@ -104,8 +104,8 @@ export const putWorkspaceInUrl = (
  *
  * Written by hand rather than with `URLSearchParams`, whose serialization
  * percent-encodes `:` and `/` — legal in a query as they are — and turns every
- * address in the bar into `https%3A%2F%2F…`. Only what would be read as part
- * of the query itself is escaped, so an address stays readable, and a decoder
+ * address in the bar into `https%3A%2F%2F…`. Only what would be read as part of
+ * the query itself is escaped, so an address stays readable, and a decoder
  * reads either form back the same.
  */
 export const workspaceUrlSearch = (
@@ -265,10 +265,10 @@ const withoutTrailing = <T,>(
 /**
  * One value as `URLSearchParams` would write it, with `:` and `/` put back.
  *
- * Both are allowed in a query by the URL standard and are what makes an
- * address legible; what has to go is what the query's own syntax would read —
- * `&`, `=`, `#`, `+` (a space, to a form decoder) and `%` — and the form
- * encoding already escapes those.
+ * Both are allowed in a query by the URL standard and are what makes an address
+ * legible; what has to go is what the query's own syntax would read — `&`, `=`,
+ * `#`, `+` (a space, to a form decoder) and `%` — and the form encoding already
+ * escapes those.
  */
 const encode = (value: string): string => {
   const encoded = new URLSearchParams({ v: value });

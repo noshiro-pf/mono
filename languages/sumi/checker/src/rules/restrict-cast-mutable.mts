@@ -24,8 +24,8 @@ import { outermostWrapper, unwrap, wrapperLayers } from '../ast/index.mjs';
 import type { Rule } from '../engine/index.mjs';
 
 /**
- * `readonly/restrict-cast-mutable` — `castMutable` is used only as the
- * boundary escape it is meant to be (Sumi spec/variables-and-mutation.md,
+ * `readonly/restrict-cast-mutable` — `castMutable` is used only as the boundary
+ * escape it is meant to be (Sumi spec/variables-and-mutation.md,
  * spec/readonly.md).
  *
  * Under readonly enforcement one's own values are readonly, and an outside API
@@ -48,8 +48,8 @@ import type { Rule } from '../engine/index.mjs';
  *
  * "Handed straight to a call" is an argument of a call or `new`, a JSX
  * attribute, or a property or element of an object or array literal that is
- * itself in such a position — the value an outside API receives, however it
- * is shaped. `as`, `satisfies`, `<T>`, `!` and parentheses are seen through.
+ * itself in such a position — the value an outside API receives, however it is
+ * shaped. `as`, `satisfies`, `<T>`, `!` and parentheses are seen through.
  *
  * `castDeepMutable` is held to the same rule. The escape is recognized by the
  * name its reference resolves to, through import aliases, so an
@@ -110,9 +110,9 @@ export const restrictCastMutable: Rule = {
       return;
     }
 
-    // Unnecessary only if every layer of the argument is accepted as it is
-    // (see `wrapperLayers`): `castMutable(xs as readonly T[])` is the author
-    // saying the value is readonly, and without the cast it would not pass.
+    // Unnecessary only if every layer of the argument is accepted as it is (see
+    // `wrapperLayers`): `castMutable(xs as readonly T[])` is the author saying
+    // the value is readonly, and without the cast it would not pass.
     const isAcceptedAtEveryLayer = wrapperLayers(argument).every((layer) => {
       const actual = checker.getTypeAtLocation(layer);
 

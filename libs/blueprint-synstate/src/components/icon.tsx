@@ -11,8 +11,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * Blueprint's `Icon` at 16px: `span.bp6-icon.bp6-icon-<name>` round the
- * inline SVG, which is what Blueprint's style sheets size and colour.
+ * Blueprint's `Icon` at 16px: `span.bp6-icon.bp6-icon-<name>` round the inline
+ * SVG, which is what Blueprint's style sheets size and colour.
  *
  * Hidden from assistive technology, always: each icon here sits on a control
  * whose own label says what it does. Blueprint gives the SVG a `<title>`
@@ -42,9 +42,9 @@ export const Icon = ({ icon, class: className, style }: Props): JSX.Element => (
 );
 
 /**
- * The 16px paths of Blueprint's icons, as `@blueprintjs/icons` (6.14) has
- * them in `lib/esm/generated/16px/paths/`. Copied: the package is reachable
- * only through internal module paths, and it would bring React along.
+ * The 16px paths of Blueprint's icons, as `@blueprintjs/icons` (6.14) has them
+ * in `lib/esm/generated/16px/paths/`. Copied: the package is reachable only
+ * through internal module paths, and it would bring React along.
  */
 const ICON_PATHS_16 = {
   'chevron-down':

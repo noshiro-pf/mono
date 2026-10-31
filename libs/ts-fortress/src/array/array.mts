@@ -23,8 +23,8 @@ import {
  * Either way the elements that are kept go through `elementType.fill`, which
  * returns a valid element as it is apart from excess record properties, and a
  * non-array input becomes the default value. An element is judged as a whole
- * by `elementType.is`: a nested array or record with one wrong part is
- * dropped, not repaired.
+ * by `elementType.is`: a nested array or record with one wrong part is dropped,
+ * not repaired.
  *
  * The option is a `fill` mode only. `prune` takes a value that is already of
  * the type, so it never meets an invalid element, and `is` / `validate` are

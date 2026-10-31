@@ -1,18 +1,17 @@
 /**
  * Every read from Cloud Firestore and every write to it. Outside `src/api/`
- * nothing may import Firestore's reads and writes (`eslint.config.mts`), so
- * the functions here are all the ways there are.
+ * nothing may import Firestore's reads and writes (`eslint.config.mts`), so the
+ * functions here are all the ways there are.
  *
- * **Every write prunes.** A write names its document with a
- * {@link DocTarget} — the reference and the codec of what the document holds
- * — and what reaches the database is the codec's `prune` of the value: what
- * the codec describes and nothing more, however many fields the value
- * carries at run time, nested ones included. This is the only place that
- * prunes a document; the converters (`repository/converters.mts`) only give
- * it its shape.
+ * **Every write prunes.** A write names its document with a {@link DocTarget} —
+ * the reference and the codec of what the document holds — and what reaches the
+ * database is the codec's `prune` of the value: what the codec describes and
+ * nothing more, however many fields the value carries at run time, nested ones
+ * included. This is the only place that prunes a document; the converters
+ * (`repository/converters.mts`) only give it its shape.
  *
- * Reading hands back what is stored as `unknown`: it is data somebody else
- * may have written, and validating it is the caller's.
+ * Reading hands back what is stored as `unknown`: it is data somebody else may
+ * have written, and validating it is the caller's.
  */
 
 import {
@@ -29,8 +28,8 @@ import {
 import { Arr } from 'ts-data-forge';
 import type * as t from 'ts-fortress';
 import type { DeepReadonly } from 'ts-type-forge';
-// In `repository/`, not here: `project-file.mts` measures with it too, in
-// the first chunk, which does not load Firebase until a sign-in (`main.tsx`).
+// In `repository/`, not here: `project-file.mts` measures with it too, in the
+// first chunk, which does not load Firebase until a sign-in (`main.tsx`).
 import { docBytes } from '../repository/index.mjs';
 
 /** Creates or replaces the document `target` with `value`, pruned. */
@@ -49,13 +48,13 @@ export const commitBatch = (
 ): Promise<void> => prepareBatch(firestore, batchWrites(write)).commit();
 
 /**
- * Applies everything `write` hands its {@link BatchWriter}, in as many
- * batches as Firestore needs ({@link splitWrites}) — for more writes than one
- * batch takes. Every batch is handed over at once, so that offline each is
- * queued on this device rather than waiting for the one before it to reach
- * the server. Each is applied whole or not at all, but not the lot: when one
- * fails, the others may be applied, and once every one has been answered the
- * promise rejects, the first failure its cause.
+ * Applies everything `write` hands its {@link BatchWriter}, in as many batches
+ * as Firestore needs ({@link splitWrites}) — for more writes than one batch
+ * takes. Every batch is handed over at once, so that offline each is queued on
+ * this device rather than waiting for the one before it to reach the server.
+ * Each is applied whole or not at all, but not the lot: when one fails, the
+ * others may be applied, and once every one has been answered the promise
+ * rejects, the first failure its cause.
  */
 export const commitInBatches = async (
   firestore: DeepReadonly<Firestore>,
@@ -143,8 +142,8 @@ export const batchWrites = (
 };
 
 /**
- * Hands `observer.next` the documents of `ref` once they have loaded, and
- * again on every change after, local writes included. Returns what stops it.
+ * Hands `observer.next` the documents of `ref` once they have loaded, and again
+ * on every change after, local writes included. Returns what stops it.
  */
 export const watchCollection = (
   ref: DeepReadonly<CollectionReference>,
@@ -164,9 +163,9 @@ export const watchCollection = (
   );
 
 /**
- * Hands `observer.next` what document `ref` holds — `undefined` if it does
- * not exist, which no document's data can be — once it has loaded, and
- * again on every change after. Returns what stops it.
+ * Hands `observer.next` what document `ref` holds — `undefined` if it does not
+ * exist, which no document's data can be — once it has loaded, and again on
+ * every change after. Returns what stops it.
  */
 export const watchDoc = (
   ref: DeepReadonly<DocumentReference>,

@@ -15,9 +15,9 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Extracts the options tuple type of a rule from its TypeScript
- * implementation, so that option types stay in sync with the rule source
- * without converting `meta.schema` (JSON Schema) back into TypeScript types.
+ * Extracts the options tuple type of a rule from its TypeScript implementation,
+ * so that option types stay in sync with the rule source without converting
+ * `meta.schema` (JSON Schema) back into TypeScript types.
  */
 type RuleOptionsOf<Name extends keyof typeof tsDataForgeRules> =
   (typeof tsDataForgeRules)[Name] extends TSESLint.RuleModule<

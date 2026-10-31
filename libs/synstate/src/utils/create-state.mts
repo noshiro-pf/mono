@@ -107,8 +107,8 @@ import { createStateSource } from './state-source.mjs';
  *
  * assert.strictEqual(report.getSnapshot().value, held);
  *
- * // An edited title: a new report and a new array, while the summary is
- * // the one held, so `summary` is not told of it.
+ * // An edited title: a new report and a new array, while the summary is the
+ * // one held, so `summary` is not told of it.
  * setReport({
  *   summary: { open: 1 },
  *   pulls: [{ number: 1, title: 'one (edited)' }],
@@ -146,8 +146,8 @@ export const createState = <S,>(
     options,
   );
 
-  // Each compares with the state the write started from, as `dispatch`
-  // does, and builds nothing on the way.
+  // Each compares with the state the write started from, as `dispatch` does,
+  // and builds nothing on the way.
   const updateState = (updateFn: (prev: S) => S): S => {
     const currentState = getSnapshot();
 

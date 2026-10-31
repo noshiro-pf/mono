@@ -18,9 +18,9 @@ const config = {
   gitRevision: 'main',
   // Build source links from an explicit template so they are deterministic
   // regardless of the environment's git remote (which may not resolve to
-  // github.com, e.g. in sandboxes/CI mirrors). `{path}` is resolved relative
-  // to the repository root, so it already includes the
-  // `libs/ts-data-forge/` prefix.
+  // github.com, e.g. in sandboxes/CI mirrors). `{path}` is resolved relative to
+  // the repository root, so it already includes the `libs/ts-data-forge/`
+  // prefix.
   sourceLinkTemplate:
     'https://github.com/noshiro-pf/mono/blob/{gitRevision}/{path}#L{line}',
   headings: {

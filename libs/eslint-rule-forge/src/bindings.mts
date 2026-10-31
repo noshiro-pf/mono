@@ -8,8 +8,8 @@ import {
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
 /**
- * Whether `name`, read at `node`, resolves to something this file writes down
- * — a declaration, a parameter, an import — rather than to a global or a
+ * Whether `name`, read at `node`, resolves to something this file writes down —
+ * a declaration, a parameter, an import — rather than to a global or a
  * standard-library type of the same name.
  *
  * The scope manager makes an implicit variable for every reference it cannot
@@ -29,9 +29,8 @@ export const isLocallyBound = (
 /**
  * Whether `name`, read at `node`, resolves to a binding that is not an import
  * from `moduleName` — a declaration, a parameter, or an import from another
- * module. A fix that makes code at `node` refer to `moduleName`'s export
- * `name` has to give up then, because the name would refer to that binding
- * instead.
+ * module. A fix that makes code at `node` refer to `moduleName`'s export `name`
+ * has to give up then, because the name would refer to that binding instead.
  *
  * The innermost binding decides: an import from `moduleName` at the top of the
  * file does not help a name a function shadows around `node`.

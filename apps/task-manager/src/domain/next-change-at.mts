@@ -4,11 +4,11 @@ import { createEvaluator } from './evaluator.mjs';
 import type { DomainState } from './types.mjs';
 
 /**
- * The earliest time after `now` at which a dependency or a milestone changes
- * by the passage of time alone — a lag running after an event that has
- * happened, a milestone date still to come — or `undefined` when nothing
- * will. A UI re-renders at that time and asks again: whatever that change
- * sets off comes after it.
+ * The earliest time after `now` at which a dependency or a milestone changes by
+ * the passage of time alone — a lag running after an event that has happened, a
+ * milestone date still to come — or `undefined` when nothing will. A UI
+ * re-renders at that time and asks again: whatever that change sets off comes
+ * after it.
  */
 export const nextChangeAt = (
   state: DomainState,

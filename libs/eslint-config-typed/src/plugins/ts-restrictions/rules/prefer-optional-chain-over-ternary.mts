@@ -33,14 +33,14 @@ type MessageIds = 'preferOptionalChain';
  * The check has to catch every nullish value, or the chain would short-circuit
  * where the ternary did not. `== null` / `== undefined` always do, and so does
  * `x === null || x === undefined`. A single strict check does when the type of
- * `x` rules the other value out: `x === undefined` for `B | undefined`, not
- * for `B | null | undefined`. `any`, `unknown` and an unconstrained type
- * parameter rule nothing out, and the type has to rule it out at every
- * `as`, `satisfies` or `!` around `x`.
+ * `x` rules the other value out: `x === undefined` for `B | undefined`, not for
+ * `B | null | undefined`. `any`, `unknown` and an unconstrained type parameter
+ * rule nothing out, and the type has to rule it out at every `as`, `satisfies`
+ * or `!` around `x`.
  *
- * The other branch must be `undefined` itself — `x == null ? null : x.b`
- * yields `null`, which `x?.b` would not — and the access must start from the
- * checked value, so that it is the one link the `?.` goes on.
+ * The other branch must be `undefined` itself — `x == null ? null : x.b` yields
+ * `null`, which `x?.b` would not — and the access must start from the checked
+ * value, so that it is the one link the `?.` goes on.
  *
  * Left alone where the chain would behave differently: as a callee or a tag,
  * `(x?.f)()` calls `f` with `x` as `this` where the ternary passes none, and
@@ -49,8 +49,8 @@ type MessageIds = 'preferOptionalChain';
  * `(x == null ? undefined : x.b).c` becomes `(x?.b).c` and still throws when
  * `x` is nullish.
  *
- * The ternary reads the checked value twice and the chain once; a getter on
- * the way is therefore called one time fewer.
+ * The ternary reads the checked value twice and the chain once; a getter on the
+ * way is therefore called one time fewer.
  */
 export const preferOptionalChainOverTernary: TSESLint.RuleModule<
   MessageIds,
@@ -101,8 +101,8 @@ export const preferOptionalChainOverTernary: TSESLint.RuleModule<
       getLayerTypes(node).some((type) => typeMayHold(type, flags, checker));
 
     /**
-     * What `test` checks: the value, and whether the test is true exactly
-     * when that value is nullish (`false`: exactly when it is not).
+     * What `test` checks: the value, and whether the test is true exactly when
+     * that value is nullish (`false`: exactly when it is not).
      */
     const nullishCheckOf = (
       wrappedTest: DeepReadonly<TSESTree.Expression>,
@@ -349,8 +349,8 @@ const outermostWrapperOf = (
 };
 
 /**
- * Whether the ternary sits where an optional chain means something else: as
- * a callee or a tag (the chain passes `this`), or under `delete`.
+ * Whether the ternary sits where an optional chain means something else: as a
+ * callee or a tag (the chain passes `this`), or under `delete`.
  */
 const changesMeaningAsChain = (
   node: DeepReadonly<TSESTree.ConditionalExpression>,

@@ -1,14 +1,14 @@
 /**
- * The edges routed round the nodes (`edge-routing.mts`) run along the lines
- * of one grid, so two that go through the same gap find the same line and
- * are drawn on top of each other, or turn off it across each other. Here
- * every stretch that runs along a line another edge runs along too is
- * moved off it, side by side with the others, {@link LANE_GAP} apart — as
- * far as the nodes on either side leave room — in the order that has them
- * cross the fewest times where they turn off it.
+ * The edges routed round the nodes (`edge-routing.mts`) run along the lines of
+ * one grid, so two that go through the same gap find the same line and are
+ * drawn on top of each other, or turn off it across each other. Here every
+ * stretch that runs along a line another edge runs along too is moved off it,
+ * side by side with the others, {@link LANE_GAP} apart — as far as the nodes on
+ * either side leave room — in the order that has them cross the fewest times
+ * where they turn off it.
  *
- * Only the stretches between two turns move: the first and the last of an
- * edge, which leave and enter a node at its port, stay where they are.
+ * Only the stretches between two turns move: the first and the last of an edge,
+ * which leave and enter a node at its port, stay where they are.
  */
 
 import { Arr, Num } from 'ts-data-forge';
@@ -18,9 +18,9 @@ import type { AxisBox, AxisPoint } from './edge-geometry.mjs';
 export const LANE_GAP = 8;
 
 /**
- * The `paths` — each the points where an edge turns, both ends included, of
- * the edge `id` — with the stretches that share a line spread across it,
- * kept `clearance` clear of every one of `boxes`. In the order given.
+ * The `paths` — each the points where an edge turns, both ends included, of the
+ * edge `id` — with the stretches that share a line spread across it, kept
+ * `clearance` clear of every one of `boxes`. In the order given.
  */
 export const separateLanes = (
   paths: readonly Readonly<{ id: string; corners: readonly AxisPoint[] }>[],
@@ -87,8 +87,8 @@ export const separateLanes = (
 
   return paths.map(({ corners }, path) =>
     corners.map((corner, index) => {
-      // A corner ends the stretch before it and starts the one after: one
-      // runs along, the other across, and each moves it on its own axis.
+      // A corner ends the stretch before it and starts the one after: one runs
+      // along, the other across, and each moves it on its own axis.
       const startsAlong = isAlong(corner, corners[index + 1]);
 
       const fromStarting = mut_shifts.get(`${path} ${index}`) ?? 0;
@@ -110,15 +110,15 @@ export const separateLanes = (
 };
 
 /**
- * The `paths` — each the points where an edge from the node `from` to the
- * node `to` turns, both ends included — with the routed edges that leave
- * one side of a node, or enter it, given its ports there in the order they
- * come from: the edge that comes from lowest across takes the lowest port.
- * A port is given by the curves (`edge-geometry.mts`) in the order of the
- * nodes at the other ends, which a path round the nodes may not keep, so
- * that two edges arriving cross in front of the node. A side is left as it
- * is where a path, moved to its new port, would come within `clearance` of
- * one of `boxes` other than its own two.
+ * The `paths` — each the points where an edge from the node `from` to the node
+ * `to` turns, both ends included — with the routed edges that leave one side of
+ * a node, or enter it, given its ports there in the order they come from: the
+ * edge that comes from lowest across takes the lowest port.
+ * A port is given by the curves (`edge-geometry.mts`) in the order of the nodes
+ * at the other ends, which a path round the nodes may not keep, so that two
+ * edges arriving cross in front of the node. A side is left as it is where a
+ * path, moved to its new port, would come within `clearance` of one of `boxes`
+ * other than its own two.
  */
 export const orderPorts = (
   paths: readonly Readonly<{
@@ -337,8 +337,8 @@ const overlapping = (
 };
 
 /**
- * The stretches that share a line with one another, or run closer to it
- * than {@link LANE_GAP}, each set in no order: on one axis, each overlapping
+ * The stretches that share a line with one another, or run closer to it than
+ * {@link LANE_GAP}, each set in no order: on one axis, each overlapping
  * another, of two paths or more.
  */
 const bundlesOf = (
@@ -359,8 +359,8 @@ const bundlesOf = (
  * Where a stretch goes among the others of its line, lowest first. One that
  * turns off to the low side goes below one that turns off to the high side;
  * of two that turn off to the same side at the same end, the one that turns
- * further out goes further from that side, round the other's turn rather
- * than across it.
+ * further out goes further from that side, round the other's turn rather than
+ * across it.
  */
 const laneKey = (stretch: Stretch, low: number, high: number): number => {
   const span = high - low + 1;
@@ -377,9 +377,9 @@ const compareIds = (a: string, b: string): number =>
 
 /**
  * How far each stretch of `bundle` moves across its line: side by side, in
- * order, {@link LANE_GAP} apart or as close as the room between `boxes`
- * makes them, round the line where the room allows. Nothing moves where
- * there is no room.
+ * order, {@link LANE_GAP} apart or as close as the room between `boxes` makes
+ * them, round the line where the room allows. Nothing moves where there is no
+ * room.
  */
 const laneShifts = (
   bundle: readonly Stretch[],

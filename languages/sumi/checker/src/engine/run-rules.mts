@@ -18,10 +18,10 @@ import type { CheckerDiagnostic, Rule } from './types.mjs';
  *
  * Doing this on TypeScript 7's own API rather than through a linter is what
  * makes the program the rules see the same program `sumi check` type-checks
- * with — same compiler, same version, same `tsconfig` — and lets one walk
- * serve every rule. Measured on synstate (76 files, 804 declaration names
- * queried): 66 ms to open the project, 18 ms to walk it, 164 ms of checker
- * queries, 262 ms in total.
+ * with — same compiler, same version, same `tsconfig` — and lets one walk serve
+ * every rule. Measured on synstate (76 files, 804 declaration names queried):
+ * 66 ms to open the project, 18 ms to walk it, 164 ms of checker queries, 262
+ * ms in total.
  *
  * @param tsconfigPath Absolute path to the project's tsconfig.
  * @param rules The rules to run. Each node is offered to all of them before
@@ -114,8 +114,8 @@ const walkFile = (
   program: Program,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   checker: Checker,
-  // The accumulator every rule reports into: one array for the whole run, so
-  // a rule's `report` costs a push rather than a copy.
+  // The accumulator every rule reports into: one array for the whole run, so a
+  // rule's `report` costs a push rather than a copy.
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_diagnostics: CheckerDiagnostic[],
 ): void => {

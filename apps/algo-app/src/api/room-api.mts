@@ -11,8 +11,8 @@ export type RoomApi = Readonly<{
   addPlayer: (roomId: string, player: Player) => Promise<void>;
   addAction: (roomId: string, action: GameStateAction) => Promise<void>;
   /**
-   * Calls `onChange` with the room now and on every change, until the
-   * returned function is called.
+   * Calls `onChange` with the room now and on every change, until the returned
+   * function is called.
    */
   watchRoom: (roomId: string, onChange: (room: Room) => void) => () => void;
   /**

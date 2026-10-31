@@ -22,10 +22,10 @@ export const derive = <const BS extends NonEmptyTuple<Bindable<unknown>>, R>(
   bindables: BS,
   fn: (...values: BindableValues<BS>) => R,
 ): Bindable<R> => {
-  // `fn` is called with the value of each of `bindables`, position by
-  // position: the constants themselves, or their observables' values. The
-  // checker cannot follow a position through `Arr.map`, which carries one
-  // element type for the whole tuple.
+  // `fn` is called with the value of each of `bindables`, position by position:
+  // the constants themselves, or their observables' values. The checker cannot
+  // follow a position through `Arr.map`, which carries one element type for the
+  // whole tuple.
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- see above
   const project = fn as (...values: readonly unknown[]) => R;
 

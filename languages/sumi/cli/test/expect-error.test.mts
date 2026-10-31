@@ -292,8 +292,8 @@ describe(applyExpectErrors, () => {
   });
 
   test('reports an oxlint-disable directive that silences a preset rule', () => {
-    // oxlint applies the directive itself, so the diagnostic never reaches
-    // this pass; the directive is what is left to report.
+    // oxlint applies the directive itself, so the diagnostic never reaches this
+    // pass; the directive is what is left to report.
     withFile(
       dedent`
         // oxlint-disable-next-line no-var

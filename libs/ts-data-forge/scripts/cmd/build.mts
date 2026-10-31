@@ -19,9 +19,9 @@ const monorepoRootPath = path.resolve(workspaceRootPath, '../..');
  * alias "typescript-native" because the "typescript" package must stay on 6.x
  * for tools that require the JS compiler API (typescript-eslint, typedoc,
  * prettier-plugin-organize-imports, ...), which TypeScript 7 no longer
- * provides. Invoked via an explicit path because both packages declare a
- * `tsc` bin and the winner of the `node_modules/.bin/tsc` conflict is not
- * guaranteed. It is hoisted to the monorepo root's `node_modules`.
+ * provides. Invoked via an explicit path because both packages declare a `tsc`
+ * bin and the winner of the `node_modules/.bin/tsc` conflict is not guaranteed.
+ * It is hoisted to the monorepo root's `node_modules`.
  */
 const nativeTsc = path.resolve(
   monorepoRootPath,

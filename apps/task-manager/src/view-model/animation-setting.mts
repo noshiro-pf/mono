@@ -32,8 +32,8 @@ export const animationSettingLabels: ReadonlyRecord<AnimationSetting, string> =
   m.settings.animations;
 
 /**
- * Whether the nodes are animated under `setting`, for a reader who does or
- * does not ask the system for less motion.
+ * Whether the nodes are animated under `setting`, for a reader who does or does
+ * not ask the system for less motion.
  */
 export const shouldAnimate = (
   setting: AnimationSetting,

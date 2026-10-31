@@ -1,7 +1,7 @@
 /**
  * The default `mutableVariablePrefixes` and `mutablePropertyPrefixes` of the
- * transformers: a name that starts with one of these is left mutable. A
- * private name (`#mut_x`) is matched with or after its `#`.
+ * transformers: a name that starts with one of these is left mutable. A private
+ * name (`#mut_x`) is matched with or after its `#`.
  *
  * The ESLint counterpart is `mutablePrefix` in
  * `libs/eslint-config-typed/src/constants/mutable-prefix.mts`, from which
@@ -15,9 +15,9 @@ export const DEFAULT_MUTABLE_PREFIXES: readonly string[] = Object.freeze([
 
 /**
  * The default `mutableTypePrefixes` of the transformers: a type alias, an
- * interface or a class whose name starts with one of these is left mutable,
- * and `append-as-const` adds no `as const` where the value has to be
- * assignable to it (an annotated variable, `satisfies`, an arrow's return).
+ * interface or a class whose name starts with one of these is left mutable, and
+ * `append-as-const` adds no `as const` where the value has to be assignable to
+ * it (an annotated variable, `satisfies`, an arrow's return).
  * `Mutable` suits the PascalCase of type names; `mut_` is accepted as for
  * variables. No ESLint rule reads type names, so there is no counterpart to
  * keep in step.

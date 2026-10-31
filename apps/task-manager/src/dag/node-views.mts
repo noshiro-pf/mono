@@ -1,8 +1,8 @@
 /**
  * What each node of the DAG shows at a time: its title cut to fit a node of
- * each size (`view-model/node-size.mts`), on up to three lines on a large
- * one; the state that colours it — a task's display status, a milestone's
- * reached or not —; a task's due date and priority, and a milestone's date.
+ * each size (`view-model/node-size.mts`), on up to three lines on a large one;
+ * the state that colours it — a task's display status, a milestone's reached or
+ * not —; a task's due date and priority, and a milestone's date.
  * Separate from the layout, which does not change with any of it.
  */
 
@@ -194,8 +194,8 @@ export type MilestoneNodeView = DeepReadonly<{
   /** Cut to fit a compact node, after the check box if there is one. */
   compactTitle: string;
   /**
-   * Broken into the lines of a large node, the last cut if need be, the
-   * first after the check box if there is one.
+   * Broken into the lines of a large node, the last cut if need be, the first
+   * after the check box if there is one.
    */
   largeTitle: string[];
   reached: boolean;

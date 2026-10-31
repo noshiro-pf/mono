@@ -14,8 +14,8 @@ type Options = readonly [];
 type MessageIds = 'addInferredTypeArguments' | 'missingTypeArguments';
 
 /**
- * The global collection constructors, each with the annotation names whose
- * type arguments can be copied onto it.
+ * The global collection constructors, each with the annotation names whose type
+ * arguments can be copied onto it.
  *
  * An annotation naming the constructor itself (`const s: Set<T> = new Set()`)
  * is not copied: `@typescript-eslint/consistent-generic-constructors` moves
@@ -65,9 +65,9 @@ const collectionAnnotations = new Map<string, ReadonlySet<string>>([
  * offered as a suggestion, unless they are `any`, `unknown` or `never`.
  *
  * The argument is read through `as` / `satisfies` / `!` / `<T>`
- * (`new Set(['a'] as const)` is still an array literal). An initializer
- * wrapped in one is reported without a fix, since the wrapper, not the
- * annotation, then says what the value is.
+ * (`new Set(['a'] as const)` is still an array literal). An initializer wrapped
+ * in one is reported without a fix, since the wrapper, not the annotation, then
+ * says what the value is.
  */
 export const explicitCollectionTypeArguments: TSESLint.RuleModule<
   MessageIds,
@@ -287,9 +287,9 @@ const contextualTypeArguments = (
 };
 
 /**
- * The type arguments to suggest for `node`, as source text (`<string, number>`),
- * or `undefined` without type information or when there are none worth
- * writing.
+ * The type arguments to suggest for `node`, as source text
+ * (`<string, number>`), or `undefined` without type information or when there
+ * are none worth writing.
  *
  * The contextual type comes first — a `ReadonlySet<Id>` parameter, a
  * `ReadonlyMap<K, V>` property — when it is one of `collectionNames`: it is

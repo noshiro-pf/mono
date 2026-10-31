@@ -53,8 +53,8 @@ const addDiagnosticPermissions = (outDir: string): VitePlugin => ({
 });
 
 /**
- * The pr-manager dev server, `pnpm run dev` and `pnpm run preview` alike,
- * as the origins its "split view" links come from while it is being worked on.
+ * The pr-manager dev server, `pnpm run dev` and `pnpm run preview` alike, as
+ * the origins its "split view" links come from while it is being worked on.
  *
  * `public/manifest.json` lets `https://noshiro-pf.github.io` open `split.html`;
  * a link clicked on the same page served from `localhost` is otherwise refused
@@ -64,10 +64,10 @@ const addDiagnosticPermissions = (outDir: string): VitePlugin => ({
  * `app-dev-ports.mts`, and so that it is one port rather than all of
  * `localhost`.
  *
- * **A development build only.** Whatever else runs on that port on a
- * machine with the extension installed could open a split view of its
- * choosing, so a production build — the one `pack` and `pack:crx` make, and
- * the one the README installs — lists the published origin and nothing else.
+ * **A development build only.** Whatever else runs on that port on a machine
+ * with the extension installed could open a split view of its choosing, so a
+ * production build — the one `pack` and `pack:crx` make, and the one the README
+ * installs — lists the published origin and nothing else.
  */
 const addPrManagerDevOrigins = (outDir: string): VitePlugin => ({
   name: 'split-view:pr-manager-dev-origins',
@@ -137,8 +137,8 @@ const stripCrossOriginAttribute = (): VitePlugin => ({
  */
 export default defineConfig(({ mode }) => {
   /**
-   * A development build carries the diagnostics and the pr-manager dev
-   * server's origins; a production build carries neither.
+   * A development build carries the diagnostics and the pr-manager dev server's
+   * origins; a production build carries neither.
    */
   const diagnostics = mode !== 'production';
 

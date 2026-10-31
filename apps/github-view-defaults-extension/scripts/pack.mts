@@ -11,9 +11,9 @@ import {
 /**
  * Packs `dist/` into the zip the Chrome Web Store takes.
  *
- * See `store-package.mts` for what comes off on the way, and why the package
- * is a copy of the build rather than the build itself. `pack-crx.mts` is the
- * same thing signed, which is what the store wants once verified CRX upload is
+ * See `store-package.mts` for what comes off on the way, and why the package is
+ * a copy of the build rather than the build itself. `pack-crx.mts` is the same
+ * thing signed, which is what the store wants once verified CRX upload is
  * turned on for the item.
  */
 const main = (): void => {

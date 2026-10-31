@@ -51,17 +51,17 @@ const checkAll = async (): Promise<void> => {
   // `build` emits and nothing else, so the committed sources it used to
   // regenerate on every run are regenerated here instead, once. CI does the
   // same and then asserts the tree is clean — see "Build" in CLAUDE.md. It
-  // needs `dist/`: the re-export generators import their sibling
-  // by name, and `gen:rule-types` lints what it wrote.
+  // needs `dist/`: the re-export generators import their sibling by name, and
+  // `gen:rule-types` lints what it wrote.
   await logStep({
     startMessage: 'Regenerating the generated sources',
     action: () => runCmdStep('pnpm run ws:gen', 'Source generation failed'),
     successMessage: 'Generated sources regenerated',
   });
 
-  // What the build emitted, reached by package name through the `exports`
-  // map — the way a consumer reaches it — plus the API consistency checks
-  // that need a built sibling to read.
+  // What the build emitted, reached by package name through the `exports` map —
+  // the way a consumer reaches it — plus the API consistency checks that need a
+  // built sibling to read.
   await logStep({
     startMessage: 'Checking the build output',
     action: () =>
@@ -79,8 +79,8 @@ const checkAll = async (): Promise<void> => {
   });
 
   // The Sumi lint check of the dogfood packages (`check:sumi` scripts): the
-  // locked compilerOptions, the native type check and the oxlint preset, in
-  // one command per package (languages/sumi/docs/decisions.md, D-46).
+  // locked compilerOptions, the native type check and the oxlint preset, in one
+  // command per package (languages/sumi/docs/decisions.md, D-46).
   await logStep({
     startMessage: 'Running the Sumi check',
     action: () => runCmdStep('pnpm run ws:check:sumi', 'Sumi check failed'),
@@ -157,8 +157,8 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Tests passed',
   });
 
-  // Packs every package and installs it into `verify-npm-packages/local`, so
-  // it needs the build above. Slow, and the last thing CI would tell you.
+  // Packs every package and installs it into `verify-npm-packages/local`, so it
+  // needs the build above. Slow, and the last thing CI would tell you.
   await logStep({
     startMessage: 'Installing and running the packed packages',
     action: () =>
@@ -214,10 +214,10 @@ const checkAll = async (): Promise<void> => {
   // Two narrower-than-CI steps above are worth knowing about as well.
   // `fix:fmt:diff` formats what differs from `origin/main`, where CI runs
   // `fix:fmt:full`, so a file outside the diff that Prettier would rewrite
-  // passes here. And
-  // nothing here asserts the tree is clean afterwards — the fixers above
-  // write, and CI's `z:assert-repo-is-clean` is what turns an uncommitted
-  // rewrite into a failure. Read `git status` before pushing; #1965 again.
+  // passes here. And nothing here asserts the tree is clean afterwards — the
+  // fixers above write, and CI's `z:assert-repo-is-clean` is what turns an
+  // uncommitted rewrite into a failure. Read `git status` before pushing; #1965
+  // again.
   console.info('✅ All checks completed successfully!\n');
 };
 

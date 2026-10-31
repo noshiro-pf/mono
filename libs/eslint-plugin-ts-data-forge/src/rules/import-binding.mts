@@ -9,10 +9,10 @@ import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 /**
  * Binds ts-data-forge's `exportName` as a value once per file (see
- * `bindValueImports`), and gives, for the code at a node, the name a fix
- * writes and the edits that bring it into scope, or `undefined` when no fix
- * can: an import already binds the name to something else, or something other
- * than the import takes it where the code is.
+ * `bindValueImports`), and gives, for the code at a node, the name a fix writes
+ * and the edits that bring it into scope, or `undefined` when no fix can: an
+ * import already binds the name to something else, or something other than the
+ * import takes it where the code is.
  *
  * Every fix that writes the name makes these edits itself, so that one applied
  * alone (an editor's quick fix) is complete; `--fix` then takes one pass per
@@ -54,8 +54,8 @@ export const tsDataForgeValueAtByName = (
 /**
  * {@link tsDataForgeValueAt} for several names one fix writes together: their
  * edits are made as one, so that two names the file does not import go into a
- * single new declaration. `localNames` are the names to write, known before
- * any node is: the export names themselves when they cannot be bound.
+ * single new declaration. `localNames` are the names to write, known before any
+ * node is: the export names themselves when they cannot be bound.
  */
 export const tsDataForgeValuesAt = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

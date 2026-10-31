@@ -4,8 +4,8 @@ import type { ChecksSummary } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
 
 /**
- * The four reserved status roles of the palette. `neutral` is not one of them
- * — it is the absence of a status, which is what `paused` is.
+ * The four reserved status roles of the palette. `neutral` is not one of them —
+ * it is the absence of a status, which is what `paused` is.
  */
 export type StatusRole = 'critical' | 'good' | 'neutral' | 'warning';
 
@@ -21,21 +21,21 @@ export type VerdictPresentation = Readonly<{
 
 /**
  * An icon and a word alongside the colour, never the colour alone: two of the
- * status steps sit below 3:1 on the light surface by design, and the pairing
- * is what the palette asks for in exchange.
+ * status steps sit below 3:1 on the light surface by design, and the pairing is
+ * what the palette asks for in exchange.
  *
  * **Drawn rather than typed.** These were characters — `✓ ✗ ◐ ‖` — chosen
  * over the emoji the Markdown report uses, because GitHub renders `⏸️` from
  * its own font while a page renders it from whatever the reader has, and a
  * machine without an emoji font draws a box. But a character is still at the
- * mercy of a font: `‖` is a double vertical line, and at 12px in whatever
- * the reader has installed it is a smudge rather than a pause. A path is the
- * same shape everywhere and scales with the text around it.
+ * mercy of a font: `‖` is a double vertical line, and at 12px in whatever the
+ * reader has installed it is a smudge rather than a pause. A path is the same
+ * shape everywhere and scales with the text around it.
  *
  * `paused` is `neutral` rather than a status. While `skip-ci` is on, nothing
- * has run and the red a reader might see is the cancelled `opened` run — a
- * held pull request is not a broken one, and colouring it as one would make
- * a queue of them read as a wall of failures.
+ * has run and the red a reader might see is the cancelled `opened` run — a held
+ * pull request is not a broken one, and colouring it as one would make a queue
+ * of them read as a wall of failures.
  */
 export const presentVerdict = (
   verdict: ChecksSummary['verdict'],
@@ -84,9 +84,9 @@ export const describeCheckCounts = (checks: ChecksSummary): string =>
   }).join(' ');
 
 /**
- * The same, spelled out with the names, for the hover. Where the default
- * branch requires no context, they are every one reported on the head
- * (`buildEntries` in `pr-report-core`), and the first line says so.
+ * The same, spelled out with the names, for the hover. Where the default branch
+ * requires no context, they are every one reported on the head (`buildEntries`
+ * in `pr-report-core`), and the first line says so.
  */
 export const describeCheckBreakdown = (
   checks: ChecksSummary,
@@ -113,10 +113,10 @@ type Part = Readonly<{
 }>;
 
 /**
- * The states a required context can be in, in the order a reader triages
- * them: what is wrong, what is still coming, what was skipped or will not
- * come, what is fine. A context with nothing reported yet is still coming,
- * unless the pull request is stacked and it is one that never runs there.
+ * The states a required context can be in, in the order a reader triages them:
+ * what is wrong, what is still coming, what was skipped or will not come, what
+ * is fine. A context with nothing reported yet is still coming, unless the pull
+ * request is stacked and it is one that never runs there.
  */
 const partsOf = (checks: ChecksSummary): readonly Part[] =>
   [

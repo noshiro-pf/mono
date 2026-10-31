@@ -88,8 +88,8 @@ describe(decideClaim, () => {
 
   test('claims one set aside at its head after the base moved', () => {
     // #2267: the set-aside comment is the hand-off, whatever the tip of the
-    // default branch is read as. Until the worker rewrites it as resolved it
-    // is the skill's.
+    // default branch is read as. Until the worker rewrites it as resolved it is
+    // the skill's.
     assert.deepStrictEqual(
       decide(
         'me',
@@ -103,8 +103,8 @@ describe(decideClaim, () => {
   });
 
   test('refuses one that is the worker’s or a person’s', () => {
-    // Nothing set aside, or set aside at a head that has moved: the worker
-    // is about to act on it, or already did.
+    // Nothing set aside, or set aside at a head that has moved: the worker is
+    // about to act on it, or already did.
     assert.strictEqual(decide('me').kind, 'refuse');
 
     assert.strictEqual(

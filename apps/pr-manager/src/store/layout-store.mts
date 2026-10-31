@@ -1,13 +1,12 @@
 /**
- * The layout of the page's blocks, and what is going on with it: the height
- * or the line between two blocks being dragged, and whether the settings are
- * open.
+ * The layout of the page's blocks, and what is going on with it: the height or
+ * the line between two blocks being dragged, and whether the settings are open.
  *
- * What each change does to a layout is `layout.mts`; this holds the current
- * one and, once started, hands it to `save` — which in the browser writes it
- * into the URL — a moment after the last change rather than on every one: a
- * drag changes the layout on each pointer move, and browsers throttle a page
- * that calls `history.replaceState` that often.
+ * What each change does to a layout is `layout.mts`; this holds the current one
+ * and, once started, hands it to `save` — which in the browser writes it into
+ * the URL — a moment after the last change rather than on every one: a drag
+ * changes the layout on each pointer move, and browsers throttle a page that
+ * calls `history.replaceState` that often.
  */
 
 import {

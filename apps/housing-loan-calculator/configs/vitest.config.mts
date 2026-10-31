@@ -5,8 +5,8 @@ import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 
 export default defineViteConfig({
   packageRoot: workspaceRootPath,
-  // `tiny-router-observable` is a private package with no build output, so
-  // node resolution cannot find it at test time — the `paths` entry in
+  // `tiny-router-observable` is a private package with no build output, so node
+  // resolution cannot find it at test time — the `paths` entry in
   // `tsconfig.json` only satisfies TypeScript. `uriWithQueryParams` calls
   // `Router.utils.withSlash`, so its test does reach the module.
   alias: {

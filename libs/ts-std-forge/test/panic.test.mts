@@ -92,8 +92,8 @@ describe(unreachable, () => {
       'Reached code the types mark unreachable',
     );
 
-    // The value form's message is the same sentence plus the value, so pin
-    // that the no-argument one does not end up saying "... : undefined".
+    // The value form's message is the same sentence plus the value, so pin that
+    // the no-argument one does not end up saying "... : undefined".
     let mut_message = '';
 
     try {

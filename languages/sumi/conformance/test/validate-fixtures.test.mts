@@ -8,8 +8,8 @@ import {
 
 /**
  * Phase 0 structural validation of the conformance corpus
- * (languages/sumi/docs/conformance-corpus.md). Engine execution (ESLint
- * preset / the dedicated checker) is added in Phase 1; until then this suite
+ * (languages/sumi/docs/conformance-corpus.md). Engine execution (ESLint preset
+ * / the dedicated checker) is added in Phase 1; until then this suite
  * guarantees that every fixture is well-formed.
  */
 

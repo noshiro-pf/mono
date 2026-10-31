@@ -2,18 +2,18 @@
  * Light or dark, and where the reader's choice of it is kept.
  *
  * **The system decides until the reader does.** With nothing chosen the page
- * follows `prefers-color-scheme`, as it did before there was a button. A
- * choice is kept in the query string, `?theme=light` or `?theme=dark`, rather
- * than in storage: it travels with a bookmark and a pasted link, costs no key
- * on an origin every app under `noshiro-pf.github.io` shares, and is gone
- * from a tab opened without it.
+ * follows `prefers-color-scheme`, as it did before there was a button. A choice
+ * is kept in the query string, `?theme=light` or `?theme=dark`, rather than in
+ * storage: it travels with a bookmark and a pasted link, costs no key on an
+ * origin every app under `noshiro-pf.github.io` shares, and is gone from a tab
+ * opened without it.
  *
  * **Two buttons, one per look, and the pressed one is what is on screen.**
- * Not a third for the system: it would be pressed on a page that looks
- * exactly as one of the other two says, and pressing it would often change
- * nothing visible. So picking a look chooses it, and picking the one the
- * system shows is stored as no choice at all, which is what lets a page that
- * was switched to dark and back follow the system again.
+ * Not a third for the system: it would be pressed on a page that looks exactly
+ * as one of the other two says, and pressing it would often change nothing
+ * visible. So picking a look chooses it, and picking the one the system shows
+ * is stored as no choice at all, which is what lets a page that was switched to
+ * dark and back follow the system again.
  */
 
 import { currentSearch, rewriteSearch, searchOf } from './url.mjs';
@@ -41,9 +41,9 @@ export const themeFromSearch = (search: string): Theme => {
 };
 
 /**
- * The query string with `theme` written into it, and the other parameters
- * left as they were. `auto` is written as the parameter's absence, so a page
- * that follows the system has a URL that says nothing about it.
+ * The query string with `theme` written into it, and the other parameters left
+ * as they were. `auto` is written as the parameter's absence, so a page that
+ * follows the system has a URL that says nothing about it.
  */
 export const searchWithTheme = (search: string, theme: Theme): string => {
   const params = new URLSearchParams(search);
@@ -76,8 +76,8 @@ export const systemColorScheme = (): ColorScheme =>
   matchMedia(DARK_QUERY).matches ? 'dark' : 'light';
 
 /**
- * The media query whose `change` event says the system's preference changed
- * — an OS that turns dark at sunset does so while the page is open.
+ * The media query whose `change` event says the system's preference changed —
+ * an OS that turns dark at sunset does so while the page is open.
  */
 export const systemColorSchemeQuery = (): MediaQueryList =>
   matchMedia(DARK_QUERY);

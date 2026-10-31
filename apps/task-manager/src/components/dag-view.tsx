@@ -16,9 +16,9 @@ import { DagToolbar } from './dag-toolbar.js';
 /**
  * The dependency graph, as the reader arranged it over ELK's layout or in
  * another view mode, with the toolbar over it, the 「表示設定」 panel
- * the toolbar opens, and the nodes selected with what can be done with
- * them (`dag-selection-bar.tsx`). While a new layout is
- * computed the previous one stays up; before the first, a message says so
+ * the toolbar opens, and the nodes selected with what can be done with them
+ * (`dag-selection-bar.tsx`). While a new layout is computed the previous one
+ * stays up; before the first, a message says so
  * in 「DAG」, while 「アーク」 and 「タイル」, which need none, are drawn.
  */
 export const DagView = (): JSX.Element => {
@@ -97,8 +97,8 @@ export const DagView = (): JSX.Element => {
 const DagScreen = ({
   layout,
 }: Readonly<{ layout: InitializedObservable<GraphLayout> }>): JSX.Element => {
-  // Set by the toolbar as it is made; read by the canvas, which keeps
-  // every mode clear of it.
+  // Set by the toolbar as it is made; read by the canvas, which keeps every
+  // mode clear of it.
   const mut_toolbar: { element: HTMLDivElement | undefined } = {
     element: undefined,
   };

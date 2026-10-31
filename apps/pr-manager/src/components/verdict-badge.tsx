@@ -33,8 +33,8 @@ type Props = Readonly<{
  *
  * The counts because a verdict is one word over nine contexts, and the state
  * that once hid a failing pull request behind a tick — a required context
- * skipped in a round that was being superseded — is invisible unless the
- * parts are shown. The names are on hover.
+ * skipped in a round that was being superseded — is invisible unless the parts
+ * are shown. The names are on hover.
  */
 export const VerdictBadge = ({ checks, unread }: Props): JSX.Element => {
   const shown = derive(

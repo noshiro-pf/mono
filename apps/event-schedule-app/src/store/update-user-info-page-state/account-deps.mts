@@ -3,8 +3,8 @@ import type { Result } from 'ts-data-forge';
 
 /**
  * The parts of `Api['auth']` the account dialogs use. They pass the user and
- * the credential through without looking inside, so both are type
- * parameters: the app's are Firebase's, and a test's can be anything.
+ * the credential through without looking inside, so both are type parameters:
+ * the app's are Firebase's, and a test's can be anything.
  */
 export type AccountAuthApi<User, ReauthCredential> = Readonly<{
   emailCredential: (email: string, password: string) => ReauthCredential;

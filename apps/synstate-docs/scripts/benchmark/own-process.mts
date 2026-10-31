@@ -25,23 +25,23 @@ const childItemIndex: number | undefined = (() => {
 export const isMeasuringChild: boolean = childItemIndex !== undefined;
 
 /**
- * Measures each of `items` in a process of its own, and returns each item
- * with what `measure` returned for it, in order.
+ * Measures each of `items` in a process of its own, and returns each item with
+ * what `measure` returned for it, in order.
  *
  * V8 optimizes a function for the shapes it has seen, and what one row teaches
  * it carries into the next when they share a process. That is a cost of the
- * order, not of either row: with `Optional.some`'s `value` field optimized
- * for numbers by a row that stored only numbers, the next row, which stores an
- * observable, fell out of optimized code again and again and ran at a fifth
- * of its speed, so its figure depended on how the row before it was written.
+ * order, not of either row: with `Optional.some`'s `value` field optimized for
+ * numbers by a row that stored only numbers, the next row, which stores an
+ * observable, fell out of optimized code again and again and ran at a fifth of
+ * its speed, so its figure depended on how the row before it was written.
  * A process per row measures each with nothing else run before it.
  *
- * The runner calls this once, with `import.meta.url`; each child runs the
- * same script (so its top level should print nothing it does not need, see
+ * The runner calls this once, with `import.meta.url`; each child runs the same
+ * script (so its top level should print nothing it does not need, see
  * {@link isMeasuringChild}), reaches this call, measures its one item, sends
- * the result back and exits. `measure`'s result crosses the process boundary
- * by structured clone, and a child that exits otherwise (`process.exit(1)` on
- * a failed check) fails the runner.
+ * the result back and exits. `measure`'s result crosses the process boundary by
+ * structured clone, and a child that exits otherwise (`process.exit(1)` on a
+ * failed check) fails the runner.
  */
 export const measureEachInOwnProcess = async <T, R>(
   scriptUrl: string,

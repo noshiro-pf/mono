@@ -107,8 +107,8 @@ const installedVersion = async (name: string): Promise<string> => {
 };
 
 /**
- * Pins each external to the version installed here, so that what is deployed
- * is what was type-checked and run in the emulator, and is not re-resolved by
+ * Pins each external to the version installed here, so that what is deployed is
+ * what was type-checked and run in the emulator, and is not re-resolved by
  * `npm install` on the day of the deploy.
  */
 const writeDeployManifest = async (): Promise<void> => {

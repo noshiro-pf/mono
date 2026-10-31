@@ -397,9 +397,9 @@ describe('prefer-assert-strict-equal-for-primitives through type wrappers', () =
 });
 
 /**
- * Why two numbers get only a suggestion unless one side rules out `NaN` and
- * the zeros. If a Chai release moves either side, these fail and the exception
- * is revisited.
+ * Why two numbers get only a suggestion unless one side rules out `NaN` and the
+ * zeros. If a Chai release moves either side, these fail and the exception is
+ * revisited.
  */
 describe('deepStrictEqual and strictEqual disagree on NaN and -0 only', () => {
   test('NaN equals itself under deepStrictEqual, not under strictEqual', () => {

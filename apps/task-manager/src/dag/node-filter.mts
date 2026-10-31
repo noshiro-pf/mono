@@ -1,8 +1,8 @@
 /**
  * What the graph screen's filter (`view-model/dag-filter.mts`) leaves of the
- * graph, on top of the nodes `hiddenNodeIds` leaves out already, as two sets
- * of node ids that take the same path as those do — the layout, the arcs,
- * the tiles, the selection:
+ * graph, on top of the nodes `hiddenNodeIds` leaves out already, as two sets of
+ * node ids that take the same path as those do — the layout, the arcs, the
+ * tiles, the selection:
  *
  * - **kept**: a node in one of the groups chosen, if any are, and, if any
  *   labels are, a task with one of them, or a milestone — which has no
@@ -13,9 +13,9 @@
  *   drawn faint, so that what a task waits for, or what waits for it, is
  *   still seen. A node hidden already stays hidden.
  *
- * Every other node is hidden. A node whose group does not exist is in none,
- * as it is drawn; a group or a label chosen that is nowhere now is passed
- * over, and a filter of nothing else keeps every node.
+ * Every other node is hidden. A node whose group does not exist is in none, as
+ * it is drawn; a group or a label chosen that is nowhere now is passed over,
+ * and a filter of nothing else keeps every node.
  */
 
 import { Arr } from 'ts-data-forge';
@@ -109,8 +109,8 @@ export const filterNodes = (
 };
 
 /**
- * Every label on a task, once each, in order: what the filter offers to
- * choose from.
+ * Every label on a task, once each, in order: what the filter offers to choose
+ * from.
  */
 export const taskLabels = (state: DomainState): readonly string[] =>
   Arr.uniq(state.tasks.flatMap(({ labels }) => labels)).toSorted((a, b) =>

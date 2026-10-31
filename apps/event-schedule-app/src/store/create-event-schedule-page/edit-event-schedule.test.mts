@@ -133,8 +133,8 @@ describe(createEditEventScheduleStore, () => {
 });
 
 /**
- * Made by bob; alice, signed in, is editing it. Saved by the app, so already
- * as the settings normalize it (notes end in a line break).
+ * Made by bob; alice, signed in, is editing it. Saved by the app, so already as
+ * the settings normalize it (notes end in a line break).
  */
 const fromDatabase: EventSchedule = EventSchedule.fill({
   title: 'event',

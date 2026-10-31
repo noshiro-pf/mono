@@ -31,8 +31,8 @@
 +      .pipe(debounce(debounceMs)) // 入力が止まるのを待つ
 +      .pipe(map((q) => q.trim())) // map は変化したクエリだけを流す
        .pipe(
--        // A newer query completes the previous inner observable,
--        // and completing it aborts its request.
+-        // A newer query completes the previous inner observable, and completing
+-        // it aborts its request.
 +        // 新しいクエリが前の内部 Observable を complete し、
 +        // complete によってそのリクエストが中断される。
          switchMap((q): Observable<SearchState> =>

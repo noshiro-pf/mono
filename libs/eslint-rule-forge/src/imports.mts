@@ -61,8 +61,8 @@ export type ResolvedCallee = Readonly<{
   canonicalName: string;
 
   /**
-   * The identifier to rewrite to change what is called: the callee itself for
-   * a named import, the property for a namespace import.
+   * The identifier to rewrite to change what is called: the callee itself for a
+   * named import, the property for a namespace import.
    */
   propertyNode: TSESTree.Identifier;
 
@@ -145,12 +145,11 @@ export const buildCalleeResolver = (
  * as given, so `type T` imports a type.
  *
  * Use it only when the file does not import from `moduleName` by name;
- * {@link bindValueImports} adds to an existing declaration instead, which
- * keeps `import-x/no-duplicates` satisfied, and falls back to this. An import
- * sorter orders the declaration afterwards. Put every name one report needs
- * into a single call: ESLint merges the fixes of one report into one edit,
- * and two fixes inserting at the same place conflict, so that one of them is
- * dropped.
+ * {@link bindValueImports} adds to an existing declaration instead, which keeps
+ * `import-x/no-duplicates` satisfied, and falls back to this. An import sorter
+ * orders the declaration afterwards. Put every name one report needs into a
+ * single call: ESLint merges the fixes of one report into one edit, and two
+ * fixes inserting at the same place conflict, so that one of them is dropped.
  */
 export const buildNamedImportFix = (
   fixer: TSESLint.RuleFixer,
@@ -212,11 +211,11 @@ export const buildNamedImportFix = (
  *
  * ESLint's default parser leaves `importKind` out, which counts as a value
  * import. Every name a fix writes is bound by that fix's own edits rather than
- * left to another report's: an editor applies one fix at a time, and a fix
- * that loses a conflict with another in the same pass is dropped. Fixes that
- * all add a name overlap, so `--fix` applies one per pass, and the rest in the
- * next, by when the file imports it. Whether something other than an import
- * binds the name where it is written is the caller's to check
+ * left to another report's: an editor applies one fix at a time, and a fix that
+ * loses a conflict with another in the same pass is dropped. Fixes that all add
+ * a name overlap, so `--fix` applies one per pass, and the rest in the next, by
+ * when the file imports it. Whether something other than an import binds the
+ * name where it is written is the caller's to check
  * ({@link hasForeignBinding}).
  */
 export const bindValueImports = (

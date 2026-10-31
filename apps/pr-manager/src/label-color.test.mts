@@ -43,11 +43,11 @@ describe(chipColors, () => {
     expect(chipColors('000000').text).toBe('#ffffff');
   });
 
-  // GitHub's own rule is perceived brightness (the YIQ weighting), which
-  // picks white for `#0e8a16` where the contrast ratio picks black — and
-  // black on it measures 5.2:1 against white's 4.0:1. The measurement wins
-  // here: the chip is 12px text, and the point of computing this at all is
-  // not to reproduce a choice made before WCAG had a formula.
+  // GitHub's own rule is perceived brightness (the YIQ weighting), which picks
+  // white for `#0e8a16` where the contrast ratio picks black — and black on it
+  // measures 5.2:1 against white's 4.0:1. The measurement wins here: the chip
+  // is 12px text, and the point of computing this at all is not to reproduce a
+  // choice made before WCAG had a formula.
   test('picks by measured contrast, not by perceived brightness', () => {
     const chip = chipColors('0e8a16');
 
@@ -91,8 +91,8 @@ describe(chipColors, () => {
   });
 
   test('falls back rather than failing on a colour it was not given', () => {
-    // A page that threw for a colour it did not know would be a page
-    // nobody could open.
+    // A page that threw for a colour it did not know would be a page nobody
+    // could open.
     expect(chipColors('').background).toBe('#ededed');
 
     expect(chipColors('nope').background).toBe('#ededed');

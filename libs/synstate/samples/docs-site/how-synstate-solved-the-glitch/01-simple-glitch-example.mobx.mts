@@ -49,8 +49,8 @@ if (import.meta.vitest !== undefined) {
     });
 
     // MobX computed values are lazily evaluated:
-    // when `sum` is accessed, it first recomputes both dependencies,
-    // so all values are consistent — no glitch.
+    // when `sum` is accessed, it first recomputes both dependencies, so all
+    // values are consistent — no glitch.
     assert.deepStrictEqual(valueHistory, [0, 1010, 2020, 3030, 4040]);
     // embed-sample-code-ignore-below
   });

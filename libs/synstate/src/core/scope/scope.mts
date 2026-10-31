@@ -23,8 +23,8 @@ import {
  * disposed gives a scope that is born disposed, with a warning.
  *
  * Intended for authors of libraries built on synstate rather than for
- * application code; state defined at module level belongs to no scope and
- * lives as long as the page.
+ * application code; state defined at module level belongs to no scope and lives
+ * as long as the page.
  *
  * `run` and `dispose` read the scope they are called on, so call them on it
  * (`scope.dispose()`) rather than taking them off it.
@@ -50,8 +50,8 @@ export const getCurrentScope = (): Scope | undefined =>
 
 /**
  * Registers `cleanup` to be called when the current scope is disposed. Cleanups
- * run after the child scopes are disposed and before the owned observables
- * are, newest first.
+ * run after the child scopes are disposed and before the owned observables are,
+ * newest first.
  *
  * Outside every scope it warns and registers nothing.
  *
@@ -85,8 +85,8 @@ export const untracked = <R,>(body: () => R): R =>
  * A scope is created for every row and branch of a UI, so creating one has to
  * be cheap. It used to be a set of closures with a `Set` of children, a `Set`
  * of owned observables and a record in a `WeakMap`; it is now one object whose
- * methods live on the prototype and whose lists are arrays made when the
- * first entry arrives.
+ * methods live on the prototype and whose lists are arrays made when the first
+ * entry arrives.
  *
  * Whatever leaves a list on its own (a child scope disposed by itself, an
  * observable that completed) is not looked up and spliced out: it only counts

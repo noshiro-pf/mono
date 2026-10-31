@@ -1,8 +1,8 @@
 import type { FixedLengthTuple } from 'ts-type-forge';
 import type * as Synstate from '../src/index.mjs';
 
-// Each call loads a new module graph, standing for one more copy of synstate
-// in the same program, as a bundle that resolves two installations has.
+// Each call loads a new module graph, standing for one more copy of synstate in
+// the same program, as a bundle that resolves two installations has.
 const loadCopy = async (): Promise<typeof Synstate> => {
   vi.resetModules();
 
@@ -84,8 +84,8 @@ describe('two copies of synstate in one program', () => {
 
     const copyB = await loadCopy();
 
-    // Copy A runs ahead, so that whatever copy A counts per update is past
-    // what copy B counts.
+    // Copy A runs ahead, so that whatever copy A counts per update is past what
+    // copy B counts.
     const [warmUp$, setWarmUp] = copyA.createState(0);
 
     warmUp$.subscribe(() => {});

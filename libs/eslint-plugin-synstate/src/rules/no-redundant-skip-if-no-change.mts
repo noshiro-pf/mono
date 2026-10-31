@@ -21,20 +21,19 @@ type Options = readonly [];
 type MessageIds = 'redundantSkipIfNoChange';
 
 /**
- * `map` passes on a result only when it is not `Object.is` the one it holds,
- * so a `skipIfNoChange()` piped straight after it compares what `map` has
- * already compared, and costs one more observable for nothing. The same
- * holds after the operators synstate builds on `map` (`pluck`,
- * `unwrapResultOk`, …) and after a `skipIfNoChange()` that compares with
- * `Object.is` itself: of the values it passes on, none is `Object.is` the one
- * before.
+ * `map` passes on a result only when it is not `Object.is` the one it holds, so
+ * a `skipIfNoChange()` piped straight after it compares what `map` has already
+ * compared, and costs one more observable for nothing. The same holds after the
+ * operators synstate builds on `map` (`pluck`, `unwrapResultOk`, …) and after a
+ * `skipIfNoChange()` that compares with `Object.is` itself: of the values it
+ * passes on, none is `Object.is` the one before.
  *
  * Only `skipIfNoChange()` with no comparison or with `Object.is` (or its alias
  * `distinctUntilChanged`) is reported, piped directly onto `x.pipe(op)` where
- * `op` is one of those: a `map` given no `equals`, an operator built on
- * `map`, or `skipIfNoChange` comparing with `Object.is`. A `map` with
- * `equals` may pass equal results on, a comparison of its own may stop more
- * than `Object.is`, and `mapTo` emits on every source value.
+ * `op` is one of those: a `map` given no `equals`, an operator built on `map`,
+ * or `skipIfNoChange` comparing with `Object.is`. A `map` with `equals` may
+ * pass equal results on, a comparison of its own may stop more than
+ * `Object.is`, and `mapTo` emits on every source value.
  */
 export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
   MessageIds,
@@ -158,8 +157,8 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
 } as const;
 
 /**
- * The operators synstate builds on `map` with no `equals`, which therefore
- * stop a result `Object.is` the one they hold.
+ * The operators synstate builds on `map` with no `equals`, which therefore stop
+ * a result `Object.is` the one they hold.
  */
 const builtOnMap = [
   'pluck',

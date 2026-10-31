@@ -1,29 +1,28 @@
 /**
- * The edges of the DAG as they are drawn: the curves of
- * `edge-geometry.mts`, except where a curve would run through a node that
- * is not one of its own two — a long edge past the nodes of a layer it
- * skips, or any edge once nodes have been dragged about. Such an edge is
- * routed round the nodes instead. The same code path serves every layout,
+ * The edges of the DAG as they are drawn: the curves of `edge-geometry.mts`,
+ * except where a curve would run through a node that is not one of its own two
+ * — a long edge past the nodes of a layer it skips, or any edge once nodes have
+ * been dragged about. Such an edge is routed round the nodes instead. The same
+ * code path serves every layout,
  * ELK's or the reader's.
  *
- * An edge keeps its curve when no point of it, sampled every few pixels,
- * comes within {@link OBSTACLE_MARGIN} of another node's box (a milestone's
- * too, not its hexagon). Otherwise it leaves its port along the axis to a
- * point a little way out, and is found a path from there to the point a
- * little way in front of its target's port: an A* search over the lines
- * that run along every node's box, kept clear of all of them, costed by its
- * length, a penalty for each turn, one for each edge drawn before it that
- * it crosses, and a smaller one for running along one. The edges are routed
- * shortest first, so that the order of the input does not matter. The
- * corners of the path found are rounded with cubic curves — less where a
- * full rounding would cut into a node — so the edge still leaves and enters
- * at right angles to the sides, as the arrowhead expects. Where nodes stand
- * too close together for that, it squeezes between them along narrower
- * lines ({@link ROUTING_PASSES}); where they touch or overlap, there is no
- * way round, and it keeps its curve. Edges routed along the same line are
- * then drawn side by side rather than on top of each other
- * (`edge-lanes.mts`), and every label is put where it covers no node, and
- * as few edges as it can (`edge-labels.mts`).
+ * An edge keeps its curve when no point of it, sampled every few pixels, comes
+ * within {@link OBSTACLE_MARGIN} of another node's box (a milestone's too, not
+ * its hexagon). Otherwise it leaves its port along the axis to a point a little
+ * way out, and is found a path from there to the point a little way in front of
+ * its target's port: an A* search over the lines that run along every node's
+ * box, kept clear of all of them, costed by its length, a penalty for each
+ * turn, one for each edge drawn before it that it crosses, and a smaller one
+ * for running along one. The edges are routed shortest first, so that the order
+ * of the input does not matter. The corners of the path found are rounded with
+ * cubic curves — less where a full rounding would cut into a node — so the edge
+ * still leaves and enters at right angles to the sides, as the arrowhead
+ * expects. Where nodes stand too close together for that, it squeezes between
+ * them along narrower lines ({@link ROUTING_PASSES}); where they touch or
+ * overlap, there is no way round, and it keeps its curve. Edges routed along
+ * the same line are then drawn side by side rather than on top of each other
+ * (`edge-lanes.mts`), and every label is put where it covers no node, and as
+ * few edges as it can (`edge-labels.mts`).
  */
 
 import { Arr, Num } from 'ts-data-forge';
@@ -56,8 +55,8 @@ import type { Point } from './pan-zoom.mjs';
 export const OBSTACLE_MARGIN = 12;
 
 /**
- * Every edge of `edges` both of whose nodes are among `nodes`, in the order
- * of `edges`: its curve, or a path round the nodes in the way of it.
+ * Every edge of `edges` both of whose nodes are among `nodes`, in the order of
+ * `edges`: its curve, or a path round the nodes in the way of it.
  */
 export const routeEdges = (
   direction: DagDirection,
@@ -174,9 +173,9 @@ export const routeEdges = (
 };
 
 /**
- * `settled`, with every edge of the node `id` as its curve in `curves`
- * instead: the edges while that node is dragged, where routing them all
- * again for every move would be too slow.
+ * `settled`, with every edge of the node `id` as its curve in `curves` instead:
+ * the edges while that node is dragged, where routing them all again for every
+ * move would be too slow.
  */
 export const withCurvesOf = (
   settled: readonly EdgeGeometry[],
@@ -252,12 +251,11 @@ const CHECK_MARGIN = OBSTACLE_MARGIN + 2;
 const SAMPLE_STEP = 4;
 
 /**
- * How a path is looked for: how far from the nodes its lines run, how far
- * out from its ports it turns at the most, and how close to a node other
- * than its own two a rounded corner may come. Where nodes are too close
- * together for the first, the second squeezes between them — clear of the
- * nodes, if not by {@link OBSTACLE_MARGIN} — rather than leave the edge
- * running through one.
+ * How a path is looked for: how far from the nodes its lines run, how far out
+ * from its ports it turns at the most, and how close to a node other than its
+ * own two a rounded corner may come. Where nodes are too close together for the
+ * first, the second squeezes between them — clear of the nodes, if not by
+ * {@link OBSTACLE_MARGIN} — rather than leave the edge running through one.
  */
 const ROUTING_PASSES = [
   { margin: ROUTE_MARGIN, stub: 24, clearance: CHECK_MARGIN },
@@ -287,8 +285,7 @@ const EPSILON = 1e-6;
 const HEADINGS = [0, 1, 2, 3] as const;
 
 /**
- * How far round its two ends a search looks first, before it looks
- * everywhere.
+ * How far round its two ends a search looks first, before it looks everywhere.
  */
 const SEARCH_WINDOW = 240;
 
@@ -402,8 +399,8 @@ const routeRequest = (
 
   const end = axes.fromPoint((curve.segments.at(-1) ?? curve.segments[0]).end);
 
-  // The search starts and ends in front of the box rather than of the
-  // port, which is inside the box on a milestone's slanted side.
+  // The search starts and ends in front of the box rather than of the port,
+  // which is inside the box on a milestone's slanted side.
   return {
     index,
     curve,
@@ -448,11 +445,11 @@ const overlaps = (a: AxisBox, b: AxisBox): boolean =>
   a.crossEnd > b.crossStart;
 
 /**
- * The fewest turns a path heading `heading` (along, across, back, back
- * across) can make to arrive heading along at a point `dMain` along and
- * `dCross` across from it — never turning straight back: what the
- * estimate of the search adds to the distance, so that it does not look
- * at every path as long as the best one with fewer turns.
+ * The fewest turns a path heading `heading` (along, across, back, back across)
+ * can make to arrive heading along at a point `dMain` along and `dCross` across
+ * from it — never turning straight back: what the estimate of the search adds
+ * to the distance, so that it does not look at every path as long as the best
+ * one with fewer turns.
  */
 const fewestTurns = (
   heading: number,
@@ -488,8 +485,8 @@ const linesOf = (values: readonly number[]): readonly number[] => {
 };
 
 /**
- * The index of the first of `lines` (in order) at `value` snapped or past
- * it, or of the last line if none is.
+ * The index of the first of `lines` (in order) at `value` snapped or past it,
+ * or of the last line if none is.
  */
 const indexOfLine = (lines: readonly number[], value: number): number => {
   const target = snap(value);
@@ -512,8 +509,8 @@ const indexOfLine = (lines: readonly number[], value: number): number => {
 };
 
 /**
- * A min-heap of states by priority, then by what is left (so that of two
- * paths as good the one further on goes first), then by the state.
+ * A min-heap of states by priority, then by what is left (so that of two paths
+ * as good the one further on goes first), then by the state.
  */
 const createHeap = (): Readonly<{
   push: (state: number, priority: number, remaining: number) => void;
@@ -654,9 +651,9 @@ const simplify = (points: readonly AxisPoint[]): readonly AxisPoint[] => {
 };
 
 /**
- * The search itself, over the lines along every side of `boxes`, through
- * `from` and `to`, and round them all — or along the sides of `area`, and
- * not outside it.
+ * The search itself, over the lines along every side of `boxes`, through `from`
+ * and `to`, and round them all — or along the sides of `area`, and not outside
+ * it.
  */
 const searchAmong = (
   boxes: readonly AxisBox[],
@@ -708,8 +705,8 @@ const searchAmong = (
 
   const size = width * crosses.length;
 
-  // By `cross index * width + main index`: the vertex is inside a box; the
-  // step from it to the next line along, or across, runs through one.
+  // By `cross index * width + main index`: the vertex is inside a box; the step
+  // from it to the next line along, or across, runs through one.
   const mut_blocked = new Uint8Array(size);
 
   const mut_blockedAlong = new Uint8Array(size);
@@ -770,8 +767,7 @@ const searchAmong = (
   }
 
   // By state, `vertex * 4 + heading` (along, across, back, back across):
-  // the cost so far, the state before, and whether it was reached and
-  // settled.
+  // the cost so far, the state before, and whether it was reached and settled.
   const mut_cost = new Float64Array(size * 4);
 
   const mut_previous = new Int32Array(size * 4);
@@ -879,8 +875,7 @@ const searchAmong = (
                   ? vertex - width
                   : -1;
 
-      // Never straight back, nor into a box; into the goal, not from
-      // beyond it.
+      // Never straight back, nor into a box; into the goal, not from beyond it.
       if (
         next < 0 ||
         mut_blocked[next] === 1 ||
@@ -939,11 +934,11 @@ const searchAmong = (
 };
 
 /**
- * A search for a path from one point to another round `boxes`: the points
- * where the path found turns, both ends included, or `undefined` if there
- * is none. It heads along the axis at the start, never turns straight back,
- * and does not arrive heading back. It looks among the boxes near the two
- * ends first, and among all of them only if it finds nothing there.
+ * A search for a path from one point to another round `boxes`: the points where
+ * the path found turns, both ends included, or `undefined` if there is none. It
+ * heads along the axis at the start, never turns straight back, and does not
+ * arrive heading back. It looks among the boxes near the two ends first, and
+ * among all of them only if it finds nothing there.
  */
 const createRouter =
   (
@@ -1051,8 +1046,8 @@ const createSegmentIndex = (): SegmentIndex => {
 
     const alongMain = Math.abs(fromCross - toCross) < EPSILON;
 
-    // The step runs between `low` and `high` at `level`; each piece is read
-    // the same way round.
+    // The step runs between `low` and `high` at `level`; each piece is read the
+    // same way round.
     const level = alongMain ? fromCross : fromMain;
 
     const low = alongMain
@@ -1187,8 +1182,8 @@ const roundCorners = (
 
     const lengthOut = manhattan(corner, next);
 
-    // A stretch between two corners is shared by both; one from an end
-    // belongs to the corner alone.
+    // A stretch between two corners is shared by both; one from an end belongs
+    // to the corner alone.
     const room = Math.min(
       CORNER_RADIUS,
       index === 1 ? lengthIn : lengthIn / 2,
@@ -1285,8 +1280,8 @@ const midpointByLength = (segments: CubicSegments): Point => {
 
 /**
  * The edge along `corners`, its corners rounded — each as far as
- * {@link CORNER_RADIUS} allows, half of the straight stretches on either
- * side, and the `obstacles` it would otherwise come within `clearance` of.
+ * {@link CORNER_RADIUS} allows, half of the straight stretches on either side,
+ * and the `obstacles` it would otherwise come within `clearance` of.
  */
 const routedGeometry = (
   curve: EdgeGeometry,

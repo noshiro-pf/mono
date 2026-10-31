@@ -1,9 +1,8 @@
 /**
- * How values are written on the page, in its language (`i18n/`); the
- * examples here are the Japanese. Dates and times are numeric,
- * `2026/10/09 12:05`, in every language. Everything that depends on the
- * time zone takes it, so the tests can pin one; the page passes nothing and
- * gets the browser's.
+ * How values are written on the page, in its language (`i18n/`); the examples
+ * here are the Japanese. Dates and times are numeric, `2026/10/09 12:05`, in
+ * every language. Everything that depends on the time zone takes it, so the
+ * tests can pin one; the page passes nothing and gets the browser's.
  */
 
 import type { ReadonlyRecord } from 'ts-type-forge';
@@ -118,8 +117,8 @@ const MINUTES_PER_HOUR = 60;
 
 /**
  * Year, month, day, as the date input shows and reads them
- * (`date-time-field.tsx`), whatever the language: a day before the month,
- * or after it, would be misread by somebody.
+ * (`date-time-field.tsx`), whatever the language: a day before the month, or
+ * after it, would be misread by somebody.
  */
 const DATE_LOCALE = 'ja-JP';
 

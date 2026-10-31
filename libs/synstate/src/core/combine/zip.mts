@@ -1,6 +1,6 @@
 // Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
-// so those rules are waived here (D-63).
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why), so
+// those rules are waived here (D-63).
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
@@ -26,9 +26,9 @@ import type {
 /**
  * Combines multiple observables by pairing their emissions by index.
  * Waits for all sources to emit their nth value before emitting the nth tuple.
- * Completes once a completed source has no value left to pair, as RxJS's
- * `zip` does: at once if it completes with nothing queued, otherwise after
- * the tuple that takes its last queued value.
+ * Completes once a completed source has no value left to pair, as RxJS's `zip`
+ * does: at once if it completes with nothing queued, otherwise after the tuple
+ * that takes its last queued value.
  *
  * @template OS - Tuple type of source observables
  * @param parents - Array of observables to zip
@@ -156,8 +156,8 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
   }
 
   /**
-   * No tuple can be completed any more once a completed source has nothing
-   * left to pair (#2343).
+   * No tuple can be completed any more once a completed source has nothing left
+   * to pair (#2343).
    */
   override canEmitNoMore(): boolean {
     return this.parents.some(

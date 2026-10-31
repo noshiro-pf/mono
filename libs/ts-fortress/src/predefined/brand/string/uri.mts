@@ -3,8 +3,8 @@ import { brand } from '../../../brand/index.mjs';
 import { string } from '../../../primitives/index.mjs';
 import type { Type } from '../../../type.mjs';
 
-// An absolute URI/URL always has a non-empty scheme, so `Uri` is branded on
-// top of `NonEmptyString` and is assignable to it.
+// An absolute URI/URL always has a non-empty scheme, so `Uri` is branded on top
+// of `NonEmptyString` and is assignable to it.
 export type Uri = Brand<NonEmptyString, 'Uri'>;
 
 /**

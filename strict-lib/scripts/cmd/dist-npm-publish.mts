@@ -45,8 +45,8 @@
  *   before it goes out.
  *
  * **Re-runs are safe.** A version already on the registry is skipped rather
- * than re-published, because npm refuses to overwrite one
- * (`EPUBLISHCONFLICT`). `release.yml` runs this on every push to `main` — the
+ * than re-published, because npm refuses to overwrite one (`EPUBLISHCONFLICT`).
+ * `release.yml` runs this on every push to `main` — the
  * Changesets action runs its publish step whenever no changesets are pending —
  * so without the skip, every push after a release would fail on the 24 versions
  * that are already out.
@@ -61,9 +61,9 @@ import { collectBundle, packBundle } from '../pack-bundle.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { parseVersionExpr, versionFromPath } from '../version-filter.mjs';
 
-// The version directories sit directly under `strict-lib/`; the readdir
-// below keeps only `vX.Y`, so `scripts/`, `configs/` and friends are
-// filtered out by name rather than by living somewhere else.
+// The version directories sit directly under `strict-lib/`; the readdir below
+// keeps only `vX.Y`, so `scripts/`, `configs/` and friends are filtered out by
+// name rather than by living somewhere else.
 const packagesDir = projectRootPath;
 
 const main = async (): Promise<void> => {

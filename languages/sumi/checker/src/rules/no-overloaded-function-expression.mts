@@ -6,14 +6,14 @@ import { SignatureKind } from 'typescript-native/unstable/sync';
 import type { Rule } from '../engine/index.mjs';
 
 /**
- * `functions/no-overloaded-function-expression` — a function expression is
- * not checked against more than one call signature (Sumi spec/functions.md,
+ * `functions/no-overloaded-function-expression` — a function expression is not
+ * checked against more than one call signature (Sumi spec/functions.md,
  * D-58).
  *
- * An overload set in Sumi is written one way: a `function` declaration with
- * its signatures listed (D-13). The other way TypeScript accepts is a function
- * expression whose contextual type carries several call signatures —
- * annotating a `const`, or filling a property typed that way:
+ * An overload set in Sumi is written one way: a `function` declaration with its
+ * signatures listed (D-13). The other way TypeScript accepts is a function
+ * expression whose contextual type carries several call signatures — annotating
+ * a `const`, or filling a property typed that way:
  *
  * ```ts
  * type Show = ((a: string) => string) & ((a: string[]) => string);

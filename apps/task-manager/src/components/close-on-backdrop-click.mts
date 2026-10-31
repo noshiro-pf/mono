@@ -2,15 +2,15 @@
  * Has a click on the backdrop of a modal `<dialog>` call `closeDialog`, and
  * returns what stops listening.
  *
- * The content fills the dialog, so an event whose target is the dialog
- * itself landed on the backdrop around it. The click alone does not say so:
- * a click goes to the nearest element that both the press and the release
- * were on, which is the dialog when a press in an input — selecting its
- * text — is let go of over the backdrop. So the press and the release must
- * each have been on the backdrop.
+ * The content fills the dialog, so an event whose target is the dialog itself
+ * landed on the backdrop around it. The click alone does not say so:
+ * a click goes to the nearest element that both the press and the release were
+ * on, which is the dialog when a press in an input — selecting its text — is
+ * let go of over the backdrop. So the press and the release must each have been
+ * on the backdrop.
  *
- * Listened to on the element rather than through JSX: the backdrop is a
- * pointer convenience, and Escape is how a keyboard closes the dialog.
+ * Listened to on the element rather than through JSX: the backdrop is a pointer
+ * convenience, and Escape is how a keyboard closes the dialog.
  */
 export const closeOnBackdropClick = (
   dialog: HTMLElement,

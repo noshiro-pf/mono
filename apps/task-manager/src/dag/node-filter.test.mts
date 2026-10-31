@@ -28,8 +28,8 @@ const dependsOn = (id: string) =>
     lagMs: 0,
   }) as const;
 
-// a (g1, ui) <- b (g1, api) <- c (g2, ui) <- m (milestone, g2)
-// d (no group, no labels), e (in a group that is gone, ui)
+// a (g1, ui) <- b (g1, api) <- c (g2, ui) <- m (milestone, g2) d (no group, no
+// labels), e (in a group that is gone, ui)
 const state: DomainState = {
   tasks: [
     {

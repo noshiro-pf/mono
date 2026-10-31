@@ -522,8 +522,8 @@ export namespace Str {
    * `NonEmptyString` is an alias of `MinLengthString<1>`, so this is the
    * length-1 specialization of {@link asMinLengthString}. Use this instead of
    * writing `s as unknown as NonEmptyString`: the length is verified at
-   * runtime, and the original string type (e.g. literal types) is preserved
-   * via intersection.
+   * runtime, and the original string type (e.g. literal types) is preserved via
+   * intersection.
    *
    * @example
    *

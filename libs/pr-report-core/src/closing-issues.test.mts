@@ -145,8 +145,8 @@ describe(closingKeywordIssuesIn, () => {
 });
 
 /**
- * A reference as GitHub renders it in a pull request's `bodyHTML`, with
- * the attributes in the order GitHub writes them.
+ * A reference as GitHub renders it in a pull request's `bodyHTML`, with the
+ * attributes in the order GitHub writes them.
  */
 const link = (
   nameWithOwner: string,

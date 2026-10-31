@@ -17,8 +17,8 @@ import type { Scenario, ScenarioNode } from './scenario.mjs';
 /**
  * Runs the scenario through a model of the priority queue approach of
  * Scala.React: a node that emits enqueues its children by level (its depth),
- * and the loop dequeues the lowest level first, so a node runs only after
- * all its parents. Each enqueue and dequeue costs O(log n).
+ * and the loop dequeues the lowest level first, so a node runs only after all
+ * its parents. Each enqueue and dequeue costs O(log n).
  */
 export const simulatePriorityQueue = (scenario: Scenario): Trace =>
   ({

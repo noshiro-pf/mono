@@ -13,9 +13,9 @@ import {
 
 /**
  * The zoom is a state, and the render computes every label in a loop, in a
- * `useMemo` that depends on the level, so that a change within a level does
- * not repeat it. Each change is rendered with `flushSync`, as a click
- * handler's update is.
+ * `useMemo` that depends on the level, so that a change within a level does not
+ * repeat it. Each change is rendered with `flushSync`, as a click handler's
+ * update is.
  */
 export const reactZoom: ScenarioFramework<ZoomApp> = {
   name: 'React',

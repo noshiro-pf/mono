@@ -24,8 +24,8 @@ type ViewProps = Readonly<{
   /** Called when the down button is pressed, before it is released. */
   onDecrementMouseDown?: (event: MouseEvent) => void;
   /**
-   * Called when the up button is clicked: after a mouse press is released,
-   * or by Enter or Space on the focused button (`event.detail` is 0).
+   * Called when the up button is clicked: after a mouse press is released, or
+   * by Enter or Space on the focused button (`event.detail` is 0).
    */
   onIncrementClick?: (event: MouseEvent) => void;
   /** As `onIncrementClick`, for the down button. */
@@ -52,12 +52,12 @@ type ViewProps = Readonly<{
  * up and down buttons beside it, in Blueprint's markup.
  *
  * Its value is the **text**, and it holds no state: what it shows is `value`,
- * and every keystroke goes to `onValueChange` as a string. A number-typed
- * value would collapse what the user is half way through typing — `-`,
- * `3.`, `1e` — into `NaN` or a rounded number on the next keystroke and get
- * in the way of typing it; the text is turned into a number only when it is
- * committed, by whoever holds the state. {@link NumericInput} is that layer
- * for a number value.
+ * and every keystroke goes to `onValueChange` as a string. A number-typed value
+ * would collapse what the user is half way through typing — `-`, `3.`, `1e` —
+ * into `NaN` or a rounded number on the next keystroke and get in the way of
+ * typing it; the text is turned into a number only when it is committed, by
+ * whoever holds the state. {@link NumericInput} is that layer for a number
+ * value.
  */
 export const NumericInputView = ({
   value,
@@ -155,14 +155,13 @@ export const NumericInputView = ({
 type Props<N extends number> = Readonly<
   {
     /**
-     * The value from outside. The text is written afresh from it whenever
-     * it changes, and is otherwise the component's own.
+     * The value from outside. The text is written afresh from it whenever it
+     * changes, and is otherwise the component's own.
      */
     value: Bindable<N>;
     /**
-     * Called with the committed value — on blur, on Enter, and on every
-     * step of the buttons and the arrow keys — when it differs from
-     * `value`.
+     * Called with the committed value — on blur, on Enter, and on every step of
+     * the buttons and the arrow keys — when it differs from `value`.
      */
     onValueChange: (value: N) => void;
     /** The text a value is shown as. */
@@ -190,20 +189,20 @@ type Props<N extends number> = Readonly<
 >;
 
 /**
- * Blueprint's `NumericInput` for a number value: {@link NumericInputView}
- * with the text kept here, uncontrolled while the user types.
+ * Blueprint's `NumericInput` for a number value: {@link NumericInputView} with
+ * the text kept here, uncontrolled while the user types.
  *
  * Nothing the user types is decoded until it is committed — on blur, on
- * Enter, or by a step — so half-typed text such as `-` or `3.` stays as it
- * is; only then does `decode` read it and `normalize` make it a value, the
- * text is rewritten from that value, and `onValueChange` is told. Holding a
- * button with the main mouse button, or an arrow key, steps again after
- * 400 ms, then every 40 ms, until it is released, the window loses focus
- * (and for a key, the input) or a bound stops the value; Enter or Space on
- * a focused button steps once.
+ * Enter, or by a step — so half-typed text such as `-` or `3.` stays as it is;
+ * only then does `decode` read it and `normalize` make it a value, the text is
+ * rewritten from that value, and `onValueChange` is told. Holding a button with
+ * the main mouse button, or an arrow key, steps again after 400 ms, then every
+ * 40 ms, until it is released, the window loses focus (and for a key, the
+ * input) or a bound stops the value; Enter or Space on a focused button steps
+ * once.
  *
- * This split, stateless text in the view and the state that decodes it here,
- * is how every numeric input in this repository is built (see
+ * This split, stateless text in the view and the state that decodes it here, is
+ * how every numeric input in this repository is built (see
  * `articles/numeric-input-interface.md`): a controlled input whose value is a
  * number cannot hold text that is not yet one.
  */
@@ -222,8 +221,8 @@ export const NumericInput = <N extends number>({
 
   const afterUpdate = createAfterUpdate();
 
-  // Whether the value has been read once: the first call is the value the
-  // text was made from.
+  // Whether the value has been read once: the first call is the value the text
+  // was made from.
   let mut_following = false;
 
   // A state is not written while another is still propagating, so the text
@@ -268,18 +267,18 @@ export const NumericInput = <N extends number>({
     });
   }
 
-  // Whether the click to come ends a press that has stepped already: a
-  // click steps only when it was not, as with Enter or Space on the button.
-  // The click comes in the same task as the release, so `stepped` is
-  // cleared in the frame after the release, or after the window's blur that
-  // takes the release away, unless another press has come since.
+  // Whether the click to come ends a press that has stepped already: a click
+  // steps only when it was not, as with Enter or Space on the button.
+  // The click comes in the same task as the release, so `stepped` is cleared in
+  // the frame after the release, or after the window's blur that takes the
+  // release away, unless another press has come since.
   const mut_press = { count: 0, stepped: false };
 
   const onStepMouseDown = (event: MouseEvent, delta: number): void => {
     mut_press.count += 1;
 
-    // Only the main button, and not the Ctrl+click that opens the context
-    // menu on macOS: a menu takes the release that ends the repeat.
+    // Only the main button, and not the Ctrl+click that opens the context menu
+    // on macOS: a menu takes the release that ends the repeat.
     mut_press.stepped = event.button === 0 && !event.ctrlKey;
 
     if (!mut_press.stepped) {
@@ -354,15 +353,15 @@ export const NumericInput = <N extends number>({
         switch (event.key) {
           case 'ArrowUp':
           case 'ArrowDown':
-            // With Cmd or Ctrl, the caret moves to an end as it does
-            // elsewhere. Only on the first keydown: the modifier pressed
-            // while a step is held moves nothing.
+            // With Cmd or Ctrl, the caret moves to an end as it does elsewhere.
+            // Only on the first keydown: the modifier pressed while a step is
+            // held moves nothing.
             if (!event.repeat && (event.metaKey || event.ctrlKey)) {
               break;
             }
 
-            // Kept from moving the caret, as in Blueprint's; a held key
-            // repeats by the timers, not by the key's own repeats.
+            // Kept from moving the caret, as in Blueprint's; a held key repeats
+            // by the timers, not by the key's own repeats.
             event.preventDefault();
 
             if (!event.repeat) {
@@ -390,8 +389,8 @@ export const NumericInput = <N extends number>({
 };
 
 /**
- * What ends a held step: the mouse button's release, or the key's, told by
- * its `code`, which NumLock or Shift cannot change between press and release.
+ * What ends a held step: the mouse button's release, or the key's, told by its
+ * `code`, which NumLock or Shift cannot change between press and release.
  */
 type Release = Readonly<{ kind: 'mouse' } | { kind: 'key'; code: string }>;
 
@@ -403,12 +402,12 @@ const repeatDelayMs = 400;
 const repeatIntervalMs = 40;
 
 /**
- * Steps once at `start`, then again after 400 ms and every 40 ms, until
- * `stop`: called on the release `start` names, on the blur of the window,
- * which takes the release away, and when a step changes nothing, as at a
- * bound. A key's release is also a release of Meta, which on macOS keeps
- * the other keys' `keyup` from being sent. The listeners are on the
- * document the press happened in, and only while a step is held.
+ * Steps once at `start`, then again after 400 ms and every 40 ms, until `stop`:
+ * called on the release `start` names, on the blur of the window, which takes
+ * the release away, and when a step changes nothing, as at a bound. A key's
+ * release is also a release of Meta, which on macOS keeps the other keys'
+ * `keyup` from being sent. The listeners are on the document the press happened
+ * in, and only while a step is held.
  */
 const createRepeat = (
   step: (delta: number) => boolean,

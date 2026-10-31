@@ -7,11 +7,11 @@ import { widenedLookupParam, type ConverterOptions } from './common.mjs';
 
 /**
  * Converts `ReadonlySetLike`, the argument type of the ES2025 Set methods
- * (`union`, `intersection`, `difference`, `symmetricDifference`,
- * `isSubsetOf`, `isSupersetOf`, `isDisjointFrom`). It shipped in
- * `lib.esnext.collection.d.ts` in TS 5.5–5.9 and was promoted to
- * `lib.es2025.collection.d.ts` in TS 6.0. Pass `tolerant: true` for the
- * `esnext` layout, which TS 5.0–5.4 ship without the interface.
+ * (`union`, `intersection`, `difference`, `symmetricDifference`, `isSubsetOf`,
+ * `isSupersetOf`, `isDisjointFrom`). It shipped in `lib.esnext.collection.d.ts`
+ * in TS 5.5–5.9 and was promoted to `lib.es2025.collection.d.ts` in TS 6.0.
+ * Pass `tolerant: true` for the `esnext` layout, which TS 5.0–5.4 ship without
+ * the interface.
  *
  * `has` takes the same parameter as `ReadonlySet#has`
  * ({@link widenedLookupParam}): the Set methods call `other.has(value)` with

@@ -1,6 +1,6 @@
 // Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
-// so those rules are waived here (D-63).
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why), so
+// those rules are waived here (D-63).
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
@@ -20,14 +20,13 @@ import type {
 
 /**
  * Derives one value from the latest values of several observables: one
- * observable that calls `project` with them, as arguments, and emits the
- * result unless it equals the one already held.
+ * observable that calls `project` with them, as arguments, and emits the result
+ * unless it equals the one already held.
  *
- * It emits once every parent has a value, and then whenever any of them
- * emits, as `combine` does; but where `combine(parents).pipe(map(fn))` is two
- * observables and a tuple per update, `derive` is one, and passes the values
- * as arguments (a rest parameter in `project` collects them into an array
- * again).
+ * It emits once every parent has a value, and then whenever any of them emits,
+ * as `combine` does; but where `combine(parents).pipe(map(fn))` is two
+ * observables and a tuple per update, `derive` is one, and passes the values as
+ * arguments (a rest parameter in `project` collects them into an array again).
  * The comparison is `Object.is` unless `equals` says otherwise.
  *
  * @template OS - Tuple type of the parent observables
@@ -83,8 +82,8 @@ export const derive = <const OS extends NonEmptyTuple<Observable<unknown>>, B>(
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   new DeriveObservableClass(
     parents,
-    // `project` is called with the values of `parents`, position by
-    // position, which the checker cannot follow through an index.
+    // `project` is called with the values of `parents`, position by position,
+    // which the checker cannot follow through an index.
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     project as (...values: readonly unknown[]) => B,
     options?.equals ?? Object.is,

@@ -134,8 +134,8 @@ const internal = (
 /**
  * The edge set `ws:build` orders by: `dependencies` + `peerDependencies`, as
  * passed to `runCmdInStagesAcrossWorkspaces` via `dependencyFields`. Shown
- * alongside the graph that includes `devDependencies`, which has no
- * topological order.
+ * alongside the graph that includes `devDependencies`, which has no topological
+ * order.
  */
 const buildEdges = (
   pkg: PackageInfo,

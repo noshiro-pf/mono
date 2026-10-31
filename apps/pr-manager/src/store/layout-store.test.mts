@@ -187,8 +187,8 @@ const setup = (initial: Layout): Setup => {
     save: (layout) => {
       mut_saved.push(layout);
     },
-    // Real timers, only short: the repository's lint keeps `vi`'s fake ones
-    // out of tests.
+    // Real timers, only short: the repository's lint keeps `vi`'s fake ones out
+    // of tests.
     saveDelayMs: 0,
   });
 

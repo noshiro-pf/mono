@@ -31,8 +31,8 @@ const prepaymentCase = (
 
 /**
  * A 30-year loan shown by year. Changing the rate changes every month;
- * a prepayment changes the months from it onwards, which is half the chain
- * for one in month 181 and its last twelve links for one in month 349.
+ * a prepayment changes the months from it onwards, which is half the chain for
+ * one in month 181 and its last twelve links for one in month 349.
  */
 export const loanScenario: Scenario<LoanApp> = {
   buildName: 'loan: build the table',

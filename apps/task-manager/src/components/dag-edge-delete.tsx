@@ -13,11 +13,11 @@ type Props = Readonly<{
 }>;
 
 /**
- * The button that deletes the dependency an edge of the DAG stands for,
- * where the edge was clicked (`dag-canvas.tsx`). It takes the focus as it
- * comes, so that Delete or Backspace — or Enter or Space, as on any button —
- * deletes the edge at once; Escape, or the focus going anywhere else, leaves
- * the edge as it is.
+ * The button that deletes the dependency an edge of the DAG stands for, where
+ * the edge was clicked (`dag-canvas.tsx`). It takes the focus as it comes, so
+ * that Delete or Backspace — or Enter or Space, as on any button — deletes the
+ * edge at once; Escape, or the focus going anywhere else, leaves the edge as it
+ * is.
  */
 export const DagEdgeDelete = ({
   button,

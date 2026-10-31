@@ -7,8 +7,8 @@ import { FetchingIndicator } from './fetching-indicator.js';
 /**
  * When the report on screen was read: how long ago, and exactly when in the
  * reader's own time zone. Every read changes it, and only the nodes bound to
- * the time of reading are rewritten for it. While the next read is out, it
- * says so (`FetchingIndicator`).
+ * the time of reading are rewritten for it. While the next read is out, it says
+ * so (`FetchingIndicator`).
  */
 
 /** In the folded header: a few words beside the title, with the exact time in the tooltip. */

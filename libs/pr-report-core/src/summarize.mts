@@ -8,8 +8,8 @@ import type { ReportEntry, Summary } from './types.mjs';
  *
  * Here rather than in whoever displays it. Two of these are questions this
  * repository's conventions answer — `queued` is a label, and `failing` is the
- * verdict reached over the contexts the ruleset requires — and both
- * `pr-report` and the Pull Requests Manager page lead with them.
+ * verdict reached over the contexts the ruleset requires — and both `pr-report`
+ * and the Pull Requests Manager page lead with them.
  */
 export const summarize = (entries: readonly ReportEntry[]): Summary => {
   const count = (predicate: (entry: ReportEntry) => boolean): number =>

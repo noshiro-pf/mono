@@ -37,8 +37,8 @@ export type SignInPageDeps = Readonly<{
 }>;
 
 /**
- * The sign-in page: the form, signing in through `deps.api`, and going back
- * to the page signing in was asked from.
+ * The sign-in page: the form, signing in through `deps.api`, and going back to
+ * the page signing in was asked from.
  */
 export const createSignInPageStore = (deps: SignInPageDeps): SignInPage => {
   const dc = dict.register;

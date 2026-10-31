@@ -8,8 +8,8 @@ import { ok } from './async-data-ok.mjs';
 import { pending } from './async-data-pending.mjs';
 
 /**
- * Maps the success value: the value of an Ok and the `previous` of a Pending
- * or an Err.
+ * Maps the success value: the value of an Ok and the `previous` of a Pending or
+ * an Err.
  *
  * @example
  *

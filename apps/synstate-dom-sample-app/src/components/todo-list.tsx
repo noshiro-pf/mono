@@ -24,8 +24,8 @@ import {
 export const TodoList = (): JSX.Element => {
   const [draft$, setDraft, { getSnapshot: getDraft }] = createState('');
 
-  // Derivations only this view reads are created here, so they exist only
-  // while it is mounted (README "Guidelines").
+  // Derivations only this view reads are created here, so they exist only while
+  // it is mounted (README "Guidelines").
   const visibleTodos = derive([todos$, filter$], (todos, filter) =>
     todos.filter((todo) => matchesFilter(filter, todo)),
   );

@@ -19,9 +19,9 @@ import {
 type Props = CardProps & Readonly<{ number: Bindable<CardNumber | undefined> }>;
 
 /**
- * The face of the card `number`, or nothing while it is `undefined`: a `For`
- * of at most one row keyed by the number, so the face is drawn again only when
- * the number changes, and each row draws the number it was made for.
+ * The face of the card `number`, or nothing while it is `undefined`: a `For` of
+ * at most one row keyed by the number, so the face is drawn again only when the
+ * number changes, and each row draws the number it was made for.
  */
 export const CardFace = ({ number, color, textColor }: Props): JSX.Element => (
   <For

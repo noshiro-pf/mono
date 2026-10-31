@@ -1,23 +1,22 @@
 /**
- * What GitHub enforces on a branch: the contexts a pull request into it has
- * to pass, and whether a code owner has to approve it.
+ * What GitHub enforces on a branch: the contexts a pull request into it has to
+ * pass, and whether a code owner has to approve it.
  *
- * **Read from GitHub rather than from a file in the repository**, so that
- * any repository is judged by the rules it has: every ruleset that applies to
- * the branch (`GET /repos/{owner}/{repo}/rules/branches/{branch}`), which is
- * what `unblock-prs` reads too, and the contexts a classic branch protection
- * rule requires (`GET /repos/{owner}/{repo}/branches/{branch}`). Neither wants
- * more than reading the repository — `metadata` and `contents` read, which a
- * token with no scopes has on a public one — where the endpoints that list a
+ * **Read from GitHub rather than from a file in the repository**, so that any
+ * repository is judged by the rules it has: every ruleset that applies to the
+ * branch (`GET /repos/{owner}/{repo}/rules/branches/{branch}`), which is what
+ * `unblock-prs` reads too, and the contexts a classic branch protection rule
+ * requires (`GET /repos/{owner}/{repo}/branches/{branch}`). Neither wants more
+ * than reading the repository — `metadata` and `contents` read, which a token
+ * with no scopes has on a public one — where the endpoints that list a
  * ruleset's own settings or a protection rule's whole want an admin.
  *
  * What a classic rule says about reviews is not among what the second answers,
  * so a code owner's approval is waited for only where a ruleset asks for it.
  *
- * **REST, as the workflow runs are** (`workflow-runs.mts`): its own budget,
- * and `no-cache`, so that the answer the browser kept is revalidated and a
- * `304` costs nothing — which is every read but the first, since rules seldom
- * change.
+ * **REST, as the workflow runs are** (`workflow-runs.mts`): its own budget, and
+ * `no-cache`, so that the answer the browser kept is revalidated and a `304`
+ * costs nothing — which is every read but the first, since rules seldom change.
  */
 
 import { requirementsOfRules, type RulesetRequirements } from 'pr-report-core';
@@ -165,8 +164,8 @@ const getJson = async <A,>(
 };
 
 /**
- * Written as a wrapper rather than handed over bare, because `fetch`
- * detached from the global it belongs to is not callable in every engine.
+ * Written as a wrapper rather than handed over bare, because `fetch` detached
+ * from the global it belongs to is not callable in every engine.
  */
 const askGitHub: RestFetch = async (route, init) => fetch(route, init);
 

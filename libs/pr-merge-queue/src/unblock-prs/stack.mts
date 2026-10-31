@@ -1,8 +1,8 @@
 // cspell:ignore retarget retargeted
 
 /**
- * Stacked pull requests: one whose base is another open pull request's
- * branch rather than the default branch. Which pull request is on which is
+ * Stacked pull requests: one whose base is another open pull request's branch
+ * rather than the default branch. Which pull request is on which is
  * `pr-report-core`'s `stack.mts`, because the reports draw the same stacks;
  * what this script does about them is decided here.
  *
@@ -39,8 +39,8 @@
  * A stack here is made by the base alone. GitHub's native stacks are not
  * landed: GitHub refuses auto-merge on a pull request in one ("Auto-merge is
  * not supported for stacked pull requests"), and keeps a layer in its stack
- * after the one below has merged and it has been moved onto the default
- * branch — so one is reported rather than picked, and merged by hand.
+ * after the one below has merged and it has been moved onto the default branch
+ * — so one is reported rather than picked, and merged by hand.
  */
 
 import {
@@ -106,8 +106,8 @@ export const nativeStackNote = (
 
 /**
  * Why a layer cannot be carried along when the one below it moves, or
- * `undefined` when it can. A fork's branch is not this repository's to push
- * to, whatever its name.
+ * `undefined` when it can. A fork's branch is not this repository's to push to,
+ * whatever its name.
  */
 export const restackable = (pr: BranchOf): string | undefined =>
   pr.state !== 'OPEN'
@@ -121,12 +121,12 @@ export const restackable = (pr: BranchOf): string | undefined =>
 /**
  * The pull requests this script rebases onto the default branch ahead of any
  * turn: the bottom layer of a stack, or a lone pull request, that asked for it
- * (`wantsAutoRebase`) and is paused by `skip-ci`, so the push costs no
- * matrix. Whether it is actually behind is for the caller to ask
- * git: `skip-ci` leaves the merge state at `BLOCKED` whatever the branch is.
- * The version pull request is the release workflow's. Only the worker's own
- * are moved (`owner.mts`): one set aside or claimed is a skill's or a
- * person's until its comment is resolved or the claim ends.
+ * (`wantsAutoRebase`) and is paused by `skip-ci`, so the push costs no matrix.
+ * Whether it is actually behind is for the caller to ask git: `skip-ci` leaves
+ * the merge state at `BLOCKED` whatever the branch is.
+ * The version pull request is the release workflow's. Only the worker's own are
+ * moved (`owner.mts`): one set aside or claimed is a skill's or a person's
+ * until its comment is resolved or the claim ends.
  */
 export const autoRebaseTargets = (
   pullRequests: readonly PullRequest[],
@@ -166,11 +166,10 @@ export const stackParentsOf = (
 
 /**
  * What to remember of this survey's stacks for the next one: every layer, by
- * the branch it is on, and every layer remembered before that is still on
- * that branch. The second is a layer whose parent has merged while GitHub
- * has yet to move it — no open pull request heads its base any longer, so
- * the bases alone no longer say it is a layer, but it has still to come off
- * one.
+ * the branch it is on, and every layer remembered before that is still on that
+ * branch. The second is a layer whose parent has merged while GitHub has yet to
+ * move it — no open pull request heads its base any longer, so the bases alone
+ * no longer say it is a layer, but it has still to come off one.
  */
 export const stackedOnAfter = (
   before: StackedOn | undefined,
@@ -189,12 +188,12 @@ export const stackedOnAfter = (
 
 /**
  * The pull requests the last survey saw stacked and this one sees on the
- * default branch — before the first survey, every pull request on the
- * default branch, whose timeline then says whether it came off a stack.
+ * default branch — before the first survey, every pull request on the default
+ * branch, whose timeline then says whether it came off a stack.
  *
- * A queued one is not among them: its own rebase, when it is picked, drops
- * the merged layer's commits on its way onto the tip. Nor is anything that
- * cannot be pushed to, or the version pull request, which was never a layer.
+ * A queued one is not among them: its own rebase, when it is picked, drops the
+ * merged layer's commits on its way onto the tip. Nor is anything that cannot
+ * be pushed to, or the version pull request, which was never a layer.
  */
 export const retargetedLayers = (
   before: StackedOn | undefined,

@@ -30,10 +30,10 @@ type MessageIds = 'unnecessaryArrayFrom';
  *
  * The `Array.from()` call is found through type wrappers, which the fix keeps
  * (`(Array.from(x) satisfies T).map(f)` → `(x satisfies T).map(f)`), and the
- * argument's type is that of its value, not of a cast around it. A
- * `satisfies` around the call that the argument itself does not meet keeps
- * the copy: `(Array.from(xs) satisfies number[])` with `xs: readonly number[]`
- * would not type-check as `xs satisfies number[]`.
+ * argument's type is that of its value, not of a cast around it. A `satisfies`
+ * around the call that the argument itself does not meet keeps the copy:
+ * `(Array.from(xs) satisfies number[])` with `xs: readonly number[]` would not
+ * type-check as `xs satisfies number[]`.
  */
 const NON_MUTATING_ARRAY_METHODS: ReadonlySet<string> = new Set<string>([
   'at',

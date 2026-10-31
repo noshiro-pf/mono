@@ -161,8 +161,8 @@ describe(restackable, () => {
 
 describe(nativeStackNote, () => {
   test('says why one in a native stack is not armed, and what to do', () => {
-    // GitHub keeps the layer in the stack after the one below it merged and
-    // it was moved onto `main`, and refuses auto-merge for as long.
+    // GitHub keeps the layer in the stack after the one below it merged and it
+    // was moved onto `main`, and refuses auto-merge for as long.
     assert.deepStrictEqual(
       nativeStackNote(pullRequest({ number: 2 }), {
         stack: 3,

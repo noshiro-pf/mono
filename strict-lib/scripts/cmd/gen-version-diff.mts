@@ -38,9 +38,9 @@ import { Arr, Result } from 'ts-data-forge';
 import { $, makeEmptyDir, pathExists } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
-// The version directories sit directly under `strict-lib/`; the readdir
-// below keeps only `vX.Y`, so `scripts/`, `configs/` and friends are
-// filtered out by name rather than by living somewhere else.
+// The version directories sit directly under `strict-lib/`; the readdir below
+// keeps only `vX.Y`, so `scripts/`, `configs/` and friends are filtered out by
+// name rather than by living somewhere else.
 const packagesDir = projectRootPath;
 
 /** Subdirectory of a package holding the files to compare, per diff kind. */
@@ -104,8 +104,8 @@ const gitDiff = async (
   //
   // `--full-index`, because the output is committed and checked by CI. Without
   // it the `index` line carries blob hashes abbreviated to however many digits
-  // are unambiguous in the object database at hand: 9 in a full clone, 7 in
-  // the shallow checkout CI makes, so every diff file differed there.
+  // are unambiguous in the object database at hand: 9 in a full clone, 7 in the
+  // shallow checkout CI makes, so every diff file differed there.
   const result = await $(
     `git diff --no-index --no-color --full-index -- "${left}" "${right}" || true`,
     {

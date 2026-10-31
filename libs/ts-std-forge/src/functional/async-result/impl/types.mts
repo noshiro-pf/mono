@@ -3,8 +3,8 @@ import type { UnknownResult } from '../../result/index.mjs';
 import type { AsyncResult } from '../async-result.mjs';
 
 /**
- * Base type for any `AsyncResult`, used for generic constraints. Represents
- * an `AsyncResult` with unknown success and error types.
+ * Base type for any `AsyncResult`, used for generic constraints. Represents an
+ * `AsyncResult` with unknown success and error types.
  */
 export type UnknownAsyncResult = AsyncResult<unknown, unknown>;
 

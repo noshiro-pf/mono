@@ -8,13 +8,13 @@ export type ReportSource = Readonly<{ owner: string; repo: string }>;
  * The repository the URL names, `?repo=owner/name`, so that the page can be
  * pointed at any repository the token can read and a bookmark keeps it.
  * `undefined` without the parameter, or with a value no repository can have:
- * the page then asks which repository to read rather than picking one, so
- * that nobody lands on a repository they did not choose. The value is read
- * as the form's field reads what is typed into it ({@link parseRepository}).
+ * the page then asks which repository to read rather than picking one, so that
+ * nobody lands on a repository they did not choose. The value is read as the
+ * form's field reads what is typed into it ({@link parseRepository}).
  *
- * Read once, as the page opens: changing it is a navigation, not a choice
- * the page makes while it is open — which is also what keeps an answer about
- * one repository from landing on the page of another.
+ * Read once, as the page opens: changing it is a navigation, not a choice the
+ * page makes while it is open — which is also what keeps an answer about one
+ * repository from landing on the page of another.
  */
 export const reportSourceFromSearch = (
   search: string,
@@ -33,10 +33,10 @@ export const repositoryParam = (search: string): string | undefined => {
 
 /**
  * A repository named the way a reader would name one: `owner/name`, or its
- * address on github.com as the address bar has it — with a page after the
- * name, a query, a fragment or `.git` — so that what was copied from a tab
- * can be pasted as it is. `undefined` for anything else, a host other than
- * github.com included: this page reads `api.github.com` alone.
+ * address on github.com as the address bar has it — with a page after the name,
+ * a query, a fragment or `.git` — so that what was copied from a tab can be
+ * pasted as it is. `undefined` for anything else, a host other than github.com
+ * included: this page reads `api.github.com` alone.
  */
 export const parseRepository = (value: string): ReportSource | undefined => {
   const trimmed = value.trim();
@@ -54,8 +54,7 @@ export const parseRepository = (value: string): ReportSource | undefined => {
 
 /**
  * `search` with `repo` naming `source`, the rest kept as it is, so that the
- * layout, the theme and what the page shows go along to the other
- * repository.
+ * layout, the theme and what the page shows go along to the other repository.
  */
 export const searchWithRepository = (
   search: string,
@@ -77,12 +76,11 @@ export const repositoryUrl = (source: ReportSource): string =>
  * How often the page reads GitHub again while it is on screen, at most: a
  * repository whose reads cost more is read less often (`pollIntervalFor`).
  *
- * **Set by the GraphQL budget.** A read is one query per part of the page
- * and a follow-up, about 9 points against this repository by GitHub's
- * formula, and GraphQL has no conditional request: a read that finds
- * nothing new costs the same as one that finds everything. Every fifteen
- * seconds is 240 reads an hour, about 2,000 of the 5,000 points an account
- * gets — which leaves the rest
+ * **Set by the GraphQL budget.** A read is one query per part of the page and a
+ * follow-up, about 9 points against this repository by GitHub's formula, and
+ * GraphQL has no conditional request: a read that finds nothing new costs the
+ * same as one that finds everything. Every fifteen seconds is 240 reads an
+ * hour, about 2,000 of the 5,000 points an account gets — which leaves the rest
  * for everything else that account does with GraphQL, `gh` included.
  *
  * **Refresh** is not bound by this. It reads at once, because a reader who
@@ -91,12 +89,12 @@ export const repositoryUrl = (source: ReportSource): string =>
 export const POLL_INTERVAL_MS = 15_000;
 
 /**
- * How often "3 minutes ago" is recomputed. Not tied to the poll: a hidden
- * tab stops polling, and the sentence about how old the page is has to keep
- * up with that, or a tab left open reads as fresh forever.
+ * How often "3 minutes ago" is recomputed. Not tied to the poll: a hidden tab
+ * stops polling, and the sentence about how old the page is has to keep up with
+ * that, or a tab left open reads as fresh forever.
  *
- * Every second, because the ages count seconds, and because a tick costs a
- * text node per age rather than a render: they are signals (`age.tsx`).
+ * Every second, because the ages count seconds, and because a tick costs a text
+ * node per age rather than a render: they are signals (`age.tsx`).
  */
 export const CLOCK_TICK_MS = 1000;
 

@@ -5,9 +5,9 @@ import { viewTag } from '../internal/index.mjs';
  * An observable and a function to apply to each of its values, bound without
  * creating a node in the graph. Made by {@link view}.
  *
- * The source's value type is hidden behind `open`, which hands the pair back
- * to a callback that is generic in it: whoever opens a view sees a source and
- * a function that agree with each other, with no assertion on either side.
+ * The source's value type is hidden behind `open`, which hands the pair back to
+ * a callback that is generic in it: whoever opens a view sees a source and a
+ * function that agree with each other, with no assertion on either side.
  */
 export type View<T> = Readonly<{
   [viewTag]: true;

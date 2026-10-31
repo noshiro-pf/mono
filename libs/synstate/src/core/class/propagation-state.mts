@@ -18,8 +18,8 @@ import type { UpdateToken } from '../types/index.mjs';
 import type { ChildNode } from './observable-node.mjs';
 
 /**
- * How many updates are propagating, across every observable, and the token
- * of the outermost one. A write nothing observes opens none
+ * How many updates are propagating, across every observable, and the token of
+ * the outermost one. A write nothing observes opens none
  * (`setNextIfUnobserved`).
  */
 const mut_propagation: {
@@ -28,15 +28,14 @@ const mut_propagation: {
 } = { depth: 0, outermostToken: undefined };
 
 /**
- * Work deferred by {@link runAfterPropagation}, run once the outermost
- * update has reached every descendant.
+ * Work deferred by {@link runAfterPropagation}, run once the outermost update
+ * has reached every descendant.
  */
 const mut_afterPropagation: (() => void)[] = [];
 
 /**
- * Whether some observable's update is propagating right now. A root written
- * to while one is, is written to from inside a subscriber or a projection
- * (#2336).
+ * Whether some observable's update is propagating right now. A root written to
+ * while one is, is written to from inside a subscriber or a projection (#2336).
  */
 export const isPropagating = (): boolean => mut_propagation.depth > 0;
 
@@ -71,8 +70,7 @@ export const beginPropagation = (updateToken: UpdateToken): void => {
 };
 
 /**
- * Ends one update, and runs the deferred work once the outermost one has
- * ended.
+ * Ends one update, and runs the deferred work once the outermost one has ended.
  */
 export const endPropagation = (): void => {
   mut_propagation.depth -= 1;
@@ -91,11 +89,11 @@ export const endPropagation = (): void => {
 };
 
 /**
- * The buckets of this copy's open updates, one set per nesting level: a
- * bucket per depth below the node that started the update, holding the
- * queued nodes and how many of its slots are in use. Kept from update to
- * update, so that an update allocates nothing but its token; emptying a
- * bucket is setting its length to 0.
+ * The buckets of this copy's open updates, one set per nesting level: a bucket
+ * per depth below the node that started the update, holding the queued nodes
+ * and how many of its slots are in use. Kept from update to update, so that an
+ * update allocates nothing but its token; emptying a bucket is setting its
+ * length to 0.
  */
 const mut_bucketSets: Bucket[][] = [];
 
@@ -125,9 +123,9 @@ export const openUpdate = (depth: number): UpdateToken => {
 
 /**
  * How many updates of one copy may be open at once, one inside another. An
- * update opens inside another only when a subscriber or projection writes to
- * a root while the outer one is propagating; a chain of such writes this deep
- * is a loop that would otherwise run until the stack overflows.
+ * update opens inside another only when a subscriber or projection writes to a
+ * root while the outer one is propagating; a chain of such writes this deep is
+ * a loop that would otherwise run until the stack overflows.
  */
 export const maxUpdateNesting = 100;
 
@@ -173,10 +171,10 @@ type Bucket = {
  *
  * A queued node is marked with the token of the update that queued it
  * (`queuedFor`), which is how an update queues a node once. The mark is not
- * cleared after the visit: a later update has another token. An update does
- * not overwrite the mark of an update that is still open — one it is nested
- * in, or one of another copy of synstate — and remembers the nodes it
- * queues despite such a mark in a set of its own instead.
+ * cleared after the visit: a later update has another token. An update does not
+ * overwrite the mark of an update that is still open — one it is nested in, or
+ * one of another copy of synstate — and remembers the nodes it queues despite
+ * such a mark in a set of its own instead.
  */
 class UpdateQueue {
   readonly #base: number;
@@ -252,8 +250,8 @@ class UpdateQueue {
       }
 
       if (mark !== undefined && toQueue(mark).isOpen) {
-        // Another open update has queued `child` and may not have visited
-        // it yet: leave its mark alone.
+        // Another open update has queued `child` and may not have visited it
+        // yet: leave its mark alone.
         if (this.#mut_queuedDespiteMark === undefined) {
           this.#mut_queuedDespiteMark = new Set<ChildNode>();
         } else if (this.#mut_queuedDespiteMark.has(child)) {
@@ -274,8 +272,8 @@ class UpdateQueue {
 
     const mut_buckets = this.#mut_buckets;
 
-    // `size` grows while the buckets are visited, always past `index`, which
-    // a `range` built at the start would miss.
+    // `size` grows while the buckets are visited, always past `index`, which a
+    // `range` built at the start would miss.
     // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
     for (let mut_index = 0; mut_index < this.#mut_size; mut_index += 1) {
       const mut_bucket = mut_buckets[mut_index];
@@ -284,9 +282,9 @@ class UpdateQueue {
         continue;
       }
 
-      // A node visited here queues only deeper nodes, so this bucket does
-      // not grow while it is visited. Its length is kept until the end, so
-      // that `close` can clear what an exception leaves.
+      // A node visited here queues only deeper nodes, so this bucket does not
+      // grow while it is visited. Its length is kept until the end, so that
+      // `close` can clear what an exception leaves.
       const { nodes: mut_nodes, length } = mut_bucket;
 
       // eslint-disable-next-line ts-data-forge/prefer-range-for-loop

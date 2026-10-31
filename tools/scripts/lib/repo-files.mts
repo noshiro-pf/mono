@@ -102,8 +102,8 @@ export const hasPath = (tree: Tree, relativePath: string): boolean =>
  * up to date with the tree it describes — the documents whose references to
  * that tree are checked.
  *
- * What is left out says something as it was when it was written, and is
- * never edited to follow the tree:
+ * What is left out says something as it was when it was written, and is never
+ * edited to follow the tree:
  *
  * - `CHANGELOG.md`, and the records under {@link RECORD_SEGMENTS} and
  *   {@link RECORD_SUFFIX}: a report of work done, a session's work log, a
@@ -124,22 +124,22 @@ export const isRepositoryProse = (relativePath: string): boolean =>
 
 /**
  * Whether `relativePath` is a page an app renders — Markdown under an app's
- * `src/`, such as the content collections of the Astro docs sites — rather
- * than a document GitHub renders as it is.
+ * `src/`, such as the content collections of the Astro docs sites — rather than
+ * a document GitHub renders as it is.
  *
- * Such a page is read by the app's users: its relative links are routes of
- * the built site, and a path like `src/main.ts` in it is in the reader's
- * project, not in the app's.
+ * Such a page is read by the app's users: its relative links are routes of the
+ * built site, and a path like `src/main.ts` in it is in the reader's project,
+ * not in the app's.
  */
 export const isSitePage = (relativePath: string): boolean =>
   SITE_PAGE.test(relativePath);
 
 /**
- * Whether a path a document names is under `experimental/`, which the
- * guards that resolve such names leave alone.
+ * Whether a path a document names is under `experimental/`, which the guards
+ * that resolve such names leave alone.
  *
- * A diff that touches nothing but `experimental/` skips every workflow, so
- * the pull request that deletes a directory there merges unchecked, and the
+ * A diff that touches nothing but `experimental/` skips every workflow, so the
+ * pull request that deletes a directory there merges unchecked, and the
  * document that still names it would fail the next, unrelated pull request
  * instead. `experimental/` is emptied as its contents are revived or dropped
  * (`docs/experimental-inventory.md`), so its paths are expected to go.

@@ -17,11 +17,11 @@ export type TypeRewrite = Readonly<{
  * Emits one report per rewrite, resolving each target name. Every fix imports
  * the name it writes when the file does not import it yet
  * ({@link buildTypeImportFix}), so that one applied alone is complete, and the
- * first of those imports every name the reports need: the import edits
- * overlap, so `--fix` applies one fix per pass, and when that is the batching
- * fix the second pass applies the rest. (With nested rewrites an inner fix,
- * whose range ends first, can win the pass instead; that costs a pass, not a
- * fix.) A report that needs no import has no import edit.
+ * first of those imports every name the reports need: the import edits overlap,
+ * so `--fix` applies one fix per pass, and when that is the batching fix the
+ * second pass applies the rest. (With nested rewrites an inner fix, whose range
+ * ends first, can win the pass instead; that costs a pass, not a fix.) A report
+ * that needs no import has no import edit.
  */
 export const reportTypeRewrites = <MessageIds extends string>(
   context: TSESLint.RuleContext<MessageIds, readonly unknown[]>,

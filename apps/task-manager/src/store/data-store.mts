@@ -2,14 +2,14 @@
  * The tasks, milestones and groups of the signed-in user, and the writes to
  * them.
  *
- * Follows the session: signing in subscribes to that user's repository,
- * signing out drops it and empties the state. Writes go to the repository
- * and come back through the subscription — the repository hands local
- * writes back at once, so there is one way state changes, not two. A write
- * that fails is reported, not thrown: by then the reader has moved on.
+ * Follows the session: signing in subscribes to that user's repository, signing
+ * out drops it and empties the state. Writes go to the repository and come back
+ * through the subscription — the repository hands local writes back at once, so
+ * there is one way state changes, not two. A write that fails is reported, not
+ * thrown: by then the reader has moved on.
  *
- * The DAG's layout is followed and written the same way, apart from the
- * tasks: it changes far less often, and a task never waits for it.
+ * The DAG's layout is followed and written the same way, apart from the tasks:
+ * it changes far less often, and a task never waits for it.
  */
 
 import {
@@ -67,26 +67,26 @@ export type DataStore = Readonly<{
   /** The project's DAG layout; `undefined` while it has none. */
   dagLayout: InitializedObservable<DagLayout | undefined>;
   /**
-   * Whether the nodes, the groups and the layout have all loaded — the
-   * whole project, unlike `status`, which waits for the nodes alone — or
-   * one of them failed to.
+   * Whether the nodes, the groups and the layout have all loaded — the whole
+   * project, unlike `status`, which waits for the nodes alone — or one of them
+   * failed to.
    */
   projectLoad: InitializedObservable<ProjectLoad>;
   putTask: (task: Task) => void;
   putMilestone: (milestone: Milestone) => void;
   /**
-   * Deletes the nodes `refs` and every dependency on any of them, in one
-   * write; writes nothing when `refs` is empty.
+   * Deletes the nodes `refs` and every dependency on any of them, in one write;
+   * writes nothing when `refs` is empty.
    */
   deleteNodes: (refs: readonly NodeRef[]) => void;
   /**
-   * Makes `dependent` depend on `source` as `addDependency` says, or
-   * reports why it does not.
+   * Makes `dependent` depend on `source` as `addDependency` says, or reports
+   * why it does not.
    */
   addDependency: (dependent: NodeRef, source: NodeRef) => void;
   /**
-   * Takes out every dependency of `dependent` on `source`; writes nothing
-   * when there is none.
+   * Takes out every dependency of `dependent` on `source`; writes nothing when
+   * there is none.
    */
   removeDependency: (dependent: NodeRef, source: NodeRef) => void;
   putGroup: (group: Group) => void;
@@ -95,15 +95,15 @@ export type DataStore = Readonly<{
   /** Moves the node `ref` into the group `groupId`, or into none. */
   setNodeGroup: (ref: NodeRef, groupId: GroupId | undefined) => void;
   /**
-   * Makes `edit` to every node `refs` names, as `editNodes` says, in one
-   * write; writes nothing when nothing changes.
+   * Makes `edit` to every node `refs` names, as `editNodes` says, in one write;
+   * writes nothing when nothing changes.
    */
   editNodes: (refs: readonly NodeRef[], edit: NodeEdit) => void;
   putDagLayout: (layout: DagLayout) => void;
   /**
    * Replaces `previous`, the project as it stands, with `next`, as the
-   * repository's `replaceProject` says. Unlike the other writes, a failure
-   * is the caller's to report: the promise rejects.
+   * repository's `replaceProject` says. Unlike the other writes, a failure is
+   * the caller's to report: the promise rejects.
    */
   replaceProject: (
     next: ProjectSnapshot,
@@ -134,8 +134,8 @@ export const createDataStore = (deps: DataDeps): DataStore => {
     .pipe(withInitialValue<Followed>('stopped'));
 
   /**
-   * What `subscribeTo` hands `next` from the repository followed: `signedOut` while
-   * nobody is signed in, and `empty` from signing in until the repository
+   * What `subscribeTo` hands `next` from the repository followed: `signedOut`
+   * while nobody is signed in, and `empty` from signing in until the repository
    * hands it something.
    */
   const follow = <A,>(
@@ -197,8 +197,8 @@ export const createDataStore = (deps: DataDeps): DataStore => {
   const getState = (): DomainState => state.getSnapshot().value;
 
   /**
-   * What `subscribeTo` hands on, as `follow` does, with whether it has yet —
-   * or failed, and so never will: the value then stays the last one.
+   * What `subscribeTo` hands on, as `follow` does, with whether it has yet — or
+   * failed, and so never will: the value then stays the last one.
    */
   const followFed = <A,>(
     empty: A,
@@ -437,10 +437,10 @@ const repositoryOf = (session: Session): Repository | undefined =>
   session.type === 'signed-in' ? session.repository : undefined;
 
 /**
- * What `subscribe` hands `next`, as an observable whose value is `first`
- * until then. What it hands while it is being subscribed to — the memory
- * repository hands its state at once — is the observable's initial value
- * rather than a write.
+ * What `subscribe` hands `next`, as an observable whose value is `first` until
+ * then. What it hands while it is being subscribed to — the memory repository
+ * hands its state at once — is the observable's initial value rather than a
+ * write.
  */
 const fromFeed = <A,>(
   first: A,

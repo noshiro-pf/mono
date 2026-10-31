@@ -13,8 +13,8 @@ import { TS_TYPE_FORGE_MODULE } from './constants.mjs';
  * The edits that import the ts-type-forge types `names` the file does not
  * import yet, as types: added to an existing `import type { … }` from the
  * module (`, X`), else to a named import from it (`, type X`), else after a
- * lone default import (`, { type X }`), and only failing all of those as a
- * new `import { type X } from 'ts-type-forge'` after the directive prologue.
+ * lone default import (`, { type X }`), and only failing all of those as a new
+ * `import { type X } from 'ts-type-forge'` after the directive prologue.
  * Empty braces count as a host. Adding to an existing declaration keeps
  * `import-x/no-duplicates` satisfied.
  *

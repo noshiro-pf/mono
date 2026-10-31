@@ -25,19 +25,18 @@ type MessageIds = 'preferDerive';
 /**
  * `combine(parents).pipe(map(fn))` is two observables, and `combine` builds a
  * tuple on every update for `map` to take apart. `derive(parents, fn)` is one
- * observable that calls `fn` with the parents' values as arguments and stops
- * a result `Object.is` the one it holds, as `map` does; `map`'s `equals`
- * becomes `derive`'s.
+ * observable that calls `fn` with the parents' values as arguments and stops a
+ * result `Object.is` the one it holds, as `map` does; `map`'s `equals` becomes
+ * `derive`'s.
  *
  * Every such `.pipe` with `map` as its one operator is reported, unless the
  * `map` is one `prefer-map-to` or `no-identity-map` reports (`map(() => c)`,
- * `map((xs) => xs)`). The fix is offered
- * when the mapping function is an arrow function whose one parameter is an
- * array pattern (`([a, b]) =>`, which becomes `(a, b) =>`) or a name
- * (`(xs) =>`, which becomes `(...xs) =>`), with no type annotation, default or
- * `?`, and nothing else is written between the calls: no type wrapper, no
- * parentheses around `combine(...)` or its `.pipe`, no type arguments, no
- * comment.
+ * `map((xs) => xs)`). The fix is offered when the mapping function is an arrow
+ * function whose one parameter is an array pattern (`([a, b]) =>`, which
+ * becomes `(a, b) =>`) or a name (`(xs) =>`, which becomes `(...xs) =>`), with
+ * no type annotation, default or `?`, and nothing else is written between the
+ * calls: no type wrapper, no parentheses around `combine(...)` or its `.pipe`,
+ * no type arguments, no comment.
  */
 export const preferDerive: TSESLint.RuleModule<MessageIds, Options> = {
   meta: {
@@ -141,9 +140,9 @@ type Edit = Readonly<{ range: TSESTree.Range; text: string }>;
 
 /**
  * What rewrites the parameter of `fn` from the tuple `combine` emits to the
- * values `derive` passes: `[a, b]` to `a, b`, `xs` to `...xs`. `undefined`
- * when it cannot: a type annotation, a default, a `?`, a hole, type
- * parameters, or other than one parameter.
+ * values `derive` passes: `[a, b]` to `a, b`, `xs` to `...xs`. `undefined` when
+ * it cannot: a type annotation, a default, a `?`, a hole, type parameters, or
+ * other than one parameter.
  */
 const paramsEditOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -239,8 +238,8 @@ const rewriteOf = (
     callee.type !== AST_NODE_TYPES.MemberExpression ||
     callee.object !== combine ||
     fn?.type !== AST_NODE_TYPES.ArrowFunctionExpression ||
-    // Parentheses around `combine(...)` or `combine(...).pipe` would be
-    // left unbalanced.
+    // Parentheses around `combine(...)` or `combine(...).pipe` would be left
+    // unbalanced.
     getRangeWithParens(sourceCode, combine)[0] !== combine.range[0] ||
     getRangeWithParens(sourceCode, callee)[0] !== callee.range[0]
   ) {
@@ -253,8 +252,8 @@ const rewriteOf = (
     return undefined;
   }
 
-  // What lies between `parents` and `fn`, and after the last argument of
-  // `map`, goes: `).pipe(map(` and `))`. A comment there would go with it.
+  // What lies between `parents` and `fn`, and after the last argument of `map`,
+  // goes: `).pipe(map(` and `))`. A comment there would go with it.
   const between: TSESTree.Range = [
     getRangeWithParens(sourceCode, parents)[1],
     getRangeWithParens(sourceCode, fn)[0],
@@ -272,8 +271,8 @@ const rewriteOf = (
 
 /**
  * Whether `map` is one another rule reports: a `map` to a constant
- * (`prefer-map-to`), a value that never changes after its first emission,
- * which `derive(parents, () => c)` would hide, or an identity `map`
+ * (`prefer-map-to`), a value that never changes after its first emission, which
+ * `derive(parents, () => c)` would hide, or an identity `map`
  * (`no-identity-map`), which would become `combine` written as
  * `derive(parents, (...xs) => xs)`.
  */

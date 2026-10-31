@@ -3,11 +3,11 @@
  * two steps as a node's own is (`editor-store.mts`): `request` asks, and
  * `confirm` deletes them, with every dependency on any of them.
  *
- * The question is about the selection as it stood when it was asked, so it
- * goes away as soon as the selection changes — a node selected, or one
- * dropping out because it was deleted elsewhere — and `confirm` then deletes
- * nothing. That holds by identity: `selected` hands the same array for as
- * long as the nodes in it stay the same, and a new one when they do not.
+ * The question is about the selection as it stood when it was asked, so it goes
+ * away as soon as the selection changes — a node selected, or one dropping out
+ * because it was deleted elsewhere — and `confirm` then deletes nothing. That
+ * holds by identity: `selected` hands the same array for as long as the nodes
+ * in it stay the same, and a new one when they do not.
  */
 
 import {

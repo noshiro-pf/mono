@@ -17,8 +17,8 @@ type Props = Readonly<{
 
 /**
  * One task. The title is a button that opens the dialog, and it is stretched
- * over the whole row (`index.css`), so the row is one tap target without
- * being an interactive element itself.
+ * over the whole row (`index.css`), so the row is one tap target without being
+ * an interactive element itself.
  */
 export const TaskTableRow = ({ row }: Props): JSX.Element => (
   <tr

@@ -1,13 +1,13 @@
 /**
  * The order of the tasks of 「アーク」 and 「タイル」 — one for both, apart
- * from the list's (`list-settings.mts`) — and how it is kept in
- * `localStorage` between visits, on this device only. Edited with the same
+ * from the list's (`list-settings.mts`) — and how it is kept in `localStorage`
+ * between visits, on this device only. Edited with the same
  * editor as the list's keys (`sort-edit.mts`) in 「表示設定」.
  *
  * Every key may be removed: no keys orders by title ascending, the default.
- * Kept as every setting is (`persisted-setting.mts`): anything stored that
- * is not a list gives the default, and a broken entry of one is repaired
- * field by field.
+ * Kept as every setting is (`persisted-setting.mts`): anything stored that is
+ * not a list gives the default, and a broken entry of one is repaired field by
+ * field.
  */
 
 import { Arr } from 'ts-data-forge';

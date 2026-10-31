@@ -84,9 +84,9 @@ export namespace Obj {
 /**
  * Walks `keyPath` and rebuilds the containers along the way.
  *
- * Untyped on purpose: the types the callers carry cannot be expressed through
- * a recursive walk, so they are re-applied by the assertion at each entry
- * point above.
+ * Untyped on purpose: the types the callers carry cannot be expressed through a
+ * recursive walk, so they are re-applied by the assertion at each entry point
+ * above.
  */
 const updateInImpl = (
   obj: UnknownRecord | readonly unknown[],

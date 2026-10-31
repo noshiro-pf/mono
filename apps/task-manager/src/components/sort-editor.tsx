@@ -30,8 +30,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * Sort keys, first one deciding: each can be flipped, moved and removed,
- * and any key not in use can be added at the end — for the list's sort
+ * Sort keys, first one deciding: each can be flipped, moved and removed, and
+ * any key not in use can be added at the end — for the list's sort
  * (`list-toolbar.tsx`) and the order of 「アーク」 and 「タイル」
  * (`diagram-sort-field.tsx`) alike, each handing it its keys and its store.
  */

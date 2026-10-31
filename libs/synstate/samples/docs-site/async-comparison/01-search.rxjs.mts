@@ -33,8 +33,8 @@ export const createSearch = () => {
       debounceTime(debounceMs), // wait for typing to pause
       map((q) => q.trim()),
       distinctUntilChanged(), // skip a query that did not change
-      // A newer query unsubscribes from the previous request,
-      // and fromFetch aborts a request it is unsubscribed from.
+      // A newer query unsubscribes from the previous request, and fromFetch
+      // aborts a request it is unsubscribed from.
       switchMap((q): Observable<SearchState> =>
         q === ''
           ? of(idleState)
@@ -44,8 +44,8 @@ export const createSearch = () => {
                 query: q,
                 items,
               })),
-              // Caught inside switchMap: an error that reached the outer
-              // pipe would end it, and the search box with it.
+              // Caught inside switchMap: an error that reached the outer pipe
+              // would end it, and the search box with it.
               catchError((error: unknown) =>
                 of<SearchState>({
                   status: 'error',

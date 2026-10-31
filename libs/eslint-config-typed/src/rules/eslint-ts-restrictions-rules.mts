@@ -10,6 +10,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/function-order': 'error',
   'ts-restrictions/jsx-boolean-logical-operands': 'error',
   'ts-restrictions/no-negated-comparison': 'error',
+  'ts-restrictions/no-ragged-comment-wrap': withDefaultOption('error'),
   'ts-restrictions/no-string-spread': 'error',
   'ts-restrictions/no-unnecessary-array-from': 'error',
   'ts-restrictions/no-unnecessary-coalesce-undefined': 'error',

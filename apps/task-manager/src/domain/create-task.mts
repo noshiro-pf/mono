@@ -2,9 +2,9 @@ import type { StrictOmit } from 'ts-type-forge';
 import type { Task, TaskId } from './types.mjs';
 
 /**
- * A new task: `id`, `title` and the creation time are required, and every
- * other field defaults to an empty or neutral value — `not-started`, priority
- * `3`, no dates, no people, no dependencies, no group.
+ * A new task: `id`, `title` and the creation time are required, and every other
+ * field defaults to an empty or neutral value — `not-started`, priority `3`, no
+ * dates, no people, no dependencies, no group.
  */
 export const createTask = ({
   id,

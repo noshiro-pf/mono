@@ -21,8 +21,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * Blueprint's `Spinner` with no value: a quarter of the track, turning, in
- * the markup Blueprint's style sheets animate.
+ * Blueprint's `Spinner` with no value: a quarter of the track, turning, in the
+ * markup Blueprint's style sheets animate.
  */
 export const Spinner = ({
   size: sizeProp = SpinnerSize.STANDARD,

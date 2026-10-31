@@ -397,8 +397,8 @@ declare const mutableFixed3: MutableFixedLengthArray<3, number>;
 // Relation to the structural tuple family (FixedLengthTuple etc.)
 
 {
-  // The hybrid FixedLengthArray is assignable to the structural tuple
-  // (up to the prefix cap), but not vice versa (the brand is missing)
+  // The hybrid FixedLengthArray is assignable to the structural tuple (up to
+  // the prefix cap), but not vice versa (the brand is missing)
   expectType<FixedLengthArray<3, number>, FixedLengthTuple<3, number>>('<=');
 
   expectType<FixedLengthTuple<3, number>, FixedLengthArray<3, number>>('!<=');
@@ -418,8 +418,8 @@ declare const mutableFixed3: MutableFixedLengthArray<3, number>;
   >('<=');
 }
 
-// Length parameters are capped at 2048 (SupportedLength); larger literals
-// are rejected with a constraint error instead of a deep-instantiation error
+// Length parameters are capped at 2048 (SupportedLength); larger literals are
+// rejected with a constraint error instead of a deep-instantiation error
 
 {
   expectType<2048, SupportedLength>('<=');

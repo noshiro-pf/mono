@@ -13,8 +13,8 @@ import {
  * It re-exports every type from `./index.mjs` except
  * `TSTypeForgeInternals_`-prefixed internal helpers, so consumers of
  * `import { X } from 'ts-type-forge'` only see the public API surface.
- * (`./index.mjs` itself must keep exporting the internals because the
- * generated `global.mts` references them as `_TSTypeForge.TSTypeForgeInternals_*`.)
+ * (`./index.mjs` itself must keep exporting the internals because the generated
+ * `global.mts` references them as `_TSTypeForge.TSTypeForgeInternals_*`.)
  */
 export const genEntryPoint = async (
   srcDir: string,

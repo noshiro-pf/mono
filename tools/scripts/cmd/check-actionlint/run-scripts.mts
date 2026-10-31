@@ -12,11 +12,11 @@ import { Arr, Num, Result } from 'ts-data-forge';
  * level of nesting. **What it does not read is reported, never skipped**: a
  * step with no `shell:` (GitHub refuses it anyway), a folded `>` scalar, a
  * double-quoted one with an escape, a one-line scalar continued on the next
- * line, `runs:` or `steps:` written in flow style (`{ … }`, `[ … ]`), and —
- * the net under all of them — any `run:` key under `runs:`, quoted, as an
- * explicit `? run` or in a flow-mapping step, that is not one of the steps it
- * read. Only a script it read, and a key deeper than any step's own
- * (`env: { run: … }`), is left out of that count.
+ * line, `runs:` or `steps:` written in flow style (`{ … }`, `[ … ]`), and — the
+ * net under all of them — any `run:` key under `runs:`, quoted, as an explicit
+ * `? run` or in a flow-mapping step, that is not one of the steps it read. Only
+ * a script it read, and a key deeper than any step's own (`env: { run: … }`),
+ * is left out of that count.
  */
 export const extractRunScripts = (
   text: string,
@@ -42,8 +42,8 @@ export const extractRunScripts = (
     Arr.isEmpty(parsedSteps) ? Number.POSITIVE_INFINITY : 0,
   );
 
-  // Only what is under `runs:` can be a step, and a comment or a script it
-  // read is not a key.
+  // Only what is under `runs:` can be a step, and a comment or a script it read
+  // is not a key.
   const runKeys = lines.filter(
     (line, index) =>
       runsLine < index &&
@@ -203,8 +203,8 @@ const isContent = (line: string): boolean =>
   line.trim() !== '' && !line.trimStart().startsWith('#');
 
 /**
- * The keys of the top-level `inputs:` mapping: the action's input names,
- * which a script may reference as `inputs.<name>`.
+ * The keys of the top-level `inputs:` mapping: the action's input names, which
+ * a script may reference as `inputs.<name>`.
  */
 const readInputNames = (lines: readonly string[]): readonly string[] => {
   const inputsLine = lines.findIndex(
@@ -332,8 +332,8 @@ const readStep = (
   }
 
   if (header === '|') {
-    // An indentation indicator fixes the content's indentation relative to
-    // the key's; without one it is the first non-blank line's.
+    // An indentation indicator fixes the content's indentation relative to the
+    // key's; without one it is the first non-blank line's.
     const indicator = /\d/u.exec(headerGroups?.['flags'] ?? '')?.[0];
 
     const indent =
@@ -343,8 +343,8 @@ const readStep = (
           Result.unwrapOkOr(Num.safeParseFloat(indicator), Number.NaN);
 
     // The scalar ends at the first non-blank line indented less than its
-    // content — a trail comment included, which is YAML's and not the
-    // script's — and its trailing blank lines are not part of it.
+    // content — a trail comment included, which is YAML's and not the script's
+    // — and its trailing blank lines are not part of it.
     const stop = rest.findIndex(
       (line) => line.trim() !== '' && indentOf(line) < indent,
     );
@@ -411,8 +411,8 @@ const readStep = (
 };
 
 /**
- * The `runs:` line, or `-1` when there is none in block style, and the index
- * of the first top-level line after its section (or `lines.length`).
+ * The `runs:` line, or `-1` when there is none in block style, and the index of
+ * the first top-level line after its section (or `lines.length`).
  */
 const findRuns = (
   lines: readonly string[],
@@ -514,8 +514,8 @@ const problemAtLine = (index: number): string =>
   `${index + 1}: \`runs:\` or \`steps:\` in flow style, which this does not read; write them in block style` as const;
 
 /**
- * A `runs:` or `steps:` given a flow value on its own line, or a flow
- * sequence starting the line under `steps:` — the steps this cannot read.
+ * A `runs:` or `steps:` given a flow value on its own line, or a flow sequence
+ * starting the line under `steps:` — the steps this cannot read.
  */
 const findFlowStyle = (
   lines: readonly string[],
@@ -536,8 +536,8 @@ const findFlowStyle = (
 
     // `runs.steps`: the first `steps:` under `runs:`, as `runs:` holds no
     // nested mapping before it. A flow value on its line, or a flow sequence
-    // opening the line under it, is the only flow style looked for, so that
-    // a `steps:` or `[` deeper in a step is not mistaken for one.
+    // opening the line under it, is the only flow style looked for, so that a
+    // `steps:` or `[` deeper in a step is not mistaken for one.
     const stepsLine = findIndexFrom(
       lines,
       runsLine + 1,

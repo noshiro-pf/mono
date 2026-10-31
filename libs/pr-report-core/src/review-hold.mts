@@ -5,18 +5,18 @@
  * `main`'s ruleset asks for two things no check reports: an approval from a
  * code owner of every owned path the pull request touches, and every review
  * conversation resolved. A queued pull request missing either goes green and
- * sits there, and a rebase cannot change that. Released anyway, it costs a
- * full matrix and holds the queue for the length of a watch; and because
- * `main` moving is what puts it back in the running, it would be rebased and
- * run again every time anything else merged. So triage reads both before
- * picking, and leaves a pull request they hold in the queue with a note,
- * until an approval or a resolved conversation changes the answer.
+ * sits there, and a rebase cannot change that. Released anyway, it costs a full
+ * matrix and holds the queue for the length of a watch; and because `main`
+ * moving is what puts it back in the running, it would be rebased and run again
+ * every time anything else merged. So triage reads both before picking, and
+ * leaves a pull request they hold in the queue with a note, until an approval
+ * or a resolved conversation changes the answer.
  *
  * Except when nothing can change it: GitHub does not let an author approve
  * their own pull request, so one whose waiting paths only its author owns
- * merges by a ruleset bypass or not at all. Holding that one would hold it
- * for ever, with `skip-ci` on and no verdict for whoever makes the bypass
- * merge to go by. So it is released and watched like any other, with
+ * merges by a ruleset bypass or not at all. Holding that one would hold it for
+ * ever, with `skip-ci` on and no verdict for whoever makes the bypass merge to
+ * go by. So it is released and watched like any other, with
  * auto-merge left off — it could never fire — until its checks report, and
  * then left for that person (`awaiting-bypass`).
  *
@@ -50,11 +50,11 @@ export type ReviewRules = Readonly<{
 }>;
 
 /**
- * What the review does to the pull request: `held` waits for an approval or
- * a resolved conversation, `bypass` waits for nobody — only its author owns
- * what is waiting — and `undefined` holds nothing. What cannot be told for
- * sure — changed files past what could be read — holds nothing: the watch
- * still catches a pull request that goes green and does not merge, and
+ * What the review does to the pull request: `held` waits for an approval or a
+ * resolved conversation, `bypass` waits for nobody — only its author owns what
+ * is waiting — and `undefined` holds nothing. What cannot be told for sure —
+ * changed files past what could be read — holds nothing: the watch still
+ * catches a pull request that goes green and does not merge, and
  * `demotions.mts` is what follows.
  */
 export type ReviewHold = Readonly<{ kind: 'bypass' | 'held'; reason: string }>;

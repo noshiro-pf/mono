@@ -4,9 +4,9 @@ import * as path from 'node:path';
 import { runOxlint } from '../src/index.mjs';
 
 /**
- * The package half of the rule needs packages to resolve, which the corpus
- * (a fixture tree with no node_modules) cannot hold: a temporary project
- * with two packages, one with an `exports` map and one without.
+ * The package half of the rule needs packages to resolve, which the corpus (a
+ * fixture tree with no node_modules) cannot hold: a temporary project with two
+ * packages, one with an `exports` map and one without.
  */
 
 const CODE = 'sumi(no-internal-module-import)';

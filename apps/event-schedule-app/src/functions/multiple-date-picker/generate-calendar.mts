@@ -93,8 +93,8 @@ const genYmdRangeList = (
 
 // `DateUtils.create` takes the month as 1-12 and does the 0-based conversion
 // itself. Writing `month - 1` here does not type-check under the strict
-// standard library: it narrows `Date`'s month argument to 0-11, and
-// subtraction widens to `number`.
+// standard library: it narrows `Date`'s month argument to 0-11, and subtraction
+// widens to `number`.
 const getFirstDateOfMonth = (year: SafeUint, month: MonthEnum): Date =>
   DateUtils.create(year, month, 1);
 

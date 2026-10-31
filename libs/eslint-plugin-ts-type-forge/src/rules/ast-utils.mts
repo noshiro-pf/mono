@@ -163,8 +163,8 @@ const isNode = (value: unknown): value is TSESTree.Node =>
  * Children are found through the parser's visitor keys, so only the properties
  * that actually hold one are read. Reading every own property instead works
  * too, and is the fallback for a parser that declares no keys for a node type,
- * but it allocates an entry pair per property and walks `loc` / `range` as
- * well — on the generated rule-type files that alone was most of the cost.
+ * but it allocates an entry pair per property and walks `loc` / `range` as well
+ * — on the generated rule-type files that alone was most of the cost.
  */
 const walk = (
   node: TSESTree.Node,

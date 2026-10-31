@@ -15,13 +15,13 @@ type UnwrapPromise<P extends Promise<unknown>> =
 /**
  * Converts a Promise into a Promise that resolves to a `Result`. If the input
  * Promise resolves, the `Result` will be `Ok` with the resolved value. If the
- * input Promise rejects, the `Result` will be `Err` with the rejection
- * reason. A rejection with a `PanicError` is rethrown instead: a bug is not
- * a recoverable failure.
+ * input Promise rejects, the `Result` will be `Err` with the rejection reason.
+ * A rejection with a `PanicError` is rethrown instead: a bug is not a
+ * recoverable failure.
  *
- * The error channel is `unknown`, since the rejection reason is carried
- * through untouched. For a concrete error type, use `AsyncResult.fromPromise`
- * with a `mapError` function; called without one it behaves exactly as this
+ * The error channel is `unknown`, since the rejection reason is carried through
+ * untouched. For a concrete error type, use `AsyncResult.fromPromise` with a
+ * `mapError` function; called without one it behaves exactly as this
  * function does.
  *
  * @example

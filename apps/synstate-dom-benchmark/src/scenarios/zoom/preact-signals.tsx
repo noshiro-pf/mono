@@ -17,8 +17,8 @@ import {
 /**
  * The zoom is a signal, the level a `computed` reading it, and every label a
  * `computed` reading the level. Each cell is a `computed` that formats a
- * figure, passed to the DOM as a signal so that it binds without re-rendering
- * a component.
+ * figure, passed to the DOM as a signal so that it binds without re-rendering a
+ * component.
  */
 export const preactSignalsZoom: ScenarioFramework<ZoomApp> = {
   name: 'Preact + Signals',

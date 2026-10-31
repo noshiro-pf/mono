@@ -73,8 +73,8 @@ export function string(
   }
 
   return attachConstraints(
-    // The constraints are what the refinement checks, and they are on the
-    // type itself, so it describes itself as the primitive it refines.
+    // The constraints are what the refinement checks, and they are on the type
+    // itself, so it describes itself as the primitive it refines.
     withStructure(
       refine({
         baseType,
@@ -130,18 +130,18 @@ type Constraints = Partial<
 export type StringTypeConstraints = RawConstraints;
 
 /**
- * The result type produced by {@link string} for a given set of constraints
- * `C` (e.g. `nonempty` yields {@link NonEmptyString}, `minLength` /
- * `maxLength` yield {@link MinLengthString} / {@link MaxLengthString},
- * `startsWith` narrows to a template literal type, etc.).
+ * The result type produced by {@link string} for a given set of constraints `C`
+ * (e.g. `nonempty` yields {@link NonEmptyString}, `minLength` / `maxLength`
+ * yield {@link MinLengthString} / {@link MaxLengthString}, `startsWith` narrows
+ * to a template literal type, etc.).
  */
 export type StringConstraintsResultType<C extends StringTypeConstraints> =
   ConstraintsResultType<C>;
 
 /**
  * The constraint values carried by a {@link string} type created with the
- * constraints `C`: every key of {@link StringTypeConstraints}, taking the
- * value `C` gives it and `undefined` for the keys `C` leaves out.
+ * constraints `C`: every key of {@link StringTypeConstraints}, taking the value
+ * `C` gives it and `undefined` for the keys `C` leaves out.
  *
  * @example
  * ```ts

@@ -29,8 +29,8 @@ import {
 } from './types.mjs';
 
 /**
- * There is a credential and a repository to use it on, and the branch about
- * to be pushed is not the branch everything targets.
+ * There is a credential and a repository to use it on, and the branch about to
+ * be pushed is not the branch everything targets.
  */
 export const preflight = async (): Promise<
   Result<
@@ -111,9 +111,9 @@ export const pushBranch = async (
 /**
  * The open pull request for this branch, or `undefined`.
  *
- * `head` is qualified with the owner. A bare branch name matches the same
- * name on a fork, and this command must not mistake someone else's pull
- * request for its own.
+ * `head` is qualified with the owner. A bare branch name matches the same name
+ * on a fork, and this command must not mistake someone else's pull request for
+ * its own.
  */
 export const findOpenPullRequest = async (
   api: ApiContext,
@@ -139,16 +139,16 @@ export const findOpenPullRequest = async (
 
   const [found] = listed.value;
 
-  // `noUncheckedIndexedAccess` makes this `… | undefined`, which is the
-  // answer: there is one open pull request for the branch, or none.
+  // `noUncheckedIndexedAccess` makes this `… | undefined`, which is the answer:
+  // there is one open pull request for the branch, or none.
   return Result.ok(found === undefined ? undefined : toPullRequest(found));
 };
 
 /**
- * The open pull request whose branch `base` is, when a new one is to be
- * stacked on it: exactly one, from this repository. Anything else is not a
- * stack `unblock-prs` or the reports would recognize, and is refused rather
- * than opened.
+ * The open pull request whose branch `base` is, when a new one is to be stacked
+ * on it: exactly one, from this repository. Anything else is not a stack
+ * `unblock-prs` or the reports would recognize, and is refused rather than
+ * opened.
  */
 export const findStackParent = async (
   api: ApiContext,
@@ -186,8 +186,8 @@ export const findStackParent = async (
 };
 
 /**
- * Whether the branch contains the tip of `base`, as a layer stacked on it
- * has to: one that does not shows the layer below's old commits in its diff.
+ * Whether the branch contains the tip of `base`, as a layer stacked on it has
+ * to: one that does not shows the layer below's old commits in its diff.
  */
 export const containsBase = async (
   base: string,
@@ -255,14 +255,14 @@ export const createPullRequest = async ({
 };
 
 /**
- * What the issues the pull request closes start after, as open pull
- * requests it should merge after (`pr-report-core`'s `inheritStartAfter`),
- * less what its body or `alsoDeclared` — the layer it is stacked on — already
- * says. The readers derive the same each time they read, so this is the
- * body stating it, as it states a stack.
+ * What the issues the pull request closes start after, as open pull requests it
+ * should merge after (`pr-report-core`'s `inheritStartAfter`), less what its
+ * body or `alsoDeclared` — the layer it is stacked on — already says. The
+ * readers derive the same each time they read, so this is the body stating it,
+ * as it states a stack.
  *
- * Closing issues are read from the keywords GitHub marked in the body, which
- * it marks whatever the base; one linked by hand in the sidebar is not seen.
+ * Closing issues are read from the keywords GitHub marked in the body, which it
+ * marks whatever the base; one linked by hand in the sidebar is not seen.
  */
 export const missingInheritedOrder = async (
   api: ApiContext,
@@ -348,8 +348,8 @@ export const missingInheritedOrder = async (
 /**
  * The body of `prNumber`, to have a `Merge-After:` written into it for
  * `--merge-before`: an open pull request, and not the version pull request,
- * whose body `changesets/action` rewrites on every push to the default
- * branch — `blocks-release`, on this one, is how the release is held.
+ * whose body `changesets/action` rewrites on every push to the default branch —
+ * `blocks-release`, on this one, is how the release is held.
  */
 export const readSuccessor = async (
   api: ApiContext,
@@ -414,8 +414,8 @@ const IssueSchema = t.record({
 
 /**
  * GraphQL: the REST API cannot take a pull request out of draft. The one
- * GraphQL call this command makes, and only for a pull request someone
- * opened as a draft before running it.
+ * GraphQL call this command makes, and only for a pull request someone opened
+ * as a draft before running it.
  */
 export const markReady = async (
   api: ApiContext,

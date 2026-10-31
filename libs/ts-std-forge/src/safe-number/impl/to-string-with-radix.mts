@@ -1,15 +1,15 @@
 import type { UintRangeInclusive } from 'ts-type-forge';
 
 /**
- * Converts a number to a string in a given radix, made total by its
- * parameter type.
+ * Converts a number to a string in a given radix, made total by its parameter
+ * type.
  *
  * `Number.prototype.toString` throws a `RangeError` only when `radix` is
- * outside 2–36. With `radix` typed as the `2 | 3 | ... | 36` literal range
- * (the same refinement the strict TS lib applies), that failure is
- * unrepresentable at compile time, so the function returns the string
- * directly. A caller holding a plain `number` narrows it first; one that
- * defeats the type system gets the raw `RangeError`, by design.
+ * outside 2–36. With `radix` typed as the `2 | 3 | ... | 36` literal range (the
+ * same refinement the strict TS lib applies), that failure is unrepresentable
+ * at compile time, so the function returns the string directly. A caller
+ * holding a plain `number` narrows it first; one that defeats the type system
+ * gets the raw `RangeError`, by design.
  *
  * @example
  *

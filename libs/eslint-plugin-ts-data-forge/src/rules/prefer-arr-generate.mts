@@ -31,8 +31,8 @@ type Match = Readonly<{
 }>;
 
 /**
- * The callback of `xs.flatMap((x) => (cond ? [a, b] : []))` decides per
- * element whether to keep it and what to keep. Written as a loop, that is
+ * The callback of `xs.flatMap((x) => (cond ? [a, b] : []))` decides per element
+ * whether to keep it and what to keep. Written as a loop, that is
  *
  * ```ts
  * Arr.generate(function* () {
@@ -122,8 +122,8 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
       esTreeNodeToTSNodeMap,
     });
 
-    // The negation is the test of the loop's `if`, where only its truthiness
-    // is read, so `!!a` may always be written `a`.
+    // The negation is the test of the loop's `if`, where only its truthiness is
+    // read, so `!!a` may always be written `a`.
     const negationContext: NegationContext = {
       sourceCode,
       checker,
@@ -163,8 +163,8 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
 
         const callback = node.arguments[0];
 
-        // A wrapper around the callback may be what types its parameter, so
-        // a wrapped callback is not unwrapped.
+        // A wrapper around the callback may be what types its parameter, so a
+        // wrapped callback is not unwrapped.
         if (
           callback.type !== AST_NODE_TYPES.ArrowFunctionExpression ||
           callback.async ||
@@ -654,9 +654,8 @@ const isArrayOrTupleType = (
 };
 
 /**
- * Whether two types are both arrays or tuples whose elements have one type,
- * as the declared and the narrowed type of `xs` after `Arr.isNonEmpty(xs)`
- * are.
+ * Whether two types are both arrays or tuples whose elements have one type, as
+ * the declared and the narrowed type of `xs` after `Arr.isNonEmpty(xs)` are.
  */
 const iteratesTheSame = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -683,8 +682,8 @@ const iteratesTheSame = (
  * `undefined` when there is none to compare with (an index read with no
  * property behind it, which nothing narrows).
  *
- * A property's is read off the type of the object it is accessed on, which
- * also covers a property of a mapped type (`Readonly<…>`), whose symbol has no
+ * A property's is read off the type of the object it is accessed on, which also
+ * covers a property of a mapped type (`Readonly<…>`), whose symbol has no
  * declaration of its own. A variable's is the type at its declaration
  * (`checker.getTypeOfSymbol` would say the same, but is missing before
  * TypeScript 5.1).
@@ -749,11 +748,11 @@ const isReference = (
 };
 
 /**
- * Whether `node`, a reference or a member access, has a type here narrower
- * than its declared one, by a narrowing that a function created here would not
- * see. TypeScript keeps the narrowing of a `const`, and of a parameter or `let`
- * that is never reassigned, inside a closure; it drops every other one,
- * including any narrowing of a property.
+ * Whether `node`, a reference or a member access, has a type here narrower than
+ * its declared one, by a narrowing that a function created here would not see.
+ * TypeScript keeps the narrowing of a `const`, and of a parameter or `let` that
+ * is never reassigned, inside a closure; it drops every other one, including
+ * any narrowing of a property.
  */
 const isNarrowedHere = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -811,16 +810,16 @@ const isNarrowedHere = (
   return (
     declaredType !== undefined &&
     declaredType !== type &&
-    // The loop only iterates the receiver itself, so a narrowing that leaves
-    // it an array of the same elements (`Arr.isNonEmpty(xs)`) loses nothing.
+    // The loop only iterates the receiver itself, so a narrowing that leaves it
+    // an array of the same elements (`Arr.isNonEmpty(xs)`) loses nothing.
     !(isReceiver && iteratesTheSame(checker, declaredType, type))
   );
 };
 
 /**
- * Whether the binding `identifier` reads is declared inside `container`, as
- * the parameter of an arrow function in the receiver is: the loop variable
- * does not shadow it.
+ * Whether the binding `identifier` reads is declared inside `container`, as the
+ * parameter of an arrow function in the receiver is: the loop variable does not
+ * shadow it.
  */
 const isBoundWithin = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

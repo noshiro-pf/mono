@@ -5,8 +5,8 @@ type SourceFileMapping = Readonly<{
 
 /**
  * Mapping from source files to their sample code files. Sample files must be
- * listed in the order their `@example` blocks appear in the source file (top
- * to bottom).
+ * listed in the order their `@example` blocks appear in the source file (top to
+ * bottom).
  */
 export const sourceFileMappings: readonly SourceFileMapping[] = [
   {

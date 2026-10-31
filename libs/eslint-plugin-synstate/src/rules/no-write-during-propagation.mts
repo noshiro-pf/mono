@@ -25,31 +25,31 @@ type Options = readonly [];
 type MessageIds = 'writeDuringPropagation' | 'writeThroughCall';
 
 /**
- * A subscriber or a projection that writes to a root starts an update while
- * the one that called it is still propagating. The write is not an edge of
- * the graph, so synstate cannot order it: subscribers see intermediate
- * states, a node can emit twice for one write, and a write back into the
+ * A subscriber or a projection that writes to a root starts an update while the
+ * one that called it is still propagating. The write is not an edge of the
+ * graph, so synstate cannot order it: subscribers see intermediate states, a
+ * node can emit twice for one write, and a write back into the
  * update that called it loops. synstate warns at run time, once per root;
  * this rule says so where the write is written.
  *
  * A write is a call to what a synstate factory returned (`createState`'s
- * setter, `createReducer`'s `dispatch`, `source()`'s `next`, …), made
- * directly in a function passed to `.subscribe(…)` or to an operator in
- * `.pipe(…)`. A function passed by name counts when this file defines it, and
- * so does a write in a function of this file the callback calls, at any
- * depth, reported at the call. A write in a function the callback only
- * defines (a `setTimeout` callback) runs later and is not reported.
+ * setter, `createReducer`'s `dispatch`, `source()`'s `next`, …), made directly
+ * in a function passed to `.subscribe(…)` or to an operator in `.pipe(…)`. A
+ * function passed by name counts when this file defines it, and so does a write
+ * in a function of this file the callback calls, at any depth, reported at the
+ * call. A write in a function the callback only defines (a `setTimeout`
+ * callback) runs later and is not reported.
  *
- * `useObservableEffect`'s callback is a subscriber too. synstate is
- * recognized under its own name and under those of the packages that wrap
- * it (`synstate-react-hooks`, …), whose factories return the same writers.
+ * `useObservableEffect`'s callback is a subscriber too. synstate is recognized
+ * under its own name and under those of the packages that wrap it
+ * (`synstate-react-hooks`, …), whose factories return the same writers.
  *
  * The factory call is read in this file. With type information, a setter
  * imported from another file is followed to the declaration it was exported
  * from, and that file's factory call is read the same way; without it, an
- * imported setter is not judged. Nothing here builds a program: the cost is
- * a symbol lookup per call in a callback, on a program the parser has
- * already made.
+ * imported setter is not judged. Nothing here builds a program: the cost is a
+ * symbol lookup per call in a callback, on a program the parser has already
+ * made.
  */
 export const noWriteDuringPropagation: TSESLint.RuleModule<
   MessageIds,
@@ -139,8 +139,8 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
     };
 
     /**
-     * Where an imported `identifier` was bound from a synstate factory, read
-     * in the file that exports it. `undefined` without type information.
+     * Where an imported `identifier` was bound from a synstate factory, read in
+     * the file that exports it. `undefined` without type information.
      */
     const importedFactoryBindingOf = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -299,9 +299,9 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
 type PathStep = number | string;
 
 /**
- * What each synstate factory returns that writes, by its place in the
- * result: `createState`'s `[state$, setState, { updateState, resetState }]`
- * and so on. `source()` writes through its `next` method instead.
+ * What each synstate factory returns that writes, by its place in the result:
+ * `createState`'s `[state$, setState, { updateState, resetState }]` and so on.
+ * `source()` writes through its `next` method instead.
  */
 const writersOf = (factory: string): readonly (readonly PathStep[])[] => {
   switch (factory) {
@@ -343,8 +343,8 @@ const keyName = (
 
 /**
  * The steps from the pattern `root` down to `name`: array indices and object
- * keys, through defaults. `undefined` when the way down cannot be read (a
- * rest element, a computed key).
+ * keys, through defaults. `undefined` when the way down cannot be read (a rest
+ * element, a computed key).
  */
 const pathTo = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -417,8 +417,8 @@ const callsBackDuringPropagation = (
 };
 
 /**
- * The variable declaration a TypeScript binding is part of, and the steps
- * from its name down to the binding (see {@link pathTo}).
+ * The variable declaration a TypeScript binding is part of, and the steps from
+ * its name down to the binding (see {@link pathTo}).
  */
 const tsPathTo = (
   node: ts.Node,
@@ -516,10 +516,10 @@ const tsSynstateExportOf = (
 };
 
 /**
- * The synstate factory whose result a TypeScript `declaration` was bound
- * from, and where in it: `export const [a$, setA] = createState(0)` gives
- * `setA` the factory `createState` and the path `[1]`. The factory is
- * recognized by the import of the declaration's own file.
+ * The synstate factory whose result a TypeScript `declaration` was bound from,
+ * and where in it: `export const [a$, setA] = createState(0)` gives `setA` the
+ * factory `createState` and the path `[1]`. The factory is recognized by the
+ * import of the declaration's own file.
  */
 const tsFactoryBindingOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

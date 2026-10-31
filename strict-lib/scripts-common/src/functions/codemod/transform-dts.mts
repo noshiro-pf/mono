@@ -98,8 +98,8 @@ export const transformDeclarationFile = (
       } else if (rt.kind === ts.SyntaxKind.MinusToken) {
         // `-readonly [K in ...]`: prepend `readonly `, yielding the
         // `readonly -readonly` marker that `convert-dts` (convert-main.mts)
-        // rewrites per-config to `readonly` or `-readonly`. (A plain
-        // `readonly` / `+readonly` mapped type is left as-is.)
+        // rewrites per-config to `readonly` or `-readonly`. (A plain `readonly`
+        // / `+readonly` mapped type is left as-is.)
         insert(rt.getStart(sf), READONLY_PREFIX);
       }
 

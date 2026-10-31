@@ -16,8 +16,8 @@ import {
 import type { ProjectSnapshot } from '../repository/index.mjs';
 import { createFirestoreRepository } from './firestore-repository.mjs';
 
-// Nothing here reaches a server: what each call of `commitInBatches` asks
-// is recorded, a call to a line.
+// Nothing here reaches a server: what each call of `commitInBatches` asks is
+// recorded, a call to a line.
 vi.mock(import('../api/index.mjs'), async (importOriginal) => ({
   ...(await importOriginal()),
   commitInBatches: vi.fn(),
@@ -50,8 +50,8 @@ const previous: ProjectSnapshot = {
 } as const;
 
 /**
- * Every write asked, in order, as `set <path>` or `delete <path>`, each
- * call's writes apart.
+ * Every write asked, in order, as `set <path>` or `delete <path>`, each call's
+ * writes apart.
  */
 const recordWrites = (): readonly (readonly string[])[] => {
   const mut_calls: string[][] = [];

@@ -82,9 +82,9 @@ export const progressOf = (
       : 'none';
 
 /**
- * Whether `labels` holds `name`, whatever its case. GitHub's label names
- * are: adding `in-progress` to a repository that has `In-Progress` puts that
- * one on, so an exact match would not see the label it just added.
+ * Whether `labels` holds `name`, whatever its case. GitHub's label names are:
+ * adding `in-progress` to a repository that has `In-Progress` puts that one on,
+ * so an exact match would not see the label it just added.
  */
 export const hasLabel = (
   labels: readonly Readonly<{ name: string }>[],
@@ -114,9 +114,9 @@ export const issuesInProgress = (
   );
 
 /**
- * What GitHub says about a numbered item, in the terms both of its APIs
- * share once lower-cased: GraphQL's `CLOSED` / `NOT_PLANNED` are REST's
- * `closed` / `not_planned`.
+ * What GitHub says about a numbered item, in the terms both of its APIs share
+ * once lower-cased: GraphQL's `CLOSED` / `NOT_PLANNED` are REST's `closed` /
+ * `not_planned`.
  */
 export type ReferencedFacts = Readonly<
   | {
@@ -129,9 +129,8 @@ export type ReferencedFacts = Readonly<
 >;
 
 /**
- * Where one named item stands. An issue closed with no reason recorded is
- * taken as completed, which was the only way to close one before reasons
- * existed.
+ * Where one named item stands. An issue closed with no reason recorded is taken
+ * as completed, which was the only way to close one before reasons existed.
  */
 export const referenceStatusOf = (facts: ReferencedFacts): ReferenceStatus => {
   if (facts.state.toLowerCase() === 'open') {
@@ -152,9 +151,9 @@ export const referenceStatusOf = (facts: ReferencedFacts): ReferenceStatus => {
  *
  * `statusOf` says where each named number stands; the open issues among
  * `issues` are `waiting` whatever it says, so a caller need only know about
- * what is not in the list. Cycles are found among the declarations of
- * `issues` alone: a pull request declares no `Start-After:`, and the body of
- * an issue that is not listed was not read.
+ * what is not in the list. Cycles are found among the declarations of `issues`
+ * alone: a pull request declares no `Start-After:`, and the body of an issue
+ * that is not listed was not read.
  *
  * Nothing is transitive: an issue that names an open one is blocked whatever
  * that one is waiting for in turn.
@@ -202,15 +201,15 @@ export const decideStartStates = (
  */
 export type InheritedOrder = Readonly<{
   /**
-   * The open pull requests it merges after because of them, as if its body
-   * had declared them: one an issue names, or one closing an open issue an
-   * issue names. Lowest number first, and never itself.
+   * The open pull requests it merges after because of them, as if its body had
+   * declared them: one an issue names, or one closing an open issue an issue
+   * names. Lowest number first, and never itself.
    */
   mergeAfter: readonly number[];
   /**
-   * The open issues named that no open pull request closes. They hold
-   * nothing — waiting on work nobody has started could hold the merge for
-   * ever — but they are not done, and a reader is told so. Lowest first.
+   * The open issues named that no open pull request closes. They hold nothing —
+   * waiting on work nobody has started could hold the merge for ever — but they
+   * are not done, and a reader is told so. Lowest first.
    */
   notStarted: readonly number[];
 }>;
@@ -219,9 +218,9 @@ export type InheritedOrder = Readonly<{
  * Each open pull request's {@link InheritedOrder}, keyed by its number.
  *
  * `closes` is the open issues each closes, by closing keyword or by GitHub's
- * own link; `startAfterOf` what each issue whose body was read declares, and
- * an issue missing from it declares nothing. `openIssues` is what is known to
- * be an open issue, which only decides what is reported as
+ * own link; `startAfterOf` what each issue whose body was read declares, and an
+ * issue missing from it declares nothing. `openIssues` is what is known to be
+ * an open issue, which only decides what is reported as
  * {@link InheritedOrder.notStarted}: anything named that is neither an open
  * pull request nor an open issue — merged, closed, unknown — constrains
  * nothing, since the issue's own start state is what asks for it to be looked

@@ -25,8 +25,8 @@ if (import.meta.vitest !== undefined) {
       assert.isTrue(value !== null);
     }
 
-    // `object` is not enough to read keys from: an index signature is what
-    // says the keys are strings. `isRecord` is the guard that gives one.
+    // `object` is not enough to read keys from: an index signature is what says
+    // the keys are strings. `isRecord` is the guard that gives one.
     if (isRecord(value)) {
       assert.deepStrictEqual(Object.keys(value), ['key']);
     }

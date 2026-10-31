@@ -1,8 +1,7 @@
 /**
- * The dependency graph as adjacency lists keyed by node id, which is what
- * the graph algorithms walk. Every node is a task or a milestone, so any
- * dependency can be part of a cycle; one on a node that does not exist is
- * left out.
+ * The dependency graph as adjacency lists keyed by node id, which is what the
+ * graph algorithms walk. Every node is a task or a milestone, so any dependency
+ * can be part of a cycle; one on a node that does not exist is left out.
  */
 
 import { Arr } from 'ts-data-forge';

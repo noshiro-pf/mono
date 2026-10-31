@@ -4,8 +4,7 @@ import { isSome } from './optional-is-some.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
- * Unwraps an `Optional`, returning the contained value or `undefined` if
- * empty.
+ * Unwraps an `Optional`, returning the contained value or `undefined` if empty.
  *
  * This function provides a safe way to extract values from Optionals without
  * throwing exceptions. It has overloaded behavior based on the type:

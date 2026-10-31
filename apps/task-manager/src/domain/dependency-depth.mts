@@ -6,9 +6,9 @@ import type { DomainState, MilestoneId, NodeRef, TaskId } from './types.mjs';
 /**
  * For every node, the length of the longest chain of dependencies above it:
  * `0` for a node that depends on nothing, one more than its deepest source
- * otherwise. Dependencies on nodes that do not exist do not count. With a
- * cycle there is no longest chain, so the result is the cycle
- * `topologicalOrder` reports.
+ * otherwise. Dependencies on nodes that do not exist do not count. With a cycle
+ * there is no longest chain, so the result is the cycle `topologicalOrder`
+ * reports.
  */
 export const dependencyDepth = (
   state: DomainState,

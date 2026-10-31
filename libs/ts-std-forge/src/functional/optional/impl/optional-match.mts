@@ -5,12 +5,11 @@ import type { Unwrap } from './types.mjs';
 
 /**
  * Folds an {@link Optional} into a plain value by applying one of two case
- * handlers: `some` if the {@link Optional} contains a value, `none`
- * otherwise. This is the function form of pattern matching on an
- * {@link Optional}.
+ * handlers: `some` if the {@link Optional} contains a value, `none` otherwise.
+ * This is the function form of pattern matching on an {@link Optional}.
  *
- * Unlike {@link Optional.map}, the result is not wrapped in an
- * {@link Optional} — both branches produce the final value directly.
+ * Unlike {@link Optional.map}, the result is not wrapped in an {@link Optional}
+ * — both branches produce the final value directly.
  *
  * @example
  *
@@ -52,8 +51,8 @@ export function match<O extends UnknownOptional, S2, N2>(
 //
 // The returned function is generic over the *whole* optional, mirroring the
 // direct overload above; see the comment on the curried overload of
-// `Optional.map` for why the parameter is a conditional type instead of a
-// plain `Optional<S>`.
+// `Optional.map` for why the parameter is a conditional type instead of a plain
+// `Optional<S>`.
 export function match<S, S2, N2>(
   cases: Readonly<{
     some: (value: S) => S2;

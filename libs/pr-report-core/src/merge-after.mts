@@ -8,11 +8,10 @@ import { Arr, Num, Result } from 'ts-data-forge';
 
 /**
  * `#N`, and only when nothing that could end a repository name comes right
- * before the `#`: `other/repo#5` is another repository's #5, and treating it
- * as this one's would wait for a pull request the author never named.
- * `noshiro-pf/mono#5` is not read either, though it means this repository —
- * the declaration takes `#N` and nothing else, so there is one way to write
- * it.
+ * before the `#`: `other/repo#5` is another repository's #5, and treating it as
+ * this one's would wait for a pull request the author never named.
+ * `noshiro-pf/mono#5` is not read either, though it means this repository — the
+ * declaration takes `#N` and nothing else, so there is one way to write it.
  */
 const NUMBER_REF = /(?<![\w./-])#(?<number>\d+)\b/gu;
 
@@ -29,32 +28,32 @@ const FENCE_LINE = /^[^\S\n]*(?:`{3,}|~{3,})/u;
  *
  * Duplicates are dropped and the order within the declaration is not kept:
  * what is being read is a set of things that have to have happened, not a
- * sequence. A number that names no pull request, or one that is already
- * closed, simply never appears in the open list and so constrains nothing.
+ * sequence. A number that names no pull request, or one that is already closed,
+ * simply never appears in the open list and so constrains nothing.
  */
 export const parseMergeAfter = (body: string): readonly number[] =>
   parseDeclaration(body, 'merge-after');
 
 /**
- * The numbers an issue body declares it waits for before it is started,
- * read exactly as {@link parseMergeAfter} reads its trailer
+ * The numbers an issue body declares it waits for before it is started, read
+ * exactly as {@link parseMergeAfter} reads its trailer
  * (`docs/issue-start-after.md`).
  */
 export const parseStartAfter = (body: string): readonly number[] =>
   parseDeclaration(body, 'start-after');
 
 /**
- * The body with the contents of its fenced code blocks blanked out, line
- * count preserved.
+ * The body with the contents of its fenced code blocks blanked out, line count
+ * preserved.
  *
  * A declaration and an example of one are the same text, and the pull request
  * that introduced this feature had to describe it: written in a fence, the
- * example would have been read as a constraint on the pull request
- * documenting it. A fence is how every document here already says "this is a
- * sample, not the thing itself", so it is the line to draw.
+ * example would have been read as a constraint on the pull request documenting
+ * it. A fence is how every document here already says "this is a sample, not
+ * the thing itself", so it is the line to draw.
  *
- * Exported because `pr-report` reads the closing keywords (`Closes #12`) out
- * of the same bodies and has to draw the line in the same place — a document
+ * Exported because `pr-report` reads the closing keywords (`Closes #12`) out of
+ * the same bodies and has to draw the line in the same place — a document
  * showing what a declaration looks like must not become one.
  */
 export const outsideCodeFences = (body: string): string => {
@@ -76,15 +75,15 @@ export const outsideCodeFences = (body: string): string => {
 
 /**
  * The `Merge-After` cycles, one entry per cycle, each listing the numbers in
- * the order the edges run and rotated to start at its lowest number so that
- * the same cycle is always reported the same way.
+ * the order the edges run and rotated to start at its lowest number so that the
+ * same cycle is always reported the same way.
  *
  * A cycle is not a state anything here can resolve: every pull request on one
  * waits for another that waits, in the end, for it. Naming it is the whole of
  * what can be done about it — without this the members would each report
  * "waiting on #N" for as long as the loop runs, with nothing saying why that
- * never changes. A pull request that declares itself is a cycle of one, and
- * is found by the same walk.
+ * never changes. A pull request that declares itself is a cycle of one, and is
+ * found by the same walk.
  */
 export const findMergeAfterCycles = (
   dependencies: ReadonlyMap<number, readonly number[]>,
@@ -97,8 +96,8 @@ export const findMergeAfterCycles = (
     const at = walked.indexOf(node);
 
     if (at !== -1) {
-      // A back edge into the path being walked: everything from there on is
-      // the cycle.
+      // A back edge into the path being walked: everything from there on is the
+      // cycle.
       const cycle = rotateToLowest(walked.slice(at));
 
       mut_cycles.set(cycle.join(','), cycle);
@@ -114,8 +113,8 @@ export const findMergeAfterCycles = (
       visit(dependency, Arr.toPushed(walked, node));
     }
 
-    // Only once every edge out of it has been walked, so no back edge into
-    // this node's subtree can be missed by the walk that comes next.
+    // Only once every edge out of it has been walked, so no back edge into this
+    // node's subtree can be missed by the walk that comes next.
     mut_finished.add(node);
   };
 

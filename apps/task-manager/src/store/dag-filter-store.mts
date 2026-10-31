@@ -1,8 +1,8 @@
 /**
  * The graph screen's filter (`view-model/dag-filter.mts`): which groups and
- * labels it shows. Read from the URL when the page loads, and written back
- * to it by `view-query-sync.mts`; what it leaves of the graph is worked out
- * in `store.mts` (`dag/node-filter.mts`).
+ * labels it shows. Read from the URL when the page loads, and written back to
+ * it by `view-query-sync.mts`; what it leaves of the graph is worked out in
+ * `store.mts` (`dag/node-filter.mts`).
  */
 
 import { createState, type InitializedObservable } from 'synstate';

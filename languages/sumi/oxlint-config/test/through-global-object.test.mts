@@ -5,11 +5,11 @@ import { runOxlint } from '../src/index.mjs';
 
 /**
  * The plugin rules that match a global constructor, reached through the global
- * object (`globalThis.Number`). The corpus holds the forms that reach the
- * real global; what is left alone — a global object or a constructor that a
- * user declaration shadows, and a key that is not static — is a binding the
- * corpus cannot hold, since a valid fixture must type-check under the strict
- * standard library, so it is exercised here.
+ * object (`globalThis.Number`). The corpus holds the forms that reach the real
+ * global; what is left alone — a global object or a constructor that a user
+ * declaration shadows, and a key that is not static — is a binding the corpus
+ * cannot hold, since a valid fixture must type-check under the strict standard
+ * library, so it is exercised here.
  */
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sumi-global-object-'));

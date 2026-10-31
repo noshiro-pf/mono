@@ -96,8 +96,8 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
   // Reducing a value
 
   /**
-   * Checks if all elements in the map satisfy a predicate. Also supports a
-   * type predicate overload that narrows the type of values in the map if the
+   * Checks if all elements in the map satisfy a predicate. Also supports a type
+   * predicate overload that narrows the type of values in the map if the
    * predicate returns true for all elements.
    *
    * @example
@@ -656,8 +656,7 @@ export namespace IMap {
    *
    * Two IMaps are considered equal if they have the same size and contain
    * exactly the same key-value pairs. The order of entries does not matter for
-   * equality comparison. Values are compared using JavaScript's `===`
-   * operator.
+   * equality comparison. Values are compared using JavaScript's `===` operator.
    *
    * **Performance:** O(n) where n is the size of the smaller map.
    *

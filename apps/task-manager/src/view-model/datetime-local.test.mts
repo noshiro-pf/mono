@@ -126,8 +126,8 @@ describe(fromDateLocal, () => {
   });
 
   test('is the day as the clocks run where a change of time is at midnight', () => {
-    // Santiago goes from 00:00 to 01:00 on 2026-09-06, and from 00:00 back
-    // to 23:00 on 2026-04-05.
+    // Santiago goes from 00:00 to 01:00 on 2026-09-06, and from 00:00 back to
+    // 23:00 on 2026-04-05.
     assert.strictEqual(
       fromDateLocal('2026-09-06', 'start', 'America/Santiago'),
       1_788_667_200_000 /* 2026-09-06T01:00-03:00 */,

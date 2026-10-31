@@ -3,10 +3,10 @@ import { nodeId } from './graph-nodes.mjs';
 import type { Dependency, DomainState, NodeRef } from './types.mjs';
 
 /**
- * `dependent` as stored, with every dependency on `source` taken out at
- * `now` — the one edge the DAG draws between them, however many rows of the
- * dialog it stands for — and the rest kept in their order; `undefined` when
- * there is no such node or it does not depend on `source`.
+ * `dependent` as stored, with every dependency on `source` taken out at `now` —
+ * the one edge the DAG draws between them, however many rows of the dialog it
+ * stands for — and the rest kept in their order; `undefined` when there is no
+ * such node or it does not depend on `source`.
  */
 export const removeDependency = (
   state: DomainState,

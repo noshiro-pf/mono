@@ -365,9 +365,9 @@ describe(toElkGraph, () => {
       'RIGHT',
     );
 
-    // Fewer crossings and shorter edges, with room beside the nodes of a
-    // layer for the edges that skip it (`edge-routing.mts`), in a layout
-    // that follows the order of the input where it can.
+    // Fewer crossings and shorter edges, with room beside the nodes of a layer
+    // for the edges that skip it (`edge-routing.mts`), in a layout that follows
+    // the order of the input where it can.
     const options = graph.layoutOptions ?? {};
 
     assert.deepStrictEqual(
@@ -675,8 +675,8 @@ describe(fromElkGraph, () => {
         before.map((node) => node[along]),
       );
 
-      // The node put in the group stays; one ELK put close by moves out of
-      // the way of the frame round it, by no more than the frame's room.
+      // The node put in the group stays; one ELK put close by moves out of the
+      // way of the frame round it, by no more than the frame's room.
       assert.deepStrictEqual(
         after.find(({ id }) => id === 'task:z'),
         before.find(({ id }) => id === 'task:z'),
@@ -695,9 +695,9 @@ describe(fromElkGraph, () => {
   test.each(dagDirections)(
     'puts the two ends of a labelled edge in adjacent layers, %s, leaving no layer inside a group that holds them',
     async (direction) => {
-      // b waits for x, and for a to start with a lag: given a layer of its
-      // own, the label made one between a and b, which x went into, and x,
-      // moved out of the frame round a and b, left that layer empty.
+      // b waits for x, and for a to start with a lag: given a layer of its own,
+      // the label made one between a and b, which x went into, and x, moved out
+      // of the frame round a and b, left that layer empty.
       const x = asTaskId('x');
 
       const nodesWith = async (
@@ -779,8 +779,8 @@ describe(fromElkGraph, () => {
 });
 
 describe(layOutGraph, () => {
-  // p and q depend on nothing and s on r, all in the group; u, v and w
-  // depend on nothing, and z on y, in none.
+  // p and q depend on nothing and s on r, all in the group; u, v and w depend
+  // on nothing, and z on y, in none.
   const tasks = [
     ['p'],
     ['q'],
@@ -891,9 +891,9 @@ describe('layOutGraph, with a dependency between groups', () => {
   test.each(dagDirections)(
     'leaves no band inside a group, %s, where a member waits for a node in the middle of another group',
     async (direction) => {
-      // Three chains in g, the middle one waiting for s in h; h holds s and
-      // n, which nothing joins: s goes where it is waited for, in the
-      // middle of g, and n where ELK puts what nothing joins, apart.
+      // Three chains in g, the middle one waiting for s in h; h holds s and n,
+      // which nothing joins: s goes where it is waited for, in the middle of g,
+      // and n where ELK puts what nothing joins, apart.
       const chains = [
         ['a1', 'a2', 'a3', 'a4'],
         ['b1', 'b2', 'b3', 'b4'],
@@ -1013,8 +1013,8 @@ describe(clearOfFrames, () => {
 
     assert.isDefined(group);
 
-    // c up to as close below a as ELK puts two nodes of a layer, and the
-    // frame round them: b's place between them is not left empty.
+    // c up to as close below a as ELK puts two nodes of a layer, and the frame
+    // round them: b's place between them is not left empty.
     const nodeC = TASK_NODE_SIZE.height + NODE_SPACING;
 
     assert.deepStrictEqual(group, {
@@ -1050,8 +1050,8 @@ describe(clearOfFrames, () => {
   });
 
   test('draws the bands of members together, and keeps the members of a band where they are in it', () => {
-    // a and b side by side in one band, c a little below b in it; d far
-    // below, and further along.
+    // a and b side by side in one band, c a little below b in it; d far below,
+    // and further along.
     const moved = clearOfFrames('right', {
       nodes: [
         box('a', 0, 0),

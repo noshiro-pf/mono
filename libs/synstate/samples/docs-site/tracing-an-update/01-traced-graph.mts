@@ -26,9 +26,8 @@ if (import.meta.vitest !== undefined) {
       [0, 1, 1, 2, 3, 2],
     );
 
-    // Back to the initial values, then the two updates again, logging the
-    // order in which the nodes emit, which the trace on the docs page steps
-    // through.
+    // Back to the initial values, then the two updates again, logging the order
+    // in which the nodes emit, which the trace on the docs page steps through.
     setA(0);
 
     const mut_log: string[] = [];

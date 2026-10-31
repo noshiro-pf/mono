@@ -10,10 +10,10 @@ const manifestPath = path.resolve(
 );
 
 /**
- * Stamps the package's version into the Claude Code plugin's manifest, so
- * that the skill a user installs is the one written for the commands of the
- * same version. `changeset version` bumps `package.json` only; Claude Code
- * hands a user a new copy of the plugin only when `version` here changes.
+ * Stamps the package's version into the Claude Code plugin's manifest, so that
+ * the skill a user installs is the one written for the commands of the same
+ * version. `changeset version` bumps `package.json` only; Claude Code hands a
+ * user a new copy of the plugin only when `version` here changes.
  */
 const genPluginVersion = async (): Promise<void> => {
   const packageJson: unknown = JSON.parse(

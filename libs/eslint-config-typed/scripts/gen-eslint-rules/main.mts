@@ -31,8 +31,8 @@ const postCodemodLintConfigPath = path.resolve(
 const tsconfigPath = path.resolve(thisDir, './tsconfig.gen.json');
 
 /**
- * The lint passes sit on either side of the one codemod pass, because the
- * rules depend on it in opposite directions:
+ * The lint passes sit on either side of the one codemod pass, because the rules
+ * depend on it in opposite directions:
  *
  * - `consistent-indexed-object-style` rewrites index signatures into the
  *   built-in `Record`, which the codemod then turns into `ReadonlyRecord`, so
@@ -202,12 +202,12 @@ const readContents = (
 /**
  * `oxlint --fix` until nothing is left to fix.
  *
- * One oxlint run applies one round of fixes, where `eslint --fix` repeats
- * them up to ten times, so a fix that only becomes possible after another
- * (a tuple inside a tuple, a blank line next to a rewritten statement) waits
- * for the next run. A run that changes no file ends the loop; the problems it
- * still reports are only warned about, because the formatting that follows
- * has to run either way, or the generated files are left half-formatted.
+ * One oxlint run applies one round of fixes, where `eslint --fix` repeats them
+ * up to ten times, so a fix that only becomes possible after another (a tuple
+ * inside a tuple, a blank line next to a rewritten statement) waits for the
+ * next run. A run that changes no file ends the loop; the problems it still
+ * reports are only warned about, because the formatting that follows has to run
+ * either way, or the generated files are left half-formatted.
  */
 const lintFix = async (
   configPath: string,

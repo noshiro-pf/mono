@@ -11,8 +11,8 @@ import type {
 /**
  * Recursively applies the `readonly` modifier to all properties of an object, array, Map, or Set.
  * Primitives and functions are returned as is.
- * Note: passing `any` yields a union of both conditional branches
- * (standard TypeScript behavior for `any` in conditional types).
+ * Note: passing `any` yields a union of both conditional branches (standard
+ * TypeScript behavior for `any` in conditional types).
  * A length-constrained array keeps its constraint and stays an array — see the
  * note on brand-carrying arrays at the bottom of this module.
  * @template T - The type to make deeply readonly.
@@ -53,8 +53,8 @@ export type DeepReadonly<T> = T extends Primitive
 /**
  * Recursively removes the `readonly` modifier from all properties of an object, array, Map, or Set.
  * Primitives and functions are returned as is.
- * Note: passing `any` yields a union of both conditional branches
- * (standard TypeScript behavior for `any` in conditional types).
+ * Note: passing `any` yields a union of both conditional branches (standard
+ * TypeScript behavior for `any` in conditional types).
  * A length-constrained array keeps its constraint and stays an array — see the
  * note on brand-carrying arrays at the bottom of this module.
  * @template T - The type to make deeply mutable.
@@ -90,8 +90,8 @@ export type DeepMutable<T> = T extends Primitive
  * Recursively applies the `?` optional modifier to all properties of an UnknownRecord or array.
  * Handles Map and Set types by applying `DeepPartial` to their keys/values.
  * Primitives and functions are returned as is.
- * Note: passing `any` yields a union of both conditional branches
- * (standard TypeScript behavior for `any` in conditional types).
+ * Note: passing `any` yields a union of both conditional branches (standard
+ * TypeScript behavior for `any` in conditional types).
  * A length-constrained array keeps its constraint and stays an array — see the
  * note on brand-carrying arrays at the bottom of this module.
  * @template T - The type to make deeply partial.
@@ -133,8 +133,8 @@ export type DeepPartial<T> = T extends Primitive
  * Recursively removes the `?` optional modifier from all properties of an object or array.
  * Handles Map and Set types by applying `DeepRequired` to their keys/values.
  * Primitives and functions are returned as is.
- * Note: passing `any` yields a union of both conditional branches
- * (standard TypeScript behavior for `any` in conditional types).
+ * Note: passing `any` yields a union of both conditional branches (standard
+ * TypeScript behavior for `any` in conditional types).
  * A length-constrained array keeps its constraint and stays an array — see the
  * note on brand-carrying arrays at the bottom of this module.
  * @template T - The type to make deeply required.

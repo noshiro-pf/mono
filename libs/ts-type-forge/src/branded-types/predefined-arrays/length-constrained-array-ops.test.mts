@@ -241,8 +241,8 @@ expectType<
 // produce this — the guard checked the length — but the type is writable by
 // hand, and there normalizing is NOT type-preserving: the dropped
 // `MinLengthTuple<6, number>` conjunct is the one the five-tuple does not
-// imply, so the result is strictly wider. Consistency between the brand and
-// the tuple is the precondition; every guard-produced type satisfies it.
+// imply, so the result is strictly wider. Consistency between the brand and the
+// tuple is the precondition; every guard-produced type satisfies it.
 {
   type Contradictory = MinLengthArray<6, number> & readonly [1, 2, 3, 4, 5];
 
@@ -537,10 +537,10 @@ expectType<
 
 /* What the raw `List` / `Tuple` namespaces do with the same input.
  *
- * These are not aspirations — they pin the current behavior, so that the
- * reason `ConstrainedList` exists stays visible and a future improvement to
- * `List` is noticed here rather than silently diverging. `List` and `Tuple`
- * are deliberately left brand-unaware: variadic `infer` cannot see through the
+ * These are not aspirations — they pin the current behavior, so that the reason
+ * `ConstrainedList` exists stays visible and a future improvement to `List` is
+ * noticed here rather than silently diverging. `List` and `Tuple` are
+ * deliberately left brand-unaware: variadic `infer` cannot see through the
  * brand intersection, so every match falls through to the default branch. */
 
 // The element type is lost entirely, not merely the length.

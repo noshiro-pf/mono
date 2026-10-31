@@ -23,16 +23,15 @@ describe(reportSourceFromSearch, () => {
     );
   });
 
-  // The page then asks which one to read rather than reading one nobody
-  // chose.
+  // The page then asks which one to read rather than reading one nobody chose.
   test('is none without the parameter', () => {
     assert.isUndefined(reportSourceFromSearch(''));
 
     assert.isUndefined(reportSourceFromSearch('?cols=2'));
   });
 
-  // Anything else would reach the query as a name GitHub cannot have, and
-  // the reader would read an error about a repository they never named.
+  // Anything else would reach the query as a name GitHub cannot have, and the
+  // reader would read an error about a repository they never named.
   test('is none for a value that names no repository', () => {
     for (const value of [
       'example-org',

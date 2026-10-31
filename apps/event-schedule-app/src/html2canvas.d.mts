@@ -22,8 +22,8 @@ declare module 'html2canvas' {
     }>,
   ) => Promise<HTMLCanvasElement>;
 
-  // This declaration describes `html2canvas`'s own shape, and what that
-  // module exports is a default.
+  // This declaration describes `html2canvas`'s own shape, and what that module
+  // exports is a default.
   // eslint-disable-next-line import-x/no-default-export
   export default html2canvas;
 }

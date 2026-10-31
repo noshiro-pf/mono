@@ -5,8 +5,8 @@ import { unwrapOk } from './result-unwrap-ok.mjs';
 import type { UnwrapOk } from './types.mjs';
 
 /**
- * Unwraps a `Result`, returning the success value or throwing an error with
- * the provided message.
+ * Unwraps a `Result`, returning the success value or throwing an error with the
+ * provided message.
  *
  * @example
  *

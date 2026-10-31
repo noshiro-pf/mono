@@ -7,8 +7,8 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
 
 // Renders every tab icon / home-screen icon from `public/synstate-logo.png`
 // (1200×674: a white rounded square on a blue glow, centered). Not part of
-// `gen`: the output only changes when the logo does, and a resvg upgrade
-// would otherwise dirty the tree with byte-level differences.
+// `gen`: the output only changes when the logo does, and a resvg upgrade would
+// otherwise dirty the tree with byte-level differences.
 
 const logoPath = path.resolve(workspaceRootPath, 'public/synstate-logo.png');
 

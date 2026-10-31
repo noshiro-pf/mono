@@ -1,12 +1,12 @@
 /**
  * Which pull requests the merge order shows, and the tree that leaves.
  *
- * What a choice does is `merge-order-view.mts`; this holds the current one
- * and derives from it, with the report, what the merge order draws.
+ * What a choice does is `merge-order-view.mts`; this holds the current one and
+ * derives from it, with the report, what the merge order draws.
  *
- * The choice starts as `initial`, which the page reads off the query string
- * as it opens (`merge-order-view.mts`), and every change is handed to `save`
- * from `start` on.
+ * The choice starts as `initial`, which the page reads off the query string as
+ * it opens (`merge-order-view.mts`), and every change is handed to `save` from
+ * `start` on.
  */
 
 import {
@@ -81,8 +81,8 @@ export const createMergeOrderStore = (
 
   return {
     view,
-    // Passed on only when it changed, as the reader's parts are: a pull
-    // request whose checks moved changes the entries, not the tree.
+    // Passed on only when it changed, as the reader's parts are: a pull request
+    // whose checks moved changes the entries, not the tree.
     roots: combine([deps.roots, deps.entries, applied])
       .pipe(
         map(([roots, entries, current]) =>

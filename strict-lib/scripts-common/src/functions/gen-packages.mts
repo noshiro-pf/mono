@@ -10,16 +10,16 @@ import { formatDir } from './utils/format.mjs';
 import { replaceWithNoMatchCheck } from './utils/node-utils.mjs';
 
 /**
- * Copied verbatim into every bundle from `scripts-common/assets/`. It is
- * plain JavaScript because it runs from inside a consumer's `node_modules`,
- * where nothing of ours is available to it.
+ * Copied verbatim into every bundle from `scripts-common/assets/`. It is plain
+ * JavaScript because it runs from inside a consumer's `node_modules`, where
+ * nothing of ours is available to it.
  */
 const LINKER_FILE = 'link-libs.mjs';
 
 /**
- * The published package needs one of its own. `changeset publish` releases
- * this package — it is not private — and the changesets action reads the
- * changelog of every package whose version moved, to build the release notes.
+ * The published package needs one of its own. `changeset publish` releases this
+ * package — it is not private — and the changesets action reads the changelog
+ * of every package whose version moved, to build the release notes.
  * The version moves here on every release, because `changeset:version-packages`
  * regenerates these manifests after `changeset version` has bumped the
  * harnesses. Without the file the release fails outright, before publishing
@@ -31,8 +31,8 @@ const CHANGELOG_FILE = 'CHANGELOG.md';
  * Copied from the repository root. Every declaration in the bundle is a
  * derivative of a TypeScript lib file, which is Apache-2.0 (Copyright
  * Microsoft), and section 4 of that license asks a redistributor to give the
- * recipient a copy of it. `package.json`'s `license` field names it and
- * hands over nothing.
+ * recipient a copy of it. `package.json`'s `license` field names it and hands
+ * over nothing.
  */
 const LICENSE_FILE = 'LICENSE';
 
@@ -168,8 +168,8 @@ const createPackages = async (
 ): Promise<Result<undefined, unknown>> => {
   const { paths, versionConfig } = ctx;
 
-  // Each flavor owns one subdirectory of the published package, so emptying
-  // it cannot disturb the other flavor or the manifest beside them both.
+  // Each flavor owns one subdirectory of the published package, so emptying it
+  // cannot disturb the other flavor or the manifest beside them both.
   const outDir =
     paths.strictTsLib.output.lib[
       config.useBrandedNumber ? 'libsBranded' : 'libs'
@@ -238,9 +238,9 @@ const createPackages = async (
       // to 7.0.
       //
       // So: top-level group directories of the non-branded flavor, which is
-      // exactly the set those devDependencies name. Sub-libs
-      // (`es2020/bigint`) and everything branded are reachable through the
-      // group's own `<reference lib>` graph and are never resolved by name.
+      // exactly the set those devDependencies name. Sub-libs (`es2020/bigint`)
+      // and everything branded are reachable through the group's own
+      // `<reference lib>` graph and are never resolved by name.
       if (!config.useBrandedNumber && !packageRelativePath.includes('/')) {
         const outputFile = path.resolve(outputDir, 'package.json');
 
@@ -296,8 +296,8 @@ const createPackages = async (
 
 /**
  * The second route, which only TypeScript 7 reads. It saves the `prepare`
- * script, and is worth offering only with what it does not reach said
- * beside it.
+ * script, and is worth offering only with what it does not reach said beside
+ * it.
  */
 const pathsAlternative = (libName: string): readonly string[] => [
   '**Or, if nothing runs TypeScript 6, `paths`.** TypeScript 7 also reads',
@@ -437,8 +437,8 @@ const bundleChangelog = async (
     .readFile(path.resolve(harnessDir, CHANGELOG_FILE), 'utf8')
     .catch(() => undefined);
 
-  // Before the first release there is nothing to carry over, and the file
-  // still has to exist: the changesets action reads it either way.
+  // Before the first release there is nothing to carry over, and the file still
+  // has to exist: the changesets action reads it either way.
   if (harnessChangelog === undefined) {
     return `# ${libName}\n`;
   }
@@ -458,8 +458,8 @@ const bundleChangelog = async (
  *
  * This is the only package a consumer installs, and it sits beside the
  * declarations rather than above them: `libs/` and `libs-branded/` are written
- * into this same directory by the two flavor passes, so what is on disk is
- * what ships.
+ * into this same directory by the two flavor passes, so what is on disk is what
+ * ships.
  *
  * It used to be an umbrella whose dependencies were the ~107 per-lib packages,
  * one URL each, so that a package manager would resolve them transitively and
@@ -504,10 +504,10 @@ const genBundlePackage = async (
       // exist so that this repository's own harnesses can resolve
       // `@typescript/lib-<group>` by name, which is the only way TypeScript 6
       // and earlier find a replacement (their lib resolution is a fixed Node10
-      // lookup that ignores `paths`). Publishing them would not help a
-      // consumer — reaching them by name means a dependency on a directory
-      // inside `node_modules`, which pnpm refuses. `link-libs.mjs` answers
-      // that lookup instead, with a symlink per group.
+      // lookup that ignores `paths`). Publishing them would not help a consumer
+      // — reaching them by name means a dependency on a directory inside
+      // `node_modules`, which pnpm refuses. `link-libs.mjs` answers that lookup
+      // instead, with a symlink per group.
       files: [
         'libs',
         'libs-branded',
@@ -519,8 +519,8 @@ const genBundlePackage = async (
         LICENSE_FILE,
         NOTICE_FILE,
       ],
-      // Named after the package so that two of these installed side by side
-      // do not fight over one command.
+      // Named after the package so that two of these installed side by side do
+      // not fight over one command.
       bin: { [`${libName}-link`]: `./${LINKER_FILE}` },
       // ts-type-forge is a real runtime-resolvable dependency: the generated
       // lib references its types via `import('ts-type-forge')`, so consumers
@@ -543,11 +543,11 @@ const genBundlePackage = async (
     linkerPath,
   );
 
-  // Explicitly, rather than inheriting the asset's mode: this is a `bin`, and
-  // a package manager installing the package sets the bit itself. Without this
-  // the two disagree — `pnpm install` writes 755, regeneration writes back
-  // 644 — and the working tree flips between them, which is a dirty
-  // repository as far as CI is concerned.
+  // Explicitly, rather than inheriting the asset's mode: this is a `bin`, and a
+  // package manager installing the package sets the bit itself. Without this
+  // the two disagree — `pnpm install` writes 755, regeneration writes back 644
+  // — and the working tree flips between them, which is a dirty repository as
+  // far as CI is concerned.
   await fs.chmod(linkerPath, 0o755);
 
   await fs.writeFile(
@@ -694,8 +694,8 @@ const getTsTypeForgeRange = async (
 
   // Relax the peer range to a major-version match (e.g. "7.2.1" -> "^7.0.0"),
   // so consumers are not pinned to the exact ts-type-forge version the lib was
-  // generated with. This is why `update-packages` filters the generated
-  // bundles out: `pnpm update --latest` would write the exact current version
-  // into all twelve manifests and the next run of this generator would undo it.
+  // generated with. This is why `update-packages` filters the generated bundles
+  // out: `pnpm update --latest` would write the exact current version into all
+  // twelve manifests and the next run of this generator would undo it.
   return major === undefined ? undefined : `^${major}.0.0`;
 };

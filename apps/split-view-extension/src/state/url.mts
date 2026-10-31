@@ -11,8 +11,8 @@ const schemePattern = /^[a-z][a-z\d+.-]*:(?!\d)/iu;
  * The schemes a pane will navigate to, as an allowlist.
  *
  * An allowlist rather than a list of refusals, so that a scheme nobody thought
- * about — one that runs script in the frame with the page's own privileges,
- * say — becomes a search rather than a navigation.
+ * about — one that runs script in the frame with the page's own privileges, say
+ * — becomes a search rather than a navigation.
  */
 const allowedSchemes: readonly string[] = [
   'about:',

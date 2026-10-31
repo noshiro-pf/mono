@@ -28,22 +28,22 @@ import {
  * actions under `.github/actions/`, which actionlint reads only for their
  * inputs.
  *
- * What it reports — an expression of the wrong type, a context the key does
- * not allow, a `needs` or a step id that does not exist, an input a local
- * action or reusable workflow does not take, an untrusted value spliced into
- * a `run:` — otherwise shows only when the workflow runs, which for one that
- * runs on a `push` to `main`, a schedule or `workflow_dispatch` is after the
- * merge; an injection shows only when someone uses it. The inputs and
- * outputs of a third-party action are not checked: actionlint knows them by
- * `owner/repo@vX` only, and every pin here is a SHA.
+ * What it reports — an expression of the wrong type, a context the key does not
+ * allow, a `needs` or a step id that does not exist, an input a local action or
+ * reusable workflow does not take, an untrusted value spliced into a `run:` —
+ * otherwise shows only when the workflow runs, which for one that runs on a
+ * `push` to `main`, a schedule or `workflow_dispatch` is after the merge; an
+ * injection shows only when someone uses it. The inputs and outputs of a
+ * third-party action are not checked: actionlint knows them by `owner/repo@vX`
+ * only, and every pin here is a SHA.
  *
  * **The verdict is CI's.** Both binaries are the ones
  * `tools/configs/release-binaries.json` pins, downloaded and verified by
  * `../../lib/release-binaries.mts`, never whatever `PATH` has: a missing
  * shellcheck is skipped by actionlint without a word, an older one lacks
- * checks, and a newer actionlint accepts syntax the pinned one rejects. For
- * the same reason pyflakes, which actionlint runs over `shell: python` steps
- * when it is on `PATH`, is turned off (there is no such step), and
+ * checks, and a newer actionlint accepts syntax the pinned one rejects. For the
+ * same reason pyflakes, which actionlint runs over `shell: python` steps when
+ * it is on `PATH`, is turned off (there is no such step), and
  * `SHELLCHECK_OPTS`, which shellcheck reads, is cleared.
  *
  * **The composite actions are judged by actionlint itself.** Their
@@ -53,11 +53,11 @@ import {
  * arguments it passes shellcheck, the prelude it puts before a script, the
  * codes it excludes and which shells it checks are its own, and cannot drift
  * from how it judges a workflow when the pin moves. Every key of every step is
- * checked, `env:`, `with:` and `if:` as well as `run:`, and the action's
- * inputs are declared in that workflow ({@link wrapInWorkflow}), so a
- * misspelt `inputs.*`, a step id that does not exist and an untrusted
- * `github.event.*` are all reported. A composite action has no `secrets`, so
- * the wrapper declares one secret no action reads, and actionlint reports a
+ * checked, `env:`, `with:` and `if:` as well as `run:`, and the action's inputs
+ * are declared in that workflow ({@link wrapInWorkflow}), so a misspelt
+ * `inputs.*`, a step id that does not exist and an untrusted `github.event.*`
+ * are all reported. A composite action has no `secrets`, so the wrapper
+ * declares one secret no action reads, and actionlint reports a
  * `secrets.<name>` it does not declare; what it still accepts is the secrets
  * every workflow has (`secrets.GITHUB_TOKEN`, `secrets.ACTIONS_STEP_DEBUG`,
  * `secrets.ACTIONS_RUNNER_DEBUG`) and the whole object (`toJSON(secrets)`).
@@ -77,8 +77,8 @@ export const checkActionlint = async ({
   install: Install;
   /**
    * Why `binary args` could not run, or `undefined` when it did — so that a
-   * binary this machine cannot execute fails here instead of actionlint
-   * quietly skipping the shellcheck it was given.
+   * binary this machine cannot execute fails here instead of actionlint quietly
+   * skipping the shellcheck it was given.
    */
   tryRunning: (binary: string, args: readonly string[]) => string | undefined;
   runActionlint: RunActionlint;
@@ -215,19 +215,19 @@ export const checkActionlint = async ({
 };
 
 /**
- * `steps` as the steps of a one-job workflow, copied line for line, and how
- * far they moved: a line of `steps` is `lineOffset` lines further down in the
- * workflow than in `action.yml`, and `columnOffset` columns further right —
- * as many as put its items under the wrapper's `steps:`, whatever their
- * indentation in `action.yml`. The first `headerLines` lines are the
- * wrapper's own.
+ * `steps` as the steps of a one-job workflow, copied line for line, and how far
+ * they moved: a line of `steps` is `lineOffset` lines further down in the
+ * workflow than in `action.yml`, and `columnOffset` columns further right — as
+ * many as put its items under the wrapper's `steps:`, whatever their
+ * indentation in `action.yml`. The first `headerLines` lines are the wrapper's
+ * own.
  *
  * The workflow gives the steps the composite action's own inputs: a
  * `workflow_call` declaring them as strings, which a composite action's are.
- * The matrix is an expression (of a context no configuration declares), so
- * that a `matrix.*` of the calling job may be any value, and the runner is one of its entries, so that actionlint does
- * not judge a `shell:` against one operating system when a composite action
- * can run on any.
+ * The matrix is an expression (of a context no configuration declares), so that
+ * a `matrix.*` of the calling job may be any value, and the runner is one of
+ * its entries, so that actionlint does not judge a `shell:` against one
+ * operating system when a composite action can run on any.
  */
 export const wrapInWorkflow = (
   steps: StepsBlock,
@@ -369,9 +369,9 @@ const explain = (message: string): string =>
  * What actionlint found in a composite action's steps, each moved to its line
  * and column in `file`: a shellcheck finding to the line of the script it
  * names, anything else by the constant shift {@link wrapInWorkflow} made.
- * Inside a scalar that spans lines actionlint gives only an offset into it,
- * so such a finding gets the scalar's first line and no column, or for a
- * `run: |` where the script starts.
+ * Inside a scalar that spans lines actionlint gives only an offset into it, so
+ * such a finding gets the scalar's first line and no column, or for a `run: |`
+ * where the script starts.
  */
 const judgeComposite = (
   { workflow, status, stdout, stderr, error }: ReturnType<LintWorkflowText>,
@@ -460,9 +460,9 @@ const judgeComposite = (
       // script starts on that line, or on the next for a block scalar.
       const script = scripts.find((s) => s.runLine === line);
 
-      // On the line of a block scalar's header (`script: |`), and wherever
-      // else a scalar spans lines, actionlint's column is an offset into the
-      // whole scalar, so the line alone is right.
+      // On the line of a block scalar's header (`script: |`), and wherever else
+      // a scalar spans lines, actionlint's column is an offset into the whole
+      // scalar, so the line alone is right.
       const lineText = workflowLines[reportedLine - 1] ?? '';
 
       const at =
@@ -500,9 +500,9 @@ const judgeComposite = (
   };
 };
 
-// Run from the repository root and without `SHELLCHECK_OPTS`, which
-// shellcheck reads whoever starts it. (An `undefined` value leaves the
-// variable out of the child's environment.)
+// Run from the repository root and without `SHELLCHECK_OPTS`, which shellcheck
+// reads whoever starts it. (An `undefined` value leaves the variable out of the
+// child's environment.)
 const toolEnv = { ...process.env, SHELLCHECK_OPTS: undefined } as const;
 
 const section = (

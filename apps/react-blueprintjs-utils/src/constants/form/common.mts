@@ -49,8 +49,8 @@ export const darkInputBackgroundColor = hexToRgba(black, 0.3);
 
 export const darkInputBackgroundColorDisabled = hexToRgba(darkGray5, 0.5);
 
-// avoids edge blurriness for light theme focused default input
-// second box-shadow of pt-input-box-shadow
+// avoids edge blurriness for light theme focused default input second
+// box-shadow of pt-input-box-shadow
 export const inputBoxShadowFocus = `inset 0 1px 1px ${hexToRgba(
   black,
   ptDropShadowOpacity,

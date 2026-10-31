@@ -13,12 +13,11 @@ import { TaskForm } from './task-form.js';
  * The dialog of one task or milestone, for viewing, editing, creating and
  * deleting it.
  *
- * A native `<dialog>` opened modal, so the page behind is inert and focus
- * stays inside; Escape and a tap on the backdrop close it. Styled with
- * Blueprint's dialog classes, and a full-screen sheet on a phone
- * (`index.css`). Whether it is open is the editor store's: the element
- * follows it (`follow-modal.mts`), and its form is built afresh each time it
- * opens.
+ * A native `<dialog>` opened modal, so the page behind is inert and focus stays
+ * inside; Escape and a tap on the backdrop close it. Styled with
+ * Blueprint's dialog classes, and a full-screen sheet on a phone (`index.css`).
+ * Whether it is open is the editor store's: the element follows it
+ * (`follow-modal.mts`), and its form is built afresh each time it opens.
  */
 export const NodeDialog = (): JSX.Element => (
   <dialog
@@ -56,9 +55,9 @@ type OpenEditorState = RelaxedExclude<
 >;
 
 /**
- * Saves. A dependency row that is wrong holds the save back, and its error
- * is already on screen, so the first such row is brought into view and
- * focused instead.
+ * Saves. A dependency row that is wrong holds the save back, and its error is
+ * already on screen, so the first such row is brought into view and focused
+ * instead.
  */
 const onSubmit = (
   submitted: Event & Readonly<{ currentTarget: Element }>,

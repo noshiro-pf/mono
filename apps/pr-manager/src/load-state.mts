@@ -4,10 +4,9 @@ import { Result } from 'ts-data-forge';
 import type { LoadedReport } from './load-report.mjs';
 
 /**
- * How the reading went: what the page says around the report rather than
- * in it. The report itself is kept apart, part by part
- * (`store/reader.mts`), so that a read that only brought a new report does
- * not change this.
+ * How the reading went: what the page says around the report rather than in it.
+ * The report itself is kept apart, part by part (`store/reader.mts`), so that a
+ * read that only brought a new report does not change this.
  */
 export type LoadStatus = Readonly<
   | { type: 'failed'; message: string }
@@ -15,10 +14,9 @@ export type LoadStatus = Readonly<
   | {
       type: 'ready';
       /**
-       * A background read that failed, kept beside the data it did not
-       * replace. Silence here would be a page that had quietly stopped being
-       * told anything, which looks exactly like a page where nothing has
-       * happened.
+       * A background read that failed, kept beside the data it did not replace.
+       * Silence here would be a page that had quietly stopped being told
+       * anything, which looks exactly like a page where nothing has happened.
        */
       pollError: string | undefined;
       refreshing: boolean;
@@ -46,19 +44,18 @@ export type Settled = Readonly<{
 }>;
 
 /**
- * What a read makes of the page: the status to show, and the report if it
- * is to replace the one on screen.
+ * What a read makes of the page: the status to show, and the report if it is to
+ * replace the one on screen.
  *
- * Pure, so that the reader can hand it whatever is current rather than
- * whatever was current when the request went out.
+ * Pure, so that the reader can hand it whatever is current rather than whatever
+ * was current when the request went out.
  *
- * Two rules. **A read may add to the page, and may say it failed, but may
- * not take the page away**: a read that fails leaves the last report on
- * screen with a note beside it, because a dashboard that blanks on a spent
- * rate limit is worse than one showing data from a minute ago. And **an
- * older read never replaces a newer one**: a poll and a Refresh can both be
- * out at once, and whichever answers last is not necessarily the one that
- * asked last.
+ * Two rules. **A read may add to the page, and may say it failed, but may not
+ * take the page away**: a read that fails leaves the last report on screen with
+ * a note beside it, because a dashboard that blanks on a spent rate limit is
+ * worse than one showing data from a minute ago. And **an older read never
+ * replaces a newer one**: a poll and a Refresh can both be out at once, and
+ * whichever answers last is not necessarily the one that asked last.
  */
 export const settle = (
   current: LoadStatus,

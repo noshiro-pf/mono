@@ -63,9 +63,9 @@ export function at<
  * argument is constrained to the keys declared on that record.
  *
  * The record type may be a simple record, an intersection (e.g. the result of
- * {@link mergeRecords}), a union, a recursive type, or any combination of
- * these — the underlying shape is expanded and, when a key resolves to
- * multiple member types (as in a union), the resulting types are combined with
+ * {@link mergeRecords}), a union, a recursive type, or any combination of these
+ * — the underlying shape is expanded and, when a key resolves to multiple
+ * member types (as in a union), the resulting types are combined with
  * {@link union}.
  *
  * @example

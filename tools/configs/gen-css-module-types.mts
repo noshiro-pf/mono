@@ -10,16 +10,15 @@ import { preprocessCSS, resolveConfig, type ResolvedConfig } from 'vite';
  * deletes a declaration whose stylesheet is gone. Each name the stylesheet
  * exports becomes a named `string` export, so a class the stylesheet does not
  * define is a type error rather than `undefined` at run time. Vite's own
- * `*.module.css` typing is an index signature, which
- * `noUncheckedIndexedAccess` turns into `string | undefined` and which accepts
- * any name.
+ * `*.module.css` typing is an index signature, which `noUncheckedIndexedAccess`
+ * turns into `string | undefined` and which accepts any name.
  *
- * The names are the ones Vite's own CSS Modules pass reports
- * (`preprocessCSS`), so `:global(…)`, `@keyframes` and the rest of the syntax
- * are read exactly as the app's build reads them. Every stylesheet is read
- * before anything is written, and a declaration is written only when it
- * changes, already in the layout Prettier gives it. A declaration without the
- * generated header is never overwritten (that is an error) nor deleted.
+ * The names are the ones Vite's own CSS Modules pass reports (`preprocessCSS`),
+ * so `:global(…)`, `@keyframes` and the rest of the syntax are read exactly as
+ * the app's build reads them. Every stylesheet is read before anything is
+ * written, and a declaration is written only when it changes, already in the
+ * layout Prettier gives it. A declaration without the generated header is never
+ * overwritten (that is an error) nor deleted.
  *
  * Components import a stylesheet as `import * as styles from
  * './x.module.css'`, so that a class name never shadows a local binding. A
@@ -52,8 +51,8 @@ export const genCssModuleTypes = async ({
       (p) => p.endsWith('.module.d.css.ts') && !declarations.has(p),
     );
 
-    // Resolved only when needed, so that deleting a stale declaration does
-    // not depend on the app's config.
+    // Resolved only when needed, so that deleting a stale declaration does not
+    // depend on the app's config.
     const config = Arr.isNonEmpty(stylesheets)
       ? await resolveCssModulesConfig(viteConfigFile)
       : undefined;
@@ -102,9 +101,9 @@ export const genCssModuleTypes = async ({
     }
 
     // Stale declarations go first, and each is read again before writing:
-    // on a case-insensitive file system a stylesheet renamed only in case
-    // reads its new declaration through the old name, which is stale, and
-    // the declaration has to be written afresh under the new one.
+    // on a case-insensitive file system a stylesheet renamed only in case reads
+    // its new declaration through the old name, which is stale, and the
+    // declaration has to be written afresh under the new one.
     for (const file of stale) {
       const content = await readIfExists(file);
 
@@ -136,12 +135,12 @@ export const declarationPathOf = (stylesheet: string): string =>
   stylesheet.replace(/\.css$/u, '.d.css.ts');
 
 /**
- * The app's Vite config, `configFile`, to read CSS Modules with: its `root`
- * and the `postcss.config.*` found from there included. It is refused if it
- * sets `css.modules`, `css.transformer` or `css.postcss`, because the
- * declarations and the Vitest config (`vite-config.mts`) both assume Vite's
- * default CSS Modules options, and Vitest, run from the package root, reads
- * only such a `postcss.config.*` of the app's.
+ * The app's Vite config, `configFile`, to read CSS Modules with: its `root` and
+ * the `postcss.config.*` found from there included. It is refused if it sets
+ * `css.modules`, `css.transformer` or `css.postcss`, because the declarations
+ * and the Vitest config (`vite-config.mts`) both assume Vite's default CSS
+ * Modules options, and Vitest, run from the package root, reads only such a
+ * `postcss.config.*` of the app's.
  */
 export const resolveCssModulesConfig = async (
   configFile: string,
@@ -167,9 +166,8 @@ export const resolveCssModulesConfig = async (
 };
 
 /**
- * What a stylesheet exports, name to value, as Vite's CSS Modules pass
- * reports it for the file at `filePath` under `config` (see
- * `resolveCssModulesConfig`).
+ * What a stylesheet exports, name to value, as Vite's CSS Modules pass reports
+ * it for the file at `filePath` under `config` (see `resolveCssModulesConfig`).
  */
 export const cssModuleExports = async (
   source: string,
@@ -183,12 +181,12 @@ export const cssModuleExports = async (
 };
 
 /**
- * The declaration of what a stylesheet exports, named `fileName` in its
- * header and its errors.
+ * The declaration of what a stylesheet exports, named `fileName` in its header
+ * and its errors.
  *
  * Every export must be the stylesheet's own scoped class (or keyframes),
- * `_<name>_…` under the default options `resolveCssModulesConfig` holds the
- * app to. That refuses `@value` and `:export`, which export CSS values, and
+ * `_<name>_…` under the default options `resolveCssModulesConfig` holds the app
+ * to. That refuses `@value` and `:export`, which export CSS values, and
  * `composes`, which makes a value several class names that a key of
  * synstate-dom's `class` object cannot be, wherever they come from,
  * `@import`ed files included.

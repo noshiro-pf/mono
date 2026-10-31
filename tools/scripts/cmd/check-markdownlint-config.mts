@@ -14,22 +14,22 @@ import config from '../../../.markdownlint-cli2.mjs';
  * `experimental/` kept acquiring `*` → `-` list-marker changes, with their
  * spacing preserved: the fingerprint of this configuration's own rules, since
  * `list-marker-space` is off here. No repository script could reproduce it,
- * because every one of them passes relative globs; one absolute path
- * reproduces it exactly, and an editor plugin linting the open document is
- * enough to do it.
+ * because every one of them passes relative globs; one absolute path reproduces
+ * it exactly, and an editor plugin linting the open document is enough to do
+ * it.
  *
  * `ignores` has no such gap. markdownlint-cli2 appends those entries to the
  * glob patterns itself — "Pass base ignore globs as globby patterns (best
  * performance)", in its own words — so the discovery walk is pruned exactly as
  * a negation would prune it, and then applies them again after discovery, to
  * whatever was collected however it was named. They also survive `--no-globs`,
- * which drops `globs` and keeps `ignores`. Measured: the two spellings lint
- * the same file count in the same time, and only `ignores` holds for an
- * absolute path.
+ * which drops `globs` and keeps `ignores`. Measured: the two spellings lint the
+ * same file count in the same time, and only `ignores` holds for an absolute
+ * path.
  *
  * So a negation in `globs` is either redundant with an `ignores` entry or a
- * hole, and there is no way to tell which at a glance. This check is what
- * says so when the next exclusion is added to the wrong list.
+ * hole, and there is no way to tell which at a glance. This check is what says
+ * so when the next exclusion is added to the wrong list.
  */
 export const checkMarkdownlintConfig = (): Result<number, string> => {
   // Read straight off the config: both fields are literals there, so removing

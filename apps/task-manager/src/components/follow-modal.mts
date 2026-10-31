@@ -4,16 +4,15 @@ import { closeOnBackdropClick } from './close-on-backdrop-click.mjs';
 import { createAfterUpdate, subscribeInScope } from './scope-effects.mjs';
 
 /**
- * Has a native `<dialog>` follow a store: opened modal while `isOpen` says
- * so of `source`'s value, and closed otherwise. A modal dialog is opened by
- * a call, not an attribute, so this is called from the element's `ref`, and
- * listens for as long as the component that made it is mounted. A click on
- * the backdrop calls `close`, as Escape does through the element's
- * `onCancel`.
+ * Has a native `<dialog>` follow a store: opened modal while `isOpen` says so
+ * of `source`'s value, and closed otherwise. A modal dialog is opened by a
+ * call, not an attribute, so this is called from the element's `ref`, and
+ * listens for as long as the component that made it is mounted. A click on the
+ * backdrop calls `close`, as Escape does through the element's `onCancel`.
  *
- * Opened and closed once the update has finished: the content the store
- * just asked for is then mounted, the element is in the document, and the
- * focus that moves with it changes no state while another is propagating.
+ * Opened and closed once the update has finished: the content the store just
+ * asked for is then mounted, the element is in the document, and the focus that
+ * moves with it changes no state while another is propagating.
  */
 export const followModal = <A,>(
   dialog: HTMLElement &

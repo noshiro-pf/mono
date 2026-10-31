@@ -21,22 +21,22 @@ import type {
 /**
  * The name of the interface that declares the member being accessed — or
  * `undefined` where it does not resolve — at each of the receiver's
- * {@link wrapperLayers}, outermost first. One entry for a receiver that is
- * not wrapped.
+ * {@link wrapperLayers}, outermost first. One entry for a receiver that is not
+ * wrapped.
  *
  * This is how a rule tells `xs.sort()` from a `sort` of one's own: the method
  * name selects a candidate syntactically, and the declaring interface —
  * `Array`, `Map`, `ObjectConstructor` — decides. It is a checker query, so
  * narrow the candidates by syntax first: the pass walks every node of every
- * file and each query is a round trip (D-55). Each layer past the first costs
- * a type query or two, and the fallback for a member reached through a mapped
+ * file and each query is a round trip (D-55). Each layer past the first costs a
+ * type query or two, and the fallback for a member reached through a mapped
  * type one more.
  *
  * A wrapped receiver can name a different owner at each layer:
- * `(xs as { push: … }).push(1)` resolves to a member of one's own outside
- * and to `Array`'s inside. The caller decides how the layers combine — a rule
- * that reports a danger (a mutation) reports if any layer shows it, and an
- * exemption that spares a report holds only if every layer does.
+ * `(xs as { push: … }).push(1)` resolves to a member of one's own outside and
+ * to `Array`'s inside. The caller decides how the layers combine — a rule that
+ * reports a danger (a mutation) reports if any layer shows it, and an exemption
+ * that spares a report holds only if every layer does.
  */
 export const ownersOf = (
   // `Checker` is TypeScript's own interface, declared mutable; this package
@@ -47,8 +47,8 @@ export const ownersOf = (
   access: PropertyAccessExpression,
 ): readonly (string | undefined)[] =>
   wrapperLayers(access.expression).map((layer, index) => {
-    // The outermost layer is the receiver as written, whose member the
-    // checker has already resolved.
+    // The outermost layer is the receiver as written, whose member the checker
+    // has already resolved.
     const symbol =
       index === 0
         ? checker.getSymbolAtLocation(access.name)
@@ -81,15 +81,14 @@ export const unwrap = (node: TsNode): TsNode =>
  *
  * A wrapper changes no value, so syntax is judged on `unwrap(node)`: a type
  * that only says `0` (`n as 0`) is not the literal `0`. A type is asked at
- * every layer, the `unknown` of `x as unknown as T` included, and an
- * assertion only ever moves a rule to the cautious side: a conclusion that
- * spares a report or enables a fix holds only if it holds at every layer, and
- * a rule that reports a danger reports it if any layer shows it. A widening
- * `as` (`x as string | undefined`) is thus respected as the author's claim,
- * and a narrowing one (`x!`, a cast from `unknown`) cannot hide what the
+ * every layer, the `unknown` of `x as unknown as T` included, and an assertion
+ * only ever moves a rule to the cautious side: a conclusion that spares a
+ * report or enables a fix holds only if it holds at every layer, and a rule
+ * that reports a danger reports it if any layer shows it. A widening `as`
+ * (`x as string | undefined`) is thus respected as the author's claim, and a
+ * narrowing one (`x!`, a cast from `unknown`) cannot hide what the
  * value's own type says (docs/writing-lint-rules.md at the repository root;
- * `typeWrapperLayers` in `libs/eslint-rule-forge` is the ESTree
- * counterpart).
+ * `typeWrapperLayers` in `libs/eslint-rule-forge` is the ESTree counterpart).
  */
 export const wrapperLayers = (node: TsNode): readonly TsNode[] =>
   isTransparent(node)
@@ -110,8 +109,8 @@ export type TransparentWrapper =
 
 /** The name of the interface that declares `symbol`, if it resolves. */
 const interfaceNameOf = (
-  // `Symbol` is TypeScript's own interface, declared mutable; this package
-  // does not get to restate it.
+  // `Symbol` is TypeScript's own interface, declared mutable; this package does
+  // not get to restate it.
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   symbol: TsSymbol,
 ): string | undefined => {
@@ -134,8 +133,8 @@ const interfaceNameOf = (
 };
 
 /**
- * The property `name` on the apparent type of `node`, which is how a member
- * is resolved on a layer of the receiver the checker did not resolve it on.
+ * The property `name` on the apparent type of `node`, which is how a member is
+ * resolved on a layer of the receiver the checker did not resolve it on.
  */
 const propertyAt = (
   // `Checker` is TypeScript's own interface, declared mutable; this package

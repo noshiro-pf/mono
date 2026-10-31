@@ -27,8 +27,8 @@ export const StopwatchDemo = (): JSX.Element => {
 };
 
 const Stopwatch = (): JSX.Element => {
-  // Belongs to the `If` branch's scope: its interval is cleared when the
-  // branch is disposed.
+  // Belongs to the `If` branch's scope: its interval is cleared when the branch
+  // is disposed.
   const tenths$ = counter(100, { emitInitial: false }).pipe(
     withInitialValue(0),
   );

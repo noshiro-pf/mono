@@ -51,10 +51,10 @@ type MessageIds = 'preferLogical';
  * A ternary whose branches are both bare boolean literals is
  * `no-unneeded-ternary`'s. When a wrapper hides one of them from it, this rule
  * writes `a ? (true as boolean) : false` as `a` and the reverse as `!a`.
- * One whose value is rendered or passed in JSX is rewritten only when its
- * other branch is a boolean too: there `&&` and `||` take booleans on both
- * sides (`ts-restrictions/jsx-boolean-logical-operands`), so
- * `{a ? false : <X />}` stays a ternary.
+ * One whose value is rendered or passed in JSX is rewritten only when its other
+ * branch is a boolean too: there `&&` and `||` take booleans on both sides
+ * (`ts-restrictions/jsx-boolean-logical-operands`), so `{a ? false : <X />}`
+ * stays a ternary.
  */
 export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
   MessageIds,
@@ -87,8 +87,8 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
       sourceCode.getText(asNode(node));
 
     /**
-     * `node` as an operand of `operator`, parenthesized if need be. The text
-     * of a node never includes the parentheses written around it, so they are
+     * `node` as an operand of `operator`, parenthesized if need be. The text of
+     * a node never includes the parentheses written around it, so they are
      * added here whether or not the source had them.
      */
     const operand = (
@@ -141,8 +141,8 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
       const alternateValue = booleanLiteralValue(alternate);
 
       if (consequentValue !== undefined && alternateValue !== undefined) {
-        // Two bare literals are no-unneeded-ternary's, which does not see
-        // one through `satisfies` or `as`.
+        // Two bare literals are no-unneeded-ternary's, which does not see one
+        // through `satisfies` or `as`.
         if (
           consequentValue === alternateValue ||
           (!isTypeWrapper(consequent) && !isTypeWrapper(alternate))

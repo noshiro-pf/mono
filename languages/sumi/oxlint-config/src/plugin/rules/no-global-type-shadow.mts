@@ -6,14 +6,14 @@ import { globalTypeNames } from './global-type-names.mjs';
 type Options = readonly [Readonly<{ libs: readonly string[] }>];
 
 /**
- * `banned-syntax/no-global-type-shadow` — a type-space declaration (type
- * alias, interface, enum, namespace, class, type parameter) must not reuse a
- * name the standard library declares in the type space (D-19). The value
- * space is covered by `no-shadow` with `builtinGlobals`.
+ * `banned-syntax/no-global-type-shadow` — a type-space declaration (type alias,
+ * interface, enum, namespace, class, type parameter) must not reuse a name the
+ * standard library declares in the type space (D-19). The value space is
+ * covered by `no-shadow` with `builtinGlobals`.
  *
  * Which names count as global depends on `compilerOptions.lib`, which Sumi
- * leaves free (D-40); the `libs` option mirrors it (default `["esnext"]` —
- * add `"dom"` for browser code).
+ * leaves free (D-40); the `libs` option mirrors it (default `["esnext"]` — add
+ * `"dom"` for browser code).
  */
 export const noGlobalTypeShadow = createRule<Options, 'shadow'>({
   meta: {

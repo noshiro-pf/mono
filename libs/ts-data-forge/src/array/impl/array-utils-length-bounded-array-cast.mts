@@ -18,8 +18,8 @@ import {
  * exactly `length` elements.
  *
  * Use this instead of writing `xs as unknown as FixedLengthArray<N, E>`: the
- * length is verified at runtime, and the original array type (e.g. tuple
- * types) is preserved via intersection, so the result also benefits from the
+ * length is verified at runtime, and the original array type (e.g. tuple types)
+ * is preserved via intersection, so the result also benefits from the
  * structural tuple prefix (in-range indexed access without `undefined` under
  * `noUncheckedIndexedAccess`).
  *
@@ -88,8 +88,8 @@ export function asFixedLengthArray<E>(
  * at least `minLength` elements.
  *
  * Use this instead of writing `xs as unknown as MinLengthArray<N, E>`: the
- * length is verified at runtime, and the original array type (e.g. tuple
- * types) is preserved via intersection, so the result also benefits from the
+ * length is verified at runtime, and the original array type (e.g. tuple types)
+ * is preserved via intersection, so the result also benefits from the
  * structural tuple prefix (indexed access below `min(N, 10)` without
  * `undefined` under `noUncheckedIndexedAccess`).
  *
@@ -158,8 +158,8 @@ export function asMinLengthArray<E>(
  * at most `maxLength` elements.
  *
  * Use this instead of writing `xs as unknown as MaxLengthArray<N, E>`: the
- * length is verified at runtime, and the original array type (e.g. tuple
- * types) is preserved via intersection.
+ * length is verified at runtime, and the original array type (e.g. tuple types)
+ * is preserved via intersection.
  *
  * The length argument comes first, matching the type-parameter order of
  * `MaxLengthArray<MaxLength, Elm>`. Omitting the array returns a function that
@@ -223,8 +223,8 @@ export function asMaxLengthArray<E>(
  * `[minLength, maxLength]`.
  *
  * Use this instead of writing
- * `xs as unknown as BoundedLengthArray<Min, Max, E>`: the length is verified
- * at runtime, and the original array type (e.g. tuple types) is preserved via
+ * `xs as unknown as BoundedLengthArray<Min, Max, E>`: the length is verified at
+ * runtime, and the original array type (e.g. tuple types) is preserved via
  * intersection.
  *
  * The length arguments come first, matching the type-parameter order of

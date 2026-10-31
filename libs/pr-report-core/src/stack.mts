@@ -3,13 +3,13 @@
  * branch, so that its diff is its own layer and nothing below it.
  *
  * The stack is read from the bases alone, because GitHub already holds it: a
- * pull request onto `a` is on top of whichever pull request is `a`'s. When
- * that one merges, GitHub moves the layer above it onto its base and rebases
- * it, so the base chain is the merge order, and everything that orders pull
- * requests here reads a parent as a `Merge-After:` on it. `open-pr --base`
- * writes that trailer too, so that the body states the order as it does for
- * every other; a stack made any other way, without one, counts all the same,
- * and one naming the parent is not counted twice.
+ * pull request onto `a` is on top of whichever pull request is `a`'s. When that
+ * one merges, GitHub moves the layer above it onto its base and rebases it, so
+ * the base chain is the merge order, and everything that orders pull requests
+ * here reads a parent as a `Merge-After:` on it. `open-pr --base` writes that
+ * trailer too, so that the body states the order as it does for every other; a
+ * stack made any other way, without one, counts all the same, and one naming
+ * the parent is not counted twice.
  */
 
 /** The fields a stack is read from. */
@@ -20,8 +20,8 @@ export type StackMember = Readonly<{
   headRef: string;
   baseRef: string;
   /**
-   * Whether the head branch lives in a fork. A fork's branch is not a branch
-   * of this repository, whatever its name, so it is never a parent.
+   * Whether the head branch lives in a fork. A fork's branch is not a branch of
+   * this repository, whatever its name, so it is never a parent.
    */
   fromFork: boolean;
 }>;
@@ -31,9 +31,9 @@ export type StackMember = Readonly<{
  * A pull request that is not stacked has no entry.
  *
  * A base is a parent's head only when exactly one open pull request from this
- * repository heads it: a branch opened against two bases is two pull
- * requests, and which of them a layer above means cannot be told. Nothing
- * onto the default branch is stacked, even if some odd pull request heads it.
+ * repository heads it: a branch opened against two bases is two pull requests,
+ * and which of them a layer above means cannot be told. Nothing onto the
+ * default branch is stacked, even if some odd pull request heads it.
  */
 export const findStackParents = (
   pulls: readonly StackMember[],
@@ -60,9 +60,8 @@ export const findStackParents = (
 };
 
 /**
- * Every layer above `number`, each after the one it is on — the order in
- * which they are moved when `number` moves. Siblings keep the lowest number
- * first.
+ * Every layer above `number`, each after the one it is on — the order in which
+ * they are moved when `number` moves. Siblings keep the lowest number first.
  */
 export const stackDescendants = (
   parents: ReadonlyMap<number, number>,

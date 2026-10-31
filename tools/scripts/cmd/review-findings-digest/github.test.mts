@@ -15,8 +15,8 @@ const pull = (
     updated_at: updatedAt,
   }) as const;
 
-// Newest update first, as the list endpoint returns them. #3 was commented
-// on after it merged, so it is listed before #4, which merged later.
+// Newest update first, as the list endpoint returns them. #3 was commented on
+// after it merged, so it is listed before #4, which merged later.
 const seen = [
   pull(3, '2026-10-20T10:00:00Z', '2026-10-30T00:00:00Z'),
   pull(4, '2026-10-25T10:00:00Z', '2026-10-25T10:00:01Z'),

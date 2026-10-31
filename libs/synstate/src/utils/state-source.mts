@@ -3,9 +3,9 @@ import { source, type InitializedSourceObservable } from '../core/index.mjs';
 import type { StateOptions } from './create-reducer.mjs';
 
 /**
- * What `createState` and `createReducer` are both built on: the source
- * holding the state, its current value, and `commit`, the one way either
- * writes it. `commit` writes `reduced` unless `equals` finds it the same as
+ * What `createState` and `createReducer` are both built on: the source holding
+ * the state, its current value, and `commit`, the one way either writes it.
+ * `commit` writes `reduced` unless `equals` finds it the same as
  * `currentState`, after keeping the parts of `currentState` it did not change
  * when `keepEqualParts` asks for that, and returns the state written, or
  * `currentState` when nothing was.

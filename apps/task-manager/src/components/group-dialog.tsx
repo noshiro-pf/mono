@@ -7,8 +7,8 @@ import { groupEditorStore, type GroupEditorState } from '../store/index.mjs';
 import { followModal } from './follow-modal.mjs';
 
 /**
- * The dialog of one group, for creating it, renaming it and deleting it —
- * which leaves its nodes where they are, in no group. Opened from
+ * The dialog of one group, for creating it, renaming it and deleting it — which
+ * leaves its nodes where they are, in no group. Opened from
  * 「＋グループ」 in the header (a new group) or from a frame's title
  * (`dag-group-frame.tsx`); a native `<dialog>` as the node's is
  * (`node-dialog.tsx`).

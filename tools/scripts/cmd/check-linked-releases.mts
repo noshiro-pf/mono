@@ -25,17 +25,17 @@ import {
  * `linked` makes the members that release together take the same version, the
  * highest in the group — including the members that are not releasing. So a
  * breaking release of one member moves the whole group onto its new major: the
- * next patch of any other member is released from there. synstate and the
- * four packages wrapping it are linked for the other direction: they depend
- * on synstate's exact version, so a synstate release takes them along, and
+ * next patch of any other member is released from there. synstate and the four
+ * packages wrapping it are linked for the other direction: they depend on
+ * synstate's exact version, so a synstate release takes them along, and
  * `linked` raises that dependency patch to synstate's own bump.
  *
- * Neither direction carries a changeset's text. A changeset's body reaches
- * the changelog of the packages it names and no other, so a member made
- * breaking by `linked` alone tells its consumers nothing about why. Naming
- * every member in the breaking changeset is what puts the change in front of
- * each package's consumers, and releasing the group's majors together is what
- * keeps one member's major from becoming everyone's next version unannounced.
+ * Neither direction carries a changeset's text. A changeset's body reaches the
+ * changelog of the packages it names and no other, so a member made breaking by
+ * `linked` alone tells its consumers nothing about why. Naming every member in
+ * the breaking changeset is what puts the change in front of each package's
+ * consumers, and releasing the group's majors together is what keeps one
+ * member's major from becoming everyone's next version unannounced.
  *
  * The check fails when
  *

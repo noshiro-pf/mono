@@ -12,10 +12,10 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  * hand.
  *
  * It makes `a`, `title`, `script` and `style` HTML elements wherever they are
- * written (its SPEC.md 5.2), and an HTML `<a>` inside an `<svg>` draws
- * nothing, nor does an HTML `<title>` name it; and it takes a fixed list of
- * SVG attributes, which leaves out `focusable`. Each of these
- * goes once the library can say them itself.
+ * written (its SPEC.md 5.2), and an HTML `<a>` inside an `<svg>` draws nothing,
+ * nor does an HTML `<title>` name it; and it takes a fixed list of
+ * SVG attributes, which leaves out `focusable`. Each of these goes once the
+ * library can say them itself.
  */
 
 type LinkProps = Readonly<{
@@ -27,9 +27,9 @@ type LinkProps = Readonly<{
 }>;
 
 /**
- * SVG's own `<a>`, opening in a tab of its own as every link on the page
- * does (`external-link.tsx`), with its tooltip as the SVG `<title>` inside
- * it, which is what an SVG element has instead of a `title` attribute.
+ * SVG's own `<a>`, opening in a tab of its own as every link on the page does
+ * (`external-link.tsx`), with its tooltip as the SVG `<title>` inside it, which
+ * is what an SVG element has instead of a `title` attribute.
  */
 export const SvgLink = ({ href, title, children }: LinkProps): JSX.Element =>
   mountable(() => {

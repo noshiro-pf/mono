@@ -1,67 +1,65 @@
 /**
  * Which open issues the list shows, and in what order.
  *
- * **The priorities** are the `priority:*` labels (`priority.mts`), and
- * "none" for an issue carrying no one of them; an issue is hidden when its
- * priority is switched off. Each can also be picked ("only"): once any is,
- * an issue is shown only when its priority is one picked — the merge
- * order's statuses (`merge-order-view.mts`), for the priorities of issues.
- * A priority is never both, so picking one switches it back on, and
- * switching one off unpicks it. They, `pending` and `in progress` are the
- * part of the view the DAG reads too (`issue-graph.mts`'s
- * `omitFilteredIssues`), so that the two views draw the same issues.
+ * **The priorities** are the `priority:*` labels (`priority.mts`), and "none"
+ * for an issue carrying no one of them; an issue is hidden when its priority is
+ * switched off. Each can also be picked ("only"): once any is, an issue is
+ * shown only when its priority is one picked — the merge order's statuses
+ * (`merge-order-view.mts`), for the priorities of issues.
+ * A priority is never both, so picking one switches it back on, and switching
+ * one off unpicks it. They, `pending` and `in progress` are the part of the
+ * view the DAG reads too (`issue-graph.mts`'s `omitFilteredIssues`), so that
+ * the two views draw the same issues.
  *
- * **The labels** are every other label an open issue carries, each one a
- * pick: once any is picked, an issue is shown only when it carries one
- * picked, and still not when its priority is switched off. A pick rather
- * than a switch for hiding, because a label is a kind of work, and the
- * question a reader brings to the list is "what bugs are open", not "what
- * is open that is not a bug".
+ * **The labels** are every other label an open issue carries, each one a pick:
+ * once any is picked, an issue is shown only when it carries one picked, and
+ * still not when its priority is switched off. A pick rather than a switch for
+ * hiding, because a label is a kind of work, and the question a reader brings
+ * to the list is "what bugs are open", not "what is open that is not a bug".
  *
- * **Pending** is the `pending` label, which an author puts on what is held
- * back for now. It is a switch with a pick of its own rather than one of the
- * labels, as the merge order's `pending` is (`merge-order-view.mts`): what a
- * reader wants of it is to leave it out, or to look at it alone. Switched
- * off, an issue carrying it is hidden, whatever else it is; picked, an issue
- * not carrying it is. It is the other side of the priorities, read with them
+ * **Pending** is the `pending` label, which an author puts on what is held back
+ * for now. It is a switch with a pick of its own rather than one of the labels,
+ * as the merge order's `pending` is (`merge-order-view.mts`): what a reader
+ * wants of it is to leave it out, or to look at it alone. Switched off, an
+ * issue carrying it is hidden, whatever else it is; picked, an issue not
+ * carrying it is. It is the other side of the priorities, read with them
  * (`issue-filter.mts`): picking both is what is pending of the priorities
  * picked. It too is read by the DAG.
  *
  * **In progress** is the start state `in-progress` (`in-progress.mts`): the
- * issue could be started, and an open pull request closes it or it is
- * labelled `in-progress`. It is
- * a switch with a pick of its own as `pending` is, and a third side read with
- * the other two, since what a reader wants of it is the work under way alone,
- * in the DAG as much as in the list.
+ * issue could be started, and an open pull request closes it or it is labelled
+ * `in-progress`. It is a switch with a pick of its own as `pending` is, and a
+ * third side read with the other two, since what a reader wants of it is the
+ * work under way alone, in the DAG as much as in the list.
  *
  * **The start states** are how each issue stands for being started
- * (`docs/issue-start-after.md`, `pr-report-core`'s `IssueStartState`), read
- * off the issue graph (`issue-start.mts`); each but `in-progress`, which is
- * the switch above, is a switch as a priority is, and an issue none is known
- * for is `free`.
+ * (`docs/issue-start-after.md`, `pr-report-core`'s `IssueStartState`), read off
+ * the issue graph (`issue-start.mts`); each but `in-progress`, which is the
+ * switch above, is a switch as a priority is, and an issue none is known for is
+ * `free`.
  *
  * **The search** is what the reader types: an issue is shown only when its
  * title holds it, whatever the case, and still not when its priority or its
- * labels leave it out. It narrows the list there and then, so it is not kept
- * in the URL as the rest of the view is: it is held beside the view
+ * labels leave it out. It narrows the list there and then, so it is not kept in
+ * the URL as the rest of the view is: it is held beside the view
  * (`issues-list-store.mts`) rather than in it.
  *
- * Sorted by priority, high comes first and "none" between mid and low, the
- * most recently updated first within each; sorted by start state, what can
- * be started first — ready, then free — then what is planned, what is under way, what wants
+ * Sorted by priority, high comes first and "none" between mid and low, the most
+ * recently updated first within each; sorted by start state, what can be
+ * started first — ready, then free — then what is planned, what is under way,
+ * what wants
  * looking at, and what waits, the most recently updated first within each;
- * otherwise the list is in the order it is read, most recently updated
- * first. Everything is shown, by
- * update, by default.
+ * otherwise the list is in the order it is read, most recently updated first.
+ * Everything is shown, by update, by default.
  *
  * **Kept in the query string** as the merge order's view is
  * (`merge-order-view.mts`), with only what differs from {@link
  * DEFAULT_ISSUES_LIST_VIEW} written: `issues.hidePriority=low.none`,
  * `issues.onlyPriority=high`, `issues.hideStart=blocked.cycle`,
  * `issues.hidePending=1` or `issues.onlyPending=1`, `issues.hideInProgress=1`
- * or `issues.onlyInProgress=1`, `issues.sort=priority`, and a label picked
- * as `issues.label=bug`, once for each, since a label's name can hold the
- * `.` the others are joined with.
+ * or `issues.onlyInProgress=1`, `issues.sort=priority`, and a label picked as
+ * `issues.label=bug`, once for each, since a label's name can hold the `.` the
+ * others are joined with.
  */
 
 import { PENDING_LABEL, type IssueStartState } from 'pr-report-core';
@@ -108,8 +106,8 @@ export const ISSUE_STARTS = [
 ] as const satisfies readonly IssueStartState[];
 
 /**
- * The start states the list switches one by one: every one but
- * `in-progress`, which is the switch both views read (`in-progress.mts`).
+ * The start states the list switches one by one: every one but `in-progress`,
+ * which is the switch both views read (`in-progress.mts`).
  */
 export type IssueStartSwitch = StrictExclude<IssueStartState, 'in-progress'>;
 
@@ -121,8 +119,8 @@ export const ISSUE_START_SWITCHES: readonly IssueStartSwitch[] =
 export type IssuesListView = IssueFilter &
   Readonly<{
     /**
-     * What is switched off rather than on, as the merge order keeps it, so
-     * that the two read alike.
+     * What is switched off rather than on, as the merge order keeps it, so that
+     * the two read alike.
      */
     hiddenStarts: readonly IssueStartSwitch[];
     /** The labels picked, in name order; nothing picked is no narrowing. */
@@ -208,12 +206,12 @@ export const isIssueShown = (
 
 /**
  * The `open` count, each priority's, `pending`'s and `in progress`'s, of
- * `items` that `passes` lets through whatever their priority and whether or
- * not they are pending or in progress, as {@link countIssues} counts them:
+ * `items` that `passes` lets through whatever their priority and whether or not
+ * they are pending or in progress, as {@link countIssues} counts them:
  * `open` as the filter leaves it, and each priority, `pending` and `in
  * progress` as if it were shown, the other sides of the filter as they are.
- * The DAG counts its issues with this (`issues-view-store.mts`), with every
- * one it reads passing.
+ * The DAG counts its issues with this (`issues-view-store.mts`), with every one
+ * it reads passing.
  */
 export const countIssueFilter = <T,>(
   items: readonly T[],
@@ -222,8 +220,8 @@ export const countIssueFilter = <T,>(
   filter: IssueFilter,
 ): IssueFilterCounts => {
   // Each priority reads how many of it the view would show were it shown,
-  // whether that is switching it back on or picking it too: an issue has
-  // one priority, so under a pick one not picked would otherwise read none.
+  // whether that is switching it back on or picking it too: an issue has one
+  // priority, so under a pick one not picked would otherwise read none.
   const underPriority = (which: Priority): Count => {
     const all = items.filter((item) => priority(item) === which);
 
@@ -286,8 +284,8 @@ export const countIssueFilter = <T,>(
 };
 
 /**
- * Whether the title holds what was typed, whatever the case; the spaces
- * around it are not read, and nothing typed matches everything.
+ * Whether the title holds what was typed, whatever the case; the spaces around
+ * it are not read, and nothing typed matches everything.
  */
 export const matchesIssueTitle = (issue: IssueItem, query: string): boolean => {
   const typed = query.trim().toLowerCase();
@@ -330,14 +328,14 @@ export const arrangeIssues = (
 /**
  * What each count reads: how many the list shows, of how many are open.
  *
- * As the merge order counts (`countView`), each switch is counted with
- * itself on and every other as it is: a priority switched off reads how many
- * showing it would show (switching it back on, or picking it too while
- * another is picked), `pending` and `in progress` likewise, and a label how
- * many picking it would add — which, picked or not, is every issue carrying
- * it that the priorities, `pending` and `in progress` show. The search
- * narrows what each shows, never its whole: the whole is what is open, so
- * that the counts say how much the search leaves out.
+ * As the merge order counts (`countView`), each switch is counted with itself
+ * on and every other as it is: a priority switched off reads how many showing
+ * it would show (switching it back on, or picking it too while another is
+ * picked), `pending` and `in progress` likewise, and a label how many picking
+ * it would add — which, picked or not, is every issue carrying it that the
+ * priorities, `pending` and `in progress` show. The search narrows what each
+ * shows, never its whole: the whole is what is open, so that the counts say how
+ * much the search leaves out.
  */
 export const countIssues = (
   items: readonly IssueItem[],
@@ -411,8 +409,8 @@ export const countIssues = (
 
 /**
  * Hides the priority when it is shown, and shows it when it is not: switched
- * back on, and picked too while another is, since an issue has one priority
- * and one not picked would otherwise still show nothing.
+ * back on, and picked too while another is, since an issue has one priority and
+ * one not picked would otherwise still show nothing.
  */
 export const toggleIssuePriority = (
   view: IssuesListView,
@@ -475,8 +473,7 @@ export const toggleIssuePendingOnly = (view: IssuesListView): IssuesListView =>
   ({ ...view, hidePending: false, onlyPending: !view.onlyPending }) as const;
 
 /**
- * Hides what is in progress when it is shown, unpicking it, and shows it
- * again.
+ * Hides what is in progress when it is shown, unpicking it, and shows it again.
  */
 export const toggleIssueInProgress = (view: IssuesListView): IssuesListView =>
   ({
@@ -501,11 +498,11 @@ export const withIssueSort = (
 ): IssuesListView => ({ ...view, sort }) as const;
 
 /**
- * The view the query string asks for. A priority, or `pending`, both
- * switched off and picked, which only a hand can write, is switched off.
+ * The view the query string asks for. A priority, or `pending`, both switched
+ * off and picked, which only a hand can write, is switched off.
  * A `dag.hidePending=1` an older page wrote switches `pending` off, unless
- * `issues.onlyPending` picks it, and an `issues.hideStart=in-progress`
- * switches `in progress` off, unless `issues.onlyInProgress` picks it.
+ * `issues.onlyPending` picks it, and an `issues.hideStart=in-progress` switches
+ * `in progress` off, unless `issues.onlyInProgress` picks it.
  */
 export const issuesListViewFromSearch = (search: string): IssuesListView => {
   const params = new URLSearchParams(search);
@@ -527,8 +524,8 @@ export const issuesListViewFromSearch = (search: string): IssuesListView => {
 
   const onlyInProgress = flagParam(params, PARAM.onlyInProgress);
 
-  // The start state's own switch an older page wrote, now the one both
-  // views read.
+  // The start state's own switch an older page wrote, now the one both views
+  // read.
   const hideInProgress =
     flagParam(params, PARAM.hideInProgress) ||
     (!onlyInProgress &&
@@ -579,8 +576,8 @@ export const searchWithIssuesListView = (
 
   setNamesParam(params, PARAM.hideStart, view.hiddenStarts);
 
-  // Rewritten only when they changed, since writing them again moves them
-  // to the end of the query.
+  // Rewritten only when they changed, since writing them again moves them to
+  // the end of the query.
   if (!Arr.eq(params.getAll(PARAM.label), view.onlyLabels)) {
     params.delete(PARAM.label);
 
@@ -644,8 +641,8 @@ const PARAM = {
 } as const;
 
 /**
- * What an older page wrote for the DAG's own switch for what is pending,
- * read as `issues.hidePending`; `issues-view-settings.mts` drops it.
+ * What an older page wrote for the DAG's own switch for what is pending, read
+ * as `issues.hidePending`; `issues-view-settings.mts` drops it.
  */
 const DAG_HIDE_PENDING = 'dag.hidePending';
 

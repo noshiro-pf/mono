@@ -10,8 +10,8 @@
 declare module '*.png' {
   const url: string;
 
-  // This declaration describes what a bundler gives the importer, and that is
-  // a default.
+  // This declaration describes what a bundler gives the importer, and that is a
+  // default.
   // eslint-disable-next-line import-x/no-default-export
   export default url;
 }

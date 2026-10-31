@@ -2,8 +2,8 @@ import { Num } from 'ts-data-forge';
 
 /**
  * The number a numeric input of the page commits for `n`: clamped to
- * `[min, max]`, rounded to a whole number for `integer`, and `min` for a
- * number that is not finite, as the `NaN` of text that is no number.
+ * `[min, max]`, rounded to a whole number for `integer`, and `min` for a number
+ * that is not finite, as the `NaN` of text that is no number.
  */
 export const normalizeBounded =
   ({

@@ -22,9 +22,9 @@ import { ViewSettingsRow } from './view-settings-row.js';
  * Everything the pointer does on the page can be done here with a keyboard,
  * which is what lets the drag surfaces there be pointer-only. A native
  * `<dialog>`, opened modal, so focus and Escape are the browser's. Whether it
- * is open is the store's `settingsOpen`: the element follows it, and
- * tells it when Escape closes the dialog. Every change applies at once, so
- * there is nothing to confirm or cancel.
+ * is open is the store's `settingsOpen`: the element follows it, and tells it
+ * when Escape closes the dialog. Every change applies at once, so there is
+ * nothing to confirm or cancel.
  */
 export const ViewSettings = (): JSX.Element => {
   const layout$ = layoutStore.layout;
@@ -142,9 +142,9 @@ export const ViewSettings = (): JSX.Element => {
                     value={view(layout$, ({ lines }) =>
                       (100 - lines[1]).toString(),
                     )}
-                    // The right column's slider counts from the right, so
-                    // that more is wider for both: the line it moves is 100
-                    // less its value.
+                    // The right column's slider counts from the right, so that
+                    // more is wider for both: the line it moves is 100 less its
+                    // value.
                     onInput={(changed) => {
                       layoutStore.setLine(
                         1,
@@ -186,8 +186,8 @@ export const ViewSettings = (): JSX.Element => {
 
         <For items={view(layout$, columnIndicesOf)} key={(column) => column}>
           {(column$) => {
-            // The key is the column, so the row's column is the one it was
-            // made with.
+            // The key is the column, so the row's column is the one it was made
+            // with.
             const column = column$.getSnapshot().value;
 
             const ids$ = layout$.pipe(

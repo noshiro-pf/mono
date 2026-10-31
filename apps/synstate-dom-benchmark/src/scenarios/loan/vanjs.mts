@@ -18,15 +18,14 @@ import {
 const { table, tbody, td, tr } = van.tags;
 
 /**
- * The inputs are states, and every figure is a `van.derive` of its own,
- * reading the figures it is computed from. Each cell is bound to a function
- * that formats a figure.
+ * The inputs are states, and every figure is a `van.derive` of its own, reading
+ * the figures it is computed from. Each cell is bound to a function that
+ * formats a figure.
  *
- * VanJS recomputes derived states in rounds, in a microtask: each round
- * reruns the derivations that read a state the last round changed, and it
- * stops after 100 rounds. A change that has to travel further down the chain
- * than that leaves stale figures, which the harness reports instead of a
- * time.
+ * VanJS recomputes derived states in rounds, in a microtask: each round reruns
+ * the derivations that read a state the last round changed, and it stops after
+ * 100 rounds. A change that has to travel further down the chain than that
+ * leaves stale figures, which the harness reports instead of a time.
  */
 export const vanjsLoan: ScenarioFramework<LoanApp> = {
   name: 'VanJS',

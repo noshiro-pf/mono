@@ -12,8 +12,8 @@ const resizeObserver = new ResizeObserver((entries) => {
 export const Pad = (): JSX.Element => (
   <div
     ref={(element) => {
-      // Called once, right after the element is created and before anything
-      // is bound or its children are mounted.
+      // Called once, right after the element is created and before anything is
+      // bound or its children are mounted.
       resizeObserver.observe(element);
     }}
     onPointerMove={(event) => {

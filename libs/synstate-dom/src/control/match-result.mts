@@ -10,13 +10,12 @@ import { mountable, type JSX } from '../jsx/index.mjs';
 import { mountSwitch } from './mount-switch.mjs';
 
 /**
- * Mounts `ok` while `value` is `Ok` and `err` while it is `Err`
- * (SPEC.md 8.3).
+ * Mounts `ok` while `value` is `Ok` and `err` while it is `Err` (SPEC.md 8.3).
  *
- * Each branch is called once per change of tag, with an observable of the
- * value narrowed to `S` or `E`; while the tag stays the same, new values flow
- * through that observable rather than rebuilding the branch. It is derived
- * from `value`, not written to, so nothing is written during propagation.
+ * Each branch is called once per change of tag, with an observable of the value
+ * narrowed to `S` or `E`; while the tag stays the same, new values flow through
+ * that observable rather than rebuilding the branch. It is derived from
+ * `value`, not written to, so nothing is written during propagation.
  */
 export const MatchResult = <S, E>({
   value,

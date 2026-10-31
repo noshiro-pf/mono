@@ -234,9 +234,8 @@ describe(readTsConfig, () => {
 });
 
 /**
- * Writes `files` (JSON, by path) into a new directory, runs
- * `resolveImportPath` with `readTsConfig` from `cwdSubdirectory` of it, and
- * removes the directory.
+ * Writes `files` (JSON, by path) into a new directory, runs `resolveImportPath`
+ * with `readTsConfig` from `cwdSubdirectory` of it, and removes the directory.
  */
 const resolveWithFiles = (
   files: ReadonlyRecord<string, unknown>,

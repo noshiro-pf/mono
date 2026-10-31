@@ -20,8 +20,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  * A workspace sibling is reached through its `exports`, not through `paths` —
  * pnpm's part ends at the `node_modules/<name>` symlink, and what the name
  * resolves *to* is decided by the target's own `package.json`. The one
- * legitimate mapping is a package's own name, so that `samples/` can import
- * the way a consumer does while still being checked against the source being
+ * legitimate mapping is a package's own name, so that `samples/` can import the
+ * way a consumer does while still being checked against the source being
  * edited. See docs/workspace-package-linking.md.
  *
  * Both halves exist because TypeScript reports neither. A `paths` entry for a
@@ -214,9 +214,9 @@ const readPaths = async (file: string): Promise<PathsBlock | undefined> => {
     return undefined;
   }
 
-  // These files are JSONC. `parseConfigFileTextToJson` is what tsc itself
-  // reads them with, so comments and trailing commas are handled exactly as
-  // the compiler handles them.
+  // These files are JSONC. `parseConfigFileTextToJson` is what tsc itself reads
+  // them with, so comments and trailing commas are handled exactly as the
+  // compiler handles them.
   const parsed: unknown = ts.parseConfigFileTextToJson(file, text.value).config;
 
   if (!isRecord(parsed) || !hasKey(parsed, 'compilerOptions')) {
@@ -307,8 +307,8 @@ const checkFile = async (file: string): Promise<readonly Violation[]> => {
 
   // No package of its own: the nearest `package.json` is the repository root.
   // `tools/configs/tsconfig.tsx.json` is the case here, and its `paths` are a
-  // different mechanism — `tsx`'s runtime resolution for build scripts that
-  // run before any `dist/` exists. See CLAUDE.md, "Build".
+  // different mechanism — `tsx`'s runtime resolution for build scripts that run
+  // before any `dist/` exists. See CLAUDE.md, "Build".
   if (packageDir === undefined) {
     return [];
   }
@@ -348,8 +348,8 @@ const checkFile = async (file: string): Promise<readonly Violation[]> => {
  * The `paths` block of one tsconfig, with the directory its entries resolve
  * against.
  *
- * Only this file's own block is read: `paths` is not merged through `extends`
- * — a child that declares one replaces its parent's wholesale — so a config
+ * Only this file's own block is read: `paths` is not merged through `extends` —
+ * a child that declares one replaces its parent's wholesale — so a config
  * without a block of its own has nothing to answer for. `baseUrl` is read the
  * same way, which is exact as long as no shared base sets one; none does.
  */

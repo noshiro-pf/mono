@@ -1,18 +1,18 @@
 /**
- * The edges of the DAG as curves between wherever the nodes are — put there
- * by ELK or by hand — so they are worked out here rather than taken from
+ * The edges of the DAG as curves between wherever the nodes are — put there by
+ * ELK or by hand — so they are worked out here rather than taken from
  * ELK's routes.
  *
- * Every edge leaves its source and enters its target across the sides that
- * face along the direction of growth (right then left, or bottom then top),
- * at right angles to them: a cubic Bézier curve whose control points lie on
- * that axis, so the arrowhead, which follows the curve's last tangent, points
- * straight into the node. Several edges on one side are spread along it, in
- * the order of the nodes at their other ends, so that they do not cross
- * where they need not. A target behind its source in line with it gets two
- * curves that go round both nodes rather than one through them. A curve
- * that would run through some other node is routed round it instead
- * (`edge-routing.mts`), which is how the edges are drawn.
+ * Every edge leaves its source and enters its target across the sides that face
+ * along the direction of growth (right then left, or bottom then top), at right
+ * angles to them: a cubic Bézier curve whose control points lie on that axis,
+ * so the arrowhead, which follows the curve's last tangent, points straight
+ * into the node. Several edges on one side are spread along it, in the order of
+ * the nodes at their other ends, so that they do not cross where they need not.
+ * A target behind its source in line with it gets two curves that go round both
+ * nodes rather than one through them. A curve that would run through some other
+ * node is routed round it instead (`edge-routing.mts`), which is how the edges
+ * are drawn.
  */
 
 import { Arr, Num } from 'ts-data-forge';
@@ -34,8 +34,8 @@ import type { Point, Size } from './pan-zoom.mjs';
 export const MIN_CONTROL_OFFSET = 40;
 
 /**
- * The curve of every edge of `edges` both of whose nodes are among `nodes`,
- * in the order of `edges`.
+ * The curve of every edge of `edges` both of whose nodes are among `nodes`, in
+ * the order of `edges`.
  */
 export const edgeGeometries = (
   direction: DagDirection,
@@ -195,8 +195,8 @@ export type EdgeGeometry = DeepReadonly<{
   /** Drawn dashed, and cannot be selected (`dag-edge.tsx`). */
   implied: boolean;
   /**
-   * One curve, or two that go round the nodes — or, for an edge routed
-   * round the nodes in its way (`edge-routing.mts`), as many as it takes.
+   * One curve, or two that go round the nodes — or, for an edge routed round
+   * the nodes in its way (`edge-routing.mts`), as many as it takes.
    * The first leaves its start, and the last arrives at its end, along the
    * direction of growth.
    */
@@ -210,8 +210,8 @@ export type EdgeGeometry = DeepReadonly<{
 }>;
 
 /**
- * Coordinates along the direction of growth (`main`) and across it
- * (`cross`), so that one piece of geometry serves both directions.
+ * Coordinates along the direction of growth (`main`) and across it (`cross`),
+ * so that one piece of geometry serves both directions.
  */
 export type AxisPoint = Readonly<{ main: number; cross: number }>;
 
@@ -251,8 +251,8 @@ const ONLY_SLOT: Slot = { index: 0, count: 1 } as const;
 const DETOUR_CLEARANCE = 32;
 
 /**
- * The least gap across the axis between two nodes, one behind the other,
- * for a single curve to pass between them rather than go round.
+ * The least gap across the axis between two nodes, one behind the other, for a
+ * single curve to pass between them rather than go round.
  */
 const MIN_CROSS_GAP = 24;
 
@@ -291,9 +291,9 @@ const compareEnds = (
 };
 
 /**
- * The slot of every edge on the side of its `node`, ordered by where the
- * node at the other end is across the axis — then along it, then by id, so
- * that the order never depends on the order of the input.
+ * The slot of every edge on the side of its `node`, ordered by where the node
+ * at the other end is across the axis — then along it, then by id, so that the
+ * order never depends on the order of the input.
  */
 const slotsBySide = (
   ends: readonly Readonly<{
@@ -317,10 +317,9 @@ const slotsBySide = (
 
 /**
  * Where an edge in `slot` meets `node`'s exit side (towards the direction of
- * growth) or entry side. A milestone's hexagon has its points on the sides
- * that face along the axis when it grows to the right — edges meet its
- * slanted edges there — and a flat top and bottom between the slants when it
- * grows down.
+ * growth) or entry side. A milestone's hexagon has its points on the sides that
+ * face along the axis when it grows to the right — edges meet its slanted edges
+ * there — and a flat top and bottom between the slants when it grows down.
  */
 const attachment = (
   node: LaidOutNode,
@@ -332,8 +331,8 @@ const attachment = (
 
   const hexagon = node.kind === 'milestone';
 
-  // The milestone's slants (`dag-milestone-node.tsx`) are half its height
-  // deep, at 45 degrees.
+  // The milestone's slants (`dag-milestone-node.tsx`) are half its height deep,
+  // at 45 degrees.
   const inset = node.height / 2;
 
   const pointsAlongAxis = hexagon && axes.direction === 'right';
@@ -380,11 +379,11 @@ const straightOn = (
   }) as const;
 
 /**
- * From `start`, heading along the axis, to `end`, arriving along it. A
- * target ahead gets one curve whose control points are half the gap out (at
- * least {@link MIN_CONTROL_OFFSET}); one behind, but clear of the source
- * across the axis, an S-shaped one; one behind and in line with it, two
- * curves that turn round outside both nodes.
+ * From `start`, heading along the axis, to `end`, arriving along it. A target
+ * ahead gets one curve whose control points are half the gap out (at least
+ * {@link MIN_CONTROL_OFFSET}); one behind, but clear of the source across the
+ * axis, an S-shaped one; one behind and in line with it, two curves that turn
+ * round outside both nodes.
  */
 const curveBetween = (
   start: AxisPoint,

@@ -58,9 +58,9 @@ const withTemporaryDirectory = (run: (directory: string) => void): void => {
 };
 
 /**
- * A throwaway repository: the marker the hook looks for, a Prettier config
- * with the plugin this repository's has, this repository's `node_modules`
- * for the tools, and one package that lints with oxlint.
+ * A throwaway repository: the marker the hook looks for, a Prettier config with
+ * the plugin this repository's has, this repository's `node_modules` for the
+ * tools, and one package that lints with oxlint.
  */
 const withRepository = (run: (root: string) => void): void => {
   withTemporaryDirectory((root) => {
@@ -85,8 +85,8 @@ const withRepository = (run: (root: string) => void): void => {
       JSON.stringify({ scripts: { 'check:lint': 'oxlint . && eslint .' } }),
     );
 
-    // The hook passes `--quiet`, so only errors count, as in this
-    // repository's own config.
+    // The hook passes `--quiet`, so only errors count, as in this repository's
+    // own config.
     write(
       path.join(root, 'libs/a/.oxlintrc.json'),
       JSON.stringify({ rules: { 'no-debugger': 'error' } }),

@@ -31,8 +31,8 @@ export type LayoutPreset = Readonly<{
   id: PresetId;
 
   /**
-   * What the button says. Short, because the nine of them share one toolbar
-   * row with everything else: a row that wraps costs the panes a whole line of
+   * What the button says. Short, because the nine of them share one toolbar row
+   * with everything else: a row that wraps costs the panes a whole line of
    * height for as long as the window is that wide.
    */
   label: string;
@@ -83,9 +83,9 @@ export const layoutPresets: readonly LayoutPreset[] = [
   // A grid is a row of columns, never a column of rows. Both shapes look the
   // same, but they differ in which divider spans the whole stage: nested this
   // way the vertical one does, and each column's horizontal divider moves on
-  // its own. The other way round every column shares one horizontal divider,
-  // so making one pane taller shortens the pane beside it — which is almost
-  // never what is wanted.
+  // its own. The other way round every column shares one horizontal divider, so
+  // making one pane taller shortens the pane beside it — which is almost never
+  // what is wanted.
   {
     id: 'grid-2x2',
     label: '2×2',

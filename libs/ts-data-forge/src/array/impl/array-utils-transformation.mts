@@ -48,8 +48,8 @@ export function map<const Ar extends readonly unknown[] & UnknownBrand, B>(
   mapFn: (a: Ar[number], index: ArrayIndex<Ar>) => B,
 ): ChangeArrayElement<Ar, B>;
 
-// A plain array or tuple carries no length brand, so the homomorphic mapping
-// is the whole answer. Stating it directly — rather than going through
+// A plain array or tuple carries no length brand, so the homomorphic mapping is
+// the whole answer. Stating it directly — rather than going through
 // `ChangeArrayElement`, whose `HasLengthConstraint` test a *generic* `Ar`
 // cannot decide — is what keeps `map` usable inside a function that is itself
 // generic over the tuple: a deferred conditional is not assignable to the
@@ -68,8 +68,8 @@ export function map<const Ar extends readonly unknown[], B>(
 //
 // Spelled as an intersection of two function types rather than one object type
 // carrying two call signatures — the `convert-to-readonly` codemod wraps an
-// inline object type in `Readonly<…>`, and a mapped type drops call
-// signatures, which would leave the curried form with none at all.
+// inline object type in `Readonly<…>`, and a mapped type drops call signatures,
+// which would leave the curried form with none at all.
 export function map<A, B>(
   mapFn: (a: A, index: SizeType.Arr) => B,
 ): (<const Ar extends readonly A[] & UnknownBrand>(
@@ -942,8 +942,8 @@ const flatImpl = (
 /**
  * Element type of {@link partition}'s result: a chunk holds between 1 and `N`
  * elements. The lower bound is what makes this worth spelling out — `partition`
- * never emits an empty chunk, so indexed access into a chunk is not
- * `undefined` at position `0`, unlike with a plain `readonly E[]`.
+ * never emits an empty chunk, so indexed access into a chunk is not `undefined`
+ * at position `0`, unlike with a plain `readonly E[]`.
  *
  * Falls back to {@link NonEmptyArray} when `N` is not a bound the brand can
  * express, which keeps that lower bound in every case.
@@ -973,8 +973,8 @@ export const chunk = partition;
 /**
  * Return type of {@link concat}: the concatenated tuple `readonly [...Ar1,
  * ...Ar2]`, additionally branded as {@link NonEmptyArray} when either input is
- * a non-empty tuple (a plain non-empty tuple or a branded `NonEmptyArray`,
- * both of which extend `NonEmptyTuple<unknown>`).
+ * a non-empty tuple (a plain non-empty tuple or a branded `NonEmptyArray`, both
+ * of which extend `NonEmptyTuple<unknown>`).
  */
 type ConcatResult<
   Ar1 extends readonly unknown[],

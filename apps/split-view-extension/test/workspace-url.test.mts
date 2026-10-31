@@ -339,8 +339,8 @@ describe('parseWorkspaceUrl', () => {
   });
 
   test('carries six long addresses well inside any limit the browser has', () => {
-    // The longest URLs in ordinary use are a few hundred characters; this is
-    // an order of magnitude more, in every pane of the largest preset.
+    // The longest URLs in ordinary use are a few hundred characters; this is an
+    // order of magnitude more, in every pane of the largest preset.
     const long =
       `https://example.com/${'segment/'.repeat(250)}?q=${'x'.repeat(500)}` as const;
 

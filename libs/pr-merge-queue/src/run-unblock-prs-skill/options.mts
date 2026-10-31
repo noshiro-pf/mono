@@ -86,9 +86,9 @@ export type Options = Readonly<{
 export const DEFAULT_INTERVAL_MIN = 10;
 
 /**
- * A day. Past about 24 days the wait overflows `setTimeout`, which then
- * fires at once and turns the loop into a busy one; nothing needs a wait
- * anywhere near that long.
+ * A day. Past about 24 days the wait overflows `setTimeout`, which then fires
+ * at once and turns the loop into a busy one; nothing needs a wait anywhere
+ * near that long.
  */
 export const MAX_INTERVAL_MIN = 24 * 60;
 
@@ -119,8 +119,8 @@ export const HELP = [
 
 /**
  * Required, because the alternative is an amount nobody chose: a round that
- * cannot settle a failure keeps going until something stops it, and this is
- * the only thing that does.
+ * cannot settle a failure keeps going until something stops it, and this is the
+ * only thing that does.
  */
 const budget = (raw: string | undefined): Result<number, string> => {
   if (raw === undefined) {
@@ -129,8 +129,8 @@ const budget = (raw: string | undefined): Result<number, string> => {
     );
   }
 
-  // A whole part and an optional fraction, read apart so that neither
-  // pattern repeats inside another.
+  // A whole part and an optional fraction, read apart so that neither pattern
+  // repeats inside another.
   const [whole = '', fraction, ...rest] = raw.split('.');
 
   const parsed =

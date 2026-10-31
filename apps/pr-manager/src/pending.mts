@@ -19,9 +19,9 @@ export const isPendingShown = (
 
 /**
  * Whether what is pending is shown, as the open issues filter it
- * (`issue-filter.mts`): switched off, or picked ("only") to be shown alone,
- * as a priority is. Never both: picking it switches it back on, and
- * switching it off unpicks it.
+ * (`issue-filter.mts`): switched off, or picked ("only") to be shown alone, as
+ * a priority is. Never both: picking it switches it back on, and switching it
+ * off unpicks it.
  */
 export type PendingFilter = Readonly<{
   /** Whether what is labelled `pending` is left out. */

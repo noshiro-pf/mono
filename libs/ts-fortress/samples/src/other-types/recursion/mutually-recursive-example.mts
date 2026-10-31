@@ -4,8 +4,8 @@ type EvenNumber = Readonly<{ type: 'even'; next: OddNumber | null }>;
 
 type OddNumber = Readonly<{ type: 'odd'; next: EvenNumber | null }>;
 
-// IMPORTANT: For mutual recursion, place terminal types (like nullType)
-// first in unions, or provide explicit defaultValue
+// IMPORTANT: For mutual recursion, place terminal types (like nullType) first
+// in unions, or provide explicit defaultValue
 const EvenNumber: t.Type<EvenNumber> = t.recursion('EvenNumber', () =>
   t.record({
     type: t.literal('even'),

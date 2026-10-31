@@ -23,8 +23,8 @@ export type Options = Readonly<{
   /** How long to watch one pull request before giving up on it. */
   watchTimeoutMin: number;
   /**
-   * Whether a watched pull request whose failure is only a fixer's diff has
-   * the fixer run, amended onto its commit and pushed. See `auto-fix.mts`.
+   * Whether a watched pull request whose failure is only a fixer's diff has the
+   * fixer run, amended onto its commit and pushed. See `auto-fix.mts`.
    */
   autoFix: boolean;
   /**

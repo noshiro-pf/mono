@@ -89,10 +89,10 @@ export const Table = ({
 
   const cardSize = sizes.pipe(map((s) => s.cardSize));
 
-  // The cards and the names are measured again after every update of the
-  // window size or of what the table shows, rather than after a list of what
-  // can move them, which would go stale silently; `reportRectOn` reports only
-  // the rects that changed.
+  // The cards and the names are measured again after every update of the window
+  // size or of what the table shows, rather than after a list of what can move
+  // them, which would go stale silently; `reportRectOn` reports only the rects
+  // that changed.
   const measureOn = combine([windowSize, displayValues]);
 
   return (

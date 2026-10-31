@@ -10,20 +10,20 @@ import {
 
 /**
  * Writes the comment `release.yml` keeps on the version pull request while a
- * breaking release has `NEXT_MAJOR.md` items open, or an empty file when
- * there is none.
+ * breaking release has `NEXT_MAJOR.md` items open, or an empty file when there
+ * is none.
  *
  * The decided items hold the version pull request — `check:prose:next-major`
- * fails on it — and are listed from the moment the breaking changeset lands,
- * so that what the release waits for is in sight before anyone queues it. The
+ * fails on it — and are listed from the moment the breaking changeset lands, so
+ * that what the release waits for is in sight before anyone queues it. The
  * undecided ones hold nothing, and the version pull request is where the
- * release is decided — adding `merge-queued` to it is the decision — so that
- * is where they are listed. A comment, not the body: the body is rewritten by
+ * release is decided — adding `merge-queued` to it is the decision — so that is
+ * where they are listed. A comment, not the body: the body is rewritten by
  * `changesets/action` on every push to `main`.
  *
  * Run it on a checkout of `main`, before `changeset version` has consumed
- * `.changeset/`. It writes a file and nothing else: the job running it holds
- * no key, and the job posting the comment runs nothing from the tree.
+ * `.changeset/`. It writes a file and nothing else: the job running it holds no
+ * key, and the job posting the comment runs nothing from the tree.
  *
  * Usage: `pnpm run z:next-major-reminder <output path>`.
  */

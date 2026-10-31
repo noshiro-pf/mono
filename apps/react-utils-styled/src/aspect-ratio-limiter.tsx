@@ -17,8 +17,8 @@ const Root = styled.div`
   justify-content: center;
 `;
 
-// `Readonly`, not `DeepReadonly`: a deeply-readonly `ReactNode` is no longer
-// a `ReactNode`, and React is the one consuming these.
+// `Readonly`, not `DeepReadonly`: a deeply-readonly `ReactNode` is no longer a
+// `ReactNode`, and React is the one consuming these.
 type Props = Readonly<{
   children: React.ReactNode;
   maxWidthPerHeight?: number;

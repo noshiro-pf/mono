@@ -1,16 +1,16 @@
 /**
- * Where a user's plans are kept: Firestore when signed in (`firebase/`),
- * memory in the tests and the demo (`memory-repository.mts`). The store sees
- * only this.
+ * Where a user's plans are kept: Firestore when signed in (`firebase/`), memory
+ * in the tests and the demo (`memory-repository.mts`). The store sees only
+ * this.
  */
 
 import type { Plan } from './plan-doc.mjs';
 
 export type PlanRepository = Readonly<{
   /**
-   * Hands `observer.next` every plan once they have loaded, in creation
-   * order, and again on every change after — local writes included, before
-   * they are confirmed. Returns what stops it.
+   * Hands `observer.next` every plan once they have loaded, in creation order,
+   * and again on every change after — local writes included, before they are
+   * confirmed. Returns what stops it.
    */
   subscribePlans: (observer: PlansObserver) => () => void;
   /** Creates or replaces the plan with its id. */
@@ -28,8 +28,8 @@ export type PlansObserver = Readonly<{
 /** Signing in and out, and the repository of whoever is signed in. */
 export type Backend = Readonly<{
   /**
-   * Hands `listener` the session as soon as it is known, and again whenever
-   * it changes. Returns what stops it.
+   * Hands `listener` the session as soon as it is known, and again whenever it
+   * changes. Returns what stops it.
    */
   watchSession: (listener: (session: BackendSession) => void) => () => void;
   signIn: () => Promise<void>;

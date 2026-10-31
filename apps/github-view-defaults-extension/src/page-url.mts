@@ -136,8 +136,8 @@ export const isSettledLink = (
  * The path alone, because that is what identifies the page across the rewrites
  * GitHub makes to its own address bar: it takes the parameters in, applies
  * them, and then normalizes them off the URL. The caller remembers this so that
- * it does not read that normalization as "the defaults are missing again" —
- * see `content.mts`, where putting them back would be an endless redirect.
+ * it does not read that normalization as "the defaults are missing again" — see
+ * `content.mts`, where putting them back would be an endless redirect.
  */
 export const managedPagePathOf = (
   href: string,

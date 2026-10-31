@@ -22,18 +22,18 @@ import { projectRootPath } from '../project-root-path.mjs';
 /**
  * Fails when something served from the GitHub Pages site — an app, or a slide
  * deck under `docs/reveal-slides/` — has a `firebase.json` whose `hosting` is
- * anything but the redirect from its old Firebase Hosting site, or has only
- * one of `firebase.json` and `.firebaserc`. Pages serves these; a Firebase
- * project behind one may hold its backend (Firestore, Auth), and that is not
- * this check's business.
+ * anything but the redirect from its old Firebase Hosting site, or has only one
+ * of `firebase.json` and `.firebaserc`. Pages serves these; a Firebase project
+ * behind one may hold its backend (Firestore, Auth), and that is not this
+ * check's business.
  *
  * What moved from Firebase Hosting to Pages keeps its Firebase project for a
  * while, deployed once with this redirect so that links to the old `*.web.app`
  * address still arrive. The two files are there exactly as long as the project
  * is: when the project is deleted, both go. Nothing else reads them, so a
  * redirect pointing at the wrong directory, or a `firebase.json` that serves
- * the site again, would otherwise pass every check and be found only by
- * whoever followed an old link.
+ * the site again, would otherwise pass every check and be found only by whoever
+ * followed an old link.
  *
  * Deploy with `pnpm dlx firebase-tools deploy --only hosting` from the
  * directory holding the two files. `public` is only there because Hosting
@@ -96,8 +96,8 @@ export const slideDeckUrl = (deck: string): string =>
   `${PAGES_SITE_ORIGIN}${PAGES_SITE_ROOT}${PAGES_SLIDES_DIR}/${deck}/` as const;
 
 /**
- * The one `firebase.json` an app on Pages may have. Elsewhere `public` may
- * name another directory, as long as it exists.
+ * The one `firebase.json` an app on Pages may have. Elsewhere `public` may name
+ * another directory, as long as it exists.
  */
 export const redirectConfig = (
   pagesUrl: string,
@@ -185,12 +185,11 @@ const slideDeckSites = async (): Promise<readonly Site[]> => {
 /**
  * Whether `hosting` does nothing but redirect into `pagesUrl`.
  *
- * Rules for old paths whose shape changed (`/rooms/<id>/` →
- * `/rooms/?id=<id>`) may come first, as long as each is a 301 into the same
- * page; the last is always the catch-all that keeps the path. `public` only
- * has to name a directory that exists, which a deploy checks, and `site` picks
- * the project's Hosting site; neither serves anything, as redirects come
- * before files.
+ * Rules for old paths whose shape changed (`/rooms/<id>/` → `/rooms/?id=<id>`)
+ * may come first, as long as each is a 301 into the same page; the last is
+ * always the catch-all that keeps the path. `public` only has to name a
+ * directory that exists, which a deploy checks, and `site` picks the project's
+ * Hosting site; neither serves anything, as redirects come before files.
  */
 const isRedirectOnly = (hosting: unknown, pagesUrl: string): boolean => {
   if (

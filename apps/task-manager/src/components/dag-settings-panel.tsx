@@ -27,11 +27,10 @@ import { listenInScope } from './scope-effects.mjs';
  * focus going back to the button. The focus goes to the panel itself, which
  * draws no ring, rather than to its first button: the close button would
  * otherwise open with a ring round it, as if it were the one thing to do. A
- * popover hanging from the button on a wide screen, a sheet across the
- * bottom on a narrow one (`view-model/settings-panel.mts`), placed again
- * when the screen changes size. Whether and where it is open is the UI
- * store's: the element follows it, as the node dialog follows the editor
- * store.
+ * popover hanging from the button on a wide screen, a sheet across the bottom
+ * on a narrow one (`view-model/settings-panel.mts`), placed again when the
+ * screen changes size. Whether and where it is open is the UI store's: the
+ * element follows it, as the node dialog follows the editor store.
  */
 export const DagSettingsPanel = (): JSX.Element => {
   const popoverStyle = (
@@ -54,9 +53,8 @@ export const DagSettingsPanel = (): JSX.Element => {
               dialog.focus();
             },
             closed: () => {
-              // The browser may give it back by itself; Safari, which does
-              // not focus a button that is clicked, has nothing to give it
-              // back to.
+              // The browser may give it back by itself; Safari, which does not
+              // focus a button that is clicked, has nothing to give it back to.
               document
                 .querySelector<HTMLButtonElement>(`#${DAG_SETTINGS_BUTTON_ID}`)
                 ?.focus();

@@ -7,9 +7,9 @@ import {
 
 /**
  * The day a key moves a calendar's focus to from `from`, as react-day-picker
- * moves it, or `undefined` for a key that does not: the arrows by a day and
- * a week, PageUp and PageDown by a month (a year with Shift), Home and End to
- * the ends of the week that begins on `weekStartsOn` (0 for Sunday).
+ * moves it, or `undefined` for a key that does not: the arrows by a day and a
+ * week, PageUp and PageDown by a month (a year with Shift), Home and End to the
+ * ends of the week that begins on `weekStartsOn` (0 for Sunday).
  */
 export const dayAfterKey = (
   from: WallClock,

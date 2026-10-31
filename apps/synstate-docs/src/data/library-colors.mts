@@ -24,8 +24,8 @@ export const libraryColorOf = (label: string): string | undefined =>
  * every branch costs. Drawn like the others, the fan-out's naive SynState row
  * read as SynState's own growth with the branch count, which its natural
  * `switchMap` form does not have. Read from the label rather than listed here,
- * so that a naive row cannot be added without being drawn as one. Each is
- * given the paler colour of its library below, which no check enforces.
+ * so that a naive row cannot be added without being drawn as one. Each is given
+ * the paler colour of its library below, which no check enforces.
  */
 export const isNaiveForm = (label: string): boolean => label.includes('(naive');
 

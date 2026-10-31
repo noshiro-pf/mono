@@ -11,8 +11,7 @@ import {
 const pageOrigin = 'https://github.com';
 
 /**
- * A page that holds a link, for the cases where which page makes no
- * difference.
+ * A page that holds a link, for the cases where which page makes no difference.
  *
  * Only the branches rule reads it, and only on the overview; every diff case
  * below answers the same whatever is passed here.

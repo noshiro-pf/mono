@@ -2,8 +2,8 @@ import { Arr, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
- * Replaces the content of every `<!-- <name>:<key> -->…<!-- /<name> -->`
- * span. A key the page uses and `values` lacks is an error, and so is a key in
+ * Replaces the content of every `<!-- <name>:<key> -->…<!-- /<name> -->` span.
+ * A key the page uses and `values` lacks is an error, and so is a key in
  * `values` the page never uses: a table that quietly stopped being embedded is
  * the drift the embedding scripts exist to prevent.
  */

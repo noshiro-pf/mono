@@ -14,10 +14,10 @@ export type CompilerOptionViolation = Readonly<{
 }>;
 
 /**
- * Compares a project's effective compilerOptions (as `tsc --showConfig`
- * reports them) with the locked entries. The comparison follows how the
- * compiler reads the file: an absent boolean is `false` unless the option is
- * one whose absence means something else, enum values compare
+ * Compares a project's effective compilerOptions (as `tsc --showConfig` reports
+ * them) with the locked entries. The comparison follows how the compiler reads
+ * the file: an absent boolean is `false` unless the option is one whose absence
+ * means something else, enum values compare
  * case-insensitively (`"NodeNext"` is `"nodenext"`), and a strict-family
  * flag set to `false` under `strict: true` is a violation of `strict`.
  */

@@ -2,8 +2,8 @@ import { asUint32, range } from 'ts-data-forge';
 
 /**
  * Wraps a string with parentheses if not already wrapped.
- * Avoids adding redundant parentheses when the expression is already
- * fully wrapped with balanced parentheses.
+ * Avoids adding redundant parentheses when the expression is already fully
+ * wrapped with balanced parentheses.
  *
  * @example
  *
@@ -37,8 +37,8 @@ const parenDepthDelta = (char: string | undefined): number => {
     case ')':
       return -1;
 
-    // `at` returns `undefined` past the end of the string. The loop below
-    // never asks for such an index, but the type says it can.
+    // `at` returns `undefined` past the end of the string. The loop below never
+    // asks for such an index, but the type says it can.
     case undefined:
     default:
       return 0;
@@ -55,8 +55,8 @@ const parenDepthDelta = (char: string | undefined): number => {
  *
  * Module-local, so `samples/` — which imports the package the way a consumer
  * does — cannot reach it, and it therefore carries no `@example`. See
- * {@link wrapWithParentheses}, the exported form, whose example covers the
- * same cases.
+ * {@link wrapWithParentheses}, the exported form, whose example covers the same
+ * cases.
  */
 const isWrappedWithParentheses = (str: string): boolean => {
   const trimmed = str.trim();
@@ -65,8 +65,8 @@ const isWrappedWithParentheses = (str: string): boolean => {
     return false;
   }
 
-  // Check if the opening and closing parentheses are balanced
-  // and the opening parenthesis corresponds to the closing one
+  // Check if the opening and closing parentheses are balanced and the opening
+  // parenthesis corresponds to the closing one
   let mut_depth = 0;
 
   for (const mut_i of range(0, asUint32(trimmed.length))) {

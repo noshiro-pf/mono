@@ -12,17 +12,18 @@ type Props = Readonly<{
 }>;
 
 /**
- * Where a reader names the repository to read: `owner/name`, or its address
- * on GitHub as the address bar has it.
+ * Where a reader names the repository to read: `owner/name`, or its address on
+ * GitHub as the address bar has it.
  *
- * What it does is write `?repo=` and open the page there, the rest of the
- * query — the layout, the theme, the filters — kept. The page reads the repository once, as it opens
- * (`reportSourceFromSearch`), so a read still out for the one before cannot
- * land on the page of the next, and a bookmark of it opens the same one.
+ * What it does is write `?repo=` and open the page there, the rest of the query
+ * — the layout, the theme, the filters — kept. The page reads the repository
+ * once, as it opens (`reportSourceFromSearch`), so a read still out for the one
+ * before cannot land on the page of the next, and a bookmark of it opens the
+ * same one.
  *
- * Outside `components/` because the start page draws it, and that page must
- * not load the store: the store reads the repository the URL names, and on
- * the start page there is none.
+ * Outside `components/` because the start page draws it, and that page must not
+ * load the store: the store reads the repository the URL names, and on the
+ * start page there is none.
  */
 export const RepoForm = ({ initial, initialError }: Props): JSX.Element => {
   const [error, setError] = createState<string | undefined>(initialError);

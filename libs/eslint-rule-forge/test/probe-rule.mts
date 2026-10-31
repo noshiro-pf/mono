@@ -14,8 +14,8 @@ export type ProbeContext = Readonly<
  * A rule that reports every `probe(<argument>)` call in the code under test,
  * with `read(context, argument)` as the message. A test asserts on that
  * message, which is how a helper that needs a rule context — the source code,
- * the scope manager, a fixer — is run on real parser output. `fix`, when
- * given, is offered as the report's fix.
+ * the scope manager, a fixer — is run on real parser output. `fix`, when given,
+ * is offered as the report's fix.
  */
 export const probeRule = (
   read: (context: ProbeContext, argument: TSESTree.Expression) => string,

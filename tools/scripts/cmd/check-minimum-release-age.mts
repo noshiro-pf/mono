@@ -8,10 +8,10 @@ import { projectRootPath } from '../project-root-path.mjs';
 /**
  * Fails when a `minimumReleaseAgeExclude` entry would outlive its reason.
  *
- * `pnpm-workspace.yaml`, above the list, states the rule: an entry is a
- * waiver, not a policy, so it names a version and
- * `minimumReleaseAgeExcludePrune` drops it once the lockfile stops resolving
- * it. Two spellings defeat that, and pnpm takes both without a word:
+ * `pnpm-workspace.yaml`, above the list, states the rule: an entry is a waiver,
+ * not a policy, so it names a version and `minimumReleaseAgeExcludePrune` drops
+ * it once the lockfile stops resolving it. Two spellings defeat that, and pnpm
+ * takes both without a word:
  *
  * - **A bare name exempts every version, for good.** Measured on pnpm 12.3.4:
  *   with `- vite` on the list, `pnpm update --latest` took a release published
@@ -26,10 +26,10 @@ import { projectRootPath } from '../project-root-path.mjs';
  * rather than a silent exemption.
  *
  * It also checks that each waiver still has a reason, and that each reason
- * still has a waiver. A reason is a `# waiver: <prefix>` heading in the
- * comment block above `minimumReleaseAgeExcludePrune`, which is the one place
- * anywhere near the list that survives pruning — measured, and written down
- * beside the reasons themselves. A heading inside the list is a violation of its own,
+ * still has a waiver. A reason is a `# waiver: <prefix>` heading in the comment
+ * block above `minimumReleaseAgeExcludePrune`, which is the one place anywhere
+ * near the list that survives pruning — measured, and written down beside the
+ * reasons themselves. A heading inside the list is a violation of its own,
  * because that is precisely the comment pruning takes with it.
  *
  * So this reads `pnpm-workspace.yaml` alone. With patterns gone, an entry's
@@ -58,8 +58,8 @@ export const checkMinimumReleaseAge = (): Promise<
   });
 
 /**
- * The three `minimumReleaseAge*` settings, read with a line scanner rather
- * than a YAML parser — as `check-lockfile-tarballs.mts` reads the lockfile.
+ * The three `minimumReleaseAge*` settings, read with a line scanner rather than
+ * a YAML parser — as `check-lockfile-tarballs.mts` reads the lockfile.
  * All three sit at the top level of a file whose shape is stable, and a parser
  * would be a dependency taken on for one nesting level.
  */
@@ -96,9 +96,9 @@ export const parseMinimumReleaseAgeSettings = (
 /**
  * `true` when the reason heading speaks for the entry.
  *
- * Prefix matching, so one heading covers a family — `@octokit/` answers for
- * the eight entries that have to move together — and an exact
- * `name@version` heading still covers only itself.
+ * Prefix matching, so one heading covers a family — `@octokit/` answers for the
+ * eight entries that have to move together — and an exact `name@version`
+ * heading still covers only itself.
  */
 export const reasonCoversEntry = (target: string, entry: string): boolean =>
   entry.startsWith(target);
@@ -275,9 +275,9 @@ type ViolationReason =
   | 'stale-reason';
 
 /**
- * `true` when the entry carries a version — the `@` that is not the one
- * opening a scope, with something after it. `@types/node@22.20.2 || 24.13.4`
- * is one entry naming two versions, and that `@` is the separator.
+ * `true` when the entry carries a version — the `@` that is not the one opening
+ * a scope, with something after it. `@types/node@22.20.2 || 24.13.4` is one
+ * entry naming two versions, and that `@` is the separator.
  */
 const hasVersion = (entry: string): boolean => {
   const separatorIndex = entry.indexOf('@', entry.startsWith('@') ? 1 : 0);
@@ -357,8 +357,8 @@ const collectListItems = (startLines: readonly string[]): readonly string[] => {
 /**
  * The run of comment lines that ends on the line before `keyIndex`.
  *
- * Pruning rewrites the list below that key and nothing above it, so this is
- * the block a reason has to be in to outlive the entry it explains.
+ * Pruning rewrites the list below that key and nothing above it, so this is the
+ * block a reason has to be in to outlive the entry it explains.
  */
 const commentBlockAbove = (
   lines: readonly string[],
@@ -382,11 +382,11 @@ const commentText = (line: string): string => {
 };
 
 /**
- * The `# waiver:` headings among `lines`, each with whether anything is
- * written under it.
+ * The `# waiver:` headings among `lines`, each with whether anything is written
+ * under it.
  *
- * A body is the next comment line with something on it, so the heading and
- * its reason stay one paragraph — a blank comment line ends it.
+ * A body is the next comment line with something on it, so the heading and its
+ * reason stay one paragraph — a blank comment line ends it.
  */
 const collectReasons = (lines: readonly string[]): readonly WaiverReason[] =>
   lines.flatMap((line, index) => {

@@ -2,8 +2,8 @@ import { createState, map } from 'synstate';
 import { type JSX, view } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
-// The store: module level, so it belongs to no scope and lives as long as
-// the page.
+// The store: module level, so it belongs to no scope and lives as long as the
+// page.
 export const [cart$, setCart] = createState<readonly number[]>([]);
 
 export const CartTotal = (): JSX.Element => {

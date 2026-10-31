@@ -17,12 +17,12 @@ type MessageIds = 'preferAssertIsFalseOverExpectFalse';
 type Options = readonly [];
 
 /**
- * `expect(X).toBe(false)` becomes `assert.isFalse(X)` when `X` is a boolean. The
- * calls, the `expect` function and the `false` are read through `as`,
- * `satisfies`, `!` and `<T>`; `X` keeps its wrappers, and is a boolean only
- * if the type at every layer of them is one: a widening `as` is the author
- * saying it may not be, and a narrowing one (`v as boolean` on an `unknown`,
- * `flag!`) does not make the value a boolean.
+ * `expect(X).toBe(false)` becomes `assert.isFalse(X)` when `X` is a boolean.
+ * The calls, the `expect` function and the `false` are read through `as`,
+ * `satisfies`, `!` and `<T>`; `X` keeps its wrappers, and is a boolean only if
+ * the type at every layer of them is one: a widening `as` is the author saying
+ * it may not be, and a narrowing one (`v as boolean` on an `unknown`, `flag!`)
+ * does not make the value a boolean.
  */
 export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
   MessageIds,

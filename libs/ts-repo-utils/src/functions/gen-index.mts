@@ -53,17 +53,17 @@ export type GenIndexConfig = DeepReadonly<{
   minDepth?: number;
 
   /**
-   * Glob patterns of index files to leave untouched, matched against the
-   * index file's own path relative to the target directory (POSIX
-   * separators), e.g. `'index.mts'` for the one at the root of the walk and
-   * `'v*\/index.mts'` for a whole generation of them.
+   * Glob patterns of index files to leave untouched, matched against the index
+   * file's own path relative to the target directory (POSIX separators), e.g.
+   * `'index.mts'` for the one at the root of the walk and `'v*\/index.mts'` for
+   * a whole generation of them.
    *
    * This is what protects a hand-written index file — an executable entry
-   * point, or a curated list of named re-exports — from being overwritten
-   * with a barrel. `exclude` cannot express it: it says what an index file
-   * may not *export*, and is matched against a bare file name as well as a
-   * relative path, so `'index.mts'` there would name every index file in the
-   * tree rather than one of them.
+   * point, or a curated list of named re-exports — from being overwritten with
+   * a barrel. `exclude` cannot express it: it says what an index file may not
+   * *export*, and is matched against a bare file name as well as a relative
+   * path, so `'index.mts'` there would name every index file in the tree rather
+   * than one of them.
    *
    * A preserved directory is still walked, so index files below it are still
    * generated, and its parent still re-exports it. (default: none)
@@ -306,8 +306,8 @@ const shouldExportFile = ({
 /**
  * The module specifiers a generated index file re-exports, sorted.
  *
- * Returns `undefined` for anything this generator would not have written —
- * a hand-written barrel with named re-exports, say — so that the caller falls
+ * Returns `undefined` for anything this generator would not have written — a
+ * hand-written barrel with named re-exports, say — so that the caller falls
  * back to writing the file rather than assuming it is already correct.
  *
  * @param source - Contents of an index file.
@@ -357,10 +357,10 @@ const exportedSpecifiers = (source: string): readonly string[] | undefined => {
  *
  * Avoiding the write is not an optimization. `genIndex` is called from a
  * package's `build`, and in a workspace those builds run several at a time,
- * each importing its siblings' sources through `tsx`. A rewritten index file
- * is unreadable while it is being rewritten, so a barrel touched needlessly is
- * a sibling build that fails with "does not provide an export named ..." for
- * no reason at all.
+ * each importing its siblings' sources through `tsx`. A rewritten index file is
+ * unreadable while it is being rewritten, so a barrel touched needlessly is a
+ * sibling build that fails with "does not provide an export named ..." for no
+ * reason at all.
  *
  * @param indexPath - Absolute path of the index file.
  * @param indexContent - The content that would be written.
@@ -423,8 +423,7 @@ const writeFileAtomic = async (
 };
 
 /**
- * The extension a module specifier needs for a source file with this
- * extension.
+ * The extension a module specifier needs for a source file with this extension.
  *
  * TypeScript resolves a specifier by the name the file *emits*, so the answer
  * follows the source's own extension rather than one configured value: `.mts`
@@ -690,8 +689,8 @@ if (import.meta.vitest !== undefined) {
     });
 
     test('reads the formatted spelling of the same file back', () => {
-      // The formatter that runs after generation rewrites the quotes, the
-      // order and the trailing newline; all three have to compare equal.
+      // The formatter that runs after generation rewrites the quotes, the order
+      // and the trailing newline; all three have to compare equal.
       assert.deepStrictEqual(
         exportedSpecifiers(
           "export * from './a.mjs';\nexport * from './b.mjs';\n",

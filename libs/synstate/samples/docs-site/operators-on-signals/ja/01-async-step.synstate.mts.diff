@@ -4,8 +4,8 @@
  export const createSearchView = (): SearchView => {
    const [query, setQuery] = createState('a');
  
--  // A newer query completes the previous inner observable,
--  // which cancels its request.
+-  // A newer query completes the previous inner observable, which cancels its
+-  // request.
 +  // 新しいクエリは前の内側の Observable を完了させ、
 +  // それがリクエストを取り消す。
    const searchState = query.pipe(

@@ -48,8 +48,8 @@ export type UpdateEmailPageDeps<User, ReauthCredential> = Readonly<{
 }>;
 
 /**
- * The dialog that changes the user's email: signing in again with the
- * password, then changing it.
+ * The dialog that changes the user's email: signing in again with the password,
+ * then changing it.
  */
 export const createUpdateEmailPageStore = <
   User extends AccountUser,

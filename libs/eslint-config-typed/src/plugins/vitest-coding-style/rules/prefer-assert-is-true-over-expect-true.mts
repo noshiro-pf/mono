@@ -19,10 +19,10 @@ type Options = readonly [];
 /**
  * `expect(X).toBe(true)` becomes `assert.isTrue(X)` when `X` is a boolean. The
  * calls, the `expect` function and the `true` are read through `as`,
- * `satisfies`, `!` and `<T>`; `X` keeps its wrappers, and is a boolean only
- * if the type at every layer of them is one: a widening `as` is the author
- * saying it may not be, and a narrowing one (`v as boolean` on an `unknown`,
- * `flag!`) does not make the value a boolean.
+ * `satisfies`, `!` and `<T>`; `X` keeps its wrappers, and is a boolean only if
+ * the type at every layer of them is one: a widening `as` is the author saying
+ * it may not be, and a narrowing one (`v as boolean` on an `unknown`, `flag!`)
+ * does not make the value a boolean.
  */
 export const preferAssertIsTrueOverExpectTrueRule: TSESLint.RuleModule<
   MessageIds,

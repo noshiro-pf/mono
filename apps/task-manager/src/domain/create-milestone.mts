@@ -2,10 +2,9 @@ import type { StrictOmit } from 'ts-type-forge';
 import type { Milestone, MilestoneId } from './types.mjs';
 
 /**
- * A new milestone: `id`, `title` and the creation time are required, and
- * every other field defaults to an empty value — no date, no manual check,
- * no dependencies and no group, which makes a milestone that is reached
- * at once.
+ * A new milestone: `id`, `title` and the creation time are required, and every
+ * other field defaults to an empty value — no date, no manual check, no
+ * dependencies and no group, which makes a milestone that is reached at once.
  */
 export const createMilestone = ({
   id,

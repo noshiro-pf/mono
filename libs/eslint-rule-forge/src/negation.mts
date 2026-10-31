@@ -137,10 +137,9 @@ export type NegationContext = Readonly<{
   checker: ts.TypeChecker;
   getLayerTypes: GetLayerTypes;
   /**
-   * Whether `node`'s value is a boolean, so that the negation of `!node` may
-   * be `node` itself. Where only the truthiness of the negation is read — the
-   * test of an `if` — any value will do, and this may answer `true` for every
-   * node.
+   * Whether `node`'s value is a boolean, so that the negation of `!node` may be
+   * `node` itself. Where only the truthiness of the negation is read — the test
+   * of an `if` — any value will do, and this may answer `true` for every node.
    */
   isBoolean: (node: DeepReadonly<TSESTree.Expression>) => boolean;
 }>;
@@ -159,12 +158,12 @@ export type NegationContext = Readonly<{
  * | anything else      | `!a`, `!(a)`      | always                                |
  *
  * `undefined` when the first two rows' condition does not hold: then the only
- * exact negation is `!!a` or `!(a < b)`, and a caller decides whether to
- * write it (with {@link prefixedNegationOf}) or to give up. Inside `&&` and
- * `||`, a side with no short negation is written with `!`.
+ * exact negation is `!!a` or `!(a < b)`, and a caller decides whether to write
+ * it (with {@link prefixedNegationOf}) or to give up. Inside `&&` and `||`, a
+ * side with no short negation is written with `!`.
  *
- * The node is taken as written: a comparison under a type wrapper is not
- * looked into, since inverting it would drop the wrapper.
+ * The node is taken as written: a comparison under a type wrapper is not looked
+ * into, since inverting it would drop the wrapper.
  */
 export const negationOf = (
   node: DeepReadonly<TSESTree.Expression>,
@@ -231,8 +230,8 @@ const precedenceOf = (node: DeepReadonly<TSESTree.Node>): Precedence => {
 };
 
 /**
- * The parser's node, which the source code and the token store take as
- * mutable, for one that this package only reads.
+ * The parser's node, which the source code and the token store take as mutable,
+ * for one that this package only reads.
  */
 const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

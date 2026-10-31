@@ -110,8 +110,8 @@ describe('docs/rule-rationale.md', () => {
       severityOf(linterOptions['reportUnusedDisableDirectives']),
     );
 
-    // `prefer-range-for-loop` is not in the preset; the prose says it has to
-    // be added.
+    // `prefer-range-for-loop` is not in the preset; the prose says it has to be
+    // added.
     expect(rules['ts-data-forge/prefer-range-for-loop']).toBeUndefined();
   });
 

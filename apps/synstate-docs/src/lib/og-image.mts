@@ -293,8 +293,8 @@ const woffToTtf = (woffBuf: Readonly<Buffer>): Buffer => {
 
 // ---------------------------------------------------------------------------
 // Font loading — convert all @fontsource WOFF subsets to TTF at startup.
-// Each subset is registered under a unique name (F0, F1, …) because satori
-// does not do character-level fallback across fonts that share the same name.
+// Each subset is registered under a unique name (F0, F1, …) because satori does
+// not do character-level fallback across fonts that share the same name.
 // The CSS fontFamily is set to "F0, F1, …" so satori searches each subset.
 // ---------------------------------------------------------------------------
 const require = createRequire(import.meta.url);
@@ -346,16 +346,16 @@ const fonts = [
 
 // ---------------------------------------------------------------------------
 // Logo — rasterized from public/synstate-logo.png by `pnpm run gen:icons`.
-// Resolved from the working directory because this module is bundled before
-// it runs, so `import.meta.url` does not point into `src/`; Astro itself
-// takes the project root from the working directory.
+// Resolved from the working directory because this module is bundled before it
+// runs, so `import.meta.url` does not point into `src/`; Astro itself takes the
+// project root from the working directory.
 // ---------------------------------------------------------------------------
 const logoPng = readFileSync(
   path.resolve(process.cwd(), 'public/favicon/logo-mark-256x256.png'),
 );
 
-// The site is built on every Node.js line CI tests, and
-// `Uint8Array#toBase64` arrived only in Node.js 25.
+// The site is built on every Node.js line CI tests, and `Uint8Array#toBase64`
+// arrived only in Node.js 25.
 // eslint-disable-next-line unicorn/prefer-uint8array-base64
 const logoBase64 = logoPng.toString('base64');
 

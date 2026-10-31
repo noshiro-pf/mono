@@ -48,8 +48,8 @@ export type ValueOf<T> = T[keyof T];
  * type TupleLen = Length<[1, 2, 3]>; // 3
  * type ArrayLen = Length<string[]>; // number
  *
- * // Note: a string literal's `length` property is typed as `number`,
- * // not as the literal length of the string.
+ * // Note: a string literal's `length` property is typed as `number`, not as the
+ * // literal length of the string.
  * type StringLen = Length<'abc'>; // number
  * ```
  */
@@ -89,8 +89,8 @@ export type Reducer<S, A> = (state: S, action: A) => S;
  * Represents any function type. Useful as a constraint for generic type
  * parameters that accept arbitrary functions.
  *
- * Uses `any` (rather than `unknown`) for the argument and return types so
- * that every concrete function type is assignable to it.
+ * Uses `any` (rather than `unknown`) for the argument and return types so that
+ * every concrete function type is assignable to it.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFn = (...args: readonly any[]) => any;

@@ -13,16 +13,16 @@ import { projectRootPath } from '../project-root-path.mjs';
  * Binaries a command runs that npm does not distribute, pinned in
  * `tools/configs/release-binaries.json` and fetched from GitHub Releases.
  *
- * Each asset is checked against the pinned SHA-256 before it is kept, and
- * again every time it is used, so an archive that changed after it was cached
- * fails as loudly as a download that never matched; neither is ever run. The
- * binary is extracted afresh from the verified archive on every use, into a
- * directory of this process's own, so that a concurrent run cannot swap or
- * remove it underneath.
+ * Each asset is checked against the pinned SHA-256 before it is kept, and again
+ * every time it is used, so an archive that changed after it was cached fails
+ * as loudly as a download that never matched; neither is ever run. The binary
+ * is extracted afresh from the verified archive on every use, into a directory
+ * of this process's own, so that a concurrent run cannot swap or remove it
+ * underneath.
  *
  * The pins are moved by `mature-updates.mts release-binaries` from
- * `pnpm-update.yml`, under `minimumReleaseAge`; that file's header says how
- * far they move on their own.
+ * `pnpm-update.yml`, under `minimumReleaseAge`; that file's header says how far
+ * they move on their own.
  */
 export const releaseBinaryPinsPath = path.resolve(
   projectRootPath,
@@ -40,11 +40,11 @@ export const releaseBinaryCacheDir = path.resolve(
 );
 
 /**
- * The pins, checked beyond their shape: a `version` is `X.Y.Z`, a `sha256`
- * 64 lowercase hex digits, a `repository` `owner/name`, and an asset name or
- * a `binary` a relative path that stays where it is put, since all of them
- * are spliced into a URL, a path or `tar`'s arguments. `pnpm-update.yml`
- * lets an automated update change the first two and nothing else.
+ * The pins, checked beyond their shape: a `version` is `X.Y.Z`, a `sha256` 64
+ * lowercase hex digits, a `repository` `owner/name`, and an asset name or a
+ * `binary` a relative path that stays where it is put, since all of them are
+ * spliced into a URL, a path or `tar`'s arguments. `pnpm-update.yml` lets an
+ * automated update change the first two and nothing else.
  */
 export const parseReleaseBinaryPins = (
   raw: unknown,
@@ -92,8 +92,8 @@ export const platformKey = (platform: string, arch: string): string =>
   `${platform}-${arch}` as const;
 
 /**
- * The path of `name`'s binary for `platform`, extracted from its pinned
- * archive under `cacheDir` — downloaded first when it is not there yet. A
+ * The path of `name`'s binary for `platform`, extracted from its pinned archive
+ * under `cacheDir` — downloaded first when it is not there yet. A
  * file-system failure (a read-only or full disk) comes back as an error like
  * any other, not as a rejection.
  */
@@ -132,8 +132,8 @@ export const downloadWithFetch = async (url: string): Promise<Uint8Array> => {
     }
 
     if (!response.value.ok) {
-      // Read off and dropped, so that its connection is not held until the
-      // body is collected.
+      // Read off and dropped, so that its connection is not held until the body
+      // is collected.
       await Result.fromPromise(
         response.value.body?.cancel() ?? Promise.resolve(),
       );
@@ -232,9 +232,9 @@ const describeFetchError = (error: unknown): string =>
     : unknownToString(error);
 
 /**
- * Removes what an earlier run that never reached its exit handler — killed
- * by a signal — left under `bin/`: an extraction is in use for one run, and
- * none takes an hour.
+ * Removes what an earlier run that never reached its exit handler — killed by a
+ * signal — left under `bin/`: an extraction is in use for one run, and none
+ * takes an hour.
  */
 const pruneStaleExtractions = async (binDir: string): Promise<void> => {
   const cutoff = Date.now() - staleExtractionMs;
@@ -329,8 +329,8 @@ const downloadVerified = async ({
     );
   }
 
-  // Written aside and renamed, so an interrupted run leaves no partial
-  // archive under the name a later run trusts.
+  // Written aside and renamed, so an interrupted run leaves no partial archive
+  // under the name a later run trusts.
   const partial = `${archivePath}.partial-${process.pid}` as const;
 
   const saved = await Result.fromPromise(
@@ -369,9 +369,9 @@ const install = async ({
 
   const assetName = render(asset.name, pin.version);
 
-  // Keyed by the digest as well as the name, so that a pin that moves — or
-  // an asset whose name carries no version — never meets an archive verified
-  // for another digest.
+  // Keyed by the digest as well as the name, so that a pin that moves — or an
+  // asset whose name carries no version — never meets an archive verified for
+  // another digest.
   const archivesDir = path.join(cacheDir, 'archives', asset.sha256);
 
   const archivePath = path.join(archivesDir, assetName);
@@ -420,9 +420,9 @@ const install = async ({
   const binary = render(pin.binary, pin.version);
 
   // The bytes just verified go to `tar` on stdin, rather than the file being
-  // read a second time, so what is extracted is what was hashed. GNU tar
-  // cannot tell the compression of a pipe, so it is named from the magic
-  // bytes: gzip or xz, the two a release ships.
+  // read a second time, so what is extracted is what was hashed. GNU tar cannot
+  // tell the compression of a pipe, so it is named from the magic bytes: gzip
+  // or xz, the two a release ships.
   const extracted = spawnSync(
     'tar',
     [...compressionFlag(verified.value), '-xf', '-', '-C', extractDir, binary],

@@ -25,18 +25,18 @@ type Props = Readonly<{
  * screen too narrow for them, the stylesheet stacks them into one (the grid
  * template is then ignored, which is why it can be an inline style).
  *
- * A hidden block is left out of its column altogether, so the blocks around
- * it share the column as if it were not there; a column whose blocks are all
- * hidden keeps its width, empty. So is a block the repository has nothing
- * for (`absentBlocks`), without being hidden: the queue, on a repository
- * that does not run `unblock-prs`.
+ * A hidden block is left out of its column altogether, so the blocks around it
+ * share the column as if it were not there; a column whose blocks are all
+ * hidden keeps its width, empty. So is a block the repository has nothing for
+ * (`absentBlocks`), without being hidden: the queue, on a repository that does
+ * not run `unblock-prs`.
  *
  * In the `fill` mode the layout takes the height the page leaves it, and each
  * column shares that out among its blocks (`index.css`).
  *
- * A drag changes the layout many times a second, and what it changes is a
- * width or a height: the columns keep their blocks, each block its contents,
- * and only the styles bound to the layout are rewritten.
+ * A drag changes the layout many times a second, and what it changes is a width
+ * or a height: the columns keep their blocks, each block its contents, and only
+ * the styles bound to the layout are rewritten.
  */
 export const BlockLayout = ({ blocks }: Props): JSX.Element => {
   const layout$ = layoutStore.layout;

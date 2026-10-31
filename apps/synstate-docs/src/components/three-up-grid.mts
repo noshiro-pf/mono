@@ -2,8 +2,8 @@ import type * as React from 'react';
 
 /**
  * A grid of demo canvases: three to a row in the content column, and fewer,
- * down to one, as the column narrows below three 140px tracks. Both the gap
- * and the track width come from `gapPx`, so they cannot disagree.
+ * down to one, as the column narrows below three 140px tracks. Both the gap and
+ * the track width come from `gapPx`, so they cannot disagree.
  */
 export const threeUpGrid = (gapPx: number): React.CSSProperties =>
   ({

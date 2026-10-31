@@ -103,8 +103,8 @@ export const convertLibEs5 =
 
         // The ts-morph codemod (transform-dts.mts) adds `readonly` to every
         // mapped type, but the transformation utilities Partial/Pick/Required
-        // must stay transparent (whether the result is readonly is the
-        // caller's choice), so strip the added `readonly` back off them.
+        // must stay transparent (whether the result is readonly is the caller's
+        // choice), so strip the added `readonly` back off them.
         composeMonoTypeFns(
           replaceWithNoMatchCheck(
             'type Partial<T> = { readonly',

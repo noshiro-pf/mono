@@ -21,8 +21,8 @@ export type Some<S> = Readonly<{
 }>;
 
 /**
- * Represents the 'None' variant of an Optional, indicating the absence
- * of a value.
+ * Represents the 'None' variant of an Optional, indicating the absence of a
+ * value.
  */
 export type None = Readonly<{
   /** @internal Discriminant property for the 'None' type. */

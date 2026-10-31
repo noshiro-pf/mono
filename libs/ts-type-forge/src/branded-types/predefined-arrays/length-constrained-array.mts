@@ -16,15 +16,14 @@ import type { SupportedLength } from '../supported-length.mjs';
 /**
  * Upper bound (inclusive, `10`) of the structural tuple prefix embedded in
  * {@link MinLengthArray} (and, via composition, in {@link BoundedLengthArray}
- * and {@link FixedLengthArray}) — i.e. the boundary between "expand the
- * minimum length into tuple positions" and "fall back to `readonly Elm[]`".
- * The prefix is what makes indexed access below the minimum length not
- * include `undefined` under `noUncheckedIndexedAccess`. It is kept small so
- * that the prefix stays cheap for the type checker even when the element type
- * is large.
+ * and {@link FixedLengthArray}) — i.e. the boundary between "expand the minimum
+ * length into tuple positions" and "fall back to `readonly Elm[]`".
+ * The prefix is what makes indexed access below the minimum length not include
+ * `undefined` under `noUncheckedIndexedAccess`. It is kept small so that the
+ * prefix stays cheap for the type checker even when the element type is large.
  *
- * Exported so that downstream libraries can share the same boundary instead
- * of hard-coding their own.
+ * Exported so that downstream libraries can share the same boundary instead of
+ * hard-coding their own.
  */
 export type StructuralPrefixCap = 10;
 
@@ -33,8 +32,8 @@ export type StructuralPrefixCap = 10;
  * {@link StructuralPrefixCap} — i.e. the lengths for which structural tuple
  * expansion is considered cheap enough. Exported so that downstream libraries
  * can use the same boundary as a type-parameter constraint (e.g. runtime
- * validators that only encode a structural tuple type for lengths in this
- * range and fall back to `readonly Elm[]` otherwise).
+ * validators that only encode a structural tuple type for lengths in this range
+ * and fall back to `readonly Elm[]` otherwise).
  */
 export type StructuralPrefixLength = UintRangeInclusive<0, StructuralPrefixCap>;
 
@@ -51,9 +50,9 @@ type ClampToPrefixCap<N extends number> =
 /**
  * Branded readonly array type for arrays with at most `MaxLength` elements.
  *
- * Unlike the structural tuple-based `MaxLengthTuple`, the length
- * constraint is encoded only in the brand, so the element type `Elm` never
- * gets multiplied into tuple positions or tuple unions. This keeps
+ * Unlike the structural tuple-based `MaxLengthTuple`, the length constraint is
+ * encoded only in the brand, so the element type `Elm` never gets multiplied
+ * into tuple positions or tuple unions. This keeps
  * type-checking cost (instantiation count / memory) independent of the size of
  * `Elm` and nearly independent of `MaxLength`, and also supports large bounds
  * (e.g. `1000`) that make the tuple-based family hit the recursion limit.
@@ -62,9 +61,9 @@ type ClampToPrefixCap<N extends number> =
  * The brand is encoded so that the natural subtyping relation between length
  * constraints is preserved: if `M <= N`, then `MaxLengthArray<M, Elm>` is
  * assignable to `MaxLengthArray<N, Elm>` (an array of at most `M` elements is
- * also an array of at most `N` elements). This is achieved by branding with
- * the union of allowed lengths (`0 | 1 | ... | MaxLength`), which shrinks as
- * the constraint gets stricter. The result is also covariant in `Elm`.
+ * also an array of at most `N` elements). This is achieved by branding with the
+ * union of allowed lengths (`0 | 1 | ... | MaxLength`), which shrinks as the
+ * constraint gets stricter. The result is also covariant in `Elm`.
  *
  * @template MaxLength - The maximum number of elements (inclusive). Must be a
  *   non-negative integer literal.
@@ -85,14 +84,14 @@ type ClampToPrefixCap<N extends number> =
  * ```
  */
 // The `IsUnion<MaxLength>` guard is a type-checker performance safeguard. The
-// brand value `IndexInclusive<MaxLength>` distributes over a union
-// `MaxLength`, materializing `0 | 1 | ... | k` once per member. In real usage
-// `MaxLength` is a single literal, so this never happens — except when a
-// consumer's deferred conditional forces this type's *constraint*, where
-// `MaxLength` widens to its bound `SupportedLength` (the whole `0 | ... | 2048`
-// union), expanding the brand across all 2049 lengths and generating millions
-// of types. Collapsing the union case to the unbranded `readonly Elm[]` (a
-// sound supertype) keeps that constraint cheap while leaving every concrete
+// brand value `IndexInclusive<MaxLength>` distributes over a union `MaxLength`,
+// materializing `0 | 1 | ... | k` once per member. In real usage `MaxLength` is
+// a single literal, so this never happens — except when a consumer's deferred
+// conditional forces this type's *constraint*, where `MaxLength` widens to its
+// bound `SupportedLength` (the whole `0 | ... | 2048` union), expanding the
+// brand across all 2049 lengths and generating millions of types. Collapsing
+// the union case to the unbranded `readonly Elm[]` (a sound supertype) keeps
+// that constraint cheap while leaving every concrete
 // single-literal result identical.
 export type MaxLengthArray<MaxLength extends SupportedLength, Elm = unknown> =
   IsUnion<MaxLength> extends true
@@ -326,8 +325,8 @@ export type MutableBoundedLengthArray<
  *
  * This is the brand-based, lightweight counterpart of the structural
  * tuple-based `FixedLengthTuple`; type-checking cost stays essentially
- * independent of the size of `Elm`. Prefer this type when `Elm` is a large
- * type or the length is large.
+ * independent of the size of `Elm`. Prefer this type when `Elm` is a large type
+ * or the length is large.
  *
  * For `Length <= 10`, the structural part is additionally intersected with the
  * exact tuple `FixedLengthTuple<Length, Elm>`, so `length` is the literal

@@ -238,8 +238,8 @@ const framingHeaderActions = (): readonly Readonly<{
  * The scope is what keeps this narrow, and it is the scope both rules already
  * have: `sub_frame` requests only — never a top-level document, never a script
  * or an XHR, which is where Fetch Metadata guards against CSRF and XSSI rather
- * than against framing — and only in this extension's own frames, or in the
- * one tab a split view is open in.
+ * than against framing — and only in this extension's own frames, or in the one
+ * tab a split view is open in.
  */
 const requestHeaderActions = (): readonly Readonly<{
   header: string;

@@ -1,13 +1,13 @@
 /**
  * The GitHub API over `fetch`, and the credential it needs, for every command.
  *
- * `open-pr` and `unblock-prs` used to shell out to `gh`. They do not any
- * more, because the places they are most useful — a cloud container, a
- * runner, a repository other than this one — are the places `gh` is least
- * likely to be installed, while a token is already there. The
- * API is the same one `gh` calls; only where the credential comes from
- * differs, so `gh auth token` stays as the last resort for a machine set up
- * that way with nothing exported.
+ * `open-pr` and `unblock-prs` used to shell out to `gh`. They do not any more,
+ * because the places they are most useful — a cloud container, a runner, a
+ * repository other than this one — are the places `gh` is least likely to be
+ * installed, while a token is already there. The
+ * API is the same one `gh` calls; only where the credential comes from differs,
+ * so `gh auth token` stays as the last resort for a machine set up that way
+ * with nothing exported.
  *
  * `mature-updates.mts` keeps a client of its own: it runs before
  * `pnpm install`, when nothing this imports exists yet.
@@ -28,11 +28,11 @@ export type ApiContext = Readonly<{ repo: RepoRef; token: string }>;
  * The token the environment holds, if any: `GH_TOKEN`, then `GITHUB_TOKEN`.
  *
  * That is the order `gh` reads them in, so that with both set every command
- * here acts as the same account as `gh` would — the commands trust a comment
- * by whose account wrote it, and `unblock-prs`'s set-aside comments were
- * written through `gh` before it moved here. A workflow sets either only by passing it; Actions
- * exports neither by itself. `github-settings-as-code` reads a list of its
- * own, without `GITHUB_TOKEN`, and says why in `resolveAuthToken`.
+ * here acts as the same account as `gh` would — the commands trust a comment by
+ * whose account wrote it, and `unblock-prs`'s set-aside comments were written
+ * through `gh` before it moved here. A workflow sets either only by passing it;
+ * Actions exports neither by itself. `github-settings-as-code` reads a list of
+ * its own, without `GITHUB_TOKEN`, and says why in `resolveAuthToken`.
  */
 export const tokenFromEnv = (): string | undefined => {
   const token = process.env['GH_TOKEN'] ?? process.env['GITHUB_TOKEN'] ?? '';
@@ -41,10 +41,9 @@ export const tokenFromEnv = (): string | undefined => {
 };
 
 /**
- * The token to authenticate with: the environment first, `gh` only if it has
- * to be. `GH_TOKEN` and `GITHUB_TOKEN` are what a runner and a container
- * already set, and asking `gh` first would fail on exactly the machines this
- * is for.
+ * The token to authenticate with: the environment first, `gh` only if it has to
+ * be. `GH_TOKEN` and `GITHUB_TOKEN` are what a runner and a container already
+ * set, and asking `gh` first would fail on exactly the machines this is for.
  */
 export const resolveToken = async (): Promise<Result<string, string>> => {
   const fromEnv = tokenFromEnv();
@@ -75,12 +74,12 @@ export const resolveToken = async (): Promise<Result<string, string>> => {
  * (`--repo owner/name`) when given, else `origin`, else the root
  * `package.json`.
  *
- * `origin` before the manifest because a fork's checkout names the fork
- * there and the upstream in the manifest, and a command that reads the queue
- * of one and pushes or comments on the other is worse than either. The
- * manifest is for a checkout whose `origin` names no GitHub repository at
- * all — a proxy remote in a container, a tree without `.git` — where it is
- * the only thing left that says.
+ * `origin` before the manifest because a fork's checkout names the fork there
+ * and the upstream in the manifest, and a command that reads the queue of one
+ * and pushes or comments on the other is worse than either. The manifest is for
+ * a checkout whose `origin` names no GitHub repository at all — a proxy remote
+ * in a container, a tree without `.git` — where it is the only thing left that
+ * says.
  */
 export const resolveRepo = async (
   repoOption?: string,
@@ -210,8 +209,8 @@ export const rest = async <A,>(
 };
 
 /**
- * The login the token authenticates as. Outside `rest` because the route is
- * not under the repository.
+ * The login the token authenticates as. Outside `rest` because the route is not
+ * under the repository.
  */
 export const viewerLogin = async (
   token: string,
@@ -245,8 +244,8 @@ export type RestOptions = Readonly<{
 }>;
 
 /**
- * One GraphQL mutation. Two of `open-pr`'s four writes have no REST
- * equivalent — GitHub exposes neither "mark ready for review" nor "enable
+ * One GraphQL mutation. Two of `open-pr`'s four writes have no REST equivalent
+ * — GitHub exposes neither "mark ready for review" nor "enable
  * auto-merge" there — so those go through here rather than through a
  * different tool.
  */
@@ -263,10 +262,10 @@ export const graphql = async (
 /**
  * One GraphQL request, resolving to its `data` validated by `schema`.
  *
- * GraphQL answers 200 to a failed request and puts the reason in `errors`,
- * so that is checked rather than the status alone. A partial answer — `data`
- * beside `errors` — is still a failure: what is missing from it is exactly
- * what the caller asked for.
+ * GraphQL answers 200 to a failed request and puts the reason in `errors`, so
+ * that is checked rather than the status alone. A partial answer — `data`
+ * beside `errors` — is still a failure: what is missing from it is exactly what
+ * the caller asked for.
  */
 export const graphqlQuery = async <A,>(
   context: ApiContext,
@@ -317,8 +316,8 @@ const GraphqlResponseSchema = t.record({
 export type HttpMethod = 'DELETE' | 'GET' | 'PATCH' | 'POST';
 
 /**
- * Adds `label` to a pull request. Labels hang off the issue, which is the
- * same object as the pull request.
+ * Adds `label` to a pull request. Labels hang off the issue, which is the same
+ * object as the pull request.
  */
 export const addLabel = async (
   context: ApiContext,
@@ -333,8 +332,8 @@ export const addLabel = async (
   );
 
 /**
- * Takes `label` off a pull request. A label already off is not an error, as
- * it is not to `gh pr edit --remove-label`: GitHub answers 404, and what the
+ * Takes `label` off a pull request. A label already off is not an error, as it
+ * is not to `gh pr edit --remove-label`: GitHub answers 404, and what the
  * caller wanted is true.
  */
 export const removeLabel = async (
@@ -342,8 +341,8 @@ export const removeLabel = async (
   prNumber: number,
   label: string,
 ): Promise<Result<undefined, string>> => {
-  // One path segment, whatever the name holds. The rule's premise, building
-  // a query string, is not what this is.
+  // One path segment, whatever the name holds. The rule's premise, building a
+  // query string, is not what this is.
   // eslint-disable-next-line no-restricted-globals
   const segment = encodeURIComponent(label);
 
@@ -370,8 +369,8 @@ export type GitHubRequest = Readonly<{
 }>;
 
 /**
- * Why a request came to nothing: the transport failing, or GitHub refusing
- * with a status and what it said about it.
+ * Why a request came to nothing: the transport failing, or GitHub refusing with
+ * a status and what it said about it.
  */
 export type GitHubRefusal = Readonly<{
   message: string;
@@ -387,8 +386,8 @@ export type GitHubRefusal = Readonly<{
  * failure and a refusal both become a {@link GitHubRefusal}; nothing here
  * throws.
  *
- * The headers are assembled here rather than passed in, so that every call
- * the commands make carries the same ones and there is one place to read.
+ * The headers are assembled here rather than passed in, so that every call the
+ * commands make carries the same ones and there is one place to read.
  */
 export const send = async ({
   url,

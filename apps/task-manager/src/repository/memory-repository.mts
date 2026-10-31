@@ -15,11 +15,11 @@ import type {
 } from './repository.mjs';
 
 /**
- * A {@link Repository} that keeps the state in memory, starting from
- * `initial` (the DAG's layout from `initialLayout`, none by default, and the
- * groups from `initialGroups`, none by default):
- * for the tests, and for the demo (`?storage=memory`), where reloading the
- * page starts over.
+ * A {@link Repository} that keeps the state in memory, starting from `initial`
+ * (the DAG's layout from `initialLayout`, none by default, and the groups from
+ * `initialGroups`, none by default):
+ * for the tests, and for the demo (`?storage=memory`), where reloading the page
+ * starts over.
  *
  * Every write is applied and handed to the subscribers before its promise
  * resolves, as Firestore hands local writes to its listeners at once.

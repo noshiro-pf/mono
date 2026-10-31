@@ -1,7 +1,7 @@
 /**
  * A due date or a milestone's date as a form holds it — a date field, and
- * whether it is all day — and back. An all-day date stands for one edge of
- * its day: a due date its end, a milestone's date its start.
+ * whether it is all day — and back. An all-day date stands for one edge of its
+ * day: a due date its end, a milestone's date its start.
  */
 
 import { Result } from 'ts-data-forge';
@@ -31,11 +31,10 @@ export const dateField = (
       : toDateTimeLocal(epochMs, timeZone);
 
 /**
- * The date of a date field (`value`, all day or not) and whether it is all
- * day — `stored` as it is while the field shows it unchanged, so that
- * saving from another time zone does not move it — or `undefined` with no
- * date; an error for what is not one. An all-day date is that `edge` of its
- * day.
+ * The date of a date field (`value`, all day or not) and whether it is all day
+ * — `stored` as it is while the field shows it unchanged, so that saving from
+ * another time zone does not move it — or `undefined` with no date; an error
+ * for what is not one. An all-day date is that `edge` of its day.
  */
 export const draftedDate = (
   value: string,
@@ -54,9 +53,9 @@ export const draftedDate = (
 
 /**
  * What a date field holds once 「終日」 is turned on or off: see
- * `switchAllDay`, but turned off on the day `stored` is timed on, the time
- * it is stored with — so that turning it on and off again on a stored date
- * changes nothing.
+ * `switchAllDay`, but turned off on the day `stored` is timed on, the time it
+ * is stored with — so that turning it on and off again on a stored date changes
+ * nothing.
  */
 export const switchDateField = (
   value: string,
@@ -80,8 +79,8 @@ export const switchDateField = (
 export type StoredDate = Readonly<{ at: number | undefined; allDay: boolean }>;
 
 /**
- * An empty field is `undefined`; anything else has to be a date and time —
- * or with `allDayEdge`, a day alone, read as that end of it.
+ * An empty field is `undefined`; anything else has to be a date and time — or
+ * with `allDayEdge`, a day alone, read as that end of it.
  */
 const optionalDateTime = (
   value: string,

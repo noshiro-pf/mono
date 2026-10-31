@@ -12,12 +12,12 @@ import {
 } from './propagation-state.mjs';
 
 /**
- * The base of the observables that start updates of their own: a root, and
- * an async child (`debounce`, `switchMap`), which emits later than its
- * parents do. Its update visits, shallowest first, the nodes its value
- * reaches: each node that emits puts its children in the update's queue
- * (`propagation-state.mts`), so that each sees its parents' values of that
- * update (no glitch) and a node no value reached is not visited.
+ * The base of the observables that start updates of their own: a root, and an
+ * async child (`debounce`, `switchMap`), which emits later than its parents do.
+ * Its update visits, shallowest first, the nodes its value reaches: each node
+ * that emits puts its children in the update's queue (`propagation-state.mts`),
+ * so that each sees its parents' values of that update (no glitch) and a node
+ * no value reached is not visited.
  */
 export class ManagerObservableClass<
   A,
@@ -26,9 +26,9 @@ export class ManagerObservableClass<
 > extends ObservableBaseClass<A, Kind, Depth> {
   /** Emits `nextValue` and propagates it to the descendants. */
   protected startUpdate(nextValue: A): void {
-    // Nothing to propagate to (a branch no `switchMap` follows, a state
-    // written before anything subscribes): the update is the value alone,
-    // and opening one would cost more than storing it.
+    // Nothing to propagate to (a branch no `switchMap` follows, a state written
+    // before anything subscribes): the update is the value alone, and opening
+    // one would cost more than storing it.
     if (this.setNextIfUnobserved(nextValue)) {
       return;
     }
@@ -37,9 +37,9 @@ export class ManagerObservableClass<
 
     beginPropagation(updateToken);
 
-    // A subscriber or projection may throw, and the depth has to come back
-    // down regardless, or every later write would warn. The exception itself
-    // is not caught: it reaches the caller of `next` as it always has.
+    // A subscriber or projection may throw, and the depth has to come back down
+    // regardless, or every later write would warn. The exception itself is not
+    // caught: it reaches the caller of `next` as it always has.
     // @sumi-expect-error exceptions/no-try
     try {
       this.setNext(nextValue, updateToken);

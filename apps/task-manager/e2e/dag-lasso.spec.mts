@@ -272,9 +272,8 @@ const showDag = async (page: DeepReadonly<Page>): Promise<void> => {
 };
 
 /**
- * Draws a loop round the box of the points given, 12px clear of them. It
- * starts below the box and 80px left of it, on the background, and closes
- * back there.
+ * Draws a loop round the box of the points given, 12px clear of them. It starts
+ * below the box and 80px left of it, on the background, and closes back there.
  */
 const lasso = async (
   page: DeepReadonly<Page>,

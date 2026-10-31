@@ -21,9 +21,9 @@ import { projectRootPath } from '../project-root-path.mjs';
  * Left naming the old event after a trigger moves, that expression turns
  * `cancel-in-progress` off altogether — and in `skip-ci-label.yml` that is a
  * `labeled` run writing `pending` after the `unlabeled` run wrote `success`,
- * leaving a pull request blocked with no label on it. The same sentence is
- * one edit in the `on:` block away in every one of them, which is why this is
- * asked of the directory rather than of one file.
+ * leaving a pull request blocked with no label on it. The same sentence is one
+ * edit in the `on:` block away in every one of them, which is why this is asked
+ * of the directory rather than of one file.
  *
  * A workflow reached through `workflow_call` is not asked. Inside a reusable
  * workflow `github.event_name` is the *caller's* event, never `workflow_call`,
@@ -142,10 +142,9 @@ const TRIGGER_BLOCK_KEY = 'on:';
 /**
  * Every event name compared against `github.event_name`.
  *
- * Only a comparison is read, rather than every quoted string in the
- * expression: `github.ref == 'refs/heads/main'` quotes something that is not
- * an event name, and taking it for one would fail the check on a workflow that
- * is correct.
+ * Only a comparison is read, rather than every quoted string in the expression:
+ * `github.ref == 'refs/heads/main'` quotes something that is not an event name,
+ * and taking it for one would fail the check on a workflow that is correct.
  */
 const EVENT_NAME_COMPARISON =
   /github\.event_name\s*[=!]=\s*'(?<eventName>[^']+)'/gu;

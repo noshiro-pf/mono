@@ -144,9 +144,9 @@ describe('SafeArray.create', () => {
   });
 
   test('rejects the lengths `Array.from` would silently accept', () => {
-    // `Array.from({ length })` applies ToLength, which clamps a negative
-    // length to 0 and truncates a fractional one — the silent wrong answer
-    // this wrapper exists to turn into a failure.
+    // `Array.from({ length })` applies ToLength, which clamps a negative length
+    // to 0 and truncates a fractional one — the silent wrong answer this
+    // wrapper exists to turn into a failure.
     for (const length of [-1, Number.NaN] as const) {
       assert.deepStrictEqual(
         Array.from({ length }, () => 0),

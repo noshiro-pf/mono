@@ -49,9 +49,9 @@ export const preferAssertIsTrueOverAssertRule: TSESLint.RuleModule<
           node: bareCallee,
           messageId: 'preferAssertIsTrueOverAssert',
           data: { method: bareCallee.name },
-          // Through a wrapper, `(assert as typeof assert)(x)`, the rename
-          // would land inside it — `(assert.isTrue as typeof assert)(x)` —
-          // and what the wrapper should become is not ours to decide.
+          // Through a wrapper, `(assert as typeof assert)(x)`, the rename would
+          // land inside it — `(assert.isTrue as typeof assert)(x)` — and what
+          // the wrapper should become is not ours to decide.
           fix:
             bareCallee === node.callee
               ? (fixer) =>

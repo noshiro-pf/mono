@@ -78,9 +78,9 @@ import { watch } from './watch.mjs';
  *
  * The `/unblock-prs` skill fixes what this script sets aside — a failing check
  * that needs reading, a conflict — after claiming it, so that this script
- * leaves it alone meanwhile (`claims.mts`). This script fixes only the one
- * kind that needs no reading — a fixer's diff, see step 4 — and it never
- * merges anything: auto-merge does that once the checks are green.
+ * leaves it alone meanwhile (`claims.mts`). This script fixes only the one kind
+ * that needs no reading — a fixer's diff, see step 4 — and it never merges
+ * anything: auto-merge does that once the checks are green.
  *
  * One cycle:
  *
@@ -162,8 +162,8 @@ import { watch } from './watch.mjs';
  *    given.
  *
  * The rebase happens in a `git worktree` under the OS temp directory, so the
- * checkout this runs from is never touched — its working tree may be dirty,
- * and the pull request's branch may even be checked out somewhere else.
+ * checkout this runs from is never touched — its working tree may be dirty, and
+ * the pull request's branch may even be checked out somewhere else.
  *
  * ## The order, and `skip-ci`
  *
@@ -206,16 +206,16 @@ import { watch } from './watch.mjs';
  *   to be kept on the tip while it waits, as a queued one is (step 3). It is
  *   opt-in so that a branch left to sleep is never moved for want of a label.
  *
- * Releasing one is as far as it goes. From there it is an ordinary queued
- * pull request, and if its checks fail it is set aside like any other — with
- * its `skip-ci` off. Everything that declared `Merge-After` on it then waits,
+ * Releasing one is as far as it goes. From there it is an ordinary queued pull
+ * request, and if its checks fail it is set aside like any other — with its
+ * `skip-ci` off. Everything that declared `Merge-After` on it then waits,
  * because it has not merged, which is what a declared order is for.
  *
  * **One queued pull request is released at a time, from this side only.**
- * Nothing is picked while one is in flight, and after releasing it looks
- * again: when another the worker owns was released in the same moment and
- * goes first, it gives back the `skip-ci` it has just taken off its own. It
- * puts the label on no other pull request (`release.mts`).
+ * Nothing is picked while one is in flight, and after releasing it looks again:
+ * when another the worker owns was released in the same moment and goes first,
+ * it gives back the `skip-ci` it has just taken off its own. It puts the label
+ * on no other pull request (`release.mts`).
  *
  * ## Where the rest of it is
  *
@@ -324,11 +324,11 @@ export const unblockPrs = async (
 };
 
 /**
- * Says on each newly set-aside pull request why, where GitHub keeps it, so
- * that finding out does not mean finding the terminal this ran in: in its one
+ * Says on each newly set-aside pull request why, where GitHub keeps it, so that
+ * finding out does not mean finding the terminal this ran in: in its one
  * set-aside comment, written over the one it has or posted as its first. A
- * comment that could not be written is reported and nothing more: the job is
- * to land pull requests, and this is not a reason to stop.
+ * comment that could not be written is reported and nothing more: the job is to
+ * land pull requests, and this is not a reason to stop.
  */
 const announceSetAside = async (
   api: ApiContext,
@@ -356,16 +356,15 @@ const announceSetAside = async (
 };
 
 /**
- * Reads this account's set-aside comments on the pull requests that are queued or
- * ask for `auto-rebase`, and on
- * any other this run holds a record for, and settles the records with them
- * (`settleSkips`): a comment whose state has ended, or whose retry box a
- * person ticked, is rewritten as resolved — not under `--dry-run` — and one
- * an earlier run left standing becomes a record again. Comments that cannot
- * be read leave the records as they were.
+ * Reads this account's set-aside comments on the pull requests that are queued
+ * or ask for `auto-rebase`, and on any other this run holds a record for, and
+ * settles the records with them (`settleSkips`): a comment whose state has
+ * ended, or whose retry box a person ticked, is rewritten as resolved — not
+ * under `--dry-run` — and one an earlier run left standing becomes a record
+ * again. Comments that cannot be read leave the records as they were.
  *
- * The claims sessions wrote on the same pull requests are read with them,
- * and those that still hold are returned beside the records (`claims.mts`).
+ * The claims sessions wrote on the same pull requests are read with them, and
+ * those that still hold are returned beside the records (`claims.mts`).
  * Comments that cannot be read hold nothing: every push is leased anyway.
  */
 const settleWithComments = async (
@@ -424,8 +423,8 @@ const settleWithComments = async (
     }
   }
 
-  // A record whose comment never got written is one every other reader of
-  // the queue takes for the worker's while this run holds it aside.
+  // A record whose comment never got written is one every other reader of the
+  // queue takes for the worker's while this run holds it aside.
   const unannounced = unannouncedSkips(settled.skipped, read.value.setAside);
 
   if (!dryRun && Arr.isNonEmpty(unannounced)) {
@@ -448,11 +447,11 @@ const settleWithComments = async (
  * Resolves to the outcome and the head it was reached on, which is the one a
  * skip record has to name.
  *
- * Once per watch: a head `autoFix` wrote that fails again is a fixer that
- * does not agree with CI, and running it again would only push the same diff.
+ * Once per watch: a head `autoFix` wrote that fails again is a fixer that does
+ * not agree with CI, and running it again would only push the same diff.
  * The pull request is set aside as any other failure is, and nothing else
- * failing in the queue is touched — the one being watched is the one this
- * cycle picked.
+ * failing in the queue is touched — the one being watched is the one this cycle
+ * picked.
  */
 const watchAndFix = async (
   api: ApiContext,
@@ -522,9 +521,9 @@ const watchAndFix = async (
 };
 
 /**
- * A pull request the run has acted on is worth remembering while it might
- * still end without anything watching it; once it has ended there is nothing
- * left to report.
+ * A pull request the run has acted on is worth remembering while it might still
+ * end without anything watching it; once it has ended there is nothing left to
+ * report.
  */
 const trackAfterWatch = (
   tracked: ReadonlySet<number>,
@@ -540,8 +539,8 @@ const trackAfterWatch = (
  * open list, and returns the ones that are still on it.
  *
  * Nothing else notices: a pull request the watch gave up on merges minutes
- * later, and the only trace is that it stops being listed. Without this the
- * run that pushed the merge commit never mentions it.
+ * later, and the only trace is that it stops being listed. Without this the run
+ * that pushed the merge commit never mentions it.
  */
 const reportDeparted = async (
   api: ApiContext,
@@ -579,10 +578,10 @@ const reportDeparted = async (
 };
 
 /**
- * What the issues the open pull requests close add to the merge order. A
- * read that fails holds nothing extra: the declared order and the stacks
- * still stand, and an order inherited from an issue is the one a person can
- * also write into the body.
+ * What the issues the open pull requests close add to the merge order. A read
+ * that fails holds nothing extra: the declared order and the stacks still
+ * stand, and an order inherited from an issue is the one a person can also
+ * write into the body.
  */
 const issueOrderFor = async (
   api: ApiContext,
@@ -720,8 +719,8 @@ const runCycle = async (
     return { state: before, next: 'idle', settled: before.skipped };
   }
 
-  // What the next cycle compares its bases with. From this survey rather
-  // than the one below, which a layer moving in between could skip.
+  // What the next cycle compares its bases with. From this survey rather than
+  // the one below, which a layer moving in between could skip.
   const stackedOn = stackedOnAfter(
     before.stackedOn,
     listed.value.pullRequests,
@@ -801,9 +800,9 @@ const runCycle = async (
       stackedOn,
     }) as const;
 
-  // A pull request that is up to date and already failing gets remembered
-  // now, so that it is not rebased the moment `main` moves and put through
-  // the same failing matrix again.
+  // A pull request that is up to date and already failing gets remembered now,
+  // so that it is not rebased the moment `main` moves and put through the same
+  // failing matrix again.
   let mut_skipped: SkipRecords = triaged.failing.reduce(
     (acc, { pr, summary }) =>
       withSkip(acc, {
@@ -820,9 +819,9 @@ const runCycle = async (
     return { state: state(mut_skipped), next: 'stop', settled: skipped };
   }
 
-  // Normally the only one. Two are what a pull request opened already
-  // released looks like; the first is watched, and the other runs as it was
-  // released, since nothing here labels a pull request it did not pick.
+  // Normally the only one. Two are what a pull request opened already released
+  // looks like; the first is watched, and the other runs as it was released,
+  // since nothing here labels a pull request it did not pick.
   const watched = firstInReleaseOrder(
     triaged.inFlight,
     defaultBranch,
@@ -903,9 +902,9 @@ const runCycle = async (
     };
   }
 
-  // One whose checks could not be read may be running a matrix as much as
-  // one in flight is, and releasing another beside it starts a second; the
-  // next survey reads them again.
+  // One whose checks could not be read may be running a matrix as much as one
+  // in flight is, and releasing another beside it starts a second; the next
+  // survey reads them again.
   if (Arr.isNonEmpty(triaged.unreadReleased)) {
     log(
       `${triaged.unreadReleased.map((pr) => `#${pr.number}`).join(', ')}: released, and its checks could not be read; releasing nothing else until they can be.`,
@@ -943,8 +942,8 @@ const runCycle = async (
     return { state: state(mut_skipped), next: 'stop', settled: skipped };
   }
 
-  // What a release found afterwards can have happened in the same moment
-  // only for these; see `release.mts`.
+  // What a release found afterwards can have happened in the same moment only
+  // for these; see `release.mts`.
   const pausedAtSurvey: ReadonlySet<number> = new Set(
     pullRequests.filter(isSkipCiLabelled).map((pr) => pr.number),
   );
@@ -981,9 +980,9 @@ const runCycle = async (
     }
 
     if (advanced.value.kind === 'moved') {
-      // Someone else is moving this one — the skill, or a person. Whatever
-      // they pushed is likely to start a matrix, so rather than start a
-      // second on the next candidate, survey again and take what is there.
+      // Someone else is moving this one — the skill, or a person. Whatever they
+      // pushed is likely to start a matrix, so rather than start a second on
+      // the next candidate, survey again and take what is there.
       log(
         `#${target.number} moved while this run was moving it; leaving it to whoever pushed, and surveying again.`,
       );

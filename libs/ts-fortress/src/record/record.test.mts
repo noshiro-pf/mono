@@ -306,8 +306,8 @@ describe(record, () => {
         // @ts-expect-error missing key: "date"
         ymd.prune({ year: 2000, month: 12 });
 
-      // runtime: prune assumes type-conforming input, so a missing required
-      // key just yields undefined (never a default value)
+      // runtime: prune assumes type-conforming input, so a missing required key
+      // just yields undefined (never a default value)
       assert.deepStrictEqual(pruned, {
         year: 2000,
         month: 12,

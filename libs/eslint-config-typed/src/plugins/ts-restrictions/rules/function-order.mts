@@ -33,22 +33,21 @@ type MessageIds = 'calleeAfterCaller' | 'exportedAfterHelper';
  * `export =`.
  *
  * A **helper** is a function that is not exported and that the module does not
- * refer to while it loads. A function referred to outside every function body
- * — called by `await main()` at the top level, passed by name to
- * `memoize(...)` or read by a constant — is an entry point rather than a
- * helper: where it goes
- * is decided by when it runs (a `const` read at load time must come before
- * the statement reading it), so the rule leaves it where it is, and the
- * helpers it calls are not ordered against it. That is what lets a script
- * keep `main` at the top and call it at the bottom.
+ * refer to while it loads. A function referred to outside every function body —
+ * called by `await main()` at the top level, passed by name to `memoize(...)`
+ * or read by a constant — is an entry point rather than a helper: where it goes
+ * is decided by when it runs (a `const` read at load time must come before the
+ * statement reading it), so the rule leaves it where it is, and the helpers it
+ * calls are not ordered against it. That is what lets a script keep `main` at
+ * the top and call it at the bottom.
  *
  * A function called where it is written — `void (async () => { await main();
  * })()` — runs while the module loads, so its body counts as outside every
  * function body.
  *
  * Helper `a` **calls** helper `b` when `b` is referred to anywhere in `a`'s
- * body, called or not (`xs.map(b)` counts). A reference in a type
- * (`typeof b`) does not.
+ * body, called or not (`xs.map(b)` counts). A reference in a type (`typeof b`)
+ * does not.
  *
  * ## What is reported
  *
@@ -72,8 +71,8 @@ type MessageIds = 'calleeAfterCaller' | 'exportedAfterHelper';
  *
  * ## Fix
  *
- * The fix moves the reported function up — a helper above its first caller,
- * an exported function above the first helper — together with its overload
+ * The fix moves the reported function up — a helper above its first caller, an
+ * exported function above the first helper — together with its overload
  * signatures, the comments directly above it (no blank line between) and a
  * comment after it on the same line. Moving a function declaration, or a
  * `const` whose initializer is a function expression, to an earlier position
@@ -81,12 +80,11 @@ type MessageIds = 'calleeAfterCaller' | 'exportedAfterHelper';
  * binding that exists earlier cannot be read before it exists. No fix is
  * offered above the file's first statement when a shebang, a triple-slash
  * directive or a pragma (`@jsxImportSource`, `@ts-nocheck`) precedes it, which
- * has to stay first, where an overload
- * signature stands apart from the others, for a
- * statement sharing a line with another, where removing it would join the
+ * has to stay first, where an overload signature stands apart from the others,
+ * for a statement sharing a line with another, where removing it would join the
  * statements around it into one expression (a statement above it with no
- * semicolon), or in a file with `\r\n` line endings. Nor is one offered where
- * a top-level comment with a blank line after it stands above where the
+ * semicolon), or in a file with `\r\n` line endings. Nor is one offered where a
+ * top-level comment with a blank line after it stands above where the
  * function would go or anywhere between there and the function: that may be a
  * section heading or a note about what follows it, and the rule cannot tell
  * whether the move belongs above it or below. Nor where the function would
@@ -210,8 +208,8 @@ type TopLevelFunction = DeepReadonly<{
    */
   first: TSESTree.ProgramStatement;
   /**
-   * The node whose declared variable is the function's binding; `undefined`
-   * for `export default () => ...`, which has none.
+   * The node whose declared variable is the function's binding; `undefined` for
+   * `export default () => ...`, which has none.
    */
   declarator:
     TSESTree.FunctionDeclaration | TSESTree.VariableDeclarator | undefined;
@@ -259,9 +257,9 @@ const STATEMENT_START_IDENTIFIERS: ReadonlySet<string> = new Set<string>([
 ]);
 
 /**
- * A comment that applies to a stretch of the file rather than to the node
- * after it: a `*-disable` / `*-enable` pair (`eslint-`, `oxlint-`, `cspell:`),
- * a coverage-tool range, a `#region`, or a marker such as
+ * A comment that applies to a stretch of the file rather than to the node after
+ * it: a `*-disable` / `*-enable` pair (`eslint-`, `oxlint-`, `cspell:`), a
+ * coverage-tool range, a `#region`, or a marker such as
  * `embed-sample-code-ignore-above`.
  */
 const RANGE_MARKER =
@@ -278,8 +276,8 @@ const FUNCTION_NODE_TYPES: ReadonlySet<AST_NODE_TYPES> =
   ]);
 
 /**
- * The `@typescript-eslint/utils` APIs take mutable nodes; this module only
- * ever reads them.
+ * The `@typescript-eslint/utils` APIs take mutable nodes; this module only ever
+ * reads them.
  */
 const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -492,8 +490,7 @@ const isInvokedInPlace = (fn: DeepReadonly<TSESTree.Node>): boolean => {
 
 /**
  * The top-level statement `node` is in, and whether the code there runs only
- * when some function is called (`deferred`) rather than while the module
- * loads.
+ * when some function is called (`deferred`) rather than while the module loads.
  */
 const referenceSite = (node: DeepReadonly<TSESTree.Node>): ReferenceSite => {
   let mut_deferred = false;
@@ -580,8 +577,8 @@ const analyzeReferences = (
 };
 
 /**
- * Tarjan's algorithm: a map from each node to an id shared exactly by the
- * nodes that reach each other through `edgesOf`.
+ * Tarjan's algorithm: a map from each node to an id shared exactly by the nodes
+ * that reach each other through `edgesOf`.
  */
 const stronglyConnectedComponents = <T,>(
   nodes: readonly T[],
@@ -661,8 +658,7 @@ const stronglyConnectedComponents = <T,>(
 /**
  * The range of `f`'s statements (its overload signatures included), the
  * comments directly above them — each on its own line, with no blank line
- * between it and what follows — and the comments after them on their last
- * line.
+ * between it and what follows — and the comments after them on their last line.
  */
 const attachedRange = (
   sourceCode: DeepReadonly<TSESLint.SourceCode>,
@@ -696,9 +692,9 @@ const attachedRange = (
 };
 
 /**
- * Whether a comment on its own line stands above `f`'s attached comments with
- * a blank line between: a section heading, or a note about `f` written apart
- * from it. The rule cannot tell which, so it moves nothing across one.
+ * Whether a comment on its own line stands above `f`'s attached comments with a
+ * blank line between: a section heading, or a note about `f` written apart from
+ * it. The rule cannot tell which, so it moves nothing across one.
  */
 const hasDetachedCommentAbove = (
   sourceCode: DeepReadonly<TSESLint.SourceCode>,
@@ -757,8 +753,8 @@ const wholeLines = (
 
 /**
  * Whether taking `f` out leaves the statements around it as separate
- * statements: either the one above ends with `;` (or there is none), or the
- * one below starts with a token that cannot continue an expression.
+ * statements: either the one above ends with `;` (or there is none), or the one
+ * below starts with a token that cannot continue an expression.
  */
 const removable = (
   sourceCode: DeepReadonly<TSESLint.SourceCode>,

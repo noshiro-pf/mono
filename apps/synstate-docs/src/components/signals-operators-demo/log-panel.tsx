@@ -11,8 +11,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * Every run of one implementation's view, a run whose list is for another
- * query than the box shows marked as a glitch.
+ * Every run of one implementation's view, a run whose list is for another query
+ * than the box shows marked as a glitch.
  */
 export const LogPanel = ({
   title,

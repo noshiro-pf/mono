@@ -91,9 +91,8 @@ export const ptCodeBackgroundColor = hexToRgba(white, 0.7);
 
 export const ptDarkCodeBackgroundColor = hexToRgba(black, 0.3);
 
-// "cobalt" is becoming "cerulean" in Blueprint 4.0
-// for a smoother migration, we provide these aliases so that consumers
-// can reference the new names in 3.x
+// "cobalt" is becoming "cerulean" in Blueprint 4.0 for a smoother migration, we
+// provide these aliases so that consumers can reference the new names in 3.x
 export const cerulean1 = cobalt1;
 
 export const cerulean2 = cobalt2;

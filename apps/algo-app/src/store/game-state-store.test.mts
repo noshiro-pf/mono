@@ -102,8 +102,8 @@ describe(createGameStateStore, () => {
 
     store.onTossCancel();
 
-    // Another player joining changes `players`. Written again, the action
-    // would reach every client twice, and a second `selectMyCard` unselects.
+    // Another player joining changes `players`. Written again, the action would
+    // reach every client twice, and a second `selectMyCard` unselects.
     setRoom({
       ...roomWithId('a'),
       players: [

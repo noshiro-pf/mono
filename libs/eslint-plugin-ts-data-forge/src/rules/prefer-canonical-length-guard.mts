@@ -59,8 +59,8 @@ const MESSAGES = {
 } as const satisfies ReadonlyRecord<MessageIds, string>;
 
 /**
- * Length guards whose bound makes them redundant with a named degenerate
- * guard, keyed by guard name.
+ * Length guards whose bound makes them redundant with a named degenerate guard,
+ * keyed by guard name.
  *
  * Every entry stays inside its own family rather than crossing the
  * branded/structural divide:

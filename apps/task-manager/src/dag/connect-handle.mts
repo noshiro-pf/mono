@@ -1,14 +1,14 @@
 /**
- * Drawing a dependency on the canvas: where on a node's outline the handle
- * an arrow is drawn from appears, and which node an arrow dropped at a point
- * is dropped on. Everything is in content coordinates; `reach` is how far
- * from an outline still counts as on it, which the canvas keeps the same on
- * the screen whatever the zoom. Inside a node that is less, and never more
- * than {@link INSIDE_REACH_SHARE} of its height, so that most of a node is
- * still pressed to move it.
+ * Drawing a dependency on the canvas: where on a node's outline the handle an
+ * arrow is drawn from appears, and which node an arrow dropped at a point is
+ * dropped on. Everything is in content coordinates; `reach` is how far from an
+ * outline still counts as on it, which the canvas keeps the same on the screen
+ * whatever the zoom. Inside a node that is less, and never more than
+ * {@link INSIDE_REACH_SHARE} of its height, so that most of a node is still
+ * pressed to move it.
  *
- * A task is taken as its rectangle, its rounded corners square; a milestone
- * as its hexagon, as `dag-milestone-node.tsx` draws it.
+ * A task is taken as its rectangle, its rounded corners square; a milestone as
+ * its hexagon, as `dag-milestone-node.tsx` draws it.
  */
 
 import { Arr, Num } from 'ts-data-forge';
@@ -21,9 +21,8 @@ export const INSIDE_REACH_SHARE = 1 / 6;
 
 /**
  * The handle for `point`: on the outline of the node it is nearest, at the
- * point of that outline nearest it — or `undefined` when no outline is
- * within `reach`. Of two outlines as near, the node drawn later, which is on
- * top.
+ * point of that outline nearest it — or `undefined` when no outline is within
+ * `reach`. Of two outlines as near, the node drawn later, which is on top.
  */
 export const connectHandleAt = (
   nodes: readonly LaidOutNode[],
@@ -58,9 +57,9 @@ export const connectHandleAt = (
 };
 
 /**
- * The node an arrow dropped at `point` joins: the one it is inside — the
- * top one, of nodes that overlap — or failing that, the one whose outline
- * is within `reach` of it; `undefined` on the background.
+ * The node an arrow dropped at `point` joins: the one it is inside — the top
+ * one, of nodes that overlap — or failing that, the one whose outline is within
+ * `reach` of it; `undefined` on the background.
  */
 export const dropTargetAt = (
   nodes: readonly LaidOutNode[],

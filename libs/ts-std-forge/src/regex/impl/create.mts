@@ -8,10 +8,10 @@ import { Result } from '../../functional/index.mjs';
  * Pattern validity is the engine's own grammar check, so — unlike the range
  * conditions of the number and string wrappers — it cannot reasonably be
  * validated in advance; the failure is caught instead. Classification is
- * conservative: only a caught `SyntaxError` (the error type the spec
- * mandates for parse failures) becomes `'invalid-regexp'`, with the error
- * attached as `cause`; anything else the engine throws surfaces as the
- * `'unexpected'` fallback.
+ * conservative: only a caught `SyntaxError` (the error type the spec mandates
+ * for parse failures) becomes `'invalid-regexp'`, with the error attached as
+ * `cause`; anything else the engine throws surfaces as the `'unexpected'`
+ * fallback.
  *
  * @example
  *

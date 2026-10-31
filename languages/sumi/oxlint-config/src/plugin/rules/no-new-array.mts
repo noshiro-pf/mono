@@ -2,13 +2,13 @@ import { createRule } from './create-rule.mjs';
 import { globalReferenceName } from './global-reference.mjs';
 
 /**
- * `banned-syntax/no-new-array` — `new Array(...)` in every form is banned
- * (its single-numeric-argument case, which ESLint's `no-array-constructor`
- * allows, is exactly the trap). The call form `Array(...)` is covered by
+ * `banned-syntax/no-new-array` — `new Array(...)` in every form is banned (its
+ * single-numeric-argument case, which ESLint's `no-array-constructor` allows,
+ * is exactly the trap). The call form `Array(...)` is covered by
  * `no-constructor-call`. A type wrapper around the constructor
- * (`new (Array as ArrayConstructor)(3)`) is looked through, the global
- * object's property (`new globalThis.Array(3)`) is the same constructor, and
- * a locally declared `Array` is not the global.
+ * (`new (Array as ArrayConstructor)(3)`) is looked through, the global object's
+ * property (`new globalThis.Array(3)`) is the same constructor, and a locally
+ * declared `Array` is not the global.
  */
 export const noNewArray = createRule({
   meta: {

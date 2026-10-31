@@ -34,14 +34,13 @@ type Props = Readonly<{
  *
  * Five rows, in the order a reader asks the questions. What state is it in —
  * the badges. What is it — the number, the title, a link that opens it in a
- * split view, the issues it closes and the Claude Code sessions it was
- * written in. Which branch, and how far from its base. When did it last
- * move. What has been said about it — the labels, and
- * the names of any checks that are red.
+ * split view, the issues it closes and the Claude Code sessions it was written
+ * in. Which branch, and how far from its base. When did it last move. What has
+ * been said about it — the labels, and the names of any checks that are red.
  *
  * The card is drawn as soon as the pull request is read; the verdict, the
- * distance from the base and the badges read from its details come by
- * queries of their own, and say they are being read until they answer
+ * distance from the base and the badges read from its details come by queries
+ * of their own, and say they are being read until they answer
  * (`entry.reading`). A poll that changes a pull request rewrites the parts of
  * its card bound to what changed, and leaves the rest of it alone.
  */

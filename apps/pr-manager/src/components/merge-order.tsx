@@ -28,8 +28,8 @@ type Props = Readonly<{
  * reader to rebuild it; nested, the one at the top is the one to look at.
  *
  * Each level keeps one row per pull request, by number, so a poll moves the
- * cards that moved and rewrites the ones that changed, and builds only the
- * ones that are new.
+ * cards that moved and rewrites the ones that changed, and builds only the ones
+ * that are new.
  */
 export const MergeOrder = ({ nodes, depth }: Props): JSX.Element => {
   const rows = derive([nodes, reader.byNumber], rowsOf());

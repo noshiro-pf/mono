@@ -8,8 +8,8 @@ import { source, type InitializedSourceObservable } from 'synstate';
  * This allows applying synstate's rich operator chain (e.g. `map`, `filter`,
  * `debounce`, `switchMap`) to values originating from Preact Signals.
  *
- * The bridge uses `effect()` from `@preact/signals` to track signal changes
- * and propagate them to the observable.
+ * The bridge uses `effect()` from `@preact/signals` to track signal changes and
+ * propagate them to the observable.
  *
  * @returns A tuple of `[observable, dispose]`.
  *   - `observable` — an `InitializedSourceObservable` that mirrors the signal.

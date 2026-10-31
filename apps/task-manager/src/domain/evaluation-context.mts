@@ -7,8 +7,8 @@ import type {
 } from './types.mjs';
 
 /**
- * The {@link DomainState} indexed by id, which is what evaluating a
- * dependency looks nodes up in. Build it once per state, not per task.
+ * The {@link DomainState} indexed by id, which is what evaluating a dependency
+ * looks nodes up in. Build it once per state, not per task.
  */
 export const buildEvaluationContext = ({
   tasks,

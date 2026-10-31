@@ -105,14 +105,14 @@ export const buildPagesSite = async (): Promise<Result<number, string>> => {
 
   const slidesOut = path.resolve(outDir, PAGES_SLIDES_DIR);
 
-  // A reveal.js deck and a Marp deck land side by side; one name for two
-  // decks would have the second silently overwrite the first.
+  // A reveal.js deck and a Marp deck land side by side; one name for two decks
+  // would have the second silently overwrite the first.
   const mut_deckDirs = new Set<string>();
 
   // The reveal.js decks are copied as they are: each loads reveal.js from the
   // CDN and needs no build. The Firebase files are the redirect from a deck's
-  // old address, and the README and the cspell config are for whoever edits
-  // the decks; none of them belongs on the site.
+  // old address, and the README and the cspell config are for whoever edits the
+  // decks; none of them belongs on the site.
   const revealSource = path.resolve(projectRootPath, 'docs/reveal-slides');
 
   await fs.cp(revealSource, slidesOut, {

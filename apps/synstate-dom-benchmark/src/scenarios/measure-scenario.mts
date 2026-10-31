@@ -14,9 +14,8 @@ import type {
 } from './scenario.mjs';
 
 /**
- * A timing, or `undefined` when the library rendered something other than
- * what the model computes: a time for the wrong figures is not one to
- * compare.
+ * A timing, or `undefined` when the library rendered something other than what
+ * the model computes: a time for the wrong figures is not one to compare.
  */
 export type ScenarioResult = Readonly<{
   operation: string;
@@ -28,10 +27,10 @@ export type ScenarioResult = Readonly<{
 const samples = 15;
 
 /**
- * How many changes one sample times, alternating a case's `apply` and
- * `revert`, and how many mounts a build sample times. A single change of these
- * graphs takes well under a millisecond, close to the 0.1 ms to which the
- * browser rounds `performance.now()`; a sample is their mean.
+ * How many changes one sample times, alternating a case's `apply` and `revert`,
+ * and how many mounts a build sample times. A single change of these graphs
+ * takes well under a millisecond, close to the 0.1 ms to which the browser
+ * rounds `performance.now()`; a sample is their mean.
  */
 const changesPerSample = 20;
 

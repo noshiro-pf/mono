@@ -89,9 +89,9 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
   // Reducing a value
 
   /**
-   * Checks if all elements in the set satisfy a predicate. Also supports a
-   * type predicate overload that narrows the type of elements in the set if
-   * the predicate returns true for all elements.
+   * Checks if all elements in the set satisfy a predicate. Also supports a type
+   * predicate overload that narrows the type of elements in the set if the
+   * predicate returns true for all elements.
    *
    * @example
    *
@@ -539,8 +539,7 @@ export namespace ISet {
    *
    * This factory function accepts any iterable of elements, including arrays,
    * JavaScript Sets, other ISets, or custom iterables. Duplicate elements in
-   * the input iterable will be automatically deduplicated in the resulting
-   * set.
+   * the input iterable will be automatically deduplicated in the resulting set.
    *
    * **Performance:** O(n) where n is the number of elements in the iterable.
    *

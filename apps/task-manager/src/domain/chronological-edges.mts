@@ -1,14 +1,14 @@
 /**
  * The order in time of the milestones that have a date, as edges of the
- * dependency graph: one from each such milestone to each of the next date,
- * so that the DAG lays them out in that order. Only neighbors in time are
- * joined, since the rest of the order follows from theirs.
+ * dependency graph: one from each such milestone to each of the next date, so
+ * that the DAG lays them out in that order. Only neighbors in time are joined,
+ * since the rest of the order follows from theirs.
  *
- * These edges are not dependencies: nothing is stored for them, nothing
- * waits on them, and they follow the dates as they change. Where the
- * dependencies already order two neighbors, either way, none is added —
- * so that none is drawn twice, none points against what the reader made,
- * and none closes a cycle.
+ * These edges are not dependencies: nothing is stored for them, nothing waits
+ * on them, and they follow the dates as they change. Where the dependencies
+ * already order two neighbors, either way, none is added — so that none is
+ * drawn twice, none points against what the reader made, and none closes a
+ * cycle.
  */
 
 import { Arr } from 'ts-data-forge';
@@ -20,10 +20,10 @@ import { nodeId, type GraphNodeId } from './graph-nodes.mjs';
 import type { DomainState } from './types.mjs';
 
 /**
- * `graph` with an edge, `implied`, from every milestone of `state` that is
- * one of its nodes and has a date to every such milestone of the next date,
- * unless the edges already order the two. They come after those of `graph`,
- * in order of date and then of the milestones.
+ * `graph` with an edge, `implied`, from every milestone of `state` that is one
+ * of its nodes and has a date to every such milestone of the next date, unless
+ * the edges already order the two. They come after those of `graph`, in order
+ * of date and then of the milestones.
  */
 export const withChronologicalEdges = (
   state: DomainState,

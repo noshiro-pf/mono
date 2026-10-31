@@ -11,17 +11,17 @@ import type { UnwrapErr, UnwrapOk } from './types.mjs';
  * The body must return a `Result`. If every unwrapped `Result` is `Ok`, the
  * returned value is the body's `Result`; otherwise it is the first `Err`
  * encountered, and the rest of the body never runs — though the generator is
- * closed rather than dropped, so `finally` blocks and `using` disposals
- * pending in the body still run. An exception thrown by the body is not
- * converted to an `Err`: it propagates out of `safeTry` (as a rejected
- * `Promise` for an async body). Use {@link Result.fromThrowable} for that.
+ * closed rather than dropped, so `finally` blocks and `using` disposals pending
+ * in the body still run. An exception thrown by the body is not converted to an
+ * `Err`: it propagates out of `safeTry` (as a rejected `Promise` for an async
+ * body). Use {@link Result.fromThrowable} for that.
  *
  * Passing an async generator (`async function*`) returns a
  * `Promise<Result<...>>` instead, so `await` can be used inside the body.
  * Note that `yield*` inside an `async function*` awaits what it receives, so
- * unwrapping an `Ok` whose value is itself a `Promise` yields the awaited
- * value there while the static type still says `Promise<...>`; keep promises
- * out of the `Ok` side of a `Result` unwrapped in an async body.
+ * unwrapping an `Ok` whose value is itself a `Promise` yields the awaited value
+ * there while the static type still says `Promise<...>`; keep promises out of
+ * the `Ok` side of a `Result` unwrapped in an async body.
  *
  * @example
  *
@@ -65,16 +65,16 @@ export function safeTry(
 ): Promise<UnknownResult> | UnknownResult {
   const generator = body();
 
-  // A yielded `Err` and a returned `Result` are both already the final
-  // answer, so the first step's `value` is the result in either case: the
-  // generator is closed rather than resumed after yielding.
+  // A yielded `Err` and a returned `Result` are both already the final answer,
+  // so the first step's `value` is the result in either case: the generator is
+  // closed rather than resumed after yielding.
   const step = generator.next();
 
   if (isSyncStep(step)) {
     // Dropping a suspended generator would skip the `finally` blocks and
-    // `using` disposals still pending in the body; closing it runs them
-    // before the short-circuited `Err` is handed back. `isSyncGenerator` is
-    // what makes `return()` here synchronous rather than a floating promise.
+    // `using` disposals still pending in the body; closing it runs them before
+    // the short-circuited `Err` is handed back. `isSyncGenerator` is what makes
+    // `return()` here synchronous rather than a floating promise.
     if (step.done !== true && isSyncGenerator(generator, step)) {
       generator.return(step.value);
     }
@@ -91,10 +91,9 @@ export function safeTry(
   });
 }
 
-// A sync generator's `next()` returns a plain `{ value, done }` object with
-// own properties, while an async generator's returns a `Promise`, whose
-// `then` lives on the prototype — so an own-key check on `done` separates the
-// two.
+// A sync generator's `next()` returns a plain `{ value, done }` object with own
+// properties, while an async generator's returns a `Promise`, whose `then`
+// lives on the prototype — so an own-key check on `done` separates the two.
 const isSyncStep = (
   value: unknown,
 ): value is IteratorResult<UnknownResult, UnknownResult> =>

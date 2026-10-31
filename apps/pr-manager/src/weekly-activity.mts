@@ -1,23 +1,23 @@
 /**
- * How many pull requests merged and how many issues closed on each of the
- * last seven days, and so far today, for the dialog the header's "Activity"
- * button opens.
+ * How many pull requests merged and how many issues closed on each of the last
+ * seven days, and so far today, for the dialog the header's "Activity" button
+ * opens.
  *
  * **A day is the reader's own**: it starts at midnight in the browser's time
  * zone, not in UTC, because "how many did I merge on Tuesday" is a question
  * about the reader's Tuesday. The seven are the days that have ended — up to
- * yesterday — so a count never changes once it is shown; the week moves on
- * at midnight, which is when the store reads it again (`activity-store.mts`).
- * **Today is counted apart from them**: it is still going, so its counts are
- * as of the read, and none of the week's (its total included) waits on it.
+ * yesterday — so a count never changes once it is shown; the week moves on at
+ * midnight, which is when the store reads it again (`activity-store.mts`).
+ * **Today is counted apart from them**: it is still going, so its counts are as
+ * of the read, and none of the week's (its total included) waits on it.
  *
- * **Counted by GitHub's search** rather than by listing what merged and
- * closed: one `issueCount` per day and kind, sixteen aliased fields in one
- * query, so the cost is the same however busy the week was. A search
- * qualifier takes a time with an offset, which is what puts each day's
- * bounds at the reader's midnight. The merged section's list
- * (`MERGED_QUERY`) could not stand in for it: it looks through the last
- * thirty updated pull requests, which a busy week outruns.
+ * **Counted by GitHub's search** rather than by listing what merged and closed:
+ * one `issueCount` per day and kind, sixteen aliased fields in one query, so
+ * the cost is the same however busy the week was. A search qualifier takes a
+ * time with an offset, which is what puts each day's bounds at the reader's
+ * midnight. The merged section's list (`MERGED_QUERY`) could not stand in for
+ * it: it looks through the last thirty updated pull requests, which a busy week
+ * outruns.
  */
 
 import { Arr, isRecord, Num, Result } from 'ts-data-forge';
@@ -57,12 +57,12 @@ export type WeeklyActivity = Readonly<{
 }>;
 
 /**
- * The {@link WEEK_LENGTH} days that ended before the day `nowMs` is in,
- * oldest first, in `timeZone` — the browser's own when it is left out.
+ * The {@link WEEK_LENGTH} days that ended before the day `nowMs` is in, oldest
+ * first, in `timeZone` — the browser's own when it is left out.
  *
- * Each day is a calendar day rather than 24 hours back from the next: its
- * start is that date's midnight at the offset the zone had then, so a day
- * that daylight saving makes 23 or 25 hours long is still one day.
+ * Each day is a calendar day rather than 24 hours back from the next: its start
+ * is that date's midnight at the offset the zone had then, so a day that
+ * daylight saving makes 23 or 25 hours long is still one day.
  */
 export const weekBefore = (
   nowMs: number,
@@ -77,8 +77,8 @@ export const weekBefore = (
 
 /**
  * The day `nowMs` is in, in `timeZone`, from its midnight to the next. The
- * search runs to the end of the day rather than to `nowMs`, which finds
- * nothing more now and keeps a count's link right when it is followed later.
+ * search runs to the end of the day rather than to `nowMs`, which finds nothing
+ * more now and keeps a count's link right when it is followed later.
  */
 export const todayOf = (nowMs: number, timeZone?: string): ActivityDay =>
   dayOf(epochDayOf(nowMs, timeZone), timeZone);
@@ -119,8 +119,8 @@ export const isoWithOffset = (ms: number, offsetMinutes: number): string => {
 };
 
 /**
- * The search that counts one kind on one day. Both ends are inclusive, so
- * the day runs to its last second rather than to the next midnight.
+ * The search that counts one kind on one day. Both ends are inclusive, so the
+ * day runs to its last second rather than to the next midnight.
  */
 export const activitySearch = (
   source: ReportSource,
@@ -175,8 +175,8 @@ export const weeklyActivityQuery = (
   return {
     query: [
       `query WeeklyActivity(${fields.map(({ alias: field }) => `$${field}: String!`).join(', ')}) {`,
-      // `first: 1` because a connection has to be given a size between 1
-      // and 100; nothing of the node is asked for.
+      // `first: 1` because a connection has to be given a size between 1 and
+      // 100; nothing of the node is asked for.
       ...fields.map(
         ({ alias: field }) =>
           `  ${field}: search(query: $${field}, type: ISSUE, first: 1) { issueCount }`,
@@ -199,9 +199,9 @@ export type WeeklyActivityRequest = Readonly<{
 
 /**
  * The week before the day `nowMs` is in, and that day so far, counted, or a
- * sentence a reader can act on. A count GitHub could not give fails the
- * whole read: a day drawn as `0` that was really unanswered would be read as
- * a quiet day.
+ * sentence a reader can act on. A count GitHub could not give fails the whole
+ * read: a day drawn as `0` that was really unanswered would be read as a quiet
+ * day.
  */
 export const loadWeeklyActivity = async (
   source: ReportSource,
@@ -329,8 +329,8 @@ const offsetFormat = (timeZone: string | undefined): Intl.DateTimeFormat => {
 };
 
 /**
- * How many minutes east of UTC `timeZone` is at `ms`, from the
- * `GMT+09:00` that `Intl` writes for it — `GMT` alone at UTC itself.
+ * How many minutes east of UTC `timeZone` is at `ms`, from the `GMT+09:00` that
+ * `Intl` writes for it — `GMT` alone at UTC itself.
  */
 const offsetMinutesAt = (ms: number, timeZone: string | undefined): number => {
   const written =
@@ -354,16 +354,16 @@ const offsetMinutesAt = (ms: number, timeZone: string | undefined): number => {
 };
 
 /**
- * Days since the epoch, counted in `timeZone`: the date `ms` falls on there,
- * as one number that the days before and after are a subtraction from.
+ * Days since the epoch, counted in `timeZone`: the date `ms` falls on there, as
+ * one number that the days before and after are a subtraction from.
  */
 const epochDayOf = (ms: number, timeZone: string | undefined): number =>
   Math.floor((ms + offsetMinutesAt(ms, timeZone) * MINUTE_MS) / DAY_MS);
 
 /**
- * The first instant of `epochDay` in `timeZone`. The offset is read twice,
- * the second time at the answer the first gave, so a midnight on the far
- * side of a daylight-saving change gets the offset it actually has.
+ * The first instant of `epochDay` in `timeZone`. The offset is read twice, the
+ * second time at the answer the first gave, so a midnight on the far side of a
+ * daylight-saving change gets the offset it actually has.
  */
 const midnightOf = (epochDay: number, timeZone: string | undefined): number => {
   const wall = epochDay * DAY_MS;

@@ -22,9 +22,9 @@ export const changedValuesOnly: FigureOutput = (figure$) =>
   figure$.pipe(skipIfNoChange());
 
 /**
- * One node computed from any number of others: `combine` over them, then
- * `map`. For a figure whose inputs are a list (the months of a year, the
- * predecessors of a task) rather than a fixed tuple.
+ * One node computed from any number of others: `combine` over them, then `map`.
+ * For a figure whose inputs are a list (the months of a year, the predecessors
+ * of a task) rather than a fixed tuple.
  */
 export const combineAll = <R,>(
   parents: readonly InitializedObservable<number>[],

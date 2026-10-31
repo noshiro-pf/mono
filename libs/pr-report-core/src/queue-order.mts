@@ -2,13 +2,13 @@
  * Where each pull request stands in `unblock-prs`'s queue, and the order the
  * worker picks the ones it may pick.
  *
- * The worker decides on someone's machine, from what `gh` and `git` return,
- * and the Pull Requests Manager page draws the same queue from what GraphQL
+ * The worker decides on someone's machine, from what `gh` and `git` return, and
+ * the Pull Requests Manager page draws the same queue from what GraphQL
  * returns. So the deciding is here, once, over facts either side can supply,
  * and each side does only its own reading: the worker reads some facts only
  * when the answer needs them — the checks of a `BLOCKED` pull request, the
- * native stack of one without auto-merge — which is why
- * {@link queueStanding} asks for them rather than taking them all up front.
+ * native stack of one without auto-merge — which is why {@link queueStanding}
+ * asks for them rather than taking them all up front.
  *
  * What the worker alone knows is left out: which pull requests one run has
  * demoted (`demotions.mts` in `unblock-prs`) lives in that run's memory, so
@@ -39,8 +39,8 @@ export type QueueFacts = Readonly<{
   headRef: string;
   baseRef: string;
   /**
-   * GitHub's `mergeStateStatus` — `BEHIND`, `DIRTY`, `CLEAN`, `BLOCKED` and
-   * so on — or as near to it as the reader can tell.
+   * GitHub's `mergeStateStatus` — `BEHIND`, `DIRTY`, `CLEAN`, `BLOCKED` and so
+   * on — or as near to it as the reader can tell.
    */
   mergeState: string;
   autoMerge: boolean;
@@ -57,8 +57,8 @@ export type QueueGraphMember = Readonly<{
   baseRef: string;
   fromFork: boolean;
   /**
-   * The open issues it closes, whose `Start-After:` it inherits. Absent for
-   * a reader that did not read them: nothing is inherited.
+   * The open issues it closes, whose `Start-After:` it inherits. Absent for a
+   * reader that did not read them: nothing is inherited.
    */
   closes?: readonly number[];
 }>;
@@ -68,8 +68,8 @@ export type QueueGraph = Readonly<{
   /** Which open pull request each stacked one is on: child → parent. */
   stackParents: ReadonlyMap<number, number>;
   /**
-   * What each pull request must merge after: what it declared, the one it
-   * is stacked on, and what it inherits.
+   * What each pull request must merge after: what it declared, the one it is
+   * stacked on, and what it inherits.
    */
   dependencies: ReadonlyMap<number, readonly number[]>;
   /**
@@ -165,9 +165,9 @@ export const versionBranchName = (defaultBranch: string): string =>
   `changeset-release/${defaultBranch}` as const;
 
 /**
- * Whether a pull request from `headRef` is the version pull request. The
- * branch is the only stable handle on it: the title and body are rewritten
- * on every run, and the number changes with every release.
+ * Whether a pull request from `headRef` is the version pull request. The branch
+ * is the only stable handle on it: the title and body are rewritten on every
+ * run, and the number changes with every release.
  */
 export const isVersionBranch = (
   headRef: string,
@@ -191,8 +191,8 @@ export const isMergeableState = (mergeState: string): boolean =>
 
 /**
  * The stacks, the declared order and its cycles, and what holds the release,
- * read off the open pull requests. `startAfterOf` is what the issues they
- * close declare, each issue's `Start-After:` by its number.
+ * read off the open pull requests. `startAfterOf` is what the issues they close
+ * declare, each issue's `Start-After:` by its number.
  */
 export const queueGraph = (
   pulls: readonly QueueGraphMember[],
@@ -219,12 +219,12 @@ export const queueGraph = (
 
       return [
         pr.number,
-        // The version pull request declares nothing: its body is rewritten
-        // on every push to the base, so a trailer written there would hold
-        // for a cycle or two and then silently stop. `blocks-release`, on
-        // the pull requests it is waiting for, is how an order is declared
-        // on it. Other pull requests may still name *it*. A stacked pull
-        // request waits for the layer below it whether or not it says so.
+        // The version pull request declares nothing: its body is rewritten on
+        // every push to the base, so a trailer written there would hold for a
+        // cycle or two and then silently stop. `blocks-release`, on the pull
+        // requests it is waiting for, is how an order is declared on it. Other
+        // pull requests may still name *it*. A stacked pull request waits for
+        // the layer below it whether or not it says so.
         isVersionBranch(pr.headRef, defaultBranch)
           ? []
           : Arr.uniq([
@@ -241,8 +241,8 @@ export const queueGraph = (
 
       return [
         number,
-        // The version pull request closes nothing it means to, and is held
-        // by `blocks-release` alone.
+        // The version pull request closes nothing it means to, and is held by
+        // `blocks-release` alone.
         isVersionBranch(headRef, defaultBranch)
           ? []
           : (inheritedOrders.get(number)?.mergeAfter ?? []).filter(
@@ -288,15 +288,15 @@ export const queueStanding = (
   if (outOfScope !== undefined) {
     // `merge-queued` is an explicit request, so anything that answers it with
     // "no" is worth saying out loud — a queued pull request left as a draft
-    // would otherwise sit in the queue forever with nothing saying why. A
-    // pull request that never asked is passed over in silence.
+    // would otherwise sit in the queue forever with nothing saying why. A pull
+    // request that never asked is passed over in silence.
     return hasLabel(pr, MERGE_QUEUED_LABEL)
       ? { kind: 'unactionable', reason: outOfScope }
       : { kind: 'ignore' };
   }
 
-  // A pull request set aside, or claimed, is a skill's or a person's until
-  // its comment is resolved (`queue-owner.mts`).
+  // A pull request set aside, or claimed, is a skill's or a person's until its
+  // comment is resolved (`queue-owner.mts`).
   const owner = context.owners.get(pr.number);
 
   if (owner !== undefined && owner.owner !== 'worker') {
@@ -327,9 +327,9 @@ export const queueStanding = (
     }
   }
 
-  // The version pull request is rebuilt from the tip of the base by the
-  // release workflow, never rebased here; taking `skip-ci` off is the whole
-  // of what it can be given.
+  // The version pull request is rebuilt from the tip of the base by the release
+  // workflow, never rebased here; taking `skip-ci` off is the whole of what it
+  // can be given.
   if (isVersionBranch(pr.headRef, context.defaultBranch)) {
     return versionStanding(pr, context, reads);
   }
@@ -342,9 +342,9 @@ export const queueStanding = (
   }
 
   switch (pr.mergeState) {
-    // `DIRTY` is a candidate too: it answers whether *merging* conflicts,
-    // from a cached computation, where the worker *rebases*, and the rebase
-    // is what says whether the conflict is real.
+    // `DIRTY` is a candidate too: it answers whether *merging* conflicts, from
+    // a cached computation, where the worker *rebases*, and the rebase is what
+    // says whether the conflict is real.
     case 'BEHIND':
     case 'DIRTY':
       return waitingOn(pr, context) ?? { kind: 'candidate' };
@@ -363,10 +363,10 @@ export const queueStanding = (
 };
 
 /**
- * Whether what {@link queueStanding} decided is worth asking the review
- * about: one about to be picked, or one about to be watched while GitHub
- * still calls it `BLOCKED`. A merge state GitHub already calls mergeable is
- * its own answer that nothing but the checks is left.
+ * Whether what {@link queueStanding} decided is worth asking the review about:
+ * one about to be picked, or one about to be watched while GitHub still calls
+ * it `BLOCKED`. A merge state GitHub already calls mergeable is its own answer
+ * that nothing but the checks is left.
  */
 export const asksReview = (
   standing: QueueStanding,
@@ -377,8 +377,8 @@ export const asksReview = (
 
 /**
  * The standing once the review is known: a hold that waits for someone holds
- * it; one that only a bypass merges, and none at all, change nothing here —
- * the worker leaves the first unarmed, which is not a question of order.
+ * it; one that only a bypass merges, and none at all, change nothing here — the
+ * worker leaves the first unarmed, which is not a question of order.
  */
 export const withReviewHold = (
   standing: QueueStanding,
@@ -392,9 +392,9 @@ export const withReviewHold = (
 export type QueuePriority = 'high' | 'low' | 'none' | 'both';
 
 /**
- * Which priority label a pull request carries: `both` is the two at once,
- * which contradict each other and so count as neither. `priority:mid` is the
- * same as neither here.
+ * Which priority label a pull request carries: `both` is the two at once, which
+ * contradict each other and so count as neither. `priority:mid` is the same as
+ * neither here.
  */
 export const priorityOfLabels = (labels: readonly string[]): QueuePriority => {
   const high = labels.includes(PRIORITY_HIGH_LABEL);
@@ -427,9 +427,9 @@ export const priorityRankOfLabels = (labels: readonly string[]): 0 | 1 | 2 => {
  * ruleset bypass merges ({@link ReviewHold}): that one ranks with
  * `priority:low` unless labelled `priority:high` — alone, since the two
  * together count as neither. Picked, it is released, goes green and is set
- * aside for a person, so the cycle spent on it lands nothing; picked last,
- * it still has its checks run. `priority:high` is a person saying they want
- * that verdict now, and is the one way to ask for it, so it still counts.
+ * aside for a person, so the cycle spent on it lands nothing; picked last, it
+ * still has its checks run. `priority:high` is a person saying they want that
+ * verdict now, and is the one way to ask for it, so it still counts.
  */
 export const pickPriorityRank = (
   labels: readonly string[],
@@ -443,9 +443,9 @@ export const pickPriorityRank = (
 };
 
 /**
- * The order the worker picks candidates in. The declared order has already
- * been applied, as a gate rather than a sort, so this is lowest number first
- * within these ranks, outermost first:
+ * The order the worker picks candidates in. The declared order has already been
+ * applied, as a gate rather than a sort, so this is lowest number first within
+ * these ranks, outermost first:
  *
  * 1. What a watch has seen green and still open (`demoted`) goes after
  *    everything else, the release and `priority:high` included: everything
@@ -463,8 +463,8 @@ export const pickPriorityRank = (
  *    release: it only says that when a queued change and the release are
  *    both ready, the change goes first.
  *
- * `toSorted` is stable, so each sort keeps the order of the one before it
- * among equals, and the last one is the outermost.
+ * `toSorted` is stable, so each sort keeps the order of the one before it among
+ * equals, and the last one is the outermost.
  */
 export const orderCandidates = <P,>(
   candidates: readonly P[],
@@ -498,9 +498,8 @@ export const orderCandidates = <P,>(
 };
 
 /**
- * Whether `pr` carries the label `name`. A function rather than `includes`
- * in place, which narrows the label constant itself to `never` where it says
- * no.
+ * Whether `pr` carries the label `name`. A function rather than `includes` in
+ * place, which narrows the label constant itself to `never` where it says no.
  */
 const hasLabel = (
   pr: Readonly<{ labels: readonly string[] }>,
@@ -522,10 +521,9 @@ const outOfScopeReason = (
     return `not labelled ${MERGE_QUEUED_LABEL}`;
   }
 
-  // A base that is neither the default branch nor another open pull
-  // request's branch is one nothing here knows how to land on. A stacked one
-  // whose parent has just merged reads this way for the moment before GitHub
-  // moves it.
+  // A base that is neither the default branch nor another open pull request's
+  // branch is one nothing here knows how to land on. A stacked one whose parent
+  // has just merged reads this way for the moment before GitHub moves it.
   return pr.isDraft
     ? 'draft'
     : pr.baseRef !== context.defaultBranch &&
@@ -565,17 +563,17 @@ const byChecks = (reads: QueueReads): QueueStanding =>
       : ({ kind: 'in-flight' } as const);
 
 /**
- * The version pull request: held while anything labelled `blocks-release`
- * is open, and while the branch was built before the tip of the base, then
- * a candidate if paused and otherwise judged by its checks.
+ * The version pull request: held while anything labelled `blocks-release` is
+ * open, and while the branch was built before the tip of the base, then a
+ * candidate if paused and otherwise judged by its checks.
  */
 const versionStanding = (
   pr: QueueFacts,
   context: QueueContext,
   reads: QueueReads,
 ): QueueStanding => {
-  // Never one of its own blockers: the label on it would otherwise hold it
-  // for as long as it existed.
+  // Never one of its own blockers: the label on it would otherwise hold it for
+  // as long as it existed.
   const by = context.releaseBlockers.filter(
     (blocker) => blocker.number !== pr.number,
   );

@@ -2,12 +2,12 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
  * The compilerOptions Sumi locks (languages/sumi/docs/spec/compiler-options.md, D-40):
- * the entries whose value decides whether the same source is legal, what
- * the type check says, or how a module resolves. `sumi check` refuses to run
+ * the entries whose value decides whether the same source is legal, what the
+ * type check says, or how a module resolves. `sumi check` refuses to run
  * against a project whose effective options differ from these, because the
- * result would not be the language's result (D-7). Everything else —
- * `lib`, `types`, `target`, `jsxImportSource`, emit and project layout — is
- * the project's to choose.
+ * result would not be the language's result (D-7). Everything else — `lib`,
+ * `types`, `target`, `jsxImportSource`, emit and project layout — is the
+ * project's to choose.
  *
  * `tsconfig.base.json` (what projects `extends`) carries the same values; a
  * test keeps the two in sync.
@@ -62,10 +62,10 @@ export const lockedOptionsThatMustBeExplicit: ReadonlySet<string> =
   new Set<string>(['allowUnusedLabels', 'allowUnreachableCode']);
 
 /**
- * The flags `strict: true` turns on, as of the TypeScript this package
- * depends on (D-34: the peer range is the single source of truth for which
- * TypeScript defines the language). `strict` is locked, so none of these may
- * be turned back off individually — an explicit `false` on any of them is a
+ * The flags `strict: true` turns on, as of the TypeScript this package depends
+ * on (D-34: the peer range is the single source of truth for which
+ * TypeScript defines the language). `strict` is locked, so none of these may be
+ * turned back off individually — an explicit `false` on any of them is a
  * violation, while absence is fine (it inherits from `strict`).
  */
 export const strictFamilyOptionNames: ReadonlySet<string> = new Set<string>([

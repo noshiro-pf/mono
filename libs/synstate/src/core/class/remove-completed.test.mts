@@ -202,8 +202,8 @@ describe('a completed observable leaves the propagation graph', () => {
 
     const mut_got: number[] = [];
 
-    // Subscribed on a child, so the node is created while the update of `s`
-    // is under way.
+    // Subscribed on a child, so the node is created while the update of `s` is
+    // under way.
     s.pipe(map((x) => x)).subscribe((x) => {
       if (x === 1) {
         s.pipe(

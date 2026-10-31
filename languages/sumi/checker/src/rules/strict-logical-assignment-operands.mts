@@ -15,12 +15,12 @@ import type { Rule } from '../engine/index.mjs';
  * `boolean/strict-logical-assignment-operands` — both operands of `&&=` and
  * `||=` are boolean (Sumi D-29, spec/booleans-and-logic.md).
  *
- * `x &&= y` means `x = x && y`, so under the boolean strictness Sumi applies
- * to `&&` and `||` the same constraint belongs here. It is a separate rule
- * because `@typescript-eslint/strict-boolean-expressions` examines
- * `LogicalExpression`, condition positions and `!` — not the operands of an
- * assignment (measured 2026-09-05, typescript-eslint 8.67), which leaves the
- * truthiness idiom (`opts ||= {}`) legal where `opts || {}` is not.
+ * `x &&= y` means `x = x && y`, so under the boolean strictness Sumi applies to
+ * `&&` and `||` the same constraint belongs here. It is a separate rule because
+ * `@typescript-eslint/strict-boolean-expressions` examines `LogicalExpression`,
+ * condition positions and `!` — not the operands of an assignment (measured
+ * 2026-09-05, typescript-eslint 8.67), which leaves the truthiness idiom
+ * (`opts ||= {}`) legal where `opts || {}` is not.
  *
  * `??=` coalesces a value rather than folding booleans, so it is exempt.
  */
@@ -78,15 +78,15 @@ const isBooleanLike = (type: Type): boolean =>
   (type.flags & TypeFlags.BooleanLike) !== 0;
 
 /**
- * Whether the operand's type is boolean, `true`, `false`, or a union of
- * those, at every layer of its type wrappers. `TypeFlags.BooleanLike` covers
- * the literal types as well as `boolean` itself, which TypeScript models as
- * their union.
+ * Whether the operand's type is boolean, `true`, `false`, or a union of those,
+ * at every layer of its type wrappers. `TypeFlags.BooleanLike` covers the
+ * literal types as well as `boolean` itself, which TypeScript models as their
+ * union.
  *
  * The operand is reported if any layer is not boolean (see `wrapperLayers`):
- * `(flag as boolean | undefined) ||= x` is the author saying the operand may
- * be `undefined`, and `maybe! ||= x` or `n as unknown as boolean` asserts what
- * the value's own type does not say.
+ * `(flag as boolean | undefined) ||= x` is the author saying the operand may be
+ * `undefined`, and `maybe! ||= x` or `n as unknown as boolean` asserts what the
+ * value's own type does not say.
  */
 const isBooleanTyped = (
   // `Checker` and `Node` are TypeScript's own interfaces, declared mutable;

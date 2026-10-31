@@ -4,10 +4,10 @@ import { Result } from 'ts-data-forge';
 import { $ } from 'ts-repo-utils';
 
 /**
- * Runs a git or gh command silently and resolves to its stdout, or to a
- * message that includes what it printed to stderr. `unblock-prs` runs its
- * `pnpm` commands through it too. It runs where the command was started
- * unless told otherwise; git finds the repository from any directory in it.
+ * Runs a git or gh command silently and resolves to its stdout, or to a message
+ * that includes what it printed to stderr. `unblock-prs` runs its `pnpm`
+ * commands through it too. It runs where the command was started unless told
+ * otherwise; git finds the repository from any directory in it.
  */
 export const git = async (
   command: string,
@@ -26,9 +26,9 @@ export const git = async (
 };
 
 /**
- * The root of the repository the command runs in, where its configuration
- * files are read from: the working tree holding the current directory, or
- * the current directory itself where git finds none (a tree without `.git`).
+ * The root of the repository the command runs in, where its configuration files
+ * are read from: the working tree holding the current directory, or the current
+ * directory itself where git finds none (a tree without `.git`).
  */
 export const repoRoot = async (): Promise<string> => {
   const top = await git('git rev-parse --show-toplevel');
@@ -42,8 +42,8 @@ export const sh = (value: string): string =>
 
 /**
  * Passed to every git and gh invocation. `GIT_TERMINAL_PROMPT=0` turns a
- * missing credential into a failure instead of a hang; `GIT_EDITOR=true`
- * keeps any editor git might want out of the way.
+ * missing credential into a failure instead of a hang; `GIT_EDITOR=true` keeps
+ * any editor git might want out of the way.
  */
 const childEnv: NodeJS.ProcessEnv = {
   ...process.env,

@@ -1,8 +1,8 @@
 /**
  * Where the graph screen's 「表示設定」 panel opens: a popover hanging from
- * its button on a wide screen, a sheet across the bottom on a narrow one,
- * where a popover would be cramped and out of the thumb's reach. Worked out
- * from the button's box when it opens.
+ * its button on a wide screen, a sheet across the bottom on a narrow one, where
+ * a popover would be cramped and out of the thumb's reach. Worked out from the
+ * button's box when it opens.
  */
 
 export type SettingsPanelPlacement = Readonly<
@@ -25,8 +25,8 @@ export const POPOVER_GAP = 6;
 export const POPOVER_MARGIN = 8;
 
 /**
- * The panel of a button whose box ends at `anchor`, on a screen
- * `screenSize` big, `narrow` or not (`store.mts`, `NARROW_QUERY`).
+ * The panel of a button whose box ends at `anchor`, on a screen `screenSize`
+ * big, `narrow` or not (`store.mts`, `NARROW_QUERY`).
  */
 export const settingsPanelPlacement = (
   anchor: Readonly<{ bottom: number; right: number }>,

@@ -114,8 +114,8 @@ describe('keeping the token', () => {
 
     saveToken({ value: 'ghp_device', store: 'device' }, both);
 
-    // Written straight into the tab's store, which is what a second tab of
-    // the same page would look like from here.
+    // Written straight into the tab's store, which is what a second tab of the
+    // same page would look like from here.
     both.session?.setItem(KEY, 'ghp_tab');
 
     assert.deepStrictEqual(readToken(both), {
@@ -124,9 +124,9 @@ describe('keeping the token', () => {
     });
   });
 
-  // A browser with storage turned off is a browser the page still has to
-  // work in: the token is refused a home and the reader is told so, rather
-  // than the page failing to load.
+  // A browser with storage turned off is a browser the page still has to work
+  // in: the token is refused a home and the reader is told so, rather than the
+  // page failing to load.
   test('says so, once, when the browser will not store anything', () => {
     const none: TokenStores = {
       device: undefined,

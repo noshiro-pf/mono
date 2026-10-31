@@ -119,8 +119,8 @@ export const createSearch = () => {
             .pipe(debounce(debounceMs)) // wait for typing to pause
             .pipe(map((q) => q.trim())) // map passes on only a changed query
             .pipe(
-                // A newer query completes the previous inner observable,
-                // and completing it aborts its request.
+                // A newer query completes the previous inner observable, and completing
+                // it aborts its request.
                 switchMap((q): Observable<SearchState> =>
                     q === ''
                         ? just(idleState)
@@ -189,8 +189,8 @@ export const createSearch = () => {
             debounceTime(debounceMs), // wait for typing to pause
             map((q) => q.trim()),
             distinctUntilChanged(), // skip a query that did not change
-            // A newer query unsubscribes from the previous request,
-            // and fromFetch aborts a request it is unsubscribed from.
+            // A newer query unsubscribes from the previous request, and fromFetch
+            // aborts a request it is unsubscribed from.
             switchMap((q): Observable<SearchState> =>
                 q === ''
                     ? of(idleState)
@@ -200,8 +200,8 @@ export const createSearch = () => {
                               query: q,
                               items,
                           })),
-                          // Caught inside switchMap: an error that reached the outer
-                          // pipe would end it, and the search box with it.
+                          // Caught inside switchMap: an error that reached the outer pipe
+                          // would end it, and the search box with it.
                           catchError((error: unknown) =>
                               of<SearchState>({
                                   status: 'error',
@@ -291,8 +291,8 @@ export const createSearch = () => {
             });
     };
 
-    // reaction's `delay` option runs the effect `delay` ms after the
-    // *first* change, which throttles; a debounce is written by hand.
+    // reaction's `delay` option runs the effect `delay` ms after the *first*
+    // change, which throttles; a debounce is written by hand.
     const disposeReaction = reaction(
         () => query.get(), // untrimmed: a typed space restarts the wait too
         (typed) => {
@@ -338,8 +338,8 @@ export const createSearch = () => {
 export const createSearch = () => {
     const store = createStore();
 
-    // A primitive atom ignores a write equal to its value,
-    // so a query that did not change triggers nothing.
+    // A primitive atom ignores a write equal to its value, so a query that did
+    // not change triggers nothing.
     const debouncedQueryAtom = atom('');
 
     // Jotai has no debounce; a timer restarted on every keystroke.
@@ -353,9 +353,9 @@ export const createSearch = () => {
         }, debounceMs);
     };
 
-    // Jotai aborts `signal` when a dependency changes and the atom is
-    // read again, and ignores the promise it returned. Unsubscribing does
-    // not abort it, so disposal brings a signal of its own.
+    // Jotai aborts `signal` when a dependency changes and the atom is read again,
+    // and ignores the promise it returned. Unsubscribing does not abort it, so
+    // disposal brings a signal of its own.
     const disposal = new AbortController();
 
     const resultAtom = atom(
@@ -371,8 +371,8 @@ export const createSearch = () => {
         },
     );
 
-    // An async atom suspends; unwrap turns the pending promise into a
-    // fallback value, which carries no query of its own.
+    // An async atom suspends; unwrap turns the pending promise into a fallback
+    // value, which carries no query of its own.
     const unwrappedAtom = unwrap(resultAtom, () => undefined);
 
     const searchStateAtom = atom(
@@ -383,8 +383,8 @@ export const createSearch = () => {
             },
     );
 
-    // Nothing is computed, and no request sent, until an atom is
-    // subscribed to (useAtomValue in a component does this).
+    // Nothing is computed, and no request sent, until an atom is subscribed to
+    // (useAtomValue in a component does this).
     const unsubscribe = store.sub(searchStateAtom, () => {});
 
     return {
@@ -447,8 +447,8 @@ export const createSearch = () => {
         },
     });
 
-    // Fetch: a separate listener, so that a keystroke does not cancel
-    // a request; only the next debounced query does, by aborting `signal`.
+    // Fetch: a separate listener, so that a keystroke does not cancel a request;
+    // only the next debounced query does, by aborting `signal`.
     listener.startListening({
         actionCreator: queryDebounced,
         effect: async (action, api) => {
@@ -467,8 +467,8 @@ export const createSearch = () => {
             try {
                 const items = await fetchItems(q, api.signal);
 
-                // A cancelled run reports nothing, whether its request
-                // settled before the abort or rejected because of it.
+                // A cancelled run reports nothing, whether its request settled before
+                // the abort or rejected because of it.
                 if (!api.signal.aborted) {
                     api.dispatch(searchSucceeded({ query: q, items }));
                 }
@@ -571,12 +571,12 @@ export const createSearch = () =>
     createRoot((dispose) => {
         const [query, setQuery] = createSignal('');
 
-        // A signal ignores a write equal to its value,
-        // so a query that did not change triggers nothing.
+        // A signal ignores a write equal to its value, so a query that did not
+        // change triggers nothing.
         const [debouncedQuery, setDebouncedQuery] = createSignal('');
 
-        // There is no debounce; an effect whose cleanup clears the timer
-        // runs again on every keystroke.
+        // There is no debounce; an effect whose cleanup clears the timer runs again
+        // on every keystroke.
         createEffect(() => {
             const q = query().trim();
 
@@ -588,8 +588,8 @@ export const createSearch = () =>
         });
 
         // createResource ignores a stale response but hands the fetcher no
-        // AbortSignal. One controller per query, aborted by the cleanup that
-        // runs when the query changes and when the root is disposed:
+        // AbortSignal. One controller per query, aborted by the cleanup that runs
+        // when the query changes and when the root is disposed:
         const signal = createMemo(() => {
             debouncedQuery();
 
@@ -652,14 +652,14 @@ export const createSearch = () =>
 export const createSearch = () => {
     const query = signal('');
 
-    // A signal ignores a write equal to its value,
-    // so a query that did not change triggers nothing.
+    // A signal ignores a write equal to its value, so a query that did not change
+    // triggers nothing.
     const debouncedQuery = signal('');
 
     const searchState = signal<SearchState>(idleState);
 
-    // There is no debounce; an effect whose cleanup clears the timer
-    // runs again on every keystroke.
+    // There is no debounce; an effect whose cleanup clears the timer runs again
+    // on every keystroke.
     const disposeDebounce = effect(() => {
         const q = query.value.trim();
 

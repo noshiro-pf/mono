@@ -31,8 +31,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  *   may be older.
  *
  * Both exist because they answer different questions. `local` fails on a
- * regression before it ships; `published` fails when something already
- * released is broken, which no amount of checking a working tree can tell you.
+ * regression before it ships; `published` fails when something already released
+ * is broken, which no amount of checking a working tree can tell you.
  *
  * The repository has shipped, and every check it had passed each time:
  * executables importing packages a consumer is never given, and `module` /
@@ -73,8 +73,8 @@ export const verifyNpmPackages = async (
     return generated;
   }
 
-  // What the space actually contains, which in the published space is not
-  // every publishable package — see `generateSpace`.
+  // What the space actually contains, which in the published space is not every
+  // publishable package — see `generateSpace`.
   const included = generated.value;
 
   console.info(
@@ -93,8 +93,8 @@ export const verifyNpmPackages = async (
 };
 
 /**
- * Writes the committed files of the `local` space and nothing else: no pack,
- * no install, no check.
+ * Writes the committed files of the `local` space and nothing else: no pack, no
+ * install, no check.
  *
  * What they say comes from the manifests in this checkout alone (the tarball
  * paths do not carry a version, and the peers are read from the workspace), so
@@ -118,8 +118,8 @@ export const generateLocalSpace = async (): Promise<
 };
 
 /**
- * Runs `check` with the repository's own `@typescript/lib-*` links removed,
- * and puts them back afterwards, whatever `check` returned.
+ * Runs `check` with the repository's own `@typescript/lib-*` links removed, and
+ * puts them back afterwards, whatever `check` returned.
  *
  * The root `prepare` links the strict library into the repository's
  * `node_modules/@typescript/`, and every project in the space sits below it.
@@ -168,17 +168,17 @@ const withoutRootLibLinks = async (
  * resolves more of them at the importer, and in one workspace the importer is
  * shared: measured on this space, `eslint-plugin-ts-data-forge` was handed
  * `typescript@7.0.2` against its own `>=5.0.0 <7.0.0` peer range, because the
- * `ts-type-forge` project next to it asks for `typescript: latest`. That is
- * the same fault the space already splits one project per package to avoid —
- * a package passing the check on something another package brought in — and
- * peers were the way back in.
+ * `ts-type-forge` project next to it asks for `typescript: latest`. That is the
+ * same fault the space already splits one project per package to avoid — a
+ * package passing the check on something another package brought in — and peers
+ * were the way back in.
  *
  * Neither space can be installed incrementally. The tarballs are packed under
  * names without versions in them, so their paths do not change between runs
  * even though their contents do, and pnpm keys a `file:` dependency on the
  * path. Measured: with `cmd-ts` removed from ts-codemod-cli's dependencies,
- * reinstalling — with `--force`, and with the lockfile deleted — still
- * produced a tree containing `cmd-ts`, and the check passed. Only removing
+ * reinstalling — with `--force`, and with the lockfile deleted — still produced
+ * a tree containing `cmd-ts`, and the check passed. Only removing
  * `node_modules` re-extracts the tarball. A pinned version in the published
  * space is a moving target for the same reason.
  */
@@ -197,9 +197,9 @@ const installProjects = async (
     await fs.rm(path.resolve(dir, 'pnpm-lock.yaml'), { force: true });
 
     // `1>&2` because pnpm reports the fault — `ERR_PNPM_NO_MATCHING_VERSION`,
-    // and which package asked for what — on stdout, while Node puts only
-    // stderr into the error it hands back. Without the redirect a failed
-    // install reached CI as "Command failed: pnpm install" and nothing else.
+    // and which package asked for what — on stdout, while Node puts only stderr
+    // into the error it hands back. Without the redirect a failed install
+    // reached CI as "Command failed: pnpm install" and nothing else.
     const installed = await $(
       `pnpm --dir ${dir} install --no-frozen-lockfile 1>&2`,
       { silent: true },
@@ -382,17 +382,15 @@ const checkAdvertisedPaths = async (
  * The packages in this repository depend on each other, and `pnpm pack`
  * resolves `workspace:^` to the version in the checkout — so the tarball of
  * `github-settings-as-code` asks for `octokit-safe-types@^1.2.26` while npm
- * still has 1.2.25. Nearly every package here has a dependent, so without
- * these overrides a `chore: version packages` branch fails to install at all
- * — `ERR_PNPM_NO_MATCHING_VERSION`, until the release it exists to make goes
- * out.
+ * still has 1.2.25. Nearly every package here has a dependent, so without these
+ * overrides a `chore: version packages` branch fails to install at all —
+ * `ERR_PNPM_NO_MATCHING_VERSION`, until the release it exists to make goes out.
  *
- * Off a version branch the range did resolve, but to the sibling on npm,
- * which is the older one. The `local` space is meant to be what the next
- * release will be, and the packages in it are released together, so the
- * sibling it installs should come from this checkout either way. That the
- * declared range matches what is published is the `published` space's
- * question, not this one's.
+ * Off a version branch the range did resolve, but to the sibling on npm, which
+ * is the older one. The `local` space is meant to be what the next release will
+ * be, and the packages in it are released together, so the sibling it installs
+ * should come from this checkout either way. That the declared range matches
+ * what is published is the `published` space's question, not this one's.
  */
 const siblingOverrides = (
   dir: string,
@@ -482,8 +480,8 @@ const isTypesOnly = (packageName: string): boolean =>
 
 /**
  * What the last generation wrote, read back the way `readPinnedVersion` reads
- * the pin: everything in the project's `dependencies` except the package
- * itself and the `typescript` a types-only check compiles against.
+ * the pin: everything in the project's `dependencies` except the package itself
+ * and the `typescript` a types-only check compiles against.
  */
 const readCommittedPeers = async (
   dir: string,
@@ -521,14 +519,14 @@ const readCommittedPeers = async (
 
 /**
  * The peer dependencies the package under check declares, written into the
- * project as ordinary dependencies — which is what a consumer has to do with
- * a peer anyway.
+ * project as ordinary dependencies — which is what a consumer has to do with a
+ * peer anyway.
  *
- * They used to be left out, on the reasoning that pnpm installs a peer from
- * the range the *installed* package declares, so the published space would
- * exercise the published range without this file having to know it. pnpm 12
- * resolves a peer at the importer in more cases, and an importer that
- * declares nothing gets nothing: measured on this space, every ESLint plugin
+ * They used to be left out, on the reasoning that pnpm installs a peer from the
+ * range the *installed* package declares, so the published space would exercise
+ * the published range without this file having to know it. pnpm 12 resolves a
+ * peer at the importer in more cases, and an importer that declares nothing
+ * gets nothing: measured on this space, every ESLint plugin
  * `eslint-config-typed` pulls in lost its `eslint` peer, and
  * `eslint-plugin-unicorn` then found the monorepo's copy — outside the space,
  * which is the one thing `isolate.mjs` exists to catch.
@@ -544,8 +542,8 @@ const readCommittedPeers = async (
  *   right, and the check does not spend thirty-two registry round trips on
  *   every run to be told what it already knows.
  *
- * An optional peer is left out. It is optional because a consumer may not
- * have it, and a consumer who does not is the case worth checking.
+ * An optional peer is left out. It is optional because a consumer may not have
+ * it, and a consumer who does not is the case worth checking.
  */
 const peerSpecs = async (
   target: Target,
@@ -590,8 +588,8 @@ const peerSpecs = async (
  * npm reports an unknown package as `E404`, on stderr, which `exec` folds into
  * the error's message. Matched on the code rather than on the prose so that a
  * reworded message does not turn a missing package into a hard failure — and
- * narrowly enough that a 404 from somewhere else in the output does not read
- * as one.
+ * narrowly enough that a 404 from somewhere else in the output does not read as
+ * one.
  */
 const npmSaysNotFound = (message: string): boolean =>
   message.includes('E404') || message.includes('is not in this registry');
@@ -630,8 +628,8 @@ const readPinnedVersion = async (
  * The published space pins an exact version, committed, rather than tracking
  * `latest`. Two reasons: the check then only has something new to say when the
  * pin moves, and it cannot start failing on its own the moment a release goes
- * out. `--update` moves the pins, and `pnpm-update` is what runs it — a
- * version bump arrives as a reviewable diff like any other dependency.
+ * out. `--update` moves the pins, and `pnpm-update` is what runs it — a version
+ * bump arrives as a reviewable diff like any other dependency.
  *
  * Returns `undefined` for a package named in `notYetPublished` that the
  * registry does not have. Any other package the registry does not have is an
@@ -674,9 +672,9 @@ const publishedVersionPin = async (
 };
 
 /**
- * A package that publishes types only is checked by compiling against it
- * rather than importing it — there is nothing to import. Its check is written
- * as `.mts`, and the presence of that file is what selects the mode.
+ * A package that publishes types only is checked by compiling against it rather
+ * than importing it — there is nothing to import. Its check is written as
+ * `.mts`, and the presence of that file is what selects the mode.
  */
 const smokeFileName = (packageName: string): string =>
   isTypesOnly(packageName)
@@ -686,8 +684,8 @@ const smokeFileName = (packageName: string): string =>
 /**
  * The strict standard library packages all share one check, because they only
  * differ by the TypeScript minor they were generated from — and what is being
- * verified is the same for each: that the published tarball's `libs/` layout
- * is what `libReplacement` asks for.
+ * verified is the same for each: that the published tarball's `libs/` layout is
+ * what `libReplacement` asks for.
  */
 const smokeSourceName = (packageName: string): string =>
   isStrictLibPackage(packageName)
@@ -695,16 +693,14 @@ const smokeSourceName = (packageName: string): string =>
     : smokeFileName(packageName);
 
 /**
- * The `compilerOptions` a strict standard library package's own README tells
- * a consumer to write beside the linker. Nothing for a package that is not
- * one.
+ * The `compilerOptions` a strict standard library package's own README tells a
+ * consumer to write beside the linker. Nothing for a package that is not one.
  *
- * Every version resolves `@typescript/lib-*` by name, which is what the
- * linker the package ships answers; `libReplacement` stops defaulting to on at
+ * Every version resolves `@typescript/lib-*` by name, which is what the linker
+ * the package ships answers; `libReplacement` stops defaulting to on at
  * TypeScript 6, and is not a known option at all before 5.8, so it is set only
  * where it is both valid and needed. TypeScript 7 also reads `paths` for a lib
- * replacement, which its README offers as a second route — see
- * `hasPathsRoute`.
+ * replacement, which its README offers as a second route — see `hasPathsRoute`.
  */
 const strictLibCompilerOptions = (
   packageName: string,
@@ -753,8 +749,8 @@ const smokeTsconfig = (
  * The TypeScript a package is compiled against. A strict standard library
  * replaces the declarations of one TypeScript minor and says so in its peer
  * range, so checking it against anything else checks nothing: TypeScript 7
- * rejects `strict-ts-lib-v5.6` outright, because `lib.es2022.sharedmemory`
- * — which those declarations reference — no longer exists upstream.
+ * rejects `strict-ts-lib-v5.6` outright, because `lib.es2022.sharedmemory` —
+ * which those declarations reference — no longer exists upstream.
  */
 const typescriptSpec = (pkg: PackageToCheck): string => {
   const { manifest } = pkg;
@@ -791,8 +787,8 @@ const writeJson = async (file: string, value: unknown): Promise<void> => {
  * Writes the space: one project per package, each depending only on that
  * package and the peers it needs, with the shared check copied in.
  *
- * The files are generated and committed, so that CI's repository-is-clean
- * check fails if `verify-npm-packages/smoke/` and the spaces ever disagree.
+ * The files are generated and committed, so that CI's repository-is-clean check
+ * fails if `verify-npm-packages/smoke/` and the spaces ever disagree.
  */
 const generateSpace = async (
   target: Target,
@@ -892,9 +888,9 @@ const generateSpace = async (
     }
   }
 
-  // The generated files are committed, and CI checks the working tree is
-  // clean. Formatting them here means regenerating never shows up as a diff
-  // just because `JSON.stringify` and Prettier disagree about line breaks.
+  // The generated files are committed, and CI checks the working tree is clean.
+  // Formatting them here means regenerating never shows up as a diff just
+  // because `JSON.stringify` and Prettier disagree about line breaks.
   const formatted = await formatFilesGlob(
     `${spaceDir}/**/*.{json,mjs,mts,yaml}`,
     {
@@ -916,8 +912,8 @@ const generateSpace = async (
 };
 
 /**
- * Packages that are in the workspace but not on npm yet, and so are left out
- * of the published space.
+ * Packages that are in the workspace but not on npm yet, and so are left out of
+ * the published space.
  *
  * A package's first publish is manual (`libs/first-release.md`): npm's trusted
  * publishing is configured per package and cannot be configured before the
@@ -934,10 +930,10 @@ const generateSpace = async (
  *
  * "Published" has to mean *working*, not merely present. A first publish that
  * happens before the sibling release its code needs is on the registry and
- * broken: `eslint-plugin-ts-std-forge@0.1.0` shipped importing `SafeArray`
- * from `ts-std-forge`, with `workspace:*` resolved to the exact `0.4.0` in the
- * checkout — a version that does not have it. Removing the entry then only
- * pins the breakage. Wait for the release that fixes it.
+ * broken: `eslint-plugin-ts-std-forge@0.1.0` shipped importing `SafeArray` from
+ * `ts-std-forge`, with `workspace:*` resolved to the exact `0.4.0` in the
+ * checkout — a version that does not have it. Removing the entry then only pins
+ * the breakage. Wait for the release that fixes it.
  */
 const notYetPublished: ReadonlySet<string> = new Set<string>();
 

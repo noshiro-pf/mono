@@ -3,8 +3,8 @@ import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 
 /**
- * `test:rules` only: the tests under `test/` need the Firestore emulator,
- * which `vitest.config.mts` (and so `check:test`) leaves out.
+ * `test:rules` only: the tests under `test/` need the Firestore emulator, which
+ * `vitest.config.mts` (and so `check:test`) leaves out.
  */
 export default defineViteConfig({
   packageRoot: workspaceRootPath,

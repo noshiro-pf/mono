@@ -37,8 +37,8 @@ export const toNodes = (nodes: MountedNodes): readonly ChildNode[] =>
   Arr.isArray(nodes) ? nodes : ([nodes] as const);
 
 /**
- * Tells a child from any other value, one level deep: the elements of an
- * array are checked as they are mounted.
+ * Tells a child from any other value, one level deep: the elements of an array
+ * are checked as they are mounted.
  */
 export const isChild = (value: unknown): value is Child =>
   Arr.isArray(value) ||

@@ -76,8 +76,8 @@ export const getReactMemoArrowFunction = (
 };
 
 /**
- * The outermost type wrapper whose value is `node`'s, or `node` itself when
- * its parent is not one: from the arrow function in
+ * The outermost type wrapper whose value is `node`'s, or `node` itself when its
+ * parent is not one: from the arrow function in
  * `((props) => <div />) satisfies React.FC as React.FC`, the `as` expression.
  * A rule that asks where a value ends up (a variable's initializer, a call's
  * argument) asks it of the node this returns.

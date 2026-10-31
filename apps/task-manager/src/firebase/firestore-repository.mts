@@ -2,15 +2,15 @@
  * The {@link Repository} of one project in Cloud Firestore:
  * `projects/{projectId}/tasks/{taskId}`,
  * `projects/{projectId}/milestones/{milestoneId}` and
- * `projects/{projectId}/groups/{groupId}`, each document a record without
- * its id, and the DAG's layout in
- * `projects/{projectId}/settings/dagLayout` (`repository/converters.mts`).
- * Every read and write goes through `api/firestore-io.mts`, which prunes
- * each document written to its codec.
+ * `projects/{projectId}/groups/{groupId}`, each document a record without its
+ * id, and the DAG's layout in `projects/{projectId}/settings/dagLayout`
+ * (`repository/converters.mts`).
+ * Every read and write goes through `api/firestore-io.mts`, which prunes each
+ * document written to its codec.
  *
- * The listeners hand back local writes at once, and the persistent cache
- * set up in `firebase-backend.mts` keeps the data readable — and writable,
- * queued — offline.
+ * The listeners hand back local writes at once, and the persistent cache set up
+ * in `firebase-backend.mts` keeps the data readable — and writable, queued —
+ * offline.
  */
 
 import { collection, doc, type Firestore } from 'firebase/firestore';
@@ -94,8 +94,8 @@ export const createFirestoreRepository = (
 
       let mut_milestones: readonly Milestone[] | undefined = undefined;
 
-      // Nothing is handed on until both collections have loaded, so that a
-      // task is never shown blocked on a milestone that has not arrived yet.
+      // Nothing is handed on until both collections have loaded, so that a task
+      // is never shown blocked on a milestone that has not arrived yet.
       const emit = (): void => {
         if (mut_tasks !== undefined && mut_milestones !== undefined) {
           observer.next({ tasks: mut_tasks, milestones: mut_milestones });
@@ -199,8 +199,8 @@ export const createFirestoreRepository = (
     putDagLayout: (layout, updatedAt) =>
       putDoc(dagLayout, dagLayoutToDoc(layout, updatedAt)),
     replaceProject: async (next, previous, updatedAt) => {
-      // What is written is sent, and confirmed, before anything is
-      // deleted, so that a failure leaves more than before, never less.
+      // What is written is sent, and confirmed, before anything is deleted, so
+      // that a failure leaves more than before, never less.
       await commitInBatches(firestore, (batch) => {
         for (const task of next.state.tasks) {
           batch.set(taskDoc(task.id), taskToDoc(task));

@@ -1,15 +1,15 @@
 /**
- * The groups on the DAG: a frame with rounded corners round the nodes of
- * each, as they are drawn, with room above them for the group's title — so
- * a frame follows its nodes wherever they are put, and nothing of it is
- * stored but where it was. A group none of whose nodes is drawn (it has
- * none, or they are hidden) is an empty frame of a fixed size: where it was
- * when the arrangement last changed (`DagLayout.groupPositions`), or where
+ * The groups on the DAG: a frame with rounded corners round the nodes of each,
+ * as they are drawn, with room above them for the group's title — so a frame
+ * follows its nodes wherever they are put, and nothing of it is stored but
+ * where it was. A group none of whose nodes is drawn (it has none, or they are
+ * hidden) is an empty frame of a fixed size: where it was when the arrangement
+ * last changed (`DagLayout.groupPositions`), or where
  * ELK put its box, moved clear of the nodes, if it never was anywhere.
  *
- * A node dropped with its centre inside a frame goes into that group, and
- * one dropped outside every frame into none (`dropTarget`). The frames are
- * those drawn when the node was picked up, which do not follow it.
+ * A node dropped with its centre inside a frame goes into that group, and one
+ * dropped outside every frame into none (`dropTarget`). The frames are those
+ * drawn when the node was picked up, which do not follow it.
  */
 
 import { Arr, Num } from 'ts-data-forge';
@@ -65,9 +65,9 @@ export const frameTitle = (title: string, width: number): string =>
   );
 
 /**
- * Every one of `groups`, in their order, with the nodes of `state` in it
- * that are not `hidden`, in the order of `listNodes`. A node whose group is
- * not one of `groups` is in none.
+ * Every one of `groups`, in their order, with the nodes of `state` in it that
+ * are not `hidden`, in the order of `listNodes`. A node whose group is not one
+ * of `groups` is in none.
  */
 export const groupMembership = (
   state: DomainState,
@@ -160,8 +160,8 @@ export const groupFrames = (
 
 /**
  * Where the frame of each of `groups` that has no member among `nodes` is
- * drawn: where `stored` has it, or else where ELK put its box (`auto`),
- * moved clear of `nodes` and of the empty frames placed before it. A group
+ * drawn: where `stored` has it, or else where ELK put its box (`auto`), moved
+ * clear of `nodes` and of the empty frames placed before it. A group
  * ELK has not laid out yet is not drawn.
  */
 export const placeEmptyGroups = (
@@ -216,8 +216,8 @@ export const placeEmptyGroups = (
 };
 
 /**
- * The group a node dropped as `box` goes into: the last of `drawn` — the
- * one drawn on top — that has the centre of the box inside it, or none.
+ * The group a node dropped as `box` goes into: the last of `drawn` — the one
+ * drawn on top — that has the centre of the box inside it, or none.
  */
 export const dropTarget = (
   drawn: readonly GroupFrame[],

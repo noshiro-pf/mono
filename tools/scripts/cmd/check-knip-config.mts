@@ -9,9 +9,9 @@ import { projectRootPath } from '../project-root-path.mjs';
  * Fails when `knip.jsonc` does not parse, or when a workspace entry contains
  * another workspace path as a key.
  *
- * Both halves come from the same accident, which happened three times in a
- * row (#1758 / #1754 / #1756). Adding an app means inserting a block after
- * the previous entry's closing brace, and most of those blocks are
+ * Both halves come from the same accident, which happened three times in a row
+ * (#1758 / #1754 / #1756). Adding an app means inserting a block after the
+ * previous entry's closing brace, and most of those blocks are
  * byte-identical — five share `{"entry": ["src/index.mts"], "project":
  * ["**\/*.mts"]}` alone — so an edit anchored on `"entry": [...]` lands
  * *inside* the preceding entry instead of after it. The victim loses its
@@ -24,8 +24,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  * entry that was damaged.
  *
  * The nesting half matters because the brace arithmetic does not always come
- * out unbalanced: shift the insertion point and the same mistake yields a
- * file that parses cleanly while silently disabling the entry it swallowed.
+ * out unbalanced: shift the insertion point and the same mistake yields a file
+ * that parses cleanly while silently disabling the entry it swallowed.
  */
 export const checkKnipConfig = async (): Promise<Result<number, string>> => {
   const configPath = path.resolve(projectRootPath, 'knip.jsonc');
@@ -98,9 +98,9 @@ type Violation = Readonly<{ owner: string; key: string }>;
 
 /**
  * knip's own workspace options are bare identifiers (`entry`, `project`,
- * `ignore`, …) or plugin names; only a workspace key carries a `/`. Matching
- * on the workspace globs in `pnpm-workspace.yaml` keeps the rule narrow
- * enough that a future knip option containing a slash would not trip it.
+ * `ignore`, …) or plugin names; only a workspace key carries a `/`. Matching on
+ * the workspace globs in `pnpm-workspace.yaml` keeps the rule narrow enough
+ * that a future knip option containing a slash would not trip it.
  */
 const looksLikeWorkspacePath = (key: string): boolean =>
   ['apps/', 'libs/', 'tools/', 'languages/', 'strict-lib/'].some((prefix) =>

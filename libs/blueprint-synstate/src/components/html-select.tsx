@@ -32,16 +32,15 @@ type Props = Readonly<{
 }>;
 
 /**
- * Blueprint's `HTMLSelect`: a native `<select>` in the wrapper that carries
- * the modifier classes, with the double caret that says it opens.
+ * Blueprint's `HTMLSelect`: a native `<select>` in the wrapper that carries the
+ * modifier classes, with the double caret that says it opens.
  *
  * The wrapper is a `<span>` where Blueprint has a `<div>`, so that it may sit
  * inside a `<label>`; the styles hang off the classes alone.
  *
- * The value is written again once each update has finished, when the
- * options it may have brought are in place: an option and the value that
- * picks it can change together, and the value is bound before the option
- * is there.
+ * The value is written again once each update has finished, when the options it
+ * may have brought are in place: an option and the value that picks it can
+ * change together, and the value is bound before the option is there.
  */
 export const HtmlSelect = ({
   value,

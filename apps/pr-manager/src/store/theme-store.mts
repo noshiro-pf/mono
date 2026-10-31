@@ -1,7 +1,7 @@
 /**
  * Light or dark: what the reader chose, and what the system prefers. What a
- * pick means is `theme.mts`; this holds the two values and writes the first
- * to the page and the URL whenever it changes.
+ * pick means is `theme.mts`; this holds the two values and writes the first to
+ * the page and the URL whenever it changes.
  */
 
 import {

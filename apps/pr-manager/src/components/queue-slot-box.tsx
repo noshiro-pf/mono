@@ -13,9 +13,9 @@ type Props = Readonly<{
 
 /**
  * One box of the queue (`queue-section.tsx`): the number, the priority on a
- * pill across the top edge as on the DAG's nodes, and a word on why it
- * waits, or what it is. The title is in it for a screen reader, which the
- * tooltip is hidden from.
+ * pill across the top edge as on the DAG's nodes, and a word on why it waits,
+ * or what it is. The title is in it for a screen reader, which the tooltip is
+ * hidden from.
  */
 export const QueueSlotBox = ({ slot$, onShow, onHide }: Props): JSX.Element => (
   <ExternalLink

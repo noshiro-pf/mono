@@ -15,8 +15,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * One bucket set: a row per depth index, its slots, and its length. A slot
- * at or past the length is not in use, and is drawn faded.
+ * One bucket set: a row per depth index, its slots, and its length. A slot at
+ * or past the length is not in use, and is drawn faded.
  */
 export const TraceBucketSet = React.memo<Props>((props) => {
   const { set, level, changed } = props;

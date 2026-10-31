@@ -47,8 +47,8 @@ import {
 import { headShaFromListing } from './util.mjs';
 
 /**
- * The credential and the repository every call here takes, and the branch
- * the queue lands on. `repoOption` is `--repo owner/name`, when given.
+ * The credential and the repository every call here takes, and the branch the
+ * queue lands on. `repoOption` is `--repo owner/name`, when given.
  */
 export const checkPreflight = async (
   repoOption: string | undefined,
@@ -84,8 +84,8 @@ export const checkPreflight = async (
 };
 
 /**
- * The open pull requests, newest first, at most {@link OPEN_LIMIT} of them
- * as `gh pr list` read. GraphQL, because `mergeStateStatus` is not in REST.
+ * The open pull requests, newest first, at most {@link OPEN_LIMIT} of them as
+ * `gh pr list` read. GraphQL, because `mergeStateStatus` is not in REST.
  */
 export const listPullRequests = async (
   api: ApiContext,
@@ -131,9 +131,9 @@ export const viewPullRequest = async (
   );
 
 /**
- * `REVIEW_REQUIRED`, `CHANGES_REQUESTED`, `APPROVED`, or empty when the
- * rules ask for no review. Read only when a green pull request will not
- * merge, to say what holds it.
+ * `REVIEW_REQUIRED`, `CHANGES_REQUESTED`, `APPROVED`, or empty when the rules
+ * ask for no review. Read only when a green pull request will not merge, to say
+ * what holds it.
  */
 export const viewReviewDecision = async (
   api: ApiContext,
@@ -161,8 +161,8 @@ export const viewReviewDecision = async (
 
 /**
  * A pull request as GraphQL answers it, in the shape every module here reads
- * ({@link PullRequestSchema}): only the labels differ, a connection there and
- * a list here.
+ * ({@link PullRequestSchema}): only the labels differ, a connection there and a
+ * list here.
  */
 export const pullRequestOfNode = (
   node: t.TypeOf<typeof PullRequestNodeSchema>,
@@ -197,8 +197,8 @@ const PullRequestNodeSchema = t.record({
 
 /**
  * The tip of `branch` on `origin`, by its whole ref name
- * (`headShaFromListing`): the default branch read as the version pull
- * request's branch is a set-aside recorded against a base that never moves.
+ * (`headShaFromListing`): the default branch read as the version pull request's
+ * branch is a set-aside recorded against a base that never moves.
  */
 export const remoteSha = async (
   branch: string,
@@ -219,9 +219,9 @@ export const remoteSha = async (
 };
 
 /**
- * What GitHub enforces on the branch, every ruleset that applies to it
- * together — rather than what `repo-settings/` declares, which changes
- * nothing until it is applied.
+ * What GitHub enforces on the branch, every ruleset that applies to it together
+ * — rather than what `repo-settings/` declares, which changes nothing until it
+ * is applied.
  */
 export const readBranchRules = async (
   api: ApiContext,
@@ -273,9 +273,9 @@ export const readReviewStates = async (
     '  author { login }',
     '  latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
     `  files(first: ${PAGE_SIZE}) { pageInfo { hasNextPage } nodes { path } }`,
-    // A pull request with more conversations than one page is counted from
-    // the first page. Undercounting only ever holds less, and holding less
-    // is what happened before this was read at all.
+    // A pull request with more conversations than one page is counted from the
+    // first page. Undercounting only ever holds less, and holding less is what
+    // happened before this was read at all.
     `  reviewThreads(first: ${PAGE_SIZE}) { nodes { isResolved } }`,
     '}',
   ].join('\n');
@@ -430,8 +430,8 @@ export const readIssueOrder = async (
 };
 
 /**
- * What an issue waits for is its `Start-After:` and the issues GitHub
- * records as blocking it, read as one (`pr-report-core`'s `waitsFor`).
+ * What an issue waits for is its `Start-After:` and the issues GitHub records
+ * as blocking it, read as one (`pr-report-core`'s `waitsFor`).
  */
 const CLOSING_ISSUE_FIELDS =
   'number state body blockedBy(first: 20) { nodes { number repository { nameWithOwner } } }';
@@ -470,9 +470,9 @@ export const readSetAsideComments = async (
 /**
  * This account's set-aside comment, and the standing claim a session wrote
  * (`claims.mts`), on each of `numbers` that has one, in one GraphQL request:
- * every number goes in as a variable and each pull request comes back under
- * its own alias. `pr-report-core`'s `set-aside.mts` says why only
- * `viewerDidAuthor` counts; of several of a kind, the oldest is the one.
+ * every number goes in as a variable and each pull request comes back under its
+ * own alias. `pr-report-core`'s `set-aside.mts` says why only `viewerDidAuthor`
+ * counts; of several of a kind, the oldest is the one.
  */
 export const readOwnComments = async (
   api: ApiContext,
@@ -585,9 +585,9 @@ export const readOwnComments = async (
 };
 
 /**
- * Writes `body` as the pull request's set-aside comment: over `existing`,
- * this account's own, when there is one — a pull request has one, edited in
- * place — and as a new comment otherwise.
+ * Writes `body` as the pull request's set-aside comment: over `existing`, this
+ * account's own, when there is one — a pull request has one, edited in place —
+ * and as a new comment otherwise.
  */
 export const writeSetAsideCommentOn = async (
   api: ApiContext,
@@ -609,8 +609,8 @@ export const writeSetAsideCommentOn = async (
   );
 
 /**
- * Every change of the pull request's base its timeline records, oldest
- * first; `stack.mts` reads which branch GitHub moved it off.
+ * Every change of the pull request's base its timeline records, oldest first;
+ * `stack.mts` reads which branch GitHub moved it off.
  *
  * GraphQL, because the REST timeline does not say which branches a change of
  * base was between.
@@ -663,8 +663,8 @@ export const readNativeStack = async (
 
 /**
  * The head the last merged pull request from `branch` was merged at, and the
- * commit its merge made, or `undefined` when none was — the layer a
- * retargeted pull request was stacked on, whose commits it may still carry.
+ * commit its merge made, or `undefined` when none was — the layer a retargeted
+ * pull request was stacked on, whose commits it may still carry.
  */
 export const mergedHeadOf = async (
   api: ApiContext,
@@ -707,9 +707,9 @@ export const latestMergedHead = (
 };
 
 /**
- * Arms auto-merge, squash being the one method the ruleset allows. The
- * mutation refuses when nothing holds the pull request, where
- * `gh pr merge --auto` would merge it on the spot.
+ * Arms auto-merge, squash being the one method the ruleset allows. The mutation
+ * refuses when nothing holds the pull request, where `gh pr merge --auto` would
+ * merge it on the spot.
  */
 export const armAutoMerge = async (
   api: ApiContext,
@@ -719,8 +719,8 @@ export const armAutoMerge = async (
 
 /**
  * Every check run GitHub Actions reported on one commit, every job of every
- * workflow rather than only the required aggregates, so that a failure can
- * be traced to the matrix entry under the aggregate. Other apps' runs — the
+ * workflow rather than only the required aggregates, so that a failure can be
+ * traced to the matrix entry under the aggregate. Other apps' runs — the
  * codecov ones — are left out: nothing here can act on them, and none is
  * required.
  */
@@ -757,8 +757,8 @@ export const listCheckRuns = async (
           name: run.name,
           status: run.status,
           conclusion: run.conclusion ?? undefined,
-          // Not read: a fix is planned once the checks have failed, not
-          // while a newer round is running.
+          // Not read: a fix is planned once the checks have failed, not while a
+          // newer round is running.
           round: undefined,
         });
       }

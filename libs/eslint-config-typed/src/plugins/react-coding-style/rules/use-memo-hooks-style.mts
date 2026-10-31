@@ -30,8 +30,8 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
         return;
       }
 
-      // `!` and `satisfies` leave the type to `useMemo`; an `as` over them,
-      // as in `React.useMemo(...)! as T`, does not.
+      // `!` and `satisfies` leave the type to `useMemo`; an `as` over them, as
+      // in `React.useMemo(...)! as T`, does not.
       const { parent } = skipNonAssertingParents(node);
 
       if (

@@ -5,9 +5,9 @@ import type { ESLintFlatConfig, ESLintPlugin } from './types.mjs';
 /**
  * Every rule this plugin ships, at `error`.
  *
- * The `satisfies` clause below is keyed off {@link tsStdForgeRules}, so leaving a
- * rule out, naming one that does not exist, or setting one to anything
- * but `error` fails to type-check. That is the whole check; no test repeats it.
+ * The `satisfies` clause below is keyed off {@link tsStdForgeRules}, so leaving
+ * a rule out, naming one that does not exist, or setting one to anything but
+ * `error` fails to type-check. That is the whole check; no test repeats it.
  */
 const recommendedRules = {
   'ts-std-forge/prefer-is-non-null-object': 'error',
@@ -28,8 +28,8 @@ const recommendedConfig = {
     // `eslintPluginTsStdForge` refers to. ESLint rejects a plugin name that
     // maps to two different objects with `Cannot redefine plugin`, which is
     // what a user combining this preset with their own
-    // `plugins: { 'ts-std-forge': eslintPluginTsStdForge }` entry would hit
-    // if the preset embedded a separate copy of the plugin.
+    // `plugins: { 'ts-std-forge': eslintPluginTsStdForge }` entry would hit if
+    // the preset embedded a separate copy of the plugin.
     get 'ts-std-forge'(): ESLintPlugin {
       return eslintPluginTsStdForge;
     },

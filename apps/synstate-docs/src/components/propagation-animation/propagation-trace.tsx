@@ -32,8 +32,8 @@ type Props = Readonly<{
 
 /**
  * Steps through one update as synstate runs it, showing every field the
- * propagation reads or writes: the module state and its buckets, the queues
- * of the updates open, the locals, and each node's token and mark.
+ * propagation reads or writes: the module state and its buckets, the queues of
+ * the updates open, the locals, and each node's token and mark.
  */
 export const PropagationTrace = React.memo<Props>((props) => {
   const { scenario, update, lang } = props;
@@ -138,8 +138,8 @@ export const PropagationTrace = React.memo<Props>((props) => {
   const isLast = index === lastIndex;
 
   // The same figure, in the page and, while expanded, in a modal dialog
-  // covering the window; they differ only in the button that opens or
-  // closes the dialog, shown above the figure.
+  // covering the window; they differ only in the button that opens or closes
+  // the dialog, shown above the figure.
   const content = (windowButton: React.ReactNode): React.ReactNode => (
     <>
       <div className={'propagation-trace-toolbar'}>{windowButton}</div>

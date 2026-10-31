@@ -79,8 +79,8 @@ export const createSessionStore = (): SessionStore => {
     setSession({ type: 'signed-out', error: undefined, signingIn: true });
 
     backend.signIn().catch((error: unknown) => {
-      // A successful sign-in is reported through `watchSession`; only a
-      // failure comes back here.
+      // A successful sign-in is reported through `watchSession`; only a failure
+      // comes back here.
       if (getSnapshot().type === 'signed-out') {
         setSession({
           type: 'signed-out',

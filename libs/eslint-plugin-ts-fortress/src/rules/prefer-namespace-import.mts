@@ -178,8 +178,8 @@ const isBare = (declaration: TSESTree.ImportDeclaration): boolean =>
   Arr.isEmpty(declaration.specifiers);
 
 /**
- * The namespace member the references of a specifier become — `undefined` for
- * a default import, whose references become the namespace itself. The result is
+ * The namespace member the references of a specifier become — `undefined` for a
+ * default import, whose references become the namespace itself. The result is
  * `undefined` for an import name that is not an identifier
  * (`import { 'not an identifier' as x }`), which no member access can spell.
  */
@@ -274,9 +274,9 @@ const buildFixPlan = (
     (declaration) => declaration.importKind === 'type',
   );
 
-  // `import type * as t` cannot carry a value reference, so a value import
-  // does not merge into one; a namespace import of its own would be a second
-  // one, which the check above rules out.
+  // `import type * as t` cannot carry a value reference, so a value import does
+  // not merge into one; a namespace import of its own would be a second one,
+  // which the check above rules out.
   if (!typeOnly && reused?.parent.importKind === 'type') {
     return undefined;
   }

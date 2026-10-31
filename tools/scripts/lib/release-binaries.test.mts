@@ -162,8 +162,8 @@ describe('installReleaseBinary', () => {
 
     expect(download).toHaveBeenCalledOnce();
 
-    // Each use extracts into a directory of its own, so a concurrent run
-    // cannot remove the binary another is running.
+    // Each use extracts into a directory of its own, so a concurrent run cannot
+    // remove the binary another is running.
     assert.notStrictEqual(second.value, first.value);
 
     assert.strictEqual(spawnSync(first.value).stdout.toString(), 'tool\n');

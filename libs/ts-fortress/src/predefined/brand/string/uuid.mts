@@ -18,8 +18,8 @@ export type UuidBaseString<V extends UuidVersion = UuidVersion> =
   | 'ffffffff-ffff-ffff-ffff-ffffffffffff';
 
 // A UUID always has the dash-separated hexadecimal form, so it is never an
-// empty string; `Uuid` is branded on top of `NonEmptyString` and is
-// assignable to it.
+// empty string; `Uuid` is branded on top of `NonEmptyString` and is assignable
+// to it.
 export type Uuid = Brand<UuidBaseString & NonEmptyString, 'Uuid'>;
 
 export type Uuid4 = Brand<UuidBaseString<4> & NonEmptyString, 'Uuid'>;
@@ -40,8 +40,8 @@ export const uuid = <V extends UuidVersion | UuidVersionAdditionalOption>(
 
   const version = options?.version ?? 'all';
 
-  // Every value accepted is in the hexadecimal form RFC 9562 defines, so it
-  // is also of the JSON Schema `uuid` format.
+  // Every value accepted is in the hexadecimal form RFC 9562 defines, so it is
+  // also of the JSON Schema `uuid` format.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   return annotate(
     brand<UuidBaseString & NonEmptyString, readonly ['Uuid']>({

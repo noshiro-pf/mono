@@ -38,8 +38,8 @@ const upstream = eslintPluginUnicorn.rules?.['prefer-global-this'];
  * `window` / `self` / `global` it names is used to reach members that
  * `typeof globalThis` lacks: `window.history`, or `const { history } = window`
  * when any destructured name is missing. Everything else — the upstream
- * exemptions (`typeof window`, `window.top`, …), its messages and its fix —
- * is the upstream rule's. With the stock library every window member is on
+ * exemptions (`typeof window`, `window.top`, …), its messages and its fix — is
+ * the upstream rule's. With the stock library every window member is on
  * `typeof globalThis`, so the rule then reports exactly what upstream does.
  *
  * The object is read through `as` / `satisfies` / `!` / `<T>`:

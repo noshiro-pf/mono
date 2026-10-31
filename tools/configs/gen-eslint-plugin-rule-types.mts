@@ -25,8 +25,8 @@ export type GenEslintPluginRuleTypesOptions = Readonly<{
    */
   pluginPrefix: string;
   /**
-   * The runtime dependency the generated drift check imports `expectType`
-   * from. The build's strip pass removes the call and the import it empties.
+   * The runtime dependency the generated drift check imports `expectType` from.
+   * The build's strip pass removes the call and the import it empties.
    */
   expectTypeFrom: 'ts-data-forge' | 'ts-std-forge';
   /** The plugin's rules, keyed by rule name without the prefix. */
@@ -35,8 +35,8 @@ export type GenEslintPluginRuleTypesOptions = Readonly<{
 
 /**
  * Writes `src/rule-types.mts` of an ESLint plugin in this repository — one
- * namespace per rule with its metadata as JSDoc, plus the plugin-wide
- * `…Rules` / `…RulesOption` types — and formats it.
+ * namespace per rule with its metadata as JSDoc, plus the plugin-wide `…Rules`
+ * / `…RulesOption` types — and formats it.
  *
  * A plugin's `scripts/cmd/gen-rule-types.mts` is the call site and nothing
  * else; this is the code that was copied into each of them.
@@ -143,9 +143,9 @@ export const generateRuleTypesFileContent = ({
             '  : T;',
             '',
             '/**',
-            ' * Extracts the options tuple type of a rule from its TypeScript',
-            ' * implementation, so that option types stay in sync with the rule source',
-            ' * without converting `meta.schema` (JSON Schema) back into TypeScript types.',
+            ' * Extracts the options tuple type of a rule from its TypeScript implementation,',
+            ' * so that option types stay in sync with the rule source without converting',
+            ' * `meta.schema` (JSON Schema) back into TypeScript types.',
             ' */',
             `type RuleOptionsOf<Name extends keyof typeof ${rulesObjectName}> =`,
             `  (typeof ${rulesObjectName})[Name] extends TSESLint.RuleModule<`,
@@ -165,8 +165,8 @@ export const generateRuleTypesFileContent = ({
       ),
       '}>;',
       '',
-      // `Readonly<{}>` would be an "empty object" type (any non-nullish
-      // value), so the no-option case gets an explicitly empty record instead.
+      // `Readonly<{}>` would be an "empty object" type (any non-nullish value),
+      // so the no-option case gets an explicitly empty record instead.
       ...(hasAnyOptions
         ? [
             `export type ${rulesOptionTypeName} = Readonly<{`,

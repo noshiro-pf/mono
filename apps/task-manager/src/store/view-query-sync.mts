@@ -1,8 +1,8 @@
 /**
- * Keeps the URL's query saying which screen is shown, and the graph's view
- * mode and filter on it (`view-model/view-query.mts`,
- * `view-model/dag-filter.mts`), so that a reload opens them again. Reading the query when the page loads is `store.mts`'s; this only
- * writes, and only when the URL says something else.
+ * Keeps the URL's query saying which screen is shown, and the graph's view mode
+ * and filter on it (`view-model/view-query.mts`, `view-model/dag-filter.mts`),
+ * so that a reload opens them again. Reading the query when the page loads is
+ * `store.mts`'s; this only writes, and only when the URL says something else.
  */
 
 import { combine, type InitializedObservable } from 'synstate';

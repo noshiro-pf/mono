@@ -89,9 +89,9 @@ export const isIdentifierNamed = (
  * Whether `holds` is true of the type of every layer of type wrappers around
  * `node` (see {@link typeWrapperLayers}), outermost to innermost; `false`
  * without type information. A widening cast (`s as string | number`) is the
- * author saying the value may be more than it is, and is respected; a
- * narrowing one (`s!`, `v as unknown as string`) cannot vouch for what the
- * value's own type does not, and the fix, which keeps the wrapper, has to
+ * author saying the value may be more than it is, and is respected; a narrowing
+ * one (`s!`, `v as unknown as string`) cannot vouch for what the value's own
+ * type does not, and the fix, which keeps the wrapper, has to
  * type-check at every layer too.
  */
 export const typeHoldsAtEveryLayer = (

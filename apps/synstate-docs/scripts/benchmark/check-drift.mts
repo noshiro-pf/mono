@@ -17,11 +17,11 @@ import { Arr, Num, Result } from 'ts-data-forge';
  * baseline byte for byte, so that a dependency bump that moves nothing keeps
  * the published tables and a run that moves something fails.
  *
- * Absolute milliseconds cannot be compared across runs: unchanged code moved
- * by 0.8–1.4× between runs on `ubuntu-24.04`, one point by 2.5×, because the
+ * Absolute milliseconds cannot be compared across runs: unchanged code moved by
+ * 0.8–1.4× between runs on `ubuntu-24.04`, one point by 2.5×, because the
  * runner instances differ. So each library's change is divided by the median
- * change of every library in the same scenario, which is the machine's share
- * of it, and only what is left is judged.
+ * change of every library in the same scenario, which is the machine's share of
+ * it, and only what is left is judged.
  */
 const main = async (): Promise<void> => {
   const [referenceDir, committedDir] = Arr.skip(process.argv, 2);
@@ -75,8 +75,8 @@ const main = async (): Promise<void> => {
  * The widest normalized change that is still noise.
  *
  * Measured on ten `ubuntu-24.04` runs of unchanged code (deep chain): the
- * normalized change between two of them was 1.05× at the median, 1.44× at
- * p95 and 2.07× at most, the largest from RxJS, whose points there are a few
+ * normalized change between two of them was 1.05× at the median, 1.44× at p95
+ * and 2.07× at most, the largest from RxJS, whose points there are a few
  * milliseconds. Below 2× this would fail on noise; so a change has to roughly
  * double, or halve, a library relative to the others to count.
  */

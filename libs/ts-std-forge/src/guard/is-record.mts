@@ -6,9 +6,9 @@ import { isNonNullObject } from './is-non-null-object.mjs';
  * object — and narrows it to `UnknownRecord` (= `ReadonlyRecord<string,
  * unknown>`).
  *
- * This function is designed to be combined with {@link hasKey} to probe
- * values of type `unknown` (e.g. parsed JSON, caught errors, external data)
- * in a type-safe way: `if (isRecord(u) && hasKey(u, 'some-key')) { ... }`.
+ * This function is designed to be combined with {@link hasKey} to probe values
+ * of type `unknown` (e.g. parsed JSON, caught errors, external data) in a
+ * type-safe way: `if (isRecord(u) && hasKey(u, 'some-key')) { ... }`.
  *
  * **Type Narrowing Behavior:**
  *
@@ -23,12 +23,12 @@ import { isNonNullObject } from './is-non-null-object.mjs';
  *
  * **Why non-plain objects are included:** since every property of
  * `UnknownRecord` is typed `unknown`, reading properties from any object
- * through this narrowing is type-safe, and `hasKey` (backed by
- * `Object.hasOwn`) answers own-property questions correctly on any object
- * (e.g. `Map` entries are not own properties, so `hasKey` correctly returns
- * `false` for them). Restricting the guard to plain objects would require
- * prototype checks that misjudge cross-realm objects and would prevent
- * probing useful instances such as `Error` subclasses.
+ * through this narrowing is type-safe, and `hasKey` (backed by `Object.hasOwn`)
+ * answers own-property questions correctly on any object (e.g. `Map` entries
+ * are not own properties, so `hasKey` correctly returns `false` for them).
+ * Restricting the guard to plain objects would require prototype checks that
+ * misjudge cross-realm objects and would prevent probing useful instances such
+ * as `Error` subclasses.
  *
  * **Implementation:** `isNonNullObject(u) && !Array.isArray(u)`.
  *

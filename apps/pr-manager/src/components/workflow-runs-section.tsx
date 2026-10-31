@@ -23,8 +23,8 @@ import { RunStateIcon } from './run-state-icon.js';
 import { Timestamp } from './timestamp.js';
 
 /**
- * The workflow runs still going, or waiting on someone, newest first: what
- * the Actions tab shows filtered to them, which the title links to.
+ * The workflow runs still going, or waiting on someone, newest first: what the
+ * Actions tab shows filtered to them, which the title links to.
  *
  * Rows, as the merged pull requests and the issues are: a run is a name, a
  * state and where it came from, and reads in one line and a half.
@@ -74,8 +74,8 @@ type Ready = RelaxedExtract<RunsStatus, Readonly<{ type: 'ready' }>>;
 
 /**
  * A run's state: the icon the Actions tab draws, for the two states that are
- * most of what this block lists, and a badge with the word for the rest,
- * which are rare enough that a word reads better than a glyph to learn.
+ * most of what this block lists, and a badge with the word for the rest, which
+ * are rare enough that a word reads better than a glyph to learn.
  */
 const RunStateMark = ({
   state,
@@ -204,9 +204,9 @@ const titleOf = ({ runs, totalCount }: WorkflowRunList): string =>
     : (`Running workflows (${runs.length})` as const);
 
 /**
- * A word for each state — the badge's, or the icon's label — and the colour
- * the verdict badges give the same thing: a run waiting for an approval or a
- * person is a wait, and a neutral or stale run is over.
+ * A word for each state — the badge's, or the icon's label — and the colour the
+ * verdict badges give the same thing: a run waiting for an approval or a person
+ * is a wait, and a neutral or stale run is over.
  */
 const STATE_PRESENTATION = {
   in_progress: { label: 'running', status: 'warning' },

@@ -22,21 +22,21 @@ import {
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
- * Fails when the repository's own Markdown names, in backticks, a path the
- * tree does not have.
+ * Fails when the repository's own Markdown names, in backticks, a path the tree
+ * does not have.
  *
- * Renaming or deleting a file leaves every sentence that names it behind, and
- * a stale path is the one kind of stale prose that a machine can see: the
- * sentence still reads, and only a reader who goes looking finds nothing
- * there. `check:prose:mono-links` resolves the links; this resolves the paths
- * written as code, which outnumber them.
+ * Renaming or deleting a file leaves every sentence that names it behind, and a
+ * stale path is the one kind of stale prose that a machine can see: the
+ * sentence still reads, and only a reader who goes looking finds nothing there.
+ * `check:prose:mono-links` resolves the links; this resolves the paths written
+ * as code, which outnumber them.
  *
  * Which documents are read is `isRepositoryProse` in
  * `tools/scripts/lib/repo-files.mts`, with the reason for each one left out.
  *
  * Code spans are read outside fenced code blocks — a fence holds commands and
- * code, whose paths belong to wherever they run. A span is read as a path
- * only when it is unambiguously one:
+ * code, whose paths belong to wherever they run. A span is read as a path only
+ * when it is unambiguously one:
  *
  * - it is one token of path characters, two segments or more, so
  *   `src/a.mts` is read and `package.json`, `src/**`, `<name>/README.md` and
@@ -52,21 +52,20 @@ import { projectRootPath } from '../project-root-path.mjs';
  *   `noshiro-pf/mono`, `@types/node` and `origin/main` are not paths at all,
  *   and `src/a.mts` is one only beside a `src/`.
  *
- * Such a path has to be a tracked file or directory, read from any one of
- * those places. A path `.gitignore` ignores from any one of them (`dist/`,
+ * Such a path has to be a tracked file or directory, read from any one of those
+ * places. A path `.gitignore` ignores from any one of them (`dist/`,
  * `node_modules/`, a package's generated `docs/`) is generated or installed,
- * never tracked, and is not judged; nor is one that goes on past a symlink
- * (a pnpm link under `node_modules/`, a tracked link such as
+ * never tracked, and is not judged; nor is one that goes on past a symlink (a
+ * pnpm link under `node_modules/`, a tracked link such as
  * `.claude/skills/unblock-prs`), whose target the tree does not describe;
- * nor a path into `experimental/`, for the reason `isUnderExperimental`
- * gives.
+ * nor a path into `experimental/`, for the reason `isUnderExperimental` gives.
  *
- * A document that names a path that is not there on purpose — a file
- * elsewhere, one that is planned, one that was removed — declares it:
- * `<!-- doc-paths-ignore: .github/README.md -->`, anywhere in the document,
- * as written in the span (less a trailing `/`, `:12` or `#anchor`). A
- * declaration that no longer names a path that fails is itself reported, so
- * the list cannot outlive its reasons.
+ * A document that names a path that is not there on purpose — a file elsewhere,
+ * one that is planned, one that was removed — declares it:
+ * `<!-- doc-paths-ignore: .github/README.md -->`, anywhere in the document, as
+ * written in the span (less a trailing `/`, `:12` or `#anchor`). A declaration
+ * that no longer names a path that fails is itself reported, so the list cannot
+ * outlive its reasons.
  */
 export const checkDocPaths = async (): Promise<Result<CheckSummary, string>> =>
   Result.safeTry(async function* () {
@@ -143,9 +142,9 @@ export const checkDocPaths = async (): Promise<Result<CheckSummary, string>> =>
 
 /**
  * Every code span in `fileText` that is read as a repository path, with the
- * paths from the repository root it may mean. `relativePath` is the
- * document's own path from the root; `tree` is what decides whether a first
- * segment is there to be named.
+ * paths from the repository root it may mean. `relativePath` is the document's
+ * own path from the root; `tree` is what decides whether a first segment is
+ * there to be named.
  */
 export const findPathReferences = (
   fileText: string,
@@ -170,10 +169,10 @@ export const findPathReferences = (
 };
 
 /**
- * The paths `fileText` declares absent on purpose, as written and normalized
- * as a span is (a trailing `/`, `:12` or `#anchor` dropped). A declaration
- * shown as code — in a fence or a code span — is an example, not one; one
- * that wraps across lines is read whole.
+ * The paths `fileText` declares absent on purpose, as written and normalized as
+ * a span is (a trailing `/`, `:12` or `#anchor` dropped). A declaration shown
+ * as code — in a fence or a code span — is an example, not one; one that wraps
+ * across lines is read whole.
  */
 export const readDeclaredAbsent = (fileText: string): readonly string[] =>
   Array.from(
@@ -195,8 +194,8 @@ export const isResolved = (reference: PathReference, tree: Tree): boolean =>
 
 /**
  * What is wrong with one document, given the references in it that resolve
- * nowhere: those neither ignored by git (nor past a symlink) nor declared,
- * and the declarations that excuse no such reference.
+ * nowhere: those neither ignored by git (nor past a symlink) nor declared, and
+ * the declarations that excuse no such reference.
  */
 export const judgeDocument = ({
   unresolved,
@@ -258,8 +257,8 @@ const DECLARATION = /<!--\s*doc-paths-ignore:(?<paths>[^>]*?)-->/gu;
 
 /**
  * The directories a path in `relativePath` may be read from: the root, the
- * document's package (the nearest directory above it with a `package.json`)
- * and its own directory, each once.
+ * document's package (the nearest directory above it with a `package.json`) and
+ * its own directory, each once.
  */
 const basesOf = (relativePath: string, tree: Tree): readonly string[] => {
   const directory = path.posix.dirname(relativePath);
@@ -335,14 +334,14 @@ const goesPastASymlink = (relativePath: string): boolean =>
  * check-ignore` for all of them; it exits 1 when it matched none. The user's
  * own `core.excludesFile` is not read, so that the answer is CI's.
  *
- * Each is asked about twice, as written and with a trailing `/`: a path that
- * is not there is taken for a file, which a directory-only pattern
- * (`node_modules/`, `/libs/ts-data-forge/docs/`) does not match, so without
- * the second form the answer would depend on what had been built.
+ * Each is asked about twice, as written and with a trailing `/`: a path that is
+ * not there is taken for a file, which a directory-only pattern
+ * (`node_modules/`, `/libs/ts-data-forge/docs/`) does not match, so without the
+ * second form the answer would depend on what had been built.
  *
- * A path that goes on past a symlink on disk is not asked about — git
- * refuses the question — and is returned with the ignored ones: the tree
- * does not describe what a link points at.
+ * A path that goes on past a symlink on disk is not asked about — git refuses
+ * the question — and is returned with the ignored ones: the tree does not
+ * describe what a link points at.
  */
 const listGitIgnored = (
   candidates: readonly string[],

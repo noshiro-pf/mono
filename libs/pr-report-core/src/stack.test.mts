@@ -65,8 +65,8 @@ describe(findStackParents, () => {
   });
 
   test('nothing onto the default branch is stacked, whatever heads it', () => {
-    // A pull request *from* the default branch is odd but possible, and
-    // reading it as a parent would put every other pull request under it.
+    // A pull request *from* the default branch is odd but possible, and reading
+    // it as a parent would put every other pull request under it.
     const parents = findStackParents(
       pulls([
         [1, 'main', 'release'],
@@ -79,8 +79,8 @@ describe(findStackParents, () => {
   });
 
   test('a branch two open pull requests head is not a parent', () => {
-    // One branch opened against two bases: which of them the stack means
-    // cannot be told, so neither is taken.
+    // One branch opened against two bases: which of them the stack means cannot
+    // be told, so neither is taken.
     const parents = findStackParents(
       pulls([
         [1, 'a', 'main'],

@@ -1,6 +1,6 @@
 /**
- * What the declared order means for picking a pull request, as a note, and
- * the order the issues the pull requests close add to it. Reading the
+ * What the declared order means for picking a pull request, as a note, and the
+ * order the issues the pull requests close add to it. Reading the
  * `Merge-After:` trailers and the `Start-After:` lines, finding the cycles in
  * them and deciding that a pull request waits is `pr-report-core`'s, because
  * the Pull Requests Manager page draws the same queue.
@@ -11,10 +11,10 @@ import { Arr } from 'ts-data-forge';
 import type { Classification, IssueOrder, PullRequest } from './types.mjs';
 
 /**
- * The note to report instead of picking this pull request while what it
- * must merge after is still open. Picking is all this constrains: a pull
- * request that is already up to date and merging is left to auto-merge,
- * which takes no notice of anything declared here.
+ * The note to report instead of picking this pull request while what it must
+ * merge after is still open. Picking is all this constrains: a pull request
+ * that is already up to date and merging is left to auto-merge, which takes no
+ * notice of anything declared here.
  */
 export const waitingOnNote = (
   pr: PullRequest,
@@ -53,10 +53,10 @@ export type ClosingIssueAnswer = Readonly<{
  * `Start-After:`, for `queueGraph` to inherit.
  *
  * An issue closes when GitHub links it (`linked`, this repository's only) or
- * when the body closes it by keyword, as GitHub marked it in `bodyHtml` —
- * the one way to tell for a stacked pull request, which GitHub links
- * nothing on. `described` is what was read of the keyword ones GitHub did
- * not link; one it would not describe is left out, being unknown.
+ * when the body closes it by keyword, as GitHub marked it in `bodyHtml` — the
+ * one way to tell for a stacked pull request, which GitHub links nothing on.
+ * `described` is what was read of the keyword ones GitHub did not link; one it
+ * would not describe is left out, being unknown.
  */
 export const issueOrderOf = (
   repo: RepoRef,

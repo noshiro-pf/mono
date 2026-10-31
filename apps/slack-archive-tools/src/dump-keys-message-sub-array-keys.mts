@@ -32,8 +32,8 @@ const collectRecordKeys = (
  *
  * Extracted from the loop over files rather than written inline, because
  * `unicorn/no-break-in-nested-loop` rejects `continue` inside a nested loop
- * while `unicorn/prefer-continue` rejects wrapping the body in an `if` —
- * which is exactly what the first rule's message suggests doing about it.
+ * while `unicorn/prefer-continue` rejects wrapping the body in an `if` — which
+ * is exactly what the first rule's message suggests doing about it.
  */
 const collectSubArrayKeys = (
   values: readonly UnknownRecord[],

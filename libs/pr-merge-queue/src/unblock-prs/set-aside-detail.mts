@@ -1,11 +1,11 @@
 /**
- * The one sentence a set-aside record carries: what the log says, and what
- * the comment on the pull request leads with.
+ * The one sentence a set-aside record carries: what the log says, and what the
+ * comment on the pull request leads with.
  *
  * Each says what a reader would otherwise have to go and find — which check,
- * which file, which hold — rather than restate the reason. The comment has
- * room for more, and `set-aside-comment.mts` adds it: the failed checks with
- * their runs, and what the command printed.
+ * which file, which hold — rather than restate the reason. The comment has room
+ * for more, and `set-aside-comment.mts` adds it: the failed checks with their
+ * runs, and what the command printed.
  */
 
 import { Arr } from 'ts-data-forge';
@@ -13,8 +13,8 @@ import { describeWaitingOn } from './checks.mjs';
 import type { ChecksSummary } from './types.mjs';
 
 /**
- * The failed required checks by name, and each with its run, which the
- * comment links so that the failure itself is one click away.
+ * The failed required checks by name, and each with its run, which the comment
+ * links so that the failure itself is one click away.
  */
 export const describeFailedChecks = (
   summary: ChecksSummary,
@@ -26,9 +26,9 @@ export const describeFailedChecks = (
 
 /**
  * What holds a pull request whose required checks are all green.
- * `reviewDecision` is GitHub's: `REVIEW_REQUIRED` when a review the
- * rules ask for is missing, which with `required_approving_review_count: 0`
- * leaves a code owner's; empty when the rules ask for none.
+ * `reviewDecision` is GitHub's: `REVIEW_REQUIRED` when a review the rules ask
+ * for is missing, which with `required_approving_review_count: 0` leaves a code
+ * owner's; empty when the rules ask for none.
  */
 export const describeHold = (
   mergeStateStatus: string,
@@ -67,8 +67,8 @@ export const describeConflict = (
  * The end of what a failed command printed. Node's message starts with
  * `Command failed: <the command>`, which says nothing the reason does not and
  * crowds out what does: an arm that failed was once reported as its own
- * GraphQL mutation, cut off before GitHub's answer. Only a command that
- * printed nothing is left with that line.
+ * GraphQL mutation, cut off before GitHub's answer. Only a command that printed
+ * nothing is left with that line.
  */
 export const describeCommandFailure = (message: string): string => {
   const lines = message.trim().split('\n');

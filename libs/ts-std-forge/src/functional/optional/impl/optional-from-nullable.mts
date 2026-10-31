@@ -5,9 +5,9 @@ import { some } from './optional-some.mjs';
 /**
  * Converts a nullable value to an `Optional`.
  *
- * This is the primary way to lift nullable values (null or undefined) into
- * the Optional type system. The function treats both `null` and `undefined`
- * as empty values, converting them to `None`.
+ * This is the primary way to lift nullable values (null or undefined) into the
+ * Optional type system. The function treats both `null` and `undefined` as
+ * empty values, converting them to `None`.
  *
  * @example
  *

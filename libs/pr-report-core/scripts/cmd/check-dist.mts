@@ -8,9 +8,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  * alias "typescript-native" because the "typescript" package must stay on 6.x
  * for tools that require the JS compiler API (typescript-eslint, typedoc,
  * prettier-plugin-organize-imports, ...), which TypeScript 7 no longer
- * provides. Invoked via an explicit path because both packages declare a
- * `tsc` bin and the winner of the `node_modules/.bin/tsc` conflict is not
- * guaranteed.
+ * provides. Invoked via an explicit path because both packages declare a `tsc`
+ * bin and the winner of the `node_modules/.bin/tsc` conflict is not guaranteed.
  */
 const nativeTsc = path.resolve(
   projectRootPath,
@@ -21,8 +20,8 @@ const nativeTsc = path.resolve(
  * Type-checks what the build emitted, reached the way a consumer reaches it:
  * by package name, through the `exports` map, against `dist/` alone.
  *
- * Not part of `build` — a build emits, and what it emitted is checked here,
- * so that every CI job which only needs `dist/` stops paying for the check as
+ * Not part of `build` — a build emits, and what it emitted is checked here, so
+ * that every CI job which only needs `dist/` stops paying for the check as
  * well. `pnpm run ws:check:dist` is the repository-wide form.
  */
 const checkDist = async (): Promise<void> => {
@@ -54,10 +53,10 @@ const runTsc = async (project: string, label: string): Promise<void> => {
 
 /**
  * Materializes a minimal `test/dist_/node_modules/pr-report-core` package (a
- * directory containing symlinks to the repository's `package.json` and
- * `dist/` only — the same surface a published tarball has) so that the dist
- * smoke tests (`test/dist_/**`) resolve the package through the real
- * `package.json` `exports` map, exactly like an external consumer.
+ * directory containing symlinks to the repository's `package.json` and `dist/`
+ * only — the same surface a published tarball has) so that the dist smoke tests
+ * (`test/dist_/**`) resolve the package through the real `package.json`
+ * `exports` map, exactly like an external consumer.
  *
  * Deliberately NOT a symlink to the repository root: that would expose the
  * whole repository (including `node_modules/`) under `test/dist_/`, which

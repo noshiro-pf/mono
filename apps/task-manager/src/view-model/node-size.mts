@@ -2,9 +2,9 @@
  * How big the nodes of the graph screen are drawn — 「コンパクト」, the title
  * alone on one line, in a small box; 「標準」, a title and its due date under
  * it; 「大」, as 「標準」 in a wider and taller box, the title on up to
- * three lines — and how the choice is kept in `localStorage` between visits,
- * on this device only. The boxes themselves are
- * `dag/graph-layout.mts`'s (`nodeBoxSize`).
+ * three lines — and how the choice is kept in `localStorage` between visits, on
+ * this device only. The boxes themselves are `dag/graph-layout.mts`'s
+ * (`nodeBoxSize`).
  *
  * Kept as every setting is (`persisted-setting.mts`): anything stored that
  * is not a size gives 「標準」.

@@ -682,8 +682,8 @@ const arrange = async (
 };
 
 /**
- * Every edge that comes within `margin` of a node other than its own two,
- * by points every 2 units along its path, and the node: none, as drawn.
+ * Every edge that comes within `margin` of a node other than its own two, by
+ * points every 2 units along its path, and the node: none, as drawn.
  * Read from the SVG itself, in the coordinates the nodes and edges share.
  */
 const edgesThroughNodes = async (
@@ -847,8 +847,8 @@ const routedEdgeCount = async (page: DeepReadonly<Page>): Promise<number> =>
     );
 
 /**
- * Drags the node `title` so that its centre lands on the middle of the
- * edge from `from` to `to`.
+ * Drags the node `title` so that its centre lands on the middle of the edge
+ * from `from` to `to`.
  */
 const dragOntoEdge = async (
   page: DeepReadonly<Page>,
@@ -894,8 +894,8 @@ const dragOntoEdge = async (
 };
 
 /**
- * Notes, from before the page loads, whether the canvas ever says its
- * nodes are moving — which a check after the fact could miss.
+ * Notes, from before the page loads, whether the canvas ever says its nodes are
+ * moving — which a check after the fact could miss.
  */
 const watchForAnimation = async (page: DeepReadonly<Page>): Promise<void> => {
   await page.addInitScript(() => {
@@ -1439,8 +1439,8 @@ test(
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
-    // A link to the graph in another mode wins over the one kept, and one
-    // made while the list was the default still opens the graph.
+    // A link to the graph in another mode wins over the one kept, and one made
+    // while the list was the default still opens the graph.
     await page.goto(`${DEMO}&view=dag&mode=tile`);
 
     await expect
@@ -1698,8 +1698,8 @@ test(
 
     const toolbarBox = await page.getByTestId('dag-toolbar').boundingBox();
 
-    // How many of the nodes are each all in sight, between the toolbar and
-    // the bottom: all of them, some, or none.
+    // How many of the nodes are each all in sight, between the toolbar and the
+    // bottom: all of them, some, or none.
     const inView = async (): Promise<'all' | 'some' | 'none'> => {
       const nodes = await page.getByTestId('dag-node').all();
 
@@ -1762,9 +1762,9 @@ test(
 
 /**
  * What 「タイル」 draws, read from the page: each task's title and place,
- * and the geometry the rows follow — the canvas's width, the left margin
- * (where the view puts the rows), the width of a node and the gap between
- * two — so that the columns expected can be worked out from it.
+ * and the geometry the rows follow — the canvas's width, the left margin (where
+ * the view puts the rows), the width of a node and the gap between two — so
+ * that the columns expected can be worked out from it.
  */
 const tileLayoutOnPage = async (
   page: DeepReadonly<Page>,
@@ -1923,8 +1923,8 @@ test(
 
     await expect.soft(page.getByTestId('dag-settings')).toBeVisible();
 
-    // Row by row, by title as the page's own collator sorts, as many to a
-    // row as the width has room for.
+    // Row by row, by title as the page's own collator sorts, as many to a row
+    // as the width has room for.
     const wide = await tileGrid(page);
 
     const sorted = await page.evaluate((unsorted) => {
@@ -1939,8 +1939,8 @@ test(
 
     expect.soft(wide.rows).toBe(rowsOf(6, wide.expectedColumns));
 
-    // A phone, short enough for the rows to be scrolled: fewer to a row,
-    // in the same order.
+    // A phone, short enough for the rows to be scrolled: fewer to a row, in the
+    // same order.
     await page.setViewportSize({ width: 390, height: 500 });
 
     await expect
@@ -1959,8 +1959,8 @@ test(
 
     expect.soft(narrow.rowMajorTitles).toStrictEqual(sorted);
 
-    // The wheel scrolls down and up, no further than the first row at the
-    // top and the last row in view at the bottom.
+    // The wheel scrolls down and up, no further than the first row at the top
+    // and the last row in view at the bottom.
     const canvas = page.getByTestId('dag-canvas');
 
     const canvasBox = await canvas.boundingBox();
@@ -2189,8 +2189,8 @@ test(
       .soft(Math.round((panelBox?.x ?? 0) + (panelBox?.width ?? 0)))
       .toBe(Math.round((buttonBox?.x ?? 0) + (buttonBox?.width ?? 0)));
 
-    // The focus goes into it — to the panel itself, not to its close
-    // button, which Tab goes on to — and back to the button.
+    // The focus goes into it — to the panel itself, not to its close button,
+    // which Tab goes on to — and back to the button.
     await expect.soft(panel).toBeFocused();
 
     await page.keyboard.press('Tab');
@@ -2512,8 +2512,8 @@ const SAMPLE_PRIORITIES: readonly (readonly [string, number])[] = [
 ] as const;
 
 /**
- * The sample tasks' titles by priority, descending, then by title as the
- * page's own collator sorts — or by title alone.
+ * The sample tasks' titles by priority, descending, then by title as the page's
+ * own collator sorts — or by title alone.
  */
 const expectedOrder = async (
   page: DeepReadonly<Page>,
@@ -2890,8 +2890,7 @@ test.describe('on a touch screen', () => {
         .soft(await editorKeys(editor))
         .toStrictEqual(['1. 見積', '2. タイトル']);
 
-      // Every control 44px or more each way, and nothing wider than the
-      // sheet.
+      // Every control 44px or more each way, and nothing wider than the sheet.
       const sizes = await editor.getByRole('button').evaluateAll((buttons) =>
         buttons.map((button) => {
           const box = button.getBoundingClientRect();

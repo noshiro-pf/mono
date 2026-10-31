@@ -4,10 +4,10 @@
  * progress` (`in-progress.mts`), the counts both views lead with
  * (`issues-summary.tsx`).
  *
- * Three sides, each switched off or picked on its own: within the priorities
- * a pick adds to what is shown, since an issue has one priority, and between
- * the sides an issue is shown only when each side shows it. Picking `pending`
- * and `high` is the issues that are both, not every issue that is either.
+ * Three sides, each switched off or picked on its own: within the priorities a
+ * pick adds to what is shown, since an issue has one priority, and between the
+ * sides an issue is shown only when each side shows it. Picking `pending` and
+ * `high` is the issues that are both, not every issue that is either.
  */
 
 import { isInProgressShown, type InProgressFilter } from './in-progress.mjs';

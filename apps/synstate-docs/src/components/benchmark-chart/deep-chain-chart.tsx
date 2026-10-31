@@ -29,8 +29,8 @@ export const DeepChainChart = React.memo(() => (
 
 DeepChainChart.displayName = 'DeepChainChart';
 
-// The bar chart wants one group per (K, M) point, and takes the labels from
-// the group; the newline keeps K and M on separate lines under the axis.
+// The bar chart wants one group per (K, M) point, and takes the labels from the
+// group; the newline keeps K and M on separate lines under the axis.
 const groups = toGroups(deepChainResults).map(({ label, values }) => ({
   label: label.replace(', ', '\n'),
   values,

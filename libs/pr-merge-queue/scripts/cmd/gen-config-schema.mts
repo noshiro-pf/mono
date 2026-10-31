@@ -7,8 +7,8 @@ import { ConfigFileSchema } from '../../src/unblock-prs/index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
- * Writes `src/unblock-prs/config.schema.json` from `ConfigFileSchema`; the
- * test beside it holds the committed file to the same output.
+ * Writes `src/unblock-prs/config.schema.json` from `ConfigFileSchema`; the test
+ * beside it holds the committed file to the same output.
  */
 export const genConfigSchema = async (): Promise<Result<undefined, string>> => {
   const schema = t.toJsonSchema(ConfigFileSchema);

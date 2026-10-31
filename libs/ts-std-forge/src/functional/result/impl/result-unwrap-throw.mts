@@ -10,8 +10,8 @@ import type { UnwrapErr, UnwrapOk } from './types.mjs';
  *
  * This is useful when you're confident that a Result should contain a success
  * value and want to treat errors as exceptional conditions. The error message
- * will be constructed from the error value using the provided string
- * conversion function.
+ * will be constructed from the error value using the provided string conversion
+ * function.
  *
  * @example
  *

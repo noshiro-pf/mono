@@ -34,8 +34,8 @@ type MessageIds = 'useMapNullable' | 'suggestMapNullable';
  * first infers `'a'` and the second `string`, and `(v) => [v, 1]` becomes
  * `number[]` instead of `readonly [number, 1]`. The fix is therefore applied
  * automatically only when the function's return type is not inferred, or is
- * inferred with nothing such a widening could change; otherwise, and whenever
- * a comment or a type wrapper around `mapNullable` would be dropped, it is
+ * inferred with nothing such a widening could change; otherwise, and whenever a
+ * comment or a type wrapper around `mapNullable` would be dropped, it is
  * offered as a suggestion.
  */
 export const preferPipeMapNullable: TSESLint.RuleModule<MessageIds, Options> = {
@@ -81,8 +81,8 @@ export const preferPipeMapNullable: TSESLint.RuleModule<MessageIds, Options> = {
     const esTreeNodeToTSNodeMap = services?.esTreeNodeToTSNodeMap;
 
     /**
-     * Whether `callee` calls the export `name` of the module `resolve`
-     * reads, rather than a local binding that shadows the import.
+     * Whether `callee` calls the export `name` of the module `resolve` reads,
+     * rather than a local binding that shadows the import.
      */
     const calls = (
       resolve: ReturnType<typeof buildCalleeResolver>,
@@ -170,9 +170,9 @@ export const preferPipeMapNullable: TSESLint.RuleModule<MessageIds, Options> = {
       }
 
       // The `B | undefined` that `mapNullable(fn)` returns, with `B` as the
-      // `const` type parameter inferred it. The function's own return type
-      // is no guide: for `(v) => ({ kind: 'n', v })` it is already widened
-      // to `{ kind: string; v: number }`, while `B` keeps `'n'`.
+      // `const` type parameter inferred it. The function's own return type is
+      // no guide: for `(v) => ({ kind: 'n', v })` it is already widened to
+      // `{ kind: string; v: number }`, while `B` keeps `'n'`.
       const signatures = checker
         .getTypeAtLocation(esTreeNodeToTSNodeMap.get(mapNullableCall))
         .getCallSignatures();
@@ -313,11 +313,11 @@ const MAX_DEPTH = 4;
 
 /**
  * Whether `type`, inferred for a `const` type parameter, has a part a plain
- * type parameter would infer differently: a literal (`'a'` against `string`)
- * or a tuple (`readonly [number, 1]` against `number[]`), at the top level or
+ * type parameter would infer differently: a literal (`'a'` against `string`) or
+ * a tuple (`readonly [number, 1]` against `number[]`), at the top level or
  * inside an array, a generic type's arguments or an object literal's
- * properties. Conservative: a declared literal type, which neither widens,
- * also counts.
+ * properties. Conservative: a declared literal type, which neither widens, also
+ * counts.
  */
 const hasConstInferredPart = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

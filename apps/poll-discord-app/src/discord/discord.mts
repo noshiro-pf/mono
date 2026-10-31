@@ -124,10 +124,10 @@ export const startDiscordListener = (discordClient: DiscordClient): void => {
  *
  * Takes `unknown` on purpose. discord.js types `messageUpdate`'s `newMessage`
  * as a complete `Message` whose `partial` is the literal `false`, which holds
- * only for a client that does not ask for `Partials.Message`. This one does,
- * so `MessageUpdateAction` hands an uncached message over as a partial —
- * `content` is `null` there, and `updatePollTitle` reads `content`. A guard
- * declared over the discord.js types would narrow the argument to `never`
+ * only for a client that does not ask for `Partials.Message`. This one does, so
+ * `MessageUpdateAction` hands an uncached message over as a partial — `content`
+ * is `null` there, and `updatePollTitle` reads `content`. A guard declared over
+ * the discord.js types would narrow the argument to `never`
  * (`Message['partial']` is `false`, `PartialMessage['partial']` is `true`);
  * returning a plain `boolean` leaves both branches typed as `Message`.
  */

@@ -34,8 +34,8 @@
      },
    });
  
--  // Fetch: a separate listener, so that a keystroke does not cancel
--  // a request; only the next debounced query does, by aborting `signal`.
+-  // Fetch: a separate listener, so that a keystroke does not cancel a request;
+-  // only the next debounced query does, by aborting `signal`.
 +  // fetch：キー入力でリクエストがキャンセルされないよう listener を分ける。
 +  // キャンセルするのは次の debounce 済みクエリだけで、`signal` の中断による。
    listener.startListening({
@@ -45,8 +45,8 @@
        try {
          const items = await fetchItems(q, api.signal);
  
--        // A cancelled run reports nothing, whether its request
--        // settled before the abort or rejected because of it.
+-        // A cancelled run reports nothing, whether its request settled before
+-        // the abort or rejected because of it.
 +        // キャンセルされた実行は、リクエストが中断前に決着していても、
 +        // 中断で reject されても、何も反映しない。
          if (!api.signal.aborted) {

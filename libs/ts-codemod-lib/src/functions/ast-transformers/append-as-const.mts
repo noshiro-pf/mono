@@ -91,25 +91,24 @@ export type AppendAsConstTransformerOptions = DeepReadonly<{
   /**
    * Prefixes of the names of mutable types (see `convert-to-readonly`): a
    * variable whose type annotation names such a type, an expression that
-   * `satisfies` one and an arrow function body returning one get no
-   * `as const`, which would make them unassignable to it.
+   * `satisfies` one and an arrow function body returning one get no `as const`,
+   * which would make them unassignable to it.
    *
    * @default ['Mutable', 'mut_']
    */
   mutableTypePrefixes?: string[];
 
   /**
-   * Whether to remove redundant `as const` assertions from call arguments
-   * whose corresponding parameter type is exactly a `const`-modified type
-   * parameter.
+   * Whether to remove redundant `as const` assertions from call arguments whose
+   * corresponding parameter type is exactly a `const`-modified type parameter.
    *
    * (e.g. `f([1, 2] as const)` becomes `f([1, 2])` for
-   * `function f<const T>(x: T): T`, because the `const` type parameter
-   * already makes TypeScript infer the argument as if it were annotated
-   * with `as const`.)
+   * `function f<const T>(x: T): T`, because the `const` type parameter already
+   * makes TypeScript infer the argument as if it were annotated with
+   * `as const`.)
    *
-   * Only applies when the callee resolves to a single call signature within
-   * the transformed file itself; imported callees are left as they are.
+   * Only applies when the callee resolves to a single call signature within the
+   * transformed file itself; imported callees are left as they are.
    *
    * @default true
    */
@@ -203,11 +202,11 @@ const isMutableValueName = (
   startsWithAny(options.mutableTypePrefixes, name);
 
 /**
- * Whether `typeNode` names a type of a `mutableTypePrefixes` prefix anywhere
- * in it (`MutableFoo`, `ns.MutableFoo[]`, `import('./m').MutableFoo | X`), or
- * the type of a variable of a `mutableVariablePrefixes` prefix or a class of
- * a `mutableTypePrefixes` one (`typeof mut_x`, `typeof MutableStore`). It reads names only, so an alias of another name for such
- * a type is missed.
+ * Whether `typeNode` names a type of a `mutableTypePrefixes` prefix anywhere in
+ * it (`MutableFoo`, `ns.MutableFoo[]`, `import('./m').MutableFoo | X`), or the
+ * type of a variable of a `mutableVariablePrefixes` prefix or a class of a
+ * `mutableTypePrefixes` one (`typeof mut_x`, `typeof MutableStore`). It reads
+ * names only, so an alias of another name for such a type is missed.
  */
 const refersToMutableType = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -476,9 +475,9 @@ const transformNode = (
     return;
   }
 
-  // `<const>x` is handled as the `x as const` it means. Appending `as const`
-  // to `x` in place would read as `(<const>x) as const`, and every position
-  // that reaches here already takes an `as` expression.
+  // `<const>x` is handled as the `x as const` it means. Appending `as const` to
+  // `x` in place would read as `(<const>x) as const`, and every position that
+  // reaches here already takes an `as` expression.
   if (tsm.Node.isTypeAssertion(node) && isConstAssertionNode(node)) {
     const asConstText = `${node.getExpression().getText()} as const` as const;
 
@@ -678,24 +677,23 @@ const removeAsConstArgsOfCall = (
 
 /**
  * Resolves the callee of a call expression to the declaration of its single
- * call signature, and collects the names of that declaration's
- * `const`-modified type parameters.
+ * call signature, and collects the names of that declaration's `const`-modified
+ * type parameters.
  *
  * Returns `undefined` when the callee does not resolve to exactly one call
- * signature, the resolved declaration has no parameters or type parameters,
- * or none of the type parameters carry the `const` modifier.
+ * signature, the resolved declaration has no parameters or type parameters, or
+ * none of the type parameters carry the `const` modifier.
  */
 const resolveSingleSignatureCallTarget = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   call: tsm.CallExpression,
 ): ResolvedCallTarget | undefined => {
-  // The callee's type is read as the call sees it, after any `as`,
-  // `satisfies` or `!` around it: that is the signature the argument is
-  // inferred against, and an `as const` has no run-time effect for an inner
-  // layer to contradict.
+  // The callee's type is read as the call sees it, after any `as`, `satisfies`
+  // or `!` around it: that is the signature the argument is inferred against,
+  // and an `as const` has no run-time effect for an inner layer to contradict.
   //
-  // 0 signatures: the callee is unresolved (e.g. imported, since each file
-  // is transformed in an isolated single-file project).
+  // 0 signatures: the callee is unresolved (e.g. imported, since each file is
+  // transformed in an isolated single-file project).
   // 2+ signatures: overloads, where removing `as const` could change which
   // overload is selected.
   if (
@@ -721,9 +719,9 @@ const resolveSingleSignatureCallTarget = (
     return undefined;
   }
 
-  // Only type parameters declared on the call's own signature are inferred
-  // at the call site; a `const` type parameter of an enclosing declaration
-  // (e.g. a generic class containing this method) is already fixed there.
+  // Only type parameters declared on the call's own signature are inferred at
+  // the call site; a `const` type parameter of an enclosing declaration (e.g. a
+  // generic class containing this method) is already fixed there.
   const constTypeParameterNames = ISet.create(
     declaration
       .getTypeParameters()
@@ -746,10 +744,10 @@ const resolveSingleSignatureCallTarget = (
  * corresponding parameter type is exactly a `const`-modified type parameter
  * (e.g. `f([1, 2] as const)` for `function f<const T>(x: T): T`).
  *
- * A `const` type parameter makes TypeScript treat every inference candidate
- * as if it were annotated with `as const`, so when the parameter type is the
- * bare type parameter itself, removing the assertion cannot change the
- * inferred type. Conservative bail-outs (the `as const` is kept) when:
+ * A `const` type parameter makes TypeScript treat every inference candidate as
+ * if it were annotated with `as const`, so when the parameter type is the bare
+ * type parameter itself, removing the assertion cannot change the inferred
+ * type. Conservative bail-outs (the `as const` is kept) when:
  *
  * - the callee does not resolve to exactly one call signature (unresolved
  *   imports resolve to none, since each file is transformed in an isolated
@@ -764,8 +762,8 @@ const removeAsConstInConstTypeParameterArgs = (
   sourceAst: tsm.SourceFile,
   options: AppendAsConstTransformerOptionsInternal,
 ): void => {
-  // Reversed so that calls nested inside another call's arguments are
-  // processed before the outer call replaces (and thereby forgets) them.
+  // Reversed so that calls nested inside another call's arguments are processed
+  // before the outer call replaces (and thereby forgets) them.
   for (const call of sourceAst
     .getDescendantsOfKind(tsm.SyntaxKind.CallExpression)
     .toReversed()) {
@@ -799,8 +797,8 @@ const removeAsConstInConstTypeParameterArgs = (
       continue;
     }
 
-    // With explicit type arguments no inference happens, so the `as const`
-    // may be load-bearing for assignability.
+    // With explicit type arguments no inference happens, so the `as const` may
+    // be load-bearing for assignability.
     if (!Arr.isEmpty(call.getTypeArguments())) {
       continue;
     }

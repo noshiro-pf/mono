@@ -18,9 +18,9 @@ import {
 } from './model.mjs';
 
 /**
- * The inputs are signals, and every figure is a `computed` of its own,
- * reading the figures it is computed from. Each cell is a `computed` that
- * formats a figure, passed to the DOM as a signal so that it binds without
+ * The inputs are signals, and every figure is a `computed` of its own, reading
+ * the figures it is computed from. Each cell is a `computed` that formats a
+ * figure, passed to the DOM as a signal so that it binds without
  * re-rendering a component.
  */
 export const preactSignalsLoan: ScenarioFramework<LoanApp> = {

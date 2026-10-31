@@ -17,8 +17,7 @@ const { table, tbody, td, tr } = van.tags;
 
 /**
  * Each duration is a state, and every figure is a `van.derive` of its own,
- * reading the figures it is computed from. The cells are bound to the
- * figures.
+ * reading the figures it is computed from. The cells are bound to the figures.
  */
 export const vanjsSchedule: ScenarioFramework<ScheduleApp> = {
   name: 'VanJS',

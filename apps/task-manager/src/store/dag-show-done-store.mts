@@ -1,8 +1,8 @@
 /**
  * Whether the graph screen draws the done tasks and the reached milestones
- * (`view-model/dag-show-done.mts`), saved whenever it changes. Which nodes
- * that leaves out is worked out in `store.mts`, for the DAG layout store and
- * the arcs.
+ * (`view-model/dag-show-done.mts`), saved whenever it changes. Which nodes that
+ * leaves out is worked out in `store.mts`, for the DAG layout store and the
+ * arcs.
  */
 
 import { createState, type InitializedObservable } from 'synstate';

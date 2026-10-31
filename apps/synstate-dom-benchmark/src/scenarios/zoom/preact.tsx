@@ -11,10 +11,10 @@ import {
 } from './model.mjs';
 
 /**
- * Preact without Signals, written as the React implementation is: the zoom is
- * a state, and the render computes every label in a `useMemo` that depends on
- * the level. Preact renders a state change in a microtask, which the harness
- * waits for.
+ * Preact without Signals, written as the React implementation is: the zoom is a
+ * state, and the render computes every label in a `useMemo` that depends on the
+ * level. Preact renders a state change in a microtask, which the harness waits
+ * for.
  */
 export const preactZoom: ScenarioFramework<ZoomApp> = {
   name: 'Preact',

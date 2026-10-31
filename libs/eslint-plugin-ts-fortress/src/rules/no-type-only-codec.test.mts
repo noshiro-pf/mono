@@ -41,9 +41,9 @@ const USER_CODEC = dedent`
 const mut_projectNames = new Set<string>();
 
 /**
- * Writes a project for one case and returns what `RuleTester` needs to lint
- * its codec file — `codec.mts` unless `codecPath` says otherwise: the file
- * name and its content.
+ * Writes a project for one case and returns what `RuleTester` needs to lint its
+ * codec file — `codec.mts` unless `codecPath` says otherwise: the file name and
+ * its content.
  */
 const project = (
   name: string,
