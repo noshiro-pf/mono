@@ -1,0 +1,19 @@
+.title {
+  padding: 10px 0;
+  font-size: large;
+  font-weight: bold;
+}
+
+.element {
+  display: flex;
+}
+
+/*
+ * A label round its text and control, spaced as Blueprint's `Label`. Not
+ * `bp6-label` itself: inside one, Blueprint's style sheet moves the input of
+ * a numeric input down from its buttons.
+ */
+.field {
+  display: block;
+  margin-bottom: 16px;
+}

@@ -1,46 +1,34 @@
-import { Radio, RadioGroup } from '@blueprintjs/core';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import { RadioGroup } from 'blueprint-synstate';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
 import type { RepaymentType } from '../../types/index.mjs';
 
 type Props = Readonly<{
-  repaymentType: RepaymentType;
-  onRepaymentTypeChange: (value: RepaymentType) => void;
+  value: Bindable<RepaymentType>;
+  onValueChange: (value: RepaymentType) => void;
 }>;
 
-export const RepaymentTypeRadioGroup = memoNamed<Props>(
-  'RepaymentTypeRadioGroup',
-  ({ repaymentType, onRepaymentTypeChange }) => {
-    const onChange = React.useCallback<
-      NonNullable<React.ComponentProps<typeof RadioGroup>['onChange']>
-    >(
-      (ev) => {
-        onRepaymentTypeChange(
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          ev.currentTarget.value as RepaymentType,
-        );
-      },
-      [onRepaymentTypeChange],
-    );
-
-    return (
-      <RadioGroup
-        label={dict.repaymentType}
-        selectedValue={repaymentType}
-        onChange={onChange}
-      >
-        <Radio
-          data-e2e={'radio--principal-equal-payment'}
-          label={dict.principalEqualPayment}
-          value={'principal-equal-payment'}
-        />
-        <Radio
-          data-e2e={'radio--principal-and-interest-equal-repayment'}
-          label={dict.principalAndInterestEqualRepayment}
-          value={'principal-and-interest-equal-repayment'}
-        />
-      </RadioGroup>
-    );
-  },
+export const RepaymentTypeRadioGroup = ({
+  value,
+  onValueChange,
+}: Props): JSX.Element => (
+  <RadioGroup
+    label={constant(dict.repaymentType)}
+    options={options}
+    value={value}
+    onValueChange={onValueChange}
+  />
 );
+
+const options = [
+  {
+    value: 'principal-equal-payment',
+    label: constant(dict.principalEqualPayment),
+    'data-e2e': 'radio--principal-equal-payment',
+  },
+  {
+    value: 'principal-and-interest-equal-repayment',
+    label: constant(dict.principalAndInterestEqualRepayment),
+    'data-e2e': 'radio--principal-and-interest-equal-repayment',
+  },
+] as const;

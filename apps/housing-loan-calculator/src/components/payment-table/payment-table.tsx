@@ -1,20 +1,53 @@
-import { HTMLTable } from '@blueprintjs/core';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
+import { HtmlTable } from 'blueprint-synstate';
+import { constant, derive, For, mapBindable, type JSX } from 'synstate-dom';
 import { Arr, Uint32 } from 'ts-data-forge';
-import type { DeepReadonly, FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import { loanStore } from '../../store/index.mjs';
-import { Yen } from '../../types/index.mjs';
+import {
+  Yen,
+  type CalculatedValues,
+  type RepaymentType,
+} from '../../types/index.mjs';
 
-const headerCellStyle = {
-  textAlign: 'center',
-} as const satisfies React.CSSProperties;
+export const PaymentTable = (): JSX.Element => (
+  <HtmlTable bordered compact striped>
+    <thead>
+      <tr>
+        <th style={headerCellStyle}>{constant(dict.numPayments)}</th>
+        <th style={headerCellStyle}>{constant(dict.borrowingBalanceYen)}</th>
+        <th style={headerCellStyle}>{constant(dict.interestYen)}</th>
+        <th style={headerCellStyle}>
+          {mapBindable(repaymentType$, (type) =>
+            type === 'principal-equal-payment'
+              ? dict.monthlyPaymentsYen(true)
+              : dict.monthlyPrincipalPaymentsYen(true),
+          )}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <For items={rows} key={(_, index) => index}>
+        {(row$) => (
+          <tr>
+            {Arr.seq(4).map((column) => (
+              <td style={dataCellStyle}>
+                {mapBindable(row$, (row) => row[column])}
+              </td>
+            ))}
+          </tr>
+        )}
+      </For>
+    </tbody>
+  </HtmlTable>
+);
 
-const dataCellStyle = {
-  textAlign: 'right',
-} as const satisfies React.CSSProperties;
+type Row = FixedLengthTuple<4, string>;
+
+// Inline, as Blueprint's `table.bp6-html-table td` outranks a single class.
+const headerCellStyle = constant('text-align: center');
+
+const dataCellStyle = constant('text-align: right');
 
 const yenFormatter = new Intl.NumberFormat('ja-JP', {
   style: 'currency',
@@ -23,72 +56,36 @@ const yenFormatter = new Intl.NumberFormat('ja-JP', {
 
 const formatYenValue = (value: Yen): string => yenFormatter.format(value);
 
-export const PaymentTable = memoNamed('PaymentTable', () => {
-  const { repaymentType } = useObservableValue(loanStore.inputs);
-
-  const {
+const rowsOf = (
+  repaymentType: RepaymentType,
+  {
     borrowingBalanceYen,
     interestYen,
     monthlyPaymentTotalYen,
     monthlyPrincipalPaymentYen,
-  } = useObservableValue(loanStore.calculatedValues);
+  }: CalculatedValues,
+): readonly Row[] => {
+  const monthlyPayment =
+    repaymentType === 'principal-equal-payment'
+      ? monthlyPaymentTotalYen
+      : monthlyPrincipalPaymentYen;
 
-  const monthlyPayment = React.useMemo<readonly Yen[]>(
-    () =>
-      repaymentType === 'principal-equal-payment'
-        ? monthlyPaymentTotalYen
-        : monthlyPrincipalPaymentYen,
-    [repaymentType, monthlyPaymentTotalYen, monthlyPrincipalPaymentYen],
+  const numRows = Uint32.max(
+    Arr.length(borrowingBalanceYen),
+    Arr.length(interestYen),
+    Arr.length(monthlyPaymentTotalYen),
   );
 
-  const numRows = React.useMemo(
-    () =>
-      Uint32.max(
-        Arr.length(borrowingBalanceYen),
-        Arr.length(interestYen),
-        Arr.length(monthlyPaymentTotalYen),
-      ),
-    [borrowingBalanceYen, interestYen, monthlyPaymentTotalYen],
-  );
+  return Arr.seq(numRows).map((i) => [
+    i.toString(),
+    formatYenValue(borrowingBalanceYen[i] ?? Yen.cast(0)),
+    formatYenValue(interestYen[i] ?? Yen.cast(0)),
+    formatYenValue(monthlyPayment[i] ?? Yen.cast(0)),
+  ]);
+};
 
-  const tableData = React.useMemo<DeepReadonly<FixedLengthTuple<4, string>[]>>(
-    () =>
-      Arr.seq(numRows).map((i) => [
-        i.toString(),
-        formatYenValue(borrowingBalanceYen[i] ?? Yen.cast(0)),
-        formatYenValue(interestYen[i] ?? Yen.cast(0)),
-        formatYenValue(monthlyPayment[i] ?? Yen.cast(0)),
-      ]),
-    [numRows, borrowingBalanceYen, interestYen, monthlyPayment],
-  );
+const repaymentType$ = mapBindable(loanStore.inputs, (s) => s.repaymentType);
 
-  return (
-    <HTMLTable bordered compact striped>
-      <thead>
-        <tr>
-          <th style={headerCellStyle}>{dict.numPayments}</th>
-          <th style={headerCellStyle}>{dict.borrowingBalanceYen}</th>
-          <th style={headerCellStyle}>{dict.interestYen}</th>
-          <th style={headerCellStyle}>
-            {repaymentType === 'principal-equal-payment'
-              ? dict.monthlyPaymentsYen(true)
-              : dict.monthlyPrincipalPaymentsYen(true)}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {tableData.map((tableRow, rowIdx) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <tr key={rowIdx}>
-            {tableRow.map((cell, colIdx) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <td key={colIdx} style={dataCellStyle}>
-                {cell}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </HTMLTable>
-  );
-});
+// From the repayment type alone, so that a change to another input, which
+// starts a calculation, does not format the rows again before its result.
+const rows = derive([repaymentType$, loanStore.calculatedValues], rowsOf);

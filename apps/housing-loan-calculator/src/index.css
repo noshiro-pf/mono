@@ -1,8 +1,11 @@
 @import 'normalize.css';
 
-/* import these first because they're the base layer */
+/*
+ * Blueprint's style sheet draws the controls (blueprint-synstate's
+ * components, in Blueprint's markup). Each component's own layout is in the
+ * CSS Module beside it.
+ */
 @import '@blueprintjs/core/lib/css/blueprint.css';
-@import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 
 body {
   margin: 0;

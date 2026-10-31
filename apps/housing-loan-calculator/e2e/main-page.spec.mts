@@ -85,6 +85,9 @@ test('config 1', { tag: '@smoke' }, async ({ page }) => {
     .soft(fixedPrincipalYenPerMonthTitle)
     .toHaveText('月々の元金の支払い額');
 
+  // Visible, not only present: the figures are hidden while calculated.
+  await expect.soft(fixedPrincipalYenPerMonthDescription).toBeVisible();
+
   await expect.soft(fixedPrincipalYenPerMonthDescription).toHaveText('61429円');
 
   await expect.soft(interestSumTitle).toHaveText('利息合計額');
@@ -96,6 +99,8 @@ test('config 1', { tag: '@smoke' }, async ({ page }) => {
     .toHaveText('合計支払い額（＝借入金額＋利息）');
 
   await expect.soft(paymentsSumDescription).toHaveText('2806.29万円');
+
+  await expect.soft(page.getByRole('table')).toBeVisible();
 });
 
 test('config 2', { tag: '@smoke' }, async ({ page }) => {
@@ -128,6 +133,8 @@ test('config 2', { tag: '@smoke' }, async ({ page }) => {
     .check({ force: true });
 
   await expect.soft(fixedMonthlyPaymentsYenTitle).toHaveText('月々の支払い額');
+
+  await expect.soft(fixedMonthlyPaymentsYenDescription).toBeVisible();
 
   await expect.soft(fixedMonthlyPaymentsYenDescription).toHaveText('72165円');
 

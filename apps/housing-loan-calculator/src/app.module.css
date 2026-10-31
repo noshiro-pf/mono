@@ -1,0 +1,28 @@
+.root {
+  min-height: 100vh;
+  padding: 10px;
+}
+
+.title {
+  padding: 10px;
+  font-size: x-large;
+  font-weight: bold;
+  color: white;
+}
+
+.section {
+  padding: 5px 0;
+}
+
+.paper {
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f5f8fa;
+}
+
+.spinner {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
