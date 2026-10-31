@@ -5,6 +5,7 @@
   ],
   "compilerOptions": {
     "libReplacement": true,
+    "allowArbitraryExtensions": true,
     "jsx": "react-jsx",
     "jsxImportSource": "synstate-dom"
   },
