@@ -3,6 +3,7 @@ import {
   constant,
   createAfterUpdate,
   If,
+  isImeKeyDown,
   listenInScope,
   toObservable,
   view,
@@ -24,7 +25,6 @@ import {
 } from '../date/index.mjs';
 import {
   ARROW_SIZE,
-  isImeKeyDown,
   placeBottomStart,
   uniqueId,
   type PopoverPosition,
@@ -381,7 +381,9 @@ export const DateInput = ({
             ),
           }}
           onKeyDown={(event) => {
-            if (event.key !== 'Escape') {
+            // The Escape that cancels what an input method is composing, in the
+            // time picker's fields, is the input method's.
+            if (event.key !== 'Escape' || isImeKeyDown(event)) {
               return;
             }
 

@@ -10,6 +10,7 @@ import {
   createAfterUpdate,
   For,
   If,
+  isImeKeyDown,
   view,
   type JSX,
 } from 'synstate-dom';
@@ -199,15 +200,9 @@ export const LabelInput = ({
   const onKeyDown = (
     pressed: KeyboardEvent & Readonly<{ currentTarget: HTMLInputElement }>,
   ): void => {
-    // A key that ends an IME's composition is the IME's: Safari sends the
-    // Enter that confirms one after `compositionend`, as key code 229 — which a
-    // phone's keyboard may give its other keys too.
-    if (
-      pressed.isComposing ||
-      (pressed.key === 'Enter' &&
-        // eslint-disable-next-line @typescript-eslint/no-deprecated -- Safari tells this key from others by its key code alone.
-        pressed.keyCode === IME_KEY_CODE)
-    ) {
+    // A key that picks, confirms or cancels what an IME is composing is the
+    // IME's.
+    if (isImeKeyDown(pressed)) {
       return;
     }
 
@@ -486,6 +481,3 @@ export const LabelInput = ({
     </div>
   );
 };
-
-/** The key code of a key down that an IME takes. */
-const IME_KEY_CODE = 229;
