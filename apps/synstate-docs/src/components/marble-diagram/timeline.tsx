@@ -6,13 +6,14 @@ type Props = Readonly<{
 }>;
 
 export const Timeline = React.memo<Props>(({ def }) => (
+  // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- an inline SVG drawing cannot be an <img>; role="img" makes it one labelled image
   <svg
     role={'img'}
     style={timelineSvgStyle}
     viewBox={`0 0 ${VIEWBOX_WIDTH.toString()} ${VIEWBOX_HEIGHT.toString()}`}
   >
     {/* Timeline line */}
-    <title>Timeline of observable events</title>
+    <title>{'Timeline of observable events'}</title>
     <line
       stroke={'var(--sl-color-gray-3, #6b7280)'}
       strokeWidth={STROKE_WIDTH}

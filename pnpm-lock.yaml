@@ -367,6 +367,9 @@ importers:
       eslint-plugin-ts-type-forge:
         specifier: workspace:*
         version: link:libs/eslint-plugin-ts-type-forge
+      github-slugger:
+        specifier: 2.0.0
+        version: 2.0.0
       jiti:
         specifier: 'catalog:'
         version: 2.7.0

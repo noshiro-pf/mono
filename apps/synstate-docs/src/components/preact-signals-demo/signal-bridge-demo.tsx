@@ -1,6 +1,7 @@
 /** @jsxImportSource preact */
 // embed-sample-code-ignore-above
 import { signal } from '@preact/signals';
+import type { InputEventHandler } from 'preact';
 import { debounce, map, withIndex } from 'synstate';
 import { fromSignal, toSignal } from 'synstate-preact-signals';
 
@@ -28,6 +29,11 @@ const inputLength$ = input$.pipe(map((s) => s.length));
 
 const inputLengthSignal = toSignal(inputLength$);
 
+const handleInput: InputEventHandler<HTMLInputElement> = (e) => {
+  // eslint-disable-next-line functional/immutable-data
+  inputSignal.value = e.currentTarget.value;
+};
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -38,14 +44,11 @@ export const SignalBridgeDemo = (): preact.JSX.Element => (
       <label style={labelStyle}>
         {'Input (Preact Signal): '}
         <input
+          placeholder={'Type something...'}
           style={inputStyle}
           type={'text'}
-          placeholder={'Type something...'}
           value={inputSignal}
-          onInput={(e) => {
-            // eslint-disable-next-line functional/immutable-data, total-functions/no-unsafe-type-assertion
-            inputSignal.value = (e.target as HTMLInputElement).value;
-          }}
+          onInput={handleInput}
         />
       </label>
     </div>

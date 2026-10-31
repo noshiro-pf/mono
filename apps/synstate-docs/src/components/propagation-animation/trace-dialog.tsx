@@ -10,7 +10,9 @@ type Props = Readonly<{
  * Escape closes it, as it does any modal `<dialog>`; `onClose` is told so
  * that the owner can unmount it.
  */
-export const TraceDialog = React.memo<Props>(({ children, onClose }) => {
+export const TraceDialog = React.memo<Props>((props) => {
+  const { children, onClose } = props;
+
   const ref = React.useRef<HTMLDialogElement>(null);
 
   React.useEffect(() => {
@@ -18,7 +20,7 @@ export const TraceDialog = React.memo<Props>(({ children, onClose }) => {
   }, []);
 
   return (
-    <dialog className={'propagation-trace-dialog'} ref={ref} onClose={onClose}>
+    <dialog ref={ref} className={'propagation-trace-dialog'} onClose={onClose}>
       {children}
     </dialog>
   );

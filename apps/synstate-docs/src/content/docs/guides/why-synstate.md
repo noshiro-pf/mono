@@ -7,7 +7,7 @@ sidebar:
 
 ## Simple to Start, Powerful When You Need It
 
-SynState is a state management library for web frontends. For most use cases, `createState`, `createReducer`, and simple combinators like `combine` and `map` are all you need — clean, minimal APIs that feel as intuitive as React's `useState` / `useReducer`, but for global state. For example, a [simple counter](/mono/synstate/examples/react/#global-counter-state) can be implemented in just a few lines:
+SynState is a state management library for web frontends. For most use cases, `createState`, `createReducer`, and simple combinators like `combine` and `map` are all you need — clean, minimal APIs that feel as intuitive as React's `useState` / `useReducer`, but for global state. For example, a [simple counter](/mono/synstate/examples/react/#global-counter) can be implemented in just a few lines:
 
 ```tsx
 import { createState } from 'synstate-react-hooks';

@@ -60,6 +60,7 @@ export const DepGraph = React.memo<Props>((props) => {
   );
 
   return (
+    // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- an inline SVG drawing cannot be an <img>; role="img" makes it one labelled image
     <svg
       role={'img'}
       style={svgStyle}

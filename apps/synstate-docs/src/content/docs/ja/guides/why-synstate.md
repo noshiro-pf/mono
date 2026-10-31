@@ -7,7 +7,7 @@ sidebar:
 
 ## シンプルに始められ、必要に応じてパワフルに
 
-SynState は Web フロントエンド向けの状態管理ライブラリです。ほとんどのユースケースでは、`createState`、`createReducer`、そして `combine` や `map` のようなシンプルなコンビネーターだけで十分です — React の `useState` / `useReducer` と同じくらい直感的でありながら、グローバル状態を管理できるクリーンで最小限の API です。例えば、[シンプルなカウンター](/mono/synstate/ja/examples/react/#global-counter-state)はわずか数行で実装できます：
+SynState は Web フロントエンド向けの状態管理ライブラリです。ほとんどのユースケースでは、`createState`、`createReducer`、そして `combine` や `map` のようなシンプルなコンビネーターだけで十分です — React の `useState` / `useReducer` と同じくらい直感的でありながら、グローバル状態を管理できるクリーンで最小限の API です。例えば、[シンプルなカウンター](/mono/synstate/ja/examples/react/#グローバルカウンター)はわずか数行で実装できます：
 
 ```tsx
 import { createState } from 'synstate-react-hooks';
@@ -20,7 +20,7 @@ const Counter = () => {
 };
 ```
 
-要件がより複雑になっても、SynState は対応できます。シンプルな[ダークモード切替](/mono/synstate/ja/examples/react/#boolean-state-dark-mode)から[自動キャンセル付きデバウンス検索パイプライン](/mono/synstate/ja/examples/advanced/#search-with-debounce)まで、すべてを統一された API で記述できます。
+要件がより複雑になっても、SynState は対応できます。シンプルな[ダークモード切替](/mono/synstate/ja/examples/react/#boolean-状態ダークモード)から[自動キャンセル付きデバウンス検索パイプライン](/mono/synstate/ja/examples/advanced/#debounce-付き検索)まで、すべてを統一された API で記述できます。
 
 ## なぜ Observable ベースなのか？
 
