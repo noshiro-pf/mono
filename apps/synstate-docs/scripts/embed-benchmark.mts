@@ -90,6 +90,11 @@ const targets: readonly EmbedTarget[] = [
     startMarker: '{/* benchmark-result-conditional-fan-out */}',
     endMarker: '{/* /benchmark-result-conditional-fan-out */}',
   },
+  {
+    resultsFile: 'results-equality-cut-off.md',
+    startMarker: '{/* benchmark-result-equality-cut-off */}',
+    endMarker: '{/* /benchmark-result-equality-cut-off */}',
+  },
 ] as const;
 
 /**

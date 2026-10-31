@@ -22,5 +22,6 @@ export { default as cascadedDiamond } from './results-cascaded-diamond.json' wit
 export { default as conditionalFanOut } from './results-conditional-fan-out.json' with { type: 'json' };
 export { default as deepChain } from './results-deep-chain.json' with { type: 'json' };
 export { default as diamond } from './results-diamond.json' with { type: 'json' };
+export { default as equalityCutOff } from './results-equality-cut-off.json' with { type: 'json' };
 export { default as singleState } from './results-single-state.json' with { type: 'json' };
 export { default as derivedChain } from './results.json' with { type: 'json' };

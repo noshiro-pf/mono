@@ -15,6 +15,7 @@
     "benchmark:conditional-fan-out": "run-s z:build:synstate z:benchmark:conditional-fan-out gen:benchmark-doc fix:fmt",
     "benchmark:deep-chain": "run-s z:build:synstate z:benchmark:deep-chain gen:benchmark-doc fix:fmt",
     "benchmark:derived-chain": "run-s z:build:synstate z:benchmark:derived-chain gen:benchmark-doc fix:fmt",
+    "benchmark:equality-cut-off": "run-s z:build:synstate z:benchmark:equality-cut-off gen:benchmark-doc fix:fmt",
     "build": "run-s doc build:astro",
     "build:astro": "astro build",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
@@ -42,7 +43,8 @@
     "z:benchmark:conditional-fan-out": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/run-conditional-fan-out.mts",
     "z:benchmark:deep-chain": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/run-deep-chain.mts",
     "z:benchmark:derived-chain": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/run-derived-chain.mts",
-    "z:benchmark:measure": "run-s z:benchmark:derived-chain z:benchmark:cascaded-diamond z:benchmark:conditional-fan-out z:benchmark:deep-chain",
+    "z:benchmark:equality-cut-off": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/run-equality-cut-off.mts",
+    "z:benchmark:measure": "run-s z:benchmark:derived-chain z:benchmark:cascaded-diamond z:benchmark:conditional-fan-out z:benchmark:deep-chain z:benchmark:equality-cut-off",
     "z:benchmark:version-key": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/print-version-key.mts",
     "z:build:synstate": "pnpm --filter synstate run build",
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"

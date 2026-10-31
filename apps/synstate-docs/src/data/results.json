@@ -10,9 +10,9 @@
       "platform": "Linux 7.0.0-1017-azure",
       "arch": "x64",
       "cpu": "AMD EPYC 7763 64-Core Processor",
-      "measuredOn": "2026-10-30",
+      "measuredOn": "2026-10-31",
       "libraries": {
-        "synstate": "6.1.0",
+        "synstate": "6.1.1",
         "rxjs": "7.8.2",
         "jotai": "3.0.1",
         "mobx": "7.1.0",
@@ -27,59 +27,59 @@
   "rows": [
     {
       "label": "SynState",
-      "median": 15.98,
-      "min": 15.44,
-      "max": 17.04,
-      "p95": 17.02,
-      "opsPerSec": 6259498
+      "median": 14.6,
+      "min": 14.19,
+      "max": 16.14,
+      "p95": 15.53,
+      "opsPerSec": 6848907
     },
     {
       "label": "RxJS",
-      "median": 7.29,
-      "min": 7.23,
-      "max": 7.82,
-      "p95": 7.48,
-      "opsPerSec": 13711897
+      "median": 7.3,
+      "min": 7.22,
+      "max": 7.93,
+      "p95": 7.43,
+      "opsPerSec": 13707177
     },
     {
       "label": "MobX",
-      "median": 108.72,
-      "min": 108.17,
-      "max": 109.65,
-      "p95": 109.59,
-      "opsPerSec": 919769
+      "median": 109.55,
+      "min": 109.04,
+      "max": 110.2,
+      "p95": 110.17,
+      "opsPerSec": 912834
     },
     {
       "label": "Jotai",
-      "median": 747.58,
-      "min": 739.7,
-      "max": 759.42,
-      "p95": 759.17,
-      "opsPerSec": 133765
+      "median": 749.44,
+      "min": 734.09,
+      "max": 788.52,
+      "p95": 786.44,
+      "opsPerSec": 133433
     },
     {
       "label": "Redux",
-      "median": 291.38,
-      "min": 281.94,
-      "max": 305.2,
-      "p95": 305.18,
-      "opsPerSec": 343199
+      "median": 288.67,
+      "min": 283.74,
+      "max": 327.16,
+      "p95": 319.22,
+      "opsPerSec": 346421
     },
     {
       "label": "Solid",
-      "median": 90.76,
-      "min": 90.23,
-      "max": 92.76,
-      "p95": 91.7,
-      "opsPerSec": 1101788
+      "median": 89.3,
+      "min": 88.81,
+      "max": 90.31,
+      "p95": 89.61,
+      "opsPerSec": 1119791
     },
     {
       "label": "Preact Signals",
-      "median": 14.57,
-      "min": 14.41,
-      "max": 16.4,
-      "p95": 14.79,
-      "opsPerSec": 6863543
+      "median": 13.92,
+      "min": 13.78,
+      "max": 14.2,
+      "p95": 14.19,
+      "opsPerSec": 7185614
     }
   ]
 }

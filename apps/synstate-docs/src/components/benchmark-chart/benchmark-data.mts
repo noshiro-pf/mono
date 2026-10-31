@@ -2,6 +2,7 @@ import {
   cascadedDiamond,
   conditionalFanOut,
   deepChain,
+  equalityCutOff,
   isNaiveForm,
   libraryColorOf,
 } from '../../data/index.mjs';
@@ -32,6 +33,8 @@ export const deepChainResults: SeriesResults = deepChain;
 export const cascadedDiamondResults: SeriesResults = cascadedDiamond;
 
 export const conditionalFanOutResults: SeriesResults = conditionalFanOut;
+
+export const equalityCutOffResults: SeriesResults = equalityCutOff;
 
 /**
  * Pairs each library's measurements with the colour every chart draws it in

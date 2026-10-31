@@ -6,6 +6,7 @@ import {
   deepChain as deepChainJson,
   derivedChain as derivedChainJson,
   diamond as diamondJson,
+  equalityCutOff as equalityCutOffJson,
   isNaiveForm,
   singleState as singleStateJson,
 } from '../src/data/index.mjs';
@@ -273,9 +274,9 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
 
     // Scenario: Cascaded Diamond
     'cascaded-diamond/timeout': ms(timeout(cascadedDiamond)),
-    'cascaded-diamond/updates-math': String.raw`$\times ${count(updates(cascadedDiamond))}$`,
+    'cascaded-diamond/updates-math': String.raw`$\times ${countMath(updates(cascadedDiamond))}$`,
     'cascaded-diamond/rxjs-timeout-n-math': `$N=${param(rxjsTimeoutLabel())}$`,
-    'cascaded-diamond/rxjs-timeout-emissions-math': `$2^{${param(rxjsTimeoutLabel())}} = ${(2 ** param(rxjsTimeoutLabel())).toString()}$`,
+    'cascaded-diamond/rxjs-timeout-emissions-math': `$2^{${param(rxjsTimeoutLabel())}} = ${countMath(2 ** param(rxjsTimeoutLabel()))}$`,
     'cascaded-diamond/rxjs-last-measured-n-math': `$N=${param(rxjsLastLabel())}$`,
     'cascaded-diamond/rxjs@last-measured': ms(
       at(cascadedDiamond, 'RxJS', rxjsLastLabel()),
@@ -371,7 +372,7 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     ),
 
     // Scenario: Conditional Fan-Out
-    'fan-out/updates-math': `$K = ${count(updates(conditionalFanOut)).replace(',', '{,}')}$`,
+    'fan-out/updates-math': `$K = ${countMath(updates(conditionalFanOut))}$`,
     'fan-out/mobx-typical': ms(typical(conditionalFanOut, 'MobX')),
     'fan-out/jotai-typical': ms(typical(conditionalFanOut, 'Jotai')),
     'fan-out/solid-typical': ms(typical(conditionalFanOut, 'Solid')),
@@ -397,6 +398,13 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       at(conditionalFanOut, 'Redux', fanOutLastLabel()),
     ),
     'fan-out/jotai-slower-through-b': count(param(fanOutCrossoverLabel())),
+    // What a write to the branch nobody reads costs the libraries whose
+    // subscriptions follow what is read, as a bound, beside what it costs
+    // Jotai: the Jotai analysis sets the two side by side.
+    'fan-out/dynamic-write-cost-at-most': fanOutWriteCostAtMost(
+      DYNAMIC_SUBSCRIPTIONS,
+    ),
+    'fan-out/jotai-write-cost@last-measured-b': fanOutWriteCostAtLast('Jotai'),
     // "Their cost is constant regardless of B" for the libraries whose
     // subscriptions follow what is read, and the same of each alone in its
     // analysis (see `rowTrend`).
@@ -418,6 +426,49 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       'Solid',
       { flat: { en: 'stays flat', ja: 'B に関係なく一定です' } },
     ),
+
+    // Scenario: Equality Cut-Off
+    'cut-off/updates-math': `$K = ${countMath(updates(equalityCutOff))}$`,
+    // The libraries that stop at the equal bucket: the views run only when the
+    // bucket changes, so their rows grow far more slowly across W than the
+    // visiting rows (see `rowTrend`).
+    'compare/cut-off/stopping-rows-trend': rowsTrend(
+      'the SynState and RxJS cut-off rows',
+      equalityCutOff,
+      STOPPING_AT_THE_BUCKET,
+      { flat: { en: 'stay nearly flat', ja: 'W にほぼ関係なく横ばいです' } },
+    ),
+    'cut-off/synstate-start-median': ms(
+      endMedians(equalityCutOff, 'SynState')[0],
+    ),
+    'cut-off/synstate-end-median': ms(
+      endMedians(equalityCutOff, 'SynState')[1],
+    ),
+    'cut-off/rxjs-start-median': ms(endMedians(equalityCutOff, 'RxJS')[0]),
+    'cut-off/rxjs-end-median': ms(endMedians(equalityCutOff, 'RxJS')[1]),
+    // The libraries that reach every view on every update, equal bucket or
+    // not, and the RxJS row written without `distinctUntilChanged`.
+    'compare/cut-off/visiting-rows-trend': growsToLastMeasured(
+      'the Preact Signals, Solid, MobX, Jotai and Redux cut-off rows',
+      equalityCutOff,
+      VISITING_EVERY_VIEW,
+      { en: 'grow with W', ja: 'W とともに増えます' },
+    ),
+    'compare/cut-off/rxjs-naive-trend': growsToLastMeasured(
+      "RxJS's cut-off row without `distinctUntilChanged`",
+      equalityCutOff,
+      [RXJS_NAIVE_CUT_OFF],
+      { en: 'grows with W', ja: 'W とともに増えます' },
+    ),
+    'cut-off/rxjs-naive-over-rxjs@last-measured-w': ratio(
+      at(
+        equalityCutOff,
+        RXJS_NAIVE_CUT_OFF,
+        cutOffLastLabel(RXJS_NAIVE_CUT_OFF),
+      ),
+      at(equalityCutOff, 'RxJS', cutOffLastLabel(RXJS_NAIVE_CUT_OFF)),
+    ),
+    ...cutOffVisitingRows(),
 
     // Summary: the fastest library in each scenario and how far SynState is
     // from it, at the point of the sweep the summary table names. Derived
@@ -465,10 +516,15 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       pointSpread(deepChain, 'SynState', DEEP_MAX),
       1,
     ),
-    'summary/deep-chain-slowest': slowestAt(deepChain, DEEP_MAX),
+    'summary/deep-chain-slowest': slowestAt(
+      deepChain,
+      DEEP_MAX,
+      naiveLabels(deepChain),
+    ),
     'summary/deep-chain-slowest-over-fastest': slowestSpreadText(
       deepChain,
       DEEP_MAX,
+      naiveLabels(deepChain),
     ),
     'summary/cascaded-diamond-fastest': fastestAt(
       cascadedDiamond,
@@ -481,10 +537,12 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     'summary/cascaded-diamond-slowest': slowestAt(
       cascadedDiamond,
       CASCADED_MAX,
+      naiveLabels(cascadedDiamond),
     ),
     'summary/cascaded-diamond-slowest-over-fastest': slowestSpreadText(
       cascadedDiamond,
       CASCADED_MAX,
+      naiveLabels(cascadedDiamond),
     ),
     'summary/fan-out-scenario': fanOutSummaryName(),
     'summary/fan-out-fastest': fastestAt(conditionalFanOut, fanOutLastLabel()),
@@ -507,16 +565,34 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     'summary/fan-out-slowest': slowestAt(
       conditionalFanOut,
       fanOutLastLabel(),
-      fanOutSummaryExcluded(),
+      naiveLabels(conditionalFanOut),
     ),
     'summary/fan-out-slowest-over-fastest': slowestSpreadText(
       conditionalFanOut,
       fanOutLastLabel(),
-      fanOutSummaryExcluded(),
+      naiveLabels(conditionalFanOut),
+    ),
+    'summary/cut-off-scenario': cutOffSummaryName(),
+    'summary/cut-off-fastest': fastestAt(equalityCutOff, cutOffSummaryLabel()),
+    'summary/cut-off-synstate-over-fastest': factor(
+      pointSpread(equalityCutOff, 'SynState', cutOffSummaryLabel()),
+      1,
+    ),
+    // The naive RxJS row is left out of the slowest column, as the fan-out's
+    // naive rows are.
+    'summary/cut-off-slowest': slowestAt(
+      equalityCutOff,
+      cutOffSummaryLabel(),
+      naiveLabels(equalityCutOff),
+    ),
+    'summary/cut-off-slowest-over-fastest': slowestSpreadText(
+      equalityCutOff,
+      cutOffSummaryLabel(),
+      naiveLabels(equalityCutOff),
     ),
     // The two figures the sentence under the summary table sets side by side:
-    // SynState's worst distance from the fastest across the six rows, and the
-    // smallest distance of any scenario's slowest library.
+    // SynState's worst distance from the fastest across the summary rows, and
+    // the smallest distance of any row's slowest library.
     'summary/synstate-worst-over-fastest': factor(
       Math.max(...summarySynStateSpreads()),
       1,
@@ -535,11 +611,11 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       en: "RxJS's worst row",
       ja: 'RxJS の最悪の行である',
     }),
-    'summary/mobx-worst-label': whileWorstIn('MobX', DEEP_CHAIN, {
+    'summary/mobx-worst-label': whileWorstIn('MobX', CUT_OFF, {
       en: "MobX's worst row",
       ja: 'MobX の最悪の行である',
     }),
-    'summary/redux-worst-label': whileWorstIn('Redux', FAN_OUT, {
+    'summary/redux-worst-label': whileWorstIn('Redux', CUT_OFF, {
       en: "Redux's worst row",
       ja: 'Redux の最悪の行である',
     }),
@@ -547,10 +623,44 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       en: "that is already the `switchMap` form, which holds no branch nobody reads: what remains is SynState's cost of a write that reaches no node",
       ja: 'これはすでに誰も読まない分岐を持たない `switchMap` の形での数字です。残っているのは、どのノードにも届かない書き込みの SynState でのコストです',
     }),
-    'summary/jotai-worst-explained': whileWorstIn('Jotai', FAN_OUT, {
-      en: `where a write to a branch nobody reads costs MobX, Solid and Preact Signals ${fanOutWriteCostAtMost(DYNAMIC_SUBSCRIPTIONS)} or less and Jotai a whole \`store.set()\`, ${fanOutWriteCostAtLast('Jotai')}`,
-      ja: `誰も読まない分岐への書き込みは MobX・Solid・Preact Signals には ${fanOutWriteCostAtMost(DYNAMIC_SUBSCRIPTIONS)} 以下しかかかりませんが、Jotai には \`store.set()\` 1回分の ${fanOutWriteCostAtLast('Jotai')} がまるごとかかります`,
+    'summary/jotai-worst-explained': whileWorstIn('Jotai', CUT_OFF, {
+      en: 'where each `store.set()` runs steps 2 and 3 below over every view under `bucket`, and step 4 then finds `bucket` unchanged',
+      ja: 'これは、`store.set()` のたびに下の手順 2 と 3 を `bucket` の下のすべてのビューに対して行い、手順 4 で `bucket` が変わっていないとわかるシナリオです',
     }),
+    'summary/solid-worst-explained': whileWorstIn('Solid', CUT_OFF, {
+      en: 'where a write marks every view below `bucket` pending (`markDownstream`) and each is looked over (`lookUpstream`) before `bucket` is found unchanged',
+      ja: 'これは、書き込みが `bucket` の下のすべてのビューに保留の印を付け（`markDownstream`）、`bucket` が変わっていないとわかるまでに各ビューを確かめる（`lookUpstream`）シナリオです',
+    }),
+    'summary/preact-signals-worst-explained': whileWorstIn(
+      'Preact Signals',
+      CUT_OFF,
+      {
+        en: 'where a write flags every view below `bucket` outdated and queues its effect, and each effect checks its view before `bucket` is found unchanged',
+        ja: 'これは、書き込みが `bucket` の下のすべてのビューに古い印を付けてその effect をキューに入れ、`bucket` が変わっていないとわかるまでに各 effect が自分のビューを確かめるシナリオです',
+      },
+    ),
+    // Why the summary bullet's small-graph overhead does not carry over to
+    // Preact Signals' worst case.
+    'summary/preact-signals-worst-why': whileWorstIn(
+      'Preact Signals',
+      CUT_OFF,
+      {
+        en: 'where that does not help, a write that marks many readers of a derived value that comes out equal',
+        ja: 'それが効かない場面、つまり派生値が等しくなるのにその読み手を書き込みのたびにすべてマークする場面で',
+      },
+    ),
+    // Each library's scenario, against the other: the one built for
+    // subscriptions that follow what is read, and the one built for stopping
+    // where an equal value is produced.
+    'fan-out/synstate-switch-map-over-preact-signals@last-measured-b': factor(
+      at(conditionalFanOut, 'SynState (switchMap)', fanOutLastLabel()),
+      at(conditionalFanOut, 'Preact Signals', fanOutLastLabel()),
+    ),
+    'cut-off/preact-signals-over-synstate@summary-w': factor(
+      at(equalityCutOff, 'Preact Signals', cutOffSummaryLabel()),
+      at(equalityCutOff, 'SynState', cutOffSummaryLabel()),
+    ),
+    'cut-off/summary-w': param(cutOffSummaryLabel()).toString(),
 
     // Which library leads each summary row, grouped by library, for the pages
     // that sum the benchmark up in a sentence.
@@ -651,6 +761,8 @@ const cascadedDiamond: SeriesData = cascadedDiamondJson;
 
 const conditionalFanOut: SeriesData = conditionalFanOutJson;
 
+const equalityCutOff: SeriesData = equalityCutOffJson;
+
 /**
  * One fact about where every table on the page was measured.
  *
@@ -697,6 +809,32 @@ const DYNAMIC_SUBSCRIPTIONS: readonly string[] = [
   'Solid',
   'Preact Signals',
 ] as const;
+
+/**
+ * The cut-off rows whose libraries stop at the equal bucket, so that the views
+ * below it run only when the bucket changes, once in 1000 updates: SynState's
+ * `map` and RxJS's `distinctUntilChanged`.
+ */
+const STOPPING_AT_THE_BUCKET: readonly string[] = ['SynState', 'RxJS'] as const;
+
+/**
+ * The cut-off rows whose libraries compare the bucket too, but reach every
+ * view on every update first: the pull-based ones mark each view and its
+ * subscriber before the bucket is recomputed, and Redux calls every
+ * subscriber, whose selector then finds its input unchanged.
+ */
+const VISITING_EVERY_VIEW: readonly string[] = [
+  'Preact Signals',
+  'Solid',
+  'MobX',
+  'Jotai',
+  'Redux',
+] as const;
+
+const RXJS_NAIVE_CUT_OFF = 'RxJS (naive, no distinctUntilChanged)';
+
+/** The first point of the cut-off sweep, one view. */
+const CUT_OFF_MIN = 'W=1';
 
 const row = (
   data: SeriesData,
@@ -818,7 +956,7 @@ const fanOutWriteCostAtMost = (labels: readonly string[]): string =>
 
           if (value === null) {
             throw new Error(
-              `❌ ${label} timed out at '${xLabel}' of the fan-out, so the sentence that bounds what a write to an unread branch costs it (summary/jotai-worst-explained) no longer holds — rewrite it against the tables`,
+              `❌ ${label} timed out at '${xLabel}' of the fan-out, so the sentence that bounds what a write to an unread branch costs it (fan-out/dynamic-write-cost-at-most) no longer holds — rewrite it against the tables`,
             );
           }
 
@@ -867,8 +1005,8 @@ const at = (data: SeriesData, label: string, xLabel: string): number => {
 
 /**
  * What a write to the inactive branch costs `label` in the fan-out, per
- * update, at the point the summary reads the scenario at: the figure the
- * per-library table shows for a library whose worst row this is.
+ * update, at the point the summary reads the scenario at, as the per-library
+ * table prints a duration.
  */
 const fanOutWriteCostAtLast = (label: string): string =>
   durationNs(
@@ -883,6 +1021,37 @@ const listed = (items: readonly string[]): string =>
   Arr.isMaxLengthArray(1, items)
     ? items.join('')
     : (`${Arr.butLast(items).join(', ')} and ${items.at(-1) ?? ''}` as const);
+
+/**
+ * The widest view count at which every cut-off row the summary reads finished:
+ * the naive form, which its slowest column leaves out, does not move it.
+ */
+const cutOffSummaryLabel = (): string => {
+  const xLabel = equalityCutOff.xLabels.findLast((x) =>
+    equalityCutOff.series
+      .filter((s) => !isNaiveForm(s.label))
+      .every((s) => valueAt(equalityCutOff, s.label, x) !== null),
+  );
+
+  if (xLabel === undefined) {
+    throw new Error('❌ no cut-off point that every row finished');
+  }
+
+  return xLabel;
+};
+
+/**
+ * The cut-off row's name. Its point is the widest view count every row
+ * finished, so that each cell of the row is a measured ratio rather than a
+ * lower bound; several rows time out before the sweep ends, and a slower
+ * machine can move the point, so the summary table's first column reads it
+ * from here too.
+ */
+const cutOffSummaryName = (): Localized =>
+  ({
+    en: `[Equality cut-off](#scenario-equality-cut-off) (${cutOffSummaryLabel()})`,
+    ja: `[等値カットオフ](#シナリオ-等値カットオフ)（${cutOffSummaryLabel()}）`,
+  }) as const;
 
 /**
  * The fan-out row's name. Its point is the last one SynState's naive form
@@ -925,6 +1094,19 @@ const fastestRow = (
   return first.label;
 };
 
+/**
+ * The library with the largest median in a single-point scenario.
+ */
+const slowestRow = (data: StatsData): string => {
+  const [first] = data.rows.toSorted((a, b) => b.median - a.median);
+
+  if (first === undefined) {
+    throw new Error('❌ this scenario measured no library');
+  }
+
+  return first.label;
+};
+
 /** How many times the fastest library's median `label`'s median is. */
 const rowSpread = (data: StatsData, label: string): number =>
   divide(median(data, label), median(data, fastestRow(data)));
@@ -942,6 +1124,7 @@ const statsScenario = (
     fastest: () => markFastest(fastestRow(data)),
     leader: () => fastestRow(data),
     spread: (library) => rowSpread(data, library),
+    slowestSpread: () => rowSpread(data, slowestRow(data)),
     timedOut: () => false,
     perUpdateNs: (library) => ({
       library: nsPerUpdate(median(data, library), updates(data)),
@@ -968,6 +1151,31 @@ const fastestAt = (data: SeriesData, xLabel: string): string => {
   return first.label;
 };
 
+/**
+ * The library that took longest at `xLabel`, leaving out the rows named in
+ * `excluded`. A timeout is slower than any measurement, for the reason
+ * {@link aheadAt} gives.
+ */
+const slowestAt = (
+  data: SeriesData,
+  xLabel: string,
+  excluded: readonly string[] = [],
+): string => {
+  const [first] = data.series
+    .filter((s) => !excluded.includes(s.label))
+    .map((s) => ({
+      label: s.label,
+      value: valueAt(data, s.label, xLabel) ?? Number.POSITIVE_INFINITY,
+    }))
+    .toSorted((a, b) => b.value - a.value);
+
+  if (first === undefined) {
+    throw new Error(`❌ no library was measured at '${xLabel}'`);
+  }
+
+  return first.label;
+};
+
 const timeout = (data: SeriesData): number => {
   const value = data.meta.timeoutMs;
 
@@ -988,6 +1196,16 @@ const pointSpread = (data: SeriesData, label: string, xLabel: string): number =>
     valueAt(data, label, xLabel) ?? timeout(data),
     at(data, fastestAt(data, xLabel), xLabel),
   );
+
+/**
+ * The rows of a sweep the summary's slowest column leaves out: the naive forms
+ * (`isNaiveForm`, the same test that dashes them in the chart) — in the
+ * fan-out SynState and RxJS written with a `derive` / `combineLatest` over
+ * every branch, which the summary replaces with their `switchMap` forms, and
+ * in the cut-off RxJS written without `distinctUntilChanged`.
+ */
+const naiveLabels = (data: SeriesData): readonly string[] =>
+  data.series.map((s) => s.label).filter(isNaiveForm);
 
 /**
  * The library a row's label names: `'SynState (switchMap)'` and
@@ -1022,6 +1240,8 @@ const seriesScenario = (
     fastest: () => fastestAt(data, xLabel),
     leader: () => libraryNameOf(fastestAt(data, xLabel)),
     spread: (library) => pointSpread(data, form(library), xLabel),
+    slowestSpread: () =>
+      pointSpread(data, slowestAt(data, xLabel, naiveLabels(data)), xLabel),
     timedOut: (library) => valueAt(data, form(library), xLabel) === null,
     perUpdateNs: (library) => {
       if (updatesAtPoint === undefined) {
@@ -1146,6 +1366,16 @@ const summaryScenarios = (): readonly SummaryScenario[] =>
       fanOutLastLabel(),
       updates(conditionalFanOut),
       FAN_OUT_SUMMARY_FORMS,
+    ),
+    seriesScenario(
+      cutOffSummaryName(),
+      {
+        en: `the equality cut-off (${cutOffSummaryLabel()})`,
+        ja: `等値カットオフ（${cutOffSummaryLabel()}）`,
+      },
+      equalityCutOff,
+      cutOffSummaryLabel(),
+      updates(equalityCutOff),
     ),
   ] as const;
 
@@ -1295,8 +1525,85 @@ const lastAheadLabel = (
 const fanOutCrossoverLabel = (): string =>
   lastAheadLabel(conditionalFanOut, SYNSTATE_NAIVE, 'Jotai');
 
-/** Where {@link ms} stops printing a tenth of a millisecond. */
-const MS_TENTHS_BELOW = 100;
+/** The widest view count `label` finished in the cut-off scenario. */
+const cutOffLastLabel = (label: string): string =>
+  lastMeasuredLabel(equalityCutOff, label);
+
+/**
+ * The trend from `start` to `end` that `words` has wording for: flat within
+ * {@link FLAT_WITHIN}× either way, and a change within {@link EDGE_BAND} of
+ * that edge read on either side of it, as in {@link compared}.
+ */
+const trendBetween = (
+  sentence: string,
+  start: number,
+  end: number,
+  words: Partial<ReadonlyRecord<Trend, Localized>>,
+): Readonly<{ trend: Trend; wording: Localized }> => {
+  const change = divide(end, start);
+
+  const trendOf = (value: number): Trend =>
+    value > FLAT_WITHIN ? 'grows' : value * FLAT_WITHIN < 1 ? 'falls' : 'flat';
+
+  const found = [
+    trendOf(change),
+    trendOf(change * EDGE_BAND),
+    trendOf(divide(change, EDGE_BAND)),
+  ]
+    .map((candidate) => ({ trend: candidate, wording: words[candidate] }))
+    .find(
+      (c): c is Readonly<{ trend: Trend; wording: Localized }> =>
+        c.wording !== undefined,
+    );
+
+  if (found === undefined) {
+    throw new Error(
+      `❌ ${sentence}: it now ${trendOf(change)} (${factor(end, start)}× from start to end), which the sentence does not explain — rewrite it against the tables`,
+    );
+  }
+
+  return found;
+};
+
+/**
+ * `wording` for a sentence that says each of `labels` grows across the sweep,
+ * judged from its first point to the last one it finished — several of these
+ * rows time out before the end, so {@link rowTrend}'s end medians do not
+ * exist for them. A single first point is enough here: the rows the sentence
+ * covers grow by tens of times, far beyond what one noisy point moves.
+ */
+const growsToLastMeasured = (
+  sentence: string,
+  data: SeriesData,
+  labels: readonly string[],
+  wording: Localized,
+): Localized => {
+  const [first] = data.xLabels;
+
+  if (first === undefined) {
+    throw new Error(`❌ ${sentence}: the sweep has no point`);
+  }
+
+  for (const label of labels) {
+    trendBetween(
+      `${sentence} (${label})`,
+      at(data, label, first),
+      at(data, label, lastMeasuredLabel(data, label)),
+      { grows: wording },
+    );
+  }
+
+  return wording;
+};
+
+/**
+ * A cut-off row's label as a marker key: `Preact Signals` → `preact-signals`,
+ * and the naive RxJS row → `rxjs-naive`.
+ */
+const cutOffKeyOf = (label: string): string =>
+  label === RXJS_NAIVE_CUT_OFF
+    ? 'rxjs-naive'
+    : label.toLowerCase().replaceAll(' ', '-');
 
 /**
  * Renders a measurement the way the prose quotes one: a tenth of a millisecond
@@ -1306,6 +1613,46 @@ const ms = (value: number): string =>
   value < MS_TENTHS_BELOW
     ? (`${value.toFixed(1)} ms` as const)
     : (`${count(Math.round(value))} ms` as const);
+
+/**
+ * For each row that grows with W, what the cut-off section quotes: its time
+ * with one view, the widest view count it finished and its time there, and
+ * the slope between the two — what one more view adds to one update, which is
+ * what such a library spends reaching a view it then leaves as it was.
+ */
+const cutOffVisitingRows = (): ReadonlyRecord<string, string> =>
+  Object.fromEntries(
+    Arr.toPushed(VISITING_EVERY_VIEW, RXJS_NAIVE_CUT_OFF).flatMap((label) => {
+      const key = cutOffKeyOf(label);
+
+      const last = cutOffLastLabel(label);
+
+      const added = param(last) - param(CUT_OFF_MIN);
+
+      if (added <= 0) {
+        throw new Error(
+          `❌ ${label} finished no cut-off point past ${CUT_OFF_MIN}, so the sentence on what a view costs it has no slope to quote`,
+        );
+      }
+
+      const first = at(equalityCutOff, label, CUT_OFF_MIN);
+
+      const atLast = at(equalityCutOff, label, last);
+
+      return [
+        [`cut-off/${key}@min-w`, ms(first)],
+        [`cut-off/${key}-last-measured-w`, param(last).toString()],
+        [`cut-off/${key}@last-measured-w`, ms(atLast)],
+        [
+          `cut-off/${key}-ns-per-view-per-update`,
+          count(nsPerUpdate(atLast - first, added * updates(equalityCutOff))),
+        ],
+      ];
+    }),
+  );
+
+/** Where {@link ms} stops printing a tenth of a millisecond. */
+const MS_TENTHS_BELOW = 100;
 
 /**
  * `value` as {@link ms} prints it, rounded up rather than to the nearest, for
@@ -1761,42 +2108,6 @@ function sameFor(
   return Object.fromEntries(spans.map((span) => [span, words] as const));
 }
 
-/**
- * The trend from `start` to `end` that `words` has wording for: flat within
- * {@link FLAT_WITHIN}× either way, and a change within {@link EDGE_BAND} of
- * that edge read on either side of it, as in {@link compared}.
- */
-const trendBetween = (
-  sentence: string,
-  start: number,
-  end: number,
-  words: Partial<ReadonlyRecord<Trend, Localized>>,
-): Readonly<{ trend: Trend; wording: Localized }> => {
-  const change = divide(end, start);
-
-  const trendOf = (value: number): Trend =>
-    value > FLAT_WITHIN ? 'grows' : value * FLAT_WITHIN < 1 ? 'falls' : 'flat';
-
-  const found = [
-    trendOf(change),
-    trendOf(change * EDGE_BAND),
-    trendOf(divide(change, EDGE_BAND)),
-  ]
-    .map((candidate) => ({ trend: candidate, wording: words[candidate] }))
-    .find(
-      (c): c is Readonly<{ trend: Trend; wording: Localized }> =>
-        c.wording !== undefined,
-    );
-
-  if (found === undefined) {
-    throw new Error(
-      `❌ ${sentence}: it now ${trendOf(change)} (${factor(end, start)}× from start to end), which the sentence does not explain — rewrite it against the tables`,
-    );
-  }
-
-  return found;
-};
-
 /** A measurement as {@link ms} prints it, with the same rounding, as a number. */
 const shownMs = (value: number): number => {
   if (value >= MS_TENTHS_BELOW) {
@@ -1944,42 +2255,11 @@ const floored = (
 const NOISE_FLOOR_MS = 1.5;
 
 /**
- * The library with the largest median in a single-point scenario.
+ * {@link count} inside KaTeX math, which takes a bare comma for punctuation and
+ * spaces it: each group separator is braced, `100{,}000`.
  */
-const slowestRow = (data: StatsData): string => {
-  const [first] = data.rows.toSorted((a, b) => b.median - a.median);
-
-  if (first === undefined) {
-    throw new Error('❌ this scenario measured no library');
-  }
-
-  return first.label;
-};
-
-/**
- * The library that took longest at `xLabel`, leaving out the rows named in
- * `excluded`. A timeout is slower than any measurement, for the reason
- * {@link aheadAt} gives.
- */
-const slowestAt = (
-  data: SeriesData,
-  xLabel: string,
-  excluded: readonly string[] = [],
-): string => {
-  const [first] = data.series
-    .filter((s) => !excluded.includes(s.label))
-    .map((s) => ({
-      label: s.label,
-      value: valueAt(data, s.label, xLabel) ?? Number.POSITIVE_INFINITY,
-    }))
-    .toSorted((a, b) => b.value - a.value);
-
-  if (first === undefined) {
-    throw new Error(`❌ no library was measured at '${xLabel}'`);
-  }
-
-  return first.label;
-};
+const countMath = (value: number): string =>
+  count(value).replaceAll(',', '{,}');
 
 /** `figure`, marked `>` where it is a lower bound. */
 const lowerBoundMarked = (figure: string, isLowerBound: boolean): string =>
@@ -2009,15 +2289,6 @@ const slowestSpreadText = (
   );
 };
 
-/**
- * The fan-out rows the summary leaves out: the naive forms (`isNaiveForm`, the
- * same test that dashes them in the chart), SynState and RxJS written with a
- * `derive` / `combineLatest` over every branch, which the summary replaces with
- * their `switchMap` forms.
- */
-const fanOutSummaryExcluded = (): readonly string[] =>
-  conditionalFanOut.series.map((s) => s.label).filter(isNaiveForm);
-
 /** SynState's distance from the fastest in each row of the summary table. */
 const summarySynStateSpreads = (): readonly number[] =>
   summaryScenarios().map((s) => s.spread('SynState'));
@@ -2041,6 +2312,12 @@ type SummaryScenario = Readonly<{
    */
   leader: () => string;
   spread: (library: string) => number;
+  /**
+   * The slowest row's spread, as the summary's slowest column reads it: a
+   * sweep leaves its naive forms out ({@link naiveLabels}); a single-point
+   * scenario has none.
+   */
+  slowestSpread: () => number;
   timedOut: (library: string) => boolean;
   /**
    * What one update costs `library` and the fastest library, in nanoseconds,
@@ -2203,30 +2480,15 @@ const whileWorstIn = (
 };
 
 /** The summary scenarios' anchors on the English page, for {@link whileWorstIn}. */
-const DEEP_CHAIN = '#scenario-deep-chain-throughput';
-
 const CASCADED_DIAMOND = '#scenario-cascaded-diamond';
 
 const FAN_OUT = '#scenario-conditional-fan-out';
 
+const CUT_OFF = '#scenario-equality-cut-off';
+
 /** The slowest library's distance from the fastest in each summary row. */
 const summarySlowestSpreads = (): readonly number[] =>
-  [
-    rowSpread(singleState, slowestRow(singleState)),
-    rowSpread(derivedChain, slowestRow(derivedChain)),
-    rowSpread(diamond, slowestRow(diamond)),
-    pointSpread(deepChain, slowestAt(deepChain, DEEP_MAX), DEEP_MAX),
-    pointSpread(
-      cascadedDiamond,
-      slowestAt(cascadedDiamond, CASCADED_MAX),
-      CASCADED_MAX,
-    ),
-    pointSpread(
-      conditionalFanOut,
-      slowestAt(conditionalFanOut, fanOutLastLabel(), fanOutSummaryExcluded()),
-      fanOutLastLabel(),
-    ),
-  ] as const;
+  summaryScenarios().map((s) => s.slowestSpread());
 
 /**
  * The scenarios the prose calls the small graphs: one update reaches a handful
