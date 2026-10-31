@@ -3,7 +3,11 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
+import {
+  isTypeWrapper,
+  skipTypeWrappers,
+  typeWrapperLayers,
+} from 'eslint-rule-forge';
 import { Arr, castDeepMutable, hasKey, isRecord } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 
@@ -26,6 +30,14 @@ type CallExpressionWithLegacyTypeParameters = TSESTree.CallExpression &
  * an arrow function taking at most one parameter, which cannot read them, and
  * only when it is the last argument: a third one (a patch listener) would
  * become the curried form's initial state.
+ *
+ * An `async` wrapper is left alone, since it returns a `Promise` of the next
+ * state and the curried form returns the state itself, and so is a generic one
+ * (`<S extends State>(state: S) => …`), whose type parameter the curried form
+ * would have nowhere to declare, and so is a base under `!`
+ * (`produce(state!, recipe)`): the curried form would take the draft's narrower
+ * type, and its callers could no longer pass what the wrapper took.
+ * An optional parameter is left alone for the same reason.
  */
 export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
   meta: {
@@ -49,15 +61,22 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
       ArrowFunctionExpression: (
         node: DeepReadonly<TSESTree.ArrowFunctionExpression>,
       ) => {
-        if (!Arr.isFixedLengthArray(1, node.params)) {
+        if (
+          node.async ||
+          node.typeParameters !== undefined ||
+          !Arr.isFixedLengthArray(1, node.params)
+        ) {
           return;
         }
 
         const param = node.params[0];
 
+        // `(state?: State) => …` can be called without a state; the curried
+        // form cannot.
         if (
           param.type !== AST_NODE_TYPES.Identifier ||
-          param.name.length === 0
+          param.name.length === 0 ||
+          param.optional
         ) {
           return;
         }
@@ -76,6 +95,16 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
           baseArgument === undefined ||
           !Arr.isFixedLengthArray(1, restArguments) ||
           !ignoresExtraArguments(restArguments[0])
+        ) {
+          return;
+        }
+
+        // `produce(state!, recipe)` drafts a narrower type than the wrapper
+        // takes; no type argument keeps both.
+        if (
+          typeWrapperLayers(baseArgument).some(
+            (layer) => layer.type === AST_NODE_TYPES.TSNonNullExpression,
+          )
         ) {
           return;
         }
@@ -136,7 +165,7 @@ const getTypeArguments = (
 
 /**
  * The type the outermost `as` or `<T>` among `node`'s type wrappers gives it,
- * seen through `satisfies`, `!` and parentheses, or `undefined`.
+ * seen through `satisfies` and parentheses, or `undefined`.
  */
 const getAssertedType = (
   node: DeepReadonly<TSESTree.Node>,
@@ -333,7 +362,7 @@ const ignoresExtraArguments = (
 
 /**
  * The identifier named `expectedName` that `argument` is, inside any type
- * wrappers (`state satisfies State`, `state!`), or `undefined`.
+ * wrappers (`state satisfies State`, `state as State`), or `undefined`.
  */
 const findIdentifier = (
   argument: DeepReadonly<TSESTree.CallExpressionArgument>,

@@ -19,6 +19,43 @@ describe('prefer-curried-produce', () => {
   tester.run(ruleName, preferCurriedProduceRule, {
     valid: [
       {
+        name: 'async wrapper is left untouched',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const next = async (state) =>
+            produce(state, (draft) => {
+              draft.count += 1;
+            });
+        `,
+      },
+      {
+        name: 'typed async wrapper is left untouched',
+        code: dedent`
+          import { produce } from 'immer';
+
+          type State = Readonly<{ count: number }>;
+
+          const next = async (state: State): Promise<State> =>
+            produce(state, (draft) => {
+              draft.count += 1;
+            });
+        `,
+      },
+      {
+        name: 'generic wrapper is left untouched',
+        code: dedent`
+          import { produce } from 'immer';
+
+          type State = Readonly<{ count: number }>;
+
+          const next = <S extends State>(state: S): S =>
+            produce(state, (draft) => {
+              draft.count += 1;
+            });
+        `,
+      },
+      {
         name: 'Already curried',
         code: dedent`
           import { produce } from 'immer';
@@ -233,10 +270,47 @@ describe('prefer-curried-produce fixes that would change the meaning', () => {
 
 describe('prefer-curried-produce through type wrappers', () => {
   tester.run(ruleName, preferCurriedProduceRule, {
-    valid: [],
+    valid: [
+      {
+        name: 'a base under `!`, which drafts a narrower type than the wrapper takes',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const reset = (state: State | undefined) =>
+            produce(state!, (draft) => {
+              draft.count = 0;
+            });
+          const update = (state) =>
+            produce((state as State | undefined)!, (draft) => {
+              draft.count += 1;
+            });
+          // Left alone even where the type cannot be null: the rule does
+          // not read types.
+          const plain = (state: State) =>
+            produce(state!, (draft) => {
+              draft.count = 0;
+            });
+        `,
+      },
+      {
+        name: 'an optional parameter, and a generic wrapper with a cast base',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const next = (state?: State) =>
+            produce(state, (draft) => {
+              draft.count = 0;
+            });
+          const generic = <S extends State>(state: S): S =>
+            produce(state as S, (draft) => {
+              draft.count = 0;
+            });
+        `,
+      },
+    ],
     invalid: [
       {
-        name: 'the base state wrapped in `satisfies` or `!`',
+        name: 'the base state wrapped in `satisfies`',
         code: dedent`
           import { produce } from 'immer';
 
@@ -244,10 +318,6 @@ describe('prefer-curried-produce through type wrappers', () => {
             produce(state satisfies State, (draft) => {
               draft.count += 1;
             });
-
-          const reset = (state: State) => produce(state!, (draft) => {
-            draft.count = 0;
-          });
         `,
         output: dedent`
           import { produce } from 'immer';
@@ -255,15 +325,8 @@ describe('prefer-curried-produce through type wrappers', () => {
           const update = produce<State>((draft) => {
             draft.count += 1;
           });
-
-          const reset = produce<State>((draft) => {
-            draft.count = 0;
-          });
         `,
-        errors: [
-          { messageId: 'useCurriedProduce' },
-          { messageId: 'useCurriedProduce' },
-        ],
+        errors: [{ messageId: 'useCurriedProduce' }],
       },
     ],
   });
