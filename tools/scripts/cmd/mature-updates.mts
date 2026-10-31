@@ -267,6 +267,10 @@ export const selectMatureRelease = (
  * The line a release-binary pin moves within: the range a caret puts around
  * it. Its major; for a `0.x` version, `0.<minor>`; for a `0.0.x` one, the
  * version itself, which then never moves on its own.
+ *
+ * `pnpm-update.yml`'s `commit` job repeats this rule inline in jq to check
+ * the pins it is handed, together with the `v<version>` tag and what
+ * {@link readAssetDigests} accepts; change that jq with any of them.
  */
 export const releaseLine = ({ major, minor, patch }: StableVersion): string =>
   major !== '0'
@@ -852,7 +856,10 @@ const toEpochMilliseconds = (value: unknown): number | undefined => {
  * carry or one with no digest (both warned about, since they need a person),
  * or one uploaded after `cutoff`. A release's files can be uploaded or
  * replaced long after it was published, so the hold applies to each of them
- * as well as to the release.
+ * as well as to the release. `pnpm-update.yml`'s `commit` job checks the
+ * pins against the same rule (see {@link releaseLine}), more strictly: one
+ * asset per name, and the hold read only from `pnpm-workspace.yaml`'s
+ * top-level key, refusing the pins when it is not there.
  */
 const readAssetDigests = (
   name: string,

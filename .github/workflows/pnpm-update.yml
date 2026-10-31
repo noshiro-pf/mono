@@ -265,6 +265,9 @@ jobs:
       - name: Open the auto-merge pull request
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          # Reads the Releases API in the release-binary check, and nothing
+          # else; the job's own `contents: read` is all it needs.
+          RELEASES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Applied, not executed. `git apply` refuses paths outside the work
           # tree unless asked otherwise, and a diff has no way to express a
@@ -347,13 +350,84 @@ jobs:
           # before a trailing newline).
           pins='tools/configs/release-binaries.json'
           if ! git diff --cached --quiet -- "$pins"; then
+            before="${RUNNER_TEMP}/release-binaries.before.json"
+            git show "HEAD:${pins}" >"$before"
             strip='map_values(del(.version) | .assets |= map_values(del(.sha256)))'
             well_formed='[.[] | (.version | type == "string" and test("\\A[0-9]+\\.[0-9]+\\.[0-9]+\\z")), (.assets[] | .sha256 | type == "string" and test("\\A[0-9a-f]{64}\\z"))] | all'
-            if [ "$(git show "HEAD:${pins}" | jq -S "$strip")" != "$(jq -S "$strip" "$pins")" ] ||
+            if [ "$(jq -S "$strip" "$before")" != "$(jq -S "$strip" "$pins")" ] ||
               [ "$(jq "$well_formed" "$pins")" != 'true' ]; then
               echo "::error::The patch changes ${pins} beyond well-formed versions and digests; refusing to commit it."
               exit 1
             fi
+
+            # Well-formed is not yet what `update-release-binaries` writes.
+            # Each tool either stays exactly as it was, or moves forward
+            # within its line (`releaseLine` in `mature-updates.mts`: the
+            # major, or for a `0.x` version the minor, and a `0.0.x` one never
+            # moves) to a published, non-prerelease `v<version>` whose assets
+            # the Releases API reports with exactly these digests, the release
+            # and every asset older than `minimumReleaseAge`. Everything but
+            # the two values equals `HEAD` by now, so the names, repositories
+            # and asset names read below are `HEAD`'s, and so is the hold: the
+            # patch may carry `pnpm-workspace.yaml` too. The hold is read from
+            # the top-level key, where this repository sets it; not finding it
+            # there refuses the patch rather than checking against no hold.
+            hold_minutes="$(git show HEAD:pnpm-workspace.yaml |
+              sed -nE 's/^minimumReleaseAge: *([0-9]+)( +#.*)?$/\1/p' | head -n 1)"
+            if [ -z "$hold_minutes" ]; then
+              echo "::error::pnpm-workspace.yaml has no top-level minimumReleaseAge whose value is a bare number of minutes to hold the release-binary pins to; refusing to commit them."
+              exit 1
+            fi
+            cutoff="$(($(date +%s) - 10#${hold_minutes} * 60))"
+            # shellcheck disable=SC2016 # a jq program; its $ are jq variables
+            direction='
+              def parts: split(".") | map(tonumber);
+              def line: if .[0] != 0 then [.[0]] elif .[1] != 0 then [0, .[1]] else . end;
+              $before[0][$name] as $b | .[$name] as $a
+              | ($b.version | parts) as $bv | ($a.version | parts) as $av
+              | if $a.version == $b.version then (if $a == $b then "same" else "digests changed without the version" end)
+                elif $av < $bv then "version moved backwards"
+                elif ($av | line) != ($bv | line) then "version left its line"
+                else "moved\t\($a.repository)\t\($a.version)" end'
+            # shellcheck disable=SC2016 # a jq program; its $ are jq variables
+            matches='
+              def mature: type == "string" and (try (fromdateiso8601 <= $cutoff) catch false);
+              $pins[0][$name] as $pin | (.assets // []) as $release_assets
+              | .draft == false and .prerelease == false and (.published_at | mature)
+                and ([$pin.assets[]
+                  | (.name | split("{version}") | join($pin.version)) as $asset
+                  | [$release_assets[] | select(.name == $asset)] as $found
+                  | ($found | length) == 1
+                    and $found[0].digest == "sha256:" + .sha256
+                    and ($found[0].updated_at | mature)
+                ] | all)'
+            while IFS= read -r name; do
+              if ! compared="$(jq -r --arg name "$name" --slurpfile before "$before" "$direction" "$pins")"; then
+                echo "::error::${pins}: ${name}: could not be compared with HEAD (above); refusing to commit it."
+                exit 1
+              fi
+              IFS=$'\t' read -r verdict repository version <<<"$compared"
+              if [ "$verdict" = 'same' ]; then
+                continue
+              fi
+              if [ "$verdict" != 'moved' ]; then
+                echo "::error::${pins}: ${name}: ${verdict}; refusing to commit it."
+                exit 1
+              fi
+              if ! release="$(GH_TOKEN="$RELEASES_TOKEN" gh api "repos/${repository}/releases/tags/v${version}")"; then
+                echo "::error::${pins}: ${name}: could not read the release v${version} of ${repository} from the Releases API (above); refusing to commit unverified digests."
+                exit 1
+              fi
+              if ! verified="$(jq --arg name "$name" --slurpfile pins "$pins" --argjson cutoff "$cutoff" \
+                "$matches" <<<"$release")"; then
+                echo "::error::${pins}: ${name}: could not read the Releases API's answer for v${version} of ${repository} (above); refusing to commit unverified digests."
+                exit 1
+              fi
+              if [ "$verified" != 'true' ]; then
+                echo "::error::${pins}: ${name}: v${version} of ${repository} is not a published, non-prerelease release older than minimumReleaseAge whose assets have these digests; refusing to commit it."
+                exit 1
+              fi
+            done < <(jq -r 'keys[]' "$before")
           fi
 
           git commit -m "chore: update dependencies"
