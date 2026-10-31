@@ -1,0 +1,122 @@
+{
+  "kind": "series",
+  "meta": {
+    "updates": 100000,
+    "timeoutMs": 5000,
+    "environment": {
+      "runner": "github-actions",
+      "runnerImage": "ubuntu24",
+      "node": "v26.12.1",
+      "platform": "Linux 7.0.0-1017-azure",
+      "arch": "x64",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "measuredOn": "2026-10-31",
+      "libraries": {
+        "synstate": "6.1.1",
+        "rxjs": "7.8.2",
+        "jotai": "3.0.1",
+        "mobx": "7.1.0",
+        "@reduxjs/toolkit": "2.13.0",
+        "zustand": "5.0.15",
+        "valtio": "2.3.2",
+        "solid-js": "1.9.17",
+        "@preact/signals-core": "1.14.4"
+      }
+    }
+  },
+  "xLabels": [
+    "W=1",
+    "W=2",
+    "W=5",
+    "W=10",
+    "W=20",
+    "W=50",
+    "W=100",
+    "W=200",
+    "W=500",
+    "W=1000"
+  ],
+  "series": [
+    {
+      "label": "SynState",
+      "values": [9.14, 9.52, 9.19, 8.74, 8.79, 9.17, 9.41, 11.44, 12.44, 16.26]
+    },
+    {
+      "label": "RxJS",
+      "values": [7.42, 7.54, 7.06, 7.33, 7.16, 7.42, 7.72, 8.59, 10.84, 15.61]
+    },
+    {
+      "label": "RxJS (naive, no distinctUntilChanged)",
+      "values": [
+        17.64, 19.97, 30.05, 48.25, 92.32, 185.23, 341.36, 687.95, 1848.09,
+        3895.96
+      ]
+    },
+    {
+      "label": "Jotai",
+      "values": [
+        447.38,
+        492.63,
+        562.06,
+        703.01,
+        993.51,
+        1963.5,
+        3710.19,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "label": "MobX",
+      "values": [
+        66.25,
+        78.91,
+        114.54,
+        173.78,
+        287.35,
+        638.49,
+        1154.61,
+        2243.64,
+        null,
+        null
+      ]
+    },
+    {
+      "label": "Redux",
+      "values": [
+        282.29,
+        358.56,
+        574.54,
+        920.57,
+        1777.86,
+        4092.97,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "label": "Solid",
+      "values": [
+        45.95,
+        50.58,
+        66.75,
+        94.36,
+        157.51,
+        340.23,
+        654.16,
+        1294.95,
+        3469.1,
+        null
+      ]
+    },
+    {
+      "label": "Preact Signals",
+      "values": [
+        7.64, 10.24, 17.9, 31.15, 57.96, 139.25, 282.01, 584.79, 1585.9, 3345.77
+      ]
+    }
+  ]
+}

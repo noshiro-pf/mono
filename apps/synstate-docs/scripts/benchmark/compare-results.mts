@@ -72,6 +72,7 @@ const scenarios = [
   { title: 'deep chain', file: 'results-deep-chain.json' },
   { title: 'cascaded diamond', file: 'results-cascaded-diamond.json' },
   { title: 'conditional fan-out', file: 'results-conditional-fan-out.json' },
+  { title: 'equality cut-off', file: 'results-equality-cut-off.json' },
 ] as const;
 
 type Scenario = Readonly<{ title: string; file: string }>;

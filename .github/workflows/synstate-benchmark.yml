@@ -74,9 +74,11 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    # Four scenarios, and the cascaded diamond alone spends three 5-second
-    # timeouts on RxJS. Measured locally at about 2m30s for all four, plus
-    # install and build.
+    # Five scenarios. The cascaded diamond spends three 5-second timeouts on
+    # RxJS, and the equality cut-off one each on four libraries, after
+    # two warmup rounds at least as long. Measured locally at about 2m30s for
+    # the first four, and 6m for the cut-off on a slower machine, plus install
+    # and build.
     timeout-minutes: 30
 
     steps:

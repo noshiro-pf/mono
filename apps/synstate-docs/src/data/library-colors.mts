@@ -36,6 +36,7 @@ const libraryColors = {
   RxJS: '#ef4444',
   'RxJS (switchMap)': '#ef4444',
   'RxJS (naive combineLatest)': '#fca5a5',
+  'RxJS (naive, no distinctUntilChanged)': '#fca5a5',
   Jotai: '#f59e0b',
   MobX: '#8b5cf6',
   Redux: '#14b8a6',

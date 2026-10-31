@@ -6,6 +6,7 @@ import {
   deepChain,
   derivedChain,
   diamond,
+  equalityCutOff,
   libraryColorOf,
   singleState,
 } from '../src/data/index.mjs';
@@ -86,8 +87,8 @@ export const recordedEnvironment = (): RecordedEnvironment | undefined => {
  */
 export const assertEveryLibraryHasAColour = (): void => {
   const labels = [
-    ...[cascadedDiamond, conditionalFanOut, deepChain].flatMap(({ series }) =>
-      series.map(({ label }) => label),
+    ...[cascadedDiamond, conditionalFanOut, deepChain, equalityCutOff].flatMap(
+      ({ series }) => series.map(({ label }) => label),
     ),
     ...[singleState, derivedChain, diamond].flatMap(({ rows }) =>
       rows.map(({ label }) => label),
@@ -142,8 +143,15 @@ expectType<(typeof ENVIRONMENT_KEYS)[number], keyof BenchmarkEnvironment>('=');
 
 expectType<keyof RecordedEnvironment, keyof BenchmarkEnvironment>('=');
 
+/**
+ * What these checks read of a results file. `updates`, which every runner
+ * writes, is here only so that `meta` is not a weak type: TypeScript refuses
+ * an object that shares no property with a type whose every property is
+ * optional, and so would refuse the very tables without an environment that
+ * {@link recordedEnvironment} tolerates.
+ */
 type ResultsWithEnvironment = Readonly<{
-  meta: Readonly<{ environment?: RecordedEnvironment }>;
+  meta: Readonly<{ updates: number | null; environment?: RecordedEnvironment }>;
 }>;
 
 /**
@@ -158,4 +166,5 @@ const allResults: readonly ResultsWithEnvironment[] = [
   deepChain,
   cascadedDiamond,
   conditionalFanOut,
+  equalityCutOff,
 ] as const;
