@@ -709,6 +709,38 @@ describe('stringifySortedKey', () => {
     }
   });
 
+  test('keeps the properties of an object nested in an array of arrays', () => {
+    const result = Json.stringifySortedKey({ a: [[{ c: 1, b: 2 }]] });
+
+    assert.isTrue(Result.isOk(result));
+
+    expect(result.value).toBe('{"a":[[{"b":2,"c":1}]]}');
+
+    const other = Json.stringifySortedKey({ a: [[{ c: 1, b: 3 }]] });
+
+    assert.isTrue(Result.isOk(other));
+
+    expect(other.value).not.toBe(result.value);
+  });
+
+  test('keeps the properties of what toJSON returns', () => {
+    const result = Json.stringifySortedKey({
+      x: { toJSON: () => ({ z: 1, y: 2 }) },
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    expect(result.value).toBe('{"x":{"y":2,"z":1}}');
+  });
+
+  test('sorts integer-like keys as strings', () => {
+    const result = Json.stringifySortedKey({ 2: 'b', 10: 'a', x: 'c' });
+
+    assert.isTrue(Result.isOk(result));
+
+    expect(result.value).toBe('{"10":"a","2":"b","x":"c"}');
+  });
+
   test('should handle empty object', () => {
     const result = Json.stringifySortedKey({});
 
