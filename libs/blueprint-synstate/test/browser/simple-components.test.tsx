@@ -81,7 +81,9 @@ describe(Checkbox, () => {
     const label = one(container, 'label.bp6-control.bp6-checkbox');
 
     assert.isNotNull(
-      label.querySelector(':scope > input + .bp6-control-indicator'),
+      label.querySelector(
+        ':scope > input.bp6-control-input + .bp6-control-indicator',
+      ),
     );
 
     assert.strictEqual(label.textContent, 'Agree');
