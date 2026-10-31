@@ -1,6 +1,6 @@
-import { RadioGroup, Spinner, SpinnerSize } from 'blueprint-synstate';
+import { Radio, RadioGroup, Spinner, SpinnerSize } from 'blueprint-synstate';
 import { constant } from 'synstate-dom';
-import { all, controlled, mountInto, one } from './helpers.mjs';
+import { all, controlled, mountInto, nextFrame, one } from './helpers.mjs';
 
 describe(RadioGroup, () => {
   const options = [
@@ -76,7 +76,7 @@ describe(RadioGroup, () => {
     unmount();
   });
 
-  test('checks the value’s button again when the owner does not take a choice', () => {
+  test('checks the value’s button again when the owner does not take a choice', async () => {
     const { container, unmount } = mountInto(() => (
       <RadioGroup
         options={options}
@@ -93,6 +93,8 @@ describe(RadioGroup, () => {
 
     first.click();
 
+    await nextFrame();
+
     assert.isFalse(first.checked);
 
     assert.isTrue(second.checked);
@@ -100,7 +102,7 @@ describe(RadioGroup, () => {
     unmount();
   });
 
-  test('unchecks a choice the owner does not take when the value matches no option', () => {
+  test('unchecks a choice the owner does not take when the value matches no option', async () => {
     const { container, unmount } = mountInto(() => (
       <RadioGroup<string>
         options={options}
@@ -114,6 +116,8 @@ describe(RadioGroup, () => {
     assert.isDefined(first);
 
     first.click();
+
+    await nextFrame();
 
     assert.isFalse(first.checked);
 
@@ -141,6 +145,29 @@ describe(RadioGroup, () => {
     );
 
     assert.strictEqual(names.size, 2);
+
+    unmount();
+  });
+});
+
+describe(Radio, () => {
+  test('is drawn unchecked again when the owner does not take the change', async () => {
+    const { container, unmount } = mountInto(() => (
+      <Radio
+        checked={constant(false)}
+        label={constant('Equal payment')}
+        value={'equal-payment'}
+        onChange={() => {}}
+      />
+    ));
+
+    const input = one<HTMLInputElement>(container, 'input');
+
+    input.click();
+
+    await nextFrame();
+
+    assert.isFalse(input.checked);
 
     unmount();
   });

@@ -9,7 +9,7 @@ import {
 } from 'blueprint-synstate';
 import { createState } from 'synstate';
 import { constant } from 'synstate-dom';
-import { mountInto, one } from './helpers.mjs';
+import { mountInto, nextFrame, one } from './helpers.mjs';
 
 describe(Callout, () => {
   test('draws the intent’s icon and the title, or the icon it is given', () => {
@@ -91,6 +91,26 @@ describe(Checkbox, () => {
     one<HTMLInputElement>(label, ':scope > input').click();
 
     assert.isTrue(checked$.getSnapshot().value);
+
+    unmount();
+  });
+
+  test('is drawn unchecked again when the owner does not take the change', async () => {
+    const { container, unmount } = mountInto(() => (
+      <Checkbox
+        checked={constant(false)}
+        label={constant('Agree')}
+        onChange={() => {}}
+      />
+    ));
+
+    const input = one<HTMLInputElement>(container, 'input');
+
+    input.click();
+
+    await nextFrame();
+
+    assert.isFalse(input.checked);
 
     unmount();
   });

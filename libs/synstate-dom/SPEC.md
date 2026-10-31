@@ -273,6 +273,14 @@ export const render = (
 | `style`    | `Bindable<string>` は `style.cssText`。オブジェクト形式は各キーを `style.setProperty` で個別に束縛 |
 | イベント   | `addEventListener`。解除を `onScopeDispose` に登録する。開発ビルドの warning は下記                |
 
+**制御された `checked` と `indeterminate`**: `<input>` の `checked` または `indeterminate` を束縛すると、`change` の後、次のフレームの描画前に要素を束縛中の値へ書き戻す。持ち主が変更を受け取らなかった（`onChange` で値を変えなかった）とき、ユーザーの切り替えが画面に残らないようにするためで、結果は React の制御されたコンポーネントと同じになる。ただし React は自分のイベント処理の終わりに同期的に戻すのに対し、こちらは次のフレームまで戻さない。クリックは `indeterminate` も外すので、同じく書き戻す。
+
+- 書き戻しを次のフレームまで待つのは、祖先に委譲したハンドラも含めて、そのイベントのハンドラがすべてユーザーの変更を読めるようにするため。
+- 書き戻しを予約する `change` のリスナーは capture で登録する。要素自身のハンドラより先に走るので、ハンドラが `stopImmediatePropagation` を呼んでも止まらない。
+- ラジオボタンを選ぶと、同じグループ（同じ document か shadow root・同じ `name`・同じ form）のほかのボタンはイベント無しに外れる。そこで 1 つの `change` で、グループの束縛されたボタンをすべて書き戻す。束縛していないボタンを選んだときはリスナーが無いので書き戻さない。グループのボタンはすべて束縛する。
+- 束縛せずにユーザーに切り替えさせるには `defaultChecked` を使う。
+- `value` は書き戻さない。入力のたびに値を更新しない書き方（確定時にだけ反映する、など）が入力を妨げるため。
+
 **イベントハンドラの中で作った Observable**: ハンドラが呼ばれる時点ではどのスコープの `run` も動いていないので、ハンドラの中で `a$.pipe(map(...))` を作るとどのスコープにも属さず、行や分岐が消えても計算され続ける（規則 3）。開発ビルドでは、synstate-dom が登録したハンドラの実行中に Observable が作られたら warning を出す。ハンドラを包んで実行中の目印を立て、synstate の生成時の登録処理がそれを見る。`await` の後は見分けられないので、README で「同期部分で `getCurrentScope()` を取っておき、その `run` で包む」書き方を示す。モジュールのトップレベルで作るストアは正しく所属なしなので、警告しない。
 
 **`class` のオブジェクト形式**: `class` は `Bindable<string> | Readonly<Record<string, Bindable<boolean>>>` を受け付ける。

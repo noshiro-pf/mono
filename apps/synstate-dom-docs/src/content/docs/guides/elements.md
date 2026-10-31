@@ -46,6 +46,7 @@ export const SignUp = (): JSX.Element => (
 ```
 
 - Most props are written with `setAttribute`. A few, such as `value`, `checked`, `selected` and `indeterminate`, have an attribute that drifts apart from the live value as the user interacts; those are written as DOM properties instead (`element.value = v`).
+- A bound `checked` or `indeterminate` of an `<input>` is controlled. After a `change`, the input is drawn as its bound value again before the next frame is painted, so a change your `onChange` does not take undoes itself, as in the checkbox above if `toggleAgreed` were not called. To let the user toggle a checkbox freely, give it `defaultChecked` instead. In a radio group, bind every button.
 - A boolean attribute such as `disabled` takes a `Bindable<boolean>` and is removed while its value is `false`.
 
 ## `class` and `style`
