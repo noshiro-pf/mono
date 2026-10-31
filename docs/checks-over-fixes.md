@@ -24,6 +24,10 @@ surfaces, however it surfaced:
 - a manual step someone has to remember (keeping two declarations in sync,
   regenerating a file, registering something in a list).
 
+To see which `/code-review` findings recur across pull requests, rather than
+within one, `pnpm run review-findings-digest` counts the findings the merged
+pull requests record in their `## Review` sections by class.
+
 ## Where to look, cheapest first
 
 1. **A check that exists but does not run.** Run it; if CI does not run it,
