@@ -292,6 +292,6 @@ TanStack Query（旧 React Query）は、サーバーデータの取得、キャ
 
 ## パフォーマンス比較
 
-[パフォーマンスベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/)は6種類のグラフ形状で伝搬時間を計測しています。すべてで最速のライブラリはありません。小さなグラフでは RxJS が速く、単一ステートでは SynState・Preact Signals・Zustand がそれに続きます。処理を省略できる場面では MobX・Solid・Preact Signals が、深いグラフ全体が読まれる場面では SynState と Preact Signals が（ディープチェーンでは Redux も）速くなります。SynState について結果から言えるのは、どこでも最速であることではなく、最悪ケースが抑えられていることで、ページでは各ライブラリの最悪ケースを並べています。シナリオごとのまとめは[このページの読み方](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)にあります。
+[パフォーマンスベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/)は6種類のグラフ形状で伝搬時間を計測しています。すべてで最速のライブラリはありません。<!-- bench:summary/fastest-by-scenario -->単一ステート・派生チェーン・ダイヤモンドでは RxJS、ディープチェーン（K=1000, M=200）では Redux、カスケードダイアモンド（N=20）では Preact Signals、条件付きファンアウト（B=1000）では Solid が最速です<!-- /bench -->。SynState について結果から言えるのは、どこでも最速であることではなく、最悪ケースが抑えられていることで、ページでは各ライブラリの最悪ケースを並べています。シナリオごとのまとめは[このページの読み方](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)にあります。
 
 同じくグリッチフリーで、コストがグラフの大きさに比例する Preact Signals に対しては、結果に一貫した勝者はなく、シナリオによってどちらかが速くなります。Preact Signals より SynState を選ぶ理由はベンチマークではなく API にあります。`debounce`・`throttle`・`switchMap` などのオペレーターを同じグリッチフリーなグラフの上で使えることで、Preact Signals ではタイミングやキャンセルを effect の中に書くコードに任せることになります（[React の外での動作](#react-の外での動作)と、同じ検索ボックスを両方で書いた[非同期処理の比較](/mono/synstate/ja/guides/library-comparison/async-comparison/)を参照）。そうした effect として書いた operator は、どの読み手に対してもグリッチフリーとは限らず、すべての書き込みを見るとも限りません。その両方を [Signals の上の operator](/mono/synstate/ja/guides/library-comparison/operators-on-signals/) で示しています。
