@@ -26,6 +26,13 @@ export class ManagerObservableClass<
 > extends ObservableBaseClass<A, Kind, Depth> {
   /** Emits `nextValue` and propagates it to the descendants. */
   protected startUpdate(nextValue: A): void {
+    // Nothing to propagate to (a branch no `switchMap` follows, a state
+    // written before anything subscribes): the update is the value alone,
+    // and opening one would cost more than storing it.
+    if (this.setNextIfUnobserved(nextValue)) {
+      return;
+    }
+
     const updateToken = openUpdate(this.depth);
 
     beginPropagation(updateToken);

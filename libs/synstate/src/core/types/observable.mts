@@ -44,7 +44,8 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
    * The token of the update in which this observable last emitted. A child's
    * `tryUpdate` receives the token of the update now propagating; a parent
    * whose token differs did not emit in it. The token is opaque: compare it,
-   * store it, or pass it on to `setNext`.
+   * store it, or pass the one `tryUpdate` received on to `setNext`. A write
+   * nothing observes opens no update, and its token has no queue behind it.
    */
   updateToken: UpdateToken;
 
