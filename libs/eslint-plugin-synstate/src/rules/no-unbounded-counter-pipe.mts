@@ -6,10 +6,10 @@ import {
 import {
   buildCalleeResolver,
   getImportDeclarations,
-  hasForeignBinding,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { SYNSTATE_MODULE } from './constants.mjs';
+import { isShadowedCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -90,29 +90,6 @@ const isPipeProperty = (
       member.property.name === 'pipe';
 
 /**
- * The identifier whose binding decides what `callee` calls: the callee itself
- * for a named import, the namespace object for `m.counter`.
- */
-const boundIdentifierOf = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  callee: TSESTree.Expression,
-): TSESTree.Identifier | undefined => {
-  const unwrapped = skipTypeWrappers(callee);
-
-  if (unwrapped.type === AST_NODE_TYPES.Identifier) {
-    return unwrapped;
-  }
-
-  if (unwrapped.type !== AST_NODE_TYPES.MemberExpression) {
-    return undefined;
-  }
-
-  const object = skipTypeWrappers(unwrapped.object);
-
-  return object.type === AST_NODE_TYPES.Identifier ? object : undefined;
-};
-
-/**
  * Whether `callee` calls the `counter` synstate exports: by a named import,
  * an aliased one or a namespace import, and through type wrappers. A local
  * binding that shadows the import is not synstate's.
@@ -126,15 +103,9 @@ const isSynstateCounter = (
 ): boolean => {
   const resolved = resolveCallee(callee);
 
-  if (resolved?.canonicalName !== 'counter') {
-    return false;
-  }
-
-  const boundName = boundIdentifierOf(callee);
-
   return (
-    boundName !== undefined &&
-    !hasForeignBinding(sourceCode, boundName, boundName.name, SYNSTATE_MODULE)
+    resolved?.canonicalName === 'counter' &&
+    !isShadowedCallee(sourceCode, callee)
   );
 };
 

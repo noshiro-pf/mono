@@ -4,6 +4,8 @@
 
 Provides a bidirectional bridge between synstate observables and `@preact/signals`, enabling fine-grained DOM updates without component re-renders.
 
+It also re-exports every function and type synstate exports except for `createState`, `createReducer`, and `createBooleanState`, which it replaces with versions that return a `ReadonlySignal`.
+
 ## Installation
 
 ```sh

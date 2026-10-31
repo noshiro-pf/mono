@@ -143,8 +143,73 @@ ruleTester.run('no-write-during-propagation', noWriteDuringPropagation, {
         const b$ = a$.pipe(map(setA));
       `,
     },
+    {
+      name: 'a `useObservableEffect` that is not synstate’s',
+      code: dedent`
+        import { createState } from 'synstate';
+        import { useObservableEffect } from 'other-hooks';
+        const [a$, setA] = createState(0);
+        const [b$, setB] = createState(0);
+        const useSync = () => { useObservableEffect(a$, (a) => { setB(a); }); };
+      `,
+    },
+    {
+      name: 'a write deferred from a `useObservableEffect` callback',
+      code: dedent`
+        import { createState, useObservableEffect } from 'synstate-react-hooks';
+        const [, setA, { state: a$ }] = createState(0);
+        const [, setB] = createState(0);
+        const useSync = () => {
+          useObservableEffect(a$, (a) => { setTimeout(() => { setB(a); }, 0); });
+        };
+      `,
+    },
   ],
   invalid: [
+    {
+      name: 'a setter from each wrapper package',
+      code: dedent`
+        import { createState } from 'synstate-react-hooks';
+        import { createReducer } from 'synstate-react-hooks-compat';
+        import { createBooleanState } from 'synstate-preact-hooks';
+        import { source } from 'synstate-preact-signals';
+        const [, setA, { state: a$ }] = createState(0);
+        const [, dispatch] = createReducer((s: number, n: number) => s + n, 0);
+        const [, { toggle }] = createBooleanState(false);
+        const b$ = source<number>();
+        a$.subscribe((a) => {
+          setA(a + 1);
+          dispatch(a);
+          toggle();
+          b$.next(a);
+        });
+      `,
+      errors: [
+        { messageId: 'writeDuringPropagation', line: 10 },
+        { messageId: 'writeDuringPropagation', line: 11 },
+        { messageId: 'writeDuringPropagation', line: 12 },
+        { messageId: 'writeDuringPropagation', line: 13 },
+      ],
+    },
+    {
+      name: 'a write from a `useObservableEffect` callback',
+      code: dedent`
+        import { createState } from 'synstate';
+        import { useObservableEffect } from 'synstate-preact-hooks';
+        import * as hooks from 'synstate-react-hooks';
+        const [a$, setA] = createState(0);
+        const [b$, setB] = createState(0);
+        const onA = (a: number) => { setB(a); };
+        const useSync = () => {
+          useObservableEffect(a$, (a) => { setB(a); });
+          hooks.useObservableEffect(a$, onA);
+        };
+      `,
+      errors: [
+        { messageId: 'writeDuringPropagation', line: 6 },
+        { messageId: 'writeDuringPropagation', line: 8 },
+      ],
+    },
     {
       name: 'setState from a subscriber',
       code: dedent`

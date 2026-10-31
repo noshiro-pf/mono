@@ -7,11 +7,10 @@ import {
 import {
   buildCalleeResolver,
   getImportDeclarations,
-  hasForeignBinding,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import * as ts from 'typescript';
-import { SYNSTATE_MODULE } from './constants.mjs';
+import { SYNSTATE_AND_WRAPPER_MODULES } from './constants.mjs';
 import {
   enclosingFunctionOf,
   isPipeArgument,
@@ -19,6 +18,7 @@ import {
   localFunctionOf,
   type FunctionNode,
 } from './functions.mjs';
+import { isShadowedCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -39,6 +39,10 @@ type MessageIds = 'writeDuringPropagation' | 'writeThroughCall';
  * so does a write in a function of this file the callback calls, at any
  * depth, reported at the call. A write in a function the callback only
  * defines (a `setTimeout` callback) runs later and is not reported.
+ *
+ * `useObservableEffect`'s callback is a subscriber too. synstate is
+ * recognized under its own name and under those of the packages that wrap
+ * it (`synstate-react-hooks`, …), whose factories return the same writers.
  *
  * The factory call is read in this file. With type information, a setter
  * imported from another file is followed to the declaration it was exported
@@ -71,7 +75,9 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
     const sourceCode = context.sourceCode;
 
     const resolveCallee = buildCalleeResolver(
-      getImportDeclarations(sourceCode.ast, SYNSTATE_MODULE),
+      SYNSTATE_AND_WRAPPER_MODULES.flatMap((moduleName) =>
+        getImportDeclarations(sourceCode.ast, moduleName),
+      ),
     );
 
     const isSynstateCall = (
@@ -84,15 +90,11 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
         return undefined;
       }
 
-      const boundName = boundIdentifierOf(call.callee);
-
-      return boundName === undefined ||
-        hasForeignBinding(
-          sourceCode,
-          boundName,
-          boundName.name,
-          SYNSTATE_MODULE,
-        )
+      return isShadowedCallee(
+        sourceCode,
+        call.callee,
+        SYNSTATE_AND_WRAPPER_MODULES,
+      )
         ? undefined
         : resolved.canonicalName;
     };
@@ -251,7 +253,10 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
           }
         }
 
-        if (callsBackDuringPropagation(node)) {
+        if (
+          callsBackDuringPropagation(node) ||
+          isSynstateCall(node) === 'useObservableEffect'
+        ) {
           for (const argument of node.arguments) {
             const callback = localFunctionOf(sourceCode, argument);
 
@@ -456,7 +461,7 @@ const isSynstateImport = (
 ): boolean =>
   ts.isImportDeclaration(declaration) &&
   ts.isStringLiteral(declaration.moduleSpecifier) &&
-  declaration.moduleSpecifier.text === SYNSTATE_MODULE;
+  SYNSTATE_AND_WRAPPER_MODULES.includes(declaration.moduleSpecifier.text);
 
 /** `as`, `satisfies`, `!`, `<T>` and parentheses, in the TypeScript tree. */
 const skipTsTypeWrappers = (
@@ -539,27 +544,4 @@ const tsFactoryBindingOf = (
   const factory = tsSynstateExportOf(checker, call.expression);
 
   return factory === undefined ? undefined : { factory, path: binding.path };
-};
-
-/**
- * The identifier whose binding decides what `callee` calls: the callee itself
- * for a named import, the namespace object for `m.createState`.
- */
-const boundIdentifierOf = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  callee: TSESTree.Expression,
-): TSESTree.Identifier | undefined => {
-  const unwrapped = skipTypeWrappers(callee);
-
-  if (unwrapped.type === AST_NODE_TYPES.Identifier) {
-    return unwrapped;
-  }
-
-  if (unwrapped.type !== AST_NODE_TYPES.MemberExpression) {
-    return undefined;
-  }
-
-  const object = skipTypeWrappers(unwrapped.object);
-
-  return object.type === AST_NODE_TYPES.Identifier ? object : undefined;
 };

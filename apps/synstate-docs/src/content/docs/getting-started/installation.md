@@ -55,7 +55,7 @@ To render with [Preact Signals](https://preactjs.com/guide/v10/signals/) instead
 npm add synstate-preact-signals preact @preact/signals
 ```
 
-It converts between Observables and signals (`toSignal`, `fromSignal`), and its `createState`, `createReducer` and `createBooleanState` return a `ReadonlySignal` instead of a hook. Like the hooks packages, it re-exports the functions of `synstate`. See the [Preact Signals demo](/mono/synstate/preact-signals/demo/).
+It converts between Observables and signals (`toSignal`, `fromSignal`), and its `createState`, `createReducer` and `createBooleanState` return a `ReadonlySignal` instead of a hook. Like the hooks packages, it re-exports the functions and types of `synstate`. See the [Preact Signals demo](/mono/synstate/preact-signals/demo/).
 
 ### synstate-dom (no framework)
 
