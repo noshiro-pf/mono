@@ -9,6 +9,10 @@ import {
   isNaiveForm,
   singleState as singleStateJson,
 } from '../src/data/index.mjs';
+import {
+  type RecordedEnvironment,
+  recordedEnvironment,
+} from './measurement-checks.mjs';
 
 /**
  * Every number the benchmark prose quotes, keyed by what it stands for.
@@ -231,14 +235,9 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       at(deepChain, 'SynState', DEEP_MAX),
     ),
     'compare/deep-chain/redux-factor': compared(
-      'Redux against SynState at every point of the deep chain',
-      everyPoint(deepChain, 'Redux', 'SynState'),
+      'Redux against SynState across the deep chain',
+      floored(everyPoint(deepChain, 'Redux', 'SynState')),
       SMALL_FACTOR,
-    ),
-    'compare/deep-chain/redux-factor-either-way': compared(
-      'Redux against SynState on both sides at the points of the deep chain',
-      everyPoint(deepChain, 'Redux', 'SynState'),
-      SMALL_FACTOR_EITHER_WAY,
     ),
     'deep-chain/synstate@k500-m100': ms(at(deepChain, 'SynState', DEEP_MID)),
     'deep-chain/rxjs@k500-m100': ms(at(deepChain, 'RxJS', DEEP_MID)),
@@ -281,17 +280,17 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     'cascaded-diamond/mobx@max-n': ms(
       at(cascadedDiamond, 'MobX', CASCADED_MAX),
     ),
-    'cascaded-diamond/synstate@min-n': ms(
-      at(cascadedDiamond, 'SynState', CASCADED_MIN),
+    'cascaded-diamond/synstate-start-median': ms(
+      endMedians(cascadedDiamond, 'SynState')[0],
     ),
-    'cascaded-diamond/synstate@max-n': ms(
-      at(cascadedDiamond, 'SynState', CASCADED_MAX),
+    'cascaded-diamond/synstate-end-median': ms(
+      endMedians(cascadedDiamond, 'SynState')[1],
     ),
-    'cascaded-diamond/jotai@min-n': ms(
-      at(cascadedDiamond, 'Jotai', CASCADED_MIN),
+    'cascaded-diamond/jotai-start-median': ms(
+      endMedians(cascadedDiamond, 'Jotai')[0],
     ),
-    'cascaded-diamond/jotai@max-n': ms(
-      at(cascadedDiamond, 'Jotai', CASCADED_MAX),
+    'cascaded-diamond/jotai-end-median': ms(
+      endMedians(cascadedDiamond, 'Jotai')[1],
     ),
     'cascaded-diamond/jotai-over-synstate@max-n': ratio(
       at(cascadedDiamond, 'Jotai', CASCADED_MAX),
@@ -328,15 +327,13 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       "SynState's cascaded diamond row",
       cascadedDiamond,
       'SynState',
-      [CASCADED_MIN, CASCADED_MAX],
-      'flat',
+      { flat: { en: 'stays flat', ja: 'ほぼ横ばいです' } },
     ),
     'compare/cascaded-diamond/jotai-growth': rowTrend(
       "Jotai's cascaded diamond row",
       cascadedDiamond,
       'Jotai',
-      [CASCADED_MIN, CASCADED_MAX],
-      'grows',
+      { grows: { en: 'grows', ja: '増えます' } },
     ),
 
     // Scenario: Conditional Fan-Out
@@ -547,25 +544,6 @@ export type BenchmarkNumber = string | Localized;
 
 type Localized = Readonly<{ en: string; ja: string }>;
 
-/** One library's row in a sweep, and the constants the sweep ran under. */
-/**
- * The environment a results file records, as this module needs to read it.
- *
- * Optional because the tables committed before the measurement moved to CI do
- * not carry one — see {@link environmentFact}, which writes an em dash rather
- * than inventing a machine.
- */
-type RecordedEnvironment = Readonly<{
-  runner: string;
-  runnerImage: string | null;
-  node: string;
-  platform: string;
-  arch: string;
-  cpu: string;
-  measuredOn: string;
-  libraries: ReadonlyRecord<string, string>;
-}>;
-
 type ResultsMeta = Readonly<{
   updates: number | null;
   timeoutMs: number | null;
@@ -615,64 +593,22 @@ const cascadedDiamond: SeriesData = cascadedDiamondJson;
 const conditionalFanOut: SeriesData = conditionalFanOutJson;
 
 /**
- * Every committed table, for the environment check: each is a table on the
- * page, so the environment it was measured in has to agree with the others' or
- * the page's one-sentence description of where the numbers come from is false.
- */
-const allResults: readonly (StatsData | SeriesData)[] = [
-  singleState,
-  derivedChain,
-  diamond,
-  deepChain,
-  cascadedDiamond,
-  conditionalFanOut,
-] as const;
-
-/**
  * One fact about where every table on the page was measured.
  *
  * Derived rather than written, for the reason the rest of this module exists:
  * the environment is as much a part of a millisecond as the digits are, and a
  * page describing one machine while its tables came from another is how this
  * repository spent a day telling a code regression apart from a change of
- * machine.
- *
- * The scenarios must agree, the date included — `benchmark` measures all of
- * them in one pass, and re-measuring one alone (`benchmark:deep-chain`) is
- * useful on one machine and misleading across two, so a disagreement fails
- * here rather than being averaged into a claim. An em dash where nothing was
- * recorded: those tables predate the pinned runner, and inventing a machine
- * for them would be worse than saying so.
+ * machine. {@link recordedEnvironment} fails where the scenarios disagree, and
+ * gives nothing where the tables predate the pinned runner, which the page
+ * shows as an em dash.
  */
 const environmentFact = (
   read: (environment: RecordedEnvironment) => string,
 ): string => {
-  const recorded = allResults
-    .map((r) => r.meta.environment)
-    .filter((e) => e !== undefined);
+  const recorded = recordedEnvironment();
 
-  if (recorded.length < allResults.length) {
-    return '\u{2014}';
-  }
-
-  const distinct = Arr.uniq(recorded.map(read));
-
-  const [only] = distinct;
-
-  if (only === undefined || distinct.length > 1) {
-    throw new Error(
-      [
-        'The scenarios disagree about where they were measured, so no single',
-        'value describes the page:',
-        ...distinct.map((d) => `  - ${d}`),
-        '',
-        'Re-measure every scenario with',
-        '`pnpm --filter @synstate/docs run benchmark`.',
-      ].join('\n'),
-    );
-  }
-
-  return only;
+  return recorded === undefined ? '\u{2014}' : read(recorded);
 };
 
 /** The sweep points the prose singles out by name. */
@@ -905,24 +841,6 @@ type Span =
   | 'level..far-above'
   | 'above..far-above';
 
-const SPANS: readonly Span[] = [
-  'far-below',
-  'below',
-  'level',
-  'above',
-  'far-above',
-  'far-below..below',
-  'far-below..level',
-  'far-below..above',
-  'far-below..far-above',
-  'below..level',
-  'below..above',
-  'below..far-above',
-  'level..above',
-  'level..far-above',
-  'above..far-above',
-] as const;
-
 const LEVEL_WITHIN = 1.2;
 
 const FAR_BEYOND = 3;
@@ -935,7 +853,11 @@ const RELATIONS: readonly Relation[] = [
   'far-above',
 ] as const;
 
-const relationOf = (numerator: number, denominator: number): Relation => {
+/**
+ * The index in {@link RELATIONS} of where `numerator` falls against
+ * `denominator`.
+ */
+const relationIndex = (numerator: number, denominator: number): number => {
   const value = divide(numerator, denominator);
 
   // Both quotients rather than the inverse of one, so that the mirrored
@@ -953,9 +875,102 @@ const relationOf = (numerator: number, denominator: number): Relation => {
 
   const step = printed <= LEVEL_WITHIN ? 0 : printed <= FAR_BEYOND ? 1 : 2;
 
-  return value < 1
-    ? (['level', 'below', 'far-below'] as const)[step]
-    : (['level', 'above', 'far-above'] as const)[step];
+  return LEVEL + (value < 1 ? -step : step);
+};
+
+const LEVEL = RELATIONS.indexOf('level');
+
+/**
+ * The relations a pair may be in once a re-measurement's noise is allowed
+ * for: its own, and those of the ratio moved {@link EDGE_BAND}× either way.
+ * Two relations only where the ratio sits that close to an edge between
+ * steps, as indices in {@link RELATIONS}, lower first.
+ */
+const relationRange = ([numerator, denominator]: FixedLengthTuple<
+  2,
+  number
+>): RelationRange =>
+  ({
+    low: relationIndex(numerator, denominator * EDGE_BAND),
+    nominal: relationIndex(numerator, denominator),
+    high: relationIndex(numerator * EDGE_BAND, denominator),
+  }) as const;
+
+type RelationRange = Readonly<{ low: number; nominal: number; high: number }>;
+
+/**
+ * How far either side of an edge between steps a measurement counts as on
+ * both. A step's edges are hard — 1.2× is `level`, 1.21× `above` — and a pair
+ * sitting on one changed step from one re-measurement to the next: CI measured
+ * Redux against SynState in the deep chain as `below..level` once, with the
+ * same code the committed tables had as `below`. A tenth either way is about
+ * the median run-to-run move of one library after the runner is divided out
+ * (`check-drift.mts`); the move it calls drift, 2×, would leave no step
+ * standing.
+ */
+const EDGE_BAND = 1.1;
+
+/**
+ * A {@link Span}'s lower and higher step, as indices in {@link RELATIONS}: the
+ * same index twice for a single relation.
+ */
+const spanIndices = (span: string): FixedLengthTuple<2, number> => {
+  const parts = span.split('..');
+
+  const [low = '', high = low] = parts;
+
+  const indexOf = (name: string): number => {
+    const index = RELATION_INDICES.get(name);
+
+    if (index === undefined) {
+      throw new Error(`❌ '${span}' is not a span of relations`);
+    }
+
+    return index;
+  };
+
+  const indices = [indexOf(low), indexOf(high)] as const;
+
+  if (parts.length > 2 || indices[0] > indices[1]) {
+    throw new Error(`❌ '${span}' is not a span of relations, lower first`);
+  }
+
+  return indices;
+};
+
+const spanText = (
+  low: Relation | undefined,
+  high: Relation | undefined,
+): string =>
+  low === high ? (low ?? '') : (`${low ?? ''}..${high ?? ''}` as const);
+
+/**
+ * Whether each pair can be given a relation within its range so that, between
+ * them, the lowest is `low` and the highest `high`: every range meets
+ * `low..high`, and — for a span of two steps or more — one pair can take
+ * `low` while another takes `high`.
+ */
+const spanReachable = (
+  ranges: readonly RelationRange[],
+  low: number,
+  high: number,
+): boolean => {
+  const takes = (r: RelationRange, index: number): boolean =>
+    r.low <= index && index <= r.high;
+
+  if (low === high) {
+    return ranges.every((r) => takes(r, low));
+  }
+
+  return (
+    low < high &&
+    ranges.every((r) => r.low <= high && r.high >= low) &&
+    ranges.some(
+      (r, i) =>
+        takes(r, low) &&
+        ranges.some((other, j) => j !== i && takes(other, high)),
+    )
+  );
 };
 
 /**
@@ -970,34 +985,63 @@ const relationOf = (numerator: number, denominator: number): Relation => {
  * sentence states which relations it has words for, and a measurement in any
  * other is an error naming the sentence: the data now say something the
  * sentence cannot, and it has to be rewritten rather than reworded by hand.
+ *
+ * A pair within {@link EDGE_BAND} of an edge may be read on either side of
+ * it. The span the pairs fall in as measured wins where the sentence has words
+ * for it; otherwise the nearest span the band allows that it has words for,
+ * so that a near tie the sentence already covers on one side cannot fail it.
+ * Of two equally near, the one closer to `level`: the band is there for a
+ * near tie, and a near tie is the weaker claim; then the lower, so that the
+ * order a words table is written in decides nothing.
  */
 const compared = (
   sentence: string,
   pairs: readonly FixedLengthTuple<2, number>[],
   words: Partial<ReadonlyRecord<Span, Localized>>,
 ): Localized => {
-  const indices = pairs.map(([numerator, denominator]) =>
-    RELATIONS.indexOf(relationOf(numerator, denominator)),
+  if (!Arr.isNonEmpty(pairs)) {
+    throw new Error(`❌ ${sentence}: there is nothing to compare`);
+  }
+
+  const ranges = pairs.map(relationRange);
+
+  const nominalLow = Math.min(...ranges.map((r) => r.nominal));
+
+  const nominalHigh = Math.max(...ranges.map((r) => r.nominal));
+
+  const [nearest] = Arr.generate(function* () {
+    for (const [span, wording] of Object.entries(words)) {
+      const [low, high] = spanIndices(span);
+
+      if (wording !== undefined && spanReachable(ranges, low, high)) {
+        yield {
+          wording,
+          distance: Math.abs(low - nominalLow) + Math.abs(high - nominalHigh),
+          fromLevel: Math.abs(low - LEVEL) + Math.abs(high - LEVEL),
+          low,
+        } as const;
+      }
+    }
+  }).toSorted((a, b) =>
+    a.distance !== b.distance
+      ? a.distance - b.distance
+      : a.fromLevel !== b.fromLevel
+        ? a.fromLevel - b.fromLevel
+        : a.low - b.low,
   );
 
-  const low = RELATIONS[Math.min(...indices)];
-
-  const high = RELATIONS[Math.max(...indices)];
-
-  const written = low === high ? low : (`${low ?? ''}..${high ?? ''}` as const);
-
-  const span = SPANS.find((candidate) => candidate === written);
-
-  const wording = span === undefined ? undefined : words[span];
-
-  if (wording === undefined) {
+  if (nearest === undefined) {
     throw new Error(
-      `❌ ${sentence}: the measurements are now '${written}', which the sentence has no wording for — rewrite it against the tables`,
+      `❌ ${sentence}: the measurements are now '${spanText(RELATIONS[nominalLow], RELATIONS[nominalHigh])}', which the sentence has no wording for — rewrite it against the tables`,
     );
   }
 
-  return wording;
+  return nearest.wording;
 };
+
+const RELATION_INDICES: ReadonlyMap<string, number> = new Map(
+  RELATIONS.map((relation, index) => [relation, index] as const),
+);
 
 /**
  * The middle of `values`, the upper one on an even count; `undefined` when
@@ -1195,12 +1239,6 @@ const SMALL_FACTOR = sameFor(
   { en: 'a small factor', ja: '小さな定数倍' },
 );
 
-/** {@link SMALL_FACTOR}, for a sentence that says it is so on both sides. */
-const SMALL_FACTOR_EITHER_WAY = sameFor(['below..above'], {
-  en: 'a small factor',
-  ja: '小さな定数倍',
-});
-
 /**
  * "Its per-update overhead is close to SynState's, because a rerun allocates
  * nothing" — {@link OVERHEAD} for a sentence whose reason explains a cost no
@@ -1238,95 +1276,131 @@ const shownMs = (value: number): number => {
   return parsed.value;
 };
 
-/** A row's last three points against its first three, each side the mean. */
-const endOverStart = (
+/**
+ * A row's first three points and its last three, each side's median: what
+ * {@link rowTrend} judges a row's trend on, and what its sentence quotes.
+ */
+const endMedians = (
   data: SeriesData,
   label: string,
 ): FixedLengthTuple<2, number> => {
   const { values } = row(data, label);
 
-  const mean = (points: readonly (number | null)[]): number => {
+  const middle = (points: readonly (number | null)[]): number => {
     const measured = points.filter((v): v is number => v !== null);
 
-    if (measured.length !== points.length || !Arr.isNonEmpty(measured)) {
+    const value = medianOf(measured);
+
+    if (value === undefined || measured.length !== points.length) {
       throw new Error(`❌ ${label} did not complete every end of the sweep`);
     }
 
-    return divide(Arr.sum(measured), measured.length);
+    return value;
   };
 
-  return [mean(Arr.takeLast(values, 3)), mean(Arr.take(values, 3))] as const;
-};
-
-const at = (data: SeriesData, label: string, xLabel: string): number => {
-  const value = valueAt(data, label, xLabel);
-
-  if (value === null) {
-    throw new Error(`❌ ${label} has no measurement at '${xLabel}'`);
-  }
-
-  return value;
+  return [
+    middle(Arr.take(values, 3)),
+    middle(Arr.takeLast(values, 3)),
+  ] as const;
 };
 
 /**
- * "SynState's row stays flat" / "Jotai's row grows": the mean of the last three
- * points of a sweep against the mean of the first three, so that one point —
- * under a millisecond, where a point moves by half between runs — decides
- * nothing. Flat is within {@link FLAT_WITHIN}× either way, for the same reason.
- * Each sentence names the one trend its reasoning explains; any other is an
- * error naming it.
+ * "SynState's row stays flat" / "Jotai's row grows": the median of the last
+ * three points of a sweep against the median of the first three, so that one
+ * point — under a millisecond, where a shared runner has measured a point at
+ * several times its neighbors — decides nothing. Flat is within
+ * {@link FLAT_WITHIN}× either way, for the same reason, and a change within
+ * {@link EDGE_BAND} of that edge may be read on either side of it, as in
+ * {@link compared}. Each sentence has words for the trends its reasoning
+ * explains; any other is an error naming it.
+ *
+ * The sentence quotes the two medians beside the word ({@link endMedians}),
+ * not two single points, which would put back the noise the medians leave
+ * out.
  */
 const rowTrend = (
   sentence: string,
   data: SeriesData,
   label: string,
-  quoted: FixedLengthTuple<2, string>,
-  expected: 'flat' | 'grows',
+  words: Partial<ReadonlyRecord<Trend, Localized>>,
 ): Localized => {
-  const [end, start] = endOverStart(data, label);
+  const [start, end] = endMedians(data, label);
 
   const change = divide(end, start);
 
-  const trend =
-    change > FLAT_WITHIN
-      ? 'grows'
-      : change * FLAT_WITHIN < 1
-        ? 'falls'
-        : 'flat';
+  const trendOf = (value: number): Trend =>
+    value > FLAT_WITHIN ? 'grows' : value * FLAT_WITHIN < 1 ? 'falls' : 'flat';
 
-  if (trend !== expected) {
+  const found = [
+    trendOf(change),
+    trendOf(change * EDGE_BAND),
+    trendOf(divide(change, EDGE_BAND)),
+  ]
+    .map((candidate) => ({ trend: candidate, wording: words[candidate] }))
+    .find(
+      (c): c is Readonly<{ trend: Trend; wording: Localized }> =>
+        c.wording !== undefined,
+    );
+
+  if (found === undefined) {
     throw new Error(
-      `❌ ${sentence}: the row now ${trend} (${factor(end, start)}× from start to end), which the sentence does not explain — rewrite it against the tables`,
+      `❌ ${sentence}: the row now ${trendOf(change)} (${factor(end, start)}× from start to end), which the sentence does not explain — rewrite it against the tables`,
     );
   }
 
-  // The sentence quotes two points beside the word, as `ms` prints them: a
-  // flat row must not show them more than `FLAT_WITHIN` apart, nor a growing
-  // one show the later point lower.
-  const [from, to] = quoted.map((xLabel) => shownMs(at(data, label, xLabel)));
+  const { trend, wording } = found;
+
+  // The two medians, as `ms` prints them: a flat row must not show them
+  // further apart than a flat row may be, nor a growing one show the later
+  // one lower.
+  const [from, to] = [shownMs(start), shownMs(end)] as const;
 
   const shownFlat =
-    from !== undefined &&
-    to !== undefined &&
-    (from === to ||
-      (from > 0 &&
-        to > 0 &&
-        Math.max(divide(to, from), divide(from, to)) <= FLAT_WITHIN));
+    from === to ||
+    (from > 0 &&
+      to > 0 &&
+      Math.max(divide(to, from), divide(from, to)) <= FLAT_WITHIN * EDGE_BAND);
 
-  const shownGrowing = from !== undefined && to !== undefined && to > from;
+  const shown =
+    trend === 'flat' ? shownFlat : trend === 'grows' ? to > from : to < from;
 
-  if (trend === 'flat' ? !shownFlat : !shownGrowing) {
+  if (!shown) {
     throw new Error(
-      `❌ ${sentence}: the points quoted beside the word (${quoted.join(', ')}) no longer show the row ${trend === 'flat' ? 'flat' : 'growing'}`,
+      `❌ ${sentence}: the medians quoted beside the word (${ms(start)}, ${ms(end)}) no longer show the row ${trend === 'flat' ? 'flat' : trend === 'grows' ? 'growing' : 'falling'}`,
     );
   }
 
-  return trend === 'flat'
-    ? { en: 'stays flat', ja: 'ほぼ横ばいです' }
-    : { en: 'grows', ja: '増えます' };
+  return wording;
 };
 
+type Trend = 'falls' | 'flat' | 'grows';
+
 const FLAT_WITHIN = 2;
+
+/**
+ * `pairs` with each measurement under {@link NOISE_FLOOR_MS} read as that
+ * floor, for a sentence about how two rows compare across a sweep. Below it,
+ * one re-measurement on a shared runner has put a point several times off its
+ * neighbors, and the deep chain's $K=100$ points are under 1.5 ms on both
+ * sides, so their ratio is noise; read at the floor, two such points are
+ * level. Every point is kept, and a side that grows past the floor is compared
+ * with the other side's floor, so a real gap at a point the sentence covers
+ * still shows, as at least its ratio to the floor: 4 ms against 0.4 ms is
+ * judged as 4 against 1.5. What is lost is how far below the floor the faster
+ * side was, which is what the noise there does not tell.
+ */
+const floored = (
+  pairs: readonly FixedLengthTuple<2, number>[],
+): readonly FixedLengthTuple<2, number>[] =>
+  pairs.map(
+    ([numerator, denominator]) =>
+      [
+        Math.max(numerator, NOISE_FLOOR_MS),
+        Math.max(denominator, NOISE_FLOOR_MS),
+      ] as const,
+  );
+
+const NOISE_FLOOR_MS = 1.5;
 
 /** The number in a column heading: `'N=16'` → `16`, `'B=1000'` → `1000`. */
 const param = (xLabel: string): number => {
@@ -1337,6 +1411,16 @@ const param = (xLabel: string): number => {
   }
 
   return parsed.value;
+};
+
+const at = (data: SeriesData, label: string, xLabel: string): number => {
+  const value = valueAt(data, label, xLabel);
+
+  if (value === null) {
+    throw new Error(`❌ ${label} has no measurement at '${xLabel}'`);
+  }
+
+  return value;
 };
 
 /**

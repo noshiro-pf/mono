@@ -2,16 +2,8 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr } from 'ts-data-forge';
 import { pathExists } from 'ts-repo-utils';
-import {
-  cascadedDiamond,
-  conditionalFanOut,
-  deepChain,
-  derivedChain,
-  diamond,
-  libraryColorOf,
-  singleState,
-} from '../src/data/index.mjs';
 import { benchmarkNumbers } from './benchmark-numbers.mjs';
+import { assertEveryLibraryHasAColour } from './measurement-checks.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 const benchmarkResultsDir = path.resolve(workspaceRootPath, 'src/data');
@@ -267,35 +259,6 @@ const assertNoEscapedEmphasis = (
   if (markdown.includes(String.raw`\*`)) {
     throw new Error(
       `❌ ${path.relative(workspaceRootPath, targetMarkdownFile)} contains an escaped '*'. Prettier writes one when it cannot re-emit an emphasis that holds a benchmark marker; move the marker out of the '**…**'.`,
-    );
-  }
-};
-
-/**
- * Fails on a library the benchmark charts have no colour for.
- *
- * The charts draw a label `libraryColorOf` has no colour for in the axis grey,
- * which nothing notices: a runner that gained a library used to need it added
- * to a colour map per chart by hand. Checked here rather than in the chart,
- * because a throw there only fires in the reader's browser.
- */
-const assertEveryLibraryHasAColour = (): void => {
-  const labels = [
-    ...[cascadedDiamond, conditionalFanOut, deepChain].flatMap(({ series }) =>
-      series.map(({ label }) => label),
-    ),
-    ...[singleState, derivedChain, diamond].flatMap(({ rows }) =>
-      rows.map(({ label }) => label),
-    ),
-  ] as const;
-
-  const missing = Arr.uniq(
-    labels.filter((label) => libraryColorOf(label) === undefined),
-  );
-
-  if (Arr.isNonEmpty(missing)) {
-    throw new Error(
-      `❌ no chart colour for ${missing.join(', ')}; add it to src/data/library-colors.mts, then run \`pnpm run gen:benchmark-doc fix:fmt\` to embed the results`,
     );
   }
 };

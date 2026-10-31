@@ -37,6 +37,7 @@
     "watch:types": "tsc --noEmit --watch",
     "z:benchmark:cascaded-diamond": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/run-cascaded-diamond.mts",
     "z:benchmark:check-drift": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/check-drift.mts",
+    "z:benchmark:check-measurement": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/check-measurement.mts",
     "z:benchmark:compare": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/compare-results.mts",
     "z:benchmark:conditional-fan-out": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/run-conditional-fan-out.mts",
     "z:benchmark:deep-chain": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/run-deep-chain.mts",

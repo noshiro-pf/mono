@@ -7,9 +7,10 @@ import { hasKey } from 'ts-data-forge';
  *
  * One map for every chart, so that a library is the same colour wherever it
  * appears and a runner that gains one has a single place to name it.
- * `gen:benchmark-doc` fails on a results label missing here
- * (`assertEveryLibraryHasAColour` in `scripts/embed-benchmark.mts`): the chart
- * itself would only fall back to the axis grey, which no check notices.
+ * `gen:benchmark-doc`, and the benchmark workflow on its fresh measurement,
+ * fail on a results label missing here (`assertEveryLibraryHasAColour` in
+ * `scripts/measurement-checks.mts`): the chart itself would only fall back to
+ * the axis grey, which no check notices.
  * Both read it through {@link libraryColorOf}, so that the check and the chart
  * cannot disagree on which labels have a colour.
  */

@@ -156,13 +156,21 @@ jobs:
       # re-measurement must not fail the job that judges drift. A sentence the
       # committed tables no longer support fails `Build` instead (`ws:build`
       # runs the docs app's `doc`); a page left stale against its tables is
-      # style-check's `ws:gen` to catch. `fix:fmt` gives the tables the layout
-      # they are committed in, so the diff below counts changed numbers, not
+      # style-check's `ws:gen` to catch. What holds whatever the prose says —
+      # a chart colour for every library, one environment for every table —
+      # is checked here, before the measurement becomes an artifact or a
+      # baseline. Each scenario runs in its own process and stamps the date,
+      # so one date is pinned for the pass, or a run crossing midnight UTC
+      # would record two. `fix:fmt` gives the tables the layout they are
+      # committed in, so the diff below counts changed numbers, not
       # reformatted lines.
       - name: Measure
         run: |
           set -euo pipefail
+          BENCHMARK_MEASURED_ON="$(date -u +%F)"
+          export BENCHMARK_MEASURED_ON
           pnpm --filter @synstate/docs run z:benchmark:measure
+          pnpm --filter @synstate/docs run z:benchmark:check-measurement
           pnpm --filter @synstate/docs run fix:fmt
 
       # What the measurement would change if it were committed. On `main` with
