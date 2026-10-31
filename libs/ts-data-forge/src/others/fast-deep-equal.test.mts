@@ -204,9 +204,69 @@ describe(fastDeepEqual, () => {
         expected: '=',
       },
       {
+        name: 'objects whose own `valueOf` and `toString` are not functions are compared by key',
+        x: { valueOf: 1, toString: 'a' } as any,
+        y: { valueOf: 1, toString: 'a' } as any,
+        expected: '=',
+      },
+      {
+        name: 'objects whose own `valueOf` that is not a function differs are not equal',
+        x: { valueOf: 1 } as any,
+        y: { valueOf: 2 } as any,
+        expected: '!=',
+      },
+      {
         name: 'objects with `toString` functions returning different values are not equal',
         x: { toString: () => 'Hello world!' } as any,
         y: { toString: () => 'Hi!' } as any,
+        expected: '!=',
+      },
+    ] as const satisfies readonly TestCase[])('$name', testFn);
+  });
+
+  describe('null-prototype objects', () => {
+    const withNullPrototype = (
+      entries: ReadonlyRecord<string, unknown>,
+    ): unknown => Object.setPrototypeOf({ ...entries }, null);
+
+    const groupByParity = (xs: readonly number[]): unknown =>
+      Object.groupBy(xs, (x) => (x % 2 === 0 ? 'even' : 'odd'));
+
+    test.each([
+      {
+        name: 'empty null-prototype objects are equal',
+        x: Object.create(null),
+        y: Object.create(null),
+        expected: '=',
+      },
+      {
+        name: 'null-prototype objects with the same entries are equal',
+        x: withNullPrototype({ a: 1, b: [2] }),
+        y: withNullPrototype({ a: 1, b: [2] }),
+        expected: '=',
+      },
+      {
+        name: 'null-prototype objects with different entries are not equal',
+        x: withNullPrototype({ a: 1 }),
+        y: withNullPrototype({ a: 2 }),
+        expected: '!=',
+      },
+      {
+        name: 'a null-prototype object and a plain object are not equal',
+        x: Object.create(null),
+        y: {},
+        expected: '!=',
+      },
+      {
+        name: 'Object.groupBy results with the same groups are equal',
+        x: groupByParity([1, 2, 3]),
+        y: groupByParity([1, 2, 3]),
+        expected: '=',
+      },
+      {
+        name: 'Object.groupBy results with different groups are not equal',
+        x: groupByParity([1, 2, 3]),
+        y: groupByParity([1, 2, 4]),
         expected: '!=',
       },
     ] as const satisfies readonly TestCase[])('$name', testFn);
@@ -714,14 +774,57 @@ describe(fastDeepEqual, () => {
           'content',
         );
 
-        // These elements have the same structure but different _owner references
-        // fastDeepEqual should skip _owner comparison and not cause infinite loop
-        // The result depends on whether other properties are equal
-        const result = fastDeepEqualUntyped(element1, element2);
-
-        // The important thing is that it doesn't throw or hang
-        assert.isBoolean(result);
+        assert.isTrue(fastDeepEqualUntyped(element1, element2));
       });
+
+      test.each([
+        {
+          name: 'element-shaped objects with different _owner are equal',
+          x: {
+            $$typeof: Symbol.for('react.element'),
+            type: 'div',
+            key: null,
+            props: { className: 'x' },
+            _owner: { name: 'A' },
+          },
+          y: {
+            $$typeof: Symbol.for('react.element'),
+            type: 'div',
+            key: null,
+            props: { className: 'x' },
+            _owner: { name: 'B' },
+          },
+          expected: '=',
+        },
+        {
+          name: 'element-shaped objects with different props are not equal',
+          x: {
+            $$typeof: Symbol.for('react.element'),
+            type: 'div',
+            props: { className: 'x' },
+            _owner: null,
+          },
+          y: {
+            $$typeof: Symbol.for('react.element'),
+            type: 'div',
+            props: { className: 'y' },
+            _owner: null,
+          },
+          expected: '!=',
+        },
+        {
+          name: '_owner is compared on an object without $$typeof',
+          x: { _owner: { name: 'A' } },
+          y: { _owner: { name: 'B' } },
+          expected: '!=',
+        },
+        {
+          name: '_owner is compared when $$typeof is falsy',
+          x: { $$typeof: null, _owner: { name: 'A' } },
+          y: { $$typeof: null, _owner: { name: 'B' } },
+          expected: '!=',
+        },
+      ] as const satisfies readonly TestCase[])('$name', testFn);
 
       test('React elements with different props are not equal', () => {
         const element1 = React.createElement('div', { className: 'test1' });
@@ -759,9 +862,7 @@ describe(fastDeepEqual, () => {
           child.render();
         }
 
-        // Should still be 1 or 2 depending on React element comparison
-        // The important thing is it doesn't throw or hang
-        assert.isTrue(mut_renderCount >= 1);
+        assert.strictEqual(mut_renderCount, 1);
 
         // Update with different props - should re-render
         const differentProps = {
@@ -775,8 +876,7 @@ describe(fastDeepEqual, () => {
           child.render();
         }
 
-        // Should have rendered at least once more
-        assert.isTrue(mut_renderCount >= 2);
+        assert.strictEqual(mut_renderCount, 2);
       });
     });
   });
