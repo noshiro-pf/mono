@@ -231,3 +231,108 @@ describe('display-name through type wrappers', () => {
     ],
   });
 });
+
+describe('display-name for a component declared inside a function', () => {
+  tester.run('display-name', displayNameRule, {
+    valid: [
+      {
+        name: 'in an arrow-function factory',
+        code: dedent`
+          const createRow = () => {
+            const Row = React.memo(() => null);
+            Row.displayName = 'Row';
+            return Row;
+          };
+        `,
+      },
+      {
+        name: 'in a function declaration',
+        code: dedent`
+          function createRow() {
+            const Row = React.memo(() => null);
+            Row.displayName = 'Row';
+            return Row;
+          }
+        `,
+      },
+      {
+        name: 'in a nested block and a switch case',
+        code: dedent`
+          const f = (k: number) => {
+            if (k > 0) {
+              const A = React.memo(() => null);
+              A.displayName = 'A';
+              return A;
+            }
+            switch (k) {
+              case 0:
+                const B = React.memo(() => null);
+                B.displayName = 'B';
+                return B;
+            }
+            return undefined;
+          };
+        `,
+      },
+      {
+        name: 'in a class static block',
+        code: dedent`
+          class K {
+            static {
+              const S = React.memo(() => null);
+              S.displayName = 'S';
+            }
+          }
+        `,
+      },
+      {
+        name: 'in a namespace',
+        code: dedent`
+          namespace N {
+            export const C = React.memo(() => null);
+            C.displayName = 'C';
+          }
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'an assignment after the enclosing function does not count',
+        code: dedent`
+          const createRow = () => {
+            const Row = React.memo(() => null);
+            return Row;
+          };
+          Row.displayName = 'Row';
+        `,
+        errors: [{ messageId: 'missingDisplayName' }],
+      },
+      {
+        name: 'a nested component without displayName',
+        code: dedent`
+          function createRow() {
+            const Row = React.memo(() => null);
+            return Row;
+          }
+        `,
+        errors: [{ messageId: 'missingDisplayName' }],
+      },
+      {
+        name: 'a nested component with a mismatched displayName',
+        code: dedent`
+          function createRow() {
+            const Row = React.memo(() => null);
+            Row.displayName = 'Other';
+            return Row;
+          }
+        `,
+        errors: [
+          {
+            messageId: 'mismatchedDisplayName',
+            data: { componentName: 'Row' },
+          },
+        ],
+      },
+    ],
+  });
+});

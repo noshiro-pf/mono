@@ -121,6 +121,12 @@ The range and the text of a node leave out the parentheses written around it.
 | `getRangeWithParens` | the node's range including them                                     |
 | `getArgumentText`    | the node's text for an argument list, `(a, b)` kept as one argument |
 
+## Statements
+
+| Helper      | What it gives                                                                                |
+| :---------- | :------------------------------------------------------------------------------------------- |
+| `siblingOf` | the statement after (`1`) or before (`-1`) a node in its statement list, through an `export` |
+
 ## Imports and bindings
 
 | Helper                  | What it gives                                                                                        |

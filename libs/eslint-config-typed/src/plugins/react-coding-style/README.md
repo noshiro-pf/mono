@@ -37,7 +37,7 @@ export const MemoWithoutProps = React.memo(() => <div>{1}</div>);
 
 ## `display-name`
 
-Requires React components created with `React.memo` to have a `displayName` property that matches the component name for better debugging in React DevTools.
+Requires React components created with `React.memo` to have a `displayName` property that matches the component name for better debugging in React DevTools. The assignment is the statement right after the declaration, in the same statement list: inside a factory function, it goes inside that function.
 
 **Options:**
 
