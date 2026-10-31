@@ -3,7 +3,9 @@
 import { createState, derive, map, onScopeDispose } from 'synstate';
 import {
   constant,
+  createAfterUpdate,
   For,
+  subscribeInScope,
   toObservable,
   view,
   type Bindable,
@@ -31,12 +33,7 @@ import {
   type TimePrecision,
   type WallClock,
 } from '../date/index.mjs';
-import {
-  createAfterUpdate,
-  parseInteger,
-  subscribeInScope,
-  uniqueId,
-} from '../internal/index.mjs';
+import { parseInteger, uniqueId } from '../internal/index.mjs';
 import { HtmlSelect } from './html-select.js';
 import { Icon } from './icon.js';
 import { TimePicker, type TimePickerLabels } from './time-picker.js';

@@ -8,6 +8,7 @@ import {
   propertyNames,
   viewTag,
 } from '../internal/index.mjs';
+import { listenInScope } from '../scope/index.mjs';
 
 /**
  * Binds every prop of an intrinsic element except `ref` and `children` (SPEC.md
@@ -172,11 +173,9 @@ const controlledOf = (element: HTMLInputElement): Controlled => {
 
   controlled.set(element, created);
 
-  element.addEventListener('change', onChange, { capture: true });
+  listenInScope(element, 'change', onChange, { capture: true });
 
   onScopeDispose(() => {
-    element.removeEventListener('change', onChange, { capture: true });
-
     controlled.delete(element);
   });
 
@@ -225,18 +224,6 @@ const isControlledKey = (key: string): key is ControlledKey =>
 /** The elements bound by {@link bindControlled}. */
 const controlled = new WeakMap<HTMLInputElement, Controlled>();
 
-const bindEvent = (
-  element: Element,
-  type: string,
-  handler: EventListener,
-): void => {
-  element.addEventListener(type, handler);
-
-  onScopeDispose(() => {
-    element.removeEventListener(type, handler);
-  });
-};
-
 /** `onClick`, `onPointerDown`: `on` and an upper-case letter. */
 const isEventKey = (key: string): boolean => /^on[A-Z]/u.test(key);
 
@@ -261,7 +248,7 @@ const bindProp = (element: Element, key: string, value: unknown): void => {
   }
 
   if (isEventKey(key) && isEventHandler(value)) {
-    bindEvent(element, key.slice(2).toLowerCase(), value);
+    listenInScope(element, key.slice(2).toLowerCase(), value);
 
     return;
   }

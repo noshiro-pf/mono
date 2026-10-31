@@ -1,11 +1,12 @@
 import {
   constant,
+  createAfterUpdate,
+  subscribeInScope,
   toObservable,
   type Bindable,
   type Child,
   type JSX,
 } from 'synstate-dom';
-import { createAfterUpdate, subscribeInScope } from '../internal/index.mjs';
 import { Icon } from './icon.js';
 
 type Props = Readonly<{

@@ -77,3 +77,65 @@ That leaves one case: a heavy derivation defined globally and read only rarely. 
 A handler runs outside every scope: by the time it is called, no `run` is executing. So an observable you create in a handler, such as `a$.pipe(map(...))`, belongs to no scope and keeps being computed even after its row or branch is gone. In development builds, synstate-dom warns when an observable is created inside a handler it registered.
 
 Instead, have the handler write to a state, and derive from that state at mount time. If later work really has to create an observable, say after an `await`, grab the scope with `getCurrentScope()` while the component is mounting, and wrap the later work in that scope's `run`.
+
+## Effects that last as long as the component
+
+A component is called once, so what another library would run in an effect is started in the component's body and stopped when its scope is disposed. Three helpers do that:
+
+- `subscribeInScope(source, next)` calls `next` with every value of `source`, the current one first, and unsubscribes when the scope is disposed.
+- `listenInScope(target, type, listener, options)` adds an event listener to something other than an element the component draws, such as `window` or `document`, and removes it when the scope is disposed. For an element the component draws, use its `onClick`-style props.
+- `createAfterUpdate()` returns a function that runs work in a microtask, after the update under way has finished. By then the DOM bound to that update has been written and the propagation is over, so the work may write to a state: a write made while another state is still propagating is what synstate warns of. It is also how work runs after the first mount, because a component's nodes are attached to the document only once the whole description they are in is mounted. Work for a scope disposed by then is dropped.
+
+```tsx
+import { createState } from 'synstate';
+import {
+    constant,
+    createAfterUpdate,
+    listenInScope,
+    subscribeInScope,
+    type JSX,
+} from 'synstate-dom';
+
+export const SearchBox = (): JSX.Element => {
+    // Starts from the query saved last time.
+    const [query$, setQuery] = createState(
+        sessionStorage.getItem('search') ?? '',
+    );
+
+    // Saves the query whenever it changes, until the component's scope is
+    // disposed: what an effect would do.
+    subscribeInScope(query$, (query) => {
+        sessionStorage.setItem('search', query);
+    });
+
+    // Removed with the scope, so a closed branch leaves no listener behind.
+    listenInScope(globalThis, 'keydown', (event) => {
+        if (event instanceof KeyboardEvent && event.key === 'Escape') {
+            setQuery('');
+        }
+    });
+
+    // The input is in the document only once the whole description is mounted, so
+    // it is focused after that.
+    const afterUpdate = createAfterUpdate();
+
+    let mut_input: HTMLInputElement | undefined = undefined;
+
+    afterUpdate(() => {
+        mut_input?.focus();
+    });
+
+    return (
+        <input
+            placeholder={constant('Search')}
+            ref={(element) => {
+                mut_input = element;
+            }}
+            value={query$}
+            onInput={(event) => {
+                setQuery(event.currentTarget.value);
+            }}
+        />
+    );
+};
+```

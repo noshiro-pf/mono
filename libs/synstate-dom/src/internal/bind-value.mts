@@ -1,9 +1,6 @@
-import {
-  isObservable,
-  onScopeDispose,
-  type InitializedObservable,
-} from 'synstate';
+import { isObservable, type InitializedObservable } from 'synstate';
 import type { Bindable } from '../constant/index.mjs';
+import { subscribeInScope } from '../scope/index.mjs';
 import { isView } from './is-view.mjs';
 
 /**
@@ -23,7 +20,7 @@ export const bindValue = <T,>(
 ): void => {
   if (isView(bindable)) {
     bindable.open((source, fn) => {
-      subscribeInScope(source, (value) => {
+      bindObservable(source, (value) => {
         write(fn(value));
       });
     });
@@ -32,7 +29,7 @@ export const bindValue = <T,>(
   }
 
   if (isObservable(bindable)) {
-    subscribeInScope(bindable, write);
+    bindObservable(bindable, write);
 
     return;
   }
@@ -40,7 +37,8 @@ export const bindValue = <T,>(
   write(bindable);
 };
 
-const subscribeInScope = <A,>(
+/** A completed observable is written once and not subscribed to. */
+const bindObservable = <A,>(
   source: InitializedObservable<A>,
   write: (value: A) => void,
 ): void => {
@@ -50,9 +48,5 @@ const subscribeInScope = <A,>(
     return;
   }
 
-  const subscription = source.subscribe(write);
-
-  onScopeDispose(() => {
-    subscription.unsubscribe();
-  });
+  subscribeInScope(source, write);
 };

@@ -9,4 +9,3 @@ export * from './not-found-page.js';
 export * from './organisms/index.mjs';
 export * from './report-rect-on.mjs';
 export * from './root.js';
-export * from './scope-effects.mjs';

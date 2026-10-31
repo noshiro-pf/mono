@@ -1,7 +1,7 @@
 import { onScopeDispose, type Observable } from 'synstate';
+import { createAfterUpdate, subscribeInScope } from 'synstate-dom';
 import type { StrictPick } from 'ts-type-forge';
 import { closeOnBackdropClick } from './close-on-backdrop-click.mjs';
-import { createAfterUpdate, subscribeInScope } from './scope-effects.mjs';
 
 /**
  * Has a native `<dialog>` follow a store: opened modal while `isOpen` says so

@@ -225,6 +225,12 @@ type MountedNodes = Node | readonly Node[];
 
 コンポーネントは 1 回しか評価されず、寿命は必ずそれを含む分岐・行・ルートと一致するので、コンポーネント単位のスコープは作らない。スコープの数と破棄の手間が減る。context は提供しない（決定事項 11）。
 
+コンポーネントの中で effect の代わりに使う補助関数を `scope/` から公開する。どれも現在のスコープの `onScopeDispose` に後始末を登録する。
+
+- `subscribeInScope(source, next)`: 購読し、スコープの破棄で解除する。束縛（「7.1」）が完了していない Observable を購読するのもこれで行う。
+- `listenInScope(target, type, listener, options)`: `window` などコンポーネントが描く要素以外のイベントを、スコープの破棄まで聞く。要素のイベントの束縛（「7.2」）もこれで行う。
+- `createAfterUpdate()`: 処理を microtask で実行する関数を返す。進行中の更新が終わり、DOM が書かれた後に実行されるので、状態に書き込める。最初のマウントの後に実行したい処理にも使う。それまでにスコープが破棄されていれば捨てる。
+
 ### 6.5 `render`
 
 ```ts
@@ -271,7 +277,7 @@ export const render = (
 | テキスト   | 空の Text ノードを作り `node.data = String(v)`                                                     |
 | `class`    | 文字列形式とオブジェクト形式のどちらか一方を受け付ける（下記）                                     |
 | `style`    | `Bindable<string>` は `style.cssText`。オブジェクト形式は各キーを `style.setProperty` で個別に束縛 |
-| イベント   | `addEventListener`。解除を `onScopeDispose` に登録する。開発ビルドの warning は下記                |
+| イベント   | `listenInScope`（「6.4」）。開発ビルドの warning は下記                                            |
 
 **制御された `checked` と `indeterminate`**: `<input>` の `checked` または `indeterminate` を束縛すると、`change` の後、次のフレームの描画前に要素を束縛中の値へ書き戻す。持ち主が変更を受け取らなかった（`onChange` で値を変えなかった）とき、ユーザーの切り替えが画面に残らないようにするためで、結果は React の制御されたコンポーネントと同じになる。ただし React は自分のイベント処理の終わりに同期的に戻すのに対し、こちらは次のフレームまで戻さない。クリックは `indeterminate` も外すので、同じく書き戻す。
 
@@ -537,6 +543,7 @@ libs/synstate-dom/
 │   ├── jsx/           # Mountable、jsx、Fragment、JSX 名前空間、IntrinsicElements
 │   ├── bind/          # 属性・プロパティ・テキスト・class・style・イベント
 │   ├── control/       # If、MatchOptional、MatchResult、For、Portal
+│   ├── scope/         # subscribeInScope、listenInScope、createAfterUpdate
 │   └── render.mts
 └── test/
     └── browser/

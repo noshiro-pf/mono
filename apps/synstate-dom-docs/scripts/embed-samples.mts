@@ -66,7 +66,11 @@ const pageSamples: readonly (readonly [
   ],
   [
     'guides/lifecycle.md',
-    ['lifecycle/01-local-derivation.tsx', 'lifecycle/02-branch-local.tsx'],
+    [
+      'lifecycle/01-local-derivation.tsx',
+      'lifecycle/02-branch-local.tsx',
+      'lifecycle/03-scope-effects.tsx',
+    ],
   ],
   ['examples/todo-list.md', [readmeSample('02-todo-list.tsx')]],
 ] as const;

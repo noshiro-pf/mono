@@ -5,7 +5,17 @@ import {
   onScopeDispose,
   type InitializedObservable,
 } from 'synstate';
-import { constant, For, If, MatchOptional, view, type JSX } from 'synstate-dom';
+import {
+  constant,
+  createAfterUpdate,
+  For,
+  If,
+  listenInScope,
+  MatchOptional,
+  subscribeInScope,
+  view,
+  type JSX,
+} from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
@@ -83,11 +93,6 @@ import { DagGroupFrame } from './dag-group-frame.js';
 import { DagMilestoneNode } from './dag-milestone-node.js';
 import { nodeIdOf } from './dag-node-handlers.mjs';
 import { DagTaskNode } from './dag-task-node.js';
-import {
-  createAfterUpdate,
-  listenInScope,
-  subscribeInScope,
-} from './scope-effects.mjs';
 
 type Props = Readonly<{
   /** ELK's layout, which places every node not put anywhere by hand. */
