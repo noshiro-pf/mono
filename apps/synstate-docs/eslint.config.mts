@@ -80,10 +80,14 @@ export default [
 
   // Solid's root export is its server build under Node, where nothing
   // reacts; the benchmark imports the client build through one shim
-  // (`solid-js-client.mts`, beside the files it serves), and a bare import
-  // would measure a graph that never updates.
+  // (`throughput-demo/adapters/solid-js-client.mts`), and a bare import
+  // would measure a graph that never updates. The spring demo's adapters
+  // are loaded by the benchmark too, through `spring-demo/index.mts`.
   {
-    files: ['src/components/throughput-demo/adapters/**'],
+    files: [
+      'src/components/throughput-demo/adapters/**',
+      'src/components/spring-demo/adapters/**',
+    ],
     ignores: ['**/*.d.mts'],
     rules: defineKnownRules({
       'no-restricted-imports': [
@@ -97,7 +101,7 @@ export default [
               regex: String.raw`^solid-js(?:/|$)`,
               allowTypeImports: true,
               message:
-                "Import Solid through './solid-js-client.mjs', whose client build reacts under Node.",
+                "Import Solid through 'throughput-demo/adapters/solid-js-client.mjs', whose client build reacts under Node.",
             },
           ],
         }),

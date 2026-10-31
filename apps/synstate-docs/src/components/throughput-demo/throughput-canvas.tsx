@@ -157,6 +157,7 @@ const containerStyle: React.CSSProperties = {
   flexDirection: 'column',
   alignItems: 'center',
   gap: '8px',
+  minWidth: 0,
   marginTop: 0, // overrides astro starlight default style
 } as const;
 
@@ -170,6 +171,8 @@ const canvasStyle: React.CSSProperties = {
   border: '1px solid var(--sl-color-gray-5, #d1d5db)',
   borderRadius: '6px',
   background: 'var(--sl-color-bg-nav, #fff)',
+  width: '100%',
+  height: 'auto',
 } as const;
 
 const buttonStyle: React.CSSProperties = {

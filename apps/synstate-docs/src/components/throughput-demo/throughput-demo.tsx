@@ -1,9 +1,12 @@
 import * as React from 'react';
 import { Num, Result, asSafeUint } from 'ts-data-forge';
 import type { ReadonlyRecord, SafeUint } from 'ts-type-forge';
+import { threeUpGrid } from '../three-up-grid.mjs';
 import {
   createJotaiThroughputAdapter,
   createMobXThroughputAdapter,
+  createPreactSignalsThroughputAdapter,
+  createSolidThroughputAdapter,
   createSynStateThroughputAdapter,
 } from './adapters/index.mjs';
 import { ThroughputCanvas } from './throughput-canvas.js';
@@ -110,11 +113,9 @@ export const ThroughputDemo = React.memo(() => {
         })}
       </div>
       <p style={descriptionStyle}>
-        {'A ball orbits automatically. K source updates are pushed through a'}
         {
-          'depth-M reactive chain each frame. Increase K to see per-update overhead'
+          'A ball orbits automatically. Each frame pushes K source updates through a depth-M reactive chain; ms/frame is how long they take in this browser.'
         }
-        {'diverge.'}
       </p>
     </div>
   );
@@ -126,6 +127,8 @@ const adapters = [
   createSynStateThroughputAdapter(),
   createJotaiThroughputAdapter(),
   createMobXThroughputAdapter(),
+  createPreactSignalsThroughputAdapter(),
+  createSolidThroughputAdapter(),
 ] as const;
 
 const DEFAULT_CHAIN_DEPTH = 50;
@@ -168,10 +171,7 @@ const sliderStyle: React.CSSProperties = {
 } as const;
 
 const canvasesContainerStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: '24px',
-  justifyContent: 'center',
-  alignItems: 'flex-start',
+  ...threeUpGrid(24),
   userSelect: 'none',
   padding: '16px 0',
 } as const;
