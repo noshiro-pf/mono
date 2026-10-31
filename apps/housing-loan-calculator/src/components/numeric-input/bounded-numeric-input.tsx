@@ -10,7 +10,8 @@ type Props<N extends number> = Readonly<{
   /** The value a number in range is, such as a branded type's `cast`. */
   toValue: (value: number) => N;
   min: number;
-  max?: number;
+  /** Required: an input with no upper bound commits any number it is given. */
+  max: number;
   /** Rounds to a whole number. */
   integer?: boolean;
   'data-e2e': string;
@@ -30,11 +31,7 @@ export const BoundedNumericInput = <N extends number>({
   integer = false,
   'data-e2e': e2e,
 }: Props<N>): JSX.Element => {
-  const bounded = normalizeBounded({
-    min,
-    max: max ?? Number.POSITIVE_INFINITY,
-    integer,
-  });
+  const bounded = normalizeBounded({ min, max, integer });
 
   return (
     <NumericInput
@@ -43,7 +40,7 @@ export const BoundedNumericInput = <N extends number>({
       encode={encode}
       fill
       inputClass={styles.input}
-      max={max === undefined ? undefined : constant(max)}
+      max={constant(max)}
       min={constant(min)}
       normalize={(n) => toValue(bounded(n))}
       selectAllOnFocus

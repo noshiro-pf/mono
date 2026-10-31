@@ -22,9 +22,9 @@ import type * as t from 'ts-fortress';
 import { defaultValues, queryParamKey } from '../constants/index.mjs';
 import { calcAll } from '../functions/index.mjs';
 import {
+  BorrowingTotal,
   PercentFloat,
   Year,
-  Yen,
   type CalculatedValues,
   type RepaymentType,
   type Store,
@@ -44,7 +44,7 @@ export type LoanStore = Readonly<{
   isCalculating: InitializedObservable<boolean>;
   setRepaymentType: (repaymentType: RepaymentType) => void;
   /** 借入金額（万円） */
-  setBorrowingTotalManYen: (borrowingTotalManYen: Yen) => void;
+  setBorrowingTotalManYen: (borrowingTotalManYen: BorrowingTotal) => void;
   /** 借入期間（年） */
   setBorrowingPeriodYear: (borrowingPeriodYear: Year) => void;
   /** 年当たりの金利 */
@@ -138,7 +138,7 @@ const storeFromQuery = (
         ? repaymentType
         : prev.repaymentType,
     borrowingTotalManYen: numberFromQuery(
-      Yen,
+      BorrowingTotal,
       query.get(queryParamKey.borrowingTotal),
       prev.borrowingTotalManYen,
     ),

@@ -2,9 +2,9 @@ import { constant, mapBindable, type JSX } from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
 import { loanStore } from '../../store/index.mjs';
 import {
+  BorrowingTotalNumericInput,
   PercentFloatNumericInput,
   YearNumericInput,
-  YenNumericInput,
 } from '../numeric-input/index.mjs';
 import * as styles from './config-section.module.css';
 import { RepaymentTypeRadioGroup } from './repayment-type-radio-group.js';
@@ -15,9 +15,8 @@ export const ConfigSection = (): JSX.Element => (
     <div class={constant(styles.element)}>
       <label class={constant(styles.field)}>
         {constant(dict.borrowingTotalManYen)}
-        <YenNumericInput
+        <BorrowingTotalNumericInput
           data-e2e={'numericInput-borrowingTotalManYen'}
-          min={0}
           value={mapBindable(loanStore.inputs, (s) => s.borrowingTotalManYen)}
           onValueChange={loanStore.setBorrowingTotalManYen}
         />

@@ -6,7 +6,13 @@ import {
 } from 'tiny-router-observable';
 import { defaultValues } from '../constants/index.mjs';
 import { calcAll } from '../functions/index.mjs';
-import { PercentFloat, Year, Yen } from '../types/index.mjs';
+import {
+  BorrowingTotal,
+  maxBorrowingTotalManYen,
+  minBorrowingTotalManYen,
+  PercentFloat,
+  Year,
+} from '../types/index.mjs';
 import { createLoanStore, type LoanStore } from './loan-store.mjs';
 
 describe(createLoanStore, () => {
@@ -23,7 +29,7 @@ describe(createLoanStore, () => {
 
     assert.deepStrictEqual(store.inputs.getSnapshot().value, {
       repaymentType: 'principal-and-interest-equal-repayment',
-      borrowingTotalManYen: Yen.cast(3000),
+      borrowingTotalManYen: BorrowingTotal.cast(3000),
       borrowingPeriodYear: Year.cast(20),
       interestRatePercentPerYear: PercentFloat.cast(1.2),
     });
@@ -45,6 +51,9 @@ describe(createLoanStore, () => {
     ['borrowing-total', ''],
     ['borrowing-total', '12px'],
     ['borrowing-total', 'Infinity'],
+    ['borrowing-total', '-1000'],
+    ['borrowing-total', '1000001'],
+    ['borrowing-total', '1e305'],
     ['borrowing-period', 'abc'],
     ['borrowing-period', '-1'],
     ['borrowing-period', '1.5'],
@@ -70,11 +79,25 @@ describe(createLoanStore, () => {
 
     assert.deepStrictEqual(store.inputs.getSnapshot().value, {
       ...defaultValues,
-      borrowingTotalManYen: Yen.cast(1000),
+      borrowingTotalManYen: BorrowingTotal.cast(1000),
       borrowingPeriodYear: Year.cast(1),
       interestRatePercentPerYear: PercentFloat.cast(100),
     });
   });
+
+  test.each([minBorrowingTotalManYen, maxBorrowingTotalManYen])(
+    'accepts a total of %d, a bound of its range',
+    (total) => {
+      const { store } = setup(
+        `https://example.com/mono/loan/?borrowing-total=${total}`,
+      );
+
+      assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+        ...defaultValues,
+        borrowingTotalManYen: BorrowingTotal.cast(total),
+      });
+    },
+  );
 
   test('accepts a period of 100, the longest there is', () => {
     const { store } = setup(
@@ -90,7 +113,7 @@ describe(createLoanStore, () => {
   test('keeps the value before it when the URL changes to one that is not valid', () => {
     const { store, router } = setup('https://example.com/mono/loan/');
 
-    store.setBorrowingTotalManYen(Yen.cast(4000));
+    store.setBorrowingTotalManYen(BorrowingTotal.cast(4000));
 
     store.setBorrowingPeriodYear(Year.cast(10));
 
@@ -100,7 +123,7 @@ describe(createLoanStore, () => {
 
     assert.deepStrictEqual(store.inputs.getSnapshot().value, {
       ...defaultValues,
-      borrowingTotalManYen: Yen.cast(4000),
+      borrowingTotalManYen: BorrowingTotal.cast(4000),
       borrowingPeriodYear: Year.cast(10),
       interestRatePercentPerYear: PercentFloat.cast(0.8),
     });
@@ -109,7 +132,7 @@ describe(createLoanStore, () => {
   test('a setter writes every input to the URL below the base path', () => {
     const { store, browser } = setup('https://example.com/mono/loan/');
 
-    store.setBorrowingTotalManYen(Yen.cast(4000));
+    store.setBorrowingTotalManYen(BorrowingTotal.cast(4000));
 
     assert.strictEqual(browser.url().pathname, '/mono/loan/');
 
@@ -122,7 +145,7 @@ describe(createLoanStore, () => {
 
     assert.strictEqual(
       store.inputs.getSnapshot().value.borrowingTotalManYen,
-      Yen.cast(4000),
+      BorrowingTotal.cast(4000),
     );
   });
 
