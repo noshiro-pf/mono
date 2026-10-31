@@ -282,7 +282,16 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
               ),
             true,
           ) &&
-          !losesComments(sourceCode, callback, shape) &&
+          !losesComments(
+            sourceCode,
+            node,
+            [
+              receiver.range,
+              param.range,
+              ...(typeArguments === undefined ? [] : [typeArguments.range]),
+            ],
+            shape,
+          ) &&
           !needsMutableResult(sourceCode, checker, getTsNode, node);
 
         mut_matches.push({ node, replacement, autofixable });
@@ -581,19 +590,29 @@ const buildReplacement = ({
 };
 
 /**
- * Whether a comment inside `callback` lies outside every piece of source the
- * rewrite carries over, and would therefore be dropped.
+ * Whether a comment inside `node`, the call the fix replaces, lies outside
+ * every range the rewrite copies verbatim, and would therefore be dropped.
+ *
+ * `copied` lists those ranges besides the shape's: the receiver, the type
+ * arguments and the parameter. The test counts only when it is copied as it is:
+ * a negated test is rebuilt by `negationOf`, which can drop a comment (one
+ * between the operands of `a && b` is gone from `!a || !b`), so any comment in
+ * one keeps the fix a suggestion, even where the negation carries it over. A
+ * comment between the receiver and `.flatMap`, after `flatMap(` or after the
+ * callback is in none of the ranges.
  */
 const losesComments = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   sourceCode: TSESLint.SourceCode,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  callback: TSESTree.ArrowFunctionExpression,
+  node: TSESTree.CallExpression,
+  copied: readonly FixedLengthTuple<2, number>[],
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   shape: FilterMapShape,
 ): boolean => {
   const keptRanges: readonly FixedLengthTuple<2, number>[] = [
-    shape.test.range,
+    ...copied,
+    ...(shape.negated ? ([] as const) : ([shape.test.range] as const)),
     ...shape.elements.map((element) => element.range),
     ...(shape.preludeRange === undefined
       ? ([] as const)
@@ -601,7 +620,7 @@ const losesComments = (
   ] as const;
 
   return sourceCode
-    .getCommentsInside(callback)
+    .getCommentsInside(node)
     .some((comment) =>
       keptRanges.every(
         ([start, end]) =>
