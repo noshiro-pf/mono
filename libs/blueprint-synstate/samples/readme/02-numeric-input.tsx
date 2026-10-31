@@ -1,9 +1,14 @@
 import { NumericInput } from 'blueprint-synstate';
 import { createState } from 'synstate';
-import { render } from 'synstate-dom';
+import { constant, render } from 'synstate-dom';
 
 // The value is a number; what the user is typing stays text until committed.
 const [rate$, setRate] = createState(1.5);
+
+// The bounds `normalize` holds the value to, read out as the spin button's.
+const minRate = 0;
+
+const maxRate = 20;
 
 const unmount = render(
   () => (
@@ -11,10 +16,12 @@ const unmount = render(
       // `NaN` for text that is not a number, which `normalize` replaces.
       decode={Number.parseFloat}
       encode={(rate) => rate.toFixed(2)}
+      max={constant(maxRate)}
+      min={constant(minRate)}
       normalize={(rate) =>
-        Number.isFinite(rate)
-          ? Math.min(20, Math.max(0, Math.round(rate * 100) / 100))
-          : 0
+        Number.isNaN(rate)
+          ? minRate
+          : Math.min(maxRate, Math.max(minRate, Math.round(rate * 100) / 100))
       }
       step={0.05}
       value={rate$}

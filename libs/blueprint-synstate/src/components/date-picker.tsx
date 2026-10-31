@@ -35,6 +35,7 @@ import {
   createAfterUpdate,
   parseInteger,
   subscribeInScope,
+  uniqueId,
 } from '../internal/index.mjs';
 import { HtmlSelect } from './html-select.js';
 import { Icon } from './icon.js';
@@ -379,6 +380,9 @@ export const DatePicker = ({
     );
   };
 
+  // The grid is named by the month and year above it.
+  const captionId = uniqueId('date-picker-caption');
+
   const caption = (
     <div class={constant('rdp-caption')}>
       <div class={constant('rdp-caption_dropdowns')}>
@@ -386,6 +390,7 @@ export const DatePicker = ({
           <div
             aria-live={constant('polite')}
             class={constant('rdp-caption_label')}
+            id={constant(captionId)}
             role={constant('presentation')}
           >
             {view(display$, (index) => {
@@ -520,7 +525,11 @@ export const DatePicker = ({
   );
 
   const table = (
-    <table class={constant('rdp-table')} role={constant('grid')}>
+    <table
+      aria-labelledby={constant(captionId)}
+      class={constant('rdp-table')}
+      role={constant('grid')}
+    >
       <thead class={constant('rdp-head')}>
         <tr class={constant('rdp-head_row')}>
           {weekdayOrder.map((weekday) => (

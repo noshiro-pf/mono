@@ -1,12 +1,20 @@
 import { createState, onScopeDispose } from 'synstate';
-import { constant, toObservable, type Bindable, type JSX } from 'synstate-dom';
+import {
+  constant,
+  toObservable,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import type { StrictOmit } from 'ts-type-forge';
 import {
   classObject,
   createAfterUpdate,
   intentClass,
+  isImeKeyDown,
   sizeClass,
   subscribeInScope,
+  uniqueId,
 } from '../internal/index.mjs';
 import { Icon } from './icon.js';
 import type { Intent, Size } from './intent.mjs';
@@ -43,6 +51,20 @@ type ViewProps = Readonly<{
   /** Classes after `bp6-input` on the `<input>`, as `inputClassName`. */
   inputClass?: string;
   'aria-label'?: Bindable<string>;
+  /**
+   * The number the text shows, read out by assistive technology as the spin
+   * button's value: of the text as it is being typed, as in Blueprint's, so not
+   * the committed value. {@link NumericInput} passes its decoded text.
+   */
+  'aria-valuenow'?: Bindable<number | undefined>;
+  /**
+   * The lower bound read out by assistive technology. It bounds nothing: the
+   * bound is whoever commits the text, as `normalize` in {@link NumericInput},
+   * and passes the same number here.
+   */
+  min?: Bindable<number>;
+  /** As `min`, for the upper bound. */
+  max?: Bindable<number>;
   /** On the `<input>`. */
   'data-e2e'?: Bindable<string | undefined>;
 }>;
@@ -77,80 +99,96 @@ export const NumericInputView = ({
   class: className,
   inputClass,
   'aria-label': ariaLabel,
+  'aria-valuenow': valueNow,
+  min,
+  max,
   'data-e2e': e2e,
-}: ViewProps): JSX.Element => (
-  <div
-    class={classObject([
-      'bp6-control-group',
-      'bp6-numeric-input',
-      sizeClass(size),
-      fill && 'bp6-fill',
-      className,
-    ])}
-  >
+}: ViewProps): JSX.Element => {
+  // The buttons name the input they step, as Blueprint's do.
+  const inputId = uniqueId('numericInput');
+
+  return (
     <div
-      class={classObject(
-        ['bp6-input-group', intentClass(intent), fill && 'bp6-fill'],
-        [['bp6-disabled', disabled]],
-      )}
+      class={classObject([
+        'bp6-control-group',
+        'bp6-numeric-input',
+        sizeClass(size),
+        fill && 'bp6-fill',
+        className,
+      ])}
+      role={constant('group')}
     >
-      <input
-        aria-label={ariaLabel}
-        autocomplete={constant('off')}
-        class={classObject(['bp6-input', inputClass])}
-        data-e2e={e2e}
-        disabled={disabled}
-        placeholder={placeholder}
-        type={constant('text')}
-        value={value}
-        onBlur={() => {
-          onBlur?.();
-        }}
-        onFocus={(event) => {
-          if (selectAllOnFocus) {
-            event.currentTarget.select();
-          }
-        }}
-        onInput={(event) => {
-          onValueChange(event.currentTarget.value);
-        }}
-        onKeyDown={(event) => {
-          onKeyDown?.(event);
-        }}
-      />
-    </div>
-    <div class={constant('bp6-button-group bp6-vertical bp6-fixed')}>
-      <button
-        aria-label={constant('increment')}
-        class={classObject(['bp6-button', intentClass(intent)])}
-        disabled={disabled}
-        type={constant('button')}
-        onClick={(event) => {
-          onIncrementClick?.(event);
-        }}
-        onMouseDown={(event) => {
-          onIncrementMouseDown?.(event);
-        }}
+      <div
+        class={classObject(
+          ['bp6-input-group', intentClass(intent)],
+          [['bp6-disabled', disabled]],
+        )}
       >
-        <Icon icon={'chevron-up'} />
-      </button>
-      <button
-        aria-label={constant('decrement')}
-        class={classObject(['bp6-button', intentClass(intent)])}
-        disabled={disabled}
-        type={constant('button')}
-        onClick={(event) => {
-          onDecrementClick?.(event);
-        }}
-        onMouseDown={(event) => {
-          onDecrementMouseDown?.(event);
-        }}
-      >
-        <Icon icon={'chevron-down'} />
-      </button>
+        <input
+          aria-label={ariaLabel}
+          aria-valuemax={max}
+          aria-valuemin={min}
+          aria-valuenow={valueNow}
+          autocomplete={constant('off')}
+          class={classObject(['bp6-input', inputClass])}
+          data-e2e={e2e}
+          disabled={disabled}
+          id={constant(inputId)}
+          placeholder={placeholder}
+          role={constant('spinbutton')}
+          type={constant('text')}
+          value={value}
+          onBlur={() => {
+            onBlur?.();
+          }}
+          onFocus={(event) => {
+            if (selectAllOnFocus) {
+              event.currentTarget.select();
+            }
+          }}
+          onInput={(event) => {
+            onValueChange(event.currentTarget.value);
+          }}
+          onKeyDown={(event) => {
+            onKeyDown?.(event);
+          }}
+        />
+      </div>
+      <div class={constant('bp6-button-group bp6-vertical bp6-fixed')}>
+        <button
+          aria-controls={constant(inputId)}
+          aria-label={constant('increment')}
+          class={classObject(['bp6-button', intentClass(intent)])}
+          disabled={disabled}
+          type={constant('button')}
+          onClick={(event) => {
+            onIncrementClick?.(event);
+          }}
+          onMouseDown={(event) => {
+            onIncrementMouseDown?.(event);
+          }}
+        >
+          <Icon icon={'chevron-up'} />
+        </button>
+        <button
+          aria-controls={constant(inputId)}
+          aria-label={constant('decrement')}
+          class={classObject(['bp6-button', intentClass(intent)])}
+          disabled={disabled}
+          type={constant('button')}
+          onClick={(event) => {
+            onDecrementClick?.(event);
+          }}
+          onMouseDown={(event) => {
+            onDecrementMouseDown?.(event);
+          }}
+        >
+          <Icon icon={'chevron-down'} />
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 type Props<N extends number> = Readonly<
   {
@@ -168,7 +206,9 @@ type Props<N extends number> = Readonly<
     encode: (value: N) => string;
     /**
      * The number a text stands for; `NaN` for none, which `normalize` mends.
-     * A step from such a text starts from `normalize(NaN)`.
+     * A step from such a text starts from `normalize(NaN)`. It is also read
+     * whenever the text changes, for the number the spin button reads out, so
+     * it takes half-typed text such as `-` without throwing.
      */
     decode: (text: string) => number;
     /** The value a number is committed as: clamped, rounded, `NaN` replaced. */
@@ -183,6 +223,7 @@ type Props<N extends number> = Readonly<
     | 'onIncrementClick'
     | 'onIncrementMouseDown'
     | 'onKeyDown'
+    | 'aria-valuenow'
     | 'onValueChange'
     | 'value'
   >
@@ -192,9 +233,9 @@ type Props<N extends number> = Readonly<
  * Blueprint's `NumericInput` for a number value: {@link NumericInputView} with
  * the text kept here, uncontrolled while the user types.
  *
- * Nothing the user types is decoded until it is committed — on blur, on
+ * Nothing the user types becomes the value until it is committed — on blur, on
  * Enter, or by a step — so half-typed text such as `-` or `3.` stays as it is;
- * only then does `decode` read it and `normalize` make it a value, the text is
+ * only then does `normalize` make a value of what `decode` reads, the text is
  * rewritten from that value, and `onValueChange` is told. Holding a button with
  * the main mouse button, or an arrow key, steps again after 400 ms, then every
  * 40 ms, until it is released, the window loses focus (and for a key, the
@@ -319,6 +360,12 @@ export const NumericInput = <N extends number>({
   return (
     <NumericInputView
       {...viewProps}
+      // The number the text shows, as Blueprint's reads it from its own text.
+      aria-valuenow={view(text$, (text) => {
+        const decoded = decode(text);
+
+        return Number.isFinite(decoded) ? decoded : undefined;
+      })}
       value={text$}
       onBlur={() => {
         // A held arrow key needs the focus; a held button has just taken it.
@@ -339,14 +386,8 @@ export const NumericInput = <N extends number>({
         onStepMouseDown(event, step);
       }}
       onKeyDown={(event) => {
-        // Keys that pick or confirm what an input method is composing:
-        // Safari sends the Enter that confirms a composition after
-        // `compositionend`, told from others by its key code alone.
-        if (
-          event.isComposing ||
-          // eslint-disable-next-line @typescript-eslint/no-deprecated, unicorn/prefer-keyboard-event-key -- see above
-          (event.key === 'Enter' && event.keyCode === imeKeyCode)
-        ) {
+        // Keys that pick, confirm or cancel what an input method is composing.
+        if (isImeKeyDown(event)) {
           return;
         }
 
@@ -393,9 +434,6 @@ export const NumericInput = <N extends number>({
  * `code`, which NumLock or Shift cannot change between press and release.
  */
 type Release = Readonly<{ kind: 'mouse' } | { kind: 'key'; code: string }>;
-
-/** The key code of a key down that an input method takes. */
-const imeKeyCode = 229;
 
 const repeatDelayMs = 400;
 

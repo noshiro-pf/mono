@@ -22,6 +22,13 @@ export default defineViteConfig({
     includeSource: [],
     include: ['test/browser/**/*.test.{mts,tsx}'],
     // See the comment on `optimizeDepsInclude` in the shared config.
-    optimizeDepsInclude: ['ts-data-forge > @sindresorhus/is'],
+    optimizeDepsInclude: [
+      '@blueprintjs/core',
+      '@blueprintjs/datetime',
+      'react',
+      'react-dom',
+      'react-dom/client',
+      'ts-data-forge > @sindresorhus/is',
+    ],
   },
 });
