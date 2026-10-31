@@ -3,11 +3,8 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import {
-  buildNamedImportFix,
-  getImportDeclarations,
-  getNamedImports,
-} from '../imports.mjs';
+import { hasForeignBinding } from '../bindings.mjs';
+import { bindValueImports } from '../imports.mjs';
 import { getRangeWithParens } from '../parentheses.mjs';
 import { isIdentifierNamed, skipTypeWrappers } from '../type-wrappers.mjs';
 
@@ -44,10 +41,6 @@ export const createPreferArrayIsArray = ({
     create: (context) => {
       const sourceCode = context.sourceCode;
 
-      const program = sourceCode.ast;
-
-      const moduleImports = getImportDeclarations(program, moduleName);
-
       const mut_nodesToFix: TSESTree.CallExpression[] = [];
 
       return {
@@ -59,37 +52,31 @@ export const createPreferArrayIsArray = ({
           mut_nodesToFix.push(node);
         },
         'Program:exit': () => {
-          const hasNamespaceImport =
-            getNamedImports(moduleImports).includes(namespace);
+          const binding = bindValueImports(sourceCode, moduleName, [namespace]);
 
-          // The import fix lives on the first report only:
-          // `insertTextBefore(program, …)` produces overlapping ranges
-          // otherwise and only one of them would survive a pass. A first
-          // report silenced by an `eslint-disable` comment therefore takes
-          // the import with it.
-          for (const [index, node] of mut_nodesToFix.entries()) {
+          const localName = binding?.localNames[0];
+
+          // Every fix brings the namespace into scope itself, so that one
+          // applied alone (an editor's quick fix) is complete.
+          for (const node of mut_nodesToFix) {
             context.report({
               node,
               messageId: 'useIsArray',
-              fix: (fixer) => {
-                const importFixes =
-                  index === 0 && !hasNamespaceImport
-                    ? buildNamedImportFix(fixer, program, moduleName, [
-                        namespace,
-                      ])
-                    : ([] as const);
-
-                // Only the callee is replaced, type wrappers included, along
-                // with the parentheses around it, which its range leaves out;
-                // the arguments stay as written.
-                return [
-                  ...importFixes,
-                  fixer.replaceTextRange(
-                    getRangeWithParens(sourceCode, node.callee),
-                    replacement,
-                  ),
-                ];
-              },
+              fix:
+                binding === undefined ||
+                localName === undefined ||
+                hasForeignBinding(sourceCode, node, localName, moduleName)
+                  ? null
+                  : (fixer) => [
+                      ...binding.edits(fixer),
+                      // Only the callee is replaced, type wrappers included,
+                      // along with the parentheses around it, which its range
+                      // leaves out; the arguments stay as written.
+                      fixer.replaceTextRange(
+                        getRangeWithParens(sourceCode, node.callee),
+                        `${localName}.isArray`,
+                      ),
+                    ],
             });
           }
         },

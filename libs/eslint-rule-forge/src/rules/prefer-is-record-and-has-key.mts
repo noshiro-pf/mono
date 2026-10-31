@@ -4,11 +4,8 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
-import {
-  buildNamedImportFix,
-  getImportDeclarations,
-  getNamedImports,
-} from '../imports.mjs';
+import { hasForeignBinding } from '../bindings.mjs';
+import { bindValueImports } from '../imports.mjs';
 import { getArgumentText } from '../parentheses.mjs';
 import {
   isIdentifierNamed,
@@ -44,10 +41,6 @@ export const createPreferIsRecordAndHasKey = ({
 
     create: (context) => {
       const sourceCode = context.sourceCode;
-
-      const program = sourceCode.ast;
-
-      const moduleImports = getImportDeclarations(program, moduleName);
 
       /**
        * Whether the `isRecord(...)` half of the rewrite would be dead code
@@ -159,81 +152,64 @@ export const createPreferIsRecordAndHasKey = ({
         },
 
         'Program:exit': () => {
-          const namedImports = getNamedImports(moduleImports);
+          // Bound once for each shape of rewrite: a file may import `hasKey`
+          // but not `isRecord`, which only the rewrites that need it add.
+          const withIsRecord = bindValueImports(sourceCode, moduleName, [
+            'isRecord',
+            'hasKey',
+          ]);
 
-          const rewrites = mut_nodesToFix.map((entry) => {
+          const hasKeyOnly = bindValueImports(sourceCode, moduleName, [
+            'hasKey',
+          ]);
+
+          for (const { node, objExpression, keyExpression } of mut_nodesToFix) {
             // A record-typed object makes the `isRecord(...)` conjunct always
             // true, so it is left out of the replacement entirely.
-            const needsIsRecord = !isKnownRecord(entry.objExpression);
+            const needsIsRecord = !isKnownRecord(objExpression);
 
-            return {
-              ...entry,
-              needsIsRecord,
-              // `isRecord(obj) && hasKey(obj, key)` evaluates `obj` twice.
-              fixable: !needsIsRecord || isSideEffectFree(entry.objExpression),
-            };
-          });
+            const binding = needsIsRecord ? withIsRecord : hasKeyOnly;
 
-          const fixableRewrites = rewrites.filter(({ fixable }) => fixable);
+            const hasKeyName = binding?.localNames.at(-1);
 
-          const importsToAdd: readonly string[] =
-            fixableRewrites.length === 0
-              ? []
-              : [
-                  ...(fixableRewrites.some(
-                    ({ needsIsRecord }) => needsIsRecord,
-                  ) && !namedImports.includes('isRecord')
-                    ? ['isRecord']
-                    : []),
-                  ...(namedImports.includes('hasKey') ? [] : ['hasKey']),
-                ];
-
-          const importCarrier = fixableRewrites[0];
-
-          for (const rewrite of rewrites) {
-            const { node, objExpression, keyExpression, needsIsRecord } =
-              rewrite;
+            const isRecordName = needsIsRecord
+              ? binding?.localNames[0]
+              : undefined;
 
             const objText = getArgumentText(sourceCode, objExpression);
 
             const keyText = getArgumentText(sourceCode, keyExpression);
 
-            const originalText = sourceCode.getText(node);
+            const fixable =
+              binding !== undefined &&
+              hasKeyName !== undefined &&
+              (!needsIsRecord || isRecordName !== undefined) &&
+              // `isRecord(obj) && hasKey(obj, key)` evaluates `obj` twice.
+              (!needsIsRecord || isSideEffectFree(objExpression)) &&
+              binding.localNames.every(
+                (name) =>
+                  !hasForeignBinding(sourceCode, node, name, moduleName),
+              );
 
             context.report({
               node,
               messageId: needsIsRecord ? 'useIsRecordAndHasKey' : 'useHasKey',
               data: {
-                original: originalText,
+                original: sourceCode.getText(node),
                 objName: objText,
                 keyName: keyText,
               },
-              fix: !rewrite.fixable
-                ? undefined
-                : (fixer) => {
-                    const replacement = needsIsRecord
-                      ? `(isRecord(${objText}) && hasKey(${objText}, ${keyText}))`
-                      : `hasKey(${objText}, ${keyText})`;
-
-                    // All import fixes have to live on the first fixable
-                    // report: `insertTextBefore(program, …)` produces
-                    // overlapping ranges otherwise and only one of them would
-                    // survive a pass.
-                    const importFixes =
-                      rewrite === importCarrier && importsToAdd.length > 0
-                        ? buildNamedImportFix(
-                            fixer,
-                            program,
-                            moduleName,
-                            importsToAdd,
-                          )
-                        : [];
-
-                    return [
-                      ...importFixes,
-                      fixer.replaceText(node, replacement),
-                    ];
-                  },
+              fix: fixable
+                ? (fixer) => [
+                    ...binding.edits(fixer),
+                    fixer.replaceText(
+                      node,
+                      needsIsRecord
+                        ? `(${isRecordName}(${objText}) && ${hasKeyName}(${objText}, ${keyText}))`
+                        : `${hasKeyName}(${objText}, ${keyText})`,
+                    ),
+                  ]
+                : null,
             });
           }
         },

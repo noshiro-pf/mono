@@ -85,13 +85,22 @@ describe('prefer-is-record-and-has-key', () => {
           const a = Object.hasOwn(rec, 'a');
           const b = Object.hasOwn(unk, 'b');
         `,
-        output: dedent`
-          import { isRecord, hasKey } from 'ts-data-forge';
-          declare const rec: Record<string, unknown>;
-          declare const unk: unknown;
-          const a = hasKey(rec, 'a');
-          const b = (isRecord(unk) && hasKey(unk, 'b'));
-        `,
+        output: [
+          dedent`
+            import { hasKey } from 'ts-data-forge';
+            declare const rec: Record<string, unknown>;
+            declare const unk: unknown;
+            const a = hasKey(rec, 'a');
+            const b = Object.hasOwn(unk, 'b');
+          `,
+          dedent`
+            import { hasKey, isRecord } from 'ts-data-forge';
+            declare const rec: Record<string, unknown>;
+            declare const unk: unknown;
+            const a = hasKey(rec, 'a');
+            const b = (isRecord(unk) && hasKey(unk, 'b'));
+          `,
+        ],
         errors: [
           { messageId: 'useHasKey' },
           { messageId: 'useIsRecordAndHasKey' },
@@ -162,8 +171,7 @@ describe('prefer-is-record-and-has-key', () => {
           const ok = Object.hasOwn(obj, 'a');
         `,
         output: dedent`
-          import { hasKey } from 'ts-data-forge';
-          import { isRecord } from 'ts-data-forge';
+          import { isRecord, hasKey } from 'ts-data-forge';
 
           const obj = { a: 1 };
           const ok = (isRecord(obj) && hasKey(obj, 'a'));
@@ -179,8 +187,7 @@ describe('prefer-is-record-and-has-key', () => {
           const ok = 'a' in obj;
         `,
         output: dedent`
-          import { isRecord } from 'ts-data-forge';
-          import { hasKey } from 'ts-data-forge';
+          import { hasKey, isRecord } from 'ts-data-forge';
 
           const obj = { a: 1 };
           const ok = (isRecord(obj) && hasKey(obj, 'a'));
@@ -210,12 +217,20 @@ describe('prefer-is-record-and-has-key', () => {
           const ok1 = Object.hasOwn(obj, 'a');
           const ok2 = 'b' in obj;
         `,
-        output: dedent`
-          import { isRecord, hasKey } from 'ts-data-forge';
-          const obj = { a: 1 };
-          const ok1 = (isRecord(obj) && hasKey(obj, 'a'));
-          const ok2 = (isRecord(obj) && hasKey(obj, 'b'));
-        `,
+        output: [
+          dedent`
+            import { isRecord, hasKey } from 'ts-data-forge';
+            const obj = { a: 1 };
+            const ok1 = (isRecord(obj) && hasKey(obj, 'a'));
+            const ok2 = 'b' in obj;
+          `,
+          dedent`
+            import { isRecord, hasKey } from 'ts-data-forge';
+            const obj = { a: 1 };
+            const ok1 = (isRecord(obj) && hasKey(obj, 'a'));
+            const ok2 = (isRecord(obj) && hasKey(obj, 'b'));
+          `,
+        ],
         errors: [
           { messageId: 'useIsRecordAndHasKey' },
           { messageId: 'useIsRecordAndHasKey' },

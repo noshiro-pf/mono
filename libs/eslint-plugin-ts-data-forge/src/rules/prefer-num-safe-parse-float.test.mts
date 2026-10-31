@@ -105,8 +105,7 @@ describe('prefer-num-safe-parse-float', () => {
           const n = parseFloat(s);
         `,
         output: dedent`
-          import { Result } from 'ts-data-forge';
-          import { Num } from 'ts-data-forge';
+          import { Num, Result } from 'ts-data-forge';
 
           const s = "3.14";
           const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
@@ -145,13 +144,22 @@ describe('prefer-num-safe-parse-float', () => {
           const b = Number.parseFloat(s);
           const c = Number(s);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          const s = "1.5";
-          const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-          const b = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-          const c = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-        `,
+        output: [
+          dedent`
+            import { Num, Result } from 'ts-data-forge';
+            const s = "1.5";
+            const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+            const b = Number.parseFloat(s);
+            const c = Number(s);
+          `,
+          dedent`
+            import { Num, Result } from 'ts-data-forge';
+            const s = "1.5";
+            const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+            const b = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+            const c = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+          `,
+        ],
         errors: [
           { messageId: 'useSafeParseFloat' },
           { messageId: 'useSafeParseFloat' },
@@ -203,12 +211,20 @@ describe('prefer-num-safe-parse-float through type wrappers', () => {
           const a = Number(s!);
           const b = parseFloat(s satisfies string);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          declare const s: string;
-          const a = Result.unwrapOkOr(Num.safeParseFloat(s!), Number.NaN);
-          const b = Result.unwrapOkOr(Num.safeParseFloat(s satisfies string), Number.NaN);
-        `,
+        output: [
+          dedent`
+            import { Num, Result } from 'ts-data-forge';
+            declare const s: string;
+            const a = Result.unwrapOkOr(Num.safeParseFloat(s!), Number.NaN);
+            const b = parseFloat(s satisfies string);
+          `,
+          dedent`
+            import { Num, Result } from 'ts-data-forge';
+            declare const s: string;
+            const a = Result.unwrapOkOr(Num.safeParseFloat(s!), Number.NaN);
+            const b = Result.unwrapOkOr(Num.safeParseFloat(s satisfies string), Number.NaN);
+          `,
+        ],
         errors: [
           { messageId: 'useSafeParseFloat' },
           { messageId: 'useSafeParseFloat' },
@@ -221,12 +237,20 @@ describe('prefer-num-safe-parse-float through type wrappers', () => {
           const a = (Number as NumberConstructor)(s);
           const b = Number!.parseFloat(s);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          declare const s: string;
-          const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-          const b = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-        `,
+        output: [
+          dedent`
+            import { Num, Result } from 'ts-data-forge';
+            declare const s: string;
+            const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+            const b = Number!.parseFloat(s);
+          `,
+          dedent`
+            import { Num, Result } from 'ts-data-forge';
+            declare const s: string;
+            const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+            const b = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+          `,
+        ],
         errors: [
           { messageId: 'useSafeParseFloat' },
           { messageId: 'useSafeParseFloat' },
