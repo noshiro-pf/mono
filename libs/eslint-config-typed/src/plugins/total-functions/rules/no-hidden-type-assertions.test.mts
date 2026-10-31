@@ -1,6 +1,7 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import dedent from 'dedent';
+import { Arr, asUint32 } from 'ts-data-forge';
 import { noHiddenTypeAssertions } from './no-hidden-type-assertions.mjs';
 
 const ruleTester = new RuleTester({
@@ -175,6 +176,24 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
         export const result = toArray(ra);
       `,
     },
+    // A type parameter used only as the 101st member of a union in a value
+    // parameter is found there too
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(x: ${Arr.seq(asUint32(100)).join(' | ')} | T): T;
+        export const result = f<string>('a');
+      `,
+    },
+    // A type parameter nested 150 levels deep in a value parameter is found
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(x: ${nested(150, 'T')}): T;
+        declare const x: ${nested(150, 'string')};
+        export const result = f<string>(x);
+      `,
+    },
   ],
   invalid: [
     // Hidden type assertion set to arbitrary type
@@ -327,5 +346,56 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
         },
       ],
     },
+    // A type parameter used only as the 101st member of a union is found:
+    // the bound is on depth, not on a node's position among its siblings
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(): ${Arr.seq(asUint32(100)).join(' | ')} | T;
+        export const result = f<string>();
+      `,
+      errors: [
+        {
+          messageId: 'errorStringGeneric',
+        },
+      ],
+    },
+    // A type parameter nested 150 levels deep in the return type is found
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(): ${nested(150, 'T')};
+        export const result = f<string>();
+      `,
+      errors: [
+        {
+          messageId: 'errorStringGeneric',
+        },
+      ],
+    },
+    // A function type's parameters are explored once, so curried callback types
+    // nested many levels deep do not take exponential time
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(): ${curried(30, 'T')};
+        export const result = f<string>();
+      `,
+      errors: [
+        {
+          messageId: 'errorStringGeneric',
+        },
+      ],
+    },
   ],
 } as const);
+
+/** `inner` wrapped in `Readonly<…>` `depth` times. */
+function nested(depth: number, inner: string): string {
+  return depth === 0 ? inner : `Readonly<${nested(depth - 1, inner)}>`;
+}
+
+/** A function type taking a function type … `depth` levels deep, then `inner`. */
+function curried(depth: number, inner: string): string {
+  return depth === 0 ? inner : `(a: ${curried(depth - 1, inner)}) => void`;
+}

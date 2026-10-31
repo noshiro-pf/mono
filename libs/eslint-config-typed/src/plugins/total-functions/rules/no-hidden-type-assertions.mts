@@ -55,16 +55,12 @@ export const noHiddenTypeAssertions = createRule({
 
     const checker = parserServices.program.getTypeChecker();
 
-    const explodeTypeNode = (
-      type: TypeNode,
-      depth: number,
-    ): readonly TypeNode[] => {
-      // TODO write a test that exercises this
-
-      if (depth >= 100) {
-        return [] as const;
-      }
-
+    /**
+     * `type` and the type nodes under it, through the node kinds listed below.
+     * Unbounded: a type annotation is a finite syntax tree, and recursion is
+     * only as deep as it is nested.
+     */
+    const explodeTypeNode = (type: TypeNode): readonly TypeNode[] => {
       const next = isTypeReferenceNode(type)
         ? (type.typeArguments ?? [])
         : isConditionalTypeNode(type)
@@ -72,9 +68,7 @@ export const noHiddenTypeAssertions = createRule({
           : isIndexedAccessTypeNode(type)
             ? ([type.objectType, type.indexType] as const)
             : isFunctionTypeNode(type)
-              ? Arr.toUnshifted(type.type)(
-                  parametersToTypeNodes(type.parameters, depth),
-                )
+              ? Arr.toUnshifted(type.type)(parameterTypeNodes(type.parameters))
               : isTupleTypeNode(type)
                 ? type.elements
                 : isNamedTupleMember(type)
@@ -93,16 +87,6 @@ export const noHiddenTypeAssertions = createRule({
 
       return Arr.toUnshifted(type)(next.flatMap(explodeTypeNode));
     };
-
-    const parametersToTypeNodes = (
-      parameters: NodeArray<ParameterDeclaration>,
-      depth: number,
-    ): readonly TypeNode[] =>
-      parameters
-        .flatMap((parameter) =>
-          parameter.type !== undefined ? [parameter.type] : [],
-        )
-        .flatMap((parameter) => explodeTypeNode(parameter, depth));
 
     /**
      * The type parameters of `declaration` that its return type uses, with
@@ -127,7 +111,7 @@ export const noHiddenTypeAssertions = createRule({
         return undefined;
       }
 
-      const returnTypes = explodeTypeNode(returnType, 0);
+      const returnTypes = explodeTypeNode(returnType);
 
       return typeParameters
         .map((typeParameter, index) => ({ typeParameter, index }))
@@ -152,7 +136,9 @@ export const noHiddenTypeAssertions = createRule({
         typeParameter: TypeParameterDeclaration;
       }>[],
     ): boolean => {
-      const parameters = parametersToTypeNodes(declaration.parameters, 0);
+      const parameters = parameterTypeNodes(declaration.parameters).flatMap(
+        explodeTypeNode,
+      );
 
       return typeParamsUsedInReturnType
         .map(({ typeParameter }) => typeParameter)
@@ -316,6 +302,17 @@ export const noHiddenTypeAssertions = createRule({
     };
   },
 } as const);
+
+/**
+ * The annotated types of `parameters`, unexplored: the caller explores them,
+ * once.
+ */
+const parameterTypeNodes = (
+  parameters: NodeArray<ParameterDeclaration>,
+): readonly TypeNode[] =>
+  parameters.flatMap((parameter) =>
+    parameter.type !== undefined ? [parameter.type] : [],
+  );
 
 const hasTypeNode = (
   typeElement: TypeElement,
