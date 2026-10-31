@@ -4,16 +4,13 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
-  buildNamedImportFix,
   getArgumentText,
-  getImportDeclarations,
-  getNamedImports,
   skipTypeWrappers,
   typeWrapperLayers,
 } from 'eslint-rule-forge';
 import { Arr, pipe } from 'ts-data-forge';
 import type { TypeReference } from 'typescript';
-import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { tsDataForgeValueAt } from './import-binding.mjs';
 
 type Options = readonly [];
 
@@ -38,13 +35,6 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
 
   create: (context) => {
     const sourceCode = context.sourceCode;
-
-    const program = sourceCode.ast;
-
-    const tsDataForgeImports = getImportDeclarations(
-      program,
-      TS_DATA_FORGE_MODULE,
-    );
 
     const services = context.sourceCode.parserServices;
 
@@ -267,15 +257,15 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
         }
       },
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImports);
+        const arrAt = tsDataForgeValueAt(sourceCode, 'Arr');
 
-        const hasArrImport = namedImports.includes('Arr');
-
-        for (const [index, nodeInfo] of mut_nodesToFix.entries()) {
+        for (const nodeInfo of mut_nodesToFix) {
           const arrayText = getArgumentText(
             sourceCode,
             nodeInfo.arrayExpression,
           );
+
+          const arr = arrAt(nodeInfo.node);
 
           context.report({
             node: nodeInfo.node,
@@ -284,24 +274,20 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
               arrayName: arrayText,
               mapper: nodeInfo.mapper ?? '',
             },
-            fix: (fixer) => {
-              const replacement =
-                nodeInfo.messageId === 'useArrSum'
-                  ? `Arr.sum(${arrayText})`
-                  : `Arr.sumBy(${arrayText}, ${nodeInfo.mapper})`;
+            fix:
+              arr === undefined
+                ? null
+                : (fixer) => {
+                    const replacement =
+                      nodeInfo.messageId === 'useArrSum'
+                        ? `${arr.localName}.sum(${arrayText})`
+                        : `${arr.localName}.sumBy(${arrayText}, ${nodeInfo.mapper})`;
 
-              const importFixes =
-                index === 0 && !hasArrImport
-                  ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
-                      'Arr',
-                    ])
-                  : [];
-
-              return [
-                ...importFixes,
-                fixer.replaceText(nodeInfo.node, replacement),
-              ];
-            },
+                    return [
+                      ...arr.edits(fixer),
+                      fixer.replaceText(nodeInfo.node, replacement),
+                    ];
+                  },
           });
         }
       },

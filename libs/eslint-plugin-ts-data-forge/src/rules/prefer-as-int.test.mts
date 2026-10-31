@@ -60,24 +60,6 @@ describe('prefer-as-int', () => {
           `,
           errors: [{ messageId: 'useBrandedNumberCastFunction' }],
         },
-        {
-          name: 'replaces multiple as Int with asInt imports',
-          code: dedent`
-            const n = 1;
-            const result = n as Int;
-            const another = (n + 1) as Int;
-          `,
-          output: dedent`
-            import { asInt } from 'ts-data-forge';
-            const n = 1;
-            const result = asInt(n);
-            const another = asInt(n + 1);
-          `,
-          errors: [
-            { messageId: 'useBrandedNumberCastFunction' },
-            { messageId: 'useBrandedNumberCastFunction' },
-          ],
-        },
         // {
         //   name: 'replaces as Int with asInt import with another disabled line',
         //   code: dedent`
@@ -140,7 +122,7 @@ describe('prefer-as-int', () => {
 
       ...([
         {
-          name: 'adds import even if ts-data-forge import exists',
+          name: 'adds the name to an existing ts-data-forge import',
           code: dedent`
             import { isNonNullObject } from 'ts-data-forge';
 
@@ -148,8 +130,7 @@ describe('prefer-as-int', () => {
             const result = n as Int;
           `,
           output: dedent`
-            import { asInt } from 'ts-data-forge';
-            import { isNonNullObject } from 'ts-data-forge';
+            import { isNonNullObject, asInt } from 'ts-data-forge';
 
             const n = 1;
             const result = asInt(n);
@@ -157,7 +138,7 @@ describe('prefer-as-int', () => {
           errors: [{ messageId: 'useBrandedNumberCastFunction' }],
         },
         {
-          name: 'adds import even if ts-data-forge import exists (with other imports)',
+          name: 'adds the name to an existing ts-data-forge import (with other imports)',
           code: dedent`
             import { noop } from './noop.mjs';
             import { isNonNullObject } from 'ts-data-forge';
@@ -166,9 +147,8 @@ describe('prefer-as-int', () => {
             const result = n as Int;
           `,
           output: dedent`
-            import { asInt } from 'ts-data-forge';
             import { noop } from './noop.mjs';
-            import { isNonNullObject } from 'ts-data-forge';
+            import { isNonNullObject, asInt } from 'ts-data-forge';
 
             const n = 1;
             const result = asInt(n);
@@ -183,6 +163,32 @@ describe('prefer-as-int', () => {
   tester.run('prefer-as-int (other types)', preferAsInt, {
     valid: [],
     invalid: [
+      {
+        name: 'replaces multiple as Int with asInt imports',
+        code: dedent`
+          const n = 1;
+          const result = n as Int;
+          const another = (n + 1) as Int;
+        `,
+        output: [
+          dedent`
+            import { asInt } from 'ts-data-forge';
+            const n = 1;
+            const result = asInt(n);
+            const another = (n + 1) as Int;
+          `,
+          dedent`
+            import { asInt } from 'ts-data-forge';
+            const n = 1;
+            const result = asInt(n);
+            const another = asInt(n + 1);
+          `,
+        ],
+        errors: [
+          { messageId: 'useBrandedNumberCastFunction' },
+          { messageId: 'useBrandedNumberCastFunction' },
+        ],
+      },
       {
         name: 'replaces as Uint32 with asUint32',
         code: dedent`
@@ -239,17 +245,14 @@ describe('prefer-as-int', () => {
             const c = n as SafeInt;
           `,
           dedent`
-            import { asUint32 } from 'ts-data-forge';
-            import { asInt } from 'ts-data-forge';
+            import { asInt, asUint32 } from 'ts-data-forge';
             const n = 1;
             const a = asInt(n);
             const b = asUint32(n);
             const c = n as SafeInt;
           `,
           dedent`
-            import { asSafeInt } from 'ts-data-forge';
-            import { asUint32 } from 'ts-data-forge';
-            import { asInt } from 'ts-data-forge';
+            import { asInt, asUint32, asSafeInt } from 'ts-data-forge';
             const n = 1;
             const a = asInt(n);
             const b = asUint32(n);
@@ -312,6 +315,53 @@ describe('prefer-as-int with parenthesized operands', () => {
           { messageId: 'useBrandedNumberCastFunction' },
           { messageId: 'useBrandedNumberCastFunction' },
         ],
+      },
+    ],
+  });
+}, 20000);
+
+describe('prefer-as-int and the import it adds', () => {
+  tester.run('prefer-as-int', preferAsInt, {
+    valid: [],
+    invalid: [
+      {
+        name: 'writes the local name of an aliased import',
+        code: dedent`
+          import { asInt as toInt } from 'ts-data-forge';
+          const n = 1;
+          const result = n as Int;
+        `,
+        output: dedent`
+          import { asInt as toInt } from 'ts-data-forge';
+          const n = 1;
+          const result = toInt(n);
+        `,
+        errors: [
+          {
+            messageId: 'useBrandedNumberCastFunction',
+            data: { typeName: 'Int', functionName: 'toInt' },
+          },
+        ],
+      },
+      {
+        name: 'no fix when an import type binds the name',
+        code: dedent`
+          import type { asInt } from 'ts-data-forge';
+          const n = 1;
+          const result = n as Int;
+        `,
+        output: null,
+        errors: [{ messageId: 'useBrandedNumberCastFunction' }],
+      },
+      {
+        name: 'no fix where a local binding takes the name',
+        code: dedent`
+          const asInt = (x: number): number => x;
+          const n = 1;
+          const result = n as Int;
+        `,
+        output: null,
+        errors: [{ messageId: 'useBrandedNumberCastFunction' }],
       },
     ],
   });

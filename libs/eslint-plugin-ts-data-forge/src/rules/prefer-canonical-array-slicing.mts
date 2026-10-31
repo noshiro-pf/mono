@@ -5,11 +5,14 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
-  buildNamedImportFix,
+  bindValueImports,
   getImportDeclarations,
   getImportedLocalName,
+  hasForeignBinding,
+  importedNameOf,
   skipTypeWrappers,
   typeWrapperLayers,
+  type ValueImportBinding,
 } from 'eslint-rule-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
@@ -210,10 +213,16 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
     const checker = parserServices.program.getTypeChecker();
 
     /**
-     * The in-scope way to reference the `Arr` namespace: a named import
-     * (possibly aliased), a namespace import member, or the canonical `Arr`
-     * (added by the import fix when nothing is imported yet).
+     * The in-scope way to reference the `Arr` namespace, the name the
+     * reference starts with, and the edits that bring it into scope: a value
+     * import of `Arr` (possibly aliased), a namespace import member, or `Arr`
+     * bound by {@link bindValueImports}, which adds it to an existing import or
+     * drops `type` from one. `undefined` when none can: `import type { Arr }`
+     * with no namespace import.
      */
+    const arrTarget = resolveArrTarget(sourceCode, tsDataForgeImports);
+
+    /** How a call already in the file names `Arr`, to recognize it. */
     const arrLocalName = getImportedLocalName(tsDataForgeImports, 'Arr');
 
     const namespaceLocalName = tsDataForgeImports
@@ -223,12 +232,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
           specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier,
       )?.local.name;
 
-    const arrRef =
-      arrLocalName ??
-      (namespaceLocalName === undefined ? 'Arr' : `${namespaceLocalName}.Arr`);
-
-    const needsArrImport =
-      arrLocalName === undefined && namespaceLocalName === undefined;
+    const arrRef = arrTarget?.ref ?? 'Arr';
 
     /**
      * Deferred (non-concrete) types are reduced to their base constraint
@@ -855,27 +859,85 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
       },
 
       'Program:exit': () => {
-        for (const [index, nodeInfo] of mut_nodesToFix.entries()) {
+        // Every fix brings `Arr` into scope itself, so that one applied alone
+        // (an editor's quick fix) is complete.
+        for (const nodeInfo of mut_nodesToFix) {
+          const writable =
+            arrTarget !== undefined &&
+            !hasForeignBinding(
+              sourceCode,
+              nodeInfo.node,
+              arrTarget.boundName,
+              TS_DATA_FORGE_MODULE,
+            );
+
           context.report({
             node: nodeInfo.node,
             messageId: 'preferCanonicalArraySlicing',
             data: { replacement: nodeInfo.replacement },
-            fix: (fixer) => {
-              const importFixes =
-                index === 0 && needsArrImport
-                  ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
-                      'Arr',
-                    ])
-                  : [];
-
-              return [
-                ...importFixes,
-                fixer.replaceText(nodeInfo.node, nodeInfo.replacement),
-              ];
-            },
+            fix: writable
+              ? (fixer) => [
+                  ...arrTarget.edits(fixer),
+                  fixer.replaceText(nodeInfo.node, nodeInfo.replacement),
+                ]
+              : null,
           });
         }
       },
     };
   },
 } as const;
+
+/**
+ * How `Arr` is written in this file; see where it is called. A value import of
+ * `Arr` comes first, then a namespace import, and only then an edit.
+ */
+const resolveArrTarget = (
+  sourceCode: TSESLint.SourceCode,
+  tsDataForgeImports: readonly TSESTree.ImportDeclaration[],
+):
+  | Readonly<{
+      ref: string;
+      boundName: string;
+      edits: ValueImportBinding['edits'];
+    }>
+  | undefined => {
+  const valueSpecifiers = tsDataForgeImports
+    .filter((declaration) => declaration.importKind !== 'type')
+    .flatMap((declaration) => declaration.specifiers);
+
+  const arrImport = valueSpecifiers.find(
+    (specifier) =>
+      specifier.type === AST_NODE_TYPES.ImportSpecifier &&
+      specifier.importKind !== 'type' &&
+      importedNameOf(specifier) === 'Arr',
+  );
+
+  if (arrImport !== undefined) {
+    return {
+      ref: arrImport.local.name,
+      boundName: arrImport.local.name,
+      edits: () => [],
+    };
+  }
+
+  const namespace = valueSpecifiers.find(
+    (specifier) => specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier,
+  );
+
+  if (namespace !== undefined) {
+    return {
+      ref: `${namespace.local.name}.Arr`,
+      boundName: namespace.local.name,
+      edits: () => [],
+    };
+  }
+
+  const binding = bindValueImports(sourceCode, TS_DATA_FORGE_MODULE, ['Arr']);
+
+  const localName = binding?.localNames[0];
+
+  return binding === undefined || localName === undefined
+    ? undefined
+    : { ref: localName, boundName: localName, edits: binding.edits };
+};

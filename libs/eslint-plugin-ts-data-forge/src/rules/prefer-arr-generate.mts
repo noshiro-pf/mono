@@ -6,11 +6,8 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
-  buildNamedImportFix,
   createGetLayerTypes,
   getArgumentText,
-  getImportDeclarations,
-  getImportedLocalName,
   negationOf,
   prefixedNegationOf,
   skipTypeWrappers,
@@ -19,7 +16,7 @@ import {
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { tsDataForgeValuesAt } from './import-binding.mjs';
 import { needsMutableResult } from './mutable-result.mjs';
 
 type Options = readonly [];
@@ -106,13 +103,6 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
   create: (context) => {
     const sourceCode = context.sourceCode;
 
-    const program = sourceCode.ast;
-
-    const tsDataForgeImports = getImportDeclarations(
-      program,
-      TS_DATA_FORGE_MODULE,
-    );
-
     const services = sourceCode.parserServices;
 
     const tsProgram = services?.program ?? undefined;
@@ -146,9 +136,10 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
       node: TSESTree.Node,
     ): ts.Node | undefined => esTreeNodeToTSNodeMap.get(node);
 
-    const arrLocalName = getImportedLocalName(tsDataForgeImports, 'Arr');
+    // The name the rewrite writes, and, at a node, the edits that bind it.
+    const arr = tsDataForgeValuesAt(sourceCode, ['Arr']);
 
-    const arrName = arrLocalName ?? 'Arr';
+    const arrName = arr.localNames[0] ?? 'Arr';
 
     const mut_matches: Match[] = [];
 
@@ -297,39 +288,38 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
         mut_matches.push({ node, replacement, autofixable });
       },
       'Program:exit': () => {
-        // The import is added by the first fix only, so that several fixes do
-        // not insert it at the same position. When the first match is not
-        // autofixable, the first autofixable one carries it instead.
-        const firstAutofixable = mut_matches.find((m) => m.autofixable);
-
+        // Every fix brings `Arr` into scope itself, so that one applied alone
+        // (an editor's quick fix) is complete.
         for (const match of mut_matches) {
-          const buildFix =
-            (withImport: boolean): TSESLint.ReportFixFunction =>
-            (fixer) => [
-              ...(withImport && arrLocalName === undefined
-                ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
-                    'Arr',
-                  ])
-                : []),
-              fixer.replaceText(match.node, match.replacement),
-            ];
+          const binding = arr.at(match.node);
+
+          const fix: TSESLint.ReportFixFunction | null =
+            binding === undefined
+              ? null
+              : (fixer) => [
+                  ...binding.edits(fixer),
+                  fixer.replaceText(match.node, match.replacement),
+                ];
 
           if (match.autofixable) {
             context.report({
               node: match.node,
               messageId: 'useArrGenerate',
-              fix: buildFix(match === firstAutofixable),
+              fix,
             });
           } else {
             context.report({
               node: match.node,
               messageId: 'useArrGenerate',
-              suggest: [
-                {
-                  messageId: 'suggestArrGenerate',
-                  fix: buildFix(true),
-                },
-              ],
+              suggest:
+                fix === null
+                  ? []
+                  : [
+                      {
+                        messageId: 'suggestArrGenerate',
+                        fix,
+                      },
+                    ],
             });
           }
         }

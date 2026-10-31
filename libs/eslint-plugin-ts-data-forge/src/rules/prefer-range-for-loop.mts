@@ -4,15 +4,9 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import {
-  buildNamedImportFix,
-  getArgumentText,
-  getImportDeclarations,
-  getNamedImports,
-  skipTypeWrappers,
-} from 'eslint-rule-forge';
+import { getArgumentText, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
-import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { tsDataForgeValueAt } from './import-binding.mjs';
 
 type Options = readonly [];
 
@@ -36,13 +30,6 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
 
   create: (context) => {
     const sourceCode = context.sourceCode;
-
-    const program = sourceCode.ast;
-
-    const tsDataForgeImports = getImportDeclarations(
-      program,
-      TS_DATA_FORGE_MODULE,
-    );
 
     /**
      * Whether `node` is the same value on every iteration: a literal, or a
@@ -214,14 +201,12 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
         });
       },
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImports);
-
-        const hasRangeImport = namedImports.includes('range');
-
-        const importCarrier = mut_nodesToFix.find(({ fixable }) => fixable);
+        const rangeAt = tsDataForgeValueAt(sourceCode, 'range');
 
         for (const entry of mut_nodesToFix) {
           const { node, varName, begin, end, step } = entry;
+
+          const range = entry.fixable ? rangeAt(node) : undefined;
 
           context.report({
             node: node.init ?? node,
@@ -231,33 +216,24 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
               begin,
               end,
             },
-            fix: entry.fixable
-              ? (fixer) => {
-                  const bodyText = sourceCode.getText(node.body);
+            fix:
+              range === undefined
+                ? undefined
+                : (fixer) => {
+                    const bodyText = sourceCode.getText(node.body);
 
-                  const rangeArgs =
-                    step === undefined
-                      ? `${begin}, ${end}`
-                      : `${begin}, ${end}, ${step}`;
+                    const rangeArgs =
+                      step === undefined
+                        ? `${begin}, ${end}`
+                        : `${begin}, ${end}, ${step}`;
 
-                  const replacement = `for (const ${varName} of range(${rangeArgs})) ${bodyText}`;
+                    const replacement = `for (const ${varName} of ${range.localName}(${rangeArgs})) ${bodyText}`;
 
-                  // The import fix lives on the first fixable report:
-                  // `insertTextBefore(program, …)` produces overlapping ranges
-                  // otherwise.
-                  const importFixes =
-                    entry === importCarrier && !hasRangeImport
-                      ? buildNamedImportFix(
-                          fixer,
-                          program,
-                          TS_DATA_FORGE_MODULE,
-                          ['range'],
-                        )
-                      : [];
-
-                  return [...importFixes, fixer.replaceText(node, replacement)];
-                }
-              : undefined,
+                    return [
+                      ...range.edits(fixer),
+                      fixer.replaceText(node, replacement),
+                    ];
+                  },
           });
         }
       },

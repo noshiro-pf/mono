@@ -3,15 +3,10 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import {
-  buildNamedImportFix,
-  getArgumentText,
-  getImportDeclarations,
-  getNamedImports,
-} from 'eslint-rule-forge';
+import { getArgumentText } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import { brandedNumberTypeNameToFunctionName } from './branded-number-types.mjs';
-import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { tsDataForgeValueAtByName } from './import-binding.mjs';
 
 type Options = readonly [];
 
@@ -35,13 +30,6 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
 
   create: (context) => {
     const sourceCode = context.sourceCode;
-
-    const program = sourceCode.ast;
-
-    const tsDataForgeImports = getImportDeclarations(
-      program,
-      TS_DATA_FORGE_MODULE,
-    );
 
     const mut_nodesToFix: {
       node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion;
@@ -71,44 +59,31 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
       TSAsExpression: collect,
       TSTypeAssertion: collect,
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImports);
+        // One binding per cast function, however many casts use it.
+        const castAt = tsDataForgeValueAtByName(sourceCode);
 
-        // Group nodes by function name to handle imports efficiently
-        const functionNameToNodes = Map.groupBy(
-          mut_nodesToFix,
-          (nodeInfo) => nodeInfo.functionName,
-        );
+        for (const { node, typeName, functionName } of mut_nodesToFix) {
+          const cast = castAt(functionName)(node);
 
-        // Process each group
-        for (const [functionName, nodes] of functionNameToNodes) {
-          const hasImport = namedImports.includes(functionName);
-
-          for (const [index, { node, typeName }] of nodes.entries()) {
-            context.report({
-              node,
-              messageId: 'useBrandedNumberCastFunction',
-              data: {
-                typeName,
-                functionName,
-              },
-              fix: (fixer) => {
-                const replacement = `${functionName}(${getArgumentText(sourceCode, node.expression)})`;
-
-                // Add import only for the first node of this function and only if not already imported
-                const importFixes =
-                  index === 0 && !hasImport
-                    ? buildNamedImportFix(
-                        fixer,
-                        program,
-                        TS_DATA_FORGE_MODULE,
-                        [functionName],
-                      )
-                    : [];
-
-                return [...importFixes, fixer.replaceText(node, replacement)];
-              },
-            });
-          }
+          context.report({
+            node,
+            messageId: 'useBrandedNumberCastFunction',
+            data: {
+              typeName,
+              // The name the fix writes: an aliased import's local name.
+              functionName: cast?.localName ?? functionName,
+            },
+            fix:
+              cast === undefined
+                ? null
+                : (fixer) => [
+                    ...cast.edits(fixer),
+                    fixer.replaceText(
+                      node,
+                      `${cast.localName}(${getArgumentText(sourceCode, node.expression)})`,
+                    ),
+                  ],
+          });
         }
       },
     };

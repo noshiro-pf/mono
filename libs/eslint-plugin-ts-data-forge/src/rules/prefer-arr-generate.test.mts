@@ -202,25 +202,40 @@ describe('prefer-arr-generate', () => {
           const ys = xs.flatMap((x) => (x === undefined ? [] : [x]));
           const zs = xs.flatMap((x) => (skip ? [] : [x]));
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly (number | undefined)[];
-          declare const skip: boolean;
-          const ys = Arr.generate(function* () {
-            for (const x of xs) {
-              if (x !== undefined) {
-                yield x;
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly (number | undefined)[];
+            declare const skip: boolean;
+            const ys = Arr.generate(function* () {
+              for (const x of xs) {
+                if (x !== undefined) {
+                  yield x;
+                }
               }
-            }
-          });
-          const zs = Arr.generate(function* () {
-            for (const x of xs) {
-              if (!skip) {
-                yield x;
+            });
+            const zs = xs.flatMap((x) => (skip ? [] : [x]));
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly (number | undefined)[];
+            declare const skip: boolean;
+            const ys = Arr.generate(function* () {
+              for (const x of xs) {
+                if (x !== undefined) {
+                  yield x;
+                }
               }
-            }
-          });
-        `,
+            });
+            const zs = Arr.generate(function* () {
+              for (const x of xs) {
+                if (!skip) {
+                  yield x;
+                }
+              }
+            });
+          `,
+        ],
         errors: [
           { messageId: 'useArrGenerate' },
           { messageId: 'useArrGenerate' },
@@ -237,40 +252,58 @@ describe('prefer-arr-generate', () => {
           const c = xs.flatMap((x) => (n < 0 ? [] : [x]));
           const d = xs.flatMap((x) => (!ok(x) ? [] : [x]));
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly (string | undefined)[];
-          declare const ok: (x: string | undefined) => boolean;
-          declare const n: number;
-          const a = Arr.generate(function* () {
-            for (const x of xs) {
-              if (x !== undefined && x !== '') {
-                yield x;
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly (string | undefined)[];
+            declare const ok: (x: string | undefined) => boolean;
+            declare const n: number;
+            const a = Arr.generate(function* () {
+              for (const x of xs) {
+                if (x !== undefined && x !== '') {
+                  yield x;
+                }
               }
-            }
-          });
-          const b = Arr.generate(function* () {
-            for (const x of xs) {
-              if (!ok(x)) {
-                yield x;
+            });
+            const b = xs.flatMap((x) => (ok(x) ? [] : [x]));
+            const c = xs.flatMap((x) => (n < 0 ? [] : [x]));
+            const d = xs.flatMap((x) => (!ok(x) ? [] : [x]));
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly (string | undefined)[];
+            declare const ok: (x: string | undefined) => boolean;
+            declare const n: number;
+            const a = Arr.generate(function* () {
+              for (const x of xs) {
+                if (x !== undefined && x !== '') {
+                  yield x;
+                }
               }
-            }
-          });
-          const c = Arr.generate(function* () {
-            for (const x of xs) {
-              if (!(n < 0)) {
-                yield x;
+            });
+            const b = Arr.generate(function* () {
+              for (const x of xs) {
+                if (!ok(x)) {
+                  yield x;
+                }
               }
-            }
-          });
-          const d = Arr.generate(function* () {
-            for (const x of xs) {
-              if (ok(x)) {
-                yield x;
+            });
+            const c = Arr.generate(function* () {
+              for (const x of xs) {
+                if (!(n < 0)) {
+                  yield x;
+                }
               }
-            }
-          });
-        `,
+            });
+            const d = Arr.generate(function* () {
+              for (const x of xs) {
+                if (ok(x)) {
+                  yield x;
+                }
+              }
+            });
+          `,
+        ],
         errors: [
           { messageId: 'useArrGenerate' },
           { messageId: 'useArrGenerate' },
@@ -436,6 +469,25 @@ describe('prefer-arr-generate', () => {
         errors: [{ messageId: 'useArrGenerate' }],
       },
       {
+        name: 'no fix when an import type binds Arr',
+        code: dedent`
+          import type { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = xs.flatMap((x) => (x > 0 ? [x] : []));
+        `,
+        output: null,
+        errors: [{ messageId: 'useArrGenerate' }],
+      },
+      {
+        name: 'no fix where a local binding takes Arr',
+        code: dedent`
+          declare const xs: readonly number[];
+          export const f = (Arr: unknown) => xs.flatMap((x) => (x > 0 ? [x] : []));
+        `,
+        output: null,
+        errors: [{ messageId: 'useArrGenerate' }],
+      },
+      {
         name: 'indents from the line the call starts on, and accepts a mutable array, a tuple or a type parameter',
         code: dedent`
           declare const ms: number[];
@@ -446,34 +498,52 @@ describe('prefer-arr-generate', () => {
             const c = xs.flatMap((x) => (x > 0 ? [x] : []));
           };
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const ms: number[];
-          declare const ts: readonly [number, number];
-          export const f = <T extends readonly number[]>(xs: T): void => {
-            const a = Arr.generate(function* () {
-              for (const x of ms) {
-                if (x > 0) {
-                  yield x;
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const ms: number[];
+            declare const ts: readonly [number, number];
+            export const f = <T extends readonly number[]>(xs: T): void => {
+              const a = Arr.generate(function* () {
+                for (const x of ms) {
+                  if (x > 0) {
+                    yield x;
+                  }
                 }
-              }
-            });
-            const b = Arr.generate(function* () {
-              for (const x of ts) {
-                if (x > 0) {
-                  yield x;
+              });
+              const b = ts.flatMap((x) => (x > 0 ? [x] : []));
+              const c = xs.flatMap((x) => (x > 0 ? [x] : []));
+            };
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const ms: number[];
+            declare const ts: readonly [number, number];
+            export const f = <T extends readonly number[]>(xs: T): void => {
+              const a = Arr.generate(function* () {
+                for (const x of ms) {
+                  if (x > 0) {
+                    yield x;
+                  }
                 }
-              }
-            });
-            const c = Arr.generate(function* () {
-              for (const x of xs) {
-                if (x > 0) {
-                  yield x;
+              });
+              const b = Arr.generate(function* () {
+                for (const x of ts) {
+                  if (x > 0) {
+                    yield x;
+                  }
                 }
-              }
-            });
-          };
-        `,
+              });
+              const c = Arr.generate(function* () {
+                for (const x of xs) {
+                  if (x > 0) {
+                    yield x;
+                  }
+                }
+              });
+            };
+          `,
+        ],
         errors: [
           { messageId: 'useArrGenerate' },
           { messageId: 'useArrGenerate' },
@@ -691,30 +761,50 @@ describe('prefer-arr-generate', () => {
             return [...a, ...b];
           };
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const c: readonly number[] | undefined;
-          export const f = (p: readonly number[] | undefined): readonly number[] => {
-            if (c === undefined || p === undefined) {
-              return [];
-            }
-            const a = Arr.generate(function* () {
-              for (const x of c) {
-                if (x > 0) {
-                  yield x;
-                }
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const c: readonly number[] | undefined;
+            export const f = (p: readonly number[] | undefined): readonly number[] => {
+              if (c === undefined || p === undefined) {
+                return [];
               }
-            });
-            const b = Arr.generate(function* () {
-              for (const x of p) {
-                if (x > 0) {
-                  yield x;
+              const a = Arr.generate(function* () {
+                for (const x of c) {
+                  if (x > 0) {
+                    yield x;
+                  }
                 }
+              });
+              const b = p.flatMap((x) => (x > 0 ? [x] : []));
+              return [...a, ...b];
+            };
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const c: readonly number[] | undefined;
+            export const f = (p: readonly number[] | undefined): readonly number[] => {
+              if (c === undefined || p === undefined) {
+                return [];
               }
-            });
-            return [...a, ...b];
-          };
-        `,
+              const a = Arr.generate(function* () {
+                for (const x of c) {
+                  if (x > 0) {
+                    yield x;
+                  }
+                }
+              });
+              const b = Arr.generate(function* () {
+                for (const x of p) {
+                  if (x > 0) {
+                    yield x;
+                  }
+                }
+              });
+              return [...a, ...b];
+            };
+          `,
+        ],
         errors: [
           { messageId: 'useArrGenerate' },
           { messageId: 'useArrGenerate' },
@@ -737,34 +827,58 @@ describe('prefer-arr-generate', () => {
             return [...a, ...b];
           };
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const isNonEmpty: <T,>(
-            xs: readonly T[],
-          ) => xs is readonly [T, ...T[]];
-          declare const o: Readonly<{ names: readonly string[] }>;
-          declare const nested: readonly (readonly string[])[];
-          export const f = (): readonly string[] => {
-            if (!isNonEmpty(o.names)) {
-              return [];
-            }
-            const a = Arr.generate(function* () {
-              for (const x of o.names) {
-                if (x !== '') {
-                  yield x;
-                }
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const isNonEmpty: <T,>(
+              xs: readonly T[],
+            ) => xs is readonly [T, ...T[]];
+            declare const o: Readonly<{ names: readonly string[] }>;
+            declare const nested: readonly (readonly string[])[];
+            export const f = (): readonly string[] => {
+              if (!isNonEmpty(o.names)) {
+                return [];
               }
-            });
-            const b = Arr.generate(function* () {
-              for (const x of nested.flat()) {
-                if (x !== '') {
-                  yield x;
+              const a = Arr.generate(function* () {
+                for (const x of o.names) {
+                  if (x !== '') {
+                    yield x;
+                  }
                 }
+              });
+              const b = nested.flat().flatMap((x) => (x !== '' ? [x] : []));
+              return [...a, ...b];
+            };
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const isNonEmpty: <T,>(
+              xs: readonly T[],
+            ) => xs is readonly [T, ...T[]];
+            declare const o: Readonly<{ names: readonly string[] }>;
+            declare const nested: readonly (readonly string[])[];
+            export const f = (): readonly string[] => {
+              if (!isNonEmpty(o.names)) {
+                return [];
               }
-            });
-            return [...a, ...b];
-          };
-        `,
+              const a = Arr.generate(function* () {
+                for (const x of o.names) {
+                  if (x !== '') {
+                    yield x;
+                  }
+                }
+              });
+              const b = Arr.generate(function* () {
+                for (const x of nested.flat()) {
+                  if (x !== '') {
+                    yield x;
+                  }
+                }
+              });
+              return [...a, ...b];
+            };
+          `,
+        ],
         errors: [
           { messageId: 'useArrGenerate' },
           { messageId: 'useArrGenerate' },
@@ -867,24 +981,38 @@ describe('prefer-arr-generate through type wrappers', () => {
           );
           const b = xs.flatMap!((x) => (x > 0 ? [x] : []));
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const a = Arr.generate(function* () {
-            for (const x of xs satisfies readonly number[]) {
-              if (x > 0) {
-                yield x;
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly number[];
+            const a = Arr.generate(function* () {
+              for (const x of xs satisfies readonly number[]) {
+                if (x > 0) {
+                  yield x;
+                }
               }
-            }
-          });
-          const b = Arr.generate(function* () {
-            for (const x of xs) {
-              if (x > 0) {
-                yield x;
+            });
+            const b = xs.flatMap!((x) => (x > 0 ? [x] : []));
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly number[];
+            const a = Arr.generate(function* () {
+              for (const x of xs satisfies readonly number[]) {
+                if (x > 0) {
+                  yield x;
+                }
               }
-            }
-          });
-        `,
+            });
+            const b = Arr.generate(function* () {
+              for (const x of xs) {
+                if (x > 0) {
+                  yield x;
+                }
+              }
+            });
+          `,
+        ],
         errors: [
           { messageId: 'useArrGenerate' },
           { messageId: 'useArrGenerate' },
