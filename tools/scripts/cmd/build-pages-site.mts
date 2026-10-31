@@ -2,7 +2,11 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted, pathExists } from 'ts-repo-utils';
-import { PAGES_SLIDES_DIR, pagesAppDirs } from '../../configs/pages-apps.mjs';
+import {
+  PAGES_SLIDES_DIR,
+  pagesAppDirs,
+  pagesAstroSites,
+} from '../../configs/pages-apps.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -63,7 +67,7 @@ export const buildPagesSite = async (): Promise<Result<number, string>> => {
     mut_published.push({ name: pkg, from: 'TypeDoc' });
   }
 
-  for (const { packageDir, siteDir, buildCommand } of astroSites) {
+  for (const { packageDir, siteDir, buildCommand } of pagesAstroSites) {
     const astroDist = path.resolve(projectRootPath, 'apps', packageDir, 'dist');
 
     if (!(await pathExists(astroDist))) {
@@ -193,25 +197,6 @@ const notPublishedSlideFiles: ReadonlySet<string> = new Set<string>([
   'README.md',
   'cspell.config.yaml',
 ]);
-
-/**
- * The hand-written documentation sites. Each one's `base` in
- * `astro.config.mjs` is `/mono/<siteDir>/`, and has to stay so.
- * `synstate-dom-docs` embeds nothing at build time, so `ws:build` builds it;
- * `deploy-pages.yml` rebuilds only `synstate-docs`, after `ws:doc`.
- */
-const astroSites = [
-  {
-    packageDir: 'synstate-docs',
-    siteDir: 'synstate',
-    buildCommand: 'pnpm --filter @synstate/docs run build:astro',
-  },
-  {
-    packageDir: 'synstate-dom-docs',
-    siteDir: 'synstate-dom',
-    buildCommand: 'pnpm --filter synstate-dom-docs run build',
-  },
-] as const;
 
 /** The packages that build TypeDoc output, found rather than listed. */
 const typedocPackages = async (): Promise<readonly string[]> => {

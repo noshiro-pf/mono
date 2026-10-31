@@ -1,6 +1,7 @@
 /** @jsxImportSource preact */
 import { computed, effect, signal } from '@preact/signals-core';
-import { useLayoutEffect, useRef, useState } from 'preact/hooks';
+import type { InputEventHandler } from 'preact';
+import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import {
   combine,
   createScope,
@@ -98,35 +99,43 @@ export const SearchViewDemo = ({ lang }: Props): preact.JSX.Element => {
     };
   }, [viewCreatedFirst, generation]);
 
+  const changeQuery = useCallback<InputEventHandler<HTMLInputElement>>((e) => {
+    const q = e.currentTarget.value;
+
+    setQuery(q);
+
+    mut_setters.current.preact(q);
+
+    mut_setters.current.synstate(q);
+  }, []);
+
+  const createViewFirst = useCallback(() => {
+    setViewCreatedFirst(true);
+  }, []);
+
+  const createViewAfter = useCallback(() => {
+    setViewCreatedFirst(false);
+  }, []);
+
+  const reset = useCallback(() => {
+    setGeneration((g) => g + 1);
+  }, []);
+
   return (
-    <div class={'signals-demo'}>
-      <div class={'signals-demo-controls'}>
-        <label class={'signals-demo-field'}>
+    <div className={'signals-demo'}>
+      <div className={'signals-demo-controls'}>
+        <label className={'signals-demo-field'}>
           <span>{text.query[lang]}</span>
-          <input
-            type={'text'}
-            value={query}
-            onInput={(e) => {
-              const q = e.currentTarget.value;
-
-              setQuery(q);
-
-              mut_setters.current.preact(q);
-
-              mut_setters.current.synstate(q);
-            }}
-          />
+          <input type={'text'} value={query} onInput={changeQuery} />
         </label>
-        <fieldset class={'signals-demo-order'}>
+        <fieldset className={'signals-demo-order'}>
           <legend>{text.order[lang]}</legend>
           <label>
             <input
               checked={viewCreatedFirst}
               name={'view-order'}
               type={'radio'}
-              onChange={() => {
-                setViewCreatedFirst(true);
-              }}
+              onChange={createViewFirst}
             />
             {text.viewFirst[lang]}
           </label>
@@ -135,35 +144,28 @@ export const SearchViewDemo = ({ lang }: Props): preact.JSX.Element => {
               checked={!viewCreatedFirst}
               name={'view-order'}
               type={'radio'}
-              onChange={() => {
-                setViewCreatedFirst(false);
-              }}
+              onChange={createViewAfter}
             />
             {text.viewAfter[lang]}
           </label>
         </fieldset>
-        <button
-          type={'button'}
-          onClick={() => {
-            setGeneration((g) => g + 1);
-          }}
-        >
+        <button type={'button'} onClick={reset}>
           {text.reset[lang]}
         </button>
       </div>
-      <div class={'signals-demo-panels'}>
+      <div className={'signals-demo-panels'}>
         <LogPanel
-          lang={lang}
           entries={preactLog}
+          lang={lang}
           title={text.preactTitle[lang]}
         />
         <LogPanel
-          lang={lang}
           entries={synstateLog}
+          lang={lang}
           title={text.synstateTitle[lang]}
         />
       </div>
-      <p class={'signals-demo-caption'}>{text.caption[lang]}</p>
+      <p className={'signals-demo-caption'}>{text.caption[lang]}</p>
     </div>
   );
 };

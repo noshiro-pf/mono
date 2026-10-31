@@ -5,7 +5,7 @@ sidebar:
     order: 3
 ---
 
-[クイックサンプル](/mono/synstate/ja/getting-started/introduction/#クイックサンプル)で、`createState` が3要素のタプルを返すことを紹介しました。このページでは3番目の要素の詳細と、React の `useState` との設計上の違いについて説明します。
+[クイックサンプル](/mono/synstate/ja/getting-started/introduction/#簡単な例)で、`createState` が3要素のタプルを返すことを紹介しました。このページでは3番目の要素の詳細と、React の `useState` との設計上の違いについて説明します。
 
 ## 3番目の要素
 

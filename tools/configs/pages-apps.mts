@@ -70,3 +70,23 @@ export const pagesAppUrl = (packageRoot: string): string =>
 
 /** The directory name of every published app, under `apps/` and the site. */
 export const pagesAppDirs = (): readonly string[] => pagesApps;
+
+/**
+ * The hand-written documentation sites. Each one's `base` in
+ * `astro.config.mjs` is `/mono/<siteDir>/`, and has to stay so.
+ * `synstate-dom-docs` embeds nothing at build time, so `ws:build` builds it;
+ * `deploy-pages.yml` rebuilds only `synstate-docs`, after `ws:doc`.
+ * `check:prose:site-fragments` reads the pages of each.
+ */
+export const pagesAstroSites = [
+  {
+    packageDir: 'synstate-docs',
+    siteDir: 'synstate',
+    buildCommand: 'pnpm --filter @synstate/docs run build:astro',
+  },
+  {
+    packageDir: 'synstate-dom-docs',
+    siteDir: 'synstate-dom',
+    buildCommand: 'pnpm --filter synstate-dom-docs run build',
+  },
+] as const;

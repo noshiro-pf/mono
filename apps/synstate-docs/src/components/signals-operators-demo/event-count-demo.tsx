@@ -1,6 +1,6 @@
 /** @jsxImportSource preact */
 import { batch, effect, signal } from '@preact/signals-core';
-import { useLayoutEffect, useRef, useState } from 'preact/hooks';
+import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { createScope, createValueEmitter, scan } from 'synstate';
 import type { Lang } from '../constants.mjs';
 import { eventCountText as text } from './text.mjs';
@@ -55,49 +55,48 @@ export const EventCountDemo = ({ lang }: Props): preact.JSX.Element => {
     };
   }, [generation]);
 
-  return (
-    <div class={'signals-demo'}>
-      <div class={'signals-demo-controls'}>
-        <button
-          type={'button'}
-          onClick={() => {
-            setClicks((n) => n + 1);
+  const clickA = useCallback(() => {
+    setClicks((n) => n + 1);
 
-            mut_counters.current.click('A');
-          }}
-        >
+    mut_counters.current.click('A');
+  }, []);
+
+  const clickBC = useCallback(() => {
+    setClicks((n) => n + 2);
+
+    mut_counters.current.clickInOneBatch(['B', 'C']);
+  }, []);
+
+  const reset = useCallback(() => {
+    setGeneration((g) => g + 1);
+  }, []);
+
+  return (
+    <div className={'signals-demo'}>
+      <div className={'signals-demo-controls'}>
+        <button type={'button'} onClick={clickA}>
           {text.clickA[lang]}
         </button>
-        <button
-          type={'button'}
-          onClick={() => {
-            setClicks((n) => n + 2);
-
-            mut_counters.current.clickInOneBatch(['B', 'C']);
-          }}
-        >
+        <button type={'button'} onClick={clickBC}>
           {text.clickBC[lang]}
         </button>
-        <button
-          type={'button'}
-          onClick={() => {
-            setGeneration((g) => g + 1);
-          }}
-        >
+        <button type={'button'} onClick={reset}>
           {text.reset[lang]}
         </button>
       </div>
-      <dl class={'signals-demo-counts'}>
+      <dl className={'signals-demo-counts'}>
         <div>
           <dt>{text.clicks[lang]}</dt>
           <dd>{clicks}</dd>
         </div>
-        <div class={preactCount === clicks ? undefined : 'signals-demo-glitch'}>
+        <div
+          className={preactCount === clicks ? undefined : 'signals-demo-glitch'}
+        >
           <dt>{text.preact[lang]}</dt>
           <dd>
             {preactCount}
             {preactCount === clicks ? undefined : (
-              <span class={'signals-demo-badge'}>{text.lost[lang]}</span>
+              <span className={'signals-demo-badge'}>{text.lost[lang]}</span>
             )}
           </dd>
         </div>
@@ -106,7 +105,7 @@ export const EventCountDemo = ({ lang }: Props): preact.JSX.Element => {
           <dd>{synstateCount}</dd>
         </div>
       </dl>
-      <p class={'signals-demo-caption'}>{text.caption[lang]}</p>
+      <p className={'signals-demo-caption'}>{text.caption[lang]}</p>
     </div>
   );
 };

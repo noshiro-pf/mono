@@ -28,7 +28,7 @@ export const ChartLegend = React.memo<Props>(({ series, marker }) => (
       return (
         <li key={s.label} style={itemStyle}>
           <svg
-            aria-hidden={true}
+            aria-hidden
             height={MARKER_HEIGHT}
             viewBox={`0 0 ${MARKER_WIDTH.toString()} ${MARKER_HEIGHT.toString()}`}
             width={MARKER_WIDTH}

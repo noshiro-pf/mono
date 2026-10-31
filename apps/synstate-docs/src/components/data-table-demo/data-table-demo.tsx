@@ -86,10 +86,10 @@ export const DataTableDemo = React.memo(() => {
       <div style={tableWrapperStyle}>
         <table style={tableStyle}>
           <colgroup>
-            <col style={{ width: '8%' }} />
-            <col style={{ width: '30%' }} />
-            <col style={{ width: '42%' }} />
-            <col style={{ width: '20%' }} />
+            <col style={noColumnStyle} />
+            <col style={fullNameColumnStyle} />
+            <col style={emailColumnStyle} />
+            <col style={genderColumnStyle} />
           </colgroup>
           <thead>
             <tr>
@@ -117,7 +117,10 @@ export const DataTableDemo = React.memo(() => {
               </tr>
             ) : (
               tableView.slicedRows.map((row, i) => (
-                <tr key={i} style={i % 2 === 0 ? evenRowStyle : undefined}>
+                <tr
+                  key={row.email}
+                  style={i % 2 === 0 ? evenRowStyle : undefined}
+                >
                   <td style={tdStyle}>{tableView.startIdx + i + 1}</td>
                   <td style={tdStyle}>{row.fullName}</td>
                   <td style={tdStyle}>{row.email}</td>
@@ -339,6 +342,14 @@ const tableWrapperStyle: React.CSSProperties = {
   overflowY: 'auto',
   maxHeight: '65vh',
 } as const;
+
+const noColumnStyle: React.CSSProperties = { width: '8%' } as const;
+
+const fullNameColumnStyle: React.CSSProperties = { width: '30%' } as const;
+
+const emailColumnStyle: React.CSSProperties = { width: '42%' } as const;
+
+const genderColumnStyle: React.CSSProperties = { width: '20%' } as const;
 
 const tableStyle: React.CSSProperties = {
   width: '100%',

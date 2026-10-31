@@ -22,6 +22,11 @@ const increment = (): void => {
   updateState((n) => n + 1);
 };
 
+const showSnapshot = (): void => {
+  // eslint-disable-next-line no-alert
+  alert(`getSnapshot() = ${getSnapshot().toString()}`);
+};
+
 // Derived: doubled value via map + toSignal
 const doubledSignal = toSignal(count$.pipe(map((n) => n * 2)));
 
@@ -61,14 +66,7 @@ export const CounterDemo = (): preact.JSX.Element => (
       <button style={buttonStyle} type={'button'} onClick={toggleVisibility}>
         {'Toggle Visibility'}
       </button>
-      <button
-        style={buttonStyle}
-        type={'button'}
-        onClick={() => {
-          // eslint-disable-next-line no-alert
-          alert(`getSnapshot() = ${getSnapshot().toString()}`);
-        }}
-      >
+      <button style={buttonStyle} type={'button'} onClick={showSnapshot}>
         {'getSnapshot()'}
       </button>
     </div>

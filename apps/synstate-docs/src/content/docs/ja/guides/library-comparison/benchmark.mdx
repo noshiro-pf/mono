@@ -867,7 +867,7 @@ export const runBenchmark = (n: number): number => {
 
 ## シナリオ： ディープチェーンスループット
 
-最初の2つのシナリオは固定サイズのグラフを使用しています。このシナリオは[スループットのインタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#throughput-per-update-overhead-under-load)と同じトポロジーを使用します： depth-$M$ の `scan` チェーンで、各ステージが前のステージに向かって lerp し、`combine` が**すべての $M+1$ 個の出力**を読み取ります。$K$ 回のソース更新を同期的に実行します（アニメーションフレームあたり $K$ 回の更新をシミュレート）。
+最初の2つのシナリオは固定サイズのグラフを使用しています。このシナリオは[スループットのインタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#スループット-負荷時の更新ごとのオーバーヘッド)と同じトポロジーを使用します： depth-$M$ の `scan` チェーンで、各ステージが前のステージに向かって lerp し、`combine` が**すべての $M+1$ 個の出力**を読み取ります。$K$ 回のソース更新を同期的に実行します（アニメーションフレームあたり $K$ 回の更新をシミュレート）。
 
 以下の図は $M = 3$ の場合のグラフ構造です。実際のベンチマークでは $M$ は $50$〜$200$ です：
 
@@ -913,7 +913,7 @@ SynState の `combine` は、すべての親がその更新で確定してから
 ### 主な観察結果
 
 - **SynState** は $K$ と $M$ の両方に対して線形に増加します。$K=1000$, $M=200$ でも **{/* bench:deep-chain/synstate@k1000-m200 */}15.1 ms{/* /bench */}** で完了し、プッシュベースの直接関数呼び出しによるステージあたりのオーバーヘッドはごくわずかです。
-- **RxJS** は $K=1000$, $M=200$ で **{/* bench:deep-chain/rxjs@k1000-m200 */}1,125 ms{/* /bench */}** — SynState の**約{/* bench:deep-chain/rxjs-over-synstate@k1000-m200 */}75{/* /bench */}倍**です。上で説明した通り、これは定数倍の差ではなく `combineLatest` の冗長な発行による二次関数的 $O(M^2)$ な計算量の違いです。[インタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)でも同じ増大が確認できます。
+- **RxJS** は $K=1000$, $M=200$ で **{/* bench:deep-chain/rxjs@k1000-m200 */}1,125 ms{/* /bench */}** — SynState の**約{/* bench:deep-chain/rxjs-over-synstate@k1000-m200 */}75{/* /bench */}倍**です。上で説明した通り、これは定数倍の差ではなく `combineLatest` の冗長な発行による二次関数的 $O(M^2)$ な計算量の違いです。[インタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#ディープ依存関係チェーン-負荷時の伝搬)でも同じ増大が確認できます。
 - **Jotai** は $K=1000$, $M=200$ で **{/* bench:deep-chain/jotai@k1000-m200 */}815 ms{/* /bench */}** — SynState の**約{/* bench:deep-chain/jotai-over-synstate@k1000-m200 */}54{/* /bench */}倍**です。`selectAtom` の更新ごとのオーバーヘッド（エポックベースの再計算と動的依存関係追跡）に起因します。
 - **MobX** は $K=1000$, $M=200$ で **{/* bench:deep-chain/mobx@k1000-m200 */}643 ms{/* /bench */}** — SynState の**約{/* bench:deep-chain/mobx-over-synstate@k1000-m200 */}43{/* /bench */}倍**です。このシナリオは `scan`（ステートフルな累積：各ステージが自身の前回値と新しい入力を必要とする）を使用します。MobX の `computed` は純粋な派生であり、自身の前回出力にアクセスする手段を持たないため、ここでは使えません。`observable.box` + `reaction`（push-based）を使う必要があり、プロキシ追跡・依存通知・`autorun` の再読み取りによるステージごとのオーバーヘッドが発生します。対照的に、[カスケードダイアモンドシナリオ](#シナリオ-カスケードダイアモンド)はステートレスな派生のため `computed` の遅延評価で高効率に処理できます。
 - **Redux** は $K=1000$, $M=200$ で **{/* bench:deep-chain/redux@k1000-m200 */}12.8 ms{/* /bench */}** — SynState の{/* bench:deep-chain/redux-over-synstate@k1000-m200 */}0.8{/* /bench */}倍の時間です。チェーンは reducer の中でプレーンなオブジェクトを回す1つのループと、その結果を読む1つのセレクターで、ステージごとに追跡や通知をするノードがないため、計測したどの点でも SynState との差は{/* bench:compare/deep-chain/redux-factor */}小さな定数倍{/* /bench */}に収まります。更新ごとに加わるのは、dispatch と、新しいステートオブジェクトと、$M+1$ 個の点の新しい配列です。MobX の行と同じく、派生ノードのチェーンではなく命令的なコードを計測しています。
@@ -1508,7 +1508,7 @@ Jotai はグリッチフリーで、そのコストは**更新ごとのフレー
 
 ベンチマークのループは更新ごとの差を測定可能にするために{/* bench:derived-chain/updates */}100,000{/* /bench */}回の更新を実行しています。しかし、この定数倍のコストは高頻度イベントを扱う実際のアプリケーションでも問題になります。
 
-例えば、`mousemove` や `pointermove` イベントは1秒間に数十回発火します。各イベントがリアクティブパイプラインを駆動する場合（ドラッグ&ドロップ、ツールチップの位置計算、キャンバスアニメーションなど）、更新ごとのオーバーヘッドがイベント発生頻度に比例して増大します。チェーンの深さが増すと差は劇的になります： [スループットデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#throughput-per-update-overhead-under-load)（depth-100 チェーン、フレームあたり500回更新）では、Jotai では ms/frame が 16ms を超えて目に見えるカクつきが生じる一方、SynState は16ms以内で安定して描画できます。
+例えば、`mousemove` や `pointermove` イベントは1秒間に数十回発火します。各イベントがリアクティブパイプラインを駆動する場合（ドラッグ&ドロップ、ツールチップの位置計算、キャンバスアニメーションなど）、更新ごとのオーバーヘッドがイベント発生頻度に比例して増大します。チェーンの深さが増すと差は劇的になります： [スループットデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#スループット-負荷時の更新ごとのオーバーヘッド)（depth-100 チェーン、フレームあたり500回更新）では、Jotai では ms/frame が 16ms を超えて目に見えるカクつきが生じる一方、SynState は16ms以内で安定して描画できます。
 
 更新ごとの差が生じる根本原因：
 

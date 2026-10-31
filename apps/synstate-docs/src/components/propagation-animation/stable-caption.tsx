@@ -14,24 +14,29 @@ type Props = Readonly<{
  * the steps change. Every caption is laid out, hidden, in the same grid cell
  * as the one shown.
  */
-export const StableCaption = React.memo<Props>(
-  ({ captions, current, style }) => {
-    const sizers = React.useMemo(() => Arr.uniq(captions), [captions]);
+export const StableCaption = React.memo<Props>((props) => {
+  const { captions, current, style } = props;
 
-    return (
-      <div style={{ ...style, ...gridStyle }}>
-        {sizers.map((caption) => (
-          <p aria-hidden={true} key={caption} style={sizerStyle}>
-            {caption}
-          </p>
-        ))}
-        <p aria-live={'polite'} style={cellStyle}>
-          {current}
+  const sizers = React.useMemo(() => Arr.uniq(captions), [captions]);
+
+  const gridWithStyle = React.useMemo<React.CSSProperties>(
+    () => ({ ...style, ...gridStyle }),
+    [style],
+  );
+
+  return (
+    <div style={gridWithStyle}>
+      {sizers.map((caption) => (
+        <p key={caption} aria-hidden style={sizerStyle}>
+          {caption}
         </p>
-      </div>
-    );
-  },
-);
+      ))}
+      <p aria-live={'polite'} style={cellStyle}>
+        {current}
+      </p>
+    </div>
+  );
+});
 
 StableCaption.displayName = 'StableCaption';
 

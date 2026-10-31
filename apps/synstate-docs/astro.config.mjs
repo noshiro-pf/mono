@@ -5,14 +5,7 @@ import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
-
-/**
- * The component directories rendered with Preact. Each is excluded from the
- * React integration and included in the Preact one from this one list, since
- * a Preact component the React plugin also claims gets React Fast Refresh
- * injected into it.
- */
-const preactComponentDirs = ['preact-signals-demo', 'signals-operators-demo'];
+import { preactComponentDirs } from './configs/preact-component-dirs.mjs';
 
 export default defineConfig({
   site: 'https://noshiro-pf.github.io',
