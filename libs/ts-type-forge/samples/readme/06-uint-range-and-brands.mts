@@ -1,7 +1,5 @@
 import type { Brand, UintRange, UintRangeInclusive } from 'ts-type-forge';
 
-const IGNORE_EMBEDDING = (..._args: readonly unknown[]): void => {};
-
 type User = { id: UserId };
 
 type Product = { id: ProductId };
@@ -67,3 +65,5 @@ getUserById(productId);
 
 // embed-sample-code-ignore-below
 export { getProductById, getUserById, productId, userId };
+
+const IGNORE_EMBEDDING = (..._args: readonly unknown[]): void => {};

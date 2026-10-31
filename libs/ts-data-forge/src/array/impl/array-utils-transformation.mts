@@ -175,26 +175,6 @@ export function scan<E, S>(
   }
 }
 
-const scanImpl = <E, S>(
-  array: readonly E[],
-  reducer: (accumulator: S, currentValue: E, currentIndex: SizeType.Arr) => S,
-  init: S,
-): NonEmptyTuple<S> => {
-  const mut_result = castMutable<NonEmptyTuple<S>>(
-    newArray<PositiveUint32, S>(asPositiveUint32(array.length + 1), init),
-  );
-
-  let mut_acc = init;
-
-  for (const [index, value] of array.entries()) {
-    mut_acc = reducer(mut_acc, value, asUint32(index));
-
-    mut_result[index + 1] = mut_acc;
-  }
-
-  return mut_result;
-};
-
 /**
  * Reverses an array.
  *
@@ -276,16 +256,6 @@ export function toSorted(
       ((x, y) => (x as number) - (y as number)),
   );
 }
-
-/** The result of sorting `Ar`: same elements, same length, same bounds. */
-type SortedResult<Ar extends readonly unknown[]> =
-  HasLengthConstraint<Ar> extends true
-    ? ChangeArrayElement<Ar, Ar[number]>
-    : IsFixedLengthList<Ar> extends true
-      ? FixedLengthTuple<Ar['length'], Ar[number]>
-      : Ar extends NonEmptyTuple<unknown>
-        ? NonEmptyArray<Ar[number]>
-        : readonly Ar[number][];
 
 /**
  * Sorts an array by a mapped value.
@@ -426,11 +396,6 @@ export function filter<E>(
   }
 }
 
-const filterImpl = <E,>(
-  array: readonly E[],
-  predicate: (a: E, index: SizeType.Arr) => boolean,
-): readonly E[] => array.filter((a, i) => predicate(a, asUint32(i)));
-
 /**
  * Filters an array by excluding elements for which the predicate returns true.
  *
@@ -473,11 +438,6 @@ export function filterNot<E>(
       return (array) => filterNotImpl(array, ...args);
   }
 }
-
-const filterNotImpl = <E,>(
-  array: readonly E[],
-  predicate: (a: E, index: SizeType.Arr) => boolean,
-): readonly E[] => array.filter((a, i) => !predicate(a, asUint32(i)));
 
 /**
  * Creates a new array with unique elements.
@@ -615,11 +575,6 @@ export function flat<E, D extends SafeUintWithSmallInt = 1>(
   }
 }
 
-const flatImpl = (
-  array: readonly unknown[],
-  depth?: SafeUintWithSmallInt,
-): readonly unknown[] => array.flat(depth);
-
 /**
  * Maps each element and flattens the result.
  *
@@ -735,37 +690,6 @@ export function partition<
 }
 
 /**
- * Element type of {@link partition}'s result: a chunk holds between 1 and `N`
- * elements. The lower bound is what makes this worth spelling out — `partition`
- * never emits an empty chunk, so indexed access into a chunk is not
- * `undefined` at position `0`, unlike with a plain `readonly E[]`.
- *
- * Falls back to {@link NonEmptyArray} when `N` is not a bound the brand can
- * express, which keeps that lower bound in every case.
- */
-type PartitionChunk<N, E> = N extends SupportedLength
-  ? BoundedLengthArray<1, N, E>
-  : NonEmptyArray<E>;
-
-const partitionImpl = <E, N extends WithSmallInt<PositiveInt & SizeType.Arr>>(
-  array: readonly E[],
-  chunkSize: N,
-): readonly (readonly E[])[] =>
-  chunkSize < 2
-    ? ([] as const)
-    : // eslint-disable-next-line total-functions/no-partial-division
-      seq(asUint32(Math.ceil(array.length / chunkSize))).map((i: Uint32) =>
-        array.slice(chunkSize * i, chunkSize * (i + 1)),
-      );
-
-/**
- * Alias for `partition`.
- *
- * @see {@link partition}
- */
-export const chunk = partition;
-
-/**
  * Concatenates two arrays.
  *
  * The exact tuple shape is preserved. Additionally, when either input is known
@@ -804,22 +728,6 @@ export const concat = <
 ): ConcatResult<Ar1, Ar2> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   [...array1, ...array2] as never;
-
-/**
- * Return type of {@link concat}: the concatenated tuple `readonly [...Ar1,
- * ...Ar2]`, additionally branded as {@link NonEmptyArray} when either input is
- * a non-empty tuple (a plain non-empty tuple or a branded `NonEmptyArray`,
- * both of which extend `NonEmptyTuple<unknown>`).
- */
-type ConcatResult<
-  Ar1 extends readonly unknown[],
-  Ar2 extends readonly unknown[],
-> =
-  Ar1 extends NonEmptyTuple<unknown>
-    ? readonly [...Ar1, ...Ar2] & NonEmptyArray<Ar1[number] | Ar2[number]>
-    : Ar2 extends NonEmptyTuple<unknown>
-      ? readonly [...Ar1, ...Ar2] & NonEmptyArray<Ar1[number] | Ar2[number]>
-      : readonly [...Ar1, ...Ar2];
 
 /**
  * Groups elements by a key derived from each element.
@@ -985,3 +893,95 @@ export const cartesianProduct = <T,>(
 
   return first.flatMap((item) => restProduct.map((prod) => [item, ...prod]));
 };
+
+const scanImpl = <E, S>(
+  array: readonly E[],
+  reducer: (accumulator: S, currentValue: E, currentIndex: SizeType.Arr) => S,
+  init: S,
+): NonEmptyTuple<S> => {
+  const mut_result = castMutable<NonEmptyTuple<S>>(
+    newArray<PositiveUint32, S>(asPositiveUint32(array.length + 1), init),
+  );
+
+  let mut_acc = init;
+
+  for (const [index, value] of array.entries()) {
+    mut_acc = reducer(mut_acc, value, asUint32(index));
+
+    mut_result[index + 1] = mut_acc;
+  }
+
+  return mut_result;
+};
+
+/** The result of sorting `Ar`: same elements, same length, same bounds. */
+type SortedResult<Ar extends readonly unknown[]> =
+  HasLengthConstraint<Ar> extends true
+    ? ChangeArrayElement<Ar, Ar[number]>
+    : IsFixedLengthList<Ar> extends true
+      ? FixedLengthTuple<Ar['length'], Ar[number]>
+      : Ar extends NonEmptyTuple<unknown>
+        ? NonEmptyArray<Ar[number]>
+        : readonly Ar[number][];
+
+const filterImpl = <E,>(
+  array: readonly E[],
+  predicate: (a: E, index: SizeType.Arr) => boolean,
+): readonly E[] => array.filter((a, i) => predicate(a, asUint32(i)));
+
+const filterNotImpl = <E,>(
+  array: readonly E[],
+  predicate: (a: E, index: SizeType.Arr) => boolean,
+): readonly E[] => array.filter((a, i) => !predicate(a, asUint32(i)));
+
+const flatImpl = (
+  array: readonly unknown[],
+  depth?: SafeUintWithSmallInt,
+): readonly unknown[] => array.flat(depth);
+
+/**
+ * Element type of {@link partition}'s result: a chunk holds between 1 and `N`
+ * elements. The lower bound is what makes this worth spelling out — `partition`
+ * never emits an empty chunk, so indexed access into a chunk is not
+ * `undefined` at position `0`, unlike with a plain `readonly E[]`.
+ *
+ * Falls back to {@link NonEmptyArray} when `N` is not a bound the brand can
+ * express, which keeps that lower bound in every case.
+ */
+type PartitionChunk<N, E> = N extends SupportedLength
+  ? BoundedLengthArray<1, N, E>
+  : NonEmptyArray<E>;
+
+const partitionImpl = <E, N extends WithSmallInt<PositiveInt & SizeType.Arr>>(
+  array: readonly E[],
+  chunkSize: N,
+): readonly (readonly E[])[] =>
+  chunkSize < 2
+    ? ([] as const)
+    : // eslint-disable-next-line total-functions/no-partial-division
+      seq(asUint32(Math.ceil(array.length / chunkSize))).map((i: Uint32) =>
+        array.slice(chunkSize * i, chunkSize * (i + 1)),
+      );
+
+/**
+ * Alias for `partition`.
+ *
+ * @see {@link partition}
+ */
+export const chunk = partition;
+
+/**
+ * Return type of {@link concat}: the concatenated tuple `readonly [...Ar1,
+ * ...Ar2]`, additionally branded as {@link NonEmptyArray} when either input is
+ * a non-empty tuple (a plain non-empty tuple or a branded `NonEmptyArray`,
+ * both of which extend `NonEmptyTuple<unknown>`).
+ */
+type ConcatResult<
+  Ar1 extends readonly unknown[],
+  Ar2 extends readonly unknown[],
+> =
+  Ar1 extends NonEmptyTuple<unknown>
+    ? readonly [...Ar1, ...Ar2] & NonEmptyArray<Ar1[number] | Ar2[number]>
+    : Ar2 extends NonEmptyTuple<unknown>
+      ? readonly [...Ar1, ...Ar2] & NonEmptyArray<Ar1[number] | Ar2[number]>
+      : readonly [...Ar1, ...Ar2];

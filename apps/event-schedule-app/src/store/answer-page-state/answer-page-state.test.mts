@@ -152,6 +152,15 @@ type Setup = Readonly<{
   toasts: Readonly<{ count: number }>;
 }>;
 
+/** A toaster that only counts what it is asked to show. */
+const fakeToaster = (onShow: () => number): Toaster =>
+  ({
+    show: () => `toast-${onShow()}`,
+    dismiss: () => undefined,
+    clear: () => undefined,
+    getToasts: () => [],
+  }) as const;
+
 const setup = (user: SignedInUser | undefined): Setup => {
   const browser = createMemoryBrowser('https://example.com/event/abc/');
 
@@ -208,15 +217,6 @@ const setup = (user: SignedInUser | undefined): Setup => {
 
 const answerOf = (userId: string | null, userName: string): Answer =>
   Answer.fill({ id: `a-${userName}`, user: { id: userId, name: userName } });
-
-/** A toaster that only counts what it is asked to show. */
-const fakeToaster = (onShow: () => number): Toaster =>
-  ({
-    show: () => `toast-${onShow()}`,
-    dismiss: () => undefined,
-    clear: () => undefined,
-    getToasts: () => [],
-  }) as const;
 
 const settle = async (): Promise<void> => {
   await new Promise<void>((resolve) => {

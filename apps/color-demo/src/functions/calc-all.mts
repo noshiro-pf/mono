@@ -24,20 +24,6 @@ import { getLuminanceListAccumulated } from './luminance-list-accumulated.mjs';
 import { normalizeList } from './normalize-list.mjs';
 import { pickupHighContrastHues } from './pickup-high-contrast-hues.mjs';
 
-/**
- * `Arr.map` over a `Seq<N>` union yields a union of tuple types. Every member
- * is non-empty, but the union does not carry `NonEmptyArray`'s brand, and only
- * a guard can establish it. `divisionNumber` is `UintRange<2, 31>`, so this
- * cannot fail.
- */
-const asNonEmptyHues = (hues: readonly Hue[]): NonEmptyArray<Hue> => {
-  if (!Arr.isNonEmpty(hues)) {
-    throw new Error('calcAll: the picked-up hue list is unexpectedly empty');
-  }
-
-  return hues;
-};
-
 export const calcAll = ({
   saturation,
   lightness,
@@ -193,4 +179,18 @@ export const calcAll = ({
     result2_weighted,
     result3_weighted_log,
   };
+};
+
+/**
+ * `Arr.map` over a `Seq<N>` union yields a union of tuple types. Every member
+ * is non-empty, but the union does not carry `NonEmptyArray`'s brand, and only
+ * a guard can establish it. `divisionNumber` is `UintRange<2, 31>`, so this
+ * cannot fail.
+ */
+const asNonEmptyHues = (hues: readonly Hue[]): NonEmptyArray<Hue> => {
+  if (!Arr.isNonEmpty(hues)) {
+    throw new Error('calcAll: the picked-up hue list is unexpectedly empty');
+  }
+
+  return hues;
 };

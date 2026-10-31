@@ -115,37 +115,6 @@ const findPackageJson = (directory: string): string | undefined => {
   return parent === directory ? undefined : findPackageJson(parent);
 };
 
-const resolvePackage = (
-  program: ts.Program,
-  packageJsonPath: string,
-): ReadonlySet<string> | undefined => {
-  const manifest = readJson(packageJsonPath);
-
-  if (!isRecord(manifest)) {
-    return undefined;
-  }
-
-  const packageDirectory = path.dirname(packageJsonPath);
-
-  const mut_files = new Set<string>();
-
-  for (const targets of subpathTargets(manifest)) {
-    const resolved = targets.flatMap((target) =>
-      resolveTarget(program, packageDirectory, target),
-    );
-
-    if (Arr.isEmpty(resolved)) {
-      return undefined;
-    }
-
-    for (const file of resolved) {
-      mut_files.add(file);
-    }
-  }
-
-  return mut_files;
-};
-
 const readJson = (filePath: string): unknown => {
   try {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -154,6 +123,16 @@ const readJson = (filePath: string): unknown => {
     return undefined;
   }
 };
+
+/** Every string under a target, through condition objects and fallbacks. */
+const leafTargets = (value: unknown): readonly string[] =>
+  typeof value === 'string'
+    ? ([value] as const)
+    : Arr.isArray(value)
+      ? value.flatMap(leafTargets)
+      : isRecord(value)
+        ? Object.values(value).flatMap(leafTargets)
+        : ([] as const);
 
 /**
  * The code targets of each subpath the manifest publishes, one list per
@@ -191,15 +170,65 @@ const subpathTargets = (
     .filter(Arr.isNonEmpty);
 };
 
-/** Every string under a target, through condition objects and fallbacks. */
-const leafTargets = (value: unknown): readonly string[] =>
-  typeof value === 'string'
-    ? ([value] as const)
-    : Arr.isArray(value)
-      ? value.flatMap(leafTargets)
-      : isRecord(value)
-        ? Object.values(value).flatMap(leafTargets)
-        : ([] as const);
+const toPosix = (p: string): string => p.replaceAll('\\', '/');
+
+/**
+ * Where the source of an output path would be: the extension swapped for
+ * each source extension, under the output directory and under `src` (or the
+ * program's `rootDir`) in its place.
+ */
+const sourceCandidates = (
+  program: ts.Program,
+  packageDirectory: string,
+  relative: string,
+): readonly string[] => {
+  const stem = relative.replace(OUTPUT_EXTENSION_PATTERN, '');
+
+  const { outDir, rootDir } = program.getCompilerOptions();
+
+  const outputDirectory =
+    outDir === undefined
+      ? undefined
+      : toPosix(path.relative(packageDirectory, outDir));
+
+  const sourceDirectory =
+    rootDir === undefined
+      ? 'src'
+      : toPosix(path.relative(packageDirectory, rootDir));
+
+  const [first, ...rest] = stem.split('/');
+
+  const stems =
+    first !== undefined &&
+    (first === outputDirectory || OUTPUT_DIRECTORIES.has(first))
+      ? ([stem, Arr.toUnshifted(sourceDirectory)(rest).join('/')] as const)
+      : ([stem] as const);
+
+  return stems.flatMap((s) =>
+    SOURCE_EXTENSIONS.map((extension) => `${s}${extension}`),
+  );
+};
+
+/**
+ * Whether a path matches an `exports` pattern, whose one `*` stands for any
+ * non-empty string, `/` included. A pattern with more than one `*` is not one
+ * Node.js accepts, and matches nothing.
+ */
+const matchesPattern = (filePath: string, pattern: string): boolean => {
+  const parts = pattern.split('*');
+
+  if (!Arr.isFixedLengthArray(2, parts)) {
+    return false;
+  }
+
+  const [prefix, suffix] = parts;
+
+  return (
+    filePath.length > prefix.length + suffix.length &&
+    filePath.startsWith(prefix) &&
+    filePath.endsWith(suffix)
+  );
+};
 
 /** The files of the program a target names, directly or as its source. */
 const resolveTarget = (
@@ -241,62 +270,33 @@ const resolveTarget = (
     );
 };
 
-/**
- * Where the source of an output path would be: the extension swapped for
- * each source extension, under the output directory and under `src` (or the
- * program's `rootDir`) in its place.
- */
-const sourceCandidates = (
+const resolvePackage = (
   program: ts.Program,
-  packageDirectory: string,
-  relative: string,
-): readonly string[] => {
-  const stem = relative.replace(OUTPUT_EXTENSION_PATTERN, '');
+  packageJsonPath: string,
+): ReadonlySet<string> | undefined => {
+  const manifest = readJson(packageJsonPath);
 
-  const { outDir, rootDir } = program.getCompilerOptions();
-
-  const outputDirectory =
-    outDir === undefined
-      ? undefined
-      : toPosix(path.relative(packageDirectory, outDir));
-
-  const sourceDirectory =
-    rootDir === undefined
-      ? 'src'
-      : toPosix(path.relative(packageDirectory, rootDir));
-
-  const [first, ...rest] = stem.split('/');
-
-  const stems =
-    first !== undefined &&
-    (first === outputDirectory || OUTPUT_DIRECTORIES.has(first))
-      ? ([stem, Arr.toUnshifted(sourceDirectory)(rest).join('/')] as const)
-      : ([stem] as const);
-
-  return stems.flatMap((s) =>
-    SOURCE_EXTENSIONS.map((extension) => `${s}${extension}`),
-  );
-};
-
-const toPosix = (p: string): string => p.replaceAll('\\', '/');
-
-/**
- * Whether a path matches an `exports` pattern, whose one `*` stands for any
- * non-empty string, `/` included. A pattern with more than one `*` is not one
- * Node.js accepts, and matches nothing.
- */
-const matchesPattern = (filePath: string, pattern: string): boolean => {
-  const parts = pattern.split('*');
-
-  if (!Arr.isFixedLengthArray(2, parts)) {
-    return false;
+  if (!isRecord(manifest)) {
+    return undefined;
   }
 
-  const [prefix, suffix] = parts;
+  const packageDirectory = path.dirname(packageJsonPath);
 
-  return (
-    filePath.length > prefix.length + suffix.length &&
-    filePath.startsWith(prefix) &&
-    filePath.endsWith(suffix)
-  );
+  const mut_files = new Set<string>();
+
+  for (const targets of subpathTargets(manifest)) {
+    const resolved = targets.flatMap((target) =>
+      resolveTarget(program, packageDirectory, target),
+    );
+
+    if (Arr.isEmpty(resolved)) {
+      return undefined;
+    }
+
+    for (const file of resolved) {
+      mut_files.add(file);
+    }
+  }
+
+  return mut_files;
 };

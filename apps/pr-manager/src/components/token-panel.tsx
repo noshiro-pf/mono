@@ -138,15 +138,6 @@ const MS_PER_SECOND = 1000;
 
 const SECONDS_PER_MINUTE = 60;
 
-const stateWords = (
-  token: StoredToken | undefined,
-  rateLimit: RateLimit | undefined,
-  pollIntervalMs: number,
-): string =>
-  token === undefined
-    ? 'Nothing is read until there is one.'
-    : (`Held ${token.store === 'device' ? 'on this device' : 'in this tab only'}. ${limitWords(rateLimit)} Reading every ${seconds(pollIntervalMs)} while this tab is visible.${rateLimit !== undefined && isRunningLow(rateLimit) ? RUNNING_LOW : ''}` as const);
-
 /**
  * What GitHub last said is left, or what it would be if it has not answered
  * yet. The fallback is the documented size of the window rather than a blank,
@@ -164,6 +155,15 @@ const seconds = (ms: number): string => {
     ? `${total} seconds`
     : `${total / SECONDS_PER_MINUTE} minutes`;
 };
+
+const stateWords = (
+  token: StoredToken | undefined,
+  rateLimit: RateLimit | undefined,
+  pollIntervalMs: number,
+): string =>
+  token === undefined
+    ? 'Nothing is read until there is one.'
+    : (`Held ${token.store === 'device' ? 'on this device' : 'in this tab only'}. ${limitWords(rateLimit)} Reading every ${seconds(pollIntervalMs)} while this tab is visible.${rateLimit !== undefined && isRunningLow(rateLimit) ? RUNNING_LOW : ''}` as const);
 
 /**
  * The permissions, in the form of the two token pages a reader would open.

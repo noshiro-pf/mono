@@ -119,17 +119,6 @@ export const unreachable: (value?: never, message?: string) => never = (
 ) => panic(message ?? unreachableMessage(value));
 
 /**
- * The default message. Takes `unknown` rather than the parameter's own
- * `never | undefined` so that the check is a branch the checker has to
- * evaluate: typed as the latter it would be a condition whose answer is
- * already known.
- */
-const unreachableMessage = (value: unknown): string =>
-  value === undefined
-    ? 'Reached code the types mark unreachable'
-    : (`Reached code the types mark unreachable: ${unknownToString(value)}` as const);
-
-/**
  * Panics with "not implemented" — the placeholder for a code path that is
  * yet to be written.
  *
@@ -148,3 +137,14 @@ export const todo: (message?: string) => never = (message) =>
   panic(
     message === undefined ? 'not implemented' : `not implemented: ${message}`,
   );
+
+/**
+ * The default message. Takes `unknown` rather than the parameter's own
+ * `never | undefined` so that the check is a branch the checker has to
+ * evaluate: typed as the latter it would be a condition whose answer is
+ * already known.
+ */
+const unreachableMessage = (value: unknown): string =>
+  value === undefined
+    ? 'Reached code the types mark unreachable'
+    : (`Reached code the types mark unreachable: ${unknownToString(value)}` as const);

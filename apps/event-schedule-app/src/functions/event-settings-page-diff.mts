@@ -50,6 +50,87 @@ const datetimeSpecificationOptions =
 
 const dc = dict.eventSettingsPage.diff;
 
+export const collectEventSettingsPageDiff = (
+  prev: EventSchedule,
+  curr: EventSchedule,
+  emailPrev: string | undefined,
+  emailCurr: string | undefined,
+): EventSettingsPageDiffResult =>
+  ({
+    title: createDiffResult(prev, curr, ['title'], map),
+    notes: createDiffResult(prev, curr, ['notes'], map),
+
+    datetimeSpecification: createDiffResult(
+      prev,
+      curr,
+      ['datetimeSpecification'],
+      (a, b) =>
+        map(datetimeSpecificationOptions[a], datetimeSpecificationOptions[b]),
+    ),
+
+    datetimeRangeList: datetimeRangeListDiff(prev, curr),
+
+    answerDeadline: createDiffResult(prev, curr, ['answerDeadline'], (a, b) =>
+      map(
+        a === 'none' ? dc.values.none : ymdhm2str(a),
+        b === 'none' ? dc.values.none : ymdhm2str(b),
+      ),
+    ),
+
+    notificationSettings: notificationSettingsDiff(
+      prev.notificationSettings,
+      curr.notificationSettings,
+      emailPrev,
+      emailCurr,
+    ),
+
+    answerIcons: {
+      good: {
+        description: createDiffResult(
+          prev,
+          curr,
+          ['answerIcons', 'good', 'description'],
+          map,
+        ),
+      },
+
+      fair: {
+        description: createDiffResult(
+          prev,
+          curr,
+          ['answerIcons', 'fair', 'description'],
+          map,
+        ),
+        point: createDiffResult(
+          prev,
+          curr,
+          ['answerIcons', 'fair', 'point'],
+          (a, b) => map(a.toString(), b.toString()),
+        ),
+      },
+
+      poor: {
+        description: createDiffResult(
+          prev,
+          curr,
+          ['answerIcons', 'poor', 'description'],
+          map,
+        ),
+      },
+    },
+
+    author: createDiffResult(prev, curr, ['author'], (a, b) =>
+      map(a.name, b.name),
+    ),
+
+    timezoneOffsetMinutes: createDiffResult(
+      prev,
+      curr,
+      ['timezoneOffsetMinutes'],
+      (a, b) => map(a.toString(), b.toString()),
+    ),
+  }) as const;
+
 const map = (a: string, b: string): string =>
   `"${a}" ${dict.common.mapTo} "${b}"` as const;
 
@@ -209,84 +290,3 @@ const datetimeRangeListDiff = (
     deleted: deleted.map((e) => datetimeRange2str(b.datetimeSpecification, e)),
   };
 };
-
-export const collectEventSettingsPageDiff = (
-  prev: EventSchedule,
-  curr: EventSchedule,
-  emailPrev: string | undefined,
-  emailCurr: string | undefined,
-): EventSettingsPageDiffResult =>
-  ({
-    title: createDiffResult(prev, curr, ['title'], map),
-    notes: createDiffResult(prev, curr, ['notes'], map),
-
-    datetimeSpecification: createDiffResult(
-      prev,
-      curr,
-      ['datetimeSpecification'],
-      (a, b) =>
-        map(datetimeSpecificationOptions[a], datetimeSpecificationOptions[b]),
-    ),
-
-    datetimeRangeList: datetimeRangeListDiff(prev, curr),
-
-    answerDeadline: createDiffResult(prev, curr, ['answerDeadline'], (a, b) =>
-      map(
-        a === 'none' ? dc.values.none : ymdhm2str(a),
-        b === 'none' ? dc.values.none : ymdhm2str(b),
-      ),
-    ),
-
-    notificationSettings: notificationSettingsDiff(
-      prev.notificationSettings,
-      curr.notificationSettings,
-      emailPrev,
-      emailCurr,
-    ),
-
-    answerIcons: {
-      good: {
-        description: createDiffResult(
-          prev,
-          curr,
-          ['answerIcons', 'good', 'description'],
-          map,
-        ),
-      },
-
-      fair: {
-        description: createDiffResult(
-          prev,
-          curr,
-          ['answerIcons', 'fair', 'description'],
-          map,
-        ),
-        point: createDiffResult(
-          prev,
-          curr,
-          ['answerIcons', 'fair', 'point'],
-          (a, b) => map(a.toString(), b.toString()),
-        ),
-      },
-
-      poor: {
-        description: createDiffResult(
-          prev,
-          curr,
-          ['answerIcons', 'poor', 'description'],
-          map,
-        ),
-      },
-    },
-
-    author: createDiffResult(prev, curr, ['author'], (a, b) =>
-      map(a.name, b.name),
-    ),
-
-    timezoneOffsetMinutes: createDiffResult(
-      prev,
-      curr,
-      ['timezoneOffsetMinutes'],
-      (a, b) => map(a.toString(), b.toString()),
-    ),
-  }) as const;

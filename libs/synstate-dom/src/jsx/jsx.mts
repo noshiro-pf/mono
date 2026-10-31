@@ -32,6 +32,9 @@ export const createMountable = <P,>(
 export const Fragment = (props: Readonly<{ children?: Child }>): Mountable =>
   mountable(() => mountChild(props.children ?? []));
 
+const isRefCallback = (value: unknown): value is (element: Element) => void =>
+  typeof value === 'function';
+
 const mountElement = (tag: string, props: unknown): Element => {
   const element = svgTagNameSet.has(tag)
     ? document.createElementNS(svgNamespace, tag)
@@ -58,6 +61,3 @@ const mountElement = (tag: string, props: unknown): Element => {
 const svgNamespace = 'http://www.w3.org/2000/svg';
 
 const svgTagNameSet: ReadonlySet<string> = new Set(svgTagNames);
-
-const isRefCallback = (value: unknown): value is (element: Element) => void =>
-  typeof value === 'function';

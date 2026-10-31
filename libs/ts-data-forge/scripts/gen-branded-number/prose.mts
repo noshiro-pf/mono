@@ -195,6 +195,19 @@ export const methodProse = (
   }
 };
 
+const indefinite = (word: string): string =>
+  VOWELS.has(word.slice(0, 1).toLowerCase()) ? 'an' : 'a';
+
+/**
+ * Derives the bare noun from `typeNameInMessage` by dropping the leading article
+ * and any trailing range clause, e.g. `'a positive integer in [1, 2^15)'` →
+ * `'positive integer'`.
+ */
+const nounOf = (config: BrandedNumberConfig): string =>
+  config.typeNameInMessage
+    .replace(/^an? /u, '')
+    .replace(/ (?:in|less than) .*$/u, '');
+
 const binOp = (
   verb: string,
   op: string,
@@ -215,6 +228,9 @@ const binOp = (
     returns: `The ${phrase} of \`a\` and \`b\` as ${aT}`,
   };
 };
+
+const capitalize = (word: string): string =>
+  `${word.slice(0, 1).toUpperCase()}${word.slice(1)}` as const;
 
 const roundingOp = (
   name: string,
@@ -264,19 +280,3 @@ const namespaceDescription = (config: BrandedNumberConfig): string => {
 };
 
 const VOWELS = new Set<string>(['a', 'e', 'i', 'o', 'u']);
-
-const indefinite = (word: string): string =>
-  VOWELS.has(word.slice(0, 1).toLowerCase()) ? 'an' : 'a';
-
-const capitalize = (word: string): string =>
-  `${word.slice(0, 1).toUpperCase()}${word.slice(1)}` as const;
-
-/**
- * Derives the bare noun from `typeNameInMessage` by dropping the leading article
- * and any trailing range clause, e.g. `'a positive integer in [1, 2^15)'` →
- * `'positive integer'`.
- */
-const nounOf = (config: BrandedNumberConfig): string =>
-  config.typeNameInMessage
-    .replace(/^an? /u, '')
-    .replace(/ (?:in|less than) .*$/u, '');

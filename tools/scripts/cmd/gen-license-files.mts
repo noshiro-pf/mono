@@ -297,6 +297,9 @@ const REASONS = {
   ].join(' '),
 } as const;
 
+const compareStrings = (a: string, b: string): number =>
+  a < b ? -1 : a > b ? 1 : 0;
+
 const unknownLicenseMessage = (knownLicenses: ReadonlySet<string>): string =>
   [
     'declares a license this script cannot write the text of. It knows',
@@ -311,8 +314,16 @@ const isRoot = (dir: string): boolean => dir === '';
 const isExperimental = (repoRelativePath: string): boolean =>
   repoRelativePath.startsWith(EXPERIMENTAL_PREFIX);
 
-const compareStrings = (a: string, b: string): number =>
-  a < b ? -1 : a > b ? 1 : 0;
+const readFileOrUndefined = async (
+  repoRelativePath: string,
+): Promise<string | undefined> => {
+  const read = await Result.fromPromise(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a path under a package pnpm listed.
+    fs.readFile(path.resolve(projectRootPath, repoRelativePath), 'utf8'),
+  );
+
+  return Result.isErr(read) ? undefined : read.value;
+};
 
 /**
  * The root LICENSE, or why it cannot be trusted as a source.
@@ -371,6 +382,36 @@ const checkRootDeclaration = (
         ].join(' '),
       );
 };
+
+const readManifest = (
+  packageDir: string,
+): Result<t.TypeOf<typeof PACKAGE_JSON>, string> => {
+  const manifestPath = path.join(packageDir, MANIFEST_FILE);
+
+  const text = Result.fromThrowable(() =>
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a package directory pnpm listed.
+    readFileSync(manifestPath, 'utf8'),
+  );
+
+  if (Result.isErr(text)) {
+    return Result.err(`Failed to read ${manifestPath}.`);
+  }
+
+  const parsed = Json.parse(text.value);
+
+  if (Result.isErr(parsed)) {
+    return Result.err(`${manifestPath} is not JSON: ${parsed.value}`);
+  }
+
+  const validated = PACKAGE_JSON.validate(parsed.value);
+
+  return Result.isErr(validated)
+    ? Result.err(`${manifestPath} has an unexpected shape.`)
+    : Result.ok(validated.value);
+};
+
+const toRepoRelative = (absolute: string): string =>
+  path.relative(projectRootPath, absolute).split(path.sep).join('/');
 
 /**
  * Every workspace package, with the `package.json` fields this reads and
@@ -449,31 +490,11 @@ const PACKAGE_JSON = t.record({
   private: t.optional(t.boolean()),
 });
 
-const readManifest = (
-  packageDir: string,
-): Result<t.TypeOf<typeof PACKAGE_JSON>, string> => {
-  const manifestPath = path.join(packageDir, MANIFEST_FILE);
+/** `''` for a file at the repository root, matching {@link PackageManifest.dir}. */
+const dirnameOf = (repoRelativePath: string): string => {
+  const parent = path.posix.dirname(repoRelativePath);
 
-  const text = Result.fromThrowable(() =>
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a package directory pnpm listed.
-    readFileSync(manifestPath, 'utf8'),
-  );
-
-  if (Result.isErr(text)) {
-    return Result.err(`Failed to read ${manifestPath}.`);
-  }
-
-  const parsed = Json.parse(text.value);
-
-  if (Result.isErr(parsed)) {
-    return Result.err(`${manifestPath} is not JSON: ${parsed.value}`);
-  }
-
-  const validated = PACKAGE_JSON.validate(parsed.value);
-
-  return Result.isErr(validated)
-    ? Result.err(`${manifestPath} has an unexpected shape.`)
-    : Result.ok(validated.value);
+  return parent === '.' ? '' : parent;
 };
 
 /**
@@ -492,13 +513,6 @@ const collectOrphanLicenseFiles = (
   return trackedLicenseFiles
     .filter((file) => !isExperimental(file))
     .filter((file) => !packageDirs.has(dirnameOf(file)));
-};
-
-/** `''` for a file at the repository root, matching {@link PackageManifest.dir}. */
-const dirnameOf = (repoRelativePath: string): string => {
-  const parent = path.posix.dirname(repoRelativePath);
-
-  return parent === '.' ? '' : parent;
 };
 
 /**
@@ -543,20 +557,6 @@ const writeIfDifferent = async (
 
   return true;
 };
-
-const readFileOrUndefined = async (
-  repoRelativePath: string,
-): Promise<string | undefined> => {
-  const read = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a path under a package pnpm listed.
-    fs.readFile(path.resolve(projectRootPath, repoRelativePath), 'utf8'),
-  );
-
-  return Result.isErr(read) ? undefined : read.value;
-};
-
-const toRepoRelative = (absolute: string): string =>
-  path.relative(projectRootPath, absolute).split(path.sep).join('/');
 
 const formatViolations = (violations: readonly Violation[]): string =>
   [

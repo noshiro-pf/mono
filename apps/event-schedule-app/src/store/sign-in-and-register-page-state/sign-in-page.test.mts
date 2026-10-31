@@ -89,6 +89,15 @@ type Setup = Readonly<{
   setGoogleSignInUnderWay: (underWay: boolean) => void;
 }>;
 
+/** A toaster that only counts what it is asked to show. */
+const fakeToaster = (onShow: () => number): Toaster =>
+  ({
+    show: () => `toast-${onShow()}`,
+    dismiss: () => undefined,
+    clear: () => undefined,
+    getToasts: () => [],
+  }) as const;
+
 const setup = (
   answer: () => Result<unknown, Readonly<{ code: string; message: string }>>,
 ): Setup => {
@@ -134,15 +143,6 @@ const setup = (
     setGoogleSignInUnderWay,
   } as const;
 };
-
-/** A toaster that only counts what it is asked to show. */
-const fakeToaster = (onShow: () => number): Toaster =>
-  ({
-    show: () => `toast-${onShow()}`,
-    dismiss: () => undefined,
-    clear: () => undefined,
-    getToasts: () => [],
-  }) as const;
 
 const settle = async (): Promise<void> => {
   await new Promise<void>((resolve) => {

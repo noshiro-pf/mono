@@ -119,6 +119,71 @@ const salaryLookup = ({
     isEmployed: (month) => month <= retirementMonth,
   }) as const;
 
+const grossAt = (salary: SalaryLookup, month: MonthIndex): number =>
+  salary.isEmployed(month) ? (salary.entryAt(month)?.monthlyGross ?? 0) : 0;
+
+const grossAfterIdecoAt = (salary: SalaryLookup, month: MonthIndex): number => {
+  if (!salary.isEmployed(month)) {
+    return 0;
+  }
+
+  const entry = salary.entryAt(month);
+
+  return entry === undefined ? 0 : entry.monthlyGross - entry.idecoMonthly;
+};
+
+/**
+ * `month` に適用される標準報酬の元になる額: 9 月以降はその年の、8 月以前は
+ * 前の年の 4〜6 月の月給（額面）の平均。
+ */
+const standardRemunerationBase = (
+  salary: SalaryLookup,
+  month: MonthIndex,
+): number => {
+  const year = monthOf(month) < 9 ? yearOf(month) - 1 : yearOf(month);
+
+  const april = year * 12 + 3;
+
+  const sum =
+    grossAt(salary, april) +
+    grossAt(salary, april + 1) +
+    grossAt(salary, april + 2);
+
+  return sum / 3;
+};
+
+const socialInsuranceAt = (
+  salary: SalaryLookup,
+  month: MonthIndex,
+): Readonly<{
+  healthInsurance: number;
+  welfarePension: number;
+  employmentInsurance: number;
+}> => {
+  const remuneration = standardRemunerationBase(salary, month);
+
+  return {
+    healthInsurance: healthInsurancePremium(remuneration),
+    welfarePension: welfarePensionPremium(remuneration),
+    employmentInsurance: employmentInsurancePremium(grossAt(salary, month)),
+  };
+};
+
+/**
+ * 住民税（月額）の概算。給与所得控除を 2〜3 割、基礎控除などを年 150 万円と
+ * 見て、12 か月前の月給（iDeCo の掛金を除く）から求める。
+ */
+const residentTaxFrom = (grossAfterIdecoLastYear: number): number => {
+  const ref = grossAfterIdecoLastYear;
+
+  const employmentIncomeRatio = ref > 8_500_000 / 12 ? 0.8 : 0.7;
+
+  return Math.max(
+    0,
+    (ref * employmentIncomeRatio - 1_500_000 / 12) * residentTaxRate,
+  );
+};
+
 const calculateSalaryMonth = (
   salary: SalaryLookup,
   month: MonthIndex,
@@ -195,69 +260,4 @@ const calculateSalaryMonth = (
         bonusEmploymentInsurance +
         bonusIncomeTax),
   };
-};
-
-const grossAt = (salary: SalaryLookup, month: MonthIndex): number =>
-  salary.isEmployed(month) ? (salary.entryAt(month)?.monthlyGross ?? 0) : 0;
-
-const grossAfterIdecoAt = (salary: SalaryLookup, month: MonthIndex): number => {
-  if (!salary.isEmployed(month)) {
-    return 0;
-  }
-
-  const entry = salary.entryAt(month);
-
-  return entry === undefined ? 0 : entry.monthlyGross - entry.idecoMonthly;
-};
-
-const socialInsuranceAt = (
-  salary: SalaryLookup,
-  month: MonthIndex,
-): Readonly<{
-  healthInsurance: number;
-  welfarePension: number;
-  employmentInsurance: number;
-}> => {
-  const remuneration = standardRemunerationBase(salary, month);
-
-  return {
-    healthInsurance: healthInsurancePremium(remuneration),
-    welfarePension: welfarePensionPremium(remuneration),
-    employmentInsurance: employmentInsurancePremium(grossAt(salary, month)),
-  };
-};
-
-/**
- * `month` に適用される標準報酬の元になる額: 9 月以降はその年の、8 月以前は
- * 前の年の 4〜6 月の月給（額面）の平均。
- */
-const standardRemunerationBase = (
-  salary: SalaryLookup,
-  month: MonthIndex,
-): number => {
-  const year = monthOf(month) < 9 ? yearOf(month) - 1 : yearOf(month);
-
-  const april = year * 12 + 3;
-
-  const sum =
-    grossAt(salary, april) +
-    grossAt(salary, april + 1) +
-    grossAt(salary, april + 2);
-
-  return sum / 3;
-};
-
-/**
- * 住民税（月額）の概算。給与所得控除を 2〜3 割、基礎控除などを年 150 万円と
- * 見て、12 か月前の月給（iDeCo の掛金を除く）から求める。
- */
-const residentTaxFrom = (grossAfterIdecoLastYear: number): number => {
-  const ref = grossAfterIdecoLastYear;
-
-  const employmentIncomeRatio = ref > 8_500_000 / 12 ? 0.8 : 0.7;
-
-  return Math.max(
-    0,
-    (ref * employmentIncomeRatio - 1_500_000 / 12) * residentTaxRate,
-  );
 };

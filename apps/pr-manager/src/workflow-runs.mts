@@ -161,6 +161,28 @@ const newestFirst = (a: WorkflowRun, b: WorkflowRun): number => {
   return byTime === 0 ? b.id - a.id : byTime;
 };
 
+const runOf = (run: t.TypeOf<typeof RunSchema>, state: RunState): WorkflowRun =>
+  ({
+    id: run.id,
+    workflow: run.name ?? '',
+    title: run.display_title,
+    runNumber: run.run_number,
+    url: run.html_url,
+    event: run.event,
+    branch: run.head_branch ?? undefined,
+    actor: run.actor?.login ?? 'ghost',
+    state,
+    createdAt: run.created_at,
+  }) as const;
+
+/** As `graphql.mts` words them, with the budget said to be REST's. */
+const refusal = (response: Response): string =>
+  response.status === UNAUTHORIZED
+    ? 'GitHub would not accept the token for the workflow runs. It may have expired or been revoked.'
+    : response.headers.get('x-ratelimit-remaining') === '0'
+      ? "The REST rate limit on this token's account is spent, so the workflow runs cannot be read. It resets within the hour."
+      : (`GitHub answered ${response.status} ${response.statusText} for the workflow runs.` as const);
+
 const readState = async (
   source: ReportSource,
   state: RunState,
@@ -229,20 +251,6 @@ const RunsPageSchema = t.record({
   workflow_runs: t.array(RunSchema),
 });
 
-const runOf = (run: t.TypeOf<typeof RunSchema>, state: RunState): WorkflowRun =>
-  ({
-    id: run.id,
-    workflow: run.name ?? '',
-    title: run.display_title,
-    runNumber: run.run_number,
-    url: run.html_url,
-    event: run.event,
-    branch: run.head_branch ?? undefined,
-    actor: run.actor?.login ?? 'ghost',
-    state,
-    createdAt: run.created_at,
-  }) as const;
-
 /**
  * Written as a wrapper rather than handed over bare, because `fetch`
  * detached from the global it belongs to is not callable in every engine.
@@ -250,11 +258,3 @@ const runOf = (run: t.TypeOf<typeof RunSchema>, state: RunState): WorkflowRun =>
 const askGitHub: RestFetch = async (route, init) => fetch(route, init);
 
 const UNAUTHORIZED = 401;
-
-/** As `graphql.mts` words them, with the budget said to be REST's. */
-const refusal = (response: Response): string =>
-  response.status === UNAUTHORIZED
-    ? 'GitHub would not accept the token for the workflow runs. It may have expired or been revoked.'
-    : response.headers.get('x-ratelimit-remaining') === '0'
-      ? "The REST rate limit on this token's account is spent, so the workflow runs cannot be read. It resets within the hour."
-      : (`GitHub answered ${response.status} ${response.statusText} for the workflow runs.` as const);

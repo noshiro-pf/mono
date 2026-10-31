@@ -279,6 +279,44 @@ const packAll = async (
   return Result.ok(mut_tarballs);
 };
 
+/** `exports` nests conditions arbitrarily deep; every leaf string is a path. */
+const collectExportsPaths = (
+  exportsField: JsonValue | undefined,
+): readonly string[] =>
+  isString(exportsField)
+    ? ([exportsField] as const)
+    : Arr.isArray(exportsField)
+      ? exportsField.flatMap(collectExportsPaths)
+      : isRecord(exportsField)
+        ? Object.values(exportsField).flatMap(collectExportsPaths)
+        : ([] as const);
+
+const collectPaths = (manifest: JsonValue): readonly string[] => {
+  if (!isRecord(manifest)) {
+    return [];
+  }
+
+  const fromTopLevel = (['main', 'module', 'types'] as const)
+    .map((key) => manifest[key])
+    .filter(isString);
+
+  const binField = manifest['bin'];
+
+  const fromBin = isRecord(binField)
+    ? Object.values(binField).filter(isString)
+    : isString(binField)
+      ? ([binField] as const)
+      : ([] as const);
+
+  return [
+    ...fromTopLevel,
+    ...fromBin,
+    ...collectExportsPaths(manifest['exports']),
+  ]
+    .filter((p) => p.startsWith('./'))
+    .map((p) => p.slice('./'.length));
+};
+
 /**
  * `exports`, `main`, `module`, `types` and `bin` are promises to a consumer.
  * A promise about a file that is not in the tarball is broken for everyone
@@ -340,43 +378,414 @@ const checkAdvertisedPaths = async (
   return Result.ok(undefined);
 };
 
-const collectPaths = (manifest: JsonValue): readonly string[] => {
-  if (!isRecord(manifest)) {
-    return [];
+/**
+ * The packages in this repository depend on each other, and `pnpm pack`
+ * resolves `workspace:^` to the version in the checkout — so the tarball of
+ * `github-settings-as-code` asks for `octokit-safe-types@^1.2.26` while npm
+ * still has 1.2.25. Nearly every package here has a dependent, so without
+ * these overrides a `chore: version packages` branch fails to install at all
+ * — `ERR_PNPM_NO_MATCHING_VERSION`, until the release it exists to make goes
+ * out.
+ *
+ * Off a version branch the range did resolve, but to the sibling on npm,
+ * which is the older one. The `local` space is meant to be what the next
+ * release will be, and the packages in it are released together, so the
+ * sibling it installs should come from this checkout either way. That the
+ * declared range matches what is published is the `published` space's
+ * question, not this one's.
+ */
+const siblingOverrides = (
+  dir: string,
+  packages: readonly PackageToCheck[],
+): readonly string[] =>
+  [
+    '# Depend on the sibling packed from this checkout, not the older one on',
+    '# npm — on a version branch the bumped version is not published at all.',
+    'overrides:',
+    ...packages.map(
+      (pkg) =>
+        `  '${pkg.name}': 'file:${path.relative(dir, path.resolve(tarballDir, `${pkg.name}.tgz`))}'`,
+    ),
+    '',
+  ] as const;
+
+/**
+ * Each project is its own workspace root, so that nothing another project
+ * installed can reach it — see `installProjects`.
+ */
+const projectWorkspaceYaml = (
+  target: Target,
+  dir: string,
+  packages: readonly PackageToCheck[],
+): string =>
+  [
+    '# Without this, pnpm fills `node_modules/.pnpm/node_modules` and puts it',
+    '# on the resolution path, so a package that forgot to declare a',
+    '# dependency still finds it as long as something else depends on it —',
+    '# which is exactly the fault these checks look for.',
+    'hoist: false',
+    '',
+    '# What is under test is the packages, not whether someone else\u{2019}s',
+    '# postinstall script is on pnpm\u{2019}s allow list.',
+    'strictDepBuilds: false',
+    '',
+    '# The repository holds new releases back for a week. Here that would',
+    '# mean "published" quietly meaning "published a week ago".',
+    'minimumReleaseAge: 0',
+    '',
+    ...(target === 'local' ? siblingOverrides(dir, packages) : []),
+  ].join('\n');
+
+/** The non-optional `peerDependencies` of a manifest, as plain specs. */
+const declaredPeers = (manifest: JsonValue): ReadonlyRecord<string, string> => {
+  const peers = isRecord(manifest) ? manifest['peerDependencies'] : undefined;
+
+  const meta = isRecord(manifest)
+    ? manifest['peerDependenciesMeta']
+    : undefined;
+
+  if (!isRecord(peers)) {
+    return {};
   }
 
-  const fromTopLevel = (['main', 'module', 'types'] as const)
-    .map((key) => manifest[key])
-    .filter(isString);
+  const isOptional = (name: string): boolean => {
+    if (!isRecord(meta)) {
+      return false;
+    }
 
-  const binField = manifest['bin'];
+    const entry = meta[name];
 
-  const fromBin = isRecord(binField)
-    ? Object.values(binField).filter(isString)
-    : isString(binField)
-      ? ([binField] as const)
-      : ([] as const);
+    return isRecord(entry) && entry['optional'] === true;
+  };
 
-  return [
-    ...fromTopLevel,
-    ...fromBin,
-    ...collectExportsPaths(manifest['exports']),
-  ]
-    .filter((p) => p.startsWith('./'))
-    .map((p) => p.slice('./'.length));
+  return Obj.filterMap(peers, (range, name) =>
+    isString(range) && !isOptional(name) ? Optional.some(range) : Optional.none,
+  );
 };
 
-/** `exports` nests conditions arbitrarily deep; every leaf string is a path. */
-const collectExportsPaths = (
-  exportsField: JsonValue | undefined,
-): readonly string[] =>
-  isString(exportsField)
-    ? ([exportsField] as const)
-    : Arr.isArray(exportsField)
-      ? exportsField.flatMap(collectExportsPaths)
-      : isRecord(exportsField)
-        ? Object.values(exportsField).flatMap(collectExportsPaths)
-        : ([] as const);
+/** `strict-ts-lib-v7.0` and its eleven siblings, one per TypeScript minor. */
+const strictLibTypeScriptMajor = (packageName: string): number | undefined => {
+  const matched = /^strict-ts-lib-v(\d+)\.\d+$/u.exec(packageName);
+
+  const major = matched?.[1];
+
+  return major === undefined
+    ? undefined
+    : Result.unwrapOkOr(Num.safeParseInt(major), undefined);
+};
+
+const isStrictLibPackage = (packageName: string): boolean =>
+  strictLibTypeScriptMajor(packageName) !== undefined;
+
+const isTypesOnly = (packageName: string): boolean =>
+  typesOnlyPackages.has(packageName) || isStrictLibPackage(packageName);
+
+/**
+ * What the last generation wrote, read back the way `readPinnedVersion` reads
+ * the pin: everything in the project's `dependencies` except the package
+ * itself and the `typescript` a types-only check compiles against.
+ */
+const readCommittedPeers = async (
+  dir: string,
+  pkg: PackageToCheck,
+): Promise<ReadonlyRecord<string, string> | undefined> => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  const raw = await fs
+    .readFile(path.resolve(dir, 'package.json'), 'utf8')
+    .catch(() => undefined);
+
+  if (raw === undefined) {
+    return undefined;
+  }
+
+  const parsed = Json.parse(raw);
+
+  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
+    return undefined;
+  }
+
+  const deps = parsed.value['dependencies'];
+
+  if (!isRecord(deps)) {
+    return undefined;
+  }
+
+  return Obj.filterMap(deps, (spec, name) =>
+    name !== pkg.name &&
+    !(name === 'typescript' && isTypesOnly(pkg.name)) &&
+    isString(spec)
+      ? Optional.some(spec)
+      : Optional.none,
+  );
+};
+
+/**
+ * The peer dependencies the package under check declares, written into the
+ * project as ordinary dependencies — which is what a consumer has to do with
+ * a peer anyway.
+ *
+ * They used to be left out, on the reasoning that pnpm installs a peer from
+ * the range the *installed* package declares, so the published space would
+ * exercise the published range without this file having to know it. pnpm 12
+ * resolves a peer at the importer in more cases, and an importer that
+ * declares nothing gets nothing: measured on this space, every ESLint plugin
+ * `eslint-config-typed` pulls in lost its `eslint` peer, and
+ * `eslint-plugin-unicorn` then found the monorepo's copy — outside the space,
+ * which is the one thing `isolate.mjs` exists to catch.
+ *
+ * The range is still the package's own, so what is exercised is unchanged.
+ * Where it comes from differs by space, for the same reason the version pin
+ * does:
+ *
+ * - `local` reads this checkout, which is what the tarball was packed from.
+ * - `published` reads what is committed here, and looks the pinned version's
+ *   manifest up on the registry only when `--update` moves the pins. A
+ *   published version's manifest never changes, so the committed answer stays
+ *   right, and the check does not spend thirty-two registry round trips on
+ *   every run to be told what it already knows.
+ *
+ * An optional peer is left out. It is optional because a consumer may not
+ * have it, and a consumer who does not is the case worth checking.
+ */
+const peerSpecs = async (
+  target: Target,
+  dir: string,
+  pkg: PackageToCheck,
+  spec: string,
+  updatePins: boolean,
+): Promise<Result<ReadonlyRecord<string, string>, string>> => {
+  if (target === 'local') {
+    return Result.ok(declaredPeers(pkg.manifest));
+  }
+
+  const committed = updatePins ? undefined : await readCommittedPeers(dir, pkg);
+
+  if (committed !== undefined) {
+    return Result.ok(committed);
+  }
+
+  // The whole manifest rather than the two fields by name: `npm view` given
+  // several fields prints them keyed by field name only when more than one of
+  // them exists, and prints the value bare otherwise — so asking for
+  // `peerDependencies peerDependenciesMeta` returns two different shapes
+  // depending on whether the package happens to have optional peers.
+  const manifest = await $(`npm view ${pkg.name}@${spec} --json`, {
+    silent: true,
+  });
+
+  if (Result.isErr(manifest)) {
+    return Result.err(
+      `Could not look up the peer dependencies of ${pkg.name}@${spec}: ${manifest.value.message}`,
+    );
+  }
+
+  const parsed = Json.parse(manifest.value.stdout);
+
+  return Result.isErr(parsed) || !isRecord(parsed.value)
+    ? Result.err(`Could not read the manifest of ${pkg.name}@${spec}.`)
+    : Result.ok(declaredPeers(parsed.value));
+};
+
+/**
+ * npm reports an unknown package as `E404`, on stderr, which `exec` folds into
+ * the error's message. Matched on the code rather than on the prose so that a
+ * reworded message does not turn a missing package into a hard failure — and
+ * narrowly enough that a 404 from somewhere else in the output does not read
+ * as one.
+ */
+const npmSaysNotFound = (message: string): boolean =>
+  message.includes('E404') || message.includes('is not in this registry');
+
+const readPinnedVersion = async (
+  dir: string,
+  packageName: string,
+): Promise<string | undefined> => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  const raw = await fs
+    .readFile(path.resolve(dir, 'package.json'), 'utf8')
+    .catch(() => undefined);
+
+  if (raw === undefined) {
+    return undefined;
+  }
+
+  const parsed = Json.parse(raw);
+
+  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
+    return undefined;
+  }
+
+  const deps = parsed.value['dependencies'];
+
+  if (!isRecord(deps)) {
+    return undefined;
+  }
+
+  const pinned = deps[packageName];
+
+  return isString(pinned) ? pinned : undefined;
+};
+
+/**
+ * The published space pins an exact version, committed, rather than tracking
+ * `latest`. Two reasons: the check then only has something new to say when the
+ * pin moves, and it cannot start failing on its own the moment a release goes
+ * out. `--update` moves the pins, and `pnpm-update` is what runs it — a
+ * version bump arrives as a reviewable diff like any other dependency.
+ *
+ * Returns `undefined` for a package named in `notYetPublished` that the
+ * registry does not have. Any other package the registry does not have is an
+ * error: a package silently dropping out of the check is exactly what this
+ * would otherwise hide.
+ */
+const publishedVersionPin = async (
+  dir: string,
+  packageName: string,
+  updatePins: boolean,
+): Promise<Result<string | undefined, string>> => {
+  const existing = updatePins
+    ? undefined
+    : await readPinnedVersion(dir, packageName);
+
+  if (existing !== undefined) {
+    return Result.ok(existing);
+  }
+
+  const latest = await $(`npm view ${packageName} version`, { silent: true });
+
+  if (Result.isOk(latest)) {
+    return Result.ok(latest.value.stdout.trim());
+  }
+
+  // A network fault, a registry outage or an auth error is reported as-is:
+  // reading those as "not published" would drop packages from the check at
+  // exactly the moment it cannot be trusted.
+  if (!npmSaysNotFound(latest.value.message)) {
+    return Result.err(
+      `Could not look up the published version of ${packageName}: ${latest.value.message}`,
+    );
+  }
+
+  return notYetPublished.has(packageName)
+    ? Result.ok(undefined)
+    : Result.err(
+        `${packageName} is not on the registry. If it is waiting for its first manual publish, add it to \`notYetPublished\` in this file; otherwise it has been renamed or unpublished.`,
+      );
+};
+
+/**
+ * A package that publishes types only is checked by compiling against it
+ * rather than importing it — there is nothing to import. Its check is written
+ * as `.mts`, and the presence of that file is what selects the mode.
+ */
+const smokeFileName = (packageName: string): string =>
+  isTypesOnly(packageName)
+    ? (`${packageName}.mts` as const)
+    : (`${packageName}.mjs` as const);
+
+/**
+ * The strict standard library packages all share one check, because they only
+ * differ by the TypeScript minor they were generated from — and what is being
+ * verified is the same for each: that the published tarball's `libs/` layout
+ * is what `libReplacement` asks for.
+ */
+const smokeSourceName = (packageName: string): string =>
+  isStrictLibPackage(packageName)
+    ? 'strict-ts-lib.mts'
+    : smokeFileName(packageName);
+
+/**
+ * The `compilerOptions` a strict standard library package's own README tells
+ * a consumer to write beside the linker. Nothing for a package that is not
+ * one.
+ *
+ * Every version resolves `@typescript/lib-*` by name, which is what the
+ * linker the package ships answers; `libReplacement` stops defaulting to on at
+ * TypeScript 6, and is not a known option at all before 5.8, so it is set only
+ * where it is both valid and needed. TypeScript 7 also reads `paths` for a lib
+ * replacement, which its README offers as a second route — see
+ * `hasPathsRoute`.
+ */
+const strictLibCompilerOptions = (
+  packageName: string,
+): ReadonlyRecord<string, JsonValue> => {
+  const major = strictLibTypeScriptMajor(packageName);
+
+  if (major === undefined) {
+    return {};
+  }
+
+  return {
+    // What is under test is the standard library. Without this, tsc walks up
+    // out of the space and finds the repository's own `@types/*`, and with
+    // `skipLibCheck: false` a modern `@types/node` against an old TypeScript
+    // buries the check in `TS2451: Cannot redeclare block-scoped variable`.
+    types: [],
+    ...(major >= 6 ? { libReplacement: true } : {}),
+  };
+};
+
+/** The `tsconfig.json` a types-only package is compiled through. */
+const smokeTsconfig = (
+  packageName: string,
+  extra: ReadonlyRecord<string, JsonValue> = {},
+): ReadonlyRecord<string, JsonValue> =>
+  ({
+    compilerOptions: {
+      strict: true,
+      noUncheckedIndexedAccess: true,
+      target: 'ESNext',
+      module: 'NodeNext',
+      moduleResolution: 'nodenext',
+      noEmit: true,
+      skipLibCheck: false,
+      // What the strict library check exists to verify: that the recipe in the
+      // package's own README is enough for TypeScript to replace its own
+      // declarations. Which recipe that is depends on the version — see
+      // `strictLibCompilerOptions`.
+      ...strictLibCompilerOptions(packageName),
+      ...extra,
+    },
+    include: [smokeFileName(packageName)],
+  }) as const;
+
+/**
+ * The TypeScript a package is compiled against. A strict standard library
+ * replaces the declarations of one TypeScript minor and says so in its peer
+ * range, so checking it against anything else checks nothing: TypeScript 7
+ * rejects `strict-ts-lib-v5.6` outright, because `lib.es2022.sharedmemory`
+ * — which those declarations reference — no longer exists upstream.
+ */
+const typescriptSpec = (pkg: PackageToCheck): string => {
+  const { manifest } = pkg;
+
+  const peers = isRecord(manifest) ? manifest['peerDependencies'] : undefined;
+
+  const declared = isRecord(peers) ? peers['typescript'] : undefined;
+
+  return isString(declared) ? declared : 'latest';
+};
+
+/**
+ * The packages whose README also offers `paths` instead of the linker: those
+ * for TypeScript 7, the first version to read `paths` for a lib replacement.
+ * Their project carries a second config, {@link PATHS_TSCONFIG}, compiled
+ * before anything is linked so that it proves `paths` alone is enough.
+ */
+const hasPathsRoute = (packageName: string): boolean => {
+  const major = strictLibTypeScriptMajor(packageName);
+
+  return major !== undefined && major >= 7;
+};
+
+const writeFile = async (file: string, content: string): Promise<void> => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  await fs.writeFile(file, content);
+};
+
+const writeJson = async (file: string, value: unknown): Promise<void> => {
+  await writeFile(file, `${JSON.stringify(value, undefined, 2)}\n`);
+};
 
 /**
  * Writes the space: one project per package, each depending only on that
@@ -507,197 +916,6 @@ const generateSpace = async (
 };
 
 /**
- * Each project is its own workspace root, so that nothing another project
- * installed can reach it — see `installProjects`.
- */
-const projectWorkspaceYaml = (
-  target: Target,
-  dir: string,
-  packages: readonly PackageToCheck[],
-): string =>
-  [
-    '# Without this, pnpm fills `node_modules/.pnpm/node_modules` and puts it',
-    '# on the resolution path, so a package that forgot to declare a',
-    '# dependency still finds it as long as something else depends on it —',
-    '# which is exactly the fault these checks look for.',
-    'hoist: false',
-    '',
-    '# What is under test is the packages, not whether someone else\u{2019}s',
-    '# postinstall script is on pnpm\u{2019}s allow list.',
-    'strictDepBuilds: false',
-    '',
-    '# The repository holds new releases back for a week. Here that would',
-    '# mean "published" quietly meaning "published a week ago".',
-    'minimumReleaseAge: 0',
-    '',
-    ...(target === 'local' ? siblingOverrides(dir, packages) : []),
-  ].join('\n');
-
-/**
- * The peer dependencies the package under check declares, written into the
- * project as ordinary dependencies — which is what a consumer has to do with
- * a peer anyway.
- *
- * They used to be left out, on the reasoning that pnpm installs a peer from
- * the range the *installed* package declares, so the published space would
- * exercise the published range without this file having to know it. pnpm 12
- * resolves a peer at the importer in more cases, and an importer that
- * declares nothing gets nothing: measured on this space, every ESLint plugin
- * `eslint-config-typed` pulls in lost its `eslint` peer, and
- * `eslint-plugin-unicorn` then found the monorepo's copy — outside the space,
- * which is the one thing `isolate.mjs` exists to catch.
- *
- * The range is still the package's own, so what is exercised is unchanged.
- * Where it comes from differs by space, for the same reason the version pin
- * does:
- *
- * - `local` reads this checkout, which is what the tarball was packed from.
- * - `published` reads what is committed here, and looks the pinned version's
- *   manifest up on the registry only when `--update` moves the pins. A
- *   published version's manifest never changes, so the committed answer stays
- *   right, and the check does not spend thirty-two registry round trips on
- *   every run to be told what it already knows.
- *
- * An optional peer is left out. It is optional because a consumer may not
- * have it, and a consumer who does not is the case worth checking.
- */
-const peerSpecs = async (
-  target: Target,
-  dir: string,
-  pkg: PackageToCheck,
-  spec: string,
-  updatePins: boolean,
-): Promise<Result<ReadonlyRecord<string, string>, string>> => {
-  if (target === 'local') {
-    return Result.ok(declaredPeers(pkg.manifest));
-  }
-
-  const committed = updatePins ? undefined : await readCommittedPeers(dir, pkg);
-
-  if (committed !== undefined) {
-    return Result.ok(committed);
-  }
-
-  // The whole manifest rather than the two fields by name: `npm view` given
-  // several fields prints them keyed by field name only when more than one of
-  // them exists, and prints the value bare otherwise — so asking for
-  // `peerDependencies peerDependenciesMeta` returns two different shapes
-  // depending on whether the package happens to have optional peers.
-  const manifest = await $(`npm view ${pkg.name}@${spec} --json`, {
-    silent: true,
-  });
-
-  if (Result.isErr(manifest)) {
-    return Result.err(
-      `Could not look up the peer dependencies of ${pkg.name}@${spec}: ${manifest.value.message}`,
-    );
-  }
-
-  const parsed = Json.parse(manifest.value.stdout);
-
-  return Result.isErr(parsed) || !isRecord(parsed.value)
-    ? Result.err(`Could not read the manifest of ${pkg.name}@${spec}.`)
-    : Result.ok(declaredPeers(parsed.value));
-};
-
-/** The non-optional `peerDependencies` of a manifest, as plain specs. */
-const declaredPeers = (manifest: JsonValue): ReadonlyRecord<string, string> => {
-  const peers = isRecord(manifest) ? manifest['peerDependencies'] : undefined;
-
-  const meta = isRecord(manifest)
-    ? manifest['peerDependenciesMeta']
-    : undefined;
-
-  if (!isRecord(peers)) {
-    return {};
-  }
-
-  const isOptional = (name: string): boolean => {
-    if (!isRecord(meta)) {
-      return false;
-    }
-
-    const entry = meta[name];
-
-    return isRecord(entry) && entry['optional'] === true;
-  };
-
-  return Obj.filterMap(peers, (range, name) =>
-    isString(range) && !isOptional(name) ? Optional.some(range) : Optional.none,
-  );
-};
-
-/**
- * What the last generation wrote, read back the way `readPinnedVersion` reads
- * the pin: everything in the project's `dependencies` except the package
- * itself and the `typescript` a types-only check compiles against.
- */
-const readCommittedPeers = async (
-  dir: string,
-  pkg: PackageToCheck,
-): Promise<ReadonlyRecord<string, string> | undefined> => {
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  const raw = await fs
-    .readFile(path.resolve(dir, 'package.json'), 'utf8')
-    .catch(() => undefined);
-
-  if (raw === undefined) {
-    return undefined;
-  }
-
-  const parsed = Json.parse(raw);
-
-  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
-    return undefined;
-  }
-
-  const deps = parsed.value['dependencies'];
-
-  if (!isRecord(deps)) {
-    return undefined;
-  }
-
-  return Obj.filterMap(deps, (spec, name) =>
-    name !== pkg.name &&
-    !(name === 'typescript' && isTypesOnly(pkg.name)) &&
-    isString(spec)
-      ? Optional.some(spec)
-      : Optional.none,
-  );
-};
-
-/**
- * The packages in this repository depend on each other, and `pnpm pack`
- * resolves `workspace:^` to the version in the checkout — so the tarball of
- * `github-settings-as-code` asks for `octokit-safe-types@^1.2.26` while npm
- * still has 1.2.25. Nearly every package here has a dependent, so without
- * these overrides a `chore: version packages` branch fails to install at all
- * — `ERR_PNPM_NO_MATCHING_VERSION`, until the release it exists to make goes
- * out.
- *
- * Off a version branch the range did resolve, but to the sibling on npm,
- * which is the older one. The `local` space is meant to be what the next
- * release will be, and the packages in it are released together, so the
- * sibling it installs should come from this checkout either way. That the
- * declared range matches what is published is the `published` space's
- * question, not this one's.
- */
-const siblingOverrides = (
-  dir: string,
-  packages: readonly PackageToCheck[],
-): readonly string[] =>
-  [
-    '# Depend on the sibling packed from this checkout, not the older one on',
-    '# npm — on a version branch the bumped version is not published at all.',
-    'overrides:',
-    ...packages.map(
-      (pkg) =>
-        `  '${pkg.name}': 'file:${path.relative(dir, path.resolve(tarballDir, `${pkg.name}.tgz`))}'`,
-    ),
-    '',
-  ] as const;
-
-/**
  * Packages that are in the workspace but not on npm yet, and so are left out
  * of the published space.
  *
@@ -723,220 +941,17 @@ const siblingOverrides = (
  */
 const notYetPublished: ReadonlySet<string> = new Set<string>();
 
-/**
- * The published space pins an exact version, committed, rather than tracking
- * `latest`. Two reasons: the check then only has something new to say when the
- * pin moves, and it cannot start failing on its own the moment a release goes
- * out. `--update` moves the pins, and `pnpm-update` is what runs it — a
- * version bump arrives as a reviewable diff like any other dependency.
- *
- * Returns `undefined` for a package named in `notYetPublished` that the
- * registry does not have. Any other package the registry does not have is an
- * error: a package silently dropping out of the check is exactly what this
- * would otherwise hide.
- */
-const publishedVersionPin = async (
-  dir: string,
-  packageName: string,
-  updatePins: boolean,
-): Promise<Result<string | undefined, string>> => {
-  const existing = updatePins
-    ? undefined
-    : await readPinnedVersion(dir, packageName);
-
-  if (existing !== undefined) {
-    return Result.ok(existing);
-  }
-
-  const latest = await $(`npm view ${packageName} version`, { silent: true });
-
-  if (Result.isOk(latest)) {
-    return Result.ok(latest.value.stdout.trim());
-  }
-
-  // A network fault, a registry outage or an auth error is reported as-is:
-  // reading those as "not published" would drop packages from the check at
-  // exactly the moment it cannot be trusted.
-  if (!npmSaysNotFound(latest.value.message)) {
-    return Result.err(
-      `Could not look up the published version of ${packageName}: ${latest.value.message}`,
-    );
-  }
-
-  return notYetPublished.has(packageName)
-    ? Result.ok(undefined)
-    : Result.err(
-        `${packageName} is not on the registry. If it is waiting for its first manual publish, add it to \`notYetPublished\` in this file; otherwise it has been renamed or unpublished.`,
-      );
-};
-
-/**
- * npm reports an unknown package as `E404`, on stderr, which `exec` folds into
- * the error's message. Matched on the code rather than on the prose so that a
- * reworded message does not turn a missing package into a hard failure — and
- * narrowly enough that a 404 from somewhere else in the output does not read
- * as one.
- */
-const npmSaysNotFound = (message: string): boolean =>
-  message.includes('E404') || message.includes('is not in this registry');
-
-const readPinnedVersion = async (
-  dir: string,
-  packageName: string,
-): Promise<string | undefined> => {
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  const raw = await fs
-    .readFile(path.resolve(dir, 'package.json'), 'utf8')
-    .catch(() => undefined);
-
-  if (raw === undefined) {
-    return undefined;
-  }
-
-  const parsed = Json.parse(raw);
-
-  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
-    return undefined;
-  }
-
-  const deps = parsed.value['dependencies'];
-
-  if (!isRecord(deps)) {
-    return undefined;
-  }
-
-  const pinned = deps[packageName];
-
-  return isString(pinned) ? pinned : undefined;
-};
-
-/**
- * A package that publishes types only is checked by compiling against it
- * rather than importing it — there is nothing to import. Its check is written
- * as `.mts`, and the presence of that file is what selects the mode.
- */
-const smokeFileName = (packageName: string): string =>
-  isTypesOnly(packageName)
-    ? (`${packageName}.mts` as const)
-    : (`${packageName}.mjs` as const);
-
-/**
- * The strict standard library packages all share one check, because they only
- * differ by the TypeScript minor they were generated from — and what is being
- * verified is the same for each: that the published tarball's `libs/` layout
- * is what `libReplacement` asks for.
- */
-const smokeSourceName = (packageName: string): string =>
-  isStrictLibPackage(packageName)
-    ? 'strict-ts-lib.mts'
-    : smokeFileName(packageName);
-
-/** The `tsconfig.json` a types-only package is compiled through. */
-const smokeTsconfig = (
-  packageName: string,
-  extra: ReadonlyRecord<string, JsonValue> = {},
-): ReadonlyRecord<string, JsonValue> =>
-  ({
-    compilerOptions: {
-      strict: true,
-      noUncheckedIndexedAccess: true,
-      target: 'ESNext',
-      module: 'NodeNext',
-      moduleResolution: 'nodenext',
-      noEmit: true,
-      skipLibCheck: false,
-      // What the strict library check exists to verify: that the recipe in the
-      // package's own README is enough for TypeScript to replace its own
-      // declarations. Which recipe that is depends on the version — see
-      // `strictLibCompilerOptions`.
-      ...strictLibCompilerOptions(packageName),
-      ...extra,
-    },
-    include: [smokeFileName(packageName)],
-  }) as const;
-
-const isTypesOnly = (packageName: string): boolean =>
-  typesOnlyPackages.has(packageName) || isStrictLibPackage(packageName);
-
 const typesOnlyPackages: ReadonlySet<string> = new Set<string>([
   'ts-type-forge',
 ]);
 
-/**
- * The TypeScript a package is compiled against. A strict standard library
- * replaces the declarations of one TypeScript minor and says so in its peer
- * range, so checking it against anything else checks nothing: TypeScript 7
- * rejects `strict-ts-lib-v5.6` outright, because `lib.es2022.sharedmemory`
- * — which those declarations reference — no longer exists upstream.
- */
-const typescriptSpec = (pkg: PackageToCheck): string => {
-  const { manifest } = pkg;
-
-  const peers = isRecord(manifest) ? manifest['peerDependencies'] : undefined;
-
-  const declared = isRecord(peers) ? peers['typescript'] : undefined;
-
-  return isString(declared) ? declared : 'latest';
-};
-
-/**
- * The `compilerOptions` a strict standard library package's own README tells
- * a consumer to write beside the linker. Nothing for a package that is not
- * one.
- *
- * Every version resolves `@typescript/lib-*` by name, which is what the
- * linker the package ships answers; `libReplacement` stops defaulting to on at
- * TypeScript 6, and is not a known option at all before 5.8, so it is set only
- * where it is both valid and needed. TypeScript 7 also reads `paths` for a lib
- * replacement, which its README offers as a second route — see
- * `hasPathsRoute`.
- */
-const strictLibCompilerOptions = (
-  packageName: string,
-): ReadonlyRecord<string, JsonValue> => {
-  const major = strictLibTypeScriptMajor(packageName);
-
-  if (major === undefined) {
-    return {};
-  }
-
-  return {
-    // What is under test is the standard library. Without this, tsc walks up
-    // out of the space and finds the repository's own `@types/*`, and with
-    // `skipLibCheck: false` a modern `@types/node` against an old TypeScript
-    // buries the check in `TS2451: Cannot redeclare block-scoped variable`.
-    types: [],
-    ...(major >= 6 ? { libReplacement: true } : {}),
-  };
-};
-
-/**
- * The packages whose README also offers `paths` instead of the linker: those
- * for TypeScript 7, the first version to read `paths` for a lib replacement.
- * Their project carries a second config, {@link PATHS_TSCONFIG}, compiled
- * before anything is linked so that it proves `paths` alone is enough.
- */
-const hasPathsRoute = (packageName: string): boolean => {
-  const major = strictLibTypeScriptMajor(packageName);
-
-  return major !== undefined && major >= 7;
-};
-
 const PATHS_TSCONFIG = 'tsconfig.paths.json';
 
-const isStrictLibPackage = (packageName: string): boolean =>
-  strictLibTypeScriptMajor(packageName) !== undefined;
-
-/** `strict-ts-lib-v7.0` and its eleven siblings, one per TypeScript minor. */
-const strictLibTypeScriptMajor = (packageName: string): number | undefined => {
-  const matched = /^strict-ts-lib-v(\d+)\.\d+$/u.exec(packageName);
-
-  const major = matched?.[1];
-
-  return major === undefined
-    ? undefined
-    : Result.unwrapOkOr(Num.safeParseInt(major), undefined);
-};
+const indent = (text: string): string =>
+  text
+    .split('\n')
+    .map((line) => `      ${line}`)
+    .join('\n');
 
 const runChecks = async (
   spaceDir: string,
@@ -1008,21 +1023,6 @@ const runChecks = async (
         `${mut_failures.length} package(s) failed: ${mut_failures.join(', ')}`,
       )
     : Result.ok(undefined);
-};
-
-const indent = (text: string): string =>
-  text
-    .split('\n')
-    .map((line) => `      ${line}`)
-    .join('\n');
-
-const writeJson = async (file: string, value: unknown): Promise<void> => {
-  await writeFile(file, `${JSON.stringify(value, undefined, 2)}\n`);
-};
-
-const writeFile = async (file: string, content: string): Promise<void> => {
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(file, content);
 };
 
 const readPublishablePackages = async (): Promise<

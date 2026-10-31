@@ -14,14 +14,6 @@ import type {
 } from '../../spring-demo/index.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, SPRING_FACTOR, lerp } from './shared.mjs';
 
-const springOperator = (
-  startPos: Point,
-): WithInitialValueOperator<Point, Point> =>
-  scan(
-    (acc: Point, target: Point) => lerp(acc, target, SPRING_FACTOR),
-    startPos,
-  );
-
 export const createSynStateThroughputAdapter = (): SpringAdapter => {
   let mut_mousePos: ReturnType<typeof source<Point>> | undefined;
 
@@ -80,3 +72,11 @@ export const createSynStateThroughputAdapter = (): SpringAdapter => {
     },
   };
 };
+
+const springOperator = (
+  startPos: Point,
+): WithInitialValueOperator<Point, Point> =>
+  scan(
+    (acc: Point, target: Point) => lerp(acc, target, SPRING_FACTOR),
+    startPos,
+  );

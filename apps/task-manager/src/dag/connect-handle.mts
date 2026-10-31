@@ -101,25 +101,6 @@ export type ConnectHandle = Readonly<{ id: GraphNodeId; at: Point }>;
 /** How far from an outline counts as near it, outside the node and in. */
 export type ConnectReach = Readonly<{ outside: number; inside: number }>;
 
-/** The point of `outline` nearest `point`, and how far that is. */
-const nearestOnOutline = (
-  outline: readonly Point[],
-  point: Point,
-): Readonly<{ at: Point; distance: number }> =>
-  outline
-    .map((corner, index) =>
-      nearestOnSegment(
-        corner,
-        outline[(index + 1) % outline.length] ?? corner,
-        point,
-      ),
-    )
-    .reduce(
-      (best, candidate) =>
-        candidate.distance < best.distance ? candidate : best,
-      { at: point, distance: Number.POSITIVE_INFINITY },
-    );
-
 const nearestOnSegment = (
   from: Point,
   to: Point,
@@ -147,6 +128,25 @@ const nearestOnSegment = (
 
   return { at, distance: Math.hypot(point.x - at.x, point.y - at.y) };
 };
+
+/** The point of `outline` nearest `point`, and how far that is. */
+const nearestOnOutline = (
+  outline: readonly Point[],
+  point: Point,
+): Readonly<{ at: Point; distance: number }> =>
+  outline
+    .map((corner, index) =>
+      nearestOnSegment(
+        corner,
+        outline[(index + 1) % outline.length] ?? corner,
+        point,
+      ),
+    )
+    .reduce(
+      (best, candidate) =>
+        candidate.distance < best.distance ? candidate : best,
+      { at: point, distance: Number.POSITIVE_INFINITY },
+    );
 
 /** Whether `point` is inside `polygon`, by the even-odd rule. */
 const isInside = (polygon: readonly Point[], point: Point): boolean =>

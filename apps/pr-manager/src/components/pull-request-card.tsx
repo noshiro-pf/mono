@@ -213,6 +213,9 @@ export const PullRequestCard = ({ entry, scaleMax }: Props): JSX.Element => (
   </article>
 );
 
+const numbers = (list: readonly number[]): string =>
+  list.map((number) => `#${number}`).join(', ');
+
 /**
  * What the issues it closes add to its merge order, in a line: the pull
  * requests it now waits for, and the issues named that nobody has started.
@@ -229,6 +232,3 @@ const inheritedOrderText = ({
       ? [`${numbers(notStartedIssues)} (issue) not done`]
       : []),
   ].join(' · ');
-
-const numbers = (list: readonly number[]): string =>
-  list.map((number) => `#${number}`).join(', ');

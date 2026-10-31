@@ -6,9 +6,6 @@ import type {
 import { isVariable } from '../../is-variable.mjs';
 import { isNumber } from './is-number.mjs';
 
-const counter = (t: NumberTermBody<Variable, Variable>): number =>
-  isVariable(t) ? 0 : 1 + counter(t[1]);
-
 export const toNumber = (term: LambdaTerm): number | undefined => {
   if (!isNumber(term)) {
     return undefined;
@@ -20,3 +17,6 @@ export const toNumber = (term: LambdaTerm): number | undefined => {
 
   return counter(body);
 };
+
+const counter = (t: NumberTermBody<Variable, Variable>): number =>
+  isVariable(t) ? 0 : 1 + counter(t[1]);

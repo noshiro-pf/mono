@@ -11,11 +11,6 @@ import {
 } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 
-const isIntegerLiteral = (node: DeepReadonly<TSESTree.Expression>): boolean =>
-  node.type === AST_NODE_TYPES.Literal &&
-  typeof node.value === 'number' &&
-  Number.isInteger(node.value);
-
 /**
  * Whether `node` is an array or a tuple at every layer of type wrappers (see
  * {@link typeWrapperLayers}): a cast does not make a string an array, and the
@@ -134,12 +129,6 @@ export const isSameArrayText = (
   sourceCode.getText(skipTypeWrappers(a)) ===
   sourceCode.getText(skipTypeWrappers(b));
 
-type LengthComparison = Readonly<{
-  array: TSESTree.Expression;
-  bound: TSESTree.Expression;
-  kind: 'max' | 'min';
-}>;
-
 /**
  * Parses a `<array>.length <op> <bound>` comparison (in either operand order)
  * into its array expression, integer-literal/`const` `bound`, and whether it is
@@ -243,6 +232,17 @@ export const isPartOfBoundedLengthCheck = (
     isSameArrayText(self.array, other.array, sourceCode)
   );
 };
+
+const isIntegerLiteral = (node: DeepReadonly<TSESTree.Expression>): boolean =>
+  node.type === AST_NODE_TYPES.Literal &&
+  typeof node.value === 'number' &&
+  Number.isInteger(node.value);
+
+type LengthComparison = Readonly<{
+  array: TSESTree.Expression;
+  bound: TSESTree.Expression;
+  kind: 'max' | 'min';
+}>;
 
 /** The outermost of the type wrappers around `node`, or `node` itself. */
 const outermostTypeWrapper = (

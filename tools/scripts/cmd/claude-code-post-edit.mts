@@ -145,14 +145,6 @@ const SKIPPED_SEGMENTS: ReadonlySet<string> = new Set<string>([
 
 const LINTED_FILE = /\.(?:ts|mts|cts|tsx|js|mjs|cjs|jsx)$/u;
 
-/** The nearest directory holding `pnpm-workspace.yaml`. */
-const findRepositoryRoot = (start: string): string | undefined =>
-  findUp(start, (dir) => exists(path.join(dir, 'pnpm-workspace.yaml')));
-
-/** The nearest directory below the root holding a `package.json`. */
-const findPackageDir = (root: string, start: string): string | undefined =>
-  findUp(start, (dir) => exists(path.join(dir, 'package.json')), root);
-
 const findUp = (
   dir: string,
   found: (candidate: string) => boolean,
@@ -171,18 +163,16 @@ const findUp = (
   return parent === dir ? undefined : findUp(parent, found, stopAt);
 };
 
-/** Whether the package's own lint runs oxlint, so its verdict is the package's. */
-const lintsWithOxlint = (packageDir: string): boolean => {
-  const manifest = parseJson(
-    readText(path.join(packageDir, 'package.json')) ?? '',
-  );
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- paths derived from the edited file.
+const exists = (file: string): boolean => fs.existsSync(file);
 
-  const scripts = isObject(manifest) ? manifest['scripts'] : undefined;
+/** The nearest directory holding `pnpm-workspace.yaml`. */
+const findRepositoryRoot = (start: string): string | undefined =>
+  findUp(start, (dir) => exists(path.join(dir, 'pnpm-workspace.yaml')));
 
-  const lint = isObject(scripts) ? scripts['check:lint'] : undefined;
-
-  return typeof lint === 'string' && lint.includes('oxlint');
-};
+/** The nearest directory below the root holding a `package.json`. */
+const findPackageDir = (root: string, start: string): string | undefined =>
+  findUp(start, (dir) => exists(path.join(dir, 'package.json')), root);
 
 const parseJson = (text: string): unknown => {
   try {
@@ -201,12 +191,22 @@ const readText = (file: string): string | undefined => {
   }
 };
 
-// eslint-disable-next-line security/detect-non-literal-fs-filename -- paths derived from the edited file.
-const exists = (file: string): boolean => fs.existsSync(file);
-
 const isObject = (value: unknown): value is UnknownRecord =>
   // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- ts-data-forge may not be installed when this runs (see the header).
   typeof value === 'object' && value !== null;
+
+/** Whether the package's own lint runs oxlint, so its verdict is the package's. */
+const lintsWithOxlint = (packageDir: string): boolean => {
+  const manifest = parseJson(
+    readText(path.join(packageDir, 'package.json')) ?? '',
+  );
+
+  const scripts = isObject(manifest) ? manifest['scripts'] : undefined;
+
+  const lint = isObject(scripts) ? scripts['check:lint'] : undefined;
+
+  return typeof lint === 'string' && lint.includes('oxlint');
+};
 
 /**
  * `isDirectlyExecuted` from `ts-repo-utils`, inlined: this runs with `node`

@@ -280,25 +280,6 @@ const EPSILON = 1e-6;
 const isAlong = (from: AxisPoint, to: AxisPoint | undefined): boolean =>
   to !== undefined && Math.abs(from.cross - to.cross) < EPSILON;
 
-/**
- * The stretches that share a line with one another, or run closer to it
- * than {@link LANE_GAP}, each set in no order: on one axis, each overlapping
- * another, of two paths or more.
- */
-const bundlesOf = (
-  stretches: readonly Stretch[],
-): readonly (readonly Stretch[])[] =>
-  [true, false]
-    .flatMap((along) =>
-      bandsOf(
-        stretches
-          .filter((stretch) => stretch.along === along)
-          .toSorted((a, b) => firstNonZero(a.level - b.level, a.low - b.low)),
-      ),
-    )
-    .flatMap(overlapping)
-    .filter((bundle) => Arr.uniq(bundle.map(({ path }) => path)).length > 1);
-
 /** `sorted`, by level, cut where two levels are {@link LANE_GAP} apart. */
 const bandsOf = (
   sorted: readonly Stretch[],
@@ -323,6 +304,10 @@ const bandsOf = (
 
   return mut_bands;
 };
+
+/** The first of `differences` that is not 0, for an order by several keys. */
+const firstNonZero = (...differences: readonly number[]): number =>
+  differences.find((difference) => difference !== 0) ?? 0;
 
 /** `band` cut where no stretch of it overlaps the next along the line. */
 const overlapping = (
@@ -350,6 +335,45 @@ const overlapping = (
 
   return mut_runs;
 };
+
+/**
+ * The stretches that share a line with one another, or run closer to it
+ * than {@link LANE_GAP}, each set in no order: on one axis, each overlapping
+ * another, of two paths or more.
+ */
+const bundlesOf = (
+  stretches: readonly Stretch[],
+): readonly (readonly Stretch[])[] =>
+  [true, false]
+    .flatMap((along) =>
+      bandsOf(
+        stretches
+          .filter((stretch) => stretch.along === along)
+          .toSorted((a, b) => firstNonZero(a.level - b.level, a.low - b.low)),
+      ),
+    )
+    .flatMap(overlapping)
+    .filter((bundle) => Arr.uniq(bundle.map(({ path }) => path)).length > 1);
+
+/**
+ * Where a stretch goes among the others of its line, lowest first. One that
+ * turns off to the low side goes below one that turns off to the high side;
+ * of two that turn off to the same side at the same end, the one that turns
+ * further out goes further from that side, round the other's turn rather
+ * than across it.
+ */
+const laneKey = (stretch: Stretch, low: number, high: number): number => {
+  const span = high - low + 1;
+
+  const atLow = stretch.lowSide * (span + (stretch.low - low));
+
+  const atHigh = stretch.highSide * (span + (high - stretch.high));
+
+  return atLow + atHigh;
+};
+
+const compareIds = (a: string, b: string): number =>
+  a < b ? -1 : a > b ? 1 : 0;
 
 /**
  * How far each stretch of `bundle` moves across its line: side by side, in
@@ -440,27 +464,3 @@ const laneShifts = (
 
   return mut_shifts;
 };
-
-/**
- * Where a stretch goes among the others of its line, lowest first. One that
- * turns off to the low side goes below one that turns off to the high side;
- * of two that turn off to the same side at the same end, the one that turns
- * further out goes further from that side, round the other's turn rather
- * than across it.
- */
-const laneKey = (stretch: Stretch, low: number, high: number): number => {
-  const span = high - low + 1;
-
-  const atLow = stretch.lowSide * (span + (stretch.low - low));
-
-  const atHigh = stretch.highSide * (span + (high - stretch.high));
-
-  return atLow + atHigh;
-};
-
-const compareIds = (a: string, b: string): number =>
-  a < b ? -1 : a > b ? 1 : 0;
-
-/** The first of `differences` that is not 0, for an order by several keys. */
-const firstNonZero = (...differences: readonly number[]): number =>
-  differences.find((difference) => difference !== 0) ?? 0;

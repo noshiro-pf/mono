@@ -57,6 +57,72 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
   }),
 } as const;
 
+const isConstAssertion = (
+  node: DeepReadonly<TSESTree.Node> | undefined,
+): node is TSESTree.TSTypeReference => {
+  if (node === undefined) {
+    return false;
+  }
+
+  return (
+    node.type === AST_NODE_TYPES.TSTypeReference &&
+    node.typeName.type === AST_NODE_TYPES.Identifier &&
+    node.typeName.name === 'const'
+  );
+};
+
+const checkNodeForTypeAnnotations = (
+  context: DeepReadonly<TSESLint.RuleContext<MessageIds, []>>,
+  node: DeepReadonly<TSESTree.Node>,
+): void => {
+  if (
+    node.type === AST_NODE_TYPES.TSAsExpression ||
+    node.type === AST_NODE_TYPES.TSTypeAssertion
+  ) {
+    if (!isConstAssertion(node.typeAnnotation)) {
+      context.report({
+        node: castNode(node),
+        messageId: 'disallowUseMemoTypeAnnotation',
+      });
+    }
+
+    return;
+  }
+
+  if (hasKey(node, 'body')) {
+    const nodeWithBody = node;
+
+    if (nodeWithBody.body !== undefined && nodeWithBody.body !== null) {
+      checkNodeForTypeAnnotations(
+        context,
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        nodeWithBody.body as DeepReadonly<TSESTree.Node>,
+      );
+    }
+  }
+
+  if (hasKey(node, 'expression')) {
+    const nodeWithExpression = node;
+
+    checkNodeForTypeAnnotations(
+      context,
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      nodeWithExpression.expression as DeepReadonly<TSESTree.Node>,
+    );
+  }
+
+  if (hasKey(node, 'argument')) {
+    const nodeWithArgument = node;
+
+    checkNodeForTypeAnnotations(
+      context,
+      // FIXME: Enable @typescript-eslint/no-deprecated
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-deprecated
+      nodeWithArgument.argument as DeepReadonly<TSESTree.Node>,
+    );
+  }
+};
+
 /**
  * Reports the type annotations of `useMemo`'s factory: an `as` around it
  * (`(() => x) as () => T`), its return type and the assertions in its body.
@@ -112,70 +178,4 @@ const skipNonAssertingParents = (
     parent.expression === node
     ? skipNonAssertingParents(parent)
     : node;
-};
-
-const checkNodeForTypeAnnotations = (
-  context: DeepReadonly<TSESLint.RuleContext<MessageIds, []>>,
-  node: DeepReadonly<TSESTree.Node>,
-): void => {
-  if (
-    node.type === AST_NODE_TYPES.TSAsExpression ||
-    node.type === AST_NODE_TYPES.TSTypeAssertion
-  ) {
-    if (!isConstAssertion(node.typeAnnotation)) {
-      context.report({
-        node: castNode(node),
-        messageId: 'disallowUseMemoTypeAnnotation',
-      });
-    }
-
-    return;
-  }
-
-  if (hasKey(node, 'body')) {
-    const nodeWithBody = node;
-
-    if (nodeWithBody.body !== undefined && nodeWithBody.body !== null) {
-      checkNodeForTypeAnnotations(
-        context,
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        nodeWithBody.body as DeepReadonly<TSESTree.Node>,
-      );
-    }
-  }
-
-  if (hasKey(node, 'expression')) {
-    const nodeWithExpression = node;
-
-    checkNodeForTypeAnnotations(
-      context,
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      nodeWithExpression.expression as DeepReadonly<TSESTree.Node>,
-    );
-  }
-
-  if (hasKey(node, 'argument')) {
-    const nodeWithArgument = node;
-
-    checkNodeForTypeAnnotations(
-      context,
-      // FIXME: Enable @typescript-eslint/no-deprecated
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-deprecated
-      nodeWithArgument.argument as DeepReadonly<TSESTree.Node>,
-    );
-  }
-};
-
-const isConstAssertion = (
-  node: DeepReadonly<TSESTree.Node> | undefined,
-): node is TSESTree.TSTypeReference => {
-  if (node === undefined) {
-    return false;
-  }
-
-  return (
-    node.type === AST_NODE_TYPES.TSTypeReference &&
-    node.typeName.type === AST_NODE_TYPES.Identifier &&
-    node.typeName.name === 'const'
-  );
 };

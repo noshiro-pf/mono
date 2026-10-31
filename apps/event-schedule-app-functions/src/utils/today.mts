@@ -1,14 +1,6 @@
 import { pipe } from 'ts-data-forge';
 import { DateUtils, type YearMonthDate, type Ymdhm } from 'ts-fortress-types';
 
-const todayDate = (): Date => {
-  const japanLocaleString = DateUtils.today().toLocaleString('ja-JP', {
-    timeZone: 'Asia/Tokyo',
-  });
-
-  return DateUtils.from(japanLocaleString);
-};
-
 export const today = (): YearMonthDate =>
   ({
     year: pipe(todayDate()).map(DateUtils.getLocaleYear).value,
@@ -24,3 +16,11 @@ export const now = (): Ymdhm =>
     hours: pipe(todayDate()).map(DateUtils.getLocaleHours).value,
     minutes: pipe(todayDate()).map(DateUtils.getLocaleMinutes).value,
   }) as const;
+
+const todayDate = (): Date => {
+  const japanLocaleString = DateUtils.today().toLocaleString('ja-JP', {
+    timeZone: 'Asia/Tokyo',
+  });
+
+  return DateUtils.from(japanLocaleString);
+};

@@ -71,177 +71,6 @@ type RebaseTarget = Readonly<{
 }>;
 
 /**
- * Rebases the pull request's branch in a throwaway worktree and
- * force-pushes the result, expecting the remote branch to still be at the
- * head the survey saw. Resolves to the new head, or to `moved` when the
- * branch is no longer where the survey saw it.
- *
- * The worktree is detached, so the checkout this runs from is never touched,
- * and it is removed on the way out of every path: the work inside it is a
- * function of its own, and this one removes the worktree after it returns
- * however it returned. A process killed mid-rebase leaves one behind, which
- * is what the `removeWorktree` before `git worktree add` is for.
- */
-const rebaseAndPush = async (
-  pr: BranchOf,
-  target: RebaseTarget,
-): Promise<Result<Rebased, RebaseFailure>> => {
-  const branch = pr.headRefName;
-
-  const worktreeDir = path.join(os.tmpdir(), 'unblock-prs', `pr-${pr.number}`);
-
-  const rebaseFailed = (detail: string): Result<Rebased, RebaseFailure> =>
-    Result.err({ reason: 'rebase-failed', detail });
-
-  // A previous run may have been interrupted with this worktree in place.
-  await removeWorktree(worktreeDir);
-
-  const fetched = await git(
-    Arr.toUnshifted('git fetch --quiet origin')(
-      Arr.toPushed(target.fetch, branch).map(sh),
-    ).join(' '),
-  );
-
-  if (Result.isErr(fetched)) {
-    return rebaseFailed(`fetch failed: ${fetched.value}`);
-  }
-
-  const remoteHead = await git(`git rev-parse ${sh(`origin/${branch}`)}`);
-
-  if (Result.isErr(remoteHead)) {
-    return rebaseFailed(`cannot resolve origin/${branch}: ${remoteHead.value}`);
-  }
-
-  if (remoteHead.value.trim() !== pr.headRefOid) {
-    return Result.ok({ kind: 'moved' });
-  }
-
-  const added = await git(
-    `git worktree add --detach ${sh(worktreeDir)} ${sh(pr.headRefOid)}`,
-  );
-
-  if (Result.isErr(added)) {
-    return rebaseFailed(`checkout failed: ${added.value}`);
-  }
-
-  const result = await rebaseInWorktree(pr, target, worktreeDir);
-
-  await removeWorktree(worktreeDir);
-
-  return result;
-};
-
-/**
- * The part that happens inside the worktree, so that removing it afterwards
- * is one statement in the caller rather than a `finally`. Every path here
- * resolves to a `Result` — `git` turns a failing command into one — so the
- * caller's next line always runs.
- */
-const rebaseInWorktree = async (
-  pr: BranchOf,
-  target: RebaseTarget,
-  worktreeDir: string,
-): Promise<Result<Rebased, RebaseFailure>> => {
-  const branch = pr.headRefName;
-
-  const rebaseFailed = (
-    detail: string,
-    output?: string,
-  ): Result<Rebased, RebaseFailure> =>
-    Result.err({
-      reason: 'rebase-failed',
-      detail,
-      ...(output === undefined ? {} : { output }),
-    });
-
-  const { upstream } = target;
-
-  const contained =
-    upstream !== undefined &&
-    Result.isOk(
-      await git(
-        `git merge-base --is-ancestor ${sh(upstream.sha)} HEAD`,
-        worktreeDir,
-      ),
-    );
-
-  if (!contained && upstream?.required === true) {
-    return rebaseFailed(
-      `it does not contain ${upstream.sha.slice(0, 10)}, the head it was stacked on, so which commits are its own cannot be told`,
-    );
-  }
-
-  const rebased = await git(
-    contained
-      ? `git rebase --onto ${sh(target.onto)} ${sh(upstream.sha)}`
-      : `git rebase ${sh(target.onto)}`,
-    worktreeDir,
-  );
-
-  if (Result.isErr(rebased)) {
-    const conflicted = await git(
-      'git diff --name-only --diff-filter=U',
-      worktreeDir,
-    );
-
-    await git('git rebase --abort', worktreeDir);
-
-    return rebaseFailed(
-      describeConflict(
-        Result.isOk(conflicted)
-          ? conflicted.value.split('\n').filter((line) => line !== '')
-          : [],
-        lastLines(rebased.value, 5),
-        target.onto,
-      ),
-      rebased.value,
-    );
-  }
-
-  const newHead = await git('git rev-parse HEAD', worktreeDir);
-
-  if (Result.isErr(newHead)) {
-    return rebaseFailed(`cannot read the rebased head: ${newHead.value}`);
-  }
-
-  const sha = newHead.value.trim();
-
-  if (sha === pr.headRefOid) {
-    return Result.ok({ kind: 'rebased', head: sha });
-  }
-
-  const ontoHead = await git(`git rev-parse ${sh(target.onto)}`, worktreeDir);
-
-  if (Result.isOk(ontoHead) && sha === ontoHead.value.trim()) {
-    // The rebase left the branch at what it was rebased onto: every commit
-    // on it had a patch already there, so `git rebase` skipped the lot.
-    // Pushing that would leave a pull request with no commits in it, which
-    // auto-merge will never merge, so leave the branch alone and say what
-    // happened.
-    return Result.err({
-      reason: 'already-in-base',
-      detail: `every commit is already in ${target.onto}; the pull request has nothing left to merge`,
-    });
-  }
-
-  const pushed = await pushLeased(branch, sha, pr.headRefOid, worktreeDir);
-
-  if (Result.isErr(pushed)) {
-    return Result.err({
-      reason: 'push-failed',
-      detail: `push refused: ${lastLines(pushed.value, 5)}`,
-      output: pushed.value,
-    });
-  }
-
-  return Result.ok(
-    pushed.value === 'moved'
-      ? { kind: 'moved' }
-      : { kind: 'rebased', head: sha },
-  );
-};
-
-/**
  * Force-pushes `sha` to `branch`, leased against `lease`: `moved` when the
  * lease lost to someone else's push, an error when the push was refused for
  * any other reason. The worker's rebases and restacks push through here, and
@@ -273,8 +102,6 @@ export const pushLeased = async (
     ? Result.ok('moved')
     : Result.err(pushed.value);
 };
-
-type Rebased = Readonly<{ kind: 'moved' } | { kind: 'rebased'; head: string }>;
 
 /**
  * Brings one pull request as close to merging as this script can: onto the
@@ -566,252 +393,6 @@ export const restackBehind = async (
 };
 
 /**
- * Takes `skip-ci` off, having first asked GitHub whether the pull request
- * still wants it. Removing the label starts a CI matrix, and the survey it
- * was decided on is a rebase old by now.
- */
-const removeSkipCiLabel = async (
-  api: ApiContext,
-  pr: PullRequest,
-  head: string,
-): Promise<Result<'moved' | 'removed', RebaseFailure>> => {
-  const failed = (
-    detail: string,
-    output?: string,
-  ): Result<'moved' | 'removed', RebaseFailure> =>
-    Result.err({
-      reason: 'unlabel-failed',
-      detail,
-      ...(output === undefined ? {} : { output }),
-    });
-
-  const current = await viewPullRequest(api, pr.number);
-
-  if (Result.isErr(current)) {
-    return failed(`cannot re-read it before unlabelling: ${current.value}`);
-  }
-
-  if (current.value.state !== 'OPEN') {
-    return failed(`it is ${current.value.state} now`);
-  }
-
-  if (current.value.headRefOid !== head) {
-    return Result.ok('moved');
-  }
-
-  if (!isSkipCiLabelled(current.value)) {
-    // Someone took the label off in the meantime, which is the thing this was
-    // about to do.
-    return Result.ok('removed');
-  }
-
-  if (!isMergeQueued(current.value)) {
-    return failed(`${MERGE_QUEUED_LABEL} came off while it was rebasing`);
-  }
-
-  const removed = await removeLabel(api, pr.number, SKIP_CI_LABEL);
-
-  return Result.isErr(removed)
-    ? failed(
-        `cannot remove ${SKIP_CI_LABEL}: ${describeCommandFailure(removed.value)}`,
-        removed.value,
-      )
-    : Result.ok('removed');
-};
-
-/**
- * The layer this pull request was stacked on, if GitHub moved it onto the
- * default branch when that layer merged — and so the head below its own
- * commits, if GitHub did not rebase it. Anything that cannot be read is
- * `undefined`, and the rebase falls back to dropping commits by their
- * patches, which a one-commit layer squash-merged unchanged also survives.
- */
-const stackedOnMerged = async (
-  api: ApiContext,
-  pr: PullRequest,
-  defaultBranch: string,
-): Promise<MergedHead | undefined> => {
-  const changes = await readBaseChanges(api, pr.number);
-
-  if (Result.isErr(changes)) {
-    log(
-      `#${pr.number}: cannot read whether it came off a stack; rebasing by patch. (${lastLines(changes.value, 2)})`,
-    );
-
-    return undefined;
-  }
-
-  const from = retargetedFrom(changes.value, defaultBranch);
-
-  if (from === undefined || !isSafeRefName(from)) {
-    return undefined;
-  }
-
-  const merged = await mergedHeadOf(api, from);
-
-  if (Result.isErr(merged)) {
-    log(
-      `#${pr.number}: cannot read what merged from ${from}; rebasing by patch. (${lastLines(merged.value, 2)})`,
-    );
-
-    return undefined;
-  }
-
-  return merged.value;
-};
-
-/**
- * One layer of `restackRetargeted`. Whatever cannot be read or done is said
- * and left: the layer is where GitHub put it, which is where it would be
- * without this.
- */
-const restackOffMerged = async (
-  api: ApiContext,
-  { pr, from }: RetargetedLayer,
-  defaultBranch: string,
-  plan: Readonly<{ dryRun: boolean; descendants: readonly PullRequest[] }>,
-): Promise<'moved' | 'restacked' | 'untouched'> => {
-  const branch = from ?? (await retargetedFromTimeline(api, pr, defaultBranch));
-
-  if (branch === undefined || !isSafeRefName(branch)) {
-    return 'untouched';
-  }
-
-  const merged = await mergedHeadOf(api, branch);
-
-  if (Result.isErr(merged)) {
-    log(
-      `#${pr.number}: cannot read what merged from ${branch}, so not rebasing it off that. (${lastLines(merged.value, 2)})`,
-    );
-
-    return 'untouched';
-  }
-
-  // Nothing merged from that branch: the layer below was closed, or a person
-  // moved this one.
-  if (merged.value === undefined) {
-    return 'untouched';
-  }
-
-  const { number, headSha, mergeCommit } = merged.value;
-
-  const carried = await carries(pr, headSha, [
-    defaultBranch,
-    `refs/pull/${number}/head`,
-  ]);
-
-  if (Result.isErr(carried)) {
-    log(
-      `#${pr.number}: cannot tell whether it still carries #${number}'s commits. (${lastLines(carried.value, 2)})`,
-    );
-
-    return 'untouched';
-  }
-
-  // GitHub rebased it itself, or this already has.
-  if (!carried.value) {
-    return 'untouched';
-  }
-
-  if (mergeCommit === undefined) {
-    log(
-      `#${pr.number}: still carries #${number}'s commits, but GitHub does not say what #${number} merged as; leaving it.`,
-    );
-
-    return 'untouched';
-  }
-
-  if (plan.dryRun) {
-    log(
-      `Would rebase #${pr.number} off #${number}'s commits, onto the squash commit ${mergeCommit.slice(0, 10)}.`,
-    );
-
-    return 'untouched';
-  }
-
-  // `carries` has just fetched everything the rebase needs.
-  const rebased = await rebaseAndPush(pr, {
-    onto: mergeCommit,
-    fetch: [],
-    upstream: { sha: headSha, required: true },
-  });
-
-  if (Result.isErr(rebased)) {
-    log(
-      `#${pr.number}: still carries #${number}'s commits, and cannot be rebased off them — ${rebased.value.detail}`,
-    );
-
-    return 'untouched';
-  }
-
-  if (rebased.value.kind === 'moved') {
-    log(
-      `#${pr.number}: not rebased off #${number}'s commits — its branch moved since the survey, so someone else is moving it.`,
-    );
-
-    return 'moved';
-  }
-
-  const { head } = rebased.value;
-
-  log(
-    `#${pr.number}: came off #${number} still carrying its commits; rebased its own onto #${number}'s squash commit ${mergeCommit.slice(0, 10)}, at ${head.slice(0, 10)}.`,
-  );
-
-  await restack(pr, head, plan.descendants);
-
-  return 'restacked';
-};
-
-/**
- * The branch the pull request's timeline says GitHub moved it off, if it
- * did. A timeline that cannot be read says nothing.
- */
-const retargetedFromTimeline = async (
-  api: ApiContext,
-  pr: PullRequest,
-  defaultBranch: string,
-): Promise<string | undefined> => {
-  const changes = await readBaseChanges(api, pr.number);
-
-  if (Result.isErr(changes)) {
-    log(
-      `#${pr.number}: cannot read whether it came off a stack, so not rebasing it off one. (${lastLines(changes.value, 2)})`,
-    );
-
-    return undefined;
-  }
-
-  return retargetedFrom(changes.value, defaultBranch);
-};
-
-/**
- * Whether the pull request's head, as the survey saw it, contains `sha`,
- * having fetched the branch and `refspecs` to find out.
- */
-const carries = async (
-  pr: PullRequest,
-  sha: string,
-  refspecs: readonly string[],
-): Promise<Result<boolean, string>> => {
-  const fetched = await git(
-    Arr.toUnshifted('git fetch --quiet origin')(
-      Arr.toPushed(refspecs, pr.headRefName).map(sh),
-    ).join(' '),
-  );
-
-  if (Result.isErr(fetched)) {
-    return Result.err(fetched.value);
-  }
-
-  const contained = await git(
-    `git merge-base --is-ancestor ${sh(sha)} ${sh(pr.headRefOid)}`,
-  );
-
-  return Result.ok(Result.isOk(contained));
-};
-
-/**
  * Carries every layer stacked on `pr` along after it moved from its old head
  * to `head`: each is replayed with `--onto` from the head it was on to the
  * one that replaced it, lowest layer first so that each finds its own new
@@ -959,4 +540,423 @@ export const armOnPick = async (
   log(`#${pr.number}: auto-merge armed.`);
 
   return Result.ok('armed');
+};
+
+/**
+ * The part that happens inside the worktree, so that removing it afterwards
+ * is one statement in the caller rather than a `finally`. Every path here
+ * resolves to a `Result` — `git` turns a failing command into one — so the
+ * caller's next line always runs.
+ */
+const rebaseInWorktree = async (
+  pr: BranchOf,
+  target: RebaseTarget,
+  worktreeDir: string,
+): Promise<Result<Rebased, RebaseFailure>> => {
+  const branch = pr.headRefName;
+
+  const rebaseFailed = (
+    detail: string,
+    output?: string,
+  ): Result<Rebased, RebaseFailure> =>
+    Result.err({
+      reason: 'rebase-failed',
+      detail,
+      ...(output === undefined ? {} : { output }),
+    });
+
+  const { upstream } = target;
+
+  const contained =
+    upstream !== undefined &&
+    Result.isOk(
+      await git(
+        `git merge-base --is-ancestor ${sh(upstream.sha)} HEAD`,
+        worktreeDir,
+      ),
+    );
+
+  if (!contained && upstream?.required === true) {
+    return rebaseFailed(
+      `it does not contain ${upstream.sha.slice(0, 10)}, the head it was stacked on, so which commits are its own cannot be told`,
+    );
+  }
+
+  const rebased = await git(
+    contained
+      ? `git rebase --onto ${sh(target.onto)} ${sh(upstream.sha)}`
+      : `git rebase ${sh(target.onto)}`,
+    worktreeDir,
+  );
+
+  if (Result.isErr(rebased)) {
+    const conflicted = await git(
+      'git diff --name-only --diff-filter=U',
+      worktreeDir,
+    );
+
+    await git('git rebase --abort', worktreeDir);
+
+    return rebaseFailed(
+      describeConflict(
+        Result.isOk(conflicted)
+          ? conflicted.value.split('\n').filter((line) => line !== '')
+          : [],
+        lastLines(rebased.value, 5),
+        target.onto,
+      ),
+      rebased.value,
+    );
+  }
+
+  const newHead = await git('git rev-parse HEAD', worktreeDir);
+
+  if (Result.isErr(newHead)) {
+    return rebaseFailed(`cannot read the rebased head: ${newHead.value}`);
+  }
+
+  const sha = newHead.value.trim();
+
+  if (sha === pr.headRefOid) {
+    return Result.ok({ kind: 'rebased', head: sha });
+  }
+
+  const ontoHead = await git(`git rev-parse ${sh(target.onto)}`, worktreeDir);
+
+  if (Result.isOk(ontoHead) && sha === ontoHead.value.trim()) {
+    // The rebase left the branch at what it was rebased onto: every commit
+    // on it had a patch already there, so `git rebase` skipped the lot.
+    // Pushing that would leave a pull request with no commits in it, which
+    // auto-merge will never merge, so leave the branch alone and say what
+    // happened.
+    return Result.err({
+      reason: 'already-in-base',
+      detail: `every commit is already in ${target.onto}; the pull request has nothing left to merge`,
+    });
+  }
+
+  const pushed = await pushLeased(branch, sha, pr.headRefOid, worktreeDir);
+
+  if (Result.isErr(pushed)) {
+    return Result.err({
+      reason: 'push-failed',
+      detail: `push refused: ${lastLines(pushed.value, 5)}`,
+      output: pushed.value,
+    });
+  }
+
+  return Result.ok(
+    pushed.value === 'moved'
+      ? { kind: 'moved' }
+      : { kind: 'rebased', head: sha },
+  );
+};
+
+/**
+ * Rebases the pull request's branch in a throwaway worktree and
+ * force-pushes the result, expecting the remote branch to still be at the
+ * head the survey saw. Resolves to the new head, or to `moved` when the
+ * branch is no longer where the survey saw it.
+ *
+ * The worktree is detached, so the checkout this runs from is never touched,
+ * and it is removed on the way out of every path: the work inside it is a
+ * function of its own, and this one removes the worktree after it returns
+ * however it returned. A process killed mid-rebase leaves one behind, which
+ * is what the `removeWorktree` before `git worktree add` is for.
+ */
+const rebaseAndPush = async (
+  pr: BranchOf,
+  target: RebaseTarget,
+): Promise<Result<Rebased, RebaseFailure>> => {
+  const branch = pr.headRefName;
+
+  const worktreeDir = path.join(os.tmpdir(), 'unblock-prs', `pr-${pr.number}`);
+
+  const rebaseFailed = (detail: string): Result<Rebased, RebaseFailure> =>
+    Result.err({ reason: 'rebase-failed', detail });
+
+  // A previous run may have been interrupted with this worktree in place.
+  await removeWorktree(worktreeDir);
+
+  const fetched = await git(
+    Arr.toUnshifted('git fetch --quiet origin')(
+      Arr.toPushed(target.fetch, branch).map(sh),
+    ).join(' '),
+  );
+
+  if (Result.isErr(fetched)) {
+    return rebaseFailed(`fetch failed: ${fetched.value}`);
+  }
+
+  const remoteHead = await git(`git rev-parse ${sh(`origin/${branch}`)}`);
+
+  if (Result.isErr(remoteHead)) {
+    return rebaseFailed(`cannot resolve origin/${branch}: ${remoteHead.value}`);
+  }
+
+  if (remoteHead.value.trim() !== pr.headRefOid) {
+    return Result.ok({ kind: 'moved' });
+  }
+
+  const added = await git(
+    `git worktree add --detach ${sh(worktreeDir)} ${sh(pr.headRefOid)}`,
+  );
+
+  if (Result.isErr(added)) {
+    return rebaseFailed(`checkout failed: ${added.value}`);
+  }
+
+  const result = await rebaseInWorktree(pr, target, worktreeDir);
+
+  await removeWorktree(worktreeDir);
+
+  return result;
+};
+
+type Rebased = Readonly<{ kind: 'moved' } | { kind: 'rebased'; head: string }>;
+
+/**
+ * Takes `skip-ci` off, having first asked GitHub whether the pull request
+ * still wants it. Removing the label starts a CI matrix, and the survey it
+ * was decided on is a rebase old by now.
+ */
+const removeSkipCiLabel = async (
+  api: ApiContext,
+  pr: PullRequest,
+  head: string,
+): Promise<Result<'moved' | 'removed', RebaseFailure>> => {
+  const failed = (
+    detail: string,
+    output?: string,
+  ): Result<'moved' | 'removed', RebaseFailure> =>
+    Result.err({
+      reason: 'unlabel-failed',
+      detail,
+      ...(output === undefined ? {} : { output }),
+    });
+
+  const current = await viewPullRequest(api, pr.number);
+
+  if (Result.isErr(current)) {
+    return failed(`cannot re-read it before unlabelling: ${current.value}`);
+  }
+
+  if (current.value.state !== 'OPEN') {
+    return failed(`it is ${current.value.state} now`);
+  }
+
+  if (current.value.headRefOid !== head) {
+    return Result.ok('moved');
+  }
+
+  if (!isSkipCiLabelled(current.value)) {
+    // Someone took the label off in the meantime, which is the thing this was
+    // about to do.
+    return Result.ok('removed');
+  }
+
+  if (!isMergeQueued(current.value)) {
+    return failed(`${MERGE_QUEUED_LABEL} came off while it was rebasing`);
+  }
+
+  const removed = await removeLabel(api, pr.number, SKIP_CI_LABEL);
+
+  return Result.isErr(removed)
+    ? failed(
+        `cannot remove ${SKIP_CI_LABEL}: ${describeCommandFailure(removed.value)}`,
+        removed.value,
+      )
+    : Result.ok('removed');
+};
+
+/**
+ * The layer this pull request was stacked on, if GitHub moved it onto the
+ * default branch when that layer merged — and so the head below its own
+ * commits, if GitHub did not rebase it. Anything that cannot be read is
+ * `undefined`, and the rebase falls back to dropping commits by their
+ * patches, which a one-commit layer squash-merged unchanged also survives.
+ */
+const stackedOnMerged = async (
+  api: ApiContext,
+  pr: PullRequest,
+  defaultBranch: string,
+): Promise<MergedHead | undefined> => {
+  const changes = await readBaseChanges(api, pr.number);
+
+  if (Result.isErr(changes)) {
+    log(
+      `#${pr.number}: cannot read whether it came off a stack; rebasing by patch. (${lastLines(changes.value, 2)})`,
+    );
+
+    return undefined;
+  }
+
+  const from = retargetedFrom(changes.value, defaultBranch);
+
+  if (from === undefined || !isSafeRefName(from)) {
+    return undefined;
+  }
+
+  const merged = await mergedHeadOf(api, from);
+
+  if (Result.isErr(merged)) {
+    log(
+      `#${pr.number}: cannot read what merged from ${from}; rebasing by patch. (${lastLines(merged.value, 2)})`,
+    );
+
+    return undefined;
+  }
+
+  return merged.value;
+};
+
+/**
+ * The branch the pull request's timeline says GitHub moved it off, if it
+ * did. A timeline that cannot be read says nothing.
+ */
+const retargetedFromTimeline = async (
+  api: ApiContext,
+  pr: PullRequest,
+  defaultBranch: string,
+): Promise<string | undefined> => {
+  const changes = await readBaseChanges(api, pr.number);
+
+  if (Result.isErr(changes)) {
+    log(
+      `#${pr.number}: cannot read whether it came off a stack, so not rebasing it off one. (${lastLines(changes.value, 2)})`,
+    );
+
+    return undefined;
+  }
+
+  return retargetedFrom(changes.value, defaultBranch);
+};
+
+/**
+ * Whether the pull request's head, as the survey saw it, contains `sha`,
+ * having fetched the branch and `refspecs` to find out.
+ */
+const carries = async (
+  pr: PullRequest,
+  sha: string,
+  refspecs: readonly string[],
+): Promise<Result<boolean, string>> => {
+  const fetched = await git(
+    Arr.toUnshifted('git fetch --quiet origin')(
+      Arr.toPushed(refspecs, pr.headRefName).map(sh),
+    ).join(' '),
+  );
+
+  if (Result.isErr(fetched)) {
+    return Result.err(fetched.value);
+  }
+
+  const contained = await git(
+    `git merge-base --is-ancestor ${sh(sha)} ${sh(pr.headRefOid)}`,
+  );
+
+  return Result.ok(Result.isOk(contained));
+};
+
+/**
+ * One layer of `restackRetargeted`. Whatever cannot be read or done is said
+ * and left: the layer is where GitHub put it, which is where it would be
+ * without this.
+ */
+const restackOffMerged = async (
+  api: ApiContext,
+  { pr, from }: RetargetedLayer,
+  defaultBranch: string,
+  plan: Readonly<{ dryRun: boolean; descendants: readonly PullRequest[] }>,
+): Promise<'moved' | 'restacked' | 'untouched'> => {
+  const branch = from ?? (await retargetedFromTimeline(api, pr, defaultBranch));
+
+  if (branch === undefined || !isSafeRefName(branch)) {
+    return 'untouched';
+  }
+
+  const merged = await mergedHeadOf(api, branch);
+
+  if (Result.isErr(merged)) {
+    log(
+      `#${pr.number}: cannot read what merged from ${branch}, so not rebasing it off that. (${lastLines(merged.value, 2)})`,
+    );
+
+    return 'untouched';
+  }
+
+  // Nothing merged from that branch: the layer below was closed, or a person
+  // moved this one.
+  if (merged.value === undefined) {
+    return 'untouched';
+  }
+
+  const { number, headSha, mergeCommit } = merged.value;
+
+  const carried = await carries(pr, headSha, [
+    defaultBranch,
+    `refs/pull/${number}/head`,
+  ]);
+
+  if (Result.isErr(carried)) {
+    log(
+      `#${pr.number}: cannot tell whether it still carries #${number}'s commits. (${lastLines(carried.value, 2)})`,
+    );
+
+    return 'untouched';
+  }
+
+  // GitHub rebased it itself, or this already has.
+  if (!carried.value) {
+    return 'untouched';
+  }
+
+  if (mergeCommit === undefined) {
+    log(
+      `#${pr.number}: still carries #${number}'s commits, but GitHub does not say what #${number} merged as; leaving it.`,
+    );
+
+    return 'untouched';
+  }
+
+  if (plan.dryRun) {
+    log(
+      `Would rebase #${pr.number} off #${number}'s commits, onto the squash commit ${mergeCommit.slice(0, 10)}.`,
+    );
+
+    return 'untouched';
+  }
+
+  // `carries` has just fetched everything the rebase needs.
+  const rebased = await rebaseAndPush(pr, {
+    onto: mergeCommit,
+    fetch: [],
+    upstream: { sha: headSha, required: true },
+  });
+
+  if (Result.isErr(rebased)) {
+    log(
+      `#${pr.number}: still carries #${number}'s commits, and cannot be rebased off them — ${rebased.value.detail}`,
+    );
+
+    return 'untouched';
+  }
+
+  if (rebased.value.kind === 'moved') {
+    log(
+      `#${pr.number}: not rebased off #${number}'s commits — its branch moved since the survey, so someone else is moving it.`,
+    );
+
+    return 'moved';
+  }
+
+  const { head } = rebased.value;
+
+  log(
+    `#${pr.number}: came off #${number} still carrying its commits; rebased its own onto #${number}'s squash commit ${mergeCommit.slice(0, 10)}, at ${head.slice(0, 10)}.`,
+  );
+
+  await restack(pr, head, plan.descendants);
+
+  return 'restacked';
 };

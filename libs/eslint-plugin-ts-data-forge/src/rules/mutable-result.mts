@@ -74,62 +74,6 @@ const outermostTypePreservingWrapper = (
     : node;
 };
 
-const isUsedAsMutable = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: ts.TypeChecker,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  getTsNode: (esNode: TSESTree.Node) => ts.Node | undefined,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-): boolean => {
-  const parent = node.parent;
-
-  if (
-    parent?.type === AST_NODE_TYPES.MemberExpression &&
-    parent.object === node
-  ) {
-    // xs.push(...), xs.sort(), ...
-    if (
-      !parent.computed &&
-      parent.property.type === AST_NODE_TYPES.Identifier &&
-      mutatingMethods.has(parent.property.name)
-    ) {
-      return true;
-    }
-
-    // xs[0] = ..., xs.length = ..., xs[0]++, delete xs[0]
-    const grandParent = parent.parent;
-
-    return (
-      (grandParent.type === AST_NODE_TYPES.AssignmentExpression &&
-        grandParent.left === parent) ||
-      grandParent.type === AST_NODE_TYPES.UpdateExpression ||
-      (grandParent.type === AST_NODE_TYPES.UnaryExpression &&
-        grandParent.operator === 'delete')
-    );
-  }
-
-  // Passed to a parameter, assigned to a variable, or returned from a function
-  // whose declared type is a mutable array.
-  const tsNode = getTsNode(node);
-
-  if (tsNode === undefined) {
-    return false;
-  }
-
-  if (!ts.isExpression(tsNode)) {
-    return false;
-  }
-
-  const expectedType =
-    getDeclaredParameterType(checker, tsNode) ??
-    checker.getContextualType(tsNode);
-
-  return (
-    expectedType !== undefined && isMutableArrayOnly(checker, expectedType)
-  );
-};
-
 /**
  * The declared type of the parameter `argument` is passed to. The contextual
  * type of an argument to a generic function is instantiated from that very
@@ -187,6 +131,62 @@ const isMutableArrayOnly = (
         (t.flags & primitiveTypeFlags) !== 0 ||
         (checker.isArrayType(t) && t.getSymbol()?.getName() === 'Array'),
     ) && members.some((t) => (t.flags & primitiveTypeFlags) === 0)
+  );
+};
+
+const isUsedAsMutable = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  getTsNode: (esNode: TSESTree.Node) => ts.Node | undefined,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): boolean => {
+  const parent = node.parent;
+
+  if (
+    parent?.type === AST_NODE_TYPES.MemberExpression &&
+    parent.object === node
+  ) {
+    // xs.push(...), xs.sort(), ...
+    if (
+      !parent.computed &&
+      parent.property.type === AST_NODE_TYPES.Identifier &&
+      mutatingMethods.has(parent.property.name)
+    ) {
+      return true;
+    }
+
+    // xs[0] = ..., xs.length = ..., xs[0]++, delete xs[0]
+    const grandParent = parent.parent;
+
+    return (
+      (grandParent.type === AST_NODE_TYPES.AssignmentExpression &&
+        grandParent.left === parent) ||
+      grandParent.type === AST_NODE_TYPES.UpdateExpression ||
+      (grandParent.type === AST_NODE_TYPES.UnaryExpression &&
+        grandParent.operator === 'delete')
+    );
+  }
+
+  // Passed to a parameter, assigned to a variable, or returned from a function
+  // whose declared type is a mutable array.
+  const tsNode = getTsNode(node);
+
+  if (tsNode === undefined) {
+    return false;
+  }
+
+  if (!ts.isExpression(tsNode)) {
+    return false;
+  }
+
+  const expectedType =
+    getDeclaredParameterType(checker, tsNode) ??
+    checker.getContextualType(tsNode);
+
+  return (
+    expectedType !== undefined && isMutableArrayOnly(checker, expectedType)
   );
 };
 

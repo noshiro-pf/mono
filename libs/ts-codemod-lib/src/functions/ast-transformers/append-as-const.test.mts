@@ -8,6 +8,12 @@ import * as prettier from 'prettier/standalone';
 import { appendAsConstTransformer } from './append-as-const.mjs';
 import { transformSourceCode } from './transform-source-code.mjs';
 
+const formatter = (code: string): Promise<string> =>
+  prettier.format(code, {
+    parser: 'typescript',
+    plugins: [prettierPluginTypeScript, prettierPluginEstree],
+  });
+
 const testFn = async ({
   source,
   expected,
@@ -37,12 +43,6 @@ const testFn = async ({
 
   expect(transformed).toBe(expectedFormatted);
 };
-
-const formatter = (code: string): Promise<string> =>
-  prettier.format(code, {
-    parser: 'typescript',
-    plugins: [prettierPluginTypeScript, prettierPluginEstree],
-  });
 
 describe(appendAsConstTransformer, () => {
   describe('Primitive types (should not add as const)', () => {

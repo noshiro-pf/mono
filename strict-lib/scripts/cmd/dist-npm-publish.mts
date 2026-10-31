@@ -187,6 +187,25 @@ const getFlagValue = (
 ): string | undefined =>
   args.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
 
+/**
+ * Whether this exact version is on the registry already.
+ *
+ * `npm view <name>@<version> version` exits non-zero for a package that does
+ * not exist and prints nothing for a version that does not, so both cases read
+ * as "not published" — which is the safe direction: at worst the publish runs
+ * and npm rejects it.
+ */
+const isAlreadyPublished = async (
+  name: string,
+  version: string,
+): Promise<boolean> => {
+  const result = await $(`npm view ${name}@${version} version`, {
+    silent: true,
+  });
+
+  return Result.isOk(result) && result.value.stdout.trim() !== '';
+};
+
 /** Publishes one version's bundles; returns an error message on failure. */
 const publishVersion = async (
   versionName: string,
@@ -269,25 +288,6 @@ const publishVersion = async (
       await fs.rm(destDir, { recursive: true, force: true });
     }
   }
-};
-
-/**
- * Whether this exact version is on the registry already.
- *
- * `npm view <name>@<version> version` exits non-zero for a package that does
- * not exist and prints nothing for a version that does not, so both cases read
- * as "not published" — which is the safe direction: at worst the publish runs
- * and npm rejects it.
- */
-const isAlreadyPublished = async (
-  name: string,
-  version: string,
-): Promise<boolean> => {
-  const result = await $(`npm view ${name}@${version} version`, {
-    silent: true,
-  });
-
-  return Result.isOk(result) && result.value.stdout.trim() !== '';
 };
 
 await main();

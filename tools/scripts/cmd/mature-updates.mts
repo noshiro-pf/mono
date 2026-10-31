@@ -194,110 +194,6 @@ export type RegistryMetadata = Readonly<{
   time: ReadonlyRecord<string, unknown>;
 }>;
 
-const readPnpmRegistryMetadata = (): RegistryMetadata => {
-  const raw: unknown = JSON.parse(
-    pnpmStdout(['view', 'pnpm', 'versions', 'time', '--json']),
-  );
-
-  const metadata = parseRegistryMetadata(raw);
-
-  if (metadata === undefined) {
-    throw new Error(
-      '`pnpm view pnpm versions time --json` did not return { versions: string[], time: object }.',
-    );
-  }
-
-  return metadata;
-};
-
-const parseRegistryMetadata = (raw: unknown): RegistryMetadata | undefined => {
-  if (!isRecord(raw)) {
-    return undefined;
-  }
-
-  const { versions, time } = raw;
-
-  return !isListOfStrings(versions) || !isRecord(time)
-    ? undefined
-    : { versions, time };
-};
-
-// ---------------------------------------------------------------------------
-// `actions`
-// ---------------------------------------------------------------------------
-
-export const updateActionPins = async (
-  options: Readonly<{
-    githubDir?: string;
-    api?: GitHubApi;
-    now?: number;
-  }> = {},
-): Promise<void> => {
-  const githubDir = options.githubDir ?? path.join(process.cwd(), '.github');
-
-  const api = options.api ?? createGitHubApi();
-
-  const now = options.now ?? Temporal.Now.instant().epochMilliseconds;
-
-  const hold = readMinimumReleaseAge();
-
-  const cutoff = now - hold.milliseconds;
-
-  console.log(describeHold(hold, cutoff));
-
-  const pins = readActionPins(githubDir);
-
-  const groups = Object.groupBy(pins, (pin) => `${pin.repo}@${pin.tag}`);
-
-  const mut_updates: ActionPinUpdate[] = [];
-
-  for (const group of Object.values(groups)) {
-    const first = group?.[0];
-
-    if (group === undefined || first === undefined) {
-      continue;
-    }
-
-    const releases = await api.releases(first.repo, first.tag);
-
-    const selection = selectMatureRelease(releases, first.tag, cutoff);
-
-    console.log(describeSelection(first, selection));
-
-    if (selection.target === undefined) {
-      continue;
-    }
-
-    const sha = await api.commitSha(first.repo, selection.target);
-
-    mut_updates.push(
-      ...group.map((pin) => ({ pin, tag: selection.target ?? '', sha })),
-    );
-  }
-
-  for (const [file, fileUpdates] of Object.entries(
-    Object.groupBy(mut_updates, ({ pin }) => pin.file),
-  )) {
-    if (fileUpdates === undefined) {
-      continue;
-    }
-
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- files found by `listPinnedFiles`.
-    const lines = fs.readFileSync(file, 'utf8').split('\n');
-
-    const rewritten = fileUpdates.reduce(
-      (acc, { pin, tag, sha }) =>
-        acc.with(pin.line, renderActionPin({ ...pin, tag, sha })),
-      lines,
-    );
-
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- files found by `listPinnedFiles`.
-    fs.writeFileSync(file, rewritten.join('\n'));
-  }
-
-  console.log(`Moved ${mut_updates.length} action pin(s).`);
-};
-
 /**
  * Among `releases`, the newest on the same line as `currentTag` that is newer
  * than it and was published at or before `cutoff`; the same-line releases the
@@ -428,13 +324,98 @@ export const parseActionPinLine = (
   };
 };
 
-const isRepositorySegment = (segment: string): boolean =>
-  /^[\w.-]+$/u.test(segment);
-
 export const renderActionPin = (
   pin: StrictOmit<ActionPin, 'file' | 'line'>,
 ): string =>
   `${pin.prefix}${pin.repo}${pin.subpath}@${pin.sha} # ${pin.tag}` as const;
+
+export const compareVersions = (a: StableVersion, b: StableVersion): number => {
+  const major = compareDigits(a.major, b.major);
+
+  if (major !== 0) {
+    return major;
+  }
+
+  const minor = compareDigits(a.minor, b.minor);
+
+  return minor !== 0 ? minor : compareDigits(a.patch, b.patch);
+};
+
+// ---------------------------------------------------------------------------
+// `actions`
+// ---------------------------------------------------------------------------
+
+export const updateActionPins = async (
+  options: Readonly<{
+    githubDir?: string;
+    api?: GitHubApi;
+    now?: number;
+  }> = {},
+): Promise<void> => {
+  const githubDir = options.githubDir ?? path.join(process.cwd(), '.github');
+
+  const api = options.api ?? createGitHubApi();
+
+  const now = options.now ?? Temporal.Now.instant().epochMilliseconds;
+
+  const hold = readMinimumReleaseAge();
+
+  const cutoff = now - hold.milliseconds;
+
+  console.log(describeHold(hold, cutoff));
+
+  const pins = readActionPins(githubDir);
+
+  const groups = Object.groupBy(pins, (pin) => `${pin.repo}@${pin.tag}`);
+
+  const mut_updates: ActionPinUpdate[] = [];
+
+  for (const group of Object.values(groups)) {
+    const first = group?.[0];
+
+    if (group === undefined || first === undefined) {
+      continue;
+    }
+
+    const releases = await api.releases(first.repo, first.tag);
+
+    const selection = selectMatureRelease(releases, first.tag, cutoff);
+
+    console.log(describeSelection(first, selection));
+
+    if (selection.target === undefined) {
+      continue;
+    }
+
+    const sha = await api.commitSha(first.repo, selection.target);
+
+    mut_updates.push(
+      ...group.map((pin) => ({ pin, tag: selection.target ?? '', sha })),
+    );
+  }
+
+  for (const [file, fileUpdates] of Object.entries(
+    Object.groupBy(mut_updates, ({ pin }) => pin.file),
+  )) {
+    if (fileUpdates === undefined) {
+      continue;
+    }
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- files found by `listPinnedFiles`.
+    const lines = fs.readFileSync(file, 'utf8').split('\n');
+
+    const rewritten = fileUpdates.reduce(
+      (acc, { pin, tag, sha }) =>
+        acc.with(pin.line, renderActionPin({ ...pin, tag, sha })),
+      lines,
+    );
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- files found by `listPinnedFiles`.
+    fs.writeFileSync(file, rewritten.join('\n'));
+  }
+
+  console.log(`Moved ${mut_updates.length} action pin(s).`);
+};
 
 export type ActionPin = Readonly<{
   /** Absolute path of the workflow or `action.yml`. */
@@ -486,18 +467,163 @@ export type GitHubApi = Readonly<{
 
 type ActionPinUpdate = Readonly<{ pin: ActionPin; tag: string; sha: string }>;
 
-const readActionPins = (githubDir: string): readonly ActionPin[] =>
-  listPinnedFiles(githubDir).flatMap((file) =>
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a workflow or an `action.yml`.
-    fs
-      .readFileSync(file, 'utf8')
-      .split('\n')
-      .flatMap((text, line) => {
-        const pin = parseActionPinLine(text);
+// ---------------------------------------------------------------------------
+// `release-binaries`
+// ---------------------------------------------------------------------------
 
-        return pin === undefined ? [] : [{ ...pin, file, line }];
-      }),
+export const updateReleaseBinaryPins = async (
+  options: Readonly<{
+    configPath?: string;
+    api?: GitHubApi;
+    now?: number;
+  }> = {},
+): Promise<void> => {
+  const configPath =
+    options.configPath ??
+    path.join(process.cwd(), 'tools', 'configs', 'release-binaries.json');
+
+  const api = options.api ?? createGitHubApi();
+
+  const now = options.now ?? Temporal.Now.instant().epochMilliseconds;
+
+  const hold = readMinimumReleaseAge();
+
+  const cutoff = now - hold.milliseconds;
+
+  console.log(describeHold(hold, cutoff));
+
+  const tools = parseReleaseBinaryPins(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- the pin file.
+    JSON.parse(fs.readFileSync(configPath, 'utf8')),
   );
+
+  const mut_next: MutableRecord<string, unknown> = {};
+
+  const mut_moved: string[] = [];
+
+  for (const { name, pin, raw } of tools) {
+    const currentTag = `v${pin.version}` as const;
+
+    // Only `v<version>` tags: that is the tag the download URL is built
+    // from (`tools/scripts/lib/release-binaries.mts`).
+    const fetched = await api.releases(pin.repository, currentTag);
+
+    const releases = fetched.filter(({ tag }) => tag.startsWith('v'));
+
+    const move = findMove(name, pin, releases, cutoff);
+
+    // The move actually made, and everything newer on the line as held back
+    // — what the hold kept and what `findMove` could not take, the lines it
+    // printed saying why. With no cutoff, nothing newer is taken.
+    console.log(
+      describeMove(`${name} (${pin.repository})`, currentTag, {
+        ...selectMatureRelease(
+          releases,
+          move?.release.tag ?? currentTag,
+          Number.NEGATIVE_INFINITY,
+          releaseLine,
+        ),
+        target: move?.release.tag,
+      }),
+    );
+
+    mut_next[name] =
+      move === undefined ? raw : movePin(raw, move.release.tag, move.digests);
+
+    if (move !== undefined) {
+      mut_moved.push(name);
+    }
+  }
+
+  // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge is not installed when this runs (see the header).
+  if (mut_moved.length > 0) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- the pin file.
+    fs.writeFileSync(configPath, `${JSON.stringify(mut_next, undefined, 2)}\n`);
+  }
+
+  console.log(`Moved ${mut_moved.length} release-binary pin(s).`);
+};
+
+// ---------------------------------------------------------------------------
+// shared
+// ---------------------------------------------------------------------------
+
+/** `x.y.z` and nothing else — a prerelease or a tag is not a candidate. */
+export const parseStableVersion = (
+  version: string,
+): StableVersion | undefined => {
+  const match = /^(\d+)\.(\d+)\.(\d+)$/u.exec(version);
+
+  if (match === null) {
+    return undefined;
+  }
+
+  const [, major, minor, patch] = match;
+
+  return major === undefined || minor === undefined || patch === undefined
+    ? undefined
+    : { major, minor, patch };
+};
+
+/**
+ * Digit strings, as the regex captured them. Semver forbids leading zeros, so
+ * a longer run is a larger number and equal-length runs compare lexically.
+ */
+export type StableVersion = Readonly<{
+  major: string;
+  minor: string;
+  patch: string;
+}>;
+
+// ---------------------------------------------------------------------------
+// helpers
+// ---------------------------------------------------------------------------
+
+const isRecord = (value: unknown): value is ReadonlyRecord<string, unknown> =>
+  // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- ts-data-forge is not installed when this runs (see the header).
+  typeof value === 'object' && value !== null;
+
+const isListOfStrings = (value: unknown): value is readonly string[] =>
+  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array -- ts-data-forge is not installed when this runs (see the header).
+  Array.isArray(value) && value.every((v) => typeof v === 'string');
+
+const parseRegistryMetadata = (raw: unknown): RegistryMetadata | undefined => {
+  if (!isRecord(raw)) {
+    return undefined;
+  }
+
+  const { versions, time } = raw;
+
+  return !isListOfStrings(versions) || !isRecord(time)
+    ? undefined
+    : { versions, time };
+};
+
+/** Stdout only; stderr goes through, so a pnpm warning is seen and not parsed. */
+const pnpmStdout = (args: readonly string[]): string =>
+  execFileSync('pnpm', args, {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'inherit'],
+  }).trim();
+
+const readPnpmRegistryMetadata = (): RegistryMetadata => {
+  const raw: unknown = JSON.parse(
+    pnpmStdout(['view', 'pnpm', 'versions', 'time', '--json']),
+  );
+
+  const metadata = parseRegistryMetadata(raw);
+
+  if (metadata === undefined) {
+    throw new Error(
+      '`pnpm view pnpm versions time --json` did not return { versions: string[], time: object }.',
+    );
+  }
+
+  return metadata;
+};
+
+const isRepositorySegment = (segment: string): boolean =>
+  /^[\w.-]+$/u.test(segment);
 
 /**
  * Where a pin can be: the workflows, which GitHub reads from
@@ -531,10 +657,18 @@ const listPinnedFiles = (githubDir: string): readonly string[] => {
   return [...workflows, ...actions].toSorted();
 };
 
-const describeSelection = (
-  pin: ActionPin,
-  selection: ReleaseSelection,
-): string => describeMove(pin.repo, pin.tag, selection);
+const readActionPins = (githubDir: string): readonly ActionPin[] =>
+  listPinnedFiles(githubDir).flatMap((file) =>
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a workflow or an `action.yml`.
+    fs
+      .readFileSync(file, 'utf8')
+      .split('\n')
+      .flatMap((text, line) => {
+        const pin = parseActionPinLine(text);
+
+        return pin === undefined ? [] : [{ ...pin, file, line }];
+      }),
+  );
 
 const describeMove = (
   subject: string,
@@ -555,7 +689,38 @@ const describeMove = (
   return `${subject}: ${move} (${heldBack}; ${majors})`;
 };
 
+const describeSelection = (
+  pin: ActionPin,
+  selection: ReleaseSelection,
+): string => describeMove(pin.repo, pin.tag, selection);
+
 const stripTagPrefix = (tag: string): string => tag.replace(/^v/u, '');
+
+const isListOfRecords = (
+  value: unknown,
+): value is readonly ReadonlyRecord<string, unknown>[] =>
+  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array -- ts-data-forge is not installed when this runs (see the header).
+  Array.isArray(value) && value.every(isRecord);
+
+const parseRelease = (raw: ReadonlyRecord<string, unknown>): Release =>
+  ({
+    tag: typeof raw['tag_name'] === 'string' ? raw['tag_name'] : ('' as const),
+    publishedAt:
+      typeof raw['published_at'] === 'string' ? raw['published_at'] : undefined,
+    draft: raw['draft'] === true,
+    prerelease: raw['prerelease'] === true,
+    assets: isListOfRecords(raw['assets'])
+      ? raw['assets'].map((asset) => ({
+          name: typeof asset['name'] === 'string' ? asset['name'] : '',
+          digest:
+            typeof asset['digest'] === 'string' ? asset['digest'] : undefined,
+          updatedAt:
+            typeof asset['updated_at'] === 'string'
+              ? asset['updated_at']
+              : undefined,
+        }))
+      : ([] as const),
+  }) as const;
 
 /**
  * Not `libs/pr-merge-queue/src/lib/github-api.mts`, which every other command calls the
@@ -669,141 +834,16 @@ const createGitHubApi = (): GitHubApi => {
  */
 const maxReleasePages = 10;
 
-const parseRelease = (raw: ReadonlyRecord<string, unknown>): Release =>
-  ({
-    tag: typeof raw['tag_name'] === 'string' ? raw['tag_name'] : ('' as const),
-    publishedAt:
-      typeof raw['published_at'] === 'string' ? raw['published_at'] : undefined,
-    draft: raw['draft'] === true,
-    prerelease: raw['prerelease'] === true,
-    assets: isListOfRecords(raw['assets'])
-      ? raw['assets'].map((asset) => ({
-          name: typeof asset['name'] === 'string' ? asset['name'] : '',
-          digest:
-            typeof asset['digest'] === 'string' ? asset['digest'] : undefined,
-          updatedAt:
-            typeof asset['updated_at'] === 'string'
-              ? asset['updated_at']
-              : undefined,
-        }))
-      : ([] as const),
-  }) as const;
-
-// ---------------------------------------------------------------------------
-// `release-binaries`
-// ---------------------------------------------------------------------------
-
-export const updateReleaseBinaryPins = async (
-  options: Readonly<{
-    configPath?: string;
-    api?: GitHubApi;
-    now?: number;
-  }> = {},
-): Promise<void> => {
-  const configPath =
-    options.configPath ??
-    path.join(process.cwd(), 'tools', 'configs', 'release-binaries.json');
-
-  const api = options.api ?? createGitHubApi();
-
-  const now = options.now ?? Temporal.Now.instant().epochMilliseconds;
-
-  const hold = readMinimumReleaseAge();
-
-  const cutoff = now - hold.milliseconds;
-
-  console.log(describeHold(hold, cutoff));
-
-  const tools = parseReleaseBinaryPins(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- the pin file.
-    JSON.parse(fs.readFileSync(configPath, 'utf8')),
-  );
-
-  const mut_next: MutableRecord<string, unknown> = {};
-
-  const mut_moved: string[] = [];
-
-  for (const { name, pin, raw } of tools) {
-    const currentTag = `v${pin.version}` as const;
-
-    // Only `v<version>` tags: that is the tag the download URL is built
-    // from (`tools/scripts/lib/release-binaries.mts`).
-    const fetched = await api.releases(pin.repository, currentTag);
-
-    const releases = fetched.filter(({ tag }) => tag.startsWith('v'));
-
-    const move = findMove(name, pin, releases, cutoff);
-
-    // The move actually made, and everything newer on the line as held back
-    // — what the hold kept and what `findMove` could not take, the lines it
-    // printed saying why. With no cutoff, nothing newer is taken.
-    console.log(
-      describeMove(`${name} (${pin.repository})`, currentTag, {
-        ...selectMatureRelease(
-          releases,
-          move?.release.tag ?? currentTag,
-          Number.NEGATIVE_INFINITY,
-          releaseLine,
-        ),
-        target: move?.release.tag,
-      }),
-    );
-
-    mut_next[name] =
-      move === undefined ? raw : movePin(raw, move.release.tag, move.digests);
-
-    if (move !== undefined) {
-      mut_moved.push(name);
-    }
-  }
-
-  // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge is not installed when this runs (see the header).
-  if (mut_moved.length > 0) {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- the pin file.
-    fs.writeFileSync(configPath, `${JSON.stringify(mut_next, undefined, 2)}\n`);
-  }
-
-  console.log(`Moved ${mut_moved.length} release-binary pin(s).`);
-};
-
-/**
- * The newest release `pin` can move to and its digests: the one
- * `selectMatureRelease` picks, or, when that one cannot be taken
- * ({@link readAssetDigests}), the next one down the same line.
- */
-const findMove = (
-  name: string,
-  pin: ReleaseBinaryPin,
-  releases: readonly Release[],
-  cutoff: number,
-):
-  | Readonly<{ release: Release; digests: ReadonlyRecord<string, string> }>
-  | undefined => {
-  const currentTag = `v${pin.version}` as const;
-
-  const { target } = selectMatureRelease(
-    releases,
-    currentTag,
-    cutoff,
-    releaseLine,
-  );
-
-  const release = releases.find(({ tag }) => tag === target);
-
-  if (release === undefined) {
+const toEpochMilliseconds = (value: unknown): number | undefined => {
+  if (typeof value !== 'string') {
     return undefined;
   }
 
-  const digests = readAssetDigests(name, pin, release, cutoff);
-
-  return digests === undefined
-    ? findMove(
-        name,
-        pin,
-        releases.filter((candidate) => candidate !== release),
-        cutoff,
-      )
-    : { release, digests };
+  try {
+    return Temporal.Instant.from(value).epochMilliseconds;
+  } catch {
+    return undefined;
+  }
 };
 
 /**
@@ -882,6 +922,46 @@ const readAssetDigests = (
 };
 
 /**
+ * The newest release `pin` can move to and its digests: the one
+ * `selectMatureRelease` picks, or, when that one cannot be taken
+ * ({@link readAssetDigests}), the next one down the same line.
+ */
+const findMove = (
+  name: string,
+  pin: ReleaseBinaryPin,
+  releases: readonly Release[],
+  cutoff: number,
+):
+  | Readonly<{ release: Release; digests: ReadonlyRecord<string, string> }>
+  | undefined => {
+  const currentTag = `v${pin.version}` as const;
+
+  const { target } = selectMatureRelease(
+    releases,
+    currentTag,
+    cutoff,
+    releaseLine,
+  );
+
+  const release = releases.find(({ tag }) => tag === target);
+
+  if (release === undefined) {
+    return undefined;
+  }
+
+  const digests = readAssetDigests(name, pin, release, cutoff);
+
+  return digests === undefined
+    ? findMove(
+        name,
+        pin,
+        releases.filter((candidate) => candidate !== release),
+        cutoff,
+      )
+    : { release, digests };
+};
+
+/**
  * `raw` with its version and digests replaced and everything else, a key
  * this does not know included, as it was.
  */
@@ -903,6 +983,37 @@ const movePin = (
       ]),
     ),
   };
+};
+
+const parseReleaseBinaryPin = (raw: unknown): ReleaseBinaryPin | undefined => {
+  if (!isRecord(raw)) {
+    return undefined;
+  }
+
+  const { repository, version, binary, assets } = raw;
+
+  if (
+    typeof repository !== 'string' ||
+    typeof version !== 'string' ||
+    typeof binary !== 'string' ||
+    !isRecord(assets) ||
+    // Spliced into URLs; `parseStableVersion` is what a move is made with.
+    parseStableVersion(version) === undefined
+  ) {
+    return undefined;
+  }
+
+  const entries = Object.entries(assets).map(([platform, asset]) =>
+    isRecord(asset) &&
+    typeof asset['name'] === 'string' &&
+    typeof asset['sha256'] === 'string'
+      ? ([platform, { name: asset['name'], sha256: asset['sha256'] }] as const)
+      : undefined,
+  );
+
+  return entries.every((entry) => entry !== undefined)
+    ? { repository, version, binary, assets: Object.fromEntries(entries) }
+    : undefined;
 };
 
 /**
@@ -937,80 +1048,6 @@ const parseReleaseBinaryPins = (
   });
 };
 
-const parseReleaseBinaryPin = (raw: unknown): ReleaseBinaryPin | undefined => {
-  if (!isRecord(raw)) {
-    return undefined;
-  }
-
-  const { repository, version, binary, assets } = raw;
-
-  if (
-    typeof repository !== 'string' ||
-    typeof version !== 'string' ||
-    typeof binary !== 'string' ||
-    !isRecord(assets) ||
-    // Spliced into URLs; `parseStableVersion` is what a move is made with.
-    parseStableVersion(version) === undefined
-  ) {
-    return undefined;
-  }
-
-  const entries = Object.entries(assets).map(([platform, asset]) =>
-    isRecord(asset) &&
-    typeof asset['name'] === 'string' &&
-    typeof asset['sha256'] === 'string'
-      ? ([platform, { name: asset['name'], sha256: asset['sha256'] }] as const)
-      : undefined,
-  );
-
-  return entries.every((entry) => entry !== undefined)
-    ? { repository, version, binary, assets: Object.fromEntries(entries) }
-    : undefined;
-};
-
-// ---------------------------------------------------------------------------
-// shared
-// ---------------------------------------------------------------------------
-
-/** `x.y.z` and nothing else — a prerelease or a tag is not a candidate. */
-export const parseStableVersion = (
-  version: string,
-): StableVersion | undefined => {
-  const match = /^(\d+)\.(\d+)\.(\d+)$/u.exec(version);
-
-  if (match === null) {
-    return undefined;
-  }
-
-  const [, major, minor, patch] = match;
-
-  return major === undefined || minor === undefined || patch === undefined
-    ? undefined
-    : { major, minor, patch };
-};
-
-export const compareVersions = (a: StableVersion, b: StableVersion): number => {
-  const major = compareDigits(a.major, b.major);
-
-  if (major !== 0) {
-    return major;
-  }
-
-  const minor = compareDigits(a.minor, b.minor);
-
-  return minor !== 0 ? minor : compareDigits(a.patch, b.patch);
-};
-
-/**
- * Digit strings, as the regex captured them. Semver forbids leading zeros, so
- * a longer run is a larger number and equal-length runs compare lexically.
- */
-export type StableVersion = Readonly<{
-  major: string;
-  minor: string;
-  patch: string;
-}>;
-
 const compareDigits = (a: string, b: string): number =>
   a.length !== b.length ? a.length - b.length : a < b ? -1 : a > b ? 1 : 0;
 
@@ -1034,39 +1071,6 @@ const readMinimumReleaseAge = (): Hold => {
 
 const describeHold = (hold: Hold, cutoff: number): string =>
   `minimumReleaseAge: ${hold.minutes} min (cutoff ${Temporal.Instant.fromEpochMilliseconds(cutoff).toString()})` as const;
-
-const toEpochMilliseconds = (value: unknown): number | undefined => {
-  if (typeof value !== 'string') {
-    return undefined;
-  }
-
-  try {
-    return Temporal.Instant.from(value).epochMilliseconds;
-  } catch {
-    return undefined;
-  }
-};
-
-const isRecord = (value: unknown): value is ReadonlyRecord<string, unknown> =>
-  // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- ts-data-forge is not installed when this runs (see the header).
-  typeof value === 'object' && value !== null;
-
-const isListOfStrings = (value: unknown): value is readonly string[] =>
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array -- ts-data-forge is not installed when this runs (see the header).
-  Array.isArray(value) && value.every((v) => typeof v === 'string');
-
-const isListOfRecords = (
-  value: unknown,
-): value is readonly ReadonlyRecord<string, unknown>[] =>
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array -- ts-data-forge is not installed when this runs (see the header).
-  Array.isArray(value) && value.every(isRecord);
-
-/** Stdout only; stderr goes through, so a pnpm warning is seen and not parsed. */
-const pnpmStdout = (args: readonly string[]): string =>
-  execFileSync('pnpm', args, {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'inherit'],
-  }).trim();
 
 /**
  * `isDirectlyExecuted` from `ts-repo-utils`, inlined: that package is not

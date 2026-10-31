@@ -167,6 +167,9 @@ export const main = async (): Promise<void> => {
   });
 };
 
+const matchFileURL = (s: string): s is `https://files.slack.com${string}` =>
+  s.startsWith('https://files.slack.com');
+
 const listDownloadFileRecursively = (
   data: unknown,
   dir: string,
@@ -223,8 +226,5 @@ const knownExtensions = ISet.create<`.${string}`>([
   // '.vtt', // error
   // '.m3u8', // error
 ]);
-
-const matchFileURL = (s: string): s is `https://files.slack.com${string}` =>
-  s.startsWith('https://files.slack.com');
 
 await main();

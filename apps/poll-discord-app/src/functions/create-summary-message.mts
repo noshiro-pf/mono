@@ -21,14 +21,6 @@ export const rpCreateSummaryMessage = (
     .setTimestamp();
 };
 
-const rpCreateSummaryFields = (
-  poll: Poll,
-  userIdToDisplayName: IMap<UserId, string>,
-): readonly EmbedField[] =>
-  poll.dateOptions.map((d) =>
-    rpCreateSummaryField(d, poll, userIdToDisplayName),
-  );
-
 export const gpCreateSummaryMessage = (
   groups: readonly Group[],
 ): EmbedBuilder => {
@@ -38,6 +30,14 @@ export const gpCreateSummaryMessage = (
     .setColor(embedMessageColor)
     .addFields(castMutable(gpCreateFields(groups)));
 };
+
+const rpCreateSummaryFields = (
+  poll: Poll,
+  userIdToDisplayName: IMap<UserId, string>,
+): readonly EmbedField[] =>
+  poll.dateOptions.map((d) =>
+    rpCreateSummaryField(d, poll, userIdToDisplayName),
+  );
 
 const gpCreateFields = (groups: readonly Group[]): readonly EmbedField[] =>
   groups.map(gpCreateSummaryField);

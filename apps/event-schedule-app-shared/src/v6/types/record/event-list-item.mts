@@ -35,17 +35,6 @@ export const eventListItemDefaultValue = {
   },
 } as const satisfies EventListItem;
 
-const isEventScheduleMetadata = (
-  a: unknown,
-): a is EventListItem['eventScheduleMetadata'] =>
-  isRecord(a) &&
-  hasKeyValue(a, 'id', isString) &&
-  hasKeyValue(a, 'createdAt', isString) &&
-  hasKeyValue(a, 'updatedAt', isString);
-
-const isAnswersMetadata = (a: unknown): a is EventListItem['answersMetadata'] =>
-  isRecord(a) && hasKeyValue(a, 'lastUpdate', isString);
-
 export const isEventListItem = (a: unknown): a is EventListItem =>
   isRecord(a) &&
   hasKeyValue(a, 'eventSchedule', isEventSchedule) &&
@@ -56,6 +45,39 @@ export const isEventListItem = (a: unknown): a is EventListItem =>
     (e: unknown): e is readonly Answer[] => Arr.isArray(e) && e.every(isAnswer),
   ) &&
   hasKeyValue(a, 'answersMetadata', isAnswersMetadata);
+
+export const fillEventListItem = (a?: unknown): EventListItem =>
+  a === undefined || !isRecord(a)
+    ? d
+    : ({
+        eventSchedule: hasKey(a, 'eventSchedule')
+          ? fillEventSchedule(a.eventSchedule)
+          : d.eventSchedule,
+
+        eventScheduleMetadata: hasKey(a, 'eventScheduleMetadata')
+          ? fillEventScheduleMetadata(a.eventScheduleMetadata)
+          : d.eventScheduleMetadata,
+
+        answers:
+          hasKey(a, 'answers') && Arr.isArray(a.answers)
+            ? a.answers.map(fillAnswer)
+            : d.answers,
+
+        answersMetadata: hasKey(a, 'answersMetadata')
+          ? fillAnswersMetadata(a.answersMetadata)
+          : d.answersMetadata,
+      } as const);
+
+const isEventScheduleMetadata = (
+  a: unknown,
+): a is EventListItem['eventScheduleMetadata'] =>
+  isRecord(a) &&
+  hasKeyValue(a, 'id', isString) &&
+  hasKeyValue(a, 'createdAt', isString) &&
+  hasKeyValue(a, 'updatedAt', isString);
+
+const isAnswersMetadata = (a: unknown): a is EventListItem['answersMetadata'] =>
+  isRecord(a) && hasKeyValue(a, 'lastUpdate', isString);
 
 const d = eventListItemDefaultValue;
 
@@ -83,26 +105,4 @@ const fillAnswersMetadata = (a: unknown): EventListItem['answersMetadata'] =>
         lastUpdate: hasKeyValue(a, 'lastUpdate', isString)
           ? a.lastUpdate
           : d.answersMetadata.lastUpdate,
-      } as const);
-
-export const fillEventListItem = (a?: unknown): EventListItem =>
-  a === undefined || !isRecord(a)
-    ? d
-    : ({
-        eventSchedule: hasKey(a, 'eventSchedule')
-          ? fillEventSchedule(a.eventSchedule)
-          : d.eventSchedule,
-
-        eventScheduleMetadata: hasKey(a, 'eventScheduleMetadata')
-          ? fillEventScheduleMetadata(a.eventScheduleMetadata)
-          : d.eventScheduleMetadata,
-
-        answers:
-          hasKey(a, 'answers') && Arr.isArray(a.answers)
-            ? a.answers.map(fillAnswer)
-            : d.answers,
-
-        answersMetadata: hasKey(a, 'answersMetadata')
-          ? fillAnswersMetadata(a.answersMetadata)
-          : d.answersMetadata,
       } as const);

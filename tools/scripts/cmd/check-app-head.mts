@@ -153,6 +153,19 @@ const OG_IMAGE_WIDTH = 1200;
 
 const OG_IMAGE_HEIGHT = 630;
 
+/** An absolute https URL of a directory, as written: no query, no fragment. */
+const isSiteUrl = (url: string): boolean => {
+  const parsed = URL.parse(url);
+
+  return (
+    parsed?.protocol === 'https:' &&
+    parsed.href === url &&
+    parsed.search === '' &&
+    parsed.hash === '' &&
+    url.endsWith('/')
+  );
+};
+
 const collectPublishedViolations = (
   { head, publicFiles }: AppFacts,
   ogUrl: string,
@@ -228,19 +241,6 @@ const collectPublishedViolations = (
     }
   });
 
-/** An absolute https URL of a directory, as written: no query, no fragment. */
-const isSiteUrl = (url: string): boolean => {
-  const parsed = URL.parse(url);
-
-  return (
-    parsed?.protocol === 'https:' &&
-    parsed.href === url &&
-    parsed.search === '' &&
-    parsed.hash === '' &&
-    url.endsWith('/')
-  );
-};
-
 const hasDoubleHyphenInComment = (svg: string): boolean =>
   svg
     .matchAll(/<!--(?<body>[\s\S]*?)-->/gu)
@@ -259,6 +259,69 @@ const listBrowserAppDirs = async (): Promise<
         `Failed to list apps/*/index.html: ${unknownToString(result.value)}`,
       )
     : Result.ok(result.value.map(path.dirname).toSorted());
+};
+
+/** The width and height in a PNG's `IHDR`, which is always its first chunk. */
+const readPngSize = (bytes: Readonly<Buffer>): PublicFile['png'] =>
+  bytes.length >= 24 && bytes.subarray(12, 16).toString('latin1') === 'IHDR'
+    ? ({
+        width: bytes.readUInt32BE(16),
+        height: bytes.readUInt32BE(20),
+      } as const)
+    : undefined;
+
+const readPublicFiles = async (
+  publicDir: string,
+): Promise<ReadonlyMap<string, PublicFile>> => {
+  const listed = await glob('**/*', { cwd: publicDir, dot: false });
+
+  if (Result.isErr(listed)) {
+    throw new Error(unknownToString(listed.value));
+  }
+
+  const entries = await Promise.all(
+    listed.value.map(async (relativePath) => {
+      const filePath = path.join(publicDir, relativePath);
+
+      const png = relativePath.endsWith('.png')
+        ? readPngSize(
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
+            await fs.readFile(filePath),
+          )
+        : undefined;
+
+      const text = relativePath.endsWith('.svg')
+        ? // eslint-disable-next-line security/detect-non-literal-fs-filename
+          await fs.readFile(filePath, 'utf8')
+        : undefined;
+
+      return [relativePath, { png, text }] as const;
+    }),
+  );
+
+  return new Map(entries);
+};
+
+const readFirebaseProject = async (
+  appDir: string,
+): Promise<string | undefined> => {
+  const text = await Result.fromPromise(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFile(path.join(appDir, '.firebaserc'), 'utf8'),
+  );
+
+  if (Result.isErr(text)) {
+    return undefined;
+  }
+
+  const parsed: unknown = JSON.parse(text.value);
+
+  const project =
+    isRecord(parsed) && isRecord(parsed['projects'])
+      ? parsed['projects']['default']
+      : undefined;
+
+  return typeof project === 'string' ? project : undefined;
 };
 
 const readAppFacts = async (
@@ -299,69 +362,6 @@ const readAppFacts = async (
         `Failed to read ${relativePath}: ${unknownToString(result.value)}`,
       )
     : Result.ok({ relativePath, facts: result.value });
-};
-
-const readPublicFiles = async (
-  publicDir: string,
-): Promise<ReadonlyMap<string, PublicFile>> => {
-  const listed = await glob('**/*', { cwd: publicDir, dot: false });
-
-  if (Result.isErr(listed)) {
-    throw new Error(unknownToString(listed.value));
-  }
-
-  const entries = await Promise.all(
-    listed.value.map(async (relativePath) => {
-      const filePath = path.join(publicDir, relativePath);
-
-      const png = relativePath.endsWith('.png')
-        ? readPngSize(
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
-            await fs.readFile(filePath),
-          )
-        : undefined;
-
-      const text = relativePath.endsWith('.svg')
-        ? // eslint-disable-next-line security/detect-non-literal-fs-filename
-          await fs.readFile(filePath, 'utf8')
-        : undefined;
-
-      return [relativePath, { png, text }] as const;
-    }),
-  );
-
-  return new Map(entries);
-};
-
-/** The width and height in a PNG's `IHDR`, which is always its first chunk. */
-const readPngSize = (bytes: Readonly<Buffer>): PublicFile['png'] =>
-  bytes.length >= 24 && bytes.subarray(12, 16).toString('latin1') === 'IHDR'
-    ? ({
-        width: bytes.readUInt32BE(16),
-        height: bytes.readUInt32BE(20),
-      } as const)
-    : undefined;
-
-const readFirebaseProject = async (
-  appDir: string,
-): Promise<string | undefined> => {
-  const text = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(path.join(appDir, '.firebaserc'), 'utf8'),
-  );
-
-  if (Result.isErr(text)) {
-    return undefined;
-  }
-
-  const parsed: unknown = JSON.parse(text.value);
-
-  const project =
-    isRecord(parsed) && isRecord(parsed['projects'])
-      ? parsed['projects']['default']
-      : undefined;
-
-  return typeof project === 'string' ? project : undefined;
 };
 
 const collectResults = <A,>(

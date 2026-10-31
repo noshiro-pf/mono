@@ -57,31 +57,6 @@ export const runOxlint = (files: readonly string[]): OxlintRunResult => {
   };
 };
 
-const parseDiagnostics = (
-  stdout: string,
-  stderr: string,
-): readonly OxlintDiagnostic[] => {
-  const start = stdout.indexOf('{');
-
-  if (start === -1) {
-    throw new Error(
-      `oxlint produced no JSON output.\nstdout:\n${stdout}\nstderr:\n${stderr}`,
-    );
-  }
-
-  const parsed: unknown = JSON.parse(stdout.slice(start));
-
-  if (
-    !isRecord(parsed) ||
-    !hasKey(parsed, 'diagnostics') ||
-    !Array.isArray(parsed.diagnostics)
-  ) {
-    throw new Error('oxlint JSON output has no `diagnostics` array');
-  }
-
-  return parsed.diagnostics.map(toDiagnostic);
-};
-
 const readString = (record: UnknownRecord, key: string): string => {
   const value = hasKey(record, key) ? record[key] : undefined;
 
@@ -109,4 +84,29 @@ const toDiagnostic = (raw: unknown): OxlintDiagnostic => {
     filename: readString(record, 'filename'),
     line: typeof line === 'number' ? line : 0,
   };
+};
+
+const parseDiagnostics = (
+  stdout: string,
+  stderr: string,
+): readonly OxlintDiagnostic[] => {
+  const start = stdout.indexOf('{');
+
+  if (start === -1) {
+    throw new Error(
+      `oxlint produced no JSON output.\nstdout:\n${stdout}\nstderr:\n${stderr}`,
+    );
+  }
+
+  const parsed: unknown = JSON.parse(stdout.slice(start));
+
+  if (
+    !isRecord(parsed) ||
+    !hasKey(parsed, 'diagnostics') ||
+    !Array.isArray(parsed.diagnostics)
+  ) {
+    throw new Error('oxlint JSON output has no `diagnostics` array');
+  }
+
+  return parsed.diagnostics.map(toDiagnostic);
 };

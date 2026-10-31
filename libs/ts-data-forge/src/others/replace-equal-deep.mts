@@ -108,6 +108,12 @@ export type ReplaceEqualDeepOptions = Readonly<{
 
 type Key = (item: unknown) => unknown;
 
+const isPlainArray = (value: unknown): value is readonly unknown[] =>
+  Array.isArray(value) && Object.getPrototypeOf(value) === Array.prototype;
+
+const isPlainObject = (value: unknown): value is UnknownRecord =>
+  isRecord(value) && Object.getPrototypeOf(value) === Object.prototype;
+
 const replace = (
   current: unknown,
   next: unknown,
@@ -122,6 +128,23 @@ const replace = (
         : fastDeepEqual(current, next)
           ? current
           : next;
+
+const indexByKey = (
+  items: readonly unknown[],
+  key: Key,
+): ReadonlyMap<unknown, unknown> => {
+  const mut_byKey = new Map<unknown, unknown>();
+
+  for (const item of items) {
+    const itemKey = key(item);
+
+    if (itemKey !== undefined && !mut_byKey.has(itemKey)) {
+      mut_byKey.set(itemKey, item);
+    }
+  }
+
+  return mut_byKey;
+};
 
 // Each walk returns `current` when every part of the result is the same part
 // of `current`, `next` when every part is the same part of `next` (nothing
@@ -200,26 +223,3 @@ const replaceObject = (
 
 // What an item of `next` is matched with when nothing of `current` is.
 const absent: unique symbol = Symbol('absent');
-
-const indexByKey = (
-  items: readonly unknown[],
-  key: Key,
-): ReadonlyMap<unknown, unknown> => {
-  const mut_byKey = new Map<unknown, unknown>();
-
-  for (const item of items) {
-    const itemKey = key(item);
-
-    if (itemKey !== undefined && !mut_byKey.has(itemKey)) {
-      mut_byKey.set(itemKey, item);
-    }
-  }
-
-  return mut_byKey;
-};
-
-const isPlainArray = (value: unknown): value is readonly unknown[] =>
-  Array.isArray(value) && Object.getPrototypeOf(value) === Array.prototype;
-
-const isPlainObject = (value: unknown): value is UnknownRecord =>
-  isRecord(value) && Object.getPrototypeOf(value) === Object.prototype;

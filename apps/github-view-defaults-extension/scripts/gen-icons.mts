@@ -89,12 +89,49 @@ const subsampleOffsets = Array.from(
   (_unused, step) => (step + 0.5) * subsampleStep,
 );
 
-const rowsOf = (size: number): readonly (readonly number[])[] =>
-  Array.from({ length: size }, (_unusedRow, y) =>
-    Array.from({ length: size }, (_unusedColumn, x) =>
-      pixelAt(size, x, y),
-    ).flat(),
+/**
+ * Whether a point in pixel space is inside a bar.
+ *
+ * Only a corner can fall outside a rectangle it is otherwise within, so the
+ * distance test is against whichever corner circle the point is nearest to.
+ */
+const isInsideBar = (
+  bar: Bar,
+  size: number,
+  px: number,
+  py: number,
+): boolean => {
+  const x0 = bar.x0 * size;
+
+  const x1 = bar.x1 * size;
+
+  const y0 = bar.y0 * size;
+
+  const y1 = bar.y1 * size;
+
+  if (px < x0 || x1 < px || py < y0 || y1 < py) {
+    return false;
+  }
+
+  const radius = Math.min(
+    barRadius * size,
+    Num.div(x1 - x0, 2),
+    Num.div(y1 - y0, 2),
   );
+
+  const cx = Math.min(Math.max(px, x0 + radius), x1 - radius);
+
+  const cy = Math.min(Math.max(py, y0 + radius), y1 - radius);
+
+  return (px - cx) ** 2 + (py - cy) ** 2 <= radius ** 2;
+};
+
+/** How much of one pixel one bar covers, as a fraction. */
+const coverageOf = (bar: Bar, size: number, x: number, y: number): number =>
+  subsampleOffsets
+    .flatMap((dy) => subsampleOffsets.map((dx) => [dx, dy] as const))
+    .filter(([dx, dy]) => isInsideBar(bar, size, x + dx, y + dy)).length *
+  subsampleWeight;
 
 /**
  * One pixel, as RGBA.
@@ -137,48 +174,33 @@ const pixelAt = (
   ];
 };
 
-/** How much of one pixel one bar covers, as a fraction. */
-const coverageOf = (bar: Bar, size: number, x: number, y: number): number =>
-  subsampleOffsets
-    .flatMap((dy) => subsampleOffsets.map((dx) => [dx, dy] as const))
-    .filter(([dx, dy]) => isInsideBar(bar, size, x + dx, y + dy)).length *
-  subsampleWeight;
-
-/**
- * Whether a point in pixel space is inside a bar.
- *
- * Only a corner can fall outside a rectangle it is otherwise within, so the
- * distance test is against whichever corner circle the point is nearest to.
- */
-const isInsideBar = (
-  bar: Bar,
-  size: number,
-  px: number,
-  py: number,
-): boolean => {
-  const x0 = bar.x0 * size;
-
-  const x1 = bar.x1 * size;
-
-  const y0 = bar.y0 * size;
-
-  const y1 = bar.y1 * size;
-
-  if (px < x0 || x1 < px || py < y0 || y1 < py) {
-    return false;
-  }
-
-  const radius = Math.min(
-    barRadius * size,
-    Num.div(x1 - x0, 2),
-    Num.div(y1 - y0, 2),
+const rowsOf = (size: number): readonly (readonly number[])[] =>
+  Array.from({ length: size }, (_unusedRow, y) =>
+    Array.from({ length: size }, (_unusedColumn, x) =>
+      pixelAt(size, x, y),
+    ).flat(),
   );
 
-  const cx = Math.min(Math.max(px, x0 + radius), x1 - radius);
+const beUint32 = (value: number): readonly number[] =>
+  [
+    (value >>> 24) & 0xff,
+    (value >>> 16) & 0xff,
+    (value >>> 8) & 0xff,
+    value & 0xff,
+  ] as const;
 
-  const cy = Math.min(Math.max(py, y0 + radius), y1 - radius);
+const crc32 = (bytes: readonly number[]): number =>
+  (bytes.reduce(
+    (value, byte) => (crcTable[(value ^ byte) & 0xff] ?? 0) ^ (value >>> 8),
+    0xff_ff_ff_ff,
+  ) ^
+    0xff_ff_ff_ff) >>>
+  0;
 
-  return (px - cx) ** 2 + (py - cy) ** 2 <= radius ** 2;
+const chunk = (kind: string, body: readonly number[]): readonly number[] => {
+  const tagged = [...Array.from(Buffer.from(kind, 'latin1')), ...body] as const;
+
+  return [...beUint32(body.length), ...tagged, ...beUint32(crc32(tagged))];
 };
 
 /**
@@ -214,20 +236,6 @@ const encodePng = (size: number): Buffer => {
   ]);
 };
 
-const chunk = (kind: string, body: readonly number[]): readonly number[] => {
-  const tagged = [...Array.from(Buffer.from(kind, 'latin1')), ...body] as const;
-
-  return [...beUint32(body.length), ...tagged, ...beUint32(crc32(tagged))];
-};
-
-const beUint32 = (value: number): readonly number[] =>
-  [
-    (value >>> 24) & 0xff,
-    (value >>> 16) & 0xff,
-    (value >>> 8) & 0xff,
-    value & 0xff,
-  ] as const;
-
 const crcTable = Array.from({ length: 256 }, (_unused, index) =>
   Array.from({ length: 8 }).reduce<number>(
     (value) =>
@@ -235,13 +243,5 @@ const crcTable = Array.from({ length: 256 }, (_unused, index) =>
     index,
   ),
 );
-
-const crc32 = (bytes: readonly number[]): number =>
-  (bytes.reduce(
-    (value, byte) => (crcTable[(value ^ byte) & 0xff] ?? 0) ^ (value >>> 8),
-    0xff_ff_ff_ff,
-  ) ^
-    0xff_ff_ff_ff) >>>
-  0;
 
 main();

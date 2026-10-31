@@ -119,6 +119,45 @@ const scheduleUrl =
   'https://raw.githubusercontent.com/nodejs/Release/main/schedule.json';
 
 /**
+ * The oldest release line still supported, at its oldest known patch — the
+ * floor a repository can honestly claim once it stops carrying the line below.
+ *
+ * The oldest patch, not the newest: the floor says "this is where support
+ * starts", and pointing it at whatever patch shipped last week would claim
+ * every earlier patch of the same line is unsupported.
+ */
+const lowestSupportedLts = (
+  releases: ReleaseData,
+  config: NodeSupportConfig,
+): string => {
+  const supportedLtsMajors = Array.from(releases.ltsMajors).filter(
+    (major) => !releases.eolMajors.has(major),
+  );
+
+  if (!Arr.isNonEmpty(supportedLtsMajors)) {
+    return config.targets.minimum;
+  }
+
+  const oldestSupportedLtsMajor = Math.min(...supportedLtsMajors);
+
+  const currentMinimum = parseVersion(config.targets.minimum);
+
+  // Never lower the floor by accident: widening what is supported is a real
+  // change too, and it is not this job's to make.
+  if (
+    currentMinimum !== undefined &&
+    currentMinimum.major >= oldestSupportedLtsMajor
+  ) {
+    return config.targets.minimum;
+  }
+
+  return `${oldestSupportedLtsMajor.toString()}.0.0`;
+};
+
+const formatVersion = (version: Version): string =>
+  `${version.major.toString()}.${version.minor.toString()}.${version.patch.toString()}` as const;
+
+/**
  * Which release line each target should point at.
  *
  * - `current` — the newest line that has shipped a release.
@@ -173,39 +212,67 @@ const desiredTargets = (
 };
 
 /**
- * The oldest release line still supported, at its oldest known patch — the
- * floor a repository can honestly claim once it stops carrying the line below.
+ * Which release lines have passed their end-of-life date, as of `today`.
  *
- * The oldest patch, not the newest: the floor says "this is where support
- * starts", and pointing it at whatever patch shipped last week would claim
- * every earlier patch of the same line is unsupported.
+ * `today` is the date of the newest Node release rather than a wall clock, so
+ * this script has no clock dependency at all: the same two inputs always give
+ * the same output, which is what makes a scheduled job that opens pull
+ * requests reviewable. The newest release is days old at worst, and the only
+ * thing this feeds is a warning about a line going EOL — a boundary that moves
+ * once every few years and is reported rather than acted on.
+ *
+ * Both sides are `YYYY-MM-DD`, so the comparison is a plain string comparison.
  */
-const lowestSupportedLts = (
-  releases: ReleaseData,
-  config: NodeSupportConfig,
-): string => {
-  const supportedLtsMajors = Array.from(releases.ltsMajors).filter(
-    (major) => !releases.eolMajors.has(major),
-  );
+const eolMajorsFrom = (
+  schedule: unknown,
+  today: string,
+): ReadonlySet<number> => {
+  const mut_eol = new Set<number>();
 
-  if (!Arr.isNonEmpty(supportedLtsMajors)) {
-    return config.targets.minimum;
+  if (today === '' || !isRecord(schedule)) {
+    return mut_eol;
   }
 
-  const oldestSupportedLtsMajor = Math.min(...supportedLtsMajors);
+  for (const [key, value] of Object.entries(schedule)) {
+    const major = Result.unwrapOkOr(
+      Num.safeParseInt(key.replace(/^v/u, '')),
+      Number.NaN,
+    );
 
-  const currentMinimum = parseVersion(config.targets.minimum);
+    if (!Number.isSafeInteger(major) || !isRecord(value)) {
+      continue;
+    }
 
-  // Never lower the floor by accident: widening what is supported is a real
-  // change too, and it is not this job's to make.
-  if (
-    currentMinimum !== undefined &&
-    currentMinimum.major >= oldestSupportedLtsMajor
-  ) {
-    return config.targets.minimum;
+    const end: unknown = hasKey(value, 'end') ? value.end : undefined;
+
+    if (isString(end) && end < today) {
+      mut_eol.add(major);
+    }
   }
 
-  return `${oldestSupportedLtsMajor.toString()}.0.0`;
+  return mut_eol;
+};
+
+const fetchJson = async (url: string): Promise<Result<unknown, string>> => {
+  const response = await Result.fromPromise(fetch(url));
+
+  if (Result.isErr(response)) {
+    return Result.err(
+      `❌ Failed to fetch ${url}: ${unknownToString(response.value)}`,
+    );
+  }
+
+  if (!response.value.ok) {
+    return Result.err(
+      `❌ Failed to fetch ${url}: HTTP ${response.value.status.toString()}.`,
+    );
+  }
+
+  const parsed = await Result.fromPromise(response.value.json());
+
+  return Result.isErr(parsed)
+    ? Result.err(`❌ ${url} did not return JSON.`)
+    : Result.ok(parsed.value);
 };
 
 const fetchReleaseData = async (): Promise<Result<ReleaseData, string>> => {
@@ -280,48 +347,6 @@ const fetchReleaseData = async (): Promise<Result<ReleaseData, string>> => {
   });
 };
 
-/**
- * Which release lines have passed their end-of-life date, as of `today`.
- *
- * `today` is the date of the newest Node release rather than a wall clock, so
- * this script has no clock dependency at all: the same two inputs always give
- * the same output, which is what makes a scheduled job that opens pull
- * requests reviewable. The newest release is days old at worst, and the only
- * thing this feeds is a warning about a line going EOL — a boundary that moves
- * once every few years and is reported rather than acted on.
- *
- * Both sides are `YYYY-MM-DD`, so the comparison is a plain string comparison.
- */
-const eolMajorsFrom = (
-  schedule: unknown,
-  today: string,
-): ReadonlySet<number> => {
-  const mut_eol = new Set<number>();
-
-  if (today === '' || !isRecord(schedule)) {
-    return mut_eol;
-  }
-
-  for (const [key, value] of Object.entries(schedule)) {
-    const major = Result.unwrapOkOr(
-      Num.safeParseInt(key.replace(/^v/u, '')),
-      Number.NaN,
-    );
-
-    if (!Number.isSafeInteger(major) || !isRecord(value)) {
-      continue;
-    }
-
-    const end: unknown = hasKey(value, 'end') ? value.end : undefined;
-
-    if (isString(end) && end < today) {
-      mut_eol.add(major);
-    }
-  }
-
-  return mut_eol;
-};
-
 const eolLineOf = (
   version: string,
   releases: ReleaseData,
@@ -352,31 +377,6 @@ const writeTargets = async (
     `${JSON.stringify(updated, undefined, 2)}\n`,
   );
 };
-
-const fetchJson = async (url: string): Promise<Result<unknown, string>> => {
-  const response = await Result.fromPromise(fetch(url));
-
-  if (Result.isErr(response)) {
-    return Result.err(
-      `❌ Failed to fetch ${url}: ${unknownToString(response.value)}`,
-    );
-  }
-
-  if (!response.value.ok) {
-    return Result.err(
-      `❌ Failed to fetch ${url}: HTTP ${response.value.status.toString()}.`,
-    );
-  }
-
-  const parsed = await Result.fromPromise(response.value.json());
-
-  return Result.isErr(parsed)
-    ? Result.err(`❌ ${url} did not return JSON.`)
-    : Result.ok(parsed.value);
-};
-
-const formatVersion = (version: Version): string =>
-  `${version.major.toString()}.${version.minor.toString()}.${version.patch.toString()}` as const;
 
 if (isDirectlyExecuted(import.meta.url)) {
   const allowMinimumChange = process.argv.includes('--allow-minimum-change');

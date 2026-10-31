@@ -169,19 +169,6 @@ const applyNumberToTitle = (): void => {
   mut_ownTitle.last = { base, written: next, shown: mut_page.title };
 };
 
-/** Every element the page has grown since the last look. */
-const patchNewAnchors = (): void => {
-  for (const element of document.querySelectorAll('a[href]')) {
-    if (evaluated.has(element)) {
-      continue;
-    }
-
-    evaluated.add(element);
-
-    patchAnchor(element);
-  }
-};
-
 /**
  * Gives one anchor the address the rules want.
  *
@@ -208,6 +195,46 @@ const patchAnchor = (element: Element): void => {
     // `setAttribute` rather than assigning `href`: the two are equivalent here,
     // and this one is not a mutation as far as the lint rules are concerned.
     element.setAttribute('href', next);
+  }
+};
+
+/** Every element the page has grown since the last look. */
+const patchNewAnchors = (): void => {
+  for (const element of document.querySelectorAll('a[href]')) {
+    if (evaluated.has(element)) {
+      continue;
+    }
+
+    evaluated.add(element);
+
+    patchAnchor(element);
+  }
+};
+
+const suppressClientSideNavigation = (clickEvent: Event): void => {
+  // `composedPath` rather than `target.closest`, so that an anchor holding the
+  // click target inside a shadow root is still found.
+  const anchor = clickEvent
+    .composedPath()
+    .find((node) => node instanceof HTMLAnchorElement);
+
+  if (!(anchor instanceof HTMLAnchorElement)) {
+    return;
+  }
+
+  patchAnchor(anchor);
+
+  if (
+    isSettledLink(
+      anchor.href,
+      globalThis.location.origin,
+      globalThis.location.href,
+    )
+  ) {
+    // `stopImmediatePropagation` rather than `stopPropagation`: a listener the
+    // page adds to the window in the capture phase would otherwise still run,
+    // since it is on the same node as this one.
+    clickEvent.stopImmediatePropagation();
   }
 };
 
@@ -248,33 +275,6 @@ const listenForClicks = (): void => {
   addEventListener('click', suppressClientSideNavigation, {
     capture: true,
   });
-};
-
-const suppressClientSideNavigation = (clickEvent: Event): void => {
-  // `composedPath` rather than `target.closest`, so that an anchor holding the
-  // click target inside a shadow root is still found.
-  const anchor = clickEvent
-    .composedPath()
-    .find((node) => node instanceof HTMLAnchorElement);
-
-  if (!(anchor instanceof HTMLAnchorElement)) {
-    return;
-  }
-
-  patchAnchor(anchor);
-
-  if (
-    isSettledLink(
-      anchor.href,
-      globalThis.location.origin,
-      globalThis.location.href,
-    )
-  ) {
-    // `stopImmediatePropagation` rather than `stopPropagation`: a listener the
-    // page adds to the window in the capture phase would otherwise still run,
-    // since it is on the same node as this one.
-    clickEvent.stopImmediatePropagation();
-  }
 };
 
 /**

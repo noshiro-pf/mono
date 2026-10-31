@@ -126,12 +126,6 @@ describe(createTokenStore, () => {
   });
 });
 
-const memoryStores = (): TokenStores =>
-  ({
-    device: memory(),
-    session: memory(),
-  }) as const;
-
 const memory = (): KeyValueStore => {
   const mut_entries = new Map<string, string>();
 
@@ -145,3 +139,9 @@ const memory = (): KeyValueStore => {
     },
   };
 };
+
+const memoryStores = (): TokenStores =>
+  ({
+    device: memory(),
+    session: memory(),
+  }) as const;

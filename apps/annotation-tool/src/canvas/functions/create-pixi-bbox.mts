@@ -17,6 +17,35 @@ import {
 import { updateBboxPoint } from './update-pixi-bbox-point.mjs';
 import { updateBboxRect } from './update-pixi-bbox-rect.mjs';
 
+export const createBboxRect = (
+  rect: Rect,
+  borderWidthPx: number,
+  borderColor: Rgba,
+): Graphics => {
+  const mut_gr = new Graphics();
+
+  updateBboxRect(mut_gr, rect, borderWidthPx, borderColor, undefined);
+
+  mut_gr.zIndex = zIndex.bboxFace;
+
+  mut_gr.cursor = 'move';
+
+  mut_gr.interactive = true;
+
+  return mut_gr;
+};
+
+export const createBbox = (
+  rect: Rect,
+  borderWidthPx: number,
+  pointWidthPx: number,
+  borderColor: Rgba,
+): readonly [Graphics, Record<Direction, Graphics>] =>
+  [
+    createBboxRect(rect, borderWidthPx, borderColor),
+    createBboxPoints(rect, pointWidthPx, borderColor),
+  ] as const;
+
 const createBboxPoint = (
   direction: Direction,
   pointWidthPxHalf: number,
@@ -69,32 +98,3 @@ const createBboxPoints = (
     createBboxPoint(direction, pointWidthPxHalf, p.x, p.y, color),
   );
 };
-
-export const createBboxRect = (
-  rect: Rect,
-  borderWidthPx: number,
-  borderColor: Rgba,
-): Graphics => {
-  const mut_gr = new Graphics();
-
-  updateBboxRect(mut_gr, rect, borderWidthPx, borderColor, undefined);
-
-  mut_gr.zIndex = zIndex.bboxFace;
-
-  mut_gr.cursor = 'move';
-
-  mut_gr.interactive = true;
-
-  return mut_gr;
-};
-
-export const createBbox = (
-  rect: Rect,
-  borderWidthPx: number,
-  pointWidthPx: number,
-  borderColor: Rgba,
-): readonly [Graphics, Record<Direction, Graphics>] =>
-  [
-    createBboxRect(rect, borderWidthPx, borderColor),
-    createBboxPoints(rect, pointWidthPx, borderColor),
-  ] as const;

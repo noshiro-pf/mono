@@ -231,6 +231,53 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
+const isConstAssertion = (node: TSESTree.TSAsExpression): boolean =>
+  node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
+  node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
+  node.typeAnnotation.typeName.name === 'const';
+
+/** `node` without the `satisfies` and `as const` around it. */
+const skipLiteralPreservingWrappers = (node: TSESTree.Node): TSESTree.Node =>
+  node.type === AST_NODE_TYPES.TSSatisfiesExpression ||
+  (node.type === AST_NODE_TYPES.TSAsExpression && isConstAssertion(node))
+    ? skipLiteralPreservingWrappers(node.expression)
+    : node;
+
+/**
+ * A non-negative integer literal's value, or `undefined` for anything else —
+ * a computed bound cannot be matched against the rewrite table.
+ *
+ * Read through `satisfies` and `as const`, which leave the literal's type as it
+ * is, but not through any other `as`: `1 as number` widens the bound the
+ * combinator infers, so the call no longer builds the type the table names.
+ */
+const getLengthLiteral = (node: TSESTree.Node): number | undefined => {
+  const literal = skipLiteralPreservingWrappers(node);
+
+  return literal.type === AST_NODE_TYPES.Literal &&
+    typeof literal.value === 'number' &&
+    Number.isSafeInteger(literal.value) &&
+    literal.value >= 0
+    ? literal.value
+    : undefined;
+};
+
+/**
+ * Whether the options argument may carry a `defaultValue`. Anything that is not
+ * a plain object literal of statically known keys counts, since its contents
+ * cannot be ruled out.
+ */
+const passesDefaultValue = (node: TSESTree.Node | undefined): boolean =>
+  node !== undefined &&
+  (node.type !== AST_NODE_TYPES.ObjectExpression ||
+    node.properties.some(
+      (property) =>
+        property.type !== AST_NODE_TYPES.Property ||
+        property.computed ||
+        property.key.type !== AST_NODE_TYPES.Identifier ||
+        property.key.name === 'defaultValue',
+    ));
+
 /**
  * Whether `node` is a `<combinator>(...bounds, elementType, options?)` call
  * whose bounds match `rewrite` exactly as written.
@@ -341,50 +388,3 @@ const dropBoundsFix = (
       ? []
       : [fixer.removeRange([start.range[0], end.range[0]])];
   });
-
-/**
- * A non-negative integer literal's value, or `undefined` for anything else —
- * a computed bound cannot be matched against the rewrite table.
- *
- * Read through `satisfies` and `as const`, which leave the literal's type as it
- * is, but not through any other `as`: `1 as number` widens the bound the
- * combinator infers, so the call no longer builds the type the table names.
- */
-const getLengthLiteral = (node: TSESTree.Node): number | undefined => {
-  const literal = skipLiteralPreservingWrappers(node);
-
-  return literal.type === AST_NODE_TYPES.Literal &&
-    typeof literal.value === 'number' &&
-    Number.isSafeInteger(literal.value) &&
-    literal.value >= 0
-    ? literal.value
-    : undefined;
-};
-
-/** `node` without the `satisfies` and `as const` around it. */
-const skipLiteralPreservingWrappers = (node: TSESTree.Node): TSESTree.Node =>
-  node.type === AST_NODE_TYPES.TSSatisfiesExpression ||
-  (node.type === AST_NODE_TYPES.TSAsExpression && isConstAssertion(node))
-    ? skipLiteralPreservingWrappers(node.expression)
-    : node;
-
-const isConstAssertion = (node: TSESTree.TSAsExpression): boolean =>
-  node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
-  node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
-  node.typeAnnotation.typeName.name === 'const';
-
-/**
- * Whether the options argument may carry a `defaultValue`. Anything that is not
- * a plain object literal of statically known keys counts, since its contents
- * cannot be ruled out.
- */
-const passesDefaultValue = (node: TSESTree.Node | undefined): boolean =>
-  node !== undefined &&
-  (node.type !== AST_NODE_TYPES.ObjectExpression ||
-    node.properties.some(
-      (property) =>
-        property.type !== AST_NODE_TYPES.Property ||
-        property.computed ||
-        property.key.type !== AST_NODE_TYPES.Identifier ||
-        property.key.name === 'defaultValue',
-    ));

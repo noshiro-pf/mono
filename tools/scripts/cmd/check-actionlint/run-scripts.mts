@@ -142,6 +142,28 @@ const readShell = (value: string | undefined): string | undefined => {
   return shell === undefined || shell === '' ? undefined : shell;
 };
 
+/** `line` without a trailing ` # comment` or trailing blanks. */
+const withoutComment = (line: string): string =>
+  line.replace(/\s#.*$/u, '').trimEnd();
+
+const findIndexFrom = (
+  lines: readonly string[],
+  from: number,
+  predicate: (line: string, index: number) => boolean,
+): number | undefined => {
+  const offset = lines
+    .slice(from)
+    .findIndex((line, offset_) => predicate(line, from + offset_));
+
+  return offset === -1 ? undefined : from + offset;
+};
+
+const indentOf = (line: string): number =>
+  line.length - line.trimStart().length;
+
+const isContent = (line: string): boolean =>
+  line.trim() !== '' && !line.trimStart().startsWith('#');
+
 /**
  * The keys of the top-level `inputs:` mapping: the action's input names,
  * which a script may reference as `inputs.<name>`.
@@ -437,6 +459,9 @@ const readSteps = (lines: readonly string[]): readonly Step[] => {
   );
 };
 
+const problemAtLine = (index: number): string =>
+  `${index + 1}: \`runs:\` or \`steps:\` in flow style, which this does not read; write them in block style` as const;
+
 /**
  * A `runs:` or `steps:` given a flow value on its own line, or a flow
  * sequence starting the line under `steps:` — the steps this cannot read.
@@ -490,9 +515,6 @@ const findFlowStyle = (
     }
   });
 
-const problemAtLine = (index: number): string =>
-  `${index + 1}: \`runs:\` or \`steps:\` in flow style, which this does not read; write them in block style` as const;
-
 /**
  * A line that gives a step its `run:` key in any way YAML allows at a step's
  * own level: plain, quoted, as an explicit `? run` key, or inside a flow
@@ -509,25 +531,3 @@ const isRunKey = (line: string): boolean => {
     (item.startsWith('{') && /[{,]\s*["']?run["']?\s*:/u.test(item))
   );
 };
-
-/** `line` without a trailing ` # comment` or trailing blanks. */
-const withoutComment = (line: string): string =>
-  line.replace(/\s#.*$/u, '').trimEnd();
-
-const findIndexFrom = (
-  lines: readonly string[],
-  from: number,
-  predicate: (line: string, index: number) => boolean,
-): number | undefined => {
-  const offset = lines
-    .slice(from)
-    .findIndex((line, offset_) => predicate(line, from + offset_));
-
-  return offset === -1 ? undefined : from + offset;
-};
-
-const indentOf = (line: string): number =>
-  line.length - line.trimStart().length;
-
-const isContent = (line: string): boolean =>
-  line.trim() !== '' && !line.trimStart().startsWith('#');

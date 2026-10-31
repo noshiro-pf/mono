@@ -452,164 +452,6 @@ const ClosingIssueSchema = t.record({
   blockedBy: BlockedBySchema,
 });
 
-/** An issue as read, with only `own`'s issues among what blocks it. */
-const closingIssueAnswer = (
-  own: string,
-  { number, state, body, blockedBy }: t.TypeOf<typeof ClosingIssueSchema>,
-): ClosingIssueAnswer =>
-  ({
-    number,
-    state,
-    body,
-    blockedBy: blockedBy.nodes
-      .filter(
-        ({ repository }) => repository.nameWithOwner.toLowerCase() === own,
-      )
-      .map((node) => node.number),
-  }) as const;
-
-const ClosingIssuesNodeSchema = t.record({
-  bodyHTML: t.string(),
-  closingIssuesReferences: t.record({
-    nodes: t.array(
-      t.record({
-        number: t.number(),
-        state: t.string(),
-        body: t.string(),
-        blockedBy: BlockedBySchema,
-        repository: t.record({ nameWithOwner: t.string() }),
-      }),
-    ),
-  }),
-});
-
-/**
- * One GraphQL request of aliased fields under the repository of the working
- * directory, each taking one number as `$<alias>`, with the repository's own
- * name read back so that a body's references can be told apart from another
- * repository's.
- */
-const askRepository = async (
-  api: ApiContext,
-  operationName: string,
-  parts: readonly Readonly<{ alias: string; number: number; field: string }>[],
-): Promise<
-  Result<
-    Readonly<{
-      repo: Readonly<{ owner: string; name: string }>;
-      fields: (alias: string) => unknown;
-    }>,
-    string
-  >
-> => {
-  const query = [
-    `query ${operationName}(${['$owner: String!', '$name: String!', ...parts.map(({ alias }) => `$${alias}: Int!`)].join(', ')}) {`,
-    '  repository(owner: $owner, name: $name) {',
-    '    nameWithOwner',
-    ...parts.map(({ alias, field }) => `    ${alias}: ${field}`),
-    '  }',
-    '}',
-  ].join('\n');
-
-  const answered = await askRepositoryOf(
-    api,
-    query,
-    Object.fromEntries(
-      parts.map(({ alias, number }) => [alias, number] as const),
-    ),
-    t.unknown(),
-  );
-
-  if (Result.isErr(answered)) {
-    return answered;
-  }
-
-  const repository = answered.value;
-
-  const nameWithOwner = isRecord(repository)
-    ? repository['nameWithOwner']
-    : undefined;
-
-  const [owner, name] =
-    typeof nameWithOwner === 'string'
-      ? nameWithOwner.split('/')
-      : ([] as const);
-
-  if (owner === undefined || name === undefined || !isRecord(repository)) {
-    return Result.err('GitHub answered without the repository');
-  }
-
-  return Result.ok({
-    repo: { owner, name },
-    fields: (alias) => repository[alias],
-  });
-};
-
-/**
- * One GraphQL request whose `$owner` and `$name` are the repository's, to be
- * declared by `query`, resolving to what it answered under `repository`.
- */
-const askRepositoryOf = async <A,>(
-  api: ApiContext,
-  query: string,
-  variables: GraphqlVariables,
-  schema: t.Type<A>,
-): Promise<Result<A, string>> =>
-  Result.map(
-    await graphqlQuery(
-      api,
-      query,
-      { owner: api.repo.owner, name: api.repo.name, ...variables },
-      t.record({ repository: schema }),
-    ),
-    ({ repository }) => repository,
-  );
-
-const CODE_OWNERS_PATH = '.github/CODEOWNERS';
-
-/** One page of a list inside a pull request. */
-const PAGE_SIZE = 100;
-
-const CodeOwnersBlobSchema = t.union([
-  t.record({ text: t.string() }),
-  t.nullType,
-]);
-
-const LoginSchema = t.union([t.record({ login: t.string() }), t.nullType]);
-
-const ReviewStateNodeSchema = t.record({
-  author: LoginSchema,
-  latestOpinionatedReviews: t.record({
-    nodes: t.array(t.record({ state: t.string(), author: LoginSchema })),
-  }),
-  files: t.record({
-    pageInfo: t.record({ hasNextPage: t.boolean() }),
-    nodes: t.array(t.record({ path: t.string() })),
-  }),
-  reviewThreads: t.record({
-    nodes: t.array(t.record({ isResolved: t.boolean() })),
-  }),
-});
-
-const reviewStateOf = (
-  node: t.TypeOf<typeof ReviewStateNodeSchema>,
-): ReviewState =>
-  ({
-    author: node.author?.login ?? '',
-    approvers: Arr.generate(function* () {
-      for (const { state, author } of node.latestOpinionatedReviews.nodes) {
-        if (state === 'APPROVED' && author !== null) {
-          yield author.login;
-        }
-      }
-    }),
-    files: node.files.nodes.map(({ path }) => path),
-    filesComplete: !node.files.pageInfo.hasNextPage,
-    unresolvedConversations: node.reviewThreads.nodes.filter(
-      ({ isResolved }) => !isResolved,
-    ).length,
-  }) as const;
-
 export const addSkipCiLabel = async (
   api: ApiContext,
   prNumber: number,
@@ -742,29 +584,6 @@ export const readOwnComments = async (
   });
 };
 
-const ownSetAsideComment = (
-  comments: readonly t.TypeOf<typeof CommentSchema>[],
-): OwnSetAsideComment | undefined =>
-  Arr.generate(function* () {
-    for (const { databaseId, body } of comments) {
-      const says = parseSetAsideComment(body);
-
-      if (databaseId !== null && says !== undefined) {
-        yield { databaseId, says };
-      }
-    }
-  }).at(0);
-
-const CommentSchema = t.record({
-  databaseId: t.union([t.number(), t.nullType]),
-  body: t.string(),
-  viewerDidAuthor: t.boolean(),
-});
-
-const CommentsNodeSchema = t.record({
-  comments: t.record({ nodes: t.array(CommentSchema) }),
-});
-
 /**
  * Writes `body` as the pull request's set-aside comment: over `existing`,
  * this account's own, when there is one — a pull request has one, edited in
@@ -817,33 +636,6 @@ export const readBaseChanges = async (
       ),
   );
 
-const TIMELINE_QUERY = [
-  'query($owner: String!, $name: String!, $number: Int!) {',
-  '  repository(owner: $owner, name: $name) {',
-  '    pullRequest(number: $number) {',
-  '      timelineItems(last: 100, itemTypes: [BASE_REF_CHANGED_EVENT]) {',
-  '        nodes {',
-  '          ... on BaseRefChangedEvent { previousRefName currentRefName }',
-  '        }',
-  '      }',
-  '    }',
-  '  }',
-  '}',
-].join(' ');
-
-const TimelineNodeSchema = t.record({
-  previousRefName: t.optional(t.union([t.string(), t.nullType])),
-  currentRefName: t.optional(t.union([t.string(), t.nullType])),
-});
-
-const TimelineSchema = t.record({
-  pullRequest: t.record({
-    timelineItems: t.record({
-      nodes: t.array(TimelineNodeSchema),
-    }),
-  }),
-});
-
 /**
  * The pull request's place in one of GitHub's native stacks, or `undefined`
  * when it is in none. GraphQL, because REST does not know them.
@@ -868,28 +660,6 @@ export const readNativeStack = async (
             size: stackEntry.stack.size,
           },
   );
-
-const NATIVE_STACK_QUERY = [
-  'query($owner: String!, $name: String!, $number: Int!) {',
-  '  repository(owner: $owner, name: $name) {',
-  '    pullRequest(number: $number) {',
-  '      stackEntry { position stack { number size } }',
-  '    }',
-  '  }',
-  '}',
-].join(' ');
-
-const NativeStackSchema = t.record({
-  pullRequest: t.record({
-    stackEntry: t.union([
-      t.record({
-        position: t.number(),
-        stack: t.record({ number: t.number(), size: t.number() }),
-      }),
-      t.nullType,
-    ]),
-  }),
-});
 
 /**
  * The head the last merged pull request from `branch` was merged at, and the
@@ -936,20 +706,6 @@ export const latestMergedHead = (
       };
 };
 
-export type MergedHead = Readonly<{
-  number: number;
-  headSha: string;
-  /** The squash commit on the base; GitHub may not have it for a moment. */
-  mergeCommit: string | undefined;
-}>;
-
-const MergedPullSchema = t.record({
-  number: t.number(),
-  head: t.record({ sha: t.string() }),
-  merge_commit_sha: t.union([t.string(), t.nullType]),
-  merged_at: t.union([t.string(), t.nullType]),
-});
-
 /**
  * Arms auto-merge, squash being the one method the ruleset allows. The
  * mutation refuses when nothing holds the pull request, where
@@ -960,9 +716,6 @@ export const armAutoMerge = async (
   nodeId: string,
 ): Promise<Result<undefined, string>> =>
   graphql(api, ARM_MUTATION, { id: nodeId });
-
-const ARM_MUTATION =
-  'mutation($id: ID!) { enablePullRequestAutoMerge(input: { pullRequestId: $id, mergeMethod: SQUASH }) { clientMutationId } }';
 
 /**
  * Every check run GitHub Actions reported on one commit, every job of every
@@ -1024,6 +777,260 @@ export const listCheckRuns = async (
   );
 };
 
+export const removeWorktree = async (worktreeDir: string): Promise<void> => {
+  // Both fail harmlessly when there is nothing to remove.
+  await git(`git worktree remove --force ${sh(worktreeDir)}`);
+
+  await git('git worktree prune');
+};
+
+/** An issue as read, with only `own`'s issues among what blocks it. */
+const closingIssueAnswer = (
+  own: string,
+  { number, state, body, blockedBy }: t.TypeOf<typeof ClosingIssueSchema>,
+): ClosingIssueAnswer =>
+  ({
+    number,
+    state,
+    body,
+    blockedBy: blockedBy.nodes
+      .filter(
+        ({ repository }) => repository.nameWithOwner.toLowerCase() === own,
+      )
+      .map((node) => node.number),
+  }) as const;
+
+const ClosingIssuesNodeSchema = t.record({
+  bodyHTML: t.string(),
+  closingIssuesReferences: t.record({
+    nodes: t.array(
+      t.record({
+        number: t.number(),
+        state: t.string(),
+        body: t.string(),
+        blockedBy: BlockedBySchema,
+        repository: t.record({ nameWithOwner: t.string() }),
+      }),
+    ),
+  }),
+});
+
+/**
+ * One GraphQL request whose `$owner` and `$name` are the repository's, to be
+ * declared by `query`, resolving to what it answered under `repository`.
+ */
+const askRepositoryOf = async <A,>(
+  api: ApiContext,
+  query: string,
+  variables: GraphqlVariables,
+  schema: t.Type<A>,
+): Promise<Result<A, string>> =>
+  Result.map(
+    await graphqlQuery(
+      api,
+      query,
+      { owner: api.repo.owner, name: api.repo.name, ...variables },
+      t.record({ repository: schema }),
+    ),
+    ({ repository }) => repository,
+  );
+
+/**
+ * One GraphQL request of aliased fields under the repository of the working
+ * directory, each taking one number as `$<alias>`, with the repository's own
+ * name read back so that a body's references can be told apart from another
+ * repository's.
+ */
+const askRepository = async (
+  api: ApiContext,
+  operationName: string,
+  parts: readonly Readonly<{ alias: string; number: number; field: string }>[],
+): Promise<
+  Result<
+    Readonly<{
+      repo: Readonly<{ owner: string; name: string }>;
+      fields: (alias: string) => unknown;
+    }>,
+    string
+  >
+> => {
+  const query = [
+    `query ${operationName}(${['$owner: String!', '$name: String!', ...parts.map(({ alias }) => `$${alias}: Int!`)].join(', ')}) {`,
+    '  repository(owner: $owner, name: $name) {',
+    '    nameWithOwner',
+    ...parts.map(({ alias, field }) => `    ${alias}: ${field}`),
+    '  }',
+    '}',
+  ].join('\n');
+
+  const answered = await askRepositoryOf(
+    api,
+    query,
+    Object.fromEntries(
+      parts.map(({ alias, number }) => [alias, number] as const),
+    ),
+    t.unknown(),
+  );
+
+  if (Result.isErr(answered)) {
+    return answered;
+  }
+
+  const repository = answered.value;
+
+  const nameWithOwner = isRecord(repository)
+    ? repository['nameWithOwner']
+    : undefined;
+
+  const [owner, name] =
+    typeof nameWithOwner === 'string'
+      ? nameWithOwner.split('/')
+      : ([] as const);
+
+  if (owner === undefined || name === undefined || !isRecord(repository)) {
+    return Result.err('GitHub answered without the repository');
+  }
+
+  return Result.ok({
+    repo: { owner, name },
+    fields: (alias) => repository[alias],
+  });
+};
+
+const CODE_OWNERS_PATH = '.github/CODEOWNERS';
+
+/** One page of a list inside a pull request. */
+const PAGE_SIZE = 100;
+
+const CodeOwnersBlobSchema = t.union([
+  t.record({ text: t.string() }),
+  t.nullType,
+]);
+
+const LoginSchema = t.union([t.record({ login: t.string() }), t.nullType]);
+
+const ReviewStateNodeSchema = t.record({
+  author: LoginSchema,
+  latestOpinionatedReviews: t.record({
+    nodes: t.array(t.record({ state: t.string(), author: LoginSchema })),
+  }),
+  files: t.record({
+    pageInfo: t.record({ hasNextPage: t.boolean() }),
+    nodes: t.array(t.record({ path: t.string() })),
+  }),
+  reviewThreads: t.record({
+    nodes: t.array(t.record({ isResolved: t.boolean() })),
+  }),
+});
+
+const reviewStateOf = (
+  node: t.TypeOf<typeof ReviewStateNodeSchema>,
+): ReviewState =>
+  ({
+    author: node.author?.login ?? '',
+    approvers: Arr.generate(function* () {
+      for (const { state, author } of node.latestOpinionatedReviews.nodes) {
+        if (state === 'APPROVED' && author !== null) {
+          yield author.login;
+        }
+      }
+    }),
+    files: node.files.nodes.map(({ path }) => path),
+    filesComplete: !node.files.pageInfo.hasNextPage,
+    unresolvedConversations: node.reviewThreads.nodes.filter(
+      ({ isResolved }) => !isResolved,
+    ).length,
+  }) as const;
+
+const ownSetAsideComment = (
+  comments: readonly t.TypeOf<typeof CommentSchema>[],
+): OwnSetAsideComment | undefined =>
+  Arr.generate(function* () {
+    for (const { databaseId, body } of comments) {
+      const says = parseSetAsideComment(body);
+
+      if (databaseId !== null && says !== undefined) {
+        yield { databaseId, says };
+      }
+    }
+  }).at(0);
+
+const CommentSchema = t.record({
+  databaseId: t.union([t.number(), t.nullType]),
+  body: t.string(),
+  viewerDidAuthor: t.boolean(),
+});
+
+const CommentsNodeSchema = t.record({
+  comments: t.record({ nodes: t.array(CommentSchema) }),
+});
+
+const TIMELINE_QUERY = [
+  'query($owner: String!, $name: String!, $number: Int!) {',
+  '  repository(owner: $owner, name: $name) {',
+  '    pullRequest(number: $number) {',
+  '      timelineItems(last: 100, itemTypes: [BASE_REF_CHANGED_EVENT]) {',
+  '        nodes {',
+  '          ... on BaseRefChangedEvent { previousRefName currentRefName }',
+  '        }',
+  '      }',
+  '    }',
+  '  }',
+  '}',
+].join(' ');
+
+const TimelineNodeSchema = t.record({
+  previousRefName: t.optional(t.union([t.string(), t.nullType])),
+  currentRefName: t.optional(t.union([t.string(), t.nullType])),
+});
+
+const TimelineSchema = t.record({
+  pullRequest: t.record({
+    timelineItems: t.record({
+      nodes: t.array(TimelineNodeSchema),
+    }),
+  }),
+});
+
+const NATIVE_STACK_QUERY = [
+  'query($owner: String!, $name: String!, $number: Int!) {',
+  '  repository(owner: $owner, name: $name) {',
+  '    pullRequest(number: $number) {',
+  '      stackEntry { position stack { number size } }',
+  '    }',
+  '  }',
+  '}',
+].join(' ');
+
+const NativeStackSchema = t.record({
+  pullRequest: t.record({
+    stackEntry: t.union([
+      t.record({
+        position: t.number(),
+        stack: t.record({ number: t.number(), size: t.number() }),
+      }),
+      t.nullType,
+    ]),
+  }),
+});
+
+export type MergedHead = Readonly<{
+  number: number;
+  headSha: string;
+  /** The squash commit on the base; GitHub may not have it for a moment. */
+  mergeCommit: string | undefined;
+}>;
+
+const MergedPullSchema = t.record({
+  number: t.number(),
+  head: t.record({ sha: t.string() }),
+  merge_commit_sha: t.union([t.string(), t.nullType]),
+  merged_at: t.union([t.string(), t.nullType]),
+});
+
+const ARM_MUTATION =
+  'mutation($id: ID!) { enablePullRequestAutoMerge(input: { pullRequestId: $id, mergeMethod: SQUASH }) { clientMutationId } }';
+
 const MAX_CHECK_RUN_PAGES = 10;
 
 const CheckRunPageSchema = t.record({
@@ -1039,12 +1046,5 @@ const CheckRunPageSchema = t.record({
     }),
   ),
 });
-
-export const removeWorktree = async (worktreeDir: string): Promise<void> => {
-  // Both fail harmlessly when there is nothing to remove.
-  await git(`git worktree remove --force ${sh(worktreeDir)}`);
-
-  await git('git worktree prune');
-};
 
 const SHA = /^[0-9a-f]{40}$/u;

@@ -22,6 +22,67 @@ import type {
   VisibilityFromMe,
 } from '../types/index.mjs';
 
+export const mapToDisplayValue = ({
+  gameState,
+  myPlayerIndex,
+  onCardClick,
+}: Readonly<{
+  gameState: GameState;
+  myPlayerIndex: PlayerIndex;
+  onCardClick: (card: Card, playerDirectionFromMe: NWES) => void;
+}>): DisplayValues =>
+  ({
+    playerCards: {
+      S: mapPlayers6CardsToDisplayValue({
+        direction: 'S',
+        player6Cards: gameState.playerCards[myPlayerIndex],
+        gameState,
+        myPlayerIndex,
+        onCardClick,
+      }),
+      W: mapPlayers6CardsToDisplayValue({
+        direction: 'W',
+        player6Cards:
+          gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 1)],
+        gameState,
+        myPlayerIndex,
+        onCardClick,
+      }),
+      N: mapPlayers6CardsToDisplayValue({
+        direction: 'N',
+        player6Cards:
+          gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 2)],
+        gameState,
+        myPlayerIndex,
+        onCardClick,
+      }),
+      E: mapPlayers6CardsToDisplayValue({
+        direction: 'E',
+        player6Cards:
+          gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 3)],
+        gameState,
+        myPlayerIndex,
+        onCardClick,
+      }),
+    },
+
+    gameMessage: match(gameState.phase, {
+      ph010_selectMyCardToToss: dictionary.gameMessage.selectYourCardToToss,
+      ph020_firstAnswer: dictionary.gameMessage.selectYourCardAndAttack,
+      ph030_continuousAnswer: dictionary.gameMessage.selectYourCardToAttack,
+    }),
+    // Every branch of the original `match` was the same expression with the
+    // matched value substituted, so it collapses to one call. `match` also
+    // requires string cases now, and `currentPlayerIndex` is numeric.
+    turnPlayer:
+      directions[
+        decrementPlayerIndex(gameState.currentPlayerIndex, myPlayerIndex)
+      ],
+
+    endTurnButtonDisabled:
+      gameState.phase !== 'ph030_continuousAnswer' || gameState.readonly,
+  }) as const;
+
 const mapPlayers6CardsToDisplayValue = ({
   direction,
   player6Cards,
@@ -114,64 +175,3 @@ const mapPlayers6CardsToDisplayValue = ({
           },
     } as const;
   });
-
-export const mapToDisplayValue = ({
-  gameState,
-  myPlayerIndex,
-  onCardClick,
-}: Readonly<{
-  gameState: GameState;
-  myPlayerIndex: PlayerIndex;
-  onCardClick: (card: Card, playerDirectionFromMe: NWES) => void;
-}>): DisplayValues =>
-  ({
-    playerCards: {
-      S: mapPlayers6CardsToDisplayValue({
-        direction: 'S',
-        player6Cards: gameState.playerCards[myPlayerIndex],
-        gameState,
-        myPlayerIndex,
-        onCardClick,
-      }),
-      W: mapPlayers6CardsToDisplayValue({
-        direction: 'W',
-        player6Cards:
-          gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 1)],
-        gameState,
-        myPlayerIndex,
-        onCardClick,
-      }),
-      N: mapPlayers6CardsToDisplayValue({
-        direction: 'N',
-        player6Cards:
-          gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 2)],
-        gameState,
-        myPlayerIndex,
-        onCardClick,
-      }),
-      E: mapPlayers6CardsToDisplayValue({
-        direction: 'E',
-        player6Cards:
-          gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 3)],
-        gameState,
-        myPlayerIndex,
-        onCardClick,
-      }),
-    },
-
-    gameMessage: match(gameState.phase, {
-      ph010_selectMyCardToToss: dictionary.gameMessage.selectYourCardToToss,
-      ph020_firstAnswer: dictionary.gameMessage.selectYourCardAndAttack,
-      ph030_continuousAnswer: dictionary.gameMessage.selectYourCardToAttack,
-    }),
-    // Every branch of the original `match` was the same expression with the
-    // matched value substituted, so it collapses to one call. `match` also
-    // requires string cases now, and `currentPlayerIndex` is numeric.
-    turnPlayer:
-      directions[
-        decrementPlayerIndex(gameState.currentPlayerIndex, myPlayerIndex)
-      ],
-
-    endTurnButtonDisabled:
-      gameState.phase !== 'ph030_continuousAnswer' || gameState.readonly,
-  }) as const;

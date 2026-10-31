@@ -407,19 +407,6 @@ const freshValueMembersByOwner: ReadonlyMap<
 ]);
 
 /**
- * Whether some segment of the path is marked mutable.
- *
- * The root binding is the usual case (`mut_xs[0] = 1`), and a property is the
- * other one the monorepo already relies on (`state.mut_cache.x = 1`) — the
- * ESLint bridge spells the pair `ignoreIdentifierPattern: ['^mut_']` and
- * `ignoreAccessorPattern: ['**.mut_**']`. How far the prefix reaches into
- * property and parameter names is an open point in
- * spec/variables-and-mutation.md; this follows what the bridge does today.
- */
-const isMutPermitted = (node: TsNode): boolean =>
-  pathSegments(node).some((segment) => segment.startsWith('mut_'));
-
-/**
  * The names along an access path, root first. A segment that is not a name —
  * a computed index, a call in the middle of the chain — contributes nothing,
  * which is what keeps `xs[mut_i] = 1` from reading as permitted.
@@ -448,6 +435,19 @@ const pathSegments = (node: TsNode): readonly string[] => {
 
   return [];
 };
+
+/**
+ * Whether some segment of the path is marked mutable.
+ *
+ * The root binding is the usual case (`mut_xs[0] = 1`), and a property is the
+ * other one the monorepo already relies on (`state.mut_cache.x = 1`) — the
+ * ESLint bridge spells the pair `ignoreIdentifierPattern: ['^mut_']` and
+ * `ignoreAccessorPattern: ['**.mut_**']`. How far the prefix reaches into
+ * property and parameter names is an open point in
+ * spec/variables-and-mutation.md; this follows what the bridge does today.
+ */
+const isMutPermitted = (node: TsNode): boolean =>
+  pathSegments(node).some((segment) => segment.startsWith('mut_'));
 
 /** The path as written, for the message. */
 const pathText = (node: TsNode): string => {
@@ -497,28 +497,10 @@ const isFreshValue = (
   );
 };
 
-/**
- * Assignment through an access path: the target of `=`, a compound operator,
- * or a `for … of` / `for … in` header, or each access a destructuring pattern
- * there assigns to.
- */
-const reportAssignedAccess = (
-  node: TsNode,
-  report: RuleContext['report'],
-  isReportedByCompiler: RuleContext['isReportedByCompiler'],
-): void => {
-  for (const target of assignedTargets(node)) {
-    if (
-      !isAccess(target) ||
-      isMutPermitted(target) ||
-      isReportedByCompiler(target, readonlyWriteCodes)
-    ) {
-      continue;
-    }
-
-    report(target, 'assignment', { path: pathText(target) });
-  }
-};
+/** A pattern element with a default value: `target = value`. */
+const hasDefault = (node: TsNode): boolean =>
+  isBinaryExpression(node) &&
+  node.operatorToken.kind === SyntaxKind.EqualsToken;
 
 /**
  * What an assignment target writes to, unwrapped: the target itself, or the
@@ -556,7 +538,25 @@ const assignedTargets = (node: TsNode): readonly TsNode[] => {
   return [target];
 };
 
-/** A pattern element with a default value: `target = value`. */
-const hasDefault = (node: TsNode): boolean =>
-  isBinaryExpression(node) &&
-  node.operatorToken.kind === SyntaxKind.EqualsToken;
+/**
+ * Assignment through an access path: the target of `=`, a compound operator,
+ * or a `for … of` / `for … in` header, or each access a destructuring pattern
+ * there assigns to.
+ */
+const reportAssignedAccess = (
+  node: TsNode,
+  report: RuleContext['report'],
+  isReportedByCompiler: RuleContext['isReportedByCompiler'],
+): void => {
+  for (const target of assignedTargets(node)) {
+    if (
+      !isAccess(target) ||
+      isMutPermitted(target) ||
+      isReportedByCompiler(target, readonlyWriteCodes)
+    ) {
+      continue;
+    }
+
+    report(target, 'assignment', { path: pathText(target) });
+  }
+};

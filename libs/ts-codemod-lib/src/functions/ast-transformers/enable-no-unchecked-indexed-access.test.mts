@@ -34,6 +34,29 @@ const preamble = dedent`
   declare const k: string;
 `;
 
+/**
+ * Runs the transformer over `code` in {@link project}, and returns what it
+ * made of it.
+ */
+const transformInProject = (
+  code: string,
+  options?: Parameters<typeof enableNoUncheckedIndexedAccessTransformer>[0],
+): string => {
+  const sourceAst = project.createSourceFile('source.ts', code, {
+    overwrite: true,
+  });
+
+  enableNoUncheckedIndexedAccessTransformer(options).transform(sourceAst);
+
+  return sourceAst.getFullText();
+};
+
+const formatter = (code: string): Promise<string> =>
+  prettier.format(code, {
+    parser: 'typescript',
+    plugins: [prettierPluginTypeScript, prettierPluginEstree],
+  });
+
 const testFn = async ({
   source,
   expected,
@@ -57,23 +80,6 @@ const testFn = async ({
   const expectedFormatted = await formatter(`${preamble}\n\n${expected}`);
 
   expect(transformed).toBe(expectedFormatted);
-};
-
-/**
- * Runs the transformer over `code` in {@link project}, and returns what it
- * made of it.
- */
-const transformInProject = (
-  code: string,
-  options?: Parameters<typeof enableNoUncheckedIndexedAccessTransformer>[0],
-): string => {
-  const sourceAst = project.createSourceFile('source.ts', code, {
-    overwrite: true,
-  });
-
-  enableNoUncheckedIndexedAccessTransformer(options).transform(sourceAst);
-
-  return sourceAst.getFullText();
 };
 
 /**
@@ -106,12 +112,6 @@ const project = new tsm.Project({
     lib: ['lib.es2015.d.ts'],
   },
 });
-
-const formatter = (code: string): Promise<string> =>
-  prettier.format(code, {
-    parser: 'typescript',
-    plugins: [prettierPluginTypeScript, prettierPluginEstree],
-  });
 
 describe(enableNoUncheckedIndexedAccessTransformer, () => {
   describe('accesses the option widens with undefined', () => {

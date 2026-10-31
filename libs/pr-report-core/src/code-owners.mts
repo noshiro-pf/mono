@@ -55,87 +55,6 @@ export const ownersOf = (
 ): readonly string[] =>
   rules.findLast((rule) => toRegExp(rule.pattern).test(path))?.owners ?? [];
 
-const stripComment = (line: string): string => {
-  const at = line.indexOf('#');
-
-  return at === -1 ? line : line.slice(0, at);
-};
-
-const toRegExp = (pattern: string): RegExp => {
-  const directory = pattern.endsWith('/');
-
-  const trimmed = pattern.replaceAll(/^\/|\/$/gu, '');
-
-  // `.gitignore`'s rule: a slash anywhere but at the end ties the pattern to
-  // the root, and a pattern without one may match at any depth.
-  const anchored = pattern.startsWith('/') || trimmed.includes('/');
-
-  const body = globToRegExpSource(trimmed);
-
-  // A directory owns what is under it and never matches as a file. A name
-  // with no trailing slash may be either, so it matches itself and what is
-  // under it — unless its last segment is a wildcard, which GitHub reads as
-  // files at that level only: `docs/*` owns `docs/a.md` and not
-  // `docs/build/a.md`.
-  const tail = directory
-    ? '/.+'
-    : (trimmed.split('/').at(-1) ?? '').includes('*')
-      ? ''
-      : '(?:/.+)?';
-
-  // eslint-disable-next-line security/detect-non-literal-regexp
-  return new RegExp(`^${anchored ? '' : '(?:.+/)?'}${body}${tail}$`, 'u');
-};
-
-const globToRegExpSource = (glob: string): string =>
-  glob
-    .split('/')
-    .map((segment, index, segments) =>
-      segment === '**'
-        ? // `a/**/b` is `a/b` as well as `a/x/y/b`, so the separator that
-          // follows is part of what `**` may leave out.
-          index === segments.length - 1
-          ? '.*'
-          : '(?:.*/)?'
-        : `${segment
-            .split('')
-            .map((char) =>
-              char === '*' ? '[^/]*' : char === '?' ? '[^/]' : escapeChar(char),
-            )
-            .join('')}${index === segments.length - 1 ? '' : '/'}`,
-    )
-    .join('');
-
-// Not `RegExp.escape`: it arrived in Node 24, and `ws:check:test` also runs
-// on the `engines.node` floor (`test-node-versions (minimum)`), which is 22.
-// Under the `u` flag only the syntax characters and `/` may be escaped, and
-// everything else is a literal as it stands.
-const escapeChar = (char: string): string =>
-  String.raw`^$\.*+?()[]{}|/`.includes(char) ? (`\\${char}` as const) : char;
-
-/**
- * Where a pull request stands with the code owners.
- *
- * `required` lists what is still waiting — the owned paths no owner has
- * approved yet, and who could approve them. `authorOwns` is the case that
- * waits for ever: GitHub does not let an author approve their own pull
- * request, so when the author is the only owner nothing but a ruleset bypass
- * will merge it. `unknown` is a pull request whose changed files were more
- * than could be read, where the unread ones might be owned — or, with
- * `teams`, one approved by someone these teams might have as a member.
- */
-export type CodeOwnerReview = Readonly<
-  | { state: 'approved' }
-  | { state: 'not-required' }
-  | { state: 'unknown'; teams?: readonly string[] }
-  | {
-      state: 'required';
-      paths: readonly string[];
-      owners: readonly string[];
-      authorOwns: boolean;
-    }
->;
-
 /**
  * What GitHub would say, worked out the way GitHub does: every changed path
  * that has owners needs an approval from one of them. An approval is the
@@ -224,6 +143,87 @@ export const codeOwnerReview = ({
 
   return owned ? { state: 'approved' } : { state: 'not-required' };
 };
+
+const stripComment = (line: string): string => {
+  const at = line.indexOf('#');
+
+  return at === -1 ? line : line.slice(0, at);
+};
+
+// Not `RegExp.escape`: it arrived in Node 24, and `ws:check:test` also runs
+// on the `engines.node` floor (`test-node-versions (minimum)`), which is 22.
+// Under the `u` flag only the syntax characters and `/` may be escaped, and
+// everything else is a literal as it stands.
+const escapeChar = (char: string): string =>
+  String.raw`^$\.*+?()[]{}|/`.includes(char) ? (`\\${char}` as const) : char;
+
+const globToRegExpSource = (glob: string): string =>
+  glob
+    .split('/')
+    .map((segment, index, segments) =>
+      segment === '**'
+        ? // `a/**/b` is `a/b` as well as `a/x/y/b`, so the separator that
+          // follows is part of what `**` may leave out.
+          index === segments.length - 1
+          ? '.*'
+          : '(?:.*/)?'
+        : `${segment
+            .split('')
+            .map((char) =>
+              char === '*' ? '[^/]*' : char === '?' ? '[^/]' : escapeChar(char),
+            )
+            .join('')}${index === segments.length - 1 ? '' : '/'}`,
+    )
+    .join('');
+
+const toRegExp = (pattern: string): RegExp => {
+  const directory = pattern.endsWith('/');
+
+  const trimmed = pattern.replaceAll(/^\/|\/$/gu, '');
+
+  // `.gitignore`'s rule: a slash anywhere but at the end ties the pattern to
+  // the root, and a pattern without one may match at any depth.
+  const anchored = pattern.startsWith('/') || trimmed.includes('/');
+
+  const body = globToRegExpSource(trimmed);
+
+  // A directory owns what is under it and never matches as a file. A name
+  // with no trailing slash may be either, so it matches itself and what is
+  // under it — unless its last segment is a wildcard, which GitHub reads as
+  // files at that level only: `docs/*` owns `docs/a.md` and not
+  // `docs/build/a.md`.
+  const tail = directory
+    ? '/.+'
+    : (trimmed.split('/').at(-1) ?? '').includes('*')
+      ? ''
+      : '(?:/.+)?';
+
+  // eslint-disable-next-line security/detect-non-literal-regexp
+  return new RegExp(`^${anchored ? '' : '(?:.+/)?'}${body}${tail}$`, 'u');
+};
+
+/**
+ * Where a pull request stands with the code owners.
+ *
+ * `required` lists what is still waiting — the owned paths no owner has
+ * approved yet, and who could approve them. `authorOwns` is the case that
+ * waits for ever: GitHub does not let an author approve their own pull
+ * request, so when the author is the only owner nothing but a ruleset bypass
+ * will merge it. `unknown` is a pull request whose changed files were more
+ * than could be read, where the unread ones might be owned — or, with
+ * `teams`, one approved by someone these teams might have as a member.
+ */
+export type CodeOwnerReview = Readonly<
+  | { state: 'approved' }
+  | { state: 'not-required' }
+  | { state: 'unknown'; teams?: readonly string[] }
+  | {
+      state: 'required';
+      paths: readonly string[];
+      owners: readonly string[];
+      authorOwns: boolean;
+    }
+>;
 
 /** `org/team`, as opposed to a person's login or an email address. */
 const isTeam = (owner: string): boolean => owner.includes('/');

@@ -112,6 +112,14 @@ const BranchSchema = t.record({
   ),
 });
 
+/** As `workflow-runs.mts` words them. */
+const refusal = (response: Response, what: string): string =>
+  response.status === UNAUTHORIZED
+    ? (`GitHub would not accept the token for ${what}. It may have expired or been revoked.` as const)
+    : response.headers.get('x-ratelimit-remaining') === '0'
+      ? (`The REST rate limit on this token's account is spent, so ${what} cannot be read. It resets within the hour.` as const)
+      : (`GitHub answered ${response.status} ${response.statusText} for ${what}.` as const);
+
 const getJson = async <A,>(
   route: string,
   schema: t.Type<A>,
@@ -163,11 +171,3 @@ const getJson = async <A,>(
 const askGitHub: RestFetch = async (route, init) => fetch(route, init);
 
 const UNAUTHORIZED = 401;
-
-/** As `workflow-runs.mts` words them. */
-const refusal = (response: Response, what: string): string =>
-  response.status === UNAUTHORIZED
-    ? (`GitHub would not accept the token for ${what}. It may have expired or been revoked.` as const)
-    : response.headers.get('x-ratelimit-remaining') === '0'
-      ? (`The REST rate limit on this token's account is spent, so ${what} cannot be read. It resets within the hour.` as const)
-      : (`GitHub answered ${response.status} ${response.statusText} for ${what}.` as const);

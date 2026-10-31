@@ -127,6 +127,17 @@ const scrollBoxOf = (box: HTMLDivElement): ScrollBox =>
     height: box.clientHeight,
   }) as const;
 
+/** A computed length such as `630px`, in pixels; `undefined` for anything else. */
+const pixelsOf = (computed: string): number | undefined => {
+  if (!computed.endsWith('px')) {
+    return undefined;
+  }
+
+  const parsed = Num.safeParseFloat(computed.slice(0, -2));
+
+  return Result.isOk(parsed) ? parsed.value : undefined;
+};
+
 const roomOf = (box: HTMLDivElement): Size => {
   const style = getComputedStyle(box);
 
@@ -143,15 +154,4 @@ const roomOf = (box: HTMLDivElement): Size => {
           (pixelsOf(style.borderTopWidth) ?? 0) -
           (pixelsOf(style.borderBottomWidth) ?? 0),
   };
-};
-
-/** A computed length such as `630px`, in pixels; `undefined` for anything else. */
-const pixelsOf = (computed: string): number | undefined => {
-  if (!computed.endsWith('px')) {
-    return undefined;
-  }
-
-  const parsed = Num.safeParseFloat(computed.slice(0, -2));
-
-  return Result.isOk(parsed) ? parsed.value : undefined;
 };

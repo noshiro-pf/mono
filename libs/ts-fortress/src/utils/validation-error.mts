@@ -245,6 +245,70 @@ type ActualValueView = Readonly<{
   summary: string;
 }>;
 
+/**
+ * Converts an array of validation errors to an array of string messages
+ * (for backward compatibility)
+ */
+export const validationErrorsToMessages = (
+  errors: readonly ValidationError[],
+  maxLengthToPrintActualValue: number = 20,
+): readonly string[] =>
+  errors.map((e) => validationErrorToMessage(e, maxLengthToPrintActualValue));
+
+/**
+ * Prepends a path segment to all validation errors
+ */
+export const prependPathToValidationErrors = (
+  errors: readonly ValidationError[],
+  pathSegment: string,
+): readonly ValidationError[] =>
+  errors.map((error) => ({
+    ...error,
+    path: Arr.toUnshifted(pathSegment)(error.path),
+  }));
+
+/**
+ * Prepends an array index to all validation errors
+ */
+export const prependIndexToValidationErrors = (
+  errors: readonly ValidationError[],
+  index: number,
+): readonly ValidationError[] =>
+  prependPathToValidationErrors(errors, index.toString());
+
+/**
+ * Creates a basic validation error for primitive type validation
+ */
+export const createPrimitiveValidationError = ({
+  actualValue,
+  expectedType,
+  typeName,
+  details,
+}: Readonly<{
+  actualValue: unknown;
+  expectedType: string;
+  typeName: string;
+  details: ValidationErrorDetails | undefined;
+}>): ValidationError =>
+  ({
+    path: [],
+    actualValue,
+    expectedType,
+    typeName,
+    details,
+  }) as const;
+
+const summarizeActualValue = (actualValue: unknown): string =>
+  isString(actualValue)
+    ? (`a string of length ${actualValue.length}` as const)
+    : Arr.isArray(actualValue)
+      ? (`an array of length ${actualValue.length}` as const)
+      : isMap(actualValue)
+        ? (`a Map of size ${actualValue.size}` as const)
+        : isSet(actualValue)
+          ? (`a Set of size ${actualValue.size}` as const)
+          : (`a value of type <${runtimeTypeNameOf(actualValue)}>` as const);
+
 const describeActualValue = (
   actualValue: unknown,
   maxLengthToPrintActualValue: number,
@@ -261,16 +325,13 @@ const describeActualValue = (
     summary: summarizeActualValue(actualValue),
   }) as const;
 
-const summarizeActualValue = (actualValue: unknown): string =>
-  isString(actualValue)
-    ? (`a string of length ${actualValue.length}` as const)
-    : Arr.isArray(actualValue)
-      ? (`an array of length ${actualValue.length}` as const)
-      : isMap(actualValue)
-        ? (`a Map of size ${actualValue.size}` as const)
-        : isSet(actualValue)
-          ? (`a Set of size ${actualValue.size}` as const)
-          : (`a value of type <${runtimeTypeNameOf(actualValue)}>` as const);
+const withUnmatchedReason = (
+  summary: string,
+  unmatchedReason: string | undefined,
+): string =>
+  unmatchedReason === undefined
+    ? summary
+    : (`${summary} ${unmatchedReason}` as const);
 
 /**
  * Renders the subject of the trailing `"... was passed."` clause, prefixed
@@ -297,14 +358,6 @@ const bareValueClause = (
   actualValue.literal === ''
     ? withUnmatchedReason(actualValue.summary, unmatchedReason)
     : actualValue.literal;
-
-const withUnmatchedReason = (
-  summary: string,
-  unmatchedReason: string | undefined,
-): string =>
-  unmatchedReason === undefined
-    ? summary
-    : (`${summary} ${unmatchedReason}` as const);
 
 /**
  * Maximum length of the ` | `-joined listing of union member type names that a
@@ -342,6 +395,100 @@ const closestMemberClause = (
   );
 
   return `the closest member types are <${allTypeNames.join('>, <')}>; the first of them failed as follows:`;
+};
+
+const stringConstraintToMessage = (
+  violation: StringConstraintViolation,
+  rawActualValue: unknown,
+  actualValue: ActualValueView,
+): string => {
+  const actualLength = isString(rawActualValue) ? rawActualValue.length : 0;
+
+  // The length carries the constraint violation, so the value itself is only
+  // appended when it is short enough to print.
+  const lengthClause =
+    actualValue.literal === ''
+      ? (`a string of length ${actualLength}` as const)
+      : (`a string of length ${actualLength} ${actualValue.literal}` as const);
+
+  switch (violation.constraint) {
+    case 'nonempty':
+      return 'expected a non-empty string but an empty string was passed.';
+
+    case 'minLength':
+      return `expected a string of length ${violation.value} or more but ${lengthClause} was passed.`;
+
+    case 'maxLength':
+      return `expected a string of length ${violation.value} or less but ${lengthClause} was passed.`;
+
+    case 'startsWith':
+      return `expected a string starting with "${violation.value}" but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'endsWith':
+      return `expected a string ending with "${violation.value}" but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'includes':
+      return `expected a string containing "${violation.value}" but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'uppercase':
+      return `expected an uppercase string but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'lowercase':
+      return `expected a lowercase string but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'regex':
+      return `expected a string matching /${violation.value}/ but ${bareValueClause(actualValue)} was passed.`;
+  }
+};
+
+const numericConstraintToMessage = (
+  numericType: 'bigint' | 'number',
+  violation: NumericConstraintViolation,
+  actualValue: ActualValueView,
+): string => {
+  switch (violation.constraint) {
+    case 'finite':
+      return `expected a finite number but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'int':
+      return `expected an integer but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'safeInteger':
+      return `expected a safe integer but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'nonZero':
+      return `expected a non-zero ${numericType} but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'negative':
+      return `expected a negative ${numericType} but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'nonNegative':
+      return `expected a non-negative ${numericType} but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'positive':
+      return `expected a positive ${numericType} but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'nonPositive':
+      return `expected a non-positive ${numericType} but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'gt':
+      return `expected a ${numericType} greater than ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'gte':
+    case 'min':
+      return `expected a ${numericType} greater than or equal to ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'lt':
+      return `expected a ${numericType} less than ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'lte':
+    case 'max':
+      return `expected a ${numericType} less than or equal to ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'multipleOf':
+    case 'step':
+      return `expected a ${numericType} to be a multiple of ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
+  }
 };
 
 const createDetailsMessage = (
@@ -443,150 +590,3 @@ const createDetailsMessage = (
       );
   }
 };
-
-const stringConstraintToMessage = (
-  violation: StringConstraintViolation,
-  rawActualValue: unknown,
-  actualValue: ActualValueView,
-): string => {
-  const actualLength = isString(rawActualValue) ? rawActualValue.length : 0;
-
-  // The length carries the constraint violation, so the value itself is only
-  // appended when it is short enough to print.
-  const lengthClause =
-    actualValue.literal === ''
-      ? (`a string of length ${actualLength}` as const)
-      : (`a string of length ${actualLength} ${actualValue.literal}` as const);
-
-  switch (violation.constraint) {
-    case 'nonempty':
-      return 'expected a non-empty string but an empty string was passed.';
-
-    case 'minLength':
-      return `expected a string of length ${violation.value} or more but ${lengthClause} was passed.`;
-
-    case 'maxLength':
-      return `expected a string of length ${violation.value} or less but ${lengthClause} was passed.`;
-
-    case 'startsWith':
-      return `expected a string starting with "${violation.value}" but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'endsWith':
-      return `expected a string ending with "${violation.value}" but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'includes':
-      return `expected a string containing "${violation.value}" but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'uppercase':
-      return `expected an uppercase string but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'lowercase':
-      return `expected a lowercase string but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'regex':
-      return `expected a string matching /${violation.value}/ but ${bareValueClause(actualValue)} was passed.`;
-  }
-};
-
-const numericConstraintToMessage = (
-  numericType: 'bigint' | 'number',
-  violation: NumericConstraintViolation,
-  actualValue: ActualValueView,
-): string => {
-  switch (violation.constraint) {
-    case 'finite':
-      return `expected a finite number but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'int':
-      return `expected an integer but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'safeInteger':
-      return `expected a safe integer but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'nonZero':
-      return `expected a non-zero ${numericType} but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'negative':
-      return `expected a negative ${numericType} but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'nonNegative':
-      return `expected a non-negative ${numericType} but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'positive':
-      return `expected a positive ${numericType} but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'nonPositive':
-      return `expected a non-positive ${numericType} but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'gt':
-      return `expected a ${numericType} greater than ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'gte':
-    case 'min':
-      return `expected a ${numericType} greater than or equal to ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'lt':
-      return `expected a ${numericType} less than ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'lte':
-    case 'max':
-      return `expected a ${numericType} less than or equal to ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
-
-    case 'multipleOf':
-    case 'step':
-      return `expected a ${numericType} to be a multiple of ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
-  }
-};
-
-/**
- * Converts an array of validation errors to an array of string messages
- * (for backward compatibility)
- */
-export const validationErrorsToMessages = (
-  errors: readonly ValidationError[],
-  maxLengthToPrintActualValue: number = 20,
-): readonly string[] =>
-  errors.map((e) => validationErrorToMessage(e, maxLengthToPrintActualValue));
-
-/**
- * Prepends a path segment to all validation errors
- */
-export const prependPathToValidationErrors = (
-  errors: readonly ValidationError[],
-  pathSegment: string,
-): readonly ValidationError[] =>
-  errors.map((error) => ({
-    ...error,
-    path: Arr.toUnshifted(pathSegment)(error.path),
-  }));
-
-/**
- * Prepends an array index to all validation errors
- */
-export const prependIndexToValidationErrors = (
-  errors: readonly ValidationError[],
-  index: number,
-): readonly ValidationError[] =>
-  prependPathToValidationErrors(errors, index.toString());
-
-/**
- * Creates a basic validation error for primitive type validation
- */
-export const createPrimitiveValidationError = ({
-  actualValue,
-  expectedType,
-  typeName,
-  details,
-}: Readonly<{
-  actualValue: unknown;
-  expectedType: string;
-  typeName: string;
-  details: ValidationErrorDetails | undefined;
-}>): ValidationError =>
-  ({
-    path: [],
-    actualValue,
-    expectedType,
-    typeName,
-    details,
-  }) as const;

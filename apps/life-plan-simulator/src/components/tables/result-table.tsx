@@ -96,6 +96,33 @@ type DisplayRow = Readonly<{
   cells: readonly string[];
 }>;
 
+/** 並びを保ったまま、`keyOf` が同じ連続した要素をまとめる。 */
+const groupConsecutive = <R,>(
+  rows: readonly R[],
+  keyOf: (row: R) => number,
+): readonly Readonly<{ key: number; group: readonly R[] }>[] => {
+  const mut_groups: Readonly<{ key: number; group: readonly R[] }>[] = [];
+
+  let mut_start = 0;
+
+  for (const [i, row] of rows.entries()) {
+    const next = rows[i + 1];
+
+    if (next !== undefined && keyOf(next) === keyOf(row)) {
+      continue;
+    }
+
+    mut_groups.push({ key: keyOf(row), group: rows.slice(mut_start, i + 1) });
+
+    mut_start = i + 1;
+  }
+
+  return mut_groups;
+};
+
+const format = <R,>(column: ResultColumn<R>, value: number): string =>
+  column.format === 'percent' ? formatPercent(value) : formatAmount(value);
+
 const toDisplayRows = <R,>(
   rows: readonly R[],
   granularity: Granularity,
@@ -137,30 +164,3 @@ const toDisplayRows = <R,>(
     },
   );
 };
-
-/** 並びを保ったまま、`keyOf` が同じ連続した要素をまとめる。 */
-const groupConsecutive = <R,>(
-  rows: readonly R[],
-  keyOf: (row: R) => number,
-): readonly Readonly<{ key: number; group: readonly R[] }>[] => {
-  const mut_groups: Readonly<{ key: number; group: readonly R[] }>[] = [];
-
-  let mut_start = 0;
-
-  for (const [i, row] of rows.entries()) {
-    const next = rows[i + 1];
-
-    if (next !== undefined && keyOf(next) === keyOf(row)) {
-      continue;
-    }
-
-    mut_groups.push({ key: keyOf(row), group: rows.slice(mut_start, i + 1) });
-
-    mut_start = i + 1;
-  }
-
-  return mut_groups;
-};
-
-const format = <R,>(column: ResultColumn<R>, value: number): string =>
-  column.format === 'percent' ? formatPercent(value) : formatAmount(value);

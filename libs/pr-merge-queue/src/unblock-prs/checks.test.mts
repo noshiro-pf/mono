@@ -295,6 +295,12 @@ describe(summarizeChecks, () => {
   });
 });
 
+/** What `gh` reports for a job of a workflow run, or a status's own URL. */
+const linkOf = (name: string, runId: number | undefined): string =>
+  runId === undefined
+    ? (`https://example.com/${name}` as const)
+    : (`https://github.com/noshiro-pf/mono/actions/runs/${runId}/job/1` as const);
+
 const check = (
   name: string,
   bucket: string = 'pass',
@@ -327,12 +333,6 @@ const running = (
   }: Readonly<{ workflow?: string; runId?: number }> = {},
 ): RunningCheck =>
   ({ name, startedAt, workflow, link: linkOf(name, runId) }) as const;
-
-/** What `gh` reports for a job of a workflow run, or a status's own URL. */
-const linkOf = (name: string, runId: number | undefined): string =>
-  runId === undefined
-    ? (`https://example.com/${name}` as const)
-    : (`https://github.com/noshiro-pf/mono/actions/runs/${runId}/job/1` as const);
 
 describe(reportedChecksOf, () => {
   const ZERO = '0001-01-01T00:00:00Z';

@@ -10,11 +10,6 @@ import { Arr, range } from 'ts-data-forge';
 import type { Point, SpringAdapter, Subscription } from '../types.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, LERP_FACTOR, lerp } from './shared.mjs';
 
-const springOperator = (
-  startPos: Point,
-): WithInitialValueOperator<Point, Point> =>
-  scan((acc: Point, target: Point) => lerp(acc, target, LERP_FACTOR), startPos);
-
 export const createSynStateSpringAdapter = (): SpringAdapter => {
   let mut_mousePos: ReturnType<typeof source<Point>> | undefined;
 
@@ -76,3 +71,8 @@ export const createSynStateSpringAdapter = (): SpringAdapter => {
     },
   };
 };
+
+const springOperator = (
+  startPos: Point,
+): WithInitialValueOperator<Point, Point> =>
+  scan((acc: Point, target: Point) => lerp(acc, target, LERP_FACTOR), startPos);

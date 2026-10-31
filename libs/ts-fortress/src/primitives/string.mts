@@ -306,6 +306,19 @@ type HasLengthAtMost<
         ? HasLengthAtMost<Rest, N, readonly [...Acc, unknown]>
         : false;
 
+const validateLengthConstraint = (
+  constraintName: 'maxLength' | 'minLength',
+  constraintValue: number | undefined,
+): Result<true, string> => {
+  if (constraintValue !== undefined && !PositiveInt.is(constraintValue)) {
+    return Result.err(
+      `${constraintName} constraint for string must be a positive integer, but ${constraintValue} was passed.`,
+    );
+  }
+
+  return Result.ok(true);
+};
+
 const validateConstraints = (
   constraints: RawConstraints,
 ): Result<Constraints, string> => {
@@ -322,19 +335,6 @@ const validateConstraints = (
     : // Both constraints are valid.
       // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
       Result.ok(constraints as Constraints);
-};
-
-const validateLengthConstraint = (
-  constraintName: 'maxLength' | 'minLength',
-  constraintValue: number | undefined,
-): Result<true, string> => {
-  if (constraintValue !== undefined && !PositiveInt.is(constraintValue)) {
-    return Result.err(
-      `${constraintName} constraint for string must be a positive integer, but ${constraintValue} was passed.`,
-    );
-  }
-
-  return Result.ok(true);
 };
 
 const createConstraintsPredicate =

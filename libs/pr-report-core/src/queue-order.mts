@@ -475,6 +475,16 @@ export const orderCandidates = <P,>(
     );
 };
 
+/**
+ * Whether `pr` carries the label `name`. A function rather than `includes`
+ * in place, which narrows the label constant itself to `never` where it says
+ * no.
+ */
+const hasLabel = (
+  pr: Readonly<{ labels: readonly string[] }>,
+  name: string,
+): boolean => pr.labels.includes(name);
+
 /** Why a pull request is none of the queue's business, if it is not. */
 const outOfScopeReason = (
   pr: QueueFacts,
@@ -522,6 +532,17 @@ const waitingOn = (
 };
 
 /**
+ * Pending — including a required context that has not reported at all — or
+ * green and about to merge is in flight; a failed required check is failing.
+ */
+const byChecks = (reads: QueueReads): QueueStanding =>
+  reads.checksFailed === undefined
+    ? ({ kind: 'needs', read: 'checksFailed' } as const)
+    : reads.checksFailed
+      ? ({ kind: 'failing' } as const)
+      : ({ kind: 'in-flight' } as const);
+
+/**
  * The version pull request: held while anything labelled `blocks-release`
  * is open, and while the branch was built before the tip of the base, then
  * a candidate if paused and otherwise judged by its checks.
@@ -547,24 +568,3 @@ const versionStanding = (
           ? { kind: 'candidate' }
           : byChecks(reads);
 };
-
-/**
- * Pending — including a required context that has not reported at all — or
- * green and about to merge is in flight; a failed required check is failing.
- */
-const byChecks = (reads: QueueReads): QueueStanding =>
-  reads.checksFailed === undefined
-    ? ({ kind: 'needs', read: 'checksFailed' } as const)
-    : reads.checksFailed
-      ? ({ kind: 'failing' } as const)
-      : ({ kind: 'in-flight' } as const);
-
-/**
- * Whether `pr` carries the label `name`. A function rather than `includes`
- * in place, which narrows the label constant itself to `never` where it says
- * no.
- */
-const hasLabel = (
-  pr: Readonly<{ labels: readonly string[] }>,
-  name: string,
-): boolean => pr.labels.includes(name);

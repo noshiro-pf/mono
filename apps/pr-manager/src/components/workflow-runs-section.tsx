@@ -72,6 +72,47 @@ export const WorkflowRunsSection = (): JSX.Element => (
 
 type Ready = RelaxedExtract<RunsStatus, Readonly<{ type: 'ready' }>>;
 
+/**
+ * A run's state: the icon the Actions tab draws, for the two states that are
+ * most of what this block lists, and a badge with the word for the rest,
+ * which are rare enough that a word reads better than a glyph to learn.
+ */
+const RunStateMark = ({
+  state,
+}: Readonly<{ state: Bindable<RunState> }>): JSX.Element => (
+  <If
+    cond={mapBindable(state, (current) => current === 'in_progress')}
+    then={
+      <RunStateIcon
+        kind={'running'}
+        label={STATE_PRESENTATION.in_progress.label}
+      />
+    }
+    else={
+      <If
+        cond={mapBindable(state, (current) => current === 'queued')}
+        then={
+          <RunStateIcon
+            kind={'queued'}
+            label={STATE_PRESENTATION.queued.label}
+          />
+        }
+        else={
+          <span
+            class={constant('badge')}
+            data-status={mapBindable(
+              state,
+              (current) => STATE_PRESENTATION[current].status,
+            )}
+          >
+            {mapBindable(state, (current) => STATE_PRESENTATION[current].label)}
+          </span>
+        }
+      />
+    }
+  />
+);
+
 const RunList = ({
   ready$,
 }: Readonly<{ ready$: InitializedObservable<Ready> }>): JSX.Element => (
@@ -150,47 +191,6 @@ const RunList = ({
       }
     />
   </>
-);
-
-/**
- * A run's state: the icon the Actions tab draws, for the two states that are
- * most of what this block lists, and a badge with the word for the rest,
- * which are rare enough that a word reads better than a glyph to learn.
- */
-const RunStateMark = ({
-  state,
-}: Readonly<{ state: Bindable<RunState> }>): JSX.Element => (
-  <If
-    cond={mapBindable(state, (current) => current === 'in_progress')}
-    then={
-      <RunStateIcon
-        kind={'running'}
-        label={STATE_PRESENTATION.in_progress.label}
-      />
-    }
-    else={
-      <If
-        cond={mapBindable(state, (current) => current === 'queued')}
-        then={
-          <RunStateIcon
-            kind={'queued'}
-            label={STATE_PRESENTATION.queued.label}
-          />
-        }
-        else={
-          <span
-            class={constant('badge')}
-            data-status={mapBindable(
-              state,
-              (current) => STATE_PRESENTATION[current].status,
-            )}
-          >
-            {mapBindable(state, (current) => STATE_PRESENTATION[current].label)}
-          </span>
-        }
-      />
-    }
-  />
 );
 
 const readyOf = (runs: RunsStatus): Optional<Ready> =>

@@ -88,12 +88,6 @@ const parseHex = (color: string): Rgb | undefined => {
 const toHexPair = (channel: number): string =>
   channel.toString(16).padStart(2, '0');
 
-/** WCAG 2.x relative luminance, which is what the contrast ratio is of. */
-const relativeLuminance = ([r, g, b]: Rgb): number =>
-  0.2126 * channelLuminance(r) +
-  0.7152 * channelLuminance(g) +
-  0.0722 * channelLuminance(b);
-
 const channelLuminance = (channel: number): number => {
   const c = Num.div(channel, MAX_CHANNEL);
 
@@ -101,6 +95,12 @@ const channelLuminance = (channel: number): number => {
     ? Num.div(c, SRGB_LINEAR_SLOPE)
     : Num.div(c + 0.055, SRGB_OFFSET_SCALE) ** 2.4;
 };
+
+/** WCAG 2.x relative luminance, which is what the contrast ratio is of. */
+const relativeLuminance = ([r, g, b]: Rgb): number =>
+  0.2126 * channelLuminance(r) +
+  0.7152 * channelLuminance(g) +
+  0.0722 * channelLuminance(b);
 
 const contrastRatio = (a: number, b: number): number => {
   const darker = Math.min(a, b) + 0.05;

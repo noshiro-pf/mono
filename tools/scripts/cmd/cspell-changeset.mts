@@ -200,30 +200,6 @@ const runCspell = async (
     : undefined;
 };
 
-/** Decides which configurations one file has to pass under. */
-const planFor = async (
-  file: string,
-  packageDirs: ReadonlyMap<string, string>,
-): Promise<Plan> => {
-  const names = await readChangesetPackageNames(file);
-
-  if (!Arr.isNonEmpty(names)) {
-    return { file, configs: [ROOT_CSPELL_CONFIG], unknownPackages: [] };
-  }
-
-  const dirs = names.map((name) => packageDirs.get(name));
-
-  const configs = await Promise.all(
-    dirs.filter(isNotUndefined).map(async (dir) => findCspellConfig(dir)),
-  );
-
-  return {
-    file,
-    configs: Arr.uniq(configs),
-    unknownPackages: names.filter((name) => !packageDirs.has(name)),
-  };
-};
-
 /**
  * The package names in a changeset's front matter, or none when the file has
  * no front matter — `README.md` and `config.json` land here.
@@ -258,24 +234,6 @@ const readChangesetPackageNames = async (
     .filter(isString);
 };
 
-/**
- * The configuration cspell would use for a file in `packageDir`: the nearest
- * one at or above it, stopping at the repository root. This mirrors cspell's
- * own upward search, which is what makes the answer here the same one the
- * `CHANGELOG.md` in that directory will get.
- */
-const findCspellConfig = async (packageDir: string): Promise<string> => {
-  const candidates = ancestorsToRoot(packageDir).flatMap((dir) =>
-    CSPELL_CONFIG_FILENAMES.map((name) => path.resolve(dir, name)),
-  );
-
-  const found = await Promise.all(candidates.map(fileExists));
-
-  return (
-    candidates.find((_, index) => found[index] === true) ?? ROOT_CSPELL_CONFIG
-  );
-};
-
 /** `dir` and every directory above it, up to and including the repository root. */
 const ancestorsToRoot = (dir: string): readonly string[] => {
   const relative = path.relative(projectRootPath, dir);
@@ -295,6 +253,58 @@ const ancestorsToRoot = (dir: string): readonly string[] => {
     (ancestor, segment) => path.resolve(ancestor, segment),
     projectRootPath,
   ).toReversed();
+};
+
+const fileExists = async (filePath: string): Promise<boolean> => {
+  // Not `.then(onOk, onErr)`: eslint --fix rewrites that pair into
+  // `.catch(() => false).then(() => true)`, which answers true for every
+  // path and silently resolves every package to the first candidate.
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  const stats = await fs.stat(filePath).catch(() => undefined);
+
+  return stats !== undefined;
+};
+
+/**
+ * The configuration cspell would use for a file in `packageDir`: the nearest
+ * one at or above it, stopping at the repository root. This mirrors cspell's
+ * own upward search, which is what makes the answer here the same one the
+ * `CHANGELOG.md` in that directory will get.
+ */
+const findCspellConfig = async (packageDir: string): Promise<string> => {
+  const candidates = ancestorsToRoot(packageDir).flatMap((dir) =>
+    CSPELL_CONFIG_FILENAMES.map((name) => path.resolve(dir, name)),
+  );
+
+  const found = await Promise.all(candidates.map(fileExists));
+
+  return (
+    candidates.find((_, index) => found[index] === true) ?? ROOT_CSPELL_CONFIG
+  );
+};
+
+/** Decides which configurations one file has to pass under. */
+const planFor = async (
+  file: string,
+  packageDirs: ReadonlyMap<string, string>,
+): Promise<Plan> => {
+  const names = await readChangesetPackageNames(file);
+
+  if (!Arr.isNonEmpty(names)) {
+    return { file, configs: [ROOT_CSPELL_CONFIG], unknownPackages: [] };
+  }
+
+  const dirs = names.map((name) => packageDirs.get(name));
+
+  const configs = await Promise.all(
+    dirs.filter(isNotUndefined).map(async (dir) => findCspellConfig(dir)),
+  );
+
+  return {
+    file,
+    configs: Arr.uniq(configs),
+    unknownPackages: names.filter((name) => !packageDirs.has(name)),
+  };
 };
 
 /** Every workspace package, by name, mapped to its directory. */
@@ -333,16 +343,6 @@ const getWorkspacePackageDirs = async (): Promise<
   return Result.ok(
     new Map(projects.value.map(({ name, path: dir }) => [name, dir])),
   );
-};
-
-const fileExists = async (filePath: string): Promise<boolean> => {
-  // Not `.then(onOk, onErr)`: eslint --fix rewrites that pair into
-  // `.catch(() => false).then(() => true)`, which answers true for every
-  // path and silently resolves every package to the first candidate.
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  const stats = await fs.stat(filePath).catch(() => undefined);
-
-  return stats !== undefined;
 };
 
 if (isDirectlyExecuted(import.meta.url)) {

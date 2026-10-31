@@ -84,6 +84,28 @@ const main = async (): Promise<void> => {
   console.log('✅ build completed');
 };
 
+const installedVersion = async (name: string): Promise<string> => {
+  // `name` is one of `external`, and `require.resolve` cannot stand in:
+  // `firebase-admin` and `firebase-functions` do not export `./package.json`.
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  const content = await fs.readFile(
+    path.resolve(packageRoot, 'node_modules', name, 'package.json'),
+    'utf8',
+  );
+
+  const parsed = Result.unwrapThrow(Json.parse(content));
+
+  if (
+    isRecord(parsed) &&
+    hasKey(parsed, 'version') &&
+    isString(parsed.version)
+  ) {
+    return parsed.version;
+  }
+
+  throw new Error(`${name}: no version in its package.json`);
+};
+
 /**
  * Pins each external to the version installed here, so that what is deployed
  * is what was type-checked and run in the emulator, and is not re-resolved by
@@ -173,28 +195,6 @@ const linkNodeModules = async (): Promise<void> => {
     path.relative(outDir, path.resolve(packageRoot, 'node_modules')),
     link,
   );
-};
-
-const installedVersion = async (name: string): Promise<string> => {
-  // `name` is one of `external`, and `require.resolve` cannot stand in:
-  // `firebase-admin` and `firebase-functions` do not export `./package.json`.
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  const content = await fs.readFile(
-    path.resolve(packageRoot, 'node_modules', name, 'package.json'),
-    'utf8',
-  );
-
-  const parsed = Result.unwrapThrow(Json.parse(content));
-
-  if (
-    isRecord(parsed) &&
-    hasKey(parsed, 'version') &&
-    isString(parsed.version)
-  ) {
-    return parsed.version;
-  }
-
-  throw new Error(`${name}: no version in its package.json`);
 };
 
 await main();

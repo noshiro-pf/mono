@@ -455,6 +455,12 @@ const expectedCeiling = (config: NodeSupportConfig): number | undefined => {
   return current === undefined ? undefined : current.major + 1;
 };
 
+/**
+ * `JSON.parse` types its result `any`; this is the one place that widens it to
+ * `unknown`, so that everything downstream has to guard rather than assert.
+ */
+const parseJson = (text: string): unknown => JSON.parse(text);
+
 const collectManifests = async (): Promise<
   Result<readonly Manifest[], string>
 > => {
@@ -487,15 +493,40 @@ const collectManifests = async (): Promise<
   return Result.ok(manifests);
 };
 
-const checkManifest = (
+const readStringAt = (
+  source: unknown,
+  keyPath: readonly string[],
+): string | undefined => {
+  const walk = (current: unknown, rest: readonly string[]): unknown => {
+    const [head, ...tail] = rest;
+
+    return head === undefined
+      ? current
+      : !isRecord(current) || !hasKey(current, head)
+        ? undefined
+        : walk(current[head], tail);
+  };
+
+  const found = walk(source, keyPath);
+
+  return isString(found) ? found : undefined;
+};
+
+/**
+ * Records a fix for one string leaf of a `package.json`.
+ *
+ * `undefined` when the leaf is not there to begin with: the caller only asks
+ * about fields it has already found, so this is the "cannot be rewritten
+ * mechanically" case rather than a normal one.
+ */
+const rewriteStringAt = (
   manifest: Manifest,
-  expected: ExpectedFields,
-): readonly Violation[] =>
-  [
-    ...checkEnginesNode(manifest, expected),
-    ...checkVoltaNode(manifest, expected),
-    ...checkDevEnginesRuntime(manifest, expected),
-  ] as const;
+  keyPath: readonly string[],
+  value: string,
+): Violation['fix'] =>
+  readStringAt(manifest.parsed, keyPath) === undefined
+    ? undefined
+    : ({ absolutePath: manifest.absolutePath, keyPath, value } as const);
 
 const checkEnginesNode = (
   manifest: Manifest,
@@ -581,6 +612,16 @@ const checkDevEnginesRuntime = (
   ];
 };
 
+const checkManifest = (
+  manifest: Manifest,
+  expected: ExpectedFields,
+): readonly Violation[] =>
+  [
+    ...checkEnginesNode(manifest, expected),
+    ...checkVoltaNode(manifest, expected),
+    ...checkDevEnginesRuntime(manifest, expected),
+  ] as const;
+
 /**
  * The workflow holds the matrix *keys*; this file holds the versions they
  * resolve to. Only the key list can drift, and only when a release line is
@@ -653,6 +694,55 @@ const checkWorkflowMatrix = async (): Promise<readonly Violation[]> => {
   ];
 };
 
+/**
+ * A copy of `source` with `keyPath` set to `value`, creating the objects along
+ * the way. Nothing is mutated: the manifests are read once and the fixes are
+ * folded over the result.
+ */
+const setStringAt = (
+  source: unknown,
+  keyPath: readonly string[],
+  value: string,
+): unknown => {
+  const [head, ...tail] = keyPath;
+
+  if (head === undefined) {
+    return value;
+  }
+
+  const base = isRecord(source) ? source : ({} as const);
+
+  return {
+    ...base,
+    [head]: setStringAt(
+      hasKey(base, head) ? base[head] : undefined,
+      tail,
+      value,
+    ),
+  };
+};
+
+const readJsonFile = async (
+  filePath: string,
+): Promise<Result<unknown, string>> => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  const text = await Result.fromPromise(fs.readFile(filePath, 'utf8'));
+
+  if (Result.isErr(text)) {
+    return Result.err(
+      `❌ Failed to read ${filePath}: ${unknownToString(text.value)}`,
+    );
+  }
+
+  const parsed = Result.fromThrowable<unknown>(() => JSON.parse(text.value));
+
+  return Result.isErr(parsed)
+    ? Result.err(
+        `❌ Failed to parse ${filePath}: ${unknownToString(parsed.value)}`,
+      )
+    : Result.ok(parsed.value);
+};
+
 const applyFixes = async (violations: readonly Violation[]): Promise<void> => {
   // One file can carry more than one violation — `engines.node` and
   // `volta.node` in the same manifest — so the fixes are grouped and applied
@@ -720,96 +810,6 @@ const formatViolations = (
     'manifests: raising the `engines` floor is a breaking change for every',
     'consumer, and it is decided there.',
   ].join('\n');
-
-/**
- * Records a fix for one string leaf of a `package.json`.
- *
- * `undefined` when the leaf is not there to begin with: the caller only asks
- * about fields it has already found, so this is the "cannot be rewritten
- * mechanically" case rather than a normal one.
- */
-const rewriteStringAt = (
-  manifest: Manifest,
-  keyPath: readonly string[],
-  value: string,
-): Violation['fix'] =>
-  readStringAt(manifest.parsed, keyPath) === undefined
-    ? undefined
-    : ({ absolutePath: manifest.absolutePath, keyPath, value } as const);
-
-/**
- * A copy of `source` with `keyPath` set to `value`, creating the objects along
- * the way. Nothing is mutated: the manifests are read once and the fixes are
- * folded over the result.
- */
-const setStringAt = (
-  source: unknown,
-  keyPath: readonly string[],
-  value: string,
-): unknown => {
-  const [head, ...tail] = keyPath;
-
-  if (head === undefined) {
-    return value;
-  }
-
-  const base = isRecord(source) ? source : ({} as const);
-
-  return {
-    ...base,
-    [head]: setStringAt(
-      hasKey(base, head) ? base[head] : undefined,
-      tail,
-      value,
-    ),
-  };
-};
-
-const readStringAt = (
-  source: unknown,
-  keyPath: readonly string[],
-): string | undefined => {
-  const walk = (current: unknown, rest: readonly string[]): unknown => {
-    const [head, ...tail] = rest;
-
-    return head === undefined
-      ? current
-      : !isRecord(current) || !hasKey(current, head)
-        ? undefined
-        : walk(current[head], tail);
-  };
-
-  const found = walk(source, keyPath);
-
-  return isString(found) ? found : undefined;
-};
-
-/**
- * `JSON.parse` types its result `any`; this is the one place that widens it to
- * `unknown`, so that everything downstream has to guard rather than assert.
- */
-const parseJson = (text: string): unknown => JSON.parse(text);
-
-const readJsonFile = async (
-  filePath: string,
-): Promise<Result<unknown, string>> => {
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  const text = await Result.fromPromise(fs.readFile(filePath, 'utf8'));
-
-  if (Result.isErr(text)) {
-    return Result.err(
-      `❌ Failed to read ${filePath}: ${unknownToString(text.value)}`,
-    );
-  }
-
-  const parsed = Result.fromThrowable<unknown>(() => JSON.parse(text.value));
-
-  return Result.isErr(parsed)
-    ? Result.err(
-        `❌ Failed to parse ${filePath}: ${unknownToString(parsed.value)}`,
-      )
-    : Result.ok(parsed.value);
-};
 
 if (isDirectlyExecuted(import.meta.url)) {
   const fix = process.argv.includes('--fix');

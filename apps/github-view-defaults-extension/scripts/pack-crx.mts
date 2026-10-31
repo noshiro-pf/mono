@@ -79,6 +79,43 @@ const defaultPassEntry = 'github-view-defaults-extension';
 const signingKeyEnvName = 'GITHUB_DIFF_DEFAULTS_SIGNING_KEY_PASS';
 
 /**
+ * The entry's contents.
+ *
+ * Neither the key nor anything `pass` said about it goes into the error: what
+ * went wrong is worth reporting, and the entry's contents are not.
+ */
+const passShow = (entry: string): string => {
+  const pem = ((): string | undefined => {
+    try {
+      return execFileSync('pass', ['show', entry], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
+    } catch {
+      return undefined;
+    }
+  })();
+
+  if (pem === undefined) {
+    throw new Error(
+      [
+        `\`pass show ${entry}\` produced nothing.`,
+        `The signing key belongs in that entry; name another with ${signingKeyEnvName}.`,
+        `To make one: openssl genrsa 2048 | pass insert --multiline ${entry}`,
+      ].join('\n'),
+    );
+  }
+
+  if (!pem.includes('-----BEGIN')) {
+    throw new Error(
+      `\`pass show ${entry}\` is not a PEM key. Check that the entry holds the private key itself.`,
+    );
+  }
+
+  return pem;
+};
+
+/**
  * Reads the signing key out of `pass`.
  *
  * `pass` and nowhere else: a key that can also be sitting in a file is a key
@@ -115,42 +152,24 @@ const readSigningKey = (): SigningKey => {
   };
 };
 
+const publicKeyDerOf = (keyPath: string): Buffer =>
+  execFileSync(
+    'openssl',
+    ['rsa', '-in', keyPath, '-pubout', '-outform', 'DER'],
+    // `openssl rsa` says "writing RSA key" on the way past, which is not
+    // something this report needs to pass on.
+    { stdio: ['ignore', 'pipe', 'ignore'] },
+  );
+
 /**
- * The entry's contents.
- *
- * Neither the key nor anything `pass` said about it goes into the error: what
- * went wrong is worth reporting, and the entry's contents are not.
+ * The id Chrome derives from a public key: the first half of its SHA-256, with
+ * each nibble written as a letter from `a`.
  */
-const passShow = (entry: string): string => {
-  const pem = ((): string | undefined => {
-    try {
-      return execFileSync('pass', ['show', entry], {
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'ignore'],
-      });
-    } catch {
-      return undefined;
-    }
-  })();
-
-  if (pem === undefined) {
-    throw new Error(
-      [
-        `\`pass show ${entry}\` produced nothing.`,
-        `The signing key belongs in that entry; name another with ${signingKeyEnvName}.`,
-        `To make one: openssl genrsa 2048 | pass insert --multiline ${entry}`,
-      ].join('\n'),
-    );
-  }
-
-  if (!pem.includes('-----BEGIN')) {
-    throw new Error(
-      `\`pass show ${entry}\` is not a PEM key. Check that the entry holds the private key itself.`,
-    );
-  }
-
-  return pem;
-};
+const idFromDer = (der: Readonly<Uint8Array>): string =>
+  Array.from(createHash('sha256').update(der).digest().subarray(0, 16))
+    .flatMap((byte) => [byte >> 4, byte & 0xf])
+    .map((nibble) => String.fromCodePoint(aCodePoint + nibble))
+    .join('');
 
 const report = (
   crxPath: string,
@@ -189,25 +208,6 @@ const report = (
       : `  id ${signedId} — the unpacked build's is ${pinnedId}, so the two are different extensions`,
   );
 };
-
-const publicKeyDerOf = (keyPath: string): Buffer =>
-  execFileSync(
-    'openssl',
-    ['rsa', '-in', keyPath, '-pubout', '-outform', 'DER'],
-    // `openssl rsa` says "writing RSA key" on the way past, which is not
-    // something this report needs to pass on.
-    { stdio: ['ignore', 'pipe', 'ignore'] },
-  );
-
-/**
- * The id Chrome derives from a public key: the first half of its SHA-256, with
- * each nibble written as a letter from `a`.
- */
-const idFromDer = (der: Readonly<Uint8Array>): string =>
-  Array.from(createHash('sha256').update(der).digest().subarray(0, 16))
-    .flatMap((byte) => [byte >> 4, byte & 0xf])
-    .map((nibble) => String.fromCodePoint(aCodePoint + nibble))
-    .join('');
 
 const aCodePoint = 'a'.codePointAt(0) ?? 97;
 

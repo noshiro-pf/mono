@@ -288,6 +288,41 @@ const readPublishablePackageNames = async (): Promise<readonly string[]> => {
     .map((pkg) => pkg.name);
 };
 
+/**
+ * Runs npm with stdin and stderr passed through, so that its OTP prompt and
+ * web login URL reach the terminal while stdout is captured.
+ */
+const runNpm = (
+  args: readonly string[],
+  otp: string | undefined,
+): Promise<Readonly<{ code: number; stdout: string }>> =>
+  new Promise((resolve) => {
+    const child = spawn(
+      'npm',
+      [...args, ...(otp === undefined ? [] : [`--otp=${otp}`])],
+      { stdio: ['inherit', 'pipe', 'inherit'] },
+    );
+
+    const mut_chunks: string[] = [];
+
+    child.stdout.setEncoding('utf8');
+
+    child.stdout.on('data', (chunk: string) => {
+      mut_chunks.push(chunk);
+    });
+
+    child.on('error', () => {
+      resolve({ code: 1, stdout: '' });
+    });
+
+    child.on('close', (code) => {
+      resolve({
+        code: code ?? 1,
+        stdout: mut_chunks.join(''),
+      });
+    });
+  });
+
 const readAccountPackageNames = async (
   user: string | undefined,
 ): Promise<Result<readonly string[], string>> => {
@@ -316,6 +351,15 @@ const readAccountPackageNames = async (
   return Result.isErr(parsed) || !isRecord(parsed.value)
     ? Result.err(`Unparsable npm output: ${listed.stdout.trim()}`)
     : Result.ok(Object.keys(parsed.value));
+};
+
+const isPublished = async (name: string): Promise<boolean> => {
+  const response = await fetch(
+    `https://registry.npmjs.org/${name.replace('/', '%2F')}`,
+    { method: 'HEAD' },
+  );
+
+  return response.ok;
 };
 
 const inspectPackage = async (
@@ -387,14 +431,8 @@ const inspectPackage = async (
   };
 };
 
-const isPublished = async (name: string): Promise<boolean> => {
-  const response = await fetch(
-    `https://registry.npmjs.org/${name.replace('/', '%2F')}`,
-    { method: 'HEAD' },
-  );
-
-  return response.ok;
-};
+const asString = (v: unknown): string | undefined =>
+  typeof v === 'string' ? v : undefined;
 
 /** Mirrors `bodyToOptions` of npm's `trust` providers. */
 const toTrustConfig = (item: ReadonlyRecord<string, unknown>): TrustConfig => {
@@ -474,44 +512,6 @@ const parseOptions = (
     check: values.check,
   });
 };
-
-/**
- * Runs npm with stdin and stderr passed through, so that its OTP prompt and
- * web login URL reach the terminal while stdout is captured.
- */
-const runNpm = (
-  args: readonly string[],
-  otp: string | undefined,
-): Promise<Readonly<{ code: number; stdout: string }>> =>
-  new Promise((resolve) => {
-    const child = spawn(
-      'npm',
-      [...args, ...(otp === undefined ? [] : [`--otp=${otp}`])],
-      { stdio: ['inherit', 'pipe', 'inherit'] },
-    );
-
-    const mut_chunks: string[] = [];
-
-    child.stdout.setEncoding('utf8');
-
-    child.stdout.on('data', (chunk: string) => {
-      mut_chunks.push(chunk);
-    });
-
-    child.on('error', () => {
-      resolve({ code: 1, stdout: '' });
-    });
-
-    child.on('close', (code) => {
-      resolve({
-        code: code ?? 1,
-        stdout: mut_chunks.join(''),
-      });
-    });
-  });
-
-const asString = (v: unknown): string | undefined =>
-  typeof v === 'string' ? v : undefined;
 
 if (isDirectlyExecuted(import.meta.url)) {
   const options = parseOptions(Arr.skip(process.argv, 2));

@@ -2,15 +2,6 @@ import { DateUtils, type Ymdhm } from 'ts-fortress-types';
 import type { MinutesEnum } from 'ts-type-forge';
 import { now } from '../utils/index.mjs';
 
-const ymdhm2DateObject = (ymdhm: Ymdhm): Date =>
-  DateUtils.create(
-    ymdhm.year,
-    ymdhm.month,
-    ymdhm.date,
-    ymdhm.hours,
-    ymdhm.minutes,
-  );
-
 export const deadlinePassed = (
   answerDeadlineYmdhm: Ymdhm,
   minutes: MinutesEnum,
@@ -23,3 +14,12 @@ export const deadlinePassed = (
 
   return 0 <= msecDiff && msecDiff <= minutes * 60 * 1000;
 };
+
+const ymdhm2DateObject = (ymdhm: Ymdhm): Date =>
+  DateUtils.create(
+    ymdhm.year,
+    ymdhm.month,
+    ymdhm.date,
+    ymdhm.hours,
+    ymdhm.minutes,
+  );

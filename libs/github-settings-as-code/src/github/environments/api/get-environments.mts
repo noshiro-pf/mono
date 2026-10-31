@@ -51,15 +51,6 @@ export const getAllEnvironments = async (): Promise<
   return settings.toSorted((a, b) => a.name.localeCompare(b.name));
 };
 
-/** 宣言ファイルに載る形。 `id` は GitHub 側の都合なので落とす。 */
-const getDeploymentBranchPolicyNames = async (
-  environmentName: string,
-): Promise<readonly Readonly<{ name: string; type: 'branch' | 'tag' }>[]> => {
-  const policies = await getDeploymentBranchPolicies(environmentName);
-
-  return policies.map(({ name, type }) => ({ name, type }));
-};
-
 /** 「 Selected branches and tags 」に登録されている pattern を列挙する。 */
 export const getDeploymentBranchPolicies = async (
   environmentName: string,
@@ -81,6 +72,15 @@ export const getDeploymentBranchPolicies = async (
     name: policy.name ?? '',
     type: policy.type === 'tag' ? 'tag' : 'branch',
   }));
+};
+
+/** 宣言ファイルに載る形。 `id` は GitHub 側の都合なので落とす。 */
+const getDeploymentBranchPolicyNames = async (
+  environmentName: string,
+): Promise<readonly Readonly<{ name: string; type: 'branch' | 'tag' }>[]> => {
+  const policies = await getDeploymentBranchPolicies(environmentName);
+
+  return policies.map(({ name, type }) => ({ name, type }));
 };
 
 export type DeploymentBranchPolicy = Readonly<{

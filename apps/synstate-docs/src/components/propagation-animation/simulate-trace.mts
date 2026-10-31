@@ -1179,6 +1179,9 @@ type MutableRun = {
   steps: TraceStep[];
 };
 
+const showSet = (set: ReadonlySet<string>): string =>
+  `{${Array.from(set).join(', ')}}` as const;
+
 const showQueue = (queue: DeepReadonly<MutableQueue>): QueueState =>
   ({
     token: queue.token,
@@ -1191,9 +1194,6 @@ const showQueue = (queue: DeepReadonly<MutableQueue>): QueueState =>
         ? undefinedText
         : showSet(queue.queuedDespiteMark),
   }) as const;
-
-const showSet = (set: ReadonlySet<string>): string =>
-  `{${Array.from(set).join(', ')}}` as const;
 
 /** `[{ nodes: [undefined, undefined], length: 2 }, { nodes: [BDR], length: 1 }]`. */
 const bucketsText = (buckets: DeepReadonly<MutableBuckets>): string =>

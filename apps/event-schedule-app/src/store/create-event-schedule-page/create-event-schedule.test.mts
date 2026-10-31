@@ -136,6 +136,15 @@ type Setup = Readonly<{
   toasts: Readonly<{ count: number }>;
 }>;
 
+/** A toaster that only counts what it is asked to show. */
+const fakeToaster = (onShow: () => number): Toaster =>
+  ({
+    show: () => `toast-${onShow()}`,
+    dismiss: () => undefined,
+    clear: () => undefined,
+    getToasts: () => [],
+  }) as const;
+
 const setup = (
   options?: Readonly<{ addFails?: boolean; stored?: EventSchedule }>,
 ): Setup => {
@@ -207,14 +216,6 @@ const setup = (
   return { store, calls: mut_calls, toasts: mut_toasts } as const;
 };
 
-const fillValidEvent = (store: CreateEventSchedule): void => {
-  store.commonStateHandlers.setTitle('event');
-
-  store.commonStateHandlers.setDatetimeRangeList(
-    EventSchedule.fill({ datetimeRangeList: [rawDayOf(31)] }).datetimeRangeList,
-  );
-};
-
 /** A date of October 2026 as stored, before the codec reads it. */
 const rawDayOf = (date: number): unknown =>
   ({
@@ -225,14 +226,13 @@ const rawDayOf = (date: number): unknown =>
     },
   }) as const;
 
-/** A toaster that only counts what it is asked to show. */
-const fakeToaster = (onShow: () => number): Toaster =>
-  ({
-    show: () => `toast-${onShow()}`,
-    dismiss: () => undefined,
-    clear: () => undefined,
-    getToasts: () => [],
-  }) as const;
+const fillValidEvent = (store: CreateEventSchedule): void => {
+  store.commonStateHandlers.setTitle('event');
+
+  store.commonStateHandlers.setDatetimeRangeList(
+    EventSchedule.fill({ datetimeRangeList: [rawDayOf(31)] }).datetimeRangeList,
+  );
+};
 
 const settle = async (ms: number): Promise<void> => {
   await new Promise<void>((resolve) => {

@@ -136,65 +136,12 @@ const operationNamesJa: ReadonlyRecord<string, string> = {
 /** What RESULTS.md writes in place of a time for the wrong figures. */
 const wrong = 'wrong';
 
-const parseResults = (markdown: string): Result<Results, string> => {
-  const environment =
-    /Measured in `(?<userAgent>[^`]+)`\. Each figure is the median of (?<runs>\d+) runs of `pnpm run benchmark`/u.exec(
-      markdown,
-    );
-
-  const userAgent = environment?.groups?.['userAgent'];
-
-  const runs = environment?.groups?.['runs'];
-
-  if (userAgent === undefined || runs === undefined) {
-    return Result.err(
-      'the "Measured in …. Each figure is the median of N runs" sentence was not found; update parseResults to its new wording',
-    );
-  }
-
-  // The medians of the operations, the first table, and those of the
-  // scenarios, the first table after their heading. RESULTS.md's ratio tables
-  // are recomputed below, so that the Japanese page can head them in
-  // Japanese.
-  const lines = markdown.split('\n').map((line) => line.trim());
-
-  const operations = parseTable(lines, 0, false);
-
-  if (Result.isErr(operations)) {
-    return operations;
-  }
-
-  const scenariosHeading = lines.indexOf('## Scenarios');
-
-  if (scenariosHeading === -1) {
-    return Result.err('the "## Scenarios" section was not found');
-  }
-
-  const scenarios = parseTable(lines, scenariosHeading, true);
-
-  if (Result.isErr(scenarios)) {
-    return scenarios;
-  }
-
-  const { libraries } = operations.value;
-
-  if (
-    !libraries.includes(subject) ||
-    !libraries.includes(reference) ||
-    !scenarios.value.libraries.includes(subject)
-  ) {
-    return Result.err(
-      `a table has no "${subject}" column, or the first no "${reference}" column`,
-    );
-  }
-
-  return Result.ok({
-    userAgent,
-    runs: Result.unwrapOkOr(Num.safeParseFloat(runs), Number.NaN),
-    operations: operations.value,
-    scenarios: scenarios.value,
-  });
-};
+const cells = (line: string): readonly string[] =>
+  line
+    .replace(/^\|/u, '')
+    .replace(/\|$/u, '')
+    .split('|')
+    .map((cell) => cell.trim());
 
 /**
  * Reads the first table at or after line `from`. Where `wrongAllowed`, a
@@ -255,12 +202,75 @@ const parseTable = (
   return Result.ok({ libraries, rows: mut_rows });
 };
 
-const cells = (line: string): readonly string[] =>
-  line
-    .replace(/^\|/u, '')
-    .replace(/\|$/u, '')
-    .split('|')
-    .map((cell) => cell.trim());
+const parseResults = (markdown: string): Result<Results, string> => {
+  const environment =
+    /Measured in `(?<userAgent>[^`]+)`\. Each figure is the median of (?<runs>\d+) runs of `pnpm run benchmark`/u.exec(
+      markdown,
+    );
+
+  const userAgent = environment?.groups?.['userAgent'];
+
+  const runs = environment?.groups?.['runs'];
+
+  if (userAgent === undefined || runs === undefined) {
+    return Result.err(
+      'the "Measured in …. Each figure is the median of N runs" sentence was not found; update parseResults to its new wording',
+    );
+  }
+
+  // The medians of the operations, the first table, and those of the
+  // scenarios, the first table after their heading. RESULTS.md's ratio tables
+  // are recomputed below, so that the Japanese page can head them in
+  // Japanese.
+  const lines = markdown.split('\n').map((line) => line.trim());
+
+  const operations = parseTable(lines, 0, false);
+
+  if (Result.isErr(operations)) {
+    return operations;
+  }
+
+  const scenariosHeading = lines.indexOf('## Scenarios');
+
+  if (scenariosHeading === -1) {
+    return Result.err('the "## Scenarios" section was not found');
+  }
+
+  const scenarios = parseTable(lines, scenariosHeading, true);
+
+  if (Result.isErr(scenarios)) {
+    return scenarios;
+  }
+
+  const { libraries } = operations.value;
+
+  if (
+    !libraries.includes(subject) ||
+    !libraries.includes(reference) ||
+    !scenarios.value.libraries.includes(subject)
+  ) {
+    return Result.err(
+      `a table has no "${subject}" column, or the first no "${reference}" column`,
+    );
+  }
+
+  return Result.ok({
+    userAgent,
+    runs: Result.unwrapOkOr(Num.safeParseFloat(runs), Number.NaN),
+    operations: operations.value,
+    scenarios: scenarios.value,
+  });
+};
+
+/** `parseResults` has already rejected a median that is not positive. */
+const ratioOf = (value: number, base: number): number =>
+  Num.isNonZero(base) ? Num.div(value, base) : Number.NaN;
+
+/** A dash where either time is missing (`wrong`). */
+const ratio = (value: number, base: number): string =>
+  Number.isNaN(value) || Number.isNaN(base)
+    ? '–'
+    : (`${ratioOf(value, base).toFixed(2)}×` as const);
 
 /** What each marker on a page is replaced with. */
 const render = (
@@ -346,16 +356,6 @@ const render = (
     },
   };
 };
-
-/** A dash where either time is missing (`wrong`). */
-const ratio = (value: number, base: number): string =>
-  Number.isNaN(value) || Number.isNaN(base)
-    ? '–'
-    : (`${ratioOf(value, base).toFixed(2)}×` as const);
-
-/** `parseResults` has already rejected a median that is not positive. */
-const ratioOf = (value: number, base: number): number =>
-  Num.isNonZero(base) ? Num.div(value, base) : Number.NaN;
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await embedBenchmark();

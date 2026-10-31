@@ -62,28 +62,6 @@ export const createAnswerSummary = (
     datetimeRangeFromMapKey,
   );
 
-const calcScoreSum = (
-  answerPointList: readonly AnswerIconPoint[],
-  answerWeightList: readonly Weight[],
-  isRequiredParticipantsList: readonly boolean[],
-): number => {
-  // Indexed rather than zipped: `Arr.zip` over these branded element types
-  // produces a union the checker cannot represent (TS2590), and the lists are
-  // parallel by construction anyway.
-  const someRequiredParticipantsScoreIs0 = isRequiredParticipantsList.some(
-    (required, i) => required && answerPointList[i] === 0,
-  );
-
-  return someRequiredParticipantsScoreIs0
-    ? 0
-    : Arr.sum(
-        answerPointList.map((score, i) => score * (answerWeightList[i] ?? 0)),
-      );
-};
-
-const calcScoreSumMax = (answerWeightList: readonly Weight[]): number =>
-  Arr.sum(answerWeightList.map((w) => w * answerIconPointConfig.max));
-
 export const createScore = (
   datetimeRangeList: readonly DatetimeRange[],
   answerSummary: IMapMapped<
@@ -142,3 +120,25 @@ export const createScore = (
     datetimeRangeToMapKey,
     datetimeRangeFromMapKey,
   );
+
+const calcScoreSum = (
+  answerPointList: readonly AnswerIconPoint[],
+  answerWeightList: readonly Weight[],
+  isRequiredParticipantsList: readonly boolean[],
+): number => {
+  // Indexed rather than zipped: `Arr.zip` over these branded element types
+  // produces a union the checker cannot represent (TS2590), and the lists are
+  // parallel by construction anyway.
+  const someRequiredParticipantsScoreIs0 = isRequiredParticipantsList.some(
+    (required, i) => required && answerPointList[i] === 0,
+  );
+
+  return someRequiredParticipantsScoreIs0
+    ? 0
+    : Arr.sum(
+        answerPointList.map((score, i) => score * (answerWeightList[i] ?? 0)),
+      );
+};
+
+const calcScoreSumMax = (answerWeightList: readonly Weight[]): number =>
+  Arr.sum(answerWeightList.map((w) => w * answerIconPointConfig.max));

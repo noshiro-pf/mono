@@ -263,6 +263,18 @@ const main = (): void => {
   keepServiceWorkersAway();
 };
 
+/** Unregisters every service worker of this origin, and counts them. */
+const removeServiceWorkers = async (): Promise<number> => {
+  const registrations =
+    await globalThis.navigator.serviceWorker.getRegistrations();
+
+  const results = await Promise.all(
+    registrations.map(async (registration) => registration.unregister()),
+  );
+
+  return results.filter((removed) => removed).length;
+};
+
 /**
  * Removes the site's service workers for as long as this document is open, if
  * its origin is on the always-clear list.
@@ -322,18 +334,6 @@ const unregisterServiceWorkers = async (
   } as const;
 
   window.parent.postMessage(message, replyOrigin);
-};
-
-/** Unregisters every service worker of this origin, and counts them. */
-const removeServiceWorkers = async (): Promise<number> => {
-  const registrations =
-    await globalThis.navigator.serviceWorker.getRegistrations();
-
-  const results = await Promise.all(
-    registrations.map(async (registration) => registration.unregister()),
-  );
-
-  return results.filter((removed) => removed).length;
 };
 
 const runCommand = (command: FrameCommand): void => {

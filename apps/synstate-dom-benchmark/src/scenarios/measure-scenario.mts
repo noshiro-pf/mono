@@ -105,6 +105,23 @@ export const measureScenario = async <App extends ScenarioAppBase>(
   return resultsByFramework.flat();
 };
 
+/** `0, 1, …, count - 1`. */
+const range = (count: number): readonly number[] =>
+  Array.from({ length: count }, (_, i) => i);
+
+const cellsOf = (container: HTMLElement): Cells =>
+  Array.from(container.querySelectorAll('tr'), (row) =>
+    Array.from(row.cells, (cell) => cell.textContent),
+  );
+
+const sameCells = (actual: Cells, expected: Cells): boolean =>
+  actual.length === expected.length &&
+  actual.every(
+    (row, i) =>
+      row.length === expected[i]?.length &&
+      row.every((text, j) => text === expected[i]?.[j]),
+  );
+
 /** Times `mount` until the screen is laid out, and checks what it shows. */
 const measureBuild = async <App extends ScenarioAppBase>(
   scenario: Scenario<App>,
@@ -146,20 +163,3 @@ const measureBuild = async <App extends ScenarioAppBase>(
       : undefined,
   };
 };
-
-/** `0, 1, …, count - 1`. */
-const range = (count: number): readonly number[] =>
-  Array.from({ length: count }, (_, i) => i);
-
-const cellsOf = (container: HTMLElement): Cells =>
-  Array.from(container.querySelectorAll('tr'), (row) =>
-    Array.from(row.cells, (cell) => cell.textContent),
-  );
-
-const sameCells = (actual: Cells, expected: Cells): boolean =>
-  actual.length === expected.length &&
-  actual.every(
-    (row, i) =>
-      row.length === expected[i]?.length &&
-      row.every((text, j) => text === expected[i]?.[j]),
-  );

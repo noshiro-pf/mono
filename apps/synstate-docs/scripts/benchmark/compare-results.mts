@@ -96,6 +96,68 @@ type Compared = Readonly<{
   calibration: readonly string[];
 }>;
 
+const valueAt = (
+  results: Results,
+  label: string,
+  point: string,
+): number | undefined => {
+  if (results.kind === 'stats') {
+    return results.rows.find((r) => r.label === label)?.median;
+  }
+
+  const index = results.xLabels.indexOf(point);
+
+  if (index === -1) {
+    return undefined;
+  }
+
+  return (
+    results.series.find((s) => s.label === label)?.values[index] ?? undefined
+  );
+};
+
+/** A list rather than an optional, so that the callers stay `flatMap`s. */
+const comparePoint = (
+  label: string,
+  point: string,
+  baseline: Results,
+  current: Results,
+): readonly Point[] => {
+  const b = valueAt(baseline, label, point);
+
+  const c = valueAt(current, label, point);
+
+  if (b === undefined || c === undefined || !Num.isNonZero(b)) {
+    return [];
+  }
+
+  return [
+    {
+      label,
+      point: point === '' ? 'median' : point,
+      baseline: b.toFixed(2),
+      current: c.toFixed(2),
+      ratio: Num.div(c, b).toFixed(2),
+    },
+  ];
+};
+
+/** SynState's rows: the plain one and a form such as `SynState (switchMap)`. */
+const isSynState = (label: string): boolean =>
+  label === 'SynState' || label.startsWith('SynState (');
+
+/** ` (switchMap)` for `SynState (switchMap)`, `''` for `SynState`. */
+const formOf = (label: string): string => label.slice('SynState'.length);
+
+const labelsOf = (results: Results): readonly string[] =>
+  results.kind === 'stats'
+    ? results.rows.map((r) => r.label)
+    : results.series.map((s) => s.label);
+
+/** `''` for a single-point scenario, the sweep's labels for a swept one. */
+const pointsOf = (results: Results): readonly string[] =>
+  results.kind === 'stats' ? ([''] as const) : results.xLabels;
+
 const compareScenario = (
   scenario: Scenario,
   baseline: Results | undefined,
@@ -140,32 +202,6 @@ type Point = Readonly<{
   ratio: string;
 }>;
 
-/** A list rather than an optional, so that the callers stay `flatMap`s. */
-const comparePoint = (
-  label: string,
-  point: string,
-  baseline: Results,
-  current: Results,
-): readonly Point[] => {
-  const b = valueAt(baseline, label, point);
-
-  const c = valueAt(current, label, point);
-
-  if (b === undefined || c === undefined || !Num.isNonZero(b)) {
-    return [];
-  }
-
-  return [
-    {
-      label,
-      point: point === '' ? 'median' : point,
-      baseline: b.toFixed(2),
-      current: c.toFixed(2),
-      ratio: Num.div(c, b).toFixed(2),
-    },
-  ];
-};
-
 const readScenario = async (
   dir: string,
   file: string,
@@ -179,42 +215,6 @@ const readScenario = async (
     ? undefined
     : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (JSON.parse(read.value) as unknown as Results);
-};
-
-/** SynState's rows: the plain one and a form such as `SynState (switchMap)`. */
-const isSynState = (label: string): boolean =>
-  label === 'SynState' || label.startsWith('SynState (');
-
-/** ` (switchMap)` for `SynState (switchMap)`, `''` for `SynState`. */
-const formOf = (label: string): string => label.slice('SynState'.length);
-
-const labelsOf = (results: Results): readonly string[] =>
-  results.kind === 'stats'
-    ? results.rows.map((r) => r.label)
-    : results.series.map((s) => s.label);
-
-/** `''` for a single-point scenario, the sweep's labels for a swept one. */
-const pointsOf = (results: Results): readonly string[] =>
-  results.kind === 'stats' ? ([''] as const) : results.xLabels;
-
-const valueAt = (
-  results: Results,
-  label: string,
-  point: string,
-): number | undefined => {
-  if (results.kind === 'stats') {
-    return results.rows.find((r) => r.label === label)?.median;
-  }
-
-  const index = results.xLabels.indexOf(point);
-
-  if (index === -1) {
-    return undefined;
-  }
-
-  return (
-    results.series.find((s) => s.label === label)?.values[index] ?? undefined
-  );
 };
 
 await main();

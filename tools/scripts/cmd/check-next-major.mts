@@ -327,9 +327,6 @@ const TOP_LEVEL_LIST_ITEM = /^(?:[-*+]|\d+[.)])\s+(.*)$/u;
 /** The start of a semver version, capturing its major and minor. */
 const VERSION = /^(\d+)\.(\d+)\.\d/u;
 
-const isBump = (value: string | undefined): value is Bump =>
-  value === 'major' || value === 'minor' || value === 'patch';
-
 /**
  * Whether `bump` breaks consumers of a package at `version`: under semver a
  * `0.x` package signals a breaking change with its minor, and changesets
@@ -357,6 +354,53 @@ export const isBreakingRelease = (from: string, to: string): boolean => {
     (before.major === 0 && after.major === 0 && after.minor > before.minor)
   );
 };
+
+export const readChangesets = async (): Promise<readonly ChangesetFile[]> => {
+  const files = await glob(`${CHANGESET_DIR_NAME}/*.md`, {
+    cwd: projectRootPath,
+  });
+
+  if (Result.isErr(files)) {
+    throw new Error(
+      `Failed to list ${CHANGESET_DIR_NAME}/: ${unknownToString(files.value)}`,
+    );
+  }
+
+  return Promise.all(
+    files.value.toSorted().map(async (file) => ({
+      file,
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      content: await fs.readFile(path.resolve(projectRootPath, file), 'utf8'),
+    })),
+  );
+};
+
+export const readStocks = async (): Promise<readonly StockFile[]> => {
+  const files = await glob(`**/${STOCK_FILE_NAME}`, {
+    cwd: projectRootPath,
+    ignore: ['**/node_modules/**', '**/dist/**', 'experimental/**'],
+  });
+
+  if (Result.isErr(files)) {
+    throw new Error(
+      `Failed to list ${STOCK_FILE_NAME} files: ${unknownToString(files.value)}`,
+    );
+  }
+
+  return Promise.all(
+    files.value.toSorted().map(async (file) => ({
+      file,
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      content: await fs.readFile(path.resolve(projectRootPath, file), 'utf8'),
+      manifest: await readManifest(
+        path.resolve(projectRootPath, path.dirname(file), 'package.json'),
+      ),
+    })),
+  );
+};
+
+const isBump = (value: string | undefined): value is Bump =>
+  value === 'major' || value === 'minor' || value === 'patch';
 
 const parseVersion = (
   version: string,
@@ -434,48 +478,21 @@ const checkStock = (
   };
 };
 
-export const readChangesets = async (): Promise<readonly ChangesetFile[]> => {
-  const files = await glob(`${CHANGESET_DIR_NAME}/*.md`, {
-    cwd: projectRootPath,
-  });
+const parseManifest = (content: string): StockFile['manifest'] => {
+  const parsed = Json.parse(content);
 
-  if (Result.isErr(files)) {
-    throw new Error(
-      `Failed to list ${CHANGESET_DIR_NAME}/: ${unknownToString(files.value)}`,
-    );
+  if (
+    Result.isErr(parsed) ||
+    !isRecord(parsed.value) ||
+    !hasKey(parsed.value, 'name') ||
+    !hasKey(parsed.value, 'version')
+  ) {
+    return undefined;
   }
 
-  return Promise.all(
-    files.value.toSorted().map(async (file) => ({
-      file,
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      content: await fs.readFile(path.resolve(projectRootPath, file), 'utf8'),
-    })),
-  );
-};
+  const { name, version } = parsed.value;
 
-export const readStocks = async (): Promise<readonly StockFile[]> => {
-  const files = await glob(`**/${STOCK_FILE_NAME}`, {
-    cwd: projectRootPath,
-    ignore: ['**/node_modules/**', '**/dist/**', 'experimental/**'],
-  });
-
-  if (Result.isErr(files)) {
-    throw new Error(
-      `Failed to list ${STOCK_FILE_NAME} files: ${unknownToString(files.value)}`,
-    );
-  }
-
-  return Promise.all(
-    files.value.toSorted().map(async (file) => ({
-      file,
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      content: await fs.readFile(path.resolve(projectRootPath, file), 'utf8'),
-      manifest: await readManifest(
-        path.resolve(projectRootPath, path.dirname(file), 'package.json'),
-      ),
-    })),
-  );
+  return isString(name) && isString(version) ? { name, version } : undefined;
 };
 
 /**
@@ -561,23 +578,6 @@ const readManifest = async (
   );
 
   return Result.isErr(content) ? undefined : parseManifest(content.value);
-};
-
-const parseManifest = (content: string): StockFile['manifest'] => {
-  const parsed = Json.parse(content);
-
-  if (
-    Result.isErr(parsed) ||
-    !isRecord(parsed.value) ||
-    !hasKey(parsed.value, 'name') ||
-    !hasKey(parsed.value, 'version')
-  ) {
-    return undefined;
-  }
-
-  const { name, version } = parsed.value;
-
-  return isString(name) && isString(version) ? { name, version } : undefined;
 };
 
 if (isDirectlyExecuted(import.meta.url)) {

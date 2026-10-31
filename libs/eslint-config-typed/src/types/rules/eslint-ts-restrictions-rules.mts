@@ -74,6 +74,21 @@ namespace ExplicitCollectionTypeArguments {
 }
 
 /**
+ * @description Require a module's exported functions before its non-exported helpers, and a helper before the helpers that call it
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace FunctionOrder {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Require booleans on both sides of `&&` and `||` whose value is rendered or passed in JSX, and write the rest as a ternary (`{a && <X />}` → `{a ? <X /> : undefined}`).
  *
  *  ```md
@@ -490,6 +505,7 @@ namespace PreferTernary {
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   'ts-restrictions/explicit-collection-type-arguments': ExplicitCollectionTypeArguments.RuleEntry;
+  'ts-restrictions/function-order': FunctionOrder.RuleEntry;
   'ts-restrictions/jsx-boolean-logical-operands': JsxBooleanLogicalOperands.RuleEntry;
   'ts-restrictions/no-negated-comparison': NoNegatedComparison.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;

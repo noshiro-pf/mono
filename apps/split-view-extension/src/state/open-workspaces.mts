@@ -132,19 +132,6 @@ const openWorkspaceTab = async (
   await chrome.tabs.create({ url: url.href, pinned, active });
 };
 
-/** The workspaces a tab is showing right now, tabs that have gone dropped. */
-const openWorkspaceIds = async (): Promise<ReadonlySet<string>> => {
-  const openTabs = await readOpenSplitViewTabs();
-
-  const live = await Promise.all(
-    Object.entries(openTabs).map(async ([tabId, workspaceId]) =>
-      (await tabIsOpen(tabId)) ? workspaceId : undefined,
-    ),
-  );
-
-  return new Set(live.filter((workspaceId) => workspaceId !== undefined));
-};
-
 const tabIsOpen = async (tabId: string): Promise<boolean> => {
   const id = Result.unwrapOkOr(Num.safeParseFloat(tabId), Number.NaN);
 
@@ -161,4 +148,17 @@ const tabIsOpen = async (tabId: string): Promise<boolean> => {
     // off the list.
     return false;
   }
+};
+
+/** The workspaces a tab is showing right now, tabs that have gone dropped. */
+const openWorkspaceIds = async (): Promise<ReadonlySet<string>> => {
+  const openTabs = await readOpenSplitViewTabs();
+
+  const live = await Promise.all(
+    Object.entries(openTabs).map(async ([tabId, workspaceId]) =>
+      (await tabIsOpen(tabId)) ? workspaceId : undefined,
+    ),
+  );
+
+  return new Set(live.filter((workspaceId) => workspaceId !== undefined));
 };

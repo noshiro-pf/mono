@@ -198,26 +198,6 @@ const collectComparedEventNames = (workflowFile: string): readonly string[] => {
   });
 };
 
-const readWorkflows = async (
-  workflowPaths: readonly string[],
-): Promise<Result<readonly Workflow[], string>> => {
-  const results = await Promise.all(workflowPaths.map(readWorkflow));
-
-  const firstError = results.find(Result.isErr);
-
-  return firstError !== undefined
-    ? Result.err(firstError.value)
-    : Result.ok(
-        Arr.generate(function* () {
-          for (const result of results) {
-            if (!Result.isErr(result)) {
-              yield result.value;
-            }
-          }
-        }),
-      );
-};
-
 const readWorkflow = async (
   workflowPath: string,
 ): Promise<Result<Workflow, string>> => {
@@ -236,6 +216,26 @@ const readWorkflow = async (
         relativePath,
         triggers: parseWorkflowTriggers(result.value),
       });
+};
+
+const readWorkflows = async (
+  workflowPaths: readonly string[],
+): Promise<Result<readonly Workflow[], string>> => {
+  const results = await Promise.all(workflowPaths.map(readWorkflow));
+
+  const firstError = results.find(Result.isErr);
+
+  return firstError !== undefined
+    ? Result.err(firstError.value)
+    : Result.ok(
+        Arr.generate(function* () {
+          for (const result of results) {
+            if (!Result.isErr(result)) {
+              yield result.value;
+            }
+          }
+        }),
+      );
 };
 
 const formatViolations = (violations: readonly string[]): string =>

@@ -145,6 +145,51 @@ export const managedPagePathOf = (
 ): string | undefined => managedPageOf(href, pageOrigin)?.url.pathname;
 
 /**
+ * `href` parsed into the parts a rule reads, or `undefined` for one the URL
+ * parser rejects: an attribute can hold anything, and a scan that gave up on
+ * the first odd one would leave every later anchor on the page unpatched.
+ */
+const parseUrl = (href: string): PageUrl | undefined => {
+  try {
+    // Named rather than destructured: `origin` on its own shadows the browser
+    // global of that name, which the lint rules will not have.
+    const url = new URL(href);
+
+    return {
+      origin: url.origin,
+      pathname: url.pathname,
+      search: url.search,
+      hash: url.hash,
+    };
+  } catch {
+    return undefined;
+  }
+};
+
+/**
+ * Which rule `href` falls under, with the address parsed, or `undefined` when
+ * it is not a page on this origin that any rule speaks for.
+ */
+const managedPageOf = (
+  href: string,
+  pageOrigin: string,
+): Readonly<{ rule: PageRule; url: PageUrl }> | undefined => {
+  const url = parseUrl(href);
+
+  if (url === undefined) {
+    return undefined;
+  }
+
+  if (url.origin !== pageOrigin) {
+    return undefined;
+  }
+
+  const rule = pageRules.find(({ path }) => path.test(url.pathname));
+
+  return rule === undefined ? undefined : { rule, url };
+};
+
+/**
  * The one place a rule is asked anything; the two exported questions differ
  * only in what they know about where the address was read.
  */
@@ -296,29 +341,6 @@ const pageRules: readonly PageRule[] = [
 ] as const;
 
 /**
- * Which rule `href` falls under, with the address parsed, or `undefined` when
- * it is not a page on this origin that any rule speaks for.
- */
-const managedPageOf = (
-  href: string,
-  pageOrigin: string,
-): Readonly<{ rule: PageRule; url: PageUrl }> | undefined => {
-  const url = parseUrl(href);
-
-  if (url === undefined) {
-    return undefined;
-  }
-
-  if (url.origin !== pageOrigin) {
-    return undefined;
-  }
-
-  const rule = pageRules.find(({ path }) => path.test(url.pathname));
-
-  return rule === undefined ? undefined : { rule, url };
-};
-
-/**
  * Whether `readFrom` is a tab of the same repository's branches page — where
  * `branches` is that page's `/{owner}/{repo}/branches` path.
  *
@@ -341,28 +363,6 @@ const isTabOfSameBranchesPage = (
     (readFrom.pathname === branches ||
       readFrom.pathname.startsWith(`${branches}/`))
   );
-};
-
-/**
- * `href` parsed into the parts a rule reads, or `undefined` for one the URL
- * parser rejects: an attribute can hold anything, and a scan that gave up on
- * the first odd one would leave every later anchor on the page unpatched.
- */
-const parseUrl = (href: string): PageUrl | undefined => {
-  try {
-    // Named rather than destructured: `origin` on its own shadows the browser
-    // global of that name, which the lint rules will not have.
-    const url = new URL(href);
-
-    return {
-      origin: url.origin,
-      pathname: url.pathname,
-      search: url.search,
-      hash: url.hash,
-    };
-  } catch {
-    return undefined;
-  }
 };
 
 /**

@@ -442,6 +442,269 @@ const settleWithComments = async (
   };
 };
 
+/**
+ * Watches one pull request, and when its checks fail on nothing but a fixer's
+ * diff, has `autoFix` push the fix and watches the new head in its place.
+ * Resolves to the outcome and the head it was reached on, which is the one a
+ * skip record has to name.
+ *
+ * Once per watch: a head `autoFix` wrote that fails again is a fixer that
+ * does not agree with CI, and running it again would only push the same diff.
+ * The pull request is set aside as any other failure is, and nothing else
+ * failing in the queue is touched — the one being watched is the one this
+ * cycle picked.
+ */
+const watchAndFix = async (
+  api: ApiContext,
+  pr: PullRequest,
+  expectedHead: string,
+  context: Readonly<{
+    defaultBranch: string;
+    requiredContexts: readonly string[];
+    /** Set for one only a ruleset bypass merges; see `watch`. */
+    bypassReason: string | undefined;
+    /** `undefined` under `--no-auto-fix`, or when the repository has none. */
+    autoFixConfig: AutoFixConfig | undefined;
+  }>,
+  options: Options,
+): Promise<Readonly<{ ended: Watched; head: string }>> => {
+  const ended = await watch(
+    api,
+    pr,
+    expectedHead,
+    context.requiredContexts,
+    options,
+    context.bypassReason,
+  );
+
+  if (
+    ended.outcome !== 'checks-failed' ||
+    context.autoFixConfig === undefined ||
+    stopRequested()
+  ) {
+    return { ended, head: expectedHead };
+  }
+
+  const fixed = await autoFix(
+    api,
+    pr,
+    expectedHead,
+    context.defaultBranch,
+    context.autoFixConfig,
+  );
+
+  switch (fixed.kind) {
+    case 'declined':
+      log(`#${pr.number}: not fixing it here: ${fixed.detail}`);
+
+      return { ended, head: expectedHead };
+
+    case 'moved':
+      return { ended: { outcome: 'head-moved' }, head: expectedHead };
+
+    case 'pushed':
+      log(
+        `#${pr.number}: pushed what ${fixed.commands.join(', ')} wrote as ${fixed.head.slice(0, 10)}; watching it again.`,
+      );
+
+      return {
+        ended: await watch(
+          api,
+          pr,
+          fixed.head,
+          context.requiredContexts,
+          options,
+          context.bypassReason,
+        ),
+        head: fixed.head,
+      };
+  }
+};
+
+/**
+ * A pull request the run has acted on is worth remembering while it might
+ * still end without anything watching it; once it has ended there is nothing
+ * left to report.
+ */
+const trackAfterWatch = (
+  tracked: ReadonlySet<number>,
+  prNumber: number,
+  outcome: WatchOutcome,
+): ReadonlySet<number> =>
+  outcome === 'merged' || outcome === 'closed'
+    ? new Set(Array.from(tracked).filter((number) => number !== prNumber))
+    : new Set<number>([...tracked, prNumber]);
+
+/**
+ * Says what became of the pull requests this run acted on that have left the
+ * open list, and returns the ones that are still on it.
+ *
+ * Nothing else notices: a pull request the watch gave up on merges minutes
+ * later, and the only trace is that it stops being listed. Without this the
+ * run that pushed the merge commit never mentions it.
+ */
+const reportDeparted = async (
+  api: ApiContext,
+  tracked: ReadonlySet<number>,
+  pullRequests: readonly PullRequest[],
+): Promise<ReadonlySet<number>> => {
+  const isOpen = (prNumber: number): boolean =>
+    pullRequests.some((pr) => pr.number === prNumber);
+
+  const departed = Array.from(tracked).filter((prNumber) => !isOpen(prNumber));
+
+  const viewed = await Promise.all(
+    departed.map(async (prNumber) => ({
+      prNumber,
+      result: await viewPullRequest(api, prNumber),
+    })),
+  );
+
+  for (const { prNumber, result } of viewed) {
+    if (Result.isErr(result)) {
+      const detail =
+        `left the open list; cannot read it: ${result.value}` as const;
+
+      log(`#${prNumber} has ${detail}`);
+    } else if (result.value.state === 'MERGED') {
+      log(`#${prNumber} merged — ${result.value.title}`);
+    } else {
+      const detail = `no longer open (${result.value.state})` as const;
+
+      log(`#${prNumber} is ${detail} — ${result.value.title}`);
+    }
+  }
+
+  return new Set(Array.from(tracked).filter(isOpen));
+};
+
+/**
+ * What the issues the open pull requests close add to the merge order. A
+ * read that fails holds nothing extra: the declared order and the stacks
+ * still stand, and an order inherited from an issue is the one a person can
+ * also write into the body.
+ */
+const issueOrderFor = async (
+  api: ApiContext,
+  pullRequests: readonly PullRequest[],
+): Promise<IssueOrder> => {
+  const read = await readIssueOrder(
+    api,
+    pullRequests.map(({ number }) => number),
+  );
+
+  if (Result.isErr(read)) {
+    log(
+      `Cannot read the issues the pull requests close; inheriting no Start-After this cycle. (${read.value})`,
+    );
+
+    return {
+      closes: new Map<number, readonly number[]>(),
+      startAfter: new Map<number, readonly number[]>(),
+    };
+  }
+
+  return read.value;
+};
+
+const applyWatchOutcome = (
+  skipped: SkipRecords,
+  pr: PullRequest,
+  baseSha: string,
+  ended: Watched,
+): SkipRecords => {
+  switch (ended.outcome) {
+    case 'merged':
+      log(`#${pr.number} merged.`);
+
+      return skipped;
+
+    case 'closed':
+      log(`#${pr.number} was closed without merging.`);
+
+      return skipped;
+
+    case 'auto-merge-disabled':
+      log(
+        `#${pr.number}: auto-merge was switched off; it is armed again when next picked, unless ${MERGE_QUEUED_LABEL} comes off.`,
+      );
+
+      return skipped;
+
+    case 'skip-ci-labelled':
+      log(
+        `#${pr.number}: ${SKIP_CI_LABEL} went on while waiting; leaving it alone.`,
+      );
+
+      return skipped;
+
+    case 'head-moved':
+      log(`#${pr.number}: someone else pushed to the branch; surveying again.`);
+
+      return skipped;
+
+    case 'behind-again':
+      log(`#${pr.number}: the base moved while waiting; surveying again.`);
+
+      return skipped;
+
+    case 'checks-failed':
+      return withSkip(skipped, {
+        number: pr.number,
+        headSha: pr.headRefOid,
+        baseSha,
+        reason: 'checks-failed',
+        detail: ended.detail ?? 'a required check failed',
+        failedChecks: ended.failedChecks,
+      });
+
+    case 'awaiting-bypass':
+      log(
+        `#${pr.number}: green, and left for a ruleset bypass merge; nothing here takes it further until the branch is pushed again or a retry is asked for.`,
+      );
+
+      return withSkip(skipped, {
+        number: pr.number,
+        headSha: pr.headRefOid,
+        baseSha,
+        reason: 'awaiting-bypass',
+        detail: ended.detail ?? 'every required check is green',
+      });
+
+    case 'not-merging':
+      log(
+        `#${pr.number}: every required check reported green and it is still open; something other than the checks holds it that its review does not show — auto-merge armed by someone who may not merge, or a rule this script does not read. It goes last from now on, until someone pushes to it.`,
+      );
+
+      return withSkip(skipped, {
+        number: pr.number,
+        headSha: pr.headRefOid,
+        baseSha,
+        reason: 'not-merging',
+        detail: ended.detail ?? 'green but not merged',
+      });
+
+    case 'timeout':
+      log(`#${pr.number}: gave up waiting.`);
+
+      return withSkip(skipped, {
+        number: pr.number,
+        headSha: pr.headRefOid,
+        baseSha,
+        reason: 'watch-timeout',
+        detail: ended.detail ?? 'checks did not finish in time',
+      });
+
+    case 'error':
+      log(`#${pr.number}: polling kept failing; surveying again later.`);
+
+      return skipped;
+
+    case 'stopped':
+      return skipped;
+  }
+};
+
 const runCycle = async (
   api: ApiContext,
   defaultBranch: string,
@@ -799,267 +1062,4 @@ const runCycle = async (
 
   // Nothing to act on, or every candidate failed to rebase or push.
   return { state: state(mut_skipped), next: 'idle', settled: skipped };
-};
-
-/**
- * Watches one pull request, and when its checks fail on nothing but a fixer's
- * diff, has `autoFix` push the fix and watches the new head in its place.
- * Resolves to the outcome and the head it was reached on, which is the one a
- * skip record has to name.
- *
- * Once per watch: a head `autoFix` wrote that fails again is a fixer that
- * does not agree with CI, and running it again would only push the same diff.
- * The pull request is set aside as any other failure is, and nothing else
- * failing in the queue is touched — the one being watched is the one this
- * cycle picked.
- */
-const watchAndFix = async (
-  api: ApiContext,
-  pr: PullRequest,
-  expectedHead: string,
-  context: Readonly<{
-    defaultBranch: string;
-    requiredContexts: readonly string[];
-    /** Set for one only a ruleset bypass merges; see `watch`. */
-    bypassReason: string | undefined;
-    /** `undefined` under `--no-auto-fix`, or when the repository has none. */
-    autoFixConfig: AutoFixConfig | undefined;
-  }>,
-  options: Options,
-): Promise<Readonly<{ ended: Watched; head: string }>> => {
-  const ended = await watch(
-    api,
-    pr,
-    expectedHead,
-    context.requiredContexts,
-    options,
-    context.bypassReason,
-  );
-
-  if (
-    ended.outcome !== 'checks-failed' ||
-    context.autoFixConfig === undefined ||
-    stopRequested()
-  ) {
-    return { ended, head: expectedHead };
-  }
-
-  const fixed = await autoFix(
-    api,
-    pr,
-    expectedHead,
-    context.defaultBranch,
-    context.autoFixConfig,
-  );
-
-  switch (fixed.kind) {
-    case 'declined':
-      log(`#${pr.number}: not fixing it here: ${fixed.detail}`);
-
-      return { ended, head: expectedHead };
-
-    case 'moved':
-      return { ended: { outcome: 'head-moved' }, head: expectedHead };
-
-    case 'pushed':
-      log(
-        `#${pr.number}: pushed what ${fixed.commands.join(', ')} wrote as ${fixed.head.slice(0, 10)}; watching it again.`,
-      );
-
-      return {
-        ended: await watch(
-          api,
-          pr,
-          fixed.head,
-          context.requiredContexts,
-          options,
-          context.bypassReason,
-        ),
-        head: fixed.head,
-      };
-  }
-};
-
-/**
- * A pull request the run has acted on is worth remembering while it might
- * still end without anything watching it; once it has ended there is nothing
- * left to report.
- */
-const trackAfterWatch = (
-  tracked: ReadonlySet<number>,
-  prNumber: number,
-  outcome: WatchOutcome,
-): ReadonlySet<number> =>
-  outcome === 'merged' || outcome === 'closed'
-    ? new Set(Array.from(tracked).filter((number) => number !== prNumber))
-    : new Set<number>([...tracked, prNumber]);
-
-/**
- * Says what became of the pull requests this run acted on that have left the
- * open list, and returns the ones that are still on it.
- *
- * Nothing else notices: a pull request the watch gave up on merges minutes
- * later, and the only trace is that it stops being listed. Without this the
- * run that pushed the merge commit never mentions it.
- */
-const reportDeparted = async (
-  api: ApiContext,
-  tracked: ReadonlySet<number>,
-  pullRequests: readonly PullRequest[],
-): Promise<ReadonlySet<number>> => {
-  const isOpen = (prNumber: number): boolean =>
-    pullRequests.some((pr) => pr.number === prNumber);
-
-  const departed = Array.from(tracked).filter((prNumber) => !isOpen(prNumber));
-
-  const viewed = await Promise.all(
-    departed.map(async (prNumber) => ({
-      prNumber,
-      result: await viewPullRequest(api, prNumber),
-    })),
-  );
-
-  for (const { prNumber, result } of viewed) {
-    if (Result.isErr(result)) {
-      const detail =
-        `left the open list; cannot read it: ${result.value}` as const;
-
-      log(`#${prNumber} has ${detail}`);
-    } else if (result.value.state === 'MERGED') {
-      log(`#${prNumber} merged — ${result.value.title}`);
-    } else {
-      const detail = `no longer open (${result.value.state})` as const;
-
-      log(`#${prNumber} is ${detail} — ${result.value.title}`);
-    }
-  }
-
-  return new Set(Array.from(tracked).filter(isOpen));
-};
-
-/**
- * What the issues the open pull requests close add to the merge order. A
- * read that fails holds nothing extra: the declared order and the stacks
- * still stand, and an order inherited from an issue is the one a person can
- * also write into the body.
- */
-const issueOrderFor = async (
-  api: ApiContext,
-  pullRequests: readonly PullRequest[],
-): Promise<IssueOrder> => {
-  const read = await readIssueOrder(
-    api,
-    pullRequests.map(({ number }) => number),
-  );
-
-  if (Result.isErr(read)) {
-    log(
-      `Cannot read the issues the pull requests close; inheriting no Start-After this cycle. (${read.value})`,
-    );
-
-    return {
-      closes: new Map<number, readonly number[]>(),
-      startAfter: new Map<number, readonly number[]>(),
-    };
-  }
-
-  return read.value;
-};
-
-const applyWatchOutcome = (
-  skipped: SkipRecords,
-  pr: PullRequest,
-  baseSha: string,
-  ended: Watched,
-): SkipRecords => {
-  switch (ended.outcome) {
-    case 'merged':
-      log(`#${pr.number} merged.`);
-
-      return skipped;
-
-    case 'closed':
-      log(`#${pr.number} was closed without merging.`);
-
-      return skipped;
-
-    case 'auto-merge-disabled':
-      log(
-        `#${pr.number}: auto-merge was switched off; it is armed again when next picked, unless ${MERGE_QUEUED_LABEL} comes off.`,
-      );
-
-      return skipped;
-
-    case 'skip-ci-labelled':
-      log(
-        `#${pr.number}: ${SKIP_CI_LABEL} went on while waiting; leaving it alone.`,
-      );
-
-      return skipped;
-
-    case 'head-moved':
-      log(`#${pr.number}: someone else pushed to the branch; surveying again.`);
-
-      return skipped;
-
-    case 'behind-again':
-      log(`#${pr.number}: the base moved while waiting; surveying again.`);
-
-      return skipped;
-
-    case 'checks-failed':
-      return withSkip(skipped, {
-        number: pr.number,
-        headSha: pr.headRefOid,
-        baseSha,
-        reason: 'checks-failed',
-        detail: ended.detail ?? 'a required check failed',
-        failedChecks: ended.failedChecks,
-      });
-
-    case 'awaiting-bypass':
-      log(
-        `#${pr.number}: green, and left for a ruleset bypass merge; nothing here takes it further until the branch is pushed again or a retry is asked for.`,
-      );
-
-      return withSkip(skipped, {
-        number: pr.number,
-        headSha: pr.headRefOid,
-        baseSha,
-        reason: 'awaiting-bypass',
-        detail: ended.detail ?? 'every required check is green',
-      });
-
-    case 'not-merging':
-      log(
-        `#${pr.number}: every required check reported green and it is still open; something other than the checks holds it that its review does not show — auto-merge armed by someone who may not merge, or a rule this script does not read. It goes last from now on, until someone pushes to it.`,
-      );
-
-      return withSkip(skipped, {
-        number: pr.number,
-        headSha: pr.headRefOid,
-        baseSha,
-        reason: 'not-merging',
-        detail: ended.detail ?? 'green but not merged',
-      });
-
-    case 'timeout':
-      log(`#${pr.number}: gave up waiting.`);
-
-      return withSkip(skipped, {
-        number: pr.number,
-        headSha: pr.headRefOid,
-        baseSha,
-        reason: 'watch-timeout',
-        detail: ended.detail ?? 'checks did not finish in time',
-      });
-
-    case 'error':
-      log(`#${pr.number}: polling kept failing; surveying again later.`);
-
-      return skipped;
-
-    case 'stopped':
-      return skipped;
-  }
 };

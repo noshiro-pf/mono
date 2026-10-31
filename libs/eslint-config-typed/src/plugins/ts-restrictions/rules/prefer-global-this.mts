@@ -164,6 +164,30 @@ const reportedStart = (
   return { line: start.line, column: start.column };
 };
 
+/** `node`, or the outermost type wrapper whose value is `node`. */
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const outermostTypeWrapper = (node: TSESTree.Node): TSESTree.Node => {
+  const { parent } = node;
+
+  return parent !== undefined &&
+    isTypeWrapper(parent) &&
+    parent.expression === node
+    ? outermostTypeWrapper(parent)
+    : node;
+};
+
+/** The name a member key spells out, if it is static. */
+const staticKeyName = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  key: TSESTree.Node,
+  computed: boolean,
+): string | undefined =>
+  !computed && key.type === AST_NODE_TYPES.Identifier
+    ? key.name
+    : key.type === AST_NODE_TYPES.Literal && typeof key.value === 'string'
+      ? key.value
+      : undefined;
+
 /**
  * The members of `window` / `self` / `global` that this use of it reaches, or
  * `undefined` when the use is not a member access or a destructuring whose
@@ -202,30 +226,6 @@ const reachedMemberNames = (
 
   return undefined;
 };
-
-/** `node`, or the outermost type wrapper whose value is `node`. */
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const outermostTypeWrapper = (node: TSESTree.Node): TSESTree.Node => {
-  const { parent } = node;
-
-  return parent !== undefined &&
-    isTypeWrapper(parent) &&
-    parent.expression === node
-    ? outermostTypeWrapper(parent)
-    : node;
-};
-
-/** The name a member key spells out, if it is static. */
-const staticKeyName = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  key: TSESTree.Node,
-  computed: boolean,
-): string | undefined =>
-  !computed && key.type === AST_NODE_TYPES.Identifier
-    ? key.name
-    : key.type === AST_NODE_TYPES.Literal && typeof key.value === 'string'
-      ? key.value
-      : undefined;
 
 /**
  * The `typeof globalThis` part of the type of `window` / `self`

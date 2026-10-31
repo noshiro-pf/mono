@@ -248,6 +248,29 @@ type MemberCloseness = Readonly<{
   score: number;
 }>;
 
+/**
+ * How many checks a member performs on a value: one per key for a record, one
+ * per element for a tuple, and a single check for everything else, which either
+ * matches or does not. A record whose shape cannot be flattened to a single set
+ * of keys (a union of shapes) also counts as one check.
+ */
+const checkCountOf = (memberType: UnknownType): number => {
+  const view = recordViewOf(memberType);
+
+  if (view !== undefined) {
+    const shape = flattenShapeStructure(view.shapeStructure);
+
+    return shape === undefined ? 1 : Object.keys(shape).length;
+  }
+
+  return tupleElementTypesOf(memberType)?.length ?? 1;
+};
+
+const validationErrorsOf = (
+  result: Result<unknown, readonly ValidationError[]>,
+): readonly ValidationError[] =>
+  Result.isErr(result) ? result.value : ([] as const);
+
 const evaluateMember = (
   memberType: UnknownType,
   a: unknown,
@@ -273,29 +296,6 @@ const compareByCloseness = (x: MemberCloseness, y: MemberCloseness): number =>
   x.score !== y.score
     ? x.score - y.score
     : y.satisfiedCheckCount - x.satisfiedCheckCount;
-
-/**
- * How many checks a member performs on a value: one per key for a record, one
- * per element for a tuple, and a single check for everything else, which either
- * matches or does not. A record whose shape cannot be flattened to a single set
- * of keys (a union of shapes) also counts as one check.
- */
-const checkCountOf = (memberType: UnknownType): number => {
-  const view = recordViewOf(memberType);
-
-  if (view !== undefined) {
-    const shape = flattenShapeStructure(view.shapeStructure);
-
-    return shape === undefined ? 1 : Object.keys(shape).length;
-  }
-
-  return tupleElementTypesOf(memberType)?.length ?? 1;
-};
-
-const validationErrorsOf = (
-  result: Result<unknown, readonly ValidationError[]>,
-): readonly ValidationError[] =>
-  Result.isErr(result) ? result.value : ([] as const);
 
 type UnionType<Types extends NonEmptyTuple<UnknownType>> = Type<
   UnionTypeValue<Types>

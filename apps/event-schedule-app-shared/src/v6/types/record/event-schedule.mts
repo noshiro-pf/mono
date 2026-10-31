@@ -61,20 +61,6 @@ export const eventScheduleDefaultValue = {
   archivedBy: [],
 } as const satisfies EventSchedule;
 
-const isAnswerDeadline = (e: unknown): e is Ymdhm | 'none' =>
-  e === 'none' || isYmdhm(e);
-
-const isNotificationSettingsWithNone = (
-  e: unknown,
-): e is NotificationSettings | 'none' =>
-  e === 'none' || isNotificationSettings(e);
-
-const isDatetimeRangeList = (e: unknown): e is readonly DatetimeRange[] =>
-  Arr.isArray(e) && Arr.isNonEmpty(e) && e.every(isDatetimeRange);
-
-const isUserList = (e: unknown): e is readonly User[] =>
-  Arr.isArray(e) && e.every(isUser);
-
 export const isEventSchedule = (a: unknown): a is EventSchedule =>
   isRecord(a) &&
   hasKeyValue(a, 'title', isString) &&
@@ -87,8 +73,6 @@ export const isEventSchedule = (a: unknown): a is EventSchedule =>
   hasKeyValue(a, 'timezoneOffsetMinutes', isNumber) &&
   hasKeyValue(a, 'author', isUser) &&
   hasKeyValue(a, 'archivedBy', isUserList);
-
-const d = eventScheduleDefaultValue;
 
 export const fillEventSchedule = (a?: unknown): EventSchedule =>
   a === undefined || !isRecord(a)
@@ -139,3 +123,19 @@ export const fillEventSchedule = (a?: unknown): EventSchedule =>
             ? a.archivedBy.map(fillUser)
             : d.archivedBy,
       } as const);
+
+const isAnswerDeadline = (e: unknown): e is Ymdhm | 'none' =>
+  e === 'none' || isYmdhm(e);
+
+const isNotificationSettingsWithNone = (
+  e: unknown,
+): e is NotificationSettings | 'none' =>
+  e === 'none' || isNotificationSettings(e);
+
+const isDatetimeRangeList = (e: unknown): e is readonly DatetimeRange[] =>
+  Arr.isArray(e) && Arr.isNonEmpty(e) && e.every(isDatetimeRange);
+
+const isUserList = (e: unknown): e is readonly User[] =>
+  Arr.isArray(e) && e.every(isUser);
+
+const d = eventScheduleDefaultValue;

@@ -90,6 +90,22 @@ export const dropTargetAt = (
   return { paneId: over.paneId, zone, indicator: indicatorOf(rect, zone) };
 };
 
+/**
+ * Flattens the tree into absolute rectangles.
+ *
+ * Everything is laid out in pixels rather than percentages so that the gutters
+ * stay the same width at every depth, and so that a drag is a subtraction
+ * rather than a conversion. The panes come back as a flat list, which is what
+ * lets the page render every `iframe` as a sibling in a stable order — moving
+ * an `iframe` in the DOM reloads it, so the tree may decide where a pane *is*
+ * but never where its element sits.
+ */
+export const computeGeometry = (
+  root: LayoutNode,
+  bounds: Rect,
+  gutter: number,
+): LayoutGeometry => walk(root, bounds, [], gutter);
+
 /** The nearest edge, when the pointer is close enough to one. */
 const zoneOf = (fromLeft: number, fromTop: number): PaneDropZone => {
   const distances = [
@@ -129,21 +145,43 @@ const indicatorOf = (rect: Rect, zone: PaneDropZone): Rect => {
   }
 };
 
-/**
- * Flattens the tree into absolute rectangles.
- *
- * Everything is laid out in pixels rather than percentages so that the gutters
- * stay the same width at every depth, and so that a drag is a subtraction
- * rather than a conversion. The panes come back as a flat list, which is what
- * lets the page render every `iframe` as a sibling in a stable order — moving
- * an `iframe` in the DOM reloads it, so the tree may decide where a pane *is*
- * but never where its element sits.
- */
-export const computeGeometry = (
-  root: LayoutNode,
-  bounds: Rect,
+/** Splits one rect into `first`, the gutter, and `second`. */
+const divideRect = (
+  rect: Rect,
+  axis: SplitAxis,
+  ratio: number,
   gutter: number,
-): LayoutGeometry => walk(root, bounds, [], gutter);
+): readonly [Rect, Rect, Rect] => {
+  if (axis === 'row') {
+    const availableWidth = Math.max(0, rect.width - gutter);
+
+    const firstWidth = Math.round(availableWidth * clampRatio(ratio));
+
+    return [
+      { ...rect, width: firstWidth },
+      { ...rect, left: rect.left + firstWidth, width: gutter },
+      {
+        ...rect,
+        left: rect.left + firstWidth + gutter,
+        width: availableWidth - firstWidth,
+      },
+    ];
+  }
+
+  const availableHeight = Math.max(0, rect.height - gutter);
+
+  const firstHeight = Math.round(availableHeight * clampRatio(ratio));
+
+  return [
+    { ...rect, height: firstHeight },
+    { ...rect, top: rect.top + firstHeight, height: gutter },
+    {
+      ...rect,
+      top: rect.top + firstHeight + gutter,
+      height: availableHeight - firstHeight,
+    },
+  ];
+};
 
 const walk = (
   node: LayoutNode,
@@ -184,42 +222,4 @@ const walk = (
       { path, axis: node.axis, rect: dividerRect, nodeRect: rect },
     ],
   };
-};
-
-/** Splits one rect into `first`, the gutter, and `second`. */
-const divideRect = (
-  rect: Rect,
-  axis: SplitAxis,
-  ratio: number,
-  gutter: number,
-): readonly [Rect, Rect, Rect] => {
-  if (axis === 'row') {
-    const availableWidth = Math.max(0, rect.width - gutter);
-
-    const firstWidth = Math.round(availableWidth * clampRatio(ratio));
-
-    return [
-      { ...rect, width: firstWidth },
-      { ...rect, left: rect.left + firstWidth, width: gutter },
-      {
-        ...rect,
-        left: rect.left + firstWidth + gutter,
-        width: availableWidth - firstWidth,
-      },
-    ];
-  }
-
-  const availableHeight = Math.max(0, rect.height - gutter);
-
-  const firstHeight = Math.round(availableHeight * clampRatio(ratio));
-
-  return [
-    { ...rect, height: firstHeight },
-    { ...rect, top: rect.top + firstHeight, height: gutter },
-    {
-      ...rect,
-      top: rect.top + firstHeight + gutter,
-      height: availableHeight - firstHeight,
-    },
-  ];
 };

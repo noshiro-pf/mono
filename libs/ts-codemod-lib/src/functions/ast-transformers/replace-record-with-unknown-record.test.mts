@@ -7,6 +7,12 @@ import * as prettier from 'prettier/standalone';
 import { replaceRecordWithUnknownRecordTransformer } from './replace-record-with-unknown-record.mjs';
 import { transformSourceCode } from './transform-source-code.mjs';
 
+const formatter = (code: string): Promise<string> =>
+  prettier.format(code, {
+    parser: 'typescript',
+    plugins: [prettierPluginTypeScript, prettierPluginEstree],
+  });
+
 const testFn = async ({
   source,
   expected,
@@ -24,12 +30,6 @@ const testFn = async ({
 
   expect(transformed).toBe(expectedFormatted);
 };
-
-const formatter = (code: string): Promise<string> =>
-  prettier.format(code, {
-    parser: 'typescript',
-    plugins: [prettierPluginTypeScript, prettierPluginEstree],
-  });
 
 describe(replaceRecordWithUnknownRecordTransformer, () => {
   test.each([

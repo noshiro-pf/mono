@@ -9,27 +9,123 @@ const fileIgnorePrefixes = [
   'transform-ignore',
 ] as const;
 
-/**
- * Finds the file-level ignore comment `/* <prefix> name, name *\/` and returns
- * the transformer names it lists (empty for all transformers), or `undefined`
- * when the file has none. Whitespace, line breaks included, may surround the
- * prefix and the names, but the names themselves must stay on one line. The
- * prefixes are tried in order, each against the whole file.
- *
- * The scan runs in time linear in the length of `code`, whatever it contains.
- */
-const findFileIgnoreTransformers = (
+export const transformSourceCode = (
   code: string,
-): readonly string[] | undefined => {
-  for (const prefix of fileIgnorePrefixes) {
-    const names = findFileIgnoreComment(code, prefix);
+  isTsx: boolean,
+  transformers: readonly TsMorphTransformer[],
+  debug: boolean = false,
+): string => {
+  const project = new tsm.Project({
+    useInMemoryFileSystem: true,
+    compilerOptions: {
+      jsx: isTsx ? tsm.ts.JsxEmit.React : undefined,
+      target: tsm.ts.ScriptTarget.ESNext,
+      module: tsm.ts.ModuleKind.ESNext,
+    },
+  });
 
-    if (names !== undefined) {
-      return names;
+  const sourceAst = project.createSourceFile(
+    `source.${isTsx ? 'tsx' : 'ts'}`,
+    code,
+  );
+
+  const ignoredTransformers = findFileIgnoreTransformers(code);
+
+  for (const transformer of transformers) {
+    const transformerName = transformer.name;
+
+    if (shouldSkipFile(ignoredTransformers, transformerName)) {
+      if (debug) {
+        console.debug(
+          `skipped by ignore-file comment for transformer: ${transformerName}`,
+        );
+      }
+
+      continue;
     }
+
+    transformer.transform(sourceAst);
   }
 
-  return undefined;
+  return sourceAst.getFullText();
+};
+
+/**
+ * Wraps a search returning the first index at or after `from` (or -1), reusing
+ * the previous answer while it still holds for a later `from`.
+ */
+const createForwardSearch = (
+  search: (from: number) => number,
+): ((from: number) => number) => {
+  let mut_from = Number.POSITIVE_INFINITY;
+
+  let mut_found = -1;
+
+  return (from) => {
+    if (from < mut_from || (mut_found !== -1 && from > mut_found)) {
+      mut_from = from;
+
+      mut_found = search(from);
+    }
+
+    return mut_found;
+  };
+};
+
+const createLastValueCache = (
+  fn: (arg: number) => number,
+): ((arg: number) => number) => {
+  let mut_arg: number | undefined = undefined;
+
+  let mut_value = 0;
+
+  return (arg) => {
+    if (arg !== mut_arg) {
+      mut_arg = arg;
+
+      mut_value = fn(arg);
+    }
+
+    return mut_value;
+  };
+};
+
+// Same set as `\s` and `String.prototype.trim`
+const isWhitespace = (char: string | undefined): boolean =>
+  char !== undefined && /^\s$/u.test(char);
+
+const skipWhitespace = (code: string, from: number): number => {
+  let mut_index = from;
+
+  while (mut_index < code.length && isWhitespace(code[mut_index])) {
+    mut_index += 1;
+  }
+
+  return mut_index;
+};
+
+const skipWhitespaceBackward = (code: string, end: number): number => {
+  let mut_index = end;
+
+  while (mut_index > 0 && isWhitespace(code[mut_index - 1])) {
+    mut_index -= 1;
+  }
+
+  return mut_index;
+};
+
+// The characters `.` does not match
+const isLineTerminator = (char: string | undefined): boolean =>
+  char !== undefined && /^[\n\r\u{2028}\u{2029}]$/u.test(char);
+
+const indexOfLineTerminator = (code: string, from: number): number => {
+  let mut_index = from;
+
+  while (mut_index < code.length && !isLineTerminator(code[mut_index])) {
+    mut_index += 1;
+  }
+
+  return mut_index < code.length ? mut_index : -1;
 };
 
 const findFileIgnoreComment = (
@@ -86,6 +182,29 @@ const findFileIgnoreComment = (
   return undefined;
 };
 
+/**
+ * Finds the file-level ignore comment `/* <prefix> name, name *\/` and returns
+ * the transformer names it lists (empty for all transformers), or `undefined`
+ * when the file has none. Whitespace, line breaks included, may surround the
+ * prefix and the names, but the names themselves must stay on one line. The
+ * prefixes are tried in order, each against the whole file.
+ *
+ * The scan runs in time linear in the length of `code`, whatever it contains.
+ */
+const findFileIgnoreTransformers = (
+  code: string,
+): readonly string[] | undefined => {
+  for (const prefix of fileIgnorePrefixes) {
+    const names = findFileIgnoreComment(code, prefix);
+
+    if (names !== undefined) {
+      return names;
+    }
+  }
+
+  return undefined;
+};
+
 const shouldSkipFile = (
   ignoredTransformers: readonly string[] | undefined,
   transformerName: string,
@@ -96,122 +215,3 @@ const shouldSkipFile = (
   // ignore list
   (Arr.isEmpty(ignoredTransformers) ||
     ignoredTransformers.includes(transformerName));
-
-/**
- * Wraps a search returning the first index at or after `from` (or -1), reusing
- * the previous answer while it still holds for a later `from`.
- */
-const createForwardSearch = (
-  search: (from: number) => number,
-): ((from: number) => number) => {
-  let mut_from = Number.POSITIVE_INFINITY;
-
-  let mut_found = -1;
-
-  return (from) => {
-    if (from < mut_from || (mut_found !== -1 && from > mut_found)) {
-      mut_from = from;
-
-      mut_found = search(from);
-    }
-
-    return mut_found;
-  };
-};
-
-const createLastValueCache = (
-  fn: (arg: number) => number,
-): ((arg: number) => number) => {
-  let mut_arg: number | undefined = undefined;
-
-  let mut_value = 0;
-
-  return (arg) => {
-    if (arg !== mut_arg) {
-      mut_arg = arg;
-
-      mut_value = fn(arg);
-    }
-
-    return mut_value;
-  };
-};
-
-const skipWhitespace = (code: string, from: number): number => {
-  let mut_index = from;
-
-  while (mut_index < code.length && isWhitespace(code[mut_index])) {
-    mut_index += 1;
-  }
-
-  return mut_index;
-};
-
-const skipWhitespaceBackward = (code: string, end: number): number => {
-  let mut_index = end;
-
-  while (mut_index > 0 && isWhitespace(code[mut_index - 1])) {
-    mut_index -= 1;
-  }
-
-  return mut_index;
-};
-
-const indexOfLineTerminator = (code: string, from: number): number => {
-  let mut_index = from;
-
-  while (mut_index < code.length && !isLineTerminator(code[mut_index])) {
-    mut_index += 1;
-  }
-
-  return mut_index < code.length ? mut_index : -1;
-};
-
-// Same set as `\s` and `String.prototype.trim`
-const isWhitespace = (char: string | undefined): boolean =>
-  char !== undefined && /^\s$/u.test(char);
-
-// The characters `.` does not match
-const isLineTerminator = (char: string | undefined): boolean =>
-  char !== undefined && /^[\n\r\u{2028}\u{2029}]$/u.test(char);
-
-export const transformSourceCode = (
-  code: string,
-  isTsx: boolean,
-  transformers: readonly TsMorphTransformer[],
-  debug: boolean = false,
-): string => {
-  const project = new tsm.Project({
-    useInMemoryFileSystem: true,
-    compilerOptions: {
-      jsx: isTsx ? tsm.ts.JsxEmit.React : undefined,
-      target: tsm.ts.ScriptTarget.ESNext,
-      module: tsm.ts.ModuleKind.ESNext,
-    },
-  });
-
-  const sourceAst = project.createSourceFile(
-    `source.${isTsx ? 'tsx' : 'ts'}`,
-    code,
-  );
-
-  const ignoredTransformers = findFileIgnoreTransformers(code);
-
-  for (const transformer of transformers) {
-    const transformerName = transformer.name;
-
-    if (shouldSkipFile(ignoredTransformers, transformerName)) {
-      if (debug) {
-        console.debug(
-          `skipped by ignore-file comment for transformer: ${transformerName}`,
-        );
-      }
-
-      continue;
-    }
-
-    transformer.transform(sourceAst);
-  }
-
-  return sourceAst.getFullText();
-};

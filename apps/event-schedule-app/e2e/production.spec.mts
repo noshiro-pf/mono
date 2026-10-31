@@ -141,6 +141,28 @@ const answerNameButton = (
   answerName: string | Readonly<RegExp>,
 ): Locator => page.getByRole('button', { name: answerName, exact: true });
 
+const deleteAnswer = async (
+  page: DeepReadonly<Page>,
+  username: string,
+): Promise<void> => {
+  await answerNameButton(page, username).click();
+
+  const buttons = page
+    .getByTestId('answer-being-edited-section')
+    .getByTestId('buttons');
+
+  await buttons.getByRole('button', { name: '削除する' }).click();
+
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: '削除する' })
+    .click();
+
+  await expect.soft(buttons).toBeHidden();
+
+  await expect.soft(answerNameButton(page, username)).toHaveCount(0);
+};
+
 const deleteLeftoverAnswers = async (
   page: DeepReadonly<Page>,
   budget: number = maxLeftoverAnswers,
@@ -184,28 +206,6 @@ const addAnswer = async (
     .click();
 
   await expect.soft(section.getByTestId('buttons')).toBeHidden();
-};
-
-const deleteAnswer = async (
-  page: DeepReadonly<Page>,
-  username: string,
-): Promise<void> => {
-  await answerNameButton(page, username).click();
-
-  const buttons = page
-    .getByTestId('answer-being-edited-section')
-    .getByTestId('buttons');
-
-  await buttons.getByRole('button', { name: '削除する' }).click();
-
-  await page
-    .getByRole('alertdialog')
-    .getByRole('button', { name: '削除する' })
-    .click();
-
-  await expect.soft(buttons).toBeHidden();
-
-  await expect.soft(answerNameButton(page, username)).toHaveCount(0);
 };
 
 /** Ends on the answer page, which the app returns to after saving. */

@@ -162,96 +162,37 @@ const SNAPSHOT_DEPENDENCY_FIELDS: ReadonlySet<string> = new Set<string>([
   'optionalDependencies',
 ]);
 
-const checkDocument = (
-  lines: readonly DocumentLine[],
-): Readonly<{
-  referenceCount: number;
-  danglingReferences: readonly DanglingReference[];
-}> => {
-  const { packageKeys, snapshots, importerReferences, snapshotReferences } =
-    scanDocument(lines);
-
-  const snapshotKeys = new Set(snapshots.map(({ key }) => key));
-
-  const missingSnapshots: readonly DanglingReference[] = [
-    ...importerReferences,
-    ...snapshotReferences,
-  ]
-    .filter(({ key }) => !snapshotKeys.has(key))
-    .map((reference) => ({ ...reference, missingFrom: 'snapshots' }));
-
-  const missingPackages: readonly DanglingReference[] = snapshots
-    .filter(({ key }) => !packageKeys.has(stripPeerSuffix(key)))
-    .map(({ lineNumber, key }) => ({
-      lineNumber,
-      from: 'snapshots',
-      key: stripPeerSuffix(key),
-      missingFrom: 'packages',
-    }));
-
-  return {
-    referenceCount:
-      importerReferences.length + snapshotReferences.length + snapshots.length,
-    danglingReferences: [...missingSnapshots, ...missingPackages].toSorted(
-      (a, b) => a.lineNumber - b.lineNumber,
-    ),
-  };
-};
+const unquote = (text: string): string =>
+  text.length >= 2 && text.startsWith("'") && text.endsWith("'")
+    ? text.slice(1, -1).replaceAll("''", "'")
+    : text;
 
 /**
- * One pass over a document, remembering the key last seen at each indent
- * that matters: the section at 0, the importer or snapshot at 2, its field at
- * 4 and, under an importer, the dependency name at 6.
+ * `key: value` or `key:`, with either side possibly single-quoted, as pnpm
+ * writes them. A line that is not a mapping entry — blank, a list item, a
+ * comment — is `undefined`.
  */
-const scanDocument = (
-  lines: readonly DocumentLine[],
-): Readonly<{
-  packageKeys: ReadonlySet<string>;
-  snapshots: readonly Reference[];
-  importerReferences: readonly Reference[];
-  snapshotReferences: readonly Reference[];
-}> => {
-  const mut_found: Found[] = [];
-
-  let mut_context: ScanContext = {
-    section: '',
-    entry: '',
-    field: '',
-    dependencyName: '',
-  };
-
-  for (const line of lines) {
-    const { context, found } = scanLine(mut_context, line);
-
-    mut_context = context;
-
-    if (found !== undefined) {
-      mut_found.push(found);
-    }
+const parseMappingLine = (
+  text: string,
+): Readonly<{ key: string; value: string | undefined }> | undefined => {
+  if (text === '' || text.startsWith('#') || text.startsWith('- ')) {
+    return undefined;
   }
 
-  const referencesOf = (kind: Found['kind']): readonly Reference[] =>
-    mut_found.filter((f) => f.kind === kind).map(({ reference }) => reference);
+  const keyEnd =
+    QUOTED_KEY_PATTERN.exec(text)?.[0].length ?? text.search(/:(?: |$)/u);
+
+  if (keyEnd <= 0 || text[keyEnd] !== ':') {
+    return undefined;
+  }
+
+  const rest = text.slice(keyEnd + 1).trim();
 
   return {
-    packageKeys: new Set(referencesOf('package').map(({ key }) => key)),
-    snapshots: referencesOf('snapshot'),
-    importerReferences: referencesOf('importer-reference'),
-    snapshotReferences: referencesOf('snapshot-reference'),
+    key: unquote(text.slice(0, keyEnd)),
+    value: rest === '' ? undefined : unquote(rest),
   };
 };
-
-type ScanContext = Readonly<{
-  section: string;
-  entry: string;
-  field: string;
-  dependencyName: string;
-}>;
-
-type Found = Readonly<{
-  kind: 'package' | 'snapshot' | 'importer-reference' | 'snapshot-reference';
-  reference: Reference;
-}>;
 
 const scanLine = (
   context: ScanContext,
@@ -344,6 +285,104 @@ const scanLine = (
   }
 };
 
+/**
+ * One pass over a document, remembering the key last seen at each indent
+ * that matters: the section at 0, the importer or snapshot at 2, its field at
+ * 4 and, under an importer, the dependency name at 6.
+ */
+const scanDocument = (
+  lines: readonly DocumentLine[],
+): Readonly<{
+  packageKeys: ReadonlySet<string>;
+  snapshots: readonly Reference[];
+  importerReferences: readonly Reference[];
+  snapshotReferences: readonly Reference[];
+}> => {
+  const mut_found: Found[] = [];
+
+  let mut_context: ScanContext = {
+    section: '',
+    entry: '',
+    field: '',
+    dependencyName: '',
+  };
+
+  for (const line of lines) {
+    const { context, found } = scanLine(mut_context, line);
+
+    mut_context = context;
+
+    if (found !== undefined) {
+      mut_found.push(found);
+    }
+  }
+
+  const referencesOf = (kind: Found['kind']): readonly Reference[] =>
+    mut_found.filter((f) => f.kind === kind).map(({ reference }) => reference);
+
+  return {
+    packageKeys: new Set(referencesOf('package').map(({ key }) => key)),
+    snapshots: referencesOf('snapshot'),
+    importerReferences: referencesOf('importer-reference'),
+    snapshotReferences: referencesOf('snapshot-reference'),
+  };
+};
+
+/** `name@1.0.0(peer@2.0.0)` → `name@1.0.0`. */
+const stripPeerSuffix = (key: string): string => {
+  const peerStart = key.indexOf('(');
+
+  return peerStart === -1 ? key : key.slice(0, peerStart);
+};
+
+const checkDocument = (
+  lines: readonly DocumentLine[],
+): Readonly<{
+  referenceCount: number;
+  danglingReferences: readonly DanglingReference[];
+}> => {
+  const { packageKeys, snapshots, importerReferences, snapshotReferences } =
+    scanDocument(lines);
+
+  const snapshotKeys = new Set(snapshots.map(({ key }) => key));
+
+  const missingSnapshots: readonly DanglingReference[] = [
+    ...importerReferences,
+    ...snapshotReferences,
+  ]
+    .filter(({ key }) => !snapshotKeys.has(key))
+    .map((reference) => ({ ...reference, missingFrom: 'snapshots' }));
+
+  const missingPackages: readonly DanglingReference[] = snapshots
+    .filter(({ key }) => !packageKeys.has(stripPeerSuffix(key)))
+    .map(({ lineNumber, key }) => ({
+      lineNumber,
+      from: 'snapshots',
+      key: stripPeerSuffix(key),
+      missingFrom: 'packages',
+    }));
+
+  return {
+    referenceCount:
+      importerReferences.length + snapshotReferences.length + snapshots.length,
+    danglingReferences: [...missingSnapshots, ...missingPackages].toSorted(
+      (a, b) => a.lineNumber - b.lineNumber,
+    ),
+  };
+};
+
+type ScanContext = Readonly<{
+  section: string;
+  entry: string;
+  field: string;
+  dependencyName: string;
+}>;
+
+type Found = Readonly<{
+  kind: 'package' | 'snapshot' | 'importer-reference' | 'snapshot-reference';
+  reference: Reference;
+}>;
+
 const splitDocuments = (
   lines: readonly string[],
 ): readonly (readonly DocumentLine[])[] => {
@@ -372,47 +411,8 @@ const splitDocuments = (
 
 const DOCUMENT_SEPARATOR = '---';
 
-/**
- * `key: value` or `key:`, with either side possibly single-quoted, as pnpm
- * writes them. A line that is not a mapping entry — blank, a list item, a
- * comment — is `undefined`.
- */
-const parseMappingLine = (
-  text: string,
-): Readonly<{ key: string; value: string | undefined }> | undefined => {
-  if (text === '' || text.startsWith('#') || text.startsWith('- ')) {
-    return undefined;
-  }
-
-  const keyEnd =
-    QUOTED_KEY_PATTERN.exec(text)?.[0].length ?? text.search(/:(?: |$)/u);
-
-  if (keyEnd <= 0 || text[keyEnd] !== ':') {
-    return undefined;
-  }
-
-  const rest = text.slice(keyEnd + 1).trim();
-
-  return {
-    key: unquote(text.slice(0, keyEnd)),
-    value: rest === '' ? undefined : unquote(rest),
-  };
-};
-
 /** A single-quoted key, in which `''` is an escaped quote. */
 const QUOTED_KEY_PATTERN = /^'(?:[^']|'')*'/u;
-
-const unquote = (text: string): string =>
-  text.length >= 2 && text.startsWith("'") && text.endsWith("'")
-    ? text.slice(1, -1).replaceAll("''", "'")
-    : text;
-
-/** `name@1.0.0(peer@2.0.0)` → `name@1.0.0`. */
-const stripPeerSuffix = (key: string): string => {
-  const peerStart = key.indexOf('(');
-
-  return peerStart === -1 ? key : key.slice(0, peerStart);
-};
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkLockfileIntegrity();

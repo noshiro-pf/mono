@@ -128,6 +128,23 @@ const isExpectCall = (
   return callee.type === AST_NODE_TYPES.Identifier && callee.name === 'expect';
 };
 
+const getModernTypeArguments = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.CallExpression,
+): TSESTree.TSTypeParameterInstantiation | undefined =>
+  isRecord(node) && hasKey(node, 'typeArguments')
+    ? node.typeArguments
+    : undefined;
+
+const getLegacyTypeParameters = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.CallExpression,
+): TSESTree.TSTypeParameterInstantiation | undefined =>
+  isRecord(node) && hasKey(node, 'typeParameters')
+    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      (node as CallExpressionWithLegacyTypeParameters).typeParameters
+    : undefined;
+
 const getTypeArgumentText = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.CallExpression,
@@ -154,20 +171,3 @@ const getTypeArgumentText = (
 
   return withoutAngles.length === 0 ? undefined : withoutAngles;
 };
-
-const getModernTypeArguments = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.CallExpression,
-): TSESTree.TSTypeParameterInstantiation | undefined =>
-  isRecord(node) && hasKey(node, 'typeArguments')
-    ? node.typeArguments
-    : undefined;
-
-const getLegacyTypeParameters = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.CallExpression,
-): TSESTree.TSTypeParameterInstantiation | undefined =>
-  isRecord(node) && hasKey(node, 'typeParameters')
-    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      (node as CallExpressionWithLegacyTypeParameters).typeParameters
-    : undefined;

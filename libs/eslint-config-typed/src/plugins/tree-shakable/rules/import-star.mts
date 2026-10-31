@@ -33,41 +33,6 @@ export const importStarRule: TSESLint.RuleModule<MessageIds> = {
 const getModuleSpecifier = (node: TSESTree.ImportNamespaceSpecifier): string =>
   node.parent.source.value;
 
-const checkModuleNamespaceUsage = (
-  node: TSESTree.ImportNamespaceSpecifier,
-  context: DeepReadonly<TSESLint.RuleContext<MessageIds, unknown[]>>,
-  moduleName: string,
-  identifier: DeepReadonly<TSESTree.Identifier>,
-): void => {
-  // backward compatible version
-  // const scope =
-  //   context.sourceCode !== undefined
-  //     ? context.sourceCode.getScope(node)
-  //     : context.getScope();
-
-  const scope = context.sourceCode.getScope(node);
-
-  const variable = scope.set.get(identifier.name);
-
-  if (variable === undefined) {
-    return;
-  }
-
-  for (const ref of variable.references) {
-    const referencedIdentifier = ref.identifier;
-
-    if (!isTreeShakingSafeReference(referencedIdentifier)) {
-      context.report({
-        node: referencedIdentifier,
-        messageId: 'non-tree-shakable-access',
-        data: {
-          module: moduleName,
-        },
-      });
-    }
-  }
-};
-
 /** `node`, or the outermost of the type wrappers directly around it. */
 const outermostTypeWrapper = (
   node: DeepReadonly<
@@ -279,5 +244,40 @@ const isTreeShakingSafeReference = (
     case TSESTree.AST_NODE_TYPES.TSUnknownKeyword:
     case TSESTree.AST_NODE_TYPES.TSVoidKeyword:
       return false;
+  }
+};
+
+const checkModuleNamespaceUsage = (
+  node: TSESTree.ImportNamespaceSpecifier,
+  context: DeepReadonly<TSESLint.RuleContext<MessageIds, unknown[]>>,
+  moduleName: string,
+  identifier: DeepReadonly<TSESTree.Identifier>,
+): void => {
+  // backward compatible version
+  // const scope =
+  //   context.sourceCode !== undefined
+  //     ? context.sourceCode.getScope(node)
+  //     : context.getScope();
+
+  const scope = context.sourceCode.getScope(node);
+
+  const variable = scope.set.get(identifier.name);
+
+  if (variable === undefined) {
+    return;
+  }
+
+  for (const ref of variable.references) {
+    const referencedIdentifier = ref.identifier;
+
+    if (!isTreeShakingSafeReference(referencedIdentifier)) {
+      context.report({
+        node: referencedIdentifier,
+        messageId: 'non-tree-shakable-access',
+        data: {
+          module: moduleName,
+        },
+      });
+    }
   }
 };

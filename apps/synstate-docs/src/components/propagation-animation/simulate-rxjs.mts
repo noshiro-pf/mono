@@ -33,6 +33,95 @@ export const simulateRxjs = (scenario: Scenario): Trace =>
     frames: framesOf(scenario),
   }) as const;
 
+/** The edges from each call on the stack to the node it calls into. */
+const callPath = (calls: readonly Call[]): readonly EdgeHighlight[] =>
+  calls.flatMap((c, i) => {
+    const next = calls[i + 1];
+
+    return next === undefined || next.node === c.node
+      ? []
+      : [{ from: c.node, to: next.node, kind: 'call' } as const];
+  });
+
+/** What every node holds once the update with `input` has settled. */
+const consistentValues = (
+  scenario: Scenario,
+  states: ReadonlyMap<string, MutableNodeState>,
+  input: number,
+): ReadonlyMap<string, number> => {
+  const mut_values = new Map<string, number>(
+    Array.from(states, ([id, s]) => [id, latestValue(s)]),
+  );
+
+  const [source, ...rest] = scenario.nodes;
+
+  if (source !== undefined) {
+    mut_values.set(source.id, input);
+  }
+
+  // `nodes` is in creation order, which is a topological order.
+  for (const node of rest) {
+    const evaluation = node.evaluate?.(
+      node.parents.map((p) => mut_values.get(p) ?? 0),
+    );
+
+    if (evaluation?.type === 'emit') {
+      mut_values.set(node.id, evaluation.value);
+    }
+  }
+
+  return mut_values;
+};
+
+const emitCaption = ({
+  node,
+  formula,
+  value,
+  glitch,
+  stale,
+  children,
+}: Readonly<{
+  node: string;
+  formula: string;
+  value: number;
+  glitch: boolean;
+  stale: readonly string[];
+  children: readonly string[];
+}>): LocalizedText => {
+  const head: LocalizedText = {
+    en: `${node} computes ${formula} and calls ${node}.next(${value.toString()}).`,
+    ja: `${node} は ${formula} を計算し、${node}.next(${value.toString()}) を呼びます。`,
+  } as const;
+
+  const glitchText: LocalizedText = glitch
+    ? ({
+        en: ` ${list(stale, 'en')} still ${byCount(stale, 'holds its', 'hold their')} old value, so ${value.toString()} is a glitch: its subscribers see a value that no consistent state has.`,
+        ja: `${list(stale, 'ja')} はまだ古い値のままなので、${value.toString()} はグリッチです。購読者は、どの整合した状態にも存在しない値を受け取ります。`,
+      } as const)
+    : ({ en: '', ja: '' } as const);
+
+  const childrenText: LocalizedText = Arr.isNonEmpty(children)
+    ? ({
+        en: ` Next it calls ${list(
+          children.map((c) => `${c}.update()`),
+          'en',
+        )}.`,
+        ja: `続いて ${list(
+          children.map((c) => `${c}.update()`),
+          'ja',
+        )} を呼びます。`,
+      } as const)
+    : ({
+        en: ` ${node} has no children, so the call returns.`,
+        ja: `${node} に子はないので、呼び出しは戻ります。`,
+      } as const);
+
+  return {
+    en: `${head.en}${glitchText.en}${childrenText.en}`,
+    ja: `${head.ja}${glitchText.ja}${childrenText.ja}`,
+  };
+};
+
 const framesOf = (scenario: Scenario): readonly Frame[] => {
   const source = scenario.nodes[0];
 
@@ -317,92 +406,3 @@ const codeLines = [
 ] as const satisfies readonly CodeLine[];
 
 type CodeLineId = (typeof codeLines)[number][0];
-
-/** The edges from each call on the stack to the node it calls into. */
-const callPath = (calls: readonly Call[]): readonly EdgeHighlight[] =>
-  calls.flatMap((c, i) => {
-    const next = calls[i + 1];
-
-    return next === undefined || next.node === c.node
-      ? []
-      : [{ from: c.node, to: next.node, kind: 'call' } as const];
-  });
-
-/** What every node holds once the update with `input` has settled. */
-const consistentValues = (
-  scenario: Scenario,
-  states: ReadonlyMap<string, MutableNodeState>,
-  input: number,
-): ReadonlyMap<string, number> => {
-  const mut_values = new Map<string, number>(
-    Array.from(states, ([id, s]) => [id, latestValue(s)]),
-  );
-
-  const [source, ...rest] = scenario.nodes;
-
-  if (source !== undefined) {
-    mut_values.set(source.id, input);
-  }
-
-  // `nodes` is in creation order, which is a topological order.
-  for (const node of rest) {
-    const evaluation = node.evaluate?.(
-      node.parents.map((p) => mut_values.get(p) ?? 0),
-    );
-
-    if (evaluation?.type === 'emit') {
-      mut_values.set(node.id, evaluation.value);
-    }
-  }
-
-  return mut_values;
-};
-
-const emitCaption = ({
-  node,
-  formula,
-  value,
-  glitch,
-  stale,
-  children,
-}: Readonly<{
-  node: string;
-  formula: string;
-  value: number;
-  glitch: boolean;
-  stale: readonly string[];
-  children: readonly string[];
-}>): LocalizedText => {
-  const head: LocalizedText = {
-    en: `${node} computes ${formula} and calls ${node}.next(${value.toString()}).`,
-    ja: `${node} は ${formula} を計算し、${node}.next(${value.toString()}) を呼びます。`,
-  } as const;
-
-  const glitchText: LocalizedText = glitch
-    ? ({
-        en: ` ${list(stale, 'en')} still ${byCount(stale, 'holds its', 'hold their')} old value, so ${value.toString()} is a glitch: its subscribers see a value that no consistent state has.`,
-        ja: `${list(stale, 'ja')} はまだ古い値のままなので、${value.toString()} はグリッチです。購読者は、どの整合した状態にも存在しない値を受け取ります。`,
-      } as const)
-    : ({ en: '', ja: '' } as const);
-
-  const childrenText: LocalizedText = Arr.isNonEmpty(children)
-    ? ({
-        en: ` Next it calls ${list(
-          children.map((c) => `${c}.update()`),
-          'en',
-        )}.`,
-        ja: `続いて ${list(
-          children.map((c) => `${c}.update()`),
-          'ja',
-        )} を呼びます。`,
-      } as const)
-    : ({
-        en: ` ${node} has no children, so the call returns.`,
-        ja: `${node} に子はないので、呼び出しは戻ります。`,
-      } as const);
-
-  return {
-    en: `${head.en}${glitchText.en}${childrenText.en}`,
-    ja: `${head.ja}${glitchText.ja}${childrenText.ja}`,
-  };
-};

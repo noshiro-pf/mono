@@ -187,6 +187,12 @@ type SlotEnd = Readonly<{
 const slotKey = (edgeId: string, node: GraphNodeId): string =>
   `${edgeId} ${node}` as const;
 
+const offsetOf = ({ node, other }: SlotEnd): number =>
+  other.y + other.height / 2 - (node.y + node.height / 2);
+
+/** `1 / x`, and `0` — between the negatives and the positives — for `0`. */
+const inverse = (x: number): number => (Num.isNonZero(x) ? Num.div(1, x) : 0);
+
 /**
  * Down a node's right side: the arcs to nodes above it, nearest first, then
  * the arcs to nodes below it, farthest first. On each side a longer arc then
@@ -205,12 +211,6 @@ const compareSlots = (a: SlotEnd, b: SlotEnd): number => {
         ? 1
         : 0;
 };
-
-const offsetOf = ({ node, other }: SlotEnd): number =>
-  other.y + other.height / 2 - (node.y + node.height / 2);
-
-/** `1 / x`, and `0` — between the negatives and the positives — for `0`. */
-const inverse = (x: number): number => (Num.isNonZero(x) ? Num.div(1, x) : 0);
 
 /**
  * The `index`th of `count` points evenly spread down `node`'s right side:

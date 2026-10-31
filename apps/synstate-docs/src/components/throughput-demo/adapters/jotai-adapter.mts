@@ -4,11 +4,6 @@ import { Arr, range } from 'ts-data-forge';
 import type { Point, SpringAdapter } from '../../spring-demo/index.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, SPRING_FACTOR, lerp } from './shared.mjs';
 
-// selectAtom's selector receives (currentValue, prevSlice?).
-// prevSlice is the atom's own previous output — equivalent to scan's accumulator.
-const springSelector = (target: Point, prevSelf?: Point): Point =>
-  prevSelf === undefined ? target : lerp(prevSelf, target, SPRING_FACTOR);
-
 export const createJotaiThroughputAdapter = (): SpringAdapter => {
   let mut_store: ReturnType<typeof createStore> | undefined;
 
@@ -83,3 +78,8 @@ export const createJotaiThroughputAdapter = (): SpringAdapter => {
     },
   };
 };
+
+// selectAtom's selector receives (currentValue, prevSlice?).
+// prevSlice is the atom's own previous output — equivalent to scan's accumulator.
+const springSelector = (target: Point, prevSelf?: Point): Point =>
+  prevSelf === undefined ? target : lerp(prevSelf, target, SPRING_FACTOR);

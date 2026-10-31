@@ -83,49 +83,6 @@ export const buildReport = ({
   }) as const;
 
 /**
- * Each open issue with how it stands for being started
- * (`docs/issue-start-after.md`): its start state, or how far someone has
- * got with it when it is startable (`progressOf`), and where each thing it
- * names stands.
- */
-const reportIssues = (
-  issues: readonly OpenIssue[],
-  pulls: readonly PullRequestFacts[],
-  references: ReadonlyMap<number, ReferenceStatus>,
-): readonly ReportIssue[] => {
-  const listed = new Set(issues.map(({ number }) => number));
-
-  const open = new Set(pulls.map(({ number }) => number));
-
-  const statusOf = (number: number): ReferenceStatus =>
-    listed.has(number) || open.has(number)
-      ? 'waiting'
-      : (references.get(number) ?? 'unknown');
-
-  const states = decideStartStates(issues, statusOf);
-
-  const worked = issuesInProgress(pulls);
-
-  return issues.map((issue) => ({
-    ...issue,
-    start: withProgress(
-      states.get(issue.number) ?? 'free',
-      progressOf(issue.labels, worked.has(issue.number)),
-    ),
-    named: issue.startAfter.map((number) => ({
-      number,
-      status: statusOf(number),
-    })),
-  }));
-};
-
-export type DecidedEntries = Readonly<{
-  entries: readonly ReportEntry[];
-  roots: readonly TreeNode[];
-  cycles: readonly (readonly number[])[];
-}>;
-
-/**
  * The part of a report that is decided rather than read: each open pull
  * request's declared order, the stack it is in, its check verdict, and the
  * merge order they add up to.
@@ -235,6 +192,49 @@ export const buildEntries = ({
 
   return { entries, roots, cycles };
 };
+
+/**
+ * Each open issue with how it stands for being started
+ * (`docs/issue-start-after.md`): its start state, or how far someone has
+ * got with it when it is startable (`progressOf`), and where each thing it
+ * names stands.
+ */
+const reportIssues = (
+  issues: readonly OpenIssue[],
+  pulls: readonly PullRequestFacts[],
+  references: ReadonlyMap<number, ReferenceStatus>,
+): readonly ReportIssue[] => {
+  const listed = new Set(issues.map(({ number }) => number));
+
+  const open = new Set(pulls.map(({ number }) => number));
+
+  const statusOf = (number: number): ReferenceStatus =>
+    listed.has(number) || open.has(number)
+      ? 'waiting'
+      : (references.get(number) ?? 'unknown');
+
+  const states = decideStartStates(issues, statusOf);
+
+  const worked = issuesInProgress(pulls);
+
+  return issues.map((issue) => ({
+    ...issue,
+    start: withProgress(
+      states.get(issue.number) ?? 'free',
+      progressOf(issue.labels, worked.has(issue.number)),
+    ),
+    named: issue.startAfter.map((number) => ({
+      number,
+      status: statusOf(number),
+    })),
+  }));
+};
+
+export type DecidedEntries = Readonly<{
+  entries: readonly ReportEntry[];
+  roots: readonly TreeNode[];
+  cycles: readonly (readonly number[])[];
+}>;
 
 const NO_DECLARATIONS: IssueDeclarations = {
   startAfter: new Map<number, readonly number[]>(),

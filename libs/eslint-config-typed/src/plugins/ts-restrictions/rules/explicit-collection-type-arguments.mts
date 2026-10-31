@@ -214,6 +214,78 @@ const annotationTypeArguments = (
   return annotationType.typeArguments;
 };
 
+/** `Set<T>` and the like: an instantiation of a generic interface or class. */
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const isTypeReference = (type: ts.Type): type is ts.TypeReference =>
+  (type.flags & ts.TypeFlags.Object) !== 0 &&
+  isRecord(type) &&
+  hasKey(type, 'target');
+
+/**
+ * The type arguments of `type` when it is an instantiation of a generic type
+ * and none of them is `any`, `unknown` or `never`.
+ */
+const meaningfulTypeArguments = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+): readonly ts.Type[] | undefined => {
+  if (!isTypeReference(type)) {
+    return undefined;
+  }
+
+  const args = checker.getTypeArguments(type);
+
+  return Arr.isEmpty(args) ||
+    args.some(
+      (arg) =>
+        (arg.flags &
+          (ts.TypeFlags.Any | ts.TypeFlags.Unknown | ts.TypeFlags.Never)) !==
+        0,
+    )
+    ? undefined
+    : args;
+};
+
+/**
+ * The type arguments of the collection type among the members of `tsNode`'s
+ * contextual type (`ReadonlySet<Id> | undefined` gives `Id`).
+ */
+const contextualTypeArguments = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+
+  tsNode: ts.Node,
+  collectionNames: readonly string[],
+): readonly ts.Type[] | undefined => {
+  if (!ts.isExpression(tsNode)) {
+    return undefined;
+  }
+
+  const contextual = checker.getContextualType(tsNode);
+
+  if (contextual === undefined) {
+    return undefined;
+  }
+
+  const collections = (
+    contextual.isUnion() ? contextual.types : [contextual]
+  ).filter((member) => {
+    const memberName = member.getSymbol()?.getName();
+
+    return memberName !== undefined && collectionNames.includes(memberName);
+  });
+
+  // Two different collection types in the context (`ReadonlySet<A> |
+  // ReadonlySet<B>`) leave the choice to the author.
+  const [only, ...rest] = collections;
+
+  return only === undefined || Arr.isNonEmpty(rest)
+    ? undefined
+    : meaningfulTypeArguments(checker, only);
+};
+
 /**
  * The type arguments to suggest for `node`, as source text (`<string, number>`),
  * or `undefined` without type information or when there are none worth
@@ -262,75 +334,3 @@ const inferredTypeArgumentsText = (
 
   return `<${texts.join(', ')}>`;
 };
-
-/**
- * The type arguments of the collection type among the members of `tsNode`'s
- * contextual type (`ReadonlySet<Id> | undefined` gives `Id`).
- */
-const contextualTypeArguments = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: ts.TypeChecker,
-
-  tsNode: ts.Node,
-  collectionNames: readonly string[],
-): readonly ts.Type[] | undefined => {
-  if (!ts.isExpression(tsNode)) {
-    return undefined;
-  }
-
-  const contextual = checker.getContextualType(tsNode);
-
-  if (contextual === undefined) {
-    return undefined;
-  }
-
-  const collections = (
-    contextual.isUnion() ? contextual.types : [contextual]
-  ).filter((member) => {
-    const memberName = member.getSymbol()?.getName();
-
-    return memberName !== undefined && collectionNames.includes(memberName);
-  });
-
-  // Two different collection types in the context (`ReadonlySet<A> |
-  // ReadonlySet<B>`) leave the choice to the author.
-  const [only, ...rest] = collections;
-
-  return only === undefined || Arr.isNonEmpty(rest)
-    ? undefined
-    : meaningfulTypeArguments(checker, only);
-};
-
-/**
- * The type arguments of `type` when it is an instantiation of a generic type
- * and none of them is `any`, `unknown` or `never`.
- */
-const meaningfulTypeArguments = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: ts.TypeChecker,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  type: ts.Type,
-): readonly ts.Type[] | undefined => {
-  if (!isTypeReference(type)) {
-    return undefined;
-  }
-
-  const args = checker.getTypeArguments(type);
-
-  return Arr.isEmpty(args) ||
-    args.some(
-      (arg) =>
-        (arg.flags &
-          (ts.TypeFlags.Any | ts.TypeFlags.Unknown | ts.TypeFlags.Never)) !==
-        0,
-    )
-    ? undefined
-    : args;
-};
-
-/** `Set<T>` and the like: an instantiation of a generic interface or class. */
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const isTypeReference = (type: ts.Type): type is ts.TypeReference =>
-  (type.flags & ts.TypeFlags.Object) !== 0 &&
-  isRecord(type) &&
-  hasKey(type, 'target');

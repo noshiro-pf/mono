@@ -227,6 +227,28 @@ type ControlsProps = Readonly<{
   row$: InitializedObservable<Row>;
 }>;
 
+const MoveButton = ({
+  label,
+  title,
+  onClick,
+  children,
+}: Readonly<{
+  label: Bindable<string>;
+  title: Bindable<string>;
+  onClick: () => void;
+  children: Child;
+}>): JSX.Element => (
+  <button
+    aria-label={label}
+    class={constant('view-settings-move')}
+    title={title}
+    type={constant('button')}
+    onClick={onClick}
+  >
+    {children}
+  </button>
+);
+
 /** Its part of the column, in the `fill` mode. */
 const ShareControls = ({ id, blockName, row$ }: ControlsProps): JSX.Element => {
   const shareNow = (): number =>
@@ -360,28 +382,6 @@ const HeightControls = ({
     />
   );
 };
-
-const MoveButton = ({
-  label,
-  title,
-  onClick,
-  children,
-}: Readonly<{
-  label: Bindable<string>;
-  title: Bindable<string>;
-  onClick: () => void;
-  children: Child;
-}>): JSX.Element => (
-  <button
-    aria-label={label}
-    class={constant('view-settings-move')}
-    title={title}
-    type={constant('button')}
-    onClick={onClick}
-  >
-    {children}
-  </button>
-);
 
 const rowOf = (
   layout: Layout,

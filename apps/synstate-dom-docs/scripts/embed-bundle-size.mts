@@ -113,43 +113,12 @@ const applicationNamesJa: ReadonlyRecord<string, string> = {
   'zoom scenario': 'ズームのシナリオ',
 } as const;
 
-const parseBundleSize = (markdown: string): Result<BundleSize, string> => {
-  const environment =
-    /bundled by Vite (?<viteVersion>\S+) .*Versions: (?<versions>.+?)\. /u.exec(
-      markdown,
-    );
-
-  const viteVersion = environment?.groups?.['viteVersion'];
-
-  const versions = environment?.groups?.['versions'];
-
-  if (viteVersion === undefined || versions === undefined) {
-    return Result.err(
-      'the "bundled by Vite …. Versions: …." sentence was not found; update parseBundleSize to its new wording',
-    );
-  }
-
-  const lines = markdown.split('\n').map((line) => line.trim());
-
-  const gzip = parseTable(lines, sections.gzip);
-
-  if (Result.isErr(gzip)) {
-    return gzip;
-  }
-
-  const brotli = parseTable(lines, sections.brotli);
-
-  if (Result.isErr(brotli)) {
-    return brotli;
-  }
-
-  return Result.ok({
-    viteVersion,
-    versions: versions.split(', ').map((v) => v.replaceAll('`', '')),
-    gzip: gzip.value,
-    brotli: brotli.value,
-  });
-};
+const cells = (line: string): readonly string[] =>
+  line
+    .replace(/^\|/u, '')
+    .replace(/\|$/u, '')
+    .split('|')
+    .map((cell) => cell.trim());
 
 /** Reads the first table after the line `heading`. */
 const parseTable = (
@@ -206,12 +175,43 @@ const parseTable = (
   return Result.ok({ libraries, rows: mut_rows });
 };
 
-const cells = (line: string): readonly string[] =>
-  line
-    .replace(/^\|/u, '')
-    .replace(/\|$/u, '')
-    .split('|')
-    .map((cell) => cell.trim());
+const parseBundleSize = (markdown: string): Result<BundleSize, string> => {
+  const environment =
+    /bundled by Vite (?<viteVersion>\S+) .*Versions: (?<versions>.+?)\. /u.exec(
+      markdown,
+    );
+
+  const viteVersion = environment?.groups?.['viteVersion'];
+
+  const versions = environment?.groups?.['versions'];
+
+  if (viteVersion === undefined || versions === undefined) {
+    return Result.err(
+      'the "bundled by Vite …. Versions: …." sentence was not found; update parseBundleSize to its new wording',
+    );
+  }
+
+  const lines = markdown.split('\n').map((line) => line.trim());
+
+  const gzip = parseTable(lines, sections.gzip);
+
+  if (Result.isErr(gzip)) {
+    return gzip;
+  }
+
+  const brotli = parseTable(lines, sections.brotli);
+
+  if (Result.isErr(brotli)) {
+    return brotli;
+  }
+
+  return Result.ok({
+    viteVersion,
+    versions: versions.split(', ').map((v) => v.replaceAll('`', '')),
+    gzip: gzip.value,
+    brotli: brotli.value,
+  });
+};
 
 /** What each marker on a page is replaced with. */
 const render = (

@@ -205,6 +205,12 @@ type RuleInfo = Readonly<{
   hasOptions: boolean;
 }>;
 
+const toPascalCase = (kebabCase: string): string =>
+  kebabCase
+    .split('-')
+    .map((word) => `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`)
+    .join('');
+
 const toRuleInfo = (name: string, meta: RuleMeta): RuleInfo => {
   const { schema } = meta;
 
@@ -221,28 +227,6 @@ const toRuleInfo = (name: string, meta: RuleMeta): RuleInfo => {
       : schema !== undefined && schema !== false,
   };
 };
-
-const generateRuleNamespace = (rule: RuleInfo): readonly string[] =>
-  [
-    '/**',
-    ` * @description ${rule.description}`,
-    ' *',
-    ...generateMetaTable(rule),
-    ' */',
-    `namespace ${rule.namespaceName} {`,
-    ...(rule.hasOptions
-      ? ([
-          ...generateSchemaJsdoc(rule.schema),
-          `  export type Options = NonNullable<RuleOptionsOf<'${rule.name}'>[0]>;`,
-          '',
-          '  export type RuleEntry =',
-          "    | 'off'",
-          '    | Linter.Severity',
-          '    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;',
-        ] as const)
-      : (['  export type RuleEntry = Linter.StringSeverity;'] as const)),
-    '}',
-  ] as const;
 
 const generateMetaTable = (rule: RuleInfo): readonly string[] => {
   const rows = [
@@ -283,8 +267,24 @@ const generateSchemaJsdoc = (schema: unknown): readonly string[] =>
     '   */',
   ] as const;
 
-const toPascalCase = (kebabCase: string): string =>
-  kebabCase
-    .split('-')
-    .map((word) => `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`)
-    .join('');
+const generateRuleNamespace = (rule: RuleInfo): readonly string[] =>
+  [
+    '/**',
+    ` * @description ${rule.description}`,
+    ' *',
+    ...generateMetaTable(rule),
+    ' */',
+    `namespace ${rule.namespaceName} {`,
+    ...(rule.hasOptions
+      ? ([
+          ...generateSchemaJsdoc(rule.schema),
+          `  export type Options = NonNullable<RuleOptionsOf<'${rule.name}'>[0]>;`,
+          '',
+          '  export type RuleEntry =',
+          "    | 'off'",
+          '    | Linter.Severity',
+          '    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;',
+        ] as const)
+      : (['  export type RuleEntry = Linter.StringSeverity;'] as const)),
+    '}',
+  ] as const;

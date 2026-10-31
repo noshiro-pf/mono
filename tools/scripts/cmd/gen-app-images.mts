@@ -134,6 +134,9 @@ const OG_IMAGE_WIDTH = 1200;
 
 const OG_IMAGE_HEIGHT = 630;
 
+const toDataUri = (mediaType: string, bytes: Readonly<Buffer>): string =>
+  `data:${mediaType};base64,${bytes.toString('base64')}` as const;
+
 const renderTouchIcon = async (
   page: DeepReadonly<Page>,
   svg: string,
@@ -165,6 +168,9 @@ type Card = Readonly<{
   lang: string;
   icon: string;
 }>;
+
+const escapeHtml = (text: string): string =>
+  text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
 /**
  * The card #2551 drew for life-plan-simulator by hand, made repeatable: the
@@ -259,12 +265,6 @@ const readOptional = async (file: string): Promise<Buffer | undefined> => {
 
   return Result.isErr(result) ? undefined : result.value;
 };
-
-const toDataUri = (mediaType: string, bytes: Readonly<Buffer>): string =>
-  `data:${mediaType};base64,${bytes.toString('base64')}` as const;
-
-const escapeHtml = (text: string): string =>
-  text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
 const USAGE = dedent`
   Usage: pnpm run gen:app-images -- <app directory>...

@@ -13,6 +13,168 @@ const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
 
 // ---------------------------------------------------------------------------
+// OG image generation
+// ---------------------------------------------------------------------------
+export const generateOgImage = async (
+  title: string,
+  description: string | undefined,
+): Promise<Buffer> => {
+  const svg = await satori(
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    {
+      type: 'div',
+      props: {
+        style: {
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '60px 72px',
+          background:
+            'linear-gradient(135deg, #0b2152 0%, #123a6b 55%, #1d5a8c 100%)',
+          fontFamily,
+          color: '#f8fafc',
+        },
+        children: [
+          // Header: logo + site name
+          {
+            type: 'div',
+            props: {
+              style: {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '20px',
+              },
+              children: [
+                {
+                  type: 'img',
+                  props: {
+                    src: logoDataUri,
+                    width: 72,
+                    height: 72,
+                    style: {
+                      boxShadow: '0 0 24px rgba(96, 200, 255, 0.55)',
+                      borderRadius: '16px',
+                    },
+                  },
+                },
+                {
+                  type: 'span',
+                  props: {
+                    style: {
+                      fontSize: '36px',
+                      fontWeight: 700,
+                      color: '#e0f2fe',
+                    },
+                    children: 'SynState',
+                  },
+                },
+              ],
+            },
+          },
+          // Body: title + description
+          {
+            type: 'div',
+            props: {
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '20px',
+                flex: 1,
+                justifyContent: 'center',
+              },
+              children: Arr.toUnshifted({
+                type: 'div',
+                props: {
+                  style: {
+                    fontSize: title.length > 30 ? '48px' : '56px',
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    color: '#f8fafc',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  },
+                  children: title,
+                },
+              })(
+                description !== undefined && description !== ''
+                  ? [
+                      {
+                        type: 'div',
+                        props: {
+                          style: {
+                            fontSize: '24px',
+                            lineHeight: 1.5,
+                            color: '#bae6fd',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          },
+                          children:
+                            description.length > 160
+                              ? `${description.slice(0, 157)}...`
+                              : description,
+                        },
+                      },
+                    ]
+                  : [],
+              ),
+            },
+          },
+          // Footer: site URL
+          {
+            type: 'div',
+            props: {
+              style: {
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              },
+              children: [
+                {
+                  type: 'span',
+                  props: {
+                    style: {
+                      fontSize: '22px',
+                      color: '#7dd3fc',
+                    },
+                    children: SITE_LABEL,
+                  },
+                },
+                // The blue-to-green of the logo's "S".
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      width: '240px',
+                      height: '8px',
+                      borderRadius: '4px',
+                      background:
+                        'linear-gradient(90deg, #2563eb 0%, #22c55e 100%)',
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    } as React.ReactNode,
+    {
+      width: OG_WIDTH,
+      height: OG_HEIGHT,
+      fonts: Array.from(fonts),
+    },
+  );
+
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: 'width', value: OG_WIDTH },
+  });
+
+  return resvg.render().asPng();
+};
+
+// ---------------------------------------------------------------------------
 // WOFF → TTF converter (satori does not support WOFF)
 // ---------------------------------------------------------------------------
 const woffToTtf = (woffBuf: Readonly<Buffer>): Buffer => {
@@ -200,165 +362,3 @@ const logoBase64 = logoPng.toString('base64');
 const logoDataUri = `data:image/png;base64,${logoBase64}` as const;
 
 const SITE_LABEL = 'noshiro-pf.github.io/mono/synstate';
-
-// ---------------------------------------------------------------------------
-// OG image generation
-// ---------------------------------------------------------------------------
-export const generateOgImage = async (
-  title: string,
-  description: string | undefined,
-): Promise<Buffer> => {
-  const svg = await satori(
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    {
-      type: 'div',
-      props: {
-        style: {
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          padding: '60px 72px',
-          background:
-            'linear-gradient(135deg, #0b2152 0%, #123a6b 55%, #1d5a8c 100%)',
-          fontFamily,
-          color: '#f8fafc',
-        },
-        children: [
-          // Header: logo + site name
-          {
-            type: 'div',
-            props: {
-              style: {
-                display: 'flex',
-                alignItems: 'center',
-                gap: '20px',
-              },
-              children: [
-                {
-                  type: 'img',
-                  props: {
-                    src: logoDataUri,
-                    width: 72,
-                    height: 72,
-                    style: {
-                      boxShadow: '0 0 24px rgba(96, 200, 255, 0.55)',
-                      borderRadius: '16px',
-                    },
-                  },
-                },
-                {
-                  type: 'span',
-                  props: {
-                    style: {
-                      fontSize: '36px',
-                      fontWeight: 700,
-                      color: '#e0f2fe',
-                    },
-                    children: 'SynState',
-                  },
-                },
-              ],
-            },
-          },
-          // Body: title + description
-          {
-            type: 'div',
-            props: {
-              style: {
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '20px',
-                flex: 1,
-                justifyContent: 'center',
-              },
-              children: Arr.toUnshifted({
-                type: 'div',
-                props: {
-                  style: {
-                    fontSize: title.length > 30 ? '48px' : '56px',
-                    fontWeight: 700,
-                    lineHeight: 1.2,
-                    color: '#f8fafc',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  },
-                  children: title,
-                },
-              })(
-                description !== undefined && description !== ''
-                  ? [
-                      {
-                        type: 'div',
-                        props: {
-                          style: {
-                            fontSize: '24px',
-                            lineHeight: 1.5,
-                            color: '#bae6fd',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          },
-                          children:
-                            description.length > 160
-                              ? `${description.slice(0, 157)}...`
-                              : description,
-                        },
-                      },
-                    ]
-                  : [],
-              ),
-            },
-          },
-          // Footer: site URL
-          {
-            type: 'div',
-            props: {
-              style: {
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              },
-              children: [
-                {
-                  type: 'span',
-                  props: {
-                    style: {
-                      fontSize: '22px',
-                      color: '#7dd3fc',
-                    },
-                    children: SITE_LABEL,
-                  },
-                },
-                // The blue-to-green of the logo's "S".
-                {
-                  type: 'div',
-                  props: {
-                    style: {
-                      width: '240px',
-                      height: '8px',
-                      borderRadius: '4px',
-                      background:
-                        'linear-gradient(90deg, #2563eb 0%, #22c55e 100%)',
-                    },
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    } as React.ReactNode,
-    {
-      width: OG_WIDTH,
-      height: OG_HEIGHT,
-      fonts: Array.from(fonts),
-    },
-  );
-
-  const resvg = new Resvg(svg, {
-    fitTo: { mode: 'width', value: OG_WIDTH },
-  });
-
-  return resvg.render().asPng();
-};

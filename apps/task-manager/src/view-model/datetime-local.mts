@@ -145,6 +145,12 @@ const startOfDay = (
         : midnight + HOUR_MS;
 };
 
+const hasDigits = (s: string | undefined, digits: number): s is string =>
+  s?.length === digits && DIGITS.test(s);
+
+const toNumber = (s: string): number =>
+  Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+
 /**
  * `YYYY-MM-DDTHH:mm`, or with `:ss` after it, as numbers — not yet checked to
  * be a real date.
@@ -180,13 +186,7 @@ const parseFields = (value: string): WallClock | undefined => {
   };
 };
 
-const hasDigits = (s: string | undefined, digits: number): s is string =>
-  s?.length === digits && DIGITS.test(s);
-
 const DIGITS = /^\d+$/u;
-
-const toNumber = (s: string): number =>
-  Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
 
 const pad = (n: number, width: number): string =>
   n.toString().padStart(width, '0');
@@ -222,53 +222,6 @@ const wallClock = (
   };
 };
 
-/** How far ahead of UTC the wall clock of `timeZone` is at `epochMs`. */
-const offsetAt = (epochMs: number, timeZone: string | undefined): number =>
-  wallClockAsUtc(wallClock(epochMs, timeZone)) -
-  (epochMs - (((epochMs % SECOND_MS) + SECOND_MS) % SECOND_MS));
-
-/** The instant that has `fields` as its wall clock in UTC. */
-const wallClockAsUtc = ({
-  year,
-  month,
-  day,
-  hour,
-  minute,
-  second,
-}: WallClock): number =>
-  daysFromCivil(year, month, day) * 24 * HOUR_MS +
-  hour * HOUR_MS +
-  minute * MINUTE_MS +
-  second * SECOND_MS;
-
-const isValidWallClock = ({
-  year,
-  month,
-  day,
-  hour,
-  minute,
-  second,
-}: WallClock): boolean =>
-  1 <= month &&
-  month <= 12 &&
-  1 <= day &&
-  day <= daysInMonth(year, month) &&
-  hour <= 23 &&
-  minute <= 59 &&
-  second <= 59;
-
-const daysInMonth = (year: number, month: number): number =>
-  month === 2
-    ? isLeapYear(year)
-      ? 29
-      : 28
-    : [4, 6, 9, 11].includes(month)
-      ? 30
-      : 31;
-
-const isLeapYear = (year: number): boolean =>
-  (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-
 /**
  * Days from 1970-01-01 to the given date of the proleptic Gregorian calendar
  * (Howard Hinnant's `days_from_civil`).
@@ -291,3 +244,50 @@ const daysFromCivil = (year: number, month: number, day: number): number => {
 
   return era * 146_097 + dayOfEra - 719_468;
 };
+
+/** The instant that has `fields` as its wall clock in UTC. */
+const wallClockAsUtc = ({
+  year,
+  month,
+  day,
+  hour,
+  minute,
+  second,
+}: WallClock): number =>
+  daysFromCivil(year, month, day) * 24 * HOUR_MS +
+  hour * HOUR_MS +
+  minute * MINUTE_MS +
+  second * SECOND_MS;
+
+/** How far ahead of UTC the wall clock of `timeZone` is at `epochMs`. */
+const offsetAt = (epochMs: number, timeZone: string | undefined): number =>
+  wallClockAsUtc(wallClock(epochMs, timeZone)) -
+  (epochMs - (((epochMs % SECOND_MS) + SECOND_MS) % SECOND_MS));
+
+const isLeapYear = (year: number): boolean =>
+  (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+
+const daysInMonth = (year: number, month: number): number =>
+  month === 2
+    ? isLeapYear(year)
+      ? 29
+      : 28
+    : [4, 6, 9, 11].includes(month)
+      ? 30
+      : 31;
+
+const isValidWallClock = ({
+  year,
+  month,
+  day,
+  hour,
+  minute,
+  second,
+}: WallClock): boolean =>
+  1 <= month &&
+  month <= 12 &&
+  1 <= day &&
+  day <= daysInMonth(year, month) &&
+  hour <= 23 &&
+  minute <= 59 &&
+  second <= 59;

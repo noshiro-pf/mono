@@ -242,131 +242,6 @@ export const placeGrid = (
 };
 
 /**
- * Where the label over the grid goes, and the `index`th cell of it, for
- * `placement`. A placement that has no room for what it asks — beside or
- * around parts that are not there, around parts too short for a row beside
- * them or with no column to their right — is the grid under them.
- */
-const gridOf = (
-  parts: ConnectedLayout,
-  { columns, side }: GridPlacement,
-): Readonly<{
-  label: Readonly<{ x: number; y: number }>;
-  slotAt: (index: number) => Readonly<{ x: number; y: number }>;
-}> => {
-  const perRow = Math.max(1, columns);
-
-  const taken = columnsIn(parts.width);
-
-  const besideRows = rowsBeside(parts);
-
-  const placed =
-    parts.width === 0 ||
-    (side === 'around' && (besideRows === 0 || perRow <= taken))
-      ? 'under'
-      : side;
-
-  const labelAt = (
-    x: number,
-    gridLabelTop: number,
-  ): Readonly<{ x: number; y: number }> =>
-    ({ x, y: gridLabelTop + LABEL_HEIGHT - PRIORITY_OVERHANG - 6 }) as const;
-
-  const rowStep = NODE_HEIGHT + NODE_GAP;
-
-  switch (placed) {
-    case 'under':
-      return {
-        label: labelAt(PADDING, parts.top),
-        slotAt: (index) => ({
-          x: PADDING + (index % perRow) * COLUMN_PITCH,
-          y: parts.top + LABEL_HEIGHT + rowOf(index, perRow) * rowStep,
-        }),
-      };
-
-    case 'beside': {
-      const left = PADDING + parts.width + LAYER_GAP;
-
-      return {
-        label: labelAt(left, PADDING),
-        slotAt: (index) => ({
-          x: left + (index % perRow) * COLUMN_PITCH,
-          y: PADDING + LABEL_HEIGHT + rowOf(index, perRow) * rowStep,
-        }),
-      };
-    }
-
-    case 'around': {
-      const right = perRow - taken;
-
-      const besideCount = besideRows * right;
-
-      return {
-        label: labelAt(PADDING + taken * COLUMN_PITCH, PADDING),
-        slotAt: (index) => {
-          if (index < besideCount) {
-            return {
-              x: PADDING + (taken + (index % right)) * COLUMN_PITCH,
-              y: PADDING + LABEL_HEIGHT + rowOf(index, right) * rowStep,
-            };
-          }
-
-          const under = index - besideCount;
-
-          return {
-            x: PADDING + (under % perRow) * COLUMN_PITCH,
-            y: parts.top + rowOf(under, perRow) * rowStep,
-          };
-        },
-      };
-    }
-  }
-};
-
-/**
- * How many rows of the grid fit to the right of the connected parts, under a
- * label level with their top, and ending above where they end.
- */
-const rowsBeside = (parts: ConnectedLayout): number => {
-  const room = parts.top - COMPONENT_GAP - (PADDING + LABEL_HEIGHT) + NODE_GAP;
-
-  return parts.width > 0 && room > 0 ? rowOf(room, NODE_HEIGHT + NODE_GAP) : 0;
-};
-
-/** Between one column and the next, room for the curves. */
-const LAYER_GAP = 64;
-
-const COLUMN_PITCH = NODE_WIDTH + LAYER_GAP;
-
-/** Between two nodes of a column. */
-const NODE_GAP = 14;
-
-/** What a placeholder takes in its column: a path, and room beside it. */
-const PLACEHOLDER_HEIGHT = 6;
-
-const COMPONENT_GAP = 32;
-
-const PADDING = 16;
-
-const LABEL_HEIGHT = 24 + PRIORITY_OVERHANG;
-
-const MIN_GRID_COLUMNS = 3;
-
-const MAX_GRID_COLUMNS = 5;
-
-const ORDER_SWEEPS = 12;
-
-const LEVEL_SWEEPS = 8;
-
-/** How many columns of nodes `width` holds. */
-const columnsIn = (width: number): number =>
-  rowOf(width + LAYER_GAP, COLUMN_PITCH);
-
-/** Which row of a grid `columns` wide the `index`th cell is in. */
-const rowOf = (index: number, columns: number): number =>
-  Num.isNonZero(columns) ? Math.floor(Num.div(index, columns)) : index;
-
-/**
  * The connected parts of the graph, edges read both ways: largest first,
  * then by lowest number; each lowest number first.
  */
@@ -502,6 +377,131 @@ export const levelColumn = (
   return levelled.map((value, index) => value + (offsets[index] ?? 0));
 };
 
+/** Which row of a grid `columns` wide the `index`th cell is in. */
+const rowOf = (index: number, columns: number): number =>
+  Num.isNonZero(columns) ? Math.floor(Num.div(index, columns)) : index;
+
+/**
+ * How many rows of the grid fit to the right of the connected parts, under a
+ * label level with their top, and ending above where they end.
+ */
+const rowsBeside = (parts: ConnectedLayout): number => {
+  const room = parts.top - COMPONENT_GAP - (PADDING + LABEL_HEIGHT) + NODE_GAP;
+
+  return parts.width > 0 && room > 0 ? rowOf(room, NODE_HEIGHT + NODE_GAP) : 0;
+};
+
+/** How many columns of nodes `width` holds. */
+const columnsIn = (width: number): number =>
+  rowOf(width + LAYER_GAP, COLUMN_PITCH);
+
+/**
+ * Where the label over the grid goes, and the `index`th cell of it, for
+ * `placement`. A placement that has no room for what it asks — beside or
+ * around parts that are not there, around parts too short for a row beside
+ * them or with no column to their right — is the grid under them.
+ */
+const gridOf = (
+  parts: ConnectedLayout,
+  { columns, side }: GridPlacement,
+): Readonly<{
+  label: Readonly<{ x: number; y: number }>;
+  slotAt: (index: number) => Readonly<{ x: number; y: number }>;
+}> => {
+  const perRow = Math.max(1, columns);
+
+  const taken = columnsIn(parts.width);
+
+  const besideRows = rowsBeside(parts);
+
+  const placed =
+    parts.width === 0 ||
+    (side === 'around' && (besideRows === 0 || perRow <= taken))
+      ? 'under'
+      : side;
+
+  const labelAt = (
+    x: number,
+    gridLabelTop: number,
+  ): Readonly<{ x: number; y: number }> =>
+    ({ x, y: gridLabelTop + LABEL_HEIGHT - PRIORITY_OVERHANG - 6 }) as const;
+
+  const rowStep = NODE_HEIGHT + NODE_GAP;
+
+  switch (placed) {
+    case 'under':
+      return {
+        label: labelAt(PADDING, parts.top),
+        slotAt: (index) => ({
+          x: PADDING + (index % perRow) * COLUMN_PITCH,
+          y: parts.top + LABEL_HEIGHT + rowOf(index, perRow) * rowStep,
+        }),
+      };
+
+    case 'beside': {
+      const left = PADDING + parts.width + LAYER_GAP;
+
+      return {
+        label: labelAt(left, PADDING),
+        slotAt: (index) => ({
+          x: left + (index % perRow) * COLUMN_PITCH,
+          y: PADDING + LABEL_HEIGHT + rowOf(index, perRow) * rowStep,
+        }),
+      };
+    }
+
+    case 'around': {
+      const right = perRow - taken;
+
+      const besideCount = besideRows * right;
+
+      return {
+        label: labelAt(PADDING + taken * COLUMN_PITCH, PADDING),
+        slotAt: (index) => {
+          if (index < besideCount) {
+            return {
+              x: PADDING + (taken + (index % right)) * COLUMN_PITCH,
+              y: PADDING + LABEL_HEIGHT + rowOf(index, right) * rowStep,
+            };
+          }
+
+          const under = index - besideCount;
+
+          return {
+            x: PADDING + (under % perRow) * COLUMN_PITCH,
+            y: parts.top + rowOf(under, perRow) * rowStep,
+          };
+        },
+      };
+    }
+  }
+};
+
+/** Between one column and the next, room for the curves. */
+const LAYER_GAP = 64;
+
+const COLUMN_PITCH = NODE_WIDTH + LAYER_GAP;
+
+/** Between two nodes of a column. */
+const NODE_GAP = 14;
+
+/** What a placeholder takes in its column: a path, and room beside it. */
+const PLACEHOLDER_HEIGHT = 6;
+
+const COMPONENT_GAP = 32;
+
+const PADDING = 16;
+
+const LABEL_HEIGHT = 24 + PRIORITY_OVERHANG;
+
+const MIN_GRID_COLUMNS = 3;
+
+const MAX_GRID_COLUMNS = 5;
+
+const ORDER_SWEEPS = 12;
+
+const LEVEL_SWEEPS = 8;
+
 /** A run of a column's nodes that moves as one, and where it wants to be. */
 type Block = Readonly<{ value: number; weight: number; size: number }>;
 
@@ -548,116 +548,39 @@ type ComponentLayout = Readonly<{
   height: number;
 }>;
 
-const layoutComponent = (
-  numbers: readonly number[],
-  edges: readonly IssueGraphEdge[],
-  /** Where its top-left corner goes. */
-  at: Readonly<{ x: number; y: number }>,
-): ComponentLayout => {
-  const columnOf = assignColumns(numbers, edges);
+const nodeId = (number: number): string => `#${number}` as const;
 
-  const mut_slots = new Map<string, Slot>(
-    numbers.map((number) => [
-      nodeId(number),
-      {
-        id: nodeId(number),
-        column: columnOf.get(number) ?? 0,
-        height: NODE_HEIGHT,
-      },
-    ]),
-  );
+const mean = (values: readonly number[]): number | undefined => {
+  const count = values.length;
 
-  // Each edge as the chain of slots it passes through, left to right.
-  const chains = edges.map((edge, index) => {
-    const fromColumn = columnOf.get(edge.from) ?? 0;
-
-    const toColumn = columnOf.get(edge.to) ?? 0;
-
-    const [leftEnd, rightEnd] =
-      fromColumn <= toColumn
-        ? ([edge.from, edge.to] as const)
-        : ([edge.to, edge.from] as const);
-
-    const leftColumn = Math.min(fromColumn, toColumn);
-
-    const rightColumn = Math.max(fromColumn, toColumn);
-
-    const placeholders = range(leftColumn + 1, rightColumn).map((column) => {
-      const slot = {
-        id: `edge-${index}-${column}`,
-        column,
-        height: PLACEHOLDER_HEIGHT,
-      } as const;
-
-      mut_slots.set(slot.id, slot);
-
-      return slot.id;
-    });
-
-    return {
-      edge,
-      reversed: fromColumn > toColumn,
-      ids: [nodeId(leftEnd), ...placeholders, nodeId(rightEnd)],
-    } as const;
-  });
-
-  const links = chains.flatMap(({ ids }) =>
-    Arr.tail(ids).map((id, index) => ({ from: ids[index] ?? id, to: id })),
-  );
-
-  const order = orderColumns(Array.from(mut_slots.values()), links);
-
-  const heights = levelHeights(order, mut_slots, links);
-
-  const topOf = (id: string): number => at.y + (heights.get(id) ?? 0);
-
-  const centre = (id: string): number =>
-    topOf(id) + (mut_slots.get(id)?.height ?? 0) / 2;
-
-  const left = (id: string): number =>
-    at.x + (mut_slots.get(id)?.column ?? 0) * COLUMN_PITCH;
-
-  const nodes = numbers.map((number) => ({
-    number,
-    x: left(nodeId(number)),
-    y: topOf(nodeId(number)),
-  }));
-
-  const laidOutEdges = chains.map(({ edge, reversed, ids }) => {
-    const points = ids.flatMap((id, index) =>
-      index === 0
-        ? [{ x: left(id) + NODE_WIDTH, y: centre(id) }]
-        : index === ids.length - 1
-          ? [{ x: left(id), y: centre(id) }]
-          : [
-              { x: left(id), y: centre(id) },
-              { x: left(id) + NODE_WIDTH, y: centre(id) },
-            ],
-    );
-
-    return {
-      ...edge,
-      path: smoothPath(reversed ? points.toReversed() : points),
-    };
-  });
-
-  const columns = Math.max(0, ...Array.from(columnOf.values())) + 1;
-
-  return {
-    nodes,
-    edges: laidOutEdges,
-    width: columns * COLUMN_PITCH - LAYER_GAP,
-    height: Math.max(
-      0,
-      ...Array.from(
-        mut_slots.values(),
-        (slot) => (heights.get(slot.id) ?? 0) + slot.height,
-      ),
-    ),
-  };
+  return Num.isNonZero(count) ? Num.div(Arr.sum(values), count) : undefined;
 };
 
-const nodeId = (number: number): string => `#${number}` as const;
+/** `[start, end)`, as plain numbers. */
+const range = (start: number, end: number): readonly number[] =>
+  Array.from({ length: Math.max(0, end - start) }, (_, index) => start + index);
+
+const positions = (
+  order: readonly (readonly string[])[],
+): ReadonlyMap<string, number> =>
+  new Map(order.flatMap((column) => column.map((id, index) => [id, index])));
+
+const groupBy = <K extends string, V extends string>(
+  links: readonly ReadonlyRecord<K | V, string>[],
+  key: K,
+  value: V,
+): ReadonlyMap<string, readonly string[]> => {
+  const mut_grouped = new Map<string, readonly string[]>();
+
+  for (const link of links) {
+    mut_grouped.set(
+      link[key],
+      Arr.toPushed(mut_grouped.get(link[key]) ?? [], link[value]),
+    );
+  }
+
+  return mut_grouped;
+};
 
 /**
  * The slots of each column, top to bottom: swept left to right by where what
@@ -846,36 +769,134 @@ const smoothPath = (
   return Arr.toUnshifted(`M ${first.x} ${first.y}`)(segments).join(' ');
 };
 
-/** `[start, end)`, as plain numbers. */
-const range = (start: number, end: number): readonly number[] =>
-  Array.from({ length: Math.max(0, end - start) }, (_, index) => start + index);
+const layoutComponent = (
+  numbers: readonly number[],
+  edges: readonly IssueGraphEdge[],
+  /** Where its top-left corner goes. */
+  at: Readonly<{ x: number; y: number }>,
+): ComponentLayout => {
+  const columnOf = assignColumns(numbers, edges);
 
-const mean = (values: readonly number[]): number | undefined => {
-  const count = values.length;
+  const mut_slots = new Map<string, Slot>(
+    numbers.map((number) => [
+      nodeId(number),
+      {
+        id: nodeId(number),
+        column: columnOf.get(number) ?? 0,
+        height: NODE_HEIGHT,
+      },
+    ]),
+  );
 
-  return Num.isNonZero(count) ? Num.div(Arr.sum(values), count) : undefined;
+  // Each edge as the chain of slots it passes through, left to right.
+  const chains = edges.map((edge, index) => {
+    const fromColumn = columnOf.get(edge.from) ?? 0;
+
+    const toColumn = columnOf.get(edge.to) ?? 0;
+
+    const [leftEnd, rightEnd] =
+      fromColumn <= toColumn
+        ? ([edge.from, edge.to] as const)
+        : ([edge.to, edge.from] as const);
+
+    const leftColumn = Math.min(fromColumn, toColumn);
+
+    const rightColumn = Math.max(fromColumn, toColumn);
+
+    const placeholders = range(leftColumn + 1, rightColumn).map((column) => {
+      const slot = {
+        id: `edge-${index}-${column}`,
+        column,
+        height: PLACEHOLDER_HEIGHT,
+      } as const;
+
+      mut_slots.set(slot.id, slot);
+
+      return slot.id;
+    });
+
+    return {
+      edge,
+      reversed: fromColumn > toColumn,
+      ids: [nodeId(leftEnd), ...placeholders, nodeId(rightEnd)],
+    } as const;
+  });
+
+  const links = chains.flatMap(({ ids }) =>
+    Arr.tail(ids).map((id, index) => ({ from: ids[index] ?? id, to: id })),
+  );
+
+  const order = orderColumns(Array.from(mut_slots.values()), links);
+
+  const heights = levelHeights(order, mut_slots, links);
+
+  const topOf = (id: string): number => at.y + (heights.get(id) ?? 0);
+
+  const centre = (id: string): number =>
+    topOf(id) + (mut_slots.get(id)?.height ?? 0) / 2;
+
+  const left = (id: string): number =>
+    at.x + (mut_slots.get(id)?.column ?? 0) * COLUMN_PITCH;
+
+  const nodes = numbers.map((number) => ({
+    number,
+    x: left(nodeId(number)),
+    y: topOf(nodeId(number)),
+  }));
+
+  const laidOutEdges = chains.map(({ edge, reversed, ids }) => {
+    const points = ids.flatMap((id, index) =>
+      index === 0
+        ? [{ x: left(id) + NODE_WIDTH, y: centre(id) }]
+        : index === ids.length - 1
+          ? [{ x: left(id), y: centre(id) }]
+          : [
+              { x: left(id), y: centre(id) },
+              { x: left(id) + NODE_WIDTH, y: centre(id) },
+            ],
+    );
+
+    return {
+      ...edge,
+      path: smoothPath(reversed ? points.toReversed() : points),
+    };
+  });
+
+  const columns = Math.max(0, ...Array.from(columnOf.values())) + 1;
+
+  return {
+    nodes,
+    edges: laidOutEdges,
+    width: columns * COLUMN_PITCH - LAYER_GAP,
+    height: Math.max(
+      0,
+      ...Array.from(
+        mut_slots.values(),
+        (slot) => (heights.get(slot.id) ?? 0) + slot.height,
+      ),
+    ),
+  };
 };
 
-const positions = (
-  order: readonly (readonly string[])[],
-): ReadonlyMap<string, number> =>
-  new Map(order.flatMap((column) => column.map((id, index) => [id, index])));
+const adjacency = (
+  numbers: readonly number[],
+  edges: readonly Readonly<{ from: number; to: number }>[],
+  toward: 'from' | 'to',
+): ReadonlyMap<number, readonly number[]> => {
+  const mut_adjacent = new Map<number, readonly number[]>(
+    numbers.map((number) => [number, []]),
+  );
 
-const groupBy = <K extends string, V extends string>(
-  links: readonly ReadonlyRecord<K | V, string>[],
-  key: K,
-  value: V,
-): ReadonlyMap<string, readonly string[]> => {
-  const mut_grouped = new Map<string, readonly string[]>();
+  for (const edge of edges) {
+    const [at, other] =
+      toward === 'to'
+        ? ([edge.from, edge.to] as const)
+        : ([edge.to, edge.from] as const);
 
-  for (const link of links) {
-    mut_grouped.set(
-      link[key],
-      Arr.toPushed(mut_grouped.get(link[key]) ?? [], link[value]),
-    );
+    mut_adjacent.set(at, Arr.toPushed(mut_adjacent.get(at) ?? [], other));
   }
 
-  return mut_grouped;
+  return mut_adjacent;
 };
 
 /** The edges, less those a walk from the lowest numbers finds running back. */
@@ -918,27 +939,6 @@ const withoutBackEdges = (
       ? { from: edge.to, to: edge.from }
       : edge,
   );
-};
-
-const adjacency = (
-  numbers: readonly number[],
-  edges: readonly Readonly<{ from: number; to: number }>[],
-  toward: 'from' | 'to',
-): ReadonlyMap<number, readonly number[]> => {
-  const mut_adjacent = new Map<number, readonly number[]>(
-    numbers.map((number) => [number, []]),
-  );
-
-  for (const edge of edges) {
-    const [at, other] =
-      toward === 'to'
-        ? ([edge.from, edge.to] as const)
-        : ([edge.to, edge.from] as const);
-
-    mut_adjacent.set(at, Arr.toPushed(mut_adjacent.get(at) ?? [], other));
-  }
-
-  return mut_adjacent;
 };
 
 /** Kahn's algorithm, lowest number first among those ready. */

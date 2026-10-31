@@ -70,38 +70,6 @@ export function find<E>(
   }
 }
 
-const findImpl = <E,>(
-  array: readonly E[],
-  predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
-): Optional<E> => {
-  const foundIndex = array.findIndex(
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    predicate as () => boolean,
-  );
-
-  // Left as a comment rather than asserted. This pinned the shape of the
-  // standard library's `findIndex`, and the shape differs between the stock
-  // library and the strict one — `(value, index, obj: this) => boolean` there
-  // against `(value, index, arr: readonly E[]) => unknown` here. `src` ships
-  // to consumers so that "Go to Definition" reaches it, so an assertion that
-  // only holds under one of them shows up as an error in their editor.
-  //
-  // expectType<
-  //   Parameters<typeof array.findIndex>[0],
-  //   (value: E, index: number, arr: readonly E[]) => unknown
-  // >('=');
-
-  expectType<
-    typeof predicate,
-    (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean
-  >('=');
-
-  return foundIndex === -1
-    ? Optional.none
-    : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      Optional.some(array[foundIndex]!);
-};
-
 /**
  * Finds the last element that satisfies a predicate.
  *
@@ -160,38 +128,6 @@ export function findLast<E>(
   }
 }
 
-const findLastImpl = <E,>(
-  array: readonly E[],
-  predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
-): Optional<E> => {
-  const foundIndex = array.findLastIndex(
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    predicate as () => boolean,
-  );
-
-  // Left as a comment rather than asserted. This pinned the shape of the
-  // standard library's `findIndex`, and the shape differs between the stock
-  // library and the strict one — `(value, index, obj: this) => boolean` there
-  // against `(value, index, arr: readonly E[]) => unknown` here. `src` ships
-  // to consumers so that "Go to Definition" reaches it, so an assertion that
-  // only holds under one of them shows up as an error in their editor.
-  //
-  // expectType<
-  //   Parameters<typeof array.findIndex>[0],
-  //   (value: E, index: number, arr: readonly E[]) => unknown
-  // >('=');
-
-  expectType<
-    typeof predicate,
-    (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean
-  >('=');
-
-  return foundIndex === -1
-    ? Optional.none
-    : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      Optional.some(array[foundIndex]!);
-};
-
 /**
  * Finds the index of the first element that satisfies a predicate.
  *
@@ -246,17 +182,6 @@ export function findIndex<E>(
       return (array) => findIndexImpl(array, ...args);
   }
 }
-
-const findIndexImpl = <E,>(
-  array: readonly E[],
-  predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
-): SizeType.Arr | -1 =>
-  pipe(
-    array.findIndex(
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      predicate as (value: E, index: number) => boolean,
-    ),
-  ).map((idx) => (idx >= 0 ? asUint32(idx) : -1)).value;
 
 /**
  * Finds the index of the last element that satisfies a predicate.
@@ -313,17 +238,6 @@ export function findLastIndex<E>(
   }
 }
 
-const findLastIndexImpl = <E,>(
-  array: readonly E[],
-  predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
-): SizeType.Arr | -1 =>
-  pipe(
-    array.findLastIndex(
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      predicate as (value: E, index: number) => boolean,
-    ),
-  ).map((idx) => (idx >= 0 ? asUint32(idx) : -1)).value;
-
 /**
  * Gets the index of a value in an array.
  *
@@ -370,15 +284,6 @@ export function indexOf<E>(
       return (array) => indexOfImpl(array, ...args);
   }
 }
-
-const indexOfImpl = <E,>(
-  array: readonly E[],
-  searchElement: E,
-): SizeType.Arr | -1 => {
-  const index = array.indexOf(searchElement);
-
-  return index !== -1 ? asUint32(index) : -1;
-};
 
 /**
  * Gets the index of a value in an array, starting from a specified index.
@@ -440,16 +345,6 @@ export function indexOfFrom<E>(
   }
 }
 
-const indexOfFromImpl = <E,>(
-  array: readonly E[],
-  searchElement: E,
-  fromIndex: SizeType.ArgArrWithNegative,
-): SizeType.Arr | -1 => {
-  const index = array.indexOf(searchElement, fromIndex);
-
-  return index !== -1 ? asUint32(index) : -1;
-};
-
 /**
  * Gets the last index of a value in an array.
  *
@@ -500,15 +395,6 @@ export function lastIndexOf<E>(
       return (array) => lastIndexOfImpl(array, ...args);
   }
 }
-
-const lastIndexOfImpl = <E,>(
-  array: readonly E[],
-  searchElement: E,
-): SizeType.Arr | -1 => {
-  const index = array.lastIndexOf(searchElement);
-
-  return index !== -1 ? asUint32(index) : -1;
-};
 
 /**
  * Gets the last index of a value in an array, starting from a specified index.
@@ -569,6 +455,120 @@ export function lastIndexOfFrom<E>(
       return (array) => lastIndexOfFromImpl(array, ...args);
   }
 }
+
+const findImpl = <E,>(
+  array: readonly E[],
+  predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
+): Optional<E> => {
+  const foundIndex = array.findIndex(
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    predicate as () => boolean,
+  );
+
+  // Left as a comment rather than asserted. This pinned the shape of the
+  // standard library's `findIndex`, and the shape differs between the stock
+  // library and the strict one — `(value, index, obj: this) => boolean` there
+  // against `(value, index, arr: readonly E[]) => unknown` here. `src` ships
+  // to consumers so that "Go to Definition" reaches it, so an assertion that
+  // only holds under one of them shows up as an error in their editor.
+  //
+  // expectType<
+  //   Parameters<typeof array.findIndex>[0],
+  //   (value: E, index: number, arr: readonly E[]) => unknown
+  // >('=');
+
+  expectType<
+    typeof predicate,
+    (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean
+  >('=');
+
+  return foundIndex === -1
+    ? Optional.none
+    : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      Optional.some(array[foundIndex]!);
+};
+
+const findLastImpl = <E,>(
+  array: readonly E[],
+  predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
+): Optional<E> => {
+  const foundIndex = array.findLastIndex(
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    predicate as () => boolean,
+  );
+
+  // Left as a comment rather than asserted. This pinned the shape of the
+  // standard library's `findIndex`, and the shape differs between the stock
+  // library and the strict one — `(value, index, obj: this) => boolean` there
+  // against `(value, index, arr: readonly E[]) => unknown` here. `src` ships
+  // to consumers so that "Go to Definition" reaches it, so an assertion that
+  // only holds under one of them shows up as an error in their editor.
+  //
+  // expectType<
+  //   Parameters<typeof array.findIndex>[0],
+  //   (value: E, index: number, arr: readonly E[]) => unknown
+  // >('=');
+
+  expectType<
+    typeof predicate,
+    (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean
+  >('=');
+
+  return foundIndex === -1
+    ? Optional.none
+    : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      Optional.some(array[foundIndex]!);
+};
+
+const findIndexImpl = <E,>(
+  array: readonly E[],
+  predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
+): SizeType.Arr | -1 =>
+  pipe(
+    array.findIndex(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      predicate as (value: E, index: number) => boolean,
+    ),
+  ).map((idx) => (idx >= 0 ? asUint32(idx) : -1)).value;
+
+const findLastIndexImpl = <E,>(
+  array: readonly E[],
+  predicate: (value: E, index: SizeType.Arr, arr: readonly E[]) => boolean,
+): SizeType.Arr | -1 =>
+  pipe(
+    array.findLastIndex(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      predicate as (value: E, index: number) => boolean,
+    ),
+  ).map((idx) => (idx >= 0 ? asUint32(idx) : -1)).value;
+
+const indexOfImpl = <E,>(
+  array: readonly E[],
+  searchElement: E,
+): SizeType.Arr | -1 => {
+  const index = array.indexOf(searchElement);
+
+  return index !== -1 ? asUint32(index) : -1;
+};
+
+const indexOfFromImpl = <E,>(
+  array: readonly E[],
+  searchElement: E,
+  fromIndex: SizeType.ArgArrWithNegative,
+): SizeType.Arr | -1 => {
+  const index = array.indexOf(searchElement, fromIndex);
+
+  return index !== -1 ? asUint32(index) : -1;
+};
+
+const lastIndexOfImpl = <E,>(
+  array: readonly E[],
+  searchElement: E,
+): SizeType.Arr | -1 => {
+  const index = array.lastIndexOf(searchElement);
+
+  return index !== -1 ? asUint32(index) : -1;
+};
 
 const lastIndexOfFromImpl = <E,>(
   array: readonly E[],

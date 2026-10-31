@@ -1,18 +1,6 @@
 import type { Hsl, Hsla, Rgb, Rgba } from '../../types/index.mjs';
 import { numberToRgbValue } from '../from-number/index.mjs';
 
-const hue2rgb = (p: number, q: number, s: number): number => {
-  const t = s < 0 ? s + 1 : s > 1 ? s - 1 : s;
-
-  return t < 1 / 6
-    ? p + (q - p) * (6 * t)
-    : t < 1 / 2
-      ? q
-      : t < 2 / 3
-        ? p + (q - p) * (2 / 3 - t) * 6
-        : p;
-};
-
 export const hslToRgb = ([h, s, l]: Hsl): Rgb => {
   const h01 = h / 360;
 
@@ -48,4 +36,16 @@ export const hslaToRgba = ([h, s, l, a]: Hsla): Rgba => {
   const [r, g, b] = hslToRgb([h, s, l]);
 
   return [r, g, b, a];
+};
+
+const hue2rgb = (p: number, q: number, s: number): number => {
+  const t = s < 0 ? s + 1 : s > 1 ? s - 1 : s;
+
+  return t < 1 / 6
+    ? p + (q - p) * (6 * t)
+    : t < 1 / 2
+      ? q
+      : t < 2 / 3
+        ? p + (q - p) * (2 / 3 - t) * 6
+        : p;
 };

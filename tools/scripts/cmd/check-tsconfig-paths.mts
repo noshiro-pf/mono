@@ -109,100 +109,6 @@ const collectTsconfigFiles = async (): Promise<
   return Result.ok(result.value.toSorted());
 };
 
-const checkFile = async (file: string): Promise<readonly Violation[]> => {
-  const paths = await readPaths(file);
-
-  if (paths === undefined) {
-    return [];
-  }
-
-  const packageDir = await findPackageDir(path.dirname(file));
-
-  // No package of its own: the nearest `package.json` is the repository root.
-  // `tools/configs/tsconfig.tsx.json` is the case here, and its `paths` are a
-  // different mechanism — `tsx`'s runtime resolution for build scripts that
-  // run before any `dist/` exists. See CLAUDE.md, "Build".
-  if (packageDir === undefined) {
-    return [];
-  }
-
-  const packageName = await readPackageName(packageDir);
-
-  const relativeFile = path.relative(projectRootPath, file);
-
-  if (packageName === undefined) {
-    return [
-      {
-        file: relativeFile,
-        key: Object.keys(paths.entries).join(', '),
-        detail: 'is declared in a package whose `package.json` has no `name`.',
-        hint: 'Name the package, or drop the `paths` block.',
-      },
-    ];
-  }
-
-  const perEntry = await Promise.all(
-    Object.entries(paths.entries).map(async ([key, value]) =>
-      checkEntry({
-        key,
-        value,
-        relativeFile,
-        packageName,
-        packageDir,
-        basePath: paths.basePath,
-      }),
-    ),
-  );
-
-  return perEntry.flat();
-};
-
-const checkEntry = async ({
-  key,
-  value,
-  relativeFile,
-  packageName,
-  packageDir,
-  basePath,
-}: Readonly<{
-  key: string;
-  value: unknown;
-  relativeFile: string;
-  packageName: string;
-  packageDir: string;
-  basePath: string;
-}>): Promise<readonly Violation[]> => {
-  if (key !== packageName && !key.startsWith(`${packageName}/`)) {
-    return [
-      {
-        file: relativeFile,
-        key,
-        detail: `maps \`${key}\`, which is not \`${packageName}\`.`,
-        hint: `Delete it. If \`${key}\` cannot be resolved by name, the fix is an \`exports\` field in \`${key}\`, not a mapping here.`,
-      },
-    ];
-  }
-
-  if (!Arr.isArray(value) || !value.every(isString)) {
-    return [
-      {
-        file: relativeFile,
-        key,
-        detail: 'is not an array of strings.',
-        hint: 'A `paths` value is an array of file paths.',
-      },
-    ];
-  }
-
-  const perTarget = await Promise.all(
-    value.map(async (target) =>
-      checkTarget({ key, target, relativeFile, packageDir, basePath }),
-    ),
-  );
-
-  return perTarget.flat();
-};
-
 const checkTarget = async ({
   key,
   target,
@@ -254,19 +160,51 @@ const checkTarget = async ({
   ];
 };
 
-/**
- * The `paths` block of one tsconfig, with the directory its entries resolve
- * against.
- *
- * Only this file's own block is read: `paths` is not merged through `extends`
- * — a child that declares one replaces its parent's wholesale — so a config
- * without a block of its own has nothing to answer for. `baseUrl` is read the
- * same way, which is exact as long as no shared base sets one; none does.
- */
-type PathsBlock = Readonly<{
-  entries: ReadonlyRecord<string, unknown>;
+const checkEntry = async ({
+  key,
+  value,
+  relativeFile,
+  packageName,
+  packageDir,
+  basePath,
+}: Readonly<{
+  key: string;
+  value: unknown;
+  relativeFile: string;
+  packageName: string;
+  packageDir: string;
   basePath: string;
-}>;
+}>): Promise<readonly Violation[]> => {
+  if (key !== packageName && !key.startsWith(`${packageName}/`)) {
+    return [
+      {
+        file: relativeFile,
+        key,
+        detail: `maps \`${key}\`, which is not \`${packageName}\`.`,
+        hint: `Delete it. If \`${key}\` cannot be resolved by name, the fix is an \`exports\` field in \`${key}\`, not a mapping here.`,
+      },
+    ];
+  }
+
+  if (!Arr.isArray(value) || !value.every(isString)) {
+    return [
+      {
+        file: relativeFile,
+        key,
+        detail: 'is not an array of strings.',
+        hint: 'A `paths` value is an array of file paths.',
+      },
+    ];
+  }
+
+  const perTarget = await Promise.all(
+    value.map(async (target) =>
+      checkTarget({ key, target, relativeFile, packageDir, basePath }),
+    ),
+  );
+
+  return perTarget.flat();
+};
 
 const readPaths = async (file: string): Promise<PathsBlock | undefined> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -357,6 +295,68 @@ const readPackageName = async (
 
   return isString(name) ? name : undefined;
 };
+
+const checkFile = async (file: string): Promise<readonly Violation[]> => {
+  const paths = await readPaths(file);
+
+  if (paths === undefined) {
+    return [];
+  }
+
+  const packageDir = await findPackageDir(path.dirname(file));
+
+  // No package of its own: the nearest `package.json` is the repository root.
+  // `tools/configs/tsconfig.tsx.json` is the case here, and its `paths` are a
+  // different mechanism — `tsx`'s runtime resolution for build scripts that
+  // run before any `dist/` exists. See CLAUDE.md, "Build".
+  if (packageDir === undefined) {
+    return [];
+  }
+
+  const packageName = await readPackageName(packageDir);
+
+  const relativeFile = path.relative(projectRootPath, file);
+
+  if (packageName === undefined) {
+    return [
+      {
+        file: relativeFile,
+        key: Object.keys(paths.entries).join(', '),
+        detail: 'is declared in a package whose `package.json` has no `name`.',
+        hint: 'Name the package, or drop the `paths` block.',
+      },
+    ];
+  }
+
+  const perEntry = await Promise.all(
+    Object.entries(paths.entries).map(async ([key, value]) =>
+      checkEntry({
+        key,
+        value,
+        relativeFile,
+        packageName,
+        packageDir,
+        basePath: paths.basePath,
+      }),
+    ),
+  );
+
+  return perEntry.flat();
+};
+
+/**
+ * The `paths` block of one tsconfig, with the directory its entries resolve
+ * against.
+ *
+ * Only this file's own block is read: `paths` is not merged through `extends`
+ * — a child that declares one replaces its parent's wholesale — so a config
+ * without a block of its own has nothing to answer for. `baseUrl` is read the
+ * same way, which is exact as long as no shared base sets one; none does.
+ */
+type PathsBlock = Readonly<{
+  entries: ReadonlyRecord<string, unknown>;
+  basePath: string;
+}>;
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkTsconfigPaths().catch((error: unknown) =>

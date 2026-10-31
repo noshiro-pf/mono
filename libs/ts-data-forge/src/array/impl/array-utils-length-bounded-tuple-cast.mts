@@ -76,21 +76,6 @@ export function asFixedLengthTuple(
   }
 }
 
-const asFixedLengthTupleImpl = (
-  length: SizeType.ArgArr,
-  xs: readonly unknown[],
-): readonly unknown[] => {
-  const actualLength = xs.length;
-
-  if (!isFixedLengthTuple(length, xs)) {
-    throw new TypeError(
-      `Expected an array of length ${length}, got an array of length ${actualLength}`,
-    );
-  }
-
-  return xs;
-};
-
 /**
  * Casts an array to `MinLengthTuple<MinLength, E>` after checking that it has
  * at least `minLength` elements.
@@ -148,21 +133,6 @@ export function asMinLengthTuple(
   }
 }
 
-const asMinLengthTupleImpl = (
-  minLength: SizeType.ArgArr,
-  xs: readonly unknown[],
-): readonly unknown[] => {
-  const actualLength = xs.length;
-
-  if (!isMinLengthTuple(minLength, xs)) {
-    throw new TypeError(
-      `Expected an array of length >= ${minLength}, got an array of length ${actualLength}`,
-    );
-  }
-
-  return xs;
-};
-
 /**
  * Casts an array to `MaxLengthTuple<MaxLength, E>` after checking that it has
  * at most `maxLength` elements.
@@ -217,21 +187,6 @@ export function asMaxLengthTuple(
       return (xs) => asMaxLengthTupleImpl(args[0], xs);
   }
 }
-
-const asMaxLengthTupleImpl = (
-  maxLength: SizeType.ArgArr,
-  xs: readonly unknown[],
-): readonly unknown[] => {
-  const actualLength = xs.length;
-
-  if (!isMaxLengthTuple(maxLength, xs)) {
-    throw new TypeError(
-      `Expected an array of length <= ${maxLength}, got an array of length ${actualLength}`,
-    );
-  }
-
-  return xs;
-};
 
 /**
  * Casts an array to `BoundedLengthTuple<Min, Max, E>` after checking that its
@@ -299,22 +254,6 @@ export function asBoundedLengthTuple(
   }
 }
 
-const asBoundedLengthTupleImpl = (
-  min: SizeType.ArgArr,
-  max: SizeType.ArgArr,
-  xs: readonly unknown[],
-): readonly unknown[] => {
-  const actualLength = xs.length;
-
-  if (!isBoundedLengthTuple(min, max, xs)) {
-    throw new TypeError(
-      `Expected an array of length in [${min}, ${max}], got an array of length ${actualLength}`,
-    );
-  }
-
-  return xs;
-};
-
 /**
  * Casts an array to the structural empty tuple after checking that it is
  * empty.
@@ -378,6 +317,67 @@ export const asNonEmptyTuple = <Xs extends readonly unknown[]>(
 ): MinLengthTuple<1, Xs[number]> & Xs => {
   if (!isMinLengthTuple(1, xs)) {
     throw new TypeError('Expected a non-empty array, got an empty array');
+  }
+
+  return xs;
+};
+
+const asFixedLengthTupleImpl = (
+  length: SizeType.ArgArr,
+  xs: readonly unknown[],
+): readonly unknown[] => {
+  const actualLength = xs.length;
+
+  if (!isFixedLengthTuple(length, xs)) {
+    throw new TypeError(
+      `Expected an array of length ${length}, got an array of length ${actualLength}`,
+    );
+  }
+
+  return xs;
+};
+
+const asMinLengthTupleImpl = (
+  minLength: SizeType.ArgArr,
+  xs: readonly unknown[],
+): readonly unknown[] => {
+  const actualLength = xs.length;
+
+  if (!isMinLengthTuple(minLength, xs)) {
+    throw new TypeError(
+      `Expected an array of length >= ${minLength}, got an array of length ${actualLength}`,
+    );
+  }
+
+  return xs;
+};
+
+const asMaxLengthTupleImpl = (
+  maxLength: SizeType.ArgArr,
+  xs: readonly unknown[],
+): readonly unknown[] => {
+  const actualLength = xs.length;
+
+  if (!isMaxLengthTuple(maxLength, xs)) {
+    throw new TypeError(
+      `Expected an array of length <= ${maxLength}, got an array of length ${actualLength}`,
+    );
+  }
+
+  return xs;
+};
+
+const asBoundedLengthTupleImpl = (
+  min: SizeType.ArgArr,
+  max: SizeType.ArgArr,
+  xs: readonly unknown[],
+): readonly unknown[] => {
+  const actualLength = xs.length;
+
+  if (!isBoundedLengthTuple(min, max, xs)) {
+    throw new TypeError(
+      `Expected an array of length in [${min}, ${max}], got an array of length ${actualLength}`,
+    );
   }
 
   return xs;

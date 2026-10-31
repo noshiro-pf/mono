@@ -13,15 +13,15 @@ import { constant, If, type JSX } from 'synstate-dom';
 
 const [isLoggedIn$] = createBooleanState(false);
 
-const Dashboard = (): JSX.Element => <main>{constant('Dashboard')}</main>;
-
-const Login = (): JSX.Element => <main>{constant('Please log in')}</main>;
-
 // Both branches are descriptions: only the chosen one is mounted, and
 // `Dashboard` is not called at all until `isLoggedIn$` becomes true.
 export const App = (): JSX.Element => (
     <If cond={isLoggedIn$} then={<Dashboard />} else={<Login />} />
 );
+
+const Dashboard = (): JSX.Element => <main>{constant('Dashboard')}</main>;
+
+const Login = (): JSX.Element => <main>{constant('Please log in')}</main>;
 ```
 
 - `cond: Bindable<boolean>`, `then: JSX.Element`, `else?: JSX.Element`. If you omit `else`, nothing is shown on that side.
@@ -39,12 +39,6 @@ type User = Readonly<{ name: string }>;
 
 const [currentUser$] = createState<Optional<User>>(Optional.none);
 
-const Profile = ({
-    user$,
-}: Readonly<{ user$: InitializedObservable<User> }>): JSX.Element => (
-    <p>{view(user$, (u) => `Signed in as ${u.name}`)}</p>
-);
-
 // `some` is called once per change from empty to present. While a user stays
 // signed in, a new value flows through `u$` and the branch is kept.
 export const Account = (): JSX.Element => (
@@ -53,6 +47,12 @@ export const Account = (): JSX.Element => (
         some={(u$) => <Profile user$={u$} />}
         none={<p>{constant('Not signed in')}</p>}
     />
+);
+
+const Profile = ({
+    user$,
+}: Readonly<{ user$: InitializedObservable<User> }>): JSX.Element => (
+    <p>{view(user$, (u) => `Signed in as ${u.name}`)}</p>
 );
 ```
 

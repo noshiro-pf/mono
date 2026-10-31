@@ -29,44 +29,6 @@ type FileEntry = Readonly<{
   types: readonly TypeEntry[];
 }>;
 
-const collectExports = async (filePath: string): Promise<FileEntry> => {
-  const relativePath = path.relative(workspaceRootPath, filePath);
-
-  try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const content = await fs.readFile(filePath, 'utf8');
-
-    const { types, namespaces } = extractTypeExports(content);
-
-    // Skip `TSTypeForgeInternals_`-prefixed exports (e.g.
-    // `TSTypeForgeInternals_SmallIntIndexMax`) that may live alongside
-    // public types in a regular module file — they're internal opt-in
-    // helpers, not part of the user-facing surface.
-    const isInternal = (name: string): boolean =>
-      name.startsWith('TSTypeForgeInternals_');
-
-    const flat: readonly TypeEntry[] = [
-      ...types
-        .filter(({ name }) => !isInternal(name))
-        .map(({ name, line }) => ({ typeName: name, line })),
-      ...namespaces.flatMap((ns) =>
-        ns.types
-          .filter(({ name }) => !isInternal(name))
-          .map(({ name, line }) => ({
-            typeName: `${ns.name}.${name}`,
-            line,
-          })),
-      ),
-    ].toSorted((a, b) => a.line - b.line);
-
-    return { relativePath, types: flat };
-  } catch (error) {
-    console.error(`Error processing file ${filePath}:`, error);
-
-    return { relativePath, types: [] };
-  }
-};
-
 export const genTypeDefinitions = async (): Promise<void> => {
   const filesResult = await glob(`${srcDir}/**/*.mts`);
 
@@ -114,4 +76,42 @@ export const genTypeDefinitions = async (): Promise<void> => {
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(readmePath, newContent, 'utf8');
+};
+
+const collectExports = async (filePath: string): Promise<FileEntry> => {
+  const relativePath = path.relative(workspaceRootPath, filePath);
+
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const content = await fs.readFile(filePath, 'utf8');
+
+    const { types, namespaces } = extractTypeExports(content);
+
+    // Skip `TSTypeForgeInternals_`-prefixed exports (e.g.
+    // `TSTypeForgeInternals_SmallIntIndexMax`) that may live alongside
+    // public types in a regular module file — they're internal opt-in
+    // helpers, not part of the user-facing surface.
+    const isInternal = (name: string): boolean =>
+      name.startsWith('TSTypeForgeInternals_');
+
+    const flat: readonly TypeEntry[] = [
+      ...types
+        .filter(({ name }) => !isInternal(name))
+        .map(({ name, line }) => ({ typeName: name, line })),
+      ...namespaces.flatMap((ns) =>
+        ns.types
+          .filter(({ name }) => !isInternal(name))
+          .map(({ name, line }) => ({
+            typeName: `${ns.name}.${name}`,
+            line,
+          })),
+      ),
+    ].toSorted((a, b) => a.line - b.line);
+
+    return { relativePath, types: flat };
+  } catch (error) {
+    console.error(`Error processing file ${filePath}:`, error);
+
+    return { relativePath, types: [] };
+  }
 };

@@ -303,13 +303,13 @@ type NamedSpecifier = Readonly<{
   specifier: TSESTree.ImportSpecifier;
 }>;
 
-/** Neither `specifier` nor its declaration says `type`. */
-const isValueImport = ({ declaration, specifier }: NamedSpecifier): boolean =>
-  isNotTypeOnly({ declaration, specifier }) && specifier.importKind !== 'type';
-
 /** The declaration is not `import type`. */
 const isNotTypeOnly = ({ declaration }: NamedSpecifier): boolean =>
   declaration.importKind !== 'type';
+
+/** Neither `specifier` nor its declaration says `type`. */
+const isValueImport = ({ declaration, specifier }: NamedSpecifier): boolean =>
+  isNotTypeOnly({ declaration, specifier }) && specifier.importKind !== 'type';
 
 const bindingOf = (
   sourceCode: TSESLint.SourceCode,

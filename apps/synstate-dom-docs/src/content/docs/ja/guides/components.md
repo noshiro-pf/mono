@@ -80,6 +80,15 @@ type CountedTextAreaProps = Readonly<{
 
 type FieldProps = Readonly<{ hint: Bindable<string> }> & CountedTextAreaProps;
 
+export const Compose = (): JSX.Element => (
+    <Field
+        label={constant('Message')}
+        hint={constant('Plain text only.')}
+        value={draft$}
+        onInput={setDraft}
+    />
+);
+
 // A helper takes bindables and returns one, like any other function.
 const remainingOf = (
     value: Bindable<string>,
@@ -139,15 +148,6 @@ const Field = ({ hint, ...textArea }: FieldProps): JSX.Element => (
 );
 
 const [draft$, setDraft] = createState('');
-
-export const Compose = (): JSX.Element => (
-    <Field
-        label={constant('Message')}
-        hint={constant('Plain text only.')}
-        value={draft$}
-        onInput={setDraft}
-    />
-);
 ```
 
 - props を分割代入できます。
@@ -176,6 +176,8 @@ Solid では、これらのどれにもルールが付いてきます。props �
 import { createState } from 'synstate';
 import { constant, type Constant, type JSX } from 'synstate-dom';
 
+export const Form = (): JSX.Element => <Stepper initial={constant(10)} />;
+
 // `initial` is read once, when the component is called. Typing it
 // `Constant<number>` says so: an observable or a plain number is an error.
 const Stepper = ({
@@ -194,8 +196,6 @@ const Stepper = ({
         </button>
     );
 };
-
-export const Form = (): JSX.Element => <Stepper initial={constant(10)} />;
 ```
 
 こうすると呼び出す側は `initial={constant(10)}` と書くことになり、Observable や素の数値を渡すと型エラーになります。一度しか読まないことが、名前の付け方の慣習ではなく型に表れるわけです。コンポーネントの中では、`Constant<T>` をそのまま `T` として使えます。
@@ -210,6 +210,12 @@ type CardProps = Readonly<{
     children: Child;
 }>;
 
+export const Page = (): JSX.Element => (
+    <Card title={<em>{constant('Welcome')}</em>}>
+        <p>{constant('Components are plain functions, called once.')}</p>
+    </Card>
+);
+
 // Children and elements passed as props are descriptions, mounted where the
 // component puts them.
 const Card = ({ title, children }: CardProps): JSX.Element => (
@@ -217,12 +223,6 @@ const Card = ({ title, children }: CardProps): JSX.Element => (
         <h2>{title}</h2>
         {children}
     </section>
-);
-
-export const Page = (): JSX.Element => (
-    <Card title={<em>{constant('Welcome')}</em>}>
-        <p>{constant('Components are plain functions, called once.')}</p>
-    </Card>
 );
 ```
 

@@ -319,52 +319,6 @@ export const followUpQuery = (
 export const followUpAlias = (followUp: FollowUp): string =>
   `${followUp.kind}_${followUp.number}` as const;
 
-/** One follow-up as a field of the query, and what it declares and binds. */
-const followUpPart = (
-  followUp: FollowUp,
-): Readonly<{
-  declarations: readonly string[];
-  field: string;
-  variables: ReadonlyRecord<string, number | string>;
-}> => {
-  const alias = followUpAlias(followUp);
-
-  switch (followUp.kind) {
-    case 'compare':
-      return {
-        declarations: [`$${alias}_base: String!`, `$${alias}_head: String!`],
-        field: `${alias}: ref(qualifiedName: $${alias}_base) { compare(headRef: $${alias}_head) { aheadBy behindBy } }`,
-        variables: {
-          [`${alias}_base`]: followUp.baseQualifiedName,
-          [`${alias}_head`]: followUp.headSha,
-        },
-      };
-
-    case 'contexts':
-      return {
-        declarations: [
-          `$${alias}_oid: GitObjectID!`,
-          `$${alias}_after: String!`,
-        ],
-        field: `${alias}: object(oid: $${alias}_oid) { ... on Commit { statusCheckRollup { contexts(first: ${PAGE_SIZE}, after: $${alias}_after) { ${PAGE_INFO} ${CONTEXT_NODES} } } } }`,
-        variables: {
-          [`${alias}_oid`]: followUp.headSha,
-          [`${alias}_after`]: followUp.after,
-        },
-      };
-
-    case 'files':
-      return {
-        declarations: [`$${alias}_number: Int!`, `$${alias}_after: String!`],
-        field: `${alias}: pullRequest(number: $${alias}_number) { files(first: ${PAGE_SIZE}, after: $${alias}_after) { ${PAGE_INFO} nodes { path } } }`,
-        variables: {
-          [`${alias}_number`]: followUp.number,
-          [`${alias}_after`]: followUp.after,
-        },
-      };
-  }
-};
-
 /**
  * One query for the issues a body closes by keyword that GitHub has not
  * linked, so that each is listed as a linked one is, with the body its
@@ -429,6 +383,52 @@ export const referencesQuery = (
 
 export const referenceAlias = (number: number): string =>
   `ref_${number}` as const;
+
+/** One follow-up as a field of the query, and what it declares and binds. */
+const followUpPart = (
+  followUp: FollowUp,
+): Readonly<{
+  declarations: readonly string[];
+  field: string;
+  variables: ReadonlyRecord<string, number | string>;
+}> => {
+  const alias = followUpAlias(followUp);
+
+  switch (followUp.kind) {
+    case 'compare':
+      return {
+        declarations: [`$${alias}_base: String!`, `$${alias}_head: String!`],
+        field: `${alias}: ref(qualifiedName: $${alias}_base) { compare(headRef: $${alias}_head) { aheadBy behindBy } }`,
+        variables: {
+          [`${alias}_base`]: followUp.baseQualifiedName,
+          [`${alias}_head`]: followUp.headSha,
+        },
+      };
+
+    case 'contexts':
+      return {
+        declarations: [
+          `$${alias}_oid: GitObjectID!`,
+          `$${alias}_after: String!`,
+        ],
+        field: `${alias}: object(oid: $${alias}_oid) { ... on Commit { statusCheckRollup { contexts(first: ${PAGE_SIZE}, after: $${alias}_after) { ${PAGE_INFO} ${CONTEXT_NODES} } } } }`,
+        variables: {
+          [`${alias}_oid`]: followUp.headSha,
+          [`${alias}_after`]: followUp.after,
+        },
+      };
+
+    case 'files':
+      return {
+        declarations: [`$${alias}_number: Int!`, `$${alias}_after: String!`],
+        field: `${alias}: pullRequest(number: $${alias}_number) { files(first: ${PAGE_SIZE}, after: $${alias}_after) { ${PAGE_INFO} nodes { path } } }`,
+        variables: {
+          [`${alias}_number`]: followUp.number,
+          [`${alias}_after`]: followUp.after,
+        },
+      };
+  }
+};
 
 // `state` is an `IssueState` on one and a `PullRequestState` on the other, and
 // GraphQL does not let one response key carry two types: a selection that

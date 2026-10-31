@@ -468,6 +468,25 @@ const actionsToAutoPlay = [
 
 const autoPlayMargin = asSafeUint(1 + (time.showJudge + time.hideJudge) / 1000);
 
+const actionsToAutoPlayStream = (
+  counter: GameStateDeps['counter'],
+  // The structural non-empty tuple rather than `NonEmptyArray`, which carries a
+  // brand a `const` tuple literal cannot have. Both give `actions[0]` without
+  // `| undefined`, which is all this needs.
+  actions: NonEmptyTuple<GameStateAction>,
+  numSkip: SafeUintWithSmallInt,
+): SynstateObservable<GameStateAction> => {
+  // Counting emissions with `scan` emits `actions[i]` on the i-th tick.
+  // `skip` shifts the timer's own value, so the count has to be kept
+  // separately rather than read off the tick.
+  const ticks = counter(autoPlaySpeedRate * 1000);
+
+  return (Num.isPositive(numSkip) ? ticks.pipe(skip(numSkip)) : ticks)
+    .pipe(take(Arr.length(actions)))
+    .pipe(scan((i: number) => i + 1, -1))
+    .pipe(map((i) => actions[i] ?? actions[0]));
+};
+
 const autoPlay = (
   counter: GameStateDeps['counter'],
 ): SynstateObservable<GameStateAction> =>
@@ -501,22 +520,3 @@ const autoPlay = (
       ),
     ),
   ] as const);
-
-const actionsToAutoPlayStream = (
-  counter: GameStateDeps['counter'],
-  // The structural non-empty tuple rather than `NonEmptyArray`, which carries a
-  // brand a `const` tuple literal cannot have. Both give `actions[0]` without
-  // `| undefined`, which is all this needs.
-  actions: NonEmptyTuple<GameStateAction>,
-  numSkip: SafeUintWithSmallInt,
-): SynstateObservable<GameStateAction> => {
-  // Counting emissions with `scan` emits `actions[i]` on the i-th tick.
-  // `skip` shifts the timer's own value, so the count has to be kept
-  // separately rather than read off the tick.
-  const ticks = counter(autoPlaySpeedRate * 1000);
-
-  return (Num.isPositive(numSkip) ? ticks.pipe(skip(numSkip)) : ticks)
-    .pipe(take(Arr.length(actions)))
-    .pipe(scan((i: number) => i + 1, -1))
-    .pipe(map((i) => actions[i] ?? actions[0]));
-};

@@ -57,6 +57,39 @@ const renderImports = (config: BrandedNumberConfig): string =>
     "import { TsDataForgeInternals } from '../refined-number-utils.mjs';",
   ].join('\n');
 
+const factoryOpFor = (key: string, nonZero: boolean): string =>
+  key === 'random' ? (nonZero ? 'randomNonZero' : 'random') : key;
+
+const namespaceLocalName = (key: string): string =>
+  key === 'min' ? 'min_' : key === 'max' ? 'max_' : key;
+
+const destructureEntries = (
+  config: BrandedNumberConfig,
+): readonly DestructureEntry[] => {
+  const customKeys = new Set(config.customKeys);
+
+  const fromKeys = config.namespaceKeys
+    .filter((key: string) => !customKeys.has(key))
+    .map((key: string) => ({
+      factoryOp: factoryOpFor(key, config.randomNonZero ?? false),
+      localName: namespaceLocalName(key),
+    }));
+
+  const all = [
+    ...fromKeys,
+    { factoryOp: 'castType', localName: 'castType' },
+  ] as const;
+
+  const deduped = all.filter(
+    (e, i) => all.findIndex((x) => x.factoryOp === e.factoryOp) === i,
+  );
+
+  // Code-unit (ASCII) order to match the hand-written destructuring in the
+  // source modules; `localeCompare` would reorder the upper-case constants.
+  // eslint-disable-next-line unicorn/prefer-simple-sort-comparator
+  return deduped.toSorted((a, b) => (a.factoryOp < b.factoryOp ? -1 : 1));
+};
+
 const renderFactoryCall = (config: BrandedNumberConfig): string => {
   const destructured = destructureEntries(config)
     .map((e) =>
@@ -92,6 +125,88 @@ const renderFactoryCall = (config: BrandedNumberConfig): string => {
     '} as const);',
   ].join('\n');
 };
+
+// ---------------------------------------------------------------------------
+// JSDoc rendering with prose wrapping
+// ---------------------------------------------------------------------------
+
+const wrapText = (text: string, width: number): readonly string[] => {
+  const words = text.split(' ');
+
+  const { lines, current } = words.reduce<
+    Readonly<{
+      lines: readonly string[];
+      current: string;
+    }>
+  >(
+    (acc, word) => {
+      if (acc.current === '') {
+        return { lines: acc.lines, current: word };
+      }
+
+      const candidate = `${acc.current} ${word}` as const;
+
+      return candidate.length <= width
+        ? { lines: acc.lines, current: candidate }
+        : { lines: [...acc.lines, acc.current], current: word };
+    },
+    { lines: [], current: '' },
+  );
+
+  return current === '' ? lines : [...lines, current];
+};
+
+const renderJsDoc = (
+  prose: MethodProse,
+  indentLevel: number,
+  withExample: boolean,
+): string => {
+  const indent = '  '.repeat(indentLevel);
+
+  const textWidth = 80 - indent.length - 3; // account for ` * `
+
+  const descriptionLines = prose.description
+    .split('\n\n')
+    .map((para) => (para === '' ? [''] : wrapText(para, textWidth)))
+    .reduce<readonly string[]>(
+      (acc, para, index) => (index === 0 ? para : [...acc, '', ...para]),
+      [],
+    );
+
+  const tagLines = [
+    ...prose.params.map((p) => `@param ${p.name} - ${p.desc}`),
+    ...(prose.returns !== undefined
+      ? ([`@returns ${prose.returns}`] as const)
+      : ([] as const)),
+    ...(prose.throws !== undefined
+      ? ([`@throws ${prose.throws}`] as const)
+      : ([] as const)),
+    ...(prose.see !== undefined
+      ? ([`@see ${prose.see}`] as const)
+      : ([] as const)),
+  ] as const;
+
+  const body: readonly string[] = [
+    ...descriptionLines,
+    ...(withExample
+      ? (['', '@example', '', '```ts', '```'] as const)
+      : ([] as const)),
+    ...(Arr.isNonEmpty(tagLines) ? ([''] as const) : ([] as const)),
+    ...tagLines,
+  ] as const;
+
+  return [
+    `${indent}/**`,
+    ...body.map((line) =>
+      line === '' ? `${indent} *` : `${indent} * ${line}`,
+    ),
+    `${indent} */`,
+  ].join('\n');
+};
+
+// ---------------------------------------------------------------------------
+// Top-level functions and the namespace
+// ---------------------------------------------------------------------------
 
 const renderTopLevel = (
   config: BrandedNumberConfig,
@@ -168,31 +283,6 @@ const renderExpectType = (config: BrandedNumberConfig): readonly string[] => {
 // ---------------------------------------------------------------------------
 
 type EnumSpec = Readonly<{ wideBase: string; hasAbs: boolean }>;
-
-const renderEnumModule = (
-  config: BrandedNumberConfig,
-  enumSpec: EnumSpec,
-): string =>
-  [
-    renderEnumImports(config, enumSpec),
-    '',
-    `export type ${config.pascalName} = TtfImported_${config.ttfType};`,
-    '',
-    `const typeNameInMessage = '${config.typeNameInMessage}';`,
-    '',
-    renderEnumFactory(config, enumSpec),
-    '',
-    renderEnumWrappers(config, enumSpec),
-    '',
-    renderTopLevel(config, 'guard'),
-    '',
-    renderTopLevel(config, 'cast'),
-    '',
-    renderNamespace(config),
-    '',
-    renderEnumExpectType(config, enumSpec),
-    '',
-  ].join('\n');
 
 const renderEnumImports = (
   config: BrandedNumberConfig,
@@ -279,119 +369,33 @@ const renderEnumExpectType = (
     ">('=');",
   ].join('\n');
 
-// ---------------------------------------------------------------------------
-// JSDoc rendering with prose wrapping
-// ---------------------------------------------------------------------------
-
-const renderJsDoc = (
-  prose: MethodProse,
-  indentLevel: number,
-  withExample: boolean,
-): string => {
-  const indent = '  '.repeat(indentLevel);
-
-  const textWidth = 80 - indent.length - 3; // account for ` * `
-
-  const descriptionLines = prose.description
-    .split('\n\n')
-    .map((para) => (para === '' ? [''] : wrapText(para, textWidth)))
-    .reduce<readonly string[]>(
-      (acc, para, index) => (index === 0 ? para : [...acc, '', ...para]),
-      [],
-    );
-
-  const tagLines = [
-    ...prose.params.map((p) => `@param ${p.name} - ${p.desc}`),
-    ...(prose.returns !== undefined
-      ? ([`@returns ${prose.returns}`] as const)
-      : ([] as const)),
-    ...(prose.throws !== undefined
-      ? ([`@throws ${prose.throws}`] as const)
-      : ([] as const)),
-    ...(prose.see !== undefined
-      ? ([`@see ${prose.see}`] as const)
-      : ([] as const)),
-  ] as const;
-
-  const body: readonly string[] = [
-    ...descriptionLines,
-    ...(withExample
-      ? (['', '@example', '', '```ts', '```'] as const)
-      : ([] as const)),
-    ...(Arr.isNonEmpty(tagLines) ? ([''] as const) : ([] as const)),
-    ...tagLines,
-  ] as const;
-
-  return [
-    `${indent}/**`,
-    ...body.map((line) =>
-      line === '' ? `${indent} *` : `${indent} * ${line}`,
-    ),
-    `${indent} */`,
+const renderEnumModule = (
+  config: BrandedNumberConfig,
+  enumSpec: EnumSpec,
+): string =>
+  [
+    renderEnumImports(config, enumSpec),
+    '',
+    `export type ${config.pascalName} = TtfImported_${config.ttfType};`,
+    '',
+    `const typeNameInMessage = '${config.typeNameInMessage}';`,
+    '',
+    renderEnumFactory(config, enumSpec),
+    '',
+    renderEnumWrappers(config, enumSpec),
+    '',
+    renderTopLevel(config, 'guard'),
+    '',
+    renderTopLevel(config, 'cast'),
+    '',
+    renderNamespace(config),
+    '',
+    renderEnumExpectType(config, enumSpec),
+    '',
   ].join('\n');
-};
-
-const wrapText = (text: string, width: number): readonly string[] => {
-  const words = text.split(' ');
-
-  const { lines, current } = words.reduce<
-    Readonly<{
-      lines: readonly string[];
-      current: string;
-    }>
-  >(
-    (acc, word) => {
-      if (acc.current === '') {
-        return { lines: acc.lines, current: word };
-      }
-
-      const candidate = `${acc.current} ${word}` as const;
-
-      return candidate.length <= width
-        ? { lines: acc.lines, current: candidate }
-        : { lines: [...acc.lines, acc.current], current: word };
-    },
-    { lines: [], current: '' },
-  );
-
-  return current === '' ? lines : [...lines, current];
-};
 
 // ---------------------------------------------------------------------------
 // Structural helpers
 // ---------------------------------------------------------------------------
 
 type DestructureEntry = Readonly<{ factoryOp: string; localName: string }>;
-
-const destructureEntries = (
-  config: BrandedNumberConfig,
-): readonly DestructureEntry[] => {
-  const customKeys = new Set(config.customKeys);
-
-  const fromKeys = config.namespaceKeys
-    .filter((key: string) => !customKeys.has(key))
-    .map((key: string) => ({
-      factoryOp: factoryOpFor(key, config.randomNonZero ?? false),
-      localName: namespaceLocalName(key),
-    }));
-
-  const all = [
-    ...fromKeys,
-    { factoryOp: 'castType', localName: 'castType' },
-  ] as const;
-
-  const deduped = all.filter(
-    (e, i) => all.findIndex((x) => x.factoryOp === e.factoryOp) === i,
-  );
-
-  // Code-unit (ASCII) order to match the hand-written destructuring in the
-  // source modules; `localeCompare` would reorder the upper-case constants.
-  // eslint-disable-next-line unicorn/prefer-simple-sort-comparator
-  return deduped.toSorted((a, b) => (a.factoryOp < b.factoryOp ? -1 : 1));
-};
-
-const factoryOpFor = (key: string, nonZero: boolean): string =>
-  key === 'random' ? (nonZero ? 'randomNonZero' : 'random') : key;
-
-const namespaceLocalName = (key: string): string =>
-  key === 'min' ? 'min_' : key === 'max' ? 'max_' : key;

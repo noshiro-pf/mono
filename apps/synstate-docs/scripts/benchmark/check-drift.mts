@@ -110,6 +110,82 @@ type Results = Readonly<
 
 type Judged = Readonly<{ drifted: boolean; rows: readonly string[] }>;
 
+/** `''` for a single-point scenario, the sweep's labels for a swept one. */
+const pointsOf = (results: Results): readonly string[] =>
+  results.kind === 'stats' ? ([''] as const) : results.xLabels;
+
+const valueAt = (
+  results: Results,
+  label: string,
+  point: string,
+): number | undefined => {
+  if (results.kind === 'stats') {
+    return results.rows.find((r) => r.label === label)?.median;
+  }
+
+  const index = results.xLabels.indexOf(point);
+
+  if (index === -1) {
+    return undefined;
+  }
+
+  return (
+    results.series.find((s) => s.label === label)?.values[index] ?? undefined
+  );
+};
+
+/**
+ * The geometric mean of reference / committed over the points both measured.
+ *
+ * Geometric because the points of a sweep span three orders of magnitude, and
+ * an arithmetic mean would be the largest point's ratio alone. A point that
+ * timed out on either side says nothing about the ratio and is left out.
+ */
+const changeOf = (
+  label: string,
+  reference: Results,
+  committed: Results,
+): number | undefined => {
+  const logs = Arr.generate(function* () {
+    for (const point of pointsOf(reference)) {
+      const r = valueAt(reference, label, point);
+
+      const c = valueAt(committed, label, point);
+
+      if (r !== undefined && c !== undefined && r > 0 && Num.isNonZero(c)) {
+        yield Math.log(Num.div(r, c));
+      }
+    }
+  });
+
+  return Arr.isNonEmpty(logs)
+    ? Math.exp(Num.div(Arr.sum(logs), Arr.length(logs)))
+    : undefined;
+};
+
+const median = (values: readonly number[]): number | undefined => {
+  const sorted = values.toSorted((a, b) => a - b);
+
+  const mid = Math.floor(sorted.length / 2);
+
+  const upper = sorted[mid];
+
+  if (upper === undefined) {
+    return undefined;
+  }
+
+  const lower = sorted[mid - 1];
+
+  return lower === undefined || sorted.length % 2 === 1
+    ? upper
+    : Num.div(lower + upper, 2);
+};
+
+const labelsOf = (results: Results): readonly string[] =>
+  results.kind === 'stats'
+    ? results.rows.map((r) => r.label)
+    : results.series.map((s) => s.label);
+
 const judgeScenario = (
   scenario: Scenario,
   reference: Results | undefined,
@@ -166,53 +242,6 @@ const judgeScenario = (
   };
 };
 
-/**
- * The geometric mean of reference / committed over the points both measured.
- *
- * Geometric because the points of a sweep span three orders of magnitude, and
- * an arithmetic mean would be the largest point's ratio alone. A point that
- * timed out on either side says nothing about the ratio and is left out.
- */
-const changeOf = (
-  label: string,
-  reference: Results,
-  committed: Results,
-): number | undefined => {
-  const logs = Arr.generate(function* () {
-    for (const point of pointsOf(reference)) {
-      const r = valueAt(reference, label, point);
-
-      const c = valueAt(committed, label, point);
-
-      if (r !== undefined && c !== undefined && r > 0 && Num.isNonZero(c)) {
-        yield Math.log(Num.div(r, c));
-      }
-    }
-  });
-
-  return Arr.isNonEmpty(logs)
-    ? Math.exp(Num.div(Arr.sum(logs), Arr.length(logs)))
-    : undefined;
-};
-
-const median = (values: readonly number[]): number | undefined => {
-  const sorted = values.toSorted((a, b) => a - b);
-
-  const mid = Math.floor(sorted.length / 2);
-
-  const upper = sorted[mid];
-
-  if (upper === undefined) {
-    return undefined;
-  }
-
-  const lower = sorted[mid - 1];
-
-  return lower === undefined || sorted.length % 2 === 1
-    ? upper
-    : Num.div(lower + upper, 2);
-};
-
 const readScenario = async (
   dir: string,
   file: string,
@@ -226,35 +255,6 @@ const readScenario = async (
     ? undefined
     : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (JSON.parse(read.value) as unknown as Results);
-};
-
-const labelsOf = (results: Results): readonly string[] =>
-  results.kind === 'stats'
-    ? results.rows.map((r) => r.label)
-    : results.series.map((s) => s.label);
-
-/** `''` for a single-point scenario, the sweep's labels for a swept one. */
-const pointsOf = (results: Results): readonly string[] =>
-  results.kind === 'stats' ? ([''] as const) : results.xLabels;
-
-const valueAt = (
-  results: Results,
-  label: string,
-  point: string,
-): number | undefined => {
-  if (results.kind === 'stats') {
-    return results.rows.find((r) => r.label === label)?.median;
-  }
-
-  const index = results.xLabels.indexOf(point);
-
-  if (index === -1) {
-    return undefined;
-  }
-
-  return (
-    results.series.find((s) => s.label === label)?.values[index] ?? undefined
-  );
 };
 
 await main();

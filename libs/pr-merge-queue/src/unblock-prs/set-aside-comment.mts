@@ -66,14 +66,6 @@ export const setAsideCommentBody = (
   );
 };
 
-/** What takes the set-aside off, as the comment's last sentence. */
-const stays = (reason: SkipRecord['reason'], defaultBranch: string): string =>
-  reason === 'checks-failed'
-    ? 'It stays aside until the branch is pushed again: rebasing it would only put the same failing checks through again.'
-    : reason === 'awaiting-bypass'
-      ? (`It stays aside until the branch is pushed again: rebasing it would only put the same checks through again. Tick the retry box to have it rebased and checked on the current \`${defaultBranch}\`.` as const)
-      : (`It stays aside until the branch is pushed again or \`${defaultBranch}\` moves.` as const);
-
 /** The one line a comment is rewritten to: what it was, what ended it, when. */
 export const resolvedCommentBody = (
   setAside: SetAside,
@@ -100,6 +92,14 @@ export const describeResolvedBy = (
       return 'a retry was asked for';
   }
 };
+
+/** What takes the set-aside off, as the comment's last sentence. */
+const stays = (reason: SkipRecord['reason'], defaultBranch: string): string =>
+  reason === 'checks-failed'
+    ? 'It stays aside until the branch is pushed again: rebasing it would only put the same failing checks through again.'
+    : reason === 'awaiting-bypass'
+      ? (`It stays aside until the branch is pushed again: rebasing it would only put the same checks through again. Tick the retry box to have it rebased and checked on the current \`${defaultBranch}\`.` as const)
+      : (`It stays aside until the branch is pushed again or \`${defaultBranch}\` moves.` as const);
 
 /** What ended a set-aside, as the resolved line says it. */
 export type ResolvedBy = 'base-moved' | 'pushed' | 'retry';

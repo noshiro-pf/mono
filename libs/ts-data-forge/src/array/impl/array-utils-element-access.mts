@@ -53,17 +53,6 @@ export function at<E>(
   }
 }
 
-const atImpl = <E,>(
-  array: readonly E[],
-  index: SizeType.ArgArrWithNegative,
-): Optional<E> =>
-  pipe(index < 0 ? array.length + index : index).map((normalizedIndex) =>
-    normalizedIndex < 0 || array.length <= normalizedIndex
-      ? Optional.none
-      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        Optional.some(array[normalizedIndex]!),
-  ).value;
-
 /**
  * Returns the first element of an array as an Optional.
  *
@@ -125,6 +114,17 @@ export const last = <const Ar extends readonly unknown[]>(
       : Optional<Ar[number]> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   (array.length === 0 ? Optional.none : Optional.some(array.at(-1))) as never;
+
+const atImpl = <E,>(
+  array: readonly E[],
+  index: SizeType.ArgArrWithNegative,
+): Optional<E> =>
+  pipe(index < 0 ? array.length + index : index).map((normalizedIndex) =>
+    normalizedIndex < 0 || array.length <= normalizedIndex
+      ? Optional.none
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        Optional.some(array[normalizedIndex]!),
+  ).value;
 
 /**
  * Alias for `head`.

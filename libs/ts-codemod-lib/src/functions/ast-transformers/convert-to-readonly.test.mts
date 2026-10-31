@@ -14,39 +14,6 @@ import {
 } from './convert-to-readonly.mjs';
 import { transformSourceCode } from './transform-source-code.mjs';
 
-const testFn = async ({
-  source,
-  expected,
-  debug,
-  options,
-  isTsx = false,
-}: Readonly<{
-  source: string;
-  expected: string;
-  debug?: boolean;
-  options?: ReadonlyTransformerOptions;
-  isTsx?: boolean;
-}>): Promise<void> => {
-  if (debug !== true) {
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
-    vi.spyOn(console, 'debug').mockImplementation(() => {});
-
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
-    vi.spyOn(console, 'trace').mockImplementation(() => {});
-  }
-
-  const transformedCodeRaw = await formatter(
-    transformSourceCode(source, isTsx, [convertToReadonlyTransformer(options)]),
-  );
-
-  const expectedFormatted = await formatter(expected);
-
-  expect(transformedCodeRaw).toBe(expectedFormatted);
-};
-
 /**
  * Normalizes whitespace in a code string, primarily for comparing AST structure outputs.
  * - Preserves newlines immediately following line comments (`//`).
@@ -91,6 +58,39 @@ const formatter = async (code: string): Promise<string> => {
     parser: 'typescript',
     plugins: [prettierPluginTypeScript, prettierPluginEstree],
   });
+};
+
+const testFn = async ({
+  source,
+  expected,
+  debug,
+  options,
+  isTsx = false,
+}: Readonly<{
+  source: string;
+  expected: string;
+  debug?: boolean;
+  options?: ReadonlyTransformerOptions;
+  isTsx?: boolean;
+}>): Promise<void> => {
+  if (debug !== true) {
+    // eslint-disable-next-line vitest/no-restricted-vi-methods
+    vi.spyOn(console, 'debug').mockImplementation(() => {});
+
+    // eslint-disable-next-line vitest/no-restricted-vi-methods
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    // eslint-disable-next-line vitest/no-restricted-vi-methods
+    vi.spyOn(console, 'trace').mockImplementation(() => {});
+  }
+
+  const transformedCodeRaw = await formatter(
+    transformSourceCode(source, isTsx, [convertToReadonlyTransformer(options)]),
+  );
+
+  const expectedFormatted = await formatter(expected);
+
+  expect(transformedCodeRaw).toBe(expectedFormatted);
 };
 
 describe(convertToReadonlyTransformer, () => {

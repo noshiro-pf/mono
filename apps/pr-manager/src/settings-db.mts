@@ -48,17 +48,6 @@ const DATABASE = 'pr-manager-app';
 
 const STORE = 'settings';
 
-const openDatabase = (): Promise<IDBDatabase> =>
-  settled(() => {
-    const request = indexedDB.open(DATABASE, 1);
-
-    request.addEventListener('upgradeneeded', () => {
-      request.result.createObjectStore(STORE);
-    });
-
-    return request;
-  });
-
 /** What the request `send` makes answers, as a promise. */
 const settled = <T,>(send: () => IDBRequest<T>): Promise<T> =>
   new Promise((resolve, reject) => {
@@ -71,4 +60,15 @@ const settled = <T,>(send: () => IDBRequest<T>): Promise<T> =>
     request.addEventListener('error', () => {
       reject(request.error ?? new Error('IndexedDB request failed'));
     });
+  });
+
+const openDatabase = (): Promise<IDBDatabase> =>
+  settled(() => {
+    const request = indexedDB.open(DATABASE, 1);
+
+    request.addEventListener('upgradeneeded', () => {
+      request.result.createObjectStore(STORE);
+    });
+
+    return request;
   });

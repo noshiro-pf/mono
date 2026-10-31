@@ -74,6 +74,9 @@ const operatorText = (
 ): string =>
   operator === SyntaxKind.AmpersandAmpersandEqualsToken ? '&&=' : '||=';
 
+const isBooleanLike = (type: Type): boolean =>
+  (type.flags & TypeFlags.BooleanLike) !== 0;
+
 /**
  * Whether the operand's type is boolean, `true`, `false`, or a union of
  * those, at every layer of its type wrappers. `TypeFlags.BooleanLike` covers
@@ -103,6 +106,3 @@ const isBooleanTyped = (
         : isBooleanLike(type))
     );
   });
-
-const isBooleanLike = (type: Type): boolean =>
-  (type.flags & TypeFlags.BooleanLike) !== 0;

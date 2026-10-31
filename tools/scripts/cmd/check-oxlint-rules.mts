@@ -89,6 +89,32 @@ const lintScriptPrefixes = {
 const depsBuiltGuardPrefix =
   /^node (?:\.\.\/)+tools\/scripts\/cmd\/assert-deps-built\.mts && /u;
 
+const readScripts = async (
+  dir: string,
+): Promise<ReadonlyRecord<string, unknown>> => {
+  const manifest: unknown = JSON.parse(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- the package.json of a workspace member git lists
+    await fs.readFile(
+      path.resolve(projectRootPath, dir, 'package.json'),
+      'utf8',
+    ),
+  );
+
+  return isRecord(manifest) &&
+    hasKey(manifest, 'scripts') &&
+    isRecord(manifest.scripts)
+    ? manifest.scripts
+    : {};
+};
+
+const git = (
+  args: readonly string[],
+  cwd: string = projectRootPath,
+): readonly string[] =>
+  execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 2 ** 28 })
+    .split('\n')
+    .filter((line) => line !== '');
+
 /** The packages `ws:fix:lint` reaches: every member with a `fix:lint`. */
 const listLintedPackages = async (): Promise<readonly string[]> => {
   const manifests = git(['ls-files', '*/package.json'])
@@ -104,50 +130,41 @@ const listLintedPackages = async (): Promise<readonly string[]> => {
   return withFixLint.flat().toSorted();
 };
 
-const checkPackage = async (dir: string): Promise<PackageResult> => {
-  const scripts = await readScripts(dir);
+const ruleEntry = (ruleId: string): unknown =>
+  hasKey(eslintRulesMovedToOxlint, ruleId)
+    ? eslintRulesMovedToOxlint[ruleId]
+    : undefined;
 
-  const scriptViolations = Arr.generate(function* () {
-    for (const [name, prefix] of Object.entries(lintScriptPrefixes)) {
-      const script: unknown = scripts[name];
+const severityNumber = (severity: unknown): unknown => {
+  switch (severity) {
+    case 'off':
+      return 0;
 
-      if (
-        !isString(script) ||
-        !script.replace(depsBuiltGuardPrefix, '').startsWith(prefix)
-      ) {
-        yield `${dir}/package.json: "${name}" must start with \`${prefix}\`.`;
-      }
-    }
-  });
+    case 'warn':
+      return 1;
 
-  const configModule: unknown = await import(
-    pathToFileURL(path.join(projectRootPath, dir, 'eslint.config.mts')).href
-  );
+    case 'error':
+      return 2;
 
-  const configs: unknown =
-    isRecord(configModule) && hasKey(configModule, 'default')
-      ? configModule.default
-      : undefined;
-
-  if (!Arr.isArray(configs) || configs.at(-1) !== eslintConfigOffForOxlint) {
-    return {
-      problems: Arr.toPushed(
-        scriptViolations,
-        `${dir}/eslint.config.mts: the exported array must end with \`eslintConfigOffForOxlint\`.`,
-      ),
-      mismatches: [],
-    };
+    default:
+      return severity;
   }
+};
 
-  const resolved = await checkResolvedRules(
-    dir,
-    configs.filter((config) => config !== eslintConfigOffForOxlint),
+/** ESLint resolves a severity to a number; the table writes it as a word. */
+const isSameEntry = (actual: unknown, expected: unknown): boolean => {
+  const [actualSeverity, ...actualOptions] = Arr.isArray(actual)
+    ? actual
+    : ([actual] as const);
+
+  const [expectedSeverity, ...expectedOptions] = Arr.isArray(expected)
+    ? expected
+    : ([expected] as const);
+
+  return (
+    severityNumber(actualSeverity) === severityNumber(expectedSeverity) &&
+    fastDeepEqual(actualOptions, expectedOptions)
   );
-
-  return {
-    problems: [...scriptViolations, ...resolved.problems],
-    mismatches: resolved.mismatches,
-  };
 };
 
 /**
@@ -227,6 +244,52 @@ const checkResolvedRules = async (
   };
 };
 
+const checkPackage = async (dir: string): Promise<PackageResult> => {
+  const scripts = await readScripts(dir);
+
+  const scriptViolations = Arr.generate(function* () {
+    for (const [name, prefix] of Object.entries(lintScriptPrefixes)) {
+      const script: unknown = scripts[name];
+
+      if (
+        !isString(script) ||
+        !script.replace(depsBuiltGuardPrefix, '').startsWith(prefix)
+      ) {
+        yield `${dir}/package.json: "${name}" must start with \`${prefix}\`.`;
+      }
+    }
+  });
+
+  const configModule: unknown = await import(
+    pathToFileURL(path.join(projectRootPath, dir, 'eslint.config.mts')).href
+  );
+
+  const configs: unknown =
+    isRecord(configModule) && hasKey(configModule, 'default')
+      ? configModule.default
+      : undefined;
+
+  if (!Arr.isArray(configs) || configs.at(-1) !== eslintConfigOffForOxlint) {
+    return {
+      problems: Arr.toPushed(
+        scriptViolations,
+        `${dir}/eslint.config.mts: the exported array must end with \`eslintConfigOffForOxlint\`.`,
+      ),
+      mismatches: [],
+    };
+  }
+
+  const resolved = await checkResolvedRules(
+    dir,
+    configs.filter((config) => config !== eslintConfigOffForOxlint),
+  );
+
+  return {
+    problems: [...scriptViolations, ...resolved.problems],
+    mismatches: resolved.mismatches,
+  };
+};
+
 /** One line per rule, however many packages it differs in. */
 const describeMismatches = (
   mismatches: readonly Mismatch[],
@@ -244,6 +307,28 @@ const describeMismatches = (
       ];
     },
   );
+
+/** `path:line:text` → [`path:line`, `text`]. */
+const splitGrepLine = (line: string): FixedLengthTuple<2, string> => {
+  const [file = '', lineNumber = '', ...text] = line.split(':');
+
+  return [`${file}:${lineNumber}`, text.join(':')];
+};
+
+/** `git grep`, for which no match is exit status 1 rather than a failure. */
+const gitGrep = (args: readonly string[]): readonly string[] => {
+  const result = spawnSync('git', Arr.toUnshifted('grep')(args), {
+    cwd: projectRootPath,
+    encoding: 'utf8',
+    maxBuffer: 2 ** 28,
+  });
+
+  if (result.status !== 0 && result.status !== 1) {
+    throw new Error(`git grep failed: ${result.stderr}`);
+  }
+
+  return result.stdout.split('\n').filter((line) => line !== '');
+};
 
 /** An `eslint-disable` comment that names a moved rule anywhere ESLint lints. */
 const findEslintDisableDirectives = (): readonly string[] => {
@@ -283,91 +368,6 @@ const findEslintDisableDirectives = (): readonly string[] => {
       );
   });
 };
-
-const ruleEntry = (ruleId: string): unknown =>
-  hasKey(eslintRulesMovedToOxlint, ruleId)
-    ? eslintRulesMovedToOxlint[ruleId]
-    : undefined;
-
-/** ESLint resolves a severity to a number; the table writes it as a word. */
-const isSameEntry = (actual: unknown, expected: unknown): boolean => {
-  const [actualSeverity, ...actualOptions] = Arr.isArray(actual)
-    ? actual
-    : ([actual] as const);
-
-  const [expectedSeverity, ...expectedOptions] = Arr.isArray(expected)
-    ? expected
-    : ([expected] as const);
-
-  return (
-    severityNumber(actualSeverity) === severityNumber(expectedSeverity) &&
-    fastDeepEqual(actualOptions, expectedOptions)
-  );
-};
-
-const severityNumber = (severity: unknown): unknown => {
-  switch (severity) {
-    case 'off':
-      return 0;
-
-    case 'warn':
-      return 1;
-
-    case 'error':
-      return 2;
-
-    default:
-      return severity;
-  }
-};
-
-const readScripts = async (
-  dir: string,
-): Promise<ReadonlyRecord<string, unknown>> => {
-  const manifest: unknown = JSON.parse(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- the package.json of a workspace member git lists
-    await fs.readFile(
-      path.resolve(projectRootPath, dir, 'package.json'),
-      'utf8',
-    ),
-  );
-
-  return isRecord(manifest) &&
-    hasKey(manifest, 'scripts') &&
-    isRecord(manifest.scripts)
-    ? manifest.scripts
-    : {};
-};
-
-/** `path:line:text` → [`path:line`, `text`]. */
-const splitGrepLine = (line: string): FixedLengthTuple<2, string> => {
-  const [file = '', lineNumber = '', ...text] = line.split(':');
-
-  return [`${file}:${lineNumber}`, text.join(':')];
-};
-
-/** `git grep`, for which no match is exit status 1 rather than a failure. */
-const gitGrep = (args: readonly string[]): readonly string[] => {
-  const result = spawnSync('git', Arr.toUnshifted('grep')(args), {
-    cwd: projectRootPath,
-    encoding: 'utf8',
-    maxBuffer: 2 ** 28,
-  });
-
-  if (result.status !== 0 && result.status !== 1) {
-    throw new Error(`git grep failed: ${result.stderr}`);
-  }
-
-  return result.stdout.split('\n').filter((line) => line !== '');
-};
-
-const git = (
-  args: readonly string[],
-  cwd: string = projectRootPath,
-): readonly string[] =>
-  execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 2 ** 28 })
-    .split('\n')
-    .filter((line) => line !== '');
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkOxlintRules().catch((error: unknown) =>

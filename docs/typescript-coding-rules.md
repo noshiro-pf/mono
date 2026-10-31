@@ -70,18 +70,26 @@ See also: [TypeScript Issue #52375](https://github.com/microsoft/TypeScript/issu
 
 ## File organization
 
-Organize a file top-down, so that reading downward follows the definitions in
-the order a reader traces them: the main logic first, then the details.
+Organize a file top-down, so that reading downward starts from the main logic:
+the entry point and the public API first, then the details. Among the helpers
+the order turns around: a helper comes before the helpers that call it, so
+that each one is read after what it is built from.
 
 1. **main function** — the entry point, at the top
 2. **exported functions and definitions** — the public API
 3. **type definitions** used by the above
 4. **constants and settings**
 5. **helper functions**, by call level, lower-level helpers before their
-   callers
-6. **utility functions** — the lowest level
+   callers — utility functions, the lowest level, before the helpers that call
+   them
 
 Exported functions and components come immediately after the imports.
+
+`ts-restrictions/function-order` checks the functions in this order: exported
+ones before the non-exported helpers, and each helper before the helpers that
+call it. A non-exported function referred to outside every function body (a
+`main()` called at the top level) is left where it is, and types and constants are not
+checked.
 
 ### React component files
 

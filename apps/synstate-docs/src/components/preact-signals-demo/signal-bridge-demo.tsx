@@ -29,11 +29,6 @@ const inputLength$ = input$.pipe(map((s) => s.length));
 
 const inputLengthSignal = toSignal(inputLength$);
 
-const handleInput: InputEventHandler<HTMLInputElement> = (e) => {
-  // eslint-disable-next-line functional/immutable-data
-  inputSignal.value = e.currentTarget.value;
-};
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -87,6 +82,11 @@ export const SignalBridgeDemo = (): preact.JSX.Element => (
     </div>
   </div>
 );
+
+const handleInput: InputEventHandler<HTMLInputElement> = (e) => {
+  // eslint-disable-next-line functional/immutable-data
+  inputSignal.value = e.currentTarget.value;
+};
 
 // embed-sample-code-ignore-below
 

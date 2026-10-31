@@ -85,6 +85,17 @@ export const generateRulesType = async (
   }
 };
 
+/** 生成対象として指定されたファイル名だけに絞り込む（未指定なら全件） */
+const filterTargetFiles = (
+  allFiles: readonly string[],
+  targetFileNames: NonEmptyArray<string> | undefined,
+): readonly string[] =>
+  targetFileNames === undefined
+    ? allFiles
+    : allFiles.filter((filePath) =>
+        targetFileNames.some((name) => filePath.endsWith(name)),
+      );
+
 /** 生成ファイルの ts-type-forge の import 文を、全型を含む形に戻す */
 const restoreTsTypeForgeImport = async (
   targetFileNames?: NonEmptyArray<string>,
@@ -180,6 +191,14 @@ const generate = async (
   return { type: 'ok' };
 };
 
+const readContents = (
+  filePaths: readonly string[],
+): Promise<readonly string[]> =>
+  Promise.all(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    filePaths.map((filePath) => fs.readFile(filePath, 'utf8')),
+  );
+
 /**
  * `oxlint --fix` until nothing is left to fix.
  *
@@ -250,25 +269,6 @@ const lintFix = async (
 };
 
 const maxLintFixRuns = 10;
-
-const readContents = (
-  filePaths: readonly string[],
-): Promise<readonly string[]> =>
-  Promise.all(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    filePaths.map((filePath) => fs.readFile(filePath, 'utf8')),
-  );
-
-/** 生成対象として指定されたファイル名だけに絞り込む（未指定なら全件） */
-const filterTargetFiles = (
-  allFiles: readonly string[],
-  targetFileNames: NonEmptyArray<string> | undefined,
-): readonly string[] =>
-  targetFileNames === undefined
-    ? allFiles
-    : allFiles.filter((filePath) =>
-        targetFileNames.some((name) => filePath.endsWith(name)),
-      );
 
 const applyTypeTransformationsForTargets = async (
   targetFileNames?: readonly string[],

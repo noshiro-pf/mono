@@ -53,6 +53,22 @@ type Case = Readonly<{
   expected: 'allowed' | 'denied';
 }>;
 
+/** The one document a case reads or writes in a project's collection. */
+const docIn = (projectId: string, collection: string): string =>
+  collection === 'settings'
+    ? (`projects/${projectId}/settings/dagLayout` as const)
+    : (`projects/${projectId}/${collection}/n1` as const);
+
+/** A personal project as the app creates it on first sign-in. */
+const project = (ownerUid: string): ReadonlyRecord<string, unknown> =>
+  ({
+    name: 'Project',
+    ownerUid,
+    memberUids: [ownerUid],
+    // The app writes a server timestamp; the rules do not read its type.
+    createdAt: 0,
+  }) as const;
+
 const cases = (): readonly Case[] => {
   const alice = { uid: 'alice', provider: 'google.com' } as const;
 
@@ -357,12 +373,6 @@ const firestoreFor = (actor: Actor): Firestore =>
       })
   ).firestore();
 
-/** The one document a case reads or writes in a project's collection. */
-const docIn = (projectId: string, collection: string): string =>
-  collection === 'settings'
-    ? (`projects/${projectId}/settings/dagLayout` as const)
-    : (`projects/${projectId}/${collection}/n1` as const);
-
 /**
  * Whether the rules let the operation through. Any error other than a
  * refusal by the rules is rethrown, so that a broken case does not pass as
@@ -387,13 +397,3 @@ const outcome = async (
     throw error;
   }
 };
-
-/** A personal project as the app creates it on first sign-in. */
-const project = (ownerUid: string): ReadonlyRecord<string, unknown> =>
-  ({
-    name: 'Project',
-    ownerUid,
-    memberUids: [ownerUid],
-    // The app writes a server timestamp; the rules do not read its type.
-    createdAt: 0,
-  }) as const;

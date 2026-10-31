@@ -44,117 +44,6 @@ import { convertLibEsnextFloat16 } from './lib.esnext.float16.mjs';
 import { convertLibEsNextIterator } from './lib.esnext.iterator.mjs';
 
 /**
- * Converts `Map.groupBy` (the `MapConstructor.groupBy` static). This shipped in
- * `lib.esnext.collection.d.ts` in TS 5.4–5.6 and was promoted to
- * `lib.es2024.collection.d.ts` in TS 5.7. The same transforms apply to both
- * locations, so both filenames route here. Pass `tolerant: true` for the
- * `esnext` layout so the rules become no-ops in TS 5.7+, where that file holds
- * the Set-method declarations instead and no longer contains `groupBy`.
- */
-const convertGroupByCollection = (
-  { config, brandedNumber }: ConverterOptions,
-  tolerant: boolean,
-): MonoTypeFunction<string> => {
-  const opt = tolerant ? ({ onNotFound: 'off' } as const) : undefined;
-
-  return composeMonoTypeFns(
-    config.returnType === 'readonly'
-      ? idFn
-      : replaceWithNoMatchCheck(
-          'ReadonlyMap<K, readonly T[]>;',
-          'Map<K, T[]>;',
-          opt,
-        ),
-    replaceWithNoMatchCheck(
-      'keySelector: (item: T, index: number) => K',
-      `keySelector: (item: T, index: ${brandedNumber.ArraySize}) => K`,
-      opt,
-    ),
-  );
-};
-
-/**
- * Converts `Object.groupBy` (the `ObjectConstructor.groupBy` static). Shipped
- * in `lib.esnext.object.d.ts` in TS 5.4–5.6 and promoted to
- * `lib.es2024.object.d.ts` in TS 5.7. See {@link convertGroupByCollection}.
- */
-const convertGroupByObject = (
-  { config, brandedNumber }: ConverterOptions,
-  tolerant: boolean,
-): MonoTypeFunction<string> => {
-  const opt = tolerant ? ({ onNotFound: 'off' } as const) : undefined;
-
-  return composeMonoTypeFns(
-    config.returnType === 'readonly'
-      ? idFn
-      : replaceWithNoMatchCheck(
-          'Partial<Record<K, readonly T[]>>',
-          'Partial<MutableRecord<K, T[]>>',
-          opt,
-        ),
-    replaceWithNoMatchCheck(
-      'keySelector: (item: T, index: number) => K',
-      `keySelector: (item: T, index: ${brandedNumber.ArraySize}) => K`,
-      opt,
-    ),
-  );
-};
-
-/**
- * Brands the length parameter of `String.prototype.padStart` / `padEnd`.
- * TypeScript 7.0 renamed that parameter from `maxLength` to `targetLength`
- * (aligning the lib with the spec), so the spelling actually present in the
- * file is detected first; every lib file carries exactly one of the two.
- */
-const convertLibEs2017String =
-  ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
-  (src) => {
-    const paramName = src.includes('targetLength: number')
-      ? 'targetLength'
-      : 'maxLength';
-
-    return replaceWithNoMatchCheck(
-      `${paramName}: number`,
-      `${paramName}: ${brandedNumber.StringSizeArgNonNegative}`,
-    )(src);
-  };
-
-/**
- * TypeScript 6.0 turned several lib files (`lib.dom.iterable.d.ts`,
- * `lib.dom.asynciterable.d.ts`, and their WebWorker counterparts) into stubs
- * whose real declarations were folded into the main `lib.dom.d.ts` /
- * `lib.webworker.d.ts`. Such a stub carries this marker comment in place of the
- * declarations the per-file transforms expect.
- */
-const stubFileMarker = 'contents are now included in the main types file';
-
-/**
- * Skip the given (per-file) transform for TypeScript 6.0 stub files, passing
- * their contents through unchanged, while the common transforms still run. Every
- * 5.x lib file is a non-stub and never contains {@link stubFileMarker}, so their
- * generated output is byte-for-byte unchanged.
- */
-const skipForStubFile =
-  (fn: MonoTypeFunction<string>): MonoTypeFunction<string> =>
-  (src) =>
-    src.includes(stubFileMarker) ? src : fn(src);
-
-/**
- * The notice that follows the Microsoft banner in every generated file. Each
- * file is published inside a bundle that also carries `LICENSE` and
- * `NOTICE`, which is where the derivation is spelled out once.
- */
-const modificationNotice = (filename: string): string =>
-  dedent`
-    /*
-     * Modified from TypeScript's \`${filename}\` by strict-ts-lib
-     * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
-     * stricter types. This is not the original file. See the NOTICE and LICENSE
-     * files of the package this ships in.
-     */
-  `;
-
-/**
  * The globals that `lib.dom.d.ts` and `lib.webworker.d.ts` both declare with
  * `declare var` — the members a window and a worker global scope share
  * (`navigator`, `location`, `crypto`, `self`, the `fetch`-family constructors,
@@ -183,27 +72,6 @@ export const sharedGlobalVarNames = (
     ),
   );
 };
-
-/**
- * Rewrites `declare var X` to `declare const X`, so that the type checker
- * rejects an assignment to a global — except for the names in `keepVar`.
- *
- * Only a `var` (or a function) declaration becomes a property of
- * `typeof globalThis`; a `const` does not. Every rewritten name therefore
- * disappears from `globalThis.X`, which is acceptable only where another
- * spelling reaches it in every realm that has it: `Number.NaN` for `NaN`, a
- * bare `Map`, `window.history` for what only a window has. A name a worker's
- * global scope declares too exists where there is no `window` at all — and
- * Node.js has `navigator`, `crypto` and `performance` as well — so `globalThis.X`
- * is its one portable spelling, and it stays a `var`. Reassigning it is left to
- * ESLint's `no-global-assign`.
- */
-const declareGlobalsConst =
-  (keepVar: ReadonlySet<string>): MonoTypeFunction<string> =>
-  (src) =>
-    src.replaceAll(/\bdeclare var ([\w$]+)/gu, (match, name: string) =>
-      keepVar.has(name) ? match : `declare const ${name}`,
-    );
 
 export const convert = (
   filename: string,
@@ -552,3 +420,135 @@ export const convert = (
       ),
     ).value;
 };
+
+/**
+ * Converts `Map.groupBy` (the `MapConstructor.groupBy` static). This shipped in
+ * `lib.esnext.collection.d.ts` in TS 5.4–5.6 and was promoted to
+ * `lib.es2024.collection.d.ts` in TS 5.7. The same transforms apply to both
+ * locations, so both filenames route here. Pass `tolerant: true` for the
+ * `esnext` layout so the rules become no-ops in TS 5.7+, where that file holds
+ * the Set-method declarations instead and no longer contains `groupBy`.
+ */
+const convertGroupByCollection = (
+  { config, brandedNumber }: ConverterOptions,
+  tolerant: boolean,
+): MonoTypeFunction<string> => {
+  const opt = tolerant ? ({ onNotFound: 'off' } as const) : undefined;
+
+  return composeMonoTypeFns(
+    config.returnType === 'readonly'
+      ? idFn
+      : replaceWithNoMatchCheck(
+          'ReadonlyMap<K, readonly T[]>;',
+          'Map<K, T[]>;',
+          opt,
+        ),
+    replaceWithNoMatchCheck(
+      'keySelector: (item: T, index: number) => K',
+      `keySelector: (item: T, index: ${brandedNumber.ArraySize}) => K`,
+      opt,
+    ),
+  );
+};
+
+/**
+ * Converts `Object.groupBy` (the `ObjectConstructor.groupBy` static). Shipped
+ * in `lib.esnext.object.d.ts` in TS 5.4–5.6 and promoted to
+ * `lib.es2024.object.d.ts` in TS 5.7. See {@link convertGroupByCollection}.
+ */
+const convertGroupByObject = (
+  { config, brandedNumber }: ConverterOptions,
+  tolerant: boolean,
+): MonoTypeFunction<string> => {
+  const opt = tolerant ? ({ onNotFound: 'off' } as const) : undefined;
+
+  return composeMonoTypeFns(
+    config.returnType === 'readonly'
+      ? idFn
+      : replaceWithNoMatchCheck(
+          'Partial<Record<K, readonly T[]>>',
+          'Partial<MutableRecord<K, T[]>>',
+          opt,
+        ),
+    replaceWithNoMatchCheck(
+      'keySelector: (item: T, index: number) => K',
+      `keySelector: (item: T, index: ${brandedNumber.ArraySize}) => K`,
+      opt,
+    ),
+  );
+};
+
+/**
+ * Brands the length parameter of `String.prototype.padStart` / `padEnd`.
+ * TypeScript 7.0 renamed that parameter from `maxLength` to `targetLength`
+ * (aligning the lib with the spec), so the spelling actually present in the
+ * file is detected first; every lib file carries exactly one of the two.
+ */
+const convertLibEs2017String =
+  ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
+  (src) => {
+    const paramName = src.includes('targetLength: number')
+      ? 'targetLength'
+      : 'maxLength';
+
+    return replaceWithNoMatchCheck(
+      `${paramName}: number`,
+      `${paramName}: ${brandedNumber.StringSizeArgNonNegative}`,
+    )(src);
+  };
+
+/**
+ * TypeScript 6.0 turned several lib files (`lib.dom.iterable.d.ts`,
+ * `lib.dom.asynciterable.d.ts`, and their WebWorker counterparts) into stubs
+ * whose real declarations were folded into the main `lib.dom.d.ts` /
+ * `lib.webworker.d.ts`. Such a stub carries this marker comment in place of the
+ * declarations the per-file transforms expect.
+ */
+const stubFileMarker = 'contents are now included in the main types file';
+
+/**
+ * Skip the given (per-file) transform for TypeScript 6.0 stub files, passing
+ * their contents through unchanged, while the common transforms still run. Every
+ * 5.x lib file is a non-stub and never contains {@link stubFileMarker}, so their
+ * generated output is byte-for-byte unchanged.
+ */
+const skipForStubFile =
+  (fn: MonoTypeFunction<string>): MonoTypeFunction<string> =>
+  (src) =>
+    src.includes(stubFileMarker) ? src : fn(src);
+
+/**
+ * The notice that follows the Microsoft banner in every generated file. Each
+ * file is published inside a bundle that also carries `LICENSE` and
+ * `NOTICE`, which is where the derivation is spelled out once.
+ */
+const modificationNotice = (filename: string): string =>
+  dedent`
+    /*
+     * Modified from TypeScript's \`${filename}\` by strict-ts-lib
+     * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
+     * stricter types. This is not the original file. See the NOTICE and LICENSE
+     * files of the package this ships in.
+     */
+  `;
+
+/**
+ * Rewrites `declare var X` to `declare const X`, so that the type checker
+ * rejects an assignment to a global — except for the names in `keepVar`.
+ *
+ * Only a `var` (or a function) declaration becomes a property of
+ * `typeof globalThis`; a `const` does not. Every rewritten name therefore
+ * disappears from `globalThis.X`, which is acceptable only where another
+ * spelling reaches it in every realm that has it: `Number.NaN` for `NaN`, a
+ * bare `Map`, `window.history` for what only a window has. A name a worker's
+ * global scope declares too exists where there is no `window` at all — and
+ * Node.js has `navigator`, `crypto` and `performance` as well — so `globalThis.X`
+ * is its one portable spelling, and it stays a `var`. Reassigning it is left to
+ * ESLint's `no-global-assign`.
+ */
+const declareGlobalsConst =
+  (keepVar: ReadonlySet<string>): MonoTypeFunction<string> =>
+  (src) =>
+    src.replaceAll(/\bdeclare var ([\w$]+)/gu, (match, name: string) =>
+      keepVar.has(name) ? match : `declare const ${name}`,
+    );

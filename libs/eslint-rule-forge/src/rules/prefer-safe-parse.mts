@@ -86,6 +86,20 @@ export const createPreferSafeParseFloat = (
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
+/**
+ * Whether every constituent of `type` is string-like, i.e. the type is
+ * assignable to the parse function's `string` parameter. A union such as
+ * `string | undefined` is rejected so the autofix never produces a type error.
+ */
+const isStringType = (type: ts.Type): boolean => {
+  const parts = type.isUnion() ? type.types : ([type] as const);
+
+  return (
+    parts.length > 0 &&
+    parts.every((t) => (t.flags & ts.TypeFlags.StringLike) !== 0)
+  );
+};
+
 const createSafeParseRule = <MessageId extends string>(
   { moduleName, namespace, method }: SafeParseRuleConfig,
   messageId: MessageId,
@@ -229,17 +243,3 @@ const isNumberMethod = (callee: TSESTree.Expression, name: string): boolean =>
   isIdentifierNamed(callee.object, 'Number') &&
   callee.property.type === AST_NODE_TYPES.Identifier &&
   callee.property.name === name;
-
-/**
- * Whether every constituent of `type` is string-like, i.e. the type is
- * assignable to the parse function's `string` parameter. A union such as
- * `string | undefined` is rejected so the autofix never produces a type error.
- */
-const isStringType = (type: ts.Type): boolean => {
-  const parts = type.isUnion() ? type.types : ([type] as const);
-
-  return (
-    parts.length > 0 &&
-    parts.every((t) => (t.flags & ts.TypeFlags.StringLike) !== 0)
-  );
-};

@@ -219,6 +219,17 @@ describe(actionsQueryUrl, () => {
 
 type Sent = Readonly<{ route: string; state: string; init: RestFetchInit }>;
 
+const stateOf = (route: string): string => {
+  const url = new URL(route);
+
+  return url.searchParams.get('status') ?? '';
+};
+
+const page = (
+  runs: readonly unknown[],
+): Readonly<{ total_count: number; workflow_runs: readonly unknown[] }> =>
+  ({ total_count: runs.length, workflow_runs: runs }) as const;
+
 /** Answers each state with what `pages` give for it, and an empty page else. */
 const answering = (
   pages: Partial<ReadonlyRecord<string, unknown>>,
@@ -234,12 +245,6 @@ const answering = (
   };
 
   return { fetchImpl, sent: mut_sent };
-};
-
-const stateOf = (route: string): string => {
-  const url = new URL(route);
-
-  return url.searchParams.get('status') ?? '';
 };
 
 const refusingStale: RestFetch = (route) =>
@@ -260,11 +265,6 @@ const spent: RestFetch = () =>
 
 const offline: RestFetch = () =>
   Promise.reject(new TypeError('Failed to fetch'));
-
-const page = (
-  runs: readonly unknown[],
-): Readonly<{ total_count: number; workflow_runs: readonly unknown[] }> =>
-  ({ total_count: runs.length, workflow_runs: runs }) as const;
 
 const run = (
   overrides: ReadonlyRecord<string, unknown> & Readonly<{ id: number }>,

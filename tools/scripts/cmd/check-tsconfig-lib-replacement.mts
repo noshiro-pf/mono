@@ -102,6 +102,34 @@ export const findLibReplacementViolations = (
     }
   });
 
+/**
+ * Whether the `"libReplacement": false` line has a comment after the value or
+ * directly above it.
+ */
+const hasReason = (content: string): boolean => {
+  const lines = content.split('\n');
+
+  const index = lines.findIndex(
+    (text) =>
+      !text.trimStart().startsWith('//') &&
+      /"libReplacement"\s*:\s*false/u.test(text),
+  );
+
+  if (index === -1) {
+    return false;
+  }
+
+  const line = lines[index] ?? '';
+
+  const above = (lines[index - 1] ?? '').trim();
+
+  return (
+    /"libReplacement"\s*:\s*false\s*,?\s*(?:\/\/|\/\*)/u.test(line) ||
+    above.startsWith('//') ||
+    above.endsWith('*/')
+  );
+};
+
 const problemOf = (
   relativePath: string,
   content: string,
@@ -135,34 +163,6 @@ const problemOf = (
       : hasReason(content)
         ? undefined
         : 'false-without-reason';
-};
-
-/**
- * Whether the `"libReplacement": false` line has a comment after the value or
- * directly above it.
- */
-const hasReason = (content: string): boolean => {
-  const lines = content.split('\n');
-
-  const index = lines.findIndex(
-    (text) =>
-      !text.trimStart().startsWith('//') &&
-      /"libReplacement"\s*:\s*false/u.test(text),
-  );
-
-  if (index === -1) {
-    return false;
-  }
-
-  const line = lines[index] ?? '';
-
-  const above = (lines[index - 1] ?? '').trim();
-
-  return (
-    /"libReplacement"\s*:\s*false\s*,?\s*(?:\/\/|\/\*)/u.test(line) ||
-    above.startsWith('//') ||
-    above.endsWith('*/')
-  );
 };
 
 if (isDirectlyExecuted(import.meta.url)) {

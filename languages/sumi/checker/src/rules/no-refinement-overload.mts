@@ -196,66 +196,6 @@ const clauseOf = (
   } as const;
 };
 
-const isDistinguishable = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: Checker,
-  // A `Clause` holds TypeScript's own declaration and signature, which
-  // this package does not get to restate as readonly.
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  a: Clause,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  b: Clause,
-): boolean => {
-  const maxA = a.hasRest ? Number.POSITIVE_INFINITY : a.count;
-
-  const maxB = b.hasRest ? Number.POSITIVE_INFINITY : b.count;
-
-  // 1. Arity.
-  if (maxA < b.minArgs || maxB < a.minArgs) {
-    return true;
-  }
-
-  // A signature whose types cannot be read is not judged.
-  if (a.signature === undefined || b.signature === undefined) {
-    return true;
-  }
-
-  const positions = Math.max(a.count, b.count);
-
-  for (let mut_i = 0; mut_i < positions; mut_i += 1) {
-    const typeA = parameterTypeAt(checker, a, mut_i);
-
-    const typeB = parameterTypeAt(checker, b, mut_i);
-
-    const classesA = positionClasses(checker, a, mut_i, typeA);
-
-    const classesB = positionClasses(checker, b, mut_i, typeB);
-
-    // 2. `typeof`.
-    if (classesA.isDisjointFrom(classesB)) {
-      return true;
-    }
-
-    // 3. A tag. Only objects carry one, so it decides only when `object` is
-    //    the one class the sides share: whatever else either side may be
-    //    (left out, a primitive) `typeof` has already told apart.
-    if (
-      typeA !== undefined &&
-      typeB !== undefined &&
-      isObjectOnly(classesA.intersection(classesB)) &&
-      hasDisjointTag(
-        checker,
-        objectMembers(checker, typeA),
-        objectMembers(checker, typeB),
-      )
-    ) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
 /** The parameter type at an argument position, `undefined` if there is none. */
 const parameterTypeAt = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -268,66 +208,22 @@ const parameterTypeAt = (
     ? undefined
     : checker.getParameterType(clause.signature, index);
 
-/**
- * The `typeof` classes an argument at `index` may have: those of the
- * parameter type, plus `undefined` where the argument may be left out.
- */
-const positionClasses = (
+const widenObject = (
+  classes: ReadonlySet<TypeofClass>,
+): ReadonlySet<TypeofClass> =>
+  classes.has('object')
+    ? classes.union(new Set<TypeofClass>(['function']))
+    : classes;
+
+const objectClasses = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   checker: Checker,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  clause: Clause,
-  index: number,
-  type: Type | undefined,
-): ReadonlySet<TypeofClass> => {
-  const mayBeAbsent = index >= clause.minArgs;
-
-  if (type === undefined) {
-    return mayBeAbsent ? new Set<TypeofClass>(['undefined']) : allClasses;
-  }
-
-  const classes = typeofClasses(checker, type);
-
-  return mayBeAbsent
-    ? classes.union(new Set<TypeofClass>(['undefined']))
-    : classes;
-};
-
-type TypeofClass =
-  | 'bigint'
-  | 'boolean'
-  | 'function'
-  | 'number'
-  | 'object'
-  | 'string'
-  | 'symbol'
-  | 'undefined';
-
-const allClasses: ReadonlySet<TypeofClass> = new Set<TypeofClass>([
-  'bigint',
-  'boolean',
-  'function',
-  'number',
-  'object',
-  'string',
-  'symbol',
-  'undefined',
-]);
-
-const isObjectOnly = (classes: ReadonlySet<TypeofClass>): boolean =>
-  classes.size === 1 && classes.has('object');
-
-/** The flags that fix a type's `typeof` class by themselves. */
-const primitiveClasses: readonly (readonly [TypeFlags, TypeofClass])[] = [
-  [TypeFlags.StringLike, 'string'],
-  [TypeFlags.NumberLike, 'number'],
-  [TypeFlags.BigIntLike, 'bigint'],
-  [TypeFlags.BooleanLike, 'boolean'],
-  [TypeFlags.ESSymbolLike, 'symbol'],
-  [TypeFlags.VoidLike, 'undefined'],
-  // `typeof null` is `'object'`.
-  [TypeFlags.Null, 'object'],
-] as const;
+  type: Type,
+): ReadonlySet<TypeofClass> =>
+  checker.getSignaturesOfType(type, SignatureKind.Call).length > 0 ||
+  checker.getSignaturesOfType(type, SignatureKind.Construct).length > 0
+    ? new Set<TypeofClass>(['function'])
+    : new Set<TypeofClass>(['object']);
 
 /**
  * What `typeof` may answer for a value of `type`. Checked in this order
@@ -395,22 +291,33 @@ const typeofClasses = (
     : typeofClasses(checker, constraint);
 };
 
-const widenObject = (
-  classes: ReadonlySet<TypeofClass>,
-): ReadonlySet<TypeofClass> =>
-  classes.has('object')
-    ? classes.union(new Set<TypeofClass>(['function']))
-    : classes;
-
-const objectClasses = (
+/**
+ * The `typeof` classes an argument at `index` may have: those of the
+ * parameter type, plus `undefined` where the argument may be left out.
+ */
+const positionClasses = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   checker: Checker,
-  type: Type,
-): ReadonlySet<TypeofClass> =>
-  checker.getSignaturesOfType(type, SignatureKind.Call).length > 0 ||
-  checker.getSignaturesOfType(type, SignatureKind.Construct).length > 0
-    ? new Set<TypeofClass>(['function'])
-    : new Set<TypeofClass>(['object']);
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  clause: Clause,
+  index: number,
+  type: Type | undefined,
+): ReadonlySet<TypeofClass> => {
+  const mayBeAbsent = index >= clause.minArgs;
+
+  if (type === undefined) {
+    return mayBeAbsent ? new Set<TypeofClass>(['undefined']) : allClasses;
+  }
+
+  const classes = typeofClasses(checker, type);
+
+  return mayBeAbsent
+    ? classes.union(new Set<TypeofClass>(['undefined']))
+    : classes;
+};
+
+const isObjectOnly = (classes: ReadonlySet<TypeofClass>): boolean =>
+  classes.size === 1 && classes.has('object');
 
 /**
  * The members of `type` an object may be: the union members whose `typeof`
@@ -428,29 +335,25 @@ const objectMembers = (
     : ([type] as const);
 
 /**
- * Whether some property both sides have is, on each, a union of literals with
- * no value in common. The names come from the first member of `a`; a name
- * some member lacks yields no tag (`tagValues`), which is what a discriminant
- * needs.
+ * Each literal in `type` as a comparable key, or `undefined` if one is not.
+ * `undefined` and `null` count: an optional tag is `undefined` when left out,
+ * and `===` tells both apart as well as any literal.
  */
-const hasDisjointTag = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: Checker,
-  a: readonly Type[],
-  b: readonly Type[],
-): boolean =>
-  a[0] !== undefined &&
-  checker.getPropertiesOfType(a[0]).some((property) => {
-    const valuesA = tagValues(checker, a, property.name);
+const literalKeys = (type: Type): readonly string[] | undefined => {
+  const members = type.isUnionType() ? type.getTypes() : ([type] as const);
 
-    if (valuesA === undefined) {
-      return false;
-    }
+  const keys = members.map((member): string | undefined =>
+    member.isLiteralType()
+      ? `${typeof member.value}:${member.value.toString()}`
+      : (member.flags & TypeFlags.Undefined) !== 0
+        ? 'undefined'
+        : (member.flags & TypeFlags.Null) !== 0
+          ? 'null'
+          : undefined,
+  );
 
-    const valuesB = tagValues(checker, b, property.name);
-
-    return valuesB !== undefined && valuesA.isDisjointFrom(valuesB);
-  });
+  return keys.every((key) => key !== undefined) ? keys : undefined;
+};
 
 /**
  * The literal values property `name` can hold on `members`, or `undefined`
@@ -486,22 +389,119 @@ const tagValues = (
 };
 
 /**
- * Each literal in `type` as a comparable key, or `undefined` if one is not.
- * `undefined` and `null` count: an optional tag is `undefined` when left out,
- * and `===` tells both apart as well as any literal.
+ * Whether some property both sides have is, on each, a union of literals with
+ * no value in common. The names come from the first member of `a`; a name
+ * some member lacks yields no tag (`tagValues`), which is what a discriminant
+ * needs.
  */
-const literalKeys = (type: Type): readonly string[] | undefined => {
-  const members = type.isUnionType() ? type.getTypes() : ([type] as const);
+const hasDisjointTag = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: Checker,
+  a: readonly Type[],
+  b: readonly Type[],
+): boolean =>
+  a[0] !== undefined &&
+  checker.getPropertiesOfType(a[0]).some((property) => {
+    const valuesA = tagValues(checker, a, property.name);
 
-  const keys = members.map((member): string | undefined =>
-    member.isLiteralType()
-      ? `${typeof member.value}:${member.value.toString()}`
-      : (member.flags & TypeFlags.Undefined) !== 0
-        ? 'undefined'
-        : (member.flags & TypeFlags.Null) !== 0
-          ? 'null'
-          : undefined,
-  );
+    if (valuesA === undefined) {
+      return false;
+    }
 
-  return keys.every((key) => key !== undefined) ? keys : undefined;
+    const valuesB = tagValues(checker, b, property.name);
+
+    return valuesB !== undefined && valuesA.isDisjointFrom(valuesB);
+  });
+
+const isDistinguishable = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: Checker,
+  // A `Clause` holds TypeScript's own declaration and signature, which
+  // this package does not get to restate as readonly.
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  a: Clause,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  b: Clause,
+): boolean => {
+  const maxA = a.hasRest ? Number.POSITIVE_INFINITY : a.count;
+
+  const maxB = b.hasRest ? Number.POSITIVE_INFINITY : b.count;
+
+  // 1. Arity.
+  if (maxA < b.minArgs || maxB < a.minArgs) {
+    return true;
+  }
+
+  // A signature whose types cannot be read is not judged.
+  if (a.signature === undefined || b.signature === undefined) {
+    return true;
+  }
+
+  const positions = Math.max(a.count, b.count);
+
+  for (let mut_i = 0; mut_i < positions; mut_i += 1) {
+    const typeA = parameterTypeAt(checker, a, mut_i);
+
+    const typeB = parameterTypeAt(checker, b, mut_i);
+
+    const classesA = positionClasses(checker, a, mut_i, typeA);
+
+    const classesB = positionClasses(checker, b, mut_i, typeB);
+
+    // 2. `typeof`.
+    if (classesA.isDisjointFrom(classesB)) {
+      return true;
+    }
+
+    // 3. A tag. Only objects carry one, so it decides only when `object` is
+    //    the one class the sides share: whatever else either side may be
+    //    (left out, a primitive) `typeof` has already told apart.
+    if (
+      typeA !== undefined &&
+      typeB !== undefined &&
+      isObjectOnly(classesA.intersection(classesB)) &&
+      hasDisjointTag(
+        checker,
+        objectMembers(checker, typeA),
+        objectMembers(checker, typeB),
+      )
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 };
+
+type TypeofClass =
+  | 'bigint'
+  | 'boolean'
+  | 'function'
+  | 'number'
+  | 'object'
+  | 'string'
+  | 'symbol'
+  | 'undefined';
+
+const allClasses: ReadonlySet<TypeofClass> = new Set<TypeofClass>([
+  'bigint',
+  'boolean',
+  'function',
+  'number',
+  'object',
+  'string',
+  'symbol',
+  'undefined',
+]);
+
+/** The flags that fix a type's `typeof` class by themselves. */
+const primitiveClasses: readonly (readonly [TypeFlags, TypeofClass])[] = [
+  [TypeFlags.StringLike, 'string'],
+  [TypeFlags.NumberLike, 'number'],
+  [TypeFlags.BigIntLike, 'bigint'],
+  [TypeFlags.BooleanLike, 'boolean'],
+  [TypeFlags.ESSymbolLike, 'symbol'],
+  [TypeFlags.VoidLike, 'undefined'],
+  // `typeof null` is `'object'`.
+  [TypeFlags.Null, 'object'],
+] as const;

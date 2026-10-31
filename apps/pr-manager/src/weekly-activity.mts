@@ -278,20 +278,6 @@ const TODAY_SUFFIX = 'today';
 const alias = (kind: ActivityKind, suffix: string): string =>
   `${kind}_${suffix}` as const;
 
-const countedDay = (
-  data: unknown,
-  day: ActivityDay,
-  suffix: string,
-): DayActivity | undefined => {
-  const mergedCount = countAt(data, alias('merged', suffix));
-
-  const closedCount = countAt(data, alias('closed', suffix));
-
-  return mergedCount === undefined || closedCount === undefined
-    ? undefined
-    : { ...day, merged: mergedCount, closed: closedCount };
-};
-
 const countAt = (data: unknown, key: string): number | undefined => {
   if (!isRecord(data)) {
     return undefined;
@@ -308,50 +294,38 @@ const countAt = (data: unknown, key: string): number | undefined => {
   return typeof count === 'number' ? count : undefined;
 };
 
-/**
- * Days since the epoch, counted in `timeZone`: the date `ms` falls on there,
- * as one number that the days before and after are a subtraction from.
- */
-const epochDayOf = (ms: number, timeZone: string | undefined): number =>
-  Math.floor((ms + offsetMinutesAt(ms, timeZone) * MINUTE_MS) / DAY_MS);
+const countedDay = (
+  data: unknown,
+  day: ActivityDay,
+  suffix: string,
+): DayActivity | undefined => {
+  const mergedCount = countAt(data, alias('merged', suffix));
 
-/**
- * The first instant of `epochDay` in `timeZone`. The offset is read twice,
- * the second time at the answer the first gave, so a midnight on the far
- * side of a daylight-saving change gets the offset it actually has.
- */
-const midnightOf = (epochDay: number, timeZone: string | undefined): number => {
-  const wall = epochDay * DAY_MS;
+  const closedCount = countAt(data, alias('closed', suffix));
 
-  const guess = wall - offsetMinutesAt(wall, timeZone) * MINUTE_MS;
-
-  return wall - offsetMinutesAt(guess, timeZone) * MINUTE_MS;
+  return mergedCount === undefined || closedCount === undefined
+    ? undefined
+    : { ...day, merged: mergedCount, closed: closedCount };
 };
 
-const dayOf = (epochDay: number, timeZone: string | undefined): ActivityDay => {
-  const startMs = midnightOf(epochDay, timeZone);
+/** A formatter that writes only the offset, made once for each zone. */
+const offsetFormat = (timeZone: string | undefined): Intl.DateTimeFormat => {
+  const key = timeZone ?? '';
 
-  const endMs = midnightOf(epochDay + 1, timeZone);
+  const held = mut_offsetFormats.get(key);
 
-  // Inclusive at both ends, so the day runs to its last second.
-  const lastMs = endMs - SECOND_MS;
+  if (held !== undefined) {
+    return held;
+  }
 
-  return {
-    key: keyOf(epochDay),
-    startMs,
-    endMs,
-    range: `${isoWithOffset(startMs, offsetMinutesAt(startMs, timeZone))}..${isoWithOffset(lastMs, offsetMinutesAt(lastMs, timeZone))}`,
-  };
-};
+  const made = new Intl.DateTimeFormat('en-US', {
+    timeZoneName: 'longOffset',
+    ...(timeZone === undefined ? {} : { timeZone }),
+  });
 
-/** `YYYY-MM-DD` of a day counted from the epoch. */
-const keyOf = (epochDay: number): string => {
-  const parts = UTC_DATE.formatToParts(epochDay * DAY_MS);
+  mut_offsetFormats.set(key, made);
 
-  const part = (type: Intl.DateTimeFormatPartTypes): string =>
-    parts.find((found) => found.type === type)?.value ?? '';
-
-  return `${part('year')}-${part('month')}-${part('day')}`;
+  return made;
 };
 
 /**
@@ -379,24 +353,50 @@ const offsetMinutesAt = (ms: number, timeZone: string | undefined): number => {
   );
 };
 
-/** A formatter that writes only the offset, made once for each zone. */
-const offsetFormat = (timeZone: string | undefined): Intl.DateTimeFormat => {
-  const key = timeZone ?? '';
+/**
+ * Days since the epoch, counted in `timeZone`: the date `ms` falls on there,
+ * as one number that the days before and after are a subtraction from.
+ */
+const epochDayOf = (ms: number, timeZone: string | undefined): number =>
+  Math.floor((ms + offsetMinutesAt(ms, timeZone) * MINUTE_MS) / DAY_MS);
 
-  const held = mut_offsetFormats.get(key);
+/**
+ * The first instant of `epochDay` in `timeZone`. The offset is read twice,
+ * the second time at the answer the first gave, so a midnight on the far
+ * side of a daylight-saving change gets the offset it actually has.
+ */
+const midnightOf = (epochDay: number, timeZone: string | undefined): number => {
+  const wall = epochDay * DAY_MS;
 
-  if (held !== undefined) {
-    return held;
-  }
+  const guess = wall - offsetMinutesAt(wall, timeZone) * MINUTE_MS;
 
-  const made = new Intl.DateTimeFormat('en-US', {
-    timeZoneName: 'longOffset',
-    ...(timeZone === undefined ? {} : { timeZone }),
-  });
+  return wall - offsetMinutesAt(guess, timeZone) * MINUTE_MS;
+};
 
-  mut_offsetFormats.set(key, made);
+/** `YYYY-MM-DD` of a day counted from the epoch. */
+const keyOf = (epochDay: number): string => {
+  const parts = UTC_DATE.formatToParts(epochDay * DAY_MS);
 
-  return made;
+  const part = (type: Intl.DateTimeFormatPartTypes): string =>
+    parts.find((found) => found.type === type)?.value ?? '';
+
+  return `${part('year')}-${part('month')}-${part('day')}`;
+};
+
+const dayOf = (epochDay: number, timeZone: string | undefined): ActivityDay => {
+  const startMs = midnightOf(epochDay, timeZone);
+
+  const endMs = midnightOf(epochDay + 1, timeZone);
+
+  // Inclusive at both ends, so the day runs to its last second.
+  const lastMs = endMs - SECOND_MS;
+
+  return {
+    key: keyOf(epochDay),
+    startMs,
+    endMs,
+    range: `${isoWithOffset(startMs, offsetMinutesAt(startMs, timeZone))}..${isoWithOffset(lastMs, offsetMinutesAt(lastMs, timeZone))}`,
+  };
 };
 
 const mut_offsetFormats = new Map<string, Intl.DateTimeFormat>();

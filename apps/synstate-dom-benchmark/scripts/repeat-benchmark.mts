@@ -180,37 +180,6 @@ const readResults = async (appRoot: string): Promise<string> =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   fs.readFile(resultsPath(appRoot), 'utf8');
 
-/** Runs the benchmark once in `appRoot` and reads the tables it wrote. */
-const runOnce = async (appRoot: string, rotate: number): Promise<Tables> => {
-  run('pnpm', ['run', 'benchmark'], appRoot, {
-    BENCHMARK_ROTATE: rotate.toString(),
-  });
-
-  return parseResults(await readResults(appRoot));
-};
-
-/**
- * Checks `ref` out in a temporary worktree and builds what its benchmark
- * imports, so that it runs the way this tree's does.
- */
-const prepareBaseline = async (ref: string): Promise<string> => {
-  const root = await fs.mkdtemp(
-    path.join(os.tmpdir(), 'synstate-dom-benchmark-baseline-'),
-  );
-
-  run('git', ['worktree', 'add', '--detach', root, ref], repoRoot);
-
-  run('pnpm', ['install', '--frozen-lockfile'], root);
-
-  // `ws:build`, not `pnpm --filter 'synstate-dom-benchmark^...' run build`:
-  // pnpm orders a filtered run by devDependencies too, which run in a cycle
-  // through the ESLint packages, so a fresh worktree builds a package before
-  // what it imports.
-  run('pnpm', ['run', 'ws:build'], root);
-
-  return root;
-};
-
 const run = (
   command: string,
   args: readonly string[],
@@ -228,6 +197,36 @@ const run = (
       `${Arr.toUnshifted(command)(args).join(' ')} failed in ${cwd} (exit ${unknownToString(result.status)})`,
     );
   }
+};
+
+const cellsOf = (line: string): readonly string[] =>
+  line
+    .trim()
+    .replace(/^\|/u, '')
+    .replace(/\|$/u, '')
+    .split('|')
+    .map((cell) => cell.trim());
+
+const parseTable = (lines: readonly string[]): Table => {
+  const [header, , ...body] = lines;
+
+  const [, ...columns] = cellsOf(header ?? '');
+
+  return {
+    columns,
+    rows: body.map((line) => {
+      const [operation = '', ...values] = cellsOf(line);
+
+      return {
+        operation,
+        values: values.map((v) =>
+          v === wrong
+            ? Number.NaN
+            : Result.unwrapOkOr(Num.safeParseFloat(v), Number.NaN),
+        ),
+      };
+    }),
+  };
 };
 
 /**
@@ -260,54 +259,53 @@ const parseResults = (markdown: string): Tables => {
   return { operations, scenarios };
 };
 
-const parseTable = (lines: readonly string[]): Table => {
-  const [header, , ...body] = lines;
+/** Runs the benchmark once in `appRoot` and reads the tables it wrote. */
+const runOnce = async (appRoot: string, rotate: number): Promise<Tables> => {
+  run('pnpm', ['run', 'benchmark'], appRoot, {
+    BENCHMARK_ROTATE: rotate.toString(),
+  });
 
-  const [, ...columns] = cellsOf(header ?? '');
-
-  return {
-    columns,
-    rows: body.map((line) => {
-      const [operation = '', ...values] = cellsOf(line);
-
-      return {
-        operation,
-        values: values.map((v) =>
-          v === wrong
-            ? Number.NaN
-            : Result.unwrapOkOr(Num.safeParseFloat(v), Number.NaN),
-        ),
-      };
-    }),
-  };
+  return parseResults(await readResults(appRoot));
 };
 
-const cellsOf = (line: string): readonly string[] =>
-  line
-    .trim()
-    .replace(/^\|/u, '')
-    .replace(/\|$/u, '')
-    .split('|')
-    .map((cell) => cell.trim());
+/**
+ * Checks `ref` out in a temporary worktree and builds what its benchmark
+ * imports, so that it runs the way this tree's does.
+ */
+const prepareBaseline = async (ref: string): Promise<string> => {
+  const root = await fs.mkdtemp(
+    path.join(os.tmpdir(), 'synstate-dom-benchmark-baseline-'),
+  );
+
+  run('git', ['worktree', 'add', '--detach', root, ref], repoRoot);
+
+  run('pnpm', ['install', '--frozen-lockfile'], root);
+
+  // `ws:build`, not `pnpm --filter 'synstate-dom-benchmark^...' run build`:
+  // pnpm orders a filtered run by devDependencies too, which run in a cycle
+  // through the ESLint packages, so a fresh worktree builds a package before
+  // what it imports.
+  run('pnpm', ['run', 'ws:build'], root);
+
+  return root;
+};
 
 const userAgentOf = (markdown: string): string =>
   /Measured in `([^`]*)`/u.exec(markdown)?.[1] ?? 'an unknown browser';
 
-const medianTables = (runs: readonly Tables[]): Tables =>
-  ({
-    operations: medianTable(runs.map((r) => r.operations)),
-    scenarios: medianTable(runs.map((r) => r.scenarios)),
-  }) as const;
+const median = (samples: readonly number[]): number => {
+  if (samples.some(Number.isNaN)) {
+    return Number.NaN;
+  }
 
-const mediansTable = (table: Table): string =>
-  [
-    `| operation (median ms) | ${table.columns.join(' | ')} |`,
-    `| :-- | ${table.columns.map(() => '--:').join(' | ')} |`,
-    ...table.rows.map(
-      (row) =>
-        `| ${row.operation} | ${row.values.map((v) => (Number.isNaN(v) ? wrong : v.toFixed(2))).join(' | ')} |`,
-    ),
-  ].join('\n');
+  const sorted = samples.toSorted((a, b) => a - b);
+
+  const mid = Math.floor(sorted.length / 2);
+
+  return sorted.length % 2 === 1
+    ? (sorted[mid] ?? Number.NaN)
+    : ((sorted[mid - 1] ?? Number.NaN) + (sorted[mid] ?? Number.NaN)) / 2;
+};
 
 /**
  * The median of each cell over `tables`, which must share their layout. A
@@ -337,19 +335,26 @@ const medianTable = (tables: readonly Table[]): Table => {
   };
 };
 
-const median = (samples: readonly number[]): number => {
-  if (samples.some(Number.isNaN)) {
-    return Number.NaN;
-  }
+const medianTables = (runs: readonly Tables[]): Tables =>
+  ({
+    operations: medianTable(runs.map((r) => r.operations)),
+    scenarios: medianTable(runs.map((r) => r.scenarios)),
+  }) as const;
 
-  const sorted = samples.toSorted((a, b) => a - b);
+const mediansTable = (table: Table): string =>
+  [
+    `| operation (median ms) | ${table.columns.join(' | ')} |`,
+    `| :-- | ${table.columns.map(() => '--:').join(' | ')} |`,
+    ...table.rows.map(
+      (row) =>
+        `| ${row.operation} | ${row.values.map((v) => (Number.isNaN(v) ? wrong : v.toFixed(2))).join(' | ')} |`,
+    ),
+  ].join('\n');
 
-  const mid = Math.floor(sorted.length / 2);
-
-  return sorted.length % 2 === 1
-    ? (sorted[mid] ?? Number.NaN)
-    : ((sorted[mid - 1] ?? Number.NaN) + (sorted[mid] ?? Number.NaN)) / 2;
-};
+const ratio = (value: number, base: number): string =>
+  Num.isNonZero(base) && !Number.isNaN(value) && !Number.isNaN(base)
+    ? (`${Num.div(value, base).toFixed(2)}×` as const)
+    : '–';
 
 const ratioTable = (table: Table): string => {
   const base = table.columns.indexOf(synstateDomColumn);
@@ -396,10 +401,5 @@ const comparisonTable = (before: Table, after: Table): string => {
     }),
   ].join('\n');
 };
-
-const ratio = (value: number, base: number): string =>
-  Num.isNonZero(base) && !Number.isNaN(value) && !Number.isNaN(base)
-    ? (`${Num.div(value, base).toFixed(2)}×` as const)
-    : '–';
 
 await main();

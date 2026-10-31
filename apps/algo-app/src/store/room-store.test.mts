@@ -171,12 +171,6 @@ type FakeApi = Readonly<{
   }>[];
 }>;
 
-const setup = (): Readonly<{ store: RoomStore; api: FakeApi }> => {
-  const api = fakeApi();
-
-  return { store: createRoomStore({ api: api.api }), api } as const;
-};
-
 const fakeApi = (): FakeApi => {
   const mut_roomWatchers = new Map<string, (room: Room) => void>();
 
@@ -241,6 +235,12 @@ const fakeApi = (): FakeApi => {
     addedRooms: mut_addedRooms,
     addedPlayers: mut_addedPlayers,
   };
+};
+
+const setup = (): Readonly<{ store: RoomStore; api: FakeApi }> => {
+  const api = fakeApi();
+
+  return { store: createRoomStore({ api: api.api }), api } as const;
 };
 
 const roomWithId = (id: string): Room =>

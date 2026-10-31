@@ -11,12 +11,6 @@ import type {
 
 export const pad2 = (n: number): string => n.toString().padStart(2, '0');
 
-const ymd2str = (ymd: YearMonthDate): string =>
-  `${ymd.year}/${pad2(ymd.month)}/${pad2(ymd.date)}` as const;
-
-const hm2str = (hm: HoursMinutes): string =>
-  `${pad2(hm.hours)}:${pad2(hm.minutes)}` as const;
-
 export const datetimeRange2str = (
   datetimeRange: DatetimeRange,
   datetimeSpecification: DatetimeSpecificationEnumType,
@@ -54,3 +48,9 @@ export const iconId2str = (
       return '✕';
   }
 };
+
+const ymd2str = (ymd: YearMonthDate): string =>
+  `${ymd.year}/${pad2(ymd.month)}/${pad2(ymd.date)}` as const;
+
+const hm2str = (hm: HoursMinutes): string =>
+  `${pad2(hm.hours)}:${pad2(hm.minutes)}` as const;

@@ -74,6 +74,93 @@ const DYNAMIC_IMPORT_PATTERN = /\b(?:import|require)\s*\(/u;
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
+/**
+ * Whether an identifier names a property or member rather than referring to a
+ * binding — `a.ns`, `{ ns: 1 }`, `class { ns = 1 }`.
+ */
+const isPropertyName = (node: ts.Identifier): boolean => {
+  const parent = node.parent;
+
+  return (
+    ((ts.isPropertyAccessExpression(parent) ||
+      ts.isPropertyAssignment(parent) ||
+      ts.isPropertyDeclaration(parent) ||
+      ts.isMethodDeclaration(parent) ||
+      ts.isGetAccessorDeclaration(parent) ||
+      ts.isSetAccessorDeclaration(parent) ||
+      ts.isEnumMember(parent)) &&
+      parent.name === node) ||
+    (ts.isBindingElement(parent) && parent.propertyName === node)
+  );
+};
+
+/**
+ * The members `import * as ns` is read through at runtime — `ns.X` and
+ * `ns['X']` — or `'all'` once `ns` is used in any other value position.
+ *
+ * Shadowing is not tracked: an unrelated `ns` in an inner scope only adds uses,
+ * which can hide a report but never makes one up.
+ */
+const collectNamespaceMembers = (
+  sourceFile: ts.SourceFile,
+  localName: string,
+): NamespaceMembers => {
+  const mut_names = new Set<string>();
+
+  const isNamespace = (node: ts.Node): node is ts.Identifier =>
+    ts.isIdentifier(node) && node.text === localName;
+
+  // `true` stops the walk: `ns` was used whole, so every member is.
+  const visit = (node: ts.Node): boolean | undefined => {
+    if (
+      ts.isImportDeclaration(node) ||
+      // A type reads nothing at runtime — `ns.X` there is a qualified name and
+      // `typeof ns.X` a type query. A heritage clause is the exception:
+      // `extends ns.Base` is a value.
+      (ts.isTypeNode(node) && !ts.isExpressionWithTypeArguments(node))
+    ) {
+      return undefined;
+    }
+
+    if (ts.isPropertyAccessExpression(node) && isNamespace(node.expression)) {
+      mut_names.add(node.name.text);
+
+      return undefined;
+    }
+
+    if (ts.isElementAccessExpression(node) && isNamespace(node.expression)) {
+      if (!ts.isStringLiteralLike(node.argumentExpression)) {
+        return true;
+      }
+
+      mut_names.add(node.argumentExpression.text);
+
+      return undefined;
+    }
+
+    return (
+      (isNamespace(node) && !isPropertyName(node)) ||
+      ts.forEachChild(node, visit)
+    );
+  };
+
+  return visit(sourceFile) === true ? 'all' : mut_names;
+};
+
+const namespaceMembers = (edge: NamespaceImportEdge): NamespaceMembers => {
+  const cached = namespaceMembersCache.get(edge);
+
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const result = collectNamespaceMembers(edge.importer, edge.localName);
+
+  namespaceMembersCache.set(edge, result);
+
+  return result;
+};
+
 const isUsed = (
   edges: ReadonlyMap<string, readonly ImportEdge[]>,
   entryPoints: ReadonlySet<string>,
@@ -122,64 +209,6 @@ const isUsed = (
         return follow(edge.importer, edge.as);
     }
   });
-};
-
-/** Every file's import edges, keyed by the file they point at. */
-const importEdges = (
-  program: ts.Program,
-): ReadonlyMap<string, readonly ImportEdge[]> => {
-  const cached = importEdgesCache.get(program);
-
-  if (cached !== undefined) {
-    return cached;
-  }
-
-  const checker = program.getTypeChecker();
-
-  const mut_edges = new Map<string, ImportEdge[]>();
-
-  const add = (
-    moduleSpecifier: ts.Expression,
-    ...edges: readonly ImportEdge[]
-  ): void => {
-    const target = resolveModule(checker, moduleSpecifier);
-
-    if (target === undefined) {
-      return;
-    }
-
-    const mut_existing = mut_edges.get(target);
-
-    if (mut_existing === undefined) {
-      mut_edges.set(target, Array.from(edges));
-    } else {
-      mut_existing.push(...edges);
-    }
-  };
-
-  for (const sourceFile of program.getSourceFiles()) {
-    if (
-      sourceFile.isDeclarationFile ||
-      program.isSourceFileFromExternalLibrary(sourceFile) ||
-      program.isSourceFileDefaultLibrary(sourceFile)
-    ) {
-      continue;
-    }
-
-    for (const statement of sourceFile.statements) {
-      collectStatementEdges(sourceFile, statement, add);
-    }
-
-    // Walking the whole file is the expensive part, so only the files that
-    // can contain a call worth finding pay for it.
-    if (DYNAMIC_IMPORT_PATTERN.test(sourceFile.text)) {
-      collectDynamicImportEdges(sourceFile, add);
-    }
-  }
-
-  importEdgesCache.set(program, mut_edges);
-
-  return mut_edges;
 };
 
 const collectStatementEdges = (
@@ -321,89 +350,60 @@ const resolveModule = (
     .getSymbolAtLocation(moduleSpecifier)
     ?.declarations?.find(ts.isSourceFile)?.fileName;
 
-const namespaceMembers = (edge: NamespaceImportEdge): NamespaceMembers => {
-  const cached = namespaceMembersCache.get(edge);
+/** Every file's import edges, keyed by the file they point at. */
+const importEdges = (
+  program: ts.Program,
+): ReadonlyMap<string, readonly ImportEdge[]> => {
+  const cached = importEdgesCache.get(program);
 
   if (cached !== undefined) {
     return cached;
   }
 
-  const result = collectNamespaceMembers(edge.importer, edge.localName);
+  const checker = program.getTypeChecker();
 
-  namespaceMembersCache.set(edge, result);
+  const mut_edges = new Map<string, ImportEdge[]>();
 
-  return result;
-};
+  const add = (
+    moduleSpecifier: ts.Expression,
+    ...edges: readonly ImportEdge[]
+  ): void => {
+    const target = resolveModule(checker, moduleSpecifier);
 
-/**
- * The members `import * as ns` is read through at runtime — `ns.X` and
- * `ns['X']` — or `'all'` once `ns` is used in any other value position.
- *
- * Shadowing is not tracked: an unrelated `ns` in an inner scope only adds uses,
- * which can hide a report but never makes one up.
- */
-const collectNamespaceMembers = (
-  sourceFile: ts.SourceFile,
-  localName: string,
-): NamespaceMembers => {
-  const mut_names = new Set<string>();
-
-  const isNamespace = (node: ts.Node): node is ts.Identifier =>
-    ts.isIdentifier(node) && node.text === localName;
-
-  // `true` stops the walk: `ns` was used whole, so every member is.
-  const visit = (node: ts.Node): boolean | undefined => {
-    if (
-      ts.isImportDeclaration(node) ||
-      // A type reads nothing at runtime — `ns.X` there is a qualified name and
-      // `typeof ns.X` a type query. A heritage clause is the exception:
-      // `extends ns.Base` is a value.
-      (ts.isTypeNode(node) && !ts.isExpressionWithTypeArguments(node))
-    ) {
-      return undefined;
+    if (target === undefined) {
+      return;
     }
 
-    if (ts.isPropertyAccessExpression(node) && isNamespace(node.expression)) {
-      mut_names.add(node.name.text);
+    const mut_existing = mut_edges.get(target);
 
-      return undefined;
+    if (mut_existing === undefined) {
+      mut_edges.set(target, Array.from(edges));
+    } else {
+      mut_existing.push(...edges);
     }
-
-    if (ts.isElementAccessExpression(node) && isNamespace(node.expression)) {
-      if (!ts.isStringLiteralLike(node.argumentExpression)) {
-        return true;
-      }
-
-      mut_names.add(node.argumentExpression.text);
-
-      return undefined;
-    }
-
-    return (
-      (isNamespace(node) && !isPropertyName(node)) ||
-      ts.forEachChild(node, visit)
-    );
   };
 
-  return visit(sourceFile) === true ? 'all' : mut_names;
-};
+  for (const sourceFile of program.getSourceFiles()) {
+    if (
+      sourceFile.isDeclarationFile ||
+      program.isSourceFileFromExternalLibrary(sourceFile) ||
+      program.isSourceFileDefaultLibrary(sourceFile)
+    ) {
+      continue;
+    }
 
-/**
- * Whether an identifier names a property or member rather than referring to a
- * binding — `a.ns`, `{ ns: 1 }`, `class { ns = 1 }`.
- */
-const isPropertyName = (node: ts.Identifier): boolean => {
-  const parent = node.parent;
+    for (const statement of sourceFile.statements) {
+      collectStatementEdges(sourceFile, statement, add);
+    }
 
-  return (
-    ((ts.isPropertyAccessExpression(parent) ||
-      ts.isPropertyAssignment(parent) ||
-      ts.isPropertyDeclaration(parent) ||
-      ts.isMethodDeclaration(parent) ||
-      ts.isGetAccessorDeclaration(parent) ||
-      ts.isSetAccessorDeclaration(parent) ||
-      ts.isEnumMember(parent)) &&
-      parent.name === node) ||
-    (ts.isBindingElement(parent) && parent.propertyName === node)
-  );
+    // Walking the whole file is the expensive part, so only the files that
+    // can contain a call worth finding pay for it.
+    if (DYNAMIC_IMPORT_PATTERN.test(sourceFile.text)) {
+      collectDynamicImportEdges(sourceFile, add);
+    }
+  }
+
+  importEdgesCache.set(program, mut_edges);
+
+  return mut_edges;
 };

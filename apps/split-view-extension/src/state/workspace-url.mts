@@ -184,6 +184,10 @@ const workspaceIdOf = (
   return fromUrl === null || fromUrl === '' ? undefined : fromUrl;
 };
 
+const presetOrSpec = (spec: string): LayoutNode | undefined =>
+  layoutPresets.find((preset) => preset.id === spec)?.build((index) => index) ??
+  parseLayoutSpec(spec);
+
 /**
  * The layout a URL asks for.
  *
@@ -209,9 +213,10 @@ const layoutOf = (
   );
 };
 
-const presetOrSpec = (spec: string): LayoutNode | undefined =>
-  layoutPresets.find((preset) => preset.id === spec)?.build((index) => index) ??
-  parseLayoutSpec(spec);
+const zoomOf = (text: string | undefined): number =>
+  text === undefined
+    ? defaultPaneZoom
+    : clampPaneZoom(Result.unwrapOkOr(Num.safeParseFloat(text), Number.NaN));
 
 /**
  * A view built from what the URL said, its panes numbered in tree order.
@@ -242,11 +247,6 @@ const stateOf = (
     ...(title === undefined ? {} : { title }),
   };
 };
-
-const zoomOf = (text: string | undefined): number =>
-  text === undefined
-    ? defaultPaneZoom
-    : clampPaneZoom(Result.unwrapOkOr(Num.safeParseFloat(text), Number.NaN));
 
 const panesInTreeOrder = (state: WorkspaceState): readonly PaneState[] =>
   paneIdsOf(state.root).map(

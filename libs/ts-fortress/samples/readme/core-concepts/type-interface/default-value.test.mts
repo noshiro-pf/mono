@@ -1,9 +1,4 @@
-/* eslint-disable import-x/first */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-const useState = <T,>(_defaultValue: T): readonly [T, (v: T) => void] =>
-  [_defaultValue, () => {}] as const;
-
-const IGNORE_EMBEDDING = (..._args: readonly unknown[]): void => {};
 
 // embed-sample-code-ignore-above
 import * as t from 'ts-fortress';
@@ -36,3 +31,8 @@ const UserForm = () => {
 
 // embed-sample-code-ignore-below
 export { UserForm };
+
+const useState = <T,>(_defaultValue: T): readonly [T, (v: T) => void] =>
+  [_defaultValue, () => {}] as const;
+
+const IGNORE_EMBEDDING = (..._args: readonly unknown[]): void => {};

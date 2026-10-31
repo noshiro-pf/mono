@@ -132,46 +132,47 @@ const mapRelativePath = 'scripts/cmd/embed-examples-in-jsdoc-map.mts';
 const countExampleTags = (content: string): number =>
   Array.from(content.matchAll(/^\s*\*\s*@example\b/gmu)).length;
 
-const checkPackage = async (
-  packageDir: string,
-): Promise<
-  Result<
-    Readonly<{ hasExamples: boolean; violation: Violation | undefined }>,
-    string
-  >
-> => {
-  const filesResult = await glob('src/**/*.mts', {
-    cwd: packageDir,
-    absolute: true,
-  });
-
-  if (Result.isErr(filesResult)) {
-    return Result.err(
-      `❌ Failed to list the sources of ${path.basename(packageDir)}: ${unknownToString(filesResult.value)}`,
-    );
-  }
-
-  const files = filesResult.value.filter((f) => !isExempt(f));
-
-  const perFile = await Promise.all(
-    files.map(async (filePath) => {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      const content = await fs.readFile(filePath, 'utf8');
-
-      return countExampleTags(content) > 0;
-    }),
+const readFileOrUndefined = async (
+  filePath: string,
+): Promise<string | undefined> => {
+  const result = await Result.fromPromise(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFile(filePath, 'utf8'),
   );
 
-  const hasExamples = perFile.includes(true);
+  return Result.isErr(result) ? undefined : result.value;
+};
 
-  if (!hasExamples) {
-    return Result.ok({ hasExamples, violation: undefined });
+const readScripts = async (
+  packageDir: string,
+): Promise<ReadonlyRecord<string, string> | undefined> => {
+  const text = await readFileOrUndefined(
+    path.resolve(packageDir, 'package.json'),
+  );
+
+  if (text === undefined) {
+    return undefined;
   }
 
-  const violation = await findWiringViolation(packageDir);
+  const parsed: unknown = JSON.parse(text);
 
-  return Result.ok({ hasExamples, violation });
+  if (!isRecord(parsed) || !hasKey(parsed, 'scripts')) {
+    return undefined;
+  }
+
+  const scripts: unknown = parsed.scripts;
+
+  if (!isRecord(scripts)) {
+    return undefined;
+  }
+
+  return Obj.filterMap(scripts, (value) =>
+    isString(value) ? Optional.some(value) : Optional.none,
+  );
 };
+
+const fileExists = async (filePath: string): Promise<boolean> =>
+  (await readFileOrUndefined(filePath)) !== undefined;
 
 /**
  * What is missing between a package's `@example` blocks and the check that
@@ -239,47 +240,46 @@ const findWiringViolation = async (
   };
 };
 
-const readScripts = async (
+const checkPackage = async (
   packageDir: string,
-): Promise<ReadonlyRecord<string, string> | undefined> => {
-  const text = await readFileOrUndefined(
-    path.resolve(packageDir, 'package.json'),
+): Promise<
+  Result<
+    Readonly<{ hasExamples: boolean; violation: Violation | undefined }>,
+    string
+  >
+> => {
+  const filesResult = await glob('src/**/*.mts', {
+    cwd: packageDir,
+    absolute: true,
+  });
+
+  if (Result.isErr(filesResult)) {
+    return Result.err(
+      `❌ Failed to list the sources of ${path.basename(packageDir)}: ${unknownToString(filesResult.value)}`,
+    );
+  }
+
+  const files = filesResult.value.filter((f) => !isExempt(f));
+
+  const perFile = await Promise.all(
+    files.map(async (filePath) => {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const content = await fs.readFile(filePath, 'utf8');
+
+      return countExampleTags(content) > 0;
+    }),
   );
 
-  if (text === undefined) {
-    return undefined;
+  const hasExamples = perFile.includes(true);
+
+  if (!hasExamples) {
+    return Result.ok({ hasExamples, violation: undefined });
   }
 
-  const parsed: unknown = JSON.parse(text);
+  const violation = await findWiringViolation(packageDir);
 
-  if (!isRecord(parsed) || !hasKey(parsed, 'scripts')) {
-    return undefined;
-  }
-
-  const scripts: unknown = parsed.scripts;
-
-  if (!isRecord(scripts)) {
-    return undefined;
-  }
-
-  return Obj.filterMap(scripts, (value) =>
-    isString(value) ? Optional.some(value) : Optional.none,
-  );
+  return Result.ok({ hasExamples, violation });
 };
-
-const readFileOrUndefined = async (
-  filePath: string,
-): Promise<string | undefined> => {
-  const result = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(filePath, 'utf8'),
-  );
-
-  return Result.isErr(result) ? undefined : result.value;
-};
-
-const fileExists = async (filePath: string): Promise<boolean> =>
-  (await readFileOrUndefined(filePath)) !== undefined;
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkExampleCoverage().catch((error: unknown) =>

@@ -210,6 +210,34 @@ type Negation = Readonly<{
   precedence: Precedence;
 }>;
 
+const isLooserThan = (precedence: Precedence, operator: '&&' | '||'): boolean =>
+  precedence === 'looser' || (operator === '&&' && precedence === '||');
+
+const asOperand = (
+  negation: Negation,
+  operator: '&&' | '||' | undefined,
+): string =>
+  operator !== undefined && isLooserThan(negation.precedence, operator)
+    ? (`(${negation.text})` as const)
+    : negation.text;
+
+const precedenceOf = (node: DeepReadonly<TSESTree.Node>): Precedence => {
+  if (node.type === AST_NODE_TYPES.LogicalExpression) {
+    // `??` cannot be mixed with `&&` or `||` without parentheses.
+    return node.operator === '??' ? 'looser' : node.operator;
+  }
+
+  return LOOSER_THAN_LOGICAL.has(node.type) ? 'looser' : 'tighter';
+};
+
+/**
+ * The parser's node, which the source code and the token store take as
+ * mutable, for one that this package only reads.
+ */
+const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  node as T;
+
 const shortNegationOf = (
   node: DeepReadonly<TSESTree.Expression>,
   context: NegationContext,
@@ -257,26 +285,6 @@ const shortNegationOf = (
     text: prefixedNegationOf(node, context.sourceCode),
     precedence: 'tighter',
   };
-};
-
-const asOperand = (
-  negation: Negation,
-  operator: '&&' | '||' | undefined,
-): string =>
-  operator !== undefined && isLooserThan(negation.precedence, operator)
-    ? (`(${negation.text})` as const)
-    : negation.text;
-
-const isLooserThan = (precedence: Precedence, operator: '&&' | '||'): boolean =>
-  precedence === 'looser' || (operator === '&&' && precedence === '||');
-
-const precedenceOf = (node: DeepReadonly<TSESTree.Node>): Precedence => {
-  if (node.type === AST_NODE_TYPES.LogicalExpression) {
-    // `??` cannot be mixed with `&&` or `||` without parentheses.
-    return node.operator === '??' ? 'looser' : node.operator;
-  }
-
-  return LOOSER_THAN_LOGICAL.has(node.type) ? 'looser' : 'tighter';
 };
 
 const LOOSER_THAN_LOGICAL: ReadonlySet<AST_NODE_TYPES> =
@@ -348,11 +356,3 @@ const isNeverNaN = (type: ts.Type, checker: ts.TypeChecker): boolean => {
     checker.typeToString(brandType) === 'false'
   );
 };
-
-/**
- * The parser's node, which the source code and the token store take as
- * mutable, for one that this package only reads.
- */
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

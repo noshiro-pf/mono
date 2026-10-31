@@ -114,40 +114,6 @@ export const survey = async (
   });
 };
 
-/**
- * What the rules on the default branch require, as GitHub applies them.
- *
- * The required contexts are what let "green" mean the whole list rather than
- * the part of it that has reported. A required context with no check run on the
- * head commit is not pending in the head's checks — it is absent from them — so a
- * pull request three minutes into a twenty-five minute matrix looks finished
- * without them. The review rules are what `pr-report-core`'s `review-hold.mts`
- * asks about.
- *
- * Rules that cannot be read require nothing: the watch falls back to judging
- * by what has reported, on a longer leash, and no review holds anything.
- */
-const readRules = async (
-  api: ApiContext,
-  branch: string,
-): Promise<RulesetRequirements> => {
-  const rules = await readBranchRules(api, branch);
-
-  if (Result.isErr(rules)) {
-    log(
-      `Cannot read the rules for ${branch}; judging by the checks that have reported, and holding nothing for review. (${lastLines(rules.value, 2)})`,
-    );
-
-    return {
-      requiredContexts: [],
-      requireCodeOwnerReview: false,
-      requireConversationResolution: false,
-    };
-  }
-
-  return rules.value;
-};
-
 export const triage = async (
   api: ApiContext,
   pullRequests: readonly PullRequest[],
@@ -293,6 +259,135 @@ export const triage = async (
   };
 };
 
+/**
+ * The cycle's order: `pr-report-core`'s `orderCandidates`, which says why,
+ * with what this run has demoted (`demotions.mts`).
+ */
+export const orderCandidates = (
+  candidates: readonly PullRequest[],
+  context: Readonly<{ defaultBranch: string; demoted: Demotions }>,
+): readonly PullRequest[] =>
+  orderQueueCandidates(candidates, factsOf, {
+    defaultBranch: context.defaultBranch,
+    demoted: (pr) => isDemoted(context.demoted, pr),
+  });
+
+export const reportTriage = (
+  triaged: Triage,
+  total: number,
+  context: Readonly<{ defaultBranch: string; demoted: Demotions }>,
+): void => {
+  const { defaultBranch } = context;
+
+  const paused = triaged.candidates.filter(isSkipCiLabelled).length;
+
+  log(
+    `${total} open pull request(s), ${triaged.inScope} labelled ${MERGE_QUEUED_LABEL}: ${triaged.candidates.length} to act on (${paused} paused by ${SKIP_CI_LABEL}), ${triaged.inFlight.length} in flight, ${triaged.failing.length} failing, ${triaged.held.length} held by review.`,
+  );
+
+  for (const cycle of triaged.cycles) {
+    if (!Arr.isNonEmpty(cycle)) {
+      continue;
+    }
+
+    log(
+      `  Merge-After cycle: ${[...cycle, cycle[0]].map((number) => `#${number}`).join(' → ')}`,
+    );
+  }
+
+  for (const held of triaged.held) {
+    log(`  ${held}`);
+  }
+
+  for (const [prNumber, reason] of triaged.bypass) {
+    log(
+      `  #${prNumber}: only a ruleset bypass merges it — ${reason}; its checks are run, and auto-merge is left off`,
+    );
+  }
+
+  for (const note of triaged.notes) {
+    log(`  ${note}`);
+  }
+
+  for (const { pr, summary } of triaged.failing) {
+    log(
+      `  #${pr.number}: up to date but failing: ${summary.failed.join(', ')}`,
+    );
+  }
+
+  for (const [position, pr] of triaged.candidates.entries()) {
+    log(
+      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch, triaged)}${isDemoted(context.demoted, pr) ? ' — last, because it sat green without merging' : ''}${priorityPhrase(pr)} — ${pr.title}`,
+    );
+  }
+};
+
+/** What this cycle is about to do to a pull request, as a phrase. */
+export const describeAction = (
+  pr: PullRequest,
+  defaultBranch: string,
+  triaged: StrictPick<Triage, 'bypass' | 'stackParents' | 'toArm'>,
+): string => {
+  if (isVersionPullRequest(pr, defaultBranch)) {
+    return `take ${SKIP_CI_LABEL} off it — the release workflow owns the branch`;
+  }
+
+  const above = stackDescendants(triaged.stackParents, pr.number);
+
+  return [
+    `rebase onto ${defaultBranch}`,
+    isConflicting(pr)
+      ? ', which GitHub says conflicts — a rebase will say'
+      : '',
+    Arr.isNonEmpty(above)
+      ? `, carry ${above.map((n) => `#${n}`).join(', ')} stacked on it along`
+      : '',
+    triaged.toArm.has(pr.number) ? ', arm auto-merge' : '',
+    bypassPhrase(triaged.bypass.get(pr.number)),
+    isSkipCiLabelled(pr) ? `, then take ${SKIP_CI_LABEL} off it` : '',
+  ].join('');
+};
+
+/** What is done instead of arming one only a bypass merges, as a phrase. */
+export const bypassPhrase = (reason: string | undefined): string =>
+  reason === undefined
+    ? ''
+    : (`, leave auto-merge off (${reason}, so it needs a bypass merge)` as const);
+
+/**
+ * What the rules on the default branch require, as GitHub applies them.
+ *
+ * The required contexts are what let "green" mean the whole list rather than
+ * the part of it that has reported. A required context with no check run on the
+ * head commit is not pending in the head's checks — it is absent from them — so a
+ * pull request three minutes into a twenty-five minute matrix looks finished
+ * without them. The review rules are what `pr-report-core`'s `review-hold.mts`
+ * asks about.
+ *
+ * Rules that cannot be read require nothing: the watch falls back to judging
+ * by what has reported, on a longer leash, and no review holds anything.
+ */
+const readRules = async (
+  api: ApiContext,
+  branch: string,
+): Promise<RulesetRequirements> => {
+  const rules = await readBranchRules(api, branch);
+
+  if (Result.isErr(rules)) {
+    log(
+      `Cannot read the rules for ${branch}; judging by the checks that have reported, and holding nothing for review. (${lastLines(rules.value, 2)})`,
+    );
+
+    return {
+      requiredContexts: [],
+      requireCodeOwnerReview: false,
+      requireConversationResolution: false,
+    };
+  }
+
+  return rules.value;
+};
+
 /** What `queueStanding` decides from, as GitHub returned it. */
 const factsOf = (pr: PullRequest): QueueFacts =>
   ({
@@ -314,6 +409,64 @@ type Settled = Readonly<{
   /** The checks, when they were read. */
   summary: ChecksSummary | undefined;
 }>;
+
+/**
+ * The pull request's place in one of GitHub's native stacks (`stack.mts`),
+ * if it is in one. One whose stack cannot be read is taken to be in none,
+ * and GitHub's refusal to arm it, should it come, sets it aside.
+ */
+const inNativeStack = async (
+  api: ApiContext,
+  pr: PullRequest,
+): Promise<QueueReads['nativeStack']> => {
+  const entry = await readNativeStack(api, pr.number);
+
+  if (Result.isErr(entry)) {
+    log(
+      `#${pr.number}: cannot read whether it is in a native stack; treating it as in none. (${lastLines(entry.value, 2)})`,
+    );
+
+    return undefined;
+  }
+
+  return entry.value;
+};
+
+/**
+ * The required checks of a pull request nothing here can move — waiting on
+ * its checks, or held by one that failed — or the note to report when they
+ * cannot be read.
+ */
+const readChecks = async (
+  api: ApiContext,
+  pr: PullRequest,
+  context: TriageContext,
+): Promise<Result<ChecksSummary, Classification>> => {
+  const checks = await listRequiredChecks(api, pr.number);
+
+  if (Result.isErr(checks)) {
+    return Result.err({
+      kind: 'note',
+      note: `#${pr.number}: could not read checks: ${checks.value}`,
+    });
+  }
+
+  // Pending and passed are both in flight here, but a red left by the round
+  // before is not a failure while this round runs, and the checks still
+  // running are what tell the two apart.
+  const running = await listRunningChecks(api, pr.number);
+
+  if (Result.isErr(running)) {
+    return Result.err({
+      kind: 'note',
+      note: `#${pr.number}: could not read checks: ${running.value}`,
+    });
+  }
+
+  return Result.ok(
+    summarizeChecks(checks.value, context.requiredContexts, running.value),
+  );
+};
 
 /**
  * Asks `queueStanding` where `pr` stands, reading what it asks for — and
@@ -439,28 +592,6 @@ const classification = (
 };
 
 /**
- * The pull request's place in one of GitHub's native stacks (`stack.mts`),
- * if it is in one. One whose stack cannot be read is taken to be in none,
- * and GitHub's refusal to arm it, should it come, sets it aside.
- */
-const inNativeStack = async (
-  api: ApiContext,
-  pr: PullRequest,
-): Promise<QueueReads['nativeStack']> => {
-  const entry = await readNativeStack(api, pr.number);
-
-  if (Result.isErr(entry)) {
-    log(
-      `#${pr.number}: cannot read whether it is in a native stack; treating it as in none. (${lastLines(entry.value, 2)})`,
-    );
-
-    return undefined;
-  }
-
-  return entry.value;
-};
-
-/**
  * What each pull request's review does to it, by number, for those it does
  * anything to — `review-hold.mts` in `pr-report-core` says what is asked and
  * why. One request covers all of them. A request that fails holds nothing,
@@ -518,143 +649,12 @@ const readReviewHolds = async (
 };
 
 /**
- * The required checks of a pull request nothing here can move — waiting on
- * its checks, or held by one that failed — or the note to report when they
- * cannot be read.
- */
-const readChecks = async (
-  api: ApiContext,
-  pr: PullRequest,
-  context: TriageContext,
-): Promise<Result<ChecksSummary, Classification>> => {
-  const checks = await listRequiredChecks(api, pr.number);
-
-  if (Result.isErr(checks)) {
-    return Result.err({
-      kind: 'note',
-      note: `#${pr.number}: could not read checks: ${checks.value}`,
-    });
-  }
-
-  // Pending and passed are both in flight here, but a red left by the round
-  // before is not a failure while this round runs, and the checks still
-  // running are what tell the two apart.
-  const running = await listRunningChecks(api, pr.number);
-
-  if (Result.isErr(running)) {
-    return Result.err({
-      kind: 'note',
-      note: `#${pr.number}: could not read checks: ${running.value}`,
-    });
-  }
-
-  return Result.ok(
-    summarizeChecks(checks.value, context.requiredContexts, running.value),
-  );
-};
-
-/**
  * Whether GitHub says merging this pull request into the base conflicts. It
  * is a candidate all the same — see `queueStanding` — but a less promising
  * one, so it is reported and ordered apart from the rest.
  */
 const isConflicting = (pr: PullRequest): boolean =>
   pr.mergeStateStatus === 'DIRTY';
-
-/**
- * The cycle's order: `pr-report-core`'s `orderCandidates`, which says why,
- * with what this run has demoted (`demotions.mts`).
- */
-export const orderCandidates = (
-  candidates: readonly PullRequest[],
-  context: Readonly<{ defaultBranch: string; demoted: Demotions }>,
-): readonly PullRequest[] =>
-  orderQueueCandidates(candidates, factsOf, {
-    defaultBranch: context.defaultBranch,
-    demoted: (pr) => isDemoted(context.demoted, pr),
-  });
-
-export const reportTriage = (
-  triaged: Triage,
-  total: number,
-  context: Readonly<{ defaultBranch: string; demoted: Demotions }>,
-): void => {
-  const { defaultBranch } = context;
-
-  const paused = triaged.candidates.filter(isSkipCiLabelled).length;
-
-  log(
-    `${total} open pull request(s), ${triaged.inScope} labelled ${MERGE_QUEUED_LABEL}: ${triaged.candidates.length} to act on (${paused} paused by ${SKIP_CI_LABEL}), ${triaged.inFlight.length} in flight, ${triaged.failing.length} failing, ${triaged.held.length} held by review.`,
-  );
-
-  for (const cycle of triaged.cycles) {
-    if (!Arr.isNonEmpty(cycle)) {
-      continue;
-    }
-
-    log(
-      `  Merge-After cycle: ${[...cycle, cycle[0]].map((number) => `#${number}`).join(' → ')}`,
-    );
-  }
-
-  for (const held of triaged.held) {
-    log(`  ${held}`);
-  }
-
-  for (const [prNumber, reason] of triaged.bypass) {
-    log(
-      `  #${prNumber}: only a ruleset bypass merges it — ${reason}; its checks are run, and auto-merge is left off`,
-    );
-  }
-
-  for (const note of triaged.notes) {
-    log(`  ${note}`);
-  }
-
-  for (const { pr, summary } of triaged.failing) {
-    log(
-      `  #${pr.number}: up to date but failing: ${summary.failed.join(', ')}`,
-    );
-  }
-
-  for (const [position, pr] of triaged.candidates.entries()) {
-    log(
-      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch, triaged)}${isDemoted(context.demoted, pr) ? ' — last, because it sat green without merging' : ''}${priorityPhrase(pr)} — ${pr.title}`,
-    );
-  }
-};
-
-/** What this cycle is about to do to a pull request, as a phrase. */
-export const describeAction = (
-  pr: PullRequest,
-  defaultBranch: string,
-  triaged: StrictPick<Triage, 'bypass' | 'stackParents' | 'toArm'>,
-): string => {
-  if (isVersionPullRequest(pr, defaultBranch)) {
-    return `take ${SKIP_CI_LABEL} off it — the release workflow owns the branch`;
-  }
-
-  const above = stackDescendants(triaged.stackParents, pr.number);
-
-  return [
-    `rebase onto ${defaultBranch}`,
-    isConflicting(pr)
-      ? ', which GitHub says conflicts — a rebase will say'
-      : '',
-    Arr.isNonEmpty(above)
-      ? `, carry ${above.map((n) => `#${n}`).join(', ')} stacked on it along`
-      : '',
-    triaged.toArm.has(pr.number) ? ', arm auto-merge' : '',
-    bypassPhrase(triaged.bypass.get(pr.number)),
-    isSkipCiLabelled(pr) ? `, then take ${SKIP_CI_LABEL} off it` : '',
-  ].join('');
-};
-
-/** What is done instead of arming one only a bypass merges, as a phrase. */
-export const bypassPhrase = (reason: string | undefined): string =>
-  reason === undefined
-    ? ''
-    : (`, leave auto-merge off (${reason}, so it needs a bypass merge)` as const);
 
 /** What the pull request's priority label did to its place, as a phrase. */
 const priorityPhrase = (pr: PullRequest): string => {

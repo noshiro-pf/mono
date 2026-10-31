@@ -507,11 +507,10 @@ rules and those under "Testing" are in `docs/typescript-coding-rules.md`.
   with the rule disabled.
 - **Strings**: template literals for a few, `.join()` for lists, `dedent` for
   generated source.
-- **File organization**, top-down: exported functions first, then types,
-  constants, helpers with lower-level ones before their callers, utilities
-  last. React files: imports, `type Props`, the component, `displayName` if
-  memoized, then styles and helpers; one component per file, arrow functions,
-  `.tsx`.
+- **File organization**: types and constants go after the exported functions
+  and before the helpers. React files: imports, `type Props`, the component,
+  `displayName` if memoized, then styles and helpers; one component per file,
+  arrow functions, `.tsx`.
 - **JSX**: `cond ? <X /> : undefined`, not `cond && <X />`; template literals
   rather than adjacent expressions; roles, labels, `alt`, `aria-*` on
   interactive elements.

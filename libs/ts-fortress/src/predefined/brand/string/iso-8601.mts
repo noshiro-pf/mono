@@ -59,27 +59,15 @@ const ISO8601ValidatorOption: Type<ISO8601ValidatorOption> = record({
   defaultValue: string(new Date().toISOString()),
 });
 
-const isISO8601 =
-  (options?: Partial<StrictOmit<ISO8601ValidatorOption, 'defaultValue'>>) =>
-  (str: string): str is Iso8601 => {
-    const filledOptions = ISO8601ValidatorOption.fill(options);
+const parseDigits = (digits: string | undefined): number | undefined => {
+  if (digits === undefined) {
+    return undefined;
+  }
 
-    const check = filledOptions.strictSeparator
-      ? regexpIso8601StrictSeparator.test(str)
-      : regexpIso8601.test(str);
+  const parsed = SafeNumber.parseInteger(digits);
 
-    return check && filledOptions.strict ? isValidDate(str) : check;
-  };
-
-// from http://goo.gl/0ejHHW
-const regexpIso8601 =
-  // eslint-disable-next-line security/detect-unsafe-regex
-  /^([+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-3])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([\sT]((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([,.]\d+(?!:))?)?(\17[0-5]\d([,.]\d+)?)?([Zz]|([+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/u;
-
-// same as above, except with a strict 'T' separator between date and time
-const regexpIso8601StrictSeparator =
-  // eslint-disable-next-line security/detect-unsafe-regex
-  /^([+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-3])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))(T((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([,.]\d+(?!:))?)?(\17[0-5]\d([,.]\d+)?)?([Zz]|([+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/u;
+  return Result.isOk(parsed) ? parsed.value : undefined;
+};
 
 const isValidDate = (str: string): boolean => {
   // str must have passed the ISO8601 check
@@ -130,12 +118,24 @@ const isValidDate = (str: string): boolean => {
   return true;
 };
 
-const parseDigits = (digits: string | undefined): number | undefined => {
-  if (digits === undefined) {
-    return undefined;
-  }
+const isISO8601 =
+  (options?: Partial<StrictOmit<ISO8601ValidatorOption, 'defaultValue'>>) =>
+  (str: string): str is Iso8601 => {
+    const filledOptions = ISO8601ValidatorOption.fill(options);
 
-  const parsed = SafeNumber.parseInteger(digits);
+    const check = filledOptions.strictSeparator
+      ? regexpIso8601StrictSeparator.test(str)
+      : regexpIso8601.test(str);
 
-  return Result.isOk(parsed) ? parsed.value : undefined;
-};
+    return check && filledOptions.strict ? isValidDate(str) : check;
+  };
+
+// from http://goo.gl/0ejHHW
+const regexpIso8601 =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^([+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-3])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([\sT]((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([,.]\d+(?!:))?)?(\17[0-5]\d([,.]\d+)?)?([Zz]|([+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/u;
+
+// same as above, except with a strict 'T' separator between date and time
+const regexpIso8601StrictSeparator =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^([+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-3])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))(T((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([,.]\d+(?!:))?)?(\17[0-5]\d([,.]\d+)?)?([Zz]|([+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/u;

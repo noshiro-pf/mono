@@ -308,6 +308,8 @@ const sections = [
   ['Minified', 'minified'],
 ] as const;
 
+const formatKb = (bytes: number): string => (bytes / 1000).toFixed(1);
+
 const render = (
   sizes: readonly (readonly Sizes[])[],
   versions: readonly string[],
@@ -331,7 +333,5 @@ const render = (
       '',
     ]),
   ].join('\n');
-
-const formatKb = (bytes: number): string => (bytes / 1000).toFixed(1);
 
 await main();

@@ -64,9 +64,6 @@ const verbs: readonly string[] = [
   'wonder',
 ] as const;
 
-const pick = (words: readonly string[]): string =>
-  words[Math.floor(Math.random() * words.length)] ?? words[0] ?? 'unknown';
-
 /** For example `swift-otters-wander (2026-09-10 02:14 UTC)`. */
 export const makeBuildId = (): string => {
   const words = [pick(adjectives), pick(creatures), pick(verbs)].join('-');
@@ -81,3 +78,6 @@ export const makeBuildId = (): string => {
 
   return `${words} (${formatter.format(Date.now())} UTC)`;
 };
+
+const pick = (words: readonly string[]): string =>
+  words[Math.floor(Math.random() * words.length)] ?? words[0] ?? 'unknown';

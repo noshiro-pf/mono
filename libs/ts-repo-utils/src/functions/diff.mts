@@ -123,70 +123,6 @@ export const getDiffFrom = async (
   });
 };
 
-const cmdResultToFiles = async ({
-  args,
-  argsToExcludeDeleted,
-  argsToIncludeDeleted,
-  trailingArgs = [],
-  options,
-}: Readonly<{
-  args: readonly string[];
-  argsToExcludeDeleted: readonly string[];
-  argsToIncludeDeleted: readonly string[];
-  trailingArgs?: readonly string[];
-  options?: Readonly<{
-    /** @default true */
-    excludeDeleted?: boolean;
-    /** @default false */
-    silent?: boolean;
-  }>;
-}>): Promise<
-  Result<readonly string[], ExecException | Readonly<{ message: string }>>
-> => {
-  // Get git root directory
-  const gitRootResult = await getGitRoot({ silent: options?.silent ?? false });
-
-  if (Result.isErr(gitRootResult)) {
-    return gitRootResult;
-  }
-
-  const gitRoot = gitRootResult.value;
-
-  const result = await execGit(
-    [
-      ...args,
-      ...((options?.excludeDeleted ?? true)
-        ? argsToExcludeDeleted
-        : argsToIncludeDeleted),
-      ...trailingArgs,
-    ],
-    {
-      silent: options?.silent ?? false,
-      // Run git from the repository root so that `git ls-files` (which
-      // defaults to cwd-relative paths) and other commands return paths
-      // relative to the repository root, matching the `path.join(gitRoot, …)`
-      // computation below regardless of the caller's current working
-      // directory.
-      cwd: gitRoot,
-    },
-  );
-
-  if (Result.isErr(result)) {
-    return result;
-  }
-
-  const { stdout } = result.value;
-
-  // Parse git output and convert to absolute paths
-  const files = stdout
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line !== '')
-    .map((relativePath) => path.join(gitRoot, relativePath));
-
-  return Result.ok(files);
-};
-
 /**
  * Runs `git` with `args` handed to the process one argument at a time. No shell
  * is involved, so each entry of `args` arrives at git exactly as written.
@@ -251,4 +187,68 @@ const execGit = async (
       },
     );
   });
+};
+
+const cmdResultToFiles = async ({
+  args,
+  argsToExcludeDeleted,
+  argsToIncludeDeleted,
+  trailingArgs = [],
+  options,
+}: Readonly<{
+  args: readonly string[];
+  argsToExcludeDeleted: readonly string[];
+  argsToIncludeDeleted: readonly string[];
+  trailingArgs?: readonly string[];
+  options?: Readonly<{
+    /** @default true */
+    excludeDeleted?: boolean;
+    /** @default false */
+    silent?: boolean;
+  }>;
+}>): Promise<
+  Result<readonly string[], ExecException | Readonly<{ message: string }>>
+> => {
+  // Get git root directory
+  const gitRootResult = await getGitRoot({ silent: options?.silent ?? false });
+
+  if (Result.isErr(gitRootResult)) {
+    return gitRootResult;
+  }
+
+  const gitRoot = gitRootResult.value;
+
+  const result = await execGit(
+    [
+      ...args,
+      ...((options?.excludeDeleted ?? true)
+        ? argsToExcludeDeleted
+        : argsToIncludeDeleted),
+      ...trailingArgs,
+    ],
+    {
+      silent: options?.silent ?? false,
+      // Run git from the repository root so that `git ls-files` (which
+      // defaults to cwd-relative paths) and other commands return paths
+      // relative to the repository root, matching the `path.join(gitRoot, …)`
+      // computation below regardless of the caller's current working
+      // directory.
+      cwd: gitRoot,
+    },
+  );
+
+  if (Result.isErr(result)) {
+    return result;
+  }
+
+  const { stdout } = result.value;
+
+  // Parse git output and convert to absolute paths
+  const files = stdout
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line !== '')
+    .map((relativePath) => path.join(gitRoot, relativePath));
+
+  return Result.ok(files);
 };

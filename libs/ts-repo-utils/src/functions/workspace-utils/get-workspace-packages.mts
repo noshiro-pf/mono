@@ -101,6 +101,19 @@ export const getWorkspacePackages = async (
   return finalPackages;
 };
 
+const getKeyValueRecordFromJsonValue = (
+  value: JsonValue,
+  key: string,
+): ReadonlyRecord<string, string> => {
+  if (!isRecord(value) || !hasKey(value, key)) {
+    return {};
+  }
+
+  const obj = value[key];
+
+  return !isRecord(obj) ? {} : Obj.filter(obj, isString);
+};
+
 /** Merges the named `package.json` fields into a single dependency map. */
 const mergeDependencyFields = (
   packageJson: JsonValue,
@@ -127,16 +140,3 @@ const getStrArrayFromJsonValue = (
   value[key].every(isString)
     ? value[key]
     : ([] as const);
-
-const getKeyValueRecordFromJsonValue = (
-  value: JsonValue,
-  key: string,
-): ReadonlyRecord<string, string> => {
-  if (!isRecord(value) || !hasKey(value, key)) {
-    return {};
-  }
-
-  const obj = value[key];
-
-  return !isRecord(obj) ? {} : Obj.filter(obj, isString);
-};

@@ -201,6 +201,8 @@ type Setup = Readonly<{
   tick: (n: number) => void;
 }>;
 
+const cancelNothing = (): void => undefined;
+
 const setup = (): Setup => {
   const [roomState, setRoom] = createState<Room | undefined>(undefined);
 
@@ -250,8 +252,6 @@ const setup = (): Setup => {
     },
   } as const;
 };
-
-const cancelNothing = (): void => undefined;
 
 const black6: Card = { color: 'black', number: 6 } as const;
 
