@@ -2,6 +2,7 @@
 prev: false
 next: false
 title: 索引
+description: SynState のすべての API を 1 ページに — 状態、イベントエミッター、Observable の作成関数、結合関数、オペレーター — 各リファレンスページへのリンク付き。
 sidebar:
     order: 1
 ---
