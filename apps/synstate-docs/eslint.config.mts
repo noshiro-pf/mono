@@ -15,9 +15,16 @@ import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
 import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
-import { preactComponentDirs } from './configs/preact-component-dirs.mjs';
+import {
+  preactComponentDirs,
+  synstateDomComponentDirs,
+} from './configs/component-dirs.mjs';
 
 const preactComponentGlobs = preactComponentDirs.map(
+  (dir) => `src/components/${dir}/**/*.tsx`,
+);
+
+const synstateDomComponentGlobs = synstateDomComponentDirs.map(
   (dir) => `src/components/${dir}/**/*.tsx`,
 );
 
@@ -40,12 +47,12 @@ export default [
 
   eslintConfigForPlaywright(['e2e/**']),
 
-  // `eslintConfigForReact` takes `files` only, so the Preact directories are
-  // taken out through `ignores` on each of its entries; a `!` inside a `files`
-  // glob is not a negation, and matches nothing.
+  // `eslintConfigForReact` takes `files` only, so the Preact and synstate-dom
+  // directories are taken out through `ignores` on each of its entries; a `!`
+  // inside a `files` glob is not a negation, and matches nothing.
   ...eslintConfigForReact(['src/components/**/*.tsx']).map((config) => ({
     ...config,
-    ignores: preactComponentGlobs,
+    ignores: [...preactComponentGlobs, ...synstateDomComponentGlobs],
   })),
 
   ...eslintConfigForPreact(preactComponentGlobs),

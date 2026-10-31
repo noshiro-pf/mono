@@ -1,0 +1,47 @@
+---
+import './synstate-dom-demo.css';
+
+type Props = Readonly<{
+  /** Which demo to mount: a key of `demos` in the script below. */
+  demo: 'counter' | 'search' | 'todo';
+}>;
+
+const { demo } = Astro.props;
+---
+
+<div
+  class="synstate-dom-demo not-content"
+  data-synstate-dom-demo={demo}
+  data-e2e={demo}
+>
+</div>
+
+<script>
+  import { render } from 'synstate-dom';
+  import { CounterDemo } from './counter-demo.jsx';
+  import { SearchDemo } from './search-demo.jsx';
+  import { TodoDemo } from './todo-demo.jsx';
+
+  const demos = {
+    counter: CounterDemo,
+    search: SearchDemo,
+    todo: TodoDemo,
+  } as const;
+
+  const isDemoName = (
+    name: string | undefined,
+  ): name is keyof typeof demos =>
+    name !== undefined && Object.hasOwn(demos, name);
+
+  for (const container of document.querySelectorAll<HTMLElement>(
+    '[data-synstate-dom-demo]',
+  )) {
+    const name = container.dataset['synstateDomDemo'];
+
+    if (!isDemoName(name)) {
+      throw new Error(`No synstate-dom demo named "${name}"`);
+    }
+
+    render(demos[name], container);
+  }
+</script>

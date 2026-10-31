@@ -6,7 +6,10 @@ import { defineConfig } from 'astro/config';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 import { appDevPort } from '../../tools/configs/app-dev-ports.mts';
-import { preactComponentDirs } from './configs/preact-component-dirs.mjs';
+import {
+  preactComponentDirs,
+  synstateDomComponentDirs,
+} from './configs/component-dirs.mjs';
 
 export default defineConfig({
   site: 'https://noshiro-pf.github.io',
@@ -16,6 +19,9 @@ export default defineConfig({
   // `astro dev` and `astro preview`; the e2e suite
   // (`configs/playwright.config.mts`) waits on it.
   server: { port: appDevPort(import.meta.dirname) },
+  // A taken port fails instead of moving to the next one, which the e2e
+  // server would never find.
+  vite: { server: { strictPort: true }, preview: { strictPort: true } },
   markdown: {
     processor: unified({
       gfm: true,
@@ -33,7 +39,9 @@ export default defineConfig({
       include: ['**/components/**/*.{jsx,tsx}'],
       // `exclude`, not a `!` pattern in `include`: the matcher ORs the entries
       // of `include`, so a negated one there removes nothing.
-      exclude: preactComponentDirs.map((dir) => `**/components/${dir}/**`),
+      exclude: [...preactComponentDirs, ...synstateDomComponentDirs].map(
+        (dir) => `**/components/${dir}/**`,
+      ),
     }),
     preact({
       include: preactComponentDirs.map(
@@ -142,6 +150,11 @@ export default defineConfig({
           label: 'Examples',
           translations: { ja: 'サンプル' },
           items: [{ autogenerate: { directory: 'examples' } }],
+        },
+        {
+          label: 'synstate-dom',
+          translations: { ja: 'synstate-dom' },
+          items: [{ slug: 'synstate-dom/introduction' }],
         },
         {
           label: 'Preact Signals',

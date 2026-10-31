@@ -59,7 +59,7 @@ Observable と signal を相互に変換する関数（`toSignal`・`fromSignal`
 
 ### synstate-dom（フレームワークなし）
 
-[synstate-dom](/mono/synstate-dom/ja/) は SynState の上に作られた、コンパイラを使わない UI ライブラリで、仮想 DOM もフレームワークも介さずに Observable を DOM に直接束縛します。[インストール方法](/mono/synstate-dom/ja/getting-started/installation/)と API は専用のドキュメントサイトにあります。
+[synstate-dom](/mono/synstate-dom/ja/) は SynState の上に作られた、コンパイラを使わない UI ライブラリで、仮想 DOM もフレームワークも介さずに Observable を DOM に直接束縛します。動くデモは [synstate-dom の紹介](/mono/synstate/ja/synstate-dom/introduction/)にあります。[インストール方法](/mono/synstate-dom/ja/getting-started/installation/)と API は専用のドキュメントサイトにあります。
 
 ### ESLint プラグイン
 

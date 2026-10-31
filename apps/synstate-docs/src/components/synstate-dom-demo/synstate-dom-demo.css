@@ -1,0 +1,85 @@
+.synstate-dom-demo .row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.synstate-dom-demo .label {
+  min-width: 160px;
+  font-size: 13px;
+  color: var(--sl-color-gray-3);
+}
+
+.synstate-dom-demo .value {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.synstate-dom-demo .box {
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid var(--sl-color-accent);
+  border-radius: 6px;
+  background: var(--sl-color-bg-nav);
+  font-size: 13px;
+}
+
+.synstate-dom-demo .controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.synstate-dom-demo .controls button,
+.synstate-dom-demo .list button {
+  padding: 4px 12px;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 4px;
+  background: var(--sl-color-bg-nav);
+  color: var(--sl-color-text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.synstate-dom-demo .input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 4px;
+  background: var(--sl-color-bg);
+  color: var(--sl-color-text);
+  font-size: 14px;
+}
+
+.synstate-dom-demo .status {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--sl-color-gray-3);
+}
+
+.synstate-dom-demo .list {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  padding-left: 0;
+}
+
+.synstate-dom-demo .list li {
+  /* not `display: list-item`, so no marker, and no `list-style: none`, which
+     would take the list role away in Safari */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.synstate-dom-demo .done label {
+  color: var(--sl-color-gray-3);
+  text-decoration: line-through;
+}
+
+.synstate-dom-demo .note {
+  font-size: 12px;
+  color: var(--sl-color-gray-4);
+}

@@ -59,7 +59,7 @@ It converts between Observables and signals (`toSignal`, `fromSignal`), and its 
 
 ### synstate-dom (no framework)
 
-[synstate-dom](/mono/synstate-dom/) is a compiler-free UI library built on SynState that binds Observables directly to the DOM, with no virtual DOM and no framework. Its [installation](/mono/synstate-dom/getting-started/installation/) and API are on its own documentation site.
+[synstate-dom](/mono/synstate-dom/) is a compiler-free UI library built on SynState that binds Observables directly to the DOM, with no virtual DOM and no framework. [Introducing synstate-dom](/mono/synstate/synstate-dom/introduction/) shows it with live demos; its [installation](/mono/synstate-dom/getting-started/installation/) and API are on its own documentation site.
 
 ### ESLint plugin
 
