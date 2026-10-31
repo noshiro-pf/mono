@@ -1,5 +1,13 @@
 # ts-fortress-types
 
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies [ad2df6c]
+    - ts-data-forge@14.10.1
+    - ts-fortress@12.4.1
+
 ## 0.0.15
 
 ### Patch Changes

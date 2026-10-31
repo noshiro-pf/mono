@@ -1,5 +1,45 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.3.0
+
+### Minor Changes
+
+- cf44538: Add `ts-restrictions/no-ragged-comment-wrap`, `error` in
+  `eslintTsRestrictionsRules`. Prettier does not reflow comments, so a comment
+  paragraph edited after it was wrapped keeps the line breaks the edit left. The
+  rule reports a line, in a run of `//` comments or a `/** … */` block, with room
+  for the first word of the line after it within the print width, and its fix
+  refills the paragraph, keeping the indentation and the comment prefix and never
+  starting a line with a word that means something else there (`@tag`, `-`, `>`,
+  `#`, `1.`).
+
+    The print width is the `printWidth` option, else that of the nearest Prettier
+    configuration, looked for as Prettier does and read only when it is JSON
+    (`package.json`'s `prettier` key, `.prettierrc`, `.prettierrc.json`); any other
+    nearest configuration, and no configuration, gives 80.
+
+    The rule leaves alone what it cannot judge: list items, JSDoc tags and what
+    follows them, fenced or indented code, tables, headings, URLs, East Asian text
+    and emoji, directives, markers and labels, commented-out code, license headers,
+    and paragraphs with an unpaired backtick or tab indentation. It neither reports
+    nor joins after a line that ends a sentence or a Markdown hard line break,
+    after a one-word line, before a line that starts with a capital, or between two
+    lines that end with commas. A code span or an inline tag is one word. No fix is
+    offered in a file with `\r\n` line endings.
+
+### Patch Changes
+
+- 757f952: `immer-coding-style/prefer-curried-produce` leaves four wrappers alone that its rewrite to `produce(recipe)` broke: an async one (`async (s) => produce(s, recipe)`), which returns a `Promise` of the next state where the curried form returns the state itself; a generic one (`<S extends State>(s: S) => …`), whose type parameter the rewrite dropped; one whose base is under `!` (`produce(s!, recipe)`), whose curried form would take only the narrowed type; and one whose parameter is optional (`(s?: State) => …`), which the curried form would require.
+- 7001f62: `react-coding-style/display-name` looks for a memo component's `displayName` assignment in the statement right after its declaration, in the same statement list, wherever it is declared (a function body, a block, a `case`, a class static block, a namespace). A component declared inside a function is no longer reported when the next statement assigns its `displayName`; an assignment placed after the enclosing top-level variable declaration, which used to be accepted, is now reported as missing.
+- d0dd6cd: `total-functions/no-hidden-type-assertions` no longer stops searching a signature's types at the 100th node among siblings. A type parameter used only from the 101st member of a union, intersection, tuple, type literal or type-argument list on is now found, in the return type (so the call is reported) and in the value parameters (so it is not). The search had no real bound on depth and now has none by design, since a type annotation is a finite syntax tree. A function type's parameters are also explored once instead of twice, so deeply curried callback types no longer take exponential time.
+- a62effb: `react-coding-style/use-memo-hooks-style` reads the values a `useMemo` factory returns, from an expression body or from the factory's own `return` statements, and reports an assertion that decides their type: on the value, under `!`, `satisfies` or `await`, on a branch of `? :`, of `||` / `??` or the right side of `&&`, or the last expression of a sequence. It now reports such an assertion in a block-bodied factory and in a non-generator `function` factory (and a `function` factory's return type), which it missed. An assertion inside the value, such as `!(x as boolean)`, `f(x as T)`, the left side of `&&` or one in the body of a function the factory returns, is no longer reported: it either does not decide the memoized type or may be a cast `useMemo<T>` could not replace.
+- Updated dependencies [ad2df6c]
+- Updated dependencies [ae82fef]
+- Updated dependencies [7001f62]
+- Updated dependencies [5a9d62a]
+    - ts-data-forge@14.10.1
+    - eslint-rule-forge@0.5.0
+
 ## 7.2.1
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # eslint-plugin-ts-fortress
 
+## 1.3.12
+
+### Patch Changes
+
+- ae82fef: An autofix that imports a name adds it inside the empty braces of `import {} from '<module>'` or `import D, {} from '<module>'`, where it wrote a duplicate declaration or `import D, { x }, {} from '<module>'`, a syntax error (through `eslint-rule-forge`'s `bindValueImports`).
+- Updated dependencies [ad2df6c]
+- Updated dependencies [ae82fef]
+- Updated dependencies [7001f62]
+- Updated dependencies [5a9d62a]
+    - ts-data-forge@14.10.1
+    - eslint-rule-forge@0.5.0
+
 ## 1.3.11
 
 ### Patch Changes

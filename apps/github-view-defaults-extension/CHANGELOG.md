@@ -1,5 +1,12 @@
 # github-view-defaults-extension
 
+## 0.4.7
+
+### Patch Changes
+
+- Updated dependencies [ad2df6c]
+    - ts-data-forge@14.10.1
+
 ## 0.4.6
 
 ### Patch Changes

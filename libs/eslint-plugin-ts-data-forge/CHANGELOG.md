@@ -1,5 +1,19 @@
 # eslint-plugin-ts-data-forge
 
+## 0.10.7
+
+### Patch Changes
+
+- f7638a9: `prefer-arr-generate` no longer applies its fix automatically when the rewrite would drop a comment that sits outside the callback (between the receiver and `.flatMap`, after `flatMap(`, or after the callback) or inside a test it negates (the negation can drop it, so any comment there now keeps the fix a suggestion). Such a rewrite is now offered as a suggestion, as one with any other dropped comment already was. A comment inside a destructured parameter is carried over, and no longer turns the fix into a suggestion.
+- ae82fef: An autofix that imports a name adds it inside the empty braces of `import {} from '<module>'` or `import D, {} from '<module>'`, where it wrote a duplicate declaration or `import D, { x }, {} from '<module>'`, a syntax error (through `eslint-rule-forge`'s `bindValueImports`).
+- 5a9d62a: `prefer-num-safe-parse-int` and `prefer-num-safe-parse-float` (eslint-plugin-ts-data-forge), `prefer-safe-number-parse-integer` and `prefer-safe-number-parse` (eslint-plugin-ts-std-forge), and the `createPreferSafeParseInt` / `createPreferSafeParseFloat` factories they are built from (eslint-rule-forge) now offer their rewrite as a suggestion instead of applying it with `--fix`. The replacement parses some strings differently from the original: `parseInt('1e3')` is 1 and the rewrite 1000, `parseFloat('12px')` is 12 and the rewrite NaN, and `Number('')` is 0 and the rewrite NaN. The report is unchanged, and its message now says so. A lint run that relied on `--fix` to clear these reports now leaves them: apply the suggestion where the input allows it, or keep the original call with a disable comment that says why.
+- Updated dependencies [ad2df6c]
+- Updated dependencies [ae82fef]
+- Updated dependencies [7001f62]
+- Updated dependencies [5a9d62a]
+    - ts-data-forge@14.10.1
+    - eslint-rule-forge@0.5.0
+
 ## 0.10.6
 
 ### Patch Changes
