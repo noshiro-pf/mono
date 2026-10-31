@@ -57,6 +57,12 @@ export type BenchmarkEnvironment = Readonly<{
   /**
    * Day precision. A re-measurement is a new fact and should show in the diff;
    * the time of day is not one, and would churn these files for nothing.
+   *
+   * `BENCHMARK_MEASURED_ON` (`YYYY-MM-DD`) when set, today in UTC
+   * otherwise. Each scenario runs in a process of its own and the tables must
+   * agree on one date (`scripts/measurement-checks.mts`), so a pass that
+   * crosses midnight would stamp two; the benchmark workflow sets it once for
+   * the whole pass.
    */
   measuredOn: string;
 
@@ -87,12 +93,10 @@ export const readBenchmarkEnvironment =
         'unknown',
       ),
 
-      measuredOn: Temporal.Now.plainDateISO().toString(),
+      measuredOn: readMeasuredOn(),
 
       libraries: await readComparisonLibraryVersions(),
     }) as const;
-
-const synstatePackageDir = path.resolve(scenarioDir, '../../..');
 
 /**
  * Reads each comparison library's installed version.
@@ -147,3 +151,27 @@ export const readComparisonLibraryVersions = async (): Promise<
 
   return Object.fromEntries(entries);
 };
+
+const readMeasuredOn = (): string => {
+  const pinned = process.env['BENCHMARK_MEASURED_ON'];
+
+  if (pinned === undefined || pinned === '') {
+    // UTC, as the workflow pins it, so that a local run and CI name a day the
+    // same way.
+    return Temporal.Now.plainDateISO('UTC').toString();
+  }
+
+  // `PlainDate.from` alone would also take a date-time or `20261031` and
+  // normalize it; a typo in the workflow should fail instead of being written
+  // into every table.
+  if (!/^\d{4}-\d{2}-\d{2}$/u.test(pinned)) {
+    throw new Error(
+      `❌ BENCHMARK_MEASURED_ON is '${pinned}', not a date written YYYY-MM-DD`,
+    );
+  }
+
+  // Throws on a day the calendar does not have (`2026-02-30`).
+  return Temporal.PlainDate.from(pinned, { overflow: 'reject' }).toString();
+};
+
+const synstatePackageDir = path.resolve(scenarioDir, '../../..');
