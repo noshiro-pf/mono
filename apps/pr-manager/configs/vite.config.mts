@@ -1,3 +1,6 @@
+import { createHash } from 'node:crypto';
+import { readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { Arr } from 'ts-data-forge';
 import type { PluginOption, UserConfig, Plugin as VitePlugin } from 'vite';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
@@ -71,4 +74,43 @@ const plugins: PluginOption[] = Array.from(
   Arr.toPushed(shared.plugins ?? [], contentSecurityPolicy),
 );
 
-export default { ...shared, plugins } satisfies UserConfig;
+/**
+ * A name for this build's sources, which the report kept for the next visit
+ * is keyed by (`src/report-cache.mts`): a report is the page's own shape, so
+ * one kept by other code is not read. A hash of the sources that shape it —
+ * this app's and `pr-report-core`'s — rather than of the moment, so that the
+ * same sources build the same bundle, and a deploy that changed neither
+ * keeps every report kept before it.
+ */
+const sourcesHash = (dirs: readonly string[]): string => {
+  const hash = createHash('sha256');
+
+  for (const dir of dirs) {
+    // The paths are this repository's own source directories.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const files = readdirSync(dir, { recursive: true, withFileTypes: true })
+      .filter((entry) => entry.isFile())
+      .map((entry) => path.join(entry.parentPath, entry.name))
+      .toSorted();
+
+    for (const file of files) {
+      hash.update(path.relative(dir, file));
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      hash.update(readFileSync(file));
+    }
+  }
+
+  return hash.digest('hex').slice(0, 16);
+};
+
+const define = {
+  PR_MANAGER_BUILD_ID: JSON.stringify(
+    sourcesHash([
+      path.resolve(workspaceRootPath, 'src'),
+      path.resolve(workspaceRootPath, '../../libs/pr-report-core/src'),
+    ]),
+  ),
+} as const;
+
+export default { ...shared, plugins, define } satisfies UserConfig;
