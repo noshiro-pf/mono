@@ -3,9 +3,9 @@
  * transformers: a name that starts with one of these is left mutable. A
  * private name (`#mut_x`) is matched with or after its `#`.
  *
- * The ESLint counterpart is `ignoredMutablePattern` in
- * `libs/eslint-config-typed/src/rules/eslint-functional-rules.mts` (and, for a
- * property, the `ignoreAccessorPattern` of `functional/immutable-data` there);
+ * The ESLint counterpart is `mutablePrefix` in
+ * `libs/eslint-config-typed/src/constants/mutable-prefix.mts`, from which
+ * `eslint-functional-rules.mts` there builds its name and property patterns;
  * `libs/eslint-config-typed/src/rules/eslint-functional-rules.test.mts` fails
  * when the two differ; it reads this package's `dist/`, so build first.
  */

@@ -1,3 +1,4 @@
+import { mutablePrefix } from '../constants/index.mjs';
 import {
   withDefaultOption,
   type EslintFunctionalRules,
@@ -13,7 +14,7 @@ import {
 // `eslint-functional-rules.test.mts` holds the two to the same prefixes. Type
 // names have their own `DEFAULT_MUTABLE_TYPE_PREFIXES`, which no ESLint rule
 // reads.
-const ignoredMutablePattern = ['^mut_'] as const;
+const ignoredMutablePattern = [`^${mutablePrefix}`] as const;
 
 /** @link {https://github.com/jonaskello/eslint-plugin-functional} */
 export const eslintFunctionalRules = {
@@ -31,7 +32,7 @@ export const eslintFunctionalRules = {
       ],
       ignoreNonConstDeclarations: false,
       ignoreAccessorPattern: [
-        '**.mut_**',
+        `**.${mutablePrefix}**`,
         'this.**',
         'super.**',
         '**.current.**', // allow React Ref object

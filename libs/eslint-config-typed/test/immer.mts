@@ -26,6 +26,7 @@ type State = Readonly<{ count: number }>;
 
 {
   // ❌ NG: A draft not named with the `mut_` prefix
+  // eslint-disable-next-line immer-coding-style/mut-prefixed-draft
   const update = produce<State>((draft) => {
     // eslint-disable-next-line functional/immutable-data
     draft.count += 1;

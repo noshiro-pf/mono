@@ -36,6 +36,7 @@ export default [
 
   {
     rules: defineKnownRules({
+      'immer-coding-style/mut-prefixed-draft': 'error',
       'immer-coding-style/prefer-curried-produce': 'error',
 
       'import-x/no-internal-modules': [
