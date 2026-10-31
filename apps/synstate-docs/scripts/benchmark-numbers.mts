@@ -1343,11 +1343,11 @@ const summaryScenarios = (): readonly SummaryScenario[] =>
     seriesScenario(
       {
         en: `[Cascaded diamond](#scenario-cascaded-diamond) (${CASCADED_MAX})`,
-        ja: `[カスケードダイアモンド](#シナリオ-カスケードダイアモンド)（${CASCADED_MAX}）`,
+        ja: `[カスケードダイヤモンド](#シナリオ-カスケードダイヤモンド)（${CASCADED_MAX}）`,
       },
       {
         en: `the cascaded diamond (${CASCADED_MAX})`,
-        ja: `カスケードダイアモンド（${CASCADED_MAX}）`,
+        ja: `カスケードダイヤモンド（${CASCADED_MAX}）`,
       },
       cascadedDiamond,
       CASCADED_MAX,

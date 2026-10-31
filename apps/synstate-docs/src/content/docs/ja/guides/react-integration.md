@@ -240,7 +240,7 @@ const ResultList = (): React.JSX.Element => {
 };
 ```
 
-各値は最新のレンダリングの `fn` に渡されるので、`fn` には現在の props と state が見えます。レンダリングのたびに `fn` が新しくなっても購読し直しません。別の Observable を渡すと、購読はそちらに移ります。そのため、レンダリングをまたいで同じものであり続ける Observable（コンポーネントの外で作ったもの、または `React.useMemo` でメモ化したもの）を渡してください。レンダリング中に作った Observable はレンダリングのたびに購読し直され、そのたびに `fn` が現在の値で呼ばれます。`fn` の戻り値は無視されます。アンマウント時の後始末は、別の `React.useEffect` に書いてください。`fn` は subscriber なので、state に書き込んではいけません。それは[伝播中の書き込み](/mono/synstate/ja/guides/core-state-management/#更新の伝播中に状態へ書き込まない)で、ここでも ESLint ルールが報告します。`localStorage` への保存のように、コンポーネントに属さない副作用はモジュールスコープでの `subscribe` で書きます。逆に props やコンポーネントの state をグラフに渡すには `useValueAsObservable(value)` を使います（[API リファレンス](/mono/synstate/ja/reference/api/#フック)を参照）。
+各値は最新のレンダリングの `fn` に渡されるので、`fn` には現在の props と state が見えます。レンダリングのたびに `fn` が新しくなっても購読し直しません。別の Observable を渡すと、購読はそちらに移ります。そのため、レンダリングをまたいで同じものであり続ける Observable（コンポーネントの外で作ったもの、または `React.useMemo` でメモ化したもの）を渡してください。レンダリング中に作った Observable はレンダリングのたびに購読し直され、そのたびに `fn` が現在の値で呼ばれます。`fn` の戻り値は無視されます。アンマウント時の後始末は、別の `React.useEffect` に書いてください。`fn` は subscriber なので、state に書き込んではいけません。それは[伝搬中の書き込み](/mono/synstate/ja/guides/core-state-management/#更新の伝搬中に状態へ書き込まない)で、ここでも ESLint ルールが報告します。`localStorage` への保存のように、コンポーネントに属さない副作用はモジュールスコープでの `subscribe` で書きます。逆に props やコンポーネントの state をグラフに渡すには `useValueAsObservable(value)` を使います（[API リファレンス](/mono/synstate/ja/reference/api/#フック)を参照）。
 
 ## React v17 以前
 

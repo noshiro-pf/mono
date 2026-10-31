@@ -52,16 +52,16 @@ const reset = resetState();
 console.log(reset); // 0
 ```
 
-## 更新の伝播中に状態へ書き込まない
+## 更新の伝搬中に状態へ書き込まない
 
-更新は同期的なので、購読者や `map` などの射影の中で呼んだ `setState`（`updateState`・`resetState`・`dispatch`・`next` も同じ）は、それを引き起こした更新がまだ伝播している最中に実行されます。書き込みはその場で伝播しますが、ほかの購読者が中間の状態を観測することがあり、伝播中の状態自身に書き戻すと無限に再帰することもあります。SynState は、状態ごとに最初にこの書き込みが起きたときに `console.warn` を出します。
+更新は同期的なので、購読者や `map` などの射影の中で呼んだ `setState`（`updateState`・`resetState`・`dispatch`・`next` も同じ）は、それを引き起こした更新がまだ伝搬している最中に実行されます。書き込みはその場で伝搬しますが、ほかの購読者が中間の状態を観測することがあり、伝搬中の状態自身に書き戻すと無限に再帰することもあります。SynState は、状態ごとに最初にこの書き込みが起きたときに `console.warn` を出します。
 
 ```ts
 const [a$, setA] = createState(0);
 
 const [b$, setB] = createState(0);
 
-// ❌ a$ の伝播中に b$ へ書き込む
+// ❌ a$ の伝搬中に b$ へ書き込む
 a$.subscribe((a) => {
     setB(a * 2);
 });
@@ -80,7 +80,7 @@ const b$ = a$.pipe(map((a) => a * 2));
 setA(1);
 ```
 
-書き込み元と値の間に重い副作用や `await` がある場合は、それも `fromPromise` や `switchMap` などでグラフに組み込みます。イベントハンドラー、タイマー、`queueMicrotask` のコールバックからの書き込みは伝播の外で実行されるので、対象外です。
+書き込み元と値の間に重い副作用や `await` がある場合は、それも `fromPromise` や `switchMap` などでグラフに組み込みます。イベントハンドラー、タイマー、`queueMicrotask` のコールバックからの書き込みは伝搬の外で実行されるので、対象外です。
 
 [`eslint-plugin-synstate`](/mono/synstate/ja/getting-started/installation/#eslint-プラグイン) の `synstate/no-write-during-propagation` ルールは、`subscribe` のコールバックや `pipe` の中のオペレーターからの書き込みを、実行前に、書かれた場所で報告します。`synstate` から import した関数も、それを再エクスポートする hooks パッケージや Preact Signals パッケージから import した関数も対象で、`useObservableEffect` のコールバックも subscriber として扱います。
 

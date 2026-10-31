@@ -7,20 +7,20 @@ sidebar:
 
 This page provides an objective comparison of SynState with popular state management libraries. The goal is to help you understand the trade-offs and choose the right tool for your project.
 
-| Library                                     | Core Paradigm          | Derived Values         | Async Operators Built-in   | Glitch-free derived values | React Compiler         | Vanilla (No React)                                      | Maintenance                                                                        |
-| ------------------------------------------- | ---------------------- | ---------------------- | -------------------------- | -------------------------- | ---------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| **SynState**                                | Observable (custom)    | Yes (operators)        | Yes                        | Yes (push-based)           | Fully compatible       | Yes                                                     | [Active](https://github.com/noshiro-pf/mono/tree/main/libs/synstate)               |
-| **RxJS**                                    | Observable (ReactiveX) | Yes (operators)        | Yes                        | No                         | N/A                    | Yes                                                     | [Low activity](https://github.com/ReactiveX/rxjs) (last commit: 2025-02)           |
-| **MobX**                                    | Proxy-based reactive   | Yes (`computed`)       | No                         | Yes (pull-based / lazy)    | Incompatible (opt-out) | Yes                                                     | [Active](https://github.com/mobxjs/mobx)                                           |
-| **Jotai**                                   | Atomic state           | Yes (derived atoms)    | Partial                    | Yes (pull-based / lazy)    | Compatible             | Yes (vanilla store)                                     | [Active](https://github.com/pmndrs/jotai)                                          |
-| **Redux**                                   | Flux / single store    | Yes (selectors)        | No (middleware)            | N/A (pull-based)           | Compatible             | Yes                                                     | [Active](https://github.com/reduxjs/redux-toolkit)                                 |
-| **Solid** (`solid-js`)                      | Signals (fine-grained) | Yes (`createMemo`)     | Partial (`createResource`) | Yes (push-based)           | N/A (no React binding) | Yes (`createRoot`; see [below](#running-outside-react)) | [Active](https://github.com/solidjs/solid)                                         |
-| **Preact Signals** (`@preact/signals-core`) | Signals                | Yes (`computed`)       | No                         | Yes (pull-based / lazy)    | Not verified           | Yes (the `-core` package)                               | [Active](https://github.com/preactjs/signals)                                      |
-| **Zustand**                                 | Flux-inspired store    | No (inline selectors)  | No                         | N/A (pull-based)           | Compatible             | Yes                                                     | [Active](https://github.com/pmndrs/zustand)                                        |
-| **Valtio**                                  | Proxy-based mutable    | No (separate `derive`) | No                         | N/A (pull-based)           | Compatible             | Yes                                                     | [Active](https://github.com/pmndrs/valtio)                                         |
-| **Recoil**                                  | Atomic state (React)   | Yes (selectors)        | Partial                    | Yes (pull-based / lazy)    | Compatible             | No                                                      | [Abandoned](https://github.com/facebookexperimental/Recoil) (last commit: 2023-09) |
-| **XState**                                  | Finite state machines  | Via context            | No                         | N/A                        | Compatible             | Yes                                                     | [Active](https://github.com/statelyai/xstate)                                      |
-| **TanStack Query**                          | Server-state cache     | N/A                    | Yes (fetch)                | N/A                        | Compatible             | Yes                                                     | [Active](https://github.com/TanStack/query)                                        |
+| Library                                     | Core Paradigm          | Derived Values         | Async Operators Built-in   | Glitch-free derived values | React Compiler         | Vanilla (No React)                                      | Maintenance                                                                         |
+| ------------------------------------------- | ---------------------- | ---------------------- | -------------------------- | -------------------------- | ---------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **SynState**                                | Observable (custom)    | Yes (operators)        | Yes                        | Yes (push-based)           | Fully compatible       | Yes                                                     | [Active](https://github.com/noshiro-pf/mono/tree/main/libs/synstate)                |
+| **RxJS**                                    | Observable (ReactiveX) | Yes (operators)        | Yes                        | No                         | N/A                    | Yes                                                     | [Active](https://github.com/ReactiveX/rxjs) (9.0 in beta as of 2026-10)             |
+| **MobX**                                    | Proxy-based reactive   | Yes (`computed`)       | No                         | Yes (pull-based / lazy)    | Incompatible (opt-out) | Yes                                                     | [Active](https://github.com/mobxjs/mobx)                                            |
+| **Jotai**                                   | Atomic state           | Yes (derived atoms)    | Partial                    | Yes (pull-based / lazy)    | Compatible             | Yes (vanilla store)                                     | [Active](https://github.com/pmndrs/jotai)                                           |
+| **Redux**                                   | Flux / single store    | Yes (selectors)        | No (middleware)            | N/A (pull-based)           | Compatible             | Yes                                                     | [Active](https://github.com/reduxjs/redux-toolkit)                                  |
+| **Solid** (`solid-js`)                      | Signals (fine-grained) | Yes (`createMemo`)     | Partial (`createResource`) | Yes (push-based)           | N/A (no React binding) | Yes (`createRoot`; see [below](#running-outside-react)) | [Active](https://github.com/solidjs/solid)                                          |
+| **Preact Signals** (`@preact/signals-core`) | Signals                | Yes (`computed`)       | No                         | Yes (pull-based / lazy)    | Not verified           | Yes (the `-core` package)                               | [Active](https://github.com/preactjs/signals)                                       |
+| **Zustand**                                 | Flux-inspired store    | No (inline selectors)  | No                         | N/A (pull-based)           | Compatible             | Yes                                                     | [Active](https://github.com/pmndrs/zustand)                                         |
+| **Valtio**                                  | Proxy-based mutable    | No (separate `derive`) | No                         | N/A (pull-based)           | Compatible             | Yes                                                     | [Active](https://github.com/pmndrs/valtio)                                          |
+| **Recoil**                                  | Atomic state (React)   | Yes (selectors)        | Partial                    | Yes (pull-based / lazy)    | Compatible             | No                                                      | [Abandoned](https://github.com/facebookexperimental/Recoil) (last release: 2023-03) |
+| **XState**                                  | Finite state machines  | Via context            | No                         | N/A                        | Compatible             | Yes                                                     | [Active](https://github.com/statelyai/xstate)                                       |
+| **TanStack Query**                          | Server-state cache     | N/A                    | Yes (fetch)                | N/A                        | Compatible             | Yes                                                     | [Active](https://github.com/TanStack/query)                                         |
 
 :::note[Push-based vs Pull-based Glitch-Free]
 SynState and Solid achieve glitch-free propagation **push-based** — derived values are eagerly updated in dependency order, so subscribers always receive consistent values without needing to pull. SynState visits the nodes an update reaches in depth order; Solid marks every node below the write before it reruns any, and a memo whose upstream is still stale runs that first.
@@ -49,7 +49,7 @@ SynState's model is the simplest of these to state: `next` on a source runs one 
 
 Every benchmarked library has a vanilla API, so all of them run outside React, and Solid and Preact Signals run outside their own frameworks too. What differs is whether anything happens before a reader appears, and for the two signal libraries, what using them on their own takes.
 
-- **SynState** registers a derived Observable with its root when it is created, so a pipeline written at module scope runs as soon as its source changes, subscribed or not. A search box's query, debounced and `switchMap`ped into `fromAbortablePromise(fetch(...))`, can live in a plain module, and a component, a test or a script that reads it gets the same value ([example](/mono/synstate/guides/declarative-state-management/#precise-control-over-async-behavior)). The same holds for a router kept as global state: its route, debounced and `switchMap`ped into a fetch, loads the page's data whether or not the view for it has mounted yet. The price is the eager evaluation the conditional fan-out benchmark measures, which a `switchMap` over the selected branch avoids.
+- **SynState** registers a derived Observable with its parents when it is created and computes it on every update of its source, so a pipeline written at module scope runs as soon as its source changes, subscribed or not. A search box's query, debounced and `switchMap`ped into `fromAbortablePromise(fetch(...))`, can live in a plain module, and a component, a test or a script that reads it gets the same value ([example](/mono/synstate/guides/declarative-state-management/#precise-control-over-async-behavior)). The same holds for a router kept as global state: its route, debounced and `switchMap`ped into a fetch, loads the page's data whether or not the view for it has mounted yet. The price is the eager evaluation the conditional fan-out benchmark measures, which a `switchMap` over the selected branch avoids.
 - **RxJS** can be written at module scope as well, but its pipelines are cold: nothing runs until a subscription, and each subscription runs the pipeline again, so a `fetch` inside it is sent once per subscriber unless the pipeline is shared (`share`, `shareReplay`).
 - **MobX** does not evaluate a `computed` until it is read, and does not cache it while unobserved. Work with side effects, such as fetching, goes into a `reaction` / `autorun` or an action (`flow`) that the application starts itself. A `reaction` runs eagerly, and its `delay` option throttles it; cancelling a fetch that a newer route has made stale is left to the effect.
 - **Jotai** runs an atom's read function — an async atom's fetch included — when the atom is first read or mounted. In React that is a component rendering it (an async atom suspends that component); outside React nothing runs until code calls `store.get` or `store.sub`. Data loading written as atoms is therefore scheduled by whatever reads them, which in an application is usually React's rendering. Measured with jotai 3.0.1's vanilla store: an async atom derived from a route atom fetches nothing until `store.sub`; while subscribed it fetches on every route change and aborts the previous one through its `signal`, the equivalent of `switchMap`; once the last subscriber leaves, route changes fetch nothing. A debounce cannot be written inside the derivation and has to be built on the writing side.
@@ -114,7 +114,7 @@ MobX uses transparent reactive programming via JavaScript proxies. Mutations to 
 
 - Implicit dependency tracking can make data flow harder to trace in large codebases.
 - No built-in asynchronous operators (use `flow` or external solutions).
-- Higher overhead per update compared to simpler store libraries.
+- Each run of a `computed` or a `reaction` tracks what it reads again, which puts its cost per update well above SynState's on the benchmark's small graphs ([summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page)).
 - `observer()` HOC tracks observable access during rendering, making it incompatible with React Compiler (requires `"use no memo"` directive to opt out).
 
 **Best for:** Teams that prefer mutable programming style with automatic reactivity and don't need complex async operators.
@@ -132,7 +132,7 @@ Jotai provides primitive atoms as the building block for state. Derived atoms co
 **Trade-offs:**
 
 - No built-in asynchronous operator chain (async atoms exist but are limited).
-- Higher per-update overhead due to store-level bookkeeping.
+- Every `store.set` goes through store-level bookkeeping, which puts its cost per update well above SynState's on the benchmark's small graphs ([summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page)).
 - `store.sub()` callback does not receive the current value (signature is `() => void`), requiring a separate `store.get(atom)` call to read the new value — less ergonomic for vanilla (non-React) usage. In contrast, SynState's `observable$.subscribe((value) => { ... })` passes the value directly to the callback.
 
 **Best for:** React applications that benefit from fine-grained atomic state with simple derivations.
@@ -169,7 +169,7 @@ Solid is a UI framework built on fine-grained signals: `createSignal`, `createMe
 **Trade-offs:**
 
 - Using it independently of the framework is possible but not what the package is shaped for: computations need an owner (`createRoot`), Node resolves `solid-js` to the non-reactive server build, and there are no bindings for other frameworks.
-- Higher per-update overhead than SynState: each write allocates its update queues, and each rerun removes the computation from every source and registers it again.
+- Each write allocates its update queues, and each rerun removes the computation from every source and registers it again, which puts its cost per update above SynState's on the benchmark's small graphs ([summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page)).
 - No async operator chain; `createResource` covers fetching, together with Suspense.
 
 **Best for:** Solid applications. Outside Solid, code that is prepared to manage roots and the build Node resolves.
@@ -277,18 +277,19 @@ TanStack Query (formerly React Query) is a server-state management library focus
 
 ## Choosing the Right Library
 
-| Your requirement                                     | Recommended                                      |
-| ---------------------------------------------------- | ------------------------------------------------ |
-| Simple shared state (dark mode, user session)        | **SynState**, Zustand, Valtio, Jotai             |
-| Complex async pipelines (debounce, switchMap, retry) | **SynState**, RxJS                               |
-| Glitch-free derived values                           | **SynState**, MobX, Jotai, Solid, Preact Signals |
-| Mutable-style API                                    | MobX, Valtio                                     |
-| Atomic / fine-grained reactivity                     | **SynState**, Jotai, Solid, Preact Signals       |
-| Strict unidirectional data flow                      | **SynState**, Redux                              |
-| Formal state machines                                | XState                                           |
-| Server-state caching                                 | TanStack Query                                   |
-| Minimal bundle + simple API                          | **SynState**, Zustand, Valtio                    |
-| Unified API from simple to complex                   | **SynState**                                     |
+| Your requirement                                     | Recommended                                  |
+| ---------------------------------------------------- | -------------------------------------------- |
+| Simple shared state (dark mode, user session)        | Zustand, Valtio, Jotai                       |
+| Complex async pipelines (debounce, switchMap, retry) | **SynState**, RxJS                           |
+| Async operators on glitch-free derived values        | **SynState**                                 |
+| Glitch-free derived values                           | SynState, MobX, Jotai, Solid, Preact Signals |
+| Mutable-style API                                    | MobX, Valtio                                 |
+| Atomic / fine-grained reactivity                     | Jotai, Solid, Preact Signals                 |
+| Strict unidirectional data flow                      | Redux                                        |
+| Formal state machines                                | XState                                       |
+| Server-state caching                                 | TanStack Query                               |
+| Minimal bundle + simple API                          | Zustand, Valtio                              |
+| Unified API from simple to complex                   | **SynState**                                 |
 
 ## Performance Comparison
 
