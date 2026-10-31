@@ -184,6 +184,7 @@ describe(createIssuesViewStore, () => {
         none: { shown: 1, total: 2 },
       },
       pending: { shown: 1, total: 1 },
+      inProgress: { shown: 0, total: 0 },
     });
 
     setFilter(DEFAULT_ISSUE_FILTER);
@@ -218,6 +219,7 @@ describe(createIssuesViewStore, () => {
         none: { shown: 1, total: 1 },
       },
       pending: { shown: 1, total: 1 },
+      inProgress: { shown: 0, total: 0 },
     });
 
     setFilter({ ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['low'] });
@@ -254,6 +256,7 @@ describe(createIssuesViewStore, () => {
       },
       // #3 is low, which is still hidden.
       pending: { shown: 0, total: 1 },
+      inProgress: { shown: 0, total: 0 },
     });
   });
 
@@ -296,6 +299,7 @@ describe(createIssuesViewStore, () => {
         none: { shown: 0, total: 1 },
       },
       pending: { shown: 1, total: 2 },
+      inProgress: { shown: 0, total: 0 },
     });
   });
 

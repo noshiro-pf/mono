@@ -2,7 +2,7 @@ import type { InitializedObservable } from 'synstate';
 import { constant, For, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import {
-  ISSUE_STARTS,
+  ISSUE_START_SWITCHES,
   type IssueSort,
   type LabelCount,
 } from '../issues-list-view.mjs';
@@ -15,13 +15,14 @@ import { OfTotal } from './stat-tile.js';
  * What the list of open issues leads with: a search of the titles, matched as
  * it is typed whatever the case, and not kept in the URL; the start states,
  * switches as the merge order's priorities are (`merge-order-filters.tsx`), in
- * the DAG's words; the labels, each a pick; and the order. What each does is
- * `issues-list-view.mts`, which keeps the choice in the URL.
+ * the DAG's words, save `in progress`, which is with the counts; the labels,
+ * each a pick; and the order. What each does is `issues-list-view.mts`, which
+ * keeps the choice in the URL.
  *
  * Each number is how many of what it counts the list shows, followed in
  * small by how many there are when that is more — the merge order's
- * counts, for issues. The priorities and `pending` are above these, with the
- * counts (`issues-summary.tsx`), since the DAG reads them too.
+ * counts, for issues. The priorities, `pending` and `in progress` are above
+ * these, with the counts (`issues-summary.tsx`), since the DAG reads them too.
  */
 export const IssuesListFilters = (): JSX.Element => {
   const { view: view$, counts: counts$ } = issuesListStore;
@@ -45,16 +46,14 @@ export const IssuesListFilters = (): JSX.Element => {
         class={constant('filter-group')}
       >
         <span class={constant('filter-group-name')}>{constant('start')}</span>
-        {ISSUE_STARTS.map((start) => (
+        {ISSUE_START_SWITCHES.map((start) => (
           <button
             aria-pressed={view(view$, ({ hiddenStarts }) =>
               (!hiddenStarts.includes(start)).toString(),
             )}
             class={constant('filter-chip')}
             title={constant(
-              start === 'in-progress'
-                ? 'an open pull request closes it, or it is labelled in-progress.'
-                : explainState({ kind: 'issue', state: start, marked: 'none' }),
+              explainState({ kind: 'issue', state: start, marked: 'none' }),
             )}
             type={constant('button')}
             onClick={() => {

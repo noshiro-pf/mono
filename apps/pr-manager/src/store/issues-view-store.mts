@@ -6,8 +6,8 @@
  * is all it lays out — what is done is closed or merged, and is read only
  * for how an issue that names it stands; what is labelled `pending`
  * (`omitPending`) when it is switched off, since what is held back for now
- * is not what is left to do; and the issues the priorities and `pending`
- * leave out (`omitFilteredIssues`), which both views read
+ * is not what is left to do; and the issues the priorities, `pending`
+ * and `in progress` leave out (`omitFilteredIssues`), which both views read
  * (`issues-list-store.mts`), with how many issues each of them has drawn of
  * how many are open. The view starts as `initial`, which the page reads off
  * the query string as it opens (`issues-view-settings.mts`), and every
@@ -92,7 +92,10 @@ export type IssuesViewDeps = Readonly<{
   issues: InitializedObservable<LoadedReport['issues']>;
   /** The whole graph, what is done included ({@link createIssueGraph}). */
   graph: InitializedObservable<IssueGraph>;
-  /** The priorities and `pending` the list shows, which the DAG draws too. */
+  /**
+   * The priorities, `pending` and `in progress` the list shows, which the
+   * DAG draws too.
+   */
   filter: InitializedObservable<IssueFilter>;
   /** The view as the page opens. */
   initial: IssuesViewSettings;
@@ -110,13 +113,15 @@ export type IssuesViewStore = Readonly<{
   view: InitializedObservable<IssuesView>;
   /**
    * The graph the DAG draws: without what is done, what is pending when
-   * that is hidden, and the issues the priorities and `pending` leave out.
+   * that is hidden, and the issues the priorities, `pending` and `in
+   * progress` leave out.
    */
   graph: InitializedObservable<IssueGraph>;
   layout: InitializedObservable<IssueGraphLayout>;
   /**
    * How many open issues the DAG draws, of how many there are, in all, for
-   * each priority and for `pending`, counted as the list counts its own.
+   * each priority, for `pending` and for `in progress`, counted as the list
+   * counts its own.
    */
   counts: InitializedObservable<IssueFilterCounts>;
   /** What the layout's units are multiplied by to draw the DAG. */
@@ -291,4 +296,5 @@ export const createIssueGraph = ({
 const NODE_FACTS: IssueFacts<IssueGraphNode> = {
   priority: (node) => node.priority,
   pending: (node) => node.pending,
+  inProgress: (node) => node.state === 'in-progress',
 } as const;

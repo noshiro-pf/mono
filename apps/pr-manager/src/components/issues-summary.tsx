@@ -19,7 +19,8 @@ import { StatTile, StatToggle } from './stat-tile.js';
 
 /**
  * What the open issues lead with, in either view: how many are shown of how
- * many are open, then the priorities, then `pending`, each a switch for the
+ * many are open, then the priorities, then `pending` and `in progress`, each
+ * a switch for the
  * issues it counts with an `only` switch in its corner — the merge order's
  * counts (`merge-order-filters.tsx`), for issues. What a switch does is
  * `issues-list-view.mts`, which keeps the choice in the URL; the list and the
@@ -27,20 +28,21 @@ import { StatTile, StatToggle } from './stat-tile.js';
  *
  * The priorities are joined into one control, since they are one question
  * asked of every issue, which has exactly one of them: picking two shows
- * either. `pending` stands apart, as the other question: picked with a
- * priority, it shows what is both (`issue-filter.mts`). Once a priority is
- * picked, the priorities neither picked nor hidden fade, and `pending` does
- * not, since it is not they that decide it.
+ * either. `pending` and `in progress` stand apart, as other questions:
+ * picked with a priority, each shows what is both (`issue-filter.mts`). Once
+ * a priority is picked, the priorities neither picked nor hidden fade, and
+ * `pending` and `in progress` do not, since it is not they that decide them.
  *
  * `open` is how many issues the view shown draws for their own sake — the
  * list, after its own switches and the search too (`countIssues`), or the
  * DAG (`issues-view-store.mts`), which also draws an issue left out that one
  * drawn waits on and does not count it. Each priority, and `pending`, is how
- * many of it showing it would draw. Beside each, in small, how many there
- * are in all when that is more. A priority is pressed while its issues are
- * shown: one neither hidden nor picked while another is picked is not, and
- * pressing it picks it too. `pending` is there while an open issue carries
- * it, or while it is switched off or picked, so that it can be undone.
+ * many of it showing it would draw, and so is `in progress`. Beside each, in
+ * small, how many there are in all when that is more. A priority is pressed
+ * while its issues are shown: one neither hidden nor picked while another is
+ * picked is not, and pressing it picks it too. `pending` is there while an
+ * open issue carries it, and `in progress` while an open issue is under way,
+ * or while either is switched off or picked, so that it can be undone.
  */
 export const IssuesSummary = (): JSX.Element => {
   const counts$ = derive(
@@ -53,7 +55,9 @@ export const IssuesSummary = (): JSX.Element => {
   return (
     <div class={constant('issues-summary-box')}>
       <div
-        aria-label={constant('Open issues by priority and pending')}
+        aria-label={constant(
+          'Open issues by priority, pending and in progress',
+        )}
         class={constant('summary-row issues-summary')}
         role={constant('group')}
       >
@@ -117,6 +121,28 @@ export const IssuesSummary = (): JSX.Element => {
             />
           }
         />
+        <If
+          cond={derive(
+            [counts$, view$],
+            ({ inProgress }, { hideInProgress, onlyInProgress }) =>
+              inProgress.total > 0 || hideInProgress || onlyInProgress,
+          )}
+          then={
+            <StatToggle
+              label={'in progress'}
+              only={view(view$, ({ onlyInProgress }) => onlyInProgress)}
+              pickWith={'both'}
+              pressed={view(view$, ({ hideInProgress }) => !hideInProgress)}
+              subject={
+                'the issues in progress: those that can start, and that an open pull request closes or that are labelled in-progress'
+              }
+              total={mapBindable(counts$, ({ inProgress }) => inProgress.total)}
+              value={mapBindable(counts$, ({ inProgress }) => inProgress.shown)}
+              onOnly={toggleInProgressOnly}
+              onToggle={toggleInProgress}
+            />
+          }
+        />
       </div>
     </div>
   );
@@ -135,4 +161,12 @@ const togglePending = (): void => {
 
 const togglePendingOnly = (): void => {
   issuesListStore.togglePendingOnly();
+};
+
+const toggleInProgress = (): void => {
+  issuesListStore.toggleInProgress();
+};
+
+const toggleInProgressOnly = (): void => {
+  issuesListStore.toggleInProgressOnly();
 };

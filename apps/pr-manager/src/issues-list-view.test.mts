@@ -7,6 +7,8 @@ import {
   issuesListViewFromSearch,
   matchesIssueTitle,
   searchWithIssuesListView,
+  toggleIssueInProgress,
+  toggleIssueInProgressOnly,
   toggleIssuePending,
   toggleIssuePendingOnly,
   toggleIssuePriority,
@@ -232,6 +234,8 @@ describe(arrangeIssues, () => {
       onlyLabels: ['bug'],
       hidePending: false,
       onlyPending: false,
+      hideInProgress: false,
+      onlyInProgress: false,
       sort: 'priority',
     } as const;
 
@@ -503,13 +507,62 @@ describe('the start states', () => {
       ready: { shown: 2, total: 2 },
       free: { shown: 1, total: 1 },
       planned: { shown: 0, total: 0 },
-      'in-progress': { shown: 1, total: 1 },
       attention: { shown: 0, total: 0 },
       blocked: { shown: 1, total: 1 },
       cycle: { shown: 1, total: 1 },
     });
 
     assert.deepStrictEqual(counts.open, { shown: 4, total: 6 });
+
+    assert.deepStrictEqual(counts.inProgress, { shown: 1, total: 1 });
+  });
+
+  test('in progress picked shows only the issues in progress, read with the start states', () => {
+    const view = toggleIssueInProgressOnly(DEFAULT_ISSUES_LIST_VIEW);
+
+    assert.deepStrictEqual(
+      numbersOf(arrangeIssues(ISSUES, view, '', starts)),
+      [3],
+    );
+
+    const counts = countIssues(ISSUES, view, '', starts);
+
+    assert.deepStrictEqual(counts.open, { shown: 1, total: 6 });
+
+    assert.deepStrictEqual(counts.inProgress, { shown: 1, total: 1 });
+
+    // A start state reads what picking in progress leaves of it.
+    assert.deepStrictEqual(counts.starts.ready, { shown: 0, total: 2 });
+  });
+
+  test('in progress switched off hides the issues in progress, and counts what showing them would show', () => {
+    const view = toggleIssueInProgress(DEFAULT_ISSUES_LIST_VIEW);
+
+    assert.deepStrictEqual(
+      numbersOf(arrangeIssues(ISSUES, view, '', starts)),
+      [1, 2, 4, 5, 6],
+    );
+
+    assert.deepStrictEqual(countIssues(ISSUES, view, '', starts).inProgress, {
+      shown: 1,
+      total: 1,
+    });
+  });
+
+  test('switching in progress off unpicks it, and picking it switches it back on', () => {
+    const picked = toggleIssueInProgressOnly(DEFAULT_ISSUES_LIST_VIEW);
+
+    const hidden = toggleIssueInProgress(picked);
+
+    assert.isTrue(hidden.hideInProgress);
+
+    assert.isFalse(hidden.onlyInProgress);
+
+    const pickedAgain = toggleIssueInProgressOnly(hidden);
+
+    assert.isFalse(pickedAgain.hideInProgress);
+
+    assert.isTrue(pickedAgain.onlyInProgress);
   });
 });
 
@@ -533,10 +586,12 @@ describe(issuesListViewFromSearch, () => {
     const view: IssuesListView = {
       hiddenPriorities: ['low', 'none'],
       onlyPriorities: ['high'],
-      hiddenStarts: ['in-progress', 'blocked'],
+      hiddenStarts: ['blocked'],
       onlyLabels: ['bug', 'good first issue', 'v1.2'],
       hidePending: true,
       onlyPending: false,
+      hideInProgress: false,
+      onlyInProgress: true,
       sort: 'start',
     } as const;
 
@@ -544,7 +599,7 @@ describe(issuesListViewFromSearch, () => {
 
     assert.strictEqual(
       search,
-      '?issues.hidePriority=low.none&issues.onlyPriority=high&issues.hideStart=in-progress.blocked&issues.label=bug&issues.label=good+first+issue&issues.label=v1.2&issues.hidePending=1&issues.sort=start',
+      '?issues.hidePriority=low.none&issues.onlyPriority=high&issues.hideStart=blocked&issues.label=bug&issues.label=good+first+issue&issues.label=v1.2&issues.hidePending=1&issues.onlyInProgress=1&issues.sort=start',
     );
 
     assert.deepStrictEqual(issuesListViewFromSearch(search), view);
@@ -583,6 +638,28 @@ describe(issuesListViewFromSearch, () => {
     );
   });
 
+  test('the start state in-progress an older page switched off switches in progress off for both views', () => {
+    const view = issuesListViewFromSearch(
+      '?issues.hideStart=in-progress.blocked',
+    );
+
+    assert.isTrue(view.hideInProgress);
+
+    assert.deepStrictEqual(view.hiddenStarts, ['blocked']);
+
+    // What the issues' own parameters say comes first.
+    assert.isFalse(
+      issuesListViewFromSearch(
+        '?issues.hideStart=in-progress&issues.onlyInProgress=1',
+      ).hideInProgress,
+    );
+
+    assert.strictEqual(
+      searchWithIssuesListView('?issues.hideStart=in-progress.blocked', view),
+      '?issues.hideStart=blocked&issues.hideInProgress=1',
+    );
+  });
+
   test('pending both switched off and picked, which only a hand can write, is switched off', () => {
     const view = issuesListViewFromSearch(
       '?issues.hidePending=1&issues.onlyPending=1',
@@ -611,6 +688,8 @@ describe(issuesListViewFromSearch, () => {
         onlyLabels: ['bug'],
         hidePending: false,
         onlyPending: false,
+        hideInProgress: false,
+        onlyInProgress: false,
         sort: 'updated',
       },
     );
