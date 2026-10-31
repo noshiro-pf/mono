@@ -214,6 +214,7 @@ synstate derivations are not lazy: a derivation is computed whenever its parent 
 - `If`, `MatchOptional` and `MatchResult`: mount one branch at a time in a scope of its own, rebuilt only when the condition or the tag changes.
 - `For`: one row per key, each in a scope of its own; `item$` and `index$` are derived from `items`, and rows are moved as little as the longest increasing subsequence allows.
 - `Portal`: mounts its children into another element, in the scope where it is written.
+- `subscribeInScope`, `listenInScope` and `createAfterUpdate`: what a component, called once, does in place of an effect. A subscription or an event listener lasts until the current scope is disposed, and work runs in a microtask once the update under way has finished, dropped if the scope has been disposed by then.
 
 ## Naming
 

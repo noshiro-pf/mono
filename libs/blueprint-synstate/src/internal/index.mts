@@ -5,5 +5,4 @@ export * from './intent.mjs';
 export * from './local-noon.mjs';
 export * from './parse-integer.mjs';
 export * from './popover-position.mjs';
-export * from './scope-effects.mjs';
 export * from './unique-id.mjs';

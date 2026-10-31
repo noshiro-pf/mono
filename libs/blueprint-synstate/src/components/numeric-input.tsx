@@ -1,6 +1,8 @@
 import { createState, onScopeDispose } from 'synstate';
 import {
   constant,
+  createAfterUpdate,
+  subscribeInScope,
   toObservable,
   view,
   type Bindable,
@@ -9,11 +11,9 @@ import {
 import type { StrictOmit } from 'ts-type-forge';
 import {
   classObject,
-  createAfterUpdate,
   intentClass,
   isImeKeyDown,
   sizeClass,
-  subscribeInScope,
   uniqueId,
 } from '../internal/index.mjs';
 import { Icon } from './icon.js';

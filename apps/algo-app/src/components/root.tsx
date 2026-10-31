@@ -1,5 +1,13 @@
 import { createState, map, onScopeDispose } from 'synstate';
-import { constant, If, MatchOptional, view, type JSX } from 'synstate-dom';
+import {
+  constant,
+  createAfterUpdate,
+  If,
+  MatchOptional,
+  subscribeInScope,
+  view,
+  type JSX,
+} from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import type { Rect } from 'ts-utils-additional';
 import {
@@ -15,7 +23,6 @@ import { GameMain } from './game-main.js';
 import { JoinRoomPage } from './join-room-page.js';
 import { NotFoundPage } from './not-found-page.js';
 import * as styles from './root.module.css';
-import { createAfterUpdate, subscribeInScope } from './scope-effects.mjs';
 
 export const Root = (): JSX.Element => {
   const [windowSize, setWindowSize] = createState<Rect>({

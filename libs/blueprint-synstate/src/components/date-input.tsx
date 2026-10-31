@@ -1,7 +1,9 @@
 import { createState, derive, map, onScopeDispose } from 'synstate';
 import {
   constant,
+  createAfterUpdate,
   If,
+  listenInScope,
   toObservable,
   view,
   type Bindable,
@@ -22,9 +24,7 @@ import {
 } from '../date/index.mjs';
 import {
   ARROW_SIZE,
-  createAfterUpdate,
   isImeKeyDown,
-  listenInScope,
   placeBottomStart,
   uniqueId,
   type PopoverPosition,

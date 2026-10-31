@@ -1,8 +1,13 @@
 import type { InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import {
+  constant,
+  createAfterUpdate,
+  subscribeInScope,
+  view,
+  type JSX,
+} from 'synstate-dom';
 import { Num } from 'ts-data-forge';
 import type { EdgeDeleteState } from './dag-canvas-scene.mjs';
-import { createAfterUpdate, subscribeInScope } from './scope-effects.mjs';
 import { SvgTitle } from './svg-title.js';
 
 type Props = Readonly<{

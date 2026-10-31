@@ -1,6 +1,6 @@
 import { onScopeDispose, type InitializedObservable } from 'synstate';
+import { subscribeInScope } from 'synstate-dom';
 import type { Rect } from 'ts-utils-additional';
-import { subscribeInScope } from './scope-effects.mjs';
 
 /**
  * Measures the element given to the returned `ref` after every value of

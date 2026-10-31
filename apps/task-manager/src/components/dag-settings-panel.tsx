@@ -1,4 +1,11 @@
-import { constant, If, view, type JSX, type View } from 'synstate-dom';
+import {
+  constant,
+  If,
+  listenInScope,
+  view,
+  type JSX,
+  type View,
+} from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { dagViewModeStore, uiStore } from '../store/index.mjs';
 import { AnimationSettingField } from './animation-setting-field.js';
@@ -12,7 +19,6 @@ import { DiagramSortField } from './diagram-sort-field.js';
 import { followModal } from './follow-modal.mjs';
 import { LanguageField } from './language-field.js';
 import { NodeSizeField } from './node-size-field.js';
-import { listenInScope } from './scope-effects.mjs';
 
 /**
  * 「表示設定」: the settings of the graph screen, each a section of the

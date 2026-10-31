@@ -5,7 +5,14 @@ import {
   onScopeDispose,
   type InitializedObservable,
 } from 'synstate';
-import { constant, For, If, view, type JSX } from 'synstate-dom';
+import {
+  constant,
+  createAfterUpdate,
+  For,
+  If,
+  view,
+  type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { withLabelsAdded } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
@@ -15,7 +22,6 @@ import {
   splitTypedLabels,
   suggestLabels,
 } from '../view-model/index.mjs';
-import { createAfterUpdate } from './scope-effects.mjs';
 
 type Props = Readonly<{
   /** The caption of the field. */
