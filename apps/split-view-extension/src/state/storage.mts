@@ -47,22 +47,6 @@ export const saveWorkspaceState = async (
 };
 
 /**
- * Folds `currentUrl` into `url` before saving, so that a reload restores where
- * the user navigated to inside the pane rather than the address the pane was
- * originally pointed at.
- */
-const collapseForStorage = (state: WorkspaceState): WorkspaceState =>
-  ({
-    ...state,
-    panes: state.panes.map((pane) => ({
-      ...pane,
-      url: pane.currentUrl ?? pane.url,
-      currentUrl: undefined,
-      title: undefined,
-    })),
-  }) as const;
-
-/**
  * Every workspace record in storage, which is what the list is recovered from
  * when there is no list yet.
  */
@@ -148,6 +132,22 @@ export const parseWorkspaceState = (
       : {}),
   };
 };
+
+/**
+ * Folds `currentUrl` into `url` before saving, so that a reload restores where
+ * the user navigated to inside the pane rather than the address the pane was
+ * originally pointed at.
+ */
+const collapseForStorage = (state: WorkspaceState): WorkspaceState =>
+  ({
+    ...state,
+    panes: state.panes.map((pane) => ({
+      ...pane,
+      url: pane.currentUrl ?? pane.url,
+      currentUrl: undefined,
+      title: undefined,
+    })),
+  }) as const;
 
 const parseLayoutNode = (value: unknown): LayoutNode | undefined => {
   if (!isRecord(value) || !hasKey(value, 'kind')) {

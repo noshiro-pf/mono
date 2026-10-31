@@ -78,23 +78,8 @@ type PackageInfo = Readonly<{
 
 const workspaceGlobs = ['libs/*', 'apps/*', 'tools/*'] as const;
 
-const readWorkspacePackages = async (): Promise<readonly PackageInfo[]> => {
-  const dirLists = await Promise.all(
-    workspaceGlobs.map(async (pattern) => {
-      const result = await glob(pattern, {
-        cwd: projectRootPath,
-        onlyDirectories: true,
-        absolute: true,
-      });
-
-      return Result.isErr(result) ? [] : result.value;
-    }),
-  );
-
-  const infos = await Promise.all(dirLists.flat().toSorted().map(readPackage));
-
-  return infos.filter((info) => info !== undefined);
-};
+const stringRecord = (value: unknown): ReadonlyRecord<string, string> =>
+  isRecord(value) ? Obj.filter(value, isString) : ({} as const);
 
 const readPackage = async (dir: string): Promise<PackageInfo | undefined> => {
   const result = await Result.fromPromise(
@@ -121,8 +106,23 @@ const readPackage = async (dir: string): Promise<PackageInfo | undefined> => {
   };
 };
 
-const stringRecord = (value: unknown): ReadonlyRecord<string, string> =>
-  isRecord(value) ? Obj.filter(value, isString) : ({} as const);
+const readWorkspacePackages = async (): Promise<readonly PackageInfo[]> => {
+  const dirLists = await Promise.all(
+    workspaceGlobs.map(async (pattern) => {
+      const result = await glob(pattern, {
+        cwd: projectRootPath,
+        onlyDirectories: true,
+        absolute: true,
+      });
+
+      return Result.isErr(result) ? [] : result.value;
+    }),
+  );
+
+  const infos = await Promise.all(dirLists.flat().toSorted().map(readPackage));
+
+  return infos.filter((info) => info !== undefined);
+};
 
 /** Keeps only the entries that name a package in this repository. */
 const internal = (
@@ -234,6 +234,40 @@ const findCycle = (
 
   return undefined;
 };
+
+const id = (name: string): string => name.replaceAll(/[^a-zA-Z0-9]/gu, '_');
+
+const mermaidEdges = (
+  packages: readonly PackageInfo[],
+  edgesOf: (pkg: PackageInfo) => readonly FixedLengthTuple<2, string>[],
+): readonly string[] => {
+  const lines = packages.flatMap((pkg) =>
+    edgesOf(pkg).map(([dep]) => `  ${id(pkg.name)} --> ${id(dep)}`),
+  );
+
+  const declarations = packages.map(
+    (pkg) => `  ${id(pkg.name)}["${pkg.name}"]`,
+  );
+
+  return [...declarations, ...lines];
+};
+
+const stageTable = (
+  title: string,
+  stages: readonly (readonly string[])[] | undefined,
+): readonly string[] =>
+  stages === undefined
+    ? ([`### ${title}`, '', '循環があり、段階に分解できない。', ''] as const)
+    : ([
+        `### ${title}`,
+        '',
+        '| 段階 | パッケージ |',
+        '| ---: | :--- |',
+        ...stages.map(
+          (stage, i) =>
+            `| ${i + 1} | ${stage.map((name) => `\`${name}\``).join(', ')} |`,
+        ),
+      ] as const);
 
 const render = (
   packages: readonly PackageInfo[],
@@ -393,40 +427,6 @@ const cycleNotes: readonly string[] = [
   'カタログ化せず、レンジをそのまま書く。',
   '',
 ] as const;
-
-const mermaidEdges = (
-  packages: readonly PackageInfo[],
-  edgesOf: (pkg: PackageInfo) => readonly FixedLengthTuple<2, string>[],
-): readonly string[] => {
-  const lines = packages.flatMap((pkg) =>
-    edgesOf(pkg).map(([dep]) => `  ${id(pkg.name)} --> ${id(dep)}`),
-  );
-
-  const declarations = packages.map(
-    (pkg) => `  ${id(pkg.name)}["${pkg.name}"]`,
-  );
-
-  return [...declarations, ...lines];
-};
-
-const id = (name: string): string => name.replaceAll(/[^a-zA-Z0-9]/gu, '_');
-
-const stageTable = (
-  title: string,
-  stages: readonly (readonly string[])[] | undefined,
-): readonly string[] =>
-  stages === undefined
-    ? ([`### ${title}`, '', '循環があり、段階に分解できない。', ''] as const)
-    : ([
-        `### ${title}`,
-        '',
-        '| 段階 | パッケージ |',
-        '| ---: | :--- |',
-        ...stages.map(
-          (stage, i) =>
-            `| ${i + 1} | ${stage.map((name) => `\`${name}\``).join(', ')} |`,
-        ),
-      ] as const);
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await genDependencyGraph();

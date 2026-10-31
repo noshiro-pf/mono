@@ -5,24 +5,6 @@ import { match } from 'ts-data-forge';
 // export const createToaster = (): IToaster =>
 //   Toaster.create({ canEscapeKeyClear: true, position: 'top' });
 
-const callback =
-  (
-    // Both signatures are dictated from outside: `resolve` is the one the
-    // `Promise` constructor hands over, and the callback below is what
-    // `OverlayToaster.create`'s ref parameter is called with.
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-    resolve: (value: OverlayToaster | PromiseLike<OverlayToaster>) => void,
-    reject: (reason?: unknown) => void,
-  ) =>
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  (instance: OverlayToaster | null) => {
-    if (instance === null) {
-      reject(new Error('[Blueprint] Unable to create toaster.'));
-    } else {
-      resolve(instance);
-    }
-  };
-
 export const createToaster = (
   // `Readonly`, not `DeepReadonly`: these props carry `ReactNode`, and a
   // deeply-readonly `ReactNode` is no longer a `ReactNode`.
@@ -82,3 +64,21 @@ export const showToast = ({
     )
     .catch(console.error);
 };
+
+const callback =
+  (
+    // Both signatures are dictated from outside: `resolve` is the one the
+    // `Promise` constructor hands over, and the callback below is what
+    // `OverlayToaster.create`'s ref parameter is called with.
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    resolve: (value: OverlayToaster | PromiseLike<OverlayToaster>) => void,
+    reject: (reason?: unknown) => void,
+  ) =>
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  (instance: OverlayToaster | null) => {
+    if (instance === null) {
+      reject(new Error('[Blueprint] Unable to create toaster.'));
+    } else {
+      resolve(instance);
+    }
+  };

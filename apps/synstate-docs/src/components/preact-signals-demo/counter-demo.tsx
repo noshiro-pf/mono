@@ -14,26 +14,6 @@ const [
   { state: count$, updateState, resetState, getSnapshot },
 ] = createState(0);
 
-const decrement = (): void => {
-  updateState((n) => n - 1);
-};
-
-const increment = (): void => {
-  updateState((n) => n + 1);
-};
-
-const showSnapshot = (): void => {
-  // eslint-disable-next-line no-alert
-  alert(`getSnapshot() = ${getSnapshot().toString()}`);
-};
-
-// Derived: doubled value via map + toSignal
-const doubledSignal = toSignal(count$.pipe(map((n) => n * 2)));
-
-// State: visibility toggle via createBooleanState
-const [isVisibleSignal, { toggle: toggleVisibility }] =
-  createBooleanState(true);
-
 export const CounterDemo = (): preact.JSX.Element => (
   <div>
     <div style={rowStyle}>
@@ -72,6 +52,26 @@ export const CounterDemo = (): preact.JSX.Element => (
     </div>
   </div>
 );
+
+const decrement = (): void => {
+  updateState((n) => n - 1);
+};
+
+const increment = (): void => {
+  updateState((n) => n + 1);
+};
+
+const showSnapshot = (): void => {
+  // eslint-disable-next-line no-alert
+  alert(`getSnapshot() = ${getSnapshot().toString()}`);
+};
+
+// Derived: doubled value via map + toSignal
+const doubledSignal = toSignal(count$.pipe(map((n) => n * 2)));
+
+// State: visibility toggle via createBooleanState
+const [isVisibleSignal, { toggle: toggleVisibility }] =
+  createBooleanState(true);
 
 // embed-sample-code-ignore-below
 

@@ -41,6 +41,15 @@ export const defaultLibSource = (typescriptVersion: string): LibSource =>
 export const libSourceOf = (versionConfig: VersionConfig): LibSource =>
   versionConfig.libSource ?? defaultLibSource(versionConfig.typescriptVersion);
 
+export const createContext = (options: CreateContextOptions): Context =>
+  ({
+    packageRoot: options.packageRoot,
+    paths: buildPaths(options.packageRoot),
+    versionConfig: options.versionConfig,
+    configs: options.configs ?? defaultConfigs,
+    packageManagerName: 'pnpm',
+  }) as const;
+
 const buildPaths = (packageRoot: string) =>
   ({
     root: path.resolve(packageRoot, '../..'),
@@ -146,12 +155,3 @@ export type CreateContextOptions = Readonly<{
   versionConfig: VersionConfig;
   configs?: readonly ConverterConfig[];
 }>;
-
-export const createContext = (options: CreateContextOptions): Context =>
-  ({
-    packageRoot: options.packageRoot,
-    paths: buildPaths(options.packageRoot),
-    versionConfig: options.versionConfig,
-    configs: options.configs ?? defaultConfigs,
-    packageManagerName: 'pnpm',
-  }) as const;

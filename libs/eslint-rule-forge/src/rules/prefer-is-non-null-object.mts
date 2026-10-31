@@ -115,49 +115,6 @@ const isChainOperand = (
   parenthesesDepth(sourceCode, node) === 0;
 
 /**
- * Every non-overlapping pair in the `&&` chain `node` heads, left to right. The
- * two halves may come in either order, and the pair may have operands before
- * and after it: `a && u !== null && typeof u === 'object' && b`. They have to
- * be next to each other, so that the pair is one range of the source.
- */
-const findNonNullObjectPairs = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceCode: TSESLint.SourceCode,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.LogicalExpression,
-): readonly NonNullObjectPair[] => {
-  const operands = chainOperands(sourceCode, node);
-
-  const pairsFrom = (index: number): readonly NonNullObjectPair[] => {
-    const first = operands[index];
-
-    const second = operands[index + 1];
-
-    if (first === undefined || second === undefined) {
-      return [];
-    }
-
-    const identifierName =
-      pairIdentifierName(first, second) ?? pairIdentifierName(second, first);
-
-    return identifierName === undefined
-      ? pairsFrom(index + 1)
-      : [
-          {
-            range: [
-              getRangeWithParens(sourceCode, first)[0],
-              getRangeWithParens(sourceCode, second)[1],
-            ],
-            identifierName,
-          },
-          ...pairsFrom(index + 2),
-        ];
-  };
-
-  return pairsFrom(0);
-};
-
-/**
  * The operands of the `&&` chain `node`, left to right. A parenthesized `&&`
  * is one operand: its halves cannot be replaced without its parentheses.
  */
@@ -178,26 +135,11 @@ const chainOperands = (
 // Every operand below is read through its type wrappers: `typeof (u satisfies
 // unknown) === 'object' && u! !== null` is the same check.
 
-/**
- * The name of `u` when `typeofCheck` is `typeof u === 'object'` and
- * `nullCheck` is `u !== null` for the same `u`.
- */
-const pairIdentifierName = (
+const isLiteralOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  typeofCheck: TSESTree.Expression,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  nullCheck: TSESTree.Expression,
-): string | undefined => {
-  const identifierName = getTypeofObjectIdentifierName(
-    skipTypeWrappers(typeofCheck),
-  );
-
-  return identifierName !== undefined &&
-    identifierName ===
-      getNonNullCheckIdentifierName(skipTypeWrappers(nullCheck))
-    ? identifierName
-    : undefined;
-};
+  node: TSESTree.Node,
+  value: string | null,
+): boolean => node.type === AST_NODE_TYPES.Literal && node.value === value;
 
 /** `u` of `typeof u === 'object'`, in either operand order. */
 const getTypeofObjectIdentifierName = (
@@ -264,8 +206,66 @@ const getNonNullCheckIdentifierName = (
   return checked?.type === AST_NODE_TYPES.Identifier ? checked.name : undefined;
 };
 
-const isLiteralOf = (
+/**
+ * The name of `u` when `typeofCheck` is `typeof u === 'object'` and
+ * `nullCheck` is `u !== null` for the same `u`.
+ */
+const pairIdentifierName = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-  value: string | null,
-): boolean => node.type === AST_NODE_TYPES.Literal && node.value === value;
+  typeofCheck: TSESTree.Expression,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  nullCheck: TSESTree.Expression,
+): string | undefined => {
+  const identifierName = getTypeofObjectIdentifierName(
+    skipTypeWrappers(typeofCheck),
+  );
+
+  return identifierName !== undefined &&
+    identifierName ===
+      getNonNullCheckIdentifierName(skipTypeWrappers(nullCheck))
+    ? identifierName
+    : undefined;
+};
+
+/**
+ * Every non-overlapping pair in the `&&` chain `node` heads, left to right. The
+ * two halves may come in either order, and the pair may have operands before
+ * and after it: `a && u !== null && typeof u === 'object' && b`. They have to
+ * be next to each other, so that the pair is one range of the source.
+ */
+const findNonNullObjectPairs = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.LogicalExpression,
+): readonly NonNullObjectPair[] => {
+  const operands = chainOperands(sourceCode, node);
+
+  const pairsFrom = (index: number): readonly NonNullObjectPair[] => {
+    const first = operands[index];
+
+    const second = operands[index + 1];
+
+    if (first === undefined || second === undefined) {
+      return [];
+    }
+
+    const identifierName =
+      pairIdentifierName(first, second) ?? pairIdentifierName(second, first);
+
+    return identifierName === undefined
+      ? pairsFrom(index + 1)
+      : [
+          {
+            range: [
+              getRangeWithParens(sourceCode, first)[0],
+              getRangeWithParens(sourceCode, second)[1],
+            ],
+            identifierName,
+          },
+          ...pairsFrom(index + 2),
+        ];
+  };
+
+  return pairsFrom(0);
+};

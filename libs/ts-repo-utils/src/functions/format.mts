@@ -167,67 +167,6 @@ export const formatFiles = async (
   );
 };
 
-const defaultIgnoreFn = (filePath: string): boolean => {
-  const filename = path.basename(filePath);
-
-  return (
-    ignoreFiles.has(filename) ||
-    filename.startsWith('.env') ||
-    ignoreExtensions.some((ext) => filePath.endsWith(ext)) ||
-    pipe(filePath.split(path.sep)).map((pathSegments) =>
-      pathSegments.some((segment) => ignoreDirs.includes(segment)),
-    ).value
-  );
-};
-
-const ignoreFiles: ReadonlySet<string> = new Set<string>([
-  '.DS_Store',
-  'package-lock.json',
-  'yarn.lock',
-  'pnpm-lock.yaml',
-  'LICENSE',
-  '.prettierignore',
-  '.editorconfig',
-  '.gitignore',
-  '.npmignore',
-  '.envrc',
-  '.nvmrc',
-  '.npmrc',
-]);
-
-const ignoreExtensions: readonly `.${string}`[] = [
-  '.svg',
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.gif',
-  '.bmp',
-  '.tiff',
-  '.bak',
-  '.log',
-  '.zip',
-  '.tar',
-  '.gz',
-  '.7z',
-  '.mp3',
-  '.mp4',
-  '.avi',
-  '.mkv',
-  '.tsbuildinfo',
-] as const;
-
-const ignoreDirs: readonly string[] = [
-  'node_modules',
-  '.git',
-  'dist',
-  'build',
-  'out',
-  '.cache',
-  '.vscode',
-  '.yarn',
-  '.wireit',
-] as const;
-
 /**
  * Format files matching the given glob pattern using Prettier
  *
@@ -367,32 +306,6 @@ export const formatUncommittedFiles = async (
 };
 
 /**
- * Filter a list of file paths to those inside `cwd`. If `cwd` is undefined,
- * returns the original list unchanged. Relative `cwd` is resolved against
- * `process.cwd()`.
- */
-const filterFilesByCwd = (
-  files: readonly string[],
-  cwd: string | undefined,
-): readonly string[] => {
-  if (cwd === undefined) {
-    return files;
-  }
-
-  const resolvedCwd = path.resolve(cwd);
-
-  const cwdWithSep = resolvedCwd.endsWith(path.sep)
-    ? resolvedCwd
-    : (`${resolvedCwd}${path.sep}` as const);
-
-  return files.filter((file) => {
-    const absFile = path.isAbsolute(file) ? file : path.resolve(file);
-
-    return absFile === resolvedCwd || absFile.startsWith(cwdWithSep);
-  });
-};
-
-/**
  * Format only files that differ from the specified base branch or commit
  *
  * @param base - Base branch name or commit hash to compare against (defaults to
@@ -521,5 +434,92 @@ export const formatDiffFrom = async (
     silent,
     ignoreUnknown,
     ignore,
+  });
+};
+
+const defaultIgnoreFn = (filePath: string): boolean => {
+  const filename = path.basename(filePath);
+
+  return (
+    ignoreFiles.has(filename) ||
+    filename.startsWith('.env') ||
+    ignoreExtensions.some((ext) => filePath.endsWith(ext)) ||
+    pipe(filePath.split(path.sep)).map((pathSegments) =>
+      pathSegments.some((segment) => ignoreDirs.includes(segment)),
+    ).value
+  );
+};
+
+const ignoreFiles: ReadonlySet<string> = new Set<string>([
+  '.DS_Store',
+  'package-lock.json',
+  'yarn.lock',
+  'pnpm-lock.yaml',
+  'LICENSE',
+  '.prettierignore',
+  '.editorconfig',
+  '.gitignore',
+  '.npmignore',
+  '.envrc',
+  '.nvmrc',
+  '.npmrc',
+]);
+
+const ignoreExtensions: readonly `.${string}`[] = [
+  '.svg',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.bmp',
+  '.tiff',
+  '.bak',
+  '.log',
+  '.zip',
+  '.tar',
+  '.gz',
+  '.7z',
+  '.mp3',
+  '.mp4',
+  '.avi',
+  '.mkv',
+  '.tsbuildinfo',
+] as const;
+
+const ignoreDirs: readonly string[] = [
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
+  'out',
+  '.cache',
+  '.vscode',
+  '.yarn',
+  '.wireit',
+] as const;
+
+/**
+ * Filter a list of file paths to those inside `cwd`. If `cwd` is undefined,
+ * returns the original list unchanged. Relative `cwd` is resolved against
+ * `process.cwd()`.
+ */
+const filterFilesByCwd = (
+  files: readonly string[],
+  cwd: string | undefined,
+): readonly string[] => {
+  if (cwd === undefined) {
+    return files;
+  }
+
+  const resolvedCwd = path.resolve(cwd);
+
+  const cwdWithSep = resolvedCwd.endsWith(path.sep)
+    ? resolvedCwd
+    : (`${resolvedCwd}${path.sep}` as const);
+
+  return files.filter((file) => {
+    const absFile = path.isAbsolute(file) ? file : path.resolve(file);
+
+    return absFile === resolvedCwd || absFile.startsWith(cwdWithSep);
   });
 };

@@ -1,6 +1,8 @@
 import { createState } from 'synstate';
 import { constant, type Constant, type JSX } from 'synstate-dom';
 
+export const Form = (): JSX.Element => <Stepper initial={constant(10)} />;
+
 // `initial` is read once, when the component is called. Typing it
 // `Constant<number>` says so: an observable or a plain number is an error.
 const Stepper = ({
@@ -19,5 +21,3 @@ const Stepper = ({
     </button>
   );
 };
-
-export const Form = (): JSX.Element => <Stepper initial={constant(10)} />;

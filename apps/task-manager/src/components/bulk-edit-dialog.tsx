@@ -66,6 +66,14 @@ type OpenBulkEditState = RelaxedExclude<
   Readonly<{ type: 'closed' }>
 >;
 
+/** The option of the group field for `group`. */
+const groupValue = (group: NodeEdit['group']): string =>
+  group === undefined
+    ? KEEP
+    : group.to === undefined
+      ? NONE
+      : (`${GROUP}${group.to}` as const);
+
 const BulkEditForm = ({
   editor,
 }: Readonly<{
@@ -284,14 +292,6 @@ const BulkEditForm = ({
     </form>
   );
 };
-
-/** The option of the group field for `group`. */
-const groupValue = (group: NodeEdit['group']): string =>
-  group === undefined
-    ? KEEP
-    : group.to === undefined
-      ? NONE
-      : (`${GROUP}${group.to}` as const);
 
 // The options' values: a group's id may be any string, so it is prefixed.
 const KEEP = 'keep';

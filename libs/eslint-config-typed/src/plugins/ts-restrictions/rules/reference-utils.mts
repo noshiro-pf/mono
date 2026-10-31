@@ -55,6 +55,14 @@ export const isSameReference = (
         isSameReference(left.object, right.object);
 };
 
+/**
+ * The `@typescript-eslint/utils` helpers take mutable nodes; this module only
+ * ever reads them.
+ */
+const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  node as T;
+
 const staticPropertyName = (
   node: DeepReadonly<TSESTree.MemberExpression>,
 ): string | undefined => {
@@ -73,11 +81,3 @@ const staticPropertyName = (
       ? value.toString()
       : undefined;
 };
-
-/**
- * The `@typescript-eslint/utils` helpers take mutable nodes; this module only
- * ever reads them.
- */
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

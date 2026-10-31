@@ -219,6 +219,24 @@ const getCastName = (
 };
 
 /**
+ * A non-negative integer literal's value, or `undefined` for anything else.
+ * Read through type wrappers: `1 as const` is still the bound `1`.
+ */
+const getLengthLiteral = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  wrapped: TSESTree.Node,
+): number | undefined => {
+  const node = skipTypeWrappers(wrapped);
+
+  return node.type === AST_NODE_TYPES.Literal &&
+    typeof node.value === 'number' &&
+    Number.isSafeInteger(node.value) &&
+    node.value >= 0
+    ? node.value
+    : undefined;
+};
+
+/**
  * Whether the call is `cast(...bounds, array)` with every bound written as the
  * exact numeric literal the rewrite requires.
  *
@@ -319,21 +337,3 @@ const dropBoundsFix = (
       ? []
       : [fixer.removeRange([start.range[0], end.range[0]])];
   });
-
-/**
- * A non-negative integer literal's value, or `undefined` for anything else.
- * Read through type wrappers: `1 as const` is still the bound `1`.
- */
-const getLengthLiteral = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  wrapped: TSESTree.Node,
-): number | undefined => {
-  const node = skipTypeWrappers(wrapped);
-
-  return node.type === AST_NODE_TYPES.Literal &&
-    typeof node.value === 'number' &&
-    Number.isSafeInteger(node.value) &&
-    node.value >= 0
-    ? node.value
-    : undefined;
-};

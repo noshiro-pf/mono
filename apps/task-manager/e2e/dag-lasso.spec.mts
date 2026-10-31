@@ -271,18 +271,6 @@ const showDag = async (page: DeepReadonly<Page>): Promise<void> => {
     .toHaveAttribute('data-animating', 'false');
 };
 
-/** Draws a lasso with Shift held round the points given. */
-const shiftLasso = async (
-  page: DeepReadonly<Page>,
-  around: readonly Readonly<{ x: number; y: number }>[],
-): Promise<void> => {
-  await page.keyboard.down('Shift');
-
-  await lasso(page, around);
-
-  await page.keyboard.up('Shift');
-};
-
 /**
  * Draws a loop round the box of the points given, 12px clear of them. It
  * starts below the box and 80px left of it, on the background, and closes
@@ -321,6 +309,18 @@ const lasso = async (
   await page.mouse.move(startX, startY, { steps: 8 });
 
   await page.mouse.up();
+};
+
+/** Draws a lasso with Shift held round the points given. */
+const shiftLasso = async (
+  page: DeepReadonly<Page>,
+  around: readonly Readonly<{ x: number; y: number }>[],
+): Promise<void> => {
+  await page.keyboard.down('Shift');
+
+  await lasso(page, around);
+
+  await page.keyboard.up('Shift');
 };
 
 const dagNode = (page: DeepReadonly<Page>, title: RegExp): Locator =>

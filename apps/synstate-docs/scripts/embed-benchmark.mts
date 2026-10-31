@@ -143,6 +143,17 @@ const embedOneTarget = async (
 };
 
 /**
+ * The language a page is written in, by where it sits: Starlight keeps every
+ * translation under a directory named after its locale.
+ */
+const pageLanguage = (markdownFile: string): 'en' | 'ja' =>
+  path
+    .relative(path.resolve(workspaceRootPath, 'src/content/docs'), markdownFile)
+    .split(path.sep)[0] === 'ja'
+    ? 'ja'
+    : 'en';
+
+/**
  * Rewrites every `{/* bench:<key> *\/}…{/* /bench *\/}` span from
  * `benchmarkNumbers`.
  *
@@ -182,17 +193,6 @@ const embedInlineNumbers = (
     markdown,
   );
 };
-
-/**
- * The language a page is written in, by where it sits: Starlight keeps every
- * translation under a directory named after its locale.
- */
-const pageLanguage = (markdownFile: string): 'en' | 'ja' =>
-  path
-    .relative(path.resolve(workspaceRootPath, 'src/content/docs'), markdownFile)
-    .split(path.sep)[0] === 'ja'
-    ? 'ja'
-    : 'en';
 
 /**
  * The two spellings a marker takes, one per document format.

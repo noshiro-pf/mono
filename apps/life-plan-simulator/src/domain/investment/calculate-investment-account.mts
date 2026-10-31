@@ -127,20 +127,6 @@ export type InvestmentAccountMonth = Readonly<{
   usedQuota: number;
 }>;
 
-const profitRatioOf = (value: number, principal: number): number =>
-  Num.isNonZero(value) ? 1 - Num.div(principal, value) : 0;
-
-const resolveSteps = (
-  steps: readonly MonthlyAmountFrom[],
-  fallback: MonthIndex,
-): readonly Readonly<{ start: MonthIndex; amount: number }>[] =>
-  sortByStart(
-    steps.map((s) => ({
-      start: parseYearMonthOr(s.start, fallback),
-      amount: s.amount,
-    })),
-  );
-
 /** 一回きりの金額を年月ごとに合計する。年月が読めない行は無視する。 */
 export const resolveOneOffs = (
   items: readonly OneOffAmount[],
@@ -157,3 +143,17 @@ export const resolveOneOffs = (
 
   return mut_map;
 };
+
+const profitRatioOf = (value: number, principal: number): number =>
+  Num.isNonZero(value) ? 1 - Num.div(principal, value) : 0;
+
+const resolveSteps = (
+  steps: readonly MonthlyAmountFrom[],
+  fallback: MonthIndex,
+): readonly Readonly<{ start: MonthIndex; amount: number }>[] =>
+  sortByStart(
+    steps.map((s) => ({
+      start: parseYearMonthOr(s.start, fallback),
+      amount: s.amount,
+    })),
+  );

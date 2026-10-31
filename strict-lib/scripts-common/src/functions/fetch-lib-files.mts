@@ -11,52 +11,6 @@ type GitHubContentEntry = Readonly<{
   type: 'dir' | 'file' | 'submodule' | 'symlink';
 }>;
 
-const sleep = (ms: number): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-
-/**
- * Whether an HTTP status is worth retrying: transient server-side / rate-limit
- * responses. `raw.githubusercontent.com` occasionally returns 5xx or times out
- * mid-run when fetching the ~100 lib files per version, so these must be
- * retried rather than treated as a hard failure.
- */
-const isRetryableStatus = (status: number): boolean =>
-  status === 408 || status === 429 || status >= 500;
-
-const fetchWithRetry = async (
-  url: string,
-  options?: RequestInit,
-  attempts: UintRange<0, 10> = 5,
-): Promise<Response> => {
-  for (const i of range(0, attempts)) {
-    const isLastAttempt = i === attempts - 1;
-
-    try {
-      const response = await fetch(url, options);
-
-      if (isLastAttempt || response.ok || !isRetryableStatus(response.status)) {
-        return response;
-      }
-
-      console.warn(
-        `fetch ${url} failed (attempt ${i + 1}): HTTP ${response.status} ${response.statusText}; retrying...`,
-      );
-    } catch (error) {
-      if (isLastAttempt) {
-        throw error;
-      }
-
-      console.warn(`fetch ${url} failed (attempt ${i + 1}); retrying...`);
-    }
-
-    await sleep(500 * (i + 1));
-  }
-
-  throw new Error('unreachable');
-};
-
 /**
  * List the names of `lib.*.d.ts` files in the given lib-file source using the
  * public GitHub Contents API. Authentication is not required for public
@@ -149,4 +103,50 @@ export const fetchLibFiles = async (
   }
 
   return Result.ok(undefined);
+};
+
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+/**
+ * Whether an HTTP status is worth retrying: transient server-side / rate-limit
+ * responses. `raw.githubusercontent.com` occasionally returns 5xx or times out
+ * mid-run when fetching the ~100 lib files per version, so these must be
+ * retried rather than treated as a hard failure.
+ */
+const isRetryableStatus = (status: number): boolean =>
+  status === 408 || status === 429 || status >= 500;
+
+const fetchWithRetry = async (
+  url: string,
+  options?: RequestInit,
+  attempts: UintRange<0, 10> = 5,
+): Promise<Response> => {
+  for (const i of range(0, attempts)) {
+    const isLastAttempt = i === attempts - 1;
+
+    try {
+      const response = await fetch(url, options);
+
+      if (isLastAttempt || response.ok || !isRetryableStatus(response.status)) {
+        return response;
+      }
+
+      console.warn(
+        `fetch ${url} failed (attempt ${i + 1}): HTTP ${response.status} ${response.statusText}; retrying...`,
+      );
+    } catch (error) {
+      if (isLastAttempt) {
+        throw error;
+      }
+
+      console.warn(`fetch ${url} failed (attempt ${i + 1}); retrying...`);
+    }
+
+    await sleep(500 * (i + 1));
+  }
+
+  throw new Error('unreachable');
 };

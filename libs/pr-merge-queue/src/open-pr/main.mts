@@ -330,42 +330,6 @@ const stackOn = async (
   return parent;
 };
 
-const open = async (
-  api: ApiContext,
-  branch: string,
-  base: string,
-  options: Options,
-  mergeAfter: readonly number[],
-): Promise<Result<number, string>> => {
-  const title = await resolveTitle(options);
-
-  if (Result.isErr(title)) {
-    return title;
-  }
-
-  const body = await resolveBody(options, mergeAfter);
-
-  if (Result.isErr(body)) {
-    return body;
-  }
-
-  const created = await createPullRequest({
-    api,
-    branch,
-    base,
-    title: title.value,
-    body: body.value,
-  });
-
-  if (Result.isErr(created)) {
-    return Result.err(`cannot create the pull request: ${created.value}`);
-  }
-
-  log(`#${created.value}: opened against ${base}`);
-
-  return created;
-};
-
 const resolveTitle = async (
   options: Options,
 ): Promise<Result<string, string>> =>
@@ -403,6 +367,42 @@ const resolveBody = async (
   return Result.ok(
     trailer === undefined ? read.value : `${trailer}\n\n${read.value}`,
   );
+};
+
+const open = async (
+  api: ApiContext,
+  branch: string,
+  base: string,
+  options: Options,
+  mergeAfter: readonly number[],
+): Promise<Result<number, string>> => {
+  const title = await resolveTitle(options);
+
+  if (Result.isErr(title)) {
+    return title;
+  }
+
+  const body = await resolveBody(options, mergeAfter);
+
+  if (Result.isErr(body)) {
+    return body;
+  }
+
+  const created = await createPullRequest({
+    api,
+    branch,
+    base,
+    title: title.value,
+    body: body.value,
+  });
+
+  if (Result.isErr(created)) {
+    return Result.err(`cannot create the pull request: ${created.value}`);
+  }
+
+  log(`#${created.value}: opened against ${base}`);
+
+  return created;
 };
 
 const dryRun = async (

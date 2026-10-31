@@ -23,41 +23,6 @@ const maxAttempts = 5;
 /** Max format passes to reach a stable (idempotent) result. */
 const maxPasses = 5;
 
-const sleep = (ms: number): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-
-/**
- * Run a single oxfmt invocation, retrying to absorb the transient "Exit prior
- * to config file resolving" abort that oxfmt hits when many instances resolve
- * the shared config at once under `ws:gen`.
- */
-const runOxfmt = async (
-  args: string,
-): Promise<Result<Readonly<{ stdout: string }>, unknown>> => {
-  let lastErr: Result<Readonly<{ stdout: string }>, unknown> = Result.err(
-    undefined,
-  );
-
-  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    // Silence the noisy per-attempt output on retries only.
-    const res = await $(args, { silent: attempt > 1 });
-
-    if (Result.isOk(res)) {
-      return Result.ok({ stdout: res.value.stdout });
-    }
-
-    lastErr = res;
-
-    if (attempt < maxAttempts) {
-      await sleep(200 * attempt);
-    }
-  }
-
-  return lastErr;
-};
-
 /**
  * Format a directory with oxfmt (Oxc's formatter), the repo's formatter. It is
  * roughly an order of magnitude faster than Prettier, which matters because the
@@ -113,4 +78,39 @@ export const formatDir = async (
   }
 
   return Result.ok(undefined);
+};
+
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+/**
+ * Run a single oxfmt invocation, retrying to absorb the transient "Exit prior
+ * to config file resolving" abort that oxfmt hits when many instances resolve
+ * the shared config at once under `ws:gen`.
+ */
+const runOxfmt = async (
+  args: string,
+): Promise<Result<Readonly<{ stdout: string }>, unknown>> => {
+  let lastErr: Result<Readonly<{ stdout: string }>, unknown> = Result.err(
+    undefined,
+  );
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    // Silence the noisy per-attempt output on retries only.
+    const res = await $(args, { silent: attempt > 1 });
+
+    if (Result.isOk(res)) {
+      return Result.ok({ stdout: res.value.stdout });
+    }
+
+    lastErr = res;
+
+    if (attempt < maxAttempts) {
+      await sleep(200 * attempt);
+    }
+  }
+
+  return lastErr;
 };

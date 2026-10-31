@@ -136,11 +136,6 @@ export function every<E>(
   }
 }
 
-const everyImpl = <E,>(
-  array: readonly E[],
-  predicate: (a: E, index: SizeType.Arr) => boolean,
-): boolean => array.every((a, i) => predicate(a, asUint32(i)));
-
 /**
  * Tests whether at least one element in an array passes a test implemented by a predicate.
  *
@@ -186,11 +181,6 @@ export function some<E>(
   }
 }
 
-const someImpl = <E,>(
-  array: readonly E[],
-  predicate: (a: E, index: SizeType.Arr) => boolean,
-): boolean => array.some((a, i) => predicate(a, asUint32(i)));
-
 /**
  * Checks if an index is within the valid range of an array.
  *
@@ -212,3 +202,13 @@ export const indexIsInRange = <E,>(
   array: readonly E[],
   index: SizeType.ArgArr,
 ): boolean => Num.isInRange(0, array.length)(index);
+
+const everyImpl = <E,>(
+  array: readonly E[],
+  predicate: (a: E, index: SizeType.Arr) => boolean,
+): boolean => array.every((a, i) => predicate(a, asUint32(i)));
+
+const someImpl = <E,>(
+  array: readonly E[],
+  predicate: (a: E, index: SizeType.Arr) => boolean,
+): boolean => array.some((a, i) => predicate(a, asUint32(i)));

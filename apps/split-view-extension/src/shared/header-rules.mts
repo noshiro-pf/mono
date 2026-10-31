@@ -83,50 +83,6 @@ export const ensureInitiatorRule = async (): Promise<boolean> => {
   return installed.some((rule) => rule.id === initiatorRuleId);
 };
 
-/** The response header edits both rules apply. */
-const framingHeaderActions = (): readonly Readonly<{
-  header: string;
-  operation: 'remove';
-}>[] =>
-  strippedResponseHeaders.map(
-    (header) => ({ header, operation: 'remove' }) as const,
-  );
-
-/**
- * The request headers that say "this is a cross-site frame", rewritten to say
- * "this is a top-level navigation".
- *
- * Some sites refuse in the *server* rather than in a response header, by
- * reading the Fetch Metadata headers the browser attaches. Google Translate is
- * the case that turned this up: measured, `translate.google.com` answers a
- * request with `Sec-Fetch-Dest: document` with `200` and the same request with
- * `Sec-Fetch-Dest: iframe`, `Sec-Fetch-Site: cross-site` with **`403` and no
- * body** — and says so in `Vary: Sec-Fetch-Dest, Sec-Fetch-Mode,
- * Sec-Fetch-Site`. There is no response header to strip: the refusal *is* the
- * response.
- *
- * So the request is made to look like what it would be if the user had typed
- * the address into a tab, which is the same claim the extension already makes
- * by removing `X-Frame-Options`. Measured again: 403 becomes 200 and the page
- * renders.
- *
- * The scope is what keeps this narrow, and it is the scope both rules already
- * have: `sub_frame` requests only — never a top-level document, never a script
- * or an XHR, which is where Fetch Metadata guards against CSRF and XSSI rather
- * than against framing — and only in this extension's own frames, or in the
- * one tab a split view is open in.
- */
-const requestHeaderActions = (): readonly Readonly<{
-  header: string;
-  operation: 'set';
-  value: string;
-}>[] =>
-  [
-    { header: 'sec-fetch-dest', value: 'document' },
-    { header: 'sec-fetch-mode', value: 'navigate' },
-    { header: 'sec-fetch-site', value: 'none' },
-  ].map(({ header, value }) => ({ header, operation: 'set', value }) as const);
-
 /**
  * The rule id used for a tab. Rule ids have to be positive, and a tab id is
  * unique for the life of the session, which is also the life of the rule.
@@ -190,57 +146,6 @@ export const ensureHeaderRule = async (tabId: number): Promise<boolean> => {
   return installed.some((rule) => rule.id === id);
 };
 
-/**
- * What the rules currently look like, for the diagnostics panel.
- *
- * `getMatchedRules` needs the `declarativeNetRequestFeedback` permission and
- * answers the only question that matters when a pane will not load: did a rule
- * act on that request, or not?
- */
-/**
- * What a URL actually answers with, fetched from the extension page.
- *
- * A `fetch` is not a `sub_frame` request, so the rules leave it alone and what
- * comes back is what the server really sent — which is the only way to see the
- * headers of a response that is being served to *this* browser, signed in as
- * this user, rather than the ones a logged-out request gets.
- */
-const probeFramingHeaders = async (
-  url: string,
-): Promise<ReadonlyRecord<string, unknown>> => {
-  try {
-    const response = await fetch(url, {
-      credentials: 'include',
-    });
-
-    const csp = response.headers.get('content-security-policy') ?? '';
-
-    return {
-      url,
-      status: response.status,
-      redirected: response.redirected,
-      finalUrl: response.url === url ? '(same)' : response.url,
-      xFrameOptions: response.headers.get('x-frame-options'),
-      frameAncestors: csp.includes('frame-ancestors')
-        ? (/frame-ancestors[^;]*/u.exec(csp)?.[0] ?? '(present)')
-        : null,
-      cspLength: csp.length,
-      cspReportOnly: response.headers.get('content-security-policy-report-only')
-        ?.length,
-      crossOriginResourcePolicy: response.headers.get(
-        'cross-origin-resource-policy',
-      ),
-      crossOriginEmbedderPolicy: response.headers.get(
-        'cross-origin-embedder-policy',
-      ),
-      cacheControl: response.headers.get('cache-control'),
-      vary: response.headers.get('vary'),
-    };
-  } catch (error: unknown) {
-    return { url, fetchFailed: unknownToString(error) };
-  }
-};
-
 export const readRuleDiagnostics = async (
   tabId: number | undefined,
   paneUrls: readonly string[] = [],
@@ -301,4 +206,99 @@ export const removeHeaderRule = async (tabId: number): Promise<void> => {
   await chrome.declarativeNetRequest.updateSessionRules({
     removeRuleIds: [headerRuleIdForTab(tabId)],
   });
+};
+
+/** The response header edits both rules apply. */
+const framingHeaderActions = (): readonly Readonly<{
+  header: string;
+  operation: 'remove';
+}>[] =>
+  strippedResponseHeaders.map(
+    (header) => ({ header, operation: 'remove' }) as const,
+  );
+
+/**
+ * The request headers that say "this is a cross-site frame", rewritten to say
+ * "this is a top-level navigation".
+ *
+ * Some sites refuse in the *server* rather than in a response header, by
+ * reading the Fetch Metadata headers the browser attaches. Google Translate is
+ * the case that turned this up: measured, `translate.google.com` answers a
+ * request with `Sec-Fetch-Dest: document` with `200` and the same request with
+ * `Sec-Fetch-Dest: iframe`, `Sec-Fetch-Site: cross-site` with **`403` and no
+ * body** — and says so in `Vary: Sec-Fetch-Dest, Sec-Fetch-Mode,
+ * Sec-Fetch-Site`. There is no response header to strip: the refusal *is* the
+ * response.
+ *
+ * So the request is made to look like what it would be if the user had typed
+ * the address into a tab, which is the same claim the extension already makes
+ * by removing `X-Frame-Options`. Measured again: 403 becomes 200 and the page
+ * renders.
+ *
+ * The scope is what keeps this narrow, and it is the scope both rules already
+ * have: `sub_frame` requests only — never a top-level document, never a script
+ * or an XHR, which is where Fetch Metadata guards against CSRF and XSSI rather
+ * than against framing — and only in this extension's own frames, or in the
+ * one tab a split view is open in.
+ */
+const requestHeaderActions = (): readonly Readonly<{
+  header: string;
+  operation: 'set';
+  value: string;
+}>[] =>
+  [
+    { header: 'sec-fetch-dest', value: 'document' },
+    { header: 'sec-fetch-mode', value: 'navigate' },
+    { header: 'sec-fetch-site', value: 'none' },
+  ].map(({ header, value }) => ({ header, operation: 'set', value }) as const);
+
+/**
+ * What the rules currently look like, for the diagnostics panel.
+ *
+ * `getMatchedRules` needs the `declarativeNetRequestFeedback` permission and
+ * answers the only question that matters when a pane will not load: did a rule
+ * act on that request, or not?
+ */
+/**
+ * What a URL actually answers with, fetched from the extension page.
+ *
+ * A `fetch` is not a `sub_frame` request, so the rules leave it alone and what
+ * comes back is what the server really sent — which is the only way to see the
+ * headers of a response that is being served to *this* browser, signed in as
+ * this user, rather than the ones a logged-out request gets.
+ */
+const probeFramingHeaders = async (
+  url: string,
+): Promise<ReadonlyRecord<string, unknown>> => {
+  try {
+    const response = await fetch(url, {
+      credentials: 'include',
+    });
+
+    const csp = response.headers.get('content-security-policy') ?? '';
+
+    return {
+      url,
+      status: response.status,
+      redirected: response.redirected,
+      finalUrl: response.url === url ? '(same)' : response.url,
+      xFrameOptions: response.headers.get('x-frame-options'),
+      frameAncestors: csp.includes('frame-ancestors')
+        ? (/frame-ancestors[^;]*/u.exec(csp)?.[0] ?? '(present)')
+        : null,
+      cspLength: csp.length,
+      cspReportOnly: response.headers.get('content-security-policy-report-only')
+        ?.length,
+      crossOriginResourcePolicy: response.headers.get(
+        'cross-origin-resource-policy',
+      ),
+      crossOriginEmbedderPolicy: response.headers.get(
+        'cross-origin-embedder-policy',
+      ),
+      cacheControl: response.headers.get('cache-control'),
+      vary: response.headers.get('vary'),
+    };
+  } catch (error: unknown) {
+    return { url, fetchFailed: unknownToString(error) };
+  }
 };

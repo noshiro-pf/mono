@@ -52,6 +52,27 @@ export const IssueDag = (): JSX.Element => (
   />
 );
 
+const edgeKey = ({ kind, from, to }: LaidOutEdge): string =>
+  `${kind}-${from}-${to}` as const;
+
+/** Each node the layout places, with where it goes. */
+const placedNodesOf = (
+  layout: IssueGraphLayout,
+  graph: IssueGraph,
+): readonly PlacedNode[] => {
+  const byNumber = new Map(graph.nodes.map((node) => [node.number, node]));
+
+  return Arr.generate(function* () {
+    for (const { number, x, y } of layout.nodes) {
+      const node = byNumber.get(number);
+
+      if (node !== undefined) {
+        yield { node, x, y };
+      }
+    }
+  });
+};
+
 const Dag = (): JSX.Element => {
   const { graph: graph$, dagScale: scale$, layout: layout$ } = issuesViewStore;
 
@@ -145,25 +166,4 @@ const Dag = (): JSX.Element => {
       </div>
     </div>
   );
-};
-
-const edgeKey = ({ kind, from, to }: LaidOutEdge): string =>
-  `${kind}-${from}-${to}` as const;
-
-/** Each node the layout places, with where it goes. */
-const placedNodesOf = (
-  layout: IssueGraphLayout,
-  graph: IssueGraph,
-): readonly PlacedNode[] => {
-  const byNumber = new Map(graph.nodes.map((node) => [node.number, node]));
-
-  return Arr.generate(function* () {
-    for (const { number, x, y } of layout.nodes) {
-      const node = byNumber.get(number);
-
-      if (node !== undefined) {
-        yield { node, x, y };
-      }
-    }
-  });
 };

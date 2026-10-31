@@ -96,17 +96,6 @@ export const checkKnipConfig = async (): Promise<Result<number, string>> => {
 
 type Violation = Readonly<{ owner: string; key: string }>;
 
-/** A workspace path used as a key inside another entry — never legitimate. */
-const collectNestedWorkspaceKeys = (
-  owner: string,
-  entry: unknown,
-): readonly Violation[] =>
-  isRecord(entry)
-    ? Object.keys(entry)
-        .filter(looksLikeWorkspacePath)
-        .map((key) => ({ owner, key }))
-    : ([] as const);
-
 /**
  * knip's own workspace options are bare identifiers (`entry`, `project`,
  * `ignore`, …) or plugin names; only a workspace key carries a `/`. Matching
@@ -117,6 +106,17 @@ const looksLikeWorkspacePath = (key: string): boolean =>
   ['apps/', 'libs/', 'tools/', 'languages/', 'strict-lib/'].some((prefix) =>
     key.startsWith(prefix),
   );
+
+/** A workspace path used as a key inside another entry — never legitimate. */
+const collectNestedWorkspaceKeys = (
+  owner: string,
+  entry: unknown,
+): readonly Violation[] =>
+  isRecord(entry)
+    ? Object.keys(entry)
+        .filter(looksLikeWorkspacePath)
+        .map((key) => ({ owner, key }))
+    : ([] as const);
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkKnipConfig().catch((error: unknown) =>

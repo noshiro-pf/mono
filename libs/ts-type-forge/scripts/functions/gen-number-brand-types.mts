@@ -346,18 +346,120 @@ type Member = Readonly<{
 
 const sampleDir = 'samples/src/branded-types/predefined-numbers';
 
-const renderFamily = async (family: FamilySpec): Promise<string> => {
-  const members = buildMembers(family);
+const describeSign = (sign: SignKey): string => {
+  switch (sign) {
+    case '!=0':
+      return 'not equal to zero';
+    case '>=0':
+      return 'greater than or equal to zero';
+    case '>0':
+      return 'strictly greater than zero';
+    case '<0':
+      return 'strictly less than zero';
+    case '<=0':
+      return 'less than or equal to zero';
+    case 'any':
+      return 'in range';
+  }
+};
 
-  const importBlock = buildImports(members);
+const f = (
+  lowSym: string,
+  highSym: string,
+  lowDec: string,
+  highDec: string,
+): RangeParts => ({ lowSym, highSym, lowDec, highDec, split: false }) as const;
 
-  const mut_blocks: string[] = [header, importBlock];
+const rangeForSign = (b: Bounds, sign: SignKey): RangeParts => {
+  switch (sign) {
+    case 'any':
+      return f(b.minSym, b.maxSym, b.minDec, b.maxDec);
+    case '>=0':
+      return f('0', b.maxSym, '0', b.maxDec);
+    case '>0':
+      return f('1', b.maxSym, '1', b.maxDec);
+    case '<0':
+      return f(b.minSym, '-1', b.minDec, '-1');
+    case '<=0':
+      return f(b.minSym, '0', b.minDec, '0');
+    case '!=0':
+      return { ...f(b.minSym, b.maxSym, b.minDec, b.maxDec), split: true };
+  }
+};
 
-  for (const member of members) {
-    mut_blocks.push(await renderMember(member));
+/** The `Range: ...` JSDoc line(s) for a sized family, or none. */
+const rangeLines = (family: FamilySpec, sign: SignKey): readonly string[] => {
+  const b = family.bounds;
+
+  if (b === undefined) {
+    return [];
   }
 
-  return `${mut_blocks.join('\n\n')}\n`;
+  const { lowSym, highSym, lowDec, highDec, split } = rangeForSign(b, sign);
+
+  // Non-zero over a signed range: two disjoint intervals.
+  return split
+    ? [`Range: [${b.minSym}, -1] ∪ [1, ${b.maxSym}]`]
+    : [`Range: [${lowSym}, ${highSym}] or [${lowDec}, ${highDec}]`];
+};
+
+const buildSummary = (family: FamilySpec, sign: SignKey): readonly string[] => {
+  /* cspell:disable-next-line */
+  const article = /^[aeiou]/u.test(family.noun) ? 'an' : 'a';
+
+  return [
+    `Branded numeric type for ${signInfoMap[sign].adj} ${family.noun}s.`,
+    `Represents ${article} ${family.noun} that is ${describeSign(sign)}.`,
+    ...rangeLines(family, sign),
+  ];
+};
+
+const buildAliasSummary = (
+  family: FamilySpec,
+  sign: SignKey,
+  targetName: string,
+): readonly string[] =>
+  [
+    `Alias for \`${targetName}\`.`,
+    `Branded numeric type for ${signInfoMap[sign].adj} ${family.noun}s (${describeSign(sign)}).`,
+    ...rangeLines(family, sign),
+  ] as const;
+
+/** Capitalized `WithSmallInt` prose label, e.g. `Non-zero 32-bit integer`. */
+const smallLabelFor = (
+  family: FamilySpec,
+  sign: SignKey,
+  isBase: boolean,
+): string => {
+  const adj = isBase ? '' : signInfoMap[sign].adj;
+
+  const base =
+    adj === '' ? family.smallLabel : (`${adj} ${family.smallLabel}` as const);
+
+  return `${base.charAt(0).toUpperCase()}${base.slice(1)}`;
+};
+
+const buildSmallSummary = (
+  family: FamilySpec,
+  sign: SignKey,
+  memberName: string,
+  isBase: boolean,
+  aliasTargetSmallName: string | undefined,
+): readonly string[] => {
+  const label = smallLabelFor(family, sign, isBase);
+
+  const typeLine =
+    `Type: \`${signInfoMap[sign].literals} | ${memberName}\`` as const;
+
+  if (aliasTargetSmallName !== undefined) {
+    return [
+      `Alias for \`${aliasTargetSmallName}\`.`,
+      `${label} type with small literal values included.`,
+      typeLine,
+    ];
+  }
+
+  return [`${label} type with small literal values included.`, typeLine];
 };
 
 /**
@@ -445,130 +547,6 @@ const buildMembers = (family: FamilySpec): readonly Member[] => {
 
   return [...mut_primaries, ...mut_small];
 };
-
-const buildSummary = (family: FamilySpec, sign: SignKey): readonly string[] => {
-  /* cspell:disable-next-line */
-  const article = /^[aeiou]/u.test(family.noun) ? 'an' : 'a';
-
-  return [
-    `Branded numeric type for ${signInfoMap[sign].adj} ${family.noun}s.`,
-    `Represents ${article} ${family.noun} that is ${describeSign(sign)}.`,
-    ...rangeLines(family, sign),
-  ];
-};
-
-const buildAliasSummary = (
-  family: FamilySpec,
-  sign: SignKey,
-  targetName: string,
-): readonly string[] =>
-  [
-    `Alias for \`${targetName}\`.`,
-    `Branded numeric type for ${signInfoMap[sign].adj} ${family.noun}s (${describeSign(sign)}).`,
-    ...rangeLines(family, sign),
-  ] as const;
-
-const buildSmallSummary = (
-  family: FamilySpec,
-  sign: SignKey,
-  memberName: string,
-  isBase: boolean,
-  aliasTargetSmallName: string | undefined,
-): readonly string[] => {
-  const label = smallLabelFor(family, sign, isBase);
-
-  const typeLine =
-    `Type: \`${signInfoMap[sign].literals} | ${memberName}\`` as const;
-
-  if (aliasTargetSmallName !== undefined) {
-    return [
-      `Alias for \`${aliasTargetSmallName}\`.`,
-      `${label} type with small literal values included.`,
-      typeLine,
-    ];
-  }
-
-  return [`${label} type with small literal values included.`, typeLine];
-};
-
-/** Capitalized `WithSmallInt` prose label, e.g. `Non-zero 32-bit integer`. */
-const smallLabelFor = (
-  family: FamilySpec,
-  sign: SignKey,
-  isBase: boolean,
-): string => {
-  const adj = isBase ? '' : signInfoMap[sign].adj;
-
-  const base =
-    adj === '' ? family.smallLabel : (`${adj} ${family.smallLabel}` as const);
-
-  return `${base.charAt(0).toUpperCase()}${base.slice(1)}`;
-};
-
-const describeSign = (sign: SignKey): string => {
-  switch (sign) {
-    case '!=0':
-      return 'not equal to zero';
-    case '>=0':
-      return 'greater than or equal to zero';
-    case '>0':
-      return 'strictly greater than zero';
-    case '<0':
-      return 'strictly less than zero';
-    case '<=0':
-      return 'less than or equal to zero';
-    case 'any':
-      return 'in range';
-  }
-};
-
-/** The `Range: ...` JSDoc line(s) for a sized family, or none. */
-const rangeLines = (family: FamilySpec, sign: SignKey): readonly string[] => {
-  const b = family.bounds;
-
-  if (b === undefined) {
-    return [];
-  }
-
-  const { lowSym, highSym, lowDec, highDec, split } = rangeForSign(b, sign);
-
-  // Non-zero over a signed range: two disjoint intervals.
-  return split
-    ? [`Range: [${b.minSym}, -1] ∪ [1, ${b.maxSym}]`]
-    : [`Range: [${lowSym}, ${highSym}] or [${lowDec}, ${highDec}]`];
-};
-
-type RangeParts = Readonly<{
-  lowSym: string;
-  highSym: string;
-  lowDec: string;
-  highDec: string;
-  split: boolean;
-}>;
-
-const rangeForSign = (b: Bounds, sign: SignKey): RangeParts => {
-  switch (sign) {
-    case 'any':
-      return f(b.minSym, b.maxSym, b.minDec, b.maxDec);
-    case '>=0':
-      return f('0', b.maxSym, '0', b.maxDec);
-    case '>0':
-      return f('1', b.maxSym, '1', b.maxDec);
-    case '<0':
-      return f(b.minSym, '-1', b.minDec, '-1');
-    case '<=0':
-      return f(b.minSym, '0', b.minDec, '0');
-    case '!=0':
-      return { ...f(b.minSym, b.maxSym, b.minDec, b.maxDec), split: true };
-  }
-};
-
-const f = (
-  lowSym: string,
-  highSym: string,
-  lowDec: string,
-  highDec: string,
-): RangeParts => ({ lowSym, highSym, lowDec, highDec, split: false }) as const;
 
 const renderMember = async (member: Member): Promise<string> => {
   const mut_lines: string[] = ['/**'];
@@ -660,6 +638,32 @@ const buildImports = (members: readonly Member[]): string => {
     })
     .join('\n');
 };
+
+// =============================================================================
+// family modules
+// =============================================================================
+
+const renderFamily = async (family: FamilySpec): Promise<string> => {
+  const members = buildMembers(family);
+
+  const importBlock = buildImports(members);
+
+  const mut_blocks: string[] = [header, importBlock];
+
+  for (const member of members) {
+    mut_blocks.push(await renderMember(member));
+  }
+
+  return `${mut_blocks.join('\n\n')}\n`;
+};
+
+type RangeParts = Readonly<{
+  lowSym: string;
+  highSym: string;
+  lowDec: string;
+  highDec: string;
+  split: boolean;
+}>;
 
 // =============================================================================
 // direct execution

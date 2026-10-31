@@ -119,9 +119,6 @@ export const hasConstraints = <T extends UnknownType>(
   t: T,
 ): t is T & WithConstraints<UnknownRecord> => hasConstraintsImpl(t);
 
-const hasConstraintsImpl = (t: unknown): t is WithConstraints<UnknownRecord> =>
-  isRecord(t) && hasKey(t, 'constraints') && isRecord(t.constraints);
-
 /**
  * @internal Copies the constraint values of `source` onto `target`, leaving
  * `target` untouched when `source` carries none.
@@ -154,3 +151,6 @@ export const fillConstraints = <
     allKeys.map((key) => tp(key, source?.[key])),
   ) as FillConstraints<All, C>;
 };
+
+const hasConstraintsImpl = (t: unknown): t is WithConstraints<UnknownRecord> =>
+  isRecord(t) && hasKey(t, 'constraints') && isRecord(t.constraints);

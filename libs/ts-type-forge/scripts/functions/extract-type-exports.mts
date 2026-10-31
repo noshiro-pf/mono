@@ -144,81 +144,8 @@ export const extractTypeExports = (content: string): FileExports => {
   return { types: mut_types, namespaces: mut_namespaces };
 };
 
-const extractNamespaceTypes = (
-  cleaned: string,
-  start: number,
-  end: number,
-  lineOf: (idx: number) => number,
-): readonly TypeExport[] => {
-  const mut_types: TypeExport[] = [];
-
-  let mut_i = start;
-
-  while (mut_i < end) {
-    if (
-      cleaned[mut_i] === "'" ||
-      cleaned[mut_i] === '"' ||
-      cleaned[mut_i] === '`'
-    ) {
-      mut_i = skipQuoted(cleaned, mut_i);
-
-      continue;
-    }
-
-    if (cleaned[mut_i] === '{') {
-      mut_i = skipBraceBlock(cleaned, mut_i);
-
-      continue;
-    }
-
-    if (!isWordBoundary(cleaned, mut_i)) {
-      mut_i += 1;
-
-      continue;
-    }
-
-    const slice = cleaned.slice(mut_i, end);
-
-    const typeMatch = /^export\s+type\s+(\w+)/u.exec(slice);
-
-    if (typeMatch !== null) {
-      const parsed = parseTypeHeader(cleaned, mut_i, typeMatch[0].length);
-
-      mut_types.push({
-        name: typeMatch[1] ?? '',
-        generic: parsed.generic,
-        argList: parsed.argList,
-        line: lineOf(mut_i),
-      });
-
-      mut_i = parsed.nextIdx;
-
-      continue;
-    }
-
-    mut_i += 1;
-  }
-
-  return mut_types;
-};
-
 const isWordBoundary = (content: string, i: number): boolean =>
   i === 0 || /\W/u.test(content[i - 1] ?? ' ');
-
-/**
- * `+1` for an opening delimiter, `-1` for a closing one, `0` otherwise.
- *
- * Kept as a function rather than an inline `if`/`else if` so the nesting-depth
- * bookkeeping stays out of the scanning loops: an `if`/`else if` on the same
- * character is rewritten to a `switch`, and a `switch` inside those loops then
- * has to be extracted anyway.
- */
-const depthDelta = (
-  ch: string | undefined,
-  openers: readonly string[],
-  closers: readonly string[],
-): number =>
-  Number(openers.includes(ch ?? '')) - Number(closers.includes(ch ?? ''));
 
 const skipQuoted = (content: string, startIdx: number): number => {
   const quote = content[startIdx];
@@ -234,11 +161,20 @@ const skipQuoted = (content: string, startIdx: number): number => {
   return mut_i + 1;
 };
 
-const skipBraceBlock = (content: string, startIdx: number): number => {
-  const endIdx = findMatchingBrace(content, startIdx);
-
-  return endIdx < 0 ? content.length : endIdx;
-};
+/**
+ * `+1` for an opening delimiter, `-1` for a closing one, `0` otherwise.
+ *
+ * Kept as a function rather than an inline `if`/`else if` so the nesting-depth
+ * bookkeeping stays out of the scanning loops: an `if`/`else if` on the same
+ * character is rewritten to a `switch`, and a `switch` inside those loops then
+ * has to be extracted anyway.
+ */
+const depthDelta = (
+  ch: string | undefined,
+  openers: readonly string[],
+  closers: readonly string[],
+): number =>
+  Number(openers.includes(ch ?? '')) - Number(closers.includes(ch ?? ''));
 
 const findMatchingBrace = (content: string, startIdx: number): number => {
   let mut_depth = 0;
@@ -268,76 +204,10 @@ const findMatchingBrace = (content: string, startIdx: number): number => {
   return -1;
 };
 
-const parseTypeHeader = (
-  content: string,
-  startIdx: number,
-  prefixLen: number,
-): Readonly<{ generic: string; argList: string; nextIdx: number }> => {
-  const len = content.length;
+const skipBraceBlock = (content: string, startIdx: number): number => {
+  const endIdx = findMatchingBrace(content, startIdx);
 
-  let mut_j = startIdx + prefixLen;
-
-  while (mut_j < len && /\s/u.test(content[mut_j] ?? '')) {
-    mut_j += 1;
-  }
-
-  let mut_generic = '';
-
-  let mut_argList = '';
-
-  if (content[mut_j] === '<') {
-    const endIdx = findMatchingGt(content, mut_j);
-
-    if (endIdx > 0) {
-      mut_generic = content.slice(mut_j, endIdx);
-
-      mut_argList = `<${extractParamNames(mut_generic).join(', ')}>`;
-
-      mut_j = endIdx;
-    }
-  }
-
-  return { generic: mut_generic, argList: mut_argList, nextIdx: mut_j };
-};
-
-const skipDeclareGlobal = (content: string, startIdx: number): number => {
-  let mut_i = startIdx;
-
-  while (mut_i < content.length && /\s/u.test(content[mut_i] ?? '')) {
-    mut_i += 1;
-  }
-
-  if (content.slice(mut_i, mut_i + 14) !== 'declare global') {
-    return -1;
-  }
-
-  while (mut_i < content.length && content[mut_i] !== '{') {
-    mut_i += 1;
-  }
-
-  if (mut_i >= content.length) {
-    return -1;
-  }
-
-  let mut_depth = 0;
-
-  while (mut_i < content.length) {
-    if (content[mut_i] === '{') {
-      mut_depth += 1;
-    }
-
-    if (content[mut_i] === '}') {
-      mut_depth -= 1;
-
-      if (mut_depth === 0) {
-        return mut_i + 1;
-      }
-    }
-
-    mut_i += 1;
-  }
-
-  return -1;
+  return endIdx < 0 ? content.length : endIdx;
 };
 
 const findMatchingGt = (content: string, startIdx: number): number => {
@@ -409,6 +279,136 @@ const extractParamNames = (generic: string): readonly string[] => {
   }
 
   return mut_params.map((p) => (p.split(/[\s=]/u, 1)[0] ?? '').trim());
+};
+
+const parseTypeHeader = (
+  content: string,
+  startIdx: number,
+  prefixLen: number,
+): Readonly<{ generic: string; argList: string; nextIdx: number }> => {
+  const len = content.length;
+
+  let mut_j = startIdx + prefixLen;
+
+  while (mut_j < len && /\s/u.test(content[mut_j] ?? '')) {
+    mut_j += 1;
+  }
+
+  let mut_generic = '';
+
+  let mut_argList = '';
+
+  if (content[mut_j] === '<') {
+    const endIdx = findMatchingGt(content, mut_j);
+
+    if (endIdx > 0) {
+      mut_generic = content.slice(mut_j, endIdx);
+
+      mut_argList = `<${extractParamNames(mut_generic).join(', ')}>`;
+
+      mut_j = endIdx;
+    }
+  }
+
+  return { generic: mut_generic, argList: mut_argList, nextIdx: mut_j };
+};
+
+const extractNamespaceTypes = (
+  cleaned: string,
+  start: number,
+  end: number,
+  lineOf: (idx: number) => number,
+): readonly TypeExport[] => {
+  const mut_types: TypeExport[] = [];
+
+  let mut_i = start;
+
+  while (mut_i < end) {
+    if (
+      cleaned[mut_i] === "'" ||
+      cleaned[mut_i] === '"' ||
+      cleaned[mut_i] === '`'
+    ) {
+      mut_i = skipQuoted(cleaned, mut_i);
+
+      continue;
+    }
+
+    if (cleaned[mut_i] === '{') {
+      mut_i = skipBraceBlock(cleaned, mut_i);
+
+      continue;
+    }
+
+    if (!isWordBoundary(cleaned, mut_i)) {
+      mut_i += 1;
+
+      continue;
+    }
+
+    const slice = cleaned.slice(mut_i, end);
+
+    const typeMatch = /^export\s+type\s+(\w+)/u.exec(slice);
+
+    if (typeMatch !== null) {
+      const parsed = parseTypeHeader(cleaned, mut_i, typeMatch[0].length);
+
+      mut_types.push({
+        name: typeMatch[1] ?? '',
+        generic: parsed.generic,
+        argList: parsed.argList,
+        line: lineOf(mut_i),
+      });
+
+      mut_i = parsed.nextIdx;
+
+      continue;
+    }
+
+    mut_i += 1;
+  }
+
+  return mut_types;
+};
+
+const skipDeclareGlobal = (content: string, startIdx: number): number => {
+  let mut_i = startIdx;
+
+  while (mut_i < content.length && /\s/u.test(content[mut_i] ?? '')) {
+    mut_i += 1;
+  }
+
+  if (content.slice(mut_i, mut_i + 14) !== 'declare global') {
+    return -1;
+  }
+
+  while (mut_i < content.length && content[mut_i] !== '{') {
+    mut_i += 1;
+  }
+
+  if (mut_i >= content.length) {
+    return -1;
+  }
+
+  let mut_depth = 0;
+
+  while (mut_i < content.length) {
+    if (content[mut_i] === '{') {
+      mut_depth += 1;
+    }
+
+    if (content[mut_i] === '}') {
+      mut_depth -= 1;
+
+      if (mut_depth === 0) {
+        return mut_i + 1;
+      }
+    }
+
+    mut_i += 1;
+  }
+
+  return -1;
 };
 
 const countOccurrences = (haystack: string, needle: string): number => {

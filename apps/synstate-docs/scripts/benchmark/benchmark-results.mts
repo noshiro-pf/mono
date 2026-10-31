@@ -87,6 +87,46 @@ export const renderStatsTable = (rows: readonly BenchmarkStats[]): string => {
   ].join('\n');
 };
 
+/**
+ * Writes one scenario's results twice: the Markdown table the docs embed, and
+ * the JSON everything else derives from.
+ *
+ * Both come out of a single call so that they cannot describe different runs.
+ * The Markdown is what a reader sees and what `gen:benchmark-doc` splices into
+ * `benchmark.mdx`; the JSON is what the chart components and the prose numbers
+ * read, because neither can recover a number from a formatted table cell — a
+ * timeout, for one, renders as `> 5000 ms` and is `null` here.
+ */
+export const writeBenchmarkResults = async (
+  resultsDir: string,
+  resultsFileName: string,
+  markdown: string,
+  data: BenchmarkResults,
+): Promise<void> => {
+  const normalized = normalize(data, await readBenchmarkEnvironment());
+
+  const markdownPath = path.resolve(resultsDir, resultsFileName);
+
+  const jsonPath = path.resolve(
+    resultsDir,
+    resultsFileName.replace(/\.md$/u, '.json'),
+  );
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  await fs.writeFile(markdownPath, `${alignTable(markdown)}\n`, 'utf8');
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  await fs.writeFile(
+    jsonPath,
+    `${JSON.stringify(normalized, undefined, 2)}\n`,
+    'utf8',
+  );
+
+  console.info(`\n✓ Results written to ${markdownPath}`);
+
+  console.info(`✓ Results written to ${jsonPath}`);
+};
+
 const formatInteger = (n: number): string =>
   n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 
@@ -131,44 +171,35 @@ export type BenchmarkResults = Readonly<
   | { kind: 'stats'; meta: BenchmarkMeta; rows: readonly BenchmarkStats[] }
 >;
 
-/**
- * Writes one scenario's results twice: the Markdown table the docs embed, and
- * the JSON everything else derives from.
- *
- * Both come out of a single call so that they cannot describe different runs.
- * The Markdown is what a reader sees and what `gen:benchmark-doc` splices into
- * `benchmark.mdx`; the JSON is what the chart components and the prose numbers
- * read, because neither can recover a number from a formatted table cell — a
- * timeout, for one, renders as `> 5000 ms` and is `null` here.
- */
-export const writeBenchmarkResults = async (
-  resultsDir: string,
-  resultsFileName: string,
-  markdown: string,
-  data: BenchmarkResults,
-): Promise<void> => {
-  const normalized = normalize(data, await readBenchmarkEnvironment());
+const separatorCell = (width: number, alignment: ColumnAlignment): string => {
+  switch (alignment) {
+    case 'right':
+      return `${'-'.repeat(width - 1)}:`;
+    case 'center':
+      return `:${'-'.repeat(width - 2)}:`;
+    case 'left':
+      return `:${'-'.repeat(width - 1)}`;
+    case 'none':
+      return '-'.repeat(width);
+  }
+};
 
-  const markdownPath = path.resolve(resultsDir, resultsFileName);
-
-  const jsonPath = path.resolve(
-    resultsDir,
-    resultsFileName.replace(/\.md$/u, '.json'),
-  );
-
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(markdownPath, `${alignTable(markdown)}\n`, 'utf8');
-
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(
-    jsonPath,
-    `${JSON.stringify(normalized, undefined, 2)}\n`,
-    'utf8',
-  );
-
-  console.info(`\n✓ Results written to ${markdownPath}`);
-
-  console.info(`✓ Results written to ${jsonPath}`);
+const padCell = (
+  cell: string,
+  width: number,
+  alignment: ColumnAlignment,
+): string => {
+  switch (alignment) {
+    case 'right':
+      return cell.padStart(width);
+    case 'center':
+      return cell
+        .padStart(Math.floor((width - cell.length) / 2) + cell.length)
+        .padEnd(width);
+    case 'left':
+    case 'none':
+      return cell.padEnd(width);
+  }
 };
 
 /**
@@ -249,36 +280,10 @@ type ColumnAlignment = 'center' | 'left' | 'none' | 'right';
 
 const MIN_COLUMN_WIDTH = 3;
 
-const separatorCell = (width: number, alignment: ColumnAlignment): string => {
-  switch (alignment) {
-    case 'right':
-      return `${'-'.repeat(width - 1)}:`;
-    case 'center':
-      return `:${'-'.repeat(width - 2)}:`;
-    case 'left':
-      return `:${'-'.repeat(width - 1)}`;
-    case 'none':
-      return '-'.repeat(width);
-  }
-};
+const plainLabel = (label: string): string => label.replaceAll('*', '');
 
-const padCell = (
-  cell: string,
-  width: number,
-  alignment: ColumnAlignment,
-): string => {
-  switch (alignment) {
-    case 'right':
-      return cell.padStart(width);
-    case 'center':
-      return cell
-        .padStart(Math.floor((width - cell.length) / 2) + cell.length)
-        .padEnd(width);
-    case 'left':
-    case 'none':
-      return cell.padEnd(width);
-  }
-};
+const toHundredths = (value: number): number =>
+  Result.unwrapOkOr(Num.safeParseFloat(value.toFixed(2)), Number.NaN);
 
 /**
  * Brings the JSON into line with the table rendered beside it.
@@ -319,8 +324,3 @@ const normalize = (
           opsPerSec: r.opsPerSec,
         })),
       } as const);
-
-const plainLabel = (label: string): string => label.replaceAll('*', '');
-
-const toHundredths = (value: number): number =>
-  Result.unwrapOkOr(Num.safeParseFloat(value.toFixed(2)), Number.NaN);

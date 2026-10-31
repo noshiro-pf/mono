@@ -154,16 +154,6 @@ export const anyRunInProgress = (runs: readonly CheckRunReport[]): boolean =>
   );
 
 /**
- * Which of two runs of one name GitHub would answer with: the one in the
- * later-created suite, and within one suite the later run of it — a re-run
- * keeps the suite and takes a new run id.
- */
-const outranks = (run: CheckRunReport, previous: CheckRunReport): boolean =>
-  run.checkSuiteId === previous.checkSuiteId
-    ? run.id > previous.id
-    : run.checkSuiteId > previous.checkSuiteId;
-
-/**
  * What every context has reported on one commit, from both places GitHub
  * keeps them. The aggregate jobs are check runs; `no-skip-ci-label` is a
  * commit status, so reading only the first would report the context that
@@ -308,3 +298,13 @@ export const summarizeChecks = ({
     required: required.length,
   };
 };
+
+/**
+ * Which of two runs of one name GitHub would answer with: the one in the
+ * later-created suite, and within one suite the later run of it — a re-run
+ * keeps the suite and takes a new run id.
+ */
+const outranks = (run: CheckRunReport, previous: CheckRunReport): boolean =>
+  run.checkSuiteId === previous.checkSuiteId
+    ? run.id > previous.id
+    : run.checkSuiteId > previous.checkSuiteId;

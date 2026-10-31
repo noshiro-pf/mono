@@ -78,8 +78,8 @@ const annotationFreeDeclarationName = (node: TsNode): TsNode | undefined =>
     ? node.name
     : undefined;
 
+const isNullType = (type: Type): boolean => (type.flags & TypeFlags.Null) !== 0;
+
 /** Whether `null` is the type itself or one of its union members. */
 const includesNull = (type: Type): boolean =>
   type.isUnionType() ? type.getTypes().some(isNullType) : isNullType(type);
-
-const isNullType = (type: Type): boolean => (type.flags & TypeFlags.Null) !== 0;

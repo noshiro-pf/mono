@@ -41,6 +41,20 @@ export const parseVersionExpr = (
 
 const OPERATORS = ['>=', '<=', '>', '<', '='] as const;
 
+const compareVersion = (a: Version, b: Version): number =>
+  a.major !== b.major ? a.major - b.major : a.minor - b.minor;
+
+const compareByOp = (a: number, b: number, op: string): boolean =>
+  op === '>='
+    ? a >= b
+    : op === '<='
+      ? a <= b
+      : op === '>'
+        ? a > b
+        : op === '<'
+          ? a < b
+          : a === b; // '='
+
 const parseVersionTerm = (term: string): VersionPredicate | undefined => {
   const cleaned = term.replaceAll(/\s+/gu, '');
 
@@ -78,17 +92,3 @@ const parseVersionTerm = (term: string): VersionPredicate | undefined => {
     ? (v) => compareByOp(v.major, major, op)
     : (v) => compareByOp(compareVersion(v, { major, minor }), 0, op);
 };
-
-const compareVersion = (a: Version, b: Version): number =>
-  a.major !== b.major ? a.major - b.major : a.minor - b.minor;
-
-const compareByOp = (a: number, b: number, op: string): boolean =>
-  op === '>='
-    ? a >= b
-    : op === '<='
-      ? a <= b
-      : op === '>'
-        ? a > b
-        : op === '<'
-          ? a < b
-          : a === b; // '='

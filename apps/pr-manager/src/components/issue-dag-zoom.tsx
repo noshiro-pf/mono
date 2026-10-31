@@ -17,6 +17,22 @@ export const IssueDagZoom = (): JSX.Element => (
   />
 );
 
+const zoomOut = (): void => {
+  issuesViewStore.zoomOut();
+};
+
+const zoomIn = (): void => {
+  issuesViewStore.zoomIn();
+};
+
+const fit = (): void => {
+  issuesViewStore.fitDag();
+};
+
+const reset = (): void => {
+  issuesViewStore.resetZoom();
+};
+
 const Zoom = (): JSX.Element => {
   const { dagScale: scale$, dagFitted: fitted$ } = issuesViewStore;
 
@@ -81,20 +97,4 @@ const Zoom = (): JSX.Element => {
       </fieldset>
     </div>
   );
-};
-
-const zoomOut = (): void => {
-  issuesViewStore.zoomOut();
-};
-
-const zoomIn = (): void => {
-  issuesViewStore.zoomIn();
-};
-
-const fit = (): void => {
-  issuesViewStore.fitDag();
-};
-
-const reset = (): void => {
-  issuesViewStore.resetZoom();
 };

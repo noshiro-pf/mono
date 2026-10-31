@@ -542,6 +542,42 @@ type UncoveredDeclaration = Readonly<{
   scriptName: string;
 }>;
 
+/**
+ * The root scripts a workflow runs: every `run: pnpm run <name>` step, plus
+ * every entry of a matrix key the workflow hands to `pnpm run`.
+ */
+export const collectWorkflowCommands = (
+  workflowFile: string,
+): readonly string[] => {
+  const matrixKeys = new Set(
+    Arr.generate(function* () {
+      for (const matched of Array.from(workflowFile.matchAll(MATRIX_COMMAND))) {
+        const key = matched.groups?.['key'];
+
+        if (key !== undefined) {
+          yield key;
+        }
+      }
+    }),
+  );
+
+  const literals = Arr.generate(function* () {
+    for (const matched of Array.from(workflowFile.matchAll(LITERAL_COMMAND))) {
+      const scriptName = matched.groups?.['scriptName'];
+
+      if (scriptName !== undefined) {
+        yield scriptName;
+      }
+    }
+  });
+
+  const fromMatrix = Array.from(matrixKeys).flatMap((key) =>
+    collectMatrixEntries(workflowFile, key),
+  );
+
+  return Arr.uniq([...literals, ...fromMatrix]).toSorted();
+};
+
 const toCommandId = (directory: string, scriptName: string): CommandId =>
   `${directory}:${scriptName}` as const;
 
@@ -718,33 +754,20 @@ const reaches = (
   to: CommandId,
 ): boolean => from !== to && reachableFrom(graph, [from]).has(to);
 
-const readManifests = async (): Promise<
-  Result<readonly Manifest[], string>
-> => {
-  const rootManifest = await readRootManifest();
-
-  if (Result.isErr(rootManifest)) {
-    return rootManifest;
+const readScripts = (manifest: unknown): ReadonlyRecord<string, string> => {
+  if (!isRecord(manifest) || !hasKey(manifest, 'scripts')) {
+    return {};
   }
 
-  const packages = await Result.fromPromise(
-    getWorkspacePackages(projectRootPath),
+  const scripts = manifest.scripts;
+
+  if (!isRecord(scripts)) {
+    return {};
+  }
+
+  return Obj.filterMap(scripts, (body) =>
+    isString(body) ? Optional.some(body) : Optional.none,
   );
-
-  if (Result.isErr(packages)) {
-    return Result.err(
-      `Failed to list the workspace packages: ${unknownToString(packages.value)}`,
-    );
-  }
-
-  const workspaceManifests = packages.value
-    .map((workspacePackage): Manifest => ({
-      directory: path.relative(projectRootPath, workspacePackage.path),
-      scripts: readScripts(workspacePackage.packageJson),
-    }))
-    .toSorted((a, b) => a.directory.localeCompare(b.directory));
-
-  return Result.ok(Arr.toUnshifted(rootManifest.value)(workspaceManifests));
 };
 
 const readRootManifest = async (): Promise<Result<Manifest, string>> => {
@@ -773,46 +796,33 @@ const readRootManifest = async (): Promise<Result<Manifest, string>> => {
       });
 };
 
-const readScripts = (manifest: unknown): ReadonlyRecord<string, string> => {
-  if (!isRecord(manifest) || !hasKey(manifest, 'scripts')) {
-    return {};
-  }
-
-  const scripts = manifest.scripts;
-
-  if (!isRecord(scripts)) {
-    return {};
-  }
-
-  return Obj.filterMap(scripts, (body) =>
-    isString(body) ? Optional.some(body) : Optional.none,
-  );
-};
-
-const readCheckWorkflows = async (): Promise<
-  Result<readonly CheckWorkflow[], string>
+const readManifests = async (): Promise<
+  Result<readonly Manifest[], string>
 > => {
-  const paths = await listWorkflowFiles();
+  const rootManifest = await readRootManifest();
 
-  if (Result.isErr(paths)) {
-    return paths;
+  if (Result.isErr(rootManifest)) {
+    return rootManifest;
   }
 
-  const results = await Promise.all(paths.value.map(readWorkflow));
+  const packages = await Result.fromPromise(
+    getWorkspacePackages(projectRootPath),
+  );
 
-  const failed = results.find(Result.isErr);
+  if (Result.isErr(packages)) {
+    return Result.err(
+      `Failed to list the workspace packages: ${unknownToString(packages.value)}`,
+    );
+  }
 
-  return failed !== undefined
-    ? Result.err(failed.value)
-    : Result.ok(
-        Arr.generate(function* () {
-          for (const result of results) {
-            if (!Result.isErr(result) && result.value !== undefined) {
-              yield result.value;
-            }
-          }
-        }),
-      );
+  const workspaceManifests = packages.value
+    .map((workspacePackage): Manifest => ({
+      directory: path.relative(projectRootPath, workspacePackage.path),
+      scripts: readScripts(workspacePackage.packageJson),
+    }))
+    .toSorted((a, b) => a.directory.localeCompare(b.directory));
+
+  return Result.ok(Arr.toUnshifted(rootManifest.value)(workspaceManifests));
 };
 
 const readWorkflow = async (
@@ -844,41 +854,34 @@ const readWorkflow = async (
   });
 };
 
-/**
- * The root scripts a workflow runs: every `run: pnpm run <name>` step, plus
- * every entry of a matrix key the workflow hands to `pnpm run`.
- */
-export const collectWorkflowCommands = (
-  workflowFile: string,
-): readonly string[] => {
-  const matrixKeys = new Set(
-    Arr.generate(function* () {
-      for (const matched of Array.from(workflowFile.matchAll(MATRIX_COMMAND))) {
-        const key = matched.groups?.['key'];
+const readCheckWorkflows = async (): Promise<
+  Result<readonly CheckWorkflow[], string>
+> => {
+  const paths = await listWorkflowFiles();
 
-        if (key !== undefined) {
-          yield key;
-        }
-      }
-    }),
-  );
+  if (Result.isErr(paths)) {
+    return paths;
+  }
 
-  const literals = Arr.generate(function* () {
-    for (const matched of Array.from(workflowFile.matchAll(LITERAL_COMMAND))) {
-      const scriptName = matched.groups?.['scriptName'];
+  const results = await Promise.all(paths.value.map(readWorkflow));
 
-      if (scriptName !== undefined) {
-        yield scriptName;
-      }
-    }
-  });
+  const failed = results.find(Result.isErr);
 
-  const fromMatrix = Array.from(matrixKeys).flatMap((key) =>
-    collectMatrixEntries(workflowFile, key),
-  );
-
-  return Arr.uniq([...literals, ...fromMatrix]).toSorted();
+  return failed !== undefined
+    ? Result.err(failed.value)
+    : Result.ok(
+        Arr.generate(function* () {
+          for (const result of results) {
+            if (!Result.isErr(result) && result.value !== undefined) {
+              yield result.value;
+            }
+          }
+        }),
+      );
 };
+
+const indentOf = (line: string): number =>
+  line.length - line.trimStart().length;
 
 /**
  * The list items under `<key>:` inside a `matrix:` block, read by indentation
@@ -922,9 +925,6 @@ const collectMatrixEntries = (
 };
 
 const LIST_ITEM = '- ';
-
-const indentOf = (line: string): number =>
-  line.length - line.trimStart().length;
 
 const formatViolations = (violations: readonly string[]): string =>
   [

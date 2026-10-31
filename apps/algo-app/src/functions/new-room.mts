@@ -36,6 +36,24 @@ const allCards: FixedLengthTuple<24, Card> = [
   { color: 'white', number: 11 },
 ] as const;
 
+export const newShuffleDef = (): ShuffleDef =>
+  pipe(Arr.seq(4))
+    .map(getShuffled)
+    .map((list) => list.join(''))
+    .map(toShuffleDef).value;
+
+export const newRoom = (
+  password: Room['password'],
+  player: Room['players'][0],
+): StrictOmit<Room, 'id'> =>
+  ({
+    state: 'not-started',
+    password,
+    players: [player],
+    playerCards: randomizePlayerCards(),
+    shuffleDef: newShuffleDef(),
+  }) as const;
+
 // Written with annotated intermediates rather than a `pipe` chain: the
 // length-constraint brands that `getShuffled` and `Arr.partition` produce do
 // not survive being threaded through one another, and `FixedLengthTuple` can
@@ -61,21 +79,3 @@ const randomizePlayerCards = (): DeepReadonly<
 
   return sorted;
 };
-
-export const newShuffleDef = (): ShuffleDef =>
-  pipe(Arr.seq(4))
-    .map(getShuffled)
-    .map((list) => list.join(''))
-    .map(toShuffleDef).value;
-
-export const newRoom = (
-  password: Room['password'],
-  player: Room['players'][0],
-): StrictOmit<Room, 'id'> =>
-  ({
-    state: 'not-started',
-    password,
-    players: [player],
-    playerCards: randomizePlayerCards(),
-    shuffleDef: newShuffleDef(),
-  }) as const;

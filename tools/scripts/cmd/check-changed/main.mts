@@ -206,6 +206,183 @@ const USAGE = [
   '  --no-coverage   run the tests without listing the changed lines they miss',
 ].join('\n');
 
+const reportCoverage = async ({
+  reportsDirectory,
+  packageDir,
+  addedLines,
+}: Readonly<{
+  reportsDirectory: string;
+  packageDir: string;
+  addedLines: ReadonlyMap<string, readonly number[]>;
+}>): Promise<readonly string[]> => {
+  const label = packageDir === '.' ? 'tools/' : packageDir;
+
+  const lcovPath = path.join(reportsDirectory, 'lcov.info');
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- the temporary directory this run made.
+  const lcov = await fs.readFile(lcovPath, 'utf8').catch(() => undefined);
+
+  if (lcov === undefined) {
+    return [`No coverage report was written for ${label}.`];
+  }
+
+  const prefix = packageDir === '.' ? 'tools/' : (`${packageDir}/` as const);
+
+  const uncovered = uncoveredChangedLines({
+    changedLines: new Map(
+      Array.from(addedLines).filter(([file]) => file.startsWith(prefix)),
+    ),
+    coverage: parseLcov({
+      lcov,
+      packageDir: path.join(projectRootPath, packageDir),
+      rootDir: projectRootPath,
+    }),
+  });
+
+  return uncovered.size === 0
+    ? []
+    : [
+        Arr.toUnshifted(
+          Array.from(
+            uncovered,
+            ([file, lines]) =>
+              `      ${file}: ${formatLineRanges(lines, REPORTED_RANGES)}`,
+          ),
+          `Changed lines in ${label} that no test executes (a report, not a failure):`,
+        ).join('\n'),
+      ];
+};
+
+/**
+ * Runs `pnpm` with the step's arguments, its output passed straight through.
+ * A coverage step gets Vitest's options appended, which `pnpm run` hands on
+ * to the last command of the script — `vitest` in the `check:test` of every
+ * package with a `check:test:cov`, and in `check:root:test`. The reporter is narrowed to `lcov` and written to a
+ * temporary directory, so a package's own `coverage/` is left alone.
+ */
+const runPnpm = async (
+  step: Step,
+  reportsDirectory: string | undefined,
+): Promise<number> => {
+  const coverageArgs =
+    reportsDirectory === undefined
+      ? ([] as const)
+      : ([
+          '--coverage.enabled=true',
+          ...(step.coverage?.packageDir === '.'
+            ? // The shared config's default `include` (`src/**`) reaches
+              // nothing under tools/.
+              ([
+                '--coverage.include=tools/**/*.mts',
+                '--coverage.exclude=**/*.test.mts',
+              ] as const)
+            : ([] as const)),
+          '--coverage.reporter=lcov',
+          `--coverage.reportsDirectory=${reportsDirectory}`,
+          // A failing test is the run where the report matters most.
+          '--coverage.reportOnFailure=true',
+        ] as const);
+
+  return new Promise((resolve) => {
+    const child = spawn('pnpm', [...step.args, ...coverageArgs], {
+      cwd: path.join(projectRootPath, step.cwd),
+      stdio: 'inherit',
+    });
+
+    child.on('error', () => {
+      resolve(COMMAND_NOT_RUN);
+    });
+
+    child.on('close', (code) => {
+      resolve(code ?? 1);
+    });
+  });
+};
+
+/** Whether a repository-relative path is a regular file now. */
+const isRegularFile = (file: string): boolean => {
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a path git status listed.
+    return fsSync.statSync(path.join(projectRootPath, file)).isFile();
+  } catch {
+    return false;
+  }
+};
+
+const splitZ = (output: string): readonly string[] =>
+  output.split('\0').filter((entry) => entry !== '');
+
+const git = (args: readonly string[], input?: string): string => {
+  const result = spawnSync('git', args, {
+    cwd: projectRootPath,
+    encoding: 'utf8',
+    maxBuffer: GIT_MAX_BUFFER,
+    ...(input === undefined ? {} : { input }),
+  });
+
+  if (result.status !== 0) {
+    throw new Error(`git ${args.join(' ')} failed:\n${result.stderr}`);
+  }
+
+  return result.stdout;
+};
+
+/**
+ * Every path `git status` reports, with a hash of what is on disk, so that
+ * two snapshots tell which files a step wrote — including a file that was
+ * already modified before it ran, which `git status` alone cannot.
+ */
+const snapshotTree = (): ReadonlyMap<string, string> => {
+  const files = splitZ(
+    git([
+      'status',
+      '--porcelain=v1',
+      '-z',
+      '--untracked-files=all',
+      '--no-renames',
+    ]),
+  ).map((entry) => entry.slice(STATUS_PREFIX_LENGTH));
+
+  // One `git hash-object` for all of them. It fails as a whole on a path
+  // that is not a regular file — deleted, or the `dir/` of an untracked
+  // nested repository — so those are set apart first.
+  const hashed = files.filter(isRegularFile);
+
+  const hashes = Arr.isEmpty(hashed)
+    ? ([] as const)
+    : git(['hash-object', '--stdin-paths'], hashed.join('\n')).split('\n');
+
+  const hashOf = new Map(hashed.map((file, i) => [file, hashes[i] ?? '']));
+
+  return new Map(files.map((file) => [file, hashOf.get(file) ?? 'not a file']));
+};
+
+/** The paths whose content differs between two {@link snapshotTree}s. */
+const diffSnapshots = (
+  before: ReadonlyMap<string, string>,
+  after: ReadonlyMap<string, string>,
+): readonly string[] =>
+  Arr.uniq([...before.keys(), ...after.keys()])
+    .filter((file) => before.get(file) !== after.get(file))
+    .toSorted();
+
+/** A step as the plan prints it, a long argument list cut short. */
+const describe = (step: Step): string => {
+  const shown = step.args.slice(0, DESCRIBED_ARGS);
+
+  const rest = step.args.length - shown.length;
+
+  return [
+    `[${step.kind}]`,
+    step.cwd === '.' ? '' : `(${step.cwd})`,
+    'pnpm',
+    ...shown,
+    rest > 0 ? `… (+${rest})` : '',
+  ]
+    .filter((part) => part !== '')
+    .join(' ');
+};
+
 /**
  * Runs the steps one after another, all of them whatever fails, and says
  * what each wrote to the tree: a generator that wrote anything fails the run,
@@ -360,6 +537,14 @@ const runPlan = async ({
   return { ran: mut_ran, failures: mut_failures, notes: mut_notes };
 };
 
+/** Reads a repository-relative file. */
+const readText = async (file: string): Promise<string> => {
+  const absolute = path.join(projectRootPath, file);
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- a repository path from the diff or a manifest.
+  return fs.readFile(absolute, 'utf8');
+};
+
 const checkCommits = async (
   base: string,
 ): Promise<
@@ -405,6 +590,24 @@ const checkCommits = async (
   return { failures: result.errors, warnings: result.warnings };
 };
 
+/** The repository-relative files of the list that exist. */
+const filterExisting = async (
+  files: readonly string[],
+): Promise<readonly string[]> => {
+  const present = await Promise.all(
+    files.map(async (file) => {
+      const absolute = path.join(projectRootPath, file);
+
+      return fs
+        .access(absolute)
+        .then(() => true)
+        .catch(() => false);
+    }),
+  );
+
+  return files.filter((_, i) => present[i] === true);
+};
+
 const checkChangesets = async (
   changedFiles: readonly string[],
   packages: readonly PackageInfo[],
@@ -444,6 +647,15 @@ const checkChangesets = async (
       ]
     : [];
 };
+
+/**
+ * The untracked files, without the `dir/` git lists for an untracked nested
+ * repository, which no check could read.
+ */
+const listUntracked = (): readonly string[] =>
+  splitZ(git(['ls-files', '--others', '--exclude-standard', '-z'])).filter(
+    (file) => !file.endsWith('/'),
+  );
 
 /**
  * The lines the diff added or changed, by file: the `-U0` hunks of what git
@@ -488,148 +700,6 @@ const collectAddedLines = async (
   return mut_lines;
 };
 
-const reportCoverage = async ({
-  reportsDirectory,
-  packageDir,
-  addedLines,
-}: Readonly<{
-  reportsDirectory: string;
-  packageDir: string;
-  addedLines: ReadonlyMap<string, readonly number[]>;
-}>): Promise<readonly string[]> => {
-  const label = packageDir === '.' ? 'tools/' : packageDir;
-
-  const lcovPath = path.join(reportsDirectory, 'lcov.info');
-
-  // eslint-disable-next-line security/detect-non-literal-fs-filename -- the temporary directory this run made.
-  const lcov = await fs.readFile(lcovPath, 'utf8').catch(() => undefined);
-
-  if (lcov === undefined) {
-    return [`No coverage report was written for ${label}.`];
-  }
-
-  const prefix = packageDir === '.' ? 'tools/' : (`${packageDir}/` as const);
-
-  const uncovered = uncoveredChangedLines({
-    changedLines: new Map(
-      Array.from(addedLines).filter(([file]) => file.startsWith(prefix)),
-    ),
-    coverage: parseLcov({
-      lcov,
-      packageDir: path.join(projectRootPath, packageDir),
-      rootDir: projectRootPath,
-    }),
-  });
-
-  return uncovered.size === 0
-    ? []
-    : [
-        Arr.toUnshifted(
-          Array.from(
-            uncovered,
-            ([file, lines]) =>
-              `      ${file}: ${formatLineRanges(lines, REPORTED_RANGES)}`,
-          ),
-          `Changed lines in ${label} that no test executes (a report, not a failure):`,
-        ).join('\n'),
-      ];
-};
-
-/**
- * Runs `pnpm` with the step's arguments, its output passed straight through.
- * A coverage step gets Vitest's options appended, which `pnpm run` hands on
- * to the last command of the script — `vitest` in the `check:test` of every
- * package with a `check:test:cov`, and in `check:root:test`. The reporter is narrowed to `lcov` and written to a
- * temporary directory, so a package's own `coverage/` is left alone.
- */
-const runPnpm = async (
-  step: Step,
-  reportsDirectory: string | undefined,
-): Promise<number> => {
-  const coverageArgs =
-    reportsDirectory === undefined
-      ? ([] as const)
-      : ([
-          '--coverage.enabled=true',
-          ...(step.coverage?.packageDir === '.'
-            ? // The shared config's default `include` (`src/**`) reaches
-              // nothing under tools/.
-              ([
-                '--coverage.include=tools/**/*.mts',
-                '--coverage.exclude=**/*.test.mts',
-              ] as const)
-            : ([] as const)),
-          '--coverage.reporter=lcov',
-          `--coverage.reportsDirectory=${reportsDirectory}`,
-          // A failing test is the run where the report matters most.
-          '--coverage.reportOnFailure=true',
-        ] as const);
-
-  return new Promise((resolve) => {
-    const child = spawn('pnpm', [...step.args, ...coverageArgs], {
-      cwd: path.join(projectRootPath, step.cwd),
-      stdio: 'inherit',
-    });
-
-    child.on('error', () => {
-      resolve(COMMAND_NOT_RUN);
-    });
-
-    child.on('close', (code) => {
-      resolve(code ?? 1);
-    });
-  });
-};
-
-/** Whether a repository-relative path is a regular file now. */
-const isRegularFile = (file: string): boolean => {
-  try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a path git status listed.
-    return fsSync.statSync(path.join(projectRootPath, file)).isFile();
-  } catch {
-    return false;
-  }
-};
-
-/**
- * Every path `git status` reports, with a hash of what is on disk, so that
- * two snapshots tell which files a step wrote — including a file that was
- * already modified before it ran, which `git status` alone cannot.
- */
-const snapshotTree = (): ReadonlyMap<string, string> => {
-  const files = splitZ(
-    git([
-      'status',
-      '--porcelain=v1',
-      '-z',
-      '--untracked-files=all',
-      '--no-renames',
-    ]),
-  ).map((entry) => entry.slice(STATUS_PREFIX_LENGTH));
-
-  // One `git hash-object` for all of them. It fails as a whole on a path
-  // that is not a regular file — deleted, or the `dir/` of an untracked
-  // nested repository — so those are set apart first.
-  const hashed = files.filter(isRegularFile);
-
-  const hashes = Arr.isEmpty(hashed)
-    ? ([] as const)
-    : git(['hash-object', '--stdin-paths'], hashed.join('\n')).split('\n');
-
-  const hashOf = new Map(hashed.map((file, i) => [file, hashes[i] ?? '']));
-
-  return new Map(files.map((file) => [file, hashOf.get(file) ?? 'not a file']));
-};
-
-/** The paths whose content differs between two {@link snapshotTree}s. */
-const diffSnapshots = (
-  before: ReadonlyMap<string, string>,
-  after: ReadonlyMap<string, string>,
-): readonly string[] =>
-  Arr.uniq([...before.keys(), ...after.keys()])
-    .filter((file) => before.get(file) !== after.get(file))
-    .toSorted();
-
 const printSummary = ({
   ran,
   failures,
@@ -666,72 +736,6 @@ const printSummary = ({
   );
 };
 
-/** A step as the plan prints it, a long argument list cut short. */
-const describe = (step: Step): string => {
-  const shown = step.args.slice(0, DESCRIBED_ARGS);
-
-  const rest = step.args.length - shown.length;
-
-  return [
-    `[${step.kind}]`,
-    step.cwd === '.' ? '' : `(${step.cwd})`,
-    'pnpm',
-    ...shown,
-    rest > 0 ? `… (+${rest})` : '',
-  ]
-    .filter((part) => part !== '')
-    .join(' ');
-};
-
-const readPackages = async (): Promise<readonly PackageInfo[]> => {
-  const workspace = await getWorkspacePackages(projectRootPath);
-
-  return workspace.map((pkg) => ({
-    name: pkg.name,
-    dir: path.relative(projectRootPath, pkg.path).split(path.sep).join('/'),
-    scripts: new Set(scriptsOf(pkg.packageJson).keys()),
-    isPrivate: isRecord(pkg.packageJson) && pkg.packageJson['private'] === true,
-  }));
-};
-
-const git = (args: readonly string[], input?: string): string => {
-  const result = spawnSync('git', args, {
-    cwd: projectRootPath,
-    encoding: 'utf8',
-    maxBuffer: GIT_MAX_BUFFER,
-    ...(input === undefined ? {} : { input }),
-  });
-
-  if (result.status !== 0) {
-    throw new Error(`git ${args.join(' ')} failed:\n${result.stderr}`);
-  }
-
-  return result.stdout;
-};
-
-/**
- * The untracked files, without the `dir/` git lists for an untracked nested
- * repository, which no check could read.
- */
-const listUntracked = (): readonly string[] =>
-  splitZ(git(['ls-files', '--others', '--exclude-standard', '-z'])).filter(
-    (file) => !file.endsWith('/'),
-  );
-
-const splitZ = (output: string): readonly string[] =>
-  output.split('\0').filter((entry) => entry !== '');
-
-/** Reads a repository-relative file. */
-const readText = async (file: string): Promise<string> => {
-  const absolute = path.join(projectRootPath, file);
-
-  // eslint-disable-next-line security/detect-non-literal-fs-filename -- a repository path from the diff or a manifest.
-  return fs.readFile(absolute, 'utf8');
-};
-
-const readJson = async (file: string): Promise<unknown> =>
-  JSON.parse(await readText(file));
-
 const scriptsOf = (manifest: unknown): ReadonlyMap<string, string> => {
   const scripts =
     isRecord(manifest) && isRecord(manifest['scripts'])
@@ -749,23 +753,19 @@ const scriptsOf = (manifest: unknown): ReadonlyMap<string, string> => {
   );
 };
 
-/** The repository-relative files of the list that exist. */
-const filterExisting = async (
-  files: readonly string[],
-): Promise<readonly string[]> => {
-  const present = await Promise.all(
-    files.map(async (file) => {
-      const absolute = path.join(projectRootPath, file);
+const readPackages = async (): Promise<readonly PackageInfo[]> => {
+  const workspace = await getWorkspacePackages(projectRootPath);
 
-      return fs
-        .access(absolute)
-        .then(() => true)
-        .catch(() => false);
-    }),
-  );
-
-  return files.filter((_, i) => present[i] === true);
+  return workspace.map((pkg) => ({
+    name: pkg.name,
+    dir: path.relative(projectRootPath, pkg.path).split(path.sep).join('/'),
+    scripts: new Set(scriptsOf(pkg.packageJson).keys()),
+    isPrivate: isRecord(pkg.packageJson) && pkg.packageJson['private'] === true,
+  }));
 };
+
+const readJson = async (file: string): Promise<unknown> =>
+  JSON.parse(await readText(file));
 
 const CODE_GATE_SCRIPT = 'z:check-should-run:code-checks';
 

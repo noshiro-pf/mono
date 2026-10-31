@@ -43,22 +43,6 @@ export const typeCheck = (tsconfigPath: string): TypeCheckResult => {
   };
 };
 
-/**
- * `src/a.mts(3,7): error TS2322: Type 'string' is not ...` — a diagnostic
- * with a location — or `error TS5083: Cannot read file ...` without one.
- * Continuation lines of a multi-line message carry no `error TS` marker and
- * are skipped (the caller prints the compiler's own text in full).
- */
-const parseDiagnostics = (
-  output: string,
-  workingDir: string,
-): readonly TypeCheckDiagnostic[] =>
-  output.split('\n').flatMap((text) => {
-    const diagnostic = parseDiagnosticLine(text, workingDir);
-
-    return diagnostic === undefined ? [] : [diagnostic];
-  });
-
 const parseDiagnosticLine = (
   text: string,
   workingDir: string,
@@ -109,3 +93,19 @@ const parseDiagnosticLine = (
     message,
   };
 };
+
+/**
+ * `src/a.mts(3,7): error TS2322: Type 'string' is not ...` — a diagnostic
+ * with a location — or `error TS5083: Cannot read file ...` without one.
+ * Continuation lines of a multi-line message carry no `error TS` marker and
+ * are skipped (the caller prints the compiler's own text in full).
+ */
+const parseDiagnostics = (
+  output: string,
+  workingDir: string,
+): readonly TypeCheckDiagnostic[] =>
+  output.split('\n').flatMap((text) => {
+    const diagnostic = parseDiagnosticLine(text, workingDir);
+
+    return diagnostic === undefined ? [] : [diagnostic];
+  });

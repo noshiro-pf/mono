@@ -35,6 +35,103 @@ import {
 } from '../types/index.mjs';
 import { DateUtils } from '../utils/index.mjs';
 
+export const sendMessageMain = async (
+  message: Discord.Message,
+): Promise<Result<undefined, unknown>> => {
+  if (message.author.bot) {
+    return Result.ok(undefined);
+  }
+
+  if (message.content.startsWith(`${triggerCommand.gp} `)) {
+    return gpSendGroupingMessage(message);
+  }
+
+  if (message.content.startsWith(`${triggerCommand.rand} `)) {
+    return gpSendRandMessage(message);
+  }
+
+  if (message.content.startsWith(`${triggerCommand.rp} `)) {
+    const [title, ...args] = rpParseCommand(message.content);
+
+    return rpSendPollMessage(
+      message.channel,
+      toCommandMessageId(message.id),
+      title,
+      args,
+    );
+  }
+
+  if (message.content.startsWith(`${triggerCommand.rp30} `)) {
+    const res = convertRp30ArgToRpArgs(
+      removeCommandPrefix(message.content, triggerCommand.rp30),
+    );
+
+    if (Result.isErr(res)) {
+      return res;
+    }
+
+    return rpSendPollMessage(
+      message.channel,
+      toCommandMessageId(message.id),
+      res.value.title,
+      res.value.args,
+    );
+  }
+
+  if (message.content.startsWith(`${triggerCommand.rp60} `)) {
+    const res = convertRp60ArgToRpArgs(
+      removeCommandPrefix(message.content, triggerCommand.rp60),
+    );
+
+    if (Result.isErr(res)) {
+      return res;
+    }
+
+    return rpSendPollMessage(
+      message.channel,
+      toCommandMessageId(message.id),
+      res.value.title,
+      res.value.args,
+    );
+  }
+
+  if (message.content.startsWith(`${triggerCommand.rp30d} `)) {
+    const res = convertRp30dArgToRpArgs(
+      removeCommandPrefix(message.content, triggerCommand.rp30d),
+    );
+
+    if (Result.isErr(res)) {
+      return res;
+    }
+
+    return rpSendPollMessage(
+      message.channel,
+      toCommandMessageId(message.id),
+      res.value.title,
+      res.value.args,
+    );
+  }
+
+  if (message.content.startsWith(`${triggerCommand.rp60d} `)) {
+    const res = convertRp60dArgToRpArgs(
+      removeCommandPrefix(message.content, triggerCommand.rp60d),
+    );
+
+    if (Result.isErr(res)) {
+      return res;
+    }
+
+    return rpSendPollMessage(
+      message.channel,
+      toCommandMessageId(message.id),
+      res.value.title,
+      res.value.args,
+    );
+  }
+
+  return Result.ok(undefined);
+};
+
 const rpSendPollMessageSub = async (
   messageChannel: Discord.GuildTextBasedChannel | Discord.TextBasedChannel,
   title: string,
@@ -297,101 +394,4 @@ const gpSendRandMessage = async (
   const replySubResult = await gpSendRandMessageSub(messageFilled.channel, n);
 
   return replySubResult;
-};
-
-export const sendMessageMain = async (
-  message: Discord.Message,
-): Promise<Result<undefined, unknown>> => {
-  if (message.author.bot) {
-    return Result.ok(undefined);
-  }
-
-  if (message.content.startsWith(`${triggerCommand.gp} `)) {
-    return gpSendGroupingMessage(message);
-  }
-
-  if (message.content.startsWith(`${triggerCommand.rand} `)) {
-    return gpSendRandMessage(message);
-  }
-
-  if (message.content.startsWith(`${triggerCommand.rp} `)) {
-    const [title, ...args] = rpParseCommand(message.content);
-
-    return rpSendPollMessage(
-      message.channel,
-      toCommandMessageId(message.id),
-      title,
-      args,
-    );
-  }
-
-  if (message.content.startsWith(`${triggerCommand.rp30} `)) {
-    const res = convertRp30ArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp30),
-    );
-
-    if (Result.isErr(res)) {
-      return res;
-    }
-
-    return rpSendPollMessage(
-      message.channel,
-      toCommandMessageId(message.id),
-      res.value.title,
-      res.value.args,
-    );
-  }
-
-  if (message.content.startsWith(`${triggerCommand.rp60} `)) {
-    const res = convertRp60ArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp60),
-    );
-
-    if (Result.isErr(res)) {
-      return res;
-    }
-
-    return rpSendPollMessage(
-      message.channel,
-      toCommandMessageId(message.id),
-      res.value.title,
-      res.value.args,
-    );
-  }
-
-  if (message.content.startsWith(`${triggerCommand.rp30d} `)) {
-    const res = convertRp30dArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp30d),
-    );
-
-    if (Result.isErr(res)) {
-      return res;
-    }
-
-    return rpSendPollMessage(
-      message.channel,
-      toCommandMessageId(message.id),
-      res.value.title,
-      res.value.args,
-    );
-  }
-
-  if (message.content.startsWith(`${triggerCommand.rp60d} `)) {
-    const res = convertRp60dArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp60d),
-    );
-
-    if (Result.isErr(res)) {
-      return res;
-    }
-
-    return rpSendPollMessage(
-      message.channel,
-      toCommandMessageId(message.id),
-      res.value.title,
-      res.value.args,
-    );
-  }
-
-  return Result.ok(undefined);
 };

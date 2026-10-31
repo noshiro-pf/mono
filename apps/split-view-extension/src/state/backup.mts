@@ -165,6 +165,57 @@ const emptyStoredState: WorkspaceState = {
   activePaneId: undefined,
 } as const;
 
+/**
+ * Hands the text to the browser as a file.
+ *
+ * An anchor with `download`, because an extension page may not use
+ * `chrome.downloads` without the permission for it, and this needs none.
+ */
+export const downloadJsonFile = (fileName: string, text: string): void => {
+  const url = URL.createObjectURL(
+    new Blob([text], { type: 'application/json' }),
+  );
+
+  const mut_anchor = document.createElement('a');
+
+  mut_anchor.href = url;
+
+  mut_anchor.download = fileName;
+
+  mut_anchor.click();
+
+  // The click is synchronous, so the object URL has done its work by here; a
+  // page that never revokes one keeps the blob for the life of the document.
+  URL.revokeObjectURL(url);
+};
+
+const parseBackedUpWorkspace = (
+  value: unknown,
+): BackedUpWorkspace | undefined => {
+  if (!isRecord(value) || !hasKey(value, 'id')) {
+    return undefined;
+  }
+
+  if (typeof value.id !== 'string' || value.id === '') {
+    return undefined;
+  }
+
+  const state = hasKey(value, 'state')
+    ? parseWorkspaceState(value.state)
+    : undefined;
+
+  return {
+    id: value.id,
+    name:
+      hasKey(value, 'name') &&
+      typeof value.name === 'string' &&
+      value.name.trim() !== ''
+        ? value.name.trim()
+        : value.id,
+    state: state ?? emptyStoredState,
+  };
+};
+
 const parseEnvelope = (
   value: unknown,
 ): readonly BackedUpWorkspace[] | undefined => {
@@ -210,62 +261,11 @@ const parseStorageDump = (
   return Arr.isNonEmpty(workspaces) ? workspaces : undefined;
 };
 
-const parseBackedUpWorkspace = (
-  value: unknown,
-): BackedUpWorkspace | undefined => {
-  if (!isRecord(value) || !hasKey(value, 'id')) {
-    return undefined;
-  }
-
-  if (typeof value.id !== 'string' || value.id === '') {
-    return undefined;
-  }
-
-  const state = hasKey(value, 'state')
-    ? parseWorkspaceState(value.state)
-    : undefined;
-
-  return {
-    id: value.id,
-    name:
-      hasKey(value, 'name') &&
-      typeof value.name === 'string' &&
-      value.name.trim() !== ''
-        ? value.name.trim()
-        : value.id,
-    state: state ?? emptyStoredState,
-  };
-};
-
 /** Keeps an imported name from colliding with one already on the list. */
 const uniqueName = (registry: WorkspaceRegistry, candidate: string): string =>
   registry.entries.some((entry) => entry.name === candidate)
     ? nextWorkspaceName(registry)
     : candidate;
-
-/**
- * Hands the text to the browser as a file.
- *
- * An anchor with `download`, because an extension page may not use
- * `chrome.downloads` without the permission for it, and this needs none.
- */
-export const downloadJsonFile = (fileName: string, text: string): void => {
-  const url = URL.createObjectURL(
-    new Blob([text], { type: 'application/json' }),
-  );
-
-  const mut_anchor = document.createElement('a');
-
-  mut_anchor.href = url;
-
-  mut_anchor.download = fileName;
-
-  mut_anchor.click();
-
-  // The click is synchronous, so the object URL has done its work by here; a
-  // page that never revokes one keeps the blob for the life of the document.
-  URL.revokeObjectURL(url);
-};
 
 const safeJsonParse = (text: string): unknown => {
   try {

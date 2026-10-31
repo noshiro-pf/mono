@@ -7,33 +7,6 @@ import type { Firestore } from 'firebase-admin/firestore';
 import type { auth } from 'firebase-functions/v1';
 import type { DeepReadonly } from 'ts-type-forge';
 
-const removeAuthorIdFromEventSchedule = (
-  eventSchedule: EventSchedule,
-  userIdToBeRemoved: string,
-): EventSchedule =>
-  ({
-    ...eventSchedule,
-    author: {
-      ...eventSchedule.author,
-      id:
-        eventSchedule.author.id === userIdToBeRemoved
-          ? null
-          : eventSchedule.author.id,
-    },
-  }) as const;
-
-const removeUserIdFromAnswer = (
-  answer: Answer,
-  userIdToBeRemoved: string,
-): Answer =>
-  ({
-    ...answer,
-    user: {
-      ...answer.user,
-      id: answer.user.id === userIdToBeRemoved ? null : answer.user.id,
-    },
-  }) as const;
-
 export const onUserDelete = async (
   db: Firestore,
   user: DeepReadonly<auth.UserRecord>,
@@ -78,3 +51,30 @@ export const onUserDelete = async (
 
   console.log('Successfully executed batch.');
 };
+
+const removeAuthorIdFromEventSchedule = (
+  eventSchedule: EventSchedule,
+  userIdToBeRemoved: string,
+): EventSchedule =>
+  ({
+    ...eventSchedule,
+    author: {
+      ...eventSchedule.author,
+      id:
+        eventSchedule.author.id === userIdToBeRemoved
+          ? null
+          : eventSchedule.author.id,
+    },
+  }) as const;
+
+const removeUserIdFromAnswer = (
+  answer: Answer,
+  userIdToBeRemoved: string,
+): Answer =>
+  ({
+    ...answer,
+    user: {
+      ...answer.user,
+      id: answer.user.id === userIdToBeRemoved ? null : answer.user.id,
+    },
+  }) as const;

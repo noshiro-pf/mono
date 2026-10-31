@@ -247,16 +247,6 @@ export function count<E>(
   }
 }
 
-const countImpl = <E,>(
-  array: readonly E[],
-  predicate: (value: E, index: SizeType.Arr) => boolean,
-): SizeType.Arr =>
-  array.reduce<Uint32>(
-    (acc, curr, index) =>
-      predicate(curr, asUint32(index)) ? Uint32.add(acc, 1) : acc,
-    asUint32(0),
-  );
-
 /**
  * Groups elements by a key and counts the elements in each group.
  *
@@ -302,23 +292,6 @@ export function countBy<E, G extends MapSetKeyType>(
       return (array) => countByImpl(array, ...args);
   }
 }
-
-const countByImpl = <E, G extends MapSetKeyType>(
-  array: readonly E[],
-  grouper: (value: E, index: SizeType.Arr) => G,
-): IMap<G, SizeType.Arr> => {
-  const mut_groups = new Map<G, SizeType.Arr>();
-
-  for (const [index, e] of array.entries()) {
-    const key = grouper(e, asUint32(index));
-
-    const curr = mut_groups.get(key) ?? 0;
-
-    mut_groups.set(key, asUint32(curr + 1));
-  }
-
-  return IMap.create(mut_groups);
-};
 
 /**
  * Reduces an array to a single value from left to right.
@@ -388,20 +361,6 @@ export function foldl<E, P>(
   }
 }
 
-const foldlImpl = <E, P>(
-  array: readonly E[],
-  callbackfn: (
-    previousValue: P,
-    currentValue: E,
-    currentIndex: SizeType.Arr,
-  ) => P,
-  initialValue: P,
-): P =>
-  array.reduce(
-    (prev, curr, index) => callbackfn(prev, curr, asUint32(index)),
-    initialValue,
-  );
-
 /**
  * Reduces an array to a single value from right to left.
  *
@@ -469,20 +428,6 @@ export function foldr<E, P>(
       return (array) => foldrImpl(array, ...args);
   }
 }
-
-const foldrImpl = <E, P>(
-  array: readonly E[],
-  callbackfn: (
-    previousValue: P,
-    currentValue: E,
-    currentIndex: SizeType.Arr,
-  ) => P,
-  initialValue: P,
-): P =>
-  array.reduceRight(
-    (prev, curr, index) => callbackfn(prev, curr, asUint32(index)),
-    initialValue,
-  );
 
 /**
  * Calculates the sum of numbers in an array.
@@ -617,6 +562,61 @@ export function join(
     }
   }
 }
+
+const countImpl = <E,>(
+  array: readonly E[],
+  predicate: (value: E, index: SizeType.Arr) => boolean,
+): SizeType.Arr =>
+  array.reduce<Uint32>(
+    (acc, curr, index) =>
+      predicate(curr, asUint32(index)) ? Uint32.add(acc, 1) : acc,
+    asUint32(0),
+  );
+
+const countByImpl = <E, G extends MapSetKeyType>(
+  array: readonly E[],
+  grouper: (value: E, index: SizeType.Arr) => G,
+): IMap<G, SizeType.Arr> => {
+  const mut_groups = new Map<G, SizeType.Arr>();
+
+  for (const [index, e] of array.entries()) {
+    const key = grouper(e, asUint32(index));
+
+    const curr = mut_groups.get(key) ?? 0;
+
+    mut_groups.set(key, asUint32(curr + 1));
+  }
+
+  return IMap.create(mut_groups);
+};
+
+const foldlImpl = <E, P>(
+  array: readonly E[],
+  callbackfn: (
+    previousValue: P,
+    currentValue: E,
+    currentIndex: SizeType.Arr,
+  ) => P,
+  initialValue: P,
+): P =>
+  array.reduce(
+    (prev, curr, index) => callbackfn(prev, curr, asUint32(index)),
+    initialValue,
+  );
+
+const foldrImpl = <E, P>(
+  array: readonly E[],
+  callbackfn: (
+    previousValue: P,
+    currentValue: E,
+    currentIndex: SizeType.Arr,
+  ) => P,
+  initialValue: P,
+): P =>
+  array.reduceRight(
+    (prev, curr, index) => callbackfn(prev, curr, asUint32(index)),
+    initialValue,
+  );
 
 const joinImpl = (
   array: readonly unknown[],

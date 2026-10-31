@@ -593,6 +593,9 @@ const build = ({
 }>): ReturnType<typeof buildIssueGraph> =>
   buildIssueGraph({ repoUrl: REPO_URL, issues, referenced, pulls });
 
+const label = (labelName: string): Label =>
+  ({ name: labelName, color: 'ededed', description: '' }) as const;
+
 const issue = (
   number: number,
   startAfter: readonly number[],
@@ -641,6 +644,3 @@ const pull = (
       state: 'open',
     })),
   }) as const;
-
-const label = (labelName: string): Label =>
-  ({ name: labelName, color: 'ededed', description: '' }) as const;

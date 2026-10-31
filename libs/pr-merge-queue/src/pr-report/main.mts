@@ -216,24 +216,6 @@ const namedBeyond = (
     .toSorted((a, b) => a - b);
 };
 
-const print = (
-  report: PrReport,
-  queue: ReadonlyMap<number, QueueComments>,
-  owners: ReadonlyMap<number, QueueOwner>,
-  format: Format,
-): string => {
-  switch (format) {
-    case 'json':
-      return JSON.stringify(serializable(report, queue, owners), undefined, 2);
-
-    case 'markdown':
-      return renderMarkdown(report);
-
-    case 'terminal':
-      return renderTerminal(report);
-  }
-};
-
 /**
  * The report with its maps turned into objects, because `JSON.stringify`
  * writes a `Map` as `{}` and would quietly drop every check verdict, and with
@@ -255,3 +237,21 @@ const serializable = (
       owner: owners.get(entry.number),
     })),
   }) as const;
+
+const print = (
+  report: PrReport,
+  queue: ReadonlyMap<number, QueueComments>,
+  owners: ReadonlyMap<number, QueueOwner>,
+  format: Format,
+): string => {
+  switch (format) {
+    case 'json':
+      return JSON.stringify(serializable(report, queue, owners), undefined, 2);
+
+    case 'markdown':
+      return renderMarkdown(report);
+
+    case 'terminal':
+      return renderTerminal(report);
+  }
+};

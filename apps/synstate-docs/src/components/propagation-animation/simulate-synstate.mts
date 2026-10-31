@@ -43,6 +43,103 @@ export const simulateSynState = (
     frames: framesOf(scenario, tokens),
   }) as const;
 
+const visitCaption = ({
+  node,
+  depth,
+  t,
+  emitted,
+  stale,
+}: Readonly<{
+  node: string;
+  depth: number;
+  /** Absent when the tokens are not shown. */
+  t: string | undefined;
+  emitted: readonly string[];
+  stale: readonly Readonly<{ id: string; token: number }>[];
+}>): LocalizedText => {
+  const head: LocalizedText = {
+    en: `Depth ${depth.toString()}: take ${node} out of its bucket and call ${node}.tryUpdate(${t ?? ''}).`,
+    ja: `深さ ${depth.toString()}：${node} をバケットから取り出し、${node}.tryUpdate(${t ?? ''}) を呼びます。`,
+  } as const;
+
+  if (t === undefined) {
+    return {
+      en: `${head.en} Every parent of ${node} is shallower, so all of them have settled.`,
+      ja: `${head.ja}${node} の親はすべてより浅いので、もう確定しています。`,
+    };
+  }
+
+  const staleText: LocalizedText = {
+    en: stale
+      .map(
+        (s) =>
+          ` ${s.id} still carries t${s.token.toString()}: it did not emit in this update, so ${node} uses its last value.`,
+      )
+      .join(''),
+    ja: stale
+      .map(
+        (s) =>
+          `${s.id} は t${s.token.toString()} のままなので、この更新では発行しておらず、${node} はその最後の値を使います。`,
+      )
+      .join(''),
+  } as const;
+
+  return {
+    en: `${head.en} ${list(emitted, 'en')} ${byCount(emitted, 'carries', 'carry')} ${t}, so ${byCount(emitted, 'it', 'they')} emitted in this update.${staleText.en}`,
+    ja: `${head.ja}${list(emitted, 'ja')} は ${t} を持っているので、この更新で発行済みです。${staleText.ja}`,
+  };
+};
+
+const depthsOf = (
+  ids: readonly string[],
+  childDepth: (id: string) => number,
+): string =>
+  Array.from(new Set(ids.map(childDepth)), (d) => d.toString()).join(', ');
+
+const emitCaption = ({
+  node,
+  formula,
+  args,
+  t,
+  queued,
+  childDepth,
+}: Readonly<{
+  node: string;
+  formula: string;
+  args: string;
+  /** Absent when the tokens are not shown. */
+  t: string | undefined;
+  queued: EnqueueResult;
+  childDepth: (id: string) => number;
+}>): LocalizedText => {
+  const added: LocalizedText = Arr.isEmpty(queued.added)
+    ? ({ en: '', ja: '' } as const)
+    : ({
+        en: ` ${list(queued.added, 'en')} ${byCount(queued.added, 'goes', 'go')} into the bucket of depth ${depthsOf(queued.added, childDepth)}.`,
+        ja: `${list(queued.added, 'ja')} を深さ ${depthsOf(queued.added, childDepth)} のバケットに入れます。`,
+      } as const);
+
+  const already: LocalizedText = Arr.isEmpty(queued.already)
+    ? ({ en: '', ja: '' } as const)
+    : ({
+        en: ` ${list(queued.already, 'en')} ${byCount(queued.already, 'is', 'are')} already waiting in the queue${t === undefined ? '' : ` ${t}`} (the bucket of depth ${depthsOf(queued.already, childDepth)}), so ${byCount(queued.already, 'it is', 'they are')} not added twice.`,
+        ja: `${list(queued.already, 'ja')} はすでにキュー${t === undefined ? '' : ` ${t}`}（深さ ${depthsOf(queued.already, childDepth)} のバケット）に並んでいるので、二度は入れません。`,
+      } as const);
+
+  const none: LocalizedText =
+    Arr.isEmpty(queued.added) && Arr.isEmpty(queued.already)
+      ? ({
+          en: ` ${node} has no children.`,
+          ja: `${node} に子はありません。`,
+        } as const)
+      : ({ en: '', ja: '' } as const);
+
+  return {
+    en: `${node} computes ${formula} and calls setNext(${args}).${added.en}${already.en}${none.en}`,
+    ja: `${node} は ${formula} を計算し、setNext(${args}) を呼びます。${added.ja}${already.ja}${none.ja}`,
+  };
+};
+
 const framesOf = (scenario: Scenario, tokens: boolean): readonly Frame[] => {
   const source = scenario.nodes[0];
 
@@ -405,100 +502,3 @@ type EnqueueResult = Readonly<{
   added: readonly string[];
   already: readonly string[];
 }>;
-
-const visitCaption = ({
-  node,
-  depth,
-  t,
-  emitted,
-  stale,
-}: Readonly<{
-  node: string;
-  depth: number;
-  /** Absent when the tokens are not shown. */
-  t: string | undefined;
-  emitted: readonly string[];
-  stale: readonly Readonly<{ id: string; token: number }>[];
-}>): LocalizedText => {
-  const head: LocalizedText = {
-    en: `Depth ${depth.toString()}: take ${node} out of its bucket and call ${node}.tryUpdate(${t ?? ''}).`,
-    ja: `深さ ${depth.toString()}：${node} をバケットから取り出し、${node}.tryUpdate(${t ?? ''}) を呼びます。`,
-  } as const;
-
-  if (t === undefined) {
-    return {
-      en: `${head.en} Every parent of ${node} is shallower, so all of them have settled.`,
-      ja: `${head.ja}${node} の親はすべてより浅いので、もう確定しています。`,
-    };
-  }
-
-  const staleText: LocalizedText = {
-    en: stale
-      .map(
-        (s) =>
-          ` ${s.id} still carries t${s.token.toString()}: it did not emit in this update, so ${node} uses its last value.`,
-      )
-      .join(''),
-    ja: stale
-      .map(
-        (s) =>
-          `${s.id} は t${s.token.toString()} のままなので、この更新では発行しておらず、${node} はその最後の値を使います。`,
-      )
-      .join(''),
-  } as const;
-
-  return {
-    en: `${head.en} ${list(emitted, 'en')} ${byCount(emitted, 'carries', 'carry')} ${t}, so ${byCount(emitted, 'it', 'they')} emitted in this update.${staleText.en}`,
-    ja: `${head.ja}${list(emitted, 'ja')} は ${t} を持っているので、この更新で発行済みです。${staleText.ja}`,
-  };
-};
-
-const emitCaption = ({
-  node,
-  formula,
-  args,
-  t,
-  queued,
-  childDepth,
-}: Readonly<{
-  node: string;
-  formula: string;
-  args: string;
-  /** Absent when the tokens are not shown. */
-  t: string | undefined;
-  queued: EnqueueResult;
-  childDepth: (id: string) => number;
-}>): LocalizedText => {
-  const added: LocalizedText = Arr.isEmpty(queued.added)
-    ? ({ en: '', ja: '' } as const)
-    : ({
-        en: ` ${list(queued.added, 'en')} ${byCount(queued.added, 'goes', 'go')} into the bucket of depth ${depthsOf(queued.added, childDepth)}.`,
-        ja: `${list(queued.added, 'ja')} を深さ ${depthsOf(queued.added, childDepth)} のバケットに入れます。`,
-      } as const);
-
-  const already: LocalizedText = Arr.isEmpty(queued.already)
-    ? ({ en: '', ja: '' } as const)
-    : ({
-        en: ` ${list(queued.already, 'en')} ${byCount(queued.already, 'is', 'are')} already waiting in the queue${t === undefined ? '' : ` ${t}`} (the bucket of depth ${depthsOf(queued.already, childDepth)}), so ${byCount(queued.already, 'it is', 'they are')} not added twice.`,
-        ja: `${list(queued.already, 'ja')} はすでにキュー${t === undefined ? '' : ` ${t}`}（深さ ${depthsOf(queued.already, childDepth)} のバケット）に並んでいるので、二度は入れません。`,
-      } as const);
-
-  const none: LocalizedText =
-    Arr.isEmpty(queued.added) && Arr.isEmpty(queued.already)
-      ? ({
-          en: ` ${node} has no children.`,
-          ja: `${node} に子はありません。`,
-        } as const)
-      : ({ en: '', ja: '' } as const);
-
-  return {
-    en: `${node} computes ${formula} and calls setNext(${args}).${added.en}${already.en}${none.en}`,
-    ja: `${node} は ${formula} を計算し、setNext(${args}) を呼びます。${added.ja}${already.ja}${none.ja}`,
-  };
-};
-
-const depthsOf = (
-  ids: readonly string[],
-  childDepth: (id: string) => number,
-): string =>
-  Array.from(new Set(ids.map(childDepth)), (d) => d.toString()).join(', ');

@@ -1850,6 +1850,41 @@ type Sent = Readonly<{
   headers: FetchInit['headers'];
 }>;
 
+const sentOf = (route: string, init: FetchInit | RestFetchInit): Sent => {
+  if (init.method === 'GET') {
+    return {
+      operation: route.includes('/rules/branches/') ? 'BranchRules' : 'Branch',
+      route,
+      query: '',
+      variables: {},
+      headers: init.headers,
+    };
+  }
+
+  const parsed = Json.parse(init.body);
+
+  const request = Result.isOk(parsed) ? parsed.value : undefined;
+
+  const variables = isRecord(request) ? request['variables'] : undefined;
+
+  const query =
+    isRecord(request) && typeof request['query'] === 'string'
+      ? request['query']
+      : '';
+
+  return {
+    operation: /^query (\w+)/u.exec(query)?.[1] ?? '',
+    route,
+    query,
+    variables: isRecord(variables) ? variables : {},
+    headers: init.headers,
+  };
+};
+
+/** What was sent as `operation`, in the order it was sent. */
+const named = (sent: readonly Sent[], operation: string): readonly Sent[] =>
+  sent.filter((each) => each.operation === operation);
+
 /**
  * A `fetch` that answers each query with the next answer `parts` give for
  * its name — `{}` once they run out — and keeps what it was asked. By name
@@ -1894,36 +1929,11 @@ const REST_OPERATIONS: ReadonlySet<string> = new Set<string>([
   'Branch',
 ]);
 
-const sentOf = (route: string, init: FetchInit | RestFetchInit): Sent => {
-  if (init.method === 'GET') {
-    return {
-      operation: route.includes('/rules/branches/') ? 'BranchRules' : 'Branch',
-      route,
-      query: '',
-      variables: {},
-      headers: init.headers,
-    };
-  }
-
-  const parsed = Json.parse(init.body);
-
-  const request = Result.isOk(parsed) ? parsed.value : undefined;
-
-  const variables = isRecord(request) ? request['variables'] : undefined;
-
-  const query =
-    isRecord(request) && typeof request['query'] === 'string'
-      ? request['query']
-      : '';
-
-  return {
-    operation: /^query (\w+)/u.exec(query)?.[1] ?? '',
-    route,
-    query,
-    variables: isRecord(variables) ? variables : {},
-    headers: init.headers,
-  };
-};
+/** Lets every answer already given land, and what follows from it run. */
+const ticks = async (): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
 
 /**
  * {@link answering}, but each answer is held back until `release` is called
@@ -1968,16 +1978,6 @@ const holding = (
   };
 };
 
-/** Lets every answer already given land, and what follows from it run. */
-const ticks = async (): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(resolve, 0);
-  });
-
-/** What was sent as `operation`, in the order it was sent. */
-const named = (sent: readonly Sent[], operation: string): readonly Sent[] =>
-  sent.filter((each) => each.operation === operation);
-
 /** One answer to the query `operation`, its fields under `repository`. */
 const answer = (
   operation: string,
@@ -2017,6 +2017,25 @@ const restAnswers = ({
   branch = UNPROTECTED_BRANCH,
 }: Readonly<{ rules?: unknown; branch?: unknown }> = {}): Answers =>
   ({ BranchRules: [rules], Branch: [branch] }) as const;
+
+/**
+ * A page of open pull requests, the last one when `endCursor` is
+ * `undefined`, as each of the three queries that list them answers it.
+ */
+const openPage = (
+  nodes: readonly unknown[],
+  endCursor: string | undefined,
+): unknown =>
+  ({
+    pageInfo: {
+      hasNextPage: endCursor !== undefined,
+      endCursor: endCursor ?? null,
+    },
+    nodes,
+  }) as const;
+
+const issuesAnswer = (page: unknown): Answers =>
+  answer('OpenIssues', { issues: page });
 
 /**
  * Every query a read sends but the follow-ups, answered from one set of
@@ -2064,22 +2083,6 @@ const REPOSITORY_FIELDS = {
   queueLabel: { name: 'merge-queued' },
 } as const;
 
-/**
- * A page of open pull requests, the last one when `endCursor` is
- * `undefined`, as each of the three queries that list them answers it.
- */
-const openPage = (
-  nodes: readonly unknown[],
-  endCursor: string | undefined,
-): unknown =>
-  ({
-    pageInfo: {
-      hasNextPage: endCursor !== undefined,
-      endCursor: endCursor ?? null,
-    },
-    nodes,
-  }) as const;
-
 /** The page after the first of each query that lists the open ones. */
 const laterOpenPage = (
   nodes: readonly unknown[],
@@ -2100,23 +2103,16 @@ const NO_ISSUES = {
   nodes: [],
 } as const;
 
-/** A page of open issues, the last one when `endCursor` is `undefined`. */
-const issuePage = (
-  totalCount: number,
-  numbers: readonly number[],
-  endCursor: string | undefined,
+/** `blockedBy` as GraphQL answers it: each number with its repository. */
+const blockedByNodes = (
+  blockedBy: readonly (readonly [number, string])[],
 ): unknown =>
   ({
-    totalCount,
-    pageInfo: {
-      hasNextPage: endCursor !== undefined,
-      endCursor: endCursor ?? null,
-    },
-    nodes: numbers.map((number) => openIssue(number, [])),
+    nodes: blockedBy.map(([number, nameWithOwner]) => ({
+      number,
+      repository: { nameWithOwner },
+    })),
   }) as const;
-
-const issuesAnswer = (page: unknown): Answers =>
-  answer('OpenIssues', { issues: page });
 
 const openIssue = (
   number: number,
@@ -2141,6 +2137,21 @@ const openIssue = (
       })),
     },
     comments: { totalCount: 3 },
+  }) as const;
+
+/** A page of open issues, the last one when `endCursor` is `undefined`. */
+const issuePage = (
+  totalCount: number,
+  numbers: readonly number[],
+  endCursor: string | undefined,
+): unknown =>
+  ({
+    totalCount,
+    pageInfo: {
+      hasNextPage: endCursor !== undefined,
+      endCursor: endCursor ?? null,
+    },
+    nodes: numbers.map((number) => openIssue(number, [])),
   }) as const;
 
 /** A finished suite no workflow made, which is how a codecov run reads. */
@@ -2319,17 +2330,6 @@ const closes = (
     repository: { nameWithOwner },
     body,
     blockedBy: blockedByNodes(blockedBy),
-  }) as const;
-
-/** `blockedBy` as GraphQL answers it: each number with its repository. */
-const blockedByNodes = (
-  blockedBy: readonly (readonly [number, string])[],
-): unknown =>
-  ({
-    nodes: blockedBy.map(([number, nameWithOwner]) => ({
-      number,
-      repository: { nameWithOwner },
-    })),
   }) as const;
 
 /**

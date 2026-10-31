@@ -349,29 +349,6 @@ const fenceMarkerOf = (line: string): string | undefined =>
 const closesFence = (openFence: string, marker: string): boolean =>
   marker.startsWith(openFence.slice(0, 1)) && marker.length >= openFence.length;
 
-const scanLine = (
-  line: string,
-  lineNumber: number,
-): readonly ParenthesisViolation[] =>
-  Arr.generate(function* () {
-    for (const matched of Array.from(line.matchAll(HALFWIDTH_PAIR))) {
-      const column = matched.index;
-
-      const pair = matched[0];
-
-      const inner = matched.groups?.['inner'] ?? '';
-
-      if (enclosesJapaneseProse(line, column, pair, inner)) {
-        yield {
-          line: lineNumber,
-          column: column + 1,
-          matched: pair,
-          lineText: line,
-        };
-      }
-    }
-  });
-
 const enclosesJapaneseProse = (
   line: string,
   index: number,
@@ -418,6 +395,37 @@ const enclosesJapaneseProse = (
   return isJapanese(previous) || isJapanese(next);
 };
 
+const scanLine = (
+  line: string,
+  lineNumber: number,
+): readonly ParenthesisViolation[] =>
+  Arr.generate(function* () {
+    for (const matched of Array.from(line.matchAll(HALFWIDTH_PAIR))) {
+      const column = matched.index;
+
+      const pair = matched[0];
+
+      const inner = matched.groups?.['inner'] ?? '';
+
+      if (enclosesJapaneseProse(line, column, pair, inner)) {
+        yield {
+          line: lineNumber,
+          column: column + 1,
+          matched: pair,
+          lineText: line,
+        };
+      }
+    }
+  });
+
+const trimOneSpace = (inner: string): string => {
+  const withoutLeading = inner.startsWith(' ') ? inner.slice(1) : inner;
+
+  return withoutLeading.endsWith(' ')
+    ? withoutLeading.slice(0, -1)
+    : withoutLeading;
+};
+
 const rewritePair = (line: string, violation: ParenthesisViolation): string => {
   const start = violation.column - 1;
 
@@ -442,14 +450,6 @@ const rewritePair = (line: string, violation: ParenthesisViolation): string => {
       ? after.slice(1)
       : after,
   ].join('');
-};
-
-const trimOneSpace = (inner: string): string => {
-  const withoutLeading = inner.startsWith(' ') ? inner.slice(1) : inner;
-
-  return withoutLeading.endsWith(' ')
-    ? withoutLeading.slice(0, -1)
-    : withoutLeading;
 };
 
 /**

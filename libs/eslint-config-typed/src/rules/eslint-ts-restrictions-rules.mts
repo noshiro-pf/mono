@@ -7,6 +7,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/no-restricted-syntax': 'off',
   'ts-restrictions/no-restricted-cast-name': 'off',
   'ts-restrictions/explicit-collection-type-arguments': 'error',
+  'ts-restrictions/function-order': 'error',
   'ts-restrictions/jsx-boolean-logical-operands': 'error',
   'ts-restrictions/no-negated-comparison': 'error',
   'ts-restrictions/no-string-spread': 'error',

@@ -452,6 +452,63 @@ const getFilterMapShape = (
   };
 };
 
+/** The whitespace at the start of the line that `index` is on. */
+const lineIndentOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  index: number,
+): string => {
+  const { line } = sourceCode.getLocFromIndex(index);
+
+  const lineText = sourceCode.lines[line - 1] ?? '';
+
+  return /^\s*/u.exec(lineText)?.[0] ?? '';
+};
+
+/**
+ * `text`, the source at `range`, with every line after the first shifted from
+ * the indentation of the line `range` starts on to `targetIndent`. Left as it
+ * is when a template literal or string spans lines inside it, since shifting
+ * those lines would change the string.
+ */
+const reindent = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  range: FixedLengthTuple<2, number>,
+  targetIndent: string,
+  text: string,
+): string => {
+  if (!text.includes('\n')) {
+    return text;
+  }
+
+  const spansLines = sourceCode.ast.tokens.some(
+    (token) =>
+      range[0] <= token.range[0] &&
+      token.range[1] <= range[1] &&
+      (token.type === AST_TOKEN_TYPES.Template ||
+        token.type === AST_TOKEN_TYPES.String) &&
+      token.loc.start.line !== token.loc.end.line,
+  );
+
+  if (spansLines) {
+    return text;
+  }
+
+  const sourceIndent = lineIndentOf(sourceCode, range[0]);
+
+  const [first, ...rest] = text.split('\n');
+
+  return [
+    first,
+    ...rest.map((line) =>
+      line.startsWith(sourceIndent)
+        ? `${targetIndent}${line.slice(sourceIndent.length)}`
+        : line,
+    ),
+  ].join('\n');
+};
+
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const buildReplacement = ({
   sourceCode,
@@ -563,63 +620,6 @@ const losesComments = (
     );
 };
 
-/**
- * `text`, the source at `range`, with every line after the first shifted from
- * the indentation of the line `range` starts on to `targetIndent`. Left as it
- * is when a template literal or string spans lines inside it, since shifting
- * those lines would change the string.
- */
-const reindent = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceCode: TSESLint.SourceCode,
-  range: FixedLengthTuple<2, number>,
-  targetIndent: string,
-  text: string,
-): string => {
-  if (!text.includes('\n')) {
-    return text;
-  }
-
-  const spansLines = sourceCode.ast.tokens.some(
-    (token) =>
-      range[0] <= token.range[0] &&
-      token.range[1] <= range[1] &&
-      (token.type === AST_TOKEN_TYPES.Template ||
-        token.type === AST_TOKEN_TYPES.String) &&
-      token.loc.start.line !== token.loc.end.line,
-  );
-
-  if (spansLines) {
-    return text;
-  }
-
-  const sourceIndent = lineIndentOf(sourceCode, range[0]);
-
-  const [first, ...rest] = text.split('\n');
-
-  return [
-    first,
-    ...rest.map((line) =>
-      line.startsWith(sourceIndent)
-        ? `${targetIndent}${line.slice(sourceIndent.length)}`
-        : line,
-    ),
-  ].join('\n');
-};
-
-/** The whitespace at the start of the line that `index` is on. */
-const lineIndentOf = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceCode: TSESLint.SourceCode,
-  index: number,
-): string => {
-  const { line } = sourceCode.getLocFromIndex(index);
-
-  const lineText = sourceCode.lines[line - 1] ?? '';
-
-  return /^\s*/u.exec(lineText)?.[0] ?? '';
-};
-
 /** Whether `node`, with its type wrappers taken off, is a `….filter(…)` call. */
 const isFilterCall = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -642,72 +642,25 @@ const isFilterCall = (
 };
 
 /**
- * Whether `node`, a reference or a member access, has a type here narrower
- * than its declared one, by a narrowing that a function created here would not
- * see. TypeScript keeps the narrowing of a `const`, and of a parameter or `let`
- * that is never reassigned, inside a closure; it drops every other one,
- * including any narrowing of a property.
+ * Whether `type` is an array or tuple, or a union of them, or an intersection
+ * with one in it (`readonly T[] & Brand`).
  */
-const isNarrowedHere = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceCode: TSESLint.SourceCode,
+const isArrayOrTupleType = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   checker: ts.TypeChecker,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  getTsNode: (esNode: TSESTree.Node) => ts.Node | undefined,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-  isReceiver: boolean,
+  type: ts.Type,
 ): boolean => {
-  if (
-    node.type !== AST_NODE_TYPES.Identifier &&
-    node.type !== AST_NODE_TYPES.MemberExpression
-  ) {
-    return false;
-  }
+  const resolved =
+    (type.flags & ts.TypeFlags.TypeParameter) !== 0
+      ? (checker.getBaseConstraintOfType(type) ?? type)
+      : type;
 
-  // A method about to be called (`xs.flat()`): its type is that of the method,
-  // which no narrowing of interest changes.
-  if (
-    node.parent.type === AST_NODE_TYPES.CallExpression &&
-    node.parent.callee === node
-  ) {
-    return false;
-  }
-
-  if (node.type === AST_NODE_TYPES.Identifier) {
-    if (!isReference(node)) {
-      return false;
-    }
-
-    const variable = ASTUtils.findVariable(sourceCode.getScope(node), node);
-
-    if (
-      variable?.references.every(
-        (reference) => !reference.isWrite() || reference.init === true,
-      ) === true
-    ) {
-      return false;
-    }
-  }
-
-  const tsNode = getTsNode(node);
-
-  if (tsNode === undefined) {
-    return false;
-  }
-
-  const declaredType = getDeclaredType(checker, tsNode);
-
-  const type = checker.getTypeAtLocation(tsNode);
-
-  return (
-    declaredType !== undefined &&
-    declaredType !== type &&
-    // The loop only iterates the receiver itself, so a narrowing that leaves
-    // it an array of the same elements (`Arr.isNonEmpty(xs)`) loses nothing.
-    !(isReceiver && iteratesTheSame(checker, declaredType, type))
-  );
+  return resolved.isUnion()
+    ? resolved.types.every((t) => isArrayOrTupleType(checker, t))
+    : resolved.isIntersection()
+      ? resolved.types.some((t) => isArrayOrTupleType(checker, t))
+      : checker.isArrayType(resolved) || checker.isTupleType(resolved);
 };
 
 /**
@@ -787,6 +740,93 @@ const getDeclaredType = (
     : checker.getTypeOfSymbolAtLocation(symbol, declaration);
 };
 
+/** Whether an identifier reads a binding, rather than naming a property or a key. */
+const isReference = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Identifier,
+): boolean => {
+  const { parent } = node;
+
+  return !(
+    (parent.type === AST_NODE_TYPES.MemberExpression &&
+      parent.property === node &&
+      !parent.computed) ||
+    (parent.type === AST_NODE_TYPES.Property &&
+      parent.key === node &&
+      !parent.computed &&
+      !parent.shorthand)
+  );
+};
+
+/**
+ * Whether `node`, a reference or a member access, has a type here narrower
+ * than its declared one, by a narrowing that a function created here would not
+ * see. TypeScript keeps the narrowing of a `const`, and of a parameter or `let`
+ * that is never reassigned, inside a closure; it drops every other one,
+ * including any narrowing of a property.
+ */
+const isNarrowedHere = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  getTsNode: (esNode: TSESTree.Node) => ts.Node | undefined,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+  isReceiver: boolean,
+): boolean => {
+  if (
+    node.type !== AST_NODE_TYPES.Identifier &&
+    node.type !== AST_NODE_TYPES.MemberExpression
+  ) {
+    return false;
+  }
+
+  // A method about to be called (`xs.flat()`): its type is that of the method,
+  // which no narrowing of interest changes.
+  if (
+    node.parent.type === AST_NODE_TYPES.CallExpression &&
+    node.parent.callee === node
+  ) {
+    return false;
+  }
+
+  if (node.type === AST_NODE_TYPES.Identifier) {
+    if (!isReference(node)) {
+      return false;
+    }
+
+    const variable = ASTUtils.findVariable(sourceCode.getScope(node), node);
+
+    if (
+      variable?.references.every(
+        (reference) => !reference.isWrite() || reference.init === true,
+      ) === true
+    ) {
+      return false;
+    }
+  }
+
+  const tsNode = getTsNode(node);
+
+  if (tsNode === undefined) {
+    return false;
+  }
+
+  const declaredType = getDeclaredType(checker, tsNode);
+
+  const type = checker.getTypeAtLocation(tsNode);
+
+  return (
+    declaredType !== undefined &&
+    declaredType !== type &&
+    // The loop only iterates the receiver itself, so a narrowing that leaves
+    // it an array of the same elements (`Arr.isNonEmpty(xs)`) loses nothing.
+    !(isReceiver && iteratesTheSame(checker, declaredType, type))
+  );
+};
+
 /**
  * Whether the binding `identifier` reads is declared inside `container`, as
  * the parameter of an arrow function in the receiver is: the loop variable
@@ -816,23 +856,8 @@ const isBoundWithin = (
   );
 };
 
-/** Whether an identifier reads a binding, rather than naming a property or a key. */
-const isReference = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Identifier,
-): boolean => {
-  const { parent } = node;
-
-  return !(
-    (parent.type === AST_NODE_TYPES.MemberExpression &&
-      parent.property === node &&
-      !parent.computed) ||
-    (parent.type === AST_NODE_TYPES.Property &&
-      parent.key === node &&
-      !parent.computed &&
-      !parent.shorthand)
-  );
-};
+const isNode = (value: unknown): value is TSESTree.Node =>
+  isRecord(value) && hasKey(value, 'type') && typeof value.type === 'string';
 
 /**
  * Whether `node` or a node inside it satisfies `predicate`. A nested
@@ -877,9 +902,6 @@ const someDescendant = (
   });
 };
 
-const isNode = (value: unknown): value is TSESTree.Node =>
-  isRecord(value) && hasKey(value, 'type') && typeof value.type === 'string';
-
 const isReturnStatement = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.Node,
@@ -894,25 +916,3 @@ const rebindsInGenerator = (
   node.type === AST_NODE_TYPES.Super ||
   node.type === AST_NODE_TYPES.MetaProperty ||
   (node.type === AST_NODE_TYPES.Identifier && node.name === 'arguments');
-
-/**
- * Whether `type` is an array or tuple, or a union of them, or an intersection
- * with one in it (`readonly T[] & Brand`).
- */
-const isArrayOrTupleType = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: ts.TypeChecker,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  type: ts.Type,
-): boolean => {
-  const resolved =
-    (type.flags & ts.TypeFlags.TypeParameter) !== 0
-      ? (checker.getBaseConstraintOfType(type) ?? type)
-      : type;
-
-  return resolved.isUnion()
-    ? resolved.types.every((t) => isArrayOrTupleType(checker, t))
-    : resolved.isIntersection()
-      ? resolved.types.some((t) => isArrayOrTupleType(checker, t))
-      : checker.isArrayType(resolved) || checker.isTupleType(resolved);
-};

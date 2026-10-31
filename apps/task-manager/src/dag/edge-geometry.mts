@@ -268,6 +268,28 @@ const mainCentre = (node: LaidOutNode, axes: Axes): number => {
   return (box.mainStart + box.mainEnd) / 2;
 };
 
+const compareEnds = (
+  a: Readonly<{ edge: LaidOutEdge; other: LaidOutNode }>,
+  b: Readonly<{ edge: LaidOutEdge; other: LaidOutNode }>,
+  axes: Axes,
+): number => {
+  const byCross = crossCentre(a.other, axes) - crossCentre(b.other, axes);
+
+  if (byCross !== 0) {
+    return byCross;
+  }
+
+  const byMain = mainCentre(a.other, axes) - mainCentre(b.other, axes);
+
+  return byMain !== 0
+    ? byMain
+    : a.edge.id < b.edge.id
+      ? -1
+      : a.edge.id > b.edge.id
+        ? 1
+        : 0;
+};
+
 /**
  * The slot of every edge on the side of its `node`, ordered by where the
  * node at the other end is across the axis — then along it, then by id, so
@@ -292,28 +314,6 @@ const slotsBySide = (
           ),
     ),
   );
-
-const compareEnds = (
-  a: Readonly<{ edge: LaidOutEdge; other: LaidOutNode }>,
-  b: Readonly<{ edge: LaidOutEdge; other: LaidOutNode }>,
-  axes: Axes,
-): number => {
-  const byCross = crossCentre(a.other, axes) - crossCentre(b.other, axes);
-
-  if (byCross !== 0) {
-    return byCross;
-  }
-
-  const byMain = mainCentre(a.other, axes) - mainCentre(b.other, axes);
-
-  return byMain !== 0
-    ? byMain
-    : a.edge.id < b.edge.id
-      ? -1
-      : a.edge.id > b.edge.id
-        ? 1
-        : 0;
-};
 
 /**
  * Where an edge in `slot` meets `node`'s exit side (towards the direction of
@@ -360,6 +360,24 @@ const attachment = (
     cross,
   };
 };
+
+const along = (point: AxisPoint, distance: number): AxisPoint =>
+  ({
+    main: point.main + distance,
+    cross: point.cross,
+  }) as const;
+
+const straightOn = (
+  start: AxisPoint,
+  end: AxisPoint,
+  offset: number,
+): AxisSegment =>
+  ({
+    start,
+    control1: along(start, offset),
+    control2: along(end, -offset),
+    end,
+  }) as const;
 
 /**
  * From `start`, heading along the axis, to `end`, arriving along it. A
@@ -426,24 +444,6 @@ const curveBetween = (
   ];
 };
 
-const straightOn = (
-  start: AxisPoint,
-  end: AxisPoint,
-  offset: number,
-): AxisSegment =>
-  ({
-    start,
-    control1: along(start, offset),
-    control2: along(end, -offset),
-    end,
-  }) as const;
-
-const along = (point: AxisPoint, distance: number): AxisPoint =>
-  ({
-    main: point.main + distance,
-    cross: point.cross,
-  }) as const;
-
 /** The middle of the whole curve: of the one segment, or where two meet. */
 const midpointOf = (segments: Segments<AxisSegment>): AxisPoint => {
   const [first] = segments;
@@ -465,17 +465,6 @@ const midpointOf = (segments: Segments<AxisSegment>): AxisPoint => {
   return { main: middle.x, cross: middle.y };
 };
 
-const mapSegments = (
-  segments: Segments<AxisSegment>,
-  toPoint: (point: AxisPoint) => Point,
-): Segments<CubicSegment> =>
-  segments.length === 1
-    ? ([mapSegment(segments[0], toPoint)] as const)
-    : ([
-        mapSegment(segments[0], toPoint),
-        mapSegment(segments[1], toPoint),
-      ] as const);
-
 const mapSegment = (
   segment: AxisSegment,
   toPoint: (point: AxisPoint) => Point,
@@ -486,3 +475,14 @@ const mapSegment = (
     control2: toPoint(segment.control2),
     end: toPoint(segment.end),
   }) as const;
+
+const mapSegments = (
+  segments: Segments<AxisSegment>,
+  toPoint: (point: AxisPoint) => Point,
+): Segments<CubicSegment> =>
+  segments.length === 1
+    ? ([mapSegment(segments[0], toPoint)] as const)
+    : ([
+        mapSegment(segments[0], toPoint),
+        mapSegment(segments[1], toPoint),
+      ] as const);

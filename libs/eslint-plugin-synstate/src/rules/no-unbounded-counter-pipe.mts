@@ -90,6 +90,29 @@ const isPipeProperty = (
       member.property.name === 'pipe';
 
 /**
+ * The identifier whose binding decides what `callee` calls: the callee itself
+ * for a named import, the namespace object for `m.counter`.
+ */
+const boundIdentifierOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  callee: TSESTree.Expression,
+): TSESTree.Identifier | undefined => {
+  const unwrapped = skipTypeWrappers(callee);
+
+  if (unwrapped.type === AST_NODE_TYPES.Identifier) {
+    return unwrapped;
+  }
+
+  if (unwrapped.type !== AST_NODE_TYPES.MemberExpression) {
+    return undefined;
+  }
+
+  const object = skipTypeWrappers(unwrapped.object);
+
+  return object.type === AST_NODE_TYPES.Identifier ? object : undefined;
+};
+
+/**
  * Whether `callee` calls the `counter` synstate exports: by a named import,
  * an aliased one or a namespace import, and through type wrappers. A local
  * binding that shadows the import is not synstate's.
@@ -115,27 +138,16 @@ const isSynstateCounter = (
   );
 };
 
-/**
- * The identifier whose binding decides what `callee` calls: the callee itself
- * for a named import, the namespace object for `m.counter`.
- */
-const boundIdentifierOf = (
+const mayBeTimesKey = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  callee: TSESTree.Expression,
-): TSESTree.Identifier | undefined => {
-  const unwrapped = skipTypeWrappers(callee);
+  property: TSESTree.Property,
+): boolean => {
+  const { key } = property;
 
-  if (unwrapped.type === AST_NODE_TYPES.Identifier) {
-    return unwrapped;
-  }
-
-  if (unwrapped.type !== AST_NODE_TYPES.MemberExpression) {
-    return undefined;
-  }
-
-  const object = skipTypeWrappers(unwrapped.object);
-
-  return object.type === AST_NODE_TYPES.Identifier ? object : undefined;
+  return key.type === AST_NODE_TYPES.Literal
+    ? key.value === 'times'
+    : property.computed ||
+        (key.type === AST_NODE_TYPES.Identifier && key.name === 'times');
 };
 
 /**
@@ -175,16 +187,4 @@ const mayStopByItself = (
     (property) =>
       property.type === AST_NODE_TYPES.SpreadElement || mayBeTimesKey(property),
   );
-};
-
-const mayBeTimesKey = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  property: TSESTree.Property,
-): boolean => {
-  const { key } = property;
-
-  return key.type === AST_NODE_TYPES.Literal
-    ? key.value === 'times'
-    : property.computed ||
-        (key.type === AST_NODE_TYPES.Identifier && key.name === 'times');
 };

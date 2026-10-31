@@ -169,6 +169,15 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
   },
 } as const;
 
+const isLengthAccess = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): node is TSESTree.MemberExpression =>
+  node.type === AST_NODE_TYPES.MemberExpression &&
+  !node.computed &&
+  node.property.type === AST_NODE_TYPES.Identifier &&
+  node.property.name === 'length';
+
 /**
  * Parses `<array>.length <op> <literal>` (in either operand order) into the
  * array expression and the guard that replaces it, or `undefined` for anything
@@ -217,12 +226,3 @@ const matchLengthComparison = (
     ? undefined
     : { arrayExpression: lengthSide.object, guard: matched.guard };
 };
-
-const isLengthAccess = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-): node is TSESTree.MemberExpression =>
-  node.type === AST_NODE_TYPES.MemberExpression &&
-  !node.computed &&
-  node.property.type === AST_NODE_TYPES.Identifier &&
-  node.property.name === 'length';

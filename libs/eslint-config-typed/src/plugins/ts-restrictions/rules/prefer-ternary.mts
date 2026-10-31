@@ -537,6 +537,48 @@ const nodeBodyOf = (
   return node;
 };
 
+const statementListOf = (
+  node: DeepReadonly<TSESTree.Node>,
+): readonly DeepReadonly<TSESTree.Node>[] | undefined => {
+  const { parent } = node;
+
+  if (parent === undefined) {
+    return undefined;
+  }
+
+  if (
+    parent.type === AST_NODE_TYPES.Program ||
+    parent.type === AST_NODE_TYPES.BlockStatement ||
+    parent.type === AST_NODE_TYPES.StaticBlock ||
+    parent.type === AST_NODE_TYPES.TSModuleBlock
+  ) {
+    return parent.body;
+  }
+
+  return parent.type === AST_NODE_TYPES.SwitchCase
+    ? parent.consequent
+    : undefined;
+};
+
+/**
+ * The statement next to `node` in the list it is one of — the only place a
+ * branch that returns can fall through to what follows it.
+ */
+const siblingOf = (
+  node: DeepReadonly<TSESTree.Node>,
+  offset: 1 | -1,
+): DeepReadonly<TSESTree.Node> | undefined => {
+  const list = statementListOf(node);
+
+  if (list === undefined) {
+    return undefined;
+  }
+
+  const index = list.indexOf(node);
+
+  return index === -1 ? undefined : list[index + offset];
+};
+
 /**
  * Every branch of the chain starting at `start`, in order, and the
  * fallback that follows the last.
@@ -591,6 +633,23 @@ const collectChain = (
   }
 };
 
+const branchesOf = (
+  node: DeepReadonly<TSESTree.Expression>,
+): readonly DeepReadonly<TSESTree.Node>[] =>
+  node.type === AST_NODE_TYPES.ConditionalExpression
+    ? ([node.test, node.consequent, ...branchesOf(node.alternate)] as const)
+    : ([node] as const);
+
+/** What a `return` returns, or what an assignment assigns. */
+const chosenValueOf = (
+  node: DeepReadonly<TSESTree.Node>,
+): DeepReadonly<TSESTree.Node> | undefined =>
+  node.type === AST_NODE_TYPES.ReturnStatement
+    ? (node.argument ?? undefined)
+    : node.type === AST_NODE_TYPES.AssignmentExpression
+      ? node.right
+      : undefined;
+
 /**
  * What `only-single-line` measures in the fallback. A ternary there is the
  * rest of the chain, which Prettier wraps one branch per line once it is long;
@@ -606,13 +665,6 @@ const linesOfFallback = (
     : [node];
 };
 
-const branchesOf = (
-  node: DeepReadonly<TSESTree.Expression>,
-): readonly DeepReadonly<TSESTree.Node>[] =>
-  node.type === AST_NODE_TYPES.ConditionalExpression
-    ? ([node.test, node.consequent, ...branchesOf(node.alternate)] as const)
-    : ([node] as const);
-
 /**
  * Whether `unicorn/prefer-ternary` would report the chain too: one `if`, and a
  * fallback that is not already a ternary.
@@ -621,60 +673,8 @@ const isUnicornShape = (chain: Chain): boolean =>
   Arr.isFixedLengthArray(1, chain.arms) &&
   !isTernary(chosenValueOf(chain.fallback));
 
-/** What a `return` returns, or what an assignment assigns. */
-const chosenValueOf = (
-  node: DeepReadonly<TSESTree.Node>,
-): DeepReadonly<TSESTree.Node> | undefined =>
-  node.type === AST_NODE_TYPES.ReturnStatement
-    ? (node.argument ?? undefined)
-    : node.type === AST_NODE_TYPES.AssignmentExpression
-      ? node.right
-      : undefined;
-
 const isSingleLine = (node: DeepReadonly<TSESTree.Node>): boolean =>
   node.loc.start.line === node.loc.end.line;
-
-/**
- * The statement next to `node` in the list it is one of — the only place a
- * branch that returns can fall through to what follows it.
- */
-const siblingOf = (
-  node: DeepReadonly<TSESTree.Node>,
-  offset: 1 | -1,
-): DeepReadonly<TSESTree.Node> | undefined => {
-  const list = statementListOf(node);
-
-  if (list === undefined) {
-    return undefined;
-  }
-
-  const index = list.indexOf(node);
-
-  return index === -1 ? undefined : list[index + offset];
-};
-
-const statementListOf = (
-  node: DeepReadonly<TSESTree.Node>,
-): readonly DeepReadonly<TSESTree.Node>[] | undefined => {
-  const { parent } = node;
-
-  if (parent === undefined) {
-    return undefined;
-  }
-
-  if (
-    parent.type === AST_NODE_TYPES.Program ||
-    parent.type === AST_NODE_TYPES.BlockStatement ||
-    parent.type === AST_NODE_TYPES.StaticBlock ||
-    parent.type === AST_NODE_TYPES.TSModuleBlock
-  ) {
-    return parent.body;
-  }
-
-  return parent.type === AST_NODE_TYPES.SwitchCase
-    ? parent.consequent
-    : undefined;
-};
 
 /**
  * The `@typescript-eslint/utils` helpers take mutable nodes; the rule only

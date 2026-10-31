@@ -1123,16 +1123,6 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
     reading: [],
   }) as const;
 
-const withIssues = (
-  readAtEpochMs: number,
-  numbers: readonly number[],
-  endCursor: string | undefined,
-): LoadedReport =>
-  ({
-    ...readAt(readAtEpochMs),
-    issues: issueList(numbers, endCursor),
-  }) as const;
-
 const issueList = (
   numbers: readonly number[],
   endCursor: string | undefined,
@@ -1153,6 +1143,16 @@ const issueList = (
     totalCount: 200,
     endCursor,
     referenced: [],
+  }) as const;
+
+const withIssues = (
+  readAtEpochMs: number,
+  numbers: readonly number[],
+  endCursor: string | undefined,
+): LoadedReport =>
+  ({
+    ...readAt(readAtEpochMs),
+    issues: issueList(numbers, endCursor),
   }) as const;
 
 const budget = (remaining: number): RateLimit =>

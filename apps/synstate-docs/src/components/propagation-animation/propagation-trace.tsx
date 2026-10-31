@@ -263,24 +263,6 @@ export const PropagationTrace = React.memo<Props>((props) => {
 
 PropagationTrace.displayName = 'PropagationTrace';
 
-/** The keys of every field whose text differs between two steps. */
-const changedKeys = (
-  previous: TraceStep | undefined,
-  current: TraceStep | undefined,
-): ReadonlySet<string> => {
-  if (previous === undefined || current === undefined) {
-    return new Set<string>();
-  }
-
-  const before = flatten(previous);
-
-  return new Set(
-    Array.from(flatten(current))
-      .filter(([key, value]) => before.get(key) !== value)
-      .map(([key]) => key),
-  );
-};
-
 const flatten = (step: TraceStep): ReadonlyMap<string, string> =>
   new Map<string, string>([
     ['propagationDepth', step.module.propagationDepth.toString()],
@@ -319,6 +301,24 @@ const flatten = (step: TraceStep): ReadonlyMap<string, string> =>
       nodeFields.map((field) => [`${n.id}.${field}`, n[field]] as const),
     ),
   ]);
+
+/** The keys of every field whose text differs between two steps. */
+const changedKeys = (
+  previous: TraceStep | undefined,
+  current: TraceStep | undefined,
+): ReadonlySet<string> => {
+  if (previous === undefined || current === undefined) {
+    return new Set<string>();
+  }
+
+  const before = flatten(previous);
+
+  return new Set(
+    Array.from(flatten(current))
+      .filter(([key, value]) => before.get(key) !== value)
+      .map(([key]) => key),
+  );
+};
 
 const graphOf = (nodes: readonly TraceNode[]): Graph =>
   ({

@@ -221,6 +221,127 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
   },
 } as const;
 
+const isElidedOrIdentifier = (
+  element: TSESTree.DestructuringPattern | null | undefined,
+): element is TSESTree.Identifier | null | undefined =>
+  element === null ||
+  element === undefined ||
+  element.type === AST_NODE_TYPES.Identifier;
+
+/**
+ * Reads the `[key, value]` destructuring the entry callback binds. Anything
+ * beyond a plain binding — a default, a rest element, a nested pattern — is
+ * rejected, because the rewritten callback receives the value and the key
+ * directly rather than an entry tuple.
+ */
+const parseEntryPattern = (
+  pattern: TSESTree.ArrayPattern,
+): EntryParams | undefined => {
+  if (pattern.elements.length > 2) {
+    return undefined;
+  }
+
+  const [keyElement, valueElement] = pattern.elements;
+
+  return isElidedOrIdentifier(keyElement) && isElidedOrIdentifier(valueElement)
+    ? {
+        keyParam: keyElement ?? undefined,
+        valueParam: valueElement ?? undefined,
+      }
+    : undefined;
+};
+
+const isConstAssertion = (node: TSESTree.TSAsExpression): boolean =>
+  node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
+  node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
+  node.typeAnnotation.typeName.name === 'const';
+
+/**
+ * Looks through the `as const` / `satisfies` an entry tuple usually carries.
+ * Any other assertion is left in place, so that a tuple asserted to a wider
+ * type than the callback returns is not reported: `Obj` would infer the
+ * narrower one and the rewrite would not type-check.
+ */
+const stripTypeWrappers = (node: TSESTree.Expression): TSESTree.Expression =>
+  node.type === AST_NODE_TYPES.TSSatisfiesExpression ||
+  (node.type === AST_NODE_TYPES.TSAsExpression && isConstAssertion(node))
+    ? stripTypeWrappers(node.expression)
+    : node;
+
+/**
+ * Matches `[k, value]` — an entry rebuilt under the very key it came from,
+ * which is the only shape `Obj.map` / `Obj.filterMap` can express. An entry
+ * built under a different key is left alone.
+ */
+const parseKeptEntry = (
+  node: TSESTree.Expression,
+  keyParam: TSESTree.Identifier | undefined,
+): KeptEntry | undefined => {
+  if (keyParam === undefined) {
+    return undefined;
+  }
+
+  const tuple = stripTypeWrappers(node);
+
+  if (
+    tuple.type !== AST_NODE_TYPES.ArrayExpression ||
+    !Arr.isFixedLengthTuple(2, tuple.elements)
+  ) {
+    return undefined;
+  }
+
+  const [key, value] = tuple.elements;
+
+  return key !== null &&
+    value !== null &&
+    key.type === AST_NODE_TYPES.Identifier &&
+    value.type !== AST_NODE_TYPES.SpreadElement &&
+    key.name === keyParam.name
+    ? { key, value }
+    : undefined;
+};
+
+/** Matches `[[k, value]]` — the `flatMap` branch that keeps an entry. */
+const parseSingletonEntry = (
+  node: TSESTree.Expression,
+  keyParam: TSESTree.Identifier | undefined,
+): KeptEntry | undefined => {
+  const array = stripTypeWrappers(node);
+
+  if (
+    array.type !== AST_NODE_TYPES.ArrayExpression ||
+    !Arr.isFixedLengthTuple(1, array.elements)
+  ) {
+    return undefined;
+  }
+
+  const [entry] = array.elements;
+
+  return entry === null || entry.type === AST_NODE_TYPES.SpreadElement
+    ? undefined
+    : parseKeptEntry(entry, keyParam);
+};
+
+/** Matches `[]` — the `flatMap` branch that drops an entry. */
+const isEmptyArray = (node: TSESTree.Expression): boolean => {
+  const array = stripTypeWrappers(node);
+
+  return (
+    array.type === AST_NODE_TYPES.ArrayExpression && array.elements.length === 0
+  );
+};
+
+const isObjectStaticCall = (
+  node: TSESTree.CallExpression,
+  name: 'entries' | 'fromEntries',
+): boolean =>
+  node.callee.type === AST_NODE_TYPES.MemberExpression &&
+  !node.callee.computed &&
+  node.callee.object.type === AST_NODE_TYPES.Identifier &&
+  node.callee.object.name === 'Object' &&
+  node.callee.property.type === AST_NODE_TYPES.Identifier &&
+  node.callee.property.name === name;
+
 /**
  * Matches `Object.fromEntries(Object.entries(record).map|filter|flatMap(cb))`
  * and reports which `Obj` function replaces it, or `undefined` when the call is
@@ -377,132 +498,11 @@ type EntryParams = Readonly<{
   valueParam: TSESTree.Identifier | undefined;
 }>;
 
-/**
- * Reads the `[key, value]` destructuring the entry callback binds. Anything
- * beyond a plain binding — a default, a rest element, a nested pattern — is
- * rejected, because the rewritten callback receives the value and the key
- * directly rather than an entry tuple.
- */
-const parseEntryPattern = (
-  pattern: TSESTree.ArrayPattern,
-): EntryParams | undefined => {
-  if (pattern.elements.length > 2) {
-    return undefined;
-  }
-
-  const [keyElement, valueElement] = pattern.elements;
-
-  return isElidedOrIdentifier(keyElement) && isElidedOrIdentifier(valueElement)
-    ? {
-        keyParam: keyElement ?? undefined,
-        valueParam: valueElement ?? undefined,
-      }
-    : undefined;
-};
-
-const isElidedOrIdentifier = (
-  element: TSESTree.DestructuringPattern | null | undefined,
-): element is TSESTree.Identifier | null | undefined =>
-  element === null ||
-  element === undefined ||
-  element.type === AST_NODE_TYPES.Identifier;
-
 type KeptEntry = Readonly<{
   /** The key identifier that only rebuilds the entry, dropped by the rewrite. */
   key: TSESTree.Identifier;
   value: TSESTree.Expression;
 }>;
-
-/**
- * Matches `[k, value]` — an entry rebuilt under the very key it came from,
- * which is the only shape `Obj.map` / `Obj.filterMap` can express. An entry
- * built under a different key is left alone.
- */
-const parseKeptEntry = (
-  node: TSESTree.Expression,
-  keyParam: TSESTree.Identifier | undefined,
-): KeptEntry | undefined => {
-  if (keyParam === undefined) {
-    return undefined;
-  }
-
-  const tuple = stripTypeWrappers(node);
-
-  if (
-    tuple.type !== AST_NODE_TYPES.ArrayExpression ||
-    !Arr.isFixedLengthTuple(2, tuple.elements)
-  ) {
-    return undefined;
-  }
-
-  const [key, value] = tuple.elements;
-
-  return key !== null &&
-    value !== null &&
-    key.type === AST_NODE_TYPES.Identifier &&
-    value.type !== AST_NODE_TYPES.SpreadElement &&
-    key.name === keyParam.name
-    ? { key, value }
-    : undefined;
-};
-
-/** Matches `[[k, value]]` — the `flatMap` branch that keeps an entry. */
-const parseSingletonEntry = (
-  node: TSESTree.Expression,
-  keyParam: TSESTree.Identifier | undefined,
-): KeptEntry | undefined => {
-  const array = stripTypeWrappers(node);
-
-  if (
-    array.type !== AST_NODE_TYPES.ArrayExpression ||
-    !Arr.isFixedLengthTuple(1, array.elements)
-  ) {
-    return undefined;
-  }
-
-  const [entry] = array.elements;
-
-  return entry === null || entry.type === AST_NODE_TYPES.SpreadElement
-    ? undefined
-    : parseKeptEntry(entry, keyParam);
-};
-
-/** Matches `[]` — the `flatMap` branch that drops an entry. */
-const isEmptyArray = (node: TSESTree.Expression): boolean => {
-  const array = stripTypeWrappers(node);
-
-  return (
-    array.type === AST_NODE_TYPES.ArrayExpression && array.elements.length === 0
-  );
-};
-
-/**
- * Looks through the `as const` / `satisfies` an entry tuple usually carries.
- * Any other assertion is left in place, so that a tuple asserted to a wider
- * type than the callback returns is not reported: `Obj` would infer the
- * narrower one and the rewrite would not type-check.
- */
-const stripTypeWrappers = (node: TSESTree.Expression): TSESTree.Expression =>
-  node.type === AST_NODE_TYPES.TSSatisfiesExpression ||
-  (node.type === AST_NODE_TYPES.TSAsExpression && isConstAssertion(node))
-    ? stripTypeWrappers(node.expression)
-    : node;
-
-const isConstAssertion = (node: TSESTree.TSAsExpression): boolean =>
-  node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
-  node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
-  node.typeAnnotation.typeName.name === 'const';
-
-const isObjectStaticCall = (
-  node: TSESTree.CallExpression,
-  name: 'entries' | 'fromEntries',
-): boolean =>
-  node.callee.type === AST_NODE_TYPES.MemberExpression &&
-  !node.callee.computed &&
-  node.callee.object.type === AST_NODE_TYPES.Identifier &&
-  node.callee.object.name === 'Object' &&
-  node.callee.property.type === AST_NODE_TYPES.Identifier &&
-  node.callee.property.name === name;
 
 /**
  * `true` when the parameter is still referenced once the identifiers in

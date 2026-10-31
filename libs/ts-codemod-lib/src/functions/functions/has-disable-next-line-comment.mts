@@ -99,38 +99,6 @@ export const hasDisableNextLineComment = (
   return false;
 };
 
-/**
- * The 1-based line number of a position in `sourceFile`, counted the way
- * ts-morph's `getStartLineNumber` and `getLineAndColumnAtPos` count it: one
- * plus the number of `\n` before the position (a lone `\r` starts no line,
- * unlike in the compiler's own line map).
- *
- * ts-morph scans the text from its start on every call, which made this
- * check, asked of every node a transformer visits, quadratic in the size of
- * the file. The newline positions are collected once per compiler source file
- * instead. ts-morph replaces that object whenever the file is edited, so an
- * entry never outlives the text it was collected from.
- */
-const lineNumberLookup = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceFile: tsm.ts.SourceFile,
-): ((pos: number) => number) => {
-  const cached = newlinePositionsCache.get(sourceFile);
-
-  const newlinePositions = cached ?? newlinePositionsOf(sourceFile.text);
-
-  if (cached === undefined) {
-    newlinePositionsCache.set(sourceFile, newlinePositions);
-  }
-
-  return (pos) => countLessThan(newlinePositions, pos) + 1;
-};
-
-const newlinePositionsCache = new WeakMap<
-  tsm.ts.SourceFile,
-  readonly number[]
->();
-
 const newlinePositionsOf = (text: string): readonly number[] => {
   const mut_positions: number[] = [];
 
@@ -164,3 +132,35 @@ const countLessThan = (sorted: readonly number[], value: number): number => {
 
   return mut_low;
 };
+
+/**
+ * The 1-based line number of a position in `sourceFile`, counted the way
+ * ts-morph's `getStartLineNumber` and `getLineAndColumnAtPos` count it: one
+ * plus the number of `\n` before the position (a lone `\r` starts no line,
+ * unlike in the compiler's own line map).
+ *
+ * ts-morph scans the text from its start on every call, which made this
+ * check, asked of every node a transformer visits, quadratic in the size of
+ * the file. The newline positions are collected once per compiler source file
+ * instead. ts-morph replaces that object whenever the file is edited, so an
+ * entry never outlives the text it was collected from.
+ */
+const lineNumberLookup = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceFile: tsm.ts.SourceFile,
+): ((pos: number) => number) => {
+  const cached = newlinePositionsCache.get(sourceFile);
+
+  const newlinePositions = cached ?? newlinePositionsOf(sourceFile.text);
+
+  if (cached === undefined) {
+    newlinePositionsCache.set(sourceFile, newlinePositions);
+  }
+
+  return (pos) => countLessThan(newlinePositions, pos) + 1;
+};
+
+const newlinePositionsCache = new WeakMap<
+  tsm.ts.SourceFile,
+  readonly number[]
+>();

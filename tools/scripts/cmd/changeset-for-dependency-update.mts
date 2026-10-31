@@ -115,27 +115,19 @@ export const isPublishable = (
   manifest: ReadonlyRecord<string, unknown>,
 ): boolean => isString(manifest['name']) && manifest['private'] !== true;
 
-const changedPublishablePackages = async (): Promise<readonly string[]> => {
-  const manifests = await workspaceManifests();
+const readJsonIfPresent = async (
+  file: string,
+): Promise<ReadonlyRecord<string, unknown> | undefined> => {
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a package.json under a workspace glob.
+    const text = await fs.readFile(file, 'utf8');
 
-  const mut_changed: string[] = [];
+    const parsed: unknown = JSON.parse(text);
 
-  for (const { relativePath, manifest } of manifests) {
-    if (!isPublishable(manifest)) {
-      continue;
-    }
-
-    const name = manifest['name'];
-
-    if (
-      isString(name) &&
-      runtimeDependenciesChanged(manifest, baselineManifest(relativePath))
-    ) {
-      mut_changed.push(name);
-    }
+    return isRecord(parsed) ? parsed : undefined;
+  } catch {
+    return undefined;
   }
-
-  return mut_changed.toSorted((a, b) => a.localeCompare(b));
 };
 
 /**
@@ -180,21 +172,6 @@ const workspaceManifests = async (): Promise<
   return mut_found;
 };
 
-const readJsonIfPresent = async (
-  file: string,
-): Promise<ReadonlyRecord<string, unknown> | undefined> => {
-  try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a package.json under a workspace glob.
-    const text = await fs.readFile(file, 'utf8');
-
-    const parsed: unknown = JSON.parse(text);
-
-    return isRecord(parsed) ? parsed : undefined;
-  } catch {
-    return undefined;
-  }
-};
-
 /**
  * The manifest as `HEAD` has it, or `{}` for a package this update added.
  *
@@ -216,6 +193,29 @@ const baselineManifest = (
   } catch {
     return {};
   }
+};
+
+const changedPublishablePackages = async (): Promise<readonly string[]> => {
+  const manifests = await workspaceManifests();
+
+  const mut_changed: string[] = [];
+
+  for (const { relativePath, manifest } of manifests) {
+    if (!isPublishable(manifest)) {
+      continue;
+    }
+
+    const name = manifest['name'];
+
+    if (
+      isString(name) &&
+      runtimeDependenciesChanged(manifest, baselineManifest(relativePath))
+    ) {
+      mut_changed.push(name);
+    }
+  }
+
+  return mut_changed.toSorted((a, b) => a.localeCompare(b));
 };
 
 /**

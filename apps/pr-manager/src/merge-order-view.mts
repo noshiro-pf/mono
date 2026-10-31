@@ -411,6 +411,14 @@ export const saveMergeOrderView = (view: MergeOrderView): void => {
   rewriteSearch((search) => searchWithMergeOrderView(search, view));
 };
 
+/** `all` with `item` flipped in or out of `current`, in the order of `all`. */
+export const toggled = <T extends string>(
+  all: readonly T[],
+  current: readonly T[],
+  item: T,
+): readonly T[] =>
+  all.filter((each) => (each === item) !== current.includes(each));
+
 const countUnder = (
   entries: readonly Entry[],
   under: (entry: Entry) => boolean,
@@ -442,14 +450,6 @@ const STATUS_TESTS = {
   pending: (entry) =>
     entry.labels.some((label) => label.name === PENDING_LABEL),
 } as const satisfies ReadonlyRecord<StatusFilter, (entry: Entry) => boolean>;
-
-/** `all` with `item` flipped in or out of `current`, in the order of `all`. */
-export const toggled = <T extends string>(
-  all: readonly T[],
-  current: readonly T[],
-  item: T,
-): readonly T[] =>
-  all.filter((each) => (each === item) !== current.includes(each));
 
 const PARAM = {
   hide: 'prs.hide',

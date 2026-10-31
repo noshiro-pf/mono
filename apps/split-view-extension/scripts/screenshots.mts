@@ -218,6 +218,27 @@ const assertBuildIsPresent = (): void => {
   }
 };
 
+const demoPage = (route: string): string =>
+  [
+    '<!doctype html><html lang="en"><head>',
+    `<title>${route}</title>`,
+    '<style>',
+    'body{font:16px/1.7 system-ui,sans-serif;margin:0;padding:24px;color:#1f2126}',
+    'h1{font-size:22px;margin:0 0 4px}',
+    'p{max-width:60ch;color:#4a5160}',
+    '.row{border-top:1px solid #e6e8ec;padding:10px 0;display:flex;gap:12px}',
+    '.tag{background:#eef2fb;color:#4f7fd9;border-radius:4px;padding:1px 8px;font-size:13px}',
+    '</style></head><body>',
+    `<h1>${route}</h1>`,
+    '<p>A page served by the screenshot script, so that what the picture shows is the split view rather than anybody else’s site.</p>',
+    ...Array.from(
+      { length: 6 },
+      (_, index) =>
+        `<div class="row"><span class="tag">${route}</span><span>Line ${(index + 1).toString()} of something you might be reading in a pane</span></div>`,
+    ),
+    '</body></html>',
+  ].join('');
+
 /**
  * Four plain pages, so that the screenshots show the extension rather than
  * somebody else's design, and go on looking the same next year.
@@ -246,26 +267,5 @@ const startDemoServer = async (): Promise<
       }),
   };
 };
-
-const demoPage = (route: string): string =>
-  [
-    '<!doctype html><html lang="en"><head>',
-    `<title>${route}</title>`,
-    '<style>',
-    'body{font:16px/1.7 system-ui,sans-serif;margin:0;padding:24px;color:#1f2126}',
-    'h1{font-size:22px;margin:0 0 4px}',
-    'p{max-width:60ch;color:#4a5160}',
-    '.row{border-top:1px solid #e6e8ec;padding:10px 0;display:flex;gap:12px}',
-    '.tag{background:#eef2fb;color:#4f7fd9;border-radius:4px;padding:1px 8px;font-size:13px}',
-    '</style></head><body>',
-    `<h1>${route}</h1>`,
-    '<p>A page served by the screenshot script, so that what the picture shows is the split view rather than anybody else’s site.</p>',
-    ...Array.from(
-      { length: 6 },
-      (_, index) =>
-        `<div class="row"><span class="tag">${route}</span><span>Line ${(index + 1).toString()} of something you might be reading in a pane</span></div>`,
-    ),
-    '</body></html>',
-  ].join('');
 
 await main();

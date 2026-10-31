@@ -1,6 +1,7 @@
 import type { ESLintPlugin } from '../../../types/index.mjs';
 import { checkDestructuringCompleteness } from './check-destructuring-completeness.mjs';
 import { explicitCollectionTypeArguments } from './explicit-collection-type-arguments.mjs';
+import { functionOrder } from './function-order.mjs';
 import { jsxBooleanLogicalOperands } from './jsx-boolean-logical-operands.mjs';
 import { noNegatedComparison } from './no-negated-comparison.mjs';
 import { noRestrictedCastName } from './no-restricted-cast-name.mjs';
@@ -21,6 +22,7 @@ import { preferTernary } from './prefer-ternary.mjs';
 export const tsRestrictionsRules = {
   'check-destructuring-completeness': checkDestructuringCompleteness,
   'explicit-collection-type-arguments': explicitCollectionTypeArguments,
+  'function-order': functionOrder,
   'jsx-boolean-logical-operands': jsxBooleanLogicalOperands,
   'no-negated-comparison': noNegatedComparison,
   'no-restricted-cast-name': noRestrictedCastName,

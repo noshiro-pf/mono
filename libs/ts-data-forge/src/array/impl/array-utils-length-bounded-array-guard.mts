@@ -85,11 +85,6 @@ export function isMinLengthArray(
   }
 }
 
-const hasMinLength = (
-  minLength: SupportedLength,
-  xs: readonly unknown[],
-): boolean => xs.length >= minLength;
-
 /**
  * Type guard that checks if an array has at most `maxLength` elements.
  *
@@ -168,11 +163,6 @@ export function isMaxLengthArray(
       return (xs) => hasMaxLength(args[0], xs);
   }
 }
-
-const hasMaxLength = (
-  maxLength: SupportedLength,
-  xs: readonly unknown[],
-): boolean => xs.length <= maxLength;
 
 /**
  * Type guard that checks if an array's length is within the inclusive range
@@ -267,12 +257,6 @@ export function isBoundedLengthArray(
   }
 }
 
-const hasBoundedLength = (
-  minLength: SupportedLength,
-  maxLength: SupportedLength,
-  xs: readonly unknown[],
-): boolean => minLength <= xs.length && xs.length <= maxLength;
-
 /**
  * Type guard that checks if an array has exactly `length` elements.
  *
@@ -350,11 +334,6 @@ export function isFixedLengthArray(
   }
 }
 
-const hasFixedLength = (
-  length: SupportedLength,
-  xs: readonly unknown[],
-): boolean => xs.length === length;
-
 /**
  * Type guard that checks if an array is empty.
  *
@@ -402,3 +381,24 @@ export const isEmpty = <Xs extends readonly unknown[]>(
 export const isNonEmpty = <Xs extends readonly unknown[]>(
   array: Xs,
 ): array is MinLengthArray<1, Xs[number]> & Xs => array.length > 0;
+
+const hasMinLength = (
+  minLength: SupportedLength,
+  xs: readonly unknown[],
+): boolean => xs.length >= minLength;
+
+const hasMaxLength = (
+  maxLength: SupportedLength,
+  xs: readonly unknown[],
+): boolean => xs.length <= maxLength;
+
+const hasBoundedLength = (
+  minLength: SupportedLength,
+  maxLength: SupportedLength,
+  xs: readonly unknown[],
+): boolean => minLength <= xs.length && xs.length <= maxLength;
+
+const hasFixedLength = (
+  length: SupportedLength,
+  xs: readonly unknown[],
+): boolean => xs.length === length;

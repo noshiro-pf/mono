@@ -132,6 +132,34 @@ export const constantBodyOf = (
 };
 
 /**
+ * Whether `identifier` names a `const` or an import, or is the global
+ * `undefined`. A `let`, a parameter or any other global may hold another value
+ * the next time it is read.
+ */
+const isConstantBinding = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  identifier: TSESTree.Identifier,
+): boolean => {
+  const variable = ASTUtils.findVariable(
+    sourceCode.getScope(identifier),
+    identifier.name,
+  );
+
+  if (variable === null || variable.defs.length === 0) {
+    return identifier.name === 'undefined';
+  }
+
+  return variable.defs.every(
+    (def) =>
+      def.type === TSESLint.Scope.DefinitionType.ImportBinding ||
+      (def.type === TSESLint.Scope.DefinitionType.Variable &&
+        def.parent.kind === 'const'),
+  );
+};
+
+/**
  * Whether `expression`, read through its type wrappers, is the same value
  * each time it is evaluated: a literal other than a regular expression (each
  * evaluation of which makes a new object), a template literal with no
@@ -166,33 +194,5 @@ const isConstant = (
       unwrapped.operator === '!' ||
       unwrapped.operator === 'void') &&
     isConstant(sourceCode, unwrapped.argument)
-  );
-};
-
-/**
- * Whether `identifier` names a `const` or an import, or is the global
- * `undefined`. A `let`, a parameter or any other global may hold another value
- * the next time it is read.
- */
-const isConstantBinding = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceCode: TSESLint.SourceCode,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  identifier: TSESTree.Identifier,
-): boolean => {
-  const variable = ASTUtils.findVariable(
-    sourceCode.getScope(identifier),
-    identifier.name,
-  );
-
-  if (variable === null || variable.defs.length === 0) {
-    return identifier.name === 'undefined';
-  }
-
-  return variable.defs.every(
-    (def) =>
-      def.type === TSESLint.Scope.DefinitionType.ImportBinding ||
-      (def.type === TSESLint.Scope.DefinitionType.Variable &&
-        def.parent.kind === 'const'),
   );
 };

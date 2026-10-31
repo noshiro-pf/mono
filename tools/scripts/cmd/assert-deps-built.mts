@@ -210,6 +210,10 @@ type DependencyField = 'dependencies' | 'peerDependencies' | 'devDependencies';
 
 type Edge = Readonly<{ packageDir: string; neededBy: string }>;
 
+const isRecord = (value: unknown): value is ReadonlyRecord<string, unknown> =>
+  // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- ts-data-forge is not built when this runs (see the header).
+  typeof value === 'object' && value !== null;
+
 const exportTargets = (value: unknown): readonly unknown[] =>
   typeof value === 'string'
     ? ([value] as const)
@@ -217,20 +221,13 @@ const exportTargets = (value: unknown): readonly unknown[] =>
       ? Object.values(value).flatMap(exportTargets)
       : ([] as const);
 
-/** The siblings `packageDir` links to through `fields`, each needed by it. */
-const edgesFrom = (
-  rootDir: string,
-  packageDir: string,
-  fields: readonly DependencyField[],
-): readonly Edge[] => {
-  const manifest = readManifest(packageDir);
-
-  const neededBy = packageName(packageDir, manifest);
-
-  return linkedSiblings(rootDir, packageDir, manifest, fields).map((dep) => ({
-    packageDir: dep,
-    neededBy,
-  }));
+const realpathOrUndefined = (p: string): string | undefined => {
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    return fs.realpathSync(p);
+  } catch {
+    return undefined;
+  }
 };
 
 /**
@@ -275,6 +272,41 @@ const linkedSiblings = (
   });
 };
 
+const packageName = (packageDir: string, manifest: unknown): string =>
+  isRecord(manifest) && typeof manifest['name'] === 'string'
+    ? manifest['name']
+    : path.basename(packageDir);
+
+const readManifest = (packageDir: string): unknown => {
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const content = fs.readFileSync(
+      path.join(packageDir, 'package.json'),
+      'utf8',
+    );
+
+    return JSON.parse(content);
+  } catch {
+    return undefined;
+  }
+};
+
+/** The siblings `packageDir` links to through `fields`, each needed by it. */
+const edgesFrom = (
+  rootDir: string,
+  packageDir: string,
+  fields: readonly DependencyField[],
+): readonly Edge[] => {
+  const manifest = readManifest(packageDir);
+
+  const neededBy = packageName(packageDir, manifest);
+
+  return linkedSiblings(rootDir, packageDir, manifest, fields).map((dep) => ({
+    packageDir: dep,
+    neededBy,
+  }));
+};
+
 /** The members `workspaces` in the root `package.json` names. */
 const workspaceMembers = (rootDir: string): readonly string[] => {
   const manifest = readManifest(rootDir);
@@ -295,38 +327,6 @@ const workspaceMembers = (rootDir: string): readonly string[] => {
       fs.existsSync(path.join(dir, 'package.json')),
     );
 };
-
-const packageName = (packageDir: string, manifest: unknown): string =>
-  isRecord(manifest) && typeof manifest['name'] === 'string'
-    ? manifest['name']
-    : path.basename(packageDir);
-
-const readManifest = (packageDir: string): unknown => {
-  try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const content = fs.readFileSync(
-      path.join(packageDir, 'package.json'),
-      'utf8',
-    );
-
-    return JSON.parse(content);
-  } catch {
-    return undefined;
-  }
-};
-
-const realpathOrUndefined = (p: string): string | undefined => {
-  try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    return fs.realpathSync(p);
-  } catch {
-    return undefined;
-  }
-};
-
-const isRecord = (value: unknown): value is ReadonlyRecord<string, unknown> =>
-  // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- ts-data-forge is not built when this runs (see the header).
-  typeof value === 'object' && value !== null;
 
 /**
  * `isDirectlyExecuted` from `ts-repo-utils`, inlined: that package may not be

@@ -65,87 +65,6 @@ export const SET_ASIDE_REASONS = [
 export type SetAsideReason = (typeof SET_ASIDE_REASONS)[number];
 
 /**
- * Whose a pull request set aside for `reason` is, while the comment stands
- * at its head. A skill's reason is one a session can fix by pushing: a
- * conflict to resolve, a failure to reproduce. A person's is one only a
- * setting, a permission, a review or a merge by hand clears, and the comment
- * says which. A `switch` with no default, so a reason added to
- * {@link SET_ASIDE_REASONS} without an owner fails to compile.
- */
-const setAsideOwner = (
-  reason: SetAsideReason,
-): Readonly<{ owner: 'human' | 'skill'; why: string }> => {
-  switch (reason) {
-    case 'checks-failed':
-    case 'rebase-failed':
-      return { owner: 'skill', why: 'the skill fixes it' };
-
-    case 'already-in-base':
-      return {
-        owner: 'human',
-        why: 'every commit is already in the base; close it',
-      };
-
-    case 'arm-failed':
-      return {
-        owner: 'human',
-        why: 'auto-merge could not be armed; a setting or a permission holds it',
-      };
-
-    case 'awaiting-bypass':
-      return {
-        owner: 'human',
-        why: 'green, and only a ruleset bypass merges it',
-      };
-
-    case 'not-merging':
-      return {
-        owner: 'human',
-        why: 'green but not merging; something the worker cannot read holds it',
-      };
-
-    case 'push-failed':
-      return {
-        owner: 'human',
-        why: 'the push was refused; a setting or a permission holds it',
-      };
-
-    case 'unlabel-failed':
-      return {
-        owner: 'human',
-        why: '`skip-ci` could not be taken off; a permission holds it',
-      };
-
-    case 'watch-timeout':
-      return {
-        owner: 'human',
-        why: 'its checks ran past the watch; look at the run',
-      };
-  }
-};
-
-/** What {@link queueOwner} reads about one pull request. */
-export type QueueOwnerInput = Readonly<{
-  number: number;
-  labels: readonly string[];
-  isDraft: boolean;
-  fromFork: boolean;
-  headRef: string;
-  headSha: string;
-  baseRef: string;
-  defaultBranch: string;
-  /** The open pull request whose branch this one is on, if any. */
-  stackedOn: number | undefined;
-  /** Whether it sits on a `Merge-After` cycle. */
-  inCycle: boolean;
-  /** This account's set-aside comment on it (`set-aside.mts`). */
-  setAside: SetAsideComment | undefined;
-  /** This account's claim comment on it (`claim.mts`). */
-  claim: ClaimComment | undefined;
-  nowEpochMs: number;
-}>;
-
-/**
  * Who moves `pr` next, or `undefined` for a pull request the queue does not
  * cover: neither `merge-queued` nor `auto-rebase` under `skip-ci`.
  */
@@ -250,6 +169,90 @@ export const queueOwnerOfEntry = (
     nowEpochMs: context.nowEpochMs,
   });
 
+export const isSetAsideReason = (reason: string): reason is SetAsideReason =>
+  KNOWN_REASONS.has(reason);
+
+/**
+ * Whose a pull request set aside for `reason` is, while the comment stands
+ * at its head. A skill's reason is one a session can fix by pushing: a
+ * conflict to resolve, a failure to reproduce. A person's is one only a
+ * setting, a permission, a review or a merge by hand clears, and the comment
+ * says which. A `switch` with no default, so a reason added to
+ * {@link SET_ASIDE_REASONS} without an owner fails to compile.
+ */
+const setAsideOwner = (
+  reason: SetAsideReason,
+): Readonly<{ owner: 'human' | 'skill'; why: string }> => {
+  switch (reason) {
+    case 'checks-failed':
+    case 'rebase-failed':
+      return { owner: 'skill', why: 'the skill fixes it' };
+
+    case 'already-in-base':
+      return {
+        owner: 'human',
+        why: 'every commit is already in the base; close it',
+      };
+
+    case 'arm-failed':
+      return {
+        owner: 'human',
+        why: 'auto-merge could not be armed; a setting or a permission holds it',
+      };
+
+    case 'awaiting-bypass':
+      return {
+        owner: 'human',
+        why: 'green, and only a ruleset bypass merges it',
+      };
+
+    case 'not-merging':
+      return {
+        owner: 'human',
+        why: 'green but not merging; something the worker cannot read holds it',
+      };
+
+    case 'push-failed':
+      return {
+        owner: 'human',
+        why: 'the push was refused; a setting or a permission holds it',
+      };
+
+    case 'unlabel-failed':
+      return {
+        owner: 'human',
+        why: '`skip-ci` could not be taken off; a permission holds it',
+      };
+
+    case 'watch-timeout':
+      return {
+        owner: 'human',
+        why: 'its checks ran past the watch; look at the run',
+      };
+  }
+};
+
+/** What {@link queueOwner} reads about one pull request. */
+export type QueueOwnerInput = Readonly<{
+  number: number;
+  labels: readonly string[];
+  isDraft: boolean;
+  fromFork: boolean;
+  headRef: string;
+  headSha: string;
+  baseRef: string;
+  defaultBranch: string;
+  /** The open pull request whose branch this one is on, if any. */
+  stackedOn: number | undefined;
+  /** Whether it sits on a `Merge-After` cycle. */
+  inCycle: boolean;
+  /** This account's set-aside comment on it (`set-aside.mts`). */
+  setAside: SetAsideComment | undefined;
+  /** This account's claim comment on it (`claim.mts`). */
+  claim: ClaimComment | undefined;
+  nowEpochMs: number;
+}>;
+
 /**
  * The set-aside `comment` says, if it stands at `headSha` with no retry
  * asked for. The base is not read: see the module comment.
@@ -263,9 +266,6 @@ const standingAt = (
   comment.setAside.headSha === headSha
     ? comment.setAside
     : undefined;
-
-export const isSetAsideReason = (reason: string): reason is SetAsideReason =>
-  KNOWN_REASONS.has(reason);
 
 const KNOWN_REASONS: ReadonlySet<string> = new Set(SET_ASIDE_REASONS);
 

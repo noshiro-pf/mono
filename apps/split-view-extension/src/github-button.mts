@@ -120,39 +120,37 @@ const main = (): void => {
 };
 
 /**
- * Reads the pull request's title, the issue it closes and the Claude Code
- * session it names from its conversation page, and asks the service worker to
- * open the split view.
- *
- * The conversation page is fetched rather than read off the document on
- * screen: the diff has none of them, and a pull request named in a link is not
- * on screen at all. The fetch is same-origin, so it sees what the user sees,
- * private repositories included. When it fails, or GitHub's markup has moved,
- * the split view opens all the same, without the issue or the session.
+ * The description as Markdown enough for `claudeSessionUrlOfBody`: its text,
+ * with each link written back as `[<text>](<href>)` and the code left out.
+ * GitHub puts a line break between the rendered blocks and after each `<br>`,
+ * so a line of the text is a line of what was written.
  */
-const openPullRequest = async (
-  pullRequest: PullRequest,
-  { active, closeOpener }: Readonly<{ active: boolean; closeOpener: boolean }>,
-): Promise<void> => {
-  const conversation = await readConversation(pullRequest);
+const descriptionTextOf = (description: Element | null): string => {
+  if (description === null) {
+    return '';
+  }
 
-  const onScreen =
-    pullRequestOf(document.location.href)?.url === pullRequest.url;
+  const mut_copy = description.cloneNode(true);
 
-  const message: GitHubMessage = {
-    tag: githubMessageTag,
-    kind: 'open',
-    url: pullRequest.url,
-    title:
-      conversation?.title ??
-      (onScreen ? pullRequestTitleOf(document.title) : undefined),
-    issueUrl: conversation?.issueUrl,
-    sessionUrl: conversation?.sessionUrl,
-    active,
-    closeOpener,
-  } as const;
+  if (!(mut_copy instanceof Element)) {
+    return '';
+  }
 
-  await chrome.runtime.sendMessage(message);
+  for (const mut_code of mut_copy.querySelectorAll('pre, code')) {
+    mut_code.remove();
+  }
+
+  for (const mut_anchor of mut_copy.querySelectorAll('a[href]')) {
+    mut_anchor.replaceWith(
+      `[${mut_anchor.textContent}](${mut_anchor.getAttribute('href') ?? ''})`,
+    );
+  }
+
+  for (const mut_lineBreak of mut_copy.querySelectorAll('br')) {
+    mut_lineBreak.replaceWith('\n');
+  }
+
+  return mut_copy.textContent;
 };
 
 /**
@@ -203,37 +201,39 @@ const readConversation = async (
 };
 
 /**
- * The description as Markdown enough for `claudeSessionUrlOfBody`: its text,
- * with each link written back as `[<text>](<href>)` and the code left out.
- * GitHub puts a line break between the rendered blocks and after each `<br>`,
- * so a line of the text is a line of what was written.
+ * Reads the pull request's title, the issue it closes and the Claude Code
+ * session it names from its conversation page, and asks the service worker to
+ * open the split view.
+ *
+ * The conversation page is fetched rather than read off the document on
+ * screen: the diff has none of them, and a pull request named in a link is not
+ * on screen at all. The fetch is same-origin, so it sees what the user sees,
+ * private repositories included. When it fails, or GitHub's markup has moved,
+ * the split view opens all the same, without the issue or the session.
  */
-const descriptionTextOf = (description: Element | null): string => {
-  if (description === null) {
-    return '';
-  }
+const openPullRequest = async (
+  pullRequest: PullRequest,
+  { active, closeOpener }: Readonly<{ active: boolean; closeOpener: boolean }>,
+): Promise<void> => {
+  const conversation = await readConversation(pullRequest);
 
-  const mut_copy = description.cloneNode(true);
+  const onScreen =
+    pullRequestOf(document.location.href)?.url === pullRequest.url;
 
-  if (!(mut_copy instanceof Element)) {
-    return '';
-  }
+  const message: GitHubMessage = {
+    tag: githubMessageTag,
+    kind: 'open',
+    url: pullRequest.url,
+    title:
+      conversation?.title ??
+      (onScreen ? pullRequestTitleOf(document.title) : undefined),
+    issueUrl: conversation?.issueUrl,
+    sessionUrl: conversation?.sessionUrl,
+    active,
+    closeOpener,
+  } as const;
 
-  for (const mut_code of mut_copy.querySelectorAll('pre, code')) {
-    mut_code.remove();
-  }
-
-  for (const mut_anchor of mut_copy.querySelectorAll('a[href]')) {
-    mut_anchor.replaceWith(
-      `[${mut_anchor.textContent}](${mut_anchor.getAttribute('href') ?? ''})`,
-    );
-  }
-
-  for (const mut_lineBreak of mut_copy.querySelectorAll('br')) {
-    mut_lineBreak.replaceWith('\n');
-  }
-
-  return mut_copy.textContent;
+  await chrome.runtime.sendMessage(message);
 };
 
 const closingIssueSelector =

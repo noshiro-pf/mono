@@ -6,9 +6,6 @@ import {
   type ValidationError,
 } from './validation-error.mjs';
 
-const validationResultToString = (result: readonly ValidationError[]): string =>
-  `\n${validationErrorsToMessages(result).join(',\n')}` as const;
-
 export const createAssertFn =
   <T,>(validate: Type<T>['validate']) =>
   (a: unknown): asserts a is T => {
@@ -18,3 +15,6 @@ export const createAssertFn =
       panic(validationResultToString(res.value));
     }
   };
+
+const validationResultToString = (result: readonly ValidationError[]): string =>
+  `\n${validationErrorsToMessages(result).join(',\n')}` as const;

@@ -60,15 +60,49 @@ const subsampleWeight = Num.isNonZero(subsampleCount)
   ? Num.div(1, subsampleCount)
   : 1;
 
-const rowsOf = (size: number): readonly (readonly number[])[] =>
-  Array.from({ length: size }, (_unusedRow, y) =>
-    Array.from({ length: size }, (_unusedColumn, x) =>
-      channels.map((channel) => channelAt(size, x, y, channel)),
-    ).flat(),
-  );
+const isInRoundedSquare = (size: number, px: number, py: number): boolean => {
+  const low = Math.round(squareInset * size);
 
-/** RGBA. */
-const channels = [0, 1, 2, 3] as const;
+  const high = size - low;
+
+  if (px < low || high < px || py < low || high < py) {
+    return false;
+  }
+
+  // Only a corner can fall outside, so the distance test is against whichever
+  // corner circle this point is nearest to. The radius stays fractional: this
+  // is the one edge that is a curve, and it is the one that wants smoothing.
+  const radius = squareRadius * size;
+
+  const cx = Math.min(Math.max(px, low + radius), high - radius);
+
+  const cy = Math.min(Math.max(py, low + radius), high - radius);
+
+  return (px - cx) ** 2 + (py - cy) ** 2 <= radius ** 2;
+};
+
+/** Whether one axis falls inside either of the two panes along it. */
+const isInPane = (
+  [near, nearEnd, far, farEnd]: readonly [number, number, number, number],
+  t: number,
+): boolean => (near <= t && t < nearEnd) || (far <= t && t < farEnd);
+
+/** The icon in pixel space: transparent, blue, or a pane. */
+const colourAt = (
+  size: number,
+  px: number,
+  py: number,
+): readonly [number, number, number, number] => {
+  if (!isInRoundedSquare(size, px, py)) {
+    return [0, 0, 0, 0];
+  }
+
+  const panes = extensionIconPaneBoundsOf(size);
+
+  return isInPane(panes, px) && isInPane(panes, py)
+    ? [pane[0], pane[1], pane[2], 255]
+    : [background[0], background[1], background[2], 255];
+};
 
 /**
  * One channel of one pixel, averaged over a grid of subsamples.
@@ -99,49 +133,37 @@ const channelAt = (
   return Math.round(total * subsampleWeight);
 };
 
-/** The icon in pixel space: transparent, blue, or a pane. */
-const colourAt = (
-  size: number,
-  px: number,
-  py: number,
-): readonly [number, number, number, number] => {
-  if (!isInRoundedSquare(size, px, py)) {
-    return [0, 0, 0, 0];
-  }
+const rowsOf = (size: number): readonly (readonly number[])[] =>
+  Array.from({ length: size }, (_unusedRow, y) =>
+    Array.from({ length: size }, (_unusedColumn, x) =>
+      channels.map((channel) => channelAt(size, x, y, channel)),
+    ).flat(),
+  );
 
-  const panes = extensionIconPaneBoundsOf(size);
+/** RGBA. */
+const channels = [0, 1, 2, 3] as const;
 
-  return isInPane(panes, px) && isInPane(panes, py)
-    ? [pane[0], pane[1], pane[2], 255]
-    : [background[0], background[1], background[2], 255];
+const beUint32 = (value: number): readonly number[] =>
+  [
+    (value >>> 24) & 0xff,
+    (value >>> 16) & 0xff,
+    (value >>> 8) & 0xff,
+    value & 0xff,
+  ] as const;
+
+const crc32 = (bytes: readonly number[]): number =>
+  (bytes.reduce(
+    (value, byte) => (crcTable[(value ^ byte) & 0xff] ?? 0) ^ (value >>> 8),
+    0xff_ff_ff_ff,
+  ) ^
+    0xff_ff_ff_ff) >>>
+  0;
+
+const chunk = (kind: string, body: readonly number[]): readonly number[] => {
+  const tagged = [...Array.from(Buffer.from(kind, 'latin1')), ...body] as const;
+
+  return [...beUint32(body.length), ...tagged, ...beUint32(crc32(tagged))];
 };
-
-const isInRoundedSquare = (size: number, px: number, py: number): boolean => {
-  const low = Math.round(squareInset * size);
-
-  const high = size - low;
-
-  if (px < low || high < px || py < low || high < py) {
-    return false;
-  }
-
-  // Only a corner can fall outside, so the distance test is against whichever
-  // corner circle this point is nearest to. The radius stays fractional: this
-  // is the one edge that is a curve, and it is the one that wants smoothing.
-  const radius = squareRadius * size;
-
-  const cx = Math.min(Math.max(px, low + radius), high - radius);
-
-  const cy = Math.min(Math.max(py, low + radius), high - radius);
-
-  return (px - cx) ** 2 + (py - cy) ** 2 <= radius ** 2;
-};
-
-/** Whether one axis falls inside either of the two panes along it. */
-const isInPane = (
-  [near, nearEnd, far, farEnd]: readonly [number, number, number, number],
-  t: number,
-): boolean => (near <= t && t < nearEnd) || (far <= t && t < farEnd);
 
 /**
  * The whole file for one size.
@@ -177,20 +199,6 @@ const encodePng = (size: number): Buffer => {
   ]);
 };
 
-const chunk = (kind: string, body: readonly number[]): readonly number[] => {
-  const tagged = [...Array.from(Buffer.from(kind, 'latin1')), ...body] as const;
-
-  return [...beUint32(body.length), ...tagged, ...beUint32(crc32(tagged))];
-};
-
-const beUint32 = (value: number): readonly number[] =>
-  [
-    (value >>> 24) & 0xff,
-    (value >>> 16) & 0xff,
-    (value >>> 8) & 0xff,
-    value & 0xff,
-  ] as const;
-
 const crcTable = Array.from({ length: 256 }, (_, index) =>
   Array.from({ length: 8 }).reduce<number>(
     (value) =>
@@ -198,13 +206,5 @@ const crcTable = Array.from({ length: 256 }, (_, index) =>
     index,
   ),
 );
-
-const crc32 = (bytes: readonly number[]): number =>
-  (bytes.reduce(
-    (value, byte) => (crcTable[(value ^ byte) & 0xff] ?? 0) ^ (value >>> 8),
-    0xff_ff_ff_ff,
-  ) ^
-    0xff_ff_ff_ff) >>>
-  0;
 
 main();

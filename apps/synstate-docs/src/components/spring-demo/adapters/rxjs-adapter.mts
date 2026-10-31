@@ -11,9 +11,6 @@ import { Arr, range } from 'ts-data-forge';
 import type { Point, SpringAdapter } from '../types.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, LERP_FACTOR, lerp } from './shared.mjs';
 
-const springOperator = (startPos: Point): OperatorFunction<Point, Point> =>
-  scan((acc: Point, target: Point) => lerp(acc, target, LERP_FACTOR), startPos);
-
 export const createRxJSSpringAdapter = (): SpringAdapter => {
   let mut_mousePos: BehaviorSubject<Point> | undefined;
 
@@ -73,3 +70,6 @@ export const createRxJSSpringAdapter = (): SpringAdapter => {
     },
   };
 };
+
+const springOperator = (startPos: Point): OperatorFunction<Point, Point> =>
+  scan((acc: Point, target: Point) => lerp(acc, target, LERP_FACTOR), startPos);

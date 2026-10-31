@@ -1,5 +1,34 @@
 import { asUint32, range } from 'ts-data-forge';
 
+/**
+ * Wraps a string with parentheses if not already wrapped.
+ * Avoids adding redundant parentheses when the expression is already
+ * fully wrapped with balanced parentheses.
+ *
+ * @example
+ *
+ * ```ts
+ * assert.strictEqual(wrapWithParentheses('A'), '(A)');
+ *
+ * // already wrapped, so not '((A))'
+ * assert.strictEqual(wrapWithParentheses('(A)'), '(A)');
+ *
+ * assert.strictEqual(wrapWithParentheses('A | B'), '(A | B)');
+ *
+ * assert.strictEqual(wrapWithParentheses('(A | B)'), '(A | B)');
+ *
+ * // the outer parentheses do not span everything, so a pair is added
+ * assert.strictEqual(wrapWithParentheses('(A) | (B)'), '((A) | (B))');
+ * ```
+ */
+export const wrapWithParentheses = (nodeStr: string): string => {
+  const trimmed = nodeStr.trim();
+
+  return isWrappedWithParentheses(trimmed)
+    ? trimmed
+    : (`(${trimmed})` as const);
+};
+
 const parenDepthDelta = (char: string | undefined): number => {
   switch (char) {
     case '(':
@@ -50,33 +79,4 @@ const isWrappedWithParentheses = (str: string): boolean => {
   }
 
   return true;
-};
-
-/**
- * Wraps a string with parentheses if not already wrapped.
- * Avoids adding redundant parentheses when the expression is already
- * fully wrapped with balanced parentheses.
- *
- * @example
- *
- * ```ts
- * assert.strictEqual(wrapWithParentheses('A'), '(A)');
- *
- * // already wrapped, so not '((A))'
- * assert.strictEqual(wrapWithParentheses('(A)'), '(A)');
- *
- * assert.strictEqual(wrapWithParentheses('A | B'), '(A | B)');
- *
- * assert.strictEqual(wrapWithParentheses('(A | B)'), '(A | B)');
- *
- * // the outer parentheses do not span everything, so a pair is added
- * assert.strictEqual(wrapWithParentheses('(A) | (B)'), '((A) | (B))');
- * ```
- */
-export const wrapWithParentheses = (nodeStr: string): string => {
-  const trimmed = nodeStr.trim();
-
-  return isWrappedWithParentheses(trimmed)
-    ? trimmed
-    : (`(${trimmed})` as const);
 };

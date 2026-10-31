@@ -68,10 +68,6 @@ const tsTypeForgeTypeNames: ReadonlySet<string> = new Set<string>([
   'MillisecondsEnum',
 ]);
 
-/** The leftmost identifier of an entity name (`A.B.C` -> `A`). */
-const leftmostIdentifier = (name: ts.EntityName): ts.Identifier =>
-  ts.isIdentifier(name) ? name : leftmostIdentifier(name.left);
-
 /**
  * Rewrites the generated strict lib so it no longer leaks ts-type-forge's
  * global augmentations into the install site:
@@ -128,3 +124,7 @@ export const rewriteTsTypeForgeRefs = (code: string): string => {
 
   return out;
 };
+
+/** The leftmost identifier of an entity name (`A.B.C` -> `A`). */
+const leftmostIdentifier = (name: ts.EntityName): ts.Identifier =>
+  ts.isIdentifier(name) ? name : leftmostIdentifier(name.left);

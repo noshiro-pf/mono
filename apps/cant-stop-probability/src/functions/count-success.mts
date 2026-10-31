@@ -7,6 +7,34 @@ import { possibleTwoDiceSumPairs } from './possible-two-dice-sum-pair.mjs';
 /** Which counter a single roll of four dice contributes to. */
 type Progress = keyof Count;
 
+export const countSuccess = (
+  x: TwoDiceSumValue,
+  y: TwoDiceSumValue,
+  z: TwoDiceSumValue,
+): Count => {
+  const mut_count: MutableRecord<Progress, number> = {
+    oneLine: 0,
+    twoLine: 0,
+    noLine: 0,
+  };
+
+  for (const a of diceValueList) {
+    for (const b of diceValueList) {
+      for (const c of diceValueList) {
+        for (const d of diceValueList) {
+          mut_count[progressFor(x, y, z, a, b, c, d)] += 1;
+        }
+      }
+    }
+  }
+
+  return {
+    noLine: asSafeUint(mut_count.noLine),
+    oneLine: asSafeUint(mut_count.oneLine),
+    twoLine: asSafeUint(mut_count.twoLine),
+  };
+};
+
 /**
  * How far the three chosen columns can be advanced by one roll.
  *
@@ -72,32 +100,4 @@ const progressFor = (
   return x1 || x2 || x3 || y1 || y2 || y3 || z1 || z2 || z3
     ? 'oneLine'
     : 'noLine';
-};
-
-export const countSuccess = (
-  x: TwoDiceSumValue,
-  y: TwoDiceSumValue,
-  z: TwoDiceSumValue,
-): Count => {
-  const mut_count: MutableRecord<Progress, number> = {
-    oneLine: 0,
-    twoLine: 0,
-    noLine: 0,
-  };
-
-  for (const a of diceValueList) {
-    for (const b of diceValueList) {
-      for (const c of diceValueList) {
-        for (const d of diceValueList) {
-          mut_count[progressFor(x, y, z, a, b, c, d)] += 1;
-        }
-      }
-    }
-  }
-
-  return {
-    noLine: asSafeUint(mut_count.noLine),
-    oneLine: asSafeUint(mut_count.oneLine),
-    twoLine: asSafeUint(mut_count.twoLine),
-  };
 };

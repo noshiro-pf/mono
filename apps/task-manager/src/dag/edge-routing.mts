@@ -292,16 +292,57 @@ const HEADINGS = [0, 1, 2, 3] as const;
  */
 const SEARCH_WINDOW = 240;
 
-/** Whether a sample of `curve` comes near a node other than its own two. */
-const runsThroughNode = (
-  curve: EdgeGeometry,
-  nodes: readonly LaidOutNode[],
-): boolean =>
-  comesNear(
-    curve.segments,
-    nodes.filter(({ id }) => id !== curve.from && id !== curve.to),
-    CHECK_MARGIN,
-  );
+/** The box round the control points, which holds the whole curve. */
+const controlBounds = (
+  segments: readonly CubicSegment[],
+): Readonly<{ minX: number; maxX: number; minY: number; maxY: number }> => {
+  let mut_minX = Number.POSITIVE_INFINITY;
+
+  let mut_maxX = Number.NEGATIVE_INFINITY;
+
+  let mut_minY = Number.POSITIVE_INFINITY;
+
+  let mut_maxY = Number.NEGATIVE_INFINITY;
+
+  for (const { start, control1, control2, end } of segments) {
+    for (const { x, y } of [start, control1, control2, end]) {
+      mut_minX = Math.min(mut_minX, x);
+
+      mut_maxX = Math.max(mut_maxX, x);
+
+      mut_minY = Math.min(mut_minY, y);
+
+      mut_maxY = Math.max(mut_maxY, y);
+    }
+  }
+
+  return { minX: mut_minX, maxX: mut_maxX, minY: mut_minY, maxY: mut_maxY };
+};
+
+/** The length of the control polygon: at least the length of the curve. */
+const controlLength = ({
+  start,
+  control1,
+  control2,
+  end,
+}: CubicSegment): number =>
+  Math.hypot(control1.x - start.x, control1.y - start.y) +
+  Math.hypot(control2.x - control1.x, control2.y - control1.y) +
+  Math.hypot(end.x - control2.x, end.y - control2.y);
+
+/** `part / whole`, or 0 for nothing whole. */
+const fraction = (part: number, whole: number): number =>
+  Num.isNonZero(whole) ? Num.div(part, whole) : 0;
+
+/** How many pieces to sample `segment` in, for samples `step` apart. */
+const sampleCount = (segment: CubicSegment, step: number): number =>
+  Math.max(2, Math.ceil(fraction(controlLength(segment), step)));
+
+const isNear = (point: Point, node: LaidOutNode, margin: number): boolean =>
+  node.x - margin < point.x &&
+  point.x < node.x + node.width + margin &&
+  node.y - margin < point.y &&
+  point.y < node.y + node.height + margin;
 
 /** Whether a sample of `segments` comes within `margin` of any of `nodes`. */
 const comesNear = (
@@ -339,57 +380,16 @@ const comesNear = (
   return false;
 };
 
-/** The box round the control points, which holds the whole curve. */
-const controlBounds = (
-  segments: readonly CubicSegment[],
-): Readonly<{ minX: number; maxX: number; minY: number; maxY: number }> => {
-  let mut_minX = Number.POSITIVE_INFINITY;
-
-  let mut_maxX = Number.NEGATIVE_INFINITY;
-
-  let mut_minY = Number.POSITIVE_INFINITY;
-
-  let mut_maxY = Number.NEGATIVE_INFINITY;
-
-  for (const { start, control1, control2, end } of segments) {
-    for (const { x, y } of [start, control1, control2, end]) {
-      mut_minX = Math.min(mut_minX, x);
-
-      mut_maxX = Math.max(mut_maxX, x);
-
-      mut_minY = Math.min(mut_minY, y);
-
-      mut_maxY = Math.max(mut_maxY, y);
-    }
-  }
-
-  return { minX: mut_minX, maxX: mut_maxX, minY: mut_minY, maxY: mut_maxY };
-};
-
-/** How many pieces to sample `segment` in, for samples `step` apart. */
-const sampleCount = (segment: CubicSegment, step: number): number =>
-  Math.max(2, Math.ceil(fraction(controlLength(segment), step)));
-
-/** `part / whole`, or 0 for nothing whole. */
-const fraction = (part: number, whole: number): number =>
-  Num.isNonZero(whole) ? Num.div(part, whole) : 0;
-
-const isNear = (point: Point, node: LaidOutNode, margin: number): boolean =>
-  node.x - margin < point.x &&
-  point.x < node.x + node.width + margin &&
-  node.y - margin < point.y &&
-  point.y < node.y + node.height + margin;
-
-/** The length of the control polygon: at least the length of the curve. */
-const controlLength = ({
-  start,
-  control1,
-  control2,
-  end,
-}: CubicSegment): number =>
-  Math.hypot(control1.x - start.x, control1.y - start.y) +
-  Math.hypot(control2.x - control1.x, control2.y - control1.y) +
-  Math.hypot(end.x - control2.x, end.y - control2.y);
+/** Whether a sample of `curve` comes near a node other than its own two. */
+const runsThroughNode = (
+  curve: EdgeGeometry,
+  nodes: readonly LaidOutNode[],
+): boolean =>
+  comesNear(
+    curve.segments,
+    nodes.filter(({ id }) => id !== curve.from && id !== curve.to),
+    CHECK_MARGIN,
+  );
 
 const routeRequest = (
   curve: EdgeGeometry,
@@ -414,6 +414,9 @@ const routeRequest = (
   };
 };
 
+const manhattan = (a: AxisPoint, b: AxisPoint): number =>
+  Math.abs(a.main - b.main) + Math.abs(a.cross - b.cross);
+
 /** Shortest first, then by id: an order the input's does not change. */
 const compareRequests = (a: RouteRequest, b: RouteRequest): number => {
   const byLength = manhattan(a.start, a.end) - manhattan(b.start, b.end);
@@ -427,9 +430,6 @@ const compareRequests = (a: RouteRequest, b: RouteRequest): number => {
         : 0;
 };
 
-const manhattan = (a: AxisPoint, b: AxisPoint): number =>
-  Math.abs(a.main - b.main) + Math.abs(a.cross - b.cross);
-
 const inflate = (box: AxisBox, margin: number): AxisBox =>
   ({
     mainStart: box.mainStart - margin,
@@ -441,45 +441,217 @@ const inflate = (box: AxisBox, margin: number): AxisBox =>
 /** Rounded, so that a box's sides and the lines along them are equal. */
 const snap = (value: number): number => Math.round(value * 64) / 64;
 
-/**
- * A search for a path from one point to another round `boxes`: the points
- * where the path found turns, both ends included, or `undefined` if there
- * is none. It heads along the axis at the start, never turns straight back,
- * and does not arrive heading back. It looks among the boxes near the two
- * ends first, and among all of them only if it finds nothing there.
- */
-const createRouter =
-  (
-    boxes: readonly AxisBox[],
-    drawn: SegmentIndex,
-  ): ((from: AxisPoint, to: AxisPoint) => readonly AxisPoint[] | undefined) =>
-  (from, to) => {
-    const area = inflate(
-      {
-        mainStart: Math.min(from.main, to.main),
-        mainEnd: Math.max(from.main, to.main),
-        crossStart: Math.min(from.cross, to.cross),
-        crossEnd: Math.max(from.cross, to.cross),
-      },
-      SEARCH_WINDOW,
-    );
-
-    return (
-      searchAmong(
-        boxes.filter((box) => overlaps(box, area)),
-        from,
-        to,
-        drawn,
-        area,
-      ) ?? searchAmong(boxes, from, to, drawn, undefined)
-    );
-  };
-
 const overlaps = (a: AxisBox, b: AxisBox): boolean =>
   a.mainStart < b.mainEnd &&
   a.mainEnd > b.mainStart &&
   a.crossStart < b.crossEnd &&
   a.crossEnd > b.crossStart;
+
+/**
+ * The fewest turns a path heading `heading` (along, across, back, back
+ * across) can make to arrive heading along at a point `dMain` along and
+ * `dCross` across from it — never turning straight back: what the
+ * estimate of the search adds to the distance, so that it does not look
+ * at every path as long as the best one with fewer turns.
+ */
+const fewestTurns = (
+  heading: number,
+  dMain: number,
+  dCross: number,
+): number => {
+  const level = Math.abs(dCross) < EPSILON;
+
+  if (heading === 0) {
+    return level ? (dMain > 0 ? 0 : 4) : dMain >= 0 ? 2 : 4;
+  }
+
+  if (heading === 2) {
+    return level ? 4 : 2;
+  }
+
+  const approaching = !level && (heading === 1) === dCross > 0;
+
+  return approaching && dMain >= 0 ? 1 : 3;
+};
+
+/** `values` snapped, once each, in order, with a line outside them all. */
+const linesOf = (values: readonly number[]): readonly number[] => {
+  const sorted = Arr.uniq(values.map(snap)).toSorted((a, b) => a - b);
+
+  return Arr.isNonEmpty(sorted)
+    ? [
+        snap(sorted[0] - ROUTE_MARGIN),
+        ...sorted,
+        snap((sorted.at(-1) ?? sorted[0]) + ROUTE_MARGIN),
+      ]
+    : sorted;
+};
+
+/**
+ * The index of the first of `lines` (in order) at `value` snapped or past
+ * it, or of the last line if none is.
+ */
+const indexOfLine = (lines: readonly number[], value: number): number => {
+  const target = snap(value);
+
+  let mut_low = 0;
+
+  let mut_high = lines.length - 1;
+
+  while (mut_low < mut_high) {
+    const middle = Math.floor((mut_low + mut_high) / 2);
+
+    if ((lines[middle] ?? 0) < target) {
+      mut_low = middle + 1;
+    } else {
+      mut_high = middle;
+    }
+  }
+
+  return mut_low;
+};
+
+/**
+ * A min-heap of states by priority, then by what is left (so that of two
+ * paths as good the one further on goes first), then by the state.
+ */
+const createHeap = (): Readonly<{
+  push: (state: number, priority: number, remaining: number) => void;
+  pop: () => number;
+  size: () => number;
+}> => {
+  const mut_states: number[] = [];
+
+  const mut_priorities: number[] = [];
+
+  const mut_remaining: number[] = [];
+
+  const before = (i: number, j: number): boolean => {
+    const pi = mut_priorities[i] ?? 0;
+
+    const pj = mut_priorities[j] ?? 0;
+
+    if (pi !== pj) {
+      return pi < pj;
+    }
+
+    const ri = mut_remaining[i] ?? 0;
+
+    const rj = mut_remaining[j] ?? 0;
+
+    return ri !== rj ? ri < rj : (mut_states[i] ?? 0) < (mut_states[j] ?? 0);
+  };
+
+  const swap = (i: number, j: number): void => {
+    const state = mut_states[i] ?? 0;
+
+    const priority = mut_priorities[i] ?? 0;
+
+    const remaining = mut_remaining[i] ?? 0;
+
+    mut_states[i] = mut_states[j] ?? 0;
+
+    mut_priorities[i] = mut_priorities[j] ?? 0;
+
+    mut_remaining[i] = mut_remaining[j] ?? 0;
+
+    mut_states[j] = state;
+
+    mut_priorities[j] = priority;
+
+    mut_remaining[j] = remaining;
+  };
+
+  return {
+    push: (state, priority, remaining) => {
+      mut_states.push(state);
+
+      mut_priorities.push(priority);
+
+      mut_remaining.push(remaining);
+
+      let mut_at = mut_states.length - 1;
+
+      while (mut_at > 0) {
+        const up = Math.floor((mut_at - 1) / 2);
+
+        if (!before(mut_at, up)) {
+          break;
+        }
+
+        swap(mut_at, up);
+
+        mut_at = up;
+      }
+    },
+    pop: () => {
+      const first = mut_states[0] ?? 0;
+
+      swap(0, mut_states.length - 1);
+
+      mut_states.pop();
+
+      mut_priorities.pop();
+
+      mut_remaining.pop();
+
+      let mut_at = 0;
+
+      let mut_sinking = true;
+
+      while (mut_sinking) {
+        const left = mut_at * 2 + 1;
+
+        const right = left + 1;
+
+        const smaller =
+          right < mut_states.length && before(right, left) ? right : left;
+
+        mut_sinking = smaller < mut_states.length && before(smaller, mut_at);
+
+        if (!mut_sinking) {
+          continue;
+        }
+
+        swap(mut_at, smaller);
+
+        mut_at = smaller;
+      }
+
+      return first;
+    },
+    size: () => mut_states.length,
+  };
+};
+
+const sameValue = (a: number, b: number): boolean => Math.abs(a - b) < EPSILON;
+
+const samePoint = (a: AxisPoint, b: AxisPoint | undefined): boolean =>
+  b !== undefined && sameValue(a.main, b.main) && sameValue(a.cross, b.cross);
+
+/** `points` without repeats, and without the points where it does not turn. */
+const simplify = (points: readonly AxisPoint[]): readonly AxisPoint[] => {
+  const distinct = points.filter(
+    (point, index) => index === 0 || !samePoint(point, points[index - 1]),
+  );
+
+  return distinct.filter((point, index) => {
+    const previous = distinct[index - 1];
+
+    const next = distinct[index + 1];
+
+    return (
+      previous === undefined ||
+      next === undefined ||
+      !(
+        (sameValue(previous.main, point.main) &&
+          sameValue(point.main, next.main)) ||
+        (sameValue(previous.cross, point.cross) &&
+          sameValue(point.cross, next.cross))
+      )
+    );
+  });
+};
 
 /**
  * The search itself, over the lines along every side of `boxes`, through
@@ -767,67 +939,63 @@ const searchAmong = (
 };
 
 /**
- * The fewest turns a path heading `heading` (along, across, back, back
- * across) can make to arrive heading along at a point `dMain` along and
- * `dCross` across from it — never turning straight back: what the
- * estimate of the search adds to the distance, so that it does not look
- * at every path as long as the best one with fewer turns.
+ * A search for a path from one point to another round `boxes`: the points
+ * where the path found turns, both ends included, or `undefined` if there
+ * is none. It heads along the axis at the start, never turns straight back,
+ * and does not arrive heading back. It looks among the boxes near the two
+ * ends first, and among all of them only if it finds nothing there.
  */
-const fewestTurns = (
-  heading: number,
-  dMain: number,
-  dCross: number,
-): number => {
-  const level = Math.abs(dCross) < EPSILON;
+const createRouter =
+  (
+    boxes: readonly AxisBox[],
+    drawn: SegmentIndex,
+  ): ((from: AxisPoint, to: AxisPoint) => readonly AxisPoint[] | undefined) =>
+  (from, to) => {
+    const area = inflate(
+      {
+        mainStart: Math.min(from.main, to.main),
+        mainEnd: Math.max(from.main, to.main),
+        crossStart: Math.min(from.cross, to.cross),
+        crossEnd: Math.max(from.cross, to.cross),
+      },
+      SEARCH_WINDOW,
+    );
 
-  if (heading === 0) {
-    return level ? (dMain > 0 ? 0 : 4) : dMain >= 0 ? 2 : 4;
-  }
+    return (
+      searchAmong(
+        boxes.filter((box) => overlaps(box, area)),
+        from,
+        to,
+        drawn,
+        area,
+      ) ?? searchAmong(boxes, from, to, drawn, undefined)
+    );
+  };
 
-  if (heading === 2) {
-    return level ? 4 : 2;
-  }
+/** The cells the box from `(m0, c0)` to `(m1, c1)` touches. */
+const cellKeys = (
+  m0: number,
+  c0: number,
+  m1: number,
+  c1: number,
+): readonly number[] => {
+  const mFirst = Math.floor(Math.min(m0, m1) / CELL);
 
-  const approaching = !level && (heading === 1) === dCross > 0;
+  const mLast = Math.floor(Math.max(m0, m1) / CELL);
 
-  return approaching && dMain >= 0 ? 1 : 3;
-};
+  const cFirst = Math.floor(Math.min(c0, c1) / CELL);
 
-/** `values` snapped, once each, in order, with a line outside them all. */
-const linesOf = (values: readonly number[]): readonly number[] => {
-  const sorted = Arr.uniq(values.map(snap)).toSorted((a, b) => a - b);
+  const cLast = Math.floor(Math.max(c0, c1) / CELL);
 
-  return Arr.isNonEmpty(sorted)
-    ? [
-        snap(sorted[0] - ROUTE_MARGIN),
-        ...sorted,
-        snap((sorted.at(-1) ?? sorted[0]) + ROUTE_MARGIN),
-      ]
-    : sorted;
-};
+  const mut_keys: number[] = [];
 
-/**
- * The index of the first of `lines` (in order) at `value` snapped or past
- * it, or of the last line if none is.
- */
-const indexOfLine = (lines: readonly number[], value: number): number => {
-  const target = snap(value);
-
-  let mut_low = 0;
-
-  let mut_high = lines.length - 1;
-
-  while (mut_low < mut_high) {
-    const middle = Math.floor((mut_low + mut_high) / 2);
-
-    if ((lines[middle] ?? 0) < target) {
-      mut_low = middle + 1;
-    } else {
-      mut_high = middle;
+  for (let mut_m = mFirst; mut_m <= mLast; mut_m += 1) {
+    for (let mut_c = cFirst; mut_c <= cLast; mut_c += 1) {
+      mut_keys.push((mut_m + 65_536) * 262_144 + (mut_c + 65_536));
     }
   }
 
-  return mut_low;
+  return mut_keys;
 };
 
 /**
@@ -941,208 +1109,62 @@ const createSegmentIndex = (): SegmentIndex => {
   return { addPolyline, costOf };
 };
 
-/** The cells the box from `(m0, c0)` to `(m1, c1)` touches. */
-const cellKeys = (
-  m0: number,
-  c0: number,
-  m1: number,
-  c1: number,
-): readonly number[] => {
-  const mFirst = Math.floor(Math.min(m0, m1) / CELL);
+const headingOf = (from: AxisPoint, to: AxisPoint): AxisPoint =>
+  ({
+    main: Math.sign(to.main - from.main),
+    cross: Math.sign(to.cross - from.cross),
+  }) as const;
 
-  const mLast = Math.floor(Math.max(m0, m1) / CELL);
+const offset = (
+  point: AxisPoint,
+  heading: AxisPoint,
+  distance: number,
+): AxisPoint =>
+  ({
+    main: point.main + heading.main * distance,
+    cross: point.cross + heading.cross * distance,
+  }) as const;
 
-  const cFirst = Math.floor(Math.min(c0, c1) / CELL);
+/** The corner at `corner` rounded to a quarter circle of `radius`. */
+const arc = (
+  corner: AxisPoint,
+  headingIn: AxisPoint,
+  headingOut: AxisPoint,
+  radius: number,
+): AxisCubic => {
+  const start = offset(corner, headingIn, -radius);
 
-  const cLast = Math.floor(Math.max(c0, c1) / CELL);
-
-  const mut_keys: number[] = [];
-
-  for (let mut_m = mFirst; mut_m <= mLast; mut_m += 1) {
-    for (let mut_c = cFirst; mut_c <= cLast; mut_c += 1) {
-      mut_keys.push((mut_m + 65_536) * 262_144 + (mut_c + 65_536));
-    }
-  }
-
-  return mut_keys;
-};
-
-/**
- * A min-heap of states by priority, then by what is left (so that of two
- * paths as good the one further on goes first), then by the state.
- */
-const createHeap = (): Readonly<{
-  push: (state: number, priority: number, remaining: number) => void;
-  pop: () => number;
-  size: () => number;
-}> => {
-  const mut_states: number[] = [];
-
-  const mut_priorities: number[] = [];
-
-  const mut_remaining: number[] = [];
-
-  const before = (i: number, j: number): boolean => {
-    const pi = mut_priorities[i] ?? 0;
-
-    const pj = mut_priorities[j] ?? 0;
-
-    if (pi !== pj) {
-      return pi < pj;
-    }
-
-    const ri = mut_remaining[i] ?? 0;
-
-    const rj = mut_remaining[j] ?? 0;
-
-    return ri !== rj ? ri < rj : (mut_states[i] ?? 0) < (mut_states[j] ?? 0);
-  };
-
-  const swap = (i: number, j: number): void => {
-    const state = mut_states[i] ?? 0;
-
-    const priority = mut_priorities[i] ?? 0;
-
-    const remaining = mut_remaining[i] ?? 0;
-
-    mut_states[i] = mut_states[j] ?? 0;
-
-    mut_priorities[i] = mut_priorities[j] ?? 0;
-
-    mut_remaining[i] = mut_remaining[j] ?? 0;
-
-    mut_states[j] = state;
-
-    mut_priorities[j] = priority;
-
-    mut_remaining[j] = remaining;
-  };
+  const end = offset(corner, headingOut, radius);
 
   return {
-    push: (state, priority, remaining) => {
-      mut_states.push(state);
-
-      mut_priorities.push(priority);
-
-      mut_remaining.push(remaining);
-
-      let mut_at = mut_states.length - 1;
-
-      while (mut_at > 0) {
-        const up = Math.floor((mut_at - 1) / 2);
-
-        if (!before(mut_at, up)) {
-          break;
-        }
-
-        swap(mut_at, up);
-
-        mut_at = up;
-      }
-    },
-    pop: () => {
-      const first = mut_states[0] ?? 0;
-
-      swap(0, mut_states.length - 1);
-
-      mut_states.pop();
-
-      mut_priorities.pop();
-
-      mut_remaining.pop();
-
-      let mut_at = 0;
-
-      let mut_sinking = true;
-
-      while (mut_sinking) {
-        const left = mut_at * 2 + 1;
-
-        const right = left + 1;
-
-        const smaller =
-          right < mut_states.length && before(right, left) ? right : left;
-
-        mut_sinking = smaller < mut_states.length && before(smaller, mut_at);
-
-        if (!mut_sinking) {
-          continue;
-        }
-
-        swap(mut_at, smaller);
-
-        mut_at = smaller;
-      }
-
-      return first;
-    },
-    size: () => mut_states.length,
+    start,
+    control1: offset(start, headingIn, KAPPA * radius),
+    control2: offset(end, headingOut, -KAPPA * radius),
+    end,
   };
 };
 
-/** `points` without repeats, and without the points where it does not turn. */
-const simplify = (points: readonly AxisPoint[]): readonly AxisPoint[] => {
-  const distinct = points.filter(
-    (point, index) => index === 0 || !samePoint(point, points[index - 1]),
-  );
+const line = (start: AxisPoint, end: AxisPoint): AxisCubic =>
+  ({
+    start,
+    control1: {
+      main: start.main + (end.main - start.main) / 3,
+      cross: start.cross + (end.cross - start.cross) / 3,
+    },
+    control2: {
+      main: start.main + ((end.main - start.main) * 2) / 3,
+      cross: start.cross + ((end.cross - start.cross) * 2) / 3,
+    },
+    end,
+  }) as const;
 
-  return distinct.filter((point, index) => {
-    const previous = distinct[index - 1];
-
-    const next = distinct[index + 1];
-
-    return (
-      previous === undefined ||
-      next === undefined ||
-      !(
-        (sameValue(previous.main, point.main) &&
-          sameValue(point.main, next.main)) ||
-        (sameValue(previous.cross, point.cross) &&
-          sameValue(point.cross, next.cross))
-      )
-    );
-  });
-};
-
-const sameValue = (a: number, b: number): boolean => Math.abs(a - b) < EPSILON;
-
-const samePoint = (a: AxisPoint, b: AxisPoint | undefined): boolean =>
-  b !== undefined && sameValue(a.main, b.main) && sameValue(a.cross, b.cross);
-
-/**
- * The edge along `corners`, its corners rounded — each as far as
- * {@link CORNER_RADIUS} allows, half of the straight stretches on either
- * side, and the `obstacles` it would otherwise come within `clearance` of.
- */
-const routedGeometry = (
-  curve: EdgeGeometry,
-  corners: readonly AxisPoint[],
-  axes: Axes,
-  obstacles: readonly LaidOutNode[],
-  clearance: number,
-): EdgeGeometry => {
-  const segments = roundCorners(corners, axes, obstacles, clearance);
-
-  const [first, ...rest] = segments;
-
-  const nonEmpty: CubicSegments =
-    first === undefined ? curve.segments : Arr.toUnshifted(first)(rest);
-
-  return {
-    id: curve.id,
-    from: curve.from,
-    to: curve.to,
-    label: curve.label,
-    implied: curve.implied,
-    segments: nonEmpty,
-    path: pathOf(nonEmpty),
-    labelBox:
-      curve.label === ''
-        ? undefined
-        : centredBox(midpointByLength(nonEmpty), labelSize(curve.label)),
-    routed: true,
-  };
-};
+const toCubic = (segment: AxisCubic, axes: Axes): CubicSegment =>
+  ({
+    start: axes.toPoint(segment.start),
+    control1: axes.toPoint(segment.control1),
+    control2: axes.toPoint(segment.control2),
+    end: axes.toPoint(segment.end),
+  }) as const;
 
 const roundCorners = (
   corners: readonly AxisPoint[],
@@ -1230,70 +1252,6 @@ const roundCorners = (
   );
 };
 
-type AxisCubic = Readonly<{
-  start: AxisPoint;
-  control1: AxisPoint;
-  control2: AxisPoint;
-  end: AxisPoint;
-}>;
-
-const headingOf = (from: AxisPoint, to: AxisPoint): AxisPoint =>
-  ({
-    main: Math.sign(to.main - from.main),
-    cross: Math.sign(to.cross - from.cross),
-  }) as const;
-
-const offset = (
-  point: AxisPoint,
-  heading: AxisPoint,
-  distance: number,
-): AxisPoint =>
-  ({
-    main: point.main + heading.main * distance,
-    cross: point.cross + heading.cross * distance,
-  }) as const;
-
-/** The corner at `corner` rounded to a quarter circle of `radius`. */
-const arc = (
-  corner: AxisPoint,
-  headingIn: AxisPoint,
-  headingOut: AxisPoint,
-  radius: number,
-): AxisCubic => {
-  const start = offset(corner, headingIn, -radius);
-
-  const end = offset(corner, headingOut, radius);
-
-  return {
-    start,
-    control1: offset(start, headingIn, KAPPA * radius),
-    control2: offset(end, headingOut, -KAPPA * radius),
-    end,
-  };
-};
-
-const line = (start: AxisPoint, end: AxisPoint): AxisCubic =>
-  ({
-    start,
-    control1: {
-      main: start.main + (end.main - start.main) / 3,
-      cross: start.cross + (end.cross - start.cross) / 3,
-    },
-    control2: {
-      main: start.main + ((end.main - start.main) * 2) / 3,
-      cross: start.cross + ((end.cross - start.cross) * 2) / 3,
-    },
-    end,
-  }) as const;
-
-const toCubic = (segment: AxisCubic, axes: Axes): CubicSegment =>
-  ({
-    start: axes.toPoint(segment.start),
-    control1: axes.toPoint(segment.control1),
-    control2: axes.toPoint(segment.control2),
-    end: axes.toPoint(segment.end),
-  }) as const;
-
 /** The point half-way along `segments`, by length. */
 const midpointByLength = (segments: CubicSegments): Point => {
   const points = sampleSegments(segments, SAMPLE_STEP);
@@ -1324,3 +1282,45 @@ const midpointByLength = (segments: CubicSegments): Point => {
 
   return segments[0].start;
 };
+
+/**
+ * The edge along `corners`, its corners rounded — each as far as
+ * {@link CORNER_RADIUS} allows, half of the straight stretches on either
+ * side, and the `obstacles` it would otherwise come within `clearance` of.
+ */
+const routedGeometry = (
+  curve: EdgeGeometry,
+  corners: readonly AxisPoint[],
+  axes: Axes,
+  obstacles: readonly LaidOutNode[],
+  clearance: number,
+): EdgeGeometry => {
+  const segments = roundCorners(corners, axes, obstacles, clearance);
+
+  const [first, ...rest] = segments;
+
+  const nonEmpty: CubicSegments =
+    first === undefined ? curve.segments : Arr.toUnshifted(first)(rest);
+
+  return {
+    id: curve.id,
+    from: curve.from,
+    to: curve.to,
+    label: curve.label,
+    implied: curve.implied,
+    segments: nonEmpty,
+    path: pathOf(nonEmpty),
+    labelBox:
+      curve.label === ''
+        ? undefined
+        : centredBox(midpointByLength(nonEmpty), labelSize(curve.label)),
+    routed: true,
+  };
+};
+
+type AxisCubic = Readonly<{
+  start: AxisPoint;
+  control1: AxisPoint;
+  control2: AxisPoint;
+  end: AxisPoint;
+}>;

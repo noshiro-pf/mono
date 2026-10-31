@@ -42,6 +42,15 @@ describe(createAnswerTableStore, () => {
   });
 });
 
+const dayOf = (date: number): unknown =>
+  ({
+    ymd: { year: 2026, month: 11, date },
+    timeRange: {
+      start: { hours: 10, minutes: 0 },
+      end: { hours: 12, minutes: 0 },
+    },
+  }) as const;
+
 const setup = (): Readonly<{
   store: AnswerTable;
   setSort: (sort: readonly ['date' | 'score', 'asc' | 'desc']) => void;
@@ -68,12 +77,3 @@ const setup = (): Readonly<{
 
   return { store, setSort } as const;
 };
-
-const dayOf = (date: number): unknown =>
-  ({
-    ymd: { year: 2026, month: 11, date },
-    timeRange: {
-      start: { hours: 10, minutes: 0 },
-      end: { hours: 12, minutes: 0 },
-    },
-  }) as const;

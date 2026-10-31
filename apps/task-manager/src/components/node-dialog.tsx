@@ -55,6 +55,33 @@ type OpenEditorState = RelaxedExclude<
   Readonly<{ type: 'closed' }>
 >;
 
+/**
+ * Saves. A dependency row that is wrong holds the save back, and its error
+ * is already on screen, so the first such row is brought into view and
+ * focused instead.
+ */
+const onSubmit = (
+  submitted: Event & Readonly<{ currentTarget: Element }>,
+): void => {
+  submitted.preventDefault();
+
+  editorStore.save();
+
+  const invalidRow = submitted.currentTarget.querySelector<HTMLElement>(
+    '.dependency-row.invalid',
+  );
+
+  if (invalidRow === null) {
+    return;
+  }
+
+  invalidRow.querySelector<HTMLSelectElement>('select')?.focus({
+    preventScroll: true,
+  });
+
+  invalidRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+};
+
 const NodeForm = ({
   editor,
 }: Readonly<{
@@ -136,32 +163,5 @@ const NodeForm = ({
     </div>
   </form>
 );
-
-/**
- * Saves. A dependency row that is wrong holds the save back, and its error
- * is already on screen, so the first such row is brought into view and
- * focused instead.
- */
-const onSubmit = (
-  submitted: Event & Readonly<{ currentTarget: Element }>,
-): void => {
-  submitted.preventDefault();
-
-  editorStore.save();
-
-  const invalidRow = submitted.currentTarget.querySelector<HTMLElement>(
-    '.dependency-row.invalid',
-  );
-
-  if (invalidRow === null) {
-    return;
-  }
-
-  invalidRow.querySelector<HTMLSelectElement>('select')?.focus({
-    preventScroll: true,
-  });
-
-  invalidRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-};
 
 const TITLE_ID = 'node-dialog-title';

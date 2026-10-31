@@ -3,15 +3,6 @@ import { toUnexpectedError, type UnexpectedError } from '../../error/index.mjs';
 import { Result } from '../../functional/index.mjs';
 
 /**
- * Mirror of the ECMAScript ToIntegerOrInfinity abstract operation: `NaN`
- * becomes `0`, everything else truncates toward zero. Applying it before the
- * range check makes the check coincide exactly with the one the engine
- * performs.
- */
-const toIntegerOrInfinity = (value: number): number =>
-  Number.isNaN(value) ? 0 : Math.trunc(value);
-
-/**
  * Repeats a string a given number of times without throwing.
  *
  * `String.prototype.repeat` throws a `RangeError` when `count` (after
@@ -67,6 +58,15 @@ export const repeat = (
     toUnexpectedError,
   );
 };
+
+/**
+ * Mirror of the ECMAScript ToIntegerOrInfinity abstract operation: `NaN`
+ * becomes `0`, everything else truncates toward zero. Applying it before the
+ * range check makes the check coincide exactly with the one the engine
+ * performs.
+ */
+const toIntegerOrInfinity = (value: number): number =>
+  Number.isNaN(value) ? 0 : Math.trunc(value);
 
 /** The failure type of {@link repeat}. */
 export type RepeatError =

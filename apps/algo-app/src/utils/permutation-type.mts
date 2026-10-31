@@ -2,28 +2,6 @@ import { Arr, ISet, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { PermutationString } from 'ts-utils-additional';
 
-const permutationStringImpl = (s: string): readonly string[] => {
-  if (s.length === 0) {
-    return [];
-  }
-
-  const mut_values = [];
-
-  for (const c of s) {
-    const suffixes = permutationStringImpl(s.replace(c, ''));
-
-    if (Arr.isEmpty(suffixes)) {
-      mut_values.push(c);
-    } else {
-      for (const sf of suffixes) {
-        mut_values.push(`${c}${sf}`);
-      }
-    }
-  }
-
-  return mut_values;
-};
-
 export const permutationType = <
   A extends string,
   P extends PermutationString<A> = PermutationString<A>,
@@ -56,4 +34,26 @@ export const permutationType = <
             }),
           ]),
   });
+};
+
+const permutationStringImpl = (s: string): readonly string[] => {
+  if (s.length === 0) {
+    return [];
+  }
+
+  const mut_values = [];
+
+  for (const c of s) {
+    const suffixes = permutationStringImpl(s.replace(c, ''));
+
+    if (Arr.isEmpty(suffixes)) {
+      mut_values.push(c);
+    } else {
+      for (const sf of suffixes) {
+        mut_values.push(`${c}${sf}`);
+      }
+    }
+  }
+
+  return mut_values;
 };

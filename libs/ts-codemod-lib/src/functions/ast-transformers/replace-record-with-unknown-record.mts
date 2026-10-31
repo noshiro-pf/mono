@@ -35,77 +35,14 @@ export const replaceRecordWithUnknownRecordTransformer =
       },
     }) as const;
 
-const processDeclarations = (
-  container: tsm.SourceFile | tsm.ModuleDeclaration,
+const isStringUnknownIndexSignature = (
+  sig: tsm.IndexSignatureDeclaration,
 ): boolean => {
-  const typeAliasModifications = container.getTypeAliases().map((typeAlias) => {
-    if (hasDisableNextLineComment(typeAlias, TRANSFORMER_NAME)) {
-      return false;
-    }
+  const keyType = sig.getKeyTypeNode();
 
-    const typeNode = typeAlias.getTypeNode();
+  const returnType = sig.getReturnTypeNode();
 
-    return typeNode !== undefined && visitTypeNode(typeNode);
-  });
-
-  const interfaceModifications = container
-    .getInterfaces()
-    .map(processInterfaceDeclaration);
-
-  return [...typeAliasModifications, ...interfaceModifications].includes(true);
-};
-
-const processInterfaceDeclaration = (
-  interfaceDecl: tsm.InterfaceDeclaration,
-): boolean => {
-  if (hasDisableNextLineComment(interfaceDecl, TRANSFORMER_NAME)) {
-    return false;
-  }
-
-  // Check if interface has index signature [k: string]: unknown
-  const indexSignatures = interfaceDecl.getIndexSignatures();
-
-  const hasStringUnknownSignature = indexSignatures.some((sig) => {
-    const keyType = sig.getKeyType();
-
-    const returnType = sig.getReturnType();
-
-    return keyType.getText() === 'string' && returnType.getText() === 'unknown';
-  });
-
-  // If it has the signature and no other members, replace entire interface with type alias.
-  // Skip when the interface carries semantics that a plain type alias would lose
-  // (type parameters, extends clauses, declare modifier, default export).
-  if (
-    hasStringUnknownSignature &&
-    Arr.isEmpty(interfaceDecl.getProperties()) &&
-    Arr.isFixedLengthArray(1, indexSignatures) &&
-    Arr.isEmpty(interfaceDecl.getTypeParameters()) &&
-    Arr.isEmpty(interfaceDecl.getExtends()) &&
-    !interfaceDecl.hasDeclareKeyword() &&
-    !interfaceDecl.hasDefaultKeyword()
-  ) {
-    const exportPrefix = interfaceDecl.hasExportKeyword() ? 'export ' : '';
-
-    const interfaceName = interfaceDecl.getName();
-
-    replaceNodeWithText(
-      interfaceDecl,
-      `${exportPrefix}type ${interfaceName} = UnknownRecord;`,
-    );
-
-    return true;
-  }
-
-  // Otherwise, check properties for Record types
-  return interfaceDecl
-    .getProperties()
-    .map((property) => {
-      const typeNode = property.getTypeNode();
-
-      return typeNode !== undefined && visitTypeNode(typeNode);
-    })
-    .includes(true);
+  return keyType.getText() === 'string' && returnType?.getText() === 'unknown';
 };
 
 const visitTypeNode = (node: tsm.TypeNode): boolean => {
@@ -208,14 +145,77 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
   );
 };
 
-const isStringUnknownIndexSignature = (
-  sig: tsm.IndexSignatureDeclaration,
+const processInterfaceDeclaration = (
+  interfaceDecl: tsm.InterfaceDeclaration,
 ): boolean => {
-  const keyType = sig.getKeyTypeNode();
+  if (hasDisableNextLineComment(interfaceDecl, TRANSFORMER_NAME)) {
+    return false;
+  }
 
-  const returnType = sig.getReturnTypeNode();
+  // Check if interface has index signature [k: string]: unknown
+  const indexSignatures = interfaceDecl.getIndexSignatures();
 
-  return keyType.getText() === 'string' && returnType?.getText() === 'unknown';
+  const hasStringUnknownSignature = indexSignatures.some((sig) => {
+    const keyType = sig.getKeyType();
+
+    const returnType = sig.getReturnType();
+
+    return keyType.getText() === 'string' && returnType.getText() === 'unknown';
+  });
+
+  // If it has the signature and no other members, replace entire interface with type alias.
+  // Skip when the interface carries semantics that a plain type alias would lose
+  // (type parameters, extends clauses, declare modifier, default export).
+  if (
+    hasStringUnknownSignature &&
+    Arr.isEmpty(interfaceDecl.getProperties()) &&
+    Arr.isFixedLengthArray(1, indexSignatures) &&
+    Arr.isEmpty(interfaceDecl.getTypeParameters()) &&
+    Arr.isEmpty(interfaceDecl.getExtends()) &&
+    !interfaceDecl.hasDeclareKeyword() &&
+    !interfaceDecl.hasDefaultKeyword()
+  ) {
+    const exportPrefix = interfaceDecl.hasExportKeyword() ? 'export ' : '';
+
+    const interfaceName = interfaceDecl.getName();
+
+    replaceNodeWithText(
+      interfaceDecl,
+      `${exportPrefix}type ${interfaceName} = UnknownRecord;`,
+    );
+
+    return true;
+  }
+
+  // Otherwise, check properties for Record types
+  return interfaceDecl
+    .getProperties()
+    .map((property) => {
+      const typeNode = property.getTypeNode();
+
+      return typeNode !== undefined && visitTypeNode(typeNode);
+    })
+    .includes(true);
+};
+
+const processDeclarations = (
+  container: tsm.SourceFile | tsm.ModuleDeclaration,
+): boolean => {
+  const typeAliasModifications = container.getTypeAliases().map((typeAlias) => {
+    if (hasDisableNextLineComment(typeAlias, TRANSFORMER_NAME)) {
+      return false;
+    }
+
+    const typeNode = typeAlias.getTypeNode();
+
+    return typeNode !== undefined && visitTypeNode(typeNode);
+  });
+
+  const interfaceModifications = container
+    .getInterfaces()
+    .map(processInterfaceDeclaration);
+
+  return [...typeAliasModifications, ...interfaceModifications].includes(true);
 };
 
 const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): boolean => {

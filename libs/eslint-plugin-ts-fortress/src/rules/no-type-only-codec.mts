@@ -187,6 +187,30 @@ const buildTypeOfMatcher = (
         typeName.right.name === TYPE_OF;
 };
 
+/** `X` when `node` is exactly `t.TypeOf<typeof X>`, otherwise `undefined`. */
+const derivedCodecName = (
+  node: TSESTree.TypeNode,
+  isTypeOf: (typeName: TSESTree.EntityName) => boolean,
+): string | undefined => {
+  if (
+    node.type !== AST_NODE_TYPES.TSTypeReference ||
+    !isTypeOf(node.typeName)
+  ) {
+    return undefined;
+  }
+
+  const params = node.typeArguments?.params ?? [];
+
+  const [query] = params;
+
+  return Arr.isFixedLengthArray(1, params) &&
+    query?.type === AST_NODE_TYPES.TSTypeQuery &&
+    query.typeArguments === undefined &&
+    query.exprName.type === AST_NODE_TYPES.Identifier
+    ? query.exprName.name
+    : undefined;
+};
+
 /**
  * The top-level `const X = …` declarators that a top-level
  * `type Y = t.TypeOf<typeof X>` derives a type from — the pair that marks `X`
@@ -240,30 +264,6 @@ const findCodecPairs = (
         ? []
         : [{ declarator, id: declarator.id, typeName }];
     });
-};
-
-/** `X` when `node` is exactly `t.TypeOf<typeof X>`, otherwise `undefined`. */
-const derivedCodecName = (
-  node: TSESTree.TypeNode,
-  isTypeOf: (typeName: TSESTree.EntityName) => boolean,
-): string | undefined => {
-  if (
-    node.type !== AST_NODE_TYPES.TSTypeReference ||
-    !isTypeOf(node.typeName)
-  ) {
-    return undefined;
-  }
-
-  const params = node.typeArguments?.params ?? [];
-
-  const [query] = params;
-
-  return Arr.isFixedLengthArray(1, params) &&
-    query?.type === AST_NODE_TYPES.TSTypeQuery &&
-    query.typeArguments === undefined &&
-    query.exprName.type === AST_NODE_TYPES.Identifier
-    ? query.exprName.name
-    : undefined;
 };
 
 /**
@@ -339,6 +339,11 @@ const collectExportedValueNames = (
   return mut_names;
 };
 
+const isInTypeQuery = (node: TSESTree.Node): boolean =>
+  node.type !== AST_NODE_TYPES.Program &&
+  (node.parent.type === AST_NODE_TYPES.TSTypeQuery ||
+    isInTypeQuery(node.parent));
+
 /**
  * Whether a reference reads the codec's value at runtime. Its own
  * initialization, `typeof X` in a type, and the name in an export list are
@@ -351,11 +356,6 @@ const isValueUse = (reference: TSESLint.Scope.Reference): boolean =>
   reference.identifier.parent.type !==
     AST_NODE_TYPES.ExportDefaultDeclaration &&
   !isInTypeQuery(reference.identifier);
-
-const isInTypeQuery = (node: TSESTree.Node): boolean =>
-  node.type !== AST_NODE_TYPES.Program &&
-  (node.parent.type === AST_NODE_TYPES.TSTypeQuery ||
-    isInTypeQuery(node.parent));
 
 /**
  * Whether another file of the TypeScript program reads the value this file

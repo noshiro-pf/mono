@@ -252,42 +252,6 @@ const isScanned = (relativePath: string): boolean =>
 const isTemplate = (target: string): boolean =>
   target.includes('{') || target.includes('$');
 
-const toAbsoluteLink = (
-  matchedText: string,
-  line: number,
-): MonoLink | undefined => {
-  const written = matchedText.replace(TRAILING_PUNCTUATION, '');
-
-  const { linkPath, fragment } = splitFragment(
-    written.slice(written.indexOf(BRANCH_SEGMENT) + BRANCH_SEGMENT.length),
-  );
-
-  const target = decodePath(linkPath).replace(/\/+$/u, '');
-
-  return isTemplate(target)
-    ? undefined
-    : { line, written, target, lines: toLineRange(fragment) };
-};
-
-const toRelativeLink = (
-  matchedText: string,
-  line: number,
-  relativePath: string,
-): MonoLink | undefined => {
-  // `](` and `)`.
-  const written = matchedText.slice(2, -1);
-
-  const { linkPath, fragment } = splitFragment(written);
-
-  const target = path.posix
-    .join(path.posix.dirname(relativePath), decodePath(linkPath))
-    .replace(/\/+$/u, '');
-
-  return isTemplate(target)
-    ? undefined
-    : { line, written, target, lines: toLineRange(fragment) };
-};
-
 /** The path of a link, and its fragment when it has one; the query goes. */
 const splitFragment = (
   link: string,
@@ -343,6 +307,42 @@ const decodePath = (encoded: string): string => {
   const decoded = Result.fromThrowable(() => decodeURI(encoded));
 
   return Result.isErr(decoded) ? encoded : decoded.value;
+};
+
+const toAbsoluteLink = (
+  matchedText: string,
+  line: number,
+): MonoLink | undefined => {
+  const written = matchedText.replace(TRAILING_PUNCTUATION, '');
+
+  const { linkPath, fragment } = splitFragment(
+    written.slice(written.indexOf(BRANCH_SEGMENT) + BRANCH_SEGMENT.length),
+  );
+
+  const target = decodePath(linkPath).replace(/\/+$/u, '');
+
+  return isTemplate(target)
+    ? undefined
+    : { line, written, target, lines: toLineRange(fragment) };
+};
+
+const toRelativeLink = (
+  matchedText: string,
+  line: number,
+  relativePath: string,
+): MonoLink | undefined => {
+  // `](` and `)`.
+  const written = matchedText.slice(2, -1);
+
+  const { linkPath, fragment } = splitFragment(written);
+
+  const target = path.posix
+    .join(path.posix.dirname(relativePath), decodePath(linkPath))
+    .replace(/\/+$/u, '');
+
+  return isTemplate(target)
+    ? undefined
+    : { line, written, target, lines: toLineRange(fragment) };
 };
 
 const countLines = async (relativePath: string): Promise<number> => {

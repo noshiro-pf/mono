@@ -25,39 +25,6 @@ const readonlyCollectionRename = new Map<string, string>([
   ['Set', 'ReadonlySet'],
 ]);
 
-const hasReadonlyModifier = (node: ts.Node): boolean =>
-  ts.canHaveModifiers(node) &&
-  (ts.getModifiers(node) ?? []).some(
-    (m) => m.kind === ts.SyntaxKind.ReadonlyKeyword,
-  );
-
-const isReadonlyOperator = (node: ts.Node | undefined): boolean =>
-  node !== undefined &&
-  ts.isTypeOperatorNode(node) &&
-  node.operator === ts.SyntaxKind.ReadonlyKeyword;
-
-/**
- * Whether an `any` keyword is the array element of a rest parameter
- * (`...args: any[]`).
- *
- * Such `any`s are left untouched, mirroring `@typescript-eslint/no-explicit-any`
- * with `ignoreRestArgs: true`, which ignores rest-parameter *arrays* only (a
- * bare `...args: any` is still converted to `unknown`). The downstream
- * `convert-dts` step relies on this: e.g. `dom-common.mts` expects to find
- * `readonly any[]` in the intermediate.
- */
-const isRestArgAny = (anyNode: ts.Node): boolean => {
-  const parent = anyNode.parent;
-
-  return (
-    ts.isArrayTypeNode(parent) &&
-    parent.elementType === anyNode &&
-    ts.isParameter(parent.parent) &&
-    parent.parent.dotDotDotToken !== undefined &&
-    parent.parent.type === parent
-  );
-};
-
 /**
  * Apply the strict-lib source transformations to a single `.d.ts` file:
  *
@@ -213,4 +180,37 @@ export const transformDeclarationFile = (
   out += code.slice(mut_cursor);
 
   return out;
+};
+
+const hasReadonlyModifier = (node: ts.Node): boolean =>
+  ts.canHaveModifiers(node) &&
+  (ts.getModifiers(node) ?? []).some(
+    (m) => m.kind === ts.SyntaxKind.ReadonlyKeyword,
+  );
+
+const isReadonlyOperator = (node: ts.Node | undefined): boolean =>
+  node !== undefined &&
+  ts.isTypeOperatorNode(node) &&
+  node.operator === ts.SyntaxKind.ReadonlyKeyword;
+
+/**
+ * Whether an `any` keyword is the array element of a rest parameter
+ * (`...args: any[]`).
+ *
+ * Such `any`s are left untouched, mirroring `@typescript-eslint/no-explicit-any`
+ * with `ignoreRestArgs: true`, which ignores rest-parameter *arrays* only (a
+ * bare `...args: any` is still converted to `unknown`). The downstream
+ * `convert-dts` step relies on this: e.g. `dom-common.mts` expects to find
+ * `readonly any[]` in the intermediate.
+ */
+const isRestArgAny = (anyNode: ts.Node): boolean => {
+  const parent = anyNode.parent;
+
+  return (
+    ts.isArrayTypeNode(parent) &&
+    parent.elementType === anyNode &&
+    ts.isParameter(parent.parent) &&
+    parent.parent.dotDotDotToken !== undefined &&
+    parent.parent.type === parent
+  );
 };

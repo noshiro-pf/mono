@@ -158,6 +158,24 @@ export const defineViteConfig = ({
   } as const satisfies ViteUserConfig;
 };
 
+/**
+ * Whether a file under the package's `src/`, `test/` or `samples/` calls
+ * `vi.mock` or `vi.doMock`. Any such file counts, test or not: a false
+ * positive costs speed, a false negative an order-dependent failure.
+ */
+export const usesModuleMocks = (packageRoot: string): boolean =>
+  fs
+    .globSync('{src,test,samples}/**/*.{mts,ts,tsx}', {
+      cwd: packageRoot,
+      exclude: (file) => file.includes('node_modules'),
+    })
+    .some((file) =>
+      moduleMockCall.test(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.readFileSync(path.resolve(packageRoot, file), 'utf8'),
+      ),
+    );
+
 const projectConfig = (packageRoot: string, overrides?: ProjectOverrides) =>
   ({
     dir: packageRoot,
@@ -185,23 +203,5 @@ const projectConfig = (packageRoot: string, overrides?: ProjectOverrides) =>
     ],
     testTimeout: overrides?.testTimeout,
   }) as const satisfies ProjectConfig;
-
-/**
- * Whether a file under the package's `src/`, `test/` or `samples/` calls
- * `vi.mock` or `vi.doMock`. Any such file counts, test or not: a false
- * positive costs speed, a false negative an order-dependent failure.
- */
-export const usesModuleMocks = (packageRoot: string): boolean =>
-  fs
-    .globSync('{src,test,samples}/**/*.{mts,ts,tsx}', {
-      cwd: packageRoot,
-      exclude: (file) => file.includes('node_modules'),
-    })
-    .some((file) =>
-      moduleMockCall.test(
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.readFileSync(path.resolve(packageRoot, file), 'utf8'),
-      ),
-    );
 
 const moduleMockCall = /\bvi\s*\.\s*(?:mock|doMock)\s*\(/u;

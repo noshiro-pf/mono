@@ -23,6 +23,20 @@ type FpTsEffectType = Readonly<{
   effectTypeParameter: Type | undefined;
 }>;
 
+export const fpTsEffectType = (type: Type): FpTsEffectType | undefined => {
+  const symbolName = typeSymbolName(type);
+
+  if (symbolName === undefined || !effects.includes(symbolName)) {
+    return undefined;
+  }
+
+  return {
+    effectType: type,
+    effectName: symbolName,
+    effectTypeParameter: fpTsEffectTypeParameter(symbolName, type),
+  } as const;
+};
+
 const fpTsEffectTypeParameter = (
   effectName: string,
 
@@ -40,18 +54,4 @@ const fpTsEffectTypeParameter = (
 
   // TODO extract the type param from other effect types.
   return undefined;
-};
-
-export const fpTsEffectType = (type: Type): FpTsEffectType | undefined => {
-  const symbolName = typeSymbolName(type);
-
-  if (symbolName === undefined || !effects.includes(symbolName)) {
-    return undefined;
-  }
-
-  return {
-    effectType: type,
-    effectName: symbolName,
-    effectTypeParameter: fpTsEffectTypeParameter(symbolName, type),
-  } as const;
 };

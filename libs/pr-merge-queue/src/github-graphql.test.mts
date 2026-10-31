@@ -77,6 +77,10 @@ describe('the GraphQL requests', () => {
 
 type Sent = Readonly<{ operation: string; query: string }>;
 
+/** An anonymous operation is named after its first field. */
+const firstFieldOf = (query: string): string =>
+  /\{\s*(\w+)/u.exec(query)?.[1] ?? '(anonymous)';
+
 /**
  * Calls every function that sends a GraphQL request, with `fetch` answering
  * each request with nothing GitHub would accept, and resolves to what was
@@ -179,10 +183,6 @@ const CLOSING_ISSUES_ANSWER = {
     },
   },
 } as const;
-
-/** An anonymous operation is named after its first field. */
-const firstFieldOf = (query: string): string =>
-  /\{\s*(\w+)/u.exec(query)?.[1] ?? '(anonymous)';
 
 /** What GitHub would say is wrong with `query`, empty when nothing is. */
 const errorsOf = (query: string): readonly string[] => {

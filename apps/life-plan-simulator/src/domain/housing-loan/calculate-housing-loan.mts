@@ -2,35 +2,6 @@ import { Num } from 'ts-data-forge';
 import type { HousingLoanParams, MonthlyPaymentResult } from './types.mjs';
 
 /**
- * 等額返済額を計算（元利均等返済）
- * @param principal 元金
- * @param monthlyRate 月利
- * @param numberOfPayments 返済回数
- * @returns 毎月の返済額
- */
-const calculateFixedMonthlyPayment = (
-  principal: number,
-  monthlyRate: number,
-  numberOfPayments: number,
-): number => {
-  if (monthlyRate === 0) {
-    return !Num.isNonZero(numberOfPayments)
-      ? 0
-      : Num.div(principal, numberOfPayments);
-  }
-
-  const r = monthlyRate;
-
-  const n = numberOfPayments;
-
-  const denominator = (1 + r) ** n - 1;
-
-  return !Num.isNonZero(denominator)
-    ? 0
-    : Num.div(principal * r * (1 + r) ** n, denominator);
-};
-
-/**
  * 住宅ローンの返済スケジュールを計算
  */
 export const calculateHousingLoan = (
@@ -92,4 +63,33 @@ export const calculateHousingLoan = (
   }
 
   return mut_results;
+};
+
+/**
+ * 等額返済額を計算（元利均等返済）
+ * @param principal 元金
+ * @param monthlyRate 月利
+ * @param numberOfPayments 返済回数
+ * @returns 毎月の返済額
+ */
+const calculateFixedMonthlyPayment = (
+  principal: number,
+  monthlyRate: number,
+  numberOfPayments: number,
+): number => {
+  if (monthlyRate === 0) {
+    return !Num.isNonZero(numberOfPayments)
+      ? 0
+      : Num.div(principal, numberOfPayments);
+  }
+
+  const r = monthlyRate;
+
+  const n = numberOfPayments;
+
+  const denominator = (1 + r) ** n - 1;
+
+  return !Num.isNonZero(denominator)
+    ? 0
+    : Num.div(principal * r * (1 + r) ** n, denominator);
 };

@@ -16,6 +16,32 @@ import {
 } from '../types/index.mjs';
 import { fixAnswerAndUpdateMessage } from './fix-answer.mjs';
 
+export const onMessageReactionAdd = async (
+  reaction: Discord.MessageReaction,
+  user: Discord.PartialUser | Discord.User,
+): Promise<Result<undefined, unknown>> =>
+  onMessageReactCommon(
+    {
+      type: 'add',
+      value: mapReactionEmojiNameToAnswerType(reaction.emoji.name),
+    },
+    reaction,
+    user,
+  );
+
+export const onMessageReactionRemove = (
+  reaction: Discord.MessageReaction,
+  user: Discord.PartialUser | Discord.User,
+): Promise<Result<undefined, unknown>> =>
+  onMessageReactCommon(
+    {
+      type: 'remove',
+      value: mapReactionEmojiNameToAnswerType(reaction.emoji.name),
+    },
+    reaction,
+    user,
+  );
+
 const onRefreshClick = async (
   reactionFilled: Discord.MessageReaction,
 ): Promise<Result<undefined, string>> => {
@@ -189,30 +215,4 @@ const mapReactionEmojiNameToAnswerType = (
       [emojis.refresh.unicode]: 'refresh',
     },
     undefined,
-  );
-
-export const onMessageReactionAdd = async (
-  reaction: Discord.MessageReaction,
-  user: Discord.PartialUser | Discord.User,
-): Promise<Result<undefined, unknown>> =>
-  onMessageReactCommon(
-    {
-      type: 'add',
-      value: mapReactionEmojiNameToAnswerType(reaction.emoji.name),
-    },
-    reaction,
-    user,
-  );
-
-export const onMessageReactionRemove = (
-  reaction: Discord.MessageReaction,
-  user: Discord.PartialUser | Discord.User,
-): Promise<Result<undefined, unknown>> =>
-  onMessageReactCommon(
-    {
-      type: 'remove',
-      value: mapReactionEmojiNameToAnswerType(reaction.emoji.name),
-    },
-    reaction,
-    user,
   );

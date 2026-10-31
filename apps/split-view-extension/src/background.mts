@@ -190,6 +190,56 @@ if (SPLIT_VIEW_DIAGNOSTICS) {
 }
 
 /**
+ * Opens every saved split view in a tab of its own, when none is open, and says
+ * whether it did.
+ *
+ * The one to bring to the front is the list's active one, or the first when
+ * the active one is not on the list: a click on the button has to end on a
+ * split view, not on the tab it was clicked from.
+ */
+const reopenEverySplitView = async (): Promise<boolean> => {
+  const registry = await loadWorkspaceRegistry();
+
+  if (!Arr.isNonEmpty(registry.entries) || (await isAnyWorkspaceOpen())) {
+    return false;
+  }
+
+  const frontId = registry.entries.some(
+    (entry) => entry.id === registry.activeId,
+  )
+    ? registry.activeId
+    : registry.entries[0].id;
+
+  await openEveryWorkspaceInTabs(registry.entries, frontId);
+
+  return true;
+};
+
+const focusExistingSplitView = async (): Promise<boolean> => {
+  const stored = await chrome.storage.session.get(splitViewTabIdSessionKey);
+
+  const tabId: unknown = stored[splitViewTabIdSessionKey];
+
+  if (typeof tabId !== 'number') {
+    return false;
+  }
+
+  try {
+    const tab = await chrome.tabs.get(tabId);
+
+    await chrome.tabs.update(tabId, { active: true });
+
+    await chrome.windows.update(tab.windowId, { focused: true });
+
+    return true;
+  } catch {
+    // The recorded tab has been closed, or was closed while the browser was
+    // shut down. Opening a new one is the answer either way.
+    return false;
+  }
+};
+
+/**
  * Focuses the split view if one is open, reopens every saved one if none is,
  * and opens one otherwise.
  *
@@ -360,56 +410,6 @@ const pullRequestUrlPattern = 'https://github.com/*/*/pull/*';
 const gitHubOrigin = 'https://github.com/';
 
 /**
- * Opens every saved split view in a tab of its own, when none is open, and says
- * whether it did.
- *
- * The one to bring to the front is the list's active one, or the first when
- * the active one is not on the list: a click on the button has to end on a
- * split view, not on the tab it was clicked from.
- */
-const reopenEverySplitView = async (): Promise<boolean> => {
-  const registry = await loadWorkspaceRegistry();
-
-  if (!Arr.isNonEmpty(registry.entries) || (await isAnyWorkspaceOpen())) {
-    return false;
-  }
-
-  const frontId = registry.entries.some(
-    (entry) => entry.id === registry.activeId,
-  )
-    ? registry.activeId
-    : registry.entries[0].id;
-
-  await openEveryWorkspaceInTabs(registry.entries, frontId);
-
-  return true;
-};
-
-const focusExistingSplitView = async (): Promise<boolean> => {
-  const stored = await chrome.storage.session.get(splitViewTabIdSessionKey);
-
-  const tabId: unknown = stored[splitViewTabIdSessionKey];
-
-  if (typeof tabId !== 'number') {
-    return false;
-  }
-
-  try {
-    const tab = await chrome.tabs.get(tabId);
-
-    await chrome.tabs.update(tabId, { active: true });
-
-    await chrome.windows.update(tab.windowId, { focused: true });
-
-    return true;
-  } catch {
-    // The recorded tab has been closed, or was closed while the browser was
-    // shut down. Opening a new one is the answer either way.
-    return false;
-  }
-};
-
-/**
  * Frame events are logged for the split view's tab only. Every page on the web
  * has frames, and a log of all of them would say nothing about this one.
  */
@@ -421,25 +421,23 @@ const mut_workerState: { appendQueue: Promise<void> } = {
   appendQueue: Promise.resolve(),
 };
 
-const logFrameEvent = async (
-  kind: string,
-  details: Readonly<{ tabId: number; frameId: number; url: string }>,
-  error?: string,
-  extra?: ReadonlyRecord<string, unknown>,
+const writeEvent = async (
+  entry: ReadonlyRecord<string, unknown>,
 ): Promise<void> => {
-  const stored = await chrome.storage.session.get(splitViewTabIdSessionKey);
+  const stored = await chrome.storage.session.get(eventLogSessionKey);
 
-  if (stored[splitViewTabIdSessionKey] !== details.tabId) {
-    return;
-  }
+  const previous: readonly unknown[] = Arr.isArray(stored[eventLogSessionKey])
+    ? stored[eventLogSessionKey]
+    : ([] as const);
 
-  await appendEvent({
-    kind,
-    tabId: details.tabId,
-    frameId: details.frameId,
-    url: details.url,
-    ...(error === undefined ? {} : { error }),
-    ...(extra ?? {}),
+  const clock = new Intl.DateTimeFormat('sv-SE', { timeStyle: 'medium' });
+
+  const stamped = { at: clock.format(Date.now()), ...entry } as const;
+
+  await chrome.storage.session.set({
+    [eventLogSessionKey]: Arr.toPushed(previous, stamped).slice(
+      -maxEventLogEntries,
+    ),
   });
 };
 
@@ -462,23 +460,25 @@ const appendEvent = async (
   return mut_workerState.appendQueue;
 };
 
-const writeEvent = async (
-  entry: ReadonlyRecord<string, unknown>,
+const logFrameEvent = async (
+  kind: string,
+  details: Readonly<{ tabId: number; frameId: number; url: string }>,
+  error?: string,
+  extra?: ReadonlyRecord<string, unknown>,
 ): Promise<void> => {
-  const stored = await chrome.storage.session.get(eventLogSessionKey);
+  const stored = await chrome.storage.session.get(splitViewTabIdSessionKey);
 
-  const previous: readonly unknown[] = Arr.isArray(stored[eventLogSessionKey])
-    ? stored[eventLogSessionKey]
-    : ([] as const);
+  if (stored[splitViewTabIdSessionKey] !== details.tabId) {
+    return;
+  }
 
-  const clock = new Intl.DateTimeFormat('sv-SE', { timeStyle: 'medium' });
-
-  const stamped = { at: clock.format(Date.now()), ...entry } as const;
-
-  await chrome.storage.session.set({
-    [eventLogSessionKey]: Arr.toPushed(previous, stamped).slice(
-      -maxEventLogEntries,
-    ),
+  await appendEvent({
+    kind,
+    tabId: details.tabId,
+    frameId: details.frameId,
+    url: details.url,
+    ...(error === undefined ? {} : { error }),
+    ...(extra ?? {}),
   });
 };
 

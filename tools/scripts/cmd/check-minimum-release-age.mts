@@ -285,6 +285,18 @@ const hasVersion = (entry: string): boolean => {
   return 0 < separatorIndex && separatorIndex < entry.length - 1;
 };
 
+/**
+ * The text before the first `#`.
+ *
+ * Neither a package name nor a version can contain one, so nothing this reads
+ * is lost by taking every `#` for the start of a comment.
+ */
+const stripComment = (text: string): string => {
+  const index = text.indexOf('#');
+
+  return index === -1 ? text : text.slice(0, index);
+};
+
 const findDelayMinutes = (lines: readonly string[]): number | undefined => {
   const declared = lines.flatMap((line) => {
     if (!line.startsWith(DELAY_KEY)) {
@@ -307,6 +319,13 @@ const findBooleanSetting = (lines: readonly string[], key: string): boolean =>
       line.startsWith(key) &&
       stripComment(line.slice(key.length)).trim() === 'true',
   );
+
+const stripQuotes = (value: string): string =>
+  value.length >= 2 &&
+  ((value.startsWith("'") && value.endsWith("'")) ||
+    (value.startsWith('"') && value.endsWith('"')))
+    ? value.slice(1, -1)
+    : value;
 
 /**
  * The list items of the block that starts on the line after `startLines[0]`.
@@ -355,6 +374,13 @@ const commentBlockAbove = (
   return before.slice(startIndex);
 };
 
+/** What a comment line says, or `''` for anything that is not one. */
+const commentText = (line: string): string => {
+  const trimmed = line.trim();
+
+  return trimmed.startsWith('#') ? trimmed.slice(1).trim() : '';
+};
+
 /**
  * The `# waiver:` headings among `lines`, each with whether anything is
  * written under it.
@@ -382,32 +408,6 @@ const collectReasons = (lines: readonly string[]): readonly WaiverReason[] =>
       },
     ];
   });
-
-/** What a comment line says, or `''` for anything that is not one. */
-const commentText = (line: string): string => {
-  const trimmed = line.trim();
-
-  return trimmed.startsWith('#') ? trimmed.slice(1).trim() : '';
-};
-
-/**
- * The text before the first `#`.
- *
- * Neither a package name nor a version can contain one, so nothing this reads
- * is lost by taking every `#` for the start of a comment.
- */
-const stripComment = (text: string): string => {
-  const index = text.indexOf('#');
-
-  return index === -1 ? text : text.slice(0, index);
-};
-
-const stripQuotes = (value: string): string =>
-  value.length >= 2 &&
-  ((value.startsWith("'") && value.endsWith("'")) ||
-    (value.startsWith('"') && value.endsWith('"')))
-    ? value.slice(1, -1)
-    : value;
 
 const readWorkspaceFile = async (): Promise<Result<string, string>> => {
   const result = await Result.fromPromise(

@@ -385,6 +385,22 @@ export const expandShapeStructure = (
 export const recordViewOf = (type: UnknownType): RecordView | undefined =>
   recordViewOfImpl(type, new Set<() => UnknownType>());
 
+/** @internal The element types of a `tuple`, if the type is one. */
+export const tupleElementTypesOf = (
+  type: UnknownType,
+): readonly UnknownType[] | undefined =>
+  type.structure?.kind === 'tuple' ? type.structure.elementTypes : undefined;
+
+/**
+ * @internal The members of a union with the unions nested directly in it
+ * flattened in, or the type itself if it is not a union. A `recursion` is
+ * not a union here even if it resolves to one, so that it is not run.
+ */
+export const unionMembersOf = (type: UnknownType): readonly UnknownType[] =>
+  type.structure?.kind === 'union'
+    ? type.structure.memberTypes.flatMap(unionMembersOf)
+    : ([type] as const);
+
 const recordViewOfImpl = (
   type: UnknownType,
   resolving: ReadonlySet<() => UnknownType>,
@@ -430,19 +446,3 @@ const recordViewOfImpl = (
 
   return undefined;
 };
-
-/** @internal The element types of a `tuple`, if the type is one. */
-export const tupleElementTypesOf = (
-  type: UnknownType,
-): readonly UnknownType[] | undefined =>
-  type.structure?.kind === 'tuple' ? type.structure.elementTypes : undefined;
-
-/**
- * @internal The members of a union with the unions nested directly in it
- * flattened in, or the type itself if it is not a union. A `recursion` is
- * not a union here even if it resolves to one, so that it is not run.
- */
-export const unionMembersOf = (type: UnknownType): readonly UnknownType[] =>
-  type.structure?.kind === 'union'
-    ? type.structure.memberTypes.flatMap(unionMembersOf)
-    : ([type] as const);

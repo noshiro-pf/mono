@@ -14,12 +14,6 @@ import type {
 } from '../../spring-demo/index.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, SPRING_FACTOR, lerp } from './shared.mjs';
 
-const springOperator = (startPos: Point): OperatorFunction<Point, Point> =>
-  scan(
-    (acc: Point, target: Point) => lerp(acc, target, SPRING_FACTOR),
-    startPos,
-  );
-
 export const createRxJSThroughputAdapter = (): SpringAdapter => {
   let mut_mousePos: BehaviorSubject<Point> | undefined;
 
@@ -77,3 +71,9 @@ export const createRxJSThroughputAdapter = (): SpringAdapter => {
     },
   };
 };
+
+const springOperator = (startPos: Point): OperatorFunction<Point, Point> =>
+  scan(
+    (acc: Point, target: Point) => lerp(acc, target, SPRING_FACTOR),
+    startPos,
+  );

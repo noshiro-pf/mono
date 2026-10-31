@@ -77,6 +77,19 @@ type AppProps = Readonly<{
   selected: ReadonlySignal<number | undefined>;
 }>;
 
+const Row = ({ row, selected }: RowProps): preact.JSX.Element => {
+  const className = useComputed(() =>
+    selected.value === row.id ? 'danger' : '',
+  );
+
+  return (
+    <tr class={className}>
+      <td>{row.id}</td>
+      <td>{row.label}</td>
+    </tr>
+  );
+};
+
 const App = ({ rows, selected }: AppProps): preact.JSX.Element => (
   <table>
     <tbody>
@@ -91,16 +104,3 @@ type RowProps = Readonly<{
   row: PreactRow;
   selected: ReadonlySignal<number | undefined>;
 }>;
-
-const Row = ({ row, selected }: RowProps): preact.JSX.Element => {
-  const className = useComputed(() =>
-    selected.value === row.id ? 'danger' : '',
-  );
-
-  return (
-    <tr class={className}>
-      <td>{row.id}</td>
-      <td>{row.label}</td>
-    </tr>
-  );
-};

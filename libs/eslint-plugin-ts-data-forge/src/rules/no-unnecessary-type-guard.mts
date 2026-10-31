@@ -335,6 +335,174 @@ type Verdict = DeepReadonly<
   | { kind: 'replace'; replacement: string }
 >;
 
+const replacementVerdict = (
+  replacement: string | undefined,
+): Verdict | undefined =>
+  replacement === undefined
+    ? undefined
+    : ({ kind: 'replace', replacement } as const);
+
+/**
+ * Decomposes a type into its union members. Returns `undefined` when any member
+ * is opaque (`any` / `unknown` / `never`) or deferred (type parameter, indexed
+ * access, …), signalling that the rule should not draw conclusions.
+ */
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const collectUnionParts = (type: ts.Type): readonly ts.Type[] | undefined => {
+  const parts = type.isUnion() ? type.types : ([type] as const);
+
+  for (const part of parts) {
+    if ((part.flags & DEFERRED_OR_OPAQUE_FLAGS) !== 0) {
+      return undefined;
+    }
+  }
+
+  return parts;
+};
+
+const isCallableType = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean =>
+  checker.getSignaturesOfType(type, ts.SignatureKind.Call).length > 0 ||
+  checker.getSignaturesOfType(type, ts.SignatureKind.Construct).length > 0;
+
+/**
+ * Whether `isRecord` is guaranteed to accept this (non-union) type.
+ *
+ * `isRecord` narrows to `UnknownRecord` (`ReadonlyRecord<string, unknown>`), so
+ * a string index signature is exactly what it asks for and its value type is
+ * `unknown`, which anything satisfies. Arrays and callables are excluded even
+ * when they carry one, because `isRecord` rejects them at runtime
+ * (`Array.isArray` is true; `typeof fn === 'object'` is false).
+ *
+ * Deliberately conservative: an object type without an index signature of its
+ * own is reported as neither guaranteed-accepted nor guaranteed-rejected, even
+ * where TypeScript would accept it through an implicit index signature.
+ */
+const isGuaranteedRecord = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean =>
+  checker.getIndexInfoOfType(type, ts.IndexKind.String) !== undefined &&
+  !isCallableType(type, checker) &&
+  !checker.isArrayType(type) &&
+  !checker.isTupleType(type);
+
+/** Classifies a single (non-union) type into a primitive {@link Atom}. */
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const classifyAtom = (type: ts.Type): Atom => {
+  const { flags } = type;
+
+  if ((flags & ts.TypeFlags.Undefined) !== 0) {
+    return 'undefined';
+  }
+
+  if ((flags & ts.TypeFlags.Null) !== 0) {
+    return 'null';
+  }
+
+  if ((flags & ts.TypeFlags.BooleanLike) !== 0) {
+    return 'boolean';
+  }
+
+  if ((flags & ts.TypeFlags.NumberLike) !== 0) {
+    return 'number';
+  }
+
+  if ((flags & ts.TypeFlags.StringLike) !== 0) {
+    return 'string';
+  }
+
+  if ((flags & ts.TypeFlags.BigIntLike) !== 0) {
+    return 'bigint';
+  }
+
+  if ((flags & ts.TypeFlags.ESSymbolLike) !== 0) {
+    return 'symbol';
+  }
+
+  // Branded primitives (e.g. `NonEmptyString = string & {...}`) are
+  // intersections; classify them by their underlying primitive constituent.
+  if (type.isIntersection()) {
+    for (const constituent of type.types) {
+      const atom = classifyAtom(constituent);
+
+      if (atom !== 'other') {
+        return atom;
+      }
+    }
+  }
+
+  return 'other';
+};
+
+/**
+ * Whether `isRecord` is guaranteed to reject this (non-union) type: every
+ * primitive (`null` included), every array or tuple, and every callable fails
+ * its `typeof x === 'object' && x !== null && !Array.isArray(x)` check.
+ */
+const isGuaranteedNotRecord = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean =>
+  classifyAtom(type) !== 'other' ||
+  checker.isArrayType(type) ||
+  checker.isTupleType(type) ||
+  isCallableType(type, checker);
+
+/** A stable key for a set of atoms, used to look up replacement guards. */
+const joinAtoms = (atoms: readonly AtomKey[]): string =>
+  ATOM_ORDER.filter((atom) => atoms.includes(atom)).join('|');
+
+/**
+ * Returns `true` when the type is guaranteed to be a non-empty string: either a
+ * non-empty string literal or a value branded as `NonEmptyString`
+ * (`MinLengthString<N>` with `N >= 1`).
+ */
+const isGuaranteedNonEmptyString = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean => {
+  if (type.isStringLiteral()) {
+    return type.value !== '';
+  }
+
+  if (type.getProperty(BRAND_MARKER_PROPERTY) === undefined) {
+    return false;
+  }
+
+  const minLengthSymbol = type.getProperty(MIN_LENGTH_BRAND_KEY);
+
+  if (minLengthSymbol === undefined) {
+    return false;
+  }
+
+  // The `MinLength` brand value is `MinLengthTuple<N, 0>`; it has a required
+  // first element (`'0'`) exactly when `N >= 1`, i.e. the string is non-empty.
+  // `MinLengthString<0>` brands with a plain array and has no such element.
+  return (
+    checker.getTypeOfSymbol(minLengthSymbol).getProperty('0') !== undefined
+  );
+};
+
+/**
+ * Returns `true` when the type can possibly be a non-empty string (a general
+ * `string`, a branded string, or a non-empty string literal). The empty string
+ * literal and non-string types cannot.
+ */
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const couldBeNonEmptyString = (type: ts.Type): boolean =>
+  type.isStringLiteral() ? type.value !== '' : classifyAtom(type) === 'string';
+
 /**
  * What a guard with `spec` does on an argument of `type`: always the same
  * boolean, the same as a narrower guard, or nothing the rule can say.
@@ -435,13 +603,6 @@ const verdictOf = (
   }
 };
 
-const replacementVerdict = (
-  replacement: string | undefined,
-): Verdict | undefined =>
-  replacement === undefined
-    ? undefined
-    : ({ kind: 'replace', replacement } as const);
-
 /**
  * Whether `verdict`, drawn from one layer's type, also holds for `type`. A
  * constant has to come out the same. A replacement holds where the rule would
@@ -481,121 +642,6 @@ const holdsOn = (
   );
 };
 
-/**
- * Decomposes a type into its union members. Returns `undefined` when any member
- * is opaque (`any` / `unknown` / `never`) or deferred (type parameter, indexed
- * access, …), signalling that the rule should not draw conclusions.
- */
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const collectUnionParts = (type: ts.Type): readonly ts.Type[] | undefined => {
-  const parts = type.isUnion() ? type.types : ([type] as const);
-
-  for (const part of parts) {
-    if ((part.flags & DEFERRED_OR_OPAQUE_FLAGS) !== 0) {
-      return undefined;
-    }
-  }
-
-  return parts;
-};
-
-/**
- * Whether `isRecord` is guaranteed to accept this (non-union) type.
- *
- * `isRecord` narrows to `UnknownRecord` (`ReadonlyRecord<string, unknown>`), so
- * a string index signature is exactly what it asks for and its value type is
- * `unknown`, which anything satisfies. Arrays and callables are excluded even
- * when they carry one, because `isRecord` rejects them at runtime
- * (`Array.isArray` is true; `typeof fn === 'object'` is false).
- *
- * Deliberately conservative: an object type without an index signature of its
- * own is reported as neither guaranteed-accepted nor guaranteed-rejected, even
- * where TypeScript would accept it through an implicit index signature.
- */
-const isGuaranteedRecord = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  type: ts.Type,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: ts.TypeChecker,
-): boolean =>
-  checker.getIndexInfoOfType(type, ts.IndexKind.String) !== undefined &&
-  !isCallableType(type, checker) &&
-  !checker.isArrayType(type) &&
-  !checker.isTupleType(type);
-
-/**
- * Whether `isRecord` is guaranteed to reject this (non-union) type: every
- * primitive (`null` included), every array or tuple, and every callable fails
- * its `typeof x === 'object' && x !== null && !Array.isArray(x)` check.
- */
-const isGuaranteedNotRecord = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  type: ts.Type,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: ts.TypeChecker,
-): boolean =>
-  classifyAtom(type) !== 'other' ||
-  checker.isArrayType(type) ||
-  checker.isTupleType(type) ||
-  isCallableType(type, checker);
-
-const isCallableType = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  type: ts.Type,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: ts.TypeChecker,
-): boolean =>
-  checker.getSignaturesOfType(type, ts.SignatureKind.Call).length > 0 ||
-  checker.getSignaturesOfType(type, ts.SignatureKind.Construct).length > 0;
-
-/** Classifies a single (non-union) type into a primitive {@link Atom}. */
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const classifyAtom = (type: ts.Type): Atom => {
-  const { flags } = type;
-
-  if ((flags & ts.TypeFlags.Undefined) !== 0) {
-    return 'undefined';
-  }
-
-  if ((flags & ts.TypeFlags.Null) !== 0) {
-    return 'null';
-  }
-
-  if ((flags & ts.TypeFlags.BooleanLike) !== 0) {
-    return 'boolean';
-  }
-
-  if ((flags & ts.TypeFlags.NumberLike) !== 0) {
-    return 'number';
-  }
-
-  if ((flags & ts.TypeFlags.StringLike) !== 0) {
-    return 'string';
-  }
-
-  if ((flags & ts.TypeFlags.BigIntLike) !== 0) {
-    return 'bigint';
-  }
-
-  if ((flags & ts.TypeFlags.ESSymbolLike) !== 0) {
-    return 'symbol';
-  }
-
-  // Branded primitives (e.g. `NonEmptyString = string & {...}`) are
-  // intersections; classify them by their underlying primitive constituent.
-  if (type.isIntersection()) {
-    for (const constituent of type.types) {
-      const atom = classifyAtom(constituent);
-
-      if (atom !== 'other') {
-        return atom;
-      }
-    }
-  }
-
-  return 'other';
-};
-
 const ATOM_ORDER: readonly AtomKey[] = [
   'undefined',
   'null',
@@ -605,52 +651,6 @@ const ATOM_ORDER: readonly AtomKey[] = [
   'bigint',
   'symbol',
 ] as const;
-
-/** A stable key for a set of atoms, used to look up replacement guards. */
-const joinAtoms = (atoms: readonly AtomKey[]): string =>
-  ATOM_ORDER.filter((atom) => atoms.includes(atom)).join('|');
-
-/**
- * Returns `true` when the type is guaranteed to be a non-empty string: either a
- * non-empty string literal or a value branded as `NonEmptyString`
- * (`MinLengthString<N>` with `N >= 1`).
- */
-const isGuaranteedNonEmptyString = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  type: ts.Type,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: ts.TypeChecker,
-): boolean => {
-  if (type.isStringLiteral()) {
-    return type.value !== '';
-  }
-
-  if (type.getProperty(BRAND_MARKER_PROPERTY) === undefined) {
-    return false;
-  }
-
-  const minLengthSymbol = type.getProperty(MIN_LENGTH_BRAND_KEY);
-
-  if (minLengthSymbol === undefined) {
-    return false;
-  }
-
-  // The `MinLength` brand value is `MinLengthTuple<N, 0>`; it has a required
-  // first element (`'0'`) exactly when `N >= 1`, i.e. the string is non-empty.
-  // `MinLengthString<0>` brands with a plain array and has no such element.
-  return (
-    checker.getTypeOfSymbol(minLengthSymbol).getProperty('0') !== undefined
-  );
-};
-
-/**
- * Returns `true` when the type can possibly be a non-empty string (a general
- * `string`, a branded string, or a non-empty string literal). The empty string
- * literal and non-string types cannot.
- */
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const couldBeNonEmptyString = (type: ts.Type): boolean =>
-  type.isStringLiteral() ? type.value !== '' : classifyAtom(type) === 'string';
 
 /**
  * Returns `true` when evaluating the expression cannot have observable side

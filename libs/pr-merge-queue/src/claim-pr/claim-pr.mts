@@ -161,105 +161,6 @@ export type ClaimArgs = Readonly<{
   release: boolean;
 }>;
 
-const claim = async (
-  context: ApiContext,
-  args: ClaimArgs,
-  viewer: string,
-  before: PullRequestState,
-): Promise<Result<string, string>> => {
-  const state = await readQueueState();
-
-  if (Result.isErr(state)) {
-    return Result.err(`cannot read the queue: ${state.value}`);
-  }
-
-  const decided = decideClaim(
-    state.value.owners.get(args.number),
-    before.queue,
-    args.by,
-  );
-
-  if (decided.kind === 'refuse') {
-    return Result.err(`#${args.number} not claimed: ${decided.reason}.`);
-  }
-
-  const atEpochMs = currentEpochMs();
-
-  const reason =
-    before.queue.setAside?.says.kind === 'standing'
-      ? before.queue.setAside.says.setAside.reason
-      : 'set aside';
-
-  const written = await writeComment(
-    context,
-    args.number,
-    decided.commentId,
-    writeClaimComment(
-      { headSha: before.headSha, by: args.by, at: isoSeconds(atEpochMs) },
-      [
-        `Being fixed by ${args.by}, after \`unblock-prs\` set it aside (\`${reason}\`).`,
-        `\`unblock-prs\` and other sessions leave it alone until the branch is pushed, or until ${isoSeconds(atEpochMs + CLAIM_LIFETIME_MINUTES * 60_000)}.`,
-      ].join(' '),
-    ),
-  );
-
-  if (Result.isErr(written)) {
-    return written;
-  }
-
-  // Two claimants writing at once both see nothing to refuse. Whichever
-  // claim reads back afterwards is the one that holds — the oldest comment,
-  // last written — and the other learns it lost here.
-  await new Promise((resolve) => {
-    setTimeout(resolve, READ_BACK_DELAY_MS);
-  });
-
-  const after = await readPullRequest(context, args.number, viewer);
-
-  if (Result.isErr(after)) {
-    return after;
-  }
-
-  const held = after.value.queue.claim;
-
-  return held?.applies === true &&
-    held.says.kind === 'standing' &&
-    held.says.claim.by === args.by
-    ? Result.ok(
-        `#${args.number} claimed by ${args.by} at ${before.headSha}, until it is pushed or ${isoSeconds(atEpochMs + CLAIM_LIFETIME_MINUTES * 60_000)}.`,
-      )
-    : Result.err(
-        `#${args.number} not claimed: ${held?.says.kind === 'standing' ? `${held.says.claim.by} claimed it at the same time` : 'the claim did not read back'}.`,
-      );
-};
-
-const release = async (
-  context: ApiContext,
-  args: ClaimArgs,
-  before: PullRequestState,
-): Promise<Result<string, string>> => {
-  const held = before.queue.claim;
-
-  if (held?.says.kind !== 'standing' || held.says.claim.by !== args.by) {
-    return Result.ok(`#${args.number}: ${args.by} holds no claim on it.`);
-  }
-
-  const written = await writeComment(
-    context,
-    args.number,
-    held.commentId,
-    writeReleasedClaimComment(
-      `${args.by} gave up the claim; \`unblock-prs\` and other sessions may take it up again.`,
-    ),
-  );
-
-  return Result.isErr(written)
-    ? written
-    : Result.ok(`#${args.number}: claim released.`);
-};
-
-type PullRequestState = Readonly<{ headSha: string; queue: QueueComments }>;
-
 /**
  * The head, and what this account's comments say about it against the tip
  * of the default branch, which is what a set-aside is recorded against.
@@ -358,6 +259,105 @@ const writeComment = async (
     ? Result.err(`cannot write the claim on #${number}: ${written.value}`)
     : Result.ok(undefined);
 };
+
+const claim = async (
+  context: ApiContext,
+  args: ClaimArgs,
+  viewer: string,
+  before: PullRequestState,
+): Promise<Result<string, string>> => {
+  const state = await readQueueState();
+
+  if (Result.isErr(state)) {
+    return Result.err(`cannot read the queue: ${state.value}`);
+  }
+
+  const decided = decideClaim(
+    state.value.owners.get(args.number),
+    before.queue,
+    args.by,
+  );
+
+  if (decided.kind === 'refuse') {
+    return Result.err(`#${args.number} not claimed: ${decided.reason}.`);
+  }
+
+  const atEpochMs = currentEpochMs();
+
+  const reason =
+    before.queue.setAside?.says.kind === 'standing'
+      ? before.queue.setAside.says.setAside.reason
+      : 'set aside';
+
+  const written = await writeComment(
+    context,
+    args.number,
+    decided.commentId,
+    writeClaimComment(
+      { headSha: before.headSha, by: args.by, at: isoSeconds(atEpochMs) },
+      [
+        `Being fixed by ${args.by}, after \`unblock-prs\` set it aside (\`${reason}\`).`,
+        `\`unblock-prs\` and other sessions leave it alone until the branch is pushed, or until ${isoSeconds(atEpochMs + CLAIM_LIFETIME_MINUTES * 60_000)}.`,
+      ].join(' '),
+    ),
+  );
+
+  if (Result.isErr(written)) {
+    return written;
+  }
+
+  // Two claimants writing at once both see nothing to refuse. Whichever
+  // claim reads back afterwards is the one that holds — the oldest comment,
+  // last written — and the other learns it lost here.
+  await new Promise((resolve) => {
+    setTimeout(resolve, READ_BACK_DELAY_MS);
+  });
+
+  const after = await readPullRequest(context, args.number, viewer);
+
+  if (Result.isErr(after)) {
+    return after;
+  }
+
+  const held = after.value.queue.claim;
+
+  return held?.applies === true &&
+    held.says.kind === 'standing' &&
+    held.says.claim.by === args.by
+    ? Result.ok(
+        `#${args.number} claimed by ${args.by} at ${before.headSha}, until it is pushed or ${isoSeconds(atEpochMs + CLAIM_LIFETIME_MINUTES * 60_000)}.`,
+      )
+    : Result.err(
+        `#${args.number} not claimed: ${held?.says.kind === 'standing' ? `${held.says.claim.by} claimed it at the same time` : 'the claim did not read back'}.`,
+      );
+};
+
+const release = async (
+  context: ApiContext,
+  args: ClaimArgs,
+  before: PullRequestState,
+): Promise<Result<string, string>> => {
+  const held = before.queue.claim;
+
+  if (held?.says.kind !== 'standing' || held.says.claim.by !== args.by) {
+    return Result.ok(`#${args.number}: ${args.by} holds no claim on it.`);
+  }
+
+  const written = await writeComment(
+    context,
+    args.number,
+    held.commentId,
+    writeReleasedClaimComment(
+      `${args.by} gave up the claim; \`unblock-prs\` and other sessions may take it up again.`,
+    ),
+  );
+
+  return Result.isErr(written)
+    ? written
+    : Result.ok(`#${args.number}: claim released.`);
+};
+
+type PullRequestState = Readonly<{ headSha: string; queue: QueueComments }>;
 
 /** Long enough for a write made in the same moment to be read back too. */
 const READ_BACK_DELAY_MS = 3000;

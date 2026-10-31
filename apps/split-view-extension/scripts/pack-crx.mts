@@ -100,35 +100,6 @@ type SigningKey = Readonly<{
 const defaultPassEntry = 'split-view-extension';
 
 /**
- * Reads the signing key out of `pass`.
- *
- * `pass` and nowhere else: a key that can also be sitting in a file is a key
- * that will end up in one. Chrome wants a path, though, so it is written to a
- * file that nothing else can read — `mkdtemp` makes its directory `0700` — and
- * deleted as soon as the packing is over, whether or not it worked.
- */
-const readSigningKey = (): SigningKey => {
-  const entry = process.env['SPLIT_VIEW_SIGNING_KEY_PASS'] ?? defaultPassEntry;
-
-  const pem = passShow(entry);
-
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'split-view-key-'));
-
-  const file = path.join(directory, 'signing-key.pem');
-
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  fs.writeFileSync(file, pem, { mode: 0o600 });
-
-  return {
-    path: file,
-    source: `pass show ${entry}`,
-    forget: () => {
-      fs.rmSync(directory, { recursive: true, force: true });
-    },
-  };
-};
-
-/**
  * The entry's contents.
  *
  * Neither the key nor anything `pass` said about it goes into the error: what
@@ -164,6 +135,54 @@ const passShow = (entry: string): string => {
   return pem;
 };
 
+/**
+ * Reads the signing key out of `pass`.
+ *
+ * `pass` and nowhere else: a key that can also be sitting in a file is a key
+ * that will end up in one. Chrome wants a path, though, so it is written to a
+ * file that nothing else can read — `mkdtemp` makes its directory `0700` — and
+ * deleted as soon as the packing is over, whether or not it worked.
+ */
+const readSigningKey = (): SigningKey => {
+  const entry = process.env['SPLIT_VIEW_SIGNING_KEY_PASS'] ?? defaultPassEntry;
+
+  const pem = passShow(entry);
+
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'split-view-key-'));
+
+  const file = path.join(directory, 'signing-key.pem');
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  fs.writeFileSync(file, pem, { mode: 0o600 });
+
+  return {
+    path: file,
+    source: `pass show ${entry}`,
+    forget: () => {
+      fs.rmSync(directory, { recursive: true, force: true });
+    },
+  };
+};
+
+const publicKeyDerOf = (keyPath: string): Buffer =>
+  execFileSync(
+    'openssl',
+    ['rsa', '-in', keyPath, '-pubout', '-outform', 'DER'],
+    // `openssl rsa` says "writing RSA key" on the way past, which is not
+    // something this report needs to pass on.
+    { stdio: ['ignore', 'pipe', 'ignore'] },
+  );
+
+/**
+ * The id Chrome derives from a public key: the first half of its SHA-256, with
+ * each nibble written as a letter from `a`.
+ */
+const idFromDer = (der: Readonly<Uint8Array>): string =>
+  Array.from(createHash('sha256').update(der).digest().subarray(0, 16))
+    .flatMap((byte) => [byte >> 4, byte & 0xf])
+    .map((nibble) => String.fromCodePoint(aCodePoint + nibble))
+    .join('');
+
 const report = (
   crxPath: string,
   key: SigningKey,
@@ -194,25 +213,6 @@ const report = (
       : `  id ${signedId} — the unpacked build's is ${pinnedId}, so the two are different extensions`,
   );
 };
-
-const publicKeyDerOf = (keyPath: string): Buffer =>
-  execFileSync(
-    'openssl',
-    ['rsa', '-in', keyPath, '-pubout', '-outform', 'DER'],
-    // `openssl rsa` says "writing RSA key" on the way past, which is not
-    // something this report needs to pass on.
-    { stdio: ['ignore', 'pipe', 'ignore'] },
-  );
-
-/**
- * The id Chrome derives from a public key: the first half of its SHA-256, with
- * each nibble written as a letter from `a`.
- */
-const idFromDer = (der: Readonly<Uint8Array>): string =>
-  Array.from(createHash('sha256').update(der).digest().subarray(0, 16))
-    .flatMap((byte) => [byte >> 4, byte & 0xf])
-    .map((nibble) => String.fromCodePoint(aCodePoint + nibble))
-    .join('');
 
 const aCodePoint = 'a'.codePointAt(0) ?? 97;
 

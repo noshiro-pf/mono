@@ -159,6 +159,11 @@ export const preferNamespaceImport: TSESLint.RuleModule<MessageIds, Options> = {
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
+const isNamespaceSpecifier = (
+  specifier: TSESTree.ImportClause,
+): specifier is TSESTree.ImportNamespaceSpecifier =>
+  specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier;
+
 /**
  * Whether a declaration is already what the rule asks for: one or more
  * namespace specifiers and nothing else. A bare `import 'ts-fortress';` has no
@@ -172,10 +177,67 @@ const isNamespaceOnly = (declaration: TSESTree.ImportDeclaration): boolean =>
 const isBare = (declaration: TSESTree.ImportDeclaration): boolean =>
   Arr.isEmpty(declaration.specifiers);
 
-const isNamespaceSpecifier = (
+/**
+ * The namespace member the references of a specifier become — `undefined` for
+ * a default import, whose references become the namespace itself. The result is
+ * `undefined` for an import name that is not an identifier
+ * (`import { 'not an identifier' as x }`), which no member access can spell.
+ */
+const resolveMember = (
   specifier: TSESTree.ImportClause,
-): specifier is TSESTree.ImportNamespaceSpecifier =>
-  specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier;
+): Readonly<{ name: string | undefined }> | undefined =>
+  specifier.type === AST_NODE_TYPES.ImportDefaultSpecifier
+    ? ({ name: undefined } as const)
+    : specifier.type === AST_NODE_TYPES.ImportSpecifier &&
+        specifier.imported.type === AST_NODE_TYPES.Identifier
+      ? ({ name: specifier.imported.name } as const)
+      : undefined;
+
+/**
+ * How one reference to an imported binding is rewritten, or `undefined` when it
+ * cannot be. Type positions need no special handling: `t.Type` reads as a
+ * qualified name there just as it reads as a member access in a value position.
+ */
+const buildReferenceRewrite = (
+  sourceCode: TSESLint.SourceCode,
+  identifier: TSESTree.Identifier | TSESTree.JSXIdentifier,
+  namespaceName: string,
+  memberName: string | undefined,
+): ReferenceRewrite | undefined => {
+  if (
+    identifier.type !== AST_NODE_TYPES.Identifier ||
+    // The namespace name has to mean the namespace import at every site the fix
+    // writes it; a binding of the same name in scope would capture it instead.
+    hasForeignBinding(sourceCode, identifier, namespaceName, TS_FORTRESS_MODULE)
+  ) {
+    return undefined;
+  }
+
+  const target =
+    memberName === undefined
+      ? namespaceName
+      : (`${namespaceName}.${memberName}` as const);
+
+  const parent = identifier.parent;
+
+  // `export { string }` names the binding rather than using it, and a member
+  // access is not a name — such a file has to be rewritten by hand.
+  if (parent.type === AST_NODE_TYPES.ExportSpecifier) {
+    return undefined;
+  }
+
+  return {
+    identifier,
+    // `{ string }` is both the key and the value, so only the value part may
+    // become a member access.
+    text:
+      parent.type === AST_NODE_TYPES.Property &&
+      parent.shorthand &&
+      parent.value === identifier
+        ? `${identifier.name}: ${target}`
+        : target,
+  };
+};
 
 /**
  * The edits that route every named and default ts-fortress import in the file
@@ -268,68 +330,6 @@ const buildFixPlan = (
     replaced,
     removed: reported.filter((declaration) => declaration !== replaced?.node),
     rewrites: mut_rewrites,
-  };
-};
-
-/**
- * The namespace member the references of a specifier become — `undefined` for
- * a default import, whose references become the namespace itself. The result is
- * `undefined` for an import name that is not an identifier
- * (`import { 'not an identifier' as x }`), which no member access can spell.
- */
-const resolveMember = (
-  specifier: TSESTree.ImportClause,
-): Readonly<{ name: string | undefined }> | undefined =>
-  specifier.type === AST_NODE_TYPES.ImportDefaultSpecifier
-    ? ({ name: undefined } as const)
-    : specifier.type === AST_NODE_TYPES.ImportSpecifier &&
-        specifier.imported.type === AST_NODE_TYPES.Identifier
-      ? ({ name: specifier.imported.name } as const)
-      : undefined;
-
-/**
- * How one reference to an imported binding is rewritten, or `undefined` when it
- * cannot be. Type positions need no special handling: `t.Type` reads as a
- * qualified name there just as it reads as a member access in a value position.
- */
-const buildReferenceRewrite = (
-  sourceCode: TSESLint.SourceCode,
-  identifier: TSESTree.Identifier | TSESTree.JSXIdentifier,
-  namespaceName: string,
-  memberName: string | undefined,
-): ReferenceRewrite | undefined => {
-  if (
-    identifier.type !== AST_NODE_TYPES.Identifier ||
-    // The namespace name has to mean the namespace import at every site the fix
-    // writes it; a binding of the same name in scope would capture it instead.
-    hasForeignBinding(sourceCode, identifier, namespaceName, TS_FORTRESS_MODULE)
-  ) {
-    return undefined;
-  }
-
-  const target =
-    memberName === undefined
-      ? namespaceName
-      : (`${namespaceName}.${memberName}` as const);
-
-  const parent = identifier.parent;
-
-  // `export { string }` names the binding rather than using it, and a member
-  // access is not a name — such a file has to be rewritten by hand.
-  if (parent.type === AST_NODE_TYPES.ExportSpecifier) {
-    return undefined;
-  }
-
-  return {
-    identifier,
-    // `{ string }` is both the key and the value, so only the value part may
-    // become a member access.
-    text:
-      parent.type === AST_NODE_TYPES.Property &&
-      parent.shorthand &&
-      parent.value === identifier
-        ? `${identifier.name}: ${target}`
-        : target,
   };
 };
 

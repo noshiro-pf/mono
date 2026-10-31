@@ -265,6 +265,63 @@ const NOW_ISO = '2026-10-16T00:00:00Z';
 /** {@link NOW_ISO}, in milliseconds. */
 const NOW_MS = 1_792_108_800_000;
 
+const entry = (fields: PullFields): ReportEntry =>
+  ({
+    number: fields.number,
+    title: `Pull request ${fields.number}`,
+    body: fields.body,
+    author: 'someone',
+    isDraft: fields.isDraft,
+    labels: fields.labels.map((labelName) => ({
+      name: labelName,
+      color: 'ededed',
+      description: '',
+    })),
+    autoMerge: fields.autoMerge,
+    headRef: fields.headRef,
+    headSha: sha(fields.number),
+    baseRef: fields.baseRef,
+    fromFork: false,
+    url: `https://github.com/noshiro-pf/mono/pull/${fields.number}`,
+    updatedAt: NOW_ISO,
+    headCommittedAt: undefined,
+    comparison: { aheadBy: 1, behindBy: fields.behindBy },
+    reported: new Map<string, ContextState>(),
+    checksRunning: false,
+    linkedIssues: [],
+    mergeAfter: [],
+    stackedOn: undefined,
+    inheritedMergeAfter: [],
+    notStartedIssues: [],
+    blockedBy: [],
+    checks: {
+      verdict: fields.verdict,
+      passed: [],
+      failed: [],
+      pending: [],
+      skipped: [],
+      missing: [],
+      notRun: [],
+      required: 0,
+    },
+  }) as const;
+
+const queuePull = (fields: PullFields): QueuePull =>
+  ({
+    entry: entry(fields),
+    baseTip: BASE_TIP,
+    mergeable: fields.mergeable,
+    nativeStack: fields.nativeStack,
+    review: {
+      author: 'someone',
+      approvers: [],
+      files: [],
+      filesComplete: true,
+      unresolvedConversations: fields.unresolvedConversations,
+    },
+    ownComments: fields.comments,
+  }) as const;
+
 const input = (
   pulls: readonly PullFields[],
   rules: Partial<Parameters<typeof queueViewOf>[0]['rules']> = {},
@@ -313,61 +370,4 @@ const pull = (number: number, fields: Partial<PullFields> = {}): PullFields =>
     unresolvedConversations: 0,
     comments: [],
     ...fields,
-  }) as const;
-
-const queuePull = (fields: PullFields): QueuePull =>
-  ({
-    entry: entry(fields),
-    baseTip: BASE_TIP,
-    mergeable: fields.mergeable,
-    nativeStack: fields.nativeStack,
-    review: {
-      author: 'someone',
-      approvers: [],
-      files: [],
-      filesComplete: true,
-      unresolvedConversations: fields.unresolvedConversations,
-    },
-    ownComments: fields.comments,
-  }) as const;
-
-const entry = (fields: PullFields): ReportEntry =>
-  ({
-    number: fields.number,
-    title: `Pull request ${fields.number}`,
-    body: fields.body,
-    author: 'someone',
-    isDraft: fields.isDraft,
-    labels: fields.labels.map((labelName) => ({
-      name: labelName,
-      color: 'ededed',
-      description: '',
-    })),
-    autoMerge: fields.autoMerge,
-    headRef: fields.headRef,
-    headSha: sha(fields.number),
-    baseRef: fields.baseRef,
-    fromFork: false,
-    url: `https://github.com/noshiro-pf/mono/pull/${fields.number}`,
-    updatedAt: NOW_ISO,
-    headCommittedAt: undefined,
-    comparison: { aheadBy: 1, behindBy: fields.behindBy },
-    reported: new Map<string, ContextState>(),
-    checksRunning: false,
-    linkedIssues: [],
-    mergeAfter: [],
-    stackedOn: undefined,
-    inheritedMergeAfter: [],
-    notStartedIssues: [],
-    blockedBy: [],
-    checks: {
-      verdict: fields.verdict,
-      passed: [],
-      failed: [],
-      pending: [],
-      skipped: [],
-      missing: [],
-      notRun: [],
-      required: 0,
-    },
   }) as const;

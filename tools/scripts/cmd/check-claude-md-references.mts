@@ -245,15 +245,15 @@ const visit = async (
   );
 };
 
-const collectScannedFiles = async (): Promise<
-  Result<readonly string[], string>
-> =>
-  Result.map(await listTrackedFiles(), (tracked) => tracked.filter(isScanned));
-
 const isScanned = (relativePath: string): boolean =>
   SCANNED_EXTENSIONS.has(path.extname(relativePath)) &&
   !IGNORED_PATHS.has(relativePath) &&
   IGNORED_PREFIXES.every((prefix) => !relativePath.startsWith(prefix));
+
+const collectScannedFiles = async (): Promise<
+  Result<readonly string[], string>
+> =>
+  Result.map(await listTrackedFiles(), (tracked) => tracked.filter(isScanned));
 
 const formatViolations = (
   violations: readonly Citation[],

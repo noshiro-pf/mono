@@ -63,6 +63,78 @@ export const QueueSection = (): JSX.Element => {
   );
 };
 
+const QueueLegend = (): JSX.Element => (
+  <ul class={constant('queue-legend')}>
+    <li>
+      <RunStateIcon kind={'running'} label={'running'} />
+      <span aria-hidden={constant('true')}>{constant('running')}</span>
+    </li>
+    <li>
+      <span class={constant('queue-swatch')} data-kind={constant('waiting')} />
+      {constant('waits for another PR')}
+    </li>
+    <li>
+      <span class={constant('queue-swatch')} data-kind={constant('outside')} />
+      {constant('set aside')}
+    </li>
+    {(['high', 'mid', 'low'] as const).map((priority) => (
+      <li>
+        <span
+          class={constant('queue-swatch')}
+          data-kind={constant('priority')}
+          data-priority={constant(priority)}
+        />
+        {constant(priority)}
+      </li>
+    ))}
+  </ul>
+);
+
+const runningOf = (queue: QueueView): number =>
+  queue.slots.filter(({ kind }) => kind === 'running').length;
+
+const slotTipOf = (
+  queue: QueueView,
+  shown: number | undefined,
+): Optional<QueueTipContent> => {
+  const index = queue.slots.findIndex(({ number }) => number === shown);
+
+  const slot = queue.slots[index];
+
+  return slot === undefined
+    ? Optional.none
+    : Optional.some({
+        number: slot.number,
+        title: slot.title,
+        detail: slot.detail,
+        side: index < queue.slots.length / 2 ? 'start' : 'end',
+      });
+};
+
+const outsideTipOf = (
+  queue: QueueView,
+  shown: number | undefined,
+): Optional<QueueTipContent> => {
+  const node = queue.outside.find(({ number }) => number === shown);
+
+  return node === undefined
+    ? Optional.none
+    : Optional.some({
+        number: node.number,
+        title: node.title,
+        detail: node.detail,
+        side: 'start',
+      });
+};
+
+/** What the label under a box says: `running`, `next`, then 2, 3 and on. */
+const placeOf = (slot: QueueSlot, place: number): string =>
+  slot.kind === 'running'
+    ? 'running'
+    : place === 0
+      ? 'next'
+      : (place + 1).toString();
+
 const QueueBody = ({
   queue$,
 }: Readonly<{ queue$: InitializedObservable<QueueView> }>): JSX.Element => {
@@ -182,36 +254,6 @@ const QueueBody = ({
   );
 };
 
-const QueueLegend = (): JSX.Element => (
-  <ul class={constant('queue-legend')}>
-    <li>
-      <RunStateIcon kind={'running'} label={'running'} />
-      <span aria-hidden={constant('true')}>{constant('running')}</span>
-    </li>
-    <li>
-      <span class={constant('queue-swatch')} data-kind={constant('waiting')} />
-      {constant('waits for another PR')}
-    </li>
-    <li>
-      <span class={constant('queue-swatch')} data-kind={constant('outside')} />
-      {constant('set aside')}
-    </li>
-    {(['high', 'mid', 'low'] as const).map((priority) => (
-      <li>
-        <span
-          class={constant('queue-swatch')}
-          data-kind={constant('priority')}
-          data-priority={constant(priority)}
-        />
-        {constant(priority)}
-      </li>
-    ))}
-  </ul>
-);
-
-const runningOf = (queue: QueueView): number =>
-  queue.slots.filter(({ kind }) => kind === 'running').length;
-
 const countsOf = (queue: QueueView): string => {
   const running = runningOf(queue);
 
@@ -221,45 +263,3 @@ const countsOf = (queue: QueueView): string => {
     `${queue.outside.length} set aside`,
   ].join(' · ');
 };
-
-const slotTipOf = (
-  queue: QueueView,
-  shown: number | undefined,
-): Optional<QueueTipContent> => {
-  const index = queue.slots.findIndex(({ number }) => number === shown);
-
-  const slot = queue.slots[index];
-
-  return slot === undefined
-    ? Optional.none
-    : Optional.some({
-        number: slot.number,
-        title: slot.title,
-        detail: slot.detail,
-        side: index < queue.slots.length / 2 ? 'start' : 'end',
-      });
-};
-
-const outsideTipOf = (
-  queue: QueueView,
-  shown: number | undefined,
-): Optional<QueueTipContent> => {
-  const node = queue.outside.find(({ number }) => number === shown);
-
-  return node === undefined
-    ? Optional.none
-    : Optional.some({
-        number: node.number,
-        title: node.title,
-        detail: node.detail,
-        side: 'start',
-      });
-};
-
-/** What the label under a box says: `running`, `next`, then 2, 3 and on. */
-const placeOf = (slot: QueueSlot, place: number): string =>
-  slot.kind === 'running'
-    ? 'running'
-    : place === 0
-      ? 'next'
-      : (place + 1).toString();

@@ -251,18 +251,6 @@ export type BrandedNumberTypes = ReadonlyRecord<
   (typeof brandedNumbers)[number] | 'bigint' | 'number' | `NumberType.${string}`
 >;
 
-const tupleMap = <T extends readonly unknown[], B>(
-  tpl: T,
-  mapFn: (a: T[number]) => B,
-): Readonly<{ [K in keyof T]: B }> =>
-  tpl.map(mapFn) as Readonly<{ [K in keyof T]: B }>;
-
-// Typed as a set of plain strings so `.has` accepts any `brandedNumbers` key
-// (a wider type than the `brandedNumberFromTypeUtils` element type).
-const typeUtilsGlobalSet: ReadonlySet<string> = new Set(
-  brandedNumberFromTypeUtils,
-);
-
 export const createBrandedNumber = (
   useBrandedNumber: boolean,
 ): BrandedNumberTypes =>
@@ -285,9 +273,6 @@ export const createBrandedNumber = (
         ] as const,
     ),
   ) as BrandedNumberTypes;
-
-const prependNamespacePrefix = (s: string): `NumberType.${string}` =>
-  `NumberType.${s}` as const;
 
 export const brandedNumberTypeDefString = (): string => {
   const {
@@ -379,14 +364,6 @@ export const getSrcFileList = async (
 export const idFn = (s: string): string => s;
 
 /**
- * The qualified name of the wildcard rest-parameter type, as written into the
- * generated lib. Every "matches any argument list" position is spelled with
- * this, so grepping it finds all of them — which is the point of it having a
- * name at all. See {@link anyArgumentsTypeDefString}.
- */
-export const anyArgumentsRef = 'StrictLibInternals.AnyArguments';
-
-/**
  * Declares {@link anyArgumentsRef}. Appended to `lib.es5.d.ts`, which every lib
  * chain loads; the two files that use it from outside `lib.es5.d.ts` carry
  * {@link ensureEs5Reference} so that they still see it when resolved on their
@@ -453,3 +430,26 @@ export const ensureEs5Reference: MonoTypeFunction<string> = (src) => {
     ? src.replace(noDefaultLibRef, () => `${noDefaultLibRef}\n${es5Ref}`)
     : `${es5Ref}\n${src}`;
 };
+
+const tupleMap = <T extends readonly unknown[], B>(
+  tpl: T,
+  mapFn: (a: T[number]) => B,
+): Readonly<{ [K in keyof T]: B }> =>
+  tpl.map(mapFn) as Readonly<{ [K in keyof T]: B }>;
+
+// Typed as a set of plain strings so `.has` accepts any `brandedNumbers` key
+// (a wider type than the `brandedNumberFromTypeUtils` element type).
+const typeUtilsGlobalSet: ReadonlySet<string> = new Set(
+  brandedNumberFromTypeUtils,
+);
+
+const prependNamespacePrefix = (s: string): `NumberType.${string}` =>
+  `NumberType.${s}` as const;
+
+/**
+ * The qualified name of the wildcard rest-parameter type, as written into the
+ * generated lib. Every "matches any argument list" position is spelled with
+ * this, so grepping it finds all of them — which is the point of it having a
+ * name at all. See {@link anyArgumentsTypeDefString}.
+ */
+export const anyArgumentsRef = 'StrictLibInternals.AnyArguments';

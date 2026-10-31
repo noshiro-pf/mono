@@ -142,20 +142,6 @@ export const installArgs = (
   };
 };
 
-const runInstall = (env: Env): void => {
-  const args = orExit(installArgs(env));
-
-  if (args === undefined) {
-    console.log('install: false; nothing is installed.');
-
-    return;
-  }
-
-  console.log(`pnpm ${args.join(' ')}`);
-
-  runOrExit('pnpm', args);
-};
-
 // ---------------------------------------------------------------------------
 // `check-diff`
 // ---------------------------------------------------------------------------
@@ -220,6 +206,46 @@ export const planDiffCheck = (
   };
 };
 
+// ---------------------------------------------------------------------------
+// Running the steps
+// ---------------------------------------------------------------------------
+
+/** An error annotation on the step, then a failed step. */
+const exitWithError = (message: string): never => {
+  console.log(`::error::${message}`);
+
+  process.exit(1);
+};
+
+const runOrExit = (command: string, args: readonly string[]): void => {
+  const { status, error } = spawnSync(command, args, { stdio: 'inherit' });
+
+  if (error !== undefined) {
+    exitWithError(`${command} could not be run: ${error.message}`);
+  }
+
+  if (status !== 0) {
+    process.exit(status ?? 1);
+  }
+};
+
+const orExit = <T,>(parsed: Parsed<T>): T =>
+  parsed.ok ? parsed.value : exitWithError(parsed.message);
+
+const runInstall = (env: Env): void => {
+  const args = orExit(installArgs(env));
+
+  if (args === undefined) {
+    console.log('install: false; nothing is installed.');
+
+    return;
+  }
+
+  console.log(`pnpm ${args.join(' ')}`);
+
+  runOrExit('pnpm', args);
+};
+
 const runDiffCheck = (env: Env): void => {
   const plan = orExit(planDiffCheck(env));
 
@@ -240,32 +266,6 @@ const runDiffCheck = (env: Env): void => {
   }
 
   runOrExit('pnpm', plan.run);
-};
-
-// ---------------------------------------------------------------------------
-// Utilities
-// ---------------------------------------------------------------------------
-
-const orExit = <T,>(parsed: Parsed<T>): T =>
-  parsed.ok ? parsed.value : exitWithError(parsed.message);
-
-/** An error annotation on the step, then a failed step. */
-const exitWithError = (message: string): never => {
-  console.log(`::error::${message}`);
-
-  process.exit(1);
-};
-
-const runOrExit = (command: string, args: readonly string[]): void => {
-  const { status, error } = spawnSync(command, args, { stdio: 'inherit' });
-
-  if (error !== undefined) {
-    exitWithError(`${command} could not be run: ${error.message}`);
-  }
-
-  if (status !== 0) {
-    process.exit(status ?? 1);
-  }
 };
 
 /**

@@ -2,6 +2,23 @@
 import { asNonZeroFiniteNumber, Num } from 'ts-data-forge';
 import { chipColors } from './label-color.mjs';
 
+const channel = (value: number): number => {
+  const c = Num.div(value, asNonZeroFiniteNumber(255));
+
+  return c <= 0.040_45
+    ? Num.div(c, asNonZeroFiniteNumber(12.92))
+    : Num.div(c + 0.055, asNonZeroFiniteNumber(1.055)) ** 2.4;
+};
+
+const luminance = (hex: string): number => {
+  const digits = hex.replace('#', '');
+
+  const at = (i: number): number =>
+    channel(Number.parseInt(digits.slice(i, i + 2), 16));
+
+  return 0.2126 * at(0) + 0.7152 * at(2) + 0.0722 * at(4);
+};
+
 /**
  * WCAG 2.x contrast, written out here rather than imported, so that the
  * assertions below are about the colours the module picks and not about the
@@ -17,23 +34,6 @@ const contrast = (a: string, b: string): number => {
   return Num.isNonZero(denominator)
     ? Num.div(lighter + 0.05, denominator)
     : Number.POSITIVE_INFINITY;
-};
-
-const luminance = (hex: string): number => {
-  const digits = hex.replace('#', '');
-
-  const at = (i: number): number =>
-    channel(Number.parseInt(digits.slice(i, i + 2), 16));
-
-  return 0.2126 * at(0) + 0.7152 * at(2) + 0.0722 * at(4);
-};
-
-const channel = (value: number): number => {
-  const c = Num.div(value, asNonZeroFiniteNumber(255));
-
-  return c <= 0.040_45
-    ? Num.div(c, asNonZeroFiniteNumber(12.92))
-    : Num.div(c + 0.055, asNonZeroFiniteNumber(1.055)) ** 2.4;
 };
 
 describe(chipColors, () => {

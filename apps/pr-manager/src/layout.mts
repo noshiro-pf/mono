@@ -660,6 +660,17 @@ const LINE_SEPARATOR = '-';
 const columnsParam = (raw: string | null): ColumnCount =>
   raw === '3' ? 3 : raw === '2' ? 2 : 1;
 
+/** Absent, empty and not-a-number are all no number. */
+const numberParam = (raw: string | null): number | undefined => {
+  if (raw === null) {
+    return undefined;
+  }
+
+  const parsed = Result.unwrapOkOr(Num.safeParseFloat(raw), Number.NaN);
+
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
 /** Two numbers, or none. */
 const linesParam = (
   raw: string | null,
@@ -679,17 +690,6 @@ const heightParam = (id: BlockId): string => `h.${id}` as const;
 
 const shareParam = (id: BlockId): string => `s.${id}` as const;
 
-/** Absent, empty and not-a-number are all no number. */
-const numberParam = (raw: string | null): number | undefined => {
-  if (raw === null) {
-    return undefined;
-  }
-
-  const parsed = Result.unwrapOkOr(Num.safeParseFloat(raw), Number.NaN);
-
-  return Number.isFinite(parsed) ? parsed : undefined;
-};
-
 const isBlockId = (value: string): value is BlockId =>
   (BLOCK_IDS as readonly string[]).includes(value);
 
@@ -702,32 +702,8 @@ const hiddenInOrder = (ids: readonly BlockId[]): readonly BlockId[] =>
 
 type Columns = StrictPick<Layout, 'columns' | 'left' | 'middle' | 'right'>;
 
-/**
- * Every block exactly once: the first mention wins, and what is not
- * mentioned goes to the end of the left column — but for the queue, which
- * goes under the merge order, wherever that is, being a strip about the pull
- * requests in it. With fewer than three columns, the middle's blocks go to
- * the top of the right one, as {@link withColumns} puts them; with one, every
- * block is on the left.
- */
-const arrange = (
-  columns: ColumnCount,
-  left: readonly BlockId[],
-  middle: readonly BlockId[],
-  right: readonly BlockId[],
-): Columns => {
-  const mentioned = Arr.uniq([...left, ...middle, ...right]);
-
-  const placed = arrangeMentioned(
-    columns,
-    left,
-    middle,
-    right,
-    BLOCK_IDS.filter((id) => id !== 'queue' && !mentioned.includes(id)),
-  );
-
-  return mentioned.includes('queue') ? placed : withQueueUnderOpen(placed);
-};
+const queueUnderOpen = (ids: readonly BlockId[]): readonly BlockId[] =>
+  ids.flatMap((id) => (id === 'open' ? (['open', 'queue'] as const) : [id]));
 
 /** The queue put under the merge order, or at the end of the left column. */
 const withQueueUnderOpen = (placed: Columns): Columns =>
@@ -739,9 +715,6 @@ const withQueueUnderOpen = (placed: Columns): Columns =>
         right: queueUnderOpen(placed.right),
       } as const)
     : ({ ...placed, left: Arr.toPushed(placed.left, 'queue') } as const);
-
-const queueUnderOpen = (ids: readonly BlockId[]): readonly BlockId[] =>
-  ids.flatMap((id) => (id === 'open' ? (['open', 'queue'] as const) : [id]));
 
 /** {@link arrange}, with `missing` going to the end of the left column. */
 const arrangeMentioned = (
@@ -780,6 +753,33 @@ const arrangeMentioned = (
       (id) => !leftOnly.includes(id) && !middleOnly.includes(id),
     ),
   };
+};
+
+/**
+ * Every block exactly once: the first mention wins, and what is not
+ * mentioned goes to the end of the left column — but for the queue, which
+ * goes under the merge order, wherever that is, being a strip about the pull
+ * requests in it. With fewer than three columns, the middle's blocks go to
+ * the top of the right one, as {@link withColumns} puts them; with one, every
+ * block is on the left.
+ */
+const arrange = (
+  columns: ColumnCount,
+  left: readonly BlockId[],
+  middle: readonly BlockId[],
+  right: readonly BlockId[],
+): Columns => {
+  const mentioned = Arr.uniq([...left, ...middle, ...right]);
+
+  const placed = arrangeMentioned(
+    columns,
+    left,
+    middle,
+    right,
+    BLOCK_IDS.filter((id) => id !== 'queue' && !mentioned.includes(id)),
+  );
+
+  return mentioned.includes('queue') ? placed : withQueueUnderOpen(placed);
 };
 
 /**
@@ -834,6 +834,10 @@ const placedColumns = (
 const clampHeight = (height: number): number =>
   Math.round(Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, height)));
 
+/** Rounded to a whole number, then kept between `min` and `max`. */
+const clampBetween = (value: number, min: number, max: number): number =>
+  Math.min(max, Math.max(min, Math.round(value)));
+
 const clampSplit = (split: number): number =>
   clampBetween(split, MIN_SPLIT, MAX_SPLIT);
 
@@ -851,10 +855,6 @@ const clampLines = (
     clampBetween(upper, first + MIN_THIRD_WIDTH, 100 - MIN_THIRD_WIDTH),
   ];
 };
-
-/** Rounded to a whole number, then kept between `min` and `max`. */
-const clampBetween = (value: number, min: number, max: number): number =>
-  Math.min(max, Math.max(min, Math.round(value)));
 
 /** To a tenth: fine enough for a drag to follow the pointer. */
 const roundShare = (share: number): number => Math.round(share * 10) / 10;

@@ -143,6 +143,114 @@ const isInConditionalTypeExtendsClause = (node: TSESTree.Node): boolean => {
   );
 };
 
+/** The `type X = …` declaration `node` sits in, if any. */
+const enclosingTypeAlias = (
+  node: TSESTree.Node,
+): TSESTree.TSTypeAliasDeclaration | undefined =>
+  node.type === AST_NODE_TYPES.TSTypeAliasDeclaration
+    ? node
+    : node.type === AST_NODE_TYPES.Program
+      ? undefined
+      : enclosingTypeAlias(node.parent);
+
+const isNode = (value: unknown): value is TSESTree.Node =>
+  isNonNullObject(value) &&
+  typeof (value as Readonly<{ type?: unknown }>).type === 'string';
+
+/**
+ * Visits `node` and its descendants.
+ *
+ * Children are found through the parser's visitor keys, so only the properties
+ * that actually hold one are read. Reading every own property instead works
+ * too, and is the fallback for a parser that declares no keys for a node type,
+ * but it allocates an entry pair per property and walks `loc` / `range` as
+ * well — on the generated rule-type files that alone was most of the cost.
+ */
+const walk = (
+  node: TSESTree.Node,
+  sourceCode: TSESLint.SourceCode,
+  visit: (visited: TSESTree.Node) => void,
+): void => {
+  visit(node);
+
+  if (!isRecord(node)) {
+    return;
+  }
+
+  const keys =
+    sourceCode.visitorKeys[node.type] ??
+    Object.keys(node).filter((key) => key !== 'parent');
+
+  for (const key of keys) {
+    const value: unknown = hasKey(node, key) ? node[key] : undefined;
+
+    if (Arr.isArray(value)) {
+      for (const element of value) {
+        if (isNode(element)) {
+          walk(element, sourceCode, visit);
+        }
+      }
+    } else if (isNode(value)) {
+      walk(value, sourceCode, visit);
+    }
+  }
+};
+
+/** The names every `X` / `X<…>` reference in the subtree points at. */
+const referencedTypeNames = (
+  node: TSESTree.Node,
+  sourceCode: TSESLint.SourceCode,
+): ReadonlySet<string> => {
+  const mut_names = new Set<string>();
+
+  walk(node, sourceCode, (visited) => {
+    if (
+      visited.type === AST_NODE_TYPES.TSTypeReference &&
+      visited.typeName.type === AST_NODE_TYPES.Identifier
+    ) {
+      mut_names.add(visited.typeName.name);
+    }
+  });
+
+  return mut_names;
+};
+
+/**
+ * Which other type names each `type X = …` in the file refers to, keyed by `X`.
+ *
+ * Built once per file and cached on the `Program` node: the search below runs
+ * per candidate tuple, and rebuilding this for each of them made the rule cost
+ * `O(tuples × file size)` — a full second on the largest generated files here.
+ */
+const aliasReferenceGraph = (
+  program: TSESTree.Program,
+  sourceCode: TSESLint.SourceCode,
+): ReadonlyMap<string, ReadonlySet<string>> => {
+  const cached = aliasReferenceGraphCache.get(program);
+
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const mut_graph = new Map<string, ReadonlySet<string>>();
+
+  walk(program, sourceCode, (visited) => {
+    if (visited.type === AST_NODE_TYPES.TSTypeAliasDeclaration) {
+      mut_graph.set(
+        visited.id.name,
+        referencedTypeNames(visited.typeAnnotation, sourceCode),
+      );
+    }
+  });
+
+  aliasReferenceGraphCache.set(program, mut_graph);
+
+  return mut_graph;
+};
+
+const programOf = (node: TSESTree.Node): TSESTree.Program =>
+  node.type === AST_NODE_TYPES.Program ? node : programOf(node.parent);
+
 /**
  * Whether the tuple spells out an alias that its own element type leads back
  * to.
@@ -225,118 +333,10 @@ const definesRecursiveTypeAlias = (
   }
 };
 
-/** The `type X = …` declaration `node` sits in, if any. */
-const enclosingTypeAlias = (
-  node: TSESTree.Node,
-): TSESTree.TSTypeAliasDeclaration | undefined =>
-  node.type === AST_NODE_TYPES.TSTypeAliasDeclaration
-    ? node
-    : node.type === AST_NODE_TYPES.Program
-      ? undefined
-      : enclosingTypeAlias(node.parent);
-
-/**
- * Which other type names each `type X = …` in the file refers to, keyed by `X`.
- *
- * Built once per file and cached on the `Program` node: the search below runs
- * per candidate tuple, and rebuilding this for each of them made the rule cost
- * `O(tuples × file size)` — a full second on the largest generated files here.
- */
-const aliasReferenceGraph = (
-  program: TSESTree.Program,
-  sourceCode: TSESLint.SourceCode,
-): ReadonlyMap<string, ReadonlySet<string>> => {
-  const cached = aliasReferenceGraphCache.get(program);
-
-  if (cached !== undefined) {
-    return cached;
-  }
-
-  const mut_graph = new Map<string, ReadonlySet<string>>();
-
-  walk(program, sourceCode, (visited) => {
-    if (visited.type === AST_NODE_TYPES.TSTypeAliasDeclaration) {
-      mut_graph.set(
-        visited.id.name,
-        referencedTypeNames(visited.typeAnnotation, sourceCode),
-      );
-    }
-  });
-
-  aliasReferenceGraphCache.set(program, mut_graph);
-
-  return mut_graph;
-};
-
 const aliasReferenceGraphCache = new WeakMap<
   TSESTree.Program,
   ReadonlyMap<string, ReadonlySet<string>>
 >();
-
-const programOf = (node: TSESTree.Node): TSESTree.Program =>
-  node.type === AST_NODE_TYPES.Program ? node : programOf(node.parent);
-
-/** The names every `X` / `X<…>` reference in the subtree points at. */
-const referencedTypeNames = (
-  node: TSESTree.Node,
-  sourceCode: TSESLint.SourceCode,
-): ReadonlySet<string> => {
-  const mut_names = new Set<string>();
-
-  walk(node, sourceCode, (visited) => {
-    if (
-      visited.type === AST_NODE_TYPES.TSTypeReference &&
-      visited.typeName.type === AST_NODE_TYPES.Identifier
-    ) {
-      mut_names.add(visited.typeName.name);
-    }
-  });
-
-  return mut_names;
-};
-
-/**
- * Visits `node` and its descendants.
- *
- * Children are found through the parser's visitor keys, so only the properties
- * that actually hold one are read. Reading every own property instead works
- * too, and is the fallback for a parser that declares no keys for a node type,
- * but it allocates an entry pair per property and walks `loc` / `range` as
- * well — on the generated rule-type files that alone was most of the cost.
- */
-const walk = (
-  node: TSESTree.Node,
-  sourceCode: TSESLint.SourceCode,
-  visit: (visited: TSESTree.Node) => void,
-): void => {
-  visit(node);
-
-  if (!isRecord(node)) {
-    return;
-  }
-
-  const keys =
-    sourceCode.visitorKeys[node.type] ??
-    Object.keys(node).filter((key) => key !== 'parent');
-
-  for (const key of keys) {
-    const value: unknown = hasKey(node, key) ? node[key] : undefined;
-
-    if (Arr.isArray(value)) {
-      for (const element of value) {
-        if (isNode(element)) {
-          walk(element, sourceCode, visit);
-        }
-      }
-    } else if (isNode(value)) {
-      walk(value, sourceCode, visit);
-    }
-  }
-};
-
-const isNode = (value: unknown): value is TSESTree.Node =>
-  isNonNullObject(value) &&
-  typeof (value as Readonly<{ type?: unknown }>).type === 'string';
 
 /** Unwraps `V[]` and `readonly V[]` to `V`. */
 const getArrayElementType = (

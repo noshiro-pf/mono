@@ -171,36 +171,8 @@ const summary = (report: PrReport): string => {
   ].join(' · ');
 };
 
-/** One pull request on one line: what it is, and what is holding it up. */
-const describe = (
-  entry: ReportEntry,
-  format: 'markdown' | 'terminal',
-): string => {
-  const markdown = format === 'markdown';
-
-  const ref = markdown
-    ? (`[#${entry.number}](${entry.url})` as const)
-    : (`#${entry.number}` as const);
-
-  const glyph = GLYPH[entry.checks.verdict][format];
-
-  const detail = [
-    entry.isDraft ? 'draft' : undefined,
-    entry.stackedOn === undefined
-      ? undefined
-      : (`stacked on #${entry.stackedOn}` as const),
-    ...inheritedOrder(entry),
-    commits(entry),
-    ...entry.labels.map(({ name }) => (markdown ? `\`${name}\`` : `[${name}]`)),
-    autoMerge(entry),
-    issues(entry, markdown),
-    failures(entry.checks),
-  ].filter((part) => part !== undefined);
-
-  const title_ = markdown ? (`**${entry.title}**` as const) : entry.title;
-
-  return Arr.toUnshifted(`${glyph} ${ref} ${title_}`)(detail).join(' · ');
-};
+const refs = (numbers: readonly number[]): string =>
+  numbers.map((number) => `#${number}`).join(', ');
 
 /**
  * What the issues it closes add to its order (`inheritStartAfter`): the open
@@ -216,9 +188,6 @@ const inheritedOrder = (entry: ReportEntry): readonly string[] =>
       ? ([`${refs(entry.notStartedIssues)} (issue) not done`] as const)
       : ([] as const)),
   ] as const;
-
-const refs = (numbers: readonly number[]): string =>
-  numbers.map((number) => `#${number}`).join(', ');
 
 /**
  * Whether anything will land the pull request once the checks go green, said
@@ -270,6 +239,37 @@ const failures = (checks: ChecksSummary): string | undefined => {
   return checks.verdict === 'paused'
     ? `checks paused, stale red: ${names}`
     : `failed: ${names}`;
+};
+
+/** One pull request on one line: what it is, and what is holding it up. */
+const describe = (
+  entry: ReportEntry,
+  format: 'markdown' | 'terminal',
+): string => {
+  const markdown = format === 'markdown';
+
+  const ref = markdown
+    ? (`[#${entry.number}](${entry.url})` as const)
+    : (`#${entry.number}` as const);
+
+  const glyph = GLYPH[entry.checks.verdict][format];
+
+  const detail = [
+    entry.isDraft ? 'draft' : undefined,
+    entry.stackedOn === undefined
+      ? undefined
+      : (`stacked on #${entry.stackedOn}` as const),
+    ...inheritedOrder(entry),
+    commits(entry),
+    ...entry.labels.map(({ name }) => (markdown ? `\`${name}\`` : `[${name}]`)),
+    autoMerge(entry),
+    issues(entry, markdown),
+    failures(entry.checks),
+  ].filter((part) => part !== undefined);
+
+  const title_ = markdown ? (`**${entry.title}**` as const) : entry.title;
+
+  return Arr.toUnshifted(`${glyph} ${ref} ${title_}`)(detail).join(' · ');
 };
 
 const cyclesSection = (report: PrReport): readonly string[] =>
@@ -331,6 +331,29 @@ const mergedSection = (
 };
 
 /**
+ * How an issue stands for being started (`docs/issue-start-after.md`), unless
+ * it is free, which is the ordinary case; what its `Start-After:` names and
+ * where each stands; and a `Merge-After:` in its body, which is not read on
+ * an issue and is said so that it can be fixed.
+ */
+const startDetail = (issue: ReportIssue): readonly string[] =>
+  [
+    ...(issue.start === 'free'
+      ? ([] as const)
+      : ([START_WORDS[issue.start]] as const)),
+    ...(Arr.isNonEmpty(issue.named)
+      ? ([
+          `after ${issue.named.map(({ number, status }) => `#${number} (${STATUS_WORDS[status]})`).join(', ')}`,
+        ] as const)
+      : ([] as const)),
+    ...(Arr.isNonEmpty(issue.misplacedMergeAfter)
+      ? ([
+          `Merge-After: ${refs(issue.misplacedMergeAfter)} is not read on an issue; use Start-After:`,
+        ] as const)
+      : ([] as const)),
+  ] as const;
+
+/**
  * What is open that is not a pull request.
  *
  * Last, after what merged, because it is the one section that is not about
@@ -377,29 +400,6 @@ const issuesSection = (
     }),
   ] as const;
 };
-
-/**
- * How an issue stands for being started (`docs/issue-start-after.md`), unless
- * it is free, which is the ordinary case; what its `Start-After:` names and
- * where each stands; and a `Merge-After:` in its body, which is not read on
- * an issue and is said so that it can be fixed.
- */
-const startDetail = (issue: ReportIssue): readonly string[] =>
-  [
-    ...(issue.start === 'free'
-      ? ([] as const)
-      : ([START_WORDS[issue.start]] as const)),
-    ...(Arr.isNonEmpty(issue.named)
-      ? ([
-          `after ${issue.named.map(({ number, status }) => `#${number} (${STATUS_WORDS[status]})`).join(', ')}`,
-        ] as const)
-      : ([] as const)),
-    ...(Arr.isNonEmpty(issue.misplacedMergeAfter)
-      ? ([
-          `Merge-After: ${refs(issue.misplacedMergeAfter)} is not read on an issue; use Start-After:`,
-        ] as const)
-      : ([] as const)),
-  ] as const;
 
 const START_WORDS = {
   free: 'free',

@@ -86,18 +86,6 @@ const TITLE_TAG = /<title>(?<title>[^<]*)<\/title>/u;
 
 const ATTRIBUTE = /(?<key>[a-z][a-z:-]*)="(?<value>[^"]*)"/gu;
 
-const parseAttributes = (source: string): ReadonlyMap<string, string> =>
-  new Map(
-    Array.from(
-      source.matchAll(ATTRIBUTE),
-      (matched) =>
-        [
-          matched.groups?.['key'] ?? '',
-          decodeEntities(matched.groups?.['value'] ?? ''),
-        ] as const,
-    ),
-  );
-
 /** The character references an attribute value can carry, `&amp;` last. */
 const decodeEntities = (value: string): string =>
   value
@@ -118,3 +106,15 @@ const decodeEntities = (value: string): string =>
     .replaceAll('&lt;', '<')
     .replaceAll('&gt;', '>')
     .replaceAll('&amp;', '&');
+
+const parseAttributes = (source: string): ReadonlyMap<string, string> =>
+  new Map(
+    Array.from(
+      source.matchAll(ATTRIBUTE),
+      (matched) =>
+        [
+          matched.groups?.['key'] ?? '',
+          decodeEntities(matched.groups?.['value'] ?? ''),
+        ] as const,
+    ),
+  );

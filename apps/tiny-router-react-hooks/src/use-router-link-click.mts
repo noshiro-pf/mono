@@ -1,58 +1,6 @@
 import * as React from 'react';
 import type { ReadonlyRecord } from 'ts-type-forge';
 
-const isModifiedEvent = (
-  ev: ReadonlyRecord<'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey', boolean>,
-): boolean => ev.metaKey || ev.altKey || ev.ctrlKey || ev.shiftKey;
-
-type Path = Readonly<{
-  /**
-   * A URL pathname, beginning with a /.
-   *
-   * @see https://github.com/remix-run/history/tree/main/docs/api-reference.md#location.pathname
-   */
-  pathname: string;
-
-  /**
-   * A URL search string, beginning with a ?.
-   *
-   * @see https://github.com/remix-run/history/tree/main/docs/api-reference.md#location.search
-   */
-  search: string;
-
-  /**
-   * A URL fragment identifier, beginning with a #.
-   *
-   * @see https://github.com/remix-run/history/tree/main/docs/api-reference.md#location.hash
-   */
-  hash: string;
-}>;
-
-/**
- * Creates a string URL path from the given pathname, search, and hash
- * components.
- *
- * @see https://github.com/remix-run/history/tree/main/docs/api-reference.md#createpath
- */
-const createPath = ({
-  pathname = '/',
-  search = '',
-  hash = '',
-}: Partial<Path>): string =>
-  `${pathname}${
-    search !== '' && search !== '?'
-      ? search.startsWith('?')
-        ? search
-        : `?${search}`
-      : ''
-  }${
-    hash !== '' && hash !== '#'
-      ? hash.startsWith('#')
-        ? hash
-        : `#${hash}`
-      : ''
-  }` as const;
-
 export const createRouterLinkClickHandler =
   ({
     replace: replaceProp,
@@ -114,3 +62,55 @@ export const useRouterLinkClick = (
     [replace, redirectFn, pushFn],
   );
 };
+
+const isModifiedEvent = (
+  ev: ReadonlyRecord<'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey', boolean>,
+): boolean => ev.metaKey || ev.altKey || ev.ctrlKey || ev.shiftKey;
+
+type Path = Readonly<{
+  /**
+   * A URL pathname, beginning with a /.
+   *
+   * @see https://github.com/remix-run/history/tree/main/docs/api-reference.md#location.pathname
+   */
+  pathname: string;
+
+  /**
+   * A URL search string, beginning with a ?.
+   *
+   * @see https://github.com/remix-run/history/tree/main/docs/api-reference.md#location.search
+   */
+  search: string;
+
+  /**
+   * A URL fragment identifier, beginning with a #.
+   *
+   * @see https://github.com/remix-run/history/tree/main/docs/api-reference.md#location.hash
+   */
+  hash: string;
+}>;
+
+/**
+ * Creates a string URL path from the given pathname, search, and hash
+ * components.
+ *
+ * @see https://github.com/remix-run/history/tree/main/docs/api-reference.md#createpath
+ */
+const createPath = ({
+  pathname = '/',
+  search = '',
+  hash = '',
+}: Partial<Path>): string =>
+  `${pathname}${
+    search !== '' && search !== '?'
+      ? search.startsWith('?')
+        ? search
+        : `?${search}`
+      : ''
+  }${
+    hash !== '' && hash !== '#'
+      ? hash.startsWith('#')
+        ? hash
+        : `#${hash}`
+      : ''
+  }` as const;

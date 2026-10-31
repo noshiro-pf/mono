@@ -223,6 +223,8 @@ const todayMergedOf = (
   return status.type === 'ready' ? status.activity.today.merged : undefined;
 };
 
+const cancelNothing = (): void => undefined;
+
 const setup = (): Readonly<{
   store: ReturnType<typeof createActivityStore>;
   loads: readonly Readonly<{ token: string; nowMs: number }>[];
@@ -289,8 +291,6 @@ const setup = (): Readonly<{
     },
   };
 };
-
-const cancelNothing = (): void => undefined;
 
 const settle = async (): Promise<void> => {
   await new Promise((resolve) => {

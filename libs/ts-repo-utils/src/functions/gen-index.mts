@@ -230,6 +230,257 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
 };
 
 /**
+ * Whether the index file about to be written is one the caller asked to keep.
+ *
+ * Matched against the path relative to the target directory alone, never
+ * against the bare file name — every index file in the tree shares that name,
+ * so `'index.mts'` would otherwise mean "generate nothing anywhere" instead of
+ * naming the one at the root of the walk.
+ *
+ * @param indexRelativePath - The index file's path relative to the target
+ *   directory, in this platform's separators.
+ * @param preserve - Glob patterns, in POSIX separators.
+ * @returns True if the file must be left as it is on disk.
+ */
+const isPreservedIndex = (
+  indexRelativePath: string,
+  preserve: readonly string[],
+): boolean => {
+  const normalized = indexRelativePath.split(path.sep).join('/');
+
+  return preserve.some((pattern) => micromatch.isMatch(normalized, pattern));
+};
+
+/**
+ * Determines if a file should be exported in the index file. A file is exported
+ * if:
+ *
+ * - It has one of the configured source extensions
+ * - It's not an index file itself
+ * - It doesn't match any exclusion patterns
+ *
+ * @param filePath - The relative path to the file from the target directory.
+ * @param absolutePath - The absolute path to the file.
+ * @param config - The merged configuration object.
+ * @returns True if the file should be exported.
+ */
+const shouldExportFile = ({
+  absolutePath,
+  filePath,
+  config,
+}: Readonly<{
+  absolutePath: string;
+  filePath: string;
+  config: GenIndexConfigInternal;
+}>): boolean => {
+  const fileName = path.basename(filePath);
+
+  const ext = path.extname(fileName);
+
+  // Must have the correct source extension
+  if (!config.targetExtensions.has(ext)) {
+    return false;
+  }
+
+  // Don't export the index file itself
+  if (
+    indexRegex.test(fileName) // Matches index.ts, index.mts, index.js, index.tsx
+  ) {
+    return false;
+  }
+
+  // Check against exclusion patterns
+  if (
+    config.exclude({
+      absolutePath,
+      relativePath: filePath,
+      fileName,
+    })
+  ) {
+    return false;
+  }
+
+  return true;
+};
+
+/**
+ * The module specifiers a generated index file re-exports, sorted.
+ *
+ * Returns `undefined` for anything this generator would not have written —
+ * a hand-written barrel with named re-exports, say — so that the caller falls
+ * back to writing the file rather than assuming it is already correct.
+ *
+ * @param source - Contents of an index file.
+ * @returns The sorted specifiers, or `undefined` if the file is not a plain
+ *   list of `export * from '...';` statements.
+ */
+const exportedSpecifiers = (source: string): readonly string[] | undefined => {
+  const lines = source
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line !== '');
+
+  if (Arr.isEmpty(lines)) {
+    return undefined; // Not a module at all; write the file.
+  }
+
+  if (Arr.isFixedLengthArray(1, lines) && lines[0] === emptyIndexContent) {
+    return [];
+  }
+
+  const mut_specifiers: string[] = [];
+
+  for (const line of lines) {
+    const matched = exportAllRegex.exec(line);
+
+    const specifier = matched?.groups?.['specifier'];
+
+    if (specifier === undefined) {
+      return undefined;
+    }
+
+    mut_specifiers.push(specifier);
+  }
+
+  return mut_specifiers.toSorted();
+};
+
+/**
+ * Whether the index file already on disk re-exports exactly what would be
+ * generated for it, so that nothing has to be written.
+ *
+ * The comparison is on the set of module specifiers rather than on the bytes,
+ * because the two never match: this generator emits double quotes, no trailing
+ * newline and subdirectories first, and the formatter that runs afterwards
+ * rewrites all three. Comparing bytes would therefore report every index file
+ * as changed on every run, which is what the check exists to avoid.
+ *
+ * Avoiding the write is not an optimization. `genIndex` is called from a
+ * package's `build`, and in a workspace those builds run several at a time,
+ * each importing its siblings' sources through `tsx`. A rewritten index file
+ * is unreadable while it is being rewritten, so a barrel touched needlessly is
+ * a sibling build that fails with "does not provide an export named ..." for
+ * no reason at all.
+ *
+ * @param indexPath - Absolute path of the index file.
+ * @param indexContent - The content that would be written.
+ * @returns True when the file exists and exports the same specifiers.
+ */
+const indexIsUpToDate = async (
+  indexPath: string,
+  indexContent: string,
+): Promise<boolean> => {
+  const existing = await Result.fromPromise(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFile(indexPath, 'utf8'),
+  );
+
+  if (Result.isErr(existing)) {
+    return false; // No index file yet, or one that cannot be read.
+  }
+
+  const onDisk = exportedSpecifiers(existing.value);
+
+  const generated = exportedSpecifiers(indexContent);
+
+  if (onDisk === undefined || generated === undefined) {
+    return false;
+  }
+
+  return (
+    onDisk.length === generated.length &&
+    onDisk.every((specifier, index) => specifier === generated[index])
+  );
+};
+
+/**
+ * Writes `content` to `filePath` through a temporary file in the same
+ * directory, so that a reader never sees the file half-written.
+ *
+ * `fs.writeFile` truncates first, which leaves a window in which the file is
+ * empty or partial; `rename` within one directory replaces it in one step.
+ *
+ * @param filePath - Absolute path of the file to write.
+ * @param content - The content to write.
+ */
+const writeFileAtomic = async (
+  filePath: string,
+  content: string,
+): Promise<void> => {
+  const tempPath = `${filePath}.${process.pid}.tmp` as const;
+
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.writeFile(tempPath, content);
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.rename(tempPath, filePath);
+  } catch (error) {
+    await fs.rm(tempPath, { force: true });
+
+    throw error;
+  }
+};
+
+/**
+ * The extension a module specifier needs for a source file with this
+ * extension.
+ *
+ * TypeScript resolves a specifier by the name the file *emits*, so the answer
+ * follows the source's own extension rather than one configured value: `.mts`
+ * emits `.mjs`, while `.tsx` — like `.ts` — emits `.js`. A directory holding
+ * both therefore needs two different extensions, which is why
+ * `exportStatementExtension` cannot decide this on its own; it is the fallback
+ * for extensions with no known emit.
+ */
+const specifierExtension = (
+  sourceExtension: string,
+  fallback: `.${string}`,
+): `.${string}` =>
+  hasKey(emittedExtensions, sourceExtension)
+    ? emittedExtensions[sourceExtension]
+    : fallback;
+
+/**
+ * Generates the content for an index file.
+ *
+ * @param subDirectories - Array of subdirectory names.
+ * @param filesToExport - Array of file names to export.
+ * @param config - The merged configuration object.
+ * @returns The index file content.
+ */
+const generateIndexContent = (
+  subDirectories: readonly string[],
+  filesToExport: readonly string[],
+  config: GenIndexConfigInternal,
+): string => {
+  const exportStatements = [
+    ...subDirectories.map((subDir) =>
+      config.exportStatementExtension === 'none'
+        ? `export * from "./${subDir}";`
+        : `export * from "./${subDir}/index${specifierExtension(
+            config.indexFileExtension,
+            config.exportStatementExtension,
+          )}";`,
+    ),
+    ...filesToExport.map((file) => {
+      const fileNameWithoutExt = path.basename(file, path.extname(file));
+
+      return config.exportStatementExtension === 'none'
+        ? `export * from "./${fileNameWithoutExt}";`
+        : `export * from "./${fileNameWithoutExt}${specifierExtension(
+            path.extname(file),
+            config.exportStatementExtension,
+          )}";`;
+    }),
+  ] as const;
+
+  return Arr.isEmpty(exportStatements)
+    ? emptyIndexContent
+    : exportStatements.join('\n');
+};
+
+/**
  * Generates an index.ts file for the given directory. Recursively calls itself
  * for subdirectories.
  *
@@ -338,28 +589,6 @@ const generateIndexFileForDir = async (
   }
 };
 
-/**
- * Whether the index file about to be written is one the caller asked to keep.
- *
- * Matched against the path relative to the target directory alone, never
- * against the bare file name — every index file in the tree shares that name,
- * so `'index.mts'` would otherwise mean "generate nothing anywhere" instead of
- * naming the one at the root of the walk.
- *
- * @param indexRelativePath - The index file's path relative to the target
- *   directory, in this platform's separators.
- * @param preserve - Glob patterns, in POSIX separators.
- * @returns True if the file must be left as it is on disk.
- */
-const isPreservedIndex = (
-  indexRelativePath: string,
-  preserve: readonly string[],
-): boolean => {
-  const normalized = indexRelativePath.split(path.sep).join('/');
-
-  return preserve.some((pattern) => micromatch.isMatch(normalized, pattern));
-};
-
 if (import.meta.vitest !== undefined) {
   describe('isPreservedIndex', () => {
     test.each([
@@ -389,58 +618,6 @@ if (import.meta.vitest !== undefined) {
 
 const indexRegex = /^index\.[cm]?[jt]s[x]?$/u;
 
-/**
- * Determines if a file should be exported in the index file. A file is exported
- * if:
- *
- * - It has one of the configured source extensions
- * - It's not an index file itself
- * - It doesn't match any exclusion patterns
- *
- * @param filePath - The relative path to the file from the target directory.
- * @param absolutePath - The absolute path to the file.
- * @param config - The merged configuration object.
- * @returns True if the file should be exported.
- */
-const shouldExportFile = ({
-  absolutePath,
-  filePath,
-  config,
-}: Readonly<{
-  absolutePath: string;
-  filePath: string;
-  config: GenIndexConfigInternal;
-}>): boolean => {
-  const fileName = path.basename(filePath);
-
-  const ext = path.extname(fileName);
-
-  // Must have the correct source extension
-  if (!config.targetExtensions.has(ext)) {
-    return false;
-  }
-
-  // Don't export the index file itself
-  if (
-    indexRegex.test(fileName) // Matches index.ts, index.mts, index.js, index.tsx
-  ) {
-    return false;
-  }
-
-  // Check against exclusion patterns
-  if (
-    config.exclude({
-      absolutePath,
-      relativePath: filePath,
-      fileName,
-    })
-  ) {
-    return false;
-  }
-
-  return true;
-};
-
 if (import.meta.vitest !== undefined) {
   describe('index file regex', () => {
     test.each([
@@ -459,25 +636,6 @@ if (import.meta.vitest !== undefined) {
     });
   });
 }
-
-/**
- * The extension a module specifier needs for a source file with this
- * extension.
- *
- * TypeScript resolves a specifier by the name the file *emits*, so the answer
- * follows the source's own extension rather than one configured value: `.mts`
- * emits `.mjs`, while `.tsx` — like `.ts` — emits `.js`. A directory holding
- * both therefore needs two different extensions, which is why
- * `exportStatementExtension` cannot decide this on its own; it is the fallback
- * for extensions with no known emit.
- */
-const specifierExtension = (
-  sourceExtension: string,
-  fallback: `.${string}`,
-): `.${string}` =>
-  hasKey(emittedExtensions, sourceExtension)
-    ? emittedExtensions[sourceExtension]
-    : fallback;
 
 const emittedExtensions = {
   '.cjs': '.cjs',
@@ -514,101 +672,11 @@ if (import.meta.vitest !== undefined) {
   });
 }
 
-/**
- * Whether the index file already on disk re-exports exactly what would be
- * generated for it, so that nothing has to be written.
- *
- * The comparison is on the set of module specifiers rather than on the bytes,
- * because the two never match: this generator emits double quotes, no trailing
- * newline and subdirectories first, and the formatter that runs afterwards
- * rewrites all three. Comparing bytes would therefore report every index file
- * as changed on every run, which is what the check exists to avoid.
- *
- * Avoiding the write is not an optimization. `genIndex` is called from a
- * package's `build`, and in a workspace those builds run several at a time,
- * each importing its siblings' sources through `tsx`. A rewritten index file
- * is unreadable while it is being rewritten, so a barrel touched needlessly is
- * a sibling build that fails with "does not provide an export named ..." for
- * no reason at all.
- *
- * @param indexPath - Absolute path of the index file.
- * @param indexContent - The content that would be written.
- * @returns True when the file exists and exports the same specifiers.
- */
-const indexIsUpToDate = async (
-  indexPath: string,
-  indexContent: string,
-): Promise<boolean> => {
-  const existing = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(indexPath, 'utf8'),
-  );
-
-  if (Result.isErr(existing)) {
-    return false; // No index file yet, or one that cannot be read.
-  }
-
-  const onDisk = exportedSpecifiers(existing.value);
-
-  const generated = exportedSpecifiers(indexContent);
-
-  if (onDisk === undefined || generated === undefined) {
-    return false;
-  }
-
-  return (
-    onDisk.length === generated.length &&
-    onDisk.every((specifier, index) => specifier === generated[index])
-  );
-};
-
 /** What a directory with nothing to re-export gets. */
 const emptyIndexContent = 'export {};';
 
 /** Matches one `export * from '...';` statement, quoted either way. */
 const exportAllRegex = /^export \* from ['"](?<specifier>[^'"]+)['"];$/u;
-
-/**
- * The module specifiers a generated index file re-exports, sorted.
- *
- * Returns `undefined` for anything this generator would not have written —
- * a hand-written barrel with named re-exports, say — so that the caller falls
- * back to writing the file rather than assuming it is already correct.
- *
- * @param source - Contents of an index file.
- * @returns The sorted specifiers, or `undefined` if the file is not a plain
- *   list of `export * from '...';` statements.
- */
-const exportedSpecifiers = (source: string): readonly string[] | undefined => {
-  const lines = source
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line !== '');
-
-  if (Arr.isEmpty(lines)) {
-    return undefined; // Not a module at all; write the file.
-  }
-
-  if (Arr.isFixedLengthArray(1, lines) && lines[0] === emptyIndexContent) {
-    return [];
-  }
-
-  const mut_specifiers: string[] = [];
-
-  for (const line of lines) {
-    const matched = exportAllRegex.exec(line);
-
-    const specifier = matched?.groups?.['specifier'];
-
-    if (specifier === undefined) {
-      return undefined;
-    }
-
-    mut_specifiers.push(specifier);
-  }
-
-  return mut_specifiers.toSorted();
-};
 
 if (import.meta.vitest !== undefined) {
   describe('exportedSpecifiers', () => {
@@ -649,71 +717,3 @@ if (import.meta.vitest !== undefined) {
     });
   });
 }
-
-/**
- * Writes `content` to `filePath` through a temporary file in the same
- * directory, so that a reader never sees the file half-written.
- *
- * `fs.writeFile` truncates first, which leaves a window in which the file is
- * empty or partial; `rename` within one directory replaces it in one step.
- *
- * @param filePath - Absolute path of the file to write.
- * @param content - The content to write.
- */
-const writeFileAtomic = async (
-  filePath: string,
-  content: string,
-): Promise<void> => {
-  const tempPath = `${filePath}.${process.pid}.tmp` as const;
-
-  try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.writeFile(tempPath, content);
-
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.rename(tempPath, filePath);
-  } catch (error) {
-    await fs.rm(tempPath, { force: true });
-
-    throw error;
-  }
-};
-
-/**
- * Generates the content for an index file.
- *
- * @param subDirectories - Array of subdirectory names.
- * @param filesToExport - Array of file names to export.
- * @param config - The merged configuration object.
- * @returns The index file content.
- */
-const generateIndexContent = (
-  subDirectories: readonly string[],
-  filesToExport: readonly string[],
-  config: GenIndexConfigInternal,
-): string => {
-  const exportStatements = [
-    ...subDirectories.map((subDir) =>
-      config.exportStatementExtension === 'none'
-        ? `export * from "./${subDir}";`
-        : `export * from "./${subDir}/index${specifierExtension(
-            config.indexFileExtension,
-            config.exportStatementExtension,
-          )}";`,
-    ),
-    ...filesToExport.map((file) => {
-      const fileNameWithoutExt = path.basename(file, path.extname(file));
-
-      return config.exportStatementExtension === 'none'
-        ? `export * from "./${fileNameWithoutExt}";`
-        : `export * from "./${fileNameWithoutExt}${specifierExtension(
-            path.extname(file),
-            config.exportStatementExtension,
-          )}";`;
-    }),
-  ] as const;
-
-  return Arr.isEmpty(exportStatements)
-    ? emptyIndexContent
-    : exportStatements.join('\n');
-};

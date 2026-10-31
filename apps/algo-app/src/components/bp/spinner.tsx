@@ -25,16 +25,6 @@ const STROKE_WIDTH = 4;
 
 const MIN_STROKE_WIDTH = 16;
 
-const getViewBox = (strokeWidth: number): string => {
-  const radius = R + strokeWidth / 2;
-
-  const viewBoxX = (50 - radius).toFixed(2);
-
-  const viewBoxWidth = (radius * 2).toFixed(2);
-
-  return `${viewBoxX} ${viewBoxX} ${viewBoxWidth} ${viewBoxWidth}`;
-};
-
 /**
  * An indeterminate Blueprint spinner; the look and the rotation are
  * `spinner.module.css`.
@@ -80,4 +70,14 @@ export const Spinner = ({ size: _size }: Props): JSX.Element => {
       </div>
     </div>
   );
+};
+
+const getViewBox = (strokeWidth: number): string => {
+  const radius = R + strokeWidth / 2;
+
+  const viewBoxX = (50 - radius).toFixed(2);
+
+  const viewBoxWidth = (radius * 2).toFixed(2);
+
+  return `${viewBoxX} ${viewBoxX} ${viewBoxWidth} ${viewBoxWidth}`;
 };

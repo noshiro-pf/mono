@@ -1353,6 +1353,17 @@ const pointerOf = (
   };
 };
 
+/** The group whose title `target` is part of, by its `data-group-id`. */
+const groupIdOf = (target: EventTarget | null): GroupId | undefined => {
+  const element =
+    target instanceof Element ? target.closest('[data-group-id]') : null;
+
+  const id =
+    element instanceof SVGElement ? element.dataset['groupId'] : undefined;
+
+  return id !== undefined && GroupIdCodec.is(id) ? id : undefined;
+};
+
 /**
  * The node under a press, by the `data-node-id` of the element it landed in,
  * and where that node is, or the group whose title it landed on, by its
@@ -1385,17 +1396,6 @@ const grabOf = (
   return node === undefined
     ? undefined
     : { kind: 'node', id, origin: { x: node.x, y: node.y } };
-};
-
-/** The group whose title `target` is part of, by its `data-group-id`. */
-const groupIdOf = (target: EventTarget | null): GroupId | undefined => {
-  const element =
-    target instanceof Element ? target.closest('[data-group-id]') : null;
-
-  const id =
-    element instanceof SVGElement ? element.dataset['groupId'] : undefined;
-
-  return id !== undefined && GroupIdCodec.is(id) ? id : undefined;
 };
 
 /**

@@ -275,6 +275,63 @@ const shouldComplete = (
   !child.isCompleted &&
   (child.parents.every((p) => p.isCompleted) || child.canEmitNoMore());
 
+const hasCircularDependencyFrom = (
+  node: Observable<unknown>,
+  mut_visited: MutableSet<Observable<unknown>>,
+  mut_inPath: MutableSet<Observable<unknown>>,
+): boolean => {
+  if (mut_inPath.has(node)) {
+    return true;
+  }
+
+  if (mut_visited.has(node)) {
+    return false;
+  }
+
+  mut_visited.add(node);
+
+  mut_inPath.add(node);
+
+  if (node.kind !== 'root') {
+    for (const parent of node.parents) {
+      if (hasCircularDependencyFrom(parent, mut_visited, mut_inPath)) {
+        return true;
+      }
+    }
+  }
+
+  mut_inPath.delete(node);
+
+  return false;
+};
+
+/**
+ * Detects circular dependencies by walking the full ancestor chain of the
+ * child's parents and checking whether the child already appears among them.
+ *
+ * @throws {Error} if a circular dependency is detected
+ */
+const detectCircularDependency = (child: ChildNode): void => {
+  const mut_visited = new Set<Observable<unknown>>();
+
+  const mut_inPath = new Set<Observable<unknown>>([
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+    child as Observable<unknown>,
+  ]);
+
+  for (const parent of child.parents) {
+    if (hasCircularDependencyFrom(parent, mut_visited, mut_inPath)) {
+      // A programming error (invariant violation), not a recoverable
+      // failure. `panic` marks the error it throws, so the `Result` /
+      // `AsyncResult` boundaries rethrow it rather than turning an invariant
+      // violation into an `Err` a caller might handle (Sumi D-48 / D-53).
+      panic(
+        'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
+      );
+    }
+  }
+};
+
 /** Registers a child to its parents. */
 const registerChild = (child: ChildNode): void => {
   if (checksCircularDependency) {
@@ -320,60 +377,3 @@ const isDevelopmentProcess = (): boolean => {
  * bundle).
  */
 export const checksCircularDependency: boolean = isDevelopmentProcess();
-
-/**
- * Detects circular dependencies by walking the full ancestor chain of the
- * child's parents and checking whether the child already appears among them.
- *
- * @throws {Error} if a circular dependency is detected
- */
-const detectCircularDependency = (child: ChildNode): void => {
-  const mut_visited = new Set<Observable<unknown>>();
-
-  const mut_inPath = new Set<Observable<unknown>>([
-    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    child as Observable<unknown>,
-  ]);
-
-  for (const parent of child.parents) {
-    if (hasCircularDependencyFrom(parent, mut_visited, mut_inPath)) {
-      // A programming error (invariant violation), not a recoverable
-      // failure. `panic` marks the error it throws, so the `Result` /
-      // `AsyncResult` boundaries rethrow it rather than turning an invariant
-      // violation into an `Err` a caller might handle (Sumi D-48 / D-53).
-      panic(
-        'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
-      );
-    }
-  }
-};
-
-const hasCircularDependencyFrom = (
-  node: Observable<unknown>,
-  mut_visited: MutableSet<Observable<unknown>>,
-  mut_inPath: MutableSet<Observable<unknown>>,
-): boolean => {
-  if (mut_inPath.has(node)) {
-    return true;
-  }
-
-  if (mut_visited.has(node)) {
-    return false;
-  }
-
-  mut_visited.add(node);
-
-  mut_inPath.add(node);
-
-  if (node.kind !== 'root') {
-    for (const parent of node.parents) {
-      if (hasCircularDependencyFrom(parent, mut_visited, mut_inPath)) {
-        return true;
-      }
-    }
-  }
-
-  mut_inPath.delete(node);
-
-  return false;
-};

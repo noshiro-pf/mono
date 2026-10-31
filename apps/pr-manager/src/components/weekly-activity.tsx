@@ -125,6 +125,103 @@ export const WeeklyActivity = (): JSX.Element => {
   );
 };
 
+const ColumnHeads = (): JSX.Element => (
+  <thead>
+    <tr>
+      <th scope={constant('col')}>{constant('Day')}</th>
+      <th scope={constant('col')}>{constant('Pull requests merged')}</th>
+      <th scope={constant('col')}>{constant('Issues closed')}</th>
+    </tr>
+  </thead>
+);
+
+const CountCell = ({ day, kind, scaleMax }: CellProps): JSX.Element => (
+  <td>
+    <div class={constant('weekly-activity-cell')}>
+      <span class={constant('weekly-activity-count')}>
+        <ExternalLink
+          href={derive([day], (counted) =>
+            activitySearchUrl(reportSource, kind, counted),
+          )}
+        >
+          {derive([day], (counted) => counted[kind].toString())}
+        </ExternalLink>
+      </span>
+      <span
+        aria-hidden={constant('true')}
+        class={constant('weekly-activity-track')}
+      >
+        <span
+          class={constant('weekly-activity-bar')}
+          data-kind={constant(kind)}
+          style={{
+            width: derive([day, scaleMax], (counted, max) =>
+              Num.isNonZero(max)
+                ? `${Num.div(counted[kind] * 100, max)}%`
+                : '0%',
+            ),
+          }}
+        />
+      </span>
+    </div>
+  </td>
+);
+
+/** One day's row; `day` is a week's entry or today, read from the whole. */
+const DayRow = ({
+  day,
+  scaleMax,
+}: Readonly<{
+  day: Bindable<DayActivity>;
+  scaleMax: Bindable<number>;
+}>): JSX.Element => (
+  <tr>
+    <th scope={constant('row')}>
+      <time dateTime={derive([day], ({ key }) => key)}>
+        {derive([day], ({ startMs }) => DAY_LABEL.format(startMs))}
+      </time>
+    </th>
+    <CountCell day={day} kind={'merged'} scaleMax={scaleMax} />
+    <CountCell day={day} kind={'closed'} scaleMax={scaleMax} />
+  </tr>
+);
+
+const WeekTable = ({
+  activity$,
+  scaleMax,
+}: Readonly<{
+  activity$: InitializedObservable<Week>;
+  scaleMax: Bindable<number>;
+}>): JSX.Element => (
+  <table class={constant('weekly-activity-table')}>
+    <ColumnHeads />
+    <tbody>
+      <For items={view(activity$, ({ days }) => days)} key={(day) => day.key}>
+        {(day$) => <DayRow day={day$} scaleMax={scaleMax} />}
+      </For>
+    </tbody>
+    <tfoot>
+      <tr>
+        <th scope={constant('row')}>{constant('Total')}</th>
+        <td class={constant('weekly-activity-total')}>
+          <span class={constant('weekly-activity-count')}>
+            {view(activity$, ({ days: all }) =>
+              all.reduce((sum, day) => sum + day.merged, 0),
+            )}
+          </span>
+        </td>
+        <td class={constant('weekly-activity-total')}>
+          <span class={constant('weekly-activity-count')}>
+            {view(activity$, ({ days: all }) =>
+              all.reduce((sum, day) => sum + day.closed, 0),
+            )}
+          </span>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+);
+
 const ActivitySections = ({
   activity$,
 }: Readonly<{ activity$: InitializedObservable<Week> }>): JSX.Element => {
@@ -168,108 +265,11 @@ const ActivitySections = ({
   );
 };
 
-const WeekTable = ({
-  activity$,
-  scaleMax,
-}: Readonly<{
-  activity$: InitializedObservable<Week>;
-  scaleMax: Bindable<number>;
-}>): JSX.Element => (
-  <table class={constant('weekly-activity-table')}>
-    <ColumnHeads />
-    <tbody>
-      <For items={view(activity$, ({ days }) => days)} key={(day) => day.key}>
-        {(day$) => <DayRow day={day$} scaleMax={scaleMax} />}
-      </For>
-    </tbody>
-    <tfoot>
-      <tr>
-        <th scope={constant('row')}>{constant('Total')}</th>
-        <td class={constant('weekly-activity-total')}>
-          <span class={constant('weekly-activity-count')}>
-            {view(activity$, ({ days: all }) =>
-              all.reduce((sum, day) => sum + day.merged, 0),
-            )}
-          </span>
-        </td>
-        <td class={constant('weekly-activity-total')}>
-          <span class={constant('weekly-activity-count')}>
-            {view(activity$, ({ days: all }) =>
-              all.reduce((sum, day) => sum + day.closed, 0),
-            )}
-          </span>
-        </td>
-      </tr>
-    </tfoot>
-  </table>
-);
-
-const ColumnHeads = (): JSX.Element => (
-  <thead>
-    <tr>
-      <th scope={constant('col')}>{constant('Day')}</th>
-      <th scope={constant('col')}>{constant('Pull requests merged')}</th>
-      <th scope={constant('col')}>{constant('Issues closed')}</th>
-    </tr>
-  </thead>
-);
-
-/** One day's row; `day` is a week's entry or today, read from the whole. */
-const DayRow = ({
-  day,
-  scaleMax,
-}: Readonly<{
-  day: Bindable<DayActivity>;
-  scaleMax: Bindable<number>;
-}>): JSX.Element => (
-  <tr>
-    <th scope={constant('row')}>
-      <time dateTime={derive([day], ({ key }) => key)}>
-        {derive([day], ({ startMs }) => DAY_LABEL.format(startMs))}
-      </time>
-    </th>
-    <CountCell day={day} kind={'merged'} scaleMax={scaleMax} />
-    <CountCell day={day} kind={'closed'} scaleMax={scaleMax} />
-  </tr>
-);
-
 type CellProps = Readonly<{
   day: Bindable<DayActivity>;
   kind: ActivityKind;
   scaleMax: Bindable<number>;
 }>;
-
-const CountCell = ({ day, kind, scaleMax }: CellProps): JSX.Element => (
-  <td>
-    <div class={constant('weekly-activity-cell')}>
-      <span class={constant('weekly-activity-count')}>
-        <ExternalLink
-          href={derive([day], (counted) =>
-            activitySearchUrl(reportSource, kind, counted),
-          )}
-        >
-          {derive([day], (counted) => counted[kind].toString())}
-        </ExternalLink>
-      </span>
-      <span
-        aria-hidden={constant('true')}
-        class={constant('weekly-activity-track')}
-      >
-        <span
-          class={constant('weekly-activity-bar')}
-          data-kind={constant(kind)}
-          style={{
-            width: derive([day, scaleMax], (counted, max) =>
-              Num.isNonZero(max)
-                ? `${Num.div(counted[kind] * 100, max)}%`
-                : '0%',
-            ),
-          }}
-        />
-      </span>
-    </div>
-  </td>
-);
 
 const failedOf = (
   status$: InitializedObservable<ActivityStatus>,

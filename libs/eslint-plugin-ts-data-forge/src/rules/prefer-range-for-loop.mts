@@ -286,6 +286,14 @@ const isNonIntegerNumberLiteral = (
   );
 };
 
+const isWithin = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  container: TSESTree.Node,
+): boolean =>
+  container.range[0] <= node.range[0] && node.range[1] <= container.range[1];
+
 /**
  * Whether the loop variable declared by `declaration` is written anywhere but
  * its initializer and the loop's `update`.
@@ -307,11 +315,3 @@ const isAssignedOutsideUpdate = (
         reference.init !== true &&
         !isWithin(reference.identifier, update),
     );
-
-const isWithin = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  container: TSESTree.Node,
-): boolean =>
-  container.range[0] <= node.range[0] && node.range[1] <= container.range[1];

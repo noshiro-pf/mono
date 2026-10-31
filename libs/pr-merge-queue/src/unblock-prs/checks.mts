@@ -121,6 +121,142 @@ export const reportedChecksOf = (
 export type CheckContextNode = t.TypeOf<typeof CheckContextNodeSchema>;
 
 /**
+ * `checks` is what {@link listRequiredChecks} reported for the head commit;
+ * `requiredContexts` is what the ruleset asks for. The difference between the
+ * two is the point: a context in the second and not the first has not
+ * reported yet, and GitHub will not merge until it does. `running` is every
+ * check on the head that has not finished ({@link listRunningChecks}); while
+ * it is not empty the required ones may be the round before speaking, so
+ * they cannot pass the pull request.
+ *
+ * Nor can they fail it when they finished before the round still running
+ * began: the round `skip-ci` cancelled, as `open-pr` opens every pull request
+ * under it, leaves its aggregates red, and reading that red as this round's
+ * set a pull request aside while its first real round was under way (#2246).
+ * Such a failure waits for the round to end, as a check not yet reported
+ * does. So does one that finished after the round began but whose workflow
+ * has a newer run still going: the round `skip-ci` was put on for can take
+ * long enough to be cancelled that its aggregate goes red after the round
+ * taking its place has started, and only the run that replaced it says it is
+ * the round before (#2463). A failure of this round still fails the pull
+ * request at once.
+ *
+ * The verdict itself is `pr-report-core`'s `summarizeChecks`, which
+ * `pr-report` and the page reach theirs through, so the worker and the report
+ * cannot disagree about one; what is here turns what GitHub reports into
+ * the states that reads.
+ */
+export const summarizeChecks = (
+  checks: readonly ReportedCheck[],
+  requiredContexts: readonly string[],
+  running: readonly RunningCheck[],
+): ChecksSummary => {
+  const roundStartedMs = earliestStart(running);
+
+  const isOfRoundBefore = (check: ReportedCheck): boolean => {
+    const completedMs = epochMsOf(check.completedAt);
+
+    return (
+      (roundStartedMs !== undefined &&
+        completedMs !== undefined &&
+        completedMs < roundStartedMs) ||
+      isSuperseded(check, running)
+    );
+  };
+
+  const isFailureOfThisRound = (check: ReportedCheck): boolean =>
+    isFailure(check) && !isOfRoundBefore(check);
+
+  const mut_reported = new Map<string, ContextState>();
+
+  for (const check of checks) {
+    const state = stateOf(check, isOfRoundBefore(check));
+
+    const previous = mut_reported.get(check.name);
+
+    mut_reported.set(
+      check.name,
+      previous === undefined ? state : combineContextStates(previous, state),
+    );
+  }
+
+  const pendingNames = new Set(
+    checks
+      .filter((check) => mut_reported.get(check.name) === 'pending')
+      .map((check) => check.name),
+  );
+
+  const stillRunning = running
+    .map(({ name }) => name)
+    .filter((name) => !pendingNames.has(name));
+
+  const summary = summarizeContexts({
+    // What the ruleset asks for, and whatever `--required` reported besides:
+    // all of it, when the rules could not be read.
+    required: Arr.uniq([
+      ...requiredContexts,
+      ...checks.map((check) => check.name),
+    ]),
+    reported: mut_reported,
+    // `skip-ci` is the queue's to read (`queueStanding`), not the checks'.
+    paused: false,
+    // No checks at all means they have not been reported yet — which is
+    // also all that can be said when the ruleset could not be read.
+    running: Arr.isNonEmpty(stillRunning) || !Arr.isNonEmpty(checks),
+    // A required context that has not reported is waited for wherever the
+    // pull request points: the worker arms what it judges green, and an
+    // armed pull request stacked on a branch no ruleset covers merges into
+    // it at once.
+    baseCovered: true,
+  });
+
+  return {
+    ...summary,
+    failedRuns: checks
+      .filter(isFailureOfThisRound)
+      .map(({ name, link }) => ({ name, link })),
+    running: stillRunning,
+  };
+};
+
+/** Everything the merge is still waiting for, reported and unreported. */
+export const describeWaitingOn = (summary: ChecksSummary): string => {
+  const waiting = [
+    ...summary.pending,
+    ...summary.missing.map((context) => `${context} (not reported yet)`),
+    ...summary.running.map((name) => `${name} (running)`),
+  ] as const;
+
+  return Arr.isNonEmpty(waiting) ? waiting.join(', ') : 'checks to be reported';
+};
+
+/**
+ * One page of the head commit's contexts, from `after` on; `null` when the
+ * head has no rollup yet.
+ */
+const readRollupPage = async (
+  api: ApiContext,
+  prNumber: number,
+  after: string | undefined,
+): Promise<Result<RollupPage | null, string>> =>
+  Result.map(
+    await graphqlQuery(
+      api,
+      CHECKS_QUERY,
+      {
+        owner: api.repo.owner,
+        name: api.repo.name,
+        number: prNumber,
+        ...(after === undefined ? {} : { after }),
+      },
+      ChecksAnswerSchema,
+    ),
+    (answer) =>
+      answer.repository.pullRequest.commits.nodes[0]?.commit.statusCheckRollup
+        ?.contexts ?? null,
+  );
+
+/**
  * Every context of the pull request's head commit, page by page. A head with
  * none reported yet — right after a push — is an empty list.
  */
@@ -158,32 +294,6 @@ const readCheckContexts = async (
     `#${prNumber} has more than ${MAX_PAGES * PAGE_SIZE} checks on its head`,
   );
 };
-
-/**
- * One page of the head commit's contexts, from `after` on; `null` when the
- * head has no rollup yet.
- */
-const readRollupPage = async (
-  api: ApiContext,
-  prNumber: number,
-  after: string | undefined,
-): Promise<Result<RollupPage | null, string>> =>
-  Result.map(
-    await graphqlQuery(
-      api,
-      CHECKS_QUERY,
-      {
-        owner: api.repo.owner,
-        name: api.repo.name,
-        number: prNumber,
-        ...(after === undefined ? {} : { after }),
-      },
-      ChecksAnswerSchema,
-    ),
-    (answer) =>
-      answer.repository.pullRequest.commits.nodes[0]?.commit.statusCheckRollup
-        ?.contexts ?? null,
-  );
 
 type RollupPage = Readonly<{
   pageInfo: Readonly<{ hasNextPage: boolean; endCursor: string | null }>;
@@ -302,29 +412,6 @@ const startedAtOf = (context: CheckContextNode): string =>
     ? context.createdAt
     : context.startedAt) ?? ZERO_TIME;
 
-const reportedCheckOf = (context: CheckContextNode): ReportedCheck =>
-  context.__typename === 'StatusContext'
-    ? ({
-        name: context.context,
-        bucket: bucketOf(context.state),
-        link: context.targetUrl ?? '',
-        startedAt: context.createdAt,
-        completedAt: context.createdAt,
-        workflow: '',
-      } as const)
-    : ({
-        name: context.name,
-        bucket: bucketOf(
-          context.status === 'COMPLETED'
-            ? (context.conclusion ?? '')
-            : context.status,
-        ),
-        link: context.detailsUrl ?? '',
-        startedAt: context.startedAt ?? ZERO_TIME,
-        completedAt: context.completedAt ?? ZERO_TIME,
-        workflow: context.checkSuite?.workflowRun?.workflow.name ?? '',
-      } as const);
-
 /**
  * A check run's conclusion, or its status while it runs, or a commit
  * status's state, in `gh pr checks`'s buckets. Anything else — `QUEUED`,
@@ -354,115 +441,28 @@ const bucketOf = (state: string): string => {
   }
 };
 
-/**
- * `checks` is what {@link listRequiredChecks} reported for the head commit;
- * `requiredContexts` is what the ruleset asks for. The difference between the
- * two is the point: a context in the second and not the first has not
- * reported yet, and GitHub will not merge until it does. `running` is every
- * check on the head that has not finished ({@link listRunningChecks}); while
- * it is not empty the required ones may be the round before speaking, so
- * they cannot pass the pull request.
- *
- * Nor can they fail it when they finished before the round still running
- * began: the round `skip-ci` cancelled, as `open-pr` opens every pull request
- * under it, leaves its aggregates red, and reading that red as this round's
- * set a pull request aside while its first real round was under way (#2246).
- * Such a failure waits for the round to end, as a check not yet reported
- * does. So does one that finished after the round began but whose workflow
- * has a newer run still going: the round `skip-ci` was put on for can take
- * long enough to be cancelled that its aggregate goes red after the round
- * taking its place has started, and only the run that replaced it says it is
- * the round before (#2463). A failure of this round still fails the pull
- * request at once.
- *
- * The verdict itself is `pr-report-core`'s `summarizeChecks`, which
- * `pr-report` and the page reach theirs through, so the worker and the report
- * cannot disagree about one; what is here turns what GitHub reports into
- * the states that reads.
- */
-export const summarizeChecks = (
-  checks: readonly ReportedCheck[],
-  requiredContexts: readonly string[],
-  running: readonly RunningCheck[],
-): ChecksSummary => {
-  const roundStartedMs = earliestStart(running);
-
-  const isOfRoundBefore = (check: ReportedCheck): boolean => {
-    const completedMs = epochMsOf(check.completedAt);
-
-    return (
-      (roundStartedMs !== undefined &&
-        completedMs !== undefined &&
-        completedMs < roundStartedMs) ||
-      isSuperseded(check, running)
-    );
-  };
-
-  const isFailureOfThisRound = (check: ReportedCheck): boolean =>
-    isFailure(check) && !isOfRoundBefore(check);
-
-  const mut_reported = new Map<string, ContextState>();
-
-  for (const check of checks) {
-    const state = stateOf(check, isOfRoundBefore(check));
-
-    const previous = mut_reported.get(check.name);
-
-    mut_reported.set(
-      check.name,
-      previous === undefined ? state : combineContextStates(previous, state),
-    );
-  }
-
-  const pendingNames = new Set(
-    checks
-      .filter((check) => mut_reported.get(check.name) === 'pending')
-      .map((check) => check.name),
-  );
-
-  const stillRunning = running
-    .map(({ name }) => name)
-    .filter((name) => !pendingNames.has(name));
-
-  const summary = summarizeContexts({
-    // What the ruleset asks for, and whatever `--required` reported besides:
-    // all of it, when the rules could not be read.
-    required: Arr.uniq([
-      ...requiredContexts,
-      ...checks.map((check) => check.name),
-    ]),
-    reported: mut_reported,
-    // `skip-ci` is the queue's to read (`queueStanding`), not the checks'.
-    paused: false,
-    // No checks at all means they have not been reported yet — which is
-    // also all that can be said when the ruleset could not be read.
-    running: Arr.isNonEmpty(stillRunning) || !Arr.isNonEmpty(checks),
-    // A required context that has not reported is waited for wherever the
-    // pull request points: the worker arms what it judges green, and an
-    // armed pull request stacked on a branch no ruleset covers merges into
-    // it at once.
-    baseCovered: true,
-  });
-
-  return {
-    ...summary,
-    failedRuns: checks
-      .filter(isFailureOfThisRound)
-      .map(({ name, link }) => ({ name, link })),
-    running: stillRunning,
-  };
-};
-
-/** Everything the merge is still waiting for, reported and unreported. */
-export const describeWaitingOn = (summary: ChecksSummary): string => {
-  const waiting = [
-    ...summary.pending,
-    ...summary.missing.map((context) => `${context} (not reported yet)`),
-    ...summary.running.map((name) => `${name} (running)`),
-  ] as const;
-
-  return Arr.isNonEmpty(waiting) ? waiting.join(', ') : 'checks to be reported';
-};
+const reportedCheckOf = (context: CheckContextNode): ReportedCheck =>
+  context.__typename === 'StatusContext'
+    ? ({
+        name: context.context,
+        bucket: bucketOf(context.state),
+        link: context.targetUrl ?? '',
+        startedAt: context.createdAt,
+        completedAt: context.createdAt,
+        workflow: '',
+      } as const)
+    : ({
+        name: context.name,
+        bucket: bucketOf(
+          context.status === 'COMPLETED'
+            ? (context.conclusion ?? '')
+            : context.status,
+        ),
+        link: context.detailsUrl ?? '',
+        startedAt: context.startedAt ?? ZERO_TIME,
+        completedAt: context.completedAt ?? ZERO_TIME,
+        workflow: context.checkSuite?.workflowRun?.workflow.name ?? '',
+      } as const);
 
 const isFailure = (check: ReportedCheck): boolean =>
   check.bucket === 'fail' || check.bucket === 'cancel';
@@ -481,6 +481,15 @@ const stateOf = (check: ReportedCheck, ofRoundBefore: boolean): ContextState =>
       : check.bucket === 'skipping'
         ? 'skipped'
         : 'passed';
+
+/** The run id in a job's link (`…/actions/runs/<id>/job/<id>`). */
+const workflowRunId = (link: string): number | undefined => {
+  const id = /\/actions\/runs\/(\d+)\//u.exec(link)?.[1];
+
+  return id === undefined
+    ? undefined
+    : Result.unwrapOkOr(Num.safeParseInt(id), undefined);
+};
 
 /**
  * Whether a newer run of the check's own workflow is still running. Run ids
@@ -506,15 +515,6 @@ const isSuperseded = (
       );
     })
   );
-};
-
-/** The run id in a job's link (`…/actions/runs/<id>/job/<id>`). */
-const workflowRunId = (link: string): number | undefined => {
-  const id = /\/actions\/runs\/(\d+)\//u.exec(link)?.[1];
-
-  return id === undefined
-    ? undefined
-    : Result.unwrapOkOr(Num.safeParseInt(id), undefined);
 };
 
 /**

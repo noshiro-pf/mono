@@ -78,6 +78,17 @@ const WORD_BREAK_FROM = 0.6;
 
 const ELLIPSIS_UNITS = 1;
 
+/** Half-width katakana (U+FF61–U+FF9F) is narrow; the rest of these is wide. */
+const charUnits = (char: string): number => {
+  const codePoint = char.codePointAt(0) ?? 0;
+
+  return 0xff_61 <= codePoint && codePoint <= 0xff_9f
+    ? 1
+    : 0x11_00 <= codePoint
+      ? 2
+      : 1;
+};
+
 /** How many of `chars`, from the start, fit in `maxUnits`. */
 const takeUnits = (chars: readonly string[], maxUnits: number): number => {
   let mut_units = 0;
@@ -91,15 +102,4 @@ const takeUnits = (chars: readonly string[], maxUnits: number): number => {
   }
 
   return chars.length;
-};
-
-/** Half-width katakana (U+FF61–U+FF9F) is narrow; the rest of these is wide. */
-const charUnits = (char: string): number => {
-  const codePoint = char.codePointAt(0) ?? 0;
-
-  return 0xff_61 <= codePoint && codePoint <= 0xff_9f
-    ? 1
-    : 0x11_00 <= codePoint
-      ? 2
-      : 1;
 };

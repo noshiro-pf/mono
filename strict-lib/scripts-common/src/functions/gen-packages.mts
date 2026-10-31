@@ -54,18 +54,6 @@ const packageJsonType = t.record({
 
 type PackageJson = t.TypeOf<typeof packageJsonType>;
 
-const parsePackageJson = (jsonStr: string): PackageJson | undefined => {
-  const parsed = Json.parse(jsonStr);
-
-  if (Result.isErr(parsed)) {
-    return undefined;
-  }
-
-  const result = packageJsonType.validate(parsed.value);
-
-  return Result.isOk(result) ? result.value : undefined;
-};
-
 /**
  * Generate the published package: `output/lib`, with `libs/` and
  * `libs-branded/` inside it.
@@ -111,6 +99,64 @@ export const genPackages = async (
   const bundleResult = await genBundlePackage(ctx, version, tsTypeForgeRange);
 
   return Result.isErr(bundleResult) ? bundleResult : Result.ok(undefined);
+};
+
+const parsePackageJson = (jsonStr: string): PackageJson | undefined => {
+  const parsed = Json.parse(jsonStr);
+
+  if (Result.isErr(parsed)) {
+    return undefined;
+  }
+
+  const result = packageJsonType.validate(parsed.value);
+
+  return Result.isOk(result) ? result.value : undefined;
+};
+
+/**
+ * "lib.es2018.asynciterable.d.ts" -> "es2018/asynciterable"
+ * "lib.es2015.symbol.wellknown.d.ts" -> "es2015/symbol-wellknown"
+ *
+ * Mirrors TypeScript's own `getLibraryNameFromLibFileName`: only the FIRST
+ * component after the lib group becomes a path segment, and any further
+ * components are joined with `-`. Replacing every dot with `/` instead nests the
+ * three-component lib files one level too deep (`es2015/symbol/wellknown`),
+ * which is a subpath `libReplacement` never looks up — so those lib files are
+ * published but silently ignored, and consumers keep getting the stock
+ * declarations for them.
+ */
+const libFilenameToPath = (libFilename: string): string => {
+  const stem = libFilename.replaceAll('lib.', '').replaceAll('.d.ts', '');
+
+  const firstDot = stem.indexOf('.');
+
+  return firstDot === -1
+    ? stem
+    : `${stem.slice(0, firstDot)}/${stem
+        .slice(firstDot + 1)
+        .replaceAll('.', '-')}`;
+};
+
+const getPackageDirListFromLibFiles = async (
+  ctx: Context,
+  config: ConverterConfig,
+): Promise<
+  readonly Readonly<{ filename: string; packageRelativePath: string }>[]
+> => {
+  const libFilesDir =
+    ctx.paths.strictTsLib.output[
+      config.useBrandedNumber ? 'libFilesBranded' : 'libFiles'
+    ].$;
+
+  const filenames = await fs.readdir(libFilesDir);
+
+  return filenames
+    .filter((filename) => /^lib.*\.d\.ts$/u.test(filename))
+    .filter((filename) => filename !== 'lib.d.ts')
+    .map((filename) => ({
+      filename,
+      packageRelativePath: libFilenameToPath(filename),
+    }));
 };
 
 // Generate declarations into the published package, one flavor per call
@@ -246,6 +292,165 @@ const createPackages = async (
   }
 
   return Result.ok(undefined);
+};
+
+/**
+ * The second route, which only TypeScript 7 reads. It saves the `prepare`
+ * script, and is worth offering only with what it does not reach said
+ * beside it.
+ */
+const pathsAlternative = (libName: string): readonly string[] => [
+  '**Or, if nothing runs TypeScript 6, `paths`.** TypeScript 7 also reads',
+  '`paths` for this, so instead of linking you can point it at the flavor you',
+  'want:',
+  '',
+  '```jsonc',
+  '{',
+  '    "compilerOptions": {',
+  '        "libReplacement": true,',
+  '        "paths": {',
+  `            "@typescript/lib-*": ["./node_modules/${libName}/libs/*"],`,
+  '        },',
+  '    },',
+  '}',
+  '```',
+  '',
+  'Three things to watch, because all of them fail silently — the replacement',
+  'simply does not happen, with no error:',
+  '',
+  '- **TypeScript 6 and earlier ignore it.** That includes your linter:',
+  '  typescript-eslint needs the JavaScript compiler API, which TypeScript 7.0',
+  '  does not export, so it runs a 6.x `typescript` and sees the stock library.',
+  '  Use the linker if anything type-aware runs on TypeScript 6.',
+  '- **`paths` is replaced, not merged, by a config that `extends` another**,',
+  '  so it has to be written in whichever config TypeScript actually loads.',
+  '- **The path is relative to the config that contains it**, which in a',
+  '  monorepo package is usually `../../node_modules/…`.',
+  '',
+];
+
+/**
+ * How a consumer points TypeScript at the flavor they chose — which differs by
+ * TypeScript version, so each package documents only its own.
+ *
+ * Every version resolves a replacement by name, which the linker answers;
+ * TypeScript 7 alone also reads `paths`, so its package offers that as well.
+ * Measured, package against its own TypeScript:
+ *
+ * | TypeScript | route                    | `libReplacement`                      |
+ * | :--------- | :----------------------- | :------------------------------------ |
+ * | 5.0 – 5.7  | name lookup              | not a known option; setting it errors |
+ * | 5.8 – 5.9  | name lookup              | defaults to on                        |
+ * | 6.x        | name lookup              | defaults to **off**; must be set      |
+ * | 7.x        | name lookup, or `paths`  | defaults to **off**; must be set      |
+ *
+ * The linker comes first even at 7.x, because a project type-checking with
+ * TypeScript 7 still lints with a 6.x one: typescript-eslint needs the
+ * JavaScript compiler API, which TypeScript 7.0's package does not export.
+ */
+const setupSection = (
+  libName: string,
+  typescriptVersion: string,
+): readonly string[] => {
+  const [major = 0, minor = 0] = typescriptVersion
+    .split('.')
+    .map((part) => Result.unwrapOkOr(Num.safeParseInt(part), 0));
+
+  return [
+    ...(major >= 7
+      ? [
+          `TypeScript ${major}.${minor} looks a replacement up as \`@typescript/lib-*\`,`,
+          'an ordinary package name. Run the linker this package ships to supply',
+          'those names. It creates one symlink per lib group under',
+          '`node_modules/@typescript/`:',
+        ]
+      : [
+          `TypeScript ${major}.${minor} resolves \`@typescript/lib-*\` as ordinary`,
+          'package names, through a fixed Node10 lookup — it does not read `paths`',
+          'for this. Run the linker this package ships to supply those names. It',
+          'creates one symlink per lib group under `node_modules/@typescript/`:',
+        ]),
+    '',
+    '```sh',
+    `npx ${libName}-link             # plain \`number\``,
+    `npx ${libName}-link --branded   # branded number types`,
+    '```',
+    '',
+    'Add it to your own `package.json` so that a reinstall restores the links:',
+    '',
+    '```jsonc',
+    '{',
+    '    "scripts": {',
+    `        "prepare": "${libName}-link",`,
+    '    },',
+    '}',
+    '```',
+    '',
+    ...(major >= 6
+      ? [
+          'Then set `libReplacement` — it defaults to off from TypeScript 6, and',
+          'the lookup does not happen without it:',
+          '',
+          '```jsonc',
+          '{',
+          '    "compilerOptions": {',
+          '        "libReplacement": true,',
+          '    },',
+          '}',
+          '```',
+          '',
+        ]
+      : minor >= 8
+        ? [
+            'Nothing goes in `tsconfig.json`: `libReplacement` defaults to on at',
+            `TypeScript ${major}.${minor}. Just do not turn it off.`,
+            '',
+          ]
+        : [
+            'Nothing goes in `tsconfig.json`: the lookup is unconditional at',
+            `TypeScript ${major}.${minor}, where \`libReplacement\` is not yet a known`,
+            'option — setting it is an error.',
+            '',
+          ]),
+    '`--unlink` removes the links again.',
+    '',
+    ...(major >= 7 ? pathsAlternative(libName) : []),
+  ];
+};
+
+/**
+ * The bundle's changelog, taken from the harness that changesets actually
+ * manages. The two share a version — the `fixed` group keeps every harness on
+ * one, and this package's `version` is written from it — so their entries are
+ * the same. Only the heading differs: the harness is named `…-source`, and a
+ * consumer reading this on npm wants the name they installed.
+ *
+ * `changeset version` rewrites the harness changelog before
+ * `strict-lib:gen:packages` runs, so the entry for the new version is already
+ * there by the time this copies it.
+ */
+const bundleChangelog = async (
+  harnessDir: string,
+  libName: string,
+): Promise<string> => {
+  const harnessChangelog = await fs
+    .readFile(path.resolve(harnessDir, CHANGELOG_FILE), 'utf8')
+    .catch(() => undefined);
+
+  // Before the first release there is nothing to carry over, and the file
+  // still has to exist: the changesets action reads it either way.
+  if (harnessChangelog === undefined) {
+    return `# ${libName}\n`;
+  }
+
+  const [heading, ...rest] = harnessChangelog.split('\n');
+
+  // Swap the harness's `# …-source` heading for the published name, and keep
+  // everything below it. A harness that somehow has no heading keeps its whole
+  // text, under a heading of ours.
+  return heading?.startsWith('# ') === true
+    ? `# ${libName}\n${rest.join('\n')}`
+    : `# ${libName}\n\n${harnessChangelog}`;
 };
 
 /**
@@ -430,211 +635,6 @@ const genBundlePackage = async (
   console.info(`${bundleDir} (bundle package) generated.`);
 
   return Result.ok(undefined);
-};
-
-/**
- * How a consumer points TypeScript at the flavor they chose — which differs by
- * TypeScript version, so each package documents only its own.
- *
- * Every version resolves a replacement by name, which the linker answers;
- * TypeScript 7 alone also reads `paths`, so its package offers that as well.
- * Measured, package against its own TypeScript:
- *
- * | TypeScript | route                    | `libReplacement`                      |
- * | :--------- | :----------------------- | :------------------------------------ |
- * | 5.0 – 5.7  | name lookup              | not a known option; setting it errors |
- * | 5.8 – 5.9  | name lookup              | defaults to on                        |
- * | 6.x        | name lookup              | defaults to **off**; must be set      |
- * | 7.x        | name lookup, or `paths`  | defaults to **off**; must be set      |
- *
- * The linker comes first even at 7.x, because a project type-checking with
- * TypeScript 7 still lints with a 6.x one: typescript-eslint needs the
- * JavaScript compiler API, which TypeScript 7.0's package does not export.
- */
-const setupSection = (
-  libName: string,
-  typescriptVersion: string,
-): readonly string[] => {
-  const [major = 0, minor = 0] = typescriptVersion
-    .split('.')
-    .map((part) => Result.unwrapOkOr(Num.safeParseInt(part), 0));
-
-  return [
-    ...(major >= 7
-      ? [
-          `TypeScript ${major}.${minor} looks a replacement up as \`@typescript/lib-*\`,`,
-          'an ordinary package name. Run the linker this package ships to supply',
-          'those names. It creates one symlink per lib group under',
-          '`node_modules/@typescript/`:',
-        ]
-      : [
-          `TypeScript ${major}.${minor} resolves \`@typescript/lib-*\` as ordinary`,
-          'package names, through a fixed Node10 lookup — it does not read `paths`',
-          'for this. Run the linker this package ships to supply those names. It',
-          'creates one symlink per lib group under `node_modules/@typescript/`:',
-        ]),
-    '',
-    '```sh',
-    `npx ${libName}-link             # plain \`number\``,
-    `npx ${libName}-link --branded   # branded number types`,
-    '```',
-    '',
-    'Add it to your own `package.json` so that a reinstall restores the links:',
-    '',
-    '```jsonc',
-    '{',
-    '    "scripts": {',
-    `        "prepare": "${libName}-link",`,
-    '    },',
-    '}',
-    '```',
-    '',
-    ...(major >= 6
-      ? [
-          'Then set `libReplacement` — it defaults to off from TypeScript 6, and',
-          'the lookup does not happen without it:',
-          '',
-          '```jsonc',
-          '{',
-          '    "compilerOptions": {',
-          '        "libReplacement": true,',
-          '    },',
-          '}',
-          '```',
-          '',
-        ]
-      : minor >= 8
-        ? [
-            'Nothing goes in `tsconfig.json`: `libReplacement` defaults to on at',
-            `TypeScript ${major}.${minor}. Just do not turn it off.`,
-            '',
-          ]
-        : [
-            'Nothing goes in `tsconfig.json`: the lookup is unconditional at',
-            `TypeScript ${major}.${minor}, where \`libReplacement\` is not yet a known`,
-            'option — setting it is an error.',
-            '',
-          ]),
-    '`--unlink` removes the links again.',
-    '',
-    ...(major >= 7 ? pathsAlternative(libName) : []),
-  ];
-};
-
-/**
- * The second route, which only TypeScript 7 reads. It saves the `prepare`
- * script, and is worth offering only with what it does not reach said
- * beside it.
- */
-const pathsAlternative = (libName: string): readonly string[] => [
-  '**Or, if nothing runs TypeScript 6, `paths`.** TypeScript 7 also reads',
-  '`paths` for this, so instead of linking you can point it at the flavor you',
-  'want:',
-  '',
-  '```jsonc',
-  '{',
-  '    "compilerOptions": {',
-  '        "libReplacement": true,',
-  '        "paths": {',
-  `            "@typescript/lib-*": ["./node_modules/${libName}/libs/*"],`,
-  '        },',
-  '    },',
-  '}',
-  '```',
-  '',
-  'Three things to watch, because all of them fail silently — the replacement',
-  'simply does not happen, with no error:',
-  '',
-  '- **TypeScript 6 and earlier ignore it.** That includes your linter:',
-  '  typescript-eslint needs the JavaScript compiler API, which TypeScript 7.0',
-  '  does not export, so it runs a 6.x `typescript` and sees the stock library.',
-  '  Use the linker if anything type-aware runs on TypeScript 6.',
-  '- **`paths` is replaced, not merged, by a config that `extends` another**,',
-  '  so it has to be written in whichever config TypeScript actually loads.',
-  '- **The path is relative to the config that contains it**, which in a',
-  '  monorepo package is usually `../../node_modules/…`.',
-  '',
-];
-
-/**
- * The bundle's changelog, taken from the harness that changesets actually
- * manages. The two share a version — the `fixed` group keeps every harness on
- * one, and this package's `version` is written from it — so their entries are
- * the same. Only the heading differs: the harness is named `…-source`, and a
- * consumer reading this on npm wants the name they installed.
- *
- * `changeset version` rewrites the harness changelog before
- * `strict-lib:gen:packages` runs, so the entry for the new version is already
- * there by the time this copies it.
- */
-const bundleChangelog = async (
-  harnessDir: string,
-  libName: string,
-): Promise<string> => {
-  const harnessChangelog = await fs
-    .readFile(path.resolve(harnessDir, CHANGELOG_FILE), 'utf8')
-    .catch(() => undefined);
-
-  // Before the first release there is nothing to carry over, and the file
-  // still has to exist: the changesets action reads it either way.
-  if (harnessChangelog === undefined) {
-    return `# ${libName}\n`;
-  }
-
-  const [heading, ...rest] = harnessChangelog.split('\n');
-
-  // Swap the harness's `# …-source` heading for the published name, and keep
-  // everything below it. A harness that somehow has no heading keeps its whole
-  // text, under a heading of ours.
-  return heading?.startsWith('# ') === true
-    ? `# ${libName}\n${rest.join('\n')}`
-    : `# ${libName}\n\n${harnessChangelog}`;
-};
-
-const getPackageDirListFromLibFiles = async (
-  ctx: Context,
-  config: ConverterConfig,
-): Promise<
-  readonly Readonly<{ filename: string; packageRelativePath: string }>[]
-> => {
-  const libFilesDir =
-    ctx.paths.strictTsLib.output[
-      config.useBrandedNumber ? 'libFilesBranded' : 'libFiles'
-    ].$;
-
-  const filenames = await fs.readdir(libFilesDir);
-
-  return filenames
-    .filter((filename) => /^lib.*\.d\.ts$/u.test(filename))
-    .filter((filename) => filename !== 'lib.d.ts')
-    .map((filename) => ({
-      filename,
-      packageRelativePath: libFilenameToPath(filename),
-    }));
-};
-
-/**
- * "lib.es2018.asynciterable.d.ts" -> "es2018/asynciterable"
- * "lib.es2015.symbol.wellknown.d.ts" -> "es2015/symbol-wellknown"
- *
- * Mirrors TypeScript's own `getLibraryNameFromLibFileName`: only the FIRST
- * component after the lib group becomes a path segment, and any further
- * components are joined with `-`. Replacing every dot with `/` instead nests the
- * three-component lib files one level too deep (`es2015/symbol/wellknown`),
- * which is a subpath `libReplacement` never looks up — so those lib files are
- * published but silently ignored, and consumers keep getting the stock
- * declarations for them.
- */
-const libFilenameToPath = (libFilename: string): string => {
-  const stem = libFilename.replaceAll('lib.', '').replaceAll('.d.ts', '');
-
-  const firstDot = stem.indexOf('.');
-
-  return firstDot === -1
-    ? stem
-    : `${stem.slice(0, firstDot)}/${stem
-        .slice(firstDot + 1)
-        .replaceAll('.', '-')}`;
 };
 
 const getSubPackageVersion = async (

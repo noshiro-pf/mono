@@ -366,6 +366,14 @@ export type Step = Readonly<{
   coverage?: Readonly<{ packageDir: string }>;
 }>;
 
+const rootStep = (kind: StepKind, script: string): Step =>
+  ({
+    title: script,
+    kind,
+    cwd: '.',
+    args: ['run', script],
+  }) as const;
+
 /**
  * The `check:root:*` scripts the areas need: all of them for `root`, all but
  * the root program's own for `root-guards`. They run in parallel, as
@@ -430,14 +438,6 @@ const formatStep = (title: string, base: string): Step =>
     kind: 'format',
     cwd: '.',
     args: ['run', 'z:format-diff-from', base],
-  }) as const;
-
-const rootStep = (kind: StepKind, script: string): Step =>
-  ({
-    title: script,
-    kind,
-    cwd: '.',
-    args: ['run', script],
   }) as const;
 
 const packageStep = (

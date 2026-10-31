@@ -10,6 +10,53 @@ export type TargetRepo = Readonly<{
   repo: string;
 }>;
 
+/**
+ * 操作対象の repository を決める。
+ *
+ * 優先順位は以下の通り。
+ *
+ * 1. コマンドライン引数 `--owner` / `--repo`
+ * 2. 環境変数 `OWNER` / `REPO_NAME`
+ * 3. `git remote get-url origin`
+ * 4. `package.json` の `name` （ repo のみ ）
+ */
+export const resolveTargetRepo = async (): Promise<TargetRepo> => {
+  const sources: readonly Partial<TargetRepo>[] = [
+    fromCliArgs(),
+    fromEnv(),
+    fromGitRemote(),
+    await fromPackageJson(),
+  ] as const;
+
+  const owner = sources.map((s) => s.owner).find((v) => v !== undefined);
+
+  if (owner === undefined) {
+    throw new Error(
+      [
+        'owner を特定できませんでした。次のいずれかで指定してください:',
+        '  --owner <owner> （コマンドライン引数）',
+        '  OWNER=<owner>   （環境変数）',
+        '  git remote add origin <URL> （ origin の URL から推測されます）',
+      ].join('\n'),
+    );
+  }
+
+  const repo = sources.map((s) => s.repo).find((v) => v !== undefined);
+
+  if (repo === undefined) {
+    throw new Error(
+      [
+        'repository 名を特定できませんでした。次のいずれかで指定してください:',
+        '  --repo <repo>     （コマンドライン引数）',
+        '  REPO_NAME=<repo>  （環境変数）',
+        '  git remote add origin <URL> （ origin の URL から推測されます）',
+      ].join('\n'),
+    );
+  }
+
+  return { owner, repo };
+};
+
 /** `strict: false` の解析結果は string | boolean | 配列 になりうるため絞り込む。 */
 const pickString = (value: unknown): string | undefined =>
   value !== '' && isString(value) ? value : undefined;
@@ -94,51 +141,4 @@ const fromPackageJson = async (): Promise<Partial<TargetRepo>> => {
   } catch {
     return {};
   }
-};
-
-/**
- * 操作対象の repository を決める。
- *
- * 優先順位は以下の通り。
- *
- * 1. コマンドライン引数 `--owner` / `--repo`
- * 2. 環境変数 `OWNER` / `REPO_NAME`
- * 3. `git remote get-url origin`
- * 4. `package.json` の `name` （ repo のみ ）
- */
-export const resolveTargetRepo = async (): Promise<TargetRepo> => {
-  const sources: readonly Partial<TargetRepo>[] = [
-    fromCliArgs(),
-    fromEnv(),
-    fromGitRemote(),
-    await fromPackageJson(),
-  ] as const;
-
-  const owner = sources.map((s) => s.owner).find((v) => v !== undefined);
-
-  if (owner === undefined) {
-    throw new Error(
-      [
-        'owner を特定できませんでした。次のいずれかで指定してください:',
-        '  --owner <owner> （コマンドライン引数）',
-        '  OWNER=<owner>   （環境変数）',
-        '  git remote add origin <URL> （ origin の URL から推測されます）',
-      ].join('\n'),
-    );
-  }
-
-  const repo = sources.map((s) => s.repo).find((v) => v !== undefined);
-
-  if (repo === undefined) {
-    throw new Error(
-      [
-        'repository 名を特定できませんでした。次のいずれかで指定してください:',
-        '  --repo <repo>     （コマンドライン引数）',
-        '  REPO_NAME=<repo>  （環境変数）',
-        '  git remote add origin <URL> （ origin の URL から推測されます）',
-      ].join('\n'),
-    );
-  }
-
-  return { owner, repo };
 };

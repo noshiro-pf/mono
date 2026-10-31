@@ -326,6 +326,16 @@ const writersOf = (factory: string): readonly (readonly PathStep[])[] => {
 const samePath = (a: readonly PathStep[], b: readonly PathStep[]): boolean =>
   a.length === b.length && a.every((step, index) => step === b[index]);
 
+const keyName = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  key: TSESTree.PropertyName,
+): string | undefined =>
+  key.type === AST_NODE_TYPES.Identifier
+    ? key.name
+    : key.type === AST_NODE_TYPES.Literal && typeof key.value === 'string'
+      ? key.value
+      : undefined;
+
 /**
  * The steps from the pattern `root` down to `name`: array indices and object
  * keys, through defaults. `undefined` when the way down cannot be read (a
@@ -380,16 +390,6 @@ const pathTo = (
   return undefined;
 };
 
-const keyName = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  key: TSESTree.PropertyName,
-): string | undefined =>
-  key.type === AST_NODE_TYPES.Identifier
-    ? key.name
-    : key.type === AST_NODE_TYPES.Literal && typeof key.value === 'string'
-      ? key.value
-      : undefined;
-
 /**
  * Whether the functions passed to `call` run while an update propagates:
  * `call` is `.subscribe(…)`, or an operator called as an argument of
@@ -409,37 +409,6 @@ const callsBackDuringPropagation = (
   }
 
   return isPipeArgument(call);
-};
-
-/**
- * The synstate factory whose result a TypeScript `declaration` was bound
- * from, and where in it: `export const [a$, setA] = createState(0)` gives
- * `setA` the factory `createState` and the path `[1]`. The factory is
- * recognized by the import of the declaration's own file.
- */
-const tsFactoryBindingOf = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: ts.TypeChecker,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  declaration: ts.Declaration,
-): Readonly<{ factory: string; path: readonly PathStep[] }> | undefined => {
-  const binding = tsPathTo(declaration);
-
-  if (binding === undefined) {
-    return undefined;
-  }
-
-  const init = binding.variable.initializer;
-
-  const call = init === undefined ? undefined : skipTsTypeWrappers(init);
-
-  if (call === undefined || !ts.isCallExpression(call)) {
-    return undefined;
-  }
-
-  const factory = tsSynstateExportOf(checker, call.expression);
-
-  return factory === undefined ? undefined : { factory, path: binding.path };
 };
 
 /**
@@ -481,6 +450,27 @@ const tsPathTo = (
     : undefined;
 };
 
+const isSynstateImport = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  declaration: ts.ImportDeclaration | ts.JSDocImportTag,
+): boolean =>
+  ts.isImportDeclaration(declaration) &&
+  ts.isStringLiteral(declaration.moduleSpecifier) &&
+  declaration.moduleSpecifier.text === SYNSTATE_MODULE;
+
+/** `as`, `satisfies`, `!`, `<T>` and parentheses, in the TypeScript tree. */
+const skipTsTypeWrappers = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  expression: ts.Expression,
+): ts.Expression =>
+  ts.isParenthesizedExpression(expression) ||
+  ts.isAsExpression(expression) ||
+  ts.isSatisfiesExpression(expression) ||
+  ts.isNonNullExpression(expression) ||
+  ts.isTypeAssertionExpression(expression)
+    ? skipTsTypeWrappers(expression.expression)
+    : expression;
+
 /**
  * The name `callee` has among synstate's exports, when the file it is in
  * imports it from synstate: by name, under an alias, or through a namespace.
@@ -520,26 +510,36 @@ const tsSynstateExportOf = (
     : undefined;
 };
 
-const isSynstateImport = (
+/**
+ * The synstate factory whose result a TypeScript `declaration` was bound
+ * from, and where in it: `export const [a$, setA] = createState(0)` gives
+ * `setA` the factory `createState` and the path `[1]`. The factory is
+ * recognized by the import of the declaration's own file.
+ */
+const tsFactoryBindingOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  declaration: ts.ImportDeclaration | ts.JSDocImportTag,
-): boolean =>
-  ts.isImportDeclaration(declaration) &&
-  ts.isStringLiteral(declaration.moduleSpecifier) &&
-  declaration.moduleSpecifier.text === SYNSTATE_MODULE;
+  checker: ts.TypeChecker,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  declaration: ts.Declaration,
+): Readonly<{ factory: string; path: readonly PathStep[] }> | undefined => {
+  const binding = tsPathTo(declaration);
 
-/** `as`, `satisfies`, `!`, `<T>` and parentheses, in the TypeScript tree. */
-const skipTsTypeWrappers = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  expression: ts.Expression,
-): ts.Expression =>
-  ts.isParenthesizedExpression(expression) ||
-  ts.isAsExpression(expression) ||
-  ts.isSatisfiesExpression(expression) ||
-  ts.isNonNullExpression(expression) ||
-  ts.isTypeAssertionExpression(expression)
-    ? skipTsTypeWrappers(expression.expression)
-    : expression;
+  if (binding === undefined) {
+    return undefined;
+  }
+
+  const init = binding.variable.initializer;
+
+  const call = init === undefined ? undefined : skipTsTypeWrappers(init);
+
+  if (call === undefined || !ts.isCallExpression(call)) {
+    return undefined;
+  }
+
+  const factory = tsSynstateExportOf(checker, call.expression);
+
+  return factory === undefined ? undefined : { factory, path: binding.path };
+};
 
 /**
  * The identifier whose binding decides what `callee` calls: the callee itself

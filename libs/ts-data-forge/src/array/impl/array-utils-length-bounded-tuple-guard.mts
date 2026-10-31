@@ -102,11 +102,6 @@ export function isFixedLengthTuple(
   }
 }
 
-const hasFixedLength = (
-  len: SizeType.ArgArr,
-  array: readonly unknown[],
-): boolean => array.length === len;
-
 /**
  * Checks if an array has at least a specific length.
  *
@@ -150,11 +145,6 @@ export function isMinLengthTuple(
   }
 }
 
-const hasMinLength = (
-  len: SizeType.ArgArr,
-  array: readonly unknown[],
-): boolean => array.length >= len;
-
 /**
  * Checks if an array has at most a specific length.
  *
@@ -197,11 +187,6 @@ export function isMaxLengthTuple(
       return (array) => hasMaxLength(args[0], array);
   }
 }
-
-const hasMaxLength = (
-  len: SizeType.ArgArr,
-  array: readonly unknown[],
-): boolean => array.length <= len;
 
 /**
  * Checks if an array's length is within a specific inclusive range.
@@ -258,6 +243,21 @@ export function isBoundedLengthTuple(
       return (array) => isWithinBounds(args[0], args[1], array);
   }
 }
+
+const hasFixedLength = (
+  len: SizeType.ArgArr,
+  array: readonly unknown[],
+): boolean => array.length === len;
+
+const hasMinLength = (
+  len: SizeType.ArgArr,
+  array: readonly unknown[],
+): boolean => array.length >= len;
+
+const hasMaxLength = (
+  len: SizeType.ArgArr,
+  array: readonly unknown[],
+): boolean => array.length <= len;
 
 const isWithinBounds = (
   min: SizeType.ArgArr,

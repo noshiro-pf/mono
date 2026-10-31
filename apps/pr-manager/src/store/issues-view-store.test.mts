@@ -644,15 +644,6 @@ const setup = (
   };
 };
 
-/** One listed issue, and a page after it when `endCursor` says so. */
-const issueList = (endCursor: string | undefined): LoadedReport['issues'] =>
-  ({
-    items: [issueItem(1, [])],
-    totalCount: endCursor === undefined ? (1 as const) : (2 as const),
-    endCursor,
-    referenced: [],
-  }) as const;
-
 const issueItem = (
   number: number,
   startAfter: readonly number[],
@@ -668,6 +659,15 @@ const issueItem = (
     comments: 0,
     startAfter,
     misplacedMergeAfter: [],
+  }) as const;
+
+/** One listed issue, and a page after it when `endCursor` says so. */
+const issueList = (endCursor: string | undefined): LoadedReport['issues'] =>
+  ({
+    items: [issueItem(1, [])],
+    totalCount: endCursor === undefined ? (1 as const) : (2 as const),
+    endCursor,
+    referenced: [],
   }) as const;
 
 const referencedIssue = (

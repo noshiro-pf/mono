@@ -48,6 +48,15 @@ type Case = Readonly<{
   expected: 'allowed' | 'denied';
 }>;
 
+/** A plan as the app writes it; the rules do not read what `input` holds. */
+const plan = (): ReadonlyRecord<string, unknown> =>
+  ({
+    name: 'Plan',
+    createdAt: 0,
+    updatedAt: 0,
+    input: { profile: { birth: '1990-04' } },
+  }) as const;
+
 const cases = (): readonly Case[] => {
   const alice = { uid: 'alice', provider: 'google.com' } as const;
 
@@ -257,12 +266,3 @@ const outcome = async (
     throw error;
   }
 };
-
-/** A plan as the app writes it; the rules do not read what `input` holds. */
-const plan = (): ReadonlyRecord<string, unknown> =>
-  ({
-    name: 'Plan',
-    createdAt: 0,
-    updatedAt: 0,
-    input: { profile: { birth: '1990-04' } },
-  }) as const;

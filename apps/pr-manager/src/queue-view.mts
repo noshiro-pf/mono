@@ -257,6 +257,9 @@ export const queueViewOf = ({
   };
 };
 
+const labelNamesOf = (entry: ReportEntry): readonly string[] =>
+  entry.labels.map((label) => label.name);
+
 /** What `queueStanding` decides from, as the page read it. */
 const factsOf = ({ entry, mergeable }: QueuePull): QueueFacts =>
   ({
@@ -314,41 +317,13 @@ const isWaiting = (standing: QueueStanding): boolean => {
   }
 };
 
-const slotOf = (
-  pull: QueuePull,
-  facts: QueueFacts,
-  standing: QueueStanding,
-  defaultBranch: string,
-): QueueSlot => {
-  const { entry } = pull;
-
-  const release = isVersionBranch(entry.headRef, defaultBranch);
-
-  const said = sayStanding(standing);
-
-  return {
-    number: entry.number,
-    title: entry.title,
-    url: entry.url,
-    kind:
-      standing.kind === 'in-flight'
-        ? 'running'
-        : standing.kind === 'candidate'
-          ? 'next'
-          : standing.kind === 'failing'
-            ? 'failing'
-            : 'waiting',
-    note:
-      said?.note ??
-      (release
-        ? 'release'
-        : facts.mergeState === 'DIRTY'
-          ? 'conflicts'
-          : undefined),
-    detail: said?.detail,
-    priority: priorityOf(entry.labels),
-  };
-};
+/** `after #1`, or `after #1 +2` for one waiting on three. */
+const afterWord = (numbers: readonly number[]): string =>
+  Arr.isNonEmpty(numbers)
+    ? numbers.length === 1
+      ? (`after #${numbers[0]}` as const)
+      : (`after #${numbers[0]} +${numbers.length - 1}` as const)
+    : 'waiting';
 
 /** The word under the number of one that waits, and what it leaves out. */
 const sayStanding = (
@@ -406,13 +381,41 @@ const sayStanding = (
   }
 };
 
-/** `after #1`, or `after #1 +2` for one waiting on three. */
-const afterWord = (numbers: readonly number[]): string =>
-  Arr.isNonEmpty(numbers)
-    ? numbers.length === 1
-      ? (`after #${numbers[0]}` as const)
-      : (`after #${numbers[0]} +${numbers.length - 1}` as const)
-    : 'waiting';
+const slotOf = (
+  pull: QueuePull,
+  facts: QueueFacts,
+  standing: QueueStanding,
+  defaultBranch: string,
+): QueueSlot => {
+  const { entry } = pull;
+
+  const release = isVersionBranch(entry.headRef, defaultBranch);
+
+  const said = sayStanding(standing);
+
+  return {
+    number: entry.number,
+    title: entry.title,
+    url: entry.url,
+    kind:
+      standing.kind === 'in-flight'
+        ? 'running'
+        : standing.kind === 'candidate'
+          ? 'next'
+          : standing.kind === 'failing'
+            ? 'failing'
+            : 'waiting',
+    note:
+      said?.note ??
+      (release
+        ? 'release'
+        : facts.mergeState === 'DIRTY'
+          ? 'conflicts'
+          : undefined),
+    detail: said?.detail,
+    priority: priorityOf(entry.labels),
+  };
+};
 
 const outsideOf = (
   { entry }: QueuePull,
@@ -461,6 +464,3 @@ const SET_ASIDE_WORDS = {
   'unlabel-failed': 'skip-ci stuck',
   'watch-timeout': 'timeout',
 } as const satisfies ReadonlyRecord<SetAsideReason, string>;
-
-const labelNamesOf = (entry: ReportEntry): readonly string[] =>
-  entry.labels.map((label) => label.name);

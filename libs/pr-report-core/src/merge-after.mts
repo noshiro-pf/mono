@@ -44,29 +44,6 @@ export const parseStartAfter = (body: string): readonly number[] =>
   parseDeclaration(body, 'start-after');
 
 /**
- * `<Key>: #1901, #1903` in a body, anywhere in it, on as many lines as it
- * likes. Only this exact trailer is read — a sentence mentioning another pull
- * request is prose, and treating it as a declaration would make every
- * cross-reference a constraint.
- */
-const parseDeclaration = (
-  body: string,
-  key: 'merge-after' | 'start-after',
-): readonly number[] =>
-  Arr.uniq(
-    outsideCodeFences(body)
-      .matchAll(DECLARATION_LINE[key])
-      .flatMap((line) =>
-        (line.groups?.['refs'] ?? '').matchAll(NUMBER_REF).flatMap((ref) => {
-          const parsed = Num.safeParseInt(ref.groups?.['number'] ?? '');
-
-          return Result.isOk(parsed) ? [parsed.value] : [];
-        }),
-      )
-      .toArray(),
-  );
-
-/**
  * The body with the contents of its fenced code blocks blanked out, line
  * count preserved.
  *
@@ -148,6 +125,29 @@ export const findMergeAfterCycles = (
 
   return Array.from(mut_cycles.values());
 };
+
+/**
+ * `<Key>: #1901, #1903` in a body, anywhere in it, on as many lines as it
+ * likes. Only this exact trailer is read — a sentence mentioning another pull
+ * request is prose, and treating it as a declaration would make every
+ * cross-reference a constraint.
+ */
+const parseDeclaration = (
+  body: string,
+  key: 'merge-after' | 'start-after',
+): readonly number[] =>
+  Arr.uniq(
+    outsideCodeFences(body)
+      .matchAll(DECLARATION_LINE[key])
+      .flatMap((line) =>
+        (line.groups?.['refs'] ?? '').matchAll(NUMBER_REF).flatMap((ref) => {
+          const parsed = Num.safeParseInt(ref.groups?.['number'] ?? '');
+
+          return Result.isOk(parsed) ? [parsed.value] : [];
+        }),
+      )
+      .toArray(),
+  );
 
 const rotateToLowest = (cycle: readonly number[]): readonly number[] => {
   if (!Arr.isNonEmpty(cycle)) {

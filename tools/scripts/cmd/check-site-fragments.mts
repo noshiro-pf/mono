@@ -427,13 +427,6 @@ const quotedValue = (
 const contentDirOf = (packageDir: string): string =>
   `apps/${packageDir}/src/content/docs` as const;
 
-/**
- * Whether `relativePath` is a page of one of the docs sites; narrower than
- * `isSitePage` in `repo-files.mts`, which is any page of any app.
- */
-const isDocsSitePage = (relativePath: string): boolean =>
-  PAGE_EXTENSION.test(relativePath) && siteOfPage(relativePath) !== undefined;
-
 /** The site whose content directory holds `relativePath`. */
 const siteOfPage = (
   relativePath: string,
@@ -442,8 +435,21 @@ const siteOfPage = (
     relativePath.startsWith(`${contentDirOf(packageDir)}/`),
   );
 
+/**
+ * Whether `relativePath` is a page of one of the docs sites; narrower than
+ * `isSitePage` in `repo-files.mts`, which is any page of any app.
+ */
+const isDocsSitePage = (relativePath: string): boolean =>
+  PAGE_EXTENSION.test(relativePath) && siteOfPage(relativePath) !== undefined;
+
 const astroConfigOf = (packageDir: string): string =>
   `apps/${packageDir}/astro.config.mjs` as const;
+
+const decoded = (encoded: string): string => {
+  const result = Result.fromThrowable(() => decodeURI(encoded));
+
+  return Result.isErr(result) ? encoded : result.value;
+};
 
 /**
  * The link `href` points at, when it points into a site with a fragment.
@@ -489,6 +495,70 @@ const toSiteLink = (
 };
 
 /**
+ * The character a decimal, hexadecimal or named character reference stands
+ * for, or `undefined` when this check does not know.
+ */
+const decodedReference = (reference: string): string | undefined => {
+  // `&` and `;`.
+  const body = reference.slice(1, -1);
+
+  if (!body.startsWith('#')) {
+    return NAMED_REFERENCES.get(body);
+  }
+
+  const isHex = body.startsWith('#x') || body.startsWith('#X');
+
+  const digits = body.slice(isHex ? 2 : 1);
+
+  // Not a reference to CommonMark, so it is the text as written.
+  if (!(isHex ? HEX_DIGITS : DECIMAL_DIGITS).test(digits)) {
+    return reference;
+  }
+
+  const codePoint = isHex
+    ? Number.parseInt(digits, 16)
+    : Result.unwrapOkOr(Num.safeParseInt(digits), Number.NaN);
+
+  // CommonMark replaces U+0000, a surrogate and a code point past Unicode
+  // with U+FFFD.
+  return codePoint === 0 ||
+    (0xd8_00 <= codePoint && codePoint <= 0xdf_ff) ||
+    codePoint > 0x10_ff_ff
+    ? REPLACEMENT_CHARACTER
+    : String.fromCodePoint(codePoint);
+};
+
+/** {@link renderedText} of prose outside code spans, its escapes masked. */
+const renderedProse = (prose: string): string | undefined => {
+  const text = prose
+    .replaceAll(IMAGE, '')
+    .replaceAll(LINK, '$<text>')
+    .replaceAll(TAG, '')
+    .replaceAll(EMPHASIS, '');
+
+  const unknownReference = text
+    .matchAll(CHARACTER_REFERENCE)
+    .some(([reference]) => decodedReference(reference) === undefined);
+
+  return unknownReference
+    ? undefined
+    : text.replaceAll(
+        CHARACTER_REFERENCE,
+        (reference) => decodedReference(reference) ?? reference,
+      );
+};
+
+/** `text` with each masked character put back. */
+const unmasked = (text: string): string =>
+  Array.from(text, (char) => {
+    const codePoint = char.codePointAt(0) ?? 0;
+
+    return MASK_BASE <= codePoint && codePoint < MASK_END
+      ? String.fromCodePoint(codePoint - MASK_BASE)
+      : char;
+  }).join('');
+
+/**
  * The text a heading's Markdown renders to, which is what Astro slugs, or
  * `undefined` when this check cannot tell: with inline math, which KaTeX
  * renders, or a named character reference it does not know. Code spans and
@@ -525,74 +595,30 @@ const renderedText = (
   return rendered.includes(undefined) ? undefined : unmasked(rendered.join(''));
 };
 
-/** {@link renderedText} of prose outside code spans, its escapes masked. */
-const renderedProse = (prose: string): string | undefined => {
-  const text = prose
-    .replaceAll(IMAGE, '')
-    .replaceAll(LINK, '$<text>')
-    .replaceAll(TAG, '')
-    .replaceAll(EMPHASIS, '');
+const commonPrefixLength = (a: string, b: string): number => {
+  const chars = Array.from(a);
 
-  const unknownReference = text
-    .matchAll(CHARACTER_REFERENCE)
-    .some(([reference]) => decodedReference(reference) === undefined);
+  const other = Array.from(b);
 
-  return unknownReference
-    ? undefined
-    : text.replaceAll(
-        CHARACTER_REFERENCE,
-        (reference) => decodedReference(reference) ?? reference,
-      );
+  const mismatch = chars.findIndex((char, index) => other[index] !== char);
+
+  return mismatch === -1 ? Math.min(chars.length, other.length) : mismatch;
 };
 
-/** `text` with each masked character put back. */
-const unmasked = (text: string): string =>
-  Array.from(text, (char) => {
-    const codePoint = char.codePointAt(0) ?? 0;
+/** The page's ids that share the most leading characters with `fragment`. */
+const nearest = (
+  fragment: string,
+  ids: readonly string[],
+): readonly string[] => {
+  const scored = ids
+    .filter((id) => id !== TOP_ID)
+    .map((id) => ({ id, score: commonPrefixLength(fragment, id) }));
 
-    return MASK_BASE <= codePoint && codePoint < MASK_END
-      ? String.fromCodePoint(codePoint - MASK_BASE)
-      : char;
-  }).join('');
+  const best = Math.max(0, ...scored.map(({ score }) => score));
 
-/**
- * The character a decimal, hexadecimal or named character reference stands
- * for, or `undefined` when this check does not know.
- */
-const decodedReference = (reference: string): string | undefined => {
-  // `&` and `;`.
-  const body = reference.slice(1, -1);
-
-  if (!body.startsWith('#')) {
-    return NAMED_REFERENCES.get(body);
-  }
-
-  const isHex = body.startsWith('#x') || body.startsWith('#X');
-
-  const digits = body.slice(isHex ? 2 : 1);
-
-  // Not a reference to CommonMark, so it is the text as written.
-  if (!(isHex ? HEX_DIGITS : DECIMAL_DIGITS).test(digits)) {
-    return reference;
-  }
-
-  const codePoint = isHex
-    ? Number.parseInt(digits, 16)
-    : Result.unwrapOkOr(Num.safeParseInt(digits), Number.NaN);
-
-  // CommonMark replaces U+0000, a surrogate and a code point past Unicode
-  // with U+FFFD.
-  return codePoint === 0 ||
-    (0xd8_00 <= codePoint && codePoint <= 0xdf_ff) ||
-    codePoint > 0x10_ff_ff
-    ? REPLACEMENT_CHARACTER
-    : String.fromCodePoint(codePoint);
-};
-
-const decoded = (encoded: string): string => {
-  const result = Result.fromThrowable(() => decodeURI(encoded));
-
-  return Result.isErr(result) ? encoded : result.value;
+  return best === 0
+    ? []
+    : scored.filter(({ score }) => score === best).map(({ id }) => id);
 };
 
 const formatBroken = (
@@ -625,32 +651,6 @@ const formatBroken = (
     '&amp; &lt; &gt; &quot; &apos; &nbsp;) can be written in plain Markdown,',
     'or given an `id`.',
   ].join('\n');
-
-/** The page's ids that share the most leading characters with `fragment`. */
-const nearest = (
-  fragment: string,
-  ids: readonly string[],
-): readonly string[] => {
-  const scored = ids
-    .filter((id) => id !== TOP_ID)
-    .map((id) => ({ id, score: commonPrefixLength(fragment, id) }));
-
-  const best = Math.max(0, ...scored.map(({ score }) => score));
-
-  return best === 0
-    ? []
-    : scored.filter(({ score }) => score === best).map(({ id }) => id);
-};
-
-const commonPrefixLength = (a: string, b: string): number => {
-  const chars = Array.from(a);
-
-  const other = Array.from(b);
-
-  const mismatch = chars.findIndex((char, index) => other[index] !== char);
-
-  return mismatch === -1 ? Math.min(chars.length, other.length) : mismatch;
-};
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkSiteFragments().catch((error: unknown) =>

@@ -133,6 +133,21 @@ const escapeNames: ReadonlySet<string> = new Set<string>([
 ]);
 
 /**
+ * A declaration's own name (`const castMutable = …`, a parameter, a property
+ * key) is not a use of the escape.
+ */
+const isDeclarationName = (parent: TsNode, node: Identifier): boolean =>
+  (isVariableDeclaration(parent) ||
+    isParameterDeclaration(parent) ||
+    isBindingElement(parent) ||
+    isFunctionDeclaration(parent) ||
+    isPropertyAssignment(parent) ||
+    isPropertyDeclaration(parent) ||
+    isPropertySignatureDeclaration(parent) ||
+    isMethodDeclaration(parent)) &&
+  parent.name === node;
+
+/**
  * The expression that refers to the escape: the identifier, or the property
  * access it names (`tdf.castMutable`). `undefined` where the identifier is not
  * a reference at all — an import or export specifier, a declaration's name.
@@ -150,21 +165,6 @@ const referenceOf = (node: Identifier): TsNode | undefined => {
     ? undefined
     : node;
 };
-
-/**
- * A declaration's own name (`const castMutable = …`, a parameter, a property
- * key) is not a use of the escape.
- */
-const isDeclarationName = (parent: TsNode, node: Identifier): boolean =>
-  (isVariableDeclaration(parent) ||
-    isParameterDeclaration(parent) ||
-    isBindingElement(parent) ||
-    isFunctionDeclaration(parent) ||
-    isPropertyAssignment(parent) ||
-    isPropertyDeclaration(parent) ||
-    isPropertySignatureDeclaration(parent) ||
-    isMethodDeclaration(parent)) &&
-  parent.name === node;
 
 /** The name the identifier's symbol resolves to, through import aliases. */
 const resolvedName = (

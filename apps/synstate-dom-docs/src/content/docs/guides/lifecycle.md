@@ -54,13 +54,6 @@ const [showStats$] = createBooleanState(false);
 
 const [samples$] = createState<readonly number[]>([]);
 
-const Stats = (): JSX.Element => {
-    // Created only while the branch is shown, and disposed when it closes.
-    const total$ = samples$.pipe(map(Arr.sum));
-
-    return <p>{view(total$, (t) => `Total: ${t}`)}</p>;
-};
-
 export const Panel = (): JSX.Element => (
     <If
         cond={showStats$}
@@ -68,6 +61,13 @@ export const Panel = (): JSX.Element => (
         else={<p>{constant('Stats are hidden')}</p>}
     />
 );
+
+const Stats = (): JSX.Element => {
+    // Created only while the branch is shown, and disposed when it closes.
+    const total$ = samples$.pipe(map(Arr.sum));
+
+    return <p>{view(total$, (t) => `Total: ${t}`)}</p>;
+};
 ```
 
 That leaves one case: a heavy derivation defined globally and read only rarely. synstate-dom does not put such a derivation to sleep while nothing reads it. If that turns out to matter in a real application, it will be revisited.

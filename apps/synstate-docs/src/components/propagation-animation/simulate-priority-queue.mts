@@ -30,6 +30,48 @@ export const simulatePriorityQueue = (scenario: Scenario): Trace =>
     frames: framesOf(scenario),
   }) as const;
 
+const enqueueEdges = (
+  from: string,
+  result: EnqueueResult,
+): readonly EdgeHighlight[] =>
+  [
+    ...result.added.map((to) => ({ from, to, kind: 'queue' }) as const),
+    ...result.already.map((to) => ({ from, to, kind: 'already' }) as const),
+  ] as const;
+
+const emitCaption = (
+  node: string,
+  formula: string,
+  queued: EnqueueResult,
+): LocalizedText => {
+  const added: LocalizedText = Arr.isEmpty(queued.added)
+    ? ({ en: '', ja: '' } as const)
+    : ({
+        en: ` It enqueues ${list(queued.added, 'en')}.`,
+        ja: `${list(queued.added, 'ja')} をキューに入れます。`,
+      } as const);
+
+  const already: LocalizedText = Arr.isEmpty(queued.already)
+    ? ({ en: '', ja: '' } as const)
+    : ({
+        en: ` ${list(queued.already, 'en')} ${byCount(queued.already, 'is', 'are')} already in the queue, so ${byCount(queued.already, 'it is', 'they are')} not enqueued again.`,
+        ja: `${list(queued.already, 'ja')} はすでにキューにあるので、もう一度は入れません。`,
+      } as const);
+
+  const none: LocalizedText =
+    Arr.isEmpty(queued.added) && Arr.isEmpty(queued.already)
+      ? ({
+          en: ` ${node} has no children.`,
+          ja: `${node} に子はありません。`,
+        } as const)
+      : ({ en: '', ja: '' } as const);
+
+  return {
+    en: `${node} computes ${formula}.${added.en}${already.en}${none.en}`,
+    ja: `${node} は ${formula} を計算します。${added.ja}${already.ja}${none.ja}`,
+  };
+};
+
 const framesOf = (scenario: Scenario): readonly Frame[] => {
   const source = scenario.nodes[0];
 
@@ -225,15 +267,6 @@ type EnqueueResult = Readonly<{
   already: readonly string[];
 }>;
 
-const enqueueEdges = (
-  from: string,
-  result: EnqueueResult,
-): readonly EdgeHighlight[] =>
-  [
-    ...result.added.map((to) => ({ from, to, kind: 'queue' }) as const),
-    ...result.already.map((to) => ({ from, to, kind: 'already' }) as const),
-  ] as const;
-
 const codeLines = [
   ['sourceNext', 'A.next(input)'],
   ['while', 'while (queue is not empty)'],
@@ -251,36 +284,3 @@ const codeLines = [
 ] as const satisfies readonly CodeLine[];
 
 type CodeLineId = (typeof codeLines)[number][0];
-
-const emitCaption = (
-  node: string,
-  formula: string,
-  queued: EnqueueResult,
-): LocalizedText => {
-  const added: LocalizedText = Arr.isEmpty(queued.added)
-    ? ({ en: '', ja: '' } as const)
-    : ({
-        en: ` It enqueues ${list(queued.added, 'en')}.`,
-        ja: `${list(queued.added, 'ja')} をキューに入れます。`,
-      } as const);
-
-  const already: LocalizedText = Arr.isEmpty(queued.already)
-    ? ({ en: '', ja: '' } as const)
-    : ({
-        en: ` ${list(queued.already, 'en')} ${byCount(queued.already, 'is', 'are')} already in the queue, so ${byCount(queued.already, 'it is', 'they are')} not enqueued again.`,
-        ja: `${list(queued.already, 'ja')} はすでにキューにあるので、もう一度は入れません。`,
-      } as const);
-
-  const none: LocalizedText =
-    Arr.isEmpty(queued.added) && Arr.isEmpty(queued.already)
-      ? ({
-          en: ` ${node} has no children.`,
-          ja: `${node} に子はありません。`,
-        } as const)
-      : ({ en: '', ja: '' } as const);
-
-  return {
-    en: `${node} computes ${formula}.${added.en}${already.en}${none.en}`,
-    ja: `${node} は ${formula} を計算します。${added.ja}${already.ja}${none.ja}`,
-  };
-};

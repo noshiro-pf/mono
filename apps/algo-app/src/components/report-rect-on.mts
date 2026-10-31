@@ -81,6 +81,16 @@ const mut_pending: { measures: Measure[]; scheduled: boolean } = {
   scheduled: false,
 };
 
+const runCaught = <R,>(fn: () => R): R | undefined => {
+  try {
+    return fn();
+  } catch (error) {
+    console.error(error);
+
+    return undefined;
+  }
+};
+
 const flushMeasures = (): void => {
   const measures = mut_pending.measures;
 
@@ -108,16 +118,6 @@ const scheduleMeasure = (measure: Measure): void => {
   mut_pending.scheduled = true;
 
   queueMicrotask(flushMeasures);
-};
-
-const runCaught = <R,>(fn: () => R): R | undefined => {
-  try {
-    return fn();
-  } catch (error) {
-    console.error(error);
-
-    return undefined;
-  }
 };
 
 const isSameRect = (a: Rect, b: Rect): boolean =>

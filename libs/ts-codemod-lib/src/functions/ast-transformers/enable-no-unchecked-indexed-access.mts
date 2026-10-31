@@ -134,6 +134,249 @@ type EnableNoUncheckedIndexedAccessTransformerOptionsInternal = DeepReadonly<{
 type IndexReadExpression =
   tsm.ElementAccessExpression | tsm.PropertyAccessExpression;
 
+const typeIncludesUndefined = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: tsm.Type,
+): boolean =>
+  type.isUndefined() ||
+  (type.isUnion() && type.getUnionTypes().some((t) => t.isUndefined()));
+
+/**
+ * Whether the position the access sits in already accepts `undefined`, in
+ * which case `noUncheckedIndexedAccess` reports nothing there and the
+ * assertion would only be noise.
+ */
+const contextAcceptsUndefined = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: IndexReadExpression,
+): boolean => {
+  const contextualType = node.getContextualType();
+
+  return (
+    contextualType !== undefined &&
+    (contextualType.isAny() ||
+      contextualType.isUnknown() ||
+      typeIncludesUndefined(contextualType))
+  );
+};
+
+const isIgnoredByComment = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: IndexReadExpression,
+): boolean => {
+  if (hasDisableNextLineComment(node, TRANSFORMER_NAME)) {
+    return true;
+  }
+
+  // An index access is rarely the first thing on its own line, so the comment
+  // that covers it is the one above the statement it appears in.
+  const statement = node.getFirstAncestor((ancestor) =>
+    tsm.Node.isStatement(ancestor),
+  );
+
+  return (
+    statement !== undefined &&
+    hasDisableNextLineComment(statement, TRANSFORMER_NAME)
+  );
+};
+
+/** `node`, or the outermost of the parentheses written around it. */
+const outermostParenthesized = (node: tsm.Node): tsm.Node => {
+  const parent = node.getParent();
+
+  return parent?.isKind(tsm.SyntaxKind.ParenthesizedExpression) === true
+    ? outermostParenthesized(parent)
+    : node;
+};
+
+/**
+ * Whether the read sits in an optional chain that can short-circuit before it,
+ * as the `xs[0]?.toFixed` of `xs[0]?.toFixed()` does. `undefined` in such a
+ * type comes from the chain rather than from the index, and the chain already
+ * accounts for it; asserting there would assert away the author's own `?.`.
+ *
+ * Parentheses end a chain (`(a?.b).c` is not one), which is why the walk stops
+ * at anything that is not a chain link.
+ */
+const isInOptionalChain = (node: tsm.Node): boolean => {
+  if (
+    node.isKind(tsm.SyntaxKind.PropertyAccessExpression) ||
+    node.isKind(tsm.SyntaxKind.ElementAccessExpression) ||
+    node.isKind(tsm.SyntaxKind.CallExpression)
+  ) {
+    return (
+      node.hasQuestionDotToken() || isInOptionalChain(node.getExpression())
+    );
+  }
+
+  return (
+    node.isKind(tsm.SyntaxKind.NonNullExpression) &&
+    isInOptionalChain(node.getExpression())
+  );
+};
+
+/**
+ * `xs[0]!`, `xs[0] as T`, `<T>xs[0]`, `xs[0]?.foo`, `xs[0]?.()`, `xs[0]?.[1]`.
+ *
+ * `outer` is `node` with its parentheses (see
+ * {@link outermostParenthesized}); a chain continues from the access itself
+ * but is guarded from the outside of the parentheses (`(xs[0])?.foo`).
+ */
+const isAlreadyAssertedOrGuarded = (
+  node: tsm.Node,
+  outer: tsm.Node,
+  parent: tsm.Node,
+): boolean => {
+  if (
+    parent.isKind(tsm.SyntaxKind.NonNullExpression) ||
+    parent.isKind(tsm.SyntaxKind.AsExpression) ||
+    parent.isKind(tsm.SyntaxKind.TypeAssertionExpression)
+  ) {
+    return true;
+  }
+
+  if (isInOptionalChain(node)) {
+    return true;
+  }
+
+  // Only the object of the optional chain is guarded; an index argument such
+  // as the `xs[0]` of `m?.[xs[0]]` is not.
+  return (
+    (parent.isKind(tsm.SyntaxKind.PropertyAccessExpression) ||
+      parent.isKind(tsm.SyntaxKind.ElementAccessExpression) ||
+      parent.isKind(tsm.SyntaxKind.CallExpression)) &&
+    parent.hasQuestionDotToken() &&
+    parent.getExpression() === outer
+  );
+};
+
+/**
+ * `=` through `^=`, i.e. every assignment operator. TypeScript keeps them in
+ * one contiguous block of {@link tsm.SyntaxKind} and marks its ends, which is
+ * how the compiler itself recognizes them.
+ */
+const isAssignmentOperatorKind = (kind: tsm.SyntaxKind): boolean =>
+  tsm.SyntaxKind.FirstAssignment <= kind &&
+  kind <= tsm.SyntaxKind.LastAssignment;
+
+/**
+ * Positions that write the value rather than read it, where `!` cannot be
+ * appended at all: an assignment target is not an expression (`xs[0]! = 1`
+ * does not parse as an assignment), and `delete xs[0]!` and `xs[0]!++` are
+ * equally invalid.
+ *
+ * `xs[0] += 1` is the one case this leaves a type error behind: its left-hand
+ * side is read as well as written, so `noUncheckedIndexedAccess` reports it,
+ * but no assertion can be spelled there.
+ */
+const isWriteTarget = (node: tsm.Node, parent: tsm.Node): boolean => {
+  if (
+    parent.isKind(tsm.SyntaxKind.DeleteExpression) ||
+    parent.isKind(tsm.SyntaxKind.PostfixUnaryExpression)
+  ) {
+    return true;
+  }
+
+  if (parent.isKind(tsm.SyntaxKind.PrefixUnaryExpression)) {
+    const operator = parent.getOperatorToken();
+
+    return (
+      operator === tsm.SyntaxKind.PlusPlusToken ||
+      operator === tsm.SyntaxKind.MinusMinusToken
+    );
+  }
+
+  if (
+    parent.isKind(tsm.SyntaxKind.ForOfStatement) ||
+    parent.isKind(tsm.SyntaxKind.ForInStatement)
+  ) {
+    return parent.getInitializer() === node;
+  }
+
+  return (
+    parent.isKind(tsm.SyntaxKind.BinaryExpression) &&
+    parent.getLeft() === node &&
+    isAssignmentOperatorKind(parent.getOperatorToken().getKind())
+  );
+};
+
+/**
+ * Positions that read the access precisely to find out whether the value is
+ * there — a truthiness check, an equality comparison, `??`, `typeof`. None of
+ * them is an error under `noUncheckedIndexedAccess`, and asserting inside one
+ * would defeat the check it performs (`case undefined:` would stop compiling
+ * against an asserted `switch` subject).
+ */
+const isTestedForAbsence = (node: tsm.Node, parent: tsm.Node): boolean => {
+  if (parent.isKind(tsm.SyntaxKind.TypeOfExpression)) {
+    return true;
+  }
+
+  if (parent.isKind(tsm.SyntaxKind.PrefixUnaryExpression)) {
+    return parent.getOperatorToken() === tsm.SyntaxKind.ExclamationToken;
+  }
+
+  if (parent.isKind(tsm.SyntaxKind.BinaryExpression)) {
+    const operator = parent.getOperatorToken().getKind();
+
+    return (
+      equalityOperatorKinds.includes(operator) ||
+      (parent.getLeft() === node &&
+        shortCircuitOperatorKinds.includes(operator))
+    );
+  }
+
+  if (
+    parent.isKind(tsm.SyntaxKind.IfStatement) ||
+    parent.isKind(tsm.SyntaxKind.WhileStatement) ||
+    parent.isKind(tsm.SyntaxKind.DoStatement) ||
+    parent.isKind(tsm.SyntaxKind.SwitchStatement)
+  ) {
+    return parent.getExpression() === node;
+  }
+
+  if (parent.isKind(tsm.SyntaxKind.ForStatement)) {
+    return parent.getCondition() === node;
+  }
+
+  return (
+    parent.isKind(tsm.SyntaxKind.ConditionalExpression) &&
+    parent.getCondition() === node
+  );
+};
+
+/**
+ * Whether a `!` appended to this access would be both syntactically valid and
+ * meaningful.
+ *
+ * Note that most write positions need no rule of their own: TypeScript gives
+ * the target of an assignment the element type without `undefined`, so the
+ * type comparison in {@link collectAssertionPositions} already passes them
+ * over. The exceptions handled here are the ones it does widen.
+ *
+ * The position is that of the outermost parenthesis around the access:
+ * `(xs[0]) === undefined` tests the value exactly as `xs[0] === undefined`
+ * does, while the `!` still goes right after the access, inside them.
+ */
+const isAssertableReadPosition = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: IndexReadExpression,
+): boolean => {
+  const outer = outermostParenthesized(node);
+
+  const parent = outer.getParent();
+
+  if (parent === undefined) {
+    return false;
+  }
+
+  return (
+    !isAlreadyAssertedOrGuarded(node, outer, parent) &&
+    !isWriteTarget(outer, parent) &&
+    !isTestedForAbsence(outer, parent)
+  );
+};
+
 /**
  * Returns the positions at which a `!` has to be inserted, i.e. the end
  * offsets of the reads whose type `noUncheckedIndexedAccess` widens with
@@ -229,249 +472,6 @@ const insertNonNullAssertions = (
 
   return mut_parts.join('');
 };
-
-const typeIncludesUndefined = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  type: tsm.Type,
-): boolean =>
-  type.isUndefined() ||
-  (type.isUnion() && type.getUnionTypes().some((t) => t.isUndefined()));
-
-/**
- * Whether the position the access sits in already accepts `undefined`, in
- * which case `noUncheckedIndexedAccess` reports nothing there and the
- * assertion would only be noise.
- */
-const contextAcceptsUndefined = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: IndexReadExpression,
-): boolean => {
-  const contextualType = node.getContextualType();
-
-  return (
-    contextualType !== undefined &&
-    (contextualType.isAny() ||
-      contextualType.isUnknown() ||
-      typeIncludesUndefined(contextualType))
-  );
-};
-
-const isIgnoredByComment = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: IndexReadExpression,
-): boolean => {
-  if (hasDisableNextLineComment(node, TRANSFORMER_NAME)) {
-    return true;
-  }
-
-  // An index access is rarely the first thing on its own line, so the comment
-  // that covers it is the one above the statement it appears in.
-  const statement = node.getFirstAncestor((ancestor) =>
-    tsm.Node.isStatement(ancestor),
-  );
-
-  return (
-    statement !== undefined &&
-    hasDisableNextLineComment(statement, TRANSFORMER_NAME)
-  );
-};
-
-/**
- * Whether a `!` appended to this access would be both syntactically valid and
- * meaningful.
- *
- * Note that most write positions need no rule of their own: TypeScript gives
- * the target of an assignment the element type without `undefined`, so the
- * type comparison in {@link collectAssertionPositions} already passes them
- * over. The exceptions handled here are the ones it does widen.
- *
- * The position is that of the outermost parenthesis around the access:
- * `(xs[0]) === undefined` tests the value exactly as `xs[0] === undefined`
- * does, while the `!` still goes right after the access, inside them.
- */
-const isAssertableReadPosition = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: IndexReadExpression,
-): boolean => {
-  const outer = outermostParenthesized(node);
-
-  const parent = outer.getParent();
-
-  if (parent === undefined) {
-    return false;
-  }
-
-  return (
-    !isAlreadyAssertedOrGuarded(node, outer, parent) &&
-    !isWriteTarget(outer, parent) &&
-    !isTestedForAbsence(outer, parent)
-  );
-};
-
-/** `node`, or the outermost of the parentheses written around it. */
-const outermostParenthesized = (node: tsm.Node): tsm.Node => {
-  const parent = node.getParent();
-
-  return parent?.isKind(tsm.SyntaxKind.ParenthesizedExpression) === true
-    ? outermostParenthesized(parent)
-    : node;
-};
-
-/**
- * `xs[0]!`, `xs[0] as T`, `<T>xs[0]`, `xs[0]?.foo`, `xs[0]?.()`, `xs[0]?.[1]`.
- *
- * `outer` is `node` with its parentheses (see
- * {@link outermostParenthesized}); a chain continues from the access itself
- * but is guarded from the outside of the parentheses (`(xs[0])?.foo`).
- */
-const isAlreadyAssertedOrGuarded = (
-  node: tsm.Node,
-  outer: tsm.Node,
-  parent: tsm.Node,
-): boolean => {
-  if (
-    parent.isKind(tsm.SyntaxKind.NonNullExpression) ||
-    parent.isKind(tsm.SyntaxKind.AsExpression) ||
-    parent.isKind(tsm.SyntaxKind.TypeAssertionExpression)
-  ) {
-    return true;
-  }
-
-  if (isInOptionalChain(node)) {
-    return true;
-  }
-
-  // Only the object of the optional chain is guarded; an index argument such
-  // as the `xs[0]` of `m?.[xs[0]]` is not.
-  return (
-    (parent.isKind(tsm.SyntaxKind.PropertyAccessExpression) ||
-      parent.isKind(tsm.SyntaxKind.ElementAccessExpression) ||
-      parent.isKind(tsm.SyntaxKind.CallExpression)) &&
-    parent.hasQuestionDotToken() &&
-    parent.getExpression() === outer
-  );
-};
-
-/**
- * Whether the read sits in an optional chain that can short-circuit before it,
- * as the `xs[0]?.toFixed` of `xs[0]?.toFixed()` does. `undefined` in such a
- * type comes from the chain rather than from the index, and the chain already
- * accounts for it; asserting there would assert away the author's own `?.`.
- *
- * Parentheses end a chain (`(a?.b).c` is not one), which is why the walk stops
- * at anything that is not a chain link.
- */
-const isInOptionalChain = (node: tsm.Node): boolean => {
-  if (
-    node.isKind(tsm.SyntaxKind.PropertyAccessExpression) ||
-    node.isKind(tsm.SyntaxKind.ElementAccessExpression) ||
-    node.isKind(tsm.SyntaxKind.CallExpression)
-  ) {
-    return (
-      node.hasQuestionDotToken() || isInOptionalChain(node.getExpression())
-    );
-  }
-
-  return (
-    node.isKind(tsm.SyntaxKind.NonNullExpression) &&
-    isInOptionalChain(node.getExpression())
-  );
-};
-
-/**
- * Positions that write the value rather than read it, where `!` cannot be
- * appended at all: an assignment target is not an expression (`xs[0]! = 1`
- * does not parse as an assignment), and `delete xs[0]!` and `xs[0]!++` are
- * equally invalid.
- *
- * `xs[0] += 1` is the one case this leaves a type error behind: its left-hand
- * side is read as well as written, so `noUncheckedIndexedAccess` reports it,
- * but no assertion can be spelled there.
- */
-const isWriteTarget = (node: tsm.Node, parent: tsm.Node): boolean => {
-  if (
-    parent.isKind(tsm.SyntaxKind.DeleteExpression) ||
-    parent.isKind(tsm.SyntaxKind.PostfixUnaryExpression)
-  ) {
-    return true;
-  }
-
-  if (parent.isKind(tsm.SyntaxKind.PrefixUnaryExpression)) {
-    const operator = parent.getOperatorToken();
-
-    return (
-      operator === tsm.SyntaxKind.PlusPlusToken ||
-      operator === tsm.SyntaxKind.MinusMinusToken
-    );
-  }
-
-  if (
-    parent.isKind(tsm.SyntaxKind.ForOfStatement) ||
-    parent.isKind(tsm.SyntaxKind.ForInStatement)
-  ) {
-    return parent.getInitializer() === node;
-  }
-
-  return (
-    parent.isKind(tsm.SyntaxKind.BinaryExpression) &&
-    parent.getLeft() === node &&
-    isAssignmentOperatorKind(parent.getOperatorToken().getKind())
-  );
-};
-
-/**
- * Positions that read the access precisely to find out whether the value is
- * there — a truthiness check, an equality comparison, `??`, `typeof`. None of
- * them is an error under `noUncheckedIndexedAccess`, and asserting inside one
- * would defeat the check it performs (`case undefined:` would stop compiling
- * against an asserted `switch` subject).
- */
-const isTestedForAbsence = (node: tsm.Node, parent: tsm.Node): boolean => {
-  if (parent.isKind(tsm.SyntaxKind.TypeOfExpression)) {
-    return true;
-  }
-
-  if (parent.isKind(tsm.SyntaxKind.PrefixUnaryExpression)) {
-    return parent.getOperatorToken() === tsm.SyntaxKind.ExclamationToken;
-  }
-
-  if (parent.isKind(tsm.SyntaxKind.BinaryExpression)) {
-    const operator = parent.getOperatorToken().getKind();
-
-    return (
-      equalityOperatorKinds.includes(operator) ||
-      (parent.getLeft() === node &&
-        shortCircuitOperatorKinds.includes(operator))
-    );
-  }
-
-  if (
-    parent.isKind(tsm.SyntaxKind.IfStatement) ||
-    parent.isKind(tsm.SyntaxKind.WhileStatement) ||
-    parent.isKind(tsm.SyntaxKind.DoStatement) ||
-    parent.isKind(tsm.SyntaxKind.SwitchStatement)
-  ) {
-    return parent.getExpression() === node;
-  }
-
-  if (parent.isKind(tsm.SyntaxKind.ForStatement)) {
-    return parent.getCondition() === node;
-  }
-
-  return (
-    parent.isKind(tsm.SyntaxKind.ConditionalExpression) &&
-    parent.getCondition() === node
-  );
-};
-
-/**
- * `=` through `^=`, i.e. every assignment operator. TypeScript keeps them in
- * one contiguous block of {@link tsm.SyntaxKind} and marks its ends, which is
- * how the compiler itself recognizes them.
- */
-const isAssignmentOperatorKind = (kind: tsm.SyntaxKind): boolean =>
-  tsm.SyntaxKind.FirstAssignment <= kind &&
-  kind <= tsm.SyntaxKind.LastAssignment;
 
 const equalityOperatorKinds: readonly tsm.SyntaxKind[] = [
   tsm.SyntaxKind.EqualsEqualsToken,

@@ -296,6 +296,32 @@ const isNodeErasedBy =
   (start, end) =>
     ranges.some(([from, to]) => from <= start && end <= to);
 
+const isImportMetaVitest = (node: ts.Node): boolean =>
+  ts.isPropertyAccessExpression(node) &&
+  node.name.text === 'vitest' &&
+  ts.isMetaProperty(node.expression) &&
+  node.expression.keywordToken === ts.SyntaxKind.ImportKeyword &&
+  node.expression.name.text === 'meta';
+
+/** `if (<import.meta>.vitest !== undefined) { ... }` with no `else`. */
+const isVitestGuard = (statement: DeepReadonly<ts.Statement>): boolean =>
+  ts.isIfStatement(statement) &&
+  statement.elseStatement === undefined &&
+  ts.isBinaryExpression(statement.expression) &&
+  statement.expression.operatorToken.kind ===
+    ts.SyntaxKind.ExclamationEqualsEqualsToken &&
+  isImportMetaVitest(statement.expression.left) &&
+  ts.isIdentifier(statement.expression.right) &&
+  statement.expression.right.text === 'undefined';
+
+const isCallOf = (
+  node: ts.Node,
+  names: ReadonlySet<string>,
+): node is ts.CallExpression =>
+  ts.isCallExpression(node) &&
+  ts.isIdentifier(node.expression) &&
+  names.has(node.expression.text);
+
 /**
  * Decides whether a statement is removed as a whole. A compound statement is
  * removed when its body is: a block all of whose statements are removable, a
@@ -348,32 +374,6 @@ const createIsRemovable = (
   return isRemovable;
 };
 
-/** `if (<import.meta>.vitest !== undefined) { ... }` with no `else`. */
-const isVitestGuard = (statement: DeepReadonly<ts.Statement>): boolean =>
-  ts.isIfStatement(statement) &&
-  statement.elseStatement === undefined &&
-  ts.isBinaryExpression(statement.expression) &&
-  statement.expression.operatorToken.kind ===
-    ts.SyntaxKind.ExclamationEqualsEqualsToken &&
-  isImportMetaVitest(statement.expression.left) &&
-  ts.isIdentifier(statement.expression.right) &&
-  statement.expression.right.text === 'undefined';
-
-const isImportMetaVitest = (node: ts.Node): boolean =>
-  ts.isPropertyAccessExpression(node) &&
-  node.name.text === 'vitest' &&
-  ts.isMetaProperty(node.expression) &&
-  node.expression.keywordToken === ts.SyntaxKind.ImportKeyword &&
-  node.expression.name.text === 'meta';
-
-const isCallOf = (
-  node: ts.Node,
-  names: ReadonlySet<string>,
-): node is ts.CallExpression =>
-  ts.isCallExpression(node) &&
-  ts.isIdentifier(node.expression) &&
-  names.has(node.expression.text);
-
 const hasStatements = (
   node: ts.Node,
 ): node is
@@ -387,6 +387,21 @@ const hasStatements = (
   ts.isModuleBlock(node) ||
   ts.isCaseClause(node) ||
   ts.isDefaultClause(node);
+
+/**
+ * A removed statement takes its leading comments with it, except that the
+ * first statement of a file keeps whatever precedes it: that is the file
+ * header, not a comment on the statement.
+ */
+const statementEraseStart = (
+  statement: DeepReadonly<ts.Statement>,
+  parent: ts.Node,
+  index: number,
+  sourceFile: DeepReadonly<ts.SourceFile>,
+): number =>
+  index === 0 && ts.isSourceFile(parent)
+    ? statement.getStart(sourceFile)
+    : statement.getFullStart();
 
 /**
  * Walks the tree looking for statement lists, and in each one erases the
@@ -422,20 +437,18 @@ const collectRemovedStatements = (
   return mut_ranges;
 };
 
-/**
- * A removed statement takes its leading comments with it, except that the
- * first statement of a file keeps whatever precedes it: that is the file
- * header, not a comment on the statement.
- */
-const statementEraseStart = (
-  statement: DeepReadonly<ts.Statement>,
-  parent: ts.Node,
-  index: number,
+const describeLeftover = (
+  message: string,
+  node: ts.Node,
   sourceFile: DeepReadonly<ts.SourceFile>,
-): number =>
-  index === 0 && ts.isSourceFile(parent)
-    ? statement.getStart(sourceFile)
-    : statement.getFullStart();
+  fileName: string,
+): string => {
+  const { line, character } = sourceFile.getLineAndCharacterOfPosition(
+    node.getStart(sourceFile),
+  );
+
+  return `${fileName}:${line + 1}:${character + 1}: ${message}`;
+};
 
 /**
  * Finds a removable call or a `<import.meta>.vitest` that survived the
@@ -488,18 +501,30 @@ const findLeftover = (
   return mut_result.current;
 };
 
-const describeLeftover = (
-  message: string,
-  node: ts.Node,
-  sourceFile: DeepReadonly<ts.SourceFile>,
-  fileName: string,
-): string => {
-  const { line, character } = sourceFile.getLineAndCharacterOfPosition(
-    node.getStart(sourceFile),
-  );
-
-  return `${fileName}:${line + 1}:${character + 1}: ${message}`;
-};
+/**
+ * Whether an expression reads the same in any position without parentheses
+ * around it. Only the forms that bind tighter than anything around them
+ * qualify; an object literal is left out because `() => ({ a })` needs its
+ * parentheses, and a function or class expression because a statement
+ * starting with one would become a declaration.
+ */
+const standsAloneWithoutParentheses = (
+  node: DeepReadonly<ts.Expression>,
+): boolean =>
+  ts.isIdentifier(node) ||
+  ts.isPropertyAccessExpression(node) ||
+  ts.isElementAccessExpression(node) ||
+  ts.isCallExpression(node) ||
+  ts.isParenthesizedExpression(node) ||
+  ts.isArrayLiteralExpression(node) ||
+  ts.isStringLiteral(node) ||
+  ts.isNumericLiteral(node) ||
+  ts.isNoSubstitutionTemplateLiteral(node) ||
+  ts.isTemplateExpression(node) ||
+  node.kind === ts.SyntaxKind.ThisKeyword ||
+  node.kind === ts.SyntaxKind.TrueKeyword ||
+  node.kind === ts.SyntaxKind.FalseKeyword ||
+  node.kind === ts.SyntaxKind.NullKeyword;
 
 /**
  * Erases `f(` and `)` around the argument of every identity function `f`,
@@ -557,29 +582,89 @@ const collectUnwrappedCallees = (
 };
 
 /**
- * Whether an expression reads the same in any position without parentheses
- * around it. Only the forms that bind tighter than anything around them
- * qualify; an object literal is left out because `() => ({ a })` needs its
- * parentheses, and a function or class expression because a statement
- * starting with one would become a declaration.
+ * The range that takes one specifier out of a list and leaves the list
+ * well-formed. A specifier's full start is right after the previous comma
+ * (or the brace), so it covers the whitespace and line break before it.
  */
-const standsAloneWithoutParentheses = (
-  node: DeepReadonly<ts.Expression>,
-): boolean =>
-  ts.isIdentifier(node) ||
-  ts.isPropertyAccessExpression(node) ||
-  ts.isElementAccessExpression(node) ||
-  ts.isCallExpression(node) ||
-  ts.isParenthesizedExpression(node) ||
-  ts.isArrayLiteralExpression(node) ||
-  ts.isStringLiteral(node) ||
-  ts.isNumericLiteral(node) ||
-  ts.isNoSubstitutionTemplateLiteral(node) ||
-  ts.isTemplateExpression(node) ||
-  node.kind === ts.SyntaxKind.ThisKeyword ||
-  node.kind === ts.SyntaxKind.TrueKeyword ||
-  node.kind === ts.SyntaxKind.FalseKeyword ||
-  node.kind === ts.SyntaxKind.NullKeyword;
+const specifierEraseRange = (
+  specifier: ts.Node,
+  neighbors: Readonly<{
+    prev: ts.Node | undefined;
+    next: ts.Node | undefined;
+    hasTrailingComma: boolean;
+  }>,
+  sourceFile: DeepReadonly<ts.SourceFile>,
+): EraseRange => {
+  if (neighbors.next !== undefined) {
+    // `{ a, X, b }` -> `{ a, b }`: up to the full start of the next one,
+    // which is right after this one's comma.
+    return [specifier.getFullStart(), neighbors.next.getFullStart()];
+  }
+
+  if (neighbors.hasTrailingComma) {
+    // `{ a, X, }` -> `{ a, }`: this one and its comma.
+    return [
+      specifier.getFullStart(),
+      sourceFile.text.indexOf(',', specifier.getEnd()) + 1,
+    ];
+  }
+
+  // `{ a, X }` -> `{ a }`: the comma that precedes and this one.
+  // The only specifier: the caller erases the whole declaration instead.
+  return neighbors.prev !== undefined
+    ? [neighbors.prev.getEnd(), specifier.getEnd()]
+    : [specifier.getStart(sourceFile), specifier.getEnd()];
+};
+
+const isPropertyName = (node: ts.Node): boolean => {
+  const { parent } = node;
+
+  return (
+    (ts.isPropertyAccessExpression(parent) && parent.name === node) ||
+    (ts.isPropertyAssignment(parent) && parent.name === node) ||
+    (ts.isMethodDeclaration(parent) && parent.name === node) ||
+    (ts.isPropertyDeclaration(parent) && parent.name === node) ||
+    (ts.isBindingElement(parent) && parent.propertyName === node)
+  );
+};
+
+/**
+ * Names of every identifier that reads as a reference: everything except
+ * import bindings themselves and property names.
+ */
+/**
+ * The names the output still refers to.
+ *
+ * A subtree is skipped only when all of it is erased. Skipping one that merely
+ * begins in erased text would lose the argument of every unwrapped identity
+ * call, whose names the output goes on using.
+ */
+const collectReferencedNames = (
+  sourceFile: DeepReadonly<ts.SourceFile>,
+  isErased: IsNodeErased,
+): ReadonlySet<string> => {
+  const mut_names = new Set<string>();
+
+  const visit = (node: ts.Node): void => {
+    if (ts.isImportDeclaration(node)) {
+      return;
+    }
+
+    if (isErased(node.getStart(sourceFile), node.getEnd())) {
+      return;
+    }
+
+    if (ts.isIdentifier(node) && !isPropertyName(node)) {
+      mut_names.add(node.text);
+    }
+
+    ts.forEachChild(node, visit);
+  };
+
+  visit(sourceFile);
+
+  return mut_names;
+};
 
 /**
  * Erases import bindings that no identifier outside the erased ranges refers
@@ -663,91 +748,6 @@ const collectUnusedImports = (
   }
 
   return mut_ranges;
-};
-
-/**
- * The range that takes one specifier out of a list and leaves the list
- * well-formed. A specifier's full start is right after the previous comma
- * (or the brace), so it covers the whitespace and line break before it.
- */
-const specifierEraseRange = (
-  specifier: ts.Node,
-  neighbors: Readonly<{
-    prev: ts.Node | undefined;
-    next: ts.Node | undefined;
-    hasTrailingComma: boolean;
-  }>,
-  sourceFile: DeepReadonly<ts.SourceFile>,
-): EraseRange => {
-  if (neighbors.next !== undefined) {
-    // `{ a, X, b }` -> `{ a, b }`: up to the full start of the next one,
-    // which is right after this one's comma.
-    return [specifier.getFullStart(), neighbors.next.getFullStart()];
-  }
-
-  if (neighbors.hasTrailingComma) {
-    // `{ a, X, }` -> `{ a, }`: this one and its comma.
-    return [
-      specifier.getFullStart(),
-      sourceFile.text.indexOf(',', specifier.getEnd()) + 1,
-    ];
-  }
-
-  // `{ a, X }` -> `{ a }`: the comma that precedes and this one.
-  // The only specifier: the caller erases the whole declaration instead.
-  return neighbors.prev !== undefined
-    ? [neighbors.prev.getEnd(), specifier.getEnd()]
-    : [specifier.getStart(sourceFile), specifier.getEnd()];
-};
-
-/**
- * Names of every identifier that reads as a reference: everything except
- * import bindings themselves and property names.
- */
-/**
- * The names the output still refers to.
- *
- * A subtree is skipped only when all of it is erased. Skipping one that merely
- * begins in erased text would lose the argument of every unwrapped identity
- * call, whose names the output goes on using.
- */
-const collectReferencedNames = (
-  sourceFile: DeepReadonly<ts.SourceFile>,
-  isErased: IsNodeErased,
-): ReadonlySet<string> => {
-  const mut_names = new Set<string>();
-
-  const visit = (node: ts.Node): void => {
-    if (ts.isImportDeclaration(node)) {
-      return;
-    }
-
-    if (isErased(node.getStart(sourceFile), node.getEnd())) {
-      return;
-    }
-
-    if (ts.isIdentifier(node) && !isPropertyName(node)) {
-      mut_names.add(node.text);
-    }
-
-    ts.forEachChild(node, visit);
-  };
-
-  visit(sourceFile);
-
-  return mut_names;
-};
-
-const isPropertyName = (node: ts.Node): boolean => {
-  const { parent } = node;
-
-  return (
-    (ts.isPropertyAccessExpression(parent) && parent.name === node) ||
-    (ts.isPropertyAssignment(parent) && parent.name === node) ||
-    (ts.isMethodDeclaration(parent) && parent.name === node) ||
-    (ts.isPropertyDeclaration(parent) && parent.name === node) ||
-    (ts.isBindingElement(parent) && parent.propertyName === node)
-  );
 };
 
 /**

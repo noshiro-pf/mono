@@ -17,6 +17,15 @@ type CountedTextAreaProps = Readonly<{
 
 type FieldProps = Readonly<{ hint: Bindable<string> }> & CountedTextAreaProps;
 
+export const Compose = (): JSX.Element => (
+  <Field
+    label={constant('Message')}
+    hint={constant('Plain text only.')}
+    value={draft$}
+    onInput={setDraft}
+  />
+);
+
 // A helper takes bindables and returns one, like any other function.
 const remainingOf = (
   value: Bindable<string>,
@@ -76,12 +85,3 @@ const Field = ({ hint, ...textArea }: FieldProps): JSX.Element => (
 );
 
 const [draft$, setDraft] = createState('');
-
-export const Compose = (): JSX.Element => (
-  <Field
-    label={constant('Message')}
-    hint={constant('Plain text only.')}
-    value={draft$}
-    onInput={setDraft}
-  />
-);

@@ -90,54 +90,6 @@ export const runTransformerCLI = async (
     : Result.ok(undefined);
 };
 
-const getFilesForTransformation = async (
-  options: GetFilesOptions,
-): Promise<
-  Result<
-    readonly string[],
-    | readonly unknown[]
-    | Readonly<{
-        message: string;
-      }>
-  >
-> => {
-  const filesFromGlob = await getFilesFromGlob(
-    options.baseDir,
-    options.exclude,
-    options.silent,
-  );
-
-  if (Result.isErr(filesFromGlob)) {
-    return filesFromGlob;
-  }
-
-  let mut_files = filesFromGlob.value;
-
-  if (options.uncommitted) {
-    const uncommittedFiles = await getUncommittedFiles(options.silent);
-
-    if (Result.isErr(uncommittedFiles)) {
-      return uncommittedFiles;
-    }
-
-    mut_files = Arr.setIntersection(mut_files, uncommittedFiles.value);
-  }
-
-  if (options.diffFrom !== undefined) {
-    const diffFiles = await getDiffFrom(options.diffFrom, {
-      silent: options.silent,
-    });
-
-    if (Result.isErr(diffFiles)) {
-      return diffFiles;
-    }
-
-    mut_files = Arr.setIntersection(mut_files, diffFiles.value);
-  }
-
-  return Result.ok(mut_files);
-};
-
 const getUncommittedFiles = async (
   silent: boolean,
 ): Promise<
@@ -215,44 +167,52 @@ const getFilesFromGlob = async (
   return Result.ok(globResult.value);
 };
 
-const transformFiles = async (
-  filePaths: readonly string[],
-  transformers: readonly TsMorphTransformer[],
-  silent: boolean,
+const getFilesForTransformation = async (
+  options: GetFilesOptions,
 ): Promise<
-  Readonly<{
-    transformedCount: number;
-    unchangedCount: number;
-    errorFiles: readonly string[];
-  }>
+  Result<
+    readonly string[],
+    | readonly unknown[]
+    | Readonly<{
+        message: string;
+      }>
+  >
 > => {
-  let mut_transformedCount: number = 0;
+  const filesFromGlob = await getFilesFromGlob(
+    options.baseDir,
+    options.exclude,
+    options.silent,
+  );
 
-  let mut_unchangedCount: number = 0;
-
-  const mut_errorFiles: string[] = [];
-
-  for (const filePath of filePaths) {
-    const result = await transformOneFile(filePath, transformers, silent);
-
-    if (Result.isOk(result)) {
-      expectType<typeof result.value, 'unchanged' | 'transformed'>('=');
-
-      if (result.value === 'transformed') {
-        mut_transformedCount += 1;
-      } else {
-        mut_unchangedCount += 1;
-      }
-    } else {
-      mut_errorFiles.push(path.basename(filePath));
-    }
+  if (Result.isErr(filesFromGlob)) {
+    return filesFromGlob;
   }
 
-  return {
-    transformedCount: mut_transformedCount,
-    unchangedCount: mut_unchangedCount,
-    errorFiles: mut_errorFiles,
-  };
+  let mut_files = filesFromGlob.value;
+
+  if (options.uncommitted) {
+    const uncommittedFiles = await getUncommittedFiles(options.silent);
+
+    if (Result.isErr(uncommittedFiles)) {
+      return uncommittedFiles;
+    }
+
+    mut_files = Arr.setIntersection(mut_files, uncommittedFiles.value);
+  }
+
+  if (options.diffFrom !== undefined) {
+    const diffFiles = await getDiffFrom(options.diffFrom, {
+      silent: options.silent,
+    });
+
+    if (Result.isErr(diffFiles)) {
+      return diffFiles;
+    }
+
+    mut_files = Arr.setIntersection(mut_files, diffFiles.value);
+  }
+
+  return Result.ok(mut_files);
 };
 
 const transformOneFile = async (
@@ -297,4 +257,44 @@ const transformOneFile = async (
 
     return Result.err(errStr);
   }
+};
+
+const transformFiles = async (
+  filePaths: readonly string[],
+  transformers: readonly TsMorphTransformer[],
+  silent: boolean,
+): Promise<
+  Readonly<{
+    transformedCount: number;
+    unchangedCount: number;
+    errorFiles: readonly string[];
+  }>
+> => {
+  let mut_transformedCount: number = 0;
+
+  let mut_unchangedCount: number = 0;
+
+  const mut_errorFiles: string[] = [];
+
+  for (const filePath of filePaths) {
+    const result = await transformOneFile(filePath, transformers, silent);
+
+    if (Result.isOk(result)) {
+      expectType<typeof result.value, 'unchanged' | 'transformed'>('=');
+
+      if (result.value === 'transformed') {
+        mut_transformedCount += 1;
+      } else {
+        mut_unchangedCount += 1;
+      }
+    } else {
+      mut_errorFiles.push(path.basename(filePath));
+    }
+  }
+
+  return {
+    transformedCount: mut_transformedCount,
+    unchangedCount: mut_unchangedCount,
+    errorFiles: mut_errorFiles,
+  };
 };

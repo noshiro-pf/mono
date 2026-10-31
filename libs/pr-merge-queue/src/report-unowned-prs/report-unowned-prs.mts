@@ -161,6 +161,9 @@ export const planUnownedReports = (
 const markerOf = (pr: number): string =>
   `<!-- unblock-prs:unowned pr=${pr} -->` as const;
 
+const describeComment = (says: unknown): string =>
+  says === undefined ? 'none' : (`\`${JSON.stringify(says)}\`` as const);
+
 const reportBody = (
   entry: ReportEntry,
   owner: QueueOwner | undefined,
@@ -181,9 +184,6 @@ const reportBody = (
     '',
     'Filed by `report-unowned-prs`.',
   ].join('\n');
-
-const describeComment = (says: unknown): string =>
-  says === undefined ? 'none' : (`\`${JSON.stringify(says)}\`` as const);
 
 const IssueListSchema = t.array(
   t.record({

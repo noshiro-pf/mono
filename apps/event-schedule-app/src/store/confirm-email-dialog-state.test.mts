@@ -100,6 +100,15 @@ type Setup = Readonly<{
   toasts: Readonly<{ count: number }>;
 }>;
 
+/** A toaster that only counts what it is asked to show. */
+const fakeToaster = (onShow: () => number): Toaster =>
+  ({
+    show: () => `toast-${onShow()}`,
+    dismiss: () => undefined,
+    clear: () => undefined,
+    getToasts: () => [],
+  }) as const;
+
 const setup = (
   answer: 'fails' | 'ng' | 'ok',
   options?: Readonly<{ notifications?: boolean }>,
@@ -162,15 +171,6 @@ const setup = (
     toasts: mut_toasts,
   } as const;
 };
-
-/** A toaster that only counts what it is asked to show. */
-const fakeToaster = (onShow: () => number): Toaster =>
-  ({
-    show: () => `toast-${onShow()}`,
-    dismiss: () => undefined,
-    clear: () => undefined,
-    getToasts: () => [],
-  }) as const;
 
 const settle = async (): Promise<void> => {
   await new Promise<void>((resolve) => {

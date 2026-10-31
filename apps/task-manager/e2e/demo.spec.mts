@@ -1817,6 +1817,10 @@ const tileLayoutOnPage = async (
     };
   });
 
+/** `a / b`, or `NaN` — which fails any comparison — for a zero `b`. */
+const ratio = (a: number, b: number): number =>
+  Num.isNonZero(b) ? Num.div(a, b) : Number.NaN;
+
 /**
  * The rows and columns 「タイル」 draws — and the columns its geometry says
  * there should be: as many nodes as fit the canvas less the margins, a gap
@@ -1862,10 +1866,6 @@ const tileGrid = async (
 /** How many rows `count` nodes take, `columns` to a row. */
 const rowsOf = (count: number, columns: number): number =>
   Math.ceil(ratio(count, columns));
-
-/** `a / b`, or `NaN` — which fails any comparison — for a zero `b`. */
-const ratio = (a: number, b: number): number =>
-  Num.isNonZero(b) ? Num.div(a, b) : Number.NaN;
 
 /** Where the view has scrolled the rows to: the top of the first row. */
 const tileTop = async (page: DeepReadonly<Page>): Promise<number> => {

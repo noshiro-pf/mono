@@ -17,6 +17,111 @@ import { revealedBlockToTiles } from './revealed-block-to-tiles.mjs';
 
 type Suit = 'jihai' | 'manzu' | 'pinzu' | 'sozu';
 
+export const hand2String = (
+  handTiles: readonly TileName[],
+  revealedBlocks: readonly RevealedBlock[],
+): string => {
+  let mut_str = '';
+
+  mut_str += block2String(handTiles);
+
+  if (Arr.isNonEmpty(revealedBlocks)) {
+    mut_str += ` ${revealedBlocks.map(revealedBlock2String).join('')}`;
+  }
+
+  return mut_str;
+};
+
+export const block2String = (sortedTiles: readonly TileName[]): string => {
+  const { manzu, pinzu, sozu, jihai } = distributeTilesByType(sortedTiles);
+
+  return [
+    Arr.isEmpty(manzu)
+      ? ''
+      : `${manzu.map((a) => tileDef[a].MPSString).join('')}m`,
+    Arr.isEmpty(pinzu)
+      ? ''
+      : `${pinzu.map((a) => tileDef[a].MPSString).join('')}p`,
+    Arr.isEmpty(sozu)
+      ? ''
+      : `${sozu.map((a) => tileDef[a].MPSString).join('')}p`,
+    Arr.isEmpty(jihai)
+      ? ''
+      : `${jihai.map((a) => tileDef[a].MPSString).join('')}p`,
+  ].join('');
+};
+
+export const hand2TenhoString = (sortedTiles: readonly TileName[]): string => {
+  const { manzu, pinzu, sozu, jihai } = distributeTilesByType(sortedTiles);
+
+  return [
+    Arr.isEmpty(manzu)
+      ? ''
+      : `${manzu.map((a) => tileDef[a].TenhoMPSString).join('')}m`,
+    Arr.isEmpty(pinzu)
+      ? ''
+      : `${pinzu.map((a) => tileDef[a].TenhoMPSString).join('')}p`,
+    Arr.isEmpty(sozu)
+      ? ''
+      : `${sozu.map((a) => tileDef[a].TenhoMPSString).join('')}p`,
+    Arr.isEmpty(jihai)
+      ? ''
+      : `${jihai.map((a) => tileDef[a].TenhoMPSString).join('')}p`,
+  ].join('');
+};
+
+export const revealedBlock2String = (revealedBlock: RevealedBlock): string =>
+  `[${block2String(revealedBlockToTiles(revealedBlock))}]` as const;
+
+export const problem2String = (
+  bakaze: Bakaze,
+  jikaze: Jikaze,
+  turn: Turn,
+  doraIndicators: readonly TileName[],
+  handTiles: readonly TileName[],
+  revealedBlocks: readonly RevealedBlock[],
+): string => {
+  let mut_str = '';
+
+  mut_str += `${dict.bakaze[bakaze]}一局0本場 `;
+
+  mut_str += `${dict.jikaze[jikaze]}家 `;
+
+  mut_str += `${turn}巡目 `;
+
+  if (Arr.isNonEmpty(doraIndicators)) {
+    mut_str += `ドラ: ${tiles2string(
+      doraIndicators.map((a) => doraHyouji2Dora[a]),
+    )}`;
+  }
+
+  mut_str += '\n';
+
+  mut_str += hand2String(handTiles, revealedBlocks);
+
+  return mut_str;
+};
+
+export const aka2Normal = (
+  tile: TileName,
+): StrictExclude<TileName, 'AkaManzu5' | 'AkaPinzu5' | 'AkaSozu5'> =>
+  tile === 'AkaManzu5'
+    ? 'Manzu5'
+    : tile === 'AkaPinzu5'
+      ? 'Pinzu5'
+      : tile === 'AkaSozu5'
+        ? 'Sozu5'
+        : tile;
+
+export const shanten2String = (
+  shanten: Shanten,
+): '和了' | '聴牌' | `${Shanten}向聴` =>
+  shanten === -1
+    ? '和了'
+    : shanten === 0
+      ? '聴牌'
+      : (`${shanten}向聴` as const);
+
 /**
  * Which bucket a tile belongs in.
  *
@@ -73,21 +178,6 @@ const suitOf = (tile: TileName): Suit => {
   }
 };
 
-export const hand2String = (
-  handTiles: readonly TileName[],
-  revealedBlocks: readonly RevealedBlock[],
-): string => {
-  let mut_str = '';
-
-  mut_str += block2String(handTiles);
-
-  if (Arr.isNonEmpty(revealedBlocks)) {
-    mut_str += ` ${revealedBlocks.map(revealedBlock2String).join('')}`;
-  }
-
-  return mut_str;
-};
-
 const distributeTilesByType = (
   tiles: readonly TileName[],
 ): DeepReadonly<{
@@ -125,95 +215,5 @@ const distributeTilesByType = (
   };
 };
 
-export const block2String = (sortedTiles: readonly TileName[]): string => {
-  const { manzu, pinzu, sozu, jihai } = distributeTilesByType(sortedTiles);
-
-  return [
-    Arr.isEmpty(manzu)
-      ? ''
-      : `${manzu.map((a) => tileDef[a].MPSString).join('')}m`,
-    Arr.isEmpty(pinzu)
-      ? ''
-      : `${pinzu.map((a) => tileDef[a].MPSString).join('')}p`,
-    Arr.isEmpty(sozu)
-      ? ''
-      : `${sozu.map((a) => tileDef[a].MPSString).join('')}p`,
-    Arr.isEmpty(jihai)
-      ? ''
-      : `${jihai.map((a) => tileDef[a].MPSString).join('')}p`,
-  ].join('');
-};
-
-export const hand2TenhoString = (sortedTiles: readonly TileName[]): string => {
-  const { manzu, pinzu, sozu, jihai } = distributeTilesByType(sortedTiles);
-
-  return [
-    Arr.isEmpty(manzu)
-      ? ''
-      : `${manzu.map((a) => tileDef[a].TenhoMPSString).join('')}m`,
-    Arr.isEmpty(pinzu)
-      ? ''
-      : `${pinzu.map((a) => tileDef[a].TenhoMPSString).join('')}p`,
-    Arr.isEmpty(sozu)
-      ? ''
-      : `${sozu.map((a) => tileDef[a].TenhoMPSString).join('')}p`,
-    Arr.isEmpty(jihai)
-      ? ''
-      : `${jihai.map((a) => tileDef[a].TenhoMPSString).join('')}p`,
-  ].join('');
-};
-
-export const revealedBlock2String = (revealedBlock: RevealedBlock): string =>
-  `[${block2String(revealedBlockToTiles(revealedBlock))}]` as const;
-
 const tiles2string = (tiles: readonly TileName[]): string =>
   tiles.map((x) => tileDef[x].displayName).join(',');
-
-export const problem2String = (
-  bakaze: Bakaze,
-  jikaze: Jikaze,
-  turn: Turn,
-  doraIndicators: readonly TileName[],
-  handTiles: readonly TileName[],
-  revealedBlocks: readonly RevealedBlock[],
-): string => {
-  let mut_str = '';
-
-  mut_str += `${dict.bakaze[bakaze]}一局0本場 `;
-
-  mut_str += `${dict.jikaze[jikaze]}家 `;
-
-  mut_str += `${turn}巡目 `;
-
-  if (Arr.isNonEmpty(doraIndicators)) {
-    mut_str += `ドラ: ${tiles2string(
-      doraIndicators.map((a) => doraHyouji2Dora[a]),
-    )}`;
-  }
-
-  mut_str += '\n';
-
-  mut_str += hand2String(handTiles, revealedBlocks);
-
-  return mut_str;
-};
-
-export const aka2Normal = (
-  tile: TileName,
-): StrictExclude<TileName, 'AkaManzu5' | 'AkaPinzu5' | 'AkaSozu5'> =>
-  tile === 'AkaManzu5'
-    ? 'Manzu5'
-    : tile === 'AkaPinzu5'
-      ? 'Pinzu5'
-      : tile === 'AkaSozu5'
-        ? 'Sozu5'
-        : tile;
-
-export const shanten2String = (
-  shanten: Shanten,
-): '和了' | '聴牌' | `${Shanten}向聴` =>
-  shanten === -1
-    ? '和了'
-    : shanten === 0
-      ? '聴牌'
-      : (`${shanten}向聴` as const);

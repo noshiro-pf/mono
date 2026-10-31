@@ -87,6 +87,22 @@ export const runRules = (
     : Result.ok(mut_diagnostics);
 };
 
+/**
+ * Replaces each `{{name}}` with `data[name]`, leaving unknown names as they
+ * are. Split and joined rather than replaced, because a replacement value is
+ * data and `$&` in it must not be read as a capture reference.
+ */
+const fillMessage = (
+  template: string,
+  data: ReadonlyRecord<string, string> | undefined,
+): string =>
+  data === undefined
+    ? template
+    : Object.entries(data).reduce(
+        (message, [name, value]) => message.split(`{{${name}}}`).join(value),
+        template,
+      );
+
 /** One traversal of one file, offering each node to every rule. */
 const walkFile = (
   // `SourceFile` and `Checker` are TypeScript's own interfaces, declared
@@ -163,19 +179,3 @@ const walkFile = (
 
   sourceFile.forEachChild(visit);
 };
-
-/**
- * Replaces each `{{name}}` with `data[name]`, leaving unknown names as they
- * are. Split and joined rather than replaced, because a replacement value is
- * data and `$&` in it must not be read as a capture reference.
- */
-const fillMessage = (
-  template: string,
-  data: ReadonlyRecord<string, string> | undefined,
-): string =>
-  data === undefined
-    ? template
-    : Object.entries(data).reduce(
-        (message, [name, value]) => message.split(`{{${name}}}`).join(value),
-        template,
-      );

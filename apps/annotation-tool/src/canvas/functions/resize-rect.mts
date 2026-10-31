@@ -1,6 +1,19 @@
 import { normalizeRect, type Point, type Rect } from 'ts-utils-additional';
 import type { Direction } from './bbox-points.mjs';
 
+export const resizeRect = (
+  rectPrevious: Rect,
+  pointDirectionToPinch: Direction,
+  movePointFrom: Point,
+  movePointTo: Point,
+): Rect =>
+  normalizeRect(
+    resizeRectSub(rectPrevious, pointDirectionToPinch, {
+      x: movePointTo.x - movePointFrom.x,
+      y: movePointTo.y - movePointFrom.y,
+    }),
+  );
+
 const resizeRectSub = (
   rectPrevious: Rect,
   pointDirectionToPinch: Direction,
@@ -65,16 +78,3 @@ const resizeRectSub = (
       };
   }
 };
-
-export const resizeRect = (
-  rectPrevious: Rect,
-  pointDirectionToPinch: Direction,
-  movePointFrom: Point,
-  movePointTo: Point,
-): Rect =>
-  normalizeRect(
-    resizeRectSub(rectPrevious, pointDirectionToPinch, {
-      x: movePointTo.x - movePointFrom.x,
-      y: movePointTo.y - movePointFrom.y,
-    }),
-  );

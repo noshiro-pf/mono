@@ -82,24 +82,41 @@ type Violation = Readonly<{
 
 const embedScriptRelativePath = 'scripts/cmd/embed-examples.mts';
 
-const checkPackage = async (
-  packageDir: string,
-): Promise<
-  Readonly<{ hasFences: boolean; violation: Violation | undefined }>
-> => {
-  const readme = await readFileOrUndefined(
-    path.resolve(packageDir, 'README.md'),
+const readFileOrUndefined = async (
+  filePath: string,
+): Promise<string | undefined> => {
+  const result = await Result.fromPromise(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFile(filePath, 'utf8'),
   );
 
-  const fenceCount = readme === undefined ? 0 : countSampleBackedFences(readme);
+  return Result.isErr(result) ? undefined : result.value;
+};
 
-  if (fenceCount === 0) {
-    return { hasFences: false, violation: undefined };
+const readDocScript = async (
+  packageDir: string,
+): Promise<string | undefined> => {
+  const text = await readFileOrUndefined(
+    path.resolve(packageDir, 'package.json'),
+  );
+
+  if (text === undefined) {
+    return undefined;
   }
 
-  const violation = await findWiringViolation(packageDir, fenceCount);
+  const parsed: unknown = JSON.parse(text);
 
-  return { hasFences: true, violation };
+  if (!isRecord(parsed) || !hasKey(parsed, 'scripts')) {
+    return undefined;
+  }
+
+  const { scripts } = parsed;
+
+  return !isRecord(scripts) || !hasKey(scripts, 'doc')
+    ? undefined
+    : isString(scripts.doc)
+      ? scripts.doc
+      : undefined;
 };
 
 /**
@@ -173,41 +190,24 @@ const findWiringViolation = async (
   };
 };
 
-const readDocScript = async (
+const checkPackage = async (
   packageDir: string,
-): Promise<string | undefined> => {
-  const text = await readFileOrUndefined(
-    path.resolve(packageDir, 'package.json'),
+): Promise<
+  Readonly<{ hasFences: boolean; violation: Violation | undefined }>
+> => {
+  const readme = await readFileOrUndefined(
+    path.resolve(packageDir, 'README.md'),
   );
 
-  if (text === undefined) {
-    return undefined;
+  const fenceCount = readme === undefined ? 0 : countSampleBackedFences(readme);
+
+  if (fenceCount === 0) {
+    return { hasFences: false, violation: undefined };
   }
 
-  const parsed: unknown = JSON.parse(text);
+  const violation = await findWiringViolation(packageDir, fenceCount);
 
-  if (!isRecord(parsed) || !hasKey(parsed, 'scripts')) {
-    return undefined;
-  }
-
-  const { scripts } = parsed;
-
-  return !isRecord(scripts) || !hasKey(scripts, 'doc')
-    ? undefined
-    : isString(scripts.doc)
-      ? scripts.doc
-      : undefined;
-};
-
-const readFileOrUndefined = async (
-  filePath: string,
-): Promise<string | undefined> => {
-  const result = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(filePath, 'utf8'),
-  );
-
-  return Result.isErr(result) ? undefined : result.value;
+  return { hasFences: true, violation };
 };
 
 if (isDirectlyExecuted(import.meta.url)) {

@@ -13,29 +13,6 @@ import {
   iconId2str,
 } from '../utils/index.mjs';
 
-const answerDiffRowStr = ({
-  datetimeRange,
-  datetimeSpecification,
-  iconBefore,
-  pointBefore,
-  iconAfter,
-  pointAfter,
-}: Readonly<{
-  datetimeRange: DatetimeRange;
-  datetimeSpecification: DatetimeSpecificationEnumType;
-  iconBefore: AnswerIconIdWithNone;
-  iconAfter: AnswerIconIdWithNone;
-  pointBefore: AnswerIconPoint;
-  pointAfter: AnswerIconPoint;
-}>): string =>
-  `    ・ ${datetimeRange2str(
-    datetimeRange,
-    datetimeSpecification,
-  )}：${iconId2str(iconBefore, pointBefore)}→${iconId2str(
-    iconAfter,
-    pointAfter,
-  )}` as const;
-
 export const answerDiffAsString = (
   before: Answer,
   after: Answer,
@@ -150,3 +127,26 @@ export const answerDiffAsString = (
 
   return mut_result;
 };
+
+const answerDiffRowStr = ({
+  datetimeRange,
+  datetimeSpecification,
+  iconBefore,
+  pointBefore,
+  iconAfter,
+  pointAfter,
+}: Readonly<{
+  datetimeRange: DatetimeRange;
+  datetimeSpecification: DatetimeSpecificationEnumType;
+  iconBefore: AnswerIconIdWithNone;
+  iconAfter: AnswerIconIdWithNone;
+  pointBefore: AnswerIconPoint;
+  pointAfter: AnswerIconPoint;
+}>): string =>
+  `    ・ ${datetimeRange2str(
+    datetimeRange,
+    datetimeSpecification,
+  )}：${iconId2str(iconBefore, pointBefore)}→${iconId2str(
+    iconAfter,
+    pointAfter,
+  )}` as const;

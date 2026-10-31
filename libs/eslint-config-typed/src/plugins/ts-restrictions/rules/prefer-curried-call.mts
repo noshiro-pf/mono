@@ -375,6 +375,34 @@ const isGlobalAmbientDeclaration = (
   );
 };
 
+/** A parameter that collects the rest of the arguments (`...args`). */
+const isRestParameter = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  symbol: ts.Symbol,
+): boolean => {
+  const declaration = symbol.valueDeclaration ?? symbol.declarations?.[0];
+
+  return (
+    declaration !== undefined &&
+    ts.isParameter(declaration) &&
+    declaration.dotDotDotToken !== undefined
+  );
+};
+
+/** The largest number of positional arguments the signature accepts. */
+const signatureMaxArgs = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  signature: ts.Signature,
+): number => {
+  const params = signature.getParameters();
+
+  const last = params.at(-1);
+
+  return last !== undefined && isRestParameter(last)
+    ? Number.POSITIVE_INFINITY
+    : params.length;
+};
+
 /**
  * `true` when every call signature of `type` accepts at most one argument, so
  * `(a) => f(a)` is equivalent to `f` even when the wrapper is used as a
@@ -392,6 +420,44 @@ const isEffectivelyUnary = (
     signatures.every((signature) => signatureMaxArgs(signature) <= 1)
   );
 };
+
+/** A parameter that may be omitted (`x?`, `x = ...`) or is a rest parameter. */
+const isOptionalParameter = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  symbol: ts.Symbol,
+): boolean => {
+  const declaration = symbol.valueDeclaration ?? symbol.declarations?.[0];
+
+  return (
+    declaration !== undefined &&
+    ts.isParameter(declaration) &&
+    (declaration.questionToken !== undefined ||
+      declaration.initializer !== undefined ||
+      declaration.dotDotDotToken !== undefined)
+  );
+};
+
+/** The number of leading required parameters (before any optional/rest). */
+const signatureMinArgs = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  signature: ts.Signature,
+): number => {
+  const firstOptional = signature
+    .getParameters()
+    .findIndex(isOptionalParameter);
+
+  return firstOptional === -1
+    ? signature.getParameters().length
+    : firstOptional;
+};
+
+const isCallableWith = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  signature: ts.Signature,
+  argCount: number,
+): boolean =>
+  signatureMinArgs(signature) <= argCount &&
+  argCount <= signatureMaxArgs(signature);
 
 /**
  * `true` when `type` has a curried call signature accepting exactly
@@ -413,72 +479,6 @@ const hasCurriedSignature = (
       .getCallSignatures()
       .some((inner) => isCallableWith(inner, 1));
   });
-
-const isCallableWith = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  signature: ts.Signature,
-  argCount: number,
-): boolean =>
-  signatureMinArgs(signature) <= argCount &&
-  argCount <= signatureMaxArgs(signature);
-
-/** The largest number of positional arguments the signature accepts. */
-const signatureMaxArgs = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  signature: ts.Signature,
-): number => {
-  const params = signature.getParameters();
-
-  const last = params.at(-1);
-
-  return last !== undefined && isRestParameter(last)
-    ? Number.POSITIVE_INFINITY
-    : params.length;
-};
-
-/** The number of leading required parameters (before any optional/rest). */
-const signatureMinArgs = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  signature: ts.Signature,
-): number => {
-  const firstOptional = signature
-    .getParameters()
-    .findIndex(isOptionalParameter);
-
-  return firstOptional === -1
-    ? signature.getParameters().length
-    : firstOptional;
-};
-
-/** A parameter that collects the rest of the arguments (`...args`). */
-const isRestParameter = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  symbol: ts.Symbol,
-): boolean => {
-  const declaration = symbol.valueDeclaration ?? symbol.declarations?.[0];
-
-  return (
-    declaration !== undefined &&
-    ts.isParameter(declaration) &&
-    declaration.dotDotDotToken !== undefined
-  );
-};
-
-/** A parameter that may be omitted (`x?`, `x = ...`) or is a rest parameter. */
-const isOptionalParameter = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  symbol: ts.Symbol,
-): boolean => {
-  const declaration = symbol.valueDeclaration ?? symbol.declarations?.[0];
-
-  return (
-    declaration !== undefined &&
-    ts.isParameter(declaration) &&
-    (declaration.questionToken !== undefined ||
-      declaration.initializer !== undefined ||
-      declaration.dotDotDotToken !== undefined)
-  );
-};
 
 /**
  * A conservative purity approximation: `true` only for expressions whose

@@ -257,6 +257,29 @@ const isGlobal = (
   return variable === null || variable.defs.length === 0;
 };
 
+const resolveConstraint = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+): ts.Type =>
+  (type.flags & ts.TypeFlags.TypeParameter) !== 0
+    ? (checker.getBaseConstraintOfType(type) ?? type)
+    : type;
+
+const isPrimitiveType = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+): boolean => {
+  const resolved = resolveConstraint(checker, type);
+
+  return resolved.isUnion()
+    ? resolved.types.every((t) => isPrimitiveType(checker, t))
+    : (resolved.flags & primitiveTypeFlags) !== 0;
+};
+
 /**
  * Whether `type` is an array or tuple (or a union or intersection of them) whose elements are
  * all primitives, i.e. something `Arr.uniq` accepts.
@@ -291,26 +314,3 @@ const isPrimitiveArrayType = (
   // An empty tuple has nothing to deduplicate, but is still accepted.
   return typeArguments.every((t) => isPrimitiveType(checker, t));
 };
-
-const isPrimitiveType = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: ts.TypeChecker,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  type: ts.Type,
-): boolean => {
-  const resolved = resolveConstraint(checker, type);
-
-  return resolved.isUnion()
-    ? resolved.types.every((t) => isPrimitiveType(checker, t))
-    : (resolved.flags & primitiveTypeFlags) !== 0;
-};
-
-const resolveConstraint = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: ts.TypeChecker,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  type: ts.Type,
-): ts.Type =>
-  (type.flags & ts.TypeFlags.TypeParameter) !== 0
-    ? (checker.getBaseConstraintOfType(type) ?? type)
-    : type;

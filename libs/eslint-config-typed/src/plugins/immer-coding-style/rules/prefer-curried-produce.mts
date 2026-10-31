@@ -112,6 +112,154 @@ type ReportContext = Readonly<{
   }>;
 }>;
 
+const getTypeArguments = (
+  node: DeepReadonly<TSESTree.CallExpression>,
+): TSESTree.TSTypeParameterInstantiation | undefined => {
+  const mutableNode = castDeepMutable(node);
+
+  if (isRecord(mutableNode) && hasKey(mutableNode, 'typeArguments')) {
+    return (
+      mutableNode as TSESTree.CallExpression &
+        Readonly<{
+          typeArguments?: TSESTree.TSTypeParameterInstantiation;
+        }>
+    ).typeArguments;
+  }
+
+  if (isRecord(mutableNode) && hasKey(mutableNode, 'typeParameters')) {
+    return (mutableNode as CallExpressionWithLegacyTypeParameters)
+      .typeParameters;
+  }
+
+  return undefined;
+};
+
+/**
+ * The type the outermost `as` or `<T>` among `node`'s type wrappers gives it,
+ * seen through `satisfies`, `!` and parentheses, or `undefined`.
+ */
+const getAssertedType = (
+  node: DeepReadonly<TSESTree.Node>,
+): DeepReadonly<TSESTree.TypeNode> | undefined => {
+  if (
+    node.type === AST_NODE_TYPES.TSAsExpression ||
+    node.type === AST_NODE_TYPES.TSTypeAssertion
+  ) {
+    return node.typeAnnotation;
+  }
+
+  return isTypeWrapper(node) ? getAssertedType(node.expression) : undefined;
+};
+
+const getArrowFunctionParameterType = ({
+  arrowFunction,
+  sourceCode,
+}: Readonly<{
+  arrowFunction: DeepReadonly<TSESTree.ArrowFunctionExpression>;
+  sourceCode: Readonly<{
+    getText: TSESLint.SourceCode['getText'];
+  }>;
+}>): string | undefined => {
+  const [parameter] = arrowFunction.params;
+
+  if (parameter?.type !== AST_NODE_TYPES.Identifier) {
+    return undefined;
+  }
+
+  const typeAnnotation = parameter.typeAnnotation?.typeAnnotation;
+
+  return typeAnnotation === undefined
+    ? undefined
+    : sourceCode.getText(castDeepMutable(typeAnnotation));
+};
+
+const getArrowFunctionReturnType = ({
+  arrowFunction,
+  sourceCode,
+}: Readonly<{
+  arrowFunction: DeepReadonly<TSESTree.ArrowFunctionExpression>;
+  sourceCode: Readonly<{
+    getText: TSESLint.SourceCode['getText'];
+  }>;
+}>): string | undefined => {
+  const typeAnnotation = arrowFunction.returnType?.typeAnnotation;
+
+  return typeAnnotation === undefined
+    ? undefined
+    : sourceCode.getText(castDeepMutable(typeAnnotation));
+};
+
+const getTypeParametersText = ({
+  arrowFunction,
+  baseArgument,
+  callExpression,
+  sourceCode,
+}: Readonly<{
+  arrowFunction: DeepReadonly<TSESTree.ArrowFunctionExpression>;
+  baseArgument: DeepReadonly<TSESTree.CallExpressionArgument>;
+  callExpression: DeepReadonly<TSESTree.CallExpression>;
+  sourceCode: Readonly<{
+    getText: TSESLint.SourceCode['getText'];
+  }>;
+}>): string => {
+  const typeArguments = getTypeArguments(callExpression);
+
+  if (typeArguments !== undefined) {
+    return sourceCode.getText(castDeepMutable(typeArguments));
+  }
+
+  // `produce(state as State, recipe)` infers its base type from the cast.
+  const assertedType = getAssertedType(baseArgument);
+
+  if (assertedType !== undefined) {
+    return `<${sourceCode.getText(castDeepMutable(assertedType))}>`;
+  }
+
+  const parameterType = getArrowFunctionParameterType({
+    arrowFunction,
+    sourceCode,
+  });
+
+  if (parameterType !== undefined) {
+    return `<${parameterType}>`;
+  }
+
+  const returnType = getArrowFunctionReturnType({
+    arrowFunction,
+    sourceCode,
+  });
+
+  return returnType !== undefined ? `<${returnType}>` : '';
+};
+
+const normalizeMultilineText = (text: string): string => {
+  const lines = text.split('\n');
+
+  if (Arr.isMaxLengthArray(1, lines)) {
+    return text;
+  }
+
+  const indents = Arr.tail(lines)
+    .filter((line) => line.trim().length > 0)
+    .map((line) => /^[\t ]*/u.exec(line)?.[0].length ?? 0);
+
+  if (Arr.isEmpty(indents)) {
+    return text;
+  }
+
+  const minIndent = Math.min(...indents);
+
+  if (minIndent === 0) {
+    return text;
+  }
+
+  const normalized = lines.map((line, index) =>
+    index === 0 ? line : line.slice(minIndent),
+  );
+
+  return normalized.join('\n');
+};
+
 const report = (
   context: DeepReadonly<TSESLint.RuleContext<MessageIds, []>>,
   {
@@ -220,152 +368,4 @@ const hasOtherReferences = (
   return variable.references.some(
     (reference) => reference.identifier !== baseIdentifier,
   );
-};
-
-const getTypeArguments = (
-  node: DeepReadonly<TSESTree.CallExpression>,
-): TSESTree.TSTypeParameterInstantiation | undefined => {
-  const mutableNode = castDeepMutable(node);
-
-  if (isRecord(mutableNode) && hasKey(mutableNode, 'typeArguments')) {
-    return (
-      mutableNode as TSESTree.CallExpression &
-        Readonly<{
-          typeArguments?: TSESTree.TSTypeParameterInstantiation;
-        }>
-    ).typeArguments;
-  }
-
-  if (isRecord(mutableNode) && hasKey(mutableNode, 'typeParameters')) {
-    return (mutableNode as CallExpressionWithLegacyTypeParameters)
-      .typeParameters;
-  }
-
-  return undefined;
-};
-
-const getTypeParametersText = ({
-  arrowFunction,
-  baseArgument,
-  callExpression,
-  sourceCode,
-}: Readonly<{
-  arrowFunction: DeepReadonly<TSESTree.ArrowFunctionExpression>;
-  baseArgument: DeepReadonly<TSESTree.CallExpressionArgument>;
-  callExpression: DeepReadonly<TSESTree.CallExpression>;
-  sourceCode: Readonly<{
-    getText: TSESLint.SourceCode['getText'];
-  }>;
-}>): string => {
-  const typeArguments = getTypeArguments(callExpression);
-
-  if (typeArguments !== undefined) {
-    return sourceCode.getText(castDeepMutable(typeArguments));
-  }
-
-  // `produce(state as State, recipe)` infers its base type from the cast.
-  const assertedType = getAssertedType(baseArgument);
-
-  if (assertedType !== undefined) {
-    return `<${sourceCode.getText(castDeepMutable(assertedType))}>`;
-  }
-
-  const parameterType = getArrowFunctionParameterType({
-    arrowFunction,
-    sourceCode,
-  });
-
-  if (parameterType !== undefined) {
-    return `<${parameterType}>`;
-  }
-
-  const returnType = getArrowFunctionReturnType({
-    arrowFunction,
-    sourceCode,
-  });
-
-  return returnType !== undefined ? `<${returnType}>` : '';
-};
-
-/**
- * The type the outermost `as` or `<T>` among `node`'s type wrappers gives it,
- * seen through `satisfies`, `!` and parentheses, or `undefined`.
- */
-const getAssertedType = (
-  node: DeepReadonly<TSESTree.Node>,
-): DeepReadonly<TSESTree.TypeNode> | undefined => {
-  if (
-    node.type === AST_NODE_TYPES.TSAsExpression ||
-    node.type === AST_NODE_TYPES.TSTypeAssertion
-  ) {
-    return node.typeAnnotation;
-  }
-
-  return isTypeWrapper(node) ? getAssertedType(node.expression) : undefined;
-};
-
-const getArrowFunctionParameterType = ({
-  arrowFunction,
-  sourceCode,
-}: Readonly<{
-  arrowFunction: DeepReadonly<TSESTree.ArrowFunctionExpression>;
-  sourceCode: Readonly<{
-    getText: TSESLint.SourceCode['getText'];
-  }>;
-}>): string | undefined => {
-  const [parameter] = arrowFunction.params;
-
-  if (parameter?.type !== AST_NODE_TYPES.Identifier) {
-    return undefined;
-  }
-
-  const typeAnnotation = parameter.typeAnnotation?.typeAnnotation;
-
-  return typeAnnotation === undefined
-    ? undefined
-    : sourceCode.getText(castDeepMutable(typeAnnotation));
-};
-
-const getArrowFunctionReturnType = ({
-  arrowFunction,
-  sourceCode,
-}: Readonly<{
-  arrowFunction: DeepReadonly<TSESTree.ArrowFunctionExpression>;
-  sourceCode: Readonly<{
-    getText: TSESLint.SourceCode['getText'];
-  }>;
-}>): string | undefined => {
-  const typeAnnotation = arrowFunction.returnType?.typeAnnotation;
-
-  return typeAnnotation === undefined
-    ? undefined
-    : sourceCode.getText(castDeepMutable(typeAnnotation));
-};
-
-const normalizeMultilineText = (text: string): string => {
-  const lines = text.split('\n');
-
-  if (Arr.isMaxLengthArray(1, lines)) {
-    return text;
-  }
-
-  const indents = Arr.tail(lines)
-    .filter((line) => line.trim().length > 0)
-    .map((line) => /^[\t ]*/u.exec(line)?.[0].length ?? 0);
-
-  if (Arr.isEmpty(indents)) {
-    return text;
-  }
-
-  const minIndent = Math.min(...indents);
-
-  if (minIndent === 0) {
-    return text;
-  }
-
-  const normalized = lines.map((line, index) =>
-    index === 0 ? line : line.slice(minIndent),
-  );
-
-  return normalized.join('\n');
 };

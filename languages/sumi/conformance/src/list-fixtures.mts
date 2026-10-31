@@ -37,39 +37,6 @@ export const listFixtures = (rootDir: string): FixtureListing => {
   };
 };
 
-const listRuleFixtures = (
-  area: string,
-  rule: string,
-  ruleDir: string,
-): FixtureListing => {
-  const kinds = listDirectories(ruleDir);
-
-  const listings = kinds.map((kind) =>
-    kind === 'valid' || kind === 'invalid'
-      ? listKindFixtures(area, rule, kind, path.join(ruleDir, kind))
-      : {
-          fixtures: [],
-          problems: [
-            `${area}/${rule}: unexpected directory "${kind}" (only valid/ and invalid/ are allowed)`,
-          ],
-        },
-  );
-
-  const missingInvalidProblems = kinds.includes('invalid')
-    ? ([] as const)
-    : ([
-        `${area}/${rule}: missing invalid/ (a rule without an invalid fixture checks nothing)`,
-      ] as const);
-
-  return {
-    fixtures: listings.flatMap((listing) => listing.fixtures),
-    problems: [
-      ...listings.flatMap((listing) => listing.problems),
-      ...missingInvalidProblems,
-    ],
-  };
-};
-
 const listKindFixtures = (
   area: string,
   rule: string,
@@ -107,3 +74,36 @@ const listDirectories = (dir: string): readonly string[] =>
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .toSorted();
+
+const listRuleFixtures = (
+  area: string,
+  rule: string,
+  ruleDir: string,
+): FixtureListing => {
+  const kinds = listDirectories(ruleDir);
+
+  const listings = kinds.map((kind) =>
+    kind === 'valid' || kind === 'invalid'
+      ? listKindFixtures(area, rule, kind, path.join(ruleDir, kind))
+      : {
+          fixtures: [],
+          problems: [
+            `${area}/${rule}: unexpected directory "${kind}" (only valid/ and invalid/ are allowed)`,
+          ],
+        },
+  );
+
+  const missingInvalidProblems = kinds.includes('invalid')
+    ? ([] as const)
+    : ([
+        `${area}/${rule}: missing invalid/ (a rule without an invalid fixture checks nothing)`,
+      ] as const);
+
+  return {
+    fixtures: listings.flatMap((listing) => listing.fixtures),
+    problems: [
+      ...listings.flatMap((listing) => listing.problems),
+      ...missingInvalidProblems,
+    ],
+  };
+};

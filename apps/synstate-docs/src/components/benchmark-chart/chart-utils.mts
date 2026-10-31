@@ -58,21 +58,6 @@ export const generateLogTicks = (
   return mut_ticks;
 };
 
-const niceStep = (max: number, targetTicks: number): PositiveSafeInt => {
-  // eslint-disable-next-line total-functions/no-partial-division
-  const raw = max / targetTicks;
-
-  const magnitude = asPositiveSafeInt(10 ** Math.floor(Math.log10(raw)));
-
-  // eslint-disable-next-line total-functions/no-partial-division
-  const normalized = raw / magnitude;
-
-  const nice =
-    normalized < 1.5 ? 1 : normalized < 3 ? 2 : normalized < 7 ? 5 : 10;
-
-  return PositiveSafeInt.mul(nice, magnitude);
-};
-
 /**
  * Compute Y-coordinate for a value, with optional log scale and clamping.
  */
@@ -103,4 +88,19 @@ export const createToY = (
     // eslint-disable-next-line total-functions/no-partial-division
     return plotH - (clamped / yMax) * plotH;
   };
+};
+
+const niceStep = (max: number, targetTicks: number): PositiveSafeInt => {
+  // eslint-disable-next-line total-functions/no-partial-division
+  const raw = max / targetTicks;
+
+  const magnitude = asPositiveSafeInt(10 ** Math.floor(Math.log10(raw)));
+
+  // eslint-disable-next-line total-functions/no-partial-division
+  const normalized = raw / magnitude;
+
+  const nice =
+    normalized < 1.5 ? 1 : normalized < 3 ? 2 : normalized < 7 ? 5 : 10;
+
+  return PositiveSafeInt.mul(nice, magnitude);
 };

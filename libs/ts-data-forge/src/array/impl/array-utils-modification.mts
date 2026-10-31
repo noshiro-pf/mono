@@ -55,12 +55,6 @@ export function set<E, const V = E>(
   }
 }
 
-const setImpl = <E, const V = E>(
-  array: readonly E[],
-  index: SizeType.ArgArr,
-  newValue: V,
-): readonly (E | V)[] => (array as readonly (E | V)[]).with(index, newValue);
-
 /**
  * Returns a new array with an element at the specified index updated by applying a function.
  *
@@ -110,14 +104,6 @@ export function toUpdated<E, V = E>(
       return (array) => toUpdatedImpl(array, ...args);
   }
 }
-
-const toUpdatedImpl = <E, V = E>(
-  array: readonly E[],
-  index: SizeType.ArgArr,
-  updater: (prev: E) => V,
-): readonly (E | V)[] =>
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  (array as readonly (E | V)[]).with(index, updater(array[index]!));
 
 /**
  * Returns a new array with a value inserted at the specified index.
@@ -175,20 +161,6 @@ export function toInserted<E, const V = E>(
   }
 }
 
-const toInsertedImpl = <E, const V = E>(
-  array: readonly E[],
-  index: SizeType.ArgArrWithNegative,
-  newValue: V,
-): NonEmptyArray<E | V> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  (array as readonly (E | V)[]).toSpliced(
-    index,
-    0,
-    newValue,
-  ) as unknown as NonEmptyArray<E | V>;
-
-type CastToNumber<T> = T extends number ? T : never;
-
 /**
  * Returns a new array with the element at the specified index removed.
  *
@@ -228,11 +200,6 @@ export function toRemoved<E>(
       return (array) => toRemovedImpl(array, ...args);
   }
 }
-
-const toRemovedImpl = <E,>(
-  array: readonly E[],
-  index: SizeType.ArgArrWithNegative,
-): readonly E[] => array.toSpliced(index, 1);
 
 /**
  * Returns a new array with a value appended to the end.
@@ -279,13 +246,6 @@ export function toPushed<const Ar extends readonly unknown[], const V>(
   }
 }
 
-const toPushedImpl = <const Ar extends readonly unknown[], const V>(
-  array: Ar,
-  newValue: V,
-): readonly [...Ar, V] =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  array.toSpliced(array.length, 0, newValue) as unknown as readonly [...Ar, V];
-
 /**
  * Returns a new array with a value prepended to the beginning.
  *
@@ -330,13 +290,6 @@ export function toUnshifted<Ar extends readonly unknown[], const V>(
       return (array) => toUnshiftedImpl(array, ...args);
   }
 }
-
-const toUnshiftedImpl = <Ar extends readonly unknown[], const V>(
-  array: Ar,
-  newValue: V,
-): readonly [V, ...Ar] =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  array.toSpliced(0, 0, newValue) as unknown as readonly [V, ...Ar];
 
 /**
  * Returns a new array with all elements replaced by the specified value.
@@ -394,9 +347,6 @@ export function toFilled<E>(
       return (array) => toFilledImpl(array, ...args);
   }
 }
-
-const toFilledImpl = <E,>(array: readonly E[], value: E): readonly E[] =>
-  create(asPositiveUint32(array.length), value);
 
 /**
  * Returns a new array with elements in the specified range replaced by the specified value.
@@ -478,6 +428,56 @@ export function toRangeFilled<E, const V>(
       return (array) => toRangeFilledImpl(array, ...args);
   }
 }
+
+const setImpl = <E, const V = E>(
+  array: readonly E[],
+  index: SizeType.ArgArr,
+  newValue: V,
+): readonly (E | V)[] => (array as readonly (E | V)[]).with(index, newValue);
+
+const toUpdatedImpl = <E, V = E>(
+  array: readonly E[],
+  index: SizeType.ArgArr,
+  updater: (prev: E) => V,
+): readonly (E | V)[] =>
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  (array as readonly (E | V)[]).with(index, updater(array[index]!));
+
+const toInsertedImpl = <E, const V = E>(
+  array: readonly E[],
+  index: SizeType.ArgArrWithNegative,
+  newValue: V,
+): NonEmptyArray<E | V> =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  (array as readonly (E | V)[]).toSpliced(
+    index,
+    0,
+    newValue,
+  ) as unknown as NonEmptyArray<E | V>;
+
+type CastToNumber<T> = T extends number ? T : never;
+
+const toRemovedImpl = <E,>(
+  array: readonly E[],
+  index: SizeType.ArgArrWithNegative,
+): readonly E[] => array.toSpliced(index, 1);
+
+const toPushedImpl = <const Ar extends readonly unknown[], const V>(
+  array: Ar,
+  newValue: V,
+): readonly [...Ar, V] =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  array.toSpliced(array.length, 0, newValue) as unknown as readonly [...Ar, V];
+
+const toUnshiftedImpl = <Ar extends readonly unknown[], const V>(
+  array: Ar,
+  newValue: V,
+): readonly [V, ...Ar] =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  array.toSpliced(0, 0, newValue) as unknown as readonly [V, ...Ar];
+
+const toFilledImpl = <E,>(array: readonly E[], value: E): readonly E[] =>
+  create(asPositiveUint32(array.length), value);
 
 const toRangeFilledImpl = <E, const V>(
   array: readonly E[],

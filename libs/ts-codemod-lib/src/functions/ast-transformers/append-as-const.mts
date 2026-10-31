@@ -144,6 +144,110 @@ type AsConstContext = Readonly<{
   isDirectUnderConstInitializer: boolean;
 }>;
 
+/**
+ * `x as const`, or `<const>x`, the angle-bracket spelling TypeScript treats
+ * identically (outside `.tsx`, where it does not parse).
+ */
+const isConstAssertionNode = (
+  node: tsm.Node,
+): node is tsm.AsExpression | tsm.TypeAssertion => {
+  if (isAsConstNode(node)) {
+    return true;
+  }
+
+  if (!tsm.Node.isTypeAssertion(node)) {
+    return false;
+  }
+
+  const typeNode = node.getTypeNode();
+
+  return (
+    typeNode !== undefined &&
+    typeNode.isKind(tsm.SyntaxKind.TypeReference) &&
+    typeNode.getTypeName().getText() === 'const' &&
+    Arr.isEmpty(typeNode.getTypeArguments())
+  );
+};
+
+/** `ns.MutableFoo` -> `MutableFoo` */
+const lastNameOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  entityName: tsm.EntityName,
+): string =>
+  (tsm.Node.isQualifiedName(entityName)
+    ? entityName.getRight()
+    : entityName
+  ).getText();
+
+/** `mut_x.items` -> `mut_x` */
+const firstNameOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  entityName: tsm.EntityName,
+): string =>
+  tsm.Node.isQualifiedName(entityName)
+    ? firstNameOf(entityName.getLeft())
+    : entityName.getText();
+
+const startsWithAny = (prefixes: ISet<string>, name: string): boolean =>
+  prefixes.some((p) => name.startsWith(p));
+
+/**
+ * The name a `typeof` starts from: a variable (`mut_x`) or a class, which
+ * `convert-to-readonly` leaves mutable by its type prefix (`MutableStore`).
+ */
+const isMutableValueName = (
+  name: string,
+  options: AppendAsConstTransformerOptionsInternal,
+): boolean =>
+  startsWithAny(options.mutableVariablePrefixes, name) ||
+  startsWithAny(options.mutableTypePrefixes, name);
+
+/**
+ * Whether `typeNode` names a type of a `mutableTypePrefixes` prefix anywhere
+ * in it (`MutableFoo`, `ns.MutableFoo[]`, `import('./m').MutableFoo | X`), or
+ * the type of a variable of a `mutableVariablePrefixes` prefix or a class of
+ * a `mutableTypePrefixes` one (`typeof mut_x`, `typeof MutableStore`). It reads names only, so an alias of another name for such
+ * a type is missed.
+ */
+const refersToMutableType = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  typeNode: tsm.TypeNode | undefined,
+  options: AppendAsConstTransformerOptionsInternal,
+): boolean => {
+  if (typeNode === undefined) {
+    return false;
+  }
+
+  const refers = (n: tsm.Node): boolean => {
+    if (n.isKind(tsm.SyntaxKind.TypeReference)) {
+      return startsWithAny(
+        options.mutableTypePrefixes,
+        lastNameOf(n.getTypeName()),
+      );
+    }
+
+    if (n.isKind(tsm.SyntaxKind.ImportType)) {
+      const qualifier = n.getQualifier();
+
+      return (
+        qualifier !== undefined &&
+        // typeof import('./m').mut_x names a value
+        (n.compilerNode.isTypeOf
+          ? isMutableValueName(firstNameOf(qualifier), options)
+          : startsWithAny(options.mutableTypePrefixes, lastNameOf(qualifier)))
+      );
+    }
+
+    // typeof mut_x, typeof mut_x.items, typeof MutableClass
+    return (
+      n.isKind(tsm.SyntaxKind.TypeQuery) &&
+      isMutableValueName(firstNameOf(n.getExprName()), options)
+    );
+  };
+
+  return refers(typeNode) || typeNode.getFirstDescendant(refers) !== undefined;
+};
+
 const transformNode = (
   node: tsm.Node,
   context: AsConstContext,
@@ -465,6 +569,178 @@ const transformNode = (
   // return;
 };
 
+/** `node` with the parentheses written around it taken off. */
+const skipParenthesizedExpressions = (node: tsm.Node): tsm.Node =>
+  tsm.Node.isParenthesizedExpression(node)
+    ? skipParenthesizedExpressions(node.getExpression())
+    : node;
+
+const getMatchedParameter = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  parameters: readonly tsm.ParameterDeclaration[],
+  argumentIndex: number,
+): tsm.ParameterDeclaration | undefined => {
+  if (argumentIndex < parameters.length) {
+    return parameters[argumentIndex];
+  }
+
+  const lastParameter = parameters.at(-1);
+
+  return lastParameter?.isRestParameter() === true ? lastParameter : undefined;
+};
+
+/**
+ * Whether the parameter's declared type is exactly a bare reference to one of
+ * the given `const`-modified type parameters (i.e. `x: T`, not `x: readonly
+ * T[]` or `x: Wrapper<T>` — there the argument expression's own type is still
+ * observable, so the `as const` is kept).
+ */
+const isBareConstTypeParameterReference = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  parameter: tsm.ParameterDeclaration,
+  constTypeParameterNames: ISet<string>,
+): boolean => {
+  const typeNode = parameter.getTypeNode();
+
+  if (typeNode === undefined) {
+    return false;
+  }
+
+  if (!typeNode.isKind(tsm.SyntaxKind.TypeReference)) {
+    return false;
+  }
+
+  const typeName = typeNode.getTypeName();
+
+  return (
+    typeName.isKind(tsm.SyntaxKind.Identifier) &&
+    Arr.isEmpty(typeNode.getTypeArguments()) &&
+    constTypeParameterNames.has(typeName.getText())
+  );
+};
+
+const removeAsConstArgsOfCall = (
+  args: readonly tsm.Node[],
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  callTarget: ResolvedCallTarget,
+  options: AppendAsConstTransformerOptionsInternal,
+): void => {
+  // Argument positions at or after a spread argument cannot be mapped to a
+  // parameter statically.
+  const firstSpreadIndex = args.findIndex((a) =>
+    a.isKind(tsm.SyntaxKind.SpreadElement),
+  );
+
+  const mappableArgCount =
+    firstSpreadIndex === -1 ? args.length : firstSpreadIndex;
+
+  for (const [argumentIndex, argument] of args.entries()) {
+    if (argumentIndex >= mappableArgCount) {
+      return;
+    }
+
+    if (argument.wasForgotten()) {
+      continue;
+    }
+
+    // `f(([1] as const))` is the same argument as `f([1] as const)`.
+    const asConst = skipParenthesizedExpressions(argument);
+
+    if (!isConstAssertionNode(asConst)) {
+      continue;
+    }
+
+    if (hasDisableNextLineComment(argument, TRANSFORMER_NAME)) {
+      continue;
+    }
+
+    const parameter = getMatchedParameter(callTarget.parameters, argumentIndex);
+
+    if (
+      parameter === undefined ||
+      !isBareConstTypeParameterReference(
+        parameter,
+        callTarget.constTypeParameterNames,
+      )
+    ) {
+      continue;
+    }
+
+    options.debugPrint(
+      'removing redundant as const in const type parameter argument',
+      argument.getText(),
+    );
+
+    // The parentheses go with it: an argument needs none of its own.
+    options.replaceNode(argument, asConst.getExpression().getText());
+  }
+};
+
+/**
+ * Resolves the callee of a call expression to the declaration of its single
+ * call signature, and collects the names of that declaration's
+ * `const`-modified type parameters.
+ *
+ * Returns `undefined` when the callee does not resolve to exactly one call
+ * signature, the resolved declaration has no parameters or type parameters,
+ * or none of the type parameters carry the `const` modifier.
+ */
+const resolveSingleSignatureCallTarget = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  call: tsm.CallExpression,
+): ResolvedCallTarget | undefined => {
+  // The callee's type is read as the call sees it, after any `as`,
+  // `satisfies` or `!` around it: that is the signature the argument is
+  // inferred against, and an `as const` has no run-time effect for an inner
+  // layer to contradict.
+  //
+  // 0 signatures: the callee is unresolved (e.g. imported, since each file
+  // is transformed in an isolated single-file project).
+  // 2+ signatures: overloads, where removing `as const` could change which
+  // overload is selected.
+  if (
+    !Arr.isFixedLengthArray(
+      1,
+      call.getExpression().getType().getCallSignatures(),
+    )
+  ) {
+    return undefined;
+  }
+
+  const declaration = call
+    .getProject()
+    .getTypeChecker()
+    .getResolvedSignature(call)
+    ?.getDeclaration();
+
+  if (
+    declaration === undefined ||
+    !tsm.Node.isParametered(declaration) ||
+    !tsm.Node.isTypeParametered(declaration)
+  ) {
+    return undefined;
+  }
+
+  // Only type parameters declared on the call's own signature are inferred
+  // at the call site; a `const` type parameter of an enclosing declaration
+  // (e.g. a generic class containing this method) is already fixed there.
+  const constTypeParameterNames = ISet.create(
+    declaration
+      .getTypeParameters()
+      .filter((tp) => tp.hasModifier(tsm.SyntaxKind.ConstKeyword))
+      .map((tp) => tp.getName()),
+  );
+
+  if (constTypeParameterNames.size === 0) {
+    return undefined;
+  }
+
+  return {
+    parameters: declaration.getParameters(),
+    constTypeParameterNames,
+  } as const;
+};
+
 /**
  * Removes redundant `as const` assertions from call arguments whose
  * corresponding parameter type is exactly a `const`-modified type parameter
@@ -539,283 +815,7 @@ const removeAsConstInConstTypeParameterArgs = (
   }
 };
 
-const removeAsConstArgsOfCall = (
-  args: readonly tsm.Node[],
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  callTarget: ResolvedCallTarget,
-  options: AppendAsConstTransformerOptionsInternal,
-): void => {
-  // Argument positions at or after a spread argument cannot be mapped to a
-  // parameter statically.
-  const firstSpreadIndex = args.findIndex((a) =>
-    a.isKind(tsm.SyntaxKind.SpreadElement),
-  );
-
-  const mappableArgCount =
-    firstSpreadIndex === -1 ? args.length : firstSpreadIndex;
-
-  for (const [argumentIndex, argument] of args.entries()) {
-    if (argumentIndex >= mappableArgCount) {
-      return;
-    }
-
-    if (argument.wasForgotten()) {
-      continue;
-    }
-
-    // `f(([1] as const))` is the same argument as `f([1] as const)`.
-    const asConst = skipParenthesizedExpressions(argument);
-
-    if (!isConstAssertionNode(asConst)) {
-      continue;
-    }
-
-    if (hasDisableNextLineComment(argument, TRANSFORMER_NAME)) {
-      continue;
-    }
-
-    const parameter = getMatchedParameter(callTarget.parameters, argumentIndex);
-
-    if (
-      parameter === undefined ||
-      !isBareConstTypeParameterReference(
-        parameter,
-        callTarget.constTypeParameterNames,
-      )
-    ) {
-      continue;
-    }
-
-    options.debugPrint(
-      'removing redundant as const in const type parameter argument',
-      argument.getText(),
-    );
-
-    // The parentheses go with it: an argument needs none of its own.
-    options.replaceNode(argument, asConst.getExpression().getText());
-  }
-};
-
-/**
- * `x as const`, or `<const>x`, the angle-bracket spelling TypeScript treats
- * identically (outside `.tsx`, where it does not parse).
- */
-const isConstAssertionNode = (
-  node: tsm.Node,
-): node is tsm.AsExpression | tsm.TypeAssertion => {
-  if (isAsConstNode(node)) {
-    return true;
-  }
-
-  if (!tsm.Node.isTypeAssertion(node)) {
-    return false;
-  }
-
-  const typeNode = node.getTypeNode();
-
-  return (
-    typeNode !== undefined &&
-    typeNode.isKind(tsm.SyntaxKind.TypeReference) &&
-    typeNode.getTypeName().getText() === 'const' &&
-    Arr.isEmpty(typeNode.getTypeArguments())
-  );
-};
-
-/** `node` with the parentheses written around it taken off. */
-const skipParenthesizedExpressions = (node: tsm.Node): tsm.Node =>
-  tsm.Node.isParenthesizedExpression(node)
-    ? skipParenthesizedExpressions(node.getExpression())
-    : node;
-
 type ResolvedCallTarget = Readonly<{
   parameters: readonly tsm.ParameterDeclaration[];
   constTypeParameterNames: ISet<string>;
 }>;
-
-/**
- * Resolves the callee of a call expression to the declaration of its single
- * call signature, and collects the names of that declaration's
- * `const`-modified type parameters.
- *
- * Returns `undefined` when the callee does not resolve to exactly one call
- * signature, the resolved declaration has no parameters or type parameters,
- * or none of the type parameters carry the `const` modifier.
- */
-const resolveSingleSignatureCallTarget = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  call: tsm.CallExpression,
-): ResolvedCallTarget | undefined => {
-  // The callee's type is read as the call sees it, after any `as`,
-  // `satisfies` or `!` around it: that is the signature the argument is
-  // inferred against, and an `as const` has no run-time effect for an inner
-  // layer to contradict.
-  //
-  // 0 signatures: the callee is unresolved (e.g. imported, since each file
-  // is transformed in an isolated single-file project).
-  // 2+ signatures: overloads, where removing `as const` could change which
-  // overload is selected.
-  if (
-    !Arr.isFixedLengthArray(
-      1,
-      call.getExpression().getType().getCallSignatures(),
-    )
-  ) {
-    return undefined;
-  }
-
-  const declaration = call
-    .getProject()
-    .getTypeChecker()
-    .getResolvedSignature(call)
-    ?.getDeclaration();
-
-  if (
-    declaration === undefined ||
-    !tsm.Node.isParametered(declaration) ||
-    !tsm.Node.isTypeParametered(declaration)
-  ) {
-    return undefined;
-  }
-
-  // Only type parameters declared on the call's own signature are inferred
-  // at the call site; a `const` type parameter of an enclosing declaration
-  // (e.g. a generic class containing this method) is already fixed there.
-  const constTypeParameterNames = ISet.create(
-    declaration
-      .getTypeParameters()
-      .filter((tp) => tp.hasModifier(tsm.SyntaxKind.ConstKeyword))
-      .map((tp) => tp.getName()),
-  );
-
-  if (constTypeParameterNames.size === 0) {
-    return undefined;
-  }
-
-  return {
-    parameters: declaration.getParameters(),
-    constTypeParameterNames,
-  } as const;
-};
-
-const getMatchedParameter = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  parameters: readonly tsm.ParameterDeclaration[],
-  argumentIndex: number,
-): tsm.ParameterDeclaration | undefined => {
-  if (argumentIndex < parameters.length) {
-    return parameters[argumentIndex];
-  }
-
-  const lastParameter = parameters.at(-1);
-
-  return lastParameter?.isRestParameter() === true ? lastParameter : undefined;
-};
-
-/**
- * Whether the parameter's declared type is exactly a bare reference to one of
- * the given `const`-modified type parameters (i.e. `x: T`, not `x: readonly
- * T[]` or `x: Wrapper<T>` — there the argument expression's own type is still
- * observable, so the `as const` is kept).
- */
-const isBareConstTypeParameterReference = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  parameter: tsm.ParameterDeclaration,
-  constTypeParameterNames: ISet<string>,
-): boolean => {
-  const typeNode = parameter.getTypeNode();
-
-  if (typeNode === undefined) {
-    return false;
-  }
-
-  if (!typeNode.isKind(tsm.SyntaxKind.TypeReference)) {
-    return false;
-  }
-
-  const typeName = typeNode.getTypeName();
-
-  return (
-    typeName.isKind(tsm.SyntaxKind.Identifier) &&
-    Arr.isEmpty(typeNode.getTypeArguments()) &&
-    constTypeParameterNames.has(typeName.getText())
-  );
-};
-
-/** `ns.MutableFoo` -> `MutableFoo` */
-const lastNameOf = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  entityName: tsm.EntityName,
-): string =>
-  (tsm.Node.isQualifiedName(entityName)
-    ? entityName.getRight()
-    : entityName
-  ).getText();
-
-/** `mut_x.items` -> `mut_x` */
-const firstNameOf = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  entityName: tsm.EntityName,
-): string =>
-  tsm.Node.isQualifiedName(entityName)
-    ? firstNameOf(entityName.getLeft())
-    : entityName.getText();
-
-const startsWithAny = (prefixes: ISet<string>, name: string): boolean =>
-  prefixes.some((p) => name.startsWith(p));
-
-/**
- * The name a `typeof` starts from: a variable (`mut_x`) or a class, which
- * `convert-to-readonly` leaves mutable by its type prefix (`MutableStore`).
- */
-const isMutableValueName = (
-  name: string,
-  options: AppendAsConstTransformerOptionsInternal,
-): boolean =>
-  startsWithAny(options.mutableVariablePrefixes, name) ||
-  startsWithAny(options.mutableTypePrefixes, name);
-
-/**
- * Whether `typeNode` names a type of a `mutableTypePrefixes` prefix anywhere
- * in it (`MutableFoo`, `ns.MutableFoo[]`, `import('./m').MutableFoo | X`), or
- * the type of a variable of a `mutableVariablePrefixes` prefix or a class of
- * a `mutableTypePrefixes` one (`typeof mut_x`, `typeof MutableStore`). It reads names only, so an alias of another name for such
- * a type is missed.
- */
-const refersToMutableType = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  typeNode: tsm.TypeNode | undefined,
-  options: AppendAsConstTransformerOptionsInternal,
-): boolean => {
-  if (typeNode === undefined) {
-    return false;
-  }
-
-  const refers = (n: tsm.Node): boolean => {
-    if (n.isKind(tsm.SyntaxKind.TypeReference)) {
-      return startsWithAny(
-        options.mutableTypePrefixes,
-        lastNameOf(n.getTypeName()),
-      );
-    }
-
-    if (n.isKind(tsm.SyntaxKind.ImportType)) {
-      const qualifier = n.getQualifier();
-
-      return (
-        qualifier !== undefined &&
-        // typeof import('./m').mut_x names a value
-        (n.compilerNode.isTypeOf
-          ? isMutableValueName(firstNameOf(qualifier), options)
-          : startsWithAny(options.mutableTypePrefixes, lastNameOf(qualifier)))
-      );
-    }
-
-    // typeof mut_x, typeof mut_x.items, typeof MutableClass
-    return (
-      n.isKind(tsm.SyntaxKind.TypeQuery) &&
-      isMutableValueName(firstNameOf(n.getExprName()), options)
-    );
-  };
-
-  return refers(typeNode) || typeNode.getFirstDescendant(refers) !== undefined;
-};

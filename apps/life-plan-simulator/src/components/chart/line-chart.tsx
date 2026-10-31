@@ -135,6 +135,22 @@ type Layout = Readonly<{
 const tickIndices = (count: number): readonly number[] =>
   Array.from({ length: count }, (_, i) => i);
 
+const ratio = (a: number, b: number): number =>
+  Num.isNonZero(b) ? Num.div(a, b) : 0;
+
+/** 1, 2, 5 × 10^n のうち `rough` 以上で最小のもの（0 以下なら 1）。 */
+const niceStep = (rough: number): number => {
+  if (rough <= 0) {
+    return 1;
+  }
+
+  const base = 10 ** Math.floor(Math.log10(rough));
+
+  return (
+    [1, 2, 5, 10].map((m) => m * base).find((s) => s >= rough) ?? base * 10
+  );
+};
+
 const computeLayout = (
   points: readonly ChartPoint[],
   seriesCount: number,
@@ -192,20 +208,4 @@ const computeLayout = (
     }),
     zero: yScale(0),
   };
-};
-
-const ratio = (a: number, b: number): number =>
-  Num.isNonZero(b) ? Num.div(a, b) : 0;
-
-/** 1, 2, 5 × 10^n のうち `rough` 以上で最小のもの（0 以下なら 1）。 */
-const niceStep = (rough: number): number => {
-  if (rough <= 0) {
-    return 1;
-  }
-
-  const base = 10 ** Math.floor(Math.log10(rough));
-
-  return (
-    [1, 2, 5, 10].map((m) => m * base).find((s) => s >= rough) ?? base * 10
-  );
 };

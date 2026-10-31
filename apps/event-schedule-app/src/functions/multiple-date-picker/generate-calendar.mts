@@ -98,6 +98,9 @@ const genYmdRangeList = (
 const getFirstDateOfMonth = (year: SafeUint, month: MonthEnum): Date =>
   DateUtils.create(year, month, 1);
 
+const isLeapYear = (year: SafeUint): boolean =>
+  (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+
 /**
  * その月の日数。
  *
@@ -138,9 +141,6 @@ const getLastDateNumberOfMonth = (
       return 31;
   }
 };
-
-const isLeapYear = (year: SafeUint): boolean =>
-  (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 
 const numWeeks = (year: SafeUint, month: MonthEnum): 4 | 5 | 6 => {
   const firstDate = getFirstDateOfMonth(year, month);

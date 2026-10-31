@@ -591,6 +591,99 @@ type DetailsPart = DetailsState &
  */
 const MAX_FOLLOW_UP_ROUNDS = 10;
 
+const unexpectedShape = (
+  errors: Parameters<typeof t.validationErrorsToMessages>[0],
+): string =>
+  `GitHub's answer is not the shape this page expects:\n${t.validationErrorsToMessages(errors).join('\n')}` as const;
+
+const nextCursor = (
+  pageInfo:
+    Readonly<{ hasNextPage: boolean; endCursor: string | null }> | undefined,
+): string | undefined =>
+  pageInfo?.hasNextPage === true && pageInfo.endCursor !== null
+    ? pageInfo.endCursor
+    : undefined;
+
+/**
+ * Every page of one of the queries that list the open pull requests, each
+ * validated by `schema`, the next asked for after the one before: a cursor is
+ * known only once the page before it has answered. `refusal` words an answer
+ * that is not a page at all. More than {@link MAX_OPEN_PAGES} fails the read,
+ * rather than reporting the first of them as the whole.
+ */
+const readOpenPages = async <D extends OpenPage<unknown>>({
+  ask,
+  query,
+  schema,
+  refusal,
+  after = null,
+  pages = [],
+  rateLimit,
+}: Readonly<{
+  ask: Ask;
+  query: string;
+  schema: t.Type<D>;
+  refusal?: (answer: GraphqlAnswer) => string | undefined;
+  after?: string | null;
+  pages?: readonly D[];
+  rateLimit?: RateLimit;
+}>): Promise<Answered<readonly D[]>> => {
+  if (pages.length >= MAX_OPEN_PAGES) {
+    return {
+      rateLimit,
+      result: Result.err(
+        `There are more than ${MAX_OPEN_PAGES * OPEN_PAGE_SIZE} open pull requests; this page reads that many and would report a part of them as the whole.`,
+      ),
+    };
+  }
+
+  const answered = await ask(query, { after });
+
+  const latestLimit = answered.rateLimit ?? rateLimit;
+
+  if (Result.isErr(answered.result)) {
+    return { rateLimit: latestLimit, result: answered.result };
+  }
+
+  const refused = refusal?.(answered.result.value);
+
+  if (refused !== undefined) {
+    return { rateLimit: latestLimit, result: Result.err(refused) };
+  }
+
+  const validated = schema.validate(answered.result.value.data);
+
+  if (Result.isErr(validated)) {
+    return {
+      rateLimit: latestLimit,
+      result: Result.err(unexpectedShape(validated.value)),
+    };
+  }
+
+  const read = Arr.toPushed(pages, validated.value);
+
+  const next = nextCursor(validated.value.repository.open.pageInfo);
+
+  return next === undefined
+    ? { rateLimit: latestLimit, result: Result.ok(read) }
+    : readOpenPages({
+        ask,
+        query,
+        schema,
+        ...(refusal === undefined ? {} : { refusal }),
+        after: next,
+        pages: read,
+        ...(latestLimit === undefined ? {} : { rateLimit: latestLimit }),
+      });
+};
+
+const openNodesOf = <N,>(pages: readonly OpenPage<N>[]): readonly N[] =>
+  pages.flatMap((page) => page.repository.open.nodes);
+
+/** `repository` in an answer, `undefined` when there is no such field. */
+const repositoryOf = ({ data }: GraphqlAnswer): unknown =>
+  isRecord(data) ? data['repository'] : undefined;
+
 const readPullRequests = async (
   ask: Ask,
   repo: RepoRef,
@@ -641,6 +734,119 @@ const readPullRequests = async (
       pulls: openNodesOf(pages.value),
     }),
   };
+};
+
+/** The aliased fields under `repository` in an answer, by alias. */
+const fieldsOf =
+  (data: unknown) =>
+  (alias: string): unknown => {
+    const repository: unknown = isRecord(data) ? data['repository'] : undefined;
+
+    return isRecord(repository) ? repository[alias] : undefined;
+  };
+
+/**
+ * Asks for whatever is left to follow up, folds the answer in, and goes
+ * round again until nothing is left or the rounds run out. One round at a
+ * time, because each round's questions are the previous round's cursors.
+ *
+ * A page that did not arrive fails the part: a verdict over half the
+ * checks, or a review state over half the files, would be a guess presented
+ * as a fact.
+ */
+const followUpRounds = async <S extends Readonly<{ number: number }>>({
+  operationName,
+  states,
+  followUpsOf,
+  applyOne,
+  rateLimit,
+  ask,
+  rounds = MAX_FOLLOW_UP_ROUNDS,
+}: Readonly<{
+  operationName: FollowUpName;
+  states: readonly S[];
+  followUpsOf: (state: S) => readonly FollowUp[];
+  applyOne: (state: S, followUp: FollowUp, value: unknown) => Result<S, string>;
+  rateLimit: RateLimit | undefined;
+  ask: Ask;
+  rounds?: number;
+}>): Promise<Answered<readonly S[]>> => {
+  const followUps = states.flatMap(followUpsOf);
+
+  if (rounds <= 0 || !Arr.isNonEmpty(followUps)) {
+    return { rateLimit, result: Result.ok(states) };
+  }
+
+  const { query, variables } = followUpQuery(operationName, followUps);
+
+  const answered = await ask(query, variables);
+
+  const latestLimit = answered.rateLimit ?? rateLimit;
+
+  if (Result.isErr(answered.result)) {
+    return { rateLimit: latestLimit, result: answered.result };
+  }
+
+  const failed = answered.result.value.errors.at(0);
+
+  if (failed !== undefined) {
+    return {
+      rateLimit: latestLimit,
+      result: Result.err(`GitHub could not finish the read: ${failed.message}`),
+    };
+  }
+
+  const field = fieldsOf(answered.result.value.data);
+
+  const mut_byNumber = new Map(states.map((state) => [state.number, state]));
+
+  for (const followUp of followUps) {
+    const state = mut_byNumber.get(followUp.number);
+
+    if (state === undefined) {
+      continue;
+    }
+
+    const next = applyOne(state, followUp, field(followUpAlias(followUp)));
+
+    if (Result.isErr(next)) {
+      return { rateLimit: latestLimit, result: next };
+    }
+
+    mut_byNumber.set(followUp.number, next.value);
+  }
+
+  return followUpRounds({
+    operationName,
+    states: states.map((state) => mut_byNumber.get(state.number) ?? state),
+    followUpsOf,
+    applyOne,
+    rateLimit: latestLimit,
+    ask,
+    rounds: rounds - 1,
+  });
+};
+
+const applyContexts = (
+  state: ChecksState,
+  _followUp: FollowUp,
+  value: unknown,
+): Result<ChecksState, string> => {
+  const validated = ContextsFieldSchema.validate(value);
+
+  if (Result.isErr(validated)) {
+    return Result.err(
+      `GitHub did not send the rest of #${state.number}'s check results.`,
+    );
+  }
+
+  const page = validated.value.statusCheckRollup?.contexts;
+
+  return Result.ok({
+    ...state,
+    contexts: [...state.contexts, ...(page?.nodes ?? [])],
+    contextsAfter: nextCursor(page?.pageInfo),
+  });
 };
 
 /**
@@ -700,6 +906,187 @@ const readChecks = async (
     ),
   };
 };
+
+const applyFiles = (
+  state: DetailsState,
+  _followUp: FollowUp,
+  value: unknown,
+): Result<DetailsState, string> => {
+  const validated = FilesFieldSchema.validate(value);
+
+  if (Result.isErr(validated)) {
+    return Result.err(
+      `GitHub did not send the rest of #${state.number}'s changed files.`,
+    );
+  }
+
+  const { files } = validated.value;
+
+  const filesAfter = nextCursor(files.pageInfo);
+
+  return Result.ok({
+    ...state,
+    files: [...state.files, ...files.nodes.map(({ path }) => path)],
+    filesAfter,
+    filesComplete: filesAfter === undefined,
+  });
+};
+
+/** The numbers of `repo`'s issues among those blocking one. */
+const ownBlockedBy = (
+  repo: RepoRef,
+  blockedBy: BlockedByNodes,
+): readonly number[] => {
+  const own = `${repo.owner}/${repo.name}`.toLowerCase();
+
+  return blockedBy.nodes
+    .filter(({ repository }) => repository.nameWithOwner.toLowerCase() === own)
+    .map(({ number }) => number);
+};
+
+/** Each of `repo`'s issues among `nodes`, by what its body declares. */
+const startAfterOfNodes = (
+  repo: RepoRef,
+  nodes: readonly t.TypeOf<typeof IssueWithBodySchema>[],
+): ReadonlyMap<number, readonly number[]> => {
+  const own = `${repo.owner}/${repo.name}`.toLowerCase();
+
+  return new Map(
+    nodes
+      .filter(
+        ({ repository }) => repository.nameWithOwner.toLowerCase() === own,
+      )
+      .map(({ number, body, blockedBy }) => [
+        number,
+        waitsFor(body, ownBlockedBy(repo, blockedBy)),
+      ]),
+  );
+};
+
+/**
+ * What GitHub calls the issues in `numbers`, keyed by number, as a linked
+ * one would be listed, and what each declares with `Start-After:`. Nothing
+ * is asked when there are none, which is so for every pull request into the
+ * default branch. An issue GitHub will not describe — deleted, or moved to
+ * another repository — is left out rather than failing the read, and is
+ * listed by its number alone.
+ */
+const describeIssues = async ({
+  repo,
+  numbers,
+  rateLimit,
+  ask,
+}: Readonly<{
+  repo: RepoRef;
+  numbers: readonly number[];
+  rateLimit: RateLimit | undefined;
+  ask: Ask;
+}>): Promise<Answered<DescribedIssues>> => {
+  if (!Arr.isNonEmpty(numbers)) {
+    return {
+      rateLimit,
+      result: Result.ok({
+        issues: new Map<number, LinkedIssue>(),
+        startAfter: new Map<number, readonly number[]>(),
+      }),
+    };
+  }
+
+  const { query, variables } = issuesQuery(numbers);
+
+  const answered = await ask(query, variables);
+
+  const latestLimit = answered.rateLimit ?? rateLimit;
+
+  if (Result.isErr(answered.result)) {
+    return { rateLimit: latestLimit, result: answered.result };
+  }
+
+  const field = fieldsOf(answered.result.value.data);
+
+  const nodes = Arr.generate(function* () {
+    for (const number of numbers) {
+      const validated = IssueWithBodySchema.validate(field(issueAlias(number)));
+
+      if (Result.isOk(validated)) {
+        yield validated.value;
+      }
+    }
+  });
+
+  return {
+    rateLimit: latestLimit,
+    result: Result.ok({
+      issues: new Map(
+        closingIssuesIn(repo, nodes).map((issue) => [issue.number, issue]),
+      ),
+      startAfter: startAfterOfNodes(repo, nodes),
+    }),
+  };
+};
+
+const unlinkedIssuesOf = (
+  repo: RepoRef,
+  pr: ClosingSources,
+): readonly number[] => {
+  const linked = new Set(
+    closingIssuesIn(repo, pr.closingIssuesReferences.nodes).map(
+      ({ number }) => number,
+    ),
+  );
+
+  return closingKeywordIssuesIn(repo, pr.bodyHTML).filter(
+    (number) => !linked.has(number),
+  );
+};
+
+/**
+ * The `Start-After:` of the issues an open pull request closes: the ones
+ * GitHub links, then the ones its body closes by keyword, from what
+ * {@link describeIssues} read of them.
+ */
+const closingStartAfterOf = (
+  repo: RepoRef,
+  pr: StrictPick<PullRequestDetails, 'bodyHTML' | 'closingIssuesReferences'>,
+  unlinked: ReadonlyMap<number, readonly number[]>,
+): ReadonlyMap<number, readonly number[]> => {
+  const mut_startAfter = new Map(
+    startAfterOfNodes(repo, pr.closingIssuesReferences.nodes),
+  );
+
+  for (const number of unlinkedIssuesOf(repo, pr)) {
+    const startAfter = unlinked.get(number);
+
+    if (startAfter !== undefined) {
+      mut_startAfter.set(number, startAfter);
+    }
+  }
+
+  return mut_startAfter;
+};
+
+/**
+ * The issues GitHub links, then the ones the body closes by keyword that it
+ * does not link yet: GitHub links a keyword only on a pull request into the
+ * default branch, and a stacked one waits for the layers below to merge.
+ */
+const linkedIssuesOf = (
+  repo: RepoRef,
+  pr: ClosingSources,
+  described: ReadonlyMap<number, LinkedIssue>,
+): readonly LinkedIssue[] =>
+  [
+    ...closingIssuesIn(repo, pr.closingIssuesReferences.nodes),
+    ...unlinkedIssuesOf(repo, pr).map(
+      (number): LinkedIssue =>
+        described.get(number) ?? {
+          number,
+          title: '',
+          url: `https://github.com/${repo.owner}/${repo.name}/issues/${number}`,
+          state: 'unknown',
+        },
+    ),
+  ] as const;
 
 /**
  * Each open pull request's details, with the issues its body closes. The
@@ -845,6 +1232,43 @@ const readComparisons = async (
   };
 };
 
+/**
+ * GitHub sends a `null` description for a label that has none; the report
+ * carries the empty string, so that nothing downstream has to know the
+ * difference.
+ */
+const labelsOf = (
+  labels: readonly Readonly<{
+    name: string;
+    color: string;
+    description: string | null;
+  }>[],
+): readonly Label[] =>
+  labels.map((label) => ({
+    name: label.name,
+    color: label.color,
+    description: label.description ?? '',
+  }));
+
+const mergedOf = (
+  repo: RepoRef,
+  pr: MergedPullRequestNode,
+  mergedAtEpochMs: number,
+  described: ReadonlyMap<number, LinkedIssue>,
+): Merged =>
+  ({
+    number: pr.number,
+    title: pr.title,
+    author: pr.author?.login ?? GHOST,
+    url: pr.url,
+    headRef: pr.headRefName,
+    baseRef: pr.baseRefName,
+    mergedAt: pr.mergedAt,
+    mergedAtEpochMs,
+    labels: labelsOf(pr.labels.nodes),
+    linkedIssues: linkedIssuesOf(repo, pr, described),
+  }) as const;
+
 /** What merged within {@link MERGED_WITHIN_DAYS}, newest first. */
 const readMerged = async (
   ask: Ask,
@@ -907,120 +1331,6 @@ const readMerged = async (
 };
 
 /**
- * The first {@link ISSUES_LIMIT} open issues, and the pages after them until
- * `count` have been asked for or every open issue is listed.
- */
-const readIssues = async ({
-  count,
-  ask,
-}: Readonly<{
-  count: number;
-  ask: (
-    after: string | undefined,
-    first: number,
-  ) => Promise<Answered<IssueList>>;
-}>): Promise<Answered<IssueList>> => {
-  const firstPage = await ask(undefined, ISSUES_LIMIT);
-
-  if (Result.isErr(firstPage.result)) {
-    return firstPage;
-  }
-
-  return listIssuesUpTo({
-    listed: firstPage.result.value,
-    covered: ISSUES_LIMIT,
-    count,
-    rateLimit: firstPage.rateLimit,
-    ask,
-  });
-};
-
-/**
- * `list` with what its declarations name described: one query for every
- * number named that is not an item of `list`, and none when there is no such
- * number. Each page is described as it is read (`loadIssuePage`), so a
- * number an earlier page lists may be asked about again; that costs a field,
- * where finding out would cost the read its independence.
- */
-const withReferences = async ({
-  list,
-  rateLimit,
-  ask,
-}: Readonly<{
-  list: IssueList;
-  rateLimit: RateLimit | undefined;
-  ask: Ask;
-}>): Promise<Answered<IssueList>> => {
-  const listed = new Set(list.items.map(({ number }) => number));
-
-  const numbers = Arr.uniq(list.items.flatMap(({ startAfter }) => startAfter))
-    .filter((number) => !listed.has(number))
-    .toSorted((a, b) => a - b);
-
-  if (!Arr.isNonEmpty(numbers)) {
-    return { rateLimit, result: Result.ok(list) };
-  }
-
-  const { query, variables } = referencesQuery(numbers);
-
-  const answered = await ask(query, variables);
-
-  const latestLimit = answered.rateLimit ?? rateLimit;
-
-  if (Result.isErr(answered.result)) {
-    return { rateLimit: latestLimit, result: answered.result };
-  }
-
-  const field = fieldsOf(answered.result.value.data);
-
-  return {
-    rateLimit: latestLimit,
-    result: Result.ok({
-      ...list,
-      referenced: Arr.generate<ReferencedItem>(function* () {
-        for (const number of numbers) {
-          const validated = ReferenceSchema.validate(
-            field(referenceAlias(number)),
-          );
-
-          if (Result.isOk(validated)) {
-            yield referencedOf(validated.value);
-          }
-        }
-      }),
-    }),
-  };
-};
-
-/** Where one named item stands, in `pr-report-core`'s terms. */
-const referencedOf = (
-  node: t.TypeOf<typeof ReferenceSchema>,
-): ReferencedItem =>
-  node.__typename === 'Issue'
-    ? ({
-        number: node.number,
-        kind: 'issue',
-        title: node.title,
-        url: node.url,
-        status: referenceStatusOf({
-          kind: 'issue',
-          state: node.state,
-          stateReason: node.stateReason ?? undefined,
-        }),
-      } as const)
-    : ({
-        number: node.number,
-        kind: 'pull-request',
-        title: node.title,
-        url: node.url,
-        status: referenceStatusOf({
-          kind: 'pull-request',
-          state: node.pullRequestState,
-          merged: node.merged,
-        }),
-      } as const);
-
-/**
  * `listed` and the pages after it, until they have asked for `count` or
  * listed every open issue. One page at a time, because each page starts
  * where the last ended.
@@ -1079,38 +1389,89 @@ const listIssuesUpTo = async ({
 };
 
 /**
- * Asks for whatever is left to follow up, folds the answer in, and goes
- * round again until nothing is left or the rounds run out. One round at a
- * time, because each round's questions are the previous round's cursors.
- *
- * A page that did not arrive fails the part: a verdict over half the
- * checks, or a review state over half the files, would be a guess presented
- * as a fact.
+ * The first {@link ISSUES_LIMIT} open issues, and the pages after them until
+ * `count` have been asked for or every open issue is listed.
  */
-const followUpRounds = async <S extends Readonly<{ number: number }>>({
-  operationName,
-  states,
-  followUpsOf,
-  applyOne,
-  rateLimit,
+const readIssues = async ({
+  count,
   ask,
-  rounds = MAX_FOLLOW_UP_ROUNDS,
 }: Readonly<{
-  operationName: FollowUpName;
-  states: readonly S[];
-  followUpsOf: (state: S) => readonly FollowUp[];
-  applyOne: (state: S, followUp: FollowUp, value: unknown) => Result<S, string>;
-  rateLimit: RateLimit | undefined;
-  ask: Ask;
-  rounds?: number;
-}>): Promise<Answered<readonly S[]>> => {
-  const followUps = states.flatMap(followUpsOf);
+  count: number;
+  ask: (
+    after: string | undefined,
+    first: number,
+  ) => Promise<Answered<IssueList>>;
+}>): Promise<Answered<IssueList>> => {
+  const firstPage = await ask(undefined, ISSUES_LIMIT);
 
-  if (rounds <= 0 || !Arr.isNonEmpty(followUps)) {
-    return { rateLimit, result: Result.ok(states) };
+  if (Result.isErr(firstPage.result)) {
+    return firstPage;
   }
 
-  const { query, variables } = followUpQuery(operationName, followUps);
+  return listIssuesUpTo({
+    listed: firstPage.result.value,
+    covered: ISSUES_LIMIT,
+    count,
+    rateLimit: firstPage.rateLimit,
+    ask,
+  });
+};
+
+/** Where one named item stands, in `pr-report-core`'s terms. */
+const referencedOf = (
+  node: t.TypeOf<typeof ReferenceSchema>,
+): ReferencedItem =>
+  node.__typename === 'Issue'
+    ? ({
+        number: node.number,
+        kind: 'issue',
+        title: node.title,
+        url: node.url,
+        status: referenceStatusOf({
+          kind: 'issue',
+          state: node.state,
+          stateReason: node.stateReason ?? undefined,
+        }),
+      } as const)
+    : ({
+        number: node.number,
+        kind: 'pull-request',
+        title: node.title,
+        url: node.url,
+        status: referenceStatusOf({
+          kind: 'pull-request',
+          state: node.pullRequestState,
+          merged: node.merged,
+        }),
+      } as const);
+
+/**
+ * `list` with what its declarations name described: one query for every
+ * number named that is not an item of `list`, and none when there is no such
+ * number. Each page is described as it is read (`loadIssuePage`), so a
+ * number an earlier page lists may be asked about again; that costs a field,
+ * where finding out would cost the read its independence.
+ */
+const withReferences = async ({
+  list,
+  rateLimit,
+  ask,
+}: Readonly<{
+  list: IssueList;
+  rateLimit: RateLimit | undefined;
+  ask: Ask;
+}>): Promise<Answered<IssueList>> => {
+  const listed = new Set(list.items.map(({ number }) => number));
+
+  const numbers = Arr.uniq(list.items.flatMap(({ startAfter }) => startAfter))
+    .filter((number) => !listed.has(number))
+    .toSorted((a, b) => a - b);
+
+  if (!Arr.isNonEmpty(numbers)) {
+    return { rateLimit, result: Result.ok(list) };
+  }
+
+  const { query, variables } = referencesQuery(numbers);
 
   const answered = await ask(query, variables);
 
@@ -1120,44 +1481,25 @@ const followUpRounds = async <S extends Readonly<{ number: number }>>({
     return { rateLimit: latestLimit, result: answered.result };
   }
 
-  const failed = answered.result.value.errors.at(0);
-
-  if (failed !== undefined) {
-    return {
-      rateLimit: latestLimit,
-      result: Result.err(`GitHub could not finish the read: ${failed.message}`),
-    };
-  }
-
   const field = fieldsOf(answered.result.value.data);
 
-  const mut_byNumber = new Map(states.map((state) => [state.number, state]));
-
-  for (const followUp of followUps) {
-    const state = mut_byNumber.get(followUp.number);
-
-    if (state === undefined) {
-      continue;
-    }
-
-    const next = applyOne(state, followUp, field(followUpAlias(followUp)));
-
-    if (Result.isErr(next)) {
-      return { rateLimit: latestLimit, result: next };
-    }
-
-    mut_byNumber.set(followUp.number, next.value);
-  }
-
-  return followUpRounds({
-    operationName,
-    states: states.map((state) => mut_byNumber.get(state.number) ?? state),
-    followUpsOf,
-    applyOne,
+  return {
     rateLimit: latestLimit,
-    ask,
-    rounds: rounds - 1,
-  });
+    result: Result.ok({
+      ...list,
+      referenced: Arr.generate<ReferencedItem>(function* () {
+        for (const number of numbers) {
+          const validated = ReferenceSchema.validate(
+            field(referenceAlias(number)),
+          );
+
+          if (Result.isOk(validated)) {
+            yield referencedOf(validated.value);
+          }
+        }
+      }),
+    }),
+  };
 };
 
 /** A page of one of the queries that list the open pull requests. */
@@ -1170,257 +1512,10 @@ type OpenPage<N> = Readonly<{
   }>;
 }>;
 
-/**
- * Every page of one of the queries that list the open pull requests, each
- * validated by `schema`, the next asked for after the one before: a cursor is
- * known only once the page before it has answered. `refusal` words an answer
- * that is not a page at all. More than {@link MAX_OPEN_PAGES} fails the read,
- * rather than reporting the first of them as the whole.
- */
-const readOpenPages = async <D extends OpenPage<unknown>>({
-  ask,
-  query,
-  schema,
-  refusal,
-  after = null,
-  pages = [],
-  rateLimit,
-}: Readonly<{
-  ask: Ask;
-  query: string;
-  schema: t.Type<D>;
-  refusal?: (answer: GraphqlAnswer) => string | undefined;
-  after?: string | null;
-  pages?: readonly D[];
-  rateLimit?: RateLimit;
-}>): Promise<Answered<readonly D[]>> => {
-  if (pages.length >= MAX_OPEN_PAGES) {
-    return {
-      rateLimit,
-      result: Result.err(
-        `There are more than ${MAX_OPEN_PAGES * OPEN_PAGE_SIZE} open pull requests; this page reads that many and would report a part of them as the whole.`,
-      ),
-    };
-  }
-
-  const answered = await ask(query, { after });
-
-  const latestLimit = answered.rateLimit ?? rateLimit;
-
-  if (Result.isErr(answered.result)) {
-    return { rateLimit: latestLimit, result: answered.result };
-  }
-
-  const refused = refusal?.(answered.result.value);
-
-  if (refused !== undefined) {
-    return { rateLimit: latestLimit, result: Result.err(refused) };
-  }
-
-  const validated = schema.validate(answered.result.value.data);
-
-  if (Result.isErr(validated)) {
-    return {
-      rateLimit: latestLimit,
-      result: Result.err(unexpectedShape(validated.value)),
-    };
-  }
-
-  const read = Arr.toPushed(pages, validated.value);
-
-  const next = nextCursor(validated.value.repository.open.pageInfo);
-
-  return next === undefined
-    ? { rateLimit: latestLimit, result: Result.ok(read) }
-    : readOpenPages({
-        ask,
-        query,
-        schema,
-        ...(refusal === undefined ? {} : { refusal }),
-        after: next,
-        pages: read,
-        ...(latestLimit === undefined ? {} : { rateLimit: latestLimit }),
-      });
-};
-
-const openNodesOf = <N,>(pages: readonly OpenPage<N>[]): readonly N[] =>
-  pages.flatMap((page) => page.repository.open.nodes);
-
-const applyContexts = (
-  state: ChecksState,
-  _followUp: FollowUp,
-  value: unknown,
-): Result<ChecksState, string> => {
-  const validated = ContextsFieldSchema.validate(value);
-
-  if (Result.isErr(validated)) {
-    return Result.err(
-      `GitHub did not send the rest of #${state.number}'s check results.`,
-    );
-  }
-
-  const page = validated.value.statusCheckRollup?.contexts;
-
-  return Result.ok({
-    ...state,
-    contexts: [...state.contexts, ...(page?.nodes ?? [])],
-    contextsAfter: nextCursor(page?.pageInfo),
-  });
-};
-
-const applyFiles = (
-  state: DetailsState,
-  _followUp: FollowUp,
-  value: unknown,
-): Result<DetailsState, string> => {
-  const validated = FilesFieldSchema.validate(value);
-
-  if (Result.isErr(validated)) {
-    return Result.err(
-      `GitHub did not send the rest of #${state.number}'s changed files.`,
-    );
-  }
-
-  const { files } = validated.value;
-
-  const filesAfter = nextCursor(files.pageInfo);
-
-  return Result.ok({
-    ...state,
-    files: [...state.files, ...files.nodes.map(({ path }) => path)],
-    filesAfter,
-    filesComplete: filesAfter === undefined,
-  });
-};
-
-/**
- * What GitHub calls the issues in `numbers`, keyed by number, as a linked
- * one would be listed, and what each declares with `Start-After:`. Nothing
- * is asked when there are none, which is so for every pull request into the
- * default branch. An issue GitHub will not describe — deleted, or moved to
- * another repository — is left out rather than failing the read, and is
- * listed by its number alone.
- */
-const describeIssues = async ({
-  repo,
-  numbers,
-  rateLimit,
-  ask,
-}: Readonly<{
-  repo: RepoRef;
-  numbers: readonly number[];
-  rateLimit: RateLimit | undefined;
-  ask: Ask;
-}>): Promise<Answered<DescribedIssues>> => {
-  if (!Arr.isNonEmpty(numbers)) {
-    return {
-      rateLimit,
-      result: Result.ok({
-        issues: new Map<number, LinkedIssue>(),
-        startAfter: new Map<number, readonly number[]>(),
-      }),
-    };
-  }
-
-  const { query, variables } = issuesQuery(numbers);
-
-  const answered = await ask(query, variables);
-
-  const latestLimit = answered.rateLimit ?? rateLimit;
-
-  if (Result.isErr(answered.result)) {
-    return { rateLimit: latestLimit, result: answered.result };
-  }
-
-  const field = fieldsOf(answered.result.value.data);
-
-  const nodes = Arr.generate(function* () {
-    for (const number of numbers) {
-      const validated = IssueWithBodySchema.validate(field(issueAlias(number)));
-
-      if (Result.isOk(validated)) {
-        yield validated.value;
-      }
-    }
-  });
-
-  return {
-    rateLimit: latestLimit,
-    result: Result.ok({
-      issues: new Map(
-        closingIssuesIn(repo, nodes).map((issue) => [issue.number, issue]),
-      ),
-      startAfter: startAfterOfNodes(repo, nodes),
-    }),
-  };
-};
-
 type DescribedIssues = Readonly<{
   issues: ReadonlyMap<number, LinkedIssue>;
   startAfter: ReadonlyMap<number, readonly number[]>;
 }>;
-
-/**
- * The `Start-After:` of the issues an open pull request closes: the ones
- * GitHub links, then the ones its body closes by keyword, from what
- * {@link describeIssues} read of them.
- */
-const closingStartAfterOf = (
-  repo: RepoRef,
-  pr: StrictPick<PullRequestDetails, 'bodyHTML' | 'closingIssuesReferences'>,
-  unlinked: ReadonlyMap<number, readonly number[]>,
-): ReadonlyMap<number, readonly number[]> => {
-  const mut_startAfter = new Map(
-    startAfterOfNodes(repo, pr.closingIssuesReferences.nodes),
-  );
-
-  for (const number of unlinkedIssuesOf(repo, pr)) {
-    const startAfter = unlinked.get(number);
-
-    if (startAfter !== undefined) {
-      mut_startAfter.set(number, startAfter);
-    }
-  }
-
-  return mut_startAfter;
-};
-
-/** Each of `repo`'s issues among `nodes`, by what its body declares. */
-const startAfterOfNodes = (
-  repo: RepoRef,
-  nodes: readonly t.TypeOf<typeof IssueWithBodySchema>[],
-): ReadonlyMap<number, readonly number[]> => {
-  const own = `${repo.owner}/${repo.name}`.toLowerCase();
-
-  return new Map(
-    nodes
-      .filter(
-        ({ repository }) => repository.nameWithOwner.toLowerCase() === own,
-      )
-      .map(({ number, body, blockedBy }) => [
-        number,
-        waitsFor(body, ownBlockedBy(repo, blockedBy)),
-      ]),
-  );
-};
-
-/** `repository` in an answer, `undefined` when there is no such field. */
-const repositoryOf = ({ data }: GraphqlAnswer): unknown =>
-  isRecord(data) ? data['repository'] : undefined;
-
-/** The aliased fields under `repository` in an answer, by alias. */
-const fieldsOf =
-  (data: unknown) =>
-  (alias: string): unknown => {
-    const repository: unknown = isRecord(data) ? data['repository'] : undefined;
-
-    return isRecord(repository) ? repository[alias] : undefined;
-  };
-
-const unexpectedShape = (
-  errors: Parameters<typeof t.validationErrorsToMessages>[0],
-): string =>
-  `GitHub's answer is not the shape this page expects:\n${t.validationErrorsToMessages(errors).join('\n')}` as const;
 
 /**
  * The later of two budgets: the one with the later reset, or within one
@@ -1443,13 +1538,231 @@ const newerLimit = (
           ? next
           : held;
 
-const nextCursor = (
-  pageInfo:
-    Readonly<{ hasNextPage: boolean; endCursor: string | null }> | undefined,
-): string | undefined =>
-  pageInfo?.hasNextPage === true && pageInfo.endCursor !== null
-    ? pageInfo.endCursor
-    : undefined;
+/**
+ * What the issues read so far declare with `Start-After:` — the listed ones,
+ * and the ones the open pull requests close — for those pull requests to
+ * inherit, and which numbers are known to be open issues.
+ */
+const issueDeclarationsOf = (known: Known): IssueDeclarations => {
+  const listed = known.issues?.items ?? [];
+
+  const mut_startAfter = new Map<number, readonly number[]>();
+
+  for (const { startAfter } of known.details?.values() ?? []) {
+    for (const [number, declared] of startAfter) {
+      mut_startAfter.set(number, declared);
+    }
+  }
+
+  for (const { number, startAfter } of listed) {
+    mut_startAfter.set(number, startAfter);
+  }
+
+  return {
+    startAfter: mut_startAfter,
+    open: new Set(
+      Arr.generate(function* () {
+        for (const { number } of listed) {
+          yield number;
+        }
+
+        for (const { number, kind, status } of known.issues?.referenced ?? []) {
+          if (kind === 'issue' && status === 'waiting') {
+            yield number;
+          }
+        }
+      }),
+    ),
+  };
+};
+
+const summaryOf = (entries: readonly Entry[]): PageSummary => {
+  const counted = summarize(entries);
+
+  const once = (part: EntryPart, count: () => number): number | undefined =>
+    entries.some(({ reading }) => reading.includes(part)) ? undefined : count();
+
+  return {
+    open: counted.open,
+    queued: counted.queued,
+    draft: counted.draft,
+    failing: once('checks', () => counted.failing),
+    setAside: once(
+      'details',
+      () => entries.filter((entry) => entry.setAside?.current === true).length,
+    ),
+    awaitingReview: once(
+      'details',
+      () =>
+        entries.filter((entry) => entry.codeOwnerReview.state === 'required')
+          .length,
+    ),
+    pending: entries.filter((entry) =>
+      entry.labels.some((label) => label.name === PENDING_LABEL),
+    ).length,
+  };
+};
+
+/** The workflow run a check suite is, in the shared verdict's terms. */
+const roundOf = (suite: CheckSuiteNode | null): CheckRunReport['round'] => {
+  const workflowId = suite?.workflowRun?.workflow.databaseId ?? undefined;
+
+  return suite === null || workflowId === undefined
+    ? undefined
+    : { workflowId, completed: suite.status === 'COMPLETED' };
+};
+
+/**
+ * A commit status's state as the REST API spells it. `EXPECTED` is GraphQL's
+ * alone — a required status nothing has reported yet — and is a wait, not a
+ * failure.
+ */
+const statusState = (state: string): string =>
+  state === 'EXPECTED' ? 'pending' : state.toLowerCase();
+
+const factsOf = (
+  pr: OpenPullRequest,
+  { checks, comparison, details }: PartsOfPull,
+): PullRequestFacts => {
+  // An unfinished list is judged as none, rather than as what it began with.
+  const contexts =
+    checks === undefined || checks.contextsAfter !== undefined
+      ? ([] as const)
+      : checks.contexts;
+
+  const runs: readonly CheckRunReport[] = Arr.generate(function* () {
+    for (const node of contexts) {
+      if (node.__typename === 'CheckRun') {
+        yield {
+          name: node.name,
+          // The REST spelling, which is what the shared verdict is written
+          // against: GraphQL says `COMPLETED` where REST says `completed`.
+          status: node.status.toLowerCase(),
+          conclusion: node.conclusion?.toLowerCase(),
+          checkSuiteId: node.checkSuite?.databaseId ?? 0,
+          id: node.databaseId ?? 0,
+          round: roundOf(node.checkSuite),
+        };
+      }
+    }
+  });
+
+  const statuses = Arr.generate(function* () {
+    for (const node of contexts) {
+      if (node.__typename === 'StatusContext') {
+        yield { context: node.context, state: statusState(node.state) };
+      }
+    }
+  });
+
+  return {
+    number: pr.number,
+    title: pr.title,
+    body: pr.body,
+    author: pr.author?.login ?? GHOST,
+    isDraft: pr.isDraft,
+    labels: labelsOf(pr.labels.nodes),
+    autoMerge: pr.autoMergeRequest !== null,
+    headRef: pr.headRefName,
+    headSha: pr.headRefOid,
+    baseRef: pr.baseRefName,
+    fromFork: pr.isCrossRepository,
+    url: pr.url,
+    updatedAt: pr.updatedAt,
+    headCommittedAt: pr.commits.nodes[0]?.commit.committedDate,
+    comparison,
+    reported: reportedContexts(runs, statuses),
+    checksRunning: anyRunInProgress(runs),
+    linkedIssues: details?.linkedIssues ?? [],
+  };
+};
+
+/**
+ * What the viewer's `unblock-prs` comment on this pull request says, when it
+ * says the pull request is set aside at the head it is at now. Once the
+ * branch has been pushed the record is someone else's head's, and the
+ * script rewrites the comment as resolved on its next survey.
+ */
+const setAsideOf = (
+  pr: OpenPullRequest,
+  details: DetailsPart,
+): SetAsideView | undefined => {
+  const found = Arr.generate(function* () {
+    for (const { viewerDidAuthor, url, body } of details.node.comments.nodes) {
+      if (!viewerDidAuthor) {
+        continue;
+      }
+
+      const says = parseSetAsideComment(body);
+
+      if (says !== undefined) {
+        yield { url, says };
+      }
+    }
+  }).at(0);
+
+  if (
+    found?.says.kind !== 'standing' ||
+    found.says.setAside.headSha !== pr.headRefOid
+  ) {
+    return undefined;
+  }
+
+  const { setAside, retry } = found.says;
+
+  const baseTip = pr.baseRef?.target?.oid;
+
+  return {
+    ...setAside,
+    retry,
+    url: found.url,
+    current: baseTip !== undefined && setAsideStillApplies(setAside, baseTip),
+  };
+};
+
+const approversOf = (details: PullRequestDetails): readonly string[] =>
+  Arr.generate(function* () {
+    for (const { state, author } of details.latestOpinionatedReviews.nodes) {
+      if (state === 'APPROVED' && author !== null) {
+        yield author.login;
+      }
+    }
+  });
+
+/** What the queue reads of one pull request (`queue-view.mts`). */
+const queuePullOf = (
+  entry: ReportEntry,
+  pr: OpenPullRequest,
+  details: DetailsPart,
+): QueuePull => {
+  const { node } = details;
+
+  return {
+    entry,
+    baseTip: pr.baseRef?.target?.oid ?? '',
+    mergeable: node.mergeable,
+    nativeStack:
+      node.stackEntry === null
+        ? undefined
+        : {
+            stack: node.stackEntry.stack.number,
+            position: node.stackEntry.position,
+            size: node.stackEntry.stack.size,
+          },
+    review: {
+      author: entry.author,
+      approvers: approversOf(node),
+      files: details.files,
+      filesComplete: details.filesComplete,
+      unresolvedConversations: node.reviewThreads.nodes.filter(
+        ({ isResolved }) => !isResolved,
+      ).length,
+    },
+    ownComments: node.comments.nodes
+      .filter(({ viewerDidAuthor }) => viewerDidAuthor)
+      .map(({ body }) => body),
+  };
+};
 
 /** Everything read so far, arranged into what the page shows. */
 const assemble = ({
@@ -1588,44 +1901,6 @@ const assemble = ({
   };
 };
 
-/**
- * What the issues read so far declare with `Start-After:` — the listed ones,
- * and the ones the open pull requests close — for those pull requests to
- * inherit, and which numbers are known to be open issues.
- */
-const issueDeclarationsOf = (known: Known): IssueDeclarations => {
-  const listed = known.issues?.items ?? [];
-
-  const mut_startAfter = new Map<number, readonly number[]>();
-
-  for (const { startAfter } of known.details?.values() ?? []) {
-    for (const [number, declared] of startAfter) {
-      mut_startAfter.set(number, declared);
-    }
-  }
-
-  for (const { number, startAfter } of listed) {
-    mut_startAfter.set(number, startAfter);
-  }
-
-  return {
-    startAfter: mut_startAfter,
-    open: new Set(
-      Arr.generate(function* () {
-        for (const { number } of listed) {
-          yield number;
-        }
-
-        for (const { number, kind, status } of known.issues?.referenced ?? []) {
-          if (kind === 'issue' && status === 'waiting') {
-            yield number;
-          }
-        }
-      }),
-    ),
-  };
-};
-
 /** What has answered about one pull request. */
 type PartsOfPull = Readonly<{
   checks: ChecksState | undefined;
@@ -1642,123 +1917,7 @@ const NO_ISSUES: IssueList = {
   referenced: [],
 } as const;
 
-const summaryOf = (entries: readonly Entry[]): PageSummary => {
-  const counted = summarize(entries);
-
-  const once = (part: EntryPart, count: () => number): number | undefined =>
-    entries.some(({ reading }) => reading.includes(part)) ? undefined : count();
-
-  return {
-    open: counted.open,
-    queued: counted.queued,
-    draft: counted.draft,
-    failing: once('checks', () => counted.failing),
-    setAside: once(
-      'details',
-      () => entries.filter((entry) => entry.setAside?.current === true).length,
-    ),
-    awaitingReview: once(
-      'details',
-      () =>
-        entries.filter((entry) => entry.codeOwnerReview.state === 'required')
-          .length,
-    ),
-    pending: entries.filter((entry) =>
-      entry.labels.some((label) => label.name === PENDING_LABEL),
-    ).length,
-  };
-};
-
 const MS_PER_DAY = 86_400_000;
-
-const factsOf = (
-  pr: OpenPullRequest,
-  { checks, comparison, details }: PartsOfPull,
-): PullRequestFacts => {
-  // An unfinished list is judged as none, rather than as what it began with.
-  const contexts =
-    checks === undefined || checks.contextsAfter !== undefined
-      ? ([] as const)
-      : checks.contexts;
-
-  const runs: readonly CheckRunReport[] = Arr.generate(function* () {
-    for (const node of contexts) {
-      if (node.__typename === 'CheckRun') {
-        yield {
-          name: node.name,
-          // The REST spelling, which is what the shared verdict is written
-          // against: GraphQL says `COMPLETED` where REST says `completed`.
-          status: node.status.toLowerCase(),
-          conclusion: node.conclusion?.toLowerCase(),
-          checkSuiteId: node.checkSuite?.databaseId ?? 0,
-          id: node.databaseId ?? 0,
-          round: roundOf(node.checkSuite),
-        };
-      }
-    }
-  });
-
-  const statuses = Arr.generate(function* () {
-    for (const node of contexts) {
-      if (node.__typename === 'StatusContext') {
-        yield { context: node.context, state: statusState(node.state) };
-      }
-    }
-  });
-
-  return {
-    number: pr.number,
-    title: pr.title,
-    body: pr.body,
-    author: pr.author?.login ?? GHOST,
-    isDraft: pr.isDraft,
-    labels: labelsOf(pr.labels.nodes),
-    autoMerge: pr.autoMergeRequest !== null,
-    headRef: pr.headRefName,
-    headSha: pr.headRefOid,
-    baseRef: pr.baseRefName,
-    fromFork: pr.isCrossRepository,
-    url: pr.url,
-    updatedAt: pr.updatedAt,
-    headCommittedAt: pr.commits.nodes[0]?.commit.committedDate,
-    comparison,
-    reported: reportedContexts(runs, statuses),
-    checksRunning: anyRunInProgress(runs),
-    linkedIssues: details?.linkedIssues ?? [],
-  };
-};
-
-/** The workflow run a check suite is, in the shared verdict's terms. */
-const roundOf = (suite: CheckSuiteNode | null): CheckRunReport['round'] => {
-  const workflowId = suite?.workflowRun?.workflow.databaseId ?? undefined;
-
-  return suite === null || workflowId === undefined
-    ? undefined
-    : { workflowId, completed: suite.status === 'COMPLETED' };
-};
-
-/**
- * The issues GitHub links, then the ones the body closes by keyword that it
- * does not link yet: GitHub links a keyword only on a pull request into the
- * default branch, and a stacked one waits for the layers below to merge.
- */
-const linkedIssuesOf = (
-  repo: RepoRef,
-  pr: ClosingSources,
-  described: ReadonlyMap<number, LinkedIssue>,
-): readonly LinkedIssue[] =>
-  [
-    ...closingIssuesIn(repo, pr.closingIssuesReferences.nodes),
-    ...unlinkedIssuesOf(repo, pr).map(
-      (number): LinkedIssue =>
-        described.get(number) ?? {
-          number,
-          title: '',
-          url: `https://github.com/${repo.owner}/${repo.name}/issues/${number}`,
-          state: 'unknown',
-        },
-    ),
-  ] as const;
 
 /**
  * What a pull request says it closes, read both ways. A merged one's closing
@@ -1768,155 +1927,6 @@ type ClosingSources = StrictPick<
   MergedPullRequestNode,
   'bodyHTML' | 'closingIssuesReferences'
 >;
-
-const unlinkedIssuesOf = (
-  repo: RepoRef,
-  pr: ClosingSources,
-): readonly number[] => {
-  const linked = new Set(
-    closingIssuesIn(repo, pr.closingIssuesReferences.nodes).map(
-      ({ number }) => number,
-    ),
-  );
-
-  return closingKeywordIssuesIn(repo, pr.bodyHTML).filter(
-    (number) => !linked.has(number),
-  );
-};
-
-/**
- * A commit status's state as the REST API spells it. `EXPECTED` is GraphQL's
- * alone — a required status nothing has reported yet — and is a wait, not a
- * failure.
- */
-const statusState = (state: string): string =>
-  state === 'EXPECTED' ? 'pending' : state.toLowerCase();
-
-/**
- * What the viewer's `unblock-prs` comment on this pull request says, when it
- * says the pull request is set aside at the head it is at now. Once the
- * branch has been pushed the record is someone else's head's, and the
- * script rewrites the comment as resolved on its next survey.
- */
-const setAsideOf = (
-  pr: OpenPullRequest,
-  details: DetailsPart,
-): SetAsideView | undefined => {
-  const found = Arr.generate(function* () {
-    for (const { viewerDidAuthor, url, body } of details.node.comments.nodes) {
-      if (!viewerDidAuthor) {
-        continue;
-      }
-
-      const says = parseSetAsideComment(body);
-
-      if (says !== undefined) {
-        yield { url, says };
-      }
-    }
-  }).at(0);
-
-  if (
-    found?.says.kind !== 'standing' ||
-    found.says.setAside.headSha !== pr.headRefOid
-  ) {
-    return undefined;
-  }
-
-  const { setAside, retry } = found.says;
-
-  const baseTip = pr.baseRef?.target?.oid;
-
-  return {
-    ...setAside,
-    retry,
-    url: found.url,
-    current: baseTip !== undefined && setAsideStillApplies(setAside, baseTip),
-  };
-};
-
-/** What the queue reads of one pull request (`queue-view.mts`). */
-const queuePullOf = (
-  entry: ReportEntry,
-  pr: OpenPullRequest,
-  details: DetailsPart,
-): QueuePull => {
-  const { node } = details;
-
-  return {
-    entry,
-    baseTip: pr.baseRef?.target?.oid ?? '',
-    mergeable: node.mergeable,
-    nativeStack:
-      node.stackEntry === null
-        ? undefined
-        : {
-            stack: node.stackEntry.stack.number,
-            position: node.stackEntry.position,
-            size: node.stackEntry.stack.size,
-          },
-    review: {
-      author: entry.author,
-      approvers: approversOf(node),
-      files: details.files,
-      filesComplete: details.filesComplete,
-      unresolvedConversations: node.reviewThreads.nodes.filter(
-        ({ isResolved }) => !isResolved,
-      ).length,
-    },
-    ownComments: node.comments.nodes
-      .filter(({ viewerDidAuthor }) => viewerDidAuthor)
-      .map(({ body }) => body),
-  };
-};
-
-const approversOf = (details: PullRequestDetails): readonly string[] =>
-  Arr.generate(function* () {
-    for (const { state, author } of details.latestOpinionatedReviews.nodes) {
-      if (state === 'APPROVED' && author !== null) {
-        yield author.login;
-      }
-    }
-  });
-
-const mergedOf = (
-  repo: RepoRef,
-  pr: MergedPullRequestNode,
-  mergedAtEpochMs: number,
-  described: ReadonlyMap<number, LinkedIssue>,
-): Merged =>
-  ({
-    number: pr.number,
-    title: pr.title,
-    author: pr.author?.login ?? GHOST,
-    url: pr.url,
-    headRef: pr.headRefName,
-    baseRef: pr.baseRefName,
-    mergedAt: pr.mergedAt,
-    mergedAtEpochMs,
-    labels: labelsOf(pr.labels.nodes),
-    linkedIssues: linkedIssuesOf(repo, pr, described),
-  }) as const;
-
-const issueListOf = (repo: RepoRef, page: OpenIssuePage): IssueList =>
-  ({
-    items: page.nodes.map((issue) => issueOf(repo, issue)),
-    totalCount: page.totalCount,
-    endCursor: nextCursor(page.pageInfo),
-    referenced: [],
-  }) as const;
-
-/** The numbers of `repo`'s issues among those blocking one. */
-const ownBlockedBy = (
-  repo: RepoRef,
-  blockedBy: BlockedByNodes,
-): readonly number[] => {
-  const own = `${repo.owner}/${repo.name}`.toLowerCase();
-
-  return blockedBy.nodes
-    .filter(({ repository }) => repository.nameWithOwner.toLowerCase() === own)
-    .map(({ number }) => number);
-};
 
 const issueOf = (repo: RepoRef, issue: OpenIssueNode): IssueItem =>
   ({
@@ -1932,23 +1942,13 @@ const issueOf = (repo: RepoRef, issue: OpenIssueNode): IssueItem =>
     misplacedMergeAfter: parseMergeAfter(issue.body),
   }) as const;
 
+const issueListOf = (repo: RepoRef, page: OpenIssuePage): IssueList =>
+  ({
+    items: page.nodes.map((issue) => issueOf(repo, issue)),
+    totalCount: page.totalCount,
+    endCursor: nextCursor(page.pageInfo),
+    referenced: [],
+  }) as const;
+
 /** What GitHub calls an account that has been deleted. */
 const GHOST = 'ghost';
-
-/**
- * GitHub sends a `null` description for a label that has none; the report
- * carries the empty string, so that nothing downstream has to know the
- * difference.
- */
-const labelsOf = (
-  labels: readonly Readonly<{
-    name: string;
-    color: string;
-    description: string | null;
-  }>[],
-): readonly Label[] =>
-  labels.map((label) => ({
-    name: label.name,
-    color: label.color,
-    description: label.description ?? '',
-  }));

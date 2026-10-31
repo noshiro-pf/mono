@@ -227,6 +227,33 @@ type NullComparison = Readonly<{
   operator: '==' | '!=' | '===' | '!==';
 }>;
 
+/** `undefined`, through any type wrapper around it. */
+const isUndefined = (node: DeepReadonly<TSESTree.Expression>): boolean => {
+  const value = skipTypeWrappers(node);
+
+  return value.type === AST_NODE_TYPES.Identifier && value.name === 'undefined';
+};
+
+const nullishKindOf = (
+  node: DeepReadonly<TSESTree.Expression>,
+): 'null' | 'undefined' | undefined => {
+  const value = skipTypeWrappers(node);
+
+  return value.type === AST_NODE_TYPES.Literal && value.raw === 'null'
+    ? 'null'
+    : isUndefined(value)
+      ? 'undefined'
+      : undefined;
+};
+
+const isEqualityOperator = (
+  operator: string,
+): operator is NullComparison['operator'] =>
+  operator === '==' ||
+  operator === '!=' ||
+  operator === '===' ||
+  operator === '!==';
+
 /** `x == null`, `undefined !== x` and the like, whichever side `x` is on. */
 const nullComparisonOf = (
   expression: DeepReadonly<TSESTree.Expression>,
@@ -308,6 +335,19 @@ const firstLinkFrom = (
     : undefined;
 };
 
+/** `node`, or the outermost `!` / `as` / `satisfies` wrapped around it. */
+const outermostWrapperOf = (
+  node: DeepReadonly<TSESTree.Node>,
+): DeepReadonly<TSESTree.Node> => {
+  const { parent } = node;
+
+  return parent !== undefined &&
+    isTypeWrapper(parent) &&
+    parent.expression === node
+    ? outermostWrapperOf(parent)
+    : node;
+};
+
 /**
  * Whether the ternary sits where an optional chain means something else: as
  * a callee or a tag (the chain passes `this`), or under `delete`.
@@ -327,19 +367,6 @@ const changesMeaningAsChain = (
     (parent?.type === AST_NODE_TYPES.UnaryExpression &&
       parent.operator === 'delete')
   );
-};
-
-/** `node`, or the outermost `!` / `as` / `satisfies` wrapped around it. */
-const outermostWrapperOf = (
-  node: DeepReadonly<TSESTree.Node>,
-): DeepReadonly<TSESTree.Node> => {
-  const { parent } = node;
-
-  return parent !== undefined &&
-    isTypeWrapper(parent) &&
-    parent.expression === node
-    ? outermostWrapperOf(parent)
-    : node;
 };
 
 const typeMayHold = (
@@ -373,33 +400,6 @@ const typeMayHold = (
 
   return false;
 };
-
-const nullishKindOf = (
-  node: DeepReadonly<TSESTree.Expression>,
-): 'null' | 'undefined' | undefined => {
-  const value = skipTypeWrappers(node);
-
-  return value.type === AST_NODE_TYPES.Literal && value.raw === 'null'
-    ? 'null'
-    : isUndefined(value)
-      ? 'undefined'
-      : undefined;
-};
-
-/** `undefined`, through any type wrapper around it. */
-const isUndefined = (node: DeepReadonly<TSESTree.Expression>): boolean => {
-  const value = skipTypeWrappers(node);
-
-  return value.type === AST_NODE_TYPES.Identifier && value.name === 'undefined';
-};
-
-const isEqualityOperator = (
-  operator: string,
-): operator is NullComparison['operator'] =>
-  operator === '==' ||
-  operator === '!=' ||
-  operator === '===' ||
-  operator === '!==';
 
 const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

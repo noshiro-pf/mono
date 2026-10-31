@@ -30,6 +30,31 @@ export const isReadonlyArrayTypeNode = (
   node.getOperator() === tsm.SyntaxKind.ReadonlyKeyword &&
   node.getTypeNode().isKind(tsm.SyntaxKind.ArrayType);
 
+export const isReadonlyTupleTypeNode = (
+  node: DeepReadonly<tsm.Node>,
+): node is ReadonlyTupleTypeNode =>
+  node.isKind(tsm.SyntaxKind.TypeOperator) &&
+  node.getOperator() === tsm.SyntaxKind.ReadonlyKeyword &&
+  node.getTypeNode().isKind(tsm.SyntaxKind.TupleType);
+
+export const isReadonlyTypeReferenceNode = (
+  node: DeepReadonly<tsm.Node>,
+): node is ReadonlyTypeReferenceNode => {
+  if (!node.isKind(tsm.SyntaxKind.TypeReference)) {
+    return false;
+  }
+
+  const typeName = node.getTypeName();
+
+  const typeArguments = node.getTypeArguments();
+
+  return (
+    typeName.isKind(tsm.SyntaxKind.Identifier) &&
+    typeName.getText() === 'Readonly' &&
+    Arr.isFixedLengthArray(1, typeArguments)
+  );
+};
+
 // Helper to get a specific type node from source code
 const getTypeNodeFromSource = (
   sourceCode: string,
@@ -97,13 +122,6 @@ export type ReadonlyTupleTypeNode = tsm.TypeNode &
     getTypeNode: () => tsm.TupleTypeNode;
   }>;
 
-export const isReadonlyTupleTypeNode = (
-  node: DeepReadonly<tsm.Node>,
-): node is ReadonlyTupleTypeNode =>
-  node.isKind(tsm.SyntaxKind.TypeOperator) &&
-  node.getOperator() === tsm.SyntaxKind.ReadonlyKeyword &&
-  node.getTypeNode().isKind(tsm.SyntaxKind.TupleType);
-
 if (import.meta.vitest !== undefined) {
   describe('isReadonlyTupleTypeNode', () => {
     test('should return true for readonly tuple type', () => {
@@ -161,24 +179,6 @@ export type ReadonlyTypeReferenceNode = tsm.TypeNode &
       }>;
     getTypeArguments: () => readonly [tsm.TypeNode];
   }>;
-
-export const isReadonlyTypeReferenceNode = (
-  node: DeepReadonly<tsm.Node>,
-): node is ReadonlyTypeReferenceNode => {
-  if (!node.isKind(tsm.SyntaxKind.TypeReference)) {
-    return false;
-  }
-
-  const typeName = node.getTypeName();
-
-  const typeArguments = node.getTypeArguments();
-
-  return (
-    typeName.isKind(tsm.SyntaxKind.Identifier) &&
-    typeName.getText() === 'Readonly' &&
-    Arr.isFixedLengthArray(1, typeArguments)
-  );
-};
 
 if (import.meta.vitest !== undefined) {
   describe('isReadonlyTypeReferenceNode', () => {

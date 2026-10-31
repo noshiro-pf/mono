@@ -413,6 +413,27 @@ const IssueSchema = t.record({
 });
 
 /**
+ * GraphQL: the REST API cannot take a pull request out of draft. The one
+ * GraphQL call this command makes, and only for a pull request someone
+ * opened as a draft before running it.
+ */
+export const markReady = async (
+  api: ApiContext,
+  nodeId: string,
+): Promise<Result<undefined, string>> =>
+  graphql(
+    api,
+    dedent`
+      mutation ($id: ID!) {
+        markPullRequestReadyForReview(input: { pullRequestId: $id }) {
+          clientMutationId
+        }
+      }
+    `,
+    { id: nodeId },
+  );
+
+/**
  * This repository's issues GitHub records as blocking `issue`, read as its
  * `Start-After:` is (`waitsFor`); asked only when its summary says there are
  * any.
@@ -443,27 +464,6 @@ const blockedByOf = async (
       .map(({ number }) => number),
   );
 };
-
-/**
- * GraphQL: the REST API cannot take a pull request out of draft. The one
- * GraphQL call this command makes, and only for a pull request someone
- * opened as a draft before running it.
- */
-export const markReady = async (
-  api: ApiContext,
-  nodeId: string,
-): Promise<Result<undefined, string>> =>
-  graphql(
-    api,
-    dedent`
-      mutation ($id: ID!) {
-        markPullRequestReadyForReview(input: { pullRequestId: $id }) {
-          clientMutationId
-        }
-      }
-    `,
-    { id: nodeId },
-  );
 
 const readRefName = async (
   command: string,

@@ -265,13 +265,6 @@ export const issueStartsOf = (
 export const isListedIssue = (node: IssueGraphNode): boolean =>
   isIssueStartState(node.state);
 
-/** Whether a node's state is a listed issue's rather than where it stands. */
-const isIssueStartState = (state: IssueNodeState): state is IssueStartState =>
-  state !== 'abandoned' &&
-  state !== 'done' &&
-  state !== 'open' &&
-  state !== 'unknown';
-
 /**
  * The graph without what is done — closed as completed, or merged — and
  * without the edges that run from it, which are the waits already over.
@@ -372,6 +365,31 @@ export const omitFilteredIssues = (
   };
 };
 
+/** Whether a node's state is a listed issue's rather than where it stands. */
+const isIssueStartState = (state: IssueNodeState): state is IssueStartState =>
+  state !== 'abandoned' &&
+  state !== 'done' &&
+  state !== 'open' &&
+  state !== 'unknown';
+
+/**
+ * `nodes` and `edges`, less what is not a listed issue and is linked by none
+ * of `edges`: such a node is drawn only for the issues it is linked to.
+ */
+const withLinked = (
+  nodes: readonly IssueGraphNode[],
+  edges: readonly IssueGraphEdge[],
+): IssueGraph => {
+  const linked = new Set(edges.flatMap(({ from, to }) => [from, to]));
+
+  return {
+    nodes: nodes.filter(
+      (node) => isListedIssue(node) || linked.has(node.number),
+    ),
+    edges,
+  };
+};
+
 /**
  * The graph without what `omitted` says, the edges that run from it or to
  * it, and what is not a listed issue and is left with no edge: what only
@@ -393,22 +411,4 @@ const omitNodes = (
     graph.nodes.filter(({ number }) => !gone.has(number)),
     graph.edges.filter(({ from, to }) => !gone.has(from) && !gone.has(to)),
   );
-};
-
-/**
- * `nodes` and `edges`, less what is not a listed issue and is linked by none
- * of `edges`: such a node is drawn only for the issues it is linked to.
- */
-const withLinked = (
-  nodes: readonly IssueGraphNode[],
-  edges: readonly IssueGraphEdge[],
-): IssueGraph => {
-  const linked = new Set(edges.flatMap(({ from, to }) => [from, to]));
-
-  return {
-    nodes: nodes.filter(
-      (node) => isListedIssue(node) || linked.has(node.number),
-    ),
-    edges,
-  };
 };

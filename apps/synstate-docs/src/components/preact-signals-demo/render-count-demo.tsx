@@ -12,14 +12,6 @@ const [
   { updateState: updateSharedCount, resetState: resetSharedCount },
 ] = createStateBase(0);
 
-const decrement = (): void => {
-  updateSharedCount((n) => n - 1);
-};
-
-const increment = (): void => {
-  updateSharedCount((n) => n + 1);
-};
-
 // Signal version of the same state
 const countSignal = toSignal(sharedCount$);
 
@@ -91,6 +83,18 @@ const SignalsPanel = (): preact.JSX.Element => {
       </div>
     </div>
   );
+};
+
+// ---------------------------------------------------------------------------
+// Controls
+// ---------------------------------------------------------------------------
+
+const decrement = (): void => {
+  updateSharedCount((n) => n - 1);
+};
+
+const increment = (): void => {
+  updateSharedCount((n) => n + 1);
 };
 
 // embed-sample-code-ignore-below

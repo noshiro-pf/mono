@@ -131,11 +131,6 @@ export function take<E>(
   }
 }
 
-const takeImpl = <E,>(
-  array: readonly E[],
-  num: SizeType.ArgArr,
-): readonly E[] => sliceClamped(array, 0, num);
-
 /**
  * Takes the last N elements from an array.
  *
@@ -197,12 +192,6 @@ export function takeLast<E>(
   }
 }
 
-const takeLastImpl = <E,>(
-  array: readonly E[],
-  num: SizeType.ArgArr,
-): readonly E[] =>
-  sliceClamped(array, Uint32.sub(size(array), num), size(array));
-
 /**
  * Skips the first N elements of an array.
  *
@@ -254,11 +243,6 @@ export function skip<E>(
       return (array) => skipImpl(array, ...args);
   }
 }
-
-const skipImpl = <E,>(
-  array: readonly E[],
-  num: SizeType.ArgArr,
-): readonly E[] => sliceClamped(array, num, size(array));
 
 /**
  * Skips the last N elements of an array.
@@ -313,6 +297,22 @@ export function skipLast<E>(
       return (array) => skipLastImpl(array, ...args);
   }
 }
+
+const takeImpl = <E,>(
+  array: readonly E[],
+  num: SizeType.ArgArr,
+): readonly E[] => sliceClamped(array, 0, num);
+
+const takeLastImpl = <E,>(
+  array: readonly E[],
+  num: SizeType.ArgArr,
+): readonly E[] =>
+  sliceClamped(array, Uint32.sub(size(array), num), size(array));
+
+const skipImpl = <E,>(
+  array: readonly E[],
+  num: SizeType.ArgArr,
+): readonly E[] => sliceClamped(array, num, size(array));
 
 const skipLastImpl = <E,>(
   array: readonly E[],

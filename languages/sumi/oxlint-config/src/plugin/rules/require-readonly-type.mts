@@ -263,6 +263,31 @@ const isMemberOfCoveredLiteral = (member: AnyNode): boolean =>
   member.parent?.type === AST_NODE_TYPES.TSTypeLiteral &&
   isCovered(member.parent, 'mapped');
 
+/** The name a declaration introduces, for the declaration kinds the codemod exempts. */
+const mutNameOf = (node: AnyNode): string | undefined => {
+  if (
+    node.type === AST_NODE_TYPES.TSTypeAliasDeclaration ||
+    node.type === AST_NODE_TYPES.TSInterfaceDeclaration ||
+    node.type === AST_NODE_TYPES.FunctionDeclaration
+  ) {
+    return node.id?.name;
+  }
+
+  if (node.type === AST_NODE_TYPES.VariableDeclarator) {
+    return node.id.type === AST_NODE_TYPES.Identifier
+      ? node.id.name
+      : undefined;
+  }
+
+  return node.type === AST_NODE_TYPES.TSPropertySignature
+    ? propertyName(node.key)
+    : undefined;
+};
+
+/** A declaration whose own name carries the `mut_` prefix. */
+const declaresMutName = (node: AnyNode): boolean =>
+  mutNameOf(node)?.startsWith(MUT_PREFIX) === true;
+
 /**
  * Whether a `DeepReadonly<>` / `Mutable<>` reference, or a `mut_`-named
  * declaration, encloses the node — the codemod's skip conditions.
@@ -290,29 +315,4 @@ const isExcluded = (node: AnyNode): boolean => {
   }
 
   return false;
-};
-
-/** A declaration whose own name carries the `mut_` prefix. */
-const declaresMutName = (node: AnyNode): boolean =>
-  mutNameOf(node)?.startsWith(MUT_PREFIX) === true;
-
-/** The name a declaration introduces, for the declaration kinds the codemod exempts. */
-const mutNameOf = (node: AnyNode): string | undefined => {
-  if (
-    node.type === AST_NODE_TYPES.TSTypeAliasDeclaration ||
-    node.type === AST_NODE_TYPES.TSInterfaceDeclaration ||
-    node.type === AST_NODE_TYPES.FunctionDeclaration
-  ) {
-    return node.id?.name;
-  }
-
-  if (node.type === AST_NODE_TYPES.VariableDeclarator) {
-    return node.id.type === AST_NODE_TYPES.Identifier
-      ? node.id.name
-      : undefined;
-  }
-
-  return node.type === AST_NODE_TYPES.TSPropertySignature
-    ? propertyName(node.key)
-    : undefined;
 };

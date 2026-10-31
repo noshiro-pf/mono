@@ -317,6 +317,19 @@ const toReference = (
     : { written, candidates };
 };
 
+/** Whether a proper prefix of `relativePath` is a symlink on disk. */
+const goesPastASymlink = (relativePath: string): boolean =>
+  Arr.butLast(relativePath.split('/')).some(
+    (_, index, segments) =>
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs
+        .lstatSync(
+          path.resolve(projectRootPath, segments.slice(0, index + 1).join('/')),
+          { throwIfNoEntry: false },
+        )
+        ?.isSymbolicLink() === true,
+  );
+
 /**
  * Which of `candidates` the repository's ignore files match. One `git
  * check-ignore` for all of them; it exits 1 when it matched none. The user's
@@ -369,19 +382,6 @@ const listGitIgnored = (
 
   return Result.ok(new Set<string>([pastASymlink, ignored].flat()));
 };
-
-/** Whether a proper prefix of `relativePath` is a symlink on disk. */
-const goesPastASymlink = (relativePath: string): boolean =>
-  Arr.butLast(relativePath.split('/')).some(
-    (_, index, segments) =>
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      fs
-        .lstatSync(
-          path.resolve(projectRootPath, segments.slice(0, index + 1).join('/')),
-          { throwIfNoEntry: false },
-        )
-        ?.isSymbolicLink() === true,
-  );
 
 const formatFindings = (
   findings: readonly Readonly<{

@@ -1,8 +1,5 @@
 import type { Hue } from './types/index.mjs';
 
-const isHue = (a: number): a is Hue =>
-  Number.isSafeInteger(a) && 0 <= a && a < 360;
-
 export const toHue = (a: number): Hue => {
   if (isHue(a)) {
     return a;
@@ -10,3 +7,6 @@ export const toHue = (a: number): Hue => {
 
   throw new Error(`toHue: ${a} is not a value of type "Hue".`);
 };
+
+const isHue = (a: number): a is Hue =>
+  Number.isSafeInteger(a) && 0 <= a && a < 360;

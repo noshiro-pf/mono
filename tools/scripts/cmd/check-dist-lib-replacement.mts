@@ -193,6 +193,16 @@ const nativeTsc = path.resolve(
   'node_modules/typescript-native/bin/tsc',
 );
 
+const hasDeclarationDir = (buildConfig: string): boolean =>
+  ts.getParsedCommandLineOfConfigFile(
+    buildConfig,
+    {},
+    {
+      ...ts.sys,
+      onUnRecoverableConfigFileDiagnostic: () => {},
+    },
+  )?.options.declarationDir !== undefined;
+
 const findTargets = async (): Promise<readonly Target[]> => {
   const packages = await getWorkspacePackages(projectRootPath);
 
@@ -227,15 +237,72 @@ const findTargets = async (): Promise<readonly Target[]> => {
     .toSorted((a, b) => a.relativeDir.localeCompare(b.relativeDir));
 };
 
-const hasDeclarationDir = (buildConfig: string): boolean =>
-  ts.getParsedCommandLineOfConfigFile(
-    buildConfig,
-    {},
-    {
-      ...ts.sys,
-      onUnRecoverableConfigFileDiagnostic: () => {},
-    },
-  )?.options.declarationDir !== undefined;
+/**
+ * Runs the native compiler on the build config with `libReplacement` forced
+ * either way and the output redirected.
+ */
+const compile = (
+  target: Target,
+  libReplacement: boolean,
+  outDir: string,
+): Promise<CompileResult> =>
+  new Promise((resolve) => {
+    execFile(
+      process.execPath,
+      [
+        nativeTsc,
+        '-p',
+        target.buildConfig,
+        '--libReplacement',
+        libReplacement ? 'true' : 'false',
+        '--outDir',
+        outDir,
+        ...(target.hasDeclarationDir ? ['--declarationDir', outDir] : []),
+        '--listFiles',
+      ],
+      { cwd: projectRootPath, maxBuffer: 2 ** 26 },
+      (error, stdout, stderr) => {
+        resolve({ succeeded: error === null, output: `${stdout}${stderr}` });
+      },
+    );
+  });
+
+/** `--listFiles` interleaves file paths with diagnostics; keep the latter. */
+const diagnosticsOf = (output: string): string =>
+  output
+    .split('\n')
+    .filter((line) => line !== '' && !path.isAbsolute(line))
+    .join('\n');
+
+const unifiedDiff = (
+  withStrictLib: string,
+  withStockLib: string,
+  label: string,
+): Promise<string> =>
+  new Promise((resolve) => {
+    execFile(
+      'diff',
+      [
+        '-u',
+        '--label',
+        `${label} (--libReplacement true)`,
+        '--label',
+        `${label} (--libReplacement false)`,
+        withStrictLib,
+        withStockLib,
+      ],
+      { maxBuffer: 2 ** 26 },
+      (_error, stdout, stderr) => {
+        resolve(`${stdout}${stderr}`.trimEnd());
+      },
+    );
+  });
+
+const indent = (text: string): string =>
+  text
+    .split('\n')
+    .map((line) => `      ${line}`)
+    .join('\n');
 
 /**
  * Compiles one package both ways and returns what to report, or `undefined`
@@ -332,67 +399,6 @@ const compareTarget = async ({
   return [header, ...details, ''].join('\n');
 };
 
-/**
- * Runs the native compiler on the build config with `libReplacement` forced
- * either way and the output redirected.
- */
-const compile = (
-  target: Target,
-  libReplacement: boolean,
-  outDir: string,
-): Promise<CompileResult> =>
-  new Promise((resolve) => {
-    execFile(
-      process.execPath,
-      [
-        nativeTsc,
-        '-p',
-        target.buildConfig,
-        '--libReplacement',
-        libReplacement ? 'true' : 'false',
-        '--outDir',
-        outDir,
-        ...(target.hasDeclarationDir ? ['--declarationDir', outDir] : []),
-        '--listFiles',
-      ],
-      { cwd: projectRootPath, maxBuffer: 2 ** 26 },
-      (error, stdout, stderr) => {
-        resolve({ succeeded: error === null, output: `${stdout}${stderr}` });
-      },
-    );
-  });
-
-/** `--listFiles` interleaves file paths with diagnostics; keep the latter. */
-const diagnosticsOf = (output: string): string =>
-  output
-    .split('\n')
-    .filter((line) => line !== '' && !path.isAbsolute(line))
-    .join('\n');
-
-const unifiedDiff = (
-  withStrictLib: string,
-  withStockLib: string,
-  label: string,
-): Promise<string> =>
-  new Promise((resolve) => {
-    execFile(
-      'diff',
-      [
-        '-u',
-        '--label',
-        `${label} (--libReplacement true)`,
-        '--label',
-        `${label} (--libReplacement false)`,
-        withStrictLib,
-        withStockLib,
-      ],
-      { maxBuffer: 2 ** 26 },
-      (_error, stdout, stderr) => {
-        resolve(`${stdout}${stderr}`.trimEnd());
-      },
-    );
-  });
-
 const listFilesRecursively = async (
   dir: string,
 ): Promise<readonly string[]> => {
@@ -407,12 +413,6 @@ const listFilesRecursively = async (
       path.relative(dir, path.join(entry.parentPath, entry.name)),
     );
 };
-
-const indent = (text: string): string =>
-  text
-    .split('\n')
-    .map((line) => `      ${line}`)
-    .join('\n');
 
 /**
  * `Promise.all(items.map(fn))`, with at most `concurrency` calls in flight.
