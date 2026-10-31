@@ -67,12 +67,20 @@ export const fastDeepEqual = <T,>(a: T, b: T): boolean => {
       return isRegExp(b) && a.source === b.source && a.flags === b.flags;
     }
 
-    if (a.valueOf !== Object.prototype.valueOf) {
-      return a.valueOf() === b.valueOf();
+    // A null-prototype object (`Object.create(null)`, `Object.groupBy`) has
+    // neither method, so it falls through to the key comparison.
+    if (
+      typeof a.valueOf === 'function' &&
+      a.valueOf !== Object.prototype.valueOf
+    ) {
+      return typeof b.valueOf === 'function' && a.valueOf() === b.valueOf();
     }
 
-    if (a.toString !== Object.prototype.toString) {
-      return a.toString() === b.toString();
+    if (
+      typeof a.toString === 'function' &&
+      a.toString !== Object.prototype.toString
+    ) {
+      return typeof b.toString === 'function' && a.toString() === b.toString();
     }
 
     const aKeys: readonly string[] = Object.keys(a);
@@ -84,12 +92,11 @@ export const fastDeepEqual = <T,>(a: T, b: T): boolean => {
       aKeys.every(
         (key) =>
           hasKey(b, key) &&
-          // React-specific: avoid traversing React elements' _owner.
-          //  _owner contains circular references
-          // and is not needed when comparing the actual elements (and not their owners)
-          // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-          !(key === '_owner' && a['$$typeof']) &&
-          fastDeepEqual(a[key], b[key]),
+          // React-specific: a React element (marked by a symbol `$$typeof`)
+          // has its _owner skipped, i.e. treated as equal. It holds circular
+          // references and is not part of what the element renders.
+          ((key === '_owner' && typeof a['$$typeof'] === 'symbol') ||
+            fastDeepEqual(a[key], b[key])),
       )
     );
   }
