@@ -291,3 +291,215 @@ describe('use-memo-hooks-style through type wrappers', () => {
     ],
   });
 });
+
+describe('use-memo-hooks-style with a block-bodied factory', () => {
+  tester.run(ruleName, useMemoHooksStyleRule, {
+    valid: [
+      {
+        name: 'an assertion inside a nested function or on a non-returned value',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: unknown;
+
+          const v = React.useMemo(() => {
+            const n = x as number;
+            const f = () => {
+              return x as number;
+            };
+            return f() + n;
+          }, []);
+        `,
+      },
+      {
+        name: 'a returned function, block- or expression-bodied',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: unknown;
+
+          const f = React.useMemo(() => () => {
+            return x as number;
+          }, []);
+          const g = React.useMemo(() => {
+            return () => x as number;
+          }, []);
+          const h = React.useMemo(() => () => x as number, []);
+        `,
+      },
+      {
+        name: 'an assertion inside the returned value, which does not decide its type',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: unknown;
+          declare const f: (n: number) => string;
+
+          const a = React.useMemo(() => {
+            return !(x as boolean);
+          }, []);
+          const b = React.useMemo(() => f(x as number), []);
+          const c = React.useMemo(() => typeof (x as string), []);
+        `,
+      },
+      {
+        name: 'an assertion in a condition, an earlier sequence member, an assignment or a generator',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: unknown;
+          declare const log: (n: number) => void;
+          declare const ref: { current: number };
+
+          const a = React.useMemo(() => ((x as boolean) ? 1 : 2), []);
+          const b = React.useMemo(() => (log(x as number), 0), []);
+          const d = React.useMemo(() => (x as boolean) && 1, []);
+          const e = React.useMemo(() => (ref.current = x as number), []);
+          const c = React.useMemo(function* () {
+            yield 1;
+            return x as number;
+          }, []);
+        `,
+      },
+      {
+        name: '`as const` in a return',
+        code: dedent`
+          import * as React from 'react';
+
+          const v = React.useMemo(() => {
+            return [1, 2] as const;
+          }, []);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'an assertion in the return',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: unknown;
+
+          const v = React.useMemo(() => {
+            return x as number;
+          }, []);
+        `,
+        errors: [{ messageId: 'disallowUseMemoTypeAnnotation', line: 6 }],
+      },
+      {
+        name: 'assertions in every return, nested in statements',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: unknown;
+          declare const k: number;
+
+          const v = React.useMemo(() => {
+            if (k > 0) {
+              return x as number;
+            }
+            for (;;) {
+              try {
+                return x as number;
+              } finally {
+                break;
+              }
+            }
+            switch (k) {
+              case 0:
+                return x! as number;
+            }
+            return (x satisfies unknown) as number;
+          }, []);
+        `,
+        errors: [
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 8 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 12 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 19 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 21 },
+        ],
+      },
+      {
+        name: 'assertions in the other statements that hold a return',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: unknown;
+          declare const k: number;
+          declare const xs: readonly number[];
+
+          const v = React.useMemo(() => {
+            if (k > 0) {
+              return 0;
+            } else {
+              return x as number;
+            }
+            try {
+              return 0;
+            } catch {
+              return x as number;
+            }
+            while (k) return x as number;
+            do {
+              return x as number;
+            } while (k);
+            for (const _ of xs) return x as number;
+            outer: {
+              return x as number;
+            }
+          }, []);
+        `,
+        errors: [
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 11 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 16 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 18 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 20 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 22 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 24 },
+        ],
+      },
+      {
+        name: 'an assertion on a branch of the returned expression',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: unknown;
+          declare const k: boolean;
+          declare const log: (n: number) => void;
+
+          const a = React.useMemo(() => {
+            return k ? (x as number) : 0;
+          }, []);
+          const b = React.useMemo(() => (x as number | undefined) ?? 0, []);
+          const c = React.useMemo(() => (log(0), x as number), []);
+          const d = React.useMemo(async () => await (x as Promise<number>), []);
+        `,
+        errors: [
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 8 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 10 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 11 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 12 },
+        ],
+      },
+      {
+        name: 'a `function` factory: its return type and its returns',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: unknown;
+
+          const a = React.useMemo(function () {
+            return x as number;
+          }, []);
+          const b = React.useMemo(function (): number {
+            return 0;
+          }, []);
+        `,
+        errors: [
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 6 },
+          { messageId: 'disallowUseMemoTypeAnnotation', line: 8 },
+        ],
+      },
+    ],
+  });
+});
