@@ -700,7 +700,7 @@ export const traceUpdates = (
       caption: outermost
         ? {
             en: `beginPropagation: no update was propagating (depth 0), so outermostToken = ${token}; depth = 1. While depth > 0, a write to a root counts as a write during propagation and warns once.`,
-            ja: `beginPropagation：伝播中の更新はなかった（depth 0）ので outermostToken = ${token}、depth = 1 にします。depth > 0 の間にルートへ書き込むと、伝播中の書き込みとして一度だけ警告が出ます。`,
+            ja: `beginPropagation：伝搬中の更新はなかった（depth 0）ので outermostToken = ${token}、depth = 1 にします。depth > 0 の間にルートへ書き込むと、伝搬中の書き込みとして一度だけ警告が出ます。`,
           }
         : {
             en: `beginPropagation: depth is ${(mut_module.propagationDepth - 1).toString()}, not 0, so outermostToken stays ${mut_module.outermostToken ?? 'undefined'}; depth = ${mut_module.propagationDepth.toString()}.`,

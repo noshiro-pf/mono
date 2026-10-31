@@ -20,7 +20,7 @@ import SignalsOperatorsDemo from '../../../../../components/signals-operators-de
 | 値から値へ状態を持ち越す       | `scan`、`pairwise`、`skip`、`take`              | signal に書く effect                         | イベント（同値の書き込みは捨てられ、batch は最後の書き込みだけを届ける）、先に作った読み手の整合性、遅延評価 |
 | 時間                           | `debounce`、`throttle`、`audit`、`timer`        | タイマーを置いて signal に書く effect        | 遅延評価と、完了時に吐き出される保留中の値                                                                   |
 | 値ごとのリクエストやストリーム | `switchMap`、`mergeMap`、`fromAbortablePromise` | signal に書き、cleanup で中断する effect     | 内側の値がすぐに出る場合（読み込み中の状態）の、先に作った読み手の整合性                                     |
-| 完了                           | `take`、`takeUntil`                             | 「終わった」を表す 2 つ目の signal           | 下流すべてへの完了の伝播                                                                                     |
+| 完了                           | `take`、`takeUntil`                             | 「終わった」を表す 2 つ目の signal           | 下流すべてへの完了の伝搬                                                                                     |
 
 何かを失う行のうち 2 つを、次の 2 つの節で動かします。
 

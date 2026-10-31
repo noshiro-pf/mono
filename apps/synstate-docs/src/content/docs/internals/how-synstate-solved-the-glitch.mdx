@@ -203,7 +203,7 @@ For graphs without diamond dependencies, RxJS is faster by a $\log n$ factor. Bu
 
 This matters in performance-sensitive scenarios such as `mousemove` or `pointermove` events, animation frames, or any high-frequency stream where updates fire dozens or hundreds of times per second. The repeated heap operations of the priority queue approach add up, and RxJS's redundant evaluations in diamond graphs scale even worse.
 
-SynState solves both problems: it achieves **glitch-free propagation in $O(n)$** — the same asymptotic cost as RxJS's tree traversal, but without glitches and without the exponential worst case ($D$ = fan-out per diamond). You can observe the slowdown in practice in the [deep dependency chain demo](/mono/synstate/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load), where RxJS's throughput collapses as the chain depth increases while SynState remains flat.
+SynState solves both problems: it achieves **glitch-free propagation in $O(n)$** — the same asymptotic cost as RxJS's tree traversal, but without glitches and without the exponential worst case ($D$ = fan-out per diamond). The [deep dependency chain demo](/mono/synstate/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load) shows the redundant emissions on a wide diamond, where $N+1$ outputs meet in one `combineLatest`: for each mouse move, RxJS's **Total updates** counter goes up by $N+1$ and SynState's by one, and each of RxJS's updates redraws all $N+1$ points.
 
 ## What Happens in SynState (Glitch-Free, _O(n)_)
 

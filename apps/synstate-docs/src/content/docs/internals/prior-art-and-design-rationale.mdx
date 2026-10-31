@@ -204,9 +204,9 @@ What does this mean concretely? In MobX and Jotai, a `computed` or derived atom 
 
 This difference is most pronounced for **updates to observables outside the subscription set**. With dynamic subscriptions, no observer is registered on the inactive observable, so update notifications never occur. With static subscriptions, `derive` fires and incurs the cost of the projection + equality comparison.
 
-To quantitatively verify this, we ran a [Conditional Fan-Out benchmark](/mono/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out). The results confirm that the oversubscription cost **exists in theory**. In MobX, the inactive branch's observer list is empty, making updates zero-cost. Written naively, with a `derive` over every branch, SynState holds all branches and its cost scales linearly with B; written with `switchMap`, which subscribes to the selected branch only, it stays flat.
+To quantitatively verify this, we ran a [Conditional Fan-Out benchmark](/mono/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out). The results confirm that the oversubscription cost **is real**. In MobX, the inactive branch's observer list is empty, making updates zero-cost. Written naively, with a `derive` over every branch, SynState holds all branches and its cost scales linearly with B; written with `switchMap`, which subscribes to the selected branch only, it stays flat.
 
-However, the benchmark scenario — a fixed selector with a large volume of updates to an inactive branch — is unlikely to occur in real applications. If unused data is being frequently updated, that is an application-level design issue to be addressed regardless of the library's subscription model. Additionally, each selector switch in dynamic-subscription libraries requires rebuilding the subscription set (unsubscribing from old dependencies and subscribing to new ones), a cost that the benchmark does not include.
+The benchmark keeps the selector fixed, so it measures neither model's cost of a switch. A dynamic-subscription library rebuilds its subscription set on each switch (unsubscribing from old dependencies and subscribing to new ones), and `switchMap` replaces its inner subscription.
 
 ## React Integration Does Not Require Dynamic Graphs
 
@@ -245,11 +245,11 @@ SynState extends the mental model React developers already know — "declare dep
 Based on the analysis above, SynState's design decision can be summarized as follows:
 
 - **Expressiveness**: Within the scope examined on this page, no global state management use case was found that requires a dynamic graph.
-- **Performance**: In [benchmarks](/mono/synstate/guides/library-comparison/benchmark/) covering practical scenarios such as linear chains and diamond dependencies, SynState shows high throughput. We also tested a [Conditional Fan-Out](/mono/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out) scenario where dynamic subscriptions are theoretically advantageous, but this involves a large volume of updates to unsubscribed observables — an unrealistic condition that should be addressed through application-level design rather than library-level optimization.
+- **Oversubscription**: The cost a static graph adds is a subscription to every branch a projection may read, which the [Conditional Fan-Out](/mono/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out) benchmark measures. `switchMap`, which subscribes to the selected branch only, removes it, for a resubscription on each switch.
 - **React integration**: The `useSyncExternalStore` subscription layer is sufficient; making the graph dynamic was not necessary.
 - **React mental model**: SynState's explicit dependency declarations share a similar structure with React's `useMemo` model.
 
-In libraries with dynamic graphs, dependencies are declared implicitly by calling `get()` inside a function. SynState's explicit dependency declarations via `derive` / `pipe`, on the other hand, make dependencies visually apparent in the code — much like React's `useMemo` dependency arrays. SynState builds on this explicit model to achieve zero-runtime-cost static graphs with glitch-free O(n) propagation.
+In libraries with dynamic graphs, dependencies are declared implicitly by calling `get()` inside a function. SynState's explicit dependency declarations via `derive` / `pipe`, on the other hand, make dependencies visually apparent in the code — much like React's `useMemo` dependency arrays. SynState builds on this explicit model: each node's place in the update order is fixed when it is built, so propagation is glitch-free and visits each affected node once.
 
 ## References
 
