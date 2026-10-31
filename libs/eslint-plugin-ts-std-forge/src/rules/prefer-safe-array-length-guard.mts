@@ -4,10 +4,9 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
-  buildNamedImportFix,
+  bindValueImports,
   getArgumentText,
-  getImportDeclarations,
-  getNamedImports,
+  hasForeignBinding,
   skipTypeWrappers,
   typeHoldsAtEveryLayer,
 } from 'eslint-rule-forge';
@@ -70,22 +69,15 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
     schema: [],
     messages: {
       useIsEmpty:
-        'Replace `{{original}}` with `SafeArray.isEmpty({{arrayName}})` from ts-std-forge: the comparison narrows nothing, the guard narrows to `readonly []`.',
+        'Replace `{{original}}` with `{{safeArray}}.isEmpty({{arrayName}})` from ts-std-forge: the comparison narrows nothing, the guard narrows to `readonly []`.',
       useIsNonEmpty:
-        'Replace `{{original}}` with `SafeArray.isNonEmpty({{arrayName}})` from ts-std-forge: the comparison narrows nothing, so `{{arrayName}}[0]` stays `| undefined`.',
+        'Replace `{{original}}` with `{{safeArray}}.isNonEmpty({{arrayName}})` from ts-std-forge: the comparison narrows nothing, so `{{arrayName}}[0]` stays `| undefined`.',
     },
     defaultOptions: [],
   },
 
   create: (context) => {
     const sourceCode = context.sourceCode;
-
-    const program = sourceCode.ast;
-
-    const tsStdForgeImports = getImportDeclarations(
-      program,
-      TS_STD_FORGE_MODULE,
-    );
 
     /**
      * Whether `expression` is an array or tuple. Without type information the
@@ -127,19 +119,30 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
         mut_nodesToFix.push({ node, ...matched });
       },
       'Program:exit': () => {
-        const hasSafeArrayImport =
-          getNamedImports(tsStdForgeImports).includes('SafeArray');
+        if (mut_nodesToFix.length === 0) {
+          return;
+        }
 
-        // The import fix lives on the first report only:
-        // `insertTextBefore(program, …)` produces overlapping ranges
-        // otherwise and only one of them would survive a pass. A first report
-        // silenced by an `eslint-disable` comment therefore takes the import
-        // with it.
-        for (const [
-          index,
-          { node, arrayExpression, guard },
-        ] of mut_nodesToFix.entries()) {
+        const binding = bindValueImports(sourceCode, TS_STD_FORGE_MODULE, [
+          'SafeArray',
+        ]);
+
+        const localName = binding?.localNames[0];
+
+        // Every fix brings `SafeArray` into scope itself, so that one applied
+        // alone (an editor's quick fix) is complete.
+        for (const { node, arrayExpression, guard } of mut_nodesToFix) {
           const arrayText = getArgumentText(sourceCode, arrayExpression);
+
+          const writable =
+            binding !== undefined &&
+            localName !== undefined &&
+            !hasForeignBinding(
+              sourceCode,
+              node,
+              localName,
+              TS_STD_FORGE_MODULE,
+            );
 
           context.report({
             node,
@@ -147,19 +150,18 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
             data: {
               original: sourceCode.getText(node),
               arrayName: arrayText,
+              // The name the fix writes; with no fix, the export's own.
+              safeArray: writable ? localName : 'SafeArray',
             },
-            fix: (fixer) => {
-              const replacement = `SafeArray.${guard}(${arrayText})`;
-
-              const importFixes =
-                index === 0 && !hasSafeArrayImport
-                  ? buildNamedImportFix(fixer, program, TS_STD_FORGE_MODULE, [
-                      'SafeArray',
-                    ])
-                  : [];
-
-              return [...importFixes, fixer.replaceText(node, replacement)];
-            },
+            fix: writable
+              ? (fixer) => [
+                  ...binding.edits(fixer),
+                  fixer.replaceText(
+                    node,
+                    `${localName}.${guard}(${arrayText})`,
+                  ),
+                ]
+              : null,
           });
         }
       },
