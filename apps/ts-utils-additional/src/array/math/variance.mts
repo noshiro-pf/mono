@@ -3,7 +3,6 @@ import {
   Num,
   asFiniteNumber,
   asNonNegativeFiniteNumber,
-  asPositiveFiniteNumber,
 } from 'ts-data-forge';
 import type { NonEmptyArray, NonNegativeFiniteNumber } from 'ts-type-forge';
 
@@ -21,13 +20,16 @@ export function variance(
 ): NonNegativeFiniteNumber | undefined {
   const len = Arr.length(list);
 
-  return Num.isNonZero(len)
-    ? asNonNegativeFiniteNumber(
-        Num.div(asFiniteNumber(sqSum(list)), len) -
-          Num.div(
-            asFiniteNumber(Arr.sum(list) ** 2),
-            asPositiveFiniteNumber(len ** 2),
-          ),
-      )
-    : undefined;
+  if (!Num.isNonZero(len)) {
+    return undefined;
+  }
+
+  // Two passes (the mean, then the mean squared deviation) rather than
+  // E[x²] − E[x]², which cancels catastrophically for (nearly) equal values and
+  // can round below 0.
+  const mean = Num.div(asFiniteNumber(Arr.sum(list)), len);
+
+  return asNonNegativeFiniteNumber(
+    Num.div(asFiniteNumber(sqSum(list.map((x) => x - mean))), len),
+  );
 }
