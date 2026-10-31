@@ -1,5 +1,11 @@
 # eslint-plugin-synstate
 
+## 0.5.0
+
+### Minor Changes
+
+- ba14fd7: `no-write-during-propagation` recognizes the factories imported from `synstate-react-hooks`, `synstate-react-hooks-compat`, `synstate-preact-hooks` and `synstate-preact-signals` as well as from `synstate`, and treats a `useObservableEffect` callback as a subscriber.
+
 ## 0.4.2
 
 ### Patch Changes

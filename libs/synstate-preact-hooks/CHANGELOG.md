@@ -1,5 +1,16 @@
 # synstate-preact-hooks
 
+## 6.2.0
+
+### Minor Changes
+
+- ba14fd7: Re-export synstate's types as well as its functions, so `import type { Observable } from 'synstate-react-hooks'` (and the same from the other wrapper packages) works without importing `synstate` directly.
+- ba14fd7: `useObservableEffect` now calls the callback of the latest render, so it sees the current props and state, and moves its subscription when a different Observable is passed. It used to keep the first render's callback and Observable for as long as the component was mounted. Pass an Observable that keeps its identity across renders: one built during render is now subscribed again on every render.
+
+### Patch Changes
+
+- synstate@6.1.1
+
 ## 6.1.1
 
 ### Patch Changes
