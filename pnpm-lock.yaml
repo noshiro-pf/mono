@@ -1278,33 +1278,18 @@ importers:
       '@blueprintjs/core':
         specifier: ^6.21.0
         version: 6.21.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@blueprintjs/icons':
-        specifier: ^6.14.1
-        version: 6.14.1(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@emotion/react':
-        specifier: ^11.14.0
-        version: 11.14.0(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0)
-      '@emotion/styled':
-        specifier: ^11.14.1
-        version: 11.14.1(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0))(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0)
+      blueprint-synstate:
+        specifier: workspace:*
+        version: link:../../libs/blueprint-synstate
       normalize.css:
         specifier: ^8.0.1
         version: 8.0.1
-      numeric-input-utils:
-        specifier: workspace:*
-        version: link:../numeric-input-utils
-      react-blueprintjs-utils:
-        specifier: workspace:*
-        version: link:../react-blueprintjs-utils
-      react-utils:
-        specifier: workspace:*
-        version: link:../react-utils
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
-      synstate-react-hooks:
+      synstate-dom:
         specifier: workspace:*
-        version: link:../../libs/synstate-react-hooks
+        version: link:../../libs/synstate-dom
       tiny-router-observable:
         specifier: workspace:*
         version: link:../tiny-router-observable
@@ -1318,12 +1303,6 @@ importers:
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.64.1
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.3.0
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.3.0(@types/react@19.3.0)
       eslint:
         specifier: 'catalog:'
         version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)

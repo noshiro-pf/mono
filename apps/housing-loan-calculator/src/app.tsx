@@ -1,8 +1,6 @@
-import { Spinner, SpinnerSize } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
+import { Spinner, SpinnerSize } from 'blueprint-synstate';
+import { constant, If, type Child, type JSX } from 'synstate-dom';
+import * as styles from './app.module.css';
 import {
   ConfigSection,
   PaymentTable,
@@ -11,61 +9,47 @@ import {
 import { dict } from './constants/index.mjs';
 import { loanStore } from './store/index.mjs';
 
-export const App = memoNamed('App', () => {
-  const isCalculating = useObservableValue(loanStore.isCalculating);
-
-  return (
-    <div
-      css={css`
-        min-height: 100vh;
-        padding: 10px;
-      `}
-      data-e2e={'root'}
-    >
-      <div
-        css={css`
-          padding: 10px;
-          font-size: x-large;
-          font-weight: bold;
-          color: white;
-        `}
-      >
-        {dict.appTitle}
+export const App = (): JSX.Element => (
+  <div class={constant(styles.root)} data-e2e={constant('root')}>
+    <div class={constant(styles.title)}>{constant(dict.appTitle)}</div>
+    <div class={constant(styles.section)}>
+      <div class={constant(styles.paper)}>
+        <ConfigSection />
       </div>
-      <Section>
-        <Paper>
-          <ConfigSection />
-        </Paper>
-      </Section>
-      <Section>
-        <Paper>{isCalculating ? spinnerElement : <SummarySection />}</Paper>
-      </Section>
-      <Section>
-        <Paper>{isCalculating ? spinnerElement : <PaymentTable />}</Paper>
-      </Section>
     </div>
-  );
-});
+    <div class={constant(styles.section)}>
+      <div class={constant(styles.paper)}>
+        <WhileCalculating>
+          <SummarySection />
+        </WhileCalculating>
+      </div>
+    </div>
+    <div class={constant(styles.section)}>
+      <div class={constant(styles.paper)}>
+        <WhileCalculating>
+          <PaymentTable />
+        </WhileCalculating>
+      </div>
+    </div>
+  </div>
+);
 
-const Section = styled.div`
-  padding: 5px 0;
-`;
-
-const Paper = styled.div`
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #f5f8fa;
-`;
-
-const SpinnerWrapper = styled.div`
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const spinnerElement = (
-  <SpinnerWrapper>
-    <Spinner intent={'primary'} size={SpinnerSize.STANDARD} />
-  </SpinnerWrapper>
+/**
+ * A spinner in place of `children` while the figures are being calculated.
+ * `children` stay mounted, hidden, so that they update in place.
+ */
+const WhileCalculating = ({
+  children,
+}: Readonly<{ children: Child }>): JSX.Element => (
+  <>
+    <If
+      cond={loanStore.isCalculating}
+      then={
+        <div class={constant(styles.spinner)}>
+          <Spinner intent={'primary'} size={SpinnerSize.STANDARD} />
+        </div>
+      }
+    />
+    <div hidden={loanStore.isCalculating}>{children}</div>
+  </>
 );
