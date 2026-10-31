@@ -1,8 +1,7 @@
-import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
-import { $, isDirectlyExecuted } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
+import { isDirectlyExecuted } from 'ts-repo-utils';
+import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
 
 /**
  * Fails when something names a section of `CLAUDE.md` that is not there.
@@ -248,45 +247,13 @@ const visit = async (
 
 const collectScannedFiles = async (): Promise<
   Result<readonly string[], string>
-> => {
-  const result = await $('git ls-files -z', {
-    cwd: projectRootPath,
-    silent: true,
-    // The repository tracks well over ten thousand files, which is more than
-    // the 1 MiB `exec` defaults to.
-    maxBuffer: 64 * 1024 * 1024,
-  });
-
-  if (Result.isErr(result)) {
-    return Result.err(
-      `Failed to list the tracked files: ${unknownToString(result.value)}`,
-    );
-  }
-
-  return Result.ok(
-    result.value.stdout.split('\0').filter(isScanned).toSorted(),
-  );
-};
+> =>
+  Result.map(await listTrackedFiles(), (tracked) => tracked.filter(isScanned));
 
 const isScanned = (relativePath: string): boolean =>
   SCANNED_EXTENSIONS.has(path.extname(relativePath)) &&
   !IGNORED_PATHS.has(relativePath) &&
   IGNORED_PREFIXES.every((prefix) => !relativePath.startsWith(prefix));
-
-const readRepositoryFile = async (
-  relativePath: string,
-): Promise<Result<string, string>> => {
-  const result = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(path.resolve(projectRootPath, relativePath), 'utf8'),
-  );
-
-  return Result.isErr(result)
-    ? Result.err(
-        `Failed to read ${relativePath}: ${unknownToString(result.value)}`,
-      )
-    : Result.ok(result.value);
-};
 
 const formatViolations = (
   violations: readonly Citation[],

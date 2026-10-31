@@ -6,6 +6,8 @@ have in common is written here once, and the workflow points at the section.
 `CLAUDE.md` ("CI") holds the rules a session has to follow and points here for
 the reasons.
 
+<!-- doc-paths-ignore: .github/README.md -->
+
 This file is beside the workflows rather than at `.github/README.md` because
 GitHub shows a `.github/README.md` in place of the root one.
 

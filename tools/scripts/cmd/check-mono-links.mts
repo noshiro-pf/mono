@@ -1,8 +1,16 @@
-import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
-import { $, isDirectlyExecuted } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
+import { isDirectlyExecuted } from 'ts-repo-utils';
+import { markdownLines, withoutCodeSpans } from '../lib/markdown.mjs';
+import {
+  isRepositoryProse,
+  isSitePage,
+  isUnderExperimental,
+  listTrackedFiles,
+  readRepositoryFile,
+  toTree,
+  type Tree,
+} from '../lib/repo-files.mjs';
 
 /**
  * Fails when a link to a file in this repository points at a path `main` no
@@ -18,13 +26,22 @@ import { projectRootPath } from '../project-root-path.mjs';
  *   `edit`). A line anchor (`#L10`, `#L10-L20`) also has to fall inside the
  *   file, because a link to a line that has moved away is as broken as one to
  *   a file that has.
- * - a relative link in a Markdown file that GitHub and npm render as it is
- *   (`[x](../../libs/synstate)`). The docs site's own pages are left out:
- *   their relative links are routes of the built site, not paths in the tree.
+ * - a relative link (`[x](../../libs/synstate)`, `[y](docs/a.md)`) in any of
+ *   the repository's own Markdown documents, which GitHub and npm render as
+ *   they are — `isRepositoryProse` in `tools/scripts/lib/repo-files.mts` says
+ *   which those are and why the rest are left out. The docs sites' own pages
+ *   are left out too: their relative links are routes of the built site, not
+ *   paths in the tree. Only the inline form `[text](path)` with no title is
+ *   read; a reference definition, a link with a title and an HTML `href` are
+ *   not. A link inside code — a fence or a code span — is an example and is
+ *   not read either.
  *
  * The tracked tree, not the file system, is what a link is resolved against,
  * because GitHub has only what is committed: a link to an untracked `dist/`
  * file works locally and nowhere else.
+ *
+ * A link into `experimental/` is not resolved, for the reason
+ * `isUnderExperimental` gives.
  *
  * A URL pinned to a commit or another branch is not read; it says what it
  * meant when it was written. A URL with a placeholder in its path
@@ -52,7 +69,7 @@ export const checkMonoLinks = async (): Promise<
 
   const results = await Promise.all(
     scanned.map(async (relativePath) => {
-      const readResult = await readTracked(relativePath);
+      const readResult = await readRepositoryFile(relativePath);
 
       return Result.isErr(readResult)
         ? readResult
@@ -83,6 +100,10 @@ export const checkMonoLinks = async (): Promise<
 
   for (const { relativePath, links } of visited) {
     for (const link of links) {
+      if (isUnderExperimental(link.target)) {
+        continue;
+      }
+
       const reason = await brokenReason(link, tree, mut_lineCounts);
 
       if (reason !== undefined) {
@@ -108,19 +129,18 @@ export const findMonoLinks = (
   fileText: string,
   relativePath: string,
 ): readonly MonoLink[] => {
-  const lines = fileText.split('\n');
-
   const readsRelative =
-    MARKDOWN_EXTENSIONS.has(path.extname(relativePath)) &&
-    !relativePath.startsWith(SITE_PAGES_PREFIX);
+    isRepositoryProse(relativePath) && !isSitePage(relativePath);
 
-  return lines.flatMap((lineText, index) => [
-    ...Array.from(lineText.matchAll(MONO_URL), (matched) =>
-      toAbsoluteLink(matched[0], index + 1),
+  return markdownLines(fileText).flatMap(({ line, text, fenced }) => [
+    ...Array.from(text.matchAll(MONO_URL), (matched) =>
+      toAbsoluteLink(matched[0], line),
     ).filter((link) => link !== undefined),
-    ...(readsRelative
-      ? Array.from(lineText.matchAll(MARKDOWN_RELATIVE_LINK), (matched) =>
-          toRelativeLink(matched[0], index + 1, relativePath),
+    // A link written in code is an example of one, and is not rendered.
+    ...(readsRelative && !fenced
+      ? Array.from(
+          withoutCodeSpans(text).matchAll(MARKDOWN_RELATIVE_LINK),
+          (matched) => toRelativeLink(matched[0], line, relativePath),
         ).filter((link) => link !== undefined)
       : []),
   ]);
@@ -160,25 +180,6 @@ export const brokenReason = async (
     : undefined;
 };
 
-/** The tracked files, and every directory that holds one. */
-export const toTree = (trackedFiles: readonly string[]): Tree =>
-  ({
-    files: new Set(trackedFiles),
-    directories: new Set(
-      trackedFiles.flatMap((file) =>
-        Arr.generate(function* () {
-          const segments = file.split('/');
-
-          for (const end of segments.keys()) {
-            if (end > 0) {
-              yield segments.slice(0, end).join('/');
-            }
-          }
-        }),
-      ),
-    ),
-  }) as const;
-
 export type MonoLink = Readonly<{
   /** 1-based. */
   line: number;
@@ -187,11 +188,6 @@ export type MonoLink = Readonly<{
   /** The path it points at, from the repository root, with no trailing `/`. */
   target: string;
   lines: Readonly<{ first: number; last: number }> | undefined;
-}>;
-
-export type Tree = Readonly<{
-  files: ReadonlySet<string>;
-  directories: ReadonlySet<string>;
 }>;
 
 type BrokenLink = Readonly<{
@@ -206,16 +202,12 @@ type CheckSummary = Readonly<{
 }>;
 
 /**
- * The files read: the SynState docs site and the SynState packages, the
- * places a moved source file is linked from.
+ * The files whose absolute URLs are read besides the repository's own
+ * Markdown: the SynState docs site and the SynState packages, whose code
+ * builds links to source files.
  */
 const SCOPE_PATTERN =
   /^(?:apps\/synstate-docs|libs\/synstate[^/]*|libs\/eslint-plugin-synstate)\//u;
-
-/**
- * The docs site's pages, whose relative links are routes of the built site.
- */
-const SITE_PAGES_PREFIX = 'apps/synstate-docs/src/';
 
 /** The extensions worth reading. Everything else is binary. */
 const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set<string>([
@@ -229,11 +221,6 @@ const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set<string>([
   '.tsx',
 ]);
 
-const MARKDOWN_EXTENSIONS: ReadonlySet<string> = new Set<string>([
-  '.md',
-  '.mdx',
-]);
-
 /**
  * An absolute URL into this repository on `main`, up to whitespace, a quote,
  * a bracket or a backtick. The query and the fragment are split off after.
@@ -244,8 +231,12 @@ const MONO_URL =
 /** What comes before a path in {@link MONO_URL}. */
 const BRANCH_SEGMENT = '/main/';
 
-/** A Markdown link or image whose destination starts with `./` or `../`. */
-const MARKDOWN_RELATIVE_LINK = /\]\(\.\.?\/[^\s()]*\)/gu;
+/**
+ * A Markdown link or image whose destination is a relative path: not a URL
+ * with a scheme (`https:`, `mailto:`), not an anchor in the same document, not
+ * a path from a site's root, not `<…>`.
+ */
+const MARKDOWN_RELATIVE_LINK = /\]\((?![a-z][\d+.a-z-]*:|[#/<])[^\s()]+\)/giu;
 
 const DIGITS = /^\d+$/u;
 
@@ -253,9 +244,10 @@ const DIGITS = /^\d+$/u;
 const TRAILING_PUNCTUATION = /[.,;:!]+$/u;
 
 const isScanned = (relativePath: string): boolean =>
-  SCOPE_PATTERN.test(relativePath) &&
-  SCANNED_EXTENSIONS.has(path.extname(relativePath)) &&
-  path.basename(relativePath) !== 'CHANGELOG.md';
+  isRepositoryProse(relativePath) ||
+  (SCOPE_PATTERN.test(relativePath) &&
+    SCANNED_EXTENSIONS.has(path.extname(relativePath)) &&
+    path.basename(relativePath) !== 'CHANGELOG.md');
 
 const isTemplate = (target: string): boolean =>
   target.includes('{') || target.includes('$');
@@ -354,7 +346,7 @@ const decodePath = (encoded: string): string => {
 };
 
 const countLines = async (relativePath: string): Promise<number> => {
-  const readResult = await readTracked(relativePath);
+  const readResult = await readRepositoryFile(relativePath);
 
   if (Result.isErr(readResult)) {
     return 0;
@@ -363,47 +355,6 @@ const countLines = async (relativePath: string): Promise<number> => {
   const text = readResult.value;
 
   return text.split('\n').length - (text.endsWith('\n') ? 1 : 0);
-};
-
-/**
- * The tracked files, asked of git rather than of a glob, for the reason given
- * at the top: GitHub has what is committed and nothing else.
- */
-const listTrackedFiles = async (): Promise<
-  Result<readonly string[], string>
-> => {
-  const result = await $('git ls-files -z', {
-    cwd: projectRootPath,
-    silent: true,
-    // The repository tracks well over ten thousand files, which is more than
-    // the 1 MiB `exec` defaults to.
-    maxBuffer: 64 * 1024 * 1024,
-  });
-
-  if (Result.isErr(result)) {
-    return Result.err(
-      `Failed to list the tracked files: ${unknownToString(result.value)}`,
-    );
-  }
-
-  return Result.ok(
-    result.value.stdout.split('\0').filter((file) => file !== ''),
-  );
-};
-
-const readTracked = async (
-  relativePath: string,
-): Promise<Result<string, string>> => {
-  const readResult = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(path.resolve(projectRootPath, relativePath), 'utf8'),
-  );
-
-  return Result.isErr(readResult)
-    ? Result.err(
-        `Failed to read ${relativePath}: ${unknownToString(readResult.value)}`,
-      )
-    : readResult;
 };
 
 const formatBroken = (broken: readonly BrokenLink[]): string =>

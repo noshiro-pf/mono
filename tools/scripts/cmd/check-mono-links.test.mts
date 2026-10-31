@@ -1,8 +1,8 @@
 import dedent from 'dedent';
+import { toTree } from '../lib/repo-files.mjs';
 import {
   brokenReason,
   findMonoLinks,
-  toTree,
   type MonoLink,
 } from './check-mono-links.mjs';
 
@@ -110,12 +110,58 @@ describe('findMonoLinks', () => {
     );
   });
 
+  test('resolves a relative link with no leading ./, in any document', () => {
+    assert.deepStrictEqual(
+      targetsOf(
+        dedent`
+          [design](docs/design.md) and ![logo](assets/logo.png).
+          [mail](mailto:a@example.com), [route](/guides/) and [x](<a b.md>).
+        `,
+        'tools/configs/README.md',
+      ),
+      ['tools/configs/docs/design.md', 'tools/configs/assets/logo.png'],
+    );
+  });
+
   test('leaves the relative links of the docs site pages alone', () => {
     assert.deepStrictEqual(
       targetsOf(
         '[map](../map/)',
         'apps/synstate-docs/src/content/docs/reference/api.md',
       ),
+      [],
+    );
+
+    assert.deepStrictEqual(
+      targetsOf(
+        '[map](../map/)',
+        'apps/synstate-dom-docs/src/content/docs/reference/api.md',
+      ),
+      [],
+    );
+  });
+
+  test('leaves a relative link written as code alone', () => {
+    assert.deepStrictEqual(
+      targetsOf(dedent`
+        Write \`[x](./gone.md)\`, not [y](./README.md).
+
+        \`\`\`ts
+        handlers[0](value);
+        \`\`\`
+      `),
+      ['libs/synstate/README.md'],
+    );
+  });
+
+  test('leaves the relative links of a record alone', () => {
+    assert.deepStrictEqual(
+      targetsOf('[old](./gone.mts)', 'libs/synstate/CHANGELOG.md'),
+      [],
+    );
+
+    assert.deepStrictEqual(
+      targetsOf('[old](./gone.mts)', 'strict-lib/docs/work-log/a.md'),
       [],
     );
   });

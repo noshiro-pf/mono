@@ -1,8 +1,9 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
-import { $, isDirectlyExecuted } from 'ts-repo-utils';
+import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { FixedLengthTuple } from 'ts-type-forge';
+import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -459,25 +460,8 @@ const trimOneSpace = (inner: string): string => {
  */
 const collectScannedFiles = async (): Promise<
   Result<readonly string[], string>
-> => {
-  const result = await $('git ls-files -z', {
-    cwd: projectRootPath,
-    silent: true,
-    // The repository tracks well over ten thousand files, which is more than
-    // the 1 MiB `exec` defaults to.
-    maxBuffer: 64 * 1024 * 1024,
-  });
-
-  if (Result.isErr(result)) {
-    return Result.err(
-      `Failed to list the tracked files: ${unknownToString(result.value)}`,
-    );
-  }
-
-  return Result.ok(
-    result.value.stdout.split('\0').filter(isScanned).toSorted(),
-  );
-};
+> =>
+  Result.map(await listTrackedFiles(), (tracked) => tracked.filter(isScanned));
 
 const visitFile = async (
   relativePath: string,
@@ -485,15 +469,10 @@ const visitFile = async (
 ): Promise<Result<VisitedFile, string>> => {
   const absolutePath = path.resolve(projectRootPath, relativePath);
 
-  const readResult = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(absolutePath, 'utf8'),
-  );
+  const readResult = await readRepositoryFile(relativePath);
 
   if (Result.isErr(readResult)) {
-    return Result.err(
-      `Failed to read ${relativePath}: ${unknownToString(readResult.value)}`,
-    );
+    return readResult;
   }
 
   const fileText = readResult.value;

@@ -69,6 +69,8 @@ $NETMEME_DIR/
     <manga-font>.otf
 ```
 
+<!-- doc-paths-ignore: test/fixtures/netmeme -->
+
 リポジトリには、自作の単純な図形で作ったテスト用テンプレート
 （`test/fixtures/netmeme/`）だけを置く。
 
