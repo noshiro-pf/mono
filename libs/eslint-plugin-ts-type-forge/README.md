@@ -249,8 +249,10 @@ options.
 - `'global'` — the ambient globals of `ts-type-forge/global` are in use
   (`/// <reference types="ts-type-forge/global" />`), so the fix only rewrites
   the type and never touches imports.
-- `'named'` — the fix additionally inserts
-  `import { type … } from 'ts-type-forge';` when the name is not imported yet.
+- `'named'` — the fix additionally imports the name when the file does not
+  import it yet: added to an existing `import type { … }` from `ts-type-forge`,
+  else to an `import { … }` from it (as `type X`), else after a lone default
+  import, and otherwise as a new `import { type … } from 'ts-type-forge';`.
 
 Either way, if the file already imports the target type from `ts-type-forge`
 (possibly under an alias), the fix reuses that binding.

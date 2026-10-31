@@ -120,8 +120,35 @@ describe('prefer-readonly-or-mutable-record', () => {
                   messageId: 'replaceWith',
                   data: { name: 'Record', replacement: 'MutableRecord' },
                   output: dedent`
-                    import { type MutableRecord } from 'ts-type-forge';
-                    import { type ReadonlyRecord as RRecord } from 'ts-type-forge';
+                    import { type ReadonlyRecord as RRecord, type MutableRecord } from 'ts-type-forge';
+                    type A = MutableRecord<string, number>;
+                  `,
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'adds the suggested name to an existing `import type`',
+          code: dedent`
+            import type { DeepReadonly } from 'ts-type-forge';
+            type A = Record<string, number>;
+          `,
+          errors: [
+            {
+              messageId: 'useReadonlyOrMutableRecord',
+              suggestions: [
+                {
+                  messageId: 'replaceWith',
+                  output: dedent`
+                    import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
+                    type A = ReadonlyRecord<string, number>;
+                  `,
+                },
+                {
+                  messageId: 'replaceWith',
+                  output: dedent`
+                    import type { DeepReadonly, MutableRecord } from 'ts-type-forge';
                     type A = MutableRecord<string, number>;
                   `,
                 },

@@ -255,13 +255,20 @@ describe('prefer-canonical-length-constrained-tuple', () => {
             type B = readonly [number, number, number];
             type C = [number, number, ...number[]];
           `,
-          output: dedent`
-            import { type FixedLengthTuple } from 'ts-type-forge';
-            import { type MutableMinLengthTuple } from 'ts-type-forge';
-            type A = FixedLengthTuple<2, string>;
-            type B = FixedLengthTuple<3, number>;
-            type C = MutableMinLengthTuple<2, number>;
-          `,
+          output: [
+            dedent`
+              import { type FixedLengthTuple, type MutableMinLengthTuple } from 'ts-type-forge';
+              type A = FixedLengthTuple<2, string>;
+              type B = readonly [number, number, number];
+              type C = [number, number, ...number[]];
+            `,
+            dedent`
+              import { type FixedLengthTuple, type MutableMinLengthTuple } from 'ts-type-forge';
+              type A = FixedLengthTuple<2, string>;
+              type B = FixedLengthTuple<3, number>;
+              type C = MutableMinLengthTuple<2, number>;
+            `,
+          ],
           errors: [
             { messageId: 'useCanonicalTuple' },
             { messageId: 'useCanonicalTuple' },
@@ -290,13 +297,43 @@ describe('prefer-canonical-length-constrained-tuple', () => {
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
+          name: 'gives a report that needs no import no import edit',
+          code: dedent`
+            import { type FixedLengthTuple } from 'ts-type-forge';
+            type A = readonly [number, number];
+            type C = [number, number, ...number[]];
+          `,
+          // C's import edit spans A, so A follows in the next pass.
+          output: [
+            dedent`
+              import { type FixedLengthTuple, type MutableMinLengthTuple } from 'ts-type-forge';
+              type A = readonly [number, number];
+              type C = MutableMinLengthTuple<2, number>;
+            `,
+            dedent`
+              import { type FixedLengthTuple, type MutableMinLengthTuple } from 'ts-type-forge';
+              type A = FixedLengthTuple<2, number>;
+              type C = MutableMinLengthTuple<2, number>;
+            `,
+          ],
+          errors: [
+            { messageId: 'useCanonicalTuple' },
+            { messageId: 'useCanonicalTuple' },
+          ],
+        },
+        {
           name: 'rewrites parameter and return type positions',
           code: 'declare const f: (xs: readonly [number, number]) => [string, string];',
-          output: dedent`
-            import { type FixedLengthTuple } from 'ts-type-forge';
-            import { type MutableFixedLengthTuple } from 'ts-type-forge';
-            declare const f: (xs: FixedLengthTuple<2, number>) => MutableFixedLengthTuple<2, string>;
-          `,
+          output: [
+            dedent`
+              import { type FixedLengthTuple, type MutableFixedLengthTuple } from 'ts-type-forge';
+              declare const f: (xs: FixedLengthTuple<2, number>) => [string, string];
+            `,
+            dedent`
+              import { type FixedLengthTuple, type MutableFixedLengthTuple } from 'ts-type-forge';
+              declare const f: (xs: FixedLengthTuple<2, number>) => MutableFixedLengthTuple<2, string>;
+            `,
+          ],
           errors: [
             { messageId: 'useCanonicalTuple' },
             { messageId: 'useCanonicalTuple' },

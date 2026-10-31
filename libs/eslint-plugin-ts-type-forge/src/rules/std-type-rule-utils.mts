@@ -3,10 +3,10 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { buildNamedImportFix, isLocallyBound } from 'eslint-rule-forge';
+import { isLocallyBound } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
-import { TS_TYPE_FORGE_MODULE } from './constants.mjs';
 import { resolveTypeName, type ImportStyle } from './import-style.mjs';
+import { buildTypeImportFix } from './import-utils.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
@@ -73,9 +73,7 @@ export const reportStdTypeReference = <MessageIds extends string>(
             fix: (fixer: TSESLint.RuleFixer): readonly TSESLint.RuleFix[] =>
               Arr.toPushed(
                 target.needsImport
-                  ? buildNamedImportFix(fixer, program, TS_TYPE_FORGE_MODULE, [
-                      `type ${candidate}`,
-                    ])
+                  ? buildTypeImportFix(fixer, context.sourceCode, [candidate])
                   : [],
                 fixer.replaceText(typeName, target.localName),
               ),

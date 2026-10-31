@@ -51,6 +51,13 @@ describe('prefer-canonical-mutable-record', () => {
         `,
       },
       {
+        name: 'stays silent when another ts-type-forge export is imported as `MutableRecord`',
+        code: dedent`
+          import { type DeepReadonly as MutableRecord } from 'ts-type-forge';
+          type A = Mutable<Record<string, number>>;
+        `,
+      },
+      {
         name: 'stays silent when `MutableRecord` is bound to another module',
         code: dedent`
           import { type MutableRecord } from './my-types.mjs';
@@ -107,15 +114,123 @@ describe('prefer-canonical-mutable-record', () => {
           type A = Mutable<Record<string, number>>;
           type B = Mutable<ReadonlyRecord<string, boolean>>;
         `,
-        output: dedent`
-          import { type MutableRecord } from 'ts-type-forge';
-          type A = MutableRecord<string, number>;
-          type B = MutableRecord<string, boolean>;
-        `,
+        output: [
+          dedent`
+            import { type MutableRecord } from 'ts-type-forge';
+            type A = MutableRecord<string, number>;
+            type B = Mutable<ReadonlyRecord<string, boolean>>;
+          `,
+          dedent`
+            import { type MutableRecord } from 'ts-type-forge';
+            type A = MutableRecord<string, number>;
+            type B = MutableRecord<string, boolean>;
+          `,
+        ],
         errors: [
           { messageId: 'useMutableRecord' },
           { messageId: 'useMutableRecord' },
         ],
+      },
+      {
+        name: 'adds the name to an existing `import type` from ts-type-forge',
+        code: dedent`
+          import type { Mutable } from 'ts-type-forge';
+          type A = Mutable<Record<string, number>>;
+        `,
+        output: dedent`
+          import type { Mutable, MutableRecord } from 'ts-type-forge';
+          type A = MutableRecord<string, number>;
+        `,
+        errors: [{ messageId: 'useMutableRecord' }],
+      },
+      {
+        name: 'adds the name to an existing `import { … }` from ts-type-forge',
+        code: dedent`
+          import { type Mutable, type DeepReadonly } from 'ts-type-forge';
+          type A = Mutable<Record<string, number>>;
+        `,
+        output: dedent`
+          import { type Mutable, type DeepReadonly, type MutableRecord } from 'ts-type-forge';
+          type A = MutableRecord<string, number>;
+        `,
+        errors: [{ messageId: 'useMutableRecord' }],
+      },
+      {
+        name: 'adds named braces after a lone default import',
+        code: dedent`
+          import forge from 'ts-type-forge';
+          type A = Mutable<Record<string, number>>;
+        `,
+        output: dedent`
+          import forge, { type MutableRecord } from 'ts-type-forge';
+          type A = MutableRecord<string, number>;
+        `,
+        errors: [{ messageId: 'useMutableRecord' }],
+      },
+      {
+        name: 'fills the empty braces of `import d, {}`',
+        code: dedent`
+          import forge, {} from 'ts-type-forge';
+          type A = Mutable<Record<string, number>>;
+        `,
+        output: dedent`
+          import forge, { type MutableRecord } from 'ts-type-forge';
+          type A = MutableRecord<string, number>;
+        `,
+        errors: [{ messageId: 'useMutableRecord' }],
+      },
+      {
+        name: 'fills the empty braces of `import type {}`',
+        code: dedent`
+          import type {} from 'ts-type-forge';
+          type A = Mutable<Record<string, number>>;
+        `,
+        output: dedent`
+          import type { MutableRecord } from 'ts-type-forge';
+          type A = MutableRecord<string, number>;
+        `,
+        errors: [{ messageId: 'useMutableRecord' }],
+      },
+      {
+        name: 'does not take the brace of import attributes for the specifiers',
+        code: dedent`
+          import type forge from 'ts-type-forge' with { 'resolution-mode': 'import' };
+          type A = Mutable<Record<string, number>>;
+        `,
+        output: dedent`
+          import { type MutableRecord } from 'ts-type-forge';
+          import type forge from 'ts-type-forge' with { 'resolution-mode': 'import' };
+          type A = MutableRecord<string, number>;
+        `,
+        errors: [{ messageId: 'useMutableRecord' }],
+      },
+      {
+        name: 'adds a new declaration beside a type-only default import',
+        code: dedent`
+          import type forge from 'ts-type-forge';
+          type A = Mutable<Record<string, number>>;
+        `,
+        output: dedent`
+          import { type MutableRecord } from 'ts-type-forge';
+          import type forge from 'ts-type-forge';
+          type A = MutableRecord<string, number>;
+        `,
+        errors: [{ messageId: 'useMutableRecord' }],
+      },
+      {
+        name: 'adds a new declaration beside a namespace import, after the directives',
+        code: dedent`
+          'use strict';
+          import * as forge from 'ts-type-forge';
+          type A = Mutable<Record<string, number>>;
+        `,
+        output: dedent`
+          'use strict';
+          import { type MutableRecord } from 'ts-type-forge';
+          import * as forge from 'ts-type-forge';
+          type A = MutableRecord<string, number>;
+        `,
+        errors: [{ messageId: 'useMutableRecord' }],
       },
       {
         name: 'follows ts-type-forge import aliases on both sides',
