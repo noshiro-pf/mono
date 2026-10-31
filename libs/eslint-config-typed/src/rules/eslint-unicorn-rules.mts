@@ -329,10 +329,12 @@ export const eslintUnicornRules = {
   'unicorn/prefer-minimal-ternary': 'off',
 
   // Disabled in favor of `ts-data-forge/prefer-num-safe-parse-int`, which
-  // rewrites `parseInt(x, 10)` to `Num.safeParseInt(x)` instead of
-  // `Math.trunc(Number(x))`. The latter is hard to read and silently changes
+  // reports `parseInt(x, 10)` on a string and suggests
+  // `Result.unwrapOkOr(Num.safeParseInt(x), Number.NaN)` instead of autofixing
+  // to `Math.trunc(Number(x))`. The latter is hard to read and silently changes
   // parsing semantics (e.g. `Number('')` is `0` whereas `parseInt('', 10)` is
-  // `NaN`).
+  // `NaN`); the suggested rewrite changes some too, which is why it is only a
+  // suggestion.
   'unicorn/prefer-number-coercion': 'off',
 
   'unicorn/prefer-number-is-safe-integer': 'error',
