@@ -192,6 +192,19 @@ describe('use-memo-hooks-style', () => {
             },
           ],
         },
+        {
+          name: 'Disallow type assertion returned from a block-bodied factory',
+          code: dedent`
+            import { useMemo } from 'react';
+
+            declare const x: unknown;
+
+            const v = useMemo(() => {
+              return x as number;
+            }, []);
+          `,
+          errors: [{ messageId: 'disallowUseMemoTypeAnnotation', line: 6 }],
+        },
       ],
     });
   });
