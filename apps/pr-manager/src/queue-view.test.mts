@@ -124,6 +124,35 @@ describe(queueViewOf, () => {
     );
   });
 
+  // The worker would release it, see it green, set it aside for a person, and
+  // have spent the cycle on nothing that merges on its own.
+  test('puts a candidate only a bypass merges with priority:low', () => {
+    const view = queueViewOf(
+      input(
+        [
+          pull(1, {
+            labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+            files: ['.github/workflows/ci.yml'],
+          }),
+          pull(2, {
+            labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL, PRIORITY_LOW_LABEL],
+          }),
+          pull(3, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+        ],
+        {
+          requireCodeOwnerReview: true,
+          codeOwners: [{ pattern: '/.github/workflows/', owners: ['someone'] }],
+        },
+      ),
+    );
+
+    assert.deepStrictEqual(shape(view).slots, [
+      [3, 'next', undefined],
+      [1, 'next', undefined],
+      [2, 'next', undefined],
+    ]);
+  });
+
   test('passes over one in a native stack', () => {
     assert.deepStrictEqual(
       shape(
@@ -315,7 +344,7 @@ const queuePull = (fields: PullFields): QueuePull =>
     review: {
       author: 'someone',
       approvers: [],
-      files: [],
+      files: fields.files,
       filesComplete: true,
       unresolvedConversations: fields.unresolvedConversations,
     },
@@ -351,6 +380,7 @@ type PullFields = Readonly<{
   mergeable: string;
   nativeStack: QueuePull['nativeStack'];
   unresolvedConversations: number;
+  files: readonly string[];
   comments: readonly string[];
 }>;
 
@@ -368,6 +398,7 @@ const pull = (number: number, fields: Partial<PullFields> = {}): PullFields =>
     mergeable: 'MERGEABLE',
     nativeStack: undefined,
     unresolvedConversations: 0,
+    files: [],
     comments: [],
     ...fields,
   }) as const;

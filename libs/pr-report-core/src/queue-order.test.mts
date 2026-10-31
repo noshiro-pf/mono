@@ -383,15 +383,52 @@ describe(orderCandidates, () => {
       [2, 3, 1],
     );
   });
+
+  // Picked early, it is released, goes green and is set aside for a person,
+  // and the cycle it took went to nothing that could merge on its own.
+  test('puts one only a bypass merges with priority:low, unless labelled priority:high', () => {
+    assert.deepStrictEqual(
+      order(
+        [
+          facts({ number: 1 }),
+          facts({
+            number: 2,
+            labels: [
+              MERGE_QUEUED_LABEL,
+              PRIORITY_HIGH_LABEL,
+              PRIORITY_LOW_LABEL,
+            ],
+          }),
+          facts({
+            number: 3,
+            labels: [MERGE_QUEUED_LABEL, PRIORITY_LOW_LABEL],
+          }),
+          facts({ number: 4, headRef: 'changeset-release/main' }),
+          facts({ number: 5, mergeState: 'DIRTY' }),
+          facts({ number: 6 }),
+          facts({ number: 7 }),
+          facts({
+            number: 8,
+            labels: [MERGE_QUEUED_LABEL, PRIORITY_HIGH_LABEL],
+          }),
+        ],
+        [7],
+        [1, 2, 7, 8],
+      ),
+      [8, 6, 5, 4, 1, 2, 3, 7],
+    );
+  });
 });
 
 const order = (
   candidates: readonly QueueFacts[],
   demoted: readonly number[] = [],
+  bypass: readonly number[] = [],
 ): readonly number[] =>
   orderCandidates(candidates, (candidate) => candidate, {
     defaultBranch: 'main',
     demoted: (candidate) => demoted.includes(candidate.number),
+    bypass: (candidate) => bypass.includes(candidate.number),
   }).map(({ number }) => number);
 
 const facts = (

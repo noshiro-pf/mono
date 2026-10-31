@@ -823,7 +823,11 @@ const runCycle = async (
   // Normally the only one. Two are what a pull request opened already
   // released looks like; the first is watched, and the other runs as it was
   // released, since nothing here labels a pull request it did not pick.
-  const watched = firstInReleaseOrder(triaged.inFlight, defaultBranch);
+  const watched = firstInReleaseOrder(
+    triaged.inFlight,
+    defaultBranch,
+    triaged.bypass,
+  );
 
   if (watched !== undefined) {
     const arm = triaged.toArm.has(watched.number);
@@ -1014,6 +1018,7 @@ const runCycle = async (
         triaged.owners,
         pausedAtSurvey,
         defaultBranch,
+        triaged.bypass,
       )) === 'yielded'
     ) {
       log(

@@ -12,8 +12,8 @@ import {
   AUTO_REBASE_LABEL,
   BLOCKS_RELEASE_LABEL,
   MERGE_QUEUED_LABEL,
+  pickPriorityRank,
   priorityOfLabels,
-  priorityRankOfLabels,
   SKIP_CI_LABEL,
   type QueuePriority,
 } from 'pr-report-core';
@@ -64,7 +64,11 @@ export const priorityOf = (pr: PullRequest): QueuePriority =>
 
 /**
  * Where {@link priorityOf} puts the pull request in the pick order, as a sort
- * key: `high` before the rest, `low` after them.
+ * key: `high` before the rest, `low` after them, and one only a ruleset
+ * `bypass` merges with `low` unless it is `high` (`pickPriorityRank`).
  */
-export const priorityRank = (pr: PullRequest): 0 | 1 | 2 =>
-  priorityRankOfLabels(pr.labels.map(({ name }) => name));
+export const priorityRank = (pr: PullRequest, bypass: boolean): 0 | 1 | 2 =>
+  pickPriorityRank(
+    pr.labels.map(({ name }) => name),
+    bypass,
+  );

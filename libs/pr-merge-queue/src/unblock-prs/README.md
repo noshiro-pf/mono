@@ -168,6 +168,12 @@ PR — から行います。public repository なので、コメントではな�
 - 解放されている PR が2本になったときにどちらを残すかも、この順で決めます。
 - 両方付いている PR は、矛盾しているのでどちらも無いものとして扱い、triage の
   出力でそう言います。
+- ruleset の bypass でしかマージできない PR（「2」の8）は、`priority:high` だ
+  けが付いていない限り `priority:low` と同じ扱いです（両方付いていればどちらも
+  無いものとするので、これも `priority:low` です）。先に pick しても green にな
+  ったら `awaiting-bypass` で見送るだけで、その間に他の PR が待たされるからで
+  す。後ろに回してもチェックはいずれ走ります。bypass merge の判断材料を早く欲
+  しいときは `priority:high` を付けます。
 - GitHub にある `priority:mid` は読みません。ラベル無しと同じです。
 
 **`skip-ci` は対象範囲の判定には使いません。** キューに入った PR を一時停止さ
@@ -213,8 +219,9 @@ PR は常に1本まで** に保ちます。`main` が動く前にマージでき
 - **in flight の PR があれば、他を pick しない。** triage が in flight と判断
   した PR があれば、それを watch して rebase も解放もしません（「3」）。
 - **解放した直後にもう一度見る。** 同じ瞬間に、担当者が `worker` の別の PR も
-  解放されていて、そちらが pick の順（`priority:high` が先、`priority:low` が
-  後、その中で番号の小さい順、version PR は最後）で先なら、**自分の PR に**
+  解放されていて、そちらが pick の順（`priority:high` が先、`priority:low` と
+  `priority:high` だけが付いてはいない bypass でしかマージできない PR が後、そ
+  の中で番号の小さい順、version PR は最後）で先なら、**自分の PR に**
   `skip-ci` を付け直して譲り、survey からやり直します（`release.mts` の
   `yieldsTo`）。見送り中・claim 中の PR（skill か人の担当）は、直した push まで
   CI を走らせないので数えません。数えると、誰も走らせない PR の後ろでキューが
@@ -388,8 +395,9 @@ version commit が「まだ消費していない changeset を含む先端」の
 なければ candidate の先頭に対して、次の手順を行います。並びは番号順で、後ろに回
 すものが3種類あります。`DIRTY`、その後ろに version PR、さらにその後ろに green
 のまま止まった PR（「5」）です。green のまま止まった PR 以外は、まず
-`priority:high` / ラベル無し / `priority:low` の順に分け、その中で今の並びに
-します。
+`priority:high` / ラベル無し / `priority:low` の順に分け（bypass でしかマージ
+できない PR は `priority:high` だけが付いていなければ `priority:low` に入れま
+す）、その中で今の並びにします。
 
 1. 使い捨て worktree で `origin/main` に rebase し、`--force-with-lease`
    （survey が見た head を明示）で push。stack から降ろされた PR がマージ済みの
@@ -963,6 +971,12 @@ pull requests to take first, and which can wait.**
   keeps its release.
 - One carrying both contradicts itself and counts as neither, and the triage
   output says so.
+- One only a ruleset bypass merges (step 2, item 8) counts as `priority:low`
+  unless labelled `priority:high` alone (both count as neither, so it is
+  `priority:low` then too): picked early, it goes green only to be set aside
+  `awaiting-bypass`, and everything behind it waited for that. Picked last,
+  its checks still run. `priority:high` is how to ask for the verdict the
+  bypass merge goes by sooner.
 - `priority:mid`, which also exists on GitHub, is not read: it is the same as
   no label.
 
@@ -1012,16 +1026,18 @@ bot opens released, and one a person had released on purpose.
   ("3").
 - **Look again straight after releasing.** When another pull request the
   worker owns was released in the same moment and comes first in the pick
-  order (`priority:high` first and `priority:low` last, then the lowest
-  number, the version pull request last), this script puts `skip-ci` back on
-  **its own** and surveys again (`yieldsTo` in `release.mts`). A set-aside or
-  claimed pull request, a skill's or a person's, runs nothing until its fix is
-  pushed, so it does not count; counting it would stall the queue behind a
-  pull request nobody is about to run. Nor does one already released when the
-  survey ran (a person took `skip-ci` off it, or labelled `merge-queued` one
-  that never had it): not in flight — waiting on `Merge-After:`, held by its
-  review, conflicting — it is still released on the next survey, and yielding
-  to it would pick and pause the same pull request forever.
+  order (`priority:high` first, and `priority:low` last together with one
+  only a bypass merges that is not labelled `priority:high` alone, then the
+  lowest number, the version pull request last), this script puts `skip-ci`
+  back on **its own** and surveys again (`yieldsTo` in `release.mts`). A
+  set-aside or claimed pull request, a skill's or a person's, runs nothing
+  until its fix is pushed, so it does not count; counting it would stall the
+  queue behind a pull request nobody is about to run. Nor does one already
+  released when the survey ran (a person took `skip-ci` off it, or labelled
+  `merge-queued` one that never had it): not in flight — waiting on
+  `Merge-After:`, held by its review, conflicting — it is still released on
+  the next survey, and yielding to it would pick and pause the same pull
+  request forever.
 - A pull request a person or a bot released runs as released. What that can
   cost is a matrix, not a wrong merge. Step 3 of the example no longer
   happens, because the skill puts `skip-ci` on its own pull request before it
@@ -1200,7 +1216,9 @@ Otherwise take the first candidate. Candidates go lowest number first, with
 three kinds moved back: `DIRTY` after the rest, the version pull request after
 that, and one that sat green without merging (step 5) last of all. Everything
 but that last kind is first split into `priority:high`, unlabelled and
-`priority:low`, in that order, and ordered as above within each. Then:
+`priority:low`, in that order (one only a bypass merges goes with
+`priority:low` unless labelled `priority:high` alone), and ordered as above
+within each. Then:
 
 1. Rebase onto `origin/main` in a throwaway worktree and push with
    `--force-with-lease`, leased against the head the survey saw. A pull

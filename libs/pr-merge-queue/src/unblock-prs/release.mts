@@ -46,6 +46,7 @@ export const settleAfterRelease = async (
   owners: ReadonlyMap<number, QueueOwner>,
   pausedAtSurvey: ReadonlySet<number>,
   defaultBranch: string,
+  bypass: ReadonlyMap<number, string>,
 ): Promise<'kept' | 'yielded'> => {
   const listed = await listPullRequests(api);
 
@@ -61,6 +62,7 @@ export const settleAfterRelease = async (
     owners,
     pausedAtSurvey,
     defaultBranch,
+    bypass,
   );
 
   if (first === undefined) {
@@ -93,6 +95,7 @@ export const yieldsTo = (
   owners: ReadonlyMap<number, QueueOwner>,
   pausedAtSurvey: ReadonlySet<number>,
   defaultBranch: string,
+  bypass: ReadonlyMap<number, string>,
 ): PullRequest | undefined => {
   const others = releasedExcept(pullRequests, target.number).filter(
     (pr) =>
@@ -103,6 +106,7 @@ export const yieldsTo = (
   const first = firstInReleaseOrder(
     Arr.toUnshifted(target)(others),
     defaultBranch,
+    bypass,
   );
 
   return first === undefined || first.number === target.number
@@ -130,16 +134,20 @@ export const releasedExcept = (
 
 /**
  * Which of several released pull requests keeps its release: `priority:high`
- * first and `priority:low` last, then the lowest number with the version pull
- * request last — the order candidates are picked in, so that the skill,
- * reading the same rule, settles it the same way.
+ * first and `priority:low` last — one in `bypass`, which only a ruleset
+ * bypass merges, counting as `priority:low` unless labelled `priority:high`
+ * — then the lowest number with the version pull request last: the order
+ * candidates are picked in, so that the skill, reading the same rule,
+ * settles it the same way.
  */
 export const firstInReleaseOrder = (
   released: readonly PullRequest[],
   defaultBranch: string,
+  bypass: ReadonlyMap<number, string>,
 ): PullRequest | undefined => {
   const rank = (pr: PullRequest): number =>
-    priorityRank(pr) * 2 + (isVersionPullRequest(pr, defaultBranch) ? 1 : 0);
+    priorityRank(pr, bypass.has(pr.number)) * 2 +
+    (isVersionPullRequest(pr, defaultBranch) ? 1 : 0);
 
   const sorted = released.toSorted((a, b) =>
     rank(a) === rank(b) ? a.number - b.number : rank(a) - rank(b),
