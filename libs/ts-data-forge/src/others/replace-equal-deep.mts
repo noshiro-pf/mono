@@ -1,4 +1,4 @@
-import type { MutableRecord, UnknownRecord } from 'ts-type-forge';
+import type { UnknownRecord } from 'ts-type-forge';
 import { hasKey, isRecord } from '../guard/index.mjs';
 import { fastDeepEqual } from './fast-deep-equal.mjs';
 
@@ -202,7 +202,10 @@ const replaceObject = (
 
   let mut_isNext = true;
 
-  const mut_shared: MutableRecord<string, unknown> = {};
+  // Entries rather than `copy[k] = result`: assigning an own `__proto__` key
+  // (which `JSON.parse` produces) would call the setter and replace the copy's
+  // prototype, while `Object.fromEntries` defines it as a property.
+  const mut_sharedEntries: (readonly [string, unknown])[] = [];
 
   for (const k of nextKeys) {
     const value = next[k];
@@ -215,10 +218,14 @@ const replaceObject = (
 
     mut_isNext &&= Object.is(result, value);
 
-    mut_shared[k] = result;
+    mut_sharedEntries.push([k, result]);
   }
 
-  return mut_isCurrent ? current : mut_isNext ? next : mut_shared;
+  return mut_isCurrent
+    ? current
+    : mut_isNext
+      ? next
+      : Object.fromEntries(mut_sharedEntries);
 };
 
 // What an item of `next` is matched with when nothing of `current` is.

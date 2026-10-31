@@ -117,6 +117,32 @@ describe(replaceEqualDeep, () => {
     assert.isFalse(Object.hasOwn(shared, 'a'));
   });
 
+  test('copies an own __proto__ key as a property, not as the prototype', () => {
+    const current: unknown = JSON.parse('{"__proto__":{"x":1},"a":[1]}');
+
+    const next: unknown = JSON.parse('{"__proto__":{"x":1},"a":[2]}');
+
+    const result = replaceEqualDeep(current, next);
+
+    assert.isTrue(isRecord(result));
+
+    assert.strictEqual(Object.getPrototypeOf(result), Object.prototype);
+
+    assert.deepStrictEqual(Object.keys(result), ['__proto__', 'a']);
+
+    assert.strictEqual(JSON.stringify(result), '{"__proto__":{"x":1},"a":[2]}');
+
+    assert.notProperty(result, 'x');
+
+    // The unchanged `__proto__` value is reused from `current`.
+    assert.isTrue(isRecord(current));
+
+    assert.strictEqual(
+      Object.getOwnPropertyDescriptor(result, '__proto__')?.value,
+      Object.getOwnPropertyDescriptor(current, '__proto__')?.value,
+    );
+  });
+
   test('matches array items by index by default', () => {
     const one: Numbered = { number: 1 } as const;
 
