@@ -1,10 +1,13 @@
 import * as React from 'react';
 import { Num, Result, asSafeUint } from 'ts-data-forge';
 import type { SafeUint } from 'ts-type-forge';
+import { threeUpGrid } from '../three-up-grid.mjs';
 import {
   createJotaiSpringAdapter,
   createMobXSpringAdapter,
+  createPreactSignalsSpringAdapter,
   createRxJSSpringAdapter,
+  createSolidSpringAdapter,
   createSynStateSpringAdapter,
 } from './adapters/index.mjs';
 import { SnakeCanvas } from './snake-canvas.js';
@@ -51,7 +54,7 @@ export const SpringDemo = React.memo(() => {
       </div>
       <p style={descriptionStyle}>
         {
-          'Move your mouse over each canvas. The snake tail has N segments, each a stage in a reactive scan chain. Increase N to see performance diverge.'
+          'Move your mouse over each canvas. The snake tail has N segments, each a stage in a reactive scan chain. Increase N and compare the Total updates counters.'
         }
       </p>
     </div>
@@ -71,6 +74,8 @@ const adapters = [
   createRxJSSpringAdapter(),
   createJotaiSpringAdapter(),
   createMobXSpringAdapter(),
+  createPreactSignalsSpringAdapter(),
+  createSolidSpringAdapter(),
 ] as const;
 
 const controlsContainerStyle: React.CSSProperties = {
@@ -92,9 +97,7 @@ const sliderStyle: React.CSSProperties = {
 } as const;
 
 const canvasesContainerStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: '12px',
-  justifyContent: 'center',
+  ...threeUpGrid(12),
   userSelect: 'none',
   padding: '16px 0',
 } as const;

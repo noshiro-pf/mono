@@ -35,14 +35,16 @@ Each emitted position is compared to the latest mouse position:
 
 ### What to look for
 
-| Library      | Glitches | Why                                                                                                                                |
-| ------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| **SynState** | 0        | Depth-based topological update — all branches resolve atomically before notifying subscribers                                      |
-| **RxJS**     | Many     | `combineLatest` fires on each input change, so `derivedX` updates before `derivedY` causing intermediate emissions with stale data |
-| **Jotai**    | 0        | Pull-based derivation ensures consistency — derived atoms always read the latest values                                            |
-| **MobX**     | 0        | `computed` values are lazily evaluated inside a batched `reaction` — all inputs are up-to-date when read                           |
+| Library            | Glitches | Why                                                                                                                 |
+| ------------------ | -------- | ------------------------------------------------------------------------------------------------------------------- |
+| **SynState**       | 0        | `derivedX` and `derivedY` are both recomputed, in depth order, before `combine` and before any subscriber           |
+| **RxJS**           | Many     | `combineLatest` emits as soon as `derivedX` changes, while `derivedY` still holds the previous position, then again |
+| **Jotai**          | 0        | The subscribed atom is recomputed when it is read, after both inputs                                                |
+| **MobX**           | 0        | The `reaction` reads the `computed` values after the action that moved the mouse, when every input is up to date    |
+| **Preact Signals** | 0        | The `effect` reads `computed` values, and each is recomputed on read once one of its sources has a newer version    |
+| **Solid**          | 0        | Every memo below the write is marked first, and the memos rerun before the effect, which then sees both new values  |
 
-With only 2 derived values, all four libraries are fast enough that the performance difference is negligible. But the extra emissions from RxJS become a serious performance problem as the graph grows — see the deep dependency chain demo below.
+Five of the six are glitch-free on this diamond, since in each of the five the guarantee covers derived values. Where they part is a step written as an effect or `reaction` that writes a value, such as one that starts a request; [Operators on Signals](/mono/synstate/guides/library-comparison/operators-on-signals/) shows that case. RxJS's extra emissions also grow with the graph, which the next demo counts.
 
 ### Why glitches matter
 
@@ -52,27 +54,27 @@ In real applications, diamond dependencies appear everywhere — computed styles
 - **Wasted work** — each extra emission triggers unnecessary side effects. With $N$ inputs to `combineLatest`, a single source update causes $N+1$ emissions — this scales to an **$O(N^2)$ performance cliff** as shown in the demo below.
 - **Logic bugs** — side effects fire with inconsistent data.
 
-SynState eliminates these problems at the library level, with no manual workarounds needed.
+A glitch-free library, SynState among them, rules these out at the library level, with no manual workarounds needed.
 
 ---
 
 ## Deep Dependency Chain: Propagation Under Load
 
-This demo measures the **serial dependency chain propagation performance** of each reactive framework. All four libraries build an identical reactive graph topology: a **depth-$N$ chain** of stateful nodes where each depends on the previous, with a final combine/derive that reads all $N+1$ outputs.
+This demo builds the same reactive graph in each of six libraries: a **depth-$N$ chain** of stateful nodes where each depends on the previous, with a final combine/derive that reads all $N+1$ outputs.
 
 A snake tail follows the mouse — each segment is a stage in the chain that smoothly follows the previous stage via linear interpolation (lerp). To draw the full snake, all $N+1$ outputs (head + $N$ stages) are collected into a single `combine`:
 
 <DeepChainDepGraph />
 
-The diagram shows $N = 3$. In the demo, $N$ is adjustable via a slider. Increase the chain depth and watch for stutter and rising μs/update.
+The diagram shows $N = 3$. In the demo, $N$ is adjustable via a slider. Increase the chain depth and compare the **Total updates** counters.
 
 <SpringDemo />
 
 ### What to look for
 
-- At **low $N$** (10–50): all four libraries render smoothly.
-- At **high $N$**: RxJS starts stuttering first — check the **Total updates** counter to see why.
-- SynState, Jotai, and MobX stay smoother at higher $N$, but Jotai and MobX show higher μs/update due to per-update overhead in their reactive engines.
+- **Total updates** counts the calls to each library's subscriber. Five of the six count one per mouse move, whatever $N$ is.
+- RxJS counts roughly $N+1$ per mouse move, so its counter pulls away as $N$ grows, and at high $N$ its canvas stutters.
+- **Avg μs/update** is how long each subscriber call takes to draw the snake. It leaves out the propagation, so it is about the same for every library; the difference is in how many calls there are. The [benchmark's deep chain scenario](/mono/synstate/guides/library-comparison/benchmark/#scenario-deep-chain-throughput) measures propagation through a chain of this shape.
 
 ### Why RxJS collapses at high N
 
@@ -85,22 +87,26 @@ Check the **Total updates** counter: RxJS shows roughly **$N+1$ times** more upd
 
 Each of these $N+1$ firings triggers a full canvas redraw of $N+1$ points → **$O(N^2)$**. This is the glitch problem from the first demo manifesting as a performance cliff.
 
-### Summary: all four libraries compared
+### Summary: all six libraries compared
 
-| Library      | Graph depth | Propagation    | Subscriber calls per mouse event | Total work per event    |
-| ------------ | ----------- | -------------- | -------------------------------- | ----------------------- |
-| **SynState** | $N$         | push (atomic)  | **1** (atomic combine)           | $O(N)$                  |
-| **Jotai**    | $N$         | pull (lazy)    | **1** (derived read)             | $O(N)$, higher constant |
-| **MobX**     | $N$         | push (batched) | **1** (autorun)                  | $O(N)$, higher constant |
-| **RxJS**     | $N$         | push (eager)   | **$N+1$** (combineLatest glitch) | $O(N^2)$                |
+Each library writes a stateful stage in its own idiom, shown in the second column; [Evaluation Models](/mono/synstate/guides/library-comparison/library-comparison/#evaluation-models) describes how each one propagates in general.
 
-SynState, Jotai, and MobX all fire the subscriber **once** per mouse event, making them all $O(N)$. But the per-update constant factor differs significantly — SynState's direct function calls have much less overhead than Jotai's DFS recomputation or MobX's proxy-based tracking. The next demo isolates this difference.
+| Library            | Stages in this demo                                   | Subscriber calls per mouse event | Work per event |
+| ------------------ | ----------------------------------------------------- | -------------------------------- | -------------- |
+| **SynState**       | `scan` operators, pushed in depth order from the root | **1** (`combine`)                | $O(N)$         |
+| **RxJS**           | `scan` operators, pushed depth-first per subscription | **$N+1$** (`combineLatest`)      | $O(N^2)$       |
+| **Jotai**          | `selectAtom` atoms, each derived from the one before  | **1** (`store.sub`)              | $O(N)$         |
+| **MobX**           | Boxes that one `reaction` writes in a single action   | **1** (`autorun`)                | $O(N)$         |
+| **Preact Signals** | Signals that one `effect` writes in a single batch    | **1** (`effect`)                 | $O(N)$         |
+| **Solid**          | Memos given their previous value, rerun after marking | **1** (`createEffect`)           | $O(N)$         |
+
+Every library but RxJS calls its subscriber **once** per mouse event, so each does work proportional to $N$. What one update costs within that is a constant that depends on the library and on the shape of the graph; the next demo makes it visible, and the [benchmark](/mono/synstate/guides/library-comparison/benchmark/) measures it.
 
 ---
 
 ## Throughput: Per-Update Overhead Under Load
 
-This demo removes RxJS (whose $O(N^2)$ blowup would dominate) and focuses on the three glitch-free libraries to make the constant-factor difference visible.
+This demo leaves out RxJS, whose $O(N^2)$ update count would dominate, and runs the five libraries that call their subscriber once per update.
 
 ### How it works
 
@@ -121,37 +127,9 @@ This amplifies the per-update overhead by a factor of $K$. When the overhead exc
 
 ### What to look for
 
-- At **low $K$** (1–100): all three libraries animate smoothly.
-- **Increase $K$** toward 500–1000: Jotai's and MobX's **ms/frame** climbs past 16ms and the animation visibly stutters, while SynState remains smooth.
-- The **ms/frame** indicator turns red when it exceeds the 16ms (60fps) threshold.
-
-### Why Jotai and MobX stutter
-
-Each of the $K$ source updates triggers the full update pipeline:
-
-**Jotai:**
-
-1. `store.set()` → DFS invalidation of $M$ dependents → $O(M)$
-2. DFS topological sort to determine recomputation order → $O(M)$
-3. Recompute each `selectAtom` with epoch checks and dynamic dependency tracking → $O(M)$
-
-**Total per frame: $K \times O(M)$ with high constant factor** (Map/WeakSet allocations, epoch comparisons, two DFS traversals per tick).
-
-**MobX:**
-
-1. `head.set()` → triggers `reaction` → `runInAction` propagates through $M$ stages → $O(M)$
-2. Each `stage.set()` notifies MobX's dependency tracking system
-3. After the action, `autorun` re-reads all $M$ stages → $O(M)$
-
-**Total per frame: $K \times O(M)$** with per-stage overhead from MobX's proxy-based tracking and reaction scheduling.
-
-SynState's push-based engine propagates through the same chain via **direct function calls**, in an order set by depths resolved once at construction time — no dynamic dependency tracking, no epoch bookkeeping.
-
-| Library      | Per-update work                                | $K=500$, $M=100$ |
-| ------------ | ---------------------------------------------- | ---------------- |
-| **SynState** | 100 direct function calls                      | ~2–5ms           |
-| **Jotai**    | 2× DFS(100) + 100 epoch-checked recomputations | ~50–100ms        |
-| **MobX**     | 100 observable.set + autorun re-read           | ~30–80ms         |
+- **ms/frame** is how long the $K$ updates of one frame take, measured in this browser on this device. It turns red past 16ms, the budget of a 60fps frame.
+- Raise $K$ and $M$ until a canvas stutters. Which one does first, and at what $K$, depends on the browser, the device and the rest of the page, so these numbers are not a benchmark: the [benchmark's deep chain scenario](/mono/synstate/guides/library-comparison/benchmark/#scenario-deep-chain-throughput) runs this same graph under controlled conditions.
+- What each library does per update, and when, is in [Evaluation Models](/mono/synstate/guides/library-comparison/library-comparison/#evaluation-models).
 
 ## What's Next?
 

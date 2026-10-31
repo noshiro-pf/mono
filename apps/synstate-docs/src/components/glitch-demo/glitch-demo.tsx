@@ -1,8 +1,11 @@
 import * as React from 'react';
+import { threeUpGrid } from '../three-up-grid.mjs';
 import {
   createJotaiAdapter,
   createMobXAdapter,
+  createPreactSignalsAdapter,
   createRxJSAdapter,
+  createSolidAdapter,
   createSynStateAdapter,
 } from './adapters/index.mjs';
 import { RectCanvas } from './rect-canvas.js';
@@ -29,12 +32,12 @@ const adapters = [
   createRxJSAdapter(),
   createJotaiAdapter(),
   createMobXAdapter(),
+  createPreactSignalsAdapter(),
+  createSolidAdapter(),
 ] as const;
 
 const containerStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: '12px',
-  justifyContent: 'center',
+  ...threeUpGrid(12),
   userSelect: 'none',
   padding: '16px 0',
 } as const;
