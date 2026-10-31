@@ -9,6 +9,8 @@ import {
   type RunActionlint,
 } from './main.mjs';
 
+const dollar = '$';
+
 const pin = (version: string): ReleaseBinaryPin =>
   ({
     repository: 'owner/tool',
@@ -81,7 +83,7 @@ describe('checkActionlint', () => {
 
     assert.strictEqual(
       result.value,
-      'Nothing to report in the workflows or in 1 composite-action run script (actionlint 1.7.12, shellcheck 0.11.0).',
+      'Nothing to report in the workflows or in the steps of 1 composite action (actionlint 1.7.12, shellcheck 0.11.0).',
     );
 
     // actionlint is handed the pinned shellcheck, not whatever PATH has.
@@ -94,15 +96,12 @@ describe('checkActionlint', () => {
       '/cache/bin/actionlint',
       '/cache/bin/shellcheck',
       wrapInWorkflow(
-        [
-          {
-            line: 12,
-            column: 11,
-            shell: 'bash',
-            script: 'node ./tools/scripts/cmd/workflow-steps.mts install\n',
-          },
-        ],
-        { inputs: [], stepIds: [] },
+        {
+          line: 5,
+          dashIndent: 4,
+          lines: Arr.skip(setupAction.text.split('\n'), 4),
+        },
+        { inputs: [] },
       ),
     );
   });
@@ -213,9 +212,10 @@ describe('checkActionlint', () => {
           message:
             'shellcheck reported issue in this script: SC2086:info:1:6: Double quote to prevent globbing and word splitting',
           filepath: 'composite-action.yml',
-          // The wrapped workflow's `run: |2` line for the first step.
-          line: 11,
-          column: 9,
+          // The `run:` key of the second step, 8 lines on in the wrapped
+          // workflow.
+          line: 20,
+          column: 7,
           kind: 'shellcheck',
         },
       ]),
@@ -226,6 +226,293 @@ describe('checkActionlint', () => {
     assert.include(
       result.value,
       '  .github/actions/setup/action.yml:12:17: info: Double quote to prevent globbing and word splitting [SC2086]',
+    );
+  });
+
+  test('moves any other finding by the shift the wrapper made', async () => {
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintExits(0),
+      compositeActions: [setupAction],
+      lintWorkflowText: compositeReports([
+        {
+          message: 'property "instal" is not defined in object type {}',
+          filepath: 'composite-action.yml',
+          // `INSTALL: ${{ inputs.install }}`, in the wrapped workflow, whose
+          // steps are as far in as the action's.
+          line: 19,
+          column: 24,
+          kind: 'expression',
+        },
+        {
+          message: 'something about the header',
+          filepath: 'composite-action.yml',
+          line: 2,
+          column: 3,
+          kind: 'syntax-check',
+        },
+      ]),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      '  .github/actions/setup/action.yml:11:24: property "instal" is not defined in object type {}',
+    );
+
+    assert.include(
+      result.value,
+      '  .github/actions/setup/action.yml: something about the header',
+    );
+  });
+
+  test('gives only the line for a column past its end, as in a block scalar that is not a script', async () => {
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintExits(0),
+      compositeActions: [
+        {
+          path: '.github/actions/x/action.yml',
+          text: dedent`
+            runs:
+              using: composite
+              steps:
+                - uses: owner/action@0000000000000000000000000000000000000000
+                  with:
+                    script: | # js
+                      console.log(1);
+                      console.log("\${{ github.event.issue.title }}");
+          `,
+        },
+      ],
+      lintWorkflowText: compositeReports([
+        {
+          message: '"github.event.issue.title" is potentially untrusted',
+          filepath: 'composite-action.yml',
+          // The `script: |` key, at an offset into the whole string.
+          line: 15,
+          column: 49,
+          kind: 'expression',
+        },
+      ]),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      '  .github/actions/x/action.yml:6: "github.event.issue.title" is potentially untrusted',
+    );
+  });
+
+  test('keeps a finding on the header there when the steps start further down than the header ends', async () => {
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintExits(0),
+      compositeActions: [
+        {
+          path: '.github/actions/x/action.yml',
+          text: dedent`
+            inputs:
+              a:
+                description: a
+              b:
+                description: b
+              c:
+                description: c
+            runs:
+              using: composite
+              steps:
+                - shell: bash
+                  run: echo hi
+          `,
+        },
+      ],
+      lintWorkflowText: compositeReports([
+        {
+          message: 'key "A" is duplicated in inputs',
+          filepath: 'composite-action.yml',
+          // The wrapper's header has 18 lines; the steps start on line 11.
+          line: 4,
+          column: 7,
+          kind: 'syntax-check',
+        },
+      ]),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      '  .github/actions/x/action.yml: key "A" is duplicated in inputs',
+    );
+  });
+
+  test('puts an expression finding in a block-scalar script at the start of the script', async () => {
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintExits(0),
+      compositeActions: [
+        {
+          path: '.github/actions/x/action.yml',
+          text: dedent`
+            runs:
+              using: composite
+              steps:
+                - shell: bash
+                  run: |
+                    echo hi
+                    echo "\${{ github.event.issue.title }}"
+          `,
+        },
+      ],
+      lintWorkflowText: compositeReports([
+        {
+          message: '"github.event.issue.title" is potentially untrusted',
+          filepath: 'composite-action.yml',
+          // The `run: |` key, at an offset into the whole script.
+          line: 14,
+          column: 30,
+          kind: 'expression',
+        },
+      ]),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      '  .github/actions/x/action.yml:6:9: "github.event.issue.title" is potentially untrusted',
+    );
+  });
+
+  test('moves a position named in the message as well', async () => {
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintExits(0),
+      compositeActions: [setupAction],
+      lintWorkflowText: compositeReports([
+        {
+          message:
+            'step ID "a" duplicates. previously defined at line:13,col:11',
+          filepath: 'composite-action.yml',
+          line: 16,
+          column: 11,
+          kind: 'id',
+        },
+      ]),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      '  .github/actions/setup/action.yml:8:11: step ID "a" duplicates. previously defined at line:5,col:11',
+    );
+  });
+
+  test('says why an anchor outside the steps is unknown', async () => {
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintExits(0),
+      compositeActions: [setupAction],
+      lintWorkflowText: compositeReports([
+        {
+          message:
+            "could not parse as YAML: yaml: unknown anchor 'd' referenced",
+          filepath: 'composite-action.yml',
+          line: 0,
+          column: 0,
+          kind: 'syntax-check',
+        },
+      ]),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      "  .github/actions/setup/action.yml: could not parse as YAML: yaml: unknown anchor 'd' referenced: `runs.steps` is linted on its own, so write the value out or anchor it within the steps",
+    );
+  });
+
+  test('leaves a finding about the step on the line of its `run: |` key', async () => {
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintExits(0),
+      compositeActions: [
+        {
+          path: '.github/actions/x/action.yml',
+          text: dedent`
+            runs:
+              using: composite
+              steps:
+                - run: |
+                    echo hi
+                  shell: bash
+                  uses: owner/action@0000000000000000000000000000000000000000
+          `,
+        },
+      ],
+      lintWorkflowText: compositeReports([
+        {
+          message:
+            'step must run script with "run" section or run action with "uses" section',
+          filepath: 'composite-action.yml',
+          line: 13,
+          column: 7,
+          kind: 'syntax-check',
+        },
+      ]),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      '  .github/actions/x/action.yml:4: step must run script',
+    );
+  });
+
+  test('says why a secret the wrapper does not declare is reported', async () => {
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintExits(0),
+      compositeActions: [setupAction],
+      lintWorkflowText: compositeReports([
+        {
+          message:
+            'property "token" is not defined in object type {actions_runner_debug: string; actions_step_debug: string; check-actionlint-no-secrets: string; github_token: string}',
+          filepath: 'composite-action.yml',
+          line: 19,
+          column: 24,
+          kind: 'expression',
+        },
+      ]),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      '  .github/actions/setup/action.yml:11:24: property "token" is not defined: a composite action has no `secrets`; pass the value in as an input',
     );
   });
 
@@ -278,7 +565,7 @@ describe('checkActionlint', () => {
 
     assert.include(
       result.value,
-      '❌ These composite-action `run:` steps were not read, so nothing checked them:\n\n  .github/actions/x/action.yml:4: a `run:` step with no `shell:`',
+      '❌ These composite-action steps were not read as `./run-scripts.mts` reads them, so they were checked only in part, or not at all:\n\n  .github/actions/x/action.yml:4: a `run:` step with no `shell:`',
     );
 
     assert.notInclude(result.value, 'shellcheck disable');
@@ -286,13 +573,21 @@ describe('checkActionlint', () => {
 });
 
 describe('wrapInWorkflow', () => {
-  test("declares the action's inputs and step ids, and says where each `run:` is", () => {
-    const { text, runLines } = wrapInWorkflow(
-      [
-        { line: 10, column: 8, shell: 'bash', script: 'set -eu\n\necho a\n' },
-        { line: 20, column: 11, shell: 'node {0}', script: 'b()\n' },
-      ],
-      { inputs: ['matrix'], stepIds: ['build'] },
+  test("copies the steps under a job declaring the action's inputs", () => {
+    const { text, lineOffset, columnOffset, headerLines } = wrapInWorkflow(
+      {
+        line: 20,
+        dashIndent: 2,
+        lines: [
+          '  - id: build',
+          '    shell: bash',
+          '    run: |',
+          '      set -eu',
+          '',
+          `      echo "${dollar}{{ inputs.matrix }}"`,
+        ],
+      },
+      { inputs: ['matrix'] },
     );
 
     assert.strictEqual(
@@ -303,32 +598,51 @@ describe('wrapInWorkflow', () => {
             inputs:
               "matrix":
                 type: string
-              "check-actionlint-runner":
-                type: string
+            secrets:
+              "check-actionlint-no-secrets":
+                required: false
         jobs:
           composite:
-            runs-on: \${{ inputs.check-actionlint-runner }}
+            runs-on: \${{ matrix.runner }}
+            strategy:
+              matrix: \${{ fromJSON(github.event_name) }}
             steps:
-              - id: "build"
-                shell: bash
-                run: 'true'
-              - shell: "bash"
-                run: |2
-                  set -eu
+            - id: build
+              shell: bash
+              run: |
+                set -eu
 
-                  echo a
-              - shell: "node {0}"
-                run: |2
-                  b()
+                echo "\${{ inputs.matrix }}"
       `}\n`,
     );
 
-    assert.deepStrictEqual(runLines, [16, 21]);
+    // Line 20 of action.yml is line 15 of the workflow, two columns on.
+    assert.strictEqual(lineOffset, -5);
 
-    assert.deepStrictEqual(
-      runLines.map((line) => text.split('\n')[line - 1]?.trim()),
-      ['run: |2', 'run: |2'],
+    assert.strictEqual(columnOffset, 2);
+
+    assert.strictEqual(headerLines, 14);
+
+    assert.strictEqual(
+      text.split('\n')[20 + lineOffset - 1],
+      '    - id: build',
     );
+  });
+
+  test('moves items indented less than the wrapper needs, and no others', () => {
+    for (const [dash, dashIndent, offset] of [
+      [' - shell: bash', 1, 3],
+      ['      - shell: bash', 6, 0],
+    ] as const) {
+      const { text, columnOffset } = wrapInWorkflow(
+        { line: 3, dashIndent, lines: [dash] },
+        { inputs: [] },
+      );
+
+      assert.strictEqual(columnOffset, offset);
+
+      assert.isTrue(text.endsWith(`\n${' '.repeat(offset)}${dash}\n`));
+    }
   });
 });
 

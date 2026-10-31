@@ -15,11 +15,16 @@ import {
   type ReleaseBinaryPin,
 } from '../../lib/release-binaries.mjs';
 import { projectRootPath } from '../../project-root-path.mjs';
-import { extractRunScripts, type RunScript } from './run-scripts.mjs';
+import {
+  extractRunScripts,
+  withoutComment,
+  type RunScript,
+  type StepsBlock,
+} from './run-scripts.mjs';
 
 /**
  * Runs actionlint over `.github/workflows/`, and through it shellcheck over
- * every `run:` block; then the same over the `run:` blocks of the composite
+ * every `run:` block; then the same over the `runs.steps` of the composite
  * actions under `.github/actions/`, which actionlint reads only for their
  * inputs.
  *
@@ -41,19 +46,24 @@ import { extractRunScripts, type RunScript } from './run-scripts.mjs';
  * when it is on `PATH`, is turned off (there is no such step), and
  * `SHELLCHECK_OPTS`, which shellcheck reads, is cleared.
  *
- * **The composite actions are judged by actionlint itself.** Their scripts,
- * read by `./run-scripts.mts`, are put back into a one-job workflow, each as
- * a step with its own `shell:`, and handed to the same actionlint over stdin;
- * what it reports is moved back to its line in `action.yml`. So the arguments
- * it passes shellcheck, the prelude it puts before a script, the codes it
- * excludes and which shells it checks are its own, and cannot drift from how
- * it judges a workflow when the pin moves. The action's own contexts are
- * declared in that workflow ({@link wrapInWorkflow}), so the expressions in
- * a script are checked too, a misspelt `inputs.*` and an untrusted
- * `github.event.*` included. Only `run:` and `shell:` are carried over: an
- * expression in a step's `env:`, `with:` or `if:` is not checked, and a
- * `secrets.*`, which a composite action cannot read, is accepted because the
- * wrapper is a reusable workflow.
+ * **The composite actions are judged by actionlint itself.** Their
+ * `runs.steps`, found by `./run-scripts.mts`, are copied line for line into a
+ * one-job workflow and handed to the same actionlint over stdin; what it
+ * reports is moved back to its line and column in `action.yml`. So the
+ * arguments it passes shellcheck, the prelude it puts before a script, the
+ * codes it excludes and which shells it checks are its own, and cannot drift
+ * from how it judges a workflow when the pin moves. Every key of every step is
+ * checked, `env:`, `with:` and `if:` as well as `run:`, and the action's
+ * inputs are declared in that workflow ({@link wrapInWorkflow}), so a
+ * misspelt `inputs.*`, a step id that does not exist and an untrusted
+ * `github.event.*` are all reported. A composite action has no `secrets`, so
+ * the wrapper declares one secret no action reads, and actionlint reports a
+ * `secrets.<name>` it does not declare; what it still accepts is the secrets
+ * every workflow has (`secrets.GITHUB_TOKEN`, `secrets.ACTIONS_STEP_DEBUG`,
+ * `secrets.ACTIONS_RUNNER_DEBUG`) and the whole object (`toJSON(secrets)`).
+ * A key only a workflow's step takes (`timeout-minutes:`) is not reported
+ * either, nor the `with:` of a local action (`uses: ./…`), which actionlint
+ * resolves only from a file.
  */
 export const checkActionlint = async ({
   pins,
@@ -129,24 +139,23 @@ export const checkActionlint = async ({
   );
 
   const actions = compositeActions.map((action) => {
-    const { scripts, inputs, stepIds, problems } = extractRunScripts(
-      action.text,
-    );
+    const { scripts, steps, inputs, problems } = extractRunScripts(action.text);
 
-    const verdict = Arr.isNonEmpty(scripts)
-      ? judgeComposite(
-          lintWorkflowText(
-            actionlint.value,
-            shellcheck.value,
-            wrapInWorkflow(scripts, { inputs, stepIds }),
-          ),
-          action.path,
-          scripts,
-        )
-      : ({ findings: [], failure: undefined } as const);
+    const verdict =
+      steps === undefined
+        ? ({ findings: [], failure: undefined } as const)
+        : judgeComposite(
+            lintWorkflowText(
+              actionlint.value,
+              shellcheck.value,
+              wrapInWorkflow(steps, { inputs }),
+            ),
+            action.path,
+            scripts,
+          );
 
     return {
-      checked: scripts.length,
+      checked: steps !== undefined,
       unread: problems.map((problem) => `${action.path}:${problem}`),
       ...verdict,
     };
@@ -164,10 +173,7 @@ export const checkActionlint = async ({
     }
   });
 
-  const checkedScripts = actions.reduce(
-    (total, { checked }) => total + checked,
-    0,
-  );
+  const checkedActions = actions.filter(({ checked }) => checked).length;
 
   if (
     workflows === undefined &&
@@ -176,7 +182,7 @@ export const checkActionlint = async ({
     !Arr.isNonEmpty(failures)
   ) {
     return Result.ok(
-      `Nothing to report in the workflows or in ${checkedScripts} composite-action run script${checkedScripts === 1 ? '' : 's'} (${versions}).`,
+      `Nothing to report in the workflows or in the steps of ${checkedActions} composite action${checkedActions === 1 ? '' : 's'} (${versions}).`,
     );
   }
 
@@ -197,7 +203,7 @@ export const checkActionlint = async ({
         [],
       ),
       ...section(
-        '❌ These composite-action `run:` steps were not read, so nothing checked them:',
+        '❌ These composite-action steps were not read as `./run-scripts.mts` reads them, so they were checked only in part, or not at all:',
         unread,
         [
           'Write each as a block-style step under `runs.steps`, with its own',
@@ -209,67 +215,77 @@ export const checkActionlint = async ({
 };
 
 /**
- * `scripts` as the steps of a one-job workflow, and the line of each step's
- * `run: |2` in it, which is where actionlint reports what it finds there.
+ * `steps` as the steps of a one-job workflow, copied line for line, and how
+ * far they moved: a line of `steps` is `lineOffset` lines further down in the
+ * workflow than in `action.yml`, and `columnOffset` columns further right —
+ * as many as put its items under the wrapper's `steps:`, whatever their
+ * indentation in `action.yml`. The first `headerLines` lines are the
+ * wrapper's own.
  *
- * The workflow gives the scripts the composite action's own contexts: a
- * `workflow_call` declaring its inputs as strings, which a composite
- * action's are, and a step with each `id` the action's steps have, ahead of
- * the scripts. The runner is an expression, so that actionlint does not
- * judge a `shell:` against one operating system when a composite action can
- * run on any.
+ * The workflow gives the steps the composite action's own inputs: a
+ * `workflow_call` declaring them as strings, which a composite action's are.
+ * The matrix is an expression (of a context no configuration declares), so
+ * that a `matrix.*` of the calling job may be any value, and the runner is one of its entries, so that actionlint does
+ * not judge a `shell:` against one operating system when a composite action
+ * can run on any.
  */
 export const wrapInWorkflow = (
-  scripts: readonly RunScript[],
-  context: Readonly<{ inputs: readonly string[]; stepIds: readonly string[] }>,
-): Readonly<{ text: string; runLines: readonly number[] }> => {
+  steps: StepsBlock,
+  context: Readonly<{ inputs: readonly string[] }>,
+): WrappedWorkflow => {
   const header = [
     'on:',
     '  workflow_call:',
-    '    inputs:',
-    ...Arr.toPushed(context.inputs, runnerInput).flatMap((name) => [
-      `      ${JSON.stringify(name)}:`,
-      '        type: string',
-    ]),
+    ...(Arr.isNonEmpty(context.inputs)
+      ? Arr.toUnshifted('    inputs:')(
+          context.inputs.flatMap((name) => [
+            `      ${JSON.stringify(name)}:`,
+            '        type: string',
+          ]),
+        )
+      : (['    inputs: {}'] as const)),
+    '    secrets:',
+    `      ${JSON.stringify(noSecret)}:`,
+    '        required: false',
     'jobs:',
     '  composite:',
-    `    runs-on: \${{ inputs.${runnerInput} }}`,
+    `    runs-on: ${dollar}{{ matrix.runner }}`,
+    '    strategy:',
+    `      matrix: ${dollar}{{ fromJSON(github.event_name) }}`,
     '    steps:',
-    ...context.stepIds.flatMap((id) => [
-      `      - id: ${JSON.stringify(id)}`,
-      '        shell: bash',
-      "        run: 'true'",
-    ]),
   ] as const;
 
-  const steps = scripts.map(({ shell, script }) => [
-    `      - shell: ${JSON.stringify(shell)}`,
-    // `|2`: the content sits two columns past the key, so a script whose
-    // first line is indented keeps that indentation.
-    '        run: |2',
-    ...script
-      .replace(/\n$/u, '')
-      .split('\n')
-      .map((line) => (line === '' ? '' : `          ${line}`)),
-  ]);
+  // The items go no shallower than the wrapper's `    steps:`.
+  const columnOffset = Math.max(0, 4 - steps.dashIndent);
 
-  // 1-based: the header and every step before, then `shell:`, then `run:`.
-  const runLines = Arr.scan(
-    steps,
-    (linesBefore, step) => linesBefore + step.length,
-    header.length,
-  )
-    .slice(0, -1)
-    .map((linesBefore) => linesBefore + 2);
+  const body = steps.lines.map((line) =>
+    line === '' ? '' : `${' '.repeat(columnOffset)}${line}`,
+  );
 
   return {
-    text: `${[...header, ...steps.flat()].join('\n')}\n`,
-    runLines,
+    text: `${[...header, ...body].join('\n')}\n`,
+    lineOffset: header.length + 1 - steps.line,
+    columnOffset,
+    headerLines: header.length,
   };
 };
 
-/** The wrapper's runner, an input no composite action is expected to have. */
-const runnerInput = 'check-actionlint-runner';
+/** What {@link wrapInWorkflow} makes of a composite action's steps. */
+export type WrappedWorkflow = Readonly<{
+  text: string;
+  lineOffset: number;
+  columnOffset: number;
+  headerLines: number;
+}>;
+
+/** `$`, for a `${{` that is not a template's. */
+const dollar = '$';
+
+/**
+ * The one secret the wrapper declares, so that actionlint reports any other
+ * `secrets.<name>`: with none declared it takes every name.
+ */
+const noSecret = 'check-actionlint-no-secrets';
 
 /** The path of `name`'s pinned binary, installed if it is not yet. */
 export type Install = (
@@ -292,9 +308,9 @@ export type RunActionlint = (
 export type LintWorkflowText = (
   actionlint: string,
   shellcheck: string,
-  workflow: Readonly<{ text: string; runLines: readonly number[] }>,
+  workflow: WrappedWorkflow,
 ) => Readonly<{
-  workflow: Readonly<{ text: string; runLines: readonly number[] }>;
+  workflow: WrappedWorkflow;
   status: number | null;
   stdout: string;
   /** Where actionlint says why it stopped, when it did. */
@@ -338,9 +354,24 @@ const judgeActionlint = (
 };
 
 /**
- * What actionlint found in a composite action's scripts, each moved to its
- * line and column in `file`: a shellcheck finding to the line of the script
- * it names, anything else to the start of that step's script.
+ * actionlint's message, with what it means for a composite action where its
+ * words are the wrapper's: an undeclared secret names the one the wrapper
+ * declares, and an unknown anchor is one the steps, linted alone, cannot see.
+ */
+const explain = (message: string): string =>
+  message.includes(noSecret)
+    ? (`${message.replace(/ in object type \{.*\}$/u, '')}: a composite action has no \`secrets\`; pass the value in as an input` as const)
+    : message.includes('unknown anchor')
+      ? (`${message}: \`runs.steps\` is linted on its own, so write the value out or anchor it within the steps` as const)
+      : message;
+
+/**
+ * What actionlint found in a composite action's steps, each moved to its line
+ * and column in `file`: a shellcheck finding to the line of the script it
+ * names, anything else by the constant shift {@link wrapInWorkflow} made.
+ * Inside a scalar that spans lines actionlint gives only an offset into it,
+ * so such a finding gets the scalar's first line and no column, or for a
+ * `run: |` where the script starts.
  */
 const judgeComposite = (
   { workflow, status, stdout, stderr, error }: ReturnType<LintWorkflowText>,
@@ -380,23 +411,44 @@ const judgeComposite = (
     };
   }
 
+  const workflowLines = workflow.text.split('\n');
+
   return {
     findings: reports.map((report) => {
-      const message =
+      const reported =
         typeof report['message'] === 'string' ? report['message'] : '';
+
+      // A position actionlint names in its message is the wrapper's too.
+      const message = explain(reported).replaceAll(
+        /\bline:(?<line>\d+),col:(?<column>\d+)/gu,
+        (match: string, l?: string, c?: string) => {
+          const position = Result.zip(
+            Num.safeParseInt(l ?? ''),
+            Num.safeParseInt(c ?? ''),
+          );
+
+          return Result.isOk(position)
+            ? `line:${position.value[0] - workflow.lineOffset},col:${position.value[1] - workflow.columnOffset}`
+            : match;
+        },
+      );
 
       const reportedLine =
         typeof report['line'] === 'number' ? report['line'] : Number.NaN;
 
-      // On a step's `run:` line, or on its `shell:` line just above.
-      const step = workflow.runLines.findIndex(
-        (runLine) => reportedLine === runLine || reportedLine === runLine - 1,
-      );
+      const line = reportedLine - workflow.lineOffset;
 
-      const script = scripts[step];
+      const column =
+        (typeof report['column'] === 'number' ? report['column'] : Number.NaN) -
+        workflow.columnOffset;
 
-      if (script === undefined) {
+      // A line of the wrapper's own header has no counterpart in `file`.
+      if (!Number.isFinite(line) || reportedLine <= workflow.headerLines) {
         return `${file}: ${message}`;
+      }
+
+      if (!Number.isFinite(column)) {
+        return `${file}:${line}: ${message}`;
       }
 
       const shellcheck =
@@ -404,20 +456,45 @@ const judgeComposite = (
           message,
         )?.groups;
 
+      // actionlint puts a shellcheck finding on the step's `run:` key; the
+      // script starts on that line, or on the next for a block scalar.
+      const script = scripts.find((s) => s.runLine === line);
+
+      // On the line of a block scalar's header (`script: |`), and wherever
+      // else a scalar spans lines, actionlint's column is an offset into the
+      // whole scalar, so the line alone is right.
+      const lineText = workflowLines[reportedLine - 1] ?? '';
+
+      const at =
+        /: *[|>][-+\d]{0,2}$/u.test(withoutComment(lineText)) ||
+        column > lineText.length - workflow.columnOffset
+          ? (`${file}:${line}` as const)
+          : (`${file}:${line}:${column}` as const);
+
       if (shellcheck === undefined) {
-        return `${file}:${script.line}:${script.column + 1}: ${message}`;
+        // What actionlint finds in a block-scalar script is nearest the
+        // script's start; a syntax error on its key line is about the step.
+        return script !== undefined &&
+          script.line !== line &&
+          report['kind'] !== 'syntax-check'
+          ? `${file}:${script.line}:${script.column + 1}: ${message}`
+          : `${at}: ${message}`;
       }
 
-      const line =
+      if (script === undefined) {
+        return `${at}: ${message}`;
+      }
+
+      const scriptLine =
         script.line +
         Result.unwrapOkOr(Num.safeParseInt(shellcheck['line'] ?? ''), 1) -
         1;
 
-      const column =
+      const scriptColumn =
         script.column +
         Result.unwrapOkOr(Num.safeParseInt(shellcheck['column'] ?? ''), 1);
 
-      return `${file}:${line}:${column}: ${shellcheck['level'] ?? ''}: ${shellcheck['text'] ?? ''} [SC${shellcheck['code'] ?? ''}]`;
+      return `${file}:${scriptLine}:${scriptColumn}: ${shellcheck['level'] ?? ''}: ${shellcheck['text'] ?? ''} [SC${shellcheck['code'] ?? ''}]`;
     }),
     failure: undefined,
   };

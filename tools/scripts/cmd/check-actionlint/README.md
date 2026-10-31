@@ -4,14 +4,20 @@ Lints the GitHub Actions configuration with the actionlint and shellcheck that
 `tools/configs/release-binaries.json` pins:
 
 - `main.mts` runs actionlint over `.github/workflows/`, which runs shellcheck
-  over each workflow's `run:` blocks. The `run:` blocks of the composite
-  actions under `.github/actions/`, which actionlint reads only for their
-  inputs, are then put back into a one-job workflow and given to the same
-  actionlint over stdin, with the action's inputs and step ids declared, so
-  a script is judged as a workflow's is; what it finds is moved back to its
-  line in `action.yml`. Only `run:` and `shell:` are carried over, so an
-  expression in a step's `env:`, `with:` or `if:` is not checked yet.
-- `run-scripts.mts` finds those composite-action scripts in each `action.yml`.
+  over each workflow's `run:` blocks. The `runs.steps` of each composite
+  action under `.github/actions/`, which actionlint reads only for its
+  inputs, are then copied line for line into a one-job workflow declaring
+  the action's inputs and given to the same actionlint over stdin, so every
+  key of a step (`run:`, `env:`, `with:`, `if:`) is judged as a workflow's
+  is; what it finds is moved back to its line and column in `action.yml`.
+  The wrapper declares one secret, so a `secrets.<name>`, which a composite
+  action cannot read, is reported too. Not reported: the secrets every
+  workflow has (`secrets.GITHUB_TOKEN`, the two `ACTIONS_*_DEBUG`),
+  `toJSON(secrets)`, a key only a workflow's step takes (`timeout-minutes:`),
+  and the `with:` of a local action (`uses: ./…`), which actionlint resolves
+  only from a file.
+- `run-scripts.mts` finds those steps and their `run:` scripts in each
+  `action.yml`.
   It reports any shape it does not read rather than skipping it.
 
 The binaries come from `../../lib/release-binaries.mts`. It downloads each

@@ -1,4 +1,5 @@
 import dedent from 'dedent';
+import { Arr } from 'ts-data-forge';
 import { extractRunScripts } from './run-scripts.mjs';
 
 /** Spliced in, so that an expected script can hold `${{` as written. */
@@ -25,6 +26,7 @@ describe('extractRunScripts', () => {
 
     assert.deepStrictEqual(scripts, [
       {
+        runLine: 6,
         line: 7,
         column: 8,
         shell: 'bash',
@@ -57,9 +59,21 @@ describe('extractRunScripts', () => {
     assert.deepStrictEqual(problems, []);
 
     assert.deepStrictEqual(scripts, [
-      { line: 4, column: 11, shell: 'sh', script: 'echo plain\n' },
-      { line: 7, column: 12, shell: 'bash', script: "echo 'single'\n" },
-      { line: 9, column: 12, shell: 'bash', script: "echo 'double'\n" },
+      { runLine: 4, line: 4, column: 11, shell: 'sh', script: 'echo plain\n' },
+      {
+        runLine: 7,
+        line: 7,
+        column: 12,
+        shell: 'bash',
+        script: "echo 'single'\n",
+      },
+      {
+        runLine: 9,
+        line: 9,
+        column: 12,
+        shell: 'bash',
+        script: "echo 'double'\n",
+      },
     ]);
   });
 
@@ -112,7 +126,13 @@ describe('extractRunScripts', () => {
     `);
 
     assert.deepStrictEqual(scripts, [
-      { line: 5, column: 11, shell: 'pwsh', script: 'Write-Output hi\n' },
+      {
+        runLine: 5,
+        line: 5,
+        column: 11,
+        shell: 'pwsh',
+        script: 'Write-Output hi\n',
+      },
     ]);
 
     assert.deepStrictEqual(problems, []);
@@ -160,8 +180,8 @@ describe('extractRunScripts', () => {
     assert.deepStrictEqual(problems, []);
 
     assert.deepStrictEqual(scripts, [
-      { line: 9, column: 8, shell: 'bash', script: 'echo a\n' },
-      { line: 12, column: 6, shell: 'bash', script: '  echo b\n' },
+      { runLine: 8, line: 9, column: 8, shell: 'bash', script: 'echo a\n' },
+      { runLine: 11, line: 12, column: 6, shell: 'bash', script: '  echo b\n' },
     ]);
   });
 
@@ -429,8 +449,8 @@ describe('extractRunScripts', () => {
     );
   });
 
-  test('reads the input names and the step ids the scripts may reference', () => {
-    const { inputs, stepIds } = extractRunScripts(dedent`
+  test('reads the input names, and the steps as they are written', () => {
+    const { inputs, steps } = extractRunScripts(dedent`
       name: probe
       inputs:
         matrix:
@@ -442,13 +462,55 @@ describe('extractRunScripts', () => {
         steps:
           - id: build
             uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+
+          # a comment between steps
           - id: 'report'
             shell: bash
             run: echo "\${{ steps.build.outputs.x }}"
+      outputs: {}
     `);
 
     assert.deepStrictEqual(inputs, ['matrix', 'quoted-name']);
 
-    assert.deepStrictEqual(stepIds, ['build', 'report']);
+    assert.deepStrictEqual(steps, {
+      line: 10,
+      dashIndent: 4,
+      lines: [
+        '    - id: build',
+        '      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0',
+        '',
+        '    # a comment between steps',
+        "    - id: 'report'",
+        '      shell: bash',
+        `      run: echo "${dollar}{{ steps.build.outputs.x }}"`,
+      ],
+    });
+  });
+
+  test('reports a composite action whose steps it cannot find', () => {
+    const { steps, problems } = extractRunScripts(dedent`
+      runs:
+        using: composite
+        "steps":
+          - uses: owner/action@0000000000000000000000000000000000000000
+    `);
+
+    assert.isUndefined(steps);
+
+    assert.deepStrictEqual(problems, [
+      '1: no block sequence under `runs.steps` of a composite action',
+    ]);
+  });
+
+  test('gives no steps when there is no block sequence under `runs.steps`, and says so', () => {
+    const { steps, problems } = extractRunScripts(dedent`
+      runs:
+        using: composite
+        steps: []
+    `);
+
+    assert.isUndefined(steps);
+
+    assert.isTrue(Arr.isNonEmpty(problems));
   });
 });
