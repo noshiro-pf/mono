@@ -36,6 +36,7 @@ export const Checkbox = ({
   >
     <input
       checked={checked}
+      class={constant('bp6-control-input')}
       data-e2e={e2e}
       disabled={disabled}
       type={constant('checkbox')}

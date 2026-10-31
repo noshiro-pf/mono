@@ -9,7 +9,7 @@ const documents = [
   {
     mdPath: path.resolve(workspaceRootPath, 'README.md'),
     samplesDir: path.resolve(workspaceRootPath, 'samples/readme'),
-    sampleCodeFiles: ['01-date-input.tsx'],
+    sampleCodeFiles: ['01-date-input.tsx', '02-numeric-input.tsx'],
   },
 ] as const;
 
