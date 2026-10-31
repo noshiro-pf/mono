@@ -11,6 +11,7 @@ import type { ESLintFlatConfig, ESLintPlugin } from './types.mjs';
  */
 const recommendedRules = {
   'synstate/no-identity-map': 'error',
+  'synstate/no-observable-in-handler': 'error',
   'synstate/no-redundant-skip-if-no-change': 'error',
   'synstate/no-throw-in-operator': 'error',
   'synstate/no-unbounded-counter-pipe': 'error',

@@ -1,5 +1,6 @@
 import type { ESLintPlugin } from '../types.mjs';
 import { noIdentityMap } from './no-identity-map.mjs';
+import { noObservableInHandler } from './no-observable-in-handler.mjs';
 import { noRedundantSkipIfNoChange } from './no-redundant-skip-if-no-change.mjs';
 import { noThrowInOperator } from './no-throw-in-operator.mjs';
 import { noUnboundedCounterPipe } from './no-unbounded-counter-pipe.mjs';
@@ -9,6 +10,7 @@ import { preferMapTo } from './prefer-map-to.mjs';
 
 export const synstateRules = {
   'no-identity-map': noIdentityMap,
+  'no-observable-in-handler': noObservableInHandler,
   'no-redundant-skip-if-no-change': noRedundantSkipIfNoChange,
   'no-throw-in-operator': noThrowInOperator,
   'no-unbounded-counter-pipe': noUnboundedCounterPipe,
