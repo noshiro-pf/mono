@@ -43,6 +43,7 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
     - [Override Specific Rules](#override-specific-rules)
     - [Use RulesOptions Types](#use-rulesoptions-types)
     - [Target Specific Files](#target-specific-files)
+- [Why Some Rules Are On or Off](#why-some-rules-are-on-or-off)
 - [Troubleshooting](#troubleshooting)
     - [Common Issues](#common-issues)
         - [1. ESLint can't find tsconfig.json](#1-eslint-cant-find-tsconfigjson)
@@ -899,6 +900,10 @@ export default [
     },
 ] satisfies readonly FlatConfig[];
 ```
+
+## Why Some Rules Are On or Off
+
+[`docs/rule-rationale.md`](https://github.com/noshiro-pf/mono/blob/main/libs/eslint-config-typed/docs/rule-rationale.md) (in Japanese) explains rules whose setting does not explain itself, such as why loops prefer `for-of` while loop statements stay allowed, and why `reduce` is allowed but only with an initial value. It also says how to fix a report from each rule.
 
 ## Troubleshooting
 
