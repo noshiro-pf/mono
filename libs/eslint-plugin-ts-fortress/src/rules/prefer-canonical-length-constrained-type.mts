@@ -5,14 +5,13 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
+  bindValueImports,
   buildCalleeResolver,
-  buildNamedImportFix,
   getImportDeclarations,
-  getImportedLocalName,
   hasForeignBinding,
   parenthesesDepth,
+  type ValueImportBinding,
 } from 'eslint-rule-forge';
-import { Arr } from 'ts-data-forge';
 import {
   ARRAY_FN,
   BOUNDED_LENGTH_TUPLE_FN,
@@ -138,10 +137,8 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
   create: (context) => {
     const sourceCode = context.sourceCode;
 
-    const program = sourceCode.ast;
-
     const tsFortressImports = getImportDeclarations(
-      program,
+      sourceCode.ast,
       TS_FORTRESS_MODULE,
     );
 
@@ -152,9 +149,6 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
       propertyNode: TSESTree.Node;
       isNamespace: boolean;
       rewrite: Rewrite;
-      /** The name the rewritten call will use; `undefined` when unavailable. */
-      localName: string | undefined;
-      needsImport: boolean;
     }[] = [];
 
     return {
@@ -175,65 +169,37 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
           return;
         }
 
-        // A namespace call (`t.maxLengthTuple(...)`) only swaps the property
-        // name, so it never needs a binding of its own.
-        if (resolved.isNamespace) {
-          mut_matches.push({
-            node,
-            propertyNode: resolved.propertyNode,
-            isNamespace: true,
-            rewrite,
-            localName: rewrite.to,
-            needsImport: false,
-          });
-
-          return;
-        }
-
-        const importedLocalName = getImportedLocalName(
-          tsFortressImports,
-          rewrite.to,
-        );
-
-        const localName = importedLocalName ?? rewrite.to;
-
         mut_matches.push({
           node,
           propertyNode: resolved.propertyNode,
-          isNamespace: false,
+          isNamespace: resolved.isNamespace,
           rewrite,
-          localName: hasForeignBinding(
-            sourceCode,
-            node,
-            localName,
-            TS_FORTRESS_MODULE,
-          )
-            ? undefined
-            : localName,
-          needsImport: importedLocalName === undefined,
         });
       },
       'Program:exit': () => {
-        const reportable = mut_matches.filter(
-          (match) => match.localName !== undefined,
-        );
+        for (const {
+          node,
+          propertyNode,
+          isNamespace,
+          rewrite,
+        } of mut_matches) {
+          // A namespace call (`t.maxLengthTuple(...)`) only swaps the property
+          // name, so it never needs a binding of its own.
+          const binding = isNamespace
+            ? ({
+                localNames: [rewrite.to],
+                edits: () => [],
+              } satisfies ValueImportBinding)
+            : bindValueImports(sourceCode, TS_FORTRESS_MODULE, [rewrite.to]);
 
-        const namesNeedingImport = Arr.uniq(
-          reportable
-            .filter((match) => match.needsImport)
-            .map((match) => match.rewrite.to),
-        );
+          const localName = binding?.localNames[0] ?? rewrite.to;
 
-        // Every missing import rides on a single report; see `buildNamedImportFix`.
-        const importFixIndex = reportable.findIndex(
-          (match) => match.needsImport,
-        );
-
-        for (const [
-          index,
-          { node, propertyNode, rewrite, localName },
-        ] of reportable.entries()) {
-          if (localName === undefined) {
+          // Another binding takes the name where the call is: the rewritten
+          // call would call that instead, so nothing is reported.
+          if (
+            !isNamespace &&
+            hasForeignBinding(sourceCode, node, localName, TS_FORTRESS_MODULE)
+          ) {
             continue;
           }
 
@@ -245,18 +211,17 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
               replacement: localName,
               boundsText: boundsText(node, rewrite, sourceCode),
             },
-            fix: (fixer) => [
-              ...(index === importFixIndex
-                ? buildNamedImportFix(
-                    fixer,
-                    program,
-                    TS_FORTRESS_MODULE,
-                    namesNeedingImport,
-                  )
-                : []),
-              fixer.replaceText(propertyNode, localName),
-              ...dropBoundsFix(fixer, node, rewrite, sourceCode),
-            ],
+            // Every fix brings the name into scope itself, so that one
+            // applied alone (an editor's quick fix) is complete. An import
+            // that cannot bind it as a value (`import type`) leaves no fix.
+            fix:
+              binding === undefined
+                ? null
+                : (fixer) => [
+                    ...binding.edits(fixer),
+                    fixer.replaceText(propertyNode, localName),
+                    ...dropBoundsFix(fixer, node, rewrite, sourceCode),
+                  ],
           });
         }
       },

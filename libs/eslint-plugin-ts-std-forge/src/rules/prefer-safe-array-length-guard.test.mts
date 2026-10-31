@@ -138,13 +138,22 @@ describe('prefer-safe-array-length-guard', () => {
           const a = xs.length === 0;
           const b = ys.length > 0;
         `,
-        output: dedent`
-          import { SafeArray } from 'ts-std-forge';
-          declare const xs: readonly number[];
-          declare const ys: readonly number[];
-          const a = SafeArray.isEmpty(xs);
-          const b = SafeArray.isNonEmpty(ys);
-        `,
+        output: [
+          dedent`
+            import { SafeArray } from 'ts-std-forge';
+            declare const xs: readonly number[];
+            declare const ys: readonly number[];
+            const a = SafeArray.isEmpty(xs);
+            const b = ys.length > 0;
+          `,
+          dedent`
+            import { SafeArray } from 'ts-std-forge';
+            declare const xs: readonly number[];
+            declare const ys: readonly number[];
+            const a = SafeArray.isEmpty(xs);
+            const b = SafeArray.isNonEmpty(ys);
+          `,
+        ],
         errors: [{ messageId: 'useIsEmpty' }, { messageId: 'useIsNonEmpty' }],
       },
     ],
@@ -257,6 +266,137 @@ describe('prefer-safe-array-length-guard with parenthesized operands', () => {
           declare const xs: readonly number[];
           const ok = SafeArray.isNonEmpty((a, xs));
         `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-safe-array-length-guard and the import it adds', () => {
+  tester.run('prefer-safe-array-length-guard', preferSafeArrayLengthGuard, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a leading directive stays first',
+        code: dedent`
+          'use client';
+          declare const xs: readonly number[];
+          const ok = xs.length > 0;
+        `,
+        output: dedent`
+          'use client';
+          import { SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = SafeArray.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'joins an existing named import from the module',
+        code: dedent`
+          import { isNonNullObject } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = xs.length > 0;
+        `,
+        output: dedent`
+          import { isNonNullObject, SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = SafeArray.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'turns a type-only specifier into a value import',
+        code: dedent`
+          import { type SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = xs.length > 0;
+        `,
+        output: dedent`
+          import { SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = SafeArray.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'writes the local name of an aliased import',
+        code: dedent`
+          import { SafeArray as SA } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = xs.length > 0;
+        `,
+        output: dedent`
+          import { SafeArray as SA } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = SA.isNonEmpty(xs);
+        `,
+        errors: [
+          {
+            messageId: 'useIsNonEmpty',
+            data: {
+              original: 'xs.length > 0',
+              arrayName: 'xs',
+              safeArray: 'SA',
+            },
+          },
+        ],
+      },
+      {
+        name: 'no fix when an import type binds the name',
+        code: dedent`
+          import type { SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = xs.length > 0;
+        `,
+        output: null,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'no fix when another module binds the name',
+        code: dedent`
+          import { SafeArray } from 'other';
+          declare const xs: readonly number[];
+          const ok = xs.length > 0;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useIsNonEmpty',
+            data: {
+              original: 'xs.length > 0',
+              arrayName: 'xs',
+              safeArray: 'SafeArray',
+            },
+          },
+        ],
+      },
+      {
+        name: 'no fix, and the export named, where a local binding takes the alias',
+        code: dedent`
+          import { SafeArray as SA } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const f = (SA: unknown) => xs.length > 0;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useIsNonEmpty',
+            data: {
+              original: 'xs.length > 0',
+              arrayName: 'xs',
+              safeArray: 'SafeArray',
+            },
+          },
+        ],
+      },
+      {
+        name: 'no fix where a local binding takes the name',
+        code: dedent`
+          declare const xs: readonly number[];
+          const f = (SafeArray: unknown) => xs.length > 0;
+        `,
+        output: null,
         errors: [{ messageId: 'useIsNonEmpty' }],
       },
     ],

@@ -311,15 +311,14 @@ describe('prefer-canonical-length-constrained-type', () => {
           errors: [{ messageId: 'useCanonicalType' }],
         },
         {
-          name: 'rewrites a named import and adds the missing import',
+          name: 'rewrites a named import and adds the missing import to it',
           code: dedent`
             import { minLengthArray, string } from 'ts-fortress';
 
             const T = minLengthArray(1, string());
           `,
           output: dedent`
-            import { nonEmptyArray } from 'ts-fortress';
-            import { minLengthArray, string } from 'ts-fortress';
+            import { minLengthArray, string, nonEmptyArray } from 'ts-fortress';
 
             const T = nonEmptyArray(string());
           `,
@@ -363,8 +362,7 @@ describe('prefer-canonical-length-constrained-type', () => {
             const T = mla(1, string());
           `,
           output: dedent`
-            import { nonEmptyArray } from 'ts-fortress';
-            import { minLengthArray as mla, string } from 'ts-fortress';
+            import { minLengthArray as mla, string, nonEmptyArray } from 'ts-fortress';
 
             const T = nonEmptyArray(string());
           `,
@@ -402,20 +400,27 @@ describe('prefer-canonical-length-constrained-type', () => {
             const A = minLengthArray(1, string());
             const B = minLengthArray(1, number());
           `,
-          output: dedent`
-            import { nonEmptyArray } from 'ts-fortress';
-            import { minLengthArray, number, string } from 'ts-fortress';
+          output: [
+            dedent`
+              import { minLengthArray, number, string, nonEmptyArray } from 'ts-fortress';
 
-            const A = nonEmptyArray(string());
-            const B = nonEmptyArray(number());
-          `,
+              const A = nonEmptyArray(string());
+              const B = minLengthArray(1, number());
+            `,
+            dedent`
+              import { minLengthArray, number, string, nonEmptyArray } from 'ts-fortress';
+
+              const A = nonEmptyArray(string());
+              const B = nonEmptyArray(number());
+            `,
+          ],
           errors: [
             { messageId: 'useCanonicalType' },
             { messageId: 'useCanonicalType' },
           ],
         },
         {
-          name: 'adds every missing import in one pass',
+          name: 'adds each missing import with the fix that needs it',
           code: dedent`
             import { boundedLengthTuple, minLengthArray, string } from 'ts-fortress';
 
@@ -423,14 +428,29 @@ describe('prefer-canonical-length-constrained-type', () => {
             const B = boundedLengthTuple(2, 2, string());
             const C = boundedLengthTuple(0, 5, string());
           `,
-          output: dedent`
-            import { nonEmptyArray, fixedLengthTuple, maxLengthTuple } from 'ts-fortress';
-            import { boundedLengthTuple, minLengthArray, string } from 'ts-fortress';
+          output: [
+            dedent`
+              import { boundedLengthTuple, minLengthArray, string, nonEmptyArray } from 'ts-fortress';
 
-            const A = nonEmptyArray(string());
-            const B = fixedLengthTuple(2, string());
-            const C = maxLengthTuple(5, string());
-          `,
+              const A = nonEmptyArray(string());
+              const B = boundedLengthTuple(2, 2, string());
+              const C = boundedLengthTuple(0, 5, string());
+            `,
+            dedent`
+              import { boundedLengthTuple, minLengthArray, string, nonEmptyArray, fixedLengthTuple } from 'ts-fortress';
+
+              const A = nonEmptyArray(string());
+              const B = fixedLengthTuple(2, string());
+              const C = boundedLengthTuple(0, 5, string());
+            `,
+            dedent`
+              import { boundedLengthTuple, minLengthArray, string, nonEmptyArray, fixedLengthTuple, maxLengthTuple } from 'ts-fortress';
+
+              const A = nonEmptyArray(string());
+              const B = fixedLengthTuple(2, string());
+              const C = maxLengthTuple(5, string());
+            `,
+          ],
           errors: [
             { messageId: 'useCanonicalType' },
             { messageId: 'useCanonicalType' },
@@ -600,6 +620,61 @@ describe('prefer-canonical-length-constrained-type with parenthesized operands',
 
             const T = t.nonEmptyArray(/* n */ t.string());
           `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-canonical-length-constrained-type and the import it adds', () => {
+  tester.run(
+    'prefer-canonical-length-constrained-type',
+    preferCanonicalLengthConstrainedType,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'joins the value import among namespace and type-only ones',
+          code: dedent`
+            import * as t from 'ts-fortress';
+            import type { Type } from 'ts-fortress';
+            import { minLengthArray } from 'ts-fortress';
+
+            const T: Type<unknown> = minLengthArray(1, t.string());
+          `,
+          output: dedent`
+            import * as t from 'ts-fortress';
+            import type { Type } from 'ts-fortress';
+            import { minLengthArray, nonEmptyArray } from 'ts-fortress';
+
+            const T: Type<unknown> = nonEmptyArray(t.string());
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+        {
+          name: 'turns a type-only specifier into a value import',
+          code: dedent`
+            import { minLengthArray, string, type nonEmptyArray } from 'ts-fortress';
+
+            const T = minLengthArray(1, string());
+          `,
+          output: dedent`
+            import { minLengthArray, string, nonEmptyArray } from 'ts-fortress';
+
+            const T = nonEmptyArray(string());
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+        {
+          name: 'reports with no fix when import type binds the name',
+          code: dedent`
+            import type { nonEmptyArray } from 'ts-fortress';
+            import { minLengthArray, string } from 'ts-fortress';
+
+            const T = minLengthArray(1, string());
+          `,
+          output: null,
           errors: [{ messageId: 'useCanonicalType' }],
         },
       ],
