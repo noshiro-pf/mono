@@ -20,9 +20,9 @@ export const IMPORT_STYLE_SCHEMA_PROPERTY: JsonSchema = {
   enum: ['global', 'named'],
   description: [
     'How the ts-type-forge type is brought into scope.',
-    "'named' (default) makes the autofix add the corresponding",
-    `\`import { type … } from '${TS_TYPE_FORGE_MODULE}';\``,
-    "when the name is not imported yet; 'global' assumes the",
+    "'named' (default) makes the autofix import the type from",
+    `\`${TS_TYPE_FORGE_MODULE}\` when the name is not imported yet,`,
+    "adding it to an existing import of the module where there is one; 'global' assumes the",
     'ambient globals of `ts-type-forge/global` and never touches',
     'imports.',
   ].join(' '),
@@ -33,7 +33,8 @@ export const IMPORT_STYLE_SCHEMA_PROPERTY: JsonSchema = {
  * whether the fix has to add an import for it.
  *
  * Returns `undefined` when the name is already bound to something else (a local
- * alias, or an import from another module) — rewriting to it would then silently
+ * alias, an import from another module, or another ts-type-forge export
+ * imported under the name) — rewriting to it would then silently
  * resolve to the wrong declaration, which is exactly what happens inside
  * ts-type-forge's own sources.
  */

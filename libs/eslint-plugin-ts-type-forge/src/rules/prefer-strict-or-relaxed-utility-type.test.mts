@@ -197,8 +197,7 @@ describe('prefer-strict-or-relaxed-utility-type', () => {
                   messageId: 'replaceWith',
                   data: { name: 'Pick', replacement: 'RelaxedPick' },
                   output: dedent`
-                    import { type RelaxedPick } from 'ts-type-forge';
-                    import { type StrictPick as SPick } from 'ts-type-forge';
+                    import { type StrictPick as SPick, type RelaxedPick } from 'ts-type-forge';
                     type A = RelaxedPick<{ a: 1 }, 'a'>;
                   `,
                 },

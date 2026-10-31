@@ -68,7 +68,7 @@ namespace PreferCanonicalLengthConstrainedTuple {
    *           "global",
    *           "named"
    *         ],
-   *         "description": "How the ts-type-forge type is brought into scope. 'named' (default) makes the autofix add the corresponding `import { type … } from 'ts-type-forge';` when the name is not imported yet; 'global' assumes the ambient globals of `ts-type-forge/global` and never touches imports."
+   *         "description": "How the ts-type-forge type is brought into scope. 'named' (default) makes the autofix import the type from `ts-type-forge` when the name is not imported yet, adding it to an existing import of the module where there is one; 'global' assumes the ambient globals of `ts-type-forge/global` and never touches imports."
    *       },
    *       "maxLength": {
    *         "type": "integer",
@@ -117,7 +117,7 @@ namespace PreferCanonicalMutableRecord {
    *           "global",
    *           "named"
    *         ],
-   *         "description": "How the ts-type-forge type is brought into scope. 'named' (default) makes the autofix add the corresponding `import { type … } from 'ts-type-forge';` when the name is not imported yet; 'global' assumes the ambient globals of `ts-type-forge/global` and never touches imports."
+   *         "description": "How the ts-type-forge type is brought into scope. 'named' (default) makes the autofix import the type from `ts-type-forge` when the name is not imported yet, adding it to an existing import of the module where there is one; 'global' assumes the ambient globals of `ts-type-forge/global` and never touches imports."
    *       }
    *     },
    *     "additionalProperties": false
@@ -161,7 +161,7 @@ namespace PreferReadonlyOrMutableRecord {
    *           "global",
    *           "named"
    *         ],
-   *         "description": "How the ts-type-forge type is brought into scope. 'named' (default) makes the autofix add the corresponding `import { type … } from 'ts-type-forge';` when the name is not imported yet; 'global' assumes the ambient globals of `ts-type-forge/global` and never touches imports."
+   *         "description": "How the ts-type-forge type is brought into scope. 'named' (default) makes the autofix import the type from `ts-type-forge` when the name is not imported yet, adding it to an existing import of the module where there is one; 'global' assumes the ambient globals of `ts-type-forge/global` and never touches imports."
    *       }
    *     },
    *     "additionalProperties": false
@@ -205,7 +205,7 @@ namespace PreferStrictOrRelaxedUtilityType {
    *           "global",
    *           "named"
    *         ],
-   *         "description": "How the ts-type-forge type is brought into scope. 'named' (default) makes the autofix add the corresponding `import { type … } from 'ts-type-forge';` when the name is not imported yet; 'global' assumes the ambient globals of `ts-type-forge/global` and never touches imports."
+   *         "description": "How the ts-type-forge type is brought into scope. 'named' (default) makes the autofix import the type from `ts-type-forge` when the name is not imported yet, adding it to an existing import of the module where there is one; 'global' assumes the ambient globals of `ts-type-forge/global` and never touches imports."
    *       }
    *     },
    *     "additionalProperties": false

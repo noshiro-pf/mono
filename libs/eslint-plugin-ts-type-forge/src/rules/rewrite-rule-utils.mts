@@ -1,8 +1,7 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { buildNamedImportFix } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
-import { TS_TYPE_FORGE_MODULE } from './constants.mjs';
 import { resolveTypeName, type ImportStyle } from './import-style.mjs';
+import { buildTypeImportFix } from './import-utils.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
@@ -15,13 +14,14 @@ export type TypeRewrite = Readonly<{
 }>;
 
 /**
- * Emits one report per rewrite, resolving each target name and attaching every
- * required import to the *first* report.
- *
- * All import fixes must live on a single report: `insertTextBefore(program, …)`
- * produces overlapping ranges, and ESLint merges each report's fixes into one
- * span — so spreading them across reports makes the fixes conflict and only one
- * survives per pass.
+ * Emits one report per rewrite, resolving each target name. Every fix imports
+ * the name it writes when the file does not import it yet
+ * ({@link buildTypeImportFix}), so that one applied alone is complete, and the
+ * first of those imports every name the reports need: the import edits
+ * overlap, so `--fix` applies one fix per pass, and when that is the batching
+ * fix the second pass applies the rest. (With nested rewrites an inner fix,
+ * whose range ends first, can win the pass instead; that costs a pass, not a
+ * fix.) A report that needs no import has no import edit.
  */
 export const reportTypeRewrites = <MessageIds extends string>(
   context: TSESLint.RuleContext<MessageIds, readonly unknown[]>,
@@ -55,6 +55,9 @@ export const reportTypeRewrites = <MessageIds extends string>(
       .map(({ rewrite }) => rewrite.canonicalName),
   );
 
+  // The fix that imports them all: the first that needs an import at all.
+  const batchIndex = resolved.findIndex(({ target }) => target.needsImport);
+
   for (const [index, { rewrite, target }] of resolved.entries()) {
     const replacement = `${target.localName}<${rewrite.typeArgs}>`;
 
@@ -64,13 +67,15 @@ export const reportTypeRewrites = <MessageIds extends string>(
       data: { original: sourceCode.getText(rewrite.node), replacement },
       fix: (fixer) =>
         Arr.toPushed(
-          index === 0
-            ? importNames.flatMap((name) =>
-                buildNamedImportFix(fixer, program, TS_TYPE_FORGE_MODULE, [
-                  `type ${name}`,
-                ]),
-              )
-            : [],
+          buildTypeImportFix(
+            fixer,
+            sourceCode,
+            index === batchIndex
+              ? importNames
+              : target.needsImport
+                ? [rewrite.canonicalName]
+                : [],
+          ),
           fixer.replaceText(rewrite.node, replacement),
         ),
     });
