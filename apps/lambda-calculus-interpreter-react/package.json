@@ -1,6 +1,6 @@
 {
   "name": "lambda-calculus-interpreter-react",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "private": true,
   "repository": {
     "type": "git",

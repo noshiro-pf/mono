@@ -1,5 +1,12 @@
 # lambda-calculus-interpreter-core
 
+## 0.0.11
+
+### Patch Changes
+
+- Updated dependencies [ad2df6c]
+    - ts-data-forge@14.10.1
+
 ## 0.0.10
 
 ### Patch Changes

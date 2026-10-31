@@ -1,5 +1,18 @@
 # eslint-plugin-ts-type-forge
 
+## 0.8.17
+
+### Patch Changes
+
+- ae82fef: A fix that imports a type, when the file has no `import type { … }` from `ts-type-forge`, adds it as `type X` to an import from it that has a value specifier before one that has only `type` specifiers or empty braces, as the other plugins' fixes place a value (through `eslint-rule-forge`'s `addTypeImports`).
+- Updated dependencies [ad2df6c]
+- Updated dependencies [ae82fef]
+- Updated dependencies [7001f62]
+- Updated dependencies [5a9d62a]
+    - ts-data-forge@14.10.1
+    - eslint-rule-forge@0.5.0
+    - ts-type-forge@9.2.2
+
 ## 0.8.16
 
 ### Patch Changes

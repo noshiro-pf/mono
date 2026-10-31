@@ -1,5 +1,17 @@
 # profile
 
+## 0.0.22
+
+### Patch Changes
+
+- Updated dependencies [ad2df6c]
+    - ts-data-forge@14.10.1
+    - preact-utils@0.0.20
+    - resize-observer-preact-hooks@0.0.8
+    - tiny-router-observable@0.0.23
+    - better-preact-use-state@1.0.4
+    - synstate-preact-hooks@6.2.0
+
 ## 0.0.21
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # eslint-rule-forge
 
+## 0.5.0
+
+### Minor Changes
+
+- ae82fef: `bindValueImports` adds a name inside the empty braces of `import {} from 'm'` or `import D, {} from 'm'`, where it wrote a duplicate declaration or `import D, { x }, {} from 'm'`, a syntax error; the autofixes of the rules this package builds (`prefer-array-is-array`, `prefer-safe-parse`, `prefer-is-non-null-object`, `prefer-is-record-and-has-key`) go through it. New exports: `addTypeImports`, which imports types into an existing `import type { … }` or, as `type X`, into another import from the module, and `addToImportBraces`, the placement both share.
+- 7001f62: Add `siblingOf(node, offset)`: the statement next to (`1`) or before (`-1`) a node in the statement list it is one of, a declaration under `export` read as the `export` statement.
+
+### Patch Changes
+
+- 5a9d62a: `prefer-num-safe-parse-int` and `prefer-num-safe-parse-float` (eslint-plugin-ts-data-forge), `prefer-safe-number-parse-integer` and `prefer-safe-number-parse` (eslint-plugin-ts-std-forge), and the `createPreferSafeParseInt` / `createPreferSafeParseFloat` factories they are built from (eslint-rule-forge) now offer their rewrite as a suggestion instead of applying it with `--fix`. The replacement parses some strings differently from the original: `parseInt('1e3')` is 1 and the rewrite 1000, `parseFloat('12px')` is 12 and the rewrite NaN, and `Number('')` is 0 and the rewrite NaN. The report is unchanged, and its message now says so. A lint run that relied on `--fix` to clear these reports now leaves them: apply the suggestion where the input allows it, or keep the original call with a disable comment that says why.
+
 ## 0.4.0
 
 ### Minor Changes

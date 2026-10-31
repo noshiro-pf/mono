@@ -1,5 +1,31 @@
 # blueprint-synstate
 
+## 0.4.0
+
+### Minor Changes
+
+- 9ae315c: Markup now matches Blueprint React's where a test compares the two:
+
+    - `NumericInput` and `NumericInputView` carry the ARIA Blueprint's do: `role="group"` on the wrapper, `role="spinbutton"` with `aria-valuemin`, `aria-valuemax` and `aria-valuenow` on the input, and `aria-controls` on the buttons. `NumericInputView` takes `min`, `max` and `aria-valuenow` for them, and `NumericInput` reads out the number its text shows as it is typed, as Blueprint's does, so its `decode` is now read whenever the text changes and has to take half-typed text without throwing; the inner input group no longer carries `bp6-fill`.
+    - `TimePicker` draws its arrow rows without `showArrowButtons` too, empty, as Blueprint's does.
+    - `DatePicker`'s grid is labelled by its caption.
+
+    `TimePicker`, `DateInput` and `NumericInput` ignore the keys that pick, confirm or cancel what an input method is composing, Safari's after `compositionend` included.
+
+- eb1a160: A bound `checked` or `indeterminate` of an `<input>` is controlled. After a `change`, synstate-dom draws the input as its bound values again, before the next frame is painted, so a toggle the owner does not take in `onChange` no longer stays on screen. A change to a radio button sets back every bound button of its group, since the browser unchecks the others without an event. Every handler of the event, a delegated one on an ancestor included, still sees the user's change. For a checkbox the user toggles freely, use `defaultChecked`. `value` is not written back.
+
+    blueprint-synstate's `Checkbox` and `Radio` now stay as their `checked` when the owner refuses a change, and `RadioGroup` drops its own workaround for the same thing. blueprint-synstate now needs synstate-dom 0.5.0 or later.
+
+### Patch Changes
+
+- 6e60c42: synstate-dom exports `subscribeInScope`, `listenInScope` and `createAfterUpdate`, what a component, called once, does in place of an effect: a subscription or an event listener that lasts until the current scope is disposed, and work run in a microtask once the update under way has finished. blueprint-synstate uses them instead of its own copies, and needs a synstate-dom that exports them.
+- Updated dependencies [ad2df6c]
+- Updated dependencies [eb1a160]
+- Updated dependencies [6e60c42]
+    - ts-data-forge@14.10.1
+    - synstate-dom@0.5.0
+    - synstate@6.1.1
+
 ## 0.3.0
 
 ### Minor Changes
