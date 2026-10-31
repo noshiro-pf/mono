@@ -1,6 +1,6 @@
 # eslint-plugin-ts-std-forge
 
-ESLint rules that steer TypeScript code toward [`ts-std-forge`](https://www.npmjs.com/package/ts-std-forge) idioms — e.g. preferring `SafeArray.isNonEmpty(xs)` over `xs.length > 0`, `isRecord(x) && hasKey(x, k)` over `Object.hasOwn(x, k)`, or `SafeNumber.parseInteger` over `parseInt`. Every rule is auto-fixable.
+ESLint rules that steer TypeScript code toward [`ts-std-forge`](https://www.npmjs.com/package/ts-std-forge) idioms — e.g. preferring `SafeArray.isNonEmpty(xs)` over `xs.length > 0`, `isRecord(x) && hasKey(x, k)` over `Object.hasOwn(x, k)`, or `SafeNumber.parseInteger` over `parseInt`. Most rules are auto-fixable; where the rewrite can change what the code does, the rule suggests it instead.
 
 ## Relation to `eslint-plugin-ts-data-forge`
 
@@ -19,8 +19,8 @@ plugin covers the part that moved, and names the new home:
 | `prefer-is-non-null-object`        | same name                       | same rule, pointing at `ts-std-forge`                                                    |
 
 **Do not enable both plugins on the same files.** Every pair above would
-report the same code twice with conflicting autofixes. Pick the package the
-code actually depends on: `ts-std-forge` alone, or `ts-data-forge` (which
+report the same code twice with conflicting fixes or suggestions. Pick the
+package the code actually depends on: `ts-std-forge` alone, or `ts-data-forge` (which
 brings `ts-std-forge` with it, and whose rules point at the branded API).
 
 The rest of `eslint-plugin-ts-data-forge` — the branded number and array
@@ -90,14 +90,14 @@ export default [
 
 ## Rules
 
-| Rule                               | Description                                                                                                                                                 |
-| :--------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `prefer-is-non-null-object`        | Replace `typeof u === 'object' && u !== null` with `isNonNullObject(u)`.                                                                                    |
-| `prefer-is-record-and-has-key`     | Replace `Object.hasOwn(obj, key)` / `key in obj` with `isRecord(obj) && hasKey(obj, key)`. Drops the `isRecord` half when the type already makes it true.   |
-| `prefer-safe-array-is-array`       | Replace `Array.isArray(x)` with `SafeArray.isArray(x)`, which keeps the array members of a union instead of widening to `any[]`.                            |
-| `prefer-safe-array-length-guard`   | Replace an emptiness check on an array (`xs.length === 0`, `> 0`, `>= 1`, `!== 0`) with `SafeArray.isEmpty(xs)` / `SafeArray.isNonEmpty(xs)`, which narrow. |
-| `prefer-safe-number-parse`         | Replace `parseFloat(x)` / `Number.parseFloat(x)` / `Number(x)` (string argument) with `Result.unwrapOkOr(SafeNumber.parse(x), Number.NaN)`.                 |
-| `prefer-safe-number-parse-integer` | Replace `parseInt(x)` / `Number.parseInt(x, 10)` with `Result.unwrapOkOr(SafeNumber.parseInteger(x), Number.NaN)`.                                          |
+| Rule                               | Description                                                                                                                                                                                            |
+| :--------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `prefer-is-non-null-object`        | Replace `typeof u === 'object' && u !== null` with `isNonNullObject(u)`.                                                                                                                               |
+| `prefer-is-record-and-has-key`     | Replace `Object.hasOwn(obj, key)` / `key in obj` with `isRecord(obj) && hasKey(obj, key)`. Drops the `isRecord` half when the type already makes it true.                                              |
+| `prefer-safe-array-is-array`       | Replace `Array.isArray(x)` with `SafeArray.isArray(x)`, which keeps the array members of a union instead of widening to `any[]`.                                                                       |
+| `prefer-safe-array-length-guard`   | Replace an emptiness check on an array (`xs.length === 0`, `> 0`, `>= 1`, `!== 0`) with `SafeArray.isEmpty(xs)` / `SafeArray.isNonEmpty(xs)`, which narrow.                                            |
+| `prefer-safe-number-parse`         | Replace `parseFloat(x)` / `Number.parseFloat(x)` / `Number(x)` (string argument) with `Result.unwrapOkOr(SafeNumber.parse(x), Number.NaN)`. Always a suggestion, since some strings parse differently. |
+| `prefer-safe-number-parse-integer` | Replace `parseInt(x)` / `Number.parseInt(x, 10)` with `Result.unwrapOkOr(SafeNumber.parseInteger(x), Number.NaN)`. Always a suggestion, since some strings parse differently.                          |
 
 ## License
 

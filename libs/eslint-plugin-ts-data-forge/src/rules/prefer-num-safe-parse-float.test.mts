@@ -21,7 +21,7 @@ describe('prefer-num-safe-parse-float', () => {
   tester.run('prefer-num-safe-parse-float', preferNumSafeParseFloat, {
     valid: [
       {
-        name: 'ignores number arguments to Number() (autofix would be unsafe)',
+        name: 'ignores number arguments to Number() (the rewrite would be unsafe)',
         code: dedent`
           const x = 42;
           const n = Number(x);
@@ -58,17 +58,74 @@ describe('prefer-num-safe-parse-float', () => {
     ],
     invalid: [
       {
+        name: 'offers no suggestion when `Result` is bound to another module',
+        code: dedent`
+          import { Result } from 'other-lib';
+
+          declare const s: string;
+          const n = parseFloat(s);
+          export const r = Result;
+        `,
+        errors: [{ messageId: 'useSafeParseFloat', suggestions: [] }],
+      },
+      {
+        // The replacement reads these strings differently ('12px' is NaN, not
+        // 12; '' is NaN, not 0), so it is offered, never applied by --fix
+        name: 'a string the replacement parses differently is a suggestion, not a fix',
+        code: dedent`
+          const a = parseFloat('12px');
+          const b = Number('');
+        `,
+        errors: [
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const a = Result.unwrapOkOr(Num.safeParseFloat('12px'), Number.NaN);
+                  const b = Number('');
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const a = parseFloat('12px');
+                  const b = Result.unwrapOkOr(Num.safeParseFloat(''), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
         name: 'replaces parseFloat(s) and imports Num + Result',
         code: dedent`
           const s = "3.14";
           const n = parseFloat(s);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          const s = "3.14";
-          const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseFloat' }],
+        errors: [
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const s = "3.14";
+                  const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'replaces Number.parseFloat(s)',
@@ -76,12 +133,21 @@ describe('prefer-num-safe-parse-float', () => {
           const s = "3.14";
           const n = Number.parseFloat(s);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          const s = "3.14";
-          const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseFloat' }],
+        errors: [
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const s = "3.14";
+                  const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'replaces Number(s) when s is a string',
@@ -89,12 +155,21 @@ describe('prefer-num-safe-parse-float', () => {
           const s = "3.14";
           const n = Number(s);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          const s = "3.14";
-          const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseFloat' }],
+        errors: [
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const s = "3.14";
+                  const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'adds only the missing Result import when Num is present',
@@ -104,13 +179,22 @@ describe('prefer-num-safe-parse-float', () => {
           const s = "3.14";
           const n = parseFloat(s);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
+        errors: [
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
 
-          const s = "3.14";
-          const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseFloat' }],
+                  const s = "3.14";
+                  const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'preserves a complex string argument expression',
@@ -118,23 +202,41 @@ describe('prefer-num-safe-parse-float', () => {
           const get = (k: string): string => k;
           const n = parseFloat(get("x").trim());
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          const get = (k: string): string => k;
-          const n = Result.unwrapOkOr(Num.safeParseFloat(get("x").trim()), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseFloat' }],
+        errors: [
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const get = (k: string): string => k;
+                  const n = Result.unwrapOkOr(Num.safeParseFloat(get("x").trim()), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'replaces Number(s) with a string literal argument',
         code: dedent`
           const n = Number("3.14");
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          const n = Result.unwrapOkOr(Num.safeParseFloat("3.14"), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseFloat' }],
+        errors: [
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const n = Result.unwrapOkOr(Num.safeParseFloat("3.14"), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'replaces all three forms in one file',
@@ -144,26 +246,52 @@ describe('prefer-num-safe-parse-float', () => {
           const b = Number.parseFloat(s);
           const c = Number(s);
         `,
-        output: [
-          dedent`
-            import { Num, Result } from 'ts-data-forge';
-            const s = "1.5";
-            const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-            const b = Number.parseFloat(s);
-            const c = Number(s);
-          `,
-          dedent`
-            import { Num, Result } from 'ts-data-forge';
-            const s = "1.5";
-            const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-            const b = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-            const c = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-          `,
-        ],
         errors: [
-          { messageId: 'useSafeParseFloat' },
-          { messageId: 'useSafeParseFloat' },
-          { messageId: 'useSafeParseFloat' },
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const s = "1.5";
+                  const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+                  const b = Number.parseFloat(s);
+                  const c = Number(s);
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const s = "1.5";
+                  const a = parseFloat(s);
+                  const b = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+                  const c = Number(s);
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const s = "1.5";
+                  const a = parseFloat(s);
+                  const b = Number.parseFloat(s);
+                  const c = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+                `,
+              },
+            ],
+          },
         ],
       },
     ],
@@ -211,23 +339,35 @@ describe('prefer-num-safe-parse-float through type wrappers', () => {
           const a = Number(s!);
           const b = parseFloat(s satisfies string);
         `,
-        output: [
-          dedent`
-            import { Num, Result } from 'ts-data-forge';
-            declare const s: string;
-            const a = Result.unwrapOkOr(Num.safeParseFloat(s!), Number.NaN);
-            const b = parseFloat(s satisfies string);
-          `,
-          dedent`
-            import { Num, Result } from 'ts-data-forge';
-            declare const s: string;
-            const a = Result.unwrapOkOr(Num.safeParseFloat(s!), Number.NaN);
-            const b = Result.unwrapOkOr(Num.safeParseFloat(s satisfies string), Number.NaN);
-          `,
-        ],
         errors: [
-          { messageId: 'useSafeParseFloat' },
-          { messageId: 'useSafeParseFloat' },
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  declare const s: string;
+                  const a = Result.unwrapOkOr(Num.safeParseFloat(s!), Number.NaN);
+                  const b = parseFloat(s satisfies string);
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  declare const s: string;
+                  const a = Number(s!);
+                  const b = Result.unwrapOkOr(Num.safeParseFloat(s satisfies string), Number.NaN);
+                `,
+              },
+            ],
+          },
         ],
       },
       {
@@ -237,23 +377,35 @@ describe('prefer-num-safe-parse-float through type wrappers', () => {
           const a = (Number as NumberConstructor)(s);
           const b = Number!.parseFloat(s);
         `,
-        output: [
-          dedent`
-            import { Num, Result } from 'ts-data-forge';
-            declare const s: string;
-            const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-            const b = Number!.parseFloat(s);
-          `,
-          dedent`
-            import { Num, Result } from 'ts-data-forge';
-            declare const s: string;
-            const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-            const b = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
-          `,
-        ],
         errors: [
-          { messageId: 'useSafeParseFloat' },
-          { messageId: 'useSafeParseFloat' },
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  declare const s: string;
+                  const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+                  const b = Number!.parseFloat(s);
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  declare const s: string;
+                  const a = (Number as NumberConstructor)(s);
+                  const b = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+                `,
+              },
+            ],
+          },
         ],
       },
     ],
@@ -271,13 +423,22 @@ describe('prefer-num-safe-parse-float with parenthesized operands', () => {
           declare const log: () => void;
           const a = Number((log(), s));
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          declare const s: string;
-          declare const log: () => void;
-          const a = Result.unwrapOkOr(Num.safeParseFloat((log(), s)), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseFloat' }],
+        errors: [
+          {
+            messageId: 'useSafeParseFloat',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  declare const s: string;
+                  declare const log: () => void;
+                  const a = Result.unwrapOkOr(Num.safeParseFloat((log(), s)), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
     ],
   });

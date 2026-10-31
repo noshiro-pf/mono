@@ -215,7 +215,7 @@ namespace PreferIsRecordAndHasKey {
  *  | :--------- | :--------- |
  *  | type       | suggestion |
  *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | fixable    | false      |
  *  ```
  */
 namespace PreferNumSafeParseInt {
@@ -230,7 +230,7 @@ namespace PreferNumSafeParseInt {
  *  | :--------- | :--------- |
  *  | type       | suggestion |
  *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | fixable    | false      |
  *  ```
  */
 namespace PreferNumSafeParseFloat {

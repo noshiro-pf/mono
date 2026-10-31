@@ -76,7 +76,7 @@ namespace PreferSafeArrayLengthGuard {
  *  | :--------- | :--------- |
  *  | type       | suggestion |
  *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | fixable    | false      |
  *  ```
  */
 namespace PreferSafeNumberParse {
@@ -91,7 +91,7 @@ namespace PreferSafeNumberParse {
  *  | :--------- | :--------- |
  *  | type       | suggestion |
  *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | fixable    | false      |
  *  ```
  */
 namespace PreferSafeNumberParseInteger {

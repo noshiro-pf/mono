@@ -212,18 +212,18 @@ export const preferIsNullish: TSESLint.RuleModule<'preferIsNullish'> = {
 ## Rule factories
 
 Rules that several plugins carry, differing only in the module whose functions
-the fix writes. Each factory takes the module name (and the namespace the
+the fix or suggestion writes. Each factory takes the module name (and the namespace the
 function is reached through, where there is one) and returns a complete rule,
 so that a fix to the rule reaches every plugin that builds it.
 
-| Factory                         | The rule it builds                                                                                        |
-| :------------------------------ | :-------------------------------------------------------------------------------------------------------- |
-| `createPreferIsNonNullObject`   | `typeof u === 'object' && u !== null` → `isNonNullObject(u)`                                              |
-| `createPreferIsRecordAndHasKey` | `Object.hasOwn(obj, key)` and `key in obj` → `isRecord(obj) && hasKey(obj, key)`, or `hasKey` on a record |
-| `createPreferArrayIsArray`      | `Array.isArray` → `<namespace>.isArray`                                                                   |
-| `createPreferSafeParseInt`      | `parseInt(x)`, `parseInt(x, 10)` → `Result.unwrapOkOr(<namespace>.<method>(x), Number.NaN)`               |
-| `createPreferSafeParseFloat`    | `parseFloat(x)`, `Number.parseFloat(x)`, `Number(x)` → the same, for a `string` `x`                       |
-| `createNoSideEffectImport`      | removes `import '<module>';`, with the reason the caller gives                                            |
+| Factory                         | The rule it builds                                                                                                                                      |
+| :------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `createPreferIsNonNullObject`   | `typeof u === 'object' && u !== null` → `isNonNullObject(u)`                                                                                            |
+| `createPreferIsRecordAndHasKey` | `Object.hasOwn(obj, key)` and `key in obj` → `isRecord(obj) && hasKey(obj, key)`, or `hasKey` on a record                                               |
+| `createPreferArrayIsArray`      | `Array.isArray` → `<namespace>.isArray`                                                                                                                 |
+| `createPreferSafeParseInt`      | `parseInt(x)`, `parseInt(x, 10)` → `Result.unwrapOkOr(<namespace>.<method>(x), Number.NaN)`, as a suggestion only, since some strings parse differently |
+| `createPreferSafeParseFloat`    | `parseFloat(x)`, `Number.parseFloat(x)`, `Number(x)` → the same, for a `string` `x`, also a suggestion only                                             |
+| `createNoSideEffectImport`      | removes `import '<module>';`, with the reason the caller gives                                                                                          |
 
 ## License
 

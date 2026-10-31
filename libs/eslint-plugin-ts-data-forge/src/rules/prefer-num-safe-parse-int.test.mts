@@ -28,7 +28,7 @@ describe('prefer-num-safe-parse-int', () => {
         `,
       },
       {
-        name: 'ignores number arguments (autofix would be unsafe)',
+        name: 'ignores number arguments (the rewrite would be unsafe)',
         code: dedent`
           const x = 42;
           const n = parseInt(x, 10);
@@ -51,17 +51,75 @@ describe('prefer-num-safe-parse-int', () => {
     ],
     invalid: [
       {
+        name: 'offers no suggestion when `Result` is bound to another module',
+        code: dedent`
+          import { Result } from 'other-lib';
+
+          declare const s: string;
+          const n = parseInt(s);
+          export const r = Result;
+        `,
+        errors: [{ messageId: 'useSafeParseInt', suggestions: [] }],
+      },
+      {
+        // The replacement reads these strings differently ('1e3' is 1000, not
+        // 1; '12px' is NaN, not 12), so it is offered, never applied by
+        // --fix
+        name: 'a string the replacement parses differently is a suggestion, not a fix',
+        code: dedent`
+          const a = parseInt('1e3');
+          const b = parseInt('12px', 10);
+        `,
+        errors: [
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const a = Result.unwrapOkOr(Num.safeParseInt('1e3'), Number.NaN);
+                  const b = parseInt('12px', 10);
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const a = parseInt('1e3');
+                  const b = Result.unwrapOkOr(Num.safeParseInt('12px'), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
         name: 'replaces parseInt(s, 10) and imports Num + Result',
         code: dedent`
           const s = "123";
           const n = parseInt(s, 10);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          const s = "123";
-          const n = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseInt' }],
+        errors: [
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const s = "123";
+                  const n = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'replaces parseInt(s) without radix',
@@ -69,12 +127,21 @@ describe('prefer-num-safe-parse-int', () => {
           const s = "123";
           const n = parseInt(s);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          const s = "123";
-          const n = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseInt' }],
+        errors: [
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const s = "123";
+                  const n = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'replaces Number.parseInt(s, 10)',
@@ -82,12 +149,21 @@ describe('prefer-num-safe-parse-int', () => {
           const s = "123";
           const n = Number.parseInt(s, 10);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          const s = "123";
-          const n = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseInt' }],
+        errors: [
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const s = "123";
+                  const n = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'adds only the missing Result import when Num is present',
@@ -97,13 +173,22 @@ describe('prefer-num-safe-parse-int', () => {
           const s = "123";
           const n = parseInt(s, 10);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
+        errors: [
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
 
-          const s = "123";
-          const n = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseInt' }],
+                  const s = "123";
+                  const n = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'wraps in parentheses in an operator context',
@@ -111,12 +196,21 @@ describe('prefer-num-safe-parse-int', () => {
           const s = "123";
           const ok = parseInt(s, 10) > 5;
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          const s = "123";
-          const ok = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN) > 5;
-        `,
-        errors: [{ messageId: 'useSafeParseInt' }],
+        errors: [
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const s = "123";
+                  const ok = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN) > 5;
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'preserves a complex string argument expression',
@@ -124,12 +218,21 @@ describe('prefer-num-safe-parse-int', () => {
           const get = (k: string): string => k;
           const n = parseInt(get("x").trim(), 10);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          const get = (k: string): string => k;
-          const n = Result.unwrapOkOr(Num.safeParseInt(get("x").trim()), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseInt' }],
+        errors: [
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  const get = (k: string): string => k;
+                  const n = Result.unwrapOkOr(Num.safeParseInt(get("x").trim()), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
     ],
   });
@@ -161,23 +264,35 @@ describe('prefer-num-safe-parse-int through type wrappers', () => {
           const a = parseInt(s, 10 as const);
           const b = Number.parseInt(s!, 10 satisfies number);
         `,
-        output: [
-          dedent`
-            import { Num, Result } from 'ts-data-forge';
-            declare const s: string;
-            const a = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
-            const b = Number.parseInt(s!, 10 satisfies number);
-          `,
-          dedent`
-            import { Num, Result } from 'ts-data-forge';
-            declare const s: string;
-            const a = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
-            const b = Result.unwrapOkOr(Num.safeParseInt(s!), Number.NaN);
-          `,
-        ],
         errors: [
-          { messageId: 'useSafeParseInt' },
-          { messageId: 'useSafeParseInt' },
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  declare const s: string;
+                  const a = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+                  const b = Number.parseInt(s!, 10 satisfies number);
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  declare const s: string;
+                  const a = parseInt(s, 10 as const);
+                  const b = Result.unwrapOkOr(Num.safeParseInt(s!), Number.NaN);
+                `,
+              },
+            ],
+          },
         ],
       },
       {
@@ -187,23 +302,35 @@ describe('prefer-num-safe-parse-int through type wrappers', () => {
           const a = (parseInt as typeof parseInt)(s);
           const b = (Number as NumberConstructor)!.parseInt(s, 10);
         `,
-        output: [
-          dedent`
-            import { Num, Result } from 'ts-data-forge';
-            declare const s: string;
-            const a = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
-            const b = (Number as NumberConstructor)!.parseInt(s, 10);
-          `,
-          dedent`
-            import { Num, Result } from 'ts-data-forge';
-            declare const s: string;
-            const a = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
-            const b = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
-          `,
-        ],
         errors: [
-          { messageId: 'useSafeParseInt' },
-          { messageId: 'useSafeParseInt' },
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  declare const s: string;
+                  const a = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+                  const b = (Number as NumberConstructor)!.parseInt(s, 10);
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  declare const s: string;
+                  const a = (parseInt as typeof parseInt)(s);
+                  const b = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+                `,
+              },
+            ],
+          },
         ],
       },
     ],
@@ -221,13 +348,22 @@ describe('prefer-num-safe-parse-int with parenthesized operands', () => {
           declare const log: () => void;
           const a = parseInt((log(), s), 10);
         `,
-        output: dedent`
-          import { Num, Result } from 'ts-data-forge';
-          declare const s: string;
-          declare const log: () => void;
-          const a = Result.unwrapOkOr(Num.safeParseInt((log(), s)), Number.NaN);
-        `,
-        errors: [{ messageId: 'useSafeParseInt' }],
+        errors: [
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num, Result } from 'ts-data-forge';
+                  declare const s: string;
+                  declare const log: () => void;
+                  const a = Result.unwrapOkOr(Num.safeParseInt((log(), s)), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
       },
     ],
   });

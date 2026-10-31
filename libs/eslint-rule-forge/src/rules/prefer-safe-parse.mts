@@ -30,16 +30,20 @@ export type SafeParseRuleConfig = Readonly<{
 }>;
 
 /**
- * Builds a rule that replaces the base-10 forms of `parseInt` and
- * `Number.parseInt` — `parseInt(x)` and `parseInt(x, 10)` — with
- * `Result.unwrapOkOr(<namespace>.<method>(x), Number.NaN)`.
+ * Builds a rule that reports the base-10 forms of `parseInt` and
+ * `Number.parseInt` — `parseInt(x)` and `parseInt(x, 10)` — and suggests
+ * `Result.unwrapOkOr(<namespace>.<method>(x), Number.NaN)` instead. A
+ * suggestion, not an autofix: the replacement reads some strings differently.
  *
  * A call that passes another radix is left alone: the replacement takes none,
  * so it would mean something the replacement cannot say.
  */
 export const createPreferSafeParseInt = (
   config: SafeParseRuleConfig,
-): TSESLint.RuleModule<'useSafeParseInt', readonly []> =>
+): TSESLint.RuleModule<
+  'useSafeParseInt' | 'replaceWithSafeParse',
+  readonly []
+> =>
   createSafeParseRule(config, 'useSafeParseInt', {
     messages: { useSafeParseInt: messageText(config) },
     description: `Replace \`parseInt(x)\` or \`Number.parseInt(x, 10)\` with \`Result.unwrapOkOr(${config.namespace}.${config.method}(x), Number.NaN)\` from ${config.moduleName}.`,
@@ -64,15 +68,20 @@ export const createPreferSafeParseInt = (
   });
 
 /**
- * Builds a rule that replaces `parseFloat(x)`, `Number.parseFloat(x)` and
- * `Number(x)` with `Result.unwrapOkOr(<namespace>.<method>(x), Number.NaN)`.
+ * Builds a rule that reports `parseFloat(x)`, `Number.parseFloat(x)` and
+ * `Number(x)`, and suggests
+ * `Result.unwrapOkOr(<namespace>.<method>(x), Number.NaN)` instead, as a
+ * suggestion for the same reason.
  *
  * Like every rewrite here, `Number(x)` is only flagged when `x` is purely a
  * `string`, which leaves `Number(someBoolean)` and `Number(someNumber)` alone.
  */
 export const createPreferSafeParseFloat = (
   config: SafeParseRuleConfig,
-): TSESLint.RuleModule<'useSafeParseFloat', readonly []> =>
+): TSESLint.RuleModule<
+  'useSafeParseFloat' | 'replaceWithSafeParse',
+  readonly []
+> =>
   createSafeParseRule(config, 'useSafeParseFloat', {
     messages: { useSafeParseFloat: messageText(config) },
     description: `Replace \`parseFloat(x)\`, \`Number.parseFloat(x)\`, or \`Number(x)\` (when x is a string) with \`Result.unwrapOkOr(${config.namespace}.${config.method}(x), Number.NaN)\` from ${config.moduleName}.`,
@@ -89,7 +98,7 @@ export const createPreferSafeParseFloat = (
 /**
  * Whether every constituent of `type` is string-like, i.e. the type is
  * assignable to the parse function's `string` parameter. A union such as
- * `string | undefined` is rejected so the autofix never produces a type error.
+ * `string | undefined` is rejected so the suggestion never produces a type error.
  */
 const isStringType = (type: ts.Type): boolean => {
   const parts = type.isUnion() ? type.types : ([type] as const);
@@ -114,14 +123,14 @@ const createSafeParseRule = <MessageId extends string>(
 
     /**
      * Whether the call, its callee read through its type wrappers, is one to
-     * rewrite.
+     * report.
      */
     isTarget: (
       callee: TSESTree.Expression,
       args: readonly TSESTree.CallExpressionArgument[],
     ) => boolean;
   }>,
-): TSESLint.RuleModule<MessageId, readonly []> => {
+): TSESLint.RuleModule<MessageId | 'replaceWithSafeParse', readonly []> => {
   // Sorted, as an import sorter would write them.
   const requiredImports = [namespace, 'Result'].toSorted();
 
@@ -129,16 +138,19 @@ const createSafeParseRule = <MessageId extends string>(
     meta: {
       type: 'suggestion',
       docs: { description },
-      fixable: 'code',
+      hasSuggestions: true,
       schema: [],
-      messages,
+      messages: {
+        ...messages,
+        replaceWithSafeParse: `Replace with \`Result.unwrapOkOr(${namespace}.${method}({{argName}}), Number.NaN)\`.`,
+      },
       defaultOptions: [],
     },
 
     create: (context) => {
       const sourceCode = context.sourceCode;
 
-      const mut_nodesToFix: {
+      const mut_reports: {
         node: TSESTree.CallExpression;
         argExpression: TSESTree.Expression;
       }[] = [];
@@ -163,14 +175,14 @@ const createSafeParseRule = <MessageId extends string>(
           // wrappers: the value's own type is what the original sees at run
           // time (`parseInt(1e21 as unknown as string)` is 1, the rewrite 1e21;
           // `Number(true as unknown as string)` is 1, the rewrite NaN), and the
-          // type a wrapper states is what the fix, which keeps the wrapper,
-          // hands the parse function's `string` parameter. Without type
-          // information, skip.
+          // type a wrapper states is what the suggestion, which keeps the
+          // wrapper, hands the parse function's `string` parameter. Without
+          // type information, skip.
           if (!typeHoldsAtEveryLayer(sourceCode, firstArg, isStringType)) {
             return;
           }
 
-          mut_nodesToFix.push({ node, argExpression: firstArg });
+          mut_reports.push({ node, argExpression: firstArg });
         },
         'Program:exit': () => {
           const binding = bindValueImports(
@@ -186,32 +198,43 @@ const createSafeParseRule = <MessageId extends string>(
 
           const resultName = localNameOf('Result');
 
-          // Every fix brings its names into scope itself, so that one applied
-          // alone (an editor's quick fix) is complete.
-          for (const { node, argExpression } of mut_nodesToFix) {
+          // A suggestion, never an autofix: the replacement parses some
+          // strings differently (`parseInt('1e3')` is 1, the rewrite 1000;
+          // `parseFloat('12px')` is 12, the rewrite NaN; `Number('')` is 0, the
+          // rewrite NaN), so applying it is a person's decision. Each one
+          // brings its names into scope itself, so that it is complete alone.
+          for (const { node, argExpression } of mut_reports) {
             const argText = getArgumentText(sourceCode, argExpression);
+
+            const data = {
+              original: sourceCode.getText(node),
+              argName: argText,
+            } as const;
 
             context.report({
               node,
               messageId,
-              data: {
-                original: sourceCode.getText(node),
-                argName: argText,
-              },
-              fix:
+              data,
+              suggest:
                 binding === undefined ||
                 namespaceName === undefined ||
                 resultName === undefined ||
                 [namespaceName, resultName].some((name) =>
                   hasForeignBinding(sourceCode, node, name, moduleName),
                 )
-                  ? null
-                  : (fixer) => [
-                      ...binding.edits(fixer),
-                      fixer.replaceText(
-                        node,
-                        `${resultName}.unwrapOkOr(${namespaceName}.${method}(${argText}), Number.NaN)`,
-                      ),
+                  ? []
+                  : [
+                      {
+                        messageId: 'replaceWithSafeParse',
+                        data,
+                        fix: (fixer) => [
+                          ...binding.edits(fixer),
+                          fixer.replaceText(
+                            node,
+                            `${resultName}.unwrapOkOr(${namespaceName}.${method}(${argText}), Number.NaN)`,
+                          ),
+                        ],
+                      },
                     ],
             });
           }
@@ -226,7 +249,7 @@ const messageText = ({
   namespace,
   method,
 }: SafeParseRuleConfig): string =>
-  `Replace \`{{original}}\` with \`Result.unwrapOkOr(${namespace}.${method}({{argName}}), Number.NaN)\` from ${moduleName}.` as const;
+  `Replace \`{{original}}\` with \`Result.unwrapOkOr(${namespace}.${method}({{argName}}), Number.NaN)\` from ${moduleName}. It parses some strings differently from the call it replaces, so check the input before applying it.` as const;
 
 /** Whether `callee` is the global function `name`, as in `parseInt(...)`. */
 const isGlobalCall = (callee: TSESTree.Expression, name: string): boolean =>
