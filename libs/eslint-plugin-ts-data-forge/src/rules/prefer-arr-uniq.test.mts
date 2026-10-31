@@ -188,12 +188,20 @@ describe('prefer-arr-uniq', () => {
           const ys = [...new Set(xs)];
           const zs = Array.from(new Set(xs));
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          const xs = ['a', 'b'];
-          const ys = Arr.uniq(xs);
-          const zs = Arr.uniq(xs);
-        `,
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            const xs = ['a', 'b'];
+            const ys = Arr.uniq(xs);
+            const zs = Array.from(new Set(xs));
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            const xs = ['a', 'b'];
+            const ys = Arr.uniq(xs);
+            const zs = Arr.uniq(xs);
+          `,
+        ],
         errors: [{ messageId: 'useArrUniq' }, { messageId: 'useArrUniq' }],
       },
       {
@@ -205,14 +213,24 @@ describe('prefer-arr-uniq', () => {
           const b = [...new Set(u)];
           const c = Array.from(new Set([1, 2, 1]));
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          const t = [1, 'a', 1] as const;
-          const u: readonly ('x' | 'y' | null | undefined | boolean | bigint)[] = [];
-          const a = Arr.uniq(t);
-          const b = Arr.uniq(u);
-          const c = Arr.uniq([1, 2, 1]);
-        `,
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            const t = [1, 'a', 1] as const;
+            const u: readonly ('x' | 'y' | null | undefined | boolean | bigint)[] = [];
+            const a = Arr.uniq(t);
+            const b = [...new Set(u)];
+            const c = Array.from(new Set([1, 2, 1]));
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            const t = [1, 'a', 1] as const;
+            const u: readonly ('x' | 'y' | null | undefined | boolean | bigint)[] = [];
+            const a = Arr.uniq(t);
+            const b = Arr.uniq(u);
+            const c = Arr.uniq([1, 2, 1]);
+          `,
+        ],
         errors: [
           { messageId: 'useArrUniq' },
           { messageId: 'useArrUniq' },
@@ -465,12 +483,20 @@ describe('prefer-arr-uniq through type wrappers', () => {
           const a = Array.from(new Set(xs) as ReadonlySet<string>);
           const b = [...(new Set(xs) satisfies ReadonlySet<string>)];
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly string[];
-          const a = Arr.uniq(xs);
-          const b = Arr.uniq(xs);
-        `,
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly string[];
+            const a = Arr.uniq(xs);
+            const b = [...(new Set(xs) satisfies ReadonlySet<string>)];
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly string[];
+            const a = Arr.uniq(xs);
+            const b = Arr.uniq(xs);
+          `,
+        ],
         errors: [{ messageId: 'useArrUniq' }, { messageId: 'useArrUniq' }],
       },
       {

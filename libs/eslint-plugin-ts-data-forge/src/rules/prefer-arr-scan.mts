@@ -4,17 +4,14 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
-  buildNamedImportFix,
   getArgumentText,
-  getImportDeclarations,
-  getNamedImports,
   skipTypeWrappers,
   typeWrapperLayers,
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { tsDataForgeValueAt } from './import-binding.mjs';
 
 type Options = readonly [];
 
@@ -47,8 +44,9 @@ type SliceCall = Readonly<{
 type AccumulationCandidate = Readonly<{
   call: TSESTree.CallExpression;
   /**
-   * What the call is replaced with, or `undefined` when the rewrite could not
-   * be derived and the report carries no fix.
+   * What the call is replaced with, after the name `Arr` is bound to
+   * (`scan(xs, f, init)`), or `undefined` when the rewrite could not be
+   * derived and the report carries no fix.
    */
   replacement: string | undefined;
 }>;
@@ -179,13 +177,6 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
 
   create: (context) => {
     const sourceCode = context.sourceCode;
-
-    const program = sourceCode.ast;
-
-    const tsDataForgeImports = getImportDeclarations(
-      program,
-      TS_DATA_FORGE_MODULE,
-    );
 
     const services = sourceCode.parserServices;
 
@@ -363,7 +354,7 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
           ? `(${elementText})`
           : elementText;
 
-      return `Arr.scan(${arrayText}, (${parameterText}) => ${bodyText}, ${getArgumentText(sourceCode, seed)})`;
+      return `scan(${arrayText}, (${parameterText}) => ${bodyText}, ${getArgumentText(sourceCode, seed)})`;
     };
 
     /**
@@ -498,36 +489,20 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
       // been seen by the time its `map` is judged, whichever order the traversal
       // reached them in.
       'Program:exit': () => {
-        const hasArrImport =
-          getNamedImports(tsDataForgeImports).includes('Arr');
+        const arrAt = tsDataForgeValueAt(sourceCode, 'Arr');
 
-        // The import is inserted once per pass: two fixes writing the same
-        // insertion point would otherwise produce it twice.
-        const mut_importNeededBy = hasArrImport
-          ? undefined
-          : mut_accumulations.find(
-              (accumulation) => accumulation.replacement !== undefined,
-            )?.call;
-
-        for (const accumulation of mut_accumulations) {
-          const { call, replacement } = accumulation;
+        for (const { call, replacement } of mut_accumulations) {
+          const arr = arrAt(call);
 
           context.report({
             node: call,
             messageId: 'preferArrScanAccumulate',
             fix:
-              replacement === undefined
+              replacement === undefined || arr === undefined
                 ? undefined
                 : (fixer) => [
-                    ...(call === mut_importNeededBy
-                      ? buildNamedImportFix(
-                          fixer,
-                          program,
-                          TS_DATA_FORGE_MODULE,
-                          ['Arr'],
-                        )
-                      : []),
-                    fixer.replaceText(call, replacement),
+                    ...arr.edits(fixer),
+                    fixer.replaceText(call, `${arr.localName}.${replacement}`),
                   ],
           });
         }

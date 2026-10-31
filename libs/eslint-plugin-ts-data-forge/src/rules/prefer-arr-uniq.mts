@@ -5,16 +5,14 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
-  buildNamedImportFix,
   getArgumentText,
-  getImportDeclarations,
-  getImportedLocalName,
   skipTypeWrappers,
   typeWrapperLayers,
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
-import { primitiveTypeFlags, TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { primitiveTypeFlags } from './constants.mjs';
+import { tsDataForgeValueAt } from './import-binding.mjs';
 import { needsMutableResult } from './mutable-result.mjs';
 
 type Options = readonly [];
@@ -50,13 +48,6 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
 
   create: (context) => {
     const sourceCode = context.sourceCode;
-
-    const program = sourceCode.ast;
-
-    const tsDataForgeImports = getImportDeclarations(
-      program,
-      TS_DATA_FORGE_MODULE,
-    );
 
     const services = sourceCode.parserServices;
 
@@ -159,14 +150,7 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
         check(node, element.argument);
       },
       'Program:exit': () => {
-        const arrLocalName = getImportedLocalName(tsDataForgeImports, 'Arr');
-
-        const arrName = arrLocalName ?? 'Arr';
-
-        // The import is added by the first fix only, so that several fixes do
-        // not insert it at the same position. When the first match is not
-        // autofixable, the first autofixable one carries it instead.
-        const firstAutofixable = mut_matches.find((m) => m.autofixable);
+        const arrAt = tsDataForgeValueAt(sourceCode, 'Arr');
 
         for (const match of mut_matches) {
           const arrayText = sourceCode.getText(match.arrayExpression);
@@ -176,16 +160,18 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
             match.arrayExpression,
           );
 
-          const buildFix =
-            (withImport: boolean): TSESLint.ReportFixFunction =>
-            (fixer) => [
-              ...(withImport && arrLocalName === undefined
-                ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
-                    'Arr',
-                  ])
-                : []),
-              fixer.replaceText(match.node, `${arrName}.uniq(${argumentText})`),
-            ];
+          const arr = arrAt(match.node);
+
+          const fix: TSESLint.ReportFixFunction | null =
+            arr === undefined
+              ? null
+              : (fixer) => [
+                  ...arr.edits(fixer),
+                  fixer.replaceText(
+                    match.node,
+                    `${arr.localName}.uniq(${argumentText})`,
+                  ),
+                ];
 
           const data = { arrayName: arrayText } as const;
 
@@ -194,20 +180,23 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
               node: match.node,
               messageId: 'useArrUniq',
               data,
-              fix: buildFix(match === firstAutofixable),
+              fix,
             });
           } else {
             context.report({
               node: match.node,
               messageId: 'useArrUniq',
               data,
-              suggest: [
-                {
-                  messageId: 'suggestArrUniq',
-                  data,
-                  fix: buildFix(true),
-                },
-              ],
+              suggest:
+                fix === null
+                  ? []
+                  : [
+                      {
+                        messageId: 'suggestArrUniq',
+                        data,
+                        fix,
+                      },
+                    ],
             });
           }
         }

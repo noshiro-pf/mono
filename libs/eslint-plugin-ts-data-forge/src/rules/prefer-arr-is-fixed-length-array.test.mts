@@ -158,13 +158,22 @@ describe('prefer-arr-is-fixed-length-array', () => {
           const ok1 = xs.length === 3;
           const ok2 = ys.length === 2;
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          const xs = [1, 2, 3];
-          const ys = [4, 5];
-          const ok1 = Arr.isFixedLengthArray(3, xs);
-          const ok2 = Arr.isFixedLengthArray(2, ys);
-        `,
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            const xs = [1, 2, 3];
+            const ys = [4, 5];
+            const ok1 = Arr.isFixedLengthArray(3, xs);
+            const ok2 = ys.length === 2;
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            const xs = [1, 2, 3];
+            const ys = [4, 5];
+            const ok1 = Arr.isFixedLengthArray(3, xs);
+            const ok2 = Arr.isFixedLengthArray(2, ys);
+          `,
+        ],
         errors: [
           { messageId: 'useIsFixedLengthArray' },
           { messageId: 'useIsFixedLengthArray' },

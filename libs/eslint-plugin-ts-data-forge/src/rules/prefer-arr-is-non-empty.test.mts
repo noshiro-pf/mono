@@ -167,3 +167,113 @@ describe('prefer-arr-is-non-empty with parenthesized operands', () => {
     ],
   });
 }, 20000);
+
+describe('prefer-arr-is-non-empty and the import it adds', () => {
+  tester.run('prefer-arr-is-non-empty', preferArrIsNonEmpty, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a leading directive stays first',
+        code: dedent`
+          'use client';
+          declare const xs: readonly number[];
+          const ok = xs.length > 0;
+        `,
+        output: dedent`
+          'use client';
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ok = Arr.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'joins an existing named import from the module',
+        code: dedent`
+          import { asInt } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ok = xs.length > 0;
+        `,
+        output: dedent`
+          import { asInt, Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ok = Arr.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'turns a type-only specifier into a value import',
+        code: dedent`
+          import { type Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ok = xs.length > 0;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ok = Arr.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'writes the local name of an aliased import',
+        code: dedent`
+          import { Arr as A } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ok = xs.length > 0;
+        `,
+        output: dedent`
+          import { Arr as A } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ok = A.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'no fix when an import type binds the name',
+        code: dedent`
+          import type { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ok = xs.length > 0;
+        `,
+        output: null,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'no fix where a local binding takes the name',
+        code: dedent`
+          declare const xs: readonly number[];
+          const f = (Arr: unknown) => xs.length > 0;
+        `,
+        output: null,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'each fix adds the import it needs, one per pass',
+        code: dedent`
+          declare const xs: readonly number[];
+          const a = xs.length > 0;
+          const b = 0 < xs.length;
+        `,
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly number[];
+            const a = Arr.isNonEmpty(xs);
+            const b = 0 < xs.length;
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly number[];
+            const a = Arr.isNonEmpty(xs);
+            const b = Arr.isNonEmpty(xs);
+          `,
+        ],
+        errors: [
+          { messageId: 'useIsNonEmpty' },
+          { messageId: 'useIsNonEmpty' },
+        ],
+      },
+    ],
+  });
+}, 20000);

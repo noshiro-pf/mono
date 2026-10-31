@@ -1,16 +1,11 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import {
-  buildNamedImportFix,
-  getArgumentText,
-  getImportDeclarations,
-  getNamedImports,
-} from 'eslint-rule-forge';
+import { getArgumentText } from 'eslint-rule-forge';
 import {
   isArrayOrTupleExpression,
   isSameArrayText,
   parseLengthComparison,
 } from './ast-utils.mjs';
-import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { tsDataForgeValueAt } from './import-binding.mjs';
 
 type Options = readonly [];
 
@@ -37,13 +32,6 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
 
   create: (context) => {
     const sourceCode = context.sourceCode;
-
-    const program = sourceCode.ast;
-
-    const tsDataForgeImports = getImportDeclarations(
-      program,
-      TS_DATA_FORGE_MODULE,
-    );
 
     const services = context.sourceCode.parserServices;
 
@@ -100,14 +88,14 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
         });
       },
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImports);
+        const arrAt = tsDataForgeValueAt(sourceCode, 'Arr');
 
-        const hasArrImport = namedImports.includes('Arr');
-
-        for (const [
-          index,
-          { node, arrayExpression, minExpression, maxExpression },
-        ] of mut_nodesToFix.entries()) {
+        for (const {
+          node,
+          arrayExpression,
+          minExpression,
+          maxExpression,
+        } of mut_nodesToFix) {
           const arrayText = getArgumentText(sourceCode, arrayExpression);
 
           const minText = sourceCode.getText(minExpression);
@@ -115,6 +103,8 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
           const maxText = sourceCode.getText(maxExpression);
 
           const originalText = sourceCode.getText(node);
+
+          const arr = arrAt(node);
 
           context.report({
             node,
@@ -125,18 +115,17 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
               min: minText,
               max: maxText,
             },
-            fix: (fixer) => {
-              const replacement = `Arr.isBoundedLengthArray(${minText}, ${maxText}, ${arrayText})`;
+            fix:
+              arr === undefined
+                ? null
+                : (fixer) => {
+                    const replacement = `${arr.localName}.isBoundedLengthArray(${minText}, ${maxText}, ${arrayText})`;
 
-              const importFixes =
-                index === 0 && !hasArrImport
-                  ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
-                      'Arr',
-                    ])
-                  : [];
-
-              return [...importFixes, fixer.replaceText(node, replacement)];
-            },
+                    return [
+                      ...arr.edits(fixer),
+                      fixer.replaceText(node, replacement),
+                    ];
+                  },
           });
         }
       },

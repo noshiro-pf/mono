@@ -6,14 +6,13 @@ import {
 } from '@typescript-eslint/utils';
 import {
   buildCalleeResolver,
-  buildNamedImportFix,
   getImportDeclarations,
-  getImportedLocalName,
   typeWrapperLayers,
 } from 'eslint-rule-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { tsDataForgeValueAtByName } from './import-binding.mjs';
 
 type Options = readonly [
   Readonly<{
@@ -178,39 +177,32 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
 
       const resolveGuard = buildCalleeResolver(tsDataForgeImports);
 
-      const buildReplaceFix =
-        (
-          isNamespace: boolean,
-          // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-          propertyNode: TSESTree.Node,
-          replacement: string,
-        ): TSESLint.ReportFixFunction =>
-        (fixer) => {
-          // A namespace member access (`tf.isX`) exposes every export, so the
-          // canonical name is always in scope.
-          if (isNamespace) {
-            return [fixer.replaceText(propertyNode, replacement)];
-          }
+      // One binding per replacement guard, however many reports use it.
+      const guardAt = tsDataForgeValueAtByName(sourceCode);
 
-          // If the replacement guard is already imported (possibly under an
-          // alias), rename to its in-scope local name. Otherwise add a new
-          // import and rename to the canonical name.
-          const localName = getImportedLocalName(
-            tsDataForgeImports,
-            replacement,
-          );
+      const buildReplaceFix = (
+        isNamespace: boolean,
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+        propertyNode: TSESTree.Node,
+        replacement: string,
+      ): TSESLint.ReportFixFunction | null => {
+        // A namespace member access (`tf.isX`) exposes every export, so the
+        // canonical name is always in scope.
+        if (isNamespace) {
+          return (fixer) => [fixer.replaceText(propertyNode, replacement)];
+        }
 
-          if (localName !== undefined) {
-            return [fixer.replaceText(propertyNode, localName)];
-          }
+        // The replacement guard's local name, added to the imports when the
+        // file does not import it; no fix when it cannot be bound there.
+        const guard = guardAt(replacement)(propertyNode);
 
-          return [
-            ...buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
-              replacement,
-            ]),
-            fixer.replaceText(propertyNode, replacement),
-          ];
-        };
+        return guard === undefined
+          ? null
+          : (fixer) => [
+              ...guard.edits(fixer),
+              fixer.replaceText(propertyNode, guard.localName),
+            ];
+      };
 
       const reportConstant = (
         node: DeepReadonly<TSESTree.CallExpression>,
@@ -250,7 +242,11 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           node: node as TSESTree.Node,
           messageId: 'replaceTypeGuard',
-          data: { from, to },
+          // The name the fix writes: an aliased import's local name.
+          data: {
+            from,
+            to: isNamespace ? to : (guardAt(to)(propertyNode)?.localName ?? to),
+          },
           fix: buildReplaceFix(isNamespace, propertyNode, to),
         });
       };

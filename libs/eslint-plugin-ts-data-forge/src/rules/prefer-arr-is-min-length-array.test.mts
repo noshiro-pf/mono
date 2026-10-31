@@ -172,13 +172,22 @@ describe('prefer-arr-is-min-length-array', () => {
           const ok1 = xs.length >= 2;
           const ok2 = ys.length >= 1;
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          const xs = [1, 2, 3];
-          const ys = [4, 5];
-          const ok1 = Arr.isMinLengthArray(2, xs);
-          const ok2 = Arr.isMinLengthArray(1, ys);
-        `,
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            const xs = [1, 2, 3];
+            const ys = [4, 5];
+            const ok1 = Arr.isMinLengthArray(2, xs);
+            const ok2 = ys.length >= 1;
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            const xs = [1, 2, 3];
+            const ys = [4, 5];
+            const ok1 = Arr.isMinLengthArray(2, xs);
+            const ok2 = Arr.isMinLengthArray(1, ys);
+          `,
+        ],
         errors: [
           { messageId: 'useIsMinLengthArray' },
           { messageId: 'useIsMinLengthArray' },

@@ -3,16 +3,10 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import {
-  buildNamedImportFix,
-  getArgumentText,
-  getImportDeclarations,
-  getImportedLocalName,
-  getNamedImports,
-} from 'eslint-rule-forge';
+import { getArgumentText } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { tsDataForgeValuesAt } from './import-binding.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
@@ -92,13 +86,6 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
   create: (context) => {
     const sourceCode = context.sourceCode;
 
-    const program = sourceCode.ast;
-
-    const tsDataForgeImports = getImportDeclarations(
-      program,
-      TS_DATA_FORGE_MODULE,
-    );
-
     const mut_roundTrips: {
       node: TSESTree.CallExpression;
       roundTrip: RoundTrip;
@@ -173,47 +160,42 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
       },
 
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImports);
+        const objAt = tsDataForgeValuesAt(sourceCode, ['Obj']).at;
 
-        const objName =
-          getImportedLocalName(tsDataForgeImports, 'Obj') ?? 'Obj';
+        const objOptionalAt = tsDataForgeValuesAt(sourceCode, [
+          'Obj',
+          'Optional',
+        ]).at;
 
-        const optionalName =
-          getImportedLocalName(tsDataForgeImports, 'Optional') ?? 'Optional';
+        // Every fix brings the names it writes into scope itself, so that one
+        // applied alone (an editor's quick fix) is complete.
+        for (const { node, roundTrip } of mut_roundTrips) {
+          const binding = (
+            roundTrip.body.kind === 'optional' ? objOptionalAt : objAt
+          )(node);
 
-        const needsOptional = mut_roundTrips.some(
-          ({ roundTrip }) => roundTrip.body.kind === 'optional',
-        );
+          const [objName, optionalName = 'Optional'] =
+            binding?.localNames ?? [];
 
-        const missingImports = (['Obj', 'Optional'] as const).filter(
-          (name) =>
-            (name !== 'Optional' || needsOptional) &&
-            !namedImports.includes(name),
-        );
-
-        // Note: the import is added by the first fix only, so that several
-        // fixes in one file do not each insert it at the same position.
-        for (const [index, { node, roundTrip }] of mut_roundTrips.entries()) {
           context.report({
             node,
             messageId: MESSAGE_ID_OF[roundTrip.method],
-            fix: (fixer) => {
-              const recordText = getArgumentText(sourceCode, roundTrip.record);
+            fix:
+              binding === undefined || objName === undefined
+                ? null
+                : (fixer) => {
+                    const recordText = getArgumentText(
+                      sourceCode,
+                      roundTrip.record,
+                    );
 
-              const replacement = `${objName}.${roundTrip.method}(${recordText}, ${buildParams(roundTrip)} => ${buildCallbackBody(roundTrip, optionalName)})`;
+                    const replacement = `${objName}.${roundTrip.method}(${recordText}, ${buildParams(roundTrip)} => ${buildCallbackBody(roundTrip, optionalName)})`;
 
-              const importFixes =
-                index === 0 && missingImports.length > 0
-                  ? buildNamedImportFix(
-                      fixer,
-                      program,
-                      TS_DATA_FORGE_MODULE,
-                      missingImports,
-                    )
-                  : [];
-
-              return [...importFixes, fixer.replaceText(node, replacement)];
-            },
+                    return [
+                      ...binding.edits(fixer),
+                      fixer.replaceText(node, replacement),
+                    ];
+                  },
           });
         }
       },

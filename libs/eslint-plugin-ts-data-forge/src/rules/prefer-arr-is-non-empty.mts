@@ -3,15 +3,9 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import {
-  buildNamedImportFix,
-  getArgumentText,
-  getImportDeclarations,
-  getNamedImports,
-  skipTypeWrappers,
-} from 'eslint-rule-forge';
+import { getArgumentText, skipTypeWrappers } from 'eslint-rule-forge';
 import { asLengthAccess, isArrayOrTupleExpression } from './ast-utils.mjs';
-import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { tsDataForgeValueAt } from './import-binding.mjs';
 
 type Options = readonly [];
 
@@ -35,13 +29,6 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
 
   create: (context) => {
     const sourceCode = context.sourceCode;
-
-    const program = sourceCode.ast;
-
-    const tsDataForgeImports = getImportDeclarations(
-      program,
-      TS_DATA_FORGE_MODULE,
-    );
 
     const services = context.sourceCode.parserServices;
 
@@ -90,17 +77,14 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
         });
       },
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImports);
+        const arrAt = tsDataForgeValueAt(sourceCode, 'Arr');
 
-        const hasArrImport = namedImports.includes('Arr');
-
-        for (const [
-          index,
-          { node, arrayExpression },
-        ] of mut_nodesToFix.entries()) {
+        for (const { node, arrayExpression } of mut_nodesToFix) {
           const arrayText = getArgumentText(sourceCode, arrayExpression);
 
           const originalText = sourceCode.getText(node);
+
+          const arr = arrAt(node);
 
           context.report({
             node,
@@ -109,18 +93,17 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
               original: originalText,
               arrayName: arrayText,
             },
-            fix: (fixer) => {
-              const replacement = `Arr.isNonEmpty(${arrayText})`;
+            fix:
+              arr === undefined
+                ? null
+                : (fixer) => {
+                    const replacement = `${arr.localName}.isNonEmpty(${arrayText})`;
 
-              const importFixes =
-                index === 0 && !hasArrImport
-                  ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
-                      'Arr',
-                    ])
-                  : [];
-
-              return [...importFixes, fixer.replaceText(node, replacement)];
-            },
+                    return [
+                      ...arr.edits(fixer),
+                      fixer.replaceText(node, replacement),
+                    ];
+                  },
           });
         }
       },

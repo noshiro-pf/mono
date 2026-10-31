@@ -7,6 +7,7 @@ import {
   buildCalleeResolver,
   getArgumentText,
   getImportDeclarations,
+  hasCommentWithin,
   hasForeignBinding,
   isTypeWrapper,
   skipTypeWrappers,
@@ -238,14 +239,11 @@ export const preferPipeMapNullable: TSESLint.RuleModule<MessageIds, Options> = {
           [mapFn.range[1], mapNullableCall.range[1]],
         ] as const;
 
-        const dropsComment = sourceCode
-          .getCommentsInside(mapNullableCall)
-          .some((comment) =>
-            droppedRanges.some(
-              ([start, end]) =>
-                start <= comment.range[0] && comment.range[1] <= end,
-            ),
-          );
+        const dropsComment = hasCommentWithin(
+          sourceCode,
+          mapNullableCall,
+          droppedRanges,
+        );
 
         const autofixable =
           !dropsComment &&

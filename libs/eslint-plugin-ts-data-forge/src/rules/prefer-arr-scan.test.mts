@@ -442,3 +442,58 @@ describe('prefer-arr-scan with parenthesized operands', () => {
     ],
   });
 });
+
+describe('prefer-arr-scan and the import it adds', () => {
+  tester.run('prefer-arr-scan', preferArrScan, {
+    valid: [],
+    invalid: [
+      {
+        name: 'writes the local name of an aliased import',
+        code: dedent`
+          import { Arr as A } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = xs.reduce<readonly number[]>(
+            (acc, x) => [...acc, (acc.at(-1) ?? 0) + x],
+            [0],
+          );
+        `,
+        output: dedent`
+          import { Arr as A } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = A.scan(xs, (acc, x) => (acc) + x, 0);
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'turns a type-only specifier into a value import',
+        code: dedent`
+          import { type Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = xs.reduce<readonly number[]>(
+            (acc, x) => [...acc, (acc.at(-1) ?? 0) + x],
+            [0],
+          );
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = Arr.scan(xs, (acc, x) => (acc) + x, 0);
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'no fix when an import type binds the name',
+        code: dedent`
+          import type { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = xs.reduce<readonly number[]>(
+            (acc, x) => [...acc, (acc.at(-1) ?? 0) + x],
+            [0],
+          );
+        `,
+        output: null,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+    ],
+  });
+});

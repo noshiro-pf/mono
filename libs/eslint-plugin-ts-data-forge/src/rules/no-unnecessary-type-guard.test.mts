@@ -406,12 +406,72 @@ describe('no-unnecessary-type-guard', () => {
           const y = isNonNullish(x);
         `,
         output: dedent`
-          import { isNotNull } from 'ts-data-forge';
-          import { isNonNullish } from 'ts-data-forge';
+          import { isNonNullish, isNotNull } from 'ts-data-forge';
           declare const x: string | null;
           const y = isNotNull(x);
         `,
         errors: [{ messageId: 'replaceTypeGuard' }],
+      },
+      {
+        name: 'the message names an aliased replacement guard by its local name',
+        code: dedent`
+          import { isNonNullish, isNotNull as inn } from 'ts-data-forge';
+          declare const x: string | null;
+          const y = isNonNullish(x);
+        `,
+        output: dedent`
+          import { isNonNullish, isNotNull as inn } from 'ts-data-forge';
+          declare const x: string | null;
+          const y = inn(x);
+        `,
+        errors: [
+          {
+            messageId: 'replaceTypeGuard',
+            data: { from: 'isNonNullish', to: 'inn' },
+          },
+        ],
+      },
+      {
+        name: 'several reports bind each replacement guard they write',
+        code: dedent`
+          import { isNonNullish } from 'ts-data-forge';
+          declare const x: string | null;
+          declare const z: string | undefined;
+          const a = isNonNullish(x);
+          const b = isNonNullish(x);
+          const c = isNonNullish(z);
+        `,
+        output: [
+          dedent`
+            import { isNonNullish, isNotNull } from 'ts-data-forge';
+            declare const x: string | null;
+            declare const z: string | undefined;
+            const a = isNotNull(x);
+            const b = isNonNullish(x);
+            const c = isNonNullish(z);
+          `,
+          dedent`
+            import { isNonNullish, isNotNull, isNotUndefined } from 'ts-data-forge';
+            declare const x: string | null;
+            declare const z: string | undefined;
+            const a = isNotNull(x);
+            const b = isNonNullish(x);
+            const c = isNotUndefined(z);
+          `,
+          dedent`
+            import { isNonNullish, isNotNull, isNotUndefined } from 'ts-data-forge';
+            declare const x: string | null;
+            declare const z: string | undefined;
+            const a = isNotNull(x);
+            const b = isNotNull(x);
+            const c = isNotUndefined(z);
+          `,
+        ],
+        errors: [
+          { messageId: 'replaceTypeGuard' },
+          { messageId: 'replaceTypeGuard' },
+          { messageId: 'replaceTypeGuard' },
+        ],
       },
       {
         name: 'isNullish that only matches undefined -> isUndefined',

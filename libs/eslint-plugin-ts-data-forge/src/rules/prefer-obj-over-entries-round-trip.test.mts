@@ -309,6 +309,38 @@ describe('prefer-obj-over-entries-round-trip', () => {
           errors: [{ messageId: 'useObjFilterMap' }],
         },
         {
+          name: 'adds Obj and Optional to one existing import',
+          code: dedent`
+            import { asInt } from 'ts-data-forge';
+            const scores = { alice: 1, bob: 2 };
+            const scaled = Object.fromEntries(
+              Object.entries(scores).flatMap(([k, v]) =>
+                v > 1 ? [[k, v * 10]] : [],
+              ),
+            );
+          `,
+          output: dedent`
+            import { asInt, Obj, Optional } from 'ts-data-forge';
+            const scores = { alice: 1, bob: 2 };
+            const scaled = Obj.filterMap(scores, (v) => v > 1 ? Optional.some(v * 10) : Optional.none);
+          `,
+          errors: [{ messageId: 'useObjFilterMap' }],
+        },
+        {
+          name: 'no fix when an import type binds Optional',
+          code: dedent`
+            import type { Optional } from 'ts-data-forge';
+            const scores = { alice: 1, bob: 2 };
+            const scaled = Object.fromEntries(
+              Object.entries(scores).flatMap(([k, v]) =>
+                v > 1 ? [[k, v * 10]] : [],
+              ),
+            );
+          `,
+          output: null,
+          errors: [{ messageId: 'useObjFilterMap' }],
+        },
+        {
           name: 'handles a flatMap whose branches are the other way round',
           code: dedent`
             const scores = { alice: 1, bob: 2 };
@@ -368,12 +400,22 @@ describe('prefer-obj-over-entries-round-trip', () => {
               Object.entries(scores).filter(([, v]) => v > 1),
             );
           `,
-          output: dedent`
-            import { Obj } from 'ts-data-forge';
-            const scores = { alice: 1, bob: 2 };
-            const doubled = Obj.map(scores, (v) => v * 2);
-            const passing = Obj.filter(scores, (v) => v > 1);
-          `,
+          output: [
+            dedent`
+              import { Obj } from 'ts-data-forge';
+              const scores = { alice: 1, bob: 2 };
+              const doubled = Obj.map(scores, (v) => v * 2);
+              const passing = Object.fromEntries(
+                Object.entries(scores).filter(([, v]) => v > 1),
+              );
+            `,
+            dedent`
+              import { Obj } from 'ts-data-forge';
+              const scores = { alice: 1, bob: 2 };
+              const doubled = Obj.map(scores, (v) => v * 2);
+              const passing = Obj.filter(scores, (v) => v > 1);
+            `,
+          ],
           errors: [{ messageId: 'useObjMap' }, { messageId: 'useObjFilter' }],
         },
         {
