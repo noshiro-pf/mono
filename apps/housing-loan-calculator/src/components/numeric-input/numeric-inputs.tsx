@@ -1,6 +1,13 @@
 import type { Bindable, JSX } from 'synstate-dom';
-import { Uint32 } from 'ts-data-forge';
-import { PercentFloat, Year, Yen } from '../../types/index.mjs';
+import {
+  maxPercent,
+  maxYear,
+  minPercent,
+  minYear,
+  PercentFloat,
+  Year,
+  Yen,
+} from '../../types/index.mjs';
 import { BoundedNumericInput } from './bounded-numeric-input.js';
 
 type Props<N extends number> = Readonly<{
@@ -13,14 +20,12 @@ export const YenNumericInput = (
   props: Props<Yen> & Readonly<{ min: number }>,
 ): JSX.Element => <BoundedNumericInput {...props} toValue={Yen.cast} />;
 
-export const YearNumericInput = (
-  props: Props<Year> & Readonly<{ min: number }>,
-): JSX.Element => (
-  // The bound of a uint32, which `Year.cast` refuses beyond.
+export const YearNumericInput = (props: Props<Year>): JSX.Element => (
   <BoundedNumericInput
     {...props}
     integer
-    max={Uint32.MAX_VALUE}
+    max={maxYear}
+    min={minYear}
     toValue={Year.cast}
   />
 );
@@ -30,8 +35,8 @@ export const PercentFloatNumericInput = (
 ): JSX.Element => (
   <BoundedNumericInput
     {...props}
-    max={100}
-    min={0}
+    max={maxPercent}
+    min={minPercent}
     toValue={PercentFloat.cast}
   />
 );
