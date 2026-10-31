@@ -2,6 +2,7 @@
 prev: false
 next: false
 title: Index
+description: Every SynState API on one page — state, event emitters, observable creation functions, combinators and operators — with a link to each reference page.
 sidebar:
     order: 1
 ---
