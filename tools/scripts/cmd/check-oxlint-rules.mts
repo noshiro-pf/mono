@@ -1,3 +1,4 @@
+import { parseForESLint } from '@typescript-eslint/parser';
 import { ESLint, type Linter } from 'eslint';
 import { execFileSync, spawnSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
@@ -13,13 +14,14 @@ import {
   unknownToString,
 } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   eslintConfigOffForOxlint,
   eslintRulesMovedToOxlint,
   oxlintConfig,
   toOxlintRuleName,
 } from '../../configs/oxlint-rules.mjs';
+import { readRepositoryFile } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -45,7 +47,7 @@ export const checkOxlintRules = async (): Promise<Result<number, string>> => {
   const violations = [
     ...perPackage.flatMap(({ problems }) => problems),
     ...describeMismatches(perPackage.flatMap(({ mismatches }) => mismatches)),
-    ...findEslintDisableDirectives(),
+    ...(await findEslintDisableDirectives()),
   ] as const;
 
   if (Arr.isNonEmpty(violations)) {
@@ -64,6 +66,53 @@ export const checkOxlintRules = async (): Promise<Result<number, string>> => {
 
   return Result.ok(packageDirs.length);
 };
+
+/**
+ * The `eslint-disable`, `eslint-disable-line` and `eslint-disable-next-line`
+ * directives in `text`, with the line each starts on and the rules it names.
+ * Read from the comments the parser found, so a string or a template that looks
+ * like a comment is not one, and parsed as ESLint's
+ * `SourceCode#getDisableDirectives` parses them (not typed public API, so
+ * copied; the test compares the two): the reason starts at the first ` -- `
+ * (two or more dashes), a line comment must be `-line` or `-next-line`, and a
+ * `-line` block must fit on its line. `filePath` picks the dialect by its
+ * extension, as it does for ESLint (`.ts` has no JSX: `<T>x` is a cast).
+ */
+export const findDirectivesIn = (
+  text: string,
+  filePath: string,
+): readonly Readonly<{ line: number; ruleIds: readonly string[] }>[] =>
+  Arr.generate(function* () {
+    const { comments } = parseForESLint(text, {
+      filePath,
+      comment: true,
+      loc: true,
+      range: true,
+    }).ast;
+
+    for (const comment of comments) {
+      const reasonAt = comment.value.search(/\s-{2,}\s/u);
+
+      const directive = (
+        reasonAt === -1 ? comment.value : comment.value.slice(0, reasonAt)
+      ).trim();
+
+      const label = /^[a-z-]+(?=\s|$)/u.exec(directive)?.[0];
+
+      const applies =
+        label === 'eslint-disable-next-line' ||
+        (label === 'eslint-disable-line' &&
+          comment.loc.start.line === comment.loc.end.line) ||
+        (label === 'eslint-disable' && text.startsWith('/*', comment.range[0]));
+
+      if (applies) {
+        yield {
+          line: comment.loc.start.line,
+          ruleIds: parseRuleList(directive.slice(label.length)),
+        };
+      }
+    }
+  });
 
 const movedRuleIds = Object.keys(eslintRulesMovedToOxlint);
 
@@ -308,16 +357,12 @@ const describeMismatches = (
     },
   );
 
-/** `path:line:text` → [`path:line`, `text`]. */
-const splitGrepLine = (line: string): FixedLengthTuple<2, string> => {
-  const [file = '', lineNumber = '', ...text] = line.split(':');
-
-  return [`${file}:${lineNumber}`, text.join(':')];
-};
-
-/** `git grep`, for which no match is exit status 1 rather than a failure. */
+/**
+ * `git grep -z`, for which no match is exit status 1 rather than a failure;
+ * NUL-separated, so a path git would quote arrives as it is.
+ */
 const gitGrep = (args: readonly string[]): readonly string[] => {
-  const result = spawnSync('git', Arr.toUnshifted('grep')(args), {
+  const result = spawnSync('git', ['grep', '-z', ...args], {
     cwd: projectRootPath,
     encoding: 'utf8',
     maxBuffer: 2 ** 28,
@@ -327,47 +372,74 @@ const gitGrep = (args: readonly string[]): readonly string[] => {
     throw new Error(`git grep failed: ${result.stderr}`);
   }
 
-  return result.stdout.split('\n').filter((line) => line !== '');
+  return result.stdout.split('\0').filter((entry) => entry !== '');
 };
 
 /** An `eslint-disable` comment that names a moved rule anywhere ESLint lints. */
-const findEslintDisableDirectives = (): readonly string[] => {
+const findEslintDisableDirectives = async (): Promise<readonly string[]> => {
   const moved = new Set(movedRuleIds);
 
-  const lines = gitGrep([
-    '--line-number',
-    '--extended-regexp',
-    'eslint-disable(-next-line|-line)?[[:space:]]',
+  // Whole files, not grep lines: a block directive's rule list can start on the
+  // line after the keyword, and only a parser tells a comment from a string.
+  // ESLint lints no Markdown here, so a README's fence is not read.
+  const files = gitGrep([
+    '--files-with-matches',
+    '--fixed-strings',
+    'eslint-disable',
     '--',
     ':(glob)apps/**',
     ':(glob)libs/**',
     ':(glob)languages/**',
-  ]);
+  ]).filter((file) => lintedExtensions.test(file));
 
-  return lines.flatMap((line) => {
-    const [location, directive] = splitGrepLine(line);
+  const perFile = await Promise.all(
+    files.map(async (file) => {
+      const text = await readRepositoryFile(file);
 
-    const ruleList = directive
-      .split(/eslint-disable(?:-next-line|-line)?\s+/u, 2)
-      .at(1)
-      ?.split(' -- ', 1)
-      .at(0)
-      ?.replace('*/', '');
+      if (Result.isErr(text)) {
+        return [text.value];
+      }
 
-    if (ruleList === undefined) {
-      return [];
-    }
+      // Parsing is the cost; a file that names no moved rule has nothing to
+      // report.
+      if (movedRuleIds.every((ruleId) => !text.value.includes(ruleId))) {
+        return [];
+      }
 
-    return ruleList
-      .split(',')
-      .map((ruleId) => ruleId.trim())
-      .filter((ruleId) => moved.has(ruleId))
-      .map(
-        (ruleId) =>
-          `${location}: ${ruleId} is checked by oxlint; disable it with an \`oxlint-disable\` comment naming \`${toOxlintRuleName(ruleId)}\`.`,
+      const directives = Result.fromThrowable(() =>
+        findDirectivesIn(text.value, file),
       );
-  });
+
+      if (Result.isErr(directives)) {
+        return [
+          `${file}: cannot be parsed to read its directives: ${unknownToString(directives.value)}`,
+        ];
+      }
+
+      return directives.value.flatMap(({ line, ruleIds }) =>
+        ruleIds
+          .filter((ruleId) => moved.has(ruleId))
+          .map(
+            (ruleId) =>
+              `${file}:${line}: ${ruleId} is checked by oxlint; disable it with an \`oxlint-disable\` comment naming \`${toOxlintRuleName(ruleId)}\`.`,
+          ),
+      );
+    }),
+  );
+
+  return perFile.flat();
 };
+
+/** ESLint's `parseListConfig`: comma-separated, each id optionally quoted. */
+const parseRuleList = (value: string): readonly string[] =>
+  value
+    .split(',')
+    .map((name) =>
+      name
+        .trim()
+        .replace(/^(?<quote>['"]?)(?<ruleId>.*)\k<quote>$/su, '$<ruleId>'),
+    )
+    .filter((ruleId) => ruleId !== '');
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkOxlintRules().catch((error: unknown) =>
