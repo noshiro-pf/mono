@@ -27,7 +27,10 @@ nothing has to be installed and `PATH` is never consulted. CI keeps the
 archives between runs with `actions/cache` (`code-check.yml`, `check:root`
 entry). `pnpm-update.yml` moves the pins (`mature-updates.mts
 release-binaries`), and the header of `mature-updates.mts` says how far they
-move on their own.
+move on their own. A move past that, a new major say, is
+`pnpm run update-release-binaries -- --to <tool>@<x.y.z>`, which fills in
+every platform's digest under the same hold; a release that renamed its
+files needs the asset `name` templates in the pin file edited first.
 
 A finding that is wrong for its line is disabled on the command it names:
 `# shellcheck disable=SC<number> # why`.

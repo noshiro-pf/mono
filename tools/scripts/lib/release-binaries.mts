@@ -320,9 +320,11 @@ const downloadVerified = async ({
       [
         `❌ ${url}`,
         `   has SHA-256 ${digest}, and ${pinsFileName} pins ${sha256}.`,
-        "   Nothing was kept or run. A pin edited by hand needs every platform's digest,",
-        '   each the `digest` the Releases API reports for that asset; a release asset',
-        '   that changed after it was pinned is worth reporting, not re-pinning.',
+        '   Nothing was kept or run. A version edited by hand without its digests: put',
+        '   back the version last pinned, then move it with',
+        '   `pnpm run update-release-binaries -- --to <tool>@<x.y.z>`, which fills in',
+        "   every platform's digest. A release asset that changed after it was pinned",
+        '   is worth reporting, not re-pinning.',
       ].join('\n'),
     );
   }

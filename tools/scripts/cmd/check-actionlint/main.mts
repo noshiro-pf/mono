@@ -344,9 +344,9 @@ const judgeActionlint = (
       'the whole directory. An error about syntax GitHub already accepts',
       '(a new expression function, key or runner label) means the pinned',
       'actionlint predates it: pnpm-update.yml moves it within its line once',
-      'a release has matured, or bump the version and every digest in',
-      'tools/configs/release-binaries.json, rather than rewriting the',
-      'workflow.',
+      'a release has matured, or pin a newer one by hand with',
+      '`pnpm run update-release-binaries -- --to actionlint@<x.y.z>`, rather',
+      'than rewriting the workflow.',
     ].join('\n');
   }
 
