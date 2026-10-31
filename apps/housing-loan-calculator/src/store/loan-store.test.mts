@@ -48,6 +48,9 @@ describe(createLoanStore, () => {
     ['borrowing-period', 'abc'],
     ['borrowing-period', '-1'],
     ['borrowing-period', '1.5'],
+    ['borrowing-period', '0'],
+    ['borrowing-period', '101'],
+    ['borrowing-period', '100000000'],
     ['interest-rate', 'abc'],
     ['interest-rate', '-0.1'],
     ['interest-rate', '101'],
@@ -70,6 +73,17 @@ describe(createLoanStore, () => {
       borrowingTotalManYen: Yen.cast(1000),
       borrowingPeriodYear: Year.cast(1),
       interestRatePercentPerYear: PercentFloat.cast(100),
+    });
+  });
+
+  test('accepts a period of 100, the longest there is', () => {
+    const { store } = setup(
+      'https://example.com/mono/loan/?borrowing-period=100',
+    );
+
+    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+      ...defaultValues,
+      borrowingPeriodYear: Year.cast(100),
     });
   });
 

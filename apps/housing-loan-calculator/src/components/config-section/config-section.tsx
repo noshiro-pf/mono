@@ -28,7 +28,6 @@ export const ConfigSection = (): JSX.Element => (
         {constant(dict.borrowingPeriodYear)}
         <YearNumericInput
           data-e2e={'numericInput-borrowingPeriodYear'}
-          min={1}
           value={mapBindable(loanStore.inputs, (s) => s.borrowingPeriodYear)}
           onValueChange={loanStore.setBorrowingPeriodYear}
         />

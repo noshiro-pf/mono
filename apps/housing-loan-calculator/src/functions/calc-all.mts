@@ -1,4 +1,4 @@
-import { Arr, Uint32 } from 'ts-data-forge';
+import { Arr, asUint32, Uint32 } from 'ts-data-forge';
 import {
   PercentFloat,
   Yen,
@@ -20,7 +20,7 @@ export const calcAll = ({
    */
   const borrowingTotalYen = Yen.cast(borrowingTotalManYen * 10_000);
 
-  const borrowingPeriodMonth = Uint32.mul(borrowingPeriodYear, 12);
+  const borrowingPeriodMonth = Uint32.mul(asUint32(borrowingPeriodYear), 12);
 
   const interestRatePerMonth = PercentFloat.cast(
     interestRatePercentPerYear / 1200,
