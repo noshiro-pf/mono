@@ -1,6 +1,6 @@
 {
   "name": "blueprint-synstate",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Blueprint's components rebuilt on synstate-dom, drawn by Blueprint's own style sheets",
   "repository": {
