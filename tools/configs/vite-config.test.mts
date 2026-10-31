@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { usesModuleMocks } from './vite-config.mjs';
+import { nodeProjectExclude, usesModuleMocks } from './vite-config.mjs';
 
 /** A package root holding `files`, removed once `fn` returns. */
 const withPackage = (
@@ -75,5 +75,15 @@ describe(usesModuleMocks, () => {
     withPackage(files, (packageRoot) => {
       expect(usesModuleMocks(packageRoot)).toBe(expected);
     });
+  });
+});
+
+describe(nodeProjectExclude, () => {
+  test('adds test/browser/ after the package’s own exclude', () => {
+    assert.deepStrictEqual(nodeProjectExclude(['**/*.d.mts', '**/index.mts']), [
+      '**/*.d.mts',
+      '**/index.mts',
+      'test/browser/**',
+    ]);
   });
 });

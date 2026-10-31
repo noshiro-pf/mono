@@ -2,6 +2,7 @@ import { createState, onScopeDispose } from 'synstate';
 import {
   constant,
   createAfterUpdate,
+  isImeKeyDown,
   subscribeInScope,
   toObservable,
   view,
@@ -12,7 +13,6 @@ import type { StrictOmit } from 'ts-type-forge';
 import {
   classObject,
   intentClass,
-  isImeKeyDown,
   sizeClass,
   uniqueId,
 } from '../internal/index.mjs';
