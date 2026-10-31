@@ -885,6 +885,235 @@ describe('prefer-arr-generate', () => {
         ],
       },
       {
+        name: 'only suggests when a comment between the receiver and `.flatMap` would be lost',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs
+            // keep only the positives
+            .flatMap((x) => (x > 0 ? [x] : []));
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useArrGenerate',
+            suggestions: [
+              {
+                messageId: 'suggestArrGenerate',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.generate(function* () {
+                    for (const x of xs) {
+                      if (x > 0) {
+                        yield x;
+                      }
+                    }
+                  });
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'only suggests when a comment after `flatMap(` would be lost',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.flatMap(
+            // keep only the positives
+            (x) => (x > 0 ? [x] : []),
+          );
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useArrGenerate',
+            suggestions: [
+              {
+                messageId: 'suggestArrGenerate',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.generate(function* () {
+                    for (const x of xs) {
+                      if (x > 0) {
+                        yield x;
+                      }
+                    }
+                  });
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'only suggests when a comment after the callback, before `)` would be lost',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.flatMap(
+            (x) => (x > 0 ? [x] : []),
+            // keep only the positives
+          );
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useArrGenerate',
+            suggestions: [
+              {
+                messageId: 'suggestArrGenerate',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.generate(function* () {
+                    for (const x of xs) {
+                      if (x > 0) {
+                        yield x;
+                      }
+                    }
+                  });
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'keeps the fix automatic when the comment is inside the carried type argument',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.flatMap</* positives */ number>((x) => (x > 0 ? [x] : []));
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = Arr.generate</* positives */ number>(function* () {
+            for (const x of xs) {
+              if (x > 0) {
+                yield x;
+              }
+            }
+          });
+        `,
+        errors: [{ messageId: 'useArrGenerate' }],
+      },
+      {
+        name: 'keeps the fix automatic when the comment is inside the receiver or the parameter',
+        code: dedent`
+          declare const f: (a: readonly { a: number }[]) => readonly { a: number }[];
+          declare const xs: readonly { a: number }[];
+          const ys = f(/* all */ xs).flatMap(({ a /* the value */ }) => (a > 0 ? [a] : []));
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const f: (a: readonly { a: number }[]) => readonly { a: number }[];
+          declare const xs: readonly { a: number }[];
+          const ys = Arr.generate(function* () {
+            for (const { a /* the value */ } of f(/* all */ xs)) {
+              if (a > 0) {
+                yield a;
+              }
+            }
+          });
+        `,
+        errors: [{ messageId: 'useArrGenerate' }],
+      },
+      {
+        name: 'only suggests when a comment in a negated test would be lost',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.flatMap((x) => (x > 0 && /* small */ x < 9 ? [] : [x]));
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useArrGenerate',
+            suggestions: [
+              {
+                messageId: 'suggestArrGenerate',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.generate(function* () {
+                    for (const x of xs) {
+                      if (!(x > 0) || !(x < 9)) {
+                        yield x;
+                      }
+                    }
+                  });
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'only suggests when a comment before `.flatMap` would be lost, even if a kept comment starts with the same text',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs // TODO
+            .flatMap((x) => {
+              // TODO: check this
+              const y = x + 1;
+              return y > 0 ? [y] : [];
+            });
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useArrGenerate',
+            suggestions: [
+              {
+                messageId: 'suggestArrGenerate',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.generate(function* () {
+                    for (const x of xs) {
+                      // TODO: check this
+                      const y = x + 1;
+                      if (y > 0) {
+                        yield y;
+                      }
+                    }
+                  });
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'keeps the fix automatic for a multi-line comment in the prelude',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.flatMap((x) => {
+            /*
+             * Odd ones only.
+             */
+            const y = x;
+            return y % 2 === 1 ? [y] : [];
+          });
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = Arr.generate(function* () {
+            for (const x of xs) {
+              /*
+               * Odd ones only.
+               */
+              const y = x;
+              if (y % 2 === 1) {
+                yield y;
+              }
+            }
+          });
+        `,
+        errors: [{ messageId: 'useArrGenerate' }],
+      },
+      {
         name: 'only suggests when a comment would be lost',
         code: dedent`
           declare const xs: readonly number[];
