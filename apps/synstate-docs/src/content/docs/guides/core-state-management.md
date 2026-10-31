@@ -82,7 +82,7 @@ setA(1);
 
 If a slow side effect or an `await` stands between the source and the value, make that part of the graph too, with `fromPromise`, `switchMap` and similar operators. Writes from event handlers, timers and `queueMicrotask` callbacks run outside propagation and are not affected.
 
-The `synstate/no-write-during-propagation` rule of [`eslint-plugin-synstate`](/mono/synstate/getting-started/installation/#eslint-plugin) reports a write from a `subscribe` callback, or from an operator inside `pipe`, where it is written, before it runs. It recognizes the functions imported from `synstate` itself, not yet the ones re-exported by the hooks and Preact Signals packages.
+The `synstate/no-write-during-propagation` rule of [`eslint-plugin-synstate`](/mono/synstate/getting-started/installation/#eslint-plugin) reports a write from a `subscribe` callback, or from an operator inside `pipe`, where it is written, before it runs. It recognizes the functions whether they are imported from `synstate` or from the hooks and Preact Signals packages that re-export it, and treats a `useObservableEffect` callback as a subscriber too.
 
 ## Design Choice: Separate `setState` and `updateState`
 

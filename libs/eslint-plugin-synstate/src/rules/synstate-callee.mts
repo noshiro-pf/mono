@@ -1,5 +1,6 @@
 import {
   AST_NODE_TYPES,
+  ASTUtils,
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
@@ -15,14 +16,15 @@ import { SYNSTATE_MODULE } from './constants.mjs';
 
 /**
  * Whether the identifier that decides what `callee` calls — the callee, or
- * the namespace object — is bound by something other than the synstate
- * import where it is read.
+ * the namespace object — is bound by something other than an import from one
+ * of `moduleNames` (synstate alone by default) where it is read.
  */
 export const isShadowedCallee = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   sourceCode: TSESLint.SourceCode,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   callee: TSESTree.Expression,
+  moduleNames: readonly string[] = SYNSTATE_ONLY,
 ): boolean => {
   const unwrapped = skipTypeWrappers(callee);
 
@@ -31,9 +33,17 @@ export const isShadowedCallee = (
       ? skipTypeWrappers(unwrapped.object)
       : unwrapped;
 
+  if (bound.type !== AST_NODE_TYPES.Identifier) {
+    return true;
+  }
+
+  const variable = ASTUtils.findVariable(
+    sourceCode.getScope(bound),
+    bound.name,
+  );
+
   return (
-    bound.type !== AST_NODE_TYPES.Identifier ||
-    hasForeignBinding(sourceCode, bound, bound.name, SYNSTATE_MODULE)
+    variable?.defs.some((def) => !isImportFromAny(def, moduleNames)) ?? false
   );
 };
 
@@ -208,3 +218,20 @@ const importedBindingOf = (
         edits: (fixer) => [fixer.insertTextAfter(last, `, ${exportName}`)],
       };
 };
+
+const SYNSTATE_ONLY = [SYNSTATE_MODULE] as const;
+
+/**
+ * Whether `def` is a binding an `import … from '<moduleName>'` declaration
+ * introduces, for one of `moduleNames`.
+ */
+const isImportFromAny = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  def: TSESLint.Scope.Definition,
+  moduleNames: readonly string[],
+): boolean =>
+  (def.node.type === AST_NODE_TYPES.ImportSpecifier ||
+    def.node.type === AST_NODE_TYPES.ImportDefaultSpecifier ||
+    def.node.type === AST_NODE_TYPES.ImportNamespaceSpecifier) &&
+  def.node.parent.type === AST_NODE_TYPES.ImportDeclaration &&
+  moduleNames.includes(def.node.parent.source.value);

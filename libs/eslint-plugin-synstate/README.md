@@ -186,8 +186,9 @@ recurses until synstate stops it. synstate warns at run time, once per state;
 this rule reports the write where it is written. Derive the value instead, so
 that the graph has the edge: `const b$ = a$.pipe(map((a) => a * 2))`.
 
-It reports a call, made directly in a function passed to `.subscribe(...)` or
-to an operator inside `.pipe(...)`, to what a synstate factory returned:
+It reports a call, made directly in a function passed to `.subscribe(...)`,
+to an operator inside `.pipe(...)` or to `useObservableEffect`, to what a
+synstate factory returned:
 
 - the setter of `createState`, and its `updateState` and `resetState`;
 - the `dispatch` of `createReducer`;
@@ -201,8 +202,11 @@ A subscriber or projection passed by name counts when the file defines it
 of the file that the callback calls, at any depth: the rule reports the call
 in the callback, naming the function that writes.
 
-The factories are recognized imported from `synstate` by name, under an alias
-or through a namespace import, and the calls are read through `as`,
+The factories and `useObservableEffect` are recognized imported from
+`synstate` or from the packages that re-export it (`synstate-react-hooks`,
+`synstate-react-hooks-compat`, `synstate-preact-hooks`,
+`synstate-preact-signals`), by name, under an alias or through a namespace
+import, and the calls are read through `as`,
 `satisfies`, `!` and parentheses. A setter made in the same file is judged from
 the syntax alone. A setter imported from another file, such as a store module
 exporting `const [count$, setCount] = createState(0)`, is judged only with

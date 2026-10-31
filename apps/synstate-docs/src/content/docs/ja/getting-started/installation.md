@@ -55,7 +55,7 @@ hooks の代わりに [Preact Signals](https://preactjs.com/guide/v10/signals/) 
 npm add synstate-preact-signals preact @preact/signals
 ```
 
-Observable と signal を相互に変換する関数（`toSignal`・`fromSignal`）を提供し、その `createState`・`createReducer`・`createBooleanState` は hook の代わりに `ReadonlySignal` を返します。hooks パッケージと同じく `synstate` の関数を再エクスポートしています。[Preact Signals デモ](/mono/synstate/ja/preact-signals/demo/)を参照してください。
+Observable と signal を相互に変換する関数（`toSignal`・`fromSignal`）を提供し、その `createState`・`createReducer`・`createBooleanState` は hook の代わりに `ReadonlySignal` を返します。hooks パッケージと同じく `synstate` の関数と型を再エクスポートしています。[Preact Signals デモ](/mono/synstate/ja/preact-signals/demo/)を参照してください。
 
 ### synstate-dom（フレームワークなし）
 
