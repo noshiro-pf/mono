@@ -354,7 +354,19 @@ describe('Num test', () => {
 
       expect(Num.divInt(-7, 2)).toBe(-4); // floor division
 
-      expect(Num.divInt(10.7, asNonZeroFiniteNumber(3.2))).toBe(3); // floors both operands
+      expect(Num.divInt(10.7, asNonZeroFiniteNumber(3.2))).toBe(3); // ⌊⌊10.7⌋ / 3.2⌋
+    });
+
+    test('a divisor in (-1, 1) is not floored to 0 or -1', () => {
+      expect(Num.divInt(5, asNonZeroFiniteNumber(0.5))).toBe(10);
+
+      expect(Num.divInt(0.3, asNonZeroFiniteNumber(0.5))).toBe(0);
+
+      expect(Num.divInt(-5, asNonZeroFiniteNumber(0.5))).toBe(-10);
+
+      expect(Num.divInt(5, asNonZeroFiniteNumber(-0.5))).toBe(-10);
+
+      expect(Num.divInt(7, asNonZeroFiniteNumber(-2.5))).toBe(-3);
     });
   });
 
