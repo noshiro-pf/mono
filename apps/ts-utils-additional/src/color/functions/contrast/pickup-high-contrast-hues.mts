@@ -84,6 +84,12 @@ export function pickupHighContrastHues(
   );
 
   for (const [x, value] of luminanceDiffAccumulated.entries()) {
+    // After the n-th pick the threshold `maxValue * n / n` can round one ulp
+    // below `maxValue`, so the last value would pass as an (n + 1)-th hue.
+    if (mut_i >= n) {
+      break;
+    }
+
     if (value <= mut_y) {
       continue;
     }
