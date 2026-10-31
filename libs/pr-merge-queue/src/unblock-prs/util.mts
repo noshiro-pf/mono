@@ -21,6 +21,9 @@ import { log } from '../lib/index.mjs';
  * call would find the signal already aborted and return immediately. So the
  * loop has one caller, the `unblock-prs` command (`src/cmd/unblock-prs.mts`),
  * which runs it once, and it is not exported from the package.
+ * `run-unblock-prs-skill` stops its own loop by the same signal, in a process
+ * of its own, and counts on both of the above: never reset, and a second
+ * signal that exits at once.
  */
 const stopController = new AbortController();
 

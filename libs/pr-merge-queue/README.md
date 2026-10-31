@@ -14,15 +14,16 @@ The commands read the repository from `origin` in the current directory and
 authenticate with `GH_TOKEN` or `GITHUB_TOKEN`, falling back to `gh auth token`
 when neither is set.
 
-| command              | what it does                                                                         |
-| :------------------- | :----------------------------------------------------------------------------------- |
-| `open-pr`            | pushes the current branch and opens its pull request, held by `skip-ci`              |
-| `unblock-prs`        | lands the `merge-queued` pull requests one at a time, in the order they declare      |
-| `pr-report`          | reports every open pull request: merge order, required checks, how far behind        |
-| `claim-pr`           | claims a pull request `unblock-prs` set aside, so that nothing else touches it       |
-| `push-fixed-pr`      | pushes the fix to a pull request you claimed and hands it back to the queue          |
-| `report-unowned-prs` | files an issue for each queued pull request that everyone is waiting on others for   |
-| `start-issue`        | labels an issue `in-progress` before work starts, refusing one someone is already on |
+| command                 | what it does                                                                         |
+| :---------------------- | :----------------------------------------------------------------------------------- |
+| `open-pr`               | pushes the current branch and opens its pull request, held by `skip-ci`              |
+| `unblock-prs`           | lands the `merge-queued` pull requests one at a time, in the order they declare      |
+| `pr-report`             | reports every open pull request: merge order, required checks, how far behind        |
+| `claim-pr`              | claims a pull request `unblock-prs` set aside, so that nothing else touches it       |
+| `push-fixed-pr`         | pushes the fix to a pull request you claimed and hands it back to the queue          |
+| `report-unowned-prs`    | files an issue for each queued pull request that everyone is waiting on others for   |
+| `start-issue`           | labels an issue `in-progress` before work starts, refusing one someone is already on |
+| `run-unblock-prs-skill` | runs the `unblock-prs` skill without a person, on the Claude API, when it has work   |
 
 Each one prints its options with `--help`. How the queue reads a pull request
 (the labels, `Merge-After:`, stacks) and what `unblock-prs` does at each step
@@ -155,6 +156,72 @@ the skill cannot guess:
 This repository's
 [`.github/unblock-prs.md`](https://github.com/noshiro-pf/mono/blob/main/.github/unblock-prs.md)
 is an example.
+
+### Without a session, on the Claude API
+
+`/loop` needs a Claude Code session left open, and spends a turn of the model
+on every look at the queue. `run-unblock-prs-skill` runs the same skill from
+a terminal beside the worker, billed to an API key:
+
+```sh
+export ANTHROPIC_API_KEY=…     # a key of its own, in a workspace with a spend limit
+npx run-unblock-prs-skill --max-budget-usd 5 --dry-run --once  # what it would run
+npx run-unblock-prs-skill --max-budget-usd 5                   # run until Ctrl+C
+```
+
+It reads the queue the way step 1 of the skill does, with no model, and
+starts `claude -p` on the skill only when a pull request is the skill's and
+nobody has claimed it: one pull request per session, in the skill's order,
+the next as soon as one ends, and another look every 10 minutes
+(`--interval-min`) once there is none. It tells the session which pull
+request, the claimant to use, and a directory for its worktrees under
+`~/.local/state/unblock-prs`, where the worker puts its own.
+It files the pull requests nobody owns with `report-unowned-prs` itself. A
+pull request a session ended on without fixing — given up, out of budget,
+failed or stopped after spending — is not handed to another until its head
+or the reason it was set aside changes, so none is paid for twice as it
+stands; restarting the command tries it once more. A session whose result
+says it failed before spending anything is tried again on the next look
+(the first one failing that way stops the command, since the key is the
+likeliest cause); one that ended with no result counts as tried, since what
+it spent is unknown.
+
+- **It runs only on the API key.** It refuses to start without
+  `ANTHROPIC_API_KEY`. It leaves out of the session's environment what Claude
+  Code would use before the key: `ANTHROPIC_AUTH_TOKEN`,
+  `CLAUDE_CODE_OAUTH_TOKEN`, and the switches to Bedrock, Vertex and Foundry,
+  and blanks them in settings of its own as well, in case a settings file's
+  `env` sets one. It also stops the session at its first event if Claude
+  Code reports any other credential, or does not know the skill.
+- **`--max-budget-usd` is required.** It caps each session, which is one
+  pull request, and is passed to `claude --max-budget-usd`. At most three
+  sessions run on one pull request while the command runs — a fix that is
+  pushed and fails again starts another. After that it is not handed on
+  again until the command restarts; its log says so, and nothing else
+  does. `--model` picks the model.
+- **Nobody is asked anything, and nothing is approved.** The session runs
+  with `--permission-mode dontAsk`, may read and edit files and run any
+  `Bash`, and has the worker's token and the API key in its environment. It
+  reads text other people wrote — diffs, CI logs, comments — and acts on it
+  with no person in between. Its denial of `gh` and `git push` is a prefix
+  rule against a slip, not a boundary (`git -C <dir> push` passes it). What
+  bounds it is the token's permissions, the key's workspace spend limit, and
+  the machine it runs on: give it a token with no more than the worker
+  needs, a key of its own, and a machine or container with nothing else
+  worth reaching. Rules under `deny` in the repository's
+  `.claude/settings.json` still apply, once the folder has been trusted in an
+  interactive session; Claude Code ignores that file otherwise.
+- It needs what the session would: `claude` on `PATH`, the package
+  installed, the worker's token in `GH_TOKEN`, and the skill. It uses
+  `unblock-prs` when `.claude/skills/unblock-prs/` exists, and the plugin's
+  `pr-merge-queue:unblock-prs` otherwise; `--skill` names another.
+- Each session's cost and id are logged; `claude --resume <id>` opens it
+  afterwards. A SIGTERM is passed on to the running session; Ctrl+C reaches
+  it from the terminal. A
+  claim the session left standing, because it ran out of budget or was
+  stopped, is released when it ends — unless a second signal stops this
+  command at once, as it does the worker, when the claim lapses after two
+  hours instead.
 
 The plugin's version is the package's, so the skill matches the commands of
 the same version. When you update the package, update the plugin too:
