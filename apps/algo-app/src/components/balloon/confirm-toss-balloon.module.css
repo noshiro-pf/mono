@@ -1,0 +1,27 @@
+.balloon {
+  transform: translateY(-20px);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardAndMessage {
+  display: flex;
+  justify-content: space-around;
+}
+
+.message {
+  color: white;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.card {
+  display: flex;
+  flex-wrap: wrap;
+  margin: var(--card-margin);
+}

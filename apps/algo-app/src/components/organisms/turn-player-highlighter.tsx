@@ -1,39 +1,24 @@
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
+import type { InitializedObservable } from 'synstate';
+import { constant, view, type JSX } from 'synstate-dom';
 import type { Rect } from 'ts-utils-additional';
-import {
-  inTurnColor,
-  playerNameRectPadding,
-  zIndex,
-} from '../../constants/index.mjs';
+import { playerNameRectPadding } from '../../constants/index.mjs';
+import * as styles from './turn-player-highlighter.module.css';
 
 type Props = Readonly<{
-  position: Rect;
+  position: InitializedObservable<Rect>;
 }>;
 
-export const TurnPlayerHighlighter = memoNamed<Props>(
-  'TurnPlayerHighlighter',
-  ({ position }) => {
-    const style = useMemo(
-      () => ({
-        top: `${position.top - playerNameRectPadding}px`,
-        left: `${position.left - playerNameRectPadding}px`,
-        width: `${position.width + 2 * playerNameRectPadding}px`,
-        height: `${position.height + 2 * playerNameRectPadding}px`,
-      }),
-      [position.height, position.left, position.top, position.width],
-    );
-
-    return <Rectangle style={style} />;
-  },
+export const TurnPlayerHighlighter = ({ position }: Props): JSX.Element => (
+  <div
+    class={constant(styles.highlighter)}
+    style={{
+      top: view(position, (p) => `${p.top - playerNameRectPadding}px`),
+      left: view(position, (p) => `${p.left - playerNameRectPadding}px`),
+      width: view(position, (p) => `${p.width + 2 * playerNameRectPadding}px`),
+      height: view(
+        position,
+        (p) => `${p.height + 2 * playerNameRectPadding}px`,
+      ),
+    }}
+  />
 );
-
-const Rectangle = styled('div')`
-  position: absolute;
-  padding: 10px;
-  border-radius: 30px;
-  background-color: ${inTurnColor};
-  z-index: ${zIndex.playerNameHighlighter};
-  transition: all 0.6s ease 0s;
-`;

@@ -8,4 +8,3 @@ export * from './routes.mjs';
 export * from './text.mjs';
 export * from './time.mjs';
 export * from './view.mjs';
-export * from './z-index.mjs';

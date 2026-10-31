@@ -1,127 +1,84 @@
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
-import { Arr } from 'ts-data-forge';
-import type { FixedLengthTuple } from 'ts-type-forge';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, For, view, type Bindable, type JSX } from 'synstate-dom';
 import type { Rect, RectSize } from 'ts-utils-additional';
-import { zIndex } from '../../constants/index.mjs';
 import { cardToString } from '../../functions/index.mjs';
 import type {
   CardColor,
   CardNumber,
   CardWithDisplayValue,
 } from '../../types/index.mjs';
-import { CardComponent } from '../card/index.mjs';
+import {
+  CardComponent,
+  isSameCardDisplay,
+  toCardDisplay,
+} from '../card/index.mjs';
+import * as styles from './player-cards-area.module.css';
 
 type Props = Readonly<{
-  areaSize: RectSize;
-  cardSize: RectSize;
+  areaSize: InitializedObservable<RectSize>;
+  cardSize: InitializedObservable<RectSize>;
   rotate: 0 | 90 | 180 | 270;
-  cards: FixedLengthTuple<6, CardWithDisplayValue>;
+  cards: Bindable<readonly CardWithDisplayValue[]>;
   paddingPx: number;
-  windowSize: RectSize;
+  /** When to measure the cards again: whatever may have moved them. */
+  measureOn: InitializedObservable<unknown>;
   cardPositionsDispatcher: (
     action: readonly [CardColor, CardNumber, Rect],
   ) => void;
 }>;
 
-export const PlayerCardsArea = memoNamed(
-  'PlayerCardsArea',
-  ({
-    rotate,
-    areaSize,
-    cardSize,
-    cards,
-    paddingPx,
-    windowSize,
-    cardPositionsDispatcher,
-  }: Props) => {
-    const rotateStyle = useMemo<preact.CSSProperties>(() => {
-      const common = {
-        padding: `${paddingPx}px`,
-        transform: `rotate(${rotate}deg)`,
-        width: `${areaSize.width}px`,
-        height: `${areaSize.height}px`,
-        zIndex: zIndex.cards,
-      } as const;
+export const PlayerCardsArea = ({
+  rotate,
+  areaSize,
+  cardSize,
+  cards,
+  paddingPx,
+  measureOn,
+  cardPositionsDispatcher,
+}: Props): JSX.Element => {
+  // A side area is laid out as a row and turned a quarter, about its centre;
+  // this moves it back to where the grid cell is.
+  const isSide = rotate === 90 || rotate === 270;
 
-      switch (rotate) {
-        case 0:
-        case 180:
-          return {
-            ...common,
-            top: 0,
-            left: 0,
-          };
-        case 90:
-        case 270:
-          return {
-            ...common,
-            top: `${(areaSize.width - areaSize.height) / 2}px`,
-            left: `${-(areaSize.width - areaSize.height) / 2}px`,
-          };
-      }
-    }, [rotate, paddingPx, areaSize]);
-
-    const cardsWithConfig = useMemo<
-      FixedLengthTuple<
-        6,
-        CardWithDisplayValue &
-          Readonly<{
-            key: string;
-            onBoundingClientRectChange: (rect: Rect) => void;
-          }>
+  return (
+    <div class={constant(styles.area)}>
+      <div
+        class={constant(styles.rotate)}
+        style={{
+          padding: constant(`${paddingPx}px`),
+          transform: constant(`rotate(${rotate}deg)`),
+          width: view(areaSize, (s) => `${s.width}px`),
+          height: view(areaSize, (s) => `${s.height}px`),
+          top: isSide
+            ? view(areaSize, (s) => `${(s.width - s.height) / 2}px`)
+            : constant('0px'),
+          left: isSide
+            ? view(areaSize, (s) => `${-(s.width - s.height) / 2}px`)
+            : constant('0px'),
+        }}
       >
-    >(
-      // Not `pipe(cards).map(Arr.map(…))`: `fix:lint` rewrites that into
-      // `Arr.map`'s curried overload, which cannot infer the element type.
-      () =>
-        Arr.map(cards, (c: CardWithDisplayValue) => ({
-          ...c,
-          key: cardToString(c),
-          onBoundingClientRectChange: (rect: Rect) => {
-            cardPositionsDispatcher([c.color, c.number, rect]);
-          },
-        })),
-      [cards, cardPositionsDispatcher],
-    );
-
-    return (
-      <Container>
-        <RotateContainer style={rotateStyle}>
-          {cardsWithConfig.map((c) => (
+        <For items={cards} key={cardToString}>
+          {(card$) => (
             <CardComponent
-              key={c.key}
-              color={c.color}
-              float={c.float}
-              isClickable={c.isClickable}
-              number={c.number}
-              outlineColor={c.outlineColor}
-              showOutline={c.showOutline}
+              card={card$.pipe(
+                map(toCardDisplay, { equals: isSameCardDisplay }),
+              )}
+              rectReport={{
+                measureOn,
+                onBoundingClientRectChange: (rect) => {
+                  const c = card$.getSnapshot().value;
+
+                  cardPositionsDispatcher([c.color, c.number, rect]);
+                },
+              }}
               size={cardSize}
-              visibilityFromMe={c.visibilityFromMe}
-              windowSize={windowSize}
-              onBoundingClientRectChange={c.onBoundingClientRectChange}
-              onClick={c.onClick}
+              onClick={() => {
+                card$.getSnapshot().value.onClick();
+              }}
             />
-          ))}
-        </RotateContainer>
-      </Container>
-    );
-  },
-);
-
-const Container = styled('div')`
-  max-width: 100%;
-  max-height: 100%;
-  position: relative;
-`;
-
-const RotateContainer = styled('div')`
-  position: absolute;
-  top: -50%;
-  left: -50%;
-
-  display: flex;
-  justify-content: space-between;
-`;
+          )}
+        </For>
+      </div>
+    </div>
+  );
+};

@@ -1,0 +1,8 @@
+.highlighter {
+  position: absolute;
+  padding: 10px;
+  border-radius: 30px;
+  background-color: var(--in-turn-color);
+  z-index: var(--z-player-name-highlighter);
+  transition: all 0.6s ease 0s;
+}

@@ -80,11 +80,8 @@ graph LR
   ts_repo_utils["ts-repo-utils"]
   ts_std_forge["ts-std-forge"]
   ts_type_forge["ts-type-forge"]
-  algo_app --> better_preact_use_state
-  algo_app --> preact_utils
-  algo_app --> resize_observer_preact_hooks
   algo_app --> synstate
-  algo_app --> synstate_preact_hooks
+  algo_app --> synstate_dom
   algo_app --> tiny_router_observable
   algo_app --> ts_data_forge
   algo_app --> ts_fortress
@@ -327,7 +324,7 @@ graph LR
 
 | パッケージ                           | 種別 | 内部依存                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | :----------------------------------- | :--- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `algo-app`                           | dep  | `better-preact-use-state`&nbsp;`workspace:*`<br>`preact-utils`&nbsp;`workspace:*`<br>`resize-observer-preact-hooks`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-preact-hooks`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-utils-additional`&nbsp;`workspace:*`                                                                                                                                     |
+| `algo-app`                           | dep  | `synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-utils-additional`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                        |
 | `algo-app`                           | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `annotation-tool`                    | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-utils-additional`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                |
 | `annotation-tool`                    | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                   |

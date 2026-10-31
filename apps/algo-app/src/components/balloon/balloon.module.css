@@ -1,0 +1,70 @@
+.body {
+  position: absolute;
+  z-index: var(--z-balloon);
+  background-color: var(--balloon-color);
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.arrowS::before,
+.arrowN::before,
+.arrowW::before,
+.arrowE::before {
+  position: absolute;
+  content: '';
+}
+
+.arrowS::before,
+.arrowN::before {
+  border-right: 10px solid transparent;
+  border-left: 10px solid transparent;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.arrowW::before,
+.arrowE::before {
+  border-bottom: 10px solid transparent;
+  border-top: 10px solid transparent;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* 99% rather than 100%, so that no gap shows between arrow and body */
+
+.arrowS::before {
+  border-top: 10px solid var(--balloon-color);
+  top: 99%;
+}
+
+.arrowN::before {
+  border-bottom: 10px solid var(--balloon-color);
+  bottom: 99%;
+}
+
+.arrowW::before {
+  border-right: 10px solid var(--balloon-color);
+  right: 99%;
+}
+
+.arrowE::before {
+  border-left: 10px solid var(--balloon-color);
+  left: 99%;
+}
+
+.buttons {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.buttons > * {
+  margin: var(--card-margin);
+}
+
+.buttonsCenter {
+  justify-content: center;
+}
+
+.buttonsEnd {
+  justify-content: flex-end;
+}

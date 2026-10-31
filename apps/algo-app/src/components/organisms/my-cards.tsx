@@ -1,55 +1,51 @@
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
-import type { FixedLengthTuple } from 'ts-type-forge';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, For, view, type Bindable, type JSX } from 'synstate-dom';
 import type { RectSize } from 'ts-utils-additional';
 import { darkGray } from '../../constants/index.mjs';
 import { cardToString } from '../../functions/index.mjs';
 import type { Card } from '../../types/index.mjs';
-import { CardComponent } from '../card/index.mjs';
+import {
+  CardComponent,
+  faceUpCard,
+  isSameCardDisplay,
+} from '../card/index.mjs';
+import * as styles from './my-cards.module.css';
 
 type Props = Readonly<{
-  cards: FixedLengthTuple<6, Card>;
-  height: number;
+  cards: Bindable<readonly Card[]>;
+  height: InitializedObservable<number>;
 }>;
 
 const paddingPx = 2;
 
-export const MyCards = memoNamed<Props>('MyCards', ({ cards, height }) => {
-  const wrapperStyle = useMemo<preact.CSSProperties>(
-    () => ({
-      height: `${height}px`,
+export const MyCards = ({ cards, height }: Props): JSX.Element => {
+  const cardSize: InitializedObservable<RectSize> = height.pipe(
+    map((h) => {
+      const cardHeight = h - 4 * paddingPx;
+
+      return { width: (2 / 3) * cardHeight, height: cardHeight };
     }),
-    [height],
-  );
-
-  const cardHeight = useMemo<number>(() => height - 4 * paddingPx, [height]);
-
-  const cardSize = useMemo<RectSize>(
-    () => ({ width: (2 / 3) * cardHeight, height: cardHeight }),
-    [cardHeight],
   );
 
   return (
-    <Wrapper style={wrapperStyle}>
-      {cards.map((card) => (
-        <CardComponent
-          key={cardToString(card)}
-          color={card.color}
-          number={card.number}
-          size={cardSize}
-        />
-      ))}
-    </Wrapper>
+    <div
+      class={constant(styles.cards)}
+      style={{
+        height: view(height, (h) => `${h}px`),
+        'background-color': constant(darkGray),
+        '--my-cards-gap': constant(`${paddingPx}px`),
+      }}
+    >
+      <For items={cards} key={cardToString}>
+        {(card$) => (
+          <CardComponent
+            card={card$.pipe(
+              map((card) => faceUpCard(card), { equals: isSameCardDisplay }),
+            )}
+            size={cardSize}
+          />
+        )}
+      </For>
+    </div>
   );
-});
-
-const Wrapper = styled('div')`
-  display: flex;
-  background-color: ${darkGray};
-  padding: ${paddingPx}px;
-
-  & > * {
-    margin: ${paddingPx}px;
-  }
-`;
+};

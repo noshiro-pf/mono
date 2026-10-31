@@ -17,11 +17,7 @@ export const darkGray: DarkGray = 'rgb(60, 60, 60)';
 
 export const lightGray: LightGray = 'rgb(240, 240, 240)';
 
-export const inTurnColor = 'rgb(80, 158, 188)';
-
 export const eyeIconColorDef = {
   light: '#ABABAB',
   dark: '#4B4B4B',
 } as const;
-
-export const balloonColor: string = 'hsl(0, 0%, 30%)';

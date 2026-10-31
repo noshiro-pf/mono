@@ -1,6 +1,5 @@
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
+import { combine, map, type InitializedObservable } from 'synstate';
+import { constant, view, type JSX } from 'synstate-dom';
 import { Num, asPositiveFiniteNumber } from 'ts-data-forge';
 import type { Rect, RectSize } from 'ts-utils-additional';
 import { playerNameRectSize } from '../../constants/index.mjs';
@@ -12,11 +11,12 @@ import type {
 } from '../../types/index.mjs';
 import { PlayerCardsArea } from './player-cards-area.js';
 import { PlayerName } from './player-name.js';
+import * as styles from './table.module.css';
 
 type Props = Readonly<{
-  displayValues: DisplayValues;
-  tableSize: RectSize;
-  windowSize: Rect;
+  displayValues: InitializedObservable<DisplayValues>;
+  tableSize: InitializedObservable<RectSize>;
+  windowSize: InitializedObservable<Rect>;
   playerNamePositionsDispatcher: (action: readonly [NWES, Rect]) => void;
   cardPositionsDispatcher: (
     action: readonly [CardColor, CardNumber, Rect],
@@ -76,199 +76,103 @@ const containerPaddingPx = 7;
  *            = (2 * 225/145 + 6)w + 11pad
  * ```
  */
-export const Table = memoNamed(
-  'Table',
-  ({
-    tableSize,
-    displayValues,
-    windowSize,
-    playerNamePositionsDispatcher,
-    cardPositionsDispatcher,
-  }: Props) => {
-    const { areaSize, cardSize } = useMemo<
-      Readonly<{
-        areaSize: RectSize;
-        cardSize: RectSize;
-      }>
-    >(() => {
-      const innerRectWidth =
-        tableSize.width - 2 * (sidesWidth + containerPaddingPx); /* px */
+export const Table = ({
+  tableSize,
+  displayValues,
+  windowSize,
+  playerNamePositionsDispatcher,
+  cardPositionsDispatcher,
+}: Props): JSX.Element => {
+  const sizes = tableSize.pipe(map(sizesOf));
 
-      const r = asPositiveFiniteNumber(225 / 145);
+  const areaSize = sizes.pipe(map((s) => s.areaSize));
 
-      const w = Num.div(
-        innerRectWidth - 11 * paddingPx,
-        asPositiveFiniteNumber(2 * r + 6),
-      );
+  const cardSize = sizes.pipe(map((s) => s.cardSize));
 
-      const h = r * w;
+  // The cards and the names are measured again after every update of the
+  // window size or of what the table shows, rather than after a list of what
+  // can move them, which would go stale silently; `reportRectOn` reports only
+  // the rects that changed.
+  const measureOn = combine([windowSize, displayValues]);
 
-      const areaWidth = 6 * w + 7 * paddingPx;
-
-      const areaHeight = h + 2 * paddingPx;
-
-      return {
-        areaSize: { width: areaWidth, height: areaHeight },
-        cardSize: { width: w, height: h },
-      };
-    }, [tableSize]);
-
-    const tableStyle = useMemo<preact.CSSProperties>(
-      () => ({
-        width: `${tableSize.width}px`,
-        height: `${tableSize.height}px`,
-        gridTemplateRows: `${sidesWidth}px ${areaSize.height}px auto ${areaSize.height}px ${sidesWidth}px`,
-        gridTemplateColumns: `${sidesWidth}px ${areaSize.height}px auto ${areaSize.height}px ${sidesWidth}px`,
-        padding: `${containerPaddingPx}px`,
-      }),
-      [tableSize, areaSize],
-    );
-
-    // Built key by key rather than through `Object.fromEntries`, which erases
-    // the key types and leaves an index signature — so every read came back
-    // `| undefined` and had to be bracket-accessed.
-    const onBoundingClientRectChange = useMemo(() => {
-      const handlerFor =
-        (d: 'E' | 'N' | 'S' | 'W') =>
-        (rect: Readonly<DOMRect>): void => {
-          playerNamePositionsDispatcher([d, rect]);
-        };
-
-      return {
-        N: handlerFor('N'),
-        W: handlerFor('W'),
-        E: handlerFor('E'),
-        S: handlerFor('S'),
-      };
-    }, [playerNamePositionsDispatcher]);
-
-    return (
-      <Container style={tableStyle}>
-        <PlayerAreaS>
+  return (
+    <div
+      class={constant(styles.table)}
+      style={{
+        width: view(tableSize, (s) => `${s.width}px`),
+        height: view(tableSize, (s) => `${s.height}px`),
+        'grid-template-rows': view(areaSize, gridTrackSizes),
+        'grid-template-columns': view(areaSize, gridTrackSizes),
+        padding: constant(`${containerPaddingPx}px`),
+      }}
+    >
+      {seats.map(({ direction, rotate }) => (
+        <div style={{ 'grid-area': constant(direction) }}>
           <PlayerCardsArea
             areaSize={areaSize}
             cardPositionsDispatcher={cardPositionsDispatcher}
             cardSize={cardSize}
-            cards={displayValues.playerCards.S}
+            cards={view(displayValues, (v) => v.playerCards[direction])}
             paddingPx={paddingPx}
-            rotate={0}
-            windowSize={windowSize}
+            measureOn={measureOn}
+            rotate={rotate}
           />
-        </PlayerAreaS>
-        <PlayerAreaW>
-          <PlayerCardsArea
-            areaSize={areaSize}
-            cardPositionsDispatcher={cardPositionsDispatcher}
-            cardSize={cardSize}
-            cards={displayValues.playerCards.W}
-            paddingPx={paddingPx}
-            rotate={90}
-            windowSize={windowSize}
-          />
-        </PlayerAreaW>
-        <PlayerAreaN>
-          <PlayerCardsArea
-            areaSize={areaSize}
-            cardPositionsDispatcher={cardPositionsDispatcher}
-            cardSize={cardSize}
-            cards={displayValues.playerCards.N}
-            paddingPx={paddingPx}
-            rotate={180}
-            windowSize={windowSize}
-          />
-        </PlayerAreaN>
-        <PlayerAreaE>
-          <PlayerCardsArea
-            areaSize={areaSize}
-            cardPositionsDispatcher={cardPositionsDispatcher}
-            cardSize={cardSize}
-            cards={displayValues.playerCards.E}
-            paddingPx={paddingPx}
-            rotate={270}
-            windowSize={windowSize}
-          />
-        </PlayerAreaE>
-        <PlayerNameAreaS>
+        </div>
+      ))}
+      {seats.map(({ direction, rotate }) => (
+        <div style={{ 'grid-area': constant(direction.toLowerCase()) }}>
           <PlayerName
-            isInTurn={displayValues.turnPlayer === 'S'}
-            playerName={'Player S'}
-            rotate={0}
-            windowSize={windowSize}
-            onBoundingClientRectChange={onBoundingClientRectChange.S}
+            isInTurn={view(displayValues, (v) => v.turnPlayer === direction)}
+            measureOn={measureOn}
+            playerName={`Player ${direction}`}
+            rotate={rotate}
+            onBoundingClientRectChange={(rect) => {
+              playerNamePositionsDispatcher([direction, rect]);
+            }}
           />
-        </PlayerNameAreaS>
-        <PlayerNameAreaW>
-          <PlayerName
-            isInTurn={displayValues.turnPlayer === 'W'}
-            playerName={'Player W'}
-            rotate={90}
-            windowSize={windowSize}
-            onBoundingClientRectChange={onBoundingClientRectChange.W}
-          />
-        </PlayerNameAreaW>
-        <PlayerNameAreaN>
-          <PlayerName
-            isInTurn={displayValues.turnPlayer === 'N'}
-            playerName={'Player N'}
-            rotate={180}
-            windowSize={windowSize}
-            onBoundingClientRectChange={onBoundingClientRectChange.N}
-          />
-        </PlayerNameAreaN>
-        <PlayerNameAreaE>
-          <PlayerName
-            isInTurn={displayValues.turnPlayer === 'E'}
-            playerName={'Player E'}
-            rotate={270}
-            windowSize={windowSize}
-            onBoundingClientRectChange={onBoundingClientRectChange.E}
-          />
-        </PlayerNameAreaE>
-      </Container>
-    );
-  },
-);
+        </div>
+      ))}
+    </div>
+  );
+};
 
-const Container = styled('div')`
-  background-color: #c4c4c4;
-  border-radius: 20px;
-  display: grid;
-  grid-template:
-    '. . n . .'
-    '. . N . .'
-    'w W . E e'
-    '. . S . .'
-    '. . s . .';
-`;
+const seats = [
+  { direction: 'S', rotate: 0 },
+  { direction: 'W', rotate: 90 },
+  { direction: 'N', rotate: 180 },
+  { direction: 'E', rotate: 270 },
+] as const satisfies readonly Readonly<{
+  direction: NWES;
+  rotate: 0 | 90 | 180 | 270;
+}>[];
 
-const PlayerAreaS = styled('div')`
-  grid-area: S;
-`;
+const sizesOf = (
+  tableSize: RectSize,
+): Readonly<{
+  areaSize: RectSize;
+  cardSize: RectSize;
+}> => {
+  const innerRectWidth =
+    tableSize.width - 2 * (sidesWidth + containerPaddingPx); /* px */
 
-const PlayerAreaW = styled('div')`
-  grid-area: W;
-`;
+  const r = asPositiveFiniteNumber(225 / 145);
 
-const PlayerAreaN = styled('div')`
-  grid-area: N;
-`;
+  const w = Num.div(
+    innerRectWidth - 11 * paddingPx,
+    asPositiveFiniteNumber(2 * r + 6),
+  );
 
-const PlayerAreaE = styled('div')`
-  grid-area: E;
-`;
+  const h = r * w;
 
-const PlayerNameAreaS = styled('div')`
-  grid-area: s;
-`;
+  const areaWidth = 6 * w + 7 * paddingPx;
 
-const PlayerNameAreaW = styled('div')`
-  grid-area: w;
-`;
+  const areaHeight = h + 2 * paddingPx;
 
-const PlayerNameAreaN = styled('div')`
-  grid-area: n;
-`;
+  return {
+    areaSize: { width: areaWidth, height: areaHeight },
+    cardSize: { width: w, height: h },
+  };
+};
 
-const PlayerNameAreaE = styled('div')`
-  grid-area: e;
-`;
+const gridTrackSizes = (areaSize: RectSize): string =>
+  `${sidesWidth}px ${areaSize.height}px auto ${areaSize.height}px ${sidesWidth}px` as const;

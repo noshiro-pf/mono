@@ -1,0 +1,60 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.header,
+.footer {
+  flex: 0;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.endTurnButtonWrapper {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  width: 120px;
+  height: 60px;
+}
+
+.endTurnButton {
+  transition: background 0.3s ease 0s;
+  text-transform: uppercase;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+  border: 1px solid rgb(222, 222, 222);
+  color: rgb(255, 255, 255);
+  height: 60px;
+  width: 120px;
+  padding: 0px 15px;
+  top: 0px;
+  font-weight: 400;
+  font-size: 18px;
+  border-radius: 5px;
+  position: absolute;
+  background: rgb(60 60 60);
+  z-index: 1;
+  left: 0px;
+  cursor: pointer;
+}
+
+.endTurnButton:active {
+  transform: translate(5px, 5px);
+}
+
+.endTurnButton:disabled {
+  background: rgb(185 185 185);
+  cursor: not-allowed;
+}

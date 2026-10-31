@@ -1,0 +1,7 @@
+.wrapper {
+  display: block;
+  z-index: var(--z-cards);
+  position: relative;
+  transition-property: transform;
+  transition-duration: 0.3s;
+}

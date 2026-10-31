@@ -1,33 +1,54 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-  background-color: #f0f0f0;
-}
+/*
+ * 要素ごとの既定値と、コンポーネントをまたいで使う変数。layer に入れてあるので、
+ * layer の外にある各コンポーネントの CSS Modules が、読み込み順や詳細度に関係なく
+ * 常に勝つ。controls は components/bp/ の部品で、既定値の上、各コンポーネントの
+ * 下に来る。この順の宣言は、先に読まれたファイルのものが効くので、layer を使う
+ * ファイルすべてに同じものを置く。
+ */
+@layer defaults, controls;
 
-code {
-  font-family:
-    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
-}
+@layer defaults {
+  body {
+    margin: 0;
+    padding: 0;
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    background-color: #f0f0f0;
+  }
 
-* {
-  box-sizing: border-box;
+  code {
+    font-family:
+      source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  }
 
-  /* prevent capitalization of text caused by Material button */
-  text-transform: none;
+  * {
+    box-sizing: border-box;
 
-  user-select: none;
-}
+    /* prevent capitalization of text caused by Material button */
+    text-transform: none;
 
-a {
-  text-decoration: none;
-}
+    user-select: none;
+  }
 
-input[type='number'] {
-  text-align: right;
+  a {
+    text-decoration: none;
+  }
+
+  input[type='number'] {
+    text-align: right;
+  }
+
+  :root {
+    --z-player-name-highlighter: 2;
+    --z-cards: 3;
+    --z-player-name: 3;
+    --z-balloon: 4;
+    --balloon-color: hsl(0, 0%, 30%);
+    --in-turn-color: rgb(80, 158, 188);
+  }
 }

@@ -1,0 +1,45 @@
+/*
+ * 部品としての見た目。layer に入れてあるので、置き場所の側の CSS Modules
+ * （`.buttons > *` の余白など）が読み込み順に関係なく勝つ。layer の順は
+ * index.css と同じ宣言で揃える。
+ */
+@layer defaults, controls;
+
+@layer controls {
+  .spinner {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    overflow: visible;
+    vertical-align: middle;
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(1turn);
+    }
+  }
+
+  .animation {
+    animation: rotate 0.5s linear infinite;
+  }
+
+  .track,
+  .head {
+    fill-opacity: 0;
+  }
+
+  .track {
+    stroke: rgba(92, 112, 128, 0.2);
+  }
+
+  .head {
+    stroke: rgba(92, 112, 128, 0.8);
+    stroke-linecap: round;
+    transform-origin: center;
+    transition: stroke-dashoffset 0.2s cubic-bezier(0.4, 1, 0.75, 0.9);
+  }
+}

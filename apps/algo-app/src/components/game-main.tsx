@@ -1,6 +1,6 @@
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useObservableValue } from 'synstate-preact-hooks';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, MatchOptional, view, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { Rect } from 'ts-utils-additional';
 import { dictionary } from '../constants/index.mjs';
 import {
@@ -8,188 +8,104 @@ import {
   gameStateStore,
   positionStore,
 } from '../store/index.mjs';
-import type { DisplayValues } from '../types/index.mjs';
 import {
   ConfirmTossBalloon,
   DecidedAnswerBalloon,
   SelectAnswerBalloon,
 } from './balloon/index.mjs';
+import { gameLayoutOf } from './game-layout.mjs';
+import * as styles from './game-main.module.css';
 import {
   GameMessage,
   MyCards,
   Table,
   TurnPlayerHighlighter,
 } from './organisms/index.mjs';
-import { useWindowSize } from './use-window-size.mjs';
 
 type Props = Readonly<{
-  windowSize: Rect;
-  playerId: string;
-  replay: boolean;
-  observe: boolean;
+  windowSize: InitializedObservable<Rect>;
 }>;
 
-// `props` rather than a partial destructure: `check-destructuring-completeness`
-// requires every property to be named, and only `windowSize` is used here.
-export const GameMain = memoNamed<Props>('GameMain', (props) => {
-  const windowSize = props.windowSize;
+export const GameMain = ({ windowSize }: Props): JSX.Element => {
+  const layout = windowSize.pipe(map(gameLayoutOf));
 
-  const { tableSize, footerHeight, headerStyle, footerStyle } =
-    useWindowSize(windowSize);
-
-  const displayValues: DisplayValues = useObservableValue(
-    displayStore.displayValues,
-  );
-
-  const turnPlayerHighlighterPosition = useObservableValue(
-    displayStore.turnPlayerHighlighterPosition,
-  );
-
-  const confirmTossBalloonProps = useObservableValue(
-    displayStore.confirmTossBalloonProps,
-  );
-
-  const selectAnswerBalloonProps = useObservableValue(
-    displayStore.selectAnswerBalloonProps,
-  );
-
-  const decidedAnswerBalloonProps = useObservableValue(
-    displayStore.decidedAnswerBalloonProps,
-  );
+  const displayValues = displayStore.displayValues;
 
   return (
-    <Root>
-      <Header style={headerStyle}>
-        <GameMessage message={displayValues.gameMessage} />
-      </Header>
-      <Main>
+    <div class={constant(styles.root)}>
+      <div
+        class={constant(styles.header)}
+        style={{
+          'flex-basis': view(layout, (l) => `${l.headerHeight}px`),
+        }}
+      >
+        <GameMessage message={view(displayValues, (v) => v.gameMessage)} />
+      </div>
+      <div class={constant(styles.main)}>
         <Table
           cardPositionsDispatcher={positionStore.cardPositionsDispatcher}
           displayValues={displayValues}
           playerNamePositionsDispatcher={
             positionStore.playerNamePositionsDispatcher
           }
-          tableSize={tableSize}
+          tableSize={layout.pipe(map((l) => l.tableSize))}
           windowSize={windowSize}
         />
-      </Main>
-      <Footer style={footerStyle}>
-        <MyCards cards={displayValues.playerCards.S} height={footerHeight} />
-      </Footer>
+      </div>
+      <div
+        class={constant(styles.footer)}
+        style={{
+          'flex-basis': view(layout, (l) => `${l.footerHeight}px`),
+        }}
+      >
+        <MyCards
+          cards={view(displayValues, (v) => v.playerCards.S)}
+          height={layout.pipe(map((l) => l.footerHeight))}
+        />
+      </div>
 
-      <EndTurnButtonWrapper>
-        <EndTurnButton
-          disabled={displayValues.endTurnButtonDisabled}
-          type={'button'}
+      <div class={constant(styles.endTurnButtonWrapper)}>
+        <button
+          class={constant(styles.endTurnButton)}
+          disabled={view(displayValues, (v) => v.endTurnButtonDisabled)}
+          type={constant('button')}
           onClick={gameStateStore.onTurnEndClick}
         >
-          {dictionary.gameMain.endTurnButton}
-        </EndTurnButton>
-      </EndTurnButtonWrapper>
+          {constant(dictionary.gameMain.endTurnButton)}
+        </button>
+      </div>
 
-      {turnPlayerHighlighterPosition !== undefined ? (
-        <TurnPlayerHighlighter position={turnPlayerHighlighterPosition} />
-      ) : undefined}
+      <MatchOptional
+        some={(position) => <TurnPlayerHighlighter position={position} />}
+        value={view(
+          displayStore.turnPlayerHighlighterPosition,
+          Optional.fromNullable,
+        )}
+      />
 
-      {confirmTossBalloonProps !== undefined ? (
-        <ConfirmTossBalloon
-          anchorCardRect={confirmTossBalloonProps.anchorCardRect}
-          cancel={confirmTossBalloonProps.cancel}
-          card={confirmTossBalloonProps.card}
-          submit={confirmTossBalloonProps.submit}
-        />
-      ) : undefined}
+      <MatchOptional
+        some={(props) => <ConfirmTossBalloon props={props} />}
+        value={view(
+          displayStore.confirmTossBalloonProps,
+          Optional.fromNullable,
+        )}
+      />
 
-      {selectAnswerBalloonProps !== undefined ? (
-        <SelectAnswerBalloon
-          anchorCardRect={selectAnswerBalloonProps.anchorCardRect}
-          arrowDirection={selectAnswerBalloonProps.arrowDirection}
-          cardColor={selectAnswerBalloonProps.cardColor}
-          selectedNumber={selectAnswerBalloonProps.selectedNumber}
-          submitAnswer={selectAnswerBalloonProps.submitAnswer}
-          submitButtonIsDisabled={
-            selectAnswerBalloonProps.submitButtonIsDisabled
-          }
-          onCancelClick={selectAnswerBalloonProps.onCancelClick}
-          onSelectedNumberChange={
-            selectAnswerBalloonProps.onSelectedNumberChange
-          }
-        />
-      ) : undefined}
+      <MatchOptional
+        some={(props) => <SelectAnswerBalloon props={props} />}
+        value={view(
+          displayStore.selectAnswerBalloonProps,
+          Optional.fromNullable,
+        )}
+      />
 
-      {decidedAnswerBalloonProps !== undefined ? (
-        <DecidedAnswerBalloon
-          anchorCardRect={decidedAnswerBalloonProps.anchorCardRect}
-          arrowDirection={decidedAnswerBalloonProps.arrowDirection}
-          card={decidedAnswerBalloonProps.card}
-          showSymbol={decidedAnswerBalloonProps.showSymbol}
-        />
-      ) : undefined}
-    </Root>
+      <MatchOptional
+        some={(props) => <DecidedAnswerBalloon props={props} />}
+        value={view(
+          displayStore.decidedAnswerBalloonProps,
+          Optional.fromNullable,
+        )}
+      />
+    </div>
   );
-});
-
-const Root = styled('div')`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  position: relative;
-`;
-
-const Header = styled('div')`
-  flex: 0;
-`;
-
-const Main = styled('div')`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Footer = styled('div')`
-  flex: 0;
-`;
-
-const EndTurnButtonWrapper = styled('div')`
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-  width: 120px;
-  height: 60px;
-`;
-
-const EndTurnButton = styled('button')`
-  transition: background 0.3s ease 0s;
-  text-transform: uppercase;
-  font-family: 'Bebas Neue', sans-serif;
-  letter-spacing: 0.6px;
-  white-space: nowrap;
-  border: 1px solid rgb(222, 222, 222);
-  color: rgb(255, 255, 255);
-  height: 60px;
-  width: 120px;
-  padding: 0px 15px;
-  top: 0px;
-  font-weight: 400;
-  font-size: 18px;
-  border-radius: 5px;
-  position: absolute;
-  background: rgb(60 60 60);
-  z-index: 1;
-  left: 0px;
-
-  &:active {
-    transform: translate(5px, 5px);
-  }
-
-  cursor: pointer;
-
-  &:disabled {
-    background: rgb(185 185 185);
-    cursor: not-allowed;
-  }
-`;
+};

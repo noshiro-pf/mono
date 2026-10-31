@@ -1,0 +1,15 @@
+.balloon {
+  position: absolute;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.symbol {
+  position: absolute;
+  z-index: var(--z-balloon);
+  transition: opacity 0.3s ease;
+}

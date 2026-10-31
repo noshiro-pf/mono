@@ -1,102 +1,104 @@
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useEffect, useMemo } from 'preact/hooks';
-import { useResizeObserver } from 'resize-observer-preact-hooks';
-import { useObservableEffect, useObservableValue } from 'synstate-preact-hooks';
+import { createState, map, onScopeDispose } from 'synstate';
+import { constant, If, MatchOptional, view, type JSX } from 'synstate-dom';
+import { Arr, Optional } from 'ts-data-forge';
+import type { Rect } from 'ts-utils-additional';
 import {
-  dictionary,
   getParams,
   getRoomId,
   isMainPage,
   roomPage,
-  routes,
 } from '../constants/index.mjs';
 import { Router } from '../router.mjs';
 import { roomStore } from '../store/index.mjs';
-import { Button } from './bp/index.mjs';
 import { CreateRoomPage } from './create-room-page.js';
 import { GameMain } from './game-main.js';
 import { JoinRoomPage } from './join-room-page.js';
+import { NotFoundPage } from './not-found-page.js';
+import * as styles from './root.module.css';
+import { createAfterUpdate, subscribeInScope } from './scope-effects.mjs';
 
-const goToMain = (): void => {
-  Router.push(routes.main);
-};
-
-export const Root = memoNamed('Root', () => {
-  const [windowSize, ref] = useResizeObserver<HTMLDivElement>({
+export const Root = (): JSX.Element => {
+  const [windowSize, setWindowSize] = createState<Rect>({
     width: 1280,
     height: 720,
     top: 0,
     left: 0,
   });
 
-  const { pathname, searchParams: queryParams } = useObservableValue(
-    Router.state,
-  );
-
-  const showMain = useMemo(() => isMainPage(pathname), [pathname]);
-
-  const roomId = useMemo(
-    () => getRoomId(pathname, queryParams),
-    [pathname, queryParams],
-  );
-
-  const { playerId, replay, observe } = useMemo(
-    () => getParams(queryParams),
-    [queryParams],
-  );
-
-  useEffect(() => {
-    if (roomId !== undefined) {
-      roomStore.setRoomId(roomId);
+  const resizeObserver = new ResizeObserver((entries) => {
+    if (!Arr.isNonEmpty(entries)) {
+      return;
     }
-  }, [roomId]);
 
-  useEffect(() => {
-    if (playerId !== undefined) {
-      roomStore.setMyName(playerId);
+    const { width, height, top, left } = entries[0].contentRect;
+
+    setWindowSize({ width, height, top, left });
+  });
+
+  onScopeDispose(() => {
+    resizeObserver.disconnect();
+  });
+
+  const roomId = Router.state.pipe(
+    map(({ pathname, searchParams }) => getRoomId(pathname, searchParams)),
+  );
+
+  const playerId = Router.state.pipe(
+    map(({ searchParams }) => getParams(searchParams).playerId),
+  );
+
+  // The store and the router are written once the update that changed the
+  // value has finished, not from inside it.
+  const afterUpdate = createAfterUpdate();
+
+  subscribeInScope(roomId, (id) => {
+    if (id !== undefined) {
+      afterUpdate(() => {
+        roomStore.setRoomId(id);
+      });
     }
-  }, [playerId]);
+  });
 
-  useObservableEffect(roomStore.createRoom.response, (res) => {
-    Router.push(roomPage(res.id));
+  subscribeInScope(playerId, (id) => {
+    if (id !== undefined) {
+      afterUpdate(() => {
+        roomStore.setMyName(id);
+      });
+    }
+  });
+
+  subscribeInScope(roomStore.createRoom.response, (res) => {
+    afterUpdate(() => {
+      Router.push(roomPage(res.id));
+    });
   });
 
   return (
-    <div ref={ref} data-e2e={'root'} style={rootStyle}>
+    <div
+      ref={(el) => {
+        resizeObserver.observe(el);
+      }}
+      class={constant(styles.root)}
+      data-e2e={constant('root')}
+    >
       {/* simple routing */}
-      {showMain ? (
-        <CreateRoomPage />
-      ) : roomId !== undefined ? (
-        playerId === undefined ? (
-          <JoinRoomPage roomId={roomId} />
-        ) : (
-          <GameMain
-            observe={observe}
-            playerId={playerId}
-            replay={replay}
-            windowSize={windowSize}
+      <If
+        cond={view(Router.state, ({ pathname }) => isMainPage(pathname))}
+        else={
+          <MatchOptional
+            none={<NotFoundPage />}
+            some={(roomId$) => (
+              <MatchOptional
+                none={<JoinRoomPage roomId={roomId$} />}
+                some={() => <GameMain windowSize={windowSize} />}
+                value={view(playerId, Optional.fromNullable)}
+              />
+            )}
+            value={view(roomId, Optional.fromNullable)}
           />
-        )
-      ) : (
-        <NotFoundPage>
-          <h1>{dictionary.notFoundPage.title}</h1>
-          <div>
-            <Button onClick={goToMain}>
-              {dictionary.notFoundPage.backToMain}
-            </Button>
-          </div>
-        </NotFoundPage>
-      )}
+        }
+        then={<CreateRoomPage />}
+      />
     </div>
   );
-});
-
-const rootStyle = {
-  width: '100vw',
-  height: '100vh',
-} as const satisfies preact.CSSProperties;
-
-const NotFoundPage = styled('div')`
-  padding: 20px;
-`;
+};

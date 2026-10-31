@@ -1,0 +1,14 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cards > * {
+  margin: var(--card-margin);
+}

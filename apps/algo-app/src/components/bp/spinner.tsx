@@ -1,12 +1,10 @@
-import { keyframes, styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
+import { constant, type JSX } from 'synstate-dom';
 import { Num, asPositiveFiniteNumber } from 'ts-data-forge';
 import { spinnerSize } from './spinner-size.mjs';
+import * as styles from './spinner.module.css';
 
 type Props = Readonly<{
   size: number;
-  value?: number;
 }>;
 
 // see http://stackoverflow.com/a/18473154/3124288 for calculating arc path
@@ -37,101 +35,49 @@ const getViewBox = (strokeWidth: number): string => {
   return `${viewBoxX} ${viewBoxX} ${viewBoxWidth} ${viewBoxWidth}`;
 };
 
-export const Spinner = memoNamed<Props>('Spinner', ({ size: _size, value }) => {
+/**
+ * An indeterminate Blueprint spinner; the look and the rotation are
+ * `spinner.module.css`.
+ */
+export const Spinner = ({ size: _size }: Props): JSX.Element => {
   const size = asPositiveFiniteNumber(Math.max(MIN_SIZE, _size));
 
-  const strokeWidth = useMemo(
-    () =>
-      Math.min(
-        MIN_STROKE_WIDTH,
-        Num.div(STROKE_WIDTH * spinnerSize.LARGE, size),
-      ),
-    [size],
+  const strokeWidth = Math.min(
+    MIN_STROKE_WIDTH,
+    Num.div(STROKE_WIDTH * spinnerSize.LARGE, size),
   );
 
-  const strokeOffset =
-    PATH_LENGTH -
-    PATH_LENGTH * (value === undefined ? 0.25 : Num.clamp(value, 0, 1));
-
-  const viewBox = useMemo(() => getViewBox(strokeWidth), [strokeWidth]);
-
-  const animationStyle = useMemo(
-    () => ({
-      width: `${size}px`,
-      height: `${size}px`,
-    }),
-    [size],
-  );
+  // A quarter of the track, as Blueprint draws a spinner with no value.
+  const strokeOffset = PATH_LENGTH - PATH_LENGTH * 0.25;
 
   // multiple DOM elements around SVG are necessary to properly isolate animation:
   // - SVG elements in IE do not support anim/trans so they must be set on a parent HTML element.
   // - SPINNER_ANIMATION isolates svg from parent display and is always centered inside root element.
   return (
-    // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
-    <Root role={'progressbar'}>
-      <SpinnerAnimation style={animationStyle}>
+    <div class={constant(styles.spinner)} role={constant('progressbar')}>
+      <div
+        class={constant(styles.animation)}
+        style={{
+          width: constant(`${size}px`),
+          height: constant(`${size}px`),
+        }}
+      >
         <svg
-          height={size}
-          strokeWidth={strokeWidth.toFixed(2)}
-          viewBox={viewBox}
-          width={size}
+          height={constant(size)}
+          stroke-width={constant(strokeWidth.toFixed(2))}
+          viewBox={constant(getViewBox(strokeWidth))}
+          width={constant(size)}
         >
-          <SpinnerTrack d={SPINNER_TRACK} />
-          <SpinnerHead
-            d={SPINNER_TRACK}
-            pathLength={PATH_LENGTH}
-            strokeDasharray={`${PATH_LENGTH} ${PATH_LENGTH}`}
-            strokeDashoffset={strokeOffset}
+          <path class={constant(styles.track)} d={constant(SPINNER_TRACK)} />
+          <path
+            class={constant(styles.head)}
+            d={constant(SPINNER_TRACK)}
+            pathLength={constant(PATH_LENGTH)}
+            stroke-dasharray={constant(`${PATH_LENGTH} ${PATH_LENGTH}`)}
+            stroke-dashoffset={constant(strokeOffset)}
           />
         </svg>
-      </SpinnerAnimation>
-    </Root>
+      </div>
+    </div>
   );
-});
-
-const Root = styled('div')`
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  overflow: visible;
-  vertical-align: middle;
-`;
-
-const rotate = keyframes`
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(1turn);
-    transform: rotate(1turn);
-  }
-`;
-
-const SpinnerAnimation = styled('div')`
-  -webkit-animation: ${rotate} 0.5s linear infinite;
-  animation: ${rotate} 0.5s linear infinite;
-`;
-
-const SpinnerPath = styled('path')`
-  fill-opacity: 0;
-`;
-
-const SpinnerTrack = styled(SpinnerPath)`
-  stroke: rgba(92, 112, 128, 0.2);
-`;
-
-const SpinnerHead = styled(SpinnerPath)`
-  stroke: rgba(92, 112, 128, 0.8);
-  stroke-linecap: round;
-  -webkit-transform-origin: center;
-  transform-origin: center;
-  -webkit-transition: stroke-dashoffset 0.2s cubic-bezier(0.4, 1, 0.75, 0.9);
-  transition: stroke-dashoffset 0.2s cubic-bezier(0.4, 1, 0.75, 0.9);
-`;
+};
