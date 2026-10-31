@@ -2,5 +2,19 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": ["mcp__claude-code-remote__add_repo"]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/tools/scripts/cmd/claude-code-post-edit.mts\"; [ ! -f \"$f\" ] || node \"$f\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
   }
 }

@@ -484,6 +484,12 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
   },
   {
     directory: ROOT_DIRECTORY,
+    scriptName: 'check-changed',
+    // A human and session aid like `check-all`: it picks the commands a diff
+    // needs and runs those, every one of which CI runs through its own entry.
+  },
+  {
+    directory: ROOT_DIRECTORY,
     scriptName: 'verify:npm-packages:published:update',
     // Not a check — it rewrites the pins under `verify-npm-packages/published`
     // so that a release arrives as a diff. `pnpm-update.yml` runs it, and
