@@ -23,12 +23,14 @@ const tablePages: readonly string[] = [
 /**
  * Pages that may quote a benchmark figure without showing a table.
  *
- * None does now: the introduction and the landing page used to open with
- * "up to N× faster than Jotai", which is the first number a reader sees and
- * the last one anyone thinks to update, and now link to the benchmark summary
- * instead. They stay listed so that a marker written there again, in the
- * spelling the page's format allows (see `inlineMarkers`), is filled, and
+ * The introduction and the landing page used to open with "up to N× faster
+ * than Jotai", which is the first number a reader sees and the last one anyone
+ * thinks to update, and now link to the benchmark summary instead. They stay
+ * listed so that a marker written there again, in the spelling the page's
+ * format allows (see `inlineMarkers`), is filled, and
  * {@link assertEveryRatioMarked} fails on a ratio quoted there without one.
+ * The library comparison sums the benchmark up in a sentence, which names the
+ * library that leads each scenario through a marker for the same reason.
  */
 const quotingPages: readonly string[] = [
   path.resolve(
@@ -41,6 +43,14 @@ const quotingPages: readonly string[] = [
   ),
   path.resolve(workspaceRootPath, 'src/content/docs/index.mdx'),
   path.resolve(workspaceRootPath, 'src/content/docs/ja/index.mdx'),
+  path.resolve(
+    workspaceRootPath,
+    'src/content/docs/guides/library-comparison/library-comparison.md',
+  ),
+  path.resolve(
+    workspaceRootPath,
+    'src/content/docs/ja/guides/library-comparison/library-comparison.md',
+  ),
 ] as const;
 
 type EmbedTarget = Readonly<{

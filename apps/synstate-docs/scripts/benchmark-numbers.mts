@@ -171,6 +171,16 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       [medians(diamond, 'RxJS', 'SynState')],
       PASS_COST,
     ),
+    // "RxJS is among the fastest libraries in the single state, the derived
+    // chain and the diamond": level with the fastest of each, which it may be.
+    'compare/small-graphs/rxjs-rank': compared(
+      'RxJS against the fastest library in the single state, the derived chain and the diamond',
+      SMALL_GRAPHS.map(
+        (data) =>
+          [median(data, 'RxJS'), median(data, fastestRow(data))] as const,
+      ),
+      { level: { en: 'among the fastest libraries', ja: '最速の一角にいる' } },
+    ),
     'compare/small-graphs/preact-signals-overhead': compared(
       'Preact Signals against SynState in the single state, the derived chain and the diamond',
       SMALL_GRAPHS.map((data) => medians(data, 'Preact Signals', 'SynState')),
@@ -296,27 +306,42 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       at(cascadedDiamond, 'Jotai', CASCADED_MAX),
       at(cascadedDiamond, 'SynState', CASCADED_MAX),
     ),
-    'cascaded-diamond/redux@min-n': ms(
-      at(cascadedDiamond, 'Redux', CASCADED_MIN),
+    'cascaded-diamond/redux-start-median': ms(
+      endMedians(cascadedDiamond, 'Redux')[0],
     ),
-    'cascaded-diamond/redux@max-n': ms(
-      at(cascadedDiamond, 'Redux', CASCADED_MAX),
+    'cascaded-diamond/redux-end-median': ms(
+      endMedians(cascadedDiamond, 'Redux')[1],
     ),
-    'cascaded-diamond/redux-over-synstate@max-n': factor(
-      at(cascadedDiamond, 'Redux', CASCADED_MAX),
-      at(cascadedDiamond, 'SynState', CASCADED_MAX),
+    // The median over N rather than the ratio at N=20, where SynState's row
+    // is a few tenths of a millisecond and one point of it is noise.
+    'cascaded-diamond/redux-over-synstate-typical': factor(
+      medianRatio(reduxOverSynStateCascaded()),
+      1,
     ),
-    'cascaded-diamond/solid@min-n': ms(
-      at(cascadedDiamond, 'Solid', CASCADED_MIN),
+    'compare/cascaded-diamond/redux-trails': compared(
+      'Redux against SynState across the cascaded diamond',
+      [[medianRatio(reduxOverSynStateCascaded()), 1]],
+      sameFor(['above', 'far-above'], { en: 'trails', ja: 'より遅く' }),
     ),
-    'cascaded-diamond/solid@max-n': ms(
-      at(cascadedDiamond, 'Solid', CASCADED_MAX),
+    'cascaded-diamond/solid-start-median': ms(
+      endMedians(cascadedDiamond, 'Solid')[0],
     ),
-    'cascaded-diamond/preact-signals@min-n': ms(
-      at(cascadedDiamond, 'Preact Signals', CASCADED_MIN),
+    'cascaded-diamond/solid-end-median': ms(
+      endMedians(cascadedDiamond, 'Solid')[1],
     ),
-    'cascaded-diamond/preact-signals@max-n': ms(
-      at(cascadedDiamond, 'Preact Signals', CASCADED_MAX),
+    'cascaded-diamond/preact-signals-start-median': ms(
+      endMedians(cascadedDiamond, 'Preact Signals')[0],
+    ),
+    'cascaded-diamond/preact-signals-end-median': ms(
+      endMedians(cascadedDiamond, 'Preact Signals')[1],
+    ),
+    // The bound the sentence on Solid and Preact Signals states for every N:
+    // the slowest point of either row, rounded up, so it holds by
+    // construction.
+    'cascaded-diamond/solid-and-preact-signals-max': msAtLeast(
+      Math.max(
+        ...everyPoint(cascadedDiamond, 'Solid', 'Preact Signals').flat(),
+      ),
     ),
     'cascaded-diamond/mobx-over-synstate-typical': typicalFactor(
       'MobX against SynState in the cascaded diamond',
@@ -334,6 +359,15 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       cascadedDiamond,
       'Jotai',
       { grows: { en: 'grows', ja: '増えます' } },
+    ),
+    'compare/cascaded-diamond/redux-growth': rowTrend(
+      "Redux's cascaded diamond row",
+      cascadedDiamond,
+      'Redux',
+      {
+        flat: { en: 'stays nearly flat', ja: 'ほぼ横ばいです' },
+        grows: { en: 'grows', ja: '増えます' },
+      },
     ),
 
     // Scenario: Conditional Fan-Out
@@ -363,6 +397,27 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       at(conditionalFanOut, 'Redux', fanOutLastLabel()),
     ),
     'fan-out/jotai-slower-through-b': count(param(fanOutCrossoverLabel())),
+    // "Their cost is constant regardless of B" for the libraries whose
+    // subscriptions follow what is read, and the same of each alone in its
+    // analysis (see `rowTrend`).
+    'compare/fan-out/dynamic-rows-trend': rowsTrend(
+      'the MobX, Solid and Preact Signals fan-out rows',
+      conditionalFanOut,
+      DYNAMIC_SUBSCRIPTIONS,
+      { flat: { en: 'stay flat', ja: 'B に関係なく一定です' } },
+    ),
+    'compare/fan-out/mobx-trend': rowTrend(
+      "MobX's fan-out row",
+      conditionalFanOut,
+      'MobX',
+      { flat: { en: 'stays flat', ja: 'B に関係なく一定な' } },
+    ),
+    'compare/fan-out/solid-trend': rowTrend(
+      "Solid's fan-out row",
+      conditionalFanOut,
+      'Solid',
+      { flat: { en: 'stays flat', ja: 'B に関係なく一定です' } },
+    ),
 
     // Summary: the fastest library in each scenario and how far SynState is
     // from it, at the point of the sweep the summary table names. Derived
@@ -493,9 +548,13 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       ja: 'これはすでに誰も読まない分岐を持たない `switchMap` の形での数字です。残っているのは、どのノードにも届かない書き込みの SynState でのコストです',
     }),
     'summary/jotai-worst-explained': whileWorstIn('Jotai', FAN_OUT, {
-      en: 'where a write to a branch nobody reads costs MobX, Solid and Preact Signals almost nothing and Jotai a whole `store.set()`',
-      ja: '誰も読まない分岐への書き込みは MobX・Solid・Preact Signals にはほとんど何のコストもかかりませんが、Jotai には `store.set()` 1回分がまるごとかかります',
+      en: `where a write to a branch nobody reads costs MobX, Solid and Preact Signals ${fanOutWriteCostAtMost(DYNAMIC_SUBSCRIPTIONS)} or less and Jotai a whole \`store.set()\`, ${fanOutWriteCostAtLast('Jotai')}`,
+      ja: `誰も読まない分岐への書き込みは MobX・Solid・Preact Signals には ${fanOutWriteCostAtMost(DYNAMIC_SUBSCRIPTIONS)} 以下しかかかりませんが、Jotai には \`store.set()\` 1回分の ${fanOutWriteCostAtLast('Jotai')} がまるごとかかります`,
     }),
+
+    // Which library leads each summary row, grouped by library, for the pages
+    // that sum the benchmark up in a sentence.
+    'summary/fastest-by-scenario': fastestByScenario(),
 
     // Summary: for each library, the summary row where it is furthest from
     // that row's fastest library, among the rows that measured it. Which row
@@ -619,8 +678,6 @@ const DEEP_MID = 'K=500, M=100';
 /** The shallowest chain at the update count of {@link DEEP_MAX}. */
 const DEEP_SHALLOW = 'K=1000, M=50';
 
-const CASCADED_MIN = 'N=2';
-
 const CASCADED_MAX = 'N=20';
 
 const FAN_OUT_MIN = 'B=2';
@@ -630,6 +687,16 @@ const FAN_OUT_MIN = 'B=2';
  * the row that grows with $B$, which the fan-out prose quotes as such.
  */
 const SYNSTATE_NAIVE = 'SynState (naive derive)';
+
+/**
+ * The fan-out rows whose subscriptions follow what is read, so that a write to
+ * an inactive branch reaches nothing; the prose says their rows stay flat.
+ */
+const DYNAMIC_SUBSCRIPTIONS: readonly string[] = [
+  'MobX',
+  'Solid',
+  'Preact Signals',
+] as const;
 
 const row = (
   data: SeriesData,
@@ -643,51 +710,6 @@ const row = (
 
   return found;
 };
-
-const firstTimeoutLabel = (data: SeriesData, label: string): string => {
-  const index = row(data, label).values.indexOf(null);
-
-  const xLabel = index === -1 ? undefined : data.xLabels[index];
-
-  if (xLabel === undefined) {
-    throw new Error(`❌ ${label} never times out — the prose says it does`);
-  }
-
-  return xLabel;
-};
-
-/** Where RxJS first exceeds the timeout, and the last depth it survived. */
-const rxjsTimeoutLabel = (): string =>
-  firstTimeoutLabel(cascadedDiamond, 'RxJS');
-
-const lastMeasuredLabel = (data: SeriesData, label: string): string => {
-  const values = row(data, label).values;
-
-  const index = values.findLastIndex((v) => v !== null);
-
-  const xLabel = index === -1 ? undefined : data.xLabels[index];
-
-  if (xLabel === undefined) {
-    throw new Error(`❌ ${label} has no measurement that completed`);
-  }
-
-  return xLabel;
-};
-
-const rxjsLastLabel = (): string => lastMeasuredLabel(cascadedDiamond, 'RxJS');
-
-/**
- * The largest branch count SynState was measured at.
- *
- * Not the sweep's largest, which is what the prose used to name: SynState's
- * fan-out row is the one that grows with $B$, so it is the row the timeout
- * catches first, and on a machine slower than the one the committed tables
- * came from the last point is a timeout rather than a measurement. Read off
- * the data — as {@link rxjsLastLabel} is for the same reason — the sentence
- * quotes the largest branch count that was actually measured, and names it.
- */
-const fanOutLastLabel = (): string =>
-  lastMeasuredLabel(conditionalFanOut, SYNSTATE_NAIVE);
 
 /**
  * What the row holds at one point of the sweep: the measurement, or `null`
@@ -709,6 +731,529 @@ const valueAt = (
 
   return row(data, label).values[index] ?? null;
 };
+
+const divide = (numerator: number, denominator: number): number => {
+  if (!Num.isNonZero(denominator)) {
+    throw new Error('❌ cannot divide by zero');
+  }
+
+  return Num.div(numerator, denominator);
+};
+
+const nsPerUpdate = (totalMs: number, updateCount: number): number =>
+  divide(totalMs * NS_PER_MS, updateCount);
+
+/**
+ * Whether {@link factor} prints `value` with one decimal: below 10 once
+ * rounded to that decimal, the way `toFixed` rounds it, so that 9.96 prints as
+ * `10` rather than `10.0`.
+ */
+const inSingleDigits = (value: number): boolean =>
+  value < 10 && value.toFixed(1) !== '10.0';
+
+/** Digits in groups of three, as every number in the prose is written. */
+const count = (value: number): string => {
+  const digits = Math.round(value).toString();
+
+  const mut_groups: string[] = [];
+
+  let mut_rest = digits;
+
+  while (mut_rest.length > 3) {
+    mut_groups.unshift(mut_rest.slice(-3));
+
+    mut_rest = mut_rest.slice(0, -3);
+  }
+
+  mut_groups.unshift(mut_rest);
+
+  return mut_groups.join(',');
+};
+
+/**
+ * A ratio as the summary quotes it: one decimal below 10, where "3.6×" and
+ * "4×" say different things, and whole numbers above it, as {@link ratio}.
+ */
+const factor = (numerator: number, denominator: number): string => {
+  const value = divide(numerator, denominator);
+
+  return inSingleDigits(value) ? value.toFixed(1) : count(Math.round(value));
+};
+
+/**
+ * A per-update cost as the per-library table prints it, in nanoseconds,
+ * microseconds or milliseconds, whichever keeps the figure under 1,000, with
+ * a tenth below 10. Each bound is read off the rounded figure, so that 999.6 ns
+ * prints as `1.0 µs`, never `1000 ns`.
+ */
+const durationNs = (ns: number): string =>
+  Math.round(ns) < 1000
+    ? (`${factor(ns, 1)} ns` as const)
+    : Math.round(divide(ns, 1000)) < 1000
+      ? (`${factor(ns, 1000)} µs` as const)
+      : (`${factor(ns, NS_PER_MS)} ms` as const);
+
+const updates = (data: SeriesData | StatsData): number => {
+  const value = data.meta.updates;
+
+  if (value === null) {
+    throw new Error('❌ this scenario varies its update count per point');
+  }
+
+  return value;
+};
+
+/**
+ * The most a write to the inactive branch costs any of `labels` at any B of
+ * the fan-out, per update, as the per-library table prints a duration: the
+ * sentence quotes it as a bound ("16 ns or less"), so a point that timed out
+ * is an error rather than left out.
+ */
+const fanOutWriteCostAtMost = (labels: readonly string[]): string =>
+  durationNs(
+    Math.max(
+      ...labels.flatMap((label) =>
+        conditionalFanOut.xLabels.map((xLabel) => {
+          const value = valueAt(conditionalFanOut, label, xLabel);
+
+          if (value === null) {
+            throw new Error(
+              `❌ ${label} timed out at '${xLabel}' of the fan-out, so the sentence that bounds what a write to an unread branch costs it (summary/jotai-worst-explained) no longer holds — rewrite it against the tables`,
+            );
+          }
+
+          return nsPerUpdate(value, updates(conditionalFanOut));
+        }),
+      ),
+    ),
+  );
+
+const lastMeasuredLabel = (data: SeriesData, label: string): string => {
+  const values = row(data, label).values;
+
+  const index = values.findLastIndex((v) => v !== null);
+
+  const xLabel = index === -1 ? undefined : data.xLabels[index];
+
+  if (xLabel === undefined) {
+    throw new Error(`❌ ${label} has no measurement that completed`);
+  }
+
+  return xLabel;
+};
+
+/**
+ * The largest branch count SynState was measured at.
+ *
+ * Not the sweep's largest, which is what the prose used to name: SynState's
+ * fan-out row is the one that grows with $B$, so it is the row the timeout
+ * catches first, and on a machine slower than the one the committed tables
+ * came from the last point is a timeout rather than a measurement. Read off
+ * the data — as {@link rxjsLastLabel} is for the same reason — the sentence
+ * quotes the largest branch count that was actually measured, and names it.
+ */
+const fanOutLastLabel = (): string =>
+  lastMeasuredLabel(conditionalFanOut, SYNSTATE_NAIVE);
+
+const at = (data: SeriesData, label: string, xLabel: string): number => {
+  const value = valueAt(data, label, xLabel);
+
+  if (value === null) {
+    throw new Error(`❌ ${label} has no measurement at '${xLabel}'`);
+  }
+
+  return value;
+};
+
+/**
+ * What a write to the inactive branch costs `label` in the fan-out, per
+ * update, at the point the summary reads the scenario at: the figure the
+ * per-library table shows for a library whose worst row this is.
+ */
+const fanOutWriteCostAtLast = (label: string): string =>
+  durationNs(
+    nsPerUpdate(
+      at(conditionalFanOut, label, fanOutLastLabel()),
+      updates(conditionalFanOut),
+    ),
+  );
+
+/** "a", "a and b", "a, b and c". */
+const listed = (items: readonly string[]): string =>
+  Arr.isMaxLengthArray(1, items)
+    ? items.join('')
+    : (`${Arr.butLast(items).join(', ')} and ${items.at(-1) ?? ''}` as const);
+
+/**
+ * The fan-out row's name. Its point is the last one SynState's naive form
+ * finished — the row that grows with $B$, so the first to time out — which a
+ * slower machine can move, so the summary table's first column reads it from
+ * here too.
+ */
+const fanOutSummaryName = (): Localized =>
+  ({
+    en: `[Conditional fan-out](#scenario-conditional-fan-out) (${fanOutLastLabel()})`,
+    ja: `[条件付きファンアウト](#シナリオ-条件付きファンアウト)（${fanOutLastLabel()}）`,
+  }) as const;
+
+const median = (data: StatsData, label: string): number => {
+  const found = data.rows.find((r) => r.label === label);
+
+  if (found === undefined) {
+    throw new Error(`❌ '${label}' is not one of the measured libraries`);
+  }
+
+  return found.median;
+};
+
+/**
+ * The library with the smallest median in a single-point scenario, leaving out
+ * the libraries named in `excluded`.
+ */
+const fastestRow = (
+  data: StatsData,
+  excluded: readonly string[] = [],
+): string => {
+  const [first] = data.rows
+    .filter((r) => !excluded.includes(r.label))
+    .toSorted((a, b) => a.median - b.median);
+
+  if (first === undefined) {
+    throw new Error('❌ this scenario measured no library');
+  }
+
+  return first.label;
+};
+
+/** How many times the fastest library's median `label`'s median is. */
+const rowSpread = (data: StatsData, label: string): number =>
+  divide(median(data, label), median(data, fastestRow(data)));
+
+const statsScenario = (
+  name: Localized,
+  phrase: Localized,
+  data: StatsData,
+  markFastest: (label: string) => string = (label) => label,
+): SummaryScenario =>
+  ({
+    name,
+    phrase,
+    libraries: data.rows.map((r) => r.label),
+    fastest: () => markFastest(fastestRow(data)),
+    leader: () => fastestRow(data),
+    spread: (library) => rowSpread(data, library),
+    timedOut: () => false,
+    perUpdateNs: (library) => ({
+      library: nsPerUpdate(median(data, library), updates(data)),
+      fastest: nsPerUpdate(median(data, fastestRow(data)), updates(data)),
+    }),
+  }) as const;
+
+/**
+ * The library that completed `xLabel` fastest. A timeout is never the fastest,
+ * for the reason {@link aheadAt} gives.
+ */
+const fastestAt = (data: SeriesData, xLabel: string): string => {
+  const [first] = data.series
+    .map((s) => ({ label: s.label, value: valueAt(data, s.label, xLabel) }))
+    .filter(
+      (r): r is Readonly<{ label: string; value: number }> => r.value !== null,
+    )
+    .toSorted((a, b) => a.value - b.value);
+
+  if (first === undefined) {
+    throw new Error(`❌ no library completed '${xLabel}'`);
+  }
+
+  return first.label;
+};
+
+const timeout = (data: SeriesData): number => {
+  const value = data.meta.timeoutMs;
+
+  if (value === null) {
+    throw new Error('❌ this scenario has no timeout');
+  }
+
+  return value;
+};
+
+/**
+ * How many times the fastest library's time `label`'s time at `xLabel` is. A
+ * row that timed out counts as the timeout itself, which makes the figure a
+ * lower bound; {@link slowestSpreadText} says so where it quotes one.
+ */
+const pointSpread = (data: SeriesData, label: string, xLabel: string): number =>
+  divide(
+    valueAt(data, label, xLabel) ?? timeout(data),
+    at(data, fastestAt(data, xLabel), xLabel),
+  );
+
+/**
+ * The library a row's label names: `'SynState (switchMap)'` and
+ * `'RxJS (naive combineLatest)'` → `'SynState'`, `'RxJS'`.
+ */
+const libraryNameOf = (label: string): string =>
+  label.replace(/\s*\(.*\)$/u, '');
+
+/**
+ * A sweep read at one point. `forms` names, for a library measured in more
+ * than one form, the row the summary counts for it; that row stands for the
+ * library in `libraries`, since no row of such a library carries its bare name.
+ */
+const seriesScenario = (
+  name: Localized,
+  phrase: Localized,
+  data: SeriesData,
+  xLabel: string,
+  updatesAtPoint: number | undefined,
+  forms: ReadonlyRecord<string, string> = {},
+): SummaryScenario => {
+  const form = (library: string): string => forms[library] ?? library;
+
+  const libraryOf = (label: string): string =>
+    Object.entries(forms).find(([, formLabel]) => formLabel === label)?.[0] ??
+    label;
+
+  return {
+    name,
+    phrase,
+    libraries: data.series.map((s) => libraryOf(s.label)),
+    fastest: () => fastestAt(data, xLabel),
+    leader: () => libraryNameOf(fastestAt(data, xLabel)),
+    spread: (library) => pointSpread(data, form(library), xLabel),
+    timedOut: (library) => valueAt(data, form(library), xLabel) === null,
+    perUpdateNs: (library) => {
+      if (updatesAtPoint === undefined) {
+        return undefined;
+      }
+
+      const value = valueAt(data, form(library), xLabel);
+
+      return {
+        library: nsPerUpdate(value ?? timeout(data), updatesAtPoint),
+        fastest: nsPerUpdate(
+          at(data, fastestAt(data, xLabel), xLabel),
+          updatesAtPoint,
+        ),
+      };
+    },
+  };
+};
+
+/** The number in a column heading: `'N=16'` → `16`, `'B=1000'` → `1000`. */
+const param = (xLabel: string): number => {
+  const parsed = Num.safeParseInt(xLabel.split('=', 2)[1] ?? '');
+
+  if (Result.isErr(parsed)) {
+    throw new Error(`❌ no parameter value in the column heading '${xLabel}'`);
+  }
+
+  return parsed.value;
+};
+
+/**
+ * The update count of a deep chain point: `'K=1000, M=200'` → `1000`. The
+ * results record none for the sweep, as it varies by point.
+ */
+const deepChainUpdates = (xLabel: string): number => {
+  const kPart = xLabel
+    .split(',')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith('K='));
+
+  if (kPart === undefined) {
+    throw new Error(`❌ no update count K in the column heading '${xLabel}'`);
+  }
+
+  return param(kPart);
+};
+
+/**
+ * A library name, with the footnote mark the summary table explains when the
+ * library is one that glitches. Language-neutral, so one value serves both
+ * pages.
+ */
+const glitchMarked = (label: string): string =>
+  GLITCHING_LIBRARIES.includes(label) ? (`${label} ※1` as const) : label;
+
+/**
+ * The summary table's rows, in its order. A name is spelled as that table's
+ * first column spells it, the point of the sweep included.
+ */
+const summaryScenarios = (): readonly SummaryScenario[] =>
+  [
+    statsScenario(
+      {
+        en: '[Single state](#scenario-single-state)',
+        ja: '[単一ステート](#シナリオ-単一ステート)',
+      },
+      { en: 'the single state', ja: '単一ステート' },
+      singleState,
+    ),
+    statsScenario(
+      {
+        en: '[Derived chain](#scenario-derived-chain)',
+        ja: '[派生チェーン](#シナリオ-派生チェーン)',
+      },
+      { en: 'the derived chain', ja: '派生チェーン' },
+      derivedChain,
+    ),
+    statsScenario(
+      {
+        en: '[Diamond](#scenario-diamond-dependency)',
+        ja: '[ダイヤモンド](#シナリオ-ダイヤモンド依存関係)',
+      },
+      { en: 'the diamond', ja: 'ダイヤモンド' },
+      diamond,
+      glitchMarked,
+    ),
+    seriesScenario(
+      {
+        en: `[Deep chain](#scenario-deep-chain-throughput) (${DEEP_MAX})`,
+        ja: `[ディープチェーン](#シナリオ-ディープチェーンスループット)（${DEEP_MAX}）`,
+      },
+      {
+        en: `the deep chain (${DEEP_MAX})`,
+        ja: `ディープチェーン（${DEEP_MAX}）`,
+      },
+      deepChain,
+      DEEP_MAX,
+      deepChainUpdates(DEEP_MAX),
+    ),
+    seriesScenario(
+      {
+        en: `[Cascaded diamond](#scenario-cascaded-diamond) (${CASCADED_MAX})`,
+        ja: `[カスケードダイアモンド](#シナリオ-カスケードダイアモンド)（${CASCADED_MAX}）`,
+      },
+      {
+        en: `the cascaded diamond (${CASCADED_MAX})`,
+        ja: `カスケードダイアモンド（${CASCADED_MAX}）`,
+      },
+      cascadedDiamond,
+      CASCADED_MAX,
+      // Each measurement builds the graph as well as updating it, and makes
+      // only 100 updates, so the building is most of what it times.
+      undefined,
+    ),
+    seriesScenario(
+      fanOutSummaryName(),
+      {
+        en: `the conditional fan-out (${fanOutLastLabel()})`,
+        ja: `条件付きファンアウト（${fanOutLastLabel()}）`,
+      },
+      conditionalFanOut,
+      fanOutLastLabel(),
+      updates(conditionalFanOut),
+      FAN_OUT_SUMMARY_FORMS,
+    ),
+  ] as const;
+
+/**
+ * "RxJS is fastest in the single state, the derived chain and the diamond;
+ * Redux in the deep chain; …": the summary rows grouped by the library that
+ * leads them, in the summary's order, for a page that sums the benchmark up
+ * without its table. Read off the summary, so the sentence and the table name
+ * the same library for each row.
+ */
+const fastestByScenario = (): Localized => {
+  const led = summaryScenarios().map((s) => ({
+    leader: s.leader(),
+    phrase: s.phrase,
+  }));
+
+  const groups = Arr.uniq(led.map((l) => l.leader)).map((leader) => ({
+    leader,
+    phrases: led.filter((l) => l.leader === leader).map((l) => l.phrase),
+  }));
+
+  const [first, ...rest] = groups;
+
+  if (first === undefined) {
+    throw new Error('❌ the summary has no scenario');
+  }
+
+  // The sentence opens "No library is fastest on all of them".
+  if (!Arr.isNonEmpty(rest)) {
+    throw new Error(
+      `❌ ${first.leader} now leads every summary row: rewrite the sentence on the library comparison page that says no library does`,
+    );
+  }
+
+  const en = (phrases: readonly Localized[]): string =>
+    listed(phrases.map((p) => p.en));
+
+  const enRest = rest.map(
+    ({ leader, phrases }) => `${leader} in ${en(phrases)}`,
+  );
+
+  return {
+    en:
+      rest.length === 1
+        ? `${first.leader} is fastest in ${en(first.phrases)}, and ${enRest.join('')}`
+        : [
+            `${first.leader} is fastest in ${en(first.phrases)}`,
+            ...Arr.butLast(enRest),
+            ...Arr.takeLast(enRest, 1).map((last) => `and ${last}`),
+          ].join('; '),
+    ja: `${groups
+      .map(
+        ({ leader, phrases }) =>
+          `${phrases.map((p) => p.ja).join('・')}では ${leader}`,
+      )
+      .join('、')} が最速です`,
+  };
+};
+
+/**
+ * One library's measurement beside another's at every point of a sweep. A
+ * point either did not complete is an error rather than left out: a sentence
+ * about every point would otherwise skip the one where the two are furthest
+ * apart, and a median across the sweep would be taken over fewer points than
+ * it says.
+ */
+const everyPoint = (
+  data: SeriesData,
+  numerator: string,
+  denominator: string,
+): readonly FixedLengthTuple<2, number>[] =>
+  Arr.generate(function* () {
+    for (const xLabel of data.xLabels) {
+      const n = valueAt(data, numerator, xLabel);
+
+      const d = valueAt(data, denominator, xLabel);
+
+      if (n === null || d === null) {
+        throw new Error(
+          `❌ ${n === null ? numerator : denominator} did not complete '${xLabel}', so no sentence can compare it with ${n === null ? denominator : numerator} at every point`,
+        );
+      }
+
+      yield [n, d] as const;
+    }
+  });
+
+/** Redux against SynState at every point of the cascaded diamond. */
+const reduxOverSynStateCascaded = (): readonly FixedLengthTuple<2, number>[] =>
+  everyPoint(cascadedDiamond, 'Redux', 'SynState');
+
+const firstTimeoutLabel = (data: SeriesData, label: string): string => {
+  const index = row(data, label).values.indexOf(null);
+
+  const xLabel = index === -1 ? undefined : data.xLabels[index];
+
+  if (xLabel === undefined) {
+    throw new Error(`❌ ${label} never times out — the prose says it does`);
+  }
+
+  return xLabel;
+};
+
+/** Where RxJS first exceeds the timeout, and the last depth it survived. */
+const rxjsTimeoutLabel = (): string =>
+  firstTimeoutLabel(cascadedDiamond, 'RxJS');
+
+const rxjsLastLabel = (): string => lastMeasuredLabel(cascadedDiamond, 'RxJS');
 
 /**
  * Whether `label` completed the point faster than `rival` did. A point one of
@@ -750,58 +1295,34 @@ const lastAheadLabel = (
 const fanOutCrossoverLabel = (): string =>
   lastAheadLabel(conditionalFanOut, SYNSTATE_NAIVE, 'Jotai');
 
-/** Digits in groups of three, as every number in the prose is written. */
-const count = (value: number): string => {
-  const digits = Math.round(value).toString();
-
-  const mut_groups: string[] = [];
-
-  let mut_rest = digits;
-
-  while (mut_rest.length > 3) {
-    mut_groups.unshift(mut_rest.slice(-3));
-
-    mut_rest = mut_rest.slice(0, -3);
-  }
-
-  mut_groups.unshift(mut_rest);
-
-  return mut_groups.join(',');
-};
+/** Where {@link ms} stops printing a tenth of a millisecond. */
+const MS_TENTHS_BELOW = 100;
 
 /**
  * Renders a measurement the way the prose quotes one: a tenth of a millisecond
  * below 100 ms, and whole milliseconds above it, where the tenth is noise.
  */
 const ms = (value: number): string =>
-  value < 100
+  value < MS_TENTHS_BELOW
     ? (`${value.toFixed(1)} ms` as const)
     : (`${count(Math.round(value))} ms` as const);
 
 /**
- * Whether {@link factor} prints `value` with one decimal: below 10 once
- * rounded to that decimal, the way `toFixed` rounds it, so that 9.96 prints as
- * `10` rather than `10.0`.
+ * `value` as {@link ms} prints it, rounded up rather than to the nearest, for
+ * a bound the sentence states: "at or below 1.4 ms" of a row whose slowest
+ * point is 1.32 ms. Read through a fixed number of decimals first, so that
+ * `1.3 * 10` coming out as `13.000000000000002` does not round it up a step.
  */
-const inSingleDigits = (value: number): boolean =>
-  value < 10 && value.toFixed(1) !== '10.0';
+const msAtLeast = (value: number): string => {
+  const scale = value < MS_TENTHS_BELOW ? 10 : 1;
 
-const divide = (numerator: number, denominator: number): number => {
-  if (!Num.isNonZero(denominator)) {
-    throw new Error('❌ cannot divide by zero');
+  const scaled = Num.safeParseFloat((value * scale).toFixed(6));
+
+  if (Result.isErr(scaled)) {
+    throw new Error(`❌ cannot read back the measurement ${value.toString()}`);
   }
 
-  return Num.div(numerator, denominator);
-};
-
-/**
- * A ratio as the summary quotes it: one decimal below 10, where "3.6×" and
- * "4×" say different things, and whole numbers above it, as {@link ratio}.
- */
-const factor = (numerator: number, denominator: number): string => {
-  const value = divide(numerator, denominator);
-
-  return inSingleDigits(value) ? value.toFixed(1) : count(Math.round(value));
+  return ms(divide(Math.ceil(scaled.value), scale));
 };
 
 const ratio = (numerator: number, denominator: number): string =>
@@ -1106,14 +1627,21 @@ const typicalFactor = (
 
 const TYPICAL_AT_MOST = 10;
 
-const median = (data: StatsData, label: string): number => {
-  const found = data.rows.find((r) => r.label === label);
+/**
+ * The median of the `pairs`' ratios, for a sentence that quotes how two rows
+ * typically compare across a sweep without claiming the ratio stays put, as
+ * {@link typicalFactor} does.
+ */
+const medianRatio = (pairs: readonly FixedLengthTuple<2, number>[]): number => {
+  const value = medianOf(
+    pairs.map(([numerator, denominator]) => divide(numerator, denominator)),
+  );
 
-  if (found === undefined) {
-    throw new Error(`❌ '${label}' is not one of the measured libraries`);
+  if (value === undefined) {
+    throw new Error('❌ there are no pairs to take a median of');
   }
 
-  return found.median;
+  return value;
 };
 
 /** One library's median beside another's, as a pair for {@link compared}. */
@@ -1123,34 +1651,6 @@ const medians = (
   denominator: string,
 ): FixedLengthTuple<2, number> =>
   [median(data, numerator), median(data, denominator)] as const;
-
-/**
- * One library's measurement beside another's at every point of a sweep. A
- * point either did not complete is an error rather than left out: a sentence
- * about every point would otherwise skip the one where the two are furthest
- * apart, and a median across the sweep would be taken over fewer points than
- * it says.
- */
-const everyPoint = (
-  data: SeriesData,
-  numerator: string,
-  denominator: string,
-): readonly FixedLengthTuple<2, number>[] =>
-  Arr.generate(function* () {
-    for (const xLabel of data.xLabels) {
-      const n = valueAt(data, numerator, xLabel);
-
-      const d = valueAt(data, denominator, xLabel);
-
-      if (n === null || d === null) {
-        throw new Error(
-          `❌ ${n === null ? numerator : denominator} did not complete '${xLabel}', so no sentence can compare it with ${n === null ? denominator : numerator} at every point`,
-        );
-      }
-
-      yield [n, d] as const;
-    }
-  });
 
 /** "X is faster than SynState" — the subject's time over SynState's. */
 const SPEED = {
@@ -1261,9 +1761,45 @@ function sameFor(
   return Object.fromEntries(spans.map((span) => [span, words] as const));
 }
 
+/**
+ * The trend from `start` to `end` that `words` has wording for: flat within
+ * {@link FLAT_WITHIN}× either way, and a change within {@link EDGE_BAND} of
+ * that edge read on either side of it, as in {@link compared}.
+ */
+const trendBetween = (
+  sentence: string,
+  start: number,
+  end: number,
+  words: Partial<ReadonlyRecord<Trend, Localized>>,
+): Readonly<{ trend: Trend; wording: Localized }> => {
+  const change = divide(end, start);
+
+  const trendOf = (value: number): Trend =>
+    value > FLAT_WITHIN ? 'grows' : value * FLAT_WITHIN < 1 ? 'falls' : 'flat';
+
+  const found = [
+    trendOf(change),
+    trendOf(change * EDGE_BAND),
+    trendOf(divide(change, EDGE_BAND)),
+  ]
+    .map((candidate) => ({ trend: candidate, wording: words[candidate] }))
+    .find(
+      (c): c is Readonly<{ trend: Trend; wording: Localized }> =>
+        c.wording !== undefined,
+    );
+
+  if (found === undefined) {
+    throw new Error(
+      `❌ ${sentence}: it now ${trendOf(change)} (${factor(end, start)}× from start to end), which the sentence does not explain — rewrite it against the tables`,
+    );
+  }
+
+  return found;
+};
+
 /** A measurement as {@link ms} prints it, with the same rounding, as a number. */
 const shownMs = (value: number): number => {
-  if (value >= 100) {
+  if (value >= MS_TENTHS_BELOW) {
     return Math.round(value);
   }
 
@@ -1314,9 +1850,9 @@ const endMedians = (
  * {@link compared}. Each sentence has words for the trends its reasoning
  * explains; any other is an error naming it.
  *
- * The sentence quotes the two medians beside the word ({@link endMedians}),
- * not two single points, which would put back the noise the medians leave
- * out.
+ * Where the sentence quotes figures beside the word, they are the two medians
+ * ({@link endMedians}), not two single points, which would put back the noise
+ * the medians leave out.
  */
 const rowTrend = (
   sentence: string,
@@ -1326,29 +1862,7 @@ const rowTrend = (
 ): Localized => {
   const [start, end] = endMedians(data, label);
 
-  const change = divide(end, start);
-
-  const trendOf = (value: number): Trend =>
-    value > FLAT_WITHIN ? 'grows' : value * FLAT_WITHIN < 1 ? 'falls' : 'flat';
-
-  const found = [
-    trendOf(change),
-    trendOf(change * EDGE_BAND),
-    trendOf(divide(change, EDGE_BAND)),
-  ]
-    .map((candidate) => ({ trend: candidate, wording: words[candidate] }))
-    .find(
-      (c): c is Readonly<{ trend: Trend; wording: Localized }> =>
-        c.wording !== undefined,
-    );
-
-  if (found === undefined) {
-    throw new Error(
-      `❌ ${sentence}: the row now ${trendOf(change)} (${factor(end, start)}× from start to end), which the sentence does not explain — rewrite it against the tables`,
-    );
-  }
-
-  const { trend, wording } = found;
+  const { trend, wording } = trendBetween(sentence, start, end, words);
 
   // The two medians, as `ms` prints them: a flat row must not show them
   // further apart than a flat row may be, nor a growing one show the later
@@ -1371,6 +1885,33 @@ const rowTrend = (
   }
 
   return wording;
+};
+
+/**
+ * {@link rowTrend} for each of `labels`, for a sentence that says the same of
+ * all of them: each row has to be in a trend `words` has wording for, and
+ * they have to share it.
+ */
+const rowsTrend = (
+  sentence: string,
+  data: SeriesData,
+  labels: readonly string[],
+  words: Partial<ReadonlyRecord<Trend, Localized>>,
+): Localized => {
+  const [only, ...others] = labels.map((label) =>
+    rowTrend(`${sentence} (${label})`, data, label, words),
+  );
+
+  if (
+    only === undefined ||
+    others.some((other) => other.en !== only.en || other.ja !== only.ja)
+  ) {
+    throw new Error(
+      `❌ ${sentence}: the rows no longer share one trend, which the sentence says of them all — rewrite it against the tables`,
+    );
+  }
+
+  return only;
 };
 
 type Trend = 'falls' | 'flat' | 'grows';
@@ -1401,65 +1942,6 @@ const floored = (
   );
 
 const NOISE_FLOOR_MS = 1.5;
-
-/** The number in a column heading: `'N=16'` → `16`, `'B=1000'` → `1000`. */
-const param = (xLabel: string): number => {
-  const parsed = Num.safeParseInt(xLabel.split('=', 2)[1] ?? '');
-
-  if (Result.isErr(parsed)) {
-    throw new Error(`❌ no parameter value in the column heading '${xLabel}'`);
-  }
-
-  return parsed.value;
-};
-
-const at = (data: SeriesData, label: string, xLabel: string): number => {
-  const value = valueAt(data, label, xLabel);
-
-  if (value === null) {
-    throw new Error(`❌ ${label} has no measurement at '${xLabel}'`);
-  }
-
-  return value;
-};
-
-/**
- * The library with the smallest median in a single-point scenario, leaving out
- * the libraries named in `excluded`.
- */
-const fastestRow = (
-  data: StatsData,
-  excluded: readonly string[] = [],
-): string => {
-  const [first] = data.rows
-    .filter((r) => !excluded.includes(r.label))
-    .toSorted((a, b) => a.median - b.median);
-
-  if (first === undefined) {
-    throw new Error('❌ this scenario measured no library');
-  }
-
-  return first.label;
-};
-
-/**
- * The library that completed `xLabel` fastest. A timeout is never the fastest,
- * for the reason {@link aheadAt} gives.
- */
-const fastestAt = (data: SeriesData, xLabel: string): string => {
-  const [first] = data.series
-    .map((s) => ({ label: s.label, value: valueAt(data, s.label, xLabel) }))
-    .filter(
-      (r): r is Readonly<{ label: string; value: number }> => r.value !== null,
-    )
-    .toSorted((a, b) => a.value - b.value);
-
-  if (first === undefined) {
-    throw new Error(`❌ no library completed '${xLabel}'`);
-  }
-
-  return first.label;
-};
 
 /**
  * The library with the largest median in a single-point scenario.
@@ -1499,31 +1981,6 @@ const slowestAt = (
   return first.label;
 };
 
-/** How many times the fastest library's median `label`'s median is. */
-const rowSpread = (data: StatsData, label: string): number =>
-  divide(median(data, label), median(data, fastestRow(data)));
-
-const timeout = (data: SeriesData): number => {
-  const value = data.meta.timeoutMs;
-
-  if (value === null) {
-    throw new Error('❌ this scenario has no timeout');
-  }
-
-  return value;
-};
-
-/**
- * How many times the fastest library's time `label`'s time at `xLabel` is. A
- * row that timed out counts as the timeout itself, which makes the figure a
- * lower bound; {@link slowestSpreadText} says so where it quotes one.
- */
-const pointSpread = (data: SeriesData, label: string, xLabel: string): number =>
-  divide(
-    valueAt(data, label, xLabel) ?? timeout(data),
-    at(data, fastestAt(data, xLabel), xLabel),
-  );
-
 /** `figure`, marked `>` where it is a lower bound. */
 const lowerBoundMarked = (figure: string, isLowerBound: boolean): string =>
   isLowerBound
@@ -1561,172 +2018,6 @@ const slowestSpreadText = (
 const fanOutSummaryExcluded = (): readonly string[] =>
   conditionalFanOut.series.map((s) => s.label).filter(isNaiveForm);
 
-/**
- * The fan-out row's name. Its point is the last one SynState's naive form
- * finished — the row that grows with $B$, so the first to time out — which a
- * slower machine can move, so the summary table's first column reads it from
- * here too.
- */
-const fanOutSummaryName = (): Localized =>
-  ({
-    en: `[Conditional fan-out](#scenario-conditional-fan-out) (${fanOutLastLabel()})`,
-    ja: `[条件付きファンアウト](#シナリオ-条件付きファンアウト)（${fanOutLastLabel()}）`,
-  }) as const;
-
-const nsPerUpdate = (totalMs: number, updateCount: number): number =>
-  divide(totalMs * NS_PER_MS, updateCount);
-
-const updates = (data: SeriesData | StatsData): number => {
-  const value = data.meta.updates;
-
-  if (value === null) {
-    throw new Error('❌ this scenario varies its update count per point');
-  }
-
-  return value;
-};
-
-const statsScenario = (
-  name: Localized,
-  data: StatsData,
-  markFastest: (label: string) => string = (label) => label,
-): SummaryScenario =>
-  ({
-    name,
-    libraries: data.rows.map((r) => r.label),
-    fastest: () => markFastest(fastestRow(data)),
-    spread: (library) => rowSpread(data, library),
-    timedOut: () => false,
-    perUpdateNs: (library) => ({
-      library: nsPerUpdate(median(data, library), updates(data)),
-      fastest: nsPerUpdate(median(data, fastestRow(data)), updates(data)),
-    }),
-  }) as const;
-
-/**
- * A sweep read at one point. `forms` names, for a library measured in more
- * than one form, the row the summary counts for it; that row stands for the
- * library in `libraries`, since no row of such a library carries its bare name.
- */
-const seriesScenario = (
-  name: Localized,
-  data: SeriesData,
-  xLabel: string,
-  updatesAtPoint: number | undefined,
-  forms: ReadonlyRecord<string, string> = {},
-): SummaryScenario => {
-  const form = (library: string): string => forms[library] ?? library;
-
-  const libraryOf = (label: string): string =>
-    Object.entries(forms).find(([, formLabel]) => formLabel === label)?.[0] ??
-    label;
-
-  return {
-    name,
-    libraries: data.series.map((s) => libraryOf(s.label)),
-    fastest: () => fastestAt(data, xLabel),
-    spread: (library) => pointSpread(data, form(library), xLabel),
-    timedOut: (library) => valueAt(data, form(library), xLabel) === null,
-    perUpdateNs: (library) => {
-      if (updatesAtPoint === undefined) {
-        return undefined;
-      }
-
-      const value = valueAt(data, form(library), xLabel);
-
-      return {
-        library: nsPerUpdate(value ?? timeout(data), updatesAtPoint),
-        fastest: nsPerUpdate(
-          at(data, fastestAt(data, xLabel), xLabel),
-          updatesAtPoint,
-        ),
-      };
-    },
-  };
-};
-
-/**
- * The update count of a deep chain point: `'K=1000, M=200'` → `1000`. The
- * results record none for the sweep, as it varies by point.
- */
-const deepChainUpdates = (xLabel: string): number => {
-  const kPart = xLabel
-    .split(',')
-    .map((part) => part.trim())
-    .find((part) => part.startsWith('K='));
-
-  if (kPart === undefined) {
-    throw new Error(`❌ no update count K in the column heading '${xLabel}'`);
-  }
-
-  return param(kPart);
-};
-
-/**
- * A library name, with the footnote mark the summary table explains when the
- * library is one that glitches. Language-neutral, so one value serves both
- * pages.
- */
-const glitchMarked = (label: string): string =>
-  GLITCHING_LIBRARIES.includes(label) ? (`${label} ※1` as const) : label;
-
-/**
- * The summary table's rows, in its order. A name is spelled as that table's
- * first column spells it, the point of the sweep included.
- */
-const summaryScenarios = (): readonly SummaryScenario[] =>
-  [
-    statsScenario(
-      {
-        en: '[Single state](#scenario-single-state)',
-        ja: '[単一ステート](#シナリオ-単一ステート)',
-      },
-      singleState,
-    ),
-    statsScenario(
-      {
-        en: '[Derived chain](#scenario-derived-chain)',
-        ja: '[派生チェーン](#シナリオ-派生チェーン)',
-      },
-      derivedChain,
-    ),
-    statsScenario(
-      {
-        en: '[Diamond](#scenario-diamond-dependency)',
-        ja: '[ダイヤモンド](#シナリオ-ダイヤモンド依存関係)',
-      },
-      diamond,
-      glitchMarked,
-    ),
-    seriesScenario(
-      {
-        en: `[Deep chain](#scenario-deep-chain-throughput) (${DEEP_MAX})`,
-        ja: `[ディープチェーン](#シナリオ-ディープチェーンスループット)（${DEEP_MAX}）`,
-      },
-      deepChain,
-      DEEP_MAX,
-      deepChainUpdates(DEEP_MAX),
-    ),
-    seriesScenario(
-      {
-        en: `[Cascaded diamond](#scenario-cascaded-diamond) (${CASCADED_MAX})`,
-        ja: `[カスケードダイアモンド](#シナリオ-カスケードダイアモンド)（${CASCADED_MAX}）`,
-      },
-      cascadedDiamond,
-      CASCADED_MAX,
-      // Each measurement builds the graph as well as updating it, and makes
-      // only 100 updates, so the building is most of what it times.
-      undefined,
-    ),
-    seriesScenario(
-      fanOutSummaryName(),
-      conditionalFanOut,
-      fanOutLastLabel(),
-      updates(conditionalFanOut),
-      FAN_OUT_SUMMARY_FORMS,
-    ),
-  ] as const;
-
 /** SynState's distance from the fastest in each row of the summary table. */
 const summarySynStateSpreads = (): readonly number[] =>
   summaryScenarios().map((s) => s.spread('SynState'));
@@ -1738,9 +2029,17 @@ const summarySynStateSpreads = (): readonly number[] =>
  */
 type SummaryScenario = Readonly<{
   name: Localized;
+  /** How a sentence names the scenario: "the single state". */
+  phrase: Localized;
   /** The labels of the rows the scenario measured. */
   libraries: readonly string[];
+  /** The fastest row's label, with the summary's footnote mark if any. */
   fastest: () => string;
+  /**
+   * The library that leads, unmarked: for a library measured in more than
+   * one form, naive ones included, its name rather than the form's label.
+   */
+  leader: () => string;
   spread: (library: string) => number;
   timedOut: (library: string) => boolean;
   /**
@@ -1756,19 +2055,6 @@ type PerUpdateNs = Readonly<{ library: number; fastest: number }>;
 
 /** A library's worst summary row, from {@link worstSummaryRow}. */
 type WorstRow = Readonly<{ scenario: SummaryScenario; spread: number }>;
-
-/**
- * A per-update cost as the per-library table prints it, in nanoseconds,
- * microseconds or milliseconds, whichever keeps the figure under 1,000, with
- * a tenth below 10. Each bound is read off the rounded figure, so that 999.6 ns
- * prints as `1.0 µs`, never `1000 ns`.
- */
-const durationNs = (ns: number): string =>
-  Math.round(ns) < 1000
-    ? (`${factor(ns, 1)} ns` as const)
-    : Math.round(divide(ns, 1000)) < 1000
-      ? (`${factor(ns, 1000)} µs` as const)
-      : (`${factor(ns, NS_PER_MS)} ms` as const);
 
 /**
  * The fan-out row the summary counts for a library measured both ways: the
