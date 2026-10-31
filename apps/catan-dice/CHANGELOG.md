@@ -1,5 +1,15 @@
 # catan-dice
 
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies [e2f3fda]
+    - synstate@6.1.1
+    - react-utils@0.0.22
+    - synstate-react-hooks@6.1.1
+    - ts-data-forge@14.10.0
+
 ## 0.0.19
 
 ### Patch Changes

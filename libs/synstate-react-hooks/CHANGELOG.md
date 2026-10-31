@@ -1,5 +1,12 @@
 # synstate-react-hooks
 
+## 6.1.1
+
+### Patch Changes
+
+- Updated dependencies [e2f3fda]
+    - synstate@6.1.1
+
 ## 6.1.0
 
 ### Minor Changes

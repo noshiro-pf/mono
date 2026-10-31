@@ -1,6 +1,6 @@
 {
   "name": "task-manager",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "private": true,
   "description": "Task manager with a dependency DAG between tasks and milestones",
   "repository": {

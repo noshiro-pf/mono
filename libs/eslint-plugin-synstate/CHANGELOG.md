@@ -1,5 +1,12 @@
 # eslint-plugin-synstate
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies [2d09754]
+    - eslint-rule-forge@0.4.0
+
 ## 0.4.1
 
 ### Patch Changes
