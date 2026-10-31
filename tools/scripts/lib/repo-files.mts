@@ -153,6 +153,31 @@ export type Tree = Readonly<{
   directories: ReadonlySet<string>;
 }>;
 
+/**
+ * The extensions of the files whose text a person writes and a reader sees —
+ * documents, code and its comments, configuration, and the markup of the sites'
+ * components. Everything else is binary or generated.
+ */
+export const TEXT_EXTENSIONS: ReadonlySet<string> = new Set<string>([
+  '.astro',
+  '.css',
+  '.cts',
+  '.html',
+  '.js',
+  '.json',
+  '.jsonc',
+  '.jsx',
+  '.md',
+  '.mdx',
+  '.mjs',
+  '.mts',
+  '.ts',
+  '.tsx',
+  '.txt',
+  '.yaml',
+  '.yml',
+]);
+
 const PROSE_EXTENSIONS: ReadonlySet<string> = new Set<string>(['.md', '.mdx']);
 
 /** A directory whose documents are records. */

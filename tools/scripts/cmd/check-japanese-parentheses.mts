@@ -3,7 +3,11 @@ import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { FixedLengthTuple } from 'ts-type-forge';
-import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
+import {
+  listTrackedFiles,
+  readRepositoryFile,
+  TEXT_EXTENSIONS,
+} from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -267,26 +271,6 @@ const FENCE_MARKER = /^\s{0,3}(?<marker>`{3,}|~{3,})/u;
  */
 const MAX_REWRITE_PASSES = 3;
 
-/** The extensions worth reading. Everything else is binary or generated. */
-const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set<string>([
-  '.css',
-  '.cts',
-  '.html',
-  '.js',
-  '.json',
-  '.jsonc',
-  '.jsx',
-  '.md',
-  '.mdx',
-  '.mjs',
-  '.mts',
-  '.ts',
-  '.tsx',
-  '.txt',
-  '.yaml',
-  '.yml',
-]);
-
 const MARKDOWN_EXTENSIONS: ReadonlySet<string> = new Set<string>([
   '.md',
   '.mdx',
@@ -332,7 +316,7 @@ const IGNORED_PATHS: ReadonlySet<string> = new Set<string>([
 ]);
 
 const isScanned = (relativePath: string): boolean =>
-  SCANNED_EXTENSIONS.has(path.extname(relativePath)) &&
+  TEXT_EXTENSIONS.has(path.extname(relativePath)) &&
   !IGNORED_PATHS.has(relativePath) &&
   IGNORED_PREFIXES.every((prefix) => !relativePath.startsWith(prefix)) &&
   !IGNORED_PATTERN.test(relativePath);
