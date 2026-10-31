@@ -1,6 +1,6 @@
 ---
 title: Signals の上の operator
-description: SynState の operator を Preact Signals のような signal ライブラリの上に作らない理由 — effect で書いた operator が失うものを、試せる 2 つのデモで示します。
+description: SynState の operator を Preact Signals のような signal ライブラリの上に作らない理由 — effect で書いた operator が失うものを試せる 2 つのデモで示し、SynState だけで UI まで作る synstate-dom を紹介します。
 sidebar:
     order: 7
 ---
@@ -220,6 +220,12 @@ effect で書いた operator をグリッチフリーにするには、それぞ
 
 また effect は読んだものすべてを購読し、書いたものを誰かが読むかどうかに関わらず、変化のたびに再実行されます。そのため effect で書いた operator より下のグラフは SynState と同じく先行評価になり、ベンチマークで Preact Signals を速くしている遅延評価の `computed` と依存の追跡は、`computed` の部分にしか効きません。
 
-## 両方を使う
+## operator ではなくモデル
 
-両者は境界で組み合わせるのが合っています。`synstate-preact-signals` は Observable を Preact の signal に（`toSignal`）、signal を Observable に（`fromSignal`）変換するので、`debounce`、`switchMap`、リクエストといったパイプラインを SynState で書き、DOM への束縛を Preact Signals に任せられます。[Preact Signals のデモ](/mono/synstate/ja/preact-signals/demo/)を参照してください。
+どの読み手も整合したグラフを見ること、1 回の発行が 1 つのイベントであることは、Preact Signals に足りない operator ではありません。どちらもその下にあるモデルから来ています。届いたノードを深さ順に実行する更新と、発行を 1 つ残らず渡す emitter（`createValueEmitter`、`source`）です。Preact の signal が持つのは現在の値で、effect の実行順がグラフの中の位置で決まることはありません。effect で書いた operator はそのモデルを引き継ぐので、SynState の保証を取り戻すには、前の節のとおり SynState のモデルをその中に作り直すことになります。速さも持ち越せません。Preact Signals を速くしているものが効くのは、もともとそのまま載る部分だけだからです。SynState が提供するのは、operator と、それを正しく保つモデルの両方です。非同期の段も状態を持つ段も、すべての派生値と同じグリッチフリーなグラフのノードであり、`scan` のような状態を持つ段は、前にある emitter の発行をすべて受け取ります。
+
+## SynState で UI を作る
+
+SynState を画面に出すおすすめの手段は [synstate-dom](/mono/synstate-dom/ja/) です。Observable を DOM に直接束縛します。コンポーネントは 1 回しか実行されず、更新はグラフから、束縛された属性、プロパティ、テキストノードへ直接届きます。仮想 DOM もコンポーネントの再実行もありません。上の検索の段なら、クエリからページに表示するものまでが 1 つのグラフになり、Observable を別のものに変える箇所がどこにもありません。
+
+Preact のアプリケーションには、`synstate-preact-signals` が境界で両者をつなぎます。Observable を Preact の signal に（`toSignal`）、signal を Observable に（`fromSignal`）変換するので、`debounce`、`switchMap`、リクエストといったパイプラインを SynState で書き、その結果を signal として Preact に渡せます。[Preact Signals のデモ](/mono/synstate/ja/preact-signals/demo/)を参照してください。ただしそこには継ぎ目が残ります。継ぎ目を越える値はすべて変換され、signal に入ったイベントは値になり、どの処理もどちらか一方に置かなければならず、非同期の段は SynState の側に置くことになります。synstate-dom なら継ぎ目はなく、非同期の段も含めて UI 全体が 1 つの SynState のグラフになります。

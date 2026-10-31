@@ -1,6 +1,6 @@
 ---
 title: Operators on Signals
-description: Why SynState's operators are not built on a signals library such as Preact Signals — what an operator written as an effect loses, with two demos to try.
+description: Why SynState's operators are not built on a signals library such as Preact Signals — what an operator written as an effect loses, with two demos to try, and how synstate-dom builds the UI on SynState alone.
 sidebar:
     order: 7
 ---
@@ -220,6 +220,12 @@ For the effect-based operators to be glitch-free, each would have to run before 
 
 An effect also subscribes to everything it reads and runs again on every change, whether or not anything reads what it writes. Below an effect-based operator, the graph is therefore eager, as SynState's is, and the lazy `computed` and the dependency tracking that make Preact Signals fast in the benchmark apply to the `computed` parts only.
 
-## Using Both
+## The Model, Not the Operators
 
-The two fit together at the boundary instead. `synstate-preact-signals` turns an Observable into a Preact signal (`toSignal`) and a signal into an Observable (`fromSignal`), so the pipeline — `debounce`, `switchMap`, a request — can be SynState, and the binding to the DOM Preact Signals. See [the Preact Signals demo](/mono/synstate/preact-signals/demo/).
+A consistent graph for every reader and an event for every emission are not operators that Preact Signals is missing. Both come from the model underneath: an update that runs each node it reaches in depth order, and an emitter (`createValueEmitter`, `source`) that passes on every emission. A Preact signal holds a current value, and nothing orders its effects by where they sit in the graph; an operator written as an effect inherits that model, and getting SynState's guarantees back means building SynState's model again inside it, as the previous section shows. The speed would not survive the trip either, since what makes Preact Signals fast applies only to the part that already carries over. What SynState offers is its operators together with the model that keeps them sound: an async or stateful step is a node in the same glitch-free graph as every derived value, and a stateful step such as `scan` sees every emission of the emitter it follows.
+
+## Building the UI on SynState
+
+The recommended way to put SynState on the screen is [synstate-dom](/mono/synstate-dom/). It binds Observables directly to the DOM: a component runs once, and an update goes from the graph straight to the attribute, property or text node bound to it, with no virtual DOM and no component re-run. The search step above is then one graph from the query to what the page shows, with no point where an Observable has to become something else.
+
+For a Preact application, `synstate-preact-signals` connects the two at a boundary: `toSignal` turns an Observable into a Preact signal and `fromSignal` a signal into an Observable, so the pipeline — `debounce`, `switchMap`, a request — is written in SynState and its result handed to Preact as a signal. See [the Preact Signals demo](/mono/synstate/preact-signals/demo/). That leaves a seam, though: every value that crosses it is converted, an event that enters a signal becomes a value, and every piece of logic has to be put on one side of it, with the async steps on SynState's. With synstate-dom there is no seam: the whole UI, async steps included, is one SynState graph.
