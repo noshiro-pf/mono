@@ -7,9 +7,9 @@
  * an issue is shown only when its priority is one picked — the merge
  * order's statuses (`merge-order-view.mts`), for the priorities of issues.
  * A priority is never both, so picking one switches it back on, and
- * switching one off unpicks it. They and `pending` are the part of the view
- * the DAG reads too (`issue-graph.mts`'s `omitFilteredIssues`), so that the
- * two views draw the same issues.
+ * switching one off unpicks it. They, `pending` and `in progress` are the
+ * part of the view the DAG reads too (`issue-graph.mts`'s
+ * `omitFilteredIssues`), so that the two views draw the same issues.
  *
  * **The labels** are every other label an open issue carries, each one a
  * pick: once any is picked, an issue is shown only when it carries one
@@ -27,10 +27,18 @@
  * (`issue-filter.mts`): picking both is what is pending of the priorities
  * picked. It too is read by the DAG.
  *
+ * **In progress** is the start state `in-progress` (`in-progress.mts`): the
+ * issue could be started, and an open pull request closes it or it is
+ * labelled `in-progress`. It is
+ * a switch with a pick of its own as `pending` is, and a third side read with
+ * the other two, since what a reader wants of it is the work under way alone,
+ * in the DAG as much as in the list.
+ *
  * **The start states** are how each issue stands for being started
  * (`docs/issue-start-after.md`, `pr-report-core`'s `IssueStartState`), read
- * off the issue graph (`issue-start.mts`); each is a switch as a priority is,
- * and an issue none is known for is `free`.
+ * off the issue graph (`issue-start.mts`); each but `in-progress`, which is
+ * the switch above, is a switch as a priority is, and an issue none is known
+ * for is `free`.
  *
  * **The search** is what the reader types: an issue is shown only when its
  * title holds it, whatever the case, and still not when its priority or its
@@ -50,15 +58,16 @@
  * (`merge-order-view.mts`), with only what differs from {@link
  * DEFAULT_ISSUES_LIST_VIEW} written: `issues.hidePriority=low.none`,
  * `issues.onlyPriority=high`, `issues.hideStart=blocked.cycle`,
- * `issues.hidePending=1` or `issues.onlyPending=1`, `issues.sort=priority`,
- * and a label picked as
- * `issues.label=bug`, once for each, since a label's name can hold the `.` the
- * others are joined with.
+ * `issues.hidePending=1` or `issues.onlyPending=1`, `issues.hideInProgress=1`
+ * or `issues.onlyInProgress=1`, `issues.sort=priority`, and a label picked
+ * as `issues.label=bug`, once for each, since a label's name can hold the
+ * `.` the others are joined with.
  */
 
 import { PENDING_LABEL, type IssueStartState } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
-import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
+import type { ReadonlyRecord, StrictExclude, StrictPick } from 'ts-type-forge';
+import { isInProgressShown } from './in-progress.mjs';
 import {
   DEFAULT_ISSUE_FILTER,
   isIssueFilterShown,
@@ -98,13 +107,24 @@ export const ISSUE_STARTS = [
   'cycle',
 ] as const satisfies readonly IssueStartState[];
 
+/**
+ * The start states the list switches one by one: every one but
+ * `in-progress`, which is the switch both views read (`in-progress.mts`).
+ */
+export type IssueStartSwitch = StrictExclude<IssueStartState, 'in-progress'>;
+
+export const ISSUE_START_SWITCHES: readonly IssueStartSwitch[] =
+  ISSUE_STARTS.filter(
+    (start): start is IssueStartSwitch => start !== 'in-progress',
+  );
+
 export type IssuesListView = IssueFilter &
   Readonly<{
     /**
      * What is switched off rather than on, as the merge order keeps it, so
      * that the two read alike.
      */
-    hiddenStarts: readonly IssueStartState[];
+    hiddenStarts: readonly IssueStartSwitch[];
     /** The labels picked, in name order; nothing picked is no narrowing. */
     onlyLabels: readonly string[];
     sort: IssueSort;
@@ -134,21 +154,29 @@ export type IssuesListCounts = Readonly<{
   open: Count;
   priorities: ReadonlyRecord<Priority, Count>;
   pending: Count;
-  starts: ReadonlyRecord<IssueStartState, Count>;
+  inProgress: Count;
+  starts: ReadonlyRecord<IssueStartSwitch, Count>;
   /** In name order; neither the priorities nor `pending`. */
   labels: readonly LabelCount[];
 }>;
 
-/** The `open` count, the priorities' and `pending`'s, for either view. */
+/**
+ * The `open` count, the priorities', `pending`'s and `in progress`'s, for
+ * either view.
+ */
 export type IssueFilterCounts = StrictPick<
   IssuesListCounts,
-  'open' | 'priorities' | 'pending'
+  'open' | 'priorities' | 'pending' | 'inProgress'
 >;
 
-/** How {@link countIssueFilter} reads an item's priority and `pending`. */
+/**
+ * How {@link countIssueFilter} reads an item's priority, `pending` and `in
+ * progress`.
+ */
 export type IssueFacts<T> = Readonly<{
   priority: (item: T) => Priority;
   pending: (item: T) => boolean;
+  inProgress: (item: T) => boolean;
 }>;
 
 /** Each issue's start state, by number; one not in it is `free`. */
@@ -159,24 +187,37 @@ export const isIssueShown = (
   view: IssuesListView,
   query: string = '',
   starts: IssueStarts = NO_STARTS,
-): boolean =>
-  isIssueFilterShown(priorityOf(issue.labels), isPending(issue.labels), view) &&
-  !view.hiddenStarts.includes(startOf(starts, issue)) &&
-  (!Arr.isNonEmpty(view.onlyLabels) ||
-    issue.labels.some((label) => view.onlyLabels.includes(label.name))) &&
-  matchesIssueTitle(issue, query);
+): boolean => {
+  const start = startOf(starts, issue);
+
+  return (
+    isIssueFilterShown(
+      {
+        priority: priorityOf(issue.labels),
+        pending: isPending(issue.labels),
+        inProgress: start === 'in-progress',
+      },
+      view,
+    ) &&
+    (start === 'in-progress' || !view.hiddenStarts.includes(start)) &&
+    (!Arr.isNonEmpty(view.onlyLabels) ||
+      issue.labels.some((label) => view.onlyLabels.includes(label.name))) &&
+    matchesIssueTitle(issue, query)
+  );
+};
 
 /**
- * The `open` count, each priority's and `pending`'s, of `items` that `passes`
- * lets through whatever their priority and whether or not they are pending,
- * as {@link countIssues} counts them: `open` as the filter leaves it, and
- * each priority and `pending` as if it were shown, the other side of the
- * filter as it is. The DAG counts its issues with this
- * (`issues-view-store.mts`), with every one it reads passing.
+ * The `open` count, each priority's, `pending`'s and `in progress`'s, of
+ * `items` that `passes` lets through whatever their priority and whether or
+ * not they are pending or in progress, as {@link countIssues} counts them:
+ * `open` as the filter leaves it, and each priority, `pending` and `in
+ * progress` as if it were shown, the other sides of the filter as they are.
+ * The DAG counts its issues with this (`issues-view-store.mts`), with every
+ * one it reads passing.
  */
 export const countIssueFilter = <T,>(
   items: readonly T[],
-  { priority, pending }: IssueFacts<T>,
+  { priority, pending, inProgress }: IssueFacts<T>,
   passes: (item: T) => boolean,
   filter: IssueFilter,
 ): IssueFilterCounts => {
@@ -188,7 +229,10 @@ export const countIssueFilter = <T,>(
 
     return {
       shown: all.filter(
-        (item) => passes(item) && isPendingShown(pending(item), filter),
+        (item) =>
+          passes(item) &&
+          isPendingShown(pending(item), filter) &&
+          isInProgressShown(inProgress(item), filter),
       ).length,
       total: all.length,
     } as const;
@@ -196,12 +240,21 @@ export const countIssueFilter = <T,>(
 
   const allPending = items.filter(pending);
 
+  const allInProgress = items.filter(inProgress);
+
   return {
     open: {
       shown: items.filter(
         (item) =>
           passes(item) &&
-          isIssueFilterShown(priority(item), pending(item), filter),
+          isIssueFilterShown(
+            {
+              priority: priority(item),
+              pending: pending(item),
+              inProgress: inProgress(item),
+            },
+            filter,
+          ),
       ).length,
       total: items.length,
     },
@@ -213,9 +266,21 @@ export const countIssueFilter = <T,>(
     },
     pending: {
       shown: allPending.filter(
-        (item) => passes(item) && isPriorityShown(priority(item), filter),
+        (item) =>
+          passes(item) &&
+          isPriorityShown(priority(item), filter) &&
+          isInProgressShown(inProgress(item), filter),
       ).length,
       total: allPending.length,
+    },
+    inProgress: {
+      shown: allInProgress.filter(
+        (item) =>
+          passes(item) &&
+          isPriorityShown(priority(item), filter) &&
+          isPendingShown(pending(item), filter),
+      ).length,
+      total: allInProgress.length,
     },
   } as const;
 };
@@ -268,10 +333,11 @@ export const arrangeIssues = (
  * As the merge order counts (`countView`), each switch is counted with
  * itself on and every other as it is: a priority switched off reads how many
  * showing it would show (switching it back on, or picking it too while
- * another is picked), `pending` likewise, and a label how many picking it
- * would add — which, picked or not, is every issue carrying it that the
- * priorities and `pending` show. The search narrows what each shows, never its whole: the whole is
- * what is open, so that the counts say how much the search leaves out.
+ * another is picked), `pending` and `in progress` likewise, and a label how
+ * many picking it would add — which, picked or not, is every issue carrying
+ * it that the priorities, `pending` and `in progress` show. The search
+ * narrows what each shows, never its whole: the whole is what is open, so
+ * that the counts say how much the search leaves out.
  */
 export const countIssues = (
   items: readonly IssueItem[],
@@ -279,7 +345,7 @@ export const countIssues = (
   query: string = '',
   starts: IssueStarts = NO_STARTS,
 ): IssuesListCounts => {
-  const underStart = (which: IssueStartState): Count =>
+  const underStart = (which: IssueStartSwitch): Count =>
     countUnder(
       items,
       (issue) => startOf(starts, issue) === which,
@@ -312,7 +378,11 @@ export const countIssues = (
   return {
     ...countIssueFilter(
       items,
-      ISSUE_FACTS,
+      {
+        priority: (issue) => priorityOf(issue.labels),
+        pending: (issue) => isPending(issue.labels),
+        inProgress: (issue) => startOf(starts, issue) === 'in-progress',
+      },
       (issue) => isIssueShown(issue, unfiltered, query, starts),
       view,
     ),
@@ -320,7 +390,6 @@ export const countIssues = (
       ready: underStart('ready'),
       free: underStart('free'),
       planned: underStart('planned'),
-      'in-progress': underStart('in-progress'),
       attention: underStart('attention'),
       blocked: underStart('blocked'),
       cycle: underStart('cycle'),
@@ -377,11 +446,11 @@ export const toggleIssuePriorityOnly = (
 
 export const toggleIssueStart = (
   view: IssuesListView,
-  start: IssueStartState,
+  start: IssueStartSwitch,
 ): IssuesListView =>
   ({
     ...view,
-    hiddenStarts: toggled(ISSUE_STARTS, view.hiddenStarts, start),
+    hiddenStarts: toggled(ISSUE_START_SWITCHES, view.hiddenStarts, start),
   }) as const;
 
 export const toggleLabel = (
@@ -405,6 +474,27 @@ export const toggleIssuePending = (view: IssuesListView): IssuesListView =>
 export const toggleIssuePendingOnly = (view: IssuesListView): IssuesListView =>
   ({ ...view, hidePending: false, onlyPending: !view.onlyPending }) as const;
 
+/**
+ * Hides what is in progress when it is shown, unpicking it, and shows it
+ * again.
+ */
+export const toggleIssueInProgress = (view: IssuesListView): IssuesListView =>
+  ({
+    ...view,
+    hideInProgress: !view.hideInProgress,
+    onlyInProgress: false,
+  }) as const;
+
+/** Picks what is in progress, switching it back on, or unpicks it. */
+export const toggleIssueInProgressOnly = (
+  view: IssuesListView,
+): IssuesListView =>
+  ({
+    ...view,
+    hideInProgress: false,
+    onlyInProgress: !view.onlyInProgress,
+  }) as const;
+
 export const withIssueSort = (
   view: IssuesListView,
   sort: IssueSort,
@@ -414,7 +504,8 @@ export const withIssueSort = (
  * The view the query string asks for. A priority, or `pending`, both
  * switched off and picked, which only a hand can write, is switched off.
  * A `dag.hidePending=1` an older page wrote switches `pending` off, unless
- * `issues.onlyPending` picks it.
+ * `issues.onlyPending` picks it, and an `issues.hideStart=in-progress`
+ * switches `in progress` off, unless `issues.onlyInProgress` picks it.
  */
 export const issuesListViewFromSearch = (search: string): IssuesListView => {
   const params = new URLSearchParams(search);
@@ -434,13 +525,27 @@ export const issuesListViewFromSearch = (search: string): IssuesListView => {
     flagParam(params, PARAM.hidePending) ||
     (!onlyPending && flagParam(params, DAG_HIDE_PENDING));
 
+  const onlyInProgress = flagParam(params, PARAM.onlyInProgress);
+
+  // The start state's own switch an older page wrote, now the one both
+  // views read.
+  const hideInProgress =
+    flagParam(params, PARAM.hideInProgress) ||
+    (!onlyInProgress &&
+      Arr.isNonEmpty(
+        namesParam(['in-progress'], params.getAll(PARAM.hideStart)),
+      ));
+
   return {
     hiddenPriorities,
     onlyPriorities: namesParam(
       PRIORITIES,
       params.getAll(PARAM.onlyPriority),
     ).filter((each) => !hiddenPriorities.includes(each)),
-    hiddenStarts: namesParam(ISSUE_STARTS, params.getAll(PARAM.hideStart)),
+    hiddenStarts: namesParam(
+      ISSUE_START_SWITCHES,
+      params.getAll(PARAM.hideStart),
+    ),
     // The priorities and `pending` are not labels to pick here: they have
     // parameters of their own.
     onlyLabels: Arr.uniq(
@@ -455,6 +560,8 @@ export const issuesListViewFromSearch = (search: string): IssuesListView => {
     ).toSorted((a, b) => a.localeCompare(b)),
     hidePending,
     onlyPending: !hidePending && onlyPending,
+    hideInProgress,
+    onlyInProgress: !hideInProgress && onlyInProgress,
     sort: sort === 'priority' || sort === 'start' ? sort : 'updated',
   };
 };
@@ -485,6 +592,10 @@ export const searchWithIssuesListView = (
   setFlagParam(params, PARAM.hidePending, view.hidePending);
 
   setFlagParam(params, PARAM.onlyPending, view.onlyPending);
+
+  setFlagParam(params, PARAM.hideInProgress, view.hideInProgress);
+
+  setFlagParam(params, PARAM.onlyInProgress, view.onlyInProgress);
 
   if (view.sort === 'updated') {
     params.delete(PARAM.sort);
@@ -527,6 +638,8 @@ const PARAM = {
   label: 'issues.label',
   hidePending: 'issues.hidePending',
   onlyPending: 'issues.onlyPending',
+  hideInProgress: 'issues.hideInProgress',
+  onlyInProgress: 'issues.onlyInProgress',
   sort: 'issues.sort',
 } as const;
 
@@ -535,11 +648,6 @@ const PARAM = {
  * read as `issues.hidePending`; `issues-view-settings.mts` drops it.
  */
 const DAG_HIDE_PENDING = 'dag.hidePending';
-
-const ISSUE_FACTS: IssueFacts<IssueItem> = {
-  priority: (issue) => priorityOf(issue.labels),
-  pending: (issue) => isPending(issue.labels),
-} as const;
 
 const NO_STARTS: IssueStarts = new Map<number, IssueStartState>();
 

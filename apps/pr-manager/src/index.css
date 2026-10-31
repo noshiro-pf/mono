@@ -2421,6 +2421,7 @@ a:focus-visible {
   border: 1.5px solid var(--dag-colour);
   border-radius: 3px;
   display: inline-block;
+  flex: none;
   height: 0.75rem;
   width: 1.25rem;
 }
@@ -2606,7 +2607,13 @@ a:focus-visible {
   border-radius: 999px;
 }
 
+/*
+ * An outline takes no room, so the margin gives it its own: without it the
+ * outline is cut off by the block's edge when the key wraps it to the start
+ * of a line, and crowds the word beside it.
+ */
 .issue-dag-swatch[data-priority='high'] {
+  margin: 3px;
   outline: 1.5px solid var(--dag-colour);
   outline-offset: 1.5px;
 }

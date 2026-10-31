@@ -10,12 +10,11 @@
  * The search is held beside the view, not in it, and so is never saved: it
  * starts empty on every visit.
  *
- * The priorities and `pending` in the view are the DAG's too
+ * The priorities, `pending` and `in progress` in the view are the DAG's too
  * (`issues-view-store.mts`): switched off or picked here, they are for either
  * view.
  */
 
-import type { IssueStartState } from 'pr-report-core';
 import {
   combine,
   createState,
@@ -33,6 +32,8 @@ import {
 import {
   arrangeIssues,
   countIssues,
+  toggleIssueInProgress,
+  toggleIssueInProgressOnly,
   toggleIssuePending,
   toggleIssuePendingOnly,
   toggleIssuePriority,
@@ -43,6 +44,7 @@ import {
   type IssuesListCounts,
   type IssuesListView,
   type IssueSort,
+  type IssueStartSwitch,
 } from '../issues-list-view.mjs';
 import type { IssueItem, LoadedReport } from '../load-report.mjs';
 import type { Priority } from '../priority.mjs';
@@ -61,9 +63,9 @@ export type IssuesListDeps = Readonly<{
 export type IssuesListStore = Readonly<{
   view: InitializedObservable<IssuesListView>;
   /**
-   * The priorities and `pending` of the view alone, which the DAG reads
-   * (`issues-view-store.mts`); passed on only when they changed, so that a
-   * change to the rest of the view derives nothing there.
+   * The priorities, `pending` and `in progress` of the view alone, which the
+   * DAG reads (`issues-view-store.mts`); passed on only when they changed, so
+   * that a change to the rest of the view derives nothing there.
    */
   filter: InitializedObservable<IssueFilter>;
   /** What the reader typed to search the titles by; empty is no search. */
@@ -79,10 +81,12 @@ export type IssuesListStore = Readonly<{
   starts: InitializedObservable<ReadonlyMap<number, IssueStart>>;
   togglePriority: (priority: Priority) => void;
   togglePriorityOnly: (priority: Priority) => void;
-  toggleStart: (which: IssueStartState) => void;
+  toggleStart: (which: IssueStartSwitch) => void;
   toggleLabel: (labelName: string) => void;
   togglePending: () => void;
   togglePendingOnly: () => void;
+  toggleInProgress: () => void;
+  toggleInProgressOnly: () => void;
   setSort: (sort: IssueSort) => void;
   setQuery: (query: string) => void;
   /** Saves every change from now on; returns what stops it. */
@@ -127,11 +131,15 @@ export const createIssuesListStore = (
             onlyPriorities,
             hidePending,
             onlyPending,
+            hideInProgress,
+            onlyInProgress,
           }): IssueFilter => ({
             hiddenPriorities,
             onlyPriorities,
             hidePending,
             onlyPending,
+            hideInProgress,
+            onlyInProgress,
           }),
         ),
       )
@@ -171,6 +179,12 @@ export const createIssuesListStore = (
     },
     togglePendingOnly: () => {
       updateView(toggleIssuePendingOnly);
+    },
+    toggleInProgress: () => {
+      updateView(toggleIssueInProgress);
+    },
+    toggleInProgressOnly: () => {
+      updateView(toggleIssueInProgressOnly);
     },
     setSort: (sort) => {
       updateView((current) => withIssueSort(current, sort));

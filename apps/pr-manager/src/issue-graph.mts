@@ -287,8 +287,9 @@ export const omitPending = (graph: IssueGraph): IssueGraph =>
   omitNodes(graph, ({ pending }) => pending);
 
 /**
- * The graph without the listed issues `filter` leaves out by their priority
- * or by whether they are pending (`issue-filter.mts`, which the list reads
+ * The graph without the listed issues `filter` leaves out by their priority,
+ * by whether they are pending or by whether they are in progress
+ * (`issue-filter.mts`, which the list reads
  * the same one from), save those an issue left in waits on, and without
  * what is left with no edge for them (see {@link omitNodes}).
  *
@@ -311,7 +312,14 @@ export const omitFilteredIssues = (
       .filter(
         (node) =>
           isListedIssue(node) &&
-          !isIssueFilterShown(node.priority, node.pending, filter),
+          !isIssueFilterShown(
+            {
+              priority: node.priority,
+              pending: node.pending,
+              inProgress: node.state === 'in-progress',
+            },
+            filter,
+          ),
       )
       .map(({ number }) => number),
   );

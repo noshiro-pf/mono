@@ -564,6 +564,43 @@ describe(omitFilteredIssues, () => {
     );
   });
 
+  test('with in progress picked, keeps the issues under way, by a pull request or a label, with what closes them', () => {
+    const graph = build({
+      issues: [
+        issue(1, []),
+        issue(2, [], ['in-progress']),
+        issue(3, []),
+        issue(4, [], ['planned']),
+      ],
+      pulls: [pull(7, [3])],
+    });
+
+    const shown = omitFilteredIssues(graph, {
+      ...DEFAULT_ISSUE_FILTER,
+      onlyInProgress: true,
+    });
+
+    assert.deepStrictEqual(
+      shown.nodes.map(({ number }) => number),
+      [2, 3, 7],
+    );
+  });
+
+  test('with in progress switched off, leaves out the issues under way', () => {
+    const graph = build({
+      issues: [issue(1, []), issue(2, [], ['in-progress']), issue(3, [])],
+      pulls: [pull(7, [3])],
+    });
+
+    assert.deepStrictEqual(
+      omitFilteredIssues(graph, {
+        ...DEFAULT_ISSUE_FILTER,
+        hideInProgress: true,
+      }).nodes.map(({ number }) => number),
+      [1],
+    );
+  });
+
   test('hands back the graph it was given when every priority in it is shown', () => {
     const graph = build({
       issues: [issue(1, [], ['priority:high']), issue(2, [1])],

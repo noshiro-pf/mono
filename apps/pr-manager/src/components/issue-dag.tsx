@@ -40,12 +40,18 @@ export const IssueDag = (): JSX.Element => (
       <p class={constant('section-note')}>
         {derive(
           [reader.issues, issuesListStore.filter, issuesViewStore.counts],
-          ({ items }, { hidePending }, { open, pending }) =>
+          (
+            { items },
+            { hidePending, hideInProgress },
+            { open, pending, inProgress },
+          ) =>
             Arr.isEmpty(items)
               ? 'No open issues.'
               : hidePending && pending.total === open.total
                 ? 'Every open issue is pending.'
-                : 'No open issue has the priorities and pending shown.',
+                : hideInProgress && inProgress.total === open.total
+                  ? 'Every open issue is in progress.'
+                  : 'No open issue has the priorities, pending and in progress shown.',
         )}
       </p>
     }

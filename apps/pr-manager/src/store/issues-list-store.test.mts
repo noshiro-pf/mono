@@ -134,6 +134,8 @@ const STORED: IssuesListView = {
   onlyLabels: ['bug'],
   hidePending: false,
   onlyPending: false,
+  hideInProgress: false,
+  onlyInProgress: false,
   sort: 'priority',
 } as const;
 
