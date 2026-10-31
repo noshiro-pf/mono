@@ -485,6 +485,20 @@ test(
 
     await expect.soft(suggestions).toHaveText(['企画']);
 
+    // Safari's Escape or Enter that ended a composition, sent after it ended,
+    // takes nothing and keeps the list.
+    await box.dispatchEvent('keydown', safariImeKeyDown.Escape);
+
+    await expect.soft(suggestions).toHaveText(['企画']);
+
+    await box.dispatchEvent('keydown', safariImeKeyDown.Enter);
+
+    await expect.soft(suggestions).toHaveText(['企画']);
+
+    await expect.soft(box).toHaveValue('企');
+
+    await expect.soft(chips).toHaveText(['ドキュメント', 'UI', '実装', '新規']);
+
     await box.press('Escape');
 
     await expect.soft(suggestions).toHaveCount(0);
@@ -2924,3 +2938,13 @@ test.describe('on a touch screen', () => {
     },
   );
 });
+
+/**
+ * The key downs Safari sends for the Enter or Escape that confirmed or
+ * cancelled a composition, after `compositionend`: key code 229 on a key that
+ * is not composing; `dag-connect.spec.mts` has the Escape too.
+ */
+const safariImeKeyDown = {
+  Enter: { key: 'Enter', keyCode: 229, bubbles: true },
+  Escape: { key: 'Escape', keyCode: 229, bubbles: true },
+} as const;

@@ -127,6 +127,14 @@ test(
 
     await expect.soft(page.getByTestId('dag-connect')).toHaveCount(1);
 
+    // Safari's Escape that cancelled a composition, after it ended, is the
+    // input method's and gives up nothing.
+    await page
+      .getByTestId('dag-canvas')
+      .dispatchEvent('keydown', safariImeEscape);
+
+    await expect.soft(page.getByTestId('dag-connect')).toHaveCount(1);
+
     await page.keyboard.press('Escape');
 
     await expect.soft(page.getByTestId('dag-connect')).toHaveCount(0);
@@ -294,3 +302,10 @@ const edgePoint = async (
 
   return { x: box.x + box.width - 2, y: box.y + box.height / 2 };
 };
+
+/**
+ * The key down Safari sends for the Escape that cancelled a composition, after
+ * `compositionend`: key code 229 on a key that is not composing. As
+ * `safariImeKeyDown.Escape` in `demo.spec.mts`.
+ */
+const safariImeEscape = { key: 'Escape', keyCode: 229, bubbles: true } as const;

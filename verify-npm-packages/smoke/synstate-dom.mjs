@@ -7,6 +7,7 @@ import {
   derive,
   For,
   If,
+  isImeKeyDown,
   mapBindable,
   render,
   toObservable,
@@ -62,5 +63,18 @@ assert.equal(typeof Fragment({}).mount, 'function');
 for (const component of [For, If, render]) {
   assert.equal(typeof component, 'function');
 }
+
+// `isImeKeyDown` reads only the event's fields, so a plain object stands in
+// for a `KeyboardEvent`: Safari's Enter after `compositionend` is the input
+// method's, and an Android keyboard's arrow key with the same key code is not.
+assert.equal(
+  isImeKeyDown({ key: 'Enter', keyCode: 229, isComposing: false }),
+  true,
+);
+
+assert.equal(
+  isImeKeyDown({ key: 'ArrowUp', keyCode: 229, isComposing: false }),
+  false,
+);
 
 console.info('synstate-dom ok');

@@ -1,6 +1,7 @@
 import { createState, derive, map } from 'synstate';
 import {
   constant,
+  isImeKeyDown,
   toObservable,
   view,
   type Bindable,
@@ -15,7 +16,7 @@ import {
   TIME_UNIT_MAX,
   type TimeOfDay,
 } from '../date/index.mjs';
-import { isImeKeyDown, parseInteger, uniqueId } from '../internal/index.mjs';
+import { parseInteger, uniqueId } from '../internal/index.mjs';
 import { Icon } from './icon.js';
 
 /** What a {@link TimePicker} reads out; Blueprint's wording by default. */

@@ -10,6 +10,7 @@ import {
   createAfterUpdate,
   For,
   If,
+  isImeKeyDown,
   listenInScope,
   MatchOptional,
   subscribeInScope,
@@ -595,6 +596,9 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     if (
       !(pressed instanceof KeyboardEvent) ||
       pressed.key !== 'Escape' ||
+      // The Escape that cancels what an input method is composing, in a text
+      // field elsewhere, is the input method's.
+      isImeKeyDown(pressed) ||
       getConnecting() === undefined
     ) {
       return;
