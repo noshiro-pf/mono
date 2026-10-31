@@ -9,6 +9,7 @@ import {
   type CalculatedValues,
   type RepaymentType,
 } from '../../types/index.mjs';
+import { formatYen } from '../../utils/index.mjs';
 
 export const PaymentTable = (): JSX.Element => (
   <HtmlTable bordered compact striped>
@@ -49,13 +50,6 @@ const headerCellStyle = constant('text-align: center');
 
 const dataCellStyle = constant('text-align: right');
 
-const yenFormatter = new Intl.NumberFormat('ja-JP', {
-  style: 'currency',
-  currency: 'JPY',
-});
-
-const formatYenValue = (value: Yen): string => yenFormatter.format(value);
-
 const rowsOf = (
   repaymentType: RepaymentType,
   {
@@ -78,9 +72,9 @@ const rowsOf = (
 
   return Arr.seq(numRows).map((i) => [
     i.toString(),
-    formatYenValue(borrowingBalanceYen[i] ?? Yen.cast(0)),
-    formatYenValue(interestYen[i] ?? Yen.cast(0)),
-    formatYenValue(monthlyPayment[i] ?? Yen.cast(0)),
+    formatYen(borrowingBalanceYen[i] ?? Yen.cast(0)),
+    formatYen(interestYen[i] ?? Yen.cast(0)),
+    formatYen(monthlyPayment[i] ?? Yen.cast(0)),
   ]);
 };
 

@@ -1,12 +1,14 @@
 import type { Bindable, JSX } from 'synstate-dom';
 import {
+  BorrowingTotal,
+  maxBorrowingTotalManYen,
   maxPercent,
   maxYear,
+  minBorrowingTotalManYen,
   minPercent,
   minYear,
   PercentFloat,
   Year,
-  Yen,
 } from '../../types/index.mjs';
 import { BoundedNumericInput } from './bounded-numeric-input.js';
 
@@ -16,9 +18,16 @@ type Props<N extends number> = Readonly<{
   'data-e2e': string;
 }>;
 
-export const YenNumericInput = (
-  props: Props<Yen> & Readonly<{ min: number }>,
-): JSX.Element => <BoundedNumericInput {...props} toValue={Yen.cast} />;
+export const BorrowingTotalNumericInput = (
+  props: Props<BorrowingTotal>,
+): JSX.Element => (
+  <BoundedNumericInput
+    {...props}
+    max={maxBorrowingTotalManYen}
+    min={minBorrowingTotalManYen}
+    toValue={BorrowingTotal.cast}
+  />
+);
 
 export const YearNumericInput = (props: Props<Year>): JSX.Element => (
   <BoundedNumericInput
