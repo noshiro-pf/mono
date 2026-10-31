@@ -518,6 +518,7 @@
         "src/pages/**/*.{astro,mts,ts,tsx}",
         "scripts/**/*.mts",
         "configs/*.mts",
+        "e2e/**/*.spec.mts",
       ],
       "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
     },

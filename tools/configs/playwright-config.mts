@@ -21,13 +21,46 @@ import { appDevPort } from './app-dev-ports.mjs';
  */
 export const definePlaywrightAppConfig = ({
   packageRoot,
+  basePath = '/',
+  server,
 }: Readonly<{
   /** The package's root directory, i.e. the parent of `configs` and `e2e`. */
   packageRoot: string;
+
+  /**
+   * The path the dev server serves the app under, with both slashes: an Astro
+   * site's `base`, such as `/mono/synstate/`. The server answers 404 at `/`
+   * then, which Playwright would wait on until it timed out, and a spec's
+   * `page.goto('guides/')` resolves against it.
+   */
+  basePath?: `/${string}`;
+
+  /**
+   * For a site checked as it ships rather than under its dev server
+   * (`pnpm run dev`, given a minute to answer): the command that serves the
+   * build (`preview`) and the one that makes it (`build`).
+   *
+   * CI runs `preview` alone, over the `dist/` that `code-check.yml`'s build job
+   * made from the same commit and unpacks before `ws:check:e2e`; locally
+   * `build` runs first, so that a stale `dist/` is never what is measured. A
+   * server already listening on the port is never reused, since it may be the
+   * dev server or a preview of an older build: the port being taken fails the
+   * run instead.
+   */
+  server?: Readonly<{ build: string; preview: string; timeoutMs: number }>;
 }>): PlaywrightTestConfig => {
   const port = appDevPort(packageRoot);
 
-  const baseURL = `http://localhost:${port}` as const;
+  const isCi = process.env['CI'] !== undefined;
+
+  const serverCommand =
+    server === undefined
+      ? 'pnpm run dev'
+      : isCi
+        ? server.preview
+        : (`${server.build} && ${server.preview}` as const);
+
+  const baseURL = `http://localhost:${port}${basePath}` as const;
 
   return defineConfig({
     testDir: path.resolve(packageRoot, 'e2e'),
@@ -43,12 +76,12 @@ export const definePlaywrightAppConfig = ({
 
     // A `test.only` left in the source fails the run rather than quietly
     // reducing it to one test.
-    forbidOnly: process.env['CI'] !== undefined,
-    retries: process.env['CI'] !== undefined ? 2 : 0,
+    forbidOnly: isCi,
+    retries: isCi ? 2 : 0,
 
     // Not `html`: that writes a report directory and starts a server after the
     // run, neither of which a CI job or `ws:check:e2e` has any use for.
-    reporter: process.env['CI'] !== undefined ? 'line' : 'list',
+    reporter: isCi ? 'line' : 'list',
 
     use: {
       baseURL,
@@ -59,12 +92,14 @@ export const definePlaywrightAppConfig = ({
     projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 
     webServer: {
-      command: 'pnpm run dev',
+      command: serverCommand,
+      timeout: server?.timeoutMs ?? 60_000,
       cwd: packageRoot,
       url: baseURL,
-      // Locally, attach to a server that is already up; the port is this app's
-      // alone, so it cannot be another app's. On CI there is never one.
-      reuseExistingServer: process.env['CI'] === undefined,
+      // Locally, attach to a dev server that is already up; the port is this
+      // app's alone, so it cannot be another app's. On CI there is never one,
+      // and a `server` is never reused (see its documentation above).
+      reuseExistingServer: server === undefined && !isCi,
     },
   });
 };

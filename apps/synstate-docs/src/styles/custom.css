@@ -1,9 +1,21 @@
-/* Prevent CJK text from breaking mid-word in table cells,
-   so wide tables overflow horizontally (with scroll) instead of
-   collapsing cells vertically. */
-table td,
-table th {
-  word-break: keep-all;
+/* Japanese table cells: a ja table wraps where its en counterpart does, and
+   scrolls only where it scrolls too (`e2e/table-overflow.spec.mts` checks
+   this on every page).
+   - Headers break between phrases (`auto-phrase`, Chromium only; elsewhere
+     the declaration is dropped and they break as body cells do), so that a
+     short header such as ライブラリ is not split.
+   - Body cells break as Japanese text normally does, between any two
+     characters. `keep-all`, which this rule used to set, made every run of
+     Japanese without a space a single word, wider than the column.
+   - Starlight gives inline `code` `dir="auto"`, an isolate, and Chromium
+     finds no break between an isolate and the punctuation next to it, so
+     `a`、`b`、`c` was one unbreakable run. */
+:lang(ja) table th {
+  word-break: auto-phrase;
+}
+
+:lang(ja) table code {
+  unicode-bidi: normal;
 }
 
 /* Figures the benchmark page singles out (`benchmark-numbers.mts` decides

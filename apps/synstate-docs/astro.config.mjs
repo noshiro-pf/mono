@@ -5,6 +5,7 @@ import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
+import { appDevPort } from '../../tools/configs/app-dev-ports.mts';
 import { preactComponentDirs } from './configs/preact-component-dirs.mjs';
 
 export default defineConfig({
@@ -12,6 +13,9 @@ export default defineConfig({
   // Served from this repository's Pages now, not the archived `synstate`
   // repository, so the site sits one level deeper.
   base: '/mono/synstate/',
+  // `astro dev` and `astro preview`; the e2e suite
+  // (`configs/playwright.config.mts`) waits on it.
+  server: { port: appDevPort(import.meta.dirname) },
   markdown: {
     processor: unified({
       gfm: true,

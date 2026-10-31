@@ -1,6 +1,7 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
+  eslintConfigForPlaywright,
   eslintConfigForPreact,
   eslintConfigForReact,
   eslintConfigForTypeScript,
@@ -36,6 +37,8 @@ export default [
   },
 
   eslintConfigForVitest(),
+
+  eslintConfigForPlaywright(['e2e/**']),
 
   // `eslintConfigForReact` takes `files` only, so the Preact directories are
   // taken out through `ignores` on each of its entries; a `!` inside a `files`

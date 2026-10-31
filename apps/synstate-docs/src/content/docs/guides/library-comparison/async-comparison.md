@@ -2,7 +2,7 @@
 title: Async Logic Compared
 description: One production-grade search box (debounce, cancellation, loading and error states, teardown) written with SynState, RxJS, MobX, Jotai, Redux Toolkit, Solid and Preact Signals.
 sidebar:
-    order: 6
+    order: 7
 ---
 
 [Declarative State Management](/mono/synstate/guides/declarative-state-management/#precise-control-over-async-behavior) compares a SynState pipeline of `debounce`, `switchMap` and `fromAbortablePromise` with the same search box written in a React `useEffect`. This page writes that search box with each library the [benchmark](/mono/synstate/guides/library-comparison/benchmark/) measures on derived graphs, to the standard production code needs, so that the difference left is what each library gives you and what you write yourself. (Zustand and Valtio, measured on a single state only, have no derived or async primitive to compare.)

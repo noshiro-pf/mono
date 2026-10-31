@@ -6,6 +6,13 @@
   "compilerOptions": {
     "libReplacement": true
   },
-  "include": ["./samples", "./src", "./test", "./scripts", "./configs"],
+  "include": [
+    "./samples",
+    "./src",
+    "./test",
+    "./scripts",
+    "./configs",
+    "./e2e"
+  ],
   "exclude": ["./src/content.config.ts"]
 }
