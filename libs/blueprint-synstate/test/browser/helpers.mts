@@ -56,6 +56,17 @@ export const settle = (): Promise<void> =>
     setTimeout(resolve, 0);
   });
 
+/**
+ * Lets the next frame's callbacks run, by which synstate-dom has drawn a
+ * refused change of a bound `checked` as its value again.
+ */
+export const nextFrame = (): Promise<void> =>
+  new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      resolve();
+    });
+  });
+
 /** The one element `selector` finds under `root`, failing the test otherwise. */
 export const one = <E extends Element = HTMLElement>(
   root: Element,

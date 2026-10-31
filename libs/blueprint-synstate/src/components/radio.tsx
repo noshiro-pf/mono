@@ -1,7 +1,6 @@
 import {
   constant,
   mapBindable,
-  toObservable,
   type Bindable,
   type Child,
   type JSX,
@@ -133,32 +132,11 @@ export const RadioGroup = <T extends string>({
           label={option.label ?? constant<string>(option.value)}
           name={name}
           value={option.value}
-          onChange={(event) => {
+          onChange={() => {
             onValueChange(option.value);
-
-            // The browser has checked this button already. When the owner did
-            // not take its value, no binding runs, so the buttons are set back
-            // to the value here: none checked if it is no option's.
-            const current = toObservable(value).getSnapshot().value;
-
-            if (current === option.value) {
-              return;
-            }
-
-            for (const mut_radio of radiosOf(event.currentTarget)) {
-              mut_radio.checked = mut_radio.value === current;
-            }
           }}
         />
       ))}
     </div>
   );
 };
-
-/** The buttons of the group `radio` is in, found by its `name`. */
-const radiosOf = (radio: HTMLInputElement): readonly HTMLInputElement[] =>
-  Array.from(
-    radio
-      .closest('[role="radiogroup"]')
-      ?.querySelectorAll<HTMLInputElement>('input[type="radio"]') ?? [],
-  ).filter((r) => r.name === radio.name);

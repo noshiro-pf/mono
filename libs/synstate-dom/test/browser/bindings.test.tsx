@@ -14,6 +14,32 @@ const mountInto = (
   return { container, unmount };
 };
 
+/** Resolves after the next frame's callbacks, when a refused change is undone. */
+const nextFrame = async (): Promise<void> => {
+  await new Promise((resolve) => {
+    requestAnimationFrame(resolve);
+  });
+};
+
+const mountInDocument = (
+  app: () => JSX.Element,
+): Readonly<{ inputs: readonly HTMLInputElement[]; unmount: () => void }> => {
+  const container = document.createElement('div');
+
+  document.body.append(container);
+
+  const unmountApp = render(app, container);
+
+  return {
+    inputs: Array.from(container.querySelectorAll('input')),
+    unmount: () => {
+      unmountApp();
+
+      container.remove();
+    },
+  };
+};
+
 describe('attributes', () => {
   test('writes constants once and observables on every update', () => {
     const [title$, setTitle] = createState('a');
@@ -114,6 +140,235 @@ describe('properties', () => {
     setChecked(true);
 
     assert.strictEqual(checkbox?.checked, true);
+  });
+});
+
+describe('controlled checked', () => {
+  test('a checkbox whose change is refused is drawn as its bound value again', async () => {
+    const mut_seen: boolean[] = [];
+
+    const { inputs, unmount } = mountInDocument(() => (
+      <input
+        checked={constant(false)}
+        type={constant('checkbox')}
+        onChange={(event) => {
+          mut_seen.push(event.currentTarget.checked);
+        }}
+      />
+    ));
+
+    const [checkbox] = inputs;
+
+    assert.isDefined(checkbox);
+
+    checkbox.click();
+
+    // The handler sees the user's change, which is undone only after it.
+    assert.deepStrictEqual(mut_seen, [true]);
+
+    await nextFrame();
+
+    assert.isFalse(checkbox.checked);
+
+    unmount();
+  });
+
+  test('a checkbox whose change is taken keeps it', async () => {
+    const [checked$, setChecked] = createState(false);
+
+    const { inputs, unmount } = mountInDocument(() => (
+      <input
+        checked={checked$}
+        type={constant('checkbox')}
+        onChange={(event) => {
+          setChecked(event.currentTarget.checked);
+        }}
+      />
+    ));
+
+    const [checkbox] = inputs;
+
+    assert.isDefined(checkbox);
+
+    checkbox.click();
+
+    await nextFrame();
+
+    assert.isTrue(checkbox.checked);
+
+    assert.isTrue(checked$.getSnapshot().value);
+
+    unmount();
+  });
+
+  test("a delegated handler on an ancestor also sees the user's change", async () => {
+    const mut_seen: boolean[] = [];
+
+    const { inputs, unmount } = mountInDocument(() => (
+      <div
+        onChange={(event) => {
+          if (event.target instanceof HTMLInputElement) {
+            mut_seen.push(event.target.checked);
+          }
+        }}
+      >
+        <input checked={constant(false)} type={constant('checkbox')} />
+      </div>
+    ));
+
+    const [checkbox] = inputs;
+
+    assert.isDefined(checkbox);
+
+    checkbox.click();
+
+    assert.deepStrictEqual(mut_seen, [true]);
+
+    await nextFrame();
+
+    assert.isFalse(checkbox.checked);
+
+    unmount();
+  });
+
+  test('a handler that stops the event does not keep the refused change', async () => {
+    const { inputs, unmount } = mountInDocument(() => (
+      <input
+        type={constant('checkbox')}
+        onChange={(event) => {
+          event.stopImmediatePropagation();
+        }}
+        checked={constant(false)}
+      />
+    ));
+
+    const [checkbox] = inputs;
+
+    assert.isDefined(checkbox);
+
+    checkbox.click();
+
+    await nextFrame();
+
+    assert.isFalse(checkbox.checked);
+
+    unmount();
+  });
+
+  test('a bound indeterminate is drawn again after a refused change', async () => {
+    const { inputs, unmount } = mountInDocument(() => (
+      <input
+        checked={constant(false)}
+        indeterminate={constant(true)}
+        type={constant('checkbox')}
+      />
+    ));
+
+    const [checkbox] = inputs;
+
+    assert.isDefined(checkbox);
+
+    checkbox.click();
+
+    await nextFrame();
+
+    assert.isFalse(checkbox.checked);
+
+    assert.isTrue(checkbox.indeterminate);
+
+    unmount();
+  });
+
+  test('a bound indeterminate is drawn again with checked left to the user', async () => {
+    const { inputs, unmount } = mountInDocument(() => (
+      <input
+        defaultChecked={constant(false)}
+        indeterminate={constant(true)}
+        type={constant('checkbox')}
+      />
+    ));
+
+    const [checkbox] = inputs;
+
+    assert.isDefined(checkbox);
+
+    checkbox.click();
+
+    await nextFrame();
+
+    assert.isTrue(checkbox.checked);
+
+    assert.isTrue(checkbox.indeterminate);
+
+    unmount();
+  });
+
+  test('a radio button whose choice is refused checks the bound one of its group again', async () => {
+    const { inputs, unmount } = mountInDocument(() => (
+      <>
+        <input
+          checked={constant(true)}
+          name={constant('controlled "refused"')}
+          type={constant('radio')}
+        />
+        <input
+          checked={constant(false)}
+          name={constant('controlled "refused"')}
+          type={constant('radio')}
+        />
+      </>
+    ));
+
+    const [first, second] = inputs;
+
+    assert.isDefined(first);
+
+    assert.isDefined(second);
+
+    second.click();
+
+    await nextFrame();
+
+    assert.isTrue(first.checked);
+
+    assert.isFalse(second.checked);
+
+    unmount();
+  });
+
+  test('a radio button whose choice is taken moves the group to it', async () => {
+    const [choice$, setChoice] = createState<'a' | 'b'>('a');
+
+    const { inputs, unmount } = mountInDocument(() => (
+      <>
+        {(['a', 'b'] as const).map((choice) => (
+          <input
+            checked={view(choice$, (c) => c === choice)}
+            name={constant('controlled-taken')}
+            type={constant('radio')}
+            onChange={() => {
+              setChoice(choice);
+            }}
+          />
+        ))}
+      </>
+    ));
+
+    const [first, second] = inputs;
+
+    assert.isDefined(first);
+
+    assert.isDefined(second);
+
+    second.click();
+
+    await nextFrame();
+
+    assert.isFalse(first.checked);
+
+    assert.isTrue(second.checked);
+
+    unmount();
   });
 });
 

@@ -46,6 +46,7 @@ export const SignUp = (): JSX.Element => (
 ```
 
 - ほとんどの props は `setAttribute` で書き込みます。ただし `value`・`checked`・`selected`・`indeterminate` のように、ユーザーの操作で属性と実際の値がずれていくものは、DOM のプロパティとして書き込みます（`element.value = v`）。
+- `<input>` の `checked` と `indeterminate` は、束縛すると制御されたものになります。`change` の後、次のフレームが描画される前に束縛中の値で描き直すので、`onChange` で受け取らなかった変更は元に戻ります。上のチェックボックスなら、`toggleAgreed` を呼ばなければ切り替わりません。ユーザーが自由に切り替えるチェックボックスには `defaultChecked` を渡します。ラジオボタンのグループでは、すべてのボタンを束縛します。
 - `disabled` などの真偽属性は `Bindable<boolean>` を受け取り、値が `false` の間は属性を外します。
 
 ## `class` と `style`
