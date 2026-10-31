@@ -1,5 +1,15 @@
 # synstate-preact-signals
 
+## 6.2.0
+
+### Minor Changes
+
+- ba14fd7: Re-export synstate's types as well as its functions, so `import type { Observable } from 'synstate-react-hooks'` (and the same from the other wrapper packages) works without importing `synstate` directly.
+
+### Patch Changes
+
+- synstate@6.1.1
+
 ## 6.1.1
 
 ### Patch Changes

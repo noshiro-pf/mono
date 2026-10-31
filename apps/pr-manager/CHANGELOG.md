@@ -1,5 +1,16 @@
 # pr-manager
 
+## 0.0.17
+
+### Patch Changes
+
+- Updated dependencies [2cd2d59]
+    - pr-report-core@0.2.0
+    - synstate@6.1.1
+    - synstate-dom@0.4.0
+    - ts-fortress@12.4.1
+    - ts-data-forge@14.10.0
+
 ## 0.0.16
 
 ### Patch Changes
