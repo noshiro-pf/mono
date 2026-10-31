@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { skipTypeWrappers } from 'eslint-rule-forge';
+import { siblingOf, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import { castNode, isReactApiCall } from './shared.mjs';
@@ -146,41 +146,16 @@ const normalizeNames = (
       ? new Set<string>([names])
       : new Set(names);
 
+/**
+ * The assignment in the statement right after the one declaring `node`, in the
+ * same statement list: the program's, a block's, a class static block's, a
+ * namespace's or a `case`'s. For a component declared inside a function, the
+ * statement after the enclosing one does not count.
+ */
 const getDisplayNameAssignment = (
   node: DeepReadonly<TSESTree.VariableDeclarator>,
 ): DeepReadonly<TSESTree.AssignmentExpression> | undefined => {
-  let mut_current = node.parent as DeepReadonly<TSESTree.Node> | undefined;
-
-  let mut_statement: DeepReadonly<TSESTree.Statement> | undefined = undefined;
-
-  while (mut_current !== undefined) {
-    if (
-      mut_current.type === AST_NODE_TYPES.VariableDeclaration ||
-      mut_current.type === AST_NODE_TYPES.ExportNamedDeclaration
-    ) {
-      mut_statement = mut_current;
-    }
-
-    if (mut_current.type === AST_NODE_TYPES.Program) {
-      break;
-    }
-
-    mut_current = mut_current.parent;
-  }
-
-  if (mut_current === undefined || mut_statement === undefined) {
-    return undefined;
-  }
-
-  const program = mut_current;
-
-  const componentIndex = program.body.indexOf(mut_statement);
-
-  if (componentIndex === -1) {
-    return undefined;
-  }
-
-  const nextStatement = program.body[componentIndex + 1];
+  const nextStatement = siblingOf(node.parent, 1);
 
   if (nextStatement?.type !== AST_NODE_TYPES.ExpressionStatement) {
     return undefined;

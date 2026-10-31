@@ -4,7 +4,11 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { getRangeWithParens, parenthesesDepth } from 'eslint-rule-forge';
+import {
+  getRangeWithParens,
+  parenthesesDepth,
+  siblingOf,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import { isSameReference } from './reference-utils.mjs';
@@ -537,48 +541,6 @@ const nodeBodyOf = (
   return node;
 };
 
-const statementListOf = (
-  node: DeepReadonly<TSESTree.Node>,
-): readonly DeepReadonly<TSESTree.Node>[] | undefined => {
-  const { parent } = node;
-
-  if (parent === undefined) {
-    return undefined;
-  }
-
-  if (
-    parent.type === AST_NODE_TYPES.Program ||
-    parent.type === AST_NODE_TYPES.BlockStatement ||
-    parent.type === AST_NODE_TYPES.StaticBlock ||
-    parent.type === AST_NODE_TYPES.TSModuleBlock
-  ) {
-    return parent.body;
-  }
-
-  return parent.type === AST_NODE_TYPES.SwitchCase
-    ? parent.consequent
-    : undefined;
-};
-
-/**
- * The statement next to `node` in the list it is one of — the only place a
- * branch that returns can fall through to what follows it.
- */
-const siblingOf = (
-  node: DeepReadonly<TSESTree.Node>,
-  offset: 1 | -1,
-): DeepReadonly<TSESTree.Node> | undefined => {
-  const list = statementListOf(node);
-
-  if (list === undefined) {
-    return undefined;
-  }
-
-  const index = list.indexOf(node);
-
-  return index === -1 ? undefined : list[index + offset];
-};
-
 /**
  * Every branch of the chain starting at `start`, in order, and the fallback
  * that follows the last.
@@ -617,6 +579,8 @@ const collectChain = (
       return undefined;
     }
 
+    // The statement after it in its list is the only place a branch that
+    // returns can fall through to.
     const next = siblingOf(mut_last, 1);
 
     if (next?.type === AST_NODE_TYPES.ReturnStatement) {
