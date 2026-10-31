@@ -2,7 +2,7 @@
 title: 非同期処理の比較
 description: debounce、キャンセル、ローディングとエラーの状態、破棄までを備えた本番品質の検索ボックスを、SynState・RxJS・MobX・Jotai・Redux Toolkit・Solid・Preact Signals で書き比べます。
 sidebar:
-    order: 6
+    order: 7
 ---
 
 [宣言的な状態管理](/mono/synstate/ja/guides/declarative-state-management/#非同期処理の正確な制御)では、`debounce`・`switchMap`・`fromAbortablePromise` による SynState のパイプラインを、React の `useEffect` で書いた同じ検索ボックスと比べました。このページでは、その検索ボックスを[ベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/)が派生グラフで計測している各ライブラリで、本番コードに必要な水準まで書きます。そうすると残る違いは、各ライブラリが何を提供し、何を自分で書くことになるかです（単一ステートでのみ計測している Zustand と Valtio には、比べるべき派生や非同期のプリミティブがありません）。

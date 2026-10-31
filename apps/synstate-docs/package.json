@@ -18,6 +18,7 @@
     "benchmark:equality-cut-off": "run-s z:build:synstate z:benchmark:equality-cut-off gen:benchmark-doc fix:fmt",
     "build": "run-s doc build:astro",
     "build:astro": "astro build",
+    "check:e2e": "playwright test --config ./configs/playwright.config.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && tsc --noEmit",
     "dev": "astro dev",
@@ -70,6 +71,7 @@
   },
   "devDependencies": {
     "@astrojs/markdown-remark": "7.3.4",
+    "@playwright/test": "catalog:",
     "@preact/signals-core": "catalog:",
     "@reduxjs/toolkit": "catalog:",
     "@types/react": "catalog:",
