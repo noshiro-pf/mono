@@ -600,10 +600,21 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       Math.min(...summarySlowestSpreads()),
       1,
     ),
-    // The figure the paragraph on Preact Signals sets beside SynState's. The
-    // per-library table's cell carries markup, so the prose has its own key.
+    // The claim beside SynState's worst case on the pages that pitch it, which
+    // holds only while SynState is the one library the per-library table
+    // emphasizes.
+    'summary/synstate-alone-in-single-digits': whileAloneInSingleDigits(
+      'SynState',
+      {
+        en: 'the only library measured in all of them whose worst case stays in single digits',
+        ja: 'すべてのシナリオで計測したライブラリのうち、最悪のケースでも1桁倍に収まるのは SynState だけです',
+      },
+    ),
+    // The figure the paragraphs on Preact Signals set beside SynState's, as the
+    // larger of the two. The per-library table's cell carries markup, so the
+    // prose has its own key.
     'summary/preact-signals-worst-over-fastest':
-      worstCaseText('Preact Signals'),
+      worstCaseTextAboveSynState('Preact Signals'),
     // Clauses that name or explain a library's worst row as a scenario the
     // prose then describes, and so hold only while the data pick it.
     'summary/rxjs-worst-label': whileWorstIn('RxJS', CASCADED_DIAMOND, {
@@ -2384,20 +2395,94 @@ const worstCaseText = (
 ): string => spreadText(spread, scenario.timedOut(library));
 
 /**
- * A library's worst case, `worst` from {@link worstSummaryRow}, as the
- * per-library table's cell prints it, `×` included; emphasized when it stays in
- * single digits, as the libraries that hold up in every scenario. Only a
- * library every summary row measured qualifies, since a worst case over some
- * rows alone (※3) says less. The class is styled in `src/styles/custom.css`.
+ * Whether `library`'s worst case stays in single digits, over every summary
+ * row: the cells {@link worstCaseCell} emphasizes.
  */
-const worstCaseCell = (library: string, worst: WorstRow): string => {
+const holdsInSingleDigits = (
+  library: string,
+  worst: WorstRow = worstSummaryRow(library),
+): boolean =>
+  !worst.scenario.timedOut(library) &&
+  inSingleDigits(worst.spread) &&
+  inEveryScenario(library);
+
+/**
+ * `library`'s worst case, as {@link worstCaseText} quotes it, for prose that
+ * sets it against SynState's as the larger of the two — or an error once it is
+ * not by {@link CLEARLY_ABOVE} times, or is in single digits itself, or is over
+ * some summary rows only, since that prose would then argue the other way, or
+ * call a small gap large, or leave out the ※3 mark.
+ */
+/**
+ * How many times SynState's worst case another library's has to be before the
+ * prose may call the gap large.
+ */
+const CLEARLY_ABOVE = 2;
+
+const worstCaseTextAboveSynState = (library: string): string => {
+  const worst = worstSummaryRow(library);
+
+  const synState = worstSummaryRow('SynState');
+
+  // A marker key has no spaces: `Preact Signals` → `preact-signals`.
+  const key =
+    `summary/${library.toLowerCase().replaceAll(' ', '-')}-worst-over-fastest` as const;
+
+  if (!inEveryScenario(library)) {
+    throw new Error(
+      `❌ ${library} is no longer measured in every summary row, so its worst case needs the ※3 mark: rewrite every sentence that quotes ${key}`,
+    );
+  }
+
+  if (
+    holdsInSingleDigits(library, worst) ||
+    worst.spread < CLEARLY_ABOVE * synState.spread
+  ) {
+    throw new Error(
+      `❌ ${library}'s worst case (${worstCaseText(library, worst)}×) is no longer clearly above SynState's (${worstCaseText('SynState', synState)}×): rewrite every sentence that quotes ${key}`,
+    );
+  }
+
+  return worstCaseText(library, worst);
+};
+
+/**
+ * A library's worst case, `worst` from {@link worstSummaryRow}, as the
+ * per-library table's cell prints it, `×` included; emphasized when the caller
+ * says so, which {@link holdsInSingleDigits} decides. The class is styled in
+ * `src/styles/custom.css`.
+ */
+const worstCaseCell = (
+  library: string,
+  worst: WorstRow,
+  emphasized: boolean,
+): string => {
   const text = `${worstCaseText(library, worst)}×` as const;
 
-  return !worst.scenario.timedOut(library) &&
-    inSingleDigits(worst.spread) &&
-    inEveryScenario(library)
+  return emphasized
     ? (`<strong class="benchmark-emphasis">${text}</strong>` as const)
     : text;
+};
+
+/**
+ * `clause`, which says `library` is the only one whose worst case stays in
+ * single digits — or an error once the data emphasize another library beside
+ * it, or not it, since the clause would then claim what the table does not
+ * show.
+ */
+const whileAloneInSingleDigits = (
+  library: string,
+  clause: Localized,
+): Localized => {
+  const holding = summaryLibraries().filter((l) => holdsInSingleDigits(l));
+
+  if (!Arr.isFixedLengthArray(1, holding) || holding[0] !== library) {
+    throw new Error(
+      `❌ the libraries whose worst case stays in single digits are now [${holding.join(', ')}], not ${library} alone: rewrite every sentence that quotes summary/synstate-alone-in-single-digits, and the benchmark page's that SynState is never far behind; if none is left, also the note on the emphasis under the per-library table`,
+    );
+  }
+
+  return clause;
 };
 
 /**
@@ -2427,18 +2512,21 @@ const worstCaseRows = (): ReadonlyRecord<string, BenchmarkNumber> => {
   const rows = summaryLibraries().map((library) => {
     const worst = worstSummaryRow(library);
 
+    const emphasized = holdsInSingleDigits(library, worst);
+
     return {
       // `Preact Signals` → `preact-signals`: a marker key has no spaces.
       key: library.toLowerCase().replaceAll(' ', '-'),
       library: partialMarked(library),
       scenario: worst.scenario.name,
       fastest: worst.scenario.fastest(),
-      cell: worstCaseCell(library, worst),
+      emphasized,
+      cell: worstCaseCell(library, worst, emphasized),
       perUpdate: perUpdateCell(library, worst),
     };
   });
 
-  if (rows.every(({ cell }) => !cell.startsWith('<strong'))) {
+  if (rows.every(({ emphasized }) => !emphasized)) {
     throw new Error(
       '❌ no library holds its worst case in single digits: remove the note on the emphasis under the per-library table',
     );

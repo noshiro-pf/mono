@@ -7,7 +7,7 @@ sidebar:
 
 import SignalsOperatorsDemo from '../../../../../components/signals-operators-demo/signals-operators-demo-island.astro';
 
-[ベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)は SynState と Preact Signals のどちらが一貫して速いとも言っていません。そこで当然の疑問が出ます。Preact Signals を使い、その上に SynState の operator を足せばよいのではないか、と。純粋な変換はそのまま載ります。それが `computed` だからです。一方、状態を持つ operator、待つ operator、リクエストを始める operator は `computed` にできず、signal に書き込む `effect` になります。そう書くと、SynState の operator が保っている 2 つの性質を失います。どの読み手も整合したグラフを見ること、そして 1 回の発行が 1 つのイベントであることです。
+Preact Signals もグリッチフリーです。そこで当然の疑問が出ます。Preact Signals を使い、その上に SynState の operator を足せばよいのではないか、と。純粋な変換はそのまま載ります。それが `computed` だからです。一方、状態を持つ operator、待つ operator、リクエストを始める operator は `computed` にできず、signal に書き込む `effect` になります。そう書くと、SynState の operator が保っている 2 つの性質を失います。どの読み手も整合したグラフを見ること、そして 1 回の発行が 1 つのイベントであることです。
 
 このページの例は `@preact/signals-core` を使っており、ライブラリを動かす例はどれもそれに対して実行するテストです。
 

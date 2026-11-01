@@ -25,12 +25,14 @@ const tablePages: readonly string[] = [
  *
  * The introduction and the landing page used to open with "up to N× faster than
  * Jotai", which is the first number a reader sees and the last one anyone
- * thinks to update, and now link to the benchmark summary instead. They stay
- * listed so that a marker written there again, in the spelling the page's
- * format allows (see `inlineMarkers`), is filled, and
- * {@link assertEveryRatioMarked} fails on a ratio quoted there without one.
- * The library comparison sums the benchmark up in a sentence, which names the
- * library that leads each scenario through a marker for the same reason.
+ * thinks to update. Both now quote SynState's worst case through a marker
+ * instead, which every run regenerates from the committed tables. Being listed
+ * is what fills those markers, in the spelling the page's format allows (see
+ * `inlineMarkers`), and makes {@link assertEveryRatioMarked} fail on a ratio
+ * quoted there without one.
+ * "Why SynState?" and the library comparison sum the benchmark up in a sentence
+ * or two, which quote SynState's worst case, and in the comparison the library
+ * that leads each scenario, through markers for the same reason.
  */
 const quotingPages: readonly string[] = [
   path.resolve(
@@ -43,6 +45,8 @@ const quotingPages: readonly string[] = [
   ),
   path.resolve(workspaceRootPath, 'src/content/docs/index.mdx'),
   path.resolve(workspaceRootPath, 'src/content/docs/ja/index.mdx'),
+  path.resolve(workspaceRootPath, 'src/content/docs/guides/why-synstate.md'),
+  path.resolve(workspaceRootPath, 'src/content/docs/ja/guides/why-synstate.md'),
   path.resolve(
     workspaceRootPath,
     'src/content/docs/guides/library-comparison/library-comparison.md',

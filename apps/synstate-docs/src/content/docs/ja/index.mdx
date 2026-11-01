@@ -29,7 +29,12 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     </Card>
     <Card title="operator を通してもグリッチフリー" icon="approve-check">
 
-更新はどれも、届く先を深さ順にたどる 1 回のパスです。`debounce` や `switchMap` が後から始める更新も同じです。そのため subscriber が更新途中のグラフを見ることはなく、1 回の更新のコストはノード間の経路の数ではなく、届くノードの数に比例します。effect で書いた operator が何を失うかは [Signals の上の operator](/mono/synstate/ja/guides/library-comparison/operators-on-signals/)、シナリオごとの速さは[ベンチマークの概要](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)を参照。
+更新はどれも、届く先を深さ順にたどる 1 回のパスです。`debounce` や `switchMap` が後から始める更新も同じです。そのため subscriber が更新途中のグラフを見ることはなく、1 回の更新のコストはノード間の経路の数ではなく、届くノードの数に比例します。effect で書いた operator が何を失うかは [Signals の上の operator](/mono/synstate/ja/guides/library-comparison/operators-on-signals/) を参照。
+
+    </Card>
+    <Card title="非常に高速" icon="rocket">
+
+ベンチマークの概要では、SynState はどのシナリオでも最速のライブラリの {/* bench:summary/synstate-worst-over-fastest */}2.7{/* /bench */} 倍以内に収まります。{/* bench:summary/synstate-alone-in-single-digits */}すべてのシナリオで計測したライブラリのうち、最悪のケースでも1桁倍に収まるのは SynState だけです{/* /bench */}。ライブラリごとの最悪のケースは[ベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)を参照。
 
     </Card>
     <Card title="軽量" icon="seti:favicon">
