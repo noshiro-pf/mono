@@ -168,7 +168,8 @@ const execGit = async (
       (error, stdout, stderr) => {
         if (!silent) {
           if (stdout !== '') {
-            console.info(stdout);
+            // One name per line, as before `-z`; NULs would print as nothing.
+            console.info(stdout.replaceAll('\0', '\n'));
           }
 
           if (stderr !== '') {
@@ -221,6 +222,10 @@ const cmdResultToFiles = async ({
   const result = await execGit(
     [
       ...args,
+      // NUL-separated and unquoted: without `-z`, git's default
+      // `core.quotePath` writes a non-ASCII name, or one with a `"`, quoted and
+      // octal-escaped (`"\346\227\245.md"`), which names no file.
+      '-z',
       ...((options?.excludeDeleted ?? true)
         ? argsToExcludeDeleted
         : argsToIncludeDeleted),
@@ -242,11 +247,11 @@ const cmdResultToFiles = async ({
 
   const { stdout } = result.value;
 
-  // Parse git output and convert to absolute paths
+  // Parse git output and convert to absolute paths. Not trimmed: a name can
+  // begin or end with a space.
   const files = stdout
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line !== '')
+    .split('\0')
+    .filter((name) => name !== '')
     .map((relativePath) => path.join(gitRoot, relativePath));
 
   return Result.ok(files);
