@@ -21,7 +21,9 @@ import { Arr, Num, Result } from 'ts-data-forge';
  * 0.8–1.4× between runs on `ubuntu-24.04`, one point by 2.5×, because the
  * runner instances differ. So each library's change is divided by the median
  * change of every library in the same scenario, which is the machine's share of
- * it, and only what is left is judged.
+ * it, and only what is left is judged. A library, or a point of a sweep, that
+ * only one side has is drift too, and so is a library with no point measured on
+ * both sides.
  */
 const main = async (): Promise<void> => {
   const [referenceDir, committedDir] = Arr.skip(process.argv, 2);
@@ -55,7 +57,7 @@ const main = async (): Promise<void> => {
         ? '### The committed tables have drifted from the reference'
         : '### The committed tables are within tolerance of the reference',
       '',
-      `Each library's change (geometric mean over the scenario's points of reference / committed), divided by the median change of all libraries in that scenario. Drift is a value beyond ${THRESHOLD.toString()}× either way.`,
+      `Each library's change (geometric mean over the scenario's points of reference / committed), divided by the median change of all libraries in that scenario. Drift is a value beyond ${THRESHOLD.toString()}× either way, a library or point only one side has, or a library with no point measured on both sides.`,
       '',
       '| scenario | library | change | machine | after the machine | verdict |',
       '| :-- | :-- | --: | --: | --: | :-- |',
@@ -187,6 +189,75 @@ const labelsOf = (results: Results): readonly string[] =>
     ? results.rows.map((r) => r.label)
     : results.series.map((s) => s.label);
 
+/** The sweep's labels, or none for a single-point scenario. */
+const sweepPointsOf = (results: Results): readonly string[] =>
+  results.kind === 'stats' ? ([] as const) : results.xLabels;
+
+/** Whether `label` has a value at any point, rather than timing out at all. */
+const isMeasured = (results: Results, label: string): boolean =>
+  pointsOf(results).some((point) => {
+    const value = valueAt(results, label, point);
+
+    return value !== undefined && value > 0;
+  });
+
+/**
+ * A drifted row for each library, and each point of a sweep, that only one side
+ * has, and for each library both sides have that no point compares (one side
+ * timed out wherever the other measured it). The ratios below compare only
+ * points both sides measured, so without these a library added to a runner, or
+ * one removed from it, would pass while the published tables lack it or still
+ * show it. A library that timed out everywhere on both sides is left out.
+ */
+const oneSidedRows = (
+  scenario: Scenario,
+  reference: Results,
+  committed: Results,
+): readonly string[] => {
+  const row = (name: string, verdict: string): string =>
+    `| ${scenario.title} | ${name} | — | — | — | **${verdict}** |` as const;
+
+  const differences = (
+    names: (results: Results) => readonly string[],
+    describe: (name: string) => string,
+  ): readonly string[] => {
+    const inReference = new Set(names(reference));
+
+    const inCommitted = new Set(names(committed));
+
+    return [
+      ...Array.from(inReference)
+        .filter((name) => !inCommitted.has(name))
+        .map((name) =>
+          row(describe(name), 'missing from the committed tables'),
+        ),
+      ...Array.from(inCommitted)
+        .filter((name) => !inReference.has(name))
+        .map((name) => row(describe(name), 'missing from the reference')),
+    ];
+  };
+
+  const committedLabels = new Set(labelsOf(committed));
+
+  const incomparable = Arr.generate(function* () {
+    for (const label of labelsOf(reference)) {
+      if (
+        committedLabels.has(label) &&
+        changeOf(label, reference, committed) === undefined &&
+        (isMeasured(reference, label) || isMeasured(committed, label))
+      ) {
+        yield row(label, 'no point measured on both sides');
+      }
+    }
+  });
+
+  return [
+    ...differences(labelsOf, (label) => label),
+    ...differences(sweepPointsOf, (point) => `point ${point}`),
+    ...incomparable,
+  ];
+};
+
 const judgeScenario = (
   scenario: Scenario,
   reference: Results | undefined,
@@ -206,6 +277,18 @@ const judgeScenario = (
     };
   }
 
+  if (reference.kind !== committed.kind) {
+    // A sweep against a single point has no ratio worth printing.
+    return {
+      drifted: true,
+      rows: [
+        `| ${scenario.title} | — | — | — | — | **${reference.kind} in the reference, ${committed.kind} in the committed tables** |`,
+      ],
+    };
+  }
+
+  const oneSided = oneSidedRows(scenario, reference, committed);
+
   const changes = Arr.generate(function* () {
     for (const label of labelsOf(reference)) {
       const change = changeOf(label, reference, committed);
@@ -221,7 +304,10 @@ const judgeScenario = (
   if (machine === undefined || !Num.isNonZero(machine)) {
     return {
       drifted: true,
-      rows: [`| ${scenario.title} | — | — | — | — | nothing to compare |`],
+      rows: Arr.toPushed(
+        oneSided,
+        `| ${scenario.title} | — | — | — | — | nothing to compare |`,
+      ),
     };
   }
 
@@ -238,8 +324,8 @@ const judgeScenario = (
   });
 
   return {
-    drifted: judged.some((j) => j.drifted),
-    rows: judged.map((j) => j.row),
+    drifted: Arr.isNonEmpty(oneSided) || judged.some((j) => j.drifted),
+    rows: [...oneSided, ...judged.map((j) => j.row)],
   };
 };
 
