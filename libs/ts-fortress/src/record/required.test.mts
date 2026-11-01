@@ -759,4 +759,65 @@ describe(required, () => {
       });
     });
   });
+
+  describe('a required member', () => {
+    test('keeps the members a type inherits through its prototype', () => {
+      const base = number(0);
+
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+      const inherited = Object.create(base) as typeof base;
+
+      const xs = required(record({ x: optional(inherited) }));
+
+      assert.isTrue(xs.is({ x: 1 }));
+
+      assert.isFalse(xs.is({}));
+    });
+
+    test('becomes required when it inherits the optional flag', () => {
+      const optionalNumber = optional(number(0));
+
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+      const inherited = Object.create(optionalNumber) as typeof optionalNumber;
+
+      const xs = required(record({ x: inherited }));
+
+      assert.isFalse(xs.is({}));
+
+      assert.isTrue(xs.is({ x: 1 }));
+    });
+
+    test('keeps its properties and leaves a lazy default unevaluated', () => {
+      const Address = record({ zip: number(0) });
+
+      const computeDefault = vi.fn(() => Address.defaultValue);
+
+      const lazyAddress = {
+        ...Address,
+        get defaultValue(): typeof Address.defaultValue {
+          return computeDefault();
+        },
+      } as const;
+
+      const user = required(record({ address: optional(lazyAddress) }));
+
+      expect(computeDefault).not.toHaveBeenCalled();
+
+      expect(user.structure).toMatchObject({
+        kind: 'record',
+        shape: { address: { shape: Address.shape } },
+      });
+
+      expect(user.structure).not.toHaveProperty(
+        ['shape', 'address', 'optional'],
+        true,
+      );
+
+      expect(computeDefault).not.toHaveBeenCalled();
+
+      assert.deepStrictEqual(user.defaultValue, { address: { zip: 0 } });
+
+      expect(computeDefault).toHaveBeenCalledExactlyOnceWith();
+    });
+  });
 });

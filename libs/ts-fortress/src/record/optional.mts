@@ -1,9 +1,11 @@
 import type { StrictOmit } from 'ts-type-forge';
-import { hasConstraints } from '../constraints/index.mjs';
-import type { Type, UnknownType } from '../type.mjs';
+import { copyTypeByDescriptors, type UnknownType } from '../type.mjs';
 
 /**
  * Converts a Type to an optional property type.
+ *
+ * The result keeps every property of `t` — a record's `shape`, a constrained
+ * type's `constraints` — and adds `optional: true`.
  *
  * @template T - The Type to make optional
  * @param t - The Type to make optional
@@ -51,35 +53,21 @@ export const optional = <T extends UnknownType>(
     }>
   >,
 ): OptionalPropertyType<T> =>
+  // `OptionalPropertyType<T>` is `T & { optional: true }`, so every property of
+  // `t` is carried over — a record's `shape`, a constrained type's
+  // `constraints`, and whatever else a wrapper attached. Property descriptors
+  // rather than a spread: a spread would call the lazy `defaultValue` getter of
+  // a record, union or recursion here, which for a recursive type still being
+  // defined never terminates.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  ({
-    assertIs: t.assertIs,
-    is: t.is,
-    cast: t.cast,
-    fill: t.fill,
-    prune: t.prune,
-    validate: t.validate,
-    typeName: t.typeName,
-    ...(t.structure === undefined ? {} : { structure: t.structure }),
-    ...(t.annotations === undefined ? {} : { annotations: t.annotations }),
-
-    // `OptionalPropertyType<T>` is `T & { optional: true }`, so a constrained
-    // member type keeps promising its `constraints` — carry them over, or an
-    // optional record field would read `undefined` at runtime while typed
-    // otherwise. A blanket `...t` would do it, but that also reads
-    // `defaultValue`, which is a lazy getter on record types and must not be
-    // evaluated here (see `forceUndefinedDefault` below).
-    ...(hasConstraints(t) ? { constraints: t.constraints } : {}),
-
-    defaultValue:
-      options?.forceUndefinedDefault === true
-        ? // For recursive types: set defaultValue to undefined to avoid infinite loops
-          undefined
-        : // For normal types: preserve the original defaultValue
-          t.defaultValue,
-
-    optional: true,
-  }) satisfies OptionalPropertyType<Type<unknown>> as OptionalPropertyType<T>;
+  copyTypeByDescriptors(t, {
+    ...Object.getOwnPropertyDescriptors(t),
+    ...(options?.forceUndefinedDefault === true
+      ? // For recursive types: set defaultValue to undefined to avoid infinite loops
+        { defaultValue: { value: undefined, enumerable: true } }
+      : {}),
+    optional: { value: true, enumerable: true },
+  }) as OptionalPropertyType<T>;
 
 export type OptionalPropertyType<T extends UnknownType> = T &
   Readonly<{ optional: true }>;
