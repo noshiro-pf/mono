@@ -43,7 +43,7 @@ SynState のアイデアは **既出の概念** である。個々の構成要�
 ### 1.5 Maier & Odersky — "Deprecating the Observer Pattern with Scala.React" (2012)
 
 - Scala.React がトポロジカル順序に基づく伝搬サイクルの2フェーズでオブザーバーが不整合データを観測しないことを保証する方法を記述。
-- URL: <https://infoscience.epfl.ch/record/176887>
+- URL: <https://infoscience.epfl.ch/items/e606e195-5e7a-4ba2-9d30-3205bb42201a>
 
 ### 1.6 Burchett, Cooper & Krishnamurthi — "Lowering: A Static Optimization Technique for Transparent Functional Reactivity" (PEPM 2007)
 
