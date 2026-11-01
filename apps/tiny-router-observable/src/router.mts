@@ -251,19 +251,27 @@ export const createRouter = (routerOptions?: RouterOptions): Router => {
 };
 
 /**
- * Normalizes a path so it ends in a slash, moving a query string after it.
+ * Ends the path part of `path` — everything before the first `?` or `#` of a
+ * path or a whole URL — in a slash, leaving the query and fragment as they are.
+ * A bare query or fragment (`?q`, `#h`) refers to the current page and comes
+ * back unchanged: a slash in front of it would point at the root instead.
  *
  * Exported as well as reachable through `Router.utils`, so that a caller who
  * only needs this pure transformation does not have to construct a router —
  * `createRouter` without a `browser` reads `window.location` at call time,
  * which a Node test cannot do.
  */
-export const withSlash = (path: string): string =>
-  path.endsWith('/') || path.includes('/?')
+export const withSlash = (path: string): string => {
+  const suffixStart = path.search(/[?#]/u);
+
+  const pathEnd = suffixStart === -1 ? path.length : suffixStart;
+
+  const pathname = path.slice(0, pathEnd);
+
+  return pathname === '' && pathEnd < path.length
     ? path
-    : path.includes('?')
-      ? path.replaceAll('?', '/?')
-      : (`${path}/` as const);
+    : `${pathname.endsWith('/') ? pathname : `${pathname}/`}${path.slice(pathEnd)}`;
+};
 
 /**
  * The real window, read when a router is created: the location as

@@ -5,6 +5,7 @@ import {
   normalizeBasePath,
   prependBasePath,
   stripBasePath,
+  withSlash,
   type Router,
   type RouterState,
 } from '../src/index.mjs';
@@ -55,6 +56,29 @@ describe(prependBasePath, () => {
   });
 });
 
+describe(withSlash, () => {
+  test.each([
+    ['', '/'],
+    ['a', 'a/'],
+    ['?q', '?q'],
+    ['#h', '#h'],
+    ['?q#h', '?q#h'],
+    ['/a', '/a/'],
+    ['/a/', '/a/'],
+    ['/a#h', '/a/#h'],
+    ['/a?q#h', '/a/?q#h'],
+    ['/a/#x?y', '/a/#x?y'],
+    ['/a#h/', '/a/#h/'],
+    ['/a?x=?y', '/a/?x=?y'],
+    ['/a?x=/?y#h', '/a/?x=/?y#h'],
+    ['/a/?x=1#h', '/a/?x=1#h'],
+    ['https://example.com/a#h', 'https://example.com/a/#h'],
+    ['https://example.com/a/?x=1#h', 'https://example.com/a/?x=1#h'],
+  ] as const)('%j becomes %j', (path, expected) => {
+    expect(withSlash(path)).toBe(expected);
+  });
+});
+
 describe(createRouter, () => {
   test('without a base path, the pathname is the whole one', () => {
     const browser = createMemoryBrowser('https://example.com/career/');
@@ -99,6 +123,72 @@ describe(createRouter, () => {
 
     expect(stateOf(router).pathname).toBe('/career/');
   });
+
+  test('push and redirect retain fragments and query values below the base path', () => {
+    const browser = createMemoryBrowser('https://example.com/mono/profile/');
+
+    const router = createRouter({ basePath: '/mono/profile/', browser });
+
+    router.push('/page#team');
+
+    expect(browser.url().href).toBe(
+      'https://example.com/mono/profile/page/#team',
+    );
+
+    expect(stateOf(router).pathname).toBe('/page/');
+
+    router.redirect('/a?x=?y#section?detail');
+
+    expect(browser.url().href).toBe(
+      'https://example.com/mono/profile/a/?x=?y#section?detail',
+    );
+
+    expect(stateOf(router).searchParams.get('x')).toBe('?y');
+  });
+
+  test('a bare fragment or query pushed stays on the current page', () => {
+    const browser = createMemoryBrowser('https://example.com/mono/profile/a/');
+
+    const router = createRouter({ basePath: '/mono/profile/', browser });
+
+    router.push('#sec');
+
+    expect(browser.url().href).toBe('https://example.com/mono/profile/a/#sec');
+
+    router.push('?q=1');
+
+    expect(browser.url().href).toBe('https://example.com/mono/profile/a/?q=1');
+
+    expect(stateOf(router).pathname).toBe('/a/');
+  });
+
+  test.each(['pushState', 'replaceState'] as const)(
+    'removing the last query parameter with %s retains the fragment',
+    (method) => {
+      const browser = createMemoryBrowser(
+        'https://example.com/mono/profile/a/?x=1#sec',
+      );
+
+      const router = createRouter({ basePath: '/mono/profile/', browser });
+
+      router.updateQueryParams(
+        (draft) => {
+          draft.delete('x');
+
+          return draft;
+        },
+        { method },
+      );
+
+      expect(browser.url().href).toBe(
+        'https://example.com/mono/profile/a/#sec',
+      );
+
+      expect(stateOf(router).pathname).toBe('/a/');
+
+      expect(stateOf(router).searchParams.size).toBe(0);
+    },
+  );
 
   test('a query string pushed to the root stays on the page', () => {
     const browser = createMemoryBrowser('https://example.com/mono/loan/');
