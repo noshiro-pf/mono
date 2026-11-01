@@ -217,6 +217,26 @@ export const withStructure = <T extends UnknownType>(
   ) as T;
 
 /**
+ * @internal A new object with the prototype of `type` and the property
+ * `descriptors` given, which are usually `type`'s own with some replaced.
+ * Copying by descriptor leaves a lazy `defaultValue` getter unevaluated (see
+ * `attachConstraints`), and keeping the prototype keeps the members a `Type`
+ * written as a class inherits.
+ */
+export const copyTypeByDescriptors = (
+  type: UnknownType,
+  descriptors: PropertyDescriptorMap,
+): unknown => {
+  const proto: unknown = Object.getPrototypeOf(type);
+
+  // A prototype is an object, a function or `null`, all of which
+  // `Object.create` takes; the other branch is unreachable.
+  return typeof proto === 'object' || typeof proto === 'function'
+    ? Object.create(proto, descriptors)
+    : Object.defineProperties({}, descriptors);
+};
+
+/**
  * @internal The bound used wherever a codec is accepted without caring which
  * value type it validates — `<T extends UnknownType>`, {@link UnknownShape},
  * and the element bounds of `union` / `tuple` / `intersection`.

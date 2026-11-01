@@ -8,6 +8,7 @@ import type {
   UnknownRecord,
 } from 'ts-type-forge';
 import {
+  copyTypeByDescriptors,
   flattenShapeStructure,
   recordViewOf,
   type ExcessPropertyOption,
@@ -95,10 +96,18 @@ const makeRequired = <T extends UnknownType>(t: T): RequiredPropertyType<T> => {
     return t as RequiredPropertyType<T>;
   }
 
-  const { optional: _, ...rest } = t;
+  // Property descriptors rather than an object rest, as in `optional`: a rest
+  // would call the lazy `defaultValue` getter of a record, union or recursion,
+  // and drop the members a `Type` written as a class inherits. Since the
+  // prototype is kept, `optional` is shadowed by a non-enumerable own
+  // `undefined` rather than only removed, in case `t` inherits the flag.
+  const { optional: _, ...descriptors } = Object.getOwnPropertyDescriptors(t);
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  return rest as RequiredPropertyType<T>;
+  return copyTypeByDescriptors(t, {
+    ...descriptors,
+    optional: { value: undefined },
+  }) as RequiredPropertyType<T>;
 };
 
 // --- expectType assertions ---
