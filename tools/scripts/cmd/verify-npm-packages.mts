@@ -27,8 +27,11 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * - `local` installs tarballs packed from this checkout — what the next
  *   release will be.
- * - `published` installs `latest` from npm — what consumers have now, which
- *   may be older.
+ * - `published` installs from npm the exact version pinned in
+ *   `verify-npm-packages/published/packages/<name>/package.json` — what
+ *   consumers have, as of the last time `--update` (run by `pnpm-update`)
+ *   moved the pins to `latest`. A new release reaches it only then (see
+ *   `publishedVersionPin`).
  *
  * Both exist because they answer different questions. `local` fails on a
  * regression before it ships; `published` fails when something already released
