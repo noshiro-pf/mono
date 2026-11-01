@@ -497,6 +497,27 @@ describe('removeComments', () => {
     assert.strictEqual(stripComments(source), source);
   });
 
+  // Arrays of lines, because the trailing spaces inside the template literal
+  // are what is being tested.
+  test('trims only the line it erased from, after astral characters', () => {
+    const source = [
+      "export const e = '😀😀😀';",
+      'export const a = 1; // comment here',
+      'export const s = `line one   ',
+      'end`;',
+    ].join('\n');
+
+    assert.strictEqual(
+      stripComments(source),
+      [
+        "export const e = '😀😀😀';",
+        'export const a = 1;',
+        'export const s = `line one   ',
+        'end`;',
+      ].join('\n'),
+    );
+  });
+
   test('leaves the comments alone when the option is not set', () => {
     const source = dedent`
       /** doc */
