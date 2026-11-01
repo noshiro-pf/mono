@@ -6,6 +6,8 @@ import {
 } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { addLabel, log, type ApiContext } from '../lib/index.mjs';
+import { descriptionProblems } from '../pr-description/index.mjs';
+import { readConfig } from '../unblock-prs/index.mjs';
 import {
   containsBase,
   createPullRequest,
@@ -67,10 +69,21 @@ import {
  * looks for why a pull request waits — in the body of the one that waits — so
  * there is no second syntax to read. The pull requests named are checked to be
  * open before anything is pushed.
+ *
+ * **A `--body-file` written in two languages is checked first**, when the
+ * repository names a translation heading (`../pr-description/README.md`): a
+ * body whose halves do not mirror each other is refused before anything is
+ * pushed, as `pr-description push` refuses it later.
  */
 export const openPullRequest = async (
   options: Options,
 ): Promise<Result<string, string>> => {
+  const checked = await checkBodyFile(options.bodyFile);
+
+  if (Result.isErr(checked)) {
+    return checked;
+  }
+
   const context = await preflight();
 
   if (Result.isErr(context)) {
@@ -330,6 +343,50 @@ const stackOn = async (
   return parent;
 };
 
+const readBodyFile = async (
+  bodyFile: string,
+): Promise<Result<string, string>> => {
+  const read = await Result.fromPromise(
+    // The path is one the operator typed; there is no literal to use here.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFile(bodyFile, 'utf8'),
+  );
+
+  return Result.isErr(read)
+    ? Result.err(`cannot read ${bodyFile}: ${unknownToString(read.value)}`)
+    : read;
+};
+
+/**
+ * Refuses a `--body-file` whose original and translation do not mirror each
+ * other, when the repository's configuration names a translation heading.
+ */
+const checkBodyFile = async (
+  bodyFile: string | undefined,
+): Promise<Result<undefined, string>> => {
+  if (bodyFile === undefined) {
+    return Result.ok(undefined);
+  }
+
+  const config = await readConfig();
+
+  if (Result.isErr(config)) {
+    return config;
+  }
+
+  const read = await readBodyFile(bodyFile);
+
+  if (Result.isErr(read)) {
+    return read;
+  }
+
+  const problems = descriptionProblems(read.value, config.value?.translation);
+
+  return problems === undefined
+    ? Result.ok(undefined)
+    : Result.err(`${bodyFile}: ${problems}`);
+};
+
 const resolveTitle = async (
   options: Options,
 ): Promise<Result<string, string>> =>
@@ -350,16 +407,10 @@ const resolveBody = async (
     return Result.ok(trailer === undefined ? '' : `${trailer}\n`);
   }
 
-  const read = await Result.fromPromise(
-    // The path is one the operator typed; there is no literal to use here.
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(options.bodyFile, 'utf8'),
-  );
+  const read = await readBodyFile(options.bodyFile);
 
   if (Result.isErr(read)) {
-    return Result.err(
-      `cannot read ${options.bodyFile}: ${unknownToString(read.value)}`,
-    );
+    return read;
   }
 
   // The trailer goes first, where `unblock-prs` reads it and a reader sees it

@@ -234,13 +234,15 @@ Documents and comments may be Japanese; commits and pull request titles may
 not (see "Commits and pull requests").
 
 **A pull request or issue description a session writes is in both languages:
-English first, then a Japanese translation under one `##` heading, its headings
+English first, then the Japanese under `## 日本語`, its headings the English's
 one level down.** The author reviews the Japanese; sessions and tools read the
-English. What a tool parses appears once: `## Review` heads the English review
-alone (`docs/code-review-loop.md`), and closing keywords and the `Start-After:`
-and `Claude-Session:` lines end the body after a `---` rule (`open-pr` puts
-`Merge-After:` at the top). Screenshots, tables and code appear once, in the
-English half, and the Japanese refers to them. Edit both halves together.
+English. **Read one with `pnpm run pr-description -- read <N>`, which leaves
+the Japanese out, and write one only through `pr-description` (`pull` then
+`push`; `create` for an issue) or `open-pr --body-file`**: they refuse halves
+that do not mirror each other and an edit to one half alone
+(`libs/pr-merge-queue/src/pr-description/README.md`). `## Review` heads the
+English review alone (`docs/code-review-loop.md`); closing keywords and the
+`Start-After:` and `Claude-Session:` lines end the body after a `---` rule.
 
 ## Session rules
 

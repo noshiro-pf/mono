@@ -83,6 +83,18 @@
         "required": ["branch", "rebuild"],
         "additionalProperties": false
       }
+    },
+    "translation": {
+      "description": "Pull request and issue descriptions are written twice: the original, which tools and sessions read, then its translation under one `## <heading>`, its headings one level down, ending at the first `---` rule. Present: `open-pr --body-file` and `pr-description push` / `create` refuse a body whose halves do not mirror each other, and `pr-description read` leaves the translation out. Absent: descriptions are taken as they are.",
+      "type": "object",
+      "properties": {
+        "heading": {
+          "description": "The text of the `## ` heading the translation follows the original under, such as `日本語`.",
+          "type": "string"
+        }
+      },
+      "required": ["heading"],
+      "additionalProperties": false
     }
   },
   "required": [],

@@ -1,0 +1,375 @@
+import * as fs from 'node:fs/promises';
+import { Arr, Result, unknownToString } from 'ts-data-forge';
+import * as t from 'ts-fortress';
+import {
+  log,
+  resolveApiContext,
+  rest,
+  type ApiContext,
+} from '../lib/index.mjs';
+import { readConfig } from '../unblock-prs/index.mjs';
+import {
+  changedParts,
+  checkDescription,
+  readableDescription,
+  splitDescription,
+} from './body.mjs';
+import type { Command, CreateCommand, PushCommand } from './options.mjs';
+
+/**
+ * Runs one `pr-description` command (`./README.md`). A pull request's description
+ * and an issue's are the same field of the same object to the REST API, so
+ * every command takes either.
+ */
+export const runDescription = async (
+  command: Command,
+): Promise<Result<string, string>> => {
+  const config = await readConfig();
+
+  if (Result.isErr(config)) {
+    return config;
+  }
+
+  const heading = config.value?.translation;
+
+  switch (command.kind) {
+    case 'check':
+      return check(command.file, heading);
+
+    case 'read':
+    case 'pull':
+    case 'push':
+    case 'create': {
+      const api = await resolveApiContext(command.repo);
+
+      if (Result.isErr(api)) {
+        return api;
+      }
+
+      switch (command.kind) {
+        case 'read':
+          return readDescription(api.value, command.number, heading);
+
+        case 'pull':
+          return pull(api.value, command.number, command.file, heading);
+
+        case 'push':
+          return push(api.value, command, heading);
+
+        case 'create':
+          return create(api.value, command, heading);
+      }
+    }
+  }
+};
+
+/**
+ * Why `body` may not be posted, or `undefined` when it may: with a translation
+ * heading configured, a body whose halves do not mirror each other
+ * (`./body.mts`). `open-pr --body-file` asks the same before it pushes.
+ */
+export const descriptionProblems = (
+  body: string,
+  heading: string | undefined,
+): string | undefined => {
+  if (heading === undefined) {
+    return undefined;
+  }
+
+  const parts = splitDescription(body, heading);
+
+  if (Result.isErr(parts)) {
+    return parts.value;
+  }
+
+  const problems = checkDescription(parts.value);
+
+  return Arr.isNonEmpty(problems)
+    ? `the original and its translation do not mirror each other:\n${problems.map((p) => `- ${p}`).join('\n')}`
+    : undefined;
+};
+
+/** The file a pulled description's original state is kept in. */
+export const pulledPath = (file: string): string => `${file}.pulled` as const;
+
+/** GitHub keeps what its editor sent, CRLF included. */
+const lf = (text: string): string => text.replaceAll('\r\n', '\n');
+
+const readText = async (path: string): Promise<Result<string, string>> => {
+  const text = await Result.fromPromise(
+    // The path is one the operator typed; there is no literal to use here.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFile(path, 'utf8'),
+  );
+
+  return Result.isErr(text)
+    ? Result.err(`cannot read ${path}: ${unknownToString(text.value)}`)
+    : Result.ok(text.value);
+};
+
+const writeText = async (
+  path: string,
+  text: string,
+): Promise<Result<undefined, string>> => {
+  const written = await Result.fromPromise(
+    // The path is one the operator typed; there is no literal to use here.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFile(path, text, 'utf8'),
+  );
+
+  return Result.isErr(written)
+    ? Result.err(`cannot write ${path}: ${unknownToString(written.value)}`)
+    : Result.ok(undefined);
+};
+
+const readBody = async (
+  api: ApiContext,
+  number: number,
+): Promise<Result<string, string>> => {
+  const issue = await rest(
+    api,
+    'GET',
+    `/issues/${number}`,
+    t.record({ body: t.union([t.string(), t.nullType]) }),
+  );
+
+  return Result.isErr(issue)
+    ? Result.err(`cannot read #${number}: ${issue.value}`)
+    : Result.ok(lf(issue.value.body ?? ''));
+};
+
+const check = async (
+  file: string,
+  heading: string | undefined,
+): Promise<Result<string, string>> => {
+  if (heading === undefined) {
+    return Result.err(
+      'no translation heading in .github/unblock-prs.json: there is nothing to check a description against',
+    );
+  }
+
+  const body = await readText(file);
+
+  if (Result.isErr(body)) {
+    return body;
+  }
+
+  const problems = descriptionProblems(body.value, heading);
+
+  return problems === undefined
+    ? Result.ok(`${file}: the original and its translation mirror each other`)
+    : Result.err(`${file}: ${problems}`);
+};
+
+const readDescription = async (
+  api: ApiContext,
+  number: number,
+  heading: string | undefined,
+): Promise<Result<string, string>> => {
+  const body = await readBody(api, number);
+
+  if (heading === undefined || Result.isErr(body)) {
+    return body;
+  }
+
+  const parts = splitDescription(body.value, heading);
+
+  if (Result.isErr(parts)) {
+    // Read in full rather than refused: what a reader needs is the text, and a
+    // description written before the convention, or by a person, has no
+    // translation to leave out.
+    log(`#${number}: ${parts.value}; printed in full`);
+
+    return body;
+  }
+
+  return Result.ok(readableDescription(parts.value, heading));
+};
+
+/**
+ * Why `pull` may not write `file`, or `undefined` when it may: an edit there
+ * that was never pushed, which a pull — the one a refused push asks for — would
+ * silently discard.
+ */
+const pendingEdit = async (file: string): Promise<string | undefined> => {
+  const current = await readText(file);
+
+  if (Result.isErr(current)) {
+    return undefined;
+  }
+
+  const pulled = await readText(pulledPath(file));
+
+  return Result.isOk(pulled) && lf(pulled.value) === lf(current.value)
+    ? undefined
+    : `${file} holds an edit that was not pushed; move it aside, pull into a new file, and make the edit again there`;
+};
+
+const pull = async (
+  api: ApiContext,
+  number: number,
+  file: string,
+  heading: string | undefined,
+): Promise<Result<string, string>> => {
+  const body = await readBody(api, number);
+
+  if (Result.isErr(body)) {
+    return body;
+  }
+
+  const pending = await pendingEdit(file);
+
+  if (pending !== undefined) {
+    return Result.err(pending);
+  }
+
+  for (const path of [file, pulledPath(file)]) {
+    const written = await writeText(path, body.value);
+
+    if (Result.isErr(written)) {
+      return written;
+    }
+  }
+
+  const problems = descriptionProblems(body.value, heading);
+
+  return Result.ok(
+    [
+      `#${number}: written to ${file}${heading === undefined ? '' : `; edit the original and the translation under "## ${heading}" together`}, then:`,
+      `  pr-description push ${number} --file ${file}`,
+      ...(problems === undefined
+        ? []
+        : ['', `As it stands, push would refuse it: ${problems}`]),
+    ].join('\n'),
+  );
+};
+
+/**
+ * Why an edit changed one half and not the other, or `undefined` when it did
+ * not. A description pulled without a translation has none to compare with, so
+ * adding one is never lopsided.
+ */
+const lopsidedEdit = (
+  before: string,
+  after: string,
+  heading: string,
+): string | undefined => {
+  const was = splitDescription(before, heading);
+
+  const is = splitDescription(after, heading);
+
+  if (Result.isErr(was) || Result.isErr(is)) {
+    return undefined;
+  }
+
+  const changed = changedParts(was.value, is.value);
+
+  return changed.original === changed.translation
+    ? undefined
+    : `the ${changed.original ? 'original' : 'translation'} changed and the ${changed.original ? 'translation' : 'original'} did not; make the same change in both, or pass --wording-only for a change of wording that changes no meaning`;
+};
+
+const push = async (
+  api: ApiContext,
+  command: PushCommand,
+  heading: string | undefined,
+): Promise<Result<string, string>> => {
+  const { number, file, wordingOnly } = command;
+
+  const edited = await readText(file);
+
+  if (Result.isErr(edited)) {
+    return edited;
+  }
+
+  const pulled = await readText(pulledPath(file));
+
+  if (Result.isErr(pulled)) {
+    return Result.err(
+      `${pulledPath(file)} is missing: push writes back what pull saved; run pr-description pull ${number} --file ${file} first`,
+    );
+  }
+
+  const current = await readBody(api, number);
+
+  if (Result.isErr(current)) {
+    return current;
+  }
+
+  if (lf(current.value) !== lf(pulled.value)) {
+    // Another writer — `open-pr --merge-before`, a person — got there first,
+    // and writing over it would silently drop what they wrote.
+    return Result.err(
+      `#${number} changed on GitHub since it was pulled; pull it again and make the edit on what is there now`,
+    );
+  }
+
+  if (lf(edited.value) === lf(pulled.value)) {
+    return Result.ok(`#${number}: unchanged, nothing written`);
+  }
+
+  const problems = descriptionProblems(edited.value, heading);
+
+  if (problems !== undefined) {
+    return Result.err(`${file}: ${problems}`);
+  }
+
+  if (heading !== undefined && !wordingOnly) {
+    const lopsided = lopsidedEdit(pulled.value, edited.value, heading);
+
+    if (lopsided !== undefined) {
+      return Result.err(`${file}: ${lopsided}`);
+    }
+  }
+
+  const updated = await rest(api, 'PATCH', `/issues/${number}`, t.unknown(), {
+    body: { body: edited.value },
+  });
+
+  if (Result.isErr(updated)) {
+    return Result.err(`cannot write #${number}: ${updated.value}`);
+  }
+
+  // What GitHub now holds, so that a second edit pushes without a second pull.
+  const recorded = await writeText(pulledPath(file), edited.value);
+
+  return Result.isErr(recorded)
+    ? recorded
+    : Result.ok(`#${number}: description written`);
+};
+
+const create = async (
+  api: ApiContext,
+  command: CreateCommand,
+  heading: string | undefined,
+): Promise<Result<string, string>> => {
+  const body = await readText(command.file);
+
+  if (Result.isErr(body)) {
+    return body;
+  }
+
+  const problems = descriptionProblems(body.value, heading);
+
+  if (problems !== undefined) {
+    return Result.err(`${command.file}: ${problems}`);
+  }
+
+  const created = await rest(
+    api,
+    'POST',
+    '/issues',
+    t.record({ number: t.number(), html_url: t.string() }),
+    {
+      body: {
+        title: command.title,
+        body: body.value,
+        labels: command.labels,
+      },
+    },
+  );
+
+  return Result.isErr(created)
+    ? Result.err(`cannot create the issue: ${created.value}`)
+    : Result.ok(`#${created.value.number}: ${created.value.html_url}`);
+};
