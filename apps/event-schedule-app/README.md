@@ -27,8 +27,12 @@ first and keeps the emulators' data in `emulator-data/` between runs; run that
 package's `watch:build` to have the emulator pick up changes to the functions.
 
 The emulators load `firestore.rules`, so what they let the app do is what
-production lets it do. Nothing in CI reads the rules; a change there takes
-effect only with `pnpm exec firebase deploy --only firestore:rules`.
+production lets it do. CI's `@emulators` e2e test runs against them, but along
+one path only: an anonymous user creating an event, answering it and editing
+it. Nothing tests what the rules deny or what they let a signed-in user do, so
+check a change there by hand before
+`pnpm exec firebase deploy --only firestore:rules`, the only thing that puts
+it in production.
 
 The Firestore and Pub/Sub emulators need Java (JDK 21 or later), and the
 emulators run through the `firebase-tools` this package declares, so nothing
@@ -37,14 +41,17 @@ else is installed.
 ### End-to-end tests
 
 ```sh
-pnpm run check:e2e            # what CI runs; leaves out @emulators and @production
+pnpm run check:e2e            # smoke tests; leaves out @emulators and @production
 pnpm run check:e2e:emulators  # the tests that write to Firestore
 pnpm run check:e2e:production # the @smoke and @production tests, against the site
 ```
 
 `check:e2e:emulators` starts its own emulators with empty data
 (`firebase emulators:exec`), so stop `pnpm run emulators` first: they listen
-on the same ports. No workflow runs it yet, since no runner has Java.
+on the same ports. `code-check.yml` runs it in the `ws:check:e2e:emulators`
+matrix entry, with Java 21 and Chromium installed. It builds the functions
+before starting the emulators and needs no Firebase credentials. The ordinary
+`ws:check:e2e` entry runs the smoke tests separately.
 
 `check:e2e:production` is run daily by
 [`e2e-production.yml`](../../.github/workflows/e2e-production.yml) against

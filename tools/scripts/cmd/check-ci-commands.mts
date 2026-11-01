@@ -511,14 +511,6 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
   },
   {
     directory: 'apps/event-schedule-app',
-    scriptName: 'check:e2e:emulators',
-    // The end-to-end test that writes to Firestore, run against the Firebase
-    // emulators, which need Java and firebase-tools that no runner sets up.
-    // `check:e2e` runs the rest of the suite; this one is run by hand until the
-    // emulators are wired into a workflow.
-  },
-  {
-    directory: 'apps/event-schedule-app',
     scriptName: 'check:e2e:production',
     // The end-to-end tests against the deployed site, which
     // `e2e-production.yml` runs daily (through the binary, after installing

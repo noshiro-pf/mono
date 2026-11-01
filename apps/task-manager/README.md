@@ -276,8 +276,9 @@ pnpm exec firebase emulators:start   # Java 21 以上が必要
 ポートを使うため、`pnpm exec firebase emulators:start` を動かしているときは先に止める。
 ほかのテストと同じく `ws:build` のあとに走らせる。
 
-このスクリプトは `check:*` に入れていない。どの CI のランナーにも Java と
-エミュレータを用意していないため、`check:` にすると CI で走らないチェックになる
+このスクリプトは `check:*` に入れていない。CI で Java とエミュレータを用意するのは
+`code-check.yml` の event-schedule-app 向け `ws:check:e2e:emulators` だけで、
+このスクリプトを走らせる job は無いため、`check:` にすると CI で走らないチェックになる
 （`check:root:ci-commands` がそれを指摘する）。`firestore.rules` を変えたときは
 手元で走らせてからデプロイする。
 
