@@ -18,10 +18,9 @@ type MessageIds = 'unboundedCounterPipe';
 
 /**
  * `counter(ms).pipe(...)` keeps no reference to the counter, so nothing can
- * complete it, and once a child completing no longer completes its parents
- * (synstate's `NEXT_MAJOR.md`) the derived observable cannot either. Only a
- * counter that stops by itself, after `{ times: N }` emissions, can be piped
- * without a name.
+ * complete it, and since synstate 4.0.0 a child completing does not complete
+ * its parents, so the derived observable cannot either. Only a counter that
+ * stops by itself, after `{ times: N }` emissions, can be piped without a name.
  *
  * The type cannot forbid this: the same `.pipe` is fine once the counter is
  * bound to a name that can be completed later.

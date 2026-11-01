@@ -99,16 +99,22 @@ export type Constant<T> = Brand<T, 'synstate-dom/Constant'>;
 
 export type Bindable<T> = InitializedObservable<T> | Constant<T> | View<T>; // View は「7.3」
 
-// ライブラリ内でこの 1 か所だけ型アサーションを使う
-export const constant = <const T extends {}>(
-    value: T extends Observable<unknown> ? never : T,
-): Constant<T> => value as Constant<T>;
+// Observable と InitializedObservable は synstate から、asConstant は下のブロックから import する
+export const constant = <const T>(
+    value: T extends Observable<unknown> | null | undefined ? never : T,
+): Constant<T> => asConstant<T>(value);
+```
+
+```ts
+// src/internal/as-constant.mts（パッケージからは export しない）。
+// Constant のブランドを付ける型アサーションはこの 1 か所だけにする
+export const asConstant = <T>(value: T): Constant<T> => value as Constant<T>;
 ```
 
 - `Constant<T>` は型の上だけのブランドで、`constant()` は値をそのまま返す。実行時のコストはない。
 - ブランドは synstate 本体（`UpdateToken` など）と揃えて ts-type-forge の `Brand` で作る。`Brand` のキーは文字列のプロパティなので、他のライブラリのブランドと衝突しないよう `'synstate-dom/Constant'` と名前空間を付ける。このキーは型の上では `true` として読めるが、実行時には存在しないので参照しない。
 - 素の値は `Constant<T>` に代入できない。`constant('btn')` の型は `Constant<'btn'>` でリテラル型を保つ。`Constant<T>` は `T` に代入できる。
-- `null` と `undefined` は `T extends {}` で拒否する。制約が無いと `constant(maybeStr)` が `Constant<string>` になり `undefined` が黙って落ちる。属性が無いことは props の省略で、あったりなかったりする値は `InitializedObservable<T | undefined>` で表す。値が無い状態を定数で渡す必要は props の省略で常に代えられるので、`null` / `undefined` の定数は用意しない。そのため、ライブラリのコンポーネントは値が無いことを表す props を optional にする。
+- `null` と `undefined` は `Observable` と同じ条件型で拒否する。`string | undefined` の値を渡すと引数の型は `string` に絞られるので、`constant(maybeStr)` は型エラーになる。属性が無いことは props の省略で、あったりなかったりする値は `InitializedObservable<T | undefined>` で表す。値が無い状態を定数で渡す必要は props の省略で常に代えられるので、`null` / `undefined` の定数は用意しない。そのため、ライブラリのコンポーネントは値が無いことを表す props を optional にする。
 - `constant(obs$)` は条件型で拒否する。
 - 残る穴は `constant(count$.getSnapshot().value)` だけで、明示的な呼び出しなので読めば分かり、検索でも見つかる。
 - 自作コンポーネントが「初期値として一度だけ読む」props は `Constant<T>` で受ける（例: `initial: Constant<number>`）。呼び出し側は `initial={constant(0)}` と書くことになり、Observable も素の値も型エラーになるので、「一度だけ読む」ことが変数名の慣習ではなく型で表れる。受け取った側は `Constant<T>` をそのまま `T` として使える。
@@ -169,7 +175,7 @@ type ElementProps<E extends Element> = Readonly<
 
 - **属性とプロパティを区別する。** `value`・`checked`・`selected`・`indeterminate` など、ユーザー操作で属性と実体がずれるものはプロパティとして書く（`el[key] = v`）。それ以外は `setAttribute`。区別の一覧は 1 つの定数表に置き、型と実行時の両方がそれを読む。
 - **イベント** は `on` + `HTMLElementEventMap` のキーを PascalCase にしたもの（`onClick`）。引数は `ev: HTMLElementEventMap[K] & Readonly<{ currentTarget: E }>`。値は関数のみで Observable は受け付けない（決定事項 4 の例外）。
-- **`ref`** は要素を作った直後、子をマウントする前に 1 回呼ぶ。
+- **`ref`** は要素を作った直後、子をマウントする前に 1 回呼ぶ。属性・プロパティの束縛もイベントの登録もまだ行われていない（「6.3」）。
 - 真偽属性（`disabled` など）は `Bindable<boolean>` で受け、`false` で属性を外す。
 - **イベントの props 名**は、イベント名が小文字の 1 語（`pointerdown`）で単語の境目が分からないので、イベント名から props 名（`onPointerDown`）への対応表を型で持つ。表が `HTMLElementEventMap` と `SVGElementEventMap` のキーをすべて覆うことはテストで確かめる。実行時は props 名を小文字にすればイベント名に戻るので、表を読まない。
 - **SVG** の要素は `SVGElementTagNameMap` のうち HTML に無いタグを SVG の名前空間で作る。`a`・`script`・`style`・`title` は HTML にもあるので、どこに書いても HTML の要素になる。SVG のプロパティは `SVGAnimatedLength` などで属性の型を読み取れないので、受け付ける属性は一覧で持つ。
@@ -209,7 +215,7 @@ type MountedNodes = Node | readonly Node[];
 
 `mount()` は常に呼び出し側のスコープの `run` の中で呼ばれる。
 
-- **要素**: `document.createElement`（SVG は名前空間付き）→ `ref` → 属性・プロパティ・イベントの束縛（「7」）→ 子を順にマウントして append。要素ごとにスコープは作らない。
+- **要素**: `document.createElement`（SVG は名前空間付き）→ `ref` → 子を順にマウントして append → 属性・プロパティ・イベントの束縛（「7」）。子を先にするのは、`<select>` の `value` が書かれる時点で `<option>` がそろっているようにするためである。要素ごとにスコープは作らない。
 - **コンポーネント**: 関数を `props` で 1 回呼び、返った `Mountable` をマウントする。コンポーネントごとにスコープは作らない（「6.4」）。
 - **子要素**: `Mountable` はマウント、`Bindable<string | number>` は Text ノード（「7.2」）、配列は平坦化して順に処理する。
 
@@ -521,7 +527,7 @@ TDD で、テストを先に書いて失敗を確認してから実装する。
     - `If`: 選ばれなかった分岐のコンポーネントが呼ばれないこと。切り替えで前の分岐のスコープが dispose されること。
     - `For`: 追加・削除・並べ替えで既存行の子の関数が再実行されず、DOM ノードが同一であること。LIS による移動回数。伝播中の書き込みの warning（#2336）が出ないこと。
     - リーク: マウントとアンマウントを繰り返しても、アンマウント後にグローバルな state を更新したとき、アプリが作った派生が 1 つも計算されないこと（`test/browser/leak.test.tsx`）。`hasChild` などは synstate の公開 API に無いので、派生の関数の呼び出し回数で確かめる。
-- **ベンチマーク**: js-framework-benchmark の操作（1,000 / 10,000 行の作成、部分更新、入れ替え、削除）で Solid、VanJS、Preact + Signals と比べる。`apps/synstate-dom-benchmark` にある（CI では走らせない）。
+- **ベンチマーク**: js-framework-benchmark の操作（1,000 / 10,000 行の作成、全置き換え、部分更新、選択、入れ替え、削除、追加、全削除）と 3 つのシナリオ（ローン、工程表、ズーム）で Solid、VanJS、Preact + Signals、Preact、React と比べる。`apps/synstate-dom-benchmark` にある（CI では走らせない）。
 - **遅延評価の要否の確認**: synstate の既存ベンチマークに「グローバルに定義したが束縛していない派生」と「コンポーネント内で作って束縛した派生」の 2 ケースを足し、「8.7」のガイドラインで MobX との差が消えるかを確かめる。
 
 ## 10. パッケージ構成
@@ -540,7 +546,7 @@ libs/synstate-dom/
 ├── scripts/cmd/       # build.mts、gen-docs.mts、embed-examples.mts
 ├── samples/
 ├── src/
-│   ├── entry-point.mts
+│   ├── index.mts
 │   ├── jsx-runtime.mts
 │   ├── jsx-dev-runtime.mts
 │   ├── constant/      # Constant、Bindable、mapBindable、derive、toObservable
@@ -549,6 +555,7 @@ libs/synstate-dom/
 │   ├── control/       # If、MatchOptional、MatchResult、For、Portal
 │   ├── scope/         # subscribeInScope、listenInScope、createAfterUpdate
 │   ├── keyboard/      # isImeKeyDown（入力メソッドのキー入力の判定）
+│   ├── internal/      # export しない実装（asConstant、属性とプロパティの定数表など）
 │   └── render.mts
 └── test/
     └── browser/
@@ -600,7 +607,7 @@ Solid は「signal を読む関数呼び出し」を依存の印にしている�
 | **`<Show>` などの children を遅延させる。** children も getter になり、選ばれた分岐だけが評価される                                                                          | `jsx()` は `Mountable` という記述を返すだけなので、`If` の両分岐を props に書いても選ばれた側しかマウントされない（決定事項 7、「8.2」）                                               |
 | **静的な部分を最適化する。** 静的な HTML を `<template>` に抜き出して `cloneNode` し、動的な箇所だけを束縛する。属性・プロパティ・イベントの区別もコンパイル時に決める       | 静的か動的かは実行時に Observable の symbol で判定し、`Constant` と完了済みの Observable は一度書くだけで購読しない（「4.1」「7.1」）。属性とプロパティの区別は定数表で持つ（「5.2」） |
 
-コンパイラを使わないことで払うコスト（推論で、ベンチマークは未実施）:
+コンパイラを使わないことで払うコスト:
 
-- テンプレートの複製をしないので、要素はノードごとの `createElement` で作る。初回描画は Solid より遅くなる可能性がある。「9」のベンチマークで確かめる。
+- テンプレートの複製をしないので、要素はノードごとの `createElement` で作る。初回描画を Solid と比べた結果は「9」のベンチマークの `apps/synstate-dom-benchmark/RESULTS.md` にある（「create 1,000 rows」「create 10,000 rows」の行）。その差のうちテンプレートの複製をしないことによる分は、分けて計っていない。
 - `count() * 2` のようにその場で式を書けず、`count$.pipe(map(...))` や `constant()` と明示的に書く分だけ記述が長くなる。その代わり、リアクティブかどうかが型に現れる。
