@@ -3,35 +3,35 @@ import { createReportCache, reportCacheKey } from './report-cache.mjs';
 
 describe(createReportCache, () => {
   test('hands back what the same build kept for the same token', async () => {
-    const { cacheOf } = setup();
+    const { cacheOf, written } = setup();
 
     const cache = cacheOf('build-1');
 
     cache.save(REPORT, 'token');
 
-    await settle();
+    await written();
 
     assert.deepStrictEqual(await cache.load('token'), REPORT);
   });
 
   test('reads nothing another build kept', async () => {
-    const { cacheOf } = setup();
+    const { cacheOf, written } = setup();
 
     cacheOf('build-1').save(REPORT, 'token');
 
-    await settle();
+    await written();
 
     assert.isUndefined(await cacheOf('build-2').load('token'));
   });
 
   test('reads nothing kept for another token, and keeps no token itself', async () => {
-    const { cacheOf, kept } = setup();
+    const { cacheOf, kept, written } = setup();
 
     const cache = cacheOf('build-1');
 
     cache.save(REPORT, 'secret-token');
 
-    await settle();
+    await written();
 
     assert.isUndefined(await cache.load('another-token'));
 
@@ -41,7 +41,7 @@ describe(createReportCache, () => {
   });
 
   test('reads nothing once cleared, or where nothing was kept', async () => {
-    const { cacheOf } = setup();
+    const { cacheOf, written } = setup();
 
     const cache = cacheOf('build-1');
 
@@ -49,11 +49,11 @@ describe(createReportCache, () => {
 
     cache.save(REPORT, 'token');
 
-    await settle();
+    await written();
 
     cache.clear();
 
-    await settle();
+    await written();
 
     assert.isUndefined(await cache.load('token'));
   });
@@ -124,8 +124,22 @@ const setup = (): Readonly<{
   cacheOf: (build: string) => ReturnType<typeof createReportCache>;
   /** What is kept for {@link SOURCE}, as the database holds it. */
   kept: () => unknown;
+  /**
+   * Settles once the next write not yet waited for has reached the database.
+   * `save` hashes the token first, which `crypto.subtle` may finish after any
+   * timer, so waiting a tick is not enough.
+   */
+  written: () => Promise<void>;
 }> => {
   const mut_database = new Map<string, unknown>();
+
+  /** One promise per write, by its order, settled as that write lands. */
+  const mut_writes: PromiseWithResolvers<undefined>[] = [];
+
+  const mut_counts = { landed: 0, awaited: 0 };
+
+  const nthWrite = (n: number): PromiseWithResolvers<undefined> =>
+    (mut_writes[n] ??= Promise.withResolvers<undefined>());
 
   return {
     cacheOf: (build) =>
@@ -136,9 +150,20 @@ const setup = (): Readonly<{
         write: (key, value) => {
           mut_database.set(key, value);
 
+          nthWrite(mut_counts.landed).resolve(undefined);
+
+          mut_counts.landed += 1;
+
           return Promise.resolve();
         },
       }),
     kept: () => mut_database.get(reportCacheKey(SOURCE)),
+    written: async () => {
+      const n = mut_counts.awaited;
+
+      mut_counts.awaited += 1;
+
+      await nthWrite(n).promise;
+    },
   };
 };

@@ -13,11 +13,12 @@ import { OfTotal } from './stat-tile.js';
 
 /**
  * What the list of open issues leads with: a search of the titles, matched as
- * it is typed whatever the case, and not kept in the URL; the start states,
+ * it is typed whatever the case, and not kept in the URL; the order, beside the
+ * search so that the two share a line where the chips do not; the start states,
  * switches as the merge order's priorities are (`merge-order-filters.tsx`), in
  * the DAG's words, save `in progress`, which is with the counts; the labels,
- * each a pick; and the order. What each does is `issues-list-view.mts`, which
- * keeps the choice in the URL.
+ * each a pick. What each does is `issues-list-view.mts`, which keeps the choice
+ * in the URL.
  *
  * Each number is how many of what it counts the list shows, followed in small
  * by how many there are when that is more — the merge order's counts, for
@@ -28,106 +29,111 @@ export const IssuesListFilters = (): JSX.Element => {
   const { view: view$, counts: counts$ } = issuesListStore;
 
   return (
-    <div class={constant('issues-list-controls')}>
-      <input
-        aria-label={constant('Search issue titles')}
-        autocomplete={constant('off')}
-        class={constant('issues-search')}
-        placeholder={constant('Search titles')}
-        type={constant('search')}
-        value={issuesListStore.query}
-        onInput={(typed) => {
-          issuesListStore.setQuery(typed.currentTarget.value);
-        }}
-      />
+    <div class={constant('issues-list-controls-box')}>
+      <div class={constant('issues-list-controls')}>
+        <input
+          aria-label={constant('Search issue titles')}
+          autocomplete={constant('off')}
+          class={constant('issues-search')}
+          placeholder={constant('Search titles')}
+          type={constant('search')}
+          value={issuesListStore.query}
+          onInput={(typed) => {
+            issuesListStore.setQuery(typed.currentTarget.value);
+          }}
+        />
 
-      <fieldset
-        aria-label={constant('Start state')}
-        class={constant('filter-group')}
-      >
-        <span class={constant('filter-group-name')}>{constant('start')}</span>
-        {ISSUE_START_SWITCHES.map((start) => (
+        <fieldset
+          aria-label={constant('Sort')}
+          class={constant('theme-switch')}
+        >
           <button
-            aria-pressed={view(view$, ({ hiddenStarts }) =>
-              (!hiddenStarts.includes(start)).toString(),
+            aria-pressed={view(view$, ({ sort }) =>
+              (sort === 'updated').toString(),
             )}
-            class={constant('filter-chip')}
+            class={constant('theme-switch-option')}
+            title={constant('The most recently updated first.')}
+            type={constant('button')}
+            onClick={sortByUpdate}
+          >
+            {constant('updated')}
+          </button>
+          <button
+            aria-pressed={view(view$, ({ sort }) =>
+              (sort === 'priority').toString(),
+            )}
+            class={constant('theme-switch-option')}
             title={constant(
-              explainState({ kind: 'issue', state: start, marked: 'none' }),
+              'High first; no priority is between mid and low. The most recently updated first within each.',
             )}
             type={constant('button')}
-            onClick={() => {
-              issuesListStore.toggleStart(start);
-            }}
+            onClick={sortByPriority}
           >
-            {constant(stateLabels[start])}
-            <span class={constant('filter-chip-count')}>
-              {view(counts$, ({ starts }) => starts[start].shown)}
-              <OfTotal count={view(counts$, ({ starts }) => starts[start])} />
-            </span>
+            {constant('priority')}
           </button>
-        ))}
-      </fieldset>
-
-      <If
-        cond={view(counts$, ({ labels }) => Arr.isNonEmpty(labels))}
-        then={
-          <fieldset
-            aria-label={constant('Labels')}
-            class={constant('filter-group')}
+          <button
+            aria-pressed={view(view$, ({ sort }) =>
+              (sort === 'start').toString(),
+            )}
+            class={constant('theme-switch-option')}
+            title={constant(
+              'What can be started first, then what is in progress, what needs a look, what waits, and what is on a cycle. The most recently updated first within each.',
+            )}
+            type={constant('button')}
+            onClick={sortByStart}
           >
-            <span class={constant('filter-group-name')}>
-              {constant('label')}
-            </span>
-            <For
-              items={view(counts$, ({ labels }) => labels)}
-              key={(label) => label.name}
-            >
-              {(label$) => <LabelPick label$={label$} />}
-            </For>
-          </fieldset>
-        }
-      />
+            {constant('start')}
+          </button>
+        </fieldset>
 
-      <fieldset aria-label={constant('Sort')} class={constant('theme-switch')}>
-        <button
-          aria-pressed={view(view$, ({ sort }) =>
-            (sort === 'updated').toString(),
-          )}
-          class={constant('theme-switch-option')}
-          title={constant('The most recently updated first.')}
-          type={constant('button')}
-          onClick={sortByUpdate}
+        <fieldset
+          aria-label={constant('Start state')}
+          class={constant('filter-group')}
         >
-          {constant('updated')}
-        </button>
-        <button
-          aria-pressed={view(view$, ({ sort }) =>
-            (sort === 'priority').toString(),
-          )}
-          class={constant('theme-switch-option')}
-          title={constant(
-            'High first; no priority is between mid and low. The most recently updated first within each.',
-          )}
-          type={constant('button')}
-          onClick={sortByPriority}
-        >
-          {constant('priority')}
-        </button>
-        <button
-          aria-pressed={view(view$, ({ sort }) =>
-            (sort === 'start').toString(),
-          )}
-          class={constant('theme-switch-option')}
-          title={constant(
-            'What can be started first, then what is in progress, what needs a look, what waits, and what is on a cycle. The most recently updated first within each.',
-          )}
-          type={constant('button')}
-          onClick={sortByStart}
-        >
-          {constant('start')}
-        </button>
-      </fieldset>
+          <span class={constant('filter-group-name')}>{constant('start')}</span>
+          {ISSUE_START_SWITCHES.map((start) => (
+            <button
+              aria-pressed={view(view$, ({ hiddenStarts }) =>
+                (!hiddenStarts.includes(start)).toString(),
+              )}
+              class={constant('filter-chip')}
+              title={constant(
+                explainState({ kind: 'issue', state: start, marked: 'none' }),
+              )}
+              type={constant('button')}
+              onClick={() => {
+                issuesListStore.toggleStart(start);
+              }}
+            >
+              {constant(stateLabels[start])}
+              <span class={constant('filter-chip-count')}>
+                {view(counts$, ({ starts }) => starts[start].shown)}
+                <OfTotal count={view(counts$, ({ starts }) => starts[start])} />
+              </span>
+            </button>
+          ))}
+        </fieldset>
+
+        <If
+          cond={view(counts$, ({ labels }) => Arr.isNonEmpty(labels))}
+          then={
+            <fieldset
+              aria-label={constant('Labels')}
+              class={constant('filter-group')}
+            >
+              <span class={constant('filter-group-name')}>
+                {constant('label')}
+              </span>
+              <For
+                items={view(counts$, ({ labels }) => labels)}
+                key={(label) => label.name}
+              >
+                {(label$) => <LabelPick label$={label$} />}
+              </For>
+            </fieldset>
+          }
+        />
+      </div>
     </div>
   );
 };

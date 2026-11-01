@@ -112,7 +112,8 @@ export const StatToggle = ({
         type={constant('button')}
         onClick={onOnly}
       >
-        {mapBindable(only, (picked) => (picked ? '✓ only' : 'only'))}
+        <span class={constant('stat-only-check')}>{constant('✓ ')}</span>
+        <span class={constant('stat-only-word')}>{constant('only')}</span>
       </button>
     </div>
   );
