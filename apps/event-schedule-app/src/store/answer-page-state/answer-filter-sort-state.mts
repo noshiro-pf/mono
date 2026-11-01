@@ -747,6 +747,7 @@ export const createAnswerFilterAndSortStore = (
                   dict.answerPage.detailedFilter.filterItems.filledDateOnly,
                 props: {
                   intent: 'none' as const,
+                  'data-e2e': 'filled-date-only-tag',
                   onRemove: () => {
                     setOnlyFilledDate(false);
                   },

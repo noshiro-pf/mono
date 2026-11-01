@@ -13,7 +13,7 @@ export const DetailedFilterFilledDateOnly = memoNamed<Props>(
   'DetailedFilterFilledDateOnly',
   ({ filledDateOnly }) => (
     <FilterItem>
-      <CheckboxWrapper>
+      <CheckboxWrapper data-e2e={'filled-date-only-filter'}>
         <CheckboxView
           state={filledDateOnly ? 'checked' : 'none'}
           onCheck={AnswerFilterAndSortStore.setOnlyFilledDate}
