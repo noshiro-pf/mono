@@ -105,52 +105,50 @@ export const outsideCodeFences = (body: string): string => {
 };
 
 /**
- * The `Merge-After` cycles, one entry per cycle, each listing the numbers in
- * the order the edges run and rotated to start at its lowest number so that the
- * same cycle is always reported the same way.
+ * The `Merge-After` cycles, each listing the numbers in the order the edges run
+ * and rotated to start at its lowest number so that the same cycle is always
+ * reported the same way.
+ *
+ * Every number that lies on any cycle appears in at least one entry — callers
+ * take `cycles.flat()` as the set of numbers on a cycle. Each entry is the
+ * shortest cycle through the first number, in key order, that no earlier entry
+ * covers, so a component with several loops yields one entry per loop needed to
+ * cover it rather than every loop it holds.
  *
  * A cycle is not a state anything here can resolve: every pull request on one
  * waits for another that waits, in the end, for it. Naming it is the whole of
  * what can be done about it — without this the members would each report
  * "waiting on #N" for as long as the loop runs, with nothing saying why that
  * never changes. A pull request that declares itself is a cycle of one, and is
- * found by the same walk.
+ * found by the same search.
  */
 export const findMergeAfterCycles = (
   dependencies: ReadonlyMap<number, readonly number[]>,
 ): readonly (readonly number[])[] => {
-  const mut_finished = new Set<number>();
+  const mut_covered = new Set<number>();
 
   const mut_cycles = new Map<string, readonly number[]>();
 
-  const visit = (node: number, walked: readonly number[]): void => {
-    const at = walked.indexOf(node);
-
-    if (at !== -1) {
-      // A back edge into the path being walked: everything from there on is the
-      // cycle.
-      const cycle = rotateToLowest(walked.slice(at));
-
-      mut_cycles.set(cycle.join(','), cycle);
-
-      return;
-    }
-
-    if (mut_finished.has(node)) {
-      return;
-    }
-
-    for (const dependency of dependencies.get(node) ?? []) {
-      visit(dependency, Arr.toPushed(walked, node));
-    }
-
-    // Only once every edge out of it has been walked, so no back edge into this
-    // node's subtree can be missed by the walk that comes next.
-    mut_finished.add(node);
-  };
-
   for (const node of dependencies.keys()) {
-    visit(node, []);
+    if (mut_covered.has(node)) {
+      continue;
+    }
+
+    // A search per node rather than one depth-first walk: a walk that skips
+    // finished nodes misses a node whose only way back runs through one.
+    const cycle = shortestCycleThrough(node, dependencies);
+
+    if (cycle === undefined) {
+      continue;
+    }
+
+    for (const member of cycle) {
+      mut_covered.add(member);
+    }
+
+    const rotated = rotateToLowest(cycle);
+
+    mut_cycles.set(rotated.join(','), rotated);
   }
 
   return Array.from(mut_cycles.values());
@@ -178,6 +176,71 @@ const parseDeclaration = (
       )
       .toArray(),
   );
+
+/** `start`, …, `end`, following `reachedFrom` back from `end`. */
+const pathFromStart = (
+  start: number,
+  end: number,
+  reachedFrom: ReadonlyMap<number, number>,
+): readonly number[] => {
+  const mut_reversed: number[] = [end];
+
+  let mut_node = end;
+
+  while (mut_node !== start) {
+    const previous = reachedFrom.get(mut_node);
+
+    if (previous === undefined) {
+      break;
+    }
+
+    mut_reversed.push(previous);
+
+    mut_node = previous;
+  }
+
+  return mut_reversed.toReversed();
+};
+
+/**
+ * The shortest cycle through `start`, from `start` along the edges back to the
+ * node whose edge returns to it, or `undefined` when no path leads back.
+ */
+const shortestCycleThrough = (
+  start: number,
+  dependencies: ReadonlyMap<number, readonly number[]>,
+): readonly number[] | undefined => {
+  // Each reached node, with the node it was first reached from.
+  const mut_reachedFrom = new Map<number, number>();
+
+  // Level by level: every node in the frontier is one edge further from `start`
+  // than the last, so the first edge back to `start` closes a shortest cycle.
+  let mut_frontier: readonly number[] = [start];
+
+  while (Arr.isNonEmpty(mut_frontier)) {
+    const mut_nextFrontier: number[] = [];
+
+    for (const node of mut_frontier) {
+      for (const next of dependencies.get(node) ?? []) {
+        if (next === start) {
+          return pathFromStart(start, node, mut_reachedFrom);
+        }
+
+        if (mut_reachedFrom.has(next)) {
+          continue;
+        }
+
+        mut_reachedFrom.set(next, node);
+
+        mut_nextFrontier.push(next);
+      }
+    }
+
+    mut_frontier = mut_nextFrontier;
+  }
+
+  return undefined;
+};
 
 const rotateToLowest = (cycle: readonly number[]): readonly number[] => {
   if (!Arr.isNonEmpty(cycle)) {
