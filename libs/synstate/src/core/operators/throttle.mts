@@ -139,14 +139,15 @@ class ThrottleObservableClass<A>
       return; // skip update
     }
 
-    this.setNext(sn.value, updateToken);
-
+    // The window opens before `setNext`, which can lead back here: a value a
+    // subscriber writes to the parent falls inside it.
     this.#mut_isSkipping = true;
 
-    // set timer
     this.#mut_timerId = setTimeout(() => {
       this.#mut_isSkipping = false;
     }, this.#milliSeconds);
+
+    this.setNext(sn.value, updateToken);
   }
 
   protected override teardown(): void {

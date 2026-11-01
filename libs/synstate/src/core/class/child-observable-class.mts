@@ -212,10 +212,13 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
    * glitch), and would emit twice.
    *
    * Values the inner observable emits later start updates of their own.
+   * `onComplete` is called when it completes, which may be while it is being
+   * subscribed, before this returns.
    */
   protected subscribeInner(
     inner: Observable<A>,
     updateToken: UpdateToken,
+    onComplete?: () => void,
   ): Subscription {
     let mut_isSubscribing = true;
 
@@ -225,7 +228,7 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
       } else {
         this.startUpdate(value);
       }
-    });
+    }, onComplete);
 
     mut_isSubscribing = false;
 

@@ -7,6 +7,7 @@
 import { Optional, Result } from 'ts-data-forge';
 import { RootObservableClass } from '../class/index.mjs';
 import type { FromPromiseObservable } from '../types/index.mjs';
+import { rethrowOutOfPromise } from '../utils/index.mjs';
 
 /**
  * Creates an observable from a Promise.
@@ -66,28 +67,37 @@ class FromPromiseObservableClass<A, E = unknown>
   constructor(promise: Promise<A>) {
     super({ initialValue: Optional.none });
 
+    // `onRejected` beside `onFulfilled`, so that only the promise's own
+    // rejection becomes an Err: what a subscriber throws on the Ok value is not
+    // the promise's (#2931). A `.catch` after `.then` would take both, and is
+    // also a step later.
     promise
-      .then((value) => {
-        if (this.isCompleted) {
-          return;
-        }
+      // eslint-disable-next-line promise/prefer-catch, unicorn/prefer-then-catch -- their fix, `.catch(onRejected).then(onFulfilled)`, would call `onFulfilled` after a rejection too
+      .then(
+        (value) => {
+          if (this.isCompleted) {
+            return;
+          }
 
-        this.startUpdate(Result.ok(value));
-      })
-      .catch((error: unknown) => {
-        if (this.isCompleted) {
-          return;
-        }
+          this.startUpdate(Result.ok(value));
+        },
+        (error: unknown) => {
+          if (this.isCompleted) {
+            return;
+          }
 
-        this.startUpdate(
-          Result.err(
-            // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-            error as E,
-          ),
-        );
-      })
+          this.startUpdate(
+            Result.err(
+              // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+              error as E,
+            ),
+          );
+        },
+      )
+      .catch(rethrowOutOfPromise)
       .finally(() => {
         this.complete();
-      });
+      })
+      .catch(rethrowOutOfPromise);
   }
 }

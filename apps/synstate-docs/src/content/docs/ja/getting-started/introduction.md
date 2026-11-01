@@ -19,7 +19,7 @@ sidebar:
 - 🔧 **非同期オペレーター内蔵**： `debounce`、`throttle`、`switchMap` など — 複雑な非同期処理を外部ライブラリなしに統一的な宣言的 API で記述。
 - ⚡ **operator を通してもグリッチフリー**： 更新はどれも、届く先を深さ順にたどる 1 回のパスです。`debounce` や `switchMap` が後から始める更新も同じです。そのため subscriber が更新途中のグラフを見ることはなく、1 回の更新のコストはノード間の経路の数ではなく、届くノードの数に比例します。effect で書いた operator が何を失うかは [Signals の上の operator](/mono/synstate/ja/guides/library-comparison/operators-on-signals/) を参照。
 - 🏎️ **非常に高速**： ベンチマークの概要では、SynState はどのシナリオでも最速のライブラリの <!-- bench:summary/synstate-worst-over-fastest -->2.7<!-- /bench --> 倍以内に収まります。<!-- bench:summary/synstate-alone-in-single-digits -->すべてのシナリオで計測したライブラリのうち、最悪のケースでも1桁倍に収まるのは SynState だけです<!-- /bench -->。ライブラリごとの最悪のケースは[ベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)を参照。
-- 🚀 **軽量**： <!-- bundle-size:synstate -->~6.8 kB min+gzip<!-- /bundle-size:synstate -->、外部ランタイム依存は [ts-data-forge](https://www.npmjs.com/package/ts-data-forge) と [ts-std-forge](https://www.npmjs.com/package/ts-std-forge) の 2 つ（前者が後者に依存している）。
+- 🚀 **軽量**： <!-- bundle-size:synstate -->~6.9 kB min+gzip<!-- /bundle-size:synstate -->、外部ランタイム依存は [ts-data-forge](https://www.npmjs.com/package/ts-data-forge) と [ts-std-forge](https://www.npmjs.com/package/ts-std-forge) の 2 つ（前者が後者に依存している）。
 - ⚛️ **React 最適化**： [React Compiler](https://react.dev/learn/react-compiler) と完全互換。`synstate-react-hooks` により数行でコンポーネントにグローバル状態を導入。
 - 🌐 **フレームワーク非依存**： コアはバニラ JavaScript、Vue、Svelte など任意のフレームワークでそのまま動作。React / Preact 向けには hooks ラッパー（`synstate-react-hooks` / `synstate-preact-hooks`）、Preact 向けにはさらに [Preact Signals 連携](/mono/synstate/ja/preact-signals/demo/)（`synstate-preact-signals`）も用意。フレームワークを使わない場合は、[synstate-dom](/mono/synstate/ja/synstate-dom/introduction/) が Observable を DOM に直接束縛します。
 

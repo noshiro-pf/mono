@@ -45,7 +45,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
 
-    num$.next(1); // logs: 1
+    num$.next(1); // nothing logged (already completed)
 
     assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
 
