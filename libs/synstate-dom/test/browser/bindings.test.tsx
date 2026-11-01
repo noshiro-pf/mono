@@ -81,6 +81,28 @@ describe('attributes', () => {
     assert.strictEqual(container.getHTML(), '<label for="name"></label>');
   });
 
+  test('writes defaultMuted, defaultSelected and encoding as the attributes they reflect (#2934)', () => {
+    const { container } = mountInto(() => (
+      <div>
+        <form encoding={constant('multipart/form-data')} />
+        <video defaultMuted={constant(true)} />
+        <select>
+          <option>{constant('a')}</option>
+          <option defaultSelected={constant(true)}>{constant('b')}</option>
+        </select>
+      </div>
+    ));
+
+    assert.strictEqual(container.querySelector('video')?.defaultMuted, true);
+
+    assert.strictEqual(container.querySelector('select')?.selectedIndex, 1);
+
+    assert.strictEqual(
+      container.querySelector('form')?.enctype,
+      'multipart/form-data',
+    );
+  });
+
   test('takes aria-* and data-* attributes', () => {
     const [expanded$, setExpanded] = createState('false');
 

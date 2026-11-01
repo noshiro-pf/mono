@@ -28,6 +28,9 @@ export const propertyNames = [
  */
 export const attributeNameOf: ReadonlyRecord<string, string> = {
   acceptCharset: 'accept-charset',
+  defaultMuted: 'muted',
+  defaultSelected: 'selected',
+  encoding: 'enctype',
   htmlFor: 'for',
   httpEquiv: 'http-equiv',
 } as const;

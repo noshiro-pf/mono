@@ -74,6 +74,24 @@ describe('element props types', () => {
     assert.isDefined([plain, wrongType, unknownProp, inner, ok]);
   });
 
+  test('writable properties with no attribute are not props (#2934)', () => {
+    const [n$] = createState(0);
+
+    // @ts-expect-error `selectedIndex` has no attribute; bind `value`
+    const select = <select selectedIndex={n$} />;
+
+    // @ts-expect-error `valueAsNumber` has no attribute
+    const input = <input valueAsNumber={n$} />;
+
+    // @ts-expect-error `currentTime` has no attribute
+    const video = <video currentTime={n$} />;
+
+    // @ts-expect-error `hash` has no attribute; bind `href`
+    const link = <a hash={constant('#x')} />;
+
+    assert.isDefined([select, input, video, link]);
+  });
+
   test('class takes a string or an object, never both', () => {
     const [on$] = createState(true);
 
