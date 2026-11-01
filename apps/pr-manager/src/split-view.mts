@@ -1,3 +1,4 @@
+import { Arr } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import type { Entry } from './load-report.mjs';
 
@@ -6,18 +7,18 @@ import type { Entry } from './load-report.mjs';
  * left, without whitespace changes or the files marked viewed, and the
  * conversation on the right at 7:3. When the pull request closes an issue or
  * names the Claude Code session it was written in, the right half is shared
- * with it at 1:1 — the conversation beside the issue, the session beside the
- * conversation — and with both, the issue beside the conversation stacked over
- * the session. The session is next to the diff unless the issue is there too.
+ * with it at 1:1, to the right of the conversation, and with both, the issue is
+ * stacked over the session to the right of the conversation.
  *
  * Only the first issue and the first session are shown. A pull request that
  * names several is rare enough that another pane, narrower than anything is
  * readable in, is not worth drawing for it.
  *
- * The conversation and the issue are shown at 75% when they share the right
- * half, so that more of each fits in a pane narrower than GitHub lays them out
- * for; the conversation alone in the right 30% is wide enough to stay at 100%,
- * as the diff and the session always do.
+ * The conversation and the issue are shown at 75%, so that more of each fits in
+ * a pane narrower than GitHub lays them out for — the conversation alone in the
+ * right 30% too, so that it reads the same whatever shares the page. The diff
+ * is at 100% beside the conversation alone and at 75% in three columns, where
+ * it has half the page; the session stays at 100%.
  *
  * The tab is titled `#<number> <title>`, as a tab of the pull request on
  * GitHub would be with the number first.
@@ -33,38 +34,33 @@ export const splitViewUrl = (entry: SplitViewSource): string => {
 
   const sessionUrl = entry.claudeSessions[0]?.url;
 
-  const diff = {
-    url: `${entry.url}/files?${diffQuery}`,
-    zoom: full,
-  } as const;
-
   const conversation = { url: entry.url, zoom: reading } as const;
 
-  const { layout, panes } =
-    issueUrl === undefined
-      ? sessionUrl === undefined
-        ? ({
-            layout: 'r70pp',
-            panes: [diff, { url: entry.url, zoom: full }],
-          } as const)
-        : ({
-            layout: threeColumns,
-            panes: [diff, { url: sessionUrl, zoom: full }, conversation],
-          } as const)
-      : sessionUrl === undefined
-        ? ({
-            layout: threeColumns,
-            panes: [diff, conversation, { url: issueUrl, zoom: reading }],
-          } as const)
-        : ({
-            layout: threeColumnsStacked,
-            panes: [
-              diff,
-              { url: issueUrl, zoom: reading },
-              conversation,
-              { url: sessionUrl, zoom: full },
-            ],
-          } as const);
+  // What shares the right half with the conversation, the issue over the
+  // session when there are both.
+  const others = [
+    ...(issueUrl === undefined
+      ? ([] as const)
+      : ([{ url: issueUrl, zoom: reading }] as const)),
+    ...(sessionUrl === undefined
+      ? ([] as const)
+      : ([{ url: sessionUrl, zoom: full }] as const)),
+  ] as const;
+
+  const layout = Arr.isEmpty(others)
+    ? 'r70pp'
+    : Arr.isFixedLengthArray(1, others)
+      ? threeColumns
+      : threeColumnsStacked;
+
+  // The diff has 70% of the page beside the conversation alone, and half of it
+  // in three columns.
+  const diff = {
+    url: `${entry.url}/files?${diffQuery}`,
+    zoom: Arr.isEmpty(others) ? full : reading,
+  } as const;
+
+  const panes = [diff, conversation, ...others] as const;
 
   const params = [
     ['ws', workspaceId],
@@ -134,5 +130,5 @@ const threeColumnsStacked = 'r75.1r66.8ppcpp';
 /** 100%, where the extension's `zoom` leaves a pane when it is absent. */
 const full = 1;
 
-/** The conversation and the issue, when they share the right half. */
+/** The conversation and the issue, and the diff in three columns. */
 const reading = 0.75;

@@ -173,13 +173,12 @@ the [PR Manager](../pr-manager/docs/design.md#opening-a-pull-request-in-a-split-
 links do: the diff, without whitespace changes or the files already marked
 viewed, beside the conversation at 7:3. When the pull request closes an
 issue, or names the Claude Code session it was written in, that shares the
-right half at 1:1 — the issue right of the conversation, the session left of
-it, next to the diff; with both, the issue is on the left of the right half,
-beside the conversation stacked over the session. Everything is at 100%,
-except the conversation and the issue when they share the right half, which
-are at 75% so that more of each fits. The pull request's own tab is closed once the
-split view has opened, so the split view takes its place; `Ctrl`+click or a
-middle click opens it behind the current tab instead, and keeps that tab.
+right half at 1:1, to the right of the conversation; with both, the issue is
+stacked over the session to the right of the conversation. The conversation
+and the issue are at 75% so that more of each fits, as is the diff in three
+columns; the diff beside the conversation alone, and the session, are at 100%. The pull request's own tab is closed once the split view has
+opened, so the split view takes its place; `Ctrl`+click or a middle click
+opens it behind the current tab instead, and keeps that tab.
 
 A link to a pull request — on GitHub, in a mail, in a chat — has **Open pull
 request in Split View** in its context menu, and so does a pull request's own
