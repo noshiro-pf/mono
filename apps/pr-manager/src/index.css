@@ -399,7 +399,8 @@ a:focus-visible {
 
 .page[data-header='folded'] .refresh-button,
 .page[data-header='folded'] .header-button,
-.page[data-header='folded'] .theme-switch-option {
+/* The header's own theme switch: the report's sort switches keep their size. */
+.page[data-header='folded'] .header-actions .theme-switch-option {
   font-size: 0.8125rem;
   padding-block: 0.2rem;
 }
@@ -443,13 +444,16 @@ a:focus-visible {
  * `<div>` does not.
  */
 .stat-tile {
+  --tile-pad-block: 0.75rem;
+  --tile-pad-inline: 0.9rem;
+
   background: var(--surface);
   border: 1px solid var(--border-ring);
   border-radius: var(--radius);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: 0.75rem 0.9rem;
+  padding: var(--tile-pad-block) var(--tile-pad-inline);
 }
 
 .stat-value {
@@ -565,6 +569,10 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
+.stat-only[aria-pressed='false'] .stat-only-check {
+  display: none;
+}
+
 .stat-only[aria-pressed='true'] {
   background: var(--accent);
   border-color: var(--accent);
@@ -581,7 +589,7 @@ a:focus-visible {
 .stat-toggle[data-only='true'] {
   background: color-mix(in srgb, var(--accent) 12%, var(--surface));
   border: 2px solid var(--accent);
-  padding: calc(0.75rem - 1px) calc(0.9rem - 1px);
+  padding: calc(var(--tile-pad-block) - 1px) calc(var(--tile-pad-inline) - 1px);
 }
 
 :is(.summary-row, .stat-group)[data-picking='true']
@@ -2264,61 +2272,6 @@ a:focus-visible {
 }
 
 /*
- * Where the row cannot hold all six tiles at their least (six of 7.5rem and
- * the two gaps), `open` and `pending` side by side and the joined tiles on a
- * row of their own under them, packed densely so that `pending` takes the
- * room beside `open` the joined tiles leave, rather than a row each. Where
- * the four are narrower than a tile can hold its number and its `only`
- * beside each other, two rows of two.
- */
-.issues-summary-box {
-  container: issues-summary / inline-size;
-}
-
-@container issues-summary (width < 46.5rem) {
-  .issues-summary.summary-row {
-    display: grid;
-    grid-auto-flow: row dense;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .issues-summary > .stat-group {
-    grid-column: 1 / -1;
-  }
-}
-
-@container issues-summary (width < 32rem) {
-  .issues-summary > .stat-group {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .stat-group > .stat-cell + .stat-cell:nth-child(odd) {
-    margin-left: 0;
-  }
-
-  .stat-group > .stat-cell:nth-child(n + 3) {
-    margin-top: -1px;
-  }
-
-  .stat-group > .stat-cell:nth-child(1) > .stat-toggle {
-    border-radius: var(--radius) 0 0 0;
-  }
-
-  .stat-group > .stat-cell:nth-child(2) > .stat-toggle {
-    border-radius: 0 var(--radius) 0 0;
-  }
-
-  .stat-group > .stat-cell:nth-child(3) > .stat-toggle {
-    border-radius: 0 0 0 var(--radius);
-  }
-
-  .stat-group > .stat-cell:nth-child(4) > .stat-toggle {
-    border-radius: 0 0 var(--radius) 0;
-  }
-}
-
-/*
  * The list's start states, labels and order, laid out as the merge order's
  * controls are, above the list and under the List / DAG switch.
  */
@@ -2335,10 +2288,11 @@ a:focus-visible {
   border: 1px solid var(--baseline);
   border-radius: var(--radius);
   color: var(--ink-primary);
+  flex: 1 1 8rem;
   font: inherit;
   font-size: 0.8125rem;
-  inline-size: 16rem;
-  max-inline-size: 100%;
+  max-inline-size: 16rem;
+  min-inline-size: 0;
   padding: 0.3rem 0.6rem;
 }
 
@@ -2375,6 +2329,200 @@ a:focus-visible {
   display: inline-block;
   height: 0.6rem;
   width: 0.6rem;
+}
+
+/* --- narrow filter bars ------------------------------------------------ */
+
+/*
+ * The merge order's counts and controls, and the issues' counts and the
+ * list's controls, are each a container, so that they compact by the width
+ * they are given, which a column decides rather than the window. Where the
+ * tiles at their full size would wrap, the tiles, the chips and the order
+ * take less padding and smaller type: six merge order tiles then stay on one
+ * line down to about 32rem, five to 27rem, and the issues' seven to 37rem.
+ * Narrower still, they wrap into even rows rather than leaving one tile alone
+ * on the last.
+ */
+.merge-order-filters,
+.issues-list-controls-box {
+  container: filter-bar / inline-size;
+}
+
+@container filter-bar (width < 55rem) {
+  .summary-row {
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+  }
+
+  .issues-summary > :is(.stat-tile, .stat-cell) {
+    flex-basis: 5rem;
+  }
+
+  .issues-summary > .stat-group {
+    flex-basis: 20rem;
+  }
+
+  .stat-tile {
+    --tile-pad-block: 0.45rem;
+    --tile-pad-inline: 0.6rem;
+  }
+
+  .stat-value {
+    font-size: 1.375rem;
+  }
+
+  /*
+   * Clear of the `only` over the corner: a count that leaves some out puts
+   * its ` of N` under the number rather than under the switch. A picked
+   * `only` is the `✓` alone, so that it is no wider than `only` and the
+   * number does not move when it is picked, and the check, not the fill
+   * alone, says it is picked.
+   */
+  .stat-cell .stat-value {
+    padding-right: 2.25rem;
+  }
+
+  .stat-only[aria-pressed='true'] .stat-only-word {
+    display: none;
+  }
+
+  .stat-value .count-total {
+    font-size: 0.75rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
+
+  .stat-only {
+    font-size: 0.625rem;
+    padding: 0.1rem 0.35rem;
+    right: 0.3rem;
+    top: 0.3rem;
+  }
+
+  .merge-order-controls,
+  .issues-list-controls {
+    gap: 0.5rem 0.6rem;
+  }
+
+  .filter-group {
+    gap: 0.25rem;
+  }
+
+  .filter-group-name {
+    font-size: 0.75rem;
+    margin-right: 0.1rem;
+  }
+
+  .filter-chip {
+    font-size: 0.75rem;
+    gap: 0.25rem;
+    padding: 0.1rem 0.45rem;
+  }
+
+  .count-total {
+    font-size: 0.75rem;
+  }
+
+  :is(.merge-order-controls, .issues-list-controls) .theme-switch-option {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.55rem;
+  }
+
+  .issues-search {
+    font-size: 0.75rem;
+  }
+}
+
+/*
+ * Merge order tiles that no longer fit on one line at 5rem and the 0.5rem
+ * gaps above: six go three and three, five three and two, and four two and
+ * two.
+ */
+@container filter-bar (width < 32.5rem) {
+  .summary-row:has(> :nth-child(6)) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/*
+ * The issues list's group names go where even the compacted chips would
+ * wrap: its chips say what they are (a start state in the DAG's words, a
+ * label with its colour), and the `<fieldset>` keeps its name for a screen
+ * reader. The merge order keeps `priority`, without which `none` would say
+ * nothing, and its sort says `order` for `merge order` instead.
+ */
+@container filter-bar (width < 27rem) {
+  .summary-row:has(> :nth-child(5)) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .issues-list-controls .filter-group-name {
+    display: none;
+  }
+
+  /* Under the section's title `Merge order`, the order needs no `merge`. */
+  .sort-by-order-merge {
+    display: none;
+  }
+}
+
+@container filter-bar (width < 21.5rem) {
+  .summary-row:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/*
+ * Where the row cannot hold all seven tiles at their least, compact as they
+ * are by then (see "narrow filter bars" above), the joined tiles go last, so
+ * that `open`, `pending` and `in progress`, those of them there are, share
+ * the first row and the joined tiles wrap onto one of their own, rather than
+ * a row each. Tab still goes in the order the markup has, as the dense grid
+ * this replaces did. Where the four are narrower than a tile can
+ * hold its number and its `only` beside each other, two rows of two.
+ */
+.issues-summary-box {
+  container: filter-bar / inline-size;
+}
+
+@container filter-bar (width < 37rem) {
+  .issues-summary > .stat-group {
+    order: 1;
+  }
+}
+
+@container filter-bar (width < 23rem) {
+  .issues-summary > .stat-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-group > .stat-cell + .stat-cell:nth-child(odd) {
+    margin-left: 0;
+  }
+
+  .stat-group > .stat-cell:nth-child(n + 3) {
+    margin-top: -1px;
+  }
+
+  .stat-group > .stat-cell:nth-child(1) > .stat-toggle {
+    border-radius: var(--radius) 0 0 0;
+  }
+
+  .stat-group > .stat-cell:nth-child(2) > .stat-toggle {
+    border-radius: 0 var(--radius) 0 0;
+  }
+
+  .stat-group > .stat-cell:nth-child(3) > .stat-toggle {
+    border-radius: 0 0 0 var(--radius);
+  }
+
+  .stat-group > .stat-cell:nth-child(4) > .stat-toggle {
+    border-radius: 0 0 var(--radius) 0;
+  }
 }
 
 /*

@@ -140,6 +140,7 @@ export const MergeOrderFilters = (): JSX.Element => {
           class={constant('theme-switch')}
         >
           <button
+            aria-label={constant('merge order')}
             aria-pressed={view(view$, ({ sort }) =>
               (sort === 'order').toString(),
             )}
@@ -150,7 +151,13 @@ export const MergeOrderFilters = (): JSX.Element => {
             type={constant('button')}
             onClick={sortByOrder}
           >
-            {constant('merge order')}
+            {/* One run of text, so that the space is a space and not the option's flex gap. */}
+            <span>
+              <span class={constant('sort-by-order-merge')}>
+                {constant('merge ')}
+              </span>
+              {constant('order')}
+            </span>
           </button>
           <button
             aria-pressed={view(view$, ({ sort }) =>
