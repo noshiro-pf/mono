@@ -121,7 +121,7 @@ Both packages share the same API surface. Use `synstate-react-hooks` for React 1
 - **`useObservableValue(observable$)`**: Subscribe to an observable and return its current value as component state. Uses `useSyncExternalStore` internally — the component re-renders when the observable emits.
 - **`useObservableValue(observable$, fallback)`**: Same as above, with a fallback value for observables without an initial value.
 - **`useObservableEffect(observable$, fn)`**: Subscribe `fn` while the component is mounted ([details](/mono/synstate/guides/react-integration/#side-effects-while-mounted-useobservableeffect)).
-- **`useValueAsObservable(value)`**: Convert a component prop/state value into a synstate observable. Useful for bridging React/Preact state into the observable graph.
+- **`useValueAsObservable(value)`**: Convert a component prop/state value into a synstate observable. Useful for bridging React/Preact state into the observable graph. The observable completes when the component unmounts. In React, it is replaced after an `<Activity>` is hidden and shown again, so read it from each render rather than keeping the first one.
 
 #### State Wrappers
 

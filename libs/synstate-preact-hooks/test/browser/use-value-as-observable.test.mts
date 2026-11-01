@@ -1,4 +1,6 @@
-import { renderHook } from '@testing-library/preact';
+import { render, renderHook } from '@testing-library/preact';
+import { h, type JSX } from 'preact';
+import * as Preact from 'preact/hooks';
 import type { Observable } from 'synstate';
 import { useValueAsObservable } from '../../src/index.mjs';
 
@@ -36,5 +38,32 @@ describe(useValueAsObservable, () => {
     unmount();
 
     assert.isTrue(observable$.isCompleted);
+  });
+
+  test('emits the initial value once', () => {
+    const mut_seen: number[] = [];
+
+    // A child's effects run before its parent's, so the child subscribes before
+    // the parent's hook has run any effect of its own.
+    const Child = ({
+      value$,
+    }: Readonly<{ value$: Observable<number> }>): null => {
+      Preact.useEffect(() => {
+        const { unsubscribe } = value$.subscribe((v) => {
+          mut_seen.push(v);
+        });
+
+        return unsubscribe;
+      }, [value$]);
+
+      return null;
+    };
+
+    const Parent = (): JSX.Element =>
+      h(Child, { value$: useValueAsObservable(1) });
+
+    render(h(Parent, {}));
+
+    assert.deepStrictEqual(mut_seen, [1]);
   });
 });
