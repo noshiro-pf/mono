@@ -795,6 +795,39 @@ describe(appendAsConstTransformer, () => {
         `,
       },
       {
+        name: 'a declared this parameter should not shift arguments onto the parameter to their left',
+        source: dedent`
+          declare function f<const T, U>(this: void, a: T, b: U): U;
+          const r = f(1, [1, 2] as const);
+        `,
+        expected: dedent`
+          declare function f<const T, U>(this: void, a: T, b: U): U;
+          const r = f(1, [1, 2] as const);
+        `,
+      },
+      {
+        name: 'a declared this parameter should still let the matching argument lose as const',
+        source: dedent`
+          declare function f<const T, U>(this: void, a: T, b: U): T;
+          const r = f([1, 2] as const, [3] as const);
+        `,
+        expected: dedent`
+          declare function f<const T, U>(this: void, a: T, b: U): T;
+          const r = f([1, 2], [3] as const);
+        `,
+      },
+      {
+        name: 'a this parameter in a function type should be skipped too',
+        source: dedent`
+          declare const g: <const T>(this: void, x: T) => T;
+          const r = g([1] as const);
+        `,
+        expected: dedent`
+          declare const g: <const T>(this: void, x: T) => T;
+          const r = g([1]);
+        `,
+      },
+      {
         name: 'non-const type parameter should keep as const',
         source: dedent`
           function g<T>(x: T): T { return x; }

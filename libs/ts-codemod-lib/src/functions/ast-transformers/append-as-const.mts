@@ -676,13 +676,26 @@ const removeAsConstArgsOfCall = (
 };
 
 /**
+ * The parameters an argument list is matched against: a declared `this`
+ * parameter (`function f(this: void, a: T)`) stays in the AST's parameter list
+ * but takes no argument, so leaving it there would match every argument to the
+ * parameter on its left. TypeScript only allows it first.
+ */
+const dropThisParameter = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- ts-morph nodes are mutable class instances
+  parameters: readonly tsm.ParameterDeclaration[],
+): readonly tsm.ParameterDeclaration[] =>
+  parameters.filter((parameter) => parameter.getName() !== 'this');
+
+/**
  * Resolves the callee of a call expression to the declaration of its single
  * call signature, and collects the names of that declaration's `const`-modified
  * type parameters.
  *
  * Returns `undefined` when the callee does not resolve to exactly one call
- * signature, the resolved declaration has no parameters or type parameters, or
- * none of the type parameters carry the `const` modifier.
+ * signature, the resolved declaration is of a kind that cannot carry both
+ * parameters and type parameters, or none of its type parameters carries the
+ * `const` modifier.
  */
 const resolveSingleSignatureCallTarget = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -734,7 +747,7 @@ const resolveSingleSignatureCallTarget = (
   }
 
   return {
-    parameters: declaration.getParameters(),
+    parameters: dropThisParameter(declaration.getParameters()),
     constTypeParameterNames,
   } as const;
 };

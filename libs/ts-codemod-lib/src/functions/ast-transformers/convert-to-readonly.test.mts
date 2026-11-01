@@ -789,6 +789,33 @@ describe(convertToReadonlyTransformer, () => {
         `,
       },
       {
+        name: 'Array<T> whose element type has a parenthesis inside a string literal type',
+        source: dedent`
+          type T = Array<(A | '(') | (B)>;
+        `,
+        expected: dedent`
+          type T = readonly ((A | '(') | (B))[];
+        `,
+      },
+      {
+        name: 'Array<T> whose element type has a parenthesis inside a comment',
+        source: dedent`
+          type T = Array<(A | /* ( */ C) | (B)>;
+        `,
+        expected: dedent`
+          type T = readonly ((A | /* ( */ C) | (B))[];
+        `,
+      },
+      {
+        name: 'Array<T> whose element type has a parenthesis inside a template literal type',
+        source: dedent`
+          type T = Array<(\`(\${A}\` | C) | (B)>;
+        `,
+        expected: dedent`
+          type T = readonly ((\`(\${A}\` | C) | (B))[];
+        `,
+      },
+      {
         name: 'Mutable array types in function args (generic)',
         source: dedent`
           function foo(a: Array<number>, b: Promise<Array<number>>) {}
