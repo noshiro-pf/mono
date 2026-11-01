@@ -648,25 +648,26 @@ const appendsToItsAccumulator = (
 
   const { body } = callback;
 
-  const spelling =
+  // In an array literal only `...acc` copies the accumulator; a bare `acc`
+  // element, as in `[acc, x]`, nests it and costs nothing per step. Likewise
+  // `Arr.toPushed(acc, x)` copies it, while the curried `Arr.toPushed(acc)`
+  // takes it as the value to push.
+  const copied =
     body.type === AST_NODE_TYPES.ArrayExpression
-      ? body.elements[0]
+      ? body.elements[0]?.type === AST_NODE_TYPES.SpreadElement
+        ? body.elements[0].argument
+        : undefined
       : body.type === AST_NODE_TYPES.CallExpression &&
           body.callee.type === AST_NODE_TYPES.MemberExpression &&
           !body.callee.computed &&
           body.callee.property.type === AST_NODE_TYPES.Identifier &&
-          body.callee.property.name === 'toPushed'
+          body.callee.property.name === 'toPushed' &&
+          body.arguments.length >= 2 &&
+          body.arguments[0]?.type !== AST_NODE_TYPES.SpreadElement
         ? body.arguments[0]
         : undefined;
 
-  const target =
-    spelling === undefined || spelling === null
-      ? undefined
-      : skipTypeWrappers(
-          spelling.type === AST_NODE_TYPES.SpreadElement
-            ? spelling.argument
-            : spelling,
-        );
+  const target = copied === undefined ? undefined : skipTypeWrappers(copied);
 
   return (
     target?.type === AST_NODE_TYPES.Identifier &&
