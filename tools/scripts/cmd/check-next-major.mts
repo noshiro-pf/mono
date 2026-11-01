@@ -7,11 +7,17 @@ import {
   isRecord,
   isString,
   Json,
-  Num,
   Result,
   unknownToString,
 } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
+import {
+  isBreaking,
+  isBreakingRelease,
+  listChangesetBumps,
+  type Bump,
+  type ChangesetFile,
+} from '../lib/changesets.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -124,13 +130,7 @@ export const listReminders = ({
   changesets: readonly ChangesetFile[];
   stocks: readonly StockFile[];
 }>): readonly Reminder[] => {
-  const bumps = changesets.flatMap(({ file, content }) =>
-    Array.from(parseChangesetBumps(content), ([name, bump]) => ({
-      file,
-      name,
-      bump,
-    })),
-  );
+  const bumps = listChangesetBumps(changesets);
 
   return Arr.generate(function* () {
     for (const { file, content, manifest } of stocks) {
@@ -163,44 +163,6 @@ export const listReminders = ({
       }
     }
   });
-};
-
-/**
- * The packages a changeset's front matter names, with their bump. A file
- * without front matter — `README.md`, `config.json` — names none.
- */
-export const parseChangesetBumps = (
-  content: string,
-): ReadonlyMap<string, Bump> => {
-  const lines = content.split('\n');
-
-  if (lines[0]?.trim() !== '---') {
-    return new Map<string, Bump>();
-  }
-
-  const end = lines.findIndex(
-    (line, index) => index > 0 && line.trim() === '---',
-  );
-
-  if (end === -1) {
-    return new Map<string, Bump>();
-  }
-
-  return new Map(
-    Arr.generate(function* () {
-      for (const line of lines.slice(1, end)) {
-        const match = FRONT_MATTER_ENTRY.exec(line);
-
-        const name = match?.[1];
-
-        const bump = match?.[2];
-
-        if (isString(name) && isBump(bump)) {
-          yield [name, bump] as const;
-        }
-      }
-    }),
-  );
 };
 
 /**
@@ -262,12 +224,6 @@ export type StockItem = Readonly<{
   undecided: boolean;
 }>;
 
-export type ChangesetFile = Readonly<{
-  /** Relative to the repository root. */
-  file: string;
-  content: string;
-}>;
-
 export type StockFile = Readonly<{
   /** Relative to the repository root. */
   file: string;
@@ -298,22 +254,15 @@ type Summary = Readonly<{
   undecided: number;
 }>;
 
-export type Bump = 'major' | 'minor' | 'patch';
-
 const STOCK_FILE_NAME = 'NEXT_MAJOR.md';
 
 /** The heading, lowercased, whose items are candidates rather than decided. */
 const UNDECIDED_HEADING = 'undecided';
 
-const CHANGESET_DIR_NAME = '.changeset';
-
 const SELF = path.resolve(
   projectRootPath,
   'tools/scripts/cmd/check-next-major.mts',
 );
-
-/** Matches `'pkg': patch`, `"pkg": minor` or `pkg: major`. */
-const FRONT_MATTER_ENTRY = /^\s*['"]?(.+?)['"]?\s*:\s*(major|minor|patch)\s*$/u;
 
 /** An opening or closing code fence, capturing its marker. */
 const FENCE = /^\s{0,3}(`{3,}|~{3,})/u;
@@ -323,57 +272,6 @@ const HEADING = /^\s{0,3}#{1,6}\s+(.*?)\s*#*\s*$/u;
 
 /** A list item at column 0, capturing its text. */
 const TOP_LEVEL_LIST_ITEM = /^(?:[-*+]|\d+[.)])\s+(.*)$/u;
-
-/** The start of a semver version, capturing its major and minor. */
-const VERSION = /^(\d+)\.(\d+)\.\d/u;
-
-/**
- * Whether `bump` breaks consumers of a package at `version`: under semver a
- * `0.x` package signals a breaking change with its minor, and changesets would
- * take a `major` there to `1.0.0`, which is breaking as well.
- */
-export const isBreaking = (bump: Bump, version: string): boolean =>
-  bump === 'major' || (bump === 'minor' && version.startsWith('0.'));
-
-/**
- * Whether moving a package from `from` to `to` breaks its consumers, by the
- * rule `isBreaking` applies to a bump. A version that is not `x.y.z` is not
- * judged.
- */
-export const isBreakingRelease = (from: string, to: string): boolean => {
-  const before = parseVersion(from);
-
-  const after = parseVersion(to);
-
-  if (before === undefined || after === undefined) {
-    return false;
-  }
-
-  return (
-    after.major > before.major ||
-    (before.major === 0 && after.major === 0 && after.minor > before.minor)
-  );
-};
-
-export const readChangesets = async (): Promise<readonly ChangesetFile[]> => {
-  const files = await glob(`${CHANGESET_DIR_NAME}/*.md`, {
-    cwd: projectRootPath,
-  });
-
-  if (Result.isErr(files)) {
-    throw new Error(
-      `Failed to list ${CHANGESET_DIR_NAME}/: ${unknownToString(files.value)}`,
-    );
-  }
-
-  return Promise.all(
-    files.value.toSorted().map(async (file) => ({
-      file,
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      content: await fs.readFile(path.resolve(projectRootPath, file), 'utf8'),
-    })),
-  );
-};
 
 export const readStocks = async (): Promise<readonly StockFile[]> => {
   const files = await glob(`**/${STOCK_FILE_NAME}`, {
@@ -397,22 +295,6 @@ export const readStocks = async (): Promise<readonly StockFile[]> => {
       ),
     })),
   );
-};
-
-const isBump = (value: string | undefined): value is Bump =>
-  value === 'major' || value === 'minor' || value === 'patch';
-
-const parseVersion = (
-  version: string,
-): Readonly<{ major: number; minor: number }> | undefined => {
-  const match = VERSION.exec(version);
-
-  return match?.[1] === undefined || match[2] === undefined
-    ? undefined
-    : {
-        major: Result.unwrapOkOr(Num.safeParseFloat(match[1]), Number.NaN),
-        minor: Result.unwrapOkOr(Num.safeParseFloat(match[2]), Number.NaN),
-      };
 };
 
 const checkStock = (

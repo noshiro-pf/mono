@@ -11,15 +11,16 @@ import {
 import { getWorkspacePackages, glob, isDirectlyExecuted } from 'ts-repo-utils';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { projectRootPath } from '../project-root-path.mjs';
-import { parseReleaseGroups } from './check-linked-releases.mjs';
 import {
   isBreaking,
-  parseChangesetBumps,
+  listChangesetBumps,
   readChangesets,
   type Bump,
+  type ChangesetBump,
   type ChangesetFile,
-} from './check-next-major.mjs';
+} from '../lib/changesets.mjs';
+import { projectRootPath } from '../project-root-path.mjs';
+import { parseReleaseGroups } from './check-linked-releases.mjs';
 
 /**
  * Holds a breaking release of a workspace package until every published package
@@ -95,13 +96,7 @@ export const checkDependentReleases = ({
     packages.map(({ name, version }) => [name, version]),
   );
 
-  const bumps = changesets.flatMap(({ file, content }) =>
-    Array.from(parseChangesetBumps(content), ([name, bump]) => ({
-      file,
-      name,
-      bump,
-    })),
-  );
+  const bumps = listChangesetBumps(changesets);
 
   const ownBreaking = (name: string): boolean =>
     bumps.some(
@@ -446,7 +441,7 @@ const RUNTIME_DEPENDENCY_FIELDS = [
 
 const findBreaking = (
   name: string,
-  bumps: readonly Readonly<{ file: string; name: string; bump: Bump }>[],
+  bumps: readonly ChangesetBump[],
   groups: readonly ReleaseGroup[],
   versions: ReadonlyMap<string, string>,
 ): readonly Pending[] => {

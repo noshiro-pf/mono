@@ -10,13 +10,13 @@ import {
   unknownToString,
 } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
 import {
   isBreaking,
-  parseChangesetBumps,
+  listChangesetBumps,
   readChangesets,
   type ChangesetFile,
-} from './check-next-major.mjs';
+} from '../lib/changesets.mjs';
+import { projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Holds a breaking release of one member of a `linked` group in
@@ -59,13 +59,7 @@ export const checkLinkedReleases = ({
   /** The version of every workspace package, by name. */
   versions: ReadonlyMap<string, string>;
 }>): Result<number, string> => {
-  const bumps = changesets.flatMap(({ file, content }) =>
-    Array.from(parseChangesetBumps(content), ([name, bump]) => ({
-      file,
-      name,
-      bump,
-    })),
-  );
+  const bumps = listChangesetBumps(changesets);
 
   const violations = linked.flatMap((group): readonly string[] => {
     const unknown = group.filter((name) => !versions.has(name));
