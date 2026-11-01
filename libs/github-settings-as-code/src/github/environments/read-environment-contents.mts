@@ -1,30 +1,28 @@
-import type { Dirent } from 'node:fs';
 import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
 import * as t from 'ts-fortress';
 import { isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { environmentsDir } from '../constants.mjs';
+import { listJsonFilesIn } from '../list-json-files.mjs';
 import { EnvironmentSettings } from './constants.mjs';
 
 export const readEnvironmentFiles = async (): Promise<
   readonly EnvironmentSettings[]
-> => readFilesIn(environmentsDir);
+> => readEnvironmentFilesIn(environmentsDir);
 
-const readFilesIn = async (
+/**
+ * `dir` の直下の宣言（`*.json`）を読んで検証する。テストが一時ディレクトリを
+ * 渡せるように、ディレクトリを引数に取る。
+ */
+export const readEnvironmentFilesIn = async (
   dir: string,
 ): Promise<readonly EnvironmentSettings[]> => {
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  const files: readonly Dirent<string>[] = await fs.readdir(dir, {
-    withFileTypes: true,
-  });
+  const files = await listJsonFilesIn(dir);
 
   const fileContents: readonly string[] = await Promise.all(
-    files
-      .filter((d) => d.isFile())
-      .map((d) =>
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.readFile(path.resolve(dir, d.name), { encoding: 'utf8' }),
-      ),
+    files.map((file) =>
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.readFile(file, { encoding: 'utf8' }),
+    ),
   );
 
   const validationResults = fileContents.map((content) =>
