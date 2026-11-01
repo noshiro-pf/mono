@@ -23,3 +23,16 @@ its lockfile; the dependency list stays readable and nothing is alerted on.
 Rename `package.snapshot.json` back to `package.json`, move the package to
 `libs/` or `apps/`, and migrate `@noshiro/ts-utils` → `ts-data-forge`,
 `@noshiro/ts-type-utils` → `ts-type-forge`, `@noshiro/io-ts` → `ts-fortress`.
+
+Do not move the package's own `.gitignore` with it, since the root one is the
+only one under `libs/` and `apps/`; leave it here, where it still hides local
+data in a checkout from before the revival. Copy the patterns the package still
+needs to the root one, prefixed with the package's new path: after the `!` of a
+negated pattern, and as `<new path>/` in place of the leading `/` of an
+anchored one. A pattern with no slash other than a trailing one matched at any
+depth below the package, so its root copy is `<new path>/**/<pattern>`. The
+last matching pattern wins, so a negated one goes below every root pattern it
+overrides. Prettier run from the package directory reads no root ignore file,
+so give the package the `z:prettier` script of `libs/ts-fortress/package.json`,
+which passes `--ignore-path ../../.gitignore`, and make its `fix:fmt:full`
+`pnpm run z:prettier .`.
