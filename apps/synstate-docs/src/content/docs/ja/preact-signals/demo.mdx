@@ -322,7 +322,9 @@ export const SignalBridgeDemo = (): preact.JSX.Element => (
             </code>
             <br />
             <code style={codeStyle}>
-                {'Signal → fromSignal → debounce(500) → map(index) → toSignal'}
+                {
+                    'Signal → fromSignal → debounce(500) → withIndex() → map → toSignal'
+                }
             </code>
         </div>
     </div>
@@ -341,4 +343,4 @@ const handleInput: InputEventHandler<HTMLInputElement> = (e) => {
 - **`fromSignal`** — Preact Signal を synstate の Observable に変換し、オペレーターチェーン（`debounce`、`map` 等）を適用可能にする。
 - **`toSignal`** — 加工された Observable を Signal に変換してレンダリングに使用。
 - 入力は即座に更新（raw Signal）されますが、デバウンスされた値は500ms の入力停止後に更新されます。
-- 更新回数と入力文字数はどちらも `map` を使用 — 更新回数は第2引数（emission index）を利用し `map((_, i) => i + 1)` で実装。
+- 更新回数と入力文字数はどちらも `map` を使用。更新回数は、debounce された値に `withIndex()` で番号を付け、`map(([i]) => i + 1)` で回数に変えて実装。

@@ -8,7 +8,7 @@ description: 同じアプリケーションを synstate-dom、Solid、Preact + S
 ## 計るもの
 
 - **すべての export**：ライブラリのエントリポイントの export をすべて残したもので、何も tree-shaking されません。synstate-dom は `synstate-dom` と `synstate`、Solid は `solid-js` と `solid-js/web`、Preact は `preact` と `preact/hooks`（Preact + Signals はこれに `@preact/signals` を加えたもの）、React は `react`、`react-dom`、`react-dom/client`、VanJS は `vanjs-core` を数えています。あくまで上限であって、アプリケーションが実際に配信するサイズではありません。
-- **カウンター**：数を表示して、クリックすると 1 足すボタンを、各ライブラリの流儀で書いたものです。アプリケーションのコードを書く前の時点で、ライブラリだけでかかる分にあたります。
+- **カウンター**：数を表示して、クリックすると 1 足すボタンを、各ライブラリの流儀で書いたものです。アプリケーションのコードを書く前の時点で、ライブラリだけでかかるおおよその分にあたります。
 - **js-framework-benchmark の表**：[ベンチマーク](/mono/synstate-dom/ja/background/benchmark/)の表と、その 8 つの操作です。
 - **ローン**・**工程表**・**ズームのシナリオ**：ベンチマークの 3 つの[シナリオ](/mono/synstate-dom/ja/background/benchmark/#シナリオ)です。
 
@@ -58,13 +58,15 @@ Brotli は品質 11 です。
 
 ## 結果の読み方
 
-- **カウンターの行が下限です。** アプリケーションがその上に足すのは、自分自身のコードと、使っているライブラリの部分だけで、ここで計ったアプリケーションならどのライブラリでも多くて数 kB です。ライブラリの順位はカウンターの行で決まり、その下の行でも変わりません。
+<!-- `checkReadingTheResults` in scripts/embed-bundle-size.mts checks the sentences below against the tables and fails `gen:bundle-size` when one no longer holds. It quotes them word for word, so a reworded sentence is reworded there too, and a new claim about an order or a margin gets a case there. -->
+
+- **カウンターの行が基準です。** その下のアプリケーションは、自分自身のコードと、使っているライブラリの部分の分だけそこから変わります。ここで計ったアプリケーションなら、どのライブラリでも、カウンターより下の行はどれもカウンターから数 kB 以内に収まります。ライブラリの順位はカウンターの行で決まり、その下の行でも変わりません。
 - **React** は、アプリケーションが何であってもほとんどが react-dom です。reconciler と scheduler はコンポーネントが何を使うかによって分かれないので、行どうしの差は 1 kB ほどしかありません。
 - **VanJS** は tree-shaking する余地のない小さな 1 モジュールなので、カウンターの時点でその全体が入ります。
 - **Solid** は JSX をテンプレートにコンパイルして小さなランタイムを呼び出すので、カウンターでは `solid-js/web` のごく一部しか使いません。すべての export はその数倍あります。
 - **Preact** は小さな仮想 DOM で、Signals はそこにリアクティブなコアと、signal を DOM に束縛する統合部分を足します。Preact の表がすべての export より大きいのは、表の行が `preact/compat` の `memo` を使っていて、すべての export の行ではそれを数えていないからです。
-- **synstate-dom** には、synstate の伝播のコア（グラフ、深さ順の伝播、スコープ）、自身の JSX ランタイムと束縛の表、そして両者が ts-data-forge と ts-std-forge から import するヘルパーが含まれています。どの行でも React の次に大きくなっています。ただ、すでに synstate を使っているアプリケーションなら、そのコアの分は一度払えば済みます。また、モデルがどの列でも ts-data-forge を使うシナリオでは、そのヘルパーを synstate と共有します。
-- **すべての export** は、React を除くと synstate-dom と Solid が大きくなっています。synstate は RxJS と同じようにオペレーターを一揃い export していますが、アプリケーションに残るのは import したものだけです。
+- **synstate-dom** には、synstate の伝播のコア（グラフ、深さ順の伝播、スコープ）、自身の JSX ランタイムと束縛の表、そして両者が ts-data-forge と ts-std-forge から import するヘルパーが含まれています。synstate-dom はどの行でも React の次に大きくなっています。ただ、すでに synstate を使っているアプリケーションなら、そのコアの分は一度払えば済みます。また、モデルがどの列でも ts-data-forge を使うシナリオでは、そのヘルパーを synstate と共有します。
+- **すべての export** の行では、React の次に synstate-dom と Solid が大きくなっています。synstate は RxJS と同じようにオペレーターを一揃い export していますが、アプリケーションに残るのは import したものだけです。
 
 ## 実行
 

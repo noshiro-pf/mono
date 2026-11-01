@@ -322,7 +322,9 @@ export const SignalBridgeDemo = (): preact.JSX.Element => (
             </code>
             <br />
             <code style={codeStyle}>
-                {'Signal → fromSignal → debounce(500) → map(index) → toSignal'}
+                {
+                    'Signal → fromSignal → debounce(500) → withIndex() → map → toSignal'
+                }
             </code>
         </div>
     </div>
@@ -341,4 +343,4 @@ Demonstrates bidirectional conversion:
 - **`fromSignal`** — converts a Preact Signal into a synstate Observable, enabling the full operator chain (`debounce`, `map`, etc.).
 - **`toSignal`** — converts the processed Observable back into a Signal for rendering.
 - The input updates instantly (raw Signal), while the debounced value settles after 500ms of inactivity.
-- The update count and input length both use `map` — the count leverages the second argument (emission index) via `map((_, i) => i + 1)`.
+- The update count and input length both use `map`: the count numbers each debounced value with `withIndex()` and turns the index into a count with `map(([i]) => i + 1)`.

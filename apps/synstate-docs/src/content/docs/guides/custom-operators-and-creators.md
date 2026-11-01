@@ -1,13 +1,13 @@
 ---
 title: 'Custom Operators and Creators'
-description: How to write your own operators and creation functions with the factories every built-in observable is made by.
+description: How to write your own operators and creation functions with factories built on the same base classes as the built-in observables.
 sidebar:
     order: 5
 ---
 
-Every built-in observable in SynState is made by one of four factories, and the same factories are exported for you. A custom operator or creator built with them takes part in glitch-free propagation exactly as `map` or `source` do.
+SynState exports four factories for writing observables of your own. They wrap the same base classes that the built-in observables extend, so a custom operator or creator built with them takes part in glitch-free propagation exactly as `map` or `source` do.
 
-| Factory                                | Makes                                                | Built-ins made with it            |
+| Factory                                | Makes                                                | Behaves like                      |
 | :------------------------------------- | :--------------------------------------------------- | :-------------------------------- |
 | `createRootObservable`                 | an observable with no parents (`kind: 'root'`)       | `source`, `timer`, `fromPromise`  |
 | `createSyncChildObservable`            | a child that emits in its parents' update            | `map`, `filter`, `combine`, `zip` |
@@ -163,4 +163,4 @@ The `onComplete` tool registers a teardown from inside `init`, so it can close o
 
 ## What you cannot do
 
-The observable types carry only what users need: `kind`, `parents` (on children), `getSnapshot`, `isCompleted`, `updateToken`, `depth`, `subscribe`, `pipe`, `complete` and `dispose`. The members propagation reads (`tryUpdate`, `addChild`, …) exist at run time but are not part of the types, and the types cannot be satisfied with an object literal: every observable has to come from one of the factories above, because propagation relies on those members being there.
+The observable types carry only what users need: `kind`, `parents` (on children), `getSnapshot`, `isCompleted`, `updateToken`, `depth`, `subscribe`, `pipe`, `complete` and `dispose`. The members propagation reads (`tryUpdate`, `addChild`, …) exist at run time but are not part of the types, and the types cannot be satisfied with an object literal: an observable of your own has to come from one of the factories above, because propagation relies on those members being there.

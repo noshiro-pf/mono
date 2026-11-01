@@ -78,7 +78,7 @@ SynState はカスタムのグリッチフリー Observable 実装の上に構�
 
 - 読まれていない派生値も、ソースが更新されるたびにすべて再計算される。MobX と Jotai はこの処理を省略できる。省略されるのはグラフが持つ必要のないノードで、`switchMap`、スコープの dispose、`audit` で外せる（[ベンチマークのまとめ](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)を参照）。
 - 小さなグラフでは、更新ごとのオーバーヘッドが RxJS より大きい。
-- 演算子の数は RxJS より少ない。ただし動作モデル上必要なものはそろっている。すべての Observable は最初から共有されているので `share` / `shareReplay` の類は不要で、エラーは `catchError` ではなく `Result` 値（`mapResultOk`、`unwrapResultOk` など）として流れる。独自の演算子や生成関数は [組み込みのものと同じファクトリ](/mono/synstate/ja/guides/custom-operators-and-creators/) で書ける。
+- 演算子の数は RxJS より少ない。ただし動作モデル上必要なものはそろっている。すべての Observable は最初から共有されているので `share` / `shareReplay` の類は不要で、エラーは `catchError` ではなく `Result` 値（`mapResultOk`、`unwrapResultOk` など）として流れる。独自の演算子や生成関数は [組み込みのものと同じ基底クラスの上に作られたファクトリ](/mono/synstate/ja/guides/custom-operators-and-creators/) で書ける。
 
 **最適:** シンプルな共有ステートと高度な非同期パイプラインの両方を単一の一貫した API で必要とするプロジェクト。
 
