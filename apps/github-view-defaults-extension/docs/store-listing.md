@@ -9,7 +9,8 @@ Upload `pack/github-view-defaults-extension-<version>.zip` from
 CRX upload** is turned on for the item, a zip is refused and
 `pnpm run pack:crx` is what to upload instead: the same package, signed by
 Chrome with the key registered on the account, which the script takes out of
-`pass`. There is no such key yet; `pack-crx.mts` says how to make one.
+`pass`. There is no such key yet; the README's "Release" section says how
+to make one.
 
 ## Store listing
 

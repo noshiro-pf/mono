@@ -1,52 +1,67 @@
-import { hasKey } from 'ts-data-forge';
-import { storeManifestOf } from './store-package.mjs';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { hasKey, isRecord } from 'ts-data-forge';
+import type { UnknownRecord } from 'ts-type-forge';
+// eslint-disable-next-line import-x/no-relative-packages, import-x/no-internal-modules -- tools/ is not a package; this is how apps reach its shared scripts
+import { storeManifestOf } from '../../../tools/configs/chrome-extension-packaging.mjs';
+import { storePackageOptions } from './store-package.mjs';
+import { workspaceRootPath } from './workspace-root-path.mjs';
 
-describe('storeManifestOf', () => {
-  const built = {
-    manifest_version: 3,
-    name: 'Split View',
-    version: '0.3.0',
-    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA',
-    permissions: ['storage'],
-    web_accessible_resources: [
-      {
-        resources: ['split.html'],
-        matches: ['https://noshiro-pf.github.io/*', 'http://localhost:5194/*'],
-      },
-    ],
-  } as const;
+const readManifest = (): UnknownRecord => {
+  const source: unknown = JSON.parse(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- this package's own manifest
+    fs.readFileSync(
+      path.resolve(workspaceRootPath, 'public/manifest.json'),
+      'utf8',
+    ),
+  );
 
-  test('takes the key off and hands it back', () => {
-    const { manifest, key } = storeManifestOf(built);
+  assert.isTrue(isRecord(source));
 
-    assert.isFalse(hasKey(manifest, 'key'));
+  return source;
+};
 
-    assert.strictEqual(key, built.key);
+describe('storePackageOptions on public/manifest.json', () => {
+  test('the manifest pins the unpacked id and opens split.html to links', () => {
+    const manifest = readManifest();
+
+    assert.isTrue(hasKey(manifest, 'key'));
+
+    assert.isTrue(hasKey(manifest, 'web_accessible_resources'));
   });
 
-  test('takes the web-accessible resources off, which only the pinned id can use', () => {
-    const { manifest } = storeManifestOf(built);
+  test('the store package has neither the key nor the web-accessible resources', () => {
+    const manifest = readManifest();
 
-    assert.isFalse(hasKey(manifest, 'web_accessible_resources'));
+    const { key: pinned } = manifest;
+
+    const { manifest: forStore, key } = storeManifestOf(
+      manifest,
+      storePackageOptions,
+    );
+
+    assert.isFalse(hasKey(forStore, 'key'));
+
+    assert.isFalse(hasKey(forStore, 'web_accessible_resources'));
+
+    assert.strictEqual(key, pinned);
   });
 
-  test('leaves everything else as the build wrote it', () => {
-    const { manifest } = storeManifestOf(built);
+  test('everything else is left as it is', () => {
+    const manifest = readManifest();
 
-    assert.deepStrictEqual(manifest, {
-      manifest_version: 3,
-      name: 'Split View',
-      version: '0.3.0',
-      permissions: ['storage'],
-    });
-  });
+    const { manifest: forStore } = storeManifestOf(
+      manifest,
+      storePackageOptions,
+    );
 
-  test('refuses a build with no key, which pins the unpacked id', () => {
-    const { key: _, ...withoutKey } = built;
-
-    assert.throws(
-      () => storeManifestOf(withoutKey),
-      /No `key` in the manifest/u,
+    assert.deepStrictEqual(
+      Object.keys(forStore).toSorted(),
+      Object.keys(manifest)
+        .filter(
+          (field) => field !== 'key' && field !== 'web_accessible_resources',
+        )
+        .toSorted(),
     );
   });
 });
