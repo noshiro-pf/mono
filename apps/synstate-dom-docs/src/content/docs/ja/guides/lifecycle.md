@@ -74,7 +74,7 @@ const Stats = (): JSX.Element => {
 
 ## イベントハンドラ
 
-ハンドラは、どのスコープの外でも実行されます。ハンドラが呼ばれる時点では、どの `run` も動いていません。そのため、ハンドラの中で作った Observable（`a$.pipe(map(...))` など）はどのスコープにも属さず、行や分岐が消えた後も計算され続けてしまいます。開発ビルドでは、synstate-dom が登録したハンドラの中で Observable が作られると warning が出ます。
+ハンドラは、どのスコープの外でも実行されます。ハンドラが呼ばれる時点では、どの `run` も動いていません。そのため、ハンドラの中で作った Observable（`a$.pipe(map(...))` など）はどのスコープにも属さず、行や分岐が消えた後も計算され続けてしまいます。synstate-dom は実行時には warning を出しません。代わりに [eslint-plugin-synstate](https://www.npmjs.com/package/eslint-plugin-synstate) の `no-observable-in-handler` ルールが、そうした Observable を報告します。対象は、`onClick` などの props や、`listenInScope`・`addEventListener` に渡したリスナー、その中に書いたコールバック、そこから名前で呼ぶ同じファイルの関数の中で派生させた Observable です。マウント時に取ったスコープの `run` の中は対象外です。ルールが追う範囲と見逃す場合は、[プラグインの README](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-plugin-synstate#no-observable-in-handler) にあります。
 
 ハンドラでは状態に書き込むだけにして、その状態からの派生はマウント時に作っておきましょう。`await` の後など、後から実行する処理でどうしても Observable を作る必要があるなら、コンポーネントのマウント中に `getCurrentScope()` でスコープを取っておき、後の処理をそのスコープの `run` で包んでください。
 

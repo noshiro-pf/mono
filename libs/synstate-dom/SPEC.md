@@ -277,7 +277,7 @@ export const render = (
 | テキスト   | 空の Text ノードを作り `node.data = String(v)`                                                     |
 | `class`    | 文字列形式とオブジェクト形式のどちらか一方を受け付ける（下記）                                     |
 | `style`    | `Bindable<string>` は `style.cssText`。オブジェクト形式は各キーを `style.setProperty` で個別に束縛 |
-| イベント   | `listenInScope`（「6.4」）。開発ビルドの warning は下記                                            |
+| イベント   | `listenInScope`（「6.4」）。ハンドラの中で作った Observable は lint ルールで検出する（下記）       |
 
 **制御された `checked` と `indeterminate`**: `<input>` の `checked` または `indeterminate` を束縛すると、`change` の後、次のフレームの描画前に要素を束縛中の値へ書き戻す。持ち主が変更を受け取らなかった（`onChange` で値を変えなかった）とき、ユーザーの切り替えが画面に残らないようにするためで、結果は React の制御されたコンポーネントと同じになる。ただし React は自分のイベント処理の終わりに同期的に戻すのに対し、こちらは次のフレームまで戻さない。クリックは `indeterminate` も外すので、同じく書き戻す。
 
@@ -287,7 +287,7 @@ export const render = (
 - 束縛せずにユーザーに切り替えさせるには `defaultChecked` を使う。
 - `value` は書き戻さない。入力のたびに値を更新しない書き方（確定時にだけ反映する、など）が入力を妨げるため。
 
-**イベントハンドラの中で作った Observable**: ハンドラが呼ばれる時点ではどのスコープの `run` も動いていないので、ハンドラの中で `a$.pipe(map(...))` を作るとどのスコープにも属さず、行や分岐が消えても計算され続ける（規則 3）。開発ビルドでは、synstate-dom が登録したハンドラの実行中に Observable が作られたら warning を出す。ハンドラを包んで実行中の目印を立て、synstate の生成時の登録処理がそれを見る。`await` の後は見分けられないので、README で「同期部分で `getCurrentScope()` を取っておき、その `run` で包む」書き方を示す。モジュールのトップレベルで作るストアは正しく所属なしなので、警告しない。
+**イベントハンドラの中で作った Observable**: ハンドラが呼ばれる時点ではどのスコープの `run` も動いていないので、ハンドラの中で `a$.pipe(map(...))` を作るとどのスコープにも属さず、行や分岐が消えても計算され続ける（規則 3）。これは実行時には検出せず、eslint-plugin-synstate の `no-observable-in-handler` が報告する。対象は、`on` と大文字で始まる JSX の props・`listenInScope`・`addEventListener` に渡した関数（中に書いた関数を含む）と、そこから名前で呼ぶ同じファイルの関数の中で、動き続ける Observable（親を持つもの、外部のソースを購読する `fromSubscribable`、止まらない `counter`）を作る呼び出しである。スコープの `run`（親なしでその場で作った `createScope().run` を除く）・`untracked`・`render` のコールバックの中は除く。`addEventListener`・`listenInScope` に渡す場合を除き、関数を値として名前で渡した先は追わない。渡した関数は、後で自分のスコープでマウントされるコンポーネントかもしれないためである。その代わり、`setTimeout(rebuild)` や `createScope().run(build)` のように名前で渡した関数の中の漏れは見逃す。実行時の warning にしない理由は 2 つある。1 つは、ハンドラを包んで実行中の目印を立てる処理を、本番でも毎回のイベントで払うことになる点である。もう 1 つは、synstate の開発ビルドの判定が `process` を見るため、ブラウザ向けのバンドルでは常に本番と判定され、warning が出ない点である。`await` の後に作る場合は、同期部分で `getCurrentScope()` を取っておき、その `run` で包む。モジュールのトップレベルで作るストアは正しく所属なしなので、報告しない。
 
 **`class` のオブジェクト形式**: `class` は `Bindable<string> | Readonly<Record<string, Bindable<boolean>>>` を受け付ける。
 

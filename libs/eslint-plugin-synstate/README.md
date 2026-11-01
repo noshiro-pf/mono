@@ -67,6 +67,7 @@ export default [
 | Rule                             | Description                                                                                                                                                                          |
 | :------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `no-identity-map`                | Require `skipIfNoChange()` instead of `map((x) => x)`, which changes no value and only stops a repeated one. Fixable.                                                                |
+| `no-observable-in-handler`       | Disallow deriving an observable in an event handler or listener. The handler runs outside every scope, so the observable is never disposed and its parents keep computing it.        |
 | `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal (`Object.is`) to the one before. Fixable. |
 | `no-throw-in-operator`           | Disallow `throw` in a function passed to a synstate operator. The exception stops the update midway, leaving part of the graph updated; return a `Result` instead.                   |
 | `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                         |
@@ -94,6 +95,68 @@ recognized imported from `synstate` by name, under an alias or through a
 namespace import. A callee in a type wrapper, a comment the rewrite would drop,
 or a file where `skipIfNoChange` names something else or is imported
 under that name by `import type` is reported without a fix.
+
+### `no-observable-in-handler`
+
+A handler runs outside every scope: by the time it is called, no `run` is
+executing. An observable it derives, such as `a$.pipe(map(f))` in an `onClick`,
+belongs to no scope, so nothing disposes it when the row or branch it was made
+for goes away, and its parents keep computing it for as long as they live.
+synstate-dom does not check this at run time: wrapping every handler would cost
+each event, and synstate's development check reads `process`, which a browser
+bundle does not have.
+
+The rule reports a call that creates an observable that keeps working while it
+lives — `.pipe(…)` with a synstate operator (written there or bound to a `const`
+of the file), `combine`, `derive`, `merge`, `zip`, `fromSubscribable`, a
+`counter` without a `times` option, and synstate-dom's `derive`, `mapBindable`
+and `toObservable` — inside:
+
+- a JSX prop whose name starts with `on` and a capital letter, including either
+  side of a condition (`enabled ? handler : undefined`);
+- the listener passed to synstate-dom's `listenInScope`, to the global
+  `addEventListener` (not a binding of the file's own: an import, a declaration
+  or a parameter), or to any object's `addEventListener`;
+
+whether the function is written in place or named by a function declaration or
+a `const` of the same file. It reads the code written inside the handler,
+nested functions included (a callback it subscribes, schedules or iterates
+with runs outside every scope too), and the functions of the same file that the
+handler calls by name. A function of the file that the handler only passes by
+name to another call, other than one of the listener calls above, is not
+followed, since it may be a component mounted later in its own scope
+(`setPage(Settings)`); so `setTimeout(rebuild)` and `createScope().run(build)`
+with a named function are not reported either. The same body written inline,
+as in `setPage(() => <div>{derive(…)}</div>)`, is code written inside the
+handler and is reported.
+
+A chain of `.pipe` calls, or a creation in the arguments of another, is
+reported once, at the outer call, which also stands for what a function of the
+file called there creates. A root state, `just(…)`, a `timer` and a counter
+with `times` are not reported: they compute nothing more, or complete by
+themselves. synstate-dom's factories are reported whatever their arguments,
+although given only constants they create nothing.
+
+Two ways out are accepted:
+
+- have the handler write to a state, and derive from that state at mount time;
+- take the scope with `getCurrentScope()` at mount time and create the
+  observable inside its `run(…)` callback, which also covers work after an
+  `await`.
+
+Any `run` is trusted to choose a scope that something disposes, except one on a
+scope made on the spot with no parent: `createScope()`,
+`createScope(undefined)`, `createScope(null)`, `createScope(void 0)` or
+`createScope(getCurrentScope())`. `untracked(…)` is accepted, for an
+observable meant to belong to no scope, and so is the app passed to
+synstate-dom's `render`, whose root scope the function it returns disposes.
+
+It recognizes the factories imported from `synstate`, its wrapper packages and
+`synstate-dom` by name, under an alias or through a namespace import, and reads
+through `as`, `satisfies`, `!` and parentheses. A `.pipe` whose operators are
+not synstate's, such as RxJS's, is not reported. Neither is a scope bound to a
+name in the handler and then run, a function of another file, nor a listener
+given as a `handleEvent` object.
 
 ### `no-redundant-skip-if-no-change`
 

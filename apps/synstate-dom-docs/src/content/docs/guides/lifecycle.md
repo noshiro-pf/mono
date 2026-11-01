@@ -74,7 +74,7 @@ That leaves one case: a heavy derivation defined globally and read only rarely. 
 
 ## Event handlers
 
-A handler runs outside every scope: by the time it is called, no `run` is executing. So an observable you create in a handler, such as `a$.pipe(map(...))`, belongs to no scope and keeps being computed even after its row or branch is gone. In development builds, synstate-dom warns when an observable is created inside a handler it registered.
+A handler runs outside every scope: by the time it is called, no `run` is executing. So an observable you create in a handler, such as `a$.pipe(map(...))`, belongs to no scope and keeps being computed even after its row or branch is gone. synstate-dom gives no warning at run time. The `no-observable-in-handler` rule of [eslint-plugin-synstate](https://www.npmjs.com/package/eslint-plugin-synstate) reports such an observable instead: one derived in an `onClick`-style prop or a listener passed to `listenInScope` or `addEventListener`, in a callback written inside it, or in a function of the same file it calls by name. Work inside the `run` of a scope taken at mount time is accepted. What the rule follows, and what it misses, is in the [plugin's README](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-plugin-synstate#no-observable-in-handler).
 
 Instead, have the handler write to a state, and derive from that state at mount time. If later work really has to create an observable, say after an `await`, grab the scope with `getCurrentScope()` while the component is mounting, and wrap the later work in that scope's `run`.
 

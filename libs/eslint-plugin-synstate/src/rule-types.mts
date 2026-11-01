@@ -24,6 +24,21 @@ namespace NoIdentityMap {
 }
 
 /**
+ * @description Disallow deriving a synstate observable in an event handler, where it belongs to no scope and is never disposed.
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | false   |
+ *  ```
+ */
+namespace NoObservableInHandler {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal to the one before.
  *
  *  ```md
@@ -115,6 +130,7 @@ namespace PreferMapTo {
 
 export type EslintSynstateRules = Readonly<{
   'synstate/no-identity-map': NoIdentityMap.RuleEntry;
+  'synstate/no-observable-in-handler': NoObservableInHandler.RuleEntry;
   'synstate/no-redundant-skip-if-no-change': NoRedundantSkipIfNoChange.RuleEntry;
   'synstate/no-throw-in-operator': NoThrowInOperator.RuleEntry;
   'synstate/no-unbounded-counter-pipe': NoUnboundedCounterPipe.RuleEntry;

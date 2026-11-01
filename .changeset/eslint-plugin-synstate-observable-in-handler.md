@@ -1,0 +1,5 @@
+---
+'eslint-plugin-synstate': minor
+---
+
+New rule `no-observable-in-handler`, on in `recommended`: it reports an observable derived in an event handler, such as `a$.pipe(map(f))` in an `onClick`, or in a listener passed to synstate-dom's `listenInScope` or to `addEventListener`. The handler runs outside every scope, so such an observable is never disposed and its parents keep computing it. It reads the code written inside the handler, nested callbacks included, and the functions of the same file the handler calls by name; a function passed by name to a call other than `addEventListener` or `listenInScope` is not followed. It accepts an observable created inside the callback of a scope's `run`, except a `run` on a scope made right there with no parent (`createScope()`, `createScope(getCurrentScope())` and the like), inside `untracked`, or in the app passed to synstate-dom's `render`. synstate-dom's documentation used to promise a run-time warning for this, which was never implemented. It now points to this rule.
