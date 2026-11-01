@@ -1,37 +1,38 @@
+import { Arr, asUint32 } from 'ts-data-forge';
 import type { LoadedReport } from './load-report.mjs';
 import { createReportCache, reportCacheKey } from './report-cache.mjs';
 
 describe(createReportCache, () => {
   test('hands back what the same build kept for the same token', async () => {
-    const { cacheOf } = setup();
+    const { cacheOf, written } = setup();
 
     const cache = cacheOf('build-1');
 
-    cache.save(REPORT, 'token');
-
-    await settle();
+    await written(() => {
+      cache.save(REPORT, 'token');
+    });
 
     assert.deepStrictEqual(await cache.load('token'), REPORT);
   });
 
   test('reads nothing another build kept', async () => {
-    const { cacheOf } = setup();
+    const { cacheOf, written } = setup();
 
-    cacheOf('build-1').save(REPORT, 'token');
-
-    await settle();
+    await written(() => {
+      cacheOf('build-1').save(REPORT, 'token');
+    });
 
     assert.isUndefined(await cacheOf('build-2').load('token'));
   });
 
   test('reads nothing kept for another token, and keeps no token itself', async () => {
-    const { cacheOf, kept } = setup();
+    const { cacheOf, kept, written } = setup();
 
     const cache = cacheOf('build-1');
 
-    cache.save(REPORT, 'secret-token');
-
-    await settle();
+    await written(() => {
+      cache.save(REPORT, 'secret-token');
+    });
 
     assert.isUndefined(await cache.load('another-token'));
 
@@ -41,36 +42,33 @@ describe(createReportCache, () => {
   });
 
   test('reads nothing once cleared, or where nothing was kept', async () => {
-    const { cacheOf } = setup();
+    const { cacheOf, written } = setup();
 
     const cache = cacheOf('build-1');
 
     assert.isUndefined(await cache.load('token'));
 
-    cache.save(REPORT, 'token');
+    await written(() => {
+      cache.save(REPORT, 'token');
+    });
 
-    await settle();
-
-    cache.clear();
-
-    await settle();
+    await written(() => {
+      cache.clear();
+    });
 
     assert.isUndefined(await cache.load('token'));
   });
 
   test('keeps nothing, and fails nothing, where IndexedDB refuses', async () => {
-    const cache = createReportCache({
-      source: SOURCE,
-      build: 'build-1',
-      read: () => Promise.reject(new Error('no IndexedDB')),
-      write: () => Promise.reject(new Error('no IndexedDB')),
-    });
+    const { cacheOf, written } = setup({ refuse: true });
 
-    cache.save(REPORT, 'token');
+    const cache = cacheOf('build-1');
 
-    cache.clear();
+    await written(() => {
+      cache.save(REPORT, 'token');
 
-    await settle();
+      cache.clear();
+    }, 2);
 
     assert.isUndefined(await cache.load('token'));
   });
@@ -113,32 +111,65 @@ const REPORT: LoadedReport = {
   reading: [],
 } as const;
 
-const settle = async (): Promise<void> => {
-  await new Promise<void>((resolve) => {
-    setTimeout(resolve, 0);
-  });
-};
+/** What IndexedDB answers where the browser has none, or refuses it. */
+const refused = (): Promise<never> => Promise.reject(new Error('no IndexedDB'));
 
-/** Caches of any build over one database, as two deploys of the page share it. */
-const setup = (): Readonly<{
+/**
+ * Caches of any build over one database, as two deploys of the page share it;
+ * with `refuse`, a database that rejects every read and write, as a browser
+ * with no IndexedDB does.
+ */
+const setup = (
+  options?: Readonly<{ refuse?: boolean }>,
+): Readonly<{
   cacheOf: (build: string) => ReturnType<typeof createReportCache>;
   /** What is kept for {@link SOURCE}, as the database holds it. */
   kept: () => unknown;
+  /**
+   * Runs `action` and settles once the database has taken (or, with `refuse`,
+   * refused) the `count` writes it makes. `save` writes only after it hashes
+   * the token, which Node does on its thread pool, so a timer cannot say when
+   * that is; `clear` writes at once, so the wait is set up before `action` runs.
+   */
+  written: (action: () => void, count?: number) => Promise<void>;
 }> => {
   const mut_database = new Map<string, unknown>();
+
+  const mut_waiting: (() => void)[] = [];
+
+  const refuse = options?.refuse === true;
 
   return {
     cacheOf: (build) =>
       createReportCache({
         source: SOURCE,
         build,
-        read: (key) => Promise.resolve(mut_database.get(key)),
+        read: (key) =>
+          refuse ? refused() : Promise.resolve(mut_database.get(key)),
         write: (key, value) => {
-          mut_database.set(key, value);
+          if (!refuse) {
+            mut_database.set(key, value);
+          }
 
-          return Promise.resolve();
+          mut_waiting.shift()?.();
+
+          return refuse ? refused() : Promise.resolve();
         },
       }),
     kept: () => mut_database.get(reportCacheKey(SOURCE)),
+    written: async (action, count = 1) => {
+      const taken = Promise.all(
+        Arr.seq(asUint32(count)).map(
+          async () =>
+            new Promise<void>((resolve) => {
+              mut_waiting.push(resolve);
+            }),
+        ),
+      );
+
+      action();
+
+      await taken;
+    },
   };
 };
