@@ -106,6 +106,9 @@ The `## Review` section says the level and the number of rounds, then lists
 the findings under **Fixed**, **Dismissed** (each with its reason) and
 **Deferred** (each with its issue). Keep that shape: it is what a reader, and
 anything that later mines the descriptions for recurring findings, can parse.
+The Japanese half of the description (`CLAUDE.md`, "Japanese text")
+translates the section under `### レビュー`, never a second `## Review`: the
+digest reads the first `## Review` alone, and only the English one parses.
 
 A security finding is the exception, as "Security findings" in `CLAUDE.md`
 says: one dismissed or deferred goes to `mono-security` and is not listed
