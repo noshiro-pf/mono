@@ -26,7 +26,7 @@ import { projectRootPath } from '../project-root-path.mjs';
  * rather than a silent exemption.
  *
  * It also checks that each waiver still has a reason, and that each reason
- * still has a waiver. A reason is a `# waiver: <prefix>` heading in the comment
+ * still has a waiver. A reason is a `# waiver: <target>` heading in the comment
  * block above `minimumReleaseAgeExcludePrune`, which is the one place anywhere
  * near the list that survives pruning — measured, and written down beside the
  * reasons themselves. A heading inside the list is a violation of its own,
@@ -66,7 +66,7 @@ export const checkMinimumReleaseAge = (): Promise<
 export const parseMinimumReleaseAgeSettings = (
   workspaceFile: string,
 ): MinimumReleaseAgeSettings => {
-  const lines = workspaceFile.split('\n');
+  const lines = workspaceFile.split(/\r?\n/u);
 
   const excludeIndex = lines.findIndex((line) => line.startsWith(EXCLUDE_KEY));
 
@@ -90,18 +90,50 @@ export const parseMinimumReleaseAgeSettings = (
         (_line, index) => index < blockStartIndex || pruneIndex <= index,
       ),
     ).map((reason) => reason.target),
+    malformedHeadings: Arr.generate(function* () {
+      for (const line of lines) {
+        const captured = REASON_HEADING.exec(line)?.groups?.['target'];
+
+        if (captured !== undefined && headingTarget(line) === undefined) {
+          yield captured.trim();
+        }
+      }
+    }),
   };
 };
 
 /**
- * `true` when the reason heading speaks for the entry.
+ * `true` when the reason heading speaks for at least one version the entry
+ * lists, which is what keeps the heading from being stale.
  *
- * Prefix matching, so one heading covers a family — `@octokit/` answers for the
- * eight entries that have to move together — and an exact `name@version`
- * heading still covers only itself.
+ * A trailing `/` marks a family prefix, such as `@octokit/`. A bare name speaks
+ * for every version of that one package. A heading with versions speaks for
+ * those versions only — `a@1.0.0 || 1.0.1` lists two — so `vite@8.2.2` covers
+ * neither `vite@8.2.20` nor `vite@8.2.2-beta.1`.
  */
-export const reasonCoversEntry = (target: string, entry: string): boolean =>
-  entry.startsWith(target);
+export const reasonCoversEntry = (target: string, entry: string): boolean => {
+  const { name, versions } = splitEntry(entry);
+
+  return versionsToExplain(versions).some((version) =>
+    reasonCoversVersion(target, name, version),
+  );
+};
+
+/**
+ * `true` when every version the entry lists has a heading speaking for it, so a
+ * reason written for `a@1.0.0` does not stand for `a@1.0.0 || 2.0.0`. That also
+ * keeps a reason in force when pruning drops one version from such an entry.
+ */
+export const reasonsExplainEntry = (
+  targets: readonly string[],
+  entry: string,
+): boolean => {
+  const { name, versions } = splitEntry(entry);
+
+  return versionsToExplain(versions).every((version) =>
+    targets.some((target) => reasonCoversVersion(target, name, version)),
+  );
+};
 
 /**
  * What is wrong with an entry, or `undefined` when it is a waiver that can
@@ -122,6 +154,8 @@ export type MinimumReleaseAgeSettings = Readonly<{
   excludeEntries: readonly string[];
   waiverReasons: readonly WaiverReason[];
   misplacedReasonTargets: readonly string[];
+  /** What follows `waiver:` on a heading line that names no target. */
+  malformedHeadings: readonly string[];
 }>;
 
 export type WaiverReason = Readonly<{
@@ -154,8 +188,17 @@ const LIST_ITEM_PREFIX = '- ';
 
 const WILDCARD = '*';
 
-/** `# waiver: @octokit/`, at any indentation, and nothing else on the line. */
-const REASON_HEADING = /^\s*#\s*waiver:\s*(?<target>\S+)\s*$/u;
+/**
+ * `# waiver: @octokit/`, at any indentation, with at most one space between `#`
+ * and `waiver:` — a reason's body is indented further, so a body line that
+ * happens to start with `waiver:` is not taken for a heading. The target is the
+ * rest of the line, so a heading can name an entry that lists versions as
+ * `a@1.0.0 || 1.0.1`; `headingTarget` checks that it is one.
+ */
+const REASON_HEADING = /^\s*# ?waiver:\s*(?<target>\S.*)$/u;
+
+/** The spaces a target may hold: those around the `||` between versions. */
+const VERSION_SEPARATOR = /\s*\|\|\s*/gu;
 
 /** Every way the list and its reasons can stop expiring, in one pass. */
 export const collectViolations = (
@@ -199,12 +242,10 @@ export const collectViolations = (
     }),
 
     ...Arr.generate(function* () {
+      const targets = settings.waiverReasons.map((reason) => reason.target);
+
       for (const entry of settings.excludeEntries) {
-        if (
-          settings.waiverReasons.every(
-            (reason) => !reasonCoversEntry(reason.target, entry),
-          )
-        ) {
+        if (!reasonsExplainEntry(targets, entry)) {
           yield { subject: `'${entry}'`, message: REASONS['no-reason'] };
         }
       }
@@ -228,6 +269,11 @@ export const collectViolations = (
       subject: `\`# waiver: ${target}\``,
       message: REASONS['misplaced-reason'],
     })),
+
+    ...settings.malformedHeadings.map((text) => ({
+      subject: `\`# waiver: ${text}\``,
+      message: REASONS['malformed-heading'],
+    })),
   ] as const;
 
 const REASONS = {
@@ -244,15 +290,20 @@ const REASONS = {
   ].join(' '),
 
   'no-reason': [
-    'is a waiver nothing explains. Add a `# waiver: <name or prefix>` heading',
-    'and the reason under it, in the comment block above',
-    '`minimumReleaseAgeExcludePrune` — which is where a reason survives',
-    'pruning.',
+    'is a waiver nothing explains — when it lists several versions, every one',
+    'needs a reason. Add a `# waiver: <target>` heading and the reason under',
+    'it, in the comment block above `minimumReleaseAgeExcludePrune` — which is',
+    'where a reason survives pruning. The target is the entry with or without',
+    'its quotes, its package name for every version of it, or a family prefix',
+    'ending in `/` such as `@octokit/`.',
   ].join(' '),
 
   'stale-reason': [
-    'answers for no entry on the list. Pruning has retired the waiver it was',
-    'written for, so the reason goes with it.',
+    'answers for no entry on the list. If pruning has retired the waiver it',
+    'was written for, the reason goes with it. Otherwise the heading does not',
+    'name the entry: a family prefix ends in `/`, a package name has to be the',
+    'whole name, and a heading with versions has to list a version the entry',
+    'lists, exactly.',
   ].join(' '),
 
   'empty-reason': [
@@ -265,24 +316,85 @@ const REASONS = {
     'how #1937 dropped eight lines of reasoning while keeping every entry',
     'they explained. Move it above that key.',
   ].join(' '),
+
+  'malformed-heading': [
+    'is a heading that names no target, so it explains nothing. After',
+    '`waiver:` comes the target alone — a package name, `name@1.0.0`,',
+    '`name@1.0.0 || 1.0.1`, or a family prefix ending in `/` — and any note',
+    'goes in the reason under it.',
+  ].join(' '),
 } as const satisfies ReadonlyRecord<ViolationReason, string>;
 
 type ViolationReason =
   | ExcludeEntryProblem
   | 'empty-reason'
+  | 'malformed-heading'
   | 'misplaced-reason'
   | 'no-reason'
   | 'stale-reason';
 
 /**
- * `true` when the entry carries a version — the `@` that is not the one opening
- * a scope, with something after it. `@types/node@22.20.2 || 24.13.4` is one
- * entry naming two versions, and that `@` is the separator.
+ * The package name and the versions an entry or a heading lists.
+ *
+ * The separator is the `@` that is not the one opening a scope, with something
+ * after it; anything else is a name with no versions. The versions are split at
+ * `||`, so `@types/node@22.20.2 || 24.13.4` is one entry naming two, and the
+ * spacing around `||` does not matter. An empty part, as in `a@1.0.0 ||`, names
+ * no version.
  */
-const hasVersion = (entry: string): boolean => {
+const splitEntry = (
+  entry: string,
+): Readonly<{ name: string; versions: readonly string[] }> => {
   const separatorIndex = entry.indexOf('@', entry.startsWith('@') ? 1 : 0);
 
-  return 0 < separatorIndex && separatorIndex < entry.length - 1;
+  if (separatorIndex <= 0) {
+    return { name: entry, versions: [] };
+  }
+
+  const versions = entry
+    .slice(separatorIndex + 1)
+    .split('||')
+    .map((version) => version.trim())
+    .filter((version) => version !== '');
+
+  return Arr.isEmpty(versions)
+    ? { name: entry, versions: [] }
+    : { name: entry.slice(0, separatorIndex), versions };
+};
+
+/** `true` when the entry carries a version. */
+const hasVersion = (entry: string): boolean =>
+  Arr.isNonEmpty(splitEntry(entry).versions);
+
+/**
+ * The versions a reason has to speak for: those the entry lists, or the single
+ * `undefined` that stands for every version when it lists none.
+ */
+const versionsToExplain = (
+  versions: readonly string[],
+): readonly (string | undefined)[] =>
+  Arr.isEmpty(versions) ? ([undefined] as const) : versions;
+
+/**
+ * `true` when the heading speaks for the package `name` at `version`, or at
+ * every version when `version` is `undefined` — an entry that lists none.
+ */
+const reasonCoversVersion = (
+  target: string,
+  name: string,
+  version: string | undefined,
+): boolean => {
+  if (target.endsWith('/')) {
+    return name.startsWith(target);
+  }
+
+  const heading = splitEntry(target);
+
+  return (
+    heading.name === name &&
+    (Arr.isEmpty(heading.versions) ||
+      (version !== undefined && heading.versions.includes(version)))
+  );
 };
 
 /**
@@ -382,6 +494,29 @@ const commentText = (line: string): string => {
 };
 
 /**
+ * What a `# waiver:` heading names, or `undefined` for a line that names none.
+ *
+ * A trailing comment and the quotes YAML puts around a scoped entry are taken
+ * off, so the entry can be copied from the list as written. What is left may
+ * hold spaces only around `||`; a heading line with anything else after its
+ * target, such as `# waiver: vite@8.2.2 (until #2218)`, names none, and
+ * `malformedHeadings` reports it rather than letting it drop out of sight.
+ */
+const headingTarget = (line: string): string | undefined => {
+  const captured = REASON_HEADING.exec(line)?.groups?.['target'];
+
+  if (captured === undefined) {
+    return undefined;
+  }
+
+  const target = stripQuotes(stripComment(captured).trim());
+
+  return target === '' || /\s/u.test(target.replaceAll(VERSION_SEPARATOR, ''))
+    ? undefined
+    : target;
+};
+
+/**
  * The `# waiver:` headings among `lines`, each with whether anything is written
  * under it.
  *
@@ -390,7 +525,7 @@ const commentText = (line: string): string => {
  */
 const collectReasons = (lines: readonly string[]): readonly WaiverReason[] =>
   lines.flatMap((line, index) => {
-    const target = REASON_HEADING.exec(line)?.groups?.['target'];
+    const target = headingTarget(line);
 
     if (target === undefined) {
       return [];

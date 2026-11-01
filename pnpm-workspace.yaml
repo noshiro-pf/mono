@@ -138,9 +138,12 @@ minimumReleaseAge: 10080 # = 7 days
 # このキーの上は両方のバージョンで無傷だった。`minimumReleaseAgeExclude:` の
 # 直前も駄目で、リストが空になるとキーごと消えて理由だけが次のキーの上に浮く。
 #
-# 書式は `# waiver: <名前かその前方一致>` の見出しと、その下の説明。族で理由が
-# 一つなら前方一致で一度書けばよい。`check:root:minimum-release-age` が、理由の
-# 無い entry、entry の無い理由、リストの中に書かれた見出しで落ちる。
+# 書式は `# waiver: <対象>` の見出しと、その下の説明。`@octokit/` のように末尾が
+# `/` の対象だけが前方一致で族をまとめる。名前だけならそのパッケージの全版、
+# `name@version`（`name@1.0.0 || 1.0.1` も可）なら書いた版だけを説明する。
+# `||` で版を並べた entry は、どの版にも理由が要る。
+# `check:root:minimum-release-age` が、理由の無い entry、entry の無い理由、
+# リストの中に書かれた見出しで落ちる。
 #
 # waiver: @octokit/
 #   octokit 族は `@octokit/openapi-types` を共有し、
