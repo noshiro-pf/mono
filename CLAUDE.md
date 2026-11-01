@@ -1,6 +1,7 @@
 # CLAUDE.md
 
-Instructions for this repository, maintained by hand. There is no `AGENTS.md`.
+Instructions for this repository, maintained by hand. `AGENTS.md` directs Codex
+to read this file at the start of every session.
 
 ## What belongs in this file
 
