@@ -90,6 +90,23 @@ describe('prefer-arr-scan', () => {
           const ys = xs.reduce<readonly number[]>((acc, x) => [...seed, x], []);
         `,
       },
+      {
+        name: 'reduce nesting its accumulator rather than spreading it',
+        code: dedent`
+          type Nested = readonly [Nested, number] | undefined;
+          declare const xs: readonly number[];
+          declare const seed: Nested;
+          const ys = xs.reduce<Nested>((acc, x) => [acc, x], seed);
+        `,
+      },
+      {
+        name: 'curried toPushed taking the accumulator as the value to push',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const f = xs.reduce<unknown>((acc) => Arr.toPushed(acc), undefined);
+        `,
+      },
     ],
     invalid: [
       {
