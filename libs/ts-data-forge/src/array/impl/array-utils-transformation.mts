@@ -956,7 +956,7 @@ const partitionImpl = <E, N extends WithSmallInt<PositiveInt & SizeType.Arr>>(
   array: readonly E[],
   chunkSize: N,
 ): readonly (readonly E[])[] =>
-  chunkSize < 2
+  chunkSize < 1
     ? ([] as const)
     : // eslint-disable-next-line total-functions/no-partial-division
       seq(asUint32(Math.ceil(array.length / chunkSize))).map((i: Uint32) =>
