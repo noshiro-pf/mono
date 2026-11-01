@@ -1,14 +1,12 @@
 import * as path from 'node:path';
-import { pipe } from 'ts-data-forge';
 
 /**
- * ".jpg?t=xoxe-1405110841104-7609868321223-7621542667925-4fad30d9a97ce707dc3984a3607d1bdc"
- * -> ".jpg"
+ * The extension of a URL's path, ignoring its query string and fragment.
+ *
+ * "https://files.slack.com/files-pri/T0/F0/a.jpg?t=xoxe-…" -> ".jpg"
  */
 export const extractExt = (url: string): string =>
-  pipe(url)
-    .map((s) => path.parse(s).ext)
-    .map((s) => s.slice(0, s.indexOf('?'))).value;
+  path.posix.extname(URL.parse(url)?.pathname ?? url);
 
 if (import.meta.vitest !== undefined) {
   test('path.parse', () => {
@@ -25,5 +23,27 @@ if (import.meta.vitest !== undefined) {
         'https://files.slack.com/files-pri/aaaaaaaaaa/ios__________.jpg?t=xoxe-bbbbbbbbbbbbbbbbbbbb',
       ),
     ).toBe('.jpg');
+  });
+
+  test('extractExt without a query string', () => {
+    expect(
+      extractExt('https://files.slack.com/files-pri/T0/F0/image.png'),
+    ).toBe('.png');
+  });
+
+  test('extractExt ignores a fragment', () => {
+    expect(
+      extractExt('https://files.slack.com/files-pri/T0/F0/image.png#x.y'),
+    ).toBe('.png');
+
+    expect(
+      extractExt('https://files.slack.com/files-pri/T0/F0/doc.pdf?t=a.b#c'),
+    ).toBe('.pdf');
+  });
+
+  test('extractExt of a path without an extension', () => {
+    expect(extractExt('https://files.slack.com/files-pri/T0/F0/README')).toBe(
+      '',
+    );
   });
 }
