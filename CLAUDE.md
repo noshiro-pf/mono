@@ -105,10 +105,6 @@ converter (`scripts-common/`), and per version the published bundle
   bundle bump is stamped back by `strict-lib:gen:packages` and the release
   silently does not happen; the `fixed` group aligns versions but a
   changeset's text reaches only the packages it names.
-- **Private manifests under `strict-lib/` use `devDependencies` only.**
-  changesets bumps dependents through `dependencies`, so one such edge turns
-  a toolchain patch into twelve empty bundle releases. `ts-type-forge` is a
-  `dependency` only in the published bundles.
 - **The generator is `gen:lib`, not `gen`.** A `gen` there would be run by
   `ws:gen` and wipes `output/lib-files*`.
 - Converter changes are committed with their output (`strict-lib-gen.yml`
