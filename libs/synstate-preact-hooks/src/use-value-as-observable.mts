@@ -22,14 +22,11 @@ export const useValueAsObservable = <A,>(input: A): Observable<A> => {
     [],
   );
 
-  const setState = Preact.useCallback((nextState: A): A => {
-    sourceObservable.next(nextState);
-
-    return nextState;
-  }, []);
-
   Preact.useEffect(() => {
-    setState(input);
+    // The observable already holds the value it was created with.
+    if (!Object.is(state.getSnapshot().value, input)) {
+      sourceObservable.next(input);
+    }
   }, [input]);
 
   return state;
