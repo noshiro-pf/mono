@@ -89,6 +89,32 @@ describe('pick', () => {
 
     assert.deepStrictEqual(result, { name: 'Alice' });
   });
+
+  test('pick matches a numeric key', () => {
+    const record = { 1: 'a', b: 2 } as const;
+
+    const result = Obj.pick(record, [1]);
+
+    expectType<typeof result, Readonly<{ 1: 'a' }>>('=');
+
+    assert.deepStrictEqual(result, { 1: 'a' });
+
+    assert.deepStrictEqual(Obj.pick([1])(record), { 1: 'a' });
+  });
+
+  test('pick matches a symbol key', () => {
+    const sym = Symbol('s');
+
+    const record = { [sym]: 'a', b: 2 } as const;
+
+    const result = Obj.pick(record, [sym]);
+
+    assert.deepStrictEqual(result, { [sym]: 'a' });
+
+    assert.deepStrictEqual(Obj.pick([sym])(record), { [sym]: 'a' });
+
+    assert.deepStrictEqual(Obj.pick(record, ['b']), { b: 2 });
+  });
 });
 
 describe('omit', () => {
@@ -130,6 +156,35 @@ describe('omit', () => {
     const result = omitNone(original);
 
     assert.deepStrictEqual(result, original);
+  });
+
+  test('omit matches a numeric key', () => {
+    const record = { 1: 'a', b: 2 } as const;
+
+    const result = Obj.omit(record, [1]);
+
+    expectType<typeof result, Readonly<{ b: 2 }>>('=');
+
+    assert.deepStrictEqual(result, { b: 2 });
+
+    assert.deepStrictEqual(Obj.omit([1])(record), { b: 2 });
+  });
+
+  test('omit keeps the symbol keys it is not asked to omit', () => {
+    const sym = Symbol('s');
+
+    const other = Symbol('other');
+
+    const record = { [sym]: 'a', [other]: 'o', b: 2 } as const;
+
+    assert.deepStrictEqual(Obj.omit(record, [sym]), { [other]: 'o', b: 2 });
+
+    assert.deepStrictEqual(Obj.omit([sym])(record), { [other]: 'o', b: 2 });
+
+    assert.deepStrictEqual(Obj.omit(record, ['b']), {
+      [sym]: 'a',
+      [other]: 'o',
+    });
   });
 
   test('should omit multiple keys in curried form', () => {

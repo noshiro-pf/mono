@@ -91,6 +91,10 @@ export namespace Obj {
    * **Type Safety**: Only keys that exist in the source record type are
    * allowed, preventing runtime errors from accessing non-existent properties.
    *
+   * **Key handling**: a numeric key `1` matches the property `'1'`, and
+   * symbol-keyed properties are picked like string-keyed ones. Only own
+   * enumerable properties are read.
+   *
    * @example
    *
    * ```ts
@@ -150,12 +154,12 @@ export namespace Obj {
       case 2: {
         const [record, keys] = args;
 
-        const keysSet = new Set<keyof R>(keys);
+        const keysSet = toOwnKeySet(keys);
 
         return (
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           Object.fromEntries(
-            Object.entries(record).filter(([k, _v]) => keysSet.has(k)),
+            ownEnumerableEntries(record).filter(([k]) => keysSet.has(k)),
           ) as never
         );
       }
@@ -176,6 +180,10 @@ export namespace Obj {
    * **Type Safety**: Only keys that exist in the source record type are
    * allowed, and the return type precisely reflects which properties remain
    * after omission.
+   *
+   * **Key handling**: a numeric key `1` matches the property `'1'`, and
+   * symbol-keyed properties are kept unless omitted, like string-keyed ones.
+   * Only own enumerable properties are copied.
    *
    * @example
    *
@@ -238,12 +246,12 @@ export namespace Obj {
       case 2: {
         const [record, keys] = args;
 
-        const keysSet = new Set<keyof R>(keys);
+        const keysSet = toOwnKeySet(keys);
 
         return (
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           Object.fromEntries(
-            Object.entries(record).filter(([k, _v]) => !keysSet.has(k)),
+            ownEnumerableEntries(record).filter(([k]) => !keysSet.has(k)),
           ) as never
         );
       }
@@ -996,3 +1004,23 @@ declare namespace TsDataForgeInternals {
         ? MergeAll<Rest, MergeTwo<Acc, First>>
         : Acc;
 }
+
+/**
+ * The keys as `Reflect.ownKeys` reports them: a numeric key `1` becomes `'1'`,
+ * a symbol stays a symbol.
+ */
+const toOwnKeySet = (
+  keys: readonly PropertyKey[],
+): ReadonlySet<string | symbol> =>
+  new Set(keys.map((k) => (typeof k === 'number' ? k.toString() : k)));
+
+/**
+ * The own enumerable entries of `record`, string and symbol keys alike, in
+ * `Reflect.ownKeys` order. `Object.entries` would leave out the symbols.
+ */
+const ownEnumerableEntries = (
+  record: UnknownRecord,
+): readonly (readonly [string | symbol, unknown])[] =>
+  Reflect.ownKeys(record)
+    .filter((k) => Object.prototype.propertyIsEnumerable.call(record, k))
+    .map((k) => [k, Reflect.get(record, k)] as const);
