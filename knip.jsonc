@@ -77,7 +77,7 @@
   // System binaries, not something to install:
   // - `diff`, invoked by `libs/synstate/scripts/cmd/generate-sample-diffs.mts`.
   // - `pass` and `openssl`, invoked by
-  //   `apps/split-view-extension/scripts/pack-crx.mts` — the signing key is
+  //   `tools/configs/chrome-extension-packaging.mts` — the signing key is
   //   read out of `pass`, and `openssl` derives the extension id from it.
   //
   // And one that is installed, but not at the root: `firebase`, which

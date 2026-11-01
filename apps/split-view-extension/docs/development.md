@@ -26,6 +26,13 @@ wanted only by the commands whose output leaves the repository:
 
 Everything below is run from `apps/split-view-extension`.
 
+The packaging commands share
+[`chrome-extension-packaging.mts`](../../../tools/configs/chrome-extension-packaging.mts)
+with the GitHub defaults extension; `scripts/store-package.mts` holds the
+package-specific settings. Its shared staging and manifest tests run through
+`pnpm run check:root:test` at the repository root. `pack:crx` checks that
+Playwright's Chromium is installed before asking `pass` for the signing key.
+
 ## Building and loading
 
 ```sh

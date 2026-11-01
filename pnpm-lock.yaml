@@ -1263,9 +1263,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.10)
-      ts-type-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-type-forge
       tsx:
         specifier: 'catalog:'
         version: 4.23.15

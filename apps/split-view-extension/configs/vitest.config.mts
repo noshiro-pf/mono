@@ -10,7 +10,8 @@ export default defineViteConfig({
   },
   node: {
     includeSource: ['src/**/*.mts'],
-    // `scripts/` holds the packing, whose manifest rewrite is tested beside it.
+    // `scripts/` holds the packing options, tested beside them against the real
+    // manifest; the shared packaging is tested under `tools/configs/`.
     include: ['test/**/*.test.mts', 'scripts/**/*.test.mts'],
   },
 });

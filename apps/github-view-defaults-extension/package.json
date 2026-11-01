@@ -47,7 +47,6 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "ts-type-forge": "workspace:*",
     "tsx": "catalog:",
     "vite": "catalog:"
   }

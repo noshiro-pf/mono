@@ -207,8 +207,17 @@ decided the same way again.
 Once **verified CRX upload** is turned on for the item the store stops taking a
 zip, and `pnpm run pack:crx` is what to upload instead: the same staged package
 signed by Chrome with the key registered on the account. That key is not in the
-repository and must not be — it comes out of `pass`, and there is not one yet;
-`scripts/pack-crx.mts` says how to make it and where it has to live. Losing it
-means losing the ability to publish an update.
+repository and must not be — it comes out of the `github-view-defaults-extension`
+entry in `pass` (override with `GITHUB_DIFF_DEFAULTS_SIGNING_KEY_PASS`). To make a
+new key for the first submission, use
+`openssl genrsa 2048 | pass insert --multiline github-view-defaults-extension`.
+Keep the same key for every later upload: losing it means losing the ability to
+publish an update. `pack:crx` checks for Playwright's Chromium before asking for
+the key; install it with `pnpm exec playwright install chromium` if prompted.
+
+The two packaging commands call the shared
+[`chrome-extension-packaging.mts`](../../tools/configs/chrome-extension-packaging.mts).
+`scripts/store-package.mts` holds this extension's settings. The shared staging
+and manifest tests run through `pnpm run check:root:test` at the repository root.
 
 This extension is not affiliated with GitHub.
