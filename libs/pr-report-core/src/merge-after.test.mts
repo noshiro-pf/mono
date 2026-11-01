@@ -79,6 +79,64 @@ describe(parseMergeAfter, () => {
     );
   });
 
+  test('ignores the trailers inside a longer fence that holds a shorter one', () => {
+    assert.deepStrictEqual(
+      parseMergeAfter(
+        [
+          '````markdown',
+          '```',
+          'Merge-After: #1901',
+          '```',
+          'Merge-After: #1902',
+          '````',
+          'Merge-After: #1903',
+          '',
+        ].join('\n'),
+      ),
+      [1903],
+    );
+  });
+
+  test('ignores a trailer after a backtick fence inside a tilde fence', () => {
+    assert.deepStrictEqual(
+      parseMergeAfter(
+        ['~~~', '```', 'Merge-After: #1901', '~~~', ''].join('\n'),
+      ),
+      [],
+    );
+  });
+
+  test('does not close a fence on a line with an info string', () => {
+    assert.deepStrictEqual(
+      parseMergeAfter(
+        ['```', '```ts', 'Merge-After: #1901', '```', ''].join('\n'),
+      ),
+      [],
+    );
+  });
+
+  test('closes a fence on a longer run of the same character', () => {
+    assert.deepStrictEqual(
+      parseMergeAfter(
+        ['```', 'Merge-After: #1901', '`````', 'Merge-After: #1903', ''].join(
+          '\n',
+        ),
+      ),
+      [1903],
+    );
+  });
+
+  test('closes a fence on a CRLF line', () => {
+    assert.deepStrictEqual(
+      parseMergeAfter(
+        ['```', 'Merge-After: #1901', '```', 'Merge-After: #1903', ''].join(
+          '\r\n',
+        ),
+      ),
+      [1903],
+    );
+  });
+
   test('reads a body with the CRLF line endings GitHub returns', () => {
     assert.deepStrictEqual(
       parseMergeAfter('Adds the parser.\r\n\r\nMerge-After: #1901\r\n'),

@@ -20,8 +20,11 @@ const DECLARATION_LINE = {
   'start-after': /^[^\S\n]*start-after[^\S\n]*:(?<refs>[^\n]*)$/gimu,
 } as const;
 
-/** The opening or closing line of a fenced code block. */
-const FENCE_LINE = /^[^\S\n]*(?:`{3,}|~{3,})/u;
+/**
+ * A line that can open or close a fenced code block: a run of three or more
+ * backticks or tildes, and what follows it on the line.
+ */
+const FENCE_LINE = /^[^\S\n]*(?<marker>`{3,}|~{3,})(?<rest>[^\n]*)$/u;
 
 /**
  * The pull request numbers a body declares this one must merge after.
@@ -57,16 +60,44 @@ export const parseStartAfter = (body: string): readonly number[] =>
  * showing what a declaration looks like must not become one.
  */
 export const outsideCodeFences = (body: string): string => {
-  let mut_inFence = false;
+  // The marker that opened the fence the current line is in, if any.
+  let mut_openedBy: string | undefined = undefined;
 
   return body
     .split('\n')
     .map((line) => {
-      if (!FENCE_LINE.test(line)) {
-        return mut_inFence ? '' : line;
+      const fence = FENCE_LINE.exec(line)?.groups;
+
+      const marker = fence?.['marker'];
+
+      const rest = fence?.['rest'] ?? '';
+
+      if (mut_openedBy === undefined) {
+        // A backtick fence's info string cannot hold a backtick (CommonMark),
+        // so ```` ```x``` ```` is inline code, not an opening line.
+        if (
+          marker === undefined ||
+          (marker.startsWith('`') && rest.includes('`'))
+        ) {
+          return line;
+        }
+
+        mut_openedBy = marker;
+
+        return '';
       }
 
-      mut_inFence = !mut_inFence;
+      // Only a run of the opening character, at least as long, with nothing
+      // after it, closes the fence (CommonMark); any other fence line is part
+      // of the code, so a ``` inside a ```` or ~~~ block does not end it.
+      if (
+        marker !== undefined &&
+        marker.at(0) === mut_openedBy.at(0) &&
+        marker.length >= mut_openedBy.length &&
+        rest.trim() === ''
+      ) {
+        mut_openedBy = undefined;
+      }
 
       return '';
     })
