@@ -330,6 +330,10 @@ export declare const view: <A, T>(
 - `fn` は値が来るたびに呼ばれる。同じ `View` を 2 か所に渡すと 2 回呼ばれる（ノードを作らないので結果を共有しない）。重い変換や複数の束縛先で共有する値は `pipe(map(...))` でノードにする。
 - `[obs, fn]` のタプルを直接渡す形は採らない（型検査を保てる方法がないことを確認して決定）。props の型は要素ごとに固定なので、タプルの第 0 要素の型から第 1 要素の引数の型を推論させられない。引数を `unknown` にすると `(n: number) => …` が代入できず、`never` にすると誤った型の関数も通ってしまう（TypeScript で確認済み）。関数 `view` なら型引数 `A` で 2 つを結び付けられる。
 
+### 7.4 キーボードの補助関数
+
+キーボードのハンドラのために、`keyboard/` から `isImeKeyDown(event)` を公開する。入力メソッドの合成中に送られた keydown か、合成を確定・取り消した Enter か Escape（Safari は `compositionend` の後に key code 229 で送る）なら `true` を返す。Android の仮想キーボードはほかのキーにも 229 を付けるので、合成中でなければ、Enter と Escape 以外は 229 でも `false`。
+
 ## 8. 制御構文
 
 制御構文は JSX のコンポーネント（`<If>`・`<MatchOptional>`・`<MatchResult>`・`<For>`）だけを提供し、同じものの関数版（`when(cond$, a, b)` など別名の API）は用意しない。
@@ -544,6 +548,7 @@ libs/synstate-dom/
 │   ├── bind/          # 属性・プロパティ・テキスト・class・style・イベント
 │   ├── control/       # If、MatchOptional、MatchResult、For、Portal
 │   ├── scope/         # subscribeInScope、listenInScope、createAfterUpdate
+│   ├── keyboard/      # isImeKeyDown（入力メソッドのキー入力の判定）
 │   └── render.mts
 └── test/
     └── browser/

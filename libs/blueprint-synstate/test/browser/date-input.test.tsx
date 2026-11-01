@@ -401,4 +401,40 @@ describe(DateInput, () => {
 
     unmount();
   });
+
+  test('the Escape that cancels a composition in the time picker keeps the calendar open', async () => {
+    fixNow();
+
+    const { value$, onChange } = controlled('2026-10-09T18:00');
+
+    const { container, unmount } = mountInto(() => (
+      <DateInput
+        {...RANGE}
+        timePrecision={'minute'}
+        value={value$}
+        onChange={onChange}
+      />
+    ));
+
+    one<HTMLInputElement>(container, 'input').focus();
+
+    await settle();
+
+    const hour = one<HTMLInputElement>(container, 'input.bp6-timepicker-hour');
+
+    hour.focus();
+
+    press(hour, 'Escape', { isComposing: true });
+
+    // Safari's, after the composition has ended.
+    press(hour, 'Escape', { keyCode: 229 });
+
+    await settle();
+
+    assert.strictEqual(all(container, '.bp6-overlay').length, 1);
+
+    assert.strictEqual(document.activeElement, hour);
+
+    unmount();
+  });
 });

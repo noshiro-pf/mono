@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { castMutable } from 'ts-data-forge';
+import { Arr, castMutable } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import type { TestProjectConfiguration, ViteUserConfig } from 'vitest/config';
 import type { InlineConfig, ProjectConfig } from 'vitest/node';
@@ -13,6 +13,10 @@ type BrowserProvider = NonNullable<
 type ProjectOverrides = DeepReadonly<{
   includeSource?: string[];
   include?: string[];
+  /**
+   * Replaces the default. The Node.js project excludes `test/browser/**` after
+   * it all the same (`nodeProjectExclude`).
+   */
   exclude?: string[];
   testTimeout?: number;
 }>;
@@ -82,12 +86,17 @@ export const defineViteConfig = ({
         fileParallelism?: boolean;
       });
 }>) => {
+  const nodeConfig = projectConfig(packageRoot, node);
+
+  const nodeExclude = nodeProjectExclude(nodeConfig.exclude);
+
   const nodeProject = {
     test: {
       name: 'Node.js',
       environment: 'node',
       alias: castMutable(alias),
-      ...projectConfig(packageRoot, node),
+      ...nodeConfig,
+      exclude: castMutable(nodeExclude),
       // One module graph per worker rather than per test file. Isolated, each
       // file imported its module graph afresh, and with in-source tests every
       // source file is a test file: `ts-data-forge`'s Node.js tests spent 85%
@@ -175,6 +184,16 @@ export const usesModuleMocks = (packageRoot: string): boolean =>
         fs.readFileSync(path.resolve(packageRoot, file), 'utf8'),
       ),
     );
+
+/**
+ * The Node.js project's `exclude`: the package's own, then `test/browser/`.
+ * That directory is the browser project's, whatever its files end in and
+ * whatever `include` a package passes: run in Node.js, a DOM test fails on a
+ * missing global such as `KeyboardEvent`.
+ */
+export const nodeProjectExclude = (
+  exclude: readonly string[],
+): readonly string[] => Arr.toPushed(exclude, 'test/browser/**');
 
 const projectConfig = (packageRoot: string, overrides?: ProjectOverrides) =>
   ({
