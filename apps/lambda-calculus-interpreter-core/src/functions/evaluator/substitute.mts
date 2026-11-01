@@ -4,10 +4,10 @@ import { getFreeVariables } from '../get-free-variables.mjs';
 import { isAbstraction, isApplication } from '../is-lambda-term.mjs';
 import { isVariable } from '../is-variable.mjs';
 import { pickUpAvailableVariable } from '../pickup-available-variable.mjs';
-import { alphaConversion } from './alpha-conversion.mjs';
 
 /**
- * Substitute term2 for x in formula term1 in capture-avoiding manner.
+ * Substitute `to` (N below) for the free occurrences of `from` (x) in `term`
+ * (M), without capturing a free variable of N or M.
  *
  * Formally:
  *
@@ -16,47 +16,61 @@ import { alphaConversion } from './alpha-conversion.mjs';
  *     (M1 M2)[x := N] = (M1[x := N]) (M2[x := N])
  *     (λx.M)[x := N]  = λx.M
  *     (λy.M)[x := N]  = λy.(M[x := N]), if x ≠ y, provided y ∉ FV(N)
- *     if y ∈ FV(N) then proceed α-conversion
+ *     (λy.M)[x := N]  = λy.M, if y ∈ FV(N) and x ∉ FV(M)
+ *     (λy.M)[x := N]  = λz.(M[y := z][x := N]), if y ∈ FV(N) and x ∈ FV(M),
+ *                       where z ∉ FV(N) ∪ FV(M)
  */
 export const substitute = (
   to: LambdaTerm,
   from: Variable,
   term: LambdaTerm,
 ): LambdaTerm => {
-  // console.log( 'substitute', to, from, term );
-  if (isVariable(term)) {
-    return term === from ? to : term;
-  }
+  const freeVariablesInTo = getFreeVariables(to);
 
-  if (isApplication(term)) {
-    return [substitute(to, from, term[0]), substitute(to, from, term[1])];
-  }
-
-  if (isAbstraction(term)) {
-    const [, arg, body] = term;
-
-    if (arg === from) {
-      return term;
+  const sub = (t: LambdaTerm): LambdaTerm => {
+    if (isVariable(t)) {
+      return t === from ? to : t;
     }
 
-    const freeVariables = getFreeVariables(to);
-
-    if (!freeVariables.includes(arg)) {
-      return ['lambda', arg, substitute(to, from, body)];
+    if (isApplication(t)) {
+      return [sub(t[0]), sub(t[1])];
     }
 
-    const v = pickUpAvailableVariable(freeVariables);
+    if (isAbstraction(t)) {
+      const [, arg, body] = t;
 
-    const converted = alphaConversion(v, term);
+      if (arg === from) {
+        return t;
+      }
 
-    return substitute(to, from, converted);
-  }
+      if (!freeVariablesInTo.includes(arg)) {
+        return ['lambda', arg, sub(body)];
+      }
 
-  console.error(
-    `Syntax error: "${Result.unwrapThrow(
-      Json.stringify(term),
-    )}" is not lambda term.`,
-  );
+      const freeVariablesInBody = getFreeVariables(body);
 
-  return term;
+      if (!freeVariablesInBody.includes(from)) {
+        return t;
+      }
+
+      // Rename `arg` to a name free in neither `to` nor `body`: `to` is then
+      // not captured, and no free variable of `body` is captured either.
+      const v = pickUpAvailableVariable([
+        ...freeVariablesInTo,
+        ...freeVariablesInBody,
+      ]);
+
+      return ['lambda', v, sub(substitute(v, arg, body))];
+    }
+
+    console.error(
+      `Syntax error: "${Result.unwrapThrow(
+        Json.stringify(t),
+      )}" is not lambda term.`,
+    );
+
+    return t;
+  };
+
+  return sub(term);
 };

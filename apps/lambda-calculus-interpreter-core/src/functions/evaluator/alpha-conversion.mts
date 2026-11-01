@@ -4,13 +4,13 @@ import type {
   LambdaTerm,
   Variable,
 } from '../../types/index.mjs';
-import { isAbstraction, isApplication } from '../is-lambda-term.mjs';
-import { isVariable } from '../is-variable.mjs';
+import { isAbstraction } from '../is-lambda-term.mjs';
+import { substitute } from './substitute.mjs';
 
 /**
  * `(λx.M[x]) -> (λy.M[y])`
  *
- * @param to `y` of `(λx.M[x]) -> (λy.M[y])`
+ * @param to `y` of `(λx.M[x]) -> (λy.M[y])`, not free in the term.
  * @param term `(λx.M[x])` of `(λx.M[x]) -> (λy.M[y])`
  */
 export function alphaConversion(to: Variable, term: Variable): Variable;
@@ -26,27 +26,10 @@ export function alphaConversion(
 ): LambdaAbstraction;
 
 export function alphaConversion(to: Variable, term: LambdaTerm): LambdaTerm {
-  if (!isAbstraction(term)) {
-    return term;
-  }
-
-  const from = term[1]; // "x" of "(λx.M[x])"
-
-  const sub = (t: LambdaTerm): LambdaTerm => {
-    if (isVariable(t)) {
-      return t === from ? to : t;
-    }
-
-    if (isApplication(t)) {
-      return [sub(t[0]), sub(t[1])];
-    }
-
-    if (isAbstraction(t)) {
-      return t[1] === from ? t : ['lambda', t[1], sub(t[2])];
-    }
-
-    return t; // dummy
-  };
-
-  return ['lambda', to, sub(term[2])];
+  // Renaming the binder is substituting `to` for it, which `substitute` does
+  // without capture: a nested binder named `to` that the old name occurs free
+  // under is renamed first.
+  return isAbstraction(term)
+    ? ['lambda', to, substitute(to, term[1], term[2])]
+    : term;
 }
