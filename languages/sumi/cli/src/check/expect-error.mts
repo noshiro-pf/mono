@@ -91,7 +91,7 @@ type Entry = Readonly<
  *
  * Both engines are matched in one pass, because which of them produced a
  * diagnostic is not something a marker can say: the oxlint preset and the
- * type-aware checker (D-54) report into the same neutral vocabulary, and the
+ * type-aware checker (D-55) report into the same neutral vocabulary, and the
  * corpus merges them for that reason too. A pass per engine would report every
  * marker the other engine answered as unused.
  *
