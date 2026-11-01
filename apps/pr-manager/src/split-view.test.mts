@@ -73,7 +73,7 @@ describe(splitViewUrl, () => {
     ]);
   });
 
-  test('puts the Claude Code session between the diff and the conversation, at 2:1:1', () => {
+  test('puts the Claude Code session right of the conversation, at 2:1:1', () => {
     const params = paramsOf(
       splitViewUrl({
         ...pullRequest,
@@ -86,12 +86,12 @@ describe(splitViewUrl, () => {
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
-      'https://claude.ai/code/session_01First',
       pullRequestUrl,
+      'https://claude.ai/code/session_01First',
     ]);
   });
 
-  test('puts the issue beside the conversation stacked over the session', () => {
+  test('puts the issue stacked over the session right of the conversation', () => {
     const params = paramsOf(
       splitViewUrl({
         ...pullRequest,
@@ -104,21 +104,21 @@ describe(splitViewUrl, () => {
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
-      'https://github.com/noshiro-pf/mono/issues/1880',
       pullRequestUrl,
+      'https://github.com/noshiro-pf/mono/issues/1880',
       'https://claude.ai/code/session_01First',
     ]);
   });
 
-  test('shows the conversation at 100% when it has the right 30% to itself', () => {
+  test('shows the conversation at 75% when it has the right 30% to itself', () => {
     const alone = paramsOf(
       splitViewUrl({ ...pullRequest, linkedIssues: [], claudeSessions: [] }),
     );
 
-    assert.deepStrictEqual(alone.getAll('zoom'), ['1', '1']);
+    assert.deepStrictEqual(alone.getAll('zoom'), ['1', '0.75']);
   });
 
-  test('shows the conversation and the issue at 75% when they share the right half', () => {
+  test('shows the diff, the conversation and the issue at 75% in three columns', () => {
     const all = paramsOf(
       splitViewUrl({
         ...pullRequest,
@@ -127,7 +127,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    assert.deepStrictEqual(all.getAll('zoom'), ['1', '0.75', '0.75', '1']);
+    assert.deepStrictEqual(all.getAll('zoom'), ['0.75', '0.75', '0.75', '1']);
 
     const sessionOnly = paramsOf(
       splitViewUrl({
@@ -137,7 +137,17 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    assert.deepStrictEqual(sessionOnly.getAll('zoom'), ['1', '1', '0.75']);
+    assert.deepStrictEqual(sessionOnly.getAll('zoom'), ['0.75', '0.75', '1']);
+
+    const issueOnly = paramsOf(
+      splitViewUrl({
+        ...pullRequest,
+        linkedIssues: [issue(1880)],
+        claudeSessions: [],
+      }),
+    );
+
+    assert.deepStrictEqual(issueOnly.getAll('zoom'), ['0.75', '0.75', '0.75']);
   });
 
   test('titles the tab with the number and the title of the pull request', () => {

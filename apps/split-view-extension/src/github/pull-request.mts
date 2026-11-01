@@ -1,4 +1,4 @@
-import { Num, Result } from 'ts-data-forge';
+import { Arr, Num, Result } from 'ts-data-forge';
 
 /**
  * A pull request on github.com, by its conversation tab's address.
@@ -102,14 +102,13 @@ export const claudeSessionUrlOfBody = (body: string): string | undefined =>
  * whitespace changes or the files already viewed, beside the conversation at
  * 7:3. When the pull request closes an issue or names the
  * Claude Code session it was written in, the right half is shared with it at
- * 1:1 — the conversation beside the issue, the session beside the
- * conversation — and with both, the issue beside the conversation stacked over
- * the session. The session is next to the diff unless the issue is there too.
+ * 1:1, to the right of the conversation, and with both, the issue is stacked
+ * over the session to the right of the conversation.
  *
- * Beside the diff alone, the conversation is at 100%, as the diff and the
- * session always are: its 30% is wide enough to read at full size. The
- * conversation and the issue are at 75% when they share the right half, so that
- * more of each fits.
+ * The conversation and the issue are at 75%, so that more of each fits — the
+ * conversation beside the diff alone too, so that it reads the same whatever
+ * shares the page. The diff is at 100% beside the conversation alone and at 75%
+ * in three columns, where it has half the page; the session is at 100%.
  *
  * Every pull request opened this way reuses one saved split view,
  * `github-pull-request`, rather than adding one to the list each time. It is
@@ -129,38 +128,33 @@ export const pullRequestSplitViewSearch = ({
   issueUrl: string | undefined;
   sessionUrl: string | undefined;
 }>): string => {
-  const diff = {
-    url: `${pullRequest.url}/files?${diffQuery}`,
-    zoom: full,
-  } as const;
-
   const conversation = { url: pullRequest.url, zoom: narrow } as const;
 
-  const { layout, panes } =
-    issueUrl === undefined
-      ? sessionUrl === undefined
-        ? ({
-            layout: 'r70pp',
-            panes: [diff, { url: pullRequest.url, zoom: full }],
-          } as const)
-        : ({
-            layout: threeColumns,
-            panes: [diff, { url: sessionUrl, zoom: full }, conversation],
-          } as const)
-      : sessionUrl === undefined
-        ? ({
-            layout: threeColumns,
-            panes: [diff, conversation, { url: issueUrl, zoom: narrow }],
-          } as const)
-        : ({
-            layout: threeColumnsStacked,
-            panes: [
-              diff,
-              { url: issueUrl, zoom: narrow },
-              conversation,
-              { url: sessionUrl, zoom: full },
-            ],
-          } as const);
+  // What shares the right half with the conversation, the issue over the
+  // session when there are both.
+  const others = [
+    ...(issueUrl === undefined
+      ? ([] as const)
+      : ([{ url: issueUrl, zoom: narrow }] as const)),
+    ...(sessionUrl === undefined
+      ? ([] as const)
+      : ([{ url: sessionUrl, zoom: full }] as const)),
+  ] as const;
+
+  const layout = Arr.isEmpty(others)
+    ? 'r70pp'
+    : Arr.isFixedLengthArray(1, others)
+      ? threeColumns
+      : threeColumnsStacked;
+
+  // The diff has 70% of the page beside the conversation alone, and half of it
+  // in three columns.
+  const diff = {
+    url: `${pullRequest.url}/files?${diffQuery}`,
+    zoom: Arr.isEmpty(others) ? full : narrow,
+  } as const;
+
+  const panes = [diff, conversation, ...others] as const;
 
   const params = [
     ['ws', workspaceId],
@@ -261,7 +255,7 @@ const diffQuery = 'w=1&show-viewed-files=false';
 /** 100%, where the extension's `zoom` leaves a pane when it is absent. */
 const full = 1;
 
-/** The conversation and the issue, when they share the right half. */
+/** The conversation and the issue, and the diff in three columns. */
 const narrow = 0.75;
 
 /**

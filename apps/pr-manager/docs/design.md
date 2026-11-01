@@ -342,13 +342,12 @@ is at, so without
 which puts them back, the next time that split view opens the diff shows
 everything. When the pull request closes an issue, or
 names the Claude Code session it was written in, that shares the right half
-at 1:1 — the issue right of the conversation, the session left of it, next to
-the diff; with both, the issue is on the left of the right half, beside the
-conversation stacked over the session. The first issue and the
+at 1:1, to the right of the conversation; with both, the issue is stacked
+over the session to the right of the conversation. The first issue and the
 first session only, if it names several. The conversation and the issue are
-shown at 75% when they share the right half, and the conversation alone at
-100%. The tab is titled with the pull request's number and title,
-`#2071 feat(…): …`.
+shown at 75%, the diff at 75% in three columns and 100% otherwise, and the
+session at 100%. The tab is titled with the
+pull request's number and title, `#2071 feat(…): …`.
 
 A session is named by a `Claude-Session:` line in the pull request's
 description, which `CLAUDE.md` asks a session to write, and the card lists

@@ -245,7 +245,7 @@ describe('pullRequestSplitViewSearch', () => {
 
   const session = 'https://claude.ai/code/session_015uv2FbmANuoW3w5XCgPMhW';
 
-  test('puts the diff beside the conversation at 7:3, both at 100%', () => {
+  test('puts the diff at 100% beside the conversation at 75%, at 7:3', () => {
     assert.deepStrictEqual(
       read(
         pullRequestSplitViewSearch({
@@ -261,7 +261,7 @@ describe('pullRequestSplitViewSearch', () => {
         title: '#2085 Fix the thing',
         layout: 'r70pp',
         url: [diff, conversation],
-        zoom: ['1', '1'],
+        zoom: ['1', '0.75'],
       },
     );
   });
@@ -282,12 +282,12 @@ describe('pullRequestSplitViewSearch', () => {
         title: '#2085 Fix the thing',
         layout: 'r75.1r66.8ppp',
         url: [diff, conversation, issue],
-        zoom: ['1', '0.75', '0.75'],
+        zoom: ['0.75', '0.75', '0.75'],
       },
     );
   });
 
-  test('puts the session between the diff and the conversation at 2:1:1', () => {
+  test('puts the session right of the diff and the conversation at 2:1:1', () => {
     assert.deepStrictEqual(
       read(
         pullRequestSplitViewSearch({
@@ -302,13 +302,13 @@ describe('pullRequestSplitViewSearch', () => {
         name: 'GitHub pull request',
         title: '#2085 Fix the thing',
         layout: 'r75.1r66.8ppp',
-        url: [diff, session, conversation],
-        zoom: ['1', '1', '0.75'],
+        url: [diff, conversation, session],
+        zoom: ['0.75', '0.75', '1'],
       },
     );
   });
 
-  test('puts the issue beside the conversation stacked over the session, with both', () => {
+  test('puts the issue stacked over the session right of the conversation, with both', () => {
     assert.deepStrictEqual(
       read(
         pullRequestSplitViewSearch({
@@ -323,8 +323,8 @@ describe('pullRequestSplitViewSearch', () => {
         name: 'GitHub pull request',
         title: '#2085 Fix the thing',
         layout: 'r75.1r66.8ppcpp',
-        url: [diff, issue, conversation, session],
-        zoom: ['1', '0.75', '0.75', '1'],
+        url: [diff, conversation, issue, session],
+        zoom: ['0.75', '0.75', '0.75', '1'],
       },
     );
   });
