@@ -3,6 +3,7 @@ import {
   collectViolations,
   parseMinimumReleaseAgeSettings,
   reasonCoversEntry,
+  reasonsExplainEntry,
   type MinimumReleaseAgeSettings,
 } from './check-minimum-release-age.mjs';
 
@@ -41,6 +42,7 @@ const settingsOf = (
     excludeEntries: [],
     waiverReasons: [],
     misplacedReasonTargets: [],
+    malformedHeadings: [],
     ...overrides,
   }) as const;
 
@@ -65,6 +67,7 @@ describe('parseMinimumReleaseAgeSettings', () => {
         { target: '@types/', hasBody: true },
       ],
       misplacedReasonTargets: [],
+      malformedHeadings: [],
     });
   });
 
@@ -85,6 +88,7 @@ describe('parseMinimumReleaseAgeSettings', () => {
       excludeEntries: [],
       waiverReasons: [],
       misplacedReasonTargets: [],
+      malformedHeadings: [],
     });
   });
 
@@ -227,6 +231,90 @@ describe('parseMinimumReleaseAgeSettings, on the reasons', () => {
       { target: 'bare', hasBody: false },
     ]);
   });
+
+  test('reads a heading naming several versions to the end of the line', () => {
+    const settings = parseMinimumReleaseAgeSettings(
+      [
+        '# waiver: @types/node@22.20.2 || 24.13.4  ',
+        '#   Both lines of the package are still maturing.',
+        'minimumReleaseAgeExcludePrune: true',
+        '',
+      ].join('\n'),
+    );
+
+    assert.deepStrictEqual(settings.waiverReasons, [
+      { target: '@types/node@22.20.2 || 24.13.4', hasBody: true },
+    ]);
+  });
+
+  test('reads a heading copied with quotes or followed by a comment', () => {
+    const settings = parseMinimumReleaseAgeSettings(
+      [
+        "# waiver: '@types/react@19.3.0'",
+        '#   Copied from the list as written.',
+        '#',
+        '# waiver: vite@8.2.2 # until #2218',
+        '#   The note after the target is a comment.',
+        'minimumReleaseAgeExcludePrune: true',
+        '',
+      ].join('\n'),
+    );
+
+    assert.deepStrictEqual(settings.waiverReasons, [
+      { target: '@types/react@19.3.0', hasBody: true },
+      { target: 'vite@8.2.2', hasBody: true },
+    ]);
+  });
+
+  test('takes an indented body line starting with `waiver:` for the body', () => {
+    const settings = parseMinimumReleaseAgeSettings(
+      [
+        '# waiver: vite@8.2.2',
+        '#   waiver: none',
+        'minimumReleaseAgeExcludePrune: true',
+        '',
+      ].join('\n'),
+    );
+
+    assert.deepStrictEqual(settings.waiverReasons, [
+      { target: 'vite@8.2.2', hasBody: true },
+    ]);
+
+    assert.deepStrictEqual(settings.malformedHeadings, []);
+  });
+
+  test('collects a heading with more than its target after `waiver:`', () => {
+    const settings = parseMinimumReleaseAgeSettings(
+      [
+        '# waiver: vite@8.2.2 (until #2218)',
+        '#   The note belongs down here.',
+        'minimumReleaseAgeExcludePrune: true',
+        '',
+        'minimumReleaseAgeExclude:',
+        '  # waiver: see the block above',
+        "  - 'vite@8.2.2'",
+        '',
+      ].join('\n'),
+    );
+
+    assert.deepStrictEqual(settings.waiverReasons, []);
+
+    assert.deepStrictEqual(settings.malformedHeadings, [
+      'vite@8.2.2 (until #2218)',
+      'see the block above',
+    ]);
+  });
+
+  test('reads a file checked out with CRLF line endings', () => {
+    const settings = parseMinimumReleaseAgeSettings(
+      workspaceFile.replaceAll('\n', '\r\n'),
+    );
+
+    assert.deepStrictEqual(
+      settings,
+      parseMinimumReleaseAgeSettings(workspaceFile),
+    );
+  });
 });
 
 describe('reasonCoversEntry', () => {
@@ -236,7 +324,7 @@ describe('reasonCoversEntry', () => {
     assert.isTrue(reasonCoversEntry('@types/', '@types/node@24.13.4'));
   });
 
-  test('covers exactly what an unabbreviated heading names', () => {
+  test('covers exactly the entry a heading with a version names', () => {
     assert.isTrue(reasonCoversEntry('vite@8.2.2', 'vite@8.2.2'));
 
     assert.isFalse(reasonCoversEntry('vite@8.2.2', 'vite@8.2.3'));
@@ -244,6 +332,51 @@ describe('reasonCoversEntry', () => {
 
   test('does not cover a package the prefix misses', () => {
     assert.isFalse(reasonCoversEntry('@octokit/', '@types/node@24.13.4'));
+  });
+
+  test.each([
+    ['vite@8.2.2', 'vite@8.2.20', false],
+    ['vite@8.2.2', 'vite@8.2.2-beta.1', false],
+    ['vite', 'vite@8.2.2', true],
+    ['vite', 'vitest@4.0.0', false],
+    ['react', 'react-dom@19.0.0', false],
+    ['@types/node', '@types/node@24.13.4', true],
+    ['@types/node', '@types/node-fetch@3.0.0', false],
+    ['@types/node@24.1.0', '@types/node@24.1.0-beta.1', false],
+    ['@types/', '@types-extra/node@1.0.0', false],
+    ['@octokit', '@octokit/core@7.0.8', false],
+    ['vite@8.2', 'vite@8.2.2', false],
+    ['vite', 'vite', true],
+    ['@types/node', '@types/node@22.20.2 || 24.13.4', true],
+    ['@types/node@22.20.2 || 24.13.4', '@types/node@22.20.2 || 24.13.4', true],
+    ['@types/node@24.13.4||22.20.2', '@types/node@22.20.2 || 24.13.4', true],
+    ['@types/node@22.20.2', '@types/node@22.20.2 || 24.13.4', true],
+    ['@types/node@22.20.2 || 24.13.4', '@types/node@24.13.4', true],
+    ['@types/node@22.20.2 || 24.13.4', '@types/node@26.5.0', false],
+    ['vite@8.2.2', 'vite', false],
+  ] as const)('%j covers %j: %j', (target, entry, expected) => {
+    assert.strictEqual(reasonCoversEntry(target, entry), expected);
+  });
+});
+
+describe('reasonsExplainEntry', () => {
+  test.each([
+    [['@types/node@22.20.2'], '@types/node@22.20.2 || 24.13.4', false],
+    [
+      ['@types/node@22.20.2', '@types/node@24.13.4'],
+      '@types/node@22.20.2 || 24.13.4',
+      true,
+    ],
+    [['@types/node@22.20.2 || 24.13.4'], '@types/node@24.13.4', true],
+    [['a@1.0.0 || 1.0.0'], 'a@1.0.0 || 2.0.0', false],
+    [['@types/node'], '@types/node@22.20.2 || 24.13.4', true],
+    [['@types/'], '@types/node@22.20.2 || 24.13.4', true],
+    [['vite'], 'vite', true],
+    [['vite@8.2.2'], 'vite', false],
+    [[], 'vite@8.2.2', false],
+    [['a@1.0.0'], 'a@1.0.0 ||', true],
+  ] as const)('%j explain %j: %j', (targets, entry, expected) => {
+    assert.strictEqual(reasonsExplainEntry(targets, entry), expected);
   });
 });
 
@@ -280,6 +413,50 @@ describe('collectViolations', () => {
     assert.isTrue(messages[0]?.includes('answers for no entry') ?? false);
   });
 
+  test.each([
+    ['vite@8.2.2', 'vite@8.2.20'],
+    ['vite', 'vitest@4.0.0'],
+  ] as const)(
+    'reports both the stale reason %j and the unexplained entry %j',
+    (target, entry) => {
+      const violations = collectViolations(
+        settingsOf({
+          excludeEntries: [entry],
+          waiverReasons: [{ target, hasBody: true }],
+        }),
+      );
+
+      assert.deepStrictEqual(
+        violations.map((violation) => violation.subject),
+        [`'${entry}'`, `\`# waiver: ${target}\``],
+      );
+
+      assert.isTrue(
+        violations[0]?.message.includes('nothing explains') ?? false,
+      );
+
+      assert.isTrue(
+        violations[1]?.message.includes('answers for no entry') ?? false,
+      );
+    },
+  );
+
+  test('reports only the missing version of a bare name its heading explains', () => {
+    const violations = collectViolations(
+      settingsOf({
+        excludeEntries: ['vite'],
+        waiverReasons: [{ target: 'vite', hasBody: true }],
+      }),
+    );
+
+    assert.deepStrictEqual(
+      violations.map((violation) => violation.subject),
+      ["'vite'"],
+    );
+
+    assert.isTrue(violations[0]?.message.includes('names no version') ?? false);
+  });
+
   test('reports a heading with no reason under it', () => {
     const messages = messagesOf(
       settingsOf({
@@ -305,5 +482,15 @@ describe('collectViolations', () => {
     assert.deepStrictEqual(messages.length, 1);
 
     assert.isTrue(messages[0]?.includes('#1937') ?? false);
+  });
+
+  test('reports a heading that names no target', () => {
+    const messages = messagesOf(
+      settingsOf({ malformedHeadings: ['vite@8.2.2 (until #2218)'] }),
+    );
+
+    assert.deepStrictEqual(messages.length, 1);
+
+    assert.isTrue(messages[0]?.includes('names no target') ?? false);
   });
 });
