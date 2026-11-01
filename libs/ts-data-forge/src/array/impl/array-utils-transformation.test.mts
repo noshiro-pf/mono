@@ -12,6 +12,7 @@ import { SafeUint } from '../../number/index.mjs';
 import { asMinLengthArray } from './array-utils-length-bounded-array-cast.mjs';
 import {
   cartesianProduct,
+  chunk,
   concat,
   filter,
   filterNot,
@@ -759,13 +760,61 @@ describe('Arr transformations', () => {
       ]);
     });
 
-    test('should work with chunk size < 2 (returns empty)', () => {
+    test('returns singleton chunks for size one', () => {
       const numbers = [1, 2, 3] as const;
 
       const result = partition(numbers, 1);
 
-      // According to docs, returns empty array if chunkSize < 2
-      assert.deepStrictEqual(result, []);
+      expectType<typeof result, readonly BoundedLengthArray<1, 1, 1 | 2 | 3>[]>(
+        '~=',
+      );
+
+      assert.deepStrictEqual<readonly (readonly number[])[]>(result, [
+        [1],
+        [2],
+        [3],
+      ]);
+    });
+
+    test('preserves singleton chunks through the alias and curried overloads', () => {
+      const numbers = [1, 2, 3] as const;
+
+      const expected = [[1], [2], [3]] as const;
+
+      assert.deepStrictEqual<readonly (readonly number[])[]>(
+        partition(1)(numbers),
+        expected,
+      );
+
+      assert.deepStrictEqual<readonly (readonly number[])[]>(
+        chunk(numbers, 1),
+        expected,
+      );
+
+      assert.deepStrictEqual<readonly (readonly number[])[]>(
+        chunk(1)(numbers),
+        expected,
+      );
+    });
+
+    test('size one produces no chunk for an empty array', () => {
+      assert.deepStrictEqual(partition([], 1), []);
+
+      assert.deepStrictEqual(partition(1)([]), []);
+
+      assert.deepStrictEqual(chunk([], 1), []);
+
+      assert.deepStrictEqual(chunk(1)([]), []);
+    });
+
+    test('a size below one, which the types reject, produces no chunk', () => {
+      const numbers = [1, 2, 3] as const;
+
+      // @ts-expect-error - a chunk size of 0 is not a positive integer
+      assert.deepStrictEqual(partition(numbers, 0), []);
+
+      // @ts-expect-error - a negative chunk size is not a positive integer
+      assert.deepStrictEqual(partition(-1)(numbers), []);
     });
 
     test('should work with chunk size larger than array', () => {
