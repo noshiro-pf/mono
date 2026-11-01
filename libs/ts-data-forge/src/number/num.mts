@@ -603,15 +603,19 @@ export namespace Num {
   /**
    * Performs integer division using floor division.
    *
-   * Computes `⌊a / b⌋` by flooring both operands before division and then
-   * flooring the result. This ensures integer arithmetic semantics.
+   * Computes `⌊⌊a⌋ / b⌋`: the dividend is floored, the divisor is used as is,
+   * and the quotient is floored. For a positive integer divisor this is
+   * `⌊a / b⌋`. The divisor is not floored, since a divisor in `(-1, 1)` would
+   * floor to `0` or `-1`.
    *
-   * Note: Unlike `div`, this function does not enforce non-zero divisor at
-   * compile time. Division by zero returns `NaN`.
+   * Like `div`, the divisor must be typed as `NonZeroNumber` or a non-zero
+   * numeric literal. A divisor of magnitude below `1` makes the quotient larger
+   * than the dividend, so it overflows to `±Infinity` once `|a / b|` exceeds
+   * `Number.MAX_VALUE` (e.g. `1e300 / 1e-10`), as `mul` can.
    *
    * @param a - The dividend
-   * @param b - The divisor
-   * @returns The integer quotient, or `NaN` if b is zero
+   * @param b - The divisor (must be non-zero, enforced by types)
+   * @returns The integer quotient `⌊⌊a⌋ / b⌋`
    */
   export const divInt = <
     A extends number,
@@ -621,7 +625,7 @@ export namespace Num {
     b: B,
   ): DivIntResult<A, B> => {
     // eslint-disable-next-line total-functions/no-partial-division
-    const quotient = Math.floor(Math.floor(a) / Math.floor(b));
+    const quotient = Math.floor(Math.floor(a) / b);
 
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return quotient as DivIntResult<A, B>;
