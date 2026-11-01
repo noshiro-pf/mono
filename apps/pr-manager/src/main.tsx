@@ -1,6 +1,7 @@
 import { render } from 'synstate-dom';
 import { reportSourceFromSearch, repositoryParam } from './constants.mjs';
 import './index.css';
+import { browserStaleBuildDeps, importOrReload } from './stale-build.mjs';
 import { applyTheme, themeFromLocation } from './theme.mjs';
 import { currentSearch } from './url.mjs';
 
@@ -12,23 +13,33 @@ if (container === null) {
 
 // The report and its store are loaded only once the URL names a repository:
 // the store reads that repository as it is made, and without one the page asks
-// which to read (`StartPage`).
+// which to read (`StartPage`). Either is a chunk of this build, which a page
+// opened from the browser's cache may find gone (`stale-build.mts`).
 if (reportSourceFromSearch(currentSearch()) === undefined) {
-  const { StartPage } = await import('./start/index.mjs');
-
-  applyTheme(themeFromLocation());
-
-  render(
-    () => <StartPage invalid={repositoryParam(currentSearch())} />,
-    container,
+  const start = await importOrReload(
+    async () => import('./start/index.mjs'),
+    browserStaleBuildDeps(),
   );
+
+  if (start !== undefined) {
+    applyTheme(themeFromLocation());
+
+    render(
+      () => <start.StartPage invalid={repositoryParam(currentSearch())} />,
+      container,
+    );
+  }
 } else {
-  const [{ App }, { startStore }] = await Promise.all([
-    import('./app.js'),
-    import('./store/index.mjs'),
-  ]);
+  const loaded = await importOrReload(
+    async () => Promise.all([import('./app.js'), import('./store/index.mjs')]),
+    browserStaleBuildDeps(),
+  );
 
-  startStore();
+  if (loaded !== undefined) {
+    const [{ App }, { startStore }] = loaded;
 
-  render(App, container);
+    startStore();
+
+    render(App, container);
+  }
 }
