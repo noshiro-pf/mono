@@ -705,6 +705,33 @@ describe('IMapMapped.withMutations', () => {
     expect(Optional.unwrap(updated.get({ id: 2, type: 'admin' }))).toBe('Bob');
   });
 
+  test('update calls the updater for a key whose value is undefined, as update() does', () => {
+    const map = IMapMapped.create<TestKey, string | undefined, string>(
+      [[{ id: 1, type: 'user' }, undefined]],
+      testKeyToString,
+      stringToTestKey,
+    );
+
+    const updater = (x: string | undefined): string | undefined =>
+      x ?? 'filled';
+
+    const batched = map.withMutations([
+      { type: 'update', key: { id: 1, type: 'user' }, updater },
+    ]);
+
+    expect(Optional.unwrap(batched.get({ id: 1, type: 'user' }))).toBe(
+      'filled',
+    );
+
+    expect(
+      Optional.unwrap(
+        map
+          .update({ id: 1, type: 'user' }, updater)
+          .get({ id: 1, type: 'user' }),
+      ),
+    ).toBe('filled');
+  });
+
   test('should handle empty mutations array', () => {
     const map = IMapMapped.create(
       [[{ id: 1, type: 'user' }, 'Alice']],

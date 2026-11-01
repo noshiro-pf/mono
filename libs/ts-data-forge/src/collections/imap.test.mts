@@ -754,6 +754,19 @@ describe('IMap.withMutations', () => {
     assert.isTrue(Optional.isNone(updated.get('nonexistent')));
   });
 
+  test('update calls the updater for a key whose value is undefined, as update() does', () => {
+    const map = IMap.create<string, number | undefined>([['a', undefined]]);
+
+    const updater = (x: number | undefined): number | undefined =>
+      x === undefined ? 1 : x + 1;
+
+    const batched = map.withMutations([{ type: 'update', key: 'a', updater }]);
+
+    expect(Optional.unwrap(batched.get('a'))).toBe(1);
+
+    expect(Optional.unwrap(map.update('a', updater).get('a'))).toBe(1);
+  });
+
   test('should handle mixed operations', () => {
     const map = IMap.create([['a', 1]]);
 
