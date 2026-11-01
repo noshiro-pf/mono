@@ -37,6 +37,13 @@ describe('prefer-arr-uniq', () => {
         `,
       },
       {
+        name: 'ignores an array of intersections of objects',
+        code: dedent`
+          declare const xs: readonly (Readonly<{ a: 1 }> & Readonly<{ b: 2 }>)[];
+          const ys = Array.from(new Set(xs));
+        `,
+      },
+      {
         name: 'ignores an array of unions including objects',
         code: dedent`
           const xs: readonly (number | { v: number })[] = [1];
@@ -262,6 +269,36 @@ describe('prefer-arr-uniq', () => {
           type Branded = readonly string[] & Readonly<{ brand: 'b' }>;
           declare const xs: Branded;
           const ys: readonly string[] = Arr.uniq(xs);
+        `,
+        errors: [{ messageId: 'useArrUniq' }],
+      },
+      {
+        name: 'accepts an array of branded numbers',
+        code: dedent`
+          type Int = number & Readonly<{ 'Int': true }>;
+          declare const xs: readonly Int[];
+          const ys: readonly Int[] = Array.from(new Set(xs));
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          type Int = number & Readonly<{ 'Int': true }>;
+          declare const xs: readonly Int[];
+          const ys: readonly Int[] = Arr.uniq(xs);
+        `,
+        errors: [{ messageId: 'useArrUniq' }],
+      },
+      {
+        name: 'accepts an array of branded strings',
+        code: dedent`
+          type Id = string & Readonly<{ brand: 'Id' }>;
+          declare const xs: readonly Id[];
+          const ys: readonly Id[] = [...new Set(xs)];
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          type Id = string & Readonly<{ brand: 'Id' }>;
+          declare const xs: readonly Id[];
+          const ys: readonly Id[] = Arr.uniq(xs);
         `,
         errors: [{ messageId: 'useArrUniq' }],
       },
