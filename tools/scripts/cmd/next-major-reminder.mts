@@ -1,9 +1,9 @@
 import * as fs from 'node:fs/promises';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import { readChangesets } from '../lib/changesets.mjs';
 import {
   listReminders,
-  readChangesets,
   readStocks,
   type Reminder,
 } from './check-next-major.mjs';

@@ -1,4 +1,7 @@
-import { parseChangesetBumps } from '../check-next-major.mjs';
+import {
+  listChangesetBumps,
+  type ChangesetFile,
+} from '../../lib/changesets.mjs';
 
 /**
  * The released packages whose `src/` the diff changed and that no changeset in
@@ -9,8 +12,8 @@ import { parseChangesetBumps } from '../check-next-major.mjs';
  * changeset forgotten for one that is — for a Chrome extension that means the
  * next store upload is refused as not newer (see "Releases" in CLAUDE.md).
  *
- * The front matter is read by `parseChangesetBumps`, the parser the
- * `check:prose:next-major` and `check:prose:dependent-releases` guards use.
+ * The front matter is read by `tools/scripts/lib/changesets.mts`, the parser
+ * every command reading a changeset uses.
  */
 export const findMissingChangesets = ({
   changedFiles,
@@ -21,13 +24,9 @@ export const findMissingChangesets = ({
   /** Packages a changeset releases: `libs/*` and the Chrome extensions. */
   released: readonly Readonly<{ name: string; dir: string }>[];
   /** The changeset files the diff adds or changes, with their content. */
-  changesets: readonly Readonly<{ file: string; content: string }>[];
+  changesets: readonly ChangesetFile[];
 }>): readonly string[] => {
-  const named = new Set(
-    changesets.flatMap(({ content }) =>
-      Array.from(parseChangesetBumps(content).keys()),
-    ),
-  );
+  const named = new Set(listChangesetBumps(changesets).map(({ name }) => name));
 
   return released
     .filter(

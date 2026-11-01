@@ -1,6 +1,7 @@
 import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import type { ChangesetFile } from '../lib/changesets.mjs';
 import {
   checkDependentReleases,
   findReExportedPackages,
@@ -9,7 +10,6 @@ import {
   type ReleaseGroup,
   type WorkspacePackage,
 } from './check-dependent-releases.mjs';
-import type { ChangesetFile } from './check-next-major.mjs';
 
 describe('findReExportedPackages', () => {
   test('reads every form of export … from, multi-line ones included', () => {

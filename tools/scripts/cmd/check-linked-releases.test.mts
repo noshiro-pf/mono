@@ -1,10 +1,10 @@
 import { Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import type { ChangesetFile } from '../lib/changesets.mjs';
 import {
   checkLinkedReleases,
   parseReleaseGroups,
 } from './check-linked-releases.mjs';
-import type { ChangesetFile } from './check-next-major.mjs';
 
 describe('parseReleaseGroups', () => {
   test('reads the groups', () => {

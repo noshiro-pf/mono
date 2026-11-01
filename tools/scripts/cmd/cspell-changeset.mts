@@ -3,13 +3,13 @@ import * as path from 'node:path';
 import {
   Arr,
   isNotUndefined,
-  isString,
   Json,
   Result,
   unknownToString,
 } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { $, isDirectlyExecuted } from 'ts-repo-utils';
+import { CHANGESET_DIR_NAME, parseChangesetBumps } from '../lib/changesets.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -129,8 +129,6 @@ type Plan = Readonly<{
   unknownPackages: readonly string[];
 }>;
 
-const CHANGESET_DIR_NAME = '.changeset';
-
 const ROOT_CSPELL_CONFIG = path.resolve(projectRootPath, '.cspell.config.yaml');
 
 /**
@@ -171,10 +169,6 @@ const PNPM_PROJECT_LIST = t.array(
   }),
 );
 
-/** Matches `'pkg': patch`, `"pkg": minor` or `pkg: major`. */
-const FRONT_MATTER_ENTRY =
-  /^\s*['"]?(.+?)['"]?\s*:\s*(?:major|minor|patch)\s*$/u;
-
 /** Runs cspell over `files` with `config`, returning its report when it fails. */
 const runCspell = async (
   config: string,
@@ -214,24 +208,7 @@ const readChangesetPackageNames = async (
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const content = await fs.readFile(file, 'utf8');
 
-  const lines = content.split('\n');
-
-  if (lines[0]?.trim() !== '---') {
-    return [];
-  }
-
-  const end = lines.findIndex(
-    (line, index) => index > 0 && line.trim() === '---',
-  );
-
-  if (end === -1) {
-    return [];
-  }
-
-  return lines
-    .slice(1, end)
-    .map((line) => FRONT_MATTER_ENTRY.exec(line)?.[1])
-    .filter(isString);
+  return Array.from(parseChangesetBumps(content).keys());
 };
 
 /** `dir` and every directory above it, up to and including the repository root. */

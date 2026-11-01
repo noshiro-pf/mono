@@ -1,7 +1,7 @@
 import dedent from 'dedent';
+import type { ChangesetFile } from '../lib/changesets.mjs';
 import {
   listReminders,
-  type ChangesetFile,
   type Reminder,
   type StockFile,
 } from './check-next-major.mjs';
