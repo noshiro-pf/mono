@@ -77,7 +77,7 @@ export const SignalBridgeDemo = (): preact.JSX.Element => (
       </code>
       <br />
       <code style={codeStyle}>
-        {'Signal → fromSignal → debounce(500) → map(index) → toSignal'}
+        {'Signal → fromSignal → debounce(500) → withIndex() → map → toSignal'}
       </code>
     </div>
   </div>

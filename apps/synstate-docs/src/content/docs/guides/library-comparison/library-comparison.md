@@ -78,7 +78,7 @@ SynState is built on a custom glitch-free Observable implementation. It provides
 
 - Every derived value is recomputed on every update of its source, even when nothing reads it; MobX and Jotai skip that work. What they skip is a node the graph need not hold, which `switchMap`, disposing a scope or `audit` leaves out — see the [benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page).
 - Per-update overhead is above RxJS on small graphs.
-- A smaller operator set than RxJS, though it covers what its model needs: every Observable is already shared, so the `share` / `shareReplay` family has nothing to do, and errors travel as `Result` values (`mapResultOk`, `unwrapResultOk`, …) rather than through `catchError`. Operators and creators of your own are written with [the factories the built-in ones are made by](/mono/synstate/guides/custom-operators-and-creators/).
+- A smaller operator set than RxJS, though it covers what its model needs: every Observable is already shared, so the `share` / `shareReplay` family has nothing to do, and errors travel as `Result` values (`mapResultOk`, `unwrapResultOk`, …) rather than through `catchError`. Operators and creators of your own are written with [factories built on the same base classes as the built-in ones](/mono/synstate/guides/custom-operators-and-creators/).
 
 **Best for:** Projects that need both simple shared state and sophisticated async pipelines in a single, consistent API.
 

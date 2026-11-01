@@ -1,13 +1,13 @@
 ---
 title: 'カスタム operator と creator'
-description: 組み込みの observable を作っているのと同じ factory で、自分の operator と生成関数を書く方法。
+description: 組み込みの observable と同じ基底クラスの上に作られた factory で、自分の operator と生成関数を書く方法。
 sidebar:
     order: 5
 ---
 
-SynState の組み込みの observable はすべて 4 つの factory のどれかで作られていて、同じ factory が export されています。これで作ったカスタム operator や creator は、`map` や `source` と同じようにグリッチのない伝搬に加わります。
+SynState は自分で observable を書くための 4 つの factory を export しています。どれも組み込みの observable が継承しているのと同じ基底クラスを包んでいるので、これで作ったカスタム operator や creator は、`map` や `source` と同じようにグリッチのない伝搬に加わります。
 
-| Factory                                | 作るもの                                           | これで作られている組み込み        |
+| Factory                                | 作るもの                                           | 同じ振る舞いの組み込み            |
 | :------------------------------------- | :------------------------------------------------- | :-------------------------------- |
 | `createRootObservable`                 | 親を持たない observable（`kind: 'root'`）          | `source`、`timer`、`fromPromise`  |
 | `createSyncChildObservable`            | 親と同じ更新の中で値を出す子                       | `map`、`filter`、`combine`、`zip` |
@@ -163,4 +163,4 @@ tools の `onComplete` は `init` の中から後始末を登録するので、`
 
 ## できないこと
 
-observable の型には、利用者に必要なメンバーだけがあります。`kind`、`parents`（子のみ）、`getSnapshot`、`isCompleted`、`updateToken`、`depth`、`subscribe`、`pipe`、`complete`、`dispose` です。伝搬が読むメンバー（`tryUpdate`、`addChild` など）は実行時には存在しますが型にはなく、型をオブジェクトリテラルで満たすこともできません。伝搬はこれらのメンバーがあることを前提にしているので、observable は必ず上の factory のどれかで作ります。
+observable の型には、利用者に必要なメンバーだけがあります。`kind`、`parents`（子のみ）、`getSnapshot`、`isCompleted`、`updateToken`、`depth`、`subscribe`、`pipe`、`complete`、`dispose` です。伝搬が読むメンバー（`tryUpdate`、`addChild` など）は実行時には存在しますが型にはなく、型をオブジェクトリテラルで満たすこともできません。伝搬はこれらのメンバーがあることを前提にしているので、自分で書く observable は必ず上の factory のどれかで作ります。

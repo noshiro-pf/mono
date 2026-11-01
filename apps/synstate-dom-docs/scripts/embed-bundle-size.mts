@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted } from 'ts-repo-utils';
-import type { ReadonlyRecord } from 'ts-type-forge';
+import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 import { embedInto, type Embedded } from './embed-markers.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
@@ -27,9 +27,27 @@ export const embedBundleSize = async (): Promise<Result<undefined, string>> => {
       return Result.err(`❌ ${bundleSizePath}: ${parsed.value}`);
     }
 
+    const checked = checkReadingTheResults(parsed.value);
+
+    if (Result.isErr(checked)) {
+      return Result.err(`❌ ${bundleSizePath}: ${checked.value}`);
+    }
+
+    // Every page is read and checked before any is written, so that a failure
+    // leaves no page half-updated.
+    const mut_embedded: FixedLengthTuple<2, string>[] = [];
+
     for (const [locale, pagePath] of pages) {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const page = await fs.readFile(pagePath, 'utf8');
+
+      const absent = missingClaims(page, locale);
+
+      if (Arr.isNonEmpty(absent)) {
+        return Result.err(
+          `❌ ${pagePath}: these sentences under "${readingTheResultsHeadings[locale]}" were reworded or removed; update checkReadingTheResults to match:\n${absent.map((text) => `  - ${text}`).join('\n')}`,
+        );
+      }
 
       const embedded = embedInto(
         page,
@@ -41,8 +59,12 @@ export const embedBundleSize = async (): Promise<Result<undefined, string>> => {
         return Result.err(`❌ ${pagePath}: ${embedded.value}`);
       }
 
+      mut_embedded.push([pagePath, embedded.value]);
+    }
+
+    for (const [pagePath, embedded] of mut_embedded) {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(pagePath, embedded.value, 'utf8');
+      await fs.writeFile(pagePath, embedded, 'utf8');
 
       await formatFiles([pagePath]);
 
@@ -211,6 +233,269 @@ const parseBundleSize = (markdown: string): Result<BundleSize, string> => {
     gzip: gzip.value,
     brotli: brotli.value,
   });
+};
+
+/**
+ * A sentence of the "Reading the results" bullets that the tables can break, as
+ * it reads on each page, and whether one table bears it out.
+ */
+type Claim = Readonly<{
+  en: string;
+  ja: string;
+  holds: (table: ClaimTable) => boolean;
+}>;
+
+type ClaimTable = Readonly<{
+  /**
+   * In tenths of a kB, the precision of the tables, so that a bound such as "3
+   * times" or "4 kB" compares integers rather than binary fractions.
+   */
+  size: (application: string, library: ClaimedLibrary) => number;
+  /** Every row. */
+  allApplications: readonly string[];
+  /** The rows below the counter, as the tables lay them out. */
+  applications: readonly string[];
+}>;
+
+/** The libraries the sentences compare. */
+const claimedLibraries = [
+  'synstate-dom',
+  'Solid',
+  'Preact + Signals',
+  'Preact',
+  'React',
+  'VanJS',
+] as const;
+
+type ClaimedLibrary = (typeof claimedLibraries)[number];
+
+/** The rows the sentences name. */
+const claimedApplications = [
+  'everything exported',
+  'counter',
+  'js-framework-benchmark table',
+] as const;
+
+/**
+ * Every library larger than another in the counter row is so in `application`'s
+ * row. Two libraries tied in the counter row have no order to keep, so a tie
+ * fails the claim.
+ */
+const keepsCounterOrder = (table: ClaimTable, application: string): boolean =>
+  claimedLibraries.every((a) =>
+    claimedLibraries.every(
+      (b) =>
+        a === b ||
+        table.size('counter', a) < table.size('counter', b) ||
+        (table.size('counter', a) > table.size('counter', b) &&
+          table.size(application, a) > table.size(application, b)),
+    ),
+  );
+
+const isLargestAfterReact = (
+  table: ClaimTable,
+  application: string,
+  libraries: readonly ClaimedLibrary[],
+): boolean =>
+  libraries.every(
+    (library) =>
+      table.size(application, 'React') > table.size(application, library) &&
+      claimedLibraries
+        .filter((other) => other !== 'React' && !libraries.includes(other))
+        .every(
+          (other) =>
+            table.size(application, library) > table.size(application, other),
+        ),
+  );
+
+/**
+ * What the "Reading the results" bullets say about the tables. Each sentence
+ * has to appear on its page word for word, so rewording one without updating
+ * its case here fails too. A new sentence about an order or a margin gets a
+ * case here.
+ */
+const claims: readonly Claim[] = [
+  {
+    en: 'every row below the counter stays within a few kB of it for every library',
+    ja: 'どのライブラリでも、カウンターより下の行はどれもカウンターから数 kB 以内に収まります',
+    // "a few": 4 kB
+    holds: (table) =>
+      table.applications.every((application) =>
+        claimedLibraries.every(
+          (library) =>
+            Math.abs(
+              table.size(application, library) - table.size('counter', library),
+            ) <= 40,
+        ),
+      ),
+  },
+  {
+    en: 'The order of the libraries is set by the counter row and stays the same in the rows below it.',
+    ja: 'ライブラリの順位はカウンターの行で決まり、その下の行でも変わりません。',
+    holds: (table) =>
+      table.applications.every((application) =>
+        keepsCounterOrder(table, application),
+      ),
+  },
+  {
+    en: '**React** is mostly react-dom, whatever the application. Its reconciler and scheduler do not split by what a component uses, so the rows differ by only about a kB.',
+    ja: '**React** は、アプリケーションが何であってもほとんどが react-dom です。reconciler と scheduler はコンポーネントが何を使うかによって分かれないので、行どうしの差は 1 kB ほどしかありません。',
+    // "about a kB": at most 1.5 kB
+    holds: (table) => {
+      const sizes = table.allApplications.map((application) =>
+        table.size(application, 'React'),
+      );
+
+      return Math.max(...sizes) - Math.min(...sizes) <= 15;
+    },
+  },
+  {
+    en: '**VanJS** is one small module with nothing to shake off, so even the counter includes all of it.',
+    ja: '**VanJS** は tree-shaking する余地のない小さな 1 モジュールなので、カウンターの時点でその全体が入ります。',
+    holds: (table) =>
+      table.size('counter', 'VanJS') >=
+      table.size('everything exported', 'VanJS'),
+  },
+  {
+    en: '**Solid** compiles JSX into templates and calls into a small runtime, so a counter uses only a little of `solid-js/web`. Everything it exports is several times that.',
+    ja: '**Solid** は JSX をテンプレートにコンパイルして小さなランタイムを呼び出すので、カウンターでは `solid-js/web` のごく一部しか使いません。すべての export はその数倍あります。',
+    // "several times": at least 3 times (Solid)
+    holds: (table) =>
+      table.size('everything exported', 'Solid') >=
+      3 * table.size('counter', 'Solid'),
+  },
+  {
+    en: 'The Preact table is larger than everything exported',
+    ja: 'Preact の表がすべての export より大きい',
+    holds: (table) =>
+      table.size('js-framework-benchmark table', 'Preact') >
+      table.size('everything exported', 'Preact'),
+  },
+  {
+    en: 'synstate-dom is the largest after React in every row.',
+    ja: 'synstate-dom はどの行でも React の次に大きくなっています。',
+    holds: (table) =>
+      table.allApplications.every((application) =>
+        isLargestAfterReact(table, application, ['synstate-dom']),
+      ),
+  },
+  {
+    en: '**Everything exported**: synstate-dom and Solid are the largest after React in this row.',
+    ja: '**すべての export** の行では、React の次に synstate-dom と Solid が大きくなっています。',
+    holds: (table) =>
+      isLargestAfterReact(table, 'everything exported', [
+        'synstate-dom',
+        'Solid',
+      ]),
+  },
+] as const;
+
+/** The claims one table does not bear out, by their English text. */
+const unsupportedClaims = ({
+  libraries,
+  rows,
+}: Table): Result<readonly string[], string> => {
+  const missing = [
+    ...claimedLibraries.filter((library) => !libraries.includes(library)),
+    ...claimedApplications.filter((application) =>
+      rows.every((row) => row.application !== application),
+    ),
+  ] as const;
+
+  if (Arr.isNonEmpty(missing)) {
+    return Result.err(
+      `the "Reading the results" sentences name ${missing.map((name) => `"${name}"`).join(', ')}, which the table lacks; update checkReadingTheResults`,
+    );
+  }
+
+  // The sentences rank every library, so a column they do not know of would go
+  // unchecked.
+  const unclaimed = libraries.filter((library) =>
+    claimedLibraries.every((claimed) => claimed !== library),
+  );
+
+  if (Arr.isNonEmpty(unclaimed)) {
+    return Result.err(
+      `the "Reading the results" sentences do not know of ${unclaimed.map((name) => `"${name}"`).join(', ')}; add it to claimedLibraries and reword the sentences that rank the libraries`,
+    );
+  }
+
+  const size = (application: string, library: ClaimedLibrary): number =>
+    Math.round(
+      (rows.find((row) => row.application === application)?.sizes[
+        libraries.indexOf(library)
+      ] ?? Number.NaN) * 10,
+    );
+
+  const table: ClaimTable = {
+    size,
+    allApplications: rows.map((row) => row.application),
+    applications: rows
+      .slice(rows.findIndex((row) => row.application === 'counter') + 1)
+      .map((row) => row.application),
+  } as const;
+
+  return Result.ok(
+    claims.filter((claim) => !claim.holds(table)).map((claim) => claim.en),
+  );
+};
+
+/**
+ * Checks the "Reading the results" bullets against the tables. Those sentences
+ * are prose rather than markers, so a run that changes the tables could
+ * otherwise leave the pages contradicting them; here such a run fails, naming
+ * each sentence the tables no longer bear out.
+ */
+const checkReadingTheResults = (
+  bundleSize: BundleSize,
+): Result<undefined, string> => {
+  const mut_failures: string[] = [];
+
+  for (const [name, table] of [
+    ['gzip', bundleSize.gzip],
+    ['Brotli', bundleSize.brotli],
+  ] as const) {
+    const result = unsupportedClaims(table);
+
+    if (Result.isErr(result)) {
+      return Result.err(`the ${name} table: ${result.value}`);
+    }
+
+    for (const sentence of result.value) {
+      mut_failures.push(`"${sentence}" (${name})`);
+    }
+  }
+
+  return Arr.isNonEmpty(mut_failures)
+    ? Result.err(
+        Arr.toUnshifted(
+          'the tables no longer bear out these sentences under "Reading the results"; reword them on both pages and update checkReadingTheResults:',
+        )(mut_failures.map((failure) => `  - ${failure}`)).join('\n'),
+      )
+    : Result.ok(undefined);
+};
+
+const readingTheResultsHeadings = {
+  en: '## Reading the results',
+  ja: '## 結果の読み方',
+} as const satisfies ReadonlyRecord<Locale, string>;
+
+/** The claims' sentences that `page`'s "Reading the results" section lacks. */
+const missingClaims = (page: string, locale: Locale): readonly string[] => {
+  const lines = page.split('\n');
+
+  const from = lines.indexOf(readingTheResultsHeadings[locale]);
+
+  const to = lines.findIndex((line, i) => i > from && line.startsWith('## '));
+
+  const section =
+    from === -1
+      ? ''
+      : lines.slice(from + 1, to === -1 ? undefined : to).join('\n');
+
+  return claims
+    .map((claim) => claim[locale])
+    .filter((text) => !section.includes(text));
 };
 
 /** What each marker on a page is replaced with. */

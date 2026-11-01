@@ -8,7 +8,7 @@ description: The minified and compressed size of the same applications written w
 ## What is measured
 
 - **everything exported**: every export of the library's entry points, kept whole, so nothing is shaken off. synstate-dom counts `synstate-dom` and `synstate`; Solid `solid-js` and `solid-js/web`; Preact `preact` and `preact/hooks`, plus `@preact/signals` for Preact + Signals; React `react`, `react-dom` and `react-dom/client`; VanJS `vanjs-core`. Treat it as an upper bound: no application actually ships all of it.
-- **counter**: a button that shows a count and adds one when clicked, written in each library's own idiom. This is what a library costs you before you write any application code.
+- **counter**: a button that shows a count and adds one when clicked, written in each library's own idiom. This is roughly what a library costs you before you write any application code.
 - **js-framework-benchmark table**: the table of the [benchmark](/mono/synstate-dom/background/benchmark/), with its eight operations.
 - **loan**, **schedule** and **zoom scenarios**: the three [scenarios](/mono/synstate-dom/background/benchmark/#scenarios) of the benchmark.
 
@@ -58,13 +58,15 @@ Brotli at quality 11.
 
 ## Reading the results
 
-- **The counter row is the floor.** On top of it, an application adds only its own code and the parts of the library it uses, and in these applications that comes to a few kB at most for every library. The order of the libraries is set by the counter row and stays the same in the rows below it.
+<!-- `checkReadingTheResults` in scripts/embed-bundle-size.mts checks the sentences below against the tables and fails `gen:bundle-size` when one no longer holds. It quotes them word for word, so a reworded sentence is reworded there too, and a new claim about an order or a margin gets a case there. -->
+
+- **The counter row is the baseline.** The applications below it differ from it by their own code and by the parts of the library they use, and in these applications every row below the counter stays within a few kB of it for every library. The order of the libraries is set by the counter row and stays the same in the rows below it.
 - **React** is mostly react-dom, whatever the application. Its reconciler and scheduler do not split by what a component uses, so the rows differ by only about a kB.
 - **VanJS** is one small module with nothing to shake off, so even the counter includes all of it.
 - **Solid** compiles JSX into templates and calls into a small runtime, so a counter uses only a little of `solid-js/web`. Everything it exports is several times that.
 - **Preact** is a small virtual DOM; Signals adds its reactive core and the integration that binds a signal to the DOM. The Preact table is larger than everything exported because its rows use `memo` from `preact/compat`, which the everything-exported row does not count.
-- **synstate-dom** carries synstate's propagation core (the graph, its depth-ordered pass and scopes), its own JSX runtime and binding tables, and the helpers both import from ts-data-forge and ts-std-forge. It is the largest after React in every row. If your application already uses synstate, though, you pay for that core only once, and in the scenarios, whose models use ts-data-forge in every column, synstate-dom shares those helpers with them.
-- **Everything exported** is largest, after React, for synstate-dom and Solid. synstate exports a full set of operators, as RxJS does, but an application keeps only the ones it imports.
+- **synstate-dom** carries synstate's propagation core (the graph, its depth-ordered pass and scopes), its own JSX runtime and binding tables, and the helpers both import from ts-data-forge and ts-std-forge. synstate-dom is the largest after React in every row. If your application already uses synstate, though, you pay for that core only once, and in the scenarios, whose models use ts-data-forge in every column, synstate-dom shares those helpers with them.
+- **Everything exported**: synstate-dom and Solid are the largest after React in this row. synstate exports a full set of operators, as RxJS does, but an application keeps only the ones it imports.
 
 ## Running it
 

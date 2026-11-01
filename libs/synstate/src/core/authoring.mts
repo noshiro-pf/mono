@@ -1,7 +1,7 @@
 /**
- * What custom creators and operators are written with: the factories every
- * built-in observable is made by (#2117). The rest of `core/base` stays
- * internal.
+ * What custom creators and operators are written with: factories that wrap the
+ * base classes the built-in observables extend (#2117). The rest of `core/base`
+ * stays internal.
  */
 export {
   createAsyncChildObservable,
