@@ -54,7 +54,6 @@ strict-typescript-lib/
 ├── scripts/
 │   ├── project-root-path.mts
 │   └── cmd/
-│       ├── check-all.mts
 │       ├── create-changeset.mts         # 全公開パッケージの changeset 一括生成
 │       ├── gen-version-diff.mts
 │       └── ws-gen-stages.mts / ws-gen-full-stages.mts / ws-gen-with-codemod-fixed-stages.mts
@@ -250,8 +249,6 @@ export type LibReplacementStrategy = Readonly<{
 ```jsonc
 {
     "scripts": {
-        "check-all": "tsx ./scripts/cmd/check-all.mts",
-
         // 全バージョン一括生成 (各 packages/vX.Y の gen ステージを順に実行)
         "ws:gen": "tsx ./scripts/cmd/ws-gen-stages.mts",
         "ws:gen:full": "tsx ./scripts/cmd/ws-gen-full-stages.mts",
@@ -317,22 +314,13 @@ ESLint 設定は root の `eslint.config.mts` 1 つに集約し、per-package �
 }
 ```
 
-## 8. check-all
+## 8. 検証
 
-`scripts/cmd/check-all.mts` のステップ:
-
-1. `pnpm i`
-2. `pnpm run check:cspell`
-3. `pnpm run check:md`
-4. `pnpm run check:root` — build tooling の型チェック (dogfood + tooling)
-5. `pnpm run ws:gen:with-codemod-fixed` — 全バージョンの生成
-6. `pnpm run ws:check:types` — 生成 lib を各バージョンの tsc@5.x で検証
-7. `pnpm run fix:lint` — 単一 config でリポジトリ全体を lint
-8. `pnpm run fmt` — oxfmt (差分が出ないこと)
+strict-lib 専用の `check-all` は持たない（上流から来た `scripts/cmd/check-all.mts` は、存在しない root script を呼ぶまま何からも呼ばれていなかったので削除した）。生成は `.github/workflows/strict-lib-gen.yml` が全バージョン分やり直して作業ツリーが変わらないことを確かめ、生成 lib の型チェックは各ハーネスの `check:types` を `ws:check:types` が走らせる。cspell・markdownlint・lint・format はリポジトリ全体のチェック（root の `check-all` / `check-changed` と CI）が受け持つ。
 
 ## 9. CI / 公開
 
-- CI: `pnpm check-all` を実行することで「生成 + 型チェック + 各種 lint」を 1 コマンドで検証。
+- CI: `strict-lib-gen.yml` と、リポジトリ全体のチェック（§8）。
 - 公開: [Changesets](https://github.com/changesets/changesets) を導入し、`output*/packages/*/` の各サブパッケージを npmjs.com に publish。バージョンは TS バージョンごとに独立して semver で運用。
 - フェーズ 1 では publish CI 自体は導入せず、Changesets の `init` のみ済ませる。手動 publish は the reference monorepo 由来の `scripts-common/src/commands/publish-packages.mts` を流用。
 
