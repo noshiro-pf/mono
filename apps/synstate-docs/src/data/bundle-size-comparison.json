@@ -1,0 +1,797 @@
+{
+  "libraries": [
+    "SynState",
+    "RxJS",
+    "MobX",
+    "Jotai",
+    "Redux",
+    "Solid",
+    "Preact Signals",
+    "Zustand",
+    "Valtio"
+  ],
+  "bundlers": {
+    "vite": "8.3.5",
+    "esbuild": "0.28.2"
+  },
+  "versions": [
+    {
+      "packageName": "synstate",
+      "version": "6.2.1"
+    },
+    {
+      "packageName": "ts-data-forge",
+      "version": "14.10.2"
+    },
+    {
+      "packageName": "ts-std-forge",
+      "version": "0.5.2"
+    },
+    {
+      "packageName": "rxjs",
+      "version": "7.8.2"
+    },
+    {
+      "packageName": "jotai",
+      "version": "3.0.1"
+    },
+    {
+      "packageName": "mobx",
+      "version": "7.1.0"
+    },
+    {
+      "packageName": "@reduxjs/toolkit",
+      "version": "2.13.0"
+    },
+    {
+      "packageName": "zustand",
+      "version": "5.0.15"
+    },
+    {
+      "packageName": "valtio",
+      "version": "2.3.2"
+    },
+    {
+      "packageName": "solid-js",
+      "version": "1.9.17"
+    },
+    {
+      "packageName": "@preact/signals-core",
+      "version": "1.14.4"
+    }
+  ],
+  "vite": {
+    "rows": [
+      {
+        "scenario": "Single state",
+        "cells": [
+          {
+            "minified": 8187,
+            "gzip": 3230,
+            "brotli": 2966
+          },
+          {
+            "minified": 10601,
+            "gzip": 3315,
+            "brotli": 2991
+          },
+          {
+            "minified": 40597,
+            "gzip": 11315,
+            "brotli": 10287
+          },
+          {
+            "minified": 5705,
+            "gzip": 2391,
+            "brotli": 2168
+          },
+          {
+            "minified": 18673,
+            "gzip": 7081,
+            "brotli": 6517
+          },
+          {
+            "minified": 6026,
+            "gzip": 2330,
+            "brotli": 2127
+          },
+          {
+            "minified": 4509,
+            "gzip": 1617,
+            "brotli": 1500
+          },
+          {
+            "minified": 326,
+            "gzip": 243,
+            "brotli": 209
+          },
+          {
+            "minified": 1952,
+            "gzip": 977,
+            "brotli": 905
+          }
+        ]
+      },
+      {
+        "scenario": "Derived chain",
+        "cells": [
+          {
+            "minified": 9918,
+            "gzip": 3835,
+            "brotli": 3516
+          },
+          {
+            "minified": 11557,
+            "gzip": 3559,
+            "brotli": 3204
+          },
+          {
+            "minified": 40600,
+            "gzip": 11313,
+            "brotli": 10291
+          },
+          {
+            "minified": 5705,
+            "gzip": 2391,
+            "brotli": 2168
+          },
+          {
+            "minified": 22656,
+            "gzip": 8519,
+            "brotli": 7803
+          },
+          {
+            "minified": 6182,
+            "gzip": 2376,
+            "brotli": 2170
+          },
+          {
+            "minified": 4545,
+            "gzip": 1626,
+            "brotli": 1498
+          },
+          null,
+          null
+        ]
+      },
+      {
+        "scenario": "Diamond",
+        "cells": [
+          {
+            "minified": 10820,
+            "gzip": 4129,
+            "brotli": 3787
+          },
+          {
+            "minified": 19674,
+            "gzip": 6035,
+            "brotli": 5470
+          },
+          {
+            "minified": 40600,
+            "gzip": 11313,
+            "brotli": 10291
+          },
+          {
+            "minified": 5705,
+            "gzip": 2391,
+            "brotli": 2168
+          },
+          {
+            "minified": 22656,
+            "gzip": 8519,
+            "brotli": 7803
+          },
+          {
+            "minified": 6182,
+            "gzip": 2376,
+            "brotli": 2170
+          },
+          {
+            "minified": 4545,
+            "gzip": 1626,
+            "brotli": 1498
+          },
+          null,
+          null
+        ]
+      },
+      {
+        "scenario": "Deep chain",
+        "cells": [
+          {
+            "minified": 8600,
+            "gzip": 3350,
+            "brotli": 3036
+          },
+          {
+            "minified": 19915,
+            "gzip": 6107,
+            "brotli": 5537
+          },
+          {
+            "minified": 40976,
+            "gzip": 11420,
+            "brotli": 10375
+          },
+          {
+            "minified": 6025,
+            "gzip": 2517,
+            "brotli": 2288
+          },
+          {
+            "minified": 9357,
+            "gzip": 3761,
+            "brotli": 3391
+          },
+          {
+            "minified": 6182,
+            "gzip": 2376,
+            "brotli": 2170
+          },
+          {
+            "minified": 4585,
+            "gzip": 1636,
+            "brotli": 1517
+          },
+          null,
+          null
+        ]
+      },
+      {
+        "scenario": "Cascaded diamond",
+        "cells": [
+          {
+            "minified": 10820,
+            "gzip": 4129,
+            "brotli": 3787
+          },
+          {
+            "minified": 19674,
+            "gzip": 6035,
+            "brotli": 5470
+          },
+          {
+            "minified": 40600,
+            "gzip": 11313,
+            "brotli": 10291
+          },
+          {
+            "minified": 5705,
+            "gzip": 2391,
+            "brotli": 2168
+          },
+          {
+            "minified": 22656,
+            "gzip": 8519,
+            "brotli": 7803
+          },
+          {
+            "minified": 6182,
+            "gzip": 2376,
+            "brotli": 2170
+          },
+          {
+            "minified": 4545,
+            "gzip": 1626,
+            "brotli": 1498
+          },
+          null,
+          null
+        ]
+      },
+      {
+        "scenario": "Conditional fan-out",
+        "cells": [
+          {
+            "minified": 11310,
+            "gzip": 4268,
+            "brotli": 3890
+          },
+          {
+            "minified": 18820,
+            "gzip": 5725,
+            "brotli": 5191
+          },
+          {
+            "minified": 40543,
+            "gzip": 11295,
+            "brotli": 10270
+          },
+          {
+            "minified": 5705,
+            "gzip": 2391,
+            "brotli": 2168
+          },
+          {
+            "minified": 9357,
+            "gzip": 3761,
+            "brotli": 3391
+          },
+          {
+            "minified": 6182,
+            "gzip": 2376,
+            "brotli": 2170
+          },
+          {
+            "minified": 4545,
+            "gzip": 1626,
+            "brotli": 1498
+          },
+          null,
+          null
+        ]
+      },
+      {
+        "scenario": "Equality cut-off",
+        "cells": [
+          {
+            "minified": 9918,
+            "gzip": 3835,
+            "brotli": 3516
+          },
+          {
+            "minified": 19393,
+            "gzip": 6032,
+            "brotli": 5476
+          },
+          {
+            "minified": 40600,
+            "gzip": 11313,
+            "brotli": 10291
+          },
+          {
+            "minified": 5705,
+            "gzip": 2391,
+            "brotli": 2168
+          },
+          {
+            "minified": 22656,
+            "gzip": 8519,
+            "brotli": 7803
+          },
+          {
+            "minified": 6182,
+            "gzip": 2376,
+            "brotli": 2170
+          },
+          {
+            "minified": 4545,
+            "gzip": 1626,
+            "brotli": 1498
+          },
+          null,
+          null
+        ]
+      }
+    ],
+    "everything": [
+      {
+        "minified": 29405,
+        "gzip": 8343,
+        "brotli": 7557
+      },
+      {
+        "minified": 63411,
+        "gzip": 17477,
+        "brotli": 15822
+      },
+      {
+        "minified": 52970,
+        "gzip": 15067,
+        "brotli": 13684
+      },
+      {
+        "minified": 12074,
+        "gzip": 4795,
+        "brotli": 4365
+      },
+      {
+        "minified": 39085,
+        "gzip": 14249,
+        "brotli": 12970
+      },
+      {
+        "minified": 22368,
+        "gzip": 8423,
+        "brotli": 7725
+      },
+      {
+        "minified": 5487,
+        "gzip": 1993,
+        "brotli": 1842
+      },
+      {
+        "minified": 497,
+        "gzip": 349,
+        "brotli": 291
+      },
+      {
+        "minified": 3256,
+        "gzip": 1522,
+        "brotli": 1403
+      }
+    ],
+    "breakdown": [
+      {
+        "packageName": "ts-std-forge",
+        "bytes": 3563
+      },
+      {
+        "packageName": "ts-data-forge",
+        "bytes": 4546
+      },
+      {
+        "packageName": "synstate",
+        "bytes": 10723
+      }
+    ]
+  },
+  "esbuild": {
+    "rows": [
+      {
+        "scenario": "Single state",
+        "cells": [
+          {
+            "minified": 10040,
+            "gzip": 3845,
+            "brotli": 3504
+          },
+          {
+            "minified": 11118,
+            "gzip": 3510,
+            "brotli": 3147
+          },
+          {
+            "minified": 42018,
+            "gzip": 11950,
+            "brotli": 10851
+          },
+          {
+            "minified": 5807,
+            "gzip": 2522,
+            "brotli": 2270
+          },
+          {
+            "minified": 22007,
+            "gzip": 8548,
+            "brotli": 7852
+          },
+          {
+            "minified": 6927,
+            "gzip": 2721,
+            "brotli": 2506
+          },
+          {
+            "minified": 4531,
+            "gzip": 1647,
+            "brotli": 1519
+          },
+          {
+            "minified": 337,
+            "gzip": 256,
+            "brotli": 238
+          },
+          {
+            "minified": 2006,
+            "gzip": 1029,
+            "brotli": 950
+          }
+        ]
+      },
+      {
+        "scenario": "Derived chain",
+        "cells": [
+          {
+            "minified": 11653,
+            "gzip": 4407,
+            "brotli": 4022
+          },
+          {
+            "minified": 12111,
+            "gzip": 3772,
+            "brotli": 3390
+          },
+          {
+            "minified": 42021,
+            "gzip": 11946,
+            "brotli": 10839
+          },
+          {
+            "minified": 5807,
+            "gzip": 2522,
+            "brotli": 2270
+          },
+          {
+            "minified": 26065,
+            "gzip": 10106,
+            "brotli": 9276
+          },
+          {
+            "minified": 7124,
+            "gzip": 2771,
+            "brotli": 2561
+          },
+          {
+            "minified": 4567,
+            "gzip": 1657,
+            "brotli": 1531
+          },
+          null,
+          null
+        ]
+      },
+      {
+        "scenario": "Diamond",
+        "cells": [
+          {
+            "minified": 12606,
+            "gzip": 4706,
+            "brotli": 4313
+          },
+          {
+            "minified": 20339,
+            "gzip": 6370,
+            "brotli": 5742
+          },
+          {
+            "minified": 42021,
+            "gzip": 11946,
+            "brotli": 10839
+          },
+          {
+            "minified": 5807,
+            "gzip": 2522,
+            "brotli": 2270
+          },
+          {
+            "minified": 26065,
+            "gzip": 10106,
+            "brotli": 9276
+          },
+          {
+            "minified": 7124,
+            "gzip": 2771,
+            "brotli": 2561
+          },
+          {
+            "minified": 4567,
+            "gzip": 1657,
+            "brotli": 1531
+          },
+          null,
+          null
+        ]
+      },
+      {
+        "scenario": "Deep chain",
+        "cells": [
+          {
+            "minified": 10367,
+            "gzip": 3890,
+            "brotli": 3534
+          },
+          {
+            "minified": 20580,
+            "gzip": 6444,
+            "brotli": 5819
+          },
+          {
+            "minified": 42412,
+            "gzip": 12051,
+            "brotli": 10934
+          },
+          {
+            "minified": 6156,
+            "gzip": 2654,
+            "brotli": 2403
+          },
+          {
+            "minified": 12456,
+            "gzip": 5100,
+            "brotli": 4608
+          },
+          {
+            "minified": 7124,
+            "gzip": 2771,
+            "brotli": 2561
+          },
+          {
+            "minified": 4603,
+            "gzip": 1668,
+            "brotli": 1541
+          },
+          null,
+          null
+        ]
+      },
+      {
+        "scenario": "Cascaded diamond",
+        "cells": [
+          {
+            "minified": 12606,
+            "gzip": 4706,
+            "brotli": 4313
+          },
+          {
+            "minified": 20339,
+            "gzip": 6370,
+            "brotli": 5742
+          },
+          {
+            "minified": 42021,
+            "gzip": 11946,
+            "brotli": 10839
+          },
+          {
+            "minified": 5807,
+            "gzip": 2522,
+            "brotli": 2270
+          },
+          {
+            "minified": 26065,
+            "gzip": 10106,
+            "brotli": 9276
+          },
+          {
+            "minified": 7124,
+            "gzip": 2771,
+            "brotli": 2561
+          },
+          {
+            "minified": 4567,
+            "gzip": 1657,
+            "brotli": 1531
+          },
+          null,
+          null
+        ]
+      },
+      {
+        "scenario": "Conditional fan-out",
+        "cells": [
+          {
+            "minified": 13199,
+            "gzip": 4904,
+            "brotli": 4462
+          },
+          {
+            "minified": 19483,
+            "gzip": 6075,
+            "brotli": 5456
+          },
+          {
+            "minified": 41964,
+            "gzip": 11933,
+            "brotli": 10831
+          },
+          {
+            "minified": 5807,
+            "gzip": 2522,
+            "brotli": 2270
+          },
+          {
+            "minified": 12456,
+            "gzip": 5100,
+            "brotli": 4608
+          },
+          {
+            "minified": 7124,
+            "gzip": 2771,
+            "brotli": 2561
+          },
+          {
+            "minified": 4567,
+            "gzip": 1657,
+            "brotli": 1531
+          },
+          null,
+          null
+        ]
+      },
+      {
+        "scenario": "Equality cut-off",
+        "cells": [
+          {
+            "minified": 11653,
+            "gzip": 4407,
+            "brotli": 4022
+          },
+          {
+            "minified": 20072,
+            "gzip": 6394,
+            "brotli": 5762
+          },
+          {
+            "minified": 42021,
+            "gzip": 11946,
+            "brotli": 10839
+          },
+          {
+            "minified": 5807,
+            "gzip": 2522,
+            "brotli": 2270
+          },
+          {
+            "minified": 26065,
+            "gzip": 10106,
+            "brotli": 9276
+          },
+          {
+            "minified": 7124,
+            "gzip": 2771,
+            "brotli": 2561
+          },
+          {
+            "minified": 4567,
+            "gzip": 1657,
+            "brotli": 1531
+          },
+          null,
+          null
+        ]
+      }
+    ],
+    "everything": [
+      {
+        "minified": 34446,
+        "gzip": 9682,
+        "brotli": 8735
+      },
+      {
+        "minified": 66197,
+        "gzip": 18552,
+        "brotli": 16618
+      },
+      {
+        "minified": 54395,
+        "gzip": 15768,
+        "brotli": 14308
+      },
+      {
+        "minified": 12268,
+        "gzip": 5050,
+        "brotli": 4562
+      },
+      {
+        "minified": 40013,
+        "gzip": 15182,
+        "brotli": 13762
+      },
+      {
+        "minified": 22575,
+        "gzip": 8738,
+        "brotli": 8024
+      },
+      {
+        "minified": 5469,
+        "gzip": 2008,
+        "brotli": 1856
+      },
+      {
+        "minified": 461,
+        "gzip": 333,
+        "brotli": 287
+      },
+      {
+        "minified": 3268,
+        "gzip": 1573,
+        "brotli": 1441
+      }
+    ],
+    "breakdown": [
+      {
+        "packageName": "ts-std-forge",
+        "bytes": 3046
+      },
+      {
+        "packageName": "ts-data-forge",
+        "bytes": 2220
+      },
+      {
+        "packageName": "synstate",
+        "bytes": 4659
+      }
+    ]
+  }
+}
