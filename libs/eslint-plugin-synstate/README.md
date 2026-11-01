@@ -216,12 +216,11 @@ costs it one look at each call.
 ### `no-unbounded-counter-pipe`
 
 `counter(1000).pipe(take(3))` reads like three ticks, but `take(3)` completes
-the observable it returns, not the counter underneath. The next major of
-synstate stops completing parents when a child completes (its `NEXT_MAJOR.md`),
-and from then on the only ways to stop a counter are to complete it through a
-name or to let it stop by itself. A counter piped straight from its call has no
-name, so without a `times` option it keeps its timer running for as long as the
-program lives.
+the observable it returns, not the counter underneath. Since synstate 4.0.0 a
+child completing does not complete its parents, so the counter keeps running
+until it is completed through a name or stops by itself. A counter piped
+straight from its call has no name, so without a `times` option it keeps its
+timer running for as long as the program lives.
 
 The type cannot forbid this `.pipe`, because the same call is fine once the
 counter has a name: `const counter$ = counter(1000)` can be completed through
