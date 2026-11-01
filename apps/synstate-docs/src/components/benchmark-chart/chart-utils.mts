@@ -1,6 +1,6 @@
 /** Shared utilities for benchmark chart components. */
 
-import { Arr, asPositiveSafeInt, PositiveSafeInt } from 'ts-data-forge';
+import { Arr, asUint32, Num } from 'ts-data-forge';
 
 /**
  * How a line chart draws a series, in the plot and in the legend alike: a naive
@@ -18,19 +18,38 @@ export const lineStyleOf = (
     ? ({ strokeDasharray: '5,3', strokeWidth: 1.5, dotRadius: 2 } as const)
     : ({ strokeDasharray: undefined, strokeWidth: 2, dotRadius: 3 } as const);
 
+/**
+ * A tick as its value reads, with as many decimals as the step gave it: the
+ * ticks are rounded where they are made, and a fixed count of decimals would
+ * print 0.05 and 0.1 alike.
+ */
 export const formatTickLabel = (v: number): string =>
-  v >= 1000
-    ? (`${(v / 1000).toString()}s` as const)
-    : v < 1
-      ? v.toFixed(1)
-      : Math.round(v).toString();
+  v >= 1000 ? (`${(v / 1000).toString()}s` as const) : v.toString();
 
-export const generateLinearTicks = (
-  max: PositiveSafeInt,
-): readonly number[] => {
+/**
+ * Ticks at a round step from the step up to `max`, none above it: the plot
+ * clamps a value above its top to the top edge, where a tick would be drawn
+ * under a label larger than the top. The step is a fraction below 5, which a
+ * chart whose scale its data sets can reach.
+ */
+export const generateLinearTicks = (max: number): readonly number[] => {
+  if (!Number.isFinite(max) || max <= 0) {
+    return [];
+  }
+
   const step = niceStep(max, 5);
 
-  return Arr.range(step, PositiveSafeInt.add(max, step), step);
+  if (!Num.isNonZero(step)) {
+    return [];
+  }
+
+  // A hair of tolerance, so that a tick on `max` survives the float division
+  const count = Math.floor(Num.div(max, step) + 1e-9);
+
+  return Arr.seq(asUint32(count)).map((i) =>
+    // Rounding drops what a fractional step leaves, 3 × 0.1 being 0.30…04
+    Num.roundAt((i + 1) * step, 9),
+  );
 };
 
 export const generateLogTicks = (
@@ -82,19 +101,27 @@ export const createToY = (
     };
   }
 
-  return (v: number): number => {
-    const clamped = Math.min(v, yMax);
+  const toY = createUnclampedLinearToY(plotH, yMax);
 
-    // eslint-disable-next-line total-functions/no-partial-division
-    return plotH - (clamped / yMax) * plotH;
-  };
+  return (v: number): number => toY(Math.min(v, yMax));
 };
 
-const niceStep = (max: number, targetTicks: number): PositiveSafeInt => {
+/**
+ * The linear scale of {@link createToY} without the clamp: a value above `yMax`
+ * maps above the plot, so that a line drawn through it under a clip path leaves
+ * the plot at its true slope instead of running along the top.
+ */
+export const createUnclampedLinearToY =
+  (plotH: number, yMax: number): ((v: number) => number) =>
+  (v: number): number =>
+    // eslint-disable-next-line total-functions/no-partial-division
+    plotH - (v / yMax) * plotH;
+
+const niceStep = (max: number, targetTicks: number): number => {
   // eslint-disable-next-line total-functions/no-partial-division
   const raw = max / targetTicks;
 
-  const magnitude = asPositiveSafeInt(10 ** Math.floor(Math.log10(raw)));
+  const magnitude = 10 ** Math.floor(Math.log10(raw));
 
   // eslint-disable-next-line total-functions/no-partial-division
   const normalized = raw / magnitude;
@@ -102,5 +129,5 @@ const niceStep = (max: number, targetTicks: number): PositiveSafeInt => {
   const nice =
     normalized < 1.5 ? 1 : normalized < 3 ? 2 : normalized < 7 ? 5 : 10;
 
-  return PositiveSafeInt.mul(nice, magnitude);
+  return nice * magnitude;
 };

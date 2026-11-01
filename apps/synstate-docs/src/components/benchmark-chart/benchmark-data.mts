@@ -7,6 +7,9 @@ import {
   libraryColorOf,
 } from '../../data/index.mjs';
 
+/** How a chart labels a measurement, as the prose beside it quotes one. */
+export { formatMs } from '../../data/index.mjs';
+
 /**
  * The benchmark numbers, read from what the runners wrote.
  *

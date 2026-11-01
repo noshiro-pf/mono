@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { Arr, PositiveSafeInt } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
+import { formatMs } from './benchmark-data.mjs';
 import { ChartLegend } from './chart-legend.js';
 import {
   createToY,
+  createUnclampedLinearToY,
   formatTickLabel,
   generateLinearTicks,
   generateLogTicks,
@@ -32,8 +34,14 @@ type Props = Readonly<{
   logScale?: boolean;
   /** Timeout threshold line (ms) */
   timeoutMs?: number;
-  /** Override the Y-axis maximum. Values above this are clipped. */
-  yMaxOverride?: number;
+  /**
+   * Set the Y-axis by the series that have a value at every X label alone. A
+   * series that timed out somewhere is the one whose growth outruns the rest,
+   * and an axis reaching its largest value flattens the others to the X-axis;
+   * its values above the top are clipped instead: its line leaves through the
+   * top edge and, in place of a dot, a triangle on the edge carries the value.
+   */
+  scaleByCompleteSeries?: boolean;
 }>;
 
 const CHART_WIDTH = 600;
@@ -46,6 +54,12 @@ const PLOT_W = CHART_WIDTH - PADDING.left - PADDING.right;
 
 const PLOT_H = CHART_HEIGHT - PADDING.top - PADDING.bottom;
 
+/** The largest dot's radius, by which the clip path overhangs the plot. */
+const DOT_ROOM = Math.max(
+  lineStyleOf(false).dotRadius,
+  lineStyleOf(true).dotRadius,
+);
+
 export const BenchmarkLineChart = React.memo<Props>((props) => {
   const {
     xLabels,
@@ -53,8 +67,10 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
     yAxisLabel = 'ms',
     logScale = false,
     timeoutMs,
-    yMaxOverride,
+    scaleByCompleteSeries = false,
   } = props;
+
+  const clipPathId = React.useId();
 
   // Collect all non-undefined values to determine Y range
   const allValues = series.flatMap((s) =>
@@ -67,11 +83,37 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
 
   const yMin = logScale ? Math.max(0.1, Math.min(...allValues)) : 0;
 
-  const yMaxRaw = yMaxOverride ?? Math.max(...allValues, timeoutMs ?? 0);
+  const scaleValues = scaleByCompleteSeries
+    ? series
+        .filter((s) => s.values.every((v) => v !== undefined))
+        .flatMap((s) => s.values.filter((v): v is number => v !== undefined))
+    : allValues;
+
+  // The timeout line does not raise an axis the complete series set: it is
+  // above every value they have, and would flatten them all over again
+  const yMaxRaw = Math.max(
+    ...(Arr.isEmpty(scaleValues) ? allValues : scaleValues),
+    scaleByCompleteSeries ? 0 : (timeoutMs ?? 0),
+  );
 
   const yMax = yMaxRaw * 1.1;
 
   const toY = createToY(PLOT_H, yMin, yMax, logScale);
+
+  // Lines are drawn through the true position and clipped to the plot, so that
+  // a line leaving the scale keeps its slope. The log scale clamps only at the
+  // bottom, so it maps a value above the top past it already.
+  const toLineY = logScale ? toY : createUnclampedLinearToY(PLOT_H, yMax);
+
+  // Per X label, the series above the top there, in legend order
+  const offScale = xLabels.map((_, i) =>
+    series
+      .map((s) => ({ label: s.label, color: s.color, value: s.values[i] }))
+      .filter(
+        (p): p is Readonly<{ label: string; color: string; value: number }> =>
+          p.value !== undefined && p.value > yMax,
+      ),
+  );
 
   const toX = (i: number): number =>
     Arr.isMaxLengthArray(1, xLabels)
@@ -88,7 +130,7 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
   // Y-axis tick values
   const yTicks = logScale
     ? generateLogTicks(yMin, yMax)
-    : generateLinearTicks(PositiveSafeInt.fromNumber(yMax));
+    : generateLinearTicks(yMax);
 
   return (
     <div style={figureStyle}>
@@ -99,6 +141,17 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
         <g
           transform={`translate(${PADDING.left.toString()}, ${PADDING.top.toString()})`}
         >
+          <defs>
+            <clipPath id={clipPathId}>
+              {/* Room for half a dot past each edge, so edge dots stay whole */}
+              <rect
+                height={PLOT_H + 2 * DOT_ROOM}
+                width={PLOT_W + 2 * DOT_ROOM}
+                x={-DOT_ROOM}
+                y={-DOT_ROOM}
+              />
+            </clipPath>
+          </defs>
           {/* Grid lines */}
           {yTicks.map((tick) => (
             <line
@@ -134,8 +187,8 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
                 v !== undefined
                   ? {
                       x: toX(i),
-                      y: toY(logScale ? Math.max(v, yMin) : v),
-                      value: v,
+                      y: toLineY(logScale ? Math.max(v, yMin) : v),
+                      clipped: v > yMax,
                     }
                   : undefined,
               )
@@ -150,7 +203,7 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
               .join(' ');
 
             return (
-              <g key={s.label}>
+              <g key={s.label} clipPath={`url(#${clipPathId})`}>
                 <path
                   d={linePath}
                   fill={'none'}
@@ -158,18 +211,50 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
                   strokeDasharray={style.strokeDasharray}
                   strokeWidth={style.strokeWidth}
                 />
-                {points.map((p) => (
-                  <circle
-                    key={`${p.x.toString()}-${p.y.toString()}`}
-                    cx={p.x}
-                    cy={p.y}
-                    fill={s.color}
-                    r={style.dotRadius}
-                  />
-                ))}
+                {points.map((p) =>
+                  p.clipped ? undefined : (
+                    <circle
+                      key={`${p.x.toString()}-${p.y.toString()}`}
+                      cx={p.x}
+                      cy={p.y}
+                      fill={s.color}
+                      r={style.dotRadius}
+                    />
+                  ),
+                )}
               </g>
             );
           })}
+
+          {/*
+           * Values above the scale: a triangle on the top edge and the values,
+           * one label per X so that two series off the scale at the same X are
+           * written side by side rather than drawn over each other
+           */}
+          {offScale.map((points, i) =>
+            Arr.isNonEmpty(points) ? (
+              <g key={xLabels[i] ?? i.toString()}>
+                <polygon
+                  fill={points[0].color}
+                  points={clippedMarkerPoints(toX(i))}
+                />
+                <text
+                  fontSize={10}
+                  fontWeight={600}
+                  textAnchor={'middle'}
+                  x={toX(i)}
+                  y={-7}
+                >
+                  {points.map((p, j) => (
+                    <tspan key={p.label} fill={p.color}>
+                      {j === 0 ? '' : ' / '}
+                      {formatMs(p.value)}
+                    </tspan>
+                  ))}
+                </text>
+              </g>
+            ) : undefined,
+          )}
 
           {/* Y-axis */}
           <line
@@ -245,3 +330,15 @@ const svgStyle: React.CSSProperties = {
   width: '100%',
   height: 'auto',
 } as const;
+
+/** An upward triangle whose tip sits just above the plot's top edge. */
+const clippedMarkerPoints = (x: number): string =>
+  (
+    [
+      [x - 4, 4],
+      [x + 4, 4],
+      [x, -3],
+    ] as const
+  )
+    .map(([px, py]) => `${px.toString()},${py.toString()}`)
+    .join(' ');

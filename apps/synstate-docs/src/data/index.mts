@@ -7,7 +7,8 @@
  * `pnpm --filter @synstate/docs run benchmark` writes the same files locally.
  * Beside them, hand-written, the colour each chart draws a results label in
  * (`library-colors.mts`), which the charts and `gen:benchmark-doc` share, and
- * which labels the charts draw dashed.
+ * which labels the charts draw dashed; and how both write a measurement
+ * (`format-ms.mts`).
  *
  * A barrel because the readers are elsewhere in the package — the chart
  * components under `src/components/`, the prose numbers under `scripts/` — and
@@ -18,6 +19,7 @@
  * against.
  */
 
+export { MS_TENTHS_BELOW, formatCount, formatMs } from './format-ms.mjs';
 export { isNaiveForm, libraryColorOf } from './library-colors.mjs';
 export { default as cascadedDiamond } from './results-cascaded-diamond.json' with { type: 'json' };
 export { default as conditionalFanOut } from './results-conditional-fan-out.json' with { type: 'json' };
