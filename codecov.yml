@@ -28,9 +28,13 @@ comment:
 # and the workflow uploads them from each of its shards; components split that
 # back apart by path, which flags could not do without one upload per package.
 #
-# The paths below assume Codecov sees `libs/<pkg>/src/...`. It does: each
-# lcov.info records paths relative to its own package, and the uploader
-# prefixes them with the directory it found the report in.
+# The paths below assume Codecov sees `libs/<pkg>/src/...`. It does because
+# `coverage:normalize-paths` (tools/scripts/cmd/normalize-coverage-paths.mts),
+# which `ws:check:test:cov` and each of its shards run last, rewrites every
+# lcov.info to repository-relative paths before upload. The test runner writes
+# them relative to the package and the uploader does not prefix them, so
+# without that step Codecov guesses the package and merges files of the same
+# name across packages.
 #
 # A package added here also wants a badge in its README
 # (`badge.svg?component=<component_id>`); a package missing from this list
