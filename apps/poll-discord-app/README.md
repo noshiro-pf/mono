@@ -1,7 +1,5 @@
 # poll-discord-app
 
-<!-- cspell:ignore gpdev -->
-
 A Discord bot that runs polls: it posts a message with a reaction per option,
 tallies the reactions, and keeps a summary message and the poll's title up to
 date as people answer. State lives in Firestore.
@@ -12,6 +10,10 @@ consolidation parked there. See
 
 ## usage
 
+In the development environment every command takes a `-dev` suffix: `/rp-dev`,
+`/rp30-dev`, `/rp60-dev`, `/rp30d-dev`, `/rp60d-dev`, `/gp-dev` and
+`/rand-dev`.
+
 ### Rich Poll
 
 ```txt
@@ -21,8 +23,6 @@ consolidation parked there. See
 "22:00-22:30"
 "22:30-23:00"
 ```
-
-(Use `/rp-dev` instead of `/rp` in the development environment)
 
 #### Shorthand
 
@@ -36,7 +36,15 @@ or
 /rp60 "title" 21 23
 ```
 
-(Use `/rp30-dev`/`/rp60-dev` instead of `/rp30`/`/rp60` respectively in the development environment)
+`/rp30` splits the hours from the first number to the second into 30-minute
+options and `/rp60` into 1-hour options: `21 23` covers 21:00–23:00.
+
+`/rp30d` and `/rp60d` do the same without a title argument, and title the poll
+with today's date (`11/2（月）`):
+
+```txt
+/rp30d 21 23
+```
 
 ### Grouping
 
@@ -49,8 +57,6 @@ or
 "Ellen"
 "Frank"
 ```
-
-(Use `/gpdev` instead of `/gp` in the development environment)
 
 result
 
@@ -88,9 +94,11 @@ result
 names one. `dotenv-example` lists what is expected.
 
 ```sh
-pnpm run build   # type-check, then transpile src/ to build/
+pnpm run build   # transpile src/ to build/ with esbuild; no type check
 pnpm run start   # node ./build/index.mjs
 ```
+
+`build` does not type-check; `pnpm run check:types` does.
 
 The Firebase config in `src/firebase/config.mts` is a web app config: public by
 design, and unchanged from before the consolidation.
