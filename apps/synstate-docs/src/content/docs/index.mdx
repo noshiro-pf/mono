@@ -29,7 +29,12 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     </Card>
     <Card title="Glitch-Free Through Every Operator" icon="approve-check">
 
-Every update is one depth-ordered pass over what it reaches, the ones `debounce` or `switchMap` start later included, so no subscriber sees a half-updated graph, and an update costs in proportion to the nodes it reaches rather than the paths between them. [Operators on Signals](/mono/synstate/guides/library-comparison/operators-on-signals/) shows what an operator written as an effect loses; [the benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page) compares speed scenario by scenario.
+Every update is one depth-ordered pass over what it reaches, the ones `debounce` or `switchMap` start later included, so no subscriber sees a half-updated graph, and an update costs in proportion to the nodes it reaches rather than the paths between them. [Operators on Signals](/mono/synstate/guides/library-comparison/operators-on-signals/) shows what an operator written as an effect loses.
+
+    </Card>
+    <Card title="Very Fast" icon="rocket">
+
+In the benchmark summary, SynState stays within {/* bench:summary/synstate-worst-over-fastest */}2.7{/* /bench */}× of the fastest library in every scenario: {/* bench:summary/synstate-alone-in-single-digits */}the only library measured in all of them whose worst case stays in single digits{/* /bench */}. [See each library's worst case](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page).
 
     </Card>
     <Card title="Lightweight" icon="seti:favicon">

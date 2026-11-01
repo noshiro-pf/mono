@@ -7,7 +7,7 @@ sidebar:
 
 import SignalsOperatorsDemo from '../../../../components/signals-operators-demo/signals-operators-demo-island.astro';
 
-The [benchmark](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page) names no consistent winner between SynState and Preact Signals, which raises a fair question: why not keep Preact Signals and add SynState's operators on top? A pure transform carries over as it is, since that is what a `computed` is. An operator that keeps state, waits or starts a request cannot be a `computed`, and becomes an `effect` that writes a signal. Written that way, it loses the two things SynState's operators keep: every reader sees a consistent graph, and every emission is an event.
+Preact Signals is glitch-free too, which raises a fair question: why not keep Preact Signals and add SynState's operators on top? A pure transform carries over as it is, since that is what a `computed` is. An operator that keeps state, waits or starts a request cannot be a `computed`, and becomes an `effect` that writes a signal. Written that way, it loses the two things SynState's operators keep: every reader sees a consistent graph, and every emission is an event.
 
 The examples on this page use `@preact/signals-core`, and each one that runs a library is a test against it.
 
