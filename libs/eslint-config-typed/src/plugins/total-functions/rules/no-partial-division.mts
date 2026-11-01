@@ -1,10 +1,17 @@
-import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
+import {
+  AST_NODE_TYPES,
+  ESLintUtils,
+  type TSESTree,
+} from '@typescript-eslint/utils';
 import { Arr, isNonNullObject } from 'ts-data-forge';
 import { intersectionTypeParts, unionTypeParts } from 'tsutils';
 import type { BigIntLiteralType, PseudoBigInt, Type } from 'typescript';
 import { createRule } from './common.mjs';
 
-/** An ESLint rule to ban partial division. */
+/**
+ * An ESLint rule to ban partial division: `x / y` and `x /= y` whose
+ * denominator is not provably non-zero.
+ */
 
 export const noPartialDivision = createRule({
   name: 'no-partial-division',
@@ -47,36 +54,38 @@ export const noPartialDivision = createRule({
       );
     };
 
+    const isProvablySafeDenominator = (
+      denominator: TSESTree.Expression,
+    ): boolean => {
+      if (
+        denominator.type === AST_NODE_TYPES.Literal &&
+        denominator.value !== 0 &&
+        denominator.value !== 0n
+      ) {
+        // Division by a literal that isn't zero is safe.
+        return true;
+      }
+
+      if (denominator.type === AST_NODE_TYPES.Identifier) {
+        const denominatorNode =
+          parserServices.esTreeNodeToTSNodeMap.get(denominator);
+
+        return isSafeDenominator(checker.getTypeAtLocation(denominatorNode));
+      }
+
+      // All other division is not provably safe.
+      return false;
+    };
+
     return {
-      BinaryExpression: (node) => {
-        if (node.operator !== '/') {
-          // Binary expressions other than division are safe.
+      // `x /= y` divides as `x = x / y` does, and `unicorn/operator-assignment`
+      // autofixes the latter into the former, so both are checked alike.
+      'BinaryExpression[operator="/"], AssignmentExpression[operator="/="]': (
+        node: TSESTree.AssignmentExpression | TSESTree.BinaryExpression,
+      ) => {
+        if (isProvablySafeDenominator(node.right)) {
           return;
         }
-
-        if (
-          node.right.type === AST_NODE_TYPES.Literal &&
-          node.right.value !== 0 &&
-          node.right.value !== 0n
-        ) {
-          // Division by a literal that isn't zero is safe.
-          return;
-        }
-
-        if (node.right.type === AST_NODE_TYPES.Identifier) {
-          const denominatorNode = parserServices.esTreeNodeToTSNodeMap.get(
-            node.right,
-          );
-
-          const denominatorNodeType =
-            checker.getTypeAtLocation(denominatorNode);
-
-          if (isSafeDenominator(denominatorNodeType)) {
-            return;
-          }
-        }
-
-        // All other division is not provably safe.
 
         context.report({
           node,

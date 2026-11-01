@@ -86,6 +86,35 @@ ruleTester.run('no-partial-division', noPartialDivision, {
         const bar = 1n / foo;
       `,
     },
+    {
+      filename: 'file.ts',
+      code: dedent`
+        let mut_x = 6;
+        mut_x /= 2;
+      `,
+    },
+    {
+      filename: 'file.ts',
+      code: dedent`
+        let mut_x = 6n;
+        mut_x /= 2n;
+      `,
+    },
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare const foo: 42 | 43;
+        let mut_x = 6;
+        mut_x /= foo;
+      `,
+    },
+    {
+      filename: 'file.ts',
+      code: dedent`
+        let mut_x = 6;
+        mut_x *= 0;
+      `,
+    },
   ],
   invalid: [
     {
@@ -211,6 +240,69 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       code: dedent`
         declare const foo: number & { __tag: string };
         const bar = 1 / foo;
+      `,
+      errors: [
+        {
+          messageId: 'errorStringGeneric',
+        },
+      ],
+    },
+    {
+      filename: 'file.ts',
+      code: dedent`
+        let mut_x = 6;
+        mut_x /= 0;
+      `,
+      errors: [
+        {
+          messageId: 'errorStringGeneric',
+        },
+      ],
+    },
+    {
+      filename: 'file.ts',
+      code: dedent`
+        let mut_x = 6n;
+        mut_x /= 0n;
+      `,
+      errors: [
+        {
+          messageId: 'errorStringGeneric',
+        },
+      ],
+    },
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare const y: number;
+        let mut_x = 6;
+        mut_x /= y;
+      `,
+      errors: [
+        {
+          messageId: 'errorStringGeneric',
+        },
+      ],
+    },
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare const foo: 42 | 0;
+        let mut_x = 6;
+        mut_x /= foo;
+      `,
+      errors: [
+        {
+          messageId: 'errorStringGeneric',
+        },
+      ],
+    },
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare const obj: { readonly n: number };
+        let mut_x = 6;
+        mut_x /= obj.n;
       `,
       errors: [
         {
