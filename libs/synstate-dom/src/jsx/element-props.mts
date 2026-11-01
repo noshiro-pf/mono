@@ -118,7 +118,20 @@ type IsWritable<E, K extends keyof E> =
 
 /**
  * Writable primitive properties that are not attributes, or that are props of
- * their own (`class`, `style`).
+ * their own (`class`, `style`). The binding would pass them to `setAttribute`,
+ * which makes an attribute nothing reads (#2934): the parts of `<a>`'s `href`
+ * (`hash` … `username`), the text of `<a>`, `<option>`, `<script>` and
+ * `<title>` (`text`), media playback state (`currentTime` … `volume`), and form
+ * control state (`returnValue` … `length`), and the obsolete `ch` and `chOff`
+ * of table cells, whose attributes are `char` and `charoff`. A property written as a property is
+ * in `propertyNames`, and one whose attribute is spelt differently in
+ * `attributeNameOf`. Checked in Chromium by setting the attribute and reading
+ * the property back.
+ *
+ * The keys are left out of every element, so a name that is an attribute on one
+ * element and not on another goes by the common case: `<body>`'s obsolete
+ * `text` attribute is left out with the rest, and `<style>`'s `disabled`, which
+ * has no attribute, stays in with every other `disabled`.
  */
 type ExcludedKey =
   | 'className'
@@ -129,4 +142,28 @@ type ExcludedKey =
   | 'outerText'
   | 'scrollLeft'
   | 'scrollTop'
-  | 'textContent';
+  | 'textContent'
+  | 'hash'
+  | 'host'
+  | 'hostname'
+  | 'password'
+  | 'pathname'
+  | 'port'
+  | 'protocol'
+  | 'search'
+  | 'username'
+  | 'text'
+  | 'currentTime'
+  | 'defaultPlaybackRate'
+  | 'playbackRate'
+  | 'preservesPitch'
+  | 'volume'
+  | 'returnValue'
+  | 'selectedIndex'
+  | 'selectionDirection'
+  | 'selectionEnd'
+  | 'selectionStart'
+  | 'valueAsNumber'
+  | 'length'
+  | 'ch'
+  | 'chOff';
