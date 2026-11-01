@@ -432,7 +432,7 @@ const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
         }
 
         case 'set-filledDateOnly':
-          return Obj.update(state, 'filledDateOnly', (b) => !b);
+          return Obj.set(state, 'filledDateOnly', action.checked);
 
         case 'set-rank':
           return Obj.setIn(state, ['rank', 'value'], action.rank);

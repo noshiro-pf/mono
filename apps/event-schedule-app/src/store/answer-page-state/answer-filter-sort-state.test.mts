@@ -40,6 +40,25 @@ describe(createAnswerFilterAndSortStore, () => {
     assert.strictEqual(savedFilters.at(-1)?.filledDateOnly, true);
   });
 
+  test.each([true, false] as const)(
+    'setOnlyFilledDate(%j) twice keeps the value it was given',
+    (checked) => {
+      const { store, savedFilters } = setup();
+
+      // Checked after each call: two flips of `false` end at `false` too.
+      for (const _call of [1, 2]) {
+        store.setOnlyFilledDate(checked);
+
+        assert.strictEqual(
+          store.filterState$.getSnapshot().value.filledDateOnly,
+          checked,
+        );
+
+        assert.strictEqual(savedFilters.at(-1)?.filledDateOnly, checked);
+      }
+    },
+  );
+
   test('restores the sort from the query string', () => {
     const { store } = setup(['score', 'desc']);
 
