@@ -880,9 +880,9 @@ class IMapClass<K extends MapSetKeyType, V>
         case 'update': {
           const { key } = action;
 
-          const curr = mut_result.get(key);
-
-          if (curr === undefined || !mut_result.has(key)) {
+          // Presence is `has` alone, as in `update`: a stored value may itself
+          // be `undefined`.
+          if (!mut_result.has(key)) {
             if (this.#showNotFoundMessage) {
               const keyStr = unknownToString(key);
 
@@ -892,7 +892,9 @@ class IMapClass<K extends MapSetKeyType, V>
             break;
           }
 
-          mut_result.set(key, action.updater(curr));
+          // `has` held, so `get` returns the stored `V`, `undefined` included.
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          mut_result.set(key, action.updater(mut_result.get(key) as V));
 
           break;
         }
