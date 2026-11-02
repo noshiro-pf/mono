@@ -8,7 +8,6 @@ export default defineViteConfig({
   alias: {
     'ts-repo-utils': path.resolve(projectRootPath, './src/entry-point.mts'),
   },
-  passWithNoTests: true,
   coverage: {
     include: ['src/**/*.{mts,tsx}'],
   },

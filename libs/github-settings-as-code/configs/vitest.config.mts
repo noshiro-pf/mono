@@ -11,7 +11,6 @@ export default defineViteConfig({
       './src/entry-point.mts',
     ),
   },
-  passWithNoTests: true,
   coverage: {
     include: ['src/**/*.{mts,tsx}'],
   },

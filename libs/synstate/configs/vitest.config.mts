@@ -13,8 +13,16 @@ export default defineViteConfig({
       '../synstate-react-hooks/src/index.mts',
     ),
   },
-  passWithNoTests: true,
   node: {
+    exclude: [
+      '**/*.d.mts',
+      '**/index.mts',
+      'src/entry-point.mts',
+      // Helpers the samples import, with no test of their own: matched by the
+      // default `samples/**/*.mts`, each would fail as an empty test file.
+      'samples/docs-site/**/solid-js-client.mts',
+      'samples/docs-site/operators-on-signals/**/00-search-request.mts',
+    ],
     testTimeout: 30_000,
   },
   browser: {

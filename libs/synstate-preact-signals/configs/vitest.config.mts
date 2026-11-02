@@ -13,7 +13,6 @@ export default defineViteConfig({
     ),
     synstate: path.resolve(workspaceRootPath, '../synstate/src/index.mts'),
   },
-  passWithNoTests: true,
   browser: {
     provider: playwright(),
     includeSource: ['src/**/*.mts'],

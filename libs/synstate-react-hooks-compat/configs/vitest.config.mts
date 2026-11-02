@@ -13,7 +13,6 @@ export default defineViteConfig({
     ),
     synstate: path.resolve(workspaceRootPath, '../synstate/src/index.mts'),
   },
-  passWithNoTests: true,
   // `test/browser/` renders components, so it belongs to the browser project
   // alone; everything directly under `test/` runs in both.
   node: {
