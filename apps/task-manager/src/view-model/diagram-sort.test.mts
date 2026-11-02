@@ -31,16 +31,26 @@ describe(diagramSortStorage.parse, () => {
     ]);
   });
 
-  test('is title ascending for what is not a sort', () => {
+  test('is title ascending for what is not a list', () => {
     for (const stored of [
       '',
       'not json',
       '{}',
       '"title"',
+      '{"sort":[{"key":"title","order":"desc"}],"hideDone":false}',
+    ]) {
+      assert.deepStrictEqual(
+        diagramSortStorage.parse(stored),
+        DEFAULT_DIAGRAM_SORT,
+      );
+    }
+  });
+
+  test('is title ascending for a list of nothing but broken entries', () => {
+    for (const stored of [
       '[{"key":"colour","order":"asc"}]',
       '[{"key":"title","order":"up"}]',
       '[{"key":"title"}]',
-      '{"sort":[{"key":"title","order":"desc"}],"hideDone":false}',
     ]) {
       assert.deepStrictEqual(
         diagramSortStorage.parse(stored),
@@ -60,25 +70,21 @@ describe(diagramSortStorage.parse, () => {
 });
 
 describe('a partly broken diagram sort', () => {
-  test('keeps the keys that are fine and repairs the rest field by field', () => {
+  test('keeps the keys that are fine and drops the rest', () => {
     assert.deepStrictEqual(
       diagramSortStorage.parse(
-        '[{"key":"priority","order":"desc"},{"key":"status","order":"sideways"}]',
+        '[{"key":"colour","order":"desc"},{"key":"priority","order":"desc"},{"key":"status","order":"sideways"},3]',
       ),
-      [
-        { key: 'priority', order: 'desc' },
-        { key: 'status', order: 'asc' },
-      ],
+      [{ key: 'priority', order: 'desc' }],
     );
   });
 
-  test('repairs an entry that is not a sort key to title ascending', () => {
+  test('drops an unknown key rather than turning it into title', () => {
     assert.deepStrictEqual(
-      diagramSortStorage.parse('[{"key":"priority","order":"desc"},3]'),
-      [
-        { key: 'priority', order: 'desc' },
-        { key: 'title', order: 'asc' },
-      ],
+      diagramSortStorage.parse(
+        '[{"key":"colour","order":"desc"},{"key":"title","order":"asc"}]',
+      ),
+      [{ key: 'title', order: 'asc' }],
     );
   });
 });

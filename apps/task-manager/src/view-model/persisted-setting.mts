@@ -10,8 +10,9 @@
  * are preferences, not data. It goes through the codec's `fill`, so a record
  * that is partly broken keeps the fields that are fine and has the default in
  * place of each broken or missing one (field by field, in the elements of an
- * array too), and fields the codec does not know are dropped. `normalize` then
- * tidies what was read, the default included.
+ * array too, unless the codec says otherwise, as the sort keys' drop a broken
+ * one), and fields the codec does not know are dropped. `normalize` then tidies
+ * what was read, the default included.
  */
 
 import { Json, Result } from 'ts-data-forge';
