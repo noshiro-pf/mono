@@ -19,6 +19,8 @@ type Props = Readonly<{
 }>;
 
 export const LabelButtons = memoNamed<Props>('LabelButtons', (props) => {
+  const labelListId = React.useId();
+
   const labelsWithVisibleFlag = React.useMemo(
     () =>
       props.labels.map((label) =>
@@ -51,24 +53,26 @@ export const LabelButtons = memoNamed<Props>('LabelButtons', (props) => {
         `}
       >
         {'Labels'}
-        {props.hidden ? (
-          <Button
-            icon={'double-chevron-down'}
-            onClick={props.handlers.expandLabelList}
-          />
-        ) : (
-          <Button
-            icon={'double-chevron-up'}
-            onClick={props.handlers.collapseLabelList}
-          />
-        )}
+        <Button
+          aria-controls={labelListId}
+          aria-expanded={!props.hidden}
+          aria-label={'Labels'}
+          icon={props.hidden ? 'double-chevron-down' : 'double-chevron-up'}
+          onClick={
+            props.hidden
+              ? props.handlers.expandLabelList
+              : props.handlers.collapseLabelList
+          }
+        />
       </div>
 
-      <Collapse isOpen={!props.hidden}>
+      <Collapse isOpen={!props.hidden} keepChildrenMounted>
         <div
           css={css`
             overflow-y: auto;
           `}
+          data-e2e={'label-list'}
+          id={labelListId}
         >
           {labelsWithVisibleFlag.map(([label, isVisible], index) => (
             <LabelButtonItem
