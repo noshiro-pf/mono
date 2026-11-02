@@ -1,13 +1,16 @@
 /**
- * Replace all instances of a substring in a string, using a regular expression
- * or search string.
+ * A function that replaces every match of `searchValue` in its argument with
+ * `replaceValue`, and says so when there was nothing to replace.
  *
- * @param searchValue A string to search for.
- * @param replaceValue A string containing the text to replace for every
- *   successful match of searchValue in this string.
- * @param options Options. The default value is `{ throwOnNotFound: true,
- *   throwOnNoChange: true }`
- * @throws {Error} If no match is found.
+ * @param searchValue A string, matched with flexible whitespace (see
+ *   `flexibleWhitespaceRegExp`), or a `RegExp` used as it is.
+ * @param replaceValue The replacement for every match. `$1` and the other
+ *   `$`-patterns of `String#replaceAll` work.
+ * @param options What to do when nothing matches (`onNotFound`, default
+ *   `'throw'`) and when the replacement leaves the text as it was
+ *   (`onNoChange`, default `'off'`: it passes silently unless asked).
+ * @throws {Error} When nothing matches and `onNotFound` is `'throw'` (the
+ *   default), or the text is unchanged and `onNoChange` is `'throw'`.
  */
 export const replaceWithNoMatchCheck =
   (
