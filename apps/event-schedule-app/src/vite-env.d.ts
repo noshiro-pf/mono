@@ -53,6 +53,12 @@ import type {
 } from './types/index.mjs';
 
 declare global {
+  /* Vite: the variables this app reads from `.env.*` */
+  interface ImportMetaEnv {
+    /** `true` to use the Firebase emulators (`api/emulator-mode.mts`). */
+    readonly VITE_FIREBASE_EMULATORS?: string;
+  }
+
   /* @blueprintjs/core */
   type HTMLInputProps = HTMLInputProps_;
 
