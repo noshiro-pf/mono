@@ -6,7 +6,7 @@ export const CodeArea = memoNamed(
   'CodeArea',
   ({
     value,
-    valueChange = () => undefined,
+    valueChange,
     minHeightPx,
     maxHeightPx,
     cyId,
@@ -20,7 +20,7 @@ export const CodeArea = memoNamed(
     const onChange = Preact.useCallback(
       (ev: Readonly<{ target: EventTarget | null }>) => {
         if (ev.target instanceof HTMLTextAreaElement) {
-          valueChange(ev.target.value);
+          valueChange?.(ev.target.value);
         }
       },
       [valueChange],
@@ -37,6 +37,8 @@ export const CodeArea = memoNamed(
     return (
       <TextArea
         data-e2e={cyId}
+        // Without a handler the area shows output only.
+        readOnly={valueChange === undefined}
         style={style}
         value={value}
         onChange={onChange}

@@ -1,0 +1,13 @@
+.root {
+  padding: 10px;
+  min-height: 100vh;
+}
+
+.description {
+  padding: 10px;
+}
+
+.textAreaWrapper {
+  padding: 10px;
+  width: 100%;
+}

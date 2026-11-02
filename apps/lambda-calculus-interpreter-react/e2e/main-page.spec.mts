@@ -6,6 +6,14 @@ test('visit main page', { tag: '@smoke' }, async ({ page }) => {
   await expect.soft(page.getByTestId('input-area')).toBeVisible();
 });
 
+test('the output area is read-only', { tag: '@smoke' }, async ({ page }) => {
+  await page.goto('/');
+
+  await expect.soft(page.getByTestId('input-area')).toBeEditable();
+
+  await expect.soft(page.getByTestId('output-area')).not.toBeEditable();
+});
+
 const testCases = [
   {
     title: '4 + 5 = 9',
