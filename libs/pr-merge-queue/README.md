@@ -258,22 +258,24 @@ issue per session, up to three sessions at once (`--concurrency`), never two
 on one issue. It looks again as soon as a session ends, and every 30 minutes
 (`--interval-min`) while a slot is free.
 
-The command runs `start-issue` on the issue before the session starts, so
-that the `in-progress` label is its own to take off. The session decides
-first whether the issue can be finished by one pull request without a
-person; if not, it says why in a comment on the issue and ends. Otherwise it
-does the work in the worktree the command made for it from the latest
-`origin/main`, under `~/.local/state/unblock-prs`, follows the
-repository's own instructions to the pull request, and opens it with
-`open-pr`, held by `skip-ci`, ending its description with `Closes #N`:
+The command runs `start-issue` on the issue before the session starts, so that
+the `in-progress` label is its own to take off. The session checks first whether
+every part of the issue is already on `main`, done by a pull request that never
+named it; if so, it says in a comment which pull request or commit did each
+part, closes the issue as completed and ends. It then decides whether the issue
+can be finished by one pull request without a person; if not, it says why in a
+comment on the issue and ends. Otherwise it does the work in the worktree the
+command made for it from the latest `origin/main`, under
+`~/.local/state/unblock-prs`, follows the repository's own instructions to the
+pull request, and opens it with `open-pr`, held by `skip-ci`, ending its
+description with `Closes #N`:
 queueing it is still the author's. When the session ends with no open pull
 request that closes the issue, the command takes the label off, and does not
 hand the issue to another session until someone changes it; nor one
 `start-issue` refuses. That record is kept across runs, in
-`run-issue-resolver/<owner>/<name>.json` beside the worktrees; removing the
-file hands every issue on once more. A second Ctrl+C stops the command at
-once, as it does the worker, and leaves the label on: `start-issue --release`
-takes it off.
+`run-issue-resolver/<owner>/<name>.json` beside the worktrees; removing the file
+hands every issue on once more. A second Ctrl+C stops the command at once, as it
+does the worker, and leaves the label on: `start-issue --release` takes it off.
 
 - **It runs only on the API key**, and refuses every other credential as
   `run-unblock-prs-skill` does (above). It also stops the session at its

@@ -657,7 +657,9 @@ const runIssue = async (
       return ran;
 
     case 'closed':
-      log(`#${next.number}: closed.`);
+      log(
+        `#${next.number}: closed — found already done by the session, or closed meanwhile; its last comment says which.`,
+      );
 
       return ran;
 
