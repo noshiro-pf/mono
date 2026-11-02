@@ -17,6 +17,15 @@ const tester = new RuleTester({
   },
 });
 
+// What the report and its suggestion name when the file imports the module as a
+// namespace.
+const namespaceData = {
+  original: 'parseFloat(s)',
+  argName: 's',
+  namespaceName: 'tsf.SafeNumber',
+  resultName: 'tsf.Result',
+} as const;
+
 describe('prefer-safe-number-parse', () => {
   tester.run('prefer-safe-number-parse', preferSafeNumberParse, {
     valid: [
@@ -113,6 +122,33 @@ describe('prefer-safe-number-parse', () => {
                   import { Result, SafeNumber } from 'ts-std-forge';
                   const a = parseFloat('12px');
                   const b = Result.unwrapOkOr(SafeNumber.parse(''), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'writes through a namespace import, and names what it writes',
+        code: dedent`
+          import * as tsf from 'ts-std-forge';
+
+          declare const s: string;
+          const n = parseFloat(s);
+        `,
+        errors: [
+          {
+            messageId: 'useSafeParseFloat',
+            data: namespaceData,
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                data: namespaceData,
+                output: dedent`
+                  import * as tsf from 'ts-std-forge';
+
+                  declare const s: string;
+                  const n = tsf.Result.unwrapOkOr(tsf.SafeNumber.parse(s), Number.NaN);
                 `,
               },
             ],

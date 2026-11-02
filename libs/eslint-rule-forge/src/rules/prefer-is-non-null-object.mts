@@ -3,8 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { hasForeignBinding } from '../bindings.mjs';
-import { bindValueImports } from '../imports.mjs';
+import { bindValueImportsAt } from '../imports.mjs';
 import { getRangeWithParens, parenthesesDepth } from '../parentheses.mjs';
 import { skipTypeWrappers } from '../type-wrappers.mjs';
 
@@ -28,7 +27,7 @@ export const createPreferIsNonNullObject = ({
       fixable: 'code',
       schema: [],
       messages: {
-        useIsNonNullObject: `Replace the object/null check with \`isNonNullObject()\` from ${moduleName}.`,
+        useIsNonNullObject: `Replace the object/null check with \`{{isNonNullObject}}()\` from ${moduleName}.`,
       },
       defaultOptions: [],
     },
@@ -54,15 +53,21 @@ export const createPreferIsNonNullObject = ({
           );
         },
         'Program:exit': () => {
-          const binding = bindValueImports(sourceCode, moduleName, [
+          if (mut_pairsToFix.length === 0) {
+            return;
+          }
+
+          const bindingAt = bindValueImportsAt(sourceCode, moduleName, [
             'isNonNullObject',
           ]);
-
-          const localName = binding?.localNames[0];
 
           // Every fix brings `isNonNullObject` into scope itself, so that one
           // applied alone (an editor's quick fix) is complete.
           for (const { range, identifierName, chain } of mut_pairsToFix) {
+            const binding = bindingAt(chain);
+
+            const localName = binding?.localNames[0];
+
             const loc = {
               start: sourceCode.getLocFromIndex(range[0]),
               end: sourceCode.getLocFromIndex(range[1]),
@@ -71,10 +76,12 @@ export const createPreferIsNonNullObject = ({
             context.report({
               loc,
               messageId: 'useIsNonNullObject',
+              data: {
+                // The name the fix writes; with no fix, the export's own.
+                isNonNullObject: localName ?? 'isNonNullObject',
+              },
               fix:
-                binding === undefined ||
-                localName === undefined ||
-                hasForeignBinding(sourceCode, chain, localName, moduleName)
+                binding === undefined || localName === undefined
                   ? null
                   : (fixer) => [
                       ...binding.edits(fixer),

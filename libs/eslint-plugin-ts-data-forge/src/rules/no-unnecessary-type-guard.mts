@@ -192,8 +192,9 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
           return (fixer) => [fixer.replaceText(propertyNode, replacement)];
         }
 
-        // The replacement guard's local name, added to the imports when the
-        // file does not import it; no fix when it cannot be bound there.
+        // The replacement guard's local name, or the guard through a namespace
+        // import, added to the imports when the file has neither; no fix when
+        // it cannot be bound there.
         const guard = guardAt(replacement)(propertyNode);
 
         return guard === undefined
@@ -242,7 +243,8 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           node: node as TSESTree.Node,
           messageId: 'replaceTypeGuard',
-          // The name the fix writes: an aliased import's local name.
+          // The name the fix writes: an aliased import's local name, or the
+          // guard through a namespace import.
           data: {
             from,
             to: isNamespace ? to : (guardAt(to)(propertyNode)?.localName ?? to),

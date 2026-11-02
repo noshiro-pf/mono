@@ -5,8 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { hasForeignBinding } from '../bindings.mjs';
-import { bindValueImports } from '../imports.mjs';
+import { bindValueImportsAt } from '../imports.mjs';
 import { getArgumentText } from '../parentheses.mjs';
 import {
   isIdentifierNamed,
@@ -142,7 +141,7 @@ const createSafeParseRule = <MessageId extends string>(
       schema: [],
       messages: {
         ...messages,
-        replaceWithSafeParse: `Replace with \`Result.unwrapOkOr(${namespace}.${method}({{argName}}), Number.NaN)\`.`,
+        replaceWithSafeParse: `Replace with \`{{resultName}}.unwrapOkOr({{namespaceName}}.${method}({{argName}}), Number.NaN)\`.`,
       },
       defaultOptions: [],
     },
@@ -185,18 +184,15 @@ const createSafeParseRule = <MessageId extends string>(
           mut_reports.push({ node, argExpression: firstArg });
         },
         'Program:exit': () => {
-          const binding = bindValueImports(
+          if (mut_reports.length === 0) {
+            return;
+          }
+
+          const bindingAt = bindValueImportsAt(
             sourceCode,
             moduleName,
             requiredImports,
           );
-
-          const localNameOf = (name: string): string | undefined =>
-            binding?.localNames[requiredImports.indexOf(name)];
-
-          const namespaceName = localNameOf(namespace);
-
-          const resultName = localNameOf('Result');
 
           // A suggestion, never an autofix: the replacement parses some
           // strings differently (`parseInt('1e3')` is 1, the rewrite 1000;
@@ -204,11 +200,23 @@ const createSafeParseRule = <MessageId extends string>(
           // rewrite NaN), so applying it is a person's decision. Each one
           // brings its names into scope itself, so that it is complete alone.
           for (const { node, argExpression } of mut_reports) {
+            const binding = bindingAt(node);
+
+            const localNameOf = (name: string): string | undefined =>
+              binding?.localNames[requiredImports.indexOf(name)];
+
+            const namespaceName = localNameOf(namespace);
+
+            const resultName = localNameOf('Result');
+
             const argText = getArgumentText(sourceCode, argExpression);
 
             const data = {
               original: sourceCode.getText(node),
               argName: argText,
+              // The names the suggestion writes; with none, the exports' own.
+              namespaceName: namespaceName ?? namespace,
+              resultName: resultName ?? 'Result',
             } as const;
 
             context.report({
@@ -218,10 +226,7 @@ const createSafeParseRule = <MessageId extends string>(
               suggest:
                 binding === undefined ||
                 namespaceName === undefined ||
-                resultName === undefined ||
-                [namespaceName, resultName].some((name) =>
-                  hasForeignBinding(sourceCode, node, name, moduleName),
-                )
+                resultName === undefined
                   ? []
                   : [
                       {
@@ -244,12 +249,12 @@ const createSafeParseRule = <MessageId extends string>(
   } as const;
 };
 
-const messageText = ({
-  moduleName,
-  namespace,
-  method,
-}: SafeParseRuleConfig): string =>
-  `Replace \`{{original}}\` with \`Result.unwrapOkOr(${namespace}.${method}({{argName}}), Number.NaN)\` from ${moduleName}. It parses some strings differently from the call it replaces, so check the input before applying it.` as const;
+/**
+ * The report's message. `{{namespaceName}}` and `{{resultName}}` are the names
+ * the suggestion writes.
+ */
+const messageText = ({ moduleName, method }: SafeParseRuleConfig): string =>
+  `Replace \`{{original}}\` with \`{{resultName}}.unwrapOkOr({{namespaceName}}.${method}({{argName}}), Number.NaN)\` from ${moduleName}. It parses some strings differently from the call it replaces, so check the input before applying it.` as const;
 
 /** Whether `callee` is the global function `name`, as in `parseInt(...)`. */
 const isGlobalCall = (callee: TSESTree.Expression, name: string): boolean =>

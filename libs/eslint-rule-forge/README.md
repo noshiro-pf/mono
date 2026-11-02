@@ -137,6 +137,7 @@ The range and the text of a node leave out the parentheses written around it.
 | `importedNameOf`        | the export name an import specifier imports (`'x'` for `import { x as y }`)                                                                     |
 | `buildCalleeResolver`   | which export a callee calls, through aliases, namespace imports and type wrappers                                                               |
 | `bindValueImports`      | the local names to write for exports, and the edits binding them as values (in the existing import)                                             |
+| `bindValueImportsAt`    | the same at a node, through a namespace import (`ns.x`) when there is one and no local binding shadows it, or `undefined` where a name is taken |
 | `buildNamedImportFix`   | a fix inserting a new `import { … } from '<module>';` after the directive prologue                                                              |
 | `addTypeImports`        | the edits importing types: into an `import type { … }`, else as `type X` into another import                                                    |
 | `addToImportBraces`     | a fix adding specifiers to a declaration's braces, empty ones included, or `undefined` without any                                              |

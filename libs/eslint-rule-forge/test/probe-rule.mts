@@ -15,13 +15,14 @@ export type ProbeContext = Readonly<
  * with `read(context, argument)` as the message. A test asserts on that
  * message, which is how a helper that needs a rule context — the source code,
  * the scope manager, a fixer — is run on real parser output. `fix`, when given,
- * is offered as the report's fix.
+ * is offered as the report's fix, given the same argument.
  */
 export const probeRule = (
   read: (context: ProbeContext, argument: TSESTree.Expression) => string,
   fix?: (
     context: ProbeContext,
     fixer: TSESLint.RuleFixer,
+    argument: TSESTree.Expression,
   ) => readonly TSESLint.RuleFix[],
 ): TSESLint.RuleModule<'result'> =>
   ({
@@ -49,7 +50,9 @@ export const probeRule = (
           node,
           messageId: 'result',
           data: { result: read(context, argument) },
-          ...(fix === undefined ? {} : { fix: (fixer) => fix(context, fixer) }),
+          ...(fix === undefined
+            ? {}
+            : { fix: (fixer) => fix(context, fixer, argument) }),
         });
       },
     }),
