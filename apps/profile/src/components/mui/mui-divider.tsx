@@ -1,9 +1,7 @@
-import { styled } from 'goober';
+import { constant, type JSX } from 'synstate-dom';
+import * as styles from './mui-divider.module.css';
 
-export const MuiDivider = styled('hr')`
-  border: none;
-  height: 1px;
-  margin: 0;
-  flex-shrink: 0;
-  background-color: rgba(0, 0, 0, 0.12);
-`;
+/** MUI's `Divider` in the default theme's look. */
+export const MuiDivider = (): JSX.Element => (
+  <hr class={constant(styles.divider)} />
+);

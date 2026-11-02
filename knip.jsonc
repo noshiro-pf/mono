@@ -421,8 +421,8 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
-    // Not an Astro site like the entry above assumes: a Vite Preact app whose
-    // entry is the module `index.html` would load.
+    // Not an Astro site like the entry above assumes: a Vite synstate-dom app
+    // whose entry is the module `index.html` would load.
     "apps/profile": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],

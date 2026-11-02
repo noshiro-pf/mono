@@ -1,6 +1,6 @@
-import { memoNamed } from 'preact-utils';
+import { constant, type JSX } from 'synstate-dom';
 import { lastUpdatedAt } from '../assets/index.mjs';
 
-export const LastUpdatedAt = memoNamed('LastUpdatedAt', () => (
-  <div>{`（最終更新日：${lastUpdatedAt}）`}</div>
-));
+export const LastUpdatedAt = (): JSX.Element => (
+  <div>{constant(`（最終更新日：${lastUpdatedAt}）`)}</div>
+);

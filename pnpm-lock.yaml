@@ -1956,21 +1956,12 @@ importers:
 
   apps/profile:
     dependencies:
-      better-preact-use-state:
+      synstate:
         specifier: workspace:*
-        version: link:../../libs/better-preact-use-state
-      goober:
-        specifier: ^2.1.19
-        version: 2.1.19(csstype@3.2.3)
-      preact-utils:
+        version: link:../../libs/synstate
+      synstate-dom:
         specifier: workspace:*
-        version: link:../preact-utils
-      resize-observer-preact-hooks:
-        specifier: workspace:*
-        version: link:../resize-observer-preact-hooks
-      synstate-preact-hooks:
-        specifier: workspace:*
-        version: link:../../libs/synstate-preact-hooks
+        version: link:../../libs/synstate-dom
       tiny-router-observable:
         specifier: workspace:*
         version: link:../tiny-router-observable
@@ -2002,9 +1993,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      preact:
-        specifier: 'catalog:'
-        version: 10.29.8(preact-render-to-string@6.8.1)
       prettier:
         specifier: 'catalog:'
         version: 3.9.10

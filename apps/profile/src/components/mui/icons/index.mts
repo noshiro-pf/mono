@@ -1,2 +1,1 @@
-export * from './github.js';
-export * from './twitter.js';
+export * from './icon-link.js';
