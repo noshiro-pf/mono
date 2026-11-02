@@ -2,10 +2,8 @@
 
 import { Arr, Result } from 'ts-data-forge';
 import { parseCommandArgs, positiveInteger } from '../lib/index.mjs';
-import {
-  MAX_INTERVAL_MIN,
-  parseMaxBudgetUsd,
-} from '../run-unblock-prs-skill/index.mjs';
+import { MAX_INTERVAL_MIN, parseUsd } from '../run-unblock-prs-skill/index.mjs';
+import { CAP_PER_AVERAGE, FIRST_CAP_SHARE } from './pool.mjs';
 
 export const parseOptions = (
   args: readonly string[],
@@ -14,7 +12,7 @@ export const parseOptions = (
     once: { type: 'boolean' },
     'dry-run': { type: 'boolean' },
     'interval-min': { type: 'string' },
-    'max-budget-usd': { type: 'string' },
+    'max-total-usd': { type: 'string' },
     'max-sessions': { type: 'string' },
     concurrency: { type: 'string' },
     model: { type: 'string' },
@@ -73,10 +71,16 @@ export const parseOptions = (
     );
   }
 
-  const maxBudgetUsd = parseMaxBudgetUsd(values['max-budget-usd']);
+  // Required, because the alternative is an amount nobody chose.
+  const maxTotalUsd =
+    values['max-total-usd'] === undefined
+      ? Result.err(
+          '--max-total-usd is required: what the run may spend on the Claude API in all',
+        )
+      : parseUsd('max-total-usd', values['max-total-usd']);
 
-  if (Result.isErr(maxBudgetUsd)) {
-    return maxBudgetUsd;
+  if (Result.isErr(maxTotalUsd)) {
+    return maxTotalUsd;
   }
 
   const authors = Arr.uniq(
@@ -91,7 +95,7 @@ export const parseOptions = (
     once: values.once ?? false,
     dryRun: values['dry-run'] ?? false,
     intervalMin: intervalMin.value,
-    maxBudgetUsd: maxBudgetUsd.value,
+    maxTotalUsd: maxTotalUsd.value,
     maxSessions: maxSessions.value,
     concurrency: concurrency.value,
     model: values.model,
@@ -106,8 +110,12 @@ export type Options = Readonly<{
   dryRun: boolean;
   /** How long it waits between rounds that find nothing. */
   intervalMin: number;
-  /** What one session may spend, passed to `claude --max-budget-usd`. */
-  maxBudgetUsd: number;
+  /**
+   * What the run may spend in all. What each session may spend, passed to
+   * `claude --max-budget-usd`, follows from it and from what the issues
+   * resolved so far cost (`capForNext` in `pool.mts`).
+   */
+  maxTotalUsd: number;
   /** How many sessions it runs before it exits. */
   maxSessions: number;
   /** How many sessions it runs at once, each on an issue of its own. */
@@ -147,7 +155,7 @@ export const DEFAULT_CONCURRENCY = 3;
 export const MAX_CONCURRENCY = 8;
 
 export const HELP = [
-  'Usage: run-issue-resolver --max-budget-usd <n> [options]',
+  'Usage: run-issue-resolver --max-total-usd <n> [options]',
   '',
   'Starts the open issues nobody has started, one Claude Code session each,',
   'without a person, on the Claude API: surveys the issues as pr-report',
@@ -156,8 +164,11 @@ export const HELP = [
   '--concurrency at once, each in a directory of its own.',
   '',
   'Options:',
-  '  --max-budget-usd <n>  what one session, on one issue, may spend',
-  '                        (required)',
+  '  --max-total-usd <n>   what the run may spend in all (required). The',
+  `                        first session, alone, may spend ${FIRST_CAP_SHARE * 100}% of it;`,
+  '                        once one has resolved an issue, each may spend',
+  `                        ${CAP_PER_AVERAGE} times what one has cost on average, out of`,
+  '                        what is left besides those running',
   '  --max-sessions <n>    sessions to run before it exits',
   `                        (default ${DEFAULT_MAX_SESSIONS})`,
   '  --concurrency <n>     sessions to run at once, an issue each',
@@ -168,7 +179,7 @@ export const HELP = [
   `                        (default ${DEFAULT_INTERVAL_MIN}, at most ${MAX_INTERVAL_MIN})`,
   '  --model <model>       the model Claude Code runs (default: its own)',
   '  --once                one look: start as many issues as --concurrency',
-  '                        allows, wait for them, then exit',
+  '                        and the budget allow, wait for them, then exit',
   '  --dry-run             say what it would run; run and label nothing',
   '  -h, --help            show this help',
   '',

@@ -47,3 +47,18 @@ export type IssueAfter = Readonly<{
 }>;
 
 export type IssueVerdict = 'closed' | 'left' | 'not-started' | 'opened';
+
+/**
+ * Whether the session's cap is what stopped it: its result says so, or it spent
+ * as much. Such an issue is held for the run, not recorded, since a later run
+ * may cap a session on it higher.
+ */
+export const hitItsCap = (
+  result: ResultEvent | undefined,
+  capUsd: number,
+): boolean =>
+  result?.subtype === BUDGET_SUBTYPE ||
+  (result?.costUsd !== undefined && capUsd <= result.costUsd);
+
+/** What `claude -p` ends with when `--max-budget-usd` stopped it. */
+const BUDGET_SUBTYPE = 'error_max_budget_usd';

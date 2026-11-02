@@ -1,5 +1,5 @@
 import type { ResultEvent } from '../run-unblock-prs-skill/index.mjs';
-import { judgeIssueSession, type IssueAfter } from './verdict.mjs';
+import { hitItsCap, judgeIssueSession, type IssueAfter } from './verdict.mjs';
 
 const ended = (overrides: Partial<ResultEvent> = {}): ResultEvent =>
   ({
@@ -59,5 +59,21 @@ describe(judgeIssueSession, () => {
       judgeIssueSession(ended({ isError: true, costUsd: 0 }), after()),
       { verdict: 'not-started', release: true },
     );
+  });
+});
+
+describe(hitItsCap, () => {
+  test('is a session its cap stopped, as its result says or its cost shows', () => {
+    assert.isTrue(
+      hitItsCap(ended({ subtype: 'error_max_budget_usd', isError: true }), 5),
+    );
+
+    assert.isTrue(hitItsCap(ended({ costUsd: 5.02 }), 5));
+  });
+
+  test('is not one that ended under it, or whose result says nothing', () => {
+    assert.isFalse(hitItsCap(ended({ costUsd: 4.2 }), 5));
+
+    assert.isFalse(hitItsCap(undefined, 5));
   });
 });

@@ -38,7 +38,13 @@ import {
   loadAttempted,
 } from './attempted.mjs';
 import type { Options } from './options.mjs';
-import { runPool, type RunError } from './pool.mjs';
+import {
+  firstCapUsd,
+  runPool,
+  usd,
+  type RunError,
+  type RunOutcome,
+} from './pool.mjs';
 import {
   checkIssueInit,
   issueArgs,
@@ -46,22 +52,22 @@ import {
   type IssueRound,
 } from './session.mjs';
 import { HELD_LABELS, surveyIssues, type IssueCandidate } from './survey.mjs';
-import { judgeIssueSession, type IssueAfter } from './verdict.mjs';
+import { hitItsCap, judgeIssueSession, type IssueAfter } from './verdict.mjs';
 
 /**
  * Starts the open issues nobody has started, one `claude -p` session each, on
  * the Claude API and without a person: what a scheduled routine asked to
- * "implement the open issues" does, but on an API key with a budget per
- * session, and choosing the issue without the model. Each look reads how every
- * open issue stands for being started (`docs/issue-start-after.md`, as
- * `pr-report` decides it), and starts a session only on one that is startable
- * and that one of the authors wrote ({@link surveyIssues}). A look that finds
- * nothing costs GitHub requests and no tokens.
+ * "implement the open issues" does, but on an API key with a budget for the
+ * run, and choosing the issue without the model. Each look reads how every open
+ * issue stands for being started (`docs/issue-start-after.md`, as `pr-report`
+ * decides it), and starts a session only on one that is startable and that one
+ * of the authors wrote ({@link surveyIssues}). A look that finds nothing costs
+ * GitHub requests and no tokens.
  *
  * ```sh
- * run-issue-resolver --max-budget-usd 5            # until --max-sessions or Ctrl+C
- * run-issue-resolver --max-budget-usd 5 --once     # one look, --concurrency issues at most
- * run-issue-resolver --max-budget-usd 5 --dry-run  # say what it would run
+ * run-issue-resolver --max-total-usd 20            # until the budget, --max-sessions or Ctrl+C
+ * run-issue-resolver --max-total-usd 20 --once     # one look, --concurrency issues at most
+ * run-issue-resolver --max-total-usd 20 --dry-run  # say what it would run
  * ```
  *
  * **Up to `--concurrency` sessions at once**, each on an issue of its own and in
@@ -71,12 +77,18 @@ import { judgeIssueSession, type IssueAfter } from './verdict.mjs';
  * keeps one it is running out of the next look, and `start-issue` refuses one
  * labelled `in-progress` by another run of the command.
  *
- * **One issue per session**, so that the budget is per issue and what a session
- * was handed is exactly what it tried. This command runs `start-issue` on it
- * first, so that the `in-progress` label is its own to take off again; the
- * session decides whether the issue can be finished unattended, and opens the
- * pull request with `open-pr`, held by `skip-ci` like any other: queueing it
- * stays the author's. What it is told is `issueInstructions` in `session.mts`.
+ * **What a session may spend follows what issues cost.** Until one resolves its
+ * issue, sessions run one at a time, each capped at a quarter of
+ * `--max-total-usd`; after, each is capped at a multiple of what a resolved
+ * issue has cost on average, and as many run as the budget holds those caps for
+ * (`capForNext` in `pool.mts`).
+ *
+ * **One issue per session**, so that a cost is per issue and what a session was
+ * handed is exactly what it tried. This command runs `start-issue` on it first,
+ * so that the `in-progress` label is its own to take off again; the session
+ * decides whether the issue can be finished unattended, and opens the pull
+ * request with `open-pr`, held by `skip-ci` like any other: queueing it stays
+ * the author's. What it is told is `issueInstructions` in `session.mts`.
  *
  * An issue the session ended on without a pull request that closes it has the
  * label taken off, and is not handed on again until someone changes it, across
@@ -141,7 +153,7 @@ export const runIssueResolver = async (
   installStopHandlers();
 
   log(
-    `Starting issues written by ${authors.value.join(', ')}, at most ${options.maxSessions} sessions, ${options.concurrency} at once.`,
+    `Starting issues written by ${authors.value.join(', ')}, at most ${options.maxSessions} sessions, ${options.concurrency} at once, ${usd(options.maxTotalUsd)} in all.`,
   );
 
   // Each issue handed to a session, with its `updatedAt` as the session left
@@ -165,12 +177,24 @@ export const runIssueResolver = async (
     }
   };
 
+  // Each issue a session's cap stopped, held for this run alone: a later one
+  // may cap a session on it higher.
+  const mut_cutOff = new Map<number, string | undefined>();
+
+  const keep: Keep = {
+    record,
+    holdForThisRun: (number, updatedAt) => {
+      mut_cutOff.set(number, updatedAt);
+    },
+  } as const;
+
   return runPool(
     {
       concurrency: options.concurrency,
       maxSessions: options.maxSessions,
       once: options.once,
       intervalMs: options.intervalMin * 60_000,
+      totalUsd: options.maxTotalUsd,
     },
     {
       survey: async () =>
@@ -181,9 +205,16 @@ export const runIssueResolver = async (
           options,
           stateFile,
           mut_attempted,
+          mut_cutOff,
         ),
-      run: async (next) =>
-        runIssue(shared, context.value, authors.value, options, record, next),
+      run: async (next, capUsd) =>
+        runIssue(
+          shared,
+          context.value,
+          roundOf(next, authors.value, options.model, capUsd),
+          keep,
+          next,
+        ),
       pause,
       stopRequested,
       now: Date.now,
@@ -313,7 +344,7 @@ const runSession = async (
   }
 
   log(
-    `Starting a session on #${round.number} in ${worktree}, for at most $${round.maxBudgetUsd}.`,
+    `Starting a session on #${round.number} in ${worktree}, for at most ${usd(round.maxBudgetUsd)}.`,
   );
 
   // It resolves whatever happens.
@@ -339,6 +370,14 @@ const runSession = async (
   return outcome;
 };
 
+/** Where an issue a session ended on is kept from being handed on again. */
+type Keep = Readonly<{
+  /** In the record, across runs, until someone changes the issue. */
+  record: (number: number, updatedAt: string | undefined) => Promise<void>;
+  /** For this run alone, for one its cap stopped. */
+  holdForThisRun: (number: number, updatedAt: string | undefined) => void;
+}>;
+
 /** What every session of the run is started from. */
 type Shared = Readonly<{
   /** The checkout the command runs in, which every worktree is made from. */
@@ -356,14 +395,15 @@ type Shared = Readonly<{
 const roundOf = (
   next: IssueCandidate,
   authors: readonly string[],
-  options: Options,
+  model: string | undefined,
+  capUsd: number,
 ): StrictOmit<IssueRound, 'workDir'> =>
   ({
     number: next.number,
     url: next.url,
     authors,
-    maxBudgetUsd: options.maxBudgetUsd,
-    model: options.model,
+    maxBudgetUsd: capUsd,
+    model,
   }) as const;
 
 /**
@@ -377,6 +417,7 @@ const survey = async (
   options: Options,
   stateFile: string,
   mut_attempted: Map<number, string | undefined>,
+  cutOff: ReadonlyMap<number, string | undefined>,
 ): Promise<
   Result<
     Readonly<{ fresh: readonly IssueCandidate[]; notes: string }>,
@@ -410,16 +451,34 @@ const survey = async (
     mut_attempted.set(number, updatedAt);
   }
 
+  // One held for this run is held as a recorded one is, while it stands.
+  const mut_held = new Map(mut_attempted);
+
+  for (const [number, updatedAt] of cutOff) {
+    mut_held.set(number, updatedAt);
+  }
+
   const found = surveyIssues(
     read.value.report.issues,
     new Set<string>(authors),
-    mut_attempted,
+    mut_held,
   );
 
+  const stoppedAtCap = found.left.filter(
+    (number) => cutOff.has(number) && !mut_attempted.has(number),
+  );
+
+  const left = found.left.filter((number) => !stoppedAtCap.includes(number));
+
   const notes = [
-    ...(Arr.isNonEmpty(found.left)
+    ...(Arr.isNonEmpty(left)
       ? [
-          `${numbers(found.left)}: an earlier session left them as they stand; waiting for someone to change them.`,
+          `${numbers(left)}: an earlier session left them as they stand; waiting for someone to change them.`,
+        ]
+      : []),
+    ...(Arr.isNonEmpty(stoppedAtCap)
+      ? [
+          `${numbers(stoppedAtCap)}: a session stopped at its cap; a later run, capping one higher, tries again.`,
         ]
       : []),
     ...(Arr.isNonEmpty(found.foreign)
@@ -439,10 +498,19 @@ const survey = async (
     return Result.ok({ fresh: found.fresh, notes });
   }
 
-  for (const next of found.fresh.slice(0, options.concurrency)) {
+  // A run starts with one session, until an issue is resolved.
+  for (const next of Arr.take(found.fresh, 1)) {
     const workDir = path.join(WORKTREE_ROOT, 'run-issue-resolver-XXXXXX');
 
-    const wouldRun = issueArgs({ ...roundOf(next, authors, options), workDir });
+    const wouldRun = issueArgs({
+      ...roundOf(
+        next,
+        authors,
+        options.model,
+        firstCapUsd(options.maxTotalUsd),
+      ),
+      workDir,
+    });
 
     log(
       `Would run start-issue ${next.number}, then make ${issueWorktree(workDir)} from origin/main in ${root}, and in it: claude ${wouldRun.map(sh).join(' ')}`,
@@ -455,17 +523,21 @@ const survey = async (
 /**
  * Starts the issue, runs one session on it, and settles its label and its
  * record; `spent` when the session may have cost anything, which is what
- * `--max-sessions` counts.
+ * `--max-sessions` counts, and `costUsd` what its result says it cost, which is
+ * what `--max-total-usd` counts.
  */
 const runIssue = async (
   shared: Shared,
   context: ApiContext,
-  authors: readonly string[],
-  options: Options,
-  record: (number: number, updatedAt: string | undefined) => Promise<void>,
+  round: StrictOmit<IssueRound, 'workDir'>,
+  keep: Keep,
   next: IssueCandidate,
-): Promise<Result<Readonly<{ spent: boolean }>, RunError>> => {
-  const notSpent = Result.ok({ spent: false } as const);
+): Promise<Result<RunOutcome, RunError>> => {
+  const notSpent = Result.ok({
+    spent: false,
+    costUsd: undefined,
+    resolved: false,
+  } as const);
 
   // Before anything is spent, and here rather than in the session: a label this
   // command put on is one it may take off again.
@@ -487,7 +559,7 @@ const runIssue = async (
 
     log(started.value);
 
-    await record(next.number, next.updatedAt);
+    await keep.record(next.number, next.updatedAt);
 
     return notSpent;
   }
@@ -495,14 +567,13 @@ const runIssue = async (
   log(started.value);
 
   // Whatever happens from here on, the label is settled below.
-  const outcome = await runSession(
-    shared,
-    roundOf(next, authors, options),
-  ).catch((error: unknown): ClaudeOutcome => ({
-    kind: 'refused',
-    cause: 'start',
-    message: `cannot start the session: ${unknownToString(error)}`,
-  }));
+  const outcome = await runSession(shared, round).catch(
+    (error: unknown): ClaudeOutcome => ({
+      kind: 'refused',
+      cause: 'start',
+      message: `cannot start the session: ${unknownToString(error)}`,
+    }),
+  );
 
   const after =
     outcome?.kind === 'ran'
@@ -554,16 +625,28 @@ const runIssue = async (
   // cannot be read is held until the record is removed, rather than paid for
   // again on the strength of a change that may be this command's own. One a
   // stop cut short is not held: the session decided nothing.
+  const cutOff =
+    verdict === 'left' && hitItsCap(outcome.result, round.maxBudgetUsd);
+
   if (spent && !stopRequested()) {
     const settled = await readIssue(context, next.number);
 
-    await record(
-      next.number,
-      Result.isOk(settled) ? settled.value.updatedAt : undefined,
-    );
+    const updatedAt = Result.isOk(settled)
+      ? settled.value.updatedAt
+      : undefined;
+
+    if (cutOff) {
+      keep.holdForThisRun(next.number, updatedAt);
+    } else {
+      await keep.record(next.number, updatedAt);
+    }
   }
 
-  const ran = Result.ok({ spent } as const);
+  const ran = Result.ok({
+    spent,
+    costUsd: outcome.result?.costUsd,
+    resolved: verdict === 'opened',
+  } as const);
 
   switch (verdict) {
     case 'opened':
@@ -580,7 +663,9 @@ const runIssue = async (
 
     case 'left':
       log(
-        `#${next.number}: left with no pull request that closes it; not handed on again until someone changes it.`,
+        cutOff
+          ? `#${next.number}: stopped at its ${usd(round.maxBudgetUsd)} cap with no pull request that closes it; not handed on again in this run.`
+          : `#${next.number}: left with no pull request that closes it; not handed on again until someone changes it.`,
       );
 
       return ran;

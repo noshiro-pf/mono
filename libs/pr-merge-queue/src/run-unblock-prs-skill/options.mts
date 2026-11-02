@@ -131,6 +131,11 @@ export const parseMaxBudgetUsd = (
     );
   }
 
+  return parseUsd('max-budget-usd', raw);
+};
+
+/** `--<flag>`'s value as a positive amount in US dollars, written plainly. */
+export const parseUsd = (flag: string, raw: string): Result<number, string> => {
   // A whole part and an optional fraction, read apart so that neither pattern
   // repeats inside another.
   const [whole = '', fraction, ...rest] = raw.split('.');
@@ -145,6 +150,6 @@ export const parseMaxBudgetUsd = (
   return Number.isFinite(parsed) && Num.isNonZero(parsed)
     ? Result.ok(parsed)
     : Result.err(
-        `--max-budget-usd must be a positive amount in US dollars, got ${JSON.stringify(raw)}`,
+        `--${flag} must be a positive amount in US dollars, got ${JSON.stringify(raw)}`,
       );
 };
