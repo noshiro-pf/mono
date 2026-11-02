@@ -13,18 +13,30 @@ Restored from `experimental/` — see
 
 ```sh
 pnpm run dev        # Vite dev server
-pnpm run emulators  # Functions, Firestore and Pub/Sub emulators
+pnpm run emulators  # Auth, Functions, Firestore and Pub/Sub emulators
 pnpm run build      # production build into `build/`, which firebase.json serves
 pnpm run preview    # serve that build
 ```
 
-In development the app talks to the Firestore and Functions emulators
-(`useEmulators` in `src/env.mts`), so `dev` needs `emulators` running beside
-it. Sign-in still goes to the production Firebase Auth. `emulators` builds
-the functions in
+In development the app talks to the Auth, Firestore and Functions emulators, so
+`dev` needs `emulators` running beside it. Sign-in goes to the Auth emulator, so
+it needs no real account and the emulators' data is never tied to a production
+user id. `emulators` builds the functions in
 [`../event-schedule-app-functions`](../event-schedule-app-functions/README.md)
 first and keeps the emulators' data in `emulator-data/` between runs; run that
 package's `watch:build` to have the emulator pick up changes to the functions.
+
+The switch is `VITE_FIREBASE_EMULATORS`, which `.env.development` sets to
+`true`. To try the production Firebase from the dev server, set it to anything
+else, in an untracked `.env.development.local` (`VITE_FIREBASE_EMULATORS=false`)
+or on the command line (`VITE_FIREBASE_EMULATORS=false pnpm run dev`). A
+production build never connects to the emulators, whatever the variable says.
+
+The app reaches the emulators on the host name the page was opened from, so a
+phone opening the dev server by its LAN address (`pnpm run dev --host`) reaches
+them too — provided the emulators listen there as well: change each `"host"`
+under `emulators` in `firebase.json` to `"0.0.0.0"` while you do, and do not
+commit that change.
 
 The emulators load `firestore.rules`, so what they let the app do is what
 production lets it do. CI's `@emulators` e2e tests run against them, but along
@@ -47,11 +59,14 @@ pnpm run check:e2e:production # the @smoke and @production tests, against the si
 ```
 
 `check:e2e:emulators` starts its own emulators with empty data
-(`firebase emulators:exec`), so stop `pnpm run emulators` first: they listen
-on the same ports. `code-check.yml` runs it in the `ws:check:e2e:emulators`
-matrix entry, with Java 21 and Chromium installed. It builds the functions
-before starting the emulators and needs no Firebase credentials. The smoke
-tests run separately, in the `ws:check:e2e:shard-2` entry.
+(`firebase emulators:exec`), so stop `pnpm run emulators` first: they listen on
+the same ports. Its dev server always uses the emulators, whatever
+`VITE_FIREBASE_EMULATORS` says, and it never reuses a dev server already running
+(`configs/playwright.emulators.config.mts`), so stop `pnpm run dev` too.
+`code-check.yml` runs it in the `ws:check:e2e:emulators` matrix entry, with Java
+21 and Chromium installed. It builds the functions before starting the emulators
+and needs no Firebase credentials. The smoke tests run separately, in the
+`ws:check:e2e:shard-2` entry.
 
 `check:e2e:production` is run daily by
 [`e2e-production.yml`](../../.github/workflows/e2e-production.yml) against

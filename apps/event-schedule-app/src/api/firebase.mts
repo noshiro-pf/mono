@@ -1,6 +1,11 @@
 import { firebaseConfig, firestorePaths } from 'event-schedule-app-shared';
 import { initializeApp } from 'firebase/app';
-import { GoogleAuthProvider, getAuth, type Auth } from 'firebase/auth';
+import {
+  GoogleAuthProvider,
+  connectAuthEmulator,
+  getAuth,
+  type Auth,
+} from 'firebase/auth';
 import {
   collection,
   connectFirestoreEmulator,
@@ -14,8 +19,8 @@ import {
 } from 'firebase/functions';
 import type { DeepReadonly } from 'ts-type-forge';
 import firebaseJson from '../../firebase.json' with { type: 'json' };
-import { isDevelopment, useEmulators } from '../env.mjs';
 import { clog } from '../utils/index.mjs';
+import { emulatorEndpoints } from './emulator-mode.mjs';
 
 /** What the API functions are built on: one of each, made by `initializeFirebase`. */
 export type FirebaseHandles = DeepReadonly<{
@@ -26,8 +31,9 @@ export type FirebaseHandles = DeepReadonly<{
 }>;
 
 /**
- * Connects to Firebase — to the emulators in development. Called once, when the
- * app's API is made.
+ * Connects to Firebase — to the emulators in a development build, unless
+ * `VITE_FIREBASE_EMULATORS` says otherwise (`emulator-mode.mts`). Called once,
+ * when the app's API is made.
  */
 export const initializeFirebase = (): FirebaseHandles => {
   const fbApp = initializeApp(firebaseConfig);
@@ -38,30 +44,43 @@ export const initializeFirebase = (): FirebaseHandles => {
     ignoreUndefinedProperties: true,
   });
 
+  const fbAuth = getAuth(fbApp);
+
   const fbFunctions = getFunctions(fbApp, 'asia-northeast2');
 
-  if (isDevelopment && useEmulators) {
+  const emulators = import.meta.env.DEV
+    ? emulatorEndpoints(
+        import.meta.env.VITE_FIREBASE_EMULATORS,
+        document.location.hostname,
+        {
+          auth: firebaseJson.emulators.auth.port,
+          firestore: firebaseJson.emulators.firestore.port,
+          functions: firebaseJson.emulators.functions.port,
+        },
+      )
+    : undefined;
+
+  if (emulators !== undefined) {
+    connectAuthEmulator(fbAuth, emulators.authUrl, { disableWarnings: true });
+
     connectFirestoreEmulator(
       firestore,
-      'localhost',
-      firebaseJson.emulators.firestore.port,
+      emulators.firestore.host,
+      emulators.firestore.port,
     );
 
     connectFunctionsEmulator(
       fbFunctions,
-      'localhost',
-      firebaseJson.emulators.functions.port,
+      emulators.functions.host,
+      emulators.functions.port,
     );
 
-    // connectAuthEmulator(
-    //   auth,
-    //   `localhost:${firebaseJson.emulators.auth.port.toString()}`
-    // );
+    clog('Using the Firebase emulators', emulators);
   }
 
   return {
     firestoreEvents: collection(firestore, firestorePaths.events),
-    fbAuth: getAuth(fbApp),
+    fbAuth,
     googleAuthProvider: new GoogleAuthProvider(),
     fbFunctions,
   };
