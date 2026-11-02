@@ -1,36 +1,23 @@
 import type { NonZeroInt32 as TtfImported_NonZeroInt32 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  abs,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  randomNonZero as random,
+} from '../operators/non-zero-int32.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type NonZeroInt32 = TtfImported_NonZeroInt32;
 
 type ElementType = NonZeroInt32;
 
 const typeNameInMessage = 'a non-zero integer in [-2^31, 2^31)';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  abs,
-  castType,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  randomNonZero: random,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  number,
-  number
->({
-  integerOrSafeInteger: 'SafeInteger',
-  nonZero: true,
-  MIN_VALUE: -(2 ** 31),
-  MAX_VALUE: 2 ** 31 - 1,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a non-zero integer in [-2^31, 2^31).
@@ -41,7 +28,11 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-zero integer in [-2^31, 2^31), `false` otherwise
  */
-export const isNonZeroInt32 = is;
+export const isNonZeroInt32 = (value: number): value is NonZeroInt32 =>
+  Number.isSafeInteger(value) &&
+  value !== 0 &&
+  -(2 ** 31) <= value &&
+  value <= 2 ** 31 - 1;
 
 /**
  * Casts a `number` to the `NonZeroInt32` branded type.
@@ -53,7 +44,15 @@ export const isNonZeroInt32 = is;
  * @returns The value as a `NonZeroInt32`
  * @throws {TypeError} If the value is not a non-zero integer in [-2^31, 2^31)
  */
-export const asNonZeroInt32 = castType;
+export const asNonZeroInt32 = <N extends number>(
+  value: N,
+): NonZeroInt32 & N => {
+  if (!isNonZeroInt32(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NonZeroInt32` branded type.
@@ -69,7 +68,7 @@ export const NonZeroInt32 = {
    * @returns `true` if the value is a non-zero integer in [-2^31, 2^31), `false` otherwise
    * @see {@link isNonZeroInt32} for usage examples
    */
-  is,
+  is: isNonZeroInt32,
 
   /**
    * The smallest value representable as `NonZeroInt32` (the lower saturation

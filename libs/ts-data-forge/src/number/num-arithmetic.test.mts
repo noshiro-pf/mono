@@ -12,7 +12,7 @@ import {
   asPositiveInt,
   asUint,
 } from './branded-types/index.mjs';
-import { Num } from './num.mjs';
+import { Num } from './num/index.mjs';
 
 describe('Num arithmetic (general / sign-aware)', () => {
   describe('Num.add', () => {

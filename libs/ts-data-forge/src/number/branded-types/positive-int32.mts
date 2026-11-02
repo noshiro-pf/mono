@@ -1,37 +1,25 @@
 import type { PositiveInt32 as TtfImported_PositiveInt32 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/positive-int32.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type PositiveInt32 = TtfImported_PositiveInt32;
 
 type ElementType = PositiveInt32;
 
 const typeNameInMessage = 'a positive integer in [1, 2^31)';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  1,
-  number
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: 1,
-  MAX_VALUE: 2 ** 31 - 1,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a positive integer in [1, 2^31).
@@ -42,7 +30,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a positive integer in [1, 2^31), `false` otherwise
  */
-export const isPositiveInt32 = is;
+export const isPositiveInt32 = (value: number): value is PositiveInt32 =>
+  Number.isSafeInteger(value) && 1 <= value && value <= 2 ** 31 - 1;
 
 /**
  * Casts a `number` to the `PositiveInt32` branded type.
@@ -54,7 +43,15 @@ export const isPositiveInt32 = is;
  * @returns The value as a `PositiveInt32`
  * @throws {TypeError} If the value is not a positive integer in [1, 2^31)
  */
-export const asPositiveInt32 = castType;
+export const asPositiveInt32 = <N extends number>(
+  value: N,
+): PositiveInt32 & N => {
+  if (!isPositiveInt32(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `PositiveInt32` branded
@@ -71,7 +68,7 @@ export const PositiveInt32 = {
    * @returns `true` if the value is a positive integer in [1, 2^31), `false` otherwise
    * @see {@link isPositiveInt32} for usage examples
    */
-  is,
+  is: isPositiveInt32,
 
   /**
    * The smallest value representable as `PositiveInt32` (the lower saturation

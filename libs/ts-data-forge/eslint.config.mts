@@ -12,7 +12,55 @@ import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
 import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 import { restrictedImports } from './configs/eslint/rules/eslint-no-restricted-imports-option.mjs';
+import { brandedNumberConfigs } from './scripts/gen-branded-number/config.mjs';
 import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
+
+const internalModulesAllowedInSrc = [
+  ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+  '**/array/impl/index.mjs',
+  '**/num/impl/index.mjs',
+] as const;
+
+const arrObjectPattern = {
+  // The barrel that exports the object and the entry point that re-exports it.
+  regex: String.raw`(^|/)(array/index|entry-point)\.mjs$`,
+  importNames: ['Arr'],
+  allowTypeImports: true,
+  message:
+    "Import the functions with `import * as Arr from '<relative path>/array/impl/index.mjs'` instead, so that a bundle keeps only the ones it calls.",
+} as const;
+
+const numObjectPattern = {
+  // The barrels that export the object and the entry point that re-exports it.
+  regex: String.raw`(^|/)(num/index|number/index|entry-point)\.mjs$`,
+  importNames: ['Num'],
+  allowTypeImports: true,
+  message:
+    "Import the functions with `import * as Num from '<relative path>/number/num/impl/index.mjs'` instead, so that a bundle keeps only the ones it calls.",
+} as const;
+
+const [firstBrandedNumberName, ...otherBrandedNumberNames] =
+  brandedNumberConfigs.map((config) => config.pascalName);
+
+if (firstBrandedNumberName === undefined) {
+  throw new Error('scripts/gen-branded-number/config.mts lists no type');
+}
+
+const brandedNumberObjectPattern = {
+  regex: String.raw`(^|/)(number/index|entry-point)\.mjs$`,
+  importNames: [firstBrandedNumberName, ...otherBrandedNumberNames],
+  allowTypeImports: true,
+  message:
+    "Use the `as*` / `is*` function with plain arithmetic (`asUint32(n + 1)`) instead of the object: a bundle keeps the object whole, with every operator of the type. Mind that `as*` throws out of range where the object's operators saturate; clamp first (`Num.clamp`) where the bound can be reached.",
+} as const;
+
+const selfImportPattern = {
+  // `tsconfig.build.json` has no `paths`, so the build would resolve a
+  // self-import to `dist/`, which does not exist yet.
+  regex: String.raw`^ts-data-forge(/|$)`,
+  message:
+    'Import the module by its relative path, not through the package name.',
+} as const;
 
 export default [
   {
@@ -112,49 +160,59 @@ export default [
     files: ['src/**'],
     rules: defineKnownRules({
       'unicorn/prefer-number-is-safe-integer': 'off',
-      // `Arr`'s functions are reached through their own barrel; see below.
+      // `Arr`'s and `Num`'s functions are reached through their own barrels;
+      // see below.
       'import-x/no-internal-modules': [
         'error',
-        {
-          allow: [
-            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
-            '**/array/impl/index.mjs',
-          ],
-        },
+        { allow: [...internalModulesAllowedInSrc] },
       ],
     }),
   },
   {
-    // The library's own code must not go through the `Arr` object: esbuild
-    // keeps an imported namespace object whole once any member is used, so
-    // `Obj` would carry every array function into a consumer's bundle.
+    // Each branded number reads its operators from the module generated for
+    // it; see `scripts/gen-branded-number/render.mts`.
+    files: ['src/number/branded-types/*.mts', 'src/number/enum/*.mts'],
+    rules: defineKnownRules({
+      'import-x/no-internal-modules': [
+        'error',
+        { allow: [...internalModulesAllowedInSrc, '**/operators/*.mjs'] },
+      ],
+    }),
+  },
+  {
+    // The library's own code must not go through the `Arr` or `Num` object:
+    // esbuild keeps an imported namespace object whole once any member is
+    // used, so `Obj` would carry every array function into a consumer's bundle.
+    // Outside `src/number/`, the same holds for the branded-number objects.
     // `test/eslint-config.test.mts` checks that this is in effect.
     files: ['src/**/*.mts'],
-    // The generated barrel re-exports `Arr`; `entry-point.mts` has the rule
-    // off below.
-    ignores: ['src/**/*.test.mts', 'src/index.mts'],
+    // The generated barrel re-exports `Arr` and `Num`, and `src/number/` has a
+    // block of its own below; `entry-point.mts` has the rule off below.
+    ignores: ['src/**/*.test.mts', 'src/index.mts', 'src/number/**'],
     rules: defineKnownRules({
       'no-restricted-imports': [
         'error',
         mergeRestrictedImportsOptions(restrictedImports[0], {
           patterns: [
-            {
-              // The barrel that exports the object and the entry point that
-              // re-exports it.
-              regex: String.raw`(^|/)(array/index|entry-point)\.mjs$`,
-              importNames: ['Arr'],
-              allowTypeImports: true,
-              message:
-                "Import the functions with `import * as Arr from '<relative path>/array/impl/index.mjs'` instead, so that a bundle keeps only the ones it calls.",
-            },
-            {
-              // `tsconfig.build.json` has no `paths`, so the build would
-              // resolve a self-import to `dist/`, which does not exist yet.
-              regex: String.raw`^ts-data-forge(/|$)`,
-              message:
-                'Import the module by its relative path, not through the package name.',
-            },
+            arrObjectPattern,
+            numObjectPattern,
+            brandedNumberObjectPattern,
+            selfImportPattern,
           ],
+        }),
+      ],
+    }),
+  },
+  {
+    // A branded-number module may use another's object (`NegativeInt.abs`
+    // uses `PositiveInt.fromNumber`).
+    files: ['src/number/**/*.mts'],
+    ignores: ['src/**/*.test.mts', 'src/number/index.mts'],
+    rules: defineKnownRules({
+      'no-restricted-imports': [
+        'error',
+        mergeRestrictedImportsOptions(restrictedImports[0], {
+          patterns: [arrObjectPattern, numObjectPattern, selfImportPattern],
         }),
       ],
     }),

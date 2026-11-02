@@ -1,36 +1,24 @@
 import type { PositiveInt as TtfImported_PositiveInt } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/positive-int.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type PositiveInt = TtfImported_PositiveInt;
 
 type ElementType = PositiveInt;
 
 const typeNameInMessage = 'a positive integer';
-
-const {
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  1,
-  number
->({
-  integerOrSafeInteger: 'Integer',
-  MIN_VALUE: 1,
-  MAX_VALUE: Number.MAX_VALUE,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a positive integer.
@@ -51,7 +39,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a positive integer, `false` otherwise
  */
-export const isPositiveInt = is;
+export const isPositiveInt = (value: number): value is PositiveInt =>
+  Number.isInteger(value) && value >= 1;
 
 /**
  * Casts a `number` to the `PositiveInt` branded type.
@@ -73,7 +62,13 @@ export const isPositiveInt = is;
  * @returns The value as a `PositiveInt`
  * @throws {TypeError} If the value is not a positive integer
  */
-export const asPositiveInt = castType;
+export const asPositiveInt = <N extends number>(value: N): PositiveInt & N => {
+  if (!isPositiveInt(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `PositiveInt` branded type.
@@ -103,7 +98,7 @@ export const PositiveInt = {
    * @returns `true` if the value is a positive integer, `false` otherwise
    * @see {@link isPositiveInt} for usage examples
    */
-  is,
+  is: isPositiveInt,
 
   /**
    * The smallest value representable as `PositiveInt` (the lower saturation

@@ -1,38 +1,25 @@
 import type { SafeUint as TtfImported_SafeUint } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/safe-uint.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type SafeUint = TtfImported_SafeUint;
 
 type ElementType = SafeUint;
 
 const typeNameInMessage = 'a non-negative safe integer';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  0,
-  SafeUint
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: 0,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer
-  MAX_VALUE: Number.MAX_SAFE_INTEGER as SafeUint,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a non-negative safe integer.
@@ -43,7 +30,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-negative safe integer, `false` otherwise
  */
-export const isSafeUint = is;
+export const isSafeUint = (value: number): value is SafeUint =>
+  Number.isSafeInteger(value) && value >= 0;
 
 /**
  * Casts a `number` to the `SafeUint` branded type.
@@ -55,7 +43,13 @@ export const isSafeUint = is;
  * @returns The value as a `SafeUint`
  * @throws {TypeError} If the value is not a non-negative safe integer
  */
-export const asSafeUint = castType;
+export const asSafeUint = <N extends number>(value: N): SafeUint & N => {
+  if (!isSafeUint(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `SafeUint` branded type.
@@ -71,7 +65,7 @@ export const SafeUint = {
    * @returns `true` if the value is a non-negative safe integer, `false` otherwise
    * @see {@link isSafeUint} for usage examples
    */
-  is,
+  is: isSafeUint,
 
   /**
    * The smallest value representable as `SafeUint` (the lower saturation target

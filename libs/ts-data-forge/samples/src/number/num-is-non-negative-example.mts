@@ -1,4 +1,4 @@
-// Example: src/number/num.mts (Num.isNonNegative)
+// Example: src/number/num/impl/num.mts (Num.isNonNegative)
 import { Num } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

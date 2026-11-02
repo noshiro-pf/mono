@@ -4,41 +4,56 @@ import type {
   Uint16,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  castType as castTypeImpl,
+  fromNumber as fromNumberImpl,
+  random as randomImpl,
+} from '../operators/uint8.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type Uint8 = TtfImported_Uint8;
 
 const typeNameInMessage = 'an non-negative integer less than 256';
 
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  castType: castTypeImpl,
-  fromNumber: fromNumberImpl,
-  is: isImpl,
-  random: randomImpl,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<Uint16, 0, 255>(
-  {
-    integerOrSafeInteger: 'SafeInteger',
-    MIN_VALUE: 0,
-    MAX_VALUE: 255,
-    typeNameInMessage,
-  } as const,
-);
+/**
+ * Type guard that checks if a value is an non-negative integer less than 256.
+ *
+ * Returns `true` for an non-negative integer less than 256 — a value with no
+ * fractional component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is an non-negative integer less than 256, `false` otherwise
+ */
+export const isUint8 = (value: number): value is Uint8 =>
+  Number.isSafeInteger(value) && 0 <= value && value <= 255;
 
-const is = (x: number): x is Uint8 => isImpl(x);
+/**
+ * Casts a `number` to the `Uint8` branded type.
+ *
+ * Validates that the value is an non-negative integer less than 256 and returns
+ * it with the `Uint8` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as an `Uint8`
+ * @throws {TypeError} If the value is not an non-negative integer less than 256
+ */
+export const asUint8 = (value: number): Uint8 => {
+  if (!isUint8(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
 
-const castType = (x: number): Uint8 =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  castTypeImpl(x) as Uint8;
+  return value;
+};
 
-const fromNumber = (a: number): Uint8 => castType(fromNumberImpl(a));
+const fromNumber = (a: number): Uint8 => asUint8(fromNumberImpl(a));
 
 const min_ = (...values: readonly Uint8[]): Uint8 =>
-  castType(Math.min(...values));
+  asUint8(Math.min(...values));
 
 const max_ = (...values: readonly Uint8[]): Uint8 =>
-  castType(Math.max(...values));
+  asUint8(Math.max(...values));
 
 const pow = (x: Uint8, y: Uint8): Uint8 => fromNumber(x ** y);
 
@@ -52,30 +67,7 @@ const div = (x: Uint8, y: StrictExclude<Uint8, 0>): Uint8 =>
   fromNumber(Math.floor(x / y));
 
 const random = (min: Uint8, max: Uint8): Uint8 =>
-  castType(randomImpl(castTypeImpl(min), castTypeImpl(max)));
-
-/**
- * Type guard that checks if a value is an non-negative integer less than 256.
- *
- * Returns `true` for an non-negative integer less than 256 — a value with no
- * fractional component.
- *
- * @param value - The value to check
- * @returns `true` if the value is an non-negative integer less than 256, `false` otherwise
- */
-export const isUint8 = is;
-
-/**
- * Casts a `number` to the `Uint8` branded type.
- *
- * Validates that the value is an non-negative integer less than 256 and returns
- * it with the `Uint8` brand. Throws a `TypeError` otherwise.
- *
- * @param value - The value to cast
- * @returns The value as an `Uint8`
- * @throws {TypeError} If the value is not an non-negative integer less than 256
- */
-export const asUint8 = castType;
+  asUint8(randomImpl(castTypeImpl(min), castTypeImpl(max)));
 
 /**
  * Namespace providing type-safe operations for the `Uint8` branded type.
@@ -91,7 +83,7 @@ export const Uint8 = {
    * @returns `true` if the value is an non-negative integer less than 256, `false` otherwise
    * @see {@link isUint8} for usage examples
    */
-  is,
+  is: isUint8,
 
   /**
    * The smallest value representable as `Uint8` (the lower saturation target of

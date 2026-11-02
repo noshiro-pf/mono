@@ -1,37 +1,25 @@
 import type { NonNegativeInt32 as TtfImported_NonNegativeInt32 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/non-negative-int32.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type NonNegativeInt32 = TtfImported_NonNegativeInt32;
 
 type ElementType = NonNegativeInt32;
 
 const typeNameInMessage = 'a non-negative integer in [0, 2^31)';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  0,
-  number
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: 0,
-  MAX_VALUE: 2 ** 31 - 1,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a non-negative integer in [0, 2^31).
@@ -42,7 +30,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-negative integer in [0, 2^31), `false` otherwise
  */
-export const isNonNegativeInt32 = is;
+export const isNonNegativeInt32 = (value: number): value is NonNegativeInt32 =>
+  Number.isSafeInteger(value) && 0 <= value && value <= 2 ** 31 - 1;
 
 /**
  * Casts a `number` to the `NonNegativeInt32` branded type.
@@ -54,7 +43,15 @@ export const isNonNegativeInt32 = is;
  * @returns The value as a `NonNegativeInt32`
  * @throws {TypeError} If the value is not a non-negative integer in [0, 2^31)
  */
-export const asNonNegativeInt32 = castType;
+export const asNonNegativeInt32 = <N extends number>(
+  value: N,
+): NonNegativeInt32 & N => {
+  if (!isNonNegativeInt32(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NonNegativeInt32` branded
@@ -71,7 +68,7 @@ export const NonNegativeInt32 = {
    * @returns `true` if the value is a non-negative integer in [0, 2^31), `false` otherwise
    * @see {@link isNonNegativeInt32} for usage examples
    */
-  is,
+  is: isNonNegativeInt32,
 
   /**
    * The smallest value representable as `NonNegativeInt32` (the lower

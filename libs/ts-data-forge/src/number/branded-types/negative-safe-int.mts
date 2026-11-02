@@ -2,7 +2,17 @@ import type {
   NegativeSafeInt as TtfImported_NegativeSafeInt,
   WithSmallInt,
 } from 'ts-type-forge';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  fromNumber,
+  max as max_,
+  min as min_,
+  pow,
+  random,
+  sub,
+} from '../operators/negative-safe-int.mjs';
 import { PositiveSafeInt } from './positive-safe-int.mjs';
 
 export type NegativeSafeInt = TtfImported_NegativeSafeInt;
@@ -10,30 +20,6 @@ export type NegativeSafeInt = TtfImported_NegativeSafeInt;
 type ElementType = NegativeSafeInt;
 
 const typeNameInMessage = 'a negative safe integer';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  add,
-  castType,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  number,
-  -1
->({
-  integerOrSafeInteger: 'SafeInteger',
-  nonZero: true,
-  MIN_VALUE: Number.MIN_SAFE_INTEGER,
-  MAX_VALUE: -1,
-  typeNameInMessage,
-} as const);
 
 const abs = (x: WithSmallInt<ElementType>): PositiveSafeInt =>
   PositiveSafeInt.fromNumber(Math.abs(x));
@@ -47,7 +33,8 @@ const abs = (x: WithSmallInt<ElementType>): PositiveSafeInt =>
  * @param value - The value to check
  * @returns `true` if the value is a negative safe integer, `false` otherwise
  */
-export const isNegativeSafeInt = is;
+export const isNegativeSafeInt = (value: number): value is NegativeSafeInt =>
+  Number.isSafeInteger(value) && value <= -1;
 
 /**
  * Casts a `number` to the `NegativeSafeInt` branded type.
@@ -59,7 +46,15 @@ export const isNegativeSafeInt = is;
  * @returns The value as a `NegativeSafeInt`
  * @throws {TypeError} If the value is not a negative safe integer
  */
-export const asNegativeSafeInt = castType;
+export const asNegativeSafeInt = <N extends number>(
+  value: N,
+): NegativeSafeInt & N => {
+  if (!isNegativeSafeInt(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NegativeSafeInt` branded
@@ -76,7 +71,7 @@ export const NegativeSafeInt = {
    * @returns `true` if the value is a negative safe integer, `false` otherwise
    * @see {@link isNegativeSafeInt} for usage examples
    */
-  is,
+  is: isNegativeSafeInt,
 
   /**
    * The smallest value representable as `NegativeSafeInt` (the lower saturation

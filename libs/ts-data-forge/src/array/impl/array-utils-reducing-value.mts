@@ -3,7 +3,8 @@ import { isError } from '../../built-in-tag.mjs';
 import { IMap } from '../../collections/index.mjs';
 import { Optional, Result } from '../../functional/index.mjs';
 import { isString, isUndefined } from '../../guard/index.mjs';
-import { asUint32, Num, Uint32 } from '../../number/index.mjs';
+import { asUint32, type Uint32 } from '../../number/index.mjs';
+import * as Num from '../../number/num/impl/index.mjs';
 import { unknownToString } from '../../others/index.mjs';
 import type {
   ArrayIndex,
@@ -569,7 +570,7 @@ const countImpl = <E,>(
 ): SizeType.Arr =>
   array.reduce<Uint32>(
     (acc, curr, index) =>
-      predicate(curr, asUint32(index)) ? Uint32.add(acc, 1) : acc,
+      predicate(curr, asUint32(index)) ? asUint32(acc + 1) : acc,
     asUint32(0),
   );
 

@@ -5,34 +5,22 @@ import type {
   NonZeroFiniteNumber as TtfImported_NonZeroFiniteNumber,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  abs,
+  div,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  randomNonZero as random,
+} from '../operators/non-zero-finite-number.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type NonZeroFiniteNumber = TtfImported_NonZeroFiniteNumber;
 
 type ElementType = NonZeroFiniteNumber;
 
 const typeNameInMessage = 'a non-zero finite number';
-
-const {
-  abs,
-  castType,
-  div,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  randomNonZero: random,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForFloat<
-  ElementType,
-  number,
-  number
->({
-  nonZero: true,
-  MIN_VALUE: -Number.MAX_VALUE,
-  MAX_VALUE: Number.MAX_VALUE,
-  typeNameInMessage,
-} as const);
 
 const floor = (
   x: ElementType,
@@ -73,7 +61,9 @@ expectType<
  * @param value - The value to check
  * @returns `true` if the value is a non-zero finite number, `false` otherwise
  */
-export const isNonZeroFiniteNumber = is;
+export const isNonZeroFiniteNumber = (
+  value: number,
+): value is NonZeroFiniteNumber => Number.isFinite(value) && value !== 0;
 
 /**
  * Casts a `number` to the `NonZeroFiniteNumber` branded type.
@@ -85,7 +75,15 @@ export const isNonZeroFiniteNumber = is;
  * @returns The value as a `NonZeroFiniteNumber`
  * @throws {TypeError} If the value is not a non-zero finite number
  */
-export const asNonZeroFiniteNumber = castType;
+export const asNonZeroFiniteNumber = <N extends number>(
+  value: N,
+): NonZeroFiniteNumber & N => {
+  if (!isNonZeroFiniteNumber(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NonZeroFiniteNumber`
@@ -101,7 +99,7 @@ export const NonZeroFiniteNumber = {
    * @returns `true` if the value is a non-zero finite number, `false` otherwise
    * @see {@link isNonZeroFiniteNumber} for usage examples
    */
-  is,
+  is: isNonZeroFiniteNumber,
 
   /**
    * Returns the absolute value of a non-zero finite number.

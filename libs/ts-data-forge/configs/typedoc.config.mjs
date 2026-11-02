@@ -13,6 +13,8 @@ const config = {
     './**/*.test.mts',
     './entry-point.mts',
     './globals.d.mts',
+    // Generated internals of the branded-number objects.
+    './number/operators/*.mts',
   ].map((p) => path.resolve(srcDir, p)),
   out: outDir,
   gitRevision: 'main',

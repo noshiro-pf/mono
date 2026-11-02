@@ -1,33 +1,20 @@
 import type { NonZeroInt as TtfImported_NonZeroInt } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  abs,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  randomNonZero as random,
+} from '../operators/non-zero-int.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type NonZeroInt = TtfImported_NonZeroInt;
 
 type ElementType = NonZeroInt;
 
 const typeNameInMessage = 'a non-zero integer';
-
-const {
-  abs,
-  castType,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  randomNonZero: random,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  number,
-  number
->({
-  integerOrSafeInteger: 'Integer',
-  nonZero: true,
-  MIN_VALUE: -Number.MAX_VALUE,
-  MAX_VALUE: Number.MAX_VALUE,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a non-zero integer.
@@ -38,7 +25,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-zero integer, `false` otherwise
  */
-export const isNonZeroInt = is;
+export const isNonZeroInt = (value: number): value is NonZeroInt =>
+  Number.isInteger(value) && value !== 0;
 
 /**
  * Casts a `number` to the `NonZeroInt` branded type.
@@ -50,7 +38,13 @@ export const isNonZeroInt = is;
  * @returns The value as a `NonZeroInt`
  * @throws {TypeError} If the value is not a non-zero integer
  */
-export const asNonZeroInt = castType;
+export const asNonZeroInt = <N extends number>(value: N): NonZeroInt & N => {
+  if (!isNonZeroInt(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NonZeroInt` branded type.
@@ -70,7 +64,7 @@ export const NonZeroInt = {
    * @returns `true` if the value is a non-zero integer, `false` otherwise
    * @see {@link isNonZeroInt} for usage examples
    */
-  is,
+  is: isNonZeroInt,
 
   /**
    * Returns the absolute value of a non-zero integer.

@@ -1,5 +1,6 @@
 import type { NonZeroSafeInt, SafeUint, WithSmallInt } from 'ts-type-forge';
-import { SafeInt, asSafeInt } from '../number/index.mjs';
+import { asSafeInt, type SafeInt } from '../number/index.mjs';
+import * as Num from '../number/num/impl/index.mjs';
 
 /**
  * Generates a sequence of numbers within a specified range using a generator
@@ -109,7 +110,14 @@ export function* range(
       for (
         let mut_i: SafeInt = asSafeInt(start);
         step > 0 ? mut_i < end : mut_i > end;
-        mut_i = SafeInt.add(mut_i, asSafeInt(step))
+        // Saturates as `SafeInt.add` does, without the `SafeInt` object.
+        mut_i = asSafeInt(
+          Num.clamp(
+            mut_i + asSafeInt(step),
+            Number.MIN_SAFE_INTEGER,
+            Number.MAX_SAFE_INTEGER,
+          ),
+        )
       ) {
         yield mut_i;
       }

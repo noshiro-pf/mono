@@ -1,34 +1,19 @@
 import type { NonPositiveSafeInt as TtfImported_NonPositiveSafeInt } from 'ts-type-forge';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
-
-export type NonPositiveSafeInt = TtfImported_NonPositiveSafeInt;
-
-type ElementType = NonPositiveSafeInt;
-
-const typeNameInMessage = 'a non-positive safe integer';
-
-const {
+import {
   MAX_VALUE,
   MIN_VALUE,
   add,
-  castType,
   fromNumber,
-  is,
-  max: max_,
-  min: min_,
+  max as max_,
+  min as min_,
   pow,
   random,
   sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  number,
-  0
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: Number.MIN_SAFE_INTEGER,
-  MAX_VALUE: 0,
-  typeNameInMessage,
-} as const);
+} from '../operators/non-positive-safe-int.mjs';
+
+export type NonPositiveSafeInt = TtfImported_NonPositiveSafeInt;
+
+const typeNameInMessage = 'a non-positive safe integer';
 
 /**
  * Type guard that checks if a value is a non-positive safe integer.
@@ -39,7 +24,9 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-positive safe integer, `false` otherwise
  */
-export const isNonPositiveSafeInt = is;
+export const isNonPositiveSafeInt = (
+  value: number,
+): value is NonPositiveSafeInt => Number.isSafeInteger(value) && value <= 0;
 
 /**
  * Casts a `number` to the `NonPositiveSafeInt` branded type.
@@ -51,7 +38,15 @@ export const isNonPositiveSafeInt = is;
  * @returns The value as a `NonPositiveSafeInt`
  * @throws {TypeError} If the value is not a non-positive safe integer
  */
-export const asNonPositiveSafeInt = castType;
+export const asNonPositiveSafeInt = <N extends number>(
+  value: N,
+): NonPositiveSafeInt & N => {
+  if (!isNonPositiveSafeInt(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NonPositiveSafeInt` branded
@@ -68,7 +63,7 @@ export const NonPositiveSafeInt = {
    * @returns `true` if the value is a non-positive safe integer, `false` otherwise
    * @see {@link isNonPositiveSafeInt} for usage examples
    */
-  is,
+  is: isNonPositiveSafeInt,
 
   /**
    * The smallest value representable as `NonPositiveSafeInt` (the lower

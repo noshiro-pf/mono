@@ -1,32 +1,21 @@
 import type { NonPositiveFiniteNumber as TtfImported_NonPositiveFiniteNumber } from 'ts-type-forge';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  add,
+  fromNumber,
+  max as max_,
+  min as min_,
+  pow,
+  random,
+  sub,
+} from '../operators/non-positive-finite-number.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type NonPositiveFiniteNumber = TtfImported_NonPositiveFiniteNumber;
 
 type ElementType = NonPositiveFiniteNumber;
 
 const typeNameInMessage = 'a non-positive finite number';
-
-const {
-  MAX_VALUE,
-  add,
-  castType,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForFloat<
-  ElementType,
-  number,
-  0
->({
-  MIN_VALUE: -Number.MAX_VALUE,
-  MAX_VALUE: 0,
-  typeNameInMessage,
-} as const);
 
 const floor = (
   x: ElementType,
@@ -71,7 +60,9 @@ const round = (
  * @param value - The value to check
  * @returns `true` if the value is a non-positive finite number, `false` otherwise
  */
-export const isNonPositiveFiniteNumber = is;
+export const isNonPositiveFiniteNumber = (
+  value: number,
+): value is NonPositiveFiniteNumber => Number.isFinite(value) && value <= 0;
 
 /**
  * Casts a `number` to the `NonPositiveFiniteNumber` branded type.
@@ -83,7 +74,15 @@ export const isNonPositiveFiniteNumber = is;
  * @returns The value as a `NonPositiveFiniteNumber`
  * @throws {TypeError} If the value is not a non-positive finite number
  */
-export const asNonPositiveFiniteNumber = castType;
+export const asNonPositiveFiniteNumber = <N extends number>(
+  value: N,
+): NonPositiveFiniteNumber & N => {
+  if (!isNonPositiveFiniteNumber(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NonPositiveFiniteNumber`
@@ -99,7 +98,7 @@ export const NonPositiveFiniteNumber = {
    * @returns `true` if the value is a non-positive finite number, `false` otherwise
    * @see {@link isNonPositiveFiniteNumber} for usage examples
    */
-  is,
+  is: isNonPositiveFiniteNumber,
 
   /**
    * The largest value representable as `NonPositiveFiniteNumber` (the upper

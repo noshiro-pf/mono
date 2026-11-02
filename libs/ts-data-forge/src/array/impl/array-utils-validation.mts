@@ -5,7 +5,8 @@ import type {
   IsUnknown,
   UnknownBrand,
 } from 'ts-type-forge';
-import { asUint32, Num } from '../../number/index.mjs';
+import { asUint32 } from '../../number/index.mjs';
+import * as Num from '../../number/num/impl/index.mjs';
 import type { ArrayIndex, SizeType } from '../../types.mjs';
 
 /**

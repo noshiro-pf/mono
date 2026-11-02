@@ -1,4 +1,4 @@
-// Example: src/number/num.mts (Num.from)
+// Example: src/number/num/impl/num.mts (Num.from)
 import { Num } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

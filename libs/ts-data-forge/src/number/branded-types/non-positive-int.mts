@@ -1,33 +1,18 @@
 import type { NonPositiveInt as TtfImported_NonPositiveInt } from 'ts-type-forge';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
-
-export type NonPositiveInt = TtfImported_NonPositiveInt;
-
-type ElementType = NonPositiveInt;
-
-const typeNameInMessage = 'a non-positive integer';
-
-const {
+import {
   MAX_VALUE,
   add,
-  castType,
   fromNumber,
-  is,
-  max: max_,
-  min: min_,
+  max as max_,
+  min as min_,
   pow,
   random,
   sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  number,
-  0
->({
-  integerOrSafeInteger: 'Integer',
-  MIN_VALUE: -Number.MAX_VALUE,
-  MAX_VALUE: 0,
-  typeNameInMessage,
-} as const);
+} from '../operators/non-positive-int.mjs';
+
+export type NonPositiveInt = TtfImported_NonPositiveInt;
+
+const typeNameInMessage = 'a non-positive integer';
 
 /**
  * Type guard that checks if a value is a non-positive integer.
@@ -39,7 +24,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-positive integer, `false` otherwise
  */
-export const isNonPositiveInt = is;
+export const isNonPositiveInt = (value: number): value is NonPositiveInt =>
+  Number.isInteger(value) && value <= 0;
 
 /**
  * Casts a `number` to the `NonPositiveInt` branded type.
@@ -51,7 +37,15 @@ export const isNonPositiveInt = is;
  * @returns The value as a `NonPositiveInt`
  * @throws {TypeError} If the value is not a non-positive integer
  */
-export const asNonPositiveInt = castType;
+export const asNonPositiveInt = <N extends number>(
+  value: N,
+): NonPositiveInt & N => {
+  if (!isNonPositiveInt(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NonPositiveInt` branded
@@ -72,7 +66,7 @@ export const NonPositiveInt = {
    * @returns `true` if the value is a non-positive integer, `false` otherwise
    * @see {@link isNonPositiveInt} for usage examples
    */
-  is,
+  is: isNonPositiveInt,
 
   /**
    * The largest value representable as `NonPositiveInt` (the upper saturation

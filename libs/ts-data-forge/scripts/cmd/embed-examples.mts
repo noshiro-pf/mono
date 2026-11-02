@@ -12,6 +12,7 @@ const documents = [
       'expect-type.mts',
       'functional-programming.mts',
       'number-utilities.mts',
+      'number-subpath.mts',
       'branded-number-types.mts',
       'array-utilities.mts',
       'array-subpath.mts',

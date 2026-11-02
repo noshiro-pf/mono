@@ -4,36 +4,25 @@ import type {
   Uint,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/positive-finite-number.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type PositiveFiniteNumber = TtfImported_PositiveFiniteNumber;
 
 type ElementType = PositiveFiniteNumber;
 
 const typeNameInMessage = 'a positive finite number';
-
-const {
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForFloat<
-  ElementType,
-  number,
-  number
->({
-  MIN_VALUE: Number.MIN_VALUE,
-  MAX_VALUE: Number.MAX_VALUE,
-  typeNameInMessage,
-} as const);
 
 const floor = (
   x: ElementType,
@@ -86,7 +75,10 @@ expectType<
  * @param value - The value to check
  * @returns `true` if the value is a positive finite number, `false` otherwise
  */
-export const isPositiveFiniteNumber = is;
+export const isPositiveFiniteNumber = (
+  value: number,
+): value is PositiveFiniteNumber =>
+  Number.isFinite(value) && value >= Number.MIN_VALUE;
 
 /**
  * Casts a `number` to the `PositiveFiniteNumber` branded type.
@@ -98,7 +90,15 @@ export const isPositiveFiniteNumber = is;
  * @returns The value as a `PositiveFiniteNumber`
  * @throws {TypeError} If the value is not a positive finite number
  */
-export const asPositiveFiniteNumber = castType;
+export const asPositiveFiniteNumber = <N extends number>(
+  value: N,
+): PositiveFiniteNumber & N => {
+  if (!isPositiveFiniteNumber(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `PositiveFiniteNumber`
@@ -114,7 +114,7 @@ export const PositiveFiniteNumber = {
    * @returns `true` if the value is a positive finite number, `false` otherwise
    * @see {@link isPositiveFiniteNumber} for usage examples
    */
-  is,
+  is: isPositiveFiniteNumber,
 
   /**
    * The smallest value representable as `PositiveFiniteNumber` (the lower

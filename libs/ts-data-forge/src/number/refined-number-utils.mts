@@ -17,7 +17,7 @@ import type {
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { pipe } from '../functional/index.mjs';
-import { Num } from './num.mjs';
+import * as Num from './num/impl/index.mjs';
 
 /** @internal */
 export namespace TsDataForgeInternals {

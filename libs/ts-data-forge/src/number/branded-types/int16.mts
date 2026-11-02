@@ -1,38 +1,26 @@
 import type { Int16 as TtfImported_Int16 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  abs,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/int16.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type Int16 = TtfImported_Int16;
 
 type ElementType = Int16;
 
 const typeNameInMessage = 'an integer in [-2^15, 2^15)';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  abs,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  number,
-  number
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: -(2 ** 15),
-  MAX_VALUE: 2 ** 15 - 1,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is an integer in [-2^15, 2^15).
@@ -43,7 +31,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is an integer in [-2^15, 2^15), `false` otherwise
  */
-export const isInt16 = is;
+export const isInt16 = (value: number): value is Int16 =>
+  Number.isSafeInteger(value) && -(2 ** 15) <= value && value <= 2 ** 15 - 1;
 
 /**
  * Casts a `number` to the `Int16` branded type.
@@ -55,7 +44,13 @@ export const isInt16 = is;
  * @returns The value as an `Int16`
  * @throws {TypeError} If the value is not an integer in [-2^15, 2^15)
  */
-export const asInt16 = castType;
+export const asInt16 = <N extends number>(value: N): Int16 & N => {
+  if (!isInt16(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `Int16` branded type.
@@ -71,7 +66,7 @@ export const Int16 = {
    * @returns `true` if the value is an integer in [-2^15, 2^15), `false` otherwise
    * @see {@link isInt16} for usage examples
    */
-  is,
+  is: isInt16,
 
   /**
    * The smallest value representable as `Int16` (the lower saturation target of

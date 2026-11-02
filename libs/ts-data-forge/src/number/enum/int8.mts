@@ -5,47 +5,58 @@ import type {
   Int8 as TtfImported_Int8,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  castType as castTypeImpl,
+  fromNumber as fromNumberImpl,
+  random as randomImpl,
+} from '../operators/int8.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type Int8 = TtfImported_Int8;
 
 const typeNameInMessage = 'an integer in [-128, 127]';
 
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  castType: castTypeImpl,
-  fromNumber: fromNumberImpl,
-  is: isImpl,
-  random: randomImpl,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  Int16,
-  -128,
-  127
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: -128,
-  MAX_VALUE: 127,
-  typeNameInMessage,
-} as const);
+/**
+ * Type guard that checks if a value is an integer in [-128, 127].
+ *
+ * Returns `true` for an integer in [-128, 127] — a value with no fractional
+ * component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is an integer in [-128, 127], `false` otherwise
+ */
+export const isInt8 = (value: number): value is Int8 =>
+  Number.isSafeInteger(value) && -128 <= value && value <= 127;
 
-const is = (x: number): x is Int8 => isImpl(x);
+/**
+ * Casts a `number` to the `Int8` branded type.
+ *
+ * Validates that the value is an integer in [-128, 127] and returns it with the
+ * `Int8` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as an `Int8`
+ * @throws {TypeError} If the value is not an integer in [-128, 127]
+ */
+export const asInt8 = (value: number): Int8 => {
+  if (!isInt8(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
 
-const castType = (x: number): Int8 =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  castTypeImpl(x) as Int8;
+  return value;
+};
 
-const fromNumber = (a: number): Int8 => castType(fromNumberImpl(a));
+const fromNumber = (a: number): Int8 => asInt8(fromNumberImpl(a));
 
 const abs = <N extends Int8>(x: N): AbsoluteValue<N> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-assertion -- unnecessary only under the strict standard library; the stock one types `Math.abs` as returning `number`
   Math.abs(x) as unknown as AbsoluteValue<N>;
 
-const min_ = (...values: readonly Int8[]): Int8 =>
-  castType(Math.min(...values));
+const min_ = (...values: readonly Int8[]): Int8 => asInt8(Math.min(...values));
 
-const max_ = (...values: readonly Int8[]): Int8 =>
-  castType(Math.max(...values));
+const max_ = (...values: readonly Int8[]): Int8 => asInt8(Math.max(...values));
 
 const pow = (x: Int8, y: Int8): Int8 => fromNumber(x ** y);
 
@@ -59,30 +70,7 @@ const div = (x: Int8, y: StrictExclude<Int8, 0>): Int8 =>
   fromNumber(Math.floor(x / y));
 
 const random = (min: Int8, max: Int8): Int8 =>
-  castType(randomImpl(castTypeImpl(min), castTypeImpl(max)));
-
-/**
- * Type guard that checks if a value is an integer in [-128, 127].
- *
- * Returns `true` for an integer in [-128, 127] — a value with no fractional
- * component.
- *
- * @param value - The value to check
- * @returns `true` if the value is an integer in [-128, 127], `false` otherwise
- */
-export const isInt8 = is;
-
-/**
- * Casts a `number` to the `Int8` branded type.
- *
- * Validates that the value is an integer in [-128, 127] and returns it with the
- * `Int8` brand. Throws a `TypeError` otherwise.
- *
- * @param value - The value to cast
- * @returns The value as an `Int8`
- * @throws {TypeError} If the value is not an integer in [-128, 127]
- */
-export const asInt8 = castType;
+  asInt8(randomImpl(castTypeImpl(min), castTypeImpl(max)));
 
 /**
  * Namespace providing type-safe operations for the `Int8` branded type.
@@ -98,7 +86,7 @@ export const Int8 = {
    * @returns `true` if the value is an integer in [-128, 127], `false` otherwise
    * @see {@link isInt8} for usage examples
    */
-  is,
+  is: isInt8,
 
   /**
    * The smallest value representable as `Int8` (the lower saturation target of

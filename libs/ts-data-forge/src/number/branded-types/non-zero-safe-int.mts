@@ -1,42 +1,23 @@
-import type {
-  SafeInt,
-  SafeUint,
-  NonZeroSafeInt as TtfImported_NonZeroSafeInt,
-} from 'ts-type-forge';
+import type { NonZeroSafeInt as TtfImported_NonZeroSafeInt } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  abs,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  randomNonZero as random,
+} from '../operators/non-zero-safe-int.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type NonZeroSafeInt = TtfImported_NonZeroSafeInt;
 
 type ElementType = NonZeroSafeInt;
 
 const typeNameInMessage = 'a non-zero safe integer';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  abs,
-  castType,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  randomNonZero: random,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  SafeInt,
-  SafeUint
->({
-  integerOrSafeInteger: 'SafeInteger',
-  nonZero: true,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-min-safe-integer
-  MIN_VALUE: Number.MIN_SAFE_INTEGER as SafeInt,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer
-  MAX_VALUE: Number.MAX_SAFE_INTEGER as SafeUint,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a non-zero safe integer.
@@ -47,7 +28,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-zero safe integer, `false` otherwise
  */
-export const isNonZeroSafeInt = is;
+export const isNonZeroSafeInt = (value: number): value is NonZeroSafeInt =>
+  Number.isSafeInteger(value) && value !== 0;
 
 /**
  * Casts a `number` to the `NonZeroSafeInt` branded type.
@@ -59,7 +41,15 @@ export const isNonZeroSafeInt = is;
  * @returns The value as a `NonZeroSafeInt`
  * @throws {TypeError} If the value is not a non-zero safe integer
  */
-export const asNonZeroSafeInt = castType;
+export const asNonZeroSafeInt = <N extends number>(
+  value: N,
+): NonZeroSafeInt & N => {
+  if (!isNonZeroSafeInt(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NonZeroSafeInt` branded
@@ -76,7 +66,7 @@ export const NonZeroSafeInt = {
    * @returns `true` if the value is a non-zero safe integer, `false` otherwise
    * @see {@link isNonZeroSafeInt} for usage examples
    */
-  is,
+  is: isNonZeroSafeInt,
 
   /**
    * The smallest value representable as `NonZeroSafeInt` (the lower saturation

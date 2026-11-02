@@ -6,7 +6,8 @@ import type {
   NonEmptyTuple,
   StructuralPrefixLength,
 } from 'ts-type-forge';
-import { Uint32 } from '../../number/index.mjs';
+import { asUint32 } from '../../number/index.mjs';
+import * as Num from '../../number/num/impl/index.mjs';
 import type { SizeType } from '../../types.mjs';
 import { isEmpty } from './array-utils-length-bounded-array-guard.mjs';
 import { size } from './array-utils-size.mjs';
@@ -298,6 +299,14 @@ export function skipLast<E>(
   }
 }
 
+/**
+ * `a - b` clamped to `[0, a]` and rounded, as `Uint32.sub` would give it within
+ * that range (a `NaN` gives `0`), without the `Uint32` object, which a bundle
+ * keeps whole with every branded-number operator.
+ */
+const saturatingSub = (a: SizeType.Arr, b: SizeType.ArgArr): SizeType.Arr =>
+  asUint32(Math.round(Num.clamp(a - b, 0, a)));
+
 const takeImpl = <E,>(
   array: readonly E[],
   num: SizeType.ArgArr,
@@ -307,7 +316,7 @@ const takeLastImpl = <E,>(
   array: readonly E[],
   num: SizeType.ArgArr,
 ): readonly E[] =>
-  sliceClamped(array, Uint32.sub(size(array), num), size(array));
+  sliceClamped(array, saturatingSub(size(array), num), size(array));
 
 const skipImpl = <E,>(
   array: readonly E[],
@@ -317,7 +326,7 @@ const skipImpl = <E,>(
 const skipLastImpl = <E,>(
   array: readonly E[],
   num: SizeType.ArgArr,
-): readonly E[] => sliceClamped(array, 0, Uint32.sub(size(array), num));
+): readonly E[] => sliceClamped(array, 0, saturatingSub(size(array), num));
 
 /**
  * Alias for `tail`.

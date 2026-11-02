@@ -78,4 +78,11 @@ describe(range, () => {
 
     assert.deepStrictEqual(xs, [0, -1]);
   });
+
+  // The step is checked before it is added, as `SafeInt.add` used to have it
+  // checked, so an unchecked caller gets an error rather than an endless loop.
+  test('a step that is not a safe integer throws', () => {
+    // @ts-expect-error -- the type forbids it; an unchecked caller can still pass it
+    assert.throws(() => Array.from(range(0, 10, Number.POSITIVE_INFINITY)));
+  });
 });

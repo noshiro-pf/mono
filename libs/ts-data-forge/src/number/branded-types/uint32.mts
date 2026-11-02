@@ -1,37 +1,25 @@
 import type { Uint32 as TtfImported_Uint32 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/uint32.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type Uint32 = TtfImported_Uint32;
 
 type ElementType = Uint32;
 
 const typeNameInMessage = 'a non-negative integer less than 2^32';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  0,
-  number
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: 0,
-  MAX_VALUE: 2 ** 32 - 1,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a non-negative integer less than 2^32.
@@ -42,7 +30,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-negative integer less than 2^32, `false` otherwise
  */
-export const isUint32 = is;
+export const isUint32 = (value: number): value is Uint32 =>
+  Number.isSafeInteger(value) && 0 <= value && value <= 2 ** 32 - 1;
 
 /**
  * Casts a `number` to the `Uint32` branded type.
@@ -54,7 +43,13 @@ export const isUint32 = is;
  * @returns The value as an `Uint32`
  * @throws {TypeError} If the value is not a non-negative integer less than 2^32
  */
-export const asUint32 = castType;
+export const asUint32 = <N extends number>(value: N): Uint32 & N => {
+  if (!isUint32(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `Uint32` branded type.
@@ -70,7 +65,7 @@ export const Uint32 = {
    * @returns `true` if the value is a non-negative integer less than 2^32, `false` otherwise
    * @see {@link isUint32} for usage examples
    */
-  is,
+  is: isUint32,
 
   /**
    * The smallest value representable as `Uint32` (the lower saturation target

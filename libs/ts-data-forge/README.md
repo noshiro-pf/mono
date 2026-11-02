@@ -290,6 +290,21 @@ const result = Num.div(10, value); // Safe division
 assert.isTrue(result === 2);
 ```
 
+#### Importing `Num` from `ts-data-forge/number`
+
+Like `Arr`, `Num` is one object, which esbuild keeps whole once any of its members is used. The `ts-data-forge/number` subpath exports the same functions as a module of their own, so a bundle keeps only the ones it calls.
+
+```tsx
+import * as Num from 'ts-data-forge/number';
+
+// The same functions as `Num` from 'ts-data-forge'
+assert.isTrue(Num.clamp(0, 100)(150) === 100);
+
+assert.isTrue(Num.isInRange(0, 10)(5));
+```
+
+The `is*` and `as*` functions of the branded number types below (`isUint32`, `asSafeUint`, …) are defined on their own, so a bundle that calls only those keeps no other operator. An object such as `SafeUint` is still kept whole once any of its members is used.
+
 #### Branded Number Types for Enhanced Type Safety
 
 `ts-data-forge` provides branded number types that enforce specific constraints at the type level.

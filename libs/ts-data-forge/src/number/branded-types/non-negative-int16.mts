@@ -1,37 +1,25 @@
 import type { NonNegativeInt16 as TtfImported_NonNegativeInt16 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/non-negative-int16.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type NonNegativeInt16 = TtfImported_NonNegativeInt16;
 
 type ElementType = NonNegativeInt16;
 
 const typeNameInMessage = 'a non-negative integer in [0, 2^15)';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  0,
-  number
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: 0,
-  MAX_VALUE: 2 ** 15 - 1,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a non-negative integer in [0, 2^15).
@@ -42,7 +30,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-negative integer in [0, 2^15), `false` otherwise
  */
-export const isNonNegativeInt16 = is;
+export const isNonNegativeInt16 = (value: number): value is NonNegativeInt16 =>
+  Number.isSafeInteger(value) && 0 <= value && value <= 2 ** 15 - 1;
 
 /**
  * Casts a `number` to the `NonNegativeInt16` branded type.
@@ -54,7 +43,15 @@ export const isNonNegativeInt16 = is;
  * @returns The value as a `NonNegativeInt16`
  * @throws {TypeError} If the value is not a non-negative integer in [0, 2^15)
  */
-export const asNonNegativeInt16 = castType;
+export const asNonNegativeInt16 = <N extends number>(
+  value: N,
+): NonNegativeInt16 & N => {
+  if (!isNonNegativeInt16(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NonNegativeInt16` branded
@@ -71,7 +68,7 @@ export const NonNegativeInt16 = {
    * @returns `true` if the value is a non-negative integer in [0, 2^15), `false` otherwise
    * @see {@link isNonNegativeInt16} for usage examples
    */
-  is,
+  is: isNonNegativeInt16,
 
   /**
    * The smallest value representable as `NonNegativeInt16` (the lower

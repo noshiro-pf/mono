@@ -3,36 +3,25 @@ import type {
   Uint,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/non-negative-finite-number.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type NonNegativeFiniteNumber = TtfImported_NonNegativeFiniteNumber;
 
 type ElementType = NonNegativeFiniteNumber;
 
 const typeNameInMessage = 'a non-negative finite number';
-
-const {
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForFloat<
-  ElementType,
-  0,
-  number
->({
-  MIN_VALUE: 0,
-  MAX_VALUE: Number.MAX_VALUE,
-  typeNameInMessage,
-} as const);
 
 const floor = (
   x: ElementType,
@@ -65,7 +54,9 @@ expectType<TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>, Uint>(
  * @param value - The value to check
  * @returns `true` if the value is a non-negative finite number, `false` otherwise
  */
-export const isNonNegativeFiniteNumber = is;
+export const isNonNegativeFiniteNumber = (
+  value: number,
+): value is NonNegativeFiniteNumber => Number.isFinite(value) && value >= 0;
 
 /**
  * Casts a `number` to the `NonNegativeFiniteNumber` branded type.
@@ -77,7 +68,15 @@ export const isNonNegativeFiniteNumber = is;
  * @returns The value as a `NonNegativeFiniteNumber`
  * @throws {TypeError} If the value is not a non-negative finite number
  */
-export const asNonNegativeFiniteNumber = castType;
+export const asNonNegativeFiniteNumber = <N extends number>(
+  value: N,
+): NonNegativeFiniteNumber & N => {
+  if (!isNonNegativeFiniteNumber(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NonNegativeFiniteNumber`
@@ -93,7 +92,7 @@ export const NonNegativeFiniteNumber = {
    * @returns `true` if the value is a non-negative finite number, `false` otherwise
    * @see {@link isNonNegativeFiniteNumber} for usage examples
    */
-  is,
+  is: isNonNegativeFiniteNumber,
 
   /**
    * The smallest value representable as `NonNegativeFiniteNumber` (the lower

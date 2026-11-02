@@ -1,5 +1,5 @@
 import type { FixedLengthTuple } from 'ts-type-forge';
-import { Num } from '../../number/index.mjs';
+import * as Num from '../../number/num/impl/index.mjs';
 import type { ArgArrayIndexWithNegative, SizeType } from '../../types.mjs';
 
 /**

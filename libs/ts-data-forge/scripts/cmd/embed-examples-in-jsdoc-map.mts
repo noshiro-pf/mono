@@ -441,7 +441,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     ],
   },
   {
-    sourcePath: 'src/number/num.mts',
+    sourcePath: 'src/number/num/impl/num.mts',
     sampleFiles: [
       'samples/src/number/num-from-example.mts',
       'samples/src/number/num-safe-parse-int.mts',
