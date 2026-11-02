@@ -24,6 +24,37 @@ describe('prefer-optional-chain-over-ternary', () => {
     {
       valid: [
         {
+          name: 'a parenthesized `as` between links ends the chain',
+          code: dedent`
+            declare const x: Readonly<{ b: unknown }> | undefined;
+            const y = x == null ? undefined : (x.b as Readonly<{ c: number }>).c;
+          `,
+        },
+        {
+          name: 'a parenthesized `satisfies` between links ends the chain',
+          code: dedent`
+            declare const x: Readonly<{ b: Readonly<{ c: number }> }> | undefined;
+            const y =
+              x == null ? undefined : (x.b satisfies Readonly<{ c: number }>).c;
+          `,
+        },
+        {
+          name: 'a parenthesized call result under `as` ends the chain',
+          code: dedent`
+            declare const x: Readonly<{ m: () => unknown }> | undefined;
+            const y = x == null ? undefined : (x.m() as Readonly<{ c: number }>).c;
+          `,
+        },
+        {
+          name: 'a parenthesized nested chain ends the chain',
+          code: dedent`
+            declare const x:
+              | Readonly<{ b: Readonly<{ c: Readonly<{ d: number }> }> | undefined }>
+              | undefined;
+            const y = x == null ? undefined : (x.b?.c)?.d;
+          `,
+        },
+        {
           name: '`=== undefined` does not cover a `null` the type allows',
           code: dedent`
             declare const x: Readonly<{ b: number }> | null | undefined;
@@ -112,6 +143,27 @@ describe('prefer-optional-chain-over-ternary', () => {
         },
       ],
       invalid: [
+        {
+          name: 'a `!` between links needs no parentheses and keeps the chain',
+          code: dedent`
+            declare const x:
+              | Readonly<{ b: Readonly<{ c: number }> | undefined }>
+              | undefined;
+            const y = x == null ? undefined : x.b!.c;
+          `,
+          output: dedent`
+            declare const x:
+              | Readonly<{ b: Readonly<{ c: number }> | undefined }>
+              | undefined;
+            const y = x?.b!.c;
+          `,
+          errors: [
+            {
+              messageId: 'preferOptionalChain',
+              data: { replacement: 'x?.b!.c' },
+            },
+          ],
+        },
         {
           name: '`x == null ? undefined : x.b`',
           code: dedent`

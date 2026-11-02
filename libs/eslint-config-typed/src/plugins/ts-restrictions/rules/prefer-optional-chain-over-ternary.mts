@@ -308,32 +308,49 @@ const strictPairCheckOf = (
       : undefined;
 };
 
+/** {@link firstLinkFrom} below the top of the branch. */
+const firstLinkBelow = (
+  branch: DeepReadonly<TSESTree.Expression>,
+  value: DeepReadonly<TSESTree.Expression>,
+):
+  | DeepReadonly<TSESTree.CallExpression | TSESTree.MemberExpression>
+  | undefined => {
+  if (branch.type === AST_NODE_TYPES.TSNonNullExpression) {
+    return firstLinkBelow(branch.expression, value);
+  }
+
+  if (branch.type === AST_NODE_TYPES.MemberExpression) {
+    return isSameReference(branch.object, value)
+      ? branch
+      : firstLinkBelow(branch.object, value);
+  }
+
+  return branch.type === AST_NODE_TYPES.CallExpression
+    ? isSameReference(branch.callee, value)
+      ? branch
+      : firstLinkBelow(branch.callee, value)
+    : undefined;
+};
+
 /**
  * The link of `branch` that accesses `value` directly — `x.b` in `x.b.c(1)`,
  * `x(1)` in `x(1).d` — or `undefined` when the chain does not start from it.
+ *
+ * A type wrapper or an optional chain is looked through only around the whole
+ * branch. Between links, `(x.b as T).c` and `(x.b?.c).d` need parentheses,
+ * which end an optional chain: `?.` spliced in after `x` would stop at them,
+ * and the next link would read a property of `undefined`. A `!` needs no
+ * parentheses, so it stays transparent there.
  */
 const firstLinkFrom = (
   branch: DeepReadonly<TSESTree.Expression>,
   value: DeepReadonly<TSESTree.Expression>,
 ):
   | DeepReadonly<TSESTree.CallExpression | TSESTree.MemberExpression>
-  | undefined => {
-  if (isTypeWrapper(branch) || branch.type === AST_NODE_TYPES.ChainExpression) {
-    return firstLinkFrom(branch.expression, value);
-  }
-
-  if (branch.type === AST_NODE_TYPES.MemberExpression) {
-    return isSameReference(branch.object, value)
-      ? branch
-      : firstLinkFrom(branch.object, value);
-  }
-
-  return branch.type === AST_NODE_TYPES.CallExpression
-    ? isSameReference(branch.callee, value)
-      ? branch
-      : firstLinkFrom(branch.callee, value)
-    : undefined;
-};
+  | undefined =>
+  isTypeWrapper(branch) || branch.type === AST_NODE_TYPES.ChainExpression
+    ? firstLinkFrom(branch.expression, value)
+    : firstLinkBelow(branch, value);
 
 /** `node`, or the outermost `!` / `as` / `satisfies` wrapped around it. */
 const outermostWrapperOf = (
