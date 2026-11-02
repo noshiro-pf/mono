@@ -2,7 +2,8 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import { Arr, type Optional, type Some } from 'ts-data-forge';
+import type { Optional, Some } from 'ts-data-forge';
+import * as Arr from 'ts-data-forge/array';
 import { unreachable } from 'ts-std-forge';
 import type {
   AsyncChildObservable,

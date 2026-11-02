@@ -12,7 +12,7 @@ import {
   isString,
   Optional,
   pipe,
-  SafeUint,
+  type SafeUint,
 } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
@@ -132,8 +132,7 @@ class FilterObservableClass<A>
       return; // skip update
     }
 
-    this.#mut_index =
-      this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
+    this.#mut_index = asSafeUint(this.#mut_index + 1);
 
     if (this.#predicate(sn.value, this.#mut_index)) {
       this.setNext(sn.value, updateToken);
