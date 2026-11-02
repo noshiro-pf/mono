@@ -18,6 +18,7 @@ import {
   type Bump,
   type ChangesetFile,
 } from '../lib/changesets.mjs';
+import { resolveDiffBase } from '../lib/diff-base.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -61,7 +62,7 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * The check fails when
  *
- * - the tree raises a package's version past `NEXT_MAJOR_BASE` with a
+ * - the tree raises a package's version past `PROSE_DIFF_BASE` with a
  *   breaking release — a new major, or a new minor while the package is still
  *   `0.x` — and that package's `NEXT_MAJOR.md` still has decided items: the
  *   release would go out without them, and the next chance is another
@@ -76,9 +77,9 @@ import { projectRootPath } from '../project-root-path.mjs';
  * `next-major-reminder.mts` lists what it is waiting for on the version pull
  * request from the moment the changeset lands.
  *
- * `NEXT_MAJOR_BASE` is the commit the versions are compared with: the base of
+ * `PROSE_DIFF_BASE` is the commit the versions are compared with: the base of
  * the pull request in CI, which `style-check.yml` fetches and sets, and
- * otherwise the merge base of `HEAD` and `origin/main`. It is a `check:prose`
+ * otherwise the merge base of `HEAD` and `origin/main` (`resolveDiffBase`). It is a `check:prose`
  * guard because what it reads is Markdown and `package.json`, and the version
  * pull request touches only those.
  */
@@ -408,49 +409,6 @@ const readBaseVersions = (
     }),
   );
 
-/**
- * The commit the versions are compared with: `NEXT_MAJOR_BASE`, or the merge
- * base of `HEAD` and `origin/main`. A base that is not in the clone is an error
- * rather than a base with no packages, which would pass every release.
- */
-const resolveBase = (): string => {
-  const fromEnv = process.env['NEXT_MAJOR_BASE'];
-
-  if (fromEnv !== undefined && fromEnv !== '') {
-    const verified = spawnSync(
-      'git',
-      // `^0` peels to the commit, and fails on anything that is not one.
-      ['rev-parse', '--verify', '--quiet', `${fromEnv}^0`],
-      { cwd: projectRootPath, encoding: 'utf8' },
-    );
-
-    if (verified.status !== 0) {
-      throw new Error(
-        `NEXT_MAJOR_BASE is ${fromEnv}, which is not a commit in this clone. Fetch it first.`,
-      );
-    }
-
-    return fromEnv;
-  }
-
-  const mergeBase = spawnSync('git', ['merge-base', 'HEAD', 'origin/main'], {
-    cwd: projectRootPath,
-    encoding: 'utf8',
-  });
-
-  if (mergeBase.status !== 0) {
-    throw new Error(
-      [
-        'Could not find the commit to compare versions with: NEXT_MAJOR_BASE is',
-        `not set, and \`git merge-base HEAD origin/main\` failed: ${mergeBase.stderr.trim()}`,
-        'Fetch origin/main, or set NEXT_MAJOR_BASE to the base of the change.',
-      ].join('\n'),
-    );
-  }
-
-  return mergeBase.stdout.trim();
-};
-
 const readManifest = async (
   manifestPath: string,
 ): Promise<StockFile['manifest']> => {
@@ -465,7 +423,7 @@ const readManifest = async (
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await readStocks()
     .then((stocks) => {
-      const base = resolveBase();
+      const base = resolveDiffBase('compare versions with');
 
       return Result.map(
         checkNextMajor({

@@ -26,6 +26,27 @@ describe('parseAddedLines', () => {
     );
   });
 
+  test('with deletionPoints, a deletion touches the lines on either side of it', () => {
+    const diff = dedent`
+      diff --git a/a.md b/a.md
+      --- a/a.md
+      +++ b/a.md
+      @@ -3 +3 @@
+      -old
+      +new
+      @@ -20,2 +23,0 @@
+      -gone
+      -gone
+      @@ -1 +0,0 @@
+      -top
+    `;
+
+    assert.deepStrictEqual(
+      parseAddedLines(diff, { deletionPoints: true }),
+      new Map<string, readonly number[]>([['a.md', [3, 23, 24, 1]]]),
+    );
+  });
+
   test('a new file counts from line 1; a deleted or binary file has no lines', () => {
     const diff = dedent`
       diff --git a/new.mts b/new.mts

@@ -21,7 +21,8 @@ type MessageIds = 'raggedWrap';
  * Report a comment paragraph wrapped unevenly: a line with room left for the
  * first word of the line after it. Prettier does not reflow comments, so a
  * paragraph edited after it was wrapped keeps whatever line breaks the edit
- * left behind.
+ * left behind. `check:prose:markdown-wrap` (`tools/scripts/cmd/`) does the same
+ * for Markdown with the same heuristics; change the two together.
  *
  * ## What is a paragraph
  *
