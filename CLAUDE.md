@@ -263,6 +263,9 @@ English review alone (`docs/code-review-loop.md`); closing keywords and the
   Add the check with the fix, defer it to an issue only when too large, or
   say in the description why none is practical. Where to look for one, and
   why prose here is the last resort: `docs/checks-over-fixes.md`.
+- **Before asking the user to choose between approaches, try each one far
+  enough to know what it costs, and give each a confidence** (Pick and Works
+  percentages, with what they rest on): `docs/presenting-choices.md`.
 
 ## Security findings
 
