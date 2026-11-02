@@ -70,6 +70,8 @@ component_management:
       paths: ['libs/synstate-react-hooks/**']
     - component_id: synstate-react-hooks-compat
       paths: ['libs/synstate-react-hooks-compat/**']
+    - component_id: synstate-router
+      paths: ['libs/synstate-router/**']
     - component_id: ts-codemod-lib
       paths: ['libs/ts-codemod-lib/**']
     - component_id: ts-data-forge

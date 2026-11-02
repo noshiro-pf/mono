@@ -1,0 +1,31 @@
+type SourceFileMapping = Readonly<{
+  sourcePath: string;
+  sampleFiles: readonly string[];
+}>;
+
+/**
+ * Mapping from source files to their sample code files, listed in the order
+ * their `@example` blocks appear in the source file. Run `pnpm run gen:jsdoc`
+ * after changing a sample.
+ */
+export const sourceFileMappings: readonly SourceFileMapping[] = [
+  {
+    sourcePath: 'src/href.mts',
+    sampleFiles: ['samples/src/external-href-example.mts'],
+  },
+  {
+    sourcePath: 'src/param-codec.mts',
+    sampleFiles: ['samples/src/param-example.mts'],
+  },
+  {
+    sourcePath: 'src/search-codec.mts',
+    sampleFiles: ['samples/src/search-example.mts'],
+  },
+  {
+    sourcePath: 'src/define-routes.mts',
+    sampleFiles: [
+      'samples/src/define-routes-example.mts',
+      'samples/src/match-routes-example.mts',
+    ],
+  },
+] as const;

@@ -1,0 +1,12 @@
+import * as path from 'node:path';
+import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
+
+export default defineViteConfig({
+  packageRoot: workspaceRootPath,
+  alias: {
+    'synstate-router': path.resolve(workspaceRootPath, './src/index.mts'),
+  },
+  browser: false,
+});
