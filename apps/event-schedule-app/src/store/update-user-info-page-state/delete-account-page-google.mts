@@ -128,19 +128,24 @@ export const createDeleteAccountCreatedWithGoogleStore = <
 
     const signInResult = await deps.api.auth.googleSignInWithPopup();
 
-    if (Result.isErr(signInResult)) {
-      // TODO: use toast
-      console.error(
-        'error occurred on googleSignInWithPopup:',
-        signInResult.value,
-      );
+    const credential: ReauthCredential | undefined = Result.unwrapOkOr(
+      signInResult,
+      undefined,
+    );
 
-      return;
-    }
-
-    const credential: ReauthCredential | undefined = signInResult.value;
-
+    // The popup failed, was closed, or gave no credential. The dialog stays
+    // open so that signing in can be tried again.
     if (credential === undefined) {
+      console.error('error occurred on googleSignInWithPopup:', signInResult);
+
+      setFalseIsWaitingResponse();
+
+      showToast({
+        toast: deps.toast,
+        message: dc.reauthenticate.message.error,
+        intent: 'danger',
+      });
+
       return;
     }
 
