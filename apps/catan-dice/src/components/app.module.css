@@ -1,0 +1,42 @@
+.root {
+  min-height: 100vh;
+  padding: 20px;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* MUI's Paper at elevation 1 in the default theme. */
+.paper {
+  padding: 10px;
+  border-radius: 4px;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #fff;
+  box-shadow:
+    0 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0 1px 1px 0 rgba(0, 0, 0, 0.14),
+    0 1px 3px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* MUI's List. */
+.list {
+  margin: 0;
+  padding: 8px 0;
+  list-style: none;
+}
+
+.buttons {
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+}
+
+.buttonWrapper {
+  padding: 5px;
+}
+
+.histogramArea {
+  padding: 20px 10px;
+  height: 350px;
+  width: 350px;
+  max-width: 100%;
+}

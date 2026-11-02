@@ -21,7 +21,8 @@
     "fix:fmt:full": "prettier --write .",
     "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
-    "gen": "run-s gen:index",
+    "gen": "run-s gen:index gen:css-module-types",
+    "gen:css-module-types": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-css-module-types.mts",
     "gen:index": "run-s gen:index:src fix:fmt",
     "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --min-depth 1 --exclude 'assets/**'",
     "preview": "vite preview --config ./configs/vite.config.mts",
@@ -31,19 +32,13 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
     "@fontsource/roboto": "^5.3.0",
-    "@mui/material": "^9.5.0",
-    "react-utils": "workspace:*",
     "synstate": "workspace:*",
-    "synstate-react-hooks": "workspace:*",
+    "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
@@ -51,8 +46,6 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
     "ts-type-forge": "workspace:*",
     "tsx": "catalog:",
     "vite": "catalog:"

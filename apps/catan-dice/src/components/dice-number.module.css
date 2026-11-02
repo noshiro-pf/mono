@@ -1,0 +1,12 @@
+.diceNumber {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-width: 2px;
+  border-style: solid;
+  border-color: gray;
+  border-radius: 50%;
+  background-color: white;
+}

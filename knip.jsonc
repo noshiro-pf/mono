@@ -448,14 +448,14 @@
       "project": ["**/*.{mts,ts,tsx}"],
     },
 
-    // Not an Astro site like the entry below assumes: a Vite React app whose
-    // entry is the module `index.html` would load.
+    // Not an Astro site like the entry below assumes: a Vite synstate-dom app
+    // whose entry is the module `index.html` would load.
     "apps/catan-dice": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
       // Loaded by `src/index.css` through CSS `@import` rather than by a
-      // module import, which knip does not follow. MUI's default theme asks
-      // for Roboto, so it belongs to this app.
+      // module import, which knip does not follow. The MUI look the components
+      // reproduce is set in Roboto, so it belongs to this app.
       "ignoreDependencies": ["@fontsource/roboto"],
     },
 
