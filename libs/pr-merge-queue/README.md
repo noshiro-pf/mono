@@ -242,8 +242,8 @@ model:
 
 ```sh
 export ANTHROPIC_API_KEY=…     # a key of its own, in a workspace with a spend limit
-npx run-issue-resolver --max-budget-usd 5 --dry-run --once  # what it would run
-npx run-issue-resolver --max-budget-usd 5                   # until --max-sessions or Ctrl+C
+npx run-issue-resolver --max-total-usd 20 --dry-run --once  # what it would run
+npx run-issue-resolver --max-total-usd 20                   # until the budget, --max-sessions or Ctrl+C
 ```
 
 Each look reads how every open issue stands for being started, as
@@ -281,11 +281,31 @@ takes it off.
   get going — refused, not started, or failed before spending anything —
   stops the command from starting more, since every try labels an issue and
   takes the label off again; it exits once the sessions running have ended.
-- **`--max-budget-usd` is required** and caps each session, which is one
-  issue. **`--max-sessions`** (10 by default) is how many sessions it runs
-  before it exits, since each one may leave a pull request waiting for
-  review; a session counts from when it starts, so the ones running never
-  take it past that, and stops counting if it spent nothing.
+- **`--max-total-usd` is required**: what the run may spend in all, and the
+  only amount to choose. What each session may spend, which is passed to
+  `claude --max-budget-usd`, follows from it and from what the issues cost:
+    - Until a session resolves its issue (opens a pull request that closes
+      it) and reports what that cost, sessions run one at a time, each capped
+      at a quarter of the total.
+    - After, each is capped at three times what a resolved issue has cost on
+      average, or at what the dearest one cost, if more; or at what is left,
+      if less, but never below that average. A session its cap stops is not
+      recorded: its issue waits for the next run, which may cap it higher.
+    - The cap of each session running is held out of the total, so the
+      sessions running never take the run past it. One that ends gives back
+      what it did not spend, by the cost its result reports; one whose result
+      reports none, or whose run threw, counts as its whole cap. Sessions
+      that leave their issue count toward what is spent, not toward the
+      average.
+    - While the budget alone keeps a slot empty, the log says so once. Once
+      what is left holds no cap, no session starts, and the command exits
+      when the ones running end. `claude` checks its cap between turns, so a
+      session can go a little past it: the workspace's spend limit is the
+      bound that holds.
+- **`--max-sessions`** (10 by default) is how many sessions it runs before it
+  exits, since each one may leave a pull request waiting for review; a
+  session counts from when it starts, so the ones running never take it past
+  that, and stops counting if it spent nothing.
 - **`--concurrency`** (3 by default, 8 at most) is how many run at once, each in a
   worktree of its own, made one at a time from the checkout the command runs
   in, which no session works in. Every one builds and checks the repository,
@@ -293,7 +313,7 @@ takes it off.
   for them all at once, and their pull requests may touch the same files,
   which leaves the later ones to `auto-rebase`. Each session's lines are
   logged with its issue number. `--once` makes one look, starts as many as
-  `--concurrency` allows, and exits once they end.
+  `--concurrency` and the budget allow, and exits once they end.
 - **Nobody is asked anything, and nothing is approved**, as for
   `run-unblock-prs-skill`, with `Skill` and `Agent` allowed besides, for the
   review. What the session acts on is the issue's text, which is why only
