@@ -1,5 +1,7 @@
 import * as assert from 'node:assert/strict';
 import {
+  createMemoryBrowser,
+  createRouter,
   defineRoutes,
   externalHref,
   matchRoutes,
@@ -75,5 +77,24 @@ assert.throws(() =>
 );
 
 assert.equal(externalHref('https://example.com/'), 'https://example.com/');
+
+// The router, with its peer synstate: the URL is canonicalized before the
+// first state, and `push` updates at once.
+
+const browser = createMemoryBrowser('https://example.com/app/products');
+
+const router = createRouter(routes, { basePath: '/app/', browser });
+
+assert.equal(browser.url().pathname, '/app/products/');
+
+assert.equal(router.match.getSnapshot().value.route, 'products');
+
+router.push(routes.products.item.href({ productId: 3 }));
+
+assert.equal(browser.url().pathname, '/app/products/3/');
+
+assert.equal(router.isActive(routes.products).getSnapshot().value, true);
+
+router.dispose();
 
 console.info('synstate-router: ok');

@@ -2,7 +2,7 @@
 
 A client-side router for [SynState](https://github.com/noshiro-pf/mono/tree/main/libs/synstate) in which every destination, path parameter and search parameter the application writes is checked by the type checker, with no code generation and no module augmentation.
 
-> **Status:** in development, not published yet. This version has the route tree, the parameter codecs, `href` and matching; the router, which follows the browser history, and the React and synstate-dom bindings follow. The design is in [SPEC.md](./SPEC.md) (Japanese).
+> **Status:** in development, not published yet. This version has the route tree, the parameter codecs, `href`, matching and the router, which follows the browser history; the React and synstate-dom bindings follow. The design is in [SPEC.md](./SPEC.md) (Japanese).
 
 ## What it checks
 
@@ -57,6 +57,66 @@ switch (m.route) {
         throw new Error(`unexpected ${m.route ?? 'not found'}`);
 }
 ```
+
+## The router
+
+`createRouter` follows the browser history and passes the match on as a SynState observable. The browser can be injected, and `createMemoryBrowser` keeps a browser's timing (history moves land in a later task), so a store that routes can be tested in Node.
+
+```ts
+const routes = defineRoutes({
+    home: { segment: '' },
+    products: {
+        search: { q: search.string() },
+        children: { item: { params: { productId: param.int } } },
+    },
+    signIn: { segment: 'sign-in' },
+    settings: {},
+});
+
+const [signedIn] = createState(false);
+
+const router = createRouter(routes, {
+    basePath: '/shop/', // `import.meta.env.BASE_URL` in a Vite app
+    browser: createMemoryBrowser('https://example.com/shop/'), // the window when left out
+    // Applied before `match` shows a page, so no subscriber has to navigate.
+    redirect: (m) =>
+        m.route === 'settings' && !signedIn.getSnapshot().value
+            ? routes.signIn.href()
+            : undefined,
+});
+
+// `push` takes an `Href` only; `router.push('/settings/')` fails `tsc`.
+router.push(routes.settings.href());
+
+assert.strictEqual(router.match.getSnapshot().value.route, 'signIn');
+
+// The URL the browser shows, below the base path.
+assert.strictEqual(
+    router.toUrl(routes.products.item.href({ productId: asSafeInt(42) })),
+    '/shop/products/42/',
+);
+
+// Observables for layouts and navigation links.
+const inProducts = router.isActive(routes.products);
+
+router.push(routes.products.href());
+
+assert.isTrue(inProducts.getSnapshot().value);
+
+// Rewrites the search of a node, keeping the rest of the URL.
+router.setSearch(routes.products, (prev) => ({ ...prev, q: 'shoe' }));
+
+assert.deepStrictEqual(router.match.getSnapshot().value, {
+    route: 'products',
+    params: {},
+    search: { q: 'shoe' },
+});
+```
+
+- `push`, `replace` and `follow` (navigating from an observable) take an `Href` only. `back`, `forward` and `go` change the state when the browser fires `popstate`, never before.
+- The URL is canonical: `trailingSlash` (`'always'` by default) is applied to every URL read, by `replaceState`, before `match` shows it, and so is `redirect`. A chain of redirects stops after ten. `basePath` must name a path: a relative base such as Vite's `base: './'` throws.
+- `match` passes nothing on when the route, params and search stay the same, and keeps the references of what did not change. `at(node)` and `isActive(node)` derive from it.
+- Scrolling: to the fragment when the destination has one, to the top when the path changed, and not at all when only the search changed. Back and forward are left to the browser.
 
 ## Installation
 

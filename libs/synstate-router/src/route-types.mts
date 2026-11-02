@@ -1,7 +1,12 @@
 import type { Optional } from 'ts-data-forge';
 import type { IsUnion, ReadonlyRecord } from 'ts-type-forge';
 import type { Href } from './href.mjs';
-import type { RouteTree, routeTreeKey } from './internal/index.mjs';
+import type {
+  RouteNodeInternals,
+  RouteTree,
+  routeNodeKey,
+  routeTreeKey,
+} from './internal/index.mjs';
 import type { SearchParseResult } from './search-codec.mjs';
 
 // Definition: what the application writes
@@ -207,6 +212,7 @@ export type RouteNode<
   ParamCodecs,
   SearchCodecs,
 > = Readonly<{
+  [routeNodeKey]: RouteNodeInternals;
   /** The dotted path of keys: the discriminant of a `RouteMatch`. */
   id: Id;
   /** For display and debugging; never a key for matching or branching. */
@@ -272,6 +278,25 @@ export type Routes<D extends RouteDefinitions> = RouteNodes<
 export type AnyRoutes = Readonly<{
   [routeTreeKey]: RouteTree<RouteDefinitions>;
 }>;
+
+/** Any node of any route tree: what the router's node arguments accept. */
+export type AnyRouteNode = Readonly<{
+  [routeNodeKey]: RouteNodeInternals;
+  id: string;
+  search: ReadonlyRecord<string, AnySearchCodec>;
+  match: (location: RouteLocation) => Optional<AnyRouteValues>;
+}>;
+
+type AnyRouteValues = Readonly<{
+  params: ReadonlyRecord<string, unknown>;
+  search: ReadonlyRecord<string, unknown>;
+}>;
+
+/** The `{ params; search }` a node's `match` returns. */
+export type RouteNodeValues<N extends AnyRouteNode> =
+  ReturnType<N['match']> extends Optional<infer V extends AnyRouteValues>
+    ? V
+    : never;
 
 // Matches
 

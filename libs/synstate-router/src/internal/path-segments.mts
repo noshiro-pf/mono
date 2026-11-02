@@ -3,11 +3,17 @@ import { Optional } from 'ts-data-forge';
 /**
  * Splits a pathname into percent-decoded segments, accepting it with or without
  * one trailing slash: `/` is `[]`, and `/a/b/` and `/a/b` are `['a', 'b']`.
- * `None` when a segment is not valid percent-encoding, which no route matches.
+ * `None` when a segment is empty (`//`, which `href` never writes and a URL
+ * reads as the start of a host) or not valid percent-encoding: no route matches
+ * either.
  */
 export const decodePathname = (
   pathname: string,
 ): Optional<readonly string[]> => {
+  if (pathname.includes('//')) {
+    return Optional.none;
+  }
+
   const withoutLeading = pathname.startsWith('/')
     ? pathname.slice(1)
     : pathname;
@@ -23,6 +29,10 @@ export const decodePathname = (
   const mut_segments: string[] = [];
 
   for (const segment of trimmed.split('/')) {
+    if (segment === '') {
+      return Optional.none;
+    }
+
     try {
       // A path segment, not a query string: query-string's `parse` does not
       // apply.
