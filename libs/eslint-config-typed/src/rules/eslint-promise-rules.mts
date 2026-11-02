@@ -22,5 +22,11 @@ export const eslintPromiseRules = {
   'promise/prefer-await-to-callbacks': 'off',
   'promise/no-multiple-resolved': 'error',
   'promise/spec-only': withDefaultOption('error'),
-  'promise/prefer-catch': 'error',
+
+  // Off: `--fix` rewrites `p.then(a, b)` into `p.catch(b).then(a)`, which calls
+  // `a` with what `b` returns after a rejection too. `unicorn/prefer-then-catch`
+  // reports `.then(a, b)` and only suggests a rewrite, but only on a receiver
+  // typed as the standard `Promise`: `.then(null, b)`, a `Readonly<Promise<T>>`
+  // and other thenables go unreported, which costs less than an unsafe fix.
+  'promise/prefer-catch': 'off',
 } as const satisfies EslintPromiseRules;

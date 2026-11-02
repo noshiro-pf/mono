@@ -320,7 +320,14 @@ export const eslintUnicornRules = {
   'unicorn/prefer-includes-over-repeated-comparisons': 'off',
 
   'unicorn/prefer-iterable-in-constructor': 'error',
-  'unicorn/prefer-iterator-concat': 'error',
+
+  /**
+   * Off. `--fix` rewrites `new Map([...a, ...b])` into
+   * `new Map(Iterator.concat(a, b))`, but `Iterator.concat` is not in every
+   * Node.js version this config supports, and the TypeScript standard library
+   * does not declare it, so the fix turns a lint error into TS2339.
+   */
+  'unicorn/prefer-iterator-concat': 'off',
   'unicorn/prefer-iterator-to-array': 'error',
   'unicorn/prefer-iterator-to-array-at-end': 'error',
   'unicorn/prefer-math-abs': 'error',
