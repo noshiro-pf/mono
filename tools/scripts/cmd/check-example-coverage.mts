@@ -49,7 +49,9 @@ export const checkExampleCoverage = async (): Promise<
 
   const packageDirs = packageDirsResult.value;
 
-  const perPackage = await Promise.all(packageDirs.map(checkPackage));
+  const perPackage = await Promise.all(
+    packageDirs.map(checkPackageExampleCoverage),
+  );
 
   const firstError = perPackage.find(Result.isErr);
 
@@ -99,6 +101,47 @@ export const checkExampleCoverage = async (): Promise<
   });
 };
 
+export const checkPackageExampleCoverage = async (
+  packageDir: string,
+): Promise<
+  Result<
+    Readonly<{ hasExamples: boolean; violation: Violation | undefined }>,
+    string
+  >
+> => {
+  const filesResult = await glob('src/**/*.{mts,tsx}', {
+    cwd: packageDir,
+    absolute: true,
+  });
+
+  if (Result.isErr(filesResult)) {
+    return Result.err(
+      `❌ Failed to list the sources of ${path.basename(packageDir)}: ${unknownToString(filesResult.value)}`,
+    );
+  }
+
+  const files = filesResult.value.filter((f) => !isExempt(f));
+
+  const perFile = await Promise.all(
+    files.map(async (filePath) => {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const content = await fs.readFile(filePath, 'utf8');
+
+      return countExampleTags(content) > 0;
+    }),
+  );
+
+  const hasExamples = perFile.includes(true);
+
+  if (!hasExamples) {
+    return Result.ok({ hasExamples, violation: undefined });
+  }
+
+  const violation = await findWiringViolation(packageDir);
+
+  return Result.ok({ hasExamples, violation });
+};
+
 type Violation = Readonly<{
   packageName: string;
   detail: string;
@@ -114,6 +157,7 @@ type Violation = Readonly<{
  */
 const isExempt = (filePath: string): boolean =>
   filePath.endsWith('.test.mts') ||
+  filePath.endsWith('.test.tsx') ||
   ['index.mts', 'global.mts', 'entry-point.mts'].includes(
     path.basename(filePath),
   );
@@ -238,47 +282,6 @@ const findWiringViolation = async (
     detail: 'has an embedder that the `doc` script never reaches.',
     hint: 'Chain `gen:jsdoc` from `doc`, or call `embedExamplesInJsDoc()` in `scripts/cmd/gen-docs.mts`; otherwise `ws:doc` runs everything but this.',
   };
-};
-
-const checkPackage = async (
-  packageDir: string,
-): Promise<
-  Result<
-    Readonly<{ hasExamples: boolean; violation: Violation | undefined }>,
-    string
-  >
-> => {
-  const filesResult = await glob('src/**/*.mts', {
-    cwd: packageDir,
-    absolute: true,
-  });
-
-  if (Result.isErr(filesResult)) {
-    return Result.err(
-      `❌ Failed to list the sources of ${path.basename(packageDir)}: ${unknownToString(filesResult.value)}`,
-    );
-  }
-
-  const files = filesResult.value.filter((f) => !isExempt(f));
-
-  const perFile = await Promise.all(
-    files.map(async (filePath) => {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      const content = await fs.readFile(filePath, 'utf8');
-
-      return countExampleTags(content) > 0;
-    }),
-  );
-
-  const hasExamples = perFile.includes(true);
-
-  if (!hasExamples) {
-    return Result.ok({ hasExamples, violation: undefined });
-  }
-
-  const violation = await findWiringViolation(packageDir);
-
-  return Result.ok({ hasExamples, violation });
 };
 
 if (isDirectlyExecuted(import.meta.url)) {

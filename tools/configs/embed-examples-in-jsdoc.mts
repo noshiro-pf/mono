@@ -243,7 +243,9 @@ const assertAllExamplesAreMapped = async ({
   packageRootPath: string;
   sourceFileMappings: readonly SourceFileMapping[];
 }>): Promise<Result<undefined, string>> => {
-  const filesResult = await glob(path.resolve(packageRootPath, 'src/**/*.mts'));
+  const filesResult = await glob(
+    path.resolve(packageRootPath, 'src/**/*.{mts,tsx}'),
+  );
 
   if (Result.isErr(filesResult)) {
     return Result.err(unknownToString(filesResult.value));
@@ -260,6 +262,7 @@ const assertAllExamplesAreMapped = async ({
   for (const filePath of filesResult.value) {
     if (
       filePath.endsWith('.test.mts') ||
+      filePath.endsWith('.test.tsx') ||
       exemptFileNames.includes(path.basename(filePath)) ||
       mappedSourcePaths.has(filePath)
     ) {
