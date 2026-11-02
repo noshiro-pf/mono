@@ -98,3 +98,114 @@ export const MyComponent = memoNamed<Props>('MyComponent', (props) => (
     <div>{props.value}</div>
 ));
 ```
+
+## `require-use-memo`
+
+Requires a value declared directly in the body of a React component or a custom
+hook to be memoized, unless it is a primitive O(1) expression. Such a value is
+computed again on every render: filtering or sorting a list, building an object,
+an array or a function, or calling a function that may do any of these.
+
+Allowed without memoization: literals (except regular expressions), names,
+property access (`props.list.search`, `xs[i + 1]`), operators, template
+literals, destructuring of these (without a default value that builds one, and
+without a rest element), calls of hooks (`React.useMemo`, `useIsActive(...)`),
+and calls of the functions in `allowedCalls` with such arguments. Everything
+else is reported: wrap it in `React.useMemo`, `React.useCallback` for a
+function, or move it out of the component when it uses neither props nor state.
+
+Components are the functions passed to `React.memo` or `React.forwardRef`, the
+first function given to a higher order component named in `componentWrappers`,
+and the functions bound to a capitalized name that contain JSX or a
+`React.createElement` call; hooks are the functions bound to a `use…` name. An
+`async` function (a server component) is not checked, since it cannot call
+hooks. Only the declarations directly in the function body are checked, because
+a hook cannot be called inside a nested block, and a name starting with `_` is
+left alone, since its value is not read.
+
+The default allowed calls are taken as O(1): `String(xs)` and `xs.toString()` on
+an array are not, and are not reported.
+
+**Options:**
+
+- `allowedCalls` (string[], default: `[]`): Functions whose call is O(1) and
+  returns a primitive, in addition to `Math.*`, `Number`, `Number.*`, `String`,
+  `Boolean`, `Object.is`, `*.toFixed` and `*.toString`. `"Num.*"` allows every
+  `Num.x(...)`, and `"*.toISOString"` the method of that name on any value.
+- `componentWrappers` (string[], default: `[]`): Higher order components, such
+  as `memoNamed`, whose function arguments are components.
+
+**Examples:**
+
+```typescript
+// ❌ Bad
+export const ProductList = React.memo<Props>((props) => {
+    const found = props.products.filter((p) => p.visible);
+
+    const style = { color: props.color };
+
+    return <ul style={style}>{found.length}</ul>;
+});
+
+// ✅ Good
+export const ProductList = React.memo<Props>((props) => {
+    const found = React.useMemo(
+        () => props.products.filter((p) => p.visible),
+        [props.products],
+    );
+
+    const style = React.useMemo(() => ({ color: props.color }), [props.color]);
+
+    const count = found.length;
+
+    const lastPage = Math.max(1, Math.ceil(count / props.perPage));
+
+    return (
+        <ul style={style}>
+            {count}
+            {lastPage}
+        </ul>
+    );
+});
+```
+
+## `single-jsx-return`
+
+Requires a function to have only one `return` statement when one of its returns
+gives JSX (directly, in an array literal or in a conditional; a callback that
+draws part of a component is one such function), and requires the same of every
+component, found as `require-use-memo` finds one but including `async`
+components, so that a component returning JSX held in a variable or built by
+`.map` is checked too. An early return splits what the function draws into
+several places, and everything written after it runs only on one branch. Branch
+inside the returned expression instead. When one of the returns gives JSX,
+`return null;` and `return;` count as returns too. The cases of a `switch` that
+is the last statement of the function count as one return, because an exhaustive
+`switch` over a union has no conditional expression to replace it.
+
+**Options:**
+
+- `componentWrappers` (string[], default: `[]`): Higher order components, such
+  as `memoNamed`, whose function arguments are components.
+
+**Examples:**
+
+```typescript
+// ❌ Bad
+export const ProductPage = React.memo<Props>((props) => {
+    if (props.product === undefined) {
+        return <p>{'No product'}</p>;
+    }
+
+    return <h1>{props.product.name}</h1>;
+});
+
+// ✅ Good
+export const ProductPage = React.memo<Props>((props) =>
+    props.product === undefined ? (
+        <p>{'No product'}</p>
+    ) : (
+        <h1>{props.product.name}</h1>
+    ),
+);
+```

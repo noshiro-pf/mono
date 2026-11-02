@@ -26,12 +26,19 @@ export const TraceGraph = React.memo<Props>((props) => {
 
   const { nodes, nodeById, viewHeight } = graph;
 
-  const rows = new Map(step.nodes.map((n) => [n.id, n]));
+  const rows = React.useMemo(
+    () => new Map(step.nodes.map((n) => [n.id, n])),
+    [step.nodes],
+  );
 
-  const pointers = pointersOf(step, nodeById);
+  const pointers = React.useMemo(
+    () => pointersOf(step, nodeById),
+    [step, nodeById],
+  );
 
-  const openTokens: ReadonlySet<string> = new Set(
-    step.queues.filter((q) => q.isOpen).map((q) => q.token),
+  const openTokens = React.useMemo<ReadonlySet<string>>(
+    () => new Set(step.queues.filter((q) => q.isOpen).map((q) => q.token)),
+    [step.queues],
   );
 
   return (
@@ -63,36 +70,36 @@ export const TraceGraph = React.memo<Props>((props) => {
       />
 
       {nodes.flatMap((child) =>
-        child.parents.map((parentId) => {
-          const parentNode = nodeById.get(parentId);
+        child.parents
+          .map((parentId) => ({ parentId, parentNode: nodeById.get(parentId) }))
+          .filter(
+            (p): p is Readonly<{ parentId: string; parentNode: TraceNode }> =>
+              p.parentNode !== undefined,
+          )
+          .map(({ parentId, parentNode }) => {
+            const from = centerOf(parentNode);
 
-          if (parentNode === undefined) {
-            return undefined;
-          }
+            const to = centerOf(child);
 
-          const from = centerOf(parentNode);
+            const len = Math.hypot(to.x - from.x, to.y - from.y);
 
-          const to = centerOf(child);
+            const ux = Num.isNonZero(len) ? Num.div(to.x - from.x, len) : 0;
 
-          const len = Math.hypot(to.x - from.x, to.y - from.y);
+            const uy = Num.isNonZero(len) ? Num.div(to.y - from.y, len) : 0;
 
-          const ux = Num.isNonZero(len) ? Num.div(to.x - from.x, len) : 0;
-
-          const uy = Num.isNonZero(len) ? Num.div(to.y - from.y, len) : 0;
-
-          return (
-            <line
-              key={`${parentId}-${child.id}`}
-              markerEnd={'url(#trace-arrow-edge)'}
-              stroke={colors.edge}
-              strokeWidth={2}
-              x1={from.x + ux * nodeRadius}
-              x2={to.x - ux * (nodeRadius + 4)}
-              y1={from.y + uy * nodeRadius}
-              y2={to.y - uy * (nodeRadius + 4)}
-            />
-          );
-        }),
+            return (
+              <line
+                key={`${parentId}-${child.id}`}
+                markerEnd={'url(#trace-arrow-edge)'}
+                stroke={colors.edge}
+                strokeWidth={2}
+                x1={from.x + ux * nodeRadius}
+                x2={to.x - ux * (nodeRadius + 4)}
+                y1={from.y + uy * nodeRadius}
+                y2={to.y - uy * (nodeRadius + 4)}
+              />
+            );
+          }),
       )}
 
       {nodes.map((n) => {

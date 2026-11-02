@@ -165,8 +165,10 @@ export const NotificationSettingsComponent = memoNamed<Props>(
       [answerDeadline, disabled, useAnswerDeadline],
     );
 
-    const invalidEmail =
-      !disabled && !isEmailString(notificationSettingsWithEmail.email);
+    const invalidEmail = React.useMemo(
+      () => !disabled && !isEmailString(notificationSettingsWithEmail.email),
+      [disabled, notificationSettingsWithEmail.email],
+    );
 
     const helperText = invalidEmail ? dict.common.error.invalidEmail : '';
 

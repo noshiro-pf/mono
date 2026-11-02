@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 // embed-sample-code-ignore-above
 import { atom, useAtom, type PrimitiveAtom } from 'jotai';
-import type * as React from 'react';
+import * as React from 'react';
 
 const todosAtom = atom([atom('Todo 1'), atom('Todo 2')]);
 
@@ -25,12 +25,12 @@ const TodoItem = ({
 const TodoList = (): React.JSX.Element => {
   const [todos, setTodos] = useAtom(todosAtom);
 
-  const addTodo = (): void => {
+  const addTodo = React.useCallback((): void => {
     // jotai's `SetStateAction` wants a mutable array, which the readonly result
     // of `Arr.toPushed` does not satisfy.
     // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
     setTodos((prev) => [...prev, atom('')]);
-  };
+  }, [setTodos]);
 
   return (
     <div>

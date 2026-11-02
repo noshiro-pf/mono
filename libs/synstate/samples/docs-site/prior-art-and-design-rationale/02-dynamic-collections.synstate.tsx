@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 // embed-sample-code-ignore-above
 import * as React from 'react';
@@ -20,11 +19,14 @@ const TodoItem = ({
     ),
   );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    updateTodos((prev) =>
-      prev.map((t, i) => (i === index ? e.target.value : t)),
-    );
-  };
+  const handleChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      updateTodos((prev) =>
+        prev.map((t, i) => (i === index ? e.target.value : t)),
+      );
+    },
+    [index],
+  );
 
   return <input value={todo} onChange={handleChange} />;
 };
@@ -34,9 +36,9 @@ const TodoList = (): React.JSX.Element => {
     React.useMemo(() => todos$.pipe(map((todos) => todos.length)), []),
   );
 
-  const addTodo = (): void => {
+  const addTodo = React.useCallback((): void => {
     updateTodos(Arr.toPushed(''));
-  };
+  }, []);
 
   return (
     <div>

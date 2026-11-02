@@ -7,8 +7,10 @@ import {
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
+  eslintReactCodingStyleRules,
   mergeRestrictedImportsOptions,
   restrictedImportsOptions,
+  type EslintReactCodingStyleRulesOption,
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
@@ -27,6 +29,9 @@ const preactComponentGlobs = preactComponentDirs.map(
 const synstateDomComponentGlobs = synstateDomComponentDirs.map(
   (dir) => `src/components/${dir}/**/*.tsx`,
 );
+
+const presetUseMemoOptions: EslintReactCodingStyleRulesOption['react-coding-style/require-use-memo'] =
+  eslintReactCodingStyleRules['react-coding-style/require-use-memo'][1];
 
 export default [
   ...eslintConfigForTypeScript({
@@ -56,6 +61,24 @@ export default [
   })),
 
   ...eslintConfigForPreact(preactComponentGlobs),
+
+  {
+    files: ['src/components/propagation-animation/**/*.tsx'],
+    rules: defineKnownRules({
+      'react-coding-style/require-use-memo': [
+        'error',
+        {
+          ...presetUseMemoOptions,
+          allowedCalls: [
+            ...(presetUseMemoOptions.allowedCalls ?? []),
+            // `translate` (propagation-animation/animation-shared.mts) formats a
+            // point as a CSS transform string.
+            'translate',
+          ],
+        },
+      ],
+    }),
+  },
 
   {
     rules: defineKnownRules({

@@ -51,48 +51,54 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
   } = props;
 
   // Collect all values to determine Y range
-  const allValues = groups.flatMap((g) => g.values);
+  const allValues = React.useMemo(
+    () => groups.flatMap((g) => g.values),
+    [groups],
+  );
 
-  if (Arr.isEmpty(allValues)) {
-    return undefined;
-  }
+  const layout = React.useMemo(() => {
+    if (Arr.isEmpty(allValues)) {
+      return undefined;
+    }
 
-  const yMin = logScale ? 0.1 : 0;
+    const yMin = logScale ? 0.1 : 0;
 
-  const yMax = (yMaxOverride ?? Math.max(...allValues)) * 1.15;
+    const yMax = (yMaxOverride ?? Math.max(...allValues)) * 1.15;
 
-  const toY = createToY(PLOT_H, yMin, yMax, logScale);
+    // Layout: groups evenly spaced across PLOT_W
+    const groupCount = groups.length;
 
-  // Layout: groups evenly spaced across PLOT_W
-  const groupCount = groups.length;
+    const barCount = series.length;
 
-  const barCount = series.length;
+    // eslint-disable-next-line total-functions/no-partial-division
+    const groupWidth = PLOT_W / groupCount;
 
-  // eslint-disable-next-line total-functions/no-partial-division
-  const groupWidth = PLOT_W / groupCount;
+    const groupPadding = groupWidth * 0.18;
 
-  const groupPadding = groupWidth * 0.18;
+    const usableGroupWidth = groupWidth - groupPadding * 2;
 
-  const usableGroupWidth = groupWidth - groupPadding * 2;
+    // eslint-disable-next-line total-functions/no-partial-division
+    const barWidth = usableGroupWidth / barCount;
 
-  // eslint-disable-next-line total-functions/no-partial-division
-  const barWidth = usableGroupWidth / barCount;
+    const barGap = barWidth * 0.1;
 
-  const barGap = barWidth * 0.1;
+    return {
+      toY: createToY(PLOT_H, yMin, yMax, logScale),
+      actualBarWidth: barWidth - barGap,
+      groupCenterX: (groupIndex: number): number =>
+        groupIndex * groupWidth + groupWidth * 0.5,
+      barX: (groupIndex: number, barIndex: number): number =>
+        groupIndex * groupWidth +
+        groupPadding +
+        barIndex * barWidth +
+        barGap * 0.5,
+      yTicks: logScale
+        ? generateLogTicks(yMin, yMax)
+        : generateLinearTicks(yMax),
+    } as const;
+  }, [allValues, groups.length, series.length, yMaxOverride, logScale]);
 
-  const actualBarWidth = barWidth - barGap;
-
-  const groupCenterX = (groupIndex: number): number =>
-    groupIndex * groupWidth + groupWidth * 0.5;
-
-  const barX = (groupIndex: number, barIndex: number): number =>
-    groupIndex * groupWidth + groupPadding + barIndex * barWidth + barGap * 0.5;
-
-  const yTicks = logScale
-    ? generateLogTicks(yMin, yMax)
-    : generateLinearTicks(yMax);
-
-  return (
+  return layout === undefined ? undefined : (
     <div style={figureStyle}>
       <svg
         style={svgStyle}
@@ -102,24 +108,24 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
           transform={`translate(${PADDING.left.toString()}, ${PADDING.top.toString()})`}
         >
           {/* Grid lines */}
-          {yTicks.map((tick) => (
+          {layout.yTicks.map((tick) => (
             <line
               key={tick}
               stroke={'var(--sl-color-gray-5, #e5e7eb)'}
               strokeWidth={0.5}
               x1={0}
               x2={PLOT_W}
-              y1={toY(tick)}
-              y2={toY(tick)}
+              y1={layout.toY(tick)}
+              y2={layout.toY(tick)}
             />
           ))}
 
           {/* Bars */}
           {groups.map((group, gi) =>
             group.values.map((value, bi) => {
-              const x = barX(gi, bi);
+              const x = layout.barX(gi, bi);
 
-              const y = toY(value);
+              const y = layout.toY(value);
 
               const height = PLOT_H - y;
 
@@ -129,7 +135,7 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
                   fill={series[bi]?.color ?? '#999'}
                   height={Math.max(0, height)}
                   rx={1.5}
-                  width={actualBarWidth}
+                  width={layout.actualBarWidth}
                   x={x}
                   y={y}
                 />
@@ -146,7 +152,7 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
             y1={0}
             y2={PLOT_H}
           />
-          {yTicks.map((tick) => (
+          {layout.yTicks.map((tick) => (
             <text
               key={tick}
               dominantBaseline={'middle'}
@@ -154,7 +160,7 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
               fontSize={11}
               textAnchor={'end'}
               x={-8}
-              y={toY(tick)}
+              y={layout.toY(tick)}
             >
               {formatTickLabel(tick)}
             </text>
@@ -181,7 +187,7 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
             y2={PLOT_H}
           />
           {groups.map((group, gi) => {
-            const cx = groupCenterX(gi);
+            const cx = layout.groupCenterX(gi);
 
             const parts = group.label.split('\n');
 

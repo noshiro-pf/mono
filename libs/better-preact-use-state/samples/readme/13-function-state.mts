@@ -1,4 +1,5 @@
 import { useState } from 'better-preact-use-state';
+import { useCallback } from 'preact/hooks';
 
 export const useExample = (
   initialFn: () => number,
@@ -7,9 +8,9 @@ export const useExample = (
   // embed-sample-code-ignore-above
   const [{ fn }, setFn] = useState({ fn: initialFn });
 
-  const onReplace = (): void => {
+  const onReplace = useCallback((): void => {
     setFn({ fn: nextFn });
-  };
+  }, [setFn, nextFn]);
   // embed-sample-code-ignore-below
 
   return { fn, onReplace };

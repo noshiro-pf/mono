@@ -94,6 +94,190 @@ export const climbTypeWrappers = (
     : node;
 };
 
+export type FunctionNode =
+  | TSESTree.ArrowFunctionExpression
+  | TSESTree.FunctionDeclaration
+  | TSESTree.FunctionExpression;
+
+export const isFunctionNode = (
+  node: DeepReadonly<TSESTree.Node>,
+): node is DeepReadonly<FunctionNode> =>
+  node.type === AST_NODE_TYPES.ArrowFunctionExpression ||
+  node.type === AST_NODE_TYPES.FunctionDeclaration ||
+  node.type === AST_NODE_TYPES.FunctionExpression;
+
+/**
+ * `['Math', 'max']` for `Math.max`, `['useValue']` for `useValue`, through type
+ * wrappers; `undefined` for a callee that is not a dotted name.
+ */
+export const calleePath = (
+  node: DeepReadonly<TSESTree.Node>,
+): readonly string[] | undefined => {
+  const callee = skipTypeWrappers(node);
+
+  if (callee.type === AST_NODE_TYPES.Identifier) {
+    return [callee.name];
+  }
+
+  if (
+    callee.type === AST_NODE_TYPES.MemberExpression &&
+    !callee.computed &&
+    callee.property.type === AST_NODE_TYPES.Identifier
+  ) {
+    const objectPath = calleePath(callee.object);
+
+    return objectPath === undefined
+      ? undefined
+      : Arr.toPushed(objectPath, callee.property.name);
+  }
+
+  return undefined;
+};
+
+/**
+ * The name the given expression is bound to, when it is bound to one, through
+ * type wrappers: `function Foo() {}` and `const Foo = (() => <div />) satisfies
+ * React.FC;` bind `Foo`.
+ */
+export const getBoundIdentifier = (
+  node: DeepReadonly<TSESTree.Node>,
+): DeepReadonly<TSESTree.Identifier> | undefined => {
+  if (node.type === AST_NODE_TYPES.FunctionDeclaration) {
+    return node.id ?? undefined;
+  }
+
+  const wrapped = climbTypeWrappers(node);
+
+  const parent =
+    wrapped.type === AST_NODE_TYPES.Program ? undefined : wrapped.parent;
+
+  return parent?.type === AST_NODE_TYPES.VariableDeclarator &&
+    parent.init === wrapped &&
+    parent.id.type === AST_NODE_TYPES.Identifier
+    ? parent.id
+    : undefined;
+};
+
+const componentNamePattern = /^[A-Z]/u;
+
+/** A capitalized name, which JSX reads as a component. */
+export const isComponentName = (name: string): boolean =>
+  componentNamePattern.test(name);
+
+const hookNamePattern = /^use(?:[A-Z0-9]|$)/u;
+
+/** `use`, or `use` followed by a capital letter or a digit. */
+export const isHookName = (name: string): boolean => hookNamePattern.test(name);
+
+/**
+ * Whether `fn` is a function component: the first argument of `React.memo` or
+ * `React.forwardRef`, the first function argument of a call whose callee's last
+ * name is in `componentWrappers` (`memoNamed('Foo', (props) => …)`), or a function
+ * bound to a capitalized name that draws JSX somewhere in its body
+ * (`containsJsx`; a capitalized function without JSX is an ordinary helper).
+ */
+export const isComponentFunction = (
+  context: DeepReadonly<TSESLint.RuleContext<string, unknown[]>>,
+  fn: DeepReadonly<FunctionNode>,
+  options: Readonly<{
+    containsJsx: boolean;
+    componentWrappers: ReadonlySet<string>;
+  }>,
+): boolean => {
+  const boundName = getBoundIdentifier(fn)?.name;
+
+  if (boundName !== undefined) {
+    return isComponentName(boundName) && options.containsJsx;
+  }
+
+  const wrapped = climbTypeWrappers(fn);
+
+  const parent =
+    wrapped.type === AST_NODE_TYPES.Program ? undefined : wrapped.parent;
+
+  if (
+    parent?.type !== AST_NODE_TYPES.CallExpression ||
+    parent.callee === wrapped
+  ) {
+    return false;
+  }
+
+  if (
+    isReactApiCall(context, parent, 'memo') ||
+    isReactApiCall(context, parent, 'forwardRef')
+  ) {
+    return parent.arguments[0] === wrapped;
+  }
+
+  const calleeName = calleePath(parent.callee)?.at(-1);
+
+  // The component is the wrapper's first function argument:
+  // `memoNamed('Foo', (props) => …)`, not a comparator after it.
+  return (
+    calleeName !== undefined &&
+    options.componentWrappers.has(calleeName) &&
+    parent.arguments.find(
+      (arg) =>
+        arg.type !== AST_NODE_TYPES.SpreadElement &&
+        isFunctionNode(skipTypeWrappers(arg)),
+    ) === wrapped
+  );
+};
+
+/**
+ * Adds every function that encloses `node` to `mut_functions`: called on each
+ * JSX node and `React.createElement` call, it leaves there the functions that
+ * contain JSX somewhere in their body, complete by the time each function is
+ * exited.
+ */
+export const markFunctionsContainingJsx = (
+  mut_functions: Set<DeepReadonly<FunctionNode>>,
+  node: DeepReadonly<TSESTree.Node>,
+): void => {
+  let mut_current: DeepReadonly<TSESTree.Node> = node;
+
+  // `Program` has no parent; the type says `undefined`, ESLint gives `null`.
+  while (mut_current.type !== AST_NODE_TYPES.Program) {
+    mut_current = mut_current.parent;
+
+    if (!isFunctionNode(mut_current)) {
+      continue;
+    }
+
+    // Its enclosing functions were marked when it was.
+    if (mut_functions.has(mut_current)) {
+      return;
+    }
+
+    mut_functions.add(mut_current);
+  }
+};
+
+/** Whether `fn` is a custom hook: a function bound to a `use…` name. */
+export const isHookFunction = (fn: DeepReadonly<FunctionNode>): boolean => {
+  const boundName = getBoundIdentifier(fn)?.name;
+
+  return boundName !== undefined && isHookName(boundName);
+};
+
+/**
+ * Visitors that call `onJsx` with every JSX element, JSX fragment and
+ * `React.createElement` call: what the rules here count as drawing JSX.
+ */
+export const jsxNodeVisitors = (
+  context: DeepReadonly<TSESLint.RuleContext<string, unknown[]>>,
+  onJsx: (node: DeepReadonly<TSESTree.Node>) => void,
+): TSESLint.RuleListener =>
+  ({
+    JSXElement: onJsx,
+    JSXFragment: onJsx,
+    CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
+      if (isReactApiCall(context, node, 'createElement')) {
+        onJsx(node);
+      }
+    },
+  }) as const;
+
 const isReactMemberExpression = (
   node: DeepReadonly<TSESTree.MemberExpression>,
   propertyName: string,

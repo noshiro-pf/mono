@@ -32,7 +32,10 @@ export const AnimationNode = React.memo<Props>((props) => {
     reduceMotion,
   } = props;
 
-  const shown = Arr.takeLast(state.history, 7);
+  const shown = React.useMemo(
+    () => Arr.takeLast(state.history, 7),
+    [state.history],
+  );
 
   const sign = valuesSide === 'right' ? 1 : -1;
 

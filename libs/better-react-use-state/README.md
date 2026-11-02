@@ -198,9 +198,9 @@ The initial value and the argument of `setState` are passed to React's `useState
 ```ts
 const [{ fn }, setFn] = useState({ fn: initialFn });
 
-const onReplace = (): void => {
+const onReplace = React.useCallback((): void => {
     setFn({ fn: nextFn });
-};
+}, [setFn, nextFn]);
 ```
 
 ## License

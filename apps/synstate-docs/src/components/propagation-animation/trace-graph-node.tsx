@@ -22,7 +22,7 @@ export const TraceGraphNode = React.memo<Props>((props) => {
   const { node, row, active, freshTokens, markedByOpenUpdate, pointers } =
     props;
 
-  const c = centerOf(node);
+  const c = React.useMemo(() => centerOf(node), [node]);
 
   const fill = row.emitted
     ? colors.emitted
@@ -30,7 +30,10 @@ export const TraceGraphNode = React.memo<Props>((props) => {
       ? colors.skipped
       : colors.idle;
 
-  const current = freshTokens.includes(row.updateToken);
+  const current = React.useMemo(
+    () => freshTokens.includes(row.updateToken),
+    [freshTokens, row.updateToken],
+  );
 
   const tagsTop = c.y - (pointers.length * 19) / 2;
 

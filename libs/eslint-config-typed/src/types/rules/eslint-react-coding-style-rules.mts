@@ -207,6 +207,107 @@ namespace RequireReactMemo {
 }
 
 /**
+ * @description Requires a value a React component or hook computes on every render to be memoized unless it is a primitive O(1) expression.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace RequireUseMemo {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowedCalls": {
+   *         "description": "Functions whose call is O(1) and returns a primitive, in addition to the defaults (`Math.*`, `Number`, `Number.*`, `String`, `Boolean`, `Object.is`, `*.toFixed`, `*.toString`). `\"a.*\"` allows every `a.x`, and `\"*.x\"` every method `x`.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
+   *       "componentWrappers": {
+   *         "description": "Higher order components besides `React.memo` and `React.forwardRef`: a function passed to them is a component.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Functions whose call is O(1) and returns a primitive, in addition to the defaults (`Math.*`, `Number`, `Number.*`, `String`, `Boolean`, `Object.is`, `*.toFixed`, `*.toString`). `"a.*"` allows every `a.x`, and `"*.x"` every method `x`.
+     */
+    allowedCalls?: readonly string[];
+    /**
+     * Higher order components besides `React.memo` and `React.forwardRef`: a function passed to them is a component.
+     */
+    componentWrappers?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Requires a function that returns JSX to have only one return statement.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace SingleJsxReturn {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "componentWrappers": {
+   *         "description": "Higher order components besides `React.memo` and `React.forwardRef`: a function passed to them is a component.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Higher order components besides `React.memo` and `React.forwardRef`: a function passed to them is a component.
+     */
+    componentWrappers?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
  * @description Restricts React.useMemo hook usage patterns for consistent styles.
  *
  *  ```md
@@ -295,6 +396,8 @@ export type EslintReactCodingStyleRules = Readonly<{
   'react-coding-style/react-memo-props-argument-name': ReactMemoPropsArgumentName.RuleEntry;
   'react-coding-style/react-memo-type-parameter': ReactMemoTypeParameter.RuleEntry;
   'react-coding-style/require-react-memo': RequireReactMemo.RuleEntry;
+  'react-coding-style/require-use-memo': RequireUseMemo.RuleEntry;
+  'react-coding-style/single-jsx-return': SingleJsxReturn.RuleEntry;
   'react-coding-style/use-memo-hook-style': UseMemoHookStyle.RuleEntry;
   'react-coding-style/ban-use-imperative-handle-hook': BanUseImperativeHandleHook.RuleEntry;
   'react-coding-style/display-name': DisplayName.RuleEntry;
@@ -304,5 +407,7 @@ export type EslintReactCodingStyleRulesOption = Readonly<{
   'react-coding-style/component-name': ComponentName.Options;
   'react-coding-style/import-style': ImportStyle.Options;
   'react-coding-style/require-react-memo': RequireReactMemo.Options;
+  'react-coding-style/require-use-memo': RequireUseMemo.Options;
+  'react-coding-style/single-jsx-return': SingleJsxReturn.Options;
   'react-coding-style/display-name': DisplayName.Options;
 }>;
