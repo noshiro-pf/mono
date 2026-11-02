@@ -27,9 +27,9 @@ first and keeps the emulators' data in `emulator-data/` between runs; run that
 package's `watch:build` to have the emulator pick up changes to the functions.
 
 The emulators load `firestore.rules`, so what they let the app do is what
-production lets it do. CI's `@emulators` e2e test runs against them, but along
-one path only: an anonymous user creating an event, answering it and editing
-it. Nothing tests what the rules deny or what they let a signed-in user do, so
+production lets it do. CI's `@emulators` e2e tests run against them, but along
+one path only: an anonymous user creating an event, answering it, editing it
+and filtering the answers. Nothing tests what the rules deny or what they let a signed-in user do, so
 check a change there by hand before
 `pnpm exec firebase deploy --only firestore:rules`, the only thing that puts
 it in production.

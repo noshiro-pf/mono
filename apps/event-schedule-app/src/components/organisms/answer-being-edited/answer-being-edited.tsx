@@ -200,7 +200,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   onCommentChange: onCellCommentChange,
                   onCheck,
                 }) => (
-                  <tr key={key}>
+                  <tr key={key} data-e2e={'answer-being-edited-row'}>
                     {batchInputFieldIsOpen ? (
                       <td>
                         <CheckboxView
@@ -226,6 +226,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                     <td>
                       <CustomIconButton
                         active={iconId === 'good'}
+                        data-e2e={'good-button'}
                         iconColor={iconId === 'good' ? 'blue' : 'gray'}
                         iconName={'good'}
                         title={buttons.good.description}

@@ -70,6 +70,7 @@ export const AnswerTable = memoNamed<Props>(
       <StickyHeaderTable
         // eslint-disable-next-line react/forbid-component-props
         className={tableMinimized ? 'minimized' : ''}
+        data-e2e={'answer-table'}
       >
         <thead>
           <tr>
@@ -153,7 +154,7 @@ export const AnswerTable = memoNamed<Props>(
               answerTableRow,
               style,
             }) => (
-              <tr key={key} style={style}>
+              <tr key={key} data-e2e={'answer-table-row'} style={style}>
                 <td className={'sticky horizontal'}>
                   <DatetimeRangeCell
                     datetimeRange={datetimeRange}

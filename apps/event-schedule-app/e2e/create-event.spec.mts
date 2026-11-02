@@ -1,16 +1,16 @@
-import { expect, type Page, test } from '@playwright/test';
-import type { DeepReadonly } from 'ts-type-forge';
+import { expect, test } from '@playwright/test';
+import {
+  createAnswer,
+  emulatorTestTimeout,
+  firestoreWriteTimeout,
+} from './answer-page-steps.mjs';
 
 // Writes to Firestore, so it runs against the emulators, through
 // `check:e2e:emulators`, and `check:e2e` leaves it out by this tag.
 
-/** Creating the event is a Firestore write, longer than the default 5s allows. */
-const createEventTimeout = 20_000;
-
-/** The answer page fetches the event and its answers before it can be used. */
-const answerPageLoadTimeout = 15_000;
-
 test('create event', { tag: '@emulators' }, async ({ page, context }) => {
+  test.setTimeout(emulatorTestTimeout);
+
   await page.goto('/');
 
   {
@@ -47,7 +47,7 @@ test('create event', { tag: '@emulators' }, async ({ page, context }) => {
 
   await expect
     .soft(createEventResultDialogBody.getByTestId('url-wrapper'))
-    .toBeVisible({ timeout: createEventTimeout });
+    .toBeVisible({ timeout: firestoreWriteTimeout });
 
   {
     const backButton = createEventResultDialogFooter.getByTestId('back-button');
@@ -158,58 +158,3 @@ test('create event', { tag: '@emulators' }, async ({ page, context }) => {
 
   await expect.soft(text).toHaveText('（7.5点）');
 });
-
-const createAnswer = async (
-  answerPage: DeepReadonly<Page>,
-  username: string,
-): Promise<void> => {
-  // create answer
-  const addAnswerButton = answerPage.getByTestId('add-answer-button');
-
-  await expect.soft(addAnswerButton).toBeVisible({
-    timeout: answerPageLoadTimeout,
-  });
-
-  await addAnswerButton.click();
-
-  const answerBeingEditedSection = answerPage.getByTestId(
-    'answer-being-edited-section',
-  );
-
-  await expect.soft(answerBeingEditedSection).toBeVisible();
-
-  const buttons = answerBeingEditedSection.getByTestId('buttons');
-
-  await expect.soft(buttons).toBeVisible();
-
-  {
-    const buttonWithConfirmation = buttons.getByTestId(
-      'button-with-confirmation',
-    );
-
-    await expect.soft(buttonWithConfirmation).toBeVisible();
-
-    // submit button should be disabled if username is not filled
-    await expect.soft(buttonWithConfirmation).toBeDisabled();
-
-    await answerBeingEditedSection.getByTestId('username').fill(username);
-
-    // submit button should be enabled if username is filled
-    await expect.soft(buttonWithConfirmation).toBeEnabled();
-  }
-
-  // fill all datetime
-  await answerBeingEditedSection.getByTestId('col-fair-button').click();
-
-  {
-    const submitAnswerButton = buttons.getByTestId('submit-answer-button');
-
-    await expect.soft(submitAnswerButton).toBeVisible();
-
-    await expect.soft(submitAnswerButton).toBeEnabled();
-
-    await submitAnswerButton.click();
-  }
-
-  await expect.soft(answerPage.getByTestId('refresh-answers')).toBeDisabled();
-};

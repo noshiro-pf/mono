@@ -267,7 +267,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             >
               <ScreenShotArea ref={screenShotAreaRef}>
                 <TableTopWrapper>
-                  <TagInputWrapper>
+                  <TagInputWrapper data-e2e={'filter-tags'}>
                     <TagInput
                       addOnBlur={false}
                       addOnPaste={false}
@@ -305,6 +305,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   </TagInputWrapper>
 
                   <ToggleDetailedFilterSettingsLabel
+                    data-e2e={'toggle-detailed-filter'}
                     onClick={AnswerTableStore.toggleDetailedFilter}
                   >
                     <ToggleDetailedFilterSettingsButton>
