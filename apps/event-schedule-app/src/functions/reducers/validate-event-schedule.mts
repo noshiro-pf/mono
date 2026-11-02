@@ -31,9 +31,9 @@ export const validateEventSchedule = ({
     title: title !== '',
     datetimeRangeList: !Arr.isEmpty(datetimeRangeList),
     answerIcons:
-      answerIcons.good.description === '' ||
-      answerIcons.fair.description === '' ||
-      answerIcons.poor.description === '' ||
+      answerIcons.good.description !== '' &&
+      answerIcons.fair.description !== '' &&
+      answerIcons.poor.description !== '' &&
       Num.isInRangeInclusive(
         answerIconPointConfig.fair.min,
         answerIconPointConfig.fair.max,

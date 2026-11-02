@@ -3,6 +3,7 @@ import { EventSchedule, NotificationSettings } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'tiny-router-observable';
 import { Result } from 'ts-data-forge';
+import { answerIconsInitialValue } from '../../constants/index.mjs';
 import { createAppRouter } from '../router-store.mjs';
 import {
   createEditEventScheduleStore,
@@ -140,6 +141,9 @@ const fromDatabase: EventSchedule = EventSchedule.fill({
   title: 'event',
   notes: 'memo\n',
   author: { id: 'u2', name: 'bob' },
+  // The schema's default leaves every description empty, which the settings
+  // page does not let the user save.
+  answerIcons: answerIconsInitialValue,
   datetimeRangeList: [
     {
       ymd: { year: 2026, month: 11, date: 1 },
