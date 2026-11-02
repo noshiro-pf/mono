@@ -191,6 +191,8 @@ const memberScripts = [
 const rootWorkspaceScripts = [
   'check:root:dist-lib-replacement',
   'ws:check:types',
+  'ws:check:types:shard-1',
+  'ws:check:types:shard-2',
   'ws:check:lint',
   'ws:fix:lint',
   'ws:fix:lint:apps',

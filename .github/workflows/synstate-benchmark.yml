@@ -12,9 +12,13 @@ name: SynState Benchmark
 # - It gates on code-check.yml's ignore list (`diff-scope: code`): the build
 #   it runs reads every workspace package SynState is built from, and a
 #   hand-kept list of those would miss the next one.
-# - On `main` the measurement runs even when the verdict is reused, because
-#   that run is what stores the baseline the next pull request is compared
-#   with. The aggregate still reports the reused verdict.
+# - On `main` the job runs even when the verdict is reused, because that run
+#   is what stores the baseline the next pull request is compared with. The
+#   aggregate still reports the reused verdict.
+# - Nothing is built or measured when `main` already stored a baseline for
+#   exactly this source and these versions: the committed tables are judged
+#   against that baseline, so a measurement could change nothing but the
+#   summary (see `Build`).
 # - A shared runner is noisy; `check-drift.mts` divides the runner out and
 #   calls drift only beyond 2× of a library's change relative to the others.
 
@@ -151,7 +155,18 @@ jobs:
       - name: Keep the committed tables
         run: cp -R apps/synstate-docs/src/data committed
 
+      # Not on an exact hit, and neither is any step that reads the
+      # measurement. The verdict there is the committed tables against the
+      # baseline (`Judge the committed tables`), which a measurement does not
+      # enter, and there is no baseline to store. What remains is the summary
+      # comparing a fresh run with the baseline, and for the same source and
+      # versions that is only the runner's noise. Measuring cost about ten
+      # minutes of a runner on every pull request that changed no library
+      # source, no benchmark file and no compared version. The docs app's
+      # `doc`, which this build also runs, is code-check.yml's `build` to fail
+      # on the same tree.
       - name: Build
+        if: steps.baseline.outputs.cache-hit != 'true'
         run: pnpm run ws:build
 
       # The tables only, without `gen:benchmark-doc`: a near tie in one noisy
@@ -167,6 +182,7 @@ jobs:
       # committed in, so the diff below counts changed numbers, not
       # reformatted lines.
       - name: Measure
+        if: steps.baseline.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
           BENCHMARK_MEASURED_ON="$(date -u +%F)"
@@ -179,6 +195,7 @@ jobs:
       # no baseline yet, this is the diff to commit; on a pull request it is
       # information, and nothing here commits anything.
       - name: Show what the measurement changes
+        if: steps.baseline.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
           {
@@ -190,7 +207,9 @@ jobs:
           } >>"${GITHUB_STEP_SUMMARY}"
 
       - name: Compare with the baseline
-        if: steps.baseline.outputs.cache-matched-key != ''
+        if: >-
+          steps.baseline.outputs.cache-matched-key != '' &&
+          steps.baseline.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
           pnpm --filter @synstate/docs run --silent z:benchmark:compare \
@@ -211,10 +230,26 @@ jobs:
             echo '`main` establishes it.'
           } >>"${GITHUB_STEP_SUMMARY}"
 
+      - name: Say that the baseline matched exactly
+        if: steps.baseline.outputs.cache-hit == 'true'
+        run: |
+          set -euo pipefail
+          # shellcheck disable=SC2016 # literal backticks, not command substitution
+          {
+            echo '### Nothing measured: `main` measured this exact source'
+            echo
+            echo 'The baseline for these versions was stored from the same'
+            echo 'source as this run, so the committed tables are judged'
+            echo 'against it below and nothing is built or measured.'
+          } >>"${GITHUB_STEP_SUMMARY}"
+
       # The results are the artifact whether or not they become the baseline:
       # on a pull request they are what the author can download and commit if
-      # the change is meant to move the published tables.
+      # the change is meant to move the published tables. On an exact hit
+      # nothing was measured, and what to commit is the baseline itself (`Upload
+      # the tables to commit`).
       - name: Upload the measurement
+        if: steps.baseline.outputs.cache-hit != 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: synstate-benchmark-${{ github.run_id }}
@@ -270,7 +305,8 @@ jobs:
         id: branch
         if: >-
           github.event_name == 'pull_request' &&
-          steps.baseline.outputs.cache-matched-key != ''
+          steps.baseline.outputs.cache-matched-key != '' &&
+          steps.baseline.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
           pnpm --filter @synstate/docs run --silent z:benchmark:check-drift \

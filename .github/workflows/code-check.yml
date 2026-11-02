@@ -135,7 +135,18 @@ jobs:
           # entries never reach its generator or scripts.
           - strict-lib:check:types
           - strict-lib:check:lint
-          - ws:check:types
+          # `ws:check:types` in two shards, both with `--no-sort`. Nine tenths
+          # of it is the twelve strict-lib harnesses, each four single-threaded
+          # `tsc` runs taking one to two and a half minutes in all, three waves
+          # of four on one runner; the other seventy-odd packages take about
+          # two and a half runner-minutes together, and pnpm's topological
+          # order held them back behind the harnesses. As one entry it was the longest
+          # of the matrix by over a minute. The first shard names the harnesses
+          # of 5.0–5.7, two waves; the second is everything else by excluding
+          # them, so a new harness or package lands there. No type check waits
+          # on another package's — siblings resolve to `dist/`.
+          - ws:check:types:shard-1
+          - ws:check:types:shard-2
           # What the build emitted, type-checked by package name through the
           # `exports` map — the way a consumer reaches it. Part of `build`
           # until it was moved out, so that the twelve other entries here,
