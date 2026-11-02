@@ -399,6 +399,42 @@ describe('prefer-safe-array-length-guard and the import it adds', () => {
         output: null,
         errors: [{ messageId: 'useIsNonEmpty' }],
       },
+      {
+        name: 'a type parameter of the name does not take the value',
+        code: dedent`
+          declare const xs: readonly number[];
+          function f<SafeArray>() {
+            return xs.length > 0;
+          }
+        `,
+        output: dedent`
+          import { SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          function f<SafeArray>() {
+            return SafeArray.isNonEmpty(xs);
+          }
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'a local type alias of the name does not take the value',
+        code: dedent`
+          declare const xs: readonly number[];
+          function f() {
+            type SafeArray = number;
+            return xs.length > 0;
+          }
+        `,
+        output: dedent`
+          import { SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          function f() {
+            type SafeArray = number;
+            return SafeArray.isNonEmpty(xs);
+          }
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
     ],
   });
 });

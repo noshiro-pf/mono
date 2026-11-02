@@ -57,6 +57,15 @@ describe('fixes in a file the default parser reads', () => {
     `);
   });
 
+  test('no-identity-map leaves a call where a parameter takes the name', () => {
+    const code = dedent`
+      import { map } from 'synstate';
+      const f = (skipIfNoChange) => x$.pipe(map((x) => x));
+    `;
+
+    expect(fixWithDefaultParser('no-identity-map', code)).toBe(code);
+  });
+
   test('prefer-derive adds the name to the import', () => {
     expect(
       fixWithDefaultParser(
