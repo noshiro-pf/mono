@@ -343,6 +343,51 @@ test('picks and clears a date', { tag: '@smoke' }, async ({ page }) => {
 });
 
 test(
+  'takes a due date seven months ahead, past Blueprint’s default range',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(LIST);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    const row = page
+      .getByTestId('task-row')
+      .filter({ hasText: 'API を実装する' });
+
+    await row.click();
+
+    const dialog = page.getByTestId('node-dialog');
+
+    const dueDate = dialog.getByLabel('期限');
+
+    // Seven months from today, on the wall clock the page reads too: a month
+    // past the end of Blueprint's default range.
+    const day = Temporal.Now.plainDateISO()
+      .add({ months: 7 })
+      .toString()
+      .replaceAll('-', '/');
+
+    const text = `${day} 09:00`;
+
+    // Text that reads as a day in range is the value as it is typed.
+    await dueDate.fill(text);
+
+    // Closes the calendar, keeping the dialog open, so that the press on 保存
+    // is not taken as one outside the calendar.
+    await dueDate.press('Escape');
+
+    await dialog.getByTestId('save').click();
+
+    await expect.soft(dialog).toBeHidden();
+
+    await row.click();
+
+    // The date, not 「Out of range」.
+    await expect.soft(dueDate).toHaveValue(text);
+  },
+);
+
+test(
   'makes a due date all day, and timed again',
   { tag: '@smoke' },
   async ({ page }) => {
