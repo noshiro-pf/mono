@@ -1,4 +1,11 @@
-import { Arr, expectType, memoizeFunction, Result } from 'ts-data-forge';
+import {
+  Arr,
+  expectType,
+  hasKey,
+  isRecord,
+  memoizeFunction,
+  Result,
+} from 'ts-data-forge';
 import type { ArrayElement, NonEmptyTuple, StrictPick } from 'ts-type-forge';
 import {
   flattenShapeStructure,
@@ -12,7 +19,6 @@ import {
 import {
   createAssertFn,
   createCastFn,
-  createIsFn,
   runtimeTypeNameOf,
   toUnionString,
   UNION_MEMBER_LISTING_MAX_LENGTH,
@@ -109,47 +115,71 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
    */
   const memberTypes: readonly UnknownType[] = types.flatMap(unionMembersOf);
 
+  // Not derived from `validate`, whose failure path validates the members once
+  // more to build its report; a rejected value would pay for that at every
+  // level of nesting.
+  const is = (a: unknown): a is T => memberTypes.some((t) => t.is(a));
+
+  const memberTypeNames = types.map((t) => t.typeName);
+
+  // A listing short enough to print is the default report. It is not the best
+  // one when the value stands out as a near-miss of a single member — which is
+  // common once the members carry names, since names are what make a listing
+  // short — so the closest member is looked for either way.
+  const isListable =
+    toUnionString(memberTypeNames).length <= UNION_MEMBER_LISTING_MAX_LENGTH;
+
+  // A nested union is listed under its own name, which the closest member would
+  // replace with one of its members'.
+  const hasNestedUnion = types.some((t) => t.structure?.kind === 'union');
+
   const validate: Type<T>['validate'] = (a) => {
-    if (memberTypes.some((t) => t.is(a))) {
-      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-      return Result.ok(a as T);
+    if (is(a)) {
+      return Result.ok(a);
     }
 
-    const memberTypeNames = types.map((t) => t.typeName);
+    const header = {
+      path: [],
+      actualValue: a,
+      expectedType: typeNameFilled,
+      typeName: typeNameFilled,
+    } as const;
 
-    if (
-      toUnionString(memberTypeNames).length <= UNION_MEMBER_LISTING_MAX_LENGTH
-    ) {
-      return Result.err([
-        {
-          path: [],
-          actualValue: a,
-          expectedType: typeNameFilled,
-          typeName: typeNameFilled,
-          details: {
-            kind: 'union',
-            typeNames: memberTypeNames,
-          },
-        } satisfies ValidationError,
-      ]);
+    const listingError = {
+      ...header,
+      details: {
+        kind: 'union',
+        typeNames: memberTypeNames,
+      },
+    } as const satisfies ValidationError;
+
+    if (isListable && hasNestedUnion) {
+      return Result.err([listingError]);
     }
 
-    // The member listing is too long to be a readable error message, so narrow
-    // the report down to the members whose runtime type category (derived from
-    // each member's default value) matches the value.
+    // Narrow the report down to the members whose runtime type category
+    // (derived from each member's default value) matches the value.
     const actualCategory = runtimeTypeNameOf(a);
 
-    const candidates = memberTypes
-      .filter((t) => runtimeTypeNameOf(t.defaultValue) === actualCategory)
-      .map((t) => evaluateMember(t, a));
+    const candidateTypes = memberTypes.filter(
+      (t) => runtimeTypeNameOf(t.defaultValue) === actualCategory,
+    );
+
+    // Only a record or a tuple can stand out (see below), so without one the
+    // listing is known without validating the members again.
+    if (
+      isListable &&
+      candidateTypes.every((t) => checkedKeysOf(t) === undefined)
+    ) {
+      return Result.err([listingError]);
+    }
+
+    const candidates = candidateTypes.map((t) => evaluateMember(t, a));
 
     if (!Arr.isNonEmpty(candidates)) {
       return Result.err([
         {
-          path: [],
-          actualValue: a,
-          expectedType: typeNameFilled,
-          typeName: typeNameFilled,
+          ...header,
           details: {
             kind: 'union-category-mismatch',
             memberCount: memberTypes.length,
@@ -176,12 +206,20 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
       (c) => c !== closest && compareByCloseness(c, closest) === 0,
     );
 
+    // When the listing can be printed, the closest member replaces it only if
+    // it stands out: no other member is as close, and the value has at least
+    // one key the member checks and accepts. Otherwise the listing says more
+    // than any one member would.
+    if (
+      isListable &&
+      (Arr.isNonEmpty(equallyClose) || acceptedKeyCountOf(closest, a) === 0)
+    ) {
+      return Result.err([listingError]);
+    }
+
     return Result.err(
       Arr.toUnshifted({
-        path: [],
-        actualValue: a,
-        expectedType: typeNameFilled,
-        typeName: typeNameFilled,
+        ...header,
         details: {
           kind: 'union-closest-member',
           memberCount: memberTypes.length,
@@ -191,8 +229,6 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
       } satisfies ValidationError)(closest.errors),
     );
   };
-
-  const is = createIsFn<T>(validate);
 
   const fill: Type<T>['fill'] = (a) => (is(a) ? a : getDefaultSource().fill(a));
 
@@ -242,6 +278,7 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
  * rules were chosen against.
  */
 type MemberCloseness = Readonly<{
+  memberType: UnknownType;
   typeName: string;
   errors: readonly ValidationError[];
   satisfiedCheckCount: number;
@@ -249,21 +286,64 @@ type MemberCloseness = Readonly<{
 }>;
 
 /**
- * How many checks a member performs on a value: one per key for a record, one
- * per element for a tuple, and a single check for everything else, which either
- * matches or does not. A record whose shape cannot be flattened to a single set
- * of keys (a union of shapes) also counts as one check.
+ * The keys of a record, or the indices of a tuple, that a member checks one by
+ * one; `undefined` for a member that checks the value as a whole.
  */
-const checkCountOf = (memberType: UnknownType): number => {
+const checkedKeysOf = (
+  memberType: UnknownType,
+): readonly string[] | undefined => {
   const view = recordViewOf(memberType);
 
   if (view !== undefined) {
     const shape = flattenShapeStructure(view.shapeStructure);
 
-    return shape === undefined ? 1 : Object.keys(shape).length;
+    return shape === undefined ? undefined : Object.keys(shape);
   }
 
-  return tupleElementTypesOf(memberType)?.length ?? 1;
+  return tupleElementTypesOf(memberType)?.map((_, index) => index.toString());
+};
+
+/**
+ * How many checks a member performs on a value: one per key for a record, one
+ * per element for a tuple, and a single check for everything else, which either
+ * matches or does not. A record whose shape cannot be flattened to a single set
+ * of keys (a union of shapes) also counts as one check.
+ */
+const checkCountOf = (memberType: UnknownType): number =>
+  checkedKeysOf(memberType)?.length ?? 1;
+
+/** The value under a record key or a tuple index, if `a` has one. */
+const valueAt = (a: unknown, key: string): unknown =>
+  Arr.isArray(a)
+    ? a.find((_, index) => index.toString() === key)
+    : isRecord(a) && hasKey(a, key)
+      ? a[key]
+      : undefined;
+
+/**
+ * How many of the keys a member checks are present in the value and accepted.
+ *
+ * Unlike `satisfiedCheckCount`, this does not credit an optional key the value
+ * leaves out (or sets to `undefined`), nor count a key as failed twice because
+ * it reported two errors beneath it, so it tells whether the value resembles
+ * the member at all. An error about the value as a whole, such as a tuple of
+ * the wrong length, means the member checked no key of it.
+ */
+const acceptedKeyCountOf = (closeness: MemberCloseness, a: unknown): number => {
+  const keys = checkedKeysOf(closeness.memberType);
+
+  if (
+    keys === undefined ||
+    closeness.errors.some((e) => !Arr.isNonEmpty(e.path))
+  ) {
+    return 0;
+  }
+
+  return keys.filter(
+    (key) =>
+      valueAt(a, key) !== undefined &&
+      closeness.errors.every((e) => e.path[0] !== key),
+  ).length;
 };
 
 const validationErrorsOf = (
@@ -285,6 +365,7 @@ const evaluateMember = (
   );
 
   return {
+    memberType,
     typeName: memberType.typeName,
     errors,
     satisfiedCheckCount,
