@@ -548,6 +548,46 @@ describe('prefer-ternary', () => {
         errors: [{ messageId: 'preferTernary' }],
       },
       {
+        name: 'no leading semicolon in the braceless body of a for',
+        code: dedent`
+          for (const k of ks) if (c) (o as T).p = 1; else (o as T).p = 2;
+        `,
+        output: dedent`
+          for (const k of ks) (o as T).p = c ? 1 : 2;
+        `,
+        errors: [{ messageId: 'preferTernary' }],
+      },
+      {
+        name: 'no leading semicolon in the braceless body of a while',
+        code: dedent`
+          while (x) if (c) (o).p = 1; else (o).p = 2;
+        `,
+        output: dedent`
+          while (x) (o).p = c ? 1 : 2;
+        `,
+        errors: [{ messageId: 'preferTernary' }],
+      },
+      {
+        name: 'no leading semicolon in the braceless body of an outer if',
+        code: dedent`
+          if (x) if (c) (o).p = 1; else (o).p = 2;
+        `,
+        output: dedent`
+          if (x) (o).p = c ? 1 : 2;
+        `,
+        errors: [{ messageId: 'preferTernary' }],
+      },
+      {
+        name: 'no leading semicolon after a label',
+        code: dedent`
+          label: if (c) (o).p = 1; else (o).p = 2;
+        `,
+        output: dedent`
+          label: (o).p = c ? 1 : 2;
+        `,
+        errors: [{ messageId: 'preferTernary' }],
+      },
+      {
         name: 'let then if: suggested, not fixed',
         code: dedent`
           let x = 1;
