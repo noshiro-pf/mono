@@ -1,6 +1,6 @@
 # synstate-router-dom
 
-[synstate-dom](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-dom) bindings for [synstate-router](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router): a `Routes` that requires a case for every page and rebuilds it only on a new route, and a `Link` that takes only an `Href`.
+[synstate-dom](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-dom) bindings for [synstate-router](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router): a `Routes` that requires a case for every page and rebuilds it only on a new route, and a `Link` that takes an `Href` or an `ExternalHref`, or an observable of either, never a plain string.
 
 > **Status:** in development, not published yet. The design is in synstate-router's [SPEC.md](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-router/SPEC.md) (Japanese), section 6.
 
@@ -81,7 +81,12 @@ const unmount = render(
     document.body,
 );
 
-// document.body now holds the nav and <h1>Product 42</h1>.
+assert.strictEqual(document.querySelector('h1')?.textContent, 'Product 42');
+
+assert.strictEqual(
+    document.querySelector('nav')?.getHTML(),
+    '<a href="/products/">Products</a><a href="https://example.com/help">Help</a>',
+);
 
 unmount();
 ```

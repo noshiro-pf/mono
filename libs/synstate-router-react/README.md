@@ -1,6 +1,6 @@
 # synstate-router-react
 
-React bindings for [synstate-router](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router): a `Routes` that requires a case for every page, a `Link` that takes only an `Href`, and hooks.
+React bindings for [synstate-router](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router): a `Routes` that requires a case for every page, a `Link` that takes an `Href` or an `ExternalHref`, never a plain string, and hooks.
 
 > **Status:** in development, not published yet. The design is in synstate-router's [SPEC.md](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-router/SPEC.md) (Japanese), section 5.
 
@@ -25,33 +25,29 @@ const router = createRouter(routes, {
 // from one module of the application.
 const { Routes, Link } = createReactRouter(router);
 
+// Outside the component, so that `Routes` gets the same object every
+// render: in an application, at the top level of the module.
+const pages: PageCases<typeof routes, RouteId<typeof routes>> = {
+    // Every page is a required key: a new route without a case fails `tsc`.
+    home: () => <h1>{'Home'}</h1>,
+    products: (list) => (
+        <Link to={list.withSearch({ page: asSafeInt(list.search.page + 1) })}>
+            {'Next page'}
+        </Link>
+    ),
+    'products.item': (item) => <h1>{`Product ${item.params.productId}`}</h1>,
+    settings: undefined, // not drawn yet: falls to notFound
+} as const;
+
+const notFound = <h1>{'Not found'}</h1>;
+
 const App = (): React.JSX.Element => (
     <>
         <nav>
             <Link to={routes.products.href()}>{'Products'}</Link>
             <Link to={externalHref('https://example.com/help')}>{'Help'}</Link>
         </nav>
-        <Routes
-            cases={{
-                // Every page is a required key: a new route without a case fails
-                // `tsc`.
-                home: () => <h1>{'Home'}</h1>,
-                products: (list) => (
-                    <Link
-                        to={list.withSearch({
-                            page: asSafeInt(list.search.page + 1),
-                        })}
-                    >
-                        {'Next page'}
-                    </Link>
-                ),
-                'products.item': (item) => (
-                    <h1>{`Product ${item.params.productId}`}</h1>
-                ),
-                settings: undefined, // not drawn yet: falls to notFound
-            }}
-            notFound={<h1>{'Not found'}</h1>}
-        />
+        <Routes cases={pages} notFound={notFound} />
     </>
 );
 

@@ -2,12 +2,12 @@
 
 A client-side router for [SynState](https://github.com/noshiro-pf/mono/tree/main/libs/synstate) in which every destination, path parameter and search parameter the application writes is checked by the type checker, with no code generation and no module augmentation.
 
-> **Status:** in development, not published yet. This version has the route tree, the parameter codecs, `href`, matching and the router, which follows the browser history; the React and synstate-dom bindings follow. The design is in [SPEC.md](./SPEC.md) (Japanese).
+> **Status:** in development, not published yet. This package has the route tree, the parameter codecs, `href`, matching and the router, which follows the browser history; [synstate-router-react](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router-react) and [synstate-router-dom](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router-dom) draw it. The design is in [SPEC.md](./SPEC.md) (Japanese).
 
 ## What it checks
 
 - **Destinations.** A route node's `href` returns an `Href`, a branded string. A hand-written string, a template literal or a `string` variable is not an `Href`, so `/prodcts/1` fails `tsc` instead of failing in the browser.
-- **Parameters.** Path and search parameters are codecs that read the raw string into a value (`param.int` gives a `SafeInt`, `param.literal` a union, `param.refine` a branded type) and are checked when the URL is read, not only declared. A path segment that does not decode means the route does not match; a search value that does not decode is read as absent.
+- **Parameters.** Path and search parameters are codecs that read the raw string into a value (`param.int` gives a `SafeInt`, `param.literal` a union, `param.refine` a branded type) and are checked when the URL is read, not only declared. A path segment that does not decode means the route does not match; a search value that does not decode is read as absent, or as its default.
 - **Branching.** A match is a union keyed by the dotted route id, so a `switch` on `route` narrows `params` and `search`.
 - **The tree.** Two routes that would match the same URL, depending on the order they were defined in, are rejected when the tree is defined.
 

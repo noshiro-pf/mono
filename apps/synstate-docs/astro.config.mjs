@@ -157,6 +157,11 @@ export default defineConfig({
           items: [{ slug: 'synstate-dom/introduction' }],
         },
         {
+          label: 'synstate-router',
+          translations: { ja: 'synstate-router' },
+          items: [{ slug: 'synstate-router/introduction' }],
+        },
+        {
           label: 'Preact Signals',
           translations: { ja: 'Preact Signals' },
           items: [{ slug: 'preact-signals/demo' }],

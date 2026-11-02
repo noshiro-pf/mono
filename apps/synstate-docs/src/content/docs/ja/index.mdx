@@ -51,5 +51,15 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
         など任意のフレームワークでそのまま動作。React / Preact 向けには hooks
         ラッパー、Preact 向けにはさらに Preact Signals 連携も用意。
     </Card>
+    <Card title="SynState で UI まで: synstate-dom" icon="window">
+
+[synstate-dom](/mono/synstate/ja/synstate-dom/introduction/) は Observable を DOM に直接結び付けるので、非同期の処理も含めて UI 全体が 1 つの SynState のグラフになります。コンポーネントは一度だけ実行され、仮想 DOM もコンパイラーもありません。
+
+    </Card>
+    <Card title="型で検査するルーティング: synstate-router" icon="link">
+
+[synstate-router](/mono/synstate/ja/synstate-router/introduction/) は、遷移先・パスパラメータ・検索パラメータをすべて型検査し、状態を SynState の Observable で持ちます。React と synstate-dom 向けの連携があり、npm にはまだ公開していません。
+
+    </Card>
 
 </CardGrid>

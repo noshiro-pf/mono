@@ -65,6 +65,11 @@ const unmount = render(
   document.body,
 );
 
-// document.body now holds the nav and <h1>Product 42</h1>.
+assert.strictEqual(document.querySelector('h1')?.textContent, 'Product 42');
+
+assert.strictEqual(
+  document.querySelector('nav')?.getHTML(),
+  '<a href="/products/">Products</a><a href="https://example.com/help">Help</a>',
+);
 
 unmount();
