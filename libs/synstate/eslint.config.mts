@@ -162,11 +162,75 @@ export default [
 
   // src/ is what `pnpm run check:sumi` checks (tsconfig.sumi.json), so the
   // ESLint rules Sumi covers are turned off there and a diagnostic is
-  // answered by its `@sumi-expect-error` marker alone (D-46). Last, to win
-  // the merge.
+  // answered by its `@sumi-expect-error` marker alone (D-46). After every
+  // other src/ block but the import allow-list below, which has to come after
+  // this one (test/eslint-config.test.mts checks that it is in effect).
   {
     ...eslintConfigOffForSumiCheck,
     files: ['src/**'],
+  },
+
+  // What src/ imports from ts-data-forge and ts-std-forge at run time is in
+  // every bundle that uses synstate. esbuild keeps an object such as `Arr`,
+  // `Num` or `SafeUint` whole once a module uses any member of it, when the
+  // object comes from the package root. So src/ imports `Arr` as
+  // `import * as Arr from 'ts-data-forge/array'`, which esbuild tree-shakes,
+  // and from the root only the names below. Each of them brings only itself
+  // and the few functions it is built on, mostly `Optional`, which the API
+  // is built on anyway (this relies on ts-data-forge's branded-number `is*` /
+  // `as*` being standalone, #3092). Add a standalone function to the list,
+  // never an object. Tests are bundled by nobody; the entry point is not
+  // exempt, since a re-export from it would reach every bundle. This block comes after the Sumi block, which turns
+  // `no-restricted-imports` off because Sumi checks the index-file imports
+  // itself. It turns the rule back on with these paths only, so the
+  // index-file pattern stays Sumi's. The ts-data-forge rules' fixes still
+  // import from the package root (#3093), so a fix that adds `Arr` or an
+  // object is reported here; move that import to the subpath by hand.
+  {
+    files: ['src/**'],
+    ignores: ['src/**/*.test.mts'],
+    rules: defineKnownRules({
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'ts-data-forge',
+              allowImportNames: [
+                'Optional',
+                'Result',
+                'asSafeUint',
+                'createQueue',
+                'expectType',
+                'hasKey',
+                'isNotUndefined',
+                'isPositiveSafeInt',
+                'isRecord',
+                'isString',
+                'pipe',
+                'replaceEqualDeep',
+              ],
+              allowTypeImports: true,
+              message:
+                "synstate src/ imports only standalone functions from the ts-data-forge root, and `Arr` from 'ts-data-forge/array'; see the comment in eslint.config.mts.",
+            },
+            {
+              name: 'ts-std-forge',
+              allowImportNames: [
+                'Optional',
+                'Result',
+                'panic',
+                'pipe',
+                'unreachable',
+              ],
+              allowTypeImports: true,
+              message:
+                'synstate src/ imports only standalone functions from ts-std-forge, which tree-shake; see the comment in eslint.config.mts.',
+            },
+          ],
+        },
+      ],
+    }),
   },
 
   // Last, so that nothing above turns these back on.

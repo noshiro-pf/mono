@@ -5,7 +5,7 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import { Optional, SafeUint, asSafeUint, pipe } from 'ts-data-forge';
+import { Optional, asSafeUint, pipe, type SafeUint } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import type {
   DropInitialValueOperator,
@@ -122,8 +122,7 @@ class SkipWhileObservableClass<A>
       return; // skip update
     }
 
-    this.#mut_index =
-      this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
+    this.#mut_index = asSafeUint(this.#mut_index + 1);
 
     // Once skipping has ended, the predicate is not asked again.
     if (this.#mut_isSkipping && !this.#predicate(sn.value, this.#mut_index)) {

@@ -4,7 +4,8 @@
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
-import { Arr, Optional } from 'ts-data-forge';
+import { Optional } from 'ts-data-forge';
+import * as Arr from 'ts-data-forge/array';
 import { RootObservableClass } from '../class/index.mjs';
 import type {
   InitializedSourceObservable,

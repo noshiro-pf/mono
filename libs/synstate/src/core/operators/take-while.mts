@@ -5,7 +5,7 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import { Optional, SafeUint, asSafeUint, expectType } from 'ts-data-forge';
+import { Optional, asSafeUint, expectType, type SafeUint } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import type {
@@ -124,8 +124,7 @@ class TakeWhileObservableClass<A>
       return; // skip update
     }
 
-    this.#mut_index =
-      this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
+    this.#mut_index = asSafeUint(this.#mut_index + 1);
 
     if (this.#predicate(sn.value, this.#mut_index)) {
       this.setNext(sn.value, updateToken);

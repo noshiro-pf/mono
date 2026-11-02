@@ -2,7 +2,8 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import { Arr, type Optional } from 'ts-data-forge';
+import type { Optional } from 'ts-data-forge';
+import * as Arr from 'ts-data-forge/array';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { RootObservable } from '../types/index.mjs';
 import { RootObservableClass } from './root-observable-class.mjs';

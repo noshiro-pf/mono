@@ -11,7 +11,7 @@
  * costs about twice as much per access as a module binding, on a path every
  * update takes.
  */
-import { Arr } from 'ts-data-forge';
+import * as Arr from 'ts-data-forge/array';
 import { panic } from 'ts-std-forge';
 import type { MutableSet } from 'ts-type-forge';
 import type { UpdateToken } from '../types/index.mjs';

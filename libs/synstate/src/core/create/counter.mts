@@ -5,7 +5,7 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import { asSafeUint, Optional, SafeUint } from 'ts-data-forge';
+import { asSafeUint, Optional, type SafeUint } from 'ts-data-forge';
 import type { PositiveSafeIntWithSmallInt } from 'ts-type-forge';
 import { RootObservableClass } from '../class/index.mjs';
 import type { CounterObservable, TimerId } from '../types/index.mjs';
@@ -154,7 +154,7 @@ class CounterObservableClass
     }
 
     this.#mut_timerId = setInterval(() => {
-      this.#mut_counter = SafeUint.add(1, this.#mut_counter);
+      this.#mut_counter = asSafeUint(this.#mut_counter + 1);
 
       this.#emit(this.#mut_counter);
     }, this.#intervalMilliSeconds);

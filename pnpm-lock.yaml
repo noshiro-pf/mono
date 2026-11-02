@@ -4302,6 +4302,9 @@ importers:
       argparse:
         specifier: 'catalog:'
         version: 3.0.3
+      eslint:
+        specifier: 'catalog:'
+        version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
       eslint-config-typed:
         specifier: workspace:*
         version: link:../eslint-config-typed
