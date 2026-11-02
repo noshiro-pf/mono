@@ -1,38 +1,26 @@
 import type { Int32 as TtfImported_Int32 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  abs,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/int32.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type Int32 = TtfImported_Int32;
 
 type ElementType = Int32;
 
 const typeNameInMessage = 'an integer in [-2^31, 2^31)';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  abs,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  number,
-  number
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: -(2 ** 31),
-  MAX_VALUE: 2 ** 31 - 1,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is an integer in [-2^31, 2^31).
@@ -43,7 +31,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is an integer in [-2^31, 2^31), `false` otherwise
  */
-export const isInt32 = is;
+export const isInt32 = (value: number): value is Int32 =>
+  Number.isSafeInteger(value) && -(2 ** 31) <= value && value <= 2 ** 31 - 1;
 
 /**
  * Casts a `number` to the `Int32` branded type.
@@ -55,7 +44,13 @@ export const isInt32 = is;
  * @returns The value as an `Int32`
  * @throws {TypeError} If the value is not an integer in [-2^31, 2^31)
  */
-export const asInt32 = castType;
+export const asInt32 = <N extends number>(value: N): Int32 & N => {
+  if (!isInt32(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `Int32` branded type.
@@ -71,7 +66,7 @@ export const Int32 = {
    * @returns `true` if the value is an integer in [-2^31, 2^31), `false` otherwise
    * @see {@link isInt32} for usage examples
    */
-  is,
+  is: isInt32,
 
   /**
    * The smallest value representable as `Int32` (the lower saturation target of

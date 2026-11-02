@@ -1,37 +1,25 @@
 import type { PositiveUint32 as TtfImported_PositiveUint32 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/positive-uint32.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type PositiveUint32 = TtfImported_PositiveUint32;
 
 type ElementType = PositiveUint32;
 
 const typeNameInMessage = 'a positive integer in [1, 2^32)';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  1,
-  number
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: 1,
-  MAX_VALUE: 2 ** 32 - 1,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a positive integer in [1, 2^32).
@@ -42,7 +30,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a positive integer in [1, 2^32), `false` otherwise
  */
-export const isPositiveUint32 = is;
+export const isPositiveUint32 = (value: number): value is PositiveUint32 =>
+  Number.isSafeInteger(value) && 1 <= value && value <= 2 ** 32 - 1;
 
 /**
  * Casts a `number` to the `PositiveUint32` branded type.
@@ -54,7 +43,15 @@ export const isPositiveUint32 = is;
  * @returns The value as a `PositiveUint32`
  * @throws {TypeError} If the value is not a positive integer in [1, 2^32)
  */
-export const asPositiveUint32 = castType;
+export const asPositiveUint32 = <N extends number>(
+  value: N,
+): PositiveUint32 & N => {
+  if (!isPositiveUint32(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `PositiveUint32` branded
@@ -71,7 +68,7 @@ export const PositiveUint32 = {
    * @returns `true` if the value is a positive integer in [1, 2^32), `false` otherwise
    * @see {@link isPositiveUint32} for usage examples
    */
-  is,
+  is: isPositiveUint32,
 
   /**
    * The smallest value representable as `PositiveUint32` (the lower saturation

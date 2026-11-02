@@ -1,40 +1,26 @@
-import type { SafeUint, SafeInt as TtfImported_SafeInt } from 'ts-type-forge';
+import type { SafeInt as TtfImported_SafeInt } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  abs,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/safe-int.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type SafeInt = TtfImported_SafeInt;
 
 type ElementType = SafeInt;
 
 const typeNameInMessage = 'a safe integer';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  abs,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  SafeInt,
-  SafeUint
->({
-  integerOrSafeInteger: 'SafeInteger',
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-min-safe-integer
-  MIN_VALUE: Number.MIN_SAFE_INTEGER as SafeInt,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer
-  MAX_VALUE: Number.MAX_SAFE_INTEGER as SafeUint,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a safe integer.
@@ -54,7 +40,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a safe integer, `false` otherwise
  */
-export const isSafeInt = is;
+export const isSafeInt = (value: number): value is SafeInt =>
+  Number.isSafeInteger(value);
 
 /**
  * Casts a `number` to the `SafeInt` branded type.
@@ -76,7 +63,13 @@ export const isSafeInt = is;
  * @returns The value as a `SafeInt`
  * @throws {TypeError} If the value is not a safe integer
  */
-export const asSafeInt = castType;
+export const asSafeInt = <N extends number>(value: N): SafeInt & N => {
+  if (!isSafeInt(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `SafeInt` branded type.
@@ -102,7 +95,7 @@ export const SafeInt = {
    * @returns `true` if the value is a safe integer, `false` otherwise
    * @see {@link isSafeInt} for usage examples
    */
-  is,
+  is: isSafeInt,
 
   /**
    * The smallest value representable as `SafeInt` (the lower saturation target

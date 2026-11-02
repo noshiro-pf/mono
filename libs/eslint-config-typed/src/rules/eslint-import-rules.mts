@@ -24,6 +24,7 @@ export const eslintImportsRules = {
         `./index.{${allExtensionsStr}}`,
         'rxjs/operators',
         'ts-data-forge/array',
+        'ts-data-forge/number',
         'solid-js/web',
         '@testing-library/jest-dom/**',
         'react-dom/client',

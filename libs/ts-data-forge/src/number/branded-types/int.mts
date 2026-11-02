@@ -1,35 +1,23 @@
 import type { Int as TtfImported_Int } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  abs,
+  add,
+  div,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/int.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type Int = TtfImported_Int;
 
 type ElementType = Int;
 
 const typeNameInMessage = 'an integer';
-
-const {
-  abs,
-  add,
-  castType,
-  div,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  number,
-  number
->({
-  integerOrSafeInteger: 'Integer',
-  MIN_VALUE: -Number.MAX_VALUE,
-  MAX_VALUE: Number.MAX_VALUE,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is an integer.
@@ -50,7 +38,7 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is an integer, `false` otherwise
  */
-export const isInt = is;
+export const isInt = (value: number): value is Int => Number.isInteger(value);
 
 /**
  * Casts a `number` to the `Int` branded type.
@@ -72,7 +60,13 @@ export const isInt = is;
  * @returns The value as an `Int`
  * @throws {TypeError} If the value is not an integer
  */
-export const asInt = castType;
+export const asInt = <N extends number>(value: N): Int & N => {
+  if (!isInt(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `Int` branded type.
@@ -101,7 +95,7 @@ export const Int = {
    * @returns `true` if the value is an integer, `false` otherwise
    * @see {@link isInt} for usage examples
    */
-  is,
+  is: isInt,
 
   /**
    * Returns the absolute value of an integer.

@@ -1,36 +1,23 @@
 import type { NonZeroUint16 as TtfImported_NonZeroUint16 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  randomNonZero as random,
+} from '../operators/non-zero-uint16.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type NonZeroUint16 = TtfImported_NonZeroUint16;
 
 type ElementType = NonZeroUint16;
 
 const typeNameInMessage = 'a non-zero integer in [1, 2^16)';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  add,
-  castType,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  randomNonZero: random,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  1,
-  number
->({
-  integerOrSafeInteger: 'SafeInteger',
-  nonZero: true,
-  MIN_VALUE: 1,
-  MAX_VALUE: 2 ** 16 - 1,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a non-zero integer in [1, 2^16).
@@ -41,7 +28,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-zero integer in [1, 2^16), `false` otherwise
  */
-export const isNonZeroUint16 = is;
+export const isNonZeroUint16 = (value: number): value is NonZeroUint16 =>
+  Number.isSafeInteger(value) && 1 <= value && value <= 2 ** 16 - 1;
 
 /**
  * Casts a `number` to the `NonZeroUint16` branded type.
@@ -53,7 +41,15 @@ export const isNonZeroUint16 = is;
  * @returns The value as a `NonZeroUint16`
  * @throws {TypeError} If the value is not a non-zero integer in [1, 2^16)
  */
-export const asNonZeroUint16 = castType;
+export const asNonZeroUint16 = <N extends number>(
+  value: N,
+): NonZeroUint16 & N => {
+  if (!isNonZeroUint16(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NonZeroUint16` branded
@@ -70,7 +66,7 @@ export const NonZeroUint16 = {
    * @returns `true` if the value is a non-zero integer in [1, 2^16), `false` otherwise
    * @see {@link isNonZeroUint16} for usage examples
    */
-  is,
+  is: isNonZeroUint16,
 
   /**
    * The smallest value representable as `NonZeroUint16` (the lower saturation

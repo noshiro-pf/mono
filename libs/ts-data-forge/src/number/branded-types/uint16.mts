@@ -1,37 +1,25 @@
 import type { Uint16 as TtfImported_Uint16 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/uint16.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type Uint16 = TtfImported_Uint16;
 
 type ElementType = Uint16;
 
 const typeNameInMessage = 'a non-negative integer less than 2^16';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  0,
-  number
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: 0,
-  MAX_VALUE: 2 ** 16 - 1,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a non-negative integer less than 2^16.
@@ -42,7 +30,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-negative integer less than 2^16, `false` otherwise
  */
-export const isUint16 = is;
+export const isUint16 = (value: number): value is Uint16 =>
+  Number.isSafeInteger(value) && 0 <= value && value <= 2 ** 16 - 1;
 
 /**
  * Casts a `number` to the `Uint16` branded type.
@@ -54,7 +43,13 @@ export const isUint16 = is;
  * @returns The value as an `Uint16`
  * @throws {TypeError} If the value is not a non-negative integer less than 2^16
  */
-export const asUint16 = castType;
+export const asUint16 = <N extends number>(value: N): Uint16 & N => {
+  if (!isUint16(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `Uint16` branded type.
@@ -70,7 +65,7 @@ export const Uint16 = {
    * @returns `true` if the value is a non-negative integer less than 2^16, `false` otherwise
    * @see {@link isUint16} for usage examples
    */
-  is,
+  is: isUint16,
 
   /**
    * The smallest value representable as `Uint16` (the lower saturation target

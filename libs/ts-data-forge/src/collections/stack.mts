@@ -1,6 +1,6 @@
 import { Optional } from '../functional/index.mjs';
 import { range } from '../iterator/index.mjs';
-import { asUint32, Uint32 } from '../number/index.mjs';
+import { asUint32, type Uint32 } from '../number/index.mjs';
 import type { SizeType } from '../types.mjs';
 
 /**
@@ -285,7 +285,7 @@ class StackClass<T> implements Stack<T> {
       return Optional.none;
     }
 
-    this.#mut_size = Uint32.sub(this.#mut_size, 1);
+    this.#mut_size = asUint32(this.#mut_size - 1);
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const element = this.#mut_buffer[this.#mut_size]!;
@@ -320,7 +320,7 @@ class StackClass<T> implements Stack<T> {
 
     this.#mut_buffer[this.#mut_size] = value;
 
-    this.#mut_size = Uint32.add(this.#mut_size, 1);
+    this.#mut_size = asUint32(this.#mut_size + 1);
   }
 }
 

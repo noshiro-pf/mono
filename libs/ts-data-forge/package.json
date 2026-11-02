@@ -31,6 +31,12 @@
         "types": "./dist/array/impl/index.d.mts",
         "default": "./dist/array/impl/index.mjs"
       }
+    },
+    "./number": {
+      "import": {
+        "types": "./dist/number/num/impl/index.d.mts",
+        "default": "./dist/number/num/impl/index.mjs"
+      }
     }
   },
   "module": "./dist/entry-point.mjs",
@@ -57,9 +63,9 @@
     "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:index gen:branded-number gen:readme gen:jsdoc",
-    "gen:branded-number": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-branded-number/generate.mts && pnpm run gen:jsdoc && pnpm run z:prettier 'src/number/branded-types/*.mts' 'src/number/enum/*.mts'",
+    "gen:branded-number": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-branded-number/generate.mts && pnpm run gen:jsdoc && pnpm run z:prettier 'src/number/branded-types/*.mts' 'src/number/enum/*.mts' 'src/number/operators/*.mts'",
     "gen:index": "run-s gen:index:src fix:fmt",
-    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude entry-point.mts --exclude built-in-tag.mts --preserve 'array/index.mts' --preserve 'functional/index.mts'",
+    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude entry-point.mts --exclude built-in-tag.mts --preserve 'array/index.mts' --preserve 'functional/index.mts' --preserve 'number/num/index.mts' --exclude 'number/operators'",
     "gen:jsdoc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples-in-jsdoc.mts",
     "gen:readme": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
     "test": "pnpm run check:test",

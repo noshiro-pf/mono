@@ -1,5 +1,5 @@
 /* eslint-disable math/no-static-nan-calculations */
-// Example: src/number/num.mts (Num.safeParseInt)
+// Example: src/number/num/impl/num.mts (Num.safeParseInt)
 import { Num, Result } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

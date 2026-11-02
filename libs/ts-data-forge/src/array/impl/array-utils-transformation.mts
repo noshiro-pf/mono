@@ -17,7 +17,11 @@ import type {
 } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';
-import { asPositiveUint32, asUint32, Uint32 } from '../../number/index.mjs';
+import {
+  asPositiveUint32,
+  asUint32,
+  type Uint32,
+} from '../../number/index.mjs';
 import { castMutable, tp } from '../../others/index.mjs';
 import type { ArrayIndex, MapSetKeyType, SizeType } from '../../types.mjs';
 import { newArray, seq } from './array-utils-creation.mjs';
@@ -845,7 +849,7 @@ export const zip = <
   array2: Ar2,
 ): ConstrainedList.Zip<Ar1, Ar2> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  seq(Uint32.min(size(array1), size(array2))).map((i: Uint32) =>
+  seq(asUint32(Math.min(size(array1), size(array2)))).map((i: Uint32) =>
     // Non-null assertion is safe here because `i` is always within bounds of both arrays up to the length of the shorter one.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     tp(array1[i]!, array2[i]!),

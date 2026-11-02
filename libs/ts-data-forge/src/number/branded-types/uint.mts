@@ -1,36 +1,24 @@
 import type { Uint as TtfImported_Uint } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/uint.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type Uint = TtfImported_Uint;
 
 type ElementType = Uint;
 
 const typeNameInMessage = 'a non-negative integer';
-
-const {
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  0,
-  number
->({
-  integerOrSafeInteger: 'Integer',
-  MIN_VALUE: 0,
-  MAX_VALUE: Number.MAX_VALUE,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a non-negative integer.
@@ -52,7 +40,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a non-negative integer, `false` otherwise
  */
-export const isUint = is;
+export const isUint = (value: number): value is Uint =>
+  Number.isInteger(value) && value >= 0;
 
 /**
  * Casts a `number` to the `Uint` branded type.
@@ -74,7 +63,13 @@ export const isUint = is;
  * @returns The value as an `Uint`
  * @throws {TypeError} If the value is not a non-negative integer
  */
-export const asUint = castType;
+export const asUint = <N extends number>(value: N): Uint & N => {
+  if (!isUint(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `Uint` branded type.
@@ -104,7 +99,7 @@ export const Uint = {
    * @returns `true` if the value is a non-negative integer, `false` otherwise
    * @see {@link isUint} for usage examples
    */
-  is,
+  is: isUint,
 
   /**
    * The smallest value representable as `Uint` (the lower saturation target of

@@ -2,7 +2,16 @@ import type {
   NegativeInt as TtfImported_NegativeInt,
   WithSmallInt,
 } from 'ts-type-forge';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  add,
+  fromNumber,
+  max as max_,
+  min as min_,
+  pow,
+  random,
+  sub,
+} from '../operators/negative-int.mjs';
 import { PositiveInt } from './positive-int.mjs';
 
 export type NegativeInt = TtfImported_NegativeInt;
@@ -10,29 +19,6 @@ export type NegativeInt = TtfImported_NegativeInt;
 type ElementType = NegativeInt;
 
 const typeNameInMessage = 'a negative integer';
-
-const {
-  MAX_VALUE,
-  add,
-  castType,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  number,
-  -1
->({
-  integerOrSafeInteger: 'Integer',
-  nonZero: true,
-  MIN_VALUE: -Number.MAX_VALUE,
-  MAX_VALUE: -1,
-  typeNameInMessage,
-} as const);
 
 const abs = (x: WithSmallInt<ElementType>): PositiveInt =>
   PositiveInt.fromNumber(Math.abs(x));
@@ -46,7 +32,8 @@ const abs = (x: WithSmallInt<ElementType>): PositiveInt =>
  * @param value - The value to check
  * @returns `true` if the value is a negative integer, `false` otherwise
  */
-export const isNegativeInt = is;
+export const isNegativeInt = (value: number): value is NegativeInt =>
+  Number.isInteger(value) && value <= -1;
 
 /**
  * Casts a `number` to the `NegativeInt` branded type.
@@ -58,7 +45,13 @@ export const isNegativeInt = is;
  * @returns The value as a `NegativeInt`
  * @throws {TypeError} If the value is not a negative integer
  */
-export const asNegativeInt = castType;
+export const asNegativeInt = <N extends number>(value: N): NegativeInt & N => {
+  if (!isNegativeInt(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NegativeInt` branded type.
@@ -78,7 +71,7 @@ export const NegativeInt = {
    * @returns `true` if the value is a negative integer, `false` otherwise
    * @see {@link isNegativeInt} for usage examples
    */
-  is,
+  is: isNegativeInt,
 
   /**
    * The largest value representable as `NegativeInt` (the upper saturation

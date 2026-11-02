@@ -1,8 +1,8 @@
 import type { FixedLengthTuple, NonZeroNumber } from 'ts-type-forge';
-import { expectType } from '../expect-type.mjs';
-import { pipe, Result } from '../functional/index.mjs';
-import { asNonZeroFiniteNumber } from './branded-types/index.mjs';
-import { Num } from './num.mjs';
+import { expectType } from '../../../expect-type.mjs';
+import { pipe, Result } from '../../../functional/index.mjs';
+import { asNonZeroFiniteNumber } from '../../branded-types/index.mjs';
+import * as Num from './num.mjs';
 
 const testClamp = (
   [a, b]: FixedLengthTuple<2, number>,

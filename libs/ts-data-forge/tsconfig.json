@@ -19,7 +19,8 @@
     // against the last build. See docs/workspace-package-linking.md.
     "paths": {
       "ts-data-forge": ["./src/entry-point.mts"],
-      "ts-data-forge/array": ["./src/array/impl/index.mts"]
+      "ts-data-forge/array": ["./src/array/impl/index.mts"],
+      "ts-data-forge/number": ["./src/number/num/impl/index.mts"]
     }
   },
   "include": ["./src", "./test", "./samples", "./scripts", "./configs"]

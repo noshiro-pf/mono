@@ -4,35 +4,24 @@ import type {
   FiniteNumber as TtfImported_FiniteNumber,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  abs,
+  add,
+  div,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/finite-number.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type FiniteNumber = TtfImported_FiniteNumber;
 
 type ElementType = FiniteNumber;
 
 const typeNameInMessage = 'a finite number';
-
-const {
-  abs,
-  add,
-  castType,
-  div,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForFloat<
-  ElementType,
-  number,
-  number
->({
-  MIN_VALUE: -Number.MAX_VALUE,
-  MAX_VALUE: Number.MAX_VALUE,
-  typeNameInMessage,
-} as const);
 
 const floor = (
   x: ElementType,
@@ -65,7 +54,8 @@ expectType<TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>, Int>(
  * @param value - The value to check
  * @returns `true` if the value is a finite number, `false` otherwise
  */
-export const isFiniteNumber = is;
+export const isFiniteNumber = (value: number): value is FiniteNumber =>
+  Number.isFinite(value);
 
 /**
  * Casts a `number` to the `FiniteNumber` branded type.
@@ -77,7 +67,15 @@ export const isFiniteNumber = is;
  * @returns The value as a `FiniteNumber`
  * @throws {TypeError} If the value is not a finite number
  */
-export const asFiniteNumber = castType;
+export const asFiniteNumber = <N extends number>(
+  value: N,
+): FiniteNumber & N => {
+  if (!isFiniteNumber(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `FiniteNumber` branded type.
@@ -92,7 +90,7 @@ export const FiniteNumber = {
    * @returns `true` if the value is a finite number, `false` otherwise
    * @see {@link isFiniteNumber} for usage examples
    */
-  is,
+  is: isFiniteNumber,
 
   /**
    * Returns the absolute value of a finite number.

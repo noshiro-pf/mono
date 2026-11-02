@@ -13,6 +13,10 @@ export default defineViteConfig({
       workspaceRootPath,
       './src/array/impl/index.mts',
     ),
+    'ts-data-forge/number': path.resolve(
+      workspaceRootPath,
+      './src/number/num/impl/index.mts',
+    ),
     'ts-data-forge': path.resolve(workspaceRootPath, './src/entry-point.mts'),
   },
   coverage: {
@@ -31,6 +35,8 @@ export default defineViteConfig({
       'samples/**/*',
       // Runs ESLint, which needs Node.js.
       'test/eslint-config.test.mts',
+      // Reads the source directory.
+      'test/branded-number-guards.test.mts',
     ],
     optimizeDepsInclude: ['react'],
   },

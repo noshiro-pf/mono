@@ -1,41 +1,25 @@
-import type {
-  SafeUint,
-  PositiveSafeInt as TtfImported_PositiveSafeInt,
-} from 'ts-type-forge';
+import type { PositiveSafeInt as TtfImported_PositiveSafeInt } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/positive-safe-int.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type PositiveSafeInt = TtfImported_PositiveSafeInt;
 
 type ElementType = PositiveSafeInt;
 
 const typeNameInMessage = 'a positive safe integer';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  1,
-  SafeUint
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: 1,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer
-  MAX_VALUE: Number.MAX_SAFE_INTEGER as SafeUint,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a positive safe integer.
@@ -58,7 +42,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a positive safe integer, `false` otherwise
  */
-export const isPositiveSafeInt = is;
+export const isPositiveSafeInt = (value: number): value is PositiveSafeInt =>
+  Number.isSafeInteger(value) && value >= 1;
 
 /**
  * Casts a `number` to the `PositiveSafeInt` branded type.
@@ -80,7 +65,15 @@ export const isPositiveSafeInt = is;
  * @returns The value as a `PositiveSafeInt`
  * @throws {TypeError} If the value is not a positive safe integer
  */
-export const asPositiveSafeInt = castType;
+export const asPositiveSafeInt = <N extends number>(
+  value: N,
+): PositiveSafeInt & N => {
+  if (!isPositiveSafeInt(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `PositiveSafeInt` branded
@@ -109,7 +102,7 @@ export const PositiveSafeInt = {
    * @returns `true` if the value is a positive safe integer, `false` otherwise
    * @see {@link isPositiveSafeInt} for usage examples
    */
-  is,
+  is: isPositiveSafeInt,
 
   /**
    * The smallest value representable as `PositiveSafeInt` (the lower saturation

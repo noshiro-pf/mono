@@ -1,37 +1,25 @@
 import type { PositiveUint16 as TtfImported_PositiveUint16 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  div,
+  fromNumber,
+  max as max_,
+  min as min_,
+  mul,
+  pow,
+  random,
+  sub,
+} from '../operators/positive-uint16.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type PositiveUint16 = TtfImported_PositiveUint16;
 
 type ElementType = PositiveUint16;
 
 const typeNameInMessage = 'a positive integer in [1, 2^16)';
-
-const {
-  MAX_VALUE,
-  MIN_VALUE,
-  add,
-  castType,
-  div,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  mul,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
-  ElementType,
-  1,
-  number
->({
-  integerOrSafeInteger: 'SafeInteger',
-  MIN_VALUE: 1,
-  MAX_VALUE: 2 ** 16 - 1,
-  typeNameInMessage,
-} as const);
 
 /**
  * Type guard that checks if a value is a positive integer in [1, 2^16).
@@ -42,7 +30,8 @@ const {
  * @param value - The value to check
  * @returns `true` if the value is a positive integer in [1, 2^16), `false` otherwise
  */
-export const isPositiveUint16 = is;
+export const isPositiveUint16 = (value: number): value is PositiveUint16 =>
+  Number.isSafeInteger(value) && 1 <= value && value <= 2 ** 16 - 1;
 
 /**
  * Casts a `number` to the `PositiveUint16` branded type.
@@ -54,7 +43,15 @@ export const isPositiveUint16 = is;
  * @returns The value as a `PositiveUint16`
  * @throws {TypeError} If the value is not a positive integer in [1, 2^16)
  */
-export const asPositiveUint16 = castType;
+export const asPositiveUint16 = <N extends number>(
+  value: N,
+): PositiveUint16 & N => {
+  if (!isPositiveUint16(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `PositiveUint16` branded
@@ -71,7 +68,7 @@ export const PositiveUint16 = {
    * @returns `true` if the value is a positive integer in [1, 2^16), `false` otherwise
    * @see {@link isPositiveUint16} for usage examples
    */
-  is,
+  is: isPositiveUint16,
 
   /**
    * The smallest value representable as `PositiveUint16` (the lower saturation

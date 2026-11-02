@@ -1,5 +1,15 @@
 import type { NegativeFiniteNumber as TtfImported_NegativeFiniteNumber } from 'ts-type-forge';
-import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+import {
+  MAX_VALUE,
+  add,
+  fromNumber,
+  max as max_,
+  min as min_,
+  pow,
+  random,
+  sub,
+} from '../operators/negative-finite-number.mjs';
+import type { TsDataForgeInternals } from '../refined-number-utils.mjs';
 import { PositiveFiniteNumber } from './positive-finite-number.mjs';
 
 export type NegativeFiniteNumber = TtfImported_NegativeFiniteNumber;
@@ -7,28 +17,6 @@ export type NegativeFiniteNumber = TtfImported_NegativeFiniteNumber;
 type ElementType = NegativeFiniteNumber;
 
 const typeNameInMessage = 'a negative finite number';
-
-const {
-  MAX_VALUE,
-  add,
-  castType,
-  fromNumber,
-  is,
-  max: max_,
-  min: min_,
-  pow,
-  random,
-  sub,
-} = TsDataForgeInternals.RefinedNumberUtils.operatorsForFloat<
-  ElementType,
-  number,
-  number
->({
-  nonZero: true,
-  MIN_VALUE: -Number.MAX_VALUE,
-  MAX_VALUE: -Number.MIN_VALUE,
-  typeNameInMessage,
-} as const);
 
 const abs = (x: ElementType): PositiveFiniteNumber =>
   PositiveFiniteNumber.fromNumber(Math.abs(x));
@@ -70,7 +58,10 @@ const round = (
  * @param value - The value to check
  * @returns `true` if the value is a negative finite number, `false` otherwise
  */
-export const isNegativeFiniteNumber = is;
+export const isNegativeFiniteNumber = (
+  value: number,
+): value is NegativeFiniteNumber =>
+  Number.isFinite(value) && value <= -Number.MIN_VALUE;
 
 /**
  * Casts a `number` to the `NegativeFiniteNumber` branded type.
@@ -82,7 +73,15 @@ export const isNegativeFiniteNumber = is;
  * @returns The value as a `NegativeFiniteNumber`
  * @throws {TypeError} If the value is not a negative finite number
  */
-export const asNegativeFiniteNumber = castType;
+export const asNegativeFiniteNumber = <N extends number>(
+  value: N,
+): NegativeFiniteNumber & N => {
+  if (!isNegativeFiniteNumber(value)) {
+    throw new TypeError(`Expected ${typeNameInMessage}, got: ${value}`);
+  }
+
+  return value;
+};
 
 /**
  * Namespace providing type-safe operations for the `NegativeFiniteNumber`
@@ -98,7 +97,7 @@ export const NegativeFiniteNumber = {
    * @returns `true` if the value is a negative finite number, `false` otherwise
    * @see {@link isNegativeFiniteNumber} for usage examples
    */
-  is,
+  is: isNegativeFiniteNumber,
 
   /**
    * The largest value representable as `NegativeFiniteNumber` (the upper
