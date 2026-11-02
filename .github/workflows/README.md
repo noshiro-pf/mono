@@ -767,7 +767,7 @@ Nothing checks this; a review does.
   conclude (see "Reusing a verdict").
 - **Local guards that read this directory**: `check:root:actionlint`,
   `check:root:ci-commands`, `check:root:workflow-event-name`,
-  `check:root:node-support`. `fmt` and `check:cspell` read it too; CI itself
+  `check:root:node-support`, `check:root:restart-unblock-prs-paths`. `fmt` and `check:cspell` read it too; CI itself
   runs nothing on a workflow change until the pull request runs.
   `check:root:actionlint` also lints the composite actions' steps, which
   actionlint does not read on its own. It downloads the actionlint and
