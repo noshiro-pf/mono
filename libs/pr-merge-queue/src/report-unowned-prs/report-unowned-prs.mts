@@ -2,7 +2,12 @@ import type { QueueComments, QueueOwner, ReportEntry } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { StrictPick } from 'ts-type-forge';
-import { resolveApiContext, rest, viewerLogin } from '../lib/index.mjs';
+import {
+  resolveApiContext,
+  rest,
+  restAllPages,
+  viewerLogin,
+} from '../lib/index.mjs';
 import { readQueueState, type QueueState } from '../pr-report/index.mjs';
 
 /** What `report-unowned-prs --help` prints. */
@@ -72,9 +77,11 @@ export const reportUnownedPrs = async (
   }
 
   // Issues and pull requests come from one endpoint; a pull request has no body
-  // this marker could be in that this account wrote as an issue.
-  const listed = await rest(api.value, 'GET', '/issues', IssueListSchema, {
-    query: { state: 'open', creator: viewer.value, per_page: '100' },
+  // this marker could be in that this account wrote as an issue. Every page:
+  // the account that runs the queue opens most of both, so a marker issue can
+  // be older than the newest hundred.
+  const listed = await restAllPages(api.value, '/issues', IssueListSchema, {
+    query: { state: 'open', creator: viewer.value },
   });
 
   if (Result.isErr(listed)) {

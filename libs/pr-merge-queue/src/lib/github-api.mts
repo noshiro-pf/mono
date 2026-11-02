@@ -15,9 +15,9 @@
 
 import * as nodePath from 'node:path';
 import type { RepoRef } from 'pr-report-core';
-import { Arr, Json, Result, unknownToString } from 'ts-data-forge';
+import { Arr, asUint32, Json, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import type { ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord, StrictOmit } from 'ts-type-forge';
 import { parseJson, readJsonFile } from './json.mjs';
 import { git, repoRoot } from './shell.mjs';
 
@@ -207,6 +207,66 @@ export const rest = async <A,>(
     ? Result.err(response.value.message)
     : validate(response.value, schema);
 };
+
+/**
+ * Every page of a list endpoint, as one list: `GET` with `per_page=100`, then
+ * `page=2`, … until a page comes back shorter than that. A list read with a
+ * bare `per_page: '100'` sees only the newest hundred, and whatever it was
+ * looking for may be on the next page.
+ */
+export const restAllPages = async <A,>(
+  context: ApiContext,
+  path: string,
+  schema: t.Type<readonly A[]>,
+  { query, withBodyHtml = false }: StrictOmit<RestOptions, 'body'> = {},
+): Promise<Result<readonly A[], string>> =>
+  collectPages(
+    async (page) =>
+      rest(context, 'GET', path, schema, {
+        query: {
+          ...query,
+          per_page: PAGE_SIZE.toString(),
+          page: page.toString(),
+        },
+        withBodyHtml,
+      }),
+    PAGE_SIZE,
+  );
+
+/**
+ * The pages `readPage` returns from page 1 on, concatenated, stopping at the
+ * first page shorter than `pageSize` (an empty one included) or the first
+ * error. Separate from {@link restAllPages} so the stopping rule is testable
+ * without a server.
+ */
+export const collectPages = async <A,>(
+  readPage: (page: number) => Promise<Result<readonly A[], string>>,
+  pageSize: number,
+): Promise<Result<readonly A[], string>> => {
+  const mut_items: A[] = [];
+
+  for (const index of Arr.seq(MAX_PAGES)) {
+    const read = await readPage(index + 1);
+
+    if (Result.isErr(read)) {
+      return read;
+    }
+
+    mut_items.push(...read.value);
+
+    if (read.value.length < pageSize) {
+      return Result.ok(mut_items);
+    }
+  }
+
+  return Result.err(`more than ${MAX_PAGES} pages of ${pageSize}`);
+};
+
+/** GitHub's largest page. */
+const PAGE_SIZE = 100;
+
+/** A bound on a list that never ends, which would otherwise loop forever. */
+const MAX_PAGES = asUint32(100);
 
 /**
  * The login the token authenticates as. Outside `rest` because the route is not
