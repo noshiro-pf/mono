@@ -1,5 +1,17 @@
 # ts-data-forge
 
+## 14.10.2
+
+### Patch Changes
+
+- eb65772: The `'update'` action of `IMap.withMutations` and `IMapMapped.withMutations` now calls its updater for a key whose value is `undefined`, as `update` does. It treated such a key as missing, so the batched form left the value unchanged (and warned "key not found" when that message is on) where `update` replaced it.
+- 5618786: `Json.stringifySortedKey` no longer drops properties it failed to collect. It sorted by passing every key it found as `JSON.stringify`'s allowlist, but its search skipped objects nested in an array of arrays and the objects `toJSON` returns, so `{ a: [[{ b: 1 }]] }` came out as `{"a":[[{}]]}` and `{ x: { toJSON: () => ({ y: 1 }) } }` as `{"x":{}}`, still as `Result.ok`. The keys are now collected while `JSON.stringify` walks the value, so every level is seen. A circular value now gives `Result.err` instead of throwing a `RangeError` from the search.
+- c53c17d: `Num.divInt` no longer floors its divisor. A divisor in `(-1, 1)` floored to `0` or `-1`, so `Num.divInt(5, asNonZeroFiniteNumber(0.5))` returned `Infinity` and `Num.divInt(0.3, asNonZeroFiniteNumber(0.5))` returned `NaN`, both typed as integers; they now return `10` and `0`. The result is `⌊⌊a⌋ / b⌋`, unchanged for an integer divisor. The JSDoc no longer says that division by zero returns `NaN`, since the divisor's type excludes zero.
+- 86c41cb: `Obj.pick` and `Obj.omit`, direct and curried, now match numeric and symbol keys as their types say. They compared the requested keys with what `Object.entries` yields, which is always a string and never a symbol, so `Obj.pick({ 1: 'a', b: 2 }, [1])` returned `{}` and `Obj.omit({ 1: 'a', b: 2 }, [1])` kept `1`. A numeric key now matches its string form, `pick` copies a requested symbol-keyed property, and `omit` keeps the symbol-keyed properties it is not asked to omit instead of dropping all of them.
+- b7a2d57: `replaceEqualDeep` now copies an own `__proto__` key, such as one `JSON.parse` produces, as a property. The copy it builds when a plain object changed was filled by assignment, so `__proto__` went through the setter and became the copy's prototype: the key was missing from `Object.keys` and `JSON.stringify`, its properties were inherited instead, and the result was not deeply equal to `next`.
+- a5235cf: Return singleton chunks when `Arr.partition` or `Arr.chunk` is given a chunk
+  size of `1`, including their curried forms, instead of dropping every element.
+
 ## 14.10.1
 
 ### Patch Changes

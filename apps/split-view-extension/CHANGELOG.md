@@ -1,5 +1,22 @@
 # split-view-extension
 
+## 0.7.4
+
+### Patch Changes
+
+- e44fb03: Open a pull request's conversation at 75% beside the diff alone, as it is
+  beside the issue or the session, and put the issue and the Claude Code session
+  to the right of the conversation, the issue stacked over the session when both
+  are there. The diff is at 75% in three columns.
+- Updated dependencies [eb65772]
+- Updated dependencies [5618786]
+- Updated dependencies [c53c17d]
+- Updated dependencies [86c41cb]
+- Updated dependencies [b7a2d57]
+- Updated dependencies [a5235cf]
+    - ts-data-forge@14.10.2
+    - react-utils@0.0.24
+
 ## 0.7.3
 
 ### Patch Changes

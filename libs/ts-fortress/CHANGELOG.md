@@ -1,5 +1,23 @@
 ## [11.0.2](https://github.com/noshiro-pf/ts-fortress/compare/v11.0.1...v11.0.2) (2026-07-24)
 
+## 12.4.2
+
+### Patch Changes
+
+- 8bbe580: `optional` now keeps every property of the type it wraps, including a record
+  type's `shape`, so nested member types and their constraints stay reachable at
+  runtime as their types promise, with or without `forceUndefinedDefault`.
+  `optional` and `required` also keep the wrapped type's prototype, so a `Type`
+  whose methods are inherited keeps them, and no longer evaluate its lazy
+  `defaultValue` when called, only when it is read.
+- Updated dependencies [eb65772]
+- Updated dependencies [5618786]
+- Updated dependencies [c53c17d]
+- Updated dependencies [86c41cb]
+- Updated dependencies [b7a2d57]
+- Updated dependencies [a5235cf]
+    - ts-data-forge@14.10.2
+
 ## 12.4.1
 
 ### Patch Changes

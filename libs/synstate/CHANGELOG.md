@@ -1,5 +1,18 @@
 # synstate
 
+## 6.2.1
+
+### Patch Changes
+
+- 766b6fd: Correct the doc comment on the authoring factories (`createRootObservable` and the rest): they wrap the base classes the built-in observables extend, rather than being what the built-ins are made with.
+- Updated dependencies [eb65772]
+- Updated dependencies [5618786]
+- Updated dependencies [c53c17d]
+- Updated dependencies [86c41cb]
+- Updated dependencies [b7a2d57]
+- Updated dependencies [a5235cf]
+    - ts-data-forge@14.10.2
+
 ## 6.1.1
 
 ### Patch Changes
