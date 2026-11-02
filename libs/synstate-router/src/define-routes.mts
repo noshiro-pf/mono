@@ -5,10 +5,14 @@ import {
   decodePathname,
   encodeSegment,
   isDevelopment,
+  pick,
+  routeNodeKey,
   routeTreeKey,
   toHref,
   valuesEqual,
   type ResolvedLocation,
+  type RouteNodeInternals,
+  type RouteTree,
 } from './internal/index.mjs';
 import type {
   AnyParamCodec,
@@ -74,9 +78,11 @@ export const defineRoutes = <const D extends RouteDefinitions>(
     return Optional.isSome(found) ? found.value.page.id : undefined;
   };
 
+  const tree: RouteTree<RouteDefinitions> = { definition, resolve } as const;
+
   const routes: AnyRoutes = {
-    ...buildNodes(root, { resolve, resolvePage }),
-    [routeTreeKey]: { definition, resolve },
+    ...buildNodes(root, { tree, resolve, resolvePage }),
+    [routeTreeKey]: tree,
   } as const;
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the runtime object mirrors the definition, which the type computes from
@@ -161,6 +167,7 @@ type Level = Readonly<{
 }>;
 
 type Resolvers = Readonly<{
+  tree: RouteTree<RouteDefinitions>;
   /** Resolves a whole location, search included. */
   resolve: (location: RouteLocation) => ResolvedLocation;
   /** The page id the decoded path segments resolve to, for `href`'s check. */
@@ -611,47 +618,47 @@ const buildSegments = (
     }
   });
 
-const buildQuery = (
-  node: CompiledNode,
+/**
+ * The query entries of `values`, in declaration order, each checked to read
+ * back as the value given; `where` names the caller in an error.
+ */
+const encodeSearch = (
+  where: string,
+  search: SearchEntries,
   values: ReadonlyRecord<string, unknown>,
-): string => {
-  const entries = node.search.flatMap(
-    ([key, codec]): readonly FixedLengthTuple<2, string>[] => {
-      const value = values[key];
+): readonly FixedLengthTuple<2, string>[] =>
+  search.flatMap(([key, codec]): readonly FixedLengthTuple<2, string>[] => {
+    const value = values[key];
 
-      if (value === undefined) {
-        return [];
-      }
+    if (value === undefined) {
+      return [];
+    }
 
-      // The type of `search` was checked against this codec.
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- see above
-      const raw = codec.encode(value as never);
+    // The type of `search` was checked against this codec.
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- see above
+    const raw = codec.encode(value as never);
 
-      if (Arr.isEmpty(raw)) {
-        return [];
-      }
+    if (Arr.isEmpty(raw)) {
+      return [];
+    }
 
-      // URLSearchParams would write a lone surrogate as U+FFFD.
-      if (raw.some((r) => !r.isWellFormed())) {
-        failHref(node, `search.${key}`, 'is not well-formed Unicode');
-      }
+    // URLSearchParams would write a lone surrogate as U+FFFD.
+    if (raw.some((r) => !r.isWellFormed())) {
+      throw new Error(
+        `synstate-router: ${where}: search.${key} is not well-formed Unicode`,
+      );
+    }
 
-      const back = codec.parse(raw);
+    const back = codec.parse(raw);
 
-      if (back.issue !== undefined || !valuesEqual(back.value, value)) {
-        throw new Error(
-          `synstate-router: ${node.id}.href: search.${key} does not read back as the value given`,
-        );
-      }
+    if (back.issue !== undefined || !valuesEqual(back.value, value)) {
+      throw new Error(
+        `synstate-router: ${where}: search.${key} does not read back as the value given`,
+      );
+    }
 
-      return raw.map((r) => [key, r] as const);
-    },
-  );
-
-  const searchParams = new URLSearchParams(entries.map(([k, v]) => [k, v]));
-
-  return searchParams.toString();
-};
+    return raw.map((r) => [key, r] as const);
+  });
 
 const encodeHash = (node: CompiledNode, hash: string): string =>
   hash.isWellFormed()
@@ -684,7 +691,15 @@ const makeHref = (
     );
   }
 
-  const query = buildQuery(node, toRecord(options['search']));
+  const searchParams = new URLSearchParams(
+    encodeSearch(
+      `${node.id}.href`,
+      node.search,
+      toRecord(options['search']),
+    ).map(([key, value]) => [key, value]),
+  );
+
+  const query = searchParams.toString();
 
   const hash = options['hash'];
 
@@ -696,16 +711,10 @@ const makeHref = (
 
 // Nodes
 
-const pick = (
-  record: ReadonlyRecord<string, unknown>,
-  keys: readonly string[],
-): ReadonlyRecord<string, unknown> =>
-  Object.fromEntries(keys.map((key) => [key, record[key]]));
-
 const buildNodeApi = (
   node: CompiledNode,
-  { resolve, resolvePage }: Resolvers,
-): ReadonlyRecord<string, unknown> => {
+  { tree, resolve, resolvePage }: Resolvers,
+): ReadonlyRecord<string | symbol, unknown> => {
   const paramNames = Arr.generate(function* () {
     for (const segment of node.segments) {
       if (segment.kind === 'dynamic') {
@@ -730,7 +739,15 @@ const buildNodeApi = (
       : Optional.none;
   };
 
+  const internals: RouteNodeInternals = {
+    tree,
+    paramNames,
+    searchKeys,
+    encodeSearch: (where, values) => encodeSearch(where, node.search, values),
+  } as const;
+
   const common = {
+    [routeNodeKey]: internals,
     id: node.id,
     pattern: patternOf(node.segments),
     search: Object.fromEntries(node.search),

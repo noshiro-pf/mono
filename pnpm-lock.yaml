@@ -4635,6 +4635,9 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
+      dedent:
+        specifier: 'catalog:'
+        version: 1.7.2(babel-plugin-macros@3.1.0)
       eslint-config-typed:
         specifier: workspace:*
         version: link:../eslint-config-typed
@@ -4656,6 +4659,9 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.10)
+      synstate:
+        specifier: workspace:*
+        version: link:../synstate
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils

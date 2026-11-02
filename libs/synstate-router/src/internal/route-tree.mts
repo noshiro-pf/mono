@@ -1,4 +1,4 @@
-import type { ReadonlyRecord } from 'ts-type-forge';
+import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 import type { RouteDefinitions, RouteLocation } from '../route-types.mjs';
 
 /** Where the compiled tree is kept on the object `defineRoutes` returns. */
@@ -24,3 +24,24 @@ export type ResolvedLocation = Readonly<
       search: ReadonlyRecord<string, unknown>;
     }
 >;
+
+/** Where a node keeps what the router needs of it. */
+export const routeNodeKey: unique symbol = Symbol('synstate-router/route-node');
+
+/** What the router reads of a node; not part of the public API. */
+export type RouteNodeInternals = Readonly<{
+  /** The compiled tree the node belongs to, compared by identity. */
+  tree: RouteTree<RouteDefinitions>;
+  /** The path parameters of the node, its ancestors' included. */
+  paramNames: readonly string[];
+  /** The search keys of the node, its ancestors' included. */
+  searchKeys: readonly string[];
+  /**
+   * The query entries of `values`, in declaration order; throws as `href` does
+   * on a value that does not read back. `where` names the caller.
+   */
+  encodeSearch: (
+    where: string,
+    values: ReadonlyRecord<string, unknown>,
+  ) => readonly FixedLengthTuple<2, string>[];
+}>;

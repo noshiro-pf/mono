@@ -28,4 +28,12 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/match-routes-example.mts',
     ],
   },
+  {
+    sourcePath: 'src/browser.mts',
+    sampleFiles: ['samples/src/memory-browser-example.mts'],
+  },
+  {
+    sourcePath: 'src/create-router.mts',
+    sampleFiles: ['samples/src/create-router-example.mts'],
+  },
 ] as const;

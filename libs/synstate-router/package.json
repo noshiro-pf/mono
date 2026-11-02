@@ -33,7 +33,7 @@
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
     "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest run",
     "check:test:cov": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest run --coverage",
-    "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit && tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-type-cost.mts",
     "check-all": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-all.mts",
     "doc": "run-s gen:readme gen:jsdoc",
     "fix:codemod": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer convert-to-readonly '{src,samples,test}/**/*.{mts,tsx}'",
@@ -60,6 +60,7 @@
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
+    "dedent": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",
@@ -67,7 +68,11 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
+    "synstate": "workspace:*",
     "ts-repo-utils": "workspace:*"
+  },
+  "peerDependencies": {
+    "synstate": ">=6.2.1"
   },
   "engines": {
     "node": ">=22.23.4",

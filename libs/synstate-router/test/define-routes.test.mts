@@ -380,6 +380,18 @@ describe('node.href', () => {
     );
   });
 
+  test('matches no path with an empty segment, even where a codec accepts ""', () => {
+    const r = defineRoutes({
+      u: { children: { v: { params: { x: param.literal('', 'a') } } } },
+    });
+
+    assert.isUndefined(matchRoutes(r, { pathname: '/u//' }).route);
+
+    assert.isUndefined(matchRoutes(r, { pathname: '//u/a/' }).route);
+
+    assert.strictEqual(matchRoutes(r, { pathname: '/u/a/' }).route, 'u.v');
+  });
+
   test('throws on an empty segment, which would collapse into "//"', () => {
     const r = defineRoutes({
       u: { params: { x: param.literal('', 'a') } },
