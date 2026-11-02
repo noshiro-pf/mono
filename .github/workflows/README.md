@@ -30,6 +30,7 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `node-support-update.yml`        | schedule                               | none; opens `chore/node-support-update` |
 | `deploy-pages.yml`               | `push` to `main`                       | none                                    |
 | `deploy-firestore.yml`           | `push` to `main`; `workflow_dispatch`  | none                                    |
+| `restart-unblock-prs.yml`        | `push` to `main`                       | none; files the author's restart TODO   |
 | `link-check.yml`                 | pull requests, path-filtered; schedule | none; other people's servers decide it  |
 | `e2e-production.yml`             | schedule; `workflow_dispatch`          | none; the live sites decide it          |
 

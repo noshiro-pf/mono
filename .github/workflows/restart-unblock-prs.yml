@@ -1,0 +1,171 @@
+name: Restart unblock-prs
+
+# Two commands run from the author's checkout until Ctrl+C: the `unblock-prs`
+# worker and `run-unblock-prs-skill`, which runs the skill on the Claude API.
+# A merge that changes what either loads takes effect only when the author
+# pulls and restarts it, and nothing else says when that is due. This workflow
+# files it as a TODO: one open issue, assigned to the repository owner, with a
+# comment per push to `main` that changed what they load, naming which to
+# restart. Closing it is the author's "restarted". The `/unblock-prs` skill
+# under `/loop` and the commands it runs read the checkout afresh each round,
+# so a pull is enough for them and they file nothing here.
+#
+# Holds `issues: write` and runs nothing from the tree: the diff is read with
+# `git` from a blobless fetch of the two commits, and everything else is the
+# event payload and `gh`.
+
+on:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+# No `concurrency`: each push's run covers only that push, and a shared group
+# would let GitHub replace a waiting run, dropping its push from the issue.
+# Two such pushes landing within seconds can open two issues instead; closing
+# one costs less than a restart nobody is told about.
+
+jobs:
+  notify:
+    name: File the restart TODO
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Open or extend the restart issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          COMPARE_URL: ${{ github.event.compare }}
+        run: |
+          set -euo pipefail
+
+          # What each command loads once, at its start. A file one starts
+          # reading at startup, or a module it starts importing from another
+          # directory, is added here; nothing else would notice.
+          # - Both run `libs/pr-merge-queue/src` through `tsx`, as the root
+          #   `package.json`'s script of the same name says, and import
+          #   `pr-report-core` from its `dist/`.
+          # - The worker imports `unblock-prs/` and `lib/`, and reads
+          #   `.github/unblock-prs.json` (`readConfig`) before the first survey.
+          # - `run-unblock-prs-skill` imports `run-unblock-prs-skill/`,
+          #   `claim-pr/`, `pr-report/`, `report-unowned-prs/`, `unblock-prs/`
+          #   and `lib/`. The sessions it starts read the skill afresh.
+          # The other workspace libraries they import from `dist/`
+          # (`ts-data-forge`, …) are left out: they change often and the
+          # queue's behavior rarely waits on them, so a TODO for each would be
+          # noise.
+          src='libs/pr-merge-queue/src'
+          core='libs/pr-report-core/src/'
+          worker_re="^(${src}/(unblock-prs/|lib/|cmd/unblock-prs\.mts$)|${core})"
+          runner_re="^(${src}/(run-unblock-prs-skill/|claim-pr/|pr-report/|report-unowned-prs/|unblock-prs/|lib/|cmd/run-unblock-prs-skill\.mts$)|${core})"
+
+          # Blobless: the name diff reads trees only, and the one blob diff
+          # below (`package.json`) is fetched on demand.
+          git init -q repo
+          git -C repo fetch -q --depth=1 --filter=blob:none --no-tags \
+            "https://github.com/${GITHUB_REPOSITORY}.git" "$BEFORE" "$AFTER"
+          files="$(git -C repo diff --name-only --no-renames "$BEFORE" "$AFTER")"
+          sources="$(grep -E '\.mts$' <<<"$files" | grep -vE '\.test\.mts$' || true)"
+          scripts=''
+          if grep -qFx 'package.json' <<<"$files"; then
+            scripts="$(git -C repo diff "$BEFORE" "$AFTER" -- package.json \
+              | sed -nE 's/^[-+] +"(unblock-prs|run-unblock-prs-skill)":.*/\1/p' | sort -u)"
+          fi
+
+          # What changed for one command: its sources, the config only the
+          # worker reads, and its own script.
+          changed_for() {
+            {
+              grep -E "$1" <<<"$sources"
+              [[ "$2" == unblock-prs ]] && grep -Fx '.github/unblock-prs.json' <<<"$files"
+              grep -qFx "$2" <<<"$scripts" && echo 'package.json'
+            } || true
+          }
+          worker="$(changed_for "$worker_re" unblock-prs)"
+          runner="$(changed_for "$runner_re" run-unblock-prs-skill)"
+
+          if [[ -z "$worker" && -z "$runner" ]]; then
+            echo 'Nothing the worker or run-unblock-prs-skill loads at startup changed.'
+            exit 0
+          fi
+
+          restart=()
+          # shellcheck disable=SC2016 # Markdown code spans, not expansions
+          [[ -n "$worker" ]] && restart+=('`unblock-prs`')
+          # shellcheck disable=SC2016 # Markdown code spans, not expansions
+          [[ -n "$runner" ]] && restart+=('`run-unblock-prs-skill`')
+          mapfile -t changed_files < <(printf '%s\n' "$worker" "$runner" | sed '/^$/d' | sort -u)
+
+          entry_file="$(mktemp)"
+          {
+            echo "### [\`${AFTER:0:9}\`](${COMPARE_URL})"
+            echo
+            # From the event file, not an env var: a push's messages can pass
+            # the 128 KiB a single environment string may hold.
+            jq -r '.commits[] | "- \(.message | split("\n")[0])"' "$GITHUB_EVENT_PATH"
+            echo
+            echo "Restart ${restart[0]}${restart[1]:+ and ${restart[1]}}."
+            if printf '%s\n' "${changed_files[@]}" | grep -q "^${core}"; then
+              # shellcheck disable=SC2016 # Markdown code spans, not expansions
+              echo 'Build `pr-report-core` first.'
+            fi
+            echo
+            echo '<details><summary>Files</summary>'
+            echo
+            # shellcheck disable=SC2016 # Markdown code spans, not expansions
+            printf -- '- `%s`\n' "${changed_files[@]}"
+            echo
+            echo '</details>'
+          } >"$entry_file"
+
+          marker='<!-- restart-unblock-prs -->'
+
+          number="$(gh api --paginate -X GET "repos/${GITHUB_REPOSITORY}/issues" \
+            -f state=open -f 'creator=github-actions[bot]' -f per_page=100 \
+            | jq -rs --arg m "$marker" \
+              '[.[][] | select(.pull_request == null and ((.body // "") | contains($m)))][0].number // empty')"
+
+          if [[ -n "$number" ]]; then
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/${number}/comments" \
+              -F "body=@${entry_file}" >/dev/null
+            echo "Added this push to #${number}."
+            exit 0
+          fi
+
+          body_file="$(mktemp)"
+          {
+            cat <<'EOF'
+          Changes that the running `unblock-prs` worker or `run-unblock-prs-skill` loads only at startup have landed on `main`. The entry below and each comment after it is one push, and names which of the two to restart. Close this issue once everything the entries name runs the current `main`; the next such push opens a new one.
+
+          1. `git pull` in the checkout they run from.
+          2. Where an entry says so, `pnpm --filter pr-report-core run build`: both import it from `dist/`.
+          3. Ctrl+C each one an entry names (it finishes the current step), then start it again: `pnpm run unblock-prs`, `pnpm run run-unblock-prs-skill -- <its options>`.
+
+          EOF
+            cat "$entry_file"
+            cat <<'EOF'
+
+          ## 日本語
+
+          起動中の `unblock-prs` worker か `run-unblock-prs-skill` が起動時にしか読まない変更が `main` に入った。上のエントリと以降のコメントがそれぞれ 1 回の push で、どちらを再起動するかを書いてある。エントリが挙げたものがすべて現在の `main` で動いたらこの issue を閉じる。次にそういう push があれば新しい issue が立つ。
+
+          1. それらを動かしているチェックアウトで `git pull`。
+          2. エントリにあれば `pnpm --filter pr-report-core run build`（どちらもこれを `dist/` から読む）。
+          3. エントリが挙げたものを Ctrl+C（今のステップを終えて止まる）してから起動し直す：`pnpm run unblock-prs`、`pnpm run run-unblock-prs-skill -- <オプション>`。
+
+          EOF
+            echo "$marker"
+          } >"$body_file"
+
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues" \
+            -f title='Restart unblock-prs and run-unblock-prs-skill' \
+            -F "body=@${body_file}" \
+            -f "assignees[]=${GITHUB_REPOSITORY_OWNER}" \
+            --jq '"Opened #\(.number)."'
