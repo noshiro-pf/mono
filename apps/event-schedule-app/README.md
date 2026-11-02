@@ -50,8 +50,8 @@ pnpm run check:e2e:production # the @smoke and @production tests, against the si
 (`firebase emulators:exec`), so stop `pnpm run emulators` first: they listen
 on the same ports. `code-check.yml` runs it in the `ws:check:e2e:emulators`
 matrix entry, with Java 21 and Chromium installed. It builds the functions
-before starting the emulators and needs no Firebase credentials. The ordinary
-`ws:check:e2e` entry runs the smoke tests separately.
+before starting the emulators and needs no Firebase credentials. The smoke
+tests run separately, in the `ws:check:e2e:shard-2` entry.
 
 `check:e2e:production` is run daily by
 [`e2e-production.yml`](../../.github/workflows/e2e-production.yml) against

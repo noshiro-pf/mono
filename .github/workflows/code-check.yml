@@ -131,27 +131,31 @@ jobs:
       matrix:
         command:
           - check:root
-          # `strict-lib/` is a directory, not a workspace member, so the `ws:*`
-          # entries never reach its generator or scripts.
-          - strict-lib:check:types
-          - strict-lib:check:lint
+          # Six checks of under forty seconds each, run one after another in
+          # one job (`run-s --continue-on-error`, so every one of them reports
+          # even when an earlier one fails): `check:knip`,
+          # `check:published-deps`, `strict-lib:check:types`,
+          # `strict-lib:check:lint` (`strict-lib/`'s own scripts, which no
+          # `ws:*` entry reaches), `ws:check:dist` (what the build emitted,
+          # type-checked by package name through the `exports` map) and
+          # `ws:check:sumi` (the Sumi lint of the dogfood packages). As six
+          # entries each paid a half-minute setup for a few seconds of work,
+          # and took six of the account's twenty runner slots at the moment
+          # the long entries below were waiting for one. A check that grows
+          # past a minute or two belongs back on an entry of its own.
+          - z:code-check:quick
           # `ws:check:types` in two shards, both with `--no-sort`. Nine tenths
           # of it is the twelve strict-lib harnesses, each four single-threaded
           # `tsc` runs taking one to two and a half minutes in all, three waves
           # of four on one runner; the other seventy-odd packages take about
           # two and a half runner-minutes together, and pnpm's topological
-          # order held them back behind the harnesses. As one entry it was the longest
-          # of the matrix by over a minute. The first shard names the harnesses
-          # of 5.0–5.7, two waves; the second is everything else by excluding
-          # them, so a new harness or package lands there. No type check waits
-          # on another package's — siblings resolve to `dist/`.
+          # order held them back behind the harnesses. As one entry it was the
+          # longest of the matrix by over a minute. The first shard names the
+          # harnesses of 5.0–5.7, two waves; the second is everything else by
+          # excluding them, so a new harness or package lands there. No type
+          # check waits on another package's — siblings resolve to `dist/`.
           - ws:check:types:shard-1
           - ws:check:types:shard-2
-          # What the build emitted, type-checked by package name through the
-          # `exports` map — the way a consumer reaches it. Part of `build`
-          # until it was moved out, so that the twelve other entries here,
-          # which only need `dist/`, stop paying for it.
-          - ws:check:dist
           # `ws:fix:lint` in two halves, `apps/` and the rest, each with
           # `--no-sort`: in one job it was the second-longest entry, and pnpm's
           # topological order kept it at one package in flight for minutes
@@ -159,8 +163,6 @@ jobs:
           # waits on another package's — siblings resolve to `dist/`.
           - ws:fix:lint:apps
           - ws:fix:lint:non-apps
-          # The Sumi lint check of the dogfood packages (`check:sumi` scripts).
-          - ws:check:sumi
           - ws:check:test:browser
           # `ws:check:test:cov` in three shards, because one package at a time
           # (`--workspace-concurrency=1`) made it the longest entry by minutes.
@@ -170,11 +172,14 @@ jobs:
           - ws:check:test:cov:shard-1
           - ws:check:test:cov:shard-2
           - ws:check:test:cov:shard-3
-          - ws:check:e2e
+          # `ws:check:e2e` in two shards, for the same reason: one app at a
+          # time, and `task-manager`'s suite alone is more than half of it.
+          # The first shard is that app; the second is every other app by
+          # excluding it, so a new suite lands there.
+          - ws:check:e2e:shard-1
+          - ws:check:e2e:shard-2
           - ws:check:e2e:emulators
           - fix:codemod:full
-          - check:knip
-          - check:published-deps
           - verify:npm-packages
 
     steps:
@@ -188,7 +193,7 @@ jobs:
 
       # `ws:check:test:cov` needs a browser too: the synstate adapters' hooks only
       # run in one, so their coverage would otherwise be reported as zero.
-      # Both `ws:check:e2e` entries drive one, which is the whole point of them.
+      # Every `ws:check:e2e` entry drives one, which is the whole point of them.
       - name: Install Playwright Browsers
         if: matrix.command == 'ws:check:test:browser' || startsWith(matrix.command, 'ws:check:test:cov') || startsWith(matrix.command, 'ws:check:e2e')
         run: pnpm exec playwright install chromium
