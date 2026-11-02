@@ -4,6 +4,28 @@
     "allow": ["mcp__claude-code-remote__add_repo"]
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/tools/scripts/cmd/claude-code-claude-md-sync.mts\"; [ ! -f \"$f\" ] || node \"$f\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/tools/scripts/cmd/claude-code-claude-md-sync.mts\"; [ ! -f \"$f\" ] || node \"$f\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",
