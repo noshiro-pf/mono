@@ -1,4 +1,4 @@
-import { isMap, isRegExp, isSet, isTypedArray } from '@sindresorhus/is';
+import { isMap, isRegExp, isSet, isTypedArray } from '../built-in-tag.mjs';
 import { hasKey, isRecord } from '../guard/index.mjs';
 
 /**

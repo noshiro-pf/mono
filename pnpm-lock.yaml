@@ -4780,9 +4780,6 @@ importers:
 
   libs/ts-data-forge:
     dependencies:
-      '@sindresorhus/is':
-        specifier: ^8.1.0
-        version: 8.1.0
       ts-std-forge:
         specifier: workspace:^
         version: link:../ts-std-forge
@@ -4802,6 +4799,9 @@ importers:
       '@mui/material':
         specifier: 9.5.0
         version: 9.5.0(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0))(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@sindresorhus/is':
+        specifier: ^8.1.0
+        version: 8.1.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -5017,13 +5017,13 @@ importers:
 
   libs/ts-std-forge:
     dependencies:
-      '@sindresorhus/is':
-        specifier: ^8.1.0
-        version: 8.1.0
       ts-type-forge:
         specifier: workspace:~
         version: link:../ts-type-forge
     devDependencies:
+      '@sindresorhus/is':
+        specifier: ^8.1.0
+        version: 8.1.0
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.5

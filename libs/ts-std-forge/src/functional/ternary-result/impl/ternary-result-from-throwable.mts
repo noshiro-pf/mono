@@ -1,4 +1,4 @@
-import { isError } from '@sindresorhus/is';
+import { isError } from '../../../built-in-tag.mjs';
 import { unknownToString } from '../../../others/index.mjs';
 import type { TernaryResult } from '../ternary-result.mjs';
 import { err } from './ternary-result-err.mjs';

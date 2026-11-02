@@ -24,7 +24,6 @@ export default defineViteConfig({
       'preact',
       'preact/compat',
       'preact/hooks',
-      'ts-data-forge > @sindresorhus/is',
     ],
   },
 });

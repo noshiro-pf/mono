@@ -1,4 +1,4 @@
-import { isError } from '@sindresorhus/is';
+import { isError } from '../built-in-tag.mjs';
 import { isRecord } from '../guard/index.mjs';
 
 /**

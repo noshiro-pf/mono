@@ -75,9 +75,9 @@ export const defineViteConfig = ({
          * test file the scan has not reached yet.
          *
          * A module the package does not itself depend on has to be named
-         * through the sibling that does — `'ts-data-forge > @sindresorhus/is'`
-         * — because a bare name is resolved from the package root, where pnpm
-         * has not put it.
+         * through the sibling that does — `'ts-fortress > @sindresorhus/is'` —
+         * because a bare name is resolved from the package root, where pnpm has
+         * not put it.
          *
          * Measured on `synstate`, deleting its `node_modules/.vite` before each
          * run: 6 of 6 runs pass with the list, 4 of 4 fail without it.

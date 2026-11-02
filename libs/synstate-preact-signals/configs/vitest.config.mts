@@ -18,9 +18,6 @@ export default defineViteConfig({
     includeSource: ['src/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
     // See the comment on `optimizeDepsInclude` in the shared config.
-    optimizeDepsInclude: [
-      '@preact/signals',
-      'ts-data-forge > @sindresorhus/is',
-    ],
+    optimizeDepsInclude: ['@preact/signals'],
   },
 });
