@@ -41,7 +41,12 @@ export const defineViteConfig = ({
   /** The package's root directory. */
   packageRoot: string;
   alias?: InlineConfig['alias'];
-  /** Omitted rather than defaulted, because Vitest's own default is `false`. */
+  /**
+   * Only for a package with no tests at all: refused when the package has any
+   * ({@link hasTestFiles}), because it also turns a run whose globs match
+   * nothing — a renamed directory, a narrowed `include` — into a pass. Omitted
+   * rather than defaulted, because Vitest's own default is `false`.
+   */
   passWithNoTests?: boolean;
   coverage?: {
     include?: string[];
@@ -86,6 +91,12 @@ export const defineViteConfig = ({
         fileParallelism?: boolean;
       });
 }>) => {
+  if (passWithNoTests === true && hasTestFiles(packageRoot)) {
+    throw new Error(
+      `${packageRoot}: passWithNoTests is only for a package with no tests, and this one has some. Remove it, so that a run matching no test file fails.`,
+    );
+  }
+
   const nodeConfig = projectConfig(packageRoot, node);
 
   const nodeExclude = nodeProjectExclude(nodeConfig.exclude);
@@ -168,6 +179,29 @@ export const defineViteConfig = ({
 };
 
 /**
+ * Whether the package has a test: a `*.test.*` file under `src/` or `test/`, or
+ * an in-source test block under `src/`.
+ */
+export const hasTestFiles = (packageRoot: string): boolean =>
+  Arr.isNonEmpty(
+    fs.globSync('{src,test}/**/*.test.{mts,ts,tsx}', {
+      cwd: packageRoot,
+      exclude: (file) => file.includes('node_modules'),
+    }),
+  ) ||
+  fs
+    .globSync('src/**/*.{mts,ts,tsx}', {
+      cwd: packageRoot,
+      exclude: (file) => file.includes('node_modules'),
+    })
+    .some((file) =>
+      inSourceTestBlock.test(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.readFileSync(path.resolve(packageRoot, file), 'utf8'),
+      ),
+    );
+
+/**
  * Whether a file under the package's `src/`, `test/` or `samples/` calls
  * `vi.mock` or `vi.doMock`. Any such file counts, test or not: a false positive
  * costs speed, a false negative an order-dependent failure.
@@ -222,5 +256,9 @@ const projectConfig = (packageRoot: string, overrides?: ProjectOverrides) =>
     ],
     testTimeout: overrides?.testTimeout,
   }) as const satisfies ProjectConfig;
+
+// A pattern, never the plain text: Vitest takes a file whose text holds the
+// in-source test guard for one with in-source tests, and this one has none.
+const inSourceTestBlock = /\bimport\.meta\.vitest\b/u;
 
 const moduleMockCall = /\bvi\s*\.\s*(?:mock|doMock)\s*\(/u;

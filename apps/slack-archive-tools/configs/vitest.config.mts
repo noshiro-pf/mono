@@ -4,7 +4,6 @@ import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 
 export default defineViteConfig({
   packageRoot: workspaceRootPath,
-  passWithNoTests: true,
   coverage: {
     include: ['src/**/*.mts'],
   },

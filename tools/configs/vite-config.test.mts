@@ -2,7 +2,11 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { nodeProjectExclude, usesModuleMocks } from './vite-config.mjs';
+import {
+  hasTestFiles,
+  nodeProjectExclude,
+  usesModuleMocks,
+} from './vite-config.mjs';
 
 /** A package root holding `files`, removed once `fn` returns. */
 const withPackage = (
@@ -27,6 +31,44 @@ const withPackage = (
     fs.rmSync(packageRoot, { recursive: true, force: true });
   }
 };
+
+describe(hasTestFiles, () => {
+  test.each<
+    Readonly<{
+      name: string;
+      files: ReadonlyRecord<string, string>;
+      expected: boolean;
+    }>
+  >([
+    { name: 'no file at all', files: {}, expected: false },
+    {
+      name: 'sources only',
+      files: { 'src/a.mts': 'export const a = 1;\n' },
+      expected: false,
+    },
+    {
+      name: 'a test file under `src/`',
+      files: { 'src/a.test.mts': "test('a', () => {});\n" },
+      expected: true,
+    },
+    {
+      name: 'a browser test under `test/`',
+      files: { 'test/browser/a.test.tsx': "test('a', () => {});\n" },
+      expected: true,
+    },
+    {
+      name: 'an in-source test block',
+      files: {
+        'src/a.mts': 'if (import.meta.vitest !== undefined) {\n}\n',
+      },
+      expected: true,
+    },
+  ])('$name', ({ files, expected }) => {
+    withPackage(files, (root) => {
+      assert.strictEqual(hasTestFiles(root), expected);
+    });
+  });
+});
 
 describe(usesModuleMocks, () => {
   test.each<
