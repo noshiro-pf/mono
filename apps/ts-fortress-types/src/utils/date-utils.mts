@@ -166,13 +166,28 @@ export namespace DateUtils {
       return next;
     };
 
-  /** A copy with the month replaced by `updater`'s result, taking 1-12. */
+  /**
+   * A copy with the month replaced by `updater`'s result, taking 1-12. A result
+   * of 13 or 0 is carried into January of the next year or December of the year
+   * before, as `setMonth` does.
+   *
+   * The day of the month is clamped to the last day of the target month, so 31
+   * January plus one month is the end of February rather than early March.
+   */
   export const updateLocaleMonth =
     (updater: (month: MonthEnum) => MonthEnum) =>
     (date: Date): Date => {
+      const monthIndex = updater(getLocaleMonth(date)) - 1;
+
       const next = new Date(date);
 
-      next.setMonth(updater(getLocaleMonth(date)) - 1);
+      // One call sets the month and the day together, so a day the target month
+      // does not have cannot roll over into the month after, and the date never
+      // passes through the 1st, which may fall in a daylight-saving gap.
+      next.setMonth(
+        monthIndex,
+        Math.min(getLocaleDate(date), lastDayOfLocaleMonth(date, monthIndex)),
+      );
 
       return next;
     };
@@ -207,6 +222,20 @@ const monthToIndex = {
   11: 10,
   12: 11,
 } as const satisfies ReadonlyRecord<MonthEnum, Index<12>>;
+
+/**
+ * The last day of the month `monthIndex` (0-based, carried into the next or
+ * previous year as `setMonth` does) of the local year of `date`. Counted in
+ * UTC, where no daylight-saving change can move the day.
+ */
+const lastDayOfLocaleMonth = (date: Date, monthIndex: number): number => {
+  // Day 0 of the following month is the last day of this one.
+  const lastDay = new Date(0);
+
+  lastDay.setUTCFullYear(date.getFullYear(), monthIndex + 1, 0);
+
+  return lastDay.getUTCDate();
+};
 
 const isMonth: (n: number) => n is MonthEnum = Num.isUintInRangeInclusive(
   1,
