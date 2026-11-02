@@ -156,6 +156,17 @@ describe(loadBranchRules, () => {
 
     assert.include(loaded.value, 'not the shape this page expects');
   });
+
+  test('names what it asked for when the answer is not JSON', async () => {
+    const loaded = await loadBranchRules(SOURCE, 'main', {
+      token: 'secret',
+      fetchImpl: () => Promise.resolve(new Response('', { status: 200 })),
+    });
+
+    assert.isTrue(Result.isErr(loaded));
+
+    assert.include(loaded.value, 'main with something that is not JSON (200');
+  });
 });
 
 type Sent = Readonly<{ route: string; init: RestFetchInit }>;

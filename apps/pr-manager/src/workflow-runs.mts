@@ -22,9 +22,10 @@
  * since it is a different API with a different budget.
  */
 
-import { Arr, isRecord, Json, Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { askAndRead } from './answer-body.mjs';
 import { repositoryUrl, type ReportSource } from './constants.mjs';
 
 /**
@@ -189,35 +190,38 @@ const readState = async (
   token: string,
   fetchImpl: RestFetch,
 ): Promise<Result<WorkflowRunList, string>> => {
-  const response = await fetchImpl(
-    `https://api.github.com/repos/${source.owner}/${source.repo}/actions/runs?status=${state}&per_page=${RUNS_PER_STATE}`,
-    {
-      method: 'GET',
-      // Revalidated rather than refetched: see the top of this file.
-      cache: 'no-cache',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github+json',
-      },
-    },
-  ).catch((error: unknown) => error);
+  const answered = await askAndRead(
+    async (again) =>
+      fetchImpl(
+        `https://api.github.com/repos/${source.owner}/${source.repo}/actions/runs?status=${state}&per_page=${RUNS_PER_STATE}`,
+        {
+          method: 'GET',
+          // Revalidated rather than refetched: see the top of this file.
+          // Asked again, it is the cached body that was bad.
+          cache: again ? 'reload' : 'no-cache',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/vnd.github+json',
+          },
+        },
+      ),
+    'the workflow runs',
+  );
 
-  if (!(response instanceof Response)) {
+  if (answered === undefined) {
     return Result.err(
       'Could not reach the GitHub API for the workflow runs. Check the connection and try again.',
     );
   }
 
+  const { response, body: parsed } = answered;
+
   if (!response.ok) {
     return Result.err(refusal(response));
   }
 
-  const parsed = Json.parse(await response.text());
-
-  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
-    return Result.err(
-      'GitHub answered the workflow runs with something that is not JSON.',
-    );
+  if (parsed === undefined || Result.isErr(parsed)) {
+    return parsed ?? Result.err('GitHub sent no body.');
   }
 
   const validated = RunsPageSchema.validate(parsed.value);

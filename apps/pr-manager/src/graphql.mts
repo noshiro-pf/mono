@@ -20,8 +20,9 @@
  * budget rather than the REST one.
  */
 
-import { Arr, isRecord, Json, Obj, Result } from 'ts-data-forge';
+import { Arr, isRecord, Obj, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { askAndRead } from './answer-body.mjs';
 import { readRateLimit, type RateLimit } from './rate-limit.mjs';
 
 /** What these functions need of `globalThis.fetch`, and no more. */
@@ -92,26 +93,32 @@ const GRAPHQL_URL = 'https://api.github.com/graphql';
  * A query that GitHub refused outright — a `data` of `null` — is a failure
  * here, with GitHub's own words. One that came back with data and some errors
  * is not: that is the caller's to judge.
+ *
+ * A `2xx` body that cannot be read is asked for once more ({@link askAndRead}).
  */
 export const askGraphql = async (
   request: GraphqlRequest,
 ): Promise<Answered<GraphqlAnswer>> => {
   const { query, variables, token, fetchImpl = askGitHub } = request;
 
-  const response = await fetchImpl(GRAPHQL_URL, {
-    method: 'POST',
-    // Nothing here is worth a cached copy: each read is a question about now.
-    cache: 'no-store',
-    headers: {
-      // `Bearer` rather than `token`, because both fine-grained and classic
-      // personal access tokens are accepted under it.
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ query, variables }),
-  }).catch((error: unknown) => error);
+  const answered = await askAndRead(
+    async () =>
+      fetchImpl(GRAPHQL_URL, {
+        method: 'POST',
+        // Nothing here is worth a cached copy: each read is a question about now.
+        cache: 'no-store',
+        headers: {
+          // `Bearer` rather than `token`, because both fine-grained and classic
+          // personal access tokens are accepted under it.
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query, variables }),
+      }),
+    queryName(query),
+  );
 
-  if (!(response instanceof Response)) {
+  if (answered === undefined) {
     return {
       rateLimit: undefined,
       result: Result.err(
@@ -120,24 +127,31 @@ export const askGraphql = async (
     };
   }
 
+  const { response, body } = answered;
+
   const rateLimit = readRateLimit(response.headers);
 
   if (!response.ok) {
     return { rateLimit, result: Result.err(refusal(response)) };
   }
 
-  const parsed = Json.parse(await response.text());
-
-  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
+  if (body === undefined || Result.isErr(body)) {
     return {
       rateLimit,
-      result: Result.err('GitHub answered with something that is not JSON.'),
+      result: body ?? Result.err('GitHub sent no body.'),
     };
   }
 
-  const data: unknown = withoutNullNodes(parsed.value['data'] ?? null);
+  if (!isRecord(body.value)) {
+    return {
+      rateLimit,
+      result: Result.err('GitHub answered with JSON that is not an object.'),
+    };
+  }
 
-  const errors = readErrors(parsed.value['errors']);
+  const data: unknown = withoutNullNodes(body.value['data'] ?? null);
+
+  const errors = readErrors(body.value['errors']);
 
   if (data === null) {
     return {
@@ -187,6 +201,16 @@ export const withoutNullNodes = (value: unknown): unknown => {
 const askGitHub: Fetch = async (route, init) => fetch(route, init);
 
 const UNAUTHORIZED = 401;
+
+/**
+ * `the PullRequests query`, read off `query PullRequests(…)`: which of the
+ * queries a read sends at once got the answer a sentence is about.
+ */
+const queryName = (query: string): string | undefined => {
+  const name = /\bquery\s+(\w+)/u.exec(query)?.[1];
+
+  return name === undefined ? undefined : `the ${name} query`;
+};
 
 /**
  * The refusals a reader can do something about, said in terms of the thing they
