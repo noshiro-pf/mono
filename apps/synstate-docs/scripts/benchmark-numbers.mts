@@ -2379,18 +2379,18 @@ const holdsInSingleDigits = (
   inEveryScenario(library);
 
 /**
+ * How many times SynState's worst case another library's has to be before the
+ * prose may call the gap large.
+ */
+const CLEARLY_ABOVE = 2;
+
+/**
  * `library`'s worst case, as {@link worstCaseText} quotes it, for prose that
  * sets it against SynState's as the larger of the two — or an error once it is
  * not by {@link CLEARLY_ABOVE} times, or is in single digits itself, or is over
  * some summary rows only, since that prose would then argue the other way, or
  * call a small gap large, or leave out the ※3 mark.
  */
-/**
- * How many times SynState's worst case another library's has to be before the
- * prose may call the gap large.
- */
-const CLEARLY_ABOVE = 2;
-
 const worstCaseTextAboveSynState = (library: string): string => {
   const worst = worstSummaryRow(library);
 

@@ -33,6 +33,7 @@ import { projectRootPath } from '../scripts/project-root-path.mjs';
  *
  * Run with `pnpm run check:published-deps`.
  */
+
 /** `true` for a directory holding a package that gets published. */
 const isPublishedPackage = (dir: string): boolean => {
   const manifestPath = path.resolve(dir, 'package.json');

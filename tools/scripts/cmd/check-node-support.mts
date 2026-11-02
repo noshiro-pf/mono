@@ -623,12 +623,6 @@ const checkManifest = (
   ] as const;
 
 /**
- * The workflow holds the matrix *keys*; this file holds the versions they
- * resolve to. Only the key list can drift, and only when a release line is
- * added or dropped — which is exactly when someone should be made to look at
- * the workflow.
- */
-/**
  * The `targets` keys the compatibility matrix is expected to carry.
  *
  * `current` is not one of them, and that is the whole of why this is a list
@@ -643,6 +637,11 @@ const checkManifest = (
  * What the two that remain are for is covered nowhere else: `minimum` is the
  * only job that runs on the floor `engines.node` promises, and `lts` the only
  * one on the line most consumers are on.
+ *
+ * The workflow holds the matrix *keys*; this file holds the versions they
+ * resolve to. Only the key list can drift, and only when a release line is
+ * added or dropped — which is exactly when someone should be made to look at
+ * the workflow.
  */
 const MATRIX_TARGETS: readonly (keyof NodeSupportConfig['targets'])[] = [
   'minimum',

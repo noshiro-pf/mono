@@ -18,7 +18,7 @@ ruleTester.run(
   noUnsafeReadonlyMutableAssignment,
   {
     valid: [
-      /** Call expressions */
+      // Call expressions:
       // zero parameters
       {
         filename: 'file.ts',
@@ -282,9 +282,9 @@ ruleTester.run(
           foo(arr);
         `,
       },
-      /** Assignment expressions */
+      // Assignment expressions:
       // TODO
-      /** Return statement */
+      // Return statement:
       // mutable -> mutable (function return)
       {
         filename: 'file.ts',
@@ -461,7 +461,7 @@ ruleTester.run(
           },
         ],
       },
-      /** Assignment expressions */
+      // Assignment expressions:
       // readonly -> mutable
       {
         filename: 'file.ts',
@@ -496,7 +496,7 @@ ruleTester.run(
           },
         ],
       },
-      /** Variable declaration */
+      // Variable declaration:
       // readonly (type) -> mutable
       {
         filename: 'file.ts',
@@ -590,7 +590,7 @@ ruleTester.run(
           },
         ],
       },
-      /** Return statement */
+      // Return statement:
       // readonly -> mutable (function return)
       {
         filename: 'file.ts',

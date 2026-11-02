@@ -104,6 +104,20 @@ namespace JsxBooleanLogicalOperands {
 }
 
 /**
+ * @description Disallow a JSDoc block that TypeScript attaches to no node, so that it documents nothing
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoDetachedJsdoc {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Invert the operator of a negated comparison instead of negating it (`!(a === b)` → `a !== b`, `!(a < b)` → `a >= b` when no operand can be NaN).
  *
  *  ```md
@@ -249,8 +263,7 @@ namespace NoRestrictedCastName {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * @minItems 0
    */
   export type Options = readonly (
@@ -323,8 +336,7 @@ namespace NoRestrictedSyntax {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * @minItems 0
    */
   export type Options = readonly (
@@ -534,8 +546,7 @@ namespace PreferTernary {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Whether to always prefer ternary, or only when every test and branch is on one line.
    */
   export type Options = 'always' | 'only-single-line';
@@ -551,6 +562,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/explicit-collection-type-arguments': ExplicitCollectionTypeArguments.RuleEntry;
   'ts-restrictions/function-order': FunctionOrder.RuleEntry;
   'ts-restrictions/jsx-boolean-logical-operands': JsxBooleanLogicalOperands.RuleEntry;
+  'ts-restrictions/no-detached-jsdoc': NoDetachedJsdoc.RuleEntry;
   'ts-restrictions/no-negated-comparison': NoNegatedComparison.RuleEntry;
   'ts-restrictions/no-ragged-comment-wrap': NoRaggedCommentWrap.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;

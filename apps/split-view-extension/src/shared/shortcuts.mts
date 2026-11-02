@@ -1,17 +1,10 @@
+import { Num, Result } from 'ts-data-forge';
+
 /**
  * The part of a `WheelEvent` the zoom test reads.
  *
  * Structural for the same reason as `ShortcutKeyEvent` below.
  */
-/**
- * The part of a `KeyboardEvent` the shortcut test reads.
- *
- * Structural rather than `KeyboardEvent` itself for the reason given on
- * `IncomingMessageEvent`: a parameter has to be deeply readonly here, and a DOM
- * event is mutable all the way down.
- */
-import { Num, Result } from 'ts-data-forge';
-
 export type ZoomWheelEvent = Readonly<{
   ctrlKey: boolean;
   deltaY: number;
@@ -37,6 +30,13 @@ export const zoomStepFromWheel = (
         : undefined
     : undefined;
 
+/**
+ * The part of a `KeyboardEvent` the shortcut test reads.
+ *
+ * Structural rather than `KeyboardEvent` itself for the reason given on
+ * `IncomingMessageEvent`: a parameter has to be deeply readonly here, and a DOM
+ * event is mutable all the way down.
+ */
 export type ShortcutKeyEvent = Readonly<{
   altKey: boolean;
   ctrlKey: boolean;

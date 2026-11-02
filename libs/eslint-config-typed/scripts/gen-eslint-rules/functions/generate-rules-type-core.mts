@@ -36,7 +36,11 @@ import {
 } from './fix-schema/index.mjs';
 import { isDeprecated } from './is-deprecated.mjs';
 import { normalizeSchemaToArray } from './normalize-schema-to-array.mjs';
-import { metaToString, rawSchemaToString } from './print/index.mjs';
+import {
+  metaToString,
+  rawSchemaToString,
+  withSchemaDoc,
+} from './print/index.mjs';
 import { renameShadowedDeclarations } from './rename-shadowed-declarations.mjs';
 import { stripGeneratorBoilerplateComments } from './strip-generator-boilerplate-comments.mjs';
 import type { JSONSchema4 } from './type.mjs';
@@ -261,8 +265,6 @@ const createResult = async (
           break;
 
         case 1: {
-          mut_resultToWrite.push(...rawSchemaToString(schemaToPrint));
-
           const sc = schema[0];
 
           if (sc === undefined) {
@@ -281,9 +283,12 @@ const createResult = async (
           });
 
           mut_resultToWrite.push(
-            ...renameShadowedDeclarations(namespaceName, [
-              stripGeneratorBoilerplateComments(optionsType),
-            ]),
+            ...withSchemaDoc(
+              rawSchemaToString(schemaToPrint),
+              renameShadowedDeclarations(namespaceName, [
+                stripGeneratorBoilerplateComments(optionsType),
+              ]).join('\n'),
+            ),
             '',
             '  export type RuleEntry = ',
             generatorOption.explicitRuleDefaultOption
@@ -297,8 +302,6 @@ const createResult = async (
         }
 
         default: {
-          mut_resultToWrite.push(...rawSchemaToString(schemaToPrint));
-
           const schemasWithDefaults = schema.map(addDefaultValuesToDescription);
 
           /* e.g. "export type Options = { ... };" */
@@ -315,9 +318,12 @@ const createResult = async (
             optionsTypeList.map((_, index) => `Options${index}` as const);
 
           mut_resultToWrite.push(
-            ...renameShadowedDeclarations(
-              namespaceName,
-              optionsTypeList.map(stripGeneratorBoilerplateComments),
+            ...withSchemaDoc(
+              rawSchemaToString(schemaToPrint),
+              renameShadowedDeclarations(
+                namespaceName,
+                optionsTypeList.map(stripGeneratorBoilerplateComments),
+              ).join('\n'),
             ),
             '',
             '  export type RuleEntry = ',

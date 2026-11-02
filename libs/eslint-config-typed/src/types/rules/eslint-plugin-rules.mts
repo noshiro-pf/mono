@@ -35,8 +35,7 @@ namespace ConsistentOutput {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Whether to enforce having output assertions 'always' or to be 'consistent' when some cases have them.
    */
   export type Options = 'always' | 'consistent';
@@ -91,8 +90,7 @@ namespace MetaPropertyOrdering {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * What order to enforce for meta properties.
    */
   export type Options = readonly string[];
@@ -662,8 +660,7 @@ namespace ReportMessageFormat {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Format that all report messages must match.
    */
   export type Options = string;
@@ -1071,8 +1068,7 @@ namespace TestCasePropertyOrdering {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * What order to enforce for test case properties.
    */
   export type Options = readonly string[];
@@ -1113,8 +1109,7 @@ namespace TestCaseShorthandStrings {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * What behavior to enforce of when shorthand strings should be banned or required.
    */
   export type Options =

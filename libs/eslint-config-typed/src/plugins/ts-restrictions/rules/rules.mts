@@ -3,6 +3,7 @@ import { checkDestructuringCompleteness } from './check-destructuring-completene
 import { explicitCollectionTypeArguments } from './explicit-collection-type-arguments.mjs';
 import { functionOrder } from './function-order.mjs';
 import { jsxBooleanLogicalOperands } from './jsx-boolean-logical-operands.mjs';
+import { noDetachedJsdoc } from './no-detached-jsdoc.mjs';
 import { noNegatedComparison } from './no-negated-comparison.mjs';
 import { noRaggedCommentWrap } from './no-ragged-comment-wrap.mjs';
 import { noRestrictedCastName } from './no-restricted-cast-name.mjs';
@@ -25,6 +26,7 @@ export const tsRestrictionsRules = {
   'explicit-collection-type-arguments': explicitCollectionTypeArguments,
   'function-order': functionOrder,
   'jsx-boolean-logical-operands': jsxBooleanLogicalOperands,
+  'no-detached-jsdoc': noDetachedJsdoc,
   'no-negated-comparison': noNegatedComparison,
   'no-ragged-comment-wrap': noRaggedCommentWrap,
   'no-restricted-cast-name': noRestrictedCastName,

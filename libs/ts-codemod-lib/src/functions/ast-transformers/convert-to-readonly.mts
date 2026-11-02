@@ -121,7 +121,7 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
      */
     typeName?: string;
 
-    /**
+    /*
      * Whether to apply `DeepReadonly` aggressively or remove `DeepReadonly` as
      * possible.
      *

@@ -409,10 +409,6 @@ const pullRequestUrlPattern = 'https://github.com/*/*/pull/*';
 const gitHubOrigin = 'https://github.com/';
 
 /**
- * Frame events are logged for the split view's tab only. Every page on the web
- * has frames, and a log of all of them would say nothing about this one.
- */
-/**
  * The tail of the log-write chain. An object, because the lint rules allow a
  * `mut_`-prefixed property to be assigned but not a top-level binding.
  */
@@ -459,6 +455,10 @@ const appendEvent = async (
   return mut_workerState.appendQueue;
 };
 
+/**
+ * Frame events are logged for the split view's tab only. Every page on the web
+ * has frames, and a log of all of them would say nothing about this one.
+ */
 const logFrameEvent = async (
   kind: string,
   details: Readonly<{ tabId: number; frameId: number; url: string }>,

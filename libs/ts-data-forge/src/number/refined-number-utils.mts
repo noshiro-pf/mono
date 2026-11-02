@@ -106,6 +106,9 @@ export namespace TsDataForgeInternals {
 
     type CastToInt<N> = N extends Int ? N : never;
 
+    /** The closed binary arithmetic operations a branded namespace may expose. */
+    export type NumberClassBinOp = 'add' | 'div' | 'mul' | 'sub';
+
     /**
      * Generates a type-safe API for a branded number type based on its
      * characteristics.
@@ -122,9 +125,6 @@ export namespace TsDataForgeInternals {
      *   'positive' | 'range'
      * @internal
      */
-    /** The closed binary arithmetic operations a branded namespace may expose. */
-    export type NumberClassBinOp = 'add' | 'div' | 'mul' | 'sub';
-
     export type NumberClass<
       N extends UnknownNumberBrand,
       classes extends 'int' | 'non-negative' | 'positive' | 'range',

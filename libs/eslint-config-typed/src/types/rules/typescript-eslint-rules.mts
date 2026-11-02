@@ -300,8 +300,7 @@ namespace ClassLiteralPropertyStyle {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Which literal class member syntax to prefer.
    */
   export type Options = 'fields' | 'getters';
@@ -424,8 +423,7 @@ namespace ConsistentGenericConstructors {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Which constructor call syntax to prefer.
    */
   export type Options = 'type-annotation' | 'constructor';
@@ -466,8 +464,7 @@ namespace ConsistentIndexedObjectStyle {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Which indexed object syntax to prefer.
    */
   export type Options = 'record' | 'index-signature';
@@ -651,8 +648,7 @@ namespace ConsistentTypeDefinitions {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Which type definition syntax to prefer.
    */
   export type Options = 'interface' | 'type';
@@ -1956,8 +1952,7 @@ namespace MethodSignatureStyle {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * The method signature style to enforce using.
    */
   export type Options = 'property' | 'method';

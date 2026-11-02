@@ -3,6 +3,7 @@
  * which `router.mts` reads, the screenshots imported as URLs, and the
  * side-effect import of `./index.css` in `main.tsx`.
  */
+
 /// <reference types="vite/client" />
 
 /**

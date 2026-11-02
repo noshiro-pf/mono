@@ -3,6 +3,7 @@
  * and the side-effect import of `./index.css`; and the variables this app reads
  * from `.env.*`.
  */
+
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
