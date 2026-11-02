@@ -821,7 +821,11 @@ const eraseRanges = (source: string, ranges: readonly EraseRange[]): string => {
 
   const mut_lineCursor = { current: 0 };
 
-  for (const [pos, char] of Array.from(source).entries()) {
+  // Code units, like `mut_erased`: `Array.from(source)` would yield code
+  // points, and after each astral character the index would fall one behind.
+  const codeUnits = source.split('');
+
+  for (const [pos, char] of codeUnits.entries()) {
     if (mut_erased[pos] === true) {
       mut_touchedLines.add(mut_lineCursor.current);
     }
@@ -831,8 +835,7 @@ const eraseRanges = (source: string, ranges: readonly EraseRange[]): string => {
     }
   }
 
-  return source
-    .split('')
+  return codeUnits
     .filter(
       (char, i) => mut_erased[i] !== true || char === '\n' || char === '\r',
     )
