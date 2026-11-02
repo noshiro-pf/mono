@@ -77,27 +77,30 @@ describe('partly broken list settings', () => {
     }
   });
 
-  test('repair a sort key field by field: an unknown order is ascending', () => {
+  test('drop a sort key with an unknown order', () => {
     assert.deepStrictEqual(
       listSettingsStorage.parse(
         '{"sort":[{"key":"priority","order":"desc"},{"key":"title","order":"up"}],"hideDone":true}',
       ),
-      {
-        sort: [
-          { key: 'priority', order: 'desc' },
-          { key: 'title', order: 'asc' },
-        ],
-        hideDone: true,
-      },
+      { sort: [{ key: 'priority', order: 'desc' }], hideDone: true },
     );
   });
 
-  test('repair an unknown key to the first key, title, kept once', () => {
+  test('drop an unknown key rather than turning it into title', () => {
     assert.deepStrictEqual(
       listSettingsStorage.parse(
         '{"sort":[{"key":"colour","order":"desc"},{"key":"title","order":"asc"}],"hideDone":false}',
       ),
-      { sort: [{ key: 'title', order: 'desc' }], hideDone: false },
+      { sort: [{ key: 'title', order: 'asc' }], hideDone: false },
+    );
+  });
+
+  test('sort by title ascending when every key is broken', () => {
+    assert.deepStrictEqual(
+      listSettingsStorage.parse(
+        '{"sort":[{"key":"colour","order":"desc"},3],"hideDone":true}',
+      ),
+      { sort: [{ key: 'title', order: 'asc' }], hideDone: true },
     );
   });
 

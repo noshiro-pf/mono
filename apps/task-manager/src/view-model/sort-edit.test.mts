@@ -8,6 +8,7 @@ import {
   sortKeyActions,
   sortKeyLabels,
   SortSpecCodec,
+  storedSortCodec,
   toggleSortOrder,
   uniqueSortKeys,
   unusedSortKeys,
@@ -159,5 +160,44 @@ describe(SortSpecCodec.is, () => {
     assert.isFalse(SortSpecCodec.is({ key: 'depth', order: 'down' }));
 
     assert.isFalse(SortSpecCodec.is({ key: 'colour', order: 'asc' }));
+  });
+});
+
+describe(storedSortCodec, () => {
+  const codec = storedSortCodec([{ key: 'status', order: 'asc' }] as const);
+
+  test('is the default for what is not a list', () => {
+    for (const stored of [undefined, null, '{}', { key: 'title' }]) {
+      assert.deepStrictEqual(codec.fill(stored), [
+        { key: 'status', order: 'asc' },
+      ]);
+    }
+
+    assert.deepStrictEqual(codec.defaultValue, [
+      { key: 'status', order: 'asc' },
+    ]);
+  });
+
+  test('keeps the entries that are fine and drops the broken ones', () => {
+    assert.deepStrictEqual(
+      codec.fill([
+        { key: 'colour', order: 'desc' },
+        { key: 'priority', order: 'desc' },
+        { key: 'status', order: 'sideways' },
+        3,
+      ]),
+      [{ key: 'priority', order: 'desc' }],
+    );
+  });
+
+  test('is title ascending when every entry is broken', () => {
+    assert.deepStrictEqual(
+      codec.fill([{ key: 'colour', order: 'desc' }, { key: 'title' }]),
+      [{ key: 'title', order: 'asc' }],
+    );
+  });
+
+  test('keeps a list that was stored empty', () => {
+    assert.deepStrictEqual(codec.fill([]), []);
   });
 });

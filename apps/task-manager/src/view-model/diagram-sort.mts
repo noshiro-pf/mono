@@ -5,20 +5,20 @@
  * editor as the list's keys (`sort-edit.mts`) in 「表示設定」.
  *
  * Every key may be removed: no keys orders by title ascending, the default.
- * Kept as every setting is (`persisted-setting.mts`): anything stored that is
- * not a list gives the default, and a broken entry of one is repaired field by
- * field.
+ * Kept as every setting is (`persisted-setting.mts`), its broken entries
+ * dropped as `storedSortCodec` says.
  */
 
 import { Arr } from 'ts-data-forge';
-import * as t from 'ts-fortress';
 import type { SortSpec } from '../domain/index.mjs';
 import { persistedSetting } from './persisted-setting.mjs';
-import { SortSpecCodec, uniqueSortKeys } from './sort-edit.mjs';
+import {
+  storedSortCodec,
+  TITLE_ASCENDING,
+  uniqueSortKeys,
+} from './sort-edit.mjs';
 
-export const DiagramSortCodec = t.array(SortSpecCodec, {
-  defaultValue: [{ key: 'title', order: 'asc' }] as const,
-});
+export const DiagramSortCodec = storedSortCodec(TITLE_ASCENDING);
 
 /** By title, and what no keys at all means. */
 export const DEFAULT_DIAGRAM_SORT: readonly SortSpec[] =

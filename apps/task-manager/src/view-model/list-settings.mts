@@ -6,21 +6,20 @@
  * Kept as every setting is (`persisted-setting.mts`): anything stored that is
  * not settings gives the defaults, and settings that are partly broken keep
  * what is fine — a sort that is not a list falls back to the default sort and
- * leaves hide-done as it was, and the other way round.
+ * leaves hide-done as it was, and the other way round. Broken sort keys are
+ * dropped as `storedSortCodec` says.
  */
 
 import * as t from 'ts-fortress';
 import { persistedSetting } from './persisted-setting.mjs';
-import { SortSpecCodec, uniqueSortKeys } from './sort-edit.mjs';
+import { storedSortCodec, uniqueSortKeys } from './sort-edit.mjs';
 
 export const ListSettingsCodec = t.record({
-  sort: t.array(SortSpecCodec, {
-    defaultValue: [
-      { key: 'status', order: 'asc' },
-      { key: 'priority', order: 'asc' },
-      { key: 'dueDate', order: 'asc' },
-    ] as const,
-  }),
+  sort: storedSortCodec([
+    { key: 'status', order: 'asc' },
+    { key: 'priority', order: 'asc' },
+    { key: 'dueDate', order: 'asc' },
+  ] as const),
   hideDone: t.boolean(false),
 });
 

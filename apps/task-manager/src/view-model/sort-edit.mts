@@ -101,6 +101,38 @@ export const sortKeyActions = (
     },
   }) as const;
 
+/**
+ * A stored list of sort keys, with `defaultValue` for what is not a list. A
+ * broken entry — an unknown key or order — is dropped rather than repaired,
+ * since a key made up in its place is not what was saved; a list whose every
+ * entry is broken is {@link TITLE_ASCENDING}, as no keys means for the
+ * diagrams. A list stored empty stays empty.
+ */
+export const storedSortCodec = (
+  defaultValue: readonly SortSpec[],
+): t.Type<readonly SortSpec[]> => {
+  const codec = t.array(SortSpecCodec, {
+    defaultValue,
+    onInvalidElement: 'drop',
+  });
+
+  return {
+    ...codec,
+    fill: (a) => {
+      const filled = codec.fill(a);
+
+      return Arr.isArray(a) && Arr.isNonEmpty(a) && Arr.isEmpty(filled)
+        ? TITLE_ASCENDING
+        : filled;
+    },
+  };
+};
+
+/** By title, ascending: the one key a broken stored sort comes back as. */
+export const TITLE_ASCENDING: readonly SortSpec[] = [
+  { key: 'title', order: 'asc' },
+] as const;
+
 /** A sort key as stored, for validating what is read back. */
 export const SortSpecCodec = t.record({
   key: SortKeyCodec,
