@@ -222,6 +222,29 @@ export type StartIssueArgs = Readonly<{
   mode: 'force' | 'release' | 'start';
 }>;
 
+/**
+ * The open pull requests whose bodies close `issue` by a closing keyword, read
+ * from GitHub's rendering as `open-pr` reads them. The first hundred only, as
+ * there: a repository with more open than that has other problems.
+ */
+export const openPullsClosing = async (
+  context: ApiContext,
+  issue: number,
+): Promise<Result<readonly number[], string>> =>
+  Result.map(
+    await rest(context, 'GET', '/pulls', PullBodiesSchema, {
+      query: { state: 'open', per_page: '100' },
+      withBodyHtml: true,
+    }),
+    (pulls) =>
+      pulls
+        .filter(({ body_html: html }) =>
+          closingKeywordIssuesIn(context.repo, html ?? '').includes(issue),
+        )
+        .map(({ number }) => number)
+        .toSorted((a, b) => a - b),
+  );
+
 const release = async (
   context: ApiContext,
   number: number,
@@ -241,29 +264,6 @@ const release = async (
     ? removed
     : Result.ok(`#${number}: ${IN_PROGRESS_LABEL} taken off.`);
 };
-
-/**
- * The open pull requests whose bodies close `issue` by a closing keyword, read
- * from GitHub's rendering as `open-pr` reads them. The first hundred only, as
- * there: a repository with more open than that has other problems.
- */
-const openPullsClosing = async (
-  context: ApiContext,
-  issue: number,
-): Promise<Result<readonly number[], string>> =>
-  Result.map(
-    await rest(context, 'GET', '/pulls', PullBodiesSchema, {
-      query: { state: 'open', per_page: '100' },
-      withBodyHtml: true,
-    }),
-    (pulls) =>
-      pulls
-        .filter(({ body_html: html }) =>
-          closingKeywordIssuesIn(context.repo, html ?? '').includes(issue),
-        )
-        .map(({ number }) => number)
-        .toSorted((a, b) => a - b),
-  );
 
 const IssueSchema = t.record({
   state: t.string(),

@@ -42,6 +42,12 @@ const PAGE_SIZE = 100;
  */
 const MAX_CHECK_RUN_PAGES = 10;
 
+/**
+ * Two thousand open issues and pull requests, for a cap past one page: every
+ * one is read before the most recently updated are kept.
+ */
+const MAX_ISSUE_PAGES = 20;
+
 const PullRequestSchema = t.record({
   number: t.number(),
   title: t.string(),
@@ -673,23 +679,50 @@ export const createClient = (
     },
 
     issues: async (repo, limit) => {
-      // A full page rather than `limit`: pull requests come back from this
+      // One page, most recently updated first, when the cap fits in one. Past
+      // that, pages in the order the issues were opened, which does not move
+      // while the pages are read as `updated` does, sorted afterwards.
+      const paged = limit > PAGE_SIZE;
+
+      const sort = paged ? 'created' : 'updated';
+
+      const mut_listed: t.TypeOf<typeof IssueListSchema>[number][] = [];
+
+      // Full pages rather than `limit`: pull requests come back from this
       // endpoint too and are filtered out after, so asking for exactly the cap
       // would let a run of recently updated pull requests crowd the issues out.
-      const listed = await getJson(
-        `/repos/${repo.owner}/${repo.name}/issues?state=open&per_page=${PAGE_SIZE}&sort=updated&direction=desc`,
-        IssueListSchema,
-      );
+      for (const page of Arr.seq(paged ? MAX_ISSUE_PAGES : 1)) {
+        const listed = await getJson(
+          `/repos/${repo.owner}/${repo.name}/issues?state=open&per_page=${PAGE_SIZE}&sort=${sort}&direction=desc&page=${page + 1}`,
+          IssueListSchema,
+        );
 
-      if (Result.isErr(listed)) {
-        return listed;
+        if (Result.isErr(listed)) {
+          return listed;
+        }
+
+        // One opened while the pages are read moves the rest along by one, and
+        // repeats the last of a page at the top of the next.
+        const seen = new Set<number>(mut_listed.map(({ number }) => number));
+
+        mut_listed.push(
+          ...listed.value.filter(
+            (each) => each.pull_request === undefined && !seen.has(each.number),
+          ),
+        );
+
+        // All of them, not the first `limit` opened: the cap is on the most
+        // recently updated.
+        if (listed.value.length < PAGE_SIZE) {
+          break;
+        }
       }
+
+      mut_listed.sort((a, b) => b.updated_at.localeCompare(a.updated_at));
 
       const mut_issues: OpenIssue[] = [];
 
-      for (const issue of listed.value
-        .filter((each) => each.pull_request === undefined)
-        .slice(0, limit)) {
+      for (const issue of mut_listed.slice(0, limit)) {
         const blockedBy = await blockedByOf(repo, issue);
 
         mut_issues.push({

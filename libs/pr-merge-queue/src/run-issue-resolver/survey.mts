@@ -1,0 +1,124 @@
+/** Which issue a round hands a session, read without the model. */
+
+import {
+  hasLabel,
+  PENDING_LABEL,
+  priorityRankOfLabels,
+  type ReportIssue,
+} from 'pr-report-core';
+import { Arr } from 'ts-data-forge';
+
+/**
+ * Picks the issues a session may start, in the order it takes them.
+ *
+ * Startable is what `docs/issue-start-after.md` calls `ready` or `free`, as the
+ * report decides it: nothing it waits for is open, nobody has labelled it
+ * `in-progress` or `planned`, and no open pull request closes it. Of those it
+ * keeps the ones `authors` wrote, since the session acts on what the issue says
+ * with the token and no person in between, and none carrying one of
+ * {@link HELD_LABELS}.
+ *
+ * `attempted` is the issues handed to earlier sessions (`attempted.mts`), with
+ * what each one's `updatedAt` read once its session ended, or `undefined` when
+ * it could not be read. One a session ended on with no pull request (too large,
+ * a decision that is a person's) is not handed on again until someone changes
+ * it; `undefined` holds it until the record is removed.
+ */
+export const surveyIssues = (
+  issues: readonly ReportIssue[],
+  authors: ReadonlySet<string>,
+  attempted: ReadonlyMap<number, string | undefined>,
+): IssueSurvey => {
+  const mut_fresh: (IssueCandidate & Readonly<{ rank: number }>)[] = [];
+
+  const mut_left: number[] = [];
+
+  const mut_foreign: number[] = [];
+
+  const mut_held: number[] = [];
+
+  // GitHub's logins are not case-sensitive.
+  const logins = new Set<string>(
+    Array.from(authors, (login) => login.toLowerCase()),
+  );
+
+  for (const issue of issues) {
+    if (issue.start !== 'free' && issue.start !== 'ready') {
+      continue;
+    }
+
+    if (!logins.has(issue.author.toLowerCase())) {
+      mut_foreign.push(issue.number);
+
+      continue;
+    }
+
+    if (HELD_LABELS.some((name) => hasLabel(issue.labels, name))) {
+      mut_held.push(issue.number);
+
+      continue;
+    }
+
+    if (
+      attempted.has(issue.number) &&
+      (attempted.get(issue.number) ?? issue.updatedAt) === issue.updatedAt
+    ) {
+      mut_left.push(issue.number);
+
+      continue;
+    }
+
+    mut_fresh.push({
+      number: issue.number,
+      url: issue.url,
+      updatedAt: issue.updatedAt,
+      rank: priorityRankOfLabels(issue.labels.map(({ name }) => name)),
+    });
+  }
+
+  return {
+    fresh: mut_fresh
+      .toSorted((a, b) =>
+        a.rank === b.rank ? a.number - b.number : a.rank - b.rank,
+      )
+      .map(({ number, url, updatedAt }) => ({ number, url, updatedAt })),
+    left: Arr.toSorted(mut_left),
+    foreign: Arr.toSorted(mut_foreign),
+    held: Arr.toSorted(mut_held),
+  };
+};
+
+/**
+ * Labels that say an issue is not to be started as it stands: a question to
+ * answer first, one that will not be done, or one the author is holding back.
+ */
+export const HELD_LABELS = [
+  'duplicate',
+  'invalid',
+  'question',
+  'wontfix',
+  PENDING_LABEL,
+] as const;
+
+/** A startable issue, as a session is handed it. */
+export type IssueCandidate = Readonly<{
+  number: number;
+  url: string;
+  /** As the survey read it. */
+  updatedAt: string;
+}>;
+
+export type IssueSurvey = Readonly<{
+  /**
+   * Startable, and not yet handed to a round as they stand, in the order they
+   * are taken: `priority:high` first, `priority:low` last, the oldest first
+   * within each.
+   */
+  fresh: readonly IssueCandidate[];
+  /** Startable, and left by an earlier round as they stand. */
+  left: readonly number[];
+  /** Startable, but written by someone outside `authors`. */
+  foreign: readonly number[];
+  /** Startable, but carrying one of {@link HELD_LABELS}. */
+  held: readonly number[];
+}>;

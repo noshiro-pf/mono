@@ -9,6 +9,7 @@ import {
   type RepoRef,
 } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
+import type { StrictOmit } from 'ts-type-forge';
 import {
   currentEpochMs,
   isoSeconds,
@@ -62,6 +63,34 @@ import { readRequiredContexts } from './repo-settings.mjs';
 export const prReport = async (
   options: Options,
 ): Promise<Result<string, string>> => {
+  const read = await readReport(options);
+
+  if (Result.isErr(read)) {
+    return read;
+  }
+
+  const { client, repo, defaultBranch, pulls, report } = read.value;
+
+  // Only the JSON carries these: they are what a session working the queue
+  // reads (`claude-plugin/skills/unblock-prs/SKILL.md`), not what a person does.
+  const queue =
+    options.format === 'json'
+      ? await client.queueComments(repo, defaultBranch, pulls)
+      : new Map<number, QueueComments>();
+
+  const owners = ownersOf(report, queue, defaultBranch, currentEpochMs());
+
+  return Result.ok(print(report, queue, owners, options.format));
+};
+
+/**
+ * What {@link prReport} prints, before the queue's comments are read: for a
+ * command that needs the report itself, such as how each open issue stands for
+ * being started.
+ */
+export const readReport = async (
+  options: StrictOmit<Options, 'format'>,
+): Promise<Result<ReadReport, string>> => {
   const repo = await resolveRepo(options.repo);
 
   if (Result.isErr(repo)) {
@@ -131,13 +160,6 @@ export const prReport = async (
     namedBeyond(facts.value, issues.value),
   );
 
-  // Only the JSON carries these: they are what a session working the queue
-  // reads (`claude-plugin/skills/unblock-prs/SKILL.md`), not what a person does.
-  const queue =
-    options.format === 'json'
-      ? await client.queueComments(repo.value, defaultBranch.value, facts.value)
-      : new Map<number, QueueComments>();
-
   const report = buildReport({
     repo: repo.value,
     defaultBranch: defaultBranch.value,
@@ -153,10 +175,23 @@ export const prReport = async (
     references,
   });
 
-  const owners = ownersOf(report, queue, defaultBranch.value, currentEpochMs());
-
-  return Result.ok(print(report, queue, owners, options.format));
+  return Result.ok({
+    client,
+    repo: repo.value,
+    defaultBranch: defaultBranch.value,
+    pulls: facts.value,
+    report,
+  });
 };
+
+export type ReadReport = Readonly<{
+  client: Client;
+  repo: RepoRef;
+  defaultBranch: string;
+  /** What the report was built from. */
+  pulls: readonly PullRequestFacts[];
+  report: PrReport;
+}>;
 
 /**
  * What the open issues listed, and the ones the open pull requests close beyond
