@@ -30,6 +30,7 @@ export const ProbabilityTable = memoNamed<Props>(
             <NoWrapBox>
               <span>{'選択した列の数字'}</span>
               <BpButton
+                aria-label={'選択した列の数字で並べ替え'}
                 icon={'sort'}
                 variant={'minimal'}
                 onClick={sortByDice}
@@ -40,6 +41,7 @@ export const ProbabilityTable = memoNamed<Props>(
             <NoWrapBox>
               <span>{'少なくとも1列当たる確率'}</span>
               <BpButton
+                aria-label={'確率で並べ替え'}
                 icon={'sort'}
                 variant={'minimal'}
                 onClick={sortByProbability}
