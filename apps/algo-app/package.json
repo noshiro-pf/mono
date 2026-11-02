@@ -39,7 +39,8 @@
     "immer": "^11.2.7",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
-    "tiny-router-observable": "workspace:*",
+    "synstate-router": "workspace:*",
+    "synstate-router-dom": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*",
     "ts-utils-additional": "workspace:*"

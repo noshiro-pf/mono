@@ -46,6 +46,38 @@ test(
 
     await page.getByRole('button', { name: 'メインページに戻る' }).click();
 
+    // Below the app's base, which the router adds.
+    await expect.soft(page).toHaveURL(/\/mono\/algo-app\/$/u);
+
     await expect.soft(page.getByPlaceholder('algo master')).toBeVisible();
+  },
+);
+
+// The two tests below cover what the router does where the server hands it a
+// path it has no page for, as the dev and preview servers do. Pages answers
+// both itself: a 301 to the path with its slash, and its own 404.
+
+test(
+  'the router rewrites a path without its trailing slash',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/mono/algo-app/create');
+
+    await expect.soft(page).toHaveURL(/\/mono\/algo-app\/create\/$/u);
+
+    // The create page, not the not-found page.
+    await expect.soft(page.getByPlaceholder('algo master')).toBeVisible();
+  },
+);
+
+test(
+  'the router draws an unknown path as not found',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/mono/algo-app/no-such-page/');
+
+    await expect
+      .soft(page.getByRole('button', { name: 'メインページに戻る' }))
+      .toBeVisible();
   },
 );

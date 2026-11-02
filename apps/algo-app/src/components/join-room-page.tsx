@@ -5,7 +5,7 @@ import {
 } from 'synstate';
 import { constant, derive, If, type JSX } from 'synstate-dom';
 import { dictionary, roomPage } from '../constants/index.mjs';
-import { Router } from '../router.mjs';
+import { router } from '../router.mjs';
 import { roomStore } from '../store/index.mjs';
 import { Button, Input, Spinner } from './bp/index.mjs';
 import * as styles from './room-form.module.css';
@@ -48,14 +48,17 @@ export const JoinRoomPage = ({ roomId }: Props): JSX.Element => {
 
     const id = roomId.getSnapshot().value;
 
-    const name = getUsername();
+    // The URL carries the name, and a lone surrogate (half of a pasted emoji)
+    // cannot be written into one: it is replaced before the player joins, so
+    // that the room and the URL hold the same name.
+    const name = getUsername().toWellFormed();
 
     // Navigated once the join has settled rather than from a subscriber, so the
     // router is not written to while the store's update propagates.
     roomStore.joinRoom
       .dispatch(id, name)
       .then(() => {
-        Router.push(roomPage(id, name));
+        router.push(roomPage(id, name));
       })
       .catch(console.error);
   };
