@@ -1,9 +1,8 @@
 import * as React from 'react';
 import {
   handleLinkClick,
+  isHref,
   type AnyRoutes,
-  type ExternalHref,
-  type Href,
   type Router,
 } from 'synstate-router';
 import type { LinkProps } from '../link-props.mjs';
@@ -47,6 +46,3 @@ export const createLink = <R extends AnyRoutes>(
 
   return Link;
 };
-
-/** An `Href` is a path; an `ExternalHref` is an absolute URL. */
-const isHref = (to: Href | ExternalHref): to is Href => to.startsWith('/');

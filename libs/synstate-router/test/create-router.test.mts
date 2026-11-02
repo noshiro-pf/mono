@@ -1,4 +1,4 @@
-import { createState, type InitializedObservable } from 'synstate';
+import { createScope, createState, type InitializedObservable } from 'synstate';
 import { asSafeInt, expectType, Optional, type SafeInt } from 'ts-data-forge';
 import type { RelaxedExtract } from 'ts-type-forge';
 import {
@@ -551,6 +551,44 @@ describe('match', () => {
 });
 
 describe('at and isActive', () => {
+  test('outlive the scope of their first caller', () => {
+    const { router } = setup();
+
+    const scope = createScope();
+
+    scope.run(() => {
+      router.at(routes.settings);
+
+      router.isActive(routes.settings);
+    });
+
+    scope.dispose();
+
+    router.push(routes.settings.href());
+
+    assert.isTrue(Optional.isSome(current(router.at(routes.settings))));
+
+    assert.isTrue(current(router.isActive(routes.settings)));
+  });
+
+  test('the router outlives the scope it was created in', () => {
+    const scope = createScope();
+
+    const { router } = scope.run(() => setup());
+
+    const settings = router.at(routes.settings);
+
+    scope.dispose();
+
+    router.push(routes.settings.href());
+
+    assert.strictEqual(current(router.match).route, 'settings');
+
+    assert.strictEqual(current(router.location).pathname, '/settings/');
+
+    assert.isTrue(Optional.isSome(current(settings)));
+  });
+
   test('at is the node prefix match with its own params and search', () => {
     const { router } = setup('https://example.com/products/5/?q=shoe');
 

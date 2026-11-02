@@ -1,13 +1,12 @@
 import * as React from 'react';
 import {
-  hrefWithSearch,
   matchAt,
+  pageValues,
   type AnyRouteNode,
   type AnyRoutes,
   type PageMatch,
   type RouteMatch,
   type Router,
-  type SearchPatch,
 } from 'synstate-router';
 import { isNonNullObject, Optional } from 'ts-data-forge';
 import type { UnknownRecord } from 'ts-type-forge';
@@ -108,11 +107,6 @@ const selectCase = <R extends AnyRoutes>(
   return {
     key: page.route,
     draw,
-    values: {
-      params: page.params,
-      search: page.search,
-      withSearch: (patch: SearchPatch<PageMatch<R>['search']>) =>
-        hrefWithSearch<R, PageMatch<R>>(router.routes, page, patch),
-    },
+    values: pageValues(router.routes, page),
   };
 };

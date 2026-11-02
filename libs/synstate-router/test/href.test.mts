@@ -1,4 +1,4 @@
-import { externalHref } from '../src/index.mjs';
+import { externalHref, isHref, type Href } from '../src/index.mjs';
 
 describe(externalHref, () => {
   test('accepts an absolute URL, with any scheme', () => {
@@ -18,5 +18,18 @@ describe(externalHref, () => {
       () => externalHref('/other-app/'),
       'synstate-router: externalHref: /other-app/ is not an absolute URL',
     );
+  });
+});
+
+describe(isHref, () => {
+  test('is true of an Href', () => {
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- what `href()` returns, without routes
+    assert.isTrue(isHref('/products/?page=2' as Href));
+  });
+
+  test('is false of an ExternalHref, even to this origin', () => {
+    assert.isFalse(isHref(externalHref('https://example.com/products/')));
+
+    assert.isFalse(isHref(externalHref('mailto:a@example.com')));
   });
 });
