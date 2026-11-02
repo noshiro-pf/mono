@@ -1,7 +1,11 @@
 import {
   employmentInsuranceRate,
+  healthInsuranceMaxStandardBonusPerYear,
+  healthInsuranceRate,
   kyoukaiKenpoInsurancePremiumTable,
+  welfarePensionMaxStandardBonus,
   welfarePensionMaxStandardRemuneration,
+  welfarePensionRate,
   type KyoukaiKenpoInsurancePremiumTableEntry,
 } from '../../data/index.mjs';
 
@@ -25,9 +29,35 @@ export const welfarePensionPremium = (remuneration: number): number =>
     : (findGrade(Math.min(remuneration, welfarePensionMaxStandardRemuneration))
         ?.welfarePension.half ?? lowestWelfarePension);
 
+/**
+ * 賞与（円）にかかる健康保険料の折半額。標準賞与額（1,000 円未満切り捨て）に
+ * 料率を掛ける（標準報酬月額の等級は使わない）。標準賞与額は年度の累計で
+ * 上限があり、賞与は年 1 回なので 1 回の賞与をその上限で頭打ちにする。
+ */
+export const bonusHealthInsurancePremium = (bonus: number): number =>
+  bonusPremiumHalf(
+    bonus,
+    healthInsuranceMaxStandardBonusPerYear,
+    healthInsuranceRate,
+  );
+
+/**
+ * 賞与（円）にかかる厚生年金保険料の折半額。標準賞与額（1,000 円未満切り
+ * 捨て、1 回 150 万円が上限）に料率を掛ける。
+ */
+export const bonusWelfarePensionPremium = (bonus: number): number =>
+  bonusPremiumHalf(bonus, welfarePensionMaxStandardBonus, welfarePensionRate);
+
 /** 雇用保険料（労働者負担）。 */
 export const employmentInsurancePremium = (wage: number): number =>
   Math.max(0, wage) * employmentInsuranceRate;
+
+/**
+ * 標準賞与額（賞与の 1,000 円未満を切り捨てた額、`cap` が上限）に `rate` を
+ * 掛けた保険料の折半額。0 以下の賞与なら 0。
+ */
+const bonusPremiumHalf = (bonus: number, cap: number, rate: number): number =>
+  (Math.min(Math.max(0, Math.floor(bonus / 1000) * 1000), cap) * rate) / 2;
 
 const findGrade = (
   remuneration: number,
