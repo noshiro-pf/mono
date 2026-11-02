@@ -1,7 +1,7 @@
 import { RadioGroup } from 'blueprint-synstate';
 import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
-import type { RepaymentType } from '../../types/index.mjs';
+import { repaymentTypes, type RepaymentType } from '../../types/index.mjs';
 
 type Props = Readonly<{
   value: Bindable<RepaymentType>;
@@ -20,15 +20,21 @@ export const RepaymentTypeRadioGroup = ({
   />
 );
 
-const options = [
-  {
-    value: 'principal-equal-payment',
-    label: constant(dict.principalEqualPayment),
-    'data-e2e': 'radio--principal-equal-payment',
-  },
-  {
-    value: 'principal-and-interest-equal-repayment',
-    label: constant(dict.principalAndInterestEqualRepayment),
-    'data-e2e': 'radio--principal-and-interest-equal-repayment',
-  },
-] as const;
+const labelOf = (value: RepaymentType): string => {
+  switch (value) {
+    case 'principal-equal-payment':
+      return dict.principalEqualPayment;
+
+    case 'principal-and-interest-equal-repayment':
+      return dict.principalAndInterestEqualRepayment;
+  }
+};
+
+const options = repaymentTypes.map(
+  (value) =>
+    ({
+      value,
+      label: constant(labelOf(value)),
+      'data-e2e': `radio--${value}`,
+    }) as const,
+);

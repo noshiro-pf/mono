@@ -12,27 +12,24 @@ import {
   map,
   mapTo,
   merge,
-  scan,
   withInitialValue,
   type InitializedObservable,
 } from 'synstate';
-import type { Router, RouterState } from 'tiny-router-observable';
-import { isNullish, Num, Result } from 'ts-data-forge';
-import type * as t from 'ts-fortress';
-import { defaultValues, queryParamKey } from '../constants/index.mjs';
+import type { RouteNodeValues, Router } from 'synstate-router';
+import { Optional } from 'ts-data-forge';
+import { defaultValues, routes, type Routes } from '../constants/index.mjs';
 import { calcAll } from '../functions/index.mjs';
-import {
+import type {
   BorrowingTotal,
+  CalculatedValues,
   PercentFloat,
+  RepaymentType,
+  Store,
   Year,
-  type CalculatedValues,
-  type RepaymentType,
-  type Store,
 } from '../types/index.mjs';
-import { uriWithQueryParams } from '../utils/index.mjs';
 
 export type LoanDeps = Readonly<{
-  router: Router;
+  router: Router<Routes>;
   /** How long the inputs have to stay still before they are calculated. */
   calcDelayMs: number;
 }>;
@@ -54,12 +51,9 @@ export type LoanStore = Readonly<{
 }>;
 
 export const createLoanStore = (deps: LoanDeps): LoanStore => {
-  const inputs: InitializedObservable<Store> = deps.router.state.pipe(
-    scan(
-      storeFromQuery,
-      storeFromQuery(defaultValues, deps.router.state.getSnapshot().value),
-    ),
-  );
+  const inputs: InitializedObservable<Store> = deps.router
+    .at(routes.loan)
+    .pipe(map(storeFromPage));
 
   const calculatedValues = inputs
     .pipe(debounce(deps.calcDelayMs))
@@ -73,14 +67,13 @@ export const createLoanStore = (deps: LoanDeps): LoanStore => {
   const setInputs = (patch: Partial<Store>): void => {
     const next = { ...inputs.getSnapshot().value, ...patch } as const;
 
-    deps.router.push(
-      uriWithQueryParams('/', [
-        [queryParamKey.repaymentType, next.repaymentType],
-        [queryParamKey.borrowingTotal, next.borrowingTotalManYen],
-        [queryParamKey.borrowingPeriodMonth, next.borrowingPeriodYear],
-        [queryParamKey.interestRatePerMonth, next.interestRatePercentPerYear],
-      ]),
-    );
+    // The hash, and query parameters the page does not declare, are kept.
+    deps.router.setSearch(routes.loan, () => ({
+      'repayment-type': next.repaymentType,
+      'borrowing-total': next.borrowingTotalManYen,
+      'borrowing-period': next.borrowingPeriodYear,
+      'interest-rate': next.interestRatePercentPerYear,
+    }));
   };
 
   return {
@@ -103,54 +96,27 @@ export const createLoanStore = (deps: LoanDeps): LoanStore => {
 };
 
 /**
- * `value` as a number of `type`, or `prev` when it is missing, not a finite
- * number (`Num.safeParseFloat` refuses `''`, `'12px'` and `'Infinity'`, which
- * `Number` reads as `0`, `NaN` and `Infinity`), or not one `type` accepts.
+ * The URL is the one place the inputs are kept: what it says, and the default
+ * for a value missing from it or not a valid one (which the route reads as
+ * absent). So the same URL always shows the same inputs, and going back undoes
+ * a change.
  */
-const numberFromQuery = <A extends number>(
-  type: t.Type<A>,
-  value: string | null | undefined,
-  prev: A,
-): A => {
-  if (isNullish(value)) {
-    return prev;
+const storeFromPage = (
+  page: Optional<RouteNodeValues<Routes['loan']>>,
+): Store => {
+  if (Optional.isNone(page)) {
+    return defaultValues;
   }
 
-  const parsed = Num.safeParseFloat(value);
-
-  return Result.isOk(parsed) && type.is(parsed.value) ? parsed.value : prev;
-};
-
-/**
- * The URL is the one place the inputs are kept: a value missing from it, or not
- * a valid one, stays as it was.
- */
-const storeFromQuery = (
-  prev: Store,
-  { searchParams: query }: RouterState,
-): Store => {
-  const repaymentType = query.get(queryParamKey.repaymentType);
+  const query = page.value.search;
 
   return {
-    repaymentType:
-      repaymentType === 'principal-and-interest-equal-repayment' ||
-      repaymentType === 'principal-equal-payment'
-        ? repaymentType
-        : prev.repaymentType,
-    borrowingTotalManYen: numberFromQuery(
-      BorrowingTotal,
-      query.get(queryParamKey.borrowingTotal),
-      prev.borrowingTotalManYen,
-    ),
-    borrowingPeriodYear: numberFromQuery(
-      Year,
-      query.get(queryParamKey.borrowingPeriodMonth),
-      prev.borrowingPeriodYear,
-    ),
-    interestRatePercentPerYear: numberFromQuery(
-      PercentFloat,
-      query.get(queryParamKey.interestRatePerMonth),
-      prev.interestRatePercentPerYear,
-    ),
+    repaymentType: query['repayment-type'] ?? defaultValues.repaymentType,
+    borrowingTotalManYen:
+      query['borrowing-total'] ?? defaultValues.borrowingTotalManYen,
+    borrowingPeriodYear:
+      query['borrowing-period'] ?? defaultValues.borrowingPeriodYear,
+    interestRatePercentPerYear:
+      query['interest-rate'] ?? defaultValues.interestRatePercentPerYear,
   };
 };
