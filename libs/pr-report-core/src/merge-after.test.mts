@@ -276,6 +276,25 @@ describe(findMergeAfterCycles, () => {
     );
   });
 
+  test('reports a member whose only way back runs through a finished node', () => {
+    // 3 → 2 → 1 → 3 is a cycle as well as 1 ⇄ 2; a walk from 1 finishes 2
+    // before it reaches 3, so 3's edge into 2 must still put 3 on a cycle.
+    const cycles = findMergeAfterCycles(
+      new Map<number, readonly number[]>([
+        [1, [2, 3]],
+        [2, [1]],
+        [3, [2]],
+      ]),
+    );
+
+    assert.deepStrictEqual(cycles, [
+      [1, 2],
+      [1, 3, 2],
+    ]);
+
+    assert.deepStrictEqual(new Set(cycles.flat()), new Set<number>([1, 2, 3]));
+  });
+
   test('follows an edge to a pull request that declared nothing', () => {
     assert.deepStrictEqual(
       findMergeAfterCycles(new Map<number, readonly number[]>([[1, [2]]])),
