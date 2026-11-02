@@ -19,6 +19,7 @@ import {
   buildPlan,
   classifyChanges,
   parsePathsIgnore,
+  readManifestDependencies,
   type PackageInfo,
   type Step,
 } from './plan.mjs';
@@ -254,7 +255,8 @@ const reportCoverage = async ({
 };
 
 /**
- * Runs `pnpm` with the step's arguments, its output passed straight through.
+ * Runs `pnpm` with the step's arguments and `CI=true`, its output passed
+ * straight through.
  * A coverage step gets Vitest's options appended, which `pnpm run` hands on to
  * the last command of the script — `vitest` in the `check:test` of every
  * package with a `check:test:cov`, and in `check:root:test`. The reporter is
@@ -287,6 +289,10 @@ const runPnpm = async (
   return new Promise((resolve) => {
     const child = spawn('pnpm', [...step.args, ...coverageArgs], {
       cwd: path.join(projectRootPath, step.cwd),
+      // As GitHub Actions sets it, since some tools read it: typescript-estree
+      // then parses a linted file from disk rather than the text it was given,
+      // and Vitest refuses `.only`. A test can pass without it and fail in CI.
+      env: { ...process.env, CI: 'true' },
       stdio: 'inherit',
     });
 
@@ -762,6 +768,7 @@ const readPackages = async (): Promise<readonly PackageInfo[]> => {
     dir: path.relative(projectRootPath, pkg.path).split(path.sep).join('/'),
     scripts: new Set(scriptsOf(pkg.packageJson).keys()),
     isPrivate: isRecord(pkg.packageJson) && pkg.packageJson['private'] === true,
+    ...readManifestDependencies(pkg.packageJson),
   }));
 };
 

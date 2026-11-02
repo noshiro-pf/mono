@@ -12,7 +12,10 @@ pnpm run check-changed --no-coverage         # skip the changed-line coverage
 
 The diff is the merge base with `--base` (default `origin/main`) against the
 working tree, plus the untracked files. It needs what the checks need: a
-`pnpm install` and a `pnpm run ws:build:deps`.
+`pnpm install` and a `pnpm run ws:build:deps`. Every step runs with `CI=true`,
+as GitHub Actions sets it, because some tools read it: with it typescript-estree
+parses a linted file from disk rather than the text it was given, and Vitest
+refuses `.only`, so a test can pass without it and fail in CI.
 
 ## What runs
 
@@ -22,14 +25,20 @@ by case. In order:
 1. **Format** the diff (`z:format-diff-from <base>`), so that a generator's
    own `fix:fmt` is not later blamed for formatting a hand-edited file.
 2. **Generators**: `gen` in every touched package, `gen:deps-graph` for a
-   manifest or the lockfile, and `gen:verify-npm-packages` for any change
-   that is not prose alone, since its committed `local/` copies are written
-   from `smoke/`, the manifests and the generator's own code. **A generator
-   that changes the tree fails the run**, naming itself and the files; that
-   is the dirty tree CI's `assert-repo-is-clean` reports with no hint which
-   generator wrote it. Only the run in which it writes fails: a later run
-   cannot tell its output, left uncommitted, from a hand edit, so commit it
-   before moving on.
+   manifest or the lockfile, and `gen:verify-npm-packages` for any change that
+   is not prose alone, since its committed `local/` copies are written from
+   `smoke/`, the manifests and the generator's own code. **A generator that
+   changes the tree fails the run**, naming itself and the files; that is the
+   dirty tree CI's `assert-repo-is-clean` reports with no hint which generator
+   wrote it. Only the run in which it writes fails: a later run cannot tell its
+   output, left uncommitted, from a hand edit, so commit it before moving on.
+   After the touched packages' own, `gen` runs in every member that declares (in
+   any dependency field) a package whose code changed, since a generator can
+   read what its package declares: the synstate docs measure synstate's bundle
+   and embed its JSDoc, the hooks packages re-export what it exports. Such a
+   package is built first (`build`) when an import of it resolves to `dist/`, so
+   that they read it rebuilt; a dependent the diff touches runs its generator
+   again after the build.
 3. **Fixers**: the codemod over the diff (`z:ts-codemod --diff-from`, plus
    `--uncommitted` when there are untracked files, which `--diff-from` cannot
    see), then `fix:lint` in every package whose code changed, so that what the
@@ -75,9 +84,9 @@ codemod's reprinting, is not.
 
 ## What it leaves to CI
 
-What depends on a changed package is not built or checked, so a stale
-`dist/` in a dependent goes unnoticed; build first (`ws:build:deps`) after a
-change other packages consume. Nor are the packages a change to
+What depends on a changed package is not built or checked beyond its generators,
+so a stale `dist/` in a dependent goes unnoticed; build first (`ws:build:deps`)
+after a change other packages consume. Nor are the packages a change to
 `tools/configs/` configures; the run says which `ws:*` commands to reach for.
 `verify:npm-packages` (pack, install and run the smoke checks) does not run
 either: a change to `verify-npm-packages/smoke/` is regenerated into its

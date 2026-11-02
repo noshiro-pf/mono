@@ -1,4 +1,6 @@
-import { Arr } from 'ts-data-forge';
+import { Arr, isRecord, isString } from 'ts-data-forge';
+import type { StrictPick } from 'ts-type-forge';
+import { entryPointTargets } from '../assert-deps-built.mjs';
 /**
  * Which commands a set of changed paths needs: the pure half of
  * `check-changed`, which `main.mts` feeds with what git and the manifests say.
@@ -119,10 +121,23 @@ export const classifyChanges = ({
     mut_touched.set(pkg.dir, { pkg, code: entry.code || !prose });
   }
 
+  const codeChanged: ReadonlySet<string> = new Set<string>(
+    Array.from(mut_touched.values())
+      .filter(({ code }) => code)
+      .map(({ pkg }) => pkg.name),
+  );
+
   return {
     packages: Array.from(mut_touched.values()).toSorted((a, b) =>
       a.pkg.dir.localeCompare(b.pkg.dir),
     ),
+    dependents: packages
+      .filter((pkg) =>
+        Array.from(pkg.workspaceDependencies).some(
+          (name) => name !== pkg.name && codeChanged.has(name),
+        ),
+      )
+      .toSorted((a, b) => a.dir.localeCompare(b.dir)),
     areas: mut_areas,
     ignored: mut_ignored,
   };
@@ -134,7 +149,9 @@ export const classifyChanges = ({
  * - **Format first**, so that what the generators' own `fix:fmt` would do to
  *   a hand-edited file is not later blamed on the generator.
  * - **Generators next**, one package at a time; `main.mts` fails the run when
- *   one changes the tree, naming the generator and the files.
+ *   one changes the tree, naming the generator and the files. After those of
+ *   the touched packages, those of every member that declares one whose code
+ *   changed, which is built first when they read its `dist/`.
  * - **Then the fixers** (the codemod, then `fix:lint` over what it wrote),
  *   then the checks, and the formatter once more for what the fixers wrote
  *   (`fix:fmt:full` instead when Prettier's own config changed).
@@ -163,14 +180,47 @@ export const buildPlan = ({
   /** The changed files that still exist and are not ignored, for cspell. */
   spellChecked: readonly string[];
 }>): readonly Step[] => {
-  const { packages, areas } = classification;
+  const { packages, dependents, areas } = classification;
 
   const code = packages.filter(({ code: isCode }) => isCode);
+
+  const dependentGenerators = dependents.filter(({ scripts }) =>
+    scripts.has('gen'),
+  );
 
   return [
     formatStep('format the diff (before)', base),
 
     ...packages.flatMap(({ pkg }) => packageStep(pkg, 'generate', 'gen')),
+
+    // A generator can read a package it declares: the docs measure its bundle
+    // and embed its JSDoc, the hooks packages re-export what it exports. Those
+    // that read its build output read it rebuilt, and a dependent the diff
+    // touches runs its generator again for that reason.
+    ...inBuildOrder(
+      code
+        .map(({ pkg }) => pkg)
+        .filter(
+          (pkg) =>
+            pkg.exportsBuild &&
+            dependentGenerators.some(({ workspaceDependencies }) =>
+              workspaceDependencies.has(pkg.name),
+            ),
+        ),
+    ).flatMap((pkg) => packageStep(pkg, 'build', 'build')),
+
+    ...dependentGenerators.map(
+      (pkg) =>
+        ({
+          title: `${pkg.name}: gen (declares ${code
+            .map(({ pkg: { name } }) => name)
+            .filter((name) => pkg.workspaceDependencies.has(name))
+            .join(', ')})`,
+          kind: 'generate',
+          cwd: pkg.dir,
+          args: ['run', 'gen'],
+        }) as const,
+    ),
 
     ...(areas.has('manifest') ? [rootStep('generate', 'gen:deps-graph')] : []),
 
@@ -332,7 +382,61 @@ export type PackageInfo = Readonly<{
   scripts: ReadonlySet<string>;
   /** `"private": true` in its manifest. */
   isPrivate: boolean;
+  /**
+   * The workspace members its manifest names in `dependencies`,
+   * `devDependencies` or `peerDependencies`.
+   */
+  workspaceDependencies: ReadonlySet<string>;
+  /**
+   * The workspace members in `dependencies` and `peerDependencies` alone, the
+   * fields `ws:build` orders its stages by.
+   */
+  buildDependencies: ReadonlySet<string>;
+  /** Whether an import of it resolves to its build output (`dist/`). */
+  exportsBuild: boolean;
 }>;
+
+/**
+ * What {@link PackageInfo} reads from a manifest's dependency fields and entry
+ * points. A range counts when it is `workspace:`, the only way a member names
+ * another.
+ */
+export const readManifestDependencies = (
+  manifest: unknown,
+): StrictPick<
+  PackageInfo,
+  'workspaceDependencies' | 'buildDependencies' | 'exportsBuild'
+> => {
+  const membersIn = (fields: readonly string[]): ReadonlySet<string> =>
+    new Set(
+      isRecord(manifest)
+        ? fields.flatMap((field) => {
+            const ranges = manifest[field];
+
+            return isRecord(ranges)
+              ? Object.entries(ranges)
+                  .filter(
+                    ([, range]) =>
+                      isString(range) && range.startsWith('workspace:'),
+                  )
+                  .map(([name]) => name)
+              : [];
+          })
+        : [],
+    );
+
+  return {
+    workspaceDependencies: membersIn([
+      'dependencies',
+      'devDependencies',
+      'peerDependencies',
+    ]),
+    buildDependencies: membersIn(['dependencies', 'peerDependencies']),
+    exportsBuild: entryPointTargets(manifest).some((target) =>
+      BUILD_OUTPUT.test(target),
+    ),
+  };
+};
 
 /**
  * What a change touches beyond its package. `root` asks for every
@@ -357,11 +461,16 @@ export type Area =
 
 export type Classification = Readonly<{
   packages: readonly Readonly<{ pkg: PackageInfo; code: boolean }>[];
+  /**
+   * The members that declare a package whose code changed, touched by the diff
+   * or not.
+   */
+  dependents: readonly PackageInfo[];
   areas: ReadonlySet<Area>;
   ignored: readonly string[];
 }>;
 
-export type StepKind = 'format' | 'generate' | 'fix' | 'check';
+export type StepKind = 'format' | 'generate' | 'build' | 'fix' | 'check';
 
 export type Step = Readonly<{
   title: string;
@@ -470,6 +579,39 @@ const packageStep = (
       ] as const)
     : ([] as const);
 
+/**
+ * The packages in an order `ws:build` could build them in: each after those of
+ * them it names in `dependencies` or `peerDependencies`, ties in the order
+ * given.
+ */
+const inBuildOrder = (pkgs: readonly PackageInfo[]): readonly PackageInfo[] => {
+  const mut_ordered: PackageInfo[] = [];
+
+  const mut_visited = new Set<string>();
+
+  const visit = (pkg: PackageInfo): void => {
+    if (mut_visited.has(pkg.name)) {
+      return;
+    }
+
+    mut_visited.add(pkg.name);
+
+    for (const dependency of pkgs) {
+      if (pkg.buildDependencies.has(dependency.name)) {
+        visit(dependency);
+      }
+    }
+
+    mut_ordered.push(pkg);
+  };
+
+  for (const pkg of pkgs) {
+    visit(pkg);
+  }
+
+  return mut_ordered;
+};
+
 const assertLiteral = (literal: string, pattern: string): string => {
   if (literal.includes('*') || literal.includes('/')) {
     throw new Error(
@@ -537,3 +679,5 @@ const MANIFEST_FILES: ReadonlySet<string> = new Set<string>([
 ]);
 
 const PATHS_IGNORE = /--paths-ignore '([^']+)'/gu;
+
+const BUILD_OUTPUT = /^(?:\.\/)?dist\//u;
