@@ -362,9 +362,11 @@ const bareValueClause = (
 /**
  * Maximum length of the ` | `-joined listing of union member type names that a
  * message may spell out. Beyond it a listing is more noise than help, so both
- * users of this bound summarize instead: `union` switches from listing every
- * member to reporting the closest one, and the closest-member message stops
- * naming the members that tie with it.
+ * users of this bound summarize instead: `union` reports the closest member, or
+ * the runtime types it accepts when no member is of the value's, rather than
+ * listing every member (within the bound, only a closest member that stands out
+ * replaces the listing), and the closest-member message stops naming the
+ * members that tie with it.
  */
 export const UNION_MEMBER_LISTING_MAX_LENGTH = 60;
 

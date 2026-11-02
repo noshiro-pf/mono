@@ -1,14 +1,18 @@
 import { Result } from 'ts-data-forge';
+import { tuple } from '../array/index.mjs';
+import { enumType } from '../enum/index.mjs';
 import { literal } from '../other-types/index.mjs';
 import { number, string } from '../primitives/index.mjs';
-import { record } from '../record/index.mjs';
+import { optional, record } from '../record/index.mjs';
 import type { UnknownType } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { union } from './union.mjs';
 
 /**
  * When a union's member listing is too long to print, the error reports a
- * single member instead. That member is chosen in two steps:
+ * single member instead; when it is short enough, it does so only if that
+ * member stands out (see `named members` below). That member is chosen in two
+ * steps:
  *
  * 1. keep the members whose runtime type category (taken from their default
  *    value) matches the value's,
@@ -321,6 +325,240 @@ describe('union - closest member selection', () => {
           'Error: the value did not match any of the 2 members of the union; the closest member type is <{ id: number, name: string, email: string, role: string, age: number }>, which failed as follows:',
           'Error at role: expected <string> type but <number> type value `7` was passed.',
           'Error at age: expected <number> type but <string> type value "unknown" was passed.',
+        ],
+      );
+    });
+  });
+
+  describe('named members', () => {
+    // Named members make the listing short enough to print, but a value that
+    // satisfies most of one member is still better explained by that member's
+    // errors than by the list of names; the name then labels the member.
+    const taskDependency = record(
+      {
+        from: record({ kind: literal('task'), id: string() }),
+        type: enumType(['fs', 'ss']),
+        lagMs: number(),
+      },
+      { typeName: 'TaskDependency' },
+    );
+
+    const milestoneDependency = record(
+      {
+        from: record({ kind: literal('milestone'), id: string() }),
+        lagMs: number(),
+      },
+      { typeName: 'MilestoneDependency' },
+    );
+
+    const dependency = union([taskDependency, milestoneDependency]);
+
+    test('a value that stands out as one member reports that member', () => {
+      // taskDependency fails 1 of its 3 checks, scoring -1; milestoneDependency
+      // fails 1 of its 2, scoring 0.
+      assert.deepStrictEqual(
+        validationErrorsToMessages(
+          Result.unwrapErrThrow(
+            dependency.validate({
+              from: { kind: 'task', id: 'a' },
+              type: 'xx',
+              lagMs: 0,
+            }),
+          ),
+        ),
+        [
+          'Error: the value did not match any of the 2 members of the union; the closest member type is <TaskDependency>, which failed as follows:',
+          'Error at type: expected one of { fs, ss } but "xx" was passed.',
+        ],
+      );
+    });
+
+    test('naming the members does not change which member is reported', () => {
+      const value = {
+        from: { kind: 'milestone', id: 'm' },
+        lagMs: '0',
+      } as const;
+
+      const unnamed = union([
+        record({
+          from: record({ kind: literal('task'), id: string() }),
+          type: enumType(['fs', 'ss']),
+          lagMs: number(),
+        }),
+        record({
+          from: record({ kind: literal('milestone'), id: string() }),
+          lagMs: number(),
+        }),
+      ]);
+
+      const withoutHeader = (type: UnknownType): readonly string[] => {
+        const [, ...memberErrors] = validationErrorsToMessages(
+          Result.unwrapErrThrow(type.validate(value)),
+        );
+
+        return memberErrors;
+      };
+
+      assert.deepStrictEqual(withoutHeader(dependency), [
+        'Error at lagMs: expected <number> type but <string> type value "0" was passed.',
+      ]);
+
+      assert.deepStrictEqual(withoutHeader(dependency), withoutHeader(unnamed));
+    });
+
+    test('a value no member stands out for keeps the listing', () => {
+      // Both members fail every check they make: milestoneDependency fails
+      // fewer, but the value satisfies nothing of it either.
+      assert.deepStrictEqual(
+        validationErrorsToMessages(
+          Result.unwrapErrThrow(dependency.validate({})),
+        ),
+        [
+          'Error: expected one of <TaskDependency>, <MilestoneDependency> but <object> type value `{}` was passed.',
+        ],
+      );
+    });
+
+    test('members that tie keep the listing', () => {
+      // Each member fails 1 of its 2 checks, so neither stands out.
+      const point = record({ x: number(), y: number() }, { typeName: 'XY' });
+
+      const column = record({ x: number(), z: number() }, { typeName: 'XZ' });
+
+      assert.deepStrictEqual(
+        validationErrorsToMessages(
+          Result.unwrapErrThrow(union([point, column]).validate({ x: 1 })),
+        ),
+        [
+          'Error: expected one of <XY>, <XZ> but <object> type value `{"x":1}` was passed.',
+        ],
+      );
+    });
+
+    test('a key with several errors beneath it fails once', () => {
+      // `from` reports two errors, but `lagMs` is still accepted.
+      assert.deepStrictEqual(
+        validationErrorsToMessages(
+          Result.unwrapErrThrow(dependency.validate({ from: {}, lagMs: 0 })),
+        ),
+        [
+          'Error: the value did not match any of the 2 members of the union; the closest member type is <MilestoneDependency>, which failed as follows:',
+          'Error at from.kind: missing required key "kind".',
+          'Error at from.id: missing required key "id".',
+        ],
+      );
+    });
+
+    test('an optional key the value leaves out is not a resemblance', () => {
+      // `a` scores best because its absent optional keys pass, but the value
+      // has no key `a` accepts.
+      const a = record(
+        {
+          kind: literal('a'),
+          note: optional(string()),
+          tag: optional(string()),
+        },
+        { typeName: 'A' },
+      );
+
+      const b = record({ kind: literal('b'), v: number() }, { typeName: 'B' });
+
+      assert.deepStrictEqual(
+        validationErrorsToMessages(
+          Result.unwrapErrThrow(union([a, b]).validate({ kind: 'b' })),
+        ),
+        [
+          'Error: expected one of <A>, <B> but <object> type value `{"kind":"b"}` was passed.',
+        ],
+      );
+
+      assert.deepStrictEqual(
+        validationErrorsToMessages(
+          Result.unwrapErrThrow(
+            union([a, b]).validate({ kind: 'b', note: undefined }),
+          ),
+        ),
+        [
+          'Error: expected one of <A>, <B> but <object> type value `{"kind":"b"}` was passed.',
+        ],
+      );
+    });
+
+    test('a nested union keeps the listing under its own name', () => {
+      const outer = union([
+        union([taskDependency, milestoneDependency], {
+          typeName: 'Dependency',
+        }),
+        literal('none'),
+      ]);
+
+      assert.deepStrictEqual(
+        validationErrorsToMessages(
+          Result.unwrapErrThrow(
+            outer.validate({
+              from: { kind: 'task', id: 'a' },
+              type: 'xx',
+              lagMs: 0,
+            }),
+          ),
+        ),
+        [
+          'Error: expected one of <Dependency>, <"none"> but a value of type <object> matching none of them was passed.',
+        ],
+      );
+    });
+
+    test('a tuple stands out by the elements it accepts', () => {
+      const entry = tuple([string(), number()], { typeName: 'Entry' });
+
+      const range = tuple([number(), number()], { typeName: 'Range' });
+
+      assert.deepStrictEqual(
+        validationErrorsToMessages(
+          Result.unwrapErrThrow(union([entry, range]).validate(['a', 'b'])),
+        ),
+        [
+          'Error: the value did not match any of the 2 members of the union; the closest member type is <Entry>, which failed as follows:',
+          'Error at 1: expected <number> type but <string> type value "b" was passed.',
+        ],
+      );
+    });
+
+    test('a nested union of one member keeps the listing', () => {
+      const outer = union([
+        union([taskDependency], { typeName: 'Dependency' }),
+        literal('none'),
+      ]);
+
+      assert.deepStrictEqual(
+        validationErrorsToMessages(
+          Result.unwrapErrThrow(
+            outer.validate({
+              from: { kind: 'task', id: 'a' },
+              type: 'xx',
+              lagMs: 0,
+            }),
+          ),
+        ),
+        [
+          'Error: expected one of <Dependency>, <"none"> but a value of type <object> matching none of them was passed.',
+        ],
+      );
+    });
+
+    test('a tuple of the wrong length checked none of the elements', () => {
+      const triple = tuple([string(), string(), string()], {
+        typeName: 'S3',
+      });
+
+      const pair = tuple([number(), number()], { typeName: 'N2' });
+
+      assert.deepStrictEqual(
+        validationErrorsToMessages(
+          Result.unwrapErrThrow(union([triple, pair]).validate([1, 2, 3, 4])),
+        ),
+        [
+          'Error: expected one of <S3>, <N2> but <array> type value `[1,2,3,4]` was passed.',
         ],
       );
     });

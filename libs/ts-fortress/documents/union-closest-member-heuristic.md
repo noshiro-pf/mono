@@ -10,7 +10,7 @@ When a value matches no member of a union, the obvious message lists every membe
 Error: expected one of <{ kind: "circle", radius: number }>, <{ kind: "square", size: number }>, <{ kind: "rectangle", width: number, height: number }> but <object> type value was passed.
 ```
 
-The reader has to diff the value against three type names to find out that a single field was wrong. In practice a rejected value usually satisfies almost all of one member, so the useful message is that member's own errors. Once the `|`-joined member listing passes `UNION_MEMBER_LISTING_MAX_LENGTH` (60 characters), the union reports one member instead of all of them:
+The reader has to diff the value against three type names to find out that a single field was wrong. In practice a rejected value usually satisfies almost all of one member, so the useful message is that member's own errors. Once the `|`-joined member listing passes `UNION_MEMBER_LISTING_MAX_LENGTH` (60 characters), the union reports one member instead of all of them, and below that length it does so too when that member stands out (see [Short listings](#short-listings)):
 
 ```text
 Error: the value did not match any of the 3 members of the union; the closest member type is <{ kind: "circle", radius: number }>, which failed as follows:
@@ -157,6 +157,23 @@ Error at radius: missing required key "radius".
 ```
 
 `circle` and `square` are equal on both keys, so both are named rather than one being picked silently. If the names the clause adds would themselves pass `UNION_MEMBER_LISTING_MAX_LENGTH`, they are replaced by their count (`3 members are equally close; <…> failed as follows:`) — the same bound that made the union stop listing its members in the first place, applied to the names this clause adds.
+
+### Short listings
+
+A listing short enough to print is usually short because the members carry names, and a name does not tell the reader which of a record's fields was wrong:
+
+```text
+Error: expected one of <TaskDependency>, <MilestoneDependency> but a value of type <object> matching none of them was passed.
+```
+
+So the closest member is looked for whatever the listing's length, and below `UNION_MEMBER_LISTING_MAX_LENGTH` it replaces the listing only when it **stands out**: no other member ties with it, and the value has at least one key the member checks and accepts — present in the value and not `undefined`, with no error beneath it, and no error about the value as a whole (a tuple of the wrong length checks none of its elements). That is stricter than `passed` above, which credits an optional key the value leaves out and counts a key with two errors beneath it as two failures. The name then labels the member whose errors follow:
+
+```text
+Error: the value did not match any of the 2 members of the union; the closest member type is <TaskDependency>, which failed as follows:
+Error at type: expected one of { fs, ss } but "xx" was passed.
+```
+
+Otherwise the listing stays. A union of literals or other primitives always keeps it, since each member makes one check and a value it rejects passes none; so does a value that passes nothing of any member (such as `{}` here), or one that two members explain equally well, where naming one of them would mislead and naming both is what the listing already does. A union with another union directly among its members keeps it too, since the listing names that union as written and the closest member would be one of its members.
 
 ### Why this scoring
 

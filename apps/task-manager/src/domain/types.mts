@@ -160,23 +160,22 @@ export const MilestoneRefCodec = t.record({
   id: MilestoneIdCodec,
 });
 
-/*
- * The two kinds of dependency go unnamed: a union whose members' names are
- * short enough to list reports only that list for a value that matches none,
- * while the structural names that `record` makes up are long enough for it to
- * report how the closest member failed instead.
- */
+export const TaskDependencyCodec = t.record(
+  {
+    from: TaskRefCodec,
+    type: DependencyTypeCodec,
+    lagMs: FiniteNumberCodec,
+  },
+  { typeName: 'TaskDependency' },
+);
 
-export const TaskDependencyCodec = t.record({
-  from: TaskRefCodec,
-  type: DependencyTypeCodec,
-  lagMs: FiniteNumberCodec,
-});
-
-export const MilestoneDependencyCodec = t.record({
-  from: MilestoneRefCodec,
-  lagMs: FiniteNumberCodec,
-});
+export const MilestoneDependencyCodec = t.record(
+  {
+    from: MilestoneRefCodec,
+    lagMs: FiniteNumberCodec,
+  },
+  { typeName: 'MilestoneDependency' },
+);
 
 /** One of the two, told apart by `from.kind`. */
 export const DependencyCodec = t.union([
