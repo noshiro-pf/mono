@@ -5,7 +5,7 @@
 
 アプリが書く遷移先・パスパラメータ・検索パラメータをすべて型で検査し、現在地を synstate の Observable として配るクライアントサイドルーターの実装仕様。v1 の目標は「文字列で書いた URL がどこにも残らない」ことで、TanStack Router と同等以上の型安全性を、コード生成も module augmentation もなしに得る。
 
-- 状態: 仕様 v1 確定（2026-11-02）。未実装。実装は「11. 実装計画」の順に進める。
+- 状態: 仕様 v1 確定（2026-11-02）。実装は「11. 実装計画」の順に進めており、2（ルート定義・codec・`href`・照合）まで入っている。
 - 出典: issue [#1733](https://github.com/noshiro-pf/mono/issues/1733)、途中まで実装した branch [`archive/migrate/synstate--add-synstate-router`](https://github.com/noshiro-pf/mono/tree/archive/migrate/synstate--add-synstate-router)（その `libs/synstate-react-router/design-docs/` の DESIGN.md と api-design-research.md に議論がある）、`apps/tiny-router-observable` とその不具合 [#2912](https://github.com/noshiro-pf/mono/issues/2912)・[#2954](https://github.com/noshiro-pf/mono/issues/2954)・[#2956](https://github.com/noshiro-pf/mono/issues/2956)・[#3033](https://github.com/noshiro-pf/mono/issues/3033)。
 
 ## 1. 目的と範囲
@@ -100,7 +100,7 @@ export const routes = defineRoutes({
 - `params` を持たないノードは、キー名が静的セグメントになる。`segment: 'user-profiles'` で上書きし、`segment: ''` は親と同じパス（ルートなら `/`）。
 - `params` を持つノードは動的セグメント 1 つだけになり、キー名はセグメントにならない（`products.item` は `/products/:productId` で、`/products/item/:productId` ではない）。`params` のキーはちょうど 1 つで、`segment` との併用は型エラーにする（archive では複数キーが定義順に並んだセグメントになり、順序が暗黙だった）。
 - どのノードもそのパスちょうどのページになる。ページを持たない中間ノードは `page: false` と書く。このノードは `RouteMatch` と網羅チェックの対象にならない。
-- 子のキーには予約名（`id`・`pattern`・`href`・`match`・`matchExact`・`params`・`search`・`children`・`segment`・`page`）を使えない。キーと `segment` は `.` と `/` を含めない（`.` はルート id の区切りなので、許すと別のノードが同じ id になる）。どれも型エラーにし、`defineRoutes` も例外を投げる。
+- 子のキーには予約名（`id`・`pattern`・`href`・`match`・`matchExact`・`params`・`search`・`children`・`segment`・`page`）を使えない。キーは空にせず、`.` と `/` を含めない（`.` はルート id の区切りなので、許すと別のノードが同じ id になる）。`segment` は `/` を含めず、`.`・`..` そのものにもしない（URL のパーサーが取り除くため。`sitemap.xml` のように `.` を含むのはよい）。どれも型エラーにし、`defineRoutes` も例外を投げる。
 - 同じパスの階層に動的セグメントが 2 つある、静的セグメント名が重なる、または同じパスのページが 2 つある（`segment: ''` の子と親がどちらもページ）ときは、`defineRoutes` が例外を投げる。「同じ階層」は親子関係ではなくパスで数える。`segment: ''` のノードはパスに現れないので、その子は親の兄弟と同じ階層として検査する。照合の結果が定義順に依存する形を作らせない。`segment: ''` の子を置くなら、親か子のどちらかを `page: false` にする。
 - 照合は深さ優先で、各階層で静的な子を動的な子より先に試し、最初に最後まで一致したものを採る。静的な枝が深い所で失敗したら、同じ階層の動的な子に戻って試す（`users.new` と `users.item.posts` があるとき、`/users/new/posts/` は `userId = 'new'` の `users.item.posts` に一致する）。動的セグメントの decode が失敗したら（`/products/abc` で `param.int`）その枝は一致しない。どの枝も一致しなければ notFound。
 
@@ -132,16 +132,16 @@ type ParamCodec<T> = Readonly<{
 }>;
 ```
 
-| 宣言                                                          | 型                                                                           | decode の規則                                                                                       |
-| :------------------------------------------------------------ | :--------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------- |
-| `param.string`                                                | `string`                                                                     | 空文字は不一致                                                                                      |
-| `param.int`                                                   | `SafeInt`（ts-data-forge）                                                   | 正規形だけ一致（`01`・`1.0`・`+1` は不一致）。URL が 1 つに定まる                                   |
-| `param.literal('live', 'sandbox')`                            | `'live' \| 'sandbox'`                                                        | 列挙外は不一致                                                                                      |
-| `param.refine(codec, guard)`                                  | guard が絞る型（`UserId` など）                                              | guard が偽なら不一致。archive の `branded` と違い、実行時にも検証される                             |
-| `param.custom({ decode, encode })`                            | 任意                                                                         | 上のどれにも当てはまらないとき                                                                      |
-| `search.string()` / `.int()` / `.boolean()` / `.literal(...)` | `T \| undefined`、`{ default }` 付きなら `T`（`.int()` の `T` は `SafeInt`） | 不正な値は「ない」と同じ扱い（default があればそれ）。`search.string()` の `''` は不正ではなく `''` |
-| `search.array(codec)`                                         | `readonly T[]`                                                               | `?tag=a&tag=b` の繰り返しキー。archive のカンマ区切りは値に `,` を含めないのでやめる                |
-| `search.schema(schema)`                                       | Standard Schema の出力型                                                     | Zod・Valibot・ArkType をそのまま渡せる。同期の検証だけを受け付ける（下記）                          |
+| 宣言                                                            | 型                                                                           | decode の規則                                                                                       |
+| :-------------------------------------------------------------- | :--------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------- |
+| `param.string`                                                  | `string`                                                                     | 空文字は不一致                                                                                      |
+| `param.int`                                                     | `SafeInt`（ts-data-forge）                                                   | 正規形だけ一致（`01`・`1.0`・`+1` は不一致）。URL が 1 つに定まる                                   |
+| `param.literal('live', 'sandbox')`                              | `'live' \| 'sandbox'`                                                        | 列挙外は不一致                                                                                      |
+| `param.refine(codec, guard)`                                    | guard が絞る型（`UserId` など）                                              | guard が偽なら不一致。archive の `branded` と違い、実行時にも検証される                             |
+| `param.custom({ decode, encode })`                              | 任意                                                                         | 上のどれにも当てはまらないとき                                                                      |
+| `search.string()` / `.int()` / `.boolean()` / `.literal([...])` | `T \| undefined`、`{ default }` 付きなら `T`（`.int()` の `T` は `SafeInt`） | 不正な値は「ない」と同じ扱い（default があればそれ）。`search.string()` の `''` は不正ではなく `''` |
+| `search.array(codec)`                                           | `readonly T[]`                                                               | `?tag=a&tag=b` の繰り返しキー。archive のカンマ区切りは値に `,` を含めないのでやめる                |
+| `search.schema(schema)`                                         | Standard Schema の出力型                                                     | Zod・Valibot・ArkType をそのまま渡せる。同期の検証だけを受け付ける（下記）                          |
 
 検索パラメータもパスパラメータと同じく refine と独自の検証を持つ。
 

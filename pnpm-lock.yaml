@@ -4626,6 +4626,40 @@ importers:
         specifier: workspace:*
         version: link:../ts-repo-utils
 
+  libs/synstate-router:
+    dependencies:
+      ts-data-forge:
+        specifier: workspace:^
+        version: link:../ts-data-forge
+      ts-type-forge:
+        specifier: workspace:^
+        version: link:../ts-type-forge
+    devDependencies:
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.10
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.10)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
+
   libs/ts-codemod-cli:
     dependencies:
       cmd-ts:
