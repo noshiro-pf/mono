@@ -1,5 +1,5 @@
-import { isError } from '@sindresorhus/is';
 import type { Int, NonEmptyTuple, Uint } from 'ts-type-forge';
+import { isError } from '../../built-in-tag.mjs';
 import { IMap } from '../../collections/index.mjs';
 import { Optional, Result } from '../../functional/index.mjs';
 import { isString, isUndefined } from '../../guard/index.mjs';

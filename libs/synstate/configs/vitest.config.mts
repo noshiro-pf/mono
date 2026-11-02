@@ -37,7 +37,7 @@ export default defineViteConfig({
       // the two copies this file needs exist only in Node.js.
       'test/duplicate-copies.test.mts',
     ],
-    optimizeDepsInclude: ['jotai', 'rxjs', 'ts-data-forge > @sindresorhus/is'],
+    optimizeDepsInclude: ['jotai', 'rxjs'],
     testTimeout: 30_000,
   },
 });

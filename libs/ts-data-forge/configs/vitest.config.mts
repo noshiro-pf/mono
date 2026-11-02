@@ -24,6 +24,6 @@ export default defineViteConfig({
       'src/entry-point.mts',
       'samples/**/*',
     ],
-    optimizeDepsInclude: ['@sindresorhus/is', 'react'],
+    optimizeDepsInclude: ['react'],
   },
 });

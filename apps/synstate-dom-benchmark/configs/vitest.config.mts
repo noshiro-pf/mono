@@ -37,7 +37,6 @@ export default defineConfig({
       'solid-js',
       'solid-js/web',
       'vanjs-core',
-      'synstate-dom > ts-data-forge > @sindresorhus/is',
     ],
   },
   test: {

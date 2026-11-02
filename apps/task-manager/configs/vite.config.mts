@@ -48,7 +48,7 @@ export default {
   // named through the sibling that does.
   optimizeDeps: {
     include: [
-      'ts-data-forge > @sindresorhus/is',
+      'ts-fortress > @sindresorhus/is',
       'elkjs/lib/elk.bundled.js',
       'firebase/app',
       'firebase/auth',

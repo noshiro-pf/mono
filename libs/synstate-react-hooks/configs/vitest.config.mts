@@ -24,7 +24,6 @@ export default defineViteConfig({
       'react',
       'react-dom',
       'react-dom/client',
-      'ts-data-forge > @sindresorhus/is',
     ],
   },
 });

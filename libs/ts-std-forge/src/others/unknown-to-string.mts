@@ -1,4 +1,4 @@
-import { isDate, isError, isMap, isRegExp, isSet } from '@sindresorhus/is';
+import { isDate, isError, isMap, isRegExp, isSet } from '../built-in-tag.mjs';
 
 /**
  * Converts an unknown value to its string representation in a type-safe manner.

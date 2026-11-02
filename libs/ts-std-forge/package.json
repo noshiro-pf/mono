@@ -60,7 +60,7 @@
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:index gen:jsdoc",
     "gen:index": "pnpm run gen:index:src && pnpm run fix:fmt",
-    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude entry-point.mts --preserve 'functional/index.mts' --preserve 'functional/**/index.mts' --preserve 'regex/index.mts' --preserve 'safe-*/index.mts'",
+    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude entry-point.mts --exclude built-in-tag.mts --preserve 'functional/index.mts' --preserve 'functional/**/index.mts' --preserve 'regex/index.mts' --preserve 'safe-*/index.mts'",
     "gen:jsdoc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples-in-jsdoc.mts",
     "test": "pnpm run check:test",
     "watch:test": "pnpm run z:vitest:node watch",
@@ -69,10 +69,10 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "@sindresorhus/is": "^8.1.0",
     "ts-type-forge": "workspace:~"
   },
   "devDependencies": {
+    "@sindresorhus/is": "^8.1.0",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "cspell": "catalog:",
