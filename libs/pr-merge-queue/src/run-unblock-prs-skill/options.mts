@@ -41,7 +41,7 @@ export const parseOptions = (
     );
   }
 
-  const maxBudgetUsd = budget(values['max-budget-usd']);
+  const maxBudgetUsd = parseMaxBudgetUsd(values['max-budget-usd']);
 
   if (Result.isErr(maxBudgetUsd)) {
     return maxBudgetUsd;
@@ -118,11 +118,13 @@ export const HELP = [
 ].join('\n');
 
 /**
- * Required, because the alternative is an amount nobody chose: a round that
- * cannot settle a failure keeps going until something stops it, and this is the
- * only thing that does.
+ * `--max-budget-usd`. Required, because the alternative is an amount nobody
+ * chose: a round that cannot settle a failure keeps going until something stops
+ * it, and this is the only thing that does.
  */
-const budget = (raw: string | undefined): Result<number, string> => {
+export const parseMaxBudgetUsd = (
+  raw: string | undefined,
+): Result<number, string> => {
   if (raw === undefined) {
     return Result.err(
       '--max-budget-usd is required: what one round may spend on the Claude API',

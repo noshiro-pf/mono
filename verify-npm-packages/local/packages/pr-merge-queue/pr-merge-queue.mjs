@@ -30,6 +30,7 @@ for (const command of [
   'pr-report',
   'push-fixed-pr',
   'report-unowned-prs',
+  'run-issue-resolver',
   'run-unblock-prs-skill',
   'start-issue',
   'unblock-prs',

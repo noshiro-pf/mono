@@ -2,7 +2,7 @@ import dedent from 'dedent';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { runClaude } from './claude.mjs';
+import { checkInit, runClaude, type InitEvent } from './claude.mjs';
 
 /**
  * A stand-in for `claude` on `PATH`: it writes the stream `FAKE_CLAUDE` names,
@@ -57,6 +57,9 @@ const envFor = (dir: string, mode: string): NodeJS.ProcessEnv =>
     FAKE_CLAUDE: mode,
   }) as const;
 
+const checkUnblockPrs = (init: InitEvent): ReturnType<typeof checkInit> =>
+  checkInit(init, 'unblock-prs');
+
 describe(runClaude, () => {
   test('runs a session to its result', async () => {
     await withFakeClaude(async (dir) => {
@@ -64,7 +67,7 @@ describe(runClaude, () => {
         dir,
         ['-p', '/unblock-prs'],
         envFor(dir, 'ok'),
-        'unblock-prs',
+        checkUnblockPrs,
       );
 
       assert.deepStrictEqual(outcome, {
@@ -91,7 +94,7 @@ describe(runClaude, () => {
         dir,
         [],
         envFor(dir, 'subscription'),
-        'unblock-prs',
+        checkUnblockPrs,
       );
 
       assert.deepStrictEqual(outcome, {
@@ -112,7 +115,7 @@ describe(runClaude, () => {
         dir,
         [],
         envFor(dir, 'no-init'),
-        'unblock-prs',
+        checkUnblockPrs,
       );
 
       assert.deepStrictEqual(outcome, {
@@ -130,7 +133,7 @@ describe(runClaude, () => {
         dir,
         [],
         envFor(dir, 'early-exit'),
-        'unblock-prs',
+        checkUnblockPrs,
       );
 
       assert.deepStrictEqual(outcome, {
@@ -148,7 +151,7 @@ describe(runClaude, () => {
         dir,
         [],
         { PATH: path.join(dir, 'nowhere') },
-        'unblock-prs',
+        checkUnblockPrs,
       );
 
       assert.strictEqual(outcome.kind, 'refused');

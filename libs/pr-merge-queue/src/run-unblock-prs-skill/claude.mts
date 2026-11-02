@@ -12,15 +12,26 @@ import {
 } from 'ts-data-forge';
 import { log } from '../lib/index.mjs';
 
-/**
- * The arguments for `claude`. The prompt comes straight after `-p`, because
- * `--allowedTools`, `--disallowedTools` and `--add-dir` each take every word up
- * to the next flag.
- */
+/** The arguments for `claude` on one round of the skill. */
 export const claudeArgs = (round: Round): readonly string[] =>
+  sessionArgs({
+    prompt: `/${round.skill}`,
+    instructions: roundInstructions(round),
+    workDir: round.workDir,
+    maxBudgetUsd: round.maxBudgetUsd,
+    model: round.model,
+    extraTools: [],
+  });
+
+/**
+ * The arguments for `claude` on any unattended session. The prompt comes
+ * straight after `-p`, because `--allowedTools`, `--disallowedTools` and
+ * `--add-dir` each take every word up to the next flag.
+ */
+export const sessionArgs = (session: Session): readonly string[] =>
   [
     '-p',
-    `/${round.skill}`,
+    session.prompt,
     '--output-format',
     'stream-json',
     '--verbose',
@@ -28,22 +39,23 @@ export const claudeArgs = (round: Round): readonly string[] =>
     'dontAsk',
     '--allowedTools',
     ...ALLOWED_TOOLS,
+    ...session.extraTools,
     '--disallowedTools',
     ...DISALLOWED_TOOLS,
     '--add-dir',
-    round.workDir,
+    session.workDir,
     '--max-budget-usd',
-    round.maxBudgetUsd.toString(),
+    session.maxBudgetUsd.toString(),
     // A settings file's `env` can set them too, and this comes after it.
     '--settings',
     JSON.stringify({
       env: Object.fromEntries(OTHER_CREDENTIALS.map((name) => [name, ''])),
     }),
     '--append-system-prompt',
-    roundInstructions(round),
-    ...(round.model === undefined
+    session.instructions,
+    ...(session.model === undefined
       ? ([] as const)
-      : (['--model', round.model] as const)),
+      : (['--model', session.model] as const)),
   ] as const;
 
 /**
@@ -131,18 +143,16 @@ export const parseStreamLine = (line: string): StreamEvent | undefined => {
 
 /**
  * Whether the session may go on: billed to the API key, and running the skill
- * it was asked to. Claude Code reports `ANTHROPIC_API_KEY` whenever that
- * variable is set, even where something that comes before it is what
- * authenticates, so this is the second line: {@link sessionEnv} is the first.
+ * it was asked to. See {@link checkApiKey}.
  */
 export const checkInit = (
   init: InitEvent,
   skill: string,
 ): Result<undefined, string> => {
-  if (init.apiKeySource !== 'ANTHROPIC_API_KEY') {
-    return Result.err(
-      `the Claude Code session authenticated with ${init.apiKeySource ?? 'a credential it did not name'}, not ANTHROPIC_API_KEY; stopped it so that nothing is billed elsewhere`,
-    );
+  const billed = checkApiKey(init);
+
+  if (Result.isErr(billed)) {
+    return billed;
   }
 
   // `includes` would narrow `skill` to `never` where it is false.
@@ -162,6 +172,19 @@ export const checkInit = (
 
   return Result.ok(undefined);
 };
+
+/**
+ * Whether the session is billed to the API key. Claude Code reports
+ * `ANTHROPIC_API_KEY` whenever that variable is set, even where something that
+ * comes before it is what authenticates, so this is the second line:
+ * {@link sessionEnv} is the first.
+ */
+export const checkApiKey = (init: InitEvent): Result<undefined, string> =>
+  init.apiKeySource === 'ANTHROPIC_API_KEY'
+    ? Result.ok(undefined)
+    : Result.err(
+        `the Claude Code session authenticated with ${init.apiKeySource ?? 'a credential it did not name'}, not ANTHROPIC_API_KEY; stopped it so that nothing is billed elsewhere`,
+      );
 
 /**
  * `env` for the session, without {@link OTHER_CREDENTIALS}, and which of them
@@ -185,10 +208,10 @@ export const sessionEnv = (
 
 /**
  * Runs `claude` with `args` in `cwd` and `env`, logging what the model writes,
- * and stopping it as soon as its first event fails {@link checkInit}. One that
- * exits before that event is refused too: it cannot run with these arguments
- * (an older Claude Code, say), and will not next time either. Its stderr is
- * passed through.
+ * and stopping it as soon as its first event fails `check` ({@link checkInit}
+ * for the skill). One that exits before that event is refused too: it cannot run with
+ * these arguments (an older Claude Code, say), and will not next time either.
+ * Its stderr is passed through.
  *
  * A SIGTERM this command receives is passed on, since one sent to this process
  * alone (`kill`, a container's stop) would otherwise leave the session running
@@ -202,7 +225,7 @@ export const runClaude = async (
   cwd: string,
   args: readonly string[],
   env: Readonly<NodeJS.ProcessEnv>,
-  skill: string,
+  check: (init: InitEvent) => Result<undefined, string>,
 ): Promise<ClaudeOutcome> =>
   new Promise((resolve) => {
     const spawned = Result.fromThrowable(() =>
@@ -298,7 +321,7 @@ export const runClaude = async (
 
           mut_sessionId = event.sessionId;
 
-          const checked = checkInit(event, skill);
+          const checked = check(event);
 
           if (Result.isErr(checked)) {
             mut_refused = checked.value;
@@ -353,7 +376,21 @@ export const runClaude = async (
     });
   });
 
-/** What one round is started with. */
+/** What any unattended session is started with. */
+export type Session = Readonly<{
+  /** What `-p` is given. */
+  prompt: string;
+  /** What `--append-system-prompt` is given. */
+  instructions: string;
+  /** Where its worktrees go, removed when it ends. */
+  workDir: string;
+  maxBudgetUsd: number;
+  model: string | undefined;
+  /** Allowed besides {@link ALLOWED_TOOLS}. */
+  extraTools: readonly string[];
+}>;
+
+/** What one round of the skill is started with. */
 export type Round = Readonly<{
   skill: string;
   /** The pull request it is handed, and the only one it may touch. */
@@ -394,7 +431,7 @@ export type ResultEvent = Readonly<{
 export type ClaudeOutcome = RefusedOutcome | RanOutcome;
 
 /**
- * No session ran: `checkInit` stopped it (`init`), or it could not be started
+ * No session ran: the `check` passed to {@link runClaude} stopped it (`init`), or it could not be started
  * or exited before its first event (`start`).
  */
 export type RefusedOutcome = Readonly<{
@@ -431,10 +468,11 @@ const ALLOWED_TOOLS = [
 
 /**
  * The skill's "Never" list, where a rule can say it: `gh` acts as whoever
- * logged it in, and the only push is `push-fixed-pr`'s. These are prefix rules
- * against a slip, not a boundary: `git -C <dir> push` or `curl` with the token
- * passes them. What bounds the session is the token's permissions and the
- * machine it runs on.
+ * logged it in, and the only push is a command's own (`push-fixed-pr`'s, or
+ * `open-pr`'s for `run-issue-resolver`). These are prefix rules against a slip,
+ * not a boundary: `git -C <dir> push` or `curl` with the token passes them.
+ * What bounds the session is the token's permissions and the machine it runs
+ * on.
  */
 const DISALLOWED_TOOLS = [
   'Bash(gh)',

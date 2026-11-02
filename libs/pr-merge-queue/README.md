@@ -25,6 +25,7 @@ when neither is set.
 | `report-unowned-prs`    | files an issue for each queued pull request that everyone is waiting on others for   |
 | `start-issue`           | labels an issue `in-progress` before work starts, refusing one someone is already on |
 | `run-unblock-prs-skill` | runs the `unblock-prs` skill without a person, on the Claude API, when it has work   |
+| `run-issue-resolver`    | starts the open issues nobody has started, one Claude API session each               |
 
 Each one prints its options with `--help`. How the queue reads a pull request
 (the labels, `Merge-After:`, stacks) and what `unblock-prs` does at each step
@@ -232,6 +233,66 @@ The plugin's version is the package's, so the skill matches the commands of
 the same version. When you update the package, update the plugin too:
 `/plugin marketplace update noshiro-pf`, then `/plugin` to see the installed
 version.
+
+## Starting issues on the Claude API
+
+`run-issue-resolver` does what a routine asked to "implement the open issues"
+does, from a terminal and billed to an API key, choosing the issue without the
+model:
+
+```sh
+export ANTHROPIC_API_KEY=…     # a key of its own, in a workspace with a spend limit
+npx run-issue-resolver --max-budget-usd 5 --dry-run --once  # what it would run
+npx run-issue-resolver --max-budget-usd 5                   # until --max-sessions or Ctrl+C
+```
+
+Each round reads how every open issue stands for being started, as
+`pr-report` decides it
+([`docs/issue-start-after.md`](https://github.com/noshiro-pf/mono/blob/main/docs/issue-start-after.md)):
+nothing it waits for is open, it carries neither `in-progress` nor `planned`,
+and no open pull request closes it. Of those it takes the ones the token's
+account wrote (`--author` names others), leaves any labelled `question`,
+`wontfix`, `duplicate`, `invalid` or `pending`, and starts `claude -p` on the
+first, `priority:high` first and the oldest first within a priority: one
+issue per session, the next as soon as one ends, and another look every 30
+minutes (`--interval-min`) once there is none.
+
+The command runs `start-issue` on the issue before the session starts, so
+that the `in-progress` label is its own to take off. The session decides
+first whether the issue can be finished by one pull request without a
+person; if not, it says why in a comment on the issue and ends. Otherwise it
+does the work in a worktree under `~/.local/state/unblock-prs`, follows the
+repository's own instructions to the pull request, and opens it with
+`open-pr`, held by `skip-ci`, ending its description with `Closes #N`:
+queueing it is still the author's. When the session ends with no open pull
+request that closes the issue, the command takes the label off, and does not
+hand the issue to another session until someone changes it; nor one
+`start-issue` refuses. That record is kept across runs, in
+`run-issue-resolver/<owner>/<name>.json` beside the worktrees; removing the
+file hands every issue on once more. A second Ctrl+C stops the command at
+once, as it does the worker, and leaves the label on: `start-issue --release`
+takes it off.
+
+- **It runs only on the API key**, and refuses every other credential as
+  `run-unblock-prs-skill` does (above). It also stops the session at its
+  first event if Claude Code has no `/code-review`. Any session that does not
+  get going — refused, not started, or failed before spending anything —
+  stops the command, since every try labels an issue and takes the label off
+  again.
+- **`--max-budget-usd` is required** and caps each session, which is one
+  issue. **`--max-sessions`** (10 by default) is how many sessions it runs
+  before it exits, since each one may leave a pull request waiting for
+  review.
+- **Nobody is asked anything, and nothing is approved**, as for
+  `run-unblock-prs-skill`, with `Skill` and `Agent` allowed besides, for the
+  review. What the session acts on is the issue's text, which is why only
+  issues its own account wrote are handed to it by default; anyone can
+  comment on one, and the session is told to read other people's words as
+  information only, which is an instruction and not a boundary. The same
+  bounds apply: a token with no more than it needs, a key of its own, and a
+  machine with nothing else worth reaching.
+- Each session's cost and id are logged; `claude --resume <id>` opens it
+  afterwards.
 
 ## As a library
 

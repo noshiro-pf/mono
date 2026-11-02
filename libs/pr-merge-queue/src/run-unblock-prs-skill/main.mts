@@ -13,6 +13,7 @@ import {
   WORKTREE_ROOT,
 } from '../unblock-prs/index.mjs';
 import {
+  checkInit,
   claudeArgs,
   runClaude,
   sessionEnv,
@@ -169,20 +170,7 @@ type RoundError = Readonly<{ fatal: boolean; message: string }>;
  */
 const MAX_SESSIONS_PER_PR = 3;
 
-/**
- * The skill as this repository links it (`.claude/skills/unblock-prs`), or else
- * as the plugin installs it. `checkInit` says which the session has when this
- * guesses wrong.
- */
-const defaultSkill = async (root: string): Promise<string> => {
-  const linked = await Result.fromPromise(
-    fs.access(path.join(root, '.claude/skills/unblock-prs/SKILL.md')),
-  );
-
-  return Result.isOk(linked) ? 'unblock-prs' : 'pr-merge-queue:unblock-prs';
-};
-
-const describeOutcome = (outcome: RanOutcome): string => {
+export const describeOutcome = (outcome: RanOutcome): string => {
   const { result, sessionId, exitCode } = outcome;
 
   const how =
@@ -196,7 +184,7 @@ const describeOutcome = (outcome: RanOutcome): string => {
   ].filter((part) => part !== undefined);
 
   return [
-    `The round ${how}`,
+    `The session ${how}`,
     Arr.isNonEmpty(spent) ? ` (${spent.join(', ')})` : '',
     '.',
     sessionId === undefined
@@ -206,14 +194,14 @@ const describeOutcome = (outcome: RanOutcome): string => {
 };
 
 /** Removes `dir`, or says why it could not: worth a line, not the round. */
-const removeDir = async (dir: string): Promise<void> => {
+export const removeDir = async (dir: string): Promise<void> => {
   await fs.rm(dir, { recursive: true, force: true }).catch((error: unknown) => {
     log(`cannot remove ${dir}: ${unknownToString(error)}`);
   });
 };
 
 /** Drops from `mut_items`, a set or a map, the keys `keep` does not keep. */
-const forgetAllBut = <A,>(
+export const forgetAllBut = <A,>(
   mut_items: Readonly<{
     keys: () => IterableIterator<A>;
     delete: (key: A) => boolean;
@@ -225,6 +213,19 @@ const forgetAllBut = <A,>(
       mut_items.delete(key);
     }
   }
+};
+
+/**
+ * The skill as this repository links it (`.claude/skills/unblock-prs`), or else
+ * as the plugin installs it. `checkInit` says which the session has when this
+ * guesses wrong.
+ */
+const defaultSkill = async (root: string): Promise<string> => {
+  const linked = await Result.fromPromise(
+    fs.access(path.join(root, '.claude/skills/unblock-prs/SKILL.md')),
+  );
+
+  return Result.isOk(linked) ? 'unblock-prs' : 'pr-merge-queue:unblock-prs';
 };
 
 /** One survey, and at most one session. */
@@ -377,7 +378,9 @@ const runRound = async (
 
   // It resolves whatever happens, and nothing from here on throws: what a
   // session that may have spent leaves behind is always settled.
-  const outcome = await runClaude(root, args, env, skill);
+  const outcome = await runClaude(root, args, env, (init) =>
+    checkInit(init, skill),
+  );
 
   // A session that may have spent is not handed the same pull request again,
   // and counts towards MAX_SESSIONS_PER_PR whatever comes of it.
