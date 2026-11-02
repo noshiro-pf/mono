@@ -77,3 +77,32 @@ test('filter 12,2,3', { tag: '@smoke' }, async ({ page }) => {
 
   await expect.soft(row0Cells.nth(7)).toHaveText('0');
 });
+
+test('filter 4,7,10', { tag: '@smoke' }, async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByTestId('filter-input').clear();
+
+  await page.getByTestId('filter-input').fill('4,7,10');
+
+  const row0Cells = page
+    .getByTestId('table-body')
+    .getByRole('row')
+    .nth(0)
+    .getByRole('cell');
+
+  await expect.soft(row0Cells.nth(0)).toHaveText('4');
+
+  await expect.soft(row0Cells.nth(1)).toHaveText('7');
+
+  await expect.soft(row0Cells.nth(2)).toHaveText('10');
+
+  await expect.soft(row0Cells.nth(4)).toHaveText('304');
+
+  await expect.soft(row0Cells.nth(5)).toHaveText('832');
+
+  await expect.soft(row0Cells.nth(6)).toHaveText('160');
+
+  // (832 + 2 * 304) / 160 is exactly 9, where the gain of one more roll is 0.
+  await expect.soft(row0Cells.nth(7)).toHaveText('8');
+});

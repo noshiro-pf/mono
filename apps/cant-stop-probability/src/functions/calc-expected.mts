@@ -16,16 +16,22 @@ import type { Count } from '../types/index.mjs';
  *
  * である必要がある。
  *
- * 条件を満たすNの最大値は
+ * 条件を満たすNの最大値は (P1 + 2 * P2) / P0 より真に小さい最大の整数
  *
- *     N = floor((P1 + 2 * P2) / P0);
+ *     N = ceil((P1 + 2 * P2) / P0) - 1;
  *
- * で求められる。
+ * (P1 + 2 * P2 = 0 または P0 = 0 のときは 0 を返す)
+ *
+ * で求められる（比がちょうど整数のとき、その値では期待値が 0 になるので含めない）。
  */
 export const calcExpected = (count: Count): number => {
   const { noLine, oneLine, twoLine } = count;
 
-  return Num.isPositive(noLine)
-    ? Math.floor(Num.div(oneLine + 2 * twoLine, noLine))
+  const gain = oneLine + 2 * twoLine;
+
+  // On the integer counts, floor((gain - 1) / noLine) is the largest N with
+  // N * noLine < gain, with no rounding of an exact ratio to worry about.
+  return Num.isPositive(noLine) && Num.isPositive(gain)
+    ? Math.floor(Num.div(gain - 1, noLine))
     : 0;
 };
