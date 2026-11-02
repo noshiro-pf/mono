@@ -502,7 +502,7 @@ describe('Arr shape invariants', () => {
   expectType<MaxLengthOf<typeof _d>, MaxLengthOf<typeof bounded>>('=');
 }
 
-/**
+/*
  * The transforms that do **not** resolve under a generic array parameter, and
  * therefore have no property-3 entry above:
  *

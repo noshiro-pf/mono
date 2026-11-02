@@ -233,8 +233,7 @@ namespace UnsafeToChainCommand {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * disallow actions within chains
    */
   export type Options = Readonly<{

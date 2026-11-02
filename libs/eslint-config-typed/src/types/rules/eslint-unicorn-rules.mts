@@ -394,8 +394,7 @@ namespace ConsistentBooleanName {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Rule options.
    */
   export type Options = Readonly<{
@@ -706,8 +705,7 @@ namespace ConsistentConditionalObjectSpread {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * The conditional object spread style to enforce.
    */
   export type Options = 'logical' | 'ternary';
@@ -815,8 +813,7 @@ namespace ConsistentExportDecoratorPosition {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Decorator position relative to the export declaration.
    */
   export type Options = 'above' | 'before' | 'after';
@@ -1010,8 +1007,7 @@ namespace ConsistentJsonFileRead {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Whether to prefer reading JSON files as strings or buffers before passing them to `JSON.parse()`.
    */
   export type Options = 'string' | 'buffer';
@@ -1250,8 +1246,7 @@ namespace EscapeCase {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * The case style for escape sequences.
    */
   export type Options = 'uppercase' | 'lowercase';
@@ -1435,8 +1430,7 @@ namespace ExplicitTimerDelay {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Whether to always require an explicit `delay` argument, or disallow an explicit `0` delay.
    */
   export type Options = 'always' | 'never';
@@ -1585,8 +1579,7 @@ namespace FilenameCase {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * The rule options.
    */
   export type Options = Readonly<
@@ -2071,8 +2064,7 @@ namespace IterationFallbackStyle {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * The preferred style for optional loop sources.
    */
   export type Options = 'guard' | 'fallback';
@@ -3689,8 +3681,7 @@ namespace NoInvalidArgumentCount {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Additional call and constructor patterns to check.
    */
   export type Options = ReadonlyRecord<
@@ -8682,8 +8673,7 @@ namespace PreferShortArrowMethod {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Mode to use when reporting methods.
    */
   export type Options = 'always' | 'consistent-as-needed';
@@ -9345,8 +9335,7 @@ namespace PreferTernary {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Whether to always prefer ternary, or only for single-line expressions.
    */
   export type Options0 = 'always' | 'only-single-line';
@@ -9623,8 +9612,7 @@ namespace RelativeUrlStyle {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Whether to never or always use a leading `./` for relative URLs.
    */
   export type Options = 'never' | 'always';
@@ -9929,8 +9917,7 @@ namespace SingleLineBlockCommentStyle {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * The style for block comments with one line of content.
    */
   export type Options0 = 'multiline' | 'single-line';
@@ -10075,8 +10062,7 @@ namespace SwitchCaseBraces {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Whether to always require braces, avoid them when possible, or require one statement per case.
    */
   export type Options = 'always' | 'avoid' | 'single-statement';

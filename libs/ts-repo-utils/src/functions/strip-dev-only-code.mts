@@ -628,10 +628,6 @@ const isPropertyName = (node: ts.Node): boolean => {
 };
 
 /**
- * Names of every identifier that reads as a reference: everything except
- * import bindings themselves and property names.
- */
-/**
  * The names the output still refers to.
  *
  * A subtree is skipped only when all of it is erased. Skipping one that merely

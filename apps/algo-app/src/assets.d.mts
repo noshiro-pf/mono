@@ -3,4 +3,5 @@
  * which `router.mts` reads, and the side-effect import of `./index.css` in
  * `main.tsx`.
  */
+
 /// <reference types="vite/client" />

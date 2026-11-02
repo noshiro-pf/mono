@@ -84,7 +84,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
         reverseMonthAndYearMenus={reverseMonthAndYearMenus}
         shortcuts={castMutable(shortcuts)}
         showActionsBar={showActionsBar}
-        /**
+        /*
          * FIXME: Blueprintjs v5 から showTimezoneSelect = true としていると
          * 以下のエラーが発生するようになったため一旦非表示にしている。
          *

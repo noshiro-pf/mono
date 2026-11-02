@@ -8973,8 +8973,7 @@ namespace NoRestrictedSyntax {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * @minItems 0
    */
   export type Options = readonly (

@@ -18,7 +18,7 @@ ruleTester.run(
   noUnsafeMutableReadonlyAssignment,
   {
     valid: [
-      /** Call expressions */
+      // Call expressions:
       // zero parameters
       {
         filename: 'file.ts',
@@ -239,7 +239,7 @@ ruleTester.run(
           foo(arr);
         `,
       },
-      /** Assignment expressions */
+      // Assignment expressions:
       // TODO
       // Array safe mutable to readonly assignment with chained array operations.
       {
@@ -298,7 +298,7 @@ ruleTester.run(
           const nextArray: readonly string[] = fooArray.slice();
         `,
       },
-      /** Return statement */
+      // Return statement:
       // mutable -> mutable (function return)
       {
         filename: 'file.ts',

@@ -869,8 +869,7 @@ namespace NoRestrictedMatchers {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Restricted matcher chains mapped to optional custom messages.
    */
   export type Options = ReadonlyRecord<string, string | null>;
@@ -911,8 +910,7 @@ namespace NoRestrictedViMethods {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * Restricted `vi` methods mapped to optional custom messages.
    */
   export type Options = ReadonlyRecord<string, string | null>;
@@ -1620,8 +1618,7 @@ namespace PreferSnapshotHint {
    *   }
    * ]
    * ```
-   */
-  /**
+   *
    * When to require snapshot hints.
    */
   export type Options = 'always' | 'multi';

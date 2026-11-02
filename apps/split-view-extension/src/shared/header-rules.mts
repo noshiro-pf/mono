@@ -146,6 +146,13 @@ export const ensureHeaderRule = async (tabId: number): Promise<boolean> => {
   return installed.some((rule) => rule.id === id);
 };
 
+/**
+ * What the rules currently look like, for the diagnostics panel.
+ *
+ * `getMatchedRules` needs the `declarativeNetRequestFeedback` permission and
+ * answers the only question that matters when a pane will not load: did a rule
+ * act on that request, or not?
+ */
 export const readRuleDiagnostics = async (
   tabId: number | undefined,
   paneUrls: readonly string[] = [],
@@ -252,13 +259,6 @@ const requestHeaderActions = (): readonly Readonly<{
     { header: 'sec-fetch-site', value: 'none' },
   ].map(({ header, value }) => ({ header, operation: 'set', value }) as const);
 
-/**
- * What the rules currently look like, for the diagnostics panel.
- *
- * `getMatchedRules` needs the `declarativeNetRequestFeedback` permission and
- * answers the only question that matters when a pane will not load: did a rule
- * act on that request, or not?
- */
 /**
  * What a URL actually answers with, fetched from the extension page.
  *
