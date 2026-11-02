@@ -14,8 +14,8 @@ import {
   canonicalPathname,
   fragmentId,
   globalBrowser,
+  isAtOrBelow,
   normalizeBasePath,
-  pick,
   prependBasePath,
   routeNodeKey,
   routeTreeKey,
@@ -24,6 +24,7 @@ import {
   valuesEqual,
   type TrailingSlash,
 } from './internal/index.mjs';
+import { matchAt } from './match-at.mjs';
 import type {
   AnyRouteNode,
   AnyRoutes,
@@ -170,6 +171,13 @@ export type Router<R extends AnyRoutes> = Readonly<{
    * function that stops it; after `dispose`, it follows nothing.
    */
   follow: (href$: Observable<Href>, options?: NavigateOptions) => () => void;
+
+  /**
+   * Makes the scroll a navigation scheduled (to the fragment, or to the top),
+   * now. For a binding's `Routes`, which calls it once the new page is in the
+   * document; without one, the router makes it after the next frame.
+   */
+  flushScroll: () => void;
 
   /**
    * Stops listening to `popstate`, stops every `follow`, and drops a scroll not
@@ -417,7 +425,7 @@ export const createRouter = <R extends AnyRoutes>(
 
     const { location: current, match: currentMatch } = getSnapshot();
 
-    const values = valuesAt(node, currentMatch);
+    const values = matchAt(node, currentMatch);
 
     if (Optional.isNone(values)) {
       return false;
@@ -554,7 +562,7 @@ export const createRouter = <R extends AnyRoutes>(
     const cached =
       mut_atCache.get(node.id) ??
       match
-        .pipe(map((m) => valuesAt(node, m)))
+        .pipe(map((m) => matchAt(node, m)))
         .pipe(keepEqualParts<Optional<unknown>>());
 
     mut_atCache.set(node.id, cached);
@@ -615,6 +623,7 @@ export const createRouter = <R extends AnyRoutes>(
     parseHref,
     toUrl,
     follow,
+    flushScroll,
     dispose: () => {
       mut_router.disposed = true;
 
@@ -650,27 +659,6 @@ const snapshotOf = <R extends AnyRoutes>(
     },
     match,
   }) as const;
-
-/** Whether the page `route` is the node `id` or one of its descendants. */
-const isAtOrBelow = (route: string | undefined, id: string): boolean =>
-  route !== undefined && (route === id || route.startsWith(`${id}.`));
-
-/** The node's params and search, when the page is the node or below it. */
-const valuesAt = (
-  node: AnyRouteNode,
-  m: RouteMatch<AnyRoutes>,
-): Optional<unknown> => {
-  if (m.route === undefined || !isAtOrBelow(m.route, node.id)) {
-    return Optional.none;
-  }
-
-  const { paramNames, searchKeys } = node[routeNodeKey];
-
-  return Optional.some({
-    params: pick(m.params, paramNames),
-    search: pick(m.search, searchKeys),
-  });
-};
 
 /**
  * Where a navigation from `before` to `after` scrolls: to the fragment when

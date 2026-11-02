@@ -17,7 +17,10 @@ export type Href = Brand<string, 'synstate-router/Href'>;
 export type ExternalHref = Brand<string, 'synstate-router/ExternalHref'>;
 
 /**
- * Marks a URL as leaving the application.
+ * Marks a URL as leaving the application. It must be absolute, with a scheme
+ * (`https:`, `mailto:`): an `Href` is a path, so `Link` tells the two apart by
+ * that, and a path of another application on this origin is written as a whole
+ * URL. Throws on anything else.
  *
  * @example
  *
@@ -27,6 +30,13 @@ export type ExternalHref = Brand<string, 'synstate-router/ExternalHref'>;
  * assert.strictEqual(docs, 'https://example.com/docs');
  * ```
  */
-export const externalHref = (url: string): ExternalHref =>
+export const externalHref = (url: string): ExternalHref => {
+  if (!URL.canParse(url)) {
+    throw new Error(
+      `synstate-router: externalHref: ${url} is not an absolute URL`,
+    );
+  }
+
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the one place an `ExternalHref` is made
-  url as ExternalHref;
+  return url as ExternalHref;
+};

@@ -36,4 +36,16 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sourcePath: 'src/create-router.mts',
     sampleFiles: ['samples/src/create-router-example.mts'],
   },
+  {
+    sourcePath: 'src/match-at.mts',
+    sampleFiles: ['samples/src/match-at-example.mts'],
+  },
+  {
+    sourcePath: 'src/href-with-search.mts',
+    sampleFiles: ['samples/src/href-with-search-example.mts'],
+  },
+  {
+    sourcePath: 'src/link-click.mts',
+    sampleFiles: ['samples/src/link-click-example.mts'],
+  },
 ] as const;

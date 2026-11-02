@@ -4,6 +4,7 @@ export * from './base-path.mjs';
 export * from './canonical-int.mjs';
 export * from './fragment-id.mjs';
 export * from './global-browser.mjs';
+export * from './is-at-or-below.mjs';
 export * from './is-development.mjs';
 export * from './path-segments.mjs';
 export * from './pick.mjs';

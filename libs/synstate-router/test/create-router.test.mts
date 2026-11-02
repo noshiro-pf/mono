@@ -815,6 +815,22 @@ describe('scrolling', () => {
   });
 });
 
+describe('flushScroll', () => {
+  test('makes the scheduled scroll at once, and the frame makes none', async () => {
+    const { router, browser } = setup();
+
+    router.push(routes.settings.href());
+
+    router.flushScroll();
+
+    assert.deepStrictEqual(browser.scrolls(), ['top']);
+
+    await nextTask();
+
+    assert.deepStrictEqual(browser.scrolls(), ['top']);
+  });
+});
+
 describe('parseHref', () => {
   test('accepts a page of this application, below the base path', () => {
     const { router } = setup('https://example.com/app/', { basePath: '/app/' });
