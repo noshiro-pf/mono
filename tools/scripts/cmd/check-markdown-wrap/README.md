@@ -29,7 +29,7 @@ The change is the working tree, untracked files included, against the commit
 `resolveDiffBase` gives (`tools/scripts/lib/diff-base.mts`): `PROSE_DIFF_BASE`
 in CI, which `style-check.yml` sets to the base of the pull request and fetches,
 and otherwise the merge base of `HEAD` and `origin/main`. The print width is the
-one Prettier resolves for the file, 80 here.
+one the Prettier CLI resolves for the file, `.editorconfig` included, 80 here.
 
 ## What it leaves alone
 
