@@ -19,6 +19,7 @@ import {
   type ChangesetBump,
   type ChangesetFile,
 } from '../lib/changesets.mjs';
+import { RUNTIME_DEPENDENCY_FIELDS } from '../lib/dependency-fields.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { parseReleaseGroups } from './check-linked-releases.mjs';
 
@@ -432,12 +433,6 @@ const CONFIG_FILE = '.changeset/config.json';
 
 /** The directory the strict standard library bundles sit under. */
 const STRICT_LIB_DIR = 'strict-lib';
-
-const RUNTIME_DEPENDENCY_FIELDS = [
-  'dependencies',
-  'optionalDependencies',
-  'peerDependencies',
-] as const;
 
 const findBreaking = (
   name: string,
