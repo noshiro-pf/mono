@@ -128,8 +128,8 @@ CI では行われないので、オーナーが手で行う。
 3. **Firestore の作成**: Firestore を作る。
 
 セキュリティルールは、`firestore.rules` を変えた変更が `main` に入ると
-`deploy-firestore.yml` がデプロイする（`docs/firestore-deploy.md`）。`test:rules` は
-CI では走らないので、マージ前に手元で通しておく。
+`deploy-firestore.yml` がデプロイする（`docs/firestore-deploy.md`）。ルールのテスト
+`check:test:rules` は `code-check.yml` が pull request で走らせる。
 
 ## Run
 
@@ -182,14 +182,13 @@ default inputs held in memory (a reload starts over):
 
 ### Rules tests
 
-`pnpm run test:rules` loads `firestore.rules` into the Firestore emulator and
-runs `test/` against it with `@firebase/rules-unit-testing`: a user reads and
-writes their own plans, in the shape the rules allow, and nothing else; other
-users, signed-out access, tokens from providers other than Google and every
-other path are refused. `emulators:exec` starts and stops the emulator, so stop
-a running `firebase emulators:start` first. It needs Java 21 or later and is
-not a `check:` script, because no CI job sets up Java and the emulator for it
-(`code-check.yml` does so only for event-schedule-app's
-`ws:check:e2e:emulators`). Run it by
-hand before merging a change to `firestore.rules`: `deploy-firestore.yml`
-deploys it as soon as it reaches `main`.
+`pnpm run check:test:rules` loads `firestore.rules` into the Firestore emulator
+and runs `test/` against it with `@firebase/rules-unit-testing`: a user reads
+and writes their own plans, in the shape the rules allow, and nothing else;
+other users, signed-out access, tokens from providers other than Google and
+every other path are refused. `emulators:exec` starts and stops the emulator, so
+stop a running `firebase emulators:start` first. It needs Java 21 or later and,
+like the other tests, the workspace built first (`ws:build`). `code-check.yml`
+runs it in the `ws:check:test:rules` matrix entry, with Java 21 set up, so a
+change to `firestore.rules` that breaks it fails before it reaches `main`, where
+`deploy-firestore.yml` deploys it. `check-changed` does not run it.

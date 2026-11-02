@@ -206,6 +206,8 @@ const checkAll = async (): Promise<void> => {
   //   `code-check.yml` runs `playwright install chromium` before them — and
   //   the last needs Java 21 for the Firebase emulators as well. Run them
   //   directly, or let CI.
+  // - `ws:check:test:rules` needs Java 21 for the Firestore emulator, which
+  //   `code-check.yml` sets up before it. Run it directly, or let CI.
   // - `verify:npm-packages:published` installs the versions pinned in
   //   `verify-npm-packages/published/`, so it says nothing about the working
   //   tree; CI runs it only when those pins change.

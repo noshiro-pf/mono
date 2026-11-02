@@ -220,11 +220,11 @@ DAG（右へ）。自動整列した状態。ノードはドラッグで動か�
 ## 開発
 
 ```sh
-pnpm run dev          # http://localhost:5195/mono/task-manager/
-pnpm run check:test   # 単体テスト
-pnpm run check:e2e    # Playwright（デモモードで動かす）
-pnpm run test:rules   # firestore.rules のテスト（エミュレータを起動して走らせる）
-pnpm run build        # build/ に出力。GitHub Pages へは deploy-pages.yml が載せる
+pnpm run dev              # http://localhost:5195/mono/task-manager/
+pnpm run check:test       # 単体テスト
+pnpm run check:e2e        # Playwright（デモモードで動かす）
+pnpm run check:test:rules # firestore.rules のテスト（エミュレータを起動して走らせる）
+pnpm run build            # build/ に出力。GitHub Pages へは deploy-pages.yml が載せる
 ```
 
 ### エミュレータ
@@ -261,7 +261,7 @@ pnpm exec firebase emulators:start   # Java 21 以上が必要
 
 ### ルールのテスト
 
-`pnpm run test:rules` は `firestore.rules` を Firestore エミュレータに読み込み、
+`pnpm run check:test:rules` は `firestore.rules` を Firestore エミュレータに読み込み、
 `@firebase/rules-unit-testing` で `test/` のテストを走らせる。確かめていること:
 
 - 自分の個人プロジェクト（id が自分の uid）は、文書ができる前から読め、配下の
@@ -276,11 +276,9 @@ pnpm exec firebase emulators:start   # Java 21 以上が必要
 ポートを使うため、`pnpm exec firebase emulators:start` を動かしているときは先に止める。
 ほかのテストと同じく `ws:build` のあとに走らせる。
 
-このスクリプトは `check:*` に入れていない。CI で Java とエミュレータを用意するのは
-`code-check.yml` の event-schedule-app 向け `ws:check:e2e:emulators` だけで、
-このスクリプトを走らせる job は無いため、`check:` にすると CI で走らないチェックになる
-（`check:root:ci-commands` がそれを指摘する）。`firestore.rules` を変えたときは
-手元で走らせてからデプロイする。
+CI では `code-check.yml` の `ws:check:test:rules` が Java 21 を用意して走らせるので、
+`firestore.rules` を壊す変更は `main` に入って `deploy-firestore.yml` にデプロイされる
+前に pull request で落ちる。`check-changed` はこれを走らせない。
 
 ### デモモード
 
@@ -304,8 +302,8 @@ CI では行われないので、オーナーが手で行う。
    ほかのプロバイダを有効にしてもデータには触れない。
 
 セキュリティルールは、`firestore.rules` を変えた変更が `main` に入ると
-`deploy-firestore.yml` がデプロイする（`docs/firestore-deploy.md`）。`test:rules` は
-CI では走らないので、マージ前に手元で通しておく。
+`deploy-firestore.yml` がデプロイする（`docs/firestore-deploy.md`）。ルールのテスト
+`check:test:rules` は `code-check.yml` が pull request で走らせる。
 
 サインインはポップアップで行う。ページ（`noshiro-pf.github.io`）と認証ドメイン
 （`firebaseapp.com`）が別のため、リダイレクト方式は Safari（iOS のすべてのブラウザ）の

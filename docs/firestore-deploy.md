@@ -29,9 +29,10 @@ workflow は対象のアプリと project を `TARGETS` に明示的に書いて
 
 ## ルールを変えるとき
 
-`test:rules`（`life-plan-simulator`・`task-manager`）は Java と Firestore
-エミュレータが要り、CI では走らない。**ルールを変える pull request は、マージ前に
-手元で `pnpm run test:rules` を通す。** マージすればそのままデプロイされる。
+`check:test:rules`（`life-plan-simulator`・`task-manager`）は Java と Firestore
+エミュレータを使うルールのテストで、`code-check.yml` の `ws:check:test:rules` が
+pull request で走らせる。マージすればそのままデプロイされるので、落ちたまま
+マージしない。手元で走らせるときは Java 21 以上が要る。
 
 切り戻しや、手で直したルールの上書きには、Actions の「Deploy Firestore rules」
 から `workflow_dispatch` でアプリを選んで走らせる。そのときのブランチの内容が

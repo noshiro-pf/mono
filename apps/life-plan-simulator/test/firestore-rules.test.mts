@@ -1,7 +1,8 @@
 /**
  * `firestore.rules` against the Firestore emulator. Run by `pnpm run
- * test:rules`, which starts the emulator and sets `FIRESTORE_EMULATOR_HOST`;
- * `check:test` does not read this directory (README.md: ルールのテスト).
+ * check:test:rules`, which starts the emulator and sets
+ * `FIRESTORE_EMULATOR_HOST`; `check:test` does not read this directory
+ * (README.md: ルールのテスト).
  *
  * Each case starts from the same data (`seed`): one plan of Alice's and one of
  * Bob's.
@@ -16,8 +17,8 @@ import { hasKey, isRecord } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 
 const env = await initializeTestEnvironment({
-  // The same id as `--project` in the `test:rules` script. `demo-` makes the
-  // emulator refuse to reach any real project.
+  // The same id as `--project` in the `check:test:rules` script. `demo-` makes
+  // the emulator refuse to reach any real project.
   projectId: 'demo-life-plan-simulator',
   firestore: {
     rules: await fs.readFile(
