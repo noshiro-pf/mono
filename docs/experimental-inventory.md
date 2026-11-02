@@ -1917,6 +1917,9 @@ emulator が戻ったので、`experimental/` に残していた最後の e2e �
 付け、`check:e2e` からは外し、`check:e2e:emulators` が
 `firebase emulators:exec` の中で走らせる。runner に Java が無いので CI には
 入れておらず、`check-ci-commands.mts` の `UNCOVERED_BY_DESIGN` に理由を書いた。
+（後に #3012 で `code-check.yml` の matrix に `ws:check:e2e:emulators` を足し、
+Java 21 を入れて CI でも走らせるようにした。`UNCOVERED_BY_DESIGN` の項はその時に
+消した。）
 
 **この spec は app の不具合を 1 つ見つけた。** 回答ページと回答の取得は
 `throttle(1000)` を通っていて、`throttle` は窓の中に来た要求を遅らせずに

@@ -20,7 +20,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  * Which `dist/` a script needs is the guard's to work out from the dependency
  * graph; what is listed here is only which scripts run it. A new package gets
  * the wiring from copying another's scripts, and this is what notices when it
- * did not.
+ * did not. A root script that starts with the guard but is missing from the
+ * lists fails too: unlisted, it could lose the guard unnoticed.
  */
 export const checkDepsBuiltGuard = async (): Promise<
   Result<number, string>
@@ -41,23 +42,70 @@ export const checkDepsBuiltGuard = async (): Promise<
     ),
   );
 
+  const rootPackageGuard =
+    `node ./${path.relative(projectRootPath, guardPath)}` as const;
+
+  const rootWorkspaceGuard = `${rootPackageGuard} --workspace` as const;
+
+  // A root script that already starts with a form of the guard but is not in
+  // that form's list would lose the guard unnoticed. One sitting in the other
+  // form's list is reported here, with the list it belongs in, and not again as
+  // unguarded below.
+  const unlistedWorkspace = findUnlistedGuardedScripts({
+    scripts: rootScripts,
+    names: rootWorkspaceScripts,
+    guard: rootWorkspaceGuard,
+  });
+
+  const unlistedPackage = findUnlistedGuardedScripts({
+    scripts: rootScripts,
+    names: rootPackageScripts,
+    guard: rootPackageGuard,
+  });
+
+  const unlisted = [
+    ...unlistedWorkspace.map(
+      (name) => `package.json: ${name} -> rootWorkspaceScripts`,
+    ),
+    ...unlistedPackage.map(
+      (name) => `package.json: ${name} -> rootPackageScripts`,
+    ),
+  ] as const;
+
+  const isReportedAsUnlisted = (name: string): boolean =>
+    unlistedWorkspace.includes(name) || unlistedPackage.includes(name);
+
   const offenders = [
     ...findUnguardedScripts({
       scripts: rootScripts,
       names: rootWorkspaceScripts,
-      guard: `node ./${path.relative(projectRootPath, guardPath)} --workspace`,
-    }).map((name) => `package.json: ${name}`),
+      guard: rootWorkspaceGuard,
+    })
+      .filter((name) => !isReportedAsUnlisted(name))
+      .map((name) => `package.json: ${name}`),
     ...findUnguardedScripts({
       scripts: rootScripts,
       names: rootPackageScripts,
-      guard: `node ./${path.relative(projectRootPath, guardPath)}`,
-    }).map((name) => `package.json: ${name}`),
+      guard: rootPackageGuard,
+    })
+      .filter((name) => !isReportedAsUnlisted(name))
+      .map((name) => `package.json: ${name}`),
     ...memberOffenders.flat(),
   ] as const;
 
-  if (Arr.isNonEmpty(offenders)) {
-    return Result.err(
-      [
+  const unlistedMessage = Arr.isNonEmpty(unlisted)
+    ? [
+        `❌ ${unlisted.length} root script(s) start with the build-output guard but are not in the list for that form of it in \`check-deps-built-guard.mts\`:`,
+        '',
+        ...unlisted.map((entry) => `  ${entry}`),
+        '',
+        'Move each into the list named beside it, so that dropping the guard',
+        'from it fails here.',
+      ].join('\n')
+    : undefined;
+
+  const offendersMessage = Arr.isNonEmpty(offenders)
+    ? [
         `❌ ${offenders.length} script(s) do not start with the build-output guard:`,
         '',
         ...offenders.map((offender) => `  ${offender}`),
@@ -65,11 +113,14 @@ export const checkDepsBuiltGuard = async (): Promise<
         'Prefix each with `node <path to>/tools/scripts/cmd/assert-deps-built.mts && `',
         '(`--workspace` for a root script that runs across the members), as',
         'its siblings are.',
-      ].join('\n'),
-    );
-  }
+      ].join('\n')
+    : undefined;
 
-  return Result.ok(members.length);
+  const messages = [unlistedMessage, offendersMessage].filter(isString);
+
+  return Arr.isNonEmpty(messages)
+    ? Result.err(messages.join('\n\n'))
+    : Result.ok(members.length);
 };
 
 /**
@@ -87,9 +138,32 @@ export const findUnguardedScripts = ({
 }>): readonly string[] =>
   names.filter(
     (name) =>
-      hasKey(scripts, name) &&
-      !(scripts[name] ?? '').startsWith(`${guard} && `),
+      hasKey(scripts, name) && !startsWithGuard(scripts[name] ?? '', guard),
   );
+
+/**
+ * The names in `scripts` whose script starts with `guard &&` but which `names`
+ * does not list.
+ */
+export const findUnlistedGuardedScripts = ({
+  scripts,
+  names,
+  guard,
+}: Readonly<{
+  scripts: ReadonlyRecord<string, string>;
+  names: readonly string[];
+  guard: string;
+}>): readonly string[] =>
+  Object.entries(scripts)
+    .filter(
+      ([name, script]) =>
+        startsWithGuard(script, guard) && !names.includes(name),
+    )
+    .map(([name]) => name);
+
+/** Whether `script` runs `guard` first, before anything else. */
+const startsWithGuard = (script: string, guard: string): boolean =>
+  script.startsWith(`${guard} && `);
 
 const guardPath = path.resolve(
   projectRootPath,
@@ -128,6 +202,7 @@ const rootWorkspaceScripts = [
   'ws:check:test:cov:shard-2',
   'ws:check:test:cov:shard-3',
   'ws:check:e2e',
+  'ws:check:e2e:emulators',
   'ws:check:dist',
   'ws:doc',
   'ws:gen',

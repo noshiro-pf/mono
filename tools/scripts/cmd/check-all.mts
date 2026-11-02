@@ -201,9 +201,11 @@ const checkAll = async (): Promise<void> => {
 
   // What CI runs and this deliberately does not:
   //
-  // - `ws:check:test:browser` and `ws:check:e2e` need Playwright's browsers,
-  //   which `pnpm install` does not fetch — `code-check.yml` runs
-  //   `playwright install chromium` before them. Run them directly, or let CI.
+  // - `ws:check:test:browser`, `ws:check:e2e` and `ws:check:e2e:emulators`
+  //   need Playwright's browsers, which `pnpm install` does not fetch —
+  //   `code-check.yml` runs `playwright install chromium` before them — and
+  //   the last needs Java 21 for the Firebase emulators as well. Run them
+  //   directly, or let CI.
   // - `verify:npm-packages:published` installs the versions pinned in
   //   `verify-npm-packages/published/`, so it says nothing about the working
   //   tree; CI runs it only when those pins change.

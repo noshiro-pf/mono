@@ -1,7 +1,8 @@
 // Firestore rules of event-schedule-app. Deployed by hand with
-// `pnpm dlx firebase-tools deploy --only firestore:rules` from this directory;
-// nothing in CI reads this file, so a change here is a change to what the
-// next deploy does.
+// `pnpm exec firebase deploy --only firestore:rules` from this directory.
+// CI's `@emulators` e2e test runs against them, but only as an anonymous user
+// creating, answering and editing an event; nothing tests what they deny or
+// what they let a signed-in user do, so check a change here by hand first.
 //
 // Who may do what (the Cloud Functions use the Admin SDK and bypass this):
 //

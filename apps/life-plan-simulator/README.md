@@ -188,6 +188,8 @@ writes their own plans, in the shape the rules allow, and nothing else; other
 users, signed-out access, tokens from providers other than Google and every
 other path are refused. `emulators:exec` starts and stops the emulator, so stop
 a running `firebase emulators:start` first. It needs Java 21 or later and is
-not a `check:` script, because no CI runner has Java and the emulator. Run it by
+not a `check:` script, because no CI job sets up Java and the emulator for it
+(`code-check.yml` does so only for event-schedule-app's
+`ws:check:e2e:emulators`). Run it by
 hand before merging a change to `firestore.rules`: `deploy-firestore.yml`
 deploys it as soon as it reaches `main`.
