@@ -25,6 +25,12 @@
         "types": "./dist/entry-point.d.mts",
         "default": "./dist/entry-point.mjs"
       }
+    },
+    "./array": {
+      "import": {
+        "types": "./dist/array/impl/index.d.mts",
+        "default": "./dist/array/impl/index.mjs"
+      }
     }
   },
   "module": "./dist/entry-point.mjs",
@@ -77,6 +83,7 @@
     "@sindresorhus/is": "^8.1.0",
     "@types/react": "catalog:",
     "@vitest/browser-playwright": "catalog:",
+    "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",

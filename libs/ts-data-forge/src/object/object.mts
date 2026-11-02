@@ -16,7 +16,7 @@ import type {
   TypeEq,
   UnknownRecord,
 } from 'ts-type-forge';
-import { Arr } from '../array/index.mjs';
+import * as Arr from '../array/impl/index.mjs';
 import { Optional } from '../functional/index.mjs';
 import { hasKey, isRecord } from '../guard/index.mjs';
 
