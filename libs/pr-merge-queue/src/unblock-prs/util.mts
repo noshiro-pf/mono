@@ -1,7 +1,7 @@
 /**
  * The small things every other module here needs: the stop signal and what
  * listens to it. Quoting and logging are shared with the other commands, in
- * `tools/scripts/lib/`.
+ * `../lib/` (`src/lib/`).
  */
 
 import { setTimeout as sleep } from 'node:timers/promises';

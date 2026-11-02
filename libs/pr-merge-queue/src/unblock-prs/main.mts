@@ -242,7 +242,7 @@ import { watch } from './watch.mjs';
  *   the ruleset requires.
  * - `github.mts` — everything that reads or writes GitHub or `git`, and
  *   nothing that decides. The API client, the runner and the quoting are
- *   `tools/scripts/lib/`'s.
+ *   `../lib/`'s (`src/lib/`).
  * - `labels.mts`, `skips.mts`, `demotions.mts`, `options.mts`, `types.mts`,
  *   `constants.mts`, `util.mts` — the vocabulary.
  */
