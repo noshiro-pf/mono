@@ -1,4 +1,5 @@
 import type { RouterBrowser } from '../browser.mjs';
+import { isRestoredLoad } from './restored-load.mjs';
 import { withHash } from './with-hash.mjs';
 
 /**
@@ -23,14 +24,27 @@ export const globalBrowser = (): RouterBrowser =>
       globalThis.removeEventListener(type, listener);
     },
     afterRender: (callback) => {
-      requestAnimationFrame(() => {
-        callback();
-      });
+      // A DOM without frames (jsdom) has none to wait for.
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => {
+          callback();
+        });
+      } else {
+        setTimeout(callback, 0);
+      }
     },
     scrollToTop: () => {
       globalThis.scrollTo(0, 0);
     },
     scrollToFragment: (id) => {
-      document.querySelector(`#${CSS.escape(id)}`)?.scrollIntoView();
+      const element = document.querySelector(`#${CSS.escape(id)}`);
+
+      element?.scrollIntoView();
+
+      return element !== null;
     },
+    // The browser's own restore, or the app's when it set
+    // `history.scrollRestoration` to 'manual': either way not the router's.
+    restoresScroll: () =>
+      isRestoredLoad(Reflect.get(globalThis, 'performance')),
   }) as const;

@@ -149,4 +149,32 @@ describe(createMemoryBrowser, () => {
 
     assert.deepStrictEqual(browser.scrolls(), ['#a', 'top']);
   });
+
+  test('has every element and restores no scroll by default', () => {
+    const browser = createMemoryBrowser('https://example.com/');
+
+    assert.isTrue(browser.scrollToFragment('a'));
+
+    assert.isFalse(browser.restoresScroll());
+  });
+
+  test('scrolls only to an element hasElement has, and records only that', () => {
+    const browser = createMemoryBrowser('https://example.com/', {
+      hasElement: (id) => id === 'b',
+    });
+
+    assert.isFalse(browser.scrollToFragment('a'));
+
+    assert.isTrue(browser.scrollToFragment('b'));
+
+    assert.deepStrictEqual(browser.scrolls(), ['#b']);
+  });
+
+  test('reports the restoresScroll it was given', () => {
+    const browser = createMemoryBrowser('https://example.com/', {
+      restoresScroll: true,
+    });
+
+    assert.isTrue(browser.restoresScroll());
+  });
 });
