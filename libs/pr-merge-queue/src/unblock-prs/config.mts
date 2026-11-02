@@ -2,8 +2,9 @@
  * What a repository says about itself in `.github/unblock-prs.json`: the parts
  * of the run that depend on how its CI is laid out.
  *
- * The auto-fix, and the branches the repository generates rather than writes.
- * The labels, `Merge-After:` and the version pull request's branch
+ * The auto-fix, the branches the repository generates rather than writes, and
+ * the heading its descriptions are translated under (`../pr-description/`). The
+ * labels, `Merge-After:` and the version pull request's branch
  * (`changeset-release/<base>`) are conventions the PR Manager page reads too,
  * from repositories it has no configuration for, so they are fixed in
  * `pr-report-core` rather than set per repository. A repository without the
@@ -47,8 +48,10 @@ export const configOf = (
 ): Result<Config, string> => {
   const generatedBranches = file.generatedBranches ?? [];
 
+  const translation = file.translation?.heading;
+
   if (file.autoFix === undefined) {
-    return Result.ok({ autoFix: undefined, generatedBranches });
+    return Result.ok({ autoFix: undefined, generatedBranches, translation });
   }
 
   const { ignore, before, prepare, fixers, after } = file.autoFix;
@@ -90,6 +93,7 @@ export const configOf = (
       after,
     },
     generatedBranches,
+    translation,
   });
 };
 
@@ -174,6 +178,20 @@ export const ConfigFileSchema = t.annotate(
         },
       ),
     ),
+    translation: t.optional(
+      t.annotate(
+        t.strictRecord({
+          heading: t.annotate(t.string(), {
+            description:
+              'The text of the `## ` heading the translation follows the original under, such as `日本語`.',
+          }),
+        }),
+        {
+          description:
+            'Pull request and issue descriptions are written twice: the original, which tools and sessions read, then its translation under one `## <heading>`, its headings one level down, ending at the first `---` rule. Present: `open-pr --body-file` and `pr-description push` / `create` refuse a body whose halves do not mirror each other, and `pr-description read` leaves the translation out. Absent: descriptions are taken as they are.',
+        },
+      ),
+    ),
   }),
   {
     title: 'unblock-prs configuration',
@@ -187,6 +205,8 @@ export type ConfigFile = t.TypeOf<typeof ConfigFileSchema>;
 export type Config = Readonly<{
   autoFix: AutoFixConfig | undefined;
   generatedBranches: readonly GeneratedBranch[];
+  /** The heading descriptions are translated under, when they are. */
+  translation: string | undefined;
 }>;
 
 /** A branch the repository builds rather than writes. */

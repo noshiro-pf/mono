@@ -94,6 +94,29 @@ describe(configOf, () => {
     assert.deepStrictEqual(config.value.generatedBranches, generatedBranches);
   });
 
+  test('reads the heading descriptions are translated under', () => {
+    const config = configOf(
+      {
+        $schema: undefined,
+        autoFix: undefined,
+        translation: { heading: '日本語' },
+      },
+      'x',
+    );
+
+    assert.isTrue(Result.isOk(config));
+
+    assert.strictEqual(config.value.translation, '日本語');
+  });
+
+  test('takes descriptions as they are when the file names no heading', () => {
+    const config = configOf({ $schema: undefined, autoFix: undefined }, 'x');
+
+    assert.isTrue(Result.isOk(config));
+
+    assert.isUndefined(config.value.translation);
+  });
+
   test('leaves the auto-fix off when the file has none', () => {
     const config = configOf({ $schema: undefined, autoFix: undefined }, 'x');
 

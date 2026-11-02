@@ -17,6 +17,7 @@ when neither is set.
 | command                 | what it does                                                                         |
 | :---------------------- | :----------------------------------------------------------------------------------- |
 | `open-pr`               | pushes the current branch and opens its pull request, held by `skip-ci`              |
+| `pr-description`        | reads and writes a description kept in two languages, checking the halves agree      |
 | `unblock-prs`           | lands the `merge-queued` pull requests one at a time, in the order they declare      |
 | `pr-report`             | reports every open pull request: merge order, required checks, how far behind        |
 | `claim-pr`              | claims a pull request `unblock-prs` set aside, so that nothing else touches it       |
@@ -28,8 +29,9 @@ when neither is set.
 Each one prints its options with `--help`. How the queue reads a pull request
 (the labels, `Merge-After:`, stacks) and what `unblock-prs` does at each step
 are in [`src/unblock-prs/README.md`](./src/unblock-prs/README.md);
-`open-pr` and `pr-report` have their own in
-[`src/open-pr/README.md`](./src/open-pr/README.md) and
+`open-pr`, `pr-description` and `pr-report` have their own in
+[`src/open-pr/README.md`](./src/open-pr/README.md),
+[`src/pr-description/README.md`](./src/pr-description/README.md) and
 [`src/pr-report/README.md`](./src/pr-report/README.md).
 
 ## Setting up a repository
@@ -72,6 +74,9 @@ are in [`src/unblock-prs/README.md`](./src/unblock-prs/README.md);
   person. Its schema is
   [`src/unblock-prs/config.schema.json`](./src/unblock-prs/config.schema.json).
   Without it, every failing check is set aside for the skill or a person.
+  Its `translation.heading` has descriptions written in two languages,
+  which `open-pr` and `pr-description` then check
+  ([`src/pr-description/README.md`](./src/pr-description/README.md)).
   This repository's own
   [`.github/unblock-prs.json`](https://github.com/noshiro-pf/mono/blob/main/.github/unblock-prs.json)
   is an example.

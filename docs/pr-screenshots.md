@@ -27,7 +27,8 @@ GitHub の添付ファイルのアップロードはブラウザからしか使�
   `https://raw.githubusercontent.com/noshiro-pf/mono-screenshots/<sha>/<番号>/<ファイル名>`。
   ブランチ名を指すと、後の push で過去の pull request の画像が差し替わる。
 - 番号は pull request を開くまで決まらない。`open-pr` の後に push し、
-  description を GitHub API で更新する。amend で見た目が変わったら撮り直して
+  description を `pr-description` の `pull` と `push` で更新する（表は英語側に
+  置き、日本語側はそれを参照する）。amend で見た目が変わったら撮り直して
   同じディレクトリに push し、下の表を出し直して差し替える。
 
 description には、画像そのものを before / after の表にして載せ、開かなくても
