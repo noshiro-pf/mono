@@ -1,5 +1,10 @@
 import { Arr, Result } from 'ts-data-forge';
-import { checkIssueInit, issueArgs, issueInstructions } from './session.mjs';
+import {
+  checkIssueInit,
+  issueArgs,
+  issueInstructions,
+  issueWorktree,
+} from './session.mjs';
 
 const round = {
   number: 2701,
@@ -68,12 +73,29 @@ describe(issueInstructions, () => {
     assert.include(text, '/tmp/run-issue-resolver-x');
   });
 
+  test('works in the worktree the command made for it', () => {
+    const text = issueInstructions(round);
+
+    assert.include(text, '`/tmp/run-issue-resolver-x/repo`');
+
+    assert.include(text, 'git switch -c');
+  });
+
   test('keeps queueing the author’s', () => {
     const text = issueInstructions(round);
 
     assert.include(text, 'never add `merge-queued`');
 
     assert.include(text, 'Leave `skip-ci` on');
+  });
+});
+
+describe(issueWorktree, () => {
+  test('is a directory of its own inside the session’s', () => {
+    assert.strictEqual(
+      issueWorktree('/tmp/run-issue-resolver-x'),
+      '/tmp/run-issue-resolver-x/repo',
+    );
   });
 });
 

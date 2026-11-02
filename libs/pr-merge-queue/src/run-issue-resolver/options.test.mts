@@ -1,7 +1,9 @@
 import { Result } from 'ts-data-forge';
 import {
+  DEFAULT_CONCURRENCY,
   DEFAULT_INTERVAL_MIN,
   DEFAULT_MAX_SESSIONS,
+  MAX_CONCURRENCY,
   parseOptions,
 } from './options.mjs';
 
@@ -15,6 +17,7 @@ describe(parseOptions, () => {
         intervalMin: DEFAULT_INTERVAL_MIN,
         maxBudgetUsd: 5,
         maxSessions: DEFAULT_MAX_SESSIONS,
+        concurrency: DEFAULT_CONCURRENCY,
         model: undefined,
         authors: [],
       },
@@ -32,6 +35,8 @@ describe(parseOptions, () => {
       '2.5',
       '--max-sessions',
       '3',
+      '--concurrency',
+      '2',
       '--model',
       'sonnet',
       '--author',
@@ -48,6 +53,7 @@ describe(parseOptions, () => {
       intervalMin: 15,
       maxBudgetUsd: 2.5,
       maxSessions: 3,
+      concurrency: 2,
       model: 'sonnet',
       authors: ['alice', 'bob'],
     });
@@ -72,6 +78,32 @@ describe(parseOptions, () => {
     assert.isTrue(Result.isErr(options));
 
     assert.include(Result.unwrapErrOr(options, ''), '--max-sessions');
+  });
+
+  test('refuses a concurrency that is not a positive whole number', () => {
+    const options = parseOptions([
+      '--max-budget-usd',
+      '5',
+      '--concurrency',
+      '0',
+    ]);
+
+    assert.isTrue(Result.isErr(options));
+
+    assert.include(Result.unwrapErrOr(options, ''), '--concurrency');
+  });
+
+  test('refuses more sessions at once than it allows', () => {
+    const options = parseOptions([
+      '--max-budget-usd',
+      '5',
+      '--concurrency',
+      (MAX_CONCURRENCY + 1).toString(),
+    ]);
+
+    assert.isTrue(Result.isErr(options));
+
+    assert.include(Result.unwrapErrOr(options, ''), '--concurrency');
   });
 
   test('refuses an empty author', () => {

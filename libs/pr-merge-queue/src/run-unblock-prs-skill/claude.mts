@@ -211,7 +211,9 @@ export const sessionEnv = (
  * and stopping it as soon as its first event fails `check` ({@link checkInit}
  * for the skill). One that exits before that event is refused too: it cannot run with
  * these arguments (an older Claude Code, say), and will not next time either.
- * Its stderr is passed through.
+ * Its stderr is passed through. Given `say`, every line it would log and every
+ * line of that stderr goes there instead, so that a command running several at
+ * once can tell them apart.
  *
  * A SIGTERM this command receives is passed on, since one sent to this process
  * alone (`kill`, a container's stop) would otherwise leave the session running
@@ -226,10 +228,13 @@ export const runClaude = async (
   args: readonly string[],
   env: Readonly<NodeJS.ProcessEnv>,
   check: (init: InitEvent) => Result<undefined, string>,
+  say?: (line: string) => void,
 ): Promise<ClaudeOutcome> =>
   new Promise((resolve) => {
+    const report = say ?? log;
+
     const spawned = Result.fromThrowable(() =>
-      spawn('claude', args, { cwd, env, stdio: ['ignore', 'pipe', 'inherit'] }),
+      spawn('claude', args, { cwd, env, stdio: ['ignore', 'pipe', 'pipe'] }),
     );
 
     if (Result.isErr(spawned)) {
@@ -243,6 +248,12 @@ export const runClaude = async (
     }
 
     const child = spawned.value;
+
+    if (say === undefined) {
+      child.stderr.pipe(process.stderr, { end: false });
+    } else {
+      readline.createInterface({ input: child.stderr }).on('line', say);
+    }
 
     let mut_refused: string | undefined = undefined;
 
@@ -285,7 +296,7 @@ export const runClaude = async (
     // could not be sent, and `close` still comes.
     child.on('error', (error) => {
       if (child.pid !== undefined) {
-        log(`claude: ${unknownToString(error)}`);
+        report(`claude: ${unknownToString(error)}`);
 
         return;
       }
@@ -331,13 +342,15 @@ export const runClaude = async (
             return;
           }
 
-          log(`Claude Code session ${event.sessionId ?? '(no id)'} started.`);
+          report(
+            `Claude Code session ${event.sessionId ?? '(no id)'} started.`,
+          );
 
           return;
         }
 
         case 'text':
-          log(event.text);
+          report(event.text);
 
           return;
 
@@ -370,6 +383,8 @@ export const runClaude = async (
     child.once('exit', (exitCode) => {
       setTimeout(() => {
         child.stdout.destroy();
+
+        child.stderr.destroy();
 
         closed(exitCode);
       }, CLOSE_GRACE_MS).unref();

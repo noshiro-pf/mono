@@ -16,6 +16,7 @@ export const parseOptions = (
     'interval-min': { type: 'string' },
     'max-budget-usd': { type: 'string' },
     'max-sessions': { type: 'string' },
+    concurrency: { type: 'string' },
     model: { type: 'string' },
     author: { type: 'string', multiple: true },
   });
@@ -56,6 +57,22 @@ export const parseOptions = (
     return maxSessions;
   }
 
+  const concurrency = positiveInteger(
+    'concurrency',
+    values.concurrency,
+    DEFAULT_CONCURRENCY,
+  );
+
+  if (Result.isErr(concurrency)) {
+    return concurrency;
+  }
+
+  if (concurrency.value > MAX_CONCURRENCY) {
+    return Result.err(
+      `--concurrency must be at most ${MAX_CONCURRENCY}, got ${concurrency.value}`,
+    );
+  }
+
   const maxBudgetUsd = parseMaxBudgetUsd(values['max-budget-usd']);
 
   if (Result.isErr(maxBudgetUsd)) {
@@ -76,6 +93,7 @@ export const parseOptions = (
     intervalMin: intervalMin.value,
     maxBudgetUsd: maxBudgetUsd.value,
     maxSessions: maxSessions.value,
+    concurrency: concurrency.value,
     model: values.model,
     authors,
   });
@@ -92,6 +110,8 @@ export type Options = Readonly<{
   maxBudgetUsd: number;
   /** How many sessions it runs before it exits. */
   maxSessions: number;
+  /** How many sessions it runs at once, each on an issue of its own. */
+  concurrency: number;
   /** `claude --model`; Claude Code's own default when not given. */
   model: string | undefined;
   /** Whose issues it starts; the token's own account when empty. */
@@ -111,25 +131,44 @@ export const DEFAULT_INTERVAL_MIN = 30;
  */
 export const DEFAULT_MAX_SESSIONS = 10;
 
+/**
+ * Three. Each session builds and checks the repository in worktrees of its own,
+ * so a machine pays for every one at once, and each that opens a pull request
+ * may touch what another does: more at once is a conflict for `auto-rebase`
+ * sooner than it is an issue done sooner.
+ */
+export const DEFAULT_CONCURRENCY = 3;
+
+/**
+ * Eight. A number past it is likelier a slip than a machine that builds the
+ * repository that many times over, and it keeps the signal listeners each
+ * session adds (`runClaude`), with the stop handler's, within Node's ten.
+ */
+export const MAX_CONCURRENCY = 8;
+
 export const HELP = [
   'Usage: run-issue-resolver --max-budget-usd <n> [options]',
   '',
   'Starts the open issues nobody has started, one Claude Code session each,',
   'without a person, on the Claude API: surveys the issues as pr-report',
   'decides how each stands, and starts `claude -p` on one only when it is',
-  'startable, unlabelled and written by one of the authors.',
+  'startable, unlabelled and written by one of the authors, up to',
+  '--concurrency at once, each in a directory of its own.',
   '',
   'Options:',
   '  --max-budget-usd <n>  what one session, on one issue, may spend',
   '                        (required)',
   '  --max-sessions <n>    sessions to run before it exits',
   `                        (default ${DEFAULT_MAX_SESSIONS})`,
+  '  --concurrency <n>     sessions to run at once, an issue each',
+  `                        (default ${DEFAULT_CONCURRENCY}, at most ${MAX_CONCURRENCY})`,
   '  --author <login>      start only issues this account wrote; repeatable',
   '                        (default: the account GH_TOKEN authenticates as)',
   '  --interval-min <n>    minutes between rounds that find nothing',
   `                        (default ${DEFAULT_INTERVAL_MIN}, at most ${MAX_INTERVAL_MIN})`,
   '  --model <model>       the model Claude Code runs (default: its own)',
-  '  --once                one round (one issue at most), then exit',
+  '  --once                one look: start as many issues as --concurrency',
+  '                        allows, wait for them, then exit',
   '  --dry-run             say what it would run; run and label nothing',
   '  -h, --help            show this help',
   '',
