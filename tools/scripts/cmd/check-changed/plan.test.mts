@@ -231,6 +231,7 @@ describe('buildPlan', () => {
     assert.deepStrictEqual(commandsOf(['libs/ts-data-forge/src/array.mts']), [
       'run z:format-diff-from abc123',
       'libs/ts-data-forge: run gen',
+      'run gen:verify-npm-packages',
       'run z:ts-codemod --diff-from abc123',
       'libs/ts-data-forge: run fix:lint',
       'libs/ts-data-forge: run check:types',
@@ -313,6 +314,8 @@ describe('buildPlan', () => {
 
     assert.include(commands, 'run gen:deps-graph');
 
+    assert.include(commands, 'run gen:verify-npm-packages');
+
     assert.include(commands, 'run check:knip');
 
     assert.include(commands, 'run check:published-deps');
@@ -341,7 +344,26 @@ describe('buildPlan', () => {
       plan(['libs/ts-data-forge/package.json'])
         .filter(({ kind }) => kind === 'generate')
         .map(({ title }) => title),
-      ['ts-data-forge: gen', 'gen:deps-graph'],
+      ['ts-data-forge: gen', 'gen:deps-graph', 'gen:verify-npm-packages'],
+    );
+  });
+
+  test.each([
+    'verify-npm-packages/smoke/pr-merge-queue.mjs',
+    'verify-npm-packages/local/packages/synstate/synstate.mjs',
+    'tools/scripts/cmd/verify-npm-packages.mts',
+    'libs/ts-repo-utils/src/functions/workspace-utils/get-workspace-packages.mts',
+  ] as const)(
+    '%s regenerates the copies verify-npm-packages installs',
+    (file) => {
+      assert.include(commandsOf([file]), 'run gen:verify-npm-packages');
+    },
+  );
+
+  test('prose alone does not regenerate them', () => {
+    assert.notInclude(
+      commandsOf(['verify-npm-packages/README.md']),
+      'run gen:verify-npm-packages',
     );
   });
 });

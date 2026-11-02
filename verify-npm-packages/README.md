@@ -57,7 +57,7 @@ import することになり、`SyntaxError: does not provide an export named ..
 で、それが 2 つの空間の違いそのもの。手順は次のとおり。
 
 1. `smoke/<pkg>.mjs` にアサーションを足す
-2. `pnpm run verify:npm-packages` で `local/` だけを再生成してコミットする
+2. `pnpm run gen:verify-npm-packages`（`check-changed` も実行する）で `local/` だけを再生成してコミットし、`pnpm run verify:npm-packages` で実際にインストールして動かす
 3. `published/<pkg>` は**触らない**
 
 `published/` の生成物が古いままでも「作業ツリーが汚れていないか」は落ちない。

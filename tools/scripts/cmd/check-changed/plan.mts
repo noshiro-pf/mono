@@ -174,6 +174,15 @@ export const buildPlan = ({
 
     ...(areas.has('manifest') ? [rootStep('generate', 'gen:deps-graph')] : []),
 
+    // Its committed `local/` copies are written from `smoke/`, the manifests,
+    // the generator and the libraries it calls, which no list here would keep
+    // up with; it only writes files, so it runs for any change that is not
+    // prose alone. CI's dirty-tree check finds them stale otherwise, naming no
+    // generator.
+    ...(areas.has('root-guards')
+      ? [rootStep('generate', 'gen:verify-npm-packages')]
+      : []),
+
     // The codemod before the lint, so that what it rewrites is linted too.
     ...(areas.has('codemod')
       ? Arr.toUnshifted({
@@ -329,6 +338,9 @@ export type PackageInfo = Readonly<{
  * What a change touches beyond its package. `root` asks for every
  * `check:root:*` (tools/ and the root configuration); `root-guards` for the
  * guards alone, without the root program's own type check, lint and tests.
+ * `root-guards` is any change that is not prose alone, and
+ * `gen:verify-npm-packages` runs on it for that reason: narrowing it to what
+ * the guards read would leave that generator's copies stale.
  */
 export type Area =
   | 'root'

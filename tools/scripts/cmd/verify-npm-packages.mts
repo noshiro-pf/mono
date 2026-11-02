@@ -806,6 +806,11 @@ const generateSpace = async (
 
   const mut_skipped: string[] = [];
 
+  // A package with no check is reported once what was written is formatted:
+  // `check-changed` runs this on every change, and would otherwise list each
+  // manifest written before it, unformatted, as output to commit.
+  let mut_missingCheck: string | undefined = undefined;
+
   for (const pkg of packages) {
     const dir = path.resolve(spaceDir, 'packages', pkg.name);
 
@@ -865,7 +870,9 @@ const generateSpace = async (
     const content = await fs.readFile(source, 'utf8').catch(() => undefined);
 
     if (content === undefined) {
-      return Result.err(`No check for ${pkg.name}: expected ${source}`);
+      mut_missingCheck = `No check for ${pkg.name}: expected ${source}`;
+
+      break;
     }
 
     await writeFile(path.resolve(dir, smokeFileName(pkg.name)), content);
@@ -903,6 +910,10 @@ const generateSpace = async (
 
   if (Result.isErr(formatted)) {
     return Result.err(`Failed to format the generated files in ${spaceDir}.`);
+  }
+
+  if (mut_missingCheck !== undefined) {
+    return Result.err(mut_missingCheck);
   }
 
   if (Arr.isNonEmpty(mut_skipped)) {
