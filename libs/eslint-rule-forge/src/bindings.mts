@@ -1,7 +1,7 @@
 import {
   AST_NODE_TYPES,
   ASTUtils,
-  type TSESLint,
+  TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
 
@@ -33,7 +33,13 @@ export const isLocallyBound = (
  * has to give up then, because the name would refer to that binding instead.
  *
  * The innermost binding decides: an import from `moduleName` at the top of the
- * file does not help a name a function shadows around `node`.
+ * file does not help a name a function shadows around `node`. A binding with no
+ * value meaning inside the file — a type parameter, a local type alias or
+ * interface — is passed over, since a type does not shadow a value or the head
+ * of a qualified name. At the top of the file it still counts: the import a fix
+ * adds there conflicts with it when the export has a type meaning too. A fix
+ * that writes the name alone in a type position, where such a binding does
+ * capture it, has to check for one itself.
  */
 export const hasForeignBinding = (
   sourceCode: TSESLint.SourceCode,
@@ -41,9 +47,43 @@ export const hasForeignBinding = (
   name: string,
   moduleName: string,
 ): boolean => {
-  const variable = ASTUtils.findVariable(sourceCode.getScope(node), name);
+  const variable = findShadowingVariable(sourceCode.getScope(node), name);
 
   return variable?.defs.some((def) => !isImportFrom(def, moduleName)) ?? false;
+};
+
+/**
+ * Whether every definition of `variable` is a type parameter, type alias or
+ * interface. Read from `def.type` rather than `isValueVariable`, which ESLint's
+ * own scope manager, used with its default parser, does not have.
+ */
+const isTypeOnly = (variable: TSESLint.Scope.Variable): boolean =>
+  variable.defs.length > 0 &&
+  variable.defs.every((def) => def.type === TSESLint.Scope.DefinitionType.Type);
+
+/**
+ * Whether `scope` is the file's own, where an added import lands: the module or
+ * global scope, or the function scope a CommonJS file wraps around them.
+ */
+const isTopLevel = (scope: TSESLint.Scope.Scope): boolean =>
+  scope.block.type === AST_NODE_TYPES.Program;
+
+/**
+ * The innermost variable named `name` from `scope` outwards that a value of
+ * that name written in `scope` would meet: one with a value meaning, or any at
+ * the top of the file.
+ */
+const findShadowingVariable = (
+  scope: TSESLint.Scope.Scope,
+  name: string,
+): TSESLint.Scope.Variable | undefined => {
+  const variable = scope.set.get(name);
+
+  return variable !== undefined && (!isTypeOnly(variable) || isTopLevel(scope))
+    ? variable
+    : scope.upper === null
+      ? undefined
+      : findShadowingVariable(scope.upper, name);
 };
 
 /**

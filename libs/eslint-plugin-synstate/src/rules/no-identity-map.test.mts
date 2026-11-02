@@ -94,6 +94,22 @@ ruleTester.run('no-identity-map', noIdentityMap, {
 
   invalid: [
     {
+      name: 'a type parameter named like the export does not take the value',
+      code: dedent`
+        import { map } from 'synstate';
+        function f<skipIfNoChange>() {
+          return x$.pipe(map((x) => x));
+        }
+      `,
+      errors: [{ messageId: 'identityMap' }],
+      output: dedent`
+        import { map, skipIfNoChange } from 'synstate';
+        function f<skipIfNoChange>() {
+          return x$.pipe(skipIfNoChange());
+        }
+      `,
+    },
+    {
       name: 'an arrow returning its parameter',
       code: dedent`
         import { map } from 'synstate';

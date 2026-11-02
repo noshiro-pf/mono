@@ -100,6 +100,76 @@ ruleTester.run(
         `,
         errors: [{ messageId: 'result', data: { result: 'true' } }],
       },
+      {
+        name: 'a type parameter around the node',
+        code: 'function g<f>() { probe(0); }',
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+      {
+        name: 'a local type alias around the node',
+        code: 'function g() { type f = number; probe(0); }',
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+      {
+        name: 'a local interface around the node',
+        code: 'function g() { interface f {} probe(0); }',
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+      {
+        name: 'a local class, which binds a value',
+        code: 'function g() { class f {} probe(0); }',
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a local enum, which binds a value',
+        code: 'function g() { enum f { A } probe(0); }',
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a local type alias in front of a parameter outside',
+        code: 'function g(f: number) { { type f = number; probe(0); } }',
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a type parameter in front of a foreign binding outside',
+        code: dedent`
+          import { f } from 'other';
+          function g<f>() { probe(0); }
+        `,
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a type parameter in front of a value binding outside',
+        code: dedent`
+          const f = 1;
+          function g<f>() { probe(0); }
+        `,
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a type parameter in front of the module’s import',
+        code: dedent`
+          import { f } from 'm';
+          function g<f>() { probe(0); }
+        `,
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+      {
+        name: 'a top-level type alias, which an added import would conflict with',
+        code: 'type f = number; probe(0);',
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a top-level type alias in a file with a global return',
+        code: 'type f = number; probe(0);',
+        languageOptions: {
+          parserOptions: {
+            sourceType: 'script',
+            ecmaFeatures: { globalReturn: true },
+          },
+        },
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
     ],
   },
 );

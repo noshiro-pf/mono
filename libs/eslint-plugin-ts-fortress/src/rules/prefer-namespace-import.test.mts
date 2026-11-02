@@ -285,6 +285,68 @@ describe('prefer-namespace-import', () => {
         errors: [{ messageId: 'useNamespaceImport' }],
       },
       {
+        name: 'a type parameter of the namespace name does not take a value',
+        code: dedent`
+          import fortress, { string } from 'ts-fortress';
+
+          function build<t>() {
+            return [string(), fortress];
+          }
+        `,
+        output: dedent`
+          import * as t from 'ts-fortress';
+
+          function build<t>() {
+            return [t.string(), t];
+          }
+        `,
+        errors: [{ messageId: 'useNamespaceImport' }],
+      },
+      {
+        name: 'a local type alias of the namespace name does not take a value',
+        code: dedent`
+          import { string } from 'ts-fortress';
+
+          const build = () => {
+            type t = number;
+            return string();
+          };
+        `,
+        output: dedent`
+          import * as t from 'ts-fortress';
+
+          const build = () => {
+            type t = number;
+            return t.string();
+          };
+        `,
+        errors: [{ messageId: 'useNamespaceImport' }],
+      },
+      {
+        name: 'reports without a fix when a type parameter takes the name at a type reference',
+        code: dedent`
+          import type { Type } from 'ts-fortress';
+
+          function build<t>(): Type<string> | undefined {
+            return undefined;
+          }
+        `,
+        output: null,
+        errors: [{ messageId: 'useNamespaceImport' }],
+      },
+      {
+        name: 'reports without a fix when a type parameter takes the name a default import becomes',
+        code: dedent`
+          import fortress from 'ts-fortress';
+
+          function build<t>(): fortress {
+            return fortress;
+          }
+        `,
+        output: null,
+        errors: [{ messageId: 'useNamespaceImport' }],
+      },
+      {
         name: 'reports without a fix when a binding is re-exported by name',
         code: dedent`
           import { string } from 'ts-fortress';

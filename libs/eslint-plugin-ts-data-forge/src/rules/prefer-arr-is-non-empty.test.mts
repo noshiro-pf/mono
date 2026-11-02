@@ -249,6 +249,42 @@ describe('prefer-arr-is-non-empty and the import it adds', () => {
         errors: [{ messageId: 'useIsNonEmpty' }],
       },
       {
+        name: 'a type parameter of the name does not take the value',
+        code: dedent`
+          declare const xs: readonly number[];
+          function f<Arr>() {
+            return xs.length > 0;
+          }
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          function f<Arr>() {
+            return Arr.isNonEmpty(xs);
+          }
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'a local type alias of the name does not take the value',
+        code: dedent`
+          declare const xs: readonly number[];
+          function f() {
+            type Arr = number;
+            return xs.length > 0;
+          }
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          function f() {
+            type Arr = number;
+            return Arr.isNonEmpty(xs);
+          }
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
         name: 'each fix adds the import it needs, one per pass',
         code: dedent`
           declare const xs: readonly number[];
