@@ -28,7 +28,12 @@ import {
   listRunningChecks,
   summarizeChecks,
 } from './checks.mjs';
-import { UNKNOWN_STATE_RETRIES, UNKNOWN_STATE_RETRY_MS } from './constants.mjs';
+import {
+  REVIEW_HEAD_RETRIES,
+  REVIEW_HEAD_RETRY_MS,
+  UNKNOWN_STATE_RETRIES,
+  UNKNOWN_STATE_RETRY_MS,
+} from './constants.mjs';
 import { isDemoted } from './demotions.mjs';
 import {
   listPullRequests,
@@ -385,6 +390,91 @@ export const priorityPhrase = (pr: PullRequest, bypass: boolean): string => {
 };
 
 /**
+ * Whether only a ruleset bypass merges the pull request at `head`, which
+ * `advance` has just pushed, read again rather than taken from triage: the
+ * reason when it does, `undefined` when it does not.
+ *
+ * Triage's verdict is about the files of the head it read, and a rebase can
+ * change them. A stacked pull request whose lower layer changed an owned path
+ * carries that layer's commit until it is rebased onto the squash merge, which
+ * drops the path; a rebase can as well bring one in. Right after the push GitHub
+ * may still answer for the old head, so the read is repeated a few times until
+ * it names `head`. When it never does, or the request fails — which a retry
+ * would only repeat, as triage's own read does not — triage's verdict (`before`)
+ * stands, and the retry box on a set-aside comment is the way back.
+ */
+export const readBypassAt = async (
+  api: ApiContext,
+  prNumber: number,
+  head: string,
+  context: ReviewContext,
+  before: string | undefined,
+): Promise<string | undefined> => {
+  let mut_attempt = 0;
+
+  while (!stopRequested()) {
+    const read = await readReviews(api, [prNumber], context);
+
+    if (Result.isErr(read)) {
+      log(
+        `#${prNumber}: cannot read its review at ${head.slice(0, 10)}; keeping what triage read. (${lastLines(read.value, 2)})`,
+      );
+
+      return before;
+    }
+
+    const verdict = bypassOfRead(read.value.get(prNumber), head);
+
+    if (verdict !== undefined) {
+      if (verdict.reason !== before) {
+        log(
+          verdict.reason === undefined
+            ? `#${prNumber}: at ${head.slice(0, 10)} it no longer needs a bypass merge.`
+            : `#${prNumber}: at ${head.slice(0, 10)} only a ruleset bypass merges it — ${verdict.reason}.`,
+        );
+      }
+
+      return verdict.reason;
+    }
+
+    if (mut_attempt >= REVIEW_HEAD_RETRIES) {
+      break;
+    }
+
+    mut_attempt += 1;
+
+    await pause(REVIEW_HEAD_RETRY_MS);
+  }
+
+  if (!stopRequested()) {
+    log(
+      `#${prNumber}: GitHub has not read its review at ${head.slice(0, 10)}; keeping what triage read.`,
+    );
+  }
+
+  return before;
+};
+
+/**
+ * What one read of a pull request's review says about `head`: whether only a
+ * bypass merges it, or `undefined` when GitHub answered for another head, whose
+ * files are not this one's. No read at all is a ruleset that asks no review,
+ * which holds nothing at any head; a review that holds for an approval is not a
+ * bypass, and is what the watch's green-but-not-merging budget is for.
+ */
+export const bypassOfRead = (
+  read: ReviewRead | undefined,
+  head: string,
+): Readonly<{ reason: string | undefined }> | undefined =>
+  read === undefined
+    ? ({ reason: undefined } as const)
+    : read.head !== head
+      ? undefined
+      : ({
+          reason: read.hold?.kind === 'bypass' ? read.hold.reason : undefined,
+        } as const);
+
+/**
  * What the rules on the default branch require, as GitHub applies them.
  *
  * The required contexts are what let "green" mean the whole list rather than
@@ -622,38 +712,28 @@ const classification = (
 };
 
 /**
- * What each pull request's review does to it, by number, for those it does
- * anything to — `review-hold.mts` in `pr-report-core` says what is asked and
- * why. One request covers all of them. A request that fails holds nothing,
- * which is how this script behaved before it asked.
+ * Each pull request's {@link ReviewRead}, by number, in one request; empty, and
+ * nothing asked, when the ruleset asks no review.
  */
-const readReviewHolds = async (
+const readReviews = async (
   api: ApiContext,
-  entries: readonly Readonly<{ pr: PullRequest }>[],
-  context: TriageContext,
-): Promise<ReadonlyMap<number, ReviewHold>> => {
+  numbers: readonly number[],
+  context: ReviewContext,
+): Promise<Result<ReadonlyMap<number, ReviewRead>, string>> => {
   const { requireCodeOwnerReview, requireConversationResolution } =
     context.reviewRequirements;
 
   if (
-    !Arr.isNonEmpty(entries) ||
+    !Arr.isNonEmpty(numbers) ||
     (!requireCodeOwnerReview && !requireConversationResolution)
   ) {
-    return new Map<number, ReviewHold>();
+    return Result.ok(new Map<number, ReviewRead>());
   }
 
-  const read = await readReviewStates(
-    api,
-    entries.map(({ pr }) => pr.number),
-    context.defaultBranch,
-  );
+  const read = await readReviewStates(api, numbers, context.defaultBranch);
 
   if (Result.isErr(read)) {
-    log(
-      `Cannot read the reviews; holding nothing for them. (${lastLines(read.value, 2)})`,
-    );
-
-    return new Map<number, ReviewHold>();
+    return read;
   }
 
   const rules = {
@@ -665,11 +745,48 @@ const readReviewHolds = async (
         : parseCodeOwners(read.value.codeOwners),
   } as const;
 
+  return Result.ok(
+    new Map(
+      Array.from(
+        read.value.states,
+        ([prNumber, state]) =>
+          [
+            prNumber,
+            { head: state.head, hold: reviewHold(state, rules) },
+          ] as const,
+      ),
+    ),
+  );
+};
+
+/**
+ * What each pull request's review does to it, by number, for those it does
+ * anything to — `review-hold.mts` in `pr-report-core` says what is asked and
+ * why. One request covers all of them. A request that fails holds nothing,
+ * which is how this script behaved before it asked.
+ */
+const readReviewHolds = async (
+  api: ApiContext,
+  entries: readonly Readonly<{ pr: PullRequest }>[],
+  context: ReviewContext,
+): Promise<ReadonlyMap<number, ReviewHold>> => {
+  const read = await readReviews(
+    api,
+    entries.map(({ pr }) => pr.number),
+    context,
+  );
+
+  if (Result.isErr(read)) {
+    log(
+      `Cannot read the reviews; holding nothing for them. (${lastLines(read.value, 2)})`,
+    );
+
+    return new Map<number, ReviewHold>();
+  }
+
   return new Map(
     Arr.generate(function* () {
-      for (const [prNumber, state] of Array.from(read.value.states)) {
-        const hold = reviewHold(state, rules);
-
+      for (const [prNumber, { hold }] of Array.from(read.value)) {
         if (hold !== undefined) {
           yield [prNumber, hold] as const;
         }
@@ -677,6 +794,15 @@ const readReviewHolds = async (
     }),
   );
 };
+
+/** What the ruleset asks of a review, and where `CODEOWNERS` is read from. */
+type ReviewContext = StrictPick<
+  TriageBase,
+  'defaultBranch' | 'reviewRequirements'
+>;
+
+/** One pull request's review hold, and the head GitHub read it at. */
+type ReviewRead = Readonly<{ head: string; hold: ReviewHold | undefined }>;
 
 /**
  * Whether GitHub says merging this pull request into the base conflicts. It is

@@ -16,7 +16,6 @@ import {
   type CheckRunReport,
   type Claim,
   type NativeStackEntry,
-  type ReviewState,
   type RulesetRequirements,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
@@ -43,6 +42,7 @@ import {
   type IssueOrder,
   type OwnSetAsideComment,
   type PullRequest,
+  type ReviewStateAt,
 } from './types.mjs';
 import { headShaFromListing } from './util.mjs';
 
@@ -240,7 +240,8 @@ export const readBranchRules = async (
 
 /**
  * `CODEOWNERS` on the default branch, and what `pr-report-core`'s
- * `review-hold.mts` reads about each of `numbers`, in one GraphQL request.
+ * `review-hold.mts` reads about each of `numbers` with the head it was read at,
+ * in one GraphQL request.
  * `undefined` for a repository without `.github/CODEOWNERS`, the one of the
  * three places GitHub looks that this repository uses.
  *
@@ -255,7 +256,7 @@ export const readReviewStates = async (
   Result<
     Readonly<{
       codeOwners: string | undefined;
-      states: ReadonlyMap<number, ReviewState>;
+      states: ReadonlyMap<number, ReviewStateAt>;
     }>,
     string
   >
@@ -271,6 +272,7 @@ export const readReviewStates = async (
     '}',
     'fragment ReviewState on PullRequest {',
     '  author { login }',
+    '  headRefOid',
     '  latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
     `  files(first: ${PAGE_SIZE}) { pageInfo { hasNextPage } nodes { path } }`,
     // A pull request with more conversations than one page is counted from the
@@ -318,7 +320,7 @@ export const readReviewStates = async (
     return Result.err(invalid.join('\n'));
   }
 
-  const states: ReadonlyMap<number, ReviewState> = new Map(
+  const states: ReadonlyMap<number, ReviewStateAt> = new Map(
     Arr.generate(function* () {
       for (const [n, node] of nodes) {
         if (Result.isOk(node)) {
@@ -911,6 +913,7 @@ const LoginSchema = t.union([t.record({ login: t.string() }), t.nullType]);
 
 const ReviewStateNodeSchema = t.record({
   author: LoginSchema,
+  headRefOid: t.string(),
   latestOpinionatedReviews: t.record({
     nodes: t.array(t.record({ state: t.string(), author: LoginSchema })),
   }),
@@ -925,9 +928,10 @@ const ReviewStateNodeSchema = t.record({
 
 const reviewStateOf = (
   node: t.TypeOf<typeof ReviewStateNodeSchema>,
-): ReviewState =>
+): ReviewStateAt =>
   ({
     author: node.author?.login ?? '',
+    head: node.headRefOid,
     approvers: Arr.generate(function* () {
       for (const { state, author } of node.latestOpinionatedReviews.nodes) {
         if (state === 'APPROVED' && author !== null) {

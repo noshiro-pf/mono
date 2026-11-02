@@ -369,6 +369,14 @@ pick も「3a」の rebase もしません。
     green になったら `awaiting-bypass` で見送り、bypass merge を人に頼む
     comment を書きます。
 
+    triage が読む変更ファイルは rebase 前の head のもので、rebase で変わり得
+    ます。所有者付きのパスを触った下の層の commit を抱えたままの stacked PR
+    は、squash merge の上に rebase するとそのパスが diff から消えますし、逆に
+    rebase で入ってくることもあります。そこで rebase で head が動いた PR は、
+    arm する前に新しい head について bypass でしかマージできないかを読み直し
+    （`readBypassAt`）、その答えで arm と watch を決めます。GitHub が新しい
+    head について答えるまで、または読めなかったときは triage の答えのままです。
+
     チェックでは分からない理由でマージできない PR を解放すると、マトリクスを
     1回丸ごと使い、watch の間キューを止めます。しかも `main` が動くたびに
     `BEHIND` として先頭に戻ってくるので、他の PR がマージされるたびに同じこと
@@ -1185,6 +1193,15 @@ merge-base` says whether the branch was built on the current tip of the
     armed** — auto-merge would wait for the same approval — and once its
     checks are green it is set aside `awaiting-bypass`, with a comment asking
     a person for the bypass merge.
+
+    The changed files triage reads are the head before the rebase, and a
+    rebase can change them: a stacked pull request still carrying the commit
+    of a lower layer that touched an owned path loses that path when it is
+    rebased onto the squash merge, and a rebase can as well bring one in. So
+    for a head the rebase moved, whether only a bypass merges it is read again
+    for the new head before arming (`readBypassAt`), and that answer decides
+    both the arming and the watch. Until GitHub answers for the new head, or
+    when it cannot be read, triage's answer stands.
 
     Releasing a pull request that cannot merge for a reason no check reports
     runs a whole matrix and holds the queue for the length of a watch. And

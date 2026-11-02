@@ -6,6 +6,7 @@ import type {
   Claim,
   QueueContext,
   QueueOwner,
+  ReviewState,
   RulesetRequirements,
   SetAsideComment,
   SetAsideReason,
@@ -110,6 +111,12 @@ export type ReviewRequirements = StrictPick<
   RulesetRequirements,
   'requireCodeOwnerReview' | 'requireConversationResolution'
 >;
+
+/**
+ * A pull request's {@link ReviewState} and the head GitHub read it at, which is
+ * how a read made just after a push tells whether its files are the new head's.
+ */
+export type ReviewStateAt = ReviewState & Readonly<{ head: string }>;
 
 export type Survey = Readonly<{
   pullRequests: readonly PullRequest[];
@@ -321,7 +328,12 @@ export type CycleResult = Readonly<{
  * forward — which is neither progress nor a failure of the pull request.
  */
 export type Advanced = Readonly<
-  | { kind: 'advanced'; head: string }
+  | {
+      kind: 'advanced';
+      head: string;
+      /** {@link AdvancePlan.bypassAt} for `head`, which the watch goes by. */
+      bypassReason: string | undefined;
+    }
   | { kind: 'moved' }
   | { kind: 'stale-merge-state' }
 >;
@@ -354,7 +366,15 @@ export type RebaseFailure = Readonly<{
  * the layers stacked on it along.
  */
 export type AdvancePlan = Readonly<{
+  /** Arm it, unless {@link bypassAt} says the head it reaches needs a bypass. */
   arm: boolean;
+  /**
+   * Whether only a ruleset bypass merges the pull request at a head: the reason
+   * when it does. Read for the head the rebase reached, since the files it
+   * changes, and so the owners it waits for, can differ from the head triage
+   * read.
+   */
+  bypassAt: (head: string) => Promise<string | undefined>;
   /** Every open layer above it, each after the one it is on. */
   descendants: readonly PullRequest[];
 }>;

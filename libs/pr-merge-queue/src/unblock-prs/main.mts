@@ -6,7 +6,7 @@ import {
   stackDescendants,
   type Claim,
 } from 'pr-report-core';
-import { Arr, Result } from 'ts-data-forge';
+import { Arr, isRecord, Result } from 'ts-data-forge';
 import { currentEpochMs, log, type ApiContext } from '../lib/index.mjs';
 import { autoFix } from './auto-fix.mjs';
 import { standingClaims } from './claims.mjs';
@@ -53,6 +53,7 @@ import { stackedOnAfter, stackParentsOf } from './stack.mjs';
 import {
   bypassPhrase,
   describeAction,
+  readBypassAt,
   reportTriage,
   survey,
   triage,
@@ -957,8 +958,22 @@ const runCycle = async (
       `#${target.number} (${target.headRefName}) is next: ${describeAction(target, defaultBranch, triaged)}.`,
     );
 
+    const bypassAtSurvey = triaged.bypass.get(target.number);
+
     const advanced = await advance(api, target, defaultBranch, {
-      arm: triaged.toArm.has(target.number),
+      // Not triage's `toArm`, which leaves out one only a bypass merges: that
+      // is for the head the rebase reaches to say (`bypassAt`).
+      arm: !isRecord(target.autoMergeRequest),
+      bypassAt: async (reached) =>
+        reached === target.headRefOid
+          ? bypassAtSurvey
+          : readBypassAt(
+              api,
+              target.number,
+              reached,
+              { defaultBranch, reviewRequirements },
+              bypassAtSurvey,
+            ),
       descendants: stackDescendants(
         triaged.stackParents,
         target.number,
@@ -1005,10 +1020,20 @@ const runCycle = async (
       return { state: state(mut_skipped), next: 'survey', settled: skipped };
     }
 
-    const advancedHead = advanced.value.head;
+    const { head: advancedHead, bypassReason } = advanced.value;
 
     // The rebase is this run's, not the author's, so a demotion goes with it.
     const demotedNow = followHead(demoted, target.number, advancedHead);
+
+    // What the release order ranks it by is the head it is released at.
+    const bypassNow: ReadonlyMap<number, string> = new Map<number, string>([
+      ...Array.from(triaged.bypass).filter(
+        ([prNumber]) => prNumber !== target.number,
+      ),
+      ...(bypassReason === undefined
+        ? []
+        : [[target.number, bypassReason] as const]),
+    ]);
 
     if (
       (await settleAfterRelease(
@@ -1017,7 +1042,7 @@ const runCycle = async (
         triaged.owners,
         pausedAtSurvey,
         defaultBranch,
-        triaged.bypass,
+        bypassNow,
       )) === 'yielded'
     ) {
       log(
@@ -1042,7 +1067,7 @@ const runCycle = async (
       {
         defaultBranch,
         requiredContexts,
-        bypassReason: triaged.bypass.get(target.number),
+        bypassReason,
         autoFixConfig,
       },
       options,

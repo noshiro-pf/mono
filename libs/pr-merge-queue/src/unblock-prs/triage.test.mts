@@ -1,4 +1,10 @@
-import { describeAction, orderCandidates, priorityPhrase } from './triage.mjs';
+import { parseCodeOwners, reviewHold, type ReviewState } from 'pr-report-core';
+import {
+  bypassOfRead,
+  describeAction,
+  orderCandidates,
+  priorityPhrase,
+} from './triage.mjs';
 import type { PullRequest } from './types.mjs';
 
 describe(orderCandidates, () => {
@@ -140,6 +146,90 @@ describe(describeAction, () => {
     );
   });
 });
+
+describe(bypassOfRead, () => {
+  const rebased = 'b'.repeat(40);
+
+  // A stacked pull request whose lower layer changed a path only its author
+  // owns still carries that layer's commit until it is rebased onto the squash
+  // merge, so triage reads the path among its files.
+  const beforeRebase = state([
+    '.github/workflows/synstate-benchmark.yml',
+    'apps/synstate-docs/src/index.mts',
+  ]);
+
+  const afterRebase = state(['apps/synstate-docs/src/index.mts']);
+
+  test("premise: the lower layer's owned path needs a bypass merge", () => {
+    assert.strictEqual(reviewHold(beforeRebase, rules)?.kind, 'bypass');
+  });
+
+  test('needs no bypass at a rebased head whose own files need nothing', () => {
+    assert.deepStrictEqual(
+      bypassOfRead(
+        { head: rebased, hold: reviewHold(afterRebase, rules) },
+        rebased,
+      ),
+      { reason: undefined },
+    );
+  });
+
+  test('needs a bypass at a rebased head that brought an owned path in', () => {
+    assert.deepStrictEqual(
+      bypassOfRead(
+        { head: rebased, hold: reviewHold(beforeRebase, rules) },
+        rebased,
+      ),
+      {
+        reason:
+          '@noshiro-pf is the only owner of .github/workflows/synstate-benchmark.yml and its author, who may not approve it',
+      },
+    );
+  });
+
+  test('says nothing while GitHub still answers for the head before the push', () => {
+    assert.isUndefined(
+      bypassOfRead(
+        { head: 'a'.repeat(40), hold: reviewHold(afterRebase, rules) },
+        rebased,
+      ),
+    );
+  });
+
+  test('needs no bypass where the ruleset asks no review', () => {
+    assert.deepStrictEqual(bypassOfRead(undefined, rebased), {
+      reason: undefined,
+    });
+  });
+
+  test('a review that holds for an approval is not a bypass', () => {
+    assert.deepStrictEqual(
+      bypassOfRead(
+        {
+          head: rebased,
+          hold: { kind: 'held', reason: '1 unresolved review conversation' },
+        },
+        rebased,
+      ),
+      { reason: undefined },
+    );
+  });
+});
+
+const rules = {
+  requireCodeOwnerReview: true,
+  requireConversationResolution: true,
+  codeOwners: parseCodeOwners('/.github/workflows/ @noshiro-pf\n'),
+} as const;
+
+const state = (files: readonly string[]): ReviewState =>
+  ({
+    author: 'noshiro-pf',
+    approvers: [],
+    files,
+    filesComplete: true,
+    unresolvedConversations: 0,
+  }) as const;
 
 const queued = { name: 'merge-queued' } as const;
 
