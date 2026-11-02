@@ -142,7 +142,7 @@ export const createSearchView = (): SearchView => {
 };
 ```
 
-`switchMap` passes on the inner observable's first value, the loading state, within the update that changed the query, so `view`, below both, runs once with `ab / loading for ab`, and once more with `ab / success for ab` when the answer arrives. (`switchMap` projects the queries written from here on, not the `'a'` that `query` holds when it is created, so nothing is requested for `a`.) There is no order to get wrong: where a node runs is decided by its depth in the graph, not by when it was created.
+`switchMap` passes on the inner observable's first value, the loading state, within the update that changed the query, so `view`, below both, runs once with `ab / loading for ab`, and once more with `ab / success for ab` when the answer arrives. (`switchMap` also projects the `'a'` that `query` holds when it is created, so `a` is requested as the Preact effect requests it.) There is no order to get wrong: where a node runs is decided by its depth in the graph, not by when it was created.
 
 Type in the box below. The Preact Signals view starts out created before the search effect, so every keystroke adds a row marked in red to its panel; switch the order and type again, and the red rows stop.
 

@@ -11,6 +11,8 @@ import { colors } from '../../../../components/constants.mjs';
 {/* jsdoc-description */}
 ソースの各値を Observable に射影し、すべての内部 Observable をマージします。
 `switchMap` とは異なり、以前の内部 Observable をキャンセルしません。
+
+`mergeMap` を作った時点でソースがすでに持っている値は、`switchMap` と同じくすぐに射影します。完了したソースは射影しません。
 {/* /jsdoc-description */}
 
 ## Marble Diagram

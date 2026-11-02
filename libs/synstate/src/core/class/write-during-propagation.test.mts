@@ -161,7 +161,8 @@ describe('a write to a root observable while an update is propagating (#2336)', 
 
     assert.deepStrictEqual(warn, []);
 
-    assert.deepStrictEqual(mut_history, [10]);
+    // 0 from the value `outer$` held when `switchMap` was created.
+    assert.deepStrictEqual(mut_history, [0, 10]);
   });
 
   test('does not warn when a root created during propagation emits while it is created', async () => {
@@ -193,7 +194,8 @@ describe('a write to a root observable while an update is propagating (#2336)', 
 
     assert.deepStrictEqual(warn, []);
 
-    assert.deepStrictEqual(mut_history, [10]);
+    // 0 from the value `outer$` held when `switchMap` was created.
+    assert.deepStrictEqual(mut_history, [0, 10]);
   });
 
   test('a subscriber that throws does not leave the propagation flag set', async () => {

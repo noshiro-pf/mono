@@ -24,7 +24,8 @@ describe('an inner observable that holds a value is passed on in the update that
 
     a$.next(3);
 
-    assert.deepStrictEqual(mut_history, ['m2,s2', 'm3,s3']);
+    // 'm1,s1' from the value `a$` held when the operators were created.
+    assert.deepStrictEqual(mut_history, ['m1,s1', 'm2,s2', 'm3,s3']);
   });
 
   test('switchMap: a child of both it and its parent emits once per update', () => {
@@ -43,6 +44,7 @@ describe('an inner observable that holds a value is passed on in the update that
     a$.next(3);
 
     assert.deepStrictEqual(mut_history, [
+      [1, 10],
       [2, 20],
       [3, 30],
     ]);
@@ -85,6 +87,6 @@ describe('an inner observable that holds a value is passed on in the update that
 
     a$.next(2);
 
-    assert.deepStrictEqual(mut_history, ['m2,s2']);
+    assert.deepStrictEqual(mut_history, ['m1,s1', 'm2,s2']);
   });
 });
