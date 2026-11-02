@@ -1,0 +1,10 @@
+.root {
+  min-height: 100vh;
+  background-color: hsl(0, 0%, 33%);
+  padding: 10px;
+  overflow: auto;
+}
+
+.title {
+  color: white;
+}

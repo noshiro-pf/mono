@@ -1,7 +1,7 @@
-/* MUI's default theme asks for Roboto. Loaded here rather than as four
-   side-effect `import` statements in `main.tsx`: `import-x/extensions` forbids
-   a file extension on a package subpath, and CSS `@import` is what a bundler
-   resolves anyway. */
+/* The MUI look the components reproduce is set in Roboto. Loaded here rather
+   than as four side-effect `import` statements in `main.tsx`:
+   `import-x/extensions` forbids a file extension on a package subpath, and CSS
+   `@import` is what a bundler resolves anyway. */
 @import '@fontsource/roboto/300.css';
 @import '@fontsource/roboto/400.css';
 @import '@fontsource/roboto/500.css';

@@ -1,33 +1,26 @@
-import { css } from '@emotion/react';
-import { MuiSlider } from 'react-mui-utils';
-import { memoNamed } from 'react-utils';
-import type { DivisionNumber } from '../../types/index.mjs';
+import { constant, type JSX } from 'synstate-dom';
+import { Num } from 'ts-data-forge';
+import { divisionNumber$, setDivisionNumber } from '../../store.mjs';
+import { MuiSlider } from '../mui/index.mjs';
+import * as styles from './division-number-slider.module.css';
 
-type Props = Readonly<{
-  divisionNumber: DivisionNumber;
-  divisionNumberOnChange: (value: DivisionNumber) => void;
-}>;
-
-export const DivisionNumberSlider = memoNamed<Props>(
-  'DivisionNumberSlider',
-  (props) => (
-    <div
-      css={css`
-        padding: 10px 0;
-      `}
-    >
-      <div id={'division-number'}>{'分割数'}</div>
-      <MuiSlider
-        ariaLabelledby={'division-number'}
-        max={30}
-        min={2}
-        step={1}
-        value={props.divisionNumber}
-        onChange={
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          props.divisionNumberOnChange as (value: number) => void
+/** How many hues each result picks. */
+export const DivisionNumberSlider = (): JSX.Element => (
+  <div class={constant(styles.root)}>
+    <div id={constant('division-number')}>{constant('分割数')}</div>
+    <MuiSlider
+      ariaLabelledby={'division-number'}
+      max={30}
+      min={2}
+      step={1}
+      value={divisionNumber$}
+      onChange={(value) => {
+        if (isDivisionNumber(value)) {
+          setDivisionNumber(value);
         }
-      />
-    </div>
-  ),
+      }}
+    />
+  </div>
 );
+
+const isDivisionNumber = Num.isUintInRange(2, 31);

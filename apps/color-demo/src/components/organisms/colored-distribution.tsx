@@ -1,58 +1,33 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
-import type { NonNegativeFiniteNumber } from 'ts-data-forge';
-import { hslToStr, type Hsl } from 'ts-utils-additional';
+import type { InitializedObservable } from 'synstate';
+import { constant, view, type JSX } from 'synstate-dom';
+import { huesDefault } from '../../constants/index.mjs';
+import * as styles from './colored-distribution.module.css';
 
 type Props = Readonly<{
-  accumulatedDistribution: readonly (readonly [Hsl, NonNegativeFiniteNumber])[];
+  /** One bar per hue, in the order of `huesDefault`. */
+  bars: InitializedObservable<readonly Bar[]>;
 }>;
 
-export const ColoredDistribution = memoNamed<Props>(
-  'ColoredDistribution',
-  (props) => {
-    const accumulatedDistributionWithStyle = React.useMemo(
-      () =>
-        props.accumulatedDistribution.map(([hsl, value]) => ({
-          hsl,
-          style: {
-            height: `${value * 100}%`,
-            backgroundColor: hslToStr(hsl),
-          },
-        })),
-      [props.accumulatedDistribution],
-    );
-
-    return (
-      <div
-        css={css`
-          width: 100%;
-          height: 300px;
-          display: flex;
-          flex-direction: row;
-        `}
-      >
-        {accumulatedDistributionWithStyle.map(({ hsl, style }) => (
-          <div
-            key={hsl[0]}
-            css={css`
-              width: ${100 / 360}%;
-              height: 100%;
-              display: flex;
-              flex-direction: column;
-              justify-content: flex-end;
-            `}
-          >
-            <Bar data-e2e={'distribution-bar'} style={style} />
-          </div>
-        ))}
+/** A bar per hue, as tall and in the colour it is given. */
+export const ColoredDistribution = ({ bars }: Props): JSX.Element => (
+  <div class={constant(styles.root)}>
+    {huesDefault.map((_, index) => (
+      <div class={constant(styles.barWrapper)}>
+        <div
+          class={constant(styles.bar)}
+          data-e2e={constant('distribution-bar')}
+          style={{
+            height: view(bars, (all) => all[index]?.height ?? '0%'),
+            'background-color': view(
+              bars,
+              (all) => all[index]?.color ?? 'transparent',
+            ),
+          }}
+        />
       </div>
-    );
-  },
+    ))}
+  </div>
 );
 
-const Bar = styled.div`
-  width: 100%;
-  /* border-color: black; */
-`;
+/** A CSS height and colour. */
+type Bar = Readonly<{ height: string; color: string }>;

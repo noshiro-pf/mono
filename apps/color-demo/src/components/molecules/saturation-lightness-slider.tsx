@@ -1,64 +1,54 @@
-import styled from '@emotion/styled';
-import { MuiSlider } from 'react-mui-utils';
-import { memoNamed } from 'react-utils';
+import { constant, type JSX } from 'synstate-dom';
 import type { Percent } from 'ts-type-forge';
-import type { Hue } from 'ts-utils-additional';
-import type { DivisionNumber } from '../../types/index.mjs';
+import {
+  lightness$,
+  saturation$,
+  setLightness,
+  setSaturation,
+} from '../../store.mjs';
+import { MuiSlider } from '../mui/index.mjs';
 import { DivisionNumberSlider } from './division-number-slider.js';
 import { FirstHueSlider } from './first-hue-slider.js';
+import * as styles from './saturation-lightness-slider.module.css';
 
-type Props = Readonly<{
-  saturation: Percent;
-  lightness: Percent;
-  saturationOnChange: (value: Percent) => void;
-  lightnessOnChange: (value: Percent) => void;
-  firstHue: Hue;
-  firstHueOnChange: (value: Hue) => void;
-  divisionNumber: DivisionNumber;
-  divisionNumberOnChange: (value: DivisionNumber) => void;
-}>;
-
-export const AllSliders = memoNamed<Props>('AllSliders', (props) => (
+/** The four sliders the luminance tab is computed from. */
+export const AllSliders = (): JSX.Element => (
   <div>
-    <SliderWrapper>
-      <div id={'saturation'}>{'彩度'}</div>
+    <div class={constant(styles.sliderWrapper)}>
+      <div id={constant('saturation')}>{constant('彩度')}</div>
       <MuiSlider
         ariaLabelledby={'saturation'}
         max={100}
         min={0}
         step={5}
-        value={props.saturation}
-        onChange={
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          props.saturationOnChange as (s: number) => void
-        }
+        value={saturation$}
+        onChange={(value) => {
+          if (isPercent(value)) {
+            setSaturation(value);
+          }
+        }}
       />
-    </SliderWrapper>
-    <SliderWrapper>
-      <div id={'lightness'}>{'明度'}</div>
+    </div>
+    <div class={constant(styles.sliderWrapper)}>
+      <div id={constant('lightness')}>{constant('明度')}</div>
       <MuiSlider
         ariaLabelledby={'lightness'}
         max={100}
         min={0}
         step={5}
-        value={props.lightness}
-        onChange={
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          props.lightnessOnChange as (l: number) => void
-        }
+        value={lightness$}
+        onChange={(value) => {
+          if (isPercent(value)) {
+            setLightness(value);
+          }
+        }}
       />
-    </SliderWrapper>
-    <FirstHueSlider
-      firstHue={props.firstHue}
-      firstHueOnChange={props.firstHueOnChange}
-    />
-    <DivisionNumberSlider
-      divisionNumber={props.divisionNumber}
-      divisionNumberOnChange={props.divisionNumberOnChange}
-    />
+    </div>
+    <FirstHueSlider />
+    <DivisionNumberSlider />
   </div>
-));
+);
 
-const SliderWrapper = styled.div`
-  padding: 10px 0;
-`;
+/** The sliders' bounds and step keep the value a whole number of 0–100. */
+const isPercent = (value: number): value is Percent =>
+  Number.isSafeInteger(value) && 0 <= value && value <= 100;

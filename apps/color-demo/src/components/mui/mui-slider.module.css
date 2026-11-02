@@ -1,0 +1,183 @@
+/* MUI's `Slider` (medium, primary) in the default theme's look. */
+.root {
+  border-radius: 12px;
+  box-sizing: content-box;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  color: #1976d2;
+  height: 4px;
+  width: 100%;
+  padding: 13px 0;
+}
+
+@media (pointer: coarse) {
+  .root {
+    padding: 20px 0;
+  }
+}
+
+.rail {
+  display: block;
+  position: absolute;
+  border-radius: inherit;
+  background-color: currentColor;
+  opacity: 0.38;
+  width: 100%;
+  height: inherit;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.track {
+  display: block;
+  position: absolute;
+  border-radius: inherit;
+  border: 1px solid currentColor;
+  background-color: currentColor;
+  transition:
+    left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    width 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    height 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  height: inherit;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.mark {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 1px;
+  background-color: currentColor;
+  top: 50%;
+  transform: translate(-1px, -50%);
+}
+
+/* A mark the track covers. */
+.markActive {
+  background-color: #fff;
+  opacity: 0.8;
+}
+
+.thumb {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  outline: 0;
+  background-color: currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.thumb::before {
+  position: absolute;
+  content: '';
+  border-radius: inherit;
+  width: 100%;
+  height: 100%;
+  box-shadow:
+    0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+
+/* The area a touch hits. */
+.thumb::after {
+  position: absolute;
+  content: '';
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.thumb:hover,
+.thumb:has(.input:focus-visible) {
+  box-shadow: 0px 0px 0px 8px rgba(25, 118, 210, 0.16);
+}
+
+@media (hover: none) {
+  .thumb:hover,
+  .thumb:has(.input:focus-visible) {
+    box-shadow: none;
+  }
+}
+
+.thumb.active {
+  box-shadow: 0px 0px 0px 14px rgba(25, 118, 210, 0.16);
+}
+
+.dragging .thumb,
+.dragging .track {
+  transition: none;
+}
+
+/* Hidden as MUI hides it: still focusable, and read out as the slider. */
+.input {
+  border: 0px;
+  clip-path: inset(50%);
+  height: 100%;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0px;
+  position: absolute;
+  white-space: nowrap;
+  width: 100%;
+  direction: ltr;
+}
+
+.valueLabel {
+  z-index: 1;
+  white-space: nowrap;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.43;
+  letter-spacing: 0.01071em;
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  position: absolute;
+  background-color: #757575;
+  border-radius: 2px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  transform: translateY(-100%) scale(0);
+  top: -10px;
+  transform-origin: bottom center;
+}
+
+.valueLabel::before {
+  position: absolute;
+  content: '';
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, 50%) rotate(45deg);
+  background-color: inherit;
+  bottom: 0;
+  left: 50%;
+}
+
+/* `valueLabelDisplay="auto"`: shown while the thumb is hovered, focused from
+   the keyboard or dragged. */
+.thumb:hover .valueLabel,
+.thumb:has(.input:focus-visible) .valueLabel,
+.thumb.active .valueLabel {
+  transform: translateY(-100%) scale(1);
+}

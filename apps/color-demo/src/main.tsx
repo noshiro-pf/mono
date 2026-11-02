@@ -1,18 +1,11 @@
-import * as React from 'react';
-import { createRoot } from 'react-dom/client';
+import { render } from 'synstate-dom';
 import { App } from './app.js';
 import './index.css';
 
-const container = document.querySelector('#root');
+const root = document.querySelector('#root');
 
-if (container !== null) {
-  const root = createRoot(container);
-
-  root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>,
-  );
-} else {
-  throw new Error('Could not find root element');
+if (root === null) {
+  throw new Error('Could not find the #root element');
 }
+
+render(App, root);

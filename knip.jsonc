@@ -463,8 +463,8 @@
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
       // Loaded by `src/index.css` through CSS `@import` rather than by a
-      // module import, which knip does not follow. MUI's default theme asks
-      // for Roboto, so it belongs to this app rather than to a consumer.
+      // module import, which knip does not follow. The MUI look the components
+      // reproduce is set in Roboto, so it belongs to this app.
       "ignoreDependencies": ["@fontsource/roboto"],
     },
 

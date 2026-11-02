@@ -1,16 +1,6 @@
-import styled from '@emotion/styled';
-import {
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-} from '@mui/material';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
-import { Arr, Num, type Uint8 } from 'ts-data-forge';
-import type { DeepReadonly, Percent } from 'ts-type-forge';
+import { constant, type JSX } from 'synstate-dom';
+import { Arr, Num } from 'ts-data-forge';
+import type { Percent } from 'ts-type-forge';
 import {
   blackHsl,
   contrastRatioHsl,
@@ -18,151 +8,125 @@ import {
   whiteHsl,
 } from 'ts-utils-additional';
 import { huesDefault } from '../../constants/index.mjs';
+import { MuiPaper } from '../mui/index.mjs';
+import * as styles from './text-color-contrast-table.module.css';
 
-const indices = [0, 1, 2] as const;
+/**
+ * For each hue at three saturations and lightnesses, the contrast of white text
+ * and of black text on it, with the better of the two checked. The checkboxes
+ * are the reader's to tick, so they start checked and are left uncontrolled;
+ * nothing reads them.
+ */
+export const TextColorContrastTable = (): JSX.Element => (
+  <div class={constant(styles.root)}>
+    <MuiPaper spaced variant={'outlined'}>
+      <table
+        class={constant(styles.table)}
+        data-e2e={constant('contrast-table')}
+      >
+        <thead>
+          <tr>
+            <th class={headCell} scope={constant('col')}>
+              {constant('Saturation（彩度）')}
+            </th>
+            {saturationLightness.flatMap(([saturation]) =>
+              [0, 1].map(() => (
+                <th class={headCell} scope={constant('col')}>
+                  {constant(saturation.toString())}
+                </th>
+              )),
+            )}
+          </tr>
+          <tr>
+            <th class={headCell} scope={constant('col')}>
+              {constant('Lightness（輝度）')}
+            </th>
+            {saturationLightness.flatMap(([, lightness]) =>
+              [0, 1].map(() => (
+                <th class={headCell} scope={constant('col')}>
+                  {constant(lightness.toString())}
+                </th>
+              )),
+            )}
+          </tr>
+          <tr>
+            <th class={headCell} scope={constant('col')}>
+              {constant('Hue（色相）')}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(({ hue, cells }) => (
+            <tr>
+              <td class={constant(`${styles.cell} ${styles.alignCenter}`)}>
+                {constant(hue.toString())}
+              </td>
+              {cells.flatMap(({ hsl, contrastWhite, contrastBlack }) => [
+                <td
+                  class={bodyCell}
+                  style={{
+                    'background-color': constant(hsl),
+                    color: constant('white'),
+                  }}
+                >
+                  <label>
+                    <input
+                      defaultChecked={constant(contrastWhite > contrastBlack)}
+                      name={constant(hsl)}
+                      type={constant('checkbox')}
+                    />
+                    {constant(Num.roundAt(contrastWhite, 2).toString())}
+                  </label>
+                </td>,
+                <td
+                  class={bodyCell}
+                  style={{
+                    'background-color': constant(hsl),
+                    color: constant('black'),
+                  }}
+                >
+                  <label>
+                    <input
+                      defaultChecked={constant(contrastWhite <= contrastBlack)}
+                      name={constant(hsl)}
+                      type={constant('checkbox')}
+                    />
+                    {constant(Num.roundAt(contrastBlack, 2).toString())}
+                  </label>
+                </td>,
+              ])}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </MuiPaper>
+  </div>
+);
 
 const saturationList = [80, 80, 100] as const satisfies readonly Percent[];
 
 const lightnessList = [40, 60, 80] as const satisfies readonly Percent[];
 
-const saturationListWithIndex = Arr.zip(saturationList, indices);
+/** The pair of each column. */
+const saturationLightness = Arr.zip(saturationList, lightnessList);
 
-const lightnessListWithIndex = Arr.zip(lightnessList, indices);
+const headCell = constant(
+  `${styles.cell} ${styles.headCell} ${styles.alignCenter}`,
+);
 
-// Written out rather than nested `Arr.zip`s: `Arr.zip`'s `const` type
-// parameters reconstruct the tuple shape, and nesting them makes `tsc` give up
-// with TS2589/TS2590.
-const SL = [
-  [[saturationList[0], lightnessList[0]], indices[0]],
-  [[saturationList[1], lightnessList[1]], indices[1]],
-  [[saturationList[2], lightnessList[2]], indices[2]],
-] as const satisfies DeepReadonly<[[Percent, Percent], Uint8][]>;
+const bodyCell = constant(`${styles.cell} ${styles.alignLeft}`);
 
-const hslWithStyle = huesDefault.map((h, idx) => {
+const rows = huesDefault.map((h) => {
   // `huesDefault` is `NonEmptyArray<number>`; see the comment there for why it
-  // is not the 360-member `Hue` tuple the original used.
+  // is not the 360-member `Hue` tuple.
   const hue = toHue(h);
 
   return {
     hue,
-    idx,
-    SLStyle: SL.map(([[saturation, lightness], key]) => {
-      const contrastWhite = contrastRatioHsl(whiteHsl, [
-        hue,
-        saturation,
-        lightness,
-      ]);
-
-      const contrastBlack = contrastRatioHsl(
-        [hue, saturation, lightness],
-        blackHsl,
-      );
-
-      return {
-        key,
-        contrastWhite,
-        contrastBlack,
-        hslStyle: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-        whiteStyle: {
-          backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-          color: 'white',
-        },
-        blackStyle: {
-          backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-          color: 'black',
-        },
-        contrastWhiteDisplayValue: Num.roundAt(contrastWhite, 2),
-        contrastBlackDisplayValue: Num.roundAt(contrastBlack, 2),
-      };
-    }),
+    cells: saturationLightness.map(([saturation, lightness]) => ({
+      hsl: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+      contrastWhite: contrastRatioHsl(whiteHsl, [hue, saturation, lightness]),
+      contrastBlack: contrastRatioHsl([hue, saturation, lightness], blackHsl),
+    })),
   };
 });
-
-export const TextColorContrastTable = memoNamed(
-  'TextColorContrastTable',
-  () => (
-    <Root>
-      <PaperCustomized variant={'outlined'}>
-        <Table data-e2e={'contrast-table'}>
-          <TableHead>
-            <TableRow>
-              <TableCell align={'center'}>{'Saturation（彩度）'}</TableCell>
-              {saturationListWithIndex.map(([sat, i]) => (
-                <React.Fragment key={i}>
-                  <TableCell align={'center'}>{sat}</TableCell>
-                  <TableCell align={'center'}>{sat}</TableCell>
-                </React.Fragment>
-              ))}
-            </TableRow>
-            <TableRow>
-              <TableCell align={'center'}>{'Lightness（輝度）'}</TableCell>
-              {lightnessListWithIndex.map(([lightness, i]) => (
-                <React.Fragment key={i}>
-                  <TableCell align={'center'}>{lightness}</TableCell>
-                  <TableCell align={'center'}>{lightness}</TableCell>
-                </React.Fragment>
-              ))}
-            </TableRow>
-            <TableRow>
-              <TableCell align={'center'}>{'Hue（色相）'}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {hslWithStyle.map(({ hue, SLStyle, idx }) => (
-              <TableRow key={hue}>
-                <TableCell align={'center'}>{idx}</TableCell>
-                {SLStyle.map(
-                  ({
-                    contrastWhite,
-                    contrastWhiteDisplayValue,
-                    contrastBlack,
-                    contrastBlackDisplayValue,
-                    whiteStyle,
-                    blackStyle,
-                    hslStyle,
-                    key,
-                  }) => (
-                    <React.Fragment key={key}>
-                      <TableCell align={'left'} style={whiteStyle}>
-                        <label>
-                          <input
-                            defaultChecked={contrastWhite > contrastBlack}
-                            name={hslStyle}
-                            type={'checkbox'}
-                          />
-                          {contrastWhiteDisplayValue}
-                        </label>
-                      </TableCell>
-                      <TableCell align={'left'} style={blackStyle}>
-                        <label>
-                          <input
-                            defaultChecked={contrastWhite <= contrastBlack}
-                            name={hslStyle}
-                            type={'checkbox'}
-                          />
-                          {contrastBlackDisplayValue}
-                        </label>
-                      </TableCell>
-                    </React.Fragment>
-                  ),
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </PaperCustomized>
-    </Root>
-  ),
-);
-
-const PaperCustomized = styled(Paper)`
-  margin-top: 10px;
-  padding: 10px;
-`;
-
-const Root = styled.div`
-  width: 100%;
-  height: 100%;
-  background-color: #c2c2c2;
-  padding: 10px;
-`;

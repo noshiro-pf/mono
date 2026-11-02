@@ -1,2 +1,2 @@
-export * from './luminance-visualizer/index.mjs';
+export * from './luminance-visualizer.js';
 export * from './text-color-contrast-table.js';
