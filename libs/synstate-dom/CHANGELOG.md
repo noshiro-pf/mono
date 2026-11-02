@@ -1,5 +1,24 @@
 # synstate-dom
 
+## 0.6.0
+
+### Minor Changes
+
+- 2e2c974: A type-level break, released as a minor while synstate-dom is 0.x: the element props no longer accept writable DOM properties that have no attribute (`selectedIndex`, `valueAsNumber`, `selectionStart`, `currentTime`, `volume`, `playbackRate`, the URL parts of `<a>` such as `hash`, the obsolete `ch` and `chOff`, and others). The binding wrote them with `setAttribute`, which changed nothing. `defaultMuted`, `defaultSelected` and `encoding` are now written as their attributes `muted`, `selected` and `enctype`.
+- bd9e8c0: synstate-dom exports `isImeKeyDown(event)`, whether a key down belongs to an input method: one sent while a composition is going on, or the Enter or Escape that Safari sends with key code 229 after `compositionend`. blueprint-synstate's `NumericInput`, `TimePicker` and `DateInput` use it in place of their own copy, so blueprint-synstate needs a synstate-dom that exports it.
+
+### Patch Changes
+
+- Updated dependencies [eb65772]
+- Updated dependencies [5618786]
+- Updated dependencies [c53c17d]
+- Updated dependencies [86c41cb]
+- Updated dependencies [b7a2d57]
+- Updated dependencies [a5235cf]
+- Updated dependencies [766b6fd]
+    - ts-data-forge@14.10.2
+    - synstate@6.2.1
+
 ## 0.5.0
 
 ### Minor Changes

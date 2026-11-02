@@ -1,5 +1,18 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.3.1
+
+### Patch Changes
+
+- df50478: `total-functions/no-partial-division` now checks `x /= y` as it checks `x / y`. It listened only to `/`, so `unicorn/operator-assignment`'s autofix of a reported `x = x / y` into `x /= y` made the error disappear without the denominator being shown non-zero.
+- Updated dependencies [eb65772]
+- Updated dependencies [5618786]
+- Updated dependencies [c53c17d]
+- Updated dependencies [86c41cb]
+- Updated dependencies [b7a2d57]
+- Updated dependencies [a5235cf]
+    - ts-data-forge@14.10.2
+
 ## 7.3.0
 
 ### Minor Changes

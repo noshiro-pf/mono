@@ -1,5 +1,19 @@
 ## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
 
+## 4.0.1
+
+### Patch Changes
+
+- 473ac09: `append-as-const` no longer matches arguments to the parameter on their left when the callee declares a `this` parameter, which removed an `as const` that changed the inferred type.
+- 473ac09: `wrapWithParentheses` ignores parentheses inside string literals, template literal text and comments, so `convert-to-readonly` no longer emits a mis-parenthesized `readonly (A | '(') | (B)[]`. Text it cannot read with certainty — a `/` that may start a regular expression, an unterminated literal, unbalanced parentheses — now always gets a pair, so an already wrapped `(a / b)` becomes `((a / b))`.
+- Updated dependencies [eb65772]
+- Updated dependencies [5618786]
+- Updated dependencies [c53c17d]
+- Updated dependencies [86c41cb]
+- Updated dependencies [b7a2d57]
+- Updated dependencies [a5235cf]
+    - ts-data-forge@14.10.2
+
 ## 4.0.0
 
 ### Major Changes

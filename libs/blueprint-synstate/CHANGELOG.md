@@ -1,5 +1,29 @@
 # blueprint-synstate
 
+## 0.5.0
+
+### Minor Changes
+
+- 96cf3cb: `NumericInput` clamps a committed number to its `min` and `max` before `normalize`, and a step stops at them, so one pair of bounds is both what is enforced and what assistive technology reads out. `normalize` no longer needs its own clamp; it is given `NaN` as it is.
+
+    A caller that passed `min` and `max` only for the readout, and let `normalize` commit numbers past them, now has those numbers clamped.
+
+### Patch Changes
+
+- bd9e8c0: synstate-dom exports `isImeKeyDown(event)`, whether a key down belongs to an input method: one sent while a composition is going on, or the Enter or Escape that Safari sends with key code 229 after `compositionend`. blueprint-synstate's `NumericInput`, `TimePicker` and `DateInput` use it in place of their own copy, so blueprint-synstate needs a synstate-dom that exports it.
+- Updated dependencies [eb65772]
+- Updated dependencies [5618786]
+- Updated dependencies [c53c17d]
+- Updated dependencies [86c41cb]
+- Updated dependencies [b7a2d57]
+- Updated dependencies [a5235cf]
+- Updated dependencies [766b6fd]
+- Updated dependencies [2e2c974]
+- Updated dependencies [bd9e8c0]
+    - ts-data-forge@14.10.2
+    - synstate@6.2.1
+    - synstate-dom@0.6.0
+
 ## 0.4.0
 
 ### Minor Changes

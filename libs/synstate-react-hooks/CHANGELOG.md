@@ -1,5 +1,25 @@
 # synstate-react-hooks
 
+## 6.2.1
+
+### Patch Changes
+
+- 9c10c8b: `useValueAsObservable` keeps following its value under React's StrictMode and after an `<Activity>` is hidden and shown again. In both cases React runs effect cleanups without unmounting, and the cleanup completed the hook's only observable for good.
+
+    - **Completion.** The observable now completes in a timer of 0 ms after the cleanup, so StrictMode's immediate second setup keeps the same observable. On unmount it completes in that timer too, rather than at once.
+    - **`<Activity>`.** An observable completed while an `<Activity>` was hidden is replaced with a new one holding the latest value, so read it from each render rather than keeping the first one.
+    - **Initial value.** In every package, the hook no longer pushes its initial value a second time on mount.
+
+- Updated dependencies [eb65772]
+- Updated dependencies [5618786]
+- Updated dependencies [c53c17d]
+- Updated dependencies [86c41cb]
+- Updated dependencies [b7a2d57]
+- Updated dependencies [a5235cf]
+- Updated dependencies [766b6fd]
+    - ts-data-forge@14.10.2
+    - synstate@6.2.1
+
 ## 6.2.0
 
 ### Minor Changes

@@ -1,5 +1,18 @@
 # eslint-plugin-ts-data-forge
 
+## 0.10.8
+
+### Patch Changes
+
+- 6fe63a4: `prefer-arr-scan` no longer reports a `reduce` whose array-literal body holds the bare accumulator, such as `xs.reduce((acc, x) => [acc, x], seed)`. That body nests the accumulator rather than copying it, so the rule's message was wrong and it offered no fix; only `[...acc, …]` counts as rebuilding the accumulator.
+- Updated dependencies [eb65772]
+- Updated dependencies [5618786]
+- Updated dependencies [c53c17d]
+- Updated dependencies [86c41cb]
+- Updated dependencies [b7a2d57]
+- Updated dependencies [a5235cf]
+    - ts-data-forge@14.10.2
+
 ## 0.10.7
 
 ### Patch Changes
