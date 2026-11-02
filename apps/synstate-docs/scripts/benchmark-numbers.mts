@@ -784,8 +784,8 @@ const equalityCutOff: SeriesData = equalityCutOffJson;
  * page describing one machine while its tables came from another is how this
  * repository spent a day telling a code regression apart from a change of
  * machine. {@link recordedEnvironment} fails where the scenarios disagree, and
- * gives nothing where the tables predate the pinned runner, which the page
- * shows as an em dash.
+ * gives nothing where a table records no environment, which the page shows as
+ * an em dash.
  */
 const environmentFact = (
   read: (environment: RecordedEnvironment) => string,

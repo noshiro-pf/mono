@@ -30,8 +30,10 @@ import type { BenchmarkEnvironment } from './benchmark/environment.mjs';
 
 /**
  * Where every table on the page was measured, or `undefined` when some table
- * records nothing: those predate the pinned runner, and the page says so rather
- * than inventing a machine for them.
+ * records nothing: the page says so rather than inventing a machine for it.
+ * Committing such a table, or one measured locally, is refused by the root
+ * guard `check:root:synstate-benchmark-runner`, not here — the local
+ * `benchmark` command runs `gen:benchmark-doc` on its own measurement.
  *
  * The scenarios must agree, the date included — `benchmark` measures all of
  * them in one pass, and re-measuring one alone (`benchmark:deep-chain`) is
@@ -109,8 +111,8 @@ export const assertEveryLibraryHasAColour = (): void => {
 /**
  * The environment a results file records, as the checks and the prose read it.
  *
- * Optional in a results file because the tables committed before the
- * measurement moved to CI do not carry one — see {@link recordedEnvironment}.
+ * Optional here so that a table without one reaches the page as dashes rather
+ * than a crash — see {@link recordedEnvironment}.
  */
 export type RecordedEnvironment = Readonly<{
   runner: string;

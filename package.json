@@ -68,6 +68,7 @@
     "check:root:restart-unblock-prs-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-restart-unblock-prs-paths.mts",
     "check:root:strict-lib-dev-dependencies": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-dev-dependencies.mts",
     "check:root:strict-lib-links": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-links.mts",
+    "check:root:synstate-benchmark-runner": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-synstate-benchmark-runner.mts",
     "check:root:test": "node ./tools/scripts/cmd/assert-deps-built.mts && vitest run --config ./tools/configs/vitest.tools.config.mts",
     "check:root:tsconfig-lib-replacement": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-tsconfig-lib-replacement.mts",
     "check:root:tsconfig-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-tsconfig-paths.mts",
