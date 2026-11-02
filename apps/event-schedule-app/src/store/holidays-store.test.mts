@@ -1,5 +1,5 @@
-import { Optional } from 'ts-data-forge';
-import { DateUtils, YearMonthDateFromDate } from 'ts-fortress-types';
+// cspell:ignore unstub
+import { asSafeUint, Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { createHolidaysStore } from './holidays-store.mjs';
 
@@ -19,6 +19,18 @@ describe(createHolidaysStore, () => {
   });
 
   test('knows no holiday until they arrive, then each by its date', async () => {
+    // West of UTC, a "YYYY-MM-DD" read as UTC midnight is the day before.
+    vi.stubEnv('TZ', 'America/New_York');
+
+    onTestFinished(() => {
+      vi.unstubAllEnvs();
+    });
+
+    // The zone took effect: there, UTC midnight of 3 November is the 2nd.
+    const utcMidnight = new Date('2026-11-03T00:00:00Z');
+
+    assert.strictEqual(utcMidnight.getDate(), 2);
+
     const { promise, resolve } =
       Promise.withResolvers<ReadonlyRecord<string, string>>();
 
@@ -38,7 +50,35 @@ describe(createHolidaysStore, () => {
 
     assert.strictEqual(
       Optional.unwrap(
-        holidays.get(YearMonthDateFromDate(DateUtils.from('2026-11-03'))),
+        holidays.get({ year: asSafeUint(2026), month: 11, date: 3 }),
+      ),
+      '文化の日',
+    );
+  });
+
+  test('skips a key that is not a date', async () => {
+    const store = createHolidaysStore({
+      fetchHolidaysJson: () =>
+        Promise.resolve({
+          '2026-11-03': '文化の日',
+          'not-a-date': '?',
+          '2026-13-01': '?',
+          '2026-1e1-03': '?',
+          '-11-03': '?',
+        }),
+    });
+
+    store.start();
+
+    await settle();
+
+    const holidays = store.holidaysJpDefinition$.getSnapshot().value;
+
+    assert.strictEqual(holidays.size, 1);
+
+    assert.strictEqual(
+      Optional.unwrap(
+        holidays.get({ year: asSafeUint(2026), month: 11, date: 3 }),
       ),
       '文化の日',
     );
