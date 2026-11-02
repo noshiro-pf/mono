@@ -129,10 +129,6 @@ export const PropagationTrace = React.memo<Props>((props) => {
     [steps, index],
   );
 
-  if (step === undefined) {
-    return undefined;
-  }
-
   const isFirst = index === 0;
 
   const isLast = index === lastIndex;
@@ -140,96 +136,117 @@ export const PropagationTrace = React.memo<Props>((props) => {
   // The same figure, in the page and, while expanded, in a modal dialog
   // covering the window; they differ only in the button that opens or closes
   // the dialog, shown above the figure.
-  const content = (windowButton: React.ReactNode): React.ReactNode => (
-    <>
-      <div className={'propagation-trace-toolbar'}>{windowButton}</div>
+  const content = React.useCallback(
+    (current: TraceStep, windowButton: React.ReactNode): React.ReactNode => (
+      <>
+        <div className={'propagation-trace-toolbar'}>{windowButton}</div>
 
-      <div className={'propagation-trace-column'}>
-        <TraceGraph graph={graph} lang={lang} step={step} />
+        <div className={'propagation-trace-column'}>
+          <TraceGraph graph={graph} lang={lang} step={current} />
 
-        <StableCaption
-          captions={captions}
-          current={step.caption[lang]}
-          style={captionStyle}
-        />
-
-        <div style={controlsStyle}>
-          <button
-            aria-label={'Previous step'}
-            disabled={isFirst}
-            style={isFirst ? buttonDisabledStyle : buttonEnabledStyle}
-            type={'button'}
-            onClick={goPrev}
-          >
-            {'◀ Prev'}
-          </button>
-          <button
-            aria-label={playing ? 'Pause' : 'Play'}
-            style={playButtonStyle}
-            type={'button'}
-            onClick={togglePlay}
-          >
-            {playing ? '❚❚ Pause' : isLast ? '↻ Replay' : '▶ Play'}
-          </button>
-          <button
-            aria-label={'Next step'}
-            disabled={isLast}
-            style={isLast ? buttonDisabledStyle : buttonEnabledStyle}
-            type={'button'}
-            onClick={goNext}
-          >
-            {'Next ▶'}
-          </button>
-          <input
-            aria-label={'Step'}
-            max={lastIndex}
-            min={0}
-            style={sliderStyle}
-            type={'range'}
-            value={index}
-            onChange={onSeek}
+          <StableCaption
+            captions={captions}
+            current={current.caption[lang]}
+            style={captionStyle}
           />
-          <span
-            style={counterStyle}
-          >{`${(index + 1).toString()} / ${steps.length.toString()}`}</span>
+
+          <div style={controlsStyle}>
+            <button
+              aria-label={'Previous step'}
+              disabled={isFirst}
+              style={isFirst ? buttonDisabledStyle : buttonEnabledStyle}
+              type={'button'}
+              onClick={goPrev}
+            >
+              {'◀ Prev'}
+            </button>
+            <button
+              aria-label={playing ? 'Pause' : 'Play'}
+              style={playButtonStyle}
+              type={'button'}
+              onClick={togglePlay}
+            >
+              {playing ? '❚❚ Pause' : isLast ? '↻ Replay' : '▶ Play'}
+            </button>
+            <button
+              aria-label={'Next step'}
+              disabled={isLast}
+              style={isLast ? buttonDisabledStyle : buttonEnabledStyle}
+              type={'button'}
+              onClick={goNext}
+            >
+              {'Next ▶'}
+            </button>
+            <input
+              aria-label={'Step'}
+              max={lastIndex}
+              min={0}
+              style={sliderStyle}
+              type={'range'}
+              value={index}
+              onChange={onSeek}
+            />
+            <span
+              style={counterStyle}
+            >{`${(index + 1).toString()} / ${steps.length.toString()}`}</span>
+          </div>
         </div>
-      </div>
 
-      <div className={'propagation-trace-column'}>
-        <div style={panelsStyle}>
-          <TraceModulePanel changed={changed} step={step} />
-          <TraceQueuePanel changed={changed} step={step} />
-          <TraceLocalsPanel changed={changed} step={step} />
+        <div className={'propagation-trace-column'}>
+          <div style={panelsStyle}>
+            <TraceModulePanel changed={changed} step={current} />
+            <TraceQueuePanel changed={changed} step={current} />
+            <TraceLocalsPanel changed={changed} step={current} />
+          </div>
+
+          <TraceNodesTable changed={changed} step={current} />
+
+          <div style={stackStyle}>
+            {Arr.isEmpty(current.stack) ? (
+              <span style={mutedStyle}>{'(no call running)'}</span>
+            ) : (
+              current.stack.map((call, i) => (
+                <span
+                  // eslint-disable-next-line react/no-array-index-key -- a call is identified by its depth in the stack
+                  key={i}
+                  style={
+                    i === current.stack.length - 1 ? stackTopStyle : undefined
+                  }
+                >
+                  {i === 0 ? '' : ' › '}
+                  {call}
+                </span>
+              ))
+            )}
+          </div>
+
+          <TraceCode active={current.code} />
         </div>
-
-        <TraceNodesTable changed={changed} step={step} />
-
-        <div style={stackStyle}>
-          {Arr.isEmpty(step.stack) ? (
-            <span style={mutedStyle}>{'(no call running)'}</span>
-          ) : (
-            step.stack.map((call, i) => (
-              <span
-                // eslint-disable-next-line react/no-array-index-key -- a call is identified by its depth in the stack
-                key={i}
-                style={i === step.stack.length - 1 ? stackTopStyle : undefined}
-              >
-                {i === 0 ? '' : ' › '}
-                {call}
-              </span>
-            ))
-          )}
-        </div>
-
-        <TraceCode active={step.code} />
-      </div>
-    </>
+      </>
+    ),
+    [
+      captions,
+      changed,
+      goNext,
+      goPrev,
+      graph,
+      index,
+      isFirst,
+      isLast,
+      lang,
+      lastIndex,
+      onSeek,
+      playing,
+      steps.length,
+      togglePlay,
+    ],
   );
 
-  return (
+  return step === undefined ? undefined : (
     <>
       <figure className={'propagation-trace'}>
         {content(
+          step,
           <button
             aria-label={'Show full screen'}
             style={buttonEnabledStyle}
@@ -245,6 +262,7 @@ export const PropagationTrace = React.memo<Props>((props) => {
         <TraceDialog onClose={collapse}>
           <figure className={'propagation-trace'}>
             {content(
+              step,
               <button
                 aria-label={'Close full screen'}
                 style={buttonEnabledStyle}

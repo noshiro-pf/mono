@@ -33,7 +33,10 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
     onBlur,
     ...props
   }) => {
-    const isEmailAddressResult = isEmailString(value ?? '');
+    const isEmailAddressResult = React.useMemo(
+      () => isEmailString(value ?? ''),
+      [value],
+    );
 
     const [
       errorsAreHidden,

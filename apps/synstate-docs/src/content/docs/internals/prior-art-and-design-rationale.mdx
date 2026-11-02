@@ -79,7 +79,7 @@ Jotai's atoms-in-atom pattern gives each list item its own atom, so updating one
 
 ```tsx
 import { atom, useAtom, type PrimitiveAtom } from 'jotai';
-import type * as React from 'react';
+import * as React from 'react';
 
 const todosAtom = atom([atom('Todo 1'), atom('Todo 2')]);
 
@@ -103,12 +103,12 @@ const TodoItem = ({
 const TodoList = (): React.JSX.Element => {
     const [todos, setTodos] = useAtom(todosAtom);
 
-    const addTodo = (): void => {
+    const addTodo = React.useCallback((): void => {
         // jotai's `SetStateAction` wants a mutable array, which the readonly result
         // of `Arr.toPushed` does not satisfy.
         // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
         setTodos((prev) => [...prev, atom('')]);
-    };
+    }, [setTodos]);
 
     return (
         <div>
@@ -143,11 +143,14 @@ const TodoItem = ({
         ),
     );
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        updateTodos((prev) =>
-            prev.map((t, i) => (i === index ? e.target.value : t)),
-        );
-    };
+    const handleChange = React.useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>): void => {
+            updateTodos((prev) =>
+                prev.map((t, i) => (i === index ? e.target.value : t)),
+            );
+        },
+        [index],
+    );
 
     return <input value={todo} onChange={handleChange} />;
 };
@@ -157,9 +160,9 @@ const TodoList = (): React.JSX.Element => {
         React.useMemo(() => todos$.pipe(map((todos) => todos.length)), []),
     );
 
-    const addTodo = (): void => {
+    const addTodo = React.useCallback((): void => {
         updateTodos(Arr.toPushed(''));
-    };
+    }, []);
 
     return (
         <div>

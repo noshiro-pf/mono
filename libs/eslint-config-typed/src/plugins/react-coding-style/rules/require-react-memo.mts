@@ -4,7 +4,16 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import type { DeepReadonly } from 'ts-type-forge';
-import { castNode, climbTypeWrappers, isReactApiCall } from './shared.mjs';
+import {
+  castNode,
+  climbTypeWrappers,
+  getBoundIdentifier,
+  isComponentName,
+  isFunctionNode,
+  isReactApiCall,
+  jsxNodeVisitors,
+  type FunctionNode,
+} from './shared.mjs';
 
 type Options = readonly [
   Readonly<{
@@ -13,11 +22,6 @@ type Options = readonly [
 ];
 
 type MessageIds = 'requireReactMemo';
-
-type FunctionNode =
-  | TSESTree.ArrowFunctionExpression
-  | TSESTree.FunctionDeclaration
-  | TSESTree.FunctionExpression;
 
 // NOTE:
 // 他の react-coding-style のルールは React.memo 化されたコンポーネントの書き方を
@@ -88,7 +92,7 @@ export const requireReactMemoRule: TSESLint.RuleModule<MessageIds, Options> = {
         return;
       }
 
-      const componentId = getComponentId(componentExpression);
+      const componentId = getBoundIdentifier(componentExpression);
 
       if (componentId === undefined || !isComponentName(componentId.name)) {
         return;
@@ -107,15 +111,7 @@ export const requireReactMemoRule: TSESLint.RuleModule<MessageIds, Options> = {
       });
     };
 
-    return {
-      JSXElement: checkElementNode,
-      JSXFragment: checkElementNode,
-      CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
-        if (isReactApiCall(context, node, 'createElement')) {
-          checkElementNode(node);
-        }
-      },
-    };
+    return jsxNodeVisitors(context, checkElementNode);
   },
 } as const;
 
@@ -135,11 +131,7 @@ const getEnclosingFunction = (
   let mut_current: DeepReadonly<TSESTree.Node> = node;
 
   while (mut_current.type !== AST_NODE_TYPES.Program) {
-    if (
-      mut_current.type === AST_NODE_TYPES.ArrowFunctionExpression ||
-      mut_current.type === AST_NODE_TYPES.FunctionDeclaration ||
-      mut_current.type === AST_NODE_TYPES.FunctionExpression
-    ) {
+    if (isFunctionNode(mut_current)) {
       return mut_current;
     }
 
@@ -185,35 +177,3 @@ const getDefinitionIfNotMemoized = (
     ? getDefinitionIfNotMemoized(context, parent)
     : undefined;
 };
-
-/**
- * The name the given expression is bound to, when it is bound to one, through
- * type wrappers: `const Foo = (() => <div />) satisfies React.FC;` binds `Foo`.
- */
-const getComponentId = (
-  node: DeepReadonly<TSESTree.Node>,
-): DeepReadonly<TSESTree.Identifier> | undefined => {
-  if (node.type === AST_NODE_TYPES.FunctionDeclaration) {
-    return node.id ?? undefined;
-  }
-
-  const wrapped = climbTypeWrappers(node);
-
-  const parent =
-    wrapped.type === AST_NODE_TYPES.Program ? undefined : wrapped.parent;
-
-  if (
-    parent?.type === AST_NODE_TYPES.VariableDeclarator &&
-    parent.init === wrapped &&
-    parent.id.type === AST_NODE_TYPES.Identifier
-  ) {
-    return parent.id;
-  }
-
-  return undefined;
-};
-
-const componentNamePattern = /^[A-Z]/u;
-
-const isComponentName = (name: string): boolean =>
-  componentNamePattern.test(name);

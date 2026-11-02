@@ -9,44 +9,82 @@ type Props = Readonly<{
 }>;
 
 export const DepGraph = React.memo<Props>((props) => {
-  const styles: DepGraphStylesFilled = {
-    NODE_WIDTH: props.styles?.NODE_WIDTH ?? 150,
-    NODE_HEIGHT: props.styles?.NODE_HEIGHT ?? 52,
-    NODE_RX: props.styles?.NODE_RX ?? 8,
-    H_GAP: props.styles?.H_GAP ?? 75,
-    V_GAP: props.styles?.V_GAP ?? 30,
-    ARROW_SIZE: props.styles?.ARROW_SIZE ?? 6,
-    FONT_SIZE: props.styles?.FONT_SIZE ?? 16,
-    SUB_FONT_SIZE: props.styles?.SUB_FONT_SIZE ?? 13,
-    EDGE_FONT_SIZE: props.styles?.EDGE_FONT_SIZE ?? 11,
-  } as const;
+  const { styles, positioned, edges, svgWidth, svgHeight } =
+    React.useMemo(() => {
+      const filled: DepGraphStylesFilled = {
+        NODE_WIDTH: props.styles?.NODE_WIDTH ?? 150,
+        NODE_HEIGHT: props.styles?.NODE_HEIGHT ?? 52,
+        NODE_RX: props.styles?.NODE_RX ?? 8,
+        H_GAP: props.styles?.H_GAP ?? 75,
+        V_GAP: props.styles?.V_GAP ?? 30,
+        ARROW_SIZE: props.styles?.ARROW_SIZE ?? 6,
+        FONT_SIZE: props.styles?.FONT_SIZE ?? 16,
+        SUB_FONT_SIZE: props.styles?.SUB_FONT_SIZE ?? 13,
+        EDGE_FONT_SIZE: props.styles?.EDGE_FONT_SIZE ?? 11,
+      } as const;
 
-  const positioned: readonly PositionedNode[] = props.nodes.map((n) => ({
-    ...n,
-    ...getNodePixelPosition(n, styles),
-  }));
+      const positionedNodes: readonly PositionedNode[] = props.nodes.map(
+        (n) => ({
+          ...n,
+          ...getNodePixelPosition(n, filled),
+        }),
+      );
 
-  const nodeMap = new Map(positioned.map((n) => [n.id, n]));
+      const nodeMap = new Map(positionedNodes.map((n) => [n.id, n]));
 
-  const maxCol = Math.max(...props.nodes.map((n) => n.col), 0);
+      const maxCol = Math.max(...props.nodes.map((n) => n.col), 0);
 
-  const maxRow = Math.max(...props.nodes.map((n) => n.row), 0);
+      const maxRow = Math.max(...props.nodes.map((n) => n.row), 0);
 
-  // Extend SVG dimensions to include edge via-waypoints that may lie outside
-  // the node grid.
-  const viaPixels: readonly Vec2[] = props.edges.flatMap((e) =>
-    (e.via ?? []).map((v) => getGridPixelCenter(v.col, v.row, styles)),
-  );
+      // Extend SVG dimensions to include edge via-waypoints that may lie
+      // outside the node grid.
+      const viaPixels: readonly Vec2[] = props.edges.flatMap((e) =>
+        (e.via ?? []).map((v) => getGridPixelCenter(v.col, v.row, filled)),
+      );
 
-  const svgWidth = Math.max(
-    (maxCol + 1) * (styles.NODE_WIDTH + styles.H_GAP) - styles.H_GAP,
-    ...viaPixels.map((v) => v.x),
-  );
+      return {
+        styles: filled,
+        positioned: positionedNodes,
+        // An edge naming a node that does not exist is not drawn.
+        edges: props.edges.flatMap((e) => {
+          const from = nodeMap.get(e.from);
 
-  const svgHeight = Math.max(
-    (maxRow + 1) * (styles.NODE_HEIGHT + styles.V_GAP) - styles.V_GAP,
-    ...viaPixels.map((v) => v.y),
-  );
+          const to = nodeMap.get(e.to);
+
+          if (from === undefined || to === undefined) {
+            return [];
+          }
+
+          const edgeParams: EdgeParams = {
+            fromNode: from,
+            toNode: to,
+            fromSide: e.fromSide ?? 'right',
+            toSide: e.toSide ?? 'left',
+            via: e.via,
+            styles: filled,
+          } as const;
+
+          return [
+            {
+              key: `${e.from}-${e.to}`,
+              d: buildEdgePath(edgeParams),
+              label:
+                e.label === undefined
+                  ? undefined
+                  : { text: e.label, position: getEdgeMidpoint(edgeParams) },
+            },
+          ] as const;
+        }),
+        svgWidth: Math.max(
+          (maxCol + 1) * (filled.NODE_WIDTH + filled.H_GAP) - filled.H_GAP,
+          ...viaPixels.map((v) => v.x),
+        ),
+        svgHeight: Math.max(
+          (maxRow + 1) * (filled.NODE_HEIGHT + filled.V_GAP) - filled.V_GAP,
+          ...viaPixels.map((v) => v.y),
+        ),
+      } as const;
+    }, [props.styles, props.nodes, props.edges]);
 
   const pad = 16;
 
@@ -88,69 +126,43 @@ export const DepGraph = React.memo<Props>((props) => {
       </defs>
 
       {/* Edges */}
-      {props.edges.map((e) => {
-        const from = nodeMap.get(e.from);
-
-        const to = nodeMap.get(e.to);
-
-        if (from === undefined || to === undefined) {
-          return undefined;
-        }
-
-        const edgeKey = `${e.from}-${e.to}` as const;
-
-        const edgeParams: EdgeParams = {
-          fromNode: from,
-          toNode: to,
-          fromSide: e.fromSide ?? 'right',
-          toSide: e.toSide ?? 'left',
-          via: e.via,
-          styles,
-        } as const;
-
-        const d = buildEdgePath(edgeParams);
-
-        const labelPos =
-          e.label !== undefined ? getEdgeMidpoint(edgeParams) : undefined;
-
-        return (
-          <g key={edgeKey}>
-            <path
-              d={d}
-              fill={'none'}
-              markerEnd={'url(#arrow)'}
-              stroke={'var(--sl-color-gray-3, #6b7280)'}
-              strokeWidth={1.5}
-            />
-            {labelPos !== undefined && e.label !== undefined ? (
-              <>
-                <rect
-                  fill={'var(--sl-color-bg, #fff)'}
-                  height={styles.EDGE_FONT_SIZE + 4}
-                  rx={3}
-                  width={e.label.length * styles.EDGE_FONT_SIZE * 0.6 + 8}
-                  x={
-                    labelPos.x -
-                    (e.label.length * styles.EDGE_FONT_SIZE * 0.6 + 8) / 2
-                  }
-                  y={labelPos.y - (styles.EDGE_FONT_SIZE + 4) / 2}
-                />
-                <text
-                  dominantBaseline={'central'}
-                  fill={'var(--sl-color-gray-3, #6b7280)'}
-                  fontFamily={'system-ui, -apple-system, sans-serif'}
-                  fontSize={styles.EDGE_FONT_SIZE}
-                  textAnchor={'middle'}
-                  x={labelPos.x}
-                  y={labelPos.y}
-                >
-                  {e.label}
-                </text>
-              </>
-            ) : undefined}
-          </g>
-        );
-      })}
+      {edges.map((e) => (
+        <g key={e.key}>
+          <path
+            d={e.d}
+            fill={'none'}
+            markerEnd={'url(#arrow)'}
+            stroke={'var(--sl-color-gray-3, #6b7280)'}
+            strokeWidth={1.5}
+          />
+          {e.label === undefined ? undefined : (
+            <>
+              <rect
+                fill={'var(--sl-color-bg, #fff)'}
+                height={styles.EDGE_FONT_SIZE + 4}
+                rx={3}
+                width={e.label.text.length * styles.EDGE_FONT_SIZE * 0.6 + 8}
+                x={
+                  e.label.position.x -
+                  (e.label.text.length * styles.EDGE_FONT_SIZE * 0.6 + 8) / 2
+                }
+                y={e.label.position.y - (styles.EDGE_FONT_SIZE + 4) / 2}
+              />
+              <text
+                dominantBaseline={'central'}
+                fill={'var(--sl-color-gray-3, #6b7280)'}
+                fontFamily={'system-ui, -apple-system, sans-serif'}
+                fontSize={styles.EDGE_FONT_SIZE}
+                textAnchor={'middle'}
+                x={e.label.position.x}
+                y={e.label.position.y}
+              >
+                {e.label.text}
+              </text>
+            </>
+          )}
+        </g>
+      ))}
 
       {/* Nodes */}
       {positioned.map((n) => (

@@ -25,10 +25,13 @@ type MediaQueryState = Readonly<{
 export const useMedia = (query: string): MediaQueryState => {
   const mediaQueryList = useMemo(() => matchMedia(query), [query]);
 
-  const initialState: MediaQueryState = {
-    matches: mediaQueryList.matches,
-    media: mediaQueryList.media,
-  } as const;
+  const initialState = useMemo(
+    (): MediaQueryState => ({
+      matches: mediaQueryList.matches,
+      media: mediaQueryList.media,
+    }),
+    [mediaQueryList],
+  );
 
   const [state, setMediaState] = useState(initialState);
 

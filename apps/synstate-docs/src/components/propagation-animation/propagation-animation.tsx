@@ -104,15 +104,11 @@ export const PropagationAnimation = React.memo<Props>((props) => {
 
   const frame = animFrames[index];
 
-  if (frame === undefined) {
-    return undefined;
-  }
-
   const isFirst = index === 0;
 
   const isLast = index === lastIndex;
 
-  return (
+  return frame === undefined ? undefined : (
     <figure style={figureStyle}>
       <AnimationDrawing
         animation={anim}

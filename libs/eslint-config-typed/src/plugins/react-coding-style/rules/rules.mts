@@ -8,6 +8,8 @@ import { propsTypeAnnotationStyleRule } from './props-type-annotation-style.mjs'
 import { reactMemoPropsArgumentNameRule } from './react-memo-props-argument-name.mjs';
 import { reactMemoTypeParameterRule } from './react-memo-type-parameter.mjs';
 import { requireReactMemoRule } from './require-react-memo.mjs';
+import { requireUseMemoRule } from './require-use-memo.mjs';
+import { singleJsxReturnRule } from './single-jsx-return.mjs';
 import { useMemoHooksStyleRule } from './use-memo-hooks-style.mjs';
 
 export const reactCodingStyleRules = {
@@ -18,6 +20,8 @@ export const reactCodingStyleRules = {
   'react-memo-props-argument-name': reactMemoPropsArgumentNameRule,
   'react-memo-type-parameter': reactMemoTypeParameterRule,
   'require-react-memo': requireReactMemoRule,
+  'require-use-memo': requireUseMemoRule,
+  'single-jsx-return': singleJsxReturnRule,
   'use-memo-hook-style': useMemoHooksStyleRule,
   'ban-use-imperative-handle-hook': banUseImperativeHandleHook,
   'display-name': displayNameRule,

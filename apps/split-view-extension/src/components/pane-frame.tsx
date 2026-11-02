@@ -309,7 +309,10 @@ export const PaneFrame = memoNamed(
     }, [dispatch, onNavigate, pane.id]);
 
     /** Known from the address alone: the browser frames none of these. */
-    const browserRefusal = unframeableKindOf(address);
+    const browserRefusal = React.useMemo(
+      () => unframeableKindOf(address),
+      [address],
+    );
 
     /**
      * The pane is not showing the page it was asked for.
@@ -332,7 +335,7 @@ export const PaneFrame = memoNamed(
      */
     const blockedBySite = blocked && browserRefusal === undefined;
 
-    const siteOrigin = originOf(address);
+    const siteOrigin = React.useMemo(() => originOf(address), [address]);
 
     /** There is a site to clear a worker for, and a worker might be the cause. */
     const canClearServiceWorkers = blockedBySite && siteOrigin !== undefined;
@@ -344,8 +347,10 @@ export const PaneFrame = memoNamed(
      */
     const canRetry = blockedBySite && !agentSeen;
 
-    const alwaysReset =
-      siteOrigin !== undefined && resetOrigins.includes(siteOrigin);
+    const alwaysReset = React.useMemo(
+      () => siteOrigin !== undefined && resetOrigins.includes(siteOrigin),
+      [siteOrigin, resetOrigins],
+    );
 
     /**
      * A clear is running, or is about to run, so this pane has not finished
@@ -639,10 +644,13 @@ export const PaneFrame = memoNamed(
     const showResetToggle =
       siteOrigin !== undefined && (alwaysReset || blockedBySite);
 
-    const resetToggleTitle =
-      siteOrigin === undefined
-        ? ''
-        : resetToggleTitleOf(siteOrigin, alwaysReset);
+    const resetToggleTitle = React.useMemo(
+      () =>
+        siteOrigin === undefined
+          ? ''
+          : resetToggleTitleOf(siteOrigin, alwaysReset),
+      [siteOrigin, alwaysReset],
+    );
 
     const handleToggleAlwaysReset = React.useCallback((): void => {
       if (siteOrigin !== undefined) {
@@ -795,7 +803,10 @@ export const PaneFrame = memoNamed(
       [pane.zoom],
     );
 
-    const zoomLabel = formatPaneZoom(pane.zoom);
+    const zoomLabel = React.useMemo(
+      () => formatPaneZoom(pane.zoom),
+      [pane.zoom],
+    );
 
     /**
      * Whether this pane is too narrow for its whole toolbar.
@@ -953,12 +964,18 @@ export const PaneFrame = memoNamed(
       ],
     );
 
-    const label = pane.title ?? hostnameOf(address) ?? 'Empty pane';
+    const label = React.useMemo(
+      () => pane.title ?? hostnameOf(address) ?? 'Empty pane',
+      [pane.title, address],
+    );
 
-    const faviconUrl =
-      address === ''
-        ? undefined
-        : chrome.runtime.getURL(`/_favicon/?${faviconQuery(address)}`);
+    const faviconUrl = React.useMemo(
+      () =>
+        address === ''
+          ? undefined
+          : chrome.runtime.getURL(`/_favicon/?${faviconQuery(address)}`),
+      [address],
+    );
 
     return (
       <section

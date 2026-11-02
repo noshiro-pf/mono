@@ -696,6 +696,9 @@ local name instead of writing one the file does not have.
 | `use-memo-hook-style`            | Forbid type assertions/annotations inside and around `React.useMemo`; annotate via type parameter or variable instead |
 | `ban-use-imperative-handle-hook` | Forbid `React.useImperativeHandle`; move logic to the parent component                                                |
 | `display-name`                   | Require explicit `displayName` on React.memo components                                                               |
+| `require-react-memo`             | Require React components to be wrapped with `React.memo`                                                              |
+| `require-use-memo`               | Require a value a component or hook computes in its body to be memoized unless it is a primitive O(1) expression      |
+| `single-jsx-return`              | Require a function that returns JSX to have one `return` statement                                                    |
 
 #### ts-data-forge
 

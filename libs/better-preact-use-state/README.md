@@ -198,9 +198,9 @@ The initial value and the argument of `setState` are passed to Preact's `useStat
 ```ts
 const [{ fn }, setFn] = useState({ fn: initialFn });
 
-const onReplace = (): void => {
+const onReplace = useCallback((): void => {
     setFn({ fn: nextFn });
-};
+}, [setFn, nextFn]);
 ```
 
 ## License

@@ -53,7 +53,10 @@ export const WorkspacePicker = memoNamed(
 
     const [root, setRoot] = React.useState<HTMLSpanElement | null>(null);
 
-    const active = registry.entries.find((entry) => entry.id === activeId);
+    const active = React.useMemo(
+      () => registry.entries.find((entry) => entry.id === activeId),
+      [registry.entries, activeId],
+    );
 
     const handleSelect = React.useCallback<
       React.ChangeEventHandler<HTMLSelectElement>

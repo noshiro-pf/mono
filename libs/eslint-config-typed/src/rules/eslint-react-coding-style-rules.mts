@@ -10,6 +10,15 @@ export const eslintReactCodingStyleRules = {
   'react-coding-style/react-memo-props-argument-name': 'error',
   'react-coding-style/react-memo-type-parameter': 'error',
   'react-coding-style/require-react-memo': ['error', {}],
+  'react-coding-style/require-use-memo': [
+    'error',
+    // `memoNamed` (`react-utils`, `preact-utils`) wraps `React.memo`.
+    { componentWrappers: ['memoNamed'] },
+  ],
+  'react-coding-style/single-jsx-return': [
+    'error',
+    { componentWrappers: ['memoNamed'] },
+  ],
   'react-coding-style/ban-use-imperative-handle-hook': 'error',
   'react-coding-style/use-memo-hook-style': 'error',
   'react-coding-style/display-name': ['error', {}],

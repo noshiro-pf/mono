@@ -73,66 +73,75 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
   const clipPathId = React.useId();
 
   // Collect all non-undefined values to determine Y range
-  const allValues = series.flatMap((s) =>
-    s.values.filter((v): v is number => v !== undefined),
-  );
-
-  if (Arr.isEmpty(allValues)) {
-    return undefined;
-  }
-
-  const yMin = logScale ? Math.max(0.1, Math.min(...allValues)) : 0;
-
-  const scaleValues = scaleByCompleteSeries
-    ? series
-        .filter((s) => s.values.every((v) => v !== undefined))
-        .flatMap((s) => s.values.filter((v): v is number => v !== undefined))
-    : allValues;
-
-  // The timeout line does not raise an axis the complete series set: it is
-  // above every value they have, and would flatten them all over again
-  const yMaxRaw = Math.max(
-    ...(Arr.isEmpty(scaleValues) ? allValues : scaleValues),
-    scaleByCompleteSeries ? 0 : (timeoutMs ?? 0),
-  );
-
-  const yMax = yMaxRaw * 1.1;
-
-  const toY = createToY(PLOT_H, yMin, yMax, logScale);
-
-  // Lines are drawn through the true position and clipped to the plot, so that
-  // a line leaving the scale keeps its slope. The log scale clamps only at the
-  // bottom, so it maps a value above the top past it already.
-  const toLineY = logScale ? toY : createUnclampedLinearToY(PLOT_H, yMax);
-
-  // Per X label, the series above the top there, in legend order
-  const offScale = xLabels.map((_, i) =>
-    series
-      .map((s) => ({ label: s.label, color: s.color, value: s.values[i] }))
-      .filter(
-        (p): p is Readonly<{ label: string; color: string; value: number }> =>
-          p.value !== undefined && p.value > yMax,
+  const allValues = React.useMemo(
+    () =>
+      series.flatMap((s) =>
+        s.values.filter((v): v is number => v !== undefined),
       ),
+    [series],
   );
 
-  const toX = (i: number): number =>
-    Arr.isMaxLengthArray(1, xLabels)
-      ? PLOT_W / 2
-      : // the guard above rules out a zero denominator
-        // eslint-disable-next-line total-functions/no-partial-division
-        (i / (xLabels.length - 1)) * PLOT_W;
+  const layout = React.useMemo(() => {
+    if (Arr.isEmpty(allValues)) {
+      return undefined;
+    }
 
-  // The naive forms first, so that the lines they cross are drawn over them
-  const drawOrder = series.toSorted(
-    (a, b) => Number(b.naive === true) - Number(a.naive === true),
-  );
+    const yMin = logScale ? Math.max(0.1, Math.min(...allValues)) : 0;
 
-  // Y-axis tick values
-  const yTicks = logScale
-    ? generateLogTicks(yMin, yMax)
-    : generateLinearTicks(yMax);
+    const scaleValues = scaleByCompleteSeries
+      ? series
+          .filter((s) => s.values.every((v) => v !== undefined))
+          .flatMap((s) => s.values.filter((v): v is number => v !== undefined))
+      : allValues;
 
-  return (
+    // The timeout line does not raise an axis the complete series set: it is
+    // above every value they have, and would flatten them all over again
+    const yMaxRaw = Math.max(
+      ...(Arr.isEmpty(scaleValues) ? allValues : scaleValues),
+      scaleByCompleteSeries ? 0 : (timeoutMs ?? 0),
+    );
+
+    const yMax = yMaxRaw * 1.1;
+
+    const toY = createToY(PLOT_H, yMin, yMax, logScale);
+
+    return {
+      yMin,
+      yMax,
+      toY,
+      // Lines are drawn through the true position and clipped to the plot, so
+      // that a line leaving the scale keeps its slope. The log scale clamps
+      // only at the bottom, so it maps a value above the top past it already.
+      toLineY: logScale ? toY : createUnclampedLinearToY(PLOT_H, yMax),
+      // Per X label, the series above the top there, in legend order
+      offScale: xLabels.map((_, i) =>
+        series
+          .map((s) => ({ label: s.label, color: s.color, value: s.values[i] }))
+          .filter(
+            (
+              p,
+            ): p is Readonly<{ label: string; color: string; value: number }> =>
+              p.value !== undefined && p.value > yMax,
+          ),
+      ),
+      toX: (i: number): number =>
+        Arr.isMaxLengthArray(1, xLabels)
+          ? PLOT_W / 2
+          : // the guard above rules out a zero denominator
+            // eslint-disable-next-line total-functions/no-partial-division
+            (i / (xLabels.length - 1)) * PLOT_W,
+      // The naive forms first, so that the lines they cross are drawn over them
+      drawOrder: series.toSorted(
+        (a, b) => Number(b.naive === true) - Number(a.naive === true),
+      ),
+      // Y-axis tick values
+      yTicks: logScale
+        ? generateLogTicks(yMin, yMax)
+        : generateLinearTicks(yMax),
+    } as const;
+  }, [allValues, series, xLabels, logScale, scaleByCompleteSeries, timeoutMs]);
+
+  return layout === undefined ? undefined : (
     <div style={figureStyle}>
       <svg
         style={svgStyle}
@@ -153,42 +162,44 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
             </clipPath>
           </defs>
           {/* Grid lines */}
-          {yTicks.map((tick) => (
+          {layout.yTicks.map((tick) => (
             <line
               key={tick}
               stroke={'var(--sl-color-gray-5, #e5e7eb)'}
               strokeWidth={0.5}
               x1={0}
               x2={PLOT_W}
-              y1={toY(tick)}
-              y2={toY(tick)}
+              y1={layout.toY(tick)}
+              y2={layout.toY(tick)}
             />
           ))}
 
           {/* Timeout line */}
-          {timeoutMs !== undefined && timeoutMs <= yMax ? (
+          {timeoutMs !== undefined && timeoutMs <= layout.yMax ? (
             <line
               stroke={'#ef4444'}
               strokeDasharray={'6,4'}
               strokeWidth={1}
               x1={0}
               x2={PLOT_W}
-              y1={toY(timeoutMs)}
-              y2={toY(timeoutMs)}
+              y1={layout.toY(timeoutMs)}
+              y2={layout.toY(timeoutMs)}
             />
           ) : undefined}
 
           {/* Data lines + dots */}
-          {drawOrder.map((s) => {
+          {layout.drawOrder.map((s) => {
             const style = lineStyleOf(s.naive);
 
             const points = s.values
               .map((v, i) =>
                 v !== undefined
                   ? {
-                      x: toX(i),
-                      y: toLineY(logScale ? Math.max(v, yMin) : v),
-                      clipped: v > yMax,
+                      x: layout.toX(i),
+                      y: layout.toLineY(
+                        logScale ? Math.max(v, layout.yMin) : v,
+                      ),
+                      clipped: v > layout.yMax,
                     }
                   : undefined,
               )
@@ -231,18 +242,18 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
            * one label per X so that two series off the scale at the same X are
            * written side by side rather than drawn over each other
            */}
-          {offScale.map((points, i) =>
+          {layout.offScale.map((points, i) =>
             Arr.isNonEmpty(points) ? (
               <g key={xLabels[i] ?? i.toString()}>
                 <polygon
                   fill={points[0].color}
-                  points={clippedMarkerPoints(toX(i))}
+                  points={clippedMarkerPoints(layout.toX(i))}
                 />
                 <text
                   fontSize={10}
                   fontWeight={600}
                   textAnchor={'middle'}
-                  x={toX(i)}
+                  x={layout.toX(i)}
                   y={-7}
                 >
                   {points.map((p, j) => (
@@ -265,7 +276,7 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
             y1={0}
             y2={PLOT_H}
           />
-          {yTicks.map((tick) => (
+          {layout.yTicks.map((tick) => (
             <text
               key={tick}
               dominantBaseline={'middle'}
@@ -273,7 +284,7 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
               fontSize={11}
               textAnchor={'end'}
               x={-8}
-              y={toY(tick)}
+              y={layout.toY(tick)}
             >
               {formatTickLabel(tick)}
             </text>
@@ -306,7 +317,7 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
               fill={'var(--sl-color-gray-3, #6b7280)'}
               fontSize={11}
               textAnchor={'middle'}
-              x={toX(i)}
+              x={layout.toX(i)}
               y={PLOT_H + 8}
             >
               {label}

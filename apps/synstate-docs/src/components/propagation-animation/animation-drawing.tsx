@@ -25,22 +25,29 @@ export const AnimationDrawing = React.memo<Props>((props) => {
 
   const { scenario } = animation;
 
-  const maxDepth = Math.max(...scenario.nodes.map((n) => n.depth));
+  const { maxDepth, height, center } = React.useMemo(() => {
+    const deepest = Math.max(...scenario.nodes.map((n) => n.depth));
 
-  const height = rowY(maxDepth) + nodeRadius + 52;
+    const nodeX = new Map(scenario.nodes.map((n) => [n.id, n.x]));
 
-  const nodeX = new Map(scenario.nodes.map((n) => [n.id, n.x]));
+    const nodeDepth = new Map(scenario.nodes.map((n) => [n.id, n.depth]));
 
-  const nodeDepth = new Map(scenario.nodes.map((n) => [n.id, n.depth]));
+    return {
+      maxDepth: deepest,
+      height: rowY(deepest) + nodeRadius + 52,
+      center: (id: string): Point =>
+        ({
+          x: nodeX.get(id) ?? 0,
+          y: rowY(nodeDepth.get(id) ?? 0),
+        }) as const,
+    } as const;
+  }, [scenario.nodes]);
 
-  const center = (id: string): Point =>
-    ({
-      x: nodeX.get(id) ?? 0,
-      y: rowY(nodeDepth.get(id) ?? 0),
-    }) as const;
-
-  const highlightOf = (from: string, to: string): EdgeHighlight | undefined =>
-    frame.edges.find((e) => e.from === from && e.to === to);
+  const highlightOf = React.useCallback(
+    (from: string, to: string): EdgeHighlight | undefined =>
+      frame.edges.find((e) => e.from === from && e.to === to),
+    [frame.edges],
+  );
 
   const sourceId = scenario.nodes[0]?.id ?? '';
 

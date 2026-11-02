@@ -24,6 +24,7 @@ export const useNumericInputState = <N extends number>({
   // caller passing them inline did not re-run the effect that reset the text.
   // Reading a ref during render is what the React Compiler rejects, and the ref
   // bought little — see the reset below, which no longer is an effect.
+  // eslint-disable-next-line react-coding-style/require-use-memo -- callers pass `encode` inline, so a memo depending on it would never hit
   const dirty = state !== encode(valueFromProps);
 
   // When the value arrives changed from outside, the text is reset to match.

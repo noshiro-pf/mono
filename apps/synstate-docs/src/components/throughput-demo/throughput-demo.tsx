@@ -96,11 +96,7 @@ export const ThroughputDemo = React.memo(() => {
         {adapters.map((adapter) => {
           const handler = toggleHandlers.get(adapter.name);
 
-          if (handler === undefined) {
-            return undefined;
-          }
-
-          return (
+          return handler === undefined ? undefined : (
             <ThroughputCanvas
               key={adapter.name}
               adapter={adapter}
