@@ -21,12 +21,15 @@ by case. In order:
 
 1. **Format** the diff (`z:format-diff-from <base>`), so that a generator's
    own `fix:fmt` is not later blamed for formatting a hand-edited file.
-2. **Generators**: `gen` in every touched package, and `gen:deps-graph` for a
-   manifest or the lockfile. **A generator that changes the tree fails the
-   run**, naming itself and the files; that is the dirty tree CI's
-   `assert-repo-is-clean` reports with no hint which generator wrote it. Only
-   the run in which it writes fails: a later run cannot tell its output, left
-   uncommitted, from a hand edit, so commit it before moving on.
+2. **Generators**: `gen` in every touched package, `gen:deps-graph` for a
+   manifest or the lockfile, and `gen:verify-npm-packages` for any change
+   that is not prose alone, since its committed `local/` copies are written
+   from `smoke/`, the manifests and the generator's own code. **A generator
+   that changes the tree fails the run**, naming itself and the files; that
+   is the dirty tree CI's `assert-repo-is-clean` reports with no hint which
+   generator wrote it. Only the run in which it writes fails: a later run
+   cannot tell its output, left uncommitted, from a hand edit, so commit it
+   before moving on.
 3. **Fixers**: the codemod over the diff (`z:ts-codemod --diff-from`, plus
    `--uncommitted` when there are untracked files, which `--diff-from` cannot
    see), then `fix:lint` in every package whose code changed, so that what the
@@ -76,8 +79,13 @@ What depends on a changed package is not built or checked, so a stale
 `dist/` in a dependent goes unnoticed; build first (`ws:build:deps`) after a
 change other packages consume. Nor are the packages a change to
 `tools/configs/` configures; the run says which `ws:*` commands to reach for.
-Under `strict-lib/` only the tooling's type check, lint and oxfmt run; the
-generators, which rewrite thousands of files, are `strict-lib-gen.yml`'s.
+`verify:npm-packages` (pack, install and run the smoke checks) does not run
+either: a change to `verify-npm-packages/smoke/` is regenerated into its
+`local/` copies, not run.
+Under `strict-lib/` only the tooling's type check, lint and oxfmt run, and
+`gen:verify-npm-packages`, which copies the published bundles' manifests; the
+strict-lib generators, which rewrite thousands of files, are
+`strict-lib-gen.yml`'s.
 Browser tests, end-to-end tests and `ws:check:dist` are not run, nor is
 `check:cspell` over the whole tree, so a `words` entry that the diff made dead
 is not found.
