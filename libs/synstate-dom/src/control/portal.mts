@@ -1,4 +1,5 @@
 import { onScopeDispose } from 'synstate';
+import { appendTo, mountThenInsert } from '../internal/index.mjs';
 import { mountChild, mountable, type Child, type JSX } from '../jsx/index.mjs';
 
 /**
@@ -18,9 +19,12 @@ export const Portal = ({
   children: Child;
 }>): JSX.Element =>
   mountable(() => {
-    const nodes = mountChild(children);
-
-    (target ?? document.body).append(...nodes);
+    const nodes = mountThenInsert(
+      mountChild,
+      children,
+      appendTo,
+      target ?? document.body,
+    );
 
     onScopeDispose(() => {
       for (const node of nodes) {

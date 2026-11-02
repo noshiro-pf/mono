@@ -6,7 +6,12 @@ import {
 } from 'synstate';
 import { Arr } from 'ts-data-forge';
 import type { Bindable } from '../constant/index.mjs';
-import { bindValue } from '../internal/index.mjs';
+import {
+  applyWhenAttached,
+  bindValue,
+  insertBefore,
+  mountThenInsert,
+} from '../internal/index.mjs';
 import { toNodes, type Mountable, type MountedNodes } from '../jsx/index.mjs';
 
 /**
@@ -22,6 +27,10 @@ import { toNodes, type Mountable, type MountedNodes } from '../jsx/index.mjs';
  *
  * `branch` runs inside the new scope, so whatever it creates belongs to the
  * branch.
+ *
+ * A value that arrives before the anchor is in a parent (a later sibling wrote
+ * it while the enclosing element was still mounting its children) is kept, and
+ * the switch follows the latest one once the nodes it returned are inserted.
  */
 export const mountSwitch = <V, K>(
   value: Bindable<V>,
@@ -37,17 +46,8 @@ export const mountSwitch = <V, K>(
     initialNodes: readonly ChildNode[];
   } = { current: undefined, initialNodes: [] };
 
-  bindValue(value, (v) => {
-    const key = keyOf(v);
-
-    if (mut_state.current !== undefined) {
-      if (Object.is(mut_state.current.key, key)) {
-        return;
-      }
-
-      mut_state.current.scope.dispose();
-    }
-
+  /** Mounts the branch for `v` in a scope of its own and returns its nodes. */
+  const mountBranch = (key: K, v: V): readonly ChildNode[] => {
     const scope = createScope(parent);
 
     const nodes = scope.run(() => {
@@ -64,10 +64,31 @@ export const mountSwitch = <V, K>(
 
     mut_state.current = { key, scope };
 
-    if (anchor.parentNode === null) {
-      mut_state.initialNodes = nodes;
+    return nodes;
+  };
+
+  /** Switches the attached switch to the branch for `v`. */
+  const switchTo = (v: V): void => {
+    const key = keyOf(v);
+
+    if (mut_state.current !== undefined) {
+      if (Object.is(mut_state.current.key, key)) {
+        return;
+      }
+
+      mut_state.current.scope.dispose();
+    }
+
+    mountThenInsert((k: K) => mountBranch(k, v), key, insertBefore, anchor);
+  };
+
+  const switchWhenAttached = applyWhenAttached(anchor, switchTo);
+
+  bindValue(value, (v) => {
+    if (mut_state.current === undefined) {
+      mut_state.initialNodes = mountBranch(keyOf(v), v);
     } else {
-      anchor.before(...nodes);
+      switchWhenAttached(v);
     }
   });
 

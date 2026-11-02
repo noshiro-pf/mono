@@ -215,7 +215,7 @@ type MountedNodes = Node | readonly Node[];
 
 `mount()` は常に呼び出し側のスコープの `run` の中で呼ばれる。
 
-- **要素**: `document.createElement`（SVG は名前空間付き）→ `ref` → 子を順にマウントして append → 属性・プロパティ・イベントの束縛（「7」）。子を先にするのは、`<select>` の `value` が書かれる時点で `<option>` がそろっているようにするためである。要素ごとにスコープは作らない。
+- **要素**: `document.createElement`（SVG は名前空間付き）→ `ref` → 子を順にマウントして append し、マウント中に保留された更新を適用する（「8.1」）→ 属性・プロパティ・イベントの束縛（「7」）。子を先にするのは、`<select>` の `value` が書かれる時点で `<option>` がそろっているようにするためである。要素ごとにスコープは作らない。
 - **コンポーネント**: 関数を `props` で 1 回呼び、返った `Mountable` をマウントする。コンポーネントごとにスコープは作らない（「6.4」）。
 - **子要素**: `Mountable` はマウント、`Bindable<string | number>` は Text ノード（「7.2」）、配列は平坦化して順に処理する。
 
@@ -246,17 +246,39 @@ export const render = (
 ): (() => void) => {
     const root = createScope(undefined);
 
-    const nodes = root.run(() => mountNodes(app()));
+    let nodes: readonly ChildNode[] = [];
 
-    container.append(...toArray(nodes));
-
-    return () => {
+    const unmount = () => {
         root.dispose();
 
-        for (const n of toArray(nodes)) n.remove();
+        for (const n of nodes) n.remove();
     };
+
+    try {
+        // マウントし、append し、保留された更新を適用する（「8.1」）
+        root.run(() =>
+            mountThenInsert(
+                (a: typeof app) => toArray(mountNodes(a())),
+                app,
+                (into: Element, mounted: readonly ChildNode[]) => {
+                    nodes = mounted;
+
+                    into.append(...mounted);
+                },
+                container,
+            ),
+        );
+    } catch (error) {
+        unmount();
+
+        throw error;
+    }
+
+    return unmount;
 };
 ```
+
+保留された更新は append の後に適用されるので、そこで例外が出ると `app` はすでに `container` に入っている。返す関数がないまま残さないよう、外してから例外を投げ直す。
 
 `app` はコンポーネント（`() => JSX.Element`）を受け取り、`render(<App />, el)` ではなく `render(App, el)` と書く。どちらでも `App()` が `root.run` の中で 1 回だけ呼ばれる点は同じだが、関数で受けるほうが「ここで評価される」ことが読み取りやすい。
 
@@ -351,6 +373,8 @@ export declare const view: <A, T>(
 ### 8.1 位置の目印
 
 `If`・`Match`・`For` はラッパー要素を作らず、範囲の終わりを示すコメントノード（アンカー）を置く。中身の挿入は `anchor.before(...)`、削除は範囲内のノードの `remove()` で行う。マウント結果は `[...中身, anchor]` になる。
+
+ノードはマウントしてから挿入するので（要素は子をすべてマウントしてから append し、`render` はアプリ全体をマウントしてから append する）、後からマウントされた兄弟が `If` や `For` の読む state に書き込むと、アンカーがまだどの親にも入っていないうちに更新が届く（#2935）。このときは更新を捨てずに最新の値だけを持っておき、その `If` や `For` をマウントした時点で開いていたマウント（要素・`render`・`Portal`・行・分岐）がノードを挿入した直後に適用する。それまでに `If` や `For` が破棄されていれば（アンカーが親から外れていれば）何もしない。アンカーが親に入った後の更新はその場で適用し、保留中の値は捨てる。マウントと挿入はすべて `mountThenInsert` を通す。どのマウントの中でもなく手で `mount()` した記述は、挿入前の更新を捨てる。
 
 分岐の中身のノードは、その分岐のスコープの `onScopeDispose` で外す。分岐の先頭に別の `If` があると中身のノードが後から入れ替わるので、外側がマウント時のノードの一覧を持っていても正しく外せないためである。親が持つ一覧には古いノードが残りうるが、外れたノードの `remove()` は何もしないので害はない。`For` は行を並べ替えるときに行の今のノードが要るので、行ごとに先頭のコメントノードを置き、そこから次の行の先頭（またはアンカー）の手前までを行のノードとする。
 
