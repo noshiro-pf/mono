@@ -40,3 +40,12 @@ export const externalHref = (url: string): ExternalHref => {
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the one place an `ExternalHref` is made
   return url as ExternalHref;
 };
+
+/**
+ * Whether a link's destination is a page of this application rather than an
+ * `externalHref`: an `Href` is a path, and an `ExternalHref` an absolute URL.
+ * A binding's `Link` routes only an `Href`, so an `ExternalHref` to this origin
+ * still loads the page.
+ */
+export const isHref = (to: Href | ExternalHref): to is Href =>
+  to.startsWith('/');

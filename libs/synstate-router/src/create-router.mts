@@ -2,6 +2,7 @@ import {
   createState,
   keepEqualParts,
   map,
+  untracked,
   type InitializedObservable,
   type Observable,
 } from 'synstate';
@@ -307,19 +308,24 @@ export const createRouter = <R extends AnyRoutes>(
     return snapshot;
   };
 
-  const [snapshot$, setSnapshot, { getSnapshot }] = createState(read(), {
-    equals: (a, b) => a.location.href === b.location.href,
-  });
+  // Every observable of the router is made outside every scope: the router
+  // outlives a component, a test or a `scope.run` that happened to create it,
+  // and so does what `at` and `isActive` cache.
+  const [snapshot$, setSnapshot, { getSnapshot }] = untracked(() =>
+    createState(read(), {
+      equals: (a, b) => a.location.href === b.location.href,
+    }),
+  );
 
   const update = (): void => {
     setSnapshot(read());
   };
 
-  const match = snapshot$
-    .pipe(map((s) => s.match))
-    .pipe(keepEqualParts<RouteMatch<R>>());
+  const match = untracked(() =>
+    snapshot$.pipe(map((s) => s.match)).pipe(keepEqualParts<RouteMatch<R>>()),
+  );
 
-  const location = snapshot$.pipe(map((s) => s.location));
+  const location = untracked(() => snapshot$.pipe(map((s) => s.location)));
 
   // Scrolling
 
@@ -559,11 +565,14 @@ export const createRouter = <R extends AnyRoutes>(
   ): InitializedObservable<Optional<RouteNodeValues<N>>> => {
     assertOwnNode(node, 'at');
 
+    // Outside every scope, as above: the first caller may be a component.
     const cached =
       mut_atCache.get(node.id) ??
-      match
-        .pipe(map((m) => matchAt(node, m)))
-        .pipe(keepEqualParts<Optional<unknown>>());
+      untracked(() =>
+        match
+          .pipe(map((m) => matchAt(node, m)))
+          .pipe(keepEqualParts<Optional<unknown>>()),
+      );
 
     mut_atCache.set(node.id, cached);
 
@@ -583,11 +592,14 @@ export const createRouter = <R extends AnyRoutes>(
 
     const key = `${exact ? 'exact' : 'prefix'}:${node.id}` as const;
 
+    // Outside every scope, as above.
     const cached =
       mut_isActiveCache.get(key) ??
-      match.pipe(
-        map((m) =>
-          exact ? m.route === node.id : isAtOrBelow(m.route, node.id),
+      untracked(() =>
+        match.pipe(
+          map((m) =>
+            exact ? m.route === node.id : isAtOrBelow(m.route, node.id),
+          ),
         ),
       );
 

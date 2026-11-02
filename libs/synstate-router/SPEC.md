@@ -5,7 +5,7 @@
 
 アプリが書く遷移先・パスパラメータ・検索パラメータをすべて型で検査し、現在地を synstate の Observable として配るクライアントサイドルーターの実装仕様。v1 の目標は「文字列で書いた URL がどこにも残らない」ことで、TanStack Router と同等以上の型安全性を、コード生成も module augmentation もなしに得る。
 
-- 状態: 仕様 v1 確定（2026-11-02）。実装は「11. 実装計画」の順に進めており、3（`createRouter`）まで入っている。
+- 状態: 仕様 v1 確定（2026-11-02）。実装は「11. 実装計画」の順に進めており、5（`synstate-router-dom`）まで入っている。
 - 出典: issue [#1733](https://github.com/noshiro-pf/mono/issues/1733)、途中まで実装した branch [`archive/migrate/synstate--add-synstate-router`](https://github.com/noshiro-pf/mono/tree/archive/migrate/synstate--add-synstate-router)（その `libs/synstate-react-router/design-docs/` の DESIGN.md と api-design-research.md に議論がある）、`apps/tiny-router-observable` とその不具合 [#2912](https://github.com/noshiro-pf/mono/issues/2912)・[#2954](https://github.com/noshiro-pf/mono/issues/2954)・[#2956](https://github.com/noshiro-pf/mono/issues/2956)・[#3033](https://github.com/noshiro-pf/mono/issues/3033)。
 
 ## 1. 目的と範囲
@@ -119,7 +119,7 @@ export const routes = defineRoutes({
 
 - `match` / `matchExact` は自分のパターンだけを見ず、`defineRoutes` が持つツリー全体で照合した結果から答える。後戻り（「3.1」）で `/users/new/posts/` が `users.item.posts` に決まったとき、`routes.users.new.match` は None になる。どのページにも一致しない URL では、どのノードも None。`router.at`・`isActive`・`Routes` の `prefix` も同じ定義に従うので、表示中のページとレイアウトや強調表示が食い違わない。
 - params は祖先の分も含む（`reviews.item` は `{ productId: SafeInt; reviewId: string }`）。search は宣言したノードとその子孫が継承する。
-- `Href` は `Brand<string, 'synstate-router/Href'>`（ts-type-forge）。中身はベースパスを含まないアプリ内のパス（`/products/42/`）で、`string` から `Href` へは変換できない。ベースパスを知っているのはルーターなので、`<a>` の属性には `Link` か `router.toUrl(href)` を通して書く（`Link` はベースパスを付けた URL を `href` 属性に書く）。例外は 2 つだけで、名前で意図を示す: 外部 URL の `externalHref(url)`（受け取るのは `Link` だけで、`push` は受けない）と、外から来た URL を照合してから使う `router.parseHref(url): Optional<Href>`。
+- `Href` は `Brand<string, 'synstate-router/Href'>`（ts-type-forge）。中身はベースパスを含まないアプリ内のパス（`/products/42/`）で、`string` から `Href` へは変換できない。ベースパスを知っているのはルーターなので、`<a>` の属性には `Link` か `router.toUrl(href)` を通して書く（`Link` はベースパスを付けた URL を `href` 属性に書く）。例外は 2 つだけで、名前で意図を示す: 外部 URL の `externalHref(url)`（受け取るのは `Link` だけで、`push` は受けない）と、外から来た URL を照合してから使う `router.parseHref(url): Optional<Href>`。どちらかを受ける側は `isHref(to)`（`/` で始まるかどうか）で見分ける。バインディングの `Link` はこれが真のときだけルーターに回す。
 - 生成では params を RFC 3986 の path segment 規則で encode し、照合では decode してから codec に渡す。`productId` が `'a/b'` でも 1 セグメントのまま往復する。
 - `href` は各 params を encode した結果を同じ codec の decode に通し、None なら例外を投げる。`param.string` に `''` を渡す、`param.refine` の guard を満たさない値を渡すなど、型を通っても一致しない URL は作らせない。型でも防ぎたい値は refine した型（`UserId` など）で受ける。さらに、作ったパスをツリー全体で照合し直し、自分と違うルートに決まったら例外を投げる（`users.new` があるときの `routes.users.item.href({ userId: 'new' })` など）。
 
@@ -217,7 +217,7 @@ type M = RouteMatch<typeof routes>;
 3. **ナビゲーションはイベントハンドラーから呼ぶ。** `push` は state への書き込みなので、購読者の中から呼ぶと synstate の伝播中書き込み警告になる。eslint-plugin-synstate の `no-write-during-propagation` が `router.push` も検出できるよう、型情報で追える形（メソッドが state の setter を呼ぶ）にしておく。
 4. **URL は定義から一意に決まる。** 末尾スラッシュは `trailingSlash: 'always' | 'never'`（既定値 `'always'`）で統一する。照合ではどちらも受け、正規形でない URL（`/products`）は、最初の読み込みと `popstate` のたびに状態を流す前に正規形へ `replaceState` する（リダイレクトと同じ扱い）。`isActive` や `Link` の「同じ URL なら `replace`」は正規形同士で比べる。ベースパスは tiny-router-observable と同じく、アプリがルートにあるものとして扱う。URL 全体を渡されたらそのパスを使い、`./` のような相対のベースはパスを持たないので例外にする。照合は空のセグメント（`//`）を含むパスを一致させない（`href` は書かず、URL では host の始まりと読まれるため）。
 5. **ブラウザは注入できる。** `RouterBrowser` と `createMemoryBrowser` を tiny-router-observable から移し、store を factory にして Node でテストする既存の書き方（#2094 の流れ）をそのまま使える。ただし `popstate` は後の task に届くので（1）、履歴移動を確かめるテストは待つ必要がある。`createRouter` は `window` を呼び出し時にしか読まない。
-6. **スクロール。** パスと検索パラメータが今と同じで `hash` だけが違う遷移は、`push` は `pushState` を使わず `location.hash` への代入でブラウザに任せる（スクロール、`hashchange`、`:target` が揃う。#3033 と同じ考え方）。`replace` は代入では履歴を置き換えられないので `replaceState` し、下の規則でその要素へスクロールする。それ以外の `push` / `replace` は、`hash` があればその要素へ、なくパスが変わったら先頭へスクロールする。スクロールは新しいページが描かれた後に行う: `Routes` が分岐を作り直した後（React は `useLayoutEffect`、synstate-dom はマウントの後）に行い、`Routes` を使わないアプリでは `requestAnimationFrame` の後に行う。検索パラメータだけが変わる遷移（`setSearch` を含む）はスクロールしない。戻る・進むはブラウザの `history.scrollRestoration` に任せる。
+6. **スクロール。** パスと検索パラメータが今と同じで `hash` だけが違う遷移は、`push` は `pushState` を使わず `location.hash` への代入でブラウザに任せる（スクロール、`hashchange`、`:target` が揃う。#3033 と同じ考え方）。`replace` は代入では履歴を置き換えられないので `replaceState` し、下の規則でその要素へスクロールする。それ以外の `push` / `replace` は、`hash` があればその要素へ、なくパスが変わったら先頭へスクロールする。スクロールは新しいページが描かれた後に行う: `Routes` が分岐を作り直した後（React は `useLayoutEffect`、synstate-dom は更新が終わった後の microtask）に行い、`Routes` を使わないアプリでは `requestAnimationFrame` の後に行う。検索パラメータだけが変わる遷移（`setSearch` を含む）はスクロールしない。戻る・進むはブラウザの `history.scrollRestoration` に任せる。
 
 ### 4.3 データ取得（v1 ではルーターに持たせない）
 
@@ -241,7 +241,7 @@ const product$ = router
 
 ## 5. React との連携（`synstate-router-react`）
 
-React 版は synstate-dom 版と同じ保証（`Href` だけを受ける `Link`、全ページを要求する `Routes`）を持つ。`synstate-react-hooks` の `useObservableValue` で Observable を読む。
+React 版は synstate-dom 版と同じ保証（`Href` だけを受ける `Link`、全ページを要求する `Routes`）を持つ。Observable は server snapshot を渡す自前の `useSyncExternalStore` の hook で読む。`synstate-react-hooks` の `useObservableValue` は server snapshot を渡さないので、memory browser 上のルーターをサーバーで描けないため。
 
 ```tsx
 export const { Routes, Link, useRouteMatch, useAt, useIsActive } =
@@ -317,7 +317,7 @@ const App = (): JSX.Element => (
 ### 6.1 `Routes`
 
 - `cases` の必須キーは React 版と同じ。
-- 各 case はそのルートに絞られた `InitializedObservable<{ params; search }>` を受け取る。内部は synstate-dom の `mountSwitch` を使い、**ルート id が変わったときだけ分岐を作り直す**。`/products/1` から `/products/2` では分岐を保ったまま Observable に新しい params が流れ、`MatchOptional` と同じ細粒度の更新になる。
+- 各 case はそのルートに絞られた `InitializedObservable<{ params; search; withSearch }>` を受け取る（`withSearch` は React 版と同じ）。内部は synstate-dom の `mountSwitch` と同じ方式で、**ルート id が変わったときだけ分岐を作り直す**。`mountSwitch` は synstate-dom の公開 API にないので、同じ処理を公開されている部品（`subscribeInScope`・`toNodes`）で持つ。`/products/1` から `/products/2` では分岐を保ったまま Observable に新しい params が流れ、`MatchOptional` と同じ細粒度の更新になる。
 - レイアウトは `under` と `prefix` で入れ子にする。`<Routes prefix cases={...}>` は直下の子の prefix 一致で分岐し、その中で `<Routes under={routes.products} cases={...}>` が `products` 以下のページを完全一致で分岐する。`under` を付けたときの必須キーはその枝のルート id だけ。
 - キーは常に完全なルート id（`'products.item'`）。枝の中でも略さないので、`grep` で定義と描画を結べる。
 
@@ -351,7 +351,7 @@ const App = (): JSX.Element => (
 <Link to={externalHref('https://example.com/')}>{constant('外部')}</Link>
 ```
 
-- `to: Bindable<Href | ExternalHref>`、`replace?: boolean`、残りは `<a>` の props。`href` 属性には、`Href` なら `router.toUrl(to)`（ベースパス付き）を、`ExternalHref` ならその URL をそのまま書くので、新しいタブで開く・コピーするなどブラウザの動作はそのまま。
+- `to: Href | ExternalHref | Bindable<Href | ExternalHref>`、`replace?: boolean`、残りは `<a>` の props。変わらない遷移先は `constant` で包まずに書ける。`ExternalHref` は同じ origin でもルーターに回さない。`href` 属性には、`Href` なら `router.toUrl(to)`（ベースパス付き）を、`ExternalHref` ならその URL をそのまま書くので、新しいタブで開く・コピーするなどブラウザの動作はそのまま。
 - クリックをルーターに回すのは、主ボタンで、修飾キーがなく、`target` が `_self` かなしで、`download` がなく、同じ origin の `Href` のときだけ。
 - tiny-router の不具合を繰り返さない: アンカーは `currentTarget` から読む（#2954、アイコンを押しても SPA 遷移）。今と同じ URL かどうかは、どちらも正規形（「4.2」の 4）にした絶対 URL 同士で比べ、同じなら `replace` にする（#2956）。同じページ内の fragment だけの移動も `router.push` に渡す。`push` はそれを `location` へのブラウザ自身の fragment navigation にするので、スクロール・`hashchange`・`:target` が残り（#3033）、まだ実行していないスクロールもその fragment へ向け直せる（その場合、要素はまだ描かれていないので `:target` は付かない）。`replace` の `Link` は「4.2」の 6 のとおり `replaceState` とルーター自身のスクロールになる。それぞれにブラウザテストを付ける。
 

@@ -5,6 +5,7 @@ export * from './href-with-search.mjs';
 export * from './href.mjs';
 export * from './link-click.mjs';
 export * from './match-at.mjs';
+export * from './page-values.mjs';
 export * from './param-codec.mjs';
 export * from './route-types.mjs';
 export * from './search-codec.mjs';

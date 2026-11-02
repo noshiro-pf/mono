@@ -41,6 +41,8 @@ export type LinkClickRouter = StrictPick<
  *   link counts (#2954).
  * - Only a URL `router.parseHref` accepts: this origin, below the base path, a
  *   page. Anything else is loaded by the browser.
+ * - Only a binding's `Href`: a `Link` given an `ExternalHref` does not call
+ *   this (`isHref`), so that one is loaded by the browser even to this origin.
  * - A move to a fragment of the current page is routed too: `router.push`
  *   makes it the browser's own fragment navigation, which scrolls, fires
  *   `hashchange` and marks `:target` (#3033), and points a scroll the router

@@ -951,6 +951,7 @@ const generateSpace = async (
  */
 const notYetPublished: ReadonlySet<string> = new Set<string>([
   'synstate-router',
+  'synstate-router-dom',
   'synstate-router-react',
 ]);
 

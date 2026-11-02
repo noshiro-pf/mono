@@ -1,0 +1,18 @@
+{
+  "extends": [
+    "../../../tools/configs/tsconfig/tsconfig.build.json",
+    "../../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "synstate-dom",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "../dist",
+    "declarationDir": "../dist",
+    "rootDir": "../src"
+  },
+  "include": ["../src"],
+  "exclude": ["../src/**/*.test.mts"]
+}
