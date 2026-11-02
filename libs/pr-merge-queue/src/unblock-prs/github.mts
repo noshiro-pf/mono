@@ -3,7 +3,7 @@
 /**
  * Everything that reads or writes GitHub or `git`, and nothing that decides.
  * The API client and the `git` runner are shared with the other commands
- * (`tools/scripts/lib/`).
+ * (`../lib/`, i.e. `src/lib/`).
  */
 
 import {
