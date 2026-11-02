@@ -81,6 +81,27 @@ describe(issueInstructions, () => {
     assert.include(text, 'git switch -c');
   });
 
+  test('closes an issue whose work is already on main, and only then', () => {
+    const text = issueInstructions(round);
+
+    assert.include(text, 'already on `origin/main`');
+
+    assert.include(text, '`state_reason` `completed`');
+
+    assert.include(text, 'Close it only when every part of it is done');
+
+    assert.include(
+      text,
+      'Check each part in the tree and its history yourself',
+    );
+
+    // Before the bail-out for a checklist, which a done one would otherwise hit.
+    assert.isBelow(
+      text.indexOf('already on `origin/main`'),
+      text.indexOf('decide whether it can be finished here'),
+    );
+  });
+
   test('keeps queueing the author’s', () => {
     const text = issueInstructions(round);
 
