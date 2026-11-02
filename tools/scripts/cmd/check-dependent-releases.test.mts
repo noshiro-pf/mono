@@ -1,10 +1,11 @@
 import dedent from 'dedent';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { ChangesetFile } from '../lib/changesets.mjs';
 import {
   checkDependentReleases,
   findReExportedPackages,
+  listDependencies,
   matchesGroupMember,
   type ExposureOverride,
   type ReleaseGroup,
@@ -141,6 +142,37 @@ describe('matchesGroupMember', () => {
   });
 });
 
+describe('listDependencies', () => {
+  test('reads each runtime field and leaves out devDependencies', () => {
+    assert.deepStrictEqual(
+      listDependencies({
+        dependencies: { a: '^1.0.0' },
+        optionalDependencies: { b: '^1.0.0' },
+        peerDependencies: { c: '^1.0.0' },
+        devDependencies: { d: '^1.0.0' },
+      }),
+      [
+        { name: 'a', field: 'dependencies', range: '^1.0.0' },
+        { name: 'b', field: 'optionalDependencies', range: '^1.0.0' },
+        { name: 'c', field: 'peerDependencies', range: '^1.0.0' },
+      ],
+    );
+  });
+
+  test('lists a name once for each field it is in', () => {
+    assert.deepStrictEqual(
+      listDependencies({
+        peerDependencies: { core: 'workspace:^' },
+        dependencies: { core: 'workspace:^' },
+      }),
+      [
+        { name: 'core', field: 'dependencies', range: 'workspace:^' },
+        { name: 'core', field: 'peerDependencies', range: 'workspace:^' },
+      ],
+    );
+  });
+});
+
 describe('checkDependentReleases', () => {
   test('passes when no breaking release is pending', () => {
     const result = check({
@@ -149,7 +181,7 @@ describe('checkDependentReleases', () => {
 
     assert.deepStrictEqual(
       result,
-      Result.ok({ edges: 3, reExports: 1, warnings: [] }),
+      Result.ok({ edges: 3, reExports: 1, peers: 0, warnings: [] }),
     );
   });
 
@@ -178,7 +210,7 @@ describe('checkDependentReleases', () => {
 
     assert.deepStrictEqual(
       result,
-      Result.ok({ edges: 3, reExports: 1, warnings: [] }),
+      Result.ok({ edges: 3, reExports: 1, peers: 0, warnings: [] }),
     );
   });
 
@@ -292,7 +324,7 @@ describe('checkDependentReleases', () => {
 
     assert.deepStrictEqual(
       result,
-      Result.ok({ edges: 0, reExports: 0, warnings: [] }),
+      Result.ok({ edges: 0, reExports: 0, peers: 0, warnings: [] }),
     );
   });
 
@@ -398,6 +430,252 @@ describe('checkDependentReleases', () => {
     );
   });
 
+  test('fails a breaking release of a peer dependency, with no re-export', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major', wrapper: 'major' })],
+      packages: Arr.toPushed(
+        defaultPackages,
+        pkg('plugin', '1.2.0', [], ['core']),
+      ),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      'plugin has core in its peerDependencies as "workspace:^", whose breaking release is pending:\n\n  - .changeset/change.md gives core "major"',
+    );
+
+    assert.include(result.value, 'moves that range to the new\ncore,');
+
+    assert.include(result.value, 'Add a changeset giving plugin "major"');
+
+    assert.notInclude(result.value, 'override the edge');
+
+    assert.notInclude(result.value, '  - plugin@');
+  });
+
+  test('reports a dependency in both peerDependencies and dependencies once, as a peer', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major', wrapper: 'major' })],
+      packages: Arr.toPushed(
+        defaultPackages,
+        pkg('plugin', '1.2.0', ['core'], ['core']),
+      ),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, '❌ 1 problem(s)');
+
+    assert.include(result.value, 'plugin has core in its peerDependencies');
+
+    assert.notInclude(result.value, '  - plugin@');
+  });
+
+  test('holds a peer edge written as workspace:* or workspace:~', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major' })],
+      packages: [
+        pkg('core', '3.1.0'),
+        {
+          ...pkg('exact', '1.0.0'),
+          dependencies: listDependencies({
+            peerDependencies: { core: 'workspace:*' },
+          }),
+        },
+        {
+          ...pkg('tilde', '1.0.0'),
+          dependencies: listDependencies({
+            peerDependencies: { core: 'workspace:~' },
+          }),
+        },
+      ],
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      'exact has core in its peerDependencies as "workspace:*"',
+    );
+
+    assert.include(
+      result.value,
+      'tilde has core in its peerDependencies as "workspace:~"',
+    );
+  });
+
+  test('holds a 0.x peer dependent on a minor of a 0.x dependency, and asks it for a minor', () => {
+    const result = check({
+      changesets: [changeset({ young: 'minor' })],
+      packages: [pkg('young', '0.5.1'), pkg('plugin', '0.2.0', [], ['young'])],
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'plugin has young in its peerDependencies');
+
+    assert.include(result.value, 'Add a changeset giving plugin "minor"');
+  });
+
+  test('passes a peer dependent that a fixed group gives the breaking release', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major' })],
+      packages: [pkg('core', '3.1.0'), pkg('plugin', '3.1.0', [], ['core'])],
+      groups: [{ kind: 'fixed', members: ['core', 'plugin'] }],
+    });
+
+    assert.deepStrictEqual(
+      result,
+      Result.ok({ edges: 1, reExports: 0, peers: 1, warnings: [] }),
+    );
+  });
+
+  test('passes a peer dependent with a breaking release of its own', () => {
+    const result = check({
+      changesets: [
+        changeset({
+          core: 'major',
+          wrapper: 'major',
+          typed: 'major',
+          user: 'major',
+          plugin: 'major',
+        }),
+      ],
+      packages: Arr.toPushed(
+        defaultPackages,
+        pkg('plugin', '1.2.0', [], ['core']),
+      ),
+    });
+
+    assert.deepStrictEqual(
+      result,
+      Result.ok({ edges: 4, reExports: 1, peers: 1, warnings: [] }),
+    );
+  });
+
+  test('holds a peer edge that src/ also re-exports as a peer', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major' })],
+      packages: [pkg('core', '3.1.0'), pkg('wrapper', '2.1.0', [], ['core'])],
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'wrapper has core in its peerDependencies');
+
+    assert.notInclude(result.value, 'wrapper re-exports core');
+  });
+
+  test('reads a peer range the break stays in as any other edge, while nothing else releases the dependent', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major', wrapper: 'major' })],
+      packages: Arr.toPushed(defaultPackages, {
+        ...pkg('plugin', '1.2.0'),
+        dependencies: listDependencies({
+          peerDependencies: { core: '>=3.1.0' },
+          devDependencies: { core: 'workspace:*' },
+        }),
+      }),
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.include(result.value.warnings[0], '  - plugin@1.2.0');
+  });
+
+  test('holds a peer range the break stays in when a changeset releases the dependent', () => {
+    const result = check({
+      changesets: [
+        changeset({ core: 'major', wrapper: 'major', plugin: 'minor' }),
+      ],
+      packages: Arr.toPushed(defaultPackages, {
+        ...pkg('plugin', '1.2.0'),
+        dependencies: listDependencies({
+          peerDependencies: { core: '>=3.1.0' },
+        }),
+      }),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      'plugin has core in its peerDependencies as ">=3.1.0", whose breaking release is pending:',
+    );
+  });
+
+  test('holds a peer range the break stays in when another field pins the dependent to the workspace version', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major', wrapper: 'major' })],
+      packages: Arr.toPushed(defaultPackages, {
+        ...pkg('plugin', '1.2.0'),
+        dependencies: listDependencies({
+          dependencies: { core: 'workspace:^' },
+          peerDependencies: { core: '>=3.1.0' },
+        }),
+      }),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      'plugin has core in its peerDependencies as ">=3.1.0"',
+    );
+  });
+
+  test('holds a peer range the break stays in when a fixed group releases the dependent', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major', other: 'patch' })],
+      packages: [
+        pkg('core', '3.1.0'),
+        pkg('other', '1.0.0'),
+        {
+          ...pkg('plugin', '1.0.0'),
+          dependencies: listDependencies({
+            peerDependencies: { core: '>=3.1.0' },
+          }),
+        },
+      ],
+      groups: [{ kind: 'fixed', members: ['other', 'plugin'] }],
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'plugin has core in its peerDependencies');
+  });
+
+  test('passes a re-exporting dependent that a linked group gives the breaking release', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major', typed: 'major', user: 'major' })],
+      groups: [{ kind: 'linked', members: ['core', 'wrapper'] }],
+    });
+
+    assert.deepStrictEqual(
+      result,
+      Result.ok({ edges: 3, reExports: 1, peers: 0, warnings: [] }),
+    );
+  });
+
+  test('fails an override of a peer edge', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major' })],
+      packages: [pkg('core', '3.1.0'), pkg('plugin', '1.2.0', [], ['core'])],
+      overrides: [
+        { dependency: 'core', dependents: ['plugin'], exposure: 'review' },
+      ],
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      'core → plugin ("review"): plugin names core in its peerDependencies and is released with any breaking release of it, which holds its release whatever src/ does. Remove the entry.',
+    );
+  });
+
   test('fails an edge overridden twice', () => {
     const result = check({
       changesets: [],
@@ -417,20 +695,41 @@ const pkg = (
   name: string,
   version: string,
   dependencies: readonly string[] = [],
+  peerDependencies: readonly string[] = [],
 ): WorkspacePackage =>
-  ({ name, version, released: true, dependencies }) as const;
+  ({
+    name,
+    version,
+    released: true,
+    dependencies: [
+      ...dependencies.map(
+        (d) =>
+          ({ name: d, field: 'dependencies', range: 'workspace:^' }) as const,
+      ),
+      ...peerDependencies.map(
+        (d) =>
+          ({
+            name: d,
+            field: 'peerDependencies',
+            range: 'workspace:^',
+          }) as const,
+      ),
+    ],
+  }) as const;
 
 /** `wrapper` re-exports `core`; `typed` and `user` use it otherwise. */
+const defaultPackages = [
+  pkg('core', '3.1.0'),
+  pkg('sibling', '1.0.0'),
+  pkg('wrapper', '2.1.0', ['core', 'react']),
+  pkg('typed', '1.0.0', ['core']),
+  pkg('user', '4.0.0', ['core']),
+] as const;
+
 const check = ({
   changesets,
   groups = [],
-  packages = [
-    pkg('core', '3.1.0'),
-    pkg('sibling', '1.0.0'),
-    pkg('wrapper', '2.1.0', ['core', 'react']),
-    pkg('typed', '1.0.0', ['core']),
-    pkg('user', '4.0.0', ['core']),
-  ],
+  packages = defaultPackages,
   reExports = new Map<string, ReadonlyMap<string, readonly string[]>>([
     [
       'wrapper',
