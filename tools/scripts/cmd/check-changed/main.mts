@@ -6,6 +6,7 @@ import * as path from 'node:path';
 import * as util from 'node:util';
 import { Arr, isRecord, isString, unknownToString } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
+import { formatLineRanges, parseAddedLines } from '../../lib/diff-lines.mjs';
 import { projectRootPath } from '../../project-root-path.mjs';
 import { findMissingChangesets, isChangesetFile } from './changesets.mjs';
 import {
@@ -14,7 +15,6 @@ import {
   type Commit,
 } from './commit-messages.mjs';
 import { parseLcov, uncoveredChangedLines } from './coverage.mjs';
-import { formatLineRanges, parseAddedLines } from './diff-lines.mjs';
 import {
   buildPlan,
   classifyChanges,

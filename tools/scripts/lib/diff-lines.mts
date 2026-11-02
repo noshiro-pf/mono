@@ -1,4 +1,4 @@
-import { Num, Result } from 'ts-data-forge';
+import { Arr, Num, Result } from 'ts-data-forge';
 
 /**
  * The added and changed lines of a `git diff -U0 --no-renames` output, by the
@@ -9,13 +9,20 @@ import { Num, Result } from 'ts-data-forge';
  * count of `0` is a deletion that wrote nothing. A deleted file (`+++
  * /dev/null`) and a binary file (no hunk) contribute no lines.
  *
+ * With `deletionPoints`, a deletion also touches the lines on either side of
+ * where it was (`@@ -20,2 +23,0 @@` is lines 23 and 24): a change that only
+ * removed lines still changed what those two now border.
+ *
  * Git quotes a path holding a double quote, a backslash or a control character
  * even under `core.quotePath=false`; such a path is skipped rather than guessed
  * at, since nothing in this repository is named that way.
  */
 export const parseAddedLines = (
   diff: string,
+  options: Readonly<{ deletionPoints?: boolean }> = {},
 ): ReadonlyMap<string, readonly number[]> => {
+  const { deletionPoints = false } = options;
+
   const mut_result = new Map<string, readonly number[]>();
 
   // `inHeader` is the stretch between `diff --git` and the first hunk, the only
@@ -63,14 +70,17 @@ export const parseAddedLines = (
     // `+12` with no count is one line; `+12,0` is none.
     const count = hunk[2] === '' ? 1 : toInt(hunk[2]);
 
-    if (count <= 0 || start <= 0) {
-      continue;
-    }
+    // A deletion's start is the line before it, `0` at the top of the file.
+    const lines =
+      count > 0 && start > 0
+        ? Array.from({ length: count }, (_, i) => start + i)
+        : count === 0 && deletionPoints
+          ? [start, start + 1].filter((n) => n > 0)
+          : ([] as const);
 
-    mut_result.set(file, [
-      ...(mut_result.get(file) ?? []),
-      ...Array.from({ length: count }, (_, i) => start + i),
-    ]);
+    if (Arr.isNonEmpty(lines)) {
+      mut_result.set(file, [...(mut_result.get(file) ?? []), ...lines]);
+    }
   }
 
   return mut_result;

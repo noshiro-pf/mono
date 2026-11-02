@@ -57,12 +57,14 @@ jobs:
     # 9m31s and 9m44s under a 10-minute cap — see "The work" in README.md.
     timeout-minutes: 25
 
-    # The commit `check:prose:next-major` compares each package's version
-    # with: a version pull request is the one tree that raises a version past
-    # its base. On `main` it is the commit before the push; a manual run
-    # compares the tree with itself.
+    # The commit the `check:prose` guards that read a change compare the tree
+    # with (`tools/scripts/lib/diff-base.mts`): `next-major` reads each
+    # package's version there, as a version pull request is the one tree that
+    # raises a version past its base, and `markdown-wrap` reads only the
+    # paragraphs the change touched. On `main` it is the commit before the
+    # push; a manual run compares the tree with itself.
     env:
-      NEXT_MAJOR_BASE: ${{ case(github.event_name == 'pull_request', github.event.pull_request.base.sha, github.event_name == 'push', github.event.before, github.sha) }}
+      PROSE_DIFF_BASE: ${{ case(github.event_name == 'pull_request', github.event.pull_request.base.sha, github.event_name == 'push', github.event.before, github.sha) }}
 
     strategy:
       fail-fast: false
@@ -147,10 +149,11 @@ jobs:
         if: matrix.command == 'ws:doc'
         run: pnpm run ws:build
 
-      # The checkout is one commit deep; `git show` needs the base as well.
-      - name: Fetch the base `check:prose:next-major` compares with
+      # The checkout is one commit deep; `git show` and `git diff` need the
+      # base as well.
+      - name: Fetch the base the `check:prose` guards compare with
         if: matrix.command == 'check:prose'
-        run: git fetch --no-tags --depth=1 origin "${NEXT_MAJOR_BASE}"
+        run: git fetch --no-tags --depth=1 origin "${PROSE_DIFF_BASE}"
 
       - name: Run "${{ matrix.command }}"
         run: pnpm run ${{ matrix.command }}
