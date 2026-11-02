@@ -108,9 +108,7 @@ export const notifyAfterAnswerDeadlineEveryMinutes =
 
 export const userDeletionListener = regionSelected.auth
   .user()
-  .onDelete((user) => {
-    onUserDelete(db, user).catch(console.error);
-  });
+  .onDelete((user) => onUserDelete(db, user).catch(logger.error));
 
 // https://firebase.google.com/docs/functions/manage-functions?hl=ja
 export const fetchEventListOfUser = regionSelected
@@ -170,5 +168,5 @@ export const sendReport = regionSelected
       return;
     }
 
-    sendReportImpl(payload).catch(logger.error);
+    return sendReportImpl(payload).catch(logger.error);
   });
