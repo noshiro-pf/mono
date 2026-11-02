@@ -15,6 +15,8 @@ import {
   isPropertyAssignment,
   isPropertyDeclaration,
   isPropertySignatureDeclaration,
+  isSourceFile,
+  isTypeNode,
   isVariableDeclaration,
   type Identifier,
   type Node as TsNode,
@@ -148,12 +150,25 @@ const isDeclarationName = (parent: TsNode, node: Identifier): boolean =>
   parent.name === node;
 
 /**
+ * Whether `node` sits inside a type: under `typeof castMutable`,
+ * `ReturnType<typeof castMutable>` or `typeof tdf.castMutable`. A type names
+ * the escape without using a value.
+ */
+const isInType = (node: TsNode): boolean =>
+  !isSourceFile(node) && (isTypeNode(node.parent) || isInType(node.parent));
+
+/**
  * The expression that refers to the escape: the identifier, or the property
  * access it names (`tdf.castMutable`). `undefined` where the identifier is not
- * a reference at all — an import or export specifier, a declaration's name.
+ * a reference to a value — an import or export specifier, a declaration's name,
+ * a name in a type.
  */
 const referenceOf = (node: Identifier): TsNode | undefined => {
   const { parent } = node;
+
+  if (isInType(node)) {
+    return undefined;
+  }
 
   if (isPropertyAccessExpression(parent)) {
     return parent.name === node ? parent : node;

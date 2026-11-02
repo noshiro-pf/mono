@@ -62,6 +62,26 @@ describe(restrictCastMutable.ruleId, () => {
         `,
       },
       {
+        name: 'named in a type position, which uses no value',
+        code: dedent`
+          ${castMutableDeclaration}
+
+          export type CastMutable = typeof castMutable;
+
+          export type Result = ReturnType<typeof castMutable<readonly string[]>>;
+        `,
+      },
+      {
+        name: 'named through a qualified name in a type position',
+        code: dedent`
+          declare namespace tdf {
+            const castMutable: <T,>(readonlyValue: T) => T;
+          }
+
+          export type Qualified = typeof tdf.castMutable;
+        `,
+      },
+      {
         name: 'a function of one’s own with another name',
         code: dedent`
           const castOther = <T,>(value: T): T => value;
