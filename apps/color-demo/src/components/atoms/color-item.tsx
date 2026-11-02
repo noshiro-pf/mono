@@ -20,6 +20,7 @@ export const ColorItem = memoNamed<Props>('ColorItem', (props) => {
         height: 30px;
         border-radius: 25%;
       `}
+      data-e2e={'color-swatch'}
       style={style}
     />
   );

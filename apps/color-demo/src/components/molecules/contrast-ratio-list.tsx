@@ -17,7 +17,9 @@ export const ContrastRatioList = memoNamed<Props>(
       {'['}
       {props.contrastRatioList.map((r, i) => (
         // eslint-disable-next-line react/no-array-index-key
-        <div key={i}>{`${r.toFixed(2)}, `}&nbsp;</div>
+        <div key={i} data-e2e={'contrast-ratio'}>
+          {`${r.toFixed(2)}, `}&nbsp;
+        </div>
       ))}
       {']'}
     </div>

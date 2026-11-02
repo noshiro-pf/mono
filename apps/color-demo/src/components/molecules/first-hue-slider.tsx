@@ -14,7 +14,7 @@ export const FirstHueSlider = memoNamed<Props>('FirstHueSlider', (props) => (
       padding: 10px 0;
     `}
   >
-    <div>{'色相0°位置'}</div>
+    <div id={'first-hue'}>{'色相0°位置'}</div>
     <MuiSlider
       ariaLabelledby={'first-hue'}
       max={359}
