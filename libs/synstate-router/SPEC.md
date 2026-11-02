@@ -20,7 +20,7 @@
 | パッケージ              | 責任                                                                          | peer         |
 | :---------------------- | :---------------------------------------------------------------------------- | :----------- |
 | `synstate-router`       | ルート定義・codec・照合・`Href`・履歴・Observable・リンクのクリック判定       | synstate     |
-| `synstate-router-react` | React 向けの `Routes`・`Link`・hooks。社内プロジェクトが React なので先に作る | react >= 18  |
+| `synstate-router-react` | React 向けの `Routes`・`Link`・hooks。社内プロジェクトが React なので先に作る | react >= 19  |
 | `synstate-router-dom`   | synstate-dom 向けの `Routes`・`Link`                                          | synstate-dom |
 
 Preact 版は v1 に入れない（「10. 今後のタスク」）。
@@ -353,7 +353,7 @@ const App = (): JSX.Element => (
 
 - `to: Bindable<Href | ExternalHref>`、`replace?: boolean`、残りは `<a>` の props。`href` 属性には、`Href` なら `router.toUrl(to)`（ベースパス付き）を、`ExternalHref` ならその URL をそのまま書くので、新しいタブで開く・コピーするなどブラウザの動作はそのまま。
 - クリックをルーターに回すのは、主ボタンで、修飾キーがなく、`target` が `_self` かなしで、`download` がなく、同じ origin の `Href` のときだけ。
-- tiny-router の不具合を繰り返さない: アンカーは `currentTarget` から読む（#2954、アイコンを押しても SPA 遷移）。今と同じ URL かどうかは、どちらも正規形（「4.2」の 4）にした絶対 URL 同士で比べ、同じなら `replace` にする（#2956）。同じページ内の fragment だけの移動はブラウザに任せてスクロールと `hashchange` を残す（#3033）。それぞれにブラウザテストを付ける。
+- tiny-router の不具合を繰り返さない: アンカーは `currentTarget` から読む（#2954、アイコンを押しても SPA 遷移）。今と同じ URL かどうかは、どちらも正規形（「4.2」の 4）にした絶対 URL 同士で比べ、同じなら `replace` にする（#2956）。同じページ内の fragment だけの移動も `router.push` に渡す。`push` はそれを `location` へのブラウザ自身の fragment navigation にするので、スクロール・`hashchange`・`:target` が残り（#3033）、まだ実行していないスクロールもその fragment へ向け直せる（その場合、要素はまだ描かれていないので `:target` は付かない）。`replace` の `Link` は「4.2」の 6 のとおり `replaceState` とルーター自身のスクロールになる。それぞれにブラウザテストを付ける。
 
 ## 7. TanStack Router・React Router との比較
 
