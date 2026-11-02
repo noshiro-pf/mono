@@ -20,8 +20,9 @@
  */
 
 import { requirementsOfRules, type RulesetRequirements } from 'pr-report-core';
-import { Arr, Json, Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
+import { askAndRead } from './answer-body.mjs';
 import type { ReportSource } from './constants.mjs';
 import type { RestFetch } from './workflow-runs.mjs';
 
@@ -126,32 +127,35 @@ const getJson = async <A,>(
   token: string,
   fetchImpl: RestFetch,
 ): Promise<Result<A, string>> => {
-  const response = await fetchImpl(route, {
-    method: 'GET',
-    // Revalidated rather than refetched: see the top of this file.
-    cache: 'no-cache',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-    },
-  }).catch((error: unknown) => error);
+  const answered = await askAndRead(
+    async (again) =>
+      fetchImpl(route, {
+        method: 'GET',
+        // Revalidated rather than refetched: see the top of this file. Asked
+        // again, it is the cached body that was bad.
+        cache: again ? 'reload' : 'no-cache',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/vnd.github+json',
+        },
+      }),
+    what,
+  );
 
-  if (!(response instanceof Response)) {
+  if (answered === undefined) {
     return Result.err(
       `Could not reach the GitHub API for ${what}. Check the connection and try again.`,
     );
   }
 
+  const { response, body: parsed } = answered;
+
   if (!response.ok) {
     return Result.err(refusal(response, what));
   }
 
-  const parsed = Json.parse(await response.text());
-
-  if (Result.isErr(parsed)) {
-    return Result.err(
-      `GitHub answered ${what} with something that is not JSON.`,
-    );
+  if (parsed === undefined || Result.isErr(parsed)) {
+    return parsed ?? Result.err('GitHub sent no body.');
   }
 
   const validated = schema.validate(parsed.value);

@@ -194,6 +194,22 @@ describe(loadWorkflowRuns, () => {
     }
   });
 
+  test('names the workflow runs when the answer is not JSON', async () => {
+    const loaded = await loadWorkflowRuns(SOURCE, {
+      token: 'secret',
+      fetchImpl: () => Promise.resolve(new Response('', { status: 200 })),
+    });
+
+    assert.isTrue(Result.isErr(loaded));
+
+    if (Result.isErr(loaded)) {
+      assert.include(
+        loaded.value,
+        'GitHub answered the workflow runs with something that is not JSON (200',
+      );
+    }
+  });
+
   test('fails without the network, rather than throwing', async () => {
     const loaded = await loadWorkflowRuns(SOURCE, {
       token: 'secret',
