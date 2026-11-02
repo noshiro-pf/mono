@@ -105,4 +105,26 @@ describe(calculateHousingLoan, () => {
       );
     }
   });
+
+  test.each([0, 1e-17, 1.7e-16, 4e-16] as const)(
+    'pays principal / months at a monthly rate of %d',
+    (monthlyRate) => {
+      const result = calculateHousingLoan({
+        principalAmount: 1_200_000,
+        loanTermYears: 1,
+        initialAnnualRate: monthlyRate * 12,
+        rateIncreaseEvery5Years: 0,
+        monthlyRateIncrease: 0,
+        maxAnnualRate: monthlyRate * 12,
+      });
+
+      expect(result).toHaveLength(12);
+
+      for (const { paymentAmount } of result) {
+        expect(paymentAmount).toBeCloseTo(100_000, 6);
+      }
+
+      expect(result[11]?.remainingBalance).toBeCloseTo(0, 6);
+    },
+  );
 });

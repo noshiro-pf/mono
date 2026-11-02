@@ -66,7 +66,22 @@ export const calculateHousingLoan = (
 };
 
 /**
+ * `(1 - (1 + rate) ** -count) / rate`, what `count` payments of 1 are worth at
+ * `rate` a payment, and `count`, its limit, at a rate of 0. Through `log1p` and
+ * `expm1` it keeps its precision down to the smallest rate. The same factor as
+ * housing-loan-calculator's `annuityFactor`.
+ */
+const annuityFactor = (rate: number, count: number): number =>
+  Num.isNonZero(rate)
+    ? Num.div(-Math.expm1(-count * Math.log1p(rate)), rate)
+    : count;
+
+/**
  * 等額返済額を計算（元利均等返済）
+ *
+ * `principal * r * (1 + r) ** n / ((1 + r) ** n - 1)` は、月利が 1e-16 程度以下だと
+ * `1 + r` が 1 に丸まって分母が 0 になり、そのすぐ上でも `1 + r` の丸めで 2 割以上
+ * ずれることがある。そのため、`log1p` / `expm1` で求めた年金現価係数で元金を割る。
  * @param principal 元金
  * @param monthlyRate 月利
  * @param numberOfPayments 返済回数
@@ -77,19 +92,7 @@ const calculateFixedMonthlyPayment = (
   monthlyRate: number,
   numberOfPayments: number,
 ): number => {
-  if (monthlyRate === 0) {
-    return !Num.isNonZero(numberOfPayments)
-      ? 0
-      : Num.div(principal, numberOfPayments);
-  }
+  const factor = annuityFactor(monthlyRate, numberOfPayments);
 
-  const r = monthlyRate;
-
-  const n = numberOfPayments;
-
-  const denominator = (1 + r) ** n - 1;
-
-  return !Num.isNonZero(denominator)
-    ? 0
-    : Num.div(principal * r * (1 + r) ** n, denominator);
+  return Num.isNonZero(factor) ? Num.div(principal, factor) : 0;
 };
