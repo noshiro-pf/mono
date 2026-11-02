@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Arr, PositiveSafeInt } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
 import { ChartLegend } from './chart-legend.js';
 import {
   createToY,
@@ -90,7 +90,7 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
 
   const yTicks = logScale
     ? generateLogTicks(yMin, yMax)
-    : generateLinearTicks(PositiveSafeInt.fromNumber(yMax));
+    : generateLinearTicks(yMax);
 
   return (
     <div style={figureStyle}>

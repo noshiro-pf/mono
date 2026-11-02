@@ -3,11 +3,14 @@ import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 import {
   cascadedDiamond as cascadedDiamondJson,
   conditionalFanOut as conditionalFanOutJson,
+  formatCount as count,
   deepChain as deepChainJson,
   derivedChain as derivedChainJson,
   diamond as diamondJson,
   equalityCutOff as equalityCutOffJson,
   isNaiveForm,
+  formatMs as ms,
+  MS_TENTHS_BELOW,
   singleState as singleStateJson,
 } from '../src/data/index.mjs';
 import {
@@ -899,25 +902,6 @@ const nsPerUpdate = (totalMs: number, updateCount: number): number =>
 const inSingleDigits = (value: number): boolean =>
   value < 10 && value.toFixed(1) !== '10.0';
 
-/** Digits in groups of three, as every number in the prose is written. */
-const count = (value: number): string => {
-  const digits = Math.round(value).toString();
-
-  const mut_groups: string[] = [];
-
-  let mut_rest = digits;
-
-  while (mut_rest.length > 3) {
-    mut_groups.unshift(mut_rest.slice(-3));
-
-    mut_rest = mut_rest.slice(0, -3);
-  }
-
-  mut_groups.unshift(mut_rest);
-
-  return mut_groups.join(',');
-};
-
 /**
  * A ratio as the summary quotes it: one decimal below 10, where "3.6×" and "4×"
  * say different things, and whole numbers above it, as {@link ratio}.
@@ -1615,15 +1599,6 @@ const cutOffKeyOf = (label: string): string =>
     : label.toLowerCase().replaceAll(' ', '-');
 
 /**
- * Renders a measurement the way the prose quotes one: a tenth of a millisecond
- * below 100 ms, and whole milliseconds above it, where the tenth is noise.
- */
-const ms = (value: number): string =>
-  value < MS_TENTHS_BELOW
-    ? (`${value.toFixed(1)} ms` as const)
-    : (`${count(Math.round(value))} ms` as const);
-
-/**
  * For each row that grows with W, what the cut-off section quotes: its time
  * with one view, the widest view count it finished and its time there, and the
  * slope between the two — what one more view adds to one update, which is what
@@ -1659,9 +1634,6 @@ const cutOffVisitingRows = (): ReadonlyRecord<string, string> =>
       ];
     }),
   );
-
-/** Where {@link ms} stops printing a tenth of a millisecond. */
-const MS_TENTHS_BELOW = 100;
 
 /**
  * `value` as {@link ms} prints it, rounded up rather than to the nearest, for a
