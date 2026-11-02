@@ -246,7 +246,7 @@ npx run-issue-resolver --max-budget-usd 5 --dry-run --once  # what it would run
 npx run-issue-resolver --max-budget-usd 5                   # until --max-sessions or Ctrl+C
 ```
 
-Each round reads how every open issue stands for being started, as
+Each look reads how every open issue stands for being started, as
 `pr-report` decides it
 ([`docs/issue-start-after.md`](https://github.com/noshiro-pf/mono/blob/main/docs/issue-start-after.md)):
 nothing it waits for is open, it carries neither `in-progress` nor `planned`,
@@ -254,14 +254,16 @@ and no open pull request closes it. Of those it takes the ones the token's
 account wrote (`--author` names others), leaves any labelled `question`,
 `wontfix`, `duplicate`, `invalid` or `pending`, and starts `claude -p` on the
 first, `priority:high` first and the oldest first within a priority: one
-issue per session, the next as soon as one ends, and another look every 30
-minutes (`--interval-min`) once there is none.
+issue per session, up to three sessions at once (`--concurrency`), never two
+on one issue. It looks again as soon as a session ends, and every 30 minutes
+(`--interval-min`) while a slot is free.
 
 The command runs `start-issue` on the issue before the session starts, so
 that the `in-progress` label is its own to take off. The session decides
 first whether the issue can be finished by one pull request without a
 person; if not, it says why in a comment on the issue and ends. Otherwise it
-does the work in a worktree under `~/.local/state/unblock-prs`, follows the
+does the work in the worktree the command made for it from the latest
+`origin/main`, under `~/.local/state/unblock-prs`, follows the
 repository's own instructions to the pull request, and opens it with
 `open-pr`, held by `skip-ci`, ending its description with `Closes #N`:
 queueing it is still the author's. When the session ends with no open pull
@@ -277,12 +279,21 @@ takes it off.
   `run-unblock-prs-skill` does (above). It also stops the session at its
   first event if Claude Code has no `/code-review`. Any session that does not
   get going — refused, not started, or failed before spending anything —
-  stops the command, since every try labels an issue and takes the label off
-  again.
+  stops the command from starting more, since every try labels an issue and
+  takes the label off again; it exits once the sessions running have ended.
 - **`--max-budget-usd` is required** and caps each session, which is one
   issue. **`--max-sessions`** (10 by default) is how many sessions it runs
   before it exits, since each one may leave a pull request waiting for
-  review.
+  review; a session counts from when it starts, so the ones running never
+  take it past that, and stops counting if it spent nothing.
+- **`--concurrency`** (3 by default, 8 at most) is how many run at once, each in a
+  worktree of its own, made one at a time from the checkout the command runs
+  in, which no session works in. Every one builds and checks the repository,
+  so the machine pays
+  for them all at once, and their pull requests may touch the same files,
+  which leaves the later ones to `auto-rebase`. Each session's lines are
+  logged with its issue number. `--once` makes one look, starts as many as
+  `--concurrency` allows, and exits once they end.
 - **Nobody is asked anything, and nothing is approved**, as for
   `run-unblock-prs-skill`, with `Skill` and `Agent` allowed besides, for the
   review. What the session acts on is the issue's text, which is why only

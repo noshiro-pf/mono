@@ -2,7 +2,12 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
-import { attemptedFile, loadAttempted, recordAttempted } from './attempted.mjs';
+import {
+  attemptedFile,
+  attemptedRecorder,
+  loadAttempted,
+  recordAttempted,
+} from './attempted.mjs';
 
 /** Runs `run` with a directory of its own, then removes it. */
 const withDir = async (run: (dir: string) => Promise<void>): Promise<void> => {
@@ -85,6 +90,53 @@ describe(loadAttempted, () => {
       assert.isTrue(Result.isErr(loaded));
 
       assert.include(Result.unwrapErrOr(loaded, ''), 'remove the file');
+    });
+  });
+});
+
+describe(attemptedRecorder, () => {
+  test('keeps every issue recorded at once, writing one after another', async () => {
+    await withDir(async (dir) => {
+      const file = path.join(dir, 'attempted.json');
+
+      const record = attemptedRecorder(file);
+
+      const written = await Promise.all([
+        record(1, '2026-10-01T00:00:00Z'),
+        record(2, undefined),
+        record(3, '2026-10-03T00:00:00Z'),
+      ]);
+
+      assert.isTrue(written.every(Result.isOk));
+
+      assert.deepStrictEqual(
+        Result.unwrapOkOr(await loadAttempted(file), undefined),
+        new Map<number, string | undefined>([
+          [1, '2026-10-01T00:00:00Z'],
+          [2, undefined],
+          [3, '2026-10-03T00:00:00Z'],
+        ]),
+      );
+    });
+  });
+
+  test('goes on after a write that failed', async () => {
+    await withDir(async (dir) => {
+      const blocker = path.join(dir, 'file');
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(blocker, '');
+
+      const record = attemptedRecorder(path.join(blocker, 'attempted.json'));
+
+      const [first, second] = await Promise.all([
+        record(1, undefined),
+        record(2, undefined),
+      ]);
+
+      assert.isTrue(Result.isErr(first));
+
+      assert.isTrue(Result.isErr(second));
     });
   });
 });

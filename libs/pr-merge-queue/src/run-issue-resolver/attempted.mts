@@ -5,7 +5,7 @@ import * as path from 'node:path';
 import type { RepoRef } from 'pr-report-core';
 import { Arr, isRecord, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { pullRequestNumber, readJsonFile } from '../lib/index.mjs';
+import { oneAtATime, pullRequestNumber, readJsonFile } from '../lib/index.mjs';
 
 /**
  * Where the issues handed to sessions in `repo` are kept, beside the worker's
@@ -107,6 +107,24 @@ export const recordAttempted = async (
   return Result.isErr(written)
     ? Result.err(`cannot write ${file}: ${unknownToString(written.value)}`)
     : Result.ok(attempted);
+};
+
+/**
+ * {@link recordAttempted} on `file`, one write after another however many
+ * sessions end at once: each reads the record before it writes it, through a
+ * file named by the process alone, so two at once would lose an issue or
+ * collide on that file.
+ */
+export const attemptedRecorder = (
+  file: string,
+): ((
+  number: number,
+  updatedAt: string | undefined,
+) => Promise<Result<ReadonlyMap<number, string | undefined>, string>>) => {
+  const queue = oneAtATime();
+
+  return async (number, updatedAt) =>
+    queue(async () => recordAttempted(file, number, updatedAt));
 };
 
 /** Each issue by its number, with its `updatedAt` or `null`. */

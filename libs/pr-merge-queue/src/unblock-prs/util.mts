@@ -52,15 +52,24 @@ export const headShaFromListing = (
 export const lastLines = (text: string, count: number): string =>
   text.trim().split('\n').slice(-count).join('\n');
 
-/** Sleeps, returning early when a stop has been requested. */
-export const pause = async (ms: number): Promise<void> => {
+/**
+ * Sleeps, returning early when a stop has been requested, or when `signal`
+ * aborts.
+ */
+export const pause = async (
+  ms: number,
+  signal?: Readonly<AbortSignal>,
+): Promise<void> => {
   if (stopRequested()) {
     return;
   }
 
-  await sleep(ms, undefined, { signal: stopController.signal }).catch(
-    () => undefined,
-  );
+  await sleep(ms, undefined, {
+    signal:
+      signal === undefined
+        ? stopController.signal
+        : AbortSignal.any([stopController.signal, signal]),
+  }).catch(() => undefined);
 };
 
 export const installStopHandlers = (): void => {

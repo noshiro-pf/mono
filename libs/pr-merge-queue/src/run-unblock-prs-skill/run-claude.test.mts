@@ -145,6 +145,26 @@ describe(runClaude, () => {
     });
   });
 
+  test('says every line, its stderr included, where it is told to', async () => {
+    await withFakeClaude(async (dir) => {
+      const mut_lines: string[] = [];
+
+      const say = (line: string): void => {
+        mut_lines.push(line);
+      };
+
+      await runClaude(dir, [], envFor(dir, 'ok'), checkUnblockPrs, say);
+
+      await runClaude(dir, [], envFor(dir, 'early-exit'), checkUnblockPrs, say);
+
+      assert.deepStrictEqual(mut_lines, [
+        'Claude Code session s1 started.',
+        'Claiming #1.',
+        "error: unknown option '--max-budget-usd'",
+      ]);
+    });
+  });
+
   test('refuses when there is no claude to run', async () => {
     await withFakeClaude(async (dir) => {
       const outcome = await runClaude(
