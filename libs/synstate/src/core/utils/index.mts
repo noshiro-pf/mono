@@ -3,3 +3,4 @@ export * from './id-maker.mjs';
 export * from './max-depth.mjs';
 export * from './observable-brand.mjs';
 export * from './observable-utils.mjs';
+export * from './rethrow-out-of-promise.mjs';

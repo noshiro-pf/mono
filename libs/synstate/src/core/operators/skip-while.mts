@@ -93,16 +93,20 @@ class SkipWhileObservableClass<A>
     parentObservable: Observable<A>,
     predicate: (value: A, index: SafeUint | -1) => boolean,
   ) {
+    const initialValue = pipe(parentObservable.getSnapshot()).map((sn) =>
+      Optional.isNone(sn) || predicate(sn.value, -1) ? Optional.none : sn,
+    ).value;
+
     super({
       parents: [parentObservable],
-      initialValue: pipe(parentObservable.getSnapshot()).map((sn) =>
-        Optional.isNone(sn) || predicate(sn.value, -1) ? Optional.none : sn,
-      ).value,
+      initialValue,
     });
 
     this.#mut_index = -1;
 
-    this.#mut_isSkipping = true;
+    // A parent value the predicate let through has ended the skipping, as any
+    // later one would.
+    this.#mut_isSkipping = Optional.isNone(initialValue);
 
     this.#predicate = predicate;
 
@@ -121,7 +125,8 @@ class SkipWhileObservableClass<A>
     this.#mut_index =
       this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
 
-    if (!this.#predicate(sn.value, this.#mut_index)) {
+    // Once skipping has ended, the predicate is not asked again.
+    if (this.#mut_isSkipping && !this.#predicate(sn.value, this.#mut_index)) {
       this.#mut_isSkipping = false;
     }
 

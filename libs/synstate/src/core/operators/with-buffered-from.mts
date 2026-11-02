@@ -93,11 +93,13 @@ class WithBufferedFromObservableClass<A, B>
   #mut_bufferedValues: readonly B[];
 
   constructor(parentObservable: Observable<A>, observable: Observable<B>) {
+    const parentSnapshot = parentObservable.getSnapshot();
+
     super({
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
       initialValue: pipe({
-        par: parentObservable.getSnapshot(),
+        par: parentSnapshot,
         me: observable.getSnapshot(),
       }).map(({ par, me }) =>
         Optional.isNone(par)
@@ -115,6 +117,12 @@ class WithBufferedFromObservableClass<A, B>
       this.#mut_bufferedValues = Arr.toPushed(this.#mut_bufferedValues, value);
     });
 
+    // `subscribe` has just pushed the buffered observable's current value,
+    // which the initial tuple already carries.
+    if (Optional.isSome(parentSnapshot)) {
+      this.#mut_bufferedValues = [];
+    }
+
     this.attach();
   }
 
@@ -127,9 +135,13 @@ class WithBufferedFromObservableClass<A, B>
       return; // skip update
     }
 
-    this.setNext([sn.value, this.#mut_bufferedValues], updateToken);
+    const buffered = this.#mut_bufferedValues;
 
+    // Emptied before `setNext`, which can lead back here: a value a subscriber
+    // writes to the buffered observable belongs to the next batch.
     this.#mut_bufferedValues = [];
+
+    this.setNext([sn.value, buffered], updateToken);
   }
 
   protected override teardown(): void {

@@ -1,3 +1,4 @@
+import { createState } from '../../utils/index.mjs';
 import { toNode } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import { withBufferedFrom } from './with-buffered-from.mjs';
@@ -53,5 +54,31 @@ describe('withBufferedFrom teardown', () => {
     trigger$.next(1);
 
     assert.deepStrictEqual(mut_history, [[1, ['A', 'B']]]);
+  });
+});
+
+describe('withBufferedFrom initial value', () => {
+  test('reports the current value of the buffered observable once when both hold one (#2767)', () => {
+    const [data$] = createState('x');
+
+    const [trigger$, setTrigger] = createState(0);
+
+    const result$ = trigger$.pipe(withBufferedFrom(data$));
+
+    const mut_history: (readonly [number, readonly string[]])[] = [];
+
+    result$.subscribe((v) => {
+      mut_history.push(v);
+    });
+
+    setTrigger(1);
+
+    setTrigger(2);
+
+    assert.deepStrictEqual(mut_history, [
+      [0, ['x']],
+      [1, []],
+      [2, []],
+    ]);
   });
 });

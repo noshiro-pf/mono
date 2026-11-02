@@ -24,7 +24,7 @@
 - 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` similar to React useState/useReducer for global state
 - ⚡ **Glitch-Free Through Every Operator**: Every update is one depth-ordered pass over what it reaches, the ones `debounce` or `switchMap` start later included, so no subscriber sees a half-updated graph, and its cost grows with the nodes it reaches, never with the paths between them ([why SynState](https://noshiro-pf.github.io/mono/synstate/guides/why-synstate/), [benchmark](https://noshiro-pf.github.io/mono/synstate/guides/library-comparison/benchmark/))
 - 🎨 **Type-Safe**: Full TypeScript support with precise type inference
-- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~6.8 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second)
+- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~6.9 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second)
 - 🌐 **Framework Agnostic**: Works with React, Vue, Svelte, or vanilla JavaScript
 - 🔄 **Reactive Updates**: Automatic propagation of state changes to all subscribers
 - 📡 **Event System**: Built-in `createValueEmitter`, `createEventEmitter` for event-driven architecture

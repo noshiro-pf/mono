@@ -71,17 +71,6 @@ const build = async (): Promise<void> => {
   });
 
   await logStep({
-    startMessage: 'Building synstate-react-hooks',
-    action: async () => {
-      await runCmdStep(
-        'cd ../synstate-react-hooks && pnpm run build',
-        'Building synstate-react-hooks failed',
-      );
-    },
-    successMessage: 'Built synstate-react-hooks successfully',
-  });
-
-  await logStep({
     startMessage: 'Generating dist/types.d.mts',
     action: async () => {
       const content = "export * from './entry-point.mjs';\n";

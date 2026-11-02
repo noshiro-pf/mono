@@ -5,13 +5,7 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import {
-  Optional,
-  SafeUint,
-  asSafeUint,
-  expectType,
-  pipe,
-} from 'ts-data-forge';
+import { Optional, SafeUint, asSafeUint, expectType } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import type {
@@ -73,7 +67,7 @@ import { withInitialValue } from './with-initial-value.mjs';
  *
  * assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
  *
- * num$.next(1); // logs: 1
+ * num$.next(1); // nothing logged (already completed)
  *
  * assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
  * ```
@@ -98,20 +92,25 @@ class TakeWhileObservableClass<A>
     parentObservable: Observable<A>,
     predicate: (value: A, index: SafeUint | -1) => boolean,
   ) {
+    const parentSnapshot = parentObservable.getSnapshot();
+
+    const isTaking =
+      Optional.isNone(parentSnapshot) || predicate(parentSnapshot.value, -1);
+
     super({
       parents: [parentObservable],
-      initialValue: pipe(parentObservable.getSnapshot()).map((par) =>
-        Optional.isNone(par)
-          ? Optional.none
-          : predicate(par.value, -1)
-            ? par
-            : Optional.none,
-      ).value,
+      initialValue: isTaking ? parentSnapshot : Optional.none,
     });
 
     this.#mut_index = -1;
 
     this.#predicate = predicate;
+
+    // A parent value the predicate rejects ends it, as any later one would;
+    // `attach` then leaves it out of the graph.
+    if (!isTaking) {
+      this.complete();
+    }
 
     this.attach();
   }

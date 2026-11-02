@@ -150,8 +150,10 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
 
     this.setNext(nextValue, updateToken);
 
+    // After the update has reached what is derived from it, as in `take`
+    // (#2371).
     if (this.canEmitNoMore()) {
-      this.complete();
+      this.completeAfterPropagation();
     }
   }
 

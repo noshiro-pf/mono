@@ -413,6 +413,43 @@ describe('custom operators and creators', () => {
     assert.strictEqual(mut_tryUpdateCalls, 0);
   });
 
+  test('an async operator that completes itself in init is never registered to its parents (#2933)', () => {
+    const num$ = source<number>();
+
+    let mut_tryUpdateCalls = 0;
+
+    const mut_events: string[] = [];
+
+    const obs$ = createAsyncChildObservable(
+      { parents: [num$], initialValue: Optional.none },
+      ({ complete, onComplete }) => {
+        complete();
+
+        onComplete(() => {
+          mut_events.push('teardown');
+        });
+
+        return {
+          tryUpdate: () => {
+            mut_tryUpdateCalls += 1;
+          },
+          flush: () => {
+            mut_events.push('flush');
+          },
+        };
+      },
+    );
+
+    assert.isTrue(obs$.isCompleted);
+
+    // `flush` is a hook `init` had not returned when it completed.
+    assert.deepStrictEqual(mut_events, ['teardown']);
+
+    num$.next(1);
+
+    assert.strictEqual(mut_tryUpdateCalls, 0);
+  });
+
   test('the public types carry only the members meant for users', () => {
     const num$ = source<number>();
 

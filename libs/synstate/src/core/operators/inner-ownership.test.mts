@@ -1,5 +1,7 @@
-import { source } from '../create/index.mjs';
-import { createScope } from '../scope/index.mjs';
+import { panic } from 'ts-std-forge';
+import { toNode } from '../class/index.mjs';
+import { just, source } from '../create/index.mjs';
+import { createScope, onScopeDispose } from '../scope/index.mjs';
 import { map } from './map.mjs';
 import { mergeMap } from './merge-map.mjs';
 import { switchMap } from './switch-map.mjs';
@@ -276,5 +278,146 @@ describe('mergeMap releases only the inner observables its projection created (#
     );
 
     assert.isFalse(shared$.isCompleted);
+  });
+});
+
+describe('mergeMap releases an inner observable as soon as it completes (#2769)', () => {
+  test('disposes what the projection made once its inner observable completes', () => {
+    const click$ = source<number>();
+
+    const mut_inners: ReturnType<typeof source<string>>[] = [];
+
+    const mut_disposed: number[] = [];
+
+    const merged$ = click$.pipe(
+      mergeMap((n) => {
+        onScopeDispose(() => {
+          mut_disposed.push(n);
+        });
+
+        const inner$ = source<string>();
+
+        mut_inners.push(inner$);
+
+        return inner$;
+      }),
+    );
+
+    const mut_values: string[] = [];
+
+    merged$.subscribe((v) => {
+      mut_values.push(v);
+    });
+
+    click$.next(1);
+
+    click$.next(2);
+
+    mut_inners[0]?.next('a');
+
+    mut_inners[0]?.complete();
+
+    assert.deepStrictEqual(mut_disposed, [1]);
+
+    mut_inners[1]?.next('b');
+
+    assert.deepStrictEqual(mut_values, ['a', 'b']);
+
+    merged$.complete();
+
+    // Each projection's scope is disposed once.
+    assert.deepStrictEqual(mut_disposed, [1, 2]);
+  });
+
+  test('disposes at once what the projection made when its inner observable completes while subscribed', () => {
+    const click$ = source<number>();
+
+    const mut_disposed: number[] = [];
+
+    const merged$ = click$.pipe(
+      mergeMap((n) => {
+        onScopeDispose(() => {
+          mut_disposed.push(n);
+        });
+
+        return just(n);
+      }),
+    );
+
+    const mut_values: number[] = [];
+
+    merged$.subscribe((v) => {
+      mut_values.push(v);
+    });
+
+    click$.next(1);
+
+    click$.next(2);
+
+    assert.deepStrictEqual(mut_values, [1, 2]);
+
+    assert.deepStrictEqual(mut_disposed, [1, 2]);
+
+    merged$.complete();
+
+    assert.deepStrictEqual(mut_disposed, [1, 2]);
+  });
+
+  test('disposes what a projection that threw made when mergeMap completes', () => {
+    const click$ = source<number>();
+
+    const mut_disposed: number[] = [];
+
+    const merged$ = click$.pipe(
+      mergeMap((n) => {
+        onScopeDispose(() => {
+          mut_disposed.push(n);
+        });
+
+        return panic('projection failed');
+      }),
+    );
+
+    merged$.subscribe(() => {});
+
+    expect(() => {
+      click$.next(1);
+    }).toThrow('projection failed');
+
+    merged$.complete();
+
+    assert.deepStrictEqual(mut_disposed, [1]);
+  });
+
+  test('releases an inner observable when mergeMap completes while subscribing to it', () => {
+    const click$ = source<number>();
+
+    const inner$ = source<string>('first');
+
+    const mut_disposed: number[] = [];
+
+    const merged$ = click$.pipe(
+      mergeMap((n) => {
+        onScopeDispose(() => {
+          mut_disposed.push(n);
+        });
+
+        return inner$;
+      }),
+    );
+
+    merged$.subscribe((v) => {
+      if (v === 'first') {
+        merged$.complete();
+      }
+    });
+
+    click$.next(1);
+
+    assert.isTrue(merged$.isCompleted);
+
+    assert.deepStrictEqual(mut_disposed, [1]);
+
+    assert.isFalse(toNode(inner$).hasSubscriber);
   });
 });

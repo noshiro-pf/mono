@@ -8,6 +8,7 @@
 import { Optional, Result } from 'ts-data-forge';
 import { RootObservableClass } from '../class/index.mjs';
 import type { FromPromiseObservable } from '../types/index.mjs';
+import { rethrowOutOfPromise } from '../utils/index.mjs';
 
 /**
  * Creates an observable from a Promise factory that receives an `AbortSignal`.
@@ -96,35 +97,44 @@ class FromAbortablePromiseObservableClass<A, E = unknown>
 
     const promise = factory(this.#abortController.signal);
 
+    // `onRejected` beside `onFulfilled`, so that only the promise's own
+    // rejection becomes an Err: what a subscriber throws on the Ok value is not
+    // the promise's (#2931). A `.catch` after `.then` would take both, and is
+    // also a step later.
     promise
-      .then((value) => {
-        if (this.isCompleted) {
-          return;
-        }
+      // eslint-disable-next-line promise/prefer-catch, unicorn/prefer-then-catch -- their fix, `.catch(onRejected).then(onFulfilled)`, would call `onFulfilled` after a rejection too
+      .then(
+        (value) => {
+          if (this.isCompleted) {
+            return;
+          }
 
-        this.startUpdate(Result.ok(value));
-      })
-      .catch((error: unknown) => {
-        if (this.isCompleted) {
-          return;
-        }
+          this.startUpdate(Result.ok(value));
+        },
+        (error: unknown) => {
+          if (this.isCompleted) {
+            return;
+          }
 
-        // Silently ignore AbortError — it means the observable was
-        // intentionally completed (e.g., by switchMap).
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
+          // Silently ignore AbortError — it means the observable was
+          // intentionally completed (e.g., by switchMap).
+          if (error instanceof DOMException && error.name === 'AbortError') {
+            return;
+          }
 
-        this.startUpdate(
-          Result.err(
-            // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-            error as E,
-          ),
-        );
-      })
+          this.startUpdate(
+            Result.err(
+              // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+              error as E,
+            ),
+          );
+        },
+      )
+      .catch(rethrowOutOfPromise)
       .finally(() => {
         this.complete();
-      });
+      })
+      .catch(rethrowOutOfPromise);
   }
 
   protected override teardown(): void {

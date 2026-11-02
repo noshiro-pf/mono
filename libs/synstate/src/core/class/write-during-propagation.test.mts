@@ -4,7 +4,12 @@ import type { FixedLengthTuple } from 'ts-type-forge';
 import { createState } from '../../utils/index.mjs';
 import { combine } from '../combine/index.mjs';
 import { fromSubscribable, source } from '../create/index.mjs';
-import { map, switchMap } from '../operators/index.mjs';
+import {
+  map,
+  switchMap,
+  throttle,
+  withBufferedFrom,
+} from '../operators/index.mjs';
 import { writeDuringPropagationWarning } from './root-observable-class.mjs';
 
 describe('a write to a root observable while an update is propagating (#2336)', () => {
@@ -214,12 +219,76 @@ describe('a write to a root observable while an update is propagating (#2336)', 
   });
 });
 
+describe('a stateful operator updates its state before setNext, which a write from a subscriber re-enters', () => {
+  test('withBufferedFrom keeps a value written to the buffered observable for the next batch', async () => {
+    const [data$, setData] = createState('a');
+
+    const [trigger$, setTrigger] = createState(0);
+
+    const result$ = trigger$.pipe(withBufferedFrom(data$));
+
+    const mut_history: (readonly [number, readonly string[]])[] = [];
+
+    result$.subscribe((v) => {
+      mut_history.push(v);
+
+      if (v[0] === 1) {
+        setData('b');
+      }
+    });
+
+    await captureWarnings(() => {
+      setTrigger(1);
+    });
+
+    setTrigger(2);
+
+    assert.deepStrictEqual(mut_history, [
+      [0, ['a']],
+      [1, []],
+      [2, ['b']],
+    ]);
+  });
+
+  test('throttle drops a value a subscriber writes to the parent inside the window, and keeps one timer', async () => {
+    vi.useFakeTimers();
+
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
+
+    const [src$, setSrc] = createState(0);
+
+    const throttled$ = src$.pipe(throttle(1000));
+
+    const mut_history: number[] = [];
+
+    throttled$.subscribe((v) => {
+      mut_history.push(v);
+
+      if (v === 1) {
+        setSrc(2);
+      }
+    });
+
+    await captureWarnings(() => {
+      setSrc(1);
+    });
+
+    assert.deepStrictEqual(mut_history, [0, 1]);
+
+    throttled$.complete();
+
+    assert.strictEqual(vi.getTimerCount(), 0);
+  });
+});
+
 /**
  * Runs `run` with `console.warn` replaced by a mock, and returns the messages
  * it was called with.
  */
 const captureWarnings = async (
-  run: () => Promise<void> | void,
+  run: () => Promise<void> | undefined,
 ): Promise<readonly unknown[]> => {
   const warn = vi.fn();
 

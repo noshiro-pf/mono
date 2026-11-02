@@ -5,7 +5,8 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import { Arr, Optional } from 'ts-data-forge';
+import { Optional } from 'ts-data-forge';
+import type { MutableMap } from 'ts-type-forge';
 import { AsyncChildObservableClass } from '../class/index.mjs';
 import { createScope, getCurrentScope } from '../scope/index.mjs';
 import type {
@@ -22,8 +23,9 @@ import type {
  * Unlike `switchMap`, does not cancel previous inner observables.
  *
  * Each projection runs in a scope of its own (see `createScope`): what it
- * creates is disposed when `mergeMap` completes. An observable it only returns
- * — one created outside the projection and shared with others — is unsubscribed
+ * creates is disposed when the observable it returned completes, or when
+ * `mergeMap` completes, whichever comes first. An observable it only returns —
+ * one created outside the projection and shared with others — is unsubscribed
  * and left running.
  *
  * @template A - The type of values from the source
@@ -136,8 +138,12 @@ class MergeMapObservableClass<A, B>
   /** See `SwitchMapObservableClass`. */
   readonly #ownerScope: Scope | undefined;
 
-  #mut_innerScopes: readonly Scope[];
-  #mut_subscriptions: readonly Subscription[];
+  /**
+   * The inner observables still live, by the scope their projection ran in.
+   * One that completes is released at once, so a long-lived `mergeMap` holds
+   * only those (#2769).
+   */
+  readonly #mut_liveInners: MutableMap<Scope, Subscription | undefined>;
 
   constructor(
     parentObservable: Observable<A>,
@@ -152,11 +158,21 @@ class MergeMapObservableClass<A, B>
 
     this.#ownerScope = getCurrentScope();
 
-    this.#mut_innerScopes = [];
-
-    this.#mut_subscriptions = [];
+    this.#mut_liveInners = new Map<Scope, Subscription | undefined>();
 
     this.attach();
+  }
+
+  /**
+   * Unsubscribes from an inner observable and disposes what its projection
+   * made.
+   */
+  #releaseInner(innerScope: Scope): void {
+    this.#mut_liveInners.get(innerScope)?.unsubscribe();
+
+    this.#mut_liveInners.delete(innerScope);
+
+    innerScope.dispose();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -170,26 +186,30 @@ class MergeMapObservableClass<A, B>
 
     const innerScope = createScope(this.#ownerScope);
 
-    this.#mut_innerScopes = Arr.toPushed(this.#mut_innerScopes, innerScope);
+    // Held before the projection runs, so that `teardown` disposes what it made
+    // even if it throws, or if `mergeMap` completes while the inner observable
+    // is being subscribed.
+    this.#mut_liveInners.set(innerScope, undefined);
 
     const observable = innerScope.run(() => this.#mapToObservable(sn.value));
 
-    const subscription = this.subscribeInner(observable, updateToken);
+    const subscription = this.subscribeInner(observable, updateToken, () => {
+      this.#releaseInner(innerScope);
+    });
 
-    this.#mut_subscriptions = Arr.toPushed(
-      this.#mut_subscriptions,
-      subscription,
-    );
+    if (this.#mut_liveInners.has(innerScope)) {
+      this.#mut_liveInners.set(innerScope, subscription);
+    } else {
+      // Released while it was subscribed: the inner observable completed
+      // (`just(x)`), or `mergeMap` did.
+      subscription.unsubscribe();
+    }
   }
 
   /** Releases the inner observables, and only those this operator made. */
   protected override teardown(): void {
-    for (const s of this.#mut_subscriptions) {
-      s.unsubscribe();
-    }
-
-    for (const scope of this.#mut_innerScopes) {
-      scope.dispose();
+    for (const innerScope of this.#mut_liveInners.keys()) {
+      this.#releaseInner(innerScope);
     }
   }
 }

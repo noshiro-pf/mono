@@ -300,7 +300,9 @@ class CustomAsyncChildObservableClass<
   const P extends NonEmptyUnknownList,
 > extends AsyncChildObservableClass<A, P> {
   #mut_teardowns: readonly (() => void)[] | undefined;
-  readonly #hooks: AsyncChildObservableHooks;
+  // Undefined until `init` returns, which may complete the observable first;
+  // `complete` then calls `flush` before there is a hook to call.
+  readonly #hooks: AsyncChildObservableHooks | undefined;
 
   constructor(
     config: ChildObservableConfig<A, P>,
@@ -344,15 +346,15 @@ class CustomAsyncChildObservableClass<
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
-    this.#hooks.tryUpdate(updateToken);
+    this.#hooks?.tryUpdate(updateToken);
   }
 
   override canEmitNoMore(): boolean {
-    return this.#hooks.canEmitNoMore?.() === true;
+    return this.#hooks?.canEmitNoMore?.() === true;
   }
 
   protected override flush(): void {
-    this.#hooks.flush?.();
+    this.#hooks?.flush?.();
   }
 
   protected override teardown(): void {
