@@ -1,6 +1,7 @@
 import type { Toaster } from '@blueprintjs/core';
 import { createState } from 'synstate';
 import { Result } from 'ts-data-forge';
+import { dict } from '../../constants/index.mjs';
 import type {
   AccountAuth,
   AccountAuthApi,
@@ -129,8 +130,11 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
     ]);
   });
 
-  test('deletes nothing when signing in with Google fails', async () => {
-    const { deps, calls, dialog } = setup({ google: Result.err(undefined) });
+  test.each([
+    { when: 'signing in with Google fails', google: Result.err(undefined) },
+    { when: 'Google returns no credential', google: Result.ok(undefined) },
+  ] as const)('deletes nothing when $when', async ({ google }) => {
+    const { deps, calls, dialog } = setup({ google });
 
     const store = createDeleteAccountCreatedWithGoogleStore(deps);
 
@@ -142,13 +146,35 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
       .spyOn(console, 'error')
       .mockImplementation(() => undefined);
 
+    const showToast = vi.spyOn(fakeToaster, 'show');
+
+    onTestFinished(() => {
+      consoleError.mockRestore();
+
+      showToast.mockRestore();
+    });
+
     store.enterClickHandler();
 
     await settle();
 
-    consoleError.mockRestore();
-
     assert.deepStrictEqual(calls, ['googleSignInWithPopup']);
+
+    assert.strictEqual(consoleError.mock.calls.length, 1);
+
+    // The dialog stays open so that signing in can be tried again, and is not
+    // waiting any more — closing it would reset the waiting state on its own.
+    assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
+
+    assert.strictEqual(
+      dialog.openingDialogType$.getSnapshot().value,
+      'deleteAccountCreatedWithGoogle',
+    );
+
+    assert.deepStrictEqual(
+      showToast.mock.calls.map(([props]) => [props.intent, props.message]),
+      [['danger', dict.accountSettings.reauthenticate.message.error]],
+    );
   });
 });
 
