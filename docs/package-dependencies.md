@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 72 個。
+このリポジトリの workspace パッケージは 73 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -47,6 +47,7 @@ graph LR
   synstate_dom_benchmark["synstate-dom-benchmark"]
   synstate_dom_docs["synstate-dom-docs"]
   synstate_dom_sample_app["synstate-dom-sample-app"]
+  synstate_router_dom_sample_app["synstate-router-dom-sample-app"]
   synstate_router_sample_app["synstate-router-sample-app"]
   task_manager["task-manager"]
   tiny_router_observable["tiny-router-observable"]
@@ -217,6 +218,12 @@ graph LR
   synstate_dom_sample_app --> synstate
   synstate_dom_sample_app --> synstate_dom
   synstate_dom_sample_app --> ts_data_forge
+  synstate_router_dom_sample_app --> synstate
+  synstate_router_dom_sample_app --> synstate_dom
+  synstate_router_dom_sample_app --> synstate_router
+  synstate_router_dom_sample_app --> synstate_router_dom
+  synstate_router_dom_sample_app --> ts_data_forge
+  synstate_router_dom_sample_app --> ts_std_forge
   synstate_router_sample_app --> synstate
   synstate_router_sample_app --> synstate_react_hooks
   synstate_router_sample_app --> synstate_router
@@ -334,7 +341,7 @@ graph LR
 |    4 | `github-view-defaults-extension`, `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `ts-utils-additional`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`                                                                                                           |
 |    5 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `pr-report-core`, `synstate-dom`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `synstate-router`, `ts-codemod-cli`                                                                                                                                                                     |
 |    6 | `algo-app`, `annotation-tool`, `blueprintjs-playground`, `catan-dice`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `pr-manager`, `profile`, `react-blueprintjs-utils`, `react-utils-styled`, `split-view-extension`, `@synstate/docs`, `synstate-dom-benchmark`, `synstate-dom-sample-app`, `blueprint-synstate`, `github-settings-as-code`, `pr-merge-queue`, `synstate-router-dom`, `synstate-router-react` |
-|    7 | `blueprintjs-playground-styled`, `cant-stop-probability`, `event-schedule-app`, `event-schedule-app-functions`, `housing-loan-calculator`, `life-plan-simulator`, `react-mui-utils`, `synstate-router-sample-app`, `task-manager`                                                                                                                                                                                                                                                                   |
+|    7 | `blueprintjs-playground-styled`, `cant-stop-probability`, `event-schedule-app`, `event-schedule-app-functions`, `housing-loan-calculator`, `life-plan-simulator`, `react-mui-utils`, `synstate-router-dom-sample-app`, `synstate-router-sample-app`, `task-manager`                                                                                                                                                                                                                                 |
 |    8 | `color-demo`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 ### 参考: devDependencies も含めた場合
@@ -414,6 +421,8 @@ graph LR
 | `synstate-dom-docs`                  | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                     |
 | `synstate-dom-sample-app`            | dep  | `synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `synstate-dom-sample-app`            | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                               |
+| `synstate-router-dom-sample-app`     | dep  | `synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`synstate-router`&nbsp;`workspace:*`<br>`synstate-router-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-std-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                              |
+| `synstate-router-dom-sample-app`     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                         |
 | `synstate-router-sample-app`         | dep  | `synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`synstate-router`&nbsp;`workspace:*`<br>`synstate-router-react`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-std-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                    |
 | `synstate-router-sample-app`         | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                         |
 | `task-manager`                       | dep  | `blueprint-synstate`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                        |
@@ -489,7 +498,7 @@ graph LR
 | `ts-std-forge`                       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `ts-type-forge`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                     |
 
-72 / 72 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+73 / 73 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 

@@ -1,6 +1,6 @@
 # synstate-router-sample-app
 
-A small React app built with [synstate-router](../../libs/synstate-router) and [synstate-router-react](../../libs/synstate-router-react), served by the Vite dev server. Its e2e suite is the browser check of both packages; `e2e/data.spec.mts` holds the page's clock to read what is drawn while a request is in flight.
+A small React app built with [synstate-router](../../libs/synstate-router) and [synstate-router-react](../../libs/synstate-router-react), served by the Vite dev server. Its e2e suite is the browser check of both packages, and [synstate-router-dom-sample-app](../synstate-router-dom-sample-app) runs it too, against the same pages built on synstate-dom; `e2e/data.spec.mts` holds the page's clock to read what is drawn while a request is in flight.
 
 What it shows:
 

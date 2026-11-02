@@ -682,6 +682,21 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
+    // Not an Astro site like the entry above assumes: a Vite React app whose
+    // entry is the module `index.html` loads.
+    "apps/synstate-router-sample-app": {
+      "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry above assumes: a Vite synstate-dom app
+    // whose entry is the module `index.html` loads. Its e2e suite is
+    // `apps/synstate-router-sample-app`'s, which its Playwright config names.
+    "apps/synstate-router-dom-sample-app": {
+      "entry": ["src/main.tsx", "configs/*.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
     // Not an Astro site like the entry above assumes: a Vite synstate-dom app
     // whose entry is the module `index.html` loads. `src/demo/` and
     // `src/firebase/` are reached from it through dynamic imports.
