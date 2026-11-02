@@ -431,6 +431,24 @@ if (Optional.isSome(oldestPerson)) {
 }
 ```
 
+#### Importing `Arr` from `ts-data-forge/array`
+
+`Arr` is one object, and esbuild keeps an object whole once any of its members is used. The `ts-data-forge/array` subpath exports the same functions as a module of their own, so a bundle keeps only the ones it calls, with what they use. The call sites stay the same.
+
+```tsx
+import * as Arr from 'ts-data-forge/array';
+
+const numbers = [1, 2, 3] as const;
+
+// The same functions as `Arr` from 'ts-data-forge'
+assert.isTrue(Arr.isNonEmpty(numbers));
+
+assert.deepStrictEqual<readonly number[]>(
+    Arr.toPushed(numbers, 4),
+    [1, 2, 3, 4],
+);
+```
+
 ### 5. Immutable Collections: `IMap` and `ISet`
 
 Type-safe, immutable data structures.

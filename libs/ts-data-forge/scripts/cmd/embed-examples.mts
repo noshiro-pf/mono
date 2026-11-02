@@ -14,6 +14,7 @@ const documents = [
       'number-utilities.mts',
       'branded-number-types.mts',
       'array-utilities.mts',
+      'array-subpath.mts',
       'immutable-collections.mts',
       'type-guards.mts',
       'iteration-range.mts',

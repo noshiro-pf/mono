@@ -3,7 +3,9 @@ import {
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  eslintImportsRules,
   type FlatConfig,
+  mergeRestrictedImportsOptions,
   restrictedSyntax,
 } from 'eslint-config-typed';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
@@ -110,6 +112,51 @@ export default [
     files: ['src/**'],
     rules: defineKnownRules({
       'unicorn/prefer-number-is-safe-integer': 'off',
+      // `Arr`'s functions are reached through their own barrel; see below.
+      'import-x/no-internal-modules': [
+        'error',
+        {
+          allow: [
+            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+            '**/array/impl/index.mjs',
+          ],
+        },
+      ],
+    }),
+  },
+  {
+    // The library's own code must not go through the `Arr` object: esbuild
+    // keeps an imported namespace object whole once any member is used, so
+    // `Obj` would carry every array function into a consumer's bundle.
+    // `test/eslint-config.test.mts` checks that this is in effect.
+    files: ['src/**/*.mts'],
+    // The generated barrel re-exports `Arr`; `entry-point.mts` has the rule
+    // off below.
+    ignores: ['src/**/*.test.mts', 'src/index.mts'],
+    rules: defineKnownRules({
+      'no-restricted-imports': [
+        'error',
+        mergeRestrictedImportsOptions(restrictedImports[0], {
+          patterns: [
+            {
+              // The barrel that exports the object and the entry point that
+              // re-exports it.
+              regex: String.raw`(^|/)(array/index|entry-point)\.mjs$`,
+              importNames: ['Arr'],
+              allowTypeImports: true,
+              message:
+                "Import the functions with `import * as Arr from '<relative path>/array/impl/index.mjs'` instead, so that a bundle keeps only the ones it calls.",
+            },
+            {
+              // `tsconfig.build.json` has no `paths`, so the build would
+              // resolve a self-import to `dist/`, which does not exist yet.
+              regex: String.raw`^ts-data-forge(/|$)`,
+              message:
+                'Import the module by its relative path, not through the package name.',
+            },
+          ],
+        }),
+      ],
     }),
   },
   {
