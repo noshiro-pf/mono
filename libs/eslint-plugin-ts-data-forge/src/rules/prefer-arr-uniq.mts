@@ -264,8 +264,14 @@ const isPrimitiveType = (
 ): boolean => {
   const resolved = resolveConstraint(checker, type);
 
-  return resolved.isUnion()
-    ? resolved.types.every((t) => isPrimitiveType(checker, t))
+  if (resolved.isUnion()) {
+    return resolved.types.every((t) => isPrimitiveType(checker, t));
+  }
+
+  // A branded primitive (`Int`, `string & Readonly<{ brand: 'Id' }>`): one
+  // primitive member makes the whole a primitive, as at the array level below.
+  return resolved.isIntersection()
+    ? resolved.types.some((t) => isPrimitiveType(checker, t))
     : (resolved.flags & primitiveTypeFlags) !== 0;
 };
 
