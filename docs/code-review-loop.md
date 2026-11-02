@@ -22,7 +22,9 @@ round dismissed, costs as much as the first.
   behaves at its edges), write the plan first — what changes, what does not,
   the edge cases from [`review-checklists.md`](./review-checklists.md) that
   apply — and settle it before writing code. A design changed in round five
-  makes every earlier round wasted work.
+  makes every earlier round wasted work. A design the user has to choose is
+  put to them as [`presenting-choices.md`](./presenting-choices.md) says:
+  each option tried first, as throwaway code rather than the change.
 - **Write down what is out of scope before the first round.** Start the pull
   request description draft with what the change deliberately leaves alone:
   existing behavior it keeps, cases it does not cover, follow-ups that are
