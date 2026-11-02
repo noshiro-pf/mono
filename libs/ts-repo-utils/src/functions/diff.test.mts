@@ -808,6 +808,85 @@ describe('diff', () => {
     });
   });
 
+  describe('file names git would quote', () => {
+    // Non-ASCII, a double quote, and leading and trailing spaces: git's
+    // default `core.quotePath` writes the first two quoted and octal-escaped,
+    // and trimming each line would change the last.
+    const names = [
+      '日本語.md',
+      'a "quoted" name.txt',
+      ' spaced name .txt',
+    ] as const;
+
+    const writeAll = async (
+      repoPath: string,
+      content: string,
+    ): Promise<readonly string[]> => {
+      const filePaths = names.map((name) => path.join(repoPath, name));
+
+      await Promise.all(
+        filePaths.map(async (filePath) =>
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          fs.writeFile(filePath, content),
+        ),
+      );
+
+      return filePaths;
+    };
+
+    test('getUntrackedFiles returns them as they are on disk', async () => {
+      const { repoPath, cleanup } = await createTempRepo();
+
+      try {
+        const filePaths = await writeAll(repoPath, 'content');
+
+        const result = await createRepoFunctions(repoPath).getUntrackedFiles({
+          silent: true,
+        });
+
+        assert.isTrue(Result.isOk(result));
+
+        assert.deepStrictEqual(result.value.toSorted(), filePaths.toSorted());
+      } finally {
+        await cleanup();
+      }
+    });
+
+    test('getStagedFiles and getModifiedFiles return them as they are on disk', async () => {
+      const { repoPath, cleanup, execInRepo } = await createTempRepo();
+
+      const repoFunctions = createRepoFunctions(repoPath);
+
+      try {
+        const filePaths = await writeAll(repoPath, 'initial');
+
+        await execInRepo('git add -A', { silent: true });
+
+        const staged = await repoFunctions.getStagedFiles({ silent: true });
+
+        assert.isTrue(Result.isOk(staged));
+
+        assert.deepStrictEqual(staged.value.toSorted(), filePaths.toSorted());
+
+        await execInRepo('git commit -m "Initial commit" --no-verify', {
+          silent: true,
+        });
+
+        await writeAll(repoPath, 'modified');
+
+        const modified = await repoFunctions.getModifiedFiles({
+          silent: true,
+        });
+
+        assert.isTrue(Result.isOk(modified));
+
+        assert.deepStrictEqual(modified.value.toSorted(), filePaths.toSorted());
+      } finally {
+        await cleanup();
+      }
+    });
+  });
+
   describe(getDiffFrom, () => {
     test('should work with silent option', async () => {
       const { repoPath, cleanup, execInRepo } = await createTempRepo();
