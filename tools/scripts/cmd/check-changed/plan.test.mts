@@ -8,15 +8,31 @@ import {
   isSpellCheckedByCi,
   matchesGatePattern,
   parsePathsIgnore,
+  readManifestDependencies,
   type PackageInfo,
 } from './plan.mjs';
 
-const pkg = (dir: string, scripts: readonly string[]): PackageInfo =>
+const pkg = (
+  dir: string,
+  scripts: readonly string[],
+  {
+    workspaceDependencies = [],
+    buildDependencies = [],
+    exportsBuild = false,
+  }: Readonly<{
+    workspaceDependencies?: readonly string[];
+    buildDependencies?: readonly string[];
+    exportsBuild?: boolean;
+  }> = {},
+): PackageInfo =>
   ({
     name: dir.slice(dir.lastIndexOf('/') + 1),
     dir,
     scripts: new Set(scripts),
     isPrivate: false,
+    workspaceDependencies: new Set(workspaceDependencies),
+    buildDependencies: new Set(buildDependencies),
+    exportsBuild,
   }) as const;
 
 const packages = [
@@ -30,6 +46,35 @@ const packages = [
   pkg('apps/profile', ['fix:lint', 'check:types', 'check:test']),
   pkg('languages/sumi/checker', ['check:types', 'check:sumi']),
   pkg('strict-lib/v7.0', ['gen:lib', 'check:types']),
+  pkg('libs/synstate', ['gen', 'build', 'check:types'], {
+    exportsBuild: true,
+  }),
+  pkg('libs/synstate-react-hooks', ['gen', 'build', 'check:types'], {
+    workspaceDependencies: ['synstate'],
+    exportsBuild: true,
+  }),
+  pkg('apps/synstate-docs', ['gen', 'check:types'], {
+    workspaceDependencies: ['synstate', 'synstate-react-hooks'],
+  }),
+  pkg('apps/react-utils', ['gen', 'build', 'check:types']),
+  pkg('apps/react-app', ['gen', 'check:types'], {
+    workspaceDependencies: ['react-utils'],
+  }),
+  pkg('libs/leaf', ['build', 'check:types'], { exportsBuild: true }),
+  // Sorts before what it depends on, so that directory order is not build
+  // order.
+  pkg('libs/a-leaf-user', ['build', 'check:types'], {
+    workspaceDependencies: ['leaf'],
+    buildDependencies: ['leaf'],
+    exportsBuild: true,
+  }),
+  pkg('apps/leaf-docs', ['gen'], {
+    workspaceDependencies: ['leaf', 'a-leaf-user'],
+  }),
+  pkg('libs/lonely', ['build', 'check:types'], { exportsBuild: true }),
+  pkg('apps/no-gen', ['check:types'], {
+    workspaceDependencies: ['synstate', 'lonely'],
+  }),
 ] as const;
 
 const rootScripts = [
@@ -360,10 +405,127 @@ describe('buildPlan', () => {
     },
   );
 
+  test('a source change builds the package, then runs the generators of what declares it', () => {
+    const commands = commandsOf(['libs/synstate/src/index.mts']);
+
+    assert.deepStrictEqual(
+      commands.slice(0, commands.indexOf('run gen:verify-npm-packages')),
+      [
+        'run z:format-diff-from abc123',
+        'libs/synstate: run gen',
+        'libs/synstate: run build',
+        'apps/synstate-docs: run gen',
+        'libs/synstate-react-hooks: run gen',
+      ],
+    );
+  });
+
+  test('a dependent the diff touches runs its generator again after the build', () => {
+    const commands = commandsOf([
+      'libs/synstate/src/index.mts',
+      'libs/synstate-react-hooks/src/index.mts',
+    ]);
+
+    assert.deepStrictEqual(
+      commands.slice(0, commands.indexOf('run gen:verify-npm-packages')),
+      [
+        'run z:format-diff-from abc123',
+        'libs/synstate: run gen',
+        'libs/synstate-react-hooks: run gen',
+        'libs/synstate: run build',
+        'libs/synstate-react-hooks: run build',
+        'apps/synstate-docs: run gen',
+        'libs/synstate-react-hooks: run gen',
+      ],
+    );
+  });
+
+  test('the generators of what declares it run as generators', () => {
+    assert.deepStrictEqual(
+      plan(['libs/synstate/src/index.mts'])
+        .filter(({ kind }) => kind === 'generate')
+        .map(({ title }) => title),
+      [
+        'synstate: gen',
+        'synstate-docs: gen (declares synstate)',
+        'synstate-react-hooks: gen (declares synstate)',
+        'gen:verify-npm-packages',
+      ],
+    );
+  });
+
+  test('a package its dependents read from source is not built', () => {
+    const commands = commandsOf(['apps/react-utils/src/index.mts']);
+
+    assert.include(commands, 'apps/react-app: run gen');
+
+    assert.notInclude(commands, 'apps/react-utils: run build');
+  });
+
+  test('a package with no dependent generator is not built', () => {
+    assert.notInclude(
+      commandsOf(['libs/lonely/src/index.mts']).join('\n'),
+      'run build',
+    );
+  });
+
+  test('the builds run in dependency order, not directory order', () => {
+    assert.deepStrictEqual(
+      commandsOf([
+        'libs/a-leaf-user/src/index.mts',
+        'libs/leaf/src/index.mts',
+      ]).filter((command) => command.endsWith('run build')),
+      ['libs/leaf: run build', 'libs/a-leaf-user: run build'],
+    );
+  });
+
+  test('a document change runs no dependent generator', () => {
+    const commands = commandsOf(['libs/synstate/README.md']);
+
+    assert.notInclude(commands, 'libs/synstate: run build');
+
+    assert.notInclude(commands, 'apps/synstate-docs: run gen');
+  });
+
   test('prose alone does not regenerate them', () => {
     assert.notInclude(
       commandsOf(['verify-npm-packages/README.md']),
       'run gen:verify-npm-packages',
+    );
+  });
+});
+
+describe('readManifestDependencies', () => {
+  test('reads the workspace members of each field, and whether dist/ is exported', () => {
+    const facts = readManifestDependencies({
+      dependencies: { a: 'workspace:^', external: '^1.0.0' },
+      peerDependencies: { b: 'workspace:*' },
+      devDependencies: { c: 'workspace:*', d: 'catalog:' },
+      exports: {
+        '.': { types: './dist/index.d.mts', default: './dist/index.mjs' },
+      },
+    });
+
+    assert.deepStrictEqual(Array.from(facts.workspaceDependencies), [
+      'a',
+      'c',
+      'b',
+    ]);
+
+    assert.deepStrictEqual(Array.from(facts.buildDependencies), ['a', 'b']);
+
+    assert.isTrue(facts.exportsBuild);
+  });
+
+  test.each([
+    [{ exports: './src/index.mts' }, false],
+    [{ main: 'dist/index.mjs' }, true],
+    [{ bin: { x: './src/cmd/x.mts' } }, false],
+    ['not a manifest', false],
+  ] as const)('%j exports its build: %s', (manifest, expected) => {
+    assert.strictEqual(
+      readManifestDependencies(manifest).exportsBuild,
+      expected,
     );
   });
 });
