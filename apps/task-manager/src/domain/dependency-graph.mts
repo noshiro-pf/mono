@@ -67,8 +67,8 @@ export type DependencyGraphEdge = DeepReadonly<{
   type: DependencyType | undefined;
   lagMs: number;
   /**
-   * Not a dependency but the order in time of two milestones
-   * (`withChronologicalEdges`), which nothing waits on.
+   * Not a dependency but the order in time of two milestones, or of a deadline
+   * and a milestone (`withChronologicalEdges`), which nothing waits on.
    */
   implied: boolean;
 }>;

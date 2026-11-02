@@ -65,8 +65,10 @@
  *
  * ELK lays out the milestones that have a date in order of date: the graph it
  * is given has an edge from each to those of the next date
- * (`withChronologicalEdges`), which the DAG draws dashed. A date changed
- * changes the structure, and so lays the DAG out again as any edge does.
+ * (`withChronologicalEdges`), which the DAG draws dashed. A task with a
+ * deadline is laid out before the milestones of the first date at or after it,
+ * by an edge of the same kind. A date or a deadline changed changes the
+ * structure, and so lays the DAG out again as any edge does.
  *
  * The nodes `hidden` (`dag/hidden-nodes.mts`) are drawn in no mode: ELK lays
  * out the rest, and 「アーク」 and 「タイル」 place the rest, which move to
@@ -150,6 +152,7 @@ import {
 import {
   isArrangeable,
   shouldAnimate,
+  startOfDayAt,
   type AnimationSetting,
   type DagViewMode,
   type NodeSize,
@@ -168,6 +171,8 @@ export type DagLayoutState = Readonly<
  */
 export type DagLayoutDeps<H, F> = Readonly<{
   state: InitializedObservable<DomainState>;
+  /** Whose wall clock an all-day deadline is a day of; `undefined` for the browser's. */
+  timeZone: string | undefined;
   /**
    * The saved arrangement, as made at 「標準」; `undefined` while there is
    * none.
@@ -1271,7 +1276,11 @@ export const createDagLayoutStore = <H, F>(
     const shownState = withoutNodes(state, hidden);
 
     const input = layoutInput(
-      withChronologicalEdges(shownState, buildDependencyGraph(shownState)),
+      withChronologicalEdges(
+        shownState,
+        buildDependencyGraph(shownState),
+        (epochMs) => startOfDayAt(epochMs, deps.timeZone),
+      ),
       direction,
       size,
       groups,

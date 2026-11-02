@@ -22,6 +22,13 @@ export const toDateLocal = (epochMs: number, timeZone?: string): string =>
   toDateTimeLocal(epochMs, timeZone).slice(0, DATE_LENGTH);
 
 /**
+ * The first instant of the day `epochMs` is in, on the wall clock of
+ * `timeZone`.
+ */
+export const startOfDayAt = (epochMs: number, timeZone?: string): number =>
+  fromDateLocal(toDateLocal(epochMs, timeZone), 'start', timeZone) ?? epochMs;
+
+/**
  * The first instant of the day `value` (`YYYY-MM-DD`) names on the wall clock
  * of `timeZone`, or its last (the millisecond before the next day's first), or
  * `undefined` when it is not a real day alone. A day whose midnight the clocks

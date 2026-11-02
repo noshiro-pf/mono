@@ -1,6 +1,7 @@
 import {
   fromDateLocal,
   fromDateTimeLocal,
+  startOfDayAt,
   switchAllDay,
   toDateLocal,
   toDateTimeLocal,
@@ -148,6 +149,25 @@ describe(fromDateLocal, () => {
 
     // Its next day is not one.
     assert.isUndefined(fromDateLocal('9999-12-31', 'end', 'UTC'));
+  });
+});
+
+describe(startOfDayAt, () => {
+  test('is the first instant of the day of an instant on the wall clock of the given zone', () => {
+    // 2026-10-10T14:59:59.999Z, the last instant of 2026-10-10 in Tokyo.
+    assert.strictEqual(
+      startOfDayAt(1_791_644_399_999, 'Asia/Tokyo'),
+      1_791_558_000_000 /* 2026-10-09T15:00:00Z */,
+    );
+  });
+
+  test('is the start of a day of 25 hours', () => {
+    // Santiago goes from 00:00 back to 23:00 on 2026-04-05, so 2026-04-04 is 25
+    // hours long.
+    assert.strictEqual(
+      startOfDayAt(1_775_361_599_999, 'America/Santiago'),
+      1_775_271_600_000 /* 2026-04-04T00:00-03:00 */,
+    );
   });
 });
 
