@@ -1,6 +1,6 @@
 import { hasKey, isRecord } from 'ts-data-forge';
 import { bindProps } from '../bind/index.mjs';
-import { svgTagNames } from '../internal/index.mjs';
+import { appendTo, mountThenInsert, svgTagNames } from '../internal/index.mjs';
 import { isChild, mountChild, type Child } from './child.mjs';
 import { mountable, type Mountable } from './mountable.mjs';
 
@@ -50,7 +50,7 @@ const mountElement = (tag: string, props: unknown): Element => {
 
   // Children first, so that a `<select>`'s `value` finds its `<option>`s.
   if (hasKey(props, 'children') && isChild(props.children)) {
-    element.append(...mountChild(props.children));
+    mountThenInsert(mountChild, props.children, appendTo, element);
   }
 
   bindProps(element, props);

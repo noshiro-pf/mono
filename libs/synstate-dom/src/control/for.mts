@@ -11,7 +11,12 @@ import {
 import { Arr, Optional } from 'ts-data-forge';
 import type { BivariantHack } from 'ts-type-forge';
 import { toObservable, type Bindable } from '../constant/index.mjs';
-import { bindValue } from '../internal/index.mjs';
+import {
+  applyWhenAttached,
+  bindValue,
+  insertBefore,
+  mountThenInsert,
+} from '../internal/index.mjs';
 import { mountable, toNodes, type JSX } from '../jsx/index.mjs';
 import { longestIncreasingSubsequence } from './longest-increasing-subsequence.mjs';
 
@@ -30,6 +35,10 @@ import { longestIncreasingSubsequence } from './longest-increasing-subsequence.m
  * written during it. A key that goes disposes its row's scope and removes its
  * nodes; the rows that stay are moved as little as the longest increasing
  * subsequence allows.
+ *
+ * An update that arrives before the anchor is in a parent (a later sibling
+ * wrote `items` while the enclosing element was still mounting its children) is
+ * applied, with the latest `items`, once the nodes `For` returned are inserted.
  *
  * `key` is required, as in React; `(_, i) => i` matches rows by position. A key
  * that appears twice is reported with `console.error`, and its later
@@ -72,7 +81,10 @@ export const For = <T,>({
 
     const rowStarts = new WeakSet<Node>();
 
-    const mut_initial: { nodes: readonly ChildNode[] } = { nodes: [] };
+    const mut_initial: { nodes: readonly ChildNode[]; built: boolean } = {
+      nodes: [],
+      built: false,
+    };
 
     /** Creates a row in a scope of its own and returns its first nodes. */
     const createRow = (
@@ -161,12 +173,11 @@ export const For = <T,>({
       range.deleteContents();
     };
 
-    bindValue(entries$, (entries) => {
+    /** Brings the attached rows in line with `entries`. */
+    const update = (entries: Entries<T>): void => {
       const previousOrder = Array.from(mut_rows.keys());
 
-      if (anchor.parentNode !== null) {
-        removeAllAtOnceIfEveryKeyGoes(previousOrder, entries);
-      }
+      removeAllAtOnceIfEveryKeyGoes(previousOrder, entries);
 
       for (const [rowKey, row] of mut_rows) {
         if (entries.byKey.has(rowKey)) {
@@ -176,16 +187,6 @@ export const For = <T,>({
         row.scope.dispose();
 
         mut_rows.delete(rowKey);
-      }
-
-      if (anchor.parentNode === null) {
-        mut_initial.nodes = entries.order.flatMap((rowKey) => {
-          const entry = entries.byKey.get(rowKey);
-
-          return entry === undefined ? [] : createRow(rowKey, entry);
-        });
-
-        return;
       }
 
       if (Arr.eq(previousOrder, entries.order)) {
@@ -224,11 +225,14 @@ export const For = <T,>({
             continue;
           }
 
-          const [start, ...rest] = createRow(rowKey, entry);
+          const [start] = mountThenInsert(
+            (e: Entry<T>) => createRow(rowKey, e),
+            entry,
+            insertBefore,
+            mut_next,
+          );
 
           if (start !== undefined) {
-            mut_next.before(start, ...rest);
-
             mut_next = start;
           }
 
@@ -243,6 +247,24 @@ export const For = <T,>({
       }
 
       reorderMap(mut_rows, entries.order);
+    };
+
+    const updateWhenAttached = applyWhenAttached(anchor, update);
+
+    bindValue(entries$, (entries) => {
+      if (!mut_initial.built) {
+        mut_initial.built = true;
+
+        mut_initial.nodes = entries.order.flatMap((rowKey) => {
+          const entry = entries.byKey.get(rowKey);
+
+          return entry === undefined ? [] : createRow(rowKey, entry);
+        });
+
+        return;
+      }
+
+      updateWhenAttached(entries);
     });
 
     return Arr.toPushed(mut_initial.nodes, anchor);
