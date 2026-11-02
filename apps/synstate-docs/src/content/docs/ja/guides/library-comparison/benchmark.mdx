@@ -71,6 +71,23 @@ SynState はどのシナリオでも最速のライブラリの {/* bench:summar
 
 したがって、概要では SynState はどのシナリオでも最速のライブラリから大きく遅れません。SynState はグリッチフリーで、グラフの形によらず更新ごとのコストがグラフの大きさに比例したままです。これは Solid と Preact Signals も同じで、RxJS は違います。小さなグラフでの更新ごとのオーバーヘッドは、Solid・MobX・Jotai・Redux {/* bench:compare/small-graphs/synstate-vs-heavy-overhead */}よりかなり小さい{/* /bench */}です。Preact Signals {/* bench:compare/small-graphs/synstate-vs-preact-signals-overhead */}と同程度{/* /bench */}です。単一ステートでは Zustand {/* bench:compare/single-state/synstate-vs-zustand-overhead */}と同程度{/* /bench */}です。RxJS {/* bench:compare/small-graphs/synstate-vs-rxjs-overhead */}と同程度かそれより大きい{/* /bench */}です。SynState が最も遅れるのは{/* bench:summary/worst/synstate-scenario */}[条件付きファンアウト](#シナリオ-条件付きファンアウト)（B=1000）{/* /bench */}で、そこで最速のライブラリの {/* bench:summary/synstate-worst-over-fastest */}2.7{/* /bench */}倍ですが、{/* bench:summary/synstate-worst-explained */}これはすでに誰も読まない分岐を持たない `switchMap` の形での数字です。残っているのは、どのノードにも届かない書き込みの SynState でのコストです{/* /bench */}。最初の2つの性質を共有する Preact Signals に対しては、{/* bench:compare/preact-signals-winner */}これらの結果に一貫した勝者はありません{/* /bench */}。Preact Signals の時間は SynState に対して単一ステートで {/* bench:single-state/preact-signals-over-synstate */}1.2{/* /bench */}倍、ディープチェーン（$K=1000$、$M=200$）で {/* bench:deep-chain/preact-signals-over-synstate@k1000-m200 */}1.2{/* /bench */}倍、ダイヤモンドでは {/* bench:diamond/preact-signals-over-synstate */}1.0{/* /bench */}倍です。それぞれのモデルのために作られたシナリオもあります。条件付きファンアウト（B={/* bench:fan-out/last-measured-b */}1000{/* /bench */}）では SynState の時間が Preact Signals の {/* bench:fan-out/synstate-switch-map-over-preact-signals@last-measured-b */}1.7{/* /bench */}倍、等値カットオフ（W={/* bench:cut-off/summary-w */}50{/* /bench */}）では Preact Signals の時間が SynState の {/* bench:cut-off/preact-signals-over-synstate@summary-w */}15{/* /bench */}倍です。Preact Signals との違いは、最悪ケース（最速のライブラリの {/* bench:summary/synstate-worst-over-fastest */}2.7{/* /bench */} 倍に対して {/* bench:summary/preact-signals-worst-over-fastest */}19{/* /bench */} 倍）と、`debounce`・`throttle`・`switchMap` などのオペレーターを同じグリッチフリーなグラフの上で使えることです（[SynState の強み](/mono/synstate/ja/guides/why-synstate/#グリッチフリーでコストは線形)）。
 
+:::note[この数値の作られ方]
+このページの数値は、CI が固定したランナー（`ubuntu-24.04`）で、比較するライブラリのバージョンの組ごとに 1 回だけ計測したものです。その計測とこのページの表を比べて、あるライブラリが他のライブラリに対して run 間のノイズを超えて変化していれば、`main` 上の [SynState Benchmark ワークフロー](https://github.com/noshiro-pf/mono/blob/main/.github/workflows/synstate-benchmark.yml)が失敗します。`pnpm --filter @synstate/docs run benchmark` は同じシナリオを手元で計測し、その 1 回の計測からこのページの表・グラフ・数値をすべて書き換えます。計測がもう支えない文があれば、その文を名指しして止まります。その文を書き直してから `gen:benchmark-doc` と `fix:fmt` を実行してください（計測し直す必要はありません）。コマンドは[ドキュメントパッケージ](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-docs)にあり、各シナリオの計測の手順は[測定方法](#測定方法)にあります。
+
+|            |                                                                                                                                                                                                           |
+| :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 実行環境   | {/* bench:environment/runner */}GitHub Actions ubuntu24{/* /bench */}                                                                                                                                     |
+| OS         | {/* bench:environment/os */}Linux 7.0.0-1017-azure (x64){/* /bench */}                                                                                                                                    |
+| CPU        | {/* bench:environment/cpu */}AMD EPYC 7763 64-Core Processor{/* /bench */}                                                                                                                                |
+| Node       | {/* bench:environment/node */}v26.12.1{/* /bench */}                                                                                                                                                      |
+| ライブラリ | {/* bench:environment/libraries */}synstate 6.1.1, rxjs 7.8.2, jotai 3.0.1, mobx 7.1.0, @reduxjs/toolkit 2.13.0, zustand 5.0.15, valtio 2.3.2, solid-js 1.9.17, @preact/signals-core 1.14.4{/* /bench */} |
+| 計測日     | {/* bench:environment/measured-on */}2026-10-31{/* /bench */}                                                                                                                                             |
+
+計測環境は各シナリオの結果ファイルに記録され、上の値はそこから読み出されています。ダッシュ（—）は、実行環境を固定する前に計測された表であることを意味します。
+
+絶対値のミリ秒は同一環境内でのみ比較できます。ここの数値とご自身で計測した数値が食い違う場合は、ミリ秒ではなくライブラリ間の比を見てください。
+:::
+
 ## シナリオ： 単一ステート
 
 ステート1つ、subscriber 1つ、派生値なし。他のすべてのシナリオの土台となる下限で、Zustand と Valtio が参加するのはこのシナリオだけです。両者のバニラ API には派生値のノードがないため、派生値のあるグラフでは subscriber の中でインライン計算するしかなく、それは他のライブラリが構築するグラフとは別の、より小さなグラフになります。
@@ -348,23 +365,6 @@ export const runBenchmark = (n: number): number => {
 | Solid | 89.30 | 88.81 | 90.31 | 89.61 | 1,119,791 | 6.12× |
 | Preact Signals | 13.92 | 13.78 | 14.20 | 14.19 | 7,185,614 | 0.95× |
 {/* /benchmark-result */}
-
-:::note[この数値の作られ方]
-このページの数値は、CI が固定したランナー（`ubuntu-24.04`）で、比較するライブラリのバージョンの組ごとに 1 回だけ計測したものです。その計測とこのページの表を比べて、あるライブラリが他のライブラリに対して run 間のノイズを超えて変化していれば、`main` 上の [SynState Benchmark ワークフロー](https://github.com/noshiro-pf/mono/blob/main/.github/workflows/synstate-benchmark.yml)が失敗します。`pnpm --filter @synstate/docs run benchmark` は同じシナリオを手元で計測し、その 1 回の計測からこのページの表・グラフ・数値をすべて書き換えます。計測がもう支えない文があれば、その文を名指しして止まります。その文を書き直してから `gen:benchmark-doc` と `fix:fmt` を実行してください（計測し直す必要はありません）。コマンドは[ドキュメントパッケージ](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-docs)にあり、各シナリオの結果ファイルには計測環境が記録されます。
-
-|            |                                                                                                                                                                                                           |
-| :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 実行環境   | {/* bench:environment/runner */}GitHub Actions ubuntu24{/* /bench */}                                                                                                                                     |
-| OS         | {/* bench:environment/os */}Linux 7.0.0-1017-azure (x64){/* /bench */}                                                                                                                                    |
-| CPU        | {/* bench:environment/cpu */}AMD EPYC 7763 64-Core Processor{/* /bench */}                                                                                                                                |
-| Node       | {/* bench:environment/node */}v26.12.1{/* /bench */}                                                                                                                                                      |
-| ライブラリ | {/* bench:environment/libraries */}synstate 6.1.1, rxjs 7.8.2, jotai 3.0.1, mobx 7.1.0, @reduxjs/toolkit 2.13.0, zustand 5.0.15, valtio 2.3.2, solid-js 1.9.17, @preact/signals-core 1.14.4{/* /bench */} |
-| 計測日     | {/* bench:environment/measured-on */}2026-10-31{/* /bench */}                                                                                                                                             |
-
-計測環境は各シナリオの結果ファイルに記録され、上の値はそこから読み出されています。ダッシュ（—）は、実行環境を固定する前に計測された表であることを意味します。
-
-絶対値のミリ秒は同一環境内でのみ比較できます。ここの数値とご自身で計測した数値が食い違う場合は、ミリ秒ではなくライブラリ間の比を見てください。
-:::
 
 :::caution[数値の読み方について]
 この単純なチェーンのシナリオでは、RxJS は SynState {/* bench:compare/derived-chain/rxjs-speed */}より高速{/* /bench */}で、Preact Signals は SynState {/* bench:compare/derived-chain/preact-signals-speed */}とほぼ同じ速さ{/* /bench */}です。このグラフから分からないこと：
