@@ -19,6 +19,8 @@ import {
   Icon,
   InputGroup,
   Label,
+  Navbar,
+  NavbarGroup,
   NumericInput,
   NumericInputView,
   Radio,
@@ -208,6 +210,16 @@ const disabledButtonTabIndex = (line: string): string =>
   /^\s*button\.[\w.-]*\.bp6-disabled\b/u.test(line)
     ? line.replace('[tabindex=-1]', '')
     : line;
+
+/**
+ * Blueprint points a tab with no panel at a panel id that is never rendered,
+ * and says whether it is expanded; this library says neither of a tab that
+ * controls nothing. For a case whose tabs all have no panel.
+ */
+const noPanelControlled = (line: string): string =>
+  line
+    .replace(/\[aria-controls=#missing\]/u, '')
+    .replace(/\[aria-expanded=(?:true|false)\]/u, '');
 
 /** A date for Blueprint React's pickers, which take a `Date`. */
 const blueprintDate = (isoLocal: string): Date =>
@@ -577,6 +589,98 @@ const cases: readonly Case[] = [
           { id: 'b', title: 'B', panel: <div /> },
         ]}
         onChange={ignore}
+      />
+    ),
+  ],
+  [
+    'Tabs with no panels',
+    {
+      // Titles alone, as in a navbar: the panels are drawn elsewhere.
+      element: () =>
+        h(
+          Blueprint.Tabs,
+          {
+            id: 'n',
+            selectedTabId: 'a',
+            animate: false,
+            onChange: ignore,
+          },
+          h(Blueprint.Tab, { id: 'a', title: 'A' }),
+          h(Blueprint.Tab, { id: 'b', title: 'B' }),
+        ),
+      deliberate: [noPanelControlled],
+    },
+    () => (
+      <Tabs
+        id={'n'}
+        selectedTabId={constant('a')}
+        tabs={[
+          { id: 'a', title: 'A' },
+          { id: 'b', title: 'B' },
+        ]}
+        onChange={ignore}
+      />
+    ),
+  ],
+  [
+    'Navbar',
+    {
+      element: () =>
+        h(
+          Blueprint.Navbar,
+          null,
+          h(Blueprint.NavbarGroup, null, h('span')),
+          h(Blueprint.NavbarGroup, { align: 'right' }, h('span')),
+        ),
+      deliberate: [],
+    },
+    () => (
+      <Navbar>
+        <NavbarGroup>
+          <span />
+        </NavbarGroup>
+        <NavbarGroup align={'right'}>
+          <span />
+        </NavbarGroup>
+      </Navbar>
+    ),
+  ],
+  [
+    'InputGroup with a left icon',
+    {
+      element: () =>
+        h(Blueprint.InputGroup, {
+          value: 'x',
+          leftIcon: 'filter-list',
+          placeholder: 'p',
+          onChange: ignore,
+        }),
+      deliberate: [],
+    },
+    () => (
+      <InputGroup
+        leftIcon={'filter-list'}
+        placeholder={constant('p')}
+        value={constant('x')}
+      />
+    ),
+  ],
+  [
+    'Button with only the sort icon',
+    {
+      element: () =>
+        h(Blueprint.Button, {
+          icon: 'sort',
+          variant: 'minimal',
+          'aria-label': 'Sort',
+        }),
+      deliberate: [],
+    },
+    () => (
+      <Button
+        aria-label={constant('Sort')}
+        icon={'sort'}
+        variant={constant('minimal')}
       />
     ),
   ],

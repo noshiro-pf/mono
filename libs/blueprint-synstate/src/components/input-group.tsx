@@ -1,5 +1,6 @@
 import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { classObject, intentClass, sizeClass } from '../internal/index.mjs';
+import { Icon, type IconName } from './icon.js';
 import type { Intent, Size } from './intent.mjs';
 
 type Props = Readonly<{
@@ -16,6 +17,8 @@ type Props = Readonly<{
   readOnly?: Bindable<boolean>;
   intent?: Intent;
   size?: Size;
+  /** Drawn inside the input, before the text. */
+  leftIcon?: IconName;
   /** Takes the width of its container (`bp6-fill`). */
   fill?: boolean;
   /** Classes after Blueprint's own on the wrapper. */
@@ -27,7 +30,8 @@ type Props = Readonly<{
 
 /**
  * Blueprint's `InputGroup`: `input.bp6-input` in `div.bp6-input-group`, which
- * carries the modifier classes. No icons or elements beside the input.
+ * carries the modifier classes, with an optional icon before the text. No
+ * elements beside the input.
  *
  * Unlike React's `onChange`, synstate-dom's is the DOM's `change`, which fires
  * when the value is committed; `onInput` is the one for every keystroke.
@@ -43,6 +47,7 @@ export const InputGroup = ({
   readOnly,
   intent = 'none',
   size = 'medium',
+  leftIcon,
   fill = false,
   class: className,
   id,
@@ -64,6 +69,7 @@ export const InputGroup = ({
       ],
     )}
   >
+    {leftIcon === undefined ? [] : <Icon icon={leftIcon} />}
     <input
       aria-label={ariaLabel}
       class={constant('bp6-input')}

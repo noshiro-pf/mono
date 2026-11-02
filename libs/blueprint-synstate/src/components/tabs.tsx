@@ -13,8 +13,11 @@ import type { Size } from './intent.mjs';
 export type TabProps<T extends string> = Readonly<{
   id: T;
   title: string;
-  /** Mounted while the tab is chosen. */
-  panel: JSX.Element;
+  /**
+   * Mounted while the tab is chosen. Left out, the tab is a title alone, as in
+   * a navbar whose content is drawn elsewhere, and controls no panel.
+   */
+  panel?: JSX.Element;
   /** On the tab's title. */
   'data-e2e'?: string;
 }>;
@@ -99,11 +102,19 @@ export const Tabs = <T extends string>({
       {tabs.map((tab) => {
         const selected = mapBindable(selectedTabId, (t) => t === tab.id);
 
+        // A title alone controls nothing, so it says neither what nor whether
+        // it is expanded.
+        const controlsPanel = tab.panel !== undefined;
+
         return (
           <div
-            aria-controls={constant(panelId(id, tab.id))}
+            aria-controls={
+              controlsPanel ? constant(panelId(id, tab.id)) : undefined
+            }
             aria-disabled={constant('false')}
-            aria-expanded={mapBindable(selected, String)}
+            aria-expanded={
+              controlsPanel ? mapBindable(selected, String) : undefined
+            }
             aria-selected={mapBindable(selected, String)}
             class={constant('bp6-tab')}
             data-e2e={
@@ -124,22 +135,26 @@ export const Tabs = <T extends string>({
         );
       })}
     </div>
-    {tabs.map((tab) => (
-      <If
-        cond={mapBindable(selectedTabId, (t) => t === tab.id)}
-        then={
-          <div
-            aria-hidden={constant('false')}
-            aria-labelledby={constant(titleId(id, tab.id))}
-            class={constant('bp6-tab-panel')}
-            id={constant(panelId(id, tab.id))}
-            role={constant('tabpanel')}
-          >
-            {tab.panel}
-          </div>
-        }
-      />
-    ))}
+    {tabs.map((tab) =>
+      tab.panel === undefined ? (
+        []
+      ) : (
+        <If
+          cond={mapBindable(selectedTabId, (t) => t === tab.id)}
+          then={
+            <div
+              aria-hidden={constant('false')}
+              aria-labelledby={constant(titleId(id, tab.id))}
+              class={constant('bp6-tab-panel')}
+              id={constant(panelId(id, tab.id))}
+              role={constant('tabpanel')}
+            >
+              {tab.panel}
+            </div>
+          }
+        />
+      ),
+    )}
   </div>
 );
 

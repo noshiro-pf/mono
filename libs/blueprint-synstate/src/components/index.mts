@@ -12,6 +12,8 @@ export * from './icon.js';
 export * from './input-group.js';
 export * from './intent.mjs';
 export * from './label.js';
+export * from './navbar-group.js';
+export * from './navbar.js';
 export * from './numeric-input.js';
 export * from './radio.js';
 export * from './segmented-control.js';

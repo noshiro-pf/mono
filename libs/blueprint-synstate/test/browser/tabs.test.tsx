@@ -102,6 +102,53 @@ describe(Tabs, () => {
     unmount();
   });
 
+  test('a tab with no panel is a title alone, beside one with a panel', () => {
+    const { value$, onChange } = controlled('a');
+
+    const { container, unmount } = mountInto(() => (
+      <Tabs
+        id={'mixed'}
+        selectedTabId={value$}
+        tabs={[
+          { id: 'a', title: 'A' },
+          { id: 'b', title: 'B', panel: <p>{constant('panel B')}</p> },
+        ]}
+        onChange={onChange}
+      />
+    ));
+
+    const [titleA, titleB] = all(container, '.bp6-tab');
+
+    assert.isDefined(titleA);
+
+    assert.isDefined(titleB);
+
+    assert.isFalse(titleA.hasAttribute('aria-controls'));
+
+    assert.isFalse(titleA.hasAttribute('aria-expanded'));
+
+    assert.strictEqual(titleA.getAttribute('aria-selected'), 'true');
+
+    assert.isTrue(titleB.hasAttribute('aria-controls'));
+
+    assert.strictEqual(titleB.getAttribute('aria-expanded'), 'false');
+
+    assert.isNull(container.querySelector('.bp6-tab-panel'));
+
+    titleB.click();
+
+    assert.strictEqual(
+      one(container, '.bp6-tab-panel').getAttribute('aria-labelledby'),
+      titleB.id,
+    );
+
+    titleA.click();
+
+    assert.isNull(container.querySelector('.bp6-tab-panel'));
+
+    unmount();
+  });
+
   test("leaves an input method's Enter alone", () => {
     const { value$, onChange, changes } = controlled('a');
 
