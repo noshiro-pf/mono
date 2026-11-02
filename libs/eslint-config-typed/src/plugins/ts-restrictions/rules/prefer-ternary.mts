@@ -273,7 +273,11 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
 
       const tokenBefore = sourceCode.getTokenBefore(asNode(node));
 
+      // Only a statement in a statement list can join the line before it. As
+      // the braceless body of a `for`, `while`, `if` or label, the token before
+      // is that statement's head, and a `;` there would become the whole body.
       const needsSemicolonBefore =
+        isInStatementList(node) &&
         tokenBefore !== null &&
         !STATEMENT_BOUNDARIES.has(tokenBefore.value) &&
         STARTS_CONTINUING_A_LINE.test(fixed);
@@ -506,8 +510,21 @@ const STATEMENT_BOUNDARIES: ReadonlySet<string> = new Set<string>([
   '}',
 ]);
 
+/** Containers whose body is a list of statements, one after another. */
+const STATEMENT_LIST_PARENTS: ReadonlySet<AST_NODE_TYPES> =
+  new Set<AST_NODE_TYPES>([
+    AST_NODE_TYPES.Program,
+    AST_NODE_TYPES.BlockStatement,
+    AST_NODE_TYPES.StaticBlock,
+    AST_NODE_TYPES.SwitchCase,
+    AST_NODE_TYPES.TSModuleBlock,
+  ]);
+
 /** A statement starting so would continue the line before it without `;`. */
 const STARTS_CONTINUING_A_LINE = /^[([`+\-/]/u;
+
+const isInStatementList = (node: DeepReadonly<TSESTree.Node>): boolean =>
+  node.parent !== undefined && STATEMENT_LIST_PARENTS.has(node.parent.type);
 
 const isTernary = (node: DeepReadonly<TSESTree.Node> | undefined): boolean =>
   node?.type === AST_NODE_TYPES.ConditionalExpression;
