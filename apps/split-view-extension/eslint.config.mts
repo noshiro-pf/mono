@@ -1,4 +1,5 @@
 import {
+  eslintConfigForPlaywright,
   eslintConfigForReact,
   eslintConfigForTypeScript,
   type FlatConfig,
@@ -24,6 +25,8 @@ export default [
   eslintPluginTsDataForge.configs.recommended,
 
   ...eslintConfigForReact(),
+
+  eslintConfigForPlaywright(['e2e/**']),
 
   // Last, so that nothing above turns these back on.
   eslintConfigOffForOxlint,

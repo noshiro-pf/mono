@@ -119,7 +119,7 @@ export const TopBar = memoNamed(
         )}
 
         {helpShown ? (
-          <ul className={'top-bar__help'}>
+          <ul className={'top-bar__help'} data-e2e={'help'}>
             <li>
               {
                 'Split a pane with ⬌ / ⬍ in its toolbar, and drag any divider to change the ratio. The layout and the addresses are saved per split view, so a reload comes back to them.'

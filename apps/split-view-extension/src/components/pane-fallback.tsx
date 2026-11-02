@@ -45,7 +45,7 @@ export const PaneFallback = memoNamed(
     onClearServiceWorkers,
     onDismiss,
   }: Props) => (
-    <div className={'pane__fallback'}>
+    <div className={'pane__fallback'} data-e2e={'pane-fallback'}>
       <div className={'pane__fallback-card'}>
         <p className={'pane__fallback-title'}>
           <Icon icon={'warning'} />

@@ -1153,7 +1153,7 @@ export const App = memoNamed('App', () => {
         />
       </TopBar>
 
-      <div ref={stageRef} className={stageClassName}>
+      <div ref={stageRef} className={stageClassName} data-e2e={'stage'}>
         {!ready ? undefined : (
           <>
             {orderedPanes.map((pane) => {

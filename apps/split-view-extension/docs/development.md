@@ -11,7 +11,7 @@ From the repository root, once — see [Setup](../../../README.md#setup) for Nod
 pnpm and `pnpm install`. Then, for this package:
 
 ```sh
-pnpm exec playwright install chromium   # for `smoke` and `screenshots`
+pnpm exec playwright install chromium   # for `check:e2e`, `smoke` and `screenshots`
 ```
 
 That is everything `build`, `check:test`, `check:lint` and `check:types` need. The rest is
@@ -87,8 +87,20 @@ placeholder pages the script serves itself and writes both copies.
 
 ```sh
 pnpm run test               # the unit tests, in Node
+pnpm run check:e2e          # the UI, in Chromium headless, with the build loaded
 xvfb-run -a pnpm run smoke  # the build, in a real Chromium
 ```
+
+`pnpm run check:e2e` builds the extension, loads `dist/` into Chromium and goes
+through every part of the page with Playwright: the presets, splitting, closing,
+dragging a divider and moving a pane, each pane's address bar, history, reload,
+zoom and menu, the explanation shown for a page that cannot be framed, the saved
+list of split views, the help, and a reload or an address that restores a view.
+The pages shown in panes come from a local server
+([`scripts/e2e-page-server.mts`](../scripts/e2e-page-server.mts)), so it needs
+no network. It runs headless, as Chromium itself (`channel: 'chromium'`) loads
+extensions headless where the headless shell does not; in CI the build job's
+`dist/` is used rather than a new build.
 
 `pnpm run smoke` loads the build into a real Chromium and checks the parts that
 only a browser can check: that a page sending `X-Frame-Options: DENY` and

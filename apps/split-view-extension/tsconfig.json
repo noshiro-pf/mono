@@ -14,5 +14,5 @@
       "chrome"
     ]
   },
-  "include": ["./src", "./test", "./scripts", "./configs"]
+  "include": ["./src", "./test", "./e2e", "./scripts", "./configs"]
 }
