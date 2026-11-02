@@ -1,0 +1,11 @@
+/* Over Blueprint's table, which aligns cells to the start. */
+.cell {
+  text-align: center !important;
+}
+
+.noWrapBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+}

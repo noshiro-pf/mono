@@ -607,9 +607,17 @@
     "apps/cant-stop-probability": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
-      // Loaded by `src/index.css` through CSS `@import` rather than by a
-      // module import, which knip does not follow.
-      "ignoreDependencies": ["normalize.css"],
+      "ignoreDependencies": [
+        // Loaded by `src/index.css` through CSS `@import` rather than by a
+        // module import, which knip does not follow.
+        "normalize.css",
+        "@blueprintjs/core",
+        // Nothing imports them: they are declared only to pin the React that
+        // `@blueprintjs/core`'s peers resolve to, which pnpm would otherwise
+        // pick from whatever the rest of the workspace offers (#2564).
+        "react",
+        "react-dom",
+      ],
     },
 
     "apps/blueprintjs-playground-styled": {

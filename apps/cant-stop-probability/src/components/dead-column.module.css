@@ -1,0 +1,11 @@
+.toggle {
+  white-space: nowrap;
+}
+
+.closed {
+  text-decoration: line-through;
+}
+
+.probability {
+  padding: 10px;
+}

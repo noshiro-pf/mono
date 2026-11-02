@@ -1,7 +1,5 @@
 import {
-  defineKnownRules,
   eslintConfigForPlaywright,
-  eslintConfigForReact,
   eslintConfigForTypeScript,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -23,16 +21,6 @@ export default [
   eslintPluginTsDataForge.configs.recommended,
   eslintPluginTsFortress.configs.recommended,
 
-  ...eslintConfigForReact(),
-
-  {
-    files: ['src/**'],
-    rules: defineKnownRules({
-      // Each component file exports the component together with the styled
-      // parts that belong to it, as the rest of the restored apps do.
-      'react-refresh/only-export-components': 'off',
-    }),
-  },
   eslintConfigForPlaywright(['e2e/**']),
 
   // Last, so that nothing above turns these back on.

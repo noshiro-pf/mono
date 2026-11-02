@@ -5,8 +5,9 @@
   ],
   "compilerOptions": {
     "libReplacement": true,
-    // Emotion's `css` prop: the JSX factory has to come from @emotion/react.
-    "jsxImportSource": "@emotion/react"
+    "allowArbitraryExtensions": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "synstate-dom"
   },
   "include": ["./src", "./test", "./e2e", "./scripts", "./configs"]
 }

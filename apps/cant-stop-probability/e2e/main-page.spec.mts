@@ -4,7 +4,9 @@ import type { DeepReadonly } from 'ts-type-forge';
 test('visit main page', { tag: '@smoke' }, async ({ page }) => {
   await page.goto('/');
 
-  await expect.soft(page.getByTestId('filter-input')).toBeVisible();
+  await expect
+    .soft(page.getByRole('textbox', { name: '列の数字で絞り込む' }))
+    .toBeVisible();
 });
 
 test('filter 4,5', { tag: '@smoke' }, async ({ page }) => {
