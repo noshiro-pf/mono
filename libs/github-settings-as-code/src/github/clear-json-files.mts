@@ -1,5 +1,5 @@
 import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
+import { listJsonFilesIn } from './list-json-files.mjs';
 
 /**
  * `dir` の直下の `*.json` を消す。ディレクトリが無ければ作る。
@@ -20,12 +20,7 @@ export const clearJsonFilesIn = async (dir: string): Promise<void> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.mkdir(dir, { recursive: true });
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  const entries = await fs.readdir(dir, { withFileTypes: true });
-
-  for (const entry of entries) {
-    if (entry.isFile() && entry.name.endsWith('.json')) {
-      await fs.rm(path.resolve(dir, entry.name));
-    }
+  for (const file of await listJsonFilesIn(dir)) {
+    await fs.rm(file);
   }
 };
