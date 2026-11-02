@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # install + ws:build + ws:check:test across 17 packages, per Node version.
+    # install + ws:build + one shard of ws:check:test, per Node version.
     # The 10 minutes this was set to when the repository held two packages
     # cut two of the three matrix entries off mid-test.
     timeout-minutes: 30
@@ -78,6 +78,17 @@ jobs:
         # here was the same tests on the same Node a second time, and the build
         # in front of them a second time.
         target: [minimum, lts]
+        # `ws:check:test` in two shards per version. As one job, its five to
+        # six minutes of tests behind a two-minute build made this the
+        # longest check workflow whenever the benchmark had nothing to
+        # measure. Each shard builds again, which is the check here, so the
+        # split costs a build and a setup of runner time per version for
+        # about two and a half minutes of wall clock. The first shard names
+        # the four slowest suites, about half the time; the second is
+        # everything else by excluding them, so a new package lands there.
+        command:
+          - ws:check:test:shard-1
+          - ws:check:test:shard-2
 
     steps:
       - name: Checkout
@@ -117,7 +128,7 @@ jobs:
         run: pnpm run ws:build
 
       - name: Test
-        run: pnpm run ws:check:test
+        run: pnpm run ${{ matrix.command }}
 
   # The one required status check for this workflow, reported as
   # `test-node-versions-result / result` — see "The aggregate job" in README.md.

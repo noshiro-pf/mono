@@ -26,16 +26,16 @@ want of `actions: write`, say so, release the claim and leave it.
 ## Reproducing a check
 
 **The check name is the command.** `style-check (X)` and `code-check (X)` both
-run `pnpm run X` at the repository root, so `code-check (check:knip)`
-reproduces as `pnpm run check:knip`. Five checks do not follow that rule:
+run `pnpm run X` at the repository root, so `code-check (check:root)`
+reproduces as `pnpm run check:root`. Five checks do not follow that rule:
 
-| Check                        | What to run                                                    |
-| :--------------------------- | :------------------------------------------------------------- |
-| `test-node-versions (<ver>)` | `pnpm run ws:build` then `pnpm run ws:check:test` on that Node |
-| `verify-published`           | `pnpm run verify:npm-packages:published`                       |
-| `backup-repository-settings` | `pnpm run repo-settings:backup`, then look for a dirty tree    |
-| `Validate PR title`          | The PR title is not Conventional Commits — `PATCH /pulls/{n}`  |
-| `Validate commit count`      | The branch is more than one commit — squash it, see below      |
+| Check                              | What to run                                                   |
+| :--------------------------------- | :------------------------------------------------------------ |
+| `test-node-versions (<target>, X)` | `pnpm run ws:build` then `pnpm run X` on that Node            |
+| `verify-published`                 | `pnpm run verify:npm-packages:published`                      |
+| `backup-repository-settings`       | `pnpm run repo-settings:backup`, then look for a dirty tree   |
+| `Validate PR title`                | The PR title is not Conventional Commits — `PATCH /pulls/{n}` |
+| `Validate commit count`            | The branch is more than one commit — squash it, see below     |
 
 `Validate PR title` is required because a squash merge takes the PR title as
 the commit title (`squash_merge_commit_title: PR_TITLE`), so the fix is the
