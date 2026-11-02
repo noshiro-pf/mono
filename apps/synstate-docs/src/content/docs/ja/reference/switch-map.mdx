@@ -11,6 +11,8 @@ import { colors } from '../../../../components/constants.mjs';
 {/* jsdoc-description */}
 ソースの各値を Observable に射影してサブスクライブし、その値を発行します。
 ソースから新しい値が届くと、以前の内部 Observable のサブスクリプションは解除されます。
+
+`switchMap` を作った時点でソースがすでに持っている値（state や初期値を持つ Observable の値）は、`map` や `filter` がそこから始めるのと同じく、すぐに射影します。完了したソースは射影しません。
 {/* /jsdoc-description */}
 
 ## Marble Diagram

@@ -2,7 +2,7 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import { hasKey, isRecord, type Optional, type Some } from 'ts-data-forge';
+import { hasKey, isRecord, Optional, type Some } from 'ts-data-forge';
 import { panic } from 'ts-std-forge';
 import type { MutableSet } from 'ts-type-forge';
 import type {
@@ -20,7 +20,7 @@ import type {
   WithInitialValueOperator,
   Wrap,
 } from '../types/index.mjs';
-import { maxDepth } from '../utils/index.mjs';
+import { issueUnqueuedToken, maxDepth } from '../utils/index.mjs';
 import { ManagerObservableClass } from './manager-observable-class.mjs';
 import { ObservableBaseClass } from './observable-base-class.mjs';
 import { toNode, type ChildNode } from './observable-node.mjs';
@@ -196,6 +196,45 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
     runAfterPropagation(() => {
       this.complete();
     });
+  }
+
+  /**
+   * `attach`, then projects the value `parent` holds when `switchMap` /
+   * `mergeMap` is created, as `map` and `filter` start from it; a completed
+   * parent is not projected. Nothing observes the operator yet, so a value the
+   * inner observable emits while it is subscribed is only stored: the token is
+   * one no update is queued with.
+   *
+   * If the projection throws, the operator is disposed, which disposes what the
+   * projection made and takes the operator off its parent, and the exception
+   * goes on to the caller of `pipe`.
+   */
+  protected attachProjectingHeldValue<V>(
+    parent: Observable<V>,
+    project: (value: V, updateToken: UpdateToken) => void,
+  ): void {
+    this.attach();
+
+    const sn = parent.getSnapshot();
+
+    if (this.isCompleted || Optional.isNone(sn)) {
+      return;
+    }
+
+    // A flag and `finally` rather than `catch` and rethrow: Sumi bans
+    // `try..catch`, and the exception is never caught on its way to `pipe`.
+    let mut_projected = false;
+
+    // @sumi-expect-error exceptions/no-try
+    try {
+      project(sn.value, issueUnqueuedToken());
+
+      mut_projected = true;
+    } finally {
+      if (!mut_projected) {
+        this.dispose();
+      }
+    }
   }
 
   /**

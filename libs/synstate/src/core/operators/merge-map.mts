@@ -22,6 +22,9 @@ import type {
  * Projects each source value to an observable and merges all inner observables.
  * Unlike `switchMap`, does not cancel previous inner observables.
  *
+ * A value the source already holds when `mergeMap` is created is projected at
+ * once, as with `switchMap`. A completed source is not projected.
+ *
  * Each projection runs in a scope of its own (see `createScope`): what it
  * creates is disposed when the observable it returned completes, or when
  * `mergeMap` completes, whichever comes first. An observable it only returns —
@@ -160,7 +163,9 @@ class MergeMapObservableClass<A, B>
 
     this.#mut_liveInners = new Map<Scope, Subscription | undefined>();
 
-    this.attach();
+    this.attachProjectingHeldValue(parentObservable, (value, updateToken) => {
+      this.#project(value, updateToken);
+    });
   }
 
   /**
@@ -175,15 +180,8 @@ class MergeMapObservableClass<A, B>
     innerScope.dispose();
   }
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
-
-    const sn = par.getSnapshot();
-
-    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
-      return; // skip update
-    }
-
+  /** Adds the inner observable of `value` to those merged. */
+  #project(value: A, updateToken: UpdateToken): void {
     const innerScope = createScope(this.#ownerScope);
 
     // Held before the projection runs, so that `teardown` disposes what it made
@@ -191,7 +189,7 @@ class MergeMapObservableClass<A, B>
     // is being subscribed.
     this.#mut_liveInners.set(innerScope, undefined);
 
-    const observable = innerScope.run(() => this.#mapToObservable(sn.value));
+    const observable = innerScope.run(() => this.#mapToObservable(value));
 
     const subscription = this.subscribeInner(observable, updateToken, () => {
       this.#releaseInner(innerScope);
@@ -204,6 +202,18 @@ class MergeMapObservableClass<A, B>
       // (`just(x)`), or `mergeMap` did.
       subscription.unsubscribe();
     }
+  }
+
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
+
+    const sn = par.getSnapshot();
+
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
+
+    this.#project(sn.value, updateToken);
   }
 
   /** Releases the inner observables, and only those this operator made. */

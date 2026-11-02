@@ -53,9 +53,8 @@ export const SearchViewDemo = ({ lang }: Props): preact.JSX.Element => {
 
     setSynstateLog([]);
 
-    // Both graphs start from an empty query and are then given the first one,
-    // so that both logs begin from the same write: `switchMap` projects the
-    // values a source emits, not the one it holds when it is created.
+    // Both graphs start from an empty query, before logging starts, and are
+    // then given the first one, so that both logs begin from the same write.
     // With the view created first, that write already shows the glitch.
     let mut_logging = false;
 

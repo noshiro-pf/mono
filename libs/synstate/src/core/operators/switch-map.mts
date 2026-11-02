@@ -21,6 +21,10 @@ import type {
  * Projects each source value to an observable, subscribes to it, and emits its values.
  * When a new value arrives from the source, the previous inner observable is unsubscribed.
  *
+ * A value the source already holds when `switchMap` is created (a state, an
+ * observable with an initial value) is projected at once, as `map` and `filter`
+ * start from it. A completed source is not projected.
+ *
  * The projection runs in a scope of its own (see `createScope`): what it
  * creates is disposed when the next value switches away from it and when
  * `switchMap` completes. An observable it only returns — one created outside
@@ -152,7 +156,9 @@ class SwitchMapObservableClass<A, B>
 
     this.#mut_subscription = undefined;
 
-    this.attach();
+    this.attachProjectingHeldValue(parentObservable, (value, updateToken) => {
+      this.#project(value, updateToken);
+    });
   }
 
   /** Releases the inner observable, and only the one this operator made. */
@@ -160,6 +166,19 @@ class SwitchMapObservableClass<A, B>
     this.#mut_subscription?.unsubscribe();
 
     this.#mut_innerScope?.dispose();
+  }
+
+  /** Switches to the inner observable of `value`. */
+  #project(value: A, updateToken: UpdateToken): void {
+    this.#releaseInner();
+
+    const innerScope = createScope(this.#ownerScope);
+
+    this.#mut_innerScope = innerScope;
+
+    const observable = innerScope.run(() => this.#mapToObservable(value));
+
+    this.#mut_subscription = this.subscribeInner(observable, updateToken);
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -171,15 +190,7 @@ class SwitchMapObservableClass<A, B>
       return; // skip update
     }
 
-    this.#releaseInner();
-
-    const innerScope = createScope(this.#ownerScope);
-
-    this.#mut_innerScope = innerScope;
-
-    const observable = innerScope.run(() => this.#mapToObservable(sn.value));
-
-    this.#mut_subscription = this.subscribeInner(observable, updateToken);
+    this.#project(sn.value, updateToken);
   }
 
   protected override teardown(): void {

@@ -12,6 +12,10 @@ import { colors } from '../../../components/constants.mjs';
 Projects each source value to an observable, subscribes to it, and emits its values.
 When a new value arrives from the source, the previous inner observable is unsubscribed.
 
+A value the source already holds when `switchMap` is created (a state, an
+observable with an initial value) is projected at once, as `map` and `filter`
+start from it. A completed source is not projected.
+
 The projection runs in a scope of its own (see `createScope`): what it
 creates is disposed when the next value switches away from it and when
 `switchMap` completes. An observable it only returns — one created outside
