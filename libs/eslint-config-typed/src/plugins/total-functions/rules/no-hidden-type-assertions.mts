@@ -10,26 +10,17 @@ import {
 import { typeWrapperLayers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import {
-  isArrayTypeNode,
-  isConditionalTypeNode,
-  isFunctionTypeNode,
-  isIndexedAccessTypeNode,
-  isIntersectionTypeNode,
-  isNamedTupleMember,
-  isTupleTypeNode,
-  isTypeLiteralNode,
-  isTypeNode,
-  isTypeOperatorNode,
+  forEachChild,
+  isIdentifier,
+  isMappedTypeNode,
+  isTypeParameterDeclaration,
   isTypeReferenceNode,
-  isUnionTypeNode,
-  type NodeArray,
-  type ParameterDeclaration,
+  type Node,
   type Signature,
   type SignatureDeclaration,
   SyntaxKind,
+  type Symbol as TsSymbol,
   type Type,
-  type TypeElement,
-  type TypeNode,
   type TypeParameterDeclaration,
 } from 'typescript';
 import { createRule } from './common.mjs';
@@ -56,48 +47,43 @@ export const noHiddenTypeAssertions = createRule({
     const checker = parserServices.program.getTypeChecker();
 
     /**
-     * `type` and the type nodes under it, through the node kinds listed below.
-     * Unbounded: a type annotation is a finite syntax tree, and recursion is
-     * only as deep as it is nested.
+     * Whether `node` or a node under it is a type reference resolving to
+     * `typeParameter`. Comparing symbols rather than names keeps a type
+     * parameter of an inner function type, or an `infer` type, that shadows it
+     * from counting as a use; the name is compared first only to spare the
+     * checker. The type parameters of an inner signature or `infer` type are
+     * not entered: `<U extends T>(u: U) => U` hands back the `U` its caller
+     * passes, not a `T`. That misses `<U extends T>() => U`, whose `U` falls
+     * back to `T`. A mapped type's is entered, since `{ [K in keyof T]: … }`
+     * reads `T`. Unbounded: a type annotation is a finite syntax tree, and
+     * recursion is only as deep as it is nested.
      */
-    const explodeTypeNode = (type: TypeNode): readonly TypeNode[] => {
-      const next = isTypeReferenceNode(type)
-        ? (type.typeArguments ?? [])
-        : isConditionalTypeNode(type)
-          ? ([type.checkType, type.trueType, type.falseType] as const)
-          : isIndexedAccessTypeNode(type)
-            ? ([type.objectType, type.indexType] as const)
-            : isFunctionTypeNode(type)
-              ? Arr.toUnshifted(type.type)(parameterTypeNodes(type.parameters))
-              : isTupleTypeNode(type)
-                ? type.elements
-                : isNamedTupleMember(type)
-                  ? ([type.type] as const)
-                  : isTypeLiteralNode(type)
-                    ? type.members.flatMap((m) =>
-                        hasTypeNode(m) ? [m.type] : [],
-                      )
-                    : isArrayTypeNode(type)
-                      ? ([type.elementType] as const)
-                      : isTypeOperatorNode(type)
-                        ? ([type.type] as const)
-                        : isUnionTypeNode(type) || isIntersectionTypeNode(type)
-                          ? type.types
-                          : ([] as const);
-
-      return Arr.toUnshifted(type)(next.flatMap(explodeTypeNode));
-    };
+    const referencesTypeParameter = (
+      node: Node,
+      typeParameter: TsSymbol,
+    ): boolean =>
+      (!isTypeParameterDeclaration(node) || isMappedTypeNode(node.parent)) &&
+      ((isTypeReferenceNode(node) &&
+        isIdentifier(node.typeName) &&
+        node.typeName.text === typeParameter.name &&
+        checker.getSymbolAtLocation(node.typeName) === typeParameter) ||
+        (forEachChild(
+          node,
+          (child) => referencesTypeParameter(child, typeParameter) || undefined,
+        ) ??
+          false));
 
     /**
      * The type parameters of `declaration` that its return type uses, with
      * their positional index (to look up the corresponding type arguments), or
-     * `undefined` when it declares no type parameters or no return type.
+     * `undefined` when its return type uses none of them.
      */
     const typeParamsUsedInReturnTypeOf = (
       declaration: SignatureDeclaration,
     ):
       | readonly Readonly<{
           typeParameter: TypeParameterDeclaration;
+          symbol: TsSymbol;
           index: number;
         }>[]
       | undefined => {
@@ -111,18 +97,16 @@ export const noHiddenTypeAssertions = createRule({
         return undefined;
       }
 
-      const returnTypes = explodeTypeNode(returnType);
+      const used = typeParameters.flatMap((typeParameter, index) => {
+        const symbol = checker.getSymbolAtLocation(typeParameter.name);
 
-      return typeParameters
-        .map((typeParameter, index) => ({ typeParameter, index }))
-        .filter((typeParameter) =>
-          returnTypes.some(
-            (retType) =>
-              isTypeReferenceNode(retType) &&
-              retType.typeName.kind === SyntaxKind.Identifier &&
-              retType.typeName.text === typeParameter.typeParameter.name.text,
-          ),
-        );
+        return symbol !== undefined &&
+          referencesTypeParameter(returnType, symbol)
+          ? [{ typeParameter, symbol, index }]
+          : [];
+      });
+
+      return Arr.isNonEmpty(used) ? used : undefined;
     };
 
     /**
@@ -132,24 +116,51 @@ export const noHiddenTypeAssertions = createRule({
      */
     const returnTypeParamsAppearInValueParams = (
       declaration: SignatureDeclaration,
-      typeParamsUsedInReturnType: readonly Readonly<{
-        typeParameter: TypeParameterDeclaration;
-      }>[],
-    ): boolean => {
-      const parameters = parameterTypeNodes(declaration.parameters).flatMap(
-        explodeTypeNode,
+      typeParamsUsedInReturnType: readonly Readonly<{ symbol: TsSymbol }>[],
+    ): boolean =>
+      typeParamsUsedInReturnType.every(({ symbol }) =>
+        declaration.parameters.some(
+          (parameter) =>
+            parameter.type !== undefined &&
+            referencesTypeParameter(parameter.type, symbol),
+        ),
       );
 
-      return typeParamsUsedInReturnType
-        .map(({ typeParameter }) => typeParameter)
-        .every((typeParameter) =>
-          parameters.some(
-            (parameter) =>
-              isTypeReferenceNode(parameter) &&
-              parameter.typeName.kind === SyntaxKind.Identifier &&
-              typeParameter.name.text === parameter.typeName.text,
-          ),
-        );
+    const mut_analysisCache = new WeakMap<
+      SignatureDeclaration,
+      SignatureAnalysis
+    >();
+
+    /**
+     * What a call of `declaration` needs to know of it, computed once per
+     * declaration: the type parameters its return type uses (`undefined` as for
+     * {@link typeParamsUsedInReturnTypeOf}), and whether each of them appears
+     * in a value parameter too.
+     */
+    const analyzeSignature = (
+      declaration: SignatureDeclaration,
+    ): SignatureAnalysis => {
+      if (mut_analysisCache.has(declaration)) {
+        return mut_analysisCache.get(declaration);
+      }
+
+      const typeParamsUsedInReturnType =
+        typeParamsUsedInReturnTypeOf(declaration);
+
+      const analysis: SignatureAnalysis =
+        typeParamsUsedInReturnType === undefined
+          ? undefined
+          : ({
+              typeParamsUsedInReturnType,
+              appearInValueParams: returnTypeParamsAppearInValueParams(
+                declaration,
+                typeParamsUsedInReturnType,
+              ),
+            } as const);
+
+      mut_analysisCache.set(declaration, analysis);
+
+      return analysis;
     };
 
     /**
@@ -167,16 +178,9 @@ export const noHiddenTypeAssertions = createRule({
           return false;
         }
 
-        const typeParamsUsedInReturnType =
-          typeParamsUsedInReturnTypeOf(declaration);
+        const analysis = analyzeSignature(declaration);
 
-        return (
-          typeParamsUsedInReturnType !== undefined &&
-          !returnTypeParamsAppearInValueParams(
-            declaration,
-            typeParamsUsedInReturnType,
-          )
-        );
+        return analysis !== undefined && !analysis.appearInValueParams;
       });
 
     /**
@@ -250,49 +254,47 @@ export const noHiddenTypeAssertions = createRule({
           return;
         }
 
-        const typeParamsUsedInReturnType = typeParamsUsedInReturnTypeOf(
-          callSignature.declaration,
-        );
+        const analysis = analyzeSignature(callSignature.declaration);
 
-        if (typeParamsUsedInReturnType === undefined) {
+        if (analysis === undefined) {
           return;
         }
 
-        // Of all the type parameters that appear in the return type, are they
-        // all set to `unknown` type arguments in this specific call?
-        // If so, this is safe even if the function being called is a hidden type assertion.
+        // Of all the type parameters that appear in the return type, is each
+        // set to `unknown` or `never` in this specific call, by its type
+        // argument or, failing one, its default? If so, this is safe even if
+        // the function being called is a hidden type assertion.
         const allCorrespondingTypeArgumentsAreUnknownType =
-          typeParamsUsedInReturnType.every(({ index, typeParameter }) => {
-            const typeArgument = (tsExpressionNode.typeArguments ?? [])[index];
+          analysis.typeParamsUsedInReturnType.every(
+            ({ index, typeParameter }) => {
+              const typeArgument = (tsExpressionNode.typeArguments ?? [])[
+                index
+              ];
 
-            const typeArgumentType =
-              typeArgument !== undefined
-                ? checker.getTypeAtLocation(typeArgument)
-                : undefined;
+              const typeArgumentType =
+                typeArgument !== undefined
+                  ? checker.getTypeAtLocation(typeArgument)
+                  : undefined;
 
-            const typeParamDefaultType =
-              typeParameter.default !== undefined
-                ? checker.getTypeAtLocation(typeParameter.default)
-                : undefined;
+              const typeParamDefaultType =
+                typeParameter.default !== undefined
+                  ? checker.getTypeAtLocation(typeParameter.default)
+                  : undefined;
 
-            const typeToCheck = typeArgumentType ?? typeParamDefaultType;
+              const typeToCheck = typeArgumentType ?? typeParamDefaultType;
 
-            return (
-              typeToCheck !== undefined &&
-              (isTypeUnknownType(typeToCheck) || isTypeNeverType(typeToCheck))
-            );
-          });
+              return (
+                typeToCheck !== undefined &&
+                (isTypeUnknownType(typeToCheck) || isTypeNeverType(typeToCheck))
+              );
+            },
+          );
 
         if (allCorrespondingTypeArgumentsAreUnknownType) {
           return;
         }
 
-        if (
-          !returnTypeParamsAppearInValueParams(
-            callSignature.declaration,
-            typeParamsUsedInReturnType,
-          )
-        ) {
+        if (!analysis.appearInValueParams) {
           context.report({
             node,
             messageId: 'errorStringGeneric',
@@ -303,27 +305,13 @@ export const noHiddenTypeAssertions = createRule({
   },
 } as const);
 
-/**
- * The annotated types of `parameters`, unexplored: the caller explores them,
- * once.
- */
-const parameterTypeNodes = (
-  parameters: NodeArray<ParameterDeclaration>,
-): readonly TypeNode[] =>
-  parameters.flatMap((parameter) =>
-    parameter.type !== undefined ? [parameter.type] : [],
-  );
-
-const hasTypeNode = (
-  typeElement: TypeElement,
-): typeElement is TypeElement & Readonly<{ type: TypeNode }> => {
-  try {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    const typeAttr = (typeElement as Partial<Readonly<{ type: TypeNode }>>)
-      .type;
-
-    return typeAttr !== undefined && isTypeNode(typeAttr);
-  } catch {
-    return false;
-  }
-};
+type SignatureAnalysis =
+  | Readonly<{
+      typeParamsUsedInReturnType: readonly Readonly<{
+        typeParameter: TypeParameterDeclaration;
+        symbol: TsSymbol;
+        index: number;
+      }>[];
+      appearInValueParams: boolean;
+    }>
+  | undefined;
