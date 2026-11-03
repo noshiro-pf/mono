@@ -98,6 +98,15 @@ open な issue はどれも、**優先度の段を表す `priority:<段>` ラベ
   `Start-After:` を残すほうへ付け替える（名指したものが duplicate として閉じると
   「要見直し」になる）。
 
+## issue に `pending` は付けない
+
+issue を止めるのは `priority:hold` だけにする。`pending` ラベルは pull request
+の「作者が今は止めている」印で、マージ順（Pull Requests Manager）がそれを数える。
+issue に付いていると、`pnpm run pr-report` が `pending is for pull requests` と
+出すので、`priority:hold` に付け替える。作者が一時的に止めたい issue も `hold` に
+し、それまでの段はコメントに残す。止めるのをやめるときは、この文書の決め方で段を
+付け直す。
+
 ## pull request の `priority:high` / `priority:low`
 
 これは別のもので、マージキューで pull request を先に／後に取る印

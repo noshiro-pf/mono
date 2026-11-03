@@ -166,7 +166,7 @@ export const HowToUse = (): JSX.Element => {
             <li>
               <code>{constant('pending')}</code>
               {constant(
-                ': counted as held back; the pending switches hide it, or show it alone.',
+                ': on a pull request, counted as held back in the merge order, which can hide it or show it alone. An issue held back is priority:hold.',
               )}
             </li>
           </ul>

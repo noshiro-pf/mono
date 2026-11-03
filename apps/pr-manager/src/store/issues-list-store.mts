@@ -10,7 +10,7 @@
  * The search is held beside the view, not in it, and so is never saved: it
  * starts empty on every visit.
  *
- * The priorities, `pending` and `in progress` in the view are the DAG's too
+ * The tiers and `in progress` in the view are the DAG's too
  * (`issues-view-store.mts`): switched off or picked here, they are for either
  * view.
  */
@@ -34,8 +34,6 @@ import {
   countIssues,
   toggleIssueInProgress,
   toggleIssueInProgressOnly,
-  toggleIssuePending,
-  toggleIssuePendingOnly,
   toggleIssuePriority,
   toggleIssuePriorityOnly,
   toggleIssueStart,
@@ -63,7 +61,7 @@ export type IssuesListDeps = Readonly<{
 export type IssuesListStore = Readonly<{
   view: InitializedObservable<IssuesListView>;
   /**
-   * The priorities, `pending` and `in progress` of the view alone, which the
+   * The tiers and `in progress` of the view alone, which the
    * DAG reads (`issues-view-store.mts`); passed on only when they changed, so
    * that a change to the rest of the view derives nothing there.
    */
@@ -83,8 +81,6 @@ export type IssuesListStore = Readonly<{
   togglePriorityOnly: (priority: IssueTier) => void;
   toggleStart: (which: IssueStartSwitch) => void;
   toggleLabel: (labelName: string) => void;
-  togglePending: () => void;
-  togglePendingOnly: () => void;
   toggleInProgress: () => void;
   toggleInProgressOnly: () => void;
   setSort: (sort: IssueSort) => void;
@@ -129,15 +125,11 @@ export const createIssuesListStore = (
           ({
             hiddenPriorities,
             onlyPriorities,
-            hidePending,
-            onlyPending,
             hideInProgress,
             onlyInProgress,
           }): IssueFilter => ({
             hiddenPriorities,
             onlyPriorities,
-            hidePending,
-            onlyPending,
             hideInProgress,
             onlyInProgress,
           }),
@@ -173,12 +165,6 @@ export const createIssuesListStore = (
     },
     toggleLabel: (labelName) => {
       updateView((current) => toggleLabel(current, labelName));
-    },
-    togglePending: () => {
-      updateView(toggleIssuePending);
-    },
-    togglePendingOnly: () => {
-      updateView(toggleIssuePendingOnly);
     },
     toggleInProgress: () => {
       updateView(toggleIssueInProgress);

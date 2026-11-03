@@ -9,8 +9,8 @@
  * request that closes it, which is the work on that issue under way. How an
  * issue stands is `pr-report-core`'s `decideStartStates`; this adds where
  * everything else stands, how far someone has got with a startable issue, and
- * the `priority:*` label of what the page read the labels of, whether it is
- * labelled `pending`, and whether `in-progress` or `planned`.
+ * the tier of a listed issue, whether an open pull request is labelled
+ * `pending`, and whether `in-progress` or `planned`.
  */
 
 import {
@@ -54,9 +54,9 @@ export type IssueGraphNode = Readonly<{
    */
   priority: IssueTier;
   /**
-   * Whether it is labelled `pending`, which its author puts on what is held
-   * back for now; read on a listed issue and an open pull request, and `false`
-   * elsewhere.
+   * Whether it is an open pull request labelled `pending`, which its author
+   * puts on what is held back for now; `false` for everything else, an issue
+   * included, since an issue held back is `priority:hold`.
    */
   pending: boolean;
   /**
@@ -139,7 +139,7 @@ export const buildIssueGraph = ({
         worked.has(issue.number) ? 'in-progress' : marked,
       ),
       priority: issueTierOf(issue.labels),
-      pending: isPending(issue.labels),
+      pending: false,
       marked,
     };
   });
@@ -279,21 +279,10 @@ export const omitDone = (graph: IssueGraph): IssueGraph =>
   omitNodes(graph, ({ state }) => state === 'done');
 
 /**
- * The graph without what is labelled `pending`, the edges that run from it or
- * to it, and what is left with no edge for it (see {@link omitNodes}).
- * How the rest stands is left as it was: an issue waiting on one still waits,
- * which its tooltip says. The graph given is handed back when nothing in it is
- * pending.
- */
-export const omitPending = (graph: IssueGraph): IssueGraph =>
-  omitNodes(graph, ({ pending }) => pending);
-
-/**
- * The graph without the listed issues `filter` leaves out by their priority, by
- * whether they are pending or by whether they are in progress
- * (`issue-filter.mts`, which the list reads the same one from), save those an
- * issue left in waits on, and without what is left with no edge for them (see
- * {@link omitNodes}).
+ * The graph without the listed issues `filter` leaves out by their tier or by
+ * whether they are in progress (`issue-filter.mts`, which the list reads the
+ * same one from), save those an issue left in waits on, and without what is
+ * left with no edge for them (see {@link omitNodes}).
  *
  * An issue left out that one left in waits on is kept, as what that one waits
  * on is kept when it is not a listed issue: it is why that issue waits. It is
@@ -301,9 +290,8 @@ export const omitPending = (graph: IssueGraph): IssueGraph =>
  * save what is drawn for another, since it is there for the other's sake, and
  * it is not counted among the issues shown (`countIssueFilter`). Only a listed
  * issue is left out by `filter`, since nothing else here has its labels read
- * for a reason of its own; what is pending is taken out whatever it is by
- * {@link omitPending}, while it is switched off. The graph given is handed back
- * when `filter` leaves out no listed issue.
+ * for a reason of its own. The graph given is handed back when `filter` leaves
+ * out no listed issue.
  */
 export const omitFilteredIssues = (
   graph: IssueGraph,
@@ -317,7 +305,6 @@ export const omitFilteredIssues = (
           !isIssueFilterShown(
             {
               priority: node.priority,
-              pending: node.pending,
               inProgress: node.state === 'in-progress',
             },
             filter,

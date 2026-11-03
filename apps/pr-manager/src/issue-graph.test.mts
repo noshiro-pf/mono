@@ -5,7 +5,6 @@ import {
   issueStartsOf,
   omitDone,
   omitFilteredIssues,
-  omitPending,
   type OpenPullRequestFacts,
 } from './issue-graph.mjs';
 import type { IssueItem, ReferencedItem } from './load-report.mjs';
@@ -243,7 +242,7 @@ describe(buildIssueGraph, () => {
     );
   });
 
-  test('marks what is labelled pending, of a listed issue and of an open pull request', () => {
+  test('marks an open pull request labelled pending, and no issue, which is held back by its tier', () => {
     const graph = build({
       issues: [
         issue(1, [], ['pending']),
@@ -257,7 +256,8 @@ describe(buildIssueGraph, () => {
     assert.deepStrictEqual(
       graph.nodes.map(({ number, pending }) => [number, pending]),
       [
-        [1, true],
+        // An issue held back is `priority:hold`; `pending` is a label to it.
+        [1, false],
         [2, false],
         [3, false],
         // What a declaration names past the list: its labels are not read.
@@ -355,46 +355,6 @@ describe(omitDone, () => {
     const graph = build({ issues: [issue(1, []), issue(2, [1])] });
 
     assert.strictEqual(omitDone(graph), graph);
-  });
-});
-
-describe(omitPending, () => {
-  test('takes out what is pending, and every edge that runs from it or to it, leaving how the rest stands', () => {
-    const graph = build({
-      issues: [issue(1, [], ['pending']), issue(2, [1]), issue(3, [])],
-      pulls: [pull(7, [3], ['pending'])],
-    });
-
-    const shown = omitPending(graph);
-
-    assert.deepStrictEqual(
-      shown.nodes.map(({ number, state }) => [number, state]),
-      [
-        // Still waiting on #1, which is drawn no more.
-        [2, 'blocked'],
-        [3, 'in-progress'],
-      ],
-    );
-
-    assert.deepStrictEqual(shown.edges, []);
-  });
-
-  test('takes out what is left with no edge that is not a listed issue', () => {
-    const graph = build({
-      issues: [issue(5, [3], ['pending']), issue(6, [])],
-      referenced: [referencedItem(3, 'issue', 'abandoned')],
-    });
-
-    assert.deepStrictEqual(
-      omitPending(graph).nodes.map(({ number }) => number),
-      [6],
-    );
-  });
-
-  test('hands back the graph it was given when nothing in it is pending', () => {
-    const graph = build({ issues: [issue(1, []), issue(2, [1])] });
-
-    assert.strictEqual(omitPending(graph), graph);
   });
 });
 
@@ -543,11 +503,11 @@ describe(omitFilteredIssues, () => {
     );
   });
 
-  test('with pending picked, keeps only the listed issues labelled pending, and what one of them waits on', () => {
+  test('with hold picked, keeps only the held issues, and what one of them waits on', () => {
     const graph = build({
       issues: [
         issue(1, [], ['priority:S']),
-        issue(2, [1], ['pending']),
+        issue(2, [1], ['priority:hold']),
         issue(3, []),
       ],
       pulls: [pull(7, [3])],
@@ -555,7 +515,7 @@ describe(omitFilteredIssues, () => {
 
     const shown = omitFilteredIssues(graph, {
       ...DEFAULT_ISSUE_FILTER,
-      onlyPending: true,
+      onlyPriorities: ['hold'],
     });
 
     // #1 is why #2 waits; #7 closed only #3.

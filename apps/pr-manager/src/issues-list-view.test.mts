@@ -9,8 +9,6 @@ import {
   searchWithIssuesListView,
   toggleIssueInProgress,
   toggleIssueInProgressOnly,
-  toggleIssuePending,
-  toggleIssuePendingOnly,
   toggleIssuePriority,
   toggleIssuePriorityOnly,
   toggleIssueStart,
@@ -109,72 +107,6 @@ describe(isIssueShown, () => {
   });
 });
 
-describe(toggleIssuePending, () => {
-  test('hides the issues labelled pending, and shows them again', () => {
-    const view = toggleIssuePending(DEFAULT_ISSUES_LIST_VIEW);
-
-    assert.isFalse(isIssueShown(issue(1, ['pending']), view));
-
-    assert.isFalse(isIssueShown(issue(2, ['bug', 'pending']), view));
-
-    assert.isTrue(isIssueShown(issue(3, ['bug']), view));
-
-    assert.isTrue(
-      isIssueShown(issue(1, ['pending']), toggleIssuePending(view)),
-    );
-  });
-
-  test('a picked label does not show what is hidden as pending', () => {
-    const view = toggleIssuePending(
-      toggleLabel(DEFAULT_ISSUES_LIST_VIEW, 'bug'),
-    );
-
-    assert.isFalse(isIssueShown(issue(1, ['bug', 'pending']), view));
-
-    assert.isTrue(isIssueShown(issue(2, ['bug']), view));
-  });
-
-  test('switching off pending while it is picked unpicks it', () => {
-    const view = toggleIssuePending(
-      toggleIssuePendingOnly(DEFAULT_ISSUES_LIST_VIEW),
-    );
-
-    assert.isTrue(view.hidePending);
-
-    assert.isFalse(view.onlyPending);
-  });
-});
-
-describe(toggleIssuePendingOnly, () => {
-  test('picked, only the issues labelled pending are shown, of the priorities shown', () => {
-    const view = toggleIssuePendingOnly(
-      toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'S'),
-    );
-
-    assert.isTrue(isIssueShown(issue(1, ['pending', 'priority:S']), view));
-
-    // Picking pending does not bring in what the priorities leave out, nor
-    // picking a priority what pending leaves out.
-    assert.isFalse(isIssueShown(issue(2, ['pending', 'priority:D']), view));
-
-    assert.isFalse(isIssueShown(issue(3, ['priority:S']), view));
-
-    assert.isTrue(
-      isIssueShown(issue(3, ['priority:S']), toggleIssuePendingOnly(view)),
-    );
-  });
-
-  test('picking pending while it is switched off switches it back on', () => {
-    const view = toggleIssuePendingOnly(
-      toggleIssuePending(DEFAULT_ISSUES_LIST_VIEW),
-    );
-
-    assert.isFalse(view.hidePending);
-
-    assert.isTrue(view.onlyPending);
-  });
-});
-
 describe(matchesIssueTitle, () => {
   test('nothing typed, or only spaces, matches every issue', () => {
     assert.isTrue(matchesIssueTitle(titled(1, 'Anything'), ''));
@@ -232,8 +164,6 @@ describe(arrangeIssues, () => {
       onlyPriorities: [],
       hiddenStarts: [],
       onlyLabels: ['bug'],
-      hidePending: false,
-      onlyPending: false,
       hideInProgress: false,
       onlyInProgress: false,
       sort: 'priority',
@@ -390,64 +320,34 @@ describe(countIssues, () => {
     });
   });
 
-  test('pending is its own switch, not a label: switched off, it reads what switching it on would show', () => {
+  test('pending is a label like any other on an issue: a pick, which holds nothing back', () => {
     const items = [
       issue(1, ['pending']),
-      issue(2, ['pending', 'bug', 'priority:D']),
+      issue(2, ['pending', 'bug', 'priority:hold']),
       issue(3, ['bug']),
     ] as const;
 
-    const shown = countIssues(items, DEFAULT_ISSUES_LIST_VIEW);
+    const counts = countIssues(items, DEFAULT_ISSUES_LIST_VIEW);
 
-    assert.deepStrictEqual(shown.pending, { shown: 2, total: 2 });
+    assert.deepStrictEqual(counts.open, { shown: 3, total: 3 });
 
     assert.deepStrictEqual(
-      shown.labels.map(({ name }) => name),
-      ['bug'],
+      counts.labels.map(({ name, count }) => [name, count]),
+      [
+        ['bug', { shown: 2, total: 2 }],
+        ['pending', { shown: 2, total: 2 }],
+      ],
     );
 
-    const hidden = countIssues(
+    // What is held back is the hold tier's switch.
+    const held = countIssues(
       items,
-      toggleIssuePending(toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'D')),
+      toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'hold'),
     );
 
-    assert.deepStrictEqual(hidden.open, { shown: 1, total: 3 });
+    assert.deepStrictEqual(held.open, { shown: 2, total: 3 });
 
-    // #2 is D, which is still hidden.
-    assert.deepStrictEqual(hidden.pending, { shown: 1, total: 2 });
-
-    assert.deepStrictEqual(hidden.labels[0]?.count, { shown: 1, total: 2 });
-  });
-
-  test('pending picked, the priorities read what is pending of each, and pending reads what the priorities show', () => {
-    const items = [
-      issue(1, ['pending', 'priority:S']),
-      issue(2, ['pending', 'priority:D']),
-      issue(3, ['priority:S']),
-      issue(4, []),
-    ] as const;
-
-    const counts = countIssues(
-      items,
-      toggleIssuePendingOnly(
-        toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'S'),
-      ),
-    );
-
-    assert.deepStrictEqual(counts.open, { shown: 1, total: 4 });
-
-    assert.deepStrictEqual(counts.pending, { shown: 1, total: 2 });
-
-    assert.deepStrictEqual(counts.priorities, {
-      S: { shown: 1, total: 2 },
-      A: { shown: 0, total: 0 },
-      B: { shown: 0, total: 0 },
-      C: { shown: 0, total: 0 },
-      D: { shown: 1, total: 1 },
-      hold: { shown: 0, total: 0 },
-      close: { shown: 0, total: 0 },
-      none: { shown: 0, total: 1 },
-    });
+    assert.deepStrictEqual(held.priorities.hold, { shown: 1, total: 1 });
   });
 
   test('a picked label no open issue carries is still listed, so that it can be unpicked', () => {
@@ -600,8 +500,6 @@ describe(issuesListViewFromSearch, () => {
       onlyPriorities: ['S'],
       hiddenStarts: ['blocked'],
       onlyLabels: ['bug', 'good first issue', 'v1.2'],
-      hidePending: true,
-      onlyPending: false,
       hideInProgress: false,
       onlyInProgress: true,
       sort: 'start',
@@ -611,42 +509,49 @@ describe(issuesListViewFromSearch, () => {
 
     assert.strictEqual(
       search,
-      '?issues.hidePriority=D.none&issues.onlyPriority=S&issues.hideStart=blocked&issues.label=bug&issues.label=good+first+issue&issues.label=v1.2&issues.hidePending=1&issues.onlyInProgress=1&issues.sort=start',
+      '?issues.hidePriority=D.none&issues.onlyPriority=S&issues.hideStart=blocked&issues.label=bug&issues.label=good+first+issue&issues.label=v1.2&issues.onlyInProgress=1&issues.sort=start',
     );
 
     assert.deepStrictEqual(issuesListViewFromSearch(search), view);
+  });
 
-    const picked: IssuesListView = {
-      ...DEFAULT_ISSUES_LIST_VIEW,
-      onlyPending: true,
-    } as const;
-
-    assert.strictEqual(
-      searchWithIssuesListView('', picked),
-      '?issues.onlyPending=1',
+  test('what an older page wrote for pending is read as the hold tier, and not written again', () => {
+    assert.deepStrictEqual(
+      issuesListViewFromSearch('?issues.hidePending=1').hiddenPriorities,
+      ['hold'],
     );
 
     assert.deepStrictEqual(
-      issuesListViewFromSearch('?issues.onlyPending=1'),
-      picked,
+      issuesListViewFromSearch('?dag.hidePending=1').hiddenPriorities,
+      ['hold'],
     );
-  });
 
-  test("the DAG's own pending switch an older page wrote switches pending off for both views", () => {
-    assert.isTrue(issuesListViewFromSearch('?dag.hidePending=1').hidePending);
+    // Picked comes first, as with a tier both switched off and picked.
+    const picked = issuesListViewFromSearch(
+      '?issues.hidePending=1&dag.hidePending=1&issues.onlyPending=1',
+    );
 
-    // What the issues' own parameters say comes first.
-    assert.isFalse(
-      issuesListViewFromSearch('?dag.hidePending=1&issues.onlyPending=1')
-        .hidePending,
+    assert.deepStrictEqual(picked.hiddenPriorities, []);
+
+    assert.deepStrictEqual(picked.onlyPriorities, ['hold']);
+
+    assert.deepStrictEqual(
+      issuesListViewFromSearch(
+        '?issues.hidePriority=hold.D&issues.onlyPending=1',
+      ),
+      {
+        ...DEFAULT_ISSUES_LIST_VIEW,
+        hiddenPriorities: ['D'],
+        onlyPriorities: ['hold'],
+      },
     );
 
     assert.strictEqual(
       searchWithIssuesListView(
-        '?dag.hidePending=1',
-        issuesListViewFromSearch('?dag.hidePending=1'),
+        '?x=1&dag.hidePending=1',
+        issuesListViewFromSearch('?x=1&dag.hidePending=1'),
       ),
-      '?dag.hidePending=1&issues.hidePending=1',
+      '?x=1&issues.hidePriority=hold',
     );
   });
 
@@ -670,16 +575,6 @@ describe(issuesListViewFromSearch, () => {
       searchWithIssuesListView('?issues.hideStart=in-progress.blocked', view),
       '?issues.hideStart=blocked&issues.hideInProgress=1',
     );
-  });
-
-  test('pending both switched off and picked, which only a hand can write, is switched off', () => {
-    const view = issuesListViewFromSearch(
-      '?issues.hidePending=1&issues.onlyPending=1',
-    );
-
-    assert.isTrue(view.hidePending);
-
-    assert.isFalse(view.onlyPending);
   });
 
   test('a tier an older page picked as a label is picked as a tier', () => {
@@ -707,9 +602,8 @@ describe(issuesListViewFromSearch, () => {
         // Switched off and picked is switched off.
         onlyPriorities: ['D'],
         hiddenStarts: ['cycle'],
-        onlyLabels: ['bug'],
-        hidePending: false,
-        onlyPending: false,
+        // An issue's pending is a label like any other.
+        onlyLabels: ['bug', 'pending'],
         hideInProgress: false,
         onlyInProgress: false,
         sort: 'updated',

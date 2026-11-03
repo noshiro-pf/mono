@@ -35,7 +35,7 @@ describe(createIssuesListStore, () => {
     assert.strictEqual(saved.length, 2);
   });
 
-  test('passes on the priorities and pending alone, and only when they changed', () => {
+  test('passes on the tiers and in progress alone, and only when they changed', () => {
     const { store } = setup();
 
     const mut_filters: unknown[] = [];
@@ -54,12 +54,12 @@ describe(createIssuesListStore, () => {
 
     store.togglePriorityOnly('S');
 
-    store.togglePendingOnly();
+    store.toggleInProgressOnly();
 
     assert.deepStrictEqual(mut_filters, [
       DEFAULT_ISSUE_FILTER,
       { ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['S'] },
-      { ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['S'], onlyPending: true },
+      { ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['S'], onlyInProgress: true },
     ]);
   });
 
@@ -132,8 +132,6 @@ const STORED: IssuesListView = {
   onlyPriorities: [],
   hiddenStarts: [],
   onlyLabels: ['bug'],
-  hidePending: false,
-  onlyPending: false,
   hideInProgress: false,
   onlyInProgress: false,
   sort: 'priority',

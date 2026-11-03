@@ -313,6 +313,28 @@ describe('the open issues section', () => {
     assert.include(line(2038), 'several priority tiers');
   });
 
+  test('says that an issue labelled pending is to be held with priority:hold', () => {
+    const rendered = renderMarkdown(
+      report(
+        [facts({ number: 1901 })],
+        [
+          { ...issue(2040), labels: labelled('pending', 'priority:C') },
+          { ...issue(2041), labels: labelled('priority:hold') },
+        ],
+      ),
+    );
+
+    const line = (number: number): string =>
+      rendered.split('\n').find((each) => each.includes(`[#${number}]`)) ?? '';
+
+    assert.include(
+      line(2040),
+      'pending is for pull requests; hold with priority:hold',
+    );
+
+    assert.notInclude(line(2041), 'pending is for');
+  });
+
   test('says how each issue stands for being started, and what it waits for', () => {
     const rendered = renderMarkdown(
       buildReport({

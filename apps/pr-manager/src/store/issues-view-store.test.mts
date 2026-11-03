@@ -148,12 +148,12 @@ describe(createIssuesViewStore, () => {
     ]);
   });
 
-  test('hiding what is pending takes it out of the graph, and counts it either way', () => {
+  test('hiding hold keeps a held issue only for what waits on it, and counts it either way', () => {
     const { store, setIssues, setFilter } = setup();
 
     setIssues({
       items: [
-        { ...issueItem(5, [3]), labels: [pendingLabel] },
+        { ...issueItem(5, [3]), labels: [priorityLabel('hold')] },
         issueItem(6, [5]),
       ],
       totalCount: 2,
@@ -161,20 +161,20 @@ describe(createIssuesViewStore, () => {
       referenced: [referencedIssue(3, 'abandoned')],
     });
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.pending, {
+    assert.deepStrictEqual(store.counts.getSnapshot().value.priorities.hold, {
       shown: 1,
       total: 1,
     });
 
-    setFilter({ ...DEFAULT_ISSUE_FILTER, hidePending: true });
+    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['hold'] });
 
-    // #3 is drawn only for #5, which waited on it.
+    // #5 stays because #6 waits on it, without #3, which only #5 waits on.
     assert.deepStrictEqual(
       store.layout.getSnapshot().value.nodes.map(({ number }) => number),
-      [6],
+      [5, 6],
     );
 
-    // Switched off, pending reads what switching it on would draw.
+    // Switched off, hold reads what switching it on would draw.
     assert.deepStrictEqual(store.counts.getSnapshot().value, {
       open: { shown: 1, total: 2 },
       priorities: {
@@ -183,11 +183,10 @@ describe(createIssuesViewStore, () => {
         B: { shown: 0, total: 0 },
         C: { shown: 0, total: 0 },
         D: { shown: 0, total: 0 },
-        hold: { shown: 0, total: 0 },
+        hold: { shown: 1, total: 1 },
         close: { shown: 0, total: 0 },
-        none: { shown: 1, total: 2 },
+        none: { shown: 1, total: 1 },
       },
-      pending: { shown: 1, total: 1 },
       inProgress: { shown: 0, total: 0 },
     });
 
@@ -206,7 +205,7 @@ describe(createIssuesViewStore, () => {
       items: [
         { ...issueItem(1, [9]), labels: [priorityLabel('S')] },
         { ...issueItem(2, [1]), labels: [priorityLabel('D')] },
-        { ...issueItem(3, []), labels: [priorityLabel('D'), pendingLabel] },
+        { ...issueItem(3, []), labels: [priorityLabel('D')] },
         issueItem(4, []),
       ],
       totalCount: 4,
@@ -226,7 +225,6 @@ describe(createIssuesViewStore, () => {
         close: { shown: 0, total: 0 },
         none: { shown: 1, total: 1 },
       },
-      pending: { shown: 1, total: 1 },
       inProgress: { shown: 0, total: 0 },
     });
 
@@ -247,13 +245,7 @@ describe(createIssuesViewStore, () => {
       [1, 4, 9],
     );
 
-    setFilter({
-      ...DEFAULT_ISSUE_FILTER,
-      hiddenPriorities: ['D'],
-      hidePending: true,
-    });
-
-    // A priority switched off counts what switching it on would draw.
+    // A tier switched off counts what switching it on would draw.
     assert.deepStrictEqual(store.counts.getSnapshot().value, {
       open: { shown: 2, total: 4 },
       priorities: {
@@ -261,115 +253,22 @@ describe(createIssuesViewStore, () => {
         A: { shown: 0, total: 0 },
         B: { shown: 0, total: 0 },
         C: { shown: 0, total: 0 },
-        D: { shown: 1, total: 2 },
+        D: { shown: 2, total: 2 },
         hold: { shown: 0, total: 0 },
         close: { shown: 0, total: 0 },
         none: { shown: 1, total: 1 },
       },
-      // #3 is D, which is still hidden.
-      pending: { shown: 0, total: 1 },
       inProgress: { shown: 0, total: 0 },
     });
   });
 
-  test('pending picked, draws only what is pending of the priorities shown, and what that waits on', () => {
-    const { store, setIssues, setFilter } = setup();
-
-    setIssues({
-      items: [
-        { ...issueItem(1, []), labels: [priorityLabel('S')] },
-        {
-          ...issueItem(2, [1]),
-          labels: [priorityLabel('S'), pendingLabel],
-        },
-        { ...issueItem(3, []), labels: [priorityLabel('D'), pendingLabel] },
-        issueItem(4, []),
-      ],
-      totalCount: 4,
-      endCursor: undefined,
-      referenced: [],
-    });
-
-    setFilter({
-      ...DEFAULT_ISSUE_FILTER,
-      onlyPriorities: ['S'],
-      onlyPending: true,
-    });
-
-    // #1 is not pending, and stays only because #2 waits on it.
-    assert.deepStrictEqual(
-      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
-      [1, 2],
-    );
-
-    assert.deepStrictEqual(store.counts.getSnapshot().value, {
-      open: { shown: 1, total: 4 },
-      priorities: {
-        S: { shown: 1, total: 2 },
-        A: { shown: 0, total: 0 },
-        B: { shown: 0, total: 0 },
-        C: { shown: 0, total: 0 },
-        D: { shown: 1, total: 1 },
-        hold: { shown: 0, total: 0 },
-        close: { shown: 0, total: 0 },
-        none: { shown: 0, total: 1 },
-      },
-      pending: { shown: 1, total: 2 },
-      inProgress: { shown: 0, total: 0 },
-    });
-  });
-
-  test('hiding what is pending brings back nothing the priorities left out, and counts only what they leave', () => {
-    const { store, setIssues, setFilter } = setup();
-
-    setIssues({
-      items: [
-        {
-          ...issueItem(5, [3]),
-          labels: [priorityLabel('D'), pendingLabel],
-        },
-        issueItem(6, []),
-        { ...issueItem(7, []), labels: [pendingLabel] },
-      ],
-      totalCount: 3,
-      endCursor: undefined,
-      referenced: [referencedIssue(3, 'abandoned')],
-    });
-
-    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['D'] });
-
-    assert.deepStrictEqual(
-      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
-      [6, 7],
-    );
-
-    assert.deepStrictEqual(store.counts.getSnapshot().value.pending, {
-      shown: 1,
-      total: 2,
-    });
-
-    setFilter({
-      ...DEFAULT_ISSUE_FILTER,
-      hiddenPriorities: ['D'],
-      hidePending: true,
-    });
-
-    assert.deepStrictEqual(
-      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
-      [6],
-    );
-  });
-
-  test('keeps what a hidden pending issue waits on only for that issue', () => {
+  test('keeps what a hidden held issue waits on only for that issue', () => {
     const { store, setIssues, setFilter } = setup();
 
     setIssues({
       items: [
         { ...issueItem(1, []), labels: [priorityLabel('D')] },
-        {
-          ...issueItem(2, [1]),
-          labels: [priorityLabel('S'), pendingLabel],
-        },
+        { ...issueItem(2, [1]), labels: [priorityLabel('hold')] },
       ],
       totalCount: 2,
       endCursor: undefined,
@@ -383,11 +282,7 @@ describe(createIssuesViewStore, () => {
       [1, 2],
     );
 
-    setFilter({
-      ...DEFAULT_ISSUE_FILTER,
-      hiddenPriorities: ['D'],
-      hidePending: true,
-    });
+    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['D', 'hold'] });
 
     assert.deepStrictEqual(store.graph.getSnapshot().value.nodes, []);
   });
@@ -702,13 +597,7 @@ const referencedIssue = (
     status: itemStatus,
   }) as const;
 
-const pendingLabel = {
-  name: 'pending',
-  color: 'ededed',
-  description: '',
-} as const;
-
-const priorityLabel = (priority: 'S' | 'B' | 'D') =>
+const priorityLabel = (priority: 'S' | 'B' | 'D' | 'hold') =>
   ({
     name: `priority:${priority}`,
     color: 'ededed',

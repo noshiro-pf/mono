@@ -71,7 +71,7 @@ optional, make it say more; **How to use** in the header sums them up:
 | `Start-After: #N` on a line of an issue's description, or GitHub's "blocked by" | draws the issue after #N in the DAG                     |
 | a `priority:high`, `priority:mid` or `priority:low` label on a pull request     | filters and sorts the merge order by it                 |
 | a `priority:S` … `priority:D`, `priority:hold` or `priority:close` on an issue  | filters and sorts the issues by it, marks it in the DAG |
-| a `pending` label                                                               | counts it as held back, can hide it or show it alone    |
+| a `pending` label on a pull request                                             | counts it as held back, can hide it or show it alone    |
 | required status checks in a ruleset or branch protection rule                   | judges the checks by those alone, not every check       |
 | a ruleset asking for code owner review, and a `CODEOWNERS` file                 | shows which pull requests wait for a code owner         |
 
