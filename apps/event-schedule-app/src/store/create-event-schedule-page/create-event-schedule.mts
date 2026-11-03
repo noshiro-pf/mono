@@ -100,6 +100,8 @@ export const createCreateEventScheduleStore = (
     const fromStorage = deps.storage.restore();
 
     if (Result.isErr(fromStorage)) {
+      console.warn(fromStorage.value);
+
       return;
     }
 
@@ -226,7 +228,7 @@ export const createCreateEventScheduleStore = (
     setUrl(deps.toAbsolutePath(`..${Routes.routes.answerPage(eventId)}`));
 
     // reset local storage
-    deps.storage.save({
+    const resetResult = deps.storage.save({
       answerDeadline: eventScheduleInitialValue.answerDeadline,
       answerIcons: eventScheduleInitialValue.answerIcons,
       datetimeRangeList: eventScheduleInitialValue.datetimeRangeList,
@@ -235,6 +237,10 @@ export const createCreateEventScheduleStore = (
       notificationSettings: eventScheduleInitialValue.notificationSettings,
       title: eventScheduleInitialValue.title,
     });
+
+    if (Result.isErr(resetResult)) {
+      console.warn(resetResult.value);
+    }
 
     return Result.ok(undefined);
   };
