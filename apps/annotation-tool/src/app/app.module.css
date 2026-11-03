@@ -1,0 +1,22 @@
+.root {
+  --sidebar-width: 250px;
+
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+}
+
+.canvasArea {
+  width: calc(100% - var(--sidebar-width));
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(121, 121, 121);
+}
+
+.sidebarArea {
+  width: var(--sidebar-width);
+  height: 100%;
+  background-color: rgb(245, 245, 245);
+}

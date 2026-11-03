@@ -1,6 +1,4 @@
-import { css } from '@emotion/react';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
+import { constant, mapBindable, type JSX } from 'synstate-dom';
 import type { RectSize } from 'ts-utils-additional';
 import {
   AnnotationCanvas,
@@ -14,66 +12,35 @@ import {
 } from '../constants/index.mjs';
 import {
   handlers,
-  useSelectedLabel,
-  useSideBarIsHidden,
-  visibleLabels$,
+  labelListIsCollapsed$,
+  labelVisibilityFlags$,
+  selectedLabel$,
 } from '../store/index.mjs';
+import * as styles from './app.module.css';
 import { Sidebar } from './sidebar/index.mjs';
 
-export const App = memoNamed('App', () => {
-  const sideBarIsHidden = useSideBarIsHidden();
-
-  const selectedLabel = useSelectedLabel();
-
-  const visibleLabels = useObservableValue(visibleLabels$);
-
-  return (
-    <div
-      css={css`
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-      `}
-      data-e2e={'root'}
-    >
-      <div
-        css={css`
-          width: calc(100% - ${sidebarWidthPx}px);
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background-color: rgb(121, 121, 121);
-        `}
-      >
-        <AnnotationCanvas
-          canvasSize={canvasSize}
-          canvasStyles={canvasStyles}
-          selectedHue={selectedLabel.hue}
-        />
-      </div>
-      <div
-        css={css`
-          width: ${sidebarWidthPx}px;
-          height: 100%;
-          background-color: rgb(245, 245, 245);
-        `}
-      >
-        <Sidebar
-          handlers={handlers}
-          hidden={sideBarIsHidden}
-          labels={labels}
-          labelsLightness={lightnessDarker}
-          labelsSaturation={saturationDarker}
-          selectedLabel={selectedLabel}
-          visibleLabels={visibleLabels}
-        />
-      </div>
+export const App = (): JSX.Element => (
+  <div class={constant(styles.root)} data-e2e={constant('root')}>
+    <div class={constant(styles.canvasArea)}>
+      <AnnotationCanvas
+        canvasSize={canvasSize}
+        canvasStyles={canvasStyles}
+        selectedHue={mapBindable(selectedLabel$, (label) => label.hue)}
+      />
     </div>
-  );
-});
-
-const sidebarWidthPx = 250;
+    <div class={constant(styles.sidebarArea)}>
+      <Sidebar
+        handlers={handlers}
+        hidden={labelListIsCollapsed$}
+        labels={labels}
+        labelsLightness={lightnessDarker}
+        labelsSaturation={saturationDarker}
+        selectedLabel={selectedLabel$}
+        visibleLabelFlags={labelVisibilityFlags$}
+      />
+    </div>
+  </div>
+);
 
 const canvasSize: RectSize = {
   width: 600,

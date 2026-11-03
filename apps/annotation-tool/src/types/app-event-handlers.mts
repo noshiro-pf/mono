@@ -1,8 +1,7 @@
 import type { IdType } from '../canvas/index.mjs';
 
 export type AppEventHandler = Readonly<{
-  expandLabelList: () => void;
-  collapseLabelList: () => void;
+  toggleLabelList: () => void;
   selectLabel: (labelId: IdType) => void;
   showAllLabels: () => void;
   hideAllLabels: () => void;

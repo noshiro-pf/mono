@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import { Arr, asUint32, Num, Result } from 'ts-data-forge';
-import type { DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly, FixedLengthTuple } from 'ts-type-forge';
 import { labelButton } from './locators.mjs';
 
 test(
@@ -145,7 +145,7 @@ test(
   },
 );
 
-type Rgb = readonly [number, number, number];
+type Rgb = FixedLengthTuple<3, number>;
 
 type CanvasPoint = Readonly<{ x: number; y: number }>;
 

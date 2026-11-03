@@ -5,6 +5,7 @@
 // which this layer depends on. The `mut_` prefix marks the deliberate mutation,
 // as it does elsewhere in the repository.
 
+import type { ReadonlyRecord } from 'ts-type-forge';
 import type { Point, Rect } from 'ts-utils-additional';
 
 export type Direction = 'nw' | 'n_' | 'ne' | 'w_' | 'e_' | 'sw' | 's_' | 'se';
@@ -14,7 +15,7 @@ export type BboxPoint = Readonly<{
   position: Point;
 }>;
 
-export type BboxPoints = Record<Direction, Point>;
+export type BboxPoints = ReadonlyRecord<Direction, Point>;
 
 /*
  *     x0    x1    x2
@@ -52,7 +53,7 @@ export const bboxPointsFromRect = (rect: Rect): BboxPoints => {
 };
 
 export const foreachBboxPoints = <A,>(
-  bboxPoints: Record<Direction, A>,
+  bboxPoints: ReadonlyRecord<Direction, A>,
   fn: (direction: Direction, p: A) => void,
 ): void => {
   fn('nw', bboxPoints.nw);
@@ -73,9 +74,9 @@ export const foreachBboxPoints = <A,>(
 };
 
 export const mapBboxPoints = <A, B>(
-  bboxPoints: Record<Direction, A>,
+  bboxPoints: ReadonlyRecord<Direction, A>,
   fn: (direction: Direction, p: A) => B,
-): Record<Direction, B> =>
+): ReadonlyRecord<Direction, B> =>
   ({
     nw: fn('nw', bboxPoints.nw),
     n_: fn('n_', bboxPoints.n_),

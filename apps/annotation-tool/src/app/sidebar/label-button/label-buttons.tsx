@@ -1,93 +1,68 @@
-import { Button, Collapse } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
-import { asSafeUint, tp } from 'ts-data-forge';
+import { Button, Collapse } from 'blueprint-synstate';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 import type { Percent } from 'ts-type-forge';
 import type { Label } from '../../../canvas/index.mjs';
 import type { AppEventHandler } from '../../../types/index.mjs';
 import { LabelButtonItem } from './label-button-item.js';
+import * as styles from './label-buttons.module.css';
 
 type Props = Readonly<{
   labels: readonly Label[];
   labelSaturation: Percent;
   labelLightness: Percent;
-  visibleLabels: readonly Label[];
-  selectedLabel: Label;
-  hidden: boolean;
+  /** Whether each label of `labels` is shown, by index. */
+  visibleLabelFlags: Bindable<readonly boolean[]>;
+  selectedLabel: Bindable<Label>;
+  hidden: Bindable<boolean>;
   handlers: AppEventHandler;
 }>;
 
-export const LabelButtons = memoNamed<Props>('LabelButtons', (props) => {
-  const labelListId = React.useId();
+export const LabelButtons = (props: Props): JSX.Element => (
+  <div class={constant(styles.root)}>
+    <div class={constant(styles.header)}>
+      {constant('Labels')}
+      <Button
+        aria-controls={constant(labelListId)}
+        aria-expanded={mapBindable(props.hidden, (hidden) =>
+          hidden ? 'false' : 'true',
+        )}
+        aria-label={constant('Labels')}
+        icon={mapBindable(props.hidden, (hidden) =>
+          hidden ? 'double-chevron-down' : 'double-chevron-up',
+        )}
+        onClick={props.handlers.toggleLabelList}
+      />
+    </div>
 
-  const labelsWithVisibleFlag = React.useMemo(
-    () =>
-      props.labels.map((label) =>
-        tp(label, props.visibleLabels.includes(label)),
-      ),
-    [props.labels, props.visibleLabels],
-  );
-
-  return (
-    <div
-      css={css`
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        user-select: none;
-        -webkit-touch-callout: none;
-      `}
+    <Collapse
+      isOpen={mapBindable(props.hidden, (hidden) => !hidden)}
+      keepChildrenMounted
     >
       <div
-        css={css`
-          flex-grow: 0;
-          padding: 10px;
-          width: 100%;
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-          align-items: center;
-          font-weight: bold;
-        `}
+        class={constant(styles.list)}
+        data-e2e={constant('label-list')}
+        id={constant(labelListId)}
       >
-        {'Labels'}
-        <Button
-          aria-controls={labelListId}
-          aria-expanded={!props.hidden}
-          aria-label={'Labels'}
-          icon={props.hidden ? 'double-chevron-down' : 'double-chevron-up'}
-          onClick={
-            props.hidden
-              ? props.handlers.expandLabelList
-              : props.handlers.collapseLabelList
-          }
-        />
+        {props.labels.map((label, index) => (
+          <LabelButtonItem
+            handlers={props.handlers}
+            isSelected={mapBindable(
+              props.selectedLabel,
+              (selected) => selected === label,
+            )}
+            isVisible={mapBindable(
+              props.visibleLabelFlags,
+              (flags) => flags[index] === true,
+            )}
+            label={label}
+            labelsLightness={props.labelLightness}
+            labelsSaturation={props.labelSaturation}
+          />
+        ))}
       </div>
+    </Collapse>
+  </div>
+);
 
-      <Collapse isOpen={!props.hidden} keepChildrenMounted>
-        <div
-          css={css`
-            overflow-y: auto;
-          `}
-          data-e2e={'label-list'}
-          id={labelListId}
-        >
-          {labelsWithVisibleFlag.map(([label, isVisible], index) => (
-            <LabelButtonItem
-              key={label.id}
-              handlers={props.handlers}
-              index={asSafeUint(index)}
-              isSelected={label === props.selectedLabel}
-              isVisible={isVisible}
-              label={label}
-              labelsLightness={props.labelLightness}
-              labelsSaturation={props.labelSaturation}
-            />
-          ))}
-        </div>
-      </Collapse>
-    </div>
-  );
-});
+/** The one label list on the page, which the header's button controls. */
+const labelListId = 'label-list';

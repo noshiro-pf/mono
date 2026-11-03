@@ -1,30 +1,23 @@
-import { css } from '@emotion/react';
-import { memoNamed } from 'react-utils';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import type { Percent } from 'ts-type-forge';
 import type { Label } from '../../canvas/index.mjs';
 import type { AppEventHandler } from '../../types/index.mjs';
 import { LabelButtons } from './label-button/index.mjs';
+import * as styles from './sidebar.module.css';
 
 type Props = Readonly<{
   labels: readonly Label[];
   labelsSaturation: Percent;
   labelsLightness: Percent;
-  visibleLabels: readonly Label[];
-  selectedLabel: Label;
-  hidden: boolean;
+  /** Whether each label of `labels` is shown, by index. */
+  visibleLabelFlags: Bindable<readonly boolean[]>;
+  selectedLabel: Bindable<Label>;
+  hidden: Bindable<boolean>;
   handlers: AppEventHandler;
 }>;
 
-export const Sidebar = memoNamed<Props>('Sidebar', (props) => (
-  <div
-    css={css`
-      width: 100%;
-      height: 100%;
-      background-color: #5a5a5a;
-      color: white;
-      padding: 10px;
-    `}
-  >
+export const Sidebar = (props: Props): JSX.Element => (
+  <div class={constant(styles.sidebar)}>
     <LabelButtons
       handlers={props.handlers}
       hidden={props.hidden}
@@ -32,7 +25,7 @@ export const Sidebar = memoNamed<Props>('Sidebar', (props) => (
       labelSaturation={props.labelsSaturation}
       labels={props.labels}
       selectedLabel={props.selectedLabel}
-      visibleLabels={props.visibleLabels}
+      visibleLabelFlags={props.visibleLabelFlags}
     />
   </div>
-));
+);
