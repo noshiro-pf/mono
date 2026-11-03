@@ -51,7 +51,13 @@ import {
   issueWorktree,
   type IssueRound,
 } from './session.mjs';
-import { HELD_LABELS, surveyIssues, type IssueCandidate } from './survey.mjs';
+import {
+  issueNumbers,
+  ISSUES_LIMIT,
+  passedOverNotes,
+  surveyIssues,
+  type IssueCandidate,
+} from './survey.mjs';
 import { hitItsCap, judgeIssueSession, type IssueAfter } from './verdict.mjs';
 
 /**
@@ -223,12 +229,6 @@ export const runIssueResolver = async (
   );
 };
 
-/**
- * Every open issue, up to a thousand, rather than the report's thirty: the
- * oldest are as startable as the newest, and the survey reads them all.
- */
-const ISSUES_LIMIT = 1000;
-
 const IssueSchema = t.record({
   state: t.string(),
   updated_at: t.string(),
@@ -266,9 +266,6 @@ const readIssueAfter = async (
       ? closedBy
       : Result.ok({ open: issue.value.open, closedBy: closedBy.value });
 };
-
-const numbers = (list: readonly number[]): string =>
-  list.map((number) => `#${number}`).join(', ');
 
 /**
  * Removes the session's directory, and git's records of the worktrees that went
@@ -468,29 +465,8 @@ const survey = async (
     (number) => cutOff.has(number) && !mut_attempted.has(number),
   );
 
-  const left = found.left.filter((number) => !stoppedAtCap.includes(number));
-
   const notes = [
-    ...(Arr.isNonEmpty(left)
-      ? [
-          `${numbers(left)}: an earlier session left them as they stand; waiting for someone to change them.`,
-        ]
-      : []),
-    ...(Arr.isNonEmpty(stoppedAtCap)
-      ? [
-          `${numbers(stoppedAtCap)}: a session stopped at its cap; a later run, capping one higher, tries again.`,
-        ]
-      : []),
-    ...(Arr.isNonEmpty(found.foreign)
-      ? [
-          `${numbers(found.foreign)}: startable, but not written by ${authors.join(' or ')}; left to a person.`,
-        ]
-      : []),
-    ...(Arr.isNonEmpty(found.held)
-      ? [
-          `${numbers(found.held)}: startable, but labelled ${HELD_LABELS.join(', ')} or the like; left as they are.`,
-        ]
-      : []),
+    ...passedOverNotes(found, authors, stoppedAtCap),
     ...(Arr.isNonEmpty(found.fresh) ? [] : ['No issue to start.']),
   ].join('\n');
 
@@ -651,7 +627,7 @@ const runIssue = async (
   switch (verdict) {
     case 'opened':
       log(
-        `#${next.number}: ${after !== undefined && Result.isOk(after) ? numbers(after.value.closedBy) : 'a pull request'} closes it now.`,
+        `#${next.number}: ${after !== undefined && Result.isOk(after) ? issueNumbers(after.value.closedBy) : 'a pull request'} closes it now.`,
       );
 
       return ran;

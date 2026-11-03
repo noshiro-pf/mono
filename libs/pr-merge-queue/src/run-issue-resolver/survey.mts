@@ -7,6 +7,7 @@ import {
   type ReportIssue,
 } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
+import type { StrictPick } from 'ts-type-forge';
 
 /**
  * Picks the issues a session may start, in the order it takes them.
@@ -87,6 +88,53 @@ export const surveyIssues = (
     held: Arr.toSorted(mut_held),
   };
 };
+
+/**
+ * A line for each kind of startable issue the survey passed over, as
+ * `run-issue-resolver` logs them and `startable-issues` prints them.
+ * `stoppedAtCap` is the part of `left` that a session's cap stopped during the
+ * run, which a later run tries again, said apart from the rest.
+ */
+export const passedOverNotes = (
+  survey: StrictPick<IssueSurvey, 'left' | 'foreign' | 'held'>,
+  authors: readonly string[],
+  stoppedAtCap: readonly number[] = [],
+): readonly string[] => {
+  const left = survey.left.filter((number) => !stoppedAtCap.includes(number));
+
+  return [
+    ...(Arr.isNonEmpty(left)
+      ? [
+          `${issueNumbers(left)}: an earlier run-issue-resolver session left them as they stand; waiting for someone to change them.`,
+        ]
+      : []),
+    ...(Arr.isNonEmpty(stoppedAtCap)
+      ? [
+          `${issueNumbers(stoppedAtCap)}: a session stopped at its cap; a later run, capping one higher, tries again.`,
+        ]
+      : []),
+    ...(Arr.isNonEmpty(survey.foreign)
+      ? [
+          `${issueNumbers(survey.foreign)}: startable, but not written by ${authors.join(' or ')}; left to a person.`,
+        ]
+      : []),
+    ...(Arr.isNonEmpty(survey.held)
+      ? [
+          `${issueNumbers(survey.held)}: startable, but labelled ${HELD_LABELS.join(', ')} or the like; left as they are.`,
+        ]
+      : []),
+  ];
+};
+
+/** `#1, #2`, for a log line. */
+export const issueNumbers = (list: readonly number[]): string =>
+  list.map((number) => `#${number}`).join(', ');
+
+/**
+ * How many open issues a survey reads: up to a thousand, rather than the
+ * report's thirty, since the oldest are as startable as the newest.
+ */
+export const ISSUES_LIMIT = 1000;
 
 /**
  * Labels that say an issue is not to be started as it stands: a question to

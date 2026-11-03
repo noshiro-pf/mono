@@ -1,5 +1,5 @@
 import type { IssueStartState, ReportIssue } from 'pr-report-core';
-import { surveyIssues } from './survey.mjs';
+import { passedOverNotes, surveyIssues } from './survey.mjs';
 
 const UPDATED = '2026-10-15T00:00:00Z';
 
@@ -151,5 +151,30 @@ describe(surveyIssues, () => {
 
     // One whose state after its session could not be read is held for good.
     assert.deepStrictEqual(survey.left, [1, 3]);
+  });
+});
+
+describe(passedOverNotes, () => {
+  test('says nothing when nothing was passed over', () => {
+    assert.deepStrictEqual(
+      passedOverNotes({ left: [], foreign: [], held: [] }, ['owner']),
+      [],
+    );
+  });
+
+  test('says apart what a cap stopped from what a session left', () => {
+    assert.deepStrictEqual(
+      passedOverNotes(
+        { left: [3, 4], foreign: [5], held: [6] },
+        ['owner'],
+        [4],
+      ),
+      [
+        '#3: an earlier run-issue-resolver session left them as they stand; waiting for someone to change them.',
+        '#4: a session stopped at its cap; a later run, capping one higher, tries again.',
+        '#5: startable, but not written by owner; left to a person.',
+        '#6: startable, but labelled duplicate, invalid, question, wontfix, pending or the like; left as they are.',
+      ],
+    );
   });
 });

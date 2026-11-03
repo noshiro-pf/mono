@@ -6,7 +6,7 @@
     {
       "name": "pr-merge-queue",
       "source": "./libs/pr-merge-queue/claude-plugin",
-      "description": "The unblock-prs skill for the pr-merge-queue worker: fix what the merge queue set aside."
+      "description": "Skills for the pr-merge-queue worker: unblock-prs fixes what the merge queue set aside, resolve-issues implements the open issues to take next."
     }
   ]
 }
