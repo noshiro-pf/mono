@@ -7,8 +7,9 @@
  * against its base and the two kinds of check — so a page that polled twenty
  * pull requests over REST would spend 5,000 an hour in well under an hour.
  * GraphQL charges a query by the size of what it asks for, and one query asks
- * about every open pull request at once: against this repository, about 9
- * points for the whole report, a handful of queries.
+ * about a page of the open pull requests at once — 50 of them, or 20 for the
+ * queries GitHub takes longest over (`report-query.mts`): a few points and a
+ * few queries per page of them for the whole report.
  *
  * What it costs is the token. GraphQL answers nobody without one, which is why
  * the page asks for one before it reads anything.
@@ -22,7 +23,7 @@
 
 import { Arr, isRecord, Obj, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { askAndRead } from './answer-body.mjs';
+import { askAndRead, unreachable } from './answer-body.mjs';
 import { readRateLimit, type RateLimit } from './rate-limit.mjs';
 
 /** What these functions need of `globalThis.fetch`, and no more. */
@@ -121,9 +122,7 @@ export const askGraphql = async (
   if (answered === undefined) {
     return {
       rateLimit: undefined,
-      result: Result.err(
-        'Could not reach the GitHub API. Check the connection and try again.',
-      ),
+      result: Result.err(unreachable(queryName(query))),
     };
   }
 

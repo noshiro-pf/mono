@@ -162,10 +162,13 @@ What follows from what the repository has:
   fail the read, since a verdict over a guess at them would be a guess.
 - **`CODEOWNERS` is read where GitHub looks for it**, in its order:
   `.github/CODEOWNERS`, then the root, then `docs/`, on the default branch.
-- **Open pull requests are read fifty a page**, every page on every read, up
-  to ten pages; past five hundred the read fails and says so, rather than
-  drawing a merge order with some of them missing. The checks and the
-  details are paged the same way.
+- **Open pull requests are read fifty a page**, every page on every read; past
+  five hundred the read fails and says so, rather than drawing a merge order
+  with some of them missing. The checks and the details are read twenty a page,
+  and the comparisons and the follow-ups twenty pull requests a query: what
+  decides whether those answer is the time GitHub takes over them, and at fifty
+  it answered `504` (with no CORS header, so the browser saw no answer at all)
+  once a repository had more than fifty open.
 - **What merged is found by search** (`merged:>=` the day a week back, in
   `mergedSearch`), not by the most recently updated closed pull requests,
   which on a busy repository can all be closed without merging.
@@ -405,12 +408,12 @@ rules stay as they are. The verdicts wait for them, which they answer well
 before the checks do. What the page does without any of it is under "On another
 repository".
 
-**GraphQL, because of how GitHub charges.** REST charges a request, and one
-pull request takes three — the comparison against its base and the two kinds
-of check — so polling twenty of them would spend an hour's 5,000 in minutes.
-GraphQL charges a query by the size of what it asks for, and a handful of
-queries covers every open pull request: **about 9 points a read** by GitHub's
-formula.
+**GraphQL, because of how GitHub charges.** REST charges a request, and one pull
+request takes three — the comparison against its base and the two kinds of check
+— so polling twenty of them would spend an hour's 5,000 in minutes.
+GraphQL charges a query by the size of what it asks for, and a few queries per
+page of open pull requests cover them all: **about 9 points a read** with fifty
+open, by GitHub's formula, and a few more for each further twenty.
 
 **One query per part of the page, all sent at once**, because GitHub answers
 a query only once all of it is ready. Measured against this repository, the

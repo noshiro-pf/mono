@@ -63,11 +63,10 @@ import {
 import { queueViewOf, type QueuePull, type QueueView } from './queue-view.mjs';
 import type { RateLimit } from './rate-limit.mjs';
 import {
-  CHECKS_QUERY,
   ChecksDataSchema,
   CompareFieldSchema,
   ContextsFieldSchema,
-  DETAILS_QUERY,
+  DETAILED_PAGE_SIZE,
   DetailsDataSchema,
   FilesFieldSchema,
   followUpAlias,
@@ -77,14 +76,13 @@ import {
   ISSUES_PAGE_SIZE,
   issuesQuery,
   IssueWithBodySchema,
-  MAX_OPEN_PAGES,
+  MAX_OPEN_PULLS,
   MERGED_QUERY,
   MergedDataSchema,
   mergedSearch,
   OPEN_ISSUES_QUERY,
-  OPEN_PAGE_SIZE,
+  OPEN_PULLS_QUERIES,
   OpenIssuesDataSchema,
-  PULL_REQUESTS_QUERY,
   PullRequestsDataSchema,
   referenceAlias,
   ReferenceSchema,
@@ -98,6 +96,7 @@ import {
   type OpenIssueNode,
   type OpenIssuePage,
   type OpenPullRequest,
+  type OpenPullsQuery,
   type PullRequestDetails,
 } from './report-query.mjs';
 import type { RestFetch } from './workflow-runs.mjs';
@@ -582,9 +581,10 @@ type DetailsPart = DetailsState &
   }>;
 
 /**
- * How many follow-ups one part may make. Each is one request of about a point;
- * ten is a thousand check results or changed files for the pull request with
- * the most, which is past anything this repository produces.
+ * How many rounds of follow-ups one part may make. A round is a query per
+ * {@link DETAILED_PAGE_SIZE} pull requests that have more, each of about a
+ * point; ten is a thousand check results or changed files for the pull request
+ * with the most, which is past anything this repository produces.
  */
 const MAX_FOLLOW_UP_ROUNDS = 10;
 
@@ -605,12 +605,12 @@ const nextCursor = (
  * Every page of one of the queries that list the open pull requests, each
  * validated by `schema`, the next asked for after the one before: a cursor is
  * known only once the page before it has answered. `refusal` words an answer
- * that is not a page at all. More than {@link MAX_OPEN_PAGES} fails the read,
+ * that is not a page at all. More than {@link MAX_OPEN_PULLS} fails the read,
  * rather than reporting the first of them as the whole.
  */
 const readOpenPages = async <D extends OpenPage<unknown>>({
   ask,
-  query,
+  listing,
   schema,
   refusal,
   after = null,
@@ -618,23 +618,23 @@ const readOpenPages = async <D extends OpenPage<unknown>>({
   rateLimit,
 }: Readonly<{
   ask: Ask;
-  query: string;
+  listing: OpenPullsQuery;
   schema: t.Type<D>;
   refusal?: (answer: GraphqlAnswer) => string | undefined;
   after?: string | null;
   pages?: readonly D[];
   rateLimit?: RateLimit;
 }>): Promise<Answered<readonly D[]>> => {
-  if (pages.length >= MAX_OPEN_PAGES) {
+  if (pages.length * listing.pageSize >= MAX_OPEN_PULLS) {
     return {
       rateLimit,
       result: Result.err(
-        `There are more than ${MAX_OPEN_PAGES * OPEN_PAGE_SIZE} open pull requests; this page reads that many and would report a part of them as the whole.`,
+        `There are more than ${MAX_OPEN_PULLS} open pull requests; this page reads that many and would report a part of them as the whole.`,
       ),
     };
   }
 
-  const answered = await ask(query, { after });
+  const answered = await ask(listing.query, { after });
 
   const latestLimit = answered.rateLimit ?? rateLimit;
 
@@ -665,7 +665,7 @@ const readOpenPages = async <D extends OpenPage<unknown>>({
     ? { rateLimit: latestLimit, result: Result.ok(read) }
     : readOpenPages({
         ask,
-        query,
+        listing,
         schema,
         ...(refusal === undefined ? {} : { refusal }),
         after: next,
@@ -687,7 +687,7 @@ const readPullRequests = async (
 ): Promise<Answered<PullsPart>> => {
   const { rateLimit, result: pages } = await readOpenPages({
     ask,
-    query: PULL_REQUESTS_QUERY,
+    listing: OPEN_PULLS_QUERIES.pullRequests,
     schema: PullRequestsDataSchema,
     // What GitHub answers for a name it cannot resolve for this token, whether
     // there is no such repository or it is one the token may not read: it does
@@ -743,6 +743,58 @@ const fieldsOf =
   };
 
 /**
+ * The follow-ups asked {@link DETAILED_PAGE_SIZE} at a time, one query after
+ * another, and every answer's fields by alias: one query for every head is one
+ * GitHub stops answering in time once there are enough of them. A query that
+ * fails, or that GitHub could not finish, fails them all.
+ */
+const askInChunks = async (
+  ask: Ask,
+  operationName: FollowUpName,
+  chunks: readonly (readonly FollowUp[])[],
+  rateLimit: RateLimit | undefined,
+  read: ReadonlyRecord<string, unknown> = {},
+): Promise<Answered<ReadonlyRecord<string, unknown>>> => {
+  const [chunk, ...rest] = chunks;
+
+  if (chunk === undefined) {
+    return { rateLimit, result: Result.ok(read) };
+  }
+
+  const { query, variables } = followUpQuery(operationName, chunk);
+
+  const answered = await ask(query, variables);
+
+  const latestLimit = answered.rateLimit ?? rateLimit;
+
+  if (Result.isErr(answered.result)) {
+    return { rateLimit: latestLimit, result: answered.result };
+  }
+
+  const failed = answered.result.value.errors.at(0);
+
+  if (failed !== undefined) {
+    return {
+      rateLimit: latestLimit,
+      result: Result.err(`GitHub could not finish the read: ${failed.message}`),
+    };
+  }
+
+  const field = fieldsOf(answered.result.value.data);
+
+  return askInChunks(ask, operationName, rest, latestLimit, {
+    ...read,
+    ...Object.fromEntries(
+      chunk.map((followUp) => {
+        const alias = followUpAlias(followUp);
+
+        return [alias, field(alias)] as const;
+      }),
+    ),
+  });
+};
+
+/**
  * Asks for whatever is left to follow up, folds the answer in, and goes round
  * again until nothing is left or the rounds run out. One round at a time,
  * because each round's questions are the previous round's cursors.
@@ -773,26 +825,22 @@ const followUpRounds = async <S extends Readonly<{ number: number }>>({
     return { rateLimit, result: Result.ok(states) };
   }
 
-  const { query, variables } = followUpQuery(operationName, followUps);
+  const asked = await askInChunks(
+    ask,
+    operationName,
+    Arr.partition(followUps, DETAILED_PAGE_SIZE),
+    rateLimit,
+  );
 
-  const answered = await ask(query, variables);
+  const latestLimit = asked.rateLimit;
 
-  const latestLimit = answered.rateLimit ?? rateLimit;
-
-  if (Result.isErr(answered.result)) {
-    return { rateLimit: latestLimit, result: answered.result };
+  if (Result.isErr(asked.result)) {
+    return { rateLimit: latestLimit, result: asked.result };
   }
 
-  const failed = answered.result.value.errors.at(0);
+  const fields = asked.result.value;
 
-  if (failed !== undefined) {
-    return {
-      rateLimit: latestLimit,
-      result: Result.err(`GitHub could not finish the read: ${failed.message}`),
-    };
-  }
-
-  const field = fieldsOf(answered.result.value.data);
+  const field = (alias: string): unknown => fields[alias];
 
   const mut_byNumber = new Map(states.map((state) => [state.number, state]));
 
@@ -860,7 +908,7 @@ const readChecks = async (
 ): Promise<Answered<ReadonlyMap<number, ChecksState>>> => {
   const answered = await readOpenPages({
     ask,
-    query: CHECKS_QUERY,
+    listing: OPEN_PULLS_QUERIES.checks,
     schema: ChecksDataSchema,
   });
 
@@ -1097,7 +1145,7 @@ const readDetails = async (
 ): Promise<Answered<ReadonlyMap<number, DetailsPart>>> => {
   const answered = await readOpenPages({
     ask,
-    query: DETAILS_QUERY,
+    listing: OPEN_PULLS_QUERIES.details,
     schema: DetailsDataSchema,
   });
 
@@ -1173,9 +1221,30 @@ const readDetails = async (
 };
 
 /**
+ * The later of two budgets: the one with the later reset, or within one window
+ * the one with less left. The parts answer in no particular order, so the last
+ * to answer need not be the last GitHub counted.
+ */
+const newerLimit = (
+  held: RateLimit | undefined,
+  next: RateLimit | undefined,
+): RateLimit | undefined =>
+  held === undefined
+    ? next
+    : next === undefined
+      ? held
+      : next.resetEpochMs !== held.resetEpochMs
+        ? next.resetEpochMs > held.resetEpochMs
+          ? next
+          : held
+        : next.remaining < held.remaining
+          ? next
+          : held;
+
+/**
  * How far each head is from its base. A comparison GitHub could not make is a
  * gap the page can show — "ahead / behind unread" — so its error is not a
- * failure of the read.
+ * failure of the read; a query of them GitHub did not answer is.
  */
 const readComparisons = async (
   ask: Ask,
@@ -1197,35 +1266,50 @@ const readComparisons = async (
     }),
   );
 
-  const { query, variables } = followUpQuery('Compare', followUps);
+  // One query per DETAILED_PAGE_SIZE heads, all at once: a comparison per head
+  // is what the query costs in time, and one query for every open pull request
+  // is one GitHub stops answering once there are enough of them.
+  const answers = await Promise.all(
+    Arr.partition(followUps, DETAILED_PAGE_SIZE).map(async (chunk) => {
+      const { query, variables } = followUpQuery('Compare', chunk);
 
-  const answered = await ask(query, variables);
+      const answered = await ask(query, variables);
 
-  if (Result.isErr(answered.result)) {
-    return { rateLimit: answered.rateLimit, result: answered.result };
+      return { chunk, answered } as const;
+    }),
+  );
+
+  const rateLimit = answers
+    .map(({ answered }) => answered.rateLimit)
+    .reduce(newerLimit, undefined);
+
+  // Not a gap the page can show, as one comparison GitHub could not make is:
+  // the queue's order turns on how far each head is behind, and a queue drawn
+  // without some of them would put a pull request where it is not.
+  const mut_entries: (readonly [number, Comparison | undefined])[] = [];
+
+  for (const { chunk, answered } of answers) {
+    if (Result.isErr(answered.result)) {
+      return { rateLimit, result: answered.result };
+    }
+
+    const field = fieldsOf(answered.result.value.data);
+
+    for (const followUp of chunk) {
+      const validated = CompareFieldSchema.validate(
+        field(followUpAlias(followUp)) ?? null,
+      );
+
+      mut_entries.push([
+        followUp.number,
+        Result.isOk(validated) && validated.value?.compare != null
+          ? validated.value.compare
+          : undefined,
+      ]);
+    }
   }
 
-  const field = fieldsOf(answered.result.value.data);
-
-  return {
-    rateLimit: answered.rateLimit,
-    result: Result.ok(
-      new Map(
-        followUps.map((followUp) => {
-          const validated = CompareFieldSchema.validate(
-            field(followUpAlias(followUp)) ?? null,
-          );
-
-          return [
-            followUp.number,
-            Result.isOk(validated) && validated.value?.compare != null
-              ? validated.value.compare
-              : undefined,
-          ];
-        }),
-      ),
-    ),
-  };
+  return { rateLimit, result: Result.ok(new Map(mut_entries)) };
 };
 
 /**
@@ -1512,27 +1596,6 @@ type DescribedIssues = Readonly<{
   issues: ReadonlyMap<number, LinkedIssue>;
   startAfter: ReadonlyMap<number, readonly number[]>;
 }>;
-
-/**
- * The later of two budgets: the one with the later reset, or within one window
- * the one with less left. The parts answer in no particular order, so the last
- * to answer need not be the last GitHub counted.
- */
-const newerLimit = (
-  held: RateLimit | undefined,
-  next: RateLimit | undefined,
-): RateLimit | undefined =>
-  held === undefined
-    ? next
-    : next === undefined
-      ? held
-      : next.resetEpochMs !== held.resetEpochMs
-        ? next.resetEpochMs > held.resetEpochMs
-          ? next
-          : held
-        : next.remaining < held.remaining
-          ? next
-          : held;
 
 /**
  * What the issues read so far declare with `Start-After:` — the listed ones,

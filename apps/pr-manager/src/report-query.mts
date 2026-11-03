@@ -20,7 +20,7 @@ import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
- * How many open pull requests one page of each query that lists them covers.
+ * How many open pull requests one page of {@link PULL_REQUESTS_QUERY} covers.
  * It is most of what a query costs — the points are counted from the sizes
  * asked for, not from what comes back — so it is what this repository needs
  * rather than GitHub's most, and a repository with more is read a page more at
@@ -29,12 +29,28 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 export const OPEN_PAGE_SIZE = 50;
 
 /**
- * How many pages of them a read follows: {@link OPEN_PAGE_SIZE} times this is
- * the most open pull requests the page reports. A repository with more has a
+ * How many open pull requests one page of {@link CHECKS_QUERY} and of
+ * {@link DETAILS_QUERY} covers, how many heads one `Compare` query asks about,
+ * and how many pull requests one `MoreChecks` or `MoreFiles` query asks the
+ * next hundred of. Smaller than {@link OPEN_PAGE_SIZE} because what decides whether they
+ * answer is time rather than points: each check run followed to its workflow,
+ * `mergeable` worked out against a base that has just moved, a comparison per
+ * head. A query GitHub does not finish within its time limit is answered with a
+ * page that carries no CORS header, which the browser reports as GitHub not
+ * being reached at all — and the part, and the queue drawn from it, fails on
+ * every read.
+ */
+export const DETAILED_PAGE_SIZE = 20;
+
+/**
+ * The most open pull requests a read reports. A repository with more has a
  * different problem than an unreadable page, so a read that finds more fails
  * loudly rather than reporting part of them as the whole.
  */
-export const MAX_OPEN_PAGES = 10;
+export const MAX_OPEN_PULLS = 500;
+
+/** A query that lists the open pull requests, and the page size it asks for. */
+export type OpenPullsQuery = Readonly<{ query: string; pageSize: number }>;
 
 /**
  * How many of the pull requests merged in the window are looked through for the
@@ -118,12 +134,12 @@ const CONTEXT_NODES = [
 ].join(' ');
 
 /**
- * A page of the open pull requests, in the order every query that lists them
+ * A page of `size` open pull requests, in the order every query that lists them
  * uses: oldest first, so that one opened while the pages are being read lands
  * on the last of them rather than moving the others along.
  */
-const OPEN_PULLS =
-  `open: pullRequests(states: OPEN, first: ${OPEN_PAGE_SIZE}, after: $after, orderBy: { field: CREATED_AT, direction: ASC })` as const;
+const openPulls = (size: number): string =>
+  `open: pullRequests(states: OPEN, first: ${size}, after: $after, orderBy: { field: CREATED_AT, direction: ASC })` as const;
 
 /**
  * The open pull requests as the merge order draws them — what each is, the
@@ -142,7 +158,7 @@ export const PULL_REQUESTS_QUERY = [
       `    ${alias}: object(expression: "HEAD:${path}") { ... on Blob { text } }`,
   ),
   `    queueLabel: label(name: "${MERGE_QUEUED_LABEL}") { name }`,
-  `    ${OPEN_PULLS} {`,
+  `    ${openPulls(OPEN_PAGE_SIZE)} {`,
   `      ${PAGE_INFO}`,
   '      nodes {',
   '        number title body isDraft url updatedAt',
@@ -167,7 +183,7 @@ export const PULL_REQUESTS_QUERY = [
 export const CHECKS_QUERY = [
   'query Checks($owner: String!, $name: String!, $after: String) {',
   '  repository(owner: $owner, name: $name) {',
-  `    ${OPEN_PULLS} {`,
+  `    ${openPulls(DETAILED_PAGE_SIZE)} {`,
   `      ${PAGE_INFO}`,
   '      nodes {',
   '        number headRefOid',
@@ -189,7 +205,7 @@ export const CHECKS_QUERY = [
 export const DETAILS_QUERY = [
   'query PullRequestDetails($owner: String!, $name: String!, $after: String) {',
   '  repository(owner: $owner, name: $name) {',
-  `    ${OPEN_PULLS} {`,
+  `    ${openPulls(DETAILED_PAGE_SIZE)} {`,
   `      ${PAGE_INFO}`,
   '      nodes {',
   '        number bodyHTML',
@@ -204,6 +220,18 @@ export const DETAILS_QUERY = [
   '  }',
   '}',
 ].join('\n');
+
+/**
+ * Each query that lists the open pull requests beside the page size written
+ * into it, which is how many pages a read takes to reach
+ * {@link MAX_OPEN_PULLS}: kept together so that the two cannot be changed
+ * apart.
+ */
+export const OPEN_PULLS_QUERIES = {
+  pullRequests: { query: PULL_REQUESTS_QUERY, pageSize: OPEN_PAGE_SIZE },
+  checks: { query: CHECKS_QUERY, pageSize: DETAILED_PAGE_SIZE },
+  details: { query: DETAILS_QUERY, pageSize: DETAILED_PAGE_SIZE },
+} as const satisfies ReadonlyRecord<string, OpenPullsQuery>;
 
 /**
  * The pull requests that merged lately, for the section below the queue:
