@@ -1,7 +1,13 @@
 import { Num, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { clampRatio, paneNode, splitNode } from './tree.mjs';
-import type { LayoutNode, PaneId, SplitAxis } from './types.mjs';
+import {
+  clampFixedPx,
+  clampRatio,
+  fixedSplitNode,
+  paneNode,
+  splitNode,
+} from './tree.mjs';
+import type { FixedSize, LayoutNode, PaneId, SplitAxis } from './types.mjs';
 
 /**
  * A layout as a short string, for the page's URL.
@@ -12,6 +18,10 @@ import type { LayoutNode, PaneId, SplitAxis } from './types.mjs';
  * not a half, and then the two children. A 2×2 grid is `rcppcpp`; two columns
  * at 7:3 is `r70pp`; one pane beside two stacked is `rpcpp`.
  *
+ * A whole number followed by `f` or `s` holds the first or the second child at
+ * that many pixels instead, the other child taking the rest: `r737fpp` is a
+ * 737px column with a pane beside it in the rest.
+ *
  * The alphabet is chosen so that the string survives a URL untouched: letters,
  * digits and a dot are the characters nothing percent-encodes, so what is in
  * the address bar is what was typed. Panes carry no id; they are numbered in
@@ -20,7 +30,7 @@ import type { LayoutNode, PaneId, SplitAxis } from './types.mjs';
 export const formatLayoutSpec = (node: LayoutNode): string =>
   node.kind === 'pane'
     ? paneLetter
-    : (`${axisLetterOf[node.axis]}${ratioDigitsOf(node.ratio)}${formatLayoutSpec(node.first)}${formatLayoutSpec(node.second)}` as const);
+    : (`${axisLetterOf[node.axis]}${node.fixed === undefined ? ratioDigitsOf(node.ratio) : fixedDigitsOf(node.fixed)}${formatLayoutSpec(node.first)}${formatLayoutSpec(node.second)}` as const);
 
 /**
  * The tree a spec describes, its panes numbered `0..n-1` in tree order, or
@@ -57,6 +67,22 @@ const ratioDigitsOf = (ratio: number): string => {
   return percent === 50 ? '' : percent.toString();
 };
 
+const fixedChildLetterOf: ReadonlyRecord<FixedSize['child'], string> = {
+  first: 'f',
+  second: 's',
+} as const;
+
+const fixedChildOfLetter: ReadonlyMap<string, FixedSize['child']> = new Map<
+  string,
+  FixedSize['child']
+>([
+  ['f', 'first'],
+  ['s', 'second'],
+]);
+
+const fixedDigitsOf = (fixed: FixedSize): string =>
+  `${clampFixedPx(fixed.px).toString()}${fixedChildLetterOf[fixed.child]}` as const;
+
 const ratioCharacters = new Set('0123456789.');
 
 /** The run of digits and dots at `index`, which is where a ratio would be. */
@@ -68,9 +94,9 @@ const ratioDigitsAt = (source: string, index: number): string => {
   return source.slice(index, end === -1 ? undefined : index + end);
 };
 
-const wholePercent = /^\d+$/u;
+const wholeNumber = /^\d+$/u;
 
-const decimalPercent = /^\d+\.\d+$/u;
+const decimalNumber = /^\d+\.\d+$/u;
 
 /**
  * Rounded to the tenth of a percent the digits can express, so that `33.3`
@@ -78,13 +104,44 @@ const decimalPercent = /^\d+\.\d+$/u;
  * `undefined` for a run of digits that is not a number: `7.`, or `1.2.3`.
  */
 const ratioOfDigits = (digits: string): number | undefined =>
-  wholePercent.test(digits) || decimalPercent.test(digits)
+  wholeNumber.test(digits) || decimalNumber.test(digits)
     ? clampRatio(
         Math.round(
           Result.unwrapOkOr(Num.safeParseFloat(digits), Number.NaN) * 10,
         ) / 1000,
       )
     : undefined;
+
+/**
+ * A ratio, or a held child when the digits are followed by its letter; a held
+ * size is a whole number of pixels, and has to be written out.
+ */
+const sizeOfDigits = (
+  digits: string,
+  fixedChild: FixedSize['child'] | undefined,
+): Readonly<{ ratio: number; fixed?: FixedSize }> | undefined => {
+  if (fixedChild !== undefined) {
+    return wholeNumber.test(digits)
+      ? {
+          ratio: 0.5,
+          fixed: {
+            child: fixedChild,
+            px: clampFixedPx(
+              Result.unwrapOkOr(Num.safeParseFloat(digits), Number.NaN),
+            ),
+          },
+        }
+      : undefined;
+  }
+
+  if (digits === '') {
+    return { ratio: 0.5 };
+  }
+
+  const ratio = ratioOfDigits(digits);
+
+  return ratio === undefined ? undefined : { ratio };
+};
 
 type Parsed = Readonly<{ node: LayoutNode; index: number; nextPaneId: PaneId }>;
 
@@ -111,13 +168,22 @@ const parseNode = (
 
   const digits = ratioDigitsAt(source, index + 1);
 
-  const ratio = digits === '' ? 0.5 : ratioOfDigits(digits);
+  const fixedLetter = source[index + 1 + digits.length];
 
-  if (ratio === undefined) {
+  const fixedChild =
+    fixedLetter === undefined ? undefined : fixedChildOfLetter.get(fixedLetter);
+
+  const size = sizeOfDigits(digits, fixedChild);
+
+  if (size === undefined) {
     return undefined;
   }
 
-  const first = parseNode(source, index + 1 + digits.length, nextPaneId);
+  const first = parseNode(
+    source,
+    index + 1 + digits.length + (fixedChild === undefined ? 0 : 1),
+    nextPaneId,
+  );
 
   if (first === undefined) {
     return undefined;
@@ -130,7 +196,10 @@ const parseNode = (
   }
 
   return {
-    node: splitNode(axis, first.node, second.node, ratio),
+    node:
+      size.fixed === undefined
+        ? splitNode(axis, first.node, second.node, size.ratio)
+        : fixedSplitNode(axis, first.node, second.node, size.fixed),
     index: second.index,
     nextPaneId: second.nextPaneId,
   };

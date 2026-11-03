@@ -1,8 +1,10 @@
 import { Arr, hasKey, isNotUndefined, isRecord } from 'ts-data-forge';
 import {
+  clampFixedPx,
   clampPaneZoom,
   clampRatio,
   defaultPaneZoom,
+  type FixedSize,
   type LayoutNode,
   type PaneState,
   type WorkspaceState,
@@ -149,6 +151,17 @@ const collapseForStorage = (state: WorkspaceState): WorkspaceState =>
     })),
   }) as const;
 
+/** `{ fixed }` for a held child `FixedSize` describes, `{}` for anything else. */
+const parseFixedSize = (value: unknown): Readonly<{ fixed?: FixedSize }> =>
+  isRecord(value) &&
+  hasKey(value, 'child') &&
+  (value.child === 'first' || value.child === 'second') &&
+  hasKey(value, 'px') &&
+  typeof value.px === 'number' &&
+  Number.isFinite(value.px)
+    ? ({ fixed: { child: value.child, px: clampFixedPx(value.px) } } as const)
+    : ({} as const);
+
 const parseLayoutNode = (value: unknown): LayoutNode | undefined => {
   if (!isRecord(value) || !hasKey(value, 'kind')) {
     return undefined;
@@ -191,6 +204,7 @@ const parseLayoutNode = (value: unknown): LayoutNode | undefined => {
         ? value.ratio
         : 0.5,
     ),
+    ...parseFixedSize(hasKey(value, 'fixed') ? value.fixed : undefined),
     first,
     second,
   };

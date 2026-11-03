@@ -10,6 +10,7 @@ import {
   splitPaneAt,
   steppedPaneZoom,
   swapPanesAt,
+  updateFixedPxAt,
   updateRatioAt,
   type NodePath,
   type PaneDropZone,
@@ -42,6 +43,7 @@ export type WorkspaceAction = Readonly<
       historyLength: number;
     }
   | { type: 'restore'; state: WorkspaceState }
+  | { type: 'set-fixed-px'; path: NodePath; px: number }
   | { type: 'set-ratio'; path: NodePath; ratio: number }
   | { type: 'set-sandboxed'; paneId: PaneId; sandboxed: boolean }
   | { type: 'split'; paneId: PaneId; axis: SplitAxis }
@@ -136,6 +138,15 @@ export const workspaceReducer = (
             ? paneIdsOf(root)[0]
             : state.activePaneId,
       };
+    }
+
+    case 'set-fixed-px': {
+      // A drag reports every pointer move, including those along the divider,
+      // within a pixel or past the clamp: the same state for those is what
+      // keeps them from re-rendering.
+      const root = updateFixedPxAt(state.root, action.path, action.px);
+
+      return root === state.root ? state : { ...state, root };
     }
 
     case 'set-ratio':

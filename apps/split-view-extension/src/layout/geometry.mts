@@ -1,6 +1,7 @@
 import { Arr, Num } from 'ts-data-forge';
 import { clampRatio } from './tree.mjs';
 import type {
+  FixedSize,
   LayoutNode,
   NodePath,
   PaneDropZone,
@@ -21,6 +22,8 @@ export type SplitterRect = Readonly<{
    * of this, so it has to travel with the divider.
    */
   nodeRect: Rect;
+  /** The node's held child, whose size a drag sets instead of the ratio. */
+  fixed?: FixedSize;
 }>;
 
 export type LayoutGeometry = Readonly<{
@@ -145,17 +148,41 @@ const indicatorOf = (rect: Rect, zone: PaneDropZone): Rect => {
   }
 };
 
+/**
+ * How much of `available` the first child gets: its share, or what the held
+ * child leaves. A held size is kept within the bounds a dragged ratio is, so
+ * that a window narrower than it still leaves both panes a toolbar.
+ */
+const firstSizeOf = (
+  available: number,
+  ratio: number,
+  fixed: FixedSize | undefined,
+): number => {
+  if (fixed === undefined) {
+    return Math.round(available * clampRatio(ratio));
+  }
+
+  const least = Math.round(available * clampRatio(0));
+
+  const most = Math.round(available * clampRatio(1));
+
+  const first = fixed.child === 'first' ? fixed.px : available - fixed.px;
+
+  return Math.min(most, Math.max(least, Math.round(first)));
+};
+
 /** Splits one rect into `first`, the gutter, and `second`. */
 const divideRect = (
   rect: Rect,
   axis: SplitAxis,
   ratio: number,
+  fixed: FixedSize | undefined,
   gutter: number,
 ): readonly [Rect, Rect, Rect] => {
   if (axis === 'row') {
     const availableWidth = Math.max(0, rect.width - gutter);
 
-    const firstWidth = Math.round(availableWidth * clampRatio(ratio));
+    const firstWidth = firstSizeOf(availableWidth, ratio, fixed);
 
     return [
       { ...rect, width: firstWidth },
@@ -170,7 +197,7 @@ const divideRect = (
 
   const availableHeight = Math.max(0, rect.height - gutter);
 
-  const firstHeight = Math.round(availableHeight * clampRatio(ratio));
+  const firstHeight = firstSizeOf(availableHeight, ratio, fixed);
 
   return [
     { ...rect, height: firstHeight },
@@ -197,6 +224,7 @@ const walk = (
     rect,
     node.axis,
     node.ratio,
+    node.fixed,
     gutter,
   );
 
@@ -219,7 +247,13 @@ const walk = (
     splitters: [
       ...first.splitters,
       ...second.splitters,
-      { path, axis: node.axis, rect: dividerRect, nodeRect: rect },
+      {
+        path,
+        axis: node.axis,
+        rect: dividerRect,
+        nodeRect: rect,
+        ...(node.fixed === undefined ? {} : { fixed: node.fixed }),
+      },
     ],
   };
 };

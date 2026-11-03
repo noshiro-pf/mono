@@ -340,22 +340,23 @@ at the page worth sharing in a link.
 
 Each card has a **⧉ split view** link beside the title, which opens the pull
 request in [`split-view-extension`](../../split-view-extension/README.md): the
-diff on the left and the conversation on the right, at 7:3. The diff hides
-whitespace changes and the files already marked viewed
-(`?w=1&show-viewed-files=false`). GitHub takes those off the pane's address
-once the diff has opened — on a pull request with files already marked viewed
-it leaves `/changes#diff-…` — and the split view saves the address the pane
-is at, so without
+diff on the left, held at 737px so that GitHub's file tree stays beside it, and
+the conversation on the right in the rest of the page. The diff hides whitespace
+changes and the files already marked viewed (`?w=1&show-viewed-files=false`).
+GitHub takes those off the pane's address once the diff has opened — on a pull
+request with files already marked viewed it leaves `/changes#diff-…` — and the
+split view saves the address the pane is at, so without
 [`github-view-defaults-extension`](../../github-view-defaults-extension/README.md),
 which puts them back, the next time that split view opens the diff shows
-everything. When the pull request closes an issue, or
-names the Claude Code session it was written in, that shares the right half
-at 1:1, to the right of the conversation; with both, the issue is stacked
-over the session to the right of the conversation. The first issue and the
-first session only, if it names several. The conversation and the issue are
-shown at 75%, the diff at 75% in three columns and 100% otherwise, and the
-session at 100%. The tab is titled with the
-pull request's number and title, `#2071 feat(…): …`.
+everything. When the pull request closes an issue, or names the Claude Code
+session it was written in, the diff is held at 554px (737px at its 75% there)
+and the conversation at 577px, the widest its description gets with the
+reviewers and the labels below it, and the issue or the session takes the rest,
+to the right of the conversation; with both, the issue is stacked over the
+session. The first issue and the first session only, if it names several. The
+conversation and the issue are shown at 75%, the diff at 75% in three columns
+and 100% otherwise, and the session at 100%. The tab is titled with the pull
+request's number and title, `#2071 feat(…): …`.
 
 A session is named by a `Claude-Session:` line in the pull request's
 description, which `CLAUDE.md` asks a session to write, and the card lists

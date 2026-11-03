@@ -148,6 +148,7 @@ type LayoutNode =
           kind: 'split';
           axis: 'column' | 'row';
           ratio: number; // first's share of the space left after the gutter, 0.05..0.95
+          fixed?: Readonly<{ child: 'first' | 'second'; px: number }>; // overrides ratio; px whole, 0..100000
           first: LayoutNode;
           second: LayoutNode;
       }>;
@@ -162,6 +163,13 @@ point of the nesting.
 `ratio` is clamped to `0.05..0.95` on the way in as well as on the way out, so
 a hand-edited `0` cannot produce a pane too small to have a toolbar and
 therefore too small to drag back.
+
+`fixed`, when present, holds one child at `px` CSS pixels and gives the other
+what is left, so that it stays the same size whatever the window is; `ratio` is
+ignored while it is there. A drag of its divider changes `px`. The geometry
+keeps a held child within the same `0.05..0.95` of the node, so a window
+narrower than `px` still leaves both panes a toolbar. A `fixed` that does not
+parse is dropped, leaving the ratio.
 
 The tree is the only thing that says where a pane is. The `iframe` elements are
 rendered as siblings in pane-id order and positioned absolutely from the
@@ -242,15 +250,15 @@ reload, a browser restart with session restore, and a tab reopened with
 snapshot of _what_ it shows, written so that the address bar is a link to the
 view on screen, and so that a link can describe a view that was never saved.
 
-| parameter | carries                                                                                                                      |
-| :-------- | :--------------------------------------------------------------------------------------------------------------------------- |
-| `ws`      | the workspace id                                                                                                             |
-| `title`   | the view's `title`, when it has one                                                                                          |
-| `layout`  | the tree, in the notation of `formatLayoutSpec` (`src/layout/spec.mts`): `rcppcpp` is a 2×2 grid, `r70pp` two columns at 7:3 |
-| `url`     | one per pane, in tree order (`paneIdsOf`); `currentUrl ?? url`, as the stored record. Trailing empty panes are left off      |
-| `zoom`    | one per pane; left off while every pane is at 100%                                                                           |
-| `sandbox` | one per pane, `0` for off; left off while every pane is sandboxed                                                            |
-| `name`    | read only, never written: names the entry when this URL is what adds it                                                      |
+| parameter | carries                                                                                                                                                                                   |
+| :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ws`      | the workspace id                                                                                                                                                                          |
+| `title`   | the view's `title`, when it has one                                                                                                                                                       |
+| `layout`  | the tree, in the notation of `formatLayoutSpec` (`src/layout/spec.mts`): `rcppcpp` is a 2×2 grid, `r70pp` two columns at 7:3, `r737fpp` a column held at 737px beside one taking the rest |
+| `url`     | one per pane, in tree order (`paneIdsOf`); `currentUrl ?? url`, as the stored record. Trailing empty panes are left off                                                                   |
+| `zoom`    | one per pane; left off while every pane is at 100%                                                                                                                                        |
+| `sandbox` | one per pane, `0` for off; left off while every pane is sandboxed                                                                                                                         |
+| `name`    | read only, never written: names the entry when this URL is what adds it                                                                                                                   |
 
 Not in it: `activePaneId`, `nextPaneId`, and the ratio beyond a tenth of a
 percent. The storage record is the full state; the URL is a projection of it,
@@ -434,6 +442,7 @@ Every change to a layout goes through one pure reducer,
 | `move-pane`     | `paneId`, `targetPaneId`, a zone          | `center` exchanges the two panes' places; an edge detaches the pane and re-attaches it to that side of the target. Tree only — nothing reloads |
 | `close`         | `paneId`                                  | removes a pane; the sibling takes the space. Refuses the last pane                                                                             |
 | `set-ratio`     | a `NodePath`, `ratio`                     | moves one divider                                                                                                                              |
+| `set-fixed-px`  | a `NodePath`, `px`                        | moves one divider whose node holds a child at a fixed size; the same state when the pixel is the same                                          |
 | `navigate`      | `paneId`, what was typed                  | normalizes it to a URL; re-submitting the same address reloads instead                                                                         |
 | `report`        | `paneId`, `url`, `title`, `historyLength` | what the frame said about itself, once a second at most                                                                                        |
 | `reload`        | `paneId`                                  | bumps `reloadToken`, having first made `url` the address the pane is at                                                                        |

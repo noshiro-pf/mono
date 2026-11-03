@@ -245,7 +245,7 @@ describe('pullRequestSplitViewSearch', () => {
 
   const session = 'https://claude.ai/code/session_015uv2FbmANuoW3w5XCgPMhW';
 
-  test('puts the diff at 100% beside the conversation at 75%, at 7:3', () => {
+  test('puts the diff at 100%, held at 737px, beside the conversation at 75%', () => {
     assert.deepStrictEqual(
       read(
         pullRequestSplitViewSearch({
@@ -259,14 +259,14 @@ describe('pullRequestSplitViewSearch', () => {
         ws: 'github-pull-request',
         name: 'GitHub pull request',
         title: '#2085 Fix the thing',
-        layout: 'r70pp',
+        layout: 'r737fpp',
         url: [diff, conversation],
         zoom: ['1', '0.75'],
       },
     );
   });
 
-  test('puts the issue beside the diff and the conversation at 2:1:1', () => {
+  test('puts the issue right of the diff and the conversation, both held', () => {
     assert.deepStrictEqual(
       read(
         pullRequestSplitViewSearch({
@@ -280,14 +280,14 @@ describe('pullRequestSplitViewSearch', () => {
         ws: 'github-pull-request',
         name: 'GitHub pull request',
         title: '#2085 Fix the thing',
-        layout: 'r75.1r66.8ppp',
+        layout: 'r554fpr577fpp',
         url: [diff, conversation, issue],
         zoom: ['0.75', '0.75', '0.75'],
       },
     );
   });
 
-  test('puts the session right of the diff and the conversation at 2:1:1', () => {
+  test('puts the session right of the diff and the conversation, both held', () => {
     assert.deepStrictEqual(
       read(
         pullRequestSplitViewSearch({
@@ -301,7 +301,7 @@ describe('pullRequestSplitViewSearch', () => {
         ws: 'github-pull-request',
         name: 'GitHub pull request',
         title: '#2085 Fix the thing',
-        layout: 'r75.1r66.8ppp',
+        layout: 'r554fpr577fpp',
         url: [diff, conversation, session],
         zoom: ['0.75', '0.75', '1'],
       },
@@ -322,30 +322,27 @@ describe('pullRequestSplitViewSearch', () => {
         ws: 'github-pull-request',
         name: 'GitHub pull request',
         title: '#2085 Fix the thing',
-        layout: 'r75.1r66.8ppcpp',
+        layout: 'r554fpr577fpcpp',
         url: [diff, conversation, issue, session],
         zoom: ['0.75', '0.75', '0.75', '1'],
       },
     );
   });
 
-  test('keeps each column within 2px of its width as the diff beside a halved right half', () => {
+  test('holds the diff and the conversation at their widths on a wide window', () => {
     const root = threeColumnRoot();
 
-    const diffBesideHalvedRight = parseLayoutSpec('rprpp');
+    for (const width of [1440, 1920, 2560, 3840]) {
+      const [diffWidth, conversationWidth, issueWidth] = widthsOf(root, width);
 
-    assert.isDefined(diffBesideHalvedRight);
-
-    for (const width of [1024, 1280, 1440, 1920, 2560, 3840]) {
-      const before = widthsOf(diffBesideHalvedRight, width);
-
-      for (const [index, after] of widthsOf(root, width).entries()) {
-        assert.isAtMost(Math.abs(after - (before[index] ?? 0)), 2);
-      }
+      assert.deepStrictEqual(
+        [diffWidth, conversationWidth, issueWidth],
+        [554, 577, width - 554 - 577 - 2 * gutter],
+      );
     }
   });
 
-  test('gives the diff the width of the conversation when it is closed', () => {
+  test('gives the right column the width of the conversation when it is closed', () => {
     const root = threeColumnRoot();
 
     const withoutConversation = removePaneAt(root, 1);
@@ -358,8 +355,8 @@ describe('pullRequestSplitViewSearch', () => {
     );
 
     assert.deepStrictEqual(widthsOf(withoutConversation, 1920), [
-      diffWidth + gutter + conversationWidth,
-      issueWidth,
+      diffWidth,
+      conversationWidth + gutter + issueWidth,
     ]);
   });
 

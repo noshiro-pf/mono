@@ -1,6 +1,7 @@
 import {
   computeGeometry,
   dropTargetAt,
+  fixedSplitNode,
   paneNode,
   splitNode,
   type Rect,
@@ -62,6 +63,62 @@ describe('computeGeometry', () => {
       { paneId: 0, rect: { left: 0, top: 0, width: 50, height: 100 } },
       { paneId: 1, rect: { left: 50, top: 0, width: 150, height: 100 } },
     ]);
+  });
+
+  test('holds the fixed child at its size and gives the other the rest', () => {
+    const second = computeGeometry(
+      fixedSplitNode('row', paneNode(0), paneNode(1), {
+        child: 'second',
+        px: 60,
+      }),
+      wholeStage,
+      6,
+    );
+
+    assert.deepStrictEqual(second.panes, [
+      { paneId: 0, rect: { left: 0, top: 0, width: 134, height: 100 } },
+      { paneId: 1, rect: { left: 140, top: 0, width: 60, height: 100 } },
+    ]);
+
+    assert.deepStrictEqual(second.splitters, [
+      {
+        path: [],
+        axis: 'row',
+        rect: { left: 134, top: 0, width: 6, height: 100 },
+        nodeRect: wholeStage,
+        fixed: { child: 'second', px: 60 },
+      },
+    ]);
+
+    const first = computeGeometry(
+      fixedSplitNode('column', paneNode(0), paneNode(1), {
+        child: 'first',
+        px: 30,
+      }),
+      wholeStage,
+      0,
+    );
+
+    assert.deepStrictEqual(
+      first.panes.map((entry) => entry.rect.height),
+      [30, 70],
+    );
+  });
+
+  test('keeps a held child within the bounds a dragged ratio has', () => {
+    const result = computeGeometry(
+      fixedSplitNode('row', paneNode(0), paneNode(1), {
+        child: 'second',
+        px: 740,
+      }),
+      wholeStage,
+      0,
+    );
+
+    assert.deepStrictEqual(
+      result.panes.map((entry) => entry.rect.width),
+      [10, 190],
+    );
   });
 
   test('addresses every divider of a 2x2 grid by its path', () => {

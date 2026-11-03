@@ -2,6 +2,7 @@ import { Arr, Num } from 'ts-data-forge';
 import {
   clampRatio,
   evenChain,
+  fixedSplitNode,
   insertPaneBeside,
   movePaneBeside,
   paneIdsOf,
@@ -10,6 +11,7 @@ import {
   splitNode,
   splitPaneAt,
   swapPanesAt,
+  updateFixedPxAt,
   updateRatioAt,
   type LayoutNode,
 } from '../src/index.mjs';
@@ -101,6 +103,59 @@ describe('updateRatioAt', () => {
       updateRatioAt(splitNode('row', paneNode(0), paneNode(1)), [], 1.5),
       splitNode('row', paneNode(0), paneNode(1), 0.95),
     );
+  });
+});
+
+describe('updateFixedPxAt', () => {
+  const held = fixedSplitNode('row', paneNode(0), paneNode(1), {
+    child: 'second',
+    px: 740,
+  });
+
+  test('sets the size of the held child, rounded', () => {
+    assert.deepStrictEqual(
+      updateFixedPxAt(held, [], 600.4),
+      fixedSplitNode('row', paneNode(0), paneNode(1), {
+        child: 'second',
+        px: 600,
+      }),
+    );
+  });
+
+  test('follows the path to a nested split', () => {
+    const tree = splitNode('column', paneNode(2), held);
+
+    assert.deepStrictEqual(
+      updateFixedPxAt(tree, ['second'], 500),
+      splitNode(
+        'column',
+        paneNode(2),
+        fixedSplitNode('row', paneNode(0), paneNode(1), {
+          child: 'second',
+          px: 500,
+        }),
+      ),
+    );
+  });
+
+  test('stops at a size small enough to be written in plain digits', () => {
+    assert.deepStrictEqual(
+      updateFixedPxAt(held, [], 1e21),
+      fixedSplitNode('row', paneNode(0), paneNode(1), {
+        child: 'second',
+        px: 100_000,
+      }),
+    );
+  });
+
+  test('is the same tree when the size is unchanged, at any depth', () => {
+    const tree = splitNode('column', paneNode(2), held);
+
+    assert.isTrue(updateFixedPxAt(tree, ['second'], 740.3) === tree);
+  });
+
+  test('leaves a split with no held child as it is', () => {
+    assert.deepStrictEqual(updateFixedPxAt(grid2x2, [], 500), grid2x2);
   });
 });
 

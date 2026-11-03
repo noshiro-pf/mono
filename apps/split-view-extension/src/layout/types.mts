@@ -36,13 +36,26 @@ export type LayoutNode = Readonly<
   | {
       kind: 'split';
       axis: SplitAxis;
-      /** `first`'s share of the space available after the gutter, in `0..1`. */
+      /**
+       * `first`'s share of the space available after the gutter, in `0..1`.
+       * Ignored while `fixed` is set.
+       */
       ratio: number;
+      /**
+       * One child held at a width (or height) in CSS pixels, the other taking
+       * what is left, so that the held one stays the same size whatever the
+       * window is. For a page that switches layout at a breakpoint: a share of
+       * the window lands either side of it depending on the screen.
+       */
+      fixed?: FixedSize;
       first: LayoutNode;
       second: LayoutNode;
     }
   | { kind: 'pane'; paneId: PaneId }
 >;
+
+/** A child of a split node held at a size in CSS pixels. */
+export type FixedSize = Readonly<{ child: 'first' | 'second'; px: number }>;
 
 /**
  * Addresses one split node by the branches taken from the root.
