@@ -66,47 +66,16 @@ export const toHMRFormatText = ({
  */
 export const downloadHMRFormatText = (): Result<
   undefined,
-  Readonly<
-    | { type: 'doraIndicators-is-empty' }
-    | { type: 'doraIndicators-is-undefined' }
-    | { type: 'hand-is-empty' }
-    | { type: 'hand-is-undefined' }
-    | { type: 'numRemainingTiles-is-undefined' }
-    | { type: 'turn-is-undefined' }
-  >
+  Readonly<{ type: 'doraIndicators-is-empty' } | { type: 'hand-is-empty' }>
 > => {
-  const maybeHand = calculatorStore.handSorted.getSnapshot();
+  const hand = calculatorStore.handSorted.getSnapshot().value;
 
-  if (Optional.isNone(maybeHand)) {
-    return Result.err({ type: 'hand-is-undefined' });
-  }
+  const turn = calculatorStore.turn.getSnapshot().value;
 
-  const maybeTurn = calculatorStore.turn.getSnapshot();
+  const doraIndicators = calculatorStore.doraIndicators.getSnapshot().value;
 
-  if (Optional.isNone(maybeTurn)) {
-    return Result.err({ type: 'turn-is-undefined' });
-  }
-
-  const maybeDoraIndicators = calculatorStore.doraIndicators.getSnapshot();
-
-  if (Optional.isNone(maybeDoraIndicators)) {
-    return Result.err({ type: 'doraIndicators-is-undefined' });
-  }
-
-  const maybeNumRemainingTiles =
-    calculatorStore.numRemainingTiles.getSnapshot();
-
-  if (Optional.isNone(maybeNumRemainingTiles)) {
-    return Result.err({ type: 'numRemainingTiles-is-undefined' });
-  }
-
-  const hand = maybeHand.value;
-
-  const turn = maybeTurn.value;
-
-  const doraIndicators = maybeDoraIndicators.value;
-
-  const numRemainingTiles = maybeNumRemainingTiles.value;
+  const numRemainingTiles =
+    calculatorStore.numRemainingTiles.getSnapshot().value;
 
   const result = toHMRFormatText({
     turn,

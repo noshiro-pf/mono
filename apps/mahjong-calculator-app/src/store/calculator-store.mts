@@ -43,18 +43,7 @@ export type CalculationResult =
   | Result<
       JsonValue,
       Readonly<{
-        type:
-          | 'bakaze-is-undefined'
-          | 'doraIndicators-is-undefined'
-          | 'fetch-error'
-          | 'flagOptions-is-undefined'
-          | 'hand-is-undefined'
-          | 'jikaze-is-undefined'
-          | 'maximizeTarget-is-undefined'
-          | 'numRemainingTiles-is-undefined'
-          | 'revealedBlocks-is-undefined'
-          | 'tehaiType-is-undefined'
-          | 'turn-is-undefined';
+        type: 'fetch-error';
         message: string;
       }>
     >
