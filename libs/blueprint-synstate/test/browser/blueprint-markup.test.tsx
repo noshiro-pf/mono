@@ -11,6 +11,7 @@ import {
   Callout,
   Card,
   Checkbox,
+  Collapse,
   DateInput,
   DatePicker,
   FileInput,
@@ -269,6 +270,74 @@ const cases: readonly Case[] = [
         text={constant('Go')}
         variant={constant('minimal')}
       />
+    ),
+  ],
+  [
+    'Button that toggles a region, with an icon',
+    {
+      element: () =>
+        h(Blueprint.Button, {
+          'aria-controls': 'region',
+          'aria-expanded': true,
+          'aria-label': 'Labels',
+          icon: 'double-chevron-up',
+        }),
+      deliberate: [],
+    },
+    () => (
+      <Button
+        aria-controls={constant('region')}
+        aria-expanded={constant('true')}
+        aria-label={constant('Labels')}
+        icon={'double-chevron-up'}
+      />
+    ),
+  ],
+  [
+    'Collapse, open',
+    {
+      element: () =>
+        h(
+          Blueprint.Collapse,
+          { isOpen: true, keepChildrenMounted: true },
+          h('p', null, 'Body'),
+        ),
+      deliberate: [],
+    },
+    () => (
+      <Collapse isOpen={constant(true)} keepChildrenMounted>
+        <p>{constant('Body')}</p>
+      </Collapse>
+    ),
+  ],
+  [
+    'Collapse, closed, its children kept',
+    {
+      element: () =>
+        h(
+          Blueprint.Collapse,
+          { isOpen: false, keepChildrenMounted: true },
+          h('p', null, 'Body'),
+        ),
+      deliberate: [],
+    },
+    () => (
+      <Collapse isOpen={constant(false)} keepChildrenMounted>
+        <p>{constant('Body')}</p>
+      </Collapse>
+    ),
+  ],
+  [
+    'Collapse, closed',
+    {
+      element: () =>
+        h(Blueprint.Collapse, { isOpen: false }, h('p', null, 'Body')),
+      deliberate: [],
+    },
+    () => (
+      <Collapse isOpen={constant(false)}>
+        <p>{constant('Body')}</p>
+      </Collapse>
     ),
   ],
   [
@@ -533,6 +602,18 @@ const cases: readonly Case[] = [
     'Icon',
     { element: () => h(Blueprint.Icon, { icon: 'cog' }), deliberate: [] },
     () => <Icon icon={'cog'} />,
+  ],
+  [
+    'Icon, large',
+    {
+      element: () =>
+        h(Blueprint.Icon, {
+          icon: 'eye-open',
+          size: Blueprint.IconSize.LARGE,
+        }),
+      deliberate: [],
+    },
+    () => <Icon icon={'eye-open'} size={20} />,
   ],
   [
     'SegmentedControl',

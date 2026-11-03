@@ -3,6 +3,7 @@ export * from './button.js';
 export * from './callout.js';
 export * from './card.js';
 export * from './checkbox.js';
+export * from './collapse.js';
 export * from './date-input.js';
 export * from './date-picker.js';
 export * from './file-input.js';

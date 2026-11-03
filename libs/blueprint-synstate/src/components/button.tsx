@@ -17,10 +17,10 @@ export type ButtonProps = Readonly<{
   text?: Bindable<string>;
   /** Drawn after `text`, in the same `span`. */
   children?: Child;
-  /** Drawn before the text. */
-  icon?: IconName;
-  /** Drawn after the text. */
-  endIcon?: IconName;
+  /** Drawn before the text; one that changes is redrawn as it does. */
+  icon?: Bindable<IconName> | IconName;
+  /** Drawn after the text; one that changes is redrawn as it does. */
+  endIcon?: Bindable<IconName> | IconName;
   intent?: Intent;
   variant?: Bindable<ButtonVariant>;
   size?: Size;
@@ -41,6 +41,8 @@ export type ButtonProps = Readonly<{
   'aria-label'?: Bindable<string>;
   'aria-pressed'?: Bindable<string | undefined>;
   'aria-checked'?: Bindable<string | undefined>;
+  'aria-controls'?: Bindable<string>;
+  'aria-expanded'?: Bindable<'false' | 'true'>;
   'data-e2e'?: Bindable<string | undefined>;
 }>;
 
@@ -71,10 +73,14 @@ export const Button = ({
   'aria-label': ariaLabel,
   'aria-pressed': ariaPressed,
   'aria-checked': ariaChecked,
+  'aria-controls': ariaControls,
+  'aria-expanded': ariaExpanded,
   'data-e2e': e2e,
 }: ButtonProps): JSX.Element => (
   <button
     aria-checked={ariaChecked}
+    aria-controls={ariaControls}
+    aria-expanded={ariaExpanded}
     aria-label={ariaLabel}
     aria-pressed={ariaPressed}
     class={classObject(
