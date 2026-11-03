@@ -40,11 +40,5 @@ export const findMissingChangesets = ({
     .toSorted();
 };
 
-/** Whether a changed path is a changeset (not the directory's README). */
-export const isChangesetFile = (file: string): boolean =>
-  CHANGESET_FILE.test(file) && file !== '.changeset/README.md';
-
 /** A colocated test, which ships nothing. */
 const TEST_FILE = /\.test\.[cm]?[jt]sx?$/u;
-
-const CHANGESET_FILE = /^\.changeset\/[^/]+\.md$/u;

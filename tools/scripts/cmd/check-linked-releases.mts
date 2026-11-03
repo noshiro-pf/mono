@@ -105,7 +105,7 @@ export const checkLinkedReleases = ({
           ({ file, name, bump }) => `  - ${file} gives ${name} "${bump}"`,
         ),
         '',
-        'and these members of it are given none:',
+        'and these members of it are given no breaking bump:',
         '',
         ...left.map((name) => `  - ${name}`),
         '',

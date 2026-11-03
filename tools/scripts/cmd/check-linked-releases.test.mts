@@ -69,7 +69,7 @@ describe('checkLinkedReleases', () => {
 
     assert.include(
       result.value,
-      'members of it are given none:\n\n  - wrapper',
+      'members of it are given no breaking bump:\n\n  - wrapper',
     );
   });
 
@@ -82,7 +82,7 @@ describe('checkLinkedReleases', () => {
 
     assert.isTrue(Result.isErr(result));
 
-    assert.include(result.value, 'given none:\n\n  - core');
+    assert.include(result.value, 'given no breaking bump:\n\n  - core');
   });
 
   test('treats a minor bump of a 0.x member as breaking', () => {

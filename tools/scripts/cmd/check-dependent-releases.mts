@@ -195,16 +195,20 @@ export const checkDependentReleases = ({
     packages
       .filter(({ name }) =>
         bumps.some(
+          // `none` names a package and releases nothing.
           (bump) =>
-            bump.name === name ||
-            groups.some(
-              ({ kind, members }) =>
-                kind === 'fixed' &&
-                members.some((pattern) => matchesGroupMember(pattern, name)) &&
-                members.some((pattern) =>
-                  matchesGroupMember(pattern, bump.name),
-                ),
-            ),
+            bump.bump !== 'none' &&
+            (bump.name === name ||
+              groups.some(
+                ({ kind, members }) =>
+                  kind === 'fixed' &&
+                  members.some((pattern) =>
+                    matchesGroupMember(pattern, name),
+                  ) &&
+                  members.some((pattern) =>
+                    matchesGroupMember(pattern, bump.name),
+                  ),
+              )),
         ),
       )
       .map(({ name }) => name),

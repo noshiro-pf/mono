@@ -9,7 +9,12 @@ import {
 } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { $, isDirectlyExecuted } from 'ts-repo-utils';
-import { CHANGESET_DIR_NAME, parseChangesetBumps } from '../lib/changesets.mjs';
+import {
+  CHANGESET_DIR_NAME,
+  isChangesetPath,
+  listChangesetBumps,
+  type ChangesetBump,
+} from '../lib/changesets.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -195,20 +200,24 @@ const runCspell = async (
 };
 
 /**
- * The package names in a changeset's front matter, or none when the file has no
- * front matter — `README.md` and `config.json` land here.
+ * The packages a changeset's front matter names, with their bump, or none for a
+ * file changesets does not read as a changeset: `README.md`, `config.json`, a
+ * Markdown file in a subdirectory other than `pre/`. Throws, naming the file, on one
+ * `changeset version` would refuse.
  */
-const readChangesetPackageNames = async (
+const readChangesetBumps = async (
   file: string,
-): Promise<readonly string[]> => {
-  if (path.extname(file) !== '.md') {
+): Promise<readonly ChangesetBump[]> => {
+  const relative = path.relative(projectRootPath, file);
+
+  if (!isChangesetPath(relative)) {
     return [];
   }
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const content = await fs.readFile(file, 'utf8');
 
-  return Array.from(parseChangesetBumps(content).keys());
+  return listChangesetBumps([{ file: relative, content }]);
 };
 
 /** `dir` and every directory above it, up to and including the repository root. */
@@ -265,21 +274,26 @@ const planFor = async (
   file: string,
   packageDirs: ReadonlyMap<string, string>,
 ): Promise<Plan> => {
-  const names = await readChangesetPackageNames(file);
+  const bumps = await readChangesetBumps(file);
 
-  if (!Arr.isNonEmpty(names)) {
-    return { file, configs: [ROOT_CSPELL_CONFIG], unknownPackages: [] };
-  }
+  // `changeset version` refuses an unknown package whatever its bump, but only
+  // a package that is released gets the body in its changelog.
+  const names = bumps.map(({ name }) => name);
 
-  const dirs = names.map((name) => packageDirs.get(name));
+  const released = bumps
+    .filter(({ bump }) => bump !== 'none')
+    .map(({ name }) => name);
 
   const configs = await Promise.all(
-    dirs.filter(isNotUndefined).map(async (dir) => findCspellConfig(dir)),
+    released
+      .map((name) => packageDirs.get(name))
+      .filter(isNotUndefined)
+      .map(async (dir) => findCspellConfig(dir)),
   );
 
   return {
     file,
-    configs: Arr.uniq(configs),
+    configs: Arr.isNonEmpty(configs) ? Arr.uniq(configs) : [ROOT_CSPELL_CONFIG],
     unknownPackages: names.filter((name) => !packageDirs.has(name)),
   };
 };
