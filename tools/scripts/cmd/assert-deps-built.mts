@@ -148,7 +148,8 @@ export const findLinkedPackages = (
 /**
  * Where `--workspace` starts: the root and every member the root
  * `package.json`'s `workspaces` names — the same list `pnpm-workspace.yaml`
- * holds, in a file Node can read without a YAML parser.
+ * holds (`check:root:workspace-globs` keeps them equal), in a file Node can
+ * read without a YAML parser.
  */
 export const workspaceStartDirs = (rootDir: string): readonly string[] =>
   // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing -- ts-data-forge is not built when this runs (see the header).

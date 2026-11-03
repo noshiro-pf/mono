@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, hasKey, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
+import { readPnpmWorkspaceGlobs } from '../lib/workspace-globs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -19,7 +20,13 @@ import { projectRootPath } from '../project-root-path.mjs';
 export const checkPackageManager = async (): Promise<
   Result<number, string>
 > => {
-  const result = await glob(Array.from(memberManifestGlobs), {
+  const memberGlobs = await readPnpmWorkspaceGlobs();
+
+  if (Result.isErr(memberGlobs)) {
+    return Result.err(`❌ ${memberGlobs.value}`);
+  }
+
+  const result = await glob(memberManifestGlobs(memberGlobs.value), {
     cwd: projectRootPath,
     ignore: ['**/node_modules/**'],
     absolute: true,
@@ -70,15 +77,8 @@ export const findPackageManagerDeclarations = (
     .map(({ relativePath }) => relativePath);
 
 /** The `packages` globs of `pnpm-workspace.yaml`, as manifest paths. */
-const memberManifestGlobs = [
-  'libs/*/package.json',
-  'apps/*/package.json',
-  'tools/*/package.json',
-  'languages/*/*/package.json',
-  'strict-lib/scripts-common/package.json',
-  'strict-lib/v*/package.json',
-  'strict-lib/v*/output/lib/package.json',
-] as const;
+const memberManifestGlobs = (globs: readonly string[]): readonly string[] =>
+  globs.map((g) => path.posix.join(g, 'package.json'));
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkPackageManager().catch((error: unknown) =>
