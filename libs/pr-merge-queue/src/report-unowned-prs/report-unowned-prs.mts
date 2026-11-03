@@ -1,4 +1,9 @@
-import type { QueueComments, QueueOwner, ReportEntry } from 'pr-report-core';
+import {
+  issuePriorityLabel,
+  type QueueComments,
+  type QueueOwner,
+  type ReportEntry,
+} from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { StrictPick } from 'ts-type-forge';
@@ -17,6 +22,7 @@ export const REPORT_UNOWNED_PRS_HELP = [
   'Files an issue for each queued pull request nobody owns: one the',
   'worker, a skill and a person are all waiting on someone else for.',
   'Once per pull request; an open issue this account filed is not filed again.',
+  'Each is labelled priority:A, the tier of a merge queue that has stopped.',
   '',
   'Options:',
   '  --dry-run   say what it would file, and file nothing',
@@ -113,7 +119,15 @@ export const reportUnownedPrs = async (
       'POST',
       '/issues',
       t.record({ number: t.number() }),
-      { body: { title: report.title, body: report.body } },
+      {
+        body: {
+          title: report.title,
+          body: report.body,
+          // A queue that waits for nothing that will come is the tier for the
+          // merge queue stopping (`docs/issue-priority.md`).
+          labels: [issuePriorityLabel('A')],
+        },
+      },
     );
 
     mut_lines.push(

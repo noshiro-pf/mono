@@ -32,12 +32,12 @@ const candidate = (number: number) =>
 
 const ISSUES = [
   issue(10),
-  issue(20, ['priority:high']),
-  issue(30, ['priority:low']),
+  issue(20, ['priority:S']),
+  issue(30, ['priority:D']),
 ] as const;
 
 describe(renderStartable, () => {
-  test('lists each in the survey’s order, with its priority and title', () => {
+  test('lists each in the survey’s order, with its tier and title', () => {
     assert.strictEqual(
       renderStartable(
         {
@@ -51,9 +51,9 @@ describe(renderStartable, () => {
         undefined,
       ),
       [
-        '#20  [priority:high]  feat: thing 20  https://github.com/o/r/issues/20',
+        '#20  [priority:S]  feat: thing 20  https://github.com/o/r/issues/20',
         '#10  feat: thing 10  https://github.com/o/r/issues/10',
-        '#30  [priority:low]  feat: thing 30  https://github.com/o/r/issues/30',
+        '#30  [priority:D]  feat: thing 30  https://github.com/o/r/issues/30',
       ].join('\n'),
     );
   });
@@ -72,7 +72,7 @@ describe(renderStartable, () => {
         1,
       ),
       [
-        '#20  [priority:high]  feat: thing 20  https://github.com/o/r/issues/20',
+        '#20  [priority:S]  feat: thing 20  https://github.com/o/r/issues/20',
         '… and 2 more, which --limit left out.',
       ].join('\n'),
     );
@@ -102,7 +102,7 @@ describe(renderStartable, () => {
         'No issue to start.',
         '#5: an earlier run-issue-resolver session left them as they stand; waiting for someone to change them.',
         '#6, #7: startable, but not written by owner or friend; left to a person.',
-        '#8: startable, but labelled duplicate, invalid, question, wontfix, pending or the like; left as they are.',
+        '#8: startable, but labelled duplicate, invalid, question, wontfix, pending, priority:hold, priority:close or the like; left as they are.',
       ].join('\n'),
     );
   });

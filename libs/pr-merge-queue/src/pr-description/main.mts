@@ -1,10 +1,12 @@
 import * as fs from 'node:fs/promises';
+import { issuePriorityLabel } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import {
   log,
   resolveApiContext,
   rest,
+  restAllPages,
   type ApiContext,
 } from '../lib/index.mjs';
 import { readConfig } from '../unblock-prs/index.mjs';
@@ -14,7 +16,19 @@ import {
   readableDescription,
   splitDescription,
 } from './body.mjs';
-import type { Command, CreateCommand, PushCommand } from './options.mjs';
+import type {
+  Command,
+  CreateCommand,
+  PushCommand,
+  SimilarCommand,
+} from './options.mjs';
+import {
+  DUPLICATE_THRESHOLD,
+  duplicateSuspects,
+  similarIssues,
+  type OpenIssueText,
+  type ScoredIssue,
+} from './similar.mjs';
 
 /**
  * Runs one `pr-description` command (`./README.md`). A pull request's description
@@ -39,7 +53,8 @@ export const runDescription = async (
     case 'read':
     case 'pull':
     case 'push':
-    case 'create': {
+    case 'create':
+    case 'similar': {
       const api = await resolveApiContext(command.repo);
 
       if (Result.isErr(api)) {
@@ -58,6 +73,9 @@ export const runDescription = async (
 
         case 'create':
           return create(api.value, command, heading);
+
+        case 'similar':
+          return similar(api.value, command);
       }
     }
   }
@@ -338,6 +356,36 @@ const push = async (
     : Result.ok(`#${number}: description written`);
 };
 
+/** One line of `similar`'s list, and of `create`'s refusal. */
+const listed = ({ number, title, url, score, keywords }: ScoredIssue): string =>
+  [
+    `- #${number} (${score.toFixed(2)}) ${title}`,
+    ...(Arr.isNonEmpty(keywords) ? [`names ${keywords.join(', ')}`] : []),
+    url,
+  ].join(' · ');
+
+/** The open issues, without the pull requests the same route answers. */
+const readOpenIssues = async (
+  api: ApiContext,
+): Promise<Result<readonly OpenIssueText[], string>> => {
+  const read = await restAllPages(api, '/issues', OpenIssuesSchema, {
+    query: { state: 'open' },
+  });
+
+  return Result.isErr(read)
+    ? Result.err(`cannot read the open issues: ${read.value}`)
+    : Result.ok(
+        read.value
+          .filter((issue) => issue.pull_request === undefined)
+          .map(({ number, title, body, html_url: url }) => ({
+            number,
+            title,
+            body: lf(body ?? ''),
+            url,
+          })),
+      );
+};
+
 const create = async (
   api: ApiContext,
   command: CreateCommand,
@@ -355,6 +403,30 @@ const create = async (
     return Result.err(`${command.file}: ${problems}`);
   }
 
+  const issues = await readOpenIssues(api);
+
+  if (Result.isErr(issues)) {
+    return issues;
+  }
+
+  const suspects = duplicateSuspects(
+    command.title,
+    issues.value,
+    command.notDuplicates,
+  );
+
+  if (Arr.isNonEmpty(suspects)) {
+    return Result.err(
+      [
+        `refused: ${suspects.length === 1 ? 'an open issue has' : `${suspects.length} open issues have`} a title close to this one (${DUPLICATE_THRESHOLD} or more):`,
+        ...suspects.map(listed),
+        '',
+        'Read each. Where one is this problem, add to it instead of filing another;',
+        'where none is, file again with --not-duplicate <number> for each.',
+      ].join('\n'),
+    );
+  }
+
   const created = await rest(
     api,
     'POST',
@@ -364,7 +436,10 @@ const create = async (
       body: {
         title: command.title,
         body: body.value,
-        labels: command.labels,
+        labels: Arr.toPushed(
+          command.labels,
+          issuePriorityLabel(command.priority),
+        ),
       },
     },
   );
@@ -373,3 +448,33 @@ const create = async (
     ? Result.err(`cannot create the issue: ${created.value}`)
     : Result.ok(`#${created.value.number}: ${created.value.html_url}`);
 };
+
+const similar = async (
+  api: ApiContext,
+  command: SimilarCommand,
+): Promise<Result<string, string>> => {
+  const issues = await readOpenIssues(api);
+
+  if (Result.isErr(issues)) {
+    return issues;
+  }
+
+  const found = similarIssues(command, issues.value);
+
+  return Result.ok(
+    Arr.isNonEmpty(found)
+      ? found.map(listed).join('\n')
+      : 'No open issue has a close title or names a keyword.',
+  );
+};
+
+/** The `pull_request` key is what tells a pull request apart in the answer. */
+const OpenIssuesSchema = t.array(
+  t.record({
+    number: t.number(),
+    title: t.string(),
+    body: t.union([t.string(), t.nullType]),
+    html_url: t.string(),
+    pull_request: t.optional(t.record({})),
+  }),
+);

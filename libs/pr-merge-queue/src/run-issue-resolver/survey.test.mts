@@ -79,12 +79,14 @@ describe(surveyIssues, () => {
     });
   });
 
-  test('takes priority:high first and priority:low last', () => {
+  test('takes the issues by tier, what has none before D', () => {
     const survey = surveyIssues(
       [
-        issue(1, { labels: ['priority:low'] }),
+        issue(1, { labels: ['priority:D'] }),
         issue(2),
-        issue(3, { labels: ['priority:high'] }),
+        issue(3, { labels: ['priority:B'] }),
+        issue(4, { labels: ['priority:S'] }),
+        issue(5, { labels: ['priority:high'] }),
       ],
       OWNER,
       NONE,
@@ -92,8 +94,27 @@ describe(surveyIssues, () => {
 
     assert.deepStrictEqual(
       survey.fresh.map(({ number }) => number),
-      [3, 2, 1],
+      [4, 3, 2, 5, 1],
     );
+  });
+
+  test('holds what is placed under hold or close', () => {
+    const survey = surveyIssues(
+      [
+        issue(1, { labels: ['priority:hold'] }),
+        issue(2, { labels: ['priority:close'] }),
+        issue(3),
+      ],
+      OWNER,
+      NONE,
+    );
+
+    assert.deepStrictEqual(
+      survey.fresh.map(({ number }) => number),
+      [3],
+    );
+
+    assert.deepStrictEqual(survey.held, [1, 2]);
   });
 
   test('leaves what someone outside the authors wrote, whatever the case of a login', () => {
@@ -173,7 +194,7 @@ describe(passedOverNotes, () => {
         '#3: an earlier run-issue-resolver session left them as they stand; waiting for someone to change them.',
         '#4: a session stopped at its cap; a later run, capping one higher, tries again.',
         '#5: startable, but not written by owner; left to a person.',
-        '#6: startable, but labelled duplicate, invalid, question, wontfix, pending or the like; left as they are.',
+        '#6: startable, but labelled duplicate, invalid, question, wontfix, pending, priority:hold, priority:close or the like; left as they are.',
       ],
     );
   });
