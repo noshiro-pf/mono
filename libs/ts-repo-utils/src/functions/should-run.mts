@@ -7,7 +7,8 @@ import { getDiffFrom, getGitRoot } from './diff.mjs';
 /**
  * Checks whether a CI step should run, based on which files differ from a base
  * branch. Reports `false` when every changed file matches one of the ignored
- * patterns.
+ * patterns. A deleted file counts as changed, and so does the old path of a
+ * renamed one, so a diff that only deletes or moves source still runs the step.
  *
  * This is the general form of {@link checkShouldRunTypeChecks}: it carries no
  * default ignore list, so the caller states exactly which paths are irrelevant
@@ -81,7 +82,9 @@ export const checkShouldRun = async (
     process.exit(1);
   }
 
-  const files = await getDiffFrom(baseBranch);
+  // A deleted file is a change the gated step has to see (whatever imported it
+  // no longer builds), so it is matched against `pathsIgnore` like any other.
+  const files = await getDiffFrom(baseBranch, { excludeDeleted: false });
 
   if (Result.isErr(files)) {
     console.error('Error getting diff:', files.value);
@@ -112,6 +115,8 @@ export const checkShouldRun = async (
 /**
  * Checks if TypeScript type checks should run based on the diff from a base
  * branch. Skips type checks if all changed files match the ignored patterns.
+ * As in {@link checkShouldRun}, a deleted file counts as changed, and so does
+ * the old path of a renamed one.
  *
  * This is {@link checkShouldRun} with an ignore list of the files that a
  * TypeScript project typically has but never type-checks — documentation,

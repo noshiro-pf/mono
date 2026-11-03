@@ -962,6 +962,78 @@ describe('diff', () => {
       }
     });
 
+    test('should report both sides of a rename when deleted files are included', async () => {
+      const { repoPath, cleanup, execInRepo } = await createTempRepo();
+
+      const repoFunctions = createRepoFunctions(repoPath);
+
+      try {
+        const sourcePath = path.join(repoPath, 'src', 'moved.mts');
+
+        const destinationPath = path.join(repoPath, 'docs', 'moved.mts');
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.mkdir(path.dirname(sourcePath), { recursive: true });
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.mkdir(path.dirname(destinationPath), { recursive: true });
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.writeFile(sourcePath, 'export const moved = 1;\n');
+
+        await execInRepo('git add --all', { silent: true });
+
+        await execInRepo('git commit -m "Initial commit" --no-verify', {
+          silent: true,
+        });
+
+        await execInRepo('git mv src/moved.mts docs/moved.mts', {
+          silent: true,
+        });
+
+        const resultInclude = await repoFunctions.getDiffFrom('HEAD', {
+          excludeDeleted: false,
+          silent: true,
+        });
+
+        assert.isTrue(Result.isOk(resultInclude));
+
+        if (Result.isOk(resultInclude)) {
+          assert.sameMembers(resultInclude.value, [
+            sourcePath,
+            destinationPath,
+          ]);
+        }
+
+        // `git mv` stages the rename, so the staged list reads it the same way.
+        const stagedInclude = await repoFunctions.getStagedFiles({
+          excludeDeleted: false,
+          silent: true,
+        });
+
+        assert.isTrue(Result.isOk(stagedInclude));
+
+        if (Result.isOk(stagedInclude)) {
+          assert.sameMembers(stagedInclude.value, [
+            sourcePath,
+            destinationPath,
+          ]);
+        }
+
+        const resultExclude = await repoFunctions.getDiffFrom('HEAD', {
+          silent: true,
+        });
+
+        assert.isTrue(Result.isOk(resultExclude));
+
+        if (Result.isOk(resultExclude)) {
+          assert.deepStrictEqual(resultExclude.value, [destinationPath]);
+        }
+      } finally {
+        await cleanup();
+      }
+    });
+
     test('should treat the base as one revision rather than several arguments', async () => {
       const { repoPath, cleanup, execInRepo } = await createTempRepo();
 

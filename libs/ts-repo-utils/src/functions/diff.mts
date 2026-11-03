@@ -39,7 +39,8 @@ export const getUntrackedFiles = async (
 
 /**
  * Get modified files from the working tree (files that have been changed but
- * not staged). Runs `git diff --name-only [--diff-filter=d]`
+ * not staged). Runs `git diff --name-only -z --diff-filter=d`, or `git diff
+ * --name-only -z --no-renames` with `excludeDeleted: false`.
  */
 export const getModifiedFiles = async (
   options?: Readonly<{
@@ -54,13 +55,15 @@ export const getModifiedFiles = async (
   cmdResultToFiles({
     args: ['diff', '--name-only'],
     argsToExcludeDeleted: ['--diff-filter=d'], // lower case 'd' means exclude deleted files
-    argsToIncludeDeleted: [],
+    argsToIncludeDeleted: NO_RENAMES,
     options,
   });
 
 /**
  * Get files that are staged for commit (files added with git add). Runs `git
- * diff --staged --name-only [--diff-filter=d]`
+ * diff --staged --name-only -z --diff-filter=d`, or `git diff --staged
+ * --name-only -z --no-renames` with `excludeDeleted: false`, which reports a
+ * staged rename under both its old path and its new one.
  */
 export const getStagedFiles = async (
   options?: Readonly<{
@@ -75,13 +78,17 @@ export const getStagedFiles = async (
   cmdResultToFiles({
     args: ['diff', '--staged', '--name-only'],
     argsToExcludeDeleted: ['--diff-filter=d'], // lower case 'd' means exclude deleted files
-    argsToIncludeDeleted: [],
+    argsToIncludeDeleted: NO_RENAMES,
     options,
   });
 
 /**
  * Get files that differ from the specified base branch or commit. Runs `git
- * diff --name-only [--diff-filter=d] <base> --`
+ * diff --name-only -z --diff-filter=d <base> --`, or `git diff --name-only -z
+ * --no-renames <base> --` with `excludeDeleted: false`.
+ *
+ * With `excludeDeleted: false`, a renamed file is reported under both its old
+ * path (deleted) and its new one; otherwise only the new path is.
  *
  * `base` names exactly one revision. It reaches `git` as a single argument and
  * never as a command line, so whatever it contains — whitespace, punctuation —
@@ -115,13 +122,20 @@ export const getDiffFrom = async (
   return cmdResultToFiles({
     args: ['diff', '--name-only'],
     argsToExcludeDeleted: ['--diff-filter=d'],
-    argsToIncludeDeleted: [],
+    argsToIncludeDeleted: NO_RENAMES,
     // `--` ends the revision list, so a base that happens to match a path in
     // the working tree is still read as a revision.
     trailingArgs: [base, '--'],
     options,
   });
 };
+
+/**
+ * What a `git diff` asked for deleted files adds. `--name-only` names a rename
+ * by its destination alone, which would hide the deleted source from a caller
+ * that asked for deleted files.
+ */
+const NO_RENAMES: readonly string[] = ['--no-renames'] as const;
 
 /**
  * Runs `git` with `args` handed to the process one argument at a time. No shell
