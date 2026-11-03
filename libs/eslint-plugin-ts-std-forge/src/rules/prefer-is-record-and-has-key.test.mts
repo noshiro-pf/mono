@@ -146,12 +146,22 @@ describe('prefer-is-record-and-has-key through type wrappers', () => {
           declare const u: unknown;
           const ok = 'a' in (<Record<string, unknown>>u);
         `,
-        output: dedent`
-          import { isRecord, hasKey } from 'ts-std-forge';
-          declare const u: unknown;
-          const ok = (isRecord(<Record<string, unknown>>u) && hasKey(<Record<string, unknown>>u, 'a'));
-        `,
-        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-std-forge';
+                  declare const u: unknown;
+                  const ok = (isRecord(<Record<string, unknown>>u) && hasKey(<Record<string, unknown>>u, 'a'));
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'drops isRecord for a record behind `satisfies` and keeps the wrapper',
@@ -222,7 +232,7 @@ describe('prefer-is-record-and-has-key with parenthesized operands', () => {
           const ok = 'k' in (a, o);
         `,
         output: null,
-        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+        errors: [{ messageId: 'inReadsPrototypeChain' }],
       },
       {
         name: 'a sequence object in Object.hasOwn, read twice by the fix, gets no fix',
@@ -316,9 +326,9 @@ describe('prefer-is-record-and-has-key where the rewrite would change behavior',
         `,
         output: null,
         errors: [
+          { messageId: 'inReadsPrototypeChain' },
           { messageId: 'useIsRecordAndHasKey' },
-          { messageId: 'useIsRecordAndHasKey' },
-          { messageId: 'useIsRecordAndHasKey' },
+          { messageId: 'inReadsPrototypeChain' },
         ],
       },
       {
@@ -340,12 +350,314 @@ describe('prefer-is-record-and-has-key where the rewrite would change behavior',
           declare const o: { readonly p: object };
           const ok = 'k' in (o.p satisfies object);
         `,
-        output: dedent`
-          import { isRecord, hasKey } from 'ts-std-forge';
-          declare const o: { readonly p: object };
-          const ok = (isRecord(o.p satisfies object) && hasKey(o.p satisfies object, 'k'));
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-std-forge';
+                  declare const o: { readonly p: object };
+                  const ok = (isRecord(o.p satisfies object) && hasKey(o.p satisfies object, 'k'));
+                `,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+});
+
+// `in` walks the prototype chain and accepts a function; `hasKey` reads own
+// properties and `isRecord` rejects a function, so each of these would turn
+// from true to false: a suggestion, never a fix.
+describe('prefer-is-record-and-has-key on `key in obj` outside a record type', () => {
+  tester.run('prefer-is-record-and-has-key', preferIsRecordAndHasKey, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a Promise, whose `then` is inherited',
+        code: dedent`
+          declare const value: Promise<number>;
+          const ok = 'then' in value;
         `,
-        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-std-forge';
+                  declare const value: Promise<number>;
+                  const ok = (isRecord(value) && hasKey(value, 'then'));
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a Map, whose `size` is inherited',
+        code: dedent`
+          declare const coll: ReadonlyMap<string, number>;
+          const ok = 'size' in coll;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-std-forge';
+                  declare const coll: ReadonlyMap<string, number>;
+                  const ok = (isRecord(coll) && hasKey(coll, 'size'));
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a Date, whose `toISOString` is inherited',
+        code: dedent`
+          declare const d: Date;
+          const ok = 'toISOString' in d;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-std-forge';
+                  declare const d: Date;
+                  const ok = (isRecord(d) && hasKey(d, 'toISOString'));
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a class instance, whose method is on the prototype',
+        code: dedent`
+          class View {
+            render(): void {}
+          }
+          declare const instance: View;
+          const ok = 'render' in instance;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-std-forge';
+                  class View {
+                    render(): void {}
+                  }
+                  declare const instance: View;
+                  const ok = (isRecord(instance) && hasKey(instance, 'render'));
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a class instance with a string index signature, whose method is still on the prototype',
+        code: dedent`
+          class Bag {
+            [key: string]: unknown;
+            render(): void {}
+          }
+          declare const bag: Bag;
+          const ok = 'render' in bag;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  class Bag {
+                    [key: string]: unknown;
+                    render(): void {}
+                  }
+                  declare const bag: Bag;
+                  const ok = hasKey(bag, 'render');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'an interface with a string index signature, which a class or a built-in may implement',
+        code: dedent`
+          interface Store {
+            [key: string]: unknown;
+            getItem(key: string): unknown;
+          }
+          declare const store: Store;
+          const ok = 'getItem' in store;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  interface Store {
+                    [key: string]: unknown;
+                    getItem(key: string): unknown;
+                  }
+                  declare const store: Store;
+                  const ok = hasKey(store, 'getItem');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a type parameter bounded by a class with a string index signature',
+        code: dedent`
+          class Bag {
+            [key: string]: unknown;
+            render(): void {}
+          }
+          const f = <T extends Bag>(bag: T): boolean => 'render' in bag;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  class Bag {
+                    [key: string]: unknown;
+                    render(): void {}
+                  }
+                  const f = <T extends Bag>(bag: T): boolean => hasKey(bag, 'render');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a mapped type over a class, whose methods are still on the prototype',
+        code: dedent`
+          class Bag {
+            [key: string]: unknown;
+            render(): void {}
+          }
+          declare const bag: Readonly<Bag>;
+          const ok = 'render' in bag;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  class Bag {
+                    [key: string]: unknown;
+                    render(): void {}
+                  }
+                  declare const bag: Readonly<Bag>;
+                  const ok = hasKey(bag, 'render');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a literal key naming a member of `Object.prototype`',
+        code: dedent`
+          declare const rec: Readonly<Record<string, unknown>>;
+          const ok = 'constructor' in rec;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const rec: Readonly<Record<string, unknown>>;
+                  const ok = hasKey(rec, 'constructor');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'an object literal with a computed key is fixed: it has no prototype of its own',
+        code: dedent`
+          declare const key: string;
+          const counts = { [key]: 0 };
+          const ok = 'a' in counts;
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+          declare const key: string;
+          const counts = { [key]: 0 };
+          const ok = hasKey(counts, 'a');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'a function, which `isRecord` rejects',
+        code: dedent`
+          declare const fn: () => void;
+          const ok = 'name' in fn;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-std-forge';
+                  declare const fn: () => void;
+                  const ok = (isRecord(fn) && hasKey(fn, 'name'));
+                `,
+              },
+            ],
+          },
+        ],
       },
     ],
   });
