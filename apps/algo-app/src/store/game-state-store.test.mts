@@ -1,7 +1,12 @@
-import { serverTimestamp } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 import { createState, source } from 'synstate';
 import { newRoom } from '../functions/index.mjs';
-import type { Card, GameStateAction, Room } from '../types/index.mjs';
+import type {
+  Card,
+  GameStateActionFromDb,
+  GameStateActionToWrite,
+  Room,
+} from '../types/index.mjs';
 import {
   createGameStateStore,
   type GameStateStore,
@@ -190,12 +195,12 @@ type Setup = Readonly<{
   store: GameStateStore;
   setRoom: (room: Room | undefined) => void;
   actionsFromDb: Readonly<{
-    next: (actions: readonly GameStateAction[]) => void;
+    next: (actions: readonly GameStateActionFromDb[]) => void;
   }>;
   /** Each `addAction` call, as its arguments. */
-  written: readonly (readonly [string, GameStateAction])[];
+  written: readonly (readonly [string, GameStateActionToWrite])[];
   /** The type of each action played here, in order. */
-  played: readonly GameStateAction['type'][];
+  played: readonly GameStateActionToWrite['type'][];
   timers: readonly (readonly [number, () => void])[];
   /** Advances every counter the store asked for. */
   tick: (n: number) => void;
@@ -206,13 +211,13 @@ const cancelNothing = (): void => undefined;
 const setup = (): Setup => {
   const [roomState, setRoom] = createState<Room | undefined>(undefined);
 
-  const actionsFromDb = source<readonly GameStateAction[]>();
+  const actionsFromDb = source<readonly GameStateActionFromDb[]>();
 
   const ticks = source<number>();
 
-  const mut_written: (readonly [string, GameStateAction])[] = [];
+  const mut_written: (readonly [string, GameStateActionToWrite])[] = [];
 
-  const mut_played: GameStateAction['type'][] = [];
+  const mut_played: GameStateActionToWrite['type'][] = [];
 
   const mut_timers: (readonly [number, () => void])[] = [];
 
@@ -257,16 +262,17 @@ const black6: Card = { color: 'black', number: 6 } as const;
 
 const white7: Card = { color: 'white', number: 7 } as const;
 
-const selectMyCard = (card: Card): GameStateAction =>
+/** `selectMyCard` as the database reads it back. */
+const selectMyCard = (card: Card): GameStateActionFromDb =>
   ({
     type: 'selectMyCard',
-    timestamp: serverTimestamp(),
+    timestamp: Timestamp.fromMillis(0),
     card,
   }) as const;
 
 const writtenTypes = (
   written: Setup['written'],
-): readonly (readonly [string, GameStateAction['type']])[] =>
+): readonly (readonly [string, GameStateActionToWrite['type']])[] =>
   written.map(([roomId, action]) => [roomId, action.type] as const);
 
 const roomWithId = (id: string): Room =>
