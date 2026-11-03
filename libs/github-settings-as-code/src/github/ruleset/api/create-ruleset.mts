@@ -11,9 +11,9 @@ export const createRuleset = async ({
   payload: { name, target, enforcement, bypass_actors, conditions, rules },
 }: Readonly<{
   payload: CreateRulesetRequest;
-}>): Promise<void> => {
+}>): Promise<number> => {
   // https://docs.github.com/ja/rest/repos/rules?apiVersion=2022-11-28#create-a-repository-ruleset
-  await octokit.request(
+  const { data } = await octokit.request(
     'POST /repos/{owner}/{repo}/rulesets' satisfies EndpointKeys,
     // transformer-ignore-next-line convert-to-readonly
     {
@@ -32,4 +32,7 @@ export const createRuleset = async ({
       ) as components['schemas']['repository-rule'][],
     },
   );
+
+  // 作られた ruleset の id。 apply の書き戻しは、送った ruleset をこれで特定する。
+  return data.id;
 };

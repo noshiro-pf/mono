@@ -3,3 +3,4 @@ export * from './apply.mjs';
 export * from './backup.mjs';
 export * from './constants.mjs';
 export * from './read-environment-contents.mjs';
+export * from './select-declared-environments.mjs';

@@ -42,8 +42,10 @@ export const applyRulesets = async (): Promise<void> => {
     });
   }
 
+  const mut_createdIds: number[] = [];
+
   for (const ruleset of rulesetsToCreate) {
-    await createRuleset({
+    const createdId = await createRuleset({
       payload: {
         bypass_actors: ruleset.bypass_actors,
         conditions: ruleset.conditions ?? undefined,
@@ -53,15 +55,28 @@ export const applyRulesets = async (): Promise<void> => {
         target: ruleset.target === 'repository' ? undefined : ruleset.target,
       },
     });
+
+    mut_createdIds.push(createdId);
   }
 
-  // update local ruleset files
+  // 書き戻すのは、いま送った ruleset だけ — 更新したものは宣言の id で、
+  // 作ったものは GitHub が付けた id で特定する。宣言に無い ruleset（GUI で
+  // 作られたもの、 organization の ruleset）まで書くと、 drift 検査が報せる
+  // はずのものが宣言として取り込まれてしまう。名前では特定しない。親の
+  // ruleset が同じ名前を持てるので、別物が同じファイルに書かれうる。
+  const appliedIds: ReadonlySet<number> = new Set<number>([
+    ...rulesetsToUpdate.map((r) => r.id),
+    ...mut_createdIds,
+  ]);
+
+  // 反映後の実際の値で、送った ruleset のファイルを更新する。 GitHub が値を
+  // 正規化したり受け付けなかったりしたものが diff に出る。一覧は読み直さず
+  // id ごとに取る（一覧はページ分割され、親の ruleset も含む）。全部取って
+  // から書くので、途中で取得に失敗しても一部だけ書き換わることはない。
   {
-    const rulesetsResult = await getAllRulesets();
+    const contents = await Promise.all(Array.from(appliedIds, getRuleset));
 
-    for (const rule of rulesetsResult) {
-      const content = await getRuleset(rule.id);
-
+    for (const content of contents) {
       const str = JSON.stringify(
         Obj.pick(content, rulesetKeysToPick),
         undefined,
@@ -70,7 +85,7 @@ export const applyRulesets = async (): Promise<void> => {
 
       // `settingsFilePath` が `rulesetsDir` の直下であることを確かめている。
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(settingsFilePath(rulesetsDir, rule.name), str);
+      await fs.writeFile(settingsFilePath(rulesetsDir, content.name), str);
     }
 
     await formatUncommittedFiles();

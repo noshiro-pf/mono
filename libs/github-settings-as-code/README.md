@@ -42,11 +42,15 @@ repo-settings backup
 repo-settings apply --owner noshiro-pf --repo ts-repo-utils
 ```
 
-`backup` rewrites the settings files themselves from what GitHub currently
-has — there is one copy of each resource, not a declaration and a mirror of it.
-`apply` reads the values back from GitHub afterwards and rewrites the files
-with what was actually applied, so a value GitHub canonicalized or refused
-shows up as a diff.
+`backup` rewrites the settings files themselves from what GitHub currently has —
+there is one copy of each resource, not a declaration and a mirror of it.
+`apply` reads the values back from GitHub afterwards and rewrites the files with
+what was actually applied, so a value GitHub canonicalized or refused shows up
+as a diff; `variables` writes nothing back. For rulesets and environments, only
+the ones a declaration file names are rewritten (a ruleset by its id, or by the
+id GitHub gave it when created; an environment by name). One that exists only on
+GitHub stays undeclared, so the drift check keeps reporting it; importing it is
+an explicit `backup`.
 
 ## Resolving the target repository
 
