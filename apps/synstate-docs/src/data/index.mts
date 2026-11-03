@@ -10,6 +10,10 @@
  * which labels the charts draw dashed; and how both write a measurement
  * (`format-ms.mts`).
  *
+ * `bundle-size-comparison.json` is measured apart from the benchmark, by
+ * `pnpm run bundle-size`, and no workflow re-measures it. Only
+ * `scripts/embed-bundle-size.mts` reads it, so it is not exported here.
+ *
  * A barrel because the readers are elsewhere in the package — the chart
  * components under `src/components/`, the prose numbers under `scripts/` — and
  * `import-x/no-internal-modules` allows `../../<dir>/index.mjs` while
