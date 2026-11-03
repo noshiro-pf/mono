@@ -1,50 +1,23 @@
-import {
-  withSlash,
-  type ReadonlyURLSearchParams,
-} from 'tiny-router-observable';
-import type { DeepReadonly } from 'ts-type-forge';
-import { routes } from './route-paths.mjs';
+import { defineRoutes, search, type Href } from 'synstate-router';
 
-export const params = {
-  roomId: 'id',
-  playerId: 'player-id',
-  replay: 'replay',
-  observe: 'observe',
-} as const;
+/**
+ * Every page of the app. The room is a search parameter of the rooms page, and
+ * the player too once they have joined: see `route-paths.mts` for why.
+ */
+export const routes = defineRoutes({
+  main: { segment: '' },
+  createRoom: { segment: 'create' },
+  rooms: {
+    search: {
+      id: search.string(),
+      'player-id': search.string(),
+    },
+  },
+});
 
 /**
  * The page of the room `roomId`: where a player joins it, or, with `playerId`,
  * the game as that player.
  */
-export const roomPage = (roomId: string, playerId?: string): string => {
-  const query = new URLSearchParams({
-    [params.roomId]: roomId,
-    ...(playerId === undefined ? {} : { [params.playerId]: playerId }),
-  });
-
-  return `${withSlash(routes.rooms)}?${query.toString()}`;
-};
-
-export const getRoomId = (
-  path: string,
-  queryParams: ReadonlyURLSearchParams,
-): string | undefined =>
-  path === withSlash(routes.rooms)
-    ? (queryParams.get(params.roomId) ?? undefined)
-    : undefined;
-
-export const isMainPage = (path: string): boolean =>
-  path === routes.main || path === withSlash(routes.createRoom);
-
-export const getParams = (
-  queryParams: ReadonlyURLSearchParams,
-): DeepReadonly<{
-  playerId: string | undefined;
-  replay: boolean;
-  observe: boolean;
-}> =>
-  ({
-    playerId: queryParams.get(params.playerId) ?? undefined,
-    replay: queryParams.get(params.replay) === 'true',
-    observe: queryParams.get(params.observe) === 'true',
-  }) as const;
+export const roomPage = (roomId: string, playerId?: string): Href =>
+  routes.rooms.href({ search: { id: roomId, 'player-id': playerId } });

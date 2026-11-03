@@ -39,8 +39,11 @@ Pages にはリライトが無い。存在しないパスを開くと、サイ�
 置けない `/mono/404.html` になる。そのため：
 
 - **画面の種類（有限）はパス**にし、ビルド時に `index.html` を各パスへ複製する
-  （`tools/configs/vite-app-config.mts` の `routePaths`。アプリは画面のパスの
-  一覧を 1 か所に持ち、ルーティングと Vite の設定の両方がそれを読む）。
+  （`tools/configs/vite-app-config.mts` の `routePaths`）。アプリは画面のパスの
+  一覧を 1 か所に持ち、Vite の設定がそれを読む。tiny-router-observable の
+  アプリはルーティングもそれを読む。synstate-router のアプリはルートの木が
+  正で、一覧はテストが木と突き合わせる（`apps/algo-app/src/constants/route-paths.mts`
+  と `apps/algo-app/src/constants/routes.test.mts`）。
 - **ID のような動的な値は query** に置く（例: `algo-app` の `/rooms/?id=<id>`、
   `/cashflow/?plan=<id>`）。数が無限なのでパスごとの複製はできない。
 - 編集のような別画面は、真偽値の query（`?edit=true`）にせず、パス
@@ -53,10 +56,12 @@ Pages にはリライトが無い。存在しないパスを開くと、サイ�
 0 件）。複製が返るのはそのパスを直接開いた・再読み込みしたときだけで、
 サーバー側のリライトと同じ働きをする。
 
-base path は `tiny-router-observable` の `createRouter({ basePath:
-import.meta.env.BASE_URL })` で扱い、アプリは root にいるつもりでルーティング
-する。`<a href>` はブラウザがオリジンから解決するので、リンクには base を
-付けた URL を書く（`prependBasePath`）。
+base path は router の `basePath` に `import.meta.env.BASE_URL` を渡して扱い
+（synstate-router は `createRouter(routes, { basePath })`、
+tiny-router-observable は `createRouter({ basePath })`）、アプリは root に
+いるつもりでルーティングする。`<a href>` はブラウザがオリジンから解決するので、
+リンクには base を付けた URL を書く。synstate-router では `Link` と
+`router.toUrl` が付け、tiny-router-observable では `prependBasePath` で付ける。
 
 ## Pages から出るとき
 

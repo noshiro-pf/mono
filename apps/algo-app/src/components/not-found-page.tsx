@@ -1,6 +1,6 @@
 import { constant, type JSX } from 'synstate-dom';
 import { dictionary, routes } from '../constants/index.mjs';
-import { Router } from '../router.mjs';
+import { router } from '../router.mjs';
 import { Button } from './bp/index.mjs';
 import * as styles from './not-found-page.module.css';
 
@@ -16,5 +16,5 @@ export const NotFoundPage = (): JSX.Element => (
 );
 
 const goToMain = (): void => {
-  Router.push(routes.main);
+  router.push(routes.main.href());
 };

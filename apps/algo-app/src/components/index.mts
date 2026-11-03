@@ -8,4 +8,5 @@ export * from './join-room-page.js';
 export * from './not-found-page.js';
 export * from './organisms/index.mjs';
 export * from './report-rect-on.mjs';
+export * from './rooms-page.js';
 export * from './root.js';
