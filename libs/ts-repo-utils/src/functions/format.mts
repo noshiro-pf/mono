@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import type { ExecException } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
@@ -64,9 +65,11 @@ export const formatFiles = async (
   const mut_skipped = { nonExistent: 0, ignored: 0, noParser: 0 };
 
   // Format each file
-  const results: readonly PromiseSettledResult<Result<undefined, unknown>>[] =
+  const formatAll = async (): Promise<
+    readonly PromiseSettledResult<Result<undefined, unknown>>[]
+  > =>
     // NOTE: Using Promise.allSettled to ensure all files are processed even if some fail
-    await Promise.allSettled(
+    Promise.allSettled(
       files.map(async (filePath) => {
         try {
           // Check if file exists first
@@ -139,6 +142,10 @@ export const formatFiles = async (
         }
       }),
     );
+
+  // Prettier's API logs nothing itself, but a plugin or a bundled parser (YAML,
+  // PostCSS) may write to the console, and no Prettier option stops that.
+  const results = await (silent ? withConsoleMuted(formatAll) : formatAll());
 
   const skipReport = [
     mut_skipped.ignored === 0 ? '' : `${mut_skipped.ignored} ignored`,
@@ -435,6 +442,135 @@ export const formatDiffFrom = async (
     ignoreUnknown,
     ignore,
   });
+};
+
+/**
+ * The console methods {@link withConsoleMuted} mutes: everything that writes to
+ * stdout, and `warn`, which plugins use for chatter. Node prints `assert`,
+ * `count`, `group` and `time*` through `log` or `warn`, so those are muted too;
+ * `error` and `trace` are left alone.
+ */
+const mutedConsoleMethods = [
+  'debug',
+  'dir',
+  'dirxml',
+  'info',
+  'log',
+  'table',
+  'warn',
+] as const;
+
+type MutedConsoleMethod = (typeof mutedConsoleMethods)[number];
+
+/** A wrapper on the console, with the descriptor it replaced. */
+type InstalledConsoleWrapper = Readonly<{
+  wrapper: (...args: readonly unknown[]) => unknown;
+  replaced: PropertyDescriptor | undefined;
+}>;
+
+/** Set inside a {@link withConsoleMuted} run, and only there. */
+const consoleMutedContext = new AsyncLocalStorage<true>();
+
+/**
+ * The console {@link withConsoleMuted} installed its wrappers on, each wrapper
+ * with the descriptor it replaced, and how many runs are using them.
+ */
+const mut_consoleMuting: {
+  depth: number;
+  target: Console | undefined;
+  readonly installed: Map<MutedConsoleMethod, InstalledConsoleWrapper>;
+} = {
+  depth: 0,
+  target: undefined,
+  installed: new Map<MutedConsoleMethod, InstalledConsoleWrapper>(),
+};
+
+const installConsoleWrappers = (): void => {
+  const target = console;
+
+  mut_consoleMuting.target = target;
+
+  for (const method of mutedConsoleMethods) {
+    const original: unknown = Reflect.get(target, method);
+
+    if (typeof original !== 'function') {
+      continue;
+    }
+
+    const replaced = Object.getOwnPropertyDescriptor(target, method);
+
+    // Forwards to the method it replaced, never to what the console holds now:
+    // a replacement that calls through would otherwise loop back here.
+    const wrapper = (...args: readonly unknown[]): unknown =>
+      consoleMutedContext.getStore() === true
+        ? undefined
+        : Reflect.apply(original, target, args);
+
+    // Reflect.defineProperty reports a frozen console by returning false; that
+    // method is then left as it is.
+    if (
+      Reflect.defineProperty(target, method, {
+        enumerable: replaced?.enumerable ?? true,
+        value: wrapper,
+        writable: true,
+        configurable: true,
+      })
+    ) {
+      mut_consoleMuting.installed.set(method, { wrapper, replaced });
+    }
+  }
+};
+
+const removeConsoleWrappers = (): void => {
+  const target = mut_consoleMuting.target;
+
+  if (target !== undefined) {
+    for (const [method, { wrapper, replaced }] of mut_consoleMuting.installed) {
+      // Something else replaced the method during the run; leave it there.
+      if (Reflect.get(target, method) !== wrapper) {
+        continue;
+      }
+
+      if (replaced === undefined) {
+        // The method was inherited, so dropping the own wrapper restores it.
+        Reflect.deleteProperty(target, method);
+      } else {
+        Reflect.defineProperty(target, method, replaced);
+      }
+    }
+  }
+
+  mut_consoleMuting.installed.clear();
+
+  mut_consoleMuting.target = undefined;
+};
+
+/**
+ * Run `run` with the console methods in {@link mutedConsoleMethods} dropping
+ * what is printed from inside it.
+ *
+ * The methods are replaced, for as long as any run is going, by wrappers that
+ * drop a call made from the run's async context and forward any other. So work
+ * running alongside still prints, and a module that keeps a reference to a
+ * wrapper (one Prettier loads during the run) goes on printing once the run
+ * ends.
+ */
+const withConsoleMuted = async <T,>(run: () => Promise<T>): Promise<T> => {
+  mut_consoleMuting.depth += 1;
+
+  try {
+    if (mut_consoleMuting.depth === 1) {
+      installConsoleWrappers();
+    }
+
+    return await consoleMutedContext.run(true, run);
+  } finally {
+    mut_consoleMuting.depth -= 1;
+
+    if (mut_consoleMuting.depth === 0) {
+      removeConsoleWrappers();
+    }
+  }
 };
 
 const defaultIgnoreFn = (filePath: string): boolean => {

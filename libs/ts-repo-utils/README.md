@@ -609,6 +609,8 @@ Both return whether the step should run, and, in GitHub Actions, append `should_
 
 ### Code Formatting Utilities
 
+With `silent: true` (`--silent` for the commands), these functions also drop what a Prettier plugin or bundled parser prints while it formats, because no Prettier option stops that. The calls dropped are `console.log`, `info`, `debug`, `dir`, `dirxml`, `table` and `warn` (and `assert`, `count`, `group` and `time*`, which Node prints through `log` or `warn`) made from inside the formatting run, which includes an `ignore` callback; the rest of the process prints as usual. `console.error` and `trace`, and direct writes to `process.stdout` or `process.stderr`, still get through.
+
 #### `formatFilesGlob(pathGlob: string, options?): Promise<Result<undefined, unknown>>`
 
 Formats files matching a glob pattern using Prettier.
