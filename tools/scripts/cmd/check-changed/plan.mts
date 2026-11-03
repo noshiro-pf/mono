@@ -1,6 +1,12 @@
 import { Arr, isRecord, isString } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { entryPointTargets } from '../assert-deps-built.mjs';
+// The gate's own matcher, so that what check-changed calls prose is what CI
+// skips. It lives in the gate's script rather than tools/scripts/lib/ because
+// that script runs under plain `node`, which resolves an import by the name
+// written, and the imports here name `.mjs` files that only tsx maps to `.mts`
+// (assert-deps-built.mts above is shared the same way, for the same reason).
+import { matchesGatePattern } from '../workflow-steps.mjs';
 /**
  * Which commands a set of changed paths needs: the pure half of
  * `check-changed`, which `main.mts` feeds with what git and the manifests say.
@@ -343,33 +349,6 @@ export const buildPlan = ({
 };
 
 /**
- * Whether a path matches one of the code gate's `--paths-ignore` patterns, in
- * the shapes that list uses: `dir/` (a directory prefix), `**.ext` (any file
- * with that extension, as micromatch reads it), `** /name` (that file name in
- * any directory, the root included) and a plain path.
- *
- * Any other shape throws, so that a pattern added to the gate and not
- * understood here is a loud failure rather than a quiet misfiling.
- */
-export const matchesGatePattern = (file: string, pattern: string): boolean => {
-  if (pattern.endsWith('/')) {
-    return file.startsWith(pattern);
-  }
-
-  if (pattern.startsWith('**.')) {
-    return file.endsWith(assertLiteral(pattern.slice('**'.length), pattern));
-  }
-
-  if (pattern.startsWith('**/')) {
-    return (
-      basename(file) === assertLiteral(pattern.slice('**/'.length), pattern)
-    );
-  }
-
-  return file === assertLiteral(pattern, pattern);
-};
-
-/**
  * Whether `check:cspell` reads a path: its glob takes in everything but
  * dot-directories and dotfiles, `.github/` excepted. A changeset is
  * `check:cspell:changeset`'s, under the config of the package it names, and
@@ -378,13 +357,6 @@ export const matchesGatePattern = (file: string, pattern: string): boolean => {
 export const isSpellCheckedByCi = (file: string): boolean =>
   file.startsWith('.github/') ||
   file.split('/').every((segment) => !segment.startsWith('.'));
-
-/**
- * The `--paths-ignore` values of a `z:check-should-run:*` script, read from its
- * command line so that the list is the gate's own.
- */
-export const parsePathsIgnore = (command: string): readonly string[] =>
-  Array.from(command.matchAll(PATHS_IGNORE), (match) => match[1] ?? '');
 
 export type PackageInfo = Readonly<{
   name: string;
@@ -626,16 +598,6 @@ const inBuildOrder = (pkgs: readonly PackageInfo[]): readonly PackageInfo[] => {
   return mut_ordered;
 };
 
-const assertLiteral = (literal: string, pattern: string): string => {
-  if (literal.includes('*') || literal.includes('/')) {
-    throw new Error(
-      `Unsupported code gate pattern: ${pattern}. Teach matchesGatePattern in tools/scripts/cmd/check-changed/plan.mts its shape.`,
-    );
-  }
-
-  return literal;
-};
-
 const basename = (file: string): string =>
   file.slice(file.lastIndexOf('/') + 1);
 
@@ -693,7 +655,5 @@ const MANIFEST_FILES: ReadonlySet<string> = new Set<string>([
   'pnpm-lock.yaml',
   'pnpm-workspace.yaml',
 ]);
-
-const PATHS_IGNORE = /--paths-ignore '([^']+)'/gu;
 
 const BUILD_OUTPUT = /^(?:\.\/)?dist\//u;

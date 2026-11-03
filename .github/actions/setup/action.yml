@@ -20,6 +20,12 @@ inputs:
       runs on unless it is checking another one.
     required: false
     default: ''
+  pnpm:
+    description: >-
+      `false` to set up Node.js alone, with no pnpm and no store cache, for a
+      job that runs only `node` on the tree. Takes `install: false` with it.
+    required: false
+    default: 'true'
   install:
     description: >-
       `false` to stop after setting up pnpm and Node.js, for a job that changes
@@ -39,6 +45,7 @@ runs:
   using: composite
   steps:
     - name: Install pnpm
+      if: inputs.pnpm != 'false'
       uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
 
     # `node-version` wins over `node-version-file` when both are given, and
@@ -48,7 +55,10 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
         node-version-file: ${{ case(inputs.node-version == '', 'package.json', '') }}
-        cache: 'pnpm'
+        cache: ${{ case(inputs.pnpm != 'false', 'pnpm', '') }}
+        # Without it, `packageManager` in package.json turns the pnpm cache on
+        # whatever `cache` says, and asks a pnpm that is not there for its store.
+        package-manager-cache: ${{ inputs.pnpm != 'false' }}
 
     # pnpm verifies the lockfile against the supply-chain policies of
     # pnpm-workspace.yaml on every install, which is most of an install from a
@@ -56,25 +66,24 @@ runs:
     # policies at least as strict. The record is per machine, so without this
     # every job verifies again. With it, a job skips the verification when a
     # job that finished before it started saved the record under this key: in
-    # a run, the jobs after `gates`. Jobs that start together, such as the
-    # `gates` of each workflow, each verify. Where a record may be read from,
-    # and so which pull requests reuse it, is in "Setup" in
-    # .github/workflows/README.md. A changed lockfile or policy misses the
-    # key, and so does another pnpm, whose record format or policies may
-    # differ: a record it ignored would otherwise be restored, ignored and
-    # never replaced, since a key is saved once. The path is where pnpm
-    # writes the record on Linux, read here once for both steps below; the
-    # install warns when pnpm wrote nothing there.
+    # code-check.yml, the matrix after `build`. Jobs that start together each
+    # verify. Where a record may be read from, and so which pull requests
+    # reuse it, is in "Setup" in .github/workflows/README.md. A changed
+    # lockfile or policy misses the key, and so does another pnpm, whose
+    # record format or policies may differ: a record it ignored would
+    # otherwise be restored, ignored and never replaced, since a key is saved
+    # once. The path is where pnpm writes the record on Linux, read here once
+    # for both steps below; the install warns when pnpm wrote nothing there.
     - name: Locate pnpm's lockfile verification record
       id: lockfile-record
-      if: inputs.install == 'true'
+      if: inputs.pnpm != 'false' && inputs.install == 'true'
       shell: bash
       run: |
         echo "path=${XDG_CACHE_HOME:-$HOME/.cache}/pnpm/lockfile-verified.jsonl" >> "$GITHUB_OUTPUT"
         echo "pnpm=$(pnpm --version)" >> "$GITHUB_OUTPUT"
 
     - name: Restore pnpm's lockfile verification record
-      if: inputs.install == 'true'
+      if: inputs.pnpm != 'false' && inputs.install == 'true'
       uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
       with:
         path: ${{ steps.lockfile-record.outputs.path }}
@@ -85,6 +94,7 @@ runs:
     - name: Install dependencies
       shell: bash
       env:
+        PNPM: ${{ inputs.pnpm }}
         INSTALL: ${{ inputs.install }}
         ENGINE_STRICT: ${{ inputs.engine-strict }}
         IGNORE_SCRIPTS: ${{ inputs.ignore-scripts }}

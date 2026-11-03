@@ -226,7 +226,8 @@ written, rather than every job that takes the steps.
   `node-support-update.yml`'s canary, `ignore-scripts` in `release.yml`'s
   publishing job, `install: false` in `pnpm-update.yml`, which changes pnpm
   before it installs anything, and in `deploy-firestore.yml` and
-  `e2e-production.yml`, which install one app rather than the workspace.
+  `e2e-production.yml`, which install one app rather than the workspace, and
+  `pnpm: false` in `check-gates.yml`, whose diff check runs on Node.js alone.
 - **The checkout stays in the caller.** A local action is read from the
   workspace, so it cannot be resolved before something has checked it out.
 - **A composite action is a file in the tree**, read when its step starts
@@ -248,17 +249,18 @@ written, rather than every job that takes the steps.
   records the result on the machine; the action caches that record, keyed on the
   pnpm version, the lockfile and `pnpm-workspace.yaml`. A job skips the
   verification only when a job that finished before it started saved the record
-  under that key. In a run, those are the jobs after `gates`, which saves it as
-  it ends; jobs that start together, such as the `gates` of each workflow, each
-  verify. A cache is read only from the ref that saved it, a pull request's base
-  branch and `main`, so a pull request that changes the lockfile verifies in the
-  `gates` of its first run and reuses the record from then on, and other pull
-  requests reuse it once the push to `main` that merges the lockfile has saved
-  it there. A pull request that changes none of the key's three inputs reuses
-  `main`'s from its first job. pnpm accepts a record only for the same lockfile
-  hash under policies at least as strict, so a restored one skips nothing that
-  has not passed. The install warns when pnpm wrote no record where the action
-  looks, because the cache would then save nothing and fail nothing.
+  under that key. In `code-check.yml` those are the matrix entries, after
+  `build`, which saves it as it ends; jobs that start together, such as the
+  matrix entries of the other workflows, each verify. `gates` installs nothing
+  (`pnpm: false`). A cache is read only from the ref that saved it, a pull
+  request's base branch and `main`, so a pull request that changes the lockfile
+  verifies in the first jobs of its first run and reuses the record from then
+  on, and other pull requests reuse it once a run on `main` after the merge has
+  saved it there. A pull request that changes none of the key's three inputs
+  reuses `main`'s from its first job. pnpm accepts a record only for the same
+  lockfile hash under policies at least as strict, so a restored one skips
+  nothing that has not passed. The install warns when pnpm wrote no record where
+  the action looks, because the cache would then save nothing and fail nothing.
 - **A composite action cannot read `secrets`.** None is needed: nothing
   installs from GitHub Packages any more, so no job points `setup-node` at it
   or passes `NODE_AUTH_TOKEN` to the install.
@@ -326,10 +328,17 @@ booted, since a job-level `if` is evaluated by GitHub itself:
   onto `main` when that layer merges. A pull request onto any other branch is
   checked as it is.
 - **A diff that touches nothing the workflow reads**, decided by
-  `check-should-run` from `ts-repo-utils` against one of the three
-  `z:check-should-run:*` ignore lists in the root `package.json`. The diff is
-  against the pull request's own base, so a stacked layer is judged on its own
-  changes; the layers below are judged on their own pull requests, and once
+  `workflow-steps.mts check-diff` against one of the three
+  `z:check-should-run:*` ignore lists in the root `package.json`, which it reads
+  from the script's command line rather than running it, so that the job needs
+  Node.js and nothing installed. A list holds single-quoted `--paths-ignore`
+  values of the shapes `matchesGatePattern` names, and the step fails on
+  anything else rather than reading it otherwise than the shell would. Running
+  the script by hand on a branch up to date with its base gives the same answer.
+  A deleted file counts, and a renamed one by both names, so that a diff that
+  only deletes code, or moves it onto a pattern, still runs the checks. The diff
+  is against the pull request's own base, so a stacked layer is judged on its
+  own changes; the layers below are judged on their own pull requests, and once
   they merge the layer's diff against `main` is the same set of changes.
 - **A verdict already reached on this tree**, which the work would only
   repeat.
@@ -467,11 +476,11 @@ on each time.
 
 #### Why a workflow of its own
 
-The answers need `pnpm install` (the gate is a program, not a glob match), so
-they cannot live in a job-level `if`, which GitHub evaluates from the event
-payload alone; hence a job that computes them and a caller that reads its
-outputs. `workflow_call` rather than the same shell copied into each
-workflow, because there is one answer to give and one place to change it.
+The answers need a checkout (the gate is a program, not a glob match), so they
+cannot live in a job-level `if`, which GitHub evaluates from the event payload
+alone; hence a job that computes them and a caller that reads its outputs.
+`workflow_call` rather than the same shell copied into each workflow, because
+there is one answer to give and one place to change it.
 
 This used to be a step inside every job, which meant every matrix runner in
 every check workflow booted, checked out and installed dependencies (about 45
