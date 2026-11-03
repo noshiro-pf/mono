@@ -12,23 +12,10 @@ import type {
   Point,
   SpringAdapter,
 } from '../../src/components/spring-demo/index.mjs';
-import {
-  type BenchmarkSeries,
-  formatBenchmarkCell,
-  writeBenchmarkResults,
-} from './benchmark-results.mjs';
-import { isMeasuringChild, measureEachInOwnProcess } from './own-process.mjs';
-import { resultsDir } from './paths.mjs';
 import { selectProductionBuilds } from './production-builds.mjs';
+import { runSeriesSweep } from './series-sweep.mjs';
 
 selectProductionBuilds();
-
-const WARMUP_ROUNDS = 2;
-
-const MEASURE_ROUNDS = 5;
-
-/** Abort if a single measurement exceeds this threshold */
-const TIMEOUT_MS = 5000;
 
 /** The chain depth {@link assertReacts} sets an adapter up with. */
 const VERIFY_DEPTH = 3;
@@ -97,14 +84,6 @@ const entries: readonly AdapterEntry[] = [
     createAdapter: adapters.createPreactSignalsThroughputAdapter,
   },
 ] as const;
-
-const median = (sorted: readonly number[]): number => {
-  const mid = Math.floor(sorted.length / 2);
-
-  return sorted.length % 2 === 0
-    ? ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2
-    : (sorted[mid] ?? 0);
-};
 
 /**
  * Run one measurement: setup adapter with given depth, push K updates, cleanup.
@@ -237,133 +216,25 @@ const assertReacts = (entry: AdapterEntry): void => {
   process.exit(1);
 };
 
-/**
- * Runs the measured rounds for a single parameter pair, bailing out as soon as a
- * round exceeds the timeout. Extracted into its own function so that the round
- * loop is not nested inside the entry/parameter loops.
- */
-const measureRounds = (
-  adapter: SpringAdapter,
-  k: number,
-  depth: number,
-): Readonly<{ times: readonly number[]; timedOut: boolean }> => {
-  const mut_times: number[] = [];
-
-  let mut_timedOut = false;
-
-  for (const _r of range(0, MEASURE_ROUNDS)) {
-    const elapsed = runOnce(adapter, k, depth);
-
-    mut_times.push(elapsed);
-
-    if (elapsed > TIMEOUT_MS) {
-      mut_timedOut = true;
-
-      break;
-    }
-  }
-
-  return { times: mut_times, timedOut: mut_timedOut };
-};
-
-/**
- * Measures every parameter pair for a single adapter, after
- * {@link assertReacts}, which ends the run if the adapter does not compute the
- * chain. Extracted into its own function so that the parameter loop is not
- * nested inside the entry loop.
- */
-const measureEntry = (entry: AdapterEntry): readonly (number | null)[] => {
-  const { label, createAdapter } = entry;
-
+await runSeriesSweep({
+  scriptUrl: import.meta.url,
+  title: 'Deep Chain Throughput',
+  // The sweep varies K itself.
+  updates: null,
+  points: PARAMS,
+  pointLabel: ([k, m]) => `K=${k.toString()}, M=${m.toString()}`,
+  entries,
   // In this library's own process (see `measureEachInOwnProcess`), so that the
   // shared `lerp` has seen no other library: the check adds only this library's
   // own points and the model's plain ones.
-  assertReacts(entry);
+  prepare: (entry) => {
+    assertReacts(entry);
 
-  const mut_values: (number | null)[] = [];
+    return ([k, depth]) => {
+      const adapter = entry.createAdapter();
 
-  let mut_skippingRest = false;
-
-  for (const [k, depth] of PARAMS) {
-    if (mut_skippingRest) {
-      mut_values.push(null);
-
-      continue;
-    }
-
-    const adapter = createAdapter();
-
-    // Warmup
-    for (const _w of range(0, WARMUP_ROUNDS)) {
-      runOnce(adapter, k, depth);
-    }
-
-    // Measure
-    const { times, timedOut } = measureRounds(adapter, k, depth);
-
-    if (timedOut) {
-      mut_values.push(null);
-
-      mut_skippingRest = true;
-
-      console.info(
-        `  ⏱ ${label} K=${k.toString()} M=${depth.toString()}: TIMEOUT (> ${TIMEOUT_MS.toString()} ms)`,
-      );
-    } else {
-      const sorted = times.toSorted((a, b) => a - b);
-
-      const med = median(sorted);
-
-      mut_values.push(med);
-
-      console.info(
-        `  ✓ ${label} K=${k.toString()} M=${depth.toString()}: ${med.toFixed(1)} ms`,
-      );
-    }
-  }
-
-  return mut_values;
-};
-
-if (!isMeasuringChild) {
-  console.info(
-    `\n## Deep Chain Throughput (${WARMUP_ROUNDS.toString()} warmup + ${MEASURE_ROUNDS.toString()} measured, timeout=${TIMEOUT_MS.toString()} ms)\n`,
-  );
-}
-
-// Column headers
-const colHeaders = PARAMS.map(
-  ([k, m]) => `K=${k.toString()}, M=${m.toString()}`,
-);
-
-const mut_series: BenchmarkSeries[] = [];
-
-const mut_tableLines: string[] = [
-  `| Library | ${colHeaders.join(' | ')} |`,
-  `| ------- | ${PARAMS.map(() => '----------:').join(' | ')} |`,
-];
-
-const measured = await measureEachInOwnProcess(
-  import.meta.url,
-  entries,
-  measureEntry,
-);
-
-for (const [entry, values] of measured) {
-  mut_series.push({ label: entry.label, values });
-
-  mut_tableLines.push(
-    `| ${entry.label} | ${values.map((v) => formatBenchmarkCell(v, TIMEOUT_MS)).join(' | ')} |`,
-  );
-}
-
-const tableContent = mut_tableLines.join('\n');
-
-console.info(`\n${tableContent}`);
-
-await writeBenchmarkResults(resultsDir, 'results-deep-chain.md', tableContent, {
-  kind: 'series',
-  meta: { updates: null, timeoutMs: TIMEOUT_MS },
-  xLabels: colHeaders,
-  series: mut_series,
+      return () => runOnce(adapter, k, depth);
+    };
+  },
+  resultsFile: 'results-deep-chain.md',
 });
