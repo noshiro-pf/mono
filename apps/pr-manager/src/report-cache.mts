@@ -32,8 +32,23 @@ export const createReportCache = ({
   build,
   read,
   write,
+  fingerprint = sha256,
 }: ReportCacheDeps): ReportCache => {
   const key = reportCacheKey(source);
+
+  /**
+   * Every write, chained in the order `save` and `clear` were called, and a
+   * `save` dropped once a later call supersedes it: a `save` still hashing its
+   * token when `clear` is called would otherwise write after it, and keep the
+   * report `clear` was there to forget.
+   */
+  const mut_writes = { last: Promise.resolve(), calls: 0 };
+
+  const enqueue = (next: () => Promise<void>): void => {
+    mut_writes.calls += 1;
+
+    mut_writes.last = mut_writes.last.then(next).catch(() => undefined);
+  };
 
   return {
     load: async (token) => {
@@ -47,16 +62,20 @@ export const createReportCache = ({
         : undefined;
     },
     save: (report, token) => {
-      fingerprint(token)
-        .then(async (tokenHash) =>
-          tokenHash === undefined
-            ? undefined
-            : write(key, { build, tokenHash, report } satisfies Kept),
-        )
-        .catch(() => undefined);
+      const hashed = fingerprint(token).catch(() => undefined);
+
+      const call = mut_writes.calls + 1;
+
+      enqueue(async () => {
+        const tokenHash = await hashed;
+
+        if (tokenHash !== undefined && call === mut_writes.calls) {
+          await write(key, { build, tokenHash, report } satisfies Kept);
+        }
+      });
     },
     clear: () => {
-      write(key, undefined).catch(() => undefined);
+      enqueue(() => write(key, undefined));
     },
   };
 };
@@ -81,6 +100,11 @@ export type ReportCacheDeps = Readonly<{
   build: string;
   read: (key: string) => Promise<unknown>;
   write: (key: string, value: unknown) => Promise<void>;
+  /**
+   * What a token is kept as, or `undefined` where it cannot be hashed; the
+   * SHA-256 of it unless a test holds it open.
+   */
+  fingerprint?: (token: string) => Promise<string | undefined>;
 }>;
 
 type Kept = Readonly<{
@@ -93,7 +117,7 @@ type Kept = Readonly<{
  * The SHA-256 of `token`, in hex; `undefined` where the browser will not hash
  * (a page served over plain HTTP has no `crypto.subtle`).
  */
-const fingerprint = async (token: string): Promise<string | undefined> => {
+const sha256 = async (token: string): Promise<string | undefined> => {
   try {
     const encoder = new TextEncoder();
 
