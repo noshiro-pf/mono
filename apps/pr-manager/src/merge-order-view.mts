@@ -29,6 +29,9 @@
  * name it does not know is dropped, so a URL written by an older page, or
  * edited by hand, still opens.
  *
+ * **Searched for on GitHub** ({@link githubSearchOf}) as far as GitHub's search
+ * can say it, for the block's "on GitHub" link.
+ *
  * A draft is not one of the statuses: it is always shown, and its badge on the
  * card says what it is. Nor is being behind the base, which the card's ahead /
  * behind bar says. A choice saved while either was one drops it.
@@ -41,9 +44,11 @@ import {
 } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { anyLabelQualifier, notLabelQualifier } from './label-search.mjs';
 import type { Entry, PageSummary } from './load-report.mjs';
 import {
   PRIORITIES,
+  PRIORITY_LABELS,
   PRIORITY_RANK,
   priorityOf,
   type Priority,
@@ -360,6 +365,92 @@ export const withSort = (
   sort: MergeOrderSort,
 ): MergeOrderView => ({ ...view, sort }) as const;
 
+/** The view as a GitHub pull request search, as far as one can say it. */
+export type MergeOrderSearch = Readonly<{
+  /** What to add to `is:pr is:open`. */
+  qualifiers: readonly string[];
+  /**
+   * The statuses switched off that the search cannot leave out, so that
+   * GitHub lists those too.
+   */
+  unhidden: readonly StatusFilter[];
+  /**
+   * The statuses picked, when the search cannot pick them, so that GitHub lists
+   * the rest too.
+   */
+  unpicked: readonly StatusFilter[];
+}>;
+
+/**
+ * The qualifiers GitHub's search narrows to what the view shows.
+ *
+ * `queued` and `pending` are labels, and so are the priorities: one switched
+ * off is `-label:`, and those picked are one `label:` listing them, which
+ * GitHub reads as any of them. `failing`, `set aside` and `awaiting code owner`
+ * are the page's own reading of checks, `unblock-prs`'s comments and the
+ * ruleset — `status:` and `review:` read GitHub's, which say something else —
+ * so one switched off is left out, and picking one of them leaves out the
+ * picking altogether, since "queued or failing" is no search GitHub has.
+ *
+ * `none` switched off asks for one of the priority labels. A pull request
+ * carrying several, which the page counts as `none`, is where the two can still
+ * differ, either way. The order is not searched for: GitHub has no merge order.
+ */
+export const githubSearchOf = (view: MergeOrderView): MergeOrderSearch => {
+  const hiddenLabels = labelsOf(view.hiddenStatuses).map(notLabelQualifier);
+
+  const pickedLabels = labelsOf(view.onlyStatuses);
+
+  const isPickingSearchable = pickedLabels.length === view.onlyStatuses.length;
+
+  const priorities = [
+    ...PRIORITY_LABELS.filter(([priority]) =>
+      view.hiddenPriorities.includes(priority),
+    ).map(([, label]) => notLabelQualifier(label)),
+    ...(view.hiddenPriorities.includes('none')
+      ? ([
+          anyLabelQualifier(PRIORITY_LABELS.map(([, label]) => label)),
+        ] as const)
+      : ([] as const)),
+  ] as const;
+
+  return {
+    qualifiers: [
+      ...hiddenLabels,
+      ...(isPickingSearchable && Arr.isNonEmpty(pickedLabels)
+        ? [anyLabelQualifier(pickedLabels)]
+        : []),
+      ...priorities,
+    ],
+    unhidden: view.hiddenStatuses.filter(
+      (filter) => STATUS_LABELS[filter] === undefined,
+    ),
+    unpicked: isPickingSearchable ? [] : view.onlyStatuses,
+  } as const;
+};
+
+/**
+ * The "on GitHub" link's tooltip: what it lists, and where it lists more than
+ * the page does.
+ */
+export const githubSearchTitle = ({
+  unhidden,
+  unpicked,
+}: MergeOrderSearch): string =>
+  [
+    'The open pull requests as the filters leave them, in no merge order.',
+    ...(Arr.isNonEmpty(unhidden)
+      ? [
+          `GitHub's search cannot leave out ${namesOf(unhidden)}, so it lists those too.`,
+        ]
+      : []),
+    ...(Arr.isNonEmpty(unpicked)
+      ? [
+          `GitHub's search cannot pick ${namesOf(unpicked)}, so it lists the rest too.`,
+        ]
+      : []),
+  ].join(' ');
+
 /**
  * The view the query string asks for. A status both switched off and picked,
  * which only a hand can write, is switched off.
@@ -418,6 +509,35 @@ export const toggled = <T extends string>(
 ): readonly T[] =>
   all.filter((each) => (each === item) !== current.includes(each));
 
+/**
+ * The label each status is, where it is one: what the page tests for and what
+ * {@link githubSearchOf} asks GitHub for, so the two cannot name different
+ * ones.
+ */
+const STATUS_LABELS = {
+  queued: MERGE_QUEUED_LABEL,
+  failing: undefined,
+  setAside: undefined,
+  awaitingReview: undefined,
+  pending: PENDING_LABEL,
+} as const satisfies ReadonlyRecord<StatusFilter, string | undefined>;
+
+/** The labels of those of `filters` that are labels. */
+const labelsOf = (filters: readonly StatusFilter[]): readonly string[] =>
+  Arr.generate(function* () {
+    for (const filter of filters) {
+      const label: string | undefined = STATUS_LABELS[filter];
+
+      if (label !== undefined) {
+        yield label;
+      }
+    }
+  });
+
+/** “queued”, “failing” */
+const namesOf = (filters: readonly StatusFilter[]): string =>
+  filters.map((filter) => `“${STATUS_NAMES[filter]}”`).join(', ');
+
 const countUnder = (
   entries: readonly Entry[],
   under: (entry: Entry) => boolean,
@@ -442,12 +562,12 @@ const shownByStatus = (
 /** The same tests `summarize` and `load-report.mts` count with. */
 const STATUS_TESTS = {
   queued: (entry) =>
-    entry.labels.some((label) => label.name === MERGE_QUEUED_LABEL),
+    entry.labels.some((label) => label.name === STATUS_LABELS.queued),
   failing: (entry) => entry.checks.verdict === 'failing',
   setAside: (entry) => entry.setAside?.current === true,
   awaitingReview: (entry) => entry.codeOwnerReview.state === 'required',
   pending: (entry) =>
-    entry.labels.some((label) => label.name === PENDING_LABEL),
+    entry.labels.some((label) => label.name === STATUS_LABELS.pending),
 } as const satisfies ReadonlyRecord<StatusFilter, (entry: Entry) => boolean>;
 
 const PARAM = {

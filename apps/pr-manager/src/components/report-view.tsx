@@ -3,6 +3,7 @@ import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { openPullRequestsUrl } from '../github-links.mjs';
 import type { BlockId } from '../layout.mjs';
+import { githubSearchTitle } from '../merge-order-view.mjs';
 import { isUnread, OPEN_PARTS } from '../part-failures.mjs';
 import { mergeOrderStore, reader, reportSource } from '../store/index.mjs';
 import { BlockLayout } from './block-layout.js';
@@ -42,7 +43,10 @@ const blocks: ReadonlyRecord<BlockId, JSX.Element> = {
           <h2 class={constant('section-title')}>
             {constant('Merge order ')}
             <ExternalLink
-              href={constant(openPullRequestsUrl(reportSource))}
+              href={view(mergeOrderStore.search, ({ qualifiers }) =>
+                openPullRequestsUrl(reportSource, qualifiers),
+              )}
+              title={view(mergeOrderStore.search, githubSearchTitle)}
               variant={'section-link'}
             >
               {constant('on GitHub')}

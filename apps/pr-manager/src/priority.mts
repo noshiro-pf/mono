@@ -146,7 +146,8 @@ export const ISSUE_TIER_RANK = {
   close: 7,
 } as const satisfies ReadonlyRecord<IssueTier, number>;
 
-const PRIORITY_LABELS = [
+/** The labels the priorities other than `none` are read from. */
+export const PRIORITY_LABELS = [
   ['high', PRIORITY_HIGH_LABEL],
   ['mid', PRIORITY_MID_LABEL],
   ['low', PRIORITY_LOW_LABEL],

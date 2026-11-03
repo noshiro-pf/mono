@@ -17,6 +17,16 @@ describe(openPullRequestsUrl, () => {
     );
   });
 
+  test('narrowed by what the merge order is filtered by', () => {
+    assert.strictEqual(
+      openPullRequestsUrl(SOURCE, [
+        '-label:"pending"',
+        '-label:"priority:low"',
+      ]),
+      'https://github.com/noshiro-pf/mono/pulls?q=is%3Apr+is%3Aopen+-label%3A%22pending%22+-label%3A%22priority%3Alow%22',
+    );
+  });
+
   test('follows the repository the page reads', () => {
     assert.strictEqual(
       openPullRequestsUrl(OTHER_SOURCE),
@@ -46,6 +56,13 @@ describe(openIssuesUrl, () => {
     assert.strictEqual(
       openIssuesUrl(SOURCE),
       'https://github.com/noshiro-pf/mono/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc',
+    );
+  });
+
+  test('narrowed by what the block is filtered by', () => {
+    assert.strictEqual(
+      openIssuesUrl(SOURCE, ['label:"bug"']),
+      'https://github.com/noshiro-pf/mono/issues?q=is%3Aissue+is%3Aopen+label%3A%22bug%22+sort%3Aupdated-desc',
     );
   });
 });

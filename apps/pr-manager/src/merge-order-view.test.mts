@@ -10,6 +10,8 @@ import {
   arrangeMergeOrder,
   countView,
   DEFAULT_MERGE_ORDER_VIEW,
+  githubSearchOf,
+  githubSearchTitle,
   isShown,
   mergeOrderViewFromSearch,
   searchWithMergeOrderView,
@@ -21,6 +23,7 @@ import {
   toggleStatus,
   withAvailable,
   withSort,
+  type MergeOrderSearch,
   type MergeOrderView,
 } from './merge-order-view.mjs';
 
@@ -468,6 +471,109 @@ describe(withAvailable, () => {
   });
 });
 
+describe(githubSearchOf, () => {
+  test('with nothing switched off or picked, is every open pull request', () => {
+    assert.deepStrictEqual(searchFor({}), {
+      qualifiers: [],
+      unhidden: [],
+      unpicked: [],
+    });
+  });
+
+  test('a label status switched off is a negated label', () => {
+    assert.deepStrictEqual(
+      searchFor({ hiddenStatuses: ['queued', 'pending'] }),
+      {
+        qualifiers: ['-label:"merge-queued"', '-label:"pending"'],
+        unhidden: [],
+        unpicked: [],
+      },
+    );
+  });
+
+  test('label statuses picked are one label qualifier, which GitHub reads as either', () => {
+    assert.deepStrictEqual(searchFor({ onlyStatuses: ['queued', 'pending'] }), {
+      qualifiers: ['label:"merge-queued","pending"'],
+      unhidden: [],
+      unpicked: [],
+    });
+  });
+
+  test('a status that is not a label is left to the page, and said to be', () => {
+    assert.deepStrictEqual(
+      searchFor({ hiddenStatuses: ['failing', 'pending', 'setAside'] }),
+      {
+        qualifiers: ['-label:"pending"'],
+        unhidden: ['failing', 'setAside'],
+        unpicked: [],
+      },
+    );
+  });
+
+  test('picking one that is not a label leaves the picking out altogether', () => {
+    // "queued or failing" is no search GitHub has.
+    assert.deepStrictEqual(
+      searchFor({ onlyStatuses: ['queued', 'awaitingReview'] }),
+      {
+        qualifiers: [],
+        unhidden: [],
+        unpicked: ['queued', 'awaitingReview'],
+      },
+    );
+  });
+
+  test('a priority switched off is its label negated', () => {
+    assert.deepStrictEqual(searchFor({ hiddenPriorities: ['low', 'mid'] }), {
+      qualifiers: ['-label:"priority:mid"', '-label:"priority:low"'],
+      unhidden: [],
+      unpicked: [],
+    });
+  });
+
+  test('"none" switched off asks for one of the priority labels', () => {
+    assert.deepStrictEqual(searchFor({ hiddenPriorities: ['none', 'low'] }), {
+      qualifiers: [
+        '-label:"priority:low"',
+        'label:"priority:high","priority:mid","priority:low"',
+      ],
+      unhidden: [],
+      unpicked: [],
+    });
+  });
+
+  test('the order is not a search', () => {
+    assert.deepStrictEqual(searchFor({ sort: 'priority' }), {
+      qualifiers: [],
+      unhidden: [],
+      unpicked: [],
+    });
+  });
+});
+
+describe(githubSearchTitle, () => {
+  test('says what GitHub cannot leave out, and what it cannot pick', () => {
+    assert.strictEqual(
+      githubSearchTitle({
+        qualifiers: [],
+        unhidden: ['failing', 'setAside'],
+        unpicked: ['queued', 'awaitingReview'],
+      }),
+      "The open pull requests as the filters leave them, in no merge order. GitHub's search cannot leave out “failing”, “set aside”, so it lists those too. GitHub's search cannot pick “queued”, “awaiting code owner”, so it lists the rest too.",
+    );
+  });
+
+  test('with nothing left out, says only what it lists', () => {
+    assert.strictEqual(
+      githubSearchTitle({
+        qualifiers: ['-label:pending'],
+        unhidden: [],
+        unpicked: [],
+      }),
+      'The open pull requests as the filters leave them, in no merge order.',
+    );
+  });
+});
+
 describe(mergeOrderViewFromSearch, () => {
   test('reads back what was written', () => {
     const view: MergeOrderView = {
@@ -540,6 +646,9 @@ describe(searchWithMergeOrderView, () => {
     );
   });
 });
+
+const searchFor = (view: Partial<MergeOrderView>): MergeOrderSearch =>
+  githubSearchOf({ ...DEFAULT_MERGE_ORDER_VIEW, ...view });
 
 const node = (
   number: number,

@@ -116,6 +116,28 @@ describe(createMergeOrderStore, () => {
       [1],
     );
   });
+
+  test('says the view as a GitHub search, as it applies to the repository', () => {
+    const { store, setQueue } = setup();
+
+    store.toggleStatus('queued');
+
+    store.toggleStatus('failing');
+
+    assert.deepStrictEqual(store.search.getSnapshot().value, {
+      qualifiers: ['-label:"merge-queued"'],
+      unhidden: ['failing'],
+      unpicked: [],
+    });
+
+    setQueue(false);
+
+    assert.deepStrictEqual(store.search.getSnapshot().value, {
+      qualifiers: [],
+      unhidden: ['failing'],
+      unpicked: [],
+    });
+  });
 });
 
 const STORED: MergeOrderView = {
