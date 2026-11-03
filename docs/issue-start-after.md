@@ -117,17 +117,31 @@ issue の着手状態は、次のうち最初に当てはまるもの。
 は着手を示すが、それができるまでの間、着手済みの issue は未着手と見分けがつかず、
 別の作業者が同じ issue を拾ってしまう。
 
-- **着手するときは `pnpm run start-issue -- <N>` を実行する**（`pr-merge-queue` の
-  `start-issue`）。`in-progress` を付け、`planned` を外す。
-- **既に `in-progress` が付いているか、閉じる開いた pull request があると拒否する。**
-  誰かが作業中かもしれないので、着手するかどうかは人が決める。続けてよいと言われた
-  ときだけ `--force` を付けて再実行する。
-- 作業をやめたときは `--release` で外す。マージで issue が閉じれば、ラベルは
-  そのまま残っても意味を持たない。
+- **着手するときは `pnpm run start-issue -- <N> --by <session URL>` を実行する**
+  （`pr-merge-queue` の `start-issue`）。`in-progress` を付け、`planned` を外し、
+  誰が着手したかを claim コメントに書く。`--by` は session URL か、自分だけが
+  使う任意の語。
+- **他の誰かの claim があるか、claim の無い `in-progress` が付いているか、閉じる
+  開いた pull request があると拒否する。** 拒否の理由には claim した人と時刻が
+  出る。誰かが作業中かもしれないので、着手するかどうかは人が決める。続けてよいと
+  言われたときだけ `--force` を付けて再実行する。同じ `--by` での再実行は通る。
+- 作業をやめたときは `--release` で外す。他の誰かの claim は `--force` を
+  付けないと外せない。マージで issue が閉じれば、ラベルも claim もそのまま残って
+  意味を持たない。
 
-**`planned` ラベルは、次に着手するつもりの issue に人が付ける。** 何も止めず、
-何を始めるか選ぶ人に「これは予定が入っている」と伝えるだけ。`start-issue` が
-`in-progress` と入れ替える。
+**`planned` ラベルは、次に着手するつもりの issue に付ける。** 何も止めず、
+何を始めるか選ぶ人に「これは予定が入っている」と伝えるだけ。session が付けるときは
+`start-issue -- <N> --by <session URL> --plan` を使い、誰の予定かを claim に残す。
+予定の claim は 24 時間で失効する（`pr-report-core` の
+`PLANNED_CLAIM_LIFETIME_HOURS`）。同じ claimant が `start-issue` を実行すると
+`in-progress` と入れ替わる。人が手で付けた `planned` は誰のものとも読めないので、
+`--plan` は `--force` 無しでは上書きしない。
+
+**claim は issue に 1 つのコメントとして、トークンのアカウントが書く**
+（`pr-report-core` の `issue-claim.mts`）。1 行目は隠しレコード、2 つ目以降は
+人向けの文。全 session が同じアカウントで書くのでラベルや assignee では誰かを
+区別できず、ラベルには順序が無いので同時の着手も見分けられない。コメントは
+書いた後に読み直し、最も古い claim コメントが名指す側だけがラベルを付ける。
 
 ## pull request への引き継ぎ
 

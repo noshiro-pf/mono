@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { IN_PROGRESS_LABEL } from 'pr-report-core';
@@ -81,7 +82,7 @@ import { hitItsCap, judgeIssueSession, type IssueAfter } from './verdict.mjs';
  * and removes after ({@link runPool} says when the next one starts), so that no
  * session works in the checkout the others start from. Two sessions are never on one issue: the pool
  * keeps one it is running out of the next look, and `start-issue` refuses one
- * labelled `in-progress` by another run of the command.
+ * another run of the command claimed.
  *
  * **What a session may spend follows what issues cost.** Until one resolves its
  * issue, sessions run one at a time, each capped at a quarter of
@@ -154,7 +155,12 @@ export const runIssueResolver = async (
     );
   }
 
-  const shared: Shared = { root, env, inRepo: oneAtATime() } as const;
+  const shared: Shared = {
+    root,
+    env,
+    inRepo: oneAtATime(),
+    claimant: `run-issue-resolver-${randomUUID().slice(0, 8)}`,
+  } as const;
 
   installStopHandlers();
 
@@ -386,6 +392,11 @@ type Shared = Readonly<{
    * together would contend for its refs and its worktree records.
    */
   inRepo: <T>(task: () => Promise<T>) => Promise<T>;
+  /**
+   * Who `start-issue` says started each issue: this run of the command, which
+   * is what releases it again.
+   */
+  claimant: string;
 }>;
 
 /** What a session on `next` is started with, but for its directory. */
@@ -519,7 +530,9 @@ const runIssue = async (
   // command put on is one it may take off again.
   const started = await startIssue({
     number: next.number,
+    by: shared.claimant,
     mode: 'start',
+    force: false,
   }).catch((error: unknown) => Result.err(unknownToString(error)));
 
   if (Result.isErr(started)) {
@@ -571,13 +584,15 @@ const runIssue = async (
   if (release) {
     const released = await startIssue({
       number: next.number,
+      by: shared.claimant,
       mode: 'release',
+      force: false,
     }).catch((error: unknown) => Result.err(unknownToString(error)));
 
     log(
       Result.isOk(released)
         ? released.value
-        : `#${next.number}: cannot take ${IN_PROGRESS_LABEL} off; \`start-issue -- ${next.number} --release\` does: ${released.value}`,
+        : `#${next.number}: cannot take ${IN_PROGRESS_LABEL} off; \`start-issue -- ${next.number} --by ${shared.claimant} --release\` does: ${released.value}`,
     );
   }
 

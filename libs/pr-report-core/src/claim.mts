@@ -113,7 +113,7 @@ export const claimApplies = (
  * Further than that is a clock that would otherwise stretch the lifetime by
  * however far ahead it ran.
  */
-const CLOCK_SKEW_MINUTES = 5;
+export const CLOCK_SKEW_MINUTES = 5;
 
 const MS_PER_MINUTE = 60_000;
 
