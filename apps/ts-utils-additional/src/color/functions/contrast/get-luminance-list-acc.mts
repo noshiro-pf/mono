@@ -8,13 +8,18 @@ import {
 } from 'ts-data-forge';
 import type { NonEmptyArray } from 'ts-type-forge';
 
+/**
+ * @param useLog Accumulate the differences of the log of the corrected
+ *   luminance (the default) rather than of the corrected luminance itself.
+ */
 export const getLuminanceListAccumulated = (
   luminanceList: NonEmptyArray<NonNegativeFiniteNumber>,
+  useLog: boolean = true,
 ): NonEmptyArray<NonNegativeFiniteNumber> => {
   /* +0.05はコントラスト比計算時に足される補正項  */
   const luminanceListCorrected: NonEmptyArray<FiniteNumber> = Arr.map(
     luminanceList,
-    (v) => asFiniteNumber(Math.log(v + 0.05)),
+    (v) => asFiniteNumber(useLog ? Math.log(v + 0.05) : v + 0.05),
   );
 
   // `.slice(1)` rather than `Arr.rest`, and the intermediate results are
