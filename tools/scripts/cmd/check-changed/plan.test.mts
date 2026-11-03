@@ -375,6 +375,20 @@ describe('buildPlan', () => {
   });
 
   test.each([
+    'tools/scripts/cmd/gen-dependency-graph.mts',
+    'docs/package-dependencies.md',
+  ])('%s regenerates the dependency graph', (file) => {
+    assert.include(commandsOf([file]), 'run gen:deps-graph');
+  });
+
+  test('a source file does not regenerate the dependency graph', () => {
+    assert.notInclude(
+      commandsOf(['libs/ts-data-forge/src/array.mts']),
+      'run gen:deps-graph',
+    );
+  });
+
+  test.each([
     'libs/ts-data-forge/LICENSE',
     'LICENSE',
     'tools/scripts/cmd/gen-license-files.mts',

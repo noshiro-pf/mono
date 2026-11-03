@@ -335,6 +335,7 @@ const ROOT_SAMPLES = [
   'pnpm-lock.yaml',
   'LICENSE',
   'docs/sample.md',
+  'docs/package-dependencies.md',
   '.markdownlint-cli2.mjs',
   '.cspell.config.yaml',
   '.prettierrc',

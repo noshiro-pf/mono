@@ -29,14 +29,15 @@ by case. In order:
 1. **Format** the diff (`z:format-diff-from <base>`), so that a generator's
    own `fix:fmt` is not later blamed for formatting a hand-edited file.
 2. **Generators**: `gen` in every touched package, `gen:deps-graph` for a
-   manifest or the lockfile, `gen:license-files` for a manifest, the lockfile, a
-   `LICENSE` or its generator, and `gen:verify-npm-packages` for any change that
-   is not prose alone, since its committed `local/` copies are written from
-   `smoke/`, the manifests and the generator's own code. **A generator that
-   changes the tree fails the run**, naming itself and the files; that is the
-   dirty tree CI's `assert-repo-is-clean` reports with no hint which generator
-   wrote it. Only the run in which it writes fails: a later run cannot tell its
-   output, left uncommitted, from a hand edit, so commit it before moving on.
+   manifest, the lockfile, its generator or its output, `gen:license-files` for
+   a manifest, the lockfile, a `LICENSE` or its generator, and
+   `gen:verify-npm-packages` for any change that is not prose alone, since its
+   committed `local/` copies are written from `smoke/`, the manifests and the
+   generator's own code. **A generator that changes the tree fails the run**,
+   naming itself and the files; that is the dirty tree CI's
+   `assert-repo-is-clean` reports with no hint which generator wrote it. Only
+   the run in which it writes fails: a later run cannot tell its output, left
+   uncommitted, from a hand edit, so commit it before moving on.
    After the touched packages' own, `gen` runs in every member that declares (in
    any dependency field) a package whose code changed, since a generator can
    read what its package declares: the synstate docs measure synstate's bundle
