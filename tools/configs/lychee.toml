@@ -27,6 +27,10 @@ exclude = [
     '^https://(www\.)?npmjs\.com/',
     # The ACM Digital Library answers a runner with 403 (a bot check).
     '^https://dl\.acm\.org/',
+    # Infoscience (EPFL) answers a runner with 405 on its item pages, and on
+    # the `/record/` links it had before them. Its `/server/api/` file links
+    # answer, so they are still checked.
+    '^https://infoscience\.epfl\.ch/(items|record)/',
     # Google Docs answers a client with no Google sign-in with 401, which
     # cannot tell a page that is gone from one shared with sign-in only.
     '^https://docs\.google\.com/',
