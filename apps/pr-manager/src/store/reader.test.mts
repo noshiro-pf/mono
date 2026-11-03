@@ -2,7 +2,12 @@ import { createState, source, type SourceObservable } from 'synstate';
 import { Result } from 'ts-data-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
 import type { Answered } from '../graphql.mjs';
-import type { IssueList, LoadedReport, Merged } from '../load-report.mjs';
+import type {
+  IssueList,
+  KnownParts,
+  LoadedReport,
+  Merged,
+} from '../load-report.mjs';
 import { LOADING, READY, type LoadStatus } from '../load-state.mjs';
 import type { RateLimit } from '../rate-limit.mjs';
 import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from '../report-query.mjs';
@@ -433,6 +438,42 @@ describe(createReader, () => {
     assert.strictEqual(reader.readAt.getSnapshot().value, 0);
   });
 
+  test('hands each read what the last one shown had, until the token changes', async () => {
+    const { reader, loads, clock, setToken } = setup(TOKEN_A);
+
+    reader.start();
+
+    assert.isUndefined(loads[0]?.previous);
+
+    const parts: KnownParts = { merged: [MERGED] } as const;
+
+    const failed = {
+      issues: { message: 'timed out', kept: false },
+    } as const;
+
+    await answer(
+      loads,
+      0,
+      Result.ok({ ...readAt(1_000), parts, failed }),
+      LIMIT,
+    );
+
+    // Each panel says what of it failed; the page as a whole is not a failure.
+    assert.deepStrictEqual(reader.failed.getSnapshot().value, failed);
+
+    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, READY);
+
+    clock.set(2_000);
+
+    reader.refresh();
+
+    assert.strictEqual(loads[1]?.previous, parts);
+
+    setToken(TOKEN_B);
+
+    assert.isUndefined(loads[2]?.previous);
+  });
+
   test('refresh marks the report as refreshing and reads at once', async () => {
     const { reader, loads, clock } = setup(TOKEN_A);
 
@@ -699,6 +740,32 @@ describe(createReader, () => {
       assert.strictEqual(loads[1]?.issueCount, ISSUES_LIMIT + ISSUES_PAGE_SIZE);
     });
 
+    test('hands the page to the next read, which keeps it if its issues fail', async () => {
+      const { reader, loads, issueLoads, timers } = setup(TOKEN_A);
+
+      reader.start();
+
+      const first = withIssues(1_000, [1], 'c1');
+
+      await answer(
+        loads,
+        0,
+        Result.ok({ ...first, parts: { issues: first.issues } }),
+        LIMIT,
+      );
+
+      reader.loadMoreIssues();
+
+      await answerIssues(issueLoads, 0, Result.ok(issueList([2], 'c2')));
+
+      timers.fire(POLL_INTERVAL_MS);
+
+      assert.deepStrictEqual(
+        loads[1]?.previous?.issues?.items.map(({ number }) => number),
+        [1, 2],
+      );
+    });
+
     test('asks once while a page is out', async () => {
       const { reader, loads, issueLoads } = setup(TOKEN_A);
 
@@ -891,6 +958,7 @@ type PendingLoad = Readonly<{
   token: string;
   nowMs: number;
   issueCount: number;
+  previous: KnownParts | undefined;
   onProgress: ((report: LoadedReport) => void) | undefined;
   resolve: (answered: Answered<LoadedReport>) => void;
   reject: (error: unknown) => void;
@@ -981,12 +1049,13 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
 
   const reader = createReader({
     token,
-    load: (tokenValue, nowMs, issueCount, onProgress) =>
+    load: (tokenValue, nowMs, issueCount, previous, onProgress) =>
       new Promise((resolve, reject) => {
         mut_loads.push({
           token: tokenValue,
           nowMs,
           issueCount,
+          previous,
           onProgress,
           resolve,
           reject,
@@ -1171,6 +1240,8 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
     },
     queue: undefined,
     reading: [],
+    failed: {},
+    parts: {},
   }) as const;
 
 const issueList = (

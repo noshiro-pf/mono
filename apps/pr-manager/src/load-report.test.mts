@@ -292,7 +292,7 @@ describe(loadReport, () => {
     );
   });
 
-  test('leaves the checks being read when they are of another head', async () => {
+  test('gives no verdict over checks of another head, and says the next read has them', async () => {
     const { fetchImpl } = answering(
       {
         ...report([pullRequest({ number: 7, headRefOid: 'pushed' })]),
@@ -311,20 +311,27 @@ describe(loadReport, () => {
 
     const loaded = await load(fetchImpl);
 
-    assert.deepStrictEqual(loaded.entries[0]?.reading, ['checks']);
+    assert.deepStrictEqual(loaded.entries[0]?.reading, []);
+
+    assert.include(loaded.entries[0]?.checksUnread, 'the next read has them');
 
     assert.isUndefined(loaded.summary.failing);
   });
 
-  test('fails the read when a part does, after handing over what answered', async () => {
+  test('says which part failed, and draws the rest from what answered', async () => {
     const mut_progress: LoadedReport[] = [];
 
     const { fetchImpl } = answering(
       {
-        ...report([pullRequest({ number: 7 })]),
+        ...report(
+          [pullRequest({ number: 7 })],
+          [merged(1, '2026-09-20T00:00:00Z')],
+        ),
         Checks: [{ data: null, errors: [{ message: 'Something went wrong' }] }],
       },
-      answer('Compare', { compare_7: null }),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
     );
 
     const { result } = await loadReport(SOURCE, {
@@ -336,10 +343,219 @@ describe(loadReport, () => {
       },
     });
 
-    assert.isTrue(Result.isErr(result));
+    assert.isTrue(Result.isOk(result));
 
-    assert.include(result.value, 'Something went wrong');
+    const { failed, entries, merged: landed, queue, summary } = result.value;
 
+    assert.deepStrictEqual(Object.keys(failed), ['checks']);
+
+    assert.include(failed.checks?.message, 'Something went wrong');
+
+    assert.strictEqual(failed.checks?.kept, false);
+
+    assert.deepStrictEqual(
+      landed.map(({ number }) => number),
+      [1],
+    );
+
+    // The card says its checks could not be read, rather than that they are
+    // still being read, and nothing counts them as passing.
+    assert.deepStrictEqual(entries[0]?.reading, []);
+
+    assert.include(entries[0]?.checksUnread, 'Something went wrong');
+
+    assert.isUndefined(summary.failing);
+
+    // The queue is not drawn without the checks.
+    assert.isUndefined(queue);
+
+    assert.isTrue(Arr.isNonEmpty(mut_progress));
+  });
+
+  test('keeps what the last read had of a part that fails', async () => {
+    const { fetchImpl: first } = answering(
+      report([pullRequest({ number: 7 })]),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const { result: firstResult } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl: first,
+    });
+
+    assert.isTrue(Result.isOk(firstResult));
+
+    const { fetchImpl: second } = answering(
+      {
+        ...report([pullRequest({ number: 7 })]),
+        Checks: [{ data: null, errors: [{ message: 'Something went wrong' }] }],
+      },
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const { result } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl: second,
+      previous: firstResult.value.parts,
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.strictEqual(result.value.failed.checks?.kept, true);
+
+    assert.deepStrictEqual(
+      result.value.entries.map(({ checks }) => checks),
+      firstResult.value.entries.map(({ checks }) => checks),
+    );
+
+    assert.isDefined(result.value.queue);
+
+    // Kept for the read after, which falls back to it again.
+    assert.strictEqual(
+      result.value.parts.checks,
+      firstResult.value.parts.checks,
+    );
+  });
+
+  test('asks the rules and the comparisons from the pull requests kept, when those fail', async () => {
+    const { fetchImpl: first } = answering(
+      report([pullRequest({ number: 7 })]),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const { result: firstResult } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl: first,
+    });
+
+    assert.isTrue(Result.isOk(firstResult));
+
+    const { fetchImpl: second, sent } = answering(
+      {
+        ...report([pullRequest({ number: 7 })]),
+        PullRequests: [
+          { data: null, errors: [{ message: 'Something went wrong' }] },
+        ],
+      },
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 3, behindBy: 2 } },
+      }),
+    );
+
+    const { result } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl: second,
+      previous: firstResult.value.parts,
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.deepStrictEqual(Object.keys(result.value.failed), ['pulls']);
+
+    assert.strictEqual(named(sent, 'Compare').length, 1);
+
+    assert.deepStrictEqual(result.value.entries[0]?.comparison, {
+      aheadBy: 3,
+      behindBy: 2,
+    });
+
+    assert.isDefined(result.value.queue);
+  });
+
+  test('draws no queue from kept details that do not cover a pull request opened since', async () => {
+    const { fetchImpl: first } = answering(
+      report([pullRequest({ number: 7 })]),
+      answer('Compare', { compare_7: null }),
+    );
+
+    const { result: firstResult } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl: first,
+    });
+
+    assert.isTrue(Result.isOk(firstResult));
+
+    const { fetchImpl: second } = answering(
+      {
+        ...report([pullRequest({ number: 7 }), pullRequest({ number: 8 })]),
+        PullRequestDetails: [
+          { data: null, errors: [{ message: 'Something went wrong' }] },
+        ],
+      },
+      answer('Compare', { compare_7: null, compare_8: null }),
+    );
+
+    const { result } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl: second,
+      previous: firstResult.value.parts,
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.strictEqual(result.value.failed.details?.kept, true);
+
+    assert.isUndefined(result.value.queue);
+  });
+
+  test('lists the issues and what merged when the pull requests cannot be read', async () => {
+    const { fetchImpl } = answering({
+      ...report(
+        [],
+        [merged(1, '2026-09-20T00:00:00Z')],
+        undefined,
+        issuePage(2, [1, 2], undefined),
+      ),
+      PullRequests: [
+        { data: null, errors: [{ message: 'Something went wrong' }] },
+      ],
+    });
+
+    const mut_progress: LoadedReport[] = [];
+
+    const { result } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl,
+      onProgress: (progress) => {
+        mut_progress.push(progress);
+      },
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    const { failed, entries, issues, merged: landed, queue } = result.value;
+
+    assert.include(failed.pulls?.message, 'Something went wrong');
+
+    assert.deepStrictEqual(entries, []);
+
+    // Not "no pull request is queued": the queue was not read.
+    assert.isUndefined(queue);
+
+    assert.deepStrictEqual(
+      issues.items.map(({ number }) => number),
+      [1, 2],
+    );
+
+    assert.deepStrictEqual(
+      landed.map(({ number }) => number),
+      [1],
+    );
+
+    // Drawn as soon as the pull requests failed, as when they answer.
     assert.isTrue(Arr.isNonEmpty(mut_progress));
   });
 
@@ -577,7 +793,7 @@ describe(loadReport, () => {
     assert.strictEqual(loaded.issues.endCursor, 'cursor-2');
   });
 
-  test('fails the read when a page of open issues cannot be read', async () => {
+  test('says so when a page of open issues cannot be read', async () => {
     const { fetchImpl } = answering(
       report([], [], undefined, issuePage(250, [1, 2], 'cursor-2')),
       {
@@ -592,7 +808,12 @@ describe(loadReport, () => {
       fetchImpl,
     });
 
-    assert.isTrue(Result.isErr(result));
+    assert.isTrue(Result.isOk(result));
+
+    assert.isDefined(result.value.failed.issues);
+
+    // Said in its panel, not drawn as an empty list still being read.
+    assert.notInclude(result.value.reading, 'issues');
   });
 
   test('reads Start-After out of the issue bodies and their blocked-by dependencies, and asks once for what they name that is not listed', async () => {
@@ -1380,7 +1601,7 @@ describe(loadReport, () => {
     });
   });
 
-  test('fails the read when the rules cannot be read', async () => {
+  test('says so when the rules cannot be read', async () => {
     const { fetchImpl: answerNow } = answering(
       report([pullRequest({ number: 7 })]),
       answer('Compare', { compare_7: null }),
@@ -1399,9 +1620,13 @@ describe(loadReport, () => {
       fetchImpl,
     });
 
-    assert.isTrue(Result.isErr(result));
+    assert.isTrue(Result.isOk(result));
 
-    assert.include(result.value, 'the rules on main');
+    assert.include(result.value.failed.rules?.message, 'the rules on main');
+
+    // The checks are judged over the rules, so no verdict is given without
+    // them.
+    assert.include(result.value.entries[0]?.checksUnread, 'the rules on main');
   });
 
   test('reads CODEOWNERS where GitHub would find it, `.github/` first', async () => {
@@ -1649,7 +1874,7 @@ describe(loadReport, () => {
     assert.isDefined(loaded.queue);
   });
 
-  test('fails the read when a query of comparisons gets no answer', async () => {
+  test('says so when a query of comparisons gets no answer', async () => {
     const numbers = Arr.seq(asUint32(DETAILED_PAGE_SIZE + 1)).map(
       (index) => index + 7,
     );
@@ -1690,9 +1915,21 @@ describe(loadReport, () => {
       fetchImpl: timingOut,
     });
 
-    assert.isTrue(Result.isErr(result));
+    assert.isTrue(Result.isOk(result));
 
-    assert.include(result.value, 'the Compare query');
+    assert.include(
+      result.value.failed.comparisons?.message,
+      'the Compare query',
+    );
+
+    // No card waits for a comparison that is not coming.
+    assert.isTrue(
+      result.value.entries.every(
+        ({ reading }) => !reading.includes('comparison'),
+      ),
+    );
+
+    assert.isUndefined(result.value.queue);
   });
 
   test('asks for the rest of the check results a page of pull requests at a time', async () => {
@@ -1765,7 +2002,12 @@ describe(loadReport, () => {
       fetchImpl,
     });
 
-    assert.isTrue(Result.isErr(result));
+    assert.isTrue(Result.isOk(result));
+
+    assert.include(
+      result.value.failed.checks?.message,
+      `more than ${MAX_OPEN_PULLS} open pull requests`,
+    );
 
     assert.strictEqual(named(sent, 'Checks').length, pages);
   });
@@ -1815,12 +2057,14 @@ describe(loadReport, () => {
       fetchImpl,
     });
 
-    assert.isTrue(Result.isErr(result));
+    assert.isTrue(Result.isOk(result));
 
     assert.include(
-      result.value,
+      result.value.failed.pulls?.message,
       `more than ${MAX_OPEN_PULLS} open pull requests`,
     );
+
+    assert.deepStrictEqual(result.value.entries, []);
   });
 
   test('words a token GitHub will not take', async () => {

@@ -3,6 +3,7 @@ import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { openPullRequestsUrl } from '../github-links.mjs';
 import type { BlockId } from '../layout.mjs';
+import { isUnread, OPEN_PARTS } from '../part-failures.mjs';
 import { mergeOrderStore, reader, reportSource } from '../store/index.mjs';
 import { BlockLayout } from './block-layout.js';
 import { CyclesSection } from './cycles-section.js';
@@ -11,6 +12,7 @@ import { IssuesSection } from './issues-section.js';
 import { MergeOrderFilters } from './merge-order-filters.js';
 import { MergeOrder } from './merge-order.js';
 import { MergedSection } from './merged-section.js';
+import { PartFailureNotes } from './part-failure-notes.js';
 import { QueueSection } from './queue-section.js';
 import { WorkflowRunsSection } from './workflow-runs-section.js';
 
@@ -46,8 +48,13 @@ const blocks: ReadonlyRecord<BlockId, JSX.Element> = {
               {constant('on GitHub')}
             </ExternalLink>
           </h2>
-          <MergeOrderFilters />
+          <If
+            // Counts of pull requests that were not read would all be 0.
+            cond={view(reader.failed, (failed) => !isUnread(failed, 'pulls'))}
+            then={<MergeOrderFilters />}
+          />
         </div>
+        <PartFailureNotes parts={OPEN_PARTS} />
         <If
           cond={view(reader.entries, Arr.isNonEmpty)}
           then={
@@ -66,9 +73,15 @@ const blocks: ReadonlyRecord<BlockId, JSX.Element> = {
             />
           }
           else={
-            <p class={constant('section-note')}>
-              {constant('No open pull requests.')}
-            </p>
+            <If
+              // Not "none" when they were not read, which the note above says.
+              cond={view(reader.failed, (failed) => !isUnread(failed, 'pulls'))}
+              then={
+                <p class={constant('section-note')}>
+                  {constant('No open pull requests.')}
+                </p>
+              }
+            />
           }
         />
       </section>

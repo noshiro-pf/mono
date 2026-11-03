@@ -9,6 +9,7 @@ import {
 } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { newIssueUrl, openIssuesUrl } from '../github-links.mjs';
+import { isUnread } from '../part-failures.mjs';
 import {
   issuesListStore,
   issuesViewStore,
@@ -24,6 +25,7 @@ import { IssuesSummary } from './issues-summary.js';
 import { IssuesViewSwitch } from './issues-view-switch.js';
 import { LabelChip } from './label-chip.js';
 import { LoadMoreIssues } from './load-more-issues.js';
+import { PartFailureNotes } from './part-failure-notes.js';
 import { Timestamp } from './timestamp.js';
 
 /**
@@ -57,17 +59,23 @@ export const IssuesSection = (): JSX.Element => {
   // Whether the list has not been read yet.
   const reading = view(reader.reading, (parts) => parts.includes('issues'));
 
+  // Whether the read of it failed with no list to keep, which the note under
+  // the title says: the list is not empty, it is not there.
+  const unread = view(reader.failed, (failed) => isUnread(failed, 'issues'));
+
   const dag = view(issuesViewStore.view, (shown) => shown === 'dag');
 
   return (
     <section class={constant('section')}>
       <h2 class={constant('section-title')}>
-        {derive([reading, issues$], (isReading, { items, totalCount }) =>
-          isReading
-            ? 'Open issues'
-            : items.length < totalCount
-              ? `Open issues (${items.length} of ${totalCount} read)`
-              : `Open issues (${totalCount})`,
+        {derive(
+          [reading, unread, issues$],
+          (isReading, isUnreadNow, { items, totalCount }) =>
+            isReading || isUnreadNow
+              ? 'Open issues'
+              : items.length < totalCount
+                ? `Open issues (${items.length} of ${totalCount} read)`
+                : `Open issues (${totalCount})`,
         )}
         {constant(' ')}
         <ExternalLink
@@ -83,6 +91,8 @@ export const IssuesSection = (): JSX.Element => {
           {constant('New issue')}
         </ExternalLink>
       </h2>
+
+      <PartFailureNotes parts={PARTS} />
 
       <div class={constant('issues-toolbar')}>
         <IssuesViewSwitch />
@@ -111,7 +121,12 @@ export const IssuesSection = (): JSX.Element => {
         then={
           <p class={constant('section-note')}>{constant('Reading GitHub…')}</p>
         }
-        else={<If cond={dag} then={<IssueDag />} else={<IssueList />} />}
+        else={
+          <If
+            cond={mapBindable(unread, (isUnreadNow) => !isUnreadNow)}
+            then={<If cond={dag} then={<IssueDag />} else={<IssueList />} />}
+          />
+        }
       />
 
       <If
@@ -128,6 +143,8 @@ export const IssuesSection = (): JSX.Element => {
     </section>
   );
 };
+
+const PARTS = ['issues'] as const;
 
 const IssueList = (): JSX.Element => (
   <If

@@ -70,11 +70,12 @@ export const tokenStore = createTokenStore(browserStores());
 
 export const reader = createReader({
   token: tokenStore.token,
-  load: (token, nowMs, issueCount, onProgress) =>
+  load: (token, nowMs, issueCount, previous, onProgress) =>
     loadReport(reportSource, {
       token,
       nowMs,
       issueCount,
+      ...(previous === undefined ? {} : { previous }),
       ...(onProgress === undefined ? {} : { onProgress }),
     }),
   loadRuns: (token) => loadWorkflowRuns(reportSource, { token }),

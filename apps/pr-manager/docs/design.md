@@ -152,18 +152,19 @@ not by what it has rather than by a setting.
 What follows from what the repository has:
 
 - **What the default branch requires is what GitHub enforces on it**: every
-  ruleset that applies to it and the contexts a classic branch protection
-  rule requires, read from the REST API as `unblock-prs` reads them. Where it
+  ruleset that applies to it and the contexts a classic branch protection rule
+  requires, read from the REST API as `unblock-prs` reads them. Where it
   requires no context, the verdict is over every context reported on the head
   instead, and the hover says so. Where no ruleset asks for a code owner's
   approval, nothing waits for one and the `awaiting code owner` count is not
-  offered; a classic rule's review settings are not among what a token
-  without admin can read, so they are not either. Rules that cannot be read
-  fail the read, since a verdict over a guess at them would be a guess.
+  offered; a classic rule's review settings are not among what a token without
+  admin can read, so they are not either. Where the rules cannot be read, no
+  check is judged (the card says `checks unread`), since a verdict over a guess
+  at them would be a guess.
 - **`CODEOWNERS` is read where GitHub looks for it**, in its order:
   `.github/CODEOWNERS`, then the root, then `docs/`, on the default branch.
 - **Open pull requests are read fifty a page**, every page on every read; past
-  five hundred the read fails and says so, rather than drawing a merge order
+  five hundred that part fails and says so, rather than drawing a merge order
   with some of them missing. The checks and the details are read twenty a page,
   and the comparisons and the follow-ups twenty pull requests a query: what
   decides whether those answer is the time GitHub takes over them, and at fifty
@@ -475,10 +476,21 @@ read on its own, rather than by a read of the whole report again, and a poll
 already out when it was asked for does not take that page away.
 
 A read may add to the page and may say it failed, but **may not take the page
-away**: a read that fails leaves the last report on screen with a note beside
-it. And an older read never replaces a newer one — a poll and a Refresh can
-both be out at once, and whichever answers last is not necessarily the one
-that asked last.
+away**. **Each part of a read fails on its own** — the pull requests, the rules,
+the checks, the details, the comparisons, what merged, the open issues — because
+GitHub times out one query, not the read. A part that fails keeps what the last
+read had of it, and is said only in the panels drawn from it:
+the merge order and the queue for the first five, its own block for the other
+two. A part that has failed with nothing to keep is drawn as unread, never as
+empty. The queue is drawn only from parts that cover every open pull request;
+until then it lists the ones labelled `merge-queued` by number, its order not
+known, and where the pull requests themselves were never read it is not shown,
+as on a repository with no queue. Only a read in which every part failed (no
+token
+GitHub takes, no network) fails as a whole, which leaves the last report on
+screen with a note in the header. And an older read never replaces a newer one —
+a poll and a Refresh can both be out at once, and whichever answers last is not
+necessarily the one that asked last.
 
 The "read 3 minutes ago" line, and every other age on the page, is measured
 against a clock of its own that ticks every second while the tab is shown, so
