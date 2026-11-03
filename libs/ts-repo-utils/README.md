@@ -609,6 +609,8 @@ Both return whether the step should run, and, in GitHub Actions, append `should_
 
 ### Code Formatting Utilities
 
+These functions, and the `format-*` commands built on them, resolve each file's Prettier options as the `prettier` CLI does, `.editorconfig` included: where the Prettier configuration does not set an option, the `.editorconfig` value for it applies — `max_line_length` (`printWidth`), `indent_style` and `indent_size` / `tab_width` (`useTabs`, `tabWidth`), `end_of_line` and `quote_type`. Which files are formatted is decided as described for each function, not as the CLI decides it.
+
 With `silent: true` (`--silent` for the commands), these functions also drop what a Prettier plugin or bundled parser prints while it formats, because no Prettier option stops that. The calls dropped are `console.log`, `info`, `debug`, `dir`, `dirxml`, `table` and `warn` (and `assert`, `count`, `group` and `time*`, which Node prints through `log` or `warn`) made from inside the formatting run, which includes an `ignore` callback; the rest of the process prints as usual. `console.error` and `trace`, and direct writes to `process.stdout` or `process.stderr`, still get through.
 
 #### `formatFilesGlob(pathGlob: string, options?): Promise<Result<undefined, unknown>>`

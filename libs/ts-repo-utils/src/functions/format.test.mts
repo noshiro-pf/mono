@@ -245,6 +245,56 @@ describe(formatFiles, () => {
     }
   });
 
+  test('should take the print width from .editorconfig, as the Prettier CLI does', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.mkdir(testDir, { recursive: true });
+
+    try {
+      // A Prettier configuration of its own with no `printWidth`, and an
+      // `.editorconfig` that is the root, so neither the repository's
+      // `.prettierrc` nor its `.editorconfig` decides the width: the
+      // `.editorconfig` one applies, as it does for `prettier --write`.
+      await createTestFile('.prettierrc', '{}\n');
+
+      await createTestFile(
+        '.editorconfig',
+        dedent`
+          root = true
+
+          [*.ts]
+          max_line_length = 40
+        `,
+      );
+
+      const file = await createTestFile(
+        'wide.ts',
+        dedent`
+          const sum = (first: number, second: number) => first + second;
+        `,
+      );
+
+      const result = await formatFiles([file], { silent: true });
+
+      assert.isTrue(Result.isOk(result));
+
+      assert.strictEqual(
+        await readTestFile(file),
+        `${dedent`
+          const sum = (
+            first: number,
+            second: number,
+          ) => first + second;
+        `}\n`,
+      );
+    } finally {
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
+  });
+
   test('should return ok for empty file list', async () => {
     vi.clearAllMocks();
 
