@@ -102,7 +102,7 @@ export const IssueDagLegend = (): JSX.Element => {
               class={constant('issue-dag-swatch')}
               data-pending={constant('true')}
             />
-            {constant('Pending')}
+            {constant('Pending pull request')}
           </li>
         }
       />

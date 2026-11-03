@@ -5,10 +5,10 @@
  * only what differs from {@link DEFAULT_ISSUES_VIEW_SETTINGS} is written.
  *
  * The DAG's own switches are gone: what is done is never drawn, and what is
- * pending is the list's switch (`issues.hidePending`, `issues-list-view.mts`),
- * which both views read. A `dag.hideDone` an older page wrote is dropped as the
- * settings are next written, and so is a `dag.hidePending`, once the list's
- * view has read it as `issues.hidePending`.
+ * held back is the `hold` tier's switch (`issues-list-view.mts`), which both
+ * views read. A `dag.hideDone` an older page wrote is dropped as the settings
+ * are next written, and so is a `dag.hidePending`, once the list's view has
+ * read it as switching `hold` off.
  */
 
 import { currentSearch, rewriteSearch, searchOf } from './url.mjs';

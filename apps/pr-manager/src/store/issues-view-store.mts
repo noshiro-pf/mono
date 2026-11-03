@@ -4,12 +4,11 @@
  *
  * The DAG leaves out what is done (`omitDone`), so that what is left to do is
  * all it lays out — what is done is closed or merged, and is read only for how
- * an issue that names it stands; what is labelled `pending` (`omitPending`)
- * when it is switched off, since what is held back for now is not what is left
- * to do; and the issues the priorities, `pending` and `in progress` leave out
- * (`omitFilteredIssues`), which both views read (`issues-list-store.mts`), with
- * how many issues each of them has drawn of how many are open. The view starts
- * as `initial`, which the page reads off the query string as it opens
+ * an issue that names it stands; and the issues the tiers and `in progress`
+ * leave out (`omitFilteredIssues`), `priority:hold` among them when it is
+ * switched off, which both views read (`issues-list-store.mts`), with how many
+ * issues each of them has drawn of how many are open. The view starts as
+ * `initial`, which the page reads off the query string as it opens
  * (`issues-view-settings.mts`), and every change is handed to `save` from
  * `start` on.
  *
@@ -72,7 +71,6 @@ import {
   isListedIssue,
   omitDone,
   omitFilteredIssues,
-  omitPending,
   type IssueGraph,
   type IssueGraphNode,
 } from '../issue-graph.mjs';
@@ -93,8 +91,7 @@ export type IssuesViewDeps = Readonly<{
   /** The whole graph, what is done included ({@link createIssueGraph}). */
   graph: InitializedObservable<IssueGraph>;
   /**
-   * The priorities, `pending` and `in progress` the list shows, which the
-   * DAG draws too.
+   * The tiers and `in progress` the list shows, which the DAG draws too.
    */
   filter: InitializedObservable<IssueFilter>;
   /** The view as the page opens. */
@@ -112,16 +109,14 @@ export type IssuesViewDeps = Readonly<{
 export type IssuesViewStore = Readonly<{
   view: InitializedObservable<IssuesView>;
   /**
-   * The graph the DAG draws: without what is done, what is pending when
-   * that is hidden, and the issues the priorities, `pending` and `in
-   * progress` leave out.
+   * The graph the DAG draws: without what is done, and the issues the tiers and
+   * `in progress` leave out.
    */
   graph: InitializedObservable<IssueGraph>;
   layout: InitializedObservable<IssueGraphLayout>;
   /**
    * How many open issues the DAG draws, of how many there are, in all, for each
-   * priority, for `pending` and for `in progress`, counted as the list counts
-   * its own.
+   * tier and for `in progress`, counted as the list counts its own.
    */
   counts: InitializedObservable<IssueFilterCounts>;
   /** What the layout's units are multiplied by to draw the DAG. */
@@ -179,17 +174,8 @@ export const createIssuesViewStore = (
 
   const withoutDone = deps.graph.pipe(map(omitDone));
 
-  // `pending` switched off before the rest, so that what an issue waits on is
-  // kept for it only while that issue is drawn.
   const graph = combine([withoutDone, deps.filter])
-    .pipe(
-      map(([open, filter]) =>
-        omitFilteredIssues(
-          filter.hidePending ? omitPending(open) : open,
-          filter,
-        ),
-      ),
-    )
+    .pipe(map(([open, filter]) => omitFilteredIssues(open, filter)))
     .pipe(skipIfNoChange(fastDeepEqual));
 
   const counts = combine([deps.graph, deps.filter])
@@ -294,6 +280,5 @@ export const createIssueGraph = ({
 
 const NODE_FACTS: IssueFacts<IssueGraphNode> = {
   priority: (node) => node.priority,
-  pending: (node) => node.pending,
   inProgress: (node) => node.state === 'in-progress',
 } as const;

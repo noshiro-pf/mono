@@ -67,27 +67,27 @@ button under the list to ask for it again.
 merge order does: **open**, how many are shown of how many are open, then the
 tiers, the `priority:S` … `priority:D`, `priority:hold` and `priority:close`
 labels of the repository's `docs/issue-priority.md`, with **none** for an issue
-carrying no one of them (or more than one), joined into one control, and
-**pending**, the `pending` label, beside them on its own. Each is a switch with
-an **only** button in its corner, as the merge order's statuses are, and the
-counts are there in the List and in the DAG alike. Two tiers picked show the
-issues of either, since an issue has one; pending picked with a tier shows the
-issues that are both. Every other label an open issue carries is a pick: once
-any is picked, only the issues carrying one picked are listed, still not those
-whose priority is switched off.
+carrying no one of them (or more than one), joined into one control, and **in
+progress** beside them on its own. What is held back is the **hold** tier; on an
+issue `pending` is a label like any other, since that label is a pull request's.
+Each is a switch with an **only** button in its corner, as the merge order's
+statuses are, and the counts are there in the List and in the
+DAG alike. Two tiers picked show the issues of either, since an issue has one;
+in progress picked with a tier shows the issues that are both. Every other label
+an open issue carries is a pick: once any is picked, only the issues carrying
+one picked are listed, still not those whose priority is switched off.
 **The start states** (`docs/issue-start-after.md`), in the DAG's words and
 colours, are switches too. The order is **updated**, **priority** — by tier, S
 first, none between C and D, then hold and close — or **start**: what can be
 started (wait over, then free), what is in progress, what needs a look, what
 waits, what is on a cycle; the most recently updated first within each. Each
 switch and pick counts what the list shows of it, as the merge order's do, and
-the choice is kept in the URL (below). The priorities and pending apply to both
+the choice is kept in the URL (below). The tiers and in progress apply to both
 views, and the DAG's counts are of what it draws; the rest apply to the list
 alone. The DAG leaves out the issues they do not show, with what only they wait
 on and the pull requests that close only them; one that an issue drawn waits on
 stays, alone, since it is why that issue waits, and is not counted as shown.
-Pending switched off leaves out every node labelled `pending` in the DAG, pull
-requests too.
+A pull request labelled `pending` is drawn faint.
 
 **Each issue in the list says how it stands for being started**: a badge for
 its start state, the numbers its `Start-After:` names, each coloured by where
@@ -258,7 +258,8 @@ is written:
 - The open issues: `issues=dag` (the DAG rather than the list), and
   `dag.zoom=125` or `dag.zoom=fit` for the DAG;
   `issues.hidePriority=hold.close`, `issues.onlyPriority=S.A`, and
-  `issues.hidePending=1` or `issues.onlyPending=1` for both;
+  `issues.hideInProgress=1` or `issues.onlyInProgress=1` for both (an older
+  page's `issues.hidePending=1` and `issues.onlyPending=1` are read as `hold`);
   `issues.hideStart=blocked.cycle`, `issues.sort=priority` and
   `issues.label=bug`, once per label picked, for the list. The search is not
   kept.

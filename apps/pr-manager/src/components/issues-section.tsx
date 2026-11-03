@@ -28,11 +28,11 @@ import { Timestamp } from './timestamp.js';
 
 /**
  * What is open that is not a pull request, most recently updated first, by
- * priority or by start state, and narrowed by priority and `pending`
+ * priority or by start state, and narrowed by tier and `in progress`
  * (`issues-summary.tsx`) and by start state, label and a search of the titles
  * (`issues-list-filters.tsx`). Each row says how the issue stands for being
  * started and what it waits for (`issue-start-row.tsx`). The DAG is narrowed by
- * the priorities and `pending` alone, which lead either view with how many
+ * the tiers and `in progress` alone, which lead either view with how many
  * issues are shown of how many are open: what an issue drawn waits on is drawn,
  * whatever its priority (`omitFilteredIssues`).
  *
@@ -140,8 +140,8 @@ const IssueList = (): JSX.Element => (
           <p class={constant('section-note')}>
             {view(issuesListStore.query, (query) =>
               query.trim() === ''
-                ? 'No open issue has the priorities, pending and labels picked.'
-                : 'No open issue with the priorities, pending and labels picked has a title matching the search.',
+                ? 'No open issue has the priorities and labels picked.'
+                : 'No open issue with the priorities and labels picked has a title matching the search.',
             )}
           </p>
         }

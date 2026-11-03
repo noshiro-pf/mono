@@ -14,30 +14,29 @@ import { StatTile, StatToggle } from './stat-tile.js';
 
 /**
  * What the open issues lead with, in either view: how many are shown of how
- * many are open, then the priorities, then `pending` and `in progress`, each a
- * switch for the issues it counts with an `only` switch in its corner — the
- * merge order's counts (`merge-order-filters.tsx`), for issues. What a switch
- * does is `issues-list-view.mts`, which keeps the choice in the URL; the list
- * and the
- * DAG show the same issues.
+ * many are open, then the tiers, then `in progress`, each a switch for the
+ * issues it counts with an `only` switch in its corner — the merge order's
+ * counts (`merge-order-filters.tsx`), for issues. What a switch does is
+ * `issues-list-view.mts`, which keeps the choice in the URL; the list and the
+ * DAG show the same issues. What is held back is the `hold` tier
+ * (`docs/issue-priority.md`), so it has no switch of its own.
  *
- * The priorities are joined into one control, since they are one question asked
- * of every issue, which has exactly one of them: picking two shows either.
- * `pending` and `in progress` stand apart, as other questions:
- * picked with a priority, each shows what is both (`issue-filter.mts`). Once a
- * priority is picked, the priorities neither picked nor hidden fade, and
- * `pending` and `in progress` do not, since it is not they that decide them.
+ * The tiers are joined into one control, since they are one question asked of
+ * every issue, which has exactly one of them: picking two shows either. `in
+ * progress` stands apart, as another question: picked with a tier, it shows
+ * what is both (`issue-filter.mts`). Once a tier is picked, the tiers neither
+ * picked nor hidden fade, and `in progress` does not, since it is not it that
+ * decides them.
  *
  * `open` is how many issues the view shown draws for their own sake — the list,
  * after its own switches and the search too (`countIssues`), or the
  * DAG (`issues-view-store.mts`), which also draws an issue left out that one
- * drawn waits on and does not count it. Each priority, and `pending`, is how
- * many of it showing it would draw, and so is `in progress`. Beside each, in
- * small, how many there are in all when that is more. A priority is pressed
- * while its issues are shown: one neither hidden nor picked while another is
- * picked is not, and pressing it picks it too. `pending` is there while an open
- * issue carries it, and `in progress` while an open issue is under way, or
- * while either is switched off or picked, so that it can be undone.
+ * drawn waits on and does not count it. Each tier is how many of it showing it
+ * would draw, and so is `in progress`. Beside each, in small, how many there
+ * are in all when that is more. A tier is pressed while its issues are shown:
+ * one neither hidden nor picked while another is picked is not, and pressing it
+ * picks it too. `in progress` is there while an open issue is under way, or
+ * while it is switched off or picked, so that it can be undone.
  */
 export const IssuesSummary = (): JSX.Element => {
   const counts$ = derive(
@@ -50,9 +49,7 @@ export const IssuesSummary = (): JSX.Element => {
   return (
     <div class={constant('issues-summary-box')}>
       <div
-        aria-label={constant(
-          'Open issues by priority, pending and in progress',
-        )}
+        aria-label={constant('Open issues by priority and in progress')}
         class={constant('summary-row issues-summary')}
         role={constant('group')}
       >
@@ -99,26 +96,6 @@ export const IssuesSummary = (): JSX.Element => {
         <If
           cond={derive(
             [counts$, view$],
-            ({ pending }, { hidePending, onlyPending }) =>
-              pending.total > 0 || hidePending || onlyPending,
-          )}
-          then={
-            <StatToggle
-              label={'pending'}
-              only={view(view$, ({ onlyPending }) => onlyPending)}
-              pickWith={'both'}
-              pressed={view(view$, ({ hidePending }) => !hidePending)}
-              subject={'what is labelled pending'}
-              total={mapBindable(counts$, ({ pending }) => pending.total)}
-              value={mapBindable(counts$, ({ pending }) => pending.shown)}
-              onOnly={togglePendingOnly}
-              onToggle={togglePending}
-            />
-          }
-        />
-        <If
-          cond={derive(
-            [counts$, view$],
             ({ inProgress }, { hideInProgress, onlyInProgress }) =>
               inProgress.total > 0 || hideInProgress || onlyInProgress,
           )}
@@ -154,14 +131,6 @@ const PRIORITY_SUBJECTS = {
   close: 'the issues to close or merge',
   none: 'the issues placed under no priority, or under several',
 } as const satisfies ReadonlyRecord<IssueTier, string>;
-
-const togglePending = (): void => {
-  issuesListStore.togglePending();
-};
-
-const togglePendingOnly = (): void => {
-  issuesListStore.togglePendingOnly();
-};
 
 const toggleInProgress = (): void => {
   issuesListStore.toggleInProgress();

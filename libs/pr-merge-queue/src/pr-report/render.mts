@@ -1,7 +1,9 @@
 /** The report as text: Markdown for GitHub and Claude, plain for a terminal. */
 
 import {
+  issuePriorityLabel,
   issuePriorityOfLabels,
+  PENDING_LABEL,
   summarize,
   type ChecksSummary,
   type IssueStartState,
@@ -356,17 +358,27 @@ const startDetail = (issue: ReportIssue): readonly string[] =>
 
 /**
  * An issue placed under no tier, or under several, which says nothing either
- * (`docs/issue-priority.md`): said so that it is placed. The one tier it does
- * carry is among its labels already.
+ * (`docs/issue-priority.md`), and one labelled `pending`, which is a pull
+ * request's label: an issue held back is `priority:hold`. Said so that it is
+ * placed. The one tier it does carry is among its labels already.
  */
 const priorityDetail = (issue: ReportIssue): readonly string[] => {
-  const priority = issuePriorityOfLabels(issue.labels.map(({ name }) => name));
+  const names = issue.labels.map(({ name }) => name);
 
-  return priority === 'none'
-    ? (['no priority tier'] as const)
-    : priority === 'several'
-      ? (['several priority tiers'] as const)
-      : ([] as const);
+  const priority = issuePriorityOfLabels(names);
+
+  return [
+    ...(priority === 'none'
+      ? (['no priority tier'] as const)
+      : priority === 'several'
+        ? (['several priority tiers'] as const)
+        : ([] as const)),
+    ...(names.includes(PENDING_LABEL)
+      ? ([
+          `${PENDING_LABEL} is for pull requests; hold with ${issuePriorityLabel('hold')}`,
+        ] as const)
+      : ([] as const)),
+  ] as const;
 };
 
 /**

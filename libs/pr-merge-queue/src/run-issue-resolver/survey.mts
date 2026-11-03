@@ -141,6 +141,9 @@ export const ISSUES_LIMIT = 1000;
  * Labels that say an issue is not to be started as it stands: a question to
  * answer first, one that will not be done, or one the author is holding back,
  * or one placed under the tier for either (`docs/issue-priority.md`).
+ * `pending` is a pull request's label, and `pr-report` asks for an issue
+ * carrying it to be moved to `priority:hold`; until it is, it still holds the
+ * issue back, so that an issue its author paused is never started by mistake.
  */
 export const HELD_LABELS = [
   'duplicate',
