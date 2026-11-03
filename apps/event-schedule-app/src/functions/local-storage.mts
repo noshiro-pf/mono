@@ -1,5 +1,5 @@
 import { EventSchedule } from 'event-schedule-app-shared';
-import { Json, Result } from 'ts-data-forge';
+import { Json, Result, isPanicError, unknownToString } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord, StrictPick } from 'ts-type-forge';
 
 type EventSchedulePicked = StrictPick<
@@ -25,12 +25,39 @@ const keys: StoreKeys = {
   createEventPage: attachSuffix('createEventPage'),
 } as const;
 
-const restore = (at: string): string | undefined =>
-  window.localStorage.getItem(at) ?? undefined;
+/**
+ * Reading `window.localStorage` throws a SecurityError when the browser blocks
+ * site data, and `setItem` throws a QuotaExceededError when storage is full.
+ * Both are DOMExceptions, which `Result.fromThrowable` does not recognize as
+ * errors (it would report `{}`), so their name and message are kept here.
+ * A panic is rethrown.
+ */
+const tryStorage = <T,>(access: () => T): Result<T, string> => {
+  try {
+    return Result.ok(access());
+  } catch (error: unknown) {
+    // A panic is a bug, not a storage failure, as for `Result.fromThrowable`.
+    if (isPanicError(error)) {
+      throw error;
+    }
 
-const save = (at: string, value: string): void => {
-  window.localStorage.setItem(at, value);
+    return Result.err(
+      error instanceof DOMException
+        ? `${error.name}: ${error.message}`
+        : unknownToString(error),
+    );
+  }
 };
+
+const restore = (at: string): Result<string | undefined, string> =>
+  tryStorage(() => window.localStorage.getItem(at) ?? undefined);
+
+const save = (at: string, value: string): Result<undefined, string> =>
+  tryStorage(() => {
+    window.localStorage.setItem(at, value);
+
+    return undefined;
+  });
 
 const restoreCreateEventPageTemp = (): Result<
   EventSchedulePicked | undefined,
@@ -38,11 +65,15 @@ const restoreCreateEventPageTemp = (): Result<
 > => {
   const fromDb = restore(keys.createEventPage);
 
-  if (fromDb === undefined) {
+  if (Result.isErr(fromDb)) {
+    return fromDb;
+  }
+
+  if (fromDb.value === undefined) {
     return Result.ok(undefined);
   }
 
-  const obj = Json.parse(fromDb);
+  const obj = Json.parse(fromDb.value);
 
   return Result.isErr(obj)
     ? Result.err(obj.value)
@@ -54,13 +85,9 @@ const saveCreateEventPageTemp = (
 ): Result<undefined, string> => {
   const str = Json.stringify(eventSchedule);
 
-  if (Result.isErr(str)) {
-    return Result.err(str.value);
-  }
-
-  save(keys.createEventPage, str.value ?? '');
-
-  return Result.ok(undefined);
+  return Result.isErr(str)
+    ? Result.err(str.value)
+    : save(keys.createEventPage, str.value ?? '');
 };
 
 export const EventScheduleAppLocalStorage = {

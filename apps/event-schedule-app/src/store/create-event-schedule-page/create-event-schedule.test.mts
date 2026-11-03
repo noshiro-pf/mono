@@ -120,6 +120,55 @@ describe(createCreateEventScheduleStore, () => {
       [31],
     );
   });
+
+  test('leaves the settings as they are, with a warning, when storage cannot be read', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    onTestFinished(() => {
+      warn.mockRestore();
+    });
+
+    const { store } = setup({ restoreFails: true });
+
+    const before = store.commonState$.getSnapshot().value;
+
+    store.restoreFromLocalStorage();
+
+    assert.strictEqual(store.commonState$.getSnapshot().value, before);
+
+    assert.deepStrictEqual(warn.mock.calls, [
+      ['SecurityError: The operation is insecure.'],
+    ]);
+  });
+
+  test('still gives the link, with a warning, when the draft cannot be cleared', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    onTestFinished(() => {
+      warn.mockRestore();
+    });
+
+    const { store, calls, toasts } = setup({ saveFails: true });
+
+    fillValidEvent(store);
+
+    store.onCreateEventClick();
+
+    await settle(10);
+
+    store.onClipboardButtonClick();
+
+    assert.strictEqual(
+      calls.at(-1),
+      'clipboard https://example.com/event/new-id/',
+    );
+
+    assert.strictEqual(toasts.count, 0);
+
+    assert.deepStrictEqual(warn.mock.calls, [
+      ['QuotaExceededError: The quota has been exceeded.'],
+    ]);
+  });
 });
 
 const saveDelayMs = 10;
@@ -146,7 +195,12 @@ const fakeToaster = (onShow: () => number): Toaster =>
   }) as const;
 
 const setup = (
-  options?: Readonly<{ addFails?: boolean; stored?: EventSchedule }>,
+  options?: Readonly<{
+    addFails?: boolean;
+    stored?: EventSchedule;
+    restoreFails?: boolean;
+    saveFails?: boolean;
+  }>,
 ): Setup => {
   const [fireAuthUser$] = createState<EventScheduleSettingUser | undefined>(
     alice,
@@ -177,13 +231,18 @@ const setup = (
     },
     auth: { fireAuthUser$, getFireAuthUserSnapshot: () => alice },
     storage: {
-      restore: () => Result.ok(options?.stored),
+      restore: () =>
+        options?.restoreFails === true
+          ? Result.err('SecurityError: The operation is insecure.')
+          : Result.ok(options?.stored),
       save: (ev) => {
         mut_calls.push(
           `storage.save ${ev.title === '' ? '(reset)' : ev.title}`,
         );
 
-        return Result.ok(undefined);
+        return options?.saveFails === true
+          ? Result.err('QuotaExceededError: The quota has been exceeded.')
+          : Result.ok(undefined);
       },
     },
     writeToClipboard: (text) => {
