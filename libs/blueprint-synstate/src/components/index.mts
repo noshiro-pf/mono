@@ -24,6 +24,7 @@ export * from './navbar-group.js';
 export * from './navbar.js';
 export * from './non-ideal-state.js';
 export * from './numeric-input.js';
+export * from './overlay-toaster.js';
 export * from './popover.js';
 export * from './radio.js';
 export * from './segmented-control.js';

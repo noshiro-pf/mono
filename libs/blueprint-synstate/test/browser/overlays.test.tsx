@@ -8,9 +8,9 @@ import { createElement as h, type ReactElement } from 'react';
 import { createState } from 'synstate';
 import { constant, render, type JSX } from 'synstate-dom';
 import { range } from 'ts-data-forge';
-import { page } from 'vitest/browser';
+import { page, userEvent } from 'vitest/browser';
 import { disabledButtonTabIndex, mountBlueprint } from './blueprint-cases.js';
-import { freezeAnimations, transitioned } from './helpers.mjs';
+import { freezeAnimations, nextFrame, transitioned } from './helpers.mjs';
 import { linesOf } from './markup-lines.mjs';
 
 const ignore = (): void => {};
@@ -194,6 +194,35 @@ describe(Dialog, () => {
     );
 
     assert.deepStrictEqual(mut_closes, ['keydown', 'click']);
+
+    unmount();
+  });
+
+  test('brings no focus into itself once a press on its backdrop has closed it', async () => {
+    const [isOpen$, setIsOpen] = createState(true);
+
+    const { unmount } = mounted(() => (
+      <Dialog
+        isOpen={isOpen$}
+        title={constant('T')}
+        onClose={() => {
+          setIsOpen(false);
+        }}
+      >
+        <div class={constant('bp6-dialog-body')} />
+      </Dialog>
+    ));
+
+    await transitioned();
+
+    await userEvent.click(one('.bp6-overlay-backdrop'), {
+      position: { x: 5, y: 5 },
+    });
+
+    await nextFrame();
+
+    // Still in its exit transition.
+    assert.isFalse(one('.bp6-overlay').contains(document.activeElement));
 
     unmount();
   });
