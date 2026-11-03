@@ -7,11 +7,11 @@ import {
   buildCalleeResolver,
   getImportDeclarations,
   getRangeWithParens,
+  hasCommentWithin,
   isTypeWrapper,
   skipTypeWrappers,
   type ResolvedCallee,
 } from 'eslint-rule-forge';
-import { hasCommentWithin } from './comments.mjs';
 import { SYNSTATE_MODULE } from './constants.mjs';
 import { pipeCallOf } from './functions.mjs';
 import { identityOf } from './no-identity-map.mjs';
@@ -61,7 +61,7 @@ export const preferDerive: TSESLint.RuleModule<MessageIds, Options> = {
 
     const resolveCallee = buildCalleeResolver(imports);
 
-    const rewriteCallee = buildCalleeRewriter(sourceCode, imports, 'derive');
+    const rewriteCallee = buildCalleeRewriter(sourceCode, 'derive');
 
     /** `expression` as a call of synstate's export among `names`. */
     const synstateCallOf = (

@@ -780,7 +780,35 @@ describe('prefer-canonical-array-slicing through type wrappers', () => {
 
 describe('prefer-canonical-array-slicing and the import it adds', () => {
   tester.run('prefer-canonical-array-slicing', preferCanonicalArraySlicing, {
-    valid: [],
+    valid: [
+      {
+        name: 'a namespace imported by `import type` binds no value',
+        code: dedent`
+          import type * as T from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = T.Arr.skip(xs, 1);
+        `,
+      },
+      {
+        name: 'a local binding that shadows the imported `Arr` is not ts-data-forge',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const f = (Arr: { skip: (a: unknown, n: number) => unknown }) =>
+            Arr.skip(xs, 1);
+        `,
+      },
+      {
+        name: 'a local binding that shadows the namespace import is not ts-data-forge',
+        code: dedent`
+          import * as tdf from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const f = (tdf: {
+            Arr: { skip: (a: unknown, n: number) => unknown };
+          }) => tdf.Arr.skip(xs, 1);
+        `,
+      },
+    ],
     invalid: [
       {
         name: 'writes through a namespace import, which needs no edit',
@@ -828,6 +856,92 @@ describe('prefer-canonical-array-slicing and the import it adds', () => {
         `,
         output: null,
         errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+      },
+      {
+        name: 'sees `Arr.skip` and `ns.Arr.skip` through type wrappers',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          import * as tdf from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = (Arr as typeof Arr).skip(xs, 1);
+          const b = (tdf satisfies typeof tdf).Arr.skipLast(xs, 1);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          import * as tdf from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = Arr.tail(xs);
+          const b = Arr.butLast(xs);
+        `,
+        errors: [
+          { messageId: 'preferCanonicalArraySlicing' },
+          { messageId: 'preferCanonicalArraySlicing' },
+        ],
+      },
+      {
+        name: 'drops `type` from an inline type specifier',
+        code: dedent`
+          import { type Arr, asInt } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = xs.slice(1);
+        `,
+        output: dedent`
+          import { Arr, asInt } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = Arr.tail(xs);
+        `,
+        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+      },
+      {
+        name: 'adds the import after a leading directive',
+        code: dedent`
+          'use client';
+          declare const xs: readonly number[];
+          const ys = xs.slice(1);
+        `,
+        output: dedent`
+          'use client';
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = Arr.tail(xs);
+        `,
+        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+      },
+      {
+        name: 'imports `Arr` by name where a local binding shadows the namespace import',
+        code: dedent`
+          import * as tdf from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const f = (tdf: unknown) => xs.slice(1);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          import * as tdf from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const f = (tdf: unknown) => Arr.tail(xs);
+        `,
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicing',
+            data: { replacement: 'Arr.tail(xs)' },
+          },
+        ],
+      },
+      {
+        name: 'no fix where a local binding shadows the namespace import and another import takes `Arr`',
+        code: dedent`
+          import * as tdf from 'ts-data-forge';
+          import { Arr } from 'other';
+          declare const xs: readonly number[];
+          const f = (tdf: unknown) => xs.slice(1);
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicing',
+            data: { replacement: 'Arr.tail(xs)' },
+          },
+        ],
       },
     ],
   });

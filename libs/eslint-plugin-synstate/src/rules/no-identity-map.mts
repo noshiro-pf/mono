@@ -7,9 +7,9 @@ import {
   buildCalleeResolver,
   getImportDeclarations,
   getRangeWithParens,
+  hasCommentWithin,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
-import { hasCommentWithin } from './comments.mjs';
 import { SYNSTATE_MODULE } from './constants.mjs';
 import { buildCalleeRewriter, isShadowedCallee } from './synstate-callee.mjs';
 
@@ -57,11 +57,7 @@ export const noIdentityMap: TSESLint.RuleModule<MessageIds, Options> = {
 
     const resolveCallee = buildCalleeResolver(imports);
 
-    const rewriteCallee = buildCalleeRewriter(
-      sourceCode,
-      imports,
-      'skipIfNoChange',
-    );
+    const rewriteCallee = buildCalleeRewriter(sourceCode, 'skipIfNoChange');
 
     return {
       CallExpression: (node) => {

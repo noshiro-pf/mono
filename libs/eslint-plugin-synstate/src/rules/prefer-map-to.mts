@@ -9,9 +9,9 @@ import {
   getArgumentText,
   getImportDeclarations,
   getRangeWithParens,
+  hasCommentWithin,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
-import { hasCommentWithin } from './comments.mjs';
 import { SYNSTATE_MODULE } from './constants.mjs';
 import { buildCalleeRewriter, isShadowedCallee } from './synstate-callee.mjs';
 
@@ -52,7 +52,7 @@ export const preferMapTo: TSESLint.RuleModule<MessageIds, Options> = {
 
     const resolveCallee = buildCalleeResolver(imports);
 
-    const rewriteCallee = buildCalleeRewriter(sourceCode, imports, 'mapTo');
+    const rewriteCallee = buildCalleeRewriter(sourceCode, 'mapTo');
 
     return {
       CallExpression: (node) => {

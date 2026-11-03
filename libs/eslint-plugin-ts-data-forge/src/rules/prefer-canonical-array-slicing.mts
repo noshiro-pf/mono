@@ -5,18 +5,16 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
-  bindValueImports,
   getImportDeclarations,
   getImportedLocalName,
   hasForeignBinding,
-  importedNameOf,
   skipTypeWrappers,
   typeWrapperLayers,
-  type ValueImportBinding,
 } from 'eslint-rule-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { tsDataForgeValueAt } from './import-binding.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
@@ -203,24 +201,15 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
 
     const program = sourceCode.ast;
 
+    // `import type` binds no value a call could go through.
     const tsDataForgeImports = getImportDeclarations(
       program,
       TS_DATA_FORGE_MODULE,
-    );
+    ).filter((declaration) => declaration.importKind !== 'type');
 
     const parserServices = ESLintUtils.getParserServices(context);
 
     const checker = parserServices.program.getTypeChecker();
-
-    /**
-     * The in-scope way to reference the `Arr` namespace, the name the reference
-     * starts with, and the edits that bring it into scope: a value
-     * import of `Arr` (possibly aliased), a namespace import member, or `Arr`
-     * bound by {@link bindValueImports}, which adds it to an existing import or
-     * drops `type` from one. `undefined` when none can: `import type { Arr }`
-     * with no namespace import.
-     */
-    const arrTarget = resolveArrTarget(sourceCode, tsDataForgeImports);
 
     /** How a call already in the file names `Arr`, to recognize it. */
     const arrLocalName = getImportedLocalName(tsDataForgeImports, 'Arr');
@@ -232,7 +221,23 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
           specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier,
       )?.local.name;
 
-    const arrRef = arrTarget?.ref ?? 'Arr';
+    /**
+     * Whether `identifier` is `localName`, bound by the import from
+     * ts-data-forge where it is rather than by a local binding.
+     */
+    const isImportedAs = (
+      identifier: TSESTree.Node,
+      localName: string | undefined,
+    ): boolean =>
+      localName !== undefined &&
+      identifier.type === AST_NODE_TYPES.Identifier &&
+      identifier.name === localName &&
+      !hasForeignBinding(
+        sourceCode,
+        identifier,
+        localName,
+        TS_DATA_FORGE_MODULE,
+      );
 
     /**
      * Deferred (non-concrete) types are reduced to their base constraint before
@@ -317,39 +322,14 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
         : text;
     };
 
-    const toReplacementText = (op: CopyOp, xsText: string): string => {
-      switch (op.fn) {
-        case 'tail':
-        case 'butLast':
-          return `${arrRef}.${op.fn}(${xsText})`;
-
-        case 'skip':
-        case 'take':
-        case 'skipLast':
-        case 'takeLast':
-          return `${arrRef}.${op.fn}(${xsText}, ${op.count})`;
-
-        // Emit the curried form for `toUnshifted` so the new element stays in
-        // the same textual position as in the `[item, ...xs]` source, keeping
-        // the rewrite easy to read.
-        case 'toUnshifted':
-          return `${arrRef}.toUnshifted(${op.itemText})(${xsText})`;
-
-        case 'toPushed':
-          return `${arrRef}.toPushed(${xsText}, ${op.itemText})`;
-      }
-    };
-
     const mut_nodesToFix: {
       node: TSESTree.Node;
-      replacement: string;
+      op: CopyOp;
+      xsText: string;
     }[] = [];
 
     const report = (node: TSESTree.Node, op: CopyOp, xsText: string): void => {
-      mut_nodesToFix.push({
-        node,
-        replacement: toReplacementText(op, xsText),
-      });
+      mut_nodesToFix.push({ node, op, xsText });
     };
 
     /**
@@ -654,17 +634,22 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
         const receiver = callee.object;
 
         // `Arr.skip(xs, 1)` → `Arr.tail(xs)`, `Arr.skipLast(xs, 1)` →
-        // `Arr.butLast(xs)` (also via a namespace import or an alias).
+        // `Arr.butLast(xs)` (also via a namespace import or an alias, and
+        // through type wrappers), unless a local binding shadows the import
+        // where the call is.
         if (methodName === 'skip' || methodName === 'skipLast') {
+          const arrObject = skipTypeWrappers(receiver);
+
           const isArrObject =
-            (receiver.type === AST_NODE_TYPES.Identifier &&
-              receiver.name === arrLocalName) ||
-            (receiver.type === AST_NODE_TYPES.MemberExpression &&
-              !receiver.computed &&
-              receiver.object.type === AST_NODE_TYPES.Identifier &&
-              receiver.object.name === namespaceLocalName &&
-              receiver.property.type === AST_NODE_TYPES.Identifier &&
-              receiver.property.name === 'Arr');
+            isImportedAs(arrObject, arrLocalName) ||
+            (arrObject.type === AST_NODE_TYPES.MemberExpression &&
+              !arrObject.computed &&
+              isImportedAs(
+                skipTypeWrappers(arrObject.object),
+                namespaceLocalName,
+              ) &&
+              arrObject.property.type === AST_NODE_TYPES.Identifier &&
+              arrObject.property.name === 'Arr');
 
           const [arrayArg, countArg] = node.arguments;
 
@@ -858,28 +843,34 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
       },
 
       'Program:exit': () => {
+        if (mut_nodesToFix.length === 0) {
+          return;
+        }
+
+        const arrAt = tsDataForgeValueAt(sourceCode, 'Arr');
+
         // Every fix brings `Arr` into scope itself, so that one applied alone
         // (an editor's quick fix) is complete.
         for (const nodeInfo of mut_nodesToFix) {
-          const writable =
-            arrTarget !== undefined &&
-            !hasForeignBinding(
-              sourceCode,
-              nodeInfo.node,
-              arrTarget.boundName,
-              TS_DATA_FORGE_MODULE,
-            );
+          const arr = arrAt(nodeInfo.node);
+
+          const replacement = toReplacementText(
+            arr?.localName ?? 'Arr',
+            nodeInfo.op,
+            nodeInfo.xsText,
+          );
 
           context.report({
             node: nodeInfo.node,
             messageId: 'preferCanonicalArraySlicing',
-            data: { replacement: nodeInfo.replacement },
-            fix: writable
-              ? (fixer) => [
-                  ...arrTarget.edits(fixer),
-                  fixer.replaceText(nodeInfo.node, nodeInfo.replacement),
-                ]
-              : null,
+            data: { replacement },
+            fix:
+              arr === undefined
+                ? null
+                : (fixer) => [
+                    ...arr.edits(fixer),
+                    fixer.replaceText(nodeInfo.node, replacement),
+                  ],
           });
         }
       },
@@ -887,56 +878,30 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
   },
 } as const;
 
-/**
- * How `Arr` is written in this file; see where it is called. A value import of
- * `Arr` comes first, then a namespace import, and only then an edit.
- */
-const resolveArrTarget = (
-  sourceCode: TSESLint.SourceCode,
-  tsDataForgeImports: readonly TSESTree.ImportDeclaration[],
-):
-  | Readonly<{
-      ref: string;
-      boundName: string;
-      edits: ValueImportBinding['edits'];
-    }>
-  | undefined => {
-  const valueSpecifiers = tsDataForgeImports
-    .filter((declaration) => declaration.importKind !== 'type')
-    .flatMap((declaration) => declaration.specifiers);
+/** The call `op` is rewritten to, writing `Arr` as `arrRef`. */
+const toReplacementText = (
+  arrRef: string,
+  op: CopyOp,
+  xsText: string,
+): string => {
+  switch (op.fn) {
+    case 'tail':
+    case 'butLast':
+      return `${arrRef}.${op.fn}(${xsText})`;
 
-  const arrImport = valueSpecifiers.find(
-    (specifier) =>
-      specifier.type === AST_NODE_TYPES.ImportSpecifier &&
-      specifier.importKind !== 'type' &&
-      importedNameOf(specifier) === 'Arr',
-  );
+    case 'skip':
+    case 'take':
+    case 'skipLast':
+    case 'takeLast':
+      return `${arrRef}.${op.fn}(${xsText}, ${op.count})`;
 
-  if (arrImport !== undefined) {
-    return {
-      ref: arrImport.local.name,
-      boundName: arrImport.local.name,
-      edits: () => [],
-    };
+    // Emit the curried form for `toUnshifted` so the new element stays in the
+    // same textual position as in the `[item, ...xs]` source, keeping the
+    // rewrite easy to read.
+    case 'toUnshifted':
+      return `${arrRef}.toUnshifted(${op.itemText})(${xsText})`;
+
+    case 'toPushed':
+      return `${arrRef}.toPushed(${xsText}, ${op.itemText})`;
   }
-
-  const namespace = valueSpecifiers.find(
-    (specifier) => specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier,
-  );
-
-  if (namespace !== undefined) {
-    return {
-      ref: `${namespace.local.name}.Arr`,
-      boundName: namespace.local.name,
-      edits: () => [],
-    };
-  }
-
-  const binding = bindValueImports(sourceCode, TS_DATA_FORGE_MODULE, ['Arr']);
-
-  const localName = binding?.localNames[0];
-
-  return binding === undefined || localName === undefined
-    ? undefined
-    : { ref: localName, boundName: localName, edits: binding.edits };
 };
