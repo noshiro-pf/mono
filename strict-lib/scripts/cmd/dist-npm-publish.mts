@@ -3,32 +3,25 @@
 // cspell:ignore EOTP
 
 /**
- * Publishes the bundle packages to the **npm registry**.
+ * Publishes the bundle packages to the **npm registry** by hand — the root
+ * `strict-lib:publish` script.
  *
- * This is the experiment the release strategy hinges on. Publishing the
- * per-lib packages to npm was abandoned because it hit the registry's rate
- * limit: a shared change in the generator fans out to every TypeScript series,
- * which is ~12 series x 2 flavors x ~107 packages ≈ 2,400 publishes, and even
- * one series' 214 was too many. Bundling collapses that to **2 per series** —
- * 24 in total — which is ordinary release traffic.
- *
- * If it goes through, consumers can install from the registry instead of a
- * release URL, and `pnpm update` moves the version for them. If it does not,
- * nothing is lost: the same bundles ship as GitHub Release assets via
- * `dist-github-release.mts`, and the only difference to a consumer is whether
- * the dependency is a `npm:` range or a URL.
+ * `release.yml` does not run this: it publishes the bundles with `changeset
+ * publish`, like every other package. This is for what CI cannot do — a new
+ * series' first publish, which has to exist on npm before its trusted
+ * publisher can be configured (`docs/first-release.md`) — and for packing a
+ * bundle to inspect it before it goes out.
  *
  * Requires an authenticated `npm` (`npm whoami`).
  *
  * Usage:
- *   tsx scripts/cmd/dist-npm-publish.mts [--version=<range>] [--publish]
+ *   pnpm run strict-lib:publish -- [--version=<range>] [--publish]
  *     [--tag=<dist-tag>] [--otp=<code>] [--pack-only [--out-dir=<dir>]]
  *
- * Dry-run unless `--publish` is passed. `--version` limits which versions are
- * published (same syntax as `dist-github-release.mts`: `5`, `5.9`,
- * `">=5.3&<=5.5"`). `--tag` sets the dist-tag; without it npm moves `latest`,
- * which is only right for the newest TypeScript series — publish an older
- * series as e.g. `--tag=v5.9`.
+ * Dry-run unless `--publish` is passed. `--version` limits which series are
+ * published (`5`, `5.9`, `">=5.3&<=5.5"`). `--tag` sets the dist-tag; without
+ * it npm moves `latest`, which is only right for the newest TypeScript series;
+ * publish an older series as e.g. `--tag=v5.9`.
  *
  * **Two-factor authentication.** Commands here run through `child_process.exec`,
  * which gives them no TTY, so npm cannot fall back to its interactive
@@ -37,19 +30,16 @@
  *
  * - `--otp=<code>` — a code from the authenticator app. npm treats the presence
  *   of `otp` as `auth-type=legacy`, so it never tries the browser flow. A code
- *   lasts ~30 seconds, which covers one series (two packages) comfortably; for
- *   a wider `--version` range, publish series by series with a fresh code.
+ *   lasts ~30 seconds, which covers one series comfortably; for a wider
+ *   `--version` range, publish series by series with a fresh code.
  * - `--pack-only` — stage and pack the tarballs, then stop, printing the
  *   `npm publish` line to run yourself in a real terminal, where npm can prompt
  *   (or open the browser) as usual. This is also the way to inspect a tarball
  *   before it goes out.
  *
  * **Re-runs are safe.** A version already on the registry is skipped rather
- * than re-published, because npm refuses to overwrite one (`EPUBLISHCONFLICT`).
- * `release.yml` runs this on every push to `main` — the
- * Changesets action runs its publish step whenever no changesets are pending —
- * so without the skip, every push after a release would fail on the 24 versions
- * that are already out.
+ * than re-published, because npm refuses to overwrite one (`EPUBLISHCONFLICT`),
+ * so a run that stopped on an expired code can be repeated with a fresh one.
  */
 
 import * as fs from 'node:fs/promises';
@@ -232,8 +222,7 @@ const publishVersion = async (
 
   try {
     {
-      // Ask the registry before packing: `release.yml` runs this on every push
-      // to `main`.
+      // Ask the registry before packing, so a repeated run skips what went out.
       if (
         publish &&
         !packOnly &&
