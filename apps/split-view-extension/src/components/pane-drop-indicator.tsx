@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import type { InitializedObservable } from 'synstate';
+import { constant, view, type JSX } from 'synstate-dom';
 import type { PaneDropTarget } from '../layout/index.mjs';
 
 /**
@@ -9,26 +9,31 @@ import type { PaneDropTarget } from '../layout/index.mjs';
  * pane highlights the whole of it, an edge highlights the half the moved pane
  * would take. The caption is there because "swap" and "move" are the kind of
  * distinction that is obvious once and never again.
+ *
+ * Mounted while there is a target; `target$` may still pass `undefined` on its
+ * way out, which draws nothing new.
  */
-export const PaneDropIndicator = memoNamed(
-  'PaneDropIndicator',
-  ({ target }: Readonly<{ target: PaneDropTarget }>) => {
-    const style = React.useMemo<React.CSSProperties>(
-      () => ({
-        left: `${target.indicator.left.toString()}px`,
-        top: `${target.indicator.top.toString()}px`,
-        width: `${target.indicator.width.toString()}px`,
-        height: `${target.indicator.height.toString()}px`,
-      }),
-      [target.indicator],
-    );
-
-    return (
-      <div className={'pane-drop'} style={style}>
-        <span className={'pane-drop__label'}>
-          {target.zone === 'center' ? 'Swap' : 'Move here'}
-        </span>
-      </div>
-    );
-  },
+export const PaneDropIndicator = ({
+  target$,
+}: Readonly<{
+  target$: InitializedObservable<PaneDropTarget | undefined>;
+}>): JSX.Element => (
+  <div
+    class={constant('pane-drop')}
+    style={{
+      left: view(target$, (target) => pixels(target?.indicator.left)),
+      top: view(target$, (target) => pixels(target?.indicator.top)),
+      width: view(target$, (target) => pixels(target?.indicator.width)),
+      height: view(target$, (target) => pixels(target?.indicator.height)),
+    }}
+  >
+    <span class={constant('pane-drop__label')}>
+      {view(target$, (target) =>
+        target?.zone === 'center' ? 'Swap' : 'Move here',
+      )}
+    </span>
+  </div>
 );
+
+const pixels = (value: number | undefined): string | undefined =>
+  value === undefined ? undefined : (`${value.toString()}px` as const);

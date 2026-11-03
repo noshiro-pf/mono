@@ -133,6 +133,20 @@ test(
     // The last, T1+B2: one divider under the top pane, one between the two
     // below.
     await expect.soft(splitters(page)).toHaveCount(2);
+
+    // The root's divider keeps its place in the tree from one of these to the
+    // other, and turns with it.
+    await preset(page, '2 cols').click();
+
+    await expect
+      .soft(splitters(page))
+      .toHaveAttribute('aria-orientation', 'vertical');
+
+    await preset(page, '2 rows').click();
+
+    await expect
+      .soft(splitters(page))
+      .toHaveAttribute('aria-orientation', 'horizontal');
   },
 );
 

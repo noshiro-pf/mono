@@ -1,6 +1,5 @@
 import {
   eslintConfigForPlaywright,
-  eslintConfigForReact,
   eslintConfigForTypeScript,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -23,8 +22,6 @@ export default [
   }),
 
   eslintPluginTsDataForge.configs.recommended,
-
-  ...eslintConfigForReact(),
 
   eslintConfigForPlaywright(['e2e/**']),
 

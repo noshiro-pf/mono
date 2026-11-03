@@ -1,13 +1,28 @@
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
-import type { WorkspaceEntry, WorkspaceRegistry } from '../state/index.mjs';
+import {
+  createBooleanState,
+  derive,
+  type InitializedObservable,
+} from 'synstate';
+import {
+  constant,
+  createAfterUpdate,
+  For,
+  If,
+  listenInScope,
+  subscribeInScope,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import type { WorkspaceRegistry } from '../state/index.mjs';
 import { Icon } from './icon.js';
+import { WorkspaceEditor } from './workspace-editor.js';
 
 type Props = Readonly<{
-  activeId: string | undefined;
+  activeId: InitializedObservable<string | undefined>;
   /** What the last import or the last "open all" had to say. */
-  notice: string | undefined;
-  registry: WorkspaceRegistry;
+  notice: Bindable<string | undefined>;
+  registry: InitializedObservable<WorkspaceRegistry>;
   onCreate: () => void;
   onExport: () => void;
   onImport: (text: string) => void;
@@ -16,7 +31,8 @@ type Props = Readonly<{
   onOpenInNewTab: (workspaceId: string) => void;
   onRemove: (workspaceId: string) => void;
   onRename: (workspaceId: string, workspaceName: string) => void;
-  onSwitch: (workspaceId: string) => void;
+  /** Settles once the tab shows `workspaceId`, or has failed to. */
+  onSwitch: (workspaceId: string) => Promise<void>;
 }>;
 
 /**
@@ -33,131 +49,154 @@ type Props = Readonly<{
  * `display: contents`, so it is in the DOM for "did the click land outside the
  * popover" without being a box in the layout.
  */
-export const WorkspacePicker = memoNamed(
-  'WorkspacePicker',
-  ({
-    activeId,
-    notice,
-    registry,
-    onCreate,
-    onExport,
-    onImport,
-    onMove,
-    onOpenAll,
-    onOpenInNewTab,
-    onRemove,
-    onRename,
-    onSwitch,
-  }: Props) => {
-    const [editing, setEditing] = React.useState(false);
+export const WorkspacePicker = ({
+  activeId,
+  notice,
+  registry,
+  onCreate,
+  onExport,
+  onImport,
+  onMove,
+  onOpenAll,
+  onOpenInNewTab,
+  onRemove,
+  onRename,
+  onSwitch,
+}: Props): JSX.Element => {
+  const [editing$, { setFalse: stopEditing, toggle: toggleEditing }] =
+    createBooleanState(false);
 
-    const [root, setRoot] = React.useState<HTMLSpanElement | null>(null);
+  const afterUpdate = createAfterUpdate();
 
-    const active = React.useMemo(
-      () => registry.entries.find((entry) => entry.id === activeId),
-      [registry.entries, activeId],
-    );
+  const mut_state: {
+    root: HTMLSpanElement | undefined;
+    /** Switches asked for from the select that have not settled yet. */
+    pendingSwitches: number;
+  } = {
+    root: undefined,
+    pendingSwitches: 0,
+  };
 
-    const handleSelect = React.useCallback<
-      React.ChangeEventHandler<HTMLSelectElement>
-    >(
-      (changeEvent) => {
-        onSwitch(changeEvent.target.value);
-      },
-      [onSwitch],
-    );
+  const active$ = derive([activeId, registry], (id, list) =>
+    list.entries.find((entry) => entry.id === id),
+  );
 
-    const handleToggleEditing = React.useCallback((): void => {
-      setEditing((shown) => !shown);
-    }, []);
+  // Switching is the one action that leaves the popover about something else,
+  // so it closes it; the rest are edits to the workspace it is open on.
+  subscribeInScope(activeId, () => {
+    afterUpdate(stopEditing);
+  });
 
-    // Switching is the one action that leaves the popover about something else,
-    // so it closes it; the rest are edits to the workspace it is open on.
-    React.useEffect(() => {
-      setEditing(false);
-    }, [activeId]);
+  /**
+   * Escape, or a click anywhere but in the popover, closes it.
+   *
+   * A click *inside a pane* is not one of those: it goes to the frame and never
+   * reaches this page. The popover stays open over it, which is the price of
+   * not having a row of its own.
+   */
+  listenInScope(globalThis, 'pointerdown', (pointerEvent) => {
+    const { root } = mut_state;
 
-    /**
-     * Escape, or a click anywhere but in the popover, closes it.
-     *
-     * A click *inside a pane* is not one of those: it goes to the frame and
-     * never reaches this page. The popover stays open over it, which is the
-     * price of not having a row of its own.
-     */
-    React.useEffect(() => {
-      if (!editing) {
-        return undefined;
-      }
+    if (
+      root !== undefined &&
+      editing$.getSnapshot().value &&
+      pointerEvent.target instanceof Node &&
+      !root.contains(pointerEvent.target)
+    ) {
+      stopEditing();
+    }
+  });
 
-      const onPointerDown = (
-        pointerEvent: Readonly<{ target: unknown }>,
-      ): void => {
-        if (
-          root !== null &&
-          pointerEvent.target instanceof Node &&
-          !root.contains(pointerEvent.target)
-        ) {
-          setEditing(false);
-        }
-      };
+  listenInScope(globalThis, 'keydown', (keyboardEvent) => {
+    if (
+      editing$.getSnapshot().value &&
+      keyboardEvent instanceof KeyboardEvent &&
+      keyboardEvent.key === 'Escape'
+    ) {
+      stopEditing();
+    }
+  });
 
-      const onKeyDown = (keyboardEvent: Readonly<{ key: string }>): void => {
-        if (keyboardEvent.key === 'Escape') {
-          setEditing(false);
-        }
-      };
+  return (
+    <span
+      ref={(element) => {
+        mut_state.root = element;
+      }}
+      class={constant('workspace-picker')}
+    >
+      <select
+        aria-label={constant('The split view shown here')}
+        class={constant('workspace-picker__select')}
+        title={constant(
+          'The split view shown in this tab. Alt+1..9 switches too.',
+        )}
+        value={view(activeId, (id) => id ?? '')}
+        onChange={(changeEvent) => {
+          const mut_select = changeEvent.currentTarget;
 
-      addEventListener('pointerdown', onPointerDown);
+          // The choice stays shown while switches run, so a second step from
+          // the keyboard starts from it. Once the last has run, the select
+          // shows the split view on screen, which is not the choice when the
+          // switch failed.
+          mut_state.pendingSwitches += 1;
 
-      addEventListener('keydown', onKeyDown);
+          onSwitch(mut_select.value)
+            .finally(() => {
+              mut_state.pendingSwitches -= 1;
 
-      return () => {
-        removeEventListener('pointerdown', onPointerDown);
-
-        removeEventListener('keydown', onKeyDown);
-      };
-    }, [editing, root]);
-
-    return (
-      <span ref={setRoot} className={'workspace-picker'}>
-        <select
-          aria-label={'The split view shown here'}
-          className={'workspace-picker__select'}
-          title={'The split view shown in this tab. Alt+1..9 switches too.'}
-          value={activeId ?? ''}
-          onChange={handleSelect}
+              if (mut_state.pendingSwitches === 0) {
+                mut_select.value = activeId.getSnapshot().value ?? '';
+              }
+            })
+            .catch(console.error);
+        }}
+      >
+        <For
+          items={view(registry, (list) => list.entries)}
+          key={(entry) => entry.id}
         >
-          {registry.entries.map((entry, index) => (
-            <option key={entry.id} value={entry.id}>
-              {`${(index + 1).toString()}: ${entry.name}`}
+          {(entry$, index$) => (
+            <option value={view(entry$, (entry) => entry.id)}>
+              {derive(
+                [entry$, index$],
+                (entry, index) => `${(index + 1).toString()}: ${entry.name}`,
+              )}
             </option>
-          ))}
-        </select>
+          )}
+        </For>
+      </select>
 
-        <button
-          className={'top-bar__button'}
-          title={'Add a split view and open it in a new tab'}
-          type={'button'}
-          onClick={onCreate}
-        >
-          <Icon icon={'plus'} />
-        </button>
+      <button
+        class={constant('top-bar__button')}
+        title={constant('Add a split view and open it in a new tab')}
+        type={constant('button')}
+        onClick={onCreate}
+      >
+        <Icon icon={'plus'} />
+      </button>
 
-        <button
-          aria-expanded={editing}
-          className={'top-bar__button'}
-          title={
-            'Rename, reorder or delete this split view, open one or all of them in tabs, export and import'
-          }
-          type={'button'}
-          onClick={handleToggleEditing}
-        >
-          {'Edit'}
-        </button>
+      <button
+        aria-expanded={view(editing$, (shown) => (shown ? 'true' : 'false'))}
+        class={constant('top-bar__button')}
+        title={constant(
+          'Rename, reorder or delete this split view, open one or all of them in tabs, export and import',
+        )}
+        type={constant('button')}
+        onClick={() => {
+          toggleEditing();
+        }}
+      >
+        {constant('Edit')}
+      </button>
 
-        {editing && active !== undefined ? (
+      <If
+        cond={derive(
+          [editing$, active$],
+          (editing, active) => editing && active !== undefined,
+        )}
+        then={
           <WorkspaceEditor
-            entry={active}
+            entry$={active$}
             notice={notice}
             onExport={onExport}
             onImport={onImport}
@@ -167,236 +206,8 @@ export const WorkspacePicker = memoNamed(
             onRemove={onRemove}
             onRename={onRename}
           />
-        ) : undefined}
-      </span>
-    );
-  },
-);
-
-const WorkspaceEditor = memoNamed(
-  'WorkspaceEditor',
-  ({
-    entry,
-    notice,
-    onExport,
-    onImport,
-    onMove,
-    onOpenAll,
-    onOpenInNewTab,
-    onRemove,
-    onRename,
-  }: Readonly<{
-    entry: WorkspaceEntry;
-    notice: string | undefined;
-    onExport: () => void;
-    onImport: (text: string) => void;
-    onMove: (workspaceId: string, offset: number) => void;
-    onOpenAll: () => void;
-    onOpenInNewTab: (workspaceId: string) => void;
-    onRemove: (workspaceId: string) => void;
-    onRename: (workspaceId: string, workspaceName: string) => void;
-  }>) => {
-    const [draft, setDraft] = React.useState(entry.name);
-
-    /**
-     * Whether deleting has been asked for once. A saved layout is not something
-     * to lose to a mis-click, and a second click is a cheaper guard than a
-     * modal.
-     */
-    const [confirming, setConfirming] = React.useState(false);
-
-    /**
-     * Bumped after a file is chosen, to replace the `input` element.
-     *
-     * A file input holds on to what was chosen, so choosing the same file twice
-     * fires no second `change`. Replacing the element is the way to clear that
-     * without assigning to `value`.
-     */
-    const [importNonce, setImportNonce] = React.useState(0);
-
-    React.useEffect(() => {
-      setDraft(entry.name);
-
-      setConfirming(false);
-    }, [entry.id, entry.name]);
-
-    const handleDraftChange = React.useCallback<
-      React.ChangeEventHandler<HTMLInputElement>
-    >((changeEvent) => {
-      setDraft(changeEvent.target.value);
-    }, []);
-
-    const handleSubmit = React.useCallback<
-      React.SubmitEventHandler<HTMLFormElement>
-    >(
-      (submitEvent) => {
-        submitEvent.preventDefault();
-
-        onRename(entry.id, draft);
-      },
-      [onRename, entry.id, draft],
-    );
-
-    const handleMoveLeft = React.useCallback((): void => {
-      onMove(entry.id, -1);
-    }, [onMove, entry.id]);
-
-    const handleMoveRight = React.useCallback((): void => {
-      onMove(entry.id, 1);
-    }, [onMove, entry.id]);
-
-    const handleOpenInNewTab = React.useCallback((): void => {
-      onOpenInNewTab(entry.id);
-    }, [onOpenInNewTab, entry.id]);
-
-    const handleAskRemove = React.useCallback((): void => {
-      setConfirming(true);
-    }, []);
-
-    const handleRemove = React.useCallback((): void => {
-      onRemove(entry.id);
-    }, [onRemove, entry.id]);
-
-    const handleChooseFile = React.useCallback<
-      React.ChangeEventHandler<HTMLInputElement>
-    >(
-      (changeEvent) => {
-        const file = changeEvent.target.files?.[0];
-
-        if (file === undefined) {
-          return;
         }
-
-        setImportNonce((nonce) => nonce + 1);
-
-        const read = async (): Promise<void> => {
-          onImport(await file.text());
-        };
-
-        read().catch(console.error);
-      },
-      [onImport],
-    );
-
-    return (
-      <div className={'workspace-popover'} data-e2e={'workspace-popover'}>
-        <form className={'workspace-popover__row'} onSubmit={handleSubmit}>
-          <input
-            aria-label={'Name of this split view'}
-            className={'workspace-popover__input'}
-            value={draft}
-            onChange={handleDraftChange}
-          />
-
-          <button
-            className={'top-bar__button'}
-            title={'Use this name'}
-            type={'submit'}
-          >
-            {'Rename'}
-          </button>
-        </form>
-
-        <div className={'workspace-popover__row'}>
-          <button
-            className={'top-bar__button'}
-            title={
-              'One place earlier in the list. The number, and its Alt+N, change with it.'
-            }
-            type={'button'}
-            onClick={handleMoveLeft}
-          >
-            {'◀ Earlier'}
-          </button>
-
-          <button
-            className={'top-bar__button'}
-            title={
-              'One place later in the list. The number, and its Alt+N, change with it.'
-            }
-            type={'button'}
-            onClick={handleMoveRight}
-          >
-            {'Later ▶'}
-          </button>
-
-          <button
-            className={'top-bar__button'}
-            title={'Open this split view in a tab of its own'}
-            type={'button'}
-            onClick={handleOpenInNewTab}
-          >
-            {'↗ New tab'}
-          </button>
-        </div>
-
-        <div className={'workspace-popover__row'}>
-          {confirming ? (
-            <button
-              className={'workspace-popover__danger'}
-              title={'Delete this split view and the layout in it'}
-              type={'button'}
-              onClick={handleRemove}
-            >
-              {'Really delete'}
-            </button>
-          ) : (
-            <button
-              className={'top-bar__button'}
-              title={'Remove this split view from the list'}
-              type={'button'}
-              onClick={handleAskRemove}
-            >
-              {'Delete'}
-            </button>
-          )}
-        </div>
-
-        <div className={'workspace-popover__row workspace-popover__row--last'}>
-          <button
-            className={'top-bar__button'}
-            title={
-              'Open every saved split view, each in a tab of its own. The ones already open in a tab are left where they are, and one last seen in a pinned tab comes back pinned.'
-            }
-            type={'button'}
-            onClick={onOpenAll}
-          >
-            {'\u{2197} Open all'}
-          </button>
-
-          <button
-            className={'top-bar__button'}
-            title={
-              'Write every saved split view to JSON. If the extension id ever changes, importing this is the way back.'
-            }
-            type={'button'}
-            onClick={onExport}
-          >
-            {'Export'}
-          </button>
-
-          <label
-            className={'top-bar__button'}
-            title={
-              'Read a JSON export back, or a raw chrome.storage.local.get(null) dump. An id already on the list is replaced; nothing is deleted.'
-            }
-          >
-            {'Import'}
-
-            <input
-              key={importNonce}
-              accept={'application/json, .json'}
-              hidden
-              type={'file'}
-              onChange={handleChooseFile}
-            />
-          </label>
-        </div>
-
-        {notice === undefined ? undefined : (
-          <p className={'workspace-popover__notice'}>{notice}</p>
-        )}
-      </div>
-    );
-  },
-);
+      />
+    </span>
+  );
+};

@@ -45,9 +45,9 @@ pnpm run screenshots # writes pack/screenshots/*.png and docs/screenshots/*.png
 ```
 
 **`pnpm run build` needs the workspace libraries built first.** It imports
-`ts-data-forge` and `react-utils` through their `dist/`, so on a checkout where
-nothing has been built yet, build the extension together with what it depends
-on — from the repository root:
+`ts-data-forge`, `synstate` and `synstate-dom` through their `dist/`, so on a
+checkout where nothing has been built yet, build the extension together with
+what it depends on — from the repository root:
 
 ```sh
 pnpm --filter-prod 'split-view-extension...' run build

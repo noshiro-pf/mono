@@ -2348,9 +2348,12 @@ importers:
 
   apps/split-view-extension:
     dependencies:
-      react-utils:
+      synstate:
         specifier: workspace:*
-        version: link:../react-utils
+        version: link:../../libs/synstate
+      synstate-dom:
+        specifier: workspace:*
+        version: link:../../libs/synstate-dom
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
@@ -2361,12 +2364,6 @@ importers:
       '@types/chrome':
         specifier: ^0.3.6
         version: 0.3.6
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.3.0
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.3.0(@types/react@19.3.0)
       eslint:
         specifier: 'catalog:'
         version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -2388,12 +2385,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.10)
-      react:
-        specifier: 'catalog:'
-        version: 19.3.1
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.3.1(react@19.3.1)
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
