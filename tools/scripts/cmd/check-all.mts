@@ -42,6 +42,22 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'File extensions validated',
   });
 
+  // Writes each published package's `LICENSE` from the license its manifest
+  // declares, as `style-check.yml` does before it asserts a clean tree, so a
+  // reformatted or hand-edited copy shows up in `git status`. It needs no
+  // `dist/` and no network (`--verify-upstream` is left to a person), so it
+  // comes before the build, where a package missing its `license` field fails
+  // at once.
+  await logStep({
+    startMessage: 'Regenerating the LICENSE files',
+    action: () =>
+      runCmdStep(
+        'pnpm run gen:license-files',
+        'LICENSE file generation failed',
+      ),
+    successMessage: 'LICENSE files regenerated',
+  });
+
   await logStep({
     startMessage: 'Building project',
     action: () => runCmdStep('pnpm run ws:build', 'Build failed'),

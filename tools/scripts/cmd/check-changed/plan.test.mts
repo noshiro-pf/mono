@@ -359,11 +359,28 @@ describe('buildPlan', () => {
 
     assert.include(commands, 'run gen:deps-graph');
 
+    assert.include(commands, 'run gen:license-files');
+
     assert.include(commands, 'run gen:verify-npm-packages');
 
     assert.include(commands, 'run check:knip');
 
     assert.include(commands, 'run check:published-deps');
+  });
+
+  test.each([
+    'libs/ts-data-forge/LICENSE',
+    'LICENSE',
+    'tools/scripts/cmd/gen-license-files.mts',
+  ])('%s regenerates the LICENSE files', (file) => {
+    assert.include(commandsOf([file]), 'run gen:license-files');
+  });
+
+  test('a source file does not regenerate the LICENSE files', () => {
+    assert.notInclude(
+      commandsOf(['libs/ts-data-forge/src/array.mts']),
+      'run gen:license-files',
+    );
   });
 
   test('the codemod runs over the untracked files too when there are any', () => {
@@ -389,7 +406,12 @@ describe('buildPlan', () => {
       plan(['libs/ts-data-forge/package.json'])
         .filter(({ kind }) => kind === 'generate')
         .map(({ title }) => title),
-      ['ts-data-forge: gen', 'gen:deps-graph', 'gen:verify-npm-packages'],
+      [
+        'ts-data-forge: gen',
+        'gen:deps-graph',
+        'gen:license-files',
+        'gen:verify-npm-packages',
+      ],
     );
   });
 
