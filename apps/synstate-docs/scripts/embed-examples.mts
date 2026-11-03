@@ -1,7 +1,10 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { Result } from 'ts-data-forge';
 import { pathExists } from 'ts-repo-utils';
 import type { DeepReadonly } from 'ts-type-forge';
+// eslint-disable-next-line import-x/no-relative-packages
+import { assertSamplePackagesDeclared } from '../../../tools/configs/embed-examples-packages.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
 import { extractSampleCode } from '../../../tools/configs/embed-examples-utils.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
@@ -626,6 +629,19 @@ const documents: DeepReadonly<
 ] as const;
 
 const embedExamples = async (): Promise<void> => {
+  const declared = await assertSamplePackagesDeclared(
+    documents.flatMap(({ mdPath, sampleCodeFiles, samplesDir }) =>
+      sampleCodeFiles.map((sampleCodeFile) => ({
+        documentPath: mdPath,
+        samplePath: path.resolve(samplesDir, sampleCodeFile),
+      })),
+    ),
+  );
+
+  if (Result.isErr(declared)) {
+    throw new Error(declared.value);
+  }
+
   for (const { mdPath, sampleCodeFiles, samplesDir } of documents) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const markdownContent = await fs.readFile(mdPath, 'utf8');

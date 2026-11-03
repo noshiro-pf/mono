@@ -522,6 +522,27 @@
       "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
     },
 
+    // The Astro site `apps/*` assumes, which also embeds samples it reads as
+    // files rather than imports. knip does not merge workspace entries, so the
+    // globs are `apps/*`'s, kept in step with it.
+    "apps/synstate-docs": {
+      "entry": [
+        "src/pages/**/*.{astro,mts,ts,tsx}",
+        "scripts/**/*.mts",
+        "configs/*.mts",
+        "e2e/**/*.spec.mts",
+      ],
+      "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
+      // `scripts/embed-examples.mts` reads their `samples/` as files, and
+      // declares them so that `check-changed` regenerates the pages when a
+      // sample changes; nothing imports them.
+      "ignoreDependencies": [
+        "synstate-router",
+        "synstate-router-dom",
+        "synstate-router-react",
+      ],
+    },
+
     // Not an Astro site like the entry above assumes: plain TypeScript with a
     // single entry point.
     "apps/lambda-calculus-interpreter-core": {

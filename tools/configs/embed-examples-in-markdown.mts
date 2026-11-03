@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
 import { formatFiles, Result } from 'ts-repo-utils';
+import { assertSamplePackagesDeclared } from './embed-examples-packages.mjs';
 import { extractSampleCode } from './embed-examples-utils.mjs';
 
 /**
@@ -35,12 +36,28 @@ export type EmbedExamplesInMarkdownOptions = Readonly<{
  * for what counts as one. A package's `scripts/cmd/embed-examples.mts` is the
  * mapping and nothing else; this is the code that was copied into all thirteen
  * of them.
+ *
+ * Before writing anything it refuses a sample from a package the document's
+ * package does not declare — see `assertSamplePackagesDeclared`.
  */
 export const embedExamplesInMarkdown = async ({
   documents,
   stripTransformerDirectives,
 }: EmbedExamplesInMarkdownOptions): Promise<Result<undefined, unknown>> => {
   try {
+    const declared = await assertSamplePackagesDeclared(
+      documents.flatMap(({ mdPath, sampleCodeFiles, samplesDir }) =>
+        sampleCodeFiles.map((sampleCodeFile) => ({
+          documentPath: mdPath,
+          samplePath: path.resolve(samplesDir, sampleCodeFile),
+        })),
+      ),
+    );
+
+    if (Result.isErr(declared)) {
+      return declared;
+    }
+
     for (const { mdPath, sampleCodeFiles, samplesDir } of documents) {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const markdownContent = await fs.readFile(mdPath, 'utf8');
