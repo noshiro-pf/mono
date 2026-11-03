@@ -1,7 +1,8 @@
-import { DateInput } from 'blueprint-synstate';
+import { DateInput, now } from 'blueprint-synstate';
 import { constant, If, type Bindable, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { NARROW_QUERY } from '../store/index.mjs';
+import { dateFieldRange } from '../view-model/index.mjs';
 
 type Props = Readonly<{
   /** The id of the input, unique on the page. */
@@ -28,7 +29,8 @@ type Props = Readonly<{
  *
  * The calendar stays open when a day is picked, so that the time can be set
  * after it. With 「終日」 on, the calendar picks a day alone, and closes on
- * it.
+ * it. The days that can be picked are {@link dateFieldRange}'s, read when the
+ * field is drawn.
  */
 export const DateTimeField = ({
   id,
@@ -48,6 +50,7 @@ export const DateTimeField = ({
     inputMode: 'none',
     labels: DATE_PICKER_LABELS,
     locale: m.dateInputLocale,
+    ...dateFieldRange(now().year),
     showActionsBar: true,
     todayButtonText: m.dateField.today,
     value,
