@@ -42,8 +42,11 @@ by case. In order:
    again after the build.
 3. **Fixers**: the codemod over the diff (`z:ts-codemod --diff-from`, plus
    `--uncommitted` when there are untracked files, which `--diff-from` cannot
-   see), then `fix:lint` in every package whose code changed, so that what the
-   codemod wrote is linted too.
+   see), the diff formatted again, then `fix:lint` in every package whose code
+   changed, so that what the codemod wrote is linted too. The format in between
+   takes off the parentheses the codemod adds when it reprints a type: CI lints
+   only the formatted tree, and a lint rule judging them would fail on a line
+   nobody changed.
 4. **Checks**: per package `check:types`, `check:test` (with coverage turned
    on where the package has a `check:test:cov`) and `check:sumi`; the
    `check:root:*` guards in parallel for any change the code gate lets

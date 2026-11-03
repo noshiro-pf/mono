@@ -286,6 +286,7 @@ describe('buildPlan', () => {
       'libs/ts-data-forge: run gen',
       'run gen:verify-npm-packages',
       'run z:ts-codemod --diff-from abc123',
+      'run z:format-diff-from abc123',
       'libs/ts-data-forge: run fix:lint',
       'libs/ts-data-forge: run check:types',
       'libs/ts-data-forge: run check:test',
@@ -406,6 +407,44 @@ describe('buildPlan', () => {
         .filter(({ args }) => args.includes('z:ts-codemod'))
         .map(({ args }) => args.join(' ')),
       ['run z:ts-codemod --diff-from abc123', 'run z:ts-codemod --uncommitted'],
+    );
+  });
+
+  test('the codemod output is formatted before it is linted', () => {
+    const steps = buildPlan({
+      classification: classify(['libs/ts-data-forge/src/array.mts']),
+      base: 'abc123',
+      rootScripts,
+      coverage: false,
+      hasUntracked: true,
+      spellChecked: [],
+    }).map(({ title }) => title);
+
+    assert.deepStrictEqual(
+      steps.slice(
+        steps.indexOf('codemod over the diff'),
+        steps.indexOf('ts-data-forge: fix:lint') + 1,
+      ),
+      [
+        'codemod over the diff',
+        'codemod over the uncommitted files',
+        'format what the codemod reprinted',
+        'ts-data-forge: fix:lint',
+      ],
+    );
+  });
+
+  test('a change with no TypeScript formats only before and after', () => {
+    assert.deepStrictEqual(
+      plan(['libs/ts-data-forge/README.md'])
+        .filter(({ args }) =>
+          args.some((arg) => arg.includes('fmt') || arg.includes('format')),
+        )
+        .map(({ title, args }) => `${title}: ${args.join(' ')}`),
+      [
+        'format the diff (before): run z:format-diff-from abc123',
+        'format the diff (after): run z:format-diff-from abc123',
+      ],
     );
   });
 
