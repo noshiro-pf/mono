@@ -53,7 +53,8 @@ name: pnpm update
 # the moment an action pin moves. That is also the reason this workflow is
 # split into two jobs: the three rules for a job that holds a key, the split,
 # the fixed branch name, the lease and the labels are in README.md under
-# "Jobs that hold a key", and this file says only what is its own.
+# "Jobs that hold a key", and this file says only what is its own. A third
+# job, `close-obsolete`, holds `GITHUB_TOKEN` alone and runs nothing but `gh`.
 
 on:
   schedule:
@@ -77,8 +78,19 @@ on:
 
   workflow_dispatch:
 
-# Neither job writes through `GITHUB_TOKEN` — the branch and the pull request
-# go through the App token in `commit` — so `contents: read` is the whole of it.
+# One run in progress, none cancelled, whatever the ref: every run writes the
+# one branch, and `close-obsolete` closes whatever pull request is open from
+# it, which an overlapping run could have just opened with an update the
+# first did not see. A run waiting in the group is replaced by the next to
+# arrive; each rebuilds from the tip.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+# The branch and the pull request go through the App token in `commit`, so
+# `contents: read` is the whole of what `update` and `commit` take. Only
+# `close-obsolete` writes through `GITHUB_TOKEN`, and only to close a pull
+# request.
 permissions: {}
 
 jobs:
@@ -454,3 +466,60 @@ jobs:
               --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm run update-release-binaries\` + \`pnpm self-update\`. The latter three go through \`tools/scripts/cmd/mature-updates.mts\`, which holds pnpm itself, the action pins and the release-binary pins (actionlint, shellcheck) to \`minimumReleaseAge\` the way pnpm holds npm dependencies. Action pins move within their major only, and release-binary pins within their major or, for a \`0.x\` version, their minor, so the next one waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
           fi
           gh pr merge --auto --squash "$branch"
+
+  # When `update` finds nothing to change, `main` already has every update the
+  # branch could carry, and `commit` — the only job that pushes — is skipped. An
+  # open pull request from the branch is then obsolete, and nothing else would
+  # settle it: typically one whose rebase conflicted because `main` took the
+  # same updates, set aside `rebase-failed` and claimed by the session that ran
+  # `rebuild-pnpm-update` to dispatch this run, which reports that this run
+  # hands it back. Closing it is that hand-back. Closed rather than pushed
+  # `main`'s tip, which would leave an empty pull request open for nothing.
+  #
+  # Only on the default branch: a run dispatched on another ref finds that
+  # ref's tree up to date, which says nothing about `main`'s. A published-pin
+  # refresh that failed before writing (it is continued past) can make a run
+  # of no change close a pull request that carried pin moves; the next run
+  # that reaches npm opens them again.
+  #
+  # `gh` alone, no checkout: nothing from the tree runs here. `GITHUB_TOKEN`
+  # rather than the App token, because a close needs to trigger no workflow.
+  # The open pull request is looked up by head branch, from this repository
+  # only, since a fork may name a branch the same. `merge-queued` comes off
+  # after the close, so that reopening it does not put a conflicting head back
+  # in the queue, and a close that fails leaves it queued as it was; a label
+  # that does not come off is a warning, since the close is what matters.
+  close-obsolete:
+    needs: update
+    if: >-
+      needs.update.outputs.changed == 'false' &&
+      github.ref_name == case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Close the obsolete pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          branch="chore/pnpm-update"
+
+          numbers="$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" \
+            --state open --json number,isCrossRepository \
+            --jq '.[] | select(.isCrossRepository | not) | .number')"
+
+          if [ -z "$numbers" ]; then
+            echo "No open pull request from ${branch}; nothing to close."
+            exit 0
+          fi
+
+          while IFS= read -r number; do
+            gh pr close "$number" --repo "$GITHUB_REPOSITORY" --comment \
+              "Closed by [pnpm-update.yml](${RUN_URL}): updating from \`main\`'s tip changes nothing, so \`main\` already has every update this pull request carries. The next run that finds an update opens a new one."
+            gh pr edit "$number" --repo "$GITHUB_REPOSITORY" --remove-label merge-queued ||
+              echo "::warning::Closed #${number}, but could not take merge-queued off it."
+          done <<<"$numbers"

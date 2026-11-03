@@ -25,7 +25,10 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
  * because the worker set it aside `rebase-failed`, and is claimed by `--by`.
  * The workflow force-pushes the branch when it finishes, which moves the head:
  * the claim ends, the set-aside is resolved, and the pull request is the
- * worker's again — as `push-fixed-pr` hands back any other.
+ * worker's again — as `push-fixed-pr` hands back any other. When `main` already
+ * has every update — the usual cause of the conflict — the run has nothing to
+ * push and closes the pull request instead (its `close-obsolete` job), which
+ * settles it as well.
  */
 export const rebuildPnpmUpdate = async (
   args: RebuildArgs,
@@ -68,7 +71,7 @@ export const rebuildPnpmUpdate = async (
         `#${args.number}: cannot start ${WORKFLOW} (the token needs \`actions: write\`): ${dispatched.value}`,
       )
     : Result.ok(
-        `#${args.number}: started ${WORKFLOW} on ${defaultBranch}; it force-pushes ${PNPM_UPDATE_BRANCH} when it finishes, and the pull request is the worker's again.`,
+        `#${args.number}: started ${WORKFLOW} on ${defaultBranch}; it force-pushes ${PNPM_UPDATE_BRANCH} when it finishes, and the pull request is the worker's again, or closes the pull request when ${defaultBranch} already has every update.`,
       );
 };
 
