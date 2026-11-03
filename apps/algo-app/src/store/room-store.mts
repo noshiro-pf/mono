@@ -16,7 +16,7 @@ import {
 import { Result } from 'ts-data-forge';
 import type { RoomApi } from '../api/index.mjs';
 import { newRoom } from '../functions/index.mjs';
-import type { GameStateAction, Room } from '../types/index.mjs';
+import type { GameStateActionFromDb, Room } from '../types/index.mjs';
 
 export type RoomDeps = Readonly<{
   api: RoomApi;
@@ -25,7 +25,7 @@ export type RoomDeps = Readonly<{
 export type RoomStore = Readonly<{
   room: InitializedObservable<Room | undefined>;
   /** Every action of the room, oldest first, each time the database has more. */
-  actionsFromDb: SynstateObservable<readonly GameStateAction[]>;
+  actionsFromDb: SynstateObservable<readonly GameStateActionFromDb[]>;
   /** Watches this room instead of the one before it, once started. */
   setRoomId: (roomId: string) => void;
   myName: InitializedObservable<string | undefined>;
@@ -58,7 +58,7 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
 
   const [room, setRoom] = createState<Room | undefined>(undefined);
 
-  const actionsFromDb = source<readonly GameStateAction[]>();
+  const actionsFromDb = source<readonly GameStateActionFromDb[]>();
 
   const [myName, setMyName] = createState<string | undefined>(undefined);
 

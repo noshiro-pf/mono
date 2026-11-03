@@ -1,7 +1,12 @@
+import { Timestamp, type FieldValue } from 'firebase/firestore';
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
+import type { StrictOmit } from 'ts-type-forge';
 import { cardTypeDef } from './card-type.mjs';
-import { firestoreTimestampTypeDef } from './firestore-timestamp-type.mjs';
+import {
+  firestoreTimestampTypeDef,
+  type FirestoreTimestamp,
+} from './firestore-timestamp-type.mjs';
 
 const gameStateActionTypeDef = t.union(
   [
@@ -59,13 +64,58 @@ const gameStateActionTypeDef = t.union(
   },
 );
 
+/**
+ * An action, written or read back: its `timestamp` is any of the shapes
+ * `FirestoreTimestamp` names.
+ */
 export type GameStateAction = t.TypeOf<typeof gameStateActionTypeDef>;
+
+/**
+ * An action as it is written: its `timestamp` is `serverTimestamp()`, which
+ * Firestore fills in, so that the order the actions are read back in is the
+ * server's.
+ */
+export type GameStateActionToWrite = WithTimestamp<GameStateAction, FieldValue>;
+
+/**
+ * An action as `d.data()` reads it back: its `timestamp` is a `Timestamp` once
+ * the write is committed, or `null` while the server timestamp is pending.
+ */
+export type GameStateActionFromDb = WithTimestamp<
+  GameStateAction,
+  Timestamp | null
+>;
 
 export const assertIsGameStateAction: (
   a: unknown,
 ) => asserts a is GameStateAction = gameStateActionTypeDef.assertIs;
 
+export const assertIsGameStateActionFromDb: (
+  a: unknown,
+) => asserts a is GameStateActionFromDb = (a) => {
+  assertIsGameStateAction(a);
+
+  if (a.timestamp !== null && !(a.timestamp instanceof Timestamp)) {
+    // What is left is a `FieldValue`, which is only ever written.
+    throw new TypeError(
+      'An action read back has a FieldValue timestamp, not a Timestamp or null.',
+    );
+  }
+};
+
 expectType<GameStateAction, Readonly<{ type: string }>>('<=');
+
+expectType<GameStateAction['timestamp'], FirestoreTimestamp>('=');
+
+expectType<GameStateActionToWrite['timestamp'], FieldValue>('=');
+
+expectType<GameStateActionToWrite['type'], GameStateAction['type']>('=');
+
+expectType<GameStateActionToWrite, GameStateAction>('<=');
+
+expectType<GameStateActionFromDb['timestamp'], Timestamp | null>('=');
+
+expectType<GameStateActionFromDb, GameStateAction>('<=');
 
 expectType<
   GameStateAction['type'],
@@ -80,3 +130,11 @@ expectType<
   | 'submitAnswer'
   | 'submitToss'
 >('=');
+
+/** Each member of the union `A`, with its `timestamp` narrowed to `T`. */
+type WithTimestamp<
+  A extends Readonly<{ timestamp: unknown }>,
+  T,
+> = A extends unknown
+  ? Readonly<StrictOmit<A, 'timestamp'> & { timestamp: T }>
+  : never;

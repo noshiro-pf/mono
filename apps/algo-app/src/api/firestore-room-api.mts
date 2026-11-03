@@ -12,12 +12,11 @@ import {
 } from 'firebase/firestore';
 import type { DeepReadonly } from 'ts-type-forge';
 import {
-  assertIsGameStateAction,
   assertIsRoomRemote,
   convertRoomRemoteToRoom,
   convertRoomToRoomRemote,
-  type GameStateAction,
 } from '../types/index.mjs';
+import { parseActionDocs } from './parse-action-docs.mjs';
 import type { RoomApi } from './room-api.mjs';
 
 /** Connects to Firestore; called once, from `store/store.mts`. */
@@ -60,17 +59,7 @@ export const createFirestoreRoomApi = (
           orderBy('timestamp'),
         ),
         (q) => {
-          const mut_actions: GameStateAction[] = [];
-
-          for (const d of q.docs) {
-            const data = d.data();
-
-            assertIsGameStateAction(data);
-
-            mut_actions.push(data);
-          }
-
-          onChange(mut_actions);
+          onChange(parseActionDocs(q.docs));
         },
       ),
   };

@@ -43,14 +43,16 @@ import type {
   Card,
   GameState,
   GameStateAction,
+  GameStateActionFromDb,
+  GameStateActionToWrite,
   NWES,
   Room,
 } from '../types/index.mjs';
 
 export type GameStateDeps = Readonly<{
   room: SynstateObservable<Room | undefined>;
-  actionsFromDb: SynstateObservable<readonly GameStateAction[]>;
-  addAction: (roomId: string, action: GameStateAction) => Promise<void>;
+  actionsFromDb: SynstateObservable<readonly GameStateActionFromDb[]>;
+  addAction: (roomId: string, action: GameStateActionToWrite) => Promise<void>;
   /** Runs `run` after `delayMs`; returns what cancels it. */
   setTimer: (delayMs: number, run: () => void) => () => void;
   /** Counts up from 0 every `ms`. */
@@ -60,7 +62,7 @@ export type GameStateDeps = Readonly<{
 export type GameStateStore = Readonly<{
   gameState: InitializedObservable<GameState>;
   /** Each action played here. */
-  gameStateAction: SynstateObservable<GameStateAction>;
+  gameStateAction: SynstateObservable<GameStateActionToWrite>;
   onCardClick: (card: Card, playerDirectionFromMe: NWES) => void;
   onTossCancel: () => void;
   onTossSubmit: () => void;
@@ -84,9 +86,9 @@ export type GameStateStore = Readonly<{
 }>;
 
 export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
-  const localGameStateActionSource = source<GameStateAction>();
+  const localGameStateActionSource = source<GameStateActionToWrite>();
 
-  const gameStateDispatcher = (action: GameStateAction): void => {
+  const gameStateDispatcher = (action: GameStateActionToWrite): void => {
     localGameStateActionSource.next(action);
   };
 
@@ -147,7 +149,7 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
   const gameState: InitializedObservable<GameState> =
     gameStateActionMerged.pipe(scan(gameStateReducer, initialGameState));
 
-  const gameStateAction: SynstateObservable<GameStateAction> =
+  const gameStateAction: SynstateObservable<GameStateActionToWrite> =
     localGameStateActionSource;
 
   const onCardClick = (card: Card, playerDirectionFromMe: NWES): void => {
@@ -239,7 +241,7 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
     const knownRoom = deps.room.pipe(filter(isNotUndefined));
 
     const playedHere = localGameStateActionSource.pipe(
-      scan<GameStateAction, readonly GameStateAction[]>(
+      scan<GameStateActionToWrite, readonly GameStateActionToWrite[]>(
         (played, action) => Arr.toPushed(played, action),
         [],
       ),
@@ -248,10 +250,10 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
     const writing = combine([knownRoom, playedHere])
       .pipe(
         scan<
-          readonly [Room, readonly GameStateAction[]],
+          readonly [Room, readonly GameStateActionToWrite[]],
           DeepReadonly<{
             roomId: string | undefined;
-            toWrite: GameStateAction[];
+            toWrite: GameStateActionToWrite[];
             numWritten: SizeType.Arr;
           }>
         >(
@@ -473,9 +475,9 @@ const actionsToAutoPlayStream = (
   // The structural non-empty tuple rather than `NonEmptyArray`, which carries a
   // brand a `const` tuple literal cannot have. Both give `actions[0]` without
   // `| undefined`, which is all this needs.
-  actions: NonEmptyTuple<GameStateAction>,
+  actions: NonEmptyTuple<GameStateActionToWrite>,
   numSkip: SafeUintWithSmallInt,
-): SynstateObservable<GameStateAction> => {
+): SynstateObservable<GameStateActionToWrite> => {
   // Counting emissions with `scan` emits `actions[i]` on the i-th tick.
   // `skip` shifts the timer's own value, so the count has to be kept separately
   // rather than read off the tick.
@@ -489,7 +491,7 @@ const actionsToAutoPlayStream = (
 
 const autoPlay = (
   counter: GameStateDeps['counter'],
-): SynstateObservable<GameStateAction> =>
+): SynstateObservable<GameStateActionToWrite> =>
   merge([
     actionsToAutoPlayStream(counter, actionsToAutoPlay[0], 0),
     actionsToAutoPlayStream(
