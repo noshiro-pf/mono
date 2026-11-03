@@ -32,7 +32,7 @@ const appDevPorts = {
   'synstate-docs': 5198,
   'synstate-dom-sample-app': 5196,
   'synstate-router-dom-sample-app': 5200,
-  'synstate-router-sample-app': 5199,
+  'synstate-router-react-sample-app': 5199,
   'task-manager': 5195,
 } as const;
 

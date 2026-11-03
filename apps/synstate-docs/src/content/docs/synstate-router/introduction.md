@@ -193,7 +193,7 @@ assert.strictEqual(
 );
 ```
 
-Layouts nest: `<Routes prefix cases={...}>` branches on the top-level node the page is under, and `<Routes under={routes.products} cases={...}>` requires the pages of that branch alone. Write each `cases` object once, outside the component (in an application, at the top level of its module): the React lint rules reject an object or a function created during render as a prop, and `Routes` then gets the same object every render. The [sample app](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-router-sample-app) shows layouts, search parameters and redirects written this way.
+Layouts nest: `<Routes prefix cases={...}>` branches on the top-level node the page is under, and `<Routes under={routes.products} cases={...}>` requires the pages of that branch alone. Write each `cases` object once, outside the component (in an application, at the top level of its module): the React lint rules reject an object or a function created during render as a prop, and `Routes` then gets the same object every render. The [sample app](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-router-react-sample-app) shows layouts, search parameters and redirects written this way.
 
 ## synstate-dom
 
@@ -286,7 +286,7 @@ unmount();
 
 ## Data fetching
 
-synstate-router has no loaders. A page's data is a SynState graph that follows the router: `router.at(node)` holds `Optional.some` of the node's values while the page is at or below the node, and `Optional.none` elsewhere, and `switchMap` with `fromAbortablePromise` fetches for each value. `switchMap` also projects the id its source already holds when the graph is built, so the request for the page the application opens on starts then, whether or not anything subscribes; after that, each new id aborts the request it replaces. The [sample app](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-router-sample-app/src/store) builds its graphs in a store module, at its top level, and maps leaving the page to an idle value, so that the request is aborted and its result dropped: the components read the store and dispatch, and fetch nothing themselves.
+synstate-router has no loaders. A page's data is a SynState graph that follows the router: `router.at(node)` holds `Optional.some` of the node's values while the page is at or below the node, and `Optional.none` elsewhere, and `switchMap` with `fromAbortablePromise` fetches for each value. `switchMap` also projects the id its source already holds when the graph is built, so the request for the page the application opens on starts then, whether or not anything subscribes; after that, each new id aborts the request it replaces. The [sample app](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-router-react-sample-app/src/store) builds its graphs in a store module, at its top level, and maps leaving the page to an idle value, so that the request is aborted and its result dropped: the components read the store and dispatch, and fetch nothing themselves.
 
 ```tsx
 const routes = defineRoutes({

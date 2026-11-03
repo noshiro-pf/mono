@@ -1,11 +1,11 @@
 {
-  "name": "synstate-router-sample-app",
+  "name": "synstate-router-react-sample-app",
   "version": "0.0.1",
   "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",
-    "directory": "apps/synstate-router-sample-app"
+    "directory": "apps/synstate-router-react-sample-app"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
@@ -31,6 +31,8 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "synstate": "workspace:*",
     "synstate-react-hooks": "workspace:*",
     "synstate-router": "workspace:*",
@@ -50,8 +52,6 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
     "ts-type-forge": "workspace:*",
     "tsx": "catalog:",
     "vite": "catalog:"
