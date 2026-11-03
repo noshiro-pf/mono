@@ -598,10 +598,12 @@ each caller passes it as `result-job: <name>-result / result`.
   nowhere. What a script body cannot show is declared in `DECLARED_COVERAGE`;
   `UNCOVERED_BY_DESIGN` is a list of claims, each with a reason, not a
   silencer.
-- **`timeout-minutes` is for a command that hangs, not a slow runner.** The
-  matrix jobs of `code-check.yml` and `style-check.yml` are at 25; a 10-minute
-  cap was spent once by a `pnpm/action-setup` step that took three minutes
-  instead of its usual few seconds, cancelling `ws:doc` before it ran.
+- **`timeout-minutes` is for a command that hangs, not a slow runner.** It is 15
+  or less (`pnpm run check:root:workflow-timeouts`), more than twice the six and
+  a half minutes a check job takes (see the next point); a 10-minute cap was
+  spent once by a `pnpm/action-setup` step that took three minutes instead of
+  its usual few seconds. A job whose usual length leaves too little of 15 to
+  spare is named in that check with its reason, and may declare more.
 - **One pull request runs seventeen jobs at a time, of about equal length.**
   The account runs twenty GitHub-hosted jobs at once, across every workflow, and
   a merge to `main` runs about three of its own while the next queued pull

@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     # `true` only when the pins step answered "unchanged". Empty — this job
     # skipped for a reused verdict — or `false` keeps the aggregate running.

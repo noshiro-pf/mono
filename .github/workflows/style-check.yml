@@ -53,10 +53,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # 25, matching code-check.yml: `ws:doc`, then the longest entry, was
-    # measured at 9m31s and 9m44s under a 10-minute cap — see "The work" in
-    # README.md.
-    timeout-minutes: 25
+    # 15, matching code-check.yml; see "The work" in README.md.
+    timeout-minutes: 15
 
     # The commit the `check:prose` guards that read a change compare the tree
     # with (`tools/scripts/lib/diff-base.mts`): `next-major` reads each

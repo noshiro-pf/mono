@@ -57,7 +57,7 @@ permissions: {}
 jobs:
   canary:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
 
     permissions:
       # No `issues: write`, although this job used to carry it. It installs and
@@ -166,7 +166,7 @@ jobs:
 
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     permissions:
       contents: read
