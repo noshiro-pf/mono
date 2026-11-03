@@ -1,4 +1,5 @@
 import { Num } from 'ts-data-forge';
+import { annuityFactor } from 'ts-utils-additional';
 import type { HousingLoanParams, MonthlyPaymentResult } from './types.mjs';
 
 /**
@@ -64,17 +65,6 @@ export const calculateHousingLoan = (
 
   return mut_results;
 };
-
-/**
- * `(1 - (1 + rate) ** -count) / rate`, what `count` payments of 1 are worth at
- * `rate` a payment, and `count`, its limit, at a rate of 0. Through `log1p` and
- * `expm1` it keeps its precision down to the smallest rate. The same factor as
- * housing-loan-calculator's `annuityFactor`.
- */
-const annuityFactor = (rate: number, count: number): number =>
-  Num.isNonZero(rate)
-    ? Num.div(-Math.expm1(-count * Math.log1p(rate)), rate)
-    : count;
 
 /**
  * 等額返済額を計算（元利均等返済）

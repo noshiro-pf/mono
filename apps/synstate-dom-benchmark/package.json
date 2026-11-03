@@ -37,6 +37,7 @@
     "solid-js": "1.9.17",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
+    "ts-utils-additional": "workspace:*",
     "vanjs-core": "1.6.1"
   },
   "devDependencies": {

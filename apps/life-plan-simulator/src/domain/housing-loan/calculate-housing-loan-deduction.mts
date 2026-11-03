@@ -4,6 +4,7 @@ import {
   housingLoanDeductionRate,
   housingTypes,
 } from '../../data/index.mjs';
+import { periodRateOf } from 'ts-utils-additional';
 import type { SimulationInput } from '../input/index.mjs';
 import { monthOf, type MonthIndex } from '../year-month/index.mjs';
 import type { MonthlyPaymentResult } from './types.mjs';
@@ -64,7 +65,7 @@ export const housingLoanDeductionConditions = (
 /** 5 年ごとの金利の上昇率を、毎月足していく上昇幅にする（スプレッドシートの式）。 */
 export const monthlyRateIncreaseFrom5Years = (
   rateIncreasePer5Years: number,
-): number => (1 + rateIncreasePer5Years) ** (1 / 60) - 1;
+): number => periodRateOf(rateIncreasePer5Years, 60);
 
 export type HousingLoanDeductionConditions = Readonly<{
   /** 借入限度額（円） */

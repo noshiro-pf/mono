@@ -42,7 +42,8 @@
     "synstate-dom": "workspace:*",
     "synstate-router": "workspace:*",
     "ts-data-forge": "workspace:*",
-    "ts-fortress": "workspace:*"
+    "ts-fortress": "workspace:*",
+    "ts-utils-additional": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",

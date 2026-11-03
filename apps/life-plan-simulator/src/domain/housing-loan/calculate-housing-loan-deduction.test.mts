@@ -2,6 +2,7 @@ import { parseYearMonthOr } from '../year-month/index.mjs';
 import {
   calculateHousingLoanDeduction,
   housingLoanDeductionConditions,
+  monthlyRateIncreaseFrom5Years,
 } from './calculate-housing-loan-deduction.mjs';
 
 const ym = (s: string): number => parseYearMonthOr(s, 0);
@@ -57,4 +58,22 @@ describe(housingLoanDeductionConditions, () => {
       { limit: 40_000_000, years: 10 },
     );
   });
+});
+
+describe(monthlyRateIncreaseFrom5Years, () => {
+  test('60 か月で 5 年分の上昇率になること', () => {
+    assert.closeTo((1 + monthlyRateIncreaseFrom5Years(0.1)) ** 60, 1.1, 1e-12);
+  });
+
+  test('上昇率 0 なら 0 であること', () => {
+    assert.strictEqual(monthlyRateIncreaseFrom5Years(0), 0);
+  });
+
+  // `1 + rate` を経由すると、1e-16 前後の上昇率は丸めで 0 や大きくずれた値になる。
+  test.each([1e-17, 1.7e-16, 4e-16])(
+    'ごく小さい上昇率 %s でも 60 で割った値になること',
+    (rate) => {
+      assert.closeTo(monthlyRateIncreaseFrom5Years(rate) / (rate / 60), 1, 1e-9);
+    },
+  );
 });

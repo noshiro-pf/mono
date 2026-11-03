@@ -1,4 +1,5 @@
 import { Arr, Num } from 'ts-data-forge';
+import { annuityFactor } from 'ts-utils-additional';
 import type { Cells } from '../scenario.mjs';
 
 /**
@@ -53,13 +54,12 @@ export const monthlyRateOf = (annualRate: number): number => annualRate / 1200;
 
 /** The fixed monthly payment that repays `principal` in {@link months}. */
 export const paymentOf = (principal: number, monthlyRate: number): number => {
-  const denominator = 1 - (1 + monthlyRate) ** -months;
+  // What one yen a month for `months` months is worth; at a rate of 0 it is
+  // `months`, so the principal is simply split evenly. It is 0 only at a rate
+  // of -100% a month or below, which no input here reaches.
+  const factor = annuityFactor(monthlyRate, months);
 
-  // The denominator is 0 only when the rate is: then the principal is simply
-  // split evenly.
-  return Num.isNonZero(denominator)
-    ? Num.div(principal * monthlyRate, denominator)
-    : principal / months;
+  return Num.isNonZero(factor) ? Num.div(principal, factor) : 0;
 };
 
 export const interestOf = (balance: number, monthlyRate: number): number =>

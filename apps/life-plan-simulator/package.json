@@ -44,7 +44,8 @@
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*",
-    "ts-fortress": "workspace:*"
+    "ts-fortress": "workspace:*",
+    "ts-utils-additional": "workspace:*"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.2",
