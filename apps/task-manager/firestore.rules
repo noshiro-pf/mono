@@ -2,8 +2,8 @@ rules_version = '2';
 
 // Deployed by `deploy-firestore.yml` when a push to main changes this file
 // (docs/firestore-deploy.md), on the same push that deploy-pages.yml
-// publishes the app with. `pnpm run test:rules` runs nowhere in CI, so run it
-// before merging a change here.
+// publishes the app with. `pnpm run check:test:rules` tests it, and
+// code-check.yml runs that on pull requests, before a change merges.
 //
 // Layout:
 //   projects/{projectId}                        { name, ownerUid, memberUids, createdAt }

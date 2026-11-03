@@ -182,6 +182,7 @@ const memberScripts = [
   'check:test',
   'check:test:cov',
   'check:test:browser',
+  'check:test:rules',
 ] as const;
 
 /**
@@ -205,6 +206,7 @@ const rootWorkspaceScripts = [
   'ws:check:test:cov:shard-3',
   'ws:check:test:shard-1',
   'ws:check:test:shard-2',
+  'ws:check:test:rules',
   'ws:check:e2e',
   'ws:check:e2e:emulators',
   'ws:check:e2e:shard-1',

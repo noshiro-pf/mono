@@ -179,6 +179,10 @@ jobs:
           - ws:check:e2e:shard-1
           - ws:check:e2e:shard-2
           - ws:check:e2e:emulators
+          # The Firestore rules tests of life-plan-simulator and task-manager,
+          # so that a pull request breaking `firestore.rules` fails before it
+          # merges; `deploy-firestore.yml` deploys whatever reaches `main`.
+          - ws:check:test:rules
           - fix:codemod:full
           - verify:npm-packages
 
@@ -199,9 +203,9 @@ jobs:
         run: pnpm exec playwright install chromium
 
       # Firestore and Pub/Sub need Java 21 or later. firebase-tools is already
-      # a catalog-pinned dependency of the app; no Firebase login is needed.
+      # a catalog-pinned dependency of each app; no Firebase login is needed.
       - name: Set up Java for the Firebase emulators
-        if: matrix.command == 'ws:check:e2e:emulators'
+        if: matrix.command == 'ws:check:e2e:emulators' || matrix.command == 'ws:check:test:rules'
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: temurin
