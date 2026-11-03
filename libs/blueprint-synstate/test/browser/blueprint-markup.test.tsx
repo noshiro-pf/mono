@@ -528,6 +528,80 @@ const cases: readonly Case[] = [
     ),
   ],
   [
+    'NumericInput at its upper bound',
+    {
+      element: () =>
+        h(Blueprint.NumericInput, {
+          value: 10,
+          min: 0,
+          max: 10,
+          onValueChange: ignore,
+        }),
+      deliberate: [disabledButtonTabIndex],
+    },
+    () => (
+      <NumericInput
+        decode={Number}
+        encode={String}
+        max={constant(10)}
+        min={constant(0)}
+        normalize={(n) => n}
+        value={constant(10)}
+        onValueChange={ignore}
+      />
+    ),
+  ],
+  [
+    'NumericInput at its lower bound',
+    {
+      element: () =>
+        h(Blueprint.NumericInput, {
+          value: 0,
+          min: 0,
+          max: 10,
+          onValueChange: ignore,
+        }),
+      deliberate: [disabledButtonTabIndex],
+    },
+    () => (
+      <NumericInput
+        decode={Number}
+        encode={String}
+        max={constant(10)}
+        min={constant(0)}
+        normalize={(n) => n}
+        value={constant(0)}
+        onValueChange={ignore}
+      />
+    ),
+  ],
+  [
+    'NumericInput disabled',
+    {
+      element: () =>
+        h(Blueprint.NumericInput, {
+          value: 5,
+          min: 0,
+          max: 10,
+          disabled: true,
+          onValueChange: ignore,
+        }),
+      deliberate: [disabledButtonTabIndex],
+    },
+    () => (
+      <NumericInput
+        decode={Number}
+        disabled={constant(true)}
+        encode={String}
+        max={constant(10)}
+        min={constant(0)}
+        normalize={(n) => n}
+        value={constant(5)}
+        onValueChange={ignore}
+      />
+    ),
+  ],
+  [
     'InputGroup inside a Label',
     {
       element: () =>

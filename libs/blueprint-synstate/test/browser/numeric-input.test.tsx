@@ -352,6 +352,43 @@ describe(NumericInput, () => {
     unmount();
   });
 
+  test('a press the input is disabled during leaves the next keyboard click its step', () => {
+    const [disabled$, setDisabled] = createState(false);
+
+    const mut_changes: number[] = [];
+
+    const { container, unmount } = mountInto(() => (
+      <NumericInput
+        decode={Number.parseFloat}
+        disabled={disabled$}
+        encode={(n) => n.toString()}
+        normalize={clampAndRound}
+        value={constant(3)}
+        onValueChange={(n) => {
+          mut_changes.push(n);
+        }}
+      />
+    ));
+
+    const [up] = all<HTMLButtonElement>(container, 'button');
+
+    assert.isDefined(up);
+
+    up.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }));
+
+    // Disabled before the release: the button gets no click for the press.
+    setDisabled(true);
+
+    setDisabled(false);
+
+    // Enter or Space on the button, with no press before it.
+    up.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
+
+    assert.deepStrictEqual(mut_changes, [4, 5]);
+
+    unmount();
+  });
+
   test('keys that an input method is composing with step and commit nothing', () => {
     const { input, changes, unmount } = setUp(3);
 
@@ -777,6 +814,178 @@ describe('NumericInput with min and max', () => {
     assert.deepStrictEqual(mut_changes, [0.5, 0]);
 
     assert.strictEqual(vi.getTimerCount(), 0);
+
+    unmount();
+  });
+
+  test('disables the button that steps toward a bound the text is at or past, as Blueprint does', () => {
+    const [max$, setMax] = createState(10);
+
+    const { input, up, down, unmount } = setUpBounded({
+      min: constant(0),
+      max: max$,
+      initial: 10,
+    });
+
+    assert.deepStrictEqual([up.disabled, down.disabled], [true, false]);
+
+    // The text as it is typed, before it is committed, as in Blueprint's.
+    type(input, '0');
+
+    assert.deepStrictEqual([up.disabled, down.disabled], [false, true]);
+
+    type(input, '-3');
+
+    assert.deepStrictEqual([up.disabled, down.disabled], [false, true]);
+
+    // No number, or no text: neither bound is reached.
+    type(input, '');
+
+    assert.deepStrictEqual([up.disabled, down.disabled], [false, false]);
+
+    type(input, '-');
+
+    assert.deepStrictEqual([up.disabled, down.disabled], [false, false]);
+
+    // A bound that moves moves with it.
+    type(input, '5');
+
+    setMax(5);
+
+    assert.deepStrictEqual([up.disabled, down.disabled], [true, false]);
+
+    unmount();
+  });
+
+  test('a button pressed up to its bound steps again once the bound is left', () => {
+    const { input, up, down, changes, unmount } = setUpBounded({
+      min: constant(0),
+      max: constant(1),
+      initial: 0.5,
+    });
+
+    // The press that reaches the bound disables the button, which then gets no
+    // click for it.
+    up.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }));
+
+    assert.isTrue(up.disabled);
+
+    type(input, '0');
+
+    input.dispatchEvent(new FocusEvent('blur'));
+
+    // Enter or Space on the button, with no press before it.
+    up.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
+
+    assert.deepStrictEqual(changes, [1, 0, 0.5]);
+
+    // The other button reaching its bound during a press leaves the press as it
+    // is: its click still comes, and does not step again.
+    type(input, '1');
+
+    input.dispatchEvent(new FocusEvent('blur'));
+
+    down.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, button: 0 }),
+    );
+
+    type(input, '1');
+
+    assert.isTrue(up.disabled);
+
+    down.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+
+    assert.deepStrictEqual(changes, [1, 0, 0.5, 1, 0.5]);
+
+    unmount();
+  });
+
+  test('a bound that moves onto the held button stops its repeat, and its press', () => {
+    vi.useFakeTimers({
+      toFake: ['setTimeout', 'setInterval', 'clearTimeout', 'clearInterval'],
+    });
+
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
+
+    const [max$, setMax] = createState(10);
+
+    const { up, changes, unmount } = setUpBounded({
+      min: constant(0),
+      max: max$,
+    });
+
+    up.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }));
+
+    assert.strictEqual(vi.getTimerCount(), 1);
+
+    setMax(5.5);
+
+    assert.isTrue(up.disabled);
+
+    assert.strictEqual(vi.getTimerCount(), 0);
+
+    setMax(10);
+
+    // Enter or Space on the button, with no press before it.
+    up.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
+
+    assert.deepStrictEqual(changes, [5.5, 6]);
+
+    unmount();
+  });
+
+  test('reads out the number the text shows within the bounds as they are', () => {
+    const [max$, setMax] = createState(10);
+
+    const { input, unmount } = setUpBounded({
+      min: constant(0),
+      max: max$,
+    });
+
+    type(input, '8');
+
+    assert.strictEqual(input.getAttribute('aria-valuenow'), '8');
+
+    setMax(5);
+
+    assert.strictEqual(input.getAttribute('aria-valuenow'), '5');
+
+    unmount();
+  });
+
+  test('takes empty text as no number, whatever decode makes of it', () => {
+    // `Number('')` is 0, which is the lower bound.
+    const { input, up, down, changes, unmount } = setUpBounded({
+      min: constant(0),
+      max: constant(10),
+      decode: Number,
+    });
+
+    type(input, '');
+
+    assert.isFalse(input.hasAttribute('aria-valuenow'));
+
+    assert.deepStrictEqual([up.disabled, down.disabled], [false, false]);
+
+    // Committed as normalize(NaN), here the initial 5, which is the value.
+    input.dispatchEvent(new FocusEvent('blur'));
+
+    assert.strictEqual(input.value, '5');
+
+    assert.deepStrictEqual(changes, []);
+
+    type(input, '');
+
+    // A step from it starts from normalize(NaN) too.
+    press(input, 'ArrowUp', { code: 'ArrowUp' });
+
+    document.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'ArrowUp', code: 'ArrowUp' }),
+    );
+
+    assert.deepStrictEqual(changes, [5.5]);
 
     unmount();
   });

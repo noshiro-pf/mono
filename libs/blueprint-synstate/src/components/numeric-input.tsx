@@ -1,11 +1,17 @@
-import { createState, onScopeDispose } from 'synstate';
+import {
+  createState,
+  map,
+  onScopeDispose,
+  type InitializedObservable,
+} from 'synstate';
 import {
   constant,
   createAfterUpdate,
+  derive,
   isImeKeyDown,
+  mapBindable,
   subscribeInScope,
   toObservable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -39,6 +45,14 @@ type ViewProps = Readonly<{
   /** As `onIncrementClick`, for the down button. */
   onDecrementClick?: (event: MouseEvent) => void;
   disabled?: Bindable<boolean>;
+  /**
+   * Disables the up button alone, beside `disabled`: Blueprint's does so at the
+   * upper bound. {@link NumericInput} passes whether its text is at or past
+   * `max`.
+   */
+  incrementDisabled?: Bindable<boolean>;
+  /** As `incrementDisabled`, for the down button and the lower bound. */
+  decrementDisabled?: Bindable<boolean>;
   placeholder?: Bindable<string>;
   /** Selects the whole text when the input gains focus. */
   selectAllOnFocus?: boolean;
@@ -93,6 +107,8 @@ export const NumericInputView = ({
   onIncrementClick,
   onDecrementClick,
   disabled,
+  incrementDisabled,
+  decrementDisabled,
   placeholder,
   selectAllOnFocus = false,
   intent = 'none',
@@ -108,6 +124,10 @@ export const NumericInputView = ({
 }: ViewProps): JSX.Element => {
   // The buttons name the input they step, as Blueprint's do.
   const inputId = uniqueId('numericInput');
+
+  const upDisabled = either(disabled, incrementDisabled);
+
+  const downDisabled = either(disabled, decrementDisabled);
 
   return (
     <div
@@ -127,6 +147,14 @@ export const NumericInputView = ({
         )}
       >
         <input
+          // As Blueprint's input group says it: absent when `disabled` is.
+          aria-disabled={
+            disabled === undefined
+              ? undefined
+              : mapBindable(disabled, (isDisabled) =>
+                  isDisabled ? 'true' : 'false',
+                )
+          }
           aria-label={ariaLabel}
           aria-valuemax={max}
           aria-valuemin={min}
@@ -160,8 +188,11 @@ export const NumericInputView = ({
         <button
           aria-controls={constant(inputId)}
           aria-label={constant('increment')}
-          class={classObject(['bp6-button', intentClass(intent)])}
-          disabled={disabled}
+          class={classObject(
+            ['bp6-button', intentClass(intent)],
+            [['bp6-disabled', upDisabled]],
+          )}
+          disabled={upDisabled}
           type={constant('button')}
           onClick={(event) => {
             onIncrementClick?.(event);
@@ -175,8 +206,11 @@ export const NumericInputView = ({
         <button
           aria-controls={constant(inputId)}
           aria-label={constant('decrement')}
-          class={classObject(['bp6-button', intentClass(intent)])}
-          disabled={disabled}
+          class={classObject(
+            ['bp6-button', intentClass(intent)],
+            [['bp6-disabled', downDisabled]],
+          )}
+          disabled={downDisabled}
           type={constant('button')}
           onClick={(event) => {
             onDecrementClick?.(event);
@@ -208,9 +242,11 @@ type Props<N extends number> = Readonly<
     encode: (value: N) => string;
     /**
      * The number a text stands for; `NaN` for none, which `normalize` mends.
+     * Empty text is none, and is not given to it.
      * A step from such a text starts from `normalize(NaN)`, clamped. It is also
-     * read whenever the text changes, for the number the spin button reads out,
-     * so it takes half-typed text such as `-` without throwing.
+     * read whenever the text changes, for the number the spin button reads out
+     * and for whether a step button is at its bound, so it takes half-typed
+     * text such as `-` without throwing.
      */
     decode: (text: string) => number;
     /**
@@ -240,6 +276,8 @@ type Props<N extends number> = Readonly<
     | 'onBlur'
     | 'onDecrementClick'
     | 'onDecrementMouseDown'
+    | 'decrementDisabled'
+    | 'incrementDisabled'
     | 'onIncrementClick'
     | 'onIncrementMouseDown'
     | 'onKeyDown'
@@ -287,9 +325,10 @@ export const NumericInput = <N extends number>({
 
   /** `n` within the bounds as they are now; `NaN` stays `NaN`. */
   const clamp = (n: number): number =>
-    Math.min(
+    clampTo(
+      min$?.getSnapshot().value ?? Number.NEGATIVE_INFINITY,
       max$?.getSnapshot().value ?? Number.POSITIVE_INFINITY,
-      Math.max(min$?.getSnapshot().value ?? Number.NEGATIVE_INFINITY, n),
+      n,
     );
 
   const [text$, setText] = createState(encode(value$.getSnapshot().value));
@@ -312,12 +351,16 @@ export const NumericInput = <N extends number>({
 
   mut_following = true;
 
+  /** The number a text stands for; empty text is none, whatever `decode` says. */
+  const read = (text: string): number =>
+    text === '' ? Number.NaN : decode(text);
+
   /**
    * Commits the text plus `delta`; `false` when that is no other number, as at
    * a bound.
    */
   const commit = (delta: number): boolean => {
-    const decoded = decode(text$.getSnapshot().value);
+    const decoded = read(text$.getSnapshot().value);
 
     const start = Number.isNaN(decoded)
       ? clamp(normalize(Number.NaN))
@@ -340,43 +383,131 @@ export const NumericInput = <N extends number>({
 
   onScopeDispose(repeat.stop);
 
-  // A disabled button gets no release in every browser.
-  if (viewProps.disabled !== undefined) {
-    subscribeInScope(toObservable(viewProps.disabled), (disabled) => {
-      if (disabled) {
-        repeat.stop();
-      }
-    });
-  }
+  // The number the text stands for, read once for what reads it.
+  const decoded$ = text$.pipe(map(read));
+
+  // Each button is disabled while the text is at or past the bound it steps
+  // toward, as Blueprint's is: by the text as it is typed, and not for text
+  // that is no number.
+  const atBound = (
+    bound$: InitializedObservable<number> | undefined,
+    reached: (n: number, b: number) => boolean,
+  ): Bindable<boolean> | undefined =>
+    bound$ === undefined
+      ? undefined
+      : derive([decoded$, bound$], (n, b) => !Number.isNaN(n) && reached(n, b));
+
+  const incrementDisabled = atBound(max$, (n, b) => n >= b);
+
+  const decrementDisabled = atBound(min$, (n, b) => n <= b);
 
   // Whether the click to come ends a press that has stepped already: a click
   // steps only when it was not, as with Enter or Space on the button.
   // The click comes in the same task as the release, so `stepped` is cleared in
   // the frame after the release, or after the window's blur that takes the
   // release away, unless another press has come since.
-  const mut_press = { count: 0, stepped: false };
+  const mut_press: {
+    count: number;
+    stepped: boolean;
+    /** The button of a press that stepped, until it ends. */
+    button: 'up' | 'down' | undefined;
+    /** Removes the listeners that wait for the press's release. */
+    removeListeners: (() => void) | undefined;
+  } = {
+    count: 0,
+    stepped: false,
+    button: undefined,
+    removeListeners: undefined,
+  };
 
-  const onStepMouseDown = (event: MouseEvent, delta: number): void => {
+  /**
+   * Ends the press at once: a button disabled before its release gets no
+   * release in every browser, and no click, so the press is not taken to have
+   * stepped when the button is next clicked by Enter or Space.
+   */
+  const endPress = (): void => {
+    mut_press.removeListeners?.();
+
+    mut_press.removeListeners = undefined;
+
+    mut_press.button = undefined;
+
+    mut_press.stepped = false;
+  };
+
+  onScopeDispose(endPress);
+
+  if (viewProps.disabled !== undefined) {
+    subscribeInScope(toObservable(viewProps.disabled), (disabled) => {
+      if (!disabled) {
+        return;
+      }
+
+      repeat.stop();
+
+      endPress();
+    });
+  }
+
+  // A bound that disables the button being held stops its repeat as well,
+  // whether the text reached it or it moved onto the text.
+  for (const [boundReached, button] of [
+    [incrementDisabled, 'up'],
+    [decrementDisabled, 'down'],
+  ] as const) {
+    if (boundReached !== undefined) {
+      subscribeInScope(toObservable(boundReached), (reached) => {
+        if (!(reached && mut_press.button === button)) {
+          return;
+        }
+
+        repeat.stopMouse();
+
+        endPress();
+      });
+    }
+  }
+
+  const onStepMouseDown = (event: MouseEvent, button: 'up' | 'down'): void => {
+    mut_press.removeListeners?.();
+
+    mut_press.removeListeners = undefined;
+
     mut_press.count += 1;
 
     // Only the main button, and not the Ctrl+click that opens the context menu
     // on macOS: a menu takes the release that ends the repeat.
     mut_press.stepped = event.button === 0 && !event.ctrlKey;
 
+    mut_press.button = mut_press.stepped ? button : undefined;
+
     if (!mut_press.stepped) {
       return;
     }
 
-    repeat.start(delta, { kind: 'mouse' }, event);
+    repeat.start(button === 'up' ? step : -step, { kind: 'mouse' }, event);
+
+    // The first step may have ended the press, by taking the text to the bound.
+    if (mut_press.button === undefined) {
+      return;
+    }
 
     const press = mut_press.count;
 
     const doc = event.view?.document ?? document;
 
-    const onRelease = (): void => {
+    const removeListeners = (): void => {
       doc.removeEventListener('mouseup', onRelease);
 
       doc.defaultView?.removeEventListener('blur', onRelease);
+    };
+
+    const onRelease = (): void => {
+      removeListeners();
+
+      mut_press.removeListeners = undefined;
+
+      mut_press.button = undefined;
 
       requestAnimationFrame(() => {
         if (mut_press.count === press) {
@@ -388,6 +519,8 @@ export const NumericInput = <N extends number>({
     doc.addEventListener('mouseup', onRelease);
 
     doc.defaultView?.addEventListener('blur', onRelease);
+
+    mut_press.removeListeners = removeListeners;
   };
 
   const onStepClick = (delta: number): void => {
@@ -401,16 +534,26 @@ export const NumericInput = <N extends number>({
   return (
     <NumericInputView
       {...viewProps}
+      decrementDisabled={decrementDisabled}
+      incrementDisabled={incrementDisabled}
       max={max}
       min={min}
       // The number the text shows, as Blueprint's reads it from its own text.
-      // A number the text shows is read out clamped, so that it stays within
-      // the bounds read out with it; text that is none reads out no value.
-      aria-valuenow={view(text$, (text) => {
-        const clamped = clamp(decode(text));
+      // A number the text shows is read out clamped to the bounds as they are,
+      // so that it stays within the bounds read out with it; text that is none
+      // reads out no value.
+      aria-valuenow={derive(
+        [
+          decoded$,
+          min$ ?? constant(Number.NEGATIVE_INFINITY),
+          max$ ?? constant(Number.POSITIVE_INFINITY),
+        ],
+        (decoded, lower, upper) => {
+          const clamped = clampTo(lower, upper, decoded);
 
-        return Number.isFinite(clamped) ? clamped : undefined;
-      })}
+          return Number.isFinite(clamped) ? clamped : undefined;
+        },
+      )}
       value={text$}
       onBlur={() => {
         // A held arrow key needs the focus; a held button has just taken it.
@@ -422,13 +565,13 @@ export const NumericInput = <N extends number>({
         onStepClick(-step);
       }}
       onDecrementMouseDown={(event) => {
-        onStepMouseDown(event, -step);
+        onStepMouseDown(event, 'down');
       }}
       onIncrementClick={() => {
         onStepClick(step);
       }}
       onIncrementMouseDown={(event) => {
-        onStepMouseDown(event, step);
+        onStepMouseDown(event, 'up');
       }}
       onKeyDown={(event) => {
         // Keys that pick, confirm or cancel what an input method is composing.
@@ -499,6 +642,8 @@ const createRepeat = (
   stop: () => void;
   /** Stops a repeat held by a key, and leaves one held by the mouse. */
   stopKey: () => void;
+  /** Stops a repeat held by the mouse, and leaves one held by a key. */
+  stopMouse: () => void;
 }> => {
   const mut_held: {
     delay: ReturnType<typeof setTimeout> | undefined;
@@ -541,11 +686,6 @@ const createRepeat = (
   const start = (delta: number, release: Release, event: UIEvent): void => {
     stop();
 
-    // A bound reached stops the repeat, as in Blueprint's.
-    if (!step(delta)) {
-      return;
-    }
-
     const doc = event.view?.document ?? document;
 
     mut_held.release = release;
@@ -559,6 +699,14 @@ const createRepeat = (
     }
 
     doc.defaultView?.addEventListener('blur', stop);
+
+    // A bound reached stops the repeat, as in Blueprint's, and so does a stop
+    // called while the first step propagates.
+    if (!step(delta) || mut_held.release !== release) {
+      stop();
+
+      return;
+    }
 
     mut_held.delay = setTimeout(() => {
       mut_held.interval = setInterval(() => {
@@ -575,5 +723,22 @@ const createRepeat = (
     }
   };
 
-  return { start, stop, stopKey };
+  const stopMouse = (): void => {
+    if (mut_held.release?.kind === 'mouse') {
+      stop();
+    }
+  };
+
+  return { start, stop, stopKey, stopMouse };
 };
+
+/** `n` within `lower` and `upper`; `NaN` stays `NaN`. */
+const clampTo = (lower: number, upper: number, n: number): number =>
+  Math.min(upper, Math.max(lower, n));
+
+/** Whether either is true; `undefined` is false. */
+const either = (
+  a: Bindable<boolean> | undefined,
+  b: Bindable<boolean> | undefined,
+): Bindable<boolean> | undefined =>
+  a === undefined ? b : b === undefined ? a : derive([a, b], (x, y) => x || y);
