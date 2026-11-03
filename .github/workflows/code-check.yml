@@ -156,13 +156,23 @@ jobs:
           # check waits on another package's — siblings resolve to `dist/`.
           - ws:check:types:shard-1
           - ws:check:types:shard-2
-          # `ws:fix:lint` in two halves, `apps/` and the rest, each with
-          # `--no-sort`: in one job it was the second-longest entry, and pnpm's
-          # topological order kept it at one package in flight for minutes
-          # while the packages everything depends on were linted. No lint
-          # waits on another package's — siblings resolve to `dist/`.
-          - ws:fix:lint:apps
-          - ws:fix:lint:non-apps
+          # `ws:fix:lint` in three shards, each with `--no-sort`, because pnpm's
+          # topological order kept one package in flight for minutes while the
+          # packages everything depends on were linted, and two halves (`apps/`
+          # and the rest) were still the longest entries of the matrix. The
+          # first shard names the ten slowest packages to lint; the second is
+          # every other app and the third every other package, by excluding
+          # those names, so a new package lands in one of them. The names were
+          # chosen from the per-package times in the lint logs to give the
+          # three shards about the same total. To rebalance, move a name into
+          # or out of the first shard and its exclusion into or out of the
+          # shard its directory falls in (`apps/` the second, the rest the
+          # third); `check:root:workspace-shards` fails when a package is
+          # linted by no shard or by two. No lint waits on another package's —
+          # siblings resolve to `dist/`.
+          - ws:fix:lint:shard-1
+          - ws:fix:lint:shard-2
+          - ws:fix:lint:shard-3
           - ws:check:test:browser
           # `ws:check:test:cov` in three shards, because one package at a time
           # (`--workspace-concurrency=1`) made it the longest entry by minutes.

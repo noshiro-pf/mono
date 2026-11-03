@@ -499,7 +499,7 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
     scriptName: 'ws:check:e2e',
     // `code-check.yml` runs it as two shards, `ws:check:e2e:shard-1` and
     // `ws:check:e2e:shard-2`, which between them reach every app's `check:e2e`;
-    // that they partition the apps is in their filters.
+    // `check:root:workspace-shards` checks that they partition the apps.
   },
   {
     directory: ROOT_DIRECTORY,
@@ -507,17 +507,18 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
     // `code-check.yml` runs it as two shards, `ws:check:types:shard-1` and
     // `ws:check:types:shard-2`, which between them reach every package's
     // `check:types`. As with `ws:check:lint` below, neither covers the root
-    // command on its own; that the shards partition the packages is in their
-    // filters.
+    // command on its own; `check:root:workspace-shards` checks that the shards
+    // partition the packages.
   },
   {
     directory: ROOT_DIRECTORY,
     scriptName: 'ws:check:lint',
-    // `code-check.yml` runs `ws:fix:lint` as two halves, `ws:fix:lint:apps` and
-    // `ws:fix:lint:non-apps`, which between them reach every package's
-    // `fix:lint` — and through it `check:lint`. Neither half covers the root
-    // command on its own, so no `DECLARED_COVERAGE` edge says so; that the
-    // halves partition the packages is in their filters.
+    // `code-check.yml` runs `ws:fix:lint` as three shards,
+    // `ws:fix:lint:shard-1` to `ws:fix:lint:shard-3`, which between them reach
+    // every package's `fix:lint` — and through it `check:lint`. No shard covers
+    // the root command on its own, so no `DECLARED_COVERAGE` edge says so;
+    // `check:root:workspace-shards` checks that the shards partition the
+    // packages.
   },
   {
     // Every package that defines one.
