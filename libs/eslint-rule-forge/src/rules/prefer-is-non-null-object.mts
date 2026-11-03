@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { isRuntimeBound } from '../bindings.mjs';
 import { bindValueImportsAt } from '../imports.mjs';
 import { getRangeWithParens, parenthesesDepth } from '../parentheses.mjs';
 import { skipTypeWrappers } from '../type-wrappers.mjs';
@@ -11,6 +12,14 @@ import { skipTypeWrappers } from '../type-wrappers.mjs';
  * Builds a rule that replaces `typeof u === 'object' && u !== null`, in either
  * order and anywhere in an `&&` chain, with `isNonNullObject(u)` imported from
  * `moduleName`.
+ *
+ * `typeof u` is the one read of an undeclared name that does not throw, and in
+ * `typeof u === 'object' && u !== null` the `u !== null` never runs then, while
+ * `isNonNullObject(u)` reads `u` unconditionally. So that order, on a name the
+ * file does not create at runtime — a global or a `declare`d name, as in
+ * `typeof window === 'object' && window !== null` probing for a browser — is
+ * left alone. With `u !== null` first the original reads `u` unconditionally
+ * too, and is replaced whatever `u` is.
  */
 export const createPreferIsNonNullObject = ({
   moduleName,
@@ -46,10 +55,16 @@ export const createPreferIsNonNullObject = ({
           }
 
           mut_pairsToFix.push(
-            ...findNonNullObjectPairs(sourceCode, node).map((pair) => ({
-              ...pair,
-              chain: node,
-            })),
+            ...findNonNullObjectPairs(sourceCode, node)
+              .filter(
+                ({ identifierName, nullCheckFirst }) =>
+                  nullCheckFirst ||
+                  isRuntimeBound(sourceCode, node, identifierName),
+              )
+              .map((pair) => ({
+                ...pair,
+                chain: node,
+              })),
           );
         },
         'Program:exit': () => {
@@ -100,11 +115,12 @@ export const createPreferIsNonNullObject = ({
 /**
  * A `typeof u === 'object'` and a `u !== null` next to each other in an `&&`
  * chain, as the source range from the first to the second (parentheses
- * included) and the name of `u`.
+ * included), the name of `u`, and whether `u !== null` comes first.
  */
 type NonNullObjectPair = Readonly<{
   range: TSESTree.Range;
   identifierName: string;
+  nullCheckFirst: boolean;
 }>;
 
 /**
@@ -257,8 +273,9 @@ const findNonNullObjectPairs = (
       return [];
     }
 
-    const identifierName =
-      pairIdentifierName(first, second) ?? pairIdentifierName(second, first);
+    const typeofFirstName = pairIdentifierName(first, second);
+
+    const identifierName = typeofFirstName ?? pairIdentifierName(second, first);
 
     return identifierName === undefined
       ? pairsFrom(index + 1)
@@ -269,6 +286,7 @@ const findNonNullObjectPairs = (
               getRangeWithParens(sourceCode, second)[1],
             ],
             identifierName,
+            nullCheckFirst: typeofFirstName === undefined,
           },
           ...pairsFrom(index + 2),
         ];

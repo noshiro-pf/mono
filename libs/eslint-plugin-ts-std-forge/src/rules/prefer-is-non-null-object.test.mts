@@ -30,10 +30,12 @@ ruleTester.run('prefer-is-non-null-object', preferIsNonNullObject, {
     {
       name: 'Replace the object/null check',
       code: dedent`
+        const u: unknown = {};
         const ok = typeof u === 'object' && u !== null;
       `,
       output: dedent`
         import { isNonNullObject } from 'ts-std-forge';
+        const u: unknown = {};
         const ok = isNonNullObject(u);
       `,
       errors: [{ messageId: 'useIsNonNullObject' }],
@@ -42,10 +44,12 @@ ruleTester.run('prefer-is-non-null-object', preferIsNonNullObject, {
       name: 'Reuses an existing import',
       code: dedent`
         import { isNonNullObject } from 'ts-std-forge';
+        const u: unknown = {};
         const ok = typeof u === 'object' && u !== null;
       `,
       output: dedent`
         import { isNonNullObject } from 'ts-std-forge';
+        const u: unknown = {};
         const ok = isNonNullObject(u);
       `,
       errors: [{ messageId: 'useIsNonNullObject' }],
@@ -70,10 +74,12 @@ describe('prefer-is-non-null-object through type wrappers', () => {
       {
         name: 'reads the typeof operand through `satisfies`',
         code: dedent`
+          const u: unknown = {};
           const ok = typeof (u satisfies unknown) === 'object' && u !== null;
         `,
         output: dedent`
           import { isNonNullObject } from 'ts-std-forge';
+          const u: unknown = {};
           const ok = isNonNullObject(u);
         `,
         errors: [{ messageId: 'useIsNonNullObject' }],
@@ -81,10 +87,12 @@ describe('prefer-is-non-null-object through type wrappers', () => {
       {
         name: 'reads the null check through `!` and `as`',
         code: dedent`
+          const u: unknown = {};
           const ok = typeof u === 'object' && u! !== (null as null);
         `,
         output: dedent`
           import { isNonNullObject } from 'ts-std-forge';
+          const u: unknown = {};
           const ok = isNonNullObject(u);
         `,
         errors: [{ messageId: 'useIsNonNullObject' }],
@@ -92,12 +100,14 @@ describe('prefer-is-non-null-object through type wrappers', () => {
       {
         name: 'reads the literal and both halves through wrappers',
         code: dedent`
+          const u: unknown = {};
           const ok =
             ((typeof (<unknown>u) === ('object' as const)) satisfies boolean) &&
             ((u !== null) as boolean);
         `,
         output: dedent`
           import { isNonNullObject } from 'ts-std-forge';
+          const u: unknown = {};
           const ok =
             isNonNullObject(u);
         `,
@@ -141,10 +151,12 @@ describe('prefer-is-non-null-object in other forms', () => {
       {
         name: 'the halves in reverse order',
         code: dedent`
+          const u: unknown = {};
           const ok = u !== null && typeof u === 'object';
         `,
         output: dedent`
           import { isNonNullObject } from 'ts-std-forge';
+          const u: unknown = {};
           const ok = isNonNullObject(u);
         `,
         errors: [{ messageId: 'useIsNonNullObject' }],
@@ -152,10 +164,12 @@ describe('prefer-is-non-null-object in other forms', () => {
       {
         name: 'each comparison with its operands swapped',
         code: dedent`
+          const u: unknown = {};
           const ok = 'object' === typeof u && null !== u;
         `,
         output: dedent`
           import { isNonNullObject } from 'ts-std-forge';
+          const u: unknown = {};
           const ok = isNonNullObject(u);
         `,
         errors: [{ messageId: 'useIsNonNullObject' }],
@@ -163,10 +177,12 @@ describe('prefer-is-non-null-object in other forms', () => {
       {
         name: '`!= null`, which typeof has already made the same check',
         code: dedent`
+          const u: unknown = {};
           const ok = typeof u === 'object' && u != null;
         `,
         output: dedent`
           import { isNonNullObject } from 'ts-std-forge';
+          const u: unknown = {};
           const ok = isNonNullObject(u);
         `,
         errors: [{ messageId: 'useIsNonNullObject' }],
@@ -174,6 +190,7 @@ describe('prefer-is-non-null-object in other forms', () => {
       {
         name: 'the pair at the start, the end and the middle of a longer chain',
         code: dedent`
+          const u: unknown = {};
           declare const a: boolean;
           declare const b: boolean;
           const x = typeof u === 'object' && u !== null && 'k' in u;
@@ -183,6 +200,7 @@ describe('prefer-is-non-null-object in other forms', () => {
         output: [
           dedent`
             import { isNonNullObject } from 'ts-std-forge';
+            const u: unknown = {};
             declare const a: boolean;
             declare const b: boolean;
             const x = isNonNullObject(u) && 'k' in u;
@@ -191,6 +209,7 @@ describe('prefer-is-non-null-object in other forms', () => {
           `,
           dedent`
             import { isNonNullObject } from 'ts-std-forge';
+            const u: unknown = {};
             declare const a: boolean;
             declare const b: boolean;
             const x = isNonNullObject(u) && 'k' in u;
@@ -207,18 +226,21 @@ describe('prefer-is-non-null-object in other forms', () => {
       {
         name: 'two pairs in one chain',
         code: dedent`
-          declare const v: unknown;
+          const u: unknown = {};
+          const v: unknown = {};
           const ok = typeof u === 'object' && u !== null && v !== null && typeof v === 'object';
         `,
         output: [
           dedent`
             import { isNonNullObject } from 'ts-std-forge';
-            declare const v: unknown;
+            const u: unknown = {};
+            const v: unknown = {};
             const ok = isNonNullObject(u) && v !== null && typeof v === 'object';
           `,
           dedent`
             import { isNonNullObject } from 'ts-std-forge';
-            declare const v: unknown;
+            const u: unknown = {};
+            const v: unknown = {};
             const ok = isNonNullObject(u) && isNonNullObject(v);
           `,
         ],
@@ -226,6 +248,96 @@ describe('prefer-is-non-null-object in other forms', () => {
           { messageId: 'useIsNonNullObject' },
           { messageId: 'useIsNonNullObject' },
         ],
+      },
+    ],
+  });
+});
+
+// `typeof u` does not throw where `u` does not exist, and `isNonNullObject(u)`
+// does, so a check on a name the file does not create at runtime is left alone
+// when `typeof` comes first.
+describe('prefer-is-non-null-object on a name that may not exist', () => {
+  ruleTester.run('prefer-is-non-null-object', preferIsNonNullObject, {
+    valid: [
+      {
+        name: 'a global the file does not declare',
+        code: dedent`
+          const inBrowser = typeof window === 'object' && window !== null;
+        `,
+      },
+      {
+        name: 'a `declare const`',
+        code: dedent`
+          declare const host: unknown;
+          const ok = typeof host === 'object' && host !== null;
+        `,
+      },
+      {
+        name: 'a `declare global` block',
+        code: dedent`
+          declare global {
+            const host: unknown;
+          }
+          const ok = typeof host === 'object' && host !== null;
+          export {};
+        `,
+      },
+      {
+        name: 'a name that is only a type in the file',
+        code: dedent`
+          interface host {}
+          const ok = typeof host === 'object' && host !== null;
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a parameter shadowing a global',
+        code: dedent`
+          const f = (window: unknown) => typeof window === 'object' && window !== null;
+        `,
+        output: dedent`
+          import { isNonNullObject } from 'ts-std-forge';
+          const f = (window: unknown) => isNonNullObject(window);
+        `,
+        errors: [{ messageId: 'useIsNonNullObject' }],
+      },
+      {
+        name: 'an import',
+        code: dedent`
+          import { host } from './host.mjs';
+          const ok = typeof host === 'object' && host !== null;
+        `,
+        output: dedent`
+          import { isNonNullObject } from 'ts-std-forge';
+          import { host } from './host.mjs';
+          const ok = isNonNullObject(host);
+        `,
+        errors: [{ messageId: 'useIsNonNullObject' }],
+      },
+      {
+        name: 'one pair of a chain on a bound name, the other on a global',
+        code: dedent`
+          const u: unknown = {};
+          const ok = typeof u === 'object' && u !== null && typeof window === 'object' && window !== null;
+        `,
+        output: dedent`
+          import { isNonNullObject } from 'ts-std-forge';
+          const u: unknown = {};
+          const ok = isNonNullObject(u) && typeof window === 'object' && window !== null;
+        `,
+        errors: [{ messageId: 'useIsNonNullObject' }],
+      },
+      {
+        name: 'a global with the null check first, which already reads it',
+        code: dedent`
+          const ok = window !== null && typeof window === 'object';
+        `,
+        output: dedent`
+          import { isNonNullObject } from 'ts-std-forge';
+          const ok = isNonNullObject(window);
+        `,
+        errors: [{ messageId: 'useIsNonNullObject' }],
       },
     ],
   });
