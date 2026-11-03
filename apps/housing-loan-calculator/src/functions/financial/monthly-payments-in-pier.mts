@@ -1,6 +1,6 @@
 import { Num, asPositiveFiniteNumber, type SafeUint } from 'ts-data-forge';
+import { annuityFactor } from 'ts-utils-additional';
 import type { PercentFloat } from '../../types/index.mjs';
-import { annuityFactor } from './annuity-factor.mjs';
 
 /**
  * 元利均等返済における月々の支払い額を求める計算式．金利 0 では総額を回数で

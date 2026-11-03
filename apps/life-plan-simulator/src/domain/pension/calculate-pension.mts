@@ -1,5 +1,6 @@
 import { Arr, Num } from 'ts-data-forge';
 import type { StrictOmit } from 'ts-type-forge';
+import { accumulationFactor } from 'ts-utils-additional';
 import {
   basicPensionFullAmount,
   basicPensionFullMonths,
@@ -212,11 +213,7 @@ const breakEven = (
   const cumulative = (row: (typeof rows)[number], age: number): number => {
     const n = age - row.startAge + 1;
 
-    return n <= 0
-      ? 0
-      : Num.isNonZero(rate)
-        ? Num.div(row.net * ((1 + rate) ** n - 1), rate)
-        : row.net * n;
+    return n <= 0 ? 0 : row.net * accumulationFactor(rate, n);
   };
 
   const mut_lastBest: (number | undefined)[] = rows.map(() => undefined);

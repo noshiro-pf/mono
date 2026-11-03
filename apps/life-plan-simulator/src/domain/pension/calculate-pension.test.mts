@@ -77,4 +77,35 @@ describe(calculatePension, () => {
       defined.toSorted((a, b) => a - b),
     );
   });
+
+  // 利回りが 1e-16 前後だと `(1 + rate) ** n - 1` が 0 に丸まり、累計がすべて 0 になる。
+  test.each([1e-17, 1.7e-16, 4e-16])(
+    '運用利回り %s でも利回り 0 と同じ損益分岐になること',
+    (yieldRetired) => {
+      const tiny = calculatePension({
+        birth,
+        salaryHistory: resolveSalaryHistory(
+          [
+            {
+              id: 1,
+              start: '2012-04',
+              annualBase: 5_000_000,
+              companyDcMonthly: 0,
+              idecoMonthly: 0,
+              annualBonus: 0,
+            },
+          ],
+          0,
+        ),
+        retirementAge: 60,
+        basicPensionMonths: 480,
+        yieldRetired,
+      });
+
+      assert.deepStrictEqual(
+        tiny.byStartAge.map((r) => r.lastAgeBest),
+        pension.byStartAge.map((r) => r.lastAgeBest),
+      );
+    },
+  );
 });
