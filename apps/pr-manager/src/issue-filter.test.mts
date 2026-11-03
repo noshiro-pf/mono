@@ -8,7 +8,7 @@ describe(isIssueFilterShown, () => {
   test('by default, every priority is shown, pending or not', () => {
     assert.isTrue(
       isIssueFilterShown(
-        { priority: 'low', pending: true, inProgress: false },
+        { priority: 'D', pending: true, inProgress: false },
         DEFAULT_ISSUE_FILTER,
       ),
     );
@@ -24,13 +24,13 @@ describe(isIssueFilterShown, () => {
   test('a pick on each side narrows by both: only what is of a priority picked and pending', () => {
     const filter: IssueFilter = {
       ...DEFAULT_ISSUE_FILTER,
-      onlyPriorities: ['high'],
+      onlyPriorities: ['S'],
       onlyPending: true,
     } as const;
 
     assert.isTrue(
       isIssueFilterShown(
-        { priority: 'high', pending: true, inProgress: false },
+        { priority: 'S', pending: true, inProgress: false },
         filter,
       ),
     );
@@ -38,14 +38,14 @@ describe(isIssueFilterShown, () => {
     // Neither side brings in what the other leaves out.
     assert.isFalse(
       isIssueFilterShown(
-        { priority: 'low', pending: true, inProgress: false },
+        { priority: 'D', pending: true, inProgress: false },
         filter,
       ),
     );
 
     assert.isFalse(
       isIssueFilterShown(
-        { priority: 'high', pending: false, inProgress: false },
+        { priority: 'S', pending: false, inProgress: false },
         filter,
       ),
     );
@@ -54,7 +54,7 @@ describe(isIssueFilterShown, () => {
   test('what either side hides is hidden', () => {
     assert.isFalse(
       isIssueFilterShown(
-        { priority: 'high', pending: true, inProgress: false },
+        { priority: 'S', pending: true, inProgress: false },
         {
           ...DEFAULT_ISSUE_FILTER,
           hidePending: true,
@@ -64,10 +64,10 @@ describe(isIssueFilterShown, () => {
 
     assert.isFalse(
       isIssueFilterShown(
-        { priority: 'low', pending: false, inProgress: false },
+        { priority: 'D', pending: false, inProgress: false },
         {
           ...DEFAULT_ISSUE_FILTER,
-          hiddenPriorities: ['low'],
+          hiddenPriorities: ['D'],
         },
       ),
     );
@@ -76,34 +76,34 @@ describe(isIssueFilterShown, () => {
   test('in progress is a side of its own, read with the others', () => {
     const filter: IssueFilter = {
       ...DEFAULT_ISSUE_FILTER,
-      onlyPriorities: ['high'],
+      onlyPriorities: ['S'],
       onlyInProgress: true,
     } as const;
 
     assert.isTrue(
       isIssueFilterShown(
-        { priority: 'high', pending: false, inProgress: true },
+        { priority: 'S', pending: false, inProgress: true },
         filter,
       ),
     );
 
     assert.isFalse(
       isIssueFilterShown(
-        { priority: 'high', pending: false, inProgress: false },
+        { priority: 'S', pending: false, inProgress: false },
         filter,
       ),
     );
 
     assert.isFalse(
       isIssueFilterShown(
-        { priority: 'mid', pending: false, inProgress: true },
+        { priority: 'B', pending: false, inProgress: true },
         filter,
       ),
     );
 
     assert.isFalse(
       isIssueFilterShown(
-        { priority: 'high', pending: false, inProgress: true },
+        { priority: 'S', pending: false, inProgress: true },
         {
           ...DEFAULT_ISSUE_FILTER,
           hideInProgress: true,
@@ -113,7 +113,7 @@ describe(isIssueFilterShown, () => {
 
     assert.isTrue(
       isIssueFilterShown(
-        { priority: 'high', pending: false, inProgress: false },
+        { priority: 'S', pending: false, inProgress: false },
         {
           ...DEFAULT_ISSUE_FILTER,
           hideInProgress: true,

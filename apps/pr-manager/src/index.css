@@ -2212,8 +2212,9 @@ a:focus-visible {
  * switches, as the merge order's counts are, closer to what they count. The
  * priorities are one control, their tiles joined edge to edge, and
  * `pending` stands beside it on its own (`issues-summary.tsx`): a row that
- * wraps rather than a grid, so that the joined tiles wrap as one, onto a row
- * of their own where the four do not fit beside the rest.
+ * wraps rather than a grid, with the joined tiles on a row of their own:
+ * eight across, or two rows of four, or four rows of two, as the width allows
+ * (below).
  */
 .issues-summary.summary-row {
   display: flex;
@@ -2226,7 +2227,9 @@ a:focus-visible {
 }
 
 .issues-summary > .stat-group {
-  flex: 4 1 30rem;
+  display: grid;
+  flex: 1 1 100%;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
 }
 
 .stat-group {
@@ -2358,10 +2361,6 @@ a:focus-visible {
     flex-basis: 5rem;
   }
 
-  .issues-summary > .stat-group {
-    flex-basis: 20rem;
-  }
-
   .stat-tile {
     --tile-pad-block: 0.45rem;
     --tile-pad-inline: 0.6rem;
@@ -2476,27 +2475,54 @@ a:focus-visible {
 }
 
 /*
- * Where the row cannot hold all seven tiles at their least, compact as they
- * are by then (see "narrow filter bars" above), the joined tiles go last, so
- * that `open`, `pending` and `in progress`, those of them there are, share
- * the first row and the joined tiles wrap onto one of their own, rather than
- * a row each. Tab still goes in the order the markup has, as the dense grid
- * this replaces did. Where the four are narrower than a tile can
- * hold its number and its `only` beside each other, two rows of two.
+ * The joined tiles go last, so that `open`, `pending` and `in progress`,
+ * those of them there are, share the first row and the eight tiers wrap onto
+ * one of their own, rather than a row each. Tab still goes in the order the
+ * markup has, as the dense grid this replaces did. Where eight across are
+ * narrower than a tile can hold its number and its `only` beside each other,
+ * two rows of four, and where four are, four rows of two; the tiles keep
+ * their shared edges, and the block its rounded corners.
  */
 .issues-summary-box {
   container: filter-bar / inline-size;
 }
 
-@container filter-bar (width < 37rem) {
+.issues-summary > .stat-group {
+  order: 1;
+}
+
+@container filter-bar (23rem <= width < 40rem) {
   .issues-summary > .stat-group {
-    order: 1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .stat-group > .stat-cell + .stat-cell:nth-child(4n + 1) {
+    margin-left: 0;
+  }
+
+  .stat-group > .stat-cell:nth-child(n + 5) {
+    margin-top: -1px;
+  }
+
+  .stat-group > .stat-cell:nth-child(1) > .stat-toggle {
+    border-radius: var(--radius) 0 0 0;
+  }
+
+  .stat-group > .stat-cell:nth-child(4) > .stat-toggle {
+    border-radius: 0 var(--radius) 0 0;
+  }
+
+  .stat-group > .stat-cell:nth-last-child(4) > .stat-toggle {
+    border-radius: 0 0 0 var(--radius);
+  }
+
+  .stat-group > .stat-cell:nth-last-child(1) > .stat-toggle {
+    border-radius: 0 0 var(--radius) 0;
   }
 }
 
 @container filter-bar (width < 23rem) {
   .issues-summary > .stat-group {
-    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -2516,11 +2542,11 @@ a:focus-visible {
     border-radius: 0 var(--radius) 0 0;
   }
 
-  .stat-group > .stat-cell:nth-child(3) > .stat-toggle {
+  .stat-group > .stat-cell:nth-last-child(2) > .stat-toggle {
     border-radius: 0 0 0 var(--radius);
   }
 
-  .stat-group > .stat-cell:nth-child(4) > .stat-toggle {
+  .stat-group > .stat-cell:nth-last-child(1) > .stat-toggle {
     border-radius: 0 0 var(--radius) 0;
   }
 }
@@ -2744,7 +2770,9 @@ a:focus-visible {
   stroke-dasharray: 5 3;
 }
 
-.issue-dag-node[data-priority='low'],
+.issue-dag-node[data-priority='D'],
+.issue-dag-node[data-priority='hold'],
+.issue-dag-node[data-priority='close'],
 .issue-dag-node[data-pending='true'] {
   opacity: 0.5;
 }
@@ -2760,17 +2788,17 @@ a:focus-visible {
  * outline is cut off by the block's edge when the key wraps it to the start
  * of a line, and crowds the word beside it.
  */
-.issue-dag-swatch[data-priority='high'] {
+.issue-dag-swatch[data-priority='S'] {
   margin: 3px;
   outline: 1.5px solid var(--dag-colour);
   outline-offset: 1.5px;
 }
 
-.issue-dag-swatch[data-priority='low'] {
+.issue-dag-swatch[data-priority='D'] {
   opacity: 0.5;
 }
 
-/* Labelled `pending`: faint as a low priority is, whatever its colour. */
+/* Labelled `pending`: faint as tier D is, whatever its colour. */
 .issue-dag-swatch[data-pending] {
   --dag-colour: var(--ink-secondary);
 
@@ -2794,24 +2822,30 @@ a:focus-visible {
   font-weight: 600;
 }
 
-.issue-dag-priority[data-priority='high'] rect {
+/* Tiers S and A filled, B and C outlined in ink, the rest quiet. */
+.issue-dag-priority:is([data-priority='S'], [data-priority='A']) rect {
   fill: var(--ink-primary);
   stroke: var(--ink-primary);
 }
 
-.issue-dag-priority[data-priority='high'] text {
+.issue-dag-priority:is([data-priority='S'], [data-priority='A']) text {
   fill: var(--surface);
 }
 
-.issue-dag-priority[data-priority='mid'] rect {
+.issue-dag-priority:is([data-priority='B'], [data-priority='C']) rect {
   stroke: var(--ink-primary);
 }
 
-.issue-dag-priority[data-priority='mid'] text {
+.issue-dag-priority:is([data-priority='B'], [data-priority='C']) text {
   fill: var(--ink-primary);
 }
 
-.issue-dag-priority[data-priority='low'] rect {
+.issue-dag-priority:is(
+    [data-priority='D'],
+    [data-priority='hold'],
+    [data-priority='close']
+  )
+  rect {
   stroke: var(--baseline);
 }
 

@@ -9,6 +9,7 @@ import {
 } from '../issue-graph-layout.mjs';
 import type { IssueGraphNode } from '../issue-graph.mjs';
 import { numberPillWidth, wrapTitle } from '../node-title.mjs';
+import { isRingedTier } from '../priority.mjs';
 import { describeNode } from './issue-dag-states.mjs';
 import { SvgLink } from './svg-elements.js';
 
@@ -27,14 +28,14 @@ type Props = Readonly<{ placed$: InitializedObservable<PlacedNode> }>;
  * ends and a pull request a rounded box, so the two read apart before the
  * colour does — the issue angular, as the problem it raises, and the pull
  * request rounded, as what settles it. Its number is on a pill across the left
- * of the top edge, and its `priority:*` label a word on a pill across the
- * right, both in ink rather than a colour, since the shape and the colour
- * already say what it is and where it stands; the number is the quieter of the
- * two, as what identifies a node rather than what ranks it. A high one also
- * gets a second outline around the shape, and a low one is drawn faint, as is
- * one labelled `pending`, held back for now. The number, the state, the
- * priority and whether it is pending are in the tooltip, which is also what a
- * screen reader announces.
+ * of the top edge, and an issue's tier (`priority:<tier>`) a word on a pill
+ * across the right, both in ink rather than a colour, since the shape and the
+ * colour already say what it is and where it stands; the number is the quieter
+ * of the two, as what identifies a node rather than what ranks it. One of tier
+ * `S` or `A` also gets a second outline around the shape, and one of `D`,
+ * `hold` or `close` is drawn faint, as is one labelled `pending`, held back for
+ * now. The number, the state, the priority and whether it is pending are in the
+ * tooltip, which is also what a screen reader announces.
  *
  * A row of the DAG keyed by its number, so the number, and with it the kind,
  * the URL and the width of the number's pill, are the ones it was made with;
@@ -58,7 +59,7 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
         transform={view(placed$, ({ x, y }) => `translate(${x} ${y})`)}
       >
         <If
-          cond={view(placed$, ({ node }) => node.priority === 'high')}
+          cond={view(placed$, ({ node }) => isRingedTier(node.priority))}
           then={
             kind === 'pull-request' ? (
               <rect
@@ -181,7 +182,7 @@ const ISSUE_POINTS = [
   [0, NODE_HEIGHT / 2],
 ] as const satisfies readonly FixedLengthTuple<2, number>[];
 
-/** Between a high priority node's shape and its second outline. */
+/** Between a ringed node's shape and its second outline (`isRingedTier`). */
 const RING_GAP = 4;
 
 const toPoints = (points: readonly FixedLengthTuple<2, number>[]): string =>
@@ -246,7 +247,7 @@ const TITLE_LINES = 2;
 
 const LINE_HEIGHT = 15;
 
-/** Wide enough for `high` in 10px bold. */
+/** Wide enough for `close` in 10px bold. */
 const PRIORITY_WIDTH = 36;
 
 /** Centred on the top edge. */

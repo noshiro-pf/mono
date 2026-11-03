@@ -54,15 +54,19 @@
  *
  * **Kept in the query string** as the merge order's view is
  * (`merge-order-view.mts`), with only what differs from {@link
- * DEFAULT_ISSUES_LIST_VIEW} written: `issues.hidePriority=low.none`,
- * `issues.onlyPriority=high`, `issues.hideStart=blocked.cycle`,
+ * DEFAULT_ISSUES_LIST_VIEW} written: `issues.hidePriority=hold.close`,
+ * `issues.onlyPriority=S.A`, `issues.hideStart=blocked.cycle`,
  * `issues.hidePending=1` or `issues.onlyPending=1`, `issues.hideInProgress=1`
  * or `issues.onlyInProgress=1`, `issues.sort=priority`, and a label picked as
  * `issues.label=bug`, once for each, since a label's name can hold the `.` the
  * others are joined with.
  */
 
-import { PENDING_LABEL, type IssueStartState } from 'pr-report-core';
+import {
+  issuePriorityLabel,
+  PENDING_LABEL,
+  type IssueStartState,
+} from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord, StrictExclude, StrictPick } from 'ts-type-forge';
 import { isInProgressShown } from './in-progress.mjs';
@@ -77,10 +81,10 @@ import { isPending, isPendingShown } from './pending.mjs';
 import {
   isPriorityLabel,
   isPriorityShown,
-  PRIORITIES,
-  PRIORITY_RANK,
-  priorityOf,
-  type Priority,
+  ISSUE_TIER_RANK,
+  ISSUE_TIERS,
+  issueTierOf,
+  type IssueTier,
 } from './priority.mjs';
 import {
   currentSearch,
@@ -150,7 +154,7 @@ export type LabelCount = Readonly<{
 /** The counts the list leads with, as the view leaves them. */
 export type IssuesListCounts = Readonly<{
   open: Count;
-  priorities: ReadonlyRecord<Priority, Count>;
+  priorities: ReadonlyRecord<IssueTier, Count>;
   pending: Count;
   inProgress: Count;
   starts: ReadonlyRecord<IssueStartSwitch, Count>;
@@ -172,7 +176,7 @@ export type IssueFilterCounts = StrictPick<
  * progress`.
  */
 export type IssueFacts<T> = Readonly<{
-  priority: (item: T) => Priority;
+  priority: (item: T) => IssueTier;
   pending: (item: T) => boolean;
   inProgress: (item: T) => boolean;
 }>;
@@ -191,7 +195,7 @@ export const isIssueShown = (
   return (
     isIssueFilterShown(
       {
-        priority: priorityOf(issue.labels),
+        priority: issueTierOf(issue.labels),
         pending: isPending(issue.labels),
         inProgress: start === 'in-progress',
       },
@@ -222,7 +226,7 @@ export const countIssueFilter = <T,>(
   // Each priority reads how many of it the view would show were it shown,
   // whether that is switching it back on or picking it too: an issue has one
   // priority, so under a pick one not picked would otherwise read none.
-  const underPriority = (which: Priority): Count => {
+  const underPriority = (which: IssueTier): Count => {
     const all = items.filter((item) => priority(item) === which);
 
     return {
@@ -257,9 +261,13 @@ export const countIssueFilter = <T,>(
       total: items.length,
     },
     priorities: {
-      high: underPriority('high'),
-      mid: underPriority('mid'),
-      low: underPriority('low'),
+      S: underPriority('S'),
+      A: underPriority('A'),
+      B: underPriority('B'),
+      C: underPriority('C'),
+      D: underPriority('D'),
+      hold: underPriority('hold'),
+      close: underPriority('close'),
       none: underPriority('none'),
     },
     pending: {
@@ -309,8 +317,8 @@ export const arrangeIssues = (
     case 'priority':
       return shown.toSorted(
         (a, b) =>
-          PRIORITY_RANK[priorityOf(a.labels)] -
-          PRIORITY_RANK[priorityOf(b.labels)],
+          ISSUE_TIER_RANK[issueTierOf(a.labels)] -
+          ISSUE_TIER_RANK[issueTierOf(b.labels)],
       );
 
     case 'start':
@@ -377,7 +385,7 @@ export const countIssues = (
     ...countIssueFilter(
       items,
       {
-        priority: (issue) => priorityOf(issue.labels),
+        priority: (issue) => issueTierOf(issue.labels),
         pending: (issue) => isPending(issue.labels),
         inProgress: (issue) => startOf(starts, issue) === 'in-progress',
       },
@@ -414,12 +422,12 @@ export const countIssues = (
  */
 export const toggleIssuePriority = (
   view: IssuesListView,
-  priority: Priority,
+  priority: IssueTier,
 ): IssuesListView =>
   isPriorityShown(priority, view)
     ? ({
         ...view,
-        hiddenPriorities: toggled(PRIORITIES, view.hiddenPriorities, priority),
+        hiddenPriorities: toggled(ISSUE_TIERS, view.hiddenPriorities, priority),
         onlyPriorities: view.onlyPriorities.filter((each) => each !== priority),
       } as const)
     : ({
@@ -428,18 +436,18 @@ export const toggleIssuePriority = (
           (each) => each !== priority,
         ),
         onlyPriorities: Arr.isNonEmpty(view.onlyPriorities)
-          ? toggled<Priority>(PRIORITIES, view.onlyPriorities, priority)
+          ? toggled<IssueTier>(ISSUE_TIERS, view.onlyPriorities, priority)
           : view.onlyPriorities,
       } as const);
 
 export const toggleIssuePriorityOnly = (
   view: IssuesListView,
-  priority: Priority,
+  priority: IssueTier,
 ): IssuesListView =>
   ({
     ...view,
     hiddenPriorities: view.hiddenPriorities.filter((each) => each !== priority),
-    onlyPriorities: toggled(PRIORITIES, view.onlyPriorities, priority),
+    onlyPriorities: toggled(ISSUE_TIERS, view.onlyPriorities, priority),
   }) as const;
 
 export const toggleIssueStart = (
@@ -510,7 +518,7 @@ export const issuesListViewFromSearch = (search: string): IssuesListView => {
   const sort = params.get(PARAM.sort);
 
   const hiddenPriorities = namesParam(
-    PRIORITIES,
+    ISSUE_TIERS,
     params.getAll(PARAM.hidePriority),
   );
 
@@ -535,10 +543,16 @@ export const issuesListViewFromSearch = (search: string): IssuesListView => {
 
   return {
     hiddenPriorities,
-    onlyPriorities: namesParam(
-      PRIORITIES,
-      params.getAll(PARAM.onlyPriority),
-    ).filter((each) => !hiddenPriorities.includes(each)),
+    // A tier picked as a label is what a page wrote before the tiers had
+    // switches of their own, and is picked as one; one switched off stays off.
+    onlyPriorities: Arr.uniq([
+      ...namesParam(ISSUE_TIERS, params.getAll(PARAM.onlyPriority)),
+      ...ISSUE_TIERS.filter(
+        (tier) =>
+          tier !== 'none' &&
+          params.getAll(PARAM.label).includes(issuePriorityLabel(tier)),
+      ),
+    ]).filter((each) => !hiddenPriorities.includes(each)),
     hiddenStarts: namesParam(
       ISSUE_START_SWITCHES,
       params.getAll(PARAM.hideStart),

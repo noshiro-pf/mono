@@ -1,5 +1,6 @@
 import { constant, For, If, view, type JSX, type View } from 'synstate-dom';
 import type { IssueGraph, IssueNodeState } from '../issue-graph.mjs';
+import { isFadedTier, isRingedTier } from '../priority.mjs';
 import { issuesViewStore } from '../store/index.mjs';
 import { legendStates, stateLabels } from './issue-dag-states.mjs';
 
@@ -67,29 +68,29 @@ export const IssueDagLegend = (): JSX.Element => {
       />
       <If
         cond={has(({ nodes }) =>
-          nodes.some(({ priority }) => priority === 'high'),
+          nodes.some(({ priority }) => isRingedTier(priority)),
         )}
         then={
           <li>
             <span
               class={constant('issue-dag-swatch')}
-              data-priority={constant('high')}
+              data-priority={constant('S')}
             />
-            {constant('High priority')}
+            {constant('Priority S or A')}
           </li>
         }
       />
       <If
         cond={has(({ nodes }) =>
-          nodes.some(({ priority }) => priority === 'low'),
+          nodes.some(({ priority }) => isFadedTier(priority)),
         )}
         then={
           <li>
             <span
               class={constant('issue-dag-swatch')}
-              data-priority={constant('low')}
+              data-priority={constant('D')}
             />
-            {constant('Low priority')}
+            {constant('Priority D, hold or close')}
           </li>
         }
       />

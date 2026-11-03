@@ -47,7 +47,7 @@ import {
   type IssueStartSwitch,
 } from '../issues-list-view.mjs';
 import type { IssueItem, LoadedReport } from '../load-report.mjs';
-import type { Priority } from '../priority.mjs';
+import type { IssueTier } from '../priority.mjs';
 
 export type IssuesListDeps = Readonly<{
   issues: InitializedObservable<LoadedReport['issues']>;
@@ -79,8 +79,8 @@ export type IssuesListStore = Readonly<{
   counts: InitializedObservable<IssuesListCounts>;
   /** How each listed issue stands for being started, by number. */
   starts: InitializedObservable<ReadonlyMap<number, IssueStart>>;
-  togglePriority: (priority: Priority) => void;
-  togglePriorityOnly: (priority: Priority) => void;
+  togglePriority: (priority: IssueTier) => void;
+  togglePriorityOnly: (priority: IssueTier) => void;
   toggleStart: (which: IssueStartSwitch) => void;
   toggleLabel: (labelName: string) => void;
   togglePending: () => void;

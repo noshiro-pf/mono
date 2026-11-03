@@ -218,26 +218,27 @@ describe(buildIssueGraph, () => {
     );
   });
 
-  test('carries the priority label of a listed issue and of an open pull request', () => {
+  test("carries a listed issue's tier, and no tier for an open pull request, whatever its priority", () => {
     const graph = build({
       issues: [
-        issue(1, [], ['priority:high']),
-        issue(2, [1], ['bug', 'priority:low']),
+        issue(1, [], ['priority:S']),
+        issue(2, [1], ['bug', 'priority:D']),
         issue(3, [4]),
       ],
       referenced: [referencedItem(4, 'issue', 'waiting')],
-      pulls: [pull(7, [1], ['priority:mid'])],
+      pulls: [pull(7, [1], ['priority:high', 'priority:B'])],
     });
 
     assert.deepStrictEqual(
       graph.nodes.map(({ number, priority }) => [number, priority]),
       [
-        [1, 'high'],
-        [2, 'low'],
+        [1, 'S'],
+        [2, 'D'],
         [3, 'none'],
         // What a declaration names past the list: its labels are not read.
         [4, 'none'],
-        [7, 'mid'],
+        // A pull request's priority orders the merge queue; it has no tier.
+        [7, 'none'],
       ],
     );
   });
@@ -401,17 +402,17 @@ describe(omitFilteredIssues, () => {
   test('takes out the listed issues of a priority not shown, with what only they name or have closed', () => {
     const graph = build({
       issues: [
-        issue(1, [9], ['priority:high']),
-        issue(2, [1, 8], ['priority:low']),
+        issue(1, [9], ['priority:S']),
+        issue(2, [1, 8], ['priority:D']),
         issue(3, [8]),
       ],
       referenced: [referencedItem(8, 'issue', 'waiting')],
-      pulls: [pull(7, [2], ['priority:high']), pull(6, [3])],
+      pulls: [pull(7, [2], ['priority:S']), pull(6, [3])],
     });
 
     const shown = omitFilteredIssues(graph, {
       ...DEFAULT_ISSUE_FILTER,
-      hiddenPriorities: ['low'],
+      hiddenPriorities: ['D'],
       onlyPriorities: [],
     });
 
@@ -435,9 +436,9 @@ describe(omitFilteredIssues, () => {
   test('keeps one left out that an issue left in waits on, alone, since it is why that one waits', () => {
     const graph = build({
       issues: [
-        issue(1, [2], ['priority:high']),
-        issue(2, [3, 9], ['priority:low']),
-        issue(3, [], ['priority:low']),
+        issue(1, [2], ['priority:S']),
+        issue(2, [3, 9], ['priority:D']),
+        issue(3, [], ['priority:D']),
       ],
       pulls: [pull(7, [2])],
     });
@@ -445,7 +446,7 @@ describe(omitFilteredIssues, () => {
     const shown = omitFilteredIssues(graph, {
       ...DEFAULT_ISSUE_FILTER,
       hiddenPriorities: [],
-      onlyPriorities: ['high'],
+      onlyPriorities: ['S'],
     });
 
     assert.deepStrictEqual(
@@ -465,18 +466,18 @@ describe(omitFilteredIssues, () => {
   test('keeps every edge between issues drawn, a cycle through one kept included', () => {
     const graph = build({
       issues: [
-        issue(1, [2], ['priority:high']),
-        issue(2, [3], ['priority:low']),
-        issue(3, [], ['priority:high']),
-        issue(4, [5], ['priority:high']),
-        issue(5, [4], ['priority:low']),
+        issue(1, [2], ['priority:S']),
+        issue(2, [3], ['priority:D']),
+        issue(3, [], ['priority:S']),
+        issue(4, [5], ['priority:S']),
+        issue(5, [4], ['priority:D']),
       ],
     });
 
     const shown = omitFilteredIssues(graph, {
       ...DEFAULT_ISSUE_FILTER,
       hiddenPriorities: [],
-      onlyPriorities: ['high'],
+      onlyPriorities: ['S'],
     });
 
     assert.deepStrictEqual(
@@ -493,8 +494,8 @@ describe(omitFilteredIssues, () => {
   test('keeps the edges a kept issue has to what is drawn for another', () => {
     const graph = build({
       issues: [
-        issue(1, [3], ['priority:low']),
-        issue(2, [1, 3, 4], ['priority:high']),
+        issue(1, [3], ['priority:D']),
+        issue(2, [1, 3, 4], ['priority:S']),
       ],
       referenced: [referencedItem(3, 'issue', 'abandoned')],
       pulls: [pull(4, [1])],
@@ -502,7 +503,7 @@ describe(omitFilteredIssues, () => {
 
     const shown = omitFilteredIssues(graph, {
       ...DEFAULT_ISSUE_FILTER,
-      hiddenPriorities: ['low'],
+      hiddenPriorities: ['D'],
       onlyPriorities: [],
     });
 
@@ -526,8 +527,8 @@ describe(omitFilteredIssues, () => {
   test('with priorities picked, keeps only the listed issues of them', () => {
     const graph = build({
       issues: [
-        issue(1, [], ['priority:high']),
-        issue(2, [], ['priority:mid']),
+        issue(1, [], ['priority:S']),
+        issue(2, [], ['priority:B']),
         issue(3, []),
       ],
     });
@@ -536,7 +537,7 @@ describe(omitFilteredIssues, () => {
       omitFilteredIssues(graph, {
         ...DEFAULT_ISSUE_FILTER,
         hiddenPriorities: [],
-        onlyPriorities: ['high', 'none'],
+        onlyPriorities: ['S', 'none'],
       }).nodes.map(({ number }) => number),
       [1, 3],
     );
@@ -545,7 +546,7 @@ describe(omitFilteredIssues, () => {
   test('with pending picked, keeps only the listed issues labelled pending, and what one of them waits on', () => {
     const graph = build({
       issues: [
-        issue(1, [], ['priority:high']),
+        issue(1, [], ['priority:S']),
         issue(2, [1], ['pending']),
         issue(3, []),
       ],
@@ -603,13 +604,13 @@ describe(omitFilteredIssues, () => {
 
   test('hands back the graph it was given when every priority in it is shown', () => {
     const graph = build({
-      issues: [issue(1, [], ['priority:high']), issue(2, [1])],
+      issues: [issue(1, [], ['priority:S']), issue(2, [1])],
     });
 
     assert.strictEqual(
       omitFilteredIssues(graph, {
         ...DEFAULT_ISSUE_FILTER,
-        hiddenPriorities: ['low'],
+        hiddenPriorities: ['D'],
         onlyPriorities: [],
       }),
       graph,

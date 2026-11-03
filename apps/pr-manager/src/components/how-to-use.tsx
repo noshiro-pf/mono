@@ -148,7 +148,19 @@ export const HowToUse = (): JSX.Element => {
               {constant(', ')}
               <code>{constant('priority:low')}</code>
               {constant(
-                ': the merge order and the issues filter and sort by it. One carrying none, or more than one, has no priority.',
+                ": a pull request's priority, which the merge order filters and sorts by. One carrying none, or more than one, has no priority.",
+              )}
+            </li>
+            <li>
+              <code>{constant('priority:S')}</code>
+              {constant(' … ')}
+              <code>{constant('priority:D')}</code>
+              {constant(', ')}
+              <code>{constant('priority:hold')}</code>
+              {constant(', ')}
+              <code>{constant('priority:close')}</code>
+              {constant(
+                ": an issue's tier, which the issues filter and sort by, and the DAG marks: S and A with a second outline, D, hold and close faint. One carrying none, or more than one, has no tier.",
               )}
             </li>
             <li>

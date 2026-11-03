@@ -178,9 +178,13 @@ describe(createIssuesViewStore, () => {
     assert.deepStrictEqual(store.counts.getSnapshot().value, {
       open: { shown: 1, total: 2 },
       priorities: {
-        high: { shown: 0, total: 0 },
-        mid: { shown: 0, total: 0 },
-        low: { shown: 0, total: 0 },
+        S: { shown: 0, total: 0 },
+        A: { shown: 0, total: 0 },
+        B: { shown: 0, total: 0 },
+        C: { shown: 0, total: 0 },
+        D: { shown: 0, total: 0 },
+        hold: { shown: 0, total: 0 },
+        close: { shown: 0, total: 0 },
         none: { shown: 1, total: 2 },
       },
       pending: { shown: 1, total: 1 },
@@ -200,9 +204,9 @@ describe(createIssuesViewStore, () => {
 
     setIssues({
       items: [
-        { ...issueItem(1, [9]), labels: [priorityLabel('high')] },
-        { ...issueItem(2, [1]), labels: [priorityLabel('low')] },
-        { ...issueItem(3, []), labels: [priorityLabel('low'), pendingLabel] },
+        { ...issueItem(1, [9]), labels: [priorityLabel('S')] },
+        { ...issueItem(2, [1]), labels: [priorityLabel('D')] },
+        { ...issueItem(3, []), labels: [priorityLabel('D'), pendingLabel] },
         issueItem(4, []),
       ],
       totalCount: 4,
@@ -213,16 +217,20 @@ describe(createIssuesViewStore, () => {
     assert.deepStrictEqual(store.counts.getSnapshot().value, {
       open: { shown: 4, total: 4 },
       priorities: {
-        high: { shown: 1, total: 1 },
-        mid: { shown: 0, total: 0 },
-        low: { shown: 2, total: 2 },
+        S: { shown: 1, total: 1 },
+        A: { shown: 0, total: 0 },
+        B: { shown: 0, total: 0 },
+        C: { shown: 0, total: 0 },
+        D: { shown: 2, total: 2 },
+        hold: { shown: 0, total: 0 },
+        close: { shown: 0, total: 0 },
         none: { shown: 1, total: 1 },
       },
       pending: { shown: 1, total: 1 },
       inProgress: { shown: 0, total: 0 },
     });
 
-    setFilter({ ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['low'] });
+    setFilter({ ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['D'] });
 
     // #1 stays, alone, since #2 waits on it; #9, which only #1 waits on,
     // goes with it.
@@ -232,7 +240,7 @@ describe(createIssuesViewStore, () => {
     );
 
     // What an issue drawn waits on stays, though nobody read its priority.
-    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['low'] });
+    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['D'] });
 
     assert.deepStrictEqual(
       store.graph.getSnapshot().value.nodes.map(({ number }) => number),
@@ -241,7 +249,7 @@ describe(createIssuesViewStore, () => {
 
     setFilter({
       ...DEFAULT_ISSUE_FILTER,
-      hiddenPriorities: ['low'],
+      hiddenPriorities: ['D'],
       hidePending: true,
     });
 
@@ -249,12 +257,16 @@ describe(createIssuesViewStore, () => {
     assert.deepStrictEqual(store.counts.getSnapshot().value, {
       open: { shown: 2, total: 4 },
       priorities: {
-        high: { shown: 1, total: 1 },
-        mid: { shown: 0, total: 0 },
-        low: { shown: 1, total: 2 },
+        S: { shown: 1, total: 1 },
+        A: { shown: 0, total: 0 },
+        B: { shown: 0, total: 0 },
+        C: { shown: 0, total: 0 },
+        D: { shown: 1, total: 2 },
+        hold: { shown: 0, total: 0 },
+        close: { shown: 0, total: 0 },
         none: { shown: 1, total: 1 },
       },
-      // #3 is low, which is still hidden.
+      // #3 is D, which is still hidden.
       pending: { shown: 0, total: 1 },
       inProgress: { shown: 0, total: 0 },
     });
@@ -265,12 +277,12 @@ describe(createIssuesViewStore, () => {
 
     setIssues({
       items: [
-        { ...issueItem(1, []), labels: [priorityLabel('high')] },
+        { ...issueItem(1, []), labels: [priorityLabel('S')] },
         {
           ...issueItem(2, [1]),
-          labels: [priorityLabel('high'), pendingLabel],
+          labels: [priorityLabel('S'), pendingLabel],
         },
-        { ...issueItem(3, []), labels: [priorityLabel('low'), pendingLabel] },
+        { ...issueItem(3, []), labels: [priorityLabel('D'), pendingLabel] },
         issueItem(4, []),
       ],
       totalCount: 4,
@@ -280,7 +292,7 @@ describe(createIssuesViewStore, () => {
 
     setFilter({
       ...DEFAULT_ISSUE_FILTER,
-      onlyPriorities: ['high'],
+      onlyPriorities: ['S'],
       onlyPending: true,
     });
 
@@ -293,9 +305,13 @@ describe(createIssuesViewStore, () => {
     assert.deepStrictEqual(store.counts.getSnapshot().value, {
       open: { shown: 1, total: 4 },
       priorities: {
-        high: { shown: 1, total: 2 },
-        mid: { shown: 0, total: 0 },
-        low: { shown: 1, total: 1 },
+        S: { shown: 1, total: 2 },
+        A: { shown: 0, total: 0 },
+        B: { shown: 0, total: 0 },
+        C: { shown: 0, total: 0 },
+        D: { shown: 1, total: 1 },
+        hold: { shown: 0, total: 0 },
+        close: { shown: 0, total: 0 },
         none: { shown: 0, total: 1 },
       },
       pending: { shown: 1, total: 2 },
@@ -310,7 +326,7 @@ describe(createIssuesViewStore, () => {
       items: [
         {
           ...issueItem(5, [3]),
-          labels: [priorityLabel('low'), pendingLabel],
+          labels: [priorityLabel('D'), pendingLabel],
         },
         issueItem(6, []),
         { ...issueItem(7, []), labels: [pendingLabel] },
@@ -320,7 +336,7 @@ describe(createIssuesViewStore, () => {
       referenced: [referencedIssue(3, 'abandoned')],
     });
 
-    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['low'] });
+    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['D'] });
 
     assert.deepStrictEqual(
       store.graph.getSnapshot().value.nodes.map(({ number }) => number),
@@ -334,7 +350,7 @@ describe(createIssuesViewStore, () => {
 
     setFilter({
       ...DEFAULT_ISSUE_FILTER,
-      hiddenPriorities: ['low'],
+      hiddenPriorities: ['D'],
       hidePending: true,
     });
 
@@ -349,10 +365,10 @@ describe(createIssuesViewStore, () => {
 
     setIssues({
       items: [
-        { ...issueItem(1, []), labels: [priorityLabel('low')] },
+        { ...issueItem(1, []), labels: [priorityLabel('D')] },
         {
           ...issueItem(2, [1]),
-          labels: [priorityLabel('high'), pendingLabel],
+          labels: [priorityLabel('S'), pendingLabel],
         },
       ],
       totalCount: 2,
@@ -360,7 +376,7 @@ describe(createIssuesViewStore, () => {
       referenced: [],
     });
 
-    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['low'] });
+    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['D'] });
 
     assert.deepStrictEqual(
       store.graph.getSnapshot().value.nodes.map(({ number }) => number),
@@ -369,7 +385,7 @@ describe(createIssuesViewStore, () => {
 
     setFilter({
       ...DEFAULT_ISSUE_FILTER,
-      hiddenPriorities: ['low'],
+      hiddenPriorities: ['D'],
       hidePending: true,
     });
 
@@ -692,7 +708,7 @@ const pendingLabel = {
   description: '',
 } as const;
 
-const priorityLabel = (priority: 'high' | 'mid' | 'low') =>
+const priorityLabel = (priority: 'S' | 'B' | 'D') =>
   ({
     name: `priority:${priority}`,
     color: 'ededed',
