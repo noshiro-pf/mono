@@ -90,6 +90,19 @@ export const isRebuiltOnBaseTip = async (
     : answered;
 };
 
+/**
+ * Whether git can fetch the base at all, which nothing is wrong with, so that a
+ * pull request whose {@link isRebuiltOnBaseTip} fails can be told from GitHub
+ * failing every fetch (`unread.mts`).
+ */
+export const probeBaseFetch = async (
+  defaultBranch: string,
+): Promise<Result<undefined, string>> =>
+  Result.map(
+    await git(`git fetch --quiet origin ${sh(defaultBranch)}`),
+    () => undefined,
+  );
+
 const mergeBaseIsTip = async (
   pr: PullRequest,
   context: TriageContext,

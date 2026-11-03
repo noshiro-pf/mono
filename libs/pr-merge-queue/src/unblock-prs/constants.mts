@@ -37,5 +37,14 @@ export const GREEN_POLLS_BEFORE_GIVING_UP = 3;
  */
 export const BLOCKED_GREEN_POLLS_BEFORE_GIVING_UP = 8;
 
+/**
+ * How many surveys in a row a released pull request may stay unread at the same
+ * head before it is set aside as `read-failed` (`unread.mts`). Long enough that
+ * GitHub failing for a few minutes holds the queue rather than setting anything
+ * aside; each survey is seconds apart while the list is changing and
+ * `--idle-interval` apart once it is not.
+ */
+export const UNREAD_SURVEYS_BEFORE_SETTING_ASIDE = 5;
+
 /** How many consecutive polling errors end a watch. */
 export const MAX_CONSECUTIVE_POLL_ERRORS = 5;

@@ -218,6 +218,15 @@ PR は常に1本まで** に保ちます。`main` が動く前にマージでき
 
 - **in flight の PR があれば、他を pick しない。** triage が in flight と判断
   した PR があれば、それを watch して rebase も解放もしません（「3」）。
+- **解放済みで読めない PR は、5回続いたら見送る。** 解放済みの PR のチェック
+  （version PR なら tip の上に作り直されたか）が読めない間は、matrix が走って
+  いるかもしれないので、他を解放しません。同じ head のまま5回続けて読めな
+  ければ、何が失敗したかを添えて `read-failed` で見送り、キューを先へ進めます
+  （`unread.mts`）。読めない原因が何であっても同じで、一時的な失敗なら途中で
+  読めて数え直しになり、読めないままの PR がキューを止め続けることはありませ
+  ん（#2784）。ただし見送る前に、同じ種類の読み取りを `main` の tip でも試しま
+  す。それも失敗するなら PR ではなく GitHub の障害なので、見送らずに待ち続けま
+  す。障害の間に、解放する PR を次々に見送ってしまわないためです。
 - **解放した直後にもう一度見る。** 同じ瞬間に、担当者が `worker` の別の PR も
   解放されていて、そちらが pick の順（`priority:high` が先、`priority:low` と
   `priority:high` だけが付いてはいない bypass でしかマージできない PR が後、そ
@@ -600,6 +609,7 @@ matrix の job まで読みます。どの失敗なら直せるか、何を実�
 | :-------------------------------- | :---------: | :-----------------: |
 | `rebase-failed`（実際に衝突した） |      ✓      |          ✓          |
 | `push-failed`                     |      ✓      |          ✓          |
+| `read-failed`                     |      ✓      |          ✓          |
 | `unlabel-failed`                  |      ✓      |          ✓          |
 | `arm-failed`                      |      ✓      |          ✓          |
 | `already-in-base`                 |      ✓      |          ✓          |
@@ -793,6 +803,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `skips.mts`             | 諦めた PR を何をもって覚え続けるか、comment との突き合わせ    |
 | `set-aside-comment.mts` | 見送りの comment の文章                                       |
 | `demotions.mts`         | green のまま止まった PR をいつまで最後に回すか                |
+| `unread.mts`            | 読めない解放済み PR を何回待ってから見送るか                  |
 | `options.mts`           | コマンドライン                                                |
 | `types.mts`             | 共有される型とスキーマ                                        |
 | `constants.mts`         | 待ち時間と諦めるまでの回数                                    |
@@ -1038,6 +1049,17 @@ bot opens released, and one a person had released on purpose.
 - **Pick nothing while one is in flight.** When triage finds a pull request
   in flight, this script watches it and rebases and releases nothing else
   ("3").
+- **Set aside one left unread for five surveys.** While a released pull
+  request's checks (or, for the version pull request, whether it was rebuilt on
+  the tip) cannot be read, it may be running a matrix, so nothing else is
+  released. Unread at the same head for five surveys in a row, it is set aside
+  as `read-failed` with what failed, and the queue moves on (`unread.mts`).
+  The cause does not matter: a failure that passes is read in the meantime and
+  the count starts again, and one that does not can no longer hold the queue for
+  good (#2784). Before setting one aside it tries the same kind of read on the
+  tip of `main`; if that fails too, the failure is GitHub's rather than the pull
+  request's, and it keeps waiting, so that an outage does not set aside each
+  pull request it would release next.
 - **Look again straight after releasing.** When another pull request the
   worker owns was released in the same moment and comes first in the pick
   order (`priority:high` first, and `priority:low` last together with one
@@ -1451,6 +1473,7 @@ A verdict lasts as long as the state it was reached in.
 | :-------------------------------- | :---------------: | :-----------------------: |
 | `rebase-failed` (a real conflict) |         ✓         |             ✓             |
 | `push-failed`                     |         ✓         |             ✓             |
+| `read-failed`                     |         ✓         |             ✓             |
 | `unlabel-failed`                  |         ✓         |             ✓             |
 | `arm-failed`                      |         ✓         |             ✓             |
 | `already-in-base`                 |         ✓         |             ✓             |
@@ -1655,6 +1678,7 @@ the pull request the other's and nobody moved it (#2267).
 | `skips.mts`             | what the loop remembers, for how long, and what comments say  |
 | `set-aside-comment.mts` | the prose of the set-aside comment                            |
 | `demotions.mts`         | how long one that sat green without merging goes last         |
+| `unread.mts`            | how many surveys an unread released one holds the queue       |
 | `options.mts`           | the command line                                              |
 | `types.mts`             | the shapes every module passes around                         |
 | `constants.mts`         | how long it waits, and how long before it gives up            |

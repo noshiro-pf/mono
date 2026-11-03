@@ -33,6 +33,7 @@ import { createClient } from './pr-report/index.mjs';
 import {
   armAutoMerge,
   listPullRequests,
+  probeCheckReads,
   readBaseChanges,
   readHeadChecks,
   readIssueOrder,
@@ -49,7 +50,7 @@ describe('the GraphQL requests', () => {
 
     // One for each function in `sendEveryQuery`, and the follow-up that
     // `readIssueOrder` sends for an issue the pull request does not link.
-    assert.lengthOf(sent, 13);
+    assert.lengthOf(sent, 14);
 
     assert.isTrue(sent.some(({ operation }) => operation === 'UnlinkedIssues'));
 
@@ -130,6 +131,8 @@ const sendEveryQuery = async (): Promise<readonly Sent[]> => {
     } as const;
 
     await listPullRequests(api);
+
+    await probeCheckReads(api, 'a'.repeat(40));
 
     await viewPullRequest(api, 1);
 

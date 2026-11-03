@@ -461,6 +461,7 @@ const SET_ASIDE_WORDS = {
   'checks-failed': 'checks',
   'not-merging': 'not merging',
   'push-failed': 'push failed',
+  'read-failed': 'unreadable',
   'rebase-failed': 'conflict',
   'unlabel-failed': 'skip-ci stuck',
   'watch-timeout': 'timeout',
