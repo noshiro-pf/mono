@@ -23,10 +23,16 @@ export type ReportedCheck = Readonly<{
   /** `pass` | `fail` | `pending` | `skipping` | `cancel` */
   bucket: string;
   link: string;
-  /** ISO 8601; GitHub's zero time before the check has started. */
-  startedAt: string;
-  /** ISO 8601; GitHub's zero time before the check has finished. */
-  completedAt: string;
+  /**
+   * ISO 8601; `undefined` before a check run has started. A commit status's is
+   * when it was set.
+   */
+  startedAt: string | undefined;
+  /**
+   * ISO 8601; `undefined` before a check run has finished. A commit status's is
+   * when it was set, whatever its state.
+   */
+  completedAt: string | undefined;
   /** The workflow the job belongs to; empty for a commit status. */
   workflow: string;
 }>;
@@ -37,7 +43,8 @@ export type ReportedCheck = Readonly<{
  */
 export type RunningCheck = Readonly<{
   name: string;
-  startedAt: string;
+  /** ISO 8601; `undefined` while the check is queued. */
+  startedAt: string | undefined;
   workflow: string;
   link: string;
 }>;
@@ -143,7 +150,7 @@ export const summarizeChecks = (
   const roundStartedMs = earliestStart(running);
 
   const isOfRoundBefore = (check: ReportedCheck): boolean => {
-    const completedMs = epochMsOf(check.completedAt);
+    const completedMs = msOf(check.completedAt);
 
     return (
       (roundStartedMs !== undefined &&
@@ -400,9 +407,6 @@ const ChecksAnswerSchema = t.record({
   }),
 });
 
-/** What `gh` wrote for a time a check has not reached. */
-const ZERO_TIME = '0001-01-01T00:00:00Z';
-
 /**
  * Which runs supersede each other: a commit status by its context, a check run
  * by its name, workflow and event, as `gh` told them apart.
@@ -417,10 +421,11 @@ const keyOf = (context: CheckContextNode): string =>
         context.checkSuite?.workflowRun?.event ?? '',
       ].join(':');
 
+/** When a run started, for ordering runs; one not started yet sorts first. */
 const startedAtOf = (context: CheckContextNode): string =>
   (context.__typename === 'StatusContext'
     ? context.createdAt
-    : context.startedAt) ?? ZERO_TIME;
+    : context.startedAt) ?? '';
 
 /**
  * A check run's conclusion, or its status while it runs, or a commit status's
@@ -469,8 +474,8 @@ const reportedCheckOf = (context: CheckContextNode): ReportedCheck =>
             : context.status,
         ),
         link: context.detailsUrl ?? '',
-        startedAt: context.startedAt ?? ZERO_TIME,
-        completedAt: context.completedAt ?? ZERO_TIME,
+        startedAt: context.startedAt ?? undefined,
+        completedAt: context.completedAt ?? undefined,
         workflow: context.checkSuite?.workflowRun?.workflow.name ?? '',
       } as const);
 
@@ -527,6 +532,10 @@ const isSuperseded = (
   );
 };
 
+/** {@link epochMsOf} of a time a check may not have reached. */
+const msOf = (timestamp: string | undefined): number | undefined =>
+  timestamp === undefined ? undefined : epochMsOf(timestamp);
+
 /**
  * When the earliest check still running started, in milliseconds; `undefined`
  * when nothing is running or no start time can be read.
@@ -536,7 +545,7 @@ const earliestStart = (
 ): number | undefined => {
   const starts = Arr.generate(function* () {
     for (const { startedAt } of running) {
-      const ms = epochMsOf(startedAt);
+      const ms = msOf(startedAt);
 
       if (ms !== undefined) {
         yield ms;
