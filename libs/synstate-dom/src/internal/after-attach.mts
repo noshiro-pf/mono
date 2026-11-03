@@ -1,3 +1,5 @@
+import { getCurrentScope, onScopeDispose } from 'synstate';
+
 /**
  * Nodes are mounted before they are inserted: an element mounts all its
  * children and then appends them, `render` mounts the app and then appends it,
@@ -71,6 +73,17 @@ export const insertBefore = (
  * Mounted outside every {@link mountThenInsert} (a description mounted by hand),
  * there is nothing to wait for: a value that arrives while `anchor` is detached
  * is dropped.
+ *
+ * A value that arrives while `apply` runs (a row or a branch it mounts writes
+ * what chose it, #3141) is kept too, and the latest one is applied once `apply`
+ * returns, if `anchor` is still attached: applying it at once would act on rows
+ * or a branch the running call has not finished recording. A write that keeps
+ * coming back this way is an error after {@link maxReapply} passes, as synstate
+ * stops a nested update loop.
+ *
+ * Once the scope current when it was taken is disposed, nothing more is
+ * applied: `anchor` can still have a parent then, a disposed element that held
+ * the `For` or switch.
  */
 export const applyWhenAttached = <V,>(
   anchor: Node,
@@ -84,21 +97,67 @@ export const applyWhenAttached = <V,>(
     latest: undefined,
   };
 
+  const mut_running = { current: false };
+
+  const mut_disposed = { current: false };
+
+  if (getCurrentScope() !== undefined) {
+    onScopeDispose(() => {
+      mut_disposed.current = true;
+    });
+  }
+
+  const attached = (): boolean =>
+    !mut_disposed.current && anchor.parentNode !== null;
+
+  /** Applies `value`, then each value that arrived meanwhile, while attached. */
+  const applyNow = (value: V): void => {
+    mut_running.current = true;
+
+    try {
+      apply(value);
+
+      for (let mut_pass = 1; ; mut_pass += 1) {
+        const { latest } = mut_pending;
+
+        mut_pending.latest = undefined;
+
+        if (latest === undefined || !attached()) {
+          return;
+        }
+
+        if (mut_pass >= maxReapply) {
+          throw new Error(reapplyLoopMessage);
+        }
+
+        apply(latest.value);
+      }
+    } finally {
+      mut_running.current = false;
+    }
+  };
+
   const flush = (): void => {
     const { latest } = mut_pending;
 
     mut_pending.latest = undefined;
 
-    if (latest !== undefined && anchor.parentNode !== null) {
-      apply(latest.value);
+    if (latest !== undefined && attached()) {
+      applyNow(latest.value);
     }
   };
 
   return (value) => {
-    if (anchor.parentNode !== null) {
+    if (mut_running.current) {
+      mut_pending.latest = { value };
+
+      return;
+    }
+
+    if (attached()) {
       mut_pending.latest = undefined;
 
-      apply(value);
+      applyNow(value);
 
       return;
     }
@@ -127,6 +186,12 @@ export const applyWhenAttached = <V,>(
     }
   };
 };
+
+/** How many times a value written from inside `apply` is applied in a row. */
+const maxReapply = 100;
+
+const reapplyLoopMessage =
+  `synstate-dom: a For or a switch was updated more than ${maxReapply.toString()} times in a row by the rows or branch it was mounting: a row or branch keeps writing the value that chose it. Make the write stop (a condition, or a value that leads to rows or a branch that do not write).` as const;
 
 const mut_state: {
   depth: number;

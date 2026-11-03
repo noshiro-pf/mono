@@ -37,7 +37,14 @@ export const bindValue = <T,>(
   write(bindable);
 };
 
-/** A completed observable is written once and not subscribed to. */
+/**
+ * A completed observable is written once and not subscribed to.
+ *
+ * `subscribe` delivers the current value before it adds the subscriber, so a
+ * value written by the first `write` itself (a `For` row or a switch branch
+ * mounted then writes what chose it, #3141) reaches no subscriber; it is
+ * written once the subscription is in place.
+ */
 const bindObservable = <A,>(
   source: InitializedObservable<A>,
   write: (value: A) => void,
@@ -48,5 +55,11 @@ const bindObservable = <A,>(
     return;
   }
 
+  const { updateToken } = source;
+
   subscribeInScope(source, write);
+
+  if (source.updateToken !== updateToken) {
+    write(source.getSnapshot().value);
+  }
 };
