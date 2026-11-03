@@ -176,7 +176,11 @@ export type Router<R extends AnyRoutes> = Readonly<{
   /**
    * Makes the scroll a navigation scheduled (to the fragment, or to the top),
    * now. For a binding's `Routes`, which calls it once the new page is in the
-   * document; without one, the router makes it after the next frame.
+   * document; without one, the router makes it after the next frame. The URL
+   * the page was loaded at counts as a navigation when it has a fragment. A
+   * fragment that frame did not find is looked for once more by the next call,
+   * while the location has not changed: the frame can run before a binding has
+   * drawn the page.
    */
   flushScroll: () => void;
 
@@ -329,33 +333,86 @@ export const createRouter = <R extends AnyRoutes>(
 
   // Scrolling
 
-  const mut_scroll: { pending: Optional<ScrollTarget> } = {
+  const mut_scroll: {
+    pending: Optional<ScrollTarget>;
+    /** Whether a frame is queued to make `pending`. */
+    frameQueued: boolean;
+    /**
+     * A fragment the frame did not find. The frame can run before a binding has
+     * drawn the page, so the binding's `flushScroll` tries it once more, unless
+     * the location has changed since.
+     */
+    missed: Optional<string>;
+  } = {
     pending: Optional.none,
+    frameQueued: false,
+    missed: Optional.none,
   };
 
-  const flushScroll = (): void => {
-    const { pending } = mut_scroll;
+  // Any change of the location, and only that: a replace to the same URL is not
+  // one.
+  const stopMissed = untracked(() =>
+    snapshot$.subscribe(() => {
+      mut_scroll.missed = Optional.none;
+    }),
+  );
+
+  const makeScroll = (inFrame: boolean): void => {
+    const { pending, missed } = mut_scroll;
 
     mut_scroll.pending = Optional.none;
 
-    if (Optional.isNone(pending)) {
+    mut_scroll.missed = Optional.none;
+
+    const target: Optional<ScrollTarget> = Optional.isSome(pending)
+      ? pending
+      : Optional.map(missed, (id) => ({ id }) as const);
+
+    if (Optional.isNone(target)) {
       return;
     }
 
-    if (pending.value === 'top') {
+    if (target.value === 'top') {
       browser.scrollToTop();
-    } else {
-      browser.scrollToFragment(pending.value.id);
+
+      return;
     }
+
+    const found = browser.scrollToFragment(target.value.id);
+
+    if (inFrame && !found) {
+      mut_scroll.missed = Optional.some(target.value.id);
+    }
+  };
+
+  const flushScroll = (): void => {
+    makeScroll(false);
   };
 
   const scheduleScroll = (target: ScrollTarget): void => {
-    if (Optional.isNone(mut_scroll.pending)) {
-      browser.afterRender(flushScroll);
+    mut_scroll.pending = Optional.some(target);
+
+    if (mut_scroll.frameQueued) {
+      return;
     }
 
-    mut_scroll.pending = Optional.some(target);
+    mut_scroll.frameQueued = true;
+
+    browser.afterRender(() => {
+      mut_scroll.frameQueued = false;
+
+      makeScroll(true);
+    });
   };
+
+  // The browser's own scroll to the fragment of the URL it loaded ran before
+  // the page was drawn, while there was no element to scroll to. A reload, or
+  // back or forward to this document, is the browser's to restore instead.
+  const startHash = getSnapshot().location.hash;
+
+  if (startHash !== '' && !browser.restoresScroll()) {
+    scheduleScroll({ id: fragmentId(startHash) });
+  }
 
   // Navigation
 
@@ -646,6 +703,10 @@ export const createRouter = <R extends AnyRoutes>(
       }
 
       mut_scroll.pending = Optional.none;
+
+      mut_scroll.missed = Optional.none;
+
+      stopMissed.unsubscribe();
     },
   };
 };

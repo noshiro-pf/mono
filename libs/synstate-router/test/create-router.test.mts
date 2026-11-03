@@ -47,6 +47,31 @@ const setup = (
 const current = <A,>(observable: InitializedObservable<A>): A =>
   observable.getSnapshot().value;
 
+/** A router whose document has only the ids given to `draw`. */
+const setupDrawing = (
+  url: string,
+): Readonly<{
+  router: ReturnType<typeof createRouter<Routes>>;
+  browser: ReturnType<typeof createMemoryBrowser>;
+  draw: (id: string) => void;
+}> => {
+  const mut_drawn = new Set<string>();
+
+  const browser = createMemoryBrowser(url, {
+    hasElement: (id) => mut_drawn.has(id),
+  });
+
+  const router = createRouter(routes, { browser });
+
+  return {
+    router,
+    browser,
+    draw: (id) => {
+      mut_drawn.add(id);
+    },
+  };
+};
+
 /** Waits for a later task, where the memory browser fires `popstate`. */
 const nextTask = async (): Promise<void> => {
   await new Promise((resolve) => {
@@ -789,6 +814,210 @@ describe('scrolling', () => {
     assert.deepStrictEqual(browser.scrolls(), ['#a b']);
   });
 
+  test('a URL with a hash scrolls to its element once the first page is drawn', async () => {
+    // The browser's own scroll ran while the document had no such element.
+    const { router, browser } = setup('https://example.com/settings/#a');
+
+    assert.deepStrictEqual(browser.scrolls(), []);
+
+    router.flushScroll();
+
+    assert.deepStrictEqual(browser.scrolls(), ['#a']);
+
+    await nextTask();
+
+    assert.deepStrictEqual(browser.scrolls(), ['#a']);
+  });
+
+  test('a URL with a hash leaves a reload or back and forward to the browser', async () => {
+    const browser = createMemoryBrowser('https://example.com/settings/#a', {
+      restoresScroll: true,
+    });
+
+    const router = createRouter(routes, { browser });
+
+    router.flushScroll();
+
+    await nextTask();
+
+    assert.deepStrictEqual(browser.scrolls(), []);
+  });
+
+  describe('a fragment the frame did not find', () => {
+    test('is looked for once more by the next flushScroll', async () => {
+      const { router, browser, draw } = setupDrawing(
+        'https://example.com/settings/#a',
+      );
+
+      // The frame runs before the page is drawn.
+      await nextTask();
+
+      assert.deepStrictEqual(browser.scrolls(), []);
+
+      draw('a');
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), ['#a']);
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), ['#a']);
+    });
+
+    test('is looked for once only', async () => {
+      const { router, browser, draw } = setupDrawing(
+        'https://example.com/settings/#a',
+      );
+
+      await nextTask();
+
+      router.flushScroll();
+
+      draw('a');
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), []);
+    });
+
+    test('is not looked for when flushScroll itself did not find it', async () => {
+      const { router, browser, draw } = setupDrawing(
+        'https://example.com/settings/#a',
+      );
+
+      router.flushScroll();
+
+      draw('a');
+
+      router.flushScroll();
+
+      await nextTask();
+
+      assert.deepStrictEqual(browser.scrolls(), []);
+    });
+
+    test('is still looked for after a replace to the same URL', async () => {
+      const { router, browser, draw } = setupDrawing(
+        'https://example.com/settings/#a',
+      );
+
+      await nextTask();
+
+      router.replace(routes.settings.href({ hash: 'a' }));
+
+      draw('a');
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), ['#a']);
+    });
+
+    test('is not looked for on another URL', async () => {
+      const { router, browser, draw } = setupDrawing(
+        'https://example.com/products/#a',
+      );
+
+      await nextTask();
+
+      // Search alone: the router schedules no scroll of its own.
+      router.setSearch(routes.products, (prev) => ({ ...prev, q: 'x' }));
+
+      draw('a');
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), []);
+    });
+
+    test('is not looked for after back', async () => {
+      const { router, browser, draw } = setupDrawing('https://example.com/');
+
+      router.push(routes.settings.href({ hash: 'a' }));
+
+      await nextTask();
+
+      router.back();
+
+      await nextTask();
+
+      draw('a');
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), []);
+    });
+
+    test('is not looked for after leaving its URL and coming back', async () => {
+      const { router, browser, draw } = setupDrawing(
+        'https://example.com/settings/#a',
+      );
+
+      await nextTask();
+
+      router.push(routes.home.href());
+
+      await nextTask();
+
+      router.back();
+
+      await nextTask();
+
+      draw('a');
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), ['top']);
+    });
+
+    test('is not looked for after a move away and back with no frame between', async () => {
+      const { router, browser, draw } = setupDrawing(
+        'https://example.com/settings/#a',
+      );
+
+      await nextTask();
+
+      // A fragment navigation and a history move: neither queues a frame.
+      router.push(routes.settings.href({ hash: 'b' }));
+
+      router.back();
+
+      await nextTask();
+
+      assert.strictEqual(browser.url().hash, '#a');
+
+      draw('a');
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), ['#b']);
+    });
+
+    test('is dropped by dispose', async () => {
+      const { router, browser, draw } = setupDrawing(
+        'https://example.com/settings/#a',
+      );
+
+      await nextTask();
+
+      router.dispose();
+
+      draw('a');
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), []);
+    });
+  });
+
+  test('a URL without a hash does not scroll at first', async () => {
+    const { browser } = setup('https://example.com/settings/');
+
+    await nextTask();
+
+    assert.deepStrictEqual(browser.scrolls(), []);
+  });
+
   test('a change of the search alone does not scroll', async () => {
     const { router, browser } = setup('https://example.com/products/');
 
@@ -854,6 +1083,35 @@ describe('scrolling', () => {
 });
 
 describe('flushScroll', () => {
+  test('a navigation after a flush in the same frame queues no second frame', async () => {
+    const memory = createMemoryBrowser('https://example.com/');
+
+    const mut_frames = { queued: 0 };
+
+    const router = createRouter(routes, {
+      browser: {
+        ...memory,
+        afterRender: (callback) => {
+          mut_frames.queued += 1;
+
+          memory.afterRender(callback);
+        },
+      },
+    });
+
+    router.push(routes.settings.href());
+
+    router.flushScroll();
+
+    router.push(routes.products.href());
+
+    assert.strictEqual(mut_frames.queued, 1);
+
+    await nextTask();
+
+    assert.deepStrictEqual(memory.scrolls(), ['top', 'top']);
+  });
+
   test('makes the scheduled scroll at once, and the frame makes none', async () => {
     const { router, browser } = setup();
 

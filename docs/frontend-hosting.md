@@ -84,12 +84,12 @@ Firebase Hosting から出るときより劣る。
 
 ## 今の割り当て
 
-| 公開先                                  | 対象                                                                                                |
-| :-------------------------------------- | :-------------------------------------------------------------------------------------------------- |
-| Pages（`tools/configs/pages-apps.mts`） | `apps/` の 12 アプリ（一覧は `pages-apps.mts`）                                                     |
-| Pages（`/mono/slides/<deck>/`）         | `docs/reveal-slides/` と `docs/marp-slides/` のスライド（`tools/scripts/cmd/build-pages-site.mts`） |
-| Firebase Hosting                        | `event-schedule-app`                                                                                |
-| 公開しない                              | `blueprintjs-playground*`、`mahjong-calculator-app`、`synstate-dom-sample-app`（開発用・未公開）    |
+| 公開先                                  | 対象                                                                                                                           |
+| :-------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- |
+| Pages（`tools/configs/pages-apps.mts`） | `apps/` の 12 アプリ（一覧は `pages-apps.mts`）                                                                                |
+| Pages（`/mono/slides/<deck>/`）         | `docs/reveal-slides/` と `docs/marp-slides/` のスライド（`tools/scripts/cmd/build-pages-site.mts`）                            |
+| Firebase Hosting                        | `event-schedule-app`                                                                                                           |
+| 公開しない                              | `blueprintjs-playground*`、`mahjong-calculator-app`、`synstate-dom-sample-app`、`synstate-router-sample-app`（開発用・未公開） |
 
 - **`event-schedule-app`** は上の基準で Firebase Hosting に置く。パスに ID を
   持つルーティング（`/event/<id>/`）のままでよい。Hosting の rewrite が

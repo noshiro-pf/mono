@@ -26,8 +26,17 @@ export type RouterBrowser = Readonly<{
   /** Runs `callback` once the new page has been drawn. */
   afterRender: (callback: () => void) => void;
   scrollToTop: () => void;
-  /** Scrolls to the element whose id is `id`, when there is one. */
-  scrollToFragment: (id: string) => void;
+  /**
+   * Scrolls to the element whose id is `id`, and returns whether there was one:
+   * a page not drawn yet may not have it.
+   */
+  scrollToFragment: (id: string) => boolean;
+  /**
+   * Whether the scroll position of this document load is restored by someone
+   * other than the router: the browser, or an app that restores it itself,
+   * after a reload or back or forward to the document.
+   */
+  restoresScroll: () => boolean;
 }>;
 
 /** A {@link RouterBrowser} in memory, with what a test reads of it. */
@@ -39,8 +48,19 @@ export type MemoryBrowser = RouterBrowser &
     scrolls: () => readonly string[];
   }>;
 
+export type MemoryBrowserOptions = Readonly<{
+  /**
+   * Whether the document has an element with the id, for `scrollToFragment`.
+   * Every id is there when left out.
+   */
+  hasElement?: (id: string) => boolean;
+  /** What `restoresScroll` returns: `false` when left out. */
+  restoresScroll?: boolean;
+}>;
+
 /**
- * A browser that lives in memory, opened at `href`.
+ * A browser that lives in memory, opened at `href`, as a document loaded by a
+ * link is.
  *
  * It keeps the timing of a real one, so that a test does not depend on a
  * stronger promise than a browser gives: `go` moves through the entries in a
@@ -70,7 +90,12 @@ export type MemoryBrowser = RouterBrowser &
  * assert.strictEqual(browser.url().pathname, '/');
  * ```
  */
-export const createMemoryBrowser = (href: string): MemoryBrowser => {
+export const createMemoryBrowser = (
+  href: string,
+  options?: MemoryBrowserOptions,
+): MemoryBrowser => {
+  const hasElement = options?.hasElement ?? (() => true);
+
   const mut_history: { entries: readonly URL[]; index: number } = {
     entries: [new URL(href)],
     index: 0,
@@ -160,8 +185,15 @@ export const createMemoryBrowser = (href: string): MemoryBrowser => {
       mut_scrolls.push('top');
     },
     scrollToFragment: (id) => {
+      if (!hasElement(id)) {
+        return false;
+      }
+
       mut_scrolls.push(`#${id}`);
+
+      return true;
     },
+    restoresScroll: () => options?.restoresScroll ?? false,
     url,
     scrolls: () => Array.from(mut_scrolls),
   };
