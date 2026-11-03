@@ -20,7 +20,7 @@ import {
   type InitializedObservable,
   type Subscription,
 } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Result, unknownToString } from 'ts-data-forge';
 import type { Answered } from '../graphql.mjs';
 import type { StoredToken } from '../token.mjs';
 import {
@@ -86,9 +86,14 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
       setStatus({ type: 'loading' });
     }
 
-    deps
-      .load(stored.value, deps.now())
-      .then(({ result }) => {
+    // A load that throws, or rejects rather than answering an error, is a
+    // failed read like any other: left alone, the status would stay `loading`,
+    // which nothing but a new token or midnight reads again. Called inside an
+    // async function so that a throw before its promise is caught too.
+    (async () => deps.load(stored.value, deps.now()))()
+      .then(({ result }) => result)
+      .catch((error: unknown) => Result.err(failedReadMessage(error)))
+      .then((result) => {
         if (id !== mut_reads.latest) {
           return;
         }
@@ -177,4 +182,15 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
     },
     start,
   };
+};
+
+/**
+ * What a read that threw says, as the report reader passes it on; a sentence of
+ * its own when the error carries none.
+ */
+const failedReadMessage = (error: unknown): string => {
+  const said =
+    error === undefined || error === null ? '' : unknownToString(error).trim();
+
+  return said === '' ? 'Could not count the week.' : said;
 };
