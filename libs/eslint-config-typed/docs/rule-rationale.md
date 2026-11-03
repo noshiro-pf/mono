@@ -52,3 +52,21 @@
 - 初期値を必ず渡す。`xs.reduce((a, b) => a * b)` ではなく `xs.reduce((a, b) => a * b, 1)`。合計や最大値なら ts-data-forge の `Arr.sum(xs)` や `Arr.max(xs)` を使う。`Arr.max` は空配列の場合を戻り値の型（`Optional`）で表す。
 - 初期値の型は型引数で書く。`xs.reduce((acc, x) => …, [] as string[])` ではなく `xs.reduce<readonly string[]>((acc, x) => …, [])`。
 - 蓄積する配列を毎回作り直す `reduce`（`[...acc, x]`）は、途中経過が要るなら ts-data-forge の `Arr.scan`、要らないなら `map` / `filter` か `for-of` で書く。
+
+## `Error` の判定
+
+| ルール                           | 設定    |
+| -------------------------------- | ------- |
+| `unicorn/prefer-error-is-error`  | `off`   |
+| `unicorn/no-instanceof-builtins` | `error` |
+| `no-restricted-properties`       | `error` |
+
+### 根拠
+
+`Error.isError` は Node.js 24 からのもので、このパッケージが `engines` で認める Node.js 22 にはない。呼ぶと、その行が実行されたときに初めて `TypeError: Error.isError is not a function` で落ち、型検査も Node.js 24 以降のツールチェーンも何も言わない。そのため `instanceof Error` を `Error.isError` に書き換える `unicorn/prefer-error-is-error` は `off` にし、`unicorn/no-instanceof-builtins` の `useErrorIsError` も `false` にしている。手で書いた `Error.isError` は `no-restricted-properties` が報告する。
+
+`instanceof Error` は別の realm（`node:vm` や iframe）で作られた `Error` を見落とすので、`unicorn/no-instanceof-builtins` が引き続き報告する（自動修正はない）。
+
+### 直し方
+
+`@sindresorhus/is` の `isError(x)` を使う。`Object.prototype.toString` のタグで判定するので、別の realm の `Error` も認識する。ただし独自のタグを持つ `DOMException`（`AbortError` など）は `Error` と判定しない。それも `Error` として扱う必要があり、別の realm の値が来ないと分かっている箇所に限り、`instanceof Error` と書いて `// eslint-disable-next-line unicorn/no-instanceof-builtins` にその理由を添える。

@@ -227,7 +227,9 @@ process.once('exit', () => {
  * does not resolve, a proxy or TLS error — which `fetch` keeps in `cause`.
  */
 const describeFetchError = (error: unknown): string =>
-  Error.isError(error) && error.cause !== undefined
+  // `fetch` rejects in this realm; not `Error.isError`, which Node.js 22 lacks.
+  // eslint-disable-next-line unicorn/no-instanceof-builtins
+  error instanceof Error && error.cause !== undefined
     ? (`${error.message}: ${unknownToString(error.cause)}` as const)
     : unknownToString(error);
 

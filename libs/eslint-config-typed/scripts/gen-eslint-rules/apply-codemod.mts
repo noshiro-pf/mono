@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { isError } from '@sindresorhus/is';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
@@ -133,11 +134,7 @@ export const applyTransformationsToFile = async (
 
     return Result.ok('transformed' as const);
   } catch (error) {
-    console.info(typeof error);
-
-    const errStr = Error.isError(error)
-      ? error.message
-      : unknownToString(error);
+    const errStr = isError(error) ? error.message : unknownToString(error);
 
     console.error(`❌ ${fileName} - error: ${errStr}`);
 

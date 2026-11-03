@@ -190,7 +190,8 @@ export const eslintUnicornRules = {
     'error',
     {
       strategy: 'strict',
-      useErrorIsError: true,
+      // See `unicorn/prefer-error-is-error`.
+      useErrorIsError: false,
     },
   ],
   'unicorn/consistent-assert': 'error',
@@ -468,7 +469,13 @@ export const eslintUnicornRules = {
   'unicorn/prefer-continue': withDefaultOption('error'),
   'unicorn/prefer-dom-node-replace-children': 'error',
   'unicorn/prefer-else-if': 'error',
-  'unicorn/prefer-error-is-error': 'error',
+  /**
+   * Off. `--fix` rewrites `x instanceof Error` into `Error.isError(x)`, which
+   * Node.js 22, still supported by this config, does not have, so the fix turns
+   * a lint error into a runtime `TypeError`. `no-restricted-properties` reports
+   * a hand-written `Error.isError` for the same reason.
+   */
+  'unicorn/prefer-error-is-error': 'off',
   'unicorn/prefer-flat-math-min-max': 'error',
   'unicorn/prefer-group-by': 'error',
   'unicorn/prefer-has-check': 'error',

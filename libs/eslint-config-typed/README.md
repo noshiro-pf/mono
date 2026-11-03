@@ -538,13 +538,14 @@ Pre-configured rule sets that can be imported and customized:
 
 ### Exported Pre-configured Rule Options
 
-| Pre-configured rule option              | Rule                    | Description                                                                                                                                                   |
-| :-------------------------------------- | :---------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **`restrictedGlobals`**                 | `no-restricted-globals` | Array of restricted global variables                                                                                                                          |
-| **`restrictedGlobalsForBrowser`**       | `no-restricted-globals` | Browser-environment-specific restricted globals                                                                                                               |
-| **`restrictedSyntax`**                  | `no-restricted-syntax`  | Disallows the `in` operator, `Object.prototype.hasOwnProperty.call` (suggests using `Object.hasOwn`), and `new Array(*)` syntax (suggests using `Array.from`) |
-| **`restrictedImportsOptions`**          | `no-restricted-imports` | Disallows importing `index.mjs` by relative path                                                                                                              |
-| **`restrictedImportsOptionsForPreact`** | `no-restricted-imports` | `restrictedImportsOptions` plus the hooks of `preact/compat` (suggests `preact/hooks`)                                                                        |
+| Pre-configured rule option              | Rule                       | Description                                                                                                                                                   |
+| :-------------------------------------- | :------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`restrictedGlobals`**                 | `no-restricted-globals`    | Array of restricted global variables                                                                                                                          |
+| **`restrictedGlobalsForBrowser`**       | `no-restricted-globals`    | Browser-environment-specific restricted globals                                                                                                               |
+| **`restrictedSyntax`**                  | `no-restricted-syntax`     | Disallows the `in` operator, `Object.prototype.hasOwnProperty.call` (suggests using `Object.hasOwn`), and `new Array(*)` syntax (suggests using `Array.from`) |
+| **`restrictedProperties`**              | `no-restricted-properties` | Disallows `Error.isError`, which Node.js 22 does not have (suggests `isError` from `@sindresorhus/is`)                                                        |
+| **`restrictedImportsOptions`**          | `no-restricted-imports`    | Disallows importing `index.mjs` by relative path                                                                                                              |
+| **`restrictedImportsOptionsForPreact`** | `no-restricted-imports`    | `restrictedImportsOptions` plus the hooks of `preact/compat` (suggests `preact/hooks`)                                                                        |
 
 A config that sets a rule replaces the options an earlier config set. To restrict more imports after `eslintConfigForPreact`, concatenate yours with the ones it set, using `mergeRestrictedImportsOptions(restrictedImportsOptionsForPreact, { paths: [...], patterns: [...] })`.
 
