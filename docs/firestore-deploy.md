@@ -30,7 +30,7 @@ workflow は対象のアプリと project を `TARGETS` に明示的に書いて
 ## ルールを変えるとき
 
 `check:test:rules`（`life-plan-simulator`・`task-manager`）は Java と Firestore
-エミュレータを使うルールのテストで、`code-check.yml` の `z:ci:code-check:firebase-and-verify` の中で `ws:check:test:rules` が
+エミュレータを使うルールのテストで、`code-check.yml` の `z:ci:code-check:coverage-2-types-and-rules` の中で `ws:check:test:rules` が
 pull request で走らせる。マージすればそのままデプロイされるので、落ちたまま
 マージしない。手元で走らせるときは Java 21 以上が要る。
 

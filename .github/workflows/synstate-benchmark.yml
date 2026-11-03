@@ -230,8 +230,8 @@ jobs:
       # versions that is only the runner's noise. Measuring cost about ten
       # minutes of a runner on every pull request that changed no library
       # source, no benchmark file and no compared version. The docs app's
-      # `doc`, which this build also runs, is code-check.yml's `build` to fail
-      # on the same tree. Nor where the measurement was taken from a pull
+      # `doc`, which this build also runs, is code-check.yml's to fail on the
+      # same tree (its `ws:build` before `z:ci:code-check:dist-and-verify`). Nor where the measurement was taken from a pull
       # request's run of this tree, which built it.
       - name: Build
         if: >-

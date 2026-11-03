@@ -11,6 +11,7 @@ export default definePlaywrightAppConfig({
   server: {
     build: 'pnpm run build:astro',
     preview: 'pnpm run preview',
+    output: 'dist',
     timeoutMs: 300_000,
   },
 });

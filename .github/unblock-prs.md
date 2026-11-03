@@ -28,19 +28,20 @@ want of `actions: write`, say so, release the claim and leave it.
 **The check name is the command.** `style-check (X)` and `code-check (X)` both
 run `pnpm run X` at the repository root, so `code-check (fix:codemod:full)`
 reproduces as `pnpm run fix:codemod:full`. A bundle (`z:ci:code-check:*`,
-`z:ci:style-check:checks-and-generators`) runs its parts with
-`run-s --continue-on-error`; when a part fails, its log names it, and that part
-is the command to rerun. When only the clean-tree step fails, rerun the whole
-bundle: `z:ci:style-check:checks-and-generators` rewrites through markdownlint,
-Prettier, oxfmt and two generators. Five checks do not follow that rule:
+`z:ci:style-check:*`) runs its parts with `run-s --continue-on-error`; when a
+part fails, its log names it, and that part is the command to rerun. When only
+the clean-tree step fails, rerun the whole bundle:
+`z:ci:style-check:checks-and-generators` rewrites through markdownlint, oxfmt
+and three generators, and `z:ci:style-check:format-and-doc` through Prettier.
+Five checks do not follow that rule:
 
-| Check                           | What to run                                                    |
-| :------------------------------ | :------------------------------------------------------------- |
-| `test-node-versions (<target>)` | `pnpm run ws:build` then `pnpm run ws:check:test` on that Node |
-| `verify-published`              | `pnpm run verify:npm-packages:published`                       |
-| `backup-repository-settings`    | `pnpm run repo-settings:backup`, then look for a dirty tree    |
-| `Validate PR title`             | The PR title is not Conventional Commits — `PATCH /pulls/{n}`  |
-| `Validate commit count`         | The branch is more than one commit — squash it, see below      |
+| Check                                      | What to run                                                   |
+| :----------------------------------------- | :------------------------------------------------------------ |
+| `test-node-versions (<target>, <command>)` | `pnpm run ws:build` then `pnpm run <command>` on that Node    |
+| `verify-published`                         | `pnpm run verify:npm-packages:published`                      |
+| `backup-repository-settings`               | `pnpm run repo-settings:backup`, then look for a dirty tree   |
+| `Validate PR title`                        | The PR title is not Conventional Commits — `PATCH /pulls/{n}` |
+| `Validate commit count`                    | The branch is more than one commit — squash it, see below     |
 
 `Validate PR title` is required because a squash merge takes the PR title as
 the commit title (`squash_merge_commit_title: PR_TITLE`), so the fix is the
@@ -54,14 +55,16 @@ Squash with `git reset --soft "$(git merge-base HEAD origin/main)" && git commit
 in the worktree. If the message is not obvious from the PR title and body,
 stop and ask.
 
-- `code-check (*)` and `style-check (ws:doc)` run `pnpm run ws:build` first in
-  CI, and `style-check (z:ci:style-check:checks-and-generators)` runs
-  `pnpm run ws:build:deps`, for its `ws:gen`. Do the same locally or they fail
-  for the wrong reason.
+- `code-check (z:ci:code-check:dist-and-verify)` and
+  `style-check (z:ci:style-check:format-and-doc)` run `pnpm run ws:build` first
+  in CI, and every other `code-check (*)` entry and
+  `style-check (z:ci:style-check:checks-and-generators)` run
+  `pnpm run ws:build:deps`. Do the same locally or they fail for the wrong
+  reason.
 - Every job ends with `z:assert-repo-is-clean`. So
-  `z:ci:style-check:checks-and-generators` (its markdownlint, formatters,
-  generators and `ws:gen`), `ws:doc`, `fix:codemod:full` and the `ws:fix:lint`
-  halves fail by _changing_ files.
+  `z:ci:style-check:checks-and-generators` (its markdownlint, oxfmt, generators
+  and `ws:gen`), `z:ci:style-check:format-and-doc` (Prettier and `ws:doc`),
+  `fix:codemod:full` and the `ws:fix:lint` halves fail by _changing_ files.
 - `code-check` and `node-version-compatibility` jobs gate on
   `z:check-should-run:code-checks`, and `style-check` jobs on
   `z:check-should-run:style-checks`; both diff against `origin/main`. A job

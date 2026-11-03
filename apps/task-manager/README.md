@@ -276,7 +276,7 @@ pnpm exec firebase emulators:start   # Java 21 以上が必要
 ポートを使うため、`pnpm exec firebase emulators:start` を動かしているときは先に止める。
 ほかのテストと同じく `ws:build` のあとに走らせる。
 
-CI では `code-check.yml` の `z:ci:code-check:firebase-and-verify` の中で `ws:check:test:rules` が Java 21 を用意して走らせるので、
+CI では `code-check.yml` の `z:ci:code-check:coverage-2-types-and-rules` の中で `ws:check:test:rules` が Java 21 を用意して走らせるので、
 `firestore.rules` を壊す変更は `main` に入って `deploy-firestore.yml` にデプロイされる
 前に pull request で落ちる。`check-changed` はこれを走らせない。
 

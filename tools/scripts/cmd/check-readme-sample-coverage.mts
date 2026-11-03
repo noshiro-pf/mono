@@ -19,9 +19,10 @@ import { listLibraryDirs } from '../lib/repo-files.mjs';
  * `embedExamplesInMarkdown` in `tools/configs/embed-examples-in-markdown.mts`
  * fails when a README has a fence that no sample backs — but only for a package
  * whose `scripts/cmd/embed-examples.mts` names that README and whose `doc`
- * script reaches it, `doc` being what `ws:doc` runs and `style-check (ws:doc)`
- * asserts the tree is clean after. A package that never opted in is not a
- * package that passes: its fences are hand-written, never
+ * script reaches it, `doc` being what `ws:doc` runs and
+ * `style-check (z:ci:style-check:format-and-doc)` asserts the tree is clean
+ * after. A package that never opted in is not a package that passes: its fences
+ * are hand-written, never
  * type-checked, and nothing reports it. That is how `ts-type-forge`'s README
  * came to call functions that do not exist, and how four ESLint plugin READMEs
  * and both `better-*-use-state` READMEs went unchecked altogether.
@@ -64,7 +65,7 @@ export const checkReadmeSampleCoverage = async (): Promise<
         '`scripts/cmd/embed-examples.mts` calling the shared',
         '`embedExamplesInMarkdown` with README.md and its `samples/readme` files,',
         'and a `doc` script that runs it — which is what `ws:doc` runs, and',
-        '`style-check (ws:doc)` checks the tree against.',
+        '`style-check (z:ci:style-check:format-and-doc)` checks the tree against.',
       ].join('\n'),
     );
   }

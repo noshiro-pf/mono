@@ -252,18 +252,17 @@ written, rather than every job that takes the steps.
   records the result on the machine; the action caches that record, keyed on the
   pnpm version, the lockfile and `pnpm-workspace.yaml`. A job skips the
   verification only when a job that finished before it started saved the record
-  under that key. In `code-check.yml` those are the matrix entries, after
-  `build`, which saves it as it ends; jobs that start together, such as the
-  matrix entries of the other workflows, each verify. `gates` installs nothing
-  (`pnpm: false`). A cache is read only from the ref that saved it, a pull
-  request's base branch and `main`, so a pull request that changes the lockfile
-  verifies in the first jobs of its first run and reuses the record from then
-  on, and other pull requests reuse it once a run on `main` after the merge has
-  saved it there. A pull request that changes none of the key's three inputs
-  reuses `main`'s from its first job. pnpm accepts a record only for the same
-  lockfile hash under policies at least as strict, so a restored one skips
-  nothing that has not passed. The install warns when pnpm wrote no record where
-  the action looks, because the cache would then save nothing and fail nothing.
+  under that key; jobs that start together, such as the matrix entries of the
+  check workflows, each verify. `gates` installs nothing (`pnpm: false`). A
+  cache is read only from the ref that saved it, a pull request's base branch
+  and `main`, so a pull request that changes the lockfile verifies in the first
+  jobs of its first run and reuses the record from then on, and other pull
+  requests reuse it once a run on `main` after the merge has saved it there. A
+  pull request that changes none of the key's three inputs reuses `main`'s from
+  its first job. pnpm accepts a record only for the same lockfile hash under
+  policies at least as strict, so a restored one skips nothing that has not
+  passed. The install warns when pnpm wrote no record where the action looks,
+  because the cache would then save nothing and fail nothing.
 - **A composite action cannot read `secrets`.** None is needed: nothing
   installs from GitHub Packages any more, so no job points `setup-node` at it
   or passes `NODE_AUTH_TOKEN` to the install.
@@ -538,11 +537,10 @@ of them is required, because a required context can be satisfied by a run
 that never happened. Two ways, both measured on this repository:
 
 - A job GitHub skips produces exactly one check run, named after the job
-  (`code-check`), never the matrix contexts
-  (`code-check (z:ci:code-check:quick)`, …). Those contexts are not superseded,
-  so they keep whatever they last said on that commit: a green from an earlier
-  run stays green, and the pull request reads as fully checked while nothing
-  ran.
+  (`code-check`), never the matrix contexts (`code-check (check:root)`, …).
+  Those contexts are not superseded, so they keep whatever they last said on
+  that commit: a green from an earlier run stays green, and the pull request
+  reads as fully checked while nothing ran.
 - A skipped job whose check run name is the required context (a job with no
   matrix) reports `skipped`, and GitHub counts a skipped required check as
   satisfied.
@@ -604,11 +602,25 @@ each caller passes it as `result-job: <name>-result / result`.
   matrix jobs of `code-check.yml` and `style-check.yml` are at 25; a 10-minute
   cap was spent once by a `pnpm/action-setup` step that took three minutes
   instead of its usual few seconds, cancelling `ws:doc` before it ran.
+- **One pull request runs seventeen jobs at a time, of about equal length.**
+  The account runs twenty GitHub-hosted jobs at once, across every workflow, and
+  a merge to `main` runs about three of its own while the next queued pull
+  request's checks start. Above twenty a job waits, and which one is GitHub's
+  choice. So the check workflows' jobs, which all start together after their
+  gates, are seventeen (code-check's ten, style-check's two,
+  node-version-compatibility's three, strict-lib-gen's two; the benchmark's job,
+  about a minute when its baseline hits, is one more), and each takes about six
+  to six and a half minutes from start to end. Pull requests merge one at a
+  time, so a pull request's longest job is what the queue waits on: a short
+  check rides along with a longer one rather than taking a runner of its own,
+  and a job that outgrows the others is split. A new entry joins an existing one
+  unless the count is rethought; the matrix comment in `code-check.yml` has the
+  arithmetic.
 
 ### The `dist/` artifact
 
-`code-check.yml` and `release.yml` build once and hand `dist/` to the jobs
-that need it, as one tarball:
+`release.yml` builds once and hands `dist/` to the job that publishes, as one
+tarball:
 
 ```bash
 find libs apps tools languages -maxdepth 3 -type d -name dist \
@@ -625,14 +637,18 @@ and `node_modules` is pruned because a dependency's own `dist` is not ours to
 carry. `retention-days: 1`, because it is read minutes later and by nothing
 else.
 
-Three workflows deliberately keep building per job. In
-`node-version-compatibility.yml`, building on each Node version is the check. In
-`style-check.yml` both entries build, and differently (the one with `ws:gen` the
-packages others link to, `ws:doc` everything), so a job to serve them would cost
-more than it saves. In `strict-lib-gen.yml`, the harnesses' type checks build
-the linked packages after the generator, which needs no `dist/`; taking
-`code-check.yml`'s artifact instead would make one workflow wait on another's
-run.
+The check workflows build in every job instead, each what it reads:
+`ws:build:deps` (about 45 seconds) for every check behind
+`assert-deps-built --workspace`, and `ws:build` (about 105) for what reads a
+package's own `dist/` (`ws:check:dist`, `verify:npm-packages`, `doc`, and an
+end-to-end suite run against a site's production build).
+`code-check.yml` used to build once and hand its matrix the tarball, which saved
+runner time and cost the critical path about three minutes — the gate, then the
+build job's setup and build, then each entry's setup and download — while ten
+runners waited; what is short is the twenty concurrent runners, not runner time,
+which a public repository does not pay for (see "One pull request runs seventeen
+jobs at a time" under "The work"). In `node-version-compatibility.yml`, building
+on each Node version is the check itself.
 
 ## `skip-ci` and `no-skip-ci-label`
 

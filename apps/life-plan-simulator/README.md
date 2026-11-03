@@ -193,7 +193,8 @@ other users, signed-out access, tokens from providers other than Google and
 every other path are refused. `emulators:exec` starts and stops the emulator, so
 stop a running `firebase emulators:start` first. It needs Java 21 or later and,
 like the other tests, the workspace built first (`ws:build`). `code-check.yml`
-runs it (`ws:check:test:rules`) in the `z:ci:code-check:firebase-and-verify`
-matrix entry, with Java 21 set up, so a change to `firestore.rules` that breaks
-it fails before it reaches `main`, where `deploy-firestore.yml` deploys it.
+runs it (`ws:check:test:rules`) in the
+`z:ci:code-check:coverage-2-types-and-rules` matrix entry, with Java 21 set up,
+so a change to `firestore.rules` that breaks it fails before it reaches `main`,
+where `deploy-firestore.yml` deploys it.
 `check-changed` does not run it.
