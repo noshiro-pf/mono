@@ -1,3 +1,5 @@
+import { asPositiveSafeInt } from 'ts-data-forge';
+import { periodRateOf } from 'ts-utils-additional';
 import {
   housingConditions,
   housingLoanDeductionChildRearingBonus,
@@ -64,7 +66,7 @@ export const housingLoanDeductionConditions = (
 /** 5 年ごとの金利の上昇率を、毎月足していく上昇幅にする（スプレッドシートの式）。 */
 export const monthlyRateIncreaseFrom5Years = (
   rateIncreasePer5Years: number,
-): number => (1 + rateIncreasePer5Years) ** (1 / 60) - 1;
+): number => periodRateOf(rateIncreasePer5Years, asPositiveSafeInt(60));
 
 export type HousingLoanDeductionConditions = Readonly<{
   /** 借入限度額（円） */

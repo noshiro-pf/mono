@@ -1,4 +1,5 @@
 import { Num } from 'ts-data-forge';
+import { periodRateOf } from 'ts-utils-additional';
 import type {
   InvestmentAccountInput,
   MonthlyAmountFrom,
@@ -93,7 +94,7 @@ export const calculateInvestmentAccount = (
 
 /** 年率の利回りを月率にする（複利）。 */
 export const toMonthlyRate = (annualRate: number): number =>
-  (1 + annualRate) ** (1 / 12) - 1;
+  periodRateOf(annualRate, 12);
 
 export type InvestmentAccountParams = Readonly<{
   input: InvestmentAccountInput;
