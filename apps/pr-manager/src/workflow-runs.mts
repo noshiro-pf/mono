@@ -122,7 +122,7 @@ export const loadWorkflowRuns = async (
 
   const failure = answers.find((answer) => Result.isErr(answer));
 
-  if (failure !== undefined && Result.isErr(failure)) {
+  if (failure !== undefined) {
     return failure;
   }
 

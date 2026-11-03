@@ -22,11 +22,9 @@ describe('the repository-variables schema', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      assert.deepStrictEqual(result.value, {
-        REPO_AUTOMATION_BOT_CLIENT_ID: 'Iv1example0client0id',
-      });
-    }
+    assert.deepStrictEqual(result.value, {
+      REPO_AUTOMATION_BOT_CLIENT_ID: 'Iv1example0client0id',
+    });
   });
 
   test('accepts an empty declaration', () => {
@@ -98,10 +96,6 @@ describe(assertVariableNamesAreValid, () => {
     });
 
     assert.isTrue(Result.isErr(result));
-
-    if (!Result.isErr(result)) {
-      return;
-    }
 
     assert.isTrue(result.value.message.includes('WITH-HYPHEN'));
 

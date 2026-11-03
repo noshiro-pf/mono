@@ -122,12 +122,9 @@ describe('formatScreenshotTable', () => {
 
     assert.isTrue(Result.isErr(result));
 
-    assert.include(
-      Result.isErr(result) ? result.value : '',
-      'after-my list.png',
-    );
+    assert.include(result.value, 'after-my list.png');
 
-    assert.include(Result.isErr(result) ? result.value : '', 'before-a#b.png');
+    assert.include(result.value, 'before-a#b.png');
   });
 
   test('refuses two images for the same side of one name, rather than drop one', () => {
@@ -139,7 +136,7 @@ describe('formatScreenshotTable', () => {
 
     assert.isTrue(Result.isErr(result));
 
-    assert.include(Result.isErr(result) ? result.value : '', 'after-list.webp');
+    assert.include(result.value, 'after-list.webp');
   });
 
   test('refuses a directory with no images', () => {

@@ -88,10 +88,7 @@ describe('assertSamplePackagesDeclared', () => {
 
       assert.isTrue(Result.isErr(result));
 
-      assert.match(
-        Result.isErr(result) ? result.value : '',
-        /docs embeds .+ from peer/u,
-      );
+      assert.match(result.value, /docs embeds .+ from peer/u);
     });
   });
 
@@ -106,10 +103,7 @@ describe('assertSamplePackagesDeclared', () => {
 
       assert.isTrue(Result.isErr(result));
 
-      assert.match(
-        Result.isErr(result) ? result.value : '',
-        /are in no workspace package/u,
-      );
+      assert.match(result.value, /are in no workspace package/u);
     });
   });
 });

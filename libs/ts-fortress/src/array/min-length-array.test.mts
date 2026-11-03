@@ -37,13 +37,11 @@ describe(minLengthArray, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (Result.isErr(result)) {
-      assert.deepStrictEqual(result.value[0]?.details, {
-        kind: 'array-min-length',
-        minLength: 2,
-        actualLength: 1,
-      });
-    }
+    assert.deepStrictEqual(result.value[0]?.details, {
+      kind: 'array-min-length',
+      minLength: 2,
+      actualLength: 1,
+    });
   });
 
   test('fill keeps longer input intact', () => {

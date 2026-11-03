@@ -1,5 +1,4 @@
 /* eslint-disable vitest/expect-expect */
-/* eslint-disable vitest/no-conditional-expect */
 import { exec, type ExecException } from 'node:child_process';
 import { expectType, Result } from 'ts-data-forge';
 import { $ } from './exec-async.mjs';
@@ -25,10 +24,6 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (!Result.isOk(result)) {
-        return;
-      }
-
       expect(result.value.stdout.trim()).toBe('hello world');
 
       expect(result.value.stderr).toBe('');
@@ -39,10 +34,6 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (!Result.isOk(result)) {
-        return;
-      }
-
       expect(result.value.stdout.trim()).toBe('line1\nline2\nline3');
 
       expect(result.value.stderr).toBe('');
@@ -52,10 +43,6 @@ describe('exec-async', () => {
       const result = await $('true', { silent: true });
 
       assert.isTrue(Result.isOk(result));
-
-      if (!Result.isOk(result)) {
-        return;
-      }
 
       expect(result.value.stdout).toBe('');
 
@@ -69,10 +56,6 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isErr(result));
 
-      if (!Result.isErr(result)) {
-        return;
-      }
-
       expect(result.value).toBeDefined();
 
       expect(result.value.code).toBeDefined();
@@ -82,10 +65,6 @@ describe('exec-async', () => {
       const result = await $('exit 1', { silent: true });
 
       assert.isTrue(Result.isErr(result));
-
-      if (!Result.isErr(result)) {
-        return;
-      }
 
       expect(result.value).toBeDefined();
 
@@ -99,9 +78,7 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isErr(result));
 
-      if (Result.isErr(result)) {
-        expect(result.value).toBeDefined();
-      }
+      expect(result.value).toBeDefined();
     });
   });
 
@@ -135,9 +112,7 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expectTypeOf(result.value.stdout).toBeString();
-      }
+      expectTypeOf(result.value.stdout).toBeString();
     });
 
     test('should return Buffer with buffer encoding', async () => {
@@ -148,10 +123,6 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (!Result.isOk(result)) {
-        return;
-      }
-
       assert.isTrue(Buffer.isBuffer(result.value.stdout));
 
       assert.isTrue(Buffer.isBuffer(result.value.stderr));
@@ -161,10 +132,6 @@ describe('exec-async', () => {
       const result = await $('echo "test"', { silent: true, encoding: null });
 
       assert.isTrue(Result.isOk(result));
-
-      if (!Result.isOk(result)) {
-        return;
-      }
 
       assert.isTrue(Buffer.isBuffer(result.value.stdout));
 
@@ -178,10 +145,6 @@ describe('exec-async', () => {
       });
 
       assert.isTrue(Result.isOk(result));
-
-      if (!Result.isOk(result)) {
-        return;
-      }
 
       expectTypeOf(result.value.stdout).toBeString();
 
@@ -197,9 +160,7 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expect(result.value.stdout.trim()).toBe('hello world');
-      }
+      expect(result.value.stdout.trim()).toBe('hello world');
     });
 
     test('should handle command chaining with &&', async () => {
@@ -207,9 +168,7 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expect(result.value.stdout.trim()).toBe('first\nsecond');
-      }
+      expect(result.value.stdout.trim()).toBe('first\nsecond');
     });
 
     test('should handle command chaining with ;', async () => {
@@ -217,9 +176,7 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expect(result.value.stdout.trim()).toBe('first\nsecond');
-      }
+      expect(result.value.stdout.trim()).toBe('first\nsecond');
     });
 
     test('should stop on first error with &&', async () => {

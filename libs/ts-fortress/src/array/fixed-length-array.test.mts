@@ -51,13 +51,11 @@ describe(fixedLengthArray, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (Result.isErr(result)) {
-      assert.deepStrictEqual(result.value[0]?.details, {
-        kind: 'array-length',
-        expectedLength: 3,
-        actualLength: 2,
-      });
-    }
+    assert.deepStrictEqual(result.value[0]?.details, {
+      kind: 'array-length',
+      expectedLength: 3,
+      actualLength: 2,
+    });
   });
 
   test('fill', () => {

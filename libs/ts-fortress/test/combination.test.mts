@@ -410,10 +410,6 @@ describe('advanced type', () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (!Result.isErr(result)) {
-      throw new Error('Expected validation to fail');
-    }
-
     const messages = validationErrorsToMessages(result.value);
 
     assert.deepStrictEqual(messages, [

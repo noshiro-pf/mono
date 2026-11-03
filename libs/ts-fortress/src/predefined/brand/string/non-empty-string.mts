@@ -49,7 +49,6 @@ export function nonEmptyString(
 
 if (import.meta.vitest !== undefined) {
   test('defaultValue', () => {
-    // eslint-disable-next-line ts-data-forge/no-unnecessary-type-guard
     assert.isTrue(isNonEmptyString(' '));
   });
 }
