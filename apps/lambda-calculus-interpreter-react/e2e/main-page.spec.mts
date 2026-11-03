@@ -14,6 +14,51 @@ test('the output area is read-only', { tag: '@smoke' }, async ({ page }) => {
   await expect.soft(page.getByTestId('output-area')).not.toBeEditable();
 });
 
+test(
+  'the output area can be scrolled to the end of a long reduction',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    const outputArea = page.getByTestId('output-area');
+
+    // The term grows with every step and never reaches a normal form, so the
+    // output holds every step allowed.
+    await page
+      .getByTestId('input-area')
+      .fill('((lambda x.((x x) x)) (lambda x.((x x) x)))');
+
+    await expect
+      .soft(outputArea)
+      .toHaveValue(/^100\.\t/mu, { timeout: evaluateAllStepsTimeoutMs });
+
+    // Without overflow the check below would pass with nothing scrolled.
+    await expect
+      .poll(async () =>
+        outputArea.evaluate((el) => el.scrollHeight > el.clientHeight),
+      )
+      .toBe(true);
+
+    // A light scrollbar would show on the dark background.
+    await expect.soft(outputArea).toHaveCSS('color-scheme', 'dark');
+
+    await outputArea.hover();
+
+    await page.mouse.wheel(0, 100_000);
+
+    await expect
+      .poll(async () =>
+        outputArea.evaluate(
+          (el) => el.scrollTop + el.clientHeight >= el.scrollHeight - 1,
+        ),
+      )
+      .toBe(true);
+  },
+);
+
+// Evaluating all the steps of a growing term takes a few seconds.
+const evaluateAllStepsTimeoutMs = 30_000;
+
 const testCases = [
   {
     title: '4 + 5 = 9',
