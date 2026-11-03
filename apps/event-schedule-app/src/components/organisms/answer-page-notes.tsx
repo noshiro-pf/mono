@@ -1,6 +1,5 @@
 import { memoNamed } from 'react-utils';
-import urlRegex from 'url-regex';
-import { splitStringByWhitespace } from '../../utils/index.mjs';
+import { isHttpUrl, splitStringByWhitespace } from '../../utils/index.mjs';
 
 type Props = Readonly<{ notes: string }>;
 
@@ -11,13 +10,11 @@ export const AnswerPageNotes = memoNamed<Props>(
   ),
 );
 
-const regex = urlRegex({ exact: true, strict: false });
-
 const convertUrlStringToAnchorElement = (
   str: string,
   key: React.Key,
 ): React.JSX.IntrinsicElements['a'] | React.JSX.IntrinsicElements['span'] =>
-  regex.test(str) ? (
+  isHttpUrl(str) ? (
     <a key={key} href={str} rel={'noopener noreferrer'} target={'_blank'}>
       {str}
     </a>
