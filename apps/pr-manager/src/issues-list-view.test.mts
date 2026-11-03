@@ -34,50 +34,50 @@ describe(isIssueShown, () => {
 
     assert.isFalse(isIssueShown(issue(2, ['bug']), view));
 
-    assert.isTrue(isIssueShown(issue(3, ['priority:low']), view));
+    assert.isTrue(isIssueShown(issue(3, ['priority:D']), view));
   });
 
   test('with priorities picked, an issue is shown only when its priority is one of them', () => {
     const view = toggleIssuePriorityOnly(
-      toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'high'),
+      toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'S'),
       'none',
     );
 
-    assert.isTrue(isIssueShown(issue(1, ['priority:high']), view));
+    assert.isTrue(isIssueShown(issue(1, ['priority:S']), view));
 
     assert.isTrue(isIssueShown(issue(2, ['bug']), view));
 
-    assert.isFalse(isIssueShown(issue(3, ['priority:mid']), view));
+    assert.isFalse(isIssueShown(issue(3, ['priority:B']), view));
   });
 
   test('under a pick, switching on one not picked picks it too, and switching off one picked unpicks it', () => {
-    const picked = toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'high');
+    const picked = toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'S');
 
-    const both = toggleIssuePriority(picked, 'mid');
+    const both = toggleIssuePriority(picked, 'B');
 
-    assert.deepStrictEqual(both.onlyPriorities, ['high', 'mid']);
+    assert.deepStrictEqual(both.onlyPriorities, ['S', 'B']);
 
     assert.deepStrictEqual(both.hiddenPriorities, []);
 
-    const hidden = toggleIssuePriority(both, 'high');
+    const hidden = toggleIssuePriority(both, 'S');
 
-    assert.deepStrictEqual(hidden.onlyPriorities, ['mid']);
+    assert.deepStrictEqual(hidden.onlyPriorities, ['B']);
 
-    assert.deepStrictEqual(hidden.hiddenPriorities, ['high']);
+    assert.deepStrictEqual(hidden.hiddenPriorities, ['S']);
   });
 
   test('a priority is never both hidden and picked', () => {
-    const hidden = toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'high');
+    const hidden = toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'S');
 
-    const picked = toggleIssuePriorityOnly(hidden, 'high');
+    const picked = toggleIssuePriorityOnly(hidden, 'S');
 
     assert.deepStrictEqual(picked.hiddenPriorities, []);
 
-    assert.deepStrictEqual(picked.onlyPriorities, ['high']);
+    assert.deepStrictEqual(picked.onlyPriorities, ['S']);
 
-    const hiddenAgain = toggleIssuePriority(picked, 'high');
+    const hiddenAgain = toggleIssuePriority(picked, 'S');
 
-    assert.deepStrictEqual(hiddenAgain.hiddenPriorities, ['high']);
+    assert.deepStrictEqual(hiddenAgain.hiddenPriorities, ['S']);
 
     assert.deepStrictEqual(hiddenAgain.onlyPriorities, []);
   });
@@ -100,12 +100,12 @@ describe(isIssueShown, () => {
   test('a picked label does not show what its priority hides', () => {
     const view = toggleIssuePriority(
       toggleLabel(DEFAULT_ISSUES_LIST_VIEW, 'bug'),
-      'low',
+      'D',
     );
 
-    assert.isFalse(isIssueShown(issue(1, ['bug', 'priority:low']), view));
+    assert.isFalse(isIssueShown(issue(1, ['bug', 'priority:D']), view));
 
-    assert.isTrue(isIssueShown(issue(2, ['bug', 'priority:mid']), view));
+    assert.isTrue(isIssueShown(issue(2, ['bug', 'priority:B']), view));
   });
 });
 
@@ -148,19 +148,19 @@ describe(toggleIssuePending, () => {
 describe(toggleIssuePendingOnly, () => {
   test('picked, only the issues labelled pending are shown, of the priorities shown', () => {
     const view = toggleIssuePendingOnly(
-      toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'high'),
+      toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'S'),
     );
 
-    assert.isTrue(isIssueShown(issue(1, ['pending', 'priority:high']), view));
+    assert.isTrue(isIssueShown(issue(1, ['pending', 'priority:S']), view));
 
     // Picking pending does not bring in what the priorities leave out, nor
     // picking a priority what pending leaves out.
-    assert.isFalse(isIssueShown(issue(2, ['pending', 'priority:low']), view));
+    assert.isFalse(isIssueShown(issue(2, ['pending', 'priority:D']), view));
 
-    assert.isFalse(isIssueShown(issue(3, ['priority:high']), view));
+    assert.isFalse(isIssueShown(issue(3, ['priority:S']), view));
 
     assert.isTrue(
-      isIssueShown(issue(3, ['priority:high']), toggleIssuePendingOnly(view)),
+      isIssueShown(issue(3, ['priority:S']), toggleIssuePendingOnly(view)),
     );
   });
 
@@ -214,7 +214,7 @@ describe(arrangeIssues, () => {
     );
   });
 
-  test('sorted by priority, high first and no priority between mid and low, the most recently updated first within each', () => {
+  test('sorted by tier, S first and no tier between C and D, the most recently updated first within each', () => {
     assert.deepStrictEqual(
       numbersOf(
         arrangeIssues(
@@ -245,7 +245,7 @@ describe(arrangeIssues, () => {
   test('leaves out what the search does not match, with the view as well', () => {
     const items = [
       titled(1, 'Header search'),
-      { ...titled(2, 'Search issues'), labels: [label('priority:low')] },
+      { ...titled(2, 'Search issues'), labels: [label('priority:D')] },
       titled(3, 'Zoom'),
     ] as const;
 
@@ -258,7 +258,7 @@ describe(arrangeIssues, () => {
       numbersOf(
         arrangeIssues(
           items,
-          toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'low'),
+          toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'D'),
           'search',
         ),
       ),
@@ -297,9 +297,13 @@ describe(countIssues, () => {
     assert.deepStrictEqual(counts.open, { shown: 6, total: 6 });
 
     assert.deepStrictEqual(counts.priorities, {
-      high: { shown: 1, total: 1 },
-      mid: { shown: 1, total: 1 },
-      low: { shown: 1, total: 1 },
+      S: { shown: 1, total: 1 },
+      A: { shown: 0, total: 0 },
+      B: { shown: 1, total: 1 },
+      C: { shown: 0, total: 0 },
+      D: { shown: 1, total: 1 },
+      hold: { shown: 0, total: 0 },
+      close: { shown: 0, total: 0 },
       none: { shown: 3, total: 3 },
     });
 
@@ -322,16 +326,16 @@ describe(countIssues, () => {
   test('a priority switched off reads what switching it on would show; the rest read the list', () => {
     const counts = countIssues(
       ISSUES,
-      toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'low'),
+      toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'D'),
     );
 
     assert.deepStrictEqual(counts.open, { shown: 5, total: 6 });
 
-    assert.deepStrictEqual(counts.priorities.low, { shown: 1, total: 1 });
+    assert.deepStrictEqual(counts.priorities.D, { shown: 1, total: 1 });
 
-    assert.deepStrictEqual(counts.priorities.high, { shown: 1, total: 1 });
+    assert.deepStrictEqual(counts.priorities.S, { shown: 1, total: 1 });
 
-    // #2 and #6 carry `bug`; #2 is low.
+    // #2 and #6 carry `bug`; #2 is D.
     assert.deepStrictEqual(
       counts.labels.find((each) => each.name === 'bug')?.count,
       { shown: 1, total: 2 },
@@ -341,14 +345,14 @@ describe(countIssues, () => {
   test('with a priority picked, it reads the list, and the rest read what picking them too would add', () => {
     const counts = countIssues(
       ISSUES,
-      toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'high'),
+      toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'S'),
     );
 
     assert.deepStrictEqual(counts.open, { shown: 1, total: 6 });
 
-    assert.deepStrictEqual(counts.priorities.high, { shown: 1, total: 1 });
+    assert.deepStrictEqual(counts.priorities.S, { shown: 1, total: 1 });
 
-    assert.deepStrictEqual(counts.priorities.low, { shown: 1, total: 1 });
+    assert.deepStrictEqual(counts.priorities.D, { shown: 1, total: 1 });
 
     assert.deepStrictEqual(counts.priorities.none, { shown: 3, total: 3 });
   });
@@ -373,11 +377,15 @@ describe(countIssues, () => {
       ],
     );
 
-    // Only the picked label's issues: #3 (high) and #4 (none).
+    // Only the picked label's issues: #3 (S) and #4 (none).
     assert.deepStrictEqual(counts.priorities, {
-      high: { shown: 1, total: 1 },
-      mid: { shown: 0, total: 1 },
-      low: { shown: 0, total: 1 },
+      S: { shown: 1, total: 1 },
+      A: { shown: 0, total: 0 },
+      B: { shown: 0, total: 1 },
+      C: { shown: 0, total: 0 },
+      D: { shown: 0, total: 1 },
+      hold: { shown: 0, total: 0 },
+      close: { shown: 0, total: 0 },
       none: { shown: 1, total: 3 },
     });
   });
@@ -385,7 +393,7 @@ describe(countIssues, () => {
   test('pending is its own switch, not a label: switched off, it reads what switching it on would show', () => {
     const items = [
       issue(1, ['pending']),
-      issue(2, ['pending', 'bug', 'priority:low']),
+      issue(2, ['pending', 'bug', 'priority:D']),
       issue(3, ['bug']),
     ] as const;
 
@@ -400,12 +408,12 @@ describe(countIssues, () => {
 
     const hidden = countIssues(
       items,
-      toggleIssuePending(toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'low')),
+      toggleIssuePending(toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'D')),
     );
 
     assert.deepStrictEqual(hidden.open, { shown: 1, total: 3 });
 
-    // #2 is low, which is still hidden.
+    // #2 is D, which is still hidden.
     assert.deepStrictEqual(hidden.pending, { shown: 1, total: 2 });
 
     assert.deepStrictEqual(hidden.labels[0]?.count, { shown: 1, total: 2 });
@@ -413,16 +421,16 @@ describe(countIssues, () => {
 
   test('pending picked, the priorities read what is pending of each, and pending reads what the priorities show', () => {
     const items = [
-      issue(1, ['pending', 'priority:high']),
-      issue(2, ['pending', 'priority:low']),
-      issue(3, ['priority:high']),
+      issue(1, ['pending', 'priority:S']),
+      issue(2, ['pending', 'priority:D']),
+      issue(3, ['priority:S']),
       issue(4, []),
     ] as const;
 
     const counts = countIssues(
       items,
       toggleIssuePendingOnly(
-        toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'high'),
+        toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'S'),
       ),
     );
 
@@ -431,9 +439,13 @@ describe(countIssues, () => {
     assert.deepStrictEqual(counts.pending, { shown: 1, total: 2 });
 
     assert.deepStrictEqual(counts.priorities, {
-      high: { shown: 1, total: 2 },
-      mid: { shown: 0, total: 0 },
-      low: { shown: 1, total: 1 },
+      S: { shown: 1, total: 2 },
+      A: { shown: 0, total: 0 },
+      B: { shown: 0, total: 0 },
+      C: { shown: 0, total: 0 },
+      D: { shown: 1, total: 1 },
+      hold: { shown: 0, total: 0 },
+      close: { shown: 0, total: 0 },
       none: { shown: 0, total: 1 },
     });
   });
@@ -584,8 +596,8 @@ describe(toggleLabel, () => {
 describe(issuesListViewFromSearch, () => {
   test('reads back what was written', () => {
     const view: IssuesListView = {
-      hiddenPriorities: ['low', 'none'],
-      onlyPriorities: ['high'],
+      hiddenPriorities: ['D', 'none'],
+      onlyPriorities: ['S'],
       hiddenStarts: ['blocked'],
       onlyLabels: ['bug', 'good first issue', 'v1.2'],
       hidePending: true,
@@ -599,7 +611,7 @@ describe(issuesListViewFromSearch, () => {
 
     assert.strictEqual(
       search,
-      '?issues.hidePriority=low.none&issues.onlyPriority=high&issues.hideStart=blocked&issues.label=bug&issues.label=good+first+issue&issues.label=v1.2&issues.hidePending=1&issues.onlyInProgress=1&issues.sort=start',
+      '?issues.hidePriority=D.none&issues.onlyPriority=S&issues.hideStart=blocked&issues.label=bug&issues.label=good+first+issue&issues.label=v1.2&issues.hidePending=1&issues.onlyInProgress=1&issues.sort=start',
     );
 
     assert.deepStrictEqual(issuesListViewFromSearch(search), view);
@@ -670,6 +682,16 @@ describe(issuesListViewFromSearch, () => {
     assert.isFalse(view.onlyPending);
   });
 
+  test('a tier an older page picked as a label is picked as a tier', () => {
+    const view = issuesListViewFromSearch(
+      '?issues.label=priority:S&issues.label=bug&issues.onlyPriority=A&issues.hidePriority=C&issues.label=priority:C',
+    );
+
+    assert.deepStrictEqual(view.onlyPriorities, ['A', 'S']);
+
+    assert.deepStrictEqual(view.onlyLabels, ['bug']);
+  });
+
   test('anything it cannot make sense of is the default, and what it does not know is dropped', () => {
     assert.deepStrictEqual(
       issuesListViewFromSearch(''),
@@ -678,12 +700,12 @@ describe(issuesListViewFromSearch, () => {
 
     assert.deepStrictEqual(
       issuesListViewFromSearch(
-        '?issues.hidePriority=urgent.mid&issues.onlyPriority=mid.low&issues.hideStart=someday.cycle&issues.label=bug&issues.label=&issues.label=bug&issues.label=pending&issues.label=priority:high&issues.hidePending=yes&issues.sort=title',
+        '?issues.hidePriority=urgent.high.B&issues.onlyPriority=B.D&issues.hideStart=someday.cycle&issues.label=bug&issues.label=&issues.label=bug&issues.label=pending&issues.label=priority:high&issues.hidePending=yes&issues.sort=title',
       ),
       {
-        hiddenPriorities: ['mid'],
+        hiddenPriorities: ['B'],
         // Switched off and picked is switched off.
-        onlyPriorities: ['low'],
+        onlyPriorities: ['D'],
         hiddenStarts: ['cycle'],
         onlyLabels: ['bug'],
         hidePending: false,
@@ -752,11 +774,11 @@ const label = (labelName: string): Label =>
 /** Most recently updated first, as the list is read. */
 const ISSUES = [
   issue(1, []),
-  issue(2, ['bug', 'priority:low']),
-  issue(3, ['enhancement', 'priority:high']),
+  issue(2, ['bug', 'priority:D']),
+  issue(3, ['enhancement', 'priority:S']),
   issue(4, ['enhancement']),
-  issue(5, ['priority:low', 'priority:high']),
-  issue(6, ['bug', 'priority:mid']),
+  issue(5, ['priority:D', 'priority:S']),
+  issue(6, ['bug', 'priority:B']),
 ] as const;
 
 const numbersOf = (items: readonly IssueItem[]): readonly number[] =>

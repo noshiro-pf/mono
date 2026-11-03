@@ -1,6 +1,6 @@
 /**
  * What the open issues are narrowed by in either view, the list and the DAG:
- * the priorities (`priority.mts`), `pending` (`pending.mts`) and `in
+ * the tiers (`priority.mts`), `pending` (`pending.mts`) and `in
  * progress` (`in-progress.mts`), the counts both views lead with
  * (`issues-summary.tsx`).
  *
@@ -14,7 +14,7 @@ import { isInProgressShown, type InProgressFilter } from './in-progress.mjs';
 import { isPendingShown, type PendingFilter } from './pending.mjs';
 import {
   isPriorityShown,
-  type Priority,
+  type IssueTier,
   type PriorityFilter,
 } from './priority.mjs';
 
@@ -29,12 +29,14 @@ export const isIssueFilterShown = (
 
 /** What the filter reads of an issue: one fact for each of its sides. */
 export type IssueFilterFacts = Readonly<{
-  priority: Priority;
+  priority: IssueTier;
   pending: boolean;
   inProgress: boolean;
 }>;
 
-export type IssueFilter = PriorityFilter & PendingFilter & InProgressFilter;
+export type IssueFilter = PriorityFilter<IssueTier> &
+  PendingFilter &
+  InProgressFilter;
 
 export const DEFAULT_ISSUE_FILTER: IssueFilter = {
   hiddenPriorities: [],

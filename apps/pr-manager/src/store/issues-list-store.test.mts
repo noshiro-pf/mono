@@ -30,7 +30,7 @@ describe(createIssuesListStore, () => {
 
     stopStore();
 
-    store.togglePriority('low');
+    store.togglePriority('D');
 
     assert.strictEqual(saved.length, 2);
   });
@@ -52,14 +52,14 @@ describe(createIssuesListStore, () => {
 
     assert.deepStrictEqual(mut_filters, [DEFAULT_ISSUE_FILTER]);
 
-    store.togglePriorityOnly('high');
+    store.togglePriorityOnly('S');
 
     store.togglePendingOnly();
 
     assert.deepStrictEqual(mut_filters, [
       DEFAULT_ISSUE_FILTER,
-      { ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['high'] },
-      { ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['high'], onlyPending: true },
+      { ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['S'] },
+      { ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['S'], onlyPending: true },
     ]);
   });
 
@@ -68,8 +68,8 @@ describe(createIssuesListStore, () => {
 
     setIssues([
       issue(1, ['bug']),
-      issue(2, ['priority:high']),
-      issue(3, ['bug', 'priority:low']),
+      issue(2, ['priority:S']),
+      issue(3, ['bug', 'priority:D']),
     ]);
 
     assert.deepStrictEqual(numbersShown(store), [1, 2, 3]);
@@ -82,7 +82,7 @@ describe(createIssuesListStore, () => {
 
     assert.deepStrictEqual(numbersShown(store), [1, 3]);
 
-    store.togglePriority('low');
+    store.togglePriority('D');
 
     assert.deepStrictEqual(numbersShown(store), [1]);
 

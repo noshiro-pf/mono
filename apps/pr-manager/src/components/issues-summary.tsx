@@ -8,12 +8,7 @@ import {
 } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import {
-  isPriorityShown,
-  PRIORITIES,
-  PRIORITY_NAMES,
-  type Priority,
-} from '../priority.mjs';
+import { isPriorityShown, ISSUE_TIERS, type IssueTier } from '../priority.mjs';
 import { issuesListStore, issuesViewStore } from '../store/index.mjs';
 import { StatTile, StatToggle } from './stat-tile.js';
 
@@ -74,9 +69,9 @@ export const IssuesSummary = (): JSX.Element => {
           )}
           role={constant('group')}
         >
-          {PRIORITIES.map((priority) => (
+          {ISSUE_TIERS.map((priority) => (
             <StatToggle
-              label={PRIORITY_NAMES[priority]}
+              label={priority}
               only={view(view$, ({ onlyPriorities }) =>
                 onlyPriorities.includes(priority),
               )}
@@ -148,12 +143,17 @@ export const IssuesSummary = (): JSX.Element => {
   );
 };
 
+/** What each tier's switch counts (`docs/issue-priority.md`). */
 const PRIORITY_SUBJECTS = {
-  high: 'the issues of high priority',
-  mid: 'the issues of mid priority',
-  low: 'the issues of low priority',
-  none: 'the issues with no priority',
-} as const satisfies ReadonlyRecord<Priority, string>;
+  S: 'the issues of priority S',
+  A: 'the issues of priority A',
+  B: 'the issues of priority B',
+  C: 'the issues of priority C',
+  D: 'the issues of priority D',
+  hold: 'the issues on hold',
+  close: 'the issues to close or merge',
+  none: 'the issues placed under no priority, or under several',
+} as const satisfies ReadonlyRecord<IssueTier, string>;
 
 const togglePending = (): void => {
   issuesListStore.togglePending();

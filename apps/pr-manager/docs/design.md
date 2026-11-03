@@ -65,27 +65,29 @@ button under the list to ask for it again.
 
 **The open issues can be narrowed and sorted.** They lead with counts, as the
 merge order does: **open**, how many are shown of how many are open, then the
-`priority:high`, `priority:mid` and `priority:low` labels, with **none** for an
-issue carrying no one of them (or more than one), joined into one control, and
+tiers, the `priority:S` … `priority:D`, `priority:hold` and `priority:close`
+labels of the repository's `docs/issue-priority.md`, with **none** for an issue
+carrying no one of them (or more than one), joined into one control, and
 **pending**, the `pending` label, beside them on its own. Each is a switch with
 an **only** button in its corner, as the merge order's statuses are, and the
-counts are there in the List and in the DAG alike. Two priorities picked show
-the issues of either, since an issue has one; pending picked with a priority
-shows the issues that are both. Every
-other label an open issue carries is a pick: once any is picked, only the issues
-carrying one picked are listed, still not those whose priority is switched off.
+counts are there in the List and in the DAG alike. Two tiers picked show the
+issues of either, since an issue has one; pending picked with a tier shows the
+issues that are both. Every other label an open issue carries is a pick: once
+any is picked, only the issues carrying one picked are listed, still not those
+whose priority is switched off.
 **The start states** (`docs/issue-start-after.md`), in the DAG's words and
-colours, are switches too. The order is **updated**, **priority** — high first,
-none between mid and low — or **start**: what can be started (wait over, then
-free), what is in progress, what needs a look, what waits, what is on a cycle;
-the most recently updated first within each. Each switch and pick counts what
-the list shows of it, as the merge order's do, and the choice is kept in the URL
-(below). The priorities and pending apply to both views, and the DAG's counts
-are of what it draws; the rest apply to the list alone. The DAG leaves out the
-issues they do not show, with what only they wait on and the pull requests that
-close only them; one that an issue drawn waits on stays, alone, since it is why
-that issue waits, and is not counted as shown. Pending switched off leaves out
-every node labelled `pending` in the DAG, pull requests too.
+colours, are switches too. The order is **updated**, **priority** — by tier, S
+first, none between C and D, then hold and close — or **start**: what can be
+started (wait over, then free), what is in progress, what needs a look, what
+waits, what is on a cycle; the most recently updated first within each. Each
+switch and pick counts what the list shows of it, as the merge order's do, and
+the choice is kept in the URL (below). The priorities and pending apply to both
+views, and the DAG's counts are of what it draws; the rest apply to the list
+alone. The DAG leaves out the issues they do not show, with what only they wait
+on and the pull requests that close only them; one that an issue drawn waits on
+stays, alone, since it is why that issue waits, and is not counted as shown.
+Pending switched off leaves out every node labelled `pending` in the DAG, pull
+requests too.
 
 **Each issue in the list says how it stands for being started**: a badge for
 its start state, the numbers its `Start-After:` names, each coloured by where
@@ -254,11 +256,12 @@ is written:
   `prs.only=failing` (the ones picked), `prs.hidePriority=low.none` and
   `prs.sort=priority`.
 - The open issues: `issues=dag` (the DAG rather than the list), and
-  `dag.zoom=125` or `dag.zoom=fit` for the DAG; `issues.hidePriority=low`,
-  `issues.onlyPriority=high`, and `issues.hidePending=1` or
-  `issues.onlyPending=1` for both; `issues.hideStart=blocked.cycle`,
-  `issues.sort=priority` and `issues.label=bug`, once per label picked, for
-  the list. The search is not kept.
+  `dag.zoom=125` or `dag.zoom=fit` for the DAG;
+  `issues.hidePriority=hold.close`, `issues.onlyPriority=S.A`, and
+  `issues.hidePending=1` or `issues.onlyPending=1` for both;
+  `issues.hideStart=blocked.cycle`, `issues.sort=priority` and
+  `issues.label=bug`, once per label picked, for the list. The search is not
+  kept.
 
 A name it does not know is dropped, so a URL written by an older page, or
 edited by hand, still opens. A page opened without them shows everything,

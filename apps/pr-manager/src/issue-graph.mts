@@ -25,7 +25,7 @@ import type { StrictPick } from 'ts-type-forge';
 import { isIssueFilterShown, type IssueFilter } from './issue-filter.mjs';
 import type { Entry, IssueItem, ReferencedItem } from './load-report.mjs';
 import { isPending } from './pending.mjs';
-import { priorityOf, type Priority } from './priority.mjs';
+import { issueTierOf, type IssueTier } from './priority.mjs';
 
 /**
  * How a node is drawn.
@@ -48,20 +48,22 @@ export type IssueGraphNode = Readonly<{
   url: string;
   state: IssueNodeState;
   /**
-   * The one `priority:*` label it carries. Only a listed issue and an open pull
-   * request have their labels read; anything else is `none`.
+   * The one tier (`priority:<tier>` label) it carries. Only a listed issue has
+   * its tier read; a pull request, whose `priority:*` labels order the merge
+   * queue rather than rank work, and anything else are `none`.
    */
-  priority: Priority;
+  priority: IssueTier;
   /**
    * Whether it is labelled `pending`, which its author puts on what is held
-   * back for now; read where the priority is, and `false` elsewhere.
+   * back for now; read on a listed issue and an open pull request, and `false`
+   * elsewhere.
    */
   pending: boolean;
   /**
    * What its `in-progress` or `planned` label says (`pr-report-core`'s
-   * `progressOf`, with no pull request), read where the priority is and `none`
-   * elsewhere: the state shows it only when the issue is startable, and the
-   * tooltip says it whatever the state.
+   * `progressOf`, with no pull request), read on a listed issue and an open
+   * pull request, and `none` elsewhere: the state shows it only when the issue
+   * is startable, and the tooltip says it whatever the state.
    */
   marked: IssueProgress;
 }>;
@@ -136,7 +138,7 @@ export const buildIssueGraph = ({
         state,
         worked.has(issue.number) ? 'in-progress' : marked,
       ),
-      priority: priorityOf(issue.labels),
+      priority: issueTierOf(issue.labels),
       pending: isPending(issue.labels),
       marked,
     };
@@ -158,7 +160,7 @@ export const buildIssueGraph = ({
         title: pull.title,
         url: pull.url,
         state: 'open',
-        priority: priorityOf(pull.labels),
+        priority: 'none',
         pending: isPending(pull.labels),
         marked: 'none',
       };

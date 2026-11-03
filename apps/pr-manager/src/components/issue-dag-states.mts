@@ -38,7 +38,7 @@ export const stateLabels = {
 } as const satisfies ReadonlyRecord<IssueNodeState, string>;
 
 /**
- * `#2225 Title — Waiting: … — Priority: high — Pending`, for the tooltip.
+ * `#2225 Title — Waiting: … — Priority: S — Pending`, for the tooltip.
  * An `in-progress` or `planned` label the state does not already say — on one
  * that waits, say — is a line of its own, as `pending` is.
  */
