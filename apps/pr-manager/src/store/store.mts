@@ -32,7 +32,6 @@ import {
   mergeOrderViewFromLocation,
   saveMergeOrderView,
 } from '../merge-order-view.mjs';
-import { createReportCache } from '../report-cache.mjs';
 import { readSetting, writeSetting } from '../settings-db.mjs';
 import {
   applyTheme,
@@ -85,12 +84,6 @@ export const reader = createReader({
   counter: (ms) => counter(ms, { emitInitial: false }),
   isVisible: () => document.visibilityState === 'visible',
   visibilityChange: fromEvent(document, 'visibilitychange'),
-  cache: createReportCache({
-    source: reportSource,
-    build: PR_MANAGER_BUILD_ID,
-    read: readSetting,
-    write: writeSetting,
-  }),
 });
 
 export const themeStore = createThemeStore({
