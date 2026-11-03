@@ -114,7 +114,8 @@ export const pushLeased = async (
  * then runs once, on the head that will actually be merged. Doing it the other
  * way round starts a full matrix on the pre-rebase head and has the push cancel
  * it through the concurrency group. Arming comes between the two, so that while
- * it happens the label still holds the merge.
+ * it happens the label still holds the merge. Whether to arm at all is decided
+ * for the head the rebase reached (`AdvancePlan.bypassAt`).
  *
  * A pull request GitHub moved off a stack is rebased with `--onto` from the
  * head its merged parent was merged at, when it still contains that head —
@@ -155,7 +156,9 @@ export const advance = async (
       return Result.ok({ kind: 'stale-merge-state' });
     }
 
-    if (plan.arm) {
+    const bypassAtTip = await plan.bypassAt(pr.headRefOid);
+
+    if (bypassAtTip === undefined && plan.arm) {
       const armed = await armOnPick(api, pr, pr.headRefOid, defaultBranch);
 
       if (Result.isErr(armed) || armed.value === 'moved') {
@@ -170,7 +173,11 @@ export const advance = async (
       : Result.ok(
           unlabelled.value === 'moved'
             ? { kind: 'moved' }
-            : { kind: 'advanced', head: pr.headRefOid },
+            : {
+                kind: 'advanced',
+                head: pr.headRefOid,
+                bypassReason: bypassAtTip,
+              },
         );
   }
 
@@ -202,7 +209,9 @@ export const advance = async (
     await restack(pr, head, plan.descendants);
   }
 
-  if (plan.arm) {
+  const bypassReason = await plan.bypassAt(head);
+
+  if (bypassReason === undefined && plan.arm) {
     const armed = await armOnPick(api, pr, head, defaultBranch);
 
     if (Result.isErr(armed) || armed.value === 'moved') {
@@ -213,7 +222,7 @@ export const advance = async (
   if (!isSkipCiLabelled(pr)) {
     return head === pr.headRefOid
       ? Result.ok({ kind: 'stale-merge-state' })
-      : Result.ok({ kind: 'advanced', head });
+      : Result.ok({ kind: 'advanced', head, bypassReason });
   }
 
   const removed = await removeSkipCiLabel(api, pr, head);
@@ -223,7 +232,7 @@ export const advance = async (
     : Result.ok(
         removed.value === 'moved'
           ? { kind: 'moved' }
-          : { kind: 'advanced', head },
+          : { kind: 'advanced', head, bypassReason },
       );
 };
 

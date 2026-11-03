@@ -6,6 +6,14 @@ export const UNKNOWN_STATE_RETRIES = 6;
 export const UNKNOWN_STATE_RETRY_MS = 10_000;
 
 /**
+ * How many times to read a pull request's review again while GitHub still
+ * answers for the head before the push (`triage.mts`'s `readBypassAt`).
+ */
+export const REVIEW_HEAD_RETRIES = 6;
+
+export const REVIEW_HEAD_RETRY_MS = 5000;
+
+/**
  * How long to wait before surveying again after a rebase that changed nothing,
  * which means the merge state the survey acted on was stale.
  */
