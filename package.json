@@ -98,6 +98,7 @@
     "gen:license-files": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/gen-license-files.mts",
     "gen:verify-npm-packages": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/verify-npm-packages.mts --gen",
     "licenses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-licenses.mts --report",
+    "measure-ci-time": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/measure-ci-time.mts",
     "node-support:update": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/update-node-support.mts",
     "npm-trusted-publishers": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/report-npm-trusted-publishers.mts",
     "open-pr": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/pr-merge-queue/src/cmd/open-pr.mts",
