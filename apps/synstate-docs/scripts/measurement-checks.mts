@@ -1,4 +1,4 @@
-import { Arr, expectType } from 'ts-data-forge';
+import { Arr, expectType, hasKey, isRecord } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   cascadedDiamond,
@@ -29,11 +29,13 @@ import type { BenchmarkEnvironment } from './benchmark/environment.mjs';
  */
 
 /**
- * Where every table on the page was measured, or `undefined` when some table
- * records nothing: the page says so rather than inventing a machine for it.
- * Committing such a table, or one measured locally, is refused by the root
- * guard `check:root:synstate-benchmark-runner`, not here — the local
- * `benchmark` command runs `gen:benchmark-doc` on its own measurement.
+ * Where every table on the page was measured. A table that records nothing
+ * fails here, naming its file: every runner writes an environment
+ * (`readBenchmarkEnvironment` in `scripts/benchmark/environment.mts`), and a
+ * page whose tables come from no stated machine is not one to generate.
+ * Committing a table measured locally is refused by the root guard
+ * `check:root:synstate-benchmark-runner`, not here — the local `benchmark`
+ * command runs `gen:benchmark-doc` on its own measurement.
  *
  * The scenarios must agree, the date included — `benchmark` measures all of
  * them in one pass, and re-measuring one alone (`benchmark:deep-chain`) is
@@ -42,16 +44,35 @@ import type { BenchmarkEnvironment } from './benchmark/environment.mjs';
  * so the workflow pins one for the whole pass (`BENCHMARK_MEASURED_ON`, read in
  * `scripts/benchmark/environment.mts`).
  */
-export const recordedEnvironment = (): RecordedEnvironment | undefined => {
-  const recorded = allResults
-    .map((r) => r.meta.environment)
-    .filter((e) => e !== undefined);
+export const recordedEnvironment = (): RecordedEnvironment => {
+  // The type says every table has one; what is checked is the JSON on disk,
+  // which `tsx` runs without type-checking.
+  const missing = allResults
+    .filter(
+      ([, r]) =>
+        !isRecord(r.meta) ||
+        !hasKey(r.meta, 'environment') ||
+        !isRecord(r.meta.environment),
+    )
+    .map(([file]) => `  - src/data/${file}`);
+
+  if (Arr.isNonEmpty(missing)) {
+    throw new Error(
+      [
+        '❌ These results files record no environment, so the page cannot say',
+        'where their numbers come from:',
+        ...missing,
+        '',
+        'Every runner writes one (`readBenchmarkEnvironment` in',
+        '`scripts/benchmark/environment.mts`); re-measure with',
+        '`pnpm --filter @synstate/docs run benchmark`.',
+      ].join('\n'),
+    );
+  }
+
+  const recorded = Arr.map(allResults, ([, r]) => r.meta.environment);
 
   const [first] = recorded;
-
-  if (first === undefined || recorded.length < allResults.length) {
-    return undefined;
-  }
 
   const disagreements = Arr.generate(function* () {
     for (const key of ENVIRONMENT_KEYS) {
@@ -108,12 +129,7 @@ export const assertEveryLibraryHasAColour = (): void => {
   }
 };
 
-/**
- * The environment a results file records, as the checks and the prose read it.
- *
- * Optional here so that a table without one reaches the page as dashes rather
- * than a crash — see {@link recordedEnvironment}.
- */
+/** The environment a results file records, as the checks and the prose read it. */
 export type RecordedEnvironment = Readonly<{
   runner: string;
   runnerImage: string | null;
@@ -145,28 +161,24 @@ expectType<(typeof ENVIRONMENT_KEYS)[number], keyof BenchmarkEnvironment>('=');
 
 expectType<keyof RecordedEnvironment, keyof BenchmarkEnvironment>('=');
 
-/**
- * What these checks read of a results file. `updates`, which every runner
- * writes, is here only so that `meta` is not a weak type: TypeScript refuses an
- * object that shares no property with a type whose every property is optional,
- * and so would refuse the very tables without an environment that
- * {@link recordedEnvironment} tolerates.
- */
+/** What these checks read of a results file. */
 type ResultsWithEnvironment = Readonly<{
-  meta: Readonly<{ updates: number | null; environment?: RecordedEnvironment }>;
+  meta: Readonly<{ environment: RecordedEnvironment }>;
 }>;
 
 /**
- * Every committed table: each is a table on the page, so the environment it was
- * measured in has to agree with the others' or the page's one-sentence
- * description of where the numbers come from is false.
+ * Every committed table, by its file under `src/data/`: each is a table on the
+ * page, so the environment it was measured in has to agree with the others' or
+ * the page's one-sentence description of where the numbers come from is false.
  */
-const allResults: readonly ResultsWithEnvironment[] = [
-  singleState,
-  derivedChain,
-  diamond,
-  deepChain,
-  cascadedDiamond,
-  conditionalFanOut,
-  equalityCutOff,
-] as const;
+const allResults: NonEmptyTuple<
+  readonly [file: string, results: ResultsWithEnvironment]
+> = [
+  ['results-single-state.json', singleState],
+  ['results.json', derivedChain],
+  ['results-diamond.json', diamond],
+  ['results-deep-chain.json', deepChain],
+  ['results-cascaded-diamond.json', cascadedDiamond],
+  ['results-conditional-fan-out.json', conditionalFanOut],
+  ['results-equality-cut-off.json', equalityCutOff],
+];

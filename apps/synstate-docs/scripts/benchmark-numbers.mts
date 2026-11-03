@@ -729,7 +729,11 @@ type Localized = Readonly<{ en: string; ja: string }>;
 type ResultsMeta = Readonly<{
   updates: number | null;
   timeoutMs: number | null;
-  environment?: RecordedEnvironment;
+  /**
+   * Required: a table that records none is re-measured, not let through. A
+   * results file this fails on is to be measured again, not this made optional.
+   */
+  environment: RecordedEnvironment;
 }>;
 
 type SeriesData = Readonly<{
@@ -783,17 +787,12 @@ const equalityCutOff: SeriesData = equalityCutOffJson;
  * the environment is as much a part of a millisecond as the digits are, and a
  * page describing one machine while its tables came from another is how this
  * repository spent a day telling a code regression apart from a change of
- * machine. {@link recordedEnvironment} fails where the scenarios disagree, and
- * gives nothing where a table records no environment, which the page shows as
- * an em dash.
+ * machine. {@link recordedEnvironment} fails where the scenarios disagree or a
+ * table records no environment.
  */
 const environmentFact = (
   read: (environment: RecordedEnvironment) => string,
-): string => {
-  const recorded = recordedEnvironment();
-
-  return recorded === undefined ? '\u{2014}' : read(recorded);
-};
+): string => read(recordedEnvironment());
 
 /** The sweep points the prose singles out by name. */
 const DEEP_MAX = 'K=1000, M=200';
