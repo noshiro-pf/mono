@@ -225,6 +225,42 @@ export const renderBundleSizeEnvironment = (
 };
 
 /**
+ * Every export of `synstate` with its dependencies left out of the bundle,
+ * built as the esbuild tables are, minified and gzipped, in kB as they print
+ * it: the size of the package itself, which the home page, the introduction and
+ * the README quote, and which the Bundle Size page sets beside its tables.
+ *
+ * Unlike the tables, it is measured by `gen` from `synstate`'s `dist/`, so that
+ * a change to `synstate` that moves it leaves the tree dirty in CI until the
+ * pages are regenerated. One bundler only, so that a Vite update cannot.
+ */
+export const measureSynstateAloneKb = async (): Promise<string> => {
+  const external = await dependenciesOfSynstate();
+
+  const { sizes, bytesByPackage } = await sizeOfBundle(
+    { build: async (source) => buildWithEsbuild(source, external) },
+    keepAlive(
+      synstateLibrary.entryPoints.map((entryPoint) => ({
+        specifier: entryPoint,
+        names: ['*'],
+      })),
+    ),
+  );
+
+  const others = Array.from(bytesByPackage.keys()).filter(
+    (packageName) => packageName !== 'synstate',
+  );
+
+  if (Arr.isNonEmpty(others)) {
+    throw new Error(
+      `synstate alone was bundled with code from ${others.join(', ')}, which libs/synstate/package.json does not name as a dependency`,
+    );
+  }
+
+  return formatKb(sizes.gzip);
+};
+
+/**
  * The share of SynState's single-state bundle that `packageName` takes under
  * `bundler`, in percent, for the checks of the prose beside the tables.
  */
@@ -802,53 +838,126 @@ const entryFromImports = async (file: string): Promise<string> => {
 };
 
 /**
- * esbuild with the production build of every library: `NODE_ENV` checks, and
- * Valtio's `import.meta.env.MODE`, which Vite defines and esbuild does not.
+ * Fails on a bundle that still reads the environment: a development-only branch
+ * the defines did not reach would be measured as shipped code.
  */
-const esbuildBundler: Bundler = {
-  build: async (source) => {
-    const result = await esbuild({
-      stdin: { contents: source, resolveDir: scenarioDir, loader: 'js' },
-      // The implementations' packages map their own sources through `paths`;
-      // the bundle has to resolve each package as an application does.
-      tsconfigRaw: '{}',
-      bundle: true,
-      minify: true,
-      write: false,
-      metafile: true,
-      format: 'esm',
-      platform: 'browser',
-      legalComments: 'none',
-      define: {
-        'process.env.NODE_ENV': JSON.stringify('production'),
-        // Valtio reads `(import.meta.env ? import.meta.env.MODE : void 0)`;
-        // an object defined for `import.meta.env` is not folded into that
-        // condition, so the development branch would stay.
-        'import.meta.env.MODE': JSON.stringify('production'),
-        'import.meta.env': 'true',
-      },
-      logLevel: 'error',
-    });
+const checked = (
+  code: string,
+  bytesByPackage: ReadonlyMap<string, number>,
+  source: string,
+): BundleOutput => {
+  if (/process\.env|import\.meta/u.test(code)) {
+    throw new Error(
+      `the bundle still reads process.env or import.meta, so a development-only branch may be in it:\n${source}`,
+    );
+  }
 
-    const code = result.outputFiles[0]?.text;
+  return { code, bytesByPackage };
+};
 
-    const output = Object.values(result.metafile.outputs)[0];
+/**
+ * The package a module path belongs to: a workspace package under `libs/`, or a
+ * package under `node_modules/`.
+ */
+const packageNameOf = (input: string): string => {
+  // esbuild names inputs relative to the working directory, Rolldown by
+  // absolute path; both are read from the repository root, so that a checkout
+  // under a directory named `libs` is not mistaken for a package.
+  const fromRoot = path.relative(repositoryRoot, path.resolve(input));
 
-    if (code === undefined || output === undefined) {
-      throw new Error(`esbuild produced no output for:\n${source}`);
+  const inNodeModules =
+    /node_modules\/(?<name>@[^/]+\/[^/]+|[^/@][^/]*)\/(?!.*node_modules\/)/u.exec(
+      fromRoot,
+    );
+
+  if (inNodeModules?.groups?.['name'] !== undefined) {
+    return inNodeModules.groups['name'];
+  }
+
+  const inLibs = /^libs\/(?<name>[^/]+)\//u.exec(fromRoot);
+
+  if (inLibs?.groups?.['name'] !== undefined) {
+    return inLibs.groups['name'];
+  }
+
+  throw new Error(`cannot tell which package ${input} is from`);
+};
+
+/** The bytes of each module in the output, summed per package. */
+const bytesPerPackage = (
+  modules: readonly (readonly [string, number])[],
+): ReadonlyMap<string, number> => {
+  const mut_bytes = new Map<string, number>();
+
+  for (const [id, bytes] of modules) {
+    // The entry, which only keeps the imports alive, and esbuild's defines.
+    if (bytes === 0 || id.startsWith('<') || id.startsWith('\0')) {
+      continue;
     }
 
-    return checked(
-      code,
-      bytesPerPackage(
-        Object.entries(output.inputs).map(([input, { bytesInOutput }]) => [
-          input,
-          bytesInOutput,
-        ]),
-      ),
-      source,
-    );
-  },
+    const packageName = packageNameOf(id);
+
+    mut_bytes.set(packageName, (mut_bytes.get(packageName) ?? 0) + bytes);
+  }
+
+  return mut_bytes;
+};
+
+/**
+ * esbuild with the production build of every library: `NODE_ENV` checks, and
+ * Valtio's `import.meta.env.MODE`, which Vite defines and esbuild does not.
+ * `external` and their subpaths are left out of the bundle.
+ */
+const buildWithEsbuild = async (
+  source: string,
+  external: readonly string[],
+): Promise<BundleOutput> => {
+  const result = await esbuild({
+    stdin: { contents: source, resolveDir: scenarioDir, loader: 'js' },
+    // The implementations' packages map their own sources through `paths`;
+    // the bundle has to resolve each package as an application does.
+    tsconfigRaw: '{}',
+    bundle: true,
+    external: Array.from(external),
+    minify: true,
+    write: false,
+    metafile: true,
+    format: 'esm',
+    platform: 'browser',
+    legalComments: 'none',
+    define: {
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      // Valtio reads `(import.meta.env ? import.meta.env.MODE : void 0)`;
+      // an object defined for `import.meta.env` is not folded into that
+      // condition, so the development branch would stay.
+      'import.meta.env.MODE': JSON.stringify('production'),
+      'import.meta.env': 'true',
+    },
+    logLevel: 'error',
+  });
+
+  const code = result.outputFiles[0]?.text;
+
+  const output = Object.values(result.metafile.outputs)[0];
+
+  if (code === undefined || output === undefined) {
+    throw new Error(`esbuild produced no output for:\n${source}`);
+  }
+
+  return checked(
+    code,
+    bytesPerPackage(
+      Object.entries(output.inputs).map(([input, { bytesInOutput }]) => [
+        input,
+        bytesInOutput,
+      ]),
+    ),
+    source,
+  );
+};
+
+const esbuildBundler: Bundler = {
+  build: async (source) => buildWithEsbuild(source, []),
 } as const;
 
 /**
@@ -933,72 +1042,6 @@ const viteBundler: Bundler = {
 } as const;
 
 /**
- * Fails on a bundle that still reads the environment: a development-only branch
- * the defines did not reach would be measured as shipped code.
- */
-const checked = (
-  code: string,
-  bytesByPackage: ReadonlyMap<string, number>,
-  source: string,
-): BundleOutput => {
-  if (/process\.env|import\.meta/u.test(code)) {
-    throw new Error(
-      `the bundle still reads process.env or import.meta, so a development-only branch may be in it:\n${source}`,
-    );
-  }
-
-  return { code, bytesByPackage };
-};
-
-/**
- * The package a module path belongs to: a workspace package under `libs/`, or a
- * package under `node_modules/`.
- */
-const packageNameOf = (input: string): string => {
-  // esbuild names inputs relative to the working directory, Rolldown by
-  // absolute path; both are read from the repository root, so that a checkout
-  // under a directory named `libs` is not mistaken for a package.
-  const fromRoot = path.relative(repositoryRoot, path.resolve(input));
-
-  const inNodeModules =
-    /node_modules\/(?<name>@[^/]+\/[^/]+|[^/@][^/]*)\/(?!.*node_modules\/)/u.exec(
-      fromRoot,
-    );
-
-  if (inNodeModules?.groups?.['name'] !== undefined) {
-    return inNodeModules.groups['name'];
-  }
-
-  const inLibs = /^libs\/(?<name>[^/]+)\//u.exec(fromRoot);
-
-  if (inLibs?.groups?.['name'] !== undefined) {
-    return inLibs.groups['name'];
-  }
-
-  throw new Error(`cannot tell which package ${input} is from`);
-};
-
-/** The bytes of each module in the output, summed per package. */
-const bytesPerPackage = (
-  modules: readonly (readonly [string, number])[],
-): ReadonlyMap<string, number> => {
-  const mut_bytes = new Map<string, number>();
-
-  for (const [id, bytes] of modules) {
-    // The entry, which only keeps the imports alive, and esbuild's defines.
-    if (bytes === 0 || id.startsWith('<') || id.startsWith('\0')) {
-      continue;
-    }
-
-    const packageName = packageNameOf(id);
-
-    mut_bytes.set(packageName, (mut_bytes.get(packageName) ?? 0) + bytes);
-  }
-
-  return mut_bytes;
-};
-
-/**
  * Builds `source`, resolving every library from the scenarios' package, where
  * the scenarios themselves resolve them and where {@link versionOf} reads the
  * versions the page names.
@@ -1070,6 +1113,33 @@ const versionOf = async (packageName: string): Promise<string> => {
   }
 
   throw new Error(`cannot find the version of ${packageName}`);
+};
+
+/**
+ * The packages `synstate`'s manifest names as dependencies of any kind, read
+ * rather than listed, so that one added later is not measured as `synstate`'s
+ * own code.
+ */
+const dependenciesOfSynstate = async (): Promise<readonly string[]> => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  const text = await fs.readFile(
+    path.resolve(repositoryRoot, 'libs/synstate/package.json'),
+    'utf8',
+  );
+
+  const manifest: unknown = JSON.parse(text);
+
+  if (!isRecord(manifest)) {
+    throw new TypeError('libs/synstate/package.json is not an object');
+  }
+
+  return (
+    ['dependencies', 'peerDependencies', 'optionalDependencies'] as const
+  ).flatMap((field) => {
+    const dependencies = manifest[field];
+
+    return isRecord(dependencies) ? Object.keys(dependencies) : [];
+  });
 };
 
 /** One bundle at a time: esbuild already uses every core for each. */

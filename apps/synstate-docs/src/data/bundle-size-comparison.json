@@ -17,15 +17,15 @@
   "versions": [
     {
       "packageName": "synstate",
-      "version": "6.2.1"
+      "version": "7.0.0"
     },
     {
       "packageName": "ts-data-forge",
-      "version": "14.10.2"
+      "version": "14.11.0"
     },
     {
       "packageName": "ts-std-forge",
-      "version": "0.5.2"
+      "version": "0.5.3"
     },
     {
       "packageName": "rxjs",
@@ -284,9 +284,9 @@
         "scenario": "Conditional fan-out",
         "cells": [
           {
-            "minified": 11310,
-            "gzip": 4268,
-            "brotli": 3890
+            "minified": 11524,
+            "gzip": 4333,
+            "brotli": 3953
           },
           {
             "minified": 18820,
@@ -367,9 +367,9 @@
     ],
     "everything": [
       {
-        "minified": 29405,
-        "gzip": 8343,
-        "brotli": 7557
+        "minified": 29674,
+        "gzip": 8427,
+        "brotli": 7637
       },
       {
         "minified": 63411,
@@ -484,8 +484,8 @@
         "cells": [
           {
             "minified": 11653,
-            "gzip": 4407,
-            "brotli": 4022
+            "gzip": 4406,
+            "brotli": 4021
           },
           {
             "minified": 12111,
@@ -526,8 +526,8 @@
         "cells": [
           {
             "minified": 12606,
-            "gzip": 4706,
-            "brotli": 4313
+            "gzip": 4707,
+            "brotli": 4303
           },
           {
             "minified": 20339,
@@ -567,9 +567,9 @@
         "scenario": "Deep chain",
         "cells": [
           {
-            "minified": 10367,
-            "gzip": 3890,
-            "brotli": 3534
+            "minified": 10368,
+            "gzip": 3888,
+            "brotli": 3530
           },
           {
             "minified": 20580,
@@ -610,8 +610,8 @@
         "cells": [
           {
             "minified": 12606,
-            "gzip": 4706,
-            "brotli": 4313
+            "gzip": 4707,
+            "brotli": 4303
           },
           {
             "minified": 20339,
@@ -651,9 +651,9 @@
         "scenario": "Conditional fan-out",
         "cells": [
           {
-            "minified": 13199,
-            "gzip": 4904,
-            "brotli": 4462
+            "minified": 13420,
+            "gzip": 4977,
+            "brotli": 4530
           },
           {
             "minified": 19483,
@@ -694,8 +694,8 @@
         "cells": [
           {
             "minified": 11653,
-            "gzip": 4407,
-            "brotli": 4022
+            "gzip": 4406,
+            "brotli": 4021
           },
           {
             "minified": 20072,
@@ -734,9 +734,9 @@
     ],
     "everything": [
       {
-        "minified": 34446,
-        "gzip": 9682,
-        "brotli": 8735
+        "minified": 34722,
+        "gzip": 9765,
+        "brotli": 8804
       },
       {
         "minified": 66197,

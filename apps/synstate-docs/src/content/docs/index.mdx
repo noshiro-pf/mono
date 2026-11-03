@@ -38,8 +38,9 @@ In the benchmark summary, SynState stays within {/* bench:summary/synstate-worst
 
     </Card>
     <Card title="Lightweight" icon="seti:favicon">
-        {/* bundle-size:synstate */}~6.8 kB min+gzip{/* /bundle-size:synstate */} with two external runtime dependencies,
-        one of which depends on the other.
+
+{/* bundle-size:synstate */}~7.1 kB min+gzip{/* /bundle-size:synstate */} with two external runtime dependencies, one of which depends on the other. [Compare it with other libraries](/mono/synstate/guides/library-comparison/bundle-size/).
+
     </Card>
     <Card title="React-Optimized" icon="seti:react">
         Fully compatible with React Compiler. `synstate-react-hooks` lets you
@@ -57,7 +58,7 @@ In the benchmark summary, SynState stays within {/* bench:summary/synstate-worst
     </Card>
     <Card title="Typed Routes: synstate-router" icon="link">
 
-[synstate-router](/mono/synstate/synstate-router/introduction/) checks every destination, path parameter and search parameter with the type checker, and keeps its state in SynState Observables. It has bindings for React and synstate-dom.
+[synstate-router](/mono/synstate/synstate-router/introduction/) checks every destination, path parameter and search parameter with the type checker, and keeps its state in SynState Observables. It has bindings for React and synstate-dom, and is not on npm yet.
 
     </Card>
 

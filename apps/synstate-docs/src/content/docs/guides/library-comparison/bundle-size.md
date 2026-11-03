@@ -11,7 +11,7 @@ The [benchmark](/mono/synstate/guides/library-comparison/benchmark/) times each 
 
 - **Everything exported**: every export of the library's entry point, kept whole: `synstate`, `rxjs`, `mobx`, `jotai/vanilla` with `jotai/vanilla/utils`, `@reduxjs/toolkit`, `solid-js`, `@preact/signals-core`, `zustand/vanilla` and `valtio/vanilla`. Treat it as an upper bound: an application keeps only what it imports. Jotai is measured through its vanilla entry points, which export the same functions without the React bindings.
 - **A scenario row**: the exports that the scenario's implementation imports, for example `createState`, `derive` and `map` from `synstate` in the diamond, each kept alive so that none is shaken off. The bundle is the library code that implementation needs. The implementation's own loops and the ts-data-forge helpers the benchmark harness calls are not counted: they would count against every library except SynState, which depends on ts-data-forge itself. Where the benchmark measures a library twice, the row uses its natural form, not the one labelled "(naive …)". A dash marks a scenario the library is not measured in.
-- **Dependencies included**: `synstate` is bundled with `ts-data-forge` and `ts-std-forge`, Redux Toolkit with Redux, Immer and Reselect, and RxJS with tslib. This is what an application downloads. The size quoted in the [introduction](/mono/synstate/getting-started/introduction/) is measured differently: every export of `synstate`, with its dependencies left out, in KiB of 1,024 bytes.
+- **Dependencies included**: `synstate` is bundled with `ts-data-forge` and `ts-std-forge`, Redux Toolkit with Redux, Immer and Reselect, and RxJS with tslib. This is what an application downloads. The size quoted on the [home page](/mono/synstate/), in the [introduction](/mono/synstate/getting-started/introduction/) and in the README is of `synstate` alone instead: every export, bundled by esbuild as here but with ts-data-forge and ts-std-forge left out, <!-- bundle-size:comparison-synstate-alone -->7.1 kB<!-- /bundle-size:comparison-synstate-alone --> minified and gzipped. The site's generators measure it from the current sources, so it can be ahead of the tables below.
 
 Every bundle is built twice, for the browser and minified, with the production build of every library (`process.env.NODE_ENV` and `import.meta.env.MODE` set to `production`): by Vite in production mode, resolving the `browser` and `production` export conditions, and by esbuild, without license comments. The two bundlers do not shake off the same code, and the difference is far larger for some libraries than for others, so both are shown. gzip runs at level 9, Brotli at quality 11. One kB is 1,000 bytes; smaller is better.
 
@@ -19,7 +19,7 @@ Every bundle is built twice, for the browser and minified, with the production b
 
 <!-- bundle-size:comparison-environment -->
 
-Bundled by Vite 8.3.5 and esbuild 0.28.2. `synstate`, `ts-data-forge` and `ts-std-forge` are built from this repository's sources, which can be ahead of the versions their manifests name (`synstate 6.2.1`, `ts-data-forge 14.10.2`, `ts-std-forge 0.5.2`). Versions of the others: `rxjs 7.8.2`, `jotai 3.0.1`, `mobx 7.1.0`, `@reduxjs/toolkit 2.13.0`, `zustand 5.0.15`, `valtio 2.3.2`, `solid-js 1.9.17`, `@preact/signals-core 1.14.4`.
+Bundled by Vite 8.3.5 and esbuild 0.28.2. `synstate`, `ts-data-forge` and `ts-std-forge` are built from this repository's sources, which can be ahead of the versions their manifests name (`synstate 7.0.0`, `ts-data-forge 14.11.0`, `ts-std-forge 0.5.3`). Versions of the others: `rxjs 7.8.2`, `jotai 3.0.1`, `mobx 7.1.0`, `@reduxjs/toolkit 2.13.0`, `zustand 5.0.15`, `valtio 2.3.2`, `solid-js 1.9.17`, `@preact/signals-core 1.14.4`.
 
 <!-- /bundle-size:comparison-environment -->
 
@@ -29,7 +29,7 @@ Bundled by Vite 8.3.5 and esbuild 0.28.2. `synstate`, `ts-data-forge` and `ts-st
 
 | Scenario (kB)                                                                                           | **SynState** | RxJS | MobX | Jotai | Redux | Solid | Preact Signals | Zustand | Valtio |
 | :------------------------------------------------------------------------------------------------------ | -----------: | ---: | ---: | ----: | ----: | ----: | -------------: | ------: | -----: |
-| Everything exported                                                                                     |          8.3 | 17.5 | 15.1 |   4.8 |  14.2 |   8.4 |            2.0 |     0.3 |    1.5 |
+| Everything exported                                                                                     |          8.4 | 17.5 | 15.1 |   4.8 |  14.2 |   8.4 |            2.0 |     0.3 |    1.5 |
 | [Single state](/mono/synstate/guides/library-comparison/benchmark/#scenario-single-state)               |          3.2 |  3.3 | 11.3 |   2.4 |   7.1 |   2.3 |            1.6 |     0.2 |    1.0 |
 | [Derived chain](/mono/synstate/guides/library-comparison/benchmark/#scenario-derived-chain)             |          3.8 |  3.6 | 11.3 |   2.4 |   8.5 |   2.4 |            1.6 |       — |      — |
 | [Diamond](/mono/synstate/guides/library-comparison/benchmark/#scenario-diamond-dependency)              |          4.1 |  6.0 | 11.3 |   2.4 |   8.5 |   2.4 |            1.6 |       — |      — |
@@ -52,7 +52,7 @@ Bundled by Vite 8.3.5 and esbuild 0.28.2. `synstate`, `ts-data-forge` and `ts-st
 | [Diamond](/mono/synstate/guides/library-comparison/benchmark/#scenario-diamond-dependency)              |          3.8 |  5.5 | 10.3 |   2.2 |   7.8 |   2.2 |            1.5 |       — |      — |
 | [Deep chain](/mono/synstate/guides/library-comparison/benchmark/#scenario-deep-chain-throughput)        |          3.0 |  5.5 | 10.4 |   2.3 |   3.4 |   2.2 |            1.5 |       — |      — |
 | [Cascaded diamond](/mono/synstate/guides/library-comparison/benchmark/#scenario-cascaded-diamond)       |          3.8 |  5.5 | 10.3 |   2.2 |   7.8 |   2.2 |            1.5 |       — |      — |
-| [Conditional fan-out](/mono/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out) |          3.9 |  5.2 | 10.3 |   2.2 |   3.4 |   2.2 |            1.5 |       — |      — |
+| [Conditional fan-out](/mono/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out) |          4.0 |  5.2 | 10.3 |   2.2 |   3.4 |   2.2 |            1.5 |       — |      — |
 | [Equality cut-off](/mono/synstate/guides/library-comparison/benchmark/#scenario-equality-cut-off)       |          3.5 |  5.5 | 10.3 |   2.2 |   7.8 |   2.2 |            1.5 |       — |      — |
 
 <!-- /bundle-size:comparison-brotli -->
@@ -63,13 +63,13 @@ Bundled by Vite 8.3.5 and esbuild 0.28.2. `synstate`, `ts-data-forge` and `ts-st
 
 | Scenario (kB)                                                                                           | **SynState** | RxJS | MobX | Jotai | Redux | Solid | Preact Signals | Zustand | Valtio |
 | :------------------------------------------------------------------------------------------------------ | -----------: | ---: | ---: | ----: | ----: | ----: | -------------: | ------: | -----: |
-| Everything exported                                                                                     |          9.7 | 18.6 | 15.8 |   5.1 |  15.2 |   8.7 |            2.0 |     0.3 |    1.6 |
+| Everything exported                                                                                     |          9.8 | 18.6 | 15.8 |   5.1 |  15.2 |   8.7 |            2.0 |     0.3 |    1.6 |
 | [Single state](/mono/synstate/guides/library-comparison/benchmark/#scenario-single-state)               |          3.8 |  3.5 | 12.0 |   2.5 |   8.5 |   2.7 |            1.6 |     0.3 |    1.0 |
 | [Derived chain](/mono/synstate/guides/library-comparison/benchmark/#scenario-derived-chain)             |          4.4 |  3.8 | 11.9 |   2.5 |  10.1 |   2.8 |            1.7 |       — |      — |
 | [Diamond](/mono/synstate/guides/library-comparison/benchmark/#scenario-diamond-dependency)              |          4.7 |  6.4 | 11.9 |   2.5 |  10.1 |   2.8 |            1.7 |       — |      — |
 | [Deep chain](/mono/synstate/guides/library-comparison/benchmark/#scenario-deep-chain-throughput)        |          3.9 |  6.4 | 12.1 |   2.7 |   5.1 |   2.8 |            1.7 |       — |      — |
 | [Cascaded diamond](/mono/synstate/guides/library-comparison/benchmark/#scenario-cascaded-diamond)       |          4.7 |  6.4 | 11.9 |   2.5 |  10.1 |   2.8 |            1.7 |       — |      — |
-| [Conditional fan-out](/mono/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out) |          4.9 |  6.1 | 11.9 |   2.5 |   5.1 |   2.8 |            1.7 |       — |      — |
+| [Conditional fan-out](/mono/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out) |          5.0 |  6.1 | 11.9 |   2.5 |   5.1 |   2.8 |            1.7 |       — |      — |
 | [Equality cut-off](/mono/synstate/guides/library-comparison/benchmark/#scenario-equality-cut-off)       |          4.4 |  6.4 | 11.9 |   2.5 |  10.1 |   2.8 |            1.7 |       — |      — |
 
 <!-- /bundle-size:comparison-esbuild-gzip -->
@@ -95,7 +95,7 @@ The largest share is `synstate` itself. The rest is ts-data-forge and ts-std-for
 
 ## Reading the Results
 
-- **SynState** is under 5 kB in every scenario row with either bundler. In every row it is smaller than MobX, and in every scenario beyond the single state and the derived chain (the diamond, the deep chain, the cascaded diamond, the conditional fan-out and the equality cut-off) it is smaller than RxJS as well. In every scenario row its esbuild figure is within 1 kB of its Vite figure.
+- **SynState** is 5 kB or under in every scenario row with either bundler. In every row it is smaller than MobX, and in every scenario beyond the single state and the derived chain (the diamond, the deep chain, the cascaded diamond, the conditional fan-out and the equality cut-off) it is smaller than RxJS as well. In every scenario row its esbuild figure is within 1 kB of its Vite figure.
 - **RxJS** keeps each operator in a module of its own, so a row grows with the operators its implementation imports: `BehaviorSubject` alone in the single state, `combineLatest` and `map` as well in the diamond.
 - **MobX** keeps most of the library as soon as any part of it is used, so its scenario rows hardly move.
 - **Redux** includes Immer where the implementation uses `createSlice`, whose reducers draft with Immer. The deep chain and the conditional fan-out write a plain reducer matched against `createAction`, and their bundles have no Immer.
