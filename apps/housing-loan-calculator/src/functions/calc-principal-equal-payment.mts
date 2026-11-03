@@ -1,5 +1,5 @@
-import { Arr, Num, Uint32, asPositiveSafeInt } from 'ts-data-forge';
-import { type PercentFloat, Yen } from '../types/index.mjs';
+import { Arr, Num, asPositiveSafeInt, type Uint32 } from 'ts-data-forge';
+import { Yen, type PercentFloat } from '../types/index.mjs';
 
 export const calcPrincipalEqualPayment = ({
   borrowingPeriodMonth: numPayments,
@@ -20,7 +20,8 @@ export const calcPrincipalEqualPayment = ({
     Num.div(borrowingTotalYen, asPositiveSafeInt(numPayments)),
   );
 
-  const borrowingBalanceYen = Arr.seq(Uint32.add(numPayments, 1)).map((i) =>
+  // The balance before each payment: one entry per payment (`CalculatedValues`).
+  const borrowingBalanceYen = Arr.seq(numPayments).map((i) =>
     Yen.cast(borrowingTotalYen - i * fixedPrincipalYenPerMonth),
   );
 

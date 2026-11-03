@@ -1,3 +1,4 @@
+import { Arr } from 'ts-data-forge';
 import {
   BorrowingTotal,
   maxBorrowingTotalManYen,
@@ -71,8 +72,72 @@ describe(calcAll, () => {
 
     expect(values.borrowingBalanceYen[6]).toBe(600_000);
 
-    expect(values.borrowingBalanceYen[12]).toBe(0);
+    expect(values.borrowingBalanceYen[11]).toBe(100_000);
 
     expect(values.interestSumManYen).toBe(0);
+  });
+
+  test.each(repaymentTypes)(
+    'gives one entry per payment, the balance before it (%s)',
+    (repaymentType) => {
+      const values = calcAll({
+        repaymentType,
+        borrowingTotalManYen: BorrowingTotal.cast(1000),
+        borrowingPeriodYear: Year.cast(1),
+        interestRatePercentPerYear: PercentFloat.cast(1),
+      });
+
+      expect(values.borrowingBalanceYen).toHaveLength(12);
+
+      expect(values.interestYen).toHaveLength(12);
+
+      expect(values.monthlyPaymentTotalYen).toHaveLength(12);
+
+      expect(values.monthlyPrincipalPaymentYen).toHaveLength(12);
+
+      expect(values.borrowingBalanceYen[0]).toBe(10_000_000);
+
+      assert.isTrue(values.borrowingBalanceYen.every((b) => b > 0));
+    },
+  );
+
+  test('repays the amount borrowed in principal, principal equal payment', () => {
+    const values = calcAll({
+      repaymentType: 'principal-equal-payment',
+      borrowingTotalManYen: BorrowingTotal.cast(1000),
+      borrowingPeriodYear: Year.cast(1),
+      interestRatePercentPerYear: PercentFloat.cast(1),
+    });
+
+    const principal = values.monthlyPaymentTotalYen.map(
+      (payment, i) => payment - (values.interestYen[i] ?? 0),
+    );
+
+    expect(Arr.sum(principal)).toBeCloseTo(10_000_000, 4);
+  });
+
+  test('repays the amount borrowed in principal, principal and interest equal repayment', () => {
+    const values = calcAll({
+      repaymentType: 'principal-and-interest-equal-repayment',
+      borrowingTotalManYen: BorrowingTotal.cast(1000),
+      borrowingPeriodYear: Year.cast(1),
+      interestRatePercentPerYear: PercentFloat.cast(1),
+    });
+
+    expect(Arr.sum(values.monthlyPrincipalPaymentYen)).toBeCloseTo(
+      10_000_000,
+      4,
+    );
+  });
+
+  test('pays the amount borrowed and no more at 0 percent', () => {
+    const values = calcAll({
+      repaymentType: 'principal-and-interest-equal-repayment',
+      borrowingTotalManYen: BorrowingTotal.cast(120),
+      borrowingPeriodYear: Year.cast(1),
+      interestRatePercentPerYear: PercentFloat.cast(minPercent),
+    });
+
+    expect(Arr.sum(values.monthlyPrincipalPaymentYen)).toBe(1_200_000);
   });
 });
