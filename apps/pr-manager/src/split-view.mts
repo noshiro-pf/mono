@@ -4,21 +4,22 @@ import type { Entry } from './load-report.mjs';
 
 /**
  * A link that opens a pull request in `split-view-extension`: the diff on the
- * left, without whitespace changes or the files marked viewed, and the
- * conversation on the right at 7:3. When the pull request closes an issue or
- * names the Claude Code session it was written in, the right half is shared
- * with it at 1:1, to the right of the conversation, and with both, the issue is
- * stacked over the session to the right of the conversation.
+ * left at the narrowest width that keeps GitHub's file tree, without whitespace
+ * changes or the files marked viewed, and the conversation in the rest of the
+ * page. When the pull request closes an issue or names the Claude
+ * Code session it was written in, the conversation is held at the widest its
+ * description gets with the sidebar below it and that takes the rest, to the
+ * right of the conversation; with both, the issue is stacked over the session.
  *
  * Only the first issue and the first session are shown. A pull request that
  * names several is rare enough that another pane, narrower than anything is
  * readable in, is not worth drawing for it.
  *
  * The conversation and the issue are shown at 75%, so that more of each fits in
- * a pane narrower than GitHub lays them out for — the conversation alone in the
- * right 30% too, so that it reads the same whatever shares the page. The diff
- * is at 100% beside the conversation alone and at 75% in three columns, where
- * it has half the page; the session stays at 100%.
+ * a pane narrower than GitHub lays them out for — the conversation beside the
+ * diff alone too, so that it reads the same whatever shares the page. The diff
+ * is at 100% beside the conversation alone and at 75% in three columns; the
+ * session stays at 100%.
  *
  * The tab is titled `#<number> <title>`, as a tab of the pull request on
  * GitHub would be with the number first.
@@ -36,8 +37,8 @@ export const splitViewUrl = (entry: SplitViewSource): string => {
 
   const conversation = { url: entry.url, zoom: reading } as const;
 
-  // What shares the right half with the conversation, the issue over the
-  // session when there are both.
+  // What goes to the right of the conversation, the issue over the session when
+  // there are both.
   const others = [
     ...(issueUrl === undefined
       ? ([] as const)
@@ -48,13 +49,11 @@ export const splitViewUrl = (entry: SplitViewSource): string => {
   ] as const;
 
   const layout = Arr.isEmpty(others)
-    ? 'r70pp'
+    ? diffBesideConversation
     : Arr.isFixedLengthArray(1, others)
       ? threeColumns
       : threeColumnsStacked;
 
-  // The diff has 70% of the page beside the conversation alone, and half of it
-  // in three columns.
   const diff = {
     url: `${entry.url}/files?${diffQuery}`,
     zoom: Arr.isEmpty(others) ? full : reading,
@@ -115,17 +114,30 @@ const workspaceName = 'PR Manager';
 const diffQuery = 'w=1&show-viewed-files=false';
 
 /**
- * The diff, the middle column and the right column at 2:1:1, as the diff and
- * the middle column in the left three quarters beside the right column, so that
- * closing the middle pane widens the diff. The ratios are not 75% and 2/3
- * because of the 6px gutters: these keep each column within 2px of the width it
- * had as half the page beside a halved right half, at window widths from 1024px
- * to 3840px.
+ * The diff beside the conversation alone: the diff held at 737px and the rest
+ * to the conversation, whose description is what a pull request is reviewed in
+ * now more than its diff.
+ *
+ * 737px is the narrowest the diff is at with GitHub's file tree beside it, at
+ * the diff's 100%: below it the tree folds into a menu. Measured on the pane's
+ * `<section>`, in the split view's own pixels, which are what a layout spec
+ * holds a pane at, so the zoom of the split view's tab does not change it.
  */
-const threeColumns = 'r75.1r66.8ppp';
+const diffBesideConversation = 'r737fpp';
+
+/**
+ * The diff, the conversation and the right column: the diff held at 554px, the
+ * conversation at 577px, and the rest to the right column.
+ *
+ * 554px is the 737px of `diffBesideConversation` at the diff's 75% here: the
+ * pane's 1px borders do not zoom, so it is (737 - 2) × 0.75 + 2, rounded up. 577px is the widest the conversation is at, at its 75%, with the
+ * reviewers, the labels and the rest of the sidebar below the description: from
+ * 578px they move beside it and the description narrows.
+ */
+const threeColumns = 'r554fpr577fpp';
 
 /** `threeColumns`, with the right column stacked in two. */
-const threeColumnsStacked = 'r75.1r66.8ppcpp';
+const threeColumnsStacked = 'r554fpr577fpcpp';
 
 /** 100%, where the extension's `zoom` leaves a pane when it is absent. */
 const full = 1;

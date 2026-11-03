@@ -9,8 +9,10 @@ import {
   WorkspacePicker,
 } from './components/index.mjs';
 import {
+  clampRatio,
   computeGeometry,
   dropTargetAt,
+  type FixedSize,
   type LayoutGeometry,
   type PaneDropTarget,
   type PaneId,
@@ -906,9 +908,21 @@ export const App = memoNamed('App', () => {
         pointerEvent.clientY - stageBounds.top,
       );
 
-      if (ratio !== undefined) {
-        dispatch({ type: 'set-ratio', path: drag.path, ratio });
+      if (ratio === undefined) {
+        return;
       }
+
+      if (drag.fixed === undefined) {
+        dispatch({ type: 'set-ratio', path: drag.path, ratio });
+
+        return;
+      }
+
+      dispatch({
+        type: 'set-fixed-px',
+        path: drag.path,
+        px: fixedPxFromRatio(drag, drag.fixed, ratio),
+      });
     };
 
     const onRelease = (): void => {
@@ -1232,4 +1246,23 @@ const ratioFromPointer = (
     axis === 'row' ? stageX - nodeRect.left : stageY - nodeRect.top;
 
   return Num.div(offset - Num.div(gutterPx, 2), span);
+};
+
+/**
+ * The held child's size, in pixels, for a divider at `ratio` of its node: a
+ * drag moves the divider the same way whichever child is held, and only what is
+ * stored differs.
+ */
+const fixedPxFromRatio = (
+  splitter: SplitterRect,
+  fixed: FixedSize,
+  ratio: number,
+): number => {
+  const { axis, nodeRect } = splitter;
+
+  const span = (axis === 'row' ? nodeRect.width : nodeRect.height) - gutterPx;
+
+  const first = clampRatio(ratio) * span;
+
+  return fixed.child === 'first' ? first : span - first;
 };

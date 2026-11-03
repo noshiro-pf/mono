@@ -27,17 +27,17 @@ describe(splitViewUrl, () => {
     expect(url.pathname).toBe('/split.html');
   });
 
-  test('puts the diff beside the conversation at 7:3', () => {
+  test('holds the diff at 737px beside the conversation', () => {
     const params = paramsOf(
       splitViewUrl({ ...pullRequest, linkedIssues: [], claudeSessions: [] }),
     );
 
-    expect(params.get('layout')).toBe('r70pp');
+    expect(params.get('layout')).toBe('r737fpp');
 
     assert.deepStrictEqual(params.getAll('url'), [diffUrl, pullRequestUrl]);
   });
 
-  test('adds the closed issue on the right, at 2:1:1, the diff and the conversation split off it first', () => {
+  test('adds the closed issue on the right, the diff and the conversation held', () => {
     const params = paramsOf(
       splitViewUrl({
         ...pullRequest,
@@ -46,7 +46,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('r75.1r66.8ppp');
+    expect(params.get('layout')).toBe('r554fpr577fpp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
@@ -64,7 +64,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('r75.1r66.8ppp');
+    expect(params.get('layout')).toBe('r554fpr577fpp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
@@ -73,7 +73,7 @@ describe(splitViewUrl, () => {
     ]);
   });
 
-  test('puts the Claude Code session right of the conversation, at 2:1:1', () => {
+  test('puts the Claude Code session right of the conversation, the diff and the conversation held', () => {
     const params = paramsOf(
       splitViewUrl({
         ...pullRequest,
@@ -82,7 +82,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('r75.1r66.8ppp');
+    expect(params.get('layout')).toBe('r554fpr577fpp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
@@ -100,7 +100,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('r75.1r66.8ppcpp');
+    expect(params.get('layout')).toBe('r554fpr577fpcpp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,

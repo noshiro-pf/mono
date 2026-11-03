@@ -1,5 +1,6 @@
 import { Arr, Num } from 'ts-data-forge';
 import type {
+  FixedSize,
   LayoutNode,
   NodePath,
   PaneDropSide,
@@ -19,6 +20,22 @@ export const splitNode = (
   second: LayoutNode,
   ratio: number = 0.5,
 ): LayoutNode => ({ kind: 'split', axis, ratio, first, second }) as const;
+
+/** A split whose `fixed.child` keeps its size and whose other child takes the rest. */
+export const fixedSplitNode = (
+  axis: SplitAxis,
+  first: LayoutNode,
+  second: LayoutNode,
+  fixed: FixedSize,
+): LayoutNode =>
+  ({
+    kind: 'split',
+    axis,
+    ratio: 0.5,
+    fixed: { child: fixed.child, px: clampFixedPx(fixed.px) },
+    first,
+    second,
+  }) as const;
 
 /**
  * The panes the tree refers to, in tree order: at every split, `first` — the
@@ -201,6 +218,48 @@ export const updateRatioAt = (
 };
 
 /**
+ * Sets the size of the held child of the split node at `path`. A node with no
+ * held child is left as it is: its divider sets a ratio instead.
+ */
+export const updateFixedPxAt = (
+  node: LayoutNode,
+  path: NodePath,
+  px: number,
+): LayoutNode => {
+  if (node.kind === 'pane') {
+    return node;
+  }
+
+  if (!Arr.isNonEmpty(path)) {
+    const clamped = clampFixedPx(px);
+
+    return node.fixed === undefined || node.fixed.px === clamped
+      ? node
+      : { ...node, fixed: { ...node.fixed, px: clamped } };
+  }
+
+  const [head, ...rest] = path;
+
+  if (head === 'first') {
+    const first = updateFixedPxAt(node.first, rest, px);
+
+    return first === node.first ? node : { ...node, first };
+  }
+
+  const second = updateFixedPxAt(node.second, rest, px);
+
+  return second === node.second ? node : { ...node, second };
+};
+
+/**
+ * A whole number of pixels from zero to `maxFixedPx`. How much of that the node
+ * can give is the geometry's to decide, because only it knows the node's size:
+ * it keeps both children within the bounds `clampRatio` sets.
+ */
+export const clampFixedPx = (px: number): number =>
+  Number.isFinite(px) ? Math.min(maxFixedPx, Math.max(0, Math.round(px))) : 0;
+
+/**
  * Keeps a divider from being dragged onto the edge of its node, which would
  * leave a pane too small to have a toolbar, and therefore too small to be
  * dragged back or closed.
@@ -235,6 +294,13 @@ export const evenChainOf = (
     ? splitNode(axis, head, evenChainOf(axis, rest), firstShareOf(nodes.length))
     : head;
 };
+
+/**
+ * Wider than any screen. Without a bound, a hand-written spec could hold a
+ * child at a number `toString` writes in exponent notation, which a spec in a
+ * URL cannot carry.
+ */
+const maxFixedPx = 100_000;
 
 /** The share of the whole that the first of `count` equal parts takes. */
 const firstShareOf = (count: number): number => {

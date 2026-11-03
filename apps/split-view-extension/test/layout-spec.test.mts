@@ -1,5 +1,7 @@
+// cspell:ignore sppp rspp
 import {
   evenChain,
+  fixedSplitNode,
   formatLayoutSpec,
   layoutPresets,
   paneIdsOf,
@@ -34,6 +36,28 @@ describe('formatLayoutSpec', () => {
     assert.deepStrictEqual(
       formatLayoutSpec(splitNode('column', paneNode(0), paneNode(1), 0.25)),
       'c25pp',
+    );
+  });
+
+  test('writes a held child as its size in pixels and f or s', () => {
+    assert.deepStrictEqual(
+      formatLayoutSpec(
+        fixedSplitNode('row', paneNode(0), paneNode(1), {
+          child: 'second',
+          px: 740,
+        }),
+      ),
+      'r740spp',
+    );
+
+    assert.deepStrictEqual(
+      formatLayoutSpec(
+        fixedSplitNode('column', paneNode(0), paneNode(1), {
+          child: 'first',
+          px: 200,
+        }),
+      ),
+      'c200fpp',
     );
   });
 
@@ -78,6 +102,42 @@ describe('parseLayoutSpec', () => {
       parseLayoutSpec('c33.3pp'),
       splitNode('column', paneNode(0), paneNode(1), 0.333),
     );
+  });
+
+  test('reads a whole number followed by f or s as a held child', () => {
+    assert.deepStrictEqual(
+      parseLayoutSpec('r740spp'),
+      fixedSplitNode('row', paneNode(0), paneNode(1), {
+        child: 'second',
+        px: 740,
+      }),
+    );
+
+    assert.deepStrictEqual(
+      parseLayoutSpec('C200FPP'),
+      fixedSplitNode('column', paneNode(0), paneNode(1), {
+        child: 'first',
+        px: 200,
+      }),
+    );
+
+    assert.deepStrictEqual(
+      parseLayoutSpec('rr740sppp'),
+      splitNode(
+        'row',
+        fixedSplitNode('row', paneNode(0), paneNode(1), {
+          child: 'second',
+          px: 740,
+        }),
+        paneNode(2),
+      ),
+    );
+  });
+
+  test('refuses a held child without a whole number of pixels', () => {
+    assert.deepStrictEqual(parseLayoutSpec('rspp'), undefined);
+
+    assert.deepStrictEqual(parseLayoutSpec('r7.5spp'), undefined);
   });
 
   test('clamps a ratio the way a dragged divider is clamped', () => {

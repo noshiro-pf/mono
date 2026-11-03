@@ -2,6 +2,7 @@ import { hasKey, isRecord } from 'ts-data-forge';
 import {
   createPane,
   findPane,
+  fixedSplitNode,
   initialWorkspaceState,
   paneIdsOf,
   paneNode,
@@ -234,6 +235,42 @@ describe('set-sandboxed', () => {
     assert.deepStrictEqual(findPane(state, 0)?.sandboxed, false);
 
     assert.deepStrictEqual(findPane(state, 0)?.reloadToken, 1);
+  });
+});
+
+describe('set-fixed-px', () => {
+  const held: WorkspaceState = {
+    ...initialWorkspaceState(),
+    root: fixedSplitNode('row', paneNode(0), paneNode(1), {
+      child: 'second',
+      px: 740,
+    }),
+  } as const;
+
+  test('sets the size of the held child', () => {
+    assert.deepStrictEqual(
+      workspaceReducer(held, { type: 'set-fixed-px', path: [], px: 600 }).root,
+      fixedSplitNode('row', paneNode(0), paneNode(1), {
+        child: 'second',
+        px: 600,
+      }),
+    );
+  });
+
+  test('is the same state within the same pixel, so that a drag is cheap', () => {
+    assert.isTrue(
+      workspaceReducer(held, { type: 'set-fixed-px', path: [], px: 740.2 }) ===
+        held,
+    );
+  });
+
+  test('is the same state on a split that holds no child', () => {
+    const state = initialWorkspaceState();
+
+    assert.isTrue(
+      workspaceReducer(state, { type: 'set-fixed-px', path: [], px: 600 }) ===
+        state,
+    );
   });
 });
 

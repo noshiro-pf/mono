@@ -99,16 +99,17 @@ export const claudeSessionUrlOfBody = (body: string): string | undefined =>
 /**
  * The query string of `split.html` that opens a pull request as the PR
  * Manager's links do (`apps/pr-manager/src/split-view.mts`): the diff, without
- * whitespace changes or the files already viewed, beside the conversation at
- * 7:3. When the pull request closes an issue or names the
- * Claude Code session it was written in, the right half is shared with it at
- * 1:1, to the right of the conversation, and with both, the issue is stacked
- * over the session to the right of the conversation.
+ * whitespace changes or the files already viewed, at the narrowest width that
+ * keeps GitHub's file tree, beside the conversation in the rest of the page.
+ * When the pull request closes an issue or names the Claude Code session it was
+ * written in, the conversation is held at a fixed width and that takes the
+ * rest, to the right of the conversation; with both, the issue is stacked over
+ * the session.
  *
  * The conversation and the issue are at 75%, so that more of each fits — the
  * conversation beside the diff alone too, so that it reads the same whatever
  * shares the page. The diff is at 100% beside the conversation alone and at 75%
- * in three columns, where it has half the page; the session is at 100%.
+ * in three columns; the session is at 100%.
  *
  * Every pull request opened this way reuses one saved split view,
  * `github-pull-request`, rather than adding one to the list each time. It is
@@ -130,8 +131,8 @@ export const pullRequestSplitViewSearch = ({
 }>): string => {
   const conversation = { url: pullRequest.url, zoom: narrow } as const;
 
-  // What shares the right half with the conversation, the issue over the
-  // session when there are both.
+  // What goes to the right of the conversation, the issue over the session when
+  // there are both.
   const others = [
     ...(issueUrl === undefined
       ? ([] as const)
@@ -142,13 +143,11 @@ export const pullRequestSplitViewSearch = ({
   ] as const;
 
   const layout = Arr.isEmpty(others)
-    ? 'r70pp'
+    ? diffBesideConversation
     : Arr.isFixedLengthArray(1, others)
       ? threeColumns
       : threeColumnsStacked;
 
-  // The diff has 70% of the page beside the conversation alone, and half of it
-  // in three columns.
   const diff = {
     url: `${pullRequest.url}/files?${diffQuery}`,
     zoom: Arr.isEmpty(others) ? full : narrow,
@@ -259,13 +258,17 @@ const full = 1;
 const narrow = 0.75;
 
 /**
- * The diff, the middle column and the right column at 2:1:1, as the diff and
- * the middle column in the left three quarters beside the right column, so that
- * closing the middle pane widens the diff. The PR Manager's `threeColumns`
- * (`apps/pr-manager/src/split-view.mts`) says why the ratios are not 75% and
- * 2/3.
+ * The diff beside the conversation alone, the diff held at 737px. The PR
+ * Manager's `diffBesideConversation` says why.
  */
-const threeColumns = 'r75.1r66.8ppp';
+const diffBesideConversation = 'r737fpp';
+
+/**
+ * The diff, the conversation and the right column, the diff and the
+ * conversation held at fixed widths. The PR Manager's `threeColumns`
+ * (`apps/pr-manager/src/split-view.mts`) says why those.
+ */
+const threeColumns = 'r554fpr577fpp';
 
 /** `threeColumns`, with the right column stacked in two. */
-const threeColumnsStacked = 'r75.1r66.8ppcpp';
+const threeColumnsStacked = 'r554fpr577fpcpp';

@@ -123,25 +123,25 @@ describes a split view opens it, and adds it to the list if it names none.
 
 ```text
 chrome-extension://nifmgpafbfpgpcijgmfpcoonjbalbkhf/split.html
-    ?layout=r70pp
+    ?layout=r737fpp
     &url=https://github.com/noshiro-pf/mono/pull/2052/files
     &url=https://github.com/noshiro-pf/mono/pull/2052
 ```
 
-That is a pull request's diff beside its conversation, at 7:3. The id in the
-host part is the one an unpacked build has wherever it is loaded from; a build
-installed from the store has an id of its own (see
+That is a pull request's diff, 737px wide, beside its conversation in the rest
+of the page. The id in the host part is the one an unpacked build has wherever
+it is loaded from; a build installed from the store has an id of its own (see
 [`docs/how-it-works.md`](./docs/how-it-works.md#the-list-and-what-it-is-keyed-to)).
 
-| parameter | means                                                                                                                                                                                                                                                                                                                             |
-| :-------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `layout`  | the arrangement: `p` is a pane, `r` puts the next two things side by side and `c` stacks them, each followed by the first one's share in percent when it is not 50. `rcppcpp` is a 2×2 grid, `rpcpp` one pane beside two stacked. A preset's name (`grid-2x2`, `columns-3`, …) works too. Left out, the addresses go side by side |
-| `url`     | one per pane, in the order the layout names them — down each column, then rightwards. Written as in the address bar, so `github.com/…` works, and escaped as any query value is (`encodeURIComponent`), so an address with a query or a fragment of its own comes through whole. A pane with none stays empty                     |
-| `zoom`    | one per pane, `0.5` to `2`. Left out, 100%                                                                                                                                                                                                                                                                                        |
-| `sandbox` | one per pane, `0` to turn that pane's sandbox off (the padlock). Left out, on                                                                                                                                                                                                                                                     |
-| `name`    | what to call the split view, when this URL is what adds it to the list                                                                                                                                                                                                                                                            |
-| `title`   | what to call the tab, `#2071 Fix the thing` say. Saved with the view. Left out, the tab follows the top-left pane                                                                                                                                                                                                                 |
-| `ws`      | which saved split view to show. Alone, it opens what is saved; with the parameters above, what they describe is shown and saved under that id                                                                                                                                                                                     |
+| parameter | means                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| :-------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `layout`  | the arrangement: `p` is a pane, `r` puts the next two things side by side and `c` stacks them, each followed by the first one's share in percent when it is not 50 — or by a whole number of pixels and `f` or `s`, to hold the first or the second one at that size and give the other the rest. `rcppcpp` is a 2×2 grid, `rpcpp` one pane beside two stacked, `r737fpp` a 737px column beside a pane. A preset's name (`grid-2x2`, `columns-3`, …) works too. Left out, the addresses go side by side |
+| `url`     | one per pane, in the order the layout names them — down each column, then rightwards. Written as in the address bar, so `github.com/…` works, and escaped as any query value is (`encodeURIComponent`), so an address with a query or a fragment of its own comes through whole. A pane with none stays empty                                                                                                                                                                                           |
+| `zoom`    | one per pane, `0.5` to `2`. Left out, 100%                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `sandbox` | one per pane, `0` to turn that pane's sandbox off (the padlock). Left out, on                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `name`    | what to call the split view, when this URL is what adds it to the list                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `title`   | what to call the tab, `#2071 Fix the thing` say. Saved with the view. Left out, the tab follows the top-left pane                                                                                                                                                                                                                                                                                                                                                                                       |
+| `ws`      | which saved split view to show. Alone, it opens what is saved; with the parameters above, what they describe is shown and saved under that id                                                                                                                                                                                                                                                                                                                                                           |
 
 So a link with `ws=pr-review` and the parameters above reuses one saved split
 view for every pull request you open this way, and a link without `ws` adds a
@@ -167,18 +167,23 @@ finds itself framed draws nothing.
 
 ### GitHub pull requests
 
-Every pull request page on github.com, in any repository, has a **⧉ Split
-view** button at the bottom left. It opens the pull request in a new tab the way
-the [PR Manager](../pr-manager/docs/design.md#opening-a-pull-request-in-a-split-view)'s
+Every pull request page on github.com, in any repository, has a **⧉ Split view**
+button at the bottom left. It opens the pull request in a new tab the way the
+[PR
+Manager](../pr-manager/docs/design.md#opening-a-pull-request-in-a-split-view)'s
 links do: the diff, without whitespace changes or the files already marked
-viewed, beside the conversation at 7:3. When the pull request closes an
-issue, or names the Claude Code session it was written in, that shares the
-right half at 1:1, to the right of the conversation; with both, the issue is
-stacked over the session to the right of the conversation. The conversation
-and the issue are at 75% so that more of each fits, as is the diff in three
-columns; the diff beside the conversation alone, and the session, are at 100%. The pull request's own tab is closed once the split view has
-opened, so the split view takes its place; `Ctrl`+click or a middle click
-opens it behind the current tab instead, and keeps that tab.
+viewed, at 737px — the narrowest that keeps GitHub's file tree beside it — and
+the conversation in the rest of the page. When the pull request closes an issue,
+or names the Claude Code session it was written in, the diff is held at 554px
+(737px at its 75% there), the conversation at 577px — the widest its description
+gets with the reviewers and the labels below it rather than beside it — and the
+rest goes to the issue or the session, to the right of the conversation; with
+both, the issue is stacked over the session. The conversation and the issue are
+at 75% so that more of each fits, as is the diff in three columns; the diff
+beside the conversation alone, and the session, are at 100%. The pull request's
+own tab is closed once the split view has opened, so the split view takes its
+place; `Ctrl`+click or a middle click opens it behind the current tab instead,
+and keeps that tab.
 
 A link to a pull request — on GitHub, in a mail, in a chat — has **Open pull
 request in Split View** in its context menu, and so does a pull request's own
