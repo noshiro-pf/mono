@@ -8,8 +8,8 @@ export type QueueTipContent = Readonly<{
   /** What the word under the number leaves out, if anything. */
   detail: string | undefined;
   /**
-   * Which end of the row it is drawn from: the start for a box in the first
-   * half, the end for one in the second.
+   * Which end of the row it is drawn from: the start for a box in the left half
+   * of what is in view, the end for one in the right half.
    */
   side: 'start' | 'end';
 }>;

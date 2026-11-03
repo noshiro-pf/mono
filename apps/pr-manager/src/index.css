@@ -1324,18 +1324,24 @@ a:focus-visible {
 /* --- the queue ---------------------------------------------------------- */
 
 /*
- * One row of boxes, every box the same width however many there are, so the
- * whole queue is in view; each box is a size container, and the number in it
- * is sized to the box. The running one is filled with the accent; one whose
- * turn has not come is a dashed box in the DAG's waiting amber, and one with
- * a check failed the same in red. What is not the worker's to move is outside
- * the row in the attention orange, as a set-aside badge is.
+ * One row of boxes, every box the same width, sharing the row but never
+ * narrower than the number needs; a row with more than fit scrolls across,
+ * with the running one held at its start, the edge faded where more is out of
+ * view, and a map of the whole queue above it. Each box is a size container,
+ * and the number in it is sized to the box. The running one is filled with
+ * the accent; one whose turn has not come is a dashed box in the DAG's waiting
+ * amber, and one with a check failed the same in red. What is not the worker's
+ * to move is outside the row in the attention orange, as a set-aside badge is.
  */
 .queue-section {
   --queue-frame: light-dark(#a9a8a1, #5a5955);
   --queue-divider: light-dark(#d6d5ce, #3a3a37);
   --queue-waiting: light-dark(#935610, #f0b35a);
   --queue-outside: light-dark(#b4501f, #ec835a);
+  --queue-slot-min: 4.75rem;
+  --queue-map-height: 0.75rem;
+  --queue-map-gap: 0.375rem;
+  --queue-fade: 2.5rem;
 }
 
 .queue-counts {
@@ -1361,6 +1367,11 @@ a:focus-visible {
   margin-top: 0.5rem;
 }
 
+/* And below the map, when there is one. */
+.queue-row:has(> .queue-track[data-overflows='true']) > .queue-base {
+  margin-top: calc(0.5rem + var(--queue-map-height) + var(--queue-map-gap));
+}
+
 .queue-track {
   flex: 1;
   min-width: 0;
@@ -1371,16 +1382,132 @@ a:focus-visible {
   display: flex;
   list-style: none;
   margin: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
   /* Room for the priority pills across the top edge. */
   padding: 0.5rem 0 0;
+  /* A box reached by Tab is not left under a faded edge. */
+  scroll-padding-inline: var(--queue-fade);
+}
+
+.queue-track[data-overflows='true'] > .queue {
+  /* Off the scroll bar. */
+  padding-bottom: 0.375rem;
+}
+
+/* A box reached by Tab is not left under the running one, which stays put. */
+.queue:has(> .queue-slot[data-kind='running']:first-child) {
+  scroll-padding-inline-start: var(--queue-slot-min);
+}
+
+.queue-track[data-more-after='true'] > .queue {
+  mask-image: linear-gradient(
+    to right,
+    #000 calc(100% - var(--queue-fade)),
+    transparent
+  );
+}
+
+/* Faded before as well only with no running box held there. */
+.queue-track[data-more-before='true'][data-more-after='true']
+  > .queue:not(:has(> .queue-slot[data-kind='running']:first-child)) {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--queue-fade),
+    #000 calc(100% - var(--queue-fade)),
+    transparent
+  );
+}
+
+.queue-track[data-more-before='true'][data-more-after='false']
+  > .queue:not(:has(> .queue-slot[data-kind='running']:first-child)) {
+  mask-image: linear-gradient(to right, transparent, #000 var(--queue-fade));
 }
 
 .queue-slot {
   container-type: inline-size;
   display: flex;
-  flex: 1 1 0;
+  /* Wide enough for `#` and five digits at full size. */
+  flex: 1 0 var(--queue-slot-min);
   flex-direction: column;
   min-width: 0;
+}
+
+/* The first running box; a second one, should there be one, scrolls by. */
+.queue-slot[data-kind='running']:first-child {
+  background: var(--surface);
+  left: 0;
+  position: sticky;
+  /* Over the priority pills scrolling under it. */
+  z-index: 2;
+}
+
+/* The map of the whole queue, over a row that scrolls (`queue-map.tsx`). */
+.queue-map {
+  cursor: pointer;
+  display: flex;
+  gap: 1px;
+  height: var(--queue-map-height);
+  margin-bottom: var(--queue-map-gap);
+  position: relative;
+}
+
+.queue-map-mark {
+  background: color-mix(in srgb, var(--ink-muted) 28%, transparent);
+  border-radius: 1.5px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.queue-map-mark[data-priority='high'] {
+  background: var(--ink-primary);
+}
+
+.queue-map-mark[data-priority='mid'] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.2px var(--ink-primary);
+}
+
+.queue-map-mark[data-priority='low'] {
+  opacity: 0.35;
+}
+
+.queue-map-mark:is(
+  [data-kind='waiting'],
+  [data-kind='failing'],
+  [data-kind='running']
+) {
+  /* Never faded for a low priority: these are what the map is looked at for. */
+  opacity: 1;
+}
+
+.queue-map-mark[data-kind='waiting'] {
+  background: color-mix(in srgb, var(--queue-waiting) 22%, transparent);
+  box-shadow: none;
+  outline: 1px dashed var(--queue-waiting);
+  outline-offset: -1px;
+}
+
+.queue-map-mark[data-kind='failing'] {
+  background: var(--status-critical);
+  box-shadow: none;
+}
+
+.queue-map-mark[data-kind='running'] {
+  background: var(--accent);
+  box-shadow: none;
+}
+
+/* The part of the queue in view. */
+.queue-map-window {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1.5px solid var(--accent);
+  border-radius: 4px;
+  bottom: -3px;
+  pointer-events: none;
+  position: absolute;
+  top: -3px;
 }
 
 .queue-slot > .queue-link {
@@ -1529,8 +1656,8 @@ a:focus-visible {
 
 /*
  * The title on hover or focus, under the row: from its start for a box in the
- * first half, and to its end for one in the second, and never wider than the
- * row (`queue-tip.tsx`).
+ * left half of what is in view, and to its end for one in the right half, and
+ * never wider than the row (`queue-tip.tsx`).
  */
 .queue-tip {
   background: light-dark(#fff, #2b2b29);
