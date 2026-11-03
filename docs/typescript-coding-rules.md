@@ -13,8 +13,11 @@ intended fix is shown under "Troubleshooting".
 - **Type safety**: lean on `ts-type-forge` for type-level work.
 - **Type guards**: prefer type guard functions over type assertions.
 - **Imports**: import `.mts` with the `.mjs` extension. Use relative paths
-  within `src/`; never import from `dist/`, and never name `index.mjs`
-  directly.
+  within `src/`, and never import from `dist/`. Import another directory through
+  its barrel, `'../dir/index.mjs'`, never a file inside it
+  (`import-x/no-internal-modules`, whose `allow` list a package's ESLint config
+  may extend for named paths). Never import the importing file's own or an
+  ancestor's barrel (`./index.mjs`, `../index.mjs`; `no-restricted-imports`).
 - **Exports**: everything a directory offers goes through its generated
   `index.mts`. Use named exports; a default export is for configuration only.
 - **Documentation**: generated from TSDoc comments by TypeDoc.
@@ -393,9 +396,18 @@ assert.deepStrictEqual(result.value, { data: [] });
 
 ### ts-type-forge
 
-`DeepReadonly`, `StrictOmit`, `ReadonlyRecord` and the rest are global types,
-declared by the `global.d.mts` that `ts-type-forge` provides; do not import
-them.
+Import `DeepReadonly`, `StrictOmit`, `ReadonlyRecord` and the rest as types from
+`'ts-type-forge'`:
+
+```ts
+import type { DeepReadonly } from 'ts-type-forge';
+```
+
+The ambient globals of `ts-type-forge/global` are for consumers. Outside
+`libs/ts-type-forge` and `verify-npm-packages/`, which exercise that entry point
+as a consumer would, no tsconfig lists it and no source file references it, so a
+name used without its import is `TS2304: Cannot find name`. The fix is the
+import, not adding `ts-type-forge/global` to a tsconfig.
 
 ### ts-data-forge
 
