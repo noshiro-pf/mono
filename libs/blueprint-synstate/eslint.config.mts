@@ -41,13 +41,17 @@ export default [
     files: ['test/**'],
     rules: defineKnownRules({
       // `samples.test.tsx` runs the README samples, which are modules of
-      // their own rather than part of the package.
+      // their own rather than part of the package; `visual-parity.test.tsx`
+      // loads Blueprint's style sheets, which are published as files, and
+      // takes screenshots through `vitest/browser`.
       'import-x/no-internal-modules': [
         'error',
         {
           allow: [
             ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
             '**/samples/readme/*',
+            '@blueprintjs/*/lib/css/*.css',
+            'vitest/browser',
           ],
         },
       ],
