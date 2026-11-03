@@ -564,8 +564,10 @@ each caller passes it as `result-job: <name>-result / result`.
   reports the cancelled ones as a failure, so the pull request would be
   blocked on an unrelated failure with nothing to read.
 - **`pnpm run z:assert-repo-is-clean`** after the command. For a `fix:` or
-  `gen:` entry that is the check: the command rewrites, and a dirty tree is
-  the failure.
+  `gen:` entry that is the check: the command rewrites, and a dirty tree is the
+  failure. A root `gen:*` script such a job runs has to be one `check-changed`
+  schedules for some diff (`check:root:ci-generators`), or a change only it
+  rewrites passes locally and fails here.
 - **A matrix entry is `pnpm run <script>`.** `pnpm run check:root:ci-commands`
   asks whether any entry duplicates another and whether any check script runs
   nowhere. What a script body cannot show is declared in `DECLARED_COVERAGE`;
@@ -796,9 +798,11 @@ Nothing checks this; a review does.
   anything else must skip the aggregate with `no_verdict` rather than
   conclude (see "Reusing a verdict").
 - **Local guards that read this directory**: `check:root:actionlint`,
-  `check:root:ci-commands`, `check:root:workflow-event-name`,
-  `check:root:node-support`, `check:root:restart-unblock-prs-paths`. `fmt` and `check:cspell` read it too; CI itself
-  runs nothing on a workflow change until the pull request runs.
+  `check:root:ci-commands`, `check:root:ci-generators`,
+  `check:root:workflow-event-name`,
+  `check:root:node-support`, `check:root:restart-unblock-prs-paths`. `fmt` and
+  `check:cspell` read it too; CI itself runs nothing on a workflow change until
+  the pull request runs.
   `check:root:actionlint` also lints the composite actions' steps, which
   actionlint does not read on its own. It downloads the actionlint and
   shellcheck that `tools/configs/release-binaries.json` pins, so it needs

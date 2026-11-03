@@ -341,6 +341,28 @@ export const findUncoveredCommands = (
   );
 };
 
+/**
+ * The root scripts that running the given root scripts runs, those included:
+ * what a workflow's `pnpm run <name>` reaches through the root manifest's
+ * `pnpm run`, `run-s` and `run-p`, and the declared edges between them.
+ */
+export const rootScriptsReachedFrom = (
+  graph: CoverageGraph,
+  scriptNames: readonly string[],
+): readonly string[] => {
+  const prefix = toCommandId(ROOT_DIRECTORY, '');
+
+  return Array.from(
+    reachableFrom(
+      graph,
+      scriptNames.map((name) => toCommandId(ROOT_DIRECTORY, name)),
+    ),
+  )
+    .filter((id) => id.startsWith(prefix))
+    .map((id) => id.slice(prefix.length))
+    .toSorted();
+};
+
 export type Manifest = Readonly<{
   /** Relative to the repository root; `.` for the root manifest. */
   directory: string;
@@ -579,6 +601,32 @@ export const collectWorkflowCommands = (
   return Arr.uniq([...literals, ...fromMatrix]).toSorted();
 };
 
+export const readRootManifest = async (): Promise<Result<Manifest, string>> => {
+  const manifestPath = path.join(projectRootPath, 'package.json');
+
+  const contents = await Result.fromPromise(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFile(manifestPath, 'utf8'),
+  );
+
+  if (Result.isErr(contents)) {
+    return Result.err(
+      `Failed to read package.json: ${unknownToString(contents.value)}`,
+    );
+  }
+
+  const parsed = Json.parse(contents.value);
+
+  return Result.isErr(parsed)
+    ? Result.err(
+        `Failed to parse package.json: ${unknownToString(parsed.value)}`,
+      )
+    : Result.ok({
+        directory: ROOT_DIRECTORY,
+        scripts: readScripts(parsed.value),
+      });
+};
+
 const toCommandId = (directory: string, scriptName: string): CommandId =>
   `${directory}:${scriptName}` as const;
 
@@ -769,32 +817,6 @@ const readScripts = (manifest: unknown): ReadonlyRecord<string, string> => {
   return Obj.filterMap(scripts, (body) =>
     isString(body) ? Optional.some(body) : Optional.none,
   );
-};
-
-const readRootManifest = async (): Promise<Result<Manifest, string>> => {
-  const manifestPath = path.join(projectRootPath, 'package.json');
-
-  const contents = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(manifestPath, 'utf8'),
-  );
-
-  if (Result.isErr(contents)) {
-    return Result.err(
-      `Failed to read package.json: ${unknownToString(contents.value)}`,
-    );
-  }
-
-  const parsed = Json.parse(contents.value);
-
-  return Result.isErr(parsed)
-    ? Result.err(
-        `Failed to parse package.json: ${unknownToString(parsed.value)}`,
-      )
-    : Result.ok({
-        directory: ROOT_DIRECTORY,
-        scripts: readScripts(parsed.value),
-      });
 };
 
 const readManifests = async (): Promise<

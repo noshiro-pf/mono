@@ -33,13 +33,15 @@ by case. In order:
    dirty tree CI's `assert-repo-is-clean` reports with no hint which generator
    wrote it. Only the run in which it writes fails: a later run cannot tell its
    output, left uncommitted, from a hand edit, so commit it before moving on.
-   After the touched packages' own, `gen` runs in every member that declares (in
-   any dependency field) a package whose code changed, since a generator can
-   read what its package declares: the synstate docs measure synstate's bundle
-   and embed its JSDoc, the hooks packages re-export what it exports. Such a
-   package is built first (`build`) when an import of it resolves to `dist/`, so
-   that they read it rebuilt; a dependent the diff touches runs its generator
-   again after the build.
+   A root `gen:*` script a workflow runs before that assertion and no area here
+   schedules fails `check:root:ci-generators` instead. After the touched
+   packages' own, `gen` runs in every member that declares (in any dependency
+   field) a package whose code changed, since a generator can read what its
+   package declares: the synstate docs measure synstate's bundle and embed its
+   JSDoc, the hooks packages re-export what it exports. Such a package is built
+   first (`build`) when an import of it resolves to `dist/`, so that they read
+   it rebuilt; a dependent the diff touches runs its generator again after the
+   build.
 3. **Fixers**: the codemod over the diff (`z:ts-codemod --diff-from`, plus
    `--uncommitted` when there are untracked files, which `--diff-from` cannot
    see), then `fix:lint` in every package whose code changed, so that what the

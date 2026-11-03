@@ -53,6 +53,7 @@
     "check:root:actionlint": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-actionlint/main.mts",
     "check:root:app-head": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-app-head.mts",
     "check:root:ci-commands": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-ci-commands.mts",
+    "check:root:ci-generators": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-ci-generators.mts",
     "check:root:deps-built-guard": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-deps-built-guard.mts",
     "check:root:dist-lib-replacement": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-dist-lib-replacement.mts",
     "check:root:example-coverage": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-example-coverage.mts",

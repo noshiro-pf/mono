@@ -431,19 +431,23 @@ export const readManifestDependencies = (
  * `LICENSE` or `gen-license-files.mts` itself; `gen:license-files` runs on it
  * and on `manifest`, whose `license` and `private` fields decide what it writes.
  */
-export type Area =
-  | 'root'
-  | 'root-guards'
-  | 'prose'
-  | 'manifest'
-  | 'license'
-  | 'codemod'
-  | 'strict-lib'
-  | 'changeset'
-  | 'repo-settings'
-  | 'shared-config'
-  | 'spell-config'
-  | 'format-config';
+export type Area = (typeof AREAS)[number];
+
+/** Every {@link Area}, which `check:root:ci-generators` plans one at a time. */
+export const AREAS = [
+  'root',
+  'root-guards',
+  'prose',
+  'manifest',
+  'license',
+  'codemod',
+  'strict-lib',
+  'changeset',
+  'repo-settings',
+  'shared-config',
+  'spell-config',
+  'format-config',
+] as const;
 
 export type Classification = Readonly<{
   packages: readonly Readonly<{ pkg: PackageInfo; code: boolean }>[];
