@@ -61,7 +61,6 @@ export const optional = <T extends UnknownType>(
   // defined never terminates.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   copyTypeByDescriptors(t, {
-    ...Object.getOwnPropertyDescriptors(t),
     ...(options?.forceUndefinedDefault === true
       ? // For recursive types: set defaultValue to undefined to avoid infinite loops
         { defaultValue: { value: undefined, enumerable: true } }
@@ -69,8 +68,7 @@ export const optional = <T extends UnknownType>(
     optional: { value: true, enumerable: true },
   }) as OptionalPropertyType<T>;
 
-export type OptionalPropertyType<T extends UnknownType> = T &
-  Readonly<{ optional: true }>;
+export type OptionalPropertyType<T extends UnknownType> = ((T) & Readonly<({ optional: true })>);
 
 export type RequiredPropertyType<T extends UnknownType> =
   T extends OptionalPropertyType<T> ? StrictOmit<T, 'optional'> : T;

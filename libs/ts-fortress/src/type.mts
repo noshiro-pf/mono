@@ -92,26 +92,8 @@ export type TypeAnnotations<A = unknown> = Partial<
  * it (OpenAPI's `int32` or `password`, for example).
  */
 export type JsonSchemaFormat =
-  | 'date-time'
-  | 'date'
-  | 'time'
-  | 'duration'
-  | 'email'
-  | 'idn-email'
-  | 'hostname'
-  | 'idn-hostname'
-  | 'ipv4'
-  | 'ipv6'
-  | 'uri'
-  | 'uri-reference'
-  | 'iri'
-  | 'iri-reference'
-  | 'uuid'
-  | 'uri-template'
-  | 'json-pointer'
-  | 'relative-json-pointer'
-  | 'regex' // Keeps the names above in autocomplete while accepting any other string.
-  | (string & {});
+  ('date-time' | 'date' | 'time' | 'duration' | 'email' | 'idn-email' | 'hostname' | 'idn-hostname' | 'ipv4' | 'ipv6' | 'uri' | 'uri-reference' | 'iri' | 'iri-reference' | 'uuid' | 'uri-template' | 'json-pointer' | 'relative-json-pointer' | 'regex' | // Keeps the names above in autocomplete while accepting any other string.
+    (string & {}));
 
 /**
  * The runtime description of a {@link Type}, discriminated by `kind`.
@@ -139,101 +121,79 @@ export type JsonSchemaFormat =
  * - `recursion` — `resolve` returns the definition, called lazily so that a
  *   type defined in terms of itself can be traversed without looping.
  */
-export type TypeStructure = Readonly<
-  | {
-      kind:
-        | 'string'
-        | 'number'
-        | 'bigint'
-        | 'boolean'
-        | 'symbol'
-        | 'null'
-        | 'undefined'
-        | 'unknown'
-        | 'templateLiteral';
-    }
-  | {
-      kind: 'literal';
-      value: StrictExtract<Primitive, string | number | bigint | boolean>;
-    }
-  | { kind: 'enum'; values: readonly Primitive[] }
-  | { kind: 'integerRange'; min: number; max: number }
-  | {
-      kind: 'record';
-      shape: UnknownShape;
-      excessProperty: ExcessPropertyOption;
-    }
-  | {
-      kind: 'keyValueRecord';
-      keyType: UnknownType;
-      valueType: UnknownType;
-    }
-  | {
-      kind: 'array';
-      elementType: UnknownType;
-      minLength: number | undefined;
-      maxLength: number | undefined;
-    }
-  | { kind: 'tuple'; elementTypes: readonly UnknownType[] }
-  | { kind: 'union'; memberTypes: readonly UnknownType[] }
-  | { kind: 'intersection'; memberTypes: readonly UnknownType[] }
-  | { kind: 'map'; keyType: UnknownType; valueType: UnknownType }
-  | { kind: 'set'; elementType: UnknownType }
-  | { kind: 'refine'; baseType: UnknownType }
-  | {
-      kind: 'brand';
-      baseType: UnknownType;
-      brandKeys: readonly string[];
-      brandFalseKeys: readonly string[];
-      refined: boolean;
-    }
-  | {
-      kind: 'recursion';
-      typeName: string;
-      resolve: () => UnknownType;
-    }
->;
+export type TypeStructure = Readonly<({
+              kind:
+                ('string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'null' | 'undefined' | 'unknown' | 'templateLiteral');
+            }) | ({
+              kind: 'literal';
+              value: StrictExtract<Primitive, (string | number | bigint | boolean)>;
+            }) | ({ kind: 'enum'; values: readonly Primitive[] }) | ({ kind: 'integerRange'; min: number; max: number }) | ({
+              kind: 'record';
+              shape: UnknownShape;
+              excessProperty: ExcessPropertyOption;
+            }) | ({
+              kind: 'keyValueRecord';
+              keyType: UnknownType;
+              valueType: UnknownType;
+            }) | ({
+              kind: 'array';
+              elementType: UnknownType;
+              minLength: (number | undefined);
+              maxLength: (number | undefined);
+            }) | ({ kind: 'tuple'; elementTypes: readonly UnknownType[] }) | ({ kind: 'union'; memberTypes: readonly UnknownType[] }) | ({ kind: 'intersection'; memberTypes: readonly UnknownType[] }) | ({ kind: 'map'; keyType: UnknownType; valueType: UnknownType }) | ({ kind: 'set'; elementType: UnknownType }) | ({ kind: 'refine'; baseType: UnknownType }) | ({
+              kind: 'brand';
+              baseType: UnknownType;
+              brandKeys: readonly string[];
+              brandFalseKeys: readonly string[];
+              refined: boolean;
+            }) | ({
+              kind: 'recursion';
+              typeName: string;
+              resolve: () => UnknownType;
+            })>;
 
 /** The `kind`s of {@link TypeStructure}. */
 export type TypeStructureKind = TypeStructure['kind'];
 
 /**
  * @internal Replaces the {@link TypeStructure} of `type`, keeping every other
- * property as it is — by property descriptor, for the reason given in
- * `attachConstraints`.
+ * property as it is, and its prototype, by {@link copyTypeByDescriptors}.
  */
 export const withStructure = <T extends UnknownType>(
   type: T,
   structure: TypeStructure,
 ): T =>
-  // The same object with one property replaced.
-  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  Object.defineProperties(
-    {},
-    {
-      ...Object.getOwnPropertyDescriptors(type),
-      structure: { value: structure, enumerable: true },
-    },
-  ) as T;
+  copyTypeByDescriptors(type, {
+    structure: { value: structure, enumerable: true },
+  });
 
 /**
- * @internal A new object with the prototype of `type` and the property
- * `descriptors` given, which are usually `type`'s own with some replaced.
- * Copying by descriptor leaves a lazy `defaultValue` getter unevaluated (see
- * `attachConstraints`), and keeping the prototype keeps the members a `Type`
- * written as a class inherits.
+ * @internal A copy of `type` with the property descriptors in `overrides`
+ * replacing its own. Every copy of a type goes through here (a lint rule in
+ * `eslint.config.mts` says so): copying by descriptor leaves a lazy
+ * `defaultValue` getter unevaluated (see `attachConstraints`), and keeping the
+ * prototype keeps the members a `Type` written as a class inherits.
  */
-export const copyTypeByDescriptors = (
-  type: UnknownType,
-  descriptors: PropertyDescriptorMap,
-): unknown => {
+export const copyTypeByDescriptors = <T extends UnknownType>(
+  type: T,
+  overrides: PropertyDescriptorMap,
+): T => {
   const proto: unknown = Object.getPrototypeOf(type);
 
-  // A prototype is an object, a function or `null`, all of which
-  // `Object.create` takes; the other branch is unreachable.
-  return typeof proto === 'object' || typeof proto === 'function'
-    ? Object.create(proto, descriptors)
-    : Object.defineProperties({}, descriptors);
+  const descriptors: PropertyDescriptorMap = {
+      ...Object.getOwnPropertyDescriptors(type),
+      ...overrides,
+    } as const;
+
+  // The same object with some properties replaced. A prototype is an object, a
+  // function or `null`, all of which `Object.create` takes; the other branch is
+  // unreachable.
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  return (
+    typeof proto === 'object' || typeof proto === 'function'
+      ? Object.create(proto, descriptors)
+      : Object.create(null, descriptors)
+  ) as T;
 };
 
 /**
@@ -273,7 +233,7 @@ export type TypeOf<A extends UnknownType> = A['defaultValue'];
  * This option only affects runtime validation behavior.
  * The value type is always exact regardless of the setting.
  */
-export type ExcessPropertyOption = 'allow' | 'reject';
+export type ExcessPropertyOption = ('allow' | 'reject');
 
 /**
  * The shape a record type is built from: a record of property names to the
@@ -296,11 +256,7 @@ export type UnknownShape = ReadonlyRecord<string, UnknownType>;
 export type WithShape<S extends UnknownShape> = Readonly<{ shape: S }>;
 
 /** @internal Shape structure that can represent union and intersection */
-export type ShapeStructure = Readonly<
-  | { kind: 'simple'; shape: UnknownShape }
-  | { kind: 'union'; variants: readonly ShapeStructure[] }
-  | { kind: 'intersection'; parts: readonly ShapeStructure[] }
->;
+export type ShapeStructure = Readonly<({ kind: 'simple'; shape: UnknownShape }) | ({ kind: 'union'; variants: readonly ShapeStructure[] }) | ({ kind: 'intersection'; parts: readonly ShapeStructure[] })>;
 
 /**
  * @internal What the record operations (`pick`, `omit`, `at`, `mergeRecords`,
@@ -316,7 +272,7 @@ export type RecordView = Readonly<{
 /** @internal Helper to flatten ShapeStructure to a simple shape if possible */
 export const flattenShapeStructure = (
   structure: ShapeStructure,
-): UnknownShape | undefined => {
+): ((UnknownShape) | undefined) => {
   switch (structure.kind) {
     case 'simple': {
       return structure.shape;
@@ -401,13 +357,13 @@ export const expandShapeStructure = (
  * resolves to one (which runs its definition). A `recursion` reached again
  * while it is being resolved is not a record.
  */
-export const recordViewOf = (type: UnknownType): RecordView | undefined =>
+export const recordViewOf = (type: UnknownType): ((RecordView) | undefined) =>
   recordViewOfImpl(type, new Set<() => UnknownType>());
 
 /** @internal The element types of a `tuple`, if the type is one. */
 export const tupleElementTypesOf = (
   type: UnknownType,
-): readonly UnknownType[] | undefined =>
+): (readonly UnknownType[] | undefined) =>
   type.structure?.kind === 'tuple' ? type.structure.elementTypes : undefined;
 
 /**
@@ -423,7 +379,7 @@ export const unionMembersOf = (type: UnknownType): readonly UnknownType[] =>
 const recordViewOfImpl = (
   type: UnknownType,
   resolving: ReadonlySet<() => UnknownType>,
-): RecordView | undefined => {
+): ((RecordView) | undefined) => {
   const { structure } = type;
 
   if (structure?.kind === 'record') {

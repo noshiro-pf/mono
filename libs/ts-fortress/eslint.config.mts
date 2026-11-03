@@ -4,6 +4,7 @@ import {
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  restrictedSyntax,
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
@@ -36,6 +37,29 @@ export default [
     rules: defineKnownRules({
       'import-x/no-unused-modules': 'off',
       'unicorn/prefer-temporal': 'off',
+    }),
+  },
+
+  {
+    // A type copied onto a new object by hand loses its prototype, and with it
+    // the members a `Type` written as a class inherits (#3037), or calls its
+    // lazy `defaultValue` getter; `copyTypeByDescriptors` in src/type.mts does
+    // neither, and is the one place that copies descriptors. The base entries
+    // are spread back in because a flat-config override replaces the whole
+    // option array.
+    files: ['src/**/*.mts'],
+    ignores: ['src/type.mts', '**/*.test.mts'],
+    rules: defineKnownRules({
+      'no-restricted-syntax': [
+        'error',
+        ...restrictedSyntax,
+        {
+          selector:
+            "CallExpression[callee.object.name='Object'][callee.property.name=/^(defineProperties|getOwnPropertyDescriptors)$/]",
+          message:
+            'Copy a type with `copyTypeByDescriptors` (src/type.mts), which keeps its prototype and leaves a lazy `defaultValue` unevaluated.',
+        },
+      ],
     }),
   },
 

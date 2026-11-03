@@ -1,6 +1,10 @@
 import { hasKey, isRecord, tp } from 'ts-data-forge';
 import type { ReadonlyRecord, UnknownRecord } from 'ts-type-forge';
-import type { Type, UnknownType } from '../type.mjs';
+import {
+  copyTypeByDescriptors,
+  type Type,
+  type UnknownType,
+} from '../type.mjs';
 
 /**
  * The carrier of the constraint values a {@link Type} was created with.
@@ -17,7 +21,7 @@ import type { Type, UnknownType } from '../type.mjs';
 export type WithConstraints<C> = Readonly<{ constraints: C }>;
 
 /** A {@link Type} that also carries the constraint values it was created with. */
-export type ConstrainedType<A, C> = Type<A> & WithConstraints<C>;
+export type ConstrainedType<A, C> = ((Type<A>) & (WithConstraints<C>));
 
 /**
  * The constraint values carried by a type, or `never` for a type that carries
@@ -74,9 +78,7 @@ export type ConstraintsCarrierOf<T extends UnknownType> =
  * key to `undefined` rather than making it optional, which is the difference
  * between `constraints.max` and `constraints.max?.`.
  */
-export type FillConstraints<All extends UnknownRecord, C> = Readonly<{
-  [K in keyof All]-?: K extends keyof C ? C[K] : undefined;
-}>;
+export type FillConstraints<All extends UnknownRecord, C> = Readonly<{ [K in keyof All]-?:  K extends keyof C ? C[K] : undefined }>;
 
 /**
  * Attaches constraint values to a type, so that they can be read back off the
@@ -106,18 +108,14 @@ export const attachConstraints = <A, C>(
   // spread would call it here — which for a recursive type never terminates —
   // and freeze whatever it returned into a plain value.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  Object.defineProperties(
-    {},
-    {
-      ...Object.getOwnPropertyDescriptors(type),
-      constraints: { value: constraints, enumerable: true },
-    },
-  ) as ConstrainedType<A, C>;
+  copyTypeByDescriptors(type, {
+    constraints: { value: constraints, enumerable: true },
+  }) as ConstrainedType<A, C>;
 
 /** Runtime check for a type that carries constraint values. */
 export const hasConstraints = <T extends UnknownType>(
   t: T,
-): t is T & WithConstraints<UnknownRecord> => hasConstraintsImpl(t);
+): t is ((T) & (WithConstraints<UnknownRecord>)) => hasConstraintsImpl(t);
 
 /**
  * @internal Copies the constraint values of `source` onto `target`, leaving
@@ -126,12 +124,11 @@ export const hasConstraints = <T extends UnknownType>(
 export const propagateConstraints = <A, C>(
   target: Type<A>,
   source: Partial<WithConstraints<C>>,
-): Type<A> & ConstraintsCarrier<C> =>
+): ((Type<A>) & (ConstraintsCarrier<C>)) =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   (source.constraints === undefined
     ? target
-    : attachConstraints(target, source.constraints)) as Type<A> &
-    ConstraintsCarrier<C>;
+    : attachConstraints(target, source.constraints)) as ((Type<A>) & (ConstraintsCarrier<C>));
 
 /**
  * @internal Expands the constraints a type was created with into a record
@@ -141,10 +138,10 @@ export const fillConstraints = <
   All extends UnknownRecord,
   C extends Partial<All>,
 >(
-  allKeys: readonly (keyof All & string)[],
-  constraints: C | undefined,
+  allKeys: readonly ((keyof All) & string)[],
+  constraints: ((C) | undefined),
 ): FillConstraints<All, C> => {
-  const source: Partial<All> | undefined = constraints;
+  const source: ((Partial<All>) | undefined) = constraints;
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   return Object.fromEntries(

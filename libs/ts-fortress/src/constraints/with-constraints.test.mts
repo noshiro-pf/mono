@@ -276,4 +276,21 @@ describe(attachConstraints, () => {
 
     assert.isTrue(attached.is({ value: 1, child: { value: 2 } }));
   });
+
+  test('keeps the members a type inherits through its prototype', () => {
+    const base = number(0);
+
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+    const inherited = Object.create(base) as typeof base;
+
+    const attached = attachConstraints(inherited, { min: 0 });
+
+    assert.strictEqual(Object.getPrototypeOf(attached), base);
+
+    assert.isTrue(attached.is(1));
+
+    assert.isFalse(attached.is('a'));
+
+    assert.strictEqual(attached.constraints.min, 0);
+  });
 });

@@ -27,7 +27,7 @@ import { record } from './record.mjs';
  */
 export const required = <
   const R extends UnknownRecord,
-  const KeysToBeRequired extends NonEmptyTuple<keyof R & string>,
+  const KeysToBeRequired extends NonEmptyTuple<((keyof R) & string)>,
 >(
   recordType: Type<R>,
   options?: Partial<
@@ -75,13 +75,13 @@ export const required = <
 
 type RequiredType<
   R extends UnknownRecord,
-  KeysToBeRequired extends NonEmptyTuple<keyof R & string>,
+  KeysToBeRequired extends NonEmptyTuple<((keyof R) & string)>,
 > = Type<RequiredValue<R, KeysToBeRequired>>;
 
 /** Compute the required value type. */
 type RequiredValue<
   R extends UnknownRecord,
-  KeysToBeRequired extends NonEmptyTuple<keyof R & string> | undefined,
+  KeysToBeRequired extends ((NonEmptyTuple<((keyof R) & string)>) | undefined),
 > =
   TypeEq<KeysToBeRequired, undefined> extends true
     ? Readonly<Required<R>>
@@ -101,11 +101,8 @@ const makeRequired = <T extends UnknownType>(t: T): RequiredPropertyType<T> => {
   // and drop the members a `Type` written as a class inherits. Since the
   // prototype is kept, `optional` is shadowed by a non-enumerable own
   // `undefined` rather than only removed, in case `t` inherits the flag.
-  const { optional: _, ...descriptors } = Object.getOwnPropertyDescriptors(t);
-
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   return copyTypeByDescriptors(t, {
-    ...descriptors,
     optional: { value: undefined },
   }) as RequiredPropertyType<T>;
 };
@@ -115,13 +112,13 @@ const makeRequired = <T extends UnknownType>(t: T): RequiredPropertyType<T> => {
 {
   type Base = ReturnType<
     typeof record<
-      Readonly<{ a: Type<0>; b: Type<1 | undefined>; c: Type<2 | undefined> }>
+      Readonly<{ a: Type<0>; b: Type<(1 | undefined)>; c: Type<(2 | undefined)> }>
     >
   >;
 
   // required with no keys makes all properties required
   expectType<
     TypeOf<ReturnType<typeof required<TypeOf<Base>, readonly ['a', 'b', 'c']>>>,
-    Readonly<Required<Readonly<{ a: 0; b: 1 | undefined; c: 2 | undefined }>>>
+    Readonly<Required<Readonly<{ a: 0; b: (1 | undefined); c: (2 | undefined) }>>>
   >('=');
 }
