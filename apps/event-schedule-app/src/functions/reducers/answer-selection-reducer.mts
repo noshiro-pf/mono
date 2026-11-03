@@ -57,22 +57,15 @@ export const answerSelectionReducer: Reducer<
             comment: '',
           });
 
-    case 'cell-point':
-      return state.has(action.datetimeRange)
-        ? state.update(action.datetimeRange, (prev) => ({
-            ...prev,
-            point: action.point,
-          }))
-        : state.set(action.datetimeRange, {
-            point: action.point,
-            iconId:
-              action.point === 0
-                ? 'good'
-                : action.point === 10
-                  ? 'poor'
-                  : 'fair',
-            comment: '',
-          });
+    case 'cell-point': {
+      // A point means something only for fair, the one icon whose point is
+      // editable, so it is taken only by a range already answered fair.
+      const prev = Optional.toNullable(state.get(action.datetimeRange));
+
+      return prev?.iconId === 'fair'
+        ? state.set(action.datetimeRange, { ...prev, point: action.point })
+        : state;
+    }
 
     case 'cell-comment':
       return state.has(action.datetimeRange)
@@ -81,7 +74,7 @@ export const answerSelectionReducer: Reducer<
             comment: action.comment,
           }))
         : state.set(action.datetimeRange, {
-            point: 0,
+            point: defaultIconPoint.none,
             iconId: 'none',
             comment: action.comment,
           });
@@ -98,7 +91,7 @@ export const answerSelectionReducer: Reducer<
           value: allSelected
             ? {
                 iconId: 'none',
-                point: 0,
+                point: defaultIconPoint.none,
                 comment: Optional.toNullable(state.get(d))?.comment ?? '',
               }
             : {
