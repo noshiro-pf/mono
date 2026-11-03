@@ -23,15 +23,15 @@ Lower is better.
 
 | operation (median ms)           | synstate-dom |  Solid | Preact + Signals | Preact |  React |  VanJS |
 | :------------------------------ | -----------: | -----: | ---------------: | -----: | -----: | -----: |
-| create 1,000 rows               |        30.80 |  22.95 |            26.90 |  24.75 |  27.10 |  29.65 |
-| replace all 1,000 rows          |        34.35 |  25.20 |            36.15 |  34.75 |  33.90 |  32.75 |
-| update every 10th of 1,000 rows |         9.75 |  10.00 |            10.50 |  10.95 |  10.30 |  10.35 |
-| select a row                    |         4.90 |   4.35 |             5.35 |   5.10 |   4.80 |  36.55 |
-| swap two rows                   |         7.15 |   5.60 |             7.15 |   6.60 |  26.90 |   5.25 |
-| remove a row                    |         5.75 |   5.50 |             6.15 |   6.75 |   5.75 |   5.85 |
-| create 10,000 rows              |       298.20 | 195.15 |           329.30 | 291.80 | 533.55 | 287.85 |
-| append 1,000 to 1,000 rows      |        33.85 |  26.95 |            36.10 |  30.05 |  34.85 |  31.35 |
-| clear 1,000 rows                |         7.45 |   6.15 |             6.40 |   5.80 |   7.55 |   6.60 |
+| create 1,000 rows               |        55.15 |  37.85 |            40.20 |  42.85 |  44.25 |  36.60 |
+| replace all 1,000 rows          |        62.85 |  38.20 |            49.70 |  46.55 |  52.10 |  47.90 |
+| update every 10th of 1,000 rows |        22.70 |  17.90 |            14.45 |  16.75 |  19.45 |  15.50 |
+| select a row                    |         0.50 |   0.13 |             1.03 |   1.77 |   0.70 |  62.20 |
+| swap two rows                   |         5.77 |   3.75 |             5.81 |   6.05 |  46.67 |   2.74 |
+| remove a row                    |         8.03 |   5.29 |             7.57 |   7.26 |   6.19 |   5.58 |
+| create 10,000 rows              |       504.30 | 388.55 |           556.95 | 493.85 | 745.80 | 534.45 |
+| append 1,000 to 1,000 rows      |        67.60 |  43.80 |            56.35 |  54.35 |  57.15 |  60.80 |
+| clear 1,000 rows                |        10.10 |   5.45 |            10.20 |  10.10 |   8.70 |   7.50 |
 
 <!-- /benchmark -->
 
@@ -41,23 +41,23 @@ Each library's time divided by synstate-dom's. Below 1.00× means faster than sy
 
 <!-- benchmark:ratios -->
 
-| operation                       | Solid | Preact + Signals | Preact | React | VanJS |
-| :------------------------------ | ----: | ---------------: | -----: | ----: | ----: |
-| create 1,000 rows               | 0.75× |            0.87× |  0.80× | 0.88× | 0.96× |
-| replace all 1,000 rows          | 0.73× |            1.05× |  1.01× | 0.99× | 0.95× |
-| update every 10th of 1,000 rows | 1.03× |            1.08× |  1.12× | 1.06× | 1.06× |
-| select a row                    | 0.89× |            1.09× |  1.04× | 0.98× | 7.46× |
-| swap two rows                   | 0.78× |            1.00× |  0.92× | 3.76× | 0.73× |
-| remove a row                    | 0.96× |            1.07× |  1.17× | 1.00× | 1.02× |
-| create 10,000 rows              | 0.65× |            1.10× |  0.98× | 1.79× | 0.97× |
-| append 1,000 to 1,000 rows      | 0.80× |            1.07× |  0.89× | 1.03× | 0.93× |
-| clear 1,000 rows                | 0.83× |            0.86× |  0.78× | 1.01× | 0.89× |
+| operation                       | Solid | Preact + Signals | Preact | React |   VanJS |
+| :------------------------------ | ----: | ---------------: | -----: | ----: | ------: |
+| create 1,000 rows               | 0.69× |            0.73× |  0.78× | 0.80× |   0.66× |
+| replace all 1,000 rows          | 0.61× |            0.79× |  0.74× | 0.83× |   0.76× |
+| update every 10th of 1,000 rows | 0.79× |            0.64× |  0.74× | 0.86× |   0.68× |
+| select a row                    | 0.26× |            2.06× |  3.54× | 1.40× | 124.40× |
+| swap two rows                   | 0.65× |            1.01× |  1.05× | 8.09× |   0.47× |
+| remove a row                    | 0.66× |            0.94× |  0.90× | 0.77× |   0.69× |
+| create 10,000 rows              | 0.77× |            1.10× |  0.98× | 1.48× |   1.06× |
+| append 1,000 to 1,000 rows      | 0.65× |            0.83× |  0.80× | 0.85× |   0.90× |
+| clear 1,000 rows                | 0.54× |            1.01× |  1.00× | 0.86× |   0.74× |
 
 <!-- /benchmark -->
 
 ## Reading the results
 
-In these runs, synstate-dom took between <!-- benchmark:reference-min -->0.97<!-- /benchmark -->× and <!-- benchmark:reference-max -->1.53<!-- /benchmark -->× Solid's time, depending on the operation. It is close to the fastest where only a few rows change (updating every 10th row, removing a row) and furthest behind where many rows are created; the table above shows, library by library, where it is ahead and where it falls behind.
+In these runs, synstate-dom took between <!-- benchmark:reference-min -->1.27<!-- /benchmark -->× and <!-- benchmark:reference-max -->3.85<!-- /benchmark -->× Solid's time, depending on the operation. It is closest to Solid when updating every 10th row and creating 10,000 rows, and furthest behind when selecting a row, which takes Solid about a tenth of a millisecond; the table above shows, library by library, where it is ahead and where it falls behind.
 
 - **Creating rows** is where having no compiler shows the most. Solid clones a compiled `<template>` for each row; synstate-dom calls `createElement` for each node and binds each dynamic leaf with its own subscription. Each row also creates a synstate node for its item (and a second for its index, which this table does not take; see `For` in [Control flow](/mono/synstate-dom/guides/control-flow/#for)), and the time to create and dispose rows grows roughly with the number of nodes.
 - **Partial updates** take a different path in each implementation. Solid, Preact + Signals and VanJS hold a signal per label and write to the 100 that change. synstate-dom replaces the whole array, as the documentation recommends; every row's `item$` compares its item with the previous one, and only the 100 rows whose item changed write to the DOM. Preact and React re-render the table from the new state, and only the `memo` rows whose props changed render again.
@@ -77,17 +77,17 @@ Each scenario also times building the screen, which builds the whole graph.
 
 | operation (median ms)                   | synstate-dom | synstate-dom (skipIfNoChange) | Solid | Preact + Signals | Preact | React | VanJS |
 | :-------------------------------------- | -----------: | ----------------------------: | ----: | ---------------: | -----: | ----: | ----: |
-| loan: build the table                   |         2.72 |                          3.66 |  1.68 |             2.04 |   1.20 |  1.16 |  2.45 |
-| loan: change the interest rate          |         1.41 |                          1.68 |  1.23 |             0.90 |   0.85 |  0.75 |  3.19 |
-| loan: prepay in month 181               |         0.80 |                          0.91 |  0.63 |             0.52 |   0.53 |  0.48 | wrong |
-| loan: prepay in month 349               |         0.18 |                          0.18 |  0.16 |             0.16 |   0.29 |  0.24 |  0.63 |
-| schedule: build the schedule            |        11.45 |                         13.37 |  4.14 |             5.07 |   1.93 |  1.90 | 10.02 |
-| schedule: lengthen the first task       |         3.45 |                          3.95 |  3.69 |             1.83 |   1.15 |  1.07 | wrong |
-| schedule: lengthen a task in the middle |         2.04 |                          0.10 |  0.72 |             0.34 |   0.40 |  0.35 |  0.72 |
-| schedule: lengthen a task near the end  |         1.70 |                          0.24 |  0.78 |             0.49 |   0.63 |  0.59 |  0.43 |
-| zoom: build the map                     |         7.02 |                         14.25 |  3.85 |             4.17 |   1.51 |  1.65 | 11.53 |
-| zoom: zoom within a level               |         2.17 |                          0.09 |  0.63 |             0.46 |   0.38 |  0.38 |  0.10 |
-| zoom: zoom to the next level            |         2.86 |                          3.38 |  3.43 |             2.11 |   1.21 |  1.21 |  6.01 |
+| loan: build the table                   |         7.07 |                         11.48 |  3.47 |             3.74 |   1.73 |  2.35 |  6.58 |
+| loan: change the interest rate          |         1.97 |                          4.68 |  2.96 |             1.41 |   1.42 |  1.76 |  6.42 |
+| loan: prepay in month 181               |         1.13 |                          2.29 |  1.16 |             0.71 |   1.12 |  0.72 | wrong |
+| loan: prepay in month 349               |         0.32 |                          0.47 |  0.32 |             0.34 |   0.79 |  0.45 |  1.10 |
+| schedule: build the schedule            |        24.35 |                         27.64 |  6.56 |             9.90 |   2.72 |  2.68 | 16.55 |
+| schedule: lengthen the first task       |         8.54 |                         10.79 |  7.70 |             3.57 |   1.97 |  1.70 | wrong |
+| schedule: lengthen a task in the middle |         0.12 |                          0.13 |  0.95 |             0.49 |   0.88 |  0.51 |  1.17 |
+| schedule: lengthen a task near the end  |         0.55 |                          0.38 |  1.20 |             0.66 |   1.00 |  0.82 |  0.93 |
+| zoom: build the map                     |        14.67 |                         26.25 |  8.40 |             9.05 |   2.12 |  2.57 | 23.29 |
+| zoom: zoom within a level               |         0.17 |                          0.22 |  1.13 |             0.65 |   0.61 |  0.53 |  0.24 |
+| zoom: zoom to the next level            |         3.38 |                          5.70 |  6.79 |             4.02 |   1.90 |  1.90 | 12.34 |
 
 <!-- /benchmark -->
 
@@ -97,17 +97,17 @@ Each scenario also times building the screen, which builds the whole graph.
 
 | operation                               | synstate-dom (skipIfNoChange) | Solid | Preact + Signals | Preact | React | VanJS |
 | :-------------------------------------- | ----------------------------: | ----: | ---------------: | -----: | ----: | ----: |
-| loan: build the table                   |                         1.35× | 0.62× |            0.75× |  0.44× | 0.43× | 0.90× |
-| loan: change the interest rate          |                         1.19× | 0.87× |            0.64× |  0.60× | 0.53× | 2.26× |
-| loan: prepay in month 181               |                         1.14× | 0.79× |            0.65× |  0.66× | 0.60× |     – |
-| loan: prepay in month 349               |                         1.00× | 0.89× |            0.89× |  1.61× | 1.33× | 3.50× |
-| schedule: build the schedule            |                         1.17× | 0.36× |            0.44× |  0.17× | 0.17× | 0.88× |
-| schedule: lengthen the first task       |                         1.14× | 1.07× |            0.53× |  0.33× | 0.31× |     – |
-| schedule: lengthen a task in the middle |                         0.05× | 0.35× |            0.17× |  0.20× | 0.17× | 0.35× |
-| schedule: lengthen a task near the end  |                         0.14× | 0.46× |            0.29× |  0.37× | 0.35× | 0.25× |
-| zoom: build the map                     |                         2.03× | 0.55× |            0.59× |  0.22× | 0.24× | 1.64× |
-| zoom: zoom within a level               |                         0.04× | 0.29× |            0.21× |  0.18× | 0.18× | 0.05× |
-| zoom: zoom to the next level            |                         1.18× | 1.20× |            0.74× |  0.42× | 0.42× | 2.10× |
+| loan: build the table                   |                         1.62× | 0.49× |            0.53× |  0.24× | 0.33× | 0.93× |
+| loan: change the interest rate          |                         2.38× | 1.50× |            0.72× |  0.72× | 0.89× | 3.26× |
+| loan: prepay in month 181               |                         2.03× | 1.03× |            0.63× |  0.99× | 0.64× |     – |
+| loan: prepay in month 349               |                         1.47× | 1.00× |            1.06× |  2.47× | 1.41× | 3.44× |
+| schedule: build the schedule            |                         1.14× | 0.27× |            0.41× |  0.11× | 0.11× | 0.68× |
+| schedule: lengthen the first task       |                         1.26× | 0.90× |            0.42× |  0.23× | 0.20× |     – |
+| schedule: lengthen a task in the middle |                         1.08× | 7.92× |            4.08× |  7.33× | 4.25× | 9.75× |
+| schedule: lengthen a task near the end  |                         0.69× | 2.18× |            1.20× |  1.82× | 1.49× | 1.69× |
+| zoom: build the map                     |                         1.79× | 0.57× |            0.62× |  0.14× | 0.18× | 1.59× |
+| zoom: zoom within a level               |                         1.29× | 6.65× |            3.82× |  3.59× | 3.12× | 1.41× |
+| zoom: zoom to the next level            |                         1.69× | 2.01× |            1.19× |  0.56× | 0.56× | 3.65× |
 
 <!-- /benchmark -->
 
@@ -118,13 +118,13 @@ Each scenario also times building the screen, which builds the whole graph.
 - **Stopping at a figure that came out the same.** Solid and Preact + Signals do not pass a value on when it equals the last one. synstate-dom as written does: each figure is `combine` + `map`, which passes on every value it computes, so lengthening a task in the middle, or zooming within a level, recomputes everything downstream, though few figures change. So synstate-dom is also measured a second time with a [`skipIfNoChange`](https://noshiro-pf.github.io/mono/synstate/reference/skip-if-no-change/) after every figure. That version does stop there, at the cost of a third node per figure and so a slower build.
 - **What a stop is worth depends on how a library notices a change.** A write in Solid and Preact + Signals first marks everything downstream as possibly stale, and the figures are then checked against their sources, so a change that stops at the level still visits all 10,000 labels. synstate visits only the children of a node that passed a value on, so with `skipIfNoChange` a change within a level costs the same whatever the size of the map below it. VanJS stops there too, because a state assigned the value it already has does not propagate. React and Preact keep the labels in a `useMemo` that depends on the level, and render the 51 rows again.
 
-A change here takes well under a millisecond. The scenarios therefore wait for the next task through a `MessageChannel` rather than a `setTimeout`, which the browser holds back to 4 ms, and one sample is the mean of 20 changes, alternating the operation and its reverse.
+A change here takes well under a millisecond. As for the table's operations, the scenarios wait for the next task through a `MessageChannel`, and one sample is the mean of 20 changes, alternating the operation and its reverse.
 
 ## What is timed
 
 In js-framework-benchmark's operations, each implementation mounts the same table, one row per item, with the item's id and label in two cells and a `danger` class on the selected row. Before timing, the harness checks that every implementation renders the same rows after the same operations.
 
-An operation is timed from the call until one macrotask has passed and the browser has laid the table out again. The wait is there because VanJS and Preact render a change in a microtask. Every implementation pays it, so it shifts all figures by about the same amount.
+An operation is timed from the call until the next task has run and the browser has laid the table out again. The wait is there because VanJS and Preact render a change in a microtask. The harness waits through a `MessageChannel` rather than a `setTimeout`, which the browser holds back to 4 ms once timeouts are nested; that clamp would be most of what the cheaper operations are timed at. Selecting a row can take well under a millisecond, close to the 0.1 ms to which the browser rounds its clock, so one sample of each operation that changes one or two rows (selecting, swapping and removing a row) is the mean of 20 changes from the same table: the selection alternates between two rows, each swap undoes the last, and each removal takes the row that moved into the same position.
 
 Libraries run as production builds (`mode: 'production'` and the `production` export condition) with their production JSX runtimes, in headless Chromium under Vitest's browser mode.
 

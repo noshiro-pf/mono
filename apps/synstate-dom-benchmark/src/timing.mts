@@ -4,6 +4,13 @@ import { Arr } from 'ts-data-forge';
 export const warmups = 3;
 
 /**
+ * How many changes one sample of a sub-millisecond operation times, one after
+ * another; the sample is their mean. A single such change is close to the 0.1
+ * ms to which the browser rounds `performance.now()`.
+ */
+export const changesPerSample = 20;
+
+/**
  * `items` turned left by `BENCHMARK_ROTATE` (set by
  * `pnpm run benchmark:repeat`), so that over several runs each library is
  * measured first in turn. The tables keep the order of `items`.
@@ -30,21 +37,6 @@ export const mapInSequence = async <T, R>(
   return Arr.toUnshifted(first)(await mapInSequence(rest, fn));
 };
 
-/**
- * Waits for one macrotask, which lets VanJS's and Preact's microtask renders
- * run, then forces layout. Every implementation pays the same wait, so it
- * shifts the timings equally rather than favouring the ones that update
- * synchronously.
- */
-export const settle = async (container: HTMLElement): Promise<void> => {
-  await new Promise<void>((resolve) => {
-    setTimeout(resolve, 0);
-  });
-
-  // Reading the geometry makes the browser lay the table out now.
-  container.getBoundingClientRect();
-};
-
 export const median = (samples: readonly number[]): number => {
   const sorted = samples.toSorted((a, b) => a - b);
 
@@ -56,15 +48,16 @@ export const median = (samples: readonly number[]): number => {
 };
 
 /**
- * Like {@link settle}, but waits for the next task through a `MessageChannel`
- * rather than a `setTimeout`, which the browser holds back to 4 ms once
- * timeouts are nested. Every library here has rendered by then: VanJS and
- * Preact render in a microtask, the others synchronously. The scenarios use it,
- * because a change there costs less than that 4 ms.
+ * Waits for the next task, then forces layout, which ends every timed change.
+ * VanJS and Preact render in a microtask and the others synchronously, so every
+ * library has rendered by then.
+ *
+ * The task is a `MessageChannel` message rather than a `setTimeout`: the
+ * browser holds a `setTimeout` back to 4 ms once timeouts are nested, as they
+ * are when samples are taken one after another, and several of the operations
+ * cost less than that.
  */
-export const settleUnclamped = async (
-  container: HTMLElement,
-): Promise<void> => {
+export const settle = async (container: HTMLElement): Promise<void> => {
   await new Promise<void>((resolve) => {
     const channel = new MessageChannel();
 
@@ -79,5 +72,6 @@ export const settleUnclamped = async (
     channel.port2.postMessage(undefined);
   });
 
+  // Reading the geometry makes the browser lay the table out now.
   container.getBoundingClientRect();
 };

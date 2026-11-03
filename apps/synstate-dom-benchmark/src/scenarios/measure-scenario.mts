@@ -1,9 +1,10 @@
 import { Arr } from 'ts-data-forge';
 import {
+  changesPerSample,
   mapInSequence,
   median,
   rotated,
-  settleUnclamped as settle,
+  settle,
   warmups,
 } from '../timing.mjs';
 import type {
@@ -26,14 +27,7 @@ export type ScenarioResult = Readonly<{
 /** How many samples each operation's median is taken over. */
 const samples = 15;
 
-/**
- * How many changes one sample times, alternating a case's `apply` and `revert`,
- * and how many mounts a build sample times. A single change of these graphs
- * takes well under a millisecond, close to the 0.1 ms to which the browser
- * rounds `performance.now()`; a sample is their mean.
- */
-const changesPerSample = 20;
-
+/** How many mounts a build sample times; a sample is their mean. */
 const buildsPerSample = 5;
 
 /**
@@ -65,6 +59,7 @@ export const measureScenario = async <App extends ScenarioAppBase>(
             async () => {
               const start = performance.now();
 
+              // `apply` and `revert` alternately, which reach the same figures.
               await mapInSequence(range(changesPerSample), async (i) => {
                 if (i % 2 === 0) {
                   c.apply(app);
