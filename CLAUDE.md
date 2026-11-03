@@ -539,8 +539,8 @@ tests to write, before writing or changing one.
 
 ## Libraries
 
-- **ts-type-forge**: `DeepReadonly`, `StrictOmit`, `ReadonlyRecord` etc. are
-  global; no import.
+- **ts-type-forge**: import `DeepReadonly`, `ReadonlyRecord` etc. from it; a
+  `TS2304` is not fixed by adding `ts-type-forge/global` to a tsconfig.
 - **ts-data-forge**: `Arr.seq` takes an `Int` (`asUint32`); `memoizeFunction`;
   `fastDeepEqual`.
 - **immer**: `castDraft` when assigning readonly values to a draft.
