@@ -23,7 +23,7 @@ import {
 } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { askAndRead } from './answer-body.mjs';
+import { askAndRead, unreachable } from './answer-body.mjs';
 import type { ReportSource } from './constants.mjs';
 import type { RestFetch } from './workflow-runs.mjs';
 
@@ -82,9 +82,7 @@ const getJson = async <A,>(
   );
 
   if (answered === undefined) {
-    return Result.err(
-      `Could not reach the GitHub API for ${what}. Check the connection and try again.`,
-    );
+    return Result.err(unreachable(what));
   }
 
   const { response, body: parsed } = answered;

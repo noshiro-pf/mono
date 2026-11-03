@@ -102,6 +102,21 @@ describe(askGraphql, () => {
     assert.strictEqual(mut_asked, 2);
   });
 
+  // A query GitHub gave up on is answered without a CORS header, which the
+  // browser rejects exactly as it rejects a lost connection.
+  test('names the query it could not get an answer to', async () => {
+    const { result } = await askGraphql(request(unreachable));
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      'Could not reach the GitHub API for the Viewer query',
+    );
+
+    assert.include(result.value, 'did not finish it in time');
+  });
+
   test('does not ask again for JSON that is not an object', async () => {
     const { fetchImpl, asked } = answering('null');
 
@@ -115,6 +130,10 @@ describe(askGraphql, () => {
     assert.strictEqual(asked(), 1);
   });
 });
+
+const unreachable: Fetch = () => {
+  throw new TypeError('Failed to fetch');
+};
 
 const request = (fetchImpl: Fetch): GraphqlRequest =>
   ({

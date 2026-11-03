@@ -82,6 +82,20 @@ export const readJson = async (
   );
 };
 
+/**
+ * What a request that got no answer the browser would hand over is said as.
+ * The browser does not say why, and a request GitHub gave up on is one of the
+ * reasons: its time-out page carries no CORS header, so it reads the same as no
+ * connection. Naming what was asked is what tells the two apart — a time-out
+ * names the same heavy request on every read.
+ *
+ * @param subject What was asked for, as {@link askAndRead} takes it.
+ */
+export const unreachable = (subject?: string): string =>
+  subject === undefined
+    ? 'Could not reach the GitHub API, or GitHub did not answer in time. Check the connection and try again.'
+    : (`Could not reach the GitHub API for ${subject}, or GitHub did not finish it in time. Check the connection and try again.` as const);
+
 const UTF8 = new TextDecoder();
 
 const askOnce = async (

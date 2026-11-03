@@ -137,9 +137,10 @@ stored under a key no other page uses (`github-token--pr-manager-app--…`).
 The "remember" choice is still off by default, because a page published
 there later would be on the same site.
 
-- The page spends the token account's GraphQL budget: about 9 points a read
-  on a repository of this size, 2,000 or so of the 5,000 an hour. On a larger
-  repository it reads less often, so that it keeps to about half the budget.
+- The page spends the token account's GraphQL budget: about 9 points a read with
+  fifty pull requests open, a few more for each further twenty, 2,000 or so of
+  the 5,000 an hour. On a larger repository it reads less often, so that it
+  keeps to about half the budget.
   The panel shows what is left and how often it reads.
 
 ## Limits

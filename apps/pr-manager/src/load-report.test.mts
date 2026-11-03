@@ -1,5 +1,5 @@
 import { writeSetAsideComment } from 'pr-report-core';
-import { Arr, isRecord, Json, Result } from 'ts-data-forge';
+import { Arr, asUint32, isRecord, Json, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { ReportSource } from './constants.mjs';
 import type { FetchInit } from './graphql.mjs';
@@ -12,10 +12,12 @@ import {
   type ReferencedItem,
 } from './load-report.mjs';
 import {
+  DETAILED_PAGE_SIZE,
   ISSUES_LIMIT,
   ISSUES_PAGE_SIZE,
-  MAX_OPEN_PAGES,
+  MAX_OPEN_PULLS,
   OPEN_PAGE_SIZE,
+  OPEN_PULLS_QUERIES,
 } from './report-query.mjs';
 import type { RestFetchInit } from './workflow-runs.mjs';
 
@@ -1599,10 +1601,210 @@ describe(loadReport, () => {
     );
   });
 
+  // A query over every head at once stops being answered once there are enough
+  // of them: GitHub gives up on it, and the queue with it.
+  test('asks how far the heads are from their bases a page of them at a time', async () => {
+    const numbers = Arr.seq(asUint32(DETAILED_PAGE_SIZE + 1)).map(
+      (index) => index + 7,
+    );
+
+    const { fetchImpl, sent } = answering(
+      report(numbers.map((number) => pullRequest({ number }))),
+      answer(
+        'Compare',
+        Object.fromEntries(
+          numbers
+            .slice(0, DETAILED_PAGE_SIZE)
+            .map((number) => [
+              `compare_${number}`,
+              { compare: { aheadBy: 1, behindBy: 2 } },
+            ]),
+        ),
+      ),
+      answer('Compare', {
+        [`compare_${numbers.at(-1)}`]: { compare: { aheadBy: 3, behindBy: 4 } },
+      }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(
+      named(sent, 'Compare').map(
+        ({ variables }) =>
+          Object.keys(variables).filter((key) => key.endsWith('_head')).length,
+      ),
+      [DETAILED_PAGE_SIZE, 1],
+    );
+
+    assert.deepStrictEqual(loaded.entries.at(0)?.comparison, {
+      aheadBy: 1,
+      behindBy: 2,
+    });
+
+    assert.deepStrictEqual(loaded.entries.at(-1)?.comparison, {
+      aheadBy: 3,
+      behindBy: 4,
+    });
+
+    assert.isDefined(loaded.queue);
+  });
+
+  test('fails the read when a query of comparisons gets no answer', async () => {
+    const numbers = Arr.seq(asUint32(DETAILED_PAGE_SIZE + 1)).map(
+      (index) => index + 7,
+    );
+
+    const { fetchImpl } = answering(
+      report(numbers.map((number) => pullRequest({ number }))),
+      answer(
+        'Compare',
+        Object.fromEntries(
+          numbers
+            .slice(0, DETAILED_PAGE_SIZE)
+            .map((number) => [
+              `compare_${number}`,
+              { compare: { aheadBy: 1, behindBy: 2 } },
+            ]),
+        ),
+      ),
+    );
+
+    // GitHub's time-out page carries no CORS header: the browser rejects it.
+    let mut_compares = 0;
+
+    const timingOut: typeof fetchImpl = async (route, init) => {
+      if (sentOf(route, init).operation === 'Compare') {
+        mut_compares += 1;
+
+        if (mut_compares > 1) {
+          throw new TypeError('Failed to fetch');
+        }
+      }
+
+      return fetchImpl(route, init);
+    };
+
+    const { result } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl: timingOut,
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'the Compare query');
+  });
+
+  test('asks for the rest of the check results a page of pull requests at a time', async () => {
+    const numbers = Arr.seq(asUint32(DETAILED_PAGE_SIZE + 1)).map(
+      (index) => index + 7,
+    );
+
+    const { fetchImpl, sent } = answering(
+      report(
+        numbers.map((number) =>
+          pullRequest({
+            number,
+            contexts: [
+              checkRun('code-check-result / result', 'COMPLETED', 'SUCCESS'),
+            ],
+            contextsAfter: 'cursor-1',
+          }),
+        ),
+      ),
+      ...[
+        numbers.slice(0, DETAILED_PAGE_SIZE),
+        numbers.slice(DETAILED_PAGE_SIZE),
+      ].map((chunk) =>
+        answer(
+          'Compare',
+          Object.fromEntries(
+            chunk.map((number) => [
+              `compare_${number}`,
+              { compare: { aheadBy: 1, behindBy: 0 } },
+            ]),
+          ),
+        ),
+      ),
+      {
+        MoreChecks: [
+          moreChecksPage(numbers.slice(0, DETAILED_PAGE_SIZE)),
+          moreChecksPage(numbers.slice(DETAILED_PAGE_SIZE)),
+        ],
+      },
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(
+      named(sent, 'MoreChecks').map(
+        ({ variables }) =>
+          Object.keys(variables).filter((key) => key.endsWith('_after')).length,
+      ),
+      [DETAILED_PAGE_SIZE, 1],
+    );
+
+    // The last pull request's rest came in the second query.
+    assert.deepStrictEqual(loaded.entries.at(-1)?.checks.passed, [
+      'code-check-result / result',
+      'no-skip-ci-label',
+    ]);
+  });
+
+  test('refuses more than the most open pull requests in the smaller pages too', async () => {
+    const pages = asUint32(MAX_OPEN_PULLS / DETAILED_PAGE_SIZE);
+
+    const { fetchImpl, sent } = answering(
+      report([], [], 'page-1'),
+      ...Arr.seq(pages).map((index) => laterOpenPage([], `page-${index + 2}`)),
+    );
+
+    const { result } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl,
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.strictEqual(named(sent, 'Checks').length, pages);
+  });
+
+  test('asks for the check results and the details a smaller page at a time', async () => {
+    const { fetchImpl, sent } = answering(
+      report([pullRequest({ number: 7 })]),
+      answer('Compare', { compare_7: null }),
+    );
+
+    await load(fetchImpl);
+
+    assert.include(
+      named(sent, 'PullRequests')[0]?.query,
+      `first: ${OPEN_PAGE_SIZE},`,
+    );
+
+    for (const operation of ['Checks', 'PullRequestDetails']) {
+      assert.include(
+        named(sent, operation)[0]?.query,
+        `first: ${DETAILED_PAGE_SIZE},`,
+      );
+    }
+  });
+
+  // The cap is reached in whole pages, and each query asks for the page size
+  // its read counts in.
+  test('keeps each query beside the page size it asks for', () => {
+    for (const { query, pageSize } of Object.values(OPEN_PULLS_QUERIES)) {
+      assert.include(query, `first: ${pageSize},`);
+
+      assert.strictEqual(MAX_OPEN_PULLS % pageSize, 0);
+    }
+  });
+
   test('refuses to report part of the open pull requests as the whole', async () => {
     const { fetchImpl } = answering(
       report([], [], 'page-1'),
-      ...Arr.seq(MAX_OPEN_PAGES).map((index) =>
+      ...Arr.seq(asUint32(MAX_OPEN_PULLS / OPEN_PAGE_SIZE)).map((index) =>
         laterOpenPage([], `page-${index + 2}`),
       ),
     );
@@ -1617,7 +1819,7 @@ describe(loadReport, () => {
 
     assert.include(
       result.value,
-      `more than ${MAX_OPEN_PAGES * OPEN_PAGE_SIZE} open pull requests`,
+      `more than ${MAX_OPEN_PULLS} open pull requests`,
     );
   });
 
@@ -1880,6 +2082,26 @@ const sentOf = (route: string, init: FetchInit | RestFetchInit): Sent => {
     headers: init.headers,
   };
 };
+
+/** The rest of the check results of each pull request in `chunk`: one more. */
+const moreChecksPage = (chunk: readonly number[]): unknown =>
+  ({
+    data: {
+      repository: Object.fromEntries(
+        chunk.map((number) => [
+          `contexts_${number}`,
+          {
+            statusCheckRollup: {
+              contexts: {
+                pageInfo: { hasNextPage: false, endCursor: null },
+                nodes: [checkRun('no-skip-ci-label', 'COMPLETED', 'SUCCESS')],
+              },
+            },
+          },
+        ]),
+      ),
+    },
+  }) as const;
 
 /** What was sent as `operation`, in the order it was sent. */
 const named = (sent: readonly Sent[], operation: string): readonly Sent[] =>

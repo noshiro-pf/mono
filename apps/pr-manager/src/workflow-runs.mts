@@ -25,7 +25,7 @@
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { askAndRead } from './answer-body.mjs';
+import { askAndRead, unreachable } from './answer-body.mjs';
 import { repositoryUrl, type ReportSource } from './constants.mjs';
 
 /**
@@ -209,9 +209,7 @@ const readState = async (
   );
 
   if (answered === undefined) {
-    return Result.err(
-      'Could not reach the GitHub API for the workflow runs. Check the connection and try again.',
-    );
+    return Result.err(unreachable('the workflow runs'));
   }
 
   const { response, body: parsed } = answered;
