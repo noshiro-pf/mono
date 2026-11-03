@@ -431,19 +431,40 @@ export const readManifestDependencies = (
  * `LICENSE` or `gen-license-files.mts` itself; `gen:license-files` runs on it
  * and on `manifest`, whose `license` and `private` fields decide what it writes.
  */
-export type Area =
-  | 'root'
-  | 'root-guards'
-  | 'prose'
-  | 'manifest'
-  | 'license'
-  | 'codemod'
-  | 'strict-lib'
-  | 'changeset'
-  | 'repo-settings'
-  | 'shared-config'
-  | 'spell-config'
-  | 'format-config';
+export type Area = (typeof ALL_AREAS)[number];
+
+/**
+ * Every {@link Area}. `check:root:ci-commands` hands them all to
+ * {@link buildPlan} to read every command a plan can run.
+ */
+export const ALL_AREAS = [
+  'root',
+  'root-guards',
+  'prose',
+  'manifest',
+  'license',
+  'codemod',
+  'strict-lib',
+  'changeset',
+  'repo-settings',
+  'shared-config',
+  'spell-config',
+  'format-config',
+] as const;
+
+/**
+ * The generators and fixers a check workflow runs that no plan does, each with
+ * the reason. `check:root:ci-commands` fails on one that {@link buildPlan} has
+ * no step for and this does not name, since CI's dirty-tree check would
+ * otherwise be the first to notice, naming no generator.
+ */
+export const GENERATORS_LEFT_TO_CI: readonly string[] = [
+  // The whole of `strict-lib-gen.yml`, which rewrites ~7,800 files; see "What
+  // it leaves to CI" in the README. `LEFT_TO_CI` in check-all.mts names them
+  // too, for that runner; the guard holds each list to the workflows.
+  'strict-lib:gen:with-codemod-fixed',
+  'strict-lib:gen:version-diff',
+] as const;
 
 export type Classification = Readonly<{
   packages: readonly Readonly<{ pkg: PackageInfo; code: boolean }>[];

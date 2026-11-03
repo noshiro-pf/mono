@@ -16,6 +16,13 @@ import { Regex } from 'ts-std-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { listWorkflowFiles } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
+import { CHECK_ALL_STEPS, LEFT_TO_CI } from './check-all.mjs';
+import {
+  ALL_AREAS,
+  buildPlan,
+  GENERATORS_LEFT_TO_CI,
+  type PackageInfo,
+} from './check-changed/plan.mjs';
 import { parseWorkflowTriggers } from './check-workflow-event-name.mjs';
 
 /**
@@ -44,6 +51,10 @@ import { parseWorkflowTriggers } from './check-workflow-event-name.mjs';
  * show — `check:test:cov` running the same suite as `check:test` with
  * `--coverage` — are declared, in {@link DECLARED_COVERAGE}, with the reason
  * next to each.
+ *
+ * The same graph answers a third question, {@link findCommandsMissingLocally}:
+ * whether the local runners that restate the workflows by hand, `check-all` and
+ * `check-changed`, still run every command the workflows do.
  */
 export const checkCiCommands = (): Promise<Result<CheckSummary, string>> =>
   Result.safeTry(async function* () {
@@ -56,6 +67,32 @@ export const checkCiCommands = (): Promise<Result<CheckSummary, string>> =>
     const violations = [
       ...findRedundantCommands(workflows, graph),
       ...findUncoveredCommands(workflows, manifests, graph),
+      ...findCommandsMissingLocally({
+        workflows,
+        graph,
+        runner: {
+          name: 'check-all.mts',
+          remedy:
+            'add a step to CHECK_ALL_STEPS there that reaches it, or name it in LEFT_TO_CI with the reason.',
+          runs: CHECK_ALL_STEPS.map(({ script }) =>
+            toCommandId(ROOT_DIRECTORY, script),
+          ),
+          leftOut: LEFT_TO_CI,
+          asks: () => true,
+        },
+      }),
+      ...findCommandsMissingLocally({
+        workflows,
+        graph,
+        runner: {
+          name: 'check-changed/plan.mts',
+          remedy:
+            'give buildPlan a step that runs it for the paths it reads (and say so in the README), or name it in GENERATORS_LEFT_TO_CI with the reason.',
+          runs: commandsAnyPlanRuns(manifests),
+          leftOut: GENERATORS_LEFT_TO_CI,
+          asks: isWriterScript,
+        },
+      }),
     ] as const;
 
     if (!Arr.isNonEmpty(violations)) {
@@ -139,29 +176,22 @@ export const buildCoverageGraph = (
     }),
   );
 
-  const mut_edges = new Map<CommandId, Set<CommandId>>();
+  const withArguments = manifests.flatMap(({ directory, scripts }) =>
+    Arr.generate(function* () {
+      for (const [scriptName, body] of Object.entries(scripts)) {
+        if (runsScriptWithArguments(body)) {
+          yield toCommandId(directory, scriptName);
+        }
+      }
+    }),
+  );
 
-  const addEdge = ({ from, to }: Edge): void => {
-    if (from === to) {
-      return;
-    }
-
-    const mut_targets = mut_edges.get(from) ?? new Set<CommandId>();
-
-    mut_targets.add(to);
-
-    mut_edges.set(from, mut_targets);
+  return {
+    commands,
+    edges: toEdgeMap([...derived, ...declared]),
+    bodyEdges: toEdgeMap(derived),
+    withArguments: new Set<CommandId>(withArguments),
   };
-
-  for (const edge of derived) {
-    addEdge(edge);
-  }
-
-  for (const edge of declared) {
-    addEdge(edge);
-  }
-
-  return { commands, edges: mut_edges };
 };
 
 /**
@@ -316,7 +346,7 @@ export const findUncoveredCommands = (
     commands.map((command) => toCommandId(ROOT_DIRECTORY, command)),
   );
 
-  const covered = reachableFrom(graph, entryPoints);
+  const covered = reachableFrom(graph.edges, entryPoints);
 
   return manifests.flatMap(({ directory, scripts }) =>
     Object.keys(scripts)
@@ -341,6 +371,258 @@ export const findUncoveredCommands = (
   );
 };
 
+/**
+ * The commands CI runs that a local runner — `check-all.mts`, or the plan
+ * `check-changed` builds — neither runs nor names as left to CI, and every name
+ * on its left-to-CI list that no longer means anything.
+ *
+ * Both runners restate the workflows by hand, and a command added to a matrix
+ * without them is found by CI first: for a generator, as a dirty tree that
+ * names none (#3213). This asks the question through the same graph as the rest
+ * of the file. A command counts as run when a runner's command reaches it, or
+ * when every script its body runs is run in turn: `code-check.yml` runs
+ * `ws:check:types:non-strict-lib`, which `check-all.mts` never names, and every
+ * package's `check:types` it runs is reached through `ws:check:types`.
+ *
+ * What is reported is the command a fix has to name: an aggregate some of whose
+ * entries are run is opened up to the entries that are not, and a command none
+ * of whose entries is run is named whole, rather than as each package script
+ * under it, since the lists name root scripts. A body that runs a program
+ * besides its scripts (an `assert-deps-built` in front) is judged by its
+ * scripts alone; one that runs a script with arguments is run only when run
+ * itself.
+ */
+export const findCommandsMissingLocally = ({
+  workflows,
+  graph,
+  runner,
+}: Readonly<{
+  workflows: readonly CheckWorkflow[];
+  graph: CoverageGraph;
+  runner: LocalRunner;
+}>): readonly string[] => {
+  const reached = reachableFrom(graph.edges, runner.runs);
+
+  const leftOut: ReadonlySet<CommandId> = new Set(
+    runner.leftOut.map((scriptName) => toCommandId(ROOT_DIRECTORY, scriptName)),
+  );
+
+  const isWhollyRun = whollyRunBy(graph, reached, leftOut);
+
+  const isRunWithoutTheList = whollyRunBy(graph, reached, new Set<CommandId>());
+
+  // The commands to name for one that is not wholly run. One the runner does
+  // not answer for is looked through, to the scripts under it that it does.
+  // One it does answer for is named whole when none of its scripts is run or
+  // none of those missing is one it answers for (`fix:fmt`, whose
+  // `z:format-uncommitted` is plumbing), and opened up to them otherwise.
+  const missingUnder = (
+    command: CommandId,
+    visiting: ReadonlySet<CommandId>,
+  ): readonly CommandId[] => {
+    if (isWhollyRun(command) || visiting.has(command)) {
+      return [];
+    }
+
+    const targets = Array.from(graph.bodyEdges.get(command) ?? []);
+
+    const open = targets.filter((target) => !isWhollyRun(target));
+
+    const below = open.flatMap((target) =>
+      missingUnder(target, new Set<CommandId>([...visiting, command])),
+    );
+
+    // A list names root scripts, so a package script under a root command is
+    // reported as that command, which the list can name.
+    if (
+      isRootCommand(command) &&
+      below.some((missing) => !isRootCommand(missing))
+    ) {
+      return [command];
+    }
+
+    return !runner.asks(scriptNameOf(command))
+      ? below
+      : open.length === targets.length || !Arr.isNonEmpty(below)
+        ? [command]
+        : below;
+  };
+
+  const mut_origins = new Map<CommandId, readonly string[]>();
+
+  for (const { relativePath, commands } of workflows) {
+    for (const command of commands) {
+      for (const missing of missingUnder(
+        toCommandId(ROOT_DIRECTORY, command),
+        new Set<CommandId>(),
+      )) {
+        const origins = mut_origins.get(missing) ?? [];
+
+        mut_origins.set(
+          missing,
+          origins.includes(relativePath)
+            ? origins
+            : Arr.toPushed(origins, relativePath),
+        );
+      }
+    }
+  }
+
+  // By body edges alone, as above: a name a workflow reaches only through a
+  // declared edge is one CI no longer runs as such.
+  const runByCi = reachableFrom(
+    graph.bodyEdges,
+    workflows.flatMap(({ commands }) =>
+      commands.map((command) => toCommandId(ROOT_DIRECTORY, command)),
+    ),
+  );
+
+  return [
+    ...Array.from(
+      mut_origins,
+      ([command, origins]) =>
+        `\`${scriptNameOf(command)}\` (${origins.join(', ')}) is run by CI and not by ${runner.name}: ${runner.remedy}`,
+    ),
+    ...runner.leftOut.flatMap((scriptName) => {
+      const command = toCommandId(ROOT_DIRECTORY, scriptName);
+
+      return !runByCi.has(command)
+        ? [
+            `${runner.name} leaves \`${scriptName}\` to CI, and no check workflow runs it; remove it from the list.`,
+          ]
+        : isRunWithoutTheList(command)
+          ? [
+              `${runner.name} leaves \`${scriptName}\` to CI, and runs it as well; remove it from the list.`,
+            ]
+          : [];
+    }),
+  ];
+};
+
+/**
+ * The root scripts a workflow runs: every `run: pnpm run <name>` step, plus
+ * every entry of a matrix key the workflow hands to `pnpm run`.
+ */
+export const collectWorkflowCommands = (
+  workflowFile: string,
+): readonly string[] => {
+  const matrixKeys = new Set(
+    Arr.generate(function* () {
+      for (const matched of Array.from(workflowFile.matchAll(MATRIX_COMMAND))) {
+        const key = matched.groups?.['key'];
+
+        if (key !== undefined) {
+          yield key;
+        }
+      }
+    }),
+  );
+
+  const literals = Arr.generate(function* () {
+    for (const matched of Array.from(workflowFile.matchAll(LITERAL_COMMAND))) {
+      const scriptName = matched.groups?.['scriptName'];
+
+      if (scriptName !== undefined) {
+        yield scriptName;
+      }
+    }
+  });
+
+  const fromMatrix = Array.from(matrixKeys).flatMap((key) =>
+    collectMatrixEntries(workflowFile, key),
+  );
+
+  return Arr.uniq([...literals, ...fromMatrix]).toSorted();
+};
+
+/**
+ * Every command a `check-changed` plan can run: the plan for a diff that
+ * touches every area and the code of every package. A step counts by the script
+ * it runs, whatever arguments narrow it to the diff
+ * (`z:ts-codemod --diff-from`), since narrowing to the diff is the plan's
+ * purpose.
+ */
+export const commandsAnyPlanRuns = (
+  manifests: readonly Manifest[],
+): readonly CommandId[] => {
+  const packages = manifests
+    .filter(({ directory }) => directory !== ROOT_DIRECTORY)
+    .map(({ directory, scripts }): PackageInfo => ({
+      name: directory,
+      dir: directory,
+      scripts: new Set(Object.keys(scripts)),
+      isPrivate: false,
+      workspaceDependencies: new Set<string>(),
+      buildDependencies: new Set<string>(),
+      exportsBuild: false,
+    }));
+
+  const plan = buildPlan({
+    classification: {
+      packages: packages.map((pkg) => ({ pkg, code: true }) as const),
+      dependents: [],
+      areas: new Set(ALL_AREAS),
+      ignored: [],
+    },
+    base: 'origin/main',
+    rootScripts: manifests.flatMap(({ directory, scripts }) =>
+      directory === ROOT_DIRECTORY ? Object.keys(scripts) : [],
+    ),
+    coverage: false,
+    hasUntracked: true,
+    spellChecked: [],
+  });
+
+  return Arr.generate(function* () {
+    for (const { cwd, args } of plan) {
+      const [verb, program, ...rest] = args;
+
+      if (verb === 'run' && program !== undefined) {
+        yield toCommandId(cwd, program);
+      }
+
+      // `exec run-p --continue-on-error check:root:…`, as the plan runs the
+      // `check:root:*` guards.
+      if (
+        verb === 'exec' &&
+        program !== undefined &&
+        RUN_ALL_BIN.has(program)
+      ) {
+        for (const scriptName of rest) {
+          if (!scriptName.startsWith('-')) {
+            yield toCommandId(cwd, scriptName);
+          }
+        }
+      }
+    }
+  });
+};
+
+/**
+ * Whether a script writes the tree, by the verb namespaces in CLAUDE.md:
+ * `gen:` writes committed generated sources and `fix:` rewrites. A leading
+ * scope is skipped as in {@link isCheckScript}, so `ws:gen`, `ws:fix:lint` and
+ * `strict-lib:fix:fmt` count, and so does a package's bare `gen`.
+ */
+export const isWriterScript = (scriptName: string): boolean =>
+  scriptName
+    .split(':')
+    .some((segment) => segment === GEN_SEGMENT || segment === FIX_SEGMENT);
+
+/** What {@link findCommandsMissingLocally} holds a local runner to. */
+export type LocalRunner = Readonly<{
+  /** The file a reader fixes, as the messages name it. */
+  name: string;
+  /** What a reported command asks of that file. */
+  remedy: string;
+  /** The commands the runner runs, as {@link CommandId}s. */
+  runs: readonly CommandId[];
+  /** Root script names the runner leaves to CI on purpose. */
+  leftOut: readonly string[];
+  /** Which of the scripts CI runs the runner answers for. */
+  asks: (scriptName: string) => boolean;
+}>;
+
 export type Manifest = Readonly<{
   /** Relative to the repository root; `.` for the root manifest. */
   directory: string;
@@ -354,6 +636,14 @@ type Edge = Readonly<{ from: CommandId; to: CommandId }>;
 export type CoverageGraph = Readonly<{
   commands: ReadonlySet<CommandId>;
   edges: ReadonlyMap<CommandId, ReadonlySet<CommandId>>;
+  /** The edges read out of script bodies, without {@link DECLARED_COVERAGE}. */
+  bodyEdges: ReadonlyMap<CommandId, ReadonlySet<CommandId>>;
+  /**
+   * The commands whose body runs a script with arguments, which adds no edge
+   * (see {@link resolveScriptInvocations}): their body edges are not all they
+   * run.
+   */
+  withArguments: ReadonlySet<CommandId>;
 }>;
 
 export type ScriptInvocations = Readonly<{
@@ -479,7 +769,8 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
     scriptName: 'check-all',
     // The aggregate of aggregates, and a human aid rather than a CI job: it
     // exists to be faster than GitHub Actions, not to agree with it. CI is the
-    // gate; see #1965 and the note at the end of check-all.mts.
+    // gate; see #1965 and `LEFT_TO_CI` in check-all.mts, which
+    // `findCommandsMissingLocally` holds to the workflows.
   },
   {
     directory: ROOT_DIRECTORY,
@@ -543,44 +834,58 @@ type UncoveredDeclaration = Readonly<{
   scriptName: string;
 }>;
 
-/**
- * The root scripts a workflow runs: every `run: pnpm run <name>` step, plus
- * every entry of a matrix key the workflow hands to `pnpm run`.
- */
-export const collectWorkflowCommands = (
-  workflowFile: string,
-): readonly string[] => {
-  const matrixKeys = new Set(
-    Arr.generate(function* () {
-      for (const matched of Array.from(workflowFile.matchAll(MATRIX_COMMAND))) {
-        const key = matched.groups?.['key'];
-
-        if (key !== undefined) {
-          yield key;
-        }
-      }
-    }),
-  );
-
-  const literals = Arr.generate(function* () {
-    for (const matched of Array.from(workflowFile.matchAll(LITERAL_COMMAND))) {
-      const scriptName = matched.groups?.['scriptName'];
-
-      if (scriptName !== undefined) {
-        yield scriptName;
-      }
-    }
-  });
-
-  const fromMatrix = Array.from(matrixKeys).flatMap((key) =>
-    collectMatrixEntries(workflowFile, key),
-  );
-
-  return Arr.uniq([...literals, ...fromMatrix]).toSorted();
-};
-
 const toCommandId = (directory: string, scriptName: string): CommandId =>
   `${directory}:${scriptName}` as const;
+
+/** A directory has no `:`, so the script name is what follows the first. */
+const scriptNameOf = (command: CommandId): string =>
+  command.slice(command.indexOf(':') + 1);
+
+const isRootCommand = (command: CommandId): boolean =>
+  command.startsWith(`${ROOT_DIRECTORY}:`);
+
+/**
+ * Whether a command is run, either itself (reached from what the runner runs,
+ * or on its list) or through every script its body runs. Only body edges count:
+ * a declared edge says the CI command covers a narrower one (`fix:fmt:full`
+ * covers `fix:fmt:diff`), so running the narrower one does not run the CI
+ * command; and a body that also runs a script with arguments runs more than its
+ * edges show. A command met again inside its own walk is taken as not run,
+ * which only a body cycle — a script that would never terminate — could make
+ * happen.
+ */
+const whollyRunBy = (
+  graph: CoverageGraph,
+  reached: ReadonlySet<CommandId>,
+  leftOut: ReadonlySet<CommandId>,
+): ((command: CommandId) => boolean) => {
+  const mut_memo = new Map<CommandId, boolean>();
+
+  const isWhollyRun = (command: CommandId): boolean => {
+    const known = mut_memo.get(command);
+
+    if (known !== undefined) {
+      return known;
+    }
+
+    mut_memo.set(command, false);
+
+    const targets = Array.from(graph.bodyEdges.get(command) ?? []);
+
+    const result =
+      reached.has(command) ||
+      leftOut.has(command) ||
+      (!graph.withArguments.has(command) &&
+        Arr.isNonEmpty(targets) &&
+        targets.every(isWhollyRun));
+
+    mut_memo.set(command, result);
+
+    return result;
+  };
+
+  return isWhollyRun;
+};
 
 /**
  * Whether a script's name says it is a check a pull request should get.
@@ -618,6 +923,12 @@ const isCheckScript = (scriptName: string): boolean => {
 };
 
 const PLUMBING_PREFIX = 'z:';
+
+const GEN_SEGMENT = 'gen';
+
+const FIX_SEGMENT = 'fix';
+
+const RUN_ALL_BIN: ReadonlySet<string> = new Set<string>(['run-p', 'run-s']);
 
 const VERIFY_PREFIX = 'verify:';
 
@@ -677,6 +988,16 @@ const tokenize = (args: string): readonly string[] => {
   return mut_tokens;
 };
 
+/** Whether a body runs a script with arguments, `pnpm run x --flag`. */
+const runsScriptWithArguments = (body: string): boolean =>
+  body.matchAll(PNPM_RUN).some((matched) => {
+    const tokens = tokenize(matched.groups?.['args'] ?? '');
+
+    const targetIndex = tokens.findIndex((token) => !token.startsWith('-'));
+
+    return targetIndex !== -1 && tokens.length > targetIndex + 1;
+  });
+
 const QUOTES: ReadonlySet<string> = new Set<string>(["'", '"']);
 
 const WHITESPACE: ReadonlySet<string> = new Set<string>([' ', '\t']);
@@ -720,8 +1041,28 @@ const matchesGlob = (pattern: string, name: string): boolean => {
   return mut_cursor.at <= name.length - last.length;
 };
 
+const toEdgeMap = (
+  edges: readonly Edge[],
+): ReadonlyMap<CommandId, ReadonlySet<CommandId>> => {
+  const mut_edges = new Map<CommandId, Set<CommandId>>();
+
+  for (const { from, to } of edges) {
+    if (from === to) {
+      continue;
+    }
+
+    const mut_targets = mut_edges.get(from) ?? new Set<CommandId>();
+
+    mut_targets.add(to);
+
+    mut_edges.set(from, mut_targets);
+  }
+
+  return mut_edges;
+};
+
 const reachableFrom = (
-  graph: CoverageGraph,
+  edges: ReadonlyMap<CommandId, ReadonlySet<CommandId>>,
   entryPoints: readonly CommandId[],
 ): ReadonlySet<CommandId> => {
   const mut_seen = new Set<CommandId>(entryPoints);
@@ -735,7 +1076,7 @@ const reachableFrom = (
       break;
     }
 
-    const unseen = Array.from(graph.edges.get(current) ?? []).filter(
+    const unseen = Array.from(edges.get(current) ?? []).filter(
       (next) => !mut_seen.has(next),
     );
 
@@ -753,7 +1094,7 @@ const reaches = (
   graph: CoverageGraph,
   from: CommandId,
   to: CommandId,
-): boolean => from !== to && reachableFrom(graph, [from]).has(to);
+): boolean => from !== to && reachableFrom(graph.edges, [from]).has(to);
 
 const readScripts = (manifest: unknown): ReadonlyRecord<string, string> => {
   if (!isRecord(manifest) || !hasKey(manifest, 'scripts')) {
@@ -937,6 +1278,8 @@ const formatViolations = (violations: readonly string[]): string =>
     'a question, and a check no workflow runs is a check that cannot fail.',
     'Remove the redundant entry, wire the uncovered check into a workflow, or',
     'record the exception with its reason in check-ci-commands.mts.',
+    'A command CI runs that check-all or check-changed does not is found by CI',
+    'first; each message above says which list in which file to change.',
   ].join('\n');
 
 if (isDirectlyExecuted(import.meta.url)) {

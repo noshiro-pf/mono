@@ -85,6 +85,11 @@ codemod's reprinting, is not.
 
 ## What it leaves to CI
 
+`check:root:ci-commands` holds the plan to the check workflows: a generator or
+fixer one of them runs that no plan has a step for fails it, unless
+`GENERATORS_LEFT_TO_CI` in `plan.mts` names it with the reason. The checks below
+are not held to it; this list is theirs.
+
 What depends on a changed package is not built or checked beyond its generators,
 so a stale `dist/` in a dependent goes unnoticed; build first (`ws:build:deps`)
 after a change other packages consume. Nor are the packages a change to

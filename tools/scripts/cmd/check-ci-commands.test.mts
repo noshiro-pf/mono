@@ -3,11 +3,15 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   buildCoverageGraph,
   collectWorkflowCommands,
+  commandsAnyPlanRuns,
+  findCommandsMissingLocally,
   findRedundantCommands,
   findUncoveredCommands,
+  isWriterScript,
   matchScriptNames,
   resolveScriptInvocations,
   type CheckWorkflow,
+  type LocalRunner,
   type Manifest,
 } from './check-ci-commands.mjs';
 
@@ -338,5 +342,304 @@ describe('findUncoveredCommands', () => {
     );
 
     assert.isFalse(violations.some((message) => message.includes('fix:fmt')));
+  });
+});
+
+describe('findCommandsMissingLocally', () => {
+  const manifests = [
+    rootManifest({
+      'ws:build': 'tsx ./build.mts',
+      'ws:check:types': 'pnpm run --recursive --if-present check:types',
+      'ws:check:types:half':
+        "pnpm run --recursive --if-present --filter='./libs/**' check:types",
+      'ws:check:dist': 'pnpm run --recursive --if-present check:dist',
+      'ws:gen': 'pnpm run --recursive --if-present gen',
+      'check:md': 'markdownlint-cli2',
+      'gen:graph': 'tsx ./graph.mts',
+      'z:assert-repo-is-clean': 'tsx ./clean.mts',
+      'z:ci:aggregate': 'run-s --continue-on-error check:md gen:graph ws:gen',
+      'fix:fmt:full': 'prettier --write .',
+      'fix:fmt:diff': 'pnpm run z:format-diff',
+      'z:format-diff': 'tsx ./format-diff.mts',
+      'fix:fmt': 'pnpm run z:format-uncommitted',
+      'z:format-uncommitted': 'tsx ./format-uncommitted.mts',
+      'fix:codemod:diff':
+        'pnpm run z:ts-codemod --diff-from origin/main && pnpm run fix:fmt',
+      'ws:check:types:half-again':
+        "pnpm run --recursive --if-present --filter='./libs/**' check:types",
+    }),
+    packageManifest('libs/a', {
+      'check:types': 'tsc --noEmit',
+      'check:dist': 'tsx ./dist.mts',
+      gen: 'tsx ./gen.mts',
+    }),
+    packageManifest('libs/b', {
+      'check:types': 'tsc --noEmit',
+      gen: 'tsx ./gen.mts',
+    }),
+  ] as const;
+
+  const graph = buildCoverageGraph(manifests);
+
+  const runner = (
+    runs: readonly string[],
+    leftOut: readonly string[] = [],
+    asks: (scriptName: string) => boolean = () => true,
+  ): LocalRunner =>
+    ({
+      name: 'check-all.mts',
+      remedy: 'add a step that reaches it, or list it in LEFT_TO_CI.',
+      runs,
+      leftOut,
+      asks,
+    }) as const;
+
+  test('reports a command CI runs and no step reaches', () => {
+    const violations = findCommandsMissingLocally({
+      workflows: [
+        workflow('.github/workflows/a.yml', ['ws:build', 'check:md']),
+      ],
+      graph,
+      runner: runner(['.:ws:build']),
+    });
+
+    assert.deepStrictEqual(violations, [
+      '`check:md` (.github/workflows/a.yml) is run by CI and not by check-all.mts: add a step that reaches it, or list it in LEFT_TO_CI.',
+    ]);
+  });
+
+  test('takes a command whose every target a step reaches as run', () => {
+    // `ws:check:types:non-strict-lib` against `ws:check:types`: the half is
+    // never named, and every package script it runs is.
+    const violations = findCommandsMissingLocally({
+      workflows: [workflow('.github/workflows/a.yml', ['ws:check:types:half'])],
+      graph,
+      runner: runner(['.:ws:check:types']),
+    });
+
+    assert.deepStrictEqual(violations, []);
+  });
+
+  test('names the one entry of an aggregate that no step reaches', () => {
+    const violations = findCommandsMissingLocally({
+      workflows: [workflow('.github/workflows/a.yml', ['z:ci:aggregate'])],
+      graph,
+      runner: runner(['.:check:md', '.:ws:gen']),
+    });
+
+    assert.deepStrictEqual(violations, [
+      '`gen:graph` (.github/workflows/a.yml) is run by CI and not by check-all.mts: add a step that reaches it, or list it in LEFT_TO_CI.',
+    ]);
+  });
+
+  test('names a recursive command whole when no script it reaches is run', () => {
+    const violations = findCommandsMissingLocally({
+      workflows: [workflow('.github/workflows/a.yml', ['z:ci:aggregate'])],
+      graph,
+      runner: runner(['.:check:md', '.:gen:graph']),
+    });
+
+    assert.deepStrictEqual(violations, [
+      '`ws:gen` (.github/workflows/a.yml) is run by CI and not by check-all.mts: add a step that reaches it, or list it in LEFT_TO_CI.',
+    ]);
+  });
+
+  test('names each workflow that runs a missing command', () => {
+    const violations = findCommandsMissingLocally({
+      workflows: [
+        workflow('.github/workflows/a.yml', ['gen:graph']),
+        workflow('.github/workflows/b.yml', ['gen:graph'], true),
+      ],
+      graph,
+      runner: runner([]),
+    });
+
+    assert.deepStrictEqual(violations, [
+      '`gen:graph` (.github/workflows/a.yml, .github/workflows/b.yml) is run by CI and not by check-all.mts: add a step that reaches it, or list it in LEFT_TO_CI.',
+    ]);
+  });
+
+  test('accepts a command left to CI, at any depth', () => {
+    const violations = findCommandsMissingLocally({
+      workflows: [
+        workflow('.github/workflows/a.yml', [
+          'z:ci:aggregate',
+          'z:assert-repo-is-clean',
+        ]),
+      ],
+      graph,
+      runner: runner(
+        ['.:check:md', '.:ws:gen'],
+        ['gen:graph', 'z:assert-repo-is-clean'],
+      ),
+    });
+
+    assert.deepStrictEqual(violations, []);
+  });
+
+  test('reports a command left to CI that no check workflow runs', () => {
+    const violations = findCommandsMissingLocally({
+      workflows: [workflow('.github/workflows/a.yml', ['ws:build'])],
+      graph,
+      runner: runner(['.:ws:build'], ['ws:check:dist']),
+    });
+
+    assert.deepStrictEqual(violations, [
+      'check-all.mts leaves `ws:check:dist` to CI, and no check workflow runs it; remove it from the list.',
+    ]);
+  });
+
+  test('reports a command left to CI that a step reaches after all', () => {
+    const violations = findCommandsMissingLocally({
+      workflows: [workflow('.github/workflows/a.yml', ['check:md'])],
+      graph,
+      runner: runner(['.:check:md'], ['check:md']),
+    });
+
+    assert.deepStrictEqual(violations, [
+      'check-all.mts leaves `check:md` to CI, and runs it as well; remove it from the list.',
+    ]);
+  });
+
+  test('does not take a narrower command, declared as covered, for the CI one', () => {
+    // `fix:fmt:full` covers `fix:fmt:diff` by DECLARED_COVERAGE; running the
+    // diff alone leaves the rest of the tree unformatted.
+    const violations = findCommandsMissingLocally({
+      workflows: [workflow('.github/workflows/a.yml', ['fix:fmt:full'])],
+      graph,
+      runner: runner(['.:fix:fmt:diff']),
+    });
+
+    assert.deepStrictEqual(violations, [
+      '`fix:fmt:full` (.github/workflows/a.yml) is run by CI and not by check-all.mts: add a step that reaches it, or list it in LEFT_TO_CI.',
+    ]);
+  });
+
+  test('reports a command left to CI that a workflow reaches only by a declared edge', () => {
+    const violations = findCommandsMissingLocally({
+      workflows: [workflow('.github/workflows/a.yml', ['fix:fmt:full'])],
+      graph,
+      runner: runner([], ['fix:fmt:full', 'fix:fmt:diff']),
+    });
+
+    assert.deepStrictEqual(violations, [
+      'check-all.mts leaves `fix:fmt:diff` to CI, and no check workflow runs it; remove it from the list.',
+    ]);
+  });
+
+  test('names a writer whose body runs only plumbing nothing runs', () => {
+    const violations = findCommandsMissingLocally({
+      workflows: [workflow('.github/workflows/a.yml', ['fix:fmt'])],
+      graph,
+      runner: runner([], [], isWriterScript),
+    });
+
+    assert.deepStrictEqual(violations, [
+      '`fix:fmt` (.github/workflows/a.yml) is run by CI and not by check-all.mts: add a step that reaches it, or list it in LEFT_TO_CI.',
+    ]);
+  });
+
+  test('does not take a body that also runs a script with arguments as run by its edges', () => {
+    // Its only edge is `fix:fmt`; the codemod it runs first adds none.
+    const violations = findCommandsMissingLocally({
+      workflows: [workflow('.github/workflows/a.yml', ['fix:codemod:diff'])],
+      graph,
+      runner: runner(['.:fix:fmt']),
+    });
+
+    assert.deepStrictEqual(violations, [
+      '`fix:codemod:diff` (.github/workflows/a.yml) is run by CI and not by check-all.mts: add a step that reaches it, or list it in LEFT_TO_CI.',
+    ]);
+  });
+
+  test('reports a command left to CI that every script under it runs anyway', () => {
+    const violations = findCommandsMissingLocally({
+      workflows: [
+        workflow('.github/workflows/a.yml', ['ws:check:types:half-again']),
+      ],
+      graph,
+      runner: runner(['.:ws:check:types'], ['ws:check:types:half-again']),
+    });
+
+    assert.deepStrictEqual(violations, [
+      'check-all.mts leaves `ws:check:types:half-again` to CI, and runs it as well; remove it from the list.',
+    ]);
+  });
+
+  test('asks only about the scripts the runner answers for', () => {
+    // check-changed answers for the generators: a check it leaves to CI is
+    // in its README, and a generator it misses is a dirty tree in CI.
+    const violations = findCommandsMissingLocally({
+      workflows: [
+        workflow('.github/workflows/a.yml', [
+          'ws:check:dist',
+          'z:ci:aggregate',
+        ]),
+      ],
+      graph,
+      runner: runner(['.:check:md', 'libs/a:gen'], [], isWriterScript),
+    });
+
+    assert.deepStrictEqual(violations, [
+      '`gen:graph` (.github/workflows/a.yml) is run by CI and not by check-all.mts: add a step that reaches it, or list it in LEFT_TO_CI.',
+      '`ws:gen` (.github/workflows/a.yml) is run by CI and not by check-all.mts: add a step that reaches it, or list it in LEFT_TO_CI.',
+    ]);
+  });
+});
+
+describe('isWriterScript', () => {
+  test('takes `gen` and `fix` under any scope, and a bare `gen`', () => {
+    assert.isTrue(isWriterScript('gen'));
+
+    assert.isTrue(isWriterScript('ws:gen'));
+
+    assert.isTrue(isWriterScript('gen:license-files'));
+
+    assert.isTrue(isWriterScript('strict-lib:fix:fmt'));
+
+    assert.isTrue(isWriterScript('ws:fix:lint:apps'));
+  });
+
+  test('leaves the checks, the builds and a name that only contains a verb', () => {
+    assert.isFalse(isWriterScript('check:md'));
+
+    assert.isFalse(isWriterScript('ws:build'));
+
+    assert.isFalse(isWriterScript('doc'));
+
+    assert.isFalse(isWriterScript('check:gen-index'));
+  });
+});
+
+describe('commandsAnyPlanRuns', () => {
+  test('reads the root and package scripts a plan touching everything runs', () => {
+    const runs = commandsAnyPlanRuns([
+      rootManifest({
+        'check:root:one': 'tsx ./one.mts',
+        'check:root:two': 'tsx ./two.mts',
+        'gen:deps-graph': 'tsx ./graph.mts',
+        'gen:license-files': 'tsx ./license.mts',
+        'strict-lib:fix:fmt': 'oxfmt ./strict-lib',
+      }),
+      packageManifest('libs/a', {
+        gen: 'tsx ./gen.mts',
+        'fix:lint': 'eslint . --fix',
+      }),
+    ]);
+
+    const expected = [
+      '.:check:root:one',
+      '.:check:root:two',
+      '.:gen:deps-graph',
+      '.:gen:license-files',
+      '.:strict-lib:fix:fmt',
+      'libs/a:gen',
+      'libs/a:fix:lint',
+    ] as const;
+
+    assert.deepStrictEqual(
+      expected.filter((command) => !runs.includes(command)),
+      [],
+    );
   });
 });

@@ -154,13 +154,13 @@ Main entry points: `ws:build[:deps]`, `ws:gen`, `ws:check:types`, `ws:fix:lint`,
 A missing `dist/` is named by the check that needs it; **a stale one is not**.
 
 **Run `pnpm run check-changed`, not `check-all`**, after every change
-(`--base <branch>` for a stacked one). It runs what the diff touches, fails on
-a generator that changed the tree, and reads the commits and changesets;
+(`--base <branch>` for a stacked one). It runs what the diff touches, fails on a
+generator that changed the tree, and reads the commits and changesets;
 `tools/scripts/cmd/check-changed/README.md` says what it runs and leaves to
-CI. It does not build what depends on a changed package: run
-`ws:build:deps` first when other packages consume the change. `check-all` is
-a human aid (its limits end `check-all.mts`). A generator of a package the
-diff does not touch can still write; read `git status` before pushing.
+CI. It does not build what depends on a changed package: run `ws:build:deps`
+first when other packages consume the change. `check-all` is a human aid (its
+limits: `LEFT_TO_CI` in `check-all.mts`). A generator of a package the diff does
+not touch can still write; read `git status` before pushing.
 
 ### Samples and generated documentation
 
