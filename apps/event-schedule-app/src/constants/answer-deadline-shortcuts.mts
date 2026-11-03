@@ -1,59 +1,36 @@
-import { pipe } from 'ts-data-forge';
+import type { DatePickerShortcut } from '@blueprintjs/datetime';
 import { DateUtils } from 'ts-fortress-types';
-import type { DateEnum, MonthEnum } from 'ts-type-forge';
-import { idfn } from '../utils-ported/index.mjs';
+import type { MonthEnum } from 'ts-type-forge';
+import { addDays, endOfDay } from '../utils/index.mjs';
 
-const createDate = (modifier: (d: Date) => Date): Date =>
-  pipe(DateUtils.today())
-    .map(modifier)
-    .map(DateUtils.setLocaleHours(23))
-    .map(DateUtils.setLocaleMinutes(59))
-    .map(DateUtils.toDate).value;
+/**
+ * The answer-deadline picker's shortcuts, counted from `today` and ending at
+ * 23:59. Built where the picker opens, so that a tab left open past midnight
+ * counts from the day the user is working, not the day the page loaded.
+ */
+export const createAnswerDeadlineShortcuts = (
+  today: Date,
+): readonly DatePickerShortcut[] =>
+  shortcuts.map(({ label, shift }) => ({
+    date: endOfDay(shift(today)),
+    label,
+    includeTime: true,
+  }));
 
-export const answerDeadlineShortcuts: readonly DatePickerShortcut[] = [
-  { date: createDate(idfn), label: 'Today', includeTime: true },
+const shortcuts = [
+  { label: 'Today', shift: addDays(0) },
+  { label: 'Tomorrow', shift: addDays(1) },
+  { label: '1 week later', shift: addDays(7) },
+  { label: '2 week later', shift: addDays(14) },
   {
-    date: createDate(
-      DateUtils.updateLocaleDate(
-        (v) =>
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          (v + 1) as DateEnum,
-      ),
-    ),
-    label: 'Tomorrow',
-    includeTime: true,
-  },
-  {
-    date: createDate(
-      DateUtils.updateLocaleDate(
-        (v) =>
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          (v + 7) as DateEnum,
-      ),
-    ),
-    label: '1 week later',
-    includeTime: true,
-  },
-  {
-    date: createDate(
-      DateUtils.updateLocaleDate(
-        (v) =>
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          (v + 14) as DateEnum,
-      ),
-    ),
-    label: '2 week later',
-    includeTime: true,
-  },
-  {
-    date: createDate(
-      DateUtils.updateLocaleMonth(
-        (v) =>
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          (v + 1) as MonthEnum,
-      ),
-    ),
     label: '1 month later',
-    includeTime: true,
+    shift: DateUtils.updateLocaleMonth(
+      (v) =>
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        (v + 1) as MonthEnum,
+    ),
   },
-] as const;
+] as const satisfies readonly Readonly<{
+  label: string;
+  shift: (date: Date) => Date;
+}>[];

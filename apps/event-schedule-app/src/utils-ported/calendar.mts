@@ -85,9 +85,6 @@ export const isEmailString = (str: string): boolean =>
     str,
   );
 
-/** The identity function. */
-export const idfn = <T,>(value: T): T => value;
-
 /**
  * Resolves a relative path against the current document.
  *
