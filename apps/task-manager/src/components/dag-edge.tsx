@@ -18,8 +18,9 @@ type Props = Readonly<{
  * is easy to point at: pointed at, it is drawn in the focus colour, and
  * clicked, it is selected (`dag-canvas.tsx`) and stays so.
  *
- * An `implied` edge, the order in time of two milestones, is drawn dashed and
- * with nothing to point at: it is no dependency, so there is nothing to delete.
+ * An `implied` edge, the order in time of two milestones or of a deadline and a
+ * milestone, is drawn dashed and with nothing to point at: it is no dependency,
+ * so there is nothing to delete.
  */
 export const DagEdge = ({ record }: Props): JSX.Element => {
   const path = view(record, ({ edge }) => edge.path);

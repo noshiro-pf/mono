@@ -195,6 +195,7 @@ export const dagOutsideNodes = dagFilteredNodes
 
 export const dagLayoutStore = createDagLayoutStore({
   state: dataStore.state,
+  timeZone: undefined,
   stored: dataStore.dagLayout,
   defaultDirection: narrowStore.matches.pipe(map(defaultDirection)),
   active: uiStore.view.pipe(map((view) => view === 'dag')),

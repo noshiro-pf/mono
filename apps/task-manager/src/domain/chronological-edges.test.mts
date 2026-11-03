@@ -9,9 +9,12 @@ import {
   asTaskId,
   type DomainState,
   type Milestone,
+  type Task,
 } from './types.mjs';
 
 const day = 86_400_000;
+
+const startOfUtcDay = (epochMs: number): number => epochMs - (epochMs % day);
 
 const milestone = (
   id: string,
@@ -26,13 +29,26 @@ const milestone = (
     dependencies,
   });
 
+const task = (id: string, dueDate: number | undefined): Task =>
+  createTask({ id: asTaskId(id), title: id, now: 0, dueDate });
+
+const allDay = (id: string, dueDate: number): Task =>
+  createTask({ id: asTaskId(id), title: id, now: 0, dueDate, dueAllDay: true });
+
+const dependsOn = (id: string) =>
+  ({
+    from: { kind: 'task', id: asTaskId(id) },
+    type: 'finish-to-start',
+    lagMs: 0,
+  }) as const;
+
 const on = (id: string) =>
   ({ from: { kind: 'milestone', id: asMilestoneId(id) }, lagMs: 0 }) as const;
 
 const impliedOf = (
   state: DomainState,
 ): readonly FixedLengthTuple<2, string>[] =>
-  withChronologicalEdges(state, buildDependencyGraph(state))
+  withChronologicalEdges(state, buildDependencyGraph(state), startOfUtcDay)
     .edges.filter(({ implied }) => implied)
     .map(({ from, to }) => [from, to] as const);
 
@@ -70,7 +86,7 @@ describe(withChronologicalEdges, () => {
 
     const graph = buildDependencyGraph(state);
 
-    const withImplied = withChronologicalEdges(state, graph);
+    const withImplied = withChronologicalEdges(state, graph, startOfUtcDay);
 
     assert.deepStrictEqual(withImplied.nodes, graph.nodes);
 
@@ -149,6 +165,138 @@ describe(withChronologicalEdges, () => {
     );
   });
 
+  test('joins a task to the milestones of the first date at or after its deadline', () => {
+    assert.deepStrictEqual(
+      impliedOf({
+        tasks: [
+          task('early', day),
+          task('between', 15 * day),
+          task('same', 20 * day),
+          task('late', 30 * day),
+          task('none', undefined),
+        ],
+        milestones: [
+          milestone('m20', 20 * day),
+          milestone('m25', 25 * day),
+          milestone('m25b', 25 * day),
+        ],
+      }),
+      [
+        ['milestone:m20', 'milestone:m25'],
+        ['milestone:m20', 'milestone:m25b'],
+        ['task:early', 'milestone:m20'],
+        ['task:between', 'milestone:m20'],
+        ['task:same', 'milestone:m20'],
+      ],
+    );
+  });
+
+  test('joins a task whose deadline is after the milestones of a date to those of the next', () => {
+    assert.deepStrictEqual(
+      impliedOf({
+        tasks: [task('t', 22 * day)],
+        milestones: [
+          milestone('m20', 20 * day),
+          milestone('m25', 25 * day),
+          milestone('m25b', 25 * day),
+        ],
+      }),
+      [
+        ['milestone:m20', 'milestone:m25'],
+        ['milestone:m20', 'milestone:m25b'],
+        ['task:t', 'milestone:m25'],
+        ['task:t', 'milestone:m25b'],
+      ],
+    );
+  });
+
+  test('takes an all-day deadline from the start of its day', () => {
+    assert.deepStrictEqual(
+      impliedOf({
+        tasks: [
+          // Due on day 4, stored as its last moment.
+          allDay('sameDay', 5 * day - 1),
+          allDay('dayBefore', 4 * day - 1),
+        ],
+        milestones: [
+          // Day 4, stored as its start.
+          createMilestone({
+            id: asMilestoneId('m4'),
+            title: 'm4',
+            now: 0,
+            date: 4 * day,
+            dateAllDay: true,
+          }),
+          milestone('m9', 9 * day),
+        ],
+      }),
+      [
+        ['milestone:m4', 'milestone:m9'],
+        ['task:sameDay', 'milestone:m4'],
+        ['task:dayBefore', 'milestone:m4'],
+      ],
+    );
+  });
+
+  test('adds no deadline edge where the edges already order the task and the milestone', () => {
+    const after = asTaskId('after');
+
+    assert.deepStrictEqual(
+      impliedOf({
+        tasks: [
+          // Due before m1, which already depends on it.
+          task('direct', 2 * day),
+          // Due before m2, and already before it through m1 and the order in
+          // time.
+          task('through', 4 * day),
+          // Due before m1, but depends on it, so it cannot come before it.
+          createTask({
+            id: after,
+            title: 'after',
+            now: 0,
+            dueDate: day,
+            dependencies: [on('m1')],
+          }),
+        ],
+        milestones: [
+          milestone('m1', 3 * day, [dependsOn('direct'), dependsOn('through')]),
+          milestone('m2', 5 * day),
+        ],
+      }),
+      [['milestone:m1', 'milestone:m2']],
+    );
+  });
+
+  test('joins only the tasks in the graph', () => {
+    const state: DomainState = {
+      tasks: [task('shown', day), task('hidden', day)],
+      milestones: [milestone('m', 2 * day)],
+    } as const;
+
+    const graph = buildDependencyGraph(state);
+
+    assert.deepStrictEqual(
+      withChronologicalEdges(
+        state,
+        {
+          nodes: graph.nodes.filter(({ id }) => id !== 'task:hidden'),
+          edges: [],
+        },
+        startOfUtcDay,
+      ).edges,
+      [
+        {
+          id: 'deadline:task:shown>milestone:m',
+          from: 'task:shown',
+          to: 'milestone:m',
+          type: undefined,
+          lagMs: 0,
+          implied: true,
+        },
+      ],
+    );
+  });
+
   test('joins only the milestones in the graph', () => {
     const state: DomainState = {
       tasks: [],
@@ -162,10 +310,14 @@ describe(withChronologicalEdges, () => {
     const graph = buildDependencyGraph(state);
 
     assert.deepStrictEqual(
-      withChronologicalEdges(state, {
-        nodes: graph.nodes.filter(({ id }) => id !== 'milestone:m2'),
-        edges: [],
-      }).edges.map(({ from, to }) => [from, to]),
+      withChronologicalEdges(
+        state,
+        {
+          nodes: graph.nodes.filter(({ id }) => id !== 'milestone:m2'),
+          edges: [],
+        },
+        startOfUtcDay,
+      ).edges.map(({ from, to }) => [from, to]),
       [['milestone:m1', 'milestone:m3']],
     );
   });

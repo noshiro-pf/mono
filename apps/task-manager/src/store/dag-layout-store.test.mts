@@ -273,6 +273,7 @@ const setup = (
 
   const store = createDagLayoutStore({
     state,
+    timeZone: 'UTC',
     stored,
     defaultDirection,
     active,
@@ -508,6 +509,13 @@ const dated = (dates: readonly number[]): DomainState =>
     ),
   }) as const;
 
+/** A task due at `dueDate` and milestones dated 2000 and 4000. */
+const withDeadline = (dueDate: number): DomainState =>
+  ({
+    tasks: [createTask({ id: asTaskId('t'), title: 'T', now: 0, dueDate })],
+    milestones: dated([2000, 4000]).milestones,
+  }) as const;
+
 describe(createDagLayoutStore, () => {
   describe('the automatic layout', () => {
     test('lays nothing out while the DAG is not shown', () => {
@@ -594,6 +602,25 @@ describe(createDagLayoutStore, () => {
         ['milestone:m2', 'milestone:m1'],
         ['milestone:m1', 'milestone:m0'],
       ]);
+    });
+
+    test('lays a task out before the milestone of the date after its deadline, and follows a deadline changed', () => {
+      const { deferred, setState } = setup({ state: withDeadline(1000) });
+
+      const fromTask = (
+        index: number,
+      ): readonly FixedLengthTuple<2, string>[] =>
+        (deferred.requests[index]?.edges ?? [])
+          .filter((edge) => edge.implied && edge.from === 'task:t')
+          .map(({ from, to }) => [from, to] as const);
+
+      assert.deepStrictEqual(fromTask(0), [['task:t', 'milestone:m0']]);
+
+      setState(withDeadline(3000));
+
+      assert.strictEqual(deferred.requests.length, 2);
+
+      assert.deepStrictEqual(fromTask(1), [['task:t', 'milestone:m1']]);
     });
 
     test('drops a result that a newer request has overtaken', async () => {

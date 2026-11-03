@@ -4,6 +4,12 @@
  * that the DAG lays them out in that order. Only neighbors in time are joined,
  * since the rest of the order follows from theirs.
  *
+ * A task with a deadline is put in that order too: an edge runs from it to each
+ * milestone of the first date at or after its deadline, so that it is laid out
+ * before that milestone. A deadline that is a day is taken from the start of
+ * that day (`startOfDay`, which knows the wall clock), so that a task due on a
+ * day comes before a milestone of that day.
+ *
  * These edges are not dependencies: nothing is stored for them, nothing waits
  * on them, and they follow the dates as they change. Where the dependencies
  * already order two neighbors, either way, none is added — so that none is
@@ -21,13 +27,17 @@ import type { DomainState } from './types.mjs';
 
 /**
  * `graph` with an edge, `implied`, from every milestone of `state` that is one
- * of its nodes and has a date to every such milestone of the next date, unless
- * the edges already order the two. They come after those of `graph`, in order
- * of date and then of the milestones.
+ * of its nodes and has a date to every such milestone of the next date, and
+ * from every task of `state` that is one of its nodes and has a deadline to
+ * every such milestone of the first date at or after it, unless the edges
+ * already order the two. They come after those of `graph`: those between
+ * milestones in order of date and then of the milestones, then those from tasks
+ * in order of the tasks and then of the milestones.
  */
 export const withChronologicalEdges = (
   state: DomainState,
   graph: DependencyGraph,
+  startOfDay: (epochMs: number) => number,
 ): DependencyGraph => {
   const nodeIds: ReadonlySet<GraphNodeId> = new Set(
     graph.nodes.map(({ id }) => id),
@@ -42,8 +52,8 @@ export const withChronologicalEdges = (
     .toSorted((a, b) => a.date - b.date);
 
   const byDate = Array.from(
-    Map.groupBy(dated, ({ date }) => date).values(),
-    (entries) => entries.map(({ id }) => id),
+    Map.groupBy(dated, ({ date }) => date),
+    ([date, entries]) => ({ date, ids: entries.map(({ id }) => id) }),
   );
 
   const mut_targets = new Map<GraphNodeId, readonly GraphNodeId[]>();
@@ -86,28 +96,53 @@ export const withChronologicalEdges = (
     return false;
   };
 
+  /** The edge, joined, unless the edges already order the two. */
+  const implied = (
+    prefix: 'chronological' | 'deadline',
+    from: GraphNodeId,
+    to: GraphNodeId,
+  ): readonly DependencyGraphEdge[] => {
+    if (reaches(from, to) || reaches(to, from)) {
+      return [];
+    }
+
+    join(from, to);
+
+    return [
+      {
+        id: `${prefix}:${from}>${to}`,
+        from,
+        to,
+        type: undefined,
+        lagMs: 0,
+        implied: true,
+      },
+    ];
+  };
+
   const added = Arr.tail(byDate).flatMap((later, index) =>
-    (byDate[index] ?? []).flatMap((from) =>
-      later.flatMap((to): readonly DependencyGraphEdge[] => {
-        if (reaches(from, to) || reaches(to, from)) {
-          return [];
-        }
-
-        join(from, to);
-
-        return [
-          {
-            id: `chronological:${from}>${to}`,
-            from,
-            to,
-            type: undefined,
-            lagMs: 0,
-            implied: true,
-          },
-        ];
-      }),
+    (byDate[index]?.ids ?? []).flatMap((from) =>
+      later.ids.flatMap((to) => implied('chronological', from, to)),
     ),
   );
 
-  return { nodes: graph.nodes, edges: [...graph.edges, ...added] };
+  const fromTasks = state.tasks.flatMap(({ id, dueDate, dueAllDay }) => {
+    const from = nodeId({ kind: 'task', id });
+
+    if (dueDate === undefined || !nodeIds.has(from)) {
+      return [];
+    }
+
+    // An all-day deadline is stored as the end of its day.
+    const due = dueAllDay ? startOfDay(dueDate) : dueDate;
+
+    const next = byDate.find(({ date }) => due <= date);
+
+    return (next?.ids ?? []).flatMap((to) => implied('deadline', from, to));
+  });
+
+  return {
+    nodes: graph.nodes,
+    edges: [...graph.edges, ...added, ...fromTasks],
+  };
 };

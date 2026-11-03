@@ -20,12 +20,13 @@ test(
       page.getByRole('button', { name: /仕様をまとめる/u }),
     );
 
-    // Eight of the nine nodes, and seven of the ten edges: none from it.
+    // Eight of the nine nodes, and eleven of the fourteen edges: none from it.
+    // Four are implied by deadlines, from the dated tasks to コードフリーズ.
     await expect.soft(nodes).toHaveCount(8);
 
     await expect.soft(spec).toHaveCount(0);
 
-    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(7);
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(11);
 
     // What waited for it is shown with the status it has, not blocked.
     await expect
@@ -36,7 +37,7 @@ test(
       )
       .toHaveAccessibleName(/状態: 着手可/u);
 
-    // In 「アーク」 too: the eight nodes left, and the DAG's seven edges.
+    // In 「アーク」 too: the eight nodes left, and the DAG's seven stored edges.
     await page.getByTestId('dag-mode-arc').click();
 
     await expect.soft(canvas).toHaveAttribute('data-animating', 'false');
@@ -68,7 +69,7 @@ test(
 
     await expect.soft(spec).toHaveCount(1);
 
-    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(10);
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(14);
 
     // Kept on this device: a new visit, whose URL names no mode.
     await page.goto(DEMO);

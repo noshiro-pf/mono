@@ -2,9 +2,11 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import type { DeepReadonly } from 'ts-type-forge';
 
 // As `demo.spec.mts`: the in-memory demo, with the sample data of
-// `src/demo/sample-data.mts`. Its done task is hidden, so seven edges are
+// `src/demo/sample-data.mts`. Its done task is hidden, so eleven edges are
 // drawn: 画面設計 and API を実装する → 画面を実装する → 実装完了 → 結合テスト
-// → リリース承認, API を実装する → 実装完了, and コードフリーズ → リリース承認.
+// → リリース承認, API を実装する → 実装完了, and コードフリーズ → リリース承認;
+// and, implied by their deadlines, one from each of 画面設計, API を実装する,
+// 画面を実装する and 結合テスト to コードフリーズ.
 const DEMO = '/mono/task-manager/?storage=memory';
 
 test(
@@ -13,7 +15,7 @@ test(
   async ({ page }) => {
     await showDag(page);
 
-    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(7);
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(11);
 
     // Near the right edge of 画面設計, its handle shows; in its middle, none.
     const from = await edgePoint(dagNode(page, /画面設計/u));
@@ -43,7 +45,7 @@ test(
     // Not a tap: no dialog.
     await expect.soft(page.getByTestId('node-dialog')).toBeHidden();
 
-    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(8);
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(12);
 
     expect.soft(await edgeEnds(page)).toContain('task:design -> task:docs');
   },
@@ -74,7 +76,7 @@ test(
 
     await expect.soft(page.getByRole('alert')).toContainText('循環する依存');
 
-    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(7);
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(11);
   },
 );
 
@@ -100,7 +102,7 @@ test(
 
     await expect.soft(page.getByTestId('dag-connect')).toHaveCount(0);
 
-    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(7);
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(11);
 
     // The node stayed where it was: a drag from the handle draws, not moves.
     await expect.soft(node).toHaveAttribute('transform', before ?? '');
@@ -148,7 +150,7 @@ test(
 
     await expect.soft(page.getByTestId('node-dialog')).toBeHidden();
 
-    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(7);
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(11);
 
     expect.soft(await edgeEnds(page)).not.toContain('task:design -> task:docs');
 
@@ -161,7 +163,7 @@ test(
 
     await page.mouse.up();
 
-    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(8);
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(12);
   },
 );
 
@@ -186,13 +188,13 @@ test(
 
     await expect.soft(page.getByTestId('dag-edge-delete')).toHaveCount(0);
 
-    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(7);
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(11);
 
     await clickEdge(page, edge);
 
     await page.getByTestId('dag-edge-delete').click();
 
-    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(6);
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(10);
 
     expect
       .soft(await edgeEnds(page))
@@ -217,7 +219,7 @@ test(
 
     await page.keyboard.press('Delete');
 
-    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(6);
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(10);
   },
 );
 

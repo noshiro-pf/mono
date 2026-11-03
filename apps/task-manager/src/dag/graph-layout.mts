@@ -622,7 +622,10 @@ export type LaidOutEdge = DeepReadonly<{
   to: GraphNodeId;
   /** Empty for none. */
   label: string;
-  /** The order in time of two milestones rather than a dependency. */
+  /**
+   * The order in time of two milestones, or of a deadline and a milestone,
+   * rather than a dependency.
+   */
   implied: boolean;
 }>;
 
