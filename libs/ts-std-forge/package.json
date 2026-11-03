@@ -74,7 +74,7 @@
   "devDependencies": {
     "@sindresorhus/is": "^8.1.0",
     "@types/node": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
     "cspell": "catalog:",
     "dedent": "catalog:",
     "eslint": "catalog:",

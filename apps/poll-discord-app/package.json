@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
     "esbuild": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",

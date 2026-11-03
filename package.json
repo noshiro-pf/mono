@@ -192,7 +192,7 @@
     "@typescript-eslint/parser": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "@vitest/browser-playwright": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
     "@vitest/ui": "catalog:",
     "cspell": "catalog:",
     "dedent": "catalog:",

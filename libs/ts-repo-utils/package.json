@@ -94,7 +94,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
     "@vitest/ui": "catalog:",
     "cspell": "catalog:",
     "dedent": "catalog:",
