@@ -20,7 +20,7 @@ import {
 import type { DeepReadonly } from 'ts-type-forge';
 import firebaseJson from '../../firebase.json' with { type: 'json' };
 import { clog } from '../utils/index.mjs';
-import { emulatorEndpoints } from './emulator-mode.mjs';
+import { emulatorEndpoints, firebaseAppOptions } from './emulator-mode.mjs';
 
 /** What the API functions are built on: one of each, made by `initializeFirebase`. */
 export type FirebaseHandles = DeepReadonly<{
@@ -36,18 +36,6 @@ export type FirebaseHandles = DeepReadonly<{
  * when the app's API is made.
  */
 export const initializeFirebase = (): FirebaseHandles => {
-  const fbApp = initializeApp(firebaseConfig);
-
-  clog('firebase.initializeApp done.');
-
-  const firestore = initializeFirestore(fbApp, {
-    ignoreUndefinedProperties: true,
-  });
-
-  const fbAuth = getAuth(fbApp);
-
-  const fbFunctions = getFunctions(fbApp, 'asia-northeast2');
-
   const emulators = import.meta.env.DEV
     ? emulatorEndpoints(
         import.meta.env.VITE_FIREBASE_EMULATORS,
@@ -59,6 +47,18 @@ export const initializeFirebase = (): FirebaseHandles => {
         },
       )
     : undefined;
+
+  const fbApp = initializeApp(firebaseAppOptions(firebaseConfig, emulators));
+
+  clog('firebase.initializeApp done.');
+
+  const firestore = initializeFirestore(fbApp, {
+    ignoreUndefinedProperties: true,
+  });
+
+  const fbAuth = getAuth(fbApp);
+
+  const fbFunctions = getFunctions(fbApp, 'asia-northeast2');
 
   if (emulators !== undefined) {
     connectAuthEmulator(fbAuth, emulators.authUrl, { disableWarnings: true });
