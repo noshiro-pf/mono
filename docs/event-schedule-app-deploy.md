@@ -54,19 +54,19 @@ Functions は lockfile の変更だけでも選ばれるが、firebase-tools が
 `deploy-firestore.yml` が自動でデプロイしている（`docs/firestore-deploy.md`）。
 こちらは実ユーザーのいるアプリで、デプロイするものも多いので、次の点が違う。
 
-|                    | `deploy-firestore.yml`                                       | `deploy-event-schedule-app.yml`                                                          |
-| :----------------- | :----------------------------------------------------------- | :--------------------------------------------------------------------------------------- |
-| デプロイするもの   | Firestore のルールとインデックスだけ                         | Hosting、Cloud Functions、Firestore のルールとインデックス                               |
-| フロントエンド     | GitHub Pages（`deploy-pages.yml` が push ごとに公開）        | Firebase Hosting（この workflow）                                                        |
-| 何と比べるか       | push の前後（`github.event.before`）                         | 最後に成功した run の commit                                                             |
-| 何が変わったら     | 4 つの設定ファイル                                           | 設定ファイル、パッケージと依存先のソース、lockfile など                                  |
-| job の分け方       | 1 job（ビルドするものが無い）                                | `plan` → `build`（鍵なし、テストとビルド）→ `deploy`（鍵あり、成果物を検査してデプロイ） |
-| デプロイ前のテスト | 無し（ルールのテストは pull request で走る）                 | emulator の e2e を毎回                                                                   |
-| `predeploy`        | あれば拒む                                                   | 取り除く（ビルドは `build` job で済んでいる）                                            |
-| 並び               | project ごとに 1 つ。古い run は自分で見送る                 | workflow 全体で 1 本ずつ。re-run された古い run は、`main` が変えた target を見送る      |
-| environment        | `firebase-deploy`                                            | `event-schedule-app-deploy`                                                              |
-| サービスアカウント | `firestore-deploy@noshiro-pf-ci`（ルールとインデックスだけ） | `event-schedule-app-deploy@noshiro-pf-ci`（`event-schedule-app` の project だけ）        |
-| 承認               | 無し                                                         | 無し                                                                                     |
+|                    | `deploy-firestore.yml`                                                                        | `deploy-event-schedule-app.yml`                                                          |
+| :----------------- | :-------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------- |
+| デプロイするもの   | Firestore のルールとインデックスだけ                                                          | Hosting、Cloud Functions、Firestore のルールとインデックス                               |
+| フロントエンド     | GitHub Pages（`deploy-pages.yml` が push ごとに公開）                                         | Firebase Hosting（この workflow）                                                        |
+| 何と比べるか       | push の前後（`github.event.before`）                                                          | 最後に成功した run の commit                                                             |
+| 何が変わったら     | 4 つの設定ファイル                                                                            | 設定ファイル、パッケージと依存先のソース、lockfile など                                  |
+| job の分け方       | `plan` → `test-rules`（鍵なし、ルールのテスト）→ `deploy`（鍵あり、テストに通ったアプリだけ） | `plan` → `build`（鍵なし、テストとビルド）→ `deploy`（鍵あり、成果物を検査してデプロイ） |
+| デプロイ前のテスト | ルールのテスト（`check:test:rules`）を、デプロイするアプリごとに                              | emulator の e2e を毎回                                                                   |
+| `predeploy`        | あれば拒む                                                                                    | 取り除く（ビルドは `build` job で済んでいる）                                            |
+| 並び               | project ごとに 1 つ。古い run は自分で見送る                                                  | workflow 全体で 1 本ずつ。re-run された古い run は、`main` が変えた target を見送る      |
+| environment        | `firebase-deploy`                                                                             | `event-schedule-app-deploy`                                                              |
+| サービスアカウント | `firestore-deploy@noshiro-pf-ci`（ルールとインデックスだけ）                                  | `event-schedule-app-deploy@noshiro-pf-ci`（`event-schedule-app` の project だけ）        |
+| 承認               | 無し                                                                                          | 無し                                                                                     |
 
 2 つのサービスアカウントは、同じ Workload Identity provider を通るが、それぞれ
 自分の environment を名指すトークンでしかなりすませない（下の「認証」）。

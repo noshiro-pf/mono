@@ -28,17 +28,26 @@
 workflow は対象のアプリと project を `TARGETS` に明示的に書いている。アプリを
 足すときは、`TARGETS` と `workflow_dispatch` の選択肢と下のロールの付与を揃え、
 ルールが次に変わるまで何もデプロイされないので一度手で dispatch する。
+`TARGETS` の `rulesTests` には、アプリに `check:test:rules` があるかを書く。
+`package.json` と食い違っていればテストの job が落ち、何もデプロイしない。
 
 ## ルールを変えるとき
 
 `check:test:rules`（`life-plan-simulator`・`task-manager`）は Java と Firestore
 エミュレータを使うルールのテストで、`code-check.yml` の `z:ci:code-check:coverage-2-types-and-rules` の中で `ws:check:test:rules` が
-pull request で走らせる。マージすればそのままデプロイされるので、落ちたまま
-マージしない。手元で走らせるときは Java 21 以上が要る。
+pull request で走らせる。workflow もデプロイの前に、鍵を持たない job で
+デプロイするアプリのテストを走らせ、落ちたアプリはデプロイしない。バイパスでの
+マージや、チェックがまだ走っている `main` への push でも、テストに落ちるルールは
+本番に出ない。そのアプリはルールが次に変わったときにデプロイされる。テストだけを
+直した変更では workflow が何も選ばないので、マージ後にそのアプリを
+`workflow_dispatch` で走らせる。手元で走らせるときは Java 21 以上が要る。
 
 切り戻しや、手で直したルールの上書きには、Actions の「Deploy Firestore rules」
 から `workflow_dispatch` でアプリを選んで走らせる。そのときのブランチの内容が
-デプロイされる（environment が `main` に限っている）。
+デプロイされる（environment が `main` に限っている）。この場合もルールのテストを
+先に走らせるので、デプロイまで数分かかり、テストに落ちるルールには戻せない。
+テストを通らない状態で急いで戻すときは、手元からアプリのディレクトリで
+`pnpm exec firebase deploy --only firestore` を実行する。
 
 インデックスは `--force` を付けずにデプロイするので、`firestore.indexes.json` に
 無いインデックスが本番にあっても消さずに警告だけが出る。

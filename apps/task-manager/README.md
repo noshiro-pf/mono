@@ -280,7 +280,8 @@ pnpm exec firebase emulators:start   # Java 21 以上が必要
 
 CI では `code-check.yml` の `z:ci:code-check:coverage-2-types-and-rules` の中で `ws:check:test:rules` が Java 21 を用意して走らせるので、
 `firestore.rules` を壊す変更は `main` に入って `deploy-firestore.yml` にデプロイされる
-前に pull request で落ちる。`check-changed` はこれを走らせない。
+前に pull request で落ちる。`deploy-firestore.yml` もデプロイの前にこれを走らせ、落ちれば
+デプロイしない（`docs/firestore-deploy.md`）。`check-changed` はこれを走らせない。
 
 ### デモモード
 

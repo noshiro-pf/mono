@@ -1,4 +1,4 @@
-# cspell:ignore vitest temurin
+# cspell:ignore vitest
 
 name: Code Check
 
@@ -147,7 +147,8 @@ jobs:
           # run in strict-lib-gen.yml) and the Firestore rules tests of
           # life-plan-simulator and task-manager, so that a pull request
           # breaking `firestore.rules` fails before it merges
-          # (`deploy-firestore.yml` deploys whatever reaches `main`).
+          # (`deploy-firestore.yml` runs them again before it deploys, for
+          # what reaches `main` without this verdict).
           - command: z:ci:code-check:coverage-1-and-emulators
             build: ws:build:deps
             browser: true

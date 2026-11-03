@@ -3,7 +3,8 @@ name: Deploy Firestore rules
 # Deploys the Firestore security rules and indexes of the apps in `TARGETS`
 # when a push to main changes them. Their frontends are on GitHub Pages, which
 # deploy-pages.yml publishes on the same push, so the rules go out alongside
-# the code that relies on them rather than with the next version bump.
+# the code that relies on them, after their tests, rather than with the next
+# version bump.
 #
 # `TARGETS` names each app and its Firebase project explicitly. The other
 # `firebase.json` files in `apps/` belong to event-schedule-app, which
@@ -11,6 +12,15 @@ name: Deploy Firestore rules
 # app with real users whose deploys are still made by hand, or only redirect an
 # old Hosting URL to Pages and are deployed once. Adding an app here deploys nothing until its
 # rules next change; dispatch the workflow for it once.
+#
+# The rules tests (`check:test:rules`) of the apps to deploy run first, in a
+# job that holds no key, and an app whose tests fail, or did not run, is not
+# deployed. code-check.yml runs them on pull requests too, but nothing makes a
+# push to main wait for that: a bypass merge, or a push whose checks are still
+# running, would otherwise deploy rules that fail them. Such an app is deployed
+# again when its rules next change; a fix elsewhere (the tests, a library the
+# tests build) changes nothing the plan job compares, so dispatch the workflow
+# for it once the fix has merged.
 #
 # The key is a Workload Identity Federation credential for a service account
 # that may only replace rules and indexes. The provider admits this workflow
@@ -38,11 +48,14 @@ permissions: {}
 env:
   # The `.firebaserc` of each app has to name the same project; the deploy job
   # checks. The `workflow_dispatch` options above list the same apps.
+  # `rulesTests` says the app has a `check:test:rules` script, which the
+  # test-rules job then has to pass; it is declared rather than looked up so
+  # that a renamed script fails the job instead of deploying untested rules.
   TARGETS: >-
     [
-      { "app": "algo-app", "project": "algo-app-45270" },
-      { "app": "life-plan-simulator", "project": "life-plan-simulator-9eab3" },
-      { "app": "task-manager", "project": "task-manager-app-d0cae" }
+      { "app": "algo-app", "project": "algo-app-45270", "rulesTests": false },
+      { "app": "life-plan-simulator", "project": "life-plan-simulator-9eab3", "rulesTests": true },
+      { "app": "task-manager", "project": "task-manager-app-d0cae", "rulesTests": true }
     ]
 
 jobs:
@@ -111,10 +124,117 @@ jobs:
           echo "Deploying: ${targets}"
           echo "targets=${targets}" >>"${GITHUB_OUTPUT}"
 
-  deploy:
-    name: Deploy ${{ matrix.app }}
+  # Holds no key: it installs and builds the workspace and runs its code, which
+  # is what the job split in .github/workflows/README.md keeps away from the
+  # deploy job. Its output is the names of the apps whose tests passed, or that
+  # have none (algo-app). Each deploy job reads it only to stand down when its
+  # app is missing, so one app's failing tests hold back that app alone, and
+  # what this job writes can only narrow the plan, never add to it. The job
+  # still fails, to show it.
+  test-rules:
+    name: Test the rules
     needs: plan
     if: needs.plan.outputs.targets != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    permissions:
+      contents: read
+
+    outputs:
+      passed: ${{ steps.test.outputs.passed }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # A run for apps with no rules tests installs and builds nothing.
+      - name: Find the apps with rules tests
+        id: find
+        env:
+          TARGETS: ${{ needs.plan.outputs.targets }}
+        run: |
+          set -euo pipefail
+          # `rulesTests` has to be a boolean that agrees with the app's
+          # `package.json`, so that neither a missing key nor a new script
+          # leaves an app untested.
+          for app in $(jq -r '.[].app' <<<"$TARGETS"); do
+            declared="$(jq -r --arg app "$app" '.[] | select(.app == $app) | .rulesTests | if type == "boolean" then . else "missing" end' <<<"$TARGETS")"
+            present="$(jq -r '.scripts["check:test:rules"] != null' "apps/${app}/package.json")"
+            if [[ "$declared" != "$present" ]]; then
+              echo "::error::TARGETS declares rulesTests ${declared} for ${app}, but its package.json has check:test:rules: ${present}."
+              exit 1
+            fi
+            if [[ "$declared" == 'false' ]]; then
+              echo "::notice::${app} has no rules tests to run."
+            fi
+          done
+          tested="$(jq -r '[.[] | select(.rulesTests) | .app] | join(" ")' <<<"$TARGETS")"
+          echo "Tested: ${tested}"
+          echo "tested=${tested}" >>"${GITHUB_OUTPUT}"
+
+      - name: Set up pnpm, Node.js and the dependencies
+        if: steps.find.outputs.tested != ''
+        uses: ./.github/actions/setup
+
+      # The Firestore emulator needs Java 21 or later. firebase-tools is a
+      # catalog-pinned dependency of each app; no Firebase login is needed.
+      - name: Set up Java for the Firestore emulator
+        if: steps.find.outputs.tested != ''
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # The tests resolve the workspace libraries from their `dist/`.
+      - name: Build the workspace libraries
+        if: steps.find.outputs.tested != ''
+        run: pnpm run ws:build:deps
+
+      # Exits 0 whatever the tests do, so that its output reaches the deploy
+      # jobs; the next step fails the job when any app failed.
+      - name: Run the rules tests
+        id: test
+        env:
+          TARGETS: ${{ needs.plan.outputs.targets }}
+          TESTED: ${{ steps.find.outputs.tested }}
+        run: |
+          set -euo pipefail
+          read -r -a tested <<<"$TESTED"
+          failed=()
+          for app in "${tested[@]}"; do
+            if ! pnpm --dir "apps/${app}" run check:test:rules; then
+              echo "::error::The rules tests of ${app} failed; it is not deployed."
+              failed+=("$app")
+            fi
+          done
+          passed="$(jq -c --args '[.[].app | select(IN($ARGS.positional[]) | not)]' "${failed[@]}" <<<"$TARGETS")"
+          echo "Passed: ${passed}"
+          echo "passed=${passed}" >>"${GITHUB_OUTPUT}"
+          echo "failed=${failed[*]}" >>"${GITHUB_OUTPUT}"
+
+      - name: Fail when any app's rules tests failed
+        if: steps.test.outputs.failed != ''
+        env:
+          FAILED: ${{ steps.test.outputs.failed }}
+        run: |
+          echo "::error::Not deployed: ${FAILED}. A fix that does not change the rules files deploys nothing; dispatch the workflow for each app once it has merged."
+          exit 1
+
+  deploy:
+    name: Deploy ${{ matrix.app }}
+    needs:
+      - plan
+      - test-rules
+    # `!cancelled()`, because the test job fails when any app's tests failed
+    # and the others still deploy; the first step below stands down for an app
+    # that did not pass.
+    if: >-
+      !cancelled() &&
+      needs.plan.result == 'success' &&
+      needs.plan.outputs.targets != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -124,7 +244,7 @@ jobs:
         include: ${{ fromJSON(needs.plan.outputs.targets) }}
 
     # One deploy per project at a time, and never cancelled halfway. Jobs enter
-    # the group in the order their plan jobs finish, not the order of the
+    # the group in the order the jobs they need finish, not the order of the
     # pushes, so a job can start after a newer push's job has deployed; the
     # first step below makes that job stand down rather than deploy older rules.
     concurrency:
@@ -147,17 +267,36 @@ jobs:
     # everything it depends on, comes from `pnpm-lock.yaml` (the `catalog:`
     # entry), held to `minimumReleaseAge` and moved by pnpm-update.yml.
     steps:
+      # The test job's output is read as data, and only to stand down. It is
+      # empty when that job failed before the tests ran, and then no app
+      # deploys.
+      - name: Check that the rules tests passed
+        id: tested
+        env:
+          APP: ${{ matrix.app }}
+          PASSED: ${{ needs.test-rules.outputs.passed }}
+        run: |
+          set -euo pipefail
+          if jq -e --arg app "$APP" 'type == "array" and index($app) != null' <<<"${PASSED:-null}" >/dev/null 2>&1; then
+            echo 'passed=true' >>"${GITHUB_OUTPUT}"
+          else
+            echo "::warning::${APP} is not deployed: its rules tests did not pass in this run. Dispatch the workflow for it once the fix has merged."
+            echo 'passed=false' >>"${GITHUB_OUTPUT}"
+          fi
+
       - name: Checkout
+        if: steps.tested.outputs.passed == 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       # If main has moved on and changed this app's files since this run's
       # commit, a later run has this app in its matrix and deploys the newer
-      # files, before or after this job. Deploying here could only put the
-      # older ones back.
+      # files once they pass their tests, before or after this job. Deploying
+      # here could only put the older ones back.
       - name: Check that main has not changed the files since
         id: current
+        if: steps.tested.outputs.passed == 'true'
         env:
           DIR: apps/${{ matrix.app }}
           SHA: ${{ github.sha }}
@@ -173,7 +312,7 @@ jobs:
           case "$status" in
             0) echo 'current=true' >>"${GITHUB_OUTPUT}" ;;
             1)
-              echo "::notice::main has changed ${DIR} since ${SHA}; the run for that change deploys it."
+              echo "::notice::main has changed ${DIR} since ${SHA}; the run for that change deploys it if its rules tests pass, and if they fail, dispatch the workflow for it once the fix has merged."
               echo 'current=false' >>"${GITHUB_OUTPUT}"
               ;;
             *) exit "$status" ;;
