@@ -12,12 +12,20 @@ import {
 import { Arr, Optional } from 'ts-data-forge';
 import type { Entry } from '../load-report.mjs';
 import { isUnread, OPEN_PARTS } from '../part-failures.mjs';
+import {
+  edgesOf,
+  overflows,
+  tipSideOf,
+  type QueueStrip,
+} from '../queue-strip.mjs';
 import type { QueueSlot, QueueView } from '../queue-view.mjs';
 import { reader } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
 import { PartFailureNotes } from './part-failure-notes.js';
+import { QueueMap } from './queue-map.js';
 import { QueueOutsideBox } from './queue-outside-box.js';
 import { QueueSlotBox } from './queue-slot-box.js';
+import { queueStripBox } from './queue-strip-box.mjs';
 import { QueueTip, type QueueTipContent } from './queue-tip.js';
 import { RunStateIcon } from './run-state-icon.js';
 
@@ -28,11 +36,12 @@ import { RunStateIcon } from './run-state-icon.js';
  * is set aside, claimed or otherwise not the worker's to move is drawn outside
  * the row, on its own.
  *
- * Every box is the same width, however many there are, so the whole queue is
- * always in view; the number shrinks with the box. The title is in the tooltip,
- * and the rest of what is known about a pull request is in its card in the
- * merge order, so a box says only its number, its priority and a word on why it
- * waits.
+ * The boxes share the row, but none is narrower than its number needs: when
+ * there are more than fit, the row scrolls across, the running one stays at its
+ * start, and a map of the whole queue is drawn above it (`queue-map.tsx`). The
+ * title is in the tooltip, and the rest of what is known about a pull request
+ * is in its card in the merge order, so a box says only its number, its
+ * priority and a word on why it waits.
  */
 export const QueueSection = (): JSX.Element => {
   // `undefined` while what it is decided from is still being read.
@@ -169,6 +178,7 @@ const runningOf = (queue: QueueView): number =>
 const slotTipOf = (
   queue: QueueView,
   shown: number | undefined,
+  strip: QueueStrip,
 ): Optional<QueueTipContent> => {
   const index = queue.slots.findIndex(({ number }) => number === shown);
 
@@ -180,7 +190,7 @@ const slotTipOf = (
         number: slot.number,
         title: slot.title,
         detail: slot.detail,
-        side: index < queue.slots.length / 2 ? 'start' : 'end',
+        side: tipSideOf(strip, index, queue.slots.length),
       });
 };
 
@@ -225,6 +235,10 @@ const QueueBody = ({
 
   const running$ = queue$.pipe(map(runningOf));
 
+  const slots$ = queue$.pipe(map((queue) => queue.slots));
+
+  const strip = queueStripBox();
+
   return (
     <If
       cond={view(
@@ -243,12 +257,35 @@ const QueueBody = ({
                   <span aria-hidden={constant('true')}>{constant(' ←')}</span>
                 </span>
 
-                <div class={constant('queue-track')}>
-                  <ol class={constant('queue')}>
-                    <For
-                      items={view(queue$, (queue) => queue.slots)}
-                      key={(slot) => slot.number}
-                    >
+                <div
+                  class={constant('queue-track')}
+                  data-overflows={view(strip.strip$, (s) =>
+                    overflows(s).toString(),
+                  )}
+                  data-more-before={view(strip.strip$, (s) =>
+                    edgesOf(s).before.toString(),
+                  )}
+                  data-more-after={view(strip.strip$, (s) =>
+                    edgesOf(s).after.toString(),
+                  )}
+                >
+                  <If
+                    cond={view(strip.strip$, overflows)}
+                    then={
+                      <QueueMap
+                        slots$={slots$}
+                        strip$={strip.strip$}
+                        onJump={strip.jumpTo}
+                      />
+                    }
+                  />
+
+                  <ol
+                    ref={strip.ref}
+                    class={constant('queue')}
+                    onScroll={strip.onScroll}
+                  >
+                    <For items={slots$} key={(slot) => slot.number}>
                       {(slot$, index$) => (
                         <li
                           class={constant('queue-slot')}
@@ -274,7 +311,7 @@ const QueueBody = ({
 
                   <MatchOptional
                     some={(tip$) => <QueueTip tip={tip$} />}
-                    value={derive([queue$, shown$], slotTipOf)}
+                    value={derive([queue$, shown$, strip.strip$], slotTipOf)}
                   />
                 </div>
               </div>
