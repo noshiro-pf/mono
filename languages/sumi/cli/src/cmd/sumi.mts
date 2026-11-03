@@ -84,8 +84,16 @@ const report = (result: CheckResult): number => {
     return 1;
   }
 
-  if (result.typeCheck.diagnostics.length > 0) {
+  if (
+    (result.typeCheck.diagnostics.length > 0 ||
+      result.typeCheck.failure !== undefined) &&
+    result.typeCheck.output.trim() !== ''
+  ) {
     console.error(result.typeCheck.output.trimEnd());
+  }
+
+  if (result.typeCheck.failure !== undefined) {
+    console.error(`sumi check: ${result.typeCheck.failure}.`);
   }
 
   for (const diagnostic of result.lint.diagnostics) {
@@ -129,7 +137,7 @@ const report = (result: CheckResult): number => {
   console.error(
     result.ok
       ? `sumi check: ${result.fileCount} files, no problems.`
-      : `sumi check: ${result.fileCount} files, ${result.typeCheck.diagnostics.length} type errors, ${result.lint.diagnostics.length + result.checker.diagnostics.length} lint problems, ${result.unusedExpectErrors.length} unused @sumi-expect-error, ${result.invalidExpectErrors.length} invalid @sumi-expect-error, ${result.silencingDirectives.length} oxlint-disable directives silencing a Sumi rule.`,
+      : `sumi check: ${result.fileCount} files, ${result.typeCheck.failure === undefined ? '' : 'type check incomplete, '}${result.typeCheck.diagnostics.length} type errors, ${result.lint.diagnostics.length + result.checker.diagnostics.length} lint problems, ${result.unusedExpectErrors.length} unused @sumi-expect-error, ${result.invalidExpectErrors.length} invalid @sumi-expect-error, ${result.silencingDirectives.length} oxlint-disable directives silencing a Sumi rule.`,
   );
 
   return result.ok ? 0 : 1;

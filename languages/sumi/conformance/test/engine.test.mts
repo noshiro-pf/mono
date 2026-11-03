@@ -169,6 +169,12 @@ describe('engines', () => {
     assert.strictEqual(run.stderr.replaceAll(/^warning:.*$/gmu, '').trim(), '');
   });
 
+  test('the compiler ran to completion', () => {
+    // A crashed or killed compiler prints no diagnostic, which would make every
+    // compiler fixture fail confusingly, so it is asserted first.
+    assert.isUndefined(tscRun.failure);
+  });
+
   test('the compiler reported nothing outside the fixtures', () => {
     // A config error or a diagnostic in a file the corpus does not list (a
     // helper module) would otherwise be dropped without being compared.

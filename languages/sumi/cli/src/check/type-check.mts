@@ -17,6 +17,15 @@ export type TypeCheckResult = Readonly<{
   diagnostics: readonly TypeCheckDiagnostic[];
   /** The compiler's own text, for printing as is. */
   output: string;
+
+  /**
+   * Set when the compiler did not finish normally — it could not be started,
+   * its output overran the buffer, it was killed by a signal, or it exited
+   * non-zero without printing a diagnostic (a crash). The type check then says
+   * nothing about the project, and `diagnostics` being empty must not read as
+   * clean.
+   */
+  failure: string | undefined;
 }>;
 
 /**
@@ -24,24 +33,63 @@ export type TypeCheckResult = Readonly<{
  * options are already verified at this point (languages/sumi/docs/spec/compiler-options.md),
  * so these diagnostics are the language's.
  */
-export const typeCheck = (tsconfigPath: string): TypeCheckResult => {
+export const typeCheck = (
+  tsconfigPath: string,
+  /** The compiler script run with this Node.js; replaced only by tests. */
+  compilerPath: string = nativeTscPath,
+): TypeCheckResult => {
   const result = spawnSync(
     process.execPath,
-    [nativeTscPath, '-p', tsconfigPath, '--noEmit', '--pretty', 'false'],
+    [compilerPath, '-p', tsconfigPath, '--noEmit', '--pretty', 'false'],
     { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
   );
 
-  const output = `${result.stdout}${result.stderr}` as const;
+  // Both are null when the process could not be spawned at all.
+  const output = [result.stdout, result.stderr]
+    .map((text: string | null) => text ?? '')
+    .join('');
+
+  // The compiler prints each file relative to its working directory — this
+  // process's, which is also what makes the printed output usable from the
+  // terminal it ran in. Resolved against the project directory instead, every
+  // filename came out wrong but its basename.
+  const diagnostics = parseDiagnostics(output, process.cwd());
 
   return {
-    // The compiler prints each file relative to its working directory — this
-    // process's, which is also what makes the printed output usable from the
-    // terminal it ran in. Resolved against the project directory instead, every
-    // filename came out wrong but its basename.
-    diagnostics: parseDiagnostics(output, process.cwd()),
+    diagnostics,
     output,
+    failure: describeFailure(
+      {
+        errorMessage: result.error?.message,
+        signal: result.signal,
+        status: result.status,
+      },
+      diagnostics.length > 0,
+    ),
   };
 };
+
+/**
+ * The compiler exits non-zero when it reports a diagnostic — 1 for most, 2 for
+ * some config errors (a missing `files` entry) — so a non-zero status is a
+ * failure only when nothing was parsed. A crash after some diagnostics is not
+ * told apart by its status (a Go panic also exits 2).
+ */
+const describeFailure = (
+  result: Readonly<{
+    errorMessage: string | undefined;
+    signal: string | null;
+    status: number | null;
+  }>,
+  hasDiagnostics: boolean,
+): string | undefined =>
+  result.errorMessage !== undefined
+    ? (`the native compiler did not run to completion: ${result.errorMessage}` as const)
+    : result.signal !== null
+      ? (`the native compiler was killed by ${result.signal}` as const)
+      : !hasDiagnostics && result.status !== 0
+        ? (`the native compiler exited with status ${result.status ?? 'null'} and reported no diagnostic` as const)
+        : undefined;
 
 const parseDiagnosticLine = (
   text: string,

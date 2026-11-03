@@ -10,7 +10,7 @@ import {
   type UnusedExpectError,
 } from './expect-error.mjs';
 import { showConfig } from './show-config.mjs';
-import { typeCheck, type TypeCheckDiagnostic } from './type-check.mjs';
+import { typeCheck, type TypeCheckResult } from './type-check.mjs';
 import {
   validateCompilerOptions,
   type CompilerOptionViolation,
@@ -24,9 +24,9 @@ import {
  *   entries. Nothing else ran — a check under overridden options is not the
  *   language's check (D-7 / D-40).
  * - `checked`: the type check, the oxlint preset and the type-aware checker
- *   ran; `ok` is whether all three were clean, every `@sumi-expect-error`
- *   was well-formed and answered, and no `oxlint-disable*` silenced a Sumi
- *   rule.
+ *   ran; `ok` is whether the type check ran to completion and all three were
+ *   clean, every `@sumi-expect-error` was well-formed and answered, and no
+ *   `oxlint-disable*` silenced a Sumi rule.
  */
 export type CheckResult = Readonly<
   | {
@@ -39,10 +39,7 @@ export type CheckResult = Readonly<
       tsconfigPath: string;
       ok: boolean;
       fileCount: number;
-      typeCheck: Readonly<{
-        diagnostics: readonly TypeCheckDiagnostic[];
-        output: string;
-      }>;
+      typeCheck: TypeCheckResult;
       lint: Readonly<{
         /** After `@sumi-expect-error` suppression. */
         diagnostics: readonly OxlintDiagnostic[];
@@ -143,6 +140,7 @@ export const runCheck = (project: string): Result<CheckResult, string> => {
     tsconfigPath: tsconfigPath.value,
     ok:
       typeCheckResult.diagnostics.length === 0 &&
+      typeCheckResult.failure === undefined &&
       expectErrors.lint.length === 0 &&
       expectErrors.checker.length === 0 &&
       expectErrors.unused.length === 0 &&
