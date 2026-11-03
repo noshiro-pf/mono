@@ -109,4 +109,6 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
     },
     queue: undefined,
     reading: [],
+    failed: {},
+    parts: {},
   }) as const;

@@ -38,8 +38,10 @@ import {
   appendIssues,
   type Entry,
   type IssueList,
+  type KnownParts,
   type LoadedReport,
   type PageSummary,
+  type PartFailures,
   type SectionPart,
 } from '../load-report.mjs';
 import {
@@ -60,14 +62,16 @@ import type { WorkflowRunList } from '../workflow-runs.mjs';
 export type ReaderDeps = Readonly<{
   token: InitializedObservable<StoredToken | undefined>;
   /**
-   * A read of the report, listing the first `issueCount` open issues. When
-   * `onProgress` is given, it is handed the report as it stands each time a
-   * part of it answers before the last.
+   * A read of the report, listing the first `issueCount` open issues, and
+   * keeping what `previous` had of a part it cannot read. When `onProgress` is
+   * given, it is handed the report as it stands each time a part of it answers
+   * before the last.
    */
   load: (
     token: string,
     nowMs: number,
     issueCount: number,
+    previous: KnownParts | undefined,
     onProgress: ((report: LoadedReport) => void) | undefined,
   ) => Promise<Answered<LoadedReport>>;
   /**
@@ -126,6 +130,11 @@ export type Reader = Readonly<{
   issues: InitializedObservable<LoadedReport['issues']>;
   /** The sections below the merge order that have not answered yet. */
   reading: InitializedObservable<readonly SectionPart[]>;
+  /**
+   * The parts the last read shown could not read, each said in the panel that
+   * draws it rather than over the whole page.
+   */
+  failed: InitializedObservable<PartFailures>;
   /**
    * Whether a read of the report is out: the first, a poll or a Refresh.
    * What is on screen may be minutes old — the last poll before the tab was
@@ -324,6 +333,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
   const reading = partOf('reading');
 
+  const failed = partOf('failed');
+
   const { state: runs, update: updateRuns } = createResettableState<RunsStatus>(
     RUNS_READING,
     fastDeepEqual,
@@ -341,6 +352,11 @@ export const createReader = (deps: ReaderDeps): Reader => {
     tokenChanged.pipe(mapTo(MORE_ISSUES_IDLE)),
   ]);
 
+  // What the report on screen had of each part, which the next read keeps of a
+  // part it cannot read. Put back when the token changes: another token's
+  // report is not one to fall back to.
+  let mut_parts: KnownParts | undefined = undefined;
+
   // How many open issues each read lists. Raised by `loadMoreIssues`, and put
   // back when the token changes. Nothing draws it, so it is a variable rather
   // than a state.
@@ -357,11 +373,23 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
   const getIssues = (): ReportParts['issues'] => getReport().issues;
 
-  const writeReport = (next: ReportParts, withIssues: boolean): void => {
+  const writeReport = (next: LoadedReport, withIssues: boolean): void => {
     updateReport((held) =>
       replaceEqualDeep(
         held,
-        { ...next, issues: withIssues ? next.issues : held.issues },
+        {
+          readAtEpochMs: next.readAtEpochMs,
+          summary: next.summary,
+          entries: next.entries,
+          roots: next.roots,
+          cycles: next.cycles,
+          merged: next.merged,
+          queue: next.queue,
+          features: next.features,
+          issues: withIssues ? next.issues : held.issues,
+          reading: next.reading,
+          failed: next.failed,
+        },
         { key: pullRequestNumber },
       ),
     );
@@ -409,6 +437,13 @@ export const createReader = (deps: ReaderDeps): Reader => {
       // it was asked for before `loadMoreIssues` added a page: it lists fewer
       // than the page now shows, and would take that page away.
       if (settled.report !== undefined) {
+        // Its issues are what is on screen where the page kept those, so that a
+        // later read whose issues fail keeps the page `loadMoreIssues` added.
+        mut_parts =
+          issueCount >= mut_issueCount
+            ? settled.report.parts
+            : { ...settled.report.parts, issues: getIssues() };
+
         writeReport(settled.report, issueCount >= mut_issueCount);
       }
 
@@ -463,7 +498,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     // Called by an async function, so that a `load` that throws rather than
     // rejects still settles it, and the count still goes down.
     const loading = async (): Promise<Answered<LoadedReport>> =>
-      load(tokenValue, startedAtMs, issueCount, onProgress);
+      load(tokenValue, startedAtMs, issueCount, mut_parts, onProgress);
 
     loading()
       .then(({ result, rateLimit: answeredLimit }) => {
@@ -523,10 +558,14 @@ export const createReader = (deps: ReaderDeps): Reader => {
       const current = getIssues();
 
       if (current.endCursor === after) {
-        updateReport((held) => ({
-          ...held,
-          issues: appendIssues(current, result.value),
-        }));
+        const appended = appendIssues(current, result.value);
+
+        updateReport((held) => ({ ...held, issues: appended }));
+
+        // So that a read whose issues fail keeps the page too.
+        if (mut_parts !== undefined) {
+          mut_parts = { ...mut_parts, issues: appended };
+        }
       }
 
       setMoreIssues(MORE_ISSUES_IDLE);
@@ -546,6 +585,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
     // reader finds out whether GitHub takes the one they pasted.
     const tokenSubscription = tokenChanged.subscribe((tokenValue) => {
       mut_issueCount = ISSUES_LIMIT;
+
+      mut_parts = undefined;
 
       if (tokenValue === undefined) {
         mut_runsShownFromMs = 0;
@@ -631,6 +672,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     features,
     issues,
     reading,
+    failed,
     fetching,
     runs,
     moreIssues,
@@ -656,6 +698,7 @@ type ReportParts = StrictPick<
   | 'features'
   | 'issues'
   | 'reading'
+  | 'failed'
 >;
 
 /**
@@ -692,6 +735,7 @@ const EMPTY_PARTS: ReportParts = {
     referenced: [],
   },
   reading: [],
+  failed: {},
 } as const;
 
 const RUNS_READING: RunsStatus = { type: 'reading' } as const;

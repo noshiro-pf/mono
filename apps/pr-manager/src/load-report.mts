@@ -60,6 +60,7 @@ import {
   type Fetch,
   type GraphqlAnswer,
 } from './graphql.mjs';
+import { checksFailureOf } from './part-failures.mjs';
 import { queueViewOf, type QueuePull, type QueueView } from './queue-view.mjs';
 import type { RateLimit } from './rate-limit.mjs';
 import {
@@ -196,6 +197,36 @@ export type RepoFeatures = Readonly<{
 /** The sections below the merge order, each read by a query of its own. */
 export type SectionPart = 'merged' | 'issues';
 
+/**
+ * The parts a read asks for, each by a query, or a REST request, of its own,
+ * and each able to fail on its own.
+ */
+export type ReadPart =
+  | 'pulls'
+  | 'rules'
+  | 'checks'
+  | 'details'
+  | 'comparisons'
+  | 'merged'
+  | 'issues';
+
+/**
+ * A part a read could not read: why, and whether what the page shows of it is
+ * the last read that could. A part with nothing kept is shown as not read,
+ * never as empty.
+ */
+export type PartFailure = Readonly<{ message: string; kept: boolean }>;
+
+/** What a read could not read, part by part. */
+export type PartFailures = Partial<ReadonlyRecord<ReadPart, PartFailure>>;
+
+/**
+ * What a read had of each part, handed back to the next read
+ * ({@link LoadRequest.previous}) so that a part that fails there keeps what
+ * this one had.
+ */
+export type KnownParts = Known;
+
 export type LoadedReport = Readonly<{
   repo: RepoRef;
   /** When the read this was built from started. */
@@ -226,6 +257,14 @@ export type LoadedReport = Readonly<{
    * not answered, not because there is nothing in it.
    */
   reading: readonly SectionPart[];
+  /**
+   * The parts this read could not read. Each is said in the panel that shows
+   * it, beside what an earlier read had of it, and the rest of the page is
+   * drawn from what did answer.
+   */
+  failed: PartFailures;
+  /** What the next read falls back to for a part it cannot read. */
+  parts: KnownParts;
 }>;
 
 /** The open issues the page lists, and where the list stops. */
@@ -282,6 +321,11 @@ export type LoadRequest = Readonly<{
    * the last part: that is the report the read resolves to.
    */
   onProgress?: (report: LoadedReport) => void;
+  /**
+   * What the last read had ({@link LoadedReport.parts}). A part this read
+   * cannot read keeps what that one had, and says it failed.
+   */
+  previous?: KnownParts;
   /** GraphQL's and REST's both: the default branch's rules are REST's. */
   fetchImpl?: Fetch & RestFetch;
 }>;
@@ -299,9 +343,11 @@ export type LoadRequest = Readonly<{
  * an issue a body closes by keyword, unlinked by GitHub, is called — and the
  * open issues past the first page are read only when more are asked for.
  *
- * A part that fails fails the read, with what the pull requests' query said
- * first: a report with a part missing is what {@link LoadRequest.onProgress} is
- * for, and the read itself either has all of it or says why not.
+ * A part that fails is said in {@link LoadedReport.failed}, and keeps what
+ * {@link LoadRequest.previous} had of it, so that one query GitHub times out
+ * takes nothing else off the page. Only a read in which every part failed — no
+ * token GitHub takes, no network — fails as a whole, with what the pull
+ * requests' query said.
  */
 export const loadReport = async (
   source: ReportSource,
@@ -312,6 +358,7 @@ export const loadReport = async (
     nowMs,
     issueCount = ISSUES_LIMIT,
     onProgress,
+    previous = {},
     fetchImpl,
   } = request;
 
@@ -327,7 +374,12 @@ export const loadReport = async (
 
   const pulls = readPullRequests(ask, repo);
 
-  const rules = pulls.then(async ({ result }) =>
+  // What the rules and the comparisons are asked from: the pull requests this
+  // read found, or where it could not, the ones the last read had, so that one
+  // query timing out does not take three parts back to the last read.
+  const pullsOrKept = orKept(pulls, previous.pulls);
+
+  const rules = pullsOrKept.then(async ({ result }) =>
     Result.isOk(result)
       ? {
           rateLimit: undefined,
@@ -344,8 +396,10 @@ export const loadReport = async (
     pulls,
     rules,
     checks: readChecks(ask),
-    details: readDetails(ask, repo, rules),
-    comparisons: pulls.then(async ({ result }) =>
+    // The details follow the changed files where the rules ask for a code
+    // owner, which the last read's rules still say where these fail.
+    details: readDetails(ask, repo, orKept(rules, previous.rules)),
+    comparisons: pullsOrKept.then(async ({ result }) =>
       Result.isOk(result)
         ? readComparisons(ask, result.value.pulls)
         : // The pull requests' own failure is the one the read reports.
@@ -354,17 +408,19 @@ export const loadReport = async (
     merged: readMerged(ask, repo, nowMs),
     issues: readIssues({
       count: issueCount,
-      ask: async (after, first) =>
+      ask: async (after, pageSize) =>
         loadIssuePage(source, {
           token,
           after,
-          first,
+          first: pageSize,
           ...(fetchImpl === undefined ? {} : { fetchImpl }),
         }),
     }),
   } as const;
 
   let mut_known: Known = {};
+
+  let mut_failed: PartFailures = {};
 
   let mut_outstanding = Object.keys(parts).length;
 
@@ -378,16 +434,38 @@ export const loadReport = async (
 
     if (Result.isOk(answered.result)) {
       mut_known = { ...mut_known, [key]: answered.result.value };
+    } else {
+      const kept = previous[key];
+
+      mut_failed = {
+        ...mut_failed,
+        [key]: { message: answered.result.value, kept: kept !== undefined },
+      };
+
+      if (kept !== undefined) {
+        mut_known = { ...mut_known, [key]: kept };
+      }
     }
 
     const soFar = mut_known;
 
+    // Drawn once the pull requests have answered, or have failed: the merge
+    // order first, and never a page that says there are none while they are
+    // still being read.
     if (
       onProgress !== undefined &&
       mut_outstanding > 0 &&
-      soFar.pulls !== undefined
+      (soFar.pulls !== undefined || mut_failed.pulls !== undefined)
     ) {
-      onProgress(assemble({ repo, nowMs, known: soFar, pulls: soFar.pulls }));
+      onProgress(
+        assemble({
+          repo,
+          nowMs,
+          known: soFar,
+          failed: mut_failed,
+          settled: false,
+        }),
+      );
     }
 
     return answered;
@@ -407,38 +485,28 @@ export const loadReport = async (
     .map((answered) => answered.rateLimit)
     .reduce(newerLimit, undefined);
 
-  const failure = answers
-    .map((answered) => answered.result)
-    .find((result) => Result.isErr(result));
+  const [first] = answers;
 
-  if (failure !== undefined && Result.isErr(failure)) {
-    return { rateLimit, result: Result.err(failure.value) };
+  if (
+    Result.isErr(first.result) &&
+    answers.every(({ result }) => Result.isErr(result))
+  ) {
+    return { rateLimit, result: Result.err(first.result.value) };
   }
 
-  const known = mut_known;
-
-  return known.pulls === undefined
-    ? {
-        rateLimit,
-        result: Result.err('GitHub did not send the open pull requests.'),
-      }
-    : {
-        rateLimit,
-        result: Result.ok(assemble({ repo, nowMs, known, pulls: known.pulls })),
-      };
+  return {
+    rateLimit,
+    result: Result.ok(
+      assemble({
+        repo,
+        nowMs,
+        known: mut_known,
+        failed: mut_failed,
+        settled: true,
+      }),
+    ),
+  };
 };
-
-export type IssuePageRequest = Readonly<{
-  token: string;
-  /**
-   * The `endCursor` of the list the page goes after, or `undefined` for the
-   * first page.
-   */
-  after: string | undefined;
-  /** How many to read, at most {@link ISSUES_PAGE_SIZE}. */
-  first: number;
-  fetchImpl?: Fetch;
-}>;
 
 /**
  * The open issues after `after`, in the order the report lists them: the next
@@ -517,6 +585,35 @@ export const appendIssues = (held: IssueList, page: IssueList): IssueList => {
     ].toSorted((a, b) => a.number - b.number),
   };
 };
+
+/**
+ * A part as a read that depends on it sees it: what it answered, or where it
+ * failed, what the last read had of it.
+ */
+const orKept = async <T,>(
+  part: Promise<Answered<T>>,
+  kept: T | undefined,
+): Promise<Answered<T>> => {
+  const { rateLimit, result } = await part;
+
+  return {
+    rateLimit,
+    result:
+      kept !== undefined && Result.isErr(result) ? Result.ok(kept) : result,
+  };
+};
+
+export type IssuePageRequest = Readonly<{
+  token: string;
+  /**
+   * The `endCursor` of the list the page goes after, or `undefined` for the
+   * first page.
+   */
+  after: string | undefined;
+  /** How many to read, at most {@link ISSUES_PAGE_SIZE}. */
+  first: number;
+  fetchImpl?: Fetch;
+}>;
 
 /** One query, with the repository's owner and name bound already. */
 type Ask = (
@@ -1635,11 +1732,16 @@ const issueDeclarationsOf = (known: Known): IssueDeclarations => {
   };
 };
 
-const summaryOf = (entries: readonly Entry[]): PageSummary => {
+const summaryOf = (
+  entries: readonly Entry[],
+  lacking: ReadonlySet<EntryPart>,
+): PageSummary => {
   const counted = summarize(entries);
 
+  // Not counted while any pull request lacks the part, whether it is still
+  // coming or this read did not get it: a count of none read is not none.
   const once = (part: EntryPart, count: () => number): number | undefined =>
-    entries.some(({ reading }) => reading.includes(part)) ? undefined : count();
+    lacking.has(part) ? undefined : count();
 
   return {
     open: counted.open,
@@ -1823,18 +1925,47 @@ const queuePullOf = (
   };
 };
 
+/**
+ * Why a head with no checks read cannot be judged on this read, worded for its
+ * card; `undefined` while its checks may still come.
+ */
+const checksFailure = (failed: PartFailures): string | undefined => {
+  const failure = checksFailureOf(failed);
+
+  return failure === undefined
+    ? undefined
+    : failed.rules?.kept === false
+      ? `What the default branch requires could not be read, so no check is judged. ${failure.message}`
+      : `The check results could not be read. ${failure.message}`;
+};
+
 /** Everything read so far, arranged into what the page shows. */
 const assemble = ({
   repo,
   nowMs,
   known,
-  pulls: { defaultBranch, queue, codeOwners, pulls },
+  failed,
+  settled,
 }: Readonly<{
   repo: RepoRef;
   nowMs: number;
   known: Known;
-  pulls: PullsPart;
+  failed: PartFailures;
+  /**
+   * Whether every part has answered or failed, so that nothing a card lacks is
+   * still coming on this read.
+   */
+  settled: boolean;
 }>): LoadedReport => {
+  // Without the pull requests, the page is the sections that do not need them.
+  const { defaultBranch, queue, codeOwners, pulls } = known.pulls ?? NO_PULLS;
+
+  // A part that failed is not being read any more, nor is anything once the
+  // read is over: what a card lacks then — a part kept from the last read has
+  // nothing of a pull request opened since — is said, not waited for.
+  const doneWith = (part: ReadPart): boolean =>
+    settled || failed[part] !== undefined;
+
   const requirements = known.rules;
 
   const required =
@@ -1847,6 +1978,13 @@ const assemble = ({
     codeOwnerReview: requirements?.requireCodeOwnerReview ?? true,
     queue,
   } as const;
+
+  // The same for every card: what failed is the read's, not the card's.
+  const checksUnreadBy =
+    checksFailure(failed) ??
+    (settled
+      ? 'The check results read were not of this head, or were read before it was opened; the next read has them.'
+      : undefined);
 
   const partsOf = (pr: OpenPullRequest): PartsOfPull => {
     const checks = known.checks?.get(pr.number);
@@ -1905,13 +2043,21 @@ const assemble = ({
             }),
       claudeSessions: parseClaudeSessions(entry.body),
       checksUnread:
-        parts?.checks?.contextsAfter === undefined
-          ? undefined
-          : `#${entry.number} has more check results than this page reads, so it gives no verdict over them.`,
+        parts?.checks === undefined
+          ? checksUnreadBy
+          : parts.checks.contextsAfter === undefined
+            ? undefined
+            : `#${entry.number} has more check results than this page reads, so it gives no verdict over them.`,
       reading: [
-        ...(parts?.checks === undefined ? (['checks'] as const) : []),
-        ...(parts?.comparisonRead === true ? [] : (['comparison'] as const)),
-        ...(details === undefined ? (['details'] as const) : []),
+        ...(checksUnreadBy === undefined && parts?.checks === undefined
+          ? (['checks'] as const)
+          : []),
+        ...(parts?.comparisonRead === true || doneWith('comparisons')
+          ? []
+          : (['comparison'] as const)),
+        ...(details === undefined && !doneWith('details')
+          ? (['details'] as const)
+          : []),
       ],
     };
   });
@@ -1921,7 +2067,28 @@ const assemble = ({
     readAtEpochMs: nowMs,
     required,
     features,
-    summary: summaryOf(entries),
+    summary: summaryOf(
+      entries,
+      new Set(
+        Arr.generate(function* () {
+          for (const pr of pulls) {
+            const parts = partsOf(pr);
+
+            if (parts.checks === undefined) {
+              yield 'checks' as const;
+            }
+
+            if (!parts.comparisonRead) {
+              yield 'comparison' as const;
+            }
+
+            if (parts.details === undefined) {
+              yield 'details' as const;
+            }
+          }
+        }),
+      ),
+    ),
     entries,
     roots: report.roots,
     cycles: report.cycles,
@@ -1929,9 +2096,20 @@ const assemble = ({
     issues: known.issues ?? NO_ISSUES,
     queue:
       requirements === undefined ||
+      known.pulls === undefined ||
       known.checks === undefined ||
       known.comparisons === undefined ||
-      known.details === undefined
+      known.details === undefined ||
+      // A part kept from the last read has nothing of a pull request opened
+      // since, and a queue drawn without it would leave it out of the order.
+      pulls.some(
+        ({ number }) =>
+          !(
+            known.checks?.has(number) === true &&
+            known.details?.has(number) === true &&
+            known.comparisons?.has(number) === true
+          ),
+      )
         ? undefined
         : queueViewOf({
             defaultBranch,
@@ -1954,11 +2132,27 @@ const assemble = ({
             }),
           }),
     reading: [
-      ...(known.merged === undefined ? (['merged'] as const) : []),
-      ...(known.issues === undefined ? (['issues'] as const) : []),
+      ...(known.merged === undefined && !doneWith('merged')
+        ? (['merged'] as const)
+        : []),
+      ...(known.issues === undefined && !doneWith('issues')
+        ? (['issues'] as const)
+        : []),
     ],
+    failed,
+    parts: known,
   };
 };
+
+/** The pull requests' part of a read they failed in. */
+const NO_PULLS: PullsPart = {
+  defaultBranch: '',
+  // Not known, and a queue block shown on a repository that has none would go
+  // again on the next read.
+  queue: false,
+  codeOwners: [],
+  pulls: [],
+} as const;
 
 /** What has answered about one pull request. */
 type PartsOfPull = Readonly<{

@@ -1607,6 +1607,33 @@ a:focus-visible {
   padding: 0;
 }
 
+/*
+ * The queue before its order is known: the numbers labelled merge-queued, as
+ * plain links on one wrapping line.
+ */
+.queue-unordered {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  gap: 0.35rem 0.75rem;
+}
+
+.queue-unordered-label {
+  color: var(--ink-secondary);
+  font-size: 0.75rem;
+}
+
+.queue-unordered-list {
+  display: flex;
+  flex-wrap: wrap;
+  font-variant-numeric: tabular-nums;
+  gap: 0.35rem 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 .queue-outside-node > .queue-link {
   align-items: center;
   background: color-mix(in srgb, var(--queue-outside) 12%, var(--surface));

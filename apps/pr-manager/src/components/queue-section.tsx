@@ -1,3 +1,4 @@
+import { MERGE_QUEUED_LABEL } from 'pr-report-core';
 import { createState, map, type InitializedObservable } from 'synstate';
 import {
   constant,
@@ -9,8 +10,12 @@ import {
   type JSX,
 } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
+import type { Entry } from '../load-report.mjs';
+import { isUnread, OPEN_PARTS } from '../part-failures.mjs';
 import type { QueueSlot, QueueView } from '../queue-view.mjs';
 import { reader } from '../store/index.mjs';
+import { ExternalLink } from './external-link.js';
+import { PartFailureNotes } from './part-failure-notes.js';
 import { QueueOutsideBox } from './queue-outside-box.js';
 import { QueueSlotBox } from './queue-slot-box.js';
 import { QueueTip, type QueueTipContent } from './queue-tip.js';
@@ -52,14 +57,82 @@ export const QueueSection = (): JSX.Element => {
         />
       </h2>
 
+      <PartFailureNotes parts={OPEN_PARTS} />
+
       <MatchOptional
-        none={
-          <p class={constant('section-note')}>{constant('Reading GitHub…')}</p>
-        }
+        none={<QueueUnordered />}
         some={(queue$) => <QueueBody queue$={queue$} />}
         value={queue}
       />
     </section>
+  );
+};
+
+const queuedOf = (entries: readonly Entry[]): readonly Entry[] =>
+  entries
+    .filter(({ labels }) =>
+      labels.some(({ name }) => name === MERGE_QUEUED_LABEL),
+    )
+    .toSorted((a, b) => a.number - b.number);
+
+/**
+ * The queue before its order is known: the pull requests labelled
+ * `merge-queued`, which the pull requests' query reads, by number. The order
+ * needs the checks, the comparisons and the details, which come later or, where
+ * one failed, not on this read.
+ */
+const QueueUnordered = (): JSX.Element => {
+  const queued = reader.entries.pipe(map(queuedOf));
+
+  // Whether the parts the order needs may still come: a read is out, and none
+  // of them has failed with nothing kept.
+  const coming = derive(
+    [reader.fetching, reader.failed],
+    (isFetching, failed) =>
+      isFetching && OPEN_PARTS.every((part) => !isUnread(failed, part)),
+  );
+
+  return (
+    <>
+      <If
+        cond={coming}
+        then={
+          <p class={constant('section-note')}>{constant('Reading GitHub…')}</p>
+        }
+      />
+
+      <If
+        cond={view(queued, Arr.isNonEmpty)}
+        then={
+          <div class={constant('queue-unordered')}>
+            <span class={constant('queue-unordered-label')}>
+              {derive(
+                [queued, coming],
+                (entries, isComing) =>
+                  `${entries.length} labelled merge-queued, order ${isComing ? 'not known yet' : 'not read'}`,
+              )}
+            </span>
+            <ul class={constant('queue-unordered-list')}>
+              <For items={queued} key={(entry) => entry.number}>
+                {(entry$) => (
+                  <li>
+                    <ExternalLink
+                      href={view(entry$, ({ url }) => url)}
+                      title={view(
+                        entry$,
+                        ({ number, title }) => `#${number} ${title}`,
+                      )}
+                    >
+                      {view(entry$, ({ number }) => `#${number}`)}
+                    </ExternalLink>
+                  </li>
+                )}
+              </For>
+            </ul>
+          </div>
+        }
+      />
+    </>
   );
 };
 
