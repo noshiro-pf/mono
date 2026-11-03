@@ -163,11 +163,14 @@ jobs:
       # request itself is the total — the commit list endpoint caps at 250,
       # and a count is all this needs.
       #
-      # A pull request based on another one (the chain CLAUDE.md describes)
-      # counts its parent's commit too, and so reads as more than one until
-      # the parent merges and it is rebased. That is `unblock-prs`'s order
-      # already: it rebases before taking `skip-ci` off, and while the label
-      # is on this job does not run.
+      # A stacked pull request (CLAUDE.md, "Commits and pull requests") is
+      # based on the layer below, so `.commits` is its own commit, and this
+      # workflow, filtered to `main`, does not run on it at all. When the layer
+      # below merges, GitHub moves its base to `main`, and until it is rebased
+      # (unless GitHub rebased it in that move) it still carries the original
+      # commit of the layer that was squashed into `main`: the count reads 2
+      # and this context is red. `unblock-prs` rebases a layer before it arms
+      # auto-merge, so nothing merges in that window.
       - name: Check that the branch is a single commit
         env:
           GH_TOKEN: ${{ github.token }}
