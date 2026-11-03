@@ -16,15 +16,17 @@ import { oxlintCodeToRuleId } from './rule-id-mapping.mjs';
  * is left alone: the repository disables a rule moved from ESLint to oxlint
  * that way (`tools/configs/oxlint-rules.mts`).
  *
- * Comments are found line by line, as the markers are: a comment is text after
- * `//` or `/*` whose first word is the directive. A string that holds such text
- * is read as one too, which errs towards reporting.
+ * A comment is text after `//`, up to the end of its line, or after `/*`, up to
+ * the `*\/` that closes it on whichever line that is, whose first word, after
+ * the whitespace oxlint trims (newlines included), is the directive; it is
+ * reported on the line it starts on. A string that holds such text is read as
+ * one too, which errs towards reporting.
  */
 export const findSumiSilencingDirectives = (
   sourceText: string,
 ): readonly MarkerProblem[] =>
-  sourceText.split('\n').flatMap((lineText, index) =>
-    commentBodies(lineText).flatMap((body): readonly MarkerProblem[] => {
+  directiveComments(sourceText).flatMap(
+    ({ body, line }): readonly MarkerProblem[] => {
       const directive = parseDirective(body);
 
       if (directive === undefined) {
@@ -36,7 +38,7 @@ export const findSumiSilencingDirectives = (
       if (ruleNames.length === 0) {
         return [
           {
-            line: index + 1,
+            line,
             message: `\`${keyword}\` names no rule, so it silences every rule \`sumi check\` enforces. Use \`// @sumi-expect-error <rule-id>\` instead (D-60).`,
           },
         ];
@@ -54,7 +56,7 @@ export const findSumiSilencingDirectives = (
         ? []
         : [
             {
-              line: index + 1,
+              line,
               message: `\`${keyword}\` silences ${silenced
                 .map(({ code }) => `\`${code}\``)
                 .join(', ')}, which \`sumi check\` enforces. Use ${silenced
@@ -62,7 +64,7 @@ export const findSumiSilencingDirectives = (
                 .join(', ')} instead (D-60).`,
             },
           ];
-    }),
+    },
   );
 
 type PresetRule = Readonly<{ code: string; ruleId: string }>;
@@ -77,21 +79,55 @@ const presetRulesByName: ReadonlyMap<string, PresetRule> = new Map(
 );
 
 /**
- * The text of each comment that starts on `lineText`: what follows every `//`
- * and every `/*`, up to the `*\/` that closes a block comment.
+ * Each comment in `sourceText` whose text starts with `oxlint-disable` once the
+ * leading whitespace is trimmed, with the line its `//` or `/*` is on: its text
+ * up to the line terminator that ends a line comment, or up to the `*\/` that
+ * closes a block comment, on whichever line that is (to the end of the source
+ * when none does). Every `/` followed by `/` or `*` opens one, so the `/` of a
+ * `*\/` does not hide a comment opened straight after it, save the second `/`
+ * of a `//`, which `///` would otherwise read as a comment of its own.
  */
-const commentBodies = (lineText: string): readonly string[] =>
-  Array.from(lineText.matchAll(/\/\/|\/\*/gu), (match) => {
-    const rest = lineText.slice(match.index + 2);
+const directiveComments = (
+  sourceText: string,
+): readonly Readonly<{ body: string; line: number }>[] => {
+  // Lines are counted from the previous directive, as the matches come in order.
+  let mut_line = 1;
 
-    if (match[0] === '//') {
-      return rest;
+  let mut_counted = 0;
+
+  return Array.from(sourceText.matchAll(/\/(?=[/*])/gu)).flatMap((match) => {
+    if (
+      sourceText[match.index - 1] === '/' &&
+      sourceText[match.index - 2] !== '*'
+    ) {
+      return [];
     }
 
-    const close = rest.indexOf('*/');
+    const rest = sourceText.slice(match.index + 2);
 
-    return close === -1 ? rest : rest.slice(0, close);
+    // Only the leading whitespace is read before the rest is known to matter.
+    if (!rest.trimStart().startsWith('oxlint-disable')) {
+      return [];
+    }
+
+    const end =
+      sourceText[match.index + 1] === '/'
+        ? rest.search(/[\n\r\u{2028}\u{2029}]/u)
+        : rest.indexOf('*/');
+
+    mut_line +=
+      sourceText.slice(mut_counted, match.index).split('\n').length - 1;
+
+    mut_counted = match.index;
+
+    return [
+      {
+        body: end === -1 ? rest : rest.slice(0, end),
+        line: mut_line,
+      },
+    ];
   });
+};
 
 type Directive = Readonly<{ keyword: string; ruleNames: readonly string[] }>;
 
