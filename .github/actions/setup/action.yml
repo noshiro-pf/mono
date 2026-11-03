@@ -50,6 +50,36 @@ runs:
         node-version-file: ${{ case(inputs.node-version == '', 'package.json', '') }}
         cache: 'pnpm'
 
+    # pnpm verifies the lockfile against the supply-chain policies of
+    # pnpm-workspace.yaml on every install, which is most of an install from a
+    # warm store, and skips it when its record holds this lockfile's hash under
+    # policies at least as strict. The record is per machine, so without this
+    # every job verifies again. With it, a job skips the verification when a
+    # job that finished before it started saved the record under this key: in
+    # a run, the jobs after `gates`. Jobs that start together, such as the
+    # `gates` of each workflow, each verify. Where a record may be read from,
+    # and so which pull requests reuse it, is in "Setup" in
+    # .github/workflows/README.md. A changed lockfile or policy misses the
+    # key, and so does another pnpm, whose record format or policies may
+    # differ: a record it ignored would otherwise be restored, ignored and
+    # never replaced, since a key is saved once. The path is where pnpm
+    # writes the record on Linux, read here once for both steps below; the
+    # install warns when pnpm wrote nothing there.
+    - name: Locate pnpm's lockfile verification record
+      id: lockfile-record
+      if: inputs.install == 'true'
+      shell: bash
+      run: |
+        echo "path=${XDG_CACHE_HOME:-$HOME/.cache}/pnpm/lockfile-verified.jsonl" >> "$GITHUB_OUTPUT"
+        echo "pnpm=$(pnpm --version)" >> "$GITHUB_OUTPUT"
+
+    - name: Restore pnpm's lockfile verification record
+      if: inputs.install == 'true'
+      uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+      with:
+        path: ${{ steps.lockfile-record.outputs.path }}
+        key: pnpm-lockfile-verified-${{ runner.os }}-pnpm-${{ steps.lockfile-record.outputs.pnpm }}-${{ hashFiles('pnpm-lock.yaml', 'pnpm-workspace.yaml') }}
+
     # What to install, and the check that each input is `true` or `false`,
     # are in the script; see its header for why it may be a file in the tree.
     - name: Install dependencies
@@ -58,4 +88,5 @@ runs:
         INSTALL: ${{ inputs.install }}
         ENGINE_STRICT: ${{ inputs.engine-strict }}
         IGNORE_SCRIPTS: ${{ inputs.ignore-scripts }}
+        LOCKFILE_RECORD: ${{ steps.lockfile-record.outputs.path }}
       run: node ./tools/scripts/cmd/workflow-steps.mts install

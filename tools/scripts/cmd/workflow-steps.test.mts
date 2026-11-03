@@ -248,6 +248,19 @@ const makeBinDir = (): string => {
   return dir;
 };
 
+/** An existing, empty file to stand for pnpm's verification record. */
+const makeRecord = (): string => {
+  const record = path.join(
+    fs.mkdtempSync(path.join(os.tmpdir(), 'workflow-steps-record-')),
+    'lockfile-verified.jsonl',
+  );
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  fs.writeFileSync(record, '');
+
+  return record;
+};
+
 /** The script under `node`, as a workflow step runs it; never rejects. */
 const run = async (
   args: readonly string[],
@@ -280,6 +293,7 @@ describe('the script, run the way the workflows run it', () => {
       INSTALL: 'true',
       ENGINE_STRICT: 'true',
       IGNORE_SCRIPTS: 'false',
+      LOCKFILE_RECORD: makeRecord(),
     });
 
     assert.deepStrictEqual(result, {
@@ -287,6 +301,60 @@ describe('the script, run the way the workflows run it', () => {
       stdout:
         'pnpm install --frozen-lockfile --engine-strict\nfake pnpm: install --frozen-lockfile --engine-strict\n',
     });
+  });
+
+  test('`install` warns when pnpm left no verification record to cache', async () => {
+    // The setup action caches the record so that the jobs after the first skip
+    // pnpm's lockfile verification. A pnpm that writes it elsewhere would make
+    // that cache save nothing, and every job pay for the verification again,
+    // with nothing failing.
+    const record = path.join(
+      fs.mkdtempSync(path.join(os.tmpdir(), 'workflow-steps-record-')),
+      'lockfile-verified.jsonl',
+    );
+
+    const result = await run(['install'], {
+      INSTALL: 'true',
+      ENGINE_STRICT: 'false',
+      IGNORE_SCRIPTS: 'false',
+      LOCKFILE_RECORD: record,
+    });
+
+    assert.deepStrictEqual(result, {
+      code: 0,
+      stdout: [
+        'pnpm install --frozen-lockfile',
+        'fake pnpm: install --frozen-lockfile',
+        `::warning::pnpm left no lockfile verification record at ${record}, so the setup action's cache of it saves nothing and every job verifies the lockfile again. Point the "Locate pnpm's lockfile verification record" step of .github/actions/setup/action.yml at the file this pnpm writes.`,
+        '',
+      ].join('\n'),
+    });
+  });
+
+  test('`install` without a record path stops before installing', async () => {
+    // Empty is what a skipped step's output reads as.
+    const unset: readonly ReadonlyRecord<string, string>[] = [
+      {},
+      { LOCKFILE_RECORD: '' },
+    ] as const;
+
+    const results = await Promise.all(
+      unset.map(async (record) =>
+        run(['install'], {
+          INSTALL: 'true',
+          ENGINE_STRICT: 'false',
+          IGNORE_SCRIPTS: 'false',
+          ...record,
+        }),
+      ),
+    );
+
+    for (const result of results) {
+      assert.deepStrictEqual(result, {
+        code: 1,
+        stdout: '::error::LOCKFILE_RECORD is not set.\n',
+      });
+    }
   });
 
   test('a misspelt input stops the step with an error annotation', async () => {

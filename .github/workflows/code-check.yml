@@ -198,9 +198,13 @@ jobs:
       # `ws:check:test:cov` needs a browser too: the synstate adapters' hooks only
       # run in one, so their coverage would otherwise be reported as zero.
       # Every `ws:check:e2e` entry drives one, which is the whole point of them.
+      # `--only-shell`: every launch here is headless, which Playwright runs on
+      # `chromium-headless-shell`, so the full Chromium build would be
+      # downloaded for nothing. Only the extensions' `pack:crx` and `smoke`
+      # need it, and CI runs neither.
       - name: Install Playwright Browsers
         if: matrix.command == 'ws:check:test:browser' || startsWith(matrix.command, 'ws:check:test:cov') || startsWith(matrix.command, 'ws:check:e2e')
-        run: pnpm exec playwright install chromium
+        run: pnpm exec playwright install --only-shell chromium
 
       # Firestore and Pub/Sub need Java 21 or later. firebase-tools is already
       # a catalog-pinned dependency of each app; no Firebase login is needed.
@@ -289,7 +293,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Install Playwright Browsers
-        run: pnpm exec playwright install chromium
+        run: pnpm exec playwright install --only-shell chromium
 
       - name: Build all packages
         run: pnpm run ws:build
