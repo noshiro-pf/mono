@@ -37,7 +37,11 @@ export default [
   },
 
   {
-    files: ['src/utils/date-utils.mts'],
+    files: [
+      'src/utils/date-utils.mts',
+      'src/utils/answer-deadline.mts',
+      'src/utils/answer-deadline.test.mts',
+    ],
     rules: defineKnownRules({
       // `Temporal` is not available on Node 22, which is the floor this
       // repository declares in `engines`. Revisit when that floor moves.

@@ -1,7 +1,6 @@
-import type { Answer } from 'event-schedule-app-shared';
+import { isAfterAnswerDeadline, type Answer } from 'event-schedule-app-shared';
 import type { Firestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions/v1';
-import { compareYmdhm } from 'ts-fortress-types';
 import {
   createMailBodyForAnswerDelete,
   createMailBodyForNewAnswer,
@@ -9,7 +8,6 @@ import {
 } from './functions/index.mjs';
 import { getEmail, getEventItem } from './get-event-item.mjs';
 import { createMailOptions, sendEmail } from './setup-mailer.mjs';
-import { now } from './utils/index.mjs';
 
 export const notifyOnAnswerChangeBody = async (
   db: Firestore,
@@ -18,11 +16,14 @@ export const notifyOnAnswerChangeBody = async (
     eventId,
     answerItemBefore,
     answerItemAfter,
+    writtenAt,
   }: Readonly<{
     eventType: 'create' | 'delete' | 'update';
     eventId: string;
     answerItemBefore: Answer | undefined;
     answerItemAfter: Answer | undefined;
+    /** When the answer was written, in milliseconds since the epoch. */
+    writtenAt: number;
   }>,
 ): Promise<void> => {
   const [eventItem, email] = await Promise.all([
@@ -56,10 +57,7 @@ export const notifyOnAnswerChangeBody = async (
     return;
   }
 
-  if (
-    eventItem.answerDeadline !== 'none' &&
-    compareYmdhm(eventItem.answerDeadline, now()) <= 0
-  ) {
+  if (isAfterAnswerDeadline(eventItem, writtenAt)) {
     logger.log(
       'skipped because eventItem.useAnswerDeadline is true and answerDeadline overed.',
     );

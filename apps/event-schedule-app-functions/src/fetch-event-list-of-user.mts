@@ -3,14 +3,14 @@ import {
   EventListItem,
   EventSchedule,
   firestorePaths,
+  wallClockInOffset,
 } from 'event-schedule-app-shared';
 import type { Firestore } from 'firebase-admin/firestore';
 import { https } from 'firebase-functions/v1';
 import { Arr, IMap, Optional, pipe, tp } from 'ts-data-forge';
-import { compareYearMonthDate } from 'ts-fortress-types';
+import { compareYearMonthDate, DateUtils } from 'ts-fortress-types';
 import type { StrictPick } from 'ts-type-forge';
 import type { FetchEventListOfUserPayload } from './types/index.mjs';
-import { today } from './utils/index.mjs';
 
 /**
  * `EventSchedule.author.id === uid` であるか、 `answers` に `uid`
@@ -56,6 +56,9 @@ export const fetchEventListOfUserImpl = async (
     },
   }));
 
+  // One instant for the whole listing, so that every event is judged at it.
+  const nowMillis = DateUtils.now();
+
   const eventListFiltered = pipe(eventList).map((list) =>
     list.filter(({ eventSchedule }) => {
       const isArchived = eventSchedule.archivedBy.some((u) => u.id === uid);
@@ -83,7 +86,11 @@ export const fetchEventListOfUserImpl = async (
       }
 
       if (!showAllPastDaysEvent) {
-        const t = today();
+        // "Past" by the event's own date, not the date where this runs.
+        const t = wallClockInOffset(
+          nowMillis,
+          eventSchedule.timezoneOffsetMinutes,
+        );
 
         if (
           eventSchedule.datetimeRangeList.every(

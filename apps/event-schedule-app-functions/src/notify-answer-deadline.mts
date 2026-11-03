@@ -7,6 +7,7 @@ import {
   createMailBodyForAnswerDeadline,
   createMailBodyForAnswerResult,
   deadlinePassed,
+  isReminderHour,
   todayIsNDaysBeforeDeadline,
 } from './functions/index.mjs';
 import { getEmail } from './get-event-item.mjs';
@@ -18,7 +19,14 @@ const keys = {
   notificationSettings: 'notificationSettings',
 } as const satisfies ReadonlyRecord<string, keyof EventSchedule>;
 
-export const notifyAnswerDeadline = async (db: Firestore): Promise<void> => {
+/**
+ * Mails the reminders due at `nowMillis`: run every hour, it reminds each event
+ * once a day, in the hour its own clock reads noon.
+ */
+export const notifyAnswerDeadline = async (
+  db: Firestore,
+  nowMillis: number,
+): Promise<void> => {
   const querySnapshot = await db
     .collection(firestorePaths.events)
     .where(keys.notificationSettings, '!=', 'none')
@@ -26,7 +34,13 @@ export const notifyAnswerDeadline = async (db: Firestore): Promise<void> => {
 
   const events = querySnapshot.docs
     .map((doc) => tp(doc.id, fillEventScheduleWithCheck(doc.data())))
-    .filter(([_id, ev]) => ev.answerDeadline !== 'none');
+    .filter(
+      ([_id, ev]) =>
+        ev.answerDeadline !== 'none' &&
+        // Before the per-event reads below: in all but one run a day, an
+        // event's clock does not read noon.
+        isReminderHour(nowMillis, ev.timezoneOffsetMinutes),
+    );
 
   const emails = await Promise.all(
     events.map(([eventId]) => getEmail(db, eventId)),
@@ -56,7 +70,13 @@ export const notifyAnswerDeadline = async (db: Firestore): Promise<void> => {
       )
         .filter(
           ([flag, diff]) =>
-            flag && todayIsNDaysBeforeDeadline(diff, answerDeadline),
+            flag &&
+            todayIsNDaysBeforeDeadline(
+              diff,
+              answerDeadline,
+              ev.timezoneOffsetMinutes,
+              nowMillis,
+            ),
         )
         .map(([_, diff]) => {
           logger.log(`notify${pad2(diff)}daysBeforeAnswerDeadline`);
@@ -79,6 +99,7 @@ export const notifyAnswerDeadline = async (db: Firestore): Promise<void> => {
 export const notifyAfterAnswerDeadline = async (
   db: Firestore,
   minutes: MinutesEnum,
+  nowMillis: number,
 ): Promise<void> => {
   const querySnapshot = await db
     .collection(firestorePaths.events)
@@ -87,7 +108,17 @@ export const notifyAfterAnswerDeadline = async (
 
   const events = querySnapshot.docs
     .map((doc) => tp(doc.id, fillEventScheduleWithCheck(doc.data())))
-    .filter(([_id, ev]) => ev.answerDeadline !== 'none');
+    .filter(
+      ([_id, ev]) =>
+        ev.answerDeadline !== 'none' &&
+        // Before the per-event reads below: few deadlines fall in a run's window.
+        deadlinePassed(
+          ev.answerDeadline,
+          ev.timezoneOffsetMinutes,
+          minutes,
+          nowMillis,
+        ),
+    );
 
   const emails = await Promise.all(
     events.map(([eventId]) => getEmail(db, eventId)),
@@ -105,8 +136,7 @@ export const notifyAfterAnswerDeadline = async (
         answerDeadline !== 'none' &&
         ns !== 'none' &&
         email !== '' &&
-        ns.notifyAfterAnswerDeadline &&
-        deadlinePassed(answerDeadline, minutes)
+        ns.notifyAfterAnswerDeadline
       ) {
         return sendEmail(
           createMailOptions({

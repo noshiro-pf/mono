@@ -1,25 +1,21 @@
-import { DateUtils, type Ymdhm } from 'ts-fortress-types';
+import { answerDeadlineMillis } from 'event-schedule-app-shared';
+import type { Ymdhm } from 'ts-fortress-types';
 import type { MinutesEnum } from 'ts-type-forge';
-import { now } from '../utils/index.mjs';
 
+/**
+ * Whether the deadline, read in the event's own zone (`timezoneOffsetMinutes`)
+ * as `firestore.rules` reads it, passed in the `minutes` that end at
+ * `nowMillis`: after the run before, up to and including this one. Runs every
+ * `minutes` apart therefore see each deadline once.
+ */
 export const deadlinePassed = (
-  answerDeadlineYmdhm: Ymdhm,
+  answerDeadline: Ymdhm,
+  timezoneOffsetMinutes: number,
   minutes: MinutesEnum,
+  nowMillis: number,
 ): boolean => {
-  const answerDeadlineDate = ymdhm2DateObject(answerDeadlineYmdhm);
+  const msecDiff: number =
+    nowMillis - answerDeadlineMillis(answerDeadline, timezoneOffsetMinutes);
 
-  const current = ymdhm2DateObject(now());
-
-  const msecDiff: number = current.getTime() - answerDeadlineDate.getTime();
-
-  return 0 <= msecDiff && msecDiff <= minutes * 60 * 1000;
+  return 0 <= msecDiff && msecDiff < minutes * 60 * 1000;
 };
-
-const ymdhm2DateObject = (ymdhm: Ymdhm): Date =>
-  DateUtils.create(
-    ymdhm.year,
-    ymdhm.month,
-    ymdhm.date,
-    ymdhm.hours,
-    ymdhm.minutes,
-  );

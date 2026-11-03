@@ -2,6 +2,7 @@ import { firestorePaths } from 'event-schedule-app-shared';
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { https, logger, region } from 'firebase-functions/v1';
+import { DateUtils } from 'ts-fortress-types';
 import type { MinutesEnum } from 'ts-type-forge';
 import { runtimeConfig } from './env.mjs';
 import { fetchEventListOfUserImpl } from './fetch-event-list-of-user.mjs';
@@ -33,6 +34,14 @@ const regionSelectedWithConfig = regionSelected.runWith({
 
 const db = getFirestore();
 
+/**
+ * When the event a function was called for happened — the write, or the
+ * scheduled tick — rather than when the function got to run, which a cold start
+ * or a retry delays. `context.timestamp` is an ISO 8601 string in UTC.
+ */
+const eventTimeMillis = (timestamp: string): number =>
+  DateUtils.toTimestamp(DateUtils.from(timestamp));
+
 const wildcard = {
   eventId: 'eventId',
   answerId: 'answerId',
@@ -47,6 +56,7 @@ export const answerCreationListener = regionSelectedWithConfig.firestore
     notifyOnAnswerChangeBody(db, {
       eventType: 'create',
       eventId: toStringWithCheck(context.params[wildcard.eventId]),
+      writtenAt: eventTimeMillis(context.timestamp),
       answerItemBefore: undefined,
       answerItemAfter: fillAnswerWithCheck(snapshot.data()),
     }),
@@ -58,6 +68,7 @@ export const answerDeletionListener = regionSelectedWithConfig.firestore
     notifyOnAnswerChangeBody(db, {
       eventType: 'delete',
       eventId: toStringWithCheck(context.params[wildcard.eventId]),
+      writtenAt: eventTimeMillis(context.timestamp),
       answerItemBefore: fillAnswerWithCheck(snapshot.data()),
       answerItemAfter: undefined,
     }),
@@ -69,23 +80,45 @@ export const answerUpdateListener = regionSelectedWithConfig.firestore
     notifyOnAnswerChangeBody(db, {
       eventType: 'update',
       eventId: toStringWithCheck(context.params[wildcard.eventId]),
+      writtenAt: eventTimeMillis(context.timestamp),
       answerItemBefore: fillAnswerWithCheck(change.before.data()),
       answerItemAfter: fillAnswerWithCheck(change.after.data()),
     }),
   );
 
+/**
+ * The zone the schedules below are read in, which decides only when they run:
+ * each event is judged in its own zone. Given, because a schedule without one
+ * is read in `America/Los_Angeles`, whose daylight-saving changes skip or
+ * repeat a run.
+ */
+const scheduleTimeZone = 'Etc/UTC';
+
+/**
+ * Every hour, so that each event is reminded at noon in its own zone
+ * (`isReminderHour`). The name is kept from when this ran once a day at noon in
+ * Tokyo: a deployed function renamed is a function deleted.
+ */
 export const notifyAnswerDeadlineEveryday = regionSelectedWithConfig.pubsub
-  .schedule('00 12 * * *')
-  .timeZone('Asia/Tokyo')
-  .onRun(() => notifyAnswerDeadline(db));
+  .schedule('0 * * * *')
+  .timeZone(scheduleTimeZone)
+  .onRun((context) =>
+    notifyAnswerDeadline(db, eventTimeMillis(context.timestamp)),
+  );
 
 const minutes: MinutesEnum = 10;
 
 export const notifyAfterAnswerDeadlineEveryMinutes =
   regionSelectedWithConfig.pubsub
     .schedule(`*/${minutes} * * * *`)
-    .timeZone('Asia/Tokyo')
-    .onRun(() => notifyAfterAnswerDeadline(db, minutes));
+    .timeZone(scheduleTimeZone)
+    .onRun((context) =>
+      notifyAfterAnswerDeadline(
+        db,
+        minutes,
+        eventTimeMillis(context.timestamp),
+      ),
+    );
 
 // export const answerPagePreRender = functions
 //   .region('asia-northeast2')
