@@ -9,6 +9,22 @@ export const employmentInsuranceRate = 0.0055;
 /** 厚生年金保険の標準報酬月額の上限（円）。 */
 export const welfarePensionMaxStandardRemuneration = 650_000;
 
+/**
+ * 健康保険料率（協会けんぽ東京都、介護保険第 2 号被保険者に該当しない場合）。
+ * 保険料額表（`kyoukai-kenpo-insurance-premium-table.mts`）と同じ年度の率に
+ * する（食い違うとテストが落ちる）。
+ */
+export const healthInsuranceRate = 0.0998;
+
+/** 厚生年金保険料率。保険料額表と同じ率にする（食い違うとテストが落ちる）。 */
+export const welfarePensionRate = 0.183;
+
+/** 厚生年金保険の標準賞与額の上限（円 / 1 回の支給）。 */
+export const welfarePensionMaxStandardBonus = 1_500_000;
+
+/** 健康保険の標準賞与額の上限（円 / 年度の累計）。 */
+export const healthInsuranceMaxStandardBonusPerYear = 5_730_000;
+
 /** 所得税の基礎控除額（円）。 */
 export const incomeTaxBasicDeduction = 480_000;
 

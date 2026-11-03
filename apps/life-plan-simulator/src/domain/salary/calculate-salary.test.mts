@@ -50,17 +50,49 @@ describe(calculateSalary, () => {
 
     assert.strictEqual(january.bonus, 600_000);
 
-    assert.strictEqual(january.bonusHealthInsurance, 29_441);
+    // 600,000 × 9.98% / 2
+    assert.closeTo(january.bonusHealthInsurance, 29_940, 1e-6);
 
-    assert.strictEqual(january.bonusWelfarePension, 53_985);
+    // 600,000 × 18.3% / 2
+    assert.closeTo(january.bonusWelfarePension, 54_900, 1e-6);
 
     assert.closeTo(january.bonusEmploymentInsurance, 3300, 1e-9);
 
     assert.closeTo(
       january.bonusIncomeTax,
-      (600_000 - 29_441 - 53_985 - 3300) * 0.040_84,
+      (600_000 - 29_940 - 54_900 - 3300) * 0.040_84,
       1e-6,
     );
+  });
+
+  test('標準報酬月額の上限より大きい賞与も標準賞与額で保険料を求めること', () => {
+    const [bigBonusJanuary] = calculateSalary(
+      {
+        history: resolveSalaryHistory(
+          [
+            {
+              id: 1,
+              start: '2025-01',
+              annualBase: 3_600_000,
+              companyDcMonthly: 0,
+              idecoMonthly: 0,
+              annualBonus: 2_000_000,
+            },
+          ],
+          0,
+        ),
+        retirementMonth: ym('2027-10'),
+      },
+      [ym('2027-01')],
+    );
+
+    assert.isDefined(bigBonusJanuary);
+
+    // 2,000,000 × 9.98% / 2
+    assert.closeTo(bigBonusJanuary.bonusHealthInsurance, 99_800, 1e-6);
+
+    // 標準賞与額の上限 1,500,000 × 18.3% / 2
+    assert.closeTo(bigBonusJanuary.bonusWelfarePension, 137_250, 1e-6);
   });
 
   test('退職した翌月から給与は 0 で、保険料と住民税は残ること', () => {

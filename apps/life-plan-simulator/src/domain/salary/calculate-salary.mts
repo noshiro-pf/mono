@@ -2,6 +2,8 @@ import type { StrictOmit } from 'ts-type-forge';
 import { residentTaxRate } from '../../data/index.mjs';
 import type { SalaryHistoryEntry } from '../input/index.mjs';
 import {
+  bonusHealthInsurancePremium,
+  bonusWelfarePensionPremium,
   bonusWithholdingRate,
   employmentInsurancePremium,
   healthInsurancePremium,
@@ -23,7 +25,8 @@ import {
  * - 月給（額面）は年収の推移の表から引き、退職する月（`retirementMonth`）の
  *   翌月から 0。賞与は毎年 1 月に支給する。
  * - 健康保険料・厚生年金保険料は、4〜6 月の月給（額面）の平均を標準報酬として
- *   その年の 9 月から翌年 8 月まで使う（定時決定）。
+ *   その年の 9 月から翌年 8 月まで使う（定時決定）。賞与の分は等級を使わず、
+ *   標準賞与額に料率を掛ける。
  * - 所得税は月額表、住民税は 12 か月前の月給からの概算。
  */
 export const calculateSalary = (
@@ -206,13 +209,9 @@ const calculateSalaryMonth = (
       ? (salary.entryAt(month)?.annualBonus ?? 0)
       : 0;
 
-  const bonusSocialInsuranceBase = Math.floor(bonus / 1000) * 1000;
+  const bonusHealthInsurance = bonusHealthInsurancePremium(bonus);
 
-  const bonusHealthInsurance =
-    bonus === 0 ? 0 : healthInsurancePremium(bonusSocialInsuranceBase);
-
-  const bonusWelfarePension =
-    bonus === 0 ? 0 : welfarePensionPremium(bonusSocialInsuranceBase);
+  const bonusWelfarePension = bonusWelfarePensionPremium(bonus);
 
   const bonusEmploymentInsurance = employmentInsurancePremium(bonus);
 

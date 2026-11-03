@@ -1,10 +1,17 @@
 import {
+  healthInsuranceRate,
+  kyoukaiKenpoInsurancePremiumTable,
+  welfarePensionRate,
+} from '../../data/index.mjs';
+import {
   bonusWithholdingRate,
   monthlyWithholdingTax,
   progressiveIncomeTax,
 } from './income-tax.mjs';
 import { publicPensionDeduction } from './public-pension-deduction.mjs';
 import {
+  bonusHealthInsurancePremium,
+  bonusWelfarePensionPremium,
   employmentInsurancePremium,
   healthInsurancePremium,
   welfarePensionPremium,
@@ -88,5 +95,55 @@ describe('social insurance', () => {
 
   test('雇用保険料は 0.55% であること', () => {
     assert.closeTo(employmentInsurancePremium(300_000), 1650, 1e-9);
+  });
+});
+
+describe('bonus social insurance', () => {
+  test('標準賞与額（1,000 円未満切り捨て）に保険料率の半分を掛けること', () => {
+    // 600,000 × 9.98% / 2, 600,000 × 18.3% / 2
+    assert.closeTo(bonusHealthInsurancePremium(600_999), 29_940, 1e-6);
+
+    assert.closeTo(bonusWelfarePensionPremium(600_999), 54_900, 1e-6);
+  });
+
+  test('標準報酬月額の上限より大きい賞与も等級に丸めないこと', () => {
+    assert.closeTo(bonusHealthInsurancePremium(1_500_000), 74_850, 1e-6);
+
+    assert.closeTo(bonusWelfarePensionPremium(1_500_000), 137_250, 1e-6);
+  });
+
+  test('厚生年金は 1 回 150 万円、健康保険は年 573 万円で頭打ちになること', () => {
+    assert.closeTo(bonusWelfarePensionPremium(2_000_000), 137_250, 1e-6);
+
+    assert.closeTo(bonusHealthInsurancePremium(2_000_000), 99_800, 1e-6);
+
+    // 5,730,000 × 9.98% / 2
+    assert.closeTo(bonusHealthInsurancePremium(6_000_000), 285_927, 1e-6);
+  });
+
+  test('0 以下の賞与は 0 を返すこと', () => {
+    assert.strictEqual(bonusHealthInsurancePremium(0), 0);
+
+    assert.strictEqual(bonusWelfarePensionPremium(-1), 0);
+  });
+
+  test('保険料率の半分が保険料額表の折半額と食い違わないこと', () => {
+    for (const entry of kyoukaiKenpoInsurancePremiumTable) {
+      // 月額の保険料は折半額 `half` を引くので、賞与の `rate / 2` と同じ
+      // 丸め方であることも確かめる。
+      assert.closeTo(
+        entry.healthInsuranceNoLongTermCare.half,
+        (entry.standardMonthlyRemuneration * healthInsuranceRate) / 2,
+        1e-6,
+      );
+
+      if (entry.welfarePension.half !== null) {
+        assert.closeTo(
+          entry.welfarePension.half,
+          (entry.standardMonthlyRemuneration * welfarePensionRate) / 2,
+          1e-6,
+        );
+      }
+    }
   });
 });
