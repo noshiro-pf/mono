@@ -23,7 +23,7 @@ when neither is set.
 | `claim-pr`              | claims a pull request `unblock-prs` set aside, so that nothing else touches it          |
 | `push-fixed-pr`         | pushes the fix to a pull request you claimed and hands it back to the queue             |
 | `report-unowned-prs`    | files an issue (`priority:A`) for each queued pull request everyone waits on others for |
-| `start-issue`           | labels an issue `in-progress` before work starts, refusing one someone is already on    |
+| `start-issue`           | labels an issue `in-progress` and names who started it, refusing one someone is on      |
 | `startable-issues`      | lists the open issues nobody has started, in the order to take them                     |
 | `run-unblock-prs-skill` | runs the `unblock-prs` skill without a person, on the Claude API, when it has work      |
 | `run-issue-resolver`    | starts the open issues nobody has started, one Claude API session each                  |
@@ -46,7 +46,8 @@ are in [`src/unblock-prs/README.md`](./src/unblock-prs/README.md);
   release waits for every open pull request carrying it.
   `priority:high` and `priority:low` order the queue and are optional.
   `in-progress` and `planned`, which `start-issue` puts on and takes off, are
-  optional too: they mark an issue as started, or as meant to be next.
+  optional too: they mark an issue as started, or as meant to be next, and a
+  comment `start-issue` writes beside them says by whom.
   So are an issue's tier labels, `priority:S`, `priority:A`, `priority:B`,
   `priority:C`, `priority:D`, `priority:hold` and `priority:close`, which
   `pr-description create --priority` puts on a new issue and
@@ -287,24 +288,25 @@ session, up to three sessions at once (`--concurrency`), never two on one issue.
 It looks again as soon as a session ends, and every 30 minutes
 (`--interval-min`) while a slot is free.
 
-The command runs `start-issue` on the issue before the session starts, so that
-the `in-progress` label is its own to take off. The session checks first whether
-every part of the issue is already on `main`, done by a pull request that never
-named it; if so, it says in a comment which pull request or commit did each
-part, closes the issue as completed and ends. It then decides whether the issue
-can be finished by one pull request without a person; if not, it says why in a
-comment on the issue and ends. Otherwise it does the work in the worktree the
-command made for it from the latest `origin/main`, under
-`~/.local/state/unblock-prs`, follows the repository's own instructions to the
-pull request, and opens it with `open-pr`, held by `skip-ci`, ending its
-description with `Closes #N`:
+The command runs `start-issue` on the issue before the session starts, under a
+claimant name of its own for the run, so that the claim and the `in-progress`
+label are its own to take off. The session checks first whether every part of
+the issue is already on `main`, done by a pull request that never named it; if
+so, it says in a comment which pull request or commit did each part, closes the
+issue as completed and ends. It then decides whether the issue can be finished
+by one pull request without a person; if not, it says why in a comment on the
+issue and ends. Otherwise it does the work in the worktree the command made for
+it from the latest `origin/main`, under `~/.local/state/unblock-prs`, follows
+the repository's own instructions to the pull request, and opens it with
+`open-pr`, held by `skip-ci`, ending its description with `Closes #N`:
 queueing it is still the author's. When the session ends with no open pull
 request that closes the issue, the command takes the label off, and does not
 hand the issue to another session until someone changes it; nor one
 `start-issue` refuses. That record is kept across runs, in
 `run-issue-resolver/<owner>/<name>.json` beside the worktrees; removing the file
 hands every issue on once more. A second Ctrl+C stops the command at once, as it
-does the worker, and leaves the label on: `start-issue --release` takes it off.
+does the worker, and leaves the label on: `start-issue --release`, with the
+`--by` the log names, takes it off.
 
 - **It runs only on the API key**, and refuses every other credential as
   `run-unblock-prs-skill` does (above). It also stops the session at its
