@@ -1,8 +1,10 @@
 import { parseCodeOwners, reviewHold, type ReviewState } from 'pr-report-core';
+import { Result } from 'ts-data-forge';
 import {
   awaitsMergeState,
   bypassOfRead,
   describeAction,
+  holdOfRead,
   orderCandidates,
   outOfSyncAtSurvey,
   priorityPhrase,
@@ -302,6 +304,41 @@ describe(bypassOfRead, () => {
         rebased,
       ),
       { reason: undefined },
+    );
+  });
+});
+
+describe(holdOfRead, () => {
+  const head = 'b'.repeat(40);
+
+  // A code owner's approval dismissed after triage released it.
+  const owned = state(['.github/workflows/code-check.yml']);
+
+  const ownedByAnother = { ...owned, author: 'someone-else' } as const;
+
+  test('names the approval a green pull request still waits for', () => {
+    assert.deepStrictEqual(
+      holdOfRead({ head, hold: reviewHold(ownedByAnother, rules) }, head),
+      Result.ok({
+        kind: 'held',
+        reason:
+          'waiting for @noshiro-pf to approve .github/workflows/code-check.yml',
+      }),
+    );
+  });
+
+  test('holds nothing where the ruleset asks no review', () => {
+    assert.deepStrictEqual(holdOfRead(undefined, head), Result.ok(undefined));
+  });
+
+  test('is not an answer for a head GitHub has not read', () => {
+    assert.isTrue(
+      Result.isErr(
+        holdOfRead(
+          { head: 'a'.repeat(40), hold: reviewHold(owned, rules) },
+          head,
+        ),
+      ),
     );
   });
 });

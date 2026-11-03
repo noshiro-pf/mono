@@ -533,14 +533,50 @@ export const readBypassAt = async (
 export const bypassOfRead = (
   read: ReviewRead | undefined,
   head: string,
-): Readonly<{ reason: string | undefined }> | undefined =>
+): Readonly<{ reason: string | undefined }> | undefined => {
+  const hold = holdOfRead(read, head);
+
+  return Result.isErr(hold)
+    ? undefined
+    : ({
+        reason: hold.value?.kind === 'bypass' ? hold.value.reason : undefined,
+      } as const);
+};
+
+/**
+ * What holds `prNumber`'s review at `head`, read once: when a green pull
+ * request has not merged, which is long after GitHub has read the head it
+ * watched. `holdOfRead` says what the read means.
+ */
+export const readHoldAt = async (
+  api: ApiContext,
+  prNumber: number,
+  head: string,
+  context: ReviewContext,
+): Promise<Result<ReviewHold | undefined, string>> => {
+  const read = await readReviews(api, [prNumber], context);
+
+  return Result.isErr(read)
+    ? Result.err(lastLines(read.value, 2).replaceAll(/\s+/gu, ' '))
+    : holdOfRead(read.value.get(prNumber), head);
+};
+
+/**
+ * What one read of a pull request's review holds it for at `head`. No read at
+ * all is a ruleset that asks no review, which holds nothing; a read of another
+ * head is not an answer, since its files are not this one's.
+ */
+export const holdOfRead = (
+  read: ReviewRead | undefined,
+  head: string,
+): Result<ReviewHold | undefined, string> =>
   read === undefined
-    ? ({ reason: undefined } as const)
+    ? Result.ok(undefined)
     : read.head !== head
-      ? undefined
-      : ({
-          reason: read.hold?.kind === 'bypass' ? read.hold.reason : undefined,
-        } as const);
+      ? Result.err(
+          `GitHub read it at ${read.head.slice(0, 10)}, not ${head.slice(0, 10)}`,
+        )
+      : Result.ok(read.hold);
 
 /**
  * What the rules on the default branch require, as GitHub applies them.
@@ -866,7 +902,7 @@ const readReviewHolds = async (
 };
 
 /** What the ruleset asks of a review, and where `CODEOWNERS` is read from. */
-type ReviewContext = StrictPick<
+export type ReviewContext = StrictPick<
   TriageBase,
   'defaultBranch' | 'reviewRequirements'
 >;

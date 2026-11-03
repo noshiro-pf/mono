@@ -1,12 +1,14 @@
 /**
  * The pull requests picked last: ones a watch saw green and still open, held by
- * something no check reports and triage could not name.
+ * something no check reports and triage could not name before the release.
  *
  * `pr-report-core`'s `review-hold.mts` keeps the causes it can read — an
  * owner's approval, an unresolved conversation — from being picked at all. What
- * is left is a pull request whose checks all passed and which did not merge for
- * a reason nothing here can see, and the likeliest thing about it is that it
- * will not merge next time either. A `not-merging` skip record already keeps it
+ * is left is a pull request whose checks all passed and which did not merge,
+ * for a reason triage did not see before the release: one of those arriving
+ * during the watch, which the set-aside names but which is demoted all the
+ * same, or something nothing here reads. The likeliest thing about it is that
+ * it will not merge next time either. A `not-merging` skip record already keeps it
  * from being picked until the base moves; the base moving is what makes it
  * `BEHIND` again, and without this it would then be rebased first, run a full
  * matrix, and sit green once more ahead of everything behind it.

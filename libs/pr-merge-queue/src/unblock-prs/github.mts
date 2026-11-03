@@ -131,35 +131,6 @@ export const viewPullRequest = async (
   );
 
 /**
- * `REVIEW_REQUIRED`, `CHANGES_REQUESTED`, `APPROVED`, or empty when the rules
- * ask for no review. Read only when a green pull request will not merge, to say
- * what holds it.
- */
-export const viewReviewDecision = async (
-  api: ApiContext,
-  prNumber: number,
-): Promise<Result<string, string>> =>
-  Result.map(
-    await askRepositoryOf(
-      api,
-      [
-        'query($owner: String!, $name: String!, $number: Int!) {',
-        '  repository(owner: $owner, name: $name) {',
-        '    pullRequest(number: $number) { reviewDecision }',
-        '  }',
-        '}',
-      ].join('\n'),
-      { number: prNumber },
-      t.record({
-        pullRequest: t.record({
-          reviewDecision: t.union([t.string(), t.nullType]),
-        }),
-      }),
-    ),
-    ({ pullRequest }) => pullRequest.reviewDecision ?? '',
-  );
-
-/**
  * A pull request as GraphQL answers it, in the shape every module here reads
  * ({@link PullRequestSchema}): only the labels differ, a connection there and a
  * list here.

@@ -581,9 +581,11 @@ check workflow もこれで起動します。見送りは `main` が動いたと
 
 全部 green なのにマージされない場合は rebase では直せないので、連続 green 回
 数で打ち切ります。原因のうち未解決の会話と code owner の承認不足は triage が先
-に見つけて解放しないので（「2」の8）、ここに来るのはそれ以外です。たとえばマー
-ジ権限の無い人が auto-merge を有効にした、このスクリプトが読まない rule に引っ
-かかっている、などです。GitHub 自身が mergeable と言っている場合は2回、`BLOCKED` の
+に見つけて解放しないので（「2」の8）、ここに来るのは解放の後にそれが生じたも
+の（watch 中に会話が開かれた、承認が dismiss された。set-aside は watch した
+head で review を読み直して名指しします）か、それ以外です。たとえばマージ権限
+の無い人が auto-merge を有効にした、このスクリプトが読まない rule に引っかかっ
+ている、などです。GitHub 自身が mergeable と言っている場合は2回、`BLOCKED` の
 まま green の場合は5回。後者が長いのは、check run が superseded された直後の一
 瞬がこの形になるためです。
 
@@ -1527,11 +1529,13 @@ green, beside whatever was released after it.
 A pull request that is green and still open is held by something a rebase cannot
 fix, so it is given a budget of consecutive green polls. An unresolved
 conversation or a missing code-owner approval is caught by triage before release
-(step 2, item 8), so what reaches this point is anything else, such as
-auto-merge armed by someone who may not merge, or a rule this script does not
-read. The budget is two when GitHub itself calls it mergeable, five while it
-still reads `BLOCKED`, because that combination is also what a check run that
-has just been superseded looks like for a moment.
+(step 2, item 8), so what reaches this point is one of those arriving after the
+release — a conversation opened or an approval dismissed during the watch, which
+the set-aside names from the review read again at the watched head — or anything
+else, such as auto-merge armed by someone who may not merge, or a rule this
+script does not read. The budget is two when GitHub itself calls it mergeable,
+five while it still reads `BLOCKED`, because that combination is also what a
+check run that has just been superseded looks like for a moment.
 
 #### 4a. Fix a failure that is only a fixer's diff
 

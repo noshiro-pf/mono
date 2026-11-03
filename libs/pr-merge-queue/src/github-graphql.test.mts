@@ -42,7 +42,6 @@ import {
   readOwnComments,
   readReviewStates,
   viewPullRequest,
-  viewReviewDecision,
 } from './unblock-prs/index.mjs';
 
 describe('the GraphQL requests', () => {
@@ -51,7 +50,7 @@ describe('the GraphQL requests', () => {
 
     // One for each function in `sendEveryQuery`, and the follow-up that
     // `readIssueOrder` sends for an issue the pull request does not link.
-    assert.lengthOf(sent, 16);
+    assert.lengthOf(sent, 15);
 
     assert.isTrue(sent.some(({ operation }) => operation === 'UnlinkedIssues'));
 
@@ -136,8 +135,6 @@ const sendEveryQuery = async (): Promise<readonly Sent[]> => {
     await probeCheckReads(api, 'a'.repeat(40));
 
     await viewPullRequest(api, 1);
-
-    await viewReviewDecision(api, 1);
 
     await readReviewStates(api, [1, 2], 'main');
 

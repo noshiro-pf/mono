@@ -67,6 +67,7 @@ import {
   reportTriage,
   survey,
   triage,
+  type ReviewContext,
 } from './triage.mjs';
 import type {
   CycleResult,
@@ -487,14 +488,14 @@ const watchAndFix = async (
   api: ApiContext,
   pr: PullRequest,
   expectedHead: string,
-  context: Readonly<{
-    defaultBranch: string;
-    requiredContexts: readonly string[];
-    /** Set for one only a ruleset bypass merges; see `watch`. */
-    bypassReason: string | undefined;
-    /** `undefined` under `--no-auto-fix`, or when the repository has none. */
-    autoFixConfig: AutoFixConfig | undefined;
-  }>,
+  context: ReviewContext &
+    Readonly<{
+      requiredContexts: readonly string[];
+      /** Set for one only a ruleset bypass merges; see `watch`. */
+      bypassReason: string | undefined;
+      /** `undefined` under `--no-auto-fix`, or when the repository has none. */
+      autoFixConfig: AutoFixConfig | undefined;
+    }>,
   options: Options,
 ): Promise<Readonly<{ ended: Watched; head: string }>> => {
   const ended = await watch(
@@ -504,6 +505,7 @@ const watchAndFix = async (
     context.requiredContexts,
     options,
     context.bypassReason,
+    context,
   );
 
   if (
@@ -544,6 +546,7 @@ const watchAndFix = async (
           context.requiredContexts,
           options,
           context.bypassReason,
+          context,
         ),
         head: fixed.head,
       };
@@ -702,7 +705,7 @@ const applyWatchOutcome = (
 
     case 'not-merging':
       log(
-        `#${pr.number}: every required check reported green and it is still open; something other than the checks holds it that its review does not show — auto-merge armed by someone who may not merge, or a rule this script does not read. It goes last from now on, until someone pushes to it.`,
+        `#${pr.number}: ${ended.detail ?? 'green but not merged'}. It goes last from now on, until someone pushes to it.`,
       );
 
       return withSkip(skipped, {
@@ -1000,7 +1003,13 @@ const runCycle = async (
       api,
       watched,
       watched.headRefOid,
-      { defaultBranch, requiredContexts, bypassReason, autoFixConfig },
+      {
+        defaultBranch,
+        requiredContexts,
+        bypassReason,
+        autoFixConfig,
+        reviewRequirements,
+      },
       options,
     );
 
@@ -1233,6 +1242,7 @@ const runCycle = async (
         requiredContexts,
         bypassReason,
         autoFixConfig,
+        reviewRequirements,
       },
       options,
     );

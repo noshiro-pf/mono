@@ -24,8 +24,9 @@ export const STALE_STATE_PAUSE_MS = 30_000;
  * green, and GitHub saying nothing holds the merge, before it is written off as
  * held by something a rebase cannot fix. Triage keeps back the two such things
  * it can read, a missing code-owner approval and an unresolved conversation, so
- * this is what is left: auto-merge armed by someone who may not merge, or a
- * rule nothing here reads.
+ * this is what is left: one of those arriving after the release, which the
+ * watch reads the review again to name, auto-merge armed by someone who may not
+ * merge, or a rule nothing here reads.
  */
 export const GREEN_POLLS_BEFORE_GIVING_UP = 2;
 
