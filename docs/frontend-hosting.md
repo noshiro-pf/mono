@@ -91,7 +91,7 @@ Firebase Hosting から出るときより劣る。
 
 | 公開先                                  | 対象                                                                                                                                                             |
 | :-------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Pages（`tools/configs/pages-apps.mts`） | `apps/` の 12 アプリ（一覧は `pages-apps.mts`）                                                                                                                  |
+| Pages（`tools/configs/pages-apps.mts`） | `apps/` のアプリ（一覧は `pages-apps.mts`）                                                                                                                      |
 | Pages（`/mono/slides/<deck>/`）         | `docs/reveal-slides/` と `docs/marp-slides/` のスライド（`tools/scripts/cmd/build-pages-site.mts`）                                                              |
 | Firebase Hosting                        | `event-schedule-app`                                                                                                                                             |
 | 公開しない                              | `blueprintjs-playground*`、`mahjong-calculator-app`、`synstate-dom-sample-app`、`synstate-router-sample-app`、`synstate-router-dom-sample-app`（開発用・未公開） |

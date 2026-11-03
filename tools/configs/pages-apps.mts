@@ -22,6 +22,7 @@ const pagesApps: readonly string[] = [
   'housing-loan-calculator',
   'lambda-calculus-interpreter-preact',
   'lambda-calculus-interpreter-react',
+  'lambda-calculus-interpreter-synstate-dom',
   'life-plan-simulator',
   'pr-manager',
   'profile',

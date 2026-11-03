@@ -6,7 +6,7 @@ export const CodeArea = memoNamed(
   'CodeArea',
   ({
     value,
-    valueChange = () => undefined,
+    valueChange,
     minHeightPx,
     maxHeightPx,
     cyId,
@@ -21,7 +21,7 @@ export const CodeArea = memoNamed(
       React.ChangeEventHandler<HTMLTextAreaElement>
     >(
       (ev) => {
-        valueChange(ev.target.value);
+        valueChange?.(ev.target.value);
       },
       [valueChange],
     );
@@ -37,6 +37,8 @@ export const CodeArea = memoNamed(
     return (
       <TextArea
         data-e2e={cyId}
+        // Without a handler the area shows output only.
+        readOnly={valueChange === undefined}
         style={style}
         value={value}
         onChange={onChange}

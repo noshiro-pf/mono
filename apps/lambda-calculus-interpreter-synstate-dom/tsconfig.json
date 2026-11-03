@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "libReplacement": true,
+    "allowArbitraryExtensions": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "synstate-dom"
+  },
+  "include": ["./src", "./test", "./e2e", "./scripts", "./configs"]
+}

@@ -435,6 +435,13 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
+    // Not an Astro site like the entry below assumes: a Vite synstate-dom app
+    // whose entry is the module `index.html` would load.
+    "apps/lambda-calculus-interpreter-synstate-dom": {
+      "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
     // Not an Astro site like the entry below assumes: a single entry point.
     "apps/react-blueprintjs-utils": {
       "entry": ["src/index.mts"],

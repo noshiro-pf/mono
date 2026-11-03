@@ -24,6 +24,7 @@ const appDevPorts = {
   'housing-loan-calculator': 5189,
   'lambda-calculus-interpreter-preact': 5190,
   'lambda-calculus-interpreter-react': 5191,
+  'lambda-calculus-interpreter-synstate-dom': 5201,
   'life-plan-simulator': 5197,
   'mahjong-calculator-app': 5192,
   'pr-manager': 5194,
