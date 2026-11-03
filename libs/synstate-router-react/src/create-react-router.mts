@@ -19,8 +19,10 @@ export type ReactRouter<R extends AnyRoutes> = Readonly<{
   /**
    * Draws the case of the page the location is. Every page id is a required
    * key, so a route added without a case fails `tsc`. The element is keyed by
-   * the route id: a new route remounts it, new params of the same route update
-   * it.
+   * the route id (with `prefix`, by the top-level node): a new route remounts
+   * it, new params of the same route update it. A case is drawn as a component
+   * of its own, so the hooks it calls are its own and are remounted on a new
+   * route.
    */
   Routes: <N extends AnyRouteNode = never>(
     props: RoutesProps<R, N>,

@@ -1,4 +1,5 @@
 import { act, render } from '@testing-library/react';
+import * as React from 'react';
 import { asSafeInt, expectType, type SafeInt } from 'ts-data-forge';
 import { routes, setup } from './fixture.js';
 
@@ -105,6 +106,64 @@ describe('Routes', () => {
     assert.strictEqual(getByTestId('page').textContent, 'products');
 
     assert.notStrictEqual(getByTestId('page'), first);
+  });
+
+  test('gives a case its own hooks, remounted with the case', () => {
+    const {
+      router,
+      bound: { Routes },
+    } = setup('/settings/');
+
+    const Label = React.createContext('first');
+
+    /** A case that keeps the first value it read in state. */
+    const Kept = (): string => {
+      const [kept] = React.useState(React.useContext(Label));
+
+      return kept;
+    };
+
+    // The same object on every render, as a hoisted `cases` would be. The cases
+    // call hooks themselves, and different numbers of them.
+    const cases = {
+      home: () => React.useContext(Label),
+      products: () => 'products',
+      'products.new': () => 'new',
+      'products.item': () => 'item',
+      settings: Kept,
+      drafts: undefined,
+    } as const;
+
+    const { container, rerender } = render(
+      <Label.Provider value="first">
+        <Routes cases={cases} />
+      </Label.Provider>,
+    );
+
+    assert.strictEqual(container.textContent, 'first');
+
+    rerender(
+      <Label.Provider value="second">
+        <Routes cases={cases} />
+      </Label.Provider>,
+    );
+
+    // Kept in state on the same case...
+    assert.strictEqual(container.textContent, 'first');
+
+    act(() => {
+      router.push(routes.home.href());
+    });
+
+    // ...read again by another case...
+    assert.strictEqual(container.textContent, 'second');
+
+    act(() => {
+      router.push(routes.settings.href());
+    });
+
+    // ...and fresh when the first case is drawn again.
+    assert.strictEqual(container.textContent, 'second');
   });
 
   test('withSearch makes this page with part of its search changed', () => {
