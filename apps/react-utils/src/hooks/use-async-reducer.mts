@@ -47,7 +47,14 @@ export const useAsyncDispatchFunction = <S, A>(
             return stateAfter;
           } catch (error: unknown) {
             reject(
-              Error.isError(error) ? error : new Error(unknownToString(error)),
+              // A tag check (`isError` from `@sindresorhus/is`) would wrap a
+              // `DOMException` such as an `AbortError`, and `Error.isError` is
+              // not in every supported runtime; an error from another realm
+              // does not reach a reducer.
+              // eslint-disable-next-line unicorn/no-instanceof-builtins
+              error instanceof Error
+                ? error
+                : new Error(unknownToString(error)),
             );
 
             // FIXME

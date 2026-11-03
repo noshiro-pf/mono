@@ -153,7 +153,15 @@ export const eslintRulesMovedToOxlint = {
   'no-proto': 'error',
   'no-prototype-builtins': 'error',
   'no-regex-spaces': 'error',
-  'no-restricted-properties': 'error',
+  'no-restricted-properties': [
+    'error',
+    {
+      object: 'Error',
+      property: 'isError',
+      message:
+        "Node.js 22, which this config supports, has no 'Error.isError'. Use 'isError' from https://www.npmjs.com/package/@sindresorhus/is instead.",
+    },
+  ],
   'no-return-assign': ['error', 'except-parens'],
   'no-self-assign': ['error', { props: true }],
   'no-self-compare': 'error',

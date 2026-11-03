@@ -42,7 +42,7 @@ describe('built-in-tag guards', () => {
     const [error, date, regExp, map, set] = foreign;
 
     // The `instanceof` these guards avoid, shown failing on this value.
-    // eslint-disable-next-line unicorn/no-instanceof-builtins, unicorn/prefer-error-is-error
+    // eslint-disable-next-line unicorn/no-instanceof-builtins
     assert.isFalse(error instanceof Error);
 
     assert.isTrue(isError(error));

@@ -126,6 +126,23 @@ export const restrictedSyntax = [
   // },
 ] as const satisfies EslintRulesOption['no-restricted-syntax'];
 
+// Typed by annotation rather than `as const satisfies`: `Arr.toUnshifted`'s
+// result for a literal tuple of these is not assignable to the rule's entry.
+// This repository's `tools/configs/oxlint-rules.mts` repeats them, and its
+// `check:root:oxlint-rules` compares the two.
+export const restrictedProperties: EslintRulesOption['no-restricted-properties'] =
+  [
+    {
+      // Node.js has it from 24 on, and a call on an older one throws
+      // `TypeError: Error.isError is not a function` only when it runs; the type
+      // checker and every Node.js 24+ toolchain see nothing wrong.
+      object: 'Error',
+      property: 'isError',
+      message:
+        "Node.js 22, which this config supports, has no 'Error.isError'. Use 'isError' from https://www.npmjs.com/package/@sindresorhus/is instead.",
+    },
+  ] as const;
+
 /**
  * The object form of the `no-restricted-imports` options, with `patterns`
  * written as objects so that options can be concatenated
@@ -386,7 +403,7 @@ export const eslintRules = {
   'no-regex-spaces': 'error',
   'no-restricted-exports': ['error', { restrictedNamedExports: ['default'] }],
   'no-restricted-globals': Arr.toUnshifted('error')(restrictedGlobals),
-  'no-restricted-properties': withDefaultOption('error'),
+  'no-restricted-properties': Arr.toUnshifted('error')(restrictedProperties),
 
   /**
    * Write restricted syntax here that is difficult to achieve with other rules.
