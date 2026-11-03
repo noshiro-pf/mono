@@ -1,6 +1,6 @@
 /** What the observed state allows, and nothing that talks to GitHub. */
 
-import { outsideCodeFences } from 'pr-report-core';
+import { outsideCodeFences, parseMergeAfter } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
 
 /**
@@ -78,6 +78,66 @@ export const withMergeAfter = (
   }
 
   return body === '' ? `${trailer}\n` : `${trailer}\n\n${body}`;
+};
+
+/**
+ * Why a run cannot go on with the pull request already open for the branch, or
+ * `undefined` when it can. Asked before anything is pushed.
+ *
+ * - A `--base` other than its base: a run that took it as it is would report it
+ *   stacked while it still targets its old base, which is all `unblock-prs`
+ *   reads. Moving it is refused rather than done: its diff, its `Merge-After:`
+ *   and what it was reviewed against all change with the base, and which of
+ *   them to keep is the author's call.
+ * - Its own number in `--merge-after` or `--merge-before`: a pull request that
+ *   waits for itself is never picked.
+ */
+export const existingConflict = (
+  existing: Readonly<{ number: number; base: string }>,
+  options: Readonly<{
+    base: string | undefined;
+    mergeAfter: readonly number[];
+    mergeBefore: readonly number[];
+  }>,
+): string | undefined => {
+  if (options.base !== undefined && existing.base !== options.base) {
+    return `#${existing.number} is open against ${existing.base}, not ${options.base}, and open-pr does not move an open pull request. Change its base on GitHub and its Merge-After: to match, then run again; or run again with --base ${existing.base}.`;
+  }
+
+  const flag = options.mergeAfter.includes(existing.number)
+    ? '--merge-after'
+    : options.mergeBefore.includes(existing.number)
+      ? '--merge-before'
+      : undefined;
+
+  return flag === undefined
+    ? undefined
+    : `${flag} #${existing.number} names the pull request already open for this branch`;
+};
+
+/**
+ * The base a run targets: the one asked for, else that of the pull request
+ * already open for the branch, so that a run finishing one opened stacked keeps
+ * it stacked, else the default branch.
+ */
+export const resolveBase = (
+  requested: string | undefined,
+  existing: Readonly<{ base: string }> | undefined,
+  defaultBranch: string,
+): string => requested ?? existing?.base ?? defaultBranch;
+
+/**
+ * The numbers in `declared` that `body` does not declare with `Merge-After:`
+ * yet, in the order given: what a run on a pull request opened earlier still
+ * has to write into it, each once.
+ */
+export const undeclared = (
+  body: string,
+  declared: readonly number[],
+): readonly number[] => {
+  const named = new Set(parseMergeAfter(body));
+
+  return Arr.uniq(declared.filter((n) => !named.has(n)));
 };
 
 const MERGE_AFTER_LINE = /^\s*merge-after\s*:/iu;

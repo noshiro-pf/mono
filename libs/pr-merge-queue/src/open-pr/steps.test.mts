@@ -1,7 +1,10 @@
 import { parseMergeAfter } from 'pr-report-core';
 import {
+  existingConflict,
   mergeAfterTrailer,
   mergeBeforeNote,
+  resolveBase,
+  undeclared,
   withMergeAfter,
   withStackParent,
 } from './steps.mjs';
@@ -98,5 +101,78 @@ describe(mergeBeforeNote, () => {
   // request's own order.
   test('declares nothing itself', () => {
     assert.deepStrictEqual(parseMergeAfter(mergeBeforeNote([1905]) ?? ''), []);
+  });
+});
+
+describe(existingConflict, () => {
+  const existing = { number: 1905, base: 'feat/lower' } as const;
+
+  const none = { base: undefined, mergeAfter: [], mergeBefore: [] } as const;
+
+  test('takes an open pull request when no base was asked for', () => {
+    assert.isUndefined(existingConflict(existing, none));
+  });
+
+  test('takes an open pull request already on the base asked for', () => {
+    assert.isUndefined(
+      existingConflict(existing, { ...none, base: 'feat/lower' }),
+    );
+  });
+
+  test('refuses an open pull request on another base, saying how to restack', () => {
+    assert.strictEqual(
+      existingConflict(existing, { ...none, base: 'main' }),
+      '#1905 is open against feat/lower, not main, and open-pr does not move an open pull request. Change its base on GitHub and its Merge-After: to match, then run again; or run again with --base feat/lower.',
+    );
+  });
+
+  test('refuses its own number in --merge-after', () => {
+    assert.strictEqual(
+      existingConflict(existing, { ...none, mergeAfter: [1901, 1905] }),
+      '--merge-after #1905 names the pull request already open for this branch',
+    );
+  });
+
+  test('refuses its own number in --merge-before', () => {
+    assert.strictEqual(
+      existingConflict(existing, { ...none, mergeBefore: [1905] }),
+      '--merge-before #1905 names the pull request already open for this branch',
+    );
+  });
+});
+
+describe(resolveBase, () => {
+  test('takes the base asked for first', () => {
+    assert.strictEqual(
+      resolveBase('feat/a', { base: 'feat/b' }, 'main'),
+      'feat/a',
+    );
+  });
+
+  test('keeps the base of the pull request already open', () => {
+    assert.strictEqual(
+      resolveBase(undefined, { base: 'feat/b' }, 'main'),
+      'feat/b',
+    );
+  });
+
+  test('targets the default branch otherwise', () => {
+    assert.strictEqual(resolveBase(undefined, undefined, 'main'), 'main');
+  });
+});
+
+describe(undeclared, () => {
+  test('names what the body does not declare yet, in the order given', () => {
+    assert.deepStrictEqual(
+      undeclared('Merge-After: #1901\n\nProse.', [1903, 1901, 1905, 1903]),
+      [1903, 1905],
+    );
+  });
+
+  test('does not read a declaration shown in a fenced code block', () => {
+    assert.deepStrictEqual(
+      undeclared('```\nMerge-After: #1901\n```\n', [1901]),
+      [1901],
+    );
   });
 });

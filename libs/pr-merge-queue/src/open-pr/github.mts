@@ -154,6 +154,33 @@ export const findStackParent = async (
   api: ApiContext,
   base: string,
 ): Promise<Result<number, string>> => {
+  const listed = await listStackParents(api, base);
+
+  if (Result.isErr(listed)) {
+    return listed;
+  }
+
+  const [parent, second] = listed.value;
+
+  return parent === undefined
+    ? Result.err(
+        `${base} is neither the default branch nor the branch of an open pull request; a stacked pull request targets the branch of the one below it`,
+      )
+    : second === undefined
+      ? Result.ok(parent)
+      : Result.err(
+          `${base} is the branch of more than one open pull request (#${parent}, #${second}), so which one this is stacked on cannot be told`,
+        );
+};
+
+/**
+ * The open pull requests whose branch `base` is, at most two: enough to tell
+ * none, one and more than one apart.
+ */
+export const listStackParents = async (
+  api: ApiContext,
+  base: string,
+): Promise<Result<readonly number[], string>> => {
   const listed = await rest(
     api,
     'GET',
@@ -168,21 +195,9 @@ export const findStackParent = async (
     },
   );
 
-  if (Result.isErr(listed)) {
-    return listed;
-  }
-
-  const [parent, second] = listed.value;
-
-  return parent === undefined
-    ? Result.err(
-        `${base} is neither the default branch nor the branch of an open pull request; a stacked pull request targets the branch of the one below it`,
-      )
-    : second === undefined
-      ? Result.ok(parent.number)
-      : Result.err(
-          `${base} is the branch of more than one open pull request (#${parent.number}, #${second.number}), so which one this is stacked on cannot be told`,
-        );
+  return Result.isErr(listed)
+    ? listed
+    : Result.ok(listed.value.map((pr) => pr.number));
 };
 
 /**

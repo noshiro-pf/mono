@@ -10,8 +10,9 @@ export type Options = Readonly<{
   /** A file to take the body from; only the trailer, or nothing, when absent. */
   bodyFile: string | undefined;
   /**
-   * What to target; the repository's default branch when absent. Another open
-   * pull request's branch stacks it on that pull request.
+   * What to target; when absent, the base of the pull request already open for
+   * the branch, else the repository's default branch. Another open pull
+   * request's branch stacks it on that pull request.
    */
   base: string | undefined;
   /** Pull requests to declare with `Merge-After:`, in the order given. */
@@ -44,7 +45,8 @@ export const HELP = [
   '  --body-file <path>      file to take the body from (default: the trailer alone);',
   '                          refused when its translation does not mirror it, if',
   '                          .github/unblock-prs.json names a translation heading',
-  '  --base <branch>         what to target (default: the repository default branch);',
+  "  --base <branch>         what to target (default: the open pull request's base,",
+  '                          else the repository default branch);',
   '                          the branch of an open pull request stacks it on that one',
   '  --merge-after <number>  declare a predecessor; repeat for several',
   '  --merge-before <number> declare a successor: write this one into the',

@@ -66,6 +66,13 @@ runner には前2つが既にあり、`gh` で設定しただけのマシンで�
 各ステップは既に済んでいればスキップされます。PR が既にあれば作らず、ラベルが
 既にあれば付け直しません。巻き戻す必要はありません。
 
+既にある PR はタイトルと本文をそのまま使い（`--title` と `--body-file` は
+使わず、そう表示します）、`--base` が無ければその PR の base を使い、この実行が宣言する `Merge-After:`
+（スタックの下の層、`--merge-after`）のうち本文にまだ無いものだけを書き足します。
+`--base` を渡したのに既にある PR の base がそれと違うときは、何も push せずに
+止まります。PR を別の base へ動かすことはしません。GitHub で base と
+`Merge-After:` を直してからもう一度実行するか、今の base を `--base` に渡します。
+
 ### 実行
 
 ```bash
@@ -193,6 +200,14 @@ and is not one.
 
 Every step is skipped when it is already done, so a run that failed part way
 through is finished by running it again rather than unpicked.
+
+A pull request already open for the branch keeps its title and body (a `--title`
+or `--body-file` given is not applied, and the run says so), is taken on its own
+base when no `--base` is given, and gets only the `Merge-After:` this run
+declares (the layer below, `--merge-after`) that its body does not name yet. One
+open against another base than the `--base` given is refused before anything is
+pushed: the run does not move an open pull request. Change its base and its
+`Merge-After:` on GitHub and run again, or pass its current base as `--base`.
 
 ```bash
 pnpm run open-pr                                   # the default
