@@ -5,6 +5,7 @@ import { Linter } from 'eslint';
 import {
   addTypeImports,
   bindValueImports,
+  bindValueImportsAt,
   buildCalleeResolver,
   buildNamedImportFix,
   getImportDeclarations,
@@ -453,6 +454,133 @@ ruleTester.run(
     ],
   },
 );
+
+const probeBindingAt = (
+  names: readonly string[],
+): ReturnType<typeof probeRule> =>
+  probeRule(
+    (context, argument) =>
+      bindValueImportsAt(
+        context.sourceCode,
+        'm',
+        names,
+      )(argument)?.localNames.join(', ') ?? '(none)',
+    (context, fixer, argument) =>
+      bindValueImportsAt(
+        context.sourceCode,
+        'm',
+        names,
+      )(argument)?.edits(fixer) ?? [],
+  );
+
+ruleTester.run('bindValueImportsAt', probeBindingAt(['f', 'h']), {
+  valid: [],
+  invalid: [
+    {
+      name: 'written through a namespace import, with no edit',
+      code: dedent`
+        import * as ns from 'm';
+        probe(0);
+      `,
+      output: null,
+      errors: [{ messageId: 'result', data: { result: 'ns.f, ns.h' } }],
+    },
+    {
+      name: 'a value named import comes before the namespace',
+      code: dedent`
+        import { f as g } from 'm';
+        import * as ns from 'm';
+        probe(0);
+      `,
+      output: null,
+      errors: [{ messageId: 'result', data: { result: 'g, ns.h' } }],
+    },
+    {
+      name: 'the namespace comes before dropping `type`',
+      code: dedent`
+        import { type f } from 'm';
+        import * as ns from 'm';
+        probe(0);
+      `,
+      output: null,
+      errors: [{ messageId: 'result', data: { result: 'ns.f, ns.h' } }],
+    },
+    {
+      name: 'a namespace import beside a default import',
+      code: dedent`
+        import D, * as ns from 'm';
+        probe(D);
+      `,
+      output: null,
+      errors: [{ messageId: 'result', data: { result: 'ns.f, ns.h' } }],
+    },
+    {
+      name: '`import type * as` is passed over',
+      code: dedent`
+        import type * as ns from 'm';
+        probe(0);
+      `,
+      output: dedent`
+        import { f, h } from 'm';
+        import type * as ns from 'm';
+        probe(0);
+      `,
+      errors: [{ messageId: 'result', data: { result: 'f, h' } }],
+    },
+    {
+      name: 'a shadowed namespace falls back to a named import',
+      code: dedent`
+        import * as ns from 'm';
+        const run = (ns: number) => probe(ns);
+      `,
+      output: dedent`
+        import { f, h } from 'm';
+        import * as ns from 'm';
+        const run = (ns: number) => probe(ns);
+      `,
+      errors: [{ messageId: 'result', data: { result: 'f, h' } }],
+    },
+    {
+      name: 'a namespace shadowed only as a type is still written',
+      code: dedent`
+        import * as ns from 'm';
+        const run = <ns,>() => probe(0);
+      `,
+      output: null,
+      errors: [{ messageId: 'result', data: { result: 'ns.f, ns.h' } }],
+    },
+    {
+      name: 'refused where a name it would write is shadowed',
+      code: dedent`
+        import { f } from 'm';
+        const run = (f: number) => probe(f);
+      `,
+      output: null,
+      errors: [{ messageId: 'result', data: { result: '(none)' } }],
+    },
+    {
+      name: 'refused when both the namespace and the fallback are taken',
+      code: dedent`
+        import * as ns from 'm';
+        const run = (ns: number, f: number) => probe(ns + f);
+      `,
+      output: null,
+      errors: [{ messageId: 'result', data: { result: '(none)' } }],
+    },
+    {
+      name: 'with no namespace import, bound as bindValueImports binds it',
+      code: dedent`
+        import { a } from 'm';
+        probe(0);
+      `,
+      output: dedent`
+        import { a, f, h } from 'm';
+        probe(0);
+      `,
+      errors: [{ messageId: 'result', data: { result: 'f, h' } }],
+    },
+  ],
+});
 
 ruleTester.run(
   'addTypeImports',

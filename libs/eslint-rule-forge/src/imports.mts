@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import type { DeepReadonly } from 'ts-type-forge';
+import { hasForeignBinding } from './bindings.mjs';
 import { isTypeWrapper, skipTypeWrappers } from './type-wrappers.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
@@ -224,47 +225,60 @@ export const bindValueImports = (
   sourceCode: TSESLint.SourceCode,
   moduleName: string,
   exportNames: readonly string[],
-): ValueImportBinding | undefined => {
-  const program = sourceCode.ast;
+): ValueImportBinding | undefined =>
+  bindNames(sourceCode, moduleName, exportNames, undefined);
 
-  const allImports = program.body.filter(
-    (node): node is TSESTree.ImportDeclaration =>
-      node.type === AST_NODE_TYPES.ImportDeclaration,
-  );
+/**
+ * {@link bindValueImports} for the code at a node, which writes an export
+ * through a namespace import of the module (`ns.f` after
+ * `import * as ns from '<moduleName>'`) rather than importing it by name beside
+ * the namespace. Gives, for a node, what a fix there writes, or `undefined`
+ * when no fix can: an import binds a name to something else, or something other
+ * than an import from the module takes a name the fix writes where the node is
+ * ({@link hasForeignBinding}).
+ *
+ * - An export imported as a value is written by its local name, as
+ *   {@link bindValueImports} writes it.
+ * - Any other, one imported only by `import { type x }` included, goes through
+ *   the first namespace import that is not `import type * as`, with no edit.
+ * - Where a local binding shadows the namespace's name, every export is bound
+ *   as {@link bindValueImports} binds it instead.
+ *
+ * Each choice is worked out once, however many nodes ask.
+ */
+export const bindValueImportsAt = (
+  sourceCode: TSESLint.SourceCode,
+  moduleName: string,
+  exportNames: readonly string[],
+): ((node: TSESTree.Node) => ValueImportBinding | undefined) => {
+  const namespaceName = getImportDeclarations(sourceCode.ast, moduleName)
+    .filter((declaration) => !isTypeOnlyDeclaration(declaration))
+    .flatMap((declaration) => declaration.specifiers)
+    .find(
+      (specifier) => specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier,
+    )?.local.name;
 
-  const declarations = getImportDeclarations(program, moduleName);
+  const viaNamespace =
+    namespaceName === undefined
+      ? undefined
+      : bindNames(sourceCode, moduleName, exportNames, namespaceName);
 
-  const named = declarations.flatMap((declaration) =>
-    declaration.specifiers.flatMap((specifier) =>
-      specifier.type === AST_NODE_TYPES.ImportSpecifier
-        ? [{ declaration, specifier }]
-        : [],
-    ),
-  );
+  const byName = bindNames(sourceCode, moduleName, exportNames, undefined);
 
-  const bindings = exportNames.map((exportName) =>
-    bindingOf(sourceCode, allImports, named, exportName),
-  );
+  const holdsAt = (
+    binding: BoundNames | undefined,
+    node: TSESTree.Node,
+  ): binding is BoundNames =>
+    binding?.boundNames.every(
+      (name) => !hasForeignBinding(sourceCode, node, name, moduleName),
+    ) ?? false;
 
-  if (bindings.includes(undefined)) {
-    return undefined;
-  }
-
-  const defined = bindings.filter((b) => b !== undefined);
-
-  const toAdd = defined.flatMap((b) => (b.isAdded ? [b.localName] : []));
-
-  const hosts = hostsFor(declarations);
-
-  return {
-    localNames: defined.map((b) => b.localName),
-    edits: (fixer) => [
-      ...defined.flatMap((b) => b.edits(fixer)),
-      ...(toAdd.length === 0
-        ? []
-        : addToFirstHost(fixer, sourceCode, moduleName, hosts, toAdd)),
-    ],
-  };
+  return (node) =>
+    holdsAt(viaNamespace, node)
+      ? viaNamespace
+      : holdsAt(byName, node)
+        ? byName
+        : undefined;
 };
 
 /**
@@ -400,20 +414,6 @@ const addToFirstHost = (
     : buildNamedImportFix(fixer, sourceCode.ast, moduleName, specifiers);
 };
 
-/** What {@link bindValueImports} gives. */
-export type ValueImportBinding = Readonly<{
-  /** The names to write, in the order of the export names asked for. */
-  localNames: readonly string[];
-
-  /** The edits that bring every one of them into scope. */
-  edits: (fixer: TSESLint.RuleFixer) => readonly TSESLint.RuleFix[];
-}>;
-
-type NamedSpecifier = Readonly<{
-  declaration: TSESTree.ImportDeclaration;
-  specifier: TSESTree.ImportSpecifier;
-}>;
-
 /** `import type …`. */
 const isTypeOnlyDeclaration = (
   declaration: TSESTree.ImportDeclaration,
@@ -460,9 +460,11 @@ const bindingOf = (
   allImports: readonly TSESTree.ImportDeclaration[],
   named: readonly NamedSpecifier[],
   exportName: string,
+  namespaceName: string | undefined,
 ):
   | Readonly<{
       localName: string;
+      boundName: string;
       isAdded: boolean;
       edits: (fixer: TSESLint.RuleFixer) => readonly TSESLint.RuleFix[];
     }>
@@ -476,6 +478,16 @@ const bindingOf = (
   if (value !== undefined) {
     return {
       localName: value.specifier.local.name,
+      boundName: value.specifier.local.name,
+      isAdded: false,
+      edits: () => [],
+    };
+  }
+
+  if (namespaceName !== undefined) {
+    return {
+      localName: `${namespaceName}.${exportName}`,
+      boundName: namespaceName,
       isAdded: false,
       edits: () => [],
     };
@@ -497,6 +509,7 @@ const bindingOf = (
       ? undefined
       : {
           localName: inlineType.local.name,
+          boundName: inlineType.local.name,
           isAdded: false,
           edits: (fixer) => [
             fixer.removeRange([typeKeyword.range[0], next.range[0]]),
@@ -512,5 +525,89 @@ const bindingOf = (
 
   return isTaken
     ? undefined
-    : { localName: exportName, isAdded: true, edits: () => [] };
+    : {
+        localName: exportName,
+        boundName: exportName,
+        isAdded: true,
+        edits: () => [],
+      };
 };
+
+/**
+ * {@link bindValueImports}, writing an export no value import binds through the
+ * namespace import `namespaceName` when there is one. `boundNames` are the
+ * names the written text starts with, which something at the node must not
+ * shadow.
+ */
+const bindNames = (
+  sourceCode: TSESLint.SourceCode,
+  moduleName: string,
+  exportNames: readonly string[],
+  namespaceName: string | undefined,
+): BoundNames | undefined => {
+  const program = sourceCode.ast;
+
+  const allImports = program.body.filter(
+    (node): node is TSESTree.ImportDeclaration =>
+      node.type === AST_NODE_TYPES.ImportDeclaration,
+  );
+
+  const declarations = getImportDeclarations(program, moduleName);
+
+  const named = declarations.flatMap((declaration) =>
+    declaration.specifiers.flatMap((specifier) =>
+      specifier.type === AST_NODE_TYPES.ImportSpecifier
+        ? [{ declaration, specifier }]
+        : [],
+    ),
+  );
+
+  const bindings = exportNames.map((exportName) =>
+    bindingOf(sourceCode, allImports, named, exportName, namespaceName),
+  );
+
+  if (bindings.includes(undefined)) {
+    return undefined;
+  }
+
+  const defined = bindings.filter((b) => b !== undefined);
+
+  const toAdd = defined.flatMap((b) => (b.isAdded ? [b.localName] : []));
+
+  const hosts = hostsFor(declarations);
+
+  return {
+    localNames: defined.map((b) => b.localName),
+    boundNames: defined.map((b) => b.boundName),
+    edits: (fixer) => [
+      ...defined.flatMap((b) => b.edits(fixer)),
+      ...(toAdd.length === 0
+        ? []
+        : addToFirstHost(fixer, sourceCode, moduleName, hosts, toAdd)),
+    ],
+  };
+};
+
+/** What {@link bindValueImports} and {@link bindValueImportsAt} give. */
+export type ValueImportBinding = Readonly<{
+  /**
+   * What to write for each export, in the order of the export names asked for:
+   * a local name, or `ns.x` through a namespace import.
+   */
+  localNames: readonly string[];
+
+  /** The edits that bring every one of them into scope. */
+  edits: (fixer: TSESLint.RuleFixer) => readonly TSESLint.RuleFix[];
+}>;
+
+/** What {@link bindNames} gives. */
+type BoundNames = ValueImportBinding &
+  Readonly<{
+    /** The name each of `localNames` starts with. */
+    boundNames: readonly string[];
+  }>;
+
+type NamedSpecifier = Readonly<{
+  declaration: TSESTree.ImportDeclaration;
+  specifier: TSESTree.ImportSpecifier;
+}>;

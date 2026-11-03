@@ -12,6 +12,7 @@ import {
   prefixedNegationOf,
   skipTypeWrappers,
   type NegationContext,
+  type ValueImportBinding,
 } from 'eslint-rule-forge';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
@@ -28,6 +29,9 @@ type Match = Readonly<{
   node: TSESTree.CallExpression;
   replacement: string;
   autofixable: boolean;
+
+  /** What binds the `Arr` that `replacement` writes, if anything can. */
+  binding: ValueImportBinding | undefined;
 }>;
 
 /**
@@ -136,10 +140,8 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
       node: TSESTree.Node,
     ): ts.Node | undefined => esTreeNodeToTSNodeMap.get(node);
 
-    // The name the rewrite writes, and, at a node, the edits that bind it.
-    const arr = tsDataForgeValuesAt(sourceCode, ['Arr']);
-
-    const arrName = arr.localNames[0] ?? 'Arr';
+    // At a node, the name the rewrite writes and the edits that bind it.
+    const arrAt = tsDataForgeValuesAt(sourceCode, ['Arr']);
 
     const mut_matches: Match[] = [];
 
@@ -243,11 +245,13 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
+        const binding = arrAt(node);
+
         const replacement = buildReplacement({
           sourceCode,
           negationContext,
           node,
-          arrName,
+          arrName: binding?.localNames[0] ?? 'Arr',
           typeArgumentsText:
             typeArguments === undefined
               ? ''
@@ -294,13 +298,13 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
           ) &&
           !needsMutableResult(sourceCode, checker, getTsNode, node);
 
-        mut_matches.push({ node, replacement, autofixable });
+        mut_matches.push({ node, replacement, autofixable, binding });
       },
       'Program:exit': () => {
         // Every fix brings `Arr` into scope itself, so that one applied alone
         // (an editor's quick fix) is complete.
         for (const match of mut_matches) {
-          const binding = arr.at(match.node);
+          const { binding } = match;
 
           const fix: TSESLint.ReportFixFunction | null =
             binding === undefined

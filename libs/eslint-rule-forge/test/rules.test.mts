@@ -32,6 +32,40 @@ ruleTester.run(
         `,
         errors: [{ messageId: 'useIsNonNullObject' }],
       },
+      {
+        name: 'names the alias the fix writes',
+        code: dedent`
+          import { isNonNullObject as isObj } from 'my-lib';
+          const ok = typeof u === 'object' && u !== null;
+        `,
+        output: dedent`
+          import { isNonNullObject as isObj } from 'my-lib';
+          const ok = isObj(u);
+        `,
+        errors: [
+          {
+            messageId: 'useIsNonNullObject',
+            data: { isNonNullObject: 'isObj' },
+          },
+        ],
+      },
+      {
+        name: 'writes through a namespace import',
+        code: dedent`
+          import * as lib from 'my-lib';
+          const ok = typeof u === 'object' && u !== null;
+        `,
+        output: dedent`
+          import * as lib from 'my-lib';
+          const ok = lib.isNonNullObject(u);
+        `,
+        errors: [
+          {
+            messageId: 'useIsNonNullObject',
+            data: { isNonNullObject: 'lib.isNonNullObject' },
+          },
+        ],
+      },
     ],
   },
 );
@@ -52,6 +86,29 @@ ruleTester.run(
           const ok = (isRecord(obj) && hasKey(obj, 'a'));
         `,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+      {
+        name: 'writes through a namespace import, and names what it writes',
+        code: dedent`
+          import * as lib from 'my-lib';
+          const ok = Object.hasOwn(obj, 'a');
+        `,
+        output: dedent`
+          import * as lib from 'my-lib';
+          const ok = (lib.isRecord(obj) && lib.hasKey(obj, 'a'));
+        `,
+        errors: [
+          {
+            messageId: 'useIsRecordAndHasKey',
+            data: {
+              original: "Object.hasOwn(obj, 'a')",
+              objName: 'obj',
+              keyName: "'a'",
+              isRecord: 'lib.isRecord',
+              hasKey: 'lib.hasKey',
+            },
+          },
+        ],
       },
     ],
   },
@@ -83,6 +140,45 @@ ruleTester.run(
           const result = Lib.isArray(value);
         `,
         errors: [{ messageId: 'useIsArray' }],
+      },
+      {
+        name: 'names the alias the fix writes',
+        code: dedent`
+          import { Lib as L } from 'my-lib';
+          const result = Array.isArray(value);
+        `,
+        output: dedent`
+          import { Lib as L } from 'my-lib';
+          const result = L.isArray(value);
+        `,
+        errors: [
+          { messageId: 'useIsArray', data: { replacement: 'L.isArray' } },
+        ],
+      },
+      {
+        name: 'writes through a namespace import',
+        code: dedent`
+          import * as lib from 'my-lib';
+          const result = Array.isArray(value);
+        `,
+        output: dedent`
+          import * as lib from 'my-lib';
+          const result = lib.Lib.isArray(value);
+        `,
+        errors: [
+          { messageId: 'useIsArray', data: { replacement: 'lib.Lib.isArray' } },
+        ],
+      },
+      {
+        name: 'with no fix, names the export',
+        code: dedent`
+          import type { Lib } from 'my-lib';
+          const result = Array.isArray(value);
+        `,
+        output: null,
+        errors: [
+          { messageId: 'useIsArray', data: { replacement: 'Lib.isArray' } },
+        ],
       },
     ],
   },

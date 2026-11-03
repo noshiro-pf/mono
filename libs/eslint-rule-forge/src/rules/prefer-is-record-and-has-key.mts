@@ -4,8 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
-import { hasForeignBinding } from '../bindings.mjs';
-import { bindValueImports } from '../imports.mjs';
+import { bindValueImportsAt } from '../imports.mjs';
 import { getArgumentText } from '../parentheses.mjs';
 import {
   isIdentifierNamed,
@@ -33,8 +32,8 @@ export const createPreferIsRecordAndHasKey = ({
       fixable: 'code',
       schema: [],
       messages: {
-        useIsRecordAndHasKey: `Replace \`{{original}}\` with \`isRecord({{objName}}) && hasKey({{objName}}, {{keyName}})\` from ${moduleName}.`,
-        useHasKey: `Replace \`{{original}}\` with \`hasKey({{objName}}, {{keyName}})\` from ${moduleName}.`,
+        useIsRecordAndHasKey: `Replace \`{{original}}\` with \`{{isRecord}}({{objName}}) && {{hasKey}}({{objName}}, {{keyName}})\` from ${moduleName}.`,
+        useHasKey: `Replace \`{{original}}\` with \`{{hasKey}}({{objName}}, {{keyName}})\` from ${moduleName}.`,
       },
       defaultOptions: [],
     },
@@ -152,14 +151,18 @@ export const createPreferIsRecordAndHasKey = ({
         },
 
         'Program:exit': () => {
+          if (mut_nodesToFix.length === 0) {
+            return;
+          }
+
           // Bound once for each shape of rewrite: a file may import `hasKey`
           // but not `isRecord`, which only the rewrites that need it add.
-          const withIsRecord = bindValueImports(sourceCode, moduleName, [
+          const withIsRecordAt = bindValueImportsAt(sourceCode, moduleName, [
             'isRecord',
             'hasKey',
           ]);
 
-          const hasKeyOnly = bindValueImports(sourceCode, moduleName, [
+          const hasKeyOnlyAt = bindValueImportsAt(sourceCode, moduleName, [
             'hasKey',
           ]);
 
@@ -168,7 +171,9 @@ export const createPreferIsRecordAndHasKey = ({
             // true, so it is left out of the replacement entirely.
             const needsIsRecord = !isKnownRecord(objExpression);
 
-            const binding = needsIsRecord ? withIsRecord : hasKeyOnly;
+            const binding = (needsIsRecord ? withIsRecordAt : hasKeyOnlyAt)(
+              node,
+            );
 
             const hasKeyName = binding?.localNames.at(-1);
 
@@ -185,11 +190,7 @@ export const createPreferIsRecordAndHasKey = ({
               hasKeyName !== undefined &&
               (!needsIsRecord || isRecordName !== undefined) &&
               // `isRecord(obj) && hasKey(obj, key)` evaluates `obj` twice.
-              (!needsIsRecord || isSideEffectFree(objExpression)) &&
-              binding.localNames.every(
-                (name) =>
-                  !hasForeignBinding(sourceCode, node, name, moduleName),
-              );
+              (!needsIsRecord || isSideEffectFree(objExpression));
 
             context.report({
               node,
@@ -198,6 +199,10 @@ export const createPreferIsRecordAndHasKey = ({
                 original: sourceCode.getText(node),
                 objName: objText,
                 keyName: keyText,
+                // The names a fix here writes; where none can bind them, the
+                // exports' own.
+                isRecord: isRecordName ?? 'isRecord',
+                hasKey: hasKeyName ?? 'hasKey',
               },
               fix: fixable
                 ? (fixer) => [

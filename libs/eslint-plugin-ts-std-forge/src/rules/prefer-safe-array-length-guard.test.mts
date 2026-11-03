@@ -79,6 +79,29 @@ describe('prefer-safe-array-length-guard', () => {
         errors: [{ messageId: 'useIsNonEmpty' }],
       },
       {
+        name: 'writes through a namespace import, and names what it writes',
+        code: dedent`
+          import * as tsf from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = xs.length === 0;
+        `,
+        output: dedent`
+          import * as tsf from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = tsf.SafeArray.isEmpty(xs);
+        `,
+        errors: [
+          {
+            messageId: 'useIsEmpty',
+            data: {
+              original: 'xs.length === 0',
+              arrayName: 'xs',
+              safeArray: 'tsf.SafeArray',
+            },
+          },
+        ],
+      },
+      {
         name: 'xs.length >= 1 becomes isNonEmpty',
         code: dedent`
           declare const xs: readonly number[];

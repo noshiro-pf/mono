@@ -3,8 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { hasForeignBinding } from '../bindings.mjs';
-import { bindValueImports } from '../imports.mjs';
+import { bindValueImportsAt } from '../imports.mjs';
 import { getRangeWithParens } from '../parentheses.mjs';
 import { isIdentifierNamed, skipTypeWrappers } from '../type-wrappers.mjs';
 
@@ -22,19 +21,18 @@ export const createPreferArrayIsArray = ({
 
   /** The exported namespace whose `isArray` replaces `Array.isArray`. */
   namespace: string;
-}>): TSESLint.RuleModule<'useIsArray', readonly []> => {
-  const replacement = `${namespace}.isArray` as const;
-
-  const text =
-    `Replace \`Array.isArray\` with \`${replacement}\` from ${moduleName}.` as const;
-
-  return {
+}>): TSESLint.RuleModule<'useIsArray', readonly []> =>
+  ({
     meta: {
       type: 'suggestion',
-      docs: { description: text },
+      docs: {
+        description: `Replace \`Array.isArray\` with \`${namespace}.isArray\` from ${moduleName}.`,
+      },
       fixable: 'code',
       schema: [],
-      messages: { useIsArray: text },
+      messages: {
+        useIsArray: `Replace \`Array.isArray\` with \`{{replacement}}\` from ${moduleName}.`,
+      },
       defaultOptions: [],
     },
 
@@ -52,20 +50,30 @@ export const createPreferArrayIsArray = ({
           mut_nodesToFix.push(node);
         },
         'Program:exit': () => {
-          const binding = bindValueImports(sourceCode, moduleName, [namespace]);
+          if (mut_nodesToFix.length === 0) {
+            return;
+          }
 
-          const localName = binding?.localNames[0];
+          const bindingAt = bindValueImportsAt(sourceCode, moduleName, [
+            namespace,
+          ]);
 
           // Every fix brings the namespace into scope itself, so that one
           // applied alone (an editor's quick fix) is complete.
           for (const node of mut_nodesToFix) {
+            const binding = bindingAt(node);
+
+            const localName = binding?.localNames[0];
+
             context.report({
               node,
               messageId: 'useIsArray',
+              data: {
+                // The name the fix writes; with no fix, the export's own.
+                replacement: `${localName ?? namespace}.isArray`,
+              },
               fix:
-                binding === undefined ||
-                localName === undefined ||
-                hasForeignBinding(sourceCode, node, localName, moduleName)
+                binding === undefined || localName === undefined
                   ? null
                   : (fixer) => [
                       ...binding.edits(fixer),
@@ -82,8 +90,7 @@ export const createPreferArrayIsArray = ({
         },
       };
     },
-  } as const;
-};
+  }) as const;
 
 /**
  * Whether `node` calls `Array.isArray`, the callee and `Array` both read

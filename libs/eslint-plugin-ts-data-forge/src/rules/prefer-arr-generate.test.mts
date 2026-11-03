@@ -312,6 +312,26 @@ describe('prefer-arr-generate', () => {
         ],
       },
       {
+        name: 'writes Arr through a namespace import',
+        code: dedent`
+          import * as tdf from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = xs.flatMap((x) => (x > 0 ? [x * 2] : []));
+        `,
+        output: dedent`
+          import * as tdf from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = tdf.Arr.generate(function* () {
+            for (const x of xs) {
+              if (x > 0) {
+                yield x * 2;
+              }
+            }
+          });
+        `,
+        errors: [{ messageId: 'useArrGenerate' }],
+      },
+      {
         name: 'moves the statements of a block body into the loop',
         code: dedent`
           declare const xs: readonly string[];

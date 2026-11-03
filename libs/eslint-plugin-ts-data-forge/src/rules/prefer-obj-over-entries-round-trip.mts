@@ -92,11 +92,11 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
     }[] = [];
 
     /**
-     * Rebuilds the callback's parameter list. The entry pattern binds
+     * The names of the rebuilt callback's parameters. The entry pattern binds
      * `[key, value]`; `Obj` passes `(value, key)`, and either parameter is
      * dropped when the rewritten body no longer refers to it.
      */
-    const buildParams = (roundTrip: RoundTrip): string => {
+    const rebuiltParamNames = (roundTrip: RoundTrip): readonly string[] => {
       const scope = sourceCode.getScope(roundTrip.callback);
 
       const dropped = new Set<TSESTree.Node>(roundTrip.dropped);
@@ -112,13 +112,13 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
       if (keyName !== undefined) {
         // `Obj` puts the value first, so a callback that only needs the key
         // still has to name a value parameter.
-        return `(${valueName ?? unusedValueParamName(scope)}, ${keyName})`;
+        return [valueName ?? unusedValueParamName(scope), keyName];
       }
 
       return valueName !== undefined &&
         isReferencedOutside(scope, valueName, dropped)
-        ? `(${valueName})`
-        : '()';
+        ? [valueName]
+        : [];
     };
 
     const buildCallbackBody = (
@@ -160,12 +160,12 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
       },
 
       'Program:exit': () => {
-        const objAt = tsDataForgeValuesAt(sourceCode, ['Obj']).at;
+        const objAt = tsDataForgeValuesAt(sourceCode, ['Obj']);
 
         const objOptionalAt = tsDataForgeValuesAt(sourceCode, [
           'Obj',
           'Optional',
-        ]).at;
+        ]);
 
         // Every fix brings the names it writes into scope itself, so that one
         // applied alone (an editor's quick fix) is complete.
@@ -177,11 +177,19 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
           const [objName, optionalName = 'Optional'] =
             binding?.localNames ?? [];
 
+          const paramNames = rebuiltParamNames(roundTrip);
+
+          // `Optional` is written inside the rebuilt callback, where a
+          // parameter it keeps would capture the name `Optional` starts with.
+          const isCaptured =
+            roundTrip.body.kind === 'optional' &&
+            paramNames.includes(optionalName.split('.', 1)[0] ?? optionalName);
+
           context.report({
             node,
             messageId: MESSAGE_ID_OF[roundTrip.method],
             fix:
-              binding === undefined || objName === undefined
+              binding === undefined || objName === undefined || isCaptured
                 ? null
                 : (fixer) => {
                     const recordText = getArgumentText(
@@ -189,7 +197,7 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
                       roundTrip.record,
                     );
 
-                    const replacement = `${objName}.${roundTrip.method}(${recordText}, ${buildParams(roundTrip)} => ${buildCallbackBody(roundTrip, optionalName)})`;
+                    const replacement = `${objName}.${roundTrip.method}(${recordText}, (${paramNames.join(', ')}) => ${buildCallbackBody(roundTrip, optionalName)})`;
 
                     return [
                       ...binding.edits(fixer),

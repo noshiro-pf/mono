@@ -309,6 +309,68 @@ describe('prefer-obj-over-entries-round-trip', () => {
           errors: [{ messageId: 'useObjFilterMap' }],
         },
         {
+          name: 'writes through a namespace import',
+          code: dedent`
+            import * as tdf from 'ts-data-forge';
+            const scores = { alice: 1, bob: 2 };
+            const scaled = Object.fromEntries(
+              Object.entries(scores).flatMap(([k, v]) =>
+                v > 1 ? [[k, v * 10]] : [],
+              ),
+            );
+          `,
+          output: dedent`
+            import * as tdf from 'ts-data-forge';
+            const scores = { alice: 1, bob: 2 };
+            const scaled = tdf.Obj.filterMap(scores, (v) => v > 1 ? tdf.Optional.some(v * 10) : tdf.Optional.none);
+          `,
+          errors: [{ messageId: 'useObjFilterMap' }],
+        },
+        {
+          name: 'no fix when a parameter the callback keeps shadows the namespace it reads',
+          code: dedent`
+            import * as tdf from 'ts-data-forge';
+            const scores = { alice: 1, bob: 2 };
+            const scaled = Object.fromEntries(
+              Object.entries(scores).flatMap(([k, tdf]) =>
+                tdf > 1 ? [[k, tdf * 10]] : [],
+              ),
+            );
+          `,
+          output: null,
+          errors: [{ messageId: 'useObjFilterMap' }],
+        },
+        {
+          name: 'no fix when a parameter the callback keeps is named Optional',
+          code: dedent`
+            const scores = { alice: 1, bob: 2 };
+            const scaled = Object.fromEntries(
+              Object.entries(scores).flatMap(([k, Optional]) =>
+                Optional > 1 ? [[k, Optional * 10]] : [],
+              ),
+            );
+          `,
+          output: null,
+          errors: [{ messageId: 'useObjFilterMap' }],
+        },
+        {
+          name: 'a dropped key parameter named Optional captures nothing',
+          code: dedent`
+            const scores = { alice: 1, bob: 2 };
+            const scaled = Object.fromEntries(
+              Object.entries(scores).flatMap(([Optional, v]) =>
+                v > 1 ? [[Optional, v * 10]] : [],
+              ),
+            );
+          `,
+          output: dedent`
+            import { Obj, Optional } from 'ts-data-forge';
+            const scores = { alice: 1, bob: 2 };
+            const scaled = Obj.filterMap(scores, (v) => v > 1 ? Optional.some(v * 10) : Optional.none);
+          `,
+          errors: [{ messageId: 'useObjFilterMap' }],
+        },
+        {
           name: 'adds Obj and Optional to one existing import',
           code: dedent`
             import { asInt } from 'ts-data-forge';

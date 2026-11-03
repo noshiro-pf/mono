@@ -4,9 +4,8 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
-  bindValueImports,
+  bindValueImportsAt,
   getArgumentText,
-  hasForeignBinding,
   skipTypeWrappers,
   typeHoldsAtEveryLayer,
 } from 'eslint-rule-forge';
@@ -123,26 +122,20 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
           return;
         }
 
-        const binding = bindValueImports(sourceCode, TS_STD_FORGE_MODULE, [
+        const bindingAt = bindValueImportsAt(sourceCode, TS_STD_FORGE_MODULE, [
           'SafeArray',
         ]);
-
-        const localName = binding?.localNames[0];
 
         // Every fix brings `SafeArray` into scope itself, so that one applied
         // alone (an editor's quick fix) is complete.
         for (const { node, arrayExpression, guard } of mut_nodesToFix) {
+          const binding = bindingAt(node);
+
+          const localName = binding?.localNames[0];
+
           const arrayText = getArgumentText(sourceCode, arrayExpression);
 
-          const writable =
-            binding !== undefined &&
-            localName !== undefined &&
-            !hasForeignBinding(
-              sourceCode,
-              node,
-              localName,
-              TS_STD_FORGE_MODULE,
-            );
+          const writable = binding !== undefined && localName !== undefined;
 
           context.report({
             node,
