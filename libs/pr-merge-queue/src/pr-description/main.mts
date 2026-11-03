@@ -83,8 +83,9 @@ export const runDescription = async (
 
 /**
  * Why `body` may not be posted, or `undefined` when it may: with a translation
- * heading configured, a body whose halves do not mirror each other
- * (`./body.mts`). `open-pr --body-file` asks the same before it pushes.
+ * heading configured, a body whose halves do not mirror each other, or that has
+ * a trailer or a `## Review` out of its place (`./body.mts`).
+ * `open-pr --body-file` asks the same before it pushes.
  */
 export const descriptionProblems = (
   body: string,
@@ -103,7 +104,7 @@ export const descriptionProblems = (
   const problems = checkDescription(parts.value);
 
   return Arr.isNonEmpty(problems)
-    ? `the original and its translation do not mirror each other:\n${problems.map((p) => `- ${p}`).join('\n')}`
+    ? `the description is not laid out as the original, its translation, then the trailers:\n${problems.map((p) => `- ${p}`).join('\n')}`
     : undefined;
 };
 
