@@ -32,7 +32,7 @@ Repository permissions:
 - **Actions**: Read (to trigger workflows)
 - **Metadata**: Read (always required)
 
-**Note about distribution**: this GitHub App is only used to open the Changesets release PR; it does not distribute packages. Packages are shipped as GitHub Release tarballs via `pnpm dist:github-release` (an authenticated `gh` CLI). See the [Distribution guide](./distribution.md).
+**Note about distribution**: this GitHub App is only used to open the Changesets release PR; it does not distribute packages. Packages are published to npm by `changeset publish` in `release.yml`, authenticated by OIDC rather than by this App. See the [Distribution guide](./distribution.md).
 
 ### Where can this GitHub App be installed?
 
@@ -87,7 +87,7 @@ If workflows still don't trigger:
 
 This GitHub App setup is specifically for triggering workflows when Changesets creates PRs.
 
-Packages are **not** published to any npm registry — no `NPM_TOKEN` is needed. On merge of the "Version Packages" PR, the release workflow packs the generated packages and uploads them as **GitHub Release tarballs** via the `gh` CLI (authenticated with the workflow's token).
+No `NPM_TOKEN` is needed either. On a push to `main` with no changeset pending, `release.yml` publishes the bundles to npm with `changeset publish`, authenticated by OIDC against each package's trusted publisher; there are no GitHub Release tarballs.
 
 See the [Distribution guide](./distribution.md) for the full flow.
 

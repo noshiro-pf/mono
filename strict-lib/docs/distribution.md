@@ -27,9 +27,9 @@ while halving the package count halves the per-minor setup.
 
 ## The layout on disk is the layout that ships
 
-`packages/vX.Y/output/lib` **is** the package: `package.json`, `README.md`,
-`libs/` and `libs-branded/`. `npm pack` runs against that directory and nothing
-is rearranged.
+Each series' `output/lib` (`strict-lib/v7.0/output/lib` for 7.0) **is** the
+package: `package.json`, `README.md`, `libs/` and `libs-branded/`. `npm pack`
+runs against that directory and nothing is rearranged.
 
 That is a requirement, not tidiness. A consuming repository points `paths` at
 `node_modules/<pkg>/libs/*`; when it vendors this repository as a workspace,
@@ -57,12 +57,18 @@ mean pointing a `file:` dependency inside `node_modules`.
 library, so upgrading TypeScript does not leave you guessing which version of
 the strict library matches.
 
-The version lives in each harness's `packages/vX.Y/package.json` and is copied
-into the generated manifest; changesets moves them together.
+The version lives in each harness's `package.json`
+(`strict-lib/v7.0/package.json`, `strict-ts-lib-v7.0-source`, for 7.0) and is
+copied into the generated manifest; changesets moves them together.
 
 ## Publishing
 
-`pnpm run dist:npm-publish` packs and publishes.
+`release.yml` publishes the bundles with `changeset publish`, as it does every
+other package; a version already on the registry is skipped there.
+
+`pnpm run strict-lib:publish` (`scripts/cmd/dist-npm-publish.mts`) packs and
+publishes by hand. It is for a series' first publish, which cannot go through
+CI, and for inspecting a bundle before it goes out.
 
 | Flag | Effect |
 | :--- | :----- |
@@ -73,8 +79,8 @@ into the generated manifest; changesets moves them together.
 | `--otp=<code>` | pass a 2FA code (needed when publishing by hand) |
 | `--pack-only [--out-dir=<dir>]` | write tarballs and stop |
 
-A version already on the registry is skipped, so the release workflow can run
-it on every push to `main` and do nothing most of the time.
+A version already on the registry is skipped, so a run that fails partway can be
+repeated with a fresh `--otp` without re-publishing what went out.
 
 In CI, publishing is authenticated by **OIDC against the trusted publisher**
 configured per package on npm — there is no token. A package's first publish

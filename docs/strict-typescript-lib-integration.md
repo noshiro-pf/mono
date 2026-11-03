@@ -903,7 +903,7 @@ changesets の `fixed` グループに入れれば自動で揃う（`.changeset/
 | 廃止するもの                              | 置き換え                                                                              |
 | :---------------------------------------- | :------------------------------------------------------------------------------------ |
 | `scripts/cmd/dist-github-release.mts`     | なし（GitHub Release をやめる）                                                       |
-| `scripts/cmd/dist-npm-publish.mts`        | changesets の publish                                                                 |
+| `scripts/cmd/dist-npm-publish.mts`        | changesets の publish（初回 publish の手動の入口 `strict-lib:publish` としては残る）  |
 | `.github/workflows/release.yml`（上流の） | mono の `release.yml`                                                                 |
 | `docs/first-release.md` の手順            | 初回 publish だけは残る（後述）                                                       |
 | 引き継ぐもの                              | **dist の生成方法のみ** — `ws:gen:packages` と `pack-bundle` の「何を libs に置くか」 |
