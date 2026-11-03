@@ -381,7 +381,6 @@
     },
 
     // Not an Astro site like the entry below assumes: a single entry point.
-
     "apps/react-blueprintjs-utils": {
       "entry": ["src/index.mts"],
       "project": ["**/*.{mts,ts,tsx}"],
@@ -440,12 +439,6 @@
     "apps/lambda-calculus-interpreter-synstate-dom": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
-    },
-
-    // Not an Astro site like the entry below assumes: a single entry point.
-    "apps/react-blueprintjs-utils": {
-      "entry": ["src/index.mts"],
-      "project": ["**/*.{mts,ts,tsx}"],
     },
 
     // Not an Astro site like the entry below assumes: a Vite synstate-dom app
@@ -582,20 +575,6 @@
       "project": ["**/*.mts"],
     },
 
-    "apps/blueprintjs-playground": {
-      "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
-      "project": ["**/*.{mts,tsx}"],
-      // Loaded by `src/index.css` through CSS `@import` rather than by a
-      // module import, which knip does not follow.
-      "ignoreDependencies": [
-        "normalize.css",
-        "@blueprintjs/icons",
-        "@blueprintjs/datetime2",
-        "@blueprintjs/datetime",
-        "@blueprintjs/select",
-      ],
-    },
-
     "apps/housing-loan-calculator": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
@@ -625,18 +604,6 @@
         // pick from whatever the rest of the workspace offers (#2564).
         "react",
         "react-dom",
-      ],
-    },
-
-    "apps/blueprintjs-playground-styled": {
-      "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
-      "project": ["**/*.{mts,tsx}"],
-      // Loaded by `src/index.css` through CSS `@import` rather than by a
-      // module import, which knip does not follow.
-      "ignoreDependencies": [
-        "normalize.css",
-        "@blueprintjs/core",
-        "@blueprintjs/icons",
       ],
     },
 
