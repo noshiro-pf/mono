@@ -110,7 +110,7 @@ describe(createDeleteAccountPageStore, () => {
 });
 
 describe(createDeleteAccountCreatedWithGoogleStore, () => {
-  test('signs in with Google again, then deletes the user', async () => {
+  test('re-authenticates the user with Google, then deletes them', async () => {
     const { deps, calls, dialog } = setup();
 
     const store = createDeleteAccountCreatedWithGoogleStore(deps);
@@ -124,58 +124,76 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
     await settle();
 
     assert.deepStrictEqual(calls, [
-      'googleSignInWithPopup',
-      'reauthenticate alice cred(google)',
+      'reauthenticateWithGooglePopup alice',
       'deleteUser alice',
     ]);
+
+    assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
   });
 
   test.each([
-    { when: 'signing in with Google fails', google: Result.err(undefined) },
-    { when: 'Google returns no credential', google: Result.ok(undefined) },
-  ] as const)('deletes nothing when $when', async ({ google }) => {
-    const { deps, calls, dialog } = setup({ google });
+    { code: 'auth/popup-closed-by-user', toasts: [], errors: 0 },
+    { code: 'auth/cancelled-popup-request', toasts: [], errors: 0 },
+    {
+      code: 'auth/user-mismatch',
+      toasts: [['danger', dict.accountSettings.reauthenticate.message.error]],
+      errors: 1,
+    },
+  ] as const)(
+    'deletes nothing when re-authentication fails with $code',
+    async ({ code, toasts, errors }) => {
+      const { deps, calls, dialog } = setup({
+        reauthenticateWithGoogle: Result.err({ code, message: code }),
+      });
 
-    const store = createDeleteAccountCreatedWithGoogleStore(deps);
+      const store = createDeleteAccountCreatedWithGoogleStore(deps);
 
-    dialog.deleteAccountCreatedWithGoogle();
+      dialog.deleteAccountCreatedWithGoogle();
 
-    store.inputEmailHandler('alice@example.com');
+      store.inputEmailHandler('alice@example.com');
 
-    const consoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => undefined);
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
 
-    const showToast = vi.spyOn(fakeToaster, 'show');
+      const showToast = vi.spyOn(fakeToaster, 'show');
 
-    onTestFinished(() => {
-      consoleError.mockRestore();
+      onTestFinished(() => {
+        consoleError.mockRestore();
 
-      showToast.mockRestore();
-    });
+        showToast.mockRestore();
+      });
 
-    store.enterClickHandler();
+      store.enterClickHandler();
 
-    await settle();
+      await settle();
 
-    assert.deepStrictEqual(calls, ['googleSignInWithPopup']);
+      assert.deepStrictEqual(calls, ['reauthenticateWithGooglePopup alice']);
 
-    assert.strictEqual(consoleError.mock.calls.length, 1);
+      // A popup closed on purpose is not an error; a real failure names its
+      // code in the log.
+      assert.strictEqual(consoleError.mock.calls.length, errors);
 
-    // The dialog stays open so that signing in can be tried again, and is not
-    // waiting any more — closing it would reset the waiting state on its own.
-    assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
+      assert.isTrue(
+        consoleError.mock.calls.every((args) => args.includes(code)),
+      );
 
-    assert.strictEqual(
-      dialog.openingDialogType$.getSnapshot().value,
-      'deleteAccountCreatedWithGoogle',
-    );
+      // The dialog stays open so that re-authenticating can be tried again, and
+      // is not waiting any more.
+      assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
 
-    assert.deepStrictEqual(
-      showToast.mock.calls.map(([props]) => [props.intent, props.message]),
-      [['danger', dict.accountSettings.reauthenticate.message.error]],
-    );
-  });
+      assert.strictEqual(
+        dialog.openingDialogType$.getSnapshot().value,
+        'deleteAccountCreatedWithGoogle',
+      );
+
+      const shown: readonly (readonly unknown[])[] = showToast.mock.calls.map(
+        ([props]) => [props.intent, props.message],
+      );
+
+      assert.deepStrictEqual(shown, toasts);
+    },
+  );
 });
 
 describe(createUpdateDisplayNamePageStore, () => {
@@ -302,7 +320,7 @@ const setup = (
   options?: Readonly<{
     signedIn?: boolean;
     reauthenticate?: Result<unknown, AuthError>;
-    google?: Result<string | undefined, unknown>;
+    reauthenticateWithGoogle?: Result<unknown, AuthError>;
   }>,
 ): Setup => {
   const user = options?.signedIn === false ? undefined : alice;
@@ -324,11 +342,11 @@ const setup = (
       api: {
         auth: {
           emailCredential: (email, password) => `cred(${email},${password})`,
-          googleSignInWithPopup: () => {
-            mut_calls.push('googleSignInWithPopup');
+          reauthenticateWithGooglePopup: (u) => {
+            mut_calls.push(`reauthenticateWithGooglePopup ${u.name}`);
 
             return Promise.resolve(
-              options?.google ?? Result.ok('cred(google)'),
+              options?.reauthenticateWithGoogle ?? Result.ok(undefined),
             );
           },
           reauthenticateWithCredential: (u, credential) => {

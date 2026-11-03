@@ -8,10 +8,10 @@ import type { Result } from 'ts-data-forge';
  */
 export type AccountAuthApi<User, ReauthCredential> = Readonly<{
   emailCredential: (email: string, password: string) => ReauthCredential;
-  /** Only the credential, or that there is none, is read. */
-  googleSignInWithPopup: () => Promise<
-    Result<ReauthCredential | undefined, unknown>
-  >;
+  /** Only whether it went through, and why not, is read. */
+  reauthenticateWithGooglePopup: (
+    user: User,
+  ) => Promise<Result<unknown, AuthError>>;
   /** Only whether it went through, and why not, is read. */
   reauthenticateWithCredential: (
     user: User,
