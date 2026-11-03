@@ -1,3 +1,4 @@
+export * from './alert.js';
 export * from './anchor-button.js';
 export * from './button-group.js';
 export * from './button.js';
@@ -8,6 +9,7 @@ export * from './collapse.js';
 export * from './control-group.js';
 export * from './date-input.js';
 export * from './date-picker.js';
+export * from './dialog.js';
 export * from './file-input.js';
 export * from './form-group.js';
 export * from './html-select.js';
