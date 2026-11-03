@@ -1,3 +1,4 @@
+// cspell:ignore xhigh
 /**
  * A description written twice — the original, then its translation under one
  * `## <heading>` — and what keeps the two saying the same thing. Nothing here
@@ -12,7 +13,7 @@
  */
 
 import { outsideCodeFences } from 'pr-report-core';
-import { Arr, Result } from 'ts-data-forge';
+import { Arr, Num, Result } from 'ts-data-forge';
 
 /** A description cut where its translation begins and where it ends. */
 export type DescriptionParts = Readonly<{
@@ -103,6 +104,9 @@ export const splitDescription = (
  *   translation, so that each appears once, where the layout puts it.
  * - The original has at most one `## Review`, and the translation none: the
  *   tools read the first they find in the body.
+ * - The original's `## Review` opens with the level and the total of rounds,
+ *   in the form {@link reviewOpeningRounds} reads, so that a count is read,
+ *   not guessed.
  */
 export const checkDescription = (
   parts: DescriptionParts,
@@ -142,6 +146,8 @@ export const checkDescription = (
 
   const reviews = original.filter((line) => REVIEW_HEADING.test(line)).length;
 
+  const reviewOpening = reviewOpeningIn(original);
+
   return [
     mirrored
       ? undefined
@@ -176,7 +182,50 @@ export const checkDescription = (
     translation.some((line) => REVIEW_HEADING.test(line))
       ? 'the translation has a "## Review" heading; the tools read the first in the body, so the findings go under the original\'s and the translation titles its own section "### <translated heading>"'
       : undefined,
+    reviewOpening === undefined ||
+    reviewOpeningRounds(reviewOpening) !== undefined
+      ? undefined
+      : reviewOpening === ''
+        ? `the "## Review" section is empty; ${REVIEW_OPENING_RULE}`
+        : `the "## Review" section opens with "${reviewOpening}"; ${REVIEW_OPENING_RULE}`,
   ].filter((problem) => problem !== undefined);
+};
+
+/**
+ * The first line of a `## Review` section that is not blank and not in a code
+ * fence, its trailing spaces dropped, given the text under the heading; `''`
+ * when nothing comes before the next `#` or `##` heading. `checkDescription`
+ * and `review-findings-digest` both pick the opening with this, so they read
+ * the same line.
+ */
+export const reviewOpeningOf = (section: string): string => {
+  const opening = outsideCodeFences(section.replaceAll('\r\n', '\n'))
+    .split('\n')
+    .find((line) => line.trim() !== '');
+
+  return opening === undefined || SECTION_HEADING.test(opening)
+    ? ''
+    : opening.trimEnd();
+};
+
+/**
+ * The total of rounds a `## Review` section's opening ({@link reviewOpeningOf})
+ * states, or `undefined` when it is not in the form {@link checkDescription}
+ * asks for: the level and the total in digits, as `` `/code-review high`, 3
+ * rounds. ``, or for a review with no `/code-review`, `` Review at `high`, 2
+ * rounds. `` or `` Self-review at `high`, 1 round. ``.
+ * Indented four spaces or more, the line is code, not an opening.
+ */
+export const reviewOpeningRounds = (line: string): number | undefined => {
+  const count = REVIEW_OPENING.exec(line.trimEnd())?.groups?.['count'];
+
+  if (count === undefined) {
+    return undefined;
+  }
+
+  const parsed = Num.safeParseInt(count);
+
+  return Result.isOk(parsed) ? parsed.value : undefined;
 };
 
 /**
@@ -243,6 +292,16 @@ const TRAILER_LINE = /^[^\S\n]*(?:start-after|claude-session)[^\S\n]*:/iu;
  * and all (`## Review (/code-review high)`): its `parse.mts` pattern, as is.
  */
 const REVIEW_HEADING = /^##\s+Review\b/u;
+
+/** What {@link reviewOpeningRounds} reads. */
+const REVIEW_OPENING =
+  /^ {0,3}(?:`\/code-review (?:low|medium|high|xhigh|max)`|(?:Self-review|Review) at `(?:low|medium|high|xhigh|max)`), (?<count>1(?= round\b)|(?:[2-9]|[1-9]\d+)(?= rounds\b)) rounds?(?:[.,;:]|$)/u;
+
+const REVIEW_OPENING_RULE =
+  'it opens with the level and the total of rounds in digits, as "`/code-review high`, 3 rounds.", "Review at `high`, 2 rounds." or "Self-review at `high`, 1 round."';
+
+/** A `#` or `##` heading, which ends a `## Review` section. */
+const SECTION_HEADING = /^ {0,3}#{1,2}(?:[ \t]|$)/u;
 
 /** `open-pr --merge-before`'s line (`mergeBeforeNote`). */
 const MERGE_BEFORE_NOTE = /^Merges before #\d/u;
@@ -319,6 +378,18 @@ const onlyIn = (
   Array.from(a)
     .filter((n) => !b.has(n))
     .map((n) => `#${n}`);
+
+/**
+ * The opening of the first `## Review` section in `lines` ({@link reviewOpeningOf}),
+ * or `undefined` when there is no such heading.
+ */
+const reviewOpeningIn = (lines: readonly string[]): string | undefined => {
+  const start = lines.findIndex((line) => REVIEW_HEADING.test(line));
+
+  return start === -1
+    ? undefined
+    : reviewOpeningOf(lines.slice(start + 1).join('\n'));
+};
 
 /** `text`'s lines with fenced code blanked out; `text` is LF only, as {@link splitDescription} leaves it. */
 const visibleLines = (text: string): readonly string[] =>

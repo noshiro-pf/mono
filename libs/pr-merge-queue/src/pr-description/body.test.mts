@@ -1,9 +1,12 @@
+// cspell:ignore xhigh
 import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import {
   changedParts,
   checkDescription,
   readableDescription,
+  reviewOpeningOf,
+  reviewOpeningRounds,
   splitDescription,
   type DescriptionParts,
 } from './body.mjs';
@@ -20,6 +23,8 @@ const BODY = dedent`
   - \`check:test\`
 
   ## Review
+
+  \`/code-review high\`, 2 rounds.
 
   - Deferred: the rest (#13).
 
@@ -346,7 +351,7 @@ describe(checkDescription, () => {
         split(dedent`
           ## Review (/code-review high)
 
-          A.
+          \`/code-review high\`, 1 round.
 
           ## Review findings not fixed
 
@@ -366,6 +371,137 @@ describe(checkDescription, () => {
       [
         'the original has a "## Review" section 2 times; the tools read the first, so the findings go under one',
       ],
+    );
+  });
+
+  test.each([
+    '`/code-review high`, 3 rounds.',
+    '`/code-review medium`, 1 round, no findings.',
+    '`/code-review xhigh`, 12 rounds; the amend, one more.',
+    'Self-review at `high`, 1 round: no review tool was available.',
+    'Review at `high`, 2 rounds, with the review tool Codex has.',
+    '  `/code-review high`, 2 rounds.  ',
+  ])('takes a Review section opening %j', (opening) => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(
+          `## Review\n\n${opening}\n\n- Fixed: a.\n\n## 日本語\n\n### レビュー\n\nあ。`,
+        ),
+      ),
+      [],
+    );
+  });
+
+  test.each([
+    'Three rounds of `/code-review high`.',
+    '`/code-review high`, three rounds.',
+    '`/code-review high`, 1 rounds.',
+    '`/code-review high`, 2 round.',
+    '`/code-review high`, 0 rounds.',
+    '`/code-review high`, 3 rounds and more',
+    '    `/code-review high`, 3 rounds.',
+    '`/code-review` high, 2 rounds.',
+    '- Fixed: a.',
+  ])('refuses a Review section opening %j', (opening) => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(`## Review\n\n${opening}\n\n## 日本語\n\n### レビュー\n\nあ。`),
+      ),
+      [
+        `the "## Review" section opens with "${opening}"; ${REVIEW_OPENING_RULE}`,
+      ],
+    );
+  });
+
+  test('names a heading the Review section opens with', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(
+          '## Review\n\n### Round 1\n\n- Fixed: a.\n\n## 日本語\n\n### レビュー\n\n#### 1 回目\n\nあ。',
+        ),
+      ),
+      [
+        `the "## Review" section opens with "### Round 1"; ${REVIEW_OPENING_RULE}`,
+      ],
+    );
+  });
+
+  test('calls a Review section empty when the next section follows it', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(
+          '## Review\n\n## Checks\n\nA.\n\n## 日本語\n\n### レビュー\n\n### チェック\n\nあ。',
+        ),
+      ),
+      [`the "## Review" section is empty; ${REVIEW_OPENING_RULE}`],
+    );
+  });
+
+  test('refuses a Review section with nothing under it', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split('A.\n\n## Review\n\n## 日本語\n\nあ。\n\n### レビュー'),
+      ),
+      [`the "## Review" section is empty; ${REVIEW_OPENING_RULE}`],
+    );
+  });
+
+  test('reads the Review opening outside code fences only', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A.
+
+          \`\`\`md
+          ## Review
+
+          Anything.
+          \`\`\`
+
+          ## 日本語
+
+          あ。
+        `),
+      ),
+      [],
+    );
+  });
+});
+
+const REVIEW_OPENING_RULE =
+  'it opens with the level and the total of rounds in digits, as "`/code-review high`, 3 rounds.", "Review at `high`, 2 rounds." or "Self-review at `high`, 1 round."';
+
+describe(reviewOpeningOf, () => {
+  test('skips blank lines and code fences', () => {
+    assert.strictEqual(
+      reviewOpeningOf(
+        '\n```md\nTwo rounds.\n```\n\n`/code-review high`, 6 rounds.  \nMore.',
+      ),
+      '`/code-review high`, 6 rounds.',
+    );
+  });
+
+  test('is empty when a heading comes first', () => {
+    assert.strictEqual(reviewOpeningOf('\n## Checks\n\nA.'), '');
+  });
+
+  test('keeps a sub-heading that comes first', () => {
+    assert.strictEqual(reviewOpeningOf('### Round 1\n\nA.'), '### Round 1');
+  });
+});
+
+describe(reviewOpeningRounds, () => {
+  test.each([
+    ['`/code-review high`, 3 rounds.', 3],
+    ['  `/code-review medium`, 1 round, no findings.  ', 1],
+    ['Review at `xhigh`, 12 rounds; then the amend.', 12],
+  ] as const)('reads %j as %i', (line, expected) => {
+    assert.strictEqual(reviewOpeningRounds(line), expected);
+  });
+
+  test('reads no total from another form', () => {
+    assert.isUndefined(
+      reviewOpeningRounds('Three rounds of `/code-review high`.'),
     );
   });
 });
