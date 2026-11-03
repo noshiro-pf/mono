@@ -4,23 +4,24 @@
  *
  * **Read from GitHub rather than from a file in the repository**, so that any
  * repository is judged by the rules it has: every ruleset that applies to the
- * branch (`GET /repos/{owner}/{repo}/rules/branches/{branch}`), which is what
- * `unblock-prs` reads too, and the contexts a classic branch protection rule
- * requires (`GET /repos/{owner}/{repo}/branches/{branch}`). Neither wants more
- * than reading the repository — `metadata` and `contents` read, which a token
- * with no scopes has on a public one — where the endpoints that list a
- * ruleset's own settings or a protection rule's whole want an admin.
- *
- * What a classic rule says about reviews is not among what the second answers,
- * so a code owner's approval is waited for only where a ruleset asks for it.
+ * branch (`GET /repos/{owner}/{repo}/rules/branches/{branch}`) and the contexts
+ * a classic branch protection rule requires
+ * (`GET /repos/{owner}/{repo}/branches/{branch}`), both read and added up by
+ * `pr-report-core`'s `readBranchRequirements`, which `unblock-prs` and
+ * `pr-report` use too. Neither wants more than reading the repository —
+ * `metadata` and `contents` read, which a token with no scopes has on a public
+ * one.
  *
  * **REST, as the workflow runs are** (`workflow-runs.mts`): its own budget, and
  * `no-cache`, so that the answer the browser kept is revalidated and a `304`
  * costs nothing — which is every read but the first, since rules seldom change.
  */
 
-import { requirementsOfRules, type RulesetRequirements } from 'pr-report-core';
-import { Arr, Result } from 'ts-data-forge';
+import {
+  readBranchRequirements,
+  type RulesetRequirements,
+} from 'pr-report-core';
+import { Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { askAndRead } from './answer-body.mjs';
 import type { ReportSource } from './constants.mjs';
@@ -32,9 +33,8 @@ export type BranchRulesRequest = Readonly<{
 }>;
 
 /**
- * The requirements on `branch`, or a sentence a reader can act on. Either
- * request failing fails it: a list of required contexts missing half of them
- * would be read as the whole.
+ * The requirements on `branch` (`pr-report-core`'s `readBranchRequirements`),
+ * or a sentence a reader can act on.
  */
 export const loadBranchRules = async (
   source: ReportSource,
@@ -46,71 +46,10 @@ export const loadBranchRules = async (
   const repoRoute =
     `https://api.github.com/repos/${source.owner}/${source.repo}` as const;
 
-  // One path segment, whatever the name holds: `release/1.x` included. The
-  // rule's premise, building a query string, is not what this is.
-  // eslint-disable-next-line no-restricted-globals
-  const segment = encodeURIComponent(branch);
-
-  const [rules, branchAnswer] = await Promise.all([
-    getJson(
-      `${repoRoute}/rules/branches/${segment}?per_page=${RULES_PER_PAGE}`,
-      RulesSchema,
-      `the rules on ${branch}`,
-      token,
-      fetchImpl,
-    ),
-    getJson(
-      `${repoRoute}/branches/${segment}`,
-      BranchSchema,
-      `the protection of ${branch}`,
-      token,
-      fetchImpl,
-    ),
-  ]);
-
-  if (Result.isErr(rules)) {
-    return rules;
-  }
-
-  if (Result.isErr(branchAnswer)) {
-    return branchAnswer;
-  }
-
-  const fromRulesets = requirementsOfRules(rules.value);
-
-  const classic = branchAnswer.value.protection?.required_status_checks;
-
-  return Result.ok({
-    ...fromRulesets,
-    requiredContexts: Arr.uniq([
-      ...fromRulesets.requiredContexts,
-      ...(classic === undefined || classic.enforcement_level === 'off'
-        ? []
-        : classic.contexts),
-    ]),
-  });
+  return readBranchRequirements(branch, async (path, schema, what) =>
+    getJson(`${repoRoute}${path}`, schema, what, token, fetchImpl),
+  );
 };
-
-/**
- * As many rules as a page holds. Each ruleset contributes a handful, so a
- * branch with more than a hundred is not one a person keeps.
- */
-const RULES_PER_PAGE = 100;
-
-const RulesSchema = t.array(t.unknown());
-
-const BranchSchema = t.record({
-  protection: t.optional(
-    t.record({
-      required_status_checks: t.optional(
-        t.record({
-          enforcement_level: t.string(),
-          contexts: t.array(t.string()),
-        }),
-      ),
-    }),
-  ),
-});
 
 /** As `workflow-runs.mts` words them. */
 const refusal = (response: Response, what: string): string =>

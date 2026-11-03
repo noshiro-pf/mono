@@ -5,10 +5,10 @@ import {
   closingIssuesIn,
   epochMsOf,
   parseMergeAfter,
+  readBranchRequirements,
   readQueueComments,
   referenceStatusOf,
   reportedContexts,
-  requirementsOfRules,
   waitsFor,
   type CheckRunReport,
   type Comparison,
@@ -230,7 +230,8 @@ export type Client = Readonly<{
   defaultBranch: (repo: RepoRef) => Promise<Result<string, string>>;
   /**
    * The contexts GitHub requires on `branch`, every ruleset that applies to it
-   * together (`pr-report-core`'s `requirementsOfRules`).
+   * and a classic branch protection rule together (`pr-report-core`'s
+   * `readBranchRequirements`).
    */
   requiredContexts: (
     repo: RepoRef,
@@ -612,22 +613,13 @@ export const createClient = (
         : Result.ok(answered.value.default_branch);
     },
 
-    requiredContexts: async (repo, branch) => {
-      // One path segment, whatever the name holds: `release/1.x` included.
-      // The rule's premise, building a query string, is not what this is.
-      // eslint-disable-next-line no-restricted-globals
-      const segment = encodeURIComponent(branch);
-
-      const answered = await getJson(
-        `/repos/${repo.owner}/${repo.name}/rules/branches/${segment}`,
-        t.array(t.unknown()),
-      );
-
-      return Result.map(
-        answered,
-        (rules) => requirementsOfRules(rules).requiredContexts,
-      );
-    },
+    requiredContexts: async (repo, branch) =>
+      Result.map(
+        await readBranchRequirements(branch, async (path, schema) =>
+          getJson(`/repos/${repo.owner}/${repo.name}${path}`, schema),
+        ),
+        ({ requiredContexts }) => requiredContexts,
+      ),
 
     queueComments: async (repo, defaultBranch, pulls) => {
       // Without a token this is refused, and nothing is trusted.

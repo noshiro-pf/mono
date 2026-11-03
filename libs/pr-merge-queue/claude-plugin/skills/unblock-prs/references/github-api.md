@@ -111,18 +111,25 @@ Read by hand, this is what to watch for:
   `started_at` calls a blocked pull request green.
 
 `pr-report` reads the required contexts from GitHub's rules for the default
-branch — or from `repo-settings/rulesets/main.json` where a repository keeps
-its rulesets as code, which is the desired state: a context in it that has not
-been applied yet is required by nothing. When the difference matters, ask
-GitHub:
+branch — or from `repo-settings/rulesets/main.json` where a repository keeps its
+rulesets as code, which is the desired state: a context in it that has not been
+applied yet is required by nothing. When the difference matters, ask
+GitHub, as `pr-report-core`'s `readBranchRequirements` does: every ruleset's
+rules, and the contexts a classic branch protection rule requires.
 
 ```bash
-gh_api 'repos/<owner>/<repo>/rules/branches/<base>' | python3 -c '
+gh_api 'repos/<owner>/<repo>/rules/branches/<base>?per_page=100' | python3 -c '
 import json, sys
 for rule in json.load(sys.stdin):
     if rule.get("type") == "required_status_checks":
         for check in rule["parameters"]["required_status_checks"]:
             print(check["context"])'
+gh_api 'repos/<owner>/<repo>/branches/<base>' | python3 -c '
+import json, sys
+protection = json.load(sys.stdin).get("protection") or {}
+checks = protection.get("required_status_checks") or {}
+if protection.get("enabled") is not False and checks.get("enforcement_level") != "off":
+    print("\n".join(checks.get("contexts", [])))'
 ```
 
 ## The open pull request for a branch
