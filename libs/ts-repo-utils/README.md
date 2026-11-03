@@ -181,7 +181,7 @@ generated, and its parent still re-exports it.
 
 ### `check-should-run`
 
-Checks whether a CI step should run, based on which files differ from the base branch. Reports `false` when every changed file matches one of the `--paths-ignore` patterns, so a step can be skipped when nothing it checks has changed.
+Checks whether a CI step should run, based on which files differ from the base branch. Reports `false` when every changed file matches one of the `--paths-ignore` patterns, so a step can be skipped when nothing it checks has changed. A deleted file counts as changed, and so does the old path of a renamed one, so a diff that only deletes or moves source still runs the step.
 
 Prefer this over a workflow-level `paths-ignore` trigger filter: a workflow that a path filter skips never reports a status check, so a pull request that changed only the filtered paths waits forever on a required check that never arrives. Gating the individual steps keeps the workflow running — and reporting — while doing no work.
 
@@ -227,7 +227,7 @@ When running in GitHub Actions, the command appends `should_run=true` or `should
 
 Checks whether TypeScript type checks should run based on file changes from the base branch. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files have changed. The determination of "non-TypeScript files" is based on configurable ignore patterns, which can be specified using the `--paths-ignore` option.
 
-This is [`check-should-run`](#check-should-run) with a default ignore list of the files a TypeScript project typically has but never type-checks. For a step that is not a type check, use `check-should-run` and state its paths.
+This is [`check-should-run`](#check-should-run) with a default ignore list of the files a TypeScript project typically has but never type-checks. For a step that is not a type check, use `check-should-run` and state its paths. As there, a deleted file counts as changed, and so does the old path of a renamed one.
 
 ```bash
 # Basic usage (compares against origin/main)
@@ -525,17 +525,19 @@ Runs `git ls-files --others --exclude-standard [--deleted]`
 ##### `getModifiedFiles(options?)`
 
 Gets modified files from the working tree (files that have been changed but not staged).  
-Runs `git diff --name-only [--diff-filter=d]`
+Runs `git diff --name-only -z --diff-filter=d`, or `git diff --name-only -z --no-renames` with `excludeDeleted: false`
 
 ##### `getStagedFiles(options?)`
 
 Gets files that are staged for commit (files added with git add).  
-Runs `git diff --staged --name-only [--diff-filter=d]`
+Runs `git diff --staged --name-only -z --diff-filter=d`, or `git diff --staged --name-only -z --no-renames` with `excludeDeleted: false`, which reports a staged rename under both its old path and its new one
 
 ##### `getDiffFrom(base: string, options?)`
 
 Gets files that differ from the specified base branch or commit.  
-Runs `git diff --name-only [--diff-filter=d] <base> --`
+Runs `git diff --name-only -z --diff-filter=d <base> --`, or `git diff --name-only -z --no-renames <base> --` with `excludeDeleted: false`
+
+With `excludeDeleted: false`, a renamed file is reported under both its old path and its new one; otherwise only the new path is.
 
 `base` names exactly one revision. It reaches `git` as a single argument and never as part of a command line, so whatever it contains is read as the name of a revision and nothing else; a `base` git cannot resolve comes back as an `Err`. A `base` beginning with `-` is rejected without invoking git, since git would read it as an option.
 
@@ -560,12 +562,12 @@ type Ret = Result<
 
 ##### `checkShouldRun(options?): Promise<boolean>`
 
-Checks whether a CI step should run, based on which files differ from the base branch. Reports `false` when every changed file matches one of the ignored patterns.
+Checks whether a CI step should run, based on which files differ from the base branch. Reports `false` when every changed file matches one of the ignored patterns. A deleted file counts as changed, and so does the old path of a renamed one.
 (Function version of the `check-should-run` command)
 
 ##### `checkShouldRunTypeChecks(options?): Promise<boolean>`
 
-`checkShouldRun` with a default ignore list of the files a TypeScript project typically has but never type-checks. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files have changed.
+`checkShouldRun` with a default ignore list of the files a TypeScript project typically has but never type-checks, and the same reading of deleted and renamed files. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files have changed.
 (Function version of the `check-should-run-type-checks` command)
 
 ```tsx
