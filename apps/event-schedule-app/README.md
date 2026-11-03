@@ -26,6 +26,14 @@ user id. `emulators` builds the functions in
 first and keeps the emulators' data in `emulator-data/` between runs; run that
 package's `watch:build` to have the emulator pick up changes to the functions.
 
+Both scripts run the emulators under the project id `demo-event-schedule-app`
+rather than `.firebaserc`'s production `event-schedule-app`, and the app names
+the same id to them; `emulatorProjectId` in `src/api/emulator-mode.mts` says
+why. Start the emulators through these scripts: a bare
+`firebase emulators:start` runs them under `.firebaserc`'s id, which the app
+does not call. Data saved in `emulator-data/` under the old id is imported under
+the new one.
+
 The switch is `VITE_FIREBASE_EMULATORS`, which `.env.development` sets to
 `true`. To try the production Firebase from the dev server, set it to anything
 else, in an untracked `.env.development.local` (`VITE_FIREBASE_EMULATORS=false`)
