@@ -1,5 +1,30 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.4.0
+
+### Minor Changes
+
+- a48864f: `eslint-config-typed`: add `ts-restrictions/no-detached-jsdoc` (`error` in the TypeScript config), which reports a `/** … */` block that TypeScript attaches to no node — one left above another block, at the end of a file or a block, inside an expression, on a JSX attribute or a call argument — so that an editor shows it nowhere. A top-level block with only imports before it and a blank line after it, or with `@module` / `@packageDocumentation` / `@file` / `@fileoverview`, is left alone as the module's documentation. The generated rule option types no longer leave their `### schema` block detached above the `Options` description: the two are one block.
+
+    `ts-data-forge`: the documentation of `NumberClass` in the refined number utilities is attached to it again.
+
+- fa51571: Add two rules to `react-coding-style`, both on in `eslintConfigForReact`. `react-coding-style/require-use-memo` reports a value declared directly in a React component or custom hook body that is computed again on every render: anything but a primitive O(1) expression (property access, operators, template literals, hook calls, and calls of `Math.*`, `Number`, `Number.*`, `String`, `Boolean`, `Object.is`, `*.toFixed` and `*.toString`; more through `allowedCalls`) must be wrapped in `React.useMemo` / `React.useCallback` or moved out of the component. `react-coding-style/single-jsx-return` reports a function that returns JSX, or a component, with more than one `return` statement; branch inside the one returned expression instead. The cases of a final `switch` count as one return. Both take `componentWrappers` for higher order components such as `memoNamed`, which the preset sets.
+
+### Patch Changes
+
+- 1f78470: `import-x/no-internal-modules` allows `ts-data-forge/array`, the subpath ts-data-forge now exports for bundles that should keep only the `Arr` functions they call.
+- d567a6a: `import-x/no-internal-modules` allows `ts-data-forge/number`, the subpath ts-data-forge now exports for bundles that should keep only the `Num` functions they call.
+- 972a573: Turn off two rules whose `--fix` changed or broke the code. `promise/prefer-catch` rewrote `p.then(a, b)` into `p.catch(b).then(a)`, which calls `a` after a rejection too; `unicorn/prefer-then-catch` still reports `.then(a, b)` on a standard `Promise` and only suggests a rewrite; `.then(null, b)`, a `Readonly<Promise<T>>` receiver and other thenables are no longer reported. `unicorn/prefer-iterator-concat` rewrote `new Map([...a, ...b])` into `new Map(Iterator.concat(a, b))`, which Node.js 22 does not have and the TypeScript standard library does not declare (TS2339).
+- 67bd429: `ts-restrictions/prefer-optional-chain-over-ternary` no longer reports, or fixes, a ternary whose access goes through a parenthesized `as`, `satisfies` or optional chain between its links, such as `x == null ? undefined : (x.b as T).c`. The fix spliced `?.` in after `x`, giving `(x?.b as T).c`, and the parentheses end the optional chain, so for a nullish `x` the fixed code read `.c` of `undefined` and threw where the ternary gave `undefined`. A wrapper around the whole access, and a `!` anywhere, are still looked through.
+- 66f1ce3: `ts-restrictions/prefer-ternary` no longer puts a `;` before its fix when the `if` is the braceless body of a `for`, `while`, `if` or label. There the token before the `if` is that statement's head, so the `;` became the whole body and the folded assignment ran once after it: `for (const k of ks) if (c) (o as T).p = 1; else (o as T).p = 2;` was fixed into `for (const k of ks) ;(o as T).p = c ? 1 : 2;`. The `;` is now added only to a statement in a statement list, where it can join the line before.
+- Updated dependencies [e9420e9]
+- Updated dependencies [01dc5be]
+- Updated dependencies [a48864f]
+- Updated dependencies [1f78470]
+- Updated dependencies [d567a6a]
+    - ts-data-forge@14.11.0
+    - eslint-rule-forge@0.5.1
+
 ## 7.3.1
 
 ### Patch Changes

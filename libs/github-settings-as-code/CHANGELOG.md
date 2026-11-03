@@ -1,5 +1,21 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 4.0.6
+
+### Patch Changes
+
+- f523ca5: `apply` for rulesets and environments now reads only the `*.json` files of `repo-settings/rulesets/` and `repo-settings/environments/`. It parsed every file there, so a README beside the declarations made it throw a `SyntaxError` before sending anything, although `backup` already left such a file alone. Both readers and `clearJsonFilesIn` now pick the declaration files through the new `listJsonFilesIn`, and `readRulesetFilesIn` / `readEnvironmentFilesIn` read a given directory.
+- Updated dependencies [e9420e9]
+- Updated dependencies [2731308]
+- Updated dependencies [a48864f]
+- Updated dependencies [8859dc2]
+- Updated dependencies [1f78470]
+- Updated dependencies [d567a6a]
+- Updated dependencies [27bc91d]
+    - ts-data-forge@14.11.0
+    - ts-repo-utils@10.7.2
+    - ts-fortress@12.4.3
+
 ## 4.0.5
 
 ### Patch Changes

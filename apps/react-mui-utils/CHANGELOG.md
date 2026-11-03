@@ -1,5 +1,18 @@
 # react-mui-utils
 
+## 0.0.22
+
+### Patch Changes
+
+- Updated dependencies [e9420e9]
+- Updated dependencies [a48864f]
+- Updated dependencies [1f78470]
+- Updated dependencies [d567a6a]
+    - ts-data-forge@14.11.0
+    - react-utils@0.0.25
+    - react-utils-styled@0.0.25
+    - better-react-use-state@1.0.1
+
 ## 0.0.21
 
 ### Patch Changes

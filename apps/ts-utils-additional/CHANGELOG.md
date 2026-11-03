@@ -1,5 +1,15 @@
 # ts-utils-additional
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [e9420e9]
+- Updated dependencies [a48864f]
+- Updated dependencies [1f78470]
+- Updated dependencies [d567a6a]
+    - ts-data-forge@14.11.0
+
 ## 0.0.9
 
 ### Patch Changes

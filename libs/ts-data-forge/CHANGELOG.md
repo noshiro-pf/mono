@@ -1,5 +1,22 @@
 # ts-data-forge
 
+## 14.11.0
+
+### Minor Changes
+
+- 1f78470: Add the `ts-data-forge/array` subpath, which exports the functions of `Arr` one by one: `import * as Arr from 'ts-data-forge/array'` keeps the call sites as they are, and esbuild then keeps only the functions a bundle calls, with what they use. Imported from the package root, `Arr` is kept whole by esbuild once any member is used (`Arr.isNonEmpty` alone is about 26 kB minified, 7.5 kB gzipped; through the subpath it is under 0.1 kB). Some `Arr` functions still use `Num` or the branded-number helpers, which esbuild keeps whole together with the ts-std-forge `Optional` and `Result` they use (about 3.6 kB gzipped for `Arr.filter`). `Obj` no longer goes through `Arr`, so a bundle that uses `Obj` in esbuild drops from 8.0 to 1.4 kB gzipped. `import { Arr } from 'ts-data-forge'` is unchanged.
+- d567a6a: Add the `ts-data-forge/number` subpath, which exports the functions of `Num` one by one, as `ts-data-forge/array` does for `Arr`: `import * as Num from 'ts-data-forge/number'` keeps the call sites as they are, and a bundle keeps only the functions it calls. The `is*` and `as*` function of every branded number type (`isUint32`, `asSafeUint`, …) is now defined on its own instead of being taken from the shared operator factory, so a bundle that calls one no longer keeps the factory, `Num` and the ts-std-forge `Optional` and `Result` (esbuild, gzipped: `asUint32` 3.5 → 0.2 kB; Vite: 1.5 → 0.2 kB). The `Arr` functions that used them follow: through `ts-data-forge/array`, `Arr.filter` drops from 3.6 to 0.2 kB in esbuild and from 1.6 to 0.2 kB in Vite. The branded-number objects (`Uint32`, `SafeUint`, …) and `import { Num } from 'ts-data-forge'` are unchanged.
+
+### Patch Changes
+
+- e9420e9: Drop the runtime dependency on `@sindresorhus/is`. The six guards these packages used from it (`isError`, `isDate`, `isRegExp`, `isMap`, `isSet`, `isTypedArray`) are now a few lines of their own that read the same `Object.prototype.toString` tag, so they answer as before, across realms included. `@sindresorhus/is` stayed mostly whole in a bundle that used any one of them: a bundle that reaches `fastDeepEqual`, `replaceEqualDeep`, `unknownToString`, `Result.fromThrowable` or the panic helpers is about 12 kB smaller minified (about 3 kB gzipped).
+- a48864f: `eslint-config-typed`: add `ts-restrictions/no-detached-jsdoc` (`error` in the TypeScript config), which reports a `/** … */` block that TypeScript attaches to no node — one left above another block, at the end of a file or a block, inside an expression, on a JSX attribute or a call argument — so that an editor shows it nowhere. A top-level block with only imports before it and a blank line after it, or with `@module` / `@packageDocumentation` / `@file` / `@fileoverview`, is left alone as the module's documentation. The generated rule option types no longer leave their `### schema` block detached above the `Options` description: the two are one block.
+
+    `ts-data-forge`: the documentation of `NumberClass` in the refined number utilities is attached to it again.
+
+- Updated dependencies [e9420e9]
+    - ts-std-forge@0.5.3
+
 ## 14.10.2
 
 ### Patch Changes
