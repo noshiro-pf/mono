@@ -1,7 +1,6 @@
 import * as path from 'node:path';
 import { type UnknownResult, unknownToString } from 'ts-data-forge';
 import { $, assertPathExists, isDirectlyExecuted, Result } from 'ts-repo-utils';
-import { genTypeDefinitions } from '../functions/index.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 import { embedExamplesInJsDoc } from './embed-examples-in-jsdoc.mjs';
 import { embedExamples } from './embed-examples.mjs';
@@ -31,16 +30,6 @@ export const genDocs = async (): Promise<void> => {
     action: () =>
       runStep(embedExamplesInJsDoc(), 'Example embedding into JSDoc failed'),
     successMessage: 'Example code embedded into JSDoc',
-  });
-
-  await logStep({
-    startMessage: 'Refreshing README type listing',
-    action: () =>
-      runStep(
-        Result.fromPromise(genTypeDefinitions()),
-        'Failed to regenerate README type listing',
-      ),
-    successMessage: 'README type listing refreshed',
   });
 
   await logStep({

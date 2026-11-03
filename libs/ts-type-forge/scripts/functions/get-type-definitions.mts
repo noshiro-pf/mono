@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr } from 'ts-data-forge';
-import { glob, Result } from 'ts-repo-utils';
+import { Arr, unknownToString } from 'ts-data-forge';
+import { formatFiles, glob, Result } from 'ts-repo-utils';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 import { extractTypeExports } from './extract-type-exports.mjs';
 
@@ -32,10 +32,11 @@ type FileEntry = Readonly<{
 export const genTypeDefinitions = async (): Promise<void> => {
   const filesResult = await glob(`${srcDir}/**/*.mts`);
 
+  // A listing written from what could be read would be committed as current.
   if (Result.isErr(filesResult)) {
-    console.error(filesResult.value);
-
-    return;
+    throw new Error(
+      `Failed to list ${srcDir}: ${unknownToString(filesResult.value)}`,
+    );
   }
 
   const filesToList = filesResult.value.filter((p) => {
@@ -68,50 +69,67 @@ export const genTypeDefinitions = async (): Promise<void> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const content = await fs.readFile(readmePath, 'utf8');
 
-  const newContent = content.replaceAll(
-    // eslint-disable-next-line security/detect-non-literal-regexp
-    new RegExp(String.raw`${markers.start}[.\s\S]*${markers.end}`, 'gu'),
+  // eslint-disable-next-line security/detect-non-literal-regexp
+  const listing = new RegExp(
+    String.raw`${markers.start}[.\s\S]*${markers.end}`,
+    'u',
+  );
+
+  // Without its markers the README would be written back unchanged, a stale
+  // listing kept as current.
+  if (!listing.test(content)) {
+    throw new Error(
+      `${readmePath} has no ${markers.start} … ${markers.end} block to write the type listing into.`,
+    );
+  }
+
+  const newContent = content.replace(
+    listing,
     () => `${markers.start}\n${result}\n\n${markers.end}`,
   );
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(readmePath, newContent, 'utf8');
+
+  const formatted = await formatFiles([readmePath]);
+
+  if (Result.isErr(formatted)) {
+    throw new Error(
+      `Failed to format ${readmePath}: ${unknownToString(formatted.value)}`,
+    );
+  }
 };
+
+/**
+ * Whether an export is a `TSTypeForgeInternals_`-prefixed one (e.g.
+ * `TSTypeForgeInternals_SmallIntIndexMax`), which may live alongside public
+ * types in a regular module file: an internal opt-in helper, not part of the
+ * user-facing surface.
+ */
+const isInternal = (name: string): boolean =>
+  name.startsWith('TSTypeForgeInternals_');
 
 const collectExports = async (filePath: string): Promise<FileEntry> => {
   const relativePath = path.relative(workspaceRootPath, filePath);
 
-  try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const content = await fs.readFile(filePath, 'utf8');
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  const content = await fs.readFile(filePath, 'utf8');
 
-    const { types, namespaces } = extractTypeExports(content);
+  const { types, namespaces } = extractTypeExports(content);
 
-    // Skip `TSTypeForgeInternals_`-prefixed exports (e.g.
-    // `TSTypeForgeInternals_SmallIntIndexMax`) that may live alongside public
-    // types in a regular module file — they're internal opt-in helpers, not
-    // part of the user-facing surface.
-    const isInternal = (name: string): boolean =>
-      name.startsWith('TSTypeForgeInternals_');
-
-    const flat: readonly TypeEntry[] = [
-      ...types
+  const flat: readonly TypeEntry[] = [
+    ...types
+      .filter(({ name }) => !isInternal(name))
+      .map(({ name, line }) => ({ typeName: name, line })),
+    ...namespaces.flatMap((ns) =>
+      ns.types
         .filter(({ name }) => !isInternal(name))
-        .map(({ name, line }) => ({ typeName: name, line })),
-      ...namespaces.flatMap((ns) =>
-        ns.types
-          .filter(({ name }) => !isInternal(name))
-          .map(({ name, line }) => ({
-            typeName: `${ns.name}.${name}`,
-            line,
-          })),
-      ),
-    ].toSorted((a, b) => a.line - b.line);
+        .map(({ name, line }) => ({
+          typeName: `${ns.name}.${name}`,
+          line,
+        })),
+    ),
+  ].toSorted((a, b) => a.line - b.line);
 
-    return { relativePath, types: flat };
-  } catch (error) {
-    console.error(`Error processing file ${filePath}:`, error);
-
-    return { relativePath, types: [] };
-  }
+  return { relativePath, types: flat };
 };
