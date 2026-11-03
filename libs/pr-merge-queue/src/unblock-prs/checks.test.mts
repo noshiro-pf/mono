@@ -170,6 +170,32 @@ describe(summarizeChecks, () => {
     assert.deepStrictEqual(summary.failedRuns, []);
   });
 
+  // #2772: a check run still queued has no start time, and a placeholder for
+  // it read as year 1 put the round's start before every red.
+  test('waits on a required check that failed before the round began while a running check is still queued', () => {
+    const { running: stillRunning } = headChecksOf([
+      checkRun('code-check (ws:fix:lint)', 'IN_PROGRESS', null),
+      checkRun('code-check (ws:check:types)', 'QUEUED', null, null),
+    ]);
+
+    const summary = summarizeChecks(
+      [
+        check('code-check-result / result', 'cancel', {
+          completedAt: '2026-10-25T09:00:00Z',
+        }),
+        check('no-skip-ci-label'),
+      ],
+      required,
+      stillRunning,
+    );
+
+    assert.strictEqual(summary.verdict, 'pending');
+
+    assert.deepStrictEqual(summary.failedRuns, []);
+
+    assert.deepStrictEqual(summary.pending, ['code-check-result / result']);
+  });
+
   test('fails on a required check whose workflow is still running in the same run', () => {
     const summary = summarizeChecks(
       [
@@ -311,7 +337,7 @@ const check = (
   name: string,
   bucket: string = 'pass',
   {
-    completedAt = '',
+    completedAt,
     workflow = '',
     runId,
   }: Readonly<{
@@ -332,7 +358,7 @@ const check = (
 
 const running = (
   name: string,
-  startedAt: string = '',
+  startedAt?: string,
   {
     workflow = '',
     runId,
@@ -341,8 +367,6 @@ const running = (
   ({ name, startedAt, workflow, link: linkOf(name, runId) }) as const;
 
 describe(reportedChecksOf, () => {
-  const ZERO = '0001-01-01T00:00:00Z';
-
   test('sorts a check run into the bucket `gh pr checks` would', () => {
     const buckets = reportedChecksOf(
       [
@@ -394,13 +418,15 @@ describe(reportedChecksOf, () => {
         startedAt,
         completedAt,
       })),
-      [
-        ['no-skip-ci-label', 'pass'],
-        ['x', 'fail'],
-        ['y', 'fail'],
-        ['z', 'pending'],
-        ['w', 'pending'],
-      ].map(([name, bucket]) => ({
+      (
+        [
+          ['no-skip-ci-label', 'pass'],
+          ['x', 'fail'],
+          ['y', 'fail'],
+          ['z', 'pending'],
+          ['w', 'pending'],
+        ] as const
+      ).map(([name, bucket]) => ({
         name,
         bucket,
         link: '',
@@ -410,15 +436,18 @@ describe(reportedChecksOf, () => {
     );
   });
 
-  test("writes GitHub's zero time for a time not reached yet", () => {
+  // #2772: a placeholder time parsed as a real one, in year 1.
+  test('leaves a time not reached yet undefined', () => {
     const [queued] = reportedChecksOf(
       [checkRun('i', 'QUEUED', null, null)],
       'all',
     );
 
-    assert.strictEqual(queued?.startedAt, ZERO);
+    assert.isDefined(queued);
 
-    assert.strictEqual(queued?.completedAt, ZERO);
+    assert.isUndefined(queued.startedAt);
+
+    assert.isUndefined(queued.completedAt);
   });
 
   test('keeps only the latest run of a job in one workflow and event', () => {
@@ -499,7 +528,7 @@ describe(headChecksOf, () => {
       },
       {
         name: 'c',
-        startedAt: '0001-01-01T00:00:00Z',
+        startedAt: undefined,
         workflow: 'code-check',
         link: 'https://example.com/c',
       },
