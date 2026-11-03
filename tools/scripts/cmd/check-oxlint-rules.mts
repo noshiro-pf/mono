@@ -1,6 +1,6 @@
 import { parseForESLint } from '@typescript-eslint/parser';
 import { ESLint, type Linter } from 'eslint';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -21,7 +21,7 @@ import {
   oxlintConfig,
   toOxlintRuleName,
 } from '../../configs/oxlint-rules.mjs';
-import { readRepositoryFile } from '../lib/repo-files.mjs';
+import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -40,14 +40,25 @@ import { projectRootPath } from '../project-root-path.mjs';
  * `eslint.config.mts` imports the plugins by name.
  */
 export const checkOxlintRules = async (): Promise<Result<number, string>> => {
-  const packageDirs = await listLintedPackages();
+  const trackedFiles = await listTrackedFiles();
 
-  const perPackage = await Promise.all(packageDirs.map(checkPackage));
+  if (Result.isErr(trackedFiles)) {
+    return trackedFiles;
+  }
+
+  const packageDirs = await listLintedPackages(trackedFiles.value);
+
+  const perPackage = await Promise.all(
+    packageDirs.map((dir) => checkPackage(dir, trackedFiles.value)),
+  );
 
   const violations = [
     ...perPackage.flatMap(({ problems }) => problems),
     ...describeMismatches(perPackage.flatMap(({ mismatches }) => mismatches)),
-    ...(await findEslintDisableDirectives()),
+    ...(await findEslintDisableDirectives(
+      packageDirs,
+      new Set(perPackage.flatMap(({ lintedFiles }) => lintedFiles)),
+    )),
   ] as const;
 
   if (Arr.isNonEmpty(violations)) {
@@ -121,6 +132,13 @@ const lintedExtensions = /\.(?:[cm]?[jt]s|[jt]sx)$/u;
 type PackageResult = Readonly<{
   problems: readonly string[];
   mismatches: readonly Mismatch[];
+  /**
+   * The files, relative to the repository root, the package's ESLint lints.
+   * None when its configuration does not end with the off block, which is
+   * reported: there ESLint still applies the moved rules, so a directive naming
+   * one is not unused.
+   */
+  lintedFiles: readonly string[];
 }>;
 
 /** A moved rule ESLint would apply otherwise, at the first file found. */
@@ -156,19 +174,16 @@ const readScripts = async (
     : {};
 };
 
-const git = (
-  args: readonly string[],
-  cwd: string = projectRootPath,
-): readonly string[] =>
-  execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 2 ** 28 })
-    .split('\n')
-    .filter((line) => line !== '');
-
 /** The packages `ws:fix:lint` reaches: every member with a `fix:lint`. */
-const listLintedPackages = async (): Promise<readonly string[]> => {
-  const manifests = git(['ls-files', '*/package.json'])
-    .filter((file) => !file.startsWith('experimental/'))
-    .map(path.dirname);
+const listLintedPackages = async (
+  trackedFiles: readonly string[],
+): Promise<readonly string[]> => {
+  const manifests = trackedFiles
+    .filter(
+      (file) =>
+        file.endsWith('/package.json') && !file.startsWith('experimental/'),
+    )
+    .map(path.posix.dirname);
 
   const withFixLint = await Promise.all(
     manifests.map(async (dir) =>
@@ -223,32 +238,38 @@ const isSameEntry = (actual: unknown, expected: unknown): boolean => {
 const checkResolvedRules = async (
   dir: string,
   configs: readonly unknown[],
+  trackedFiles: readonly string[],
 ): Promise<PackageResult> => {
-  const cwd = path.join(projectRootPath, dir);
-
+  // Without the off block, which turns rules off and ignores nothing, so this
+  // ESLint also ignores what the package's own does.
   const eslint = new ESLint({
-    cwd,
+    cwd: path.join(projectRootPath, dir),
     overrideConfigFile: true,
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the array a package's `eslint.config.mts` exports, which ESLint validates
     overrideConfig: Array.from(configs as readonly Linter.Config[]),
   });
 
-  const files = git(['ls-files'], cwd).filter((file) =>
-    lintedExtensions.test(file),
+  const files = trackedFiles.filter(
+    (file) => file.startsWith(`${dir}/`) && lintedExtensions.test(file),
   );
 
   const mut_mismatches = new Map<string, Mismatch>();
 
   const mut_hiddenFiles: string[] = [];
 
-  for (const file of files) {
-    const absolute = path.join(cwd, file);
+  const mut_lintedFiles: string[] = [];
 
-    if (await eslint.isPathIgnored(absolute)) {
+  for (const file of files) {
+    const absolute = path.join(projectRootPath, file);
+
+    // `undefined` for a file ESLint ignores, as `isPathIgnored` reads it.
+    const resolved: unknown = await eslint.calculateConfigForFile(absolute);
+
+    if (resolved === undefined) {
       continue;
     }
 
-    const resolved: unknown = await eslint.calculateConfigForFile(absolute);
+    mut_lintedFiles.push(file);
 
     const rules: unknown =
       isRecord(resolved) && hasKey(resolved, 'rules')
@@ -259,14 +280,12 @@ const checkResolvedRules = async (
       continue;
     }
 
-    const repoRelative = path.join(dir, file);
-
     if (
       oxlintConfig.ignorePatterns.some((pattern) =>
-        path.matchesGlob(repoRelative, pattern),
+        path.matchesGlob(file, pattern),
       )
     ) {
-      mut_hiddenFiles.push(repoRelative);
+      mut_hiddenFiles.push(file);
     }
 
     for (const ruleId of movedRuleIds) {
@@ -277,7 +296,7 @@ const checkResolvedRules = async (
       if (!isSameEntry(rules[ruleId], ruleEntry(ruleId))) {
         mut_mismatches.set(ruleId, {
           ruleId,
-          file: repoRelative,
+          file,
           actual: rules[ruleId] ?? 'off',
         });
       }
@@ -290,10 +309,14 @@ const checkResolvedRules = async (
         `${file}: ESLint lints it, but an \`ignorePatterns\` entry keeps oxlint from it.`,
     ),
     mismatches: Array.from(mut_mismatches.values()),
+    lintedFiles: mut_lintedFiles,
   };
 };
 
-const checkPackage = async (dir: string): Promise<PackageResult> => {
+const checkPackage = async (
+  dir: string,
+  trackedFiles: readonly string[],
+): Promise<PackageResult> => {
   const scripts = await readScripts(dir);
 
   const scriptViolations = Arr.generate(function* () {
@@ -325,17 +348,19 @@ const checkPackage = async (dir: string): Promise<PackageResult> => {
         `${dir}/eslint.config.mts: the exported array must end with \`eslintConfigOffForOxlint\`.`,
       ),
       mismatches: [],
+      lintedFiles: [],
     };
   }
 
   const resolved = await checkResolvedRules(
     dir,
     configs.filter((config) => config !== eslintConfigOffForOxlint),
+    trackedFiles,
   );
 
   return {
+    ...resolved,
     problems: [...scriptViolations, ...resolved.problems],
-    mismatches: resolved.mismatches,
   };
 };
 
@@ -375,8 +400,21 @@ const gitGrep = (args: readonly string[]): readonly string[] => {
   return result.stdout.split('\0').filter((entry) => entry !== '');
 };
 
-/** An `eslint-disable` comment that names a moved rule anywhere ESLint lints. */
-const findEslintDisableDirectives = async (): Promise<readonly string[]> => {
+/**
+ * An `eslint-disable` comment that names a moved rule in a file ESLint lints.
+ * A file every package's ESLint ignores is left out: ESLint never reads it, so
+ * never reports a directive there as unused nor deletes it, and a fixture there
+ * need not parse.
+ */
+const findEslintDisableDirectives = async (
+  packageDirs: readonly string[],
+  lintedFiles: ReadonlySet<string>,
+): Promise<readonly string[]> => {
+  // With no pathspec, `git grep` would read the whole tree.
+  if (!Arr.isNonEmpty(packageDirs)) {
+    return [];
+  }
+
   const moved = new Set(movedRuleIds);
 
   // Whole files, not grep lines: a block directive's rule list can start on the
@@ -387,10 +425,8 @@ const findEslintDisableDirectives = async (): Promise<readonly string[]> => {
     '--fixed-strings',
     'eslint-disable',
     '--',
-    ':(glob)apps/**',
-    ':(glob)libs/**',
-    ':(glob)languages/**',
-  ]).filter((file) => lintedExtensions.test(file));
+    ...packageDirs.map((dir) => `:(literal)${dir}/`),
+  ]).filter((file) => lintedFiles.has(file));
 
   const perFile = await Promise.all(
     files.map(async (file) => {
