@@ -65,12 +65,7 @@ export const answerSelectionReducer: Reducer<
           }))
         : state.set(action.datetimeRange, {
             point: action.point,
-            iconId:
-              action.point === 0
-                ? 'good'
-                : action.point === 10
-                  ? 'poor'
-                  : 'fair',
+            iconId: 'fair',
             comment: '',
           });
 
