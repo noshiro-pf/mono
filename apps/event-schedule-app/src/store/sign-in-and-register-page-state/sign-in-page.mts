@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import { combine, filter, map, type InitializedObservable } from 'synstate';
 import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
@@ -47,7 +46,7 @@ export const createSignInPageStore = (deps: SignInPageDeps): SignInPage => {
     filter((isPage) => !isPage),
   );
 
-  const [, dispatch, { state: formState$ }] = createReducerWithActions(
+  const [formState$, dispatch] = createReducerWithActions(
     signInPageStateReducer,
     signInPageInitialState,
     [left$.pipe(map(() => ({ type: 'reset' }) as const))],

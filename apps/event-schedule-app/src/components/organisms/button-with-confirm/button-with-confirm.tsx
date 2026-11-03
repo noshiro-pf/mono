@@ -1,137 +1,126 @@
-import { useBoolState } from 'better-react-use-state';
-import * as React from 'react';
-import { ButtonNowrapStyled } from 'react-blueprintjs-utils';
-import { memoNamed, useAlive } from 'react-utils';
+import { Button, type IconName, type IconName20 } from 'blueprint-synstate';
+import { createState, onScopeDispose } from 'synstate';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { hasKey, isRecord } from 'ts-data-forge';
-import type { DeepReadonly } from 'ts-type-forge';
 import { createToaster, showToast } from '../../../functions/index.mjs';
+import { nowrapClass } from '../../styled/index.mjs';
 import { ConfirmDialog } from './confirm-dialog.js';
 
-type Props = DeepReadonly<{
+type Props = Readonly<{
   onConfirmClick: (() => Promise<void>) | (() => void);
-  disabled?: boolean;
-  loading?: boolean;
-  buttonConfig: {
+  disabled?: Bindable<boolean>;
+  loading?: Bindable<boolean>;
+  buttonConfig: Readonly<{
     name: string | undefined;
     intent?: Intent;
     icon?: IconName;
-    color?: string;
     minimal?: boolean;
-  };
-  dialogConfig: {
-    icon?: IconName;
+  }>;
+  dialogConfig: Readonly<{
+    icon?: IconName20;
     intent?: Intent;
     message: string;
     description?: string;
     cancelButtonText: string;
     confirmButtonText: string;
-  };
-  toastConfig?: { message: string; intent: Intent };
+  }>;
+  toastConfig?: Readonly<{ message: string; intent: Intent }>;
 }>;
 
 const toast = createToaster();
 
-export const ButtonWithConfirm = memoNamed<Props>(
-  'ButtonWithConfirm',
-  ({
-    onConfirmClick,
-    disabled,
-    loading,
-    buttonConfig,
-    dialogConfig,
-    toastConfig,
-  }) => {
-    const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
-      useBoolState(false);
+/** A button that asks in an alert before it does what it says. */
+export const ButtonWithConfirm = ({
+  onConfirmClick,
+  disabled,
+  loading,
+  buttonConfig,
+  dialogConfig,
+  toastConfig,
+}: Props): JSX.Element => {
+  const [isOpen$, setIsOpen] = createState(false);
 
-    const [
-      loadingLocal,
-      { setTrue: setTrueLoadingLocal, setFalse: setFalseLoadingLocal },
-    ] = useBoolState(false);
+  const [loadingLocal$, setLoadingLocal] = createState(false);
 
-    const alive = useAlive();
+  const loading$ = loading ?? loadingLocal$;
 
-    const onConfirm = React.useCallback(() => {
-      if (!alive.current) {
-        return;
-      }
+  let mut_alive = true;
 
-      const afterConfirm = (): void => {
-        if (toastConfig !== undefined) {
-          showToast({
-            toast,
-            message: toastConfig.message,
-            intent: toastConfig.intent,
-          });
-        }
+  onScopeDispose(() => {
+    mut_alive = false;
+  });
 
-        handleClose();
-      };
+  const afterConfirm = (): void => {
+    if (toastConfig !== undefined) {
+      showToast({
+        toast,
+        message: toastConfig.message,
+        intent: toastConfig.intent,
+      });
+    }
 
-      // `unknown`, not the declared `Promise<void> | void`: a `() => void`
-      // may return anything at runtime — TypeScript's `void` accepts any
-      // value — so `p !== undefined` would send a non-thenable down the
-      // `.then` branch. The pre-restoration code asked `p instanceof
-      // Promise`; asking whether it is thenable says the same thing without
-      // `unicorn/no-instanceof-builtins`, and also covers a promise from
-      // another realm.
-      const p: unknown = onConfirmClick();
+    setIsOpen(false);
+  };
 
-      if (isPromiseLike(p)) {
-        setTrueLoadingLocal();
+  const onConfirm = (): void => {
+    // `unknown`, not the declared `Promise<void> | void`: a `() => void` may
+    // return anything at runtime — TypeScript's `void` accepts any value — so
+    // `p !== undefined` would send a non-thenable down the `.then` branch.
+    const p: unknown = onConfirmClick();
 
-        Promise.resolve(p)
-          .then(() => {
-            if (!alive.current) {
-              return;
-            }
+    if (isPromiseLike(p)) {
+      setLoadingLocal(true);
 
-            afterConfirm();
+      Promise.resolve(p)
+        .then(() => {
+          if (!mut_alive) {
+            return;
+          }
 
-            setFalseLoadingLocal();
-          })
-          .catch(console.error);
-      } else {
-        afterConfirm();
-      }
-    }, [
-      onConfirmClick,
-      handleClose,
-      toastConfig,
-      alive,
-      setTrueLoadingLocal,
-      setFalseLoadingLocal,
-    ]);
+          afterConfirm();
 
-    return (
-      <>
-        <ButtonNowrapStyled
-          color={buttonConfig.color}
-          data-e2e={'button-with-confirmation'}
-          disabled={disabled}
-          icon={buttonConfig.icon}
-          intent={buttonConfig.intent ?? 'none'}
-          loading={loading ?? loadingLocal}
-          text={buttonConfig.name}
-          variant={buttonConfig.minimal === true ? 'minimal' : 'solid'}
-          onClick={handleOpen}
-        />
-        <ConfirmDialog
-          cancelButtonText={dialogConfig.cancelButtonText}
-          confirmButtonText={dialogConfig.confirmButtonText}
-          description={dialogConfig.description}
-          icon={dialogConfig.icon}
-          intent={dialogConfig.intent ?? 'none'}
-          isOpen={isOpen}
-          loading={loading ?? loadingLocal}
-          message={dialogConfig.message}
-          onCancel={handleClose}
-          onConfirm={onConfirm}
-        />
-      </>
-    );
-  },
-);
+          setLoadingLocal(false);
+        })
+        .catch(console.error);
+    } else {
+      afterConfirm();
+    }
+  };
+
+  return (
+    <>
+      <Button
+        class={nowrapClass}
+        data-e2e={constant('button-with-confirmation')}
+        disabled={disabled}
+        icon={buttonConfig.icon}
+        intent={buttonConfig.intent ?? 'none'}
+        loading={loading$}
+        {...(buttonConfig.name === undefined
+          ? {}
+          : { text: constant(buttonConfig.name) })}
+        variant={constant(buttonConfig.minimal === true ? 'minimal' : 'solid')}
+        onClick={() => {
+          setIsOpen(true);
+        }}
+      />
+      <ConfirmDialog
+        cancelButtonText={dialogConfig.cancelButtonText}
+        confirmButtonText={dialogConfig.confirmButtonText}
+        description={dialogConfig.description}
+        icon={dialogConfig.icon}
+        intent={dialogConfig.intent ?? 'none'}
+        isOpen={isOpen$}
+        loading={loading$}
+        message={dialogConfig.message}
+        onCancel={() => {
+          setIsOpen(false);
+        }}
+        onConfirm={onConfirm}
+      />
+    </>
+  );
+};
 
 const isPromiseLike = (value: unknown): value is PromiseLike<unknown> =>
   isRecord(value) && hasKey(value, 'then') && typeof value.then === 'function';

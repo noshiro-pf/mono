@@ -1,14 +1,18 @@
-import { useBoolState } from 'better-react-use-state';
-import { ButtonNowrapStyled } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
+import { Button } from 'blueprint-synstate';
+import { createState } from 'synstate';
+import { constant, If, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerPageStore } from '../../../store/index.mjs';
+import { nowrapClass } from '../../styled/index.mjs';
 import { ButtonWithConfirm } from './button-with-confirm.js';
 import { ForNonLoggedInUserDialog } from './for-non-logged-in-user-button.js';
 
 const dc = dict.answerPage.answerLater;
 
-type Props = Readonly<{ loading: boolean; loggedIn: boolean }>;
+type Props = Readonly<{
+  loading: Bindable<boolean>;
+  loggedIn: Bindable<boolean>;
+}>;
 
 const buttonConfig = {
   icon: 'saved',
@@ -25,32 +29,53 @@ const dialogConfig = {
   confirmButtonText: dc.confirmButton,
 } as const;
 
-export const AnswerLaterButtonWithConfirmation = memoNamed<Props>(
-  'AnswerLaterButtonWithConfirmation',
-  ({ loading, loggedIn }) => {
-    const [isOpen, { setTrue: openDialog, setFalse: closeDialog }] =
-      useBoolState(false);
-
-    return loggedIn ? (
+/**
+ * Sends an empty answer to fill in later, once confirmed; for a visitor who is
+ * not signed in, says that it needs an account instead.
+ */
+export const AnswerLaterButtonWithConfirmation = ({
+  loading,
+  loggedIn,
+}: Props): JSX.Element => (
+  <If
+    cond={loggedIn}
+    then={
       <ButtonWithConfirm
         buttonConfig={buttonConfig}
         dialogConfig={dialogConfig}
-        disabled={false}
+        disabled={constant(false)}
         loading={loading}
         onConfirmClick={AnswerPageStore.onSubmitEmptyAnswerClick}
       />
-    ) : (
-      <>
-        <ButtonNowrapStyled
-          data-e2e={'button-with-confirmation'}
-          icon={buttonConfig.icon}
-          intent={buttonConfig.intent}
-          loading={loading}
-          text={buttonConfig.name}
-          onClick={openDialog}
-        />
-        <ForNonLoggedInUserDialog cancel={closeDialog} isOpen={isOpen} />
-      </>
-    );
-  },
+    }
+    else={<ForNonLoggedInUser loading={loading} />}
+  />
 );
+
+const ForNonLoggedInUser = ({
+  loading,
+}: Readonly<{ loading: Bindable<boolean> }>): JSX.Element => {
+  const [isOpen$, setIsOpen] = createState(false);
+
+  return (
+    <>
+      <Button
+        class={nowrapClass}
+        data-e2e={constant('button-with-confirmation')}
+        icon={buttonConfig.icon}
+        intent={buttonConfig.intent}
+        loading={loading}
+        text={constant(buttonConfig.name)}
+        onClick={() => {
+          setIsOpen(true);
+        }}
+      />
+      <ForNonLoggedInUserDialog
+        cancel={() => {
+          setIsOpen(false);
+        }}
+        isOpen={isOpen$}
+      />
+    </>
+  );
+};

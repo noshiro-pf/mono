@@ -1,11 +1,11 @@
 import { Weight } from 'event-schedule-app-shared';
-import {
-  type NumericTypeProperties,
-  clampAndRoundFn,
-} from 'numeric-input-utils';
 import { asSafeUint } from 'ts-data-forge';
 import type { SafeUint, StrictPick } from 'ts-type-forge';
 import type { AnswerRank, AnswersScore } from '../types/index.mjs';
+import {
+  type NumericTypeProperties,
+  clampAndRoundFn,
+} from '../utils/index.mjs';
 import { defaultIconPoint } from './default-icon-point.mjs';
 
 type NumericInputConfigBase<N extends number> = Readonly<{

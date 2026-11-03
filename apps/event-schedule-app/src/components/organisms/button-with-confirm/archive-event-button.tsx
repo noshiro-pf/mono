@@ -1,10 +1,9 @@
-import { Button } from '@blueprintjs/core';
-import { useBoolState } from 'better-react-use-state';
-import * as React from 'react';
-import { AlertWithMaxWidth } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { dict, eventListItemTextColor } from '../../../constants/index.mjs';
+import { Alert, Button } from 'blueprint-synstate';
+import { createState } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
+import { dict } from '../../../constants/index.mjs';
 import { Description } from '../../atoms/index.mjs';
+import { maxWidthModalClass } from '../../styled/index.mjs';
 
 const dc = dict.eventListPage;
 
@@ -13,76 +12,64 @@ type Props = Readonly<{
   onConfirm: () => void;
 }>;
 
-export const ArchiveEventButton = memoNamed<Props>(
-  'ArchiveEventButton',
-  ({ archiveOrUnArchive, onConfirm }) => {
-    const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
-      useBoolState(false);
+/**
+ * Archives an event of the list, or takes it out of the archive, once
+ * confirmed. Inside the item's link, so that no press here follows it.
+ */
+export const ArchiveEventButton = ({
+  archiveOrUnArchive,
+  onConfirm,
+}: Props): JSX.Element => {
+  const [isOpen$, setIsOpen] = createState(false);
 
-    const archiveIconClick = React.useCallback(
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev: React.MouseEvent<HTMLElement>) => {
-        ev.preventDefault();
+  return (
+    <>
+      <Button
+        icon={archiveOrUnArchive}
+        title={constant(dc[archiveOrUnArchive])}
+        variant={constant('minimal')}
+        onClick={(event) => {
+          stop(event);
 
-        ev.stopPropagation();
+          setIsOpen(true);
+        }}
+      />
+      <Alert
+        canEscapeKeyCancel
+        canOutsideClickCancel
+        cancelButtonText={constant(dict.common.buttonText.cancel)}
+        class={maxWidthModalClass}
+        confirmButtonText={constant(dc[archiveOrUnArchive])}
+        icon={archiveOrUnArchive}
+        intent={'primary'}
+        isOpen={isOpen$}
+        onCancel={(event) => {
+          stop(event);
 
-        handleOpen();
-      },
-      [handleOpen],
-    );
+          setIsOpen(false);
+        }}
+        onConfirm={(event) => {
+          stop(event);
 
-    const onCancel = React.useCallback(
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev?: React.SyntheticEvent<HTMLElement, Event>) => {
-        ev?.preventDefault();
+          setIsOpen(false);
 
-        ev?.stopPropagation();
-
-        handleClose();
-      },
-      [handleClose],
-    );
-
-    const onConfirmHandler = React.useCallback(
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev?: React.SyntheticEvent<HTMLElement, Event>) => {
-        ev?.preventDefault();
-
-        ev?.stopPropagation();
-
-        handleClose();
-
-        onConfirm();
-      },
-      [onConfirm, handleClose],
-    );
-
-    return (
-      <>
-        <Button
-          color={eventListItemTextColor}
-          icon={archiveOrUnArchive}
-          title={dc[archiveOrUnArchive]}
-          variant={'minimal'}
-          onClick={archiveIconClick}
+          onConfirm();
+        }}
+      >
+        <p>{constant(dc.confirmationMessage[archiveOrUnArchive].title)}</p>
+        <Description
+          text={constant(
+            dc.confirmationMessage[archiveOrUnArchive].description,
+          )}
         />
-        <AlertWithMaxWidth
-          canEscapeKeyCancel
-          canOutsideClickCancel
-          cancelButtonText={dict.common.buttonText.cancel}
-          confirmButtonText={dc[archiveOrUnArchive]}
-          icon={archiveOrUnArchive}
-          intent={'primary'}
-          isOpen={isOpen}
-          onCancel={onCancel}
-          onConfirm={onConfirmHandler}
-        >
-          <p>{dc.confirmationMessage[archiveOrUnArchive].title}</p>
-          <Description
-            text={dc.confirmationMessage[archiveOrUnArchive].description}
-          />
-        </AlertWithMaxWidth>
-      </>
-    );
-  },
-);
+      </Alert>
+    </>
+  );
+};
+
+/** Keeps a press inside the card from opening the event as well. */
+const stop = (event: Event | undefined): void => {
+  event?.preventDefault();
+
+  event?.stopPropagation();
+};

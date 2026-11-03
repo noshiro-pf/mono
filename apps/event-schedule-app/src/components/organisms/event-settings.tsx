@@ -1,13 +1,18 @@
-import { css } from '@emotion/react';
-import { useBoolState } from 'better-react-use-state';
-import * as React from 'react';
-import { memoNamed, useObservable } from 'react-utils';
+import { createEventEmitter, map, type InitializedObservable } from 'synstate';
+import {
+  constant,
+  createAfterUpdate,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import {
   dict,
   notificationSettingsWithEmailDefaultValue,
 } from '../../constants/index.mjs';
 import type { NotificationSettingsWithEmail } from '../../types/index.mjs';
 import { AnswerDeadlineDatepicker } from './answer-deadline.js';
+import * as styles from './event-settings.module.css';
 import { AnswerIconSettingsComponent } from './icon-settings/index.mjs';
 import { NotificationSettingsComponent } from './notification-settings.js';
 import { ParagraphWithSwitch } from './paragraph-with-switch.js';
@@ -15,120 +20,91 @@ import { ParagraphWithSwitch } from './paragraph-with-switch.js';
 const dc = dict.eventSettingsPage.section3;
 
 type Props = Readonly<{
-  useAnswerDeadline: boolean;
+  useAnswerDeadline: InitializedObservable<boolean>;
   onToggleAnswerDeadline: () => void;
-  answerDeadline: Ymdhm | undefined;
+  answerDeadline: Bindable<Ymdhm | undefined>;
   onAnswerDeadlineChange: (value: Ymdhm | undefined) => void;
-  answerIcons: AnswerIconSettings;
+  answerIcons: Bindable<AnswerIconSettings>;
   onAnswerIconsChange: (value: AnswerIconSettings) => void;
-  useNotification: boolean;
+  useNotification: InitializedObservable<boolean>;
   onToggleUseNotification: () => void;
-  notificationSettingsWithEmail: NotificationSettingsWithEmail | undefined;
+  notificationSettingsWithEmail: InitializedObservable<
+    NotificationSettingsWithEmail | undefined
+  >;
   onNotificationSettingsWithEmailChange: (
     value: NotificationSettingsWithEmail,
   ) => void;
 }>;
 
-export const EventSettings = memoNamed<Props>(
-  'EventSettings',
-  ({
-    useAnswerDeadline,
-    onToggleAnswerDeadline,
-    answerDeadline,
-    onAnswerDeadlineChange,
-    answerIcons,
-    onAnswerIconsChange,
-    useNotification,
-    onToggleUseNotification,
-    notificationSettingsWithEmail,
-    onNotificationSettingsWithEmailChange,
-  }) => {
-    const focusEmailInput$ = useObservable<undefined>();
+export const EventSettings = ({
+  useAnswerDeadline,
+  onToggleAnswerDeadline,
+  answerDeadline,
+  onAnswerDeadlineChange,
+  answerIcons,
+  onAnswerIconsChange,
+  useNotification,
+  onToggleUseNotification,
+  notificationSettingsWithEmail,
+  onNotificationSettingsWithEmailChange,
+}: Props): JSX.Element => {
+  const [focusEmailInput$, focusEmailInput] = createEventEmitter();
 
-    const [clickedMoreThanOnce, { setTrue: setClickedMoreThanOnce }] =
-      useBoolState(false);
+  const afterUpdate = createAfterUpdate();
 
-    const onToggleUseNotificationLocal = React.useCallback(() => {
-      onToggleUseNotification();
+  return (
+    <div class={constant(styles.settings)}>
+      <ParagraphWithSwitch
+        description={dc.answerDeadline.howAnswerDeadlineIsUsed}
+        elementToToggle={
+          <AnswerDeadlineDatepicker
+            answerDeadline={answerDeadline}
+            useAnswerDeadline={useAnswerDeadline}
+            onAnswerDeadlineChange={onAnswerDeadlineChange}
+          />
+        }
+        title={dc.answerDeadline.title}
+        toggleState={useAnswerDeadline}
+        onToggle={onToggleAnswerDeadline}
+      />
+      <hr />
+      <ParagraphWithSwitch
+        description={dc.notification.description}
+        elementToToggle={
+          <NotificationSettingsComponent
+            answerDeadline={answerDeadline}
+            disabled={view(useNotification, (use) => !use)}
+            focusEmailInput$={focusEmailInput$}
+            notificationSettingsWithEmail={notificationSettingsWithEmail.pipe(
+              map(
+                (settings) =>
+                  settings ?? notificationSettingsWithEmailDefaultValue,
+              ),
+            )}
+            useAnswerDeadline={useAnswerDeadline}
+            onNotificationSettingsWithEmailChange={
+              onNotificationSettingsWithEmailChange
+            }
+          />
+        }
+        title={dc.notification.useNotification}
+        toggleState={useNotification}
+        onToggle={() => {
+          onToggleUseNotification();
 
-      setClickedMoreThanOnce();
-    }, [onToggleUseNotification, setClickedMoreThanOnce]);
-
-    React.useEffect(() => {
-      if (useNotification && clickedMoreThanOnce) {
-        focusEmailInput$.next(undefined);
-      }
-    }, [useNotification, focusEmailInput$, clickedMoreThanOnce]);
-
-    const answerDeadlineDatepicker = React.useMemo(
-      () => (
-        <AnswerDeadlineDatepicker
-          answerDeadline={answerDeadline}
-          useAnswerDeadline={useAnswerDeadline}
-          onAnswerDeadlineChange={onAnswerDeadlineChange}
-        />
-      ),
-      [answerDeadline, onAnswerDeadlineChange, useAnswerDeadline],
-    );
-
-    const notificationSettingsComponent = React.useMemo(
-      () => (
-        <NotificationSettingsComponent
-          answerDeadline={answerDeadline}
-          disabled={!useNotification}
-          focusEmailInput$={focusEmailInput$}
-          notificationSettingsWithEmail={
-            notificationSettingsWithEmail ??
-            notificationSettingsWithEmailDefaultValue
-          }
-          useAnswerDeadline={useAnswerDeadline}
-          onNotificationSettingsWithEmailChange={
-            onNotificationSettingsWithEmailChange
-          }
-        />
-      ),
-      [
-        answerDeadline,
-        focusEmailInput$,
-        notificationSettingsWithEmail,
-        onNotificationSettingsWithEmailChange,
-        useAnswerDeadline,
-        useNotification,
-      ],
-    );
-
-    return (
-      <div
-        css={css`
-          padding: 10px;
-          & > * {
-            margin-bottom: 15px;
-          }
-        `}
-      >
-        <ParagraphWithSwitch
-          description={dc.answerDeadline.howAnswerDeadlineIsUsed}
-          elementToToggle={answerDeadlineDatepicker}
-          hideContentIfToggleIsFalse={false}
-          title={dc.answerDeadline.title}
-          toggleState={useAnswerDeadline}
-          onToggle={onToggleAnswerDeadline}
-        />
-        <hr />
-        <ParagraphWithSwitch
-          description={dc.notification.description}
-          elementToToggle={notificationSettingsComponent}
-          hideContentIfToggleIsFalse={false}
-          title={dc.notification.useNotification}
-          toggleState={useNotification}
-          onToggle={onToggleUseNotificationLocal}
-        />
-        <hr />
-        <AnswerIconSettingsComponent
-          answerIcons={answerIcons}
-          onAnswerIconsChange={onAnswerIconsChange}
-        />
-      </div>
-    );
-  },
-);
+          // The email input is wanted next once notifications are turned on.
+          afterUpdate(() => {
+            if (useNotification.getSnapshot().value) {
+              focusEmailInput();
+            }
+          });
+        }}
+      />
+      <hr />
+      <AnswerIconSettingsComponent
+        answerIcons={answerIcons}
+        onAnswerIconsChange={onAnswerIconsChange}
+      />
+    </div>
+  );
+};

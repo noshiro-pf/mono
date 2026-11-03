@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import {
   combine,
   filter,
@@ -59,7 +58,7 @@ export const createDeleteAccountCreatedWithGoogleStore = <
     filter((openingDialog) => openingDialog === undefined),
   );
 
-  const [, dispatch, { state: formState$ }] = createReducerWithActions(
+  const [formState$, dispatch] = createReducerWithActions(
     emailInputStateReducer,
     emailInputInitialState,
     [dialogClosed$.pipe(map(() => ({ type: 'reset' }) as const))],
@@ -75,7 +74,7 @@ export const createDeleteAccountCreatedWithGoogleStore = <
     ),
   );
 
-  const [, dispatchIsWaitingResponse, { state: isWaitingResponseState }] =
+  const [isWaitingResponseState, dispatchIsWaitingResponse] =
     createReducerWithActions(
       (_: boolean, isWaitingResponse: boolean) => isWaitingResponse,
       false,

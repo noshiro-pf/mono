@@ -1,12 +1,12 @@
-import { Button } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import { BpDatePicker } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { TimeRangeView } from '../../../molecules/index.mjs';
+import { Button } from 'blueprint-synstate';
+import type { InitializedObservable } from 'synstate';
+import { constant, view, type Bindable, type JSX } from 'synstate-dom';
+import { TimeRangeView, YmdInput } from '../../../molecules/index.mjs';
+import * as styles from '../select-datetimes.module.css';
 
 type Props = Readonly<{
-  datetimeSpecification: DatetimeSpecificationEnumType;
-  datetimeRange: DatetimeRange;
+  datetimeSpecification: Bindable<DatetimeSpecificationEnumType>;
+  datetimeRange: InitializedObservable<DatetimeRange>;
   onYmdChange: (ymd: YearMonthDate | undefined) => void;
   onRangeStartChange: (hm: HoursMinutes) => void;
   onRangeEndChange: (hm: HoursMinutes) => void;
@@ -14,79 +14,47 @@ type Props = Readonly<{
   onDeleteClick: () => void;
 }>;
 
-export const SelectedDatetimeRow = memoNamed<Props>(
-  'SelectedDatetimeRow',
-  ({
-    datetimeRange,
-    onYmdChange,
-    datetimeSpecification,
-    onRangeEndChange,
-    onRangeStartChange,
-    onDuplicateClick,
-    onDeleteClick,
-  }) => (
-    <div
-      css={css`
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-        margin-bottom: 5px;
-        justify-content: space-between;
-      `}
-      data-e2e={'selected-datetime-row'}
-    >
-      <div
-        css={css`
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-        `}
-      >
-        <div
-          css={css`
-            margin-top: 3px;
-            margin-bottom: 3px;
-          `}
-        >
-          <BpDatePicker
-            closeOnSelection
-            ymd={datetimeRange.ymd}
-            onYmdChange={onYmdChange}
-          />
-        </div>
-        <div
-          css={css`
-            margin-left: 7px;
-          `}
-        >
-          <TimeRangeView
-            datetimeSpecification={datetimeSpecification}
-            timeRange={datetimeRange.timeRange}
-            onRangeEndChange={onRangeEndChange}
-            onRangeStartChange={onRangeStartChange}
-          />
-        </div>
-      </div>
-
-      <div
-        css={css`
-          display: flex;
-          flex-wrap: nowrap;
-          margin-left: 5px;
-        `}
-      >
-        <Button
-          icon={'duplicate'}
-          variant={'minimal'}
-          onClick={onDuplicateClick}
+export const SelectedDatetimeRow = ({
+  datetimeRange,
+  onYmdChange,
+  datetimeSpecification,
+  onRangeEndChange,
+  onRangeStartChange,
+  onDuplicateClick,
+  onDeleteClick,
+}: Props): JSX.Element => (
+  <div
+    class={constant(styles.row)}
+    data-e2e={constant('selected-datetime-row')}
+  >
+    <div class={constant(styles.rowInputs)}>
+      <div class={constant(styles.rowDate)}>
+        <YmdInput
+          ymd={view(datetimeRange, (r) => r.ymd)}
+          onYmdChange={onYmdChange}
         />
-        <Button
-          data-e2e={'delete-button'}
-          icon={'trash'}
-          variant={'minimal'}
-          onClick={onDeleteClick}
+      </div>
+      <div class={constant(styles.rowTime)}>
+        <TimeRangeView
+          datetimeSpecification={datetimeSpecification}
+          timeRange={view(datetimeRange, (r) => r.timeRange)}
+          onRangeEndChange={onRangeEndChange}
+          onRangeStartChange={onRangeStartChange}
         />
       </div>
     </div>
-  ),
+    <div class={constant(styles.rowButtons)}>
+      <Button
+        icon={'duplicate'}
+        variant={constant('minimal')}
+        onClick={onDuplicateClick}
+      />
+      <Button
+        data-e2e={constant('delete-button')}
+        icon={'trash'}
+        variant={constant('minimal')}
+        onClick={onDeleteClick}
+      />
+    </div>
+  </div>
 );

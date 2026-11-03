@@ -1,0 +1,31 @@
+/* The grey label above each input of an account dialog. */
+.field > :global(.bp6-label) {
+  color: #757575;
+  font-size: 12px;
+}
+
+/* Present for the browser's password manager, never shown. */
+.hidden {
+  display: none;
+}
+
+.displayNameBody {
+  width: 300px;
+  height: 80px;
+}
+
+.emailBody,
+.passwordBody {
+  width: 300px;
+  height: 200px;
+}
+
+.deleteAccountBody {
+  width: 300px;
+  height: 160px;
+}
+
+.deleteAccountGoogleBody {
+  width: 300px;
+  height: 100px;
+}

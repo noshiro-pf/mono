@@ -1,69 +1,50 @@
-import { Button, PopoverNext } from '@blueprintjs/core';
-import { useBoolState } from 'better-react-use-state';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
-import type { DayOfWeekName, ReadonlyRecord } from 'ts-type-forge';
+import { Button, Popover } from 'blueprint-synstate';
+import { createBooleanState, type InitializedObservable } from 'synstate';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../../../constants/index.mjs';
+import type { SetTimesSubmission } from '../../../../hooks/index.mjs';
 import { SetTimesPopoverContent } from './set-times-popover-content.js';
 
 const dc = dict.eventSettingsPage.section2;
 
 type Props = Readonly<{
-  datetimeSpecification: DatetimeSpecificationEnumType;
-  initialValue: TimeRange;
-  onSetTimesSubmit: (
-    state: Readonly<{
-      timeRange: TimeRange;
-      checkboxState: ReadonlyRecord<DayOfWeekName, boolean>;
-    }>,
-  ) => void;
+  datetimeSpecification: Bindable<DatetimeSpecificationEnumType>;
+  initialValue: InitializedObservable<TimeRange>;
+  onSetTimesSubmit: (state: SetTimesSubmission) => void;
 }>;
 
-export const SetTimesPopover = memoNamed<Props>(
-  'SetTimesPopover',
-  ({ datetimeSpecification, initialValue, onSetTimesSubmit }) => {
-    const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
-      useBoolState(false);
+export const SetTimesPopover = ({
+  datetimeSpecification,
+  initialValue,
+  onSetTimesSubmit,
+}: Props): JSX.Element => {
+  const [isOpen$, { setTrue: handleOpen, setFalse: handleClose }] =
+    createBooleanState(false);
 
-    const onOkClick = React.useCallback(
-      (
-        state: Readonly<{
-          timeRange: TimeRange;
-          checkboxState: ReadonlyRecord<DayOfWeekName, boolean>;
-        }>,
-      ) => {
-        onSetTimesSubmit(state);
-
-        handleClose();
-      },
-      [onSetTimesSubmit, handleClose],
-    );
-
-    const popoverContent = React.useMemo(
-      () => (
+  return (
+    <Popover
+      canEscapeKeyClose
+      content={
         <SetTimesPopoverContent
           datetimeSpecification={datetimeSpecification}
           initialValue={initialValue}
+          isOpen={isOpen$}
           onCancelClick={handleClose}
-          onOkClick={onOkClick}
-        />
-      ),
-      [datetimeSpecification, handleClose, initialValue, onOkClick],
-    );
+          onOkClick={(state) => {
+            onSetTimesSubmit(state);
 
-    return (
-      <PopoverNext
-        canEscapeKeyClose
-        content={popoverContent}
-        isOpen={isOpen}
-        onClose={handleClose}
-      >
-        <Button
-          intent={'success'}
-          text={dc.setTimesAtOneTime}
-          onClick={handleOpen}
+            handleClose();
+          }}
         />
-      </PopoverNext>
-    );
-  },
-);
+      }
+      isOpen={isOpen$}
+      onClose={handleClose}
+    >
+      <Button
+        intent={'success'}
+        text={constant(dc.setTimesAtOneTime)}
+        onClick={handleOpen}
+      />
+    </Popover>
+  );
+};

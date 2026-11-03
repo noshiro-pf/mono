@@ -1,0 +1,28 @@
+.paragraph {
+  margin: 20px 0;
+}
+
+.tableWrapper {
+  margin-bottom: 15px;
+}
+
+.weightRow {
+  margin-bottom: 5px;
+}
+
+.weightSetting {
+  display: flex;
+  align-items: center;
+}
+
+.weightInput {
+  flex: 0 0 120px;
+}
+
+.weightSuffix {
+  margin-left: 5px;
+}
+
+.helperSpacer {
+  height: 1rem;
+}

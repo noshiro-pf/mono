@@ -1,9 +1,17 @@
-import styled from '@emotion/styled';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
-import { descriptionFontColor, dict } from '../../../constants/index.mjs';
-import { EditEventScheduleStore } from '../../../store/index.mjs';
+import { combine } from 'synstate';
+import {
+  constant,
+  createAfterUpdate,
+  derive,
+  subscribeInScope,
+  view,
+  type JSX,
+} from 'synstate-dom';
+import { dict } from '../../../constants/index.mjs';
+import {
+  EditEventScheduleStore,
+  eventSchedule$,
+} from '../../../store/index.mjs';
 import {
   BackToAnswerPageButton,
   EventScheduleDiff,
@@ -11,86 +19,74 @@ import {
   SubmitEditingEventButton,
 } from '../../organisms/index.mjs';
 import { ButtonsWrapperForEventSettingsPage } from '../../styled/index.mjs';
+import * as styles from './edit-event-schedule.module.css';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common.js';
 
 const dc = dict.eventSettingsPage;
 
-type Props = Readonly<{
-  eventScheduleFromDb: EventSchedule;
-  emailVerified: string | undefined;
-}>;
+/** The edit form, once the event is read and the author's email confirmed. */
+export const EditEventScheduleEmailVerified = (): JSX.Element => {
+  const { commonState$, hasNoChanges$, isLoading$, emailVerified$ } =
+    EditEventScheduleStore;
 
-export const EditEventScheduleEmailVerified = memoNamed<Props>(
-  'EditEventScheduleEmailVerified',
-  ({ eventScheduleFromDb, emailVerified }) => {
-    const commonState = useObservableValue(EditEventScheduleStore.commonState$);
+  const resetState = (): void => {
+    const eventSchedule = eventSchedule$.getSnapshot().value;
 
-    const hasNoChanges = useObservableValue(
-      EditEventScheduleStore.hasNoChanges$,
-    );
-
-    React.useEffect(() => {
+    if (eventSchedule !== undefined) {
       EditEventScheduleStore.setEventSchedule(
-        eventScheduleFromDb,
-        emailVerified,
+        eventSchedule,
+        emailVerified$.getSnapshot().value,
       );
-    }, [eventScheduleFromDb, emailVerified]);
+    }
+  };
 
-    const editButtonIsLoading = EditEventScheduleStore.useIsLoading();
+  // The form starts from the event as it is stored, and again whenever that is
+  // read anew or the confirmed email changes.
+  const afterUpdate = createAfterUpdate();
 
-    const diff = useObservableValue(EditEventScheduleStore.diff$);
+  subscribeInScope(combine([eventSchedule$, emailVerified$]), () => {
+    afterUpdate(resetState);
+  });
 
-    const hasDeletedDatetimeChanges = useObservableValue(
-      EditEventScheduleStore.hasDeletedDatetimeChanges$,
-    );
+  return (
+    <>
+      <div class={constant(styles.subTitle)}>
+        {view(eventSchedule$, (e) => dc.editSubTitle(e?.title ?? ''))}
+      </div>
 
-    const { eventScheduleValidationOk } = commonState;
+      <EventScheduleSettingCommon
+        handlers={EditEventScheduleStore.commonStateHandlers}
+        state$={commonState$}
+      />
 
-    const resetState = React.useCallback(() => {
-      EditEventScheduleStore.setEventSchedule(
-        eventScheduleFromDb,
-        emailVerified,
-      );
-    }, [eventScheduleFromDb, emailVerified]);
-
-    return (
-      <>
-        <SubTitle>{dc.editSubTitle(eventScheduleFromDb.title)}</SubTitle>
-
-        <EventScheduleSettingCommon
-          handlers={EditEventScheduleStore.commonStateHandlers}
-          state={commonState}
+      <ButtonsWrapperForEventSettingsPage>
+        <BackToAnswerPageButton
+          disabled={isLoading$}
+          hasNoChanges={hasNoChanges$}
+          onConfirmClick={EditEventScheduleStore.onBackToAnswerPage}
         />
-
-        <ButtonsWrapperForEventSettingsPage>
-          <BackToAnswerPageButton
-            disabled={editButtonIsLoading}
-            hasNoChanges={hasNoChanges}
-            onConfirmClick={EditEventScheduleStore.onBackToAnswerPage}
+        <ResetEditButton
+          disabled={derive(
+            [isLoading$, hasNoChanges$],
+            (loading, noChanges) => loading || noChanges,
+          )}
+          onConfirmClick={resetState}
+        />
+        <div data-e2e={constant('submit-button')}>
+          <SubmitEditingEventButton
+            disabled={derive(
+              [commonState$, isLoading$, hasNoChanges$],
+              (s, loading, noChanges) =>
+                !s.eventScheduleValidationOk || loading || noChanges,
+            )}
+            loading={isLoading$}
+            showConfirmationDialog={
+              EditEventScheduleStore.hasDeletedDatetimeChanges$
+            }
           />
-          <ResetEditButton
-            disabled={editButtonIsLoading || hasNoChanges}
-            onConfirmClick={resetState}
-          />
-          <div data-e2e={'submit-button'}>
-            <SubmitEditingEventButton
-              disabled={
-                !eventScheduleValidationOk ||
-                editButtonIsLoading ||
-                hasNoChanges
-              }
-              loading={editButtonIsLoading}
-              showConfirmationDialog={hasDeletedDatetimeChanges}
-            />
-          </div>
-        </ButtonsWrapperForEventSettingsPage>
-        <EventScheduleDiff diff={diff} />
-      </>
-    );
-  },
-);
-
-const SubTitle = styled('div')`
-  margin: 10px 20px;
-  color: ${descriptionFontColor.normal};
-`;
+        </div>
+      </ButtonsWrapperForEventSettingsPage>
+      <EventScheduleDiff diff={EditEventScheduleStore.diff$} />
+    </>
+  );
+};

@@ -1,0 +1,22 @@
+.inputWrapper {
+  min-height: 72px;
+}
+
+.urlRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.urlCell {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.url {
+  display: block;
+  margin: 0 5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

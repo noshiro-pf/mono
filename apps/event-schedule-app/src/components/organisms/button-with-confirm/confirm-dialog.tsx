@@ -1,51 +1,51 @@
-import { AlertWithMaxWidth } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { mapNullable } from 'ts-data-forge';
+import { Alert, type IconName20 } from 'blueprint-synstate';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { Description } from '../../atoms/index.mjs';
+import { maxWidthModalClass } from '../../styled/index.mjs';
 
 type Props = Readonly<{
-  isOpen: boolean;
+  isOpen: Bindable<boolean>;
   onCancel: () => void;
   onConfirm: () => void;
   cancelButtonText: string;
   confirmButtonText: string;
   message: string;
   description?: string;
-  icon: IconName | undefined;
+  icon: IconName20 | undefined;
   intent: Intent;
-  loading?: boolean;
+  loading?: Bindable<boolean>;
 }>;
 
-export const ConfirmDialog = memoNamed<Props>(
-  'ConfirmDialog',
-  ({
-    isOpen,
-    onCancel,
-    onConfirm,
-    cancelButtonText,
-    confirmButtonText,
-    message,
-    description,
-    icon,
-    intent,
-    loading,
-  }) => (
-    <AlertWithMaxWidth
-      canEscapeKeyCancel
-      canOutsideClickCancel
-      cancelButtonText={cancelButtonText}
-      confirmButtonText={confirmButtonText}
-      icon={icon}
-      intent={intent}
-      isOpen={isOpen}
-      loading={loading}
-      onCancel={onCancel}
-      onConfirm={onConfirm}
-    >
-      <p>{message}</p>
-      {mapNullable(description, (s) => (
-        <Description text={s} />
-      ))}
-    </AlertWithMaxWidth>
-  ),
+export const ConfirmDialog = ({
+  isOpen,
+  onCancel,
+  onConfirm,
+  cancelButtonText,
+  confirmButtonText,
+  message,
+  description,
+  icon,
+  intent,
+  loading,
+}: Props): JSX.Element => (
+  <Alert
+    canEscapeKeyCancel
+    canOutsideClickCancel
+    cancelButtonText={constant(cancelButtonText)}
+    class={maxWidthModalClass}
+    confirmButtonText={constant(confirmButtonText)}
+    icon={icon}
+    intent={intent}
+    isOpen={isOpen}
+    loading={loading}
+    onCancel={onCancel}
+    onConfirm={onConfirm}
+  >
+    <p>{constant(message)}</p>
+    {description === undefined ? (
+      []
+    ) : (
+      <Description text={constant(description)} />
+    )}
+  </Alert>
 );

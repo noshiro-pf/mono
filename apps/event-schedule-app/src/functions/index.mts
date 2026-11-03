@@ -1,4 +1,5 @@
 export * from './answers-page/index.mjs';
+export * from './date-input-text.mjs';
 export * from './event-settings-page-diff.mjs';
 export * from './fetch-holidays.mjs';
 export * from './is-after-deadline.mjs';
@@ -7,6 +8,7 @@ export * from './map-key/index.mjs';
 export * from './multiple-date-picker/index.mjs';
 export * from './normalize-event-schedule.mjs';
 export * from './reducers/index.mjs';
+export * from './router-link-click.mjs';
 export * from './select-datetimes-component/index.mjs';
 export * from './the-name-is-already-used.mjs';
 export * from './toaster.js';

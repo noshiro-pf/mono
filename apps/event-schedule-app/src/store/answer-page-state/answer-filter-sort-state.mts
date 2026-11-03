@@ -1,4 +1,4 @@
-import type { TagProps } from '@blueprintjs/core';
+import type { TagInputValue } from 'blueprint-synstate';
 import {
   type InitializedObservable,
   combine,
@@ -7,7 +7,6 @@ import {
   map,
   skipIfNoChange,
 } from 'synstate';
-import { useObservableValue } from 'synstate-react-hooks';
 import {
   Arr,
   Optional,
@@ -21,6 +20,7 @@ import type {
   DeepReadonly,
   ReadonlyRecord,
   SafeUint,
+  StrictOmit,
   StrictPick,
 } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
@@ -104,7 +104,7 @@ export const createAnswerFilterAndSortStore = (
     }
   };
 
-  const [, filterStateWithAnswersDispatch, { state: filterStateWithAnswers$ }] =
+  const [filterStateWithAnswers$, filterStateWithAnswersDispatch] =
     createReducerWithActions(
       filterStateWithAnswersReducer,
       {
@@ -143,9 +143,6 @@ export const createAnswerFilterAndSortStore = (
 
   const filterState$: InitializedObservable<AnswerFilterState> =
     filterStateWithAnswers$.pipe(map((st) => st.filterState));
-
-  const useFilterState = (): AnswerFilterState =>
-    useObservableValue(filterState$);
 
   const filterStateDispatch = (
     action: AnswerFilterStateAction,
@@ -783,19 +780,10 @@ export const createAnswerFilterAndSortStore = (
     ),
   );
 
-  const tagValues$: InitializedObservable<readonly string[]> = tags$.pipe(
-    map((tags) => tags.map((t) => t.value)),
-  );
-
-  const tagProps$: InitializedObservable<TagPropsGetter> = tags$.pipe(
-    map(
-      (tags): TagPropsGetter =>
-        (value) =>
-          tags.find((t) => t.value === value)?.props ?? {
-            intent: 'none' as const,
-          },
-    ),
-  );
+  const tagValues$: InitializedObservable<readonly TagInputValue[]> =
+    tags$.pipe(
+      map((tags) => tags.map(({ value, props }) => ({ value, ...props }))),
+    );
 
   const clearTags = (): void => {
     resetSortOrderAndKey();
@@ -815,11 +803,9 @@ export const createAnswerFilterAndSortStore = (
     answersFiltered$,
     sortKeyAndOrder$,
     filterState$,
-    useFilterState,
     iconOfSpecifiedRespondentCheckState$,
     respondentCheckState$,
     tagValues$,
-    tagProps$,
     onDatetimeSortOrderChange,
     onScoreSortOrderChange,
     disableFilteringByIcon,
@@ -874,7 +860,6 @@ export type AnswerFilterAndSort = Readonly<{
     readonly ['date' | 'score', 'asc' | 'desc']
   >;
   filterState$: InitializedObservable<AnswerFilterState>;
-  useFilterState: () => AnswerFilterState;
   iconOfSpecifiedRespondentCheckState$: InitializedObservable<
     DeepReadonly<
       {
@@ -896,8 +881,7 @@ export type AnswerFilterAndSort = Readonly<{
       }[]
     >
   >;
-  tagValues$: InitializedObservable<readonly string[]>;
-  tagProps$: InitializedObservable<TagPropsGetter>;
+  tagValues$: InitializedObservable<readonly TagInputValue[]>;
   onDatetimeSortOrderChange: (state: 'asc' | 'desc') => void;
   onScoreSortOrderChange: (state: 'asc' | 'desc') => void;
   disableFilteringByIcon: (iconId: DetailedFilterIcon) => void;
@@ -972,17 +956,7 @@ type FilterStateWithAnswersAction = DeepReadonly<
   | { type: 'filter'; action: AnswerFilterStateAction }
 >;
 
-/**
- * Named rather than written inline: `DeepReadonly` over Blueprint's `TagProps`
- * expands into something the checker cannot carry through the operators
- * downstream (TS2589).
- */
-type FilterTag = Readonly<{ value: string; props: TagProps }>;
-
-// `DeepReadonly` over `ReactNode` and Blueprint's `TagProps` expands into
-// something the checker gives up on (TS2589) once it goes through an operator.
-// Blueprint takes these props as they are, so `Readonly` is what they need.
-type TagPropsGetter = (
-  value: React.ReactNode,
-  index: number,
-) => Readonly<TagProps>;
+type FilterTag = Readonly<{
+  value: string;
+  props: StrictOmit<TagInputValue, 'value'>;
+}>;

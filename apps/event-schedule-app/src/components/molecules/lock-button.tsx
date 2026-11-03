@@ -1,23 +1,31 @@
-import { Button, Tooltip } from '@blueprintjs/core';
-import { memoNamed } from 'react-utils';
+import { Button, Tooltip } from 'blueprint-synstate';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 
-export const LockButton = memoNamed<
-  Readonly<{
-    passwordIsOpen: boolean;
-    disabled: boolean;
-    onLockClick: () => void;
-  }>
->('LockButton', ({ passwordIsOpen, disabled, onLockClick }) => (
+type Props = Readonly<{
+  passwordIsOpen: Bindable<boolean>;
+  disabled: Bindable<boolean>;
+  onLockClick: () => void;
+}>;
+
+/** Shows or hides the password, inside its input. */
+export const LockButton = ({
+  passwordIsOpen,
+  disabled,
+  onLockClick,
+}: Props): JSX.Element => (
   <Tooltip
-    content={`${passwordIsOpen ? 'Hide' : 'Show'} Password`}
+    content={mapBindable(
+      passwordIsOpen,
+      (open) => `${open ? 'Hide' : 'Show'} Password`,
+    )}
     disabled={disabled}
   >
     <Button
       disabled={disabled}
-      icon={passwordIsOpen ? 'unlock' : 'lock'}
+      icon={mapBindable(passwordIsOpen, (open) => (open ? 'unlock' : 'lock'))}
       intent={'warning'}
-      variant={'minimal'}
+      variant={constant('minimal')}
       onClick={onLockClick}
     />
   </Tooltip>
-));
+);

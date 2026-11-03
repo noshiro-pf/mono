@@ -1,117 +1,72 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import type { InitializedObservable } from 'synstate';
+import { constant, If, mapBindable, view, type JSX } from 'synstate-dom';
 import { dict, ymdhm2strWithDay } from '../../constants/index.mjs';
 import { eventIsAfterDeadline } from '../../functions/index.mjs';
 import { Description } from '../atoms/index.mjs';
+import * as styles from './answer-page-event-info.module.css';
 import { AnswerPageNotes } from './answer-page-notes.js';
 
 const dc = dict.answerPage;
 
-type Props = Readonly<{ eventSchedule: EventSchedule }>;
+type Props = Readonly<{ eventSchedule: InitializedObservable<EventSchedule> }>;
 
-export const AnswerPageEventInfo = memoNamed<Props>(
-  'AnswerPageEventInfo',
-  ({ eventSchedule }) => {
-    const afterDeadline = React.useMemo(
-      () => eventIsAfterDeadline(eventSchedule),
-      [eventSchedule],
-    );
+/** The event's title, notes and answer deadline. */
+export const AnswerPageEventInfo = ({ eventSchedule }: Props): JSX.Element => {
+  const afterDeadline$ = view(eventSchedule, eventIsAfterDeadline);
 
-    return (
+  return (
+    <div class={constant(styles.grid)}>
+      <div class={constant(label(styles.label1))}>
+        {constant(dc.eventInfo.eventName)}
+      </div>
       <div
-        css={css`
-          display: grid;
-          grid-template-columns: auto 1fr;
-          grid-template-rows: repeat(3, auto);
-          grid-template-areas:
-            'label1 value1'
-            'label2 value2'
-            'label3 value3';
-        `}
+        class={constant(value(styles.value1))}
+        data-e2e={constant('event-title')}
       >
-        <TableLabel
-          css={css`
-            grid-area: label1;
-          `}
-        >
-          {dc.eventInfo.eventName}
-        </TableLabel>
-        <TableValue
-          css={css`
-            grid-area: value1;
-          `}
-          data-e2e={'event-title'}
-        >
-          {eventSchedule.title}
-        </TableValue>
-        <TableLabel
-          css={css`
-            grid-area: label2;
-          `}
-        >
-          {dc.eventInfo.notes}
-        </TableLabel>
-        <TableValue
-          css={css`
-            grid-area: value2;
-            white-space: pre-wrap;
-          `}
-        >
-          <AnswerPageNotes notes={eventSchedule.notes} />
-        </TableValue>
-        <TableLabel
-          css={css`
-            grid-area: label3;
-          `}
-        >
-          {dc.eventInfo.answerDeadline}
-        </TableLabel>
-        <TableValue
-          css={css`
-            grid-area: value3;
-          `}
-        >
-          {eventSchedule.answerDeadline === 'none' ? (
-            <div>{dict.answerPage.eventInfo.noAnswerDeadline}</div>
-          ) : (
+        {view(eventSchedule, (e) => e.title)}
+      </div>
+      <div class={constant(label(styles.label2))}>
+        {constant(dc.eventInfo.notes)}
+      </div>
+      <div class={constant(value(styles.value2))}>
+        <AnswerPageNotes notes={view(eventSchedule, (e) => e.notes)} />
+      </div>
+      <div class={constant(label(styles.label3))}>
+        {constant(dc.eventInfo.answerDeadline)}
+      </div>
+      <div class={constant(value(styles.value3))}>
+        <If
+          cond={view(eventSchedule, (e) => e.answerDeadline === 'none')}
+          then={
+            <div>{constant(dict.answerPage.eventInfo.noAnswerDeadline)}</div>
+          }
+          else={
             <>
-              <div>{ymdhm2strWithDay(eventSchedule.answerDeadline)}</div>
+              <div>
+                {view(eventSchedule, (e) =>
+                  e.answerDeadline === 'none'
+                    ? ''
+                    : ymdhm2strWithDay(e.answerDeadline),
+                )}
+              </div>
               <Description
-                error={afterDeadline}
-                text={
-                  afterDeadline
+                error={afterDeadline$}
+                text={mapBindable(afterDeadline$, (after) =>
+                  after
                     ? dc.eventInfo.answerDeadlineIsExpired
-                    : dc.eventInfo.answerDeadlineDescription
-                }
+                    : dc.eventInfo.answerDeadlineDescription,
+                )}
               />
             </>
-          )}
-        </TableValue>
+          }
+        />
       </div>
-    );
-  },
-);
+    </div>
+  );
+};
 
-const TableCell = styled.div`
-  padding-top: 3px;
-  padding-bottom: 3px;
-  text-align: left;
-  vertical-align: text-top;
-`;
+const label = (area: string): string =>
+  `${styles.cell} ${styles.label} ${area}` as const;
 
-const TableLabel = styled(TableCell)`
-  grid-area: label;
-  white-space: nowrap;
-  padding-right: 10px;
-  font-weight: bolder;
-`;
-
-const TableValue = styled(TableCell)`
-  grid-area: value;
-  white-space: pre-line;
-  width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
+const value = (area: string): string =>
+  `${styles.cell} ${styles.value} ${area}` as const;

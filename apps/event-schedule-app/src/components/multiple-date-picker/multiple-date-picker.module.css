@@ -1,0 +1,140 @@
+/* What react-blueprintjs-utils' styled date picker parts drew. */
+
+.datePicker {
+  background: #ffffff;
+  border-radius: 3px;
+  display: flex;
+  padding: 5px;
+  position: relative;
+  user-select: none;
+}
+
+.dayPicker {
+  display: inline-block;
+  min-width: 210px;
+  position: relative;
+  vertical-align: top;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.month {
+  border-collapse: collapse;
+  border-spacing: 0;
+  display: inline-table;
+  margin: 0 5px 5px;
+  user-select: none;
+}
+
+.weekdays {
+  display: table-header-group;
+}
+
+.row {
+  display: table-row;
+}
+
+.body {
+  display: table-row-group;
+}
+
+.weekday {
+  display: table-cell;
+  height: 30px;
+  line-height: 1;
+  text-align: center;
+  vertical-align: middle;
+  width: 30px;
+  font-weight: 600;
+  padding-top: 5px;
+  outline: none;
+  border-radius: 3px;
+}
+
+.weekdayClickable {
+  cursor: pointer;
+
+  &:hover {
+    background: #d8e1e8;
+  }
+}
+
+.abbr {
+  text-decoration: none !important;
+}
+
+.day {
+  display: table-cell;
+  height: 30px;
+  line-height: 1;
+  text-align: center;
+  vertical-align: middle;
+  width: 30px;
+  border-radius: 3px;
+  outline: none;
+}
+
+.saturday {
+  color: #0000ec;
+}
+
+.holiday {
+  color: #e70000;
+}
+
+.clickable {
+  cursor: pointer;
+
+  &:active {
+    background: #ced9e0;
+  }
+
+  &:hover,
+  &:focus {
+    background: #d8e1e8;
+    color: #182026;
+  }
+}
+
+.selected {
+  background-color: #137cbd;
+  color: #ffffff;
+}
+
+.selectedClickable {
+  cursor: pointer;
+
+  &:hover {
+    background-color: #106ba3;
+  }
+}
+
+.outlinedSelected {
+  outline: rgba(19, 124, 189, 0.6) auto 1px;
+  outline-offset: -2px;
+  border-radius: 50%;
+}
+
+.outside {
+  color: rgba(92, 112, 128, 0.6);
+}
+
+.dayWrapper {
+  border-radius: 3px;
+  padding: 7px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.today {
+  display: flex;
+  justify-content: center;
+}

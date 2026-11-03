@@ -1,3 +1,4 @@
+export * from './clamp-and-round.mjs';
 export * from './create-reducer-with-actions.mjs';
 export * from './end-of-day.mjs';
 export * from './is-http-url.mjs';

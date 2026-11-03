@@ -1,3 +1,4 @@
+export * from './answer-icon-point-cell.js';
 export * from './fair-point-input.js';
 export * from './good-point.js';
 export * from './poor-point.js';

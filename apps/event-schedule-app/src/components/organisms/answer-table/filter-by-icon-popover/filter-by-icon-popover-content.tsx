@@ -1,19 +1,16 @@
-import { Button } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import * as React from 'react';
-import { SwitchWithoutLabelStyled } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
+import { Button, Switch } from 'blueprint-synstate';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 import type { SafeUint } from 'ts-type-forge';
 import { dict } from '../../../../constants/index.mjs';
 import type { NumIconFilterState } from '../../../../types/index.mjs';
 import { IconCountNumericInput } from '../../../molecules/index.mjs';
+import * as styles from '../answer-table.module.css';
 
 const dc = dict.answerPage.answers.iconHeaderFilter;
 
 type Props = Readonly<{
-  state: NumIconFilterState;
-  upperLimit: SafeUint;
+  state: Bindable<NumIconFilterState>;
+  upperLimit: Bindable<SafeUint>;
   onMinChange: (value: SafeUint) => void;
   onMaxChange: (value: SafeUint) => void;
   enableFiltering: () => void;
@@ -21,107 +18,63 @@ type Props = Readonly<{
   onClose: () => void;
 }>;
 
-export const FilterByIconPopoverContent = memoNamed<Props>(
-  'FilterByIconPopoverContent',
-  ({
-    state,
-    upperLimit,
-    onMinChange,
-    onMaxChange,
-    onClose,
-    enableFiltering,
-    disableFiltering,
-  }) => {
-    const switchHandler = React.useCallback<
-      React.ChangeEventHandler<HTMLInputElement>
-    >(
-      (ev) => {
-        if (!(ev.target instanceof HTMLInputElement)) {
-          return;
-        }
+export const FilterByIconPopoverContent = ({
+  state,
+  upperLimit,
+  onMinChange,
+  onMaxChange,
+  onClose,
+  enableFiltering,
+  disableFiltering,
+}: Props): JSX.Element => {
+  const disabled = mapBindable(state, (s) => !s.enabled);
 
-        if (ev.target.checked) {
-          enableFiltering();
-        } else {
-          disableFiltering();
-        }
-      },
-      [enableFiltering, disableFiltering],
-    );
-
-    return (
-      <div
-        css={css`
-          padding: 10px;
-        `}
-      >
-        <Row>
-          <NumericInputWrapper>
-            <IconCountNumericInput
-              count={state.min}
-              disabled={!state.enabled}
-              max={upperLimit}
-              onCountChange={onMinChange}
-            />
-          </NumericInputWrapper>
-          <Suffix>{dc.ge}</Suffix>
-        </Row>
-        <Row>
-          <NumericInputWrapper>
-            <IconCountNumericInput
-              count={state.max}
-              disabled={!state.enabled}
-              max={upperLimit}
-              onCountChange={onMaxChange}
-            />
-          </NumericInputWrapper>
-          <Suffix>{dc.le}</Suffix>
-        </Row>
-
-        <Footer>
-          <div
-            css={css`
-              margin: 5px 10px;
-            `}
-          >
-            <SwitchWithoutLabelStyled
-              checked={state.enabled}
-              label={dc.enableFilteringSwitchLabel}
-              onChange={switchHandler}
-            />
-          </div>
-          <Button
-            intent={'primary'}
-            text={dict.common.buttonText.close}
-            onClick={onClose}
+  return (
+    <div class={constant(styles.filterPopover)}>
+      <div class={constant(styles.filterRow)}>
+        <div class={constant(styles.filterInput)}>
+          <IconCountNumericInput
+            count={mapBindable(state, (s) => s.min)}
+            disabled={disabled}
+            max={upperLimit}
+            onCountChange={onMinChange}
           />
-        </Footer>
+        </div>
+        <div class={constant(styles.filterSuffix)}>{constant(dc.ge)}</div>
       </div>
-    );
-  },
-);
+      <div class={constant(styles.filterRow)}>
+        <div class={constant(styles.filterInput)}>
+          <IconCountNumericInput
+            count={mapBindable(state, (s) => s.max)}
+            disabled={disabled}
+            max={upperLimit}
+            onCountChange={onMaxChange}
+          />
+        </div>
+        <div class={constant(styles.filterSuffix)}>{constant(dc.le)}</div>
+      </div>
 
-const numericInputWrapperWidthPx = 120;
-
-const Row = styled.div`
-  margin: 3px;
-  display: flex;
-  align-items: center;
-  width: ${numericInputWrapperWidthPx + 42}px;
-`;
-
-const NumericInputWrapper = styled.div`
-  flex: 0 0 ${numericInputWrapperWidthPx}px;
-`;
-
-const Suffix = styled.div`
-  white-space: nowrap;
-  margin-left: 5px;
-`;
-
-const Footer = styled.div`
-  margin-top: 10px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-`;
+      <div class={constant(styles.filterFooter)}>
+        <div class={constant(styles.filterSwitch)}>
+          <Switch
+            checked={mapBindable(state, (s) => s.enabled)}
+            class={styles.switchWithoutMargin}
+            label={constant(dc.enableFilteringSwitchLabel)}
+            onChange={({ currentTarget }) => {
+              if (currentTarget.checked) {
+                enableFiltering();
+              } else {
+                disableFiltering();
+              }
+            }}
+          />
+        </div>
+        <Button
+          intent={'primary'}
+          text={constant(dict.common.buttonText.close)}
+          onClick={onClose}
+        />
+      </div>
+    </div>
+  );
+};

@@ -1,0 +1,10 @@
+.section {
+  margin: 10px;
+  min-width: 300px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

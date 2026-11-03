@@ -1,18 +1,9 @@
-import { css } from '@emotion/react';
-import { memoNamed } from 'react-utils';
+import { constant, type JSX } from 'synstate-dom';
 import { defaultIconPoint } from '../../../constants/index.mjs';
+import * as styles from './fixed-point.module.css';
 
-const s = defaultIconPoint.poor.toString();
-
-export const AnswerIconPoorPoint = memoNamed('AnswerIconPoorPoint', () => (
-  <div
-    css={css`
-      display: flex;
-      justify-content: flex-end;
-      width: 75px;
-      padding-right: 39px;
-    `}
-  >
-    {s}
+export const AnswerIconPoorPoint = (): JSX.Element => (
+  <div class={constant(styles.point)}>
+    {constant(defaultIconPoint.poor.toString())}
   </div>
-));
+);

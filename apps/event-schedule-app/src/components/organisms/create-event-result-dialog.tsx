@@ -1,137 +1,141 @@
 import {
   AnchorButton,
   Button,
-  Classes,
+  Dialog,
   Spinner,
   Tooltip,
-} from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import * as React from 'react';
-import { DialogWithMaxWidth } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
+} from 'blueprint-synstate';
+import { createBooleanState, filter } from 'synstate';
+import {
+  constant,
+  createAfterUpdate,
+  derive,
+  If,
+  mapBindable,
+  subscribeInScope,
+  toObservable,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
 import { CreateEventScheduleStore } from '../../store/index.mjs';
-import { ButtonsWrapperAlignEnd } from '../styled/index.mjs';
+import {
+  ButtonsWrapperAlignEnd,
+  maxWidthModalClass,
+} from '../styled/index.mjs';
+import * as styles from './dialogs.module.css';
 
 const dc = dict.createEventResultDialog;
 
-type Props = Readonly<{ isOpen: boolean; url: string; isLoading: boolean }>;
+type Props = Readonly<{
+  isOpen: Bindable<boolean>;
+  url: Bindable<string>;
+  isLoading: Bindable<boolean>;
+}>;
 
-export const CreateEventResultDialog = memoNamed<Props>(
-  'CreateEventResultDialog',
-  ({ isLoading, isOpen, url }) => {
-    const [linkIsUsed, setLinkIsUsed] = React.useState<boolean>(false);
+export const CreateEventResultDialog = ({
+  isLoading,
+  isOpen,
+  url,
+}: Props): JSX.Element => {
+  const [linkIsUsed$, { setTrue: markLinkUsed, setFalse: resetLinkIsUsed }] =
+    createBooleanState(false);
 
-    const onClipboardButtonClick = React.useCallback(() => {
-      setLinkIsUsed(true);
+  const afterUpdate = createAfterUpdate();
 
-      CreateEventScheduleStore.onClipboardButtonClick();
-    }, [setLinkIsUsed]);
+  subscribeInScope(toObservable(isOpen).pipe(filter((open) => !open)), () => {
+    afterUpdate(resetLinkIsUsed);
+  });
 
-    const onLinkClick = React.useCallback(() => {
-      setLinkIsUsed(true);
-    }, [setLinkIsUsed]);
+  const backIsDisabled = derive(
+    [isLoading, linkIsUsed$],
+    (loading, used) => loading || !used,
+  );
 
-    React.useEffect(() => {
-      if (!isOpen) {
-        setLinkIsUsed(false);
-      }
-    }, [isOpen, setLinkIsUsed]);
-
-    return (
-      <DialogWithMaxWidth
-        canEscapeKeyClose={false}
-        icon={'timeline-events'}
-        isCloseButtonShown={false}
-        isOpen={isOpen}
-        title={isLoading ? dc.titleLoading : dc.title}
+  return (
+    <Dialog
+      canEscapeKeyClose={false}
+      class={maxWidthModalClass}
+      icon={'timeline-events'}
+      isCloseButtonShown={false}
+      isOpen={isOpen}
+      title={mapBindable(isLoading, (loading) =>
+        loading ? dc.titleLoading : dc.title,
+      )}
+    >
+      <div
+        class={constant('bp6-dialog-body')}
+        data-e2e={constant('create-event-result-dialog-body')}
       >
-        <div
-          className={Classes.DIALOG_BODY}
-          data-e2e={'create-event-result-dialog-body'}
-        >
-          {isLoading ? (
-            <Spinner />
-          ) : (
+        <If
+          cond={isLoading}
+          else={
             <>
-              <p>{dc.description}</p>
+              <p>{constant(dc.description)}</p>
               <div
-                css={css`
-                  display: flex;
-                  align-items: center;
-                  flex-wrap: nowrap;
-                `}
-                data-e2e={'url-wrapper'}
+                class={constant(styles.urlRow)}
+                data-e2e={constant('url-wrapper')}
               >
-                <div>{'URL: '}</div>
-                <div
-                  css={css`
-                    flex-shrink: 1;
-                    min-width: 0;
-                  `}
-                >
+                <div>{constant('URL: ')}</div>
+                <div class={constant(styles.urlCell)}>
                   <a
-                    css={css`
-                      display: block;
-                      margin: 0 5px;
-                      text-overflow: ellipsis;
-                      overflow: hidden;
-                      white-space: nowrap;
-                    `}
+                    class={constant(styles.url)}
                     href={url}
-                    rel={'noopener noreferrer'}
-                    target={'_blank'}
-                    onClick={onLinkClick}
+                    rel={constant('noopener noreferrer')}
+                    target={constant('_blank')}
+                    onClick={markLinkUsed}
                   >
                     {url}
                   </a>
                 </div>
                 <div>
-                  <Tooltip content={dc.clipboardButton}>
+                  <Tooltip content={constant(dc.clipboardButton)}>
                     <Button
-                      data-e2e={'clipboard-button'}
+                      data-e2e={constant('clipboard-button')}
                       icon={'clipboard'}
-                      variant={'minimal'}
-                      onClick={onClipboardButtonClick}
+                      variant={constant('minimal')}
+                      onClick={() => {
+                        markLinkUsed();
+
+                        CreateEventScheduleStore.onClipboardButtonClick();
+                      }}
                     />
                   </Tooltip>
                 </div>
               </div>
             </>
-          )}
-        </div>
+          }
+          then={<Spinner />}
+        />
+      </div>
 
-        <div
-          className={Classes.DIALOG_FOOTER}
-          data-e2e={'create-event-result-dialog-footer'}
-        >
-          <ButtonsWrapperAlignEnd>
-            <Button
-              data-e2e={'back-button'}
-              disabled={isLoading || !linkIsUsed}
-              intent={'none'}
-              title={
-                isLoading || !linkIsUsed ? dc.whyButtonIsDisabled : undefined
-              }
-              onClick={CreateEventScheduleStore.closeCreateResultDialog}
-            >
-              {dc.back}
-            </Button>
-
-            <AnchorButton
-              data-e2e={'open-answer-page-button'}
-              href={url}
-              intent={'primary'}
-              loading={isLoading}
-              rel={'noopener noreferrer'}
-              target={'_blank'}
-              onClick={onLinkClick}
-            >
-              {dc.openEventPageCreated}
-            </AnchorButton>
-          </ButtonsWrapperAlignEnd>
-        </div>
-      </DialogWithMaxWidth>
-    );
-  },
-);
+      <div
+        class={constant('bp6-dialog-footer')}
+        data-e2e={constant('create-event-result-dialog-footer')}
+      >
+        <ButtonsWrapperAlignEnd>
+          <Button
+            data-e2e={constant('back-button')}
+            disabled={backIsDisabled}
+            intent={'none'}
+            text={constant(dc.back)}
+            title={mapBindable(backIsDisabled, (disabled) =>
+              disabled ? dc.whyButtonIsDisabled : '',
+            )}
+            onClick={CreateEventScheduleStore.closeCreateResultDialog}
+          />
+          <AnchorButton
+            data-e2e={constant('open-answer-page-button')}
+            href={url}
+            intent={'primary'}
+            loading={isLoading}
+            rel={'noopener noreferrer'}
+            target={'_blank'}
+            text={constant(dc.openEventPageCreated)}
+            onClick={markLinkUsed}
+          />
+        </ButtonsWrapperAlignEnd>
+      </div>
+    </Dialog>
+  );
+};

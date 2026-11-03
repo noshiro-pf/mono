@@ -15,7 +15,6 @@ import {
   type InitializedObservable,
   type Subscription,
 } from 'synstate';
-import { useObservableValue } from 'synstate-react-hooks';
 import { Result, isNotUndefined, tp } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
@@ -54,8 +53,6 @@ export type EventListFetcher = Readonly<{
   refreshButtonIsLoading$: InitializedObservable<boolean>;
   /** Disabled for `throttleMs` after each read the button can ask for. */
   refreshButtonIsDisabled$: InitializedObservable<boolean>;
-  useRefreshButtonIsDisabled: () => boolean;
-  useRefreshButtonIsLoading: () => boolean;
   refreshEventList: () => void;
   /** Starts reading, with the first read; returns what stops it. */
   start: () => () => void;
@@ -103,27 +100,21 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
     withInitialValue(undefined),
   );
 
-  const [
-    useRefreshButtonIsLoading,
-    setRefreshButtonIsLoading,
-    { state: refreshButtonIsLoading$ },
-  ] = createReducerWithActions(
-    (_: boolean, isLoading: boolean) => isLoading,
-    false,
-    [
-      fetchEventListStarted$.pipe(mapTo(true)),
-      fetchedEventListResult$.pipe(mapTo(false)),
-    ],
-  );
+  const [refreshButtonIsLoading$, setRefreshButtonIsLoading] =
+    createReducerWithActions(
+      (_: boolean, isLoading: boolean) => isLoading,
+      false,
+      [
+        fetchEventListStarted$.pipe(mapTo(true)),
+        fetchedEventListResult$.pipe(mapTo(false)),
+      ],
+    );
 
   /** Disabled for `throttleMs` after each read the button can ask for. */
   const refreshButtonIsDisabled$ = merge([
     fetchEventListThrottled$.pipe(mapTo(true)),
     fetchEventListThrottled$.pipe(debounce(deps.throttleMs)).pipe(mapTo(false)),
   ]).pipe(withInitialValue(false));
-
-  const useRefreshButtonIsDisabled = (): boolean =>
-    useObservableValue(refreshButtonIsDisabled$);
 
   const refreshEventList = (): void => {
     fetchEventList();
@@ -195,8 +186,6 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
     fetchEventList,
     refreshButtonIsLoading$,
     refreshButtonIsDisabled$,
-    useRefreshButtonIsDisabled,
-    useRefreshButtonIsLoading,
     refreshEventList,
     start,
   };

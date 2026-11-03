@@ -1,12 +1,23 @@
-import { Button, ControlGroup, HTMLSelect, Spinner } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
+import {
+  Button,
+  Checkbox,
+  ControlGroup,
+  HtmlSelect,
+  InputGroup,
+  Spinner,
+} from 'blueprint-synstate';
 import { UserId, UserName } from 'event-schedule-app-shared';
-import * as React from 'react';
-import { BpCheckbox, BpInput } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
-import { Arr, Result, match, tp } from 'ts-data-forge';
+import {
+  For,
+  If,
+  constant,
+  createAfterUpdate,
+  derive,
+  mapBindable,
+  view,
+  type JSX,
+} from 'synstate-dom';
+import { Arr, Result, match } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import { createToaster, showToast } from '../../../functions/index.mjs';
 import {
@@ -18,190 +29,195 @@ import {
 } from '../../../store/index.mjs';
 import { Header } from '../../organisms/index.mjs';
 import { EventListItemComponent } from './event-list-item.js';
+import * as styles from './event-list-page.module.css';
 
 const dc = dict.eventListPage;
 
-export const EventListPage = memoNamed('EventListPage', () => {
-  React.useEffect(() => {
-    EventListStore.fetchEventList();
-  }, []);
+export const EventListPage = (): JSX.Element => {
+  // After the update that opened the page.
+  createAfterUpdate()(EventListStore.fetchEventList);
 
-  const eventList = useObservableValue(eventList$);
-
-  const fireAuthUser = Auth.useFireAuthUser();
-
-  const eventListWithHandler = React.useMemo(
-    () =>
-      eventList
-        // TODO: backend でソートするようにする
-        ?.toSorted(
-          (a, b) =>
-            (b.eventScheduleMetadata.createdAtMillis ??
-              Date.parse(b.eventScheduleMetadata.createdAt)) -
-            (a.eventScheduleMetadata.createdAtMillis ??
-              Date.parse(a.eventScheduleMetadata.createdAt)),
-        )
-        .map((e) =>
-          tp(
-            e,
-            () => {
-              if (fireAuthUser === undefined) {
-                return;
-              }
-
-              archiveEventScheduleHandler(e.eventScheduleMetadata.id, {
-                id: UserId.cast(fireAuthUser.uid),
-                name: UserName.cast(fireAuthUser.displayName ?? ''),
-              }).catch(() => {});
-            },
-            () => {
-              if (fireAuthUser === undefined) {
-                return;
-              }
-
-              unarchiveEventScheduleHandler(e.eventScheduleMetadata.id, {
-                id: UserId.cast(fireAuthUser.uid),
-                name: UserName.cast(fireAuthUser.displayName ?? ''),
-              }).catch(() => {});
-            },
-          ),
-        ),
-
-    [eventList, fireAuthUser],
+  const sortedEventList$ = view(eventList$, (eventList) =>
+    // TODO: backend でソートするようにする
+    eventList?.toSorted(
+      (a, b) =>
+        (b.eventScheduleMetadata.createdAtMillis ??
+          Date.parse(b.eventScheduleMetadata.createdAt)) -
+        (a.eventScheduleMetadata.createdAtMillis ??
+          Date.parse(a.eventScheduleMetadata.createdAt)),
+    ),
   );
 
-  const refreshButtonIsDisabled = EventListStore.useRefreshButtonIsDisabled();
+  const formElementsAreDisabled = derive(
+    [
+      EventListStore.refreshButtonIsDisabled$,
+      EventListStore.refreshButtonIsLoading$,
+    ],
+    (disabled, loading) => disabled || loading,
+  );
 
-  const refreshButtonIsLoading = EventListStore.useRefreshButtonIsLoading();
-
-  const filterOptionState = EventListPageFilterStore.useFilterOptionState();
-
-  const showOnlyEventSchedulesICreated =
-    EventListPageFilterStore.useShowOnlyEventSchedulesICreated();
-
-  const showAllPastDaysEvent =
-    EventListPageFilterStore.useShowAllPastDaysEvent();
-
-  const filterText = EventListPageFilterStore.useFilterText();
-
-  const formElementsAreDisabled =
-    refreshButtonIsDisabled || refreshButtonIsLoading;
-
-  const archiveOrUnArchive = React.useMemo(
-    () =>
-      match(filterOptionState, {
+  const archiveOrUnArchive$ = view(
+    EventListPageFilterStore.filterOptionState$,
+    (option) =>
+      match(option, {
         archive: 'unarchive',
         inProgress: 'archive',
       } as const),
-    [filterOptionState],
+  );
+
+  // Every card is drawn again when the list, the user or the filter changes.
+  const listDrawing$ = derive(
+    [sortedEventList$, Auth.fireAuthUser$, archiveOrUnArchive$],
+    (eventList, fireAuthUser, archiveOrUnArchive) =>
+      ({
+        eventList: eventList ?? [],
+        fireAuthUser,
+        archiveOrUnArchive,
+      }) as const,
   );
 
   return (
-    <div data-e2e={'event-list-page'}>
+    <div data-e2e={constant('event-list-page')}>
       <Header title={dc.title} />
-      {eventListWithHandler === undefined ? (
-        <Spinner />
-      ) : (
-        <div
-          css={css`
-            margin: 0 20px;
-          `}
-        >
-          <FilterByArea>
-            <HTMLSelect
-              disabled={formElementsAreDisabled}
-              value={filterOptionState}
-              onChange={filterOptionStateChangeHandler}
-            >
-              <option value={'inProgress'}>{dc.filter.inProgress}</option>
-              <option value={'archive'}>{dc.filter.archive}</option>
-            </HTMLSelect>
-            <BpCheckbox
-              checked={showOnlyEventSchedulesICreated}
-              disabled={formElementsAreDisabled}
-              label={dc.filter.showOnlyEventSchedulesICreated}
-              onCheck={
-                EventListPageFilterStore.setShowOnlyEventSchedulesICreated
-              }
-            />
-            <BpCheckbox
-              checked={showAllPastDaysEvent}
-              disabled={formElementsAreDisabled}
-              label={dc.filter.showAllPastDaysEvent}
-              onCheck={EventListPageFilterStore.setShowAllPastDaysEvent}
-            />
-            <ControlGroup>
-              <BpInput
-                data-e2e={'search-input'}
-                leftIcon={'search'}
-                placeholder={dc.filter.searchInput}
-                type={'search'}
-                value={filterText}
-                onValueChange={EventListPageFilterStore.setFilterText}
-              />
-              <Button
-                data-e2e={'search-button'}
+      <If
+        cond={mapBindable(sortedEventList$, (list) => list === undefined)}
+        else={
+          <div class={constant(styles.content)}>
+            <div class={constant(styles.filterByArea)}>
+              <HtmlSelect
                 disabled={formElementsAreDisabled}
-                onClick={EventListPageFilterStore.filterByText}
+                value={EventListPageFilterStore.filterOptionState$}
+                onChange={({ currentTarget }) => {
+                  const v = currentTarget.value;
+
+                  if (v === 'archive' || v === 'inProgress') {
+                    EventListPageFilterStore.setFilterOptionState(v);
+                  }
+                }}
               >
-                {dc.search}
-              </Button>
-            </ControlGroup>
-          </FilterByArea>
-
-          <hr />
-
-          <FilterByArea
-            css={css`
-              justify-content: space-between;
-            `}
-          >
-            <div data-e2e={'event-count'}>
-              {dc.itemCount(Arr.length(eventListWithHandler))}
-            </div>
-            <Button
-              disabled={refreshButtonIsDisabled}
-              icon={'refresh'}
-              intent={'none'}
-              loading={refreshButtonIsLoading}
-              onClick={EventListStore.refreshEventList}
-            >
-              {dc.refresh}
-            </Button>
-          </FilterByArea>
-
-          <div
-            css={css`
-              > * {
-                margin: 10px 0;
-              }
-            `}
-          >
-            {eventListWithHandler.map(([eventListItem, archive, unarchive]) => (
-              <EventListItemComponent
-                key={eventListItem.eventScheduleMetadata.id}
-                archiveOrUnArchive={archiveOrUnArchive}
-                eventListItem={eventListItem}
-                fireAuthUser={fireAuthUser}
-                onConfirmArchiving={archive}
-                onConfirmUnArchiving={unarchive}
+                <option value={constant('inProgress')}>
+                  {constant(dc.filter.inProgress)}
+                </option>
+                <option value={constant('archive')}>
+                  {constant(dc.filter.archive)}
+                </option>
+              </HtmlSelect>
+              <Checkbox
+                checked={
+                  EventListPageFilterStore.showOnlyEventSchedulesICreated$
+                }
+                disabled={formElementsAreDisabled}
+                label={constant(dc.filter.showOnlyEventSchedulesICreated)}
+                onChange={({ currentTarget }) => {
+                  EventListPageFilterStore.setShowOnlyEventSchedulesICreated(
+                    currentTarget.checked,
+                  );
+                }}
               />
-            ))}
+              <Checkbox
+                checked={EventListPageFilterStore.showAllPastDaysEvent$}
+                disabled={formElementsAreDisabled}
+                label={constant(dc.filter.showAllPastDaysEvent)}
+                onChange={({ currentTarget }) => {
+                  EventListPageFilterStore.setShowAllPastDaysEvent(
+                    currentTarget.checked,
+                  );
+                }}
+              />
+              <ControlGroup>
+                <InputGroup
+                  data-e2e={constant('search-input')}
+                  leftIcon={'search'}
+                  placeholder={constant(dc.filter.searchInput)}
+                  type={'search'}
+                  value={EventListPageFilterStore.filterText$}
+                  onInput={({ currentTarget }) => {
+                    EventListPageFilterStore.setFilterText(currentTarget.value);
+                  }}
+                />
+                <Button
+                  data-e2e={constant('search-button')}
+                  disabled={formElementsAreDisabled}
+                  text={constant(dc.search)}
+                  onClick={EventListPageFilterStore.filterByText}
+                />
+              </ControlGroup>
+            </div>
+
+            <hr />
+
+            <div
+              class={constant(`${styles.filterByArea} ${styles.spaceBetween}`)}
+            >
+              <div data-e2e={constant('event-count')}>
+                {mapBindable(sortedEventList$, (list) =>
+                  dc.itemCount(Arr.length(list ?? [])),
+                )}
+              </div>
+              <Button
+                disabled={EventListStore.refreshButtonIsDisabled$}
+                icon={'refresh'}
+                intent={'none'}
+                loading={EventListStore.refreshButtonIsLoading$}
+                text={constant(dc.refresh)}
+                onClick={EventListStore.refreshEventList}
+              />
+            </div>
+
+            <div class={constant(styles.list)}>
+              <For items={mapBindable(listDrawing$, (d) => [d])} key={(d) => d}>
+                {(drawing$) => {
+                  const { eventList, fireAuthUser, archiveOrUnArchive } =
+                    drawing$.getSnapshot().value;
+
+                  const user = (): User | undefined =>
+                    fireAuthUser === undefined
+                      ? undefined
+                      : ({
+                          id: UserId.cast(fireAuthUser.uid),
+                          name: UserName.cast(fireAuthUser.displayName ?? ''),
+                        } as const);
+
+                  return (
+                    <>
+                      {eventList.map((eventListItem) => {
+                        const eventId = eventListItem.eventScheduleMetadata.id;
+
+                        const run =
+                          (handler: (id: string, u: User) => Promise<void>) =>
+                          (): void => {
+                            const u = user();
+
+                            if (u !== undefined) {
+                              handler(eventId, u).catch(() => {});
+                            }
+                          };
+
+                        return (
+                          <EventListItemComponent
+                            archiveOrUnArchive={archiveOrUnArchive}
+                            eventListItem={eventListItem}
+                            fireAuthUser={fireAuthUser}
+                            onConfirmArchiving={run(
+                              archiveEventScheduleHandler,
+                            )}
+                            onConfirmUnArchiving={run(
+                              unarchiveEventScheduleHandler,
+                            )}
+                          />
+                        );
+                      })}
+                    </>
+                  );
+                }}
+              </For>
+            </div>
           </div>
-        </div>
-      )}
+        }
+        then={<Spinner />}
+      />
     </div>
   );
-});
-
-const filterOptionStateChangeHandler: React.ChangeEventHandler<
-  HTMLSelectElement
-> = (ev) => {
-  const v = ev.target.value;
-
-  if (v === 'archive' || v === 'inProgress') {
-    EventListPageFilterStore.setFilterOptionState(v);
-  }
 };
 
 const toast = createToaster();
@@ -232,14 +248,3 @@ const archiveOrUnarchiveHandler =
 const archiveEventScheduleHandler = archiveOrUnarchiveHandler('archive');
 
 const unarchiveEventScheduleHandler = archiveOrUnarchiveHandler('unarchive');
-
-const FilterByArea = styled.div`
-  margin: 10px 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-
-  > * {
-    margin: 3px 10px;
-  }
-`;

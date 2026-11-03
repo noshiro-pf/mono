@@ -1,93 +1,63 @@
-import { Icon } from '@blueprintjs/core';
-import styled from '@emotion/styled';
-import { memoNamed } from 'react-utils';
+import { Icon, type IconName } from 'blueprint-synstate';
+import { constant, type Child, type JSX } from 'synstate-dom';
+import * as styles from './styled.module.css';
 
-export const FilterItem = styled.div`
-  margin: 5px;
-  &:not(:first-of-type) {
-    margin-top: 15px;
-  }
-  &:first-of-type {
-    margin-top: 0;
-  }
-  display: flex;
-  align-items: center;
-  min-height: 30px;
-`;
+type Props = Readonly<{ children: Child; 'data-e2e'?: string }>;
 
-export const CheckboxWrapper = styled.label`
-  display: flex;
-  align-items: center;
-  cursor: pointer;
+const wrapper =
+  (className: string) =>
+  ({ children, 'data-e2e': e2e }: Props): JSX.Element => (
+    <div
+      class={constant(className)}
+      data-e2e={e2e === undefined ? undefined : constant(e2e)}
+    >
+      {children}
+    </div>
+  );
 
-  > :first-of-type {
-    margin-right: 10px;
-  }
-`;
+export const FilterItem = wrapper(styles.filterItem);
 
-export const IconCountNumericInputWrapper = styled.div`
-  max-width: 80px;
-`;
+/** A `<label>`, so that its text toggles the checkbox in it. */
+export const CheckboxWrapper = ({
+  children,
+  'data-e2e': e2e,
+}: Props): JSX.Element => (
+  <label
+    class={constant(styles.checkboxWrapper)}
+    data-e2e={e2e === undefined ? undefined : constant(e2e)}
+  >
+    {children}
+  </label>
+);
 
-export const FilterItemContent = styled.div`
-  margin-left: 31px; // margin 5px + checkbox size 16px + margin-right 10px
-  margin-bottom: 5px;
-`;
+export const IconCountNumericInputWrapper = wrapper(
+  styles.iconCountNumericInputWrapper,
+);
 
-export const RangeSliderWrapper = styled.div`
-  margin-left: 14px;
-  margin-right: 40px;
-`;
+export const FilterItemContent = wrapper(styles.filterItemContent);
 
-export const CheckboxWithRightLabel = styled.div`
-  display: flex;
-  align-items: center;
-  margin-right: 10px;
-`;
+export const RangeSliderWrapper = wrapper(styles.rangeSliderWrapper);
 
-export const CheckboxWithBottomLabel = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
+export const CheckboxWithRightLabel = wrapper(styles.checkboxWithRightLabel);
 
-export const HorizontalCheckboxesWrapper = styled.div`
-  display: flex;
+export const CheckboxWithBottomLabel = wrapper(styles.checkboxWithBottomLabel);
 
-  > :not(:last-of-type) {
-    margin-right: 15px;
-  }
-`;
+export const HorizontalCheckboxesWrapper = wrapper(
+  styles.horizontalCheckboxesWrapper,
+);
 
-export const VerticalCheckboxesWrapper = styled.div`
-  display: flex;
+export const VerticalCheckboxesWrapper = wrapper(
+  styles.verticalCheckboxesWrapper,
+);
 
-  > :not(:last-of-type) {
-    margin-right: 5px;
-  }
-`;
+const operator = (icon: IconName) => (): JSX.Element => (
+  <div class={constant(styles.operator)}>
+    <Icon icon={icon} size={12} />
+  </div>
+);
 
-const Operator = styled.div`
-  padding: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
+export const LessThanOrEqualTo = operator('less-than-or-equal-to');
 
-export const LessThanOrEqualTo = memoNamed('LessThanOrEqualTo', () => (
-  <Operator>
-    <Icon icon={'less-than-or-equal-to'} size={12} />
-  </Operator>
-));
+export const GreaterThanOrEqualTo = operator('greater-than-or-equal-to');
 
-export const GreaterThanOrEqualTo = memoNamed('GreaterThanOrEqualTo', () => (
-  <Operator>
-    <Icon icon={'greater-than-or-equal-to'} size={12} />
-  </Operator>
-));
-
-export const Plus = memoNamed('Plus', () => (
-  <Operator>
-    <Icon icon={'plus'} size={12} />
-  </Operator>
-));
+export const Plus = operator('plus');

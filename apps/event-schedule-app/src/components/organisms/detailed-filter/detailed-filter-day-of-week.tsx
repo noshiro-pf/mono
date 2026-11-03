@@ -1,8 +1,8 @@
-import { CheckboxView } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
+import { constant, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
-import type { AnswerFilterState } from '../../../functions/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
+import { CheckboxView } from '../../molecules/index.mjs';
+import { filterView } from './filter-state.mjs';
 import {
   CheckboxWithBottomLabel,
   CheckboxWrapper,
@@ -13,83 +13,44 @@ import {
 
 const dc = dict.answerPage.detailedFilter;
 
-type Props = Readonly<{ state: AnswerFilterState['dayOfWeek'] }>;
+const days = [
+  ['Sun', AnswerFilterAndSortStore.setSundayCheck],
+  ['Mon', AnswerFilterAndSortStore.setMondayCheck],
+  ['Tue', AnswerFilterAndSortStore.setTuesdayCheck],
+  ['Wed', AnswerFilterAndSortStore.setWednesdayCheck],
+  ['Thr', AnswerFilterAndSortStore.setThursdayCheck],
+  ['Fri', AnswerFilterAndSortStore.setFridayCheck],
+  ['Sat', AnswerFilterAndSortStore.setSaturdayCheck],
+] as const;
 
 /* 曜日で絞り込み */
-export const DetailedFilterDayOfWeek = memoNamed<Props>(
-  'DetailedFilterDayOfWeek',
-  ({ state }) => (
-    <>
-      <FilterItem>
-        <CheckboxWrapper>
-          <CheckboxView
-            state={state.enabled ? 'checked' : 'none'}
-            onCheck={AnswerFilterAndSortStore.setEnabledFilteringByDayOfWeek}
-          />
-          <span>{dc.filterItems.dayOfWeek.title}</span>
-        </CheckboxWrapper>
-      </FilterItem>
+export const DetailedFilterDayOfWeek = (): JSX.Element => (
+  <>
+    <FilterItem>
+      <CheckboxWrapper>
+        <CheckboxView
+          state={filterView((s) => (s.dayOfWeek.enabled ? 'checked' : 'none'))}
+          onCheck={AnswerFilterAndSortStore.setEnabledFilteringByDayOfWeek}
+        />
+        <span>{constant(dc.filterItems.dayOfWeek.title)}</span>
+      </CheckboxWrapper>
+    </FilterItem>
 
-      <FilterItemContent>
-        <VerticalCheckboxesWrapper>
+    <FilterItemContent>
+      <VerticalCheckboxesWrapper>
+        {days.map(([day, onCheck]) => (
           <CheckboxWithBottomLabel>
             <CheckboxView
-              disabled={!state.enabled}
-              state={state.value.Sun ? 'checked' : 'none'}
-              onCheck={AnswerFilterAndSortStore.setSundayCheck}
+              disabled={filterView((s) => !s.dayOfWeek.enabled)}
+              state={filterView((s) =>
+                s.dayOfWeek.value[day] ? 'checked' : 'none',
+              )}
+              onCheck={onCheck}
             />
-            {dc.filterItems.dayOfWeek.items.Sun.abbr}
+            {constant(dc.filterItems.dayOfWeek.items[day].abbr)}
           </CheckboxWithBottomLabel>
-          <CheckboxWithBottomLabel>
-            <CheckboxView
-              disabled={!state.enabled}
-              state={state.value.Mon ? 'checked' : 'none'}
-              onCheck={AnswerFilterAndSortStore.setMondayCheck}
-            />
-            {dc.filterItems.dayOfWeek.items.Mon.abbr}
-          </CheckboxWithBottomLabel>
-          <CheckboxWithBottomLabel>
-            <CheckboxView
-              disabled={!state.enabled}
-              state={state.value.Tue ? 'checked' : 'none'}
-              onCheck={AnswerFilterAndSortStore.setTuesdayCheck}
-            />
-            {dc.filterItems.dayOfWeek.items.Tue.abbr}
-          </CheckboxWithBottomLabel>
-          <CheckboxWithBottomLabel>
-            <CheckboxView
-              disabled={!state.enabled}
-              state={state.value.Wed ? 'checked' : 'none'}
-              onCheck={AnswerFilterAndSortStore.setWednesdayCheck}
-            />
-            {dc.filterItems.dayOfWeek.items.Wed.abbr}
-          </CheckboxWithBottomLabel>
-          <CheckboxWithBottomLabel>
-            <CheckboxView
-              disabled={!state.enabled}
-              state={state.value.Thr ? 'checked' : 'none'}
-              onCheck={AnswerFilterAndSortStore.setThursdayCheck}
-            />
-            {dc.filterItems.dayOfWeek.items.Thr.abbr}
-          </CheckboxWithBottomLabel>
-          <CheckboxWithBottomLabel>
-            <CheckboxView
-              disabled={!state.enabled}
-              state={state.value.Fri ? 'checked' : 'none'}
-              onCheck={AnswerFilterAndSortStore.setFridayCheck}
-            />
-            {dc.filterItems.dayOfWeek.items.Fri.abbr}
-          </CheckboxWithBottomLabel>
-          <CheckboxWithBottomLabel>
-            <CheckboxView
-              disabled={!state.enabled}
-              state={state.value.Sat ? 'checked' : 'none'}
-              onCheck={AnswerFilterAndSortStore.setSaturdayCheck}
-            />
-            {dc.filterItems.dayOfWeek.items.Sat.abbr}
-          </CheckboxWithBottomLabel>
-        </VerticalCheckboxesWrapper>
-      </FilterItemContent>
-    </>
-  ),
+        ))}
+      </VerticalCheckboxesWrapper>
+    </FilterItemContent>
+  </>
 );

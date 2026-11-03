@@ -1,0 +1,6 @@
+.point {
+  display: flex;
+  justify-content: flex-end;
+  width: 75px;
+  padding-right: 39px;
+}

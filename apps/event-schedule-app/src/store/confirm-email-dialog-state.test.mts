@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import { EventSchedule, NotificationSettings } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'tiny-router-observable';
@@ -163,6 +162,7 @@ const fakeToaster = (onShow: () => number): Toaster =>
     dismiss: () => undefined,
     clear: () => undefined,
     getToasts: () => [],
+    remove: () => undefined,
   }) as const;
 
 const setup = (

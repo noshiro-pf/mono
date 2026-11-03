@@ -329,8 +329,8 @@
       ],
     },
 
-    // Not an Astro site like the entry below assumes: a Vite React app whose
-    // entry is the module `index.html` loads.
+    // Not an Astro site like the entry below assumes: a Vite synstate-dom app
+    // whose entry is the module `index.html` loads.
     "apps/event-schedule-app": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,ts,tsx}"],
@@ -338,9 +338,8 @@
       // module import, which knip does not follow.
       "ignoreDependencies": [
         "normalize.css",
-        "@blueprintjs/icons",
-        "@blueprintjs/datetime2",
-        "@blueprintjs/select",
+        "@blueprintjs/core",
+        "@blueprintjs/datetime",
       ],
     },
 

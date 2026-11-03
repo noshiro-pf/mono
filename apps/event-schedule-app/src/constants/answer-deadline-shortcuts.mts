@@ -1,4 +1,8 @@
-import type { DatePickerShortcut } from '@blueprintjs/datetime';
+import {
+  toDateTimeValue,
+  wallClockOf,
+  type DatePickerShortcut,
+} from 'blueprint-synstate';
 import { DateUtils } from 'ts-fortress-types';
 import type { MonthEnum } from 'ts-type-forge';
 import { addDays, endOfDay } from '../utils/index.mjs';
@@ -12,7 +16,7 @@ export const createAnswerDeadlineShortcuts = (
   today: Date,
 ): readonly DatePickerShortcut[] =>
   shortcuts.map(({ label, shift }) => ({
-    date: endOfDay(shift(today)),
+    value: toDateTimeValue(wallClockOf(endOfDay(shift(today)))),
     label,
     includeTime: true,
   }));

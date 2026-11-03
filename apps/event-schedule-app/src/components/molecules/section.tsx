@@ -1,38 +1,39 @@
-import { Button, Card } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import { memoNamed } from 'react-utils';
-import { mapNullable } from 'ts-data-forge';
+import { Button, Card } from 'blueprint-synstate';
+import { constant, type Child, type JSX } from 'synstate-dom';
 import { SectionTitle } from '../atoms/index.mjs';
+import * as styles from './section.module.css';
 
-type Props = Readonly<{ sectionTitle?: string; onCloseClick?: () => void }>;
+type Props = Readonly<{
+  sectionTitle?: string;
+  onCloseClick?: () => void;
+  children: Child;
+}>;
 
-export const Section = memoNamed<React.PropsWithChildren<Props>>(
-  'Section',
-  ({ children, sectionTitle, onCloseClick }) => (
-    <div
-      css={css`
-        margin: 10px;
-        min-width: 300px;
-      `}
-    >
-      <Card elevation={1}>
-        <Header>
-          {mapNullable(sectionTitle, (s) => (
-            <SectionTitle>{s}</SectionTitle>
-          ))}
-          {mapNullable(onCloseClick, (f) => (
-            <Button icon={'cross'} variant={'minimal'} onClick={f} />
-          ))}
-        </Header>
-        {children}
-      </Card>
-    </div>
-  ),
+/** A card with a title and, given `onCloseClick`, a close button. */
+export const Section = ({
+  children,
+  sectionTitle,
+  onCloseClick,
+}: Props): JSX.Element => (
+  <div class={constant(styles.section)}>
+    <Card elevation={1}>
+      <div class={constant(styles.header)}>
+        {sectionTitle === undefined ? (
+          []
+        ) : (
+          <SectionTitle>{constant(sectionTitle)}</SectionTitle>
+        )}
+        {onCloseClick === undefined ? (
+          []
+        ) : (
+          <Button
+            icon={'cross'}
+            variant={constant('minimal')}
+            onClick={onCloseClick}
+          />
+        )}
+      </div>
+      {children}
+    </Card>
+  </div>
 );
-
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;

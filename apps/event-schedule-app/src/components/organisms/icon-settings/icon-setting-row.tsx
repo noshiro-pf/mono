@@ -1,16 +1,16 @@
-import { css } from '@emotion/react';
-import { BpInput } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
+import { InputGroup } from 'blueprint-synstate';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 import { CustomIcon } from '../../atoms/index.mjs';
 import {
   AnswerIconFairPointInput,
   AnswerIconGoodPoint,
   AnswerIconPoorPoint,
 } from '../../molecules/index.mjs';
+import * as styles from './icon-settings.module.css';
 
 type Props = Readonly<
   {
-    answerIcon: AnswerIconSetting;
+    answerIcon: Bindable<AnswerIconSetting>;
     onDescriptionChange: (value: string) => void;
   } & (
     | {
@@ -25,61 +25,38 @@ type Props = Readonly<
   )
 >;
 
-export const AnswerIconRow = memoNamed<Props>(
-  'AnswerIconRow',
-  ({ iconId, answerIcon, onDescriptionChange, onPointChange }) => (
-    <div
-      css={css`
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-        margin-bottom: 5px;
-        justify-content: flex-start;
-
-        & > * {
-          margin-right: 3px;
-        }
-      `}
-    >
-      <div
-        css={css`
-          flex: 0;
-          padding: 0 5px;
-        `}
-      >
-        <CustomIcon iconName={iconId} />
-      </div>
-      <div
-        css={css`
-          flex: 2 2;
-          min-width: 92px;
-          max-width: 300px;
-        `}
-      >
-        <BpInput
-          value={answerIcon.description}
-          onValueChange={onDescriptionChange}
-        />
-      </div>
-      <div
-        css={css`
-          flex: 0 0 75px;
-        `}
-      >
-        {iconId === 'fair' ? (
-          <div data-e2e={'fair-point-input'}>
-            <AnswerIconFairPointInput
-              disabled={false}
-              value={answerIcon.point}
-              onValueChange={onPointChange}
-            />
-          </div>
-        ) : iconId === 'good' ? (
-          <AnswerIconGoodPoint />
-        ) : (
-          <AnswerIconPoorPoint />
-        )}
-      </div>
+export const AnswerIconRow = ({
+  iconId,
+  answerIcon,
+  onDescriptionChange,
+  onPointChange,
+}: Props): JSX.Element => (
+  <div class={constant(styles.row)}>
+    <div class={constant(styles.icon)}>
+      <CustomIcon iconName={iconId} />
     </div>
-  ),
+    <div class={constant(styles.description)}>
+      <InputGroup
+        value={mapBindable(answerIcon, (a) => a.description)}
+        onInput={({ currentTarget }) => {
+          onDescriptionChange(currentTarget.value);
+        }}
+      />
+    </div>
+    <div class={constant(styles.point)}>
+      {onPointChange !== undefined ? (
+        <div data-e2e={constant('fair-point-input')}>
+          <AnswerIconFairPointInput
+            disabled={constant(false)}
+            value={mapBindable(answerIcon, (a) => a.point)}
+            onValueChange={onPointChange}
+          />
+        </div>
+      ) : iconId === 'good' ? (
+        <AnswerIconGoodPoint />
+      ) : (
+        <AnswerIconPoorPoint />
+      )}
+    </div>
+  </div>
 );

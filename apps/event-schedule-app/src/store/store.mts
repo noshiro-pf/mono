@@ -59,8 +59,8 @@ export const Router = createAppRouter();
 export const Auth = createAuthStore({ auth: api.auth, router: Router });
 
 /**
- * The screens `useIsMobile` reports as narrow. Declared here rather than with
- * the helpers below, because the media store reads it as it is created.
+ * The screens `isMobile$` reports as narrow. Declared here rather than with the
+ * helpers below, because the media store reads it as it is created.
  */
 const mobileMediaQuery = '(max-width: 600px)';
 
@@ -69,7 +69,7 @@ const mediaStore = createMediaStore({
   watchIsMobile: (onChange) => watchMediaQuery(mobileMediaQuery, onChange),
 });
 
-export const { useIsMobile } = mediaStore;
+export const { isMobile$ } = mediaStore;
 
 const holidaysStore = createHolidaysStore({ fetchHolidaysJson });
 
@@ -173,6 +173,7 @@ export const GoogleSignInStore = createGoogleSignInStore({
 
 export const RegisterPageStore = createRegisterPageStore({
   api,
+  auth: Auth,
   router: Router,
   googleSignIn: GoogleSignInStore,
   toast: createToaster(),
@@ -237,8 +238,8 @@ export const UpdatePasswordPageStore = createUpdatePasswordPageStore({
  *
  * Made on import, not here, because components import the stores by name:
  * the router (which reads `location`), `api` (which connects to Firebase), the
- * media store (which reads `matchMedia`, so that the first render already has
- * the screen width) and each page's toaster (which adds an element to
+ * media store (which reads `matchMedia`, so that the first read of `isMobile$`
+ * already has the screen width) and each page's toaster (which adds an element to
  * `document.body`).
  */
 export const startStore = (): (() => void) => {

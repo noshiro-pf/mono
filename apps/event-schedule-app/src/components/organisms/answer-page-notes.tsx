@@ -1,23 +1,40 @@
-import { memoNamed } from 'react-utils';
+import {
+  constant,
+  For,
+  If,
+  mapBindable,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { isHttpUrl, splitStringByWhitespace } from '../../utils/index.mjs';
 
-type Props = Readonly<{ notes: string }>;
+type Props = Readonly<{ notes: Bindable<string> }>;
 
-export const AnswerPageNotes = memoNamed<Props>(
-  'AnswerPageNotes',
-  ({ notes }) => (
-    <>{splitStringByWhitespace(notes).map(convertUrlStringToAnchorElement)}</>
-  ),
+/** The event's notes, each http or https URL in them a link. */
+export const AnswerPageNotes = ({ notes }: Props): JSX.Element => (
+  <For items={mapBindable(notes, splitStringByWhitespace)} key={(_, i) => i}>
+    {(word$) => (
+      <If
+        cond={view(word$, isHttpUrl)}
+        then={
+          <a
+            href={view(word$, linkHref)}
+            rel={constant('noopener noreferrer')}
+            target={constant('_blank')}
+          >
+            {word$}
+          </a>
+        }
+        else={<span>{word$}</span>}
+      />
+    )}
+  </For>
 );
 
-const convertUrlStringToAnchorElement = (
-  str: string,
-  key: React.Key,
-): React.JSX.IntrinsicElements['a'] | React.JSX.IntrinsicElements['span'] =>
-  isHttpUrl(str) ? (
-    <a key={key} href={str} rel={'noopener noreferrer'} target={'_blank'}>
-      {str}
-    </a>
-  ) : (
-    <span key={key}>{str}</span>
-  );
+/**
+ * Checked again rather than trusting `cond`: `For` keys by index, so a word can
+ * change in place, and the link must never carry a non-http one, even before
+ * `If` swaps it for plain text.
+ */
+const linkHref = (word: string): string => (isHttpUrl(word) ? word : '');

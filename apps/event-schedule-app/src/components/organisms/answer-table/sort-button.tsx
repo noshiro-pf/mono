@@ -1,59 +1,49 @@
-import { Button, ButtonGroup, PopoverNext } from '@blueprintjs/core';
-import { useBoolState } from 'better-react-use-state';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import { Button, ButtonGroup, Popover } from 'blueprint-synstate';
+import { createBooleanState } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 
 type Props = Readonly<{ onSortChange: (state: 'asc' | 'desc') => void }>;
 
-export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
-  const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
-    useBoolState(false);
+export const SortButton = ({ onSortChange }: Props): JSX.Element => {
+  const [isOpen$, { setTrue: handleOpen, setFalse: handleClose }] =
+    createBooleanState(false);
 
-  const onSortAscClick = React.useCallback(() => {
-    onSortChange('asc');
-
-    handleClose();
-  }, [onSortChange, handleClose]);
-
-  const onSortDescClick = React.useCallback(() => {
-    onSortChange('desc');
+  const sortBy = (order: 'asc' | 'desc') => (): void => {
+    onSortChange(order);
 
     handleClose();
-  }, [onSortChange, handleClose]);
-
-  const popoverContent = React.useMemo(
-    () => (
-      <ButtonGroup vertical>
-        <Button icon={'sort-asc'} variant={'minimal'} onClick={onSortAscClick}>
-          {dict.answerPage.answers.sortAsc}
-        </Button>
-        <Button
-          icon={'sort-desc'}
-          variant={'minimal'}
-          onClick={onSortDescClick}
-        >
-          {dict.answerPage.answers.sortDesc}
-        </Button>
-      </ButtonGroup>
-    ),
-    [onSortAscClick, onSortDescClick],
-  );
+  };
 
   return (
-    <PopoverNext
+    <Popover
       canEscapeKeyClose
-      content={popoverContent}
-      isOpen={isOpen}
+      content={
+        <ButtonGroup vertical>
+          <Button
+            icon={'sort-asc'}
+            text={constant(dict.answerPage.answers.sortAsc)}
+            variant={constant('minimal')}
+            onClick={sortBy('asc')}
+          />
+          <Button
+            icon={'sort-desc'}
+            text={constant(dict.answerPage.answers.sortDesc)}
+            variant={constant('minimal')}
+            onClick={sortBy('desc')}
+          />
+        </ButtonGroup>
+      }
+      isOpen={isOpen$}
       placement={'bottom'}
       onClose={handleClose}
     >
       <Button
         icon={'chevron-down'}
         size={'small'}
-        variant={'outlined'}
+        variant={constant('outlined')}
         onClick={handleOpen}
       />
-    </PopoverNext>
+    </Popover>
   );
-});
+};

@@ -1,103 +1,78 @@
-import { Button, FormGroup } from '@blueprintjs/core';
-import styled from '@emotion/styled';
-import { BpInput } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
+import { Button, FormGroup, InputGroup } from 'blueprint-synstate';
+import { constant, view, type JSX } from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
 import { ResetPasswordPageStore } from '../../store/index.mjs';
-import { Label } from '../atoms/index.mjs';
-import { SignInStyled } from '../styled/index.mjs';
+import { preventSubmit } from './shared-auth-parts.js';
+import * as styles from './sign-in.module.css';
 
 const dc = dict.register;
 
-const returnFalse = (): false => false;
-
 type Props = Readonly<{ hidePasswordResetForm: () => void }>;
 
-export const ResetPasswordPage = memoNamed<Props>(
-  'ResetPasswordPage',
-  ({ hidePasswordResetForm }) => {
-    const { formState, enterButtonDisabled, emailFormIntent } =
-      useObservableValue(ResetPasswordPageStore.state);
+const { state } = ResetPasswordPageStore;
 
-    return (
-      <FormRectWrapper>
-        <SignInStyled.FormRect onSubmit={returnFalse}>
-          <BackButtonWrapper>
-            <Button
-              icon={'chevron-left'}
-              intent={'none'}
-              variant={'minimal'}
-              onClick={hidePasswordResetForm}
+export const ResetPasswordPage = ({
+  hidePasswordResetForm,
+}: Props): JSX.Element => {
+  const isWaitingResponse = view(state, (s) => s.formState.isWaitingResponse);
+
+  const intent = view(state, (s) => s.emailFormIntent);
+
+  return (
+    <div
+      class={constant(`${styles.formRectWrapper} ${styles.resetPasswordRect}`)}
+    >
+      <form class={constant(styles.formRect)} onSubmit={preventSubmit}>
+        <div class={constant(styles.backButtonWrapper)}>
+          <Button
+            icon={'chevron-left'}
+            intent={'none'}
+            text={constant(dc.resetPasswordMode.back)}
+            variant={constant('minimal')}
+            onClick={hidePasswordResetForm}
+          />
+        </div>
+
+        <div class={constant(styles.content)}>
+          <h1 class={constant(styles.title)}>
+            {constant(dc.resetPasswordMode.title)}
+          </h1>
+
+          <div>
+            <FormGroup
+              class={styles.field}
+              helperText={view(state, (s) => s.formState.email.error)}
+              intent={intent}
+              label={constant(dc.email)}
             >
-              {dc.resetPasswordMode.back}
-            </Button>
-          </BackButtonWrapper>
+              <InputGroup
+                autoComplete={'email'}
+                autoFocus
+                data-e2e={constant('email')}
+                disabled={isWaitingResponse}
+                intent={intent}
+                type={'email'}
+                value={view(state, (s) => s.formState.email.inputValue)}
+                onInput={({ currentTarget }) => {
+                  ResetPasswordPageStore.inputEmailHandler(currentTarget.value);
+                }}
+              />
+            </FormGroup>
+          </div>
 
-          <Content>
-            <Title>{dc.resetPasswordMode.title}</Title>
-
-            <SignInStyled.FormGroups>
-              <FormGroup
-                helperText={formState.email.error}
-                intent={emailFormIntent}
-                label={emailInputLabel}
-              >
-                <BpInput
-                  autoComplete={'email'}
-                  // eslint-disable-next-line jsx-a11y/no-autofocus
-                  autoFocus
-                  data-e2e={'email'}
-                  disabled={formState.isWaitingResponse}
-                  intent={emailFormIntent}
-                  type={'email'}
-                  value={formState.email.inputValue}
-                  onValueChange={ResetPasswordPageStore.inputEmailHandler}
-                />
-              </FormGroup>
-            </SignInStyled.FormGroups>
-
-            <SignInStyled.ButtonWrapper>
-              <Button
-                data-e2e={'reset-password-button'}
-                disabled={enterButtonDisabled}
-                fill
-                intent={'primary'}
-                loading={formState.isWaitingResponse}
-                onClick={ResetPasswordPageStore.enterClickHandler}
-              >
-                {dc.resetPasswordMode.submit}
-              </Button>
-            </SignInStyled.ButtonWrapper>
-          </Content>
-        </SignInStyled.FormRect>
-      </FormRectWrapper>
-    );
-  },
-);
-
-const emailInputLabel = <Label>{dc.email}</Label>;
-
-const FormRectWrapper = styled(SignInStyled.FormRectWrapperBase)`
-  height: 320px;
-  position: relative;
-`;
-
-const BackButtonWrapper = styled.div`
-  position: absolute;
-  top: 10px;
-  left: 10px;
-`;
-
-const Content = styled.div`
-  margin-top: 30px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-`;
-
-const Title = styled.h1`
-  font-size: x-large;
-  margin-bottom: 20px;
-`;
+          <div class={constant(styles.buttonWrapper)}>
+            <Button
+              data-e2e={constant('reset-password-button')}
+              disabled={view(state, (s) => s.enterButtonDisabled)}
+              fill
+              intent={'primary'}
+              loading={isWaitingResponse}
+              text={constant(dc.resetPasswordMode.submit)}
+              onClick={ResetPasswordPageStore.enterClickHandler}
+            />
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};

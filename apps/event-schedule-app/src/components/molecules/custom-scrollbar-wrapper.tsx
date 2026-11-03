@@ -1,21 +1,28 @@
-import styled from '@emotion/styled';
+import { constant, type Child, type JSX } from 'synstate-dom';
+import * as styles from './custom-scrollbar-wrapper.module.css';
 
-export const CustomScrollbarWrapper = styled.div`
-  overflow-x: scroll;
+type Props = Readonly<{
+  children: Child;
+  /** Classes after the wrapper's own. */
+  class?: string;
+  /** Called with the scrolling `<div>`. */
+  ref?: (element: HTMLDivElement) => void;
+}>;
 
-  &::-webkit-scrollbar {
-    width: 7px;
-    height: 7px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: rgb(165, 165, 165);
-    border-radius: 7px;
-  }
-  &::-webkit-scrollbar-track {
-    background-color: rgb(220, 220, 220);
-    border-radius: 7px;
-  }
-  &::-webkit-scrollbar-corner {
-    display: none;
-  }
-`;
+/** Scrolls sideways, with a thin rounded scroll bar. */
+export const CustomScrollbarWrapper = ({
+  children,
+  class: className,
+  ref,
+}: Props): JSX.Element => (
+  <div
+    {...(ref === undefined ? {} : { ref })}
+    class={constant(
+      className === undefined
+        ? styles.wrapper
+        : `${styles.wrapper} ${className}`,
+    )}
+  >
+    {children}
+  </div>
+);

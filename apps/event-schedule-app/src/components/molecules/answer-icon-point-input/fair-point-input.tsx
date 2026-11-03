@@ -1,17 +1,14 @@
-import { useNumericInputWithStepState } from 'numeric-input-utils';
-import * as React from 'react';
-import { NumericInputView } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { Num, Result } from 'ts-data-forge';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import {
   answerIconPointConfig,
   clampAndRoundAnswerFairIconPoint,
 } from '../../../constants/index.mjs';
+import { AppNumericInput } from '../app-numeric-input.js';
 
 type Props = Readonly<{
-  value: AnswerIconPoint;
+  value: Bindable<AnswerIconPoint>;
   onValueChange: (value: AnswerIconPoint) => void;
-  disabled: boolean;
+  disabled: Bindable<boolean>;
 }>;
 
 const {
@@ -19,45 +16,18 @@ const {
   fair: { max, min },
 } = answerIconPointConfig;
 
-export const AnswerIconFairPointInput = memoNamed<Props>(
-  'AnswerIconFairPointInput',
-  ({ value: valueFromProps, onValueChange, disabled }) => {
-    const {
-      state,
-      setState,
-      onDecrementMouseDown,
-      onIncrementMouseDown,
-      submit,
-      onKeyDown,
-    } = useNumericInputWithStepState<AnswerIconPoint>({
-      onValueChange,
-      normalize: clampAndRoundAnswerFairIconPoint,
-      decode: (s) =>
-        clampAndRoundAnswerFairIconPoint(
-          Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN),
-        ),
-      encode: (s) => s.toString(),
-      valueFromProps,
-      step,
-    });
-
-    const inputProps = React.useMemo(
-      () => ({ min, max, step, onKeyDown }),
-      [onKeyDown],
-    );
-
-    return (
-      <NumericInputView
-        disabled={disabled}
-        fillSpace
-        inputProps={inputProps}
-        selectOnFocus
-        valueAsStr={state}
-        onDecrementMouseDown={onDecrementMouseDown}
-        onIncrementMouseDown={onIncrementMouseDown}
-        onInputBlur={submit}
-        onInputStringChange={setState}
-      />
-    );
-  },
+export const AnswerIconFairPointInput = ({
+  value,
+  onValueChange,
+  disabled,
+}: Props): JSX.Element => (
+  <AppNumericInput
+    disabled={disabled}
+    max={constant(max)}
+    min={constant(min)}
+    normalize={clampAndRoundAnswerFairIconPoint}
+    step={step}
+    value={value}
+    onValueChange={onValueChange}
+  />
 );

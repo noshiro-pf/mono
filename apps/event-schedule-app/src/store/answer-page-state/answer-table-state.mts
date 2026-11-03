@@ -1,6 +1,10 @@
 import { UserName } from 'event-schedule-app-shared';
-import { type InitializedObservable, combine, map } from 'synstate';
-import { createBooleanState } from 'synstate-react-hooks';
+import {
+  type InitializedObservable,
+  combine,
+  createBooleanState,
+  map,
+} from 'synstate';
 import {
   Arr,
   IMapMapped,
@@ -207,7 +211,8 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
           score: number;
           answerSummaryRow: FixedLengthTuple<3, number> | undefined;
           answerTableRow: AnswerTableCell[] | undefined;
-          style: React.CSSProperties;
+          /** The row's background, by its score. */
+          backgroundColor: string | undefined;
         }>,
         string
       >
@@ -268,7 +273,8 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
                   score: number;
                   answerSummaryRow: FixedLengthTuple<3, number> | undefined;
                   answerTableRow: AnswerTableCell[] | undefined;
-                  style: React.CSSProperties;
+                  /** The row's background, by its score. */
+                  backgroundColor: string | undefined;
                 }> = {
                   key: datetimeRange2str(datetimeRange),
                   datetimeRange,
@@ -277,14 +283,12 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
                     answerSummary.get(datetimeRange),
                   ),
                   answerTableRow,
-                  style: {
-                    backgroundColor:
-                      score === 1
-                        ? answerTableColor.perfectColor
-                        : score >= answerTableColor.goodThreshold
-                          ? answerTableColor.goodColor
-                          : undefined,
-                  },
+                  backgroundColor:
+                    score === 1
+                      ? answerTableColor.perfectColor
+                      : score >= answerTableColor.goodThreshold
+                        ? answerTableColor.goodColor
+                        : undefined,
                 } as const;
 
                 return tp(datetimeRange, value);
@@ -303,7 +307,8 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
         score: number;
         answerSummaryRow: FixedLengthTuple<3, number> | undefined;
         answerTableRow: AnswerTableCell[] | undefined;
-        style: React.CSSProperties;
+        /** The row's background, by its score. */
+        backgroundColor: string | undefined;
       }[]
     >
   > = combine([
@@ -420,27 +425,27 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
     }),
   );
 
-  const [useTableIsMinimized, { toggle: toggleTableIsMinimized }] =
+  const [tableIsMinimized$, { toggle: toggleTableIsMinimized }] =
     createBooleanState(false);
 
-  const [useAnswerIconIsHidden, { toggle: toggleAnswerIconIsHidden }] =
+  const [answerIconIsHidden$, { toggle: toggleAnswerIconIsHidden }] =
     createBooleanState(false);
 
-  const [useDateStringIsMinimized, { toggle: toggleDateStringIsMinimized }] =
+  const [dateStringIsMinimized$, { toggle: toggleDateStringIsMinimized }] =
     createBooleanState(false);
 
-  const [useDetailedFilterIsOpen, { toggle: toggleDetailedFilter }] =
+  const [detailedFilterIsOpen$, { toggle: toggleDetailedFilter }] =
     createBooleanState(false);
 
   return {
     tableBodyValuesFiltered$,
-    useDetailedFilterIsOpen,
+    detailedFilterIsOpen$,
+    dateStringIsMinimized$,
+    answerIconIsHidden$,
+    tableIsMinimized$,
     toggleDetailedFilter,
-    useDateStringIsMinimized,
     toggleDateStringIsMinimized,
-    useAnswerIconIsHidden,
     toggleAnswerIconIsHidden,
-    useTableIsMinimized,
     toggleTableIsMinimized,
   } as const;
 };
@@ -455,16 +460,17 @@ export type AnswerTable = Readonly<{
         score: number;
         answerSummaryRow: FixedLengthTuple<3, number> | undefined;
         answerTableRow: AnswerTableCell[] | undefined;
-        style: React.CSSProperties;
+        /** The row's background, by its score. */
+        backgroundColor: string | undefined;
       }[]
     >
   >;
-  useDetailedFilterIsOpen: () => boolean;
+  detailedFilterIsOpen$: InitializedObservable<boolean>;
+  dateStringIsMinimized$: InitializedObservable<boolean>;
+  answerIconIsHidden$: InitializedObservable<boolean>;
+  tableIsMinimized$: InitializedObservable<boolean>;
   toggleDetailedFilter: () => boolean;
-  useDateStringIsMinimized: () => boolean;
   toggleDateStringIsMinimized: () => boolean;
-  useAnswerIconIsHidden: () => boolean;
   toggleAnswerIconIsHidden: () => boolean;
-  useTableIsMinimized: () => boolean;
   toggleTableIsMinimized: () => boolean;
 }>;

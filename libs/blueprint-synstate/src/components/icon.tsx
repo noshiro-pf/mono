@@ -1,4 +1,5 @@
 import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
+import type { Intent } from './intent.mjs';
 
 /** The icons this package draws. */
 export type IconName = keyof typeof ICON_PATHS_16;
@@ -7,25 +8,33 @@ export type IconName = keyof typeof ICON_PATHS_16;
 export type IconName20 = keyof typeof ICON_PATHS_20;
 
 /** The sizes from 20px up, drawn from the 20px paths. */
-export type LargeIconSize = 20 | 32 | 40 | 48;
+export type LargeIconSize = 20 | 28 | 32 | 40 | 48;
+
+/** The sizes below 20px, drawn from the 16px paths. */
+export type SmallIconSize = 12 | 16;
 
 type Props = Readonly<
   {
     /** Classes after Blueprint's own, such as `rdp-nav_icon`. */
     class?: string;
     style?: Bindable<string>;
+    /** The SVG's `fill`, over the colour Blueprint's style sheets give it. */
+    color?: string;
+    /** Blueprint's intent colour (`bp6-intent-*`). */
+    intent?: Intent;
   } & (
     | {
         /** A name, or one that changes: the drawing follows it. */
         icon: Bindable<IconName> | IconName;
-        size?: 16;
+        /** 16 by default; 12 scales the 16px drawing down, as Blueprint does. */
+        size?: SmallIconSize;
       }
     | {
         icon: Bindable<IconName20> | IconName20;
         /**
-         * `IconSize.LARGE` (20), an `Alert`'s 40, or a `NonIdealState`'s 32 or
-         * 48: the 20px drawing, scaled to this many pixels, as Blueprint draws
-         * any size from 20 up.
+         * `IconSize.LARGE` (20), an `Alert`'s 40, a `NonIdealState`'s 32 or 48,
+         * or a heading's 28: the 20px drawing, scaled to this many pixels, as
+         * Blueprint draws any size from 20 up.
          */
         size: LargeIconSize;
       }
@@ -46,12 +55,20 @@ type Props = Readonly<
 export const Icon = ({
   class: className,
   style,
+  color,
+  intent = 'none',
   icon,
   size,
 }: Props): JSX.Element => {
   const pixels = size ?? 16;
 
-  const large = size === 20 || size === 32 || size === 40 || size === 48;
+  const large =
+    size === 20 || size === 28 || size === 32 || size === 40 || size === 48;
+
+  const classes = [
+    ...(intent === 'none' ? [] : [`bp6-intent-${intent}`]),
+    ...(className === undefined ? [] : [className]),
+  ].join(' ');
 
   const grid = large ? 20 : 16;
 
@@ -72,14 +89,15 @@ export const Icon = ({
     <span
       aria-hidden={constant('true')}
       class={mapBindable(name$, (name) =>
-        className === undefined
+        classes === ''
           ? `bp6-icon bp6-icon-${name}`
-          : `bp6-icon bp6-icon-${name} ${className}`,
+          : `bp6-icon bp6-icon-${name} ${classes}`,
       )}
       {...(style === undefined ? {} : { style })}
     >
       <svg
         data-icon={name$}
+        {...(color === undefined ? {} : { fill: constant(color) })}
         height={constant(pixels)}
         role={constant('img')}
         viewBox={constant(`0 0 ${grid.toString()} ${grid.toString()}`)}
@@ -220,6 +238,8 @@ const ICON_PATHS_20 = {
     'm19.56 17.44-4.94-4.94A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8S0 3.58 0 8s3.58 8 8 8c1.67 0 3.21-.51 4.5-1.38l4.94 4.94a1.498 1.498 0 1 0 2.12-2.12M8 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6',
   'small-cross':
     'm11.41 10 3.29-3.29c.19-.18.3-.43.3-.71a1.003 1.003 0 0 0-1.71-.71L10 8.59l-3.29-3.3a1.003 1.003 0 0 0-1.42 1.42L8.59 10 5.3 13.29c-.19.18-.3.43-.3.71a1.003 1.003 0 0 0 1.71.71l3.29-3.3 3.29 3.29c.18.19.43.3.71.3a1.003 1.003 0 0 0 .71-1.71z',
+  'timeline-events':
+    'M5 5c.6 0 1-.4 1-1V2c0-.5-.4-1-1-1s-1 .5-1 1v2c0 .6.4 1 1 1m10 0c.6 0 1-.4 1-1V2c0-.5-.4-1-1-1s-1 .5-1 1v2c0 .6.4 1 1 1m-9 9H4v2h2zM17 3v1c0 1.1-.9 2-2 2s-2-.9-2-2V3H7v1c0 1.1-.9 2-2 2s-2-.9-2-2V3H2c-.5 0-1 .5-1 1v14c0 .5.5 1 1 1h16c.5 0 1-.5 1-1V4c0-.5-.5-1-1-1zM7 17H3v-4h4zm0-5H3V8h4zm5 5H8v-4h4zm0-5H8V8h4zm5 5h-4v-4h4zm0-5h-4V8h4zm-6 2H9v2h2zm5-5h-2v2h2z',
   trash:
     'M17 1h-5c0-.55-.45-1-1-1H9c-.55 0-1 .45-1 1H3c-.55 0-1 .45-1 1v1h16V2c0-.55-.45-1-1-1m.5 3h-15c-.28 0-.5.22-.5.5s.22.5.5.5H3v14c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V5h.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5M7 16c0 .55-.45 1-1 1s-1-.45-1-1V8c0-.55.45-1 1-1s1 .45 1 1zm4 0c0 .55-.45 1-1 1s-1-.45-1-1V8c0-.55.45-1 1-1s1 .45 1 1zm4 0c0 .55-.45 1-1 1s-1-.45-1-1V8c0-.55.45-1 1-1s1 .45 1 1z',
   unarchive:

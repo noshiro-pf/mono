@@ -1,5 +1,8 @@
-import { type InitializedObservable, createState } from 'synstate';
-import { createBooleanState } from 'synstate-react-hooks';
+import {
+  type InitializedObservable,
+  createBooleanState,
+  createState,
+} from 'synstate';
 
 export type ToggleSectionState<A> = Readonly<{
   toggleState$: InitializedObservable<boolean>;
@@ -23,13 +26,14 @@ export const createToggleSectionState = <A,>({
   valueToBeSetWhenTurnedOff: () => A;
   valueToBeSetWhenTurnedOn?: () => A;
 }>): ToggleSectionState<A> => {
-  const [, toggleState] = createBooleanState(initialToggleState);
+  const [toggleState$, toggleState] = createBooleanState(initialToggleState);
 
   const [value$, setValue, { updateState: updateValue }] =
     createState<A>(initialState);
 
   const { toggle, resetState, turnOff, turnOn } =
     createToggleSectionStateManager<A>({
+      toggleState$,
       toggleState,
       initialState,
       valueToBeSetWhenTurnedOff,
@@ -38,7 +42,7 @@ export const createToggleSectionState = <A,>({
     });
 
   return {
-    toggleState$: toggleState.state,
+    toggleState$,
     toggle,
     value$,
     setValue,
@@ -57,16 +61,17 @@ type ToggleSectionManagerState = Readonly<{
 }>;
 
 const createToggleSectionStateManager = <A,>({
+  toggleState$,
   toggleState,
   initialState,
   valueToBeSetWhenTurnedOff,
   valueToBeSetWhenTurnedOn,
   setValue,
 }: Readonly<{
+  toggleState$: InitializedObservable<boolean>;
   toggleState: Readonly<{
     setTrue: () => void;
     setFalse: () => void;
-    state: InitializedObservable<boolean>;
     resetState: () => void;
   }>;
   initialState: A;
@@ -92,7 +97,7 @@ const createToggleSectionStateManager = <A,>({
   };
 
   const toggle = (): void => {
-    if (toggleState.state.getSnapshot().value) {
+    if (toggleState$.getSnapshot().value) {
       turnOff();
     } else {
       turnOn();

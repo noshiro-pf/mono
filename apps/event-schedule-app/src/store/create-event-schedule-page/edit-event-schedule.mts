@@ -1,12 +1,11 @@
-import type { Toaster } from '@blueprintjs/core';
 import {
   combine,
+  createBooleanState,
   createState as createStateBase,
   map,
   mapTo,
   type InitializedObservable,
 } from 'synstate';
-import { createBooleanState } from 'synstate-react-hooks';
 import { Arr, fastDeepEqual, Obj, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
@@ -70,7 +69,7 @@ export const createEditEventScheduleStore = (
   // for. The store outlives the page, so it is forgotten when the edit page is
   // left, and read only on the page of that event: an event without
   // notifications never asks, so nothing else would replace it.
-  const [, setVerified, { state: verified$ }] = createReducerWithActions(
+  const [verified$, setVerified] = createReducerWithActions(
     (_: VerifiedEmail | undefined, next: VerifiedEmail | undefined) => next,
     undefined,
     [deps.router.editPageLeaves$.pipe(mapTo(undefined))],
@@ -293,18 +292,18 @@ export const createEditEventScheduleStore = (
   };
 
   const [
-    useIsLoading,
+    isLoading$,
     { setTrue: setIsLoadingTrue, setFalse: setIsLoadingFalse },
   ] = createBooleanState(false);
 
   return {
     commonState$,
     commonStateHandlers,
+    isLoading$,
     diff$,
     emailVerified$,
     hasDeletedDatetimeChanges$,
     hasNoChanges$,
-    useIsLoading,
     setEmailVerified,
     onBackToAnswerPage,
     onEditEventClick,
@@ -317,11 +316,11 @@ export const createEditEventScheduleStore = (
 export type EditEventSchedule = Readonly<{
   commonState$: InitializedObservable<EventScheduleSettingCommonState>;
   commonStateHandlers: EventScheduleSettingCommonStateHandler;
+  isLoading$: InitializedObservable<boolean>;
   /** What the settings change from the event as the database has it. */
   diff$: InitializedObservable<EventSettingsPageDiffResult>;
   hasDeletedDatetimeChanges$: InitializedObservable<boolean>;
   hasNoChanges$: InitializedObservable<boolean>;
-  useIsLoading: () => boolean;
   /** The author email confirmed for the event whose edit page is open. */
   emailVerified$: InitializedObservable<string | undefined>;
   /** Records `email` as confirmed for event `eventId`. */

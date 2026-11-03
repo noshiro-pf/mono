@@ -1,70 +1,101 @@
-import { FormGroup } from '@blueprintjs/core';
-import * as React from 'react';
-import { BpDatetimePicker } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { compareYearMonthDate, DateUtils } from 'ts-fortress-types';
+import {
+  DateInput,
+  FormGroup,
+  toDateTimeValue,
+  toDateValue,
+  type WallClock,
+} from 'blueprint-synstate';
+import { derive, mapBindable, type Bindable, type JSX } from 'synstate-dom';
+import { DateUtils } from 'ts-fortress-types';
 import { createAnswerDeadlineShortcuts, dict } from '../../constants/index.mjs';
-import { useIsMobile } from '../../store/index.mjs';
-import { todayYearMonthDate } from '../../utils/index.mjs';
+import {
+  dateInputMaxDate,
+  parseDateInputText,
+} from '../../functions/index.mjs';
+import { isMobile$ } from '../../store/index.mjs';
+import { pad2, todayYearMonthDate } from '../../utils/index.mjs';
 
 type Props = Readonly<{
-  useAnswerDeadline: boolean;
-  answerDeadline: Ymdhm | undefined;
+  useAnswerDeadline: Bindable<boolean>;
+  answerDeadline: Bindable<Ymdhm | undefined>;
   onAnswerDeadlineChange: (value: Ymdhm | undefined) => void;
 }>;
 
-export const AnswerDeadlineDatepicker = memoNamed<Props>(
-  'AnswerDeadlineDatepicker',
-  ({ useAnswerDeadline, answerDeadline, onAnswerDeadlineChange }) => {
-    const showError: boolean =
-      useAnswerDeadline && answerDeadline === undefined;
+export const AnswerDeadlineDatepicker = ({
+  useAnswerDeadline,
+  answerDeadline,
+  onAnswerDeadlineChange,
+}: Props): JSX.Element => {
+  const showError$ = derive(
+    [useAnswerDeadline, answerDeadline],
+    (use, deadline) => use && deadline === undefined,
+  );
 
-    const isMobile = useIsMobile();
+  return (
+    <FormGroup
+      helperText={mapBindable(showError$, (e) =>
+        e
+          ? dict.eventSettingsPage.errorMessages.answerDeadlineIsEnabledButEmpty
+          : undefined,
+      )}
+      intent={mapBindable(showError$, (e) => (e ? 'danger' : 'primary'))}
+    >
+      <DateInput
+        canClearSelection={false}
+        disabled={mapBindable(useAnswerDeadline, (use) => !use)}
+        formatDate={formatDate}
+        maxDate={dateInputMaxDate()}
+        parseDate={(text) => parseDateInputText(text, 'minute')}
+        placeholder={'YYYY-MM-DD HH:mm'}
+        reverseMonthAndYearMenus
+        // Counted from the day the calendar opens: the page may have been open
+        // since an earlier day.
+        shortcuts={() => {
+          if (isMobile$.getSnapshot().value) {
+            return undefined;
+          }
 
-    // The day the shortcuts count from, read again each time the picker opens:
-    // the page may have been open since an earlier day.
-    const [today, setToday] = React.useState<YearMonthDate>(todayYearMonthDate);
+          const today = todayYearMonthDate();
 
-    const shortcuts = React.useMemo(
-      () =>
-        createAnswerDeadlineShortcuts(
-          DateUtils.create(today.year, today.month, today.date),
-        ),
-      [today],
-    );
-
-    const popoverProps = React.useMemo(
-      () => ({
-        onOpening: () => {
-          const next = todayYearMonthDate();
-
-          setToday((prev) =>
-            compareYearMonthDate(prev, next) === 0 ? prev : next,
+          return createAnswerDeadlineShortcuts(
+            DateUtils.create(today.year, today.month, today.date),
           );
-        },
-      }),
-      [],
-    );
+        }}
+        showActionsBar={false}
+        timePrecision={'minute'}
+        value={mapBindable(answerDeadline, (deadline) =>
+          deadline === undefined
+            ? ''
+            : toDateTimeValue(wallClockFrom(deadline)),
+        )}
+        onChange={(value) => {
+          onAnswerDeadlineChange(
+            value === '' ? undefined : ymdhmFrom(new Date(value)),
+          );
+        }}
+      />
+    </FormGroup>
+  );
+};
 
-    return (
-      <FormGroup
-        helperText={
-          showError
-            ? dict.eventSettingsPage.errorMessages
-                .answerDeadlineIsEnabledButEmpty
-            : undefined
-        }
-        intent={showError ? 'danger' : 'primary'}
-      >
-        <BpDatetimePicker
-          disabled={!useAnswerDeadline}
-          popoverProps={isMobile ? undefined : popoverProps}
-          shortcuts={isMobile ? false : shortcuts}
-          showActionsBar={false}
-          ymdhm={answerDeadline}
-          onYmdhmChange={onAnswerDeadlineChange}
-        />
-      </FormGroup>
-    );
-  },
-);
+const wallClockFrom = (a: Ymdhm): WallClock =>
+  ({
+    year: a.year,
+    month: a.month,
+    day: a.date,
+    hour: a.hours,
+    minute: a.minutes,
+  }) as const;
+
+const ymdhmFrom = (date: Date): Ymdhm =>
+  ({
+    year: DateUtils.getLocaleYear(date),
+    month: DateUtils.getLocaleMonth(date),
+    date: DateUtils.getLocaleDate(date),
+    hours: DateUtils.getLocaleHours(date),
+    minutes: DateUtils.getLocaleMinutes(date),
+  }) as const;
+
+/** As Blueprint's input showed it before: `YYYY-MM-DD  HH:mm`. */
+const formatDate = (clock: WallClock): string =>
+  `${toDateValue(clock)}  ${pad2(clock.hour)}:${pad2(clock.minute)}` as const;

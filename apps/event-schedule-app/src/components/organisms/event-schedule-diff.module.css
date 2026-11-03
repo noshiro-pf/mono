@@ -1,0 +1,14 @@
+.root {
+  margin: 10px 20px;
+}
+
+.box {
+  padding: 15px 20px;
+  border-radius: 5px;
+  border-style: solid;
+  border-color: gray;
+}
+
+.title {
+  margin: 5px;
+}

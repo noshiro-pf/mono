@@ -1,285 +1,173 @@
-import { FormGroup } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import * as React from 'react';
-import { BpCheckbox, BpInput } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import type { Observable as SynstateObservable } from 'synstate';
+import { Checkbox, FormGroup, InputGroup } from 'blueprint-synstate';
+import type { InitializedObservable, Observable } from 'synstate';
+import {
+  constant,
+  createAfterUpdate,
+  derive,
+  mapBindable,
+  subscribeInScope,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
 import type { NotificationSettingsWithEmail } from '../../types/index.mjs';
 import { isEmailString } from '../../utils-ported/index.mjs';
 import { now, ymdhmDateDiff } from '../../utils/index.mjs';
 import { WidthRestrictedInputWrapper } from '../styled/index.mjs';
+import * as styles from './notification-settings.module.css';
 
 const dc = dict.eventSettingsPage.section3;
 
 type Props = Readonly<{
-  notificationSettingsWithEmail: NotificationSettingsWithEmail;
+  notificationSettingsWithEmail: InitializedObservable<NotificationSettingsWithEmail>;
   onNotificationSettingsWithEmailChange: (
     value: NotificationSettingsWithEmail,
   ) => void;
-  disabled: boolean;
-  useAnswerDeadline: boolean;
-  answerDeadline: Ymdhm | undefined;
-  focusEmailInput$: SynstateObservable<undefined>;
+  disabled: Bindable<boolean>;
+  useAnswerDeadline: Bindable<boolean>;
+  answerDeadline: Bindable<Ymdhm | undefined>;
+  /** Each emission focuses the email input. */
+  focusEmailInput$: Observable<unknown>;
 }>;
 
-export const NotificationSettingsComponent = memoNamed<Props>(
-  'NotificationSettings',
-  ({
-    notificationSettingsWithEmail,
-    onNotificationSettingsWithEmailChange,
-    disabled,
-    useAnswerDeadline,
-    answerDeadline,
-    focusEmailInput$,
-  }) => {
-    const onEmailChange = React.useCallback(
-      (email: string) => {
-        onNotificationSettingsWithEmailChange({
-          ...notificationSettingsWithEmail,
-          email,
-        });
-      },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
+type Item =
+  | 'notify00daysBeforeAnswerDeadline'
+  | 'notify01daysBeforeAnswerDeadline'
+  | 'notify03daysBeforeAnswerDeadline'
+  | 'notify07daysBeforeAnswerDeadline'
+  | 'notify14daysBeforeAnswerDeadline'
+  | 'notify28daysBeforeAnswerDeadline'
+  | 'notifyAfterAnswerDeadline'
+  | 'notifyOnAnswerChange';
+
+export const NotificationSettingsComponent = ({
+  notificationSettingsWithEmail,
+  onNotificationSettingsWithEmailChange,
+  disabled,
+  useAnswerDeadline,
+  answerDeadline,
+  focusEmailInput$,
+}: Props): JSX.Element => {
+  const afterUpdate = createAfterUpdate();
+
+  const settings$ = notificationSettingsWithEmail;
+
+  const update = (patch: Partial<NotificationSettingsWithEmail>): void => {
+    onNotificationSettingsWithEmailChange({
+      ...settings$.getSnapshot().value,
+      ...patch,
+    });
+  };
+
+  /** Off unless the deadline is more than `days` days away. */
+  const disabledUnlessDeadlineIsAfter = (days: number): Bindable<boolean> =>
+    derive(
+      [disabled, useAnswerDeadline, answerDeadline],
+      (d, use, deadline) =>
+        d ||
+        !use ||
+        deadline === undefined ||
+        ymdhmDateDiff(deadline, now()) <= days,
     );
 
-    const onNotifyOnAnswerChangeCheck = React.useCallback(
-      (checked: boolean) => {
-        onNotificationSettingsWithEmailChange({
-          ...notificationSettingsWithEmail,
-          notifyOnAnswerChange: checked,
-        });
-      },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
-    );
+  const invalidEmail$ = derive(
+    [disabled, settings$],
+    (d, s) => !d && !isEmailString(s.email),
+  );
 
-    const onNotifyAfterAnswerDeadlineCheck = React.useCallback(
-      (checked: boolean) => {
-        onNotificationSettingsWithEmailChange({
-          ...notificationSettingsWithEmail,
-          notifyAfterAnswerDeadline: checked,
-        });
-      },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
-    );
+  const checkbox = (
+    item: Item,
+    label: string,
+    itemDisabled: Bindable<boolean>,
+  ): JSX.Element => (
+    <div class={constant(styles.checkboxWrapper)}>
+      <Checkbox
+        checked={mapBindable(settings$, (s) => s[item])}
+        disabled={itemDisabled}
+        label={constant(label)}
+        onChange={({ currentTarget }) => {
+          update({ [item]: currentTarget.checked });
+        }}
+      />
+    </div>
+  );
 
-    const onNotify00daysBeforeAnswerDeadlineCheck = React.useCallback(
-      (checked: boolean) => {
-        onNotificationSettingsWithEmailChange({
-          ...notificationSettingsWithEmail,
-          notify00daysBeforeAnswerDeadline: checked,
-        });
-      },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
-    );
-
-    const onNotify01daysBeforeAnswerDeadlineCheck = React.useCallback(
-      (checked: boolean) => {
-        onNotificationSettingsWithEmailChange({
-          ...notificationSettingsWithEmail,
-          notify01daysBeforeAnswerDeadline: checked,
-        });
-      },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
-    );
-
-    const onNotify03daysBeforeAnswerDeadlineCheck = React.useCallback(
-      (checked: boolean) => {
-        onNotificationSettingsWithEmailChange({
-          ...notificationSettingsWithEmail,
-          notify03daysBeforeAnswerDeadline: checked,
-        });
-      },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
-    );
-
-    const onNotify07daysBeforeAnswerDeadlineCheck = React.useCallback(
-      (checked: boolean) => {
-        onNotificationSettingsWithEmailChange({
-          ...notificationSettingsWithEmail,
-          notify07daysBeforeAnswerDeadline: checked,
-        });
-      },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
-    );
-
-    const onNotify14daysBeforeAnswerDeadlineCheck = React.useCallback(
-      (checked: boolean) => {
-        onNotificationSettingsWithEmailChange({
-          ...notificationSettingsWithEmail,
-          notify14daysBeforeAnswerDeadline: checked,
-        });
-      },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
-    );
-
-    const onNotify28daysBeforeAnswerDeadlineCheck = React.useCallback(
-      (checked: boolean) => {
-        onNotificationSettingsWithEmailChange({
-          ...notificationSettingsWithEmail,
-          notify28daysBeforeAnswerDeadline: checked,
-        });
-      },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
-    );
-
-    const disabledDetail = React.useMemo(
-      () => ({
-        notifyAfterAnswerDeadline:
-          disabled ||
-          !useAnswerDeadline ||
-          answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, now()) <= -1,
-        notify00daysBefore:
-          disabled ||
-          !useAnswerDeadline ||
-          answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, now()) <= 0,
-        notify01daysBefore:
-          disabled ||
-          !useAnswerDeadline ||
-          answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, now()) <= 1,
-        notify03daysBefore:
-          disabled ||
-          !useAnswerDeadline ||
-          answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, now()) <= 3,
-        notify07daysBefore:
-          disabled ||
-          !useAnswerDeadline ||
-          answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, now()) <= 7,
-        notify14daysBefore:
-          disabled ||
-          !useAnswerDeadline ||
-          answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, now()) <= 14,
-        notify28daysBefore:
-          disabled ||
-          !useAnswerDeadline ||
-          answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, now()) <= 28,
-      }),
-      [answerDeadline, disabled, useAnswerDeadline],
-    );
-
-    const invalidEmail = React.useMemo(
-      () => !disabled && !isEmailString(notificationSettingsWithEmail.email),
-      [disabled, notificationSettingsWithEmail.email],
-    );
-
-    const helperText = invalidEmail ? dict.common.error.invalidEmail : '';
-
-    return (
-      <div>
-        <WidthRestrictedInputWrapper>
-          <FormGroup
-            helperText={helperText}
-            intent={invalidEmail ? 'danger' : 'primary'}
-            label={dc.notification.emailAddress}
-          >
-            <BpInput
-              // eslint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus
-              disabled={disabled}
-              focus$={focusEmailInput$}
-              intent={invalidEmail ? 'danger' : 'primary'}
-              placeholder={'sample@gmail.com'}
-              type={'email'}
-              value={notificationSettingsWithEmail.email}
-              onValueChange={onEmailChange}
-            />
-          </FormGroup>
-        </WidthRestrictedInputWrapper>
-        <div
-          css={css`
-            padding: 5px;
-          `}
+  return (
+    <div>
+      <WidthRestrictedInputWrapper>
+        <FormGroup
+          helperText={mapBindable(invalidEmail$, (invalid) =>
+            invalid ? dict.common.error.invalidEmail : '',
+          )}
+          intent={mapBindable(invalidEmail$, (invalid) =>
+            invalid ? 'danger' : 'primary',
+          )}
+          label={constant(dc.notification.emailAddress)}
         >
-          <CheckboxWrapper>
-            <BpCheckbox
-              checked={notificationSettingsWithEmail.notifyOnAnswerChange}
-              disabled={disabled}
-              label={dc.notification.notifyOnAnswerChange}
-              onCheck={onNotifyOnAnswerChangeCheck}
-            />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
-            <BpCheckbox
-              checked={notificationSettingsWithEmail.notifyAfterAnswerDeadline}
-              disabled={disabledDetail.notifyAfterAnswerDeadline}
-              label={dc.notification.notifyAfterAnswerDeadline}
-              onCheck={onNotifyAfterAnswerDeadlineCheck}
-            />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
-            <BpCheckbox
-              checked={
-                notificationSettingsWithEmail.notify00daysBeforeAnswerDeadline
-              }
-              disabled={disabledDetail.notify00daysBefore}
-              label={dc.notification.notify00daysBeforeAnswerDeadline}
-              onCheck={onNotify00daysBeforeAnswerDeadlineCheck}
-            />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
-            <BpCheckbox
-              checked={
-                notificationSettingsWithEmail.notify01daysBeforeAnswerDeadline
-              }
-              disabled={disabledDetail.notify01daysBefore}
-              label={dc.notification.notify01daysBeforeAnswerDeadline}
-              onCheck={onNotify01daysBeforeAnswerDeadlineCheck}
-            />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
-            <BpCheckbox
-              checked={
-                notificationSettingsWithEmail.notify03daysBeforeAnswerDeadline
-              }
-              disabled={disabledDetail.notify03daysBefore}
-              label={dc.notification.notify03daysBeforeAnswerDeadline}
-              onCheck={onNotify03daysBeforeAnswerDeadlineCheck}
-            />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
-            <BpCheckbox
-              checked={
-                notificationSettingsWithEmail.notify07daysBeforeAnswerDeadline
-              }
-              disabled={disabledDetail.notify07daysBefore}
-              label={dc.notification.notify07daysBeforeAnswerDeadline}
-              onCheck={onNotify07daysBeforeAnswerDeadlineCheck}
-            />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
-            <BpCheckbox
-              checked={
-                notificationSettingsWithEmail.notify14daysBeforeAnswerDeadline
-              }
-              disabled={disabledDetail.notify14daysBefore}
-              label={dc.notification.notify14daysBeforeAnswerDeadline}
-              onCheck={onNotify14daysBeforeAnswerDeadlineCheck}
-            />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
-            <BpCheckbox
-              checked={
-                notificationSettingsWithEmail.notify28daysBeforeAnswerDeadline
-              }
-              disabled={disabledDetail.notify28daysBefore}
-              label={dc.notification.notify28daysBeforeAnswerDeadline}
-              onCheck={onNotify28daysBeforeAnswerDeadlineCheck}
-            />
-          </CheckboxWrapper>
-        </div>
+          <InputGroup
+            autoFocus
+            disabled={disabled}
+            inputRef={(input) => {
+              subscribeInScope(focusEmailInput$, () => {
+                afterUpdate(() => {
+                  input.focus();
+                });
+              });
+            }}
+            intent={mapBindable(invalidEmail$, (invalid) =>
+              invalid ? 'danger' : 'primary',
+            )}
+            placeholder={constant('sample@gmail.com')}
+            type={'email'}
+            value={mapBindable(settings$, (s) => s.email)}
+            onInput={({ currentTarget }) => {
+              update({ email: currentTarget.value });
+            }}
+          />
+        </FormGroup>
+      </WidthRestrictedInputWrapper>
+      <div class={constant(styles.checkboxes)}>
+        {checkbox(
+          'notifyOnAnswerChange',
+          dc.notification.notifyOnAnswerChange,
+          disabled,
+        )}
+        {checkbox(
+          'notifyAfterAnswerDeadline',
+          dc.notification.notifyAfterAnswerDeadline,
+          disabledUnlessDeadlineIsAfter(-1),
+        )}
+        {checkbox(
+          'notify00daysBeforeAnswerDeadline',
+          dc.notification.notify00daysBeforeAnswerDeadline,
+          disabledUnlessDeadlineIsAfter(0),
+        )}
+        {checkbox(
+          'notify01daysBeforeAnswerDeadline',
+          dc.notification.notify01daysBeforeAnswerDeadline,
+          disabledUnlessDeadlineIsAfter(1),
+        )}
+        {checkbox(
+          'notify03daysBeforeAnswerDeadline',
+          dc.notification.notify03daysBeforeAnswerDeadline,
+          disabledUnlessDeadlineIsAfter(3),
+        )}
+        {checkbox(
+          'notify07daysBeforeAnswerDeadline',
+          dc.notification.notify07daysBeforeAnswerDeadline,
+          disabledUnlessDeadlineIsAfter(7),
+        )}
+        {checkbox(
+          'notify14daysBeforeAnswerDeadline',
+          dc.notification.notify14daysBeforeAnswerDeadline,
+          disabledUnlessDeadlineIsAfter(14),
+        )}
+        {checkbox(
+          'notify28daysBeforeAnswerDeadline',
+          dc.notification.notify28daysBeforeAnswerDeadline,
+          disabledUnlessDeadlineIsAfter(28),
+        )}
       </div>
-    );
-  },
-);
-
-const CheckboxWrapper = styled.div`
-  display: flex;
-`;
+    </div>
+  );
+};

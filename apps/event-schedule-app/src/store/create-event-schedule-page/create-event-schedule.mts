@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import {
   NotificationSettings,
   UserId,
@@ -6,12 +5,13 @@ import {
 } from 'event-schedule-app-shared';
 import {
   type InitializedObservable,
+  createBooleanState,
+  createState,
   debounce,
   filter,
   map,
   skip,
 } from 'synstate';
-import { createBooleanState, createState } from 'synstate-react-hooks';
 import {
   Result,
   fastDeepEqual,
@@ -168,16 +168,16 @@ export const createCreateEventScheduleStore = (
   };
 
   const [
-    useIsLoading,
+    isLoading$,
     { setTrue: setIsLoadingTrue, setFalse: setIsLoadingFalse },
   ] = createBooleanState(false);
 
   const [
-    useCreateResultDialogIsOpen,
+    createResultDialogIsOpen$,
     { setTrue: openCreateResultDialog, setFalse: closeCreateResultDialog },
   ] = createBooleanState(false);
 
-  const [useUrl, setUrl, { getSnapshot: getUrlSnapshot }] =
+  const [url$, setUrl, { getSnapshot: getUrlSnapshot }] =
     createState<string>('');
 
   const createEvent = async (): Promise<Result<undefined, string>> => {
@@ -285,33 +285,33 @@ export const createCreateEventScheduleStore = (
 
   return {
     start,
+    isLoading$,
+    createResultDialogIsOpen$,
+    url$,
     closeCreateResultDialog,
     commonState$,
     commonStateHandlers,
-    useCreateResultDialogIsOpen,
     hasNoChanges$,
-    useIsLoading,
     onClipboardButtonClick,
     onCreateEventClick,
     resetAllState,
     restoreFromLocalStorage,
-    useUrl,
   } as const;
 };
 
 export type CreateEventSchedule = Readonly<{
   /** Starts saving the settings as they change; returns what stops it. */
   start: () => () => void;
+  isLoading$: InitializedObservable<boolean>;
+  createResultDialogIsOpen$: InitializedObservable<boolean>;
+  /** The link to the event just created. */
+  url$: InitializedObservable<string>;
   closeCreateResultDialog: () => void;
   commonState$: InitializedObservable<EventScheduleSettingCommonState>;
   commonStateHandlers: EventScheduleSettingCommonStateHandler;
-  useCreateResultDialogIsOpen: () => boolean;
   hasNoChanges$: InitializedObservable<boolean>;
-  useIsLoading: () => boolean;
   onClipboardButtonClick: () => void;
   onCreateEventClick: () => void;
   resetAllState: () => void;
   restoreFromLocalStorage: () => void;
-  /** The link to the event just created. */
-  useUrl: () => string;
 }>;

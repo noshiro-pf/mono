@@ -1,30 +1,25 @@
-import { Icon } from '@blueprintjs/core';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import type { Bindable, JSX } from 'synstate-dom';
 import { CircleIcon, CloseIcon, TriangleIcon } from './icons/index.mjs';
 
 type Props = Readonly<{
   iconName: AnswerIconIdWithNone;
-  color?: string;
+  color?: Bindable<string>;
   size?: number;
 }>;
 
-export const CustomIcon = memoNamed<Props>(
-  'MyIcon',
-  ({ iconName, color, size }) => {
-    const icon = React.useMemo<React.JSX.Element>(() => {
-      switch (iconName) {
-        case 'good':
-          return <CircleIcon color={color} size={size} />;
-        case 'fair':
-          return <TriangleIcon color={color} size={size} />;
-        case 'poor':
-          return <CloseIcon color={color} size={size} />;
-        case 'none':
-          return <div />;
-      }
-    }, [iconName, color, size]);
+/** The answer icon, ○ △ ×, or an empty box for none. */
+export const CustomIcon = ({ iconName, color, size }: Props): JSX.Element => {
+  switch (iconName) {
+    case 'good':
+      return <CircleIcon color={color} size={size} />;
 
-    return <Icon color={color} icon={icon} size={size} />;
-  },
-);
+    case 'fair':
+      return <TriangleIcon color={color} size={size} />;
+
+    case 'poor':
+      return <CloseIcon color={color} size={size} />;
+
+    case 'none':
+      return <div />;
+  }
+};

@@ -1,8 +1,9 @@
-import type { Toaster } from '@blueprintjs/core';
 import { Answer, UserId, UserName } from 'event-schedule-app-shared';
 import {
   combine,
+  createBooleanState,
   createEventEmitter,
+  createState,
   createState as createStateBase,
   filter,
   map,
@@ -12,7 +13,6 @@ import {
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { createBooleanState, createState } from 'synstate-react-hooks';
 import {
   Arr,
   IMapMapped,
@@ -66,21 +66,18 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     Answer | undefined
   >(undefined);
 
-  const [useSubmitButtonIsLoading, { setState: setSubmitButtonIsLoading }] =
+  const [submitButtonIsLoading$, { setState: setSubmitButtonIsLoading }] =
     createBooleanState(false);
 
   const [
-    useAlertOnAnswerClickIsOpen,
+    alertOnAnswerClickIsOpen$,
     { setTrue: openAlertOnAnswerClick, setFalse: closeAlertOnAnswerClick },
   ] = createBooleanState(false);
 
   const [
-    useAnswerBeingEditedSectionState,
+    answerBeingEditedSectionState$,
     setAnswerBeingEditedSectionState_,
-    {
-      state: answerBeingEditedSectionState$,
-      getSnapshot: getAnswerBeingEditedSectionStateSnapshot,
-    },
+    { getSnapshot: getAnswerBeingEditedSectionStateSnapshot },
   ] = createState<'creating' | 'editing' | 'hidden'>('hidden');
 
   const emptyAnswerSelection$: InitializedObservable<Answer> =
@@ -107,9 +104,9 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     createEventEmitter();
 
   const [
-    useAnswerBeingEdited,
+    answerBeingEdited$,
     updateAnswerBeingEdited,
-    { state: answerBeingEdited$, getSnapshot: getAnswerBeingEditedSnapshot },
+    { getSnapshot: getAnswerBeingEditedSnapshot },
   ] = createReducerWithActions(
     (answer: Answer, update: (prev: Answer) => Answer) => update(answer),
     Answer.defaultValue,
@@ -149,7 +146,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
   };
 
   const [
-    useCheckboxesState,
+    checkboxesState$,
     setCheckboxesState,
     {
       getSnapshot: getCheckboxesStateSnapshot,
@@ -164,7 +161,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     ),
   );
 
-  const [useBatchInputFieldIsOpen, { toggle: toggleBatchInputField_ }] =
+  const [batchInputFieldIsOpen$, { toggle: toggleBatchInputField_ }] =
     createBooleanState(false);
 
   const toggleBatchInputField = (): void => {
@@ -215,16 +212,25 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     ),
   );
 
-  const submitButtonIsDisabled$: InitializedObservable<boolean> = combine([
+  const userNameIsInvalid$: InitializedObservable<boolean> = combine([
     answerBeingEdited$,
-    selectedAnswerSavedState$,
     theNameIsAlreadyUsed$,
   ]).pipe(
     map(
-      ([answerBeingEdited, selectedAnswerSaved, theNameIsAlreadyUsed]) =>
-        answerBeingEdited.user.name === '' ||
-        fastDeepEqual(selectedAnswerSaved, answerBeingEdited) ||
-        theNameIsAlreadyUsed,
+      ([answerBeingEdited, theNameIsAlreadyUsed]) =>
+        answerBeingEdited.user.name === '' || theNameIsAlreadyUsed,
+    ),
+  );
+
+  const submitButtonIsDisabled$: InitializedObservable<boolean> = combine([
+    answerBeingEdited$,
+    selectedAnswerSavedState$,
+    userNameIsInvalid$,
+  ]).pipe(
+    map(
+      ([answerBeingEdited, selectedAnswerSaved, userNameIsInvalid]) =>
+        userNameIsInvalid ||
+        fastDeepEqual(selectedAnswerSaved, answerBeingEdited),
     ),
   );
 
@@ -740,12 +746,13 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     );
 
   return {
+    alertOnAnswerClickIsOpen$,
     answerBeingEdited$,
+    submitButtonIsLoading$,
+    checkboxesState$,
+    batchInputFieldIsOpen$,
     answerBeingEditedSectionState$,
-    useAlertOnAnswerClickIsOpen,
-    useAnswerBeingEdited,
     answerBeingEditedList$,
-    useAnswerBeingEditedSectionState,
     hasUnanswered$,
     iconHeader$,
     requiredParticipantsExist$,
@@ -753,10 +760,8 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     selectedDates$,
     setYearMonth$,
     submitButtonIsDisabled$,
-    useSubmitButtonIsLoading,
     theNameIsAlreadyUsed$,
-    useCheckboxesState,
-    useBatchInputFieldIsOpen,
+    userNameIsInvalid$,
     closeAlertOnAnswerClick,
     onAddAnswerButtonClick,
     onAnswerClick,
@@ -778,13 +783,18 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
 };
 
 export type AnswerPage = Readonly<{
+  /** Whether the alert a click on an answer opens is open. */
+  alertOnAnswerClickIsOpen$: InitializedObservable<boolean>;
   /** The answer as it is being written. */
   answerBeingEdited$: InitializedObservable<Answer>;
+  submitButtonIsLoading$: InitializedObservable<boolean>;
+  checkboxesState$: InitializedObservable<
+    ISetMapped<DatetimeRange, DatetimeRangeMapKey>
+  >;
+  batchInputFieldIsOpen$: InitializedObservable<boolean>;
   answerBeingEditedSectionState$: InitializedObservable<
     'creating' | 'editing' | 'hidden'
   >;
-  useAlertOnAnswerClickIsOpen: () => boolean;
-  useAnswerBeingEdited: () => Answer;
   answerBeingEditedList$: InitializedObservable<
     DeepReadonly<
       {
@@ -801,7 +811,6 @@ export type AnswerPage = Readonly<{
       }[]
     >
   >;
-  useAnswerBeingEditedSectionState: () => 'creating' | 'editing' | 'hidden';
   hasUnanswered$: InitializedObservable<boolean>;
   iconHeader$: InitializedObservable<
     | DeepReadonly<
@@ -817,10 +826,9 @@ export type AnswerPage = Readonly<{
   selectedDates$: InitializedObservable<readonly YearMonthDate[]>;
   setYearMonth$: SynstateObservable<CalendarCurrentPageReducerState>;
   submitButtonIsDisabled$: InitializedObservable<boolean>;
-  useSubmitButtonIsLoading: () => boolean;
   theNameIsAlreadyUsed$: InitializedObservable<boolean>;
-  useCheckboxesState: () => ISetMapped<DatetimeRange, DatetimeRangeMapKey>;
-  useBatchInputFieldIsOpen: () => boolean;
+  /** Empty, or already used by another answer: what the name's error says. */
+  userNameIsInvalid$: InitializedObservable<boolean>;
   closeAlertOnAnswerClick: () => void;
   onAddAnswerButtonClick: () => void;
   onAnswerClick: (answer: Answer) => void;

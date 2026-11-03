@@ -1,74 +1,35 @@
-import { useNumericInputWithStepState } from 'numeric-input-utils';
-import * as React from 'react';
-import { NumericInputView } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { Num, Result } from 'ts-data-forge';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import {
   answersScoreNumericInputConfig,
   clampAndRoundAnswersScore,
 } from '../../constants/index.mjs';
 import type { AnswersScore } from '../../types/index.mjs';
+import { AppNumericInput } from './app-numeric-input.js';
 
 type Props = Readonly<{
-  score: AnswersScore;
+  score: Bindable<AnswersScore>;
   onScoreChange: (value: AnswersScore) => void;
-  disabled?: boolean;
-  min?: AnswersScore;
-  max?: AnswersScore;
+  disabled?: Bindable<boolean>;
+  min?: Bindable<AnswersScore>;
+  max?: Bindable<AnswersScore>;
 }>;
 
 const { majorStep: step } = answersScoreNumericInputConfig;
 
-export const ScoreNumericInput = memoNamed<Props>(
-  'ScoreNumericInput',
-  ({
-    score: valueFromProps,
-    disabled = false,
-    min = answersScoreNumericInputConfig.min,
-    max = answersScoreNumericInputConfig.max,
-    onScoreChange: onValueChange,
-  }) => {
-    const normalizeValue = React.useCallback(
-      (value: number) => clampAndRoundAnswersScore(Num.clamp(value, min, max)),
-      [min, max],
-    );
-
-    const {
-      state,
-      setState,
-      onDecrementMouseDown,
-      onIncrementMouseDown,
-      submit,
-      onKeyDown,
-    } = useNumericInputWithStepState({
-      onValueChange,
-      normalize: normalizeValue,
-      decode: (s) =>
-        clampAndRoundAnswersScore(
-          Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN),
-        ),
-      encode: (s) => s.toString(),
-      valueFromProps,
-      step,
-    });
-
-    const inputProps = React.useMemo(
-      () => ({ min, max, step, onKeyDown }),
-      [min, max, onKeyDown],
-    );
-
-    return (
-      <NumericInputView
-        disabled={disabled}
-        fillSpace
-        inputProps={inputProps}
-        selectOnFocus
-        valueAsStr={state}
-        onDecrementMouseDown={onDecrementMouseDown}
-        onIncrementMouseDown={onIncrementMouseDown}
-        onInputBlur={submit}
-        onInputStringChange={setState}
-      />
-    );
-  },
+export const ScoreNumericInput = ({
+  score,
+  disabled,
+  min = constant(answersScoreNumericInputConfig.min),
+  max = constant(answersScoreNumericInputConfig.max),
+  onScoreChange,
+}: Props): JSX.Element => (
+  <AppNumericInput
+    disabled={disabled}
+    max={max}
+    min={min}
+    normalize={clampAndRoundAnswersScore}
+    step={step}
+    value={score}
+    onValueChange={onScoreChange}
+  />
 );

@@ -1,11 +1,15 @@
-import { Button } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import { BpSelect } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
+import { Button, HtmlSelect } from 'blueprint-synstate';
+import {
+  constant,
+  For,
+  toObservable,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import { asUint32 } from 'ts-data-forge';
 import { dict } from '../../../../constants/index.mjs';
 import { selectorOptions } from '../../../../functions/index.mjs';
-import { useSelectDatetimesHooks } from '../../../../hooks/index.mjs';
+import { createSelectDatetimesState } from '../../../../hooks/index.mjs';
 import {
   AnswerPageStore,
   holidaysJpDefinition$,
@@ -14,116 +18,116 @@ import { AddElementButton } from '../../../molecules/index.mjs';
 import { MultipleDatePicker } from '../../../multiple-date-picker/index.mjs';
 import { ButtonsWrapper } from '../../../styled/index.mjs';
 import { DeleteAllButton } from '../../button-with-confirm/index.mjs';
+import * as styles from '../select-datetimes.module.css';
 import { SetTimesPopover } from '../set-times-popover/index.mjs';
 import { SelectedDatetimeRow } from './selected-datetime-row.js';
 
 const dc = dict.eventSettingsPage.section2;
 
 type Props = Readonly<{
-  datetimeSpecification: DatetimeSpecificationEnumType;
+  datetimeSpecification: Bindable<DatetimeSpecificationEnumType>;
   onDatetimeSpecificationChange: (value: DatetimeSpecificationEnumType) => void;
-  datetimeList: readonly DatetimeRange[];
+  datetimeList: Bindable<readonly DatetimeRange[]>;
   onDatetimeListChange: (list: readonly DatetimeRange[]) => void;
 }>;
 
-type CastedHandlerType = (value: string) => void;
+export const SelectDatetimes = ({
+  datetimeSpecification,
+  onDatetimeSpecificationChange,
+  datetimeList,
+  onDatetimeListChange,
+}: Props): JSX.Element => {
+  const datetimeList$ = toObservable(datetimeList);
 
-export const SelectDatetimes = memoNamed<Props>(
-  'SelectDatetimes',
-  ({
-    datetimeSpecification,
-    onDatetimeSpecificationChange,
-    datetimeList,
-    onDatetimeListChange,
-  }) => {
-    const {
-      selectedDates,
-      onSelectedDatesChange,
-      datetimeListWithHandler,
-      onAddDatetimeClick,
-      onConfirmDeleteAll,
-      setTimesPopoverInitialValue,
-      onSetTimesPopoverSubmit,
-      onSortClick,
-    } = useSelectDatetimesHooks(datetimeList, onDatetimeListChange);
+  const {
+    selectedDates$,
+    onSelectedDatesChange,
+    mostFrequentTimeRange$,
+    onYmdChange,
+    onRangeStartChange,
+    onRangeEndChange,
+    onDuplicateClick,
+    onDeleteClick,
+    onAddDatetimeClick,
+    onConfirmDeleteAll,
+    onSetTimesPopoverSubmit,
+    onSortClick,
+  } = createSelectDatetimesState(datetimeList$, onDatetimeListChange);
 
-    const holidaysJpDefinition = useObservableValue(holidaysJpDefinition$);
-
-    return (
-      <div
-        css={css`
-          display: flex;
-          flex-wrap: wrap-reverse;
-        `}
-      >
-        <div>
-          <div
-            css={css`
-              margin-bottom: 10px;
-            `}
-          >
-            <div>{dc.datetimeSpecification}</div>
-            <BpSelect
-              options={selectorOptions}
-              value={datetimeSpecification}
-              onValueChange={
+  return (
+    <div class={constant(styles.root)}>
+      <div>
+        <div class={constant(styles.section)}>
+          <div>{constant(dc.datetimeSpecification)}</div>
+          <HtmlSelect
+            value={datetimeSpecification}
+            onChange={({ currentTarget }) => {
+              onDatetimeSpecificationChange(
                 // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-                onDatetimeSpecificationChange as CastedHandlerType
-              }
-            />
-          </div>
-          <div
-            css={css`
-              margin-bottom: 10px;
-            `}
-            data-e2e={'datetime-list'}
+                currentTarget.value as DatetimeSpecificationEnumType,
+              );
+            }}
           >
-            {datetimeListWithHandler.map(
-              ({
-                id,
-                datetimeRange,
-                onYmdChange,
-                onRangeStartChange,
-                onRangeEndChange,
-                onDuplicateClick,
-                onDeleteClick,
-              }) => (
-                <SelectedDatetimeRow
-                  key={id}
-                  datetimeRange={datetimeRange}
-                  datetimeSpecification={datetimeSpecification}
-                  onDeleteClick={onDeleteClick}
-                  onDuplicateClick={onDuplicateClick}
-                  onRangeEndChange={onRangeEndChange}
-                  onRangeStartChange={onRangeStartChange}
-                  onYmdChange={onYmdChange}
-                />
-              ),
-            )}
-            <AddElementButton onClick={onAddDatetimeClick} />
-          </div>
-          <ButtonsWrapper>
-            <DeleteAllButton onConfirmDeleteAll={onConfirmDeleteAll} />
-            <SetTimesPopover
-              datetimeSpecification={datetimeSpecification}
-              initialValue={setTimesPopoverInitialValue}
-              onSetTimesSubmit={onSetTimesPopoverSubmit}
-            />
-            <Button
-              icon={'sort-asc'}
-              intent={'primary'}
-              text={dc.sortDatetimes}
-              onClick={onSortClick}
-            />
-          </ButtonsWrapper>
+            {selectorOptions.map(({ label, value }) => (
+              <option value={constant(value)}>{constant(label)}</option>
+            ))}
+          </HtmlSelect>
         </div>
-        <MultipleDatePicker
-          holidaysJpDefinition={holidaysJpDefinition}
-          selectedDates={selectedDates}
-          setYearMonth$={AnswerPageStore.setYearMonth$}
-          onSelectedDatesChange={onSelectedDatesChange}
-        />
+        <div
+          class={constant(styles.section)}
+          data-e2e={constant('datetime-list')}
+        >
+          <For items={datetimeList$} key={(_, index) => index}>
+            {(datetimeRange$, index$) => {
+              const index = (): ReturnType<typeof asUint32> =>
+                asUint32(index$.getSnapshot().value);
+
+              return (
+                <SelectedDatetimeRow
+                  datetimeRange={datetimeRange$}
+                  datetimeSpecification={datetimeSpecification}
+                  onDeleteClick={() => {
+                    onDeleteClick(index());
+                  }}
+                  onDuplicateClick={() => {
+                    onDuplicateClick(index());
+                  }}
+                  onRangeEndChange={(hm) => {
+                    onRangeEndChange(index(), hm);
+                  }}
+                  onRangeStartChange={(hm) => {
+                    onRangeStartChange(index(), hm);
+                  }}
+                  onYmdChange={(ymd) => {
+                    onYmdChange(index(), ymd);
+                  }}
+                />
+              );
+            }}
+          </For>
+          <AddElementButton onClick={onAddDatetimeClick} />
+        </div>
+        <ButtonsWrapper>
+          <DeleteAllButton onConfirmDeleteAll={onConfirmDeleteAll} />
+          <SetTimesPopover
+            datetimeSpecification={datetimeSpecification}
+            initialValue={mostFrequentTimeRange$}
+            onSetTimesSubmit={onSetTimesPopoverSubmit}
+          />
+          <Button
+            icon={'sort-asc'}
+            intent={'primary'}
+            text={constant(dc.sortDatetimes)}
+            onClick={onSortClick}
+          />
+        </ButtonsWrapper>
       </div>
-    );
-  },
-);
+      <MultipleDatePicker
+        holidaysJpDefinition={holidaysJpDefinition$}
+        selectedDates={selectedDates$}
+        setYearMonth$={AnswerPageStore.setYearMonth$}
+        onSelectedDatesChange={onSelectedDatesChange}
+      />
+    </div>
+  );
+};

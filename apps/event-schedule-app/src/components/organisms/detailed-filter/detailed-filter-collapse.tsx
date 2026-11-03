@@ -1,194 +1,89 @@
-import { Collapse } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import { CheckboxView } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
-import { expectType } from 'ts-data-forge';
-import type { DeepReadonly } from 'ts-type-forge';
+import { Collapse } from 'blueprint-synstate';
+import { constant, For, view, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
+import { CheckboxView } from '../../molecules/index.mjs';
 import { DetailedFilterDateRange } from './detailed-filter-date-range.js';
 import { DetailedFilterDayOfWeek } from './detailed-filter-day-of-week.js';
 import { DetailedFilterFilledDateOnly } from './detailed-filter-filled-date-only.js';
 import { DetailedFilterIconOfSpecifiedRespondent } from './detailed-filter-icon-of-specified-respondent.js';
-import { DetailedFilterNumFairIcon } from './detailed-filter-num-fair-icon.js';
-import { DetailedFilterNumFairPlusPoorIcon } from './detailed-filter-num-fair-plus-poor-icon.js';
-import { DetailedFilterNumGoodIcon } from './detailed-filter-num-good-icon.js';
-import { DetailedFilterNumGoodPlusFairIcon } from './detailed-filter-num-good-plus-fair-icon.js';
-import { DetailedFilterNumPoorIcon } from './detailed-filter-num-poor-icon.js';
+import { DetailedFilterNumIcon } from './detailed-filter-num-icon.js';
 import { DetailedFilterRank } from './detailed-filter-rank.js';
 import { DetailedFilterScoreRange } from './detailed-filter-score-range.js';
+import { filterView } from './filter-state.mjs';
 import { CheckboxWrapper, FilterItem, FilterItemContent } from './styled.js';
+import * as styles from './styled.module.css';
 
-type Props = DeepReadonly<{ isOpen: boolean }>;
+type Props = Readonly<{ isOpen: Bindable<boolean> }>;
 
-export const DetailedFilterCollapse = memoNamed<Props>(
-  'DetailedFilterCollapse',
-  ({ isOpen }) => {
-    const {
-      dateRange,
-      dayOfWeek,
-      filledDateOnly,
-      iconOfSpecifiedRespondent,
-      respondent,
-      iconState,
-      scoreRange,
-      rank,
-      ..._rest
-    } = AnswerFilterAndSortStore.useFilterState();
+const dc = dict.answerPage.detailedFilter.filterItems;
 
-    expectType<keyof typeof _rest, never>('=');
+export const DetailedFilterCollapse = ({ isOpen }: Props): JSX.Element => (
+  <Collapse isOpen={isOpen}>
+    <div class={constant(styles.collapseScroll)}>
+      <div class={constant(styles.collapseBox)}>
+        <DetailedFilterDateRange />
+        <DetailedFilterDayOfWeek />
+        <DetailedFilterScoreRange />
+        <DetailedFilterRank />
 
-    const iconOfSpecifiedRespondentCheckState = useObservableValue(
-      AnswerFilterAndSortStore.iconOfSpecifiedRespondentCheckState$,
-    );
+        <hr />
 
-    const filteredRespondentCheckState = useObservableValue(
-      AnswerFilterAndSortStore.respondentCheckState$,
-    );
+        <div class={constant(styles.groupTitle)}>{constant(dc.answerIcon)}</div>
 
-    return (
-      <Collapse isOpen={isOpen}>
-        <div
-          css={css`
-            margin-bottom: 10px;
-            overflow-x: auto;
-          `}
-        >
-          <div
-            css={css`
-              padding: 10px;
-              width: 350px;
-              border: solid 1px rgba(16, 22, 26, 0.15);
-              border-radius: 10px;
-            `}
-          >
-            <DetailedFilterDateRange
-              dateRange={dateRange.defaultValue}
-              state={dateRange}
-            />
+        <DetailedFilterNumIcon icon={'good'} />
+        <DetailedFilterNumIcon icon={'fair'} />
+        <DetailedFilterNumIcon icon={'poor'} />
+        <DetailedFilterNumIcon icon={'goodPlusFair'} />
+        <DetailedFilterNumIcon icon={'fairPlusPoor'} />
 
-            <DetailedFilterDayOfWeek state={dayOfWeek} />
+        <DetailedFilterFilledDateOnly />
 
-            <DetailedFilterScoreRange
-              enabled={scoreRange.enabled}
-              range={scoreRange.value}
-            />
+        <DetailedFilterIconOfSpecifiedRespondent />
 
-            <DetailedFilterRank enabled={rank.enabled} rank={rank.value} />
+        <hr />
 
-            <hr />
-
-            <div
-              css={css`
-                margin-top: 20px;
-                margin-bottom: 15px;
-              `}
-            >
-              {dict.answerPage.detailedFilter.filterItems.answerIcon}
-            </div>
-
-            <DetailedFilterNumGoodIcon
-              enabled={iconState.good.enabled}
-              max={iconState.good.max}
-              min={iconState.good.min}
-              upperLimit={iconState.upperLimit}
-            />
-            <DetailedFilterNumFairIcon
-              enabled={iconState.fair.enabled}
-              max={iconState.fair.max}
-              min={iconState.fair.min}
-              upperLimit={iconState.upperLimit}
-            />
-            <DetailedFilterNumPoorIcon
-              enabled={iconState.poor.enabled}
-              max={iconState.poor.max}
-              min={iconState.poor.min}
-              upperLimit={iconState.upperLimit}
-            />
-
-            <DetailedFilterNumGoodPlusFairIcon
-              enabled={iconState.goodPlusFair.enabled}
-              max={iconState.goodPlusFair.max}
-              min={iconState.goodPlusFair.min}
-              upperLimit={iconState.upperLimit}
-            />
-            <DetailedFilterNumFairPlusPoorIcon
-              enabled={iconState.fairPlusPoor.enabled}
-              max={iconState.fairPlusPoor.max}
-              min={iconState.fairPlusPoor.min}
-              upperLimit={iconState.upperLimit}
-            />
-
-            <DetailedFilterFilledDateOnly filledDateOnly={filledDateOnly} />
-
-            <DetailedFilterIconOfSpecifiedRespondent
-              checkState={iconOfSpecifiedRespondentCheckState}
-              enabled={iconOfSpecifiedRespondent.enabled}
-              fairDisabled={
-                iconState.fair.max === 0 ||
-                iconState.goodPlusFair.max === 0 ||
-                iconState.fairPlusPoor.max === 0
-              }
-              goodDisabled={
-                iconState.good.max === 0 || iconState.goodPlusFair.max === 0
-              }
-              noneDisabled={filledDateOnly}
-              poorDisabled={
-                iconState.poor.max === 0 || iconState.fairPlusPoor.max === 0
-              }
-            />
-
-            <hr />
-
-            <div
-              css={css`
-                margin-top: 20px;
-                margin-bottom: 15px;
-              `}
-            >
-              {dict.answerPage.detailedFilter.filterItems.filterOutSomeAnswer}
-            </div>
-
-            <FilterItem>
-              <CheckboxWrapper>
-                <CheckboxView
-                  state={respondent.enabled ? 'checked' : 'none'}
-                  onCheck={
-                    AnswerFilterAndSortStore.setEnabledFilteringByRespondent
-                  }
-                />
-                <span>
-                  {dict.answerPage.detailedFilter.filterItems.respondent.title}
-                </span>
-              </CheckboxWrapper>
-            </FilterItem>
-            <FilterItemContent>
-              {filteredRespondentCheckState.map(
-                ({ username, checkState, key: _key }, index) => (
-                  <div
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={index}
-                    css={css`
-                      display: flex;
-                      align-items: center;
-                    `}
-                  >
-                    <CheckboxWrapper>
-                      <CheckboxView
-                        disabled={!respondent.enabled}
-                        state={checkState.checked ? 'checked' : 'none'}
-                        onCheck={checkState.onCheck}
-                      />
-                      <span>{username}</span>
-                    </CheckboxWrapper>
-                  </div>
-                ),
-              )}
-            </FilterItemContent>
-          </div>
+        <div class={constant(styles.groupTitle)}>
+          {constant(dc.filterOutSomeAnswer)}
         </div>
-      </Collapse>
-    );
-  },
+
+        <FilterItem>
+          <CheckboxWrapper>
+            <CheckboxView
+              state={filterView((s) =>
+                s.respondent.enabled ? 'checked' : 'none',
+              )}
+              onCheck={AnswerFilterAndSortStore.setEnabledFilteringByRespondent}
+            />
+            <span>{constant(dc.respondent.title)}</span>
+          </CheckboxWrapper>
+        </FilterItem>
+        <FilterItemContent>
+          <For
+            items={AnswerFilterAndSortStore.respondentCheckState$}
+            key={(_, index) => index}
+          >
+            {(respondent$) => (
+              <div class={constant(styles.respondentRow)}>
+                <CheckboxWrapper>
+                  <CheckboxView
+                    disabled={filterView((s) => !s.respondent.enabled)}
+                    state={view(respondent$, (r) =>
+                      r.checkState.checked ? 'checked' : 'none',
+                    )}
+                    onCheck={(checked) => {
+                      respondent$
+                        .getSnapshot()
+                        .value.checkState.onCheck(checked);
+                    }}
+                  />
+                  <span>{view(respondent$, (r) => r.username)}</span>
+                </CheckboxWrapper>
+              </div>
+            )}
+          </For>
+        </FilterItemContent>
+      </div>
+    </div>
+  </Collapse>
 );

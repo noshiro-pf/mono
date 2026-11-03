@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import {
   combine,
   filter,
@@ -81,7 +80,7 @@ export const createUpdateEmailPageStore = <
     )
     .pipe(filter(isNotUndefined));
 
-  const [, dispatch, { state: formState$ }] = createReducerWithActions(
+  const [formState$, dispatch] = createReducerWithActions(
     updateEmailPageStateReducer,
     updateEmailPageInitialState,
     [dialogActions$],

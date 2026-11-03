@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import { EventSchedule } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
 import { Result, asSafeUint } from 'ts-data-forge';
@@ -192,6 +191,7 @@ const fakeToaster = (onShow: () => number): Toaster =>
     dismiss: () => undefined,
     clear: () => undefined,
     getToasts: () => [],
+    remove: () => undefined,
   }) as const;
 
 const setup = (

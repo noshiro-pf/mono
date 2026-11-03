@@ -59,6 +59,34 @@ describe(createAuthStore, () => {
     assert.strictEqual(store.getFireAuthUserSnapshot(), alice);
   });
 
+  test('a name changed in place reaches displayName$ when read again', () => {
+    const { store, auth } = setup();
+
+    const mut_alice = {
+      ...fakeUser('alice', ['password']),
+      displayName: 'Alice',
+    };
+
+    auth.setCurrentUser(mut_alice);
+
+    store.emitAuthStateChange();
+
+    const mut_names: (string | null)[] = [];
+
+    store.displayName$.subscribe((name) => {
+      mut_names.push(name);
+    });
+
+    // As Firebase's `updateProfile` does: the same object, changed.
+    mut_alice.displayName = 'Alicia';
+
+    store.emitAuthStateChange();
+
+    assert.deepStrictEqual(mut_names, ['Alice', 'Alicia']);
+
+    assert.strictEqual(store.email$.getSnapshot().value, null);
+  });
+
   test('signs out, then goes to the sign-in page', async () => {
     const { store, calls } = setup();
 

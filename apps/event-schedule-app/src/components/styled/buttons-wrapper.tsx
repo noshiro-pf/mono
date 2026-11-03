@@ -1,29 +1,32 @@
-import styled from '@emotion/styled';
+import { constant, type Child, type JSX } from 'synstate-dom';
+import * as styles from './buttons-wrapper.module.css';
 
-export const SingleButtonWrapper = styled.div`
-  margin: 5px;
-`;
+type Props = Readonly<{ children: Child; 'data-e2e'?: string }>;
 
-export const ButtonsWrapperNowrap = styled.div`
-  margin: 5px;
-  display: flex;
-  align-items: center;
+const wrapper =
+  (className: string) =>
+  ({ children, 'data-e2e': e2e }: Props): JSX.Element => (
+    <div
+      class={constant(className)}
+      {...(e2e === undefined ? {} : { 'data-e2e': constant(e2e) })}
+    >
+      {children}
+    </div>
+  );
 
-  & > * {
-    margin-right: 5px; /* margin between this button and the next button */
-    margin-bottom: 5px; /* margin between this button and the buttons on next line */
-  }
-  &::last-of-type {
-    margin-right: 0;
-    margin-bottom: 0;
-  }
-`;
+export const SingleButtonWrapper = wrapper(styles.single);
 
-export const ButtonsWrapper = styled(ButtonsWrapperNowrap)`
-  flex-wrap: wrap-reverse;
-  margin-top: 10px;
-`;
+/** Buttons in a row, 5px apart. */
+export const ButtonsWrapperNowrap = wrapper(styles.nowrap);
 
-export const ButtonsWrapperAlignEnd = styled(ButtonsWrapper)`
-  justify-content: flex-end;
-`;
+/** Buttons in a row that wraps, the first row last. */
+export const ButtonsWrapper = wrapper(`${styles.nowrap} ${styles.wrap}`);
+
+export const ButtonsWrapperAlignEnd = wrapper(
+  `${styles.nowrap} ${styles.wrap} ${styles.alignEnd}`,
+);
+
+/** The buttons under the create and edit pages' settings. */
+export const ButtonsWrapperForEventSettingsPage = wrapper(
+  `${styles.nowrap} ${styles.wrap} ${styles.alignEnd} ${styles.eventSettingsPage}`,
+);

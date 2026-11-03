@@ -8,6 +8,8 @@ type Props = Readonly<{
   minimal?: boolean;
   /** Takes the width of its container, shared by the buttons (`bp6-fill`). */
   fill?: boolean;
+  /** The buttons stacked, one above the next (`bp6-vertical`). */
+  vertical?: boolean;
   /** Classes after Blueprint's own. */
   class?: string;
   role?: string;
@@ -20,6 +22,7 @@ export const ButtonGroup = ({
   children,
   minimal = false,
   fill = false,
+  vertical = false,
   class: className,
   role,
   'aria-label': ariaLabel,
@@ -31,6 +34,7 @@ export const ButtonGroup = ({
       'bp6-button-group',
       minimal && 'bp6-minimal',
       fill && 'bp6-fill',
+      vertical && 'bp6-vertical',
       className,
     ])}
     data-e2e={e2e}

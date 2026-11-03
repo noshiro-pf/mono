@@ -1,5 +1,5 @@
-import { Button } from '@blueprintjs/core';
-import { memoNamed } from 'react-utils';
+import { Button } from 'blueprint-synstate';
+import { constant, If, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { EditEventScheduleStore } from '../../../store/index.mjs';
 import { ButtonWithConfirm } from './button-with-confirm.js';
@@ -7,9 +7,9 @@ import { ButtonWithConfirm } from './button-with-confirm.js';
 const dc = dict.eventSettingsPage;
 
 type Props = Readonly<{
-  loading: boolean;
-  showConfirmationDialog: boolean;
-  disabled: boolean;
+  loading: Bindable<boolean>;
+  showConfirmationDialog: Bindable<boolean>;
+  disabled: Bindable<boolean>;
 }>;
 
 const buttonConfig = {
@@ -30,27 +30,33 @@ const toastConfig = {
   intent: 'none',
 } as const;
 
-export const SubmitEditingEventButton = memoNamed<Props>(
-  'SubmitEditingEventButton',
-  ({ showConfirmationDialog, loading, disabled }) =>
-    showConfirmationDialog ? (
+/** Saves the edited event; asks first when dates with answers are removed. */
+export const SubmitEditingEventButton = ({
+  showConfirmationDialog,
+  loading,
+  disabled,
+}: Props): JSX.Element => (
+  <If
+    cond={showConfirmationDialog}
+    then={
       <ButtonWithConfirm
         buttonConfig={buttonConfig}
-        data-e2e={'update-event-settings-with-confirm'}
         dialogConfig={dialogConfig}
         disabled={disabled}
         loading={loading}
         toastConfig={toastConfig}
         onConfirmClick={EditEventScheduleStore.onEditEventClickPromise}
       />
-    ) : (
+    }
+    else={
       <Button
-        data-e2e={'update-event-settings'}
+        data-e2e={constant('update-event-settings')}
         disabled={disabled}
         intent={'primary'}
         loading={loading}
-        text={dc.editEventButton.name}
+        text={constant(dc.editEventButton.name)}
         onClick={EditEventScheduleStore.onEditEventClick}
       />
-    ),
+    }
+  />
 );

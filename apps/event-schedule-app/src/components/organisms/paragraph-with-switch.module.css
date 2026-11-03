@@ -1,0 +1,13 @@
+.titleRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  & > * {
+    margin-right: 5px;
+  }
+}
+
+/* Blueprint's control margin, which a switch without a label has no use for. */
+.switchControl {
+  margin: 0 !important;
+}

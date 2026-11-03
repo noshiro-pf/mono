@@ -1,7 +1,11 @@
-import { Button } from '@blueprintjs/core';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
+import { Button } from 'blueprint-synstate';
+import {
+  constant,
+  createAfterUpdate,
+  derive,
+  view,
+  type JSX,
+} from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { CreateEventScheduleStore } from '../../../store/index.mjs';
 import {
@@ -14,52 +18,41 @@ import { EventScheduleSettingCommon } from './event-schedule-setting-common.js';
 
 const dc = dict.eventSettingsPage;
 
-export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
-  const commonState = useObservableValue(CreateEventScheduleStore.commonState$);
+export const CreateEventSchedule = (): JSX.Element => {
+  // After the update that opened the page.
+  createAfterUpdate()(CreateEventScheduleStore.restoreFromLocalStorage);
 
-  React.useEffect(() => {
-    CreateEventScheduleStore.restoreFromLocalStorage();
-  }, []);
-
-  const { eventScheduleValidationOk } = commonState;
-
-  const createButtonIsLoading = CreateEventScheduleStore.useIsLoading();
-
-  const createResultDialogIsOpen =
-    CreateEventScheduleStore.useCreateResultDialogIsOpen();
-
-  const url = CreateEventScheduleStore.useUrl();
-
-  const hasNoChanges = useObservableValue(
-    CreateEventScheduleStore.hasNoChanges$,
-  );
+  const { isLoading$, hasNoChanges$, commonState$ } = CreateEventScheduleStore;
 
   return (
-    <div data-e2e={'create-page'}>
+    <div data-e2e={constant('create-page')}>
       <Header title={dc.title} />
       <EventScheduleSettingCommon
         handlers={CreateEventScheduleStore.commonStateHandlers}
-        state={commonState}
+        state$={commonState$}
       />
       <ButtonsWrapperForEventSettingsPage>
         <ResetButton
-          disabled={createButtonIsLoading || hasNoChanges}
+          disabled={derive(
+            [isLoading$, hasNoChanges$],
+            (loading, noChanges) => loading || noChanges,
+          )}
           onConfirmClick={CreateEventScheduleStore.resetAllState}
         />
         <Button
-          data-e2e={'create-button'}
-          disabled={!eventScheduleValidationOk}
+          data-e2e={constant('create-button')}
+          disabled={view(commonState$, (s) => !s.eventScheduleValidationOk)}
           intent={'primary'}
-          loading={createButtonIsLoading}
-          text={dc.createEventButton}
+          loading={isLoading$}
+          text={constant(dc.createEventButton)}
           onClick={CreateEventScheduleStore.onCreateEventClick}
         />
         <CreateEventResultDialog
-          isLoading={createButtonIsLoading}
-          isOpen={createResultDialogIsOpen}
-          url={url}
+          isLoading={isLoading$}
+          isOpen={CreateEventScheduleStore.createResultDialogIsOpen$}
+          url={CreateEventScheduleStore.url$}
         />
       </ButtonsWrapperForEventSettingsPage>
     </div>
   );
-});
+};

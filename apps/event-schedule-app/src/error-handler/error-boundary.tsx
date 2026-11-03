@@ -1,29 +1,28 @@
-import { css } from '@emotion/react';
-import {
-  Json,
-  Result,
-  hasKey,
-  isRecord,
-  isString,
-  unknownToString,
-} from 'ts-data-forge';
-/* eslint-disable react/no-set-state */
-/* eslint-disable react/destructuring-assignment */
 import {
   Button,
-  Classes,
+  Dialog,
   FormGroup,
   Label,
   NonIdealState,
-  Pre,
-} from '@blueprintjs/core';
-import * as React from 'react';
-import { BpTextArea, DialogWithMaxWidth } from 'react-blueprintjs-utils';
-import { ButtonsWrapperAlignEnd } from '../components/index.mjs';
+  TextArea,
+} from 'blueprint-synstate';
+import {
+  createBooleanState,
+  createScope,
+  createState,
+  getCurrentScope,
+} from 'synstate';
+import { constant, If, mapBindable, mountable, type JSX } from 'synstate-dom';
+import { Json, Result, unknownToString } from 'ts-data-forge';
+import {
+  ButtonsWrapperAlignEnd,
+  maxWidthModalClass,
+} from '../components/index.mjs';
 import { dict } from '../constants/index.mjs';
 import { isProduction } from '../env.mjs';
 import { createToaster, showToast } from '../functions/index.mjs';
 import { api } from '../store/index.mjs';
+import * as styles from './error-boundary.module.css';
 import { createUncaughtErrorReporter } from './report-uncaught.mjs';
 
 if (isProduction) {
@@ -34,72 +33,46 @@ if (isProduction) {
   addEventListener('unhandledrejection', reporter.onUnhandledRejection);
 }
 
-type State = Readonly<{
-  error: unknown;
-  errorInfo: unknown;
-  hasError: boolean;
-  isOpen: boolean;
-  loading: boolean;
-  description: string;
-  openedOnce: boolean;
-}>;
+type Props = Readonly<{ children: JSX.Element }>;
 
-type Props = Readonly<{ children?: React.ReactNode }>;
+/**
+ * Draws `children`, or, if drawing it throws, the error screen in its place,
+ * from which the error can be reported: what React's error boundary did for a
+ * render. An error thrown later, by an update, is left to the reporter above.
+ *
+ * @link https://www.asobou.co.jp/blog/web/error-boundary
+ */
+export const ErrorBoundary = ({ children }: Props): JSX.Element =>
+  // A component runs as it is mounted, so that is what is guarded. In a scope
+  // of its own, so that what the part drawn before the throw set up (its
+  // subscriptions, its requests) is stopped with it, not left behind the error
+  // screen.
+  mountable(() => {
+    const scope = createScope(getCurrentScope());
 
-// eslint-disable-next-line react/require-optimization, functional/no-class-inheritance
-export class ErrorBoundary extends React.Component<Props, State> {
-  static getDerivedStateFromError(error: unknown): State {
-    // Update state so the next render will show the fallback UI.
-    return {
-      error,
-      errorInfo: undefined,
-      hasError: true,
-      isOpen: false,
-      loading: false,
-      description: '',
-      openedOnce: false,
-    };
-  }
+    try {
+      return scope.run(() => children.mount());
+    } catch (error) {
+      scope.dispose();
 
-  constructor(props: Props) {
-    super(props);
+      console.error(error);
 
-    this.state = {
-      error: undefined,
-      errorInfo: undefined,
-      hasError: false,
-      isOpen: false,
-      loading: false,
-      description: '',
-      openedOnce: false,
-    };
-  }
+      return (<ErrorScreen error={error} />).mount();
+    }
+  });
 
-  override componentDidCatch(error: unknown, errorInfo: unknown): void {
-    // You can also log error messages to an error reporting service here
+const ErrorScreen = ({ error }: Readonly<{ error: unknown }>): JSX.Element => {
+  const [isOpen$, { setTrue: open, setFalse: close }] =
+    createBooleanState(false);
 
-    this.setState((prev) => ({
-      error,
-      errorInfo,
-      hasError: true,
-      isOpen: prev.isOpen,
-      loading: prev.loading,
-      description: prev.description,
-      openedOnce: prev.openedOnce,
-    }));
-  }
+  const [openedOnce$, { setTrue: setOpenedOnce }] = createBooleanState(false);
 
-  // eslint-disable-next-line unicorn/consistent-class-member-order
-  private readonly handleOpenClick = (): void => {
-    this.setState({ isOpen: true, openedOnce: true });
-  };
+  const [loading$, { setState: setLoading }] = createBooleanState(false);
 
-  private readonly handleCloseClick = (): void => {
-    this.setState({ isOpen: false });
-  };
+  const [description$, setDescription] = createState('');
 
-  private readonly handleSendReportClick = (): void => {
-    this.setState({ loading: true });
+  const sendReport = (): void => {
+    setLoading(true);
 
     api
       .sendReport({
@@ -108,14 +81,16 @@ export class ErrorBoundary extends React.Component<Props, State> {
         error:
           Result.unwrapThrow(
             Json.stringify({
-              error: unknownToString(this.state.error),
-              errorInfo: this.state.errorInfo,
-              description: this.state.description,
+              error: unknownToString(error),
+              errorInfo: undefined,
+              description: description$.getSnapshot().value,
             }),
           ) ?? '',
       })
       .then((res) => {
-        this.setState({ loading: false, isOpen: false });
+        setLoading(false);
+
+        close();
 
         if (Result.isErr(res)) {
           showToast({
@@ -123,8 +98,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
             intent: 'danger',
             message: (
               <div>
-                <span>{dc.sendReport.error}</span>
-                <span>{res.value.message}</span>
+                <span>{constant(dc.sendReport.error)}</span>
+                <span>{constant(res.value.message)}</span>
               </div>
             ),
           });
@@ -139,106 +114,78 @@ export class ErrorBoundary extends React.Component<Props, State> {
       .catch(console.error);
   };
 
-  private readonly onDescriptionChange = (value: string): void => {
-    this.setState({ description: value });
-  };
+  return (
+    <div class={constant(styles.screen)}>
+      <NonIdealState
+        action={
+          <Button
+            text={mapBindable(isOpen$, (isOpen) =>
+              isOpen ? dc.hideDetails : dc.showDetails,
+            )}
+            onClick={() => {
+              open();
 
-  override render(): React.ReactNode {
-    const {
-      error,
-      errorInfo,
-      hasError,
-      isOpen,
-      loading,
-      description,
-      openedOnce,
-    } = this.state;
-
-    // just render children
-    return !hasError ? (
-      this.props.children
-    ) : (
-      <div
-        css={css`
-          height: 100vh;
-        `}
-      >
-        <NonIdealState
-          action={
-            // eslint-disable-next-line react-perf/jsx-no-jsx-as-prop
-            <Button onClick={this.handleOpenClick}>
-              {isOpen ? dc.hideDetails : dc.showDetails}
-            </Button>
-          }
-          description={
-            // eslint-disable-next-line react-perf/jsx-no-jsx-as-prop
-            <div>
-              <div>{dc.unexpectedError}</div>
-              {openedOnce ? <div>{dc.reloadThisPage}</div> : undefined}
-            </div>
-          }
-          icon={'error'}
-        />
-        <DialogWithMaxWidth isOpen={isOpen} onClose={this.handleCloseClick}>
-          <div className={Classes.DIALOG_BODY}>
-            <Label>
-              {dc.sendReport.log}
-              <Pre
-                css={css`
-                  max-height: 200px;
-                  overflow-y: auto;
-                `}
-              >
-                {unknownToString(error)}
-                {isRecord(errorInfo) &&
-                hasKey(errorInfo, 'componentStack') &&
-                isString(errorInfo.componentStack)
-                  ? errorInfo.componentStack
-                  : undefined}
-              </Pre>
-            </Label>
-
-            <FormGroup
-              helperText={dc.sendReport.description.helperText}
-              label={dc.sendReport.description.label}
-              labelFor={'description-textarea'}
-              labelInfo={dc.sendReport.description.labelInfo}
-            >
-              <BpTextArea
-                fill
-                id={'description-textarea'}
-                intent={'primary'}
-                maxLength={500}
-                rows={6}
-                value={description}
-                onValueChange={this.onDescriptionChange}
-              />
-            </FormGroup>
+              setOpenedOnce();
+            }}
+          />
+        }
+        description={
+          <div>
+            <div>{constant(dc.unexpectedError)}</div>
+            <If
+              cond={openedOnce$}
+              then={<div>{constant(dc.reloadThisPage)}</div>}
+            />
           </div>
-          <div className={Classes.DIALOG_FOOTER}>
-            <ButtonsWrapperAlignEnd>
-              <Button intent={'none'} onClick={this.handleCloseClick}>
-                {dict.common.buttonText.close}
-              </Button>
-              <Button
-                intent={'primary'}
-                loading={loading}
-                onClick={this.handleSendReportClick}
-              >
-                {dc.sendReport.button}
-              </Button>
-            </ButtonsWrapperAlignEnd>
-          </div>
-        </DialogWithMaxWidth>
-      </div>
-    );
-  }
-}
+        }
+        icon={'error'}
+      />
+      <Dialog class={maxWidthModalClass} isOpen={isOpen$} onClose={close}>
+        <div class={constant('bp6-dialog-body')}>
+          <Label text={constant(dc.sendReport.log)}>
+            <pre class={constant(`bp6-code-block ${styles.log}`)}>
+              {constant(unknownToString(error))}
+            </pre>
+          </Label>
 
-/**
- * @link https://www.asobou.co.jp/blog/web/error-boundary
- * @link https://ja.reactjs.org/docs/error-boundaries.html
- */
+          <FormGroup
+            helperText={constant(dc.sendReport.description.helperText)}
+            label={constant(dc.sendReport.description.label)}
+            labelFor={'description-textarea'}
+            labelInfo={constant(dc.sendReport.description.labelInfo)}
+          >
+            <TextArea
+              fill
+              id={'description-textarea'}
+              intent={'primary'}
+              maxLength={500}
+              rows={6}
+              value={description$}
+              onInput={({ currentTarget }) => {
+                setDescription(currentTarget.value);
+              }}
+            />
+          </FormGroup>
+        </div>
+        <div class={constant('bp6-dialog-footer')}>
+          <ButtonsWrapperAlignEnd>
+            <Button
+              intent={'none'}
+              text={constant(dict.common.buttonText.close)}
+              onClick={close}
+            />
+            <Button
+              intent={'primary'}
+              loading={loading$}
+              text={constant(dc.sendReport.button)}
+              onClick={sendReport}
+            />
+          </ButtonsWrapperAlignEnd>
+        </div>
+      </Dialog>
+    </div>
+  );
+};
 
 const dc = dict.errorMessages.errorHandler;
 

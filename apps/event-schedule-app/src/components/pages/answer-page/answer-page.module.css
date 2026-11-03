@@ -1,0 +1,107 @@
+.calendarWrapper {
+  margin: 10px;
+  display: flex;
+}
+
+/* 10px to the left in all: in place of the inner row's 5px, not added to it. */
+.buttonsPadChanged {
+  margin-left: 5px;
+}
+
+.flex {
+  display: flex;
+}
+
+.screenShotArea {
+  padding: 5px;
+  max-width: 100%;
+}
+
+.tableTopWrapper {
+  margin: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.tagInputWrapper {
+  margin-bottom: 5px;
+  max-width: 500px;
+}
+
+.filterButtonsWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 5px;
+
+  & > * {
+    margin: 2px;
+  }
+}
+
+.tableWrapper {
+  margin: 5px;
+}
+
+.togglesWrapper {
+  margin: 5px;
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+
+  & > * {
+    margin-right: 20px;
+    white-space: nowrap;
+  }
+}
+
+/* As react-blueprintjs-utils' `noMargin` switch. */
+.switchWithoutMargin:global(.bp6-control) {
+  margin: 0;
+}
+
+.iconDescriptionWrapper {
+  margin: 10px;
+}
+
+.alignCenter {
+  display: flex;
+  align-items: center;
+}
+
+.requiredParticipantIconWrapper {
+  display: flex;
+  align-items: center;
+  margin: 10px 3px;
+}
+
+.noteForPointOfFair {
+  margin: 10px 3px;
+}
+
+.answerLaterWrapper {
+  margin: 20px;
+}
+
+.toggleDetailedFilterSettingsLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  /* A button drawn as the label it was. */
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+
+.toggleDetailedFilterSettingsButton {
+  margin: 5px;
+}
+
+.toggleDetailedFilterSettingsIcon {
+  transition: all 0.3s ease;
+  top: 0;
+  left: 0;
+  transform-origin: center;
+}

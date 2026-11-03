@@ -6,7 +6,6 @@ import {
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { useObservableValue } from 'synstate-react-hooks';
 import {
   createRouter,
   type Router,
@@ -61,36 +60,6 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
     editPageLeaves$: editPage$
       .pipe(filter((isEditPage) => !isEditPage))
       .pipe(scan((count) => count + 1, 0)),
-
-    useShowPage: (): Readonly<{
-      createPage: boolean;
-      answerPage: boolean;
-      editPage: boolean;
-      eventListPage: boolean;
-      registerPage: boolean;
-      signInPage: boolean;
-    }> => {
-      const createPage = useObservableValue(router.isRoute.createPage$);
-
-      const answerPage = useObservableValue(router.isRoute.answerPage$);
-
-      const editPage = useObservableValue(router.isRoute.editPage$);
-
-      const eventListPage = useObservableValue(router.isRoute.eventListPage$);
-
-      const registerPage = useObservableValue(router.isRoute.registerPage$);
-
-      const signInPage = useObservableValue(router.isRoute.signInPage$);
-
-      return {
-        createPage,
-        answerPage,
-        editPage,
-        eventListPage,
-        registerPage,
-        signInPage,
-      };
-    },
   } as const;
 
   return router;
@@ -119,12 +88,4 @@ export type AppRouter = Router &
      * is for a visit already over.
      */
     editPageLeaves$: InitializedObservable<number>;
-    useShowPage: () => Readonly<{
-      createPage: boolean;
-      answerPage: boolean;
-      editPage: boolean;
-      eventListPage: boolean;
-      registerPage: boolean;
-      signInPage: boolean;
-    }>;
   }>;

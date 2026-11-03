@@ -1,93 +1,62 @@
-import { Button, FormGroup } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import * as React from 'react';
-import { BpInput } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
+import { Button, FormGroup, InputGroup } from 'blueprint-synstate';
+import { constant, view, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
-import {
-  DeleteAccountCreatedWithGoogleStore,
-  UpdateUserInfoDialogStore,
-} from '../../../store/index.mjs';
-import { Label } from '../../atoms/index.mjs';
+import { DeleteAccountCreatedWithGoogleStore } from '../../../store/index.mjs';
 import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template.js';
+import * as styles from './update-user-info-dialog.module.css';
 
 const dc = dict.accountSettings;
 
-type Props = Readonly<{ dialogIsOpen: boolean }>;
+type Props = Readonly<{ dialogIsOpen: Bindable<boolean> }>;
 
-export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
-  'DeleteAccountCreatedWithGoogleDialog',
-  ({ dialogIsOpen }) => {
-    const {
-      formState,
-      enterButtonDisabled,
-      isWaitingResponse,
-      emailFormIntent,
-    } = useObservableValue(DeleteAccountCreatedWithGoogleStore.state);
+const { state } = DeleteAccountCreatedWithGoogleStore;
 
-    const body = React.useMemo(
-      () => (
-        <div
-          css={css`
-            width: 300px;
-            height: 100px;
-          `}
-        >
+export const DeleteAccountCreatedWithGoogleDialog = ({
+  dialogIsOpen,
+}: Props): JSX.Element => {
+  const isWaitingResponse = view(state, (s) => s.isWaitingResponse);
+
+  const intent = view(state, (s) => s.emailFormIntent);
+
+  return (
+    <UpdateUserInfoDialogTemplate
+      body={
+        <div class={constant(styles.deleteAccountGoogleBody)}>
           <FormGroup
-            helperText={formState.error}
-            intent={emailFormIntent}
-            label={verifyEmailInputLabel}
+            class={styles.field}
+            helperText={view(state, (s) => s.formState.error)}
+            intent={intent}
+            label={constant(dc.deleteAccount.verifyEmail)}
           >
-            <BpInput
+            <InputGroup
               // suppress auto complete
               autoComplete={'new-password'}
-              // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
               disabled={isWaitingResponse}
-              intent={emailFormIntent}
+              intent={intent}
               type={'email'}
-              value={formState.inputValue}
-              onValueChange={
-                DeleteAccountCreatedWithGoogleStore.inputEmailHandler
-              }
+              value={view(state, (s) => s.formState.inputValue)}
+              onInput={({ currentTarget }) => {
+                DeleteAccountCreatedWithGoogleStore.inputEmailHandler(
+                  currentTarget.value,
+                );
+              }}
             />
           </FormGroup>
         </div>
-      ),
-      [
-        emailFormIntent,
-        formState.error,
-        formState.inputValue,
-        isWaitingResponse,
-      ],
-    );
-
-    const submitButton = React.useMemo(
-      () => (
+      }
+      dialogIsOpen={dialogIsOpen}
+      isWaitingResponse={isWaitingResponse}
+      submitButton={
         <Button
-          disabled={enterButtonDisabled}
+          disabled={view(state, (s) => s.enterButtonDisabled)}
           intent={'danger'}
           loading={isWaitingResponse}
+          text={constant(dc.button.deleteAccount)}
           onClick={DeleteAccountCreatedWithGoogleStore.enterClickHandler}
-        >
-          {dc.button.deleteAccount}
-        </Button>
-      ),
-      [enterButtonDisabled, isWaitingResponse],
-    );
-
-    return (
-      <UpdateUserInfoDialogTemplate
-        body={body}
-        closeDialog={UpdateUserInfoDialogStore.closeDialog}
-        dialogIsOpen={dialogIsOpen}
-        isWaitingResponse={isWaitingResponse}
-        submitButton={submitButton}
-        title={dc.deleteAccount.title}
-      />
-    );
-  },
-);
-
-const verifyEmailInputLabel = <Label>{dc.deleteAccount.verifyEmail}</Label>;
+        />
+      }
+      title={dc.deleteAccount.title}
+    />
+  );
+};

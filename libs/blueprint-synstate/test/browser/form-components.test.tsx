@@ -10,7 +10,7 @@ import {
   TextArea,
 } from 'blueprint-synstate';
 import { createState, map } from 'synstate';
-import { constant } from 'synstate-dom';
+import { constant, If } from 'synstate-dom';
 import { mountInto, nextFrame, one, press, settle } from './helpers.mjs';
 
 describe(Button, () => {
@@ -455,6 +455,51 @@ describe(InputGroup, () => {
     input.blur();
 
     assert.deepStrictEqual(mut_blurs, ['blur']);
+
+    unmount();
+  });
+
+  test('hands the `<input>` to `inputRef`', () => {
+    const mut_inputs: HTMLInputElement[] = [];
+
+    const { container, unmount } = mountInto(() => (
+      <InputGroup
+        inputRef={(input) => {
+          mut_inputs.push(input);
+        }}
+        value={constant('')}
+      />
+    ));
+
+    assert.deepStrictEqual(mut_inputs, [
+      one<HTMLInputElement>(container, 'input'),
+    ]);
+
+    unmount();
+  });
+
+  test("takes focus as it is drawn after the page has loaded, as React's autoFocus does", async () => {
+    const [shown$, setShown] = createState(false);
+
+    // The first takes the document's one `autofocus`; the browser honours no
+    // later one.
+    const { container, unmount } = mountInto(() => (
+      <>
+        <InputGroup autoFocus value={constant('')} />
+        <If
+          cond={shown$}
+          then={<InputGroup autoFocus id={'later'} value={constant('')} />}
+        />
+      </>
+    ));
+
+    await nextFrame();
+
+    setShown(true);
+
+    await settle();
+
+    assert.strictEqual(document.activeElement, one(container, '#later'));
 
     unmount();
   });

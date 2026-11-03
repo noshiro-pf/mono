@@ -13,7 +13,6 @@ import {
   type InitializedObservable,
   type Subscription,
 } from 'synstate';
-import { useObservableValue } from 'synstate-react-hooks';
 import { Result, isNotUndefined } from 'ts-data-forge';
 import type { Api } from '../../api/index.mjs';
 import { createReducerWithActions } from '../../utils/index.mjs';
@@ -39,8 +38,6 @@ export type AnswersFetcher = Readonly<{
   refreshButtonIsLoading$: InitializedObservable<boolean>;
   /** Disabled for `throttleMs` after each read the button can ask for. */
   refreshButtonIsDisabled$: InitializedObservable<boolean>;
-  useRefreshButtonIsDisabled: () => boolean;
-  useRefreshButtonIsLoading: () => boolean;
   /** Reads the answers again, unless a read was requested within `throttleMs`. */
   fetchAnswers: () => void;
   /**
@@ -79,24 +76,21 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
     .pipe(map(([_, eventId]) => eventId, { equals: () => false }))
     .pipe(filter(isNotUndefined));
 
-  const [
-    useRefreshButtonIsLoading,
-    setRefreshButtonIsLoading,
-    { state: refreshButtonIsLoading$ },
-  ] = createReducerWithActions(
-    (_: boolean, isLoading: boolean) => isLoading,
-    false,
-    [fetchAnswersStarted$.pipe(mapTo(true)), answersResult$.pipe(mapTo(false))],
-  );
+  const [refreshButtonIsLoading$, setRefreshButtonIsLoading] =
+    createReducerWithActions(
+      (_: boolean, isLoading: boolean) => isLoading,
+      false,
+      [
+        fetchAnswersStarted$.pipe(mapTo(true)),
+        answersResult$.pipe(mapTo(false)),
+      ],
+    );
 
   /** Disabled for `throttleMs` after each read the button can ask for. */
   const refreshButtonIsDisabled$ = merge([
     fetchAnswersThrottled$.pipe(mapTo(true)),
     fetchAnswersThrottled$.pipe(debounce(deps.throttleMs)).pipe(mapTo(false)),
   ]).pipe(withInitialValue(false));
-
-  const useRefreshButtonIsDisabled = (): boolean =>
-    useObservableValue(refreshButtonIsDisabled$);
 
   const refreshAnswers = (): void => {
     deps.fetchEventSchedule();
@@ -154,8 +148,6 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
     result$,
     refreshButtonIsLoading$,
     refreshButtonIsDisabled$,
-    useRefreshButtonIsDisabled,
-    useRefreshButtonIsLoading,
     fetchAnswers,
     refetchAnswersAfterWrite,
     refreshAnswers,

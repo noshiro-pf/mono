@@ -1,0 +1,52 @@
+/* react-blueprintjs-utils' HTMLTableBorderedStyled2, as it was drawn. */
+
+.table {
+  border-spacing: 0;
+  font-size: 14px;
+
+  th,
+  td {
+    padding: 11px;
+    text-align: center;
+    vertical-align: center;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  th {
+    color: #182026;
+    font-weight: 600;
+  }
+
+  td {
+    color: #182026;
+  }
+
+  thead tr:first-of-type {
+    th,
+    td {
+      border-bottom: 1px solid rgba(16, 22, 26, 0.15);
+    }
+  }
+
+  thead tr:not(:last-of-type),
+  tbody tr:not(:last-of-type),
+  tfoot tr:not(:last-of-type) {
+    th,
+    td {
+      border-bottom: 1px solid rgba(16, 22, 26, 0.15);
+    }
+  }
+
+  thead tr,
+  tbody tr,
+  tfoot tr {
+    th,
+    td {
+      &:not(:last-of-type) {
+        border-right: 1px solid rgba(16, 22, 26, 0.15);
+      }
+    }
+  }
+}

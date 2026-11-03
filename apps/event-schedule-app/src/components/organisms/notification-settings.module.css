@@ -1,0 +1,7 @@
+.checkboxes {
+  padding: 5px;
+}
+
+.checkboxWrapper {
+  display: flex;
+}

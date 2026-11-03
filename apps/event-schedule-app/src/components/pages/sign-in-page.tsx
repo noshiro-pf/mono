@@ -1,165 +1,140 @@
-import { Button, FormGroup } from '@blueprintjs/core';
-import styled from '@emotion/styled';
-import { useBoolState } from 'better-react-use-state';
-import * as React from 'react';
-import { BpInput } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
+import { Button, FormGroup, InputGroup } from 'blueprint-synstate';
+import { createBooleanState } from 'synstate';
+import { constant, If, mapBindable, view, type JSX } from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
-import { GoogleSignInStore, SignInPageStore } from '../../store/index.mjs';
-import { GoogleIcon, Label } from '../atoms/index.mjs';
+import { SignInPageStore } from '../../store/index.mjs';
 import { LockButton } from '../molecules/index.mjs';
 import { NavBar } from '../organisms/index.mjs';
-import { SignInStyled } from '../styled/index.mjs';
 import { ResetPasswordPage } from './reset-password-page.js';
+import {
+  GoogleSignInSection,
+  OtherErrorMessages,
+  preventSubmit,
+} from './shared-auth-parts.js';
+import * as styles from './sign-in.module.css';
 
 const dc = dict.register;
 
-const returnFalse = (): false => false;
+const { state } = SignInPageStore;
 
-export const SignInPage = memoNamed('SignInPage', () => {
-  const googleSignInButtonDisabled =
-    GoogleSignInStore.useGoogleSignInButtonDisabled();
-
-  const {
-    formState,
-    enterButtonDisabled,
-    emailFormIntent,
-    passwordFormIntent,
-    passwordIsOpen,
-  } = useObservableValue(SignInPageStore.state);
-
+export const SignInPage = (): JSX.Element => {
   const [
-    isPasswordResetForm,
-    { setTrue: passwordIsOpenResetForm, setFalse: hidePasswordResetForm },
-  ] = useBoolState(false);
+    isPasswordResetForm$,
+    { setTrue: showResetForm, setFalse: hideResetForm },
+  ] = createBooleanState(false);
 
-  const lockPasswordButton = React.useMemo(
-    () => (
-      <LockButton
-        disabled={formState.isWaitingResponse}
-        passwordIsOpen={passwordIsOpen}
-        onLockClick={SignInPageStore.togglePasswordLock}
-      />
-    ),
-    [formState.isWaitingResponse, passwordIsOpen],
-  );
+  const isWaitingResponse = view(state, (s) => s.formState.isWaitingResponse);
+
+  const emailIntent = view(state, (s) => s.emailFormIntent);
+
+  const passwordIntent = view(state, (s) => s.passwordFormIntent);
+
+  const passwordIsOpen = view(state, (s) => s.passwordIsOpen);
 
   return (
-    <SignInStyled.Wrapper data-e2e={'sign-in-page'}>
+    <div class={constant(styles.wrapper)} data-e2e={constant('sign-in-page')}>
       <NavBar />
 
-      <SignInStyled.Centering>
-        {isPasswordResetForm ? (
-          <ResetPasswordPage hidePasswordResetForm={hidePasswordResetForm} />
-        ) : (
-          <FormRectWrapper>
-            <SignInStyled.FormRect onSubmit={returnFalse}>
-              <SignInStyled.FormGroups>
-                <FormGroup
-                  helperText={formState.email.error}
-                  intent={emailFormIntent}
-                  label={emailInputLabel}
-                >
-                  <BpInput
-                    autoComplete={'email'}
-                    // eslint-disable-next-line jsx-a11y/no-autofocus
-                    autoFocus
-                    data-e2e={'email'}
-                    disabled={formState.isWaitingResponse}
-                    fill
-                    intent={emailFormIntent}
-                    placeholder={'sample@gmail.com'}
-                    type={'email'}
-                    value={formState.email.inputValue}
-                    onValueChange={SignInPageStore.inputEmailHandler}
-                  />
-                </FormGroup>
-
-                <FormGroup
-                  helperText={formState.password.error}
-                  intent={passwordFormIntent}
-                  label={passwordInputLabel}
-                >
-                  <BpInput
-                    autoComplete={'current-password'}
-                    data-e2e={'password'}
-                    disabled={formState.isWaitingResponse}
-                    fill
-                    intent={passwordFormIntent}
-                    rightElement={lockPasswordButton}
-                    type={passwordIsOpen ? 'text' : 'password'}
-                    value={formState.password.inputValue}
-                    onValueChange={SignInPageStore.inputPasswordHandler}
-                  />
-                </FormGroup>
-              </SignInStyled.FormGroups>
-
-              <SignInStyled.PasswordResetWrapper>
-                <SignInStyled.PasswordReset
-                  data-e2e={'password-reset-link'}
-                  onClick={passwordIsOpenResetForm}
-                >
-                  {dc.resetPassword}
-                </SignInStyled.PasswordReset>
-              </SignInStyled.PasswordResetWrapper>
-
-              <SignInStyled.ButtonWrapper>
-                <Button
-                  data-e2e={'sign-in-button'}
-                  disabled={enterButtonDisabled}
-                  fill
-                  intent={'primary'}
-                  loading={formState.isWaitingResponse}
-                  onClick={SignInPageStore.enterClickHandler}
-                >
-                  {dc.signInButton}
-                </Button>
-              </SignInStyled.ButtonWrapper>
-
-              <SignInStyled.OtherErrorMessages>
-                {formState.otherErrors}
-              </SignInStyled.OtherErrorMessages>
-            </SignInStyled.FormRect>
-
-            {
-              <>
-                <SignInStyled.SeparatorWrapper>
-                  <SignInStyled.Separator />
-                  <SignInStyled.SepText>{dc.separator}</SignInStyled.SepText>
-                </SignInStyled.SeparatorWrapper>
-
-                <SignInStyled.ButtonWrapper>
-                  <SignInStyled.GoogleButton
-                    disabled={googleSignInButtonDisabled}
-                    fill
-                    intent={'none'}
-                    variant={'outlined'}
-                    onClick={GoogleSignInStore.googleSignInClickHandler}
+      <div class={constant(styles.centering)}>
+        <If
+          cond={isPasswordResetForm$}
+          else={
+            <div
+              class={constant(`${styles.formRectWrapper} ${styles.signInRect}`)}
+            >
+              <form class={constant(styles.formRect)} onSubmit={preventSubmit}>
+                <div>
+                  <FormGroup
+                    class={styles.field}
+                    helperText={view(state, (s) => s.formState.email.error)}
+                    intent={emailIntent}
+                    label={constant(dc.email)}
                   >
-                    <SignInStyled.GoogleButtonContentWrapper>
-                      <SignInStyled.GoogleIconWrapper>
-                        <GoogleIcon />
-                      </SignInStyled.GoogleIconWrapper>
-                      <SignInStyled.GoogleLoginButtonText>
-                        {dc.google.signIn}
-                      </SignInStyled.GoogleLoginButtonText>
-                    </SignInStyled.GoogleButtonContentWrapper>
-                  </SignInStyled.GoogleButton>
-                </SignInStyled.ButtonWrapper>
-              </>
-            }
-          </FormRectWrapper>
-        )}
-      </SignInStyled.Centering>
-    </SignInStyled.Wrapper>
+                    <InputGroup
+                      autoComplete={'email'}
+                      autoFocus
+                      data-e2e={constant('email')}
+                      disabled={isWaitingResponse}
+                      fill
+                      intent={emailIntent}
+                      placeholder={constant('sample@gmail.com')}
+                      type={'email'}
+                      value={view(state, (s) => s.formState.email.inputValue)}
+                      onInput={({ currentTarget }) => {
+                        SignInPageStore.inputEmailHandler(currentTarget.value);
+                      }}
+                    />
+                  </FormGroup>
+
+                  <FormGroup
+                    class={styles.field}
+                    helperText={view(state, (s) => s.formState.password.error)}
+                    intent={passwordIntent}
+                    label={constant(dc.password)}
+                  >
+                    <InputGroup
+                      autoComplete={'current-password'}
+                      data-e2e={constant('password')}
+                      disabled={isWaitingResponse}
+                      fill
+                      intent={passwordIntent}
+                      rightElement={
+                        <LockButton
+                          disabled={isWaitingResponse}
+                          passwordIsOpen={passwordIsOpen}
+                          onLockClick={SignInPageStore.togglePasswordLock}
+                        />
+                      }
+                      type={mapBindable(passwordIsOpen, (open) =>
+                        open ? 'text' : 'password',
+                      )}
+                      value={view(
+                        state,
+                        (s) => s.formState.password.inputValue,
+                      )}
+                      onInput={({ currentTarget }) => {
+                        SignInPageStore.inputPasswordHandler(
+                          currentTarget.value,
+                        );
+                      }}
+                    />
+                  </FormGroup>
+                </div>
+
+                <div class={constant(styles.passwordResetWrapper)}>
+                  <button
+                    class={constant(styles.passwordReset)}
+                    data-e2e={constant('password-reset-link')}
+                    type={constant('button')}
+                    onClick={showResetForm}
+                  >
+                    {constant(dc.resetPassword)}
+                  </button>
+                </div>
+
+                <div class={constant(styles.buttonWrapper)}>
+                  <Button
+                    data-e2e={constant('sign-in-button')}
+                    disabled={view(state, (s) => s.enterButtonDisabled)}
+                    fill
+                    intent={'primary'}
+                    loading={isWaitingResponse}
+                    text={constant(dc.signInButton)}
+                    onClick={SignInPageStore.enterClickHandler}
+                  />
+                </div>
+
+                <OtherErrorMessages
+                  otherErrors={view(state, (s) => s.formState.otherErrors)}
+                />
+              </form>
+
+              <GoogleSignInSection text={dc.google.signIn} />
+            </div>
+          }
+          then={<ResetPasswordPage hidePasswordResetForm={hideResetForm} />}
+        />
+      </div>
+    </div>
   );
-});
-
-const emailInputLabel = <Label>{dc.email}</Label>;
-
-const passwordInputLabel = <Label>{dc.password}</Label>;
-
-const FormRectWrapper = styled(SignInStyled.FormRectWrapperBase)`
-  height: 420px;
-`;
+};

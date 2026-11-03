@@ -1,88 +1,61 @@
-import { Button, FormGroup } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import * as React from 'react';
-import { BpInput } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
+import { Button, FormGroup, InputGroup } from 'blueprint-synstate';
+import { constant, view, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
-import {
-  UpdateDisplayNamePageStore,
-  UpdateUserInfoDialogStore,
-} from '../../../store/index.mjs';
-import { Label } from '../../atoms/index.mjs';
+import { UpdateDisplayNamePageStore } from '../../../store/index.mjs';
 import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template.js';
+import * as styles from './update-user-info-dialog.module.css';
 
 const dc = dict.accountSettings;
 
-type Props = Readonly<{ dialogIsOpen: boolean }>;
+type Props = Readonly<{ dialogIsOpen: Bindable<boolean> }>;
 
-export const UpdateDisplayNameDialog = memoNamed<Props>(
-  'UpdateDisplayNameDialog',
-  ({ dialogIsOpen }) => {
-    const { formState, displayNameFormIntent, enterButtonDisabled } =
-      useObservableValue(UpdateDisplayNamePageStore.state);
+const { state } = UpdateDisplayNamePageStore;
 
-    const body = React.useMemo(
-      () => (
-        <div
-          css={css`
-            width: 300px;
-            height: 80px;
-          `}
-        >
+export const UpdateDisplayNameDialog = ({
+  dialogIsOpen,
+}: Props): JSX.Element => {
+  const isWaitingResponse = view(state, (s) => s.formState.isWaitingResponse);
+
+  const intent = view(state, (s) => s.displayNameFormIntent);
+
+  return (
+    <UpdateUserInfoDialogTemplate
+      body={
+        <div class={constant(styles.displayNameBody)}>
           <FormGroup
-            helperText={formState.displayName.error}
-            intent={displayNameFormIntent}
-            label={newDisplayNameInputLabel}
+            class={styles.field}
+            helperText={view(state, (s) => s.formState.displayName.error)}
+            intent={intent}
+            label={constant(dc.updateDisplayName.newDisplayName)}
           >
-            <BpInput
-              // eslint-disable-next-line jsx-a11y/no-autofocus
+            <InputGroup
               autoFocus
-              data-e2e={'new-display-name'}
-              disabled={formState.isWaitingResponse}
-              intent={displayNameFormIntent}
+              data-e2e={constant('new-display-name')}
+              disabled={isWaitingResponse}
+              intent={intent}
               type={'text'}
-              value={formState.displayName.inputValue}
-              onValueChange={UpdateDisplayNamePageStore.inputDisplayNameHandler}
+              value={view(state, (s) => s.formState.displayName.inputValue)}
+              onInput={({ currentTarget }) => {
+                UpdateDisplayNamePageStore.inputDisplayNameHandler(
+                  currentTarget.value,
+                );
+              }}
             />
           </FormGroup>
         </div>
-      ),
-      [
-        displayNameFormIntent,
-        formState.displayName.error,
-        formState.displayName.inputValue,
-        formState.isWaitingResponse,
-      ],
-    );
-
-    const submitButton = React.useMemo(
-      () => (
+      }
+      dialogIsOpen={dialogIsOpen}
+      isWaitingResponse={isWaitingResponse}
+      submitButton={
         <Button
-          disabled={enterButtonDisabled}
+          disabled={view(state, (s) => s.enterButtonDisabled)}
           intent={'primary'}
-          loading={formState.isWaitingResponse}
+          loading={isWaitingResponse}
+          text={constant(dc.button.update)}
           onClick={UpdateDisplayNamePageStore.enterClickHandler}
-        >
-          {dc.button.update}
-        </Button>
-      ),
-      [enterButtonDisabled, formState.isWaitingResponse],
-    );
-
-    return (
-      <UpdateUserInfoDialogTemplate
-        body={body}
-        closeDialog={UpdateUserInfoDialogStore.closeDialog}
-        dialogIsOpen={dialogIsOpen}
-        isWaitingResponse={formState.isWaitingResponse}
-        submitButton={submitButton}
-        title={dc.updateDisplayName.title}
-      />
-    );
-  },
-);
-
-const newDisplayNameInputLabel = (
-  <Label>{dc.updateDisplayName.newDisplayName}</Label>
-);
+        />
+      }
+      title={dc.updateDisplayName.title}
+    />
+  );
+};

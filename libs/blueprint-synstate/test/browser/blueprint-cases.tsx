@@ -239,6 +239,7 @@ const allLargeIcons = [
   'reset',
   'search',
   'small-cross',
+  'timeline-events',
   'trash',
   'unarchive',
   'warning-sign',
@@ -1755,5 +1756,116 @@ export const cases: readonly Case[] = [
         value={constant([20, 60] as const)}
       />
     ),
+  ],
+  [
+    'ButtonGroup, vertical',
+    {
+      element: () =>
+        h(Blueprint.ButtonGroup, {
+          vertical: true,
+          children: [
+            h(Blueprint.Button, { key: 'a', icon: 'chevron-up' }),
+            h(Blueprint.Button, { key: 'b', icon: 'chevron-down' }),
+          ],
+        }),
+      deliberate: [],
+    },
+    () => (
+      <ButtonGroup vertical>
+        <Button icon={'chevron-up'} />
+        <Button icon={'chevron-down'} />
+      </ButtonGroup>
+    ),
+  ],
+  [
+    'Icon, small, with an intent and a colour',
+    {
+      element: () =>
+        h(Blueprint.Icon, {
+          icon: 'comment',
+          size: 12,
+          intent: 'primary',
+          color: '#5c7080',
+        }),
+      deliberate: [],
+    },
+    () => (
+      <Icon color={'#5c7080'} icon={'comment'} intent={'primary'} size={12} />
+    ),
+  ],
+  [
+    'Icon at 28px',
+    {
+      element: () => h(Blueprint.Icon, { icon: 'timeline-events', size: 28 }),
+      deliberate: [],
+    },
+    () => <Icon icon={'timeline-events'} size={28} />,
+  ],
+  [
+    'Button with an element for its icon',
+    {
+      element: () =>
+        h(Blueprint.Button, {
+          icon: h('svg', { width: 16, height: 16 }),
+          text: 'Go',
+        }),
+      deliberate: [],
+    },
+    () => (
+      <Button
+        iconElement={<svg height={constant(16)} width={constant(16)} />}
+        text={constant('Go')}
+      />
+    ),
+  ],
+  [
+    'AnchorButton with an element for its icon',
+    {
+      element: () =>
+        h(Blueprint.AnchorButton, {
+          href: 'https://example.com/',
+          icon: h('svg', { width: 16, height: 16 }),
+          variant: 'minimal',
+        }),
+      deliberate: [],
+    },
+    () => (
+      <AnchorButton
+        href={constant('https://example.com/')}
+        iconElement={<svg height={constant(16)} width={constant(16)} />}
+        variant={constant('minimal')}
+      />
+    ),
+  ],
+  [
+    'DatePicker with the year menu first',
+    {
+      element: () =>
+        h(BlueprintDatetime.DatePicker, {
+          value: blueprintDate('2026-10-15T00:00'),
+          reverseMonthAndYearMenus: true,
+          dayPickerProps: {
+            formatters: { formatWeekdayName: intlWeekdayName },
+          },
+          onChange: ignore,
+        }),
+      deliberate: [htmlSelectWrapper],
+    },
+    () => (
+      <DatePicker
+        reverseMonthAndYearMenus
+        value={constant('2026-10-15')}
+        onChange={ignore}
+      />
+    ),
+  ],
+  [
+    'TextArea with a length limit',
+    {
+      element: () =>
+        h(Blueprint.TextArea, { maxLength: 500, value: '', onChange: ignore }),
+      deliberate: [],
+    },
+    () => <TextArea maxLength={500} value={constant('')} />,
   ],
 ] as const;
