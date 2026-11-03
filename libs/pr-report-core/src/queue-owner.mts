@@ -57,6 +57,7 @@ export const SET_ASIDE_REASONS = [
   'checks-failed',
   'not-merging',
   'push-failed',
+  'read-failed',
   'rebase-failed',
   'unlabel-failed',
   'watch-timeout',
@@ -210,6 +211,12 @@ const setAsideOwner = (
       return {
         owner: 'human',
         why: 'green but not merging; something the worker cannot read holds it',
+      };
+
+    case 'read-failed':
+      return {
+        owner: 'human',
+        why: 'its checks or its base could not be read survey after survey; the comment says what failed',
       };
 
     case 'push-failed':

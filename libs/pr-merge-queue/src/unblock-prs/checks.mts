@@ -61,6 +61,26 @@ export const readHeadChecks = async (
 ): Promise<Result<HeadChecks, string>> =>
   Result.map(await readCheckContexts(api, prNumber), headChecksOf);
 
+/**
+ * Whether GitHub answers a check rollup read at all, asked of `sha` — the tip
+ * of the base, which nothing is wrong with — by the same GraphQL field
+ * {@link readHeadChecks} reads, so that a pull request whose read fails can be
+ * told from GitHub failing every such read (`unread.mts`).
+ */
+export const probeCheckReads = async (
+  api: ApiContext,
+  sha: string,
+): Promise<Result<undefined, string>> =>
+  Result.map(
+    await graphqlQuery(
+      api,
+      PROBE_QUERY,
+      { owner: api.repo.owner, name: api.repo.name, sha },
+      ProbeAnswerSchema,
+    ),
+    () => undefined,
+  );
+
 /** The two lists of {@link HeadChecks}, from the contexts of one read. */
 export const headChecksOf = (
   contexts: readonly CheckContextNode[],
@@ -346,6 +366,27 @@ const CHECKS_QUERY = [
   '  }',
   '}',
 ].join('\n');
+
+const PROBE_QUERY = [
+  'query CheckReadProbe($owner: String!, $name: String!, $sha: GitObjectID!) {',
+  '  repository(owner: $owner, name: $name) {',
+  '    object(oid: $sha) { ... on Commit { statusCheckRollup { state } } }',
+  '  }',
+  '}',
+].join('\n');
+
+const ProbeAnswerSchema = t.record({
+  repository: t.record({
+    object: t.union([
+      t.record({
+        statusCheckRollup: t.optional(
+          t.union([t.record({ state: t.string() }), t.nullType]),
+        ),
+      }),
+      t.nullType,
+    ]),
+  }),
+});
 
 const CheckContextNodeSchema = t.union([
   t.record({

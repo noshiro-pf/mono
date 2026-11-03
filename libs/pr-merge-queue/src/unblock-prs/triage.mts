@@ -52,6 +52,7 @@ import type {
   TriageBase,
   TriageContext,
 } from './types.mjs';
+import type { UnreadRead } from './unread.mjs';
 import { lastLines, pause, stopRequested } from './util.mjs';
 import {
   isRebuiltOnBaseTip,
@@ -179,7 +180,7 @@ export const triage = async (
   const classified = beforeReview.map(({ pr, standing, unread, summary }) => ({
     pr,
     result:
-      unread ??
+      unread?.note ??
       classification(
         pr,
         withReviewHold(standing, pr.mergeStateStatus, holds.get(pr.number)),
@@ -233,9 +234,20 @@ export const triage = async (
       .map(({ pr }) => pr),
     // Only a pull request without `skip-ci` has its checks read, so one whose
     // read failed is released and may be running its matrix.
-    unreadReleased: beforeReview
-      .filter(({ pr, unread }) => unread !== undefined && !isSkipCiLabelled(pr))
-      .map(({ pr }) => pr),
+    unreadReleased: Arr.generate(function* () {
+      for (const { pr, unread } of beforeReview) {
+        if (unread !== undefined && !isSkipCiLabelled(pr)) {
+          yield {
+            pr,
+            read: unread.read,
+            detail:
+              unread.note.kind === 'note'
+                ? unread.note.note
+                : `#${pr.number}: could not be read`,
+          } as const;
+        }
+      }
+    }),
     held: Arr.generate(function* () {
       for (const { pr, result } of classified) {
         if (result.kind === 'held') {
@@ -520,8 +532,11 @@ const factsOf = (pr: PullRequest): QueueFacts =>
 /** Where a pull request stands, with what was read on the way to it. */
 type Settled = Readonly<{
   standing: QueueStanding;
-  /** The note to report instead, when something it needed could not be read. */
-  unread: Classification | undefined;
+  /**
+   * The note to report instead, and which read failed, when something it needed
+   * could not be read.
+   */
+  unread: Readonly<{ read: UnreadRead; note: Classification }> | undefined;
   /** The checks, when they were read. */
   summary: ChecksSummary | undefined;
 }>;
@@ -610,7 +625,11 @@ const settle = async (
       const rebuilt = await isRebuiltOnBaseTip(pr, context);
 
       return Result.isErr(rebuilt)
-        ? { standing, unread: rebuilt.value, summary }
+        ? {
+            standing,
+            unread: { read: 'rebuiltOnTip', note: rebuilt.value },
+            summary,
+          }
         : settle(
             api,
             pr,
@@ -624,7 +643,7 @@ const settle = async (
       const checks = await readChecks(api, pr, context);
 
       return Result.isErr(checks)
-        ? { standing, unread: checks.value, summary }
+        ? { standing, unread: { read: 'checks', note: checks.value }, summary }
         : settle(
             api,
             pr,

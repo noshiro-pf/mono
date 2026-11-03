@@ -9,9 +9,13 @@ import {
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import { currentEpochMs, log, type ApiContext } from '../lib/index.mjs';
 import { autoFix } from './auto-fix.mjs';
+import { probeCheckReads } from './checks.mjs';
 import { standingClaims } from './claims.mjs';
 import { CONFIG_PATH, readConfig, type AutoFixConfig } from './config.mjs';
-import { STALE_STATE_PAUSE_MS } from './constants.mjs';
+import {
+  STALE_STATE_PAUSE_MS,
+  UNREAD_SURVEYS_BEFORE_SETTING_ASIDE,
+} from './constants.mjs';
 import { afterWatch, followHead, pruneDemotions } from './demotions.mjs';
 import {
   checkPreflight,
@@ -69,7 +73,19 @@ import type {
   Watched,
   WatchOutcome,
 } from './types.mjs';
-import { installStopHandlers, pause, stopRequested } from './util.mjs';
+import {
+  advanceUnread,
+  holdBack,
+  readFailedSkip,
+  type UnreadRead,
+} from './unread.mjs';
+import {
+  installStopHandlers,
+  lastLines,
+  pause,
+  stopRequested,
+} from './util.mjs';
+import { probeBaseFetch } from './version-pr.mjs';
 import { watch } from './watch.mjs';
 
 /**
@@ -280,6 +296,7 @@ export const unblockPrs = async (
 
   let mut_state: LoopState = {
     skipped: new Map<number, SkipRecord>(),
+    unread: new Map<number, Readonly<{ headSha: string; surveys: number }>>(),
     demoted: new Map<number, string>(),
     tracked: new Set<number>(),
     baseSha: undefined,
@@ -705,6 +722,44 @@ const applyWatchOutcome = (
   }
 };
 
+/**
+ * {@link advanceUnread}'s answer, less the set-asides whose kind of read fails
+ * for the tip of the base too: GitHub failing, not the pull request, which
+ * holds the queue rather than setting aside each pull request it would release
+ * next. Asked only of a survey that would set something aside.
+ */
+const holdBackOutages = async (
+  api: ApiContext,
+  advanced: ReturnType<typeof advanceUnread>,
+  {
+    baseSha,
+    defaultBranch,
+  }: Readonly<{ baseSha: string; defaultBranch: string }>,
+): Promise<ReturnType<typeof advanceUnread>> => {
+  const probed = await Promise.all(
+    Arr.uniq(advanced.setAside.map(({ read }) => read)).map(
+      async (read): Promise<readonly UnreadRead[]> => {
+        const answered =
+          read === 'checks'
+            ? await probeCheckReads(api, baseSha)
+            : await probeBaseFetch(defaultBranch);
+
+        if (Result.isOk(answered)) {
+          return [];
+        }
+
+        log(
+          `The same ${read === 'checks' ? 'check read' : 'fetch'} fails for ${defaultBranch} at ${baseSha.slice(0, 10)} too (${lastLines(answered.value, 2)}); GitHub looks to be failing, so holding rather than setting anything aside.`,
+        );
+
+        return [read];
+      },
+    ),
+  );
+
+  return holdBack(advanced, new Set<UnreadRead>(probed.flat()));
+};
+
 const runCycle = async (
   api: ApiContext,
   defaultBranch: string,
@@ -787,6 +842,12 @@ const runCycle = async (
     surveyFingerprint({ pullRequests, baseSha }, triaged.held),
   );
 
+  const unread = await holdBackOutages(
+    api,
+    advanceUnread(before.unread, triaged.unreadReleased),
+    { baseSha, defaultBranch },
+  );
+
   const state = (
     nextSkipped: SkipRecords,
     nextDemoted: Demotions = demoted,
@@ -794,6 +855,7 @@ const runCycle = async (
   ): LoopState =>
     ({
       skipped: nextSkipped,
+      unread: unread.streaks,
       demoted: nextDemoted,
       tracked: nextTracked,
       baseSha,
@@ -814,6 +876,13 @@ const runCycle = async (
         ...describeFailedChecks(summary),
       }),
     skipped,
+  );
+
+  // One that stayed unread survey after survey is set aside, so that a read
+  // failing for good does not hold the queue for good. See `unread.mts`.
+  mut_skipped = unread.setAside.reduce(
+    (acc, entry) => withSkip(acc, readFailedSkip(entry, baseSha)),
+    mut_skipped,
   );
 
   if (stopRequested()) {
@@ -905,11 +974,17 @@ const runCycle = async (
 
   // One whose checks could not be read may be running a matrix as much as one
   // in flight is, and releasing another beside it starts a second; the next
-  // survey reads them again.
-  if (Arr.isNonEmpty(triaged.unreadReleased)) {
-    log(
-      `${triaged.unreadReleased.map((pr) => `#${pr.number}`).join(', ')}: released, and its checks could not be read; releasing nothing else until they can be.`,
-    );
+  // survey reads them again, until `unread.mts` has set one aside above.
+  if (Arr.isNonEmpty(unread.waiting)) {
+    for (const { pr, detail } of unread.waiting) {
+      const surveys = unread.streaks.get(pr.number)?.surveys ?? 1;
+
+      log(
+        surveys >= UNREAD_SURVEYS_BEFORE_SETTING_ASIDE
+          ? `${detail} — released, and unread for ${surveys} surveys, but GitHub fails the same read for ${defaultBranch} too; releasing nothing else until either is read.`
+          : `${detail} — released, so releasing nothing else until it is read, or until it has been unread for ${UNREAD_SURVEYS_BEFORE_SETTING_ASIDE} surveys (${surveys} so far).`,
+      );
+    }
 
     return { state: state(mut_skipped), next: 'idle', settled: skipped };
   }

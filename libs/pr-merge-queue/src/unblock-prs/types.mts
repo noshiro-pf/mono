@@ -14,6 +14,7 @@ import type {
 } from 'pr-report-core';
 import * as t from 'ts-fortress';
 import type { StrictPick } from 'ts-type-forge';
+import type { Unread, UnreadStreaks } from './unread.mjs';
 
 /** The fields read of each pull request (`github.mts`'s `listPullRequests`). */
 export const PullRequestSchema = t.record({
@@ -213,11 +214,12 @@ export type Triage = Readonly<{
   /** Up to date with checks still running, or clean and about to merge. */
   inFlight: readonly PullRequest[];
   /**
-   * Released pull requests — no `skip-ci` — whose checks could not be read:
-   * in flight as far as anything here can tell, so nothing else is released
-   * while there are any.
+   * Released pull requests — no `skip-ci` — whose checks, or whether they were
+   * rebuilt on the tip, could not be read, each with what failed: in flight as
+   * far as anything here can tell, so nothing else is released while there are
+   * any, until `unread.mts` sets one aside.
    */
-  unreadReleased: readonly PullRequest[];
+  unreadReleased: readonly Unread[];
   /** Up to date, but a required check has failed. */
   failing: readonly Failing[];
   /**
@@ -302,6 +304,7 @@ export type Quiet = Readonly<{
  */
 export type LoopState = Readonly<{
   skipped: SkipRecords;
+  unread: UnreadStreaks;
   demoted: Demotions;
   tracked: ReadonlySet<number>;
   baseSha: string | undefined;
