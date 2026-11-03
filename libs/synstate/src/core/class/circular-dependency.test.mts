@@ -2,7 +2,6 @@ import { Optional } from 'ts-data-forge';
 import { combine, merge } from '../combine/index.mjs';
 import { source } from '../create/index.mjs';
 import { map } from '../operators/index.mjs';
-import { checksCircularDependency } from './child-observable-class.mjs';
 import {
   createAsyncChildObservable,
   createSyncChildObservable,
@@ -11,9 +10,12 @@ import {
 import { createRootObservable } from './create-root-observable.mjs';
 
 describe('circular dependency detection', () => {
-  // The check runs only in a process whose `NODE_ENV` is not `production`;
-  // the browser run has no `process`, and there nothing is checked.
-  describe.runIf(checksCircularDependency)('cycle in ancestor graph', () => {
+  // The check runs only where `NODE_ENV` is not `production`, which is so in
+  // both test runs: in the browser run because Vite replaced
+  // `process.env.NODE_ENV`, so these tests also fail if it stops being
+  // replaced. `test/circular-dependency-check-off.test.mts` loads a production
+  // copy.
+  describe('cycle in ancestor graph', () => {
     test('should throw when parent chain contains a cycle (A -> B -> A)', () => {
       const root = createRootObservable(
         { initialValue: Optional.some(0) },
@@ -180,39 +182,6 @@ describe('circular dependency detection', () => {
       }).toThrow(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );
-    });
-  });
-
-  describe.skipIf(checksCircularDependency)('with the check off', () => {
-    test('does not walk the ancestors of a new child', () => {
-      const root = createRootObservable(
-        { initialValue: Optional.some(0) },
-        () => ({}),
-      );
-
-      const mut_childA = createSyncChildObservable(
-        {
-          parents: [root],
-          initialValue: Optional.some(0),
-        },
-        createTryUpdateNotImplemented,
-      );
-
-      Object.defineProperty(mut_childA, 'parents', {
-        value: [mut_childA],
-        writable: false,
-        configurable: true,
-      });
-
-      expect(() => {
-        createSyncChildObservable(
-          {
-            parents: [mut_childA],
-            initialValue: Optional.some(0),
-          },
-          createTryUpdateNotImplemented,
-        );
-      }).not.toThrow();
     });
   });
 

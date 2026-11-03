@@ -36,6 +36,10 @@ export default defineViteConfig({
       // `vi.resetModules` does not give a page a second copy of a module, so
       // the two copies this file needs exist only in Node.js.
       'test/duplicate-copies.test.mts',
+      // The page's bundle has `process.env.NODE_ENV` replaced by a fixed
+      // string, which neither `vi.stubEnv` nor `vi.stubGlobal` changes.
+      'src/core/utils/is-development-build.test.mts',
+      'test/circular-dependency-check-off.test.mts',
       // ESLint runs in Node.js only.
       'test/eslint-config.test.mts',
     ],
