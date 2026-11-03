@@ -1,10 +1,11 @@
-import { Result } from 'ts-data-forge';
+import { Arr, asUint32, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { ReportSource } from './constants.mjs';
 import {
   actionsQueryUrl,
   loadWorkflowRuns,
   RUN_STATES,
+  RUNS_PER_STATE,
   type RestFetch,
   type RestFetchInit,
 } from './workflow-runs.mjs';
@@ -95,12 +96,44 @@ describe(loadWorkflowRuns, () => {
 
     assert.isTrue(Result.isOk(loaded));
 
-    if (Result.isOk(loaded)) {
-      assert.deepStrictEqual(
-        loaded.value.runs.map(({ id }) => id),
-        [5],
-      );
+    if (Result.isErr(loaded)) {
+      return;
     }
+
+    assert.deepStrictEqual(
+      loaded.value.runs.map(({ id }) => id),
+      [5],
+    );
+
+    // Counted once too, or the block would say a run is left out.
+    assert.strictEqual(loaded.value.totalCount, 1);
+  });
+
+  test("counts a run met on two states' pages once when a state has more than a page", async () => {
+    const { fetchImpl } = answering({
+      queued: page([run({ id: 5 })]),
+      in_progress: {
+        total_count: RUNS_PER_STATE + 50,
+        workflow_runs: Arr.seq(asUint32(RUNS_PER_STATE)).map((i) =>
+          run({ id: i + 5 }),
+        ),
+      },
+    });
+
+    const loaded = await loadWorkflowRuns(SOURCE, {
+      token: 'secret',
+      fetchImpl,
+    });
+
+    assert.isTrue(Result.isOk(loaded));
+
+    if (Result.isErr(loaded)) {
+      return;
+    }
+
+    assert.strictEqual(loaded.value.totalCount, RUNS_PER_STATE + 50);
+
+    assert.strictEqual(loaded.value.runs.length, RUNS_PER_STATE);
   });
 
   test('counts what GitHub has beyond the page', async () => {
@@ -115,7 +148,7 @@ describe(loadWorkflowRuns, () => {
 
     assert.isTrue(Result.isOk(loaded));
 
-    if (!Result.isOk(loaded)) {
+    if (Result.isErr(loaded)) {
       return;
     }
 

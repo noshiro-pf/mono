@@ -74,8 +74,9 @@ export type WorkflowRunList = Readonly<{
   /** Newest first, as the Actions tab lists them. */
   runs: readonly WorkflowRun[];
   /**
-   * How many GitHub says there are, which is more than {@link runs} only when a
-   * state has more than {@link RUNS_PER_STATE}.
+   * How many GitHub says there are, with a run listed under two states counted
+   * once, which is more than {@link runs} only when a state has more than
+   * {@link RUNS_PER_STATE} (or, then, when a run met past a page moved state).
    */
   totalCount: number;
 }>;
@@ -133,16 +134,19 @@ export const loadWorkflowRuns = async (
     }
   });
 
+  const listed = lists.flatMap(({ runs: ofState }) => ofState);
+
   // A run that changed state between two of the requests can be met in both; it
-  // is listed once, under the first state that found it.
-  const runs = Arr.uniqBy(
-    lists.flatMap(({ runs: listed }) => listed),
-    ({ id }) => id,
-  ).toSorted(newestFirst);
+  // is listed once, under the first state that found it, and counted once: each
+  // state's count has it, so what was listed twice comes off the sum. One met
+  // past a state's page is not seen twice, and stays counted twice.
+  const runs = Arr.uniqBy(listed, ({ id }) => id).toSorted(newestFirst);
 
   return Result.ok({
     runs,
-    totalCount: Arr.sum(lists.map(({ totalCount }) => totalCount)),
+    totalCount:
+      Arr.sum(lists.map(({ totalCount }) => totalCount)) -
+      (listed.length - runs.length),
   });
 };
 
