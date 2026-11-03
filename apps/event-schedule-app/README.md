@@ -63,10 +63,10 @@ pnpm run check:e2e:production # the @smoke and @production tests, against the si
 the same ports. Its dev server always uses the emulators, whatever
 `VITE_FIREBASE_EMULATORS` says, and it never reuses a dev server already running
 (`configs/playwright.emulators.config.mts`), so stop `pnpm run dev` too.
-`code-check.yml` runs it in the `ws:check:e2e:emulators` matrix entry, with Java
-21 and Chromium installed. It builds the functions before starting the emulators
-and needs no Firebase credentials. The smoke tests run separately, in the
-`ws:check:e2e:shard-2` entry.
+`code-check.yml` runs it in the `z:ci:code-check:firebase-and-verify` matrix
+entry, with Java 21 and Chromium installed. It builds the functions before
+starting the emulators and needs no Firebase credentials. The smoke tests run
+separately, in the `ws:check:e2e` entry.
 
 `check:e2e:production` is run daily by
 [`e2e-production.yml`](../../.github/workflows/e2e-production.yml) against

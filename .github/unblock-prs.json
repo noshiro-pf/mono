@@ -6,7 +6,7 @@
     "before": ["pnpm install --frozen-lockfile"],
     "prepare": [
       {
-        "context": "^code-check \\(|^style-check \\(ws:gen\\)$",
+        "context": "^code-check \\(|^style-check \\(z:ci:style-check:checks-and-generators\\)$",
         "run": "pnpm run ws:build"
       }
     ],
@@ -25,6 +25,11 @@
         "context": "^(?:code-check|style-check) \\(((?:(?:ws|strict-lib):)?fix(?::[^)]*)?)\\)$",
         "run": "pnpm run $1",
         "stage": 1
+      },
+      {
+        "context": "^style-check \\((z:ci:style-check:checks-and-generators)\\)$",
+        "run": "pnpm run $1",
+        "stage": -1
       }
     ],
     "after": ["pnpm run fix:fmt:diff"]

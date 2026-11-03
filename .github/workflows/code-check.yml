@@ -129,33 +129,42 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Eleven entries, sized to the account's twenty concurrent runners
+        # rather than to the shortest wall clock per entry: one pull request's
+        # jobs across the check workflows are kept near sixteen, so that it
+        # does not queue behind itself. When this matrix starts, after
+        # `build`, the same pull request holds the other workflows' jobs
+        # (style-check's two, node-version-compatibility's two, strict-lib-gen,
+        # the benchmark). With sixteen entries here and six to eight jobs
+        # there, three to six entries waited about a hundred seconds for a
+        # runner on every run measured, on the critical path. Each entry also pays about
+        # forty seconds of setup. So entries
+        # under about two and a half minutes ride together in one job, the
+        # longest pair kept under the longest single entry (the lint halves,
+        # about five minutes), and each bundle is a `run-s --continue-on-error`
+        # script so that every part of it reports even when an earlier one
+        # fails. An entry is added on its own only when it outgrows that.
         command:
-          - check:root
-          # Six checks of under forty seconds each, run one after another in
-          # one job (`run-s --continue-on-error`, so every one of them reports
-          # even when an earlier one fails): `check:knip`,
-          # `check:published-deps`, `strict-lib:check:types`,
-          # `strict-lib:check:lint` (`strict-lib/`'s own scripts, which no
-          # `ws:*` entry reaches), `ws:check:dist` (what the build emitted,
-          # type-checked by package name through the `exports` map) and
-          # `ws:check:sumi` (the Sumi lint of the dogfood packages). As six
-          # entries each paid a half-minute setup for a few seconds of work,
-          # and took six of the account's twenty runner slots at the moment
-          # the long entries below were waiting for one. A check that grows
-          # past a minute or two belongs back on an entry of its own.
-          - z:code-check:quick
+          # `check:root` (the root guards) and six checks of under forty
+          # seconds each: `check:knip`, `check:published-deps`,
+          # `strict-lib:check:types`, `strict-lib:check:lint`
+          # (`strict-lib/`'s own scripts, which no `ws:*` entry reaches),
+          # `ws:check:dist` (what the build emitted, type-checked by package
+          # name through the `exports` map) and `ws:check:sumi` (the Sumi
+          # lint of the dogfood packages).
+          - z:ci:code-check:quick
           # `ws:check:types` in two shards, both with `--no-sort`. Nine tenths
           # of it is the twelve strict-lib harnesses, each four single-threaded
           # `tsc` runs taking one to two and a half minutes in all, three waves
           # of four on one runner; the other seventy-odd packages take about
           # two and a half runner-minutes together, and pnpm's topological
-          # order held them back behind the harnesses. As one entry it was the
-          # longest of the matrix by over a minute. The first shard names the
-          # harnesses of 5.0–5.7, two waves; the second is everything else by
-          # excluding them, so a new harness or package lands there. No type
-          # check waits on another package's — siblings resolve to `dist/`.
+          # order held them back behind the harnesses. The first shard names
+          # the harnesses of 5.0–5.7, two waves; the second is everything else
+          # by excluding them, so a new harness or package lands there, and
+          # rides with the second coverage shard. No type check waits on
+          # another package's — siblings resolve to `dist/`.
           - ws:check:types:shard-1
-          - ws:check:types:shard-2
+          - z:ci:code-check:types-and-coverage
           # `ws:fix:lint` in two halves, `apps/` and the rest, each with
           # `--no-sort`: in one job it was the second-longest entry, and pnpm's
           # topological order kept it at one package in flight for minutes
@@ -166,25 +175,25 @@ jobs:
           - ws:check:test:browser
           # `ws:check:test:cov` in three shards, because one package at a time
           # (`--workspace-concurrency=1`) made it the longest entry by minutes.
-          # The first two name the slowest suites; the third is everything
-          # else by excluding them, so a new package lands there. Each shard
-          # uploads its own reports and Codecov merges them (`codecov.yml`).
+          # The first two name the slowest suites (the second runs inside
+          # `z:ci:code-check:types-and-coverage`); the third is everything else by
+          # excluding them, so a new package lands there. Each shard uploads
+          # its own reports and Codecov merges them (`codecov.yml`).
           - ws:check:test:cov:shard-1
-          - ws:check:test:cov:shard-2
           - ws:check:test:cov:shard-3
-          # `ws:check:e2e` in two shards, for the same reason: one app at a
-          # time, and `task-manager`'s suite alone is more than half of it.
-          # The first shard is that app; the second is every other app by
-          # excluding it, so a new suite lands there.
-          - ws:check:e2e:shard-1
-          - ws:check:e2e:shard-2
-          - ws:check:e2e:emulators
-          # The Firestore rules tests of life-plan-simulator and task-manager,
-          # so that a pull request breaking `firestore.rules` fails before it
-          # merges; `deploy-firestore.yml` deploys whatever reaches `main`.
-          - ws:check:test:rules
+          # Every app's `check:e2e`, one app at a time, `--no-bail` so that one
+          # app's failure does not hide the rest. It was two shards, by
+          # `task-manager` and the rest, at under three minutes each; together
+          # they take about as long as a lint half.
+          - ws:check:e2e
+          # The Firebase emulator suites, which need Java: the end-to-end tests
+          # that run against the emulators, and the Firestore rules tests of
+          # life-plan-simulator and task-manager, so that a pull request
+          # breaking `firestore.rules` fails before it merges
+          # (`deploy-firestore.yml` deploys whatever reaches `main`). Then
+          # `verify:npm-packages`, which installs what the packages publish.
+          - z:ci:code-check:firebase-and-verify
           - fix:codemod:full
-          - verify:npm-packages
 
     steps:
       - name: Checkout
@@ -197,19 +206,21 @@ jobs:
 
       # `ws:check:test:cov` needs a browser too: the synstate adapters' hooks only
       # run in one, so their coverage would otherwise be reported as zero.
-      # Every `ws:check:e2e` entry drives one, which is the whole point of them.
+      # `ws:check:e2e` and the emulator end-to-end tests drive one, which is the
+      # whole point of them. A bundle names its own entry here, by what it
+      # runs, as it does for Java and the coverage upload below.
       # `--only-shell`: every launch here is headless, which Playwright runs on
       # `chromium-headless-shell`, so the full Chromium build would be
       # downloaded for nothing. Only the extensions' `pack:crx` and `smoke`
       # need it, and CI runs neither.
       - name: Install Playwright Browsers
-        if: matrix.command == 'ws:check:test:browser' || startsWith(matrix.command, 'ws:check:test:cov') || startsWith(matrix.command, 'ws:check:e2e')
+        if: matrix.command == 'ws:check:test:browser' || startsWith(matrix.command, 'ws:check:test:cov') || startsWith(matrix.command, 'ws:check:e2e') || matrix.command == 'z:ci:code-check:types-and-coverage' || matrix.command == 'z:ci:code-check:firebase-and-verify'
         run: pnpm exec playwright install --only-shell chromium
 
       # Firestore and Pub/Sub need Java 21 or later. firebase-tools is already
       # a catalog-pinned dependency of each app; no Firebase login is needed.
       - name: Set up Java for the Firebase emulators
-        if: matrix.command == 'ws:check:e2e:emulators' || matrix.command == 'ws:check:test:rules'
+        if: matrix.command == 'z:ci:code-check:firebase-and-verify'
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: temurin
@@ -225,7 +236,7 @@ jobs:
       # whether it came from here or from the network, so a cache can make it
       # fail, never pass.
       - name: Restore the release-binary archives
-        if: matrix.command == 'check:root'
+        if: matrix.command == 'z:ci:code-check:quick'
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: node_modules/.cache/release-binaries/archives
@@ -252,7 +263,7 @@ jobs:
         run: pnpm run z:assert-repo-is-clean
 
       - name: Upload coverage reports to Codecov
-        if: startsWith(matrix.command, 'ws:check:test:cov')
+        if: startsWith(matrix.command, 'ws:check:test:cov') || matrix.command == 'z:ci:code-check:types-and-coverage'
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
 
   # What a push to main runs when the matrix above reused a verdict: its

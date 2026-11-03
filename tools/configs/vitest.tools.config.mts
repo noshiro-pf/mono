@@ -9,7 +9,7 @@ import { defineViteConfig } from './vite-config.mjs';
  * (see CLAUDE.md, "Repository layout"). So `ws:check:test`, which runs each member's
  * own `test` script, never reaches them, and a config of their own is the only
  * way their tests run at all. `check:root:test` is what runs this, which puts
- * it behind the same `code-check (check:root)` context as the rest of
+ * it behind the same `code-check (z:ci:code-check:quick)` context as the rest of
  * `check:root`.
  */
 export default defineViteConfig({

@@ -496,13 +496,6 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
   },
   {
     directory: ROOT_DIRECTORY,
-    scriptName: 'ws:check:e2e',
-    // `code-check.yml` runs it as two shards, `ws:check:e2e:shard-1` and
-    // `ws:check:e2e:shard-2`, which between them reach every app's `check:e2e`;
-    // that they partition the apps is in their filters.
-  },
-  {
-    directory: ROOT_DIRECTORY,
     scriptName: 'ws:check:types',
     // `code-check.yml` runs it as two shards, `ws:check:types:shard-1` and
     // `ws:check:types:shard-2`, which between them reach every package's

@@ -205,7 +205,7 @@ const checkAll = async (): Promise<void> => {
 
   // The other half of the formatting pass. `strict-lib/` is in
   // `.prettierignore` — oxfmt owns it — so the step above does not reach a
-  // single file under it, and `style-check (strict-lib:fix:fmt)` was the only
+  // single file under it, and style-check's `strict-lib:fix:fmt` was the only
   // thing that noticed. Six seconds over 5,914 files, and a no-op on a tree
   // that is already formatted.
   await logStep({

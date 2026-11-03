@@ -53,8 +53,7 @@ describe(planAutoFix, () => {
 
     const generated = planAutoFix(
       states([
-        ['style-check (ws:gen)', 'failed'],
-        ['style-check (gen:deps-graph)', 'failed'],
+        ['style-check (z:ci:style-check:checks-and-generators)', 'failed'],
       ]),
       config,
     );
@@ -62,6 +61,51 @@ describe(planAutoFix, () => {
     assert.isTrue(Result.isOk(generated));
 
     assert.deepStrictEqual(generated.value.prepare, [build]);
+  });
+
+  test('reruns the style-check bundle, which fixes its own formatters and generators', () => {
+    // `z:ci:style-check:checks-and-generators` holds Prettier, oxfmt, the
+    // generators and `ws:gen` beside checks, one of which (markdownlint) fixes
+    // what it can. Rerun, it rewrites what those own and exits non-zero only
+    // when something it cannot fix failed, which is what declines the fix.
+    // `ws:gen` reads its siblings' dist/, so it is built first.
+    const plan = planAutoFix(
+      states([
+        ['style-check (z:ci:style-check:checks-and-generators)', 'failed'],
+        ['style-check-result / result', 'failed'],
+      ]),
+      config,
+    );
+
+    assert.isTrue(Result.isOk(plan));
+
+    assert.deepStrictEqual(plan.value, {
+      before: ['pnpm install --frozen-lockfile'],
+      prepare: [build],
+      commands: ["pnpm run 'z:ci:style-check:checks-and-generators'"],
+      after: ['pnpm run fix:fmt:diff'],
+    });
+  });
+
+  test('reruns the style-check bundle before any other fixer, on the tree as committed', () => {
+    // Its `check:prose` diffs the tree against the base, so a generator's or a
+    // lint fix's rewrite would read as lines the change touched.
+    const plan = planAutoFix(
+      states([
+        ['code-check (fix:codemod:full)', 'failed'],
+        ['code-check (ws:fix:lint:apps)', 'failed'],
+        ['style-check (z:ci:style-check:checks-and-generators)', 'failed'],
+      ]),
+      config,
+    );
+
+    assert.isTrue(Result.isOk(plan));
+
+    assert.deepStrictEqual(plan.value.commands, [
+      "pnpm run 'z:ci:style-check:checks-and-generators'",
+      "pnpm run 'fix:codemod:full'",
+      "pnpm run 'ws:fix:lint:apps'",
+    ]);
   });
 
   test('runs generators first and formatters last', () => {
