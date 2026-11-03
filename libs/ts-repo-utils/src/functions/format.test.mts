@@ -2,6 +2,7 @@ import dedent from 'dedent';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   getDiffFrom,
   getGitRoot,
@@ -252,6 +253,355 @@ describe(formatFiles, () => {
     });
 
     assert.isTrue(Result.isOk(result));
+  });
+
+  // Writes a directory holding a Prettier plugin that prints to the console
+  // while it parses, as the YAML and PostCSS parsers bundled with Prettier do
+  // for some inputs; no option of the Prettier API turns that off. Each call
+  // gets a directory of its own, because Prettier caches the config it finds
+  // per directory.
+  const createNoisyPluginDir = async (
+    sampleText = '  hello  ',
+  ): Promise<Readonly<{ dir: string; file: string }>> => {
+    const dir = path.join(testDir, crypto.randomUUID());
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.mkdir(dir, { recursive: true });
+
+    const write = async (filename: string, content: string): Promise<void> =>
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.writeFile(path.join(dir, filename), content, 'utf8');
+
+    await write(
+      'noisy-plugin.mjs',
+      dedent`
+        export const languages = [
+          { name: 'noisy', parsers: ['noisy'], extensions: ['.noisy'] },
+        ];
+
+        export const parsers = {
+          noisy: {
+            astFormat: 'noisy',
+            locStart: () => 0,
+            locEnd: () => 0,
+            parse: async (text) => {
+              await globalThis.noisyPluginGate;
+
+              globalThis.noisyPluginLog = console.log;
+
+              console.log('noisy log', text);
+              console.info('noisy info', text);
+              console.debug('noisy debug', text);
+              console.warn('noisy warn', text);
+
+              return { type: 'root', text };
+            },
+          },
+        };
+
+        export const printers = {
+          noisy: { print: (path) => path.node.text.trim() },
+        };
+      `,
+    );
+
+    await write(
+      '.prettierrc.json',
+      JSON.stringify({ plugins: ['./noisy-plugin.mjs'] }),
+    );
+
+    await write('sample.noisy', sampleText);
+
+    return { dir, file: path.join(dir, 'sample.noisy') };
+  };
+
+  const stubConsole = (): ReadonlyRecord<
+    'log' | 'info' | 'debug' | 'warn',
+    ReturnType<typeof vi.fn>
+  > => {
+    const stubs = {
+      log: vi.fn(),
+      info: vi.fn(),
+      debug: vi.fn(),
+      warn: vi.fn(),
+    } as const;
+
+    vi.stubGlobal('console', { ...console, ...stubs });
+
+    return stubs;
+  };
+
+  test('should keep what a Prettier plugin prints off the console when silent', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    const stubs = stubConsole();
+
+    try {
+      const { file } = await createNoisyPluginDir();
+
+      const result = await formatFiles([file], { silent: true });
+
+      assert.isTrue(Result.isOk(result));
+
+      // The plugin did run.
+      await expect(readTestFile(file)).resolves.toBe('hello');
+
+      for (const stub of Object.values(stubs)) {
+        expect(stub).not.toHaveBeenCalled();
+      }
+
+      // The console is handed back once formatting ends.
+      console.log('after');
+
+      expect(stubs.log).toHaveBeenCalledWith('after');
+    } finally {
+      vi.unstubAllGlobals();
+
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
+  });
+
+  test('should let a Prettier plugin print when not silent', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    const stubs = stubConsole();
+
+    try {
+      const { file } = await createNoisyPluginDir();
+
+      const result = await formatFiles([file], { silent: false });
+
+      assert.isTrue(Result.isOk(result));
+
+      expect(stubs.log).toHaveBeenCalledWith('noisy log', '  hello  ');
+
+      expect(stubs.info).toHaveBeenCalledWith('noisy info', '  hello  ');
+
+      expect(stubs.debug).toHaveBeenCalledWith('noisy debug', '  hello  ');
+
+      expect(stubs.warn).toHaveBeenCalledWith('noisy warn', '  hello  ');
+    } finally {
+      vi.unstubAllGlobals();
+
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
+  });
+
+  test('should restore the console after overlapping silent runs', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    const stubs = stubConsole();
+
+    try {
+      const first = await createNoisyPluginDir();
+
+      const second = await createNoisyPluginDir();
+
+      const results = await Promise.all([
+        formatFiles([first.file], { silent: true }),
+        formatFiles([second.file], { silent: true }),
+      ]);
+
+      assert.isTrue(results.every(Result.isOk));
+
+      await expect(readTestFile(first.file)).resolves.toBe('hello');
+
+      await expect(readTestFile(second.file)).resolves.toBe('hello');
+
+      for (const stub of Object.values(stubs)) {
+        expect(stub).not.toHaveBeenCalled();
+      }
+
+      console.log('after');
+
+      expect(stubs.log).toHaveBeenCalledWith('after');
+    } finally {
+      vi.unstubAllGlobals();
+
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
+  });
+
+  // Holds the noisy plugin's parse until `open` is called. A test opens it in
+  // `finally` too, or a failure before that would leave the run waiting.
+  const closeNoisyPluginGate = (): (() => void) => {
+    const gate = Promise.withResolvers<undefined>();
+
+    Reflect.set(globalThis, 'noisyPluginGate', gate.promise);
+
+    return () => {
+      gate.resolve(undefined);
+    };
+  };
+
+  // Starts a silent run and resolves once it has muted the console. The run's
+  // promise is wrapped, or awaiting this would await the run itself.
+  const startSilentRun = async (
+    file: string,
+  ): Promise<Readonly<{ running: ReturnType<typeof formatFiles> }>> => {
+    const logBefore: unknown = console.log;
+
+    const running = formatFiles([file], { silent: true });
+
+    await vi.waitFor(() => {
+      expect(console.log).not.toBe(logBefore);
+    });
+
+    return { running };
+  };
+
+  test('should let what runs outside a silent run print while it runs', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    const stubs = stubConsole();
+
+    const open = closeNoisyPluginGate();
+
+    try {
+      const { file } = await createNoisyPluginDir();
+
+      const { running } = await startSilentRun(file);
+
+      console.log('outside');
+
+      // The wrappers keep the methods where Object.keys and spreads see them.
+      expect(Object.getOwnPropertyDescriptor(console, 'log')?.enumerable).toBe(
+        true,
+      );
+
+      open();
+
+      assert.isTrue(Result.isOk(await running));
+
+      expect(stubs.log).toHaveBeenCalledWith('outside');
+
+      expect(stubs.log).not.toHaveBeenCalledWith('noisy log', '  hello  ');
+    } finally {
+      // A failure before open() would leave the run waiting for good.
+      open();
+
+      Reflect.deleteProperty(globalThis, 'noisyPluginGate');
+
+      vi.unstubAllGlobals();
+
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
+  });
+
+  test('should keep a console method replaced during a silent run', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    const stubs = stubConsole();
+
+    const open = closeNoisyPluginGate();
+
+    try {
+      const { file } = await createNoisyPluginDir();
+
+      const { running } = await startSilentRun(file);
+
+      // A replacement that calls through, as a logger's or a spy's does.
+      const wrapperBelow: unknown = console.log;
+
+      assert.isTrue(typeof wrapperBelow === 'function');
+
+      const replacement = vi.fn((...args: readonly unknown[]): unknown =>
+        Reflect.apply(wrapperBelow, console, args),
+      );
+
+      Reflect.set(console, 'log', replacement);
+
+      console.log('outside');
+
+      open();
+
+      assert.isTrue(Result.isOk(await running));
+
+      expect(console.log).toBe(replacement);
+
+      expect(stubs.log).toHaveBeenCalledWith('outside');
+    } finally {
+      // A failure before open() would leave the run waiting for good.
+      open();
+
+      Reflect.deleteProperty(globalThis, 'noisyPluginGate');
+
+      vi.unstubAllGlobals();
+
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
+  });
+
+  test('should let a console method kept during a silent run print after it', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    const stubs = stubConsole();
+
+    try {
+      const { file } = await createNoisyPluginDir();
+
+      const result = await formatFiles([file], { silent: true });
+
+      assert.isTrue(Result.isOk(result));
+
+      const kept: unknown = Reflect.get(globalThis, 'noisyPluginLog');
+
+      assert.isTrue(typeof kept === 'function');
+
+      Reflect.apply(kept, undefined, ['later']);
+
+      expect(stubs.log).toHaveBeenCalledWith('later');
+    } finally {
+      Reflect.deleteProperty(globalThis, 'noisyPluginLog');
+
+      vi.unstubAllGlobals();
+
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
+  });
+
+  test('should leave a console method it found inherited inherited', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    const log = vi.fn();
+
+    const inheriting: unknown = Object.create({ ...console, log });
+
+    vi.stubGlobal('console', inheriting);
+
+    try {
+      const { file } = await createNoisyPluginDir();
+
+      const result = await formatFiles([file], { silent: true });
+
+      assert.isTrue(Result.isOk(result));
+
+      expect(log).not.toHaveBeenCalled();
+
+      expect(Object.getOwnPropertyDescriptor(console, 'log')).toBeUndefined();
+
+      console.log('after');
+
+      expect(log).toHaveBeenCalledWith('after');
+    } finally {
+      vi.unstubAllGlobals();
+
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
   });
 });
 
