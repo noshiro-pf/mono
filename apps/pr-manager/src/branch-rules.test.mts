@@ -67,55 +67,6 @@ describe(loadBranchRules, () => {
     }
   });
 
-  test('requires nothing of a branch nothing protects', async () => {
-    const { fetchImpl } = answering({
-      rules: [],
-      branch: {
-        protection: {
-          enabled: false,
-          required_status_checks: { enforcement_level: 'off', contexts: [] },
-        },
-      },
-    });
-
-    const loaded = await loadBranchRules(SOURCE, 'main', {
-      token: 'secret',
-      fetchImpl,
-    });
-
-    assert.isTrue(Result.isOk(loaded));
-
-    assert.deepStrictEqual(loaded.value, {
-      requiredContexts: [],
-      requireCodeOwnerReview: false,
-      requireConversationResolution: false,
-    });
-  });
-
-  test('reads no contexts off classic protection that is switched off', async () => {
-    const { fetchImpl } = answering({
-      rules: [],
-      branch: {
-        protection: {
-          enabled: false,
-          required_status_checks: {
-            enforcement_level: 'off',
-            contexts: ['stale'],
-          },
-        },
-      },
-    });
-
-    const loaded = await loadBranchRules(SOURCE, 'main', {
-      token: 'secret',
-      fetchImpl,
-    });
-
-    assert.isTrue(Result.isOk(loaded));
-
-    assert.deepStrictEqual(loaded.value.requiredContexts, []);
-  });
-
   test('puts the branch name in the path as one segment', async () => {
     const { fetchImpl, sent } = answering({ rules: [], branch: {} });
 

@@ -21,12 +21,12 @@ export type RulesetRequirements = Readonly<{
 /**
  * The requirements, read from the declaration rather than from GitHub, for
  * `pnpm run pr-report`, which reads the checkout. The file is the desired
- * state; what GitHub enforces is {@link requirementsOfRules} over
- * `rules/branches/{branch}`, which `unblock-prs` and the Pull Requests
- * Manager read and which wants no more than read access. The gap is that a file
- * under `repo-settings/` changes nothing until `pnpm run repo-settings:apply`
- * runs, so a context added here and not applied is reported as missing on every
- * pull request — which is a fair thing for a report to say out loud.
+ * state; what GitHub enforces is `readBranchRequirements`, which reads it for
+ * `unblock-prs`, the Pull Requests Manager and `pr-report` pointed elsewhere,
+ * and which wants no more than read access. The gap is that a file under
+ * `repo-settings/` changes nothing until `pnpm run repo-settings:apply` runs,
+ * so a context added here and not applied is reported as missing on every pull
+ * request — which is a fair thing for a report to say out loud.
  *
  * `source` names the file in the messages.
  */

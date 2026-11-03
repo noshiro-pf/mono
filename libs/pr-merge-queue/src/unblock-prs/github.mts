@@ -10,7 +10,7 @@ import {
   isSafeRefName,
   parseClaimComment,
   parseSetAsideComment,
-  requirementsOfRules,
+  readBranchRequirements,
   SET_ASIDE_COMMENT_SCAN,
   SKIP_CI_LABEL,
   type CheckRunReport,
@@ -219,24 +219,23 @@ export const remoteSha = async (
 };
 
 /**
- * What GitHub enforces on the branch, every ruleset that applies to it together
- * — rather than what `repo-settings/` declares, which changes nothing until it
- * is applied.
+ * What GitHub enforces on the branch, every ruleset that applies to it and a
+ * classic branch protection rule together (`pr-report-core`'s
+ * `readBranchRequirements`) — rather than what `repo-settings/` declares, which
+ * changes nothing until it is applied.
  */
 export const readBranchRules = async (
   api: ApiContext,
   branch: string,
-): Promise<Result<RulesetRequirements, string>> => {
-  // One path segment, whatever the name holds: `release/1.x` included. The
-  // rule's premise, building a query string, is not what this is.
-  // eslint-disable-next-line no-restricted-globals
-  const segment = encodeURIComponent(branch);
-
-  return Result.map(
-    await rest(api, 'GET', `/rules/branches/${segment}`, t.array(t.unknown())),
-    requirementsOfRules,
+): Promise<Result<RulesetRequirements, string>> =>
+  readBranchRequirements(branch, async (path, schema, what) =>
+    // `rest`'s message does not say which of the two was refused. Last, so that
+    // a log keeping a message's last lines keeps it.
+    Result.mapErr(
+      await rest(api, 'GET', path, schema),
+      (message) => `${message} (reading ${what})` as const,
+    ),
   );
-};
 
 /**
  * `CODEOWNERS` on the default branch, and what `pr-report-core`'s

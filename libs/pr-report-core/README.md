@@ -57,8 +57,11 @@ assert.deepStrictEqual(cycles, [[12, 14]]);
   forest they describe, and everything read arranged into a report.
 - **`summarize.mts`** — the counts a report leads with.
 - **`ruleset.mts`** — what a ruleset requires: the contexts, and whether code
-  owners have to approve. **`code-owners.mts`**, **`review-hold.mts`** — who
-  owns a change, and whether a review holds a pull request.
+  owners have to approve. **`branch-rules.mts`** — the same read off GitHub for
+  a branch, its rulesets and a classic branch protection rule together, through
+  whatever transport the reader hands over. **`code-owners.mts`**,
+  **`review-hold.mts`** — who owns a change, and whether a review holds a pull
+  request.
 - **`queue-owner.mts`**, **`queue-order.mts`** — who moves each queued pull
   request next, and the order the queue picks them in.
 - **`set-aside.mts`**, **`claim.mts`** — the comments `unblock-prs` and a

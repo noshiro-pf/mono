@@ -85,7 +85,8 @@ pnpm run pr-report -- --issues-limit 10 # open な issue の最大件数
 ### 判定の決まりごと
 
 - **required context の一覧は GitHub がデフォルトブランチに課している rule か
-  ら読みます**（`rules/branches/{branch}`、読み取り権限で足ります）。ただしレ
+  ら読みます**（ruleset の `rules/branches/{branch}` と classic な branch
+  protection の `branches/{branch}`、どちらも読み取り権限で足ります）。ただしレ
   ポート対象がチェックアウト自身のリポジトリで、そこに
   `repo-settings/rulesets/main.json` があれば、desired state であるそのファイ
   ルを読みます。適用前に足した context は全 PR で missing として出ます — レポー
@@ -216,12 +217,13 @@ than once, the run in the check suite with the greatest id is the answer,
 which is how GitHub resolves it — not the newest run, which would call a pull
 request green that a stale red is holding.
 
-The required contexts come from the rules GitHub enforces on the default
-branch (`rules/branches/{branch}`, which wants read access only). When the
-report is of the checkout's own repository and the checkout declares its
-ruleset in `repo-settings/rulesets/main.json`, that file is read instead, as
-the desired state: a context added there and not yet applied is reported as
-missing on every pull request, which is a fair thing for a report to say.
+The required contexts come from the rules GitHub enforces on the default branch:
+every ruleset's (`rules/branches/{branch}`) and a classic branch protection
+rule's (`branches/{branch}`), both wanting read access only. When the report is
+of the checkout's own repository and the checkout declares its ruleset in
+`repo-settings/rulesets/main.json`, that file is read instead, as the desired
+state: a context added there and not yet applied is reported as missing on every
+pull request, which is a fair thing for a report to say.
 With `--repo` naming another repository, the file is not read.
 
 It reads one page of a hundred pull requests and fails rather than reporting a
