@@ -24,6 +24,7 @@ when neither is set.
 | `push-fixed-pr`         | pushes the fix to a pull request you claimed and hands it back to the queue          |
 | `report-unowned-prs`    | files an issue for each queued pull request that everyone is waiting on others for   |
 | `start-issue`           | labels an issue `in-progress` before work starts, refusing one someone is already on |
+| `startable-issues`      | lists the open issues nobody has started, in the order to take them                  |
 | `run-unblock-prs-skill` | runs the `unblock-prs` skill without a person, on the Claude API, when it has work   |
 | `run-issue-resolver`    | starts the open issues nobody has started, one Claude API session each               |
 
@@ -162,6 +163,27 @@ the skill cannot guess:
 This repository's
 [`.github/unblock-prs.md`](https://github.com/noshiro-pf/mono/blob/main/.github/unblock-prs.md)
 is an example.
+
+### Starting issues: `resolve-issues`
+
+The plugin's second skill implements the open issues to take next, in a session
+with a person:
+
+```text
+/pr-merge-queue:resolve-issues 3
+```
+
+It does not choose them itself: `startable-issues` lists the issues
+`run-issue-resolver` (below) would hand on, in the same order and by the same
+code — startable by their `Start-After:`, not started or planned, written by the
+token's account (`--author` names others), not held by a label, `priority:high`
+first and `priority:low` last, the lowest number first within each. Going down
+that list, the skill passes over any issue that one pull request cannot finish
+without a person's decision, and takes the others one at a time until N pull
+requests are open: `start-issue` as it takes one, then the repository's own
+instructions to a pull request opened with `open-pr`, held by `skip-ci`. One it
+stops on gets a comment saying what it needs, which the next run reads, and
+`start-issue --release`.
 
 ### Without a session, on the Claude API
 

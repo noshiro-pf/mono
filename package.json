@@ -111,6 +111,7 @@
     "run-issue-resolver": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/pr-merge-queue/src/cmd/run-issue-resolver.mts",
     "run-unblock-prs-skill": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/pr-merge-queue/src/cmd/run-unblock-prs-skill.mts",
     "start-issue": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/pr-merge-queue/src/cmd/start-issue.mts",
+    "startable-issues": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/pr-merge-queue/src/cmd/startable-issues.mts",
     "strict-lib:check:lint": "pnpm run z:eslint --config ./strict-lib/eslint.config.mts './strict-lib/**/*.mts'",
     "strict-lib:check:types": "tsc -p ./strict-lib/tsconfig.tooling.json --noEmit",
     "strict-lib:fix:fmt": "oxfmt --ignore-path=./.gitignore --ignore-path=./strict-lib/.oxfmtignore --config=./strict-lib/.oxfmtrc.json ./strict-lib",

@@ -693,7 +693,10 @@ const collectAddedLines = async (
 
   const mut_lines = new Map<string, readonly number[]>(trackedLines);
 
-  for (const file of await filterExisting(untracked)) {
+  // A symlink to a directory is listed as one untracked path, and has no lines.
+  const untrackedFiles = untracked.filter(isRegularFile);
+
+  for (const file of untrackedFiles) {
     const content = await readText(file);
 
     const count = content.split('\n').length;

@@ -83,12 +83,10 @@ export const parseOptions = (
     return maxTotalUsd;
   }
 
-  const authors = Arr.uniq(
-    (values.author ?? []).map((login) => login.replace(/^@/u, '')),
-  );
+  const authors = parseAuthors(values.author);
 
-  if (authors.includes('')) {
-    return Result.err('--author takes a GitHub login, got an empty one');
+  if (Result.isErr(authors)) {
+    return authors;
   }
 
   return Result.ok({
@@ -99,8 +97,24 @@ export const parseOptions = (
     maxSessions: maxSessions.value,
     concurrency: concurrency.value,
     model: values.model,
-    authors,
+    authors: authors.value,
   });
+};
+
+/**
+ * The logins `--author` gave, each once and without a leading `@`, which a
+ * person copying a mention from GitHub will paste.
+ */
+export const parseAuthors = (
+  raw: readonly string[] | undefined,
+): Result<readonly string[], string> => {
+  const authors = Arr.uniq(
+    (raw ?? []).map((login) => login.replace(/^@/u, '')),
+  );
+
+  return authors.includes('')
+    ? Result.err('--author takes a GitHub login, got an empty one')
+    : Result.ok(authors);
 };
 
 export type Options = Readonly<{

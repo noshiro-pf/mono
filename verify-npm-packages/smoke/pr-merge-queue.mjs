@@ -33,6 +33,7 @@ for (const command of [
   'run-issue-resolver',
   'run-unblock-prs-skill',
   'start-issue',
+  'startable-issues',
   'unblock-prs',
 ]) {
   assert.ok(commands.includes(command), `pr-merge-queue has no ${command}`);
