@@ -18,11 +18,10 @@ comment:
   behavior: default
   require_changes: false
   # A pull request's coverage arrives in one upload per
-  # `ws:check:test:cov:shard-*` of code-check.yml (the second inside
-  # `z:ci:code-check:types-and-coverage`); a comment written before the last
-  # would compare the base against part of the suite. Keep this equal to the
-  # number of shards.
-  after_n_builds: 3
+  # `ws:check:test:cov:shard-*` entry of code-check.yml; a comment written
+  # before the last would compare the base against part of the suite. Keep
+  # this equal to the number of shards.
+  after_n_builds: 2
 
 # One component per package, so that a repository-wide number is not the only
 # thing on offer. `pnpm run ws:check:test:cov` writes a coverage report per package

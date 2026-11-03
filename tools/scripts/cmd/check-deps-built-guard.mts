@@ -192,8 +192,8 @@ const memberScripts = [
 const rootWorkspaceScripts = [
   'check:root:dist-lib-replacement',
   'ws:check:types',
-  'ws:check:types:shard-1',
-  'ws:check:types:shard-2',
+  'ws:check:types:non-strict-lib',
+  'ws:check:types:strict-lib',
   'ws:check:lint',
   'ws:fix:lint',
   'ws:fix:lint:apps',
@@ -203,7 +203,6 @@ const rootWorkspaceScripts = [
   'ws:check:test:cov:run',
   'ws:check:test:cov:shard-1',
   'ws:check:test:cov:shard-2',
-  'ws:check:test:cov:shard-3',
   'ws:check:test:rules',
   'ws:check:e2e',
   'ws:check:e2e:emulators',

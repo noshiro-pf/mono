@@ -497,11 +497,12 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
   {
     directory: ROOT_DIRECTORY,
     scriptName: 'ws:check:types',
-    // `code-check.yml` runs it as two shards, `ws:check:types:shard-1` and
-    // `ws:check:types:shard-2`, which between them reach every package's
+    // CI runs it as two halves, `ws:check:types:non-strict-lib` (in
+    // `code-check.yml`) and `ws:check:types:strict-lib` (in
+    // `strict-lib-gen.yml`), which between them reach every package's
     // `check:types`. As with `ws:check:lint` below, neither covers the root
-    // command on its own; that the shards partition the packages is in their
-    // filters.
+    // command on its own; that the halves partition the packages is in their
+    // filters, `!./strict-lib/**` and `./strict-lib/**`.
   },
   {
     directory: ROOT_DIRECTORY,
