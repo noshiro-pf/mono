@@ -169,8 +169,8 @@ export const classifyChanges = ({
  *
  * The codemod is in the plan for any TypeScript change because no lint rule
  * stands behind it: `prefer-as-const` rewrites `as 'foo'` and says nothing
- * about an `as const` that is missing, so `code-check (fix:codemod:full)` is
- * otherwise the first thing to mention it. It runs twice, once over the diff
+ * about an `as const` that is missing, so `code-check (fix:codemod:affected)`
+ * is otherwise the first thing to mention it. It runs twice, once over the diff
  * from the base and once over the uncommitted files, because `--diff-from`
  * reads `git diff`, which leaves out untracked files.
  */

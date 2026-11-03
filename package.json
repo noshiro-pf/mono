@@ -84,6 +84,7 @@
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "coverage:normalize-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/normalize-coverage-paths.mts",
     "fix:codemod": "pnpm run z:ts-codemod --uncommitted && pnpm run fix:fmt",
+    "fix:codemod:affected": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/codemod-affected.mts && pnpm run fix:fmt",
     "fix:codemod:diff": "pnpm run z:ts-codemod --diff-from origin/main && pnpm run fix:fmt",
     "fix:codemod:full": "pnpm run z:ts-codemod && pnpm run fix:fmt",
     "fix:fmt": "pnpm run z:format-uncommitted",

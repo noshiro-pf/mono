@@ -450,6 +450,12 @@ const DECLARED_COVERAGE: readonly CoverageDeclaration[] = [
     to: 'fix:codemod:diff',
   },
   {
+    from: 'fix:codemod:affected',
+    to: 'fix:codemod:diff',
+    // The codemod over the diff from the base, or over everything when what
+    // decides its output changed (`codemod-affected.mts`).
+  },
+  {
     from: 'fix:codemod:diff',
     to: 'fix:codemod',
   },

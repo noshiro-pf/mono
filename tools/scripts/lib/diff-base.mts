@@ -6,13 +6,18 @@ import { projectRootPath } from '../project-root-path.mjs';
  * `PROSE_DIFF_BASE`, which `style-check.yml` sets to the base of the pull
  * request (the commit before the push on `main`, the tree itself on a manual
  * run) and fetches, or else the merge base of `HEAD` and `origin/main`.
+ * `variable` names another environment variable for a caller that is not one of
+ * those guards.
  *
  * A base that is not in the clone is an error rather than an empty change,
  * which would pass every check that reads one. `purpose` finishes the sentence
  * "the commit to …" in the messages.
  */
-export const resolveDiffBase = (purpose: string): string => {
-  const fromEnv = process.env[DIFF_BASE_VARIABLE];
+export const resolveDiffBase = (
+  purpose: string,
+  variable: string = DIFF_BASE_VARIABLE,
+): string => {
+  const fromEnv = process.env[variable];
 
   if (fromEnv !== undefined && fromEnv !== '') {
     const verified = spawnSync(
@@ -24,7 +29,7 @@ export const resolveDiffBase = (purpose: string): string => {
 
     if (verified.status !== 0) {
       throw new Error(
-        `${DIFF_BASE_VARIABLE} is ${fromEnv}, which is not a commit in this clone. Fetch it first.`,
+        `${variable} is ${fromEnv}, which is not a commit in this clone. Fetch it first.`,
       );
     }
 
@@ -39,9 +44,9 @@ export const resolveDiffBase = (purpose: string): string => {
   if (mergeBase.status !== 0) {
     throw new Error(
       [
-        `Could not find the commit to ${purpose}: ${DIFF_BASE_VARIABLE} is`,
+        `Could not find the commit to ${purpose}: ${variable} is`,
         `not set, and \`git merge-base HEAD origin/main\` failed: ${mergeBase.stderr.trim()}`,
-        `Fetch origin/main, or set ${DIFF_BASE_VARIABLE} to the base of the change.`,
+        `Fetch origin/main, or set ${variable} to the base of the change.`,
       ].join('\n'),
     );
   }
