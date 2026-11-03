@@ -90,6 +90,17 @@ jobs:
         # four slowest suites and exclude them, so a new package lands in the
         # second. Each is `--no-bail`, so one package's failure does not hide
         # the rest.
+        #
+        # The second shard takes four packages at a time
+        # (`--workspace-concurrency=4`): most of its suites spend their few
+        # seconds starting the test runner on one core, which four cores
+        # overlap (about 110 seconds of tests became 60 on four cores). The
+        # first stays at one: each of its suites fills the runner on its own,
+        # and running them together is what once pushed eslint-config-typed's
+        # RuleTester tests past their timeout. So `ws:check:test` is the two
+        # shards in a row rather than one run at either setting: about 100
+        # and 60 seconds on four cores, where one run at one was about 210,
+        # and the heavy suites never overlap.
         command:
           - ws:check:test:shard-1
           - ws:check:test:shard-2

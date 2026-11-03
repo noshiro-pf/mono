@@ -114,14 +114,20 @@ jobs:
           - command: check:root
             build: ws:build:deps
 
-          # `ws:check:test:cov` in two shards, one package at a time. The
-          # first names the four ESLint plugin suites, about half of it; the
+          # `ws:check:test:cov` in two shards. The first names the four ESLint
+          # plugin suites, about half of it, and runs them one at a time: each
+          # fills the runner on its own, and together they once pushed
+          # eslint-config-typed's RuleTester tests past their timeout. The
           # second is everything else by excluding them, so a new package
-          # lands there. Each shard uploads its own reports and Codecov merges
-          # them (`codecov.yml`). The first rides with the emulator end-to-end
-          # tests; the second with `ws:check:types` outside `strict-lib/`
-          # (about a minute: the strict-lib harnesses run in
-          # strict-lib-gen.yml) and the Firestore rules tests of
+          # lands there, four at a time (`--workspace-concurrency=4`): most
+          # of its suites spend their few seconds starting vitest on one core,
+          # and four cores overlap that (about 225 seconds became 125 on four
+          # cores). The synstate adapters' browser projects run in it too, and
+          # passed four at a time. Each shard uploads its own reports and
+          # Codecov merges them (`codecov.yml`). The first rides with the
+          # emulator end-to-end tests; the second with `ws:check:types`
+          # outside `strict-lib/` (about a minute: the strict-lib harnesses
+          # run in strict-lib-gen.yml) and the Firestore rules tests of
           # life-plan-simulator and task-manager, so that a pull request
           # breaking `firestore.rules` fails before it merges
           # (`deploy-firestore.yml` deploys whatever reaches `main`).
