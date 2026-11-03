@@ -8,6 +8,7 @@ import { Arr, isRecord, isString, unknownToString } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import { formatLineRanges, parseAddedLines } from '../../lib/diff-lines.mjs';
 import { projectRootPath } from '../../project-root-path.mjs';
+import { gatePatterns } from '../workflow-steps.mjs';
 import { findMissingChangesets, isChangesetFile } from './changesets.mjs';
 import {
   checkCommitMessages,
@@ -18,7 +19,6 @@ import { parseLcov, uncoveredChangedLines } from './coverage.mjs';
 import {
   buildPlan,
   classifyChanges,
-  parsePathsIgnore,
   readManifestDependencies,
   type PackageInfo,
   type Step,
@@ -71,12 +71,20 @@ const main = async (): Promise<number> => {
     return 2;
   }
 
+  const proseGate = gatePatterns(gateCommand);
+
+  if (!proseGate.ok) {
+    console.error(`${CODE_GATE_SCRIPT}: ${proseGate.message}`);
+
+    return 2;
+  }
+
   const packages = await readPackages();
 
   const classification = classifyChanges({
     files: changedFiles,
     packages,
-    proseGate: parsePathsIgnore(gateCommand),
+    proseGate: proseGate.value,
   });
 
   const existing = await filterExisting(changedFiles);

@@ -600,9 +600,9 @@ const toCommandId = (directory: string, scriptName: string): CommandId =>
  *
  * The `z:` namespace is this repository's plumbing: a script another script or
  * a workflow's own glue invokes, never a check in its own right.
- * `z:check-should-run` is the diff gate, which check-gates.yml calls through
- * `workflow_call` — a workflow that triggers on nothing and so is not one of
- * the six below.
+ * `z:check-should-run` is the diff gate, whose lists check-gates.yml reads
+ * (`workflow-steps.mts check-diff`) through `workflow_call` — a workflow that
+ * triggers on nothing and so is not one of the six below.
  */
 const isCheckScript = (scriptName: string): boolean => {
   if (scriptName.startsWith(PLUMBING_PREFIX)) {

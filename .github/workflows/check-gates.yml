@@ -304,18 +304,20 @@ jobs:
         with:
           ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
 
-      - name: Fetch main
-        if: steps.checkout.outcome == 'success'
-        run: git fetch origin main # To allow the diff gate below to get the diff from main
-
-      - name: Set up pnpm, Node.js and the dependencies
+      # Node.js alone: the diff check reads the ignore list from the root
+      # package.json and needs no pnpm, store or install, which were most of
+      # this job's time.
+      - name: Set up Node.js
         if: steps.checkout.outcome == 'success'
         uses: ./.github/actions/setup
+        with:
+          pnpm: 'false'
+          install: 'false'
 
       # Which base the diff is taken against — the pull request's own base,
-      # or on a push to main what main pointed at before it — and the check
-      # of `diff-scope` are in the script, `planDiffCheck`. The `pnpm run` it
-      # ends in writes `should_run=` to `GITHUB_OUTPUT` itself.
+      # or on a push to main what main pointed at before it — the one-commit
+      # fetch of it, and the check of `diff-scope` are in the script,
+      # `planDiffCheck`, which writes `should_run=` to `GITHUB_OUTPUT`.
       - name: Check diff
         id: check_diff
         if: steps.checkout.outcome == 'success'

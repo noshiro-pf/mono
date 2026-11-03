@@ -2,12 +2,11 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { isRecord, isString } from 'ts-data-forge';
 import { projectRootPath } from '../../project-root-path.mjs';
+import { gatePatterns, matchesGatePattern } from '../workflow-steps.mjs';
 import {
   buildPlan,
   classifyChanges,
   isSpellCheckedByCi,
-  matchesGatePattern,
-  parsePathsIgnore,
   readManifestDependencies,
   type PackageInfo,
 } from './plan.mjs';
@@ -89,7 +88,7 @@ const rootScripts = [
 ] as const;
 
 /** The gate list as the root package.json gives it. */
-const proseGate = (() => {
+const proseGateResult = (() => {
   const manifest: unknown = JSON.parse(
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- a fixed path in this repository.
     fs.readFileSync(path.join(projectRootPath, 'package.json'), 'utf8'),
@@ -102,8 +101,12 @@ const proseGate = (() => {
 
   const command = scripts['z:check-should-run:code-checks'];
 
-  return parsePathsIgnore(isString(command) ? command : '');
+  return gatePatterns(isString(command) ? command : '');
 })();
+
+// Empty when the list is not read, which the first test below reports by its
+// message rather than failing the whole file at import.
+const proseGate = proseGateResult.ok ? proseGateResult.value : ([] as const);
 
 const classify = (files: readonly string[]) =>
   classifyChanges({ files, packages, proseGate });
@@ -128,8 +131,13 @@ const commandsOf = (files: readonly string[], coverage = true) =>
     ({ cwd, args }) => `${cwd === '.' ? '' : `${cwd}: `}${args.join(' ')}`,
   );
 
-describe('parsePathsIgnore and matchesGatePattern', () => {
+describe('the code gate, read through gatePatterns', () => {
   test('understand every pattern the code gate has', () => {
+    assert.deepStrictEqual(
+      proseGateResult.ok ? undefined : proseGateResult.message,
+      undefined,
+    );
+
     assert.isNotEmpty(proseGate);
 
     for (const pattern of proseGate) {
@@ -155,7 +163,7 @@ describe('parsePathsIgnore and matchesGatePattern', () => {
   });
 
   test('a pattern of an unknown shape throws rather than misfiling', () => {
-    assert.throws(() => matchesGatePattern('a', 'src/**/*.ts'), /Unsupported/u);
+    assert.throws(() => matchesGatePattern('a', 'src/*/x.ts'), /Unsupported/u);
   });
 });
 
