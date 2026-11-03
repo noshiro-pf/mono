@@ -46,6 +46,63 @@ export const codeSpans = (lineText: string): readonly string[] =>
     (span) => span.groups?.['code'] ?? '',
   );
 
+/**
+ * Where each inline code span of one line is, its backticks included: `start`
+ * is the index of its first backtick, `end` the index just past its last. Read
+ * as CommonMark reads them: a run of backticks opens a span that the next run
+ * of the same length closes, so a span may hold shorter runs (`` a`b ``); a
+ * run that nothing closes is text, and so is a backtick a backslash escapes.
+ */
+export const codeSpanRanges = (
+  lineText: string,
+): readonly Readonly<{ start: number; end: number }>[] =>
+  Arr.generate(function* () {
+    // A backslash escapes the first backtick of a run outside a span, so a run
+    // after an odd number of them opens one backtick later.
+    const runs = Array.from(
+      lineText.matchAll(/(?<backslashes>\\*)`+/gu),
+      (run) => {
+        const escaped = (run.groups?.['backslashes']?.length ?? 0) % 2 === 1;
+
+        const start = run.index + (run.groups?.['backslashes']?.length ?? 0);
+
+        return {
+          start,
+          openAt: escaped ? start + 1 : start,
+          end: run.index + run[0].length,
+        };
+      },
+    );
+
+    let mut_closedThrough = -1;
+
+    for (const [index, open] of runs.entries()) {
+      if (index <= mut_closedThrough) {
+        continue;
+      }
+
+      const length = open.end - open.openAt;
+
+      if (length === 0) {
+        continue;
+      }
+
+      const closeAt = runs.findIndex(
+        (run, at) => at > index && run.end - run.start === length,
+      );
+
+      const close = runs[closeAt];
+
+      if (close === undefined) {
+        continue;
+      }
+
+      mut_closedThrough = closeAt;
+
+      yield { start: open.openAt, end: close.end };
+    }
+  });
+
 /** One line with its inline code spans taken out. */
 export const withoutCodeSpans = (lineText: string): string =>
   lineText.replaceAll(CODE_SPAN, '');
