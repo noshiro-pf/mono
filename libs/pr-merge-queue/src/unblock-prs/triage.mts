@@ -23,11 +23,7 @@ import {
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { currentEpochMs, log, type ApiContext } from '../lib/index.mjs';
-import {
-  listRequiredChecks,
-  listRunningChecks,
-  summarizeChecks,
-} from './checks.mjs';
+import { readHeadChecks, summarizeChecks } from './checks.mjs';
 import {
   REVIEW_HEAD_RETRIES,
   REVIEW_HEAD_RETRY_MS,
@@ -562,7 +558,7 @@ const readChecks = async (
   pr: PullRequest,
   context: TriageContext,
 ): Promise<Result<ChecksSummary, Classification>> => {
-  const checks = await listRequiredChecks(api, pr.number);
+  const checks = await readHeadChecks(api, pr.number);
 
   if (Result.isErr(checks)) {
     return Result.err({
@@ -572,19 +568,14 @@ const readChecks = async (
   }
 
   // Pending and passed are both in flight here, but a red left by the round
-  // before is not a failure while this round runs, and the checks still running
-  // are what tell the two apart.
-  const running = await listRunningChecks(api, pr.number);
-
-  if (Result.isErr(running)) {
-    return Result.err({
-      kind: 'note',
-      note: `#${pr.number}: could not read checks: ${running.value}`,
-    });
-  }
-
+  // before is not a failure while this round runs, and the checks still running,
+  // read with the required ones, are what tell the two apart.
   return Result.ok(
-    summarizeChecks(checks.value, context.requiredContexts, running.value),
+    summarizeChecks(
+      checks.value.required,
+      context.requiredContexts,
+      checks.value.running,
+    ),
   );
 };
 

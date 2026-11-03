@@ -5,11 +5,8 @@ import { isRecord, Result } from 'ts-data-forge';
 import { log, type ApiContext } from '../lib/index.mjs';
 import {
   describeWaitingOn,
-  listRequiredChecks,
-  listRunningChecks,
+  readHeadChecks,
   summarizeChecks,
-  type ReportedCheck,
-  type RunningCheck,
 } from './checks.mjs';
 import {
   BLOCKED_GREEN_POLLS_BEFORE_GIVING_UP,
@@ -105,7 +102,7 @@ export const watch = async (
       return { outcome: 'behind-again' };
     }
 
-    const checks = await readChecks(api, pr.number);
+    const checks = await readHeadChecks(api, pr.number);
 
     if (Result.isErr(checks)) {
       mut_errors += 1;
@@ -190,30 +187,4 @@ export const watch = async (
   }
 
   return { outcome: 'stopped' };
-};
-
-/** The required checks and the names of every check still running. */
-const readChecks = async (
-  api: ApiContext,
-  prNumber: number,
-): Promise<
-  Result<
-    Readonly<{
-      required: readonly ReportedCheck[];
-      running: readonly RunningCheck[];
-    }>,
-    string
-  >
-> => {
-  const required = await listRequiredChecks(api, prNumber);
-
-  if (Result.isErr(required)) {
-    return required;
-  }
-
-  const running = await listRunningChecks(api, prNumber);
-
-  return Result.isErr(running)
-    ? running
-    : Result.ok({ required: required.value, running: running.value });
 };
