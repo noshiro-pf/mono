@@ -607,6 +607,20 @@ const documents: DeepReadonly<
     ),
     sampleCodeFiles: ['counter-demo.tsx', 'search-demo.tsx', 'todo-demo.tsx'],
   },
+  ...[
+    'src/content/docs/synstate-router/introduction.md',
+    `${jaDocsBase}/synstate-router/introduction.md`,
+  ].map((mdPath) => ({
+    mdPath: path.resolve(workspaceRootPath, mdPath),
+    samplesDir: path.resolve(workspaceRootPath, '../../libs'),
+    sampleCodeFiles: [
+      'synstate-router/samples/readme/01-define-routes.mts',
+      'synstate-router/samples/readme/02-create-router.mts',
+      'synstate-router-react/samples/readme/01-routes.tsx',
+      'synstate-router-dom/samples/readme/01-routes.tsx',
+      'synstate-router/samples/docs-site/01-data-fetching.mts',
+    ],
+  })),
   ...referenceDocuments,
   ...jaReferenceDocuments,
 ] as const;

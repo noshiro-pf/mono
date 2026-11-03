@@ -50,5 +50,15 @@ In the benchmark summary, SynState stays within {/* bench:summary/synstate-worst
         framework. For React and Preact, hooks wrappers are available. For
         Preact, a Preact Signals integration is also provided.
     </Card>
+    <Card title="UI on SynState: synstate-dom" icon="window">
+
+[synstate-dom](/mono/synstate/synstate-dom/introduction/) binds Observables straight to the DOM, so the whole UI, async steps included, is one SynState graph. A component runs once, with no virtual DOM and no compiler.
+
+    </Card>
+    <Card title="Typed Routes: synstate-router" icon="link">
+
+[synstate-router](/mono/synstate/synstate-router/introduction/) checks every destination, path parameter and search parameter with the type checker, and keeps its state in SynState Observables. It has bindings for React and synstate-dom, and is not on npm yet.
+
+    </Card>
 
 </CardGrid>

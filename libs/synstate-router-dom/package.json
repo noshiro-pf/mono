@@ -1,7 +1,7 @@
 {
   "name": "synstate-router-dom",
   "version": "0.1.0",
-  "description": "synstate-dom bindings for synstate-router: exhaustive Routes that rebuild only on a new route, and an Href-only Link",
+  "description": "synstate-dom bindings for synstate-router: exhaustive Routes that rebuild only on a new route, and a Link that takes no plain string",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",
