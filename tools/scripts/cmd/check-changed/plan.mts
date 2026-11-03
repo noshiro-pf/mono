@@ -78,6 +78,10 @@ export const classifyChanges = ({
       mut_areas.add('manifest');
     }
 
+    if (file === LICENSE_GENERATOR || basename(file) === 'LICENSE') {
+      mut_areas.add('license');
+    }
+
     // Only its tooling's checks: the generators rewrite thousands of files and
     // are `strict-lib-gen.yml`'s, as they are not `check-all`'s either.
     if (file.startsWith('strict-lib/')) {
@@ -223,6 +227,13 @@ export const buildPlan = ({
     ),
 
     ...(areas.has('manifest') ? [rootStep('generate', 'gen:deps-graph')] : []),
+
+    // Every published package's LICENSE is written from the license its
+    // manifest declares, which `style-check.yml` regenerates and then asserts a
+    // clean tree on.
+    ...(areas.has('manifest') || areas.has('license')
+      ? [rootStep('generate', 'gen:license-files')]
+      : []),
 
     // Its committed `local/` copies are written from `smoke/`, the manifests,
     // the generator and the libraries it calls, which no list here would keep
@@ -444,13 +455,16 @@ export const readManifestDependencies = (
  * guards alone, without the root program's own type check, lint and tests.
  * `root-guards` is any change that is not prose alone, and
  * `gen:verify-npm-packages` runs on it for that reason: narrowing it to what
- * the guards read would leave that generator's copies stale.
+ * the guards read would leave that generator's copies stale. `license` is a
+ * `LICENSE` or `gen-license-files.mts` itself; `gen:license-files` runs on it
+ * and on `manifest`, whose `license` and `private` fields decide what it writes.
  */
 export type Area =
   | 'root'
   | 'root-guards'
   | 'prose'
   | 'manifest'
+  | 'license'
   | 'codemod'
   | 'strict-lib'
   | 'changeset'
@@ -671,6 +685,8 @@ const FORMAT_CONFIG: ReadonlySet<string> = new Set<string>([
 const CONFIGS_SEGMENT = /(?:^|\/)configs\//u;
 
 const TYPESCRIPT_FILE = /\.(?:ts|mts|tsx)$/u;
+
+const LICENSE_GENERATOR = 'tools/scripts/cmd/gen-license-files.mts';
 
 const MANIFEST_FILES: ReadonlySet<string> = new Set<string>([
   'package.json',

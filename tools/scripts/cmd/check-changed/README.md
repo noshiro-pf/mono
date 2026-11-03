@@ -25,7 +25,8 @@ by case. In order:
 1. **Format** the diff (`z:format-diff-from <base>`), so that a generator's
    own `fix:fmt` is not later blamed for formatting a hand-edited file.
 2. **Generators**: `gen` in every touched package, `gen:deps-graph` for a
-   manifest or the lockfile, and `gen:verify-npm-packages` for any change that
+   manifest or the lockfile, `gen:license-files` for a manifest, the lockfile, a
+   `LICENSE` or its generator, and `gen:verify-npm-packages` for any change that
    is not prose alone, since its committed `local/` copies are written from
    `smoke/`, the manifests and the generator's own code. **A generator that
    changes the tree fails the run**, naming itself and the files; that is the
@@ -92,7 +93,8 @@ after a change other packages consume. Nor are the packages a change to
 either: a change to `verify-npm-packages/smoke/` is regenerated into its
 `local/` copies, not run.
 Under `strict-lib/` only the tooling's type check, lint and oxfmt run, and
-`gen:verify-npm-packages`, which copies the published bundles' manifests; the
+`gen:verify-npm-packages`, which copies the published bundles' manifests (a
+manifest or `LICENSE` there runs the generators that read one, as anywhere); the
 strict-lib generators, which rewrite thousands of files, are
 `strict-lib-gen.yml`'s.
 Browser tests, end-to-end tests, the Firestore rules tests (`check:test:rules`,
