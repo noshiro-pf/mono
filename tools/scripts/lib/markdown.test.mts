@@ -1,5 +1,10 @@
 import dedent from 'dedent';
-import { codeSpans, markdownLines, withoutCodeSpans } from './markdown.mjs';
+import {
+  codeSpans,
+  markdownLines,
+  tableCell,
+  withoutCodeSpans,
+} from './markdown.mjs';
 
 const fencedLines = (text: string): readonly number[] =>
   markdownLines(text)
@@ -116,6 +121,19 @@ describe('withoutCodeSpans', () => {
     assert.strictEqual(
       withoutCodeSpans('see `[x](./a.md)` and [y](./b.md)'),
       'see  and [y](./b.md)',
+    );
+  });
+});
+
+describe('tableCell', () => {
+  test('puts the text on one line and escapes its pipes', () => {
+    assert.strictEqual(tableCell(' a ||\n b | c '), String.raw`a \|\| b \| c`);
+  });
+
+  test('doubles a backslash before a pipe, so that it does not free it, and no other', () => {
+    assert.strictEqual(
+      tableCell(String.raw`a\|b \r\n`),
+      String.raw`a\\\|b \r\n`,
     );
   });
 });

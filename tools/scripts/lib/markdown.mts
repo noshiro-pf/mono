@@ -1,7 +1,8 @@
 /**
  * The little of Markdown that more than one guard has to tell apart: what is
  * code and what is prose. A link or a path written in code is an example, not a
- * reference.
+ * reference. And the little that more than one report needs to write: text that
+ * fits on one line, or in one table cell.
  */
 
 import { Arr } from 'ts-data-forge';
@@ -48,6 +49,23 @@ export const codeSpans = (lineText: string): readonly string[] =>
 /** One line with its inline code spans taken out. */
 export const withoutCodeSpans = (lineText: string): string =>
   lineText.replaceAll(CODE_SPAN, '');
+
+/** Text on one line: every run of whitespace one space, none at the ends. */
+export const oneLine = (text: string): string =>
+  text.replaceAll(/\s+/gu, ' ').trim();
+
+/**
+ * Text safe in a Markdown table cell: one line, each `|` escaped, and the
+ * backslashes just before one doubled, so that no `|` it has ends the cell.
+ * Other backslashes are left alone, since a code span in the text shows them as
+ * they are.
+ */
+export const tableCell = (text: string): string =>
+  oneLine(text).replaceAll(
+    /(\\*)\|/gu,
+    (_match: string, backslashes: string | undefined) =>
+      `${backslashes ?? ''}${backslashes ?? ''}${String.raw`\|`}`,
+  );
 
 export type MarkdownLine = Readonly<{
   /** 1-based. */

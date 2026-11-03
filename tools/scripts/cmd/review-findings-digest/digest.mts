@@ -1,5 +1,6 @@
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { oneLine, tableCell } from '../../lib/markdown.mjs';
 import { CATEGORIES, classify, type CategoryId } from './classify.mjs';
 import { parseReview, type Disposition, type Finding } from './parse.mjs';
 
@@ -93,7 +94,7 @@ export const renderMarkdown = (digest: Digest): string => {
     '| --: | :-- | :-- | --: | --: | --: |',
     ...digest.reviewed.map(
       (pull) =>
-        `| #${pull.number} | ${cell(pull.title)} | ${pull.levels.join(', ')} | ${pull.rounds ?? '?'} | ${diffSize(pull)} | ${pull.findings.length} |`,
+        `| #${pull.number} | ${tableCell(pull.title)} | ${pull.levels.join(', ')} | ${pull.rounds ?? '?'} | ${diffSize(pull)} | ${pull.findings.length} |`,
     ),
     '',
     '## Findings by class',
@@ -195,9 +196,3 @@ const diffSize = (
   pull.additions === undefined || pull.deletions === undefined
     ? '?'
     : (`+${pull.additions} −${pull.deletions}` as const);
-
-const oneLine = (text: string): string => text.replaceAll(/\s+/gu, ' ').trim();
-
-/** Text safe in a Markdown table cell. */
-const cell = (text: string): string =>
-  oneLine(text).replaceAll('|', String.raw`\|`);
