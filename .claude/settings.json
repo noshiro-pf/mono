@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ \"$CLAUDE_CODE_REMOTE\" = true ] || exit 0; f=/etc/profile.d/claude-cloud-node.sh; [ ! -f \"$f\" ] || . \"$f\"; log=/tmp/claude-cloud-pnpm-install.log; cd \"$CLAUDE_PROJECT_DIR\" && pnpm install --frozen-lockfile --prefer-offline > \"$log\" 2>&1 || echo \"pnpm install failed; see $log\"",
+            "command": "[ \"$CLAUDE_CODE_REMOTE\" = true ] || exit 0; f=/etc/profile.d/claude-cloud-node.sh; [ ! -f \"$f\" ] || { . \"$f\"; [ -z \"${CLAUDE_ENV_FILE:-}\" ] || echo \". $f\" >> \"$CLAUDE_ENV_FILE\"; }; log=/tmp/claude-cloud-pnpm-install.log; cd \"$CLAUDE_PROJECT_DIR\" && pnpm install --frozen-lockfile --prefer-offline > \"$log\" 2>&1 || echo \"pnpm install failed; see $log\"",
             "timeout": 600
           }
         ]

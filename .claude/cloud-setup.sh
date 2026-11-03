@@ -15,9 +15,10 @@
 # later sessions start from a fresh clone, so the install a session uses is
 # the `SessionStart` hook in `.claude/settings.json`, which runs offline-first
 # against that store. A plain `bash -c` reads no profile, so the hook sources
-# `env_file` itself; rename it in both places or neither. Setting the
-# environment variable `BASH_ENV` to the same path gives every other
-# non-interactive shell this Node too.
+# `env_file` itself and names it in `CLAUDE_ENV_FILE`, which Claude Code
+# sources before each Bash tool command; rename it in both places or neither.
+# `BASH_ENV` set to the same path is not enough: with it, the Bash tool still
+# found the image's Node 22 first.
 
 set -euxo pipefail
 
@@ -64,16 +65,31 @@ if [ ! -x "${node_dir}/bin/node" ]; then
 fi
 
 # The system store as well as Node's own, for a proxy whose CA only the system
-# trusts.
+# trusts — unless NODE_OPTIONS already names a store: the cloud environment
+# sets `--use-openssl-ca`, and Node.js 25 and later refuse to start with both
+# (exit 9). Decided when the file is sourced, since the setup run and each
+# session read NODE_OPTIONS separately; underscores and tabs are spellings
+# Node.js accepts too.
 cat > "$env_file" << EOF
 export PATH="${node_dir}/bin:\$PATH"
-export NODE_USE_SYSTEM_CA=1
+case " \$(printf '%s' "\${NODE_OPTIONS-}" | tr '_\t' '- ') " in
+  *' --use-openssl-ca '* | *' --use-bundled-ca '*) unset NODE_USE_SYSTEM_CA ;;
+  *) export NODE_USE_SYSTEM_CA=1 ;;
+esac
 EOF
 grep -qF "$env_file" ~/.bashrc 2>/dev/null || echo ". ${env_file}" >> ~/.bashrc
 . "$env_file"
 
+# Every later step runs this Node, and so does the hook: name the cause when
+# it cannot start, rather than fail on whichever command comes first.
+if ! node -e ''; then
+  echo "cloud-setup.sh: ${node_dir}/bin/node does not start with NODE_OPTIONS='${NODE_OPTIONS-}' and NODE_USE_SYSTEM_CA='${NODE_USE_SYSTEM_CA-}' (set by ${env_file})" >&2
+  exit 1
+fi
+
 # Node 25 and later ship no corepack.
-npm install -g "pnpm@$(node -p 'require("./package.json").packageManager.replace(/^pnpm@/, "")')"
+pnpm_version=$(node -p 'require("./package.json").packageManager.replace(/^pnpm@/, "")')
+npm install -g "pnpm@${pnpm_version}"
 
 # Fills the store from the lockfile alone; the hook installs the packages, and
 # a failure here is the hook's to report.
