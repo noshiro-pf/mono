@@ -43,34 +43,24 @@ export type RunningCheck = Readonly<{
 }>;
 
 /**
- * The checks that gate the merge, as GitHub reports them for the head commit.
- * `isRequired` is GitHub's own answer for this pull request, so the list
- * follows the ruleset without this script having to know it.
+ * The head commit's checks, read once: the ones that gate the merge, and every
+ * one that has not finished. Both lists come from the one answer, so they cost
+ * the requests of one read, and on a head whose checks fit on one page they
+ * speak of the same moment.
  */
-export const listRequiredChecks = async (
+export const readHeadChecks = async (
   api: ApiContext,
   prNumber: number,
-): Promise<Result<readonly ReportedCheck[], string>> =>
-  Result.map(await readCheckContexts(api, prNumber), (contexts) =>
-    reportedChecksOf(contexts, 'required'),
-  );
+): Promise<Result<HeadChecks, string>> =>
+  Result.map(await readCheckContexts(api, prNumber), headChecksOf);
 
-/**
- * The checks on the head commit that have not finished, required or not.
- *
- * A required aggregate has no run in a new round until the jobs it waits on are
- * done, so until then the required ones answer with the round before.
- * When that round was the one `skip-ci` skipped, every aggregate reads
- * `skipped` and the commit looks green halfway through its matrix. Anything
- * still running is what says the round is not over, and when it started is what
- * tells a failure of the round before from one of this round.
- */
-export const listRunningChecks = async (
-  api: ApiContext,
-  prNumber: number,
-): Promise<Result<readonly RunningCheck[], string>> =>
-  Result.map(await readCheckContexts(api, prNumber), (contexts) =>
-    reportedChecksOf(contexts, 'all')
+/** The two lists of {@link HeadChecks}, from the contexts of one read. */
+export const headChecksOf = (
+  contexts: readonly CheckContextNode[],
+): HeadChecks =>
+  ({
+    required: reportedChecksOf(contexts, 'required'),
+    running: reportedChecksOf(contexts, 'all')
       .filter((check) => check.bucket === 'pending')
       .map(({ name, startedAt, workflow, link }) => ({
         name,
@@ -78,7 +68,7 @@ export const listRunningChecks = async (
         workflow,
         link,
       })),
-  );
+  }) as const;
 
 /**
  * What the head commit's checks say, as `gh pr checks` said it: each check run
@@ -121,13 +111,13 @@ export const reportedChecksOf = (
 export type CheckContextNode = t.TypeOf<typeof CheckContextNodeSchema>;
 
 /**
- * `checks` is what {@link listRequiredChecks} reported for the head commit;
- * `requiredContexts` is what the ruleset asks for. The difference between the
- * two is the point: a context in the second and not the first has not reported
- * yet, and GitHub will not merge until it does. `running` is every check on the
- * head that has not finished ({@link listRunningChecks}); while it is not empty
- * the required ones may be the round before speaking, so they cannot pass the
- * pull request.
+ * `checks` and `running` are what {@link readHeadChecks} read of the head
+ * commit, its `required` and its `running`; `requiredContexts` is what the
+ * ruleset asks for. The difference between `requiredContexts` and `checks` is
+ * the point: a context in the first and not the second has not reported yet,
+ * and GitHub will not merge until it does. While `running` is not empty the
+ * required ones may be the round before speaking, so they cannot pass the pull
+ * request.
  *
  * Nor can they fail it when they finished before the round still running began:
  * the round `skip-ci` cancelled, as `open-pr` opens every pull request under
@@ -227,6 +217,28 @@ export const describeWaitingOn = (summary: ChecksSummary): string => {
 
   return Arr.isNonEmpty(waiting) ? waiting.join(', ') : 'checks to be reported';
 };
+
+/** What {@link readHeadChecks} reads. */
+export type HeadChecks = Readonly<{
+  /**
+   * The checks that gate the merge, as GitHub reports them for the head commit.
+   * `isRequired` is GitHub's own answer for this pull request, so the list
+   * follows the ruleset without this script having to know it.
+   */
+  required: readonly ReportedCheck[];
+
+  /**
+   * The checks on the head commit that have not finished, required or not.
+   *
+   * A required aggregate has no run in a new round until the jobs it waits on
+   * are done, so until then the required ones answer with the round before.
+   * When that round was the one `skip-ci` skipped, every aggregate reads
+   * `skipped` and the commit looks green halfway through its matrix. Anything
+   * still running is what says the round is not over, and when it started is
+   * what tells a failure of the round before from one of this round.
+   */
+  running: readonly RunningCheck[];
+}>;
 
 /**
  * One page of the head commit's contexts, from `after` on; `null` when the head

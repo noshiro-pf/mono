@@ -1,5 +1,11 @@
+// cspell:ignore unstub
+import { Result } from 'ts-data-forge';
+import * as t from 'ts-fortress';
+import { parseJson, type ApiContext } from '../lib/index.mjs';
 import {
   describeWaitingOn,
+  headChecksOf,
+  readHeadChecks,
   reportedChecksOf,
   summarizeChecks,
   type CheckContextNode,
@@ -468,6 +474,166 @@ describe(reportedChecksOf, () => {
     );
   });
 });
+
+describe(headChecksOf, () => {
+  test('takes the required checks and the running ones from one read', () => {
+    const checks = headChecksOf([
+      checkRun('a', 'COMPLETED', 'SUCCESS'),
+      checkRun('b', 'IN_PROGRESS', null, '2026-10-25T11:00:00Z', {
+        isRequired: false,
+      }),
+      checkRun('c', 'QUEUED', null, null),
+    ]);
+
+    assert.deepStrictEqual(
+      checks.required.map(({ name, bucket }) => `${name}:${bucket}`),
+      ['a:pass', 'c:pending'],
+    );
+
+    assert.deepStrictEqual(checks.running, [
+      {
+        name: 'b',
+        startedAt: '2026-10-25T11:00:00Z',
+        workflow: 'code-check',
+        link: 'https://example.com/b',
+      },
+      {
+        name: 'c',
+        startedAt: '0001-01-01T00:00:00Z',
+        workflow: 'code-check',
+        link: 'https://example.com/c',
+      },
+    ]);
+  });
+});
+
+describe(readHeadChecks, () => {
+  const api: ApiContext = {
+    repo: { owner: 'noshiro-pf', name: 'mono' },
+    token: 'token',
+  } as const;
+
+  // #2786: the required list and the running list were each read on their
+  // own, twice the requests and from two moments.
+  test('sends one request for a head whose checks fit on a page', async () => {
+    const sent = stubRollupPages([
+      [
+        checkRun('a', 'COMPLETED', 'SUCCESS'),
+        checkRun('b', 'IN_PROGRESS', null),
+      ],
+    ]);
+
+    try {
+      const checks = Result.unwrapThrow(await readHeadChecks(api, 1));
+
+      assert.lengthOf(sent, 1);
+
+      assert.deepStrictEqual(
+        checks.required.map(({ name }) => name),
+        ['a', 'b'],
+      );
+
+      assert.deepStrictEqual(
+        checks.running.map(({ name }) => name),
+        ['b'],
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  test('reads each page once and takes both lists from all of them', async () => {
+    const sent = stubRollupPages([
+      [checkRun('a', 'COMPLETED', 'SUCCESS')],
+      [checkRun('b', 'IN_PROGRESS', null)],
+    ]);
+
+    try {
+      const checks = Result.unwrapThrow(await readHeadChecks(api, 1));
+
+      assert.deepStrictEqual(sent, [undefined, 'cursor-1']);
+
+      assert.deepStrictEqual(
+        checks.required.map(({ name }) => name),
+        ['a', 'b'],
+      );
+
+      assert.deepStrictEqual(
+        checks.running.map(({ name }) => name),
+        ['b'],
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
+/**
+ * Stubs `fetch` to answer the rollup query with `pages` in turn, each but the
+ * last pointing at the next by the cursor `cursor-<n>`, and returns the `after`
+ * each request asked from, as it is sent.
+ */
+const stubRollupPages = (
+  pages: readonly (readonly CheckContextNode[])[],
+): readonly (string | undefined)[] => {
+  const mut_sent: (string | undefined)[] = [];
+
+  vi.stubGlobal(
+    'fetch',
+    (_url: string, init?: Readonly<{ body?: unknown }>): Promise<Response> => {
+      const { variables } = Result.unwrapThrow(
+        parseJson(
+          typeof init?.body === 'string' ? init.body : '',
+          t.record({
+            variables: t.record({ after: t.optional(t.string()) }),
+          }),
+          'request',
+        ),
+      );
+
+      const index = mut_sent.length;
+
+      mut_sent.push(variables.after);
+
+      const hasNextPage = index + 1 < pages.length;
+
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            data: {
+              repository: {
+                pullRequest: {
+                  commits: {
+                    nodes: [
+                      {
+                        commit: {
+                          statusCheckRollup: {
+                            contexts: {
+                              pageInfo: {
+                                hasNextPage,
+                                endCursor: hasNextPage
+                                  ? `cursor-${index + 1}`
+                                  : null,
+                              },
+                              nodes: pages[index] ?? [],
+                            },
+                          },
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          }),
+          { status: 200 },
+        ),
+      );
+    },
+  );
+
+  return mut_sent;
+};
 
 const checkRun = (
   name: string,

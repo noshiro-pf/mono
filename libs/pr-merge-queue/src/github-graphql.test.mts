@@ -33,8 +33,8 @@ import { createClient } from './pr-report/index.mjs';
 import {
   armAutoMerge,
   listPullRequests,
-  listRequiredChecks,
   readBaseChanges,
+  readHeadChecks,
   readIssueOrder,
   readNativeStack,
   readOwnComments,
@@ -147,7 +147,7 @@ const sendEveryQuery = async (): Promise<readonly Sent[]> => {
 
     await armAutoMerge(api, 'PR_node');
 
-    await listRequiredChecks(api, 1);
+    await readHeadChecks(api, 1);
 
     await markReady(api, 'PR_node');
 
