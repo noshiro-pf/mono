@@ -1,10 +1,10 @@
 import {
   createMemoryBrowser,
-  createRouter,
   type MemoryBrowser,
   type Router,
-} from 'tiny-router-observable';
-import { defaultValues } from '../constants/index.mjs';
+} from 'synstate-router';
+import { Optional } from 'ts-data-forge';
+import { defaultValues, type Routes } from '../constants/index.mjs';
 import { calcAll } from '../functions/index.mjs';
 import {
   BorrowingTotal,
@@ -13,6 +13,7 @@ import {
   PercentFloat,
   Year,
 } from '../types/index.mjs';
+import { createLoanRouter } from './loan-router.mjs';
 import { createLoanStore, type LoanStore } from './loan-store.mjs';
 
 describe(createLoanStore, () => {
@@ -35,7 +36,7 @@ describe(createLoanStore, () => {
     });
   });
 
-  test('keeps the value before it for a parameter that is missing, or a repayment type that is not one', () => {
+  test('reads a parameter that is missing, or a repayment type that is not one, as its default', () => {
     const { store } = setup(
       'https://example.com/mono/loan/?repayment-type=monthly&interest-rate=2',
     );
@@ -110,23 +111,68 @@ describe(createLoanStore, () => {
     });
   });
 
-  test('keeps the value before it when the URL changes to one that is not valid', () => {
+  test('reads a URL that is not valid as the defaults, whatever was set before', () => {
     const { store, router } = setup('https://example.com/mono/loan/');
 
     store.setBorrowingTotalManYen(BorrowingTotal.cast(4000));
 
     store.setBorrowingPeriodYear(Year.cast(10));
 
-    store.setInterestRatePercentPerYear(PercentFloat.cast(0.8));
+    router.push(
+      Optional.unwrapThrow(
+        router.parseHref(
+          '?borrowing-total=abc&borrowing-period=-1&interest-rate=101',
+        ),
+      ),
+    );
 
-    router.push('/?borrowing-total=abc&borrowing-period=-1&interest-rate=101');
+    assert.deepStrictEqual(store.inputs.getSnapshot().value, defaultValues);
+  });
+
+  test('going back to a URL that names nothing brings back the defaults', async () => {
+    const { store, router } = setup('https://example.com/mono/loan/');
+
+    store.setBorrowingTotalManYen(BorrowingTotal.cast(4000));
+
+    router.back();
+
+    await settle();
+
+    assert.deepStrictEqual(store.inputs.getSnapshot().value, defaultValues);
+  });
+
+  test('a URL off the page, such as its index.html, goes to the page with the inputs its query holds', () => {
+    const { store, browser } = setup(
+      'https://example.com/mono/loan/index.html?borrowing-total=3000&borrowing-period=abc#table',
+    );
+
+    assert.strictEqual(browser.url().pathname, '/mono/loan/');
+
+    assert.strictEqual(browser.url().hash, '#table');
 
     assert.deepStrictEqual(store.inputs.getSnapshot().value, {
       ...defaultValues,
-      borrowingTotalManYen: BorrowingTotal.cast(4000),
-      borrowingPeriodYear: Year.cast(10),
-      interestRatePercentPerYear: PercentFloat.cast(0.8),
+      borrowingTotalManYen: BorrowingTotal.cast(3000),
     });
+
+    store.setBorrowingPeriodYear(Year.cast(10));
+
+    assert.strictEqual(
+      browser.url().searchParams.get('borrowing-period'),
+      '10',
+    );
+  });
+
+  test('a setter keeps the hash and the parameters the page does not declare', () => {
+    const { store, browser } = setup(
+      'https://example.com/mono/loan/?utm_source=x#table',
+    );
+
+    store.setBorrowingTotalManYen(BorrowingTotal.cast(4000));
+
+    assert.strictEqual(browser.url().searchParams.get('utm_source'), 'x');
+
+    assert.strictEqual(browser.url().hash, '#table');
   });
 
   test('a setter writes every input to the URL below the base path', () => {
@@ -166,14 +212,16 @@ describe(createLoanStore, () => {
     });
   });
 
-  test('going back in the history brings back the inputs before', () => {
-    const { store, browser } = setup('https://example.com/mono/loan/');
+  test('going back in the history brings back the inputs before', async () => {
+    const { store, router } = setup('https://example.com/mono/loan/');
 
     store.setBorrowingPeriodYear(Year.cast(10));
 
     store.setBorrowingPeriodYear(Year.cast(20));
 
-    browser.history.back();
+    router.back();
+
+    await settle();
 
     assert.strictEqual(
       store.inputs.getSnapshot().value.borrowingPeriodYear,
@@ -208,13 +256,13 @@ describe(createLoanStore, () => {
 type Setup = Readonly<{
   store: LoanStore;
   browser: MemoryBrowser;
-  router: Router;
+  router: Router<Routes>;
 }>;
 
 const setup = (href: string): Setup => {
   const browser = createMemoryBrowser(href);
 
-  const router = createRouter({ basePath: '/mono/loan/', browser });
+  const router = createLoanRouter({ basePath: '/mono/loan/', browser });
 
   const store = createLoanStore({ router, calcDelayMs: 0 });
 
