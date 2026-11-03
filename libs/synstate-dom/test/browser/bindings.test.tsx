@@ -103,6 +103,33 @@ describe('attributes', () => {
     );
   });
 
+  test('writes autocorrect and async as properties, whose false an absent attribute is not (#3000)', () => {
+    const [on$, setOn] = createState(false);
+
+    const { container } = mountInto(() => (
+      <div>
+        <input autocorrect={on$} />
+        <script async={on$} />
+      </div>
+    ));
+
+    const input = container.querySelector('input');
+
+    const script = container.querySelector('script');
+
+    // Autocorrection is on, and a script made by createElement is async, with
+    // no attribute.
+    assert.deepStrictEqual([input?.autocorrect, script?.async], [false, false]);
+
+    setOn(true);
+
+    assert.deepStrictEqual([input?.autocorrect, script?.async], [true, true]);
+
+    setOn(false);
+
+    assert.deepStrictEqual([input?.autocorrect, script?.async], [false, false]);
+  });
+
   test('takes aria-* and data-* attributes', () => {
     const [expanded$, setExpanded] = createState('false');
 
