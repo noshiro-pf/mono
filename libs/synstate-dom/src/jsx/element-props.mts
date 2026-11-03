@@ -18,6 +18,8 @@ import type { EventPropNames } from './event-prop-names.mjs';
  * - `style` is either a `cssText` string or an object of CSS properties, each
  *   bound with `style.setProperty`, so the keys are the hyphenated names
  *   (`'background-color'`, `'--accent'`).
+ * - An `aria-*` attribute also takes a number (`aria-level`, `aria-valuenow`)
+ *   and a boolean, written as `"true"` or `"false"`.
  */
 export type CommonElementProps<E extends Element> = Readonly<{
   ref?: (element: E) => void;
@@ -27,10 +29,11 @@ export type CommonElementProps<E extends Element> = Readonly<{
 }> &
   Partial<
     ReadonlyRecord<
-      `aria-${string}` | `data-${string}`,
-      Bindable<string | undefined>
+      `aria-${string}`,
+      Bindable<boolean | number | string | undefined>
     >
-  >;
+  > &
+  Partial<ReadonlyRecord<`data-${string}`, Bindable<string | undefined>>>;
 
 /** `class` as one `Bindable<boolean>` per class name. */
 export type ClassObject = ReadonlyRecord<string, Bindable<boolean>>;

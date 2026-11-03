@@ -3,7 +3,7 @@ title: Elements
 description: Attributes, properties, class, style, events, ref and SVG.
 ---
 
-The props of an intrinsic element are generated from `lib.dom.d.ts`, so your editor completes them and checks their types. Each writable primitive DOM property of the element (`id`, `disabled`, `value`, `tabIndex`, …) takes a `Bindable` of its type, `aria-*` and `data-*` take a `Bindable<string>`, and each event gets its own handler.
+The props of an intrinsic element are generated from `lib.dom.d.ts`, so your editor completes them and checks their types. Each writable primitive DOM property of the element (`id`, `disabled`, `value`, `tabIndex`, …) takes a `Bindable` of its type, `aria-*` takes a `Bindable` of a string, a number or a boolean (written as `"true"` / `"false"`), `data-*` takes a `Bindable<string>`, and each event gets its own handler.
 
 ## Attributes and properties
 

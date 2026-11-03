@@ -3,7 +3,7 @@ title: 要素
 description: 属性、プロパティ、class、style、イベント、ref、SVG。
 ---
 
-組み込み要素の props は `lib.dom.d.ts` から生成しているので、エディタで補完が効き、型もチェックされます。要素の書き込み可能なプリミティブ型の DOM プロパティ（`id`、`disabled`、`value`、`tabIndex` など）にはその型の `Bindable` を、`aria-*` と `data-*` には `Bindable<string>` を渡します。イベントにはそれぞれのハンドラを渡します。
+組み込み要素の props は `lib.dom.d.ts` から生成しているので、エディタで補完が効き、型もチェックされます。要素の書き込み可能なプリミティブ型の DOM プロパティ（`id`、`disabled`、`value`、`tabIndex` など）にはその型の `Bindable` を、`aria-*` には文字列・数値・真偽値（`"true"` / `"false"` と書き込みます）の `Bindable` を、`data-*` には `Bindable<string>` を渡します。イベントにはそれぞれのハンドラを渡します。
 
 ## 属性とプロパティ
 
