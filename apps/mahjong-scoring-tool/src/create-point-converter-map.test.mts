@@ -111,6 +111,24 @@ describe('createPointMap', () => {
         [10_000, -25],
       ],
     },
+    {
+      /**
+       * ```txt
+       *    [32.2, 23.1,  22.5,  22.2]
+       * -> [ 2.2, -6.9,  -7.5,  -7.8] (subtract oka (30))
+       * -> [17.2, -1.9, -12.5, -22.8] (add uma ([15, 5, -5, -15]))
+       * -> [37.2, -1.9, -12.5, -22.8] (add top bonus (20))
+       * ```
+       */
+      case: 'scores that are not multiples of 1000',
+      input: [32_200, 23_100, 22_500, 22_200],
+      output: [
+        [32_200, 37.2],
+        [23_100, -1.9],
+        [22_500, -12.5],
+        [22_200, -22.8],
+      ],
+    },
   ] as const satisfies readonly Readonly<{
     case: string;
     input: FixedLengthTuple<4, number>;
@@ -120,8 +138,10 @@ describe('createPointMap', () => {
 
     expect(Arr.sum(input)).toBe(100_000);
 
+    // Within rounding: 37.2 - 1.9 - 12.5 - 22.8 is not exactly 0 in floating
+    // point.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(Arr.sum(input.map((x) => result.get(x)!))).toBe(0);
+    expect(Arr.sum(input.map((x) => result.get(x)!))).toBeCloseTo(0, 10);
 
     expect(Array.from(result)).toStrictEqual(output);
   });
