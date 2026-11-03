@@ -44,6 +44,7 @@
     "check:prose:markdown-wrap": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-markdown-wrap/main.mts",
     "check:prose:markdownlint-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-markdownlint-config.mts",
     "check:prose:mono-links": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-mono-links.mts",
+    "check:prose:nested-gitignore": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-nested-gitignore.mts",
     "check:prose:next-major": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-next-major.mts",
     "check:prose:readme-sample-coverage": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-readme-sample-coverage.mts",
     "check:prose:site-fragments": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-site-fragments.mts",

@@ -68,10 +68,9 @@ see "Japanese text".
 Workspace globs are in `pnpm-workspace.yaml`; a directory is a member only
 with a `package.json`; `tools/configs/` and `tools/scripts/` have none by design.
 
-**One `.gitignore`, at the root**, and one deliberate package-level
-`.prettierignore` (`languages/sumi/conformance/`). Each says why in its own
-header, and a third of either kind has to answer them first: Prettier reads
-ignore files from one directory and no other.
+**One `.gitignore`, at the root** (`check:prose:nested-gitignore`), and one
+deliberate package-level `.prettierignore` (`languages/sumi/conformance/`),
+whose header says why; another has to answer it first.
 
 Inside a package: `src/` (`entry-point.mts` or `index.mts` is the public
 entry; `src/cmd/` for CLIs), `test/` (`test/browser/` for DOM tests),
