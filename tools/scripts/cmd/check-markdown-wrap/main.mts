@@ -35,15 +35,22 @@ export const checkMarkdownWrap = async (
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- a path git listed as changed
     const text = await fs.readFile(absolutePath, 'utf8');
 
-    const config = await prettier.resolveConfig(absolutePath);
+    // As the Prettier CLI resolves it, which reads `.editorconfig`; the API
+    // does only when asked.
+    const config = await prettier.resolveConfig(absolutePath, {
+      editorconfig: true,
+    });
 
-    const refills = unfilledRuns(
-      text,
-      isTouched,
-      config?.printWidth ?? DEFAULT_PRINT_WIDTH,
-    );
+    const printWidth = config?.printWidth ?? DEFAULT_PRINT_WIDTH;
 
     mut_files += 1;
+
+    // `max_line_length = off`: no width to fill to.
+    if (!Number.isFinite(printWidth)) {
+      continue;
+    }
+
+    const refills = unfilledRuns(text, isTouched, printWidth);
 
     if (!Arr.isNonEmpty(refills)) {
       continue;

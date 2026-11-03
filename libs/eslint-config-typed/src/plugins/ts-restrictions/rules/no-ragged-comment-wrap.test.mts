@@ -1,6 +1,10 @@
 // cspell:ignore adipiscing amet eiusmod elit incididunt tempor unconfigured
 import parser from '@typescript-eslint/parser';
-import { RuleTester, type ValidTestCase } from '@typescript-eslint/rule-tester';
+import {
+  RuleTester,
+  type InvalidTestCase,
+  type ValidTestCase,
+} from '@typescript-eslint/rule-tester';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import * as path from 'node:path';
@@ -23,6 +27,11 @@ const lines = (...xs: readonly string[]): string => xs.join('\n');
 const temporaryRoot = mkdtempSync(
   path.join(tmpdir(), 'no-ragged-comment-wrap-'),
 );
+
+// The root `.editorconfig`, so that no fixture reads one above the temporary
+// directory.
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- inside a fresh temporary directory
+writeFileSync(path.join(temporaryRoot, '.editorconfig'), 'root = true\n');
 
 /**
  * `file` (a path relative to a fresh directory) in a directory holding `files`,
@@ -56,6 +65,26 @@ type Options = readonly [Readonly<{ printWidth?: number }>?];
 const inUnconfigured = <T extends ValidTestCase<Options>>(
   cases: readonly T[],
 ): readonly T[] => cases.map((c) => ({ filename: unconfigured, ...c }));
+
+/**
+ * A two-line paragraph that fits on one line at any width of 20 or more, so
+ * that the reported `printWidth` says which configuration was read.
+ */
+const widthCase = (
+  name: string,
+  filename: string,
+  printWidth: number,
+): InvalidTestCase<'raggedWrap', Options> =>
+  ({
+    name,
+    code: lines('// Lorem ipsum', '// dolor'),
+    output: lines('// Lorem ipsum dolor'),
+    filename,
+    errors: [{ messageId: 'raggedWrap', data: { word: 'dolor', printWidth } }],
+  }) as const;
+
+const editorconfig = (...xs: readonly string[]): string =>
+  `${lines('root = true', ...xs)}\n` as const;
 
 describe('no-ragged-comment-wrap', () => {
   tester.run('no-ragged-comment-wrap', noRaggedCommentWrap, {
@@ -385,6 +414,13 @@ describe('no-ragged-comment-wrap', () => {
           'package.json': '{ "prettier": { "printWidth": 40 } }',
         }),
       },
+      {
+        name: 'an .editorconfig max_line_length of off checks nothing',
+        code: lines('// Lorem ipsum', '// dolor'),
+        filename: fileBeside({
+          '.editorconfig': editorconfig('[*]', 'max_line_length = off'),
+        }),
+      },
     ]),
     invalid: inUnconfigured([
       {
@@ -630,6 +666,274 @@ describe('no-ragged-comment-wrap', () => {
           { messageId: 'raggedWrap', data: { word: 'dolor', printWidth: 80 } },
         ],
       },
+      widthCase(
+        "an .editorconfig's max_line_length",
+        fileBeside({
+          '.editorconfig': editorconfig('[*]', 'max_line_length = 32'),
+        }),
+        32,
+      ),
+      widthCase(
+        'an .editorconfig section for other files is passed over',
+        fileBeside({
+          '.editorconfig': editorconfig('[*.md]', 'max_line_length = 32'),
+        }),
+        80,
+      ),
+      widthCase(
+        'an .editorconfig section with a brace list and a path',
+        fileBeside(
+          {
+            '.editorconfig': editorconfig(
+              '[src/**.{js,ts}]',
+              'max_line_length = 32',
+            ),
+          },
+          'src/a/file.ts',
+        ),
+        32,
+      ),
+      widthCase(
+        'an .editorconfig section whose ** matches no directory',
+        fileBeside(
+          {
+            '.editorconfig': editorconfig(
+              '[src/**/file.ts]',
+              'max_line_length = 32',
+            ),
+          },
+          'src/file.ts',
+        ),
+        32,
+      ),
+      widthCase(
+        'an .editorconfig section with a negated class',
+        fileBeside({
+          '.editorconfig': editorconfig('[[!f]*.ts]', 'max_line_length = 32'),
+        }),
+        80,
+      ),
+      widthCase(
+        'an .editorconfig section with a slash is relative to its directory',
+        fileBeside(
+          {
+            '.editorconfig': editorconfig('[/src/*]', 'max_line_length = 32'),
+          },
+          'lib/src/file.ts',
+        ),
+        80,
+      ),
+      widthCase(
+        'a later .editorconfig section wins',
+        fileBeside({
+          '.editorconfig': editorconfig(
+            '[*.ts]',
+            'max_line_length = 50',
+            '[*]',
+            'max_line_length = 32',
+          ),
+        }),
+        32,
+      ),
+      widthCase(
+        'an .editorconfig that does not parse sets nothing',
+        fileBeside({
+          '.editorconfig': editorconfig(
+            '[*]',
+            'max_line_length = 32',
+            'not a property',
+          ),
+        }),
+        80,
+      ),
+      widthCase(
+        'an .editorconfig that cannot be read sets nothing',
+        fileBeside(
+          {
+            '.editorconfig': editorconfig('[*]', 'max_line_length = 32'),
+            'sub/.editorconfig/placeholder': '',
+          },
+          'sub/file.ts',
+        ),
+        32,
+      ),
+      widthCase(
+        'an .editorconfig section named twice is one section',
+        fileBeside({
+          '.editorconfig': editorconfig(
+            '[*.ts]',
+            'max_line_length = 50',
+            '[*]',
+            'max_line_length = 32',
+            '[*.ts]',
+            'indent_size = 2',
+          ),
+        }),
+        32,
+      ),
+      widthCase(
+        'an empty Prettier override glob matches nothing',
+        fileBeside({
+          '.prettierrc': JSON.stringify({
+            overrides: [
+              { files: ['', '*.ts'], options: { printWidth: 32 } },
+              { files: '', options: { printWidth: 50 } },
+            ],
+          }),
+        }),
+        32,
+      ),
+      widthCase(
+        'a Prettier override that is not an object is passed over',
+        fileBeside({
+          '.prettierrc': JSON.stringify({
+            overrides: ['*.ts', { files: '*.ts', options: { printWidth: 32 } }],
+          }),
+        }),
+        32,
+      ),
+      widthCase(
+        'a nearer .editorconfig wins',
+        fileBeside(
+          {
+            '.editorconfig': editorconfig('[*]', 'max_line_length = 50'),
+            'sub/.editorconfig': lines('[*]', 'max_line_length = 32'),
+          },
+          'sub/file.ts',
+        ),
+        32,
+      ),
+      widthCase(
+        'an .editorconfig above a root one is not read',
+        fileBeside(
+          {
+            '.editorconfig': editorconfig('[*]', 'max_line_length = 32'),
+            'sub/.editorconfig': editorconfig('[*.md]', 'max_line_length = 50'),
+          },
+          'sub/file.ts',
+        ),
+        80,
+      ),
+      widthCase(
+        'an .editorconfig above the project root is not read',
+        fileBeside(
+          {
+            '.editorconfig': lines('[*]', 'max_line_length = 32'),
+            'repo/.git': 'gitdir: elsewhere\n',
+          },
+          'repo/file.ts',
+        ),
+        80,
+      ),
+      widthCase(
+        'a .git directory marks the project root',
+        fileBeside(
+          {
+            '.editorconfig': lines('[*]', 'max_line_length = 32'),
+            'repo/.git/HEAD': 'ref: refs/heads/main\n',
+          },
+          'repo/file.ts',
+        ),
+        80,
+      ),
+      widthCase(
+        'a .hg directory marks the project root',
+        fileBeside(
+          {
+            '.editorconfig': lines('[*]', 'max_line_length = 32'),
+            'repo/.hg/requires': '',
+          },
+          'repo/file.ts',
+        ),
+        80,
+      ),
+      widthCase(
+        'a .hg file does not mark the project root',
+        fileBeside(
+          {
+            '.editorconfig': lines('[*]', 'max_line_length = 32'),
+            'repo/.hg': '',
+          },
+          'repo/file.ts',
+        ),
+        32,
+      ),
+      widthCase(
+        'a Prettier printWidth comes before max_line_length = off',
+        fileBeside({
+          '.prettierrc': '{ "printWidth": 32 }',
+          '.editorconfig': editorconfig('[*]', 'max_line_length = off'),
+        }),
+        32,
+      ),
+      widthCase(
+        'a Prettier printWidth comes before the .editorconfig',
+        fileBeside({
+          '.prettierrc': '{ "printWidth": 32 }',
+          '.editorconfig': editorconfig('[*]', 'max_line_length = 50'),
+        }),
+        32,
+      ),
+      widthCase(
+        'a Prettier configuration that is not JSON leaves the .editorconfig',
+        fileBeside({
+          '.prettierrc.yaml': 'semi: false\n',
+          '.editorconfig': editorconfig('[*]', 'max_line_length = 32'),
+        }),
+        32,
+      ),
+      widthCase(
+        'a Prettier override for the file',
+        fileBeside({
+          '.prettierrc': JSON.stringify({
+            printWidth: 50,
+            overrides: [
+              { files: '*.md', options: { printWidth: 60 } },
+              { files: ['*.ts'], options: { printWidth: 32 } },
+            ],
+          }),
+        }),
+        32,
+      ),
+      widthCase(
+        'a Prettier override comes before the .editorconfig',
+        fileBeside({
+          'package.json': JSON.stringify({
+            prettier: {
+              overrides: [{ files: '*.ts', options: { printWidth: 32 } }],
+            },
+          }),
+          '.editorconfig': editorconfig('[*]', 'max_line_length = 50'),
+        }),
+        32,
+      ),
+      widthCase(
+        'a Prettier override with a path is relative to the configuration',
+        fileBeside(
+          {
+            '.prettierrc': JSON.stringify({
+              overrides: [{ files: 'sub/**', options: { printWidth: 32 } }],
+            }),
+          },
+          'sub/dir/file.ts',
+        ),
+        32,
+      ),
+      widthCase(
+        'a Prettier override excluding the file',
+        fileBeside({
+          '.prettierrc': JSON.stringify({
+            overrides: [
+              {
+                files: '*.ts',
+                excludeFiles: 'file.ts',
+                options: { printWidth: 32 },
+              },
+            ],
+          }),
+        }),
+        80,
+      ),
     ]),
   });
 });

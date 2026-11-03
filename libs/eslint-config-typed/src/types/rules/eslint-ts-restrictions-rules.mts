@@ -156,7 +156,7 @@ namespace NoRaggedCommentWrap {
    *       "printWidth": {
    *         "type": "integer",
    *         "minimum": 1,
-   *         "description": "The width to wrap comments at (default: the nearest JSON Prettier configuration's `printWidth`, else 80)"
+   *         "description": "The width to wrap comments at (default: the nearest JSON Prettier configuration's `printWidth` for the file, else the `.editorconfig` `max_line_length`, else 80)"
    *       }
    *     },
    *     "additionalProperties": false
@@ -166,7 +166,7 @@ namespace NoRaggedCommentWrap {
    */
   export type Options = Readonly<{
     /**
-     * The width to wrap comments at (default: the nearest JSON Prettier configuration's `printWidth`, else 80)
+     * The width to wrap comments at (default: the nearest JSON Prettier configuration's `printWidth` for the file, else the `.editorconfig` `max_line_length`, else 80)
      */
     printWidth?: number;
   }>;

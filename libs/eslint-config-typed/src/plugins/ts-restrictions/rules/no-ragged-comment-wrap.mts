@@ -4,10 +4,16 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { existsSync, readFileSync } from 'node:fs';
+import { parseSync as parseEditorconfig } from 'editorconfig-without-wasm';
+import mm from 'micromatch';
+import { existsSync, lstatSync, readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
-import type { DeepReadonly, FixedLengthTuple } from 'ts-type-forge';
+import type {
+  DeepReadonly,
+  FixedLengthTuple,
+  ReadonlyRecord,
+} from 'ts-type-forge';
 
 type Options = readonly [
   Readonly<{
@@ -67,15 +73,18 @@ type MessageIds = 'raggedWrap';
  *
  * ## Print width
  *
- * The `printWidth` option; or else that of the nearest Prettier configuration
- * above the file, looked for as Prettier does — the `prettier` key of a
- * `package.json`, then `.prettierrc` and the other `.prettierrc.*` and
- * `prettier.config.*` files; or else 80, Prettier's default. Only JSON is read
- * (`package.json`, `.prettierrc`, `.prettierrc.json`): the nearest
- * configuration in another format, or one naming a shared configuration, gives
- * 80, and neither a `printWidth` set only in `overrides` nor an `.editorconfig`
- * `max_line_length` (which Prettier reads when its own configuration sets no
- * `printWidth`) is seen. Pass the option for any of these.
+ * The `printWidth` option; or else the width Prettier would resolve for the
+ * file: that of the nearest Prettier configuration above it, looked for as
+ * Prettier does — the `prettier` key of a `package.json`, then `.prettierrc`
+ * and the other `.prettierrc.*` and `prettier.config.*` files — with the
+ * `overrides` whose `files` match the file applied; or else the
+ * `max_line_length` of the `.editorconfig` files from the file's directory up
+ * to the project root (the nearest directory with `.git`) or the first
+ * `root = true`; or else 80, Prettier's default. A `max_line_length` of `off`
+ * turns the rule off. Only JSON configurations are read (`package.json`,
+ * `.prettierrc`, `.prettierrc.json`): the nearest configuration in another
+ * format, or one naming a shared configuration, is taken to set no width, so
+ * the search goes on to `.editorconfig`. Pass the option for those.
  *
  * ## Fix
  *
@@ -102,7 +111,7 @@ export const noRaggedCommentWrap: TSESLint.RuleModule<MessageIds, Options> = {
             type: 'integer',
             minimum: 1,
             description:
-              "The width to wrap comments at (default: the nearest JSON Prettier configuration's `printWidth`, else 80)",
+              "The width to wrap comments at (default: the nearest JSON Prettier configuration's `printWidth` for the file, else the `.editorconfig` `max_line_length`, else 80)",
           },
         },
         additionalProperties: false,
@@ -120,8 +129,8 @@ export const noRaggedCommentWrap: TSESLint.RuleModule<MessageIds, Options> = {
 
     // Looked up only for a file with a paragraph to judge.
     const printWidth = (): number => {
-      mut_printWidth ??= printWidthOfPrettierConfig(
-        path.resolve(path.dirname(context.physicalFilename)),
+      mut_printWidth ??= resolvePrintWidth(
+        path.resolve(context.physicalFilename),
       );
 
       return mut_printWidth;
@@ -153,6 +162,13 @@ type FileContext = Readonly<{
   printWidth: () => number;
   /** The fix writes `\n`, so a file with `\r` in it is left alone. */
   hasCarriageReturn: boolean;
+}>;
+
+/** A Prettier configuration found, and the directory it applies from. */
+type FoundConfig = Readonly<{
+  dir: string;
+  /** The parsed options; anything but a record sets nothing. */
+  options: unknown;
 }>;
 
 /** One line of a comment, split into its prefix and its text. */
@@ -277,18 +293,17 @@ const parseJson = (file: string): unknown => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     return JSON.parse(readFileSync(file, 'utf8'));
   } catch {
-    return undefined;
+    return null;
   }
 };
 
 /**
- * The `printWidth` of the Prettier configuration in `dir`, searched for in the
- * order Prettier searches: a number, `null` when there is a configuration that
- * sets none or that the rule cannot read (a `.prettierrc.yaml`, a
- * `prettier.config.mjs`, a `"prettier": "@org/config"` reference), `undefined`
- * when there is none.
+ * The Prettier configuration in `dir`, searched for in the order Prettier
+ * searches, or `undefined` when there is none. One the rule cannot read (a
+ * `.prettierrc.yaml`, a `prettier.config.mjs`, a `"prettier": "@org/config"`
+ * reference) has `null` or a string for its options.
  */
-const printWidthIn = (dir: string): number | null | undefined => {
+const prettierConfigIn = (dir: string): FoundConfig | undefined => {
   const packageJson = path.join(dir, 'package.json');
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- the package.json in a directory above the file
@@ -296,7 +311,7 @@ const printWidthIn = (dir: string): number | null | undefined => {
     const manifest = parseJson(packageJson);
 
     if (isRecord(manifest) && hasKey(manifest, 'prettier')) {
-      return printWidthInJson(manifest.prettier) ?? null;
+      return { dir, options: manifest.prettier };
     }
   }
 
@@ -308,7 +323,7 @@ const printWidthIn = (dir: string): number | null | undefined => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- the same file
     /^prettier:/mu.test(readFileSync(packageYaml, 'utf8'))
   ) {
-    return null;
+    return { dir, options: null };
   }
 
   for (const name of ['.prettierrc', '.prettierrc.json'] as const) {
@@ -316,7 +331,7 @@ const printWidthIn = (dir: string): number | null | undefined => {
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- a Prettier configuration file looked for by name
     if (existsSync(file)) {
-      return printWidthInJson(parseJson(file)) ?? null;
+      return { dir, options: parseJson(file) };
     }
   }
 
@@ -324,26 +339,147 @@ const printWidthIn = (dir: string): number | null | undefined => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- a Prettier configuration file looked for by name
     existsSync(path.join(dir, name)),
   )
-    ? null
+    ? { dir, options: null }
     : undefined;
 };
 
-/**
- * The `printWidth` of the Prettier configuration nearest to `dir`, or 80 when
- * it sets none, cannot be read, or there is none. Not cached, so that an editor
- * that keeps ESLint running sees a change to it.
- */
-const printWidthOfPrettierConfig = (dir: string): number => {
-  const found = printWidthIn(dir);
-
+const nearestPrettierConfig = (dir: string): FoundConfig | undefined => {
   const parent = path.dirname(dir);
 
-  return found === undefined
-    ? parent === dir
-      ? DEFAULT_PRINT_WIDTH
-      : printWidthOfPrettierConfig(parent)
-    : (found ?? DEFAULT_PRINT_WIDTH);
+  return (
+    prettierConfigIn(dir) ??
+    (parent === dir ? undefined : nearestPrettierConfig(parent))
+  );
 };
+
+/**
+ * A glob or a list of globs, as `files` and `excludeFiles` take them. An empty
+ * one is dropped, since micromatch throws on it.
+ */
+const globsIn = (value: unknown): readonly string[] =>
+  (typeof value === 'string'
+    ? ([value] as const)
+    : Arr.isArray(value)
+      ? value.filter((v) => typeof v === 'string')
+      : ([] as const)
+  ).filter((g) => g !== '');
+
+/**
+ * Whether an `overrides` entry applies to `file`, a path relative to the
+ * configuration, matched as Prettier matches it: a glob with no `/` against the
+ * file name alone.
+ */
+const overrideApplies = (
+  file: string,
+  override: ReadonlyRecord<string, unknown>,
+): boolean => {
+  const ignore = globsIn(override['excludeFiles']);
+
+  const globs = globsIn(override['files']);
+
+  return (
+    mm.isMatch(
+      file,
+      globs.filter((g) => !g.includes('/')),
+      { ignore, basename: true, dot: true },
+    ) ||
+    mm.isMatch(
+      file,
+      globs.filter((g) => g.includes('/')),
+      { ignore, basename: false, dot: true },
+    )
+  );
+};
+
+/**
+ * The `printWidth` the nearest Prettier configuration gives `file`, its
+ * `overrides` applied in order, or `undefined` when it sets none, cannot be
+ * read, or there is none.
+ */
+const printWidthOfPrettierConfig = (file: string): number | undefined => {
+  const found = nearestPrettierConfig(path.dirname(file));
+
+  if (found === undefined || !isRecord(found.options)) {
+    return undefined;
+  }
+
+  const relative = path.relative(found.dir, file);
+
+  const overrides: readonly unknown[] = Arr.isArray(found.options['overrides'])
+    ? found.options['overrides']
+    : ([] as const);
+
+  return overrides.reduce<number | undefined>(
+    (acc, override) =>
+      isRecord(override) && overrideApplies(relative, override)
+        ? (printWidthInJson(override['options']) ?? acc)
+        : acc,
+    printWidthInJson(found.options),
+  );
+};
+
+/**
+ * The directory Prettier stops looking for `.editorconfig` files at: the
+ * nearest one at or above `dir` holding `.git` of any kind (a file in a
+ * worktree or a submodule; a symbolic link is not followed) or a `.hg`
+ * directory.
+ */
+const projectRoot = (dir: string): string | undefined => {
+  const parent = path.dirname(dir);
+
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a marker in a directory above the file
+    lstatSync(path.join(dir, '.git'));
+
+    return dir;
+  } catch {
+    // None here.
+  }
+
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a marker in a directory above the file
+    if (lstatSync(path.join(dir, '.hg')).isDirectory()) {
+      return dir;
+    }
+  } catch {
+    // None here.
+  }
+
+  return parent === dir ? undefined : projectRoot(parent);
+};
+
+/**
+ * The `max_line_length` the `.editorconfig` files give `file`, read by the
+ * `editorconfig` fork Prettier bundles, from the file's directory up to the
+ * project root or the first `root = true`. `off` is `Infinity`; anything but
+ * `off` or a positive integer sets nothing.
+ */
+const printWidthOfEditorconfig = (file: string): number | undefined => {
+  const root = projectRoot(path.dirname(file));
+
+  const { max_line_length: maxLineLength } = parseEditorconfig(
+    file,
+    root === undefined ? {} : { root },
+  );
+
+  return maxLineLength === 'off'
+    ? Number.POSITIVE_INFINITY
+    : typeof maxLineLength === 'number' &&
+        Number.isSafeInteger(maxLineLength) &&
+        maxLineLength > 0
+      ? maxLineLength
+      : undefined;
+};
+
+/**
+ * The print width Prettier would resolve for `file`: its configuration's, else
+ * its `.editorconfig`'s, else 80. Not cached, so that an editor that keeps
+ * ESLint running sees a change to either.
+ */
+const resolvePrintWidth = (file: string): number =>
+  printWidthOfPrettierConfig(file) ??
+  printWidthOfEditorconfig(file) ??
+  DEFAULT_PRINT_WIDTH;
 
 /** How a line's text reads, before the context of its neighbors. */
 const kindOf = (text: string): CommentLine['kind'] => {
@@ -667,6 +803,11 @@ const reportSegment = (
   segment: readonly CommentLine[],
 ): void => {
   const printWidth = printWidthOf();
+
+  // `max_line_length = off`: no width to fill to.
+  if (!Number.isFinite(printWidth)) {
+    return;
+  }
 
   const ragged = segment.findIndex((l, i) => {
     const next = segment[i + 1];
