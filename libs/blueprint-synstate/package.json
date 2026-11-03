@@ -46,7 +46,7 @@
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:index gen:readme",
     "gen:index": "run-s gen:index:src fix:fmt",
-    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude \"internal/**\"",
+    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude \"internal/**\" --exclude \"components/button-parts.tsx\"",
     "gen:readme": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
     "test": "pnpm run check:test",
     "test:cov:ui": "vite preview --outDir ./coverage",

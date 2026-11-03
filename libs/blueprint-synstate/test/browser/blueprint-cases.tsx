@@ -4,16 +4,19 @@
 import * as Blueprint from '@blueprintjs/core';
 import * as BlueprintDatetime from '@blueprintjs/datetime';
 import {
+  AnchorButton,
   Button,
   ButtonGroup,
   Callout,
   Card,
   Checkbox,
   Collapse,
+  ControlGroup,
   DateInput,
   DatePicker,
   FileInput,
   formatDateText,
+  FormGroup,
   HtmlSelect,
   HtmlTable,
   Icon,
@@ -21,6 +24,7 @@ import {
   Label,
   Navbar,
   NavbarGroup,
+  NonIdealState,
   NumericInput,
   NumericInputView,
   Radio,
@@ -28,13 +32,17 @@ import {
   SegmentedControl,
   Spinner,
   SpinnerSize,
+  Switch,
   Tabs,
+  TextArea,
   TimePicker,
+  type IconName,
 } from 'blueprint-synstate';
 import { createElement as h, type ReactElement } from 'react';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { constant, type JSX } from 'synstate-dom';
+import { expectType } from 'ts-data-forge';
 
 /**
  * Renders `element` with Blueprint React into `container` at once, and returns
@@ -114,6 +122,66 @@ const noPanelControlled = (line: string): string =>
 
 /** A date for Blueprint React's pickers, which take a `Date`. */
 const blueprintDate = (isoLocal: string): Date => new Date(isoLocal);
+
+/** Every icon this library draws, so that each path is compared with Blueprint's. */
+const allIcons = [
+  'add',
+  'archive',
+  'automatic-updates',
+  'camera',
+  'chevron-down',
+  'chevron-left',
+  'chevron-right',
+  'chevron-up',
+  'clipboard',
+  'cog',
+  'comment',
+  'confirm',
+  'cross',
+  'desktop',
+  'disable',
+  'double-caret-vertical',
+  'double-chevron-down',
+  'double-chevron-up',
+  'duplicate',
+  'edit',
+  'error',
+  'export',
+  'eye-off',
+  'eye-open',
+  'filter-list',
+  'flash',
+  'greater-than-or-equal-to',
+  'help',
+  'home',
+  'import',
+  'info-sign',
+  'key',
+  'less-than-or-equal-to',
+  'lock',
+  'log-out',
+  'moon',
+  'plus',
+  'refresh',
+  'reset',
+  'saved',
+  'search',
+  'send-message',
+  'sort',
+  'sort-asc',
+  'sort-desc',
+  'star',
+  'tick',
+  'timeline-events',
+  'trash',
+  'unarchive',
+  'unlock',
+  'user',
+  'warning-sign',
+] as const satisfies readonly IconName[];
+
+// A name added to the library and not here fails this.
+expectType<(typeof allIcons)[number], IconName>('=');
 
 export const cases: readonly Case[] = [
   [
@@ -829,5 +897,328 @@ export const cases: readonly Case[] = [
       ],
     },
     () => <DateInput value={constant('2026-10-15')} onChange={ignore} />,
+  ],
+  [
+    'Every icon',
+    {
+      element: () =>
+        h(
+          'div',
+          null,
+          allIcons.map((icon) => h(Blueprint.Icon, { key: icon, icon })),
+        ),
+      deliberate: [],
+    },
+    () => (
+      <div>
+        {allIcons.map((icon) => (
+          <Icon icon={icon} />
+        ))}
+      </div>
+    ),
+  ],
+  [
+    'Button, loading',
+    {
+      element: () =>
+        h(Blueprint.Button, { text: 'Go', icon: 'cog', loading: true }),
+      deliberate: [disabledButtonTabIndex],
+    },
+    () => (
+      <Button icon={'cog'} loading={constant(true)} text={constant('Go')} />
+    ),
+  ],
+  [
+    'AnchorButton',
+    {
+      element: () =>
+        h(Blueprint.AnchorButton, {
+          href: '/x',
+          icon: 'add',
+          intent: 'primary',
+          rel: 'noopener noreferrer',
+          target: '_blank',
+          text: 'New',
+        }),
+      deliberate: [],
+    },
+    () => (
+      <AnchorButton
+        href={constant('/x')}
+        icon={'add'}
+        intent={'primary'}
+        rel={'noopener noreferrer'}
+        target={'_blank'}
+        text={constant('New')}
+      />
+    ),
+  ],
+  [
+    'AnchorButton, minimal, with only an icon',
+    {
+      element: () =>
+        h(Blueprint.AnchorButton, {
+          href: '/help',
+          icon: 'help',
+          title: 'Help',
+          variant: 'minimal',
+        }),
+      deliberate: [],
+    },
+    () => (
+      <AnchorButton
+        href={constant('/help')}
+        icon={'help'}
+        title={constant('Help')}
+        variant={constant('minimal')}
+      />
+    ),
+  ],
+  [
+    'AnchorButton, loading',
+    {
+      element: () =>
+        h(Blueprint.AnchorButton, { href: '/x', loading: true, text: 'Open' }),
+      deliberate: [
+        // Blueprint passes `disabled` on to the `<a>`, which has no such
+        // attribute; `aria-disabled` and `bp6-disabled` say it.
+        (line) =>
+          /^\s*a\./u.test(line) ? line.replace('[disabled=]', '') : line,
+      ],
+    },
+    () => (
+      <AnchorButton
+        href={constant('/x')}
+        loading={constant(true)}
+        text={constant('Open')}
+      />
+    ),
+  ],
+  [
+    'FormGroup',
+    {
+      element: () =>
+        h(
+          Blueprint.FormGroup,
+          {
+            label: 'Name',
+            labelFor: 'form-group-name',
+            labelInfo: '(required)',
+            helperText: 'Enter a name.',
+            intent: 'danger',
+          },
+          h(Blueprint.InputGroup, {
+            id: 'form-group-name',
+            intent: 'danger',
+            value: '',
+            onChange: ignore,
+          }),
+        ),
+      deliberate: [],
+    },
+    () => (
+      <FormGroup
+        helperText={constant('Enter a name.')}
+        intent={constant('danger')}
+        label={constant('Name')}
+        labelFor={'form-group-name'}
+        labelInfo={constant('(required)')}
+      >
+        <InputGroup
+          id={'form-group-name'}
+          intent={'danger'}
+          value={constant('')}
+        />
+      </FormGroup>
+    ),
+  ],
+  [
+    'FormGroup with no label or helper text',
+    {
+      element: () =>
+        h(
+          Blueprint.FormGroup,
+          { helperText: '', label: '' },
+          h(Blueprint.InputGroup, { value: 'x', onChange: ignore }),
+        ),
+      deliberate: [],
+    },
+    () => (
+      <FormGroup helperText={constant('')} label={constant('')}>
+        <InputGroup value={constant('x')} />
+      </FormGroup>
+    ),
+  ],
+  [
+    'ControlGroup',
+    {
+      element: () =>
+        h(
+          Blueprint.ControlGroup,
+          { fill: true },
+          h(Blueprint.InputGroup, { value: 'x', onChange: ignore }),
+          h(Blueprint.Button, { icon: 'plus' }),
+        ),
+      deliberate: [],
+    },
+    () => (
+      <ControlGroup fill={true}>
+        <InputGroup value={constant('x')} />
+        <Button icon={'plus'} />
+      </ControlGroup>
+    ),
+  ],
+  [
+    'InputGroup with a right element',
+    {
+      element: () =>
+        h(Blueprint.InputGroup, {
+          value:
+            'someone.with.an.address.long.enough.to.run.under.the.button@example.com',
+          intent: 'primary',
+          onChange: ignore,
+          // Wider than the 30px Blueprint's style sheets pad by, so that only
+          // the padding measured from it keeps the text clear of it.
+          rightElement: h(Blueprint.Button, {
+            icon: 'cross',
+            text: 'Clear',
+            variant: 'minimal',
+          }),
+        }),
+      deliberate: [],
+    },
+    () => (
+      <InputGroup
+        intent={'primary'}
+        rightElement={
+          <Button
+            icon={'cross'}
+            text={constant('Clear')}
+            variant={constant('minimal')}
+          />
+        }
+        value={constant(
+          'someone.with.an.address.long.enough.to.run.under.the.button@example.com',
+        )}
+      />
+    ),
+  ],
+  [
+    'TextArea, filling and fitting its text',
+    {
+      element: () =>
+        h(Blueprint.TextArea, {
+          autoResize: true,
+          fill: true,
+          value: 'one\ntwo\nthree\nfour',
+          onChange: ignore,
+        }),
+      deliberate: [],
+    },
+    () => (
+      <TextArea
+        autoResize={true}
+        fill={true}
+        value={constant('one\ntwo\nthree\nfour')}
+      />
+    ),
+  ],
+  [
+    'TextArea with an intent and a placeholder',
+    {
+      element: () =>
+        h(Blueprint.TextArea, {
+          intent: 'primary',
+          placeholder: 'Comments',
+          value: '',
+          onChange: ignore,
+        }),
+      deliberate: [],
+    },
+    () => (
+      <TextArea
+        intent={constant('primary')}
+        placeholder={constant('Comments')}
+        value={constant('')}
+      />
+    ),
+  ],
+  [
+    'Switch',
+    {
+      element: () =>
+        h(Blueprint.Switch, {
+          label: 'Notify me',
+          checked: true,
+          inline: true,
+          onChange: ignore,
+        }),
+      deliberate: [],
+    },
+    () => (
+      <Switch
+        checked={constant(true)}
+        inline={true}
+        label={constant('Notify me')}
+        onChange={ignore}
+      />
+    ),
+  ],
+  [
+    'Switch with no label, off',
+    {
+      element: () =>
+        h(Blueprint.Switch, {
+          'aria-label': 'Required',
+          checked: false,
+          onChange: ignore,
+        }),
+      deliberate: [],
+    },
+    () => (
+      <Switch
+        aria-label={constant('Required')}
+        checked={constant(false)}
+        onChange={ignore}
+      />
+    ),
+  ],
+  [
+    'NonIdealState',
+    {
+      element: () =>
+        h(Blueprint.NonIdealState, {
+          icon: 'search',
+          title: 'Not found',
+          action: h(Blueprint.Button, { text: 'Back' }),
+        }),
+      deliberate: [],
+    },
+    () => (
+      <NonIdealState
+        action={<Button text={constant('Back')} />}
+        icon={'search'}
+        title={constant('Not found')}
+      />
+    ),
+  ],
+  [
+    'NonIdealState with a description',
+    {
+      element: () =>
+        h(Blueprint.NonIdealState, {
+          icon: 'error',
+          title: 'Something went wrong',
+          description: h('div', null, 'Reload the page.'),
+        }),
+      deliberate: [],
+    },
+    () => (
+      <NonIdealState
+        description={<div>{constant('Reload the page.')}</div>}
+        icon={'error'}
+        title={constant('Something went wrong')}
+      />
+    ),
   ],
 ] as const;
