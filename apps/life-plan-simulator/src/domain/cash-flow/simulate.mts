@@ -1,4 +1,4 @@
-import { Arr } from 'ts-data-forge';
+import { Arr, Num } from 'ts-data-forge';
 import { capitalGainsTaxRate, nisaLifetimeLimit } from '../../data/index.mjs';
 import {
   calculateDefinedContribution,
@@ -198,7 +198,8 @@ export const simulate = (input: SimulationInput): SimulationResult => {
     const periodic = periodicExpenses.map((e) =>
       e.first <= month &&
       month < e.until &&
-      (month - e.first) % e.interval === 0
+      Num.isNonZero(e.interval) &&
+      Num.rem(month - e.first, e.interval) === 0
         ? e.amount
         : 0,
     );

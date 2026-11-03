@@ -137,7 +137,9 @@ const nearestOnOutline = (
     .map((corner, index) =>
       nearestOnSegment(
         corner,
-        outline[(index + 1) % outline.length] ?? corner,
+        (Num.isNonZero(outline.length)
+          ? outline[Num.rem(index + 1, outline.length)]
+          : undefined) ?? corner,
         point,
       ),
     )
@@ -150,7 +152,10 @@ const nearestOnOutline = (
 /** Whether `point` is inside `polygon`, by the even-odd rule. */
 const isInside = (polygon: readonly Point[], point: Point): boolean =>
   polygon.reduce((inside, a, index) => {
-    const b = polygon[(index + polygon.length - 1) % polygon.length] ?? a;
+    const b =
+      (Num.isNonZero(polygon.length)
+        ? polygon[Num.rem(index + polygon.length - 1, polygon.length)]
+        : undefined) ?? a;
 
     const dy = b.y - a.y;
 

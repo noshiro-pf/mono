@@ -6,7 +6,12 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { arrowDirection, classObject, sizeClass } from '../internal/index.mjs';
+import {
+  arrowDirection,
+  classObject,
+  sizeClass,
+  stepAround,
+} from '../internal/index.mjs';
 import type { Size } from './intent.mjs';
 
 /** One tab of {@link Tabs}. */
@@ -96,7 +101,7 @@ export const Tabs = <T extends string>({
 
         event.preventDefault();
 
-        titles[(focused + direction + titles.length) % titles.length]?.focus();
+        titles[stepAround(focused, direction, titles.length)]?.focus();
       }}
     >
       {tabs.map((tab) => {

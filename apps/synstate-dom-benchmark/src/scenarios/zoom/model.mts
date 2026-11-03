@@ -1,4 +1,4 @@
-import { Arr } from 'ts-data-forge';
+import { Arr, Num } from 'ts-data-forge';
 import type { Cells } from '../scenario.mjs';
 
 /**
@@ -56,7 +56,7 @@ export const createPlaces = (count: number): readonly Place[] => {
 
     mut_state.seed = mut_x >>> 0;
 
-    return mut_state.seed % max;
+    return Num.isNonZero(max) ? Num.rem(mut_state.seed, max) : 0;
   };
 
   return Array.from({ length: count }, () => ({

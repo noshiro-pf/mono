@@ -189,7 +189,8 @@ const scattered = (
     .map(({ cell }) => cell);
 
   const nodes = cells.map((cell, index) => {
-    const x = (cell % columns) * 260 + Math.floor(random() * 28);
+    const x =
+      Num.rem(cell, asPositiveInt(columns)) * 260 + Math.floor(random() * 28);
 
     const y =
       Math.floor(Num.div(cell, asPositiveInt(columns))) * 130 +

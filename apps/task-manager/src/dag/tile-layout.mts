@@ -50,7 +50,7 @@ export const tileLayout = <K,>(
         [
           id,
           {
-            x: (index % columns) * (size.width + gap),
+            x: remainderOf(index, columns) * (size.width + gap),
             y: Math.floor(ratio(index, columns)) * (size.height + gap),
           },
         ] as const,
@@ -94,3 +94,7 @@ export const tileContentHeight = (nodes: readonly LaidOutNode[]): number =>
 /** `a / b`, or 0 for a zero `b`. */
 const ratio = (a: number, b: number): number =>
   Num.isNonZero(b) ? Num.div(a, b) : 0;
+
+/** `a % b`, `0` when `b` is. */
+const remainderOf = (a: number, b: number): number =>
+  Num.isNonZero(b) ? Num.rem(a, b) : 0;

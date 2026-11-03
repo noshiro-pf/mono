@@ -1,4 +1,4 @@
-import { Arr } from 'ts-data-forge';
+import { Arr, Num } from 'ts-data-forge';
 
 /** How many runs of each operation are discarded before the timed ones. */
 export const warmups = 3;
@@ -9,7 +9,9 @@ export const warmups = 3;
  * measured first in turn. The tables keep the order of `items`.
  */
 export const rotated = <T,>(items: readonly T[]): readonly T[] => {
-  const shift = Number(process.env['BENCHMARK_ROTATE']) % items.length;
+  const shift = Num.isNonZero(items.length)
+    ? Num.rem(Number(process.env['BENCHMARK_ROTATE']), items.length)
+    : 0;
 
   return [...items.slice(shift), ...items.slice(0, shift)];
 };

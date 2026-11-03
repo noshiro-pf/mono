@@ -1,5 +1,6 @@
 import type { InitializedObservable } from 'synstate';
 import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { Num } from 'ts-data-forge';
 import * as styles from './mui-tabs.module.css';
 
 type Props = Readonly<{
@@ -87,16 +88,16 @@ const nextFocus = (
   current: number,
   count: number,
 ): number | undefined => {
-  if (count === 0) {
+  if (!Num.isNonZero(count)) {
     return undefined;
   }
 
   switch (key) {
     case 'ArrowRight':
-      return (current + 1) % count;
+      return Num.rem(current + 1, count);
 
     case 'ArrowLeft':
-      return (current - 1 + count) % count;
+      return Num.rem(current - 1 + count, count);
 
     case 'Home':
       return 0;

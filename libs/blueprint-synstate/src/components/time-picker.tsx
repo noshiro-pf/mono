@@ -8,6 +8,7 @@ import {
   type JSX,
 } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   formatTime,
   isTimeUnitText,
@@ -97,11 +98,11 @@ export const TimePicker = ({
 
     const time = currentTime();
 
-    const max = TIME_UNIT_MAX[unit];
+    const count = TIME_UNIT_COUNT[unit];
 
     const current = unit === 'hour' ? time.hour : time.minute;
 
-    commit(unit, (current + amount + max + 1) % (max + 1));
+    commit(unit, (current + amount + count) % count);
   };
 
   const renderArrow = (unit: Unit, up: boolean): JSX.Element => (
@@ -247,5 +248,11 @@ export const TimePicker = ({
 };
 
 type Unit = keyof typeof TIME_UNIT_MAX;
+
+/** How many values each unit takes: one more than {@link TIME_UNIT_MAX}. */
+const TIME_UNIT_COUNT = {
+  hour: 24,
+  minute: 60,
+} as const satisfies ReadonlyRecord<Unit, number>;
 
 type Editing = Readonly<{ unit: Unit; text: string }>;

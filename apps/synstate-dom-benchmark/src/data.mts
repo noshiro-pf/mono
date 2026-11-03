@@ -1,3 +1,5 @@
+import { Num } from 'ts-data-forge';
+
 /** One row of the table every implementation renders. */
 export type RowData = Readonly<{ id: number; label: string }>;
 
@@ -81,7 +83,7 @@ export const createRowFactory = (): Readonly<{
 
     mut_state.seed = mut_x >>> 0;
 
-    return mut_state.seed % max;
+    return Num.isNonZero(max) ? Num.rem(mut_state.seed, max) : 0;
   };
 
   const pick = <T,>(words: readonly T[]): T => {

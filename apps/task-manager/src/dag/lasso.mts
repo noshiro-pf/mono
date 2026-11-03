@@ -49,7 +49,10 @@ export const lassoPathData = (loop: readonly Point[]): string =>
  */
 const encloses = (polygon: readonly Point[], point: Point): boolean =>
   polygon.reduce((inside, a, index) => {
-    const b = polygon[(index + 1) % polygon.length] ?? a;
+    const b =
+      (Num.isNonZero(polygon.length)
+        ? polygon[Num.rem(index + 1, polygon.length)]
+        : undefined) ?? a;
 
     const dy = b.y - a.y;
 
