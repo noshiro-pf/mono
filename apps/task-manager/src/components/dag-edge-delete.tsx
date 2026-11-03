@@ -2,6 +2,7 @@ import type { InitializedObservable } from 'synstate';
 import {
   constant,
   createAfterUpdate,
+  isImeKeyDown,
   subscribeInScope,
   view,
   type JSX,
@@ -69,6 +70,10 @@ export const DagEdgeDelete = ({
         onDelete();
       }}
       onKeyDown={(pressed) => {
+        if (isImeKeyDown(pressed)) {
+          return;
+        }
+
         if (DELETE_KEYS.has(pressed.key)) {
           pressed.preventDefault();
 

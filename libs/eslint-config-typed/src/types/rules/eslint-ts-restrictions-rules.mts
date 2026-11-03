@@ -557,6 +557,51 @@ namespace PreferTernary {
     | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
+/**
+ * @description Require a keyboard handler that compares `event.key` or `event.code` with `'Enter'` to check the same event for input method composition
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace RequireImeGuardOnEnter {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "guardFunctions": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "description": "Names of functions that, called with the event, tell an input method's key down (default: `[\"isImeKeyDown\"]`)"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Names of functions that, called with the event, tell an input method's key down (default: `["isImeKeyDown"]`)
+     */
+    guardFunctions?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   'ts-restrictions/explicit-collection-type-arguments': ExplicitCollectionTypeArguments.RuleEntry;
@@ -579,6 +624,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/prefer-optional-chain-over-ternary': PreferOptionalChainOverTernary.RuleEntry;
   'ts-restrictions/prefer-range-in-number-line-order': PreferRangeInNumberLineOrder.RuleEntry;
   'ts-restrictions/prefer-ternary': PreferTernary.RuleEntry;
+  'ts-restrictions/require-ime-guard-on-enter': RequireImeGuardOnEnter.RuleEntry;
 }>;
 
 export type EslintTsRestrictionsRulesOption = Readonly<{
@@ -587,4 +633,5 @@ export type EslintTsRestrictionsRulesOption = Readonly<{
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.Options;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.Options;
   'ts-restrictions/prefer-ternary': PreferTernary.Options;
+  'ts-restrictions/require-ime-guard-on-enter': RequireImeGuardOnEnter.Options;
 }>;

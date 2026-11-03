@@ -20,6 +20,7 @@ import { preferNullishCoalescingWhenSafe } from './prefer-nullish-coalescing-whe
 import { preferOptionalChainOverTernary } from './prefer-optional-chain-over-ternary.mjs';
 import { preferRangeInNumberLineOrder } from './prefer-range-in-number-line-order.mjs';
 import { preferTernary } from './prefer-ternary.mjs';
+import { requireImeGuardOnEnter } from './require-ime-guard-on-enter.mjs';
 
 export const tsRestrictionsRules = {
   'check-destructuring-completeness': checkDestructuringCompleteness,
@@ -43,4 +44,5 @@ export const tsRestrictionsRules = {
   'prefer-optional-chain-over-ternary': preferOptionalChainOverTernary,
   'prefer-range-in-number-line-order': preferRangeInNumberLineOrder,
   'prefer-ternary': preferTernary,
+  'require-ime-guard-on-enter': requireImeGuardOnEnter,
 } as const satisfies ESLintPlugin['rules'];

@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import * as React from 'react';
 import { BpInput, DialogWithMaxWidth } from 'react-blueprintjs-utils';
 import { memoNamed, useKeyEventListener } from 'react-utils';
+import { isImeKeyDown } from 'synstate-dom';
 import { useObservableValue } from 'synstate-react-hooks';
 import { isString, pipe } from 'ts-data-forge';
 import { dict } from '../../constants/index.mjs';
@@ -26,7 +27,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
     );
 
     const onKeyDown = React.useCallback((ev: KeyboardEvent) => {
-      if (ev.key === 'Enter') {
+      if (ev.key === 'Enter' && !isImeKeyDown(ev)) {
         ConfirmEmailDialogStore.enterClickHandler();
       }
     }, []);

@@ -101,4 +101,32 @@ describe(Tabs, () => {
 
     unmount();
   });
+
+  test("leaves an input method's Enter alone", () => {
+    const { value$, onChange, changes } = controlled('a');
+
+    const { container, unmount } = mountInto(() => (
+      <Tabs
+        id={'sheets'}
+        selectedTabId={value$}
+        tabs={tabs}
+        onChange={onChange}
+      />
+    ));
+
+    const titles = all(container, '.bp6-tab');
+
+    titles[1]?.focus();
+
+    assert.isTrue(
+      press(titles[1] ?? container, 'Enter', { isComposing: true }),
+    );
+
+    // Safari's, sent after compositionend.
+    assert.isTrue(press(titles[1] ?? container, 'Enter', { keyCode: 229 }));
+
+    assert.deepStrictEqual(changes, []);
+
+    unmount();
+  });
 });
