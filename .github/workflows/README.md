@@ -243,6 +243,22 @@ written, rather than every job that takes the steps.
   reason. A step that must not trust the tree, such as the path check in
   `pnpm-update.yml`'s `commit` job, stays inline; the script's header says
   which steps may move there, and on which Node it has to run.
+- **The install reuses pnpm's lockfile verification.** pnpm verifies the
+  lockfile against the supply-chain policies of `pnpm-workspace.yaml` and
+  records the result on the machine; the action caches that record, keyed on the
+  pnpm version, the lockfile and `pnpm-workspace.yaml`. A job skips the
+  verification only when a job that finished before it started saved the record
+  under that key. In a run, those are the jobs after `gates`, which saves it as
+  it ends; jobs that start together, such as the `gates` of each workflow, each
+  verify. A cache is read only from the ref that saved it, a pull request's base
+  branch and `main`, so a pull request that changes the lockfile verifies in the
+  `gates` of its first run and reuses the record from then on, and other pull
+  requests reuse it once the push to `main` that merges the lockfile has saved
+  it there. A pull request that changes none of the key's three inputs reuses
+  `main`'s from its first job. pnpm accepts a record only for the same lockfile
+  hash under policies at least as strict, so a restored one skips nothing that
+  has not passed. The install warns when pnpm wrote no record where the action
+  looks, because the cache would then save nothing and fail nothing.
 - **A composite action cannot read `secrets`.** None is needed: nothing
   installs from GitHub Packages any more, so no job points `setup-node` at it
   or passes `NODE_AUTH_TOKEN` to the install.

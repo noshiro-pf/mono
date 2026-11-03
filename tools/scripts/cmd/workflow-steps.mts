@@ -21,7 +21,9 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  * is checked against the values it may take. A composite action's inputs and a
  * `workflow_call` input of `type: string` reach a step as plain strings, so a
  * misspelt `true` would otherwise read as `false` and drop the difference the
- * caller asked for without a word.
+ * caller asked for without a word. `install` also reads `LOCKFILE_RECORD`,
+ * which is not an input: the path of pnpm's lockfile verification record, which
+ * the setup action caches and this warns about when pnpm wrote nothing there.
  *
  * **Only a step whose job is to run the tree anyway belongs here.** A file in
  * the tree is read when the step runs, after the steps before it — `pnpm`
@@ -240,9 +242,24 @@ const runInstall = (env: Env): void => {
     return;
   }
 
+  const record = env['LOCKFILE_RECORD'] ?? '';
+
+  if (record === '') {
+    exitWithError('LOCKFILE_RECORD is not set.');
+  }
+
   console.log(`pnpm ${args.join(' ')}`);
 
   runOrExit('pnpm', args);
+
+  // The record is what lets the jobs after the first skip pnpm's lockfile
+  // verification. Missing, the cache step saves nothing, and only this says so.
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  if (!fs.existsSync(record)) {
+    console.log(
+      `::warning::pnpm left no lockfile verification record at ${record}, so the setup action's cache of it saves nothing and every job verifies the lockfile again. Point the "Locate pnpm's lockfile verification record" step of .github/actions/setup/action.yml at the file this pnpm writes.`,
+    );
+  }
 };
 
 const runDiffCheck = (env: Env): void => {
