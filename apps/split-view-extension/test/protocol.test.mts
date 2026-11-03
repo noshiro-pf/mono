@@ -1,4 +1,8 @@
-import { asFrameToPageMessage, splitViewMessageTag } from '../src/index.mjs';
+import {
+  asFrameToPageMessage,
+  asNestedFrameMessage,
+  splitViewMessageTag,
+} from '../src/index.mjs';
 
 describe('asFrameToPageMessage', () => {
   describe('leaving', () => {
@@ -67,5 +71,86 @@ describe('asFrameToPageMessage', () => {
         }),
       );
     });
+  });
+});
+
+describe(asNestedFrameMessage, () => {
+  test('accepts a reload', () => {
+    assert.deepStrictEqual(
+      asNestedFrameMessage({
+        tag: splitViewMessageTag,
+        kind: 'nested-key',
+        key: { kind: 'reload' },
+      }),
+      {
+        tag: splitViewMessageTag,
+        kind: 'nested-key',
+        key: { kind: 'reload' },
+      },
+    );
+  });
+
+  test('accepts a workspace shortcut, dropping fields it does not have', () => {
+    assert.deepStrictEqual(
+      asNestedFrameMessage({
+        tag: splitViewMessageTag,
+        kind: 'nested-key',
+        key: { kind: 'workspace', code: 'Digit3', extra: true },
+        extra: true,
+      }),
+      {
+        tag: splitViewMessageTag,
+        kind: 'nested-key',
+        key: { kind: 'workspace', code: 'Digit3' },
+      },
+    );
+  });
+
+  test('refuses a workspace shortcut that is not a digit key', () => {
+    assert.isUndefined(
+      asNestedFrameMessage({
+        tag: splitViewMessageTag,
+        kind: 'nested-key',
+        key: { kind: 'workspace', code: 'KeyW' },
+      }),
+    );
+  });
+
+  test('refuses a workspace shortcut without a key code', () => {
+    assert.isUndefined(
+      asNestedFrameMessage({
+        tag: splitViewMessageTag,
+        kind: 'nested-key',
+        key: { kind: 'workspace' },
+      }),
+    );
+  });
+
+  test('refuses an unknown key', () => {
+    assert.isUndefined(
+      asNestedFrameMessage({
+        tag: splitViewMessageTag,
+        kind: 'nested-key',
+        key: { kind: 'close' },
+      }),
+    );
+  });
+
+  test('refuses another kind or another tag', () => {
+    assert.isUndefined(
+      asNestedFrameMessage({
+        tag: splitViewMessageTag,
+        kind: 'shortcut',
+        key: { kind: 'reload' },
+      }),
+    );
+
+    assert.isUndefined(
+      asNestedFrameMessage({
+        tag: 'someone-else',
+        kind: 'nested-key',
+        key: { kind: 'reload' },
+      }),
+    );
   });
 });

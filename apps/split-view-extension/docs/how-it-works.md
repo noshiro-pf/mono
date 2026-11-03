@@ -36,13 +36,15 @@ The full list, with the reasoning the README leaves out.
       layout tree, so the page keeps its scroll position, its history, its
       login and its sandbox setting, and simply lands in a different rectangle.
 - Drag any divider to change the ratio.
-- **`Ctrl+R` (`Cmd+R`) or `F5` with the focus in a pane reloads that pane**,
-  not the tab. The content script takes the key with `preventDefault`, which
+- **`Ctrl+R` (`Cmd+R`) or `F5` with the focus in a pane reloads that pane**, not
+  the tab. The content script takes the key with `preventDefault`, which
   Chrome honors from inside a frame, and reloads its own document as the
-  toolbar's reload button does. A pane the content script cannot run in — a
-  `chrome://` page, an error page — has no one to take it, and the key reloads
-  the tab as before; so does a site that binds `Ctrl+R` itself and takes it
-  first.
+  toolbar's reload button does. A frame nested inside the pane's page — an
+  embedded editor, a comment widget — hands the key up to the pane's own frame,
+  which reloads the pane; `Alt+1..9` travels up the same way. A pane the content
+  script cannot run in — a `chrome://` page, an error page — has no one to take
+  it, and the key reloads the tab as before; so does a site that binds `Ctrl+R`
+  itself and takes it first.
 - **`−` / `+` in a pane's toolbar zoom that pane**, and `Ctrl`+wheel (or a
   trackpad pinch) over it does the same. The percentage appears beside them
   when it is not 100%, and clicking it goes back. The zoom is saved with the
@@ -474,3 +476,7 @@ in that pane gets its own message.
 Narrow `<all_urls>` in `public/manifest.json` — in both `host_permissions` and
 the content script's `matches` — to the sites you actually frame, if you would
 rather not grant all of them.
+Keep the path of each `matches` pattern `/*`: the content script also runs, by
+`match_origin_as_fallback`, in the `about:blank` and `srcdoc` frames a page
+makes for an embedded editor, so that `Ctrl+R` there reloads the pane, and
+Chrome refuses that key beside a pattern with any other path.
