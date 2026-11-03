@@ -65,6 +65,8 @@ export const issuePriorityLabel = (
  * - `hold` — not to be started as things stand: code about to be replaced, or
  *   work waiting on a decision.
  * - `close` — to be closed or folded into another issue at the next triage.
+ *
+ * `pr-manager`'s tier tooltips (`issue-tier-group.tsx`) repeat this list.
  */
 export const ISSUE_PRIORITIES = [
   'S',

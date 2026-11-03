@@ -4,29 +4,35 @@ import {
   If,
   mapBindable,
   view,
+  type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
-import { isPriorityShown, ISSUE_TIERS, type IssueTier } from '../priority.mjs';
+import type { IssueFilterCounts } from '../issues-list-view.mjs';
 import { issuesListStore, issuesViewStore } from '../store/index.mjs';
+import { IssueTierGroup } from './issue-tier-group.js';
 import { StatTile, StatToggle } from './stat-tile.js';
 
 /**
  * What the open issues lead with, in either view: how many are shown of how
- * many are open, then the tiers, then `in progress`, each a switch for the
- * issues it counts with an `only` switch in its corner — the merge order's
- * counts (`merge-order-filters.tsx`), for issues. What a switch does is
+ * many are open, `in progress` and the tiers, each a switch for the issues it
+ * counts with an `only` switch in its corner — the merge order's counts
+ * (`merge-order-filters.tsx`), for issues. What a switch does is
  * `issues-list-view.mts`, which keeps the choice in the URL; the list and the
- * DAG show the same issues. What is held back is the `hold` tier
- * (`docs/issue-priority.md`), so it has no switch of its own.
+ * DAG show the same issues. An issue held back is one of the `hold` tier
+ * (`docs/issue-priority.md`), so being held back has no switch apart from that
+ * tier's.
  *
- * The tiers are joined into one control, since they are one question asked of
- * every issue, which has exactly one of them: picking two shows either. `in
- * progress` stands apart, as another question: picked with a tier, it shows
- * what is both (`issue-filter.mts`). Once a tier is picked, the tiers neither
- * picked nor hidden fade, and `in progress` does not, since it is not it that
- * decides them.
+ * The tiers are one control, since they are one question asked of every issue,
+ * which has exactly one of them: picking two shows either. `in progress` stands
+ * apart, as another question: picked with a tier, it shows what is both
+ * (`issue-filter.mts`). Once a tier is picked, the tiers neither picked nor
+ * hidden fade, and `in progress` does not, since it is not it that decides
+ * them.
+ *
+ * The tiers are drawn as two groups of joined tiles (`issue-tier-group.tsx`):
+ * `S` to `D` and `none` on a row of their own, and `hold` and `close` beside
+ * `open` and `in progress`. A tier's tooltip says what the tier means, and its
+ * `only`'s what picking it does.
  *
  * `open` is how many issues the view shown draws for their own sake — the list,
  * after its own switches and the search too (`countIssues`), or the
@@ -39,10 +45,7 @@ import { StatTile, StatToggle } from './stat-tile.js';
  * while it is switched off or picked, so that it can be undone.
  */
 export const IssuesSummary = (): JSX.Element => {
-  const counts$ = derive(
-    [issuesViewStore.view, issuesListStore.counts, issuesViewStore.counts],
-    (shown, list, dag) => (shown === 'dag' ? dag : list),
-  );
+  const counts$ = shownCounts();
 
   const view$ = issuesListStore.view;
 
@@ -58,41 +61,6 @@ export const IssuesSummary = (): JSX.Element => {
           total={mapBindable(counts$, ({ open }) => open.total)}
           value={mapBindable(counts$, ({ open }) => open.shown)}
         />
-        <div
-          aria-label={constant('Priority')}
-          class={constant('stat-group')}
-          data-picking={view(view$, ({ onlyPriorities }) =>
-            Arr.isNonEmpty(onlyPriorities).toString(),
-          )}
-          role={constant('group')}
-        >
-          {ISSUE_TIERS.map((priority) => (
-            <StatToggle
-              label={priority}
-              only={view(view$, ({ onlyPriorities }) =>
-                onlyPriorities.includes(priority),
-              )}
-              pressed={view(view$, (filter) =>
-                isPriorityShown(priority, filter),
-              )}
-              subject={PRIORITY_SUBJECTS[priority]}
-              total={mapBindable(
-                counts$,
-                ({ priorities }) => priorities[priority].total,
-              )}
-              value={mapBindable(
-                counts$,
-                ({ priorities }) => priorities[priority].shown,
-              )}
-              onOnly={() => {
-                issuesListStore.togglePriorityOnly(priority);
-              }}
-              onToggle={() => {
-                issuesListStore.togglePriority(priority);
-              }}
-            />
-          ))}
-        </div>
         <If
           cond={derive(
             [counts$, view$],
@@ -115,22 +83,19 @@ export const IssuesSummary = (): JSX.Element => {
             />
           }
         />
+        <IssueTierGroup counts$={counts$} row={'aside'} />
+        <IssueTierGroup counts$={counts$} row={'ranked'} />
       </div>
     </div>
   );
 };
 
-/** What each tier's switch counts (`docs/issue-priority.md`). */
-const PRIORITY_SUBJECTS = {
-  S: 'the issues of priority S',
-  A: 'the issues of priority A',
-  B: 'the issues of priority B',
-  C: 'the issues of priority C',
-  D: 'the issues of priority D',
-  hold: 'the issues on hold',
-  close: 'the issues to close or merge',
-  none: 'the issues placed under no priority, or under several',
-} as const satisfies ReadonlyRecord<IssueTier, string>;
+/** The counts of the view shown, the list's or the DAG's. */
+const shownCounts = (): Bindable<IssueFilterCounts> =>
+  derive(
+    [issuesViewStore.view, issuesListStore.counts, issuesViewStore.counts],
+    (shown, list, dag) => (shown === 'dag' ? dag : list),
+  );
 
 const toggleInProgress = (): void => {
   issuesListStore.toggleInProgress();

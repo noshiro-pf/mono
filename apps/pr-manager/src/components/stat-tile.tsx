@@ -41,6 +41,12 @@ type ToggleProps = Props &
      */
     subject?: string;
     /**
+     * What the tile's label means, as its tooltip says it in place of what
+     * clicking it does, where the label alone does not say it (an issue tier).
+     * Its `only` keeps saying what picking does.
+     */
+    description?: string;
+    /**
      * How picking it goes with what else is picked: `either` adds to it, as one
      * more of the same kind; `both` narrows it, as another kind
      * (`issue-filter.mts`). `either` unless said otherwise.
@@ -76,6 +82,7 @@ export const StatToggle = ({
   onOnly,
   only,
   subject,
+  description,
   pickWith = 'either',
 }: ToggleProps): JSX.Element => {
   const what = subject ?? `the pull requests that are ${label}`;
@@ -87,11 +94,15 @@ export const StatToggle = ({
         class={constant('stat-tile stat-toggle')}
         data-only={mapBindable(only, String)}
         data-status={tone}
-        title={mapBindable(pressed, (shown) =>
-          shown
-            ? `Shown. Click to hide ${what}.`
-            : `Hidden. Click to show ${what}.`,
-        )}
+        title={
+          description === undefined
+            ? mapBindable(pressed, (shown) =>
+                shown
+                  ? `Shown. Click to hide ${what}.`
+                  : `Hidden. Click to show ${what}.`,
+              )
+            : constant(description)
+        }
         type={constant('button')}
         onClick={onToggle}
       >
