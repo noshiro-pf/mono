@@ -356,6 +356,36 @@ export const addToImportBraces = (
     : fixer.insertTextAfter(openingBrace, ` ${specifiers.join(', ')} `);
 };
 
+/**
+ * The range a fix removes to drop the inline `type` of `specifier`
+ * (`import { type A }`, `export { type A }`): from `type` up to whatever
+ * follows it, a comment included, so that the comment stays. `undefined` when
+ * the specifier has no inline `type`.
+ */
+export const inlineTypeQualifierRange = (
+  sourceCode: TSESLint.SourceCode,
+  specifier: TSESTree.ExportSpecifier | TSESTree.ImportSpecifier,
+): TSESTree.Range | undefined => {
+  if (
+    (specifier.type === AST_NODE_TYPES.ImportSpecifier
+      ? specifier.importKind
+      : specifier.exportKind) !== 'type'
+  ) {
+    return undefined;
+  }
+
+  // An inline-`type` specifier starts with its qualifier.
+  const qualifier = sourceCode.getFirstToken(specifier);
+
+  if (qualifier === null) {
+    return undefined;
+  }
+
+  const next = sourceCode.getTokenAfter(qualifier, { includeComments: true });
+
+  return next === null ? undefined : [qualifier.range[0], next.range[0]];
+};
+
 /** The exported name `specifier` imports: `x` for `import { x as y }`. */
 export const importedNameOf = (
   specifier: DeepReadonly<TSESTree.ImportSpecifier>,
@@ -496,24 +526,15 @@ const bindingOf = (
   const inlineType = matching.find(isNotTypeOnly)?.specifier;
 
   if (inlineType !== undefined) {
-    const typeKeyword = sourceCode.getFirstToken(inlineType);
+    const qualifierRange = inlineTypeQualifierRange(sourceCode, inlineType);
 
-    // Up to whatever follows `type`, a comment included, so that the comment
-    // stays.
-    const next =
-      typeKeyword === null
-        ? null
-        : sourceCode.getTokenAfter(typeKeyword, { includeComments: true });
-
-    return typeKeyword === null || next === null
+    return qualifierRange === undefined
       ? undefined
       : {
           localName: inlineType.local.name,
           boundName: inlineType.local.name,
           isAdded: false,
-          edits: (fixer) => [
-            fixer.removeRange([typeKeyword.range[0], next.range[0]]),
-          ],
+          edits: (fixer) => [fixer.removeRange(qualifierRange)],
         };
   }
 

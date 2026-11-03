@@ -571,7 +571,7 @@ The shape of the rule option varies depending on the rule, so please check the c
 
 **`eslintPluginTsRestrictions`** - Custom ESLint plugin with additional rules for TypeScript
 
-- Currently, this plugin only provides the `ts-restrictions/no-restricted-syntax` rule (which duplicates ESLint's `no-restricted-syntax` rule).
+- Provides the `ts-restrictions/*` rules; `eslintTsRestrictionsRules` lists each one with the severity the preset sets. `ts-restrictions/no-restricted-syntax` duplicates ESLint's `no-restricted-syntax` rule.
 - Can be used to set the error level to `error` or `warn` as needed.
 
 Example:
