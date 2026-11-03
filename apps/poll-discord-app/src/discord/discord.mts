@@ -10,6 +10,7 @@ import { Result, hasKey, isRecord } from 'ts-data-forge';
 import { triggerCommand } from '../constants.mjs';
 import { DISCORD_TOKEN } from '../env.mjs';
 import { onMessageReactionAdd, onMessageReactionRemove } from './reaction.mjs';
+import { runListener } from './run-listener.mjs';
 import { sendMessageMain } from './send-poll-message.mjs';
 import { updatePollTitle } from './update-poll-title.mjs';
 
@@ -67,55 +68,37 @@ export const initDiscordClient = async (): Promise<
 
 export const startDiscordListener = (discordClient: DiscordClient): void => {
   discordClient.on('messageReactionAdd', (reaction, user) => {
-    (async () => {
+    runListener('messageReactionAdd', async () => {
       const reactionFilled: DiscordMessageReaction = reaction.partial
         ? await reaction.fetch()
         : reaction;
 
-      const result = await onMessageReactionAdd(reactionFilled, user);
-
-      if (Result.isErr(result)) {
-        console.error('on messageReactionAdd error:', result);
-      }
-    })().catch(() => {});
+      return onMessageReactionAdd(reactionFilled, user);
+    });
   });
 
   discordClient.on('messageReactionRemove', (reaction, user) => {
-    (async () => {
+    runListener('messageReactionRemove', async () => {
       const reactionFilled: DiscordMessageReaction = reaction.partial
         ? await reaction.fetch()
         : reaction;
 
-      const result = await onMessageReactionRemove(reactionFilled, user);
-
-      if (Result.isErr(result)) {
-        console.error('on messageReactionRemove error:', result);
-      }
-    })().catch(() => {});
+      return onMessageReactionRemove(reactionFilled, user);
+    });
   });
 
   discordClient.on('messageUpdate', (_oldMessage, newMessage) => {
-    (async () => {
+    runListener('messageUpdate', async () => {
       const newMessageFilled: DiscordMessage<boolean> = isPartial(newMessage)
         ? await newMessage.fetch()
         : newMessage;
 
-      const result = await updatePollTitle(newMessageFilled);
-
-      if (Result.isErr(result)) {
-        console.error('on message error:', result);
-      }
-    })().catch(() => {});
+      return updatePollTitle(newMessageFilled);
+    });
   });
 
   discordClient.on('messageCreate', (message) => {
-    (async () => {
-      const result = await sendMessageMain(message);
-
-      if (Result.isErr(result)) {
-        console.error('on message error:', result);
-      }
-    })().catch(() => {});
+    runListener('messageCreate', async () => sendMessageMain(message));
   });
 };
 
