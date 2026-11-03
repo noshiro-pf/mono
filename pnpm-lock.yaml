@@ -1031,6 +1031,9 @@ importers:
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
+      synstate-dom:
+        specifier: workspace:*
+        version: link:../../libs/synstate-dom
       synstate-react-hooks:
         specifier: workspace:*
         version: link:../../libs/synstate-react-hooks

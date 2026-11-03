@@ -1,6 +1,7 @@
 import {
   constant,
   If,
+  isImeKeyDown,
   mapBindable,
   type Bindable,
   type JSX,
@@ -59,6 +60,10 @@ export const Tabs = <T extends string>({
       class={classObject(['bp6-tab-list', sizeClass(size)])}
       role={constant('tablist')}
       onKeyDown={(event) => {
+        if (isImeKeyDown(event)) {
+          return;
+        }
+
         const titles = Array.from(
           event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]'),
         );

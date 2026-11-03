@@ -1,5 +1,5 @@
 import type { InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, isImeKeyDown, view, type JSX } from 'synstate-dom';
 import { frameTitle, GROUP_HEADER, GROUP_PADDING } from '../dag/index.mjs';
 import { m } from '../i18n/index.mjs';
 import { groupEditorStore } from '../store/index.mjs';
@@ -55,7 +55,10 @@ export const DagGroupFrame = ({ record }: Props): JSX.Element => {
           groupEditorStore.open(id);
         }}
         onKeyDown={(pressed) => {
-          if (pressed.key !== 'Enter' && pressed.key !== ' ') {
+          if (
+            isImeKeyDown(pressed) ||
+            (pressed.key !== 'Enter' && pressed.key !== ' ')
+          ) {
             return;
           }
 

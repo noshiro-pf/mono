@@ -24,6 +24,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/prefer-optional-chain-over-ternary': 'error',
   'ts-restrictions/prefer-range-in-number-line-order': 'error',
   'ts-restrictions/prefer-ternary': ['error', 'only-single-line'],
+  'ts-restrictions/require-ime-guard-on-enter': withDefaultOption('error'),
   'ts-restrictions/check-destructuring-completeness':
     withDefaultOption('error'),
 } as const satisfies EslintTsRestrictionsRules;

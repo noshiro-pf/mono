@@ -1,7 +1,7 @@
 /** @jsxImportSource synstate-dom */
 // embed-sample-code-ignore-above
 import { createState, map } from 'synstate';
-import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { constant, For, If, isImeKeyDown, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -32,7 +32,7 @@ export const TodoDemo = (): JSX.Element => (
           setDraft(event.currentTarget.value);
         }}
         onKeyDown={(event) => {
-          if (isSubmitEnter(event)) {
+          if (event.key === 'Enter' && !isImeKeyDown(event)) {
             add();
           }
         }}
@@ -112,18 +112,3 @@ const toggle = (id: number): void => {
 const remove = (id: number): void => {
   updateTodos((todos) => todos.filter((t) => t.id !== id));
 };
-// embed-sample-code-ignore-below
-
-/**
- * Whether a key down is an Enter that submits, not one that confirms an input
- * method's conversion. Safari sends that Enter after `compositionend`, told
- * from others by its key code alone.
- */
-const isSubmitEnter = (event: KeyboardEvent): boolean =>
-  event.key === 'Enter' &&
-  !event.isComposing &&
-  // eslint-disable-next-line @typescript-eslint/no-deprecated, unicorn/prefer-keyboard-event-key -- see above
-  event.keyCode !== imeKeyCode;
-
-/** The key code of a key down that an input method takes. */
-const imeKeyCode = 229;

@@ -272,7 +272,7 @@ Type quickly, then pause:
 
 ```tsx
 import { createState, map } from 'synstate';
-import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { constant, For, If, isImeKeyDown, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -303,7 +303,7 @@ export const TodoDemo = (): JSX.Element => (
                     setDraft(event.currentTarget.value);
                 }}
                 onKeyDown={(event) => {
-                    if (isSubmitEnter(event)) {
+                    if (event.key === 'Enter' && !isImeKeyDown(event)) {
                         add();
                     }
                 }}

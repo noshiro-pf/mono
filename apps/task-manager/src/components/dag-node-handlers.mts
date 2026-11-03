@@ -1,3 +1,4 @@
+import { isImeKeyDown } from 'synstate-dom';
 import { arrowKeyDelta } from '../dag/index.mjs';
 import {
   GraphNodeIdCodec,
@@ -25,6 +26,10 @@ export const dagNodeHandlers = (
       editorStore.open(ref);
     },
     onKeyDown: (pressed) => {
+      if (isImeKeyDown(pressed)) {
+        return;
+      }
+
       if (pressed.key === 'Enter' || pressed.key === ' ') {
         pressed.preventDefault();
 
