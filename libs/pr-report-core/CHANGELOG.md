@@ -1,5 +1,19 @@
 # pr-report-core
 
+## 0.2.1
+
+### Patch Changes
+
+- aa74c78: `findMergeAfterCycles` now puts every number that lies on a cycle into at least one reported cycle. Its depth-first walk skipped nodes it had finished, so a node whose only way back into a cycle ran through one was missed: with #1 after #2 and #3, #2 after #1 and #3 after #2, #3 was left out, and the tree, the queue order and the issue start states treated it as off any cycle. Each entry is now the shortest cycle through the first number no earlier entry covers.
+- c4ce547: `outsideCodeFences`, and with it `parseMergeAfter` and `parseStartAfter`, now closes a fenced code block the way CommonMark does: only on a run of the opening character at least as long as the opener, with nothing after it. Every fence line used to toggle the block, so a ` ``` ` line inside a ` ` ```` or `~~~` block ended it, and a sample `Merge-After:` or `Start-After:` after it was read as a real declaration. A backtick line whose info string holds a backtick no longer opens a block either.
+- Updated dependencies [e9420e9]
+- Updated dependencies [a48864f]
+- Updated dependencies [1f78470]
+- Updated dependencies [d567a6a]
+- Updated dependencies [27bc91d]
+    - ts-data-forge@14.11.0
+    - ts-fortress@12.4.3
+
 ## 0.2.0
 
 ### Minor Changes

@@ -1,5 +1,35 @@
 # synstate-dom
 
+## 0.7.0
+
+### Minor Changes
+
+- e894e11: `switchMap` and `mergeMap` (and `flatMap`, its alias) project the value their source already holds when they are created, as `map` and `filter` start from it. Before, they projected only the values the source emitted afterwards, so a pipeline built on a state or on an observable with an initial value did nothing until the source next changed: `pageId.pipe(switchMap(fetchPage))` on a state never fetched the page an application opened on.
+
+    A completed source is still not projected. A pipeline that relied on the drop now sees one more value at the start. That projection runs inside `pipe()`, whether or not anything subscribes: a pipeline built at module level starts its first request when the module is imported, and a projection that throws on the held value now throws from `pipe()` rather than on a later update. `skipWhile((_, index) => index === -1)` before the operator, which drops only the held value, keeps the old behavior.
+
+    synstate-react-hooks, synstate-react-hooks-compat, synstate-preact-hooks and synstate-preact-signals re-export both operators, so the change reaches their consumers too.
+
+    synstate-dom takes synstate as a peer dependency, so its release moves that range to the new synstate: a `switchMap` or `mergeMap` that a synstate-dom application builds on a state now projects the state's current value when the component runs.
+
+### Patch Changes
+
+- a8a5746: fix(synstate-dom): `For` and `If` follow an update made before they are attached
+
+    A later sibling that writes to what an earlier `For`, `If`, `MatchOptional` or `MatchResult` reads, while the enclosing element (or `render`) is still mounting, no longer leaves the old rows or branch on the page. `For` no longer builds its kept rows a second time without disposing the first ones. The update is applied once the nodes are inserted.
+
+    `render` now disposes and removes what it mounted when mounting throws, rather than leaving it in the container with no function to unmount it.
+
+- Updated dependencies [e9420e9]
+- Updated dependencies [a48864f]
+- Updated dependencies [e894e11]
+- Updated dependencies [3b3064f]
+- Updated dependencies [c4bc5ef]
+- Updated dependencies [1f78470]
+- Updated dependencies [d567a6a]
+    - ts-data-forge@14.11.0
+    - synstate@7.0.0
+
 ## 0.6.0
 
 ### Minor Changes

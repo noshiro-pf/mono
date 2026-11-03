@@ -1,5 +1,40 @@
 # synstate
 
+## 7.0.0
+
+### Major Changes
+
+- e894e11: `switchMap` and `mergeMap` (and `flatMap`, its alias) project the value their source already holds when they are created, as `map` and `filter` start from it. Before, they projected only the values the source emitted afterwards, so a pipeline built on a state or on an observable with an initial value did nothing until the source next changed: `pageId.pipe(switchMap(fetchPage))` on a state never fetched the page an application opened on.
+
+    A completed source is still not projected. A pipeline that relied on the drop now sees one more value at the start. That projection runs inside `pipe()`, whether or not anything subscribes: a pipeline built at module level starts its first request when the module is imported, and a projection that throws on the held value now throws from `pipe()` rather than on a later update. `skipWhile((_, index) => index === -1)` before the operator, which drops only the held value, keeps the old behavior.
+
+    synstate-react-hooks, synstate-react-hooks-compat, synstate-preact-hooks and synstate-preact-signals re-export both operators, so the change reaches their consumers too.
+
+    synstate-dom takes synstate as a peer dependency, so its release moves that range to the new synstate: a `switchMap` or `mergeMap` that a synstate-dom application builds on a state now projects the state's current value when the component runs.
+
+### Patch Changes
+
+- 3b3064f: Fixes found reviewing merged work:
+
+    - `skipWhile` and `takeWhile` keep their verdict on the parent's initial value: an initial value for which `skipWhile`'s predicate returns false lets every later value through without asking the predicate again, and one for which `takeWhile`'s predicate returns false completes the observable.
+    - `withBufferedFrom` no longer reports the buffered observable's current value twice when both observables already hold one.
+    - `withBufferedFrom` and `throttle` update their state before passing a value on, so a value a subscriber writes back lands in the next batch or inside the throttle window, as with the other stateful operators.
+    - `zip` completes after its last tuple has reached what is derived from it, as `take` does.
+    - `fromPromise` and `fromAbortablePromise` report only the promise's own rejection as an Err; a subscriber that throws on the Ok value no longer turns it into one, and its exception is thrown again from a task of its own, as one thrown during an update a timer started is.
+    - `createAsyncChildObservable` no longer throws when `init` completes the observable before returning.
+    - `mergeMap` releases an inner observable, and disposes what its projection made, as soon as that inner observable completes, instead of holding every one until `mergeMap` completes.
+
+- c4bc5ef: Import `Arr` from `ts-data-forge/array` and use standalone `asSafeUint` / `isPositiveSafeInt` in place of the `SafeUint` and `PositiveSafeInt` objects, so that esbuild no longer keeps those ts-data-forge objects whole in every bundle that uses synstate.
+
+    The only difference in behavior is past `Number.MAX_SAFE_INTEGER`, which one emission at a time does not reach: the index of `filter`, `skipWhile`, `takeWhile` and `attachIndex`, and the value of `counter`, would throw there instead of staying at the maximum.
+
+- Updated dependencies [e9420e9]
+- Updated dependencies [a48864f]
+- Updated dependencies [1f78470]
+- Updated dependencies [d567a6a]
+    - ts-data-forge@14.11.0
+    - ts-std-forge@0.5.3
+
 ## 6.2.1
 
 ### Patch Changes

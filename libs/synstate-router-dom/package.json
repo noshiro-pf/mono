@@ -77,8 +77,8 @@
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {
-    "synstate": ">=6.2.1",
-    "synstate-dom": ">=0.6.0",
+    "synstate": ">=7.0.0",
+    "synstate-dom": ">=0.7.0",
     "synstate-router": ">=0.1.0"
   },
   "engines": {

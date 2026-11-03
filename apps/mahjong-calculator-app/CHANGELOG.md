@@ -1,5 +1,24 @@
 # mahjong-calculator-app
 
+## 0.0.24
+
+### Patch Changes
+
+- Updated dependencies [e9420e9]
+- Updated dependencies [a48864f]
+- Updated dependencies [e894e11]
+- Updated dependencies [a8a5746]
+- Updated dependencies [3b3064f]
+- Updated dependencies [c4bc5ef]
+- Updated dependencies [1f78470]
+- Updated dependencies [d567a6a]
+- Updated dependencies [27bc91d]
+    - ts-data-forge@14.11.0
+    - synstate@7.0.0
+    - synstate-dom@0.7.0
+    - ts-fortress@12.4.3
+    - ts-utils-additional@0.0.10
+
 ## 0.0.23
 
 ### Patch Changes

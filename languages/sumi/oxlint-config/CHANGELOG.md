@@ -1,5 +1,17 @@
 # @sumi-lang/oxlint-config
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [e9420e9]
+- Updated dependencies [01dc5be]
+- Updated dependencies [a48864f]
+- Updated dependencies [1f78470]
+- Updated dependencies [d567a6a]
+    - ts-data-forge@14.11.0
+    - eslint-rule-forge@0.5.1
+
 ## 0.1.5
 
 ### Patch Changes

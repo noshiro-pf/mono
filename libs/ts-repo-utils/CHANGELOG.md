@@ -1,5 +1,17 @@
 ## [10.1.8](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.7...v10.1.8) (2026-08-09)
 
+## 10.7.2
+
+### Patch Changes
+
+- 2731308: `getUntrackedFiles`, `getModifiedFiles`, `getStagedFiles` and `getDiffFrom` now return names with non-ASCII characters, a `"`, or leading or trailing spaces as they are on disk. They read git's newline-separated output, which under the default `core.quotePath` quotes and octal-escapes such names (`"\346\227\245.md"`), and trimmed each line, so they returned paths that do not exist: `formatDiffFrom` and `formatUncommittedFiles` skipped those files without an error, and `checkShouldRun` matched the quoted string against its globs. The git commands now run with `-z`.
+- 8859dc2: `stripDevOnlyCode` no longer trims trailing whitespace from a line it erased nothing from when the file has astral characters (an emoji, say) before the erasure. It recorded which lines were touched while walking the text by code point but looked up erased positions by code unit, so after each astral character the line was attributed one position late, and the next line could be trimmed too — deleting trailing spaces that belong to a multi-line template literal.
+- Updated dependencies [e9420e9]
+- Updated dependencies [a48864f]
+- Updated dependencies [1f78470]
+- Updated dependencies [d567a6a]
+    - ts-data-forge@14.11.0
+
 ## 10.7.1
 
 ### Patch Changes
