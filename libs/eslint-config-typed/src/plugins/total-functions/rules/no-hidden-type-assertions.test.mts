@@ -194,6 +194,86 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
         export const result = f<string>(x);
       `,
     },
+    // A type parameter is found in a value parameter under each kind of type
+    // node: parentheses, rest and optional tuple elements, the parameters of a
+    // method or call signature, constructor, mapped, template literal and
+    // `typeof` types
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f1<T>(x: (T | null)[]): T;
+        export const r1 = f1<string>([]);
+        declare function f2<T>(x: [...T[]]): T;
+        export const r2 = f2<string>([]);
+        declare function f3<T>(x: [T?]): T;
+        export const r3 = f3<string>([]);
+        declare function f4<T>(x: { m(a: T): void }): T;
+        export const r4 = f4<string>({ m: () => {} });
+        declare function f5<T>(x: { (a: T): void }): T;
+        export const r5 = f5<string>(() => {});
+        declare function f6<T>(x: new (a: T) => object): T;
+        export const r6 = f6<string>(class { constructor(_a: string) {} });
+        declare function f7<T>(x: { [K in keyof T]: string }): T;
+        export const r7 = f7<{ a: number }>({ a: '' });
+        declare function f8<T extends string>(x: \`a\${T}\`): T;
+        export const r8 = f8<'b'>('ab');
+        declare const g9: <U>(u: U) => U;
+        declare function f9<T>(x: typeof g9<T>): T;
+        export const r9 = f9<string>(g9);
+      `,
+    },
+    // A type parameter of the return type that shadows the function's own is
+    // not a use of the function's
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(): <T>(x: T) => T;
+        export const result = f<string>();
+      `,
+    },
+    // An `infer` type that shadows the function's type parameter is not a use
+    // of it
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(): string[] extends (infer T)[] ? T : never;
+        export const result = f<string>();
+      `,
+    },
+    // A mapped type's key that shadows the function's type parameter is not a
+    // use of it
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(): { [T in 'a']: T };
+        export const result = f<string>();
+      `,
+    },
+    // A type guard called with `unknown` or `never`, or whose type parameter
+    // defaults to `unknown`, asserts nothing
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function isT<T>(x: unknown): x is T;
+        export const r1 = isT<unknown>(1);
+        declare function assertT<T>(x: unknown): asserts x is T;
+        assertT<never>(1);
+        declare function isU<T = unknown>(x: unknown): x is T;
+        export const r3 = isU(1);
+      `,
+    },
+    // A type parameter that only constrains, or defaults, one of the returned
+    // function's own is not looked for, as before: here the returned function
+    // hands back what its caller passes
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(): <U extends T>(u: U) => U;
+        export const r1 = f<string>();
+        declare function g<T>(): <U = T>(u: U) => U;
+        export const r2 = g<string>();
+      `,
+    },
   ],
   invalid: [
     // Hidden type assertion set to arbitrary type
@@ -380,6 +460,65 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
       code: dedent`
         declare function f<T>(): ${curried(30, 'T')};
         export const result = f<string>();
+      `,
+      errors: [
+        {
+          messageId: 'errorStringGeneric',
+        },
+      ],
+    },
+    // A type parameter is found in the return type under each kind of type
+    // node: parentheses, a type predicate (called with a type argument or none,
+    // or asserting), the parameters of a method or call signature, constructor,
+    // mapped, template literal and `typeof` types
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f1<T>(): (T | null)[];
+        export const r1 = f1<string>();
+        declare function f2<T>(x: unknown): x is T;
+        export const r2 = f2<string>(1);
+        declare function f3<T>(): { m(a: T): void };
+        export const r3 = f3<string>();
+        declare function f4<T>(): { (a: T): void };
+        export const r4 = f4<string>();
+        declare function f5<T>(): new () => T;
+        export const r5 = f5<string>();
+        declare function f6<T>(): { [K in keyof T]: string };
+        export const r6 = f6<{ a: number }>();
+        declare function f7<T extends string>(): \`a\${T}\`;
+        export const r7 = f7<'b'>();
+        declare const g8: <U>() => U;
+        declare function f8<T>(): typeof g8<T>;
+        export const r8 = f8<string>();
+        export const r9 = f2(1);
+        declare function f10<T>(x: unknown): asserts x is T;
+        f10<string>(1);
+      `,
+      errors: Arr.create(10, { messageId: 'errorStringGeneric' } as const),
+    },
+    // A cast of a function whose type parameter only a type predicate uses
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function isT<T>(x: unknown): x is T;
+        type Foo = Readonly<{ a: number }>;
+        declare const v: unknown;
+        export const result = (isT as (x: unknown) => x is Foo)(v);
+      `,
+      errors: [
+        {
+          messageId: 'errorStringGeneric',
+        },
+      ],
+    },
+    // A type parameter of a value parameter's own type that shadows the
+    // function's is not a use of the function's
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(x: <T>(t: T) => void): T;
+        export const result = f<string>(() => {});
       `,
       errors: [
         {
