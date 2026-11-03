@@ -1,7 +1,7 @@
 import { createContext, type CreateContextOptions } from '../context.mjs';
 import { exitIfErr } from '../functions/utils/exit-if-err.mjs';
 import { wrapStartEnd } from '../functions/utils/wrap-start-end.mjs';
-import { buildGenSteps, findStepIndex } from './gen-steps.mjs';
+import { buildGenSteps, selectSteps } from './gen-steps.mjs';
 
 /** Run the full generation pipeline from scratch, starting with fetchLibFiles. */
 export const runGenFull = async (
@@ -11,11 +11,10 @@ export const runGenFull = async (
 
   const steps = buildGenSteps(ctx);
 
-  const start = findStepIndex(steps, 'fetchLibFiles');
-
-  const end = findStepIndex(steps, `${ctx.packageManagerName} install`) + 1;
-
-  for (const { name, fn } of steps.slice(start, end)) {
+  for (const { name, fn } of selectSteps(steps, {
+    from: 'fetchLibFiles',
+    through: `${ctx.packageManagerName} install`,
+  })) {
     await wrapStartEnd(fn, name).then(exitIfErr);
   }
 };

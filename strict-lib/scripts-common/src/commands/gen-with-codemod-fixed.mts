@@ -3,7 +3,7 @@ import { pathExists } from 'ts-repo-utils';
 import { createContext, type CreateContextOptions } from '../context.mjs';
 import { exitIfErr } from '../functions/utils/exit-if-err.mjs';
 import { wrapStartEnd } from '../functions/utils/wrap-start-end.mjs';
-import { buildGenSteps, findStepIndex } from './gen-steps.mjs';
+import { buildGenSteps, selectSteps } from './gen-steps.mjs';
 
 /**
  * Run the generation pipeline including the `genCodemodFixed` step. When
@@ -33,14 +33,10 @@ export const runGenWithCodemodFixed = async (
     (file) => file.startsWith('lib') && file.endsWith('.d.ts'),
   );
 
-  const start = findStepIndex(
-    steps,
-    hasCopiedLibFiles ? 'format temp/copied' : 'fetchLibFiles',
-  );
-
-  const end = findStepIndex(steps, `${ctx.packageManagerName} install`) + 1;
-
-  for (const { name, fn } of steps.slice(start, end)) {
+  for (const { name, fn } of selectSteps(steps, {
+    from: hasCopiedLibFiles ? 'format temp/copied' : 'fetchLibFiles',
+    through: `${ctx.packageManagerName} install`,
+  })) {
     await wrapStartEnd(fn, name).then(exitIfErr);
   }
 };
