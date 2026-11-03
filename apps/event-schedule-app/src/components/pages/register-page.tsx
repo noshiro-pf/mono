@@ -40,7 +40,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
   );
 
   return (
-    <SignInStyled.Wrapper>
+    <SignInStyled.Wrapper data-e2e={'register-page'}>
       <NavBar />
 
       <SignInStyled.Centering>
@@ -55,6 +55,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                 <BpInput
                   // eslint-disable-next-line jsx-a11y/no-autofocus
                   autoFocus
+                  data-e2e={'username'}
                   disabled={formState.isWaitingResponse}
                   intent={usernameFormIntent}
                   type={'text'}
@@ -70,6 +71,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               >
                 <BpInput
                   autoComplete={'username'}
+                  data-e2e={'email'}
                   disabled={formState.isWaitingResponse}
                   intent={emailFormIntent}
                   placeholder={'sample@gmail.com'}
@@ -86,6 +88,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               >
                 <BpInput
                   autoComplete={'new-password'}
+                  data-e2e={'password'}
                   disabled={formState.isWaitingResponse}
                   intent={passwordFormIntent}
                   type={'password'}
@@ -100,6 +103,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                 label={verifyPasswordInputLabel}
               >
                 <BpInput
+                  data-e2e={'verify-password'}
                   disabled={formState.isWaitingResponse}
                   intent={passwordFormIntent}
                   rightElement={passwordLockButton}
@@ -114,6 +118,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
 
             <SignInStyled.ButtonWrapper>
               <Button
+                data-e2e={'register-button'}
                 disabled={enterButtonDisabled}
                 fill
                 intent={'primary'}

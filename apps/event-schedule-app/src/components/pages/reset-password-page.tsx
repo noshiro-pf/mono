@@ -47,6 +47,7 @@ export const ResetPasswordPage = memoNamed<Props>(
                   autoComplete={'email'}
                   // eslint-disable-next-line jsx-a11y/no-autofocus
                   autoFocus
+                  data-e2e={'email'}
                   disabled={formState.isWaitingResponse}
                   intent={emailFormIntent}
                   type={'email'}
@@ -58,6 +59,7 @@ export const ResetPasswordPage = memoNamed<Props>(
 
             <SignInStyled.ButtonWrapper>
               <Button
+                data-e2e={'reset-password-button'}
                 disabled={enterButtonDisabled}
                 fill
                 intent={'primary'}

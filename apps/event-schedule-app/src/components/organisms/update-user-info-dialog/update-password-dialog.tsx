@@ -85,6 +85,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
               autoComplete={'current-password'}
               // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
+              data-e2e={'old-password'}
               disabled={formState.isWaitingResponse}
               intent={oldPasswordFormIntent}
               rightElement={oldPasswordInputButton}
@@ -101,6 +102,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
           >
             <BpInput
               autoComplete={'new-password'}
+              data-e2e={'new-password'}
               disabled={formState.isWaitingResponse}
               intent={newPasswordFormIntent}
               type={'password'}
@@ -116,6 +118,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
           >
             <BpInput
               autoComplete={'new-password'}
+              data-e2e={'verify-new-password'}
               disabled={formState.isWaitingResponse}
               intent={newPasswordFormIntent}
               rightElement={newPasswordLockButton}

@@ -116,7 +116,10 @@ export const NavBar = memoNamed('NavBar', () => {
         >
           {fireAuthUser === undefined ? (
             <>
-              <ItemAnchor onClick={forNonLoggedInUserDialogState[1].setTrue}>
+              <ItemAnchor
+                data-e2e={'nav-event-list'}
+                onClick={forNonLoggedInUserDialogState[1].setTrue}
+              >
                 {dc.list}
               </ItemAnchor>
               <ForNonLoggedInUserDialog
@@ -125,12 +128,14 @@ export const NavBar = memoNamed('NavBar', () => {
               />
 
               <ItemAnchor
+                data-e2e={'nav-sign-in'}
                 href={Routes.routes.signInPage}
                 onClick={routerLinkClickHandler}
               >
                 {dc.auth.signIn}
               </ItemAnchor>
               <ItemAnchor
+                data-e2e={'nav-register'}
                 href={Routes.routes.registerPage}
                 onClick={routerLinkClickHandler}
               >
@@ -140,6 +145,7 @@ export const NavBar = memoNamed('NavBar', () => {
           ) : (
             <>
               <ItemAnchor
+                data-e2e={'nav-event-list'}
                 href={Routes.routes.eventListPage}
                 onClick={routerLinkClickHandler}
               >
@@ -153,7 +159,9 @@ export const NavBar = memoNamed('NavBar', () => {
                   placement={'bottom-start'}
                   transitionDuration={50}
                 >
-                  <Anchor>{fireAuthUser.displayName}</Anchor>
+                  <Anchor data-e2e={'nav-user-menu'}>
+                    {fireAuthUser.displayName}
+                  </Anchor>
                 </PopoverNext>
                 <span>{dc.auth.userName.suffix}</span>
               </Item>

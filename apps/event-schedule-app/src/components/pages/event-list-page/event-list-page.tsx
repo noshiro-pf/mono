@@ -97,7 +97,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
   );
 
   return (
-    <div>
+    <div data-e2e={'event-list-page'}>
       <Header title={dc.title} />
       {eventListWithHandler === undefined ? (
         <Spinner />
@@ -132,6 +132,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
             />
             <ControlGroup>
               <BpInput
+                data-e2e={'search-input'}
                 leftIcon={'search'}
                 placeholder={dc.filter.searchInput}
                 type={'search'}
@@ -139,6 +140,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
                 onValueChange={EventListPageFilterStore.setFilterText}
               />
               <Button
+                data-e2e={'search-button'}
                 disabled={formElementsAreDisabled}
                 onClick={EventListPageFilterStore.filterByText}
               >
@@ -154,7 +156,9 @@ export const EventListPage = memoNamed('EventListPage', () => {
               justify-content: space-between;
             `}
           >
-            <div>{dc.itemCount(Arr.length(eventListWithHandler))}</div>
+            <div data-e2e={'event-count'}>
+              {dc.itemCount(Arr.length(eventListWithHandler))}
+            </div>
             <Button
               disabled={refreshButtonIsDisabled}
               icon={'refresh'}

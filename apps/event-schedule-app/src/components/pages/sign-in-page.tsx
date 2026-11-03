@@ -46,7 +46,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
   );
 
   return (
-    <SignInStyled.Wrapper>
+    <SignInStyled.Wrapper data-e2e={'sign-in-page'}>
       <NavBar />
 
       <SignInStyled.Centering>
@@ -65,6 +65,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
                     autoComplete={'email'}
                     // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus
+                    data-e2e={'email'}
                     disabled={formState.isWaitingResponse}
                     fill
                     intent={emailFormIntent}
@@ -82,6 +83,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
                 >
                   <BpInput
                     autoComplete={'current-password'}
+                    data-e2e={'password'}
                     disabled={formState.isWaitingResponse}
                     fill
                     intent={passwordFormIntent}
@@ -94,13 +96,17 @@ export const SignInPage = memoNamed('SignInPage', () => {
               </SignInStyled.FormGroups>
 
               <SignInStyled.PasswordResetWrapper>
-                <SignInStyled.PasswordReset onClick={passwordIsOpenResetForm}>
+                <SignInStyled.PasswordReset
+                  data-e2e={'password-reset-link'}
+                  onClick={passwordIsOpenResetForm}
+                >
                   {dc.resetPassword}
                 </SignInStyled.PasswordReset>
               </SignInStyled.PasswordResetWrapper>
 
               <SignInStyled.ButtonWrapper>
                 <Button
+                  data-e2e={'sign-in-button'}
                   disabled={enterButtonDisabled}
                   fill
                   intent={'primary'}

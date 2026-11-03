@@ -163,7 +163,7 @@ export const AnswerTable = memoNamed<Props>(
                     minimized={tableMinimized || dateStringIsMinimized}
                   />
                 </td>
-                <td>
+                <td data-e2e={'score'}>
                   <span>{Num.roundAt(score, 2)}</span>
                 </td>
                 {answerIconIsHidden ? undefined : (
