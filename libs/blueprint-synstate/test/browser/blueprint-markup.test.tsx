@@ -7,31 +7,35 @@ import type { ReactElement } from 'react';
 import { render, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { cases, mountBlueprint } from './blueprint-cases.js';
+import { settle } from './helpers.mjs';
 import { linesOf } from './markup-lines.mjs';
 
 describe('markup', () => {
-  test.each(cases)('%s matches Blueprint React', (_name, theirs, ours) => {
-    const blueprint = renderBlueprint(theirs.element);
+  test.each(cases)(
+    '%s matches Blueprint React',
+    async (_name, theirs, ours) => {
+      const blueprint = renderBlueprint(theirs.element);
 
-    const synstate = renderSynstate(ours);
+      const synstate = await renderSynstate(ours);
 
-    assert.deepStrictEqual(
-      synstate,
-      theirs.deliberate.reduce<readonly string[]>(
-        (lines, adjust) =>
-          Arr.generate(function* () {
-            for (const line of lines) {
-              const adjusted = adjust(line);
+      assert.deepStrictEqual(
+        synstate,
+        theirs.deliberate.reduce<readonly string[]>(
+          (lines, adjust) =>
+            Arr.generate(function* () {
+              for (const line of lines) {
+                const adjusted = adjust(line);
 
-              if (adjusted !== undefined) {
-                yield adjusted;
+                if (adjusted !== undefined) {
+                  yield adjusted;
+                }
               }
-            }
-          }),
-        blueprint,
-      ),
-    );
-  });
+            }),
+          blueprint,
+        ),
+      );
+    },
+  );
 });
 
 /**
@@ -58,10 +62,16 @@ const renderBlueprint = (element: () => ReactElement): readonly string[] => {
   return linesOf(container);
 };
 
-const renderSynstate = (app: () => JSX.Element): readonly string[] => {
+const renderSynstate = async (
+  app: () => JSX.Element,
+): Promise<readonly string[]> => {
   const container = attached();
 
   onTestFinished(render(app, container));
+
+  // What a component does once it is drawn, as a popover decorating its target,
+  // is part of what it draws.
+  await settle();
 
   return linesOf(container);
 };

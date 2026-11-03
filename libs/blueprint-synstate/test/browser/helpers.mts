@@ -50,6 +50,31 @@ export const controlled = (
   };
 };
 
+/**
+ * Stops every animation and transition until the test finishes, so that a
+ * spinner, or an overlay's entrance, is drawn at the same point on both sides
+ * whenever each is taken.
+ */
+export const freezeAnimations = (): void => {
+  const style = document.createElement('style');
+
+  style.append(
+    '*, *::before, *::after { animation: none !important; transition: none !important; }',
+  );
+
+  document.head.append(style);
+
+  onTestFinished(() => {
+    style.remove();
+  });
+};
+
+/** Past `ms`, by default Blueprint's 300ms transitions and some. */
+export const transitioned = (ms = 400): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
 /** Lets the work queued for after an update run. */
 export const settle = (): Promise<void> =>
   new Promise((resolve) => {

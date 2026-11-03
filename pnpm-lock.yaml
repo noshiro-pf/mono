@@ -3491,6 +3491,9 @@ importers:
 
   libs/blueprint-synstate:
     dependencies:
+      '@floating-ui/dom':
+        specifier: ^1.8.0
+        version: 1.8.0
       ts-type-forge:
         specifier: workspace:^
         version: link:../ts-type-forge

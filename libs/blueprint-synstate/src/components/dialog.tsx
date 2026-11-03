@@ -53,10 +53,10 @@ export const Dialog = ({
       canEscapeKeyClose={canEscapeKeyClose}
       canOutsideClickClose={canOutsideClickClose}
       class={'bp6-overlay-scroll-container'}
-      content={({ class: contentClass }) => (
+      content={({ class: contentClass, tabIndex }) => (
         <div
           class={{ 'bp6-dialog-container': constant(true), ...contentClass }}
-          tabIndex={constant(0)}
+          tabIndex={tabIndex === undefined ? undefined : constant(tabIndex)}
         >
           <div
             aria-labelledby={

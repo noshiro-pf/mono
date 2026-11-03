@@ -22,6 +22,8 @@ import {
   Icon,
   InputGroup,
   Label,
+  Menu,
+  MenuItem,
   Navbar,
   NavbarGroup,
   NonIdealState,
@@ -130,6 +132,7 @@ const allIcons = [
   'archive',
   'automatic-updates',
   'camera',
+  'caret-right',
   'chevron-down',
   'chevron-left',
   'chevron-right',
@@ -440,6 +443,68 @@ export const cases: readonly Case[] = [
         value={constant('a')}
         onValueChange={ignore}
       />
+    ),
+  ],
+  [
+    'Menu',
+    {
+      element: () =>
+        h(
+          Blueprint.Menu,
+          null,
+          h(Blueprint.MenuItem, { text: 'Rename', icon: 'edit' }),
+          h(Blueprint.MenuItem, {
+            text: 'Delete',
+            intent: 'danger',
+            label: 'Del',
+          }),
+          h(Blueprint.MenuItem, { text: 'Archived', disabled: true }),
+          h(
+            Blueprint.MenuItem,
+            { text: 'Account settings' },
+            h(Blueprint.MenuItem, { text: 'Change the name' }),
+          ),
+        ),
+      deliberate: [],
+    },
+    () => (
+      <Menu>
+        <MenuItem icon={'edit'} text={constant('Rename')} />
+        <MenuItem
+          intent={'danger'}
+          label={constant('Del')}
+          text={constant('Delete')}
+        />
+        <MenuItem disabled={true} text={constant('Archived')} />
+        <MenuItem text={constant('Account settings')}>
+          <MenuItem text={constant('Change the name')} />
+        </MenuItem>
+      </Menu>
+    ),
+  ],
+  [
+    'Menu, small, its text cut short',
+    {
+      element: () =>
+        h(
+          'div',
+          { style: { width: '120px' } },
+          h(
+            Blueprint.Menu,
+            { size: 'small' },
+            h(Blueprint.MenuItem, {
+              text: 'A name too long to be drawn whole',
+            }),
+          ),
+        ),
+      deliberate: [],
+    },
+    () => (
+      <div style={{ width: constant('120px') }}>
+        <Menu size={'small'}>
+          <MenuItem text={constant('A name too long to be drawn whole')} />
+        </Menu>
+      </div>
     ),
   ],
   [

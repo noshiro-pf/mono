@@ -10,6 +10,7 @@ import { constant, render, type JSX } from 'synstate-dom';
 import { range } from 'ts-data-forge';
 import { page } from 'vitest/browser';
 import { disabledButtonTabIndex, mountBlueprint } from './blueprint-cases.js';
+import { freezeAnimations, transitioned } from './helpers.mjs';
 import { linesOf } from './markup-lines.mjs';
 
 const ignore = (): void => {};
@@ -304,7 +305,10 @@ describe(Dialog, () => {
 
     await transitioned();
 
-    assert.isNull(document.querySelector('.bp6-portal'));
+    // What it drew is gone; the empty overlay stays, as Blueprint's does.
+    assert.isNull(document.querySelector('.bp6-dialog-container'));
+
+    assert.isNull(document.querySelector('.bp6-overlay-open'));
 
     setIsOpen(true);
 
@@ -390,7 +394,10 @@ describe(Dialog, () => {
 
     await transitioned();
 
-    assert.isNull(document.querySelector('.bp6-portal'));
+    // What it drew is gone; the empty overlay stays, as Blueprint's does.
+    assert.isNull(document.querySelector('.bp6-dialog-container'));
+
+    assert.isNull(document.querySelector('.bp6-overlay-open'));
 
     assert.isFalse(document.body.classList.contains('bp6-overlay-open'));
 
@@ -882,24 +889,6 @@ describe(Alert, () => {
   });
 });
 
-/**
- * Stops every animation and transition for the test, so that a spinner is drawn
- * at the same point of its turn on both sides.
- */
-const freezeAnimations = (): void => {
-  const style = document.createElement('style');
-
-  style.append(
-    '*, *::before, *::after { animation: none !important; transition: none !important; }',
-  );
-
-  document.head.append(style);
-
-  onTestFinished(() => {
-    style.remove();
-  });
-};
-
 /** The one element `selector` finds in the document. */
 const one = <E extends Element = HTMLElement>(selector: string): E => {
   const found = document.querySelectorAll<E>(selector);
@@ -912,12 +901,6 @@ const one = <E extends Element = HTMLElement>(selector: string): E => {
 
   return element;
 };
-
-/** Past Blueprint's 300ms transitions. */
-const transitioned = (): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(resolve, 400);
-  });
 
 /**
  * Mounts a side, focuses its input, and moves focus to the trap after the

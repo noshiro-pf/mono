@@ -3,6 +3,7 @@ import '@blueprintjs/datetime/lib/css/blueprint-datetime.css';
 import { render } from 'synstate-dom';
 import { page } from 'vitest/browser';
 import { cases, mountBlueprint } from './blueprint-cases.js';
+import { freezeAnimations } from './helpers.mjs';
 
 // Draws each case of `blueprint-cases.tsx` twice, with Blueprint React and with
 // this library, under Blueprint's own style sheets, light and dark, and compares
@@ -166,22 +167,4 @@ const compare = async (
       0,
     ),
   };
-};
-
-/**
- * Stops animations until the test finishes, so that a spinner is drawn at the
- * same angle on both sides whenever each is taken.
- */
-const freezeAnimations = (): void => {
-  const style = document.createElement('style');
-
-  style.append(
-    '*, *::before, *::after { animation: none !important; transition: none !important; }',
-  );
-
-  document.head.append(style);
-
-  onTestFinished(() => {
-    style.remove();
-  });
 };
