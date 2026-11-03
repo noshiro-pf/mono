@@ -102,12 +102,60 @@ The loop ends at the first of:
   issue, or asked in the thread when it is a question of what the change
   should do. Do not start a fourth round to make it go away.
 
+A fix the third round asked for that changes behavior — anything but wording —
+is read once more, by `/code-review medium` given that fix alone (mark the
+branch as for a later round). That read is not a fourth round, and nothing it
+finds is fixed here: a finding goes to an issue, and one that shows the fix
+itself is wrong takes the fix out, its finding deferred with it. Otherwise the
+last fixes of a long loop are the only code that reaches `main` with no review
+at all.
+
+## What counts as a round
+
+The three rounds belong to one loop over one version of the change. What starts
+another, or needs none:
+
+- **A rework** — the change sent back to another approach, by the user or by a
+  finding about what the change should do, so that the code the rounds read is
+  mostly gone — starts a new loop of up to three rounds over the whole diff. A
+  second rework is put to the user before its loop starts. A fix inside a loop
+  that changes a design is not a rework: it widens the next round, as "To widen
+  a round" above says, and counts in its loop.
+- **An amend to an open pull request** is a loop of its own, over the amend.
+- **A rebase or restack that changes nothing in this layer** needs no review.
+- **A rebase that resolves a conflict** is read once, at the loop's level, given
+  the resolution alone. It is outside every count, and what it finds follows the
+  third-round rule above.
+
+Anything else — a fix, a test added, a comment reworded — is a round of the loop
+it belongs to.
+
 ## What the description records
 
-The `## Review` section says the level and the number of rounds, then lists
-the findings under **Fixed**, **Dismissed** (each with its reason) and
-**Deferred** (each with its issue). Keep that shape: it is what a reader, and
-anything that later mines the descriptions for recurring findings, can parse.
+The `## Review` section opens with one line stating the level and the total
+number of rounds, in digits and in one of these forms — `/code-review`, another
+review mechanism (`AGENTS.md`, "Codex adaptations"), or a self-review when there
+was none:
+
+```md
+`/code-review high`, 3 rounds.
+Review at `high`, 2 rounds.
+Self-review at `high`, 1 round.
+```
+
+The total counts the rounds of every loop. The read of a third-round fix and the
+read of a conflict resolution are not rounds and are not in it. More than one
+loop, or more than one level, is still one total; the next sentence says how it
+divides. The line may go on after a period, comma, semicolon or colon.
+`pr-description` and `open-pr --body-file` refuse a section that opens any other
+way, and `review-findings-digest` reads the total from it. A description written
+before this form changes the opening in both halves, or in the original alone
+with `pr-description push --wording-only`.
+
+The section then lists the findings under **Fixed**, **Dismissed** (each with
+its reason) and **Deferred** (each with its issue). Keep that shape: it is what
+a reader, and anything that later mines the descriptions for recurring findings,
+can parse.
 The Japanese half of the description (`CLAUDE.md`, "Japanese text")
 translates the section under `### レビュー`, never a second `## Review`: the
 digest reads the first `## Review` alone, and only the English one parses.

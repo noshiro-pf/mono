@@ -70,6 +70,14 @@ pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  #
 - `## Review`（`## Review (…)` のような後ろに続きのある見出しも含む）が原文に
   2つ以上ある、または訳文にある。ツールが読むのは本文で最初の1つだけです。
   訳文の節は `### レビュー` です。
+- 原文の `## Review` の最初の行が、レベルとラウンドの合計を数字で書いた
+  `` `/code-review high`, 3 rounds. `` の形（`/code-review` を使えなかった
+  レビューは、別のレビューの仕組みなら ``Review at `high`, 2 rounds.``、
+  セルフレビューなら ``Self-review at `high`, 1 round.``）で始まっていない。行は
+  ピリオド、カンマ、セミコロン、コロンの後に続けてかまいません。
+  `review-findings-digest` はこの行から合計を読みます。この形より前に書いた
+  description は、両方の最初の行を直すか、原文だけを直して `--wording-only` で
+  `push` します。
 
 `push` はさらに次を確かめます。
 
@@ -138,7 +146,15 @@ the open issues with a close title and those that name a `--keyword` as written
   appears once, after the `---` rule;
 - the original has more than one `## Review` section, a suffixed heading such as
   `## Review (…)` included, or the translation has one: the tools read the
-  first in the body. The translation's is `### レビュー`.
+  first in the body. The translation's is `### レビュー`;
+- the original's `## Review` does not open with the level and the total of
+  rounds in digits, as `` `/code-review high`, 3 rounds. `` (or, for a review
+  with no `/code-review`, ``Review at `high`, 2 rounds.`` when another review
+  mechanism ran and ``Self-review at `high`, 1 round.`` when none did), the line
+  going on, if at all, after a period, comma, semicolon or colon:
+  `review-findings-digest` reads the total from it. A description written before
+  this form has its opening fixed in both halves, or in the original alone with
+  `push --wording-only`.
 
 `push` also refuses when the description changed on GitHub since the `pull`
 (`open-pr --merge-before` writes into other pull requests' bodies), and when

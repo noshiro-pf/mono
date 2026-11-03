@@ -125,6 +125,47 @@ describe('roundsIn', () => {
 });
 
 describe('parseReview', () => {
+  test('takes the total from the opening line, not from the sentences that divide it', () => {
+    const review = parseReview(dedent`
+      ## Review
+
+      \`/code-review high\`, 6 rounds. Three rounds on the first version, and three rounds on the rework.
+
+      - Fixed: a.
+    `);
+
+    assert.strictEqual(review?.rounds, 6);
+  });
+
+  test('takes the total and the level from a self-review opening', () => {
+    const review = parseReview(dedent`
+      ## Review
+
+      Self-review at \`high\`, 1 round, no findings.
+    `);
+
+    assert.strictEqual(review?.rounds, 1);
+
+    assert.deepStrictEqual(review?.levels, ['high']);
+  });
+
+  test('takes the total from an opening with trailing spaces, after a fence', () => {
+    const review = parseReview(
+      [
+        '## Review',
+        '',
+        '```md',
+        'Two rounds.',
+        '```',
+        '',
+        '`/code-review high`, 6 rounds.  ',
+        'Three rounds on the first version, and three rounds on the rework.',
+      ].join('\n'),
+    );
+
+    assert.strictEqual(review?.rounds, 6);
+  });
+
   test('a sentence each for the fixed and the dismissed', () => {
     const review = parseReview(dedent`
       ## Review
