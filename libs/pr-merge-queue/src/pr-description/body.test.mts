@@ -248,6 +248,126 @@ describe(checkDescription, () => {
 
     assert.strictEqual(problems.length, 2);
   });
+
+  const TRAILER_RULE =
+    'Start-After: and Claude-Session: lines and closing keywords are read wherever they are, so each appears once, after the "---" rule that ends the translation';
+
+  test.each([
+    'Closes #2',
+    'Start-After: #3',
+    'Claude-Session: https://claude.ai/code/session_1',
+  ])('keeps the trailer %s out of either half', (trailer) => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          Merge-After: #1
+
+          A.
+
+          ${trailer}
+
+          ## 日本語
+
+          あ。
+
+          ${trailer}
+        `),
+      ),
+      [
+        `the original has the trailer "${trailer}"; ${TRAILER_RULE}`,
+        `the translation has the trailer "${trailer}"; ${TRAILER_RULE}`,
+      ],
+    );
+  });
+
+  test.each([
+    'Closes noshiro-pf/mono#2',
+    'Fixes https://github.com/noshiro-pf/mono/issues/2',
+    'Fixes:#2',
+    'Closes : #2',
+  ])('reads %s as a trailer', (trailer) => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A.
+
+          ${trailer}
+
+          ## 日本語
+
+          あ。
+        `),
+      ),
+      [`the original has the trailer "${trailer}"; ${TRAILER_RULE}`],
+    );
+  });
+
+  test('keeps a Review section out of the translation, even titling its lead', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A.
+
+          ## 日本語
+
+          ## Review
+
+          あ。
+        `),
+      ),
+      [
+        'the translation has a "## Review" heading; the tools read the first in the body, so the findings go under the original\'s and the translation titles its own section "### <translated heading>"',
+      ],
+    );
+  });
+
+  test('reads no trailer out of code or inline code', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          Writes \`Closes #2\` and:
+
+          \`\`\`md
+          Start-After: #3
+          \`\`\`
+
+          ## 日本語
+
+          \`Closes #2\` を書く。
+        `),
+      ),
+      [],
+    );
+  });
+
+  test('wants one Review section in the original, however headed', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          ## Review (/code-review high)
+
+          A.
+
+          ## Review findings not fixed
+
+          B.
+
+          ## 日本語
+
+          ### レビュー
+
+          あ。
+
+          ### 直していない指摘
+
+          い。
+        `),
+      ),
+      [
+        'the original has a "## Review" section 2 times; the tools read the first, so the findings go under one',
+      ],
+    );
+  });
 });
 
 describe(changedParts, () => {
@@ -270,6 +390,16 @@ describe(changedParts, () => {
             '## Review\n',
           ),
         ),
+      ),
+      { original: false, translation: false },
+    );
+  });
+
+  test('does not count a trailer moved out of a half as a change', () => {
+    assert.deepStrictEqual(
+      changedParts(
+        split('A.\n\nCloses #11\n\n## 日本語\n\nあ。'),
+        split('A.\n\n## 日本語\n\nあ。\n\n---\n\nCloses #11'),
       ),
       { original: false, translation: false },
     );

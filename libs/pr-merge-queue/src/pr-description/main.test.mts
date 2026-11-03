@@ -25,4 +25,18 @@ describe(descriptionProblems, () => {
 
     assert.include(problems, '#1');
   });
+
+  test('refuses a trailer in a half under the layout headline', () => {
+    const problems = descriptionProblems(
+      'A.\n\nCloses #1\n\n## 日本語\n\nあ。\n',
+      '日本語',
+    );
+
+    assert.include(
+      problems,
+      'the description is not laid out as the original, its translation, then the trailers:',
+    );
+
+    assert.include(problems, 'the original has the trailer "Closes #1"');
+  });
 });

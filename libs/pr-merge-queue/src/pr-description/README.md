@@ -62,8 +62,14 @@ pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  #
   closing keyword の中は数えません）。
 - 訳文にコードブロック、表、画像がある。どれも原文に1度だけ置き、訳文はそれを
   参照します。
-- 訳文に `Merge-After:`・`Start-After:` の行や closing keyword がある。ツールと
-  GitHub は本文のどこにあっても読むので、食い違った写しも効いてしまいます。
+- 訳文に `Merge-After:` の行がある。ツールは本文のどこにあっても読むので、
+  食い違った写しも効いてしまいます。原文に1度だけ置きます。
+- トレーラ（`Start-After:`・`Claude-Session:` の行、closing keyword）が原文か
+  訳文の中にある。ツールと GitHub はどこにあっても読むので、訳文の後の `---`
+  行より後に1度だけ置きます。
+- `## Review`（`## Review (…)` のような後ろに続きのある見出しも含む）が原文に
+  2つ以上ある、または訳文にある。ツールが読むのは本文で最初の1つだけです。
+  訳文の節は `### レビュー` です。
 
 `push` はさらに次を確かめます。
 
@@ -124,9 +130,15 @@ the open issues with a close title and those that name a `--keyword` as written
   declarations nor closing keywords;
 - the translation holds code, a table or an image, which appear once, in the
   original, for the translation to refer to;
-- the translation holds a `Merge-After:` or `Start-After:` line or a closing
-  keyword: the tools and GitHub read those wherever they are, so a copy that
-  drifted would be obeyed too.
+- the translation holds a `Merge-After:` line: the tools read it wherever it is,
+  so a copy that drifted would be obeyed too, and it appears once, in the
+  original;
+- either half holds a trailer — a `Start-After:` or `Claude-Session:` line or a
+  closing keyword — which the tools and GitHub read wherever it is, so it
+  appears once, after the `---` rule;
+- the original has more than one `## Review` section, a suffixed heading such as
+  `## Review (…)` included, or the translation has one: the tools read the
+  first in the body. The translation's is `### レビュー`.
 
 `push` also refuses when the description changed on GitHub since the `pull`
 (`open-pr --merge-before` writes into other pull requests' bodies), and when

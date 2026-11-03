@@ -87,17 +87,22 @@ export const splitDescription = (
 };
 
 /**
- * What keeps the halves of a description from mirroring each other, one
- * sentence each; empty when nothing does.
+ * What keeps the halves of a description from mirroring each other, or a
+ * trailer or `## Review` out of its place, one sentence each; empty when
+ * nothing does.
  *
  * - The translation has the original's headings one level down, in order,
  *   and may give a heading of its own to prose the original opens with.
  * - Each half names the same `#N`, outside code, tables and declarations.
  * - Code, tables and images appear once, in the original; the translation
  *   refers to them.
- * - `Merge-After:`, `Start-After:` and closing keywords appear once, outside
- *   the translation: every one of them is read wherever it is, so a second copy
- *   that drifted would be obeyed as well.
+ * - `Merge-After:` appears once, in the original: it is read wherever it is,
+ *   so a second copy that drifted would be obeyed as well.
+ * - The trailers — `Start-After:` and `Claude-Session:` lines and closing
+ *   keywords — are in neither half; they follow the rule that ends the
+ *   translation, so that each appears once, where the layout puts it.
+ * - The original has at most one `## Review`, and the translation none: the
+ *   tools read the first they find in the body.
  */
 export const checkDescription = (
   parts: DescriptionParts,
@@ -135,6 +140,8 @@ export const checkDescription = (
 
   const fenced = parts.translation.split('\n').some((line) => FENCE.test(line));
 
+  const reviews = original.filter((line) => REVIEW_HEADING.test(line)).length;
+
   return [
     mirrored
       ? undefined
@@ -158,20 +165,26 @@ export const checkDescription = (
     translation.some((line) => IMAGE.test(line))
       ? 'the translation has an image; an image appears once, in the original, and the translation refers to it'
       : undefined,
-    translation.some((line) => DECLARATION.test(line))
-      ? 'the translation has a Merge-After: or Start-After: line; it is read wherever it is, so it appears once, outside the translation'
+    translation.some((line) => MERGE_AFTER.test(line))
+      ? 'the translation has a Merge-After: line; it is read wherever it is, so it appears once, in the original'
       : undefined,
-    translation.some((line) => CLOSING_KEYWORD.test(stripInlineCode(line)))
-      ? 'the translation has a closing keyword; GitHub reads it wherever it is, so it appears once, after the translation'
+    trailerProblem('original', original),
+    trailerProblem('translation', translation),
+    reviews > 1
+      ? `the original has a "## Review" section ${reviews} times; the tools read the first, so the findings go under one`
+      : undefined,
+    translation.some((line) => REVIEW_HEADING.test(line))
+      ? 'the translation has a "## Review" heading; the tools read the first in the body, so the findings go under the original\'s and the translation titles its own section "### <translated heading>"'
       : undefined,
   ].filter((problem) => problem !== undefined);
 };
 
 /**
  * Which halves differ between two versions of a description. Trailing spaces,
- * runs of blank lines and the `Merge-After:` line do not count: the first two
- * change nothing a reader sees, and the last is a declaration, maintained by
- * `open-pr` and with no counterpart in the translation.
+ * runs of blank lines, the `Merge-After:` line and trailer lines do not count:
+ * the first two change nothing a reader sees, the third is a declaration,
+ * maintained by `open-pr` and with no counterpart in the translation, and a
+ * trailer belongs in neither half, so moving one out of a half is no edit.
  */
 export const changedParts = (
   before: DescriptionParts,
@@ -222,18 +235,49 @@ const MERGE_AFTER = /^[^\S\n]*merge-after[^\S\n]*:/iu;
 
 const DECLARATION = /^[^\S\n]*(?:merge|start)-after[^\S\n]*:/iu;
 
+/** A trailer line other than a closing keyword (`Start-After:`, `Claude-Session:`). */
+const TRAILER_LINE = /^[^\S\n]*(?:start-after|claude-session)[^\S\n]*:/iu;
+
+/**
+ * A heading `review-findings-digest` reads as the `## Review` section, suffix
+ * and all (`## Review (/code-review high)`): its `parse.mts` pattern, as is.
+ */
+const REVIEW_HEADING = /^##\s+Review\b/u;
+
 /** `open-pr --merge-before`'s line (`mergeBeforeNote`). */
 const MERGE_BEFORE_NOTE = /^Merges before #\d/u;
 
-/** GitHub's closing keywords before a reference, read once and replaced all. */
+/**
+ * A closing keyword before any reference GitHub closes by: `#N`,
+ * `owner/repo#N`, or an issue or pull request URL.
+ */
 const CLOSING_KEYWORD =
-  /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?[^\S\n]+#\d+/iu;
+  /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)(?:[^\S\n]*:[^\S\n]*|[^\S\n]+)(?:[\w.-]+\/[\w.-]+#\d|#\d|https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/(?:issues|pull)\/\d)/iu;
 
+/** {@link CLOSING_KEYWORD} before a `#N` alone, read once and replaced all. */
 const CLOSING_KEYWORDS =
-  /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?[^\S\n]+#\d+/giu;
+  /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)(?:[^\S\n]*:[^\S\n]*|[^\S\n]+)#\d+/giu;
 
 /** As `pr-report-core` reads one: not after anything that ends a repository name. */
 const REFERENCE = /(?<![\w./&-])#(?<number>\d+)\b/gu;
+
+const stripInlineCode = (line: string): string =>
+  line.replaceAll(/(`+)[^`]*?\1/gu, '');
+
+const isTrailer = (line: string): boolean =>
+  TRAILER_LINE.test(line) || CLOSING_KEYWORD.test(stripInlineCode(line));
+
+/** The first trailer `half` holds, as a problem; `undefined` when none. */
+const trailerProblem = (
+  half: 'original' | 'translation',
+  lines: readonly string[],
+): string | undefined => {
+  const trailer = lines.find(isTrailer);
+
+  return trailer === undefined
+    ? undefined
+    : `the ${half} has the trailer "${trailer.trim()}"; Start-After: and Claude-Session: lines and closing keywords are read wherever they are, so each appears once, after the "---" rule that ends the translation`;
+};
 
 const headingOf = (line: string): readonly Heading[] => {
   const match = /^ {0,3}(?<marks>#{1,6})[ \t]+(?<text>.*?)[ \t#]*$/u.exec(line);
@@ -280,9 +324,6 @@ const onlyIn = (
 const visibleLines = (text: string): readonly string[] =>
   outsideCodeFences(text).split('\n');
 
-const stripInlineCode = (line: string): string =>
-  line.replaceAll(/(`+)[^`]*?\1/gu, '');
-
 /**
  * The `#N` a half names, outside code, table rows, declarations and closing
  * keywords: a table, like code, appears in the original only, and the rest are
@@ -309,7 +350,7 @@ const normalized = (text: string): string =>
   text
     .split('\n')
     .map((line) => line.trimEnd())
-    .filter((line) => !MERGE_AFTER.test(line))
+    .filter((line) => !MERGE_AFTER.test(line) && !isTrailer(line))
     .join('\n')
     .replaceAll(/\n{3,}/gu, '\n\n')
     .trim();
