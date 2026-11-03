@@ -14,8 +14,8 @@ export const App = (): JSX.Element => (
       {constant('expr ::= x | (lambda x. expr) | (expr expr)')}
     </div>
     <div class={constant(styles.textAreaWrapper)}>
-      <div>{constant('Input:')}</div>
       <CodeArea
+        caption={'Input:'}
         e2eId={'input-area'}
         maxHeightPx={500}
         minHeightPx={100}
@@ -25,8 +25,8 @@ export const App = (): JSX.Element => (
     </div>
 
     <div class={constant(styles.textAreaWrapper)}>
-      <div>{constant('Output:')}</div>
       <CodeArea
+        caption={'Output:'}
         e2eId={'output-area'}
         maxHeightPx={800}
         minHeightPx={500}

@@ -15,6 +15,22 @@ test('the output area is read-only', { tag: '@smoke' }, async ({ page }) => {
 });
 
 test(
+  'the input and output areas are named by their captions',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    await expect
+      .soft(page.getByRole('textbox', { name: 'Input:', exact: true }))
+      .toHaveAttribute('data-e2e', 'input-area');
+
+    await expect
+      .soft(page.getByRole('textbox', { name: 'Output:', exact: true }))
+      .toHaveAttribute('data-e2e', 'output-area');
+  },
+);
+
+test(
   'the output area can be scrolled to the end of a long reduction',
   { tag: '@smoke' },
   async ({ page }) => {
