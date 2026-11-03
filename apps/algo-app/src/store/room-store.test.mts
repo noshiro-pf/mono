@@ -1,3 +1,4 @@
+import { Result } from 'ts-data-forge';
 import type { StrictOmit } from 'ts-type-forge';
 import type { RoomApi } from '../api/index.mjs';
 import { newRoom } from '../functions/index.mjs';
@@ -101,7 +102,11 @@ describe(createRoomStore, () => {
 
     added.resolve('new-id');
 
-    const res = await pending;
+    const result = await pending;
+
+    assert.isTrue(Result.isOk(result));
+
+    const res = result.value;
 
     assert.strictEqual(res.id, 'new-id');
 
@@ -110,6 +115,106 @@ describe(createRoomStore, () => {
     assert.strictEqual(store.myName.getSnapshot().value, 'alice');
 
     assert.isFalse(store.createRoom.isWaitingResponse.getSnapshot().value);
+
+    assert.isFalse(store.createRoom.hasFailed.getSnapshot().value);
+  });
+
+  test('createRoom that fails stops waiting, says so, and can be tried again', async () => {
+    const { store, api } = setup();
+
+    const mut_responses: Room[] = [];
+
+    store.createRoom.response.subscribe((created) => {
+      mut_responses.push(created);
+    });
+
+    const pending = store.createRoom.dispatch({
+      username: 'alice',
+      password: undefined,
+    });
+
+    const error = new Error('resource-exhausted');
+
+    const [failed] = api.addedRooms;
+
+    assert.isDefined(failed);
+
+    failed.reject(error);
+
+    const result = await pending;
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.strictEqual(result.value, error);
+
+    assert.isFalse(store.createRoom.isWaitingResponse.getSnapshot().value);
+
+    assert.isTrue(store.createRoom.hasFailed.getSnapshot().value);
+
+    assert.deepStrictEqual(mut_responses, []);
+
+    assert.isUndefined(store.myName.getSnapshot().value);
+
+    const retried = store.createRoom.dispatch({
+      username: 'alice',
+      password: undefined,
+    });
+
+    assert.isFalse(store.createRoom.hasFailed.getSnapshot().value);
+
+    assert.isTrue(store.createRoom.isWaitingResponse.getSnapshot().value);
+
+    const retriedRoom = api.addedRooms[1];
+
+    assert.isDefined(retriedRoom);
+
+    retriedRoom.resolve('new-id');
+
+    const result2 = await retried;
+
+    assert.isTrue(Result.isOk(result2));
+
+    assert.deepStrictEqual(mut_responses, [result2.value]);
+
+    assert.strictEqual(store.myName.getSnapshot().value, 'alice');
+  });
+
+  test('createRoom whose save throws instead of rejecting fails the same way', async () => {
+    const error = new Error('invalid-argument');
+
+    const { api } = fakeApi();
+
+    const store = createRoomStore({
+      api: {
+        ...api,
+        addRoom: () => {
+          throw error;
+        },
+      },
+    });
+
+    const mut_responses: Room[] = [];
+
+    store.createRoom.response.subscribe((created) => {
+      mut_responses.push(created);
+    });
+
+    const result = await store.createRoom.dispatch({
+      username: 'alice',
+      password: undefined,
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.strictEqual(result.value, error);
+
+    assert.isFalse(store.createRoom.isWaitingResponse.getSnapshot().value);
+
+    assert.isTrue(store.createRoom.hasFailed.getSnapshot().value);
+
+    assert.deepStrictEqual(mut_responses, []);
+
+    assert.isUndefined(store.myName.getSnapshot().value);
   });
 
   test('joinRoom adds the player to the room and takes the name', async () => {
@@ -165,6 +270,7 @@ type FakeApi = Readonly<{
   addedRooms: readonly Readonly<{
     room: StrictOmit<Room, 'id'>;
     resolve: (id: string) => void;
+    reject: (error: unknown) => void;
   }>[];
   addedPlayers: readonly Readonly<{
     roomId: string;
@@ -189,9 +295,9 @@ const fakeApi = (): FakeApi => {
   return {
     api: {
       addRoom: (added) => {
-        const { promise, resolve } = Promise.withResolvers<string>();
+        const { promise, resolve, reject } = Promise.withResolvers<string>();
 
-        mut_addedRooms.push({ room: added, resolve });
+        mut_addedRooms.push({ room: added, resolve, reject });
 
         return promise;
       },

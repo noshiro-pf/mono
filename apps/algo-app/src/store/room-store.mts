@@ -38,12 +38,15 @@ export type RoomStore = Readonly<{
     /** The room just created, with its id. */
     response: SynstateObservable<Room>;
     isWaitingResponse: InitializedObservable<boolean>;
+    /** Whether the last try could not save the room; cleared by the next. */
+    hasFailed: InitializedObservable<boolean>;
+    /** Resolves with the room created, or with why it could not be saved. */
     dispatch: (
       payload: Readonly<{
         username: string;
         password: string | undefined;
       }>,
-    ) => Promise<Room>;
+    ) => Promise<Result<Room, unknown>>;
   }>;
   joinRoom: Readonly<{
     isWaitingResponse: InitializedObservable<boolean>;
@@ -68,33 +71,62 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
     const [isWaitingResponse, { setState: setIsWaitingResponse }] =
       createBooleanState(false);
 
+    const [hasFailed, { setState: setHasFailed }] = createBooleanState(false);
+
     const dispatch = async (
       payload: Readonly<{
         username: string;
         password: string | undefined;
       }>,
-    ): Promise<Room> => {
+    ): Promise<Result<Room, unknown>> => {
+      setHasFailed(false);
+
       setIsWaitingResponse(true);
 
-      const created = newRoom(payload.password, {
-        name: payload.username,
-        online: true,
-      });
+      const added = await save(payload);
 
-      const id = await deps.api.addRoom(created);
+      if (Result.isErr(added)) {
+        setHasFailed(true);
 
-      const res: Room = { ...created, id } as const;
+        return added;
+      }
 
       setMyName(payload.username);
 
-      setIsWaitingResponse(false);
+      response.next(added.value);
 
-      response.next(res);
-
-      return res;
+      return added;
     };
 
-    return { response, isWaitingResponse, dispatch } as const;
+    /**
+     * The room saved, or why it could not be: a throw is an `Err` as a
+     * rejection is, and the waiting ends on every way out.
+     */
+    const save = async (
+      payload: Readonly<{
+        username: string;
+        password: string | undefined;
+      }>,
+    ): Promise<Result<Room, unknown>> => {
+      try {
+        return await Result.fromPromise(
+          (async (): Promise<Room> => {
+            const created = newRoom(payload.password, {
+              name: payload.username,
+              online: true,
+            });
+
+            const id = await deps.api.addRoom(created);
+
+            return { ...created, id };
+          })(),
+        );
+      } finally {
+        setIsWaitingResponse(false);
+      }
+    };
+
+    return { response, isWaitingResponse, hasFailed, dispatch } as const;
   })();
 
   const joinRoom = (() => {
