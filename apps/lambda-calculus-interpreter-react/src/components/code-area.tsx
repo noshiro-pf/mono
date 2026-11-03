@@ -49,7 +49,7 @@ export const CodeArea = memoNamed(
 
 const TextArea = styled.textarea`
   /* size */
-  overflow: hidden;
+  overflow: auto;
   max-width: 100%;
   width: 100%;
   padding: 15px;
@@ -68,6 +68,8 @@ const TextArea = styled.textarea`
   line-height: 1.4;
   caret-color: white;
   background-color: #272822;
+  /* a dark scrollbar on the dark background */
+  color-scheme: dark;
 
   &::placeholder {
     color: #ffffff91;
