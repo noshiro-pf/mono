@@ -387,13 +387,13 @@ of their own, so what they mean is here:
   `synstate-benchmark.yml`) drops
   `experimental/`, `docs/`, `**.md`, `**.txt` and the style tools'
   configuration.
-- **`style`** (`style-check.yml`) drops `experimental/` and nothing else:
-  three matrix entries check markdown, `ws:doc` regenerates the package
-  READMEs, and `ws:check:ext` globs every file under the directories it is
-  given, so `code` would skip that workflow exactly when it should fail. This
-  is why a guard whose input is a document is a `check:prose:*` script run
-  there, and a `check:root:*` script, run in `code-check.yml`, is skipped by
-  the very diff it judges (see "Commands" in `CLAUDE.md`).
+- **`style`** (`style-check.yml`) drops `experimental/` and nothing else: its
+  matrix checks markdown, `ws:doc` regenerates the package READMEs, and
+  `ws:check:ext` globs every file under the directories it is given, so `code`
+  would skip that workflow exactly when it should fail. This is why a guard
+  whose input is a document is a `check:prose:*` script run there, and a
+  `check:root:*` script, run in `code-check.yml`, is skipped by the very diff it
+  judges (see "Commands" in `CLAUDE.md`).
 - **`strict-lib`** (`strict-lib-gen.yml`) is a list of its own; the workflow
   explains each entry.
 - **`none`** (`verify-published-packages.yml`) skips the diff question
@@ -509,10 +509,11 @@ of them is required, because a required context can be satisfied by a run
 that never happened. Two ways, both measured on this repository:
 
 - A job GitHub skips produces exactly one check run, named after the job
-  (`code-check`), never the matrix contexts (`code-check (check:root)`, …).
-  Those contexts are not superseded, so they keep whatever they last said on
-  that commit: a green from an earlier run stays green, and the pull request
-  reads as fully checked while nothing ran.
+  (`code-check`), never the matrix contexts
+  (`code-check (z:ci:code-check:quick)`, …). Those contexts are not superseded,
+  so they keep whatever they last said on that commit: a green from an earlier
+  run stays green, and the pull request reads as fully checked while nothing
+  ran.
 - A skipped job whose check run name is the required context (a job with no
   matrix) reports `skipped`, and GitHub counts a skipped required check as
   satisfied.
@@ -596,9 +597,10 @@ carry. `retention-days: 1`, because it is read minutes later and by nothing
 else.
 
 Two workflows deliberately keep building per job. In
-`node-version-compatibility.yml`, building on each Node version is the
-check. In `style-check.yml` only two of the nine entries build at all, so a
-job to serve them would cost more than it saves.
+`node-version-compatibility.yml`, building on each Node version is the check. In
+`style-check.yml` both entries build, and differently (the one with `ws:gen` the
+packages others link to, `ws:doc` everything), so a job to serve them would cost
+more than it saves.
 
 ## `skip-ci` and `no-skip-ci-label`
 

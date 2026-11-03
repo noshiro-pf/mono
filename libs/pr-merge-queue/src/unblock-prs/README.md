@@ -547,12 +547,18 @@ matrix の job まで読みます。どの失敗なら直せるか、何を実�
 
 このリポジトリの設定では、失敗した job が **すべて** `code-check (X)` か
 `style-check (X)` で、`X` が `fix:` か `gen:` のコマンド（`ws:` /
-`strict-lib:` 付きも含む）なら直します。どの job も最後に
-`z:assert-repo-is-clean` を実行するので、それはコマンドがファイルを書き換えた
-だけの失敗だからです。その場合に限り、次のことをします。
+`strict-lib:` 付きも含む）か、style-check の `z:ci:style-check:checks-and-generators` なら直しま
+す。どの job も最後に `z:assert-repo-is-clean` を実行するので、それはコマンドが
+ファイルを書き換えただけの失敗だからです。このまとめた entry はフォーマッタや
+生成器と一緒にチェックも含むので、丸ごと再実行します。中のチェックが失敗していれ
+ば再実行も失敗し、それで修正を見送ります。これは他のどの fixer よりも先に
+（stage -1）、コミットされたままのツリーで実行します。中の `check:prose` はツ
+リーを base と比べるので、他の fixer の書き換えを変更の一部として読んでしまうか
+らです。その場合に限り、次のことをします。
 
 1. 使い捨ての worktree で `pnpm install --frozen-lockfile` し、CI がビルドする
-   entry（`code-check` のすべてと `ws:gen`）があれば `ws:build` を実行します。
+   entry（`code-check` のすべてと、`ws:gen` を含む style-check のまとめた entry）
+   があれば `ws:build` を実行します。
    worktree は `~/.local/state/unblock-prs/` に作ります。OS の temp は tmpfs
    のことが多く、pnpm store から `node_modules` をハードリンクできません。git
    ディレクトリや `~/.cache` の下も使えません。`fix:fmt:diff` は絶対パスのどこ
@@ -1390,18 +1396,25 @@ In `run`, `$1` to `$9` are `context`'s capture groups, shell-quoted. Fixers run
 by `stage`, lowest first, and within a stage by command.
 
 This repository's configuration fixes a failure when **every** job that failed
-is a `code-check (X)` or `style-check (X)` entry whose `X` is a `fix:` or
-`gen:` command (under `ws:` or `strict-lib:` too): every job ends with
-`z:assert-repo-is-clean`, so the failure is the command having rewritten
-files. Then, and only then:
+is a `code-check (X)` or `style-check (X)` entry whose `X` is a `fix:` or `gen:`
+command (under `ws:` or `strict-lib:` too), or style-check's
+`z:ci:style-check:checks-and-generators`: every job ends with
+`z:assert-repo-is-clean`, so the failure is the command having rewritten files.
+The bundle holds checks beside its formatters and generators, so it is rerun
+whole: a check in it that failed fails the rerun, and that declines the fix. It
+runs before every other fixer (stage -1), on the tree as committed, because its
+`check:prose` diffs the tree against the base and would read another fixer's
+rewrite as part of the change.
+Then, and only then:
 
 1. In a throwaway worktree, `pnpm install --frozen-lockfile`, and `ws:build`
-   when CI builds for one of the entries (every `code-check` entry, and
-   `ws:gen`). The worktree goes in `~/.local/state/unblock-prs/`. Not the OS
-   temp directory, which is often a tmpfs, and the pnpm store hard-links
-   `node_modules` only within one filesystem. Not the git directory or
-   `~/.cache` either, because `fix:fmt:diff` skips every file with a `.git`,
-   `.cache`, `dist`, `build` or `out` segment anywhere in its absolute path.
+   when CI builds for one of the entries (every `code-check` entry, and the
+   style-check bundle that holds `ws:gen`). The worktree goes in
+   `~/.local/state/unblock-prs/`. Not the OS temp directory, which is often a
+   tmpfs, and the pnpm store hard-links `node_modules` only within one
+   filesystem. Not the git directory or `~/.cache` either, because
+   `fix:fmt:diff` skips every file with a `.git`, `.cache`, `dist`, `build` or
+   `out` segment anywhere in its absolute path.
 2. Run the failed commands, generators first and formatters last, then
    `fix:fmt:diff`.
 3. If anything changed, amend it onto the pull request's one commit and push

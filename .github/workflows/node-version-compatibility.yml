@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # install + ws:build + one shard of ws:check:test, per Node version.
+    # install + ws:build + ws:check:test, per Node version.
     # The 10 minutes this was set to when the repository held two packages
     # cut two of the three matrix entries off mid-test.
     timeout-minutes: 30
@@ -73,22 +73,24 @@ jobs:
         # `current` is deliberately not one of them. `check-node-support` also
         # asserts `volta.node == targets.current`, and `volta.node` is what
         # `node-version-file: 'package.json'` resolves to in every other
-        # workflow — so `code-check (ws:check:test:cov:shard-*)` already runs this
-        # very suite on this very version, with coverage on top. A `current` entry
+        # workflow — so code-check.yml's `ws:check:test:cov` shards already run
+        # this very suite on this very version, with coverage on top. A `current` entry
         # here was the same tests on the same Node a second time, and the build
         # in front of them a second time.
         target: [minimum, lts]
-        # `ws:check:test` in two shards per version. As one job, its five to
-        # six minutes of tests behind a two-minute build made this the
-        # longest check workflow whenever the benchmark had nothing to
-        # measure. Each shard builds again, which is the check here, so the
-        # split costs a build and a setup of runner time per version for
-        # about two and a half minutes of wall clock. The first shard names
-        # the four slowest suites, about half the time; the second is
-        # everything else by excluding them, so a new package lands there.
-        command:
-          - ws:check:test:shard-1
-          - ws:check:test:shard-2
+        # One job per version, running `ws:check:test` whole. It was two
+        # shards per version, each building again, to save about two and a
+        # half minutes of wall clock; four jobs then took four of the
+        # account's twenty runners at the moment code-check.yml's matrix
+        # started, and one pull request's jobs passed twenty. As one job a
+        # version takes about seven and a half minutes plus `gates` (measured
+        # by its shards' steps: a build of one and a half to two minutes, about
+        # five of tests), about half a minute under code-check.yml
+        # and two under the benchmark, and it saves a setup and a build per
+        # version. Should it outgrow code-check.yml, it lengthens the pull
+        # requests the benchmark skips; split it again then.
+        # `ws:check:test` is `--no-bail`, so one package's failure does not
+        # hide the rest.
 
     steps:
       - name: Checkout
@@ -128,7 +130,7 @@ jobs:
         run: pnpm run ws:build
 
       - name: Test
-        run: pnpm run ${{ matrix.command }}
+        run: pnpm run ws:check:test
 
   # The one required status check for this workflow, reported as
   # `test-node-versions-result / result` — see "The aggregate job" in README.md.
