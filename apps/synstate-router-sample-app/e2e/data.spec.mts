@@ -1,6 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 import type { DeepReadonly } from 'ts-type-forge';
 
+// synstate-router-dom-sample-app runs this suite too, against the same pages
+// built on synstate-dom: test only what both apps draw.
+
 // These tests hold the page's clock, so that what is drawn while a request is
 // in flight can be read. Running it this long lets any request of the fake
 // server answer.

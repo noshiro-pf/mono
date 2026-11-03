@@ -8,7 +8,8 @@ import { appDevPort } from './app-dev-ports.mjs';
 
 /**
  * Builds the Playwright config for an app under `apps/` whose specs live in
- * `<package-root>/e2e` and whose configs live in `<package-root>/configs`.
+ * `<package-root>/e2e`, or in another package's directory named by `testDir`,
+ * and whose configs live in `<package-root>/configs`.
  *
  * `testIdAttribute` is `data-e2e`, which is what the restored sources are
  * marked up with — Playwright's own default is `data-testid`, and pointing it
@@ -23,8 +24,12 @@ export const definePlaywrightAppConfig = ({
   packageRoot,
   basePath = '/',
   server,
+  testDir = path.resolve(packageRoot, 'e2e'),
 }: Readonly<{
-  /** The package's root directory, i.e. the parent of `configs` and `e2e`. */
+  /**
+   * The package's root directory, i.e. the parent of `configs` and of `e2e`
+   * when the specs are its own.
+   */
   packageRoot: string;
 
   /**
@@ -48,6 +53,13 @@ export const definePlaywrightAppConfig = ({
    * run instead.
    */
   server?: Readonly<{ build: string; preview: string; timeoutMs: number }>;
+
+  /**
+   * The directory of the specs, `e2e` of the package unless another package's
+   * suite is run against this app: two apps that draw the same pages share one
+   * suite, and the package that holds it says so beside the specs.
+   */
+  testDir?: string;
 }>): PlaywrightTestConfig => {
   const port = appDevPort(packageRoot);
 
@@ -63,7 +75,7 @@ export const definePlaywrightAppConfig = ({
   const baseURL = `http://localhost:${port}${basePath}` as const;
 
   return defineConfig({
-    testDir: path.resolve(packageRoot, 'e2e'),
+    testDir,
 
     // One worker, everywhere. Each of these suites is backed by a single Vite
     // dev server for a single app, and the heavier apps do enough work on load

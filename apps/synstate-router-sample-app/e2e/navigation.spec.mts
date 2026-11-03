@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+// synstate-router-dom-sample-app runs this suite too, against the same pages
+// built on synstate-dom: test only what both apps draw.
+
 test('draws the home page', { tag: '@smoke' }, async ({ page }) => {
   await page.goto('/');
 

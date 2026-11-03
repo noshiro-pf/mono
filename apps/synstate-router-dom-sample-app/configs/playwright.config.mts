@@ -1,0 +1,11 @@
+import * as path from 'node:path';
+import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { definePlaywrightAppConfig } from '../../../tools/configs/playwright-config.mjs';
+
+export default definePlaywrightAppConfig({
+  packageRoot: workspaceRootPath,
+  // The suite of the React app, run against this one: the two draw the same
+  // pages, and one suite is what keeps them so.
+  testDir: path.resolve(workspaceRootPath, '../synstate-router-sample-app/e2e'),
+});

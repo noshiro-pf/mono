@@ -2713,6 +2713,64 @@ importers:
         specifier: 'catalog:'
         version: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
 
+  apps/synstate-router-dom-sample-app:
+    dependencies:
+      synstate:
+        specifier: workspace:*
+        version: link:../../libs/synstate
+      synstate-dom:
+        specifier: workspace:*
+        version: link:../../libs/synstate-dom
+      synstate-router:
+        specifier: workspace:*
+        version: link:../../libs/synstate-router
+      synstate-router-dom:
+        specifier: workspace:*
+        version: link:../../libs/synstate-router-dom
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-data-forge
+      ts-std-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-std-forge
+    devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.64.1
+      eslint:
+        specifier: 'catalog:'
+        version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../../libs/eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-data-forge
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-type-forge
+      npm-run-all2:
+        specifier: 'catalog:'
+        version: 9.0.4
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.10
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.10)
+      ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-type-forge
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.15
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+
   apps/synstate-router-sample-app:
     dependencies:
       synstate:

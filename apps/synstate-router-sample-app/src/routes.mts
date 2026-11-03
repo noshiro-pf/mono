@@ -17,7 +17,7 @@ export const routes = defineRoutes({
   home: { segment: '' },
   products: {
     search: {
-      // Read as absent when empty.
+      // `?q=` reads as `''`; the search box writes an empty query as absent.
       q: search.string(),
       // Anything but these two reads as the default.
       sort: search.literal(['name', 'price'], { default: 'name' }),

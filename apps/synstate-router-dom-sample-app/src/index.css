@@ -1,0 +1,31 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 40rem;
+  padding: 1rem;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-block: 0.5rem;
+}
+
+a[aria-current] {
+  font-weight: bold;
+}
+
+.spacer {
+  height: 150vh;
+}
+
+/* A line that keeps its height while it is empty. */
+.line {
+  min-height: 1.5em;
+}
