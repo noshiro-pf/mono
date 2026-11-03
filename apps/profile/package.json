@@ -34,7 +34,7 @@
   "dependencies": {
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
-    "tiny-router-observable": "workspace:*",
+    "synstate-router": "workspace:*",
     "ts-data-forge": "workspace:*"
   },
   "devDependencies": {

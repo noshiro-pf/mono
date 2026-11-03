@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+// The list the build writes pages from, imported directly as the Vite config
+// does: the rule allows a barrel only one directory down, and this module
+// imports nothing, so the test runner loads no library for it.
+// eslint-disable-next-line import-x/no-internal-modules
+import { routePaths } from '../src/constants/route-paths.mjs';
 
 test('visit main page', { tag: '@smoke' }, async ({ page }) => {
   await page.goto('/');
@@ -101,6 +106,73 @@ test(
     await expect
       .soft(page.getByTestId('root').getByRole('heading').nth(0))
       .toHaveText('執筆物');
+  },
+);
+
+test(
+  "a tab's path without its trailing slash gains it",
+  { tag: '@smoke' },
+  async ({ page }) => {
+    // The router's canonical URL, on the dev server. On the Pages site the
+    // server's own directory redirect gets there first.
+    await page.goto('/mono/profile/products');
+
+    await expect.soft(page).toHaveURL(/\/mono\/profile\/products\/$/u);
+
+    await expect
+      .soft(page.getByTestId('root').getByRole('heading').nth(0))
+      .toHaveText('制作物');
+  },
+);
+
+test(
+  'the tabs are as many as the paths the build writes pages at',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    await expect
+      .soft(page.getByTestId('tabs').getByRole('tab'))
+      .toHaveCount(routePaths.length);
+  },
+);
+
+for (const [index, path] of routePaths.entries()) {
+  test(
+    `the path ${path} the build writes a page at opens tab ${index + 1}`,
+    { tag: '@smoke' },
+    async ({ page }) => {
+      // A path the router does not know would be redirected to the first tab.
+      await page.goto(`/mono/profile${path}`);
+
+      await expect
+        .soft(page.getByTestId('tabs').getByTestId(`tab-${index}`))
+        .toHaveAttribute('aria-selected', 'true');
+
+      await expect
+        .soft(page)
+        .toHaveURL((url) => url.pathname === `/mono/profile${path}`);
+    },
+  );
+}
+
+test(
+  'switching tabs shows the new tab from its top',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    // From a short tab to a longer one, so that the browser has no reason to
+    // move the scroll by itself.
+    await page.goto('/mono/profile/skills/');
+
+    await page.mouse.wheel(0, 300);
+
+    await expect
+      .poll(() => page.evaluate(() => window.scrollY))
+      .toBeGreaterThan(0);
+
+    await page.getByTestId('tabs').getByTestId('tab-1').click();
+
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
   },
 );
 

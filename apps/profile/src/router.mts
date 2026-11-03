@@ -1,44 +1,30 @@
 import { map, type InitializedObservable } from 'synstate';
-import { createRouter, withSlash } from 'tiny-router-observable';
-import { routeList, routes } from './constants/index.mjs';
+import { createRouter } from 'synstate-router';
+import { routes, tabKeys } from './constants/index.mjs';
 
 export const selectTab = (tabIndex: number): void => {
-  const route = routeList[tabIndex];
+  const key = tabKeys[tabIndex];
 
-  if (route !== undefined) {
-    Router.push(route);
+  if (key !== undefined) {
+    router.push(routes[key].href());
   }
-};
-
-/**
- * Above `Router`, which calls it while it is created: a `const` below would
- * still be uninitialized then.
- */
-const tabIndexOf = (pathname: string): number | undefined => {
-  // eslint-disable-next-line unicorn/prefer-array-index-of
-  const index = routeList.findIndex((route) => route === pathname);
-
-  return index === -1 ? undefined : index;
 };
 
 // The app is served from `/mono/profile/` on the repository's Pages site, and
 // the tabs are paths below it (`/mono/profile/career/`), so the router reads
 // and writes them relative to that base. A path that names no tab opens the
-// first one, and a tab's path without its trailing slash gains it.
-export const Router = createRouter({
+// first one; the router adds a missing trailing slash itself.
+const router = createRouter(routes, {
   basePath: import.meta.env.BASE_URL,
-  redirect: (pathname) => {
-    const normalized = withSlash(pathname);
-
-    return tabIndexOf(normalized) === undefined
-      ? routes.career
-      : normalized === pathname
-        ? undefined
-        : normalized;
-  },
+  redirect: (match) =>
+    match.route === undefined ? routes[tabKeys[0]].href() : undefined,
 });
 
-/** The selected tab. The redirect above leaves no path that names none. */
-export const tabIndex$: InitializedObservable<number> = Router.state.pipe(
-  map(({ pathname }) => tabIndexOf(pathname) ?? 0),
+/**
+ * The selected tab. The redirect above leaves no path below the base that names
+ * none; a URL outside the base, which the router does not redirect, shows the
+ * first tab.
+ */
+export const tabIndex$: InitializedObservable<number> = router.match.pipe(
+  map(({ route }) => (route === undefined ? 0 : tabKeys.indexOf(route))),
 );

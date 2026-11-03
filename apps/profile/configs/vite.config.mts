@@ -4,7 +4,7 @@ import rollup from '@mdx-js/rollup';
 import { Arr } from 'ts-data-forge';
 import type { PluginOption, UserConfig } from 'vite';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
-import { routeList } from '../src/constants/routes.mjs';
+import { routePaths } from '../src/constants/route-paths.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
 import { defineViteAppConfig } from '../../../tools/configs/vite-app-config.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
@@ -18,7 +18,7 @@ const base: UserConfig = defineViteAppConfig({
   // `build-pages-site.mts` copies by.
   base: pagesAppBase(workspaceRootPath),
   // Each tab is a path, which Pages can only answer with a page there.
-  routePaths: routeList,
+  routePaths,
 });
 
 /**

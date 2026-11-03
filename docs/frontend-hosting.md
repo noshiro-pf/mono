@@ -40,10 +40,12 @@ Pages にはリライトが無い。存在しないパスを開くと、サイ�
 
 - **画面の種類（有限）はパス**にし、ビルド時に `index.html` を各パスへ複製する
   （`tools/configs/vite-app-config.mts` の `routePaths`）。アプリは画面のパスの
-  一覧を 1 か所に持ち、Vite の設定がそれを読む。tiny-router-observable の
-  アプリはルーティングもそれを読む。synstate-router のアプリはルートの木が
-  正で、一覧はテストが木と突き合わせる（`apps/algo-app/src/constants/route-paths.mts`
-  と `apps/algo-app/src/constants/routes.test.mts`）。
+  一覧を 1 か所に持ち、Vite の設定がそれを読む。ルーティングは synstate-router
+  で、ルートの木が正。一覧は何も import しない（Vite の設定は Node が読むので、
+  木を import すると設定の読み込みに `synstate-router` の `dist/` が要る）。
+  一覧はテストが木と突き合わせる（`apps/algo-app/src/constants/route-paths.mts`
+  と単体テストの `apps/algo-app/src/constants/routes.test.mts`。Vitest の無い
+  profile は e2e の `apps/profile/e2e/main-page.spec.mts` が各パスを開いて確かめる）。
 - **ID のような動的な値は query** に置く（例: `algo-app` の `/rooms/?id=<id>`、
   `/cashflow/?plan=<id>`）。数が無限なのでパスごとの複製はできない。
 - 編集のような別画面は、真偽値の query（`?edit=true`）にせず、パス
@@ -57,11 +59,9 @@ Pages にはリライトが無い。存在しないパスを開くと、サイ�
 サーバー側のリライトと同じ働きをする。
 
 base path は router の `basePath` に `import.meta.env.BASE_URL` を渡して扱い
-（synstate-router は `createRouter(routes, { basePath })`、
-tiny-router-observable は `createRouter({ basePath })`）、アプリは root に
-いるつもりでルーティングする。`<a href>` はブラウザがオリジンから解決するので、
-リンクには base を付けた URL を書く。synstate-router では `Link` と
-`router.toUrl` が付け、tiny-router-observable では `prependBasePath` で付ける。
+（`createRouter(routes, { basePath })`）、アプリは root にいるつもりで
+ルーティングする。`<a href>` はブラウザがオリジンから解決するので、リンクには
+base を付けた URL を書く。synstate-router では `Link` と `router.toUrl` が付ける。
 
 ## Pages から出るとき
 
