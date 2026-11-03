@@ -3,9 +3,10 @@ import {
   combine,
   createState as createStateBase,
   map,
+  mapTo,
   type InitializedObservable,
 } from 'synstate';
-import { createBooleanState, createState } from 'synstate-react-hooks';
+import { createBooleanState } from 'synstate-react-hooks';
 import { Arr, fastDeepEqual, Obj, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
@@ -23,6 +24,7 @@ import type {
   EventScheduleSettingCommonState,
   EventScheduleSettingCommonStateHandler,
 } from '../../types/index.mjs';
+import { createReducerWithActions } from '../../utils/index.mjs';
 import type {
   AnswersFetcher,
   EventScheduleFetcher,
@@ -43,7 +45,7 @@ export type EditEventScheduleDeps = Readonly<{
     EventScheduleFetcher,
     'refetchEventScheduleAfterWrite'
   >;
-  router: StrictPick<AppRouter, 'eventId$' | 'push'>;
+  router: StrictPick<AppRouter, 'editPageLeaves$' | 'eventId$' | 'push'>;
   /** Where the page says whether the event was saved. */
   toast: Promise<Toaster>;
 }>;
@@ -64,11 +66,30 @@ export const createEditEventScheduleStore = (
   const [eventScheduleFromDatabase$, setEventScheduleFromDatabase] =
     createStateBase<EventSchedule | undefined>(undefined);
 
-  const [
-    useEmailVerified,
-    setEmailVerified,
-    { state: emailVerified$, resetState: resetEmailVerified },
-  ] = createState<string | undefined>(undefined);
+  // The author email confirmed in the dialog, with the event it was confirmed
+  // for. The store outlives the page, so it is forgotten when the edit page is
+  // left, and read only on the page of that event: an event without
+  // notifications never asks, so nothing else would replace it.
+  const [, setVerified, { state: verified$ }] = createReducerWithActions(
+    (_: VerifiedEmail | undefined, next: VerifiedEmail | undefined) => next,
+    undefined,
+    [deps.router.editPageLeaves$.pipe(mapTo(undefined))],
+  );
+
+  const emailVerified$: InitializedObservable<string | undefined> = combine([
+    verified$,
+    deps.router.eventId$,
+  ]).pipe(
+    map(([verified, eventId]) =>
+      verified !== undefined && verified.eventId === eventId
+        ? verified.email
+        : undefined,
+    ),
+  );
+
+  const setEmailVerified = (eventId: string, email: string): void => {
+    setVerified({ eventId, email });
+  };
 
   const resetAllState = (): void => {
     commonStateHandlers.resetTitle();
@@ -280,7 +301,7 @@ export const createEditEventScheduleStore = (
     commonState$,
     commonStateHandlers,
     diff$,
-    useEmailVerified,
+    emailVerified$,
     hasDeletedDatetimeChanges$,
     hasNoChanges$,
     useIsLoading,
@@ -289,7 +310,6 @@ export const createEditEventScheduleStore = (
     onEditEventClick,
     onEditEventClickPromise,
     setEventSchedule,
-    resetEmailVerified,
     resetAllState,
   } as const;
 };
@@ -299,11 +319,13 @@ export type EditEventSchedule = Readonly<{
   commonStateHandlers: EventScheduleSettingCommonStateHandler;
   /** What the settings change from the event as the database has it. */
   diff$: InitializedObservable<EventSettingsPageDiffResult>;
-  useEmailVerified: () => string | undefined;
   hasDeletedDatetimeChanges$: InitializedObservable<boolean>;
   hasNoChanges$: InitializedObservable<boolean>;
   useIsLoading: () => boolean;
-  setEmailVerified: (v: string | undefined) => string | undefined;
+  /** The author email confirmed for the event whose edit page is open. */
+  emailVerified$: InitializedObservable<string | undefined>;
+  /** Records `email` as confirmed for event `eventId`. */
+  setEmailVerified: (eventId: string, email: string) => void;
   onBackToAnswerPage: () => void;
   onEditEventClick: () => void;
   onEditEventClickPromise: () => Promise<void>;
@@ -311,6 +333,10 @@ export type EditEventSchedule = Readonly<{
     ev: EventSchedule,
     emailVerified: string | undefined,
   ) => void;
-  resetEmailVerified: () => string | undefined;
   resetAllState: () => void;
+}>;
+
+type VerifiedEmail = Readonly<{
+  eventId: string;
+  email: string;
 }>;

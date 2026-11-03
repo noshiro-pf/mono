@@ -7,7 +7,8 @@ import {
   createConfirmEmailDialogStore,
   type ConfirmEmailDialog,
 } from './confirm-email-dialog-state.mjs';
-import { createAppRouter } from './router-store.mjs';
+import { createEditEventScheduleStore } from './create-event-schedule-page/index.mjs';
+import { createAppRouter, type AppRouter } from './router-store.mjs';
 
 describe(createConfirmEmailDialogStore, () => {
   test('is open for an event with notifications until the email is confirmed', async () => {
@@ -23,7 +24,7 @@ describe(createConfirmEmailDialogStore, () => {
 
     assert.isFalse(store.isOpen$.getSnapshot().value);
 
-    assert.deepStrictEqual(verified, ['bob@example.com']);
+    assert.deepStrictEqual(verified, ['abc:bob@example.com']);
   });
 
   test('is never open for an event without notifications', () => {
@@ -77,11 +78,65 @@ describe(createConfirmEmailDialogStore, () => {
 
     await settle();
 
+    assert.isFalse(store.isOpen$.getSnapshot().value);
+
     browser.history.back();
 
     browser.history.forward();
 
     assert.isTrue(store.isOpen$.getSnapshot().value);
+  });
+
+  test('drops an answer that comes back after the edit page is left and opened again', async () => {
+    const { store, browser, verified } = setup('ok');
+
+    store.inputEmailHandler('bob@example.com');
+
+    store.enterClickHandler();
+
+    browser.history.back();
+
+    browser.history.forward();
+
+    await settle();
+
+    assert.deepStrictEqual(verified, []);
+
+    assert.isTrue(store.isOpen$.getSnapshot().value);
+  });
+
+  test('drops an answer that comes back after another event’s edit page opened', async () => {
+    const { store, router, verified } = setup('ok');
+
+    store.inputEmailHandler('bob@example.com');
+
+    store.enterClickHandler();
+
+    router.push('/event/xyz/edit/');
+
+    await settle();
+
+    assert.deepStrictEqual(verified, []);
+
+    assert.isTrue(store.isOpen$.getSnapshot().value);
+
+    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+  });
+
+  test('drops an answer that comes back after the edit page is left', async () => {
+    const { store, browser, verified, toasts } = setup('ok');
+
+    store.inputEmailHandler('bob@example.com');
+
+    store.enterClickHandler();
+
+    browser.history.back();
+
+    await settle();
+
+    assert.deepStrictEqual(verified, []);
+
+    assert.strictEqual(toasts.count, 0);
   });
 
   test('cancel goes back to where the edit page was opened from', () => {
@@ -96,6 +151,7 @@ describe(createConfirmEmailDialogStore, () => {
 type Setup = Readonly<{
   store: ConfirmEmailDialog;
   browser: ReturnType<typeof createMemoryBrowser>;
+  router: AppRouter;
   verified: readonly string[];
   toasts: Readonly<{ count: number }>;
 }>;
@@ -131,6 +187,21 @@ const setup = (
 
   const mut_verified: string[] = [];
 
+  // The edit page's store, which keeps the confirmed email.
+  const editEventSchedule = createEditEventScheduleStore({
+    api: {
+      event: {
+        update: () => Promise.resolve(Result.ok(undefined)),
+        setAuthorsEmail: () => Promise.resolve(Result.ok(undefined)),
+      },
+    },
+    fireAuthUser$: createState(undefined)[0],
+    answers: { refetchAnswersAfterWrite: () => undefined },
+    eventSchedule: { refetchEventScheduleAfterWrite: () => undefined },
+    router,
+    toast: Promise.resolve(fakeToaster(() => 0)),
+  });
+
   const mut_toasts = { count: 0 };
 
   const store = createConfirmEmailDialogStore({
@@ -147,12 +218,11 @@ const setup = (
     router,
     eventSchedule$,
     editEventSchedule: {
-      setEmailVerified: (email) => {
-        if (email !== undefined) {
-          mut_verified.push(email);
-        }
+      emailVerified$: editEventSchedule.emailVerified$,
+      setEmailVerified: (eventId, email) => {
+        mut_verified.push(`${eventId}:${email}`);
 
-        return email;
+        editEventSchedule.setEmailVerified(eventId, email);
       },
     },
     toast: Promise.resolve(
@@ -167,6 +237,7 @@ const setup = (
   return {
     store,
     browser,
+    router,
     verified: mut_verified,
     toasts: mut_toasts,
   } as const;

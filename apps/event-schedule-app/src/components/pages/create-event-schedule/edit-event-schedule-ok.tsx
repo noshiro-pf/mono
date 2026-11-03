@@ -16,7 +16,9 @@ export const EditEventScheduleOk = memoNamed<Props>(
       ConfirmEmailDialogStore.isOpen$,
     );
 
-    const emailVerified = EditEventScheduleStore.useEmailVerified();
+    const emailVerified = useObservableValue(
+      EditEventScheduleStore.emailVerified$,
+    );
 
     return (
       <>

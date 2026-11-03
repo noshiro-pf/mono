@@ -2,6 +2,7 @@ import {
   filter,
   map,
   pluck,
+  scan,
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
@@ -41,6 +42,8 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
     }),
   );
 
+  const editPage$ = pathSegments$.pipe(map(Routes.isRoute.editPage));
+
   const router = {
     ...router_,
     pathSegments$,
@@ -49,12 +52,15 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
     isRoute: {
       createPage$: pathSegments$.pipe(map(Routes.isRoute.createPage)),
       answerPage$: pathSegments$.pipe(map(Routes.isRoute.answerPage)),
-      editPage$: pathSegments$.pipe(map(Routes.isRoute.editPage)),
+      editPage$,
       eventListPage$: pathSegments$.pipe(map(Routes.isRoute.eventListPage)),
       registerPage$: pathSegments$.pipe(map(Routes.isRoute.registerPage)),
       signInPage$: pathSegments$.pipe(map(Routes.isRoute.signInPage)),
     },
     eventId$: pathSegments$.pipe(map(Routes.getEventIdFromPathname)),
+    editPageLeaves$: editPage$
+      .pipe(filter((isEditPage) => !isEditPage))
+      .pipe(scan((count) => count + 1, 0)),
 
     useShowPage: (): Readonly<{
       createPage: boolean;
@@ -107,6 +113,12 @@ export type AppRouter = Router &
       signInPage$: InitializedObservable<boolean>;
     }>;
     eventId$: InitializedObservable<string | undefined>;
+    /**
+     * How many times the edit page has been left: what the edit page keeps is
+     * forgotten when it changes, and an answer that comes back after it changed
+     * is for a visit already over.
+     */
+    editPageLeaves$: InitializedObservable<number>;
     useShowPage: () => Readonly<{
       createPage: boolean;
       answerPage: boolean;

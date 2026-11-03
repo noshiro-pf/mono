@@ -4,7 +4,7 @@ import { createState } from 'synstate';
 import { createMemoryBrowser } from 'tiny-router-observable';
 import { Result } from 'ts-data-forge';
 import { answerIconsInitialValue } from '../../constants/index.mjs';
-import { createAppRouter } from '../router-store.mjs';
+import { createAppRouter, type AppRouter } from '../router-store.mjs';
 import {
   createEditEventScheduleStore,
   type EditEventSchedule,
@@ -124,6 +124,82 @@ describe(createEditEventScheduleStore, () => {
     assert.strictEqual(browser.url().pathname, '/event/abc/edit/');
   });
 
+  test('an email confirmed on one event is not taken for the next one', () => {
+    const { store, router } = setup();
+
+    store.setEmailVerified('abc', 'bob@example.com');
+
+    store.setEventSchedule(withNotifications, 'bob@example.com');
+
+    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+
+    // Another event, with no notifications and so no email to confirm.
+    router.push('/event/xyz/edit/');
+
+    assert.isUndefined(store.emailVerified$.getSnapshot().value);
+
+    store.setEventSchedule(fromDatabase, undefined);
+
+    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+
+    assert.isUndefined(store.diff$.getSnapshot().value.notificationSettings);
+  });
+
+  test('a confirmed email is forgotten once the edit page is left', () => {
+    const { store, router } = setup();
+
+    store.setEmailVerified('abc', 'bob@example.com');
+
+    assert.strictEqual(
+      store.emailVerified$.getSnapshot().value,
+      'bob@example.com',
+    );
+
+    // Saved with the notifications turned off, then edited again: the event
+    // asks for no email, and the one confirmed before is not taken.
+    router.push('/event/abc/');
+
+    router.push('/event/abc/edit/');
+
+    assert.isUndefined(store.emailVerified$.getSnapshot().value);
+
+    store.setEventSchedule(fromDatabase, undefined);
+
+    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+  });
+
+  test('the notification settings of one event are not kept for the next one', () => {
+    const { store, router } = setup();
+
+    store.setEventSchedule(withNotifications, undefined);
+
+    router.push('/event/xyz/edit/');
+
+    store.setEventSchedule(fromDatabase, undefined);
+
+    assert.isUndefined(
+      store.commonState$.getSnapshot().value.notificationSettingsWithEmail,
+    );
+
+    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+  });
+
+  test('an answer deadline of one event is not kept for the next one', () => {
+    const { store, router } = setup();
+
+    store.setEventSchedule(withAnswerDeadline, undefined);
+
+    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+
+    router.push('/event/xyz/edit/');
+
+    store.setEventSchedule(fromDatabase, undefined);
+
+    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+
+    assert.isUndefined(store.diff$.getSnapshot().value.answerDeadline);
+  });
+
   test('the back button goes to the answer page', () => {
     const { store, browser } = setup();
 
@@ -170,10 +246,16 @@ const withNotifications: EventSchedule = EventSchedule.fill({
   }),
 });
 
+const withAnswerDeadline: EventSchedule = EventSchedule.fill({
+  ...fromDatabase,
+  answerDeadline: { year: 2026, month: 10, date: 31, hours: 23, minutes: 59 },
+});
+
 type Setup = Readonly<{
   store: EditEventSchedule;
   calls: readonly string[];
   browser: ReturnType<typeof createMemoryBrowser>;
+  router: AppRouter;
   toasts: Readonly<{ count: number }>;
 }>;
 
@@ -200,6 +282,8 @@ const setup = (
   const mut_calls: string[] = [];
 
   const mut_toasts = { count: 0 };
+
+  const router = createAppRouter(browser);
 
   const store = createEditEventScheduleStore({
     api: {
@@ -235,7 +319,7 @@ const setup = (
         mut_calls.push('refetch event');
       },
     },
-    router: createAppRouter(browser),
+    router,
     toast: Promise.resolve(
       fakeToaster(() => {
         mut_toasts.count += 1;
@@ -245,7 +329,13 @@ const setup = (
     ),
   });
 
-  return { store, calls: mut_calls, browser, toasts: mut_toasts } as const;
+  return {
+    store,
+    calls: mut_calls,
+    browser,
+    router,
+    toasts: mut_toasts,
+  } as const;
 };
 
 const settle = async (): Promise<void> => {
