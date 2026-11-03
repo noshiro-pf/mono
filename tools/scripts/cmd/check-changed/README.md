@@ -96,7 +96,8 @@ Under `strict-lib/` only the tooling's type check, lint and oxfmt run, and
 `gen:verify-npm-packages`, which copies the published bundles' manifests (a
 manifest or `LICENSE` there runs the generators that read one, as anywhere); the
 strict-lib generators, which rewrite thousands of files, are
-`strict-lib-gen.yml`'s.
+`strict-lib-gen.yml`'s, and so are the harnesses' own type checks
+(`ws:check:types:strict-lib`, each TypeScript minor over its generated lib).
 Browser tests, end-to-end tests, the Firestore rules tests (`check:test:rules`,
 which need Java) and `ws:check:dist` are not run, nor is `check:cspell` over the
 whole tree, so a `words` entry that the diff made dead is not found.

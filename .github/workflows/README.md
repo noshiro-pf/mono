@@ -596,11 +596,14 @@ and `node_modules` is pruned because a dependency's own `dist` is not ours to
 carry. `retention-days: 1`, because it is read minutes later and by nothing
 else.
 
-Two workflows deliberately keep building per job. In
+Three workflows deliberately keep building per job. In
 `node-version-compatibility.yml`, building on each Node version is the check. In
 `style-check.yml` both entries build, and differently (the one with `ws:gen` the
 packages others link to, `ws:doc` everything), so a job to serve them would cost
-more than it saves.
+more than it saves. In `strict-lib-gen.yml`, the harnesses' type checks build
+the linked packages after the generator, which needs no `dist/`; taking
+`code-check.yml`'s artifact instead would make one workflow wait on another's
+run.
 
 ## `skip-ci` and `no-skip-ci-label`
 
