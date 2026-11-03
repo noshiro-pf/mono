@@ -579,6 +579,25 @@ export const collectWorkflowCommands = (
   return Arr.uniq([...literals, ...fromMatrix]).toSorted();
 };
 
+/** A manifest's `scripts`, the string-valued entries only. */
+export const readScripts = (
+  manifest: unknown,
+): ReadonlyRecord<string, string> => {
+  if (!isRecord(manifest) || !hasKey(manifest, 'scripts')) {
+    return {};
+  }
+
+  const scripts = manifest.scripts;
+
+  if (!isRecord(scripts)) {
+    return {};
+  }
+
+  return Obj.filterMap(scripts, (body) =>
+    isString(body) ? Optional.some(body) : Optional.none,
+  );
+};
+
 const toCommandId = (directory: string, scriptName: string): CommandId =>
   `${directory}:${scriptName}` as const;
 
@@ -754,22 +773,6 @@ const reaches = (
   from: CommandId,
   to: CommandId,
 ): boolean => from !== to && reachableFrom(graph, [from]).has(to);
-
-const readScripts = (manifest: unknown): ReadonlyRecord<string, string> => {
-  if (!isRecord(manifest) || !hasKey(manifest, 'scripts')) {
-    return {};
-  }
-
-  const scripts = manifest.scripts;
-
-  if (!isRecord(scripts)) {
-    return {};
-  }
-
-  return Obj.filterMap(scripts, (body) =>
-    isString(body) ? Optional.some(body) : Optional.none,
-  );
-};
 
 const readRootManifest = async (): Promise<Result<Manifest, string>> => {
   const manifestPath = path.join(projectRootPath, 'package.json');
