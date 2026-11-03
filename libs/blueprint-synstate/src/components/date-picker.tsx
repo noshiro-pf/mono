@@ -1,29 +1,24 @@
-// cspell:ignore vhidden
-
-import { createState, derive, map, onScopeDispose } from 'synstate';
+import { createState, map } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  For,
   subscribeInScope,
   toObservable,
   view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { Arr, Optional } from 'ts-data-forge';
+import { Optional } from 'ts-data-forge';
 import {
   calendarNames,
   clampDay,
   dateRange,
-  dayAfterKey,
   daysInMonth,
   formatTime,
   isDayInRange,
   isSameDay,
   monthIndexOf,
   monthOfIndex,
-  monthWeeks,
   now,
   parseTime,
   parseWallClock,
@@ -33,9 +28,9 @@ import {
   type TimePrecision,
   type WallClock,
 } from '../date/index.mjs';
-import { parseInteger, uniqueId } from '../internal/index.mjs';
-import { HtmlSelect } from './html-select.js';
-import { Icon } from './icon.js';
+import { Calendar } from './calendar-parts.js';
+import { MenuItem } from './menu-item.js';
+import { Menu } from './menu.js';
 import { TimePicker, type TimePickerLabels } from './time-picker.js';
 
 /** What a {@link DatePicker} reads out; react-day-picker's wording by default. */
@@ -53,8 +48,22 @@ export const DEFAULT_DATE_PICKER_LABELS: DatePickerLabels = {
   year: 'Year: ',
 } as const;
 
+/**
+ * Blueprint's `DatePickerShortcut`: a value offered by a label, beside the
+ * calendar.
+ */
+export type DatePickerShortcut = Readonly<{
+  label: string;
+  /** `YYYY-MM-DD`, or `YYYY-MM-DDTHH:mm`. */
+  value: string;
+  /** Takes the time of `value` too, rather than keeping the value's. */
+  includeTime?: boolean;
+}>;
+
 /** The props of a {@link DatePicker} other than its value. */
 export type DatePickerOptions = Readonly<{
+  /** Drawn in a menu before the calendar; none if omitted. */
+  shortcuts?: readonly DatePickerShortcut[];
   /** `'minute'` adds the time picker, and the value then has a time. */
   timePrecision?: TimePrecision;
   /** The BCP 47 tag the month and weekday names are in; `en-US` if omitted. */
@@ -88,6 +97,13 @@ type Props = DatePickerOptions &
      */
     value: Bindable<string>;
     onChange: (value: string) => void;
+    /**
+     * The index of the shortcut drawn as picked, `-1` for none; kept by the
+     * picker itself if omitted.
+     */
+    selectedShortcutIndex?: Bindable<number>;
+    /** Called with the index of a shortcut pressed. */
+    onShortcutChange?: (index: number) => void;
   }>;
 
 /**
@@ -125,6 +141,9 @@ export const DatePicker = ({
   highlightCurrentDay = false,
   timePickerProps,
   labels: labelOverrides,
+  shortcuts,
+  selectedShortcutIndex,
+  onShortcutChange,
 }: Props): JSX.Element => {
   const labels = { ...DEFAULT_DATE_PICKER_LABELS, ...labelOverrides } as const;
 
@@ -154,12 +173,6 @@ export const DatePicker = ({
   const mut_memory: { selectedDay: number } = {
     selectedDay: Optional.isSome(initial) ? initial.value.day : 1,
   };
-
-  const [focused$, setFocused] = createState<Optional<WallClock>>(
-    Optional.none,
-  );
-
-  const [caretRight$, setCaretRight] = createState(0);
 
   const afterUpdate = createAfterUpdate();
 
@@ -220,350 +233,52 @@ export const DatePicker = ({
     );
   };
 
-  const mut_dayButtons = new Map<string, HTMLButtonElement>();
-
-  const moveFocus = (
-    from: WallClock,
-    event: KeyboardEvent & Readonly<{ currentTarget: Element }>,
-  ): void => {
-    const moved = dayAfterKey(from, event, weekStartsOn);
-
-    if (moved === undefined) {
-      return;
-    }
-
-    event.preventDefault();
-
-    event.stopPropagation();
-
-    const next = clampDay(moved, min, max);
-
-    if (isSameDay(next, from)) {
-      return;
-    }
-
-    setFocused(Optional.some(next));
-
-    if (monthIndexOf(next) !== display$.getSnapshot().value) {
-      changeMonth(monthIndexOf(next));
-    }
-
-    afterUpdate(() => {
-      mut_dayButtons.get(dayKey(next))?.focus();
-    });
-  };
-
-  const focusTarget$ = derive(
-    [display$, value$, focused$],
-    (index, current, focused) => {
-      const isTarget = (day: WallClock): boolean =>
-        monthIndexOf(day) === index && isDayInRange(day, min, max);
-
-      const candidates = [
-        ...(Optional.isSome(focused)
-          ? ([focused.value] as const)
-          : ([] as const)),
-        ...(Optional.isSome(current)
-          ? ([current.value] as const)
-          : ([] as const)),
-        today,
-        clampDay(
-          { ...monthOfIndex(index), day: 1, hour: 0, minute: 0 },
-          min,
-          max,
-        ),
-      ] as const;
-
-      const target = candidates.find(isTarget);
-
-      return target === undefined ? '' : dayKey(target);
-    },
-  );
-
-  const minIndex = monthIndexOf(min);
-
-  const maxIndex = monthIndexOf(max);
-
-  const monthOptions$ = display$.pipe(
-    map((index) => {
-      const { year } = monthOfIndex(index);
-
-      const first = year === min.year ? min.month : 1;
-
-      const last = year === max.year ? max.month : 12;
-
-      return names.months
-        .map((label, i) => ({ value: i + 1, label }))
-        .filter(({ value: month }) => first <= month && month <= last);
-    }),
-  );
-
-  const yearOptions$ = display$.pipe(
-    map((index) => {
-      const { year } = monthOfIndex(index);
-
-      const years = Array.from({ length: max.year - min.year + 1 }, (_, i) => ({
-        year: min.year + i,
-        disabled: false,
-      }));
-
-      // A year past the range is listed, disabled, while it is shown.
-      return year > max.year
-        ? Arr.toPushed(years, { year, disabled: true })
-        : years;
-    }),
-  );
-
-  const weekdayOrder = Array.from(
-    { length: 7 },
-    (_, i) => (i + weekStartsOn) % 7,
-  );
-
-  const renderDay = (day: WallClock, shown: number): JSX.Element => {
-    const key = dayKey(day);
-
-    const outside = monthIndexOf(day) !== shown;
-
-    const disabled = !isDayInRange(day, min, max);
-
-    const isSelected$ = value$.pipe(
+  const isSelectedDay = (day: WallClock): Bindable<boolean> =>
+    value$.pipe(
       map(
         (current) => Optional.isSome(current) && isSameDay(current.value, day),
       ),
     );
 
-    return (
-      <td class={constant('rdp-cell')} role={constant('presentation')}>
-        <button
-          ref={(button) => {
-            mut_dayButtons.set(key, button);
-
-            onScopeDispose(() => {
-              if (mut_dayButtons.get(key) === button) {
-                mut_dayButtons.delete(key);
-              }
-            });
-          }}
-          aria-selected={view(isSelected$, (s) => (s ? 'true' : undefined))}
-          class={{
-            'bp6-button': constant(true),
-            'bp6-minimal': constant(true),
-            'rdp-day': constant(true),
-            'rdp-day_outside': constant(outside),
-            'rdp-day_selected': isSelected$,
-            'rdp-day_today': constant(isSameDay(day, today)),
-            'rdp-day_disabled': constant(disabled),
-          }}
-          disabled={constant(disabled)}
-          name={constant('day')}
-          role={constant('gridcell')}
-          tabIndex={view(focusTarget$, (target) =>
-            !outside && target === key ? 0 : -1,
-          )}
-          type={constant('button')}
-          onClick={() => {
-            selectDay(day);
-          }}
-          onFocus={() => {
-            setFocused(Optional.some(day));
-          }}
-          onKeyDown={(event) => {
-            moveFocus(day, event);
-          }}
-        >
-          {constant(day.day.toString())}
-        </button>
-      </td>
-    );
-  };
-
-  // The grid is named by the month and year above it.
-  const captionId = uniqueId('date-picker-caption');
-
-  const caption = (
-    <div class={constant('rdp-caption')}>
-      <div class={constant('rdp-caption_dropdowns')}>
-        <div class={constant('rdp-vhidden')}>
-          <div
-            aria-live={constant('polite')}
-            class={constant('rdp-caption_label')}
-            id={constant(captionId)}
-            role={constant('presentation')}
-          >
-            {view(display$, (index) => {
-              const { year, month } = monthOfIndex(index);
-
-              return names.caption(year, month);
-            })}
-          </div>
-        </div>
-        <div>
-          <HtmlSelect
-            aria-label={constant(labels.month)}
-            class={'bp6-datepicker-month-select'}
-            iconStyle={view(caretRight$, (right) => `right: ${right}px;`)}
-            minimal
-            name={'months'}
-            selectRef={(select) => {
-              subscribeInScope(display$, (index) => {
-                afterUpdate(() => {
-                  const container = select.parentElement?.parentElement;
-
-                  if (container === null || container === undefined) {
-                    return;
-                  }
-
-                  const text =
-                    names.months[monthOfIndex(index).month - 1] ?? '';
-
-                  setCaretRight(
-                    Math.max(
-                      2,
-                      select.clientWidth -
-                        measureTextWidth(text, container) -
-                        ICON_SIZE -
-                        2,
-                    ),
-                  );
-                });
-              });
-            }}
-            value={view(display$, (index) =>
-              (monthOfIndex(index).month - 1).toString(),
-            )}
-            onChange={(changed) => {
-              const month = parseInteger(changed.currentTarget.value);
-
-              if (!Number.isNaN(month)) {
-                changeMonth(
-                  monthIndexOf({
-                    year: monthOfIndex(display$.getSnapshot().value).year,
-                    month: month + 1,
-                  }),
-                );
-              }
-            }}
-          >
-            <For items={monthOptions$} key={(option) => option.value}>
-              {(option$) => (
-                <option value={view(option$, (o) => (o.value - 1).toString())}>
-                  {view(option$, (o) => o.label)}
-                </option>
-              )}
-            </For>
-          </HtmlSelect>
-        </div>
-        <div>
-          <HtmlSelect
-            aria-label={constant(labels.year)}
-            class={'bp6-datepicker-year-select'}
-            minimal
-            name={'years'}
-            value={view(display$, (index) =>
-              monthOfIndex(index).year.toString(),
-            )}
-            onChange={(changed) => {
-              const year = parseInteger(changed.currentTarget.value);
-
-              if (!Number.isNaN(year)) {
-                changeMonth(
-                  monthIndexOf({
-                    year,
-                    month: monthOfIndex(display$.getSnapshot().value).month,
-                  }),
-                );
-              }
-            }}
-          >
-            <For items={yearOptions$} key={(option) => option.year}>
-              {(option$) => (
-                <option
-                  disabled={view(option$, (o) => o.disabled)}
-                  value={view(option$, (o) => o.year.toString())}
-                >
-                  {view(option$, (o) => o.year.toString())}
-                </option>
-              )}
-            </For>
-          </HtmlSelect>
-        </div>
-      </div>
-      <div class={constant('rdp-nav')}>
-        <button
-          aria-label={constant(labels.previousMonth)}
-          class={constant(
-            'bp6-button bp6-minimal bp6-datepicker-nav-button bp6-datepicker-nav-button-previous',
-          )}
-          disabled={view(display$, (index) => index <= minIndex)}
-          name={constant('previous-month')}
-          type={constant('button')}
-          onClick={() => {
-            changeMonth(display$.getSnapshot().value - 1);
-          }}
-        >
-          <Icon class={'rdp-nav_icon'} icon={'chevron-left'} />
-        </button>
-        <button
-          aria-label={constant(labels.nextMonth)}
-          class={constant(
-            'bp6-button bp6-minimal bp6-datepicker-nav-button bp6-datepicker-nav-button-next',
-          )}
-          disabled={view(display$, (index) => index >= maxIndex)}
-          name={constant('next-month')}
-          type={constant('button')}
-          onClick={() => {
-            changeMonth(display$.getSnapshot().value + 1);
-          }}
-        >
-          <Icon class={'rdp-nav_icon'} icon={'chevron-right'} />
-        </button>
-      </div>
-    </div>
-  );
-
-  const table = (
-    <table
-      aria-labelledby={constant(captionId)}
-      class={constant('rdp-table')}
-      role={constant('grid')}
-    >
-      <thead class={constant('rdp-head')}>
-        <tr class={constant('rdp-head_row')}>
-          {weekdayOrder.map((weekday) => (
-            <th
-              aria-label={constant(names.weekdaysLong[weekday] ?? '')}
-              class={constant('rdp-head_cell')}
-              scope={constant('col')}
-            >
-              {constant(names.weekdaysShort[weekday] ?? '')}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody class={constant('rdp-tbody')}>
-        {/* One row per month, so that a month's days are built once. */}
-        <For items={view(display$, (index) => [index])} key={(index) => index}>
-          {(index$) => {
-            const shown = index$.getSnapshot().value;
-
-            const { year, month } = monthOfIndex(shown);
-
-            return (
-              <>
-                {monthWeeks(year, month, weekStartsOn).map((week) => (
-                  <tr class={constant('rdp-row')}>
-                    {week.map((day) => renderDay(day, shown))}
-                  </tr>
-                ))}
-              </>
-            );
-          }}
-        </For>
-      </tbody>
-    </table>
-  );
-
   const todayEnabled = isDayInRange(today, min, max);
+
+  const [ownShortcutIndex$, setOwnShortcutIndex] = createState(-1);
+
+  const shortcutIndex$ =
+    selectedShortcutIndex === undefined
+      ? ownShortcutIndex$
+      : toObservable(selectedShortcutIndex);
+
+  // Blueprint's `handleShortcutClick`: the shortcut's day, at its time with
+  // `includeTime`, or else at the value's.
+  const pickShortcut = (shortcut: DatePickerShortcut, index: number): void => {
+    const clock = parseWallClock(shortcut.value);
+
+    if (Optional.isNone(clock)) {
+      return;
+    }
+
+    const current = selected();
+
+    const next =
+      shortcut.includeTime === true
+        ? clock.value
+        : Optional.isSome(current)
+          ? withDayOf(current.value, clock.value)
+          : ({ ...clock.value, hour: 0, minute: 0 } as const);
+
+    mut_memory.selectedDay = next.day;
+
+    setDisplay(monthIndexOf(next));
+
+    onChange(toValue(next));
+
+    if (selectedShortcutIndex === undefined) {
+      setOwnShortcutIndex(index);
+    }
+
+    onShortcutChange?.(index);
+  };
 
   return (
     <div
@@ -573,17 +288,53 @@ export const DatePicker = ({
           : 'bp6-datepicker',
       )}
     >
+      {shortcuts === undefined ? (
+        []
+      ) : (
+        <>
+          <Menu
+            aria-label={'Date picker shortcuts'}
+            class={'bp6-daterangepicker-shortcuts'}
+            tabIndex={0}
+          >
+            {shortcuts.map((shortcut, index) => {
+              const clock = parseWallClock(shortcut.value);
+
+              return (
+                <MenuItem
+                  active={view(shortcutIndex$, (picked) => picked === index)}
+                  disabled={
+                    Optional.isNone(clock) ||
+                    !isDayInRange(clock.value, min, max)
+                  }
+                  shouldDismissPopover={false}
+                  text={constant(shortcut.label)}
+                  onClick={() => {
+                    pickShortcut(shortcut, index);
+                  }}
+                />
+              );
+            })}
+          </Menu>
+          <div class={constant('bp6-divider')} />
+        </>
+      )}
       <div class={constant('bp6-datepicker-content')}>
-        <div class={constant('rdp')}>
-          <div class={constant('rdp-months')}>
-            <div
-              class={constant('rdp-month rdp-caption_start rdp-caption_end')}
-            >
-              {caption}
-              {table}
-            </div>
-          </div>
-        </div>
+        <Calendar
+          changeMonth={changeMonth}
+          dayState={(day) => ({ selected: isSelectedDay(day) })}
+          display$={display$}
+          focusCandidates$={value$.pipe(
+            map((current) => (Optional.isSome(current) ? [current.value] : [])),
+          )}
+          labels={labels}
+          max={max}
+          min={min}
+          names={names}
+          today={today}
+          weekStartsOn={weekStartsOn}
+          onDayClick={selectDay}
+        />
         {timePrecision === 'minute' ? (
           <div class={constant('bp6-datepicker-timepicker-wrapper')}>
             <TimePicker
@@ -663,28 +414,3 @@ const FooterButton = ({
     <span class={constant('bp6-button-text')}>{constant(text)}</span>
   </button>
 );
-
-const dayKey = (day: WallClock): string => toDateValue(day);
-
-const ICON_SIZE = 16;
-
-/**
- * The width of `text` as the month select draws it, measured in a span of
- * Blueprint's `bp6-datepicker-caption-measure` put in `container` for the
- * purpose, as Blueprint measures it to put the caret beside the month.
- */
-const measureTextWidth = (text: string, container: Element): number => {
-  const mut_span = document.createElement('span');
-
-  mut_span.classList.add('bp6-datepicker-caption-measure');
-
-  mut_span.textContent = text;
-
-  container.append(mut_span);
-
-  const width = mut_span.offsetWidth;
-
-  mut_span.remove();
-
-  return width;
-};

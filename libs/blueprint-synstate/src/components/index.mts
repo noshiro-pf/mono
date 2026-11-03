@@ -10,6 +10,8 @@ export * from './collapse.js';
 export * from './control-group.js';
 export * from './date-input.js';
 export * from './date-picker.js';
+export * from './date-range-input.js';
+export * from './date-range-picker.js';
 export * from './dialog.js';
 export * from './file-input.js';
 export * from './form-group.js';

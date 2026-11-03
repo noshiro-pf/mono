@@ -3,7 +3,13 @@
 // are compared here rather than among `blueprint-cases.tsx`.
 import * as Blueprint from '@blueprintjs/core';
 import '@blueprintjs/core/lib/css/blueprint.css';
-import { Alert, Dialog, InputGroup } from 'blueprint-synstate';
+import {
+  Alert,
+  DateInput,
+  DateRangeInput,
+  Dialog,
+  InputGroup,
+} from 'blueprint-synstate';
 import { createElement as h, type ReactElement } from 'react';
 import { createState } from 'synstate';
 import { constant, render, type JSX } from 'synstate-dom';
@@ -383,6 +389,53 @@ describe(Dialog, () => {
     );
 
     assert.deepStrictEqual(mut_closes, []);
+
+    unmount();
+  });
+
+  test('does not close by an Escape that a date input in it takes to close its calendar', async () => {
+    const mut_closes: string[] = [];
+
+    const { unmount } = mounted(() => (
+      <Dialog
+        isOpen={constant(true)}
+        onClose={(event) => {
+          mut_closes.push(event.type);
+        }}
+      >
+        <div class={constant('bp6-dialog-body')}>
+          <DateInput value={constant('')} onChange={ignore} />
+          <DateRangeInput
+            value={constant(['', ''] as const)}
+            onChange={ignore}
+          />
+        </div>
+      </Dialog>
+    ));
+
+    await transitioned();
+
+    for (const selector of [
+      '.bp6-date-input input',
+      '.bp6-date-range-input .bp6-input-group:first-child input',
+    ]) {
+      // eslint-disable-next-line no-await-in-loop -- one input after the other
+      await userEvent.click(one(selector));
+
+      // eslint-disable-next-line no-await-in-loop -- one input after the other
+      await userEvent.keyboard('{Escape}');
+    }
+
+    assert.deepStrictEqual(mut_closes, []);
+
+    assert.strictEqual(document.querySelectorAll('.bp6-popover').length, 0);
+
+    // One no control has taken is the dialog's.
+    one('.bp6-dialog-body').dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    );
+
+    assert.deepStrictEqual(mut_closes, ['keydown']);
 
     unmount();
   });

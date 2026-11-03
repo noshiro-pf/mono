@@ -15,6 +15,8 @@ import {
   ControlGroup,
   DateInput,
   DatePicker,
+  DateRangeInput,
+  DateRangePicker,
   FileInput,
   formatDateText,
   FormGroup,
@@ -129,6 +131,39 @@ const noPanelControlled = (line: string): string =>
 
 /** A date for Blueprint React's pickers, which take a `Date`. */
 const blueprintDate = (isoLocal: string): Date => new Date(isoLocal);
+
+/** Shortcuts of a date picker's case: the last is out of its range. */
+const shortcutCases = [
+  { label: 'Today', value: '2026-10-08T23:59' },
+  { label: 'In a week', value: '2026-10-15T23:59' },
+  { label: 'Next year', value: '2027-10-08T23:59' },
+] as const;
+
+/** A range picker's case: its name, the days, and the options set. */
+type RangeCase = readonly [
+  name: string,
+  days: readonly [start: string, end: string],
+  options: Readonly<{
+    minDate?: string;
+    maxDate?: string;
+    disabled?: boolean;
+    fill?: boolean;
+  }>,
+];
+
+/** Blueprint's `minDate` and `maxDate` for the bounds of a case that has them. */
+const blueprintBounds = ({
+  minDate,
+  maxDate,
+}: RangeCase[2]): Readonly<{ minDate?: Date; maxDate?: Date }> =>
+  ({
+    ...(minDate === undefined
+      ? {}
+      : { minDate: blueprintDate(`${minDate}T00:00`) }),
+    ...(maxDate === undefined
+      ? {}
+      : { maxDate: blueprintDate(`${maxDate}T00:00`) }),
+  }) as const;
 
 /** Every icon this library draws, so that each path is compared with Blueprint's. */
 const allIcons = [
@@ -931,6 +966,45 @@ export const cases: readonly Case[] = [
     },
     () => <DatePicker value={constant('2026-10-15')} onChange={ignore} />,
   ],
+  ...(
+    [
+      ['a range', ['2026-10-10', '2026-10-20'], {}],
+      ['only a start', ['2026-10-10', ''], {}],
+      ['only an end', ['', '2026-10-20'], {}],
+      ['a range across months', ['2026-09-27', '2026-10-03'], {}],
+      [
+        'a range within bounds',
+        ['2026-10-12', '2026-10-14'],
+        { minDate: '2026-10-05', maxDate: '2026-11-20' },
+      ],
+    ] as const satisfies readonly RangeCase[]
+  ).map(([name, [start, end], bounds]: RangeCase): Case => [
+    `DateRangePicker, one month, ${name}`,
+    {
+      element: () =>
+        h(BlueprintDatetime.DateRangePicker, {
+          value: [
+            start === '' ? null : blueprintDate(`${start}T00:00`),
+            end === '' ? null : blueprintDate(`${end}T00:00`),
+          ],
+          singleMonthOnly: true,
+          shortcuts: false,
+          ...blueprintBounds(bounds),
+          dayPickerProps: {
+            formatters: { formatWeekdayName: intlWeekdayName },
+          },
+          onChange: ignore,
+        }),
+      deliberate: [htmlSelectWrapper],
+    },
+    () => (
+      <DateRangePicker
+        {...bounds}
+        value={constant([start, end] as const)}
+        onChange={ignore}
+      />
+    ),
+  ]),
   [
     'DatePicker with a time and the actions bar',
     {
@@ -951,6 +1025,44 @@ export const cases: readonly Case[] = [
         showActionsBar
         timePrecision={'minute'}
         value={constant('2026-10-15T10:20')}
+        onChange={ignore}
+      />
+    ),
+  ],
+  [
+    'DatePicker with shortcuts, one picked and one out of range',
+    {
+      element: () =>
+        h(BlueprintDatetime.DatePicker, {
+          value: blueprintDate('2026-10-15T23:59'),
+          timePrecision: 'minute',
+          minDate: blueprintDate('2026-01-01T00:00'),
+          maxDate: blueprintDate('2026-12-31T00:00'),
+          shortcuts: shortcutCases.map(({ label, value }) => ({
+            label,
+            date: blueprintDate(value),
+            includeTime: true,
+          })),
+          selectedShortcutIndex: 1,
+          dayPickerProps: {
+            formatters: { formatWeekdayName: intlWeekdayName },
+          },
+          onChange: ignore,
+        }),
+      deliberate: [htmlSelectWrapper],
+    },
+    () => (
+      <DatePicker
+        maxDate={'2026-12-31'}
+        minDate={'2026-01-01'}
+        selectedShortcutIndex={constant(1)}
+        shortcuts={shortcutCases.map(({ label, value }) => ({
+          label,
+          value,
+          includeTime: true,
+        }))}
+        timePrecision={'minute'}
+        value={constant('2026-10-15T23:59')}
         onChange={ignore}
       />
     ),
@@ -988,6 +1100,59 @@ export const cases: readonly Case[] = [
     },
     () => <DateInput value={constant('2026-10-15')} onChange={ignore} />,
   ],
+  ...(
+    [
+      ['a range', ['2026-10-10', '2026-10-20'], {}],
+      ['only a start', ['2026-10-10', ''], {}],
+      ['an end before the start', ['2026-10-20', '2026-10-10'], {}],
+      ['out of range', ['2026-10-10', '2026-10-20'], { maxDate: '2026-10-15' }],
+      ['disabled and filling', ['', ''], { disabled: true, fill: true }],
+    ] as const satisfies readonly RangeCase[]
+  ).map(([name, [start, end], options]: RangeCase): Case => [
+    `DateRangeInput, closed, ${name}`,
+    {
+      element: () =>
+        h(BlueprintDatetime.DateRangeInput, {
+          value: [
+            start === '' ? null : blueprintDate(`${start}T00:00`),
+            end === '' ? null : blueprintDate(`${end}T00:00`),
+          ],
+          singleMonthOnly: true,
+          shortcuts: false,
+          ...blueprintBounds(options),
+          disabled: options.disabled ?? false,
+          fill: options.fill ?? false,
+          // As this library's DateRangeInput shows a day by default.
+          formatDate: (date: Date) =>
+            formatDateText(
+              {
+                year: date.getFullYear(),
+                month: date.getMonth() + 1,
+                day: date.getDate(),
+                hour: 0,
+                minute: 0,
+              },
+              undefined,
+            ),
+          parseDate: blueprintDate,
+          onChange: ignore,
+        }),
+      deliberate: [
+        // As for DateInput: the input's own `disabled` says it.
+        (line) => line.replace(/\[aria-disabled=(?:false|true)\]/u, ''),
+      ],
+    },
+    () => (
+      <DateRangeInput
+        {...(options.minDate === undefined ? {} : { minDate: options.minDate })}
+        {...(options.maxDate === undefined ? {} : { maxDate: options.maxDate })}
+        disabled={constant(options.disabled ?? false)}
+        fill={options.fill ?? false}
+        value={constant([start, end] as const)}
+        onChange={ignore}
+      />
+    ),
+  ]),
   [
     'Every icon',
     {

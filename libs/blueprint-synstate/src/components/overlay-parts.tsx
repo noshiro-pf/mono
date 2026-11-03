@@ -547,6 +547,7 @@ const OverlayBody = ({
       !(event instanceof KeyboardEvent) ||
       event.key !== 'Escape' ||
       isImeKeyDown(event) ||
+      event.defaultPrevented ||
       !isOpen$.getSnapshot().value ||
       !isThisOnTop()
     ) {
@@ -574,10 +575,13 @@ const OverlayBody = ({
       )}
       onKeyDown={(event) => {
         // An Escape that cancels what an input method is composing is not one
-        // that closes.
+        // that closes, nor one a control in the overlay has taken: a date
+        // input's calendar drawn in place, which in Blueprint's is an overlay
+        // of its own over this one, and so takes Escape first.
         if (
           !(canEscapeKeyClose && event.key === 'Escape') ||
-          isImeKeyDown(event)
+          isImeKeyDown(event) ||
+          event.defaultPrevented
         ) {
           return;
         }
