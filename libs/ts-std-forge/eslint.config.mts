@@ -3,6 +3,8 @@ import {
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  mergeRestrictedImportsOptions,
+  restrictedImportsOptions,
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
@@ -110,7 +112,7 @@ export default [
     rules: defineKnownRules({
       'no-restricted-imports': [
         'error',
-        {
+        mergeRestrictedImportsOptions(restrictedImportsOptions, {
           paths: [
             {
               name: 'ts-type-forge',
@@ -139,7 +141,7 @@ export default [
                 'ts-std-forge imports only the literal-range types and the record / type-level utilities from ts-type-forge; branded number types are not used here (Sumi D-26 / D-39).',
             },
           ],
-        },
+        }),
       ],
     }),
   },

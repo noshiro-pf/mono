@@ -4,6 +4,8 @@ import {
   eslintConfigForPlaywright,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  mergeRestrictedImportsOptions,
+  restrictedImportsOptions,
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
@@ -40,7 +42,7 @@ export default [
     rules: defineKnownRules({
       'no-restricted-imports': [
         'error',
-        {
+        mergeRestrictedImportsOptions(restrictedImportsOptions, {
           paths: [
             {
               name: 'firebase/firestore',
@@ -70,7 +72,7 @@ export default [
               message: firestoreMessage,
             },
           ],
-        },
+        }),
       ],
     }),
   },

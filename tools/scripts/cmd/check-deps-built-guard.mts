@@ -186,11 +186,14 @@ const memberScripts = [
 ] as const;
 
 /**
- * Root scripts that run a member script, or compile the members, across the
+ * Root scripts that run a member script, compile the members, or import each
+ * member's `eslint.config.mts` (which imports the built plugins), across the
  * workspace.
  */
 const rootWorkspaceScripts = [
   'check:root:dist-lib-replacement',
+  'check:root:oxlint-rules',
+  'check:root:restricted-imports',
   'ws:check:types',
   'ws:check:types:non-strict-lib',
   'ws:check:types:strict-lib',

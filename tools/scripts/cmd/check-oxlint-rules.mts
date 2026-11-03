@@ -1,26 +1,28 @@
 import { parseForESLint } from '@typescript-eslint/parser';
-import { ESLint, type Linter } from 'eslint';
 import { spawnSync } from 'node:child_process';
-import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { pathToFileURL } from 'node:url';
 import {
   Arr,
   fastDeepEqual,
   hasKey,
-  isRecord,
   isString,
   Result,
   unknownToString,
 } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   eslintConfigOffForOxlint,
   eslintRulesMovedToOxlint,
   oxlintConfig,
   toOxlintRuleName,
 } from '../../configs/oxlint-rules.mjs';
+import {
+  forEachLintedFile,
+  importPackageEslintConfigs,
+  listLintedPackages,
+  readScripts,
+  severityNumber,
+} from '../lib/eslint-package-configs.mjs';
 import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -127,8 +129,6 @@ export const findDirectivesIn = (
 
 const movedRuleIds = Object.keys(eslintRulesMovedToOxlint);
 
-const lintedExtensions = /\.(?:[cm]?[jt]s|[jt]sx)$/u;
-
 type PackageResult = Readonly<{
   problems: readonly string[];
   mismatches: readonly Mismatch[];
@@ -156,64 +156,10 @@ const lintScriptPrefixes = {
 const depsBuiltGuardPrefix =
   /^node (?:\.\.\/)+tools\/scripts\/cmd\/assert-deps-built\.mts && /u;
 
-const readScripts = async (
-  dir: string,
-): Promise<ReadonlyRecord<string, unknown>> => {
-  const manifest: unknown = JSON.parse(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- the package.json of a workspace member git lists
-    await fs.readFile(
-      path.resolve(projectRootPath, dir, 'package.json'),
-      'utf8',
-    ),
-  );
-
-  return isRecord(manifest) &&
-    hasKey(manifest, 'scripts') &&
-    isRecord(manifest.scripts)
-    ? manifest.scripts
-    : {};
-};
-
-/** The packages `ws:fix:lint` reaches: every member with a `fix:lint`. */
-const listLintedPackages = async (
-  trackedFiles: readonly string[],
-): Promise<readonly string[]> => {
-  const manifests = trackedFiles
-    .filter(
-      (file) =>
-        file.endsWith('/package.json') && !file.startsWith('experimental/'),
-    )
-    .map(path.posix.dirname);
-
-  const withFixLint = await Promise.all(
-    manifests.map(async (dir) =>
-      hasKey(await readScripts(dir), 'fix:lint') ? [dir] : [],
-    ),
-  );
-
-  return withFixLint.flat().toSorted();
-};
-
 const ruleEntry = (ruleId: string): unknown =>
   hasKey(eslintRulesMovedToOxlint, ruleId)
     ? eslintRulesMovedToOxlint[ruleId]
     : undefined;
-
-const severityNumber = (severity: unknown): unknown => {
-  switch (severity) {
-    case 'off':
-      return 0;
-
-    case 'warn':
-      return 1;
-
-    case 'error':
-      return 2;
-
-    default:
-      return severity;
-  }
-};
 
 /** ESLint resolves a severity to a number; the table writes it as a word. */
 const isSameEntry = (actual: unknown, expected: unknown): boolean => {
@@ -240,68 +186,40 @@ const checkResolvedRules = async (
   configs: readonly unknown[],
   trackedFiles: readonly string[],
 ): Promise<PackageResult> => {
-  // Without the off block, which turns rules off and ignores nothing, so this
-  // ESLint also ignores what the package's own does.
-  const eslint = new ESLint({
-    cwd: path.join(projectRootPath, dir),
-    overrideConfigFile: true,
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the array a package's `eslint.config.mts` exports, which ESLint validates
-    overrideConfig: Array.from(configs as readonly Linter.Config[]),
-  });
-
-  const files = trackedFiles.filter(
-    (file) => file.startsWith(`${dir}/`) && lintedExtensions.test(file),
-  );
-
   const mut_mismatches = new Map<string, Mismatch>();
 
   const mut_hiddenFiles: string[] = [];
 
-  const mut_lintedFiles: string[] = [];
-
-  for (const file of files) {
-    const absolute = path.join(projectRootPath, file);
-
-    // `undefined` for a file ESLint ignores, as `isPathIgnored` reads it.
-    const resolved: unknown = await eslint.calculateConfigForFile(absolute);
-
-    if (resolved === undefined) {
-      continue;
-    }
-
-    mut_lintedFiles.push(file);
-
-    const rules: unknown =
-      isRecord(resolved) && hasKey(resolved, 'rules')
-        ? resolved.rules
-        : undefined;
-
-    if (!isRecord(rules)) {
-      continue;
-    }
-
-    if (
-      oxlintConfig.ignorePatterns.some((pattern) =>
-        path.matchesGlob(file, pattern),
-      )
-    ) {
-      mut_hiddenFiles.push(file);
-    }
-
-    for (const ruleId of movedRuleIds) {
-      if (mut_mismatches.has(ruleId)) {
-        continue;
+  // Without the off block, which turns rules off and ignores nothing, so this
+  // ESLint also ignores what the package's own does.
+  const lintedFiles = await forEachLintedFile(
+    dir,
+    configs,
+    trackedFiles,
+    (repoRelative, rules) => {
+      if (
+        oxlintConfig.ignorePatterns.some((pattern) =>
+          path.matchesGlob(repoRelative, pattern),
+        )
+      ) {
+        mut_hiddenFiles.push(repoRelative);
       }
 
-      if (!isSameEntry(rules[ruleId], ruleEntry(ruleId))) {
-        mut_mismatches.set(ruleId, {
-          ruleId,
-          file,
-          actual: rules[ruleId] ?? 'off',
-        });
+      for (const ruleId of movedRuleIds) {
+        if (mut_mismatches.has(ruleId)) {
+          continue;
+        }
+
+        if (!isSameEntry(rules[ruleId], ruleEntry(ruleId))) {
+          mut_mismatches.set(ruleId, {
+            ruleId,
+            file: repoRelative,
+            actual: rules[ruleId] ?? 'off',
+          });
+        }
       }
-    }
-  }
+    },
+  );
 
   return {
     problems: mut_hiddenFiles.map(
@@ -309,7 +227,7 @@ const checkResolvedRules = async (
         `${file}: ESLint lints it, but an \`ignorePatterns\` entry keeps oxlint from it.`,
     ),
     mismatches: Array.from(mut_mismatches.values()),
-    lintedFiles: mut_lintedFiles,
+    lintedFiles,
   };
 };
 
@@ -332,16 +250,9 @@ const checkPackage = async (
     }
   });
 
-  const configModule: unknown = await import(
-    pathToFileURL(path.join(projectRootPath, dir, 'eslint.config.mts')).href
-  );
+  const configs = await importPackageEslintConfigs(dir);
 
-  const configs: unknown =
-    isRecord(configModule) && hasKey(configModule, 'default')
-      ? configModule.default
-      : undefined;
-
-  if (!Arr.isArray(configs) || configs.at(-1) !== eslintConfigOffForOxlint) {
+  if (configs?.at(-1) !== eslintConfigOffForOxlint) {
     return {
       problems: Arr.toPushed(
         scriptViolations,
