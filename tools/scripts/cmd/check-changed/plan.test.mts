@@ -195,7 +195,10 @@ describe('classifyChanges', () => {
       [{ dir: 'libs/ts-data-forge', code: true }],
     );
 
-    assert.deepStrictEqual(sortedAreas(result), ['root-guards']);
+    assert.deepStrictEqual(sortedAreas(result), [
+      'published-source',
+      'root-guards',
+    ]);
   });
 
   test('a README touches its package as documents only', () => {
@@ -237,10 +240,13 @@ describe('classifyChanges', () => {
   test.each([
     ['tools/scripts/cmd/x.mts', ['root', 'root-guards']],
     ['tools/configs/vite-config.mts', ['root', 'root-guards', 'shared-config']],
-    ['eslint.config.mts', ['root', 'root-guards']],
+    ['eslint.config.mts', ['published-source', 'root', 'root-guards']],
     ['tsconfig.json', ['root', 'root-guards']],
     ['libs/ts-data-forge/configs/vitest.config.mts', ['root', 'root-guards']],
-    ['libs/ts-data-forge/eslint.config.mts', ['root', 'root-guards']],
+    [
+      'libs/ts-data-forge/eslint.config.mts',
+      ['published-source', 'root', 'root-guards'],
+    ],
     ['libs/ts-data-forge/samples/eslint.config.mts', ['root', 'root-guards']],
     ['.markdownlint-cli2.mjs', ['prose', 'root']],
     ['tools/scripts/cmd/check-changed/README.md', ['prose']],
@@ -271,6 +277,8 @@ describe('buildPlan', () => {
       'libs/ts-data-forge: run check:types',
       'libs/ts-data-forge: run check:test',
       'exec run-p --continue-on-error --print-label check:root:actionlint check:root:ci-commands',
+      'run check:knip',
+      'run check:published-deps',
       'run check:prose',
       'exec cspell --no-progress --no-must-find-files --gitignore ./libs/ts-data-forge/src/array.mts',
       'run z:format-diff-from abc123',
@@ -404,6 +412,47 @@ describe('buildPlan', () => {
       assert.include(commandsOf([file]), 'run fix:codemod:affected');
     },
   );
+
+  test('a package code change runs knip and the published-deps check', () => {
+    // Removing a dependency's last import changes code and no manifest, and
+    // leaves the dependency unused (#3042).
+    const commands = commandsOf(['apps/profile/src/index.mts']);
+
+    assert.include(commands, 'run check:knip');
+
+    assert.include(commands, 'run check:published-deps');
+  });
+
+  test.each([
+    'tools/scripts/cmd/x.mts',
+    'strict-lib/scripts-common/src/convert.mts',
+    'apps/synstate-docs/src/content/docs/index.mdx',
+    'libs/ts-data-forge/tsconfig.json',
+    '.github/workflows/code-check.yml',
+  ] as const)('%s runs knip, as CI does for any code change', (file) => {
+    assert.include(commandsOf([file]), 'run check:knip');
+  });
+
+  test.each([
+    ['libs/ts-data-forge/src/array.mts', true],
+    ['libs/ts-data-forge/eslint.config.mts', true],
+    ['eslint.config.mts', true],
+    ['libs/ts-data-forge/test/array.test.mts', false],
+    ['tools/scripts/cmd/x.mts', false],
+  ] as const)('%s runs the published-deps check: %s', (file, expected) => {
+    assert.strictEqual(
+      commandsOf([file]).includes('run check:published-deps'),
+      expected,
+    );
+  });
+
+  test('a document change runs neither knip nor the published-deps check', () => {
+    const commands = commandsOf(['libs/ts-data-forge/README.md']);
+
+    assert.notInclude(commands, 'run check:knip');
+
+    assert.notInclude(commands, 'run check:published-deps');
+  });
 
   test('the codemod output is formatted before it is linted', () => {
     const titles = plan(['libs/ts-data-forge/src/array.mts']).map(
