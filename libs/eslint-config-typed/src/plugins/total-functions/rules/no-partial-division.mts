@@ -3,6 +3,7 @@ import {
   ESLintUtils,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { createGetLayerTypes, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr, isNonNullObject } from 'ts-data-forge';
 import { intersectionTypeParts, unionTypeParts } from 'tsutils';
 import type { BigIntLiteralType, PseudoBigInt, Type } from 'typescript';
@@ -11,6 +12,11 @@ import { createRule } from './common.mjs';
 /**
  * An ESLint rule to ban partial division: `x / y` and `x /= y` whose
  * denominator is not provably non-zero.
+ *
+ * The denominator is read through `as`, `satisfies`, `!` and `<T>`: a number or
+ * bigint literal, or a sign applied to one, is safe by its value; anything else
+ * is safe only when the type of every layer of wrappers around it is a
+ * non-zero number or bigint literal (or a union of them).
  */
 
 export const noPartialDivision = createRule({
@@ -29,8 +35,6 @@ export const noPartialDivision = createRule({
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
-
-    const checker = parserServices.program.getTypeChecker();
 
     const isSafeDenominator = (type: Type): boolean => {
       if (type.isIntersection()) {
@@ -54,28 +58,18 @@ export const noPartialDivision = createRule({
       );
     };
 
+    const getLayerTypes = createGetLayerTypes(parserServices);
+
     const isProvablySafeDenominator = (
       denominator: TSESTree.Expression,
-    ): boolean => {
-      if (
-        denominator.type === AST_NODE_TYPES.Literal &&
-        denominator.value !== 0 &&
-        denominator.value !== 0n
-      ) {
-        // Division by a literal that isn't zero is safe.
-        return true;
-      }
-
-      if (denominator.type === AST_NODE_TYPES.Identifier) {
-        const denominatorNode =
-          parserServices.esTreeNodeToTSNodeMap.get(denominator);
-
-        return isSafeDenominator(checker.getTypeAtLocation(denominatorNode));
-      }
-
-      // All other division is not provably safe.
-      return false;
-    };
+    ): boolean =>
+      nonZeroNumericLiteralKind(denominator) !== undefined ||
+      // Otherwise the type has to say the value is not zero at every layer of
+      // type wrappers (docs/writing-lint-rules.md, B): a narrowing assertion
+      // cannot vouch for what the value's own type does not (`y as unknown as
+      // 1` with `y: number`, `foo!` with `foo: 42 | null`, whose `null`
+      // divides as `0`), and a widening one (`foo as 42 | null`) is respected.
+      getLayerTypes(denominator).every(isSafeDenominator);
 
     return {
       // `x /= y` divides as `x = x / y` does, and `unicorn/operator-assignment`
@@ -109,6 +103,38 @@ const isPseudoBigInt = (val: unknown): val is PseudoBigInt => {
     typeof valAsPseudoBigInt.base10Value === 'string' &&
     typeof valAsPseudoBigInt.negative === 'boolean'
   );
+};
+
+/**
+ * Whether `node`, read through its type wrappers, is a non-zero number or
+ * bigint literal, or a sign applied to one, and which of the two its value is:
+ * `2`, `-1n`, `(2 satisfies number)`, `-(2 as number)`. `+` on a bigint throws
+ * a TypeError, so it accepts only a number.
+ */
+const nonZeroNumericLiteralKind = (
+  node: TSESTree.Node,
+): 'bigint' | 'number' | undefined => {
+  const unwrapped = skipTypeWrappers(node);
+
+  if (unwrapped.type === AST_NODE_TYPES.Literal) {
+    return typeof unwrapped.value === 'number' && unwrapped.value !== 0
+      ? 'number'
+      : typeof unwrapped.value === 'bigint' && unwrapped.value !== 0n
+        ? 'bigint'
+        : undefined;
+  }
+
+  if (unwrapped.type === AST_NODE_TYPES.UnaryExpression) {
+    const kind = nonZeroNumericLiteralKind(unwrapped.argument);
+
+    const { operator } = unwrapped;
+
+    return operator === '-' || (operator === '+' && kind === 'number')
+      ? kind
+      : undefined;
+  }
+
+  return undefined;
 };
 
 const isBigIntLiteral = (type: Type): type is BigIntLiteralType =>
