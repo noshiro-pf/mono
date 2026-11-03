@@ -2,7 +2,7 @@
 
 [synstate-dom](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-dom) bindings for [synstate-router](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router): a `Routes` that requires a case for every page and rebuilds it only on a new route, and a `Link` that takes an `Href` or an `ExternalHref`, or an observable of either, never a plain string.
 
-> **Status:** in development, not published yet. The design is in synstate-router's [SPEC.md](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-router/SPEC.md) (Japanese), section 6.
+> **Status:** at version 0.x, the API may still change in a minor release. The design is in synstate-router's [SPEC.md](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-router/SPEC.md) (Japanese), section 6.
 
 ## Example
 

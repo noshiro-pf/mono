@@ -10,7 +10,7 @@ synstate-router is a client-side router built on SynState. Every destination, pa
 Two bindings draw it: `synstate-router-react` for React, and `synstate-router-dom` for [synstate-dom](/mono/synstate/synstate-dom/introduction/).
 
 :::caution
-synstate-router is in development and not on npm yet. The design is in its [SPEC.md](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-router/SPEC.md) (Japanese).
+synstate-router is at version 0.x, so its API may still change in a minor release. The design is in its [SPEC.md](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-router/SPEC.md) (Japanese).
 :::
 
 ## What it checks
@@ -23,7 +23,7 @@ synstate-router is in development and not on npm yet. The design is in its [SPEC
 
 ## Installation
 
-Once the packages are published, an application installs the router, its binding and the libraries the examples import (`react` 19 or later for the React binding):
+An application installs the router, its binding and the libraries the examples import (`react` 19 or later for the React binding):
 
 ```sh
 npm install react react-dom synstate synstate-router synstate-router-react ts-data-forge # React
