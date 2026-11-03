@@ -12,26 +12,10 @@
  * Each combineLatest doubles the emission count, producing 2^N subscriber calls
  * per source update in RxJS.
  */
-import * as path from 'node:path';
-import { range } from 'ts-data-forge';
-// eslint-disable-next-line @typescript-eslint/no-shadow
-import { performance } from 'node:perf_hooks';
-import {
-  type BenchmarkSeries,
-  formatBenchmarkCell,
-  writeBenchmarkResults,
-} from './benchmark-results.mjs';
-import { isMeasuringChild, measureEachInOwnProcess } from './own-process.mjs';
-import { resultsDir, scenarioDir } from './paths.mjs';
 import { selectProductionBuilds } from './production-builds.mjs';
+import { runSeriesSweep, scenarioModule } from './series-sweep.mjs';
 
 selectProductionBuilds();
-
-const WARMUP_ROUNDS = 2;
-
-const MEASURE_ROUNDS = 5;
-
-const TIMEOUT_MS = 5000;
 
 /** K = number of source updates per measurement */
 const K = 100;
@@ -39,179 +23,28 @@ const K = 100;
 /** Cascade depths to test. RxJS fires 2^N times per update. */
 const DEPTHS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20] as const;
 
-type BenchmarkModule = Readonly<{
-  runBenchmark: (k: number, depth: number) => number;
-}>;
-
-type BenchmarkEntry = Readonly<{
-  label: string;
-  file: string;
-}>;
-
-const entries: readonly BenchmarkEntry[] = [
-  { label: '**SynState**', file: '04-cascaded-diamond.synstate.mts' },
-  { label: 'RxJS', file: '04-cascaded-diamond.rxjs.mts' },
-  { label: 'Jotai', file: '04-cascaded-diamond.jotai.mts' },
-  { label: 'MobX', file: '04-cascaded-diamond.mobx.mts' },
-  { label: 'Redux', file: '04-cascaded-diamond.redux.mts' },
-  { label: 'Solid', file: '04-cascaded-diamond.solid.mts' },
-  {
-    label: 'Preact Signals',
-    file: '04-cascaded-diamond.preact-signals.mts',
-  },
-] as const;
-
-const median = (sorted: readonly number[]): number => {
-  const mid = Math.floor(sorted.length / 2);
-
-  return sorted.length % 2 === 0
-    ? ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2
-    : (sorted[mid] ?? 0);
-};
-
-/**
- * Runs the measured rounds for a single depth, bailing out as soon as a round
- * exceeds the timeout. Extracted into its own function so that the round loop is
- * not nested inside the entry/depth loops.
- */
-const measureRounds = (
-  mod: BenchmarkModule,
-  depth: number,
-): Readonly<{ times: readonly number[]; timedOut: boolean }> => {
-  const mut_times: number[] = [];
-
-  let mut_timedOut = false;
-
-  for (const _r of range(0, MEASURE_ROUNDS)) {
-    const t0 = performance.now();
-
-    mod.runBenchmark(K, depth);
-
-    const elapsed = performance.now() - t0;
-
-    mut_times.push(elapsed);
-
-    if (elapsed > TIMEOUT_MS) {
-      mut_timedOut = true;
-
-      break;
-    }
-  }
-
-  return { times: mut_times, timedOut: mut_timedOut };
-};
-
-/**
- * Measures every depth for a single benchmark entry. Extracted into its own
- * function so that the depth loop is not nested inside the entry loop.
- */
-const measureEntry = (
-  entry: BenchmarkEntry,
-  mod: BenchmarkModule,
-): readonly (number | null)[] => {
-  const mut_values: (number | null)[] = [];
-
-  let mut_skippingRest = false;
-
-  for (const depth of DEPTHS) {
-    if (mut_skippingRest) {
-      mut_values.push(null);
-
-      continue;
-    }
-
-    // Verify correctness
-    const check = mod.runBenchmark(3, depth);
-
-    if (check === 0 || !Number.isFinite(check)) {
-      console.error(
-        `❌ ${entry.label} N=${depth.toString()}: got ${check.toString()}`,
-      );
-
-      process.exit(1);
-    }
-
-    // Warmup
-    for (const _w of range(0, WARMUP_ROUNDS)) {
-      mod.runBenchmark(K, depth);
-    }
-
-    // Measure
-    const { times, timedOut } = measureRounds(mod, depth);
-
-    if (timedOut) {
-      mut_values.push(null);
-
-      mut_skippingRest = true;
-
-      console.info(
-        `  ⏱ ${entry.label} N=${depth.toString()}: TIMEOUT (> ${TIMEOUT_MS.toString()} ms)`,
-      );
-    } else {
-      const sorted = times.toSorted((a, b) => a - b);
-
-      const med = median(sorted);
-
-      mut_values.push(med);
-
-      console.info(
-        `  ✓ ${entry.label} N=${depth.toString()}: ${med.toFixed(1)} ms`,
-      );
-    }
-  }
-
-  return mut_values;
-};
-
-if (!isMeasuringChild) {
-  console.info(
-    `\n## Cascaded Diamond (K=${K.toString()} updates, ${WARMUP_ROUNDS.toString()} warmup + ${MEASURE_ROUNDS.toString()} measured, timeout=${TIMEOUT_MS.toString()} ms)\n`,
-  );
-}
-
-// Column headers
-const colHeaders = DEPTHS.map((d) => `N=${d.toString()}`);
-
-const mut_series: BenchmarkSeries[] = [];
-
-const mut_tableLines: string[] = [
-  `| Library | ${colHeaders.join(' | ')} |`,
-  `| ------- | ${DEPTHS.map(() => '----------:').join(' | ')} |`,
-];
-
-const measured = await measureEachInOwnProcess(
-  import.meta.url,
-  entries,
-  async (entry) => {
-    const filePath = path.resolve(scenarioDir, entry.file);
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const mod: BenchmarkModule = await import(filePath);
-
-    return measureEntry(entry, mod);
-  },
-);
-
-for (const [entry, values] of measured) {
-  mut_series.push({ label: entry.label, values });
-
-  mut_tableLines.push(
-    `| ${entry.label} | ${values.map((v) => formatBenchmarkCell(v, TIMEOUT_MS)).join(' | ')} |`,
-  );
-}
-
-const tableContent = mut_tableLines.join('\n');
-
-console.info(`\n${tableContent}`);
-
-await writeBenchmarkResults(
-  resultsDir,
-  'results-cascaded-diamond.md',
-  tableContent,
-  {
-    kind: 'series',
-    meta: { updates: K, timeoutMs: TIMEOUT_MS },
-    xLabels: colHeaders,
-    series: mut_series,
-  },
-);
+await runSeriesSweep({
+  scriptUrl: import.meta.url,
+  title: 'Cascaded Diamond',
+  workload: `K=${K.toString()} updates`,
+  updates: K,
+  points: DEPTHS,
+  pointLabel: (d) => `N=${d.toString()}`,
+  entries: [
+    { label: '**SynState**', file: '04-cascaded-diamond.synstate.mts' },
+    { label: 'RxJS', file: '04-cascaded-diamond.rxjs.mts' },
+    { label: 'Jotai', file: '04-cascaded-diamond.jotai.mts' },
+    { label: 'MobX', file: '04-cascaded-diamond.mobx.mts' },
+    { label: 'Redux', file: '04-cascaded-diamond.redux.mts' },
+    { label: 'Solid', file: '04-cascaded-diamond.solid.mts' },
+    {
+      label: 'Preact Signals',
+      file: '04-cascaded-diamond.preact-signals.mts',
+    },
+  ],
+  prepare: scenarioModule(K, {
+    updates: 3,
+    accepts: (result) => result !== 0 && Number.isFinite(result),
+  }),
+  resultsFile: 'results-cascaded-diamond.md',
+});

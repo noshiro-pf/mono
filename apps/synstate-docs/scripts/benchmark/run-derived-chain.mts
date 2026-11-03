@@ -7,6 +7,7 @@ import {
   renderStatsTable,
   writeBenchmarkResults,
 } from './benchmark-results.mjs';
+import { median } from './median.mjs';
 import { measureEachInOwnProcess } from './own-process.mjs';
 import { resultsDir, scenarioDir } from './paths.mjs';
 import { selectProductionBuilds } from './production-builds.mjs';
@@ -84,14 +85,6 @@ const scenarios: readonly Scenario[] = [
     ],
   },
 ] as const;
-
-const median = (sorted: readonly number[]): number => {
-  const mid = Math.floor(sorted.length / 2);
-
-  return sorted.length % 2 === 0
-    ? ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2
-    : (sorted[mid] ?? 0);
-};
 
 const p95 = (sorted: readonly number[]): number =>
   sorted[Math.ceil(sorted.length * 0.95) - 1] ?? 0;
