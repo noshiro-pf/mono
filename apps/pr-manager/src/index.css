@@ -2235,13 +2235,13 @@ a:focus-visible {
 }
 
 /*
- * How many issues either view shows, the priorities and `pending` as
- * switches, as the merge order's counts are, closer to what they count. The
- * priorities are one control, their tiles joined edge to edge, and
- * `pending` stands beside it on its own (`issues-summary.tsx`): a row that
- * wraps rather than a grid, with the joined tiles on a row of their own:
- * eight across, or two rows of four, or four rows of two, as the width allows
- * (below).
+ * How many issues either view shows, `in progress` and the tiers as switches,
+ * as the merge order's counts are, closer to what they count. The tiers are
+ * one control drawn as two groups of joined tiles (`issue-tier-group.tsx`):
+ * `hold` and `close` share the first row with `open` and `in progress`, and
+ * `S` to `D` and `none` take a row of their own, six across, or two rows of
+ * three, or three rows of two, as the width allows (below). No count or label
+ * wraps inside its tile at two digits; the rows are what give way.
  */
 .issues-summary.summary-row {
   display: flex;
@@ -2253,10 +2253,50 @@ a:focus-visible {
   flex: 1 1 7.5rem;
 }
 
+/* A label is one word or two, and the columns are set wide enough for it. */
+.issues-summary .stat-label {
+  white-space: nowrap;
+}
+
+/*
+ * A count of three digits a column is too narrow for puts its ` of N`, whole,
+ * under the number rather than under the `only`: a flex row, so that it lines
+ * up under the number when it wraps, the gap standing for the space a wrapped
+ * line would indent by.
+ */
+.issues-summary .stat-value {
+  align-items: baseline;
+  column-gap: 0.3rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.issues-summary .stat-value .count-total {
+  margin-left: 0;
+  white-space: nowrap;
+}
+
+@container filter-bar (width >= 55rem) {
+  .issues-summary .stat-cell .stat-value {
+    padding-right: 2.5rem;
+  }
+}
+
 .issues-summary > .stat-group {
   display: grid;
+  grid-template-columns: repeat(var(--tier-columns), minmax(0, 1fr));
+}
+
+.issues-summary > .tiers-aside {
+  --tier-columns: 2;
+
+  flex: 2 1 15rem;
+}
+
+.issues-summary > .tiers-ranked {
+  --tier-columns: 6;
+
   flex: 1 1 100%;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
 }
 
 .stat-group {
@@ -2369,9 +2409,9 @@ a:focus-visible {
  * they are given, which a column decides rather than the window. Where the
  * tiles at their full size would wrap, the tiles, the chips and the order
  * take less padding and smaller type: six merge order tiles then stay on one
- * line down to about 32rem, five to 27rem, and the issues' seven to 37rem.
- * Narrower still, they wrap into even rows rather than leaving one tile alone
- * on the last.
+ * line down to about 32rem and five to 27rem. Narrower still, they wrap into
+ * even rows rather than leaving one tile alone on the last. The issues' tiers
+ * keep rows of their own (below).
  */
 .merge-order-filters,
 .issues-list-controls-box {
@@ -2502,78 +2542,71 @@ a:focus-visible {
 }
 
 /*
- * The joined tiles go last, so that `open`, `pending` and `in progress`,
- * those of them there are, share the first row and the eight tiers wrap onto
- * one of their own, rather than a row each. Tab still goes in the order the
- * markup has, as the dense grid this replaces did. Where eight across are
- * narrower than a tile can hold its number and its `only` beside each other,
- * two rows of four, and where four are, four rows of two; the tiles keep
- * their shared edges, and the block its rounded corners.
+ * Where six tiers across are narrower than a tile can hold its count and its
+ * `only` beside each other, two rows of three, and narrower still three rows
+ * of two; the tiles keep their shared edges, and the block its rounded
+ * corners.
  */
 .issues-summary-box {
   container: filter-bar / inline-size;
 }
 
-.issues-summary > .stat-group {
-  order: 1;
-}
-
-@container filter-bar (23rem <= width < 40rem) {
-  .issues-summary > .stat-group {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+@container filter-bar (23rem <= width < 46rem) {
+  .issues-summary > .tiers-ranked {
+    --tier-columns: 3;
   }
 
-  .stat-group > .stat-cell + .stat-cell:nth-child(4n + 1) {
+  .tiers-ranked > .stat-cell + .stat-cell:nth-child(3n + 1) {
     margin-left: 0;
   }
 
-  .stat-group > .stat-cell:nth-child(n + 5) {
+  .tiers-ranked > .stat-cell:nth-child(n + 4) {
     margin-top: -1px;
   }
 
-  .stat-group > .stat-cell:nth-child(1) > .stat-toggle {
+  .tiers-ranked > .stat-cell:nth-child(1) > .stat-toggle {
     border-radius: var(--radius) 0 0 0;
   }
 
-  .stat-group > .stat-cell:nth-child(4) > .stat-toggle {
+  .tiers-ranked > .stat-cell:nth-child(3) > .stat-toggle {
     border-radius: 0 var(--radius) 0 0;
   }
 
-  .stat-group > .stat-cell:nth-last-child(4) > .stat-toggle {
+  .tiers-ranked > .stat-cell:nth-last-child(3) > .stat-toggle {
     border-radius: 0 0 0 var(--radius);
   }
 
-  .stat-group > .stat-cell:nth-last-child(1) > .stat-toggle {
+  .tiers-ranked > .stat-cell:nth-last-child(1) > .stat-toggle {
     border-radius: 0 0 var(--radius) 0;
   }
 }
 
 @container filter-bar (width < 23rem) {
-  .issues-summary > .stat-group {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .issues-summary > .tiers-ranked {
+    --tier-columns: 2;
   }
 
-  .stat-group > .stat-cell + .stat-cell:nth-child(odd) {
+  .tiers-ranked > .stat-cell + .stat-cell:nth-child(odd) {
     margin-left: 0;
   }
 
-  .stat-group > .stat-cell:nth-child(n + 3) {
+  .tiers-ranked > .stat-cell:nth-child(n + 3) {
     margin-top: -1px;
   }
 
-  .stat-group > .stat-cell:nth-child(1) > .stat-toggle {
+  .tiers-ranked > .stat-cell:nth-child(1) > .stat-toggle {
     border-radius: var(--radius) 0 0 0;
   }
 
-  .stat-group > .stat-cell:nth-child(2) > .stat-toggle {
+  .tiers-ranked > .stat-cell:nth-child(2) > .stat-toggle {
     border-radius: 0 var(--radius) 0 0;
   }
 
-  .stat-group > .stat-cell:nth-last-child(2) > .stat-toggle {
+  .tiers-ranked > .stat-cell:nth-last-child(2) > .stat-toggle {
     border-radius: 0 0 0 var(--radius);
   }
 
-  .stat-group > .stat-cell:nth-last-child(1) > .stat-toggle {
+  .tiers-ranked > .stat-cell:nth-last-child(1) > .stat-toggle {
     border-radius: 0 0 var(--radius) 0;
   }
 }

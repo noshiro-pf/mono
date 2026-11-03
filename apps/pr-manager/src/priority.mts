@@ -115,7 +115,10 @@ export const PRIORITY_RANK = {
 /** An issue's tier, or `none`. */
 export type IssueTier = IssuePriority | 'none';
 
-/** In the order the switches are drawn: `docs/issue-priority.md`'s, then none. */
+/**
+ * `docs/issue-priority.md`'s order, then none: the order of the URL's
+ * parameters, and of the switches within each row (`issue-tier-group.tsx`).
+ */
 export const ISSUE_TIERS = [
   'S',
   'A',
