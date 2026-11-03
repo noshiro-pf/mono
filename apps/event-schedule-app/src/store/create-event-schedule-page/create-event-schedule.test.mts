@@ -250,10 +250,8 @@ const setup = (
 
       return Promise.resolve();
     },
-    toAbsolutePath: (relativePath) => {
-      const url = new URL(relativePath, 'https://example.com/create/');
-
-      return url.href;
+    router: {
+      absoluteUrlOf: (href) => `https://example.com${href}`,
     },
     now: () => ({
       year: asSafeUint(2026),

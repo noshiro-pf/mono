@@ -1,9 +1,10 @@
-import { createMemoryBrowser, createRouter } from 'tiny-router-observable';
+import { createMemoryBrowser } from 'synstate-router';
 import { asSafeUint } from 'ts-data-forge';
 import {
   AnswerFilterState,
   type AnswerFilterStateAction,
 } from '../../functions/index.mjs';
+import { createAppRouter } from '../router-store.mjs';
 import { createAnswerFilterQueryParam } from './answer-filter-query-param.mjs';
 
 describe(createAnswerFilterQueryParam, () => {
@@ -19,12 +20,17 @@ describe(createAnswerFilterQueryParam, () => {
     assert.strictEqual(browser.url().search, '');
   });
 
-  test('replaces the history entry rather than adding one', () => {
+  test('replaces the history entry rather than adding one', async () => {
     const { queryParam, browser } = setup('https://example.com/event/abc/');
 
     queryParam.saveSortStateToQueryParams(['score', 'desc']);
 
-    browser.history.back();
+    browser.history.go(-1);
+
+    // A browser moves through the history in a later task.
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
 
     assert.strictEqual(browser.url().search, '?sort-by=score&sort-order=desc');
   });
@@ -84,6 +90,36 @@ describe(createAnswerFilterQueryParam, () => {
     assert.isTrue(filterStateRestored.dayOfWeek.enabled);
   });
 
+  test('reads and writes nothing outside the event’s pages', () => {
+    const { queryParam, browser } = setup(
+      'https://example.com/create/?sort-by=score',
+    );
+
+    const mut_calls: string[] = [];
+
+    queryParam.restoreFromQueryParams(
+      () => {
+        mut_calls.push('sort');
+      },
+      () => {
+        mut_calls.push('filter');
+      },
+    );
+
+    queryParam.saveSortStateToQueryParams(['date', 'desc']);
+
+    queryParam.saveFilterStateToQueryParams(
+      AnswerFilterState.reducer(AnswerFilterState.initialState, {
+        type: 'set-filledDateOnly',
+        checked: true,
+      }),
+    );
+
+    assert.deepStrictEqual(mut_calls, []);
+
+    assert.strictEqual(browser.url().search, '?sort-by=score');
+  });
+
   test('reads a value typed by hand that is not a number as unset', () => {
     const { queryParam } = setup(
       'https://example.com/event/abc/?good=abc--3&rank=x',
@@ -123,7 +159,7 @@ const setup = (
 
   return {
     queryParam: createAnswerFilterQueryParam({
-      router: createRouter({ browser }),
+      router: createAppRouter(browser),
     }),
     browser,
   } as const;

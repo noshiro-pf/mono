@@ -4,7 +4,7 @@ import { Arr, match, Optional } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
 import {
   dict,
-  Routes,
+  routes,
   ymd2str,
   ymdhm2strWithDay,
 } from '../../../constants/index.mjs';
@@ -75,7 +75,7 @@ export const EventListItemComponent = ({
       class={constant(styles.listItem)}
       data-e2e={constant('event-list-item')}
       onClick={() => {
-        Router.push(Routes.routes.answerPage(eventId));
+        Router.push(routes.event.answer.href({ eventId }));
       }}
     >
       <div class={constant(styles.header)}>

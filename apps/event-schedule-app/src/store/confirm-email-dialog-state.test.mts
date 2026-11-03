@@ -1,7 +1,8 @@
 import { EventSchedule, NotificationSettings } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
-import { createMemoryBrowser } from 'tiny-router-observable';
+import { createMemoryBrowser } from 'synstate-router';
 import { Result } from 'ts-data-forge';
+import { routes } from '../constants/index.mjs';
 import {
   createConfirmEmailDialogStore,
   type ConfirmEmailDialog,
@@ -79,23 +80,29 @@ describe(createConfirmEmailDialogStore, () => {
 
     assert.isFalse(store.isOpen$.getSnapshot().value);
 
-    browser.history.back();
+    browser.history.go(-1);
 
-    browser.history.forward();
+    await settle();
+
+    browser.history.go(1);
+
+    await settle();
 
     assert.isTrue(store.isOpen$.getSnapshot().value);
   });
 
   test('drops an answer that comes back after the edit page is left and opened again', async () => {
-    const { store, browser, verified } = setup('ok');
+    const { store, router, verified } = setup('ok');
 
     store.inputEmailHandler('bob@example.com');
 
     store.enterClickHandler();
 
-    browser.history.back();
+    // A link, not the history: a history move lands in a later task, after the
+    // answer.
+    router.push(routes.event.answer.href({ eventId: 'abc' }));
 
-    browser.history.forward();
+    router.push(routes.event.answer.edit.href({ eventId: 'abc' }));
 
     await settle();
 
@@ -111,7 +118,7 @@ describe(createConfirmEmailDialogStore, () => {
 
     store.enterClickHandler();
 
-    router.push('/event/xyz/edit/');
+    router.push(routes.event.answer.edit.href({ eventId: 'xyz' }));
 
     await settle();
 
@@ -123,13 +130,13 @@ describe(createConfirmEmailDialogStore, () => {
   });
 
   test('drops an answer that comes back after the edit page is left', async () => {
-    const { store, browser, verified, toasts } = setup('ok');
+    const { store, router, verified, toasts } = setup('ok');
 
     store.inputEmailHandler('bob@example.com');
 
     store.enterClickHandler();
 
-    browser.history.back();
+    router.push(routes.event.answer.href({ eventId: 'abc' }));
 
     await settle();
 
@@ -138,10 +145,12 @@ describe(createConfirmEmailDialogStore, () => {
     assert.strictEqual(toasts.count, 0);
   });
 
-  test('cancel goes back to where the edit page was opened from', () => {
+  test('cancel goes back to where the edit page was opened from', async () => {
     const { store, browser } = setup('ok');
 
     store.cancelClickHandler();
+
+    await settle();
 
     assert.strictEqual(browser.url().pathname, '/event/abc/');
   });
@@ -173,7 +182,7 @@ const setup = (
 
   const router = createAppRouter(browser);
 
-  router.push('/event/abc/edit/');
+  router.push(routes.event.answer.edit.href({ eventId: 'abc' }));
 
   const [eventSchedule$] = createState<EventSchedule | undefined>(
     EventSchedule.fill({

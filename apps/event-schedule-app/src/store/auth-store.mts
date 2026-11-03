@@ -1,15 +1,16 @@
 import { createState, type InitializedObservable, map } from 'synstate';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../api/index.mjs';
-import { Routes } from '../constants/index.mjs';
+import { routes } from '../constants/index.mjs';
 import { clog } from '../utils/index.mjs';
+import type { AppRouter } from './router-store.mjs';
 
 export type AuthDeps = Readonly<{
   auth: StrictPick<
     Api['auth'],
     'currentUser' | 'onAuthStateChanged' | 'signOut'
   >;
-  router: Readonly<{ push: (nextUrl: string) => void }>;
+  router: StrictPick<AppRouter, 'push'>;
 }>;
 
 /**
@@ -57,7 +58,7 @@ export const createAuthStore = (deps: AuthDeps): AuthStore => {
   const signOut = async (): Promise<void> => {
     await deps.auth.signOut();
 
-    deps.router.push(Routes.routes.signInPage);
+    deps.router.push(routes.signIn.href());
   };
 
   const signOutClick = (): void => {

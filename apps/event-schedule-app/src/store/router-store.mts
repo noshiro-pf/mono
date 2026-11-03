@@ -1,18 +1,19 @@
 import {
+  combine,
   filter,
   map,
-  pluck,
   scan,
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
 import {
   createRouter,
+  type Href,
   type Router,
   type RouterBrowser,
-} from 'tiny-router-observable';
+} from 'synstate-router';
 import { Optional } from 'ts-data-forge';
-import { Routes } from '../constants/index.mjs';
+import { routes } from '../constants/index.mjs';
 
 /**
  * The app's router: the URL, which page it names, and the event id in it.
@@ -20,67 +21,59 @@ import { Routes } from '../constants/index.mjs';
  * `createMemoryBrowser`.
  */
 export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
-  const router_ = createRouter({
-    redirect: (pathname) =>
-      Optional.toNullable(Routes.redirectRules.get(pathname)),
+  const router = createRouter(routes, {
+    redirect: (m) => (m.route === 'root' ? routes.create.href() : undefined),
     ...(browser === undefined ? {} : { browser }),
   });
 
-  const pathSegments$: InitializedObservable<readonly string[]> =
-    router_.state.pipe(map((state) => state.pathSegments));
-
-  const pageToBack$ = router_.state.pipe(pluck('pathname')).pipe(
-    filter((pathname) => {
-      const pathSegments = router_.utils.splitToPathSegments(pathname);
-
-      return (
+  const pageToBack$ = combine([router.match, router.location])
+    .pipe(
+      filter(
         // ログインページ・新規登録ページは除外
-        !Routes.isRoute.registerPage(pathSegments) &&
-        !Routes.isRoute.signInPage(pathSegments)
-      );
-    }),
-  );
+        ([m]) => m.route !== 'signIn' && m.route !== 'register',
+      ),
+    )
+    .pipe(map(([, location]) => router.parseHref(location.href)))
+    .pipe(filter(Optional.isSome))
+    .pipe(map((href) => href.value));
 
-  const editPage$ = pathSegments$.pipe(map(Routes.isRoute.editPage));
+  const absoluteUrlOf = (href: Href): string => {
+    // `toUrl` gives the path from the root: only the origin is taken.
+    const { origin } = new URL(router.location.getSnapshot().value.href);
 
-  const router = {
-    ...router_,
-    pathSegments$,
+    const url = new URL(router.toUrl(href), origin);
+
+    return url.href;
+  };
+
+  return {
+    ...router,
     pageToBack$,
-
-    isRoute: {
-      createPage$: pathSegments$.pipe(map(Routes.isRoute.createPage)),
-      answerPage$: pathSegments$.pipe(map(Routes.isRoute.answerPage)),
-      editPage$,
-      eventListPage$: pathSegments$.pipe(map(Routes.isRoute.eventListPage)),
-      registerPage$: pathSegments$.pipe(map(Routes.isRoute.registerPage)),
-      signInPage$: pathSegments$.pipe(map(Routes.isRoute.signInPage)),
-    },
-    eventId$: pathSegments$.pipe(map(Routes.getEventIdFromPathname)),
-    editPageLeaves$: editPage$
+    absoluteUrlOf,
+    eventId$: router
+      .at(routes.event.answer)
+      .pipe(
+        map((values) =>
+          Optional.isSome(values) ? values.value.params.eventId : undefined,
+        ),
+      ),
+    editPageLeaves$: router
+      .isActive(routes.event.answer.edit)
       .pipe(filter((isEditPage) => !isEditPage))
       .pipe(scan((count) => count + 1, 0)),
   } as const;
-
-  return router;
 };
 
-export type AppRouter = Router &
+export type AppRouter = Router<typeof routes> &
   Readonly<{
-    pathSegments$: InitializedObservable<readonly string[]>;
     /**
-     * The last pathname that was neither the sign-in nor the register page:
-     * where signing in or registering returns to.
+     * The last page that was neither the sign-in nor the register page, with
+     * its query: where signing in or registering returns to. An address that
+     * names no page is not one to return to.
      */
-    pageToBack$: SynstateObservable<string>;
-    isRoute: Readonly<{
-      createPage$: InitializedObservable<boolean>;
-      answerPage$: InitializedObservable<boolean>;
-      editPage$: InitializedObservable<boolean>;
-      eventListPage$: InitializedObservable<boolean>;
-      registerPage$: InitializedObservable<boolean>;
-      signInPage$: InitializedObservable<boolean>;
-    }>;
+    pageToBack$: SynstateObservable<Href>;
+    /** The whole URL of a page, to copy and share. */
+    absoluteUrlOf: (href: Href) => string;
     eventId$: InitializedObservable<string | undefined>;
     /**
      * How many times the edit page has been left: what the edit page keeps is

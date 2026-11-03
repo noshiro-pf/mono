@@ -23,9 +23,9 @@ import { compareYearMonthDate } from 'ts-fortress-types';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
 import {
-  Routes,
   dict,
   eventScheduleInitialValue,
+  routes,
 } from '../../constants/index.mjs';
 import {
   type EventScheduleAppLocalStorage,
@@ -35,6 +35,7 @@ import type {
   EventScheduleSettingCommonState,
   EventScheduleSettingCommonStateHandler,
 } from '../../types/index.mjs';
+import type { AppRouter } from '../router-store.mjs';
 import {
   type EventScheduleSettingUser,
   createEventScheduleSettingStore,
@@ -52,7 +53,7 @@ export type CreateEventScheduleDeps = Readonly<{
     save: (typeof EventScheduleAppLocalStorage)['saveCreateEventPageTemp'];
   }>;
   writeToClipboard: (text: string) => Promise<void>;
-  toAbsolutePath: (relativePath: string) => string;
+  router: StrictPick<AppRouter, 'absoluteUrlOf'>;
   /** Dates up to this one are not restored from storage. */
   now: () => Ymdhm;
   /** How long the settings have to stay still before they are saved. */
@@ -225,7 +226,7 @@ export const createCreateEventScheduleStore = (
 
     setIsLoadingFalse();
 
-    setUrl(deps.toAbsolutePath(`..${Routes.routes.answerPage(eventId)}`));
+    setUrl(deps.router.absoluteUrlOf(routes.event.answer.href({ eventId })));
 
     // reset local storage
     const resetResult = deps.storage.save({

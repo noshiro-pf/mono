@@ -11,9 +11,8 @@ import {
   aboutThisAppUrl,
   dict,
   feedbackUrl,
-  Routes,
+  routes,
 } from '../../constants/index.mjs';
-import { routerLinkClick } from '../../functions/index.mjs';
 import {
   Auth,
   Router,
@@ -21,6 +20,7 @@ import {
   type UpdateUserInfoDialogType,
 } from '../../store/index.mjs';
 import { NoWrapSpan } from '../atoms/index.mjs';
+import { Link } from '../router-components.mjs';
 import { ForNonLoggedInUserDialog } from './button-with-confirm/index.mjs';
 import * as styles from './navbar.module.css';
 import {
@@ -34,8 +34,6 @@ import {
 const dc = dict.header;
 
 export const NavBar = (): JSX.Element => {
-  const onLinkClick = routerLinkClick(Router.push);
-
   const [forNonLoggedInUserDialogIsOpen$, setForNonLoggedInUserDialogIsOpen] =
     createState(false);
 
@@ -49,7 +47,7 @@ export const NavBar = (): JSX.Element => {
       <div class={constant(styles.row)}>
         <div class={constant(styles.item)}>
           <AnchorButton
-            href={constant(Routes.routes.createPage)}
+            href={constant(Router.toUrl(routes.create.href()))}
             icon={'add'}
             intent={'primary'}
             rel={'noopener noreferrer'}
@@ -80,34 +78,31 @@ export const NavBar = (): JSX.Element => {
                   }}
                   isOpen={forNonLoggedInUserDialogIsOpen$}
                 />
-                <a
+                <Link
                   class={constant(styles.itemAnchor)}
                   data-e2e={constant('nav-sign-in')}
-                  href={constant(Routes.routes.signInPage)}
-                  onClick={onLinkClick}
+                  to={routes.signIn.href()}
                 >
                   {constant(dc.auth.signIn)}
-                </a>
-                <a
+                </Link>
+                <Link
                   class={constant(styles.itemAnchor)}
                   data-e2e={constant('nav-register')}
-                  href={constant(Routes.routes.registerPage)}
-                  onClick={onLinkClick}
+                  to={routes.register.href()}
                 >
                   {constant(dc.auth.register)}
-                </a>
+                </Link>
               </>
             }
             else={
               <>
-                <a
+                <Link
                   class={constant(styles.itemAnchor)}
                   data-e2e={constant('nav-event-list')}
-                  href={constant(Routes.routes.eventListPage)}
-                  onClick={onLinkClick}
+                  to={routes.eventList.href()}
                 >
                   {constant(dc.list)}
-                </a>
+                </Link>
                 <div class={constant(styles.item)}>
                   <span>{constant(dc.auth.userName.prefix)}</span>
                   <Popover
