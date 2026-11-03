@@ -302,6 +302,159 @@ describe(t.toJsonSchema, () => {
       assert.strictEqual(schema.value[0]?.kind, 'not-json');
     });
 
+    test.each([
+      [
+        'a record with an optional property no JSON value is of',
+        t.union([
+          t.record({ name: t.string(), big: t.optional(t.bigint()) }),
+          t.number(),
+        ]),
+        [['not-json', '/anyOf/0/properties/big']],
+      ],
+      [
+        'an array of a kind no JSON value is of',
+        t.union([t.array(t.bigint()), t.string()]),
+        [['not-json', '/anyOf/0/items']],
+      ],
+      [
+        'a member with an example that is not JSON',
+        t.union([t.annotate(t.unknown(), { examples: [1n] }), t.string()]),
+        [['not-json', '/anyOf/0/examples/0']],
+      ],
+    ] as const)(
+      'reports, rather than leaves out, %s, as it does outside a union',
+      (_, type, expected) => {
+        const schema = t.toJsonSchema(type);
+
+        assert.isTrue(Result.isErr(schema));
+
+        assert.deepStrictEqual<readonly (readonly string[])[]>(
+          schema.value.map(({ kind, schemaPath }) => [kind, schemaPath]),
+          expected,
+        );
+      },
+    );
+
+    test('points an error inside a member below that member', () => {
+      const schema = t.toJsonSchema(
+        t.record({
+          u: t.union([
+            t.bigint(),
+            t.string(),
+            t.record({ a: t.optional(t.SetType(t.string())) }),
+          ]),
+        }),
+      );
+
+      assert.isTrue(Result.isErr(schema));
+
+      assert.deepStrictEqual(
+        schema.value.map(({ kind, schemaPath }) => [kind, schemaPath]),
+        [['not-json', '/properties/u/anyOf/1/properties/a']],
+      );
+    });
+
+    test.each([
+      [
+        'a recursion of a kind no JSON value is of',
+        t.union([t.string(), t.recursion('B', () => t.bigint())]),
+      ],
+      [
+        'a brand or refinement of one',
+        t.union([
+          t.string(),
+          t.brand({ baseType: t.bigint(), brandKeys: ['Big'] }),
+          t.refine({
+            baseType: t.bigint(),
+            is: (n): n is bigint => n > 0n,
+            defaultValue: 1n,
+          }),
+        ]),
+      ],
+      ['an enum of no JSON value', t.union([t.string(), t.enumType([1n, 2n])])],
+      [
+        'a record, tuple or non-empty array that requires one',
+        t.union([
+          t.string(),
+          t.record({ a: t.bigint() }),
+          t.tuple([t.number(), t.bigint()]),
+          t.nonEmptyArray(t.bigint()),
+        ]),
+      ],
+      ['a recursion that requires itself', t.union([t.string(), Endless])],
+    ] as const)('leaves out %s', (_, type) => {
+      assert.deepStrictEqual(schemaOf(type), { type: 'string' });
+    });
+
+    test('keeps a recursion that requires itself only where it may end', () => {
+      assert.deepStrictEqual(schemaOf(t.union([t.string(), Linked])), {
+        anyOf: [{ type: 'string' }, { $ref: '#/$defs/Linked' }],
+        $defs: {
+          Linked: {
+            type: 'object',
+            properties: {
+              value: { type: 'number' },
+              next: { anyOf: [{ $ref: '#/$defs/Linked' }, { type: 'null' }] },
+            },
+            required: ['value', 'next'],
+          },
+        },
+      });
+    });
+
+    test('reports an enum with some JSON values, as it does outside a union', () => {
+      const schema = t.toJsonSchema(t.union([t.string(), t.enumType([1, 2n])]));
+
+      assert.isTrue(Result.isErr(schema));
+
+      assert.deepStrictEqual(
+        schema.value.map(({ kind, schemaPath }) => [kind, schemaPath]),
+        [['not-json', '/anyOf/1']],
+      );
+    });
+
+    test('points an error in the one member left at where its schema is', () => {
+      const schema = t.toJsonSchema(
+        t.union([
+          t.number(),
+          t.annotate(t.union([t.bigint(), t.array(t.bigint())]), {
+            title: 'x',
+          }),
+        ]),
+      );
+
+      assert.isTrue(Result.isErr(schema));
+
+      assert.deepStrictEqual(
+        schema.value.map(({ kind, schemaPath }) => [kind, schemaPath]),
+        [['not-json', '/anyOf/1/items']],
+      );
+
+      const alone = t.toJsonSchema(t.union([t.array(t.bigint()), t.bigint()]));
+
+      assert.isTrue(Result.isErr(alone));
+
+      assert.deepStrictEqual(
+        alone.value.map(({ kind, schemaPath }) => [kind, schemaPath]),
+        [['not-json', '/items']],
+      );
+    });
+
+    test('leaves an error in $defs where it is', () => {
+      const Big: t.Type<unknown> = t.recursion('Big', () =>
+        t.record({ big: t.optional(t.bigint()) }),
+      );
+
+      const schema = t.toJsonSchema(t.union([t.string(), Big]));
+
+      assert.isTrue(Result.isErr(schema));
+
+      assert.deepStrictEqual(
+        schema.value.map(({ kind, schemaPath }) => [kind, schemaPath]),
+        [['not-json', '/$defs/Big/properties/big']],
+      );
+    });
+
     test('oneOf with a discriminator when a literal key tells members apart', () => {
       assert.deepStrictEqual(
         schemaOf(
@@ -771,6 +924,14 @@ describe('structure', () => {
     assert.isTrue(structure?.kind === 'brand' && structure.refined);
   });
 });
+
+const Endless: t.Type<unknown> = t.recursion('Endless', () =>
+  t.record({ next: Endless }),
+);
+
+const Linked: t.Type<unknown> = t.recursion('Linked', () =>
+  t.record({ value: t.number(), next: t.union([Linked, t.nullType]) }),
+);
 
 const schemaOf = (type: t.Type<unknown>): t.JsonSchema => {
   const schema = t.toJsonSchema(type, { includeSchemaUri: false });
