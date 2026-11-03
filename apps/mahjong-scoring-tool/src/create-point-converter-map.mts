@@ -28,23 +28,9 @@ export const createPointMap = (
     (x, y) => y - x,
   );
 
-  /** E.g. `[35, 35, 20, 10]` */
-  const pointsRounded: FixedLengthTuple<4, number> = Arr.map(
-    rawPointsSorted,
-    (v) => v / 1000,
-  );
-
-  const sumOfPointsRounded = Arr.sum(pointsRounded);
-
-  if (sumOfPointsRounded !== 100) {
-    throw new Error(
-      `The sum of sumOfPointsRounded is expected to be 100, but is actually ${sumOfPointsRounded}.`,
-    );
-  }
-
   /** E.g. `[0, 0, 2, 3]` */
-  const rank: FixedLengthTuple<4, number> = Arr.map(pointsRounded, (x) =>
-    pointsRounded.indexOf(x),
+  const rank: FixedLengthTuple<4, number> = Arr.map(rawPointsSorted, (x) =>
+    rawPointsSorted.indexOf(x),
   );
 
   /** E.g. `[2, 0, 1, 1]` */
@@ -52,34 +38,46 @@ export const createPointMap = (
     Arr.count(rank, (x) => x === i),
   );
 
+  /** E.g. `[15000, 5000, -5000, -15000]` */
+  const umaInRawPoints: FixedLengthTuple<4, number> = Arr.map(
+    uma,
+    (u) => u * 1000,
+  );
+
   /**
    * 同点の場合は折半
    *
-   * E.g. `[10, 0, -5, -15]`
+   * E.g. `[10000, 0, -5000, -15000]`
    */
-  const umaAveraged: FixedLengthTuple<4, number> = Arr.map(uma, (_, i) =>
-    average(uma.slice(i, asUint32(rankCount[i] + i))),
+  const umaAveraged: FixedLengthTuple<4, number> = Arr.map(
+    umaInRawPoints,
+    (_, i) => average(umaInRawPoints.slice(i, asUint32(rankCount[i] + i))),
   );
 
-  /** E.g. 4 * (30000 - 25000) / 1000 = 20 */
-  const topBonus: number = (4 * (oka - 25_000)) / 1000;
+  /** E.g. 4 * (30000 - 25000) = 20000 */
+  const topBonus: number = 4 * (oka - 25_000);
 
   /**
    * 同点トップが複数いる場合折半
    *
-   * E.g. 10
+   * E.g. 10000
    */
   // eslint-disable-next-line total-functions/no-partial-division
   const topBonusAveraged: number = topBonus / rankCount[0];
 
+  // Every term is in raw points and the sum is divided by 1000 once, so that a
+  // score such as 23100 gives -1.9 rather than the error that 23.1 - 30
+  // carries. A tie that splits a term into thirds still gives a repeating
+  // fraction.
   const result: FixedLengthTuple<4, number> = Arr.map(
-    pointsRounded,
+    rawPointsSorted,
     (p, i) =>
-      p -
-      oka / 1000 +
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      umaAveraged[rank[i]]! +
-      (rank[i] === 0 ? topBonusAveraged : 0),
+      (p -
+        oka +
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        umaAveraged[rank[i]]! +
+        (rank[i] === 0 ? topBonusAveraged : 0)) /
+      1000,
   );
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
