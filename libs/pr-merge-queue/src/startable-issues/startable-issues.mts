@@ -1,4 +1,4 @@
-import { priorityOfLabels, type ReportIssue } from 'pr-report-core';
+import { issuePriorityOfLabels, type ReportIssue } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import {
   parseCommandArgs,
@@ -23,9 +23,10 @@ import { WORKTREE_ROOT } from '../unblock-prs/index.mjs';
 export const STARTABLE_ISSUES_HELP = [
   'Usage: startable-issues [--limit <n>] [--author <login>]...',
   '',
-  'Lists the open issues nobody has started, in the order to take them:',
-  'priority:high first, priority:low last, the lowest number first within',
-  'each. Reads them as run-issue-resolver does, and writes nothing.',
+  'Lists the open issues nobody has started, in the order to take them: by',
+  'tier, priority:S, A, B, C, then no tier, then D, the lowest number first',
+  'within each; priority:hold and priority:close are held. Reads them as',
+  'run-issue-resolver does, and writes nothing.',
   '',
   'Options:',
   '  --limit <n>       list the first n (default: all of them)',
@@ -125,16 +126,16 @@ export const renderStartable = (
     ...shown.map(({ number, url }) => {
       const issue = issues.find((each) => each.number === number);
 
-      const priority =
+      const tier =
         issue === undefined
           ? 'none'
-          : priorityOfLabels(issue.labels.map(({ name }) => name));
+          : issuePriorityOfLabels(issue.labels.map(({ name }) => name));
 
       return [
         `#${number}`,
-        ...(priority === 'high' || priority === 'low'
-          ? [`[priority:${priority}]`]
-          : []),
+        ...(tier === 'none' || tier === 'several'
+          ? []
+          : [`[priority:${tier}]`]),
         ...(issue === undefined ? [] : [issue.title]),
         url,
       ].join('  ');

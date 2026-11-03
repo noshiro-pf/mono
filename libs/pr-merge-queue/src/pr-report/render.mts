@@ -1,6 +1,7 @@
 /** The report as text: Markdown for GitHub and Claude, plain for a terminal. */
 
 import {
+  issuePriorityOfLabels,
   summarize,
   type ChecksSummary,
   type IssueStartState,
@@ -354,6 +355,21 @@ const startDetail = (issue: ReportIssue): readonly string[] =>
   ] as const;
 
 /**
+ * An issue placed under no tier, or under several, which says nothing either
+ * (`docs/issue-priority.md`): said so that it is placed. The one tier it does
+ * carry is among its labels already.
+ */
+const priorityDetail = (issue: ReportIssue): readonly string[] => {
+  const priority = issuePriorityOfLabels(issue.labels.map(({ name }) => name));
+
+  return priority === 'none'
+    ? (['no priority tier'] as const)
+    : priority === 'several'
+      ? (['several priority tiers'] as const)
+      : ([] as const);
+};
+
+/**
  * What is open that is not a pull request.
  *
  * Last, after what merged, because it is the one section that is not about the
@@ -384,6 +400,7 @@ const issuesSection = (
 
       const detail = [
         ...startDetail(issue),
+        ...priorityDetail(issue),
         `updated ${issue.updatedAt}`,
         `by ${issue.author}`,
         ...(issue.comments > 0

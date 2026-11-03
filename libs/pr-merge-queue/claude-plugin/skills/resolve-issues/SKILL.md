@@ -1,6 +1,6 @@
 ---
 name: resolve-issues
-description: Implement the N open issues to take next — startable by their `Start-After:`, not started or planned by anyone, written by the token's account, `priority:high` first — choosing them with `startable-issues` rather than by judgement, marking each started with `start-issue`, and taking each to its own pull request opened with `open-pr`. Use when asked to implement, work through or resolve the open issues, to pick the next issues and do them, or to "do N issues". The argument is N (1 when omitted).
+description: Implement the N open issues to take next — startable by their `Start-After:`, not started or planned by anyone, written by the token's account, by priority tier (`priority:S` first) — choosing them with `startable-issues` rather than by judgement, marking each started with `start-issue`, and taking each to its own pull request opened with `open-pr`. Use when asked to implement, work through or resolve the open issues, to pick the next issues and do them, or to "do N issues". The argument is N (1 when omitted).
 argument-hint: '[N]'
 ---
 
@@ -45,13 +45,14 @@ when those run out too, run it again without `--limit`.
 - **Its author is the token's account** (`--author <login>` names others, only
   when the person asked for them): whatever the issue says is acted on, and
   anyone can open one.
-- **Not held** — not labelled `question`, `wontfix`, `duplicate`, `invalid` or
-  `pending`, and not one a `run-issue-resolver` session left as it stands.
+- **Not held** — not labelled `question`, `wontfix`, `duplicate`, `invalid`,
+  `pending`, `priority:hold` or `priority:close`, and not one a
+  `run-issue-resolver` session left as it stands.
   That record is a file on the machine the resolver ran on, so elsewhere such an
   issue is listed; step 2 passes over it by its comment.
-- **Priority** — `priority:high` first, then those with neither label (or
-  `priority:mid`, or both), then `priority:low`; the lowest number first within
-  each.
+- **Priority** — by tier (`docs/issue-priority.md` in this repository):
+  `priority:S`, `priority:A`, `priority:B`, `priority:C`, then those with no
+  tier (or several), then `priority:D`; the lowest number first within each.
 
 When it prints `No issue to start.`, report that and what it passed over, and
 end.

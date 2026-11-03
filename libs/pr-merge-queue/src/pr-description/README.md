@@ -29,8 +29,25 @@ pnpm run pr-description -- read 1901                        # 訳文を省いて
 pnpm run pr-description -- pull 1901 --file ./d.md           # 編集用に保存
 pnpm run pr-description -- push 1901 --file ./d.md           # 書き戻す
 pnpm run pr-description -- check --file ./d.md               # 投稿前に確かめる
-pnpm run pr-description -- create --title 'fix: x' --file ./d.md  # issue を作る
+pnpm run pr-description -- similar --title 'fix: x' --keyword onUserDelete  # 重複を探す
+pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  # issue を作る
 ```
+
+### issue を作るとき
+
+`create` は `--priority` を必須とし、その段（`S`・`A`・`B`・`C`・`D`・`hold`）の
+`priority:<段>` ラベルを付けて作ります。段の意味と決め方は、このリポジトリの
+[`docs/issue-priority.md`](https://github.com/noshiro-pf/mono/blob/main/docs/issue-priority.md)
+にあります。`priority:` で始まるラベルを `--label` で渡すと拒否します（issue が
+持つ段は 1 つだけ）。`close` は既にある issue への判定なので、作るときには
+使えません。
+
+**重複は作る前に止めます。** `create` は open な issue を読み、タイトルが近い
+もの（`similar.mts` の `DUPLICATE_THRESHOLD` 以上）があれば一覧を出して拒否
+します。読んで別の問題だと分かったものは `--not-duplicate <番号>` で 1 つずつ
+示すと通ります。本文を書く前には `similar` で、タイトルの近いものと、
+`--keyword` に渡した名前（関数名、ファイル名、ルール名）をそのまま書いている
+ものを一覧できます。
 
 ### 書くときに確かめること
 
@@ -79,8 +96,23 @@ pnpm run pr-description -- read 1901                        # translation left o
 pnpm run pr-description -- pull 1901 --file ./d.md           # save it to edit
 pnpm run pr-description -- push 1901 --file ./d.md           # write it back
 pnpm run pr-description -- check --file ./d.md               # before posting
-pnpm run pr-description -- create --title 'fix: x' --file ./d.md  # file an issue
+pnpm run pr-description -- similar --title 'fix: x' --keyword onUserDelete  # look for duplicates
+pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  # file an issue
 ```
+
+`create` needs `--priority`, one of `S`, `A`, `B`, `C`, `D` and `hold`, and
+files the issue with that `priority:<tier>` label; what the tiers mean and how
+one is chosen is this repository's
+[`docs/issue-priority.md`](https://github.com/noshiro-pf/mono/blob/main/docs/issue-priority.md).
+It refuses a `priority:` label given with `--label`, since an issue carries one
+tier, and `close`, which is a verdict on an issue that exists.
+
+**A duplicate is stopped before it is filed.** `create` reads the open issues
+and refuses while one has a title close to the new one (`DUPLICATE_THRESHOLD` in
+`similar.mts`), listing them; each one read and found to be another problem is
+named with `--not-duplicate <number>`. Before writing the body, `similar` lists
+the open issues with a close title and those that name a `--keyword` as written
+— a function, a file, a rule.
 
 `push`, `create`, `check` and `open-pr --body-file` refuse a body when:
 

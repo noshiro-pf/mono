@@ -254,6 +254,8 @@ English review alone (`docs/code-review-loop.md`); closing keywords and the
   "Commits and pull requests"); merge or add `merge-queued`; run the `gh` CLI
   (it is a person's account; use the GitHub API); access `~/.ssh` or other
   sensitive directories.
+- **An issue is filed by the `file-issue` skill**: one `priority:<tier>`
+  (`docs/issue-priority.md`), checked against the open issues for a duplicate.
 - **Work on an issue starts with `pnpm run start-issue -- <N>`**, and one that
   should wait, even for a better order, ends with **`Start-After: #N`**; which
   issues never carry one is in `docs/issue-start-after.md`.

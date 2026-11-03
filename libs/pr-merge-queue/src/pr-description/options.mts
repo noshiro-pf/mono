@@ -1,12 +1,18 @@
 /** What the command line says, and how it is read. */
 
-import { Arr, Result } from 'ts-data-forge';
+import {
+  FILING_PRIORITIES,
+  parseIssuePriority,
+  type IssuePriority,
+} from 'pr-report-core';
+import { Arr, isNotUndefined, Result } from 'ts-data-forge';
 import { parseCommandArgs, pullRequestNumber } from '../lib/index.mjs';
 
 /** One run of `pr-description`: which command, and what it was given. */
 export type Command =
   | CreateCommand
   | PushCommand
+  | SimilarCommand
   | Readonly<
       | { kind: 'check'; file: string }
       | {
@@ -30,7 +36,18 @@ export type CreateCommand = Readonly<{
   kind: 'create';
   title: string;
   file: string;
+  /** Put on as its `priority:<tier>` label (`docs/issue-priority.md`). */
+  priority: IssuePriority;
   labels: readonly string[];
+  /** Open issues the filer has read and says this one is not. */
+  notDuplicates: readonly number[];
+  repo: string | undefined;
+}>;
+
+export type SimilarCommand = Readonly<{
+  kind: 'similar';
+  title: string;
+  keywords: readonly string[];
   repo: string | undefined;
 }>;
 
@@ -50,8 +67,15 @@ export const HELP = [
   '                                  changed it since the pull, or one half changed',
   '                                  and the other did not',
   '  check --file <path>             check a description before it is posted',
-  '  create --title <text> --file <path> [--label <name>]...',
-  '                                  file an issue with that description',
+  '  similar --title <text> [--keyword <word>]...',
+  '                                  list the open issues a new one may repeat:',
+  '                                  close titles, and those naming a keyword',
+  '  create --title <text> --file <path> --priority <tier> [--label <name>]...',
+  '         [--not-duplicate <number>]...',
+  '                                  file an issue with that description, under',
+  `                                  one of ${FILING_PRIORITIES.join(', ')} (docs/issue-priority.md);`,
+  '                                  refused while an open issue has a close',
+  '                                  title, unless named by --not-duplicate',
   '',
   'Options:',
   '  --wording-only  push: allow one half to change alone, for a change of',
@@ -83,6 +107,9 @@ export const parseOptions = (
 
     case 'create':
       return parseCreate(rest);
+
+    case 'similar':
+      return parseSimilar(rest);
 
     default:
       return Result.err(`unknown command ${JSON.stringify(kind)}`);
@@ -164,7 +191,9 @@ const parseCreate = (
   const parsed = parseCommandArgs(args, {
     title: { type: 'string' },
     file: { type: 'string' },
+    priority: { type: 'string' },
     label: { type: 'string', multiple: true },
+    'not-duplicate': { type: 'string', multiple: true },
     repo: { type: 'string' },
   });
 
@@ -176,9 +205,76 @@ const parseCreate = (
     return Result.ok('help');
   }
 
-  const { title, file, label, repo } = parsed.value;
+  const {
+    title,
+    file,
+    priority: rawPriority,
+    label: labels = [],
+    'not-duplicate': rawNotDuplicates = [],
+    repo,
+  } = parsed.value;
 
-  return file === undefined || title === undefined || title.trim() === ''
-    ? Result.err('create needs --title <text> and --file <path>')
-    : Result.ok({ kind: 'create', title, file, labels: label ?? [], repo });
+  if (file === undefined || title === undefined || title.trim() === '') {
+    return Result.err('create needs --title <text> and --file <path>');
+  }
+
+  const priority =
+    rawPriority === undefined ? undefined : parseIssuePriority(rawPriority);
+
+  if (
+    priority === undefined ||
+    FILING_PRIORITIES.every((each) => each !== priority)
+  ) {
+    return Result.err(
+      `create needs --priority <tier>, one of ${FILING_PRIORITIES.join(', ')} (docs/issue-priority.md)${rawPriority === undefined ? '' : `; got ${JSON.stringify(rawPriority)}`}`,
+    );
+  }
+
+  if (labels.some((label) => label.startsWith('priority:'))) {
+    return Result.err(
+      'give the tier with --priority, not as a --label: an issue carries exactly one',
+    );
+  }
+
+  const notDuplicates = rawNotDuplicates
+    .map(pullRequestNumber)
+    .filter(isNotUndefined);
+
+  if (notDuplicates.length !== rawNotDuplicates.length) {
+    return Result.err('--not-duplicate takes the number of an open issue');
+  }
+
+  return Result.ok({
+    kind: 'create',
+    title,
+    file,
+    priority,
+    labels,
+    notDuplicates,
+    repo,
+  });
+};
+
+const parseSimilar = (
+  args: readonly string[],
+): Result<Command | 'help', string> => {
+  const parsed = parseCommandArgs(args, {
+    title: { type: 'string' },
+    keyword: { type: 'string', multiple: true },
+    repo: { type: 'string' },
+  });
+
+  if (Result.isErr(parsed)) {
+    return parsed;
+  }
+
+  if (parsed.value === 'help') {
+    return Result.ok('help');
+  }
+
+  const { title, keyword: keywords = [], repo } = parsed.value;
+
+  return title === undefined || title.trim() === ''
+    ? Result.err('similar needs --title <text>')
+    : Result.ok({ kind: 'similar', title, keywords, repo });
 };

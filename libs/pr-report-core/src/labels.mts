@@ -55,7 +55,8 @@ export const AUTO_REBASE_LABEL = 'auto-rebase';
  * labelled `priority:low` last, the version pull request included.
  * They decide nothing else — what `Merge-After:`, a stack or `blocks-release`
  * holds back stays held, and a pull request already in flight is watched
- * whatever it carries. One carrying both counts as neither.
+ * whatever it carries. One carrying both counts as neither. They are pull
+ * request labels: an issue's is a tier (`issue-priority.mts`).
  * {@link PRIORITY_MID_LABEL} is not read there: it is the same as carrying
  * neither.
  */

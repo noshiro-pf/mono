@@ -14,19 +14,19 @@ The commands read the repository from `origin` in the current directory and
 authenticate with `GH_TOKEN` or `GITHUB_TOKEN`, falling back to `gh auth token`
 when neither is set.
 
-| command                 | what it does                                                                         |
-| :---------------------- | :----------------------------------------------------------------------------------- |
-| `open-pr`               | pushes the current branch and opens its pull request, held by `skip-ci`              |
-| `pr-description`        | reads and writes a description kept in two languages, checking the halves agree      |
-| `unblock-prs`           | lands the `merge-queued` pull requests one at a time, in the order they declare      |
-| `pr-report`             | reports every open pull request: merge order, required checks, how far behind        |
-| `claim-pr`              | claims a pull request `unblock-prs` set aside, so that nothing else touches it       |
-| `push-fixed-pr`         | pushes the fix to a pull request you claimed and hands it back to the queue          |
-| `report-unowned-prs`    | files an issue for each queued pull request that everyone is waiting on others for   |
-| `start-issue`           | labels an issue `in-progress` before work starts, refusing one someone is already on |
-| `startable-issues`      | lists the open issues nobody has started, in the order to take them                  |
-| `run-unblock-prs-skill` | runs the `unblock-prs` skill without a person, on the Claude API, when it has work   |
-| `run-issue-resolver`    | starts the open issues nobody has started, one Claude API session each               |
+| command                 | what it does                                                                            |
+| :---------------------- | :-------------------------------------------------------------------------------------- |
+| `open-pr`               | pushes the current branch and opens its pull request, held by `skip-ci`                 |
+| `pr-description`        | reads and writes a description kept in two languages, checking the halves agree         |
+| `unblock-prs`           | lands the `merge-queued` pull requests one at a time, in the order they declare         |
+| `pr-report`             | reports every open pull request: merge order, required checks, how far behind           |
+| `claim-pr`              | claims a pull request `unblock-prs` set aside, so that nothing else touches it          |
+| `push-fixed-pr`         | pushes the fix to a pull request you claimed and hands it back to the queue             |
+| `report-unowned-prs`    | files an issue (`priority:A`) for each queued pull request everyone waits on others for |
+| `start-issue`           | labels an issue `in-progress` before work starts, refusing one someone is already on    |
+| `startable-issues`      | lists the open issues nobody has started, in the order to take them                     |
+| `run-unblock-prs-skill` | runs the `unblock-prs` skill without a person, on the Claude API, when it has work      |
+| `run-issue-resolver`    | starts the open issues nobody has started, one Claude API session each                  |
 
 Each one prints its options with `--help`. How the queue reads a pull request
 (the labels, `Merge-After:`, stacks) and what `unblock-prs` does at each step
@@ -40,13 +40,17 @@ are in [`src/unblock-prs/README.md`](./src/unblock-prs/README.md);
 
 ### What the repository needs
 
-- **Labels.** `merge-queued` (queue this pull request), `skip-ci` (run no
-  checks on it yet) and `auto-rebase` (keep it on the default branch while it
-  waits). `blocks-release` is needed only with a changesets version pull
-  request: the release waits for every open pull request carrying it.
+- **Labels.** `merge-queued` (queue this pull request), `skip-ci` (run no checks
+  on it yet) and `auto-rebase` (keep it on the default branch while it waits).
+  `blocks-release` is needed only with a changesets version pull request: the
+  release waits for every open pull request carrying it.
   `priority:high` and `priority:low` order the queue and are optional.
-  `in-progress` and `planned`, which `start-issue` puts on and takes off,
-  are optional too: they mark an issue as started, or as meant to be next.
+  `in-progress` and `planned`, which `start-issue` puts on and takes off, are
+  optional too: they mark an issue as started, or as meant to be next.
+  So are an issue's tier labels, `priority:S`, `priority:A`, `priority:B`,
+  `priority:C`, `priority:D`, `priority:hold` and `priority:close`, which
+  `pr-description create --priority` puts on a new issue and
+  `run-issue-resolver` takes issues in the order of.
 - **Merging.** Squash merging and auto-merge allowed in the repository's
   settings, and a ruleset (or branch protection rule) on the default branch
   that requires status checks with "Require branches to be up to date before
@@ -176,9 +180,10 @@ with a person:
 It does not choose them itself: `startable-issues` lists the issues
 `run-issue-resolver` (below) would hand on, in the same order and by the same
 code — startable by their `Start-After:`, not started or planned, written by the
-token's account (`--author` names others), not held by a label, `priority:high`
-first and `priority:low` last, the lowest number first within each. Going down
-that list, the skill passes over any issue that one pull request cannot finish
+token's account (`--author` names others), not held by a label (`priority:hold`
+and `priority:close` included), by tier — `priority:S` first, then `A`, `B`,
+`C`, no tier and `D` — the lowest number first within each. Going down that
+list, the skill passes over any issue that one pull request cannot finish
 without a person's decision, and takes the others one at a time until N pull
 requests are open: `start-issue` as it takes one, then the repository's own
 instructions to a pull request opened with `open-pr`, held by `skip-ci`. One it
@@ -268,16 +273,18 @@ npx run-issue-resolver --max-total-usd 20 --dry-run --once  # what it would run
 npx run-issue-resolver --max-total-usd 20                   # until the budget, --max-sessions or Ctrl+C
 ```
 
-Each look reads how every open issue stands for being started, as
-`pr-report` decides it
+Each look reads how every open issue stands for being started, as `pr-report`
+decides it
 ([`docs/issue-start-after.md`](https://github.com/noshiro-pf/mono/blob/main/docs/issue-start-after.md)):
 nothing it waits for is open, it carries neither `in-progress` nor `planned`,
 and no open pull request closes it. Of those it takes the ones the token's
 account wrote (`--author` names others), leaves any labelled `question`,
 `wontfix`, `duplicate`, `invalid` or `pending`, and starts `claude -p` on the
-first, `priority:high` first and the oldest first within a priority: one
-issue per session, up to three sessions at once (`--concurrency`), never two
-on one issue. It looks again as soon as a session ends, and every 30 minutes
+first by tier — `priority:S`, `priority:A`, `priority:B`, `priority:C`, then one
+with no tier, then `priority:D` — and the oldest first within a tier; it leaves
+`priority:hold` and `priority:close` as it leaves `pending`. One issue per
+session, up to three sessions at once (`--concurrency`), never two on one issue.
+It looks again as soon as a session ends, and every 30 minutes
 (`--interval-min`) while a slot is free.
 
 The command runs `start-issue` on the issue before the session starts, so that

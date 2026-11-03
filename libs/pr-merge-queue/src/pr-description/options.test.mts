@@ -62,17 +62,45 @@ describe(parseOptions, () => {
           'fix: a thing',
           '--file',
           'd.md',
+          '--priority',
+          'B',
           '--label',
           'a',
           '--label',
           'b',
+          '--not-duplicate',
+          '#7',
+          '--not-duplicate',
+          '9',
         ),
       ),
       {
         kind: 'create',
         title: 'fix: a thing',
         file: 'd.md',
+        priority: 'B',
         labels: ['a', 'b'],
+        notDuplicates: [7, 9],
+        repo: undefined,
+      },
+    );
+  });
+
+  test('reads similar', () => {
+    assert.deepStrictEqual(
+      Result.unwrapOk(
+        parsed(
+          'similar',
+          '--title',
+          'fix: a thing',
+          '--keyword',
+          'onUserDelete',
+        ),
+      ),
+      {
+        kind: 'similar',
+        title: 'fix: a thing',
+        keywords: ['onUserDelete'],
         repo: undefined,
       },
     );
@@ -90,7 +118,45 @@ describe(parseOptions, () => {
       ['pull', '1', '--file', 'd.md', '--wording-only'],
     ],
     ['check without a file', ['check']],
-    ['create without a title', ['create', '--file', 'd.md']],
+    ['create without a title', ['create', '--file', 'd.md', '--priority', 'B']],
+    ['create without a priority', ['create', '--title', 'x', '--file', 'd.md']],
+    [
+      'create with a priority that is not a tier',
+      ['create', '--title', 'x', '--file', 'd.md', '--priority', 'high'],
+    ],
+    [
+      'create under close, which is a verdict on an issue',
+      ['create', '--title', 'x', '--file', 'd.md', '--priority', 'close'],
+    ],
+    [
+      'create with a priority label given as a label',
+      [
+        'create',
+        '--title',
+        'x',
+        '--file',
+        'd.md',
+        '--priority',
+        'B',
+        '--label',
+        'priority:S',
+      ],
+    ],
+    [
+      'create with a --not-duplicate that is not a number',
+      [
+        'create',
+        '--title',
+        'x',
+        '--file',
+        'd.md',
+        '--priority',
+        'B',
+        '--not-duplicate',
+        'x',
+      ],
+    ],
+    ['similar without a title', ['similar', '--keyword', 'x']],
     ['an unknown flag', ['read', '1', '--force']],
   ] as const)('refuses %s', (_, args) => {
     assert.isTrue(Result.isErr(parsed(...args)));

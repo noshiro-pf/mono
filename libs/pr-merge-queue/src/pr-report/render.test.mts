@@ -288,6 +288,31 @@ describe('the open issues section', () => {
     assert.isTrue(rendered.includes('2 comments'));
   });
 
+  test('says which issues are placed under no tier, or under several', () => {
+    const rendered = renderMarkdown(
+      report(
+        [facts({ number: 1901 })],
+        [
+          issue(2036),
+          { ...issue(2037), labels: labelled('bug', 'priority:B') },
+          {
+            ...issue(2038),
+            labels: labelled('priority:A', 'priority:C'),
+          },
+        ],
+      ),
+    );
+
+    const line = (number: number): string =>
+      rendered.split('\n').find((each) => each.includes(`[#${number}]`)) ?? '';
+
+    assert.include(line(2036), 'no priority tier');
+
+    assert.notInclude(line(2037), 'priority tier');
+
+    assert.include(line(2038), 'several priority tiers');
+  });
+
   test('says how each issue stands for being started, and what it waits for', () => {
     const rendered = renderMarkdown(
       buildReport({

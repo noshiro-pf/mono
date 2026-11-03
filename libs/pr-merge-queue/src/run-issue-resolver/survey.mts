@@ -2,8 +2,9 @@
 
 import {
   hasLabel,
+  issuePriorityLabel,
+  issueStartRank,
   PENDING_LABEL,
-  priorityRankOfLabels,
   type ReportIssue,
 } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
@@ -73,7 +74,7 @@ export const surveyIssues = (
       number: issue.number,
       url: issue.url,
       updatedAt: issue.updatedAt,
-      rank: priorityRankOfLabels(issue.labels.map(({ name }) => name)),
+      rank: issueStartRank(issue.labels.map(({ name }) => name)),
     });
   }
 
@@ -138,7 +139,8 @@ export const ISSUES_LIMIT = 1000;
 
 /**
  * Labels that say an issue is not to be started as it stands: a question to
- * answer first, one that will not be done, or one the author is holding back.
+ * answer first, one that will not be done, or one the author is holding back,
+ * or one placed under the tier for either (`docs/issue-priority.md`).
  */
 export const HELD_LABELS = [
   'duplicate',
@@ -146,6 +148,8 @@ export const HELD_LABELS = [
   'question',
   'wontfix',
   PENDING_LABEL,
+  issuePriorityLabel('hold'),
+  issuePriorityLabel('close'),
 ] as const;
 
 /** A startable issue, as a session is handed it. */
@@ -159,8 +163,7 @@ export type IssueCandidate = Readonly<{
 export type IssueSurvey = Readonly<{
   /**
    * Startable, and not yet handed to a round as they stand, in the order they
-   * are taken: `priority:high` first, `priority:low` last, the oldest first
-   * within each.
+   * are taken: by tier (`issueStartRank`), the oldest first within each.
    */
   fresh: readonly IssueCandidate[];
   /** Startable, and left by an earlier round as they stand. */
