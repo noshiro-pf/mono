@@ -15,9 +15,15 @@
 # later sessions start from a fresh clone, so the install a session uses is
 # the `SessionStart` hook in `.claude/settings.json`, which runs offline-first
 # against that store. A plain `bash -c` reads no profile, so the hook sources
-# `env_file` itself; rename it in both places or neither. Setting the
-# environment variable `BASH_ENV` to the same path gives every other
-# non-interactive shell this Node too.
+# `env_file` itself; rename it in both places or neither.
+#
+# The Bash tool does not see `env_file` on its own: it replays a PATH captured
+# when the session starts, which lacked it even while `~/.bashrc` sourced the
+# file (after its interactive guard), and `BASH_ENV` set as an environment
+# variable was unset there. So the hook also appends it to `CLAUDE_ENV_FILE`,
+# which Claude Code sources before each Bash tool command, and the links in
+# `~/.local/bin`, which the image's PATH puts ahead of `/opt/node22/bin`, cover
+# a session that loads no hooks, such as one with several repositories.
 
 set -euxo pipefail
 
@@ -63,17 +69,21 @@ if [ ! -x "${node_dir}/bin/node" ]; then
     tar -xJ -C "$node_dir" --strip-components=1
 fi
 
-# The system store as well as Node's own, for a proxy whose CA only the system
-# trusts.
-cat > "$env_file" << EOF
-export PATH="${node_dir}/bin:\$PATH"
-export NODE_USE_SYSTEM_CA=1
-EOF
-grep -qF "$env_file" ~/.bashrc 2>/dev/null || echo ". ${env_file}" >> ~/.bashrc
+# PATH only. The environment already runs Node with `--use-openssl-ca`, which
+# trusts the proxy's CA, and Node 26 exits 9 when `NODE_USE_SYSTEM_CA` is set
+# beside it.
+echo "export PATH=\"${node_dir}/bin:\$PATH\"" > "$env_file"
 . "$env_file"
 
+# Assigned first: `set -e` ignores a substitution that fails inside an
+# argument, which would install `pnpm@`, the latest.
+pnpm_version=$(node -p 'require("./package.json").packageManager.replace(/^pnpm@/, "")')
 # Node 25 and later ship no corepack.
-npm install -g "pnpm@$(node -p 'require("./package.json").packageManager.replace(/^pnpm@/, "")')"
+npm install -g "pnpm@${pnpm_version}"
+
+# After the pnpm install, so that its commands are linked too.
+mkdir -p ~/.local/bin
+ln -sf "${node_dir}"/bin/* ~/.local/bin/
 
 # Fills the store from the lockfile alone; the hook installs the packages, and
 # a failure here is the hook's to report.
