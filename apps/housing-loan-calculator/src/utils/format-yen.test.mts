@@ -6,7 +6,7 @@ describe(formatYen, () => {
     expect(formatYen(Yen.cast(1_234_567.4))).toBe('￥1,234,567');
   });
 
-  // A balance that ends a hair below 0, or at `-0`, is nothing owed.
+  // A figure a hair below 0, or `-0`, is nothing.
   test.each([-0, -1e-9, -0.4])(
     'writes %s, which rounds to 0, unsigned',
     (value) => {

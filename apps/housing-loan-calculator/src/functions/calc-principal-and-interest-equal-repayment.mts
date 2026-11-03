@@ -1,4 +1,4 @@
-import { Arr, Uint32 } from 'ts-data-forge';
+import { Arr, type Uint32 } from 'ts-data-forge';
 import { type PercentFloat, Yen } from '../types/index.mjs';
 import {
   ithBorrowingBalanceInPIER,
@@ -27,7 +27,8 @@ export const calcPrincipalAndInterestEqualPayment = ({
     }),
   );
 
-  const borrowingBalanceYen = Arr.seq(Uint32.add(numPayments, 1)).map((ith) =>
+  // The balance before each payment: one entry per payment (`CalculatedValues`).
+  const borrowingBalanceYen = Arr.seq(numPayments).map((ith) =>
     Yen.cast(
       ithBorrowingBalanceInPIER({
         total: borrowingTotalYen,
