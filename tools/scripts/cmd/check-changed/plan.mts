@@ -162,9 +162,10 @@ export const classifyChanges = ({
  *   one changes the tree, naming the generator and the files. After those of
  *   the touched packages, those of every member that declares one whose code
  *   changed, which is built first when they read its `dist/`.
- * - **Then the fixers** (the codemod, then `fix:lint` over what it wrote),
- *   then the checks, and the formatter once more for what the fixers wrote
- *   (`fix:fmt:full` instead when Prettier's own config changed).
+ * - **Then the fixers**: the codemod, the formatter over what it reprinted,
+ *   and `fix:lint` over the result; then the checks, and the formatter once
+ *   more for what the fixers wrote (`fix:fmt:full` instead when Prettier's own
+ *   config changed).
  *
  * The codemod is in the plan for any TypeScript change because no lint rule
  * stands behind it: `prefer-as-const` rewrites `as 'foo'` and says nothing
@@ -269,6 +270,16 @@ export const buildPlan = ({
               ]
             : [],
         )
+      : []),
+
+    // The codemod parenthesizes what it reprints and leaves the formatter to
+    // take the parentheses off, and a lint rule can judge them meanwhile:
+    // oxlint's `no-invalid-void-type` rejects `() => (Promise<void> | void)`,
+    // on a line nobody changed (#2998). CI lints only the formatted tree. The
+    // root checks' `eslint --fix` lints it too, so this runs whether or not a
+    // package has a `fix:lint`.
+    ...(areas.has('codemod')
+      ? [formatStep('format what the codemod reprinted', base)]
       : []),
 
     ...code.flatMap(({ pkg }) => packageStep(pkg, 'fix', 'fix:lint')),
