@@ -1,14 +1,12 @@
-// cspell:ignore ellipsize Ellipsized
-import { createState, onScopeDispose } from 'synstate';
 import {
   constant,
-  createAfterUpdate,
   isImeKeyDown,
   type Bindable,
   type Child,
   type JSX,
 } from 'synstate-dom';
 import { classObject, intentClass } from '../internal/index.mjs';
+import { BpText } from './bp-text.js';
 import { Icon, type IconName } from './icon.js';
 import type { Intent } from './intent.mjs';
 import { Menu } from './menu.js';
@@ -105,7 +103,9 @@ export const MenuItem = ({
           <Icon icon={icon} />
         </span>
       )}
-      <EllipsizedText text={text} />
+      <BpText class={'bp6-fill'} ellipsize={true}>
+        {text}
+      </BpText>
       {label === undefined ? (
         []
       ) : (
@@ -148,62 +148,5 @@ export const MenuItem = ({
         target
       )}
     </li>
-  );
-};
-
-/**
- * Blueprint's `Text` with `ellipsize`: `div.bp6-text-overflow-ellipsis.bp6-fill`,
- * with its text as its `title` once it is drawn cut short.
- */
-const EllipsizedText = ({
-  text,
-}: Readonly<{ text: Bindable<string> }>): JSX.Element => {
-  const mut_element: { div: HTMLElement | undefined } = { div: undefined };
-
-  const [title$, setTitle] = createState<string | undefined>(undefined);
-
-  const afterUpdate = createAfterUpdate();
-
-  const measure = (): void => {
-    const { div } = mut_element;
-
-    if (div !== undefined) {
-      setTitle(div.scrollWidth > div.clientWidth ? div.textContent : undefined);
-    }
-  };
-
-  // Measured once it is drawn, and again as its text changes, as `Text`
-  // measures on every render; read off the DOM, so that a `View` is not mapped
-  // twice.
-  const textChanges = new MutationObserver(measure);
-
-  afterUpdate(() => {
-    measure();
-
-    if (mut_element.div !== undefined) {
-      textChanges.observe(mut_element.div, {
-        characterData: true,
-        childList: true,
-        subtree: true,
-      });
-    }
-  });
-
-  onScopeDispose(() => {
-    textChanges.disconnect();
-
-    mut_element.div = undefined;
-  });
-
-  return (
-    <div
-      ref={(div) => {
-        mut_element.div = div;
-      }}
-      class={constant('bp6-text-overflow-ellipsis bp6-fill')}
-      title={title$}
-    >
-      {text}
-    </div>
   );
 };

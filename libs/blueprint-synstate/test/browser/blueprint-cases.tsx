@@ -5,6 +5,7 @@ import * as Blueprint from '@blueprintjs/core';
 import * as BlueprintDatetime from '@blueprintjs/datetime';
 import {
   AnchorButton,
+  BpText,
   Button,
   ButtonGroup,
   Callout,
@@ -31,11 +32,14 @@ import {
   NumericInputView,
   Radio,
   RadioGroup,
+  RangeSlider,
   SegmentedControl,
   Spinner,
   SpinnerSize,
   Switch,
   Tabs,
+  Tag,
+  TagInput,
   TextArea,
   TimePicker,
   type IconName,
@@ -199,6 +203,7 @@ const allLargeIcons = [
   'lock',
   'reset',
   'search',
+  'small-cross',
   'trash',
   'unarchive',
   'warning-sign',
@@ -1324,6 +1329,265 @@ export const cases: readonly Case[] = [
         description={<div>{constant('Reload the page.')}</div>}
         icon={'error'}
         title={constant('Something went wrong')}
+      />
+    ),
+  ],
+  [
+    'Text, cut short',
+    {
+      element: () =>
+        h(
+          'div',
+          { style: { width: '120px' } },
+          h(Blueprint.Text, { ellipsize: true }, 'A line far too long to fit'),
+        ),
+      deliberate: [],
+    },
+    () => (
+      <div style={{ width: constant('120px') }}>
+        <BpText ellipsize={true}>
+          {constant('A line far too long to fit')}
+        </BpText>
+      </div>
+    ),
+  ],
+  [
+    'Text as a span, with a title',
+    {
+      element: () =>
+        h(Blueprint.Text, { tagName: 'span', title: 'All of it' }, 'Some'),
+      deliberate: [],
+    },
+    () => (
+      <BpText tagName={'span'} title={constant('All of it')}>
+        {constant('Some')}
+      </BpText>
+    ),
+  ],
+  [
+    'Tag with icons, removable',
+    {
+      element: () =>
+        h(
+          Blueprint.Tag,
+          {
+            intent: 'primary',
+            icon: 'user',
+            endIcon: 'tick',
+            onRemove: ignore,
+          },
+          'Alice',
+        ),
+      deliberate: [],
+    },
+    () => (
+      <Tag endIcon={'tick'} icon={'user'} intent={'primary'} onRemove={ignore}>
+        {constant('Alice')}
+      </Tag>
+    ),
+  ],
+  [
+    'Tag, minimal, round, large and removable',
+    {
+      element: () =>
+        h(
+          Blueprint.Tag,
+          {
+            intent: 'success',
+            minimal: true,
+            round: true,
+            size: 'large',
+            onRemove: ignore,
+          },
+          'Done',
+        ),
+      deliberate: [],
+    },
+    () => (
+      <Tag
+        intent={'success'}
+        minimal={true}
+        round={true}
+        size={'large'}
+        onRemove={ignore}
+      >
+        {constant('Done')}
+      </Tag>
+    ),
+  ],
+  [
+    'Tag, filling and multiline',
+    {
+      element: () =>
+        h(Blueprint.Tag, { fill: true, multiline: true }, 'Wraps as it must'),
+      deliberate: [],
+    },
+    () => (
+      <Tag fill={true} multiline={true}>
+        {constant('Wraps as it must')}
+      </Tag>
+    ),
+  ],
+  [
+    'TagInput with tags',
+    {
+      element: () =>
+        h(Blueprint.TagInput, {
+          values: ['Apples', 'Pears'],
+          leftIcon: 'filter-list',
+          placeholder: 'Add a fruit',
+          tagProps: (_value, index) =>
+            index === 0 ? { intent: 'warning', minimal: true } : {},
+          onRemove: ignore,
+          rightElement: h(Blueprint.Button, {
+            icon: 'cross',
+            variant: 'minimal',
+          }),
+        }),
+      deliberate: [],
+    },
+    () => (
+      <TagInput
+        leftIcon={'filter-list'}
+        placeholder={'Add a fruit'}
+        rightElement={<Button icon={'cross'} variant={constant('minimal')} />}
+        values={constant([
+          { value: 'Apples', intent: 'warning', minimal: true },
+          { value: 'Pears' },
+        ])}
+        onRemove={ignore}
+      />
+    ),
+  ],
+  [
+    'TagInput, empty, with its placeholder',
+    {
+      element: () =>
+        h(Blueprint.TagInput, { values: [], placeholder: 'Add a fruit' }),
+      deliberate: [],
+    },
+    () => <TagInput placeholder={'Add a fruit'} values={constant([])} />,
+  ],
+  [
+    'TagInput, disabled and filling',
+    {
+      element: () =>
+        h(Blueprint.TagInput, {
+          values: ['Apples'],
+          disabled: true,
+          fill: true,
+          intent: 'danger',
+        }),
+      deliberate: [],
+    },
+    () => (
+      <TagInput
+        disabled={constant(true)}
+        fill={true}
+        intent={'danger'}
+        values={constant([{ value: 'Apples' }])}
+      />
+    ),
+  ],
+  [
+    'RangeSlider',
+    {
+      element: () =>
+        h(Blueprint.RangeSlider, { value: [3, 7], onChange: ignore }),
+      deliberate: [],
+    },
+    () => <RangeSlider value={constant([3, 7] as const)} onChange={ignore} />,
+  ],
+  [
+    'RangeSlider with half steps, labelled every 2.5',
+    {
+      element: () =>
+        h(Blueprint.RangeSlider, {
+          value: [-2.5, 4],
+          min: -5,
+          max: 5,
+          stepSize: 0.5,
+          labelStepSize: 2.5,
+          intent: 'success',
+        }),
+      deliberate: [],
+    },
+    () => (
+      <RangeSlider
+        intent={'success'}
+        labelStepSize={2.5}
+        max={5}
+        min={-5}
+        stepSize={0.5}
+        value={constant([-2.5, 4] as const)}
+      />
+    ),
+  ],
+  [
+    'RangeSlider, disabled, unlabelled, with no track fill',
+    {
+      element: () =>
+        h(Blueprint.RangeSlider, {
+          value: [0, 10],
+          disabled: true,
+          labelRenderer: false,
+          showTrackFill: false,
+        }),
+      deliberate: [],
+    },
+    () => (
+      <RangeSlider
+        disabled={constant(true)}
+        labelRenderer={false}
+        showTrackFill={false}
+        value={constant([0, 10] as const)}
+      />
+    ),
+  ],
+  [
+    'RangeSlider with a step written with an exponent',
+    {
+      element: () =>
+        h(Blueprint.RangeSlider, {
+          value: [2e-7, 5e-7],
+          max: 1e-6,
+          stepSize: 1e-7,
+          labelStepSize: 5e-7,
+        }),
+      deliberate: [],
+    },
+    () => (
+      <RangeSlider
+        labelStepSize={5e-7}
+        max={1e-6}
+        stepSize={1e-7}
+        value={constant([2e-7, 5e-7] as const)}
+      />
+    ),
+  ],
+  [
+    'RangeSlider with its own labels',
+    {
+      element: () =>
+        h(Blueprint.RangeSlider, {
+          value: [20, 60],
+          max: 100,
+          labelValues: [0, 50, 100],
+          labelRenderer: (value, options) =>
+            options?.isHandleTooltip === true
+              ? `${value.toString()}%`
+              : value.toString(),
+        }),
+      deliberate: [],
+    },
+    () => (
+      <RangeSlider
+        labelRenderer={(value, { isHandleTooltip }) =>
+          isHandleTooltip ? `${value.toString()}%` : value.toString()
+        }
+        labelValues={[0, 50, 100]}
+        max={100}
+        value={constant([20, 60] as const)}
       />
     ),
   ],
