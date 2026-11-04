@@ -1,6 +1,22 @@
 # Codecov configuration
 # See: https://docs.codecov.com/docs/codecov-yaml
 
+codecov:
+  notify:
+    # A pull request's coverage arrives in one upload per `coverage: true`
+    # entry of code-check.yml's matrix. Without this, Codecov writes every
+    # status after each upload: the first set compares the base against part
+    # of the suite, and each set is two GitHub API calls per check. Checks
+    # left `in_progress` for good came in bursts when the queue was busiest,
+    # likely those calls being throttled.
+    # Keep this equal to the number of those entries, as `comment` below
+    # (`check:root:codecov-builds`). A pull request one of whose uploads
+    # never arrives gets no statuses, as it already got no comment. A push to
+    # main that `coverage-main` uploads once gets none either, which nothing
+    # on main reads; its report, the base pull requests compare against and
+    # the badges read, is processed all the same.
+    after_n_builds: 2
+
 coverage:
   status:
     project:
@@ -17,10 +33,10 @@ comment:
   layout: 'reach, diff, flags, components, files'
   behavior: default
   require_changes: false
-  # A pull request's coverage arrives in one upload per
-  # `ws:check:test:cov:shard-*` entry of code-check.yml; a comment written
-  # before the last would compare the base against part of the suite. Keep
-  # this equal to the number of shards.
+  # A comment written before the last upload would compare the base against
+  # part of the suite. Keep this equal to the number of `coverage: true`
+  # entries of code-check.yml's matrix, as `codecov.notify` above
+  # (`check:root:codecov-builds`).
   after_n_builds: 2
 
 # One component per package, so that a repository-wide number is not the only
@@ -39,14 +55,13 @@ comment:
 # A package added here also wants a badge in its README
 # (`badge.svg?component=<component_id>`); a package missing from this list
 # still counts towards the repository total, it just has no view of its own.
+#
+# No component has `statuses`, so a pull request gets the two repository-wide
+# checks above and no pair per package: those were two GitHub API calls each
+# for an informational number the comment's `components` table already shows.
+# A component without `statuses` posts no check (Codecov's worker reads a
+# missing list as empty); the badge and the comment read the paths alone.
 component_management:
-  default_rules:
-    statuses:
-      - type: project
-        informational: true
-      - type: patch
-        informational: true
-
   individual_components:
     - component_id: eslint-config-typed
       paths: ['libs/eslint-config-typed/**']
