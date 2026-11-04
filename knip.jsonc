@@ -557,6 +557,7 @@
         "configs/*.mts",
         "scripts/**/*.mts",
         "test/**/*.test.mts",
+        "e2e/**/*.spec.mts",
       ],
       "project": ["**/*.{mts,tsx}"],
     },

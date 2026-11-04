@@ -29,6 +29,8 @@ const appDevPorts = {
   'mahjong-calculator-app': 5192,
   'pr-manager': 5194,
   profile: 5193,
+  // Not a dev server: the pages its e2e shows in panes (`z:e2e-pages`).
+  'split-view-extension': 5201,
   'synstate-docs': 5198,
   'synstate-dom-sample-app': 5196,
   'synstate-router-dom-sample-app': 5200,

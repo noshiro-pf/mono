@@ -980,6 +980,7 @@ export const PaneFrame = memoNamed(
     return (
       <section
         className={paneClassName(active, moving)}
+        data-e2e={'pane'}
         style={style}
         onPointerDownCapture={handleActivate}
       >
@@ -1160,7 +1161,7 @@ export const PaneFrame = memoNamed(
               </button>
 
               {menuOpen ? (
-                <div className={'pane__menu-popover'}>
+                <div className={'pane__menu-popover'} data-e2e={'pane-menu'}>
                   {compact ? (
                     <div className={'pane__menu-zoom'}>
                       <button
@@ -1246,6 +1247,7 @@ export const PaneFrame = memoNamed(
               ref={setPaneFrame}
               allow={paneAllowList}
               className={'pane__frame'}
+              data-e2e={'pane-frame'}
               name={`${paneFrameNamePrefix}${pane.id}`}
               sandbox={pane.sandboxed ? paneSandboxTokens : undefined}
               src={pane.url}

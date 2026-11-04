@@ -279,7 +279,7 @@ const WorkspaceEditor = memoNamed(
     );
 
     return (
-      <div className={'workspace-popover'}>
+      <div className={'workspace-popover'} data-e2e={'workspace-popover'}>
         <form className={'workspace-popover__row'} onSubmit={handleSubmit}>
           <input
             aria-label={'Name of this split view'}
