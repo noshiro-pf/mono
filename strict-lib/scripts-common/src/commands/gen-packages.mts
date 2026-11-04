@@ -1,7 +1,7 @@
 import { createContext, type CreateContextOptions } from '../context.mjs';
 import { exitIfErr } from '../functions/utils/exit-if-err.mjs';
 import { wrapStartEnd } from '../functions/utils/wrap-start-end.mjs';
-import { buildGenSteps, findStepIndex } from './gen-steps.mjs';
+import { buildGenSteps, selectSteps } from './gen-steps.mjs';
 
 /**
  * Runs only the package-generation slice: `genPackages` plus the `format`
@@ -21,12 +21,10 @@ export const runGenPackages = async (
 
   const steps = buildGenSteps(ctx);
 
-  const start = findStepIndex(steps, 'genPackages');
-
-  // Stop before the `pnpm install` step (exclusive) — see the note above.
-  const end = findStepIndex(steps, `${ctx.packageManagerName} install`);
-
-  for (const { name, fn } of steps.slice(start, end)) {
+  for (const { name, fn } of selectSteps(steps, {
+    from: 'genPackages',
+    before: `${ctx.packageManagerName} install`,
+  })) {
     await wrapStartEnd(fn, name).then(exitIfErr);
   }
 };
