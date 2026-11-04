@@ -14,6 +14,7 @@ import {
   findOpenPullRequest,
   findStackParent,
   lastCommitSubject,
+  listStackParents,
   markReady,
   missingInheritedOrder,
   preflight,
@@ -24,11 +25,15 @@ import {
 } from './github.mjs';
 import type { Options } from './options.mjs';
 import {
+  existingConflict,
   mergeAfterTrailer,
   mergeBeforeNote,
+  resolveBase,
+  undeclared,
   withMergeAfter,
   withStackParent,
 } from './steps.mjs';
+import type { PullRequest } from './types.mjs';
 
 /**
  * Opens the pull request for the current branch the way this repository wants
@@ -56,6 +61,13 @@ import {
  * request that branch is from, which has to exist and which the branch has to
  * contain, and declares that one with `Merge-After:` as well.
  *
+ * **A pull request already open for the branch is taken as it is**: its title
+ * and body are kept, what it should declare and does not yet is added to its
+ * `Merge-After:`, and without `--base` its own base is the base, so a stacked
+ * one stays stacked. One open against another base than a `--base` given, or
+ * named by its own `--merge-after` or `--merge-before`, is refused before
+ * anything is pushed (`existingConflict`).
+ *
  * **What the issues it closes start after is declared too**: the open pull
  * requests their `Start-After:` comes to (`docs/issue-start-after.md`), written
  * into the body's `Merge-After:` once GitHub has read which issues the body
@@ -70,20 +82,15 @@ import {
  * there is no second syntax to read. The pull requests named are checked to be
  * open before anything is pushed.
  *
- * **A `--body-file` written in two languages is checked first**, when the
- * repository names a translation heading (`../pr-description/README.md`): a
- * body whose halves do not mirror each other is refused before anything is
- * pushed, as `pr-description push` refuses it later.
+ * **A `--body-file` written in two languages is checked** before anything is
+ * pushed, when the repository names a translation heading
+ * (`../pr-description/README.md`) and the pull request is to be opened: a body
+ * whose halves do not mirror each other is refused, as `pr-description push`
+ * refuses it later.
  */
 export const openPullRequest = async (
   options: Options,
 ): Promise<Result<string, string>> => {
-  const checked = await checkBodyFile(options.bodyFile);
-
-  if (Result.isErr(checked)) {
-    return checked;
-  }
-
   const context = await preflight();
 
   if (Result.isErr(context)) {
@@ -92,9 +99,47 @@ export const openPullRequest = async (
 
   const { api, branch, defaultBranch } = context.value;
 
-  const base = options.base ?? defaultBranch;
+  // Read first, so that a conflict is refused with nothing done, and so that a
+  // run without `--base` on a pull request opened stacked stays stacked. An
+  // open pull request is still found after a push, which changes nothing about
+  // it but its head.
+  const existing = await findOpenPullRequest(api, branch);
 
-  const parent = base === defaultBranch ? undefined : await stackOn(api, base);
+  if (Result.isErr(existing)) {
+    return existing;
+  }
+
+  if (existing.value === undefined) {
+    const checked = await checkBodyFile(options.bodyFile);
+
+    if (Result.isErr(checked)) {
+      return checked;
+    }
+  } else {
+    const conflict = existingConflict(existing.value, options);
+
+    if (conflict !== undefined) {
+      return Result.err(conflict);
+    }
+
+    if (
+      !options.dryRun &&
+      (options.title !== undefined || options.bodyFile !== undefined)
+    ) {
+      log(
+        `#${existing.value.number}: open already; its title and body are kept, and --title and --body-file are not applied (edit the body with pr-description)`,
+      );
+    }
+  }
+
+  const base = resolveBase(options.base, existing.value, defaultBranch);
+
+  const parent =
+    base === defaultBranch
+      ? undefined
+      : options.base === undefined
+        ? await layerBelow(api, base)
+        : await stackOn(api, base);
 
   if (parent !== undefined && Result.isErr(parent)) {
     return parent;
@@ -114,7 +159,14 @@ export const openPullRequest = async (
   }
 
   if (options.dryRun) {
-    return dryRun(api, branch, base, options, parent?.value, mergeAfter);
+    return dryRun(
+      branch,
+      base,
+      options,
+      existing.value,
+      parent?.value,
+      mergeAfter,
+    );
   }
 
   const pushed = await pushBranch(branch);
@@ -124,12 +176,6 @@ export const openPullRequest = async (
   }
 
   log(`pushed ${branch}`);
-
-  const existing = await findOpenPullRequest(api, branch);
-
-  if (Result.isErr(existing)) {
-    return existing;
-  }
 
   const prNumber =
     existing.value === undefined
@@ -193,7 +239,7 @@ export const openPullRequest = async (
 
   return Result.ok(
     [
-      `#${prNumber.value}: opened, ${SKIP_CI_LABEL} and ${AUTO_REBASE_LABEL} on, auto-merge left unarmed.`,
+      `#${prNumber.value}: ${existing.value === undefined ? 'opened' : 'open already'}, ${SKIP_CI_LABEL} and ${AUTO_REBASE_LABEL} on, auto-merge left unarmed.`,
       `Once it is reviewed, add merge-queued: unblock-prs arms auto-merge when it picks it${parent === undefined ? '' : `, which is once #${parent.value} has merged`}.`,
     ].join('\n'),
   );
@@ -202,8 +248,10 @@ export const openPullRequest = async (
 /**
  * Writes into the body, as `Merge-After:`, the open pull requests the issues it
  * closes start after (`docs/issue-start-after.md`), once the body exists for
- * GitHub to say which issues those are. A run on a body that says them already
- * writes nothing.
+ * GitHub to say which issues those are; and, into a pull request that was open
+ * already, what this run declares (the layer below, `--merge-after`) and its
+ * body does not, since only a body this run writes starts with it. A run on a
+ * body that says them already writes nothing.
  */
 const carryStartAfter = async (
   api: ApiContext,
@@ -218,23 +266,35 @@ const carryStartAfter = async (
 
   const { body, missing } = order.value;
 
-  if (!Arr.isNonEmpty(missing)) {
+  const notYet = undeclared(body, declared);
+
+  const toWrite = [...notYet, ...missing] as const;
+
+  if (!Arr.isNonEmpty(toWrite)) {
     return Result.ok(undefined);
   }
 
   const updated = await updateBody(
     api,
     prNumber,
-    withMergeAfter(body, missing),
+    withMergeAfter(body, toWrite),
   );
 
   if (Result.isErr(updated)) {
-    return Result.err(`cannot write the inherited order: ${updated.value}`);
+    return Result.err(`cannot write the Merge-After: ${updated.value}`);
   }
 
-  log(
-    `#${prNumber}: ${mergeAfterTrailer(missing) ?? ''}, from the Start-After of the issues it closes`,
-  );
+  if (Arr.isNonEmpty(notYet)) {
+    log(
+      `#${prNumber}: ${mergeAfterTrailer(notYet) ?? ''}, as this run declares`,
+    );
+  }
+
+  if (Arr.isNonEmpty(missing)) {
+    log(
+      `#${prNumber}: ${mergeAfterTrailer(missing) ?? ''}, from the Start-After of the issues it closes`,
+    );
+  }
 
   return Result.ok(undefined);
 };
@@ -341,6 +401,30 @@ const stackOn = async (
   log(`stacking on #${parent.value} (${base})`);
 
   return parent;
+};
+
+/**
+ * The layer below a pull request already open on `base`, found without `--base`
+ * having asked for a stack: as {@link stackOn} finds it, except that no open
+ * pull request on `base` is no stack rather than a refusal — the layer below
+ * merged or closed and GitHub has not moved this one yet, and the run is
+ * finishing what an earlier one opened.
+ */
+const layerBelow = async (
+  api: ApiContext,
+  base: string,
+): Promise<Result<number, string> | undefined> => {
+  const listed = await listStackParents(api, base);
+
+  if (Result.isOk(listed) && !Arr.isNonEmpty(listed.value)) {
+    log(
+      `no open pull request has ${base} as its branch; not declaring a layer below`,
+    );
+
+    return undefined;
+  }
+
+  return stackOn(api, base);
 };
 
 const readBodyFile = async (
@@ -457,39 +541,37 @@ const open = async (
 };
 
 const dryRun = async (
-  api: ApiContext,
   branch: string,
   base: string,
   options: Options,
+  existing: PullRequest | undefined,
   parent: number | undefined,
   mergeAfter: readonly number[],
 ): Promise<Result<string, string>> => {
-  const existing = await findOpenPullRequest(api, branch);
-
-  if (Result.isErr(existing)) {
-    return existing;
-  }
-
   const title = await resolveTitle(options);
 
   const trailer = mergeAfterTrailer(mergeAfter);
 
   const steps: readonly string[] = [
     `push ${branch} to origin`,
-    existing.value === undefined
+    existing === undefined
       ? `open a pull request against ${base} titled ${JSON.stringify(Result.isOk(title) ? title.value : '(unreadable)')}`
-      : `#${existing.value.number} is open already; leave it as it is`,
-    existing.value?.isDraft === true
-      ? `#${existing.value.number}: mark it ready for review`
+      : `#${existing.number} is open already against ${existing.base}; keep its title and body${options.title !== undefined || options.bodyFile !== undefined ? ' (--title and --body-file are not applied)' : ''}`,
+    existing?.isDraft === true
+      ? `#${existing.number}: mark it ready for review`
       : undefined,
     `add ${SKIP_CI_LABEL}`,
     `add ${AUTO_REBASE_LABEL}`,
     parent === undefined
       ? 'leave auto-merge unarmed: unblock-prs arms it when it picks it'
       : `leave auto-merge unarmed: it is stacked on #${parent}, and unblock-prs arms it when it picks it, after #${parent} merges`,
-    trailer === undefined ? undefined : `declare ${trailer}`,
+    trailer === undefined
+      ? undefined
+      : existing === undefined
+        ? `declare ${trailer}`
+        : `add to its Merge-After whichever of ${trailer.replace('Merge-After: ', '')} it does not name yet`,
     Arr.isNonEmpty(options.mergeBefore)
-      ? `write ${existing.value === undefined ? 'its number' : `#${existing.value.number}`} into the Merge-After of ${options.mergeBefore.map((n) => `#${n}`).join(', ')}${existing.value === undefined ? ', and say so in its body' : ''}`
+      ? `write ${existing === undefined ? 'its number' : `#${existing.number}`} into the Merge-After of ${options.mergeBefore.map((n) => `#${n}`).join(', ')}${existing === undefined ? ', and say so in its body' : ''}`
       : undefined,
     'add to Merge-After the open pull requests the issues it closes start after, if the body does not name them',
   ].filter((step) => step !== undefined);
