@@ -1,3 +1,7 @@
+.field {
+  display: block;
+}
+
 .textArea {
   /* size */
   overflow: auto;

@@ -5,12 +5,15 @@ import * as Preact from 'preact/hooks';
 export const CodeArea = memoNamed(
   'CodeArea',
   ({
+    caption,
     value,
     valueChange,
     minHeightPx,
     maxHeightPx,
     cyId,
   }: Readonly<{
+    /** The visible caption; the `<label>` around the area makes it its name. */
+    caption: string;
     value: string;
     valueChange?: (a: string) => void;
     minHeightPx: number;
@@ -35,17 +38,24 @@ export const CodeArea = memoNamed(
     );
 
     return (
-      <TextArea
-        data-e2e={cyId}
-        // Without a handler the area shows output only.
-        readOnly={valueChange === undefined}
-        style={style}
-        value={value}
-        onChange={onChange}
-      />
+      <Field>
+        {caption}
+        <TextArea
+          data-e2e={cyId}
+          // Without a handler the area shows output only.
+          readOnly={valueChange === undefined}
+          style={style}
+          value={value}
+          onChange={onChange}
+        />
+      </Field>
     );
   },
 );
+
+const Field = styled('label')`
+  display: block;
+`;
 
 const TextArea = styled('textarea')`
   /* size */

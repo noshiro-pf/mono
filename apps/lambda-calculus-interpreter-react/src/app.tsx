@@ -30,8 +30,8 @@ export const App = memoNamed('App', () => {
         {'expr ::= x | (lambda x. expr) | (expr expr)'}
       </div>
       <TextAreaWrapper>
-        <div>{'Input:'}</div>
         <CodeArea
+          caption={'Input:'}
           cyId={'input-area'}
           maxHeightPx={500}
           minHeightPx={100}
@@ -41,8 +41,8 @@ export const App = memoNamed('App', () => {
       </TextAreaWrapper>
 
       <TextAreaWrapper>
-        <div>{'Output:'}</div>
         <CodeArea
+          caption={'Output:'}
           cyId={'output-area'}
           maxHeightPx={800}
           minHeightPx={500}
