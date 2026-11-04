@@ -364,7 +364,7 @@ const report = (
     return;
   }
 
-  const pinnedId = idFromDer(Uint8Array.fromBase64(manifestKey));
+  const pinnedId = idFromDer(Buffer.from(manifestKey, 'base64'));
 
   console.log(
     signedId === pinnedId

@@ -63,10 +63,36 @@
 
 ### 根拠
 
-`Error.isError` は Node.js 24 からのもので、このパッケージが `engines` で認める Node.js 22 にはない。呼ぶと、その行が実行されたときに初めて `TypeError: Error.isError is not a function` で落ち、型検査も Node.js 24 以降のツールチェーンも何も言わない。そのため `instanceof Error` を `Error.isError` に書き換える `unicorn/prefer-error-is-error` は `off` にし、`unicorn/no-instanceof-builtins` の `useErrorIsError` も `false` にしている。手で書いた `Error.isError` は `no-restricted-properties` が報告する。
+`Error.isError` は Node.js 24 からのもので、このパッケージが `engines` で認める Node.js 22 にはない。呼ぶと、その行が実行されたときに初めて `TypeError: Error.isError is not a function` で落ち、型検査も Node.js 24 以降のツールチェーンも何も言わない。そのため `instanceof Error` を `Error.isError` に書き換える `unicorn/prefer-error-is-error` は `off` にし、`unicorn/no-instanceof-builtins` の `useErrorIsError` も `false` にしている。手で書いた `Error.isError` は、次節の表から作る `no-restricted-properties` が報告する。
 
 `instanceof Error` は別の realm（`node:vm` や iframe）で作られた `Error` を見落とすので、`unicorn/no-instanceof-builtins` が引き続き報告する（自動修正はない）。
 
 ### 直し方
 
 `@sindresorhus/is` の `isError(x)` を使う。`Object.prototype.toString` のタグで判定するので、別の realm の `Error` も認識する。ただし独自のタグを持つ `DOMException`（`AbortError` など）は `Error` と判定しない。それも `Error` として扱う必要があり、別の realm の値が来ないと分かっている箇所に限り、`instanceof Error` と書いて `// eslint-disable-next-line unicorn/no-instanceof-builtins` にその理由を添える。
+
+## `engines` の下限の Node.js にない API
+
+| ルール                                  | 設定    |
+| --------------------------------------- | ------- |
+| `unicorn/prefer-promise-try`            | `off`   |
+| `unicorn/prefer-regexp-escape`          | `off`   |
+| `unicorn/prefer-uint8array-base64`      | `off`   |
+| `unicorn/prefer-get-or-insert-computed` | `off`   |
+| `no-restricted-properties`              | `error` |
+| `no-restricted-syntax`                  | `error` |
+
+### 根拠
+
+`Promise.try`（Node.js 23）、`RegExp.escape`（24）、`Uint8Array.fromBase64` と `Uint8Array#toBase64`（25）、`Map#getOrInsert` と `Map#getOrInsertComputed`（26）は、`engines` が認める Node.js 22 にはない。上の四つの unicorn ルールの自動修正や提案はこれらを書き込むので、`--fix` が lint エラーを、その行が Node.js 22 で実行されたときにだけ起きる `TypeError: … is not a function` に変えてしまう。そのため四つとも `off` にしている。
+
+手で書いた呼び出しは、API ごとに必要な Node.js のバージョンを持つ一つの表 `nodeVersionGatedApis`（`src/rules/node-version-gated-apis.mts`）から作るオプションで報告する。`Error.isError` のような静的メソッドとインスタンスメソッドは `no-restricted-properties` が、`globalThis.Error.isError` のように大域オブジェクト経由で書いた静的メソッドは `no-restricted-syntax` が報告する。`engines.node` の下限がある項目のバージョンに達すると `src/configs/typescript.test.mts` が失敗するので、そのときに項目を消し、対応するルールを戻す。
+
+インスタンスメソッドはプロパティ名だけで判定するので、同名の独自メソッド（例えば `toBase64` を持つ独自クラス）も報告する。そのときは理由を添えて `eslint-disable-next-line no-restricted-properties` にする。
+
+### 直し方
+
+- `Promise.try(f)` は `(async () => f())()`。`f` が同期的に投げても拒否された Promise になる点は同じである。
+- `RegExp.escape` は、使う正規表現のフラグの下で必要な文字だけを手でエスケープするか、`escape-string-regexp` を使う。
+- Base64 は Node.js では `Buffer.from(text, 'base64')` と `buffer.toString('base64')`、ブラウザでは `atob` と `btoa` を使う。
+- `getOrInsert` / `getOrInsertComputed` は `has`、`get`、`set` で書く。

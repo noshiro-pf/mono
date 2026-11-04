@@ -307,7 +307,12 @@ export const eslintUnicornRules = {
   'unicorn/prefer-direct-iteration': 'error',
   'unicorn/prefer-dispose': 'error',
   'unicorn/prefer-early-return': withDefaultOption('error'),
-  'unicorn/prefer-get-or-insert-computed': 'error',
+  /**
+   * Off. The fix writes `Map#getOrInsertComputed`, which not every Node.js this
+   * config supports has, so it turns a lint error into a runtime `TypeError`.
+   * `nodeVersionGatedApis` reports a hand-written one.
+   */
+  'unicorn/prefer-get-or-insert-computed': 'off',
 
   // prefer Number constants over global constants like Infinity, NaN to avoid accidental shadowing.
   'unicorn/prefer-global-number-constants': 'off',
@@ -362,7 +367,13 @@ export const eslintUnicornRules = {
   'unicorn/prefer-string-repeat': withDefaultOption('error'),
   'unicorn/prefer-temporal': withDefaultOption('error'),
   'unicorn/prefer-type-literal-last': 'error',
-  'unicorn/prefer-uint8array-base64': 'error',
+  /**
+   * Off. It steers `atob`, `btoa` and `Buffer` code to `Uint8Array.fromBase64`
+   * and `Uint8Array#toBase64`, which not every Node.js this config supports
+   * has, and its fix and suggestions write them, turning a lint error into a
+   * runtime `TypeError`. `nodeVersionGatedApis` reports a hand-written one.
+   */
+  'unicorn/prefer-uint8array-base64': 'off',
   'unicorn/prefer-unicode-code-point-escapes': 'error',
   'unicorn/prefer-url-href': 'error',
 
@@ -472,8 +483,8 @@ export const eslintUnicornRules = {
   /**
    * Off. `--fix` rewrites `x instanceof Error` into `Error.isError(x)`, which
    * Node.js 22, still supported by this config, does not have, so the fix turns
-   * a lint error into a runtime `TypeError`. `no-restricted-properties` reports
-   * a hand-written `Error.isError` for the same reason.
+   * a lint error into a runtime `TypeError`. `nodeVersionGatedApis` reports a
+   * hand-written `Error.isError`.
    */
   'unicorn/prefer-error-is-error': 'off',
   'unicorn/prefer-flat-math-min-max': 'error',
@@ -484,9 +495,19 @@ export const eslintUnicornRules = {
   'unicorn/prefer-map-from-entries': 'error',
   'unicorn/prefer-math-constants': 'error',
   'unicorn/prefer-observer-apis': 'error',
-  'unicorn/prefer-promise-try': 'error',
+  /**
+   * Off. The fix writes `Promise.try`, which not every Node.js this config
+   * supports has, so it turns a lint error into a runtime `TypeError`.
+   * `nodeVersionGatedApis` reports a hand-written one.
+   */
+  'unicorn/prefer-promise-try': 'off',
   'unicorn/prefer-promise-with-resolvers': 'error',
-  'unicorn/prefer-regexp-escape': 'error',
+  /**
+   * Off. The fix writes `RegExp.escape`, which not every Node.js this config
+   * supports has, so it turns a lint error into a runtime `TypeError`.
+   * `nodeVersionGatedApis` reports a hand-written one.
+   */
+  'unicorn/prefer-regexp-escape': 'off',
   'unicorn/prefer-set-methods': 'error',
   'unicorn/prefer-simplified-conditions': withDefaultOption('error'),
   'unicorn/prefer-single-replace': 'error',

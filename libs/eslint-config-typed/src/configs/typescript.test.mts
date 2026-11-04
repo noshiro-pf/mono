@@ -2,7 +2,11 @@ import dedent from 'dedent';
 import { ESLint, type Linter } from 'eslint';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, isRecord } from 'ts-data-forge';
+import { Arr, isRecord, Num, Result } from 'ts-data-forge';
+import {
+  nodeVersionGatedApis,
+  nodeVersionGatedStaticApis,
+} from '../rules/index.mjs';
 import { eslintConfigForTypeScript } from './typescript.mjs';
 
 // `--fix` rewrites without saying so, and an unsafe rewrite surfaces later as a
@@ -12,29 +16,35 @@ import { eslintConfigForTypeScript } from './typescript.mjs';
 describe(eslintConfigForTypeScript, () => {
   const packageRoot = path.resolve(import.meta.dirname, '../..');
 
-  const eslint = new ESLint({
-    cwd: packageRoot,
-    overrideConfigFile: true,
-    overrideConfig: Array.from(
-      Arr.toPushed(
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the preset's flat config, which ESLint validates
-        eslintConfigForTypeScript({
-          tsconfigFileName: 'tsconfig.json',
-          tsconfigRootDir: packageRoot,
-          packageDirs: [packageRoot],
-        }) as readonly Linter.Config[],
-        {
-          // Under `CI=true` typescript-eslint infers a single run and builds
-          // the program from the files on disk, so `lintText` would lint
-          // `src/entry-point.mts` as it is rather than the code given.
-          languageOptions: {
-            parserOptions: { disallowAutomaticSingleRunInference: true },
-          },
-        } satisfies Linter.Config,
+  const eslintOf = (applyFixes: boolean): ESLint =>
+    new ESLint({
+      cwd: packageRoot,
+      overrideConfigFile: true,
+      overrideConfig: Array.from(
+        Arr.toPushed(
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the preset's flat config, which ESLint validates
+          eslintConfigForTypeScript({
+            tsconfigFileName: 'tsconfig.json',
+            tsconfigRootDir: packageRoot,
+            packageDirs: [packageRoot],
+          }) as readonly Linter.Config[],
+          {
+            // Under `CI=true` typescript-eslint infers a single run and builds
+            // the program from the files on disk, so `lintText` would lint
+            // `src/entry-point.mts` as it is rather than the code given.
+            languageOptions: {
+              parserOptions: { disallowAutomaticSingleRunInference: true },
+            },
+          } satisfies Linter.Config,
+        ),
       ),
-    ),
-    fix: true,
-  });
+      fix: applyFixes,
+    });
+
+  const eslint = eslintOf(true);
+
+  // For a report that another rule's fix would otherwise answer first.
+  const eslintWithoutFix = eslintOf(false);
 
   /**
    * The text `--fix` leaves, and the rules still reporting on it, linted as a
@@ -113,38 +123,121 @@ describe(eslintConfigForTypeScript, () => {
     expect(ruleIds).toContain('unicorn/no-instanceof-builtins');
   });
 
-  test('`Error.isError` written by hand is reported', async () => {
-    const code = dedent`
-      export const isErrorValue = (value: unknown): boolean =>
-        Error.isError(value);
-    `;
+  // Each of these rules fixes code into an API that not every Node.js in
+  // `engines` has, and the result throws `TypeError: … is not a function` only
+  // when the line runs there.
+  test.each([
+    {
+      rule: 'unicorn/prefer-regexp-escape',
+      api: 'RegExp.escape',
+      code: String.raw`export const escape = (text: string): string => text.replace(/[$.*+?^{}()|[\]\\]/g, '\\$&');`,
+    },
+    {
+      rule: 'unicorn/prefer-promise-try',
+      api: 'Promise.try',
+      code: dedent`
+        export const attempt = async (f: () => number): Promise<number> =>
+          new Promise((resolve) => resolve(f()));
+      `,
+    },
+    {
+      rule: 'unicorn/prefer-uint8array-base64',
+      api: 'Base64',
+      code: dedent`
+        export const encode = (bytes: Uint8Array): string =>
+          Buffer.from(bytes).toString('base64');
+      `,
+    },
+    {
+      rule: 'unicorn/prefer-get-or-insert-computed',
+      api: 'getOrInsertComputed',
+      code: dedent`
+        declare const compute: () => number;
 
-    const { ruleIds } = await fix(code);
+        export const cached = (
+          cache: Readonly<{ getOrInsert: (key: string, value: number) => number }>,
+          key: string,
+        ): number => cache.getOrInsert(key, compute());
+      `,
+    },
+  ])('`$rule` does not lead to `$api`', async ({ rule, api, code }) => {
+    const { output, ruleIds } = await fix(code);
 
-    expect(ruleIds).toContain('no-restricted-properties');
+    expect(output).not.toContain(api);
+
+    // Off, not suggestion-only: until every supported Node.js has the API there
+    // is nothing to suggest.
+    expect(ruleIds).not.toContain(rule);
   });
 
-  test('`Error.isError` stays restricted only while `engines` admits a Node.js without it', async () => {
-    // When the floor reaches 24 this fails: turn
-    // `unicorn/prefer-error-is-error` and `useErrorIsError` back on, drop the
-    // `no-restricted-properties` entry (here and in the oxlint table), and
-    // delete these tests.
-    const manifest: unknown = JSON.parse(
-      await fs.readFile(path.join(packageRoot, 'package.json'), 'utf8'),
+  describe('an API newer than the `engines.node` floor', () => {
+    test.each(nodeVersionGatedApis)(
+      '`$name` written by hand is reported',
+      async ({ object, property }) => {
+        const code =
+          object === undefined
+            ? (`export const f = (x: Readonly<{ ${property}: unknown }>): unknown => x.${property};\n` as const)
+            : (`export const f = (): unknown => ${object}.${property};\n` as const);
+
+        const { ruleIds } = await fix(code);
+
+        expect(ruleIds).toContain('no-restricted-properties');
+      },
     );
 
-    assert.isTrue(isRecord(manifest));
+    test.each(nodeVersionGatedStaticApis)(
+      '`globalThis.$name` written by hand is reported',
+      async ({ object, property }) => {
+        // Without `--fix`, because `unicorn/no-unnecessary-global-this` would
+        // first rewrite it to the bare form.
+        const [result] = await eslintWithoutFix.lintText(
+          `export const f = (): unknown => globalThis.${object}.${property};\n`,
+          { filePath: path.join(packageRoot, 'src/entry-point.mts') },
+        );
 
-    const { engines } = manifest;
+        assert.isDefined(result);
 
-    assert.isTrue(isRecord(engines));
+        expect(result.messages.map(({ ruleId }) => ruleId)).toContain(
+          'no-restricted-syntax',
+        );
+      },
+    );
 
-    const { node } = engines;
+    test('every entry is one the floor has not reached', async () => {
+      // An entry whose version the floor has reached fails here: delete it, and
+      // turn back on what its comment names.
+      const manifest: unknown = JSON.parse(
+        await fs.readFile(path.join(packageRoot, 'package.json'), 'utf8'),
+      );
 
-    assert.isTrue(typeof node === 'string');
+      assert.isTrue(isRecord(manifest));
 
-    // `>=X.Y.Z`, as `check:root:node-support` writes it, with `X` below 24. Any
-    // other form fails too, so that it is read before the restriction goes.
-    assert.match(node, /^>=(?:1?\d|2[0-3])\.\d+\.\d+$/u);
+      const { engines } = manifest;
+
+      assert.isTrue(isRecord(engines));
+
+      const { node } = engines;
+
+      assert.isTrue(typeof node === 'string');
+
+      // `>=X.Y.Z`, as `check:root:node-support` writes it. Any other form fails
+      // too, so that it is read before an entry goes.
+      const floor = /^>=(?<major>\d+)\.\d+\.\d+$/u.exec(node)?.groups?.[
+        'major'
+      ];
+
+      assert.isDefined(floor);
+
+      const floorMajor = Num.safeParseInt(floor);
+
+      assert.isTrue(Result.isOk(floorMajor));
+
+      assert.deepStrictEqual(
+        nodeVersionGatedApis.filter(
+          ({ nodeMajor }) => nodeMajor <= floorMajor.value,
+        ),
+        [],
+      );
+    });
   });
 });

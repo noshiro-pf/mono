@@ -1,4 +1,11 @@
 import type { ReadonlyRecord } from 'ts-type-forge';
+// The source file, not the package: Node.js loads this file with no `dist/`
+// built and resolves no `.mjs` to `.mts`, and the package exports only `dist/`.
+// A renamed export is not hidden by the directive for long: Node.js refuses to
+// link the module, and `check:root:test` imports it.
+// @ts-expect-error TS5097, the `.mts` extension, which Node.js needs here
+// eslint-disable-next-line import-x/no-relative-packages
+import { nodeVersionRestrictedProperties } from '../../libs/eslint-config-typed/src/rules/node-version-gated-apis.mts';
 
 /**
  * The ESLint rules oxlint checks instead, in every package whose `check:lint`
@@ -25,8 +32,8 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  * measured when the rule moved. The values are ESLint's resolved options,
  * defaults included, which is what that check compares.
  *
- * This file is loaded by Node itself when oxlint reads its config, so it
- * imports nothing it needs at run time.
+ * This file is loaded by Node itself when oxlint reads its config, so what it
+ * imports at run time is TypeScript source that imports nothing in turn.
  */
 export const eslintRulesMovedToOxlint = {
   '@typescript-eslint/array-type': [
@@ -153,15 +160,10 @@ export const eslintRulesMovedToOxlint = {
   'no-proto': 'error',
   'no-prototype-builtins': 'error',
   'no-regex-spaces': 'error',
-  'no-restricted-properties': [
-    'error',
-    {
-      object: 'Error',
-      property: 'isError',
-      message:
-        "Node.js 22, which this config supports, has no 'Error.isError'. Use 'isError' from https://www.npmjs.com/package/@sindresorhus/is instead.",
-    },
-  ],
+  // The table `eslint-config-typed` gives ESLint. Spread rather than
+  // `Arr.toUnshifted`, which would be an import from a built package.
+  // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
+  'no-restricted-properties': ['error', ...nodeVersionRestrictedProperties],
   'no-return-assign': ['error', 'except-parens'],
   'no-self-assign': ['error', { props: true }],
   'no-self-compare': 'error',

@@ -6,6 +6,10 @@ import {
   type EslintRules,
   type EslintRulesOption,
 } from '../types/index.mjs';
+import {
+  nodeVersionRestrictedProperties,
+  nodeVersionRestrictedSyntax,
+} from './node-version-gated-apis.mjs';
 
 export const restrictedGlobals = [
   {
@@ -124,24 +128,17 @@ export const restrictedSyntax = [
   //   selector: "TSAsExpression[typeAnnotation.typeName.name!='const']",
   //   message: "Don't use `as`.",
   // },
+
+  // `globalThis.Error.isError` and the like, which `no-restricted-properties`
+  // does not match.
+  ...nodeVersionRestrictedSyntax,
 ] as const satisfies EslintRulesOption['no-restricted-syntax'];
 
-// Typed by annotation rather than `as const satisfies`: `Arr.toUnshifted`'s
-// result for a literal tuple of these is not assignable to the rule's entry.
-// This repository's `tools/configs/oxlint-rules.mts` repeats them, and its
+// The entries of `nodeVersionGatedApis`. This repository's
+// `tools/configs/oxlint-rules.mts` reads the same table, and its
 // `check:root:oxlint-rules` compares the two.
 export const restrictedProperties: EslintRulesOption['no-restricted-properties'] =
-  [
-    {
-      // Node.js has it from 24 on, and a call on an older one throws
-      // `TypeError: Error.isError is not a function` only when it runs; the type
-      // checker and every Node.js 24+ toolchain see nothing wrong.
-      object: 'Error',
-      property: 'isError',
-      message:
-        "Node.js 22, which this config supports, has no 'Error.isError'. Use 'isError' from https://www.npmjs.com/package/@sindresorhus/is instead.",
-    },
-  ] as const;
+  nodeVersionRestrictedProperties;
 
 /**
  * The object form of the `no-restricted-imports` options, with `patterns`

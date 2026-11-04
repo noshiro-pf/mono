@@ -28,4 +28,5 @@ export * from './eslint-ts-restrictions-rules.mjs';
 export * from './eslint-unicorn-rules.mjs';
 export * from './eslint-vitest-coding-style-rules.mjs';
 export * from './eslint-vitest-rules.mjs';
+export * from './node-version-gated-apis.mjs';
 export * from './typescript-eslint-rules.mjs';
