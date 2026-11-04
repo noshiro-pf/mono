@@ -50,6 +50,9 @@ jobs:
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false' &&
       needs.gates.outputs.reused_result == ''
+    # The command alone, as the check is named, so that `build` does not join
+    # the context name unblock-prs reads (`.github/unblock-prs.json`).
+    name: style-check (${{ matrix.command }})
     runs-on: ubuntu-latest
     permissions:
       contents: read
