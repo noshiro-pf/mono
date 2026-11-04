@@ -1451,6 +1451,9 @@ a:focus-visible {
   height: var(--queue-map-height);
   margin-bottom: var(--queue-map-gap);
   position: relative;
+  /* A sideways drag is the map's; an upward one still scrolls the page. */
+  touch-action: pan-y;
+  user-select: none;
 }
 
 .queue-map-mark {
@@ -1505,9 +1508,14 @@ a:focus-visible {
   border: 1.5px solid var(--accent);
   border-radius: 4px;
   bottom: -3px;
-  pointer-events: none;
+  cursor: grab;
   position: absolute;
   top: -3px;
+}
+
+.queue-map[data-grabbed='true'],
+.queue-map[data-grabbed='true'] > .queue-map-window {
+  cursor: grabbing;
 }
 
 .queue-slot > .queue-link {

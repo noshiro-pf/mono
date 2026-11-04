@@ -52,13 +52,13 @@ in a dashed box saying what they wait for (`after #N`, `review`,
 as the DAG's nodes do; hovering one shows its title. A box is never narrower
 than its number needs: when more are queued than fit, the row scrolls across
 with the running one held at its start, and a map of the whole queue, a mark per
-box, is drawn above it with a frame round the part in view; a click on the map
-scrolls there. What is set aside, claimed, a draft or otherwise not the worker's
-to move is drawn outside the row, with why in a word and whose it is. It is
-decided by the code the worker decides with (`queue-order.mts` in
-`pr-report-core`), from what the page reads; what one run of the worker has seen
-green without merging, and so put last, lives in that run's memory and is not
-shown.
+box, is drawn above it with a frame round the part in view; the frame is dragged
+like a scroll bar's thumb, and a click elsewhere on the map scrolls there. What
+is set aside, claimed, a draft or otherwise not the worker's to move is drawn
+outside the row, with why in a word and whose it is. It is decided by the code
+the worker decides with (`queue-order.mts` in `pr-report-core`), from what the
+page reads; what one run of the worker has seen green without merging, and so
+put last, lives in that run's memory and is not shown.
 
 Below that, the workflow runs still going, what merged in the last week, and
 the open issues, most recently updated first. Every open issue is read: the

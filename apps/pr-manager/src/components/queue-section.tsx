@@ -275,7 +275,9 @@ const QueueBody = ({
                       <QueueMap
                         slots$={slots$}
                         strip$={strip.strip$}
-                        onJump={strip.jumpTo}
+                        onDrag={strip.dragTo}
+                        onPress={strip.press}
+                        onRelease={strip.release}
                       />
                     }
                   />
