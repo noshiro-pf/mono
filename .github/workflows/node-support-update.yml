@@ -40,7 +40,8 @@ name: Node.js Support Update
 # derived from it. Grant this token `workflows`, or arm auto-merge with
 # nothing holding the merge — open it without the label, or add
 # `merge-queued` here as pnpm-update.yml does — and the split becomes
-# necessary.
+# necessary. `close-obsolete`, after it, holds `GITHUB_TOKEN` alone and runs
+# nothing but `gh`.
 
 on:
   schedule:
@@ -52,6 +53,18 @@ on:
 
   workflow_dispatch:
 
+# One run in progress, none cancelled, whatever the ref: every run writes the
+# one branch, and `close-obsolete` closes whatever pull request is open from
+# it, which an overlapping run could have just opened with a refresh the first
+# did not see. A run waiting in the group is replaced by the next to arrive;
+# each rebuilds from the tip.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+# `update` pushes and opens the pull request through the App token, so
+# `contents: read` is the whole of what it takes. Only `close-obsolete` writes
+# through `GITHUB_TOKEN`, and only to close a pull request.
 permissions: {}
 
 jobs:
@@ -171,6 +184,9 @@ jobs:
     permissions:
       contents: read
 
+    outputs:
+      changed: ${{ steps.open.outputs.changed }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -201,6 +217,7 @@ jobs:
           permission-pull-requests: write # open it, label it, arm auto-merge
 
       - name: Open a pull request if anything changed
+        id: open
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
@@ -208,8 +225,11 @@ jobs:
 
           if [ -z "$(git status --porcelain)" ]; then
             echo 'Node support targets already up to date; nothing to do.'
+            echo 'changed=false' >>"${GITHUB_OUTPUT}"
             exit 0
           fi
+
+          echo 'changed=true' >>"${GITHUB_OUTPUT}"
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -277,3 +297,57 @@ jobs:
           else
             echo "::notice::Not arming auto-merge: ${branch} is not an open, ready pull request carrying \`skip-ci\`. A run that opened one armed it already."
           fi
+
+  # When `update` finds nothing to change, `main` already has the targets the
+  # branch could carry — typically because another pull request moved them
+  # while this one was held under `skip-ci` — and `update` pushes nothing. An
+  # open pull request from the branch is then obsolete, and nothing else would
+  # close it: every later run finds nothing to do either. Closed rather than
+  # pushed `main`'s tip, which would leave an empty pull request open.
+  #
+  # Only on the default branch: a run dispatched on another ref finds that
+  # ref's tree up to date, which says nothing about `main`'s. A refresh that
+  # failed fails `update`, which skips this job, so a nodejs.org outage closes
+  # nothing.
+  #
+  # `gh` alone, no checkout: nothing from the tree runs here. `GITHUB_TOKEN`
+  # rather than the App token, because a close needs to trigger no workflow.
+  # The open pull request is looked up by head branch, from this repository
+  # only, since a fork may name a branch the same. `merge-queued` comes off
+  # after the close, so that reopening it does not put a stale head back in the
+  # queue, and a close that fails leaves it queued as it was; a label that does
+  # not come off is a warning, since the close is what matters.
+  close-obsolete:
+    needs: update
+    if: >-
+      needs.update.outputs.changed == 'false' &&
+      github.ref_name == case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Close the obsolete pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          branch="chore/node-support-update"
+
+          numbers="$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" \
+            --state open --json number,isCrossRepository \
+            --jq '.[] | select(.isCrossRepository | not) | .number')"
+
+          if [ -z "$numbers" ]; then
+            echo "No open pull request from ${branch}; nothing to close."
+            exit 0
+          fi
+
+          while IFS= read -r number; do
+            gh pr close "$number" --repo "$GITHUB_REPOSITORY" --comment \
+              "Closed by [node-support-update.yml](${RUN_URL}): refreshing the Node.js support targets from \`main\`'s tip changes nothing, so \`main\` already has what this pull request carries. The next run that finds a change opens a new one."
+            gh pr edit "$number" --repo "$GITHUB_REPOSITORY" --remove-label merge-queued ||
+              echo "::warning::Closed #${number}, but could not take merge-queued off it."
+          done <<<"$numbers"
