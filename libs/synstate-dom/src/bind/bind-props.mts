@@ -50,6 +50,25 @@ const writeAttribute = (
 };
 
 /**
+ * An `aria-*` attribute reads `""` as its default, so a boolean is written as
+ * `"true"` or `"false"`, as React does (#3165); anything else as
+ * {@link writeAttribute} writes it.
+ */
+const writeAriaAttribute = (
+  element: Element,
+  name: string,
+  value: unknown,
+): void => {
+  if (isBoolean(value)) {
+    element.setAttribute(name, value ? 'true' : 'false');
+
+    return;
+  }
+
+  writeAttribute(element, name, value);
+};
+
+/**
  * Every value is a `Bindable` at run time: what is neither an observable nor a
  * view is a constant. An omitted prop is `undefined`, which is not.
  */
@@ -269,8 +288,10 @@ const bindProp = (element: Element, key: string, value: unknown): void => {
 
   const name = attributeNameOf[key] ?? key;
 
+  const write = name.startsWith('aria-') ? writeAriaAttribute : writeAttribute;
+
   bindValue(value, (v) => {
-    writeAttribute(element, name, v);
+    write(element, name, v);
   });
 };
 

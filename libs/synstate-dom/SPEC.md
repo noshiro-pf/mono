@@ -298,14 +298,14 @@ export const render = (
 
 ### 7.2 種類ごとの書き込み
 
-| 対象       | 書き方                                                                                             |
-| :--------- | :------------------------------------------------------------------------------------------------- |
-| 属性       | `setAttribute(name, String(v))`。真偽属性は `true` で空文字、`false` で `removeAttribute`          |
-| プロパティ | `el[name] = v`                                                                                     |
-| テキスト   | 空の Text ノードを作り `node.data = String(v)`                                                     |
-| `class`    | 文字列形式とオブジェクト形式のどちらか一方を受け付ける（下記）                                     |
-| `style`    | `Bindable<string>` は `style.cssText`。オブジェクト形式は各キーを `style.setProperty` で個別に束縛 |
-| イベント   | `listenInScope`（「6.4」）。ハンドラの中で作った Observable は lint ルールで検出する（下記）       |
+| 対象       | 書き方                                                                                                                                              |
+| :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 属性       | `setAttribute(name, String(v))`。真偽属性は `true` で空文字、`false` で `removeAttribute`。`aria-*` は数値も受け付け、真偽値は `'true'` / `'false'` |
+| プロパティ | `el[name] = v`                                                                                                                                      |
+| テキスト   | 空の Text ノードを作り `node.data = String(v)`                                                                                                      |
+| `class`    | 文字列形式とオブジェクト形式のどちらか一方を受け付ける（下記）                                                                                      |
+| `style`    | `Bindable<string>` は `style.cssText`。オブジェクト形式は各キーを `style.setProperty` で個別に束縛                                                  |
+| イベント   | `listenInScope`（「6.4」）。ハンドラの中で作った Observable は lint ルールで検出する（下記）                                                        |
 
 **制御された `checked` と `indeterminate`**: `<input>` の `checked` または `indeterminate` を束縛すると、`change` の後、次のフレームの描画前に要素を束縛中の値へ書き戻す。持ち主が変更を受け取らなかった（`onChange` で値を変えなかった）とき、ユーザーの切り替えが画面に残らないようにするためで、結果は React の制御されたコンポーネントと同じになる。ただし React は自分のイベント処理の終わりに同期的に戻すのに対し、こちらは次のフレームまで戻さない。クリックは `indeterminate` も外すので、同じく書き戻す。
 

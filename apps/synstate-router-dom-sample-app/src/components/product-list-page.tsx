@@ -15,7 +15,6 @@ import {
   fetchProductSummaries,
   type ProductSummaryPage,
 } from '../api/index.mjs';
-import { ariaBusy } from '../aria-busy.mjs';
 import { latestRequest } from '../from-request.mjs';
 import { asPageNumber, firstPage } from '../page-number.mjs';
 import { Link, router, routes, type ProductListValues } from '../routes.mjs';
@@ -46,7 +45,10 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
   );
 
   return (
-    <section aria-busy={view(data$, ariaBusy)} data-e2e={constant('products')}>
+    <section
+      aria-busy={view(data$, AsyncData.isPending)}
+      data-e2e={constant('products')}
+    >
       <h1>{constant('Products')}</h1>
       <label>
         {constant('Search ')}

@@ -3,7 +3,6 @@ import { constant, If, MatchOptional, view, type JSX } from 'synstate-dom';
 import { AsyncData, Optional } from 'ts-std-forge';
 import type { SafeInt } from 'ts-type-forge';
 import { fetchProduct, type ProductDetail } from '../api/index.mjs';
-import { ariaBusy } from '../aria-busy.mjs';
 import { latestRequest } from '../from-request.mjs';
 import { Link, routes, type ProductValues } from '../routes.mjs';
 
@@ -34,7 +33,7 @@ export const ProductPage = ({ item$ }: Props): JSX.Element => {
   const nextId$ = page$.pipe(map((page) => page.product?.next));
 
   return (
-    <section aria-busy={view(data$, ariaBusy)}>
+    <section aria-busy={view(data$, AsyncData.isPending)}>
       <h1>{view(page$, (page) => page.title)}</h1>
       <If
         cond={view(page$, (page) => page.found)}

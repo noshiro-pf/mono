@@ -119,6 +119,51 @@ describe('attributes', () => {
     assert.strictEqual(div?.getAttribute('aria-expanded'), 'true');
   });
 
+  test('writes a boolean on an aria-* attribute as "true" or "false" (#3165)', () => {
+    const [busy$, setBusy] = createState<boolean | undefined>(true);
+
+    const { container } = mountInto(() => (
+      <section aria-busy={busy$} aria-hidden={constant(false)} />
+    ));
+
+    const section = container.querySelector('section');
+
+    assert.isNotNull(section);
+
+    assert.strictEqual(section.getAttribute('aria-busy'), 'true');
+
+    assert.strictEqual(section.getAttribute('aria-hidden'), 'false');
+
+    setBusy(false);
+
+    assert.strictEqual(section.getAttribute('aria-busy'), 'false');
+
+    setBusy(undefined);
+
+    assert.isFalse(section.hasAttribute('aria-busy'));
+  });
+
+  test('writes a number on an aria-* attribute', () => {
+    const { container } = mountInto(() => (
+      <div aria-level={constant(2)} aria-valuenow={constant(0)} />
+    ));
+
+    const div = container.querySelector('div');
+
+    assert.strictEqual(div?.getAttribute('aria-level'), '2');
+
+    assert.strictEqual(div?.getAttribute('aria-valuenow'), '0');
+  });
+
+  test('writes a boolean on an aria-* attribute of an SVG element too', () => {
+    const { container } = mountInto(() => <svg aria-hidden={constant(true)} />);
+
+    assert.strictEqual(
+      container.querySelector('svg')?.getAttribute('aria-hidden'),
+      'true',
+    );
+  });
+
   test('accepts a view', () => {
     const [count$, setCount] = createState(0);
 
