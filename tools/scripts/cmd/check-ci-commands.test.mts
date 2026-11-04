@@ -1,4 +1,5 @@
 import dedent from 'dedent';
+import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   buildCoverageGraph,
@@ -17,7 +18,12 @@ const rootManifest = (scripts: ReadonlyRecord<string, string>): Manifest =>
 const packageManifest = (
   directory: string,
   scripts: ReadonlyRecord<string, string>,
-): Manifest => ({ directory, scripts }) as const;
+): Manifest =>
+  ({
+    directory,
+    name: directory.slice(directory.lastIndexOf('/') + 1),
+    scripts,
+  }) as const;
 
 const workflow = (
   relativePath: string,
@@ -38,7 +44,21 @@ describe('resolveScriptInvocations', () => {
       resolveScriptInvocations(
         'pnpm run --recursive --workspace-concurrency=1 --if-present check:test',
       ),
-      { local: [], recursive: ['check:test'] },
+      { local: [], recursive: [{ pattern: 'check:test', filters: [] }] },
+    );
+  });
+
+  test('keeps the filters of a recursive run, in both spellings', () => {
+    assert.deepStrictEqual(
+      resolveScriptInvocations(
+        "pnpm run --recursive --filter='!./apps/**' --filter synstate -F=a check:test",
+      ),
+      {
+        local: [],
+        recursive: [
+          { pattern: 'check:test', filters: ['!./apps/**', 'synstate', 'a'] },
+        ],
+      },
     );
   });
 
@@ -76,7 +96,7 @@ describe('resolveScriptInvocations', () => {
       resolveScriptInvocations(
         'pnpm run --recursive --if-present "/^check:dist/"',
       ),
-      { local: [], recursive: ['/^check:dist/'] },
+      { local: [], recursive: [{ pattern: '/^check:dist/', filters: [] }] },
     );
   });
 
@@ -225,6 +245,21 @@ describe('collectWorkflowCommands', () => {
     assert.deepStrictEqual(collectWorkflowCommands(text), []);
   });
 
+  test('reads a `run:` value YAML quotes as a whole', () => {
+    const text = dedent`
+      jobs:
+        a:
+          steps:
+            - run: 'pnpm run check:single'
+            - run: "pnpm run check:double"
+    `;
+
+    assert.deepStrictEqual(collectWorkflowCommands(text), [
+      'check:double',
+      'check:single',
+    ]);
+  });
+
   test('leaves out a `pnpm run` pointed at packages', () => {
     const text = dedent`
       jobs:
@@ -337,6 +372,108 @@ describe('buildCoverageGraph', () => {
       Array.from(graph.edges.get('.:ws:check:types') ?? []).toSorted(),
       ['libs/a:check:types', 'libs/b:check:types'],
     );
+  });
+
+  test.each([
+    ["--filter='./apps/**'", ['apps/x:check:types']],
+    ["--filter='!./apps/**'", ['libs/a:check:types', 'libs/b:check:types']],
+    ['--filter=a --filter=x', ['apps/x:check:types', 'libs/a:check:types']],
+    ['--filter=!a', ['apps/x:check:types', 'libs/b:check:types']],
+    ["--filter='./libs/**' --filter=!b", ['libs/a:check:types']],
+  ] as const)(
+    'a recursive run with %s reaches only what pnpm selects',
+    (filters, reached) => {
+      const graph = buildCoverageGraph([
+        rootManifest({
+          'ws:check:types': `pnpm run --recursive ${filters} --if-present check:types`,
+        }),
+        packageManifest('libs/a', { 'check:types': 'tsc --noEmit' }),
+        packageManifest('libs/b', { 'check:types': 'tsc --noEmit' }),
+        packageManifest('apps/x', { 'check:types': 'tsc --noEmit' }),
+      ]);
+
+      assert.deepStrictEqual(
+        Array.from(graph.edges.get('.:ws:check:types') ?? []).toSorted(),
+        Array.from(reached),
+      );
+    },
+  );
+
+  test('a filtered run without --recursive reaches the packages too', () => {
+    const graph = buildCoverageGraph([
+      rootManifest({
+        'gen:x': 'pnpm run --filter a gen:x',
+        'check:y': 'pnpm run --filter-prod=b check:y',
+      }),
+      packageManifest('libs/a', { 'gen:x': 'tsx x.mts' }),
+      packageManifest('libs/b', { 'check:y': 'tsx y.mts' }),
+    ]);
+
+    assert.deepStrictEqual(Array.from(graph.edges.get('.:gen:x') ?? []), [
+      'libs/a:gen:x',
+    ]);
+
+    assert.deepStrictEqual(Array.from(graph.edges.get('.:check:y') ?? []), [
+      'libs/b:check:y',
+    ]);
+  });
+
+  test('an unscoped name selects the scoped package of that name', () => {
+    const graph = buildCoverageGraph([
+      rootManifest({
+        'ws:check:types': 'pnpm run --recursive --filter=cli check:types',
+      }),
+      {
+        directory: 'languages/sumi/cli',
+        name: '@sumi-lang/cli',
+        scripts: { 'check:types': 'tsc --noEmit' },
+      },
+      packageManifest('libs/b', { 'check:types': 'tsc --noEmit' }),
+    ]);
+
+    assert.deepStrictEqual(
+      Array.from(graph.edges.get('.:ws:check:types') ?? []),
+      ['languages/sumi/cli:check:types'],
+    );
+  });
+
+  test.each([
+    [['cli', '@sumi-lang/cli'], ['libs/cli:check:types']],
+    [['@a/cli', '@b/cli'], []],
+  ] as const)(
+    'among %j, an unscoped name falls back to a scope only when one alone matches',
+    (names, reached) => {
+      const graph = buildCoverageGraph(
+        Arr.toUnshifted(
+          rootManifest({
+            'ws:check:types': 'pnpm run --recursive --filter=cli check:types',
+          }),
+        )(
+          names.map((name) => ({
+            directory: `libs/${name.replace('@', '').replace('/', '-')}`,
+            name,
+            scripts: { 'check:types': 'tsc --noEmit' },
+          })),
+        ),
+      );
+
+      assert.deepStrictEqual(
+        Array.from(graph.edges.get('.:ws:check:types') ?? []),
+        Array.from(reached),
+      );
+    },
+  );
+
+  test('a selector of a form it does not read selects every package', () => {
+    const graph = buildCoverageGraph([
+      rootManifest({
+        'ws:check:types': "pnpm run --recursive --filter='...a' check:types",
+      }),
+      packageManifest('libs/a', { 'check:types': 'tsc --noEmit' }),
+      packageManifest('libs/b', { 'check:types': 'tsc --noEmit' }),
+    ]);
+
+    assert.lengthOf(Array.from(graph.edges.get('.:ws:check:types') ?? []), 2);
   });
 
   test('applies a declared relation to every manifest defining both names', () => {

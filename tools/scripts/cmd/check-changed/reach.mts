@@ -124,6 +124,49 @@ export const matchesCiOnly = (entry: CiOnly, command: CommandId): boolean => {
   );
 };
 
+/** The commands by script name, in the order first seen. */
+export const groupByScript = (
+  entries: readonly Uncovered[],
+): readonly Readonly<{
+  scriptName: string;
+  directories: readonly string[];
+  origin: string;
+}>[] => {
+  const mut_groups = new Map<
+    string,
+    Readonly<{ directories: readonly string[]; origin: string }>
+  >();
+
+  for (const { command, origin } of entries) {
+    const { directory, scriptName } = splitCommandId(command);
+
+    const group = mut_groups.get(scriptName);
+
+    mut_groups.set(scriptName, {
+      directories: Arr.toPushed(group?.directories ?? [], directory),
+      origin: group?.origin ?? origin,
+    });
+  }
+
+  return Array.from(mut_groups, ([scriptName, group]) => ({
+    scriptName,
+    ...group,
+  }));
+};
+
+/** Up to five directories, and how many more; `.` reads as the root. */
+export const listDirectories = (directories: readonly string[]): string => {
+  const named = directories.map((directory) =>
+    directory === '.' ? 'the root' : directory,
+  );
+
+  const shown = named.slice(0, SHOWN_DIRECTORIES).join(', ');
+
+  return named.length > SHOWN_DIRECTORIES
+    ? `${shown} and ${named.length - SHOWN_DIRECTORIES} more`
+    : shown;
+};
+
 export type Uncovered = Readonly<{
   command: CommandId;
   /** `<workflow>: <entry>`, the first CI entry point found reaching it. */
@@ -151,6 +194,12 @@ export const CI_ONLY: readonly CiOnly[] = [
     scriptName: 'z:assert-repo-is-clean',
     reason:
       'check-changed watches every step for what it writes and names the step, which is what this does in CI without the name.',
+  },
+  {
+    directory: '.',
+    scriptName: 'z:check-changed-gap',
+    reason:
+      'Says, after a failed check, which of its commands check-changed would have run; it checks nothing.',
   },
   {
     scriptName: 'coverage:normalize-paths',
@@ -233,6 +282,13 @@ export type CiOnly = Readonly<{
   writtenBy?: readonly string[];
 }>;
 
+const SHOWN_DIRECTORIES = 5;
+
+const DEPS_BUILT_GUARD =
+  /^node (?:\.\/|(?:\.\.\/)+)tools\/scripts\/cmd\/assert-deps-built\.mts(?: --workspace)?$/u;
+
+const SCRIPT_RUNNER = /^(?:pnpm run |run-[sp] )/u;
+
 /**
  * A body that runs other scripts and nothing else, the deps-built guard aside:
  * every `&&`-separated part is that guard, or a `pnpm run` or `run-s` / `run-p`
@@ -255,8 +311,3 @@ const isAggregate = (body: string): boolean =>
 
       return Arr.isNonEmpty(local) || Arr.isNonEmpty(recursive);
     });
-
-const DEPS_BUILT_GUARD =
-  /^node (?:\.\/|(?:\.\.\/)+)tools\/scripts\/cmd\/assert-deps-built\.mts(?: --workspace)?$/u;
-
-const SCRIPT_RUNNER = /^(?:pnpm run |run-[sp] )/u;

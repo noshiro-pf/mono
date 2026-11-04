@@ -105,7 +105,10 @@ declared CI's alone. An entry whose script leaves committed output, which CI's
 clean-tree check finds stale, names the generators that write it (`writtenBy`),
 and the package has to define one and some plan run each it defines:
 `verify:npm-packages` is CI's, `gen:verify-npm-packages` is not. It asks whether
-some diff's plan runs a command, not whether every diff that needs it does.
+some diff's plan runs a command, not whether every diff that needs it does. That
+second question is answered after the fact: a failed matrix job of
+`code-check.yml` or `style-check.yml` says in its summary which of its commands
+this would have run for the diff (`../check-changed-gap.mts`).
 
 What depends on a changed package is not built or checked beyond its generators,
 so a stale `dist/` in a dependent goes unnoticed; build first (`ws:build:deps`)
