@@ -1,5 +1,12 @@
 ## [10.1.8](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.7...v10.1.8) (2026-08-09)
 
+## 10.7.3
+
+### Patch Changes
+
+- bb49866: `checkShouldRun`, `checkShouldRunTypeChecks` and the `check-should-run` / `check-should-run-type-checks` commands count a deleted file, and the old path of a renamed one, as changed, so a diff that only deletes or moves source no longer skips the gated step. `getDiffFrom` with `excludeDeleted: false` reports a rename under both its old and its new path.
+- a28d46b: `formatFiles`, `formatFilesGlob`, `formatUncommittedFiles` and `formatDiffFrom` (and the `format-uncommitted` and `format-diff-from` commands) with `silent` now drop what is printed through `console.log`, `info`, `debug`, `dir`, `dirxml`, `table` or `warn` from inside the formatting run, so a Prettier plugin or bundled parser no longer prints. That includes an `ignore` callback, and `assert`, `count`, `group` and `time*`, which Node prints through `log` or `warn`. The rest of the process prints as before.
+
 ## 10.7.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "blueprint-synstate",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Blueprint's components rebuilt on synstate-dom, drawn by Blueprint's own style sheets",
   "repository": {
@@ -82,8 +82,8 @@
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {
-    "synstate": ">=7.0.0",
-    "synstate-dom": ">=0.7.0",
+    "synstate": ">=7.0.1",
+    "synstate-dom": ">=0.7.1",
     "ts-data-forge": ">=14.11.0"
   },
   "engines": {

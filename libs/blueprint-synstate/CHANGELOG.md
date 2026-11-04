@@ -1,5 +1,21 @@
 # blueprint-synstate
 
+## 0.6.0
+
+### Minor Changes
+
+- 754f7a0: `Navbar` and `NavbarGroup`, Blueprint's bar at the top of a page. A `Tabs` tab may leave out its `panel`, and is then a title alone, as in a navbar whose content is drawn below it. `InputGroup` takes a `leftIcon`, and the `sort` and `filter-list` icons are drawn.
+
+### Patch Changes
+
+- 6c94060: `Tabs` ignores a key down that belongs to an input method (`isImeKeyDown`), as the library's text fields already do, so an Enter that confirms a conversion does not choose a tab.
+- Updated dependencies [6c4fd99]
+- Updated dependencies [6f059fc]
+- Updated dependencies [809aa3c]
+    - synstate-dom@0.7.1
+    - synstate@7.0.1
+    - ts-data-forge@14.11.0
+
 ## 0.5.0
 
 ### Minor Changes

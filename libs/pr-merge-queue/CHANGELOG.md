@@ -1,5 +1,57 @@
 # pr-merge-queue
 
+## 0.5.0
+
+### Minor Changes
+
+- dd6abb2: `pr-report-core` adds `readBranchRequirements`, which reads what GitHub requires of a branch — every ruleset that applies to it and the contexts a classic branch protection rule requires — through a transport the reader hands over. `unblock-prs`, and `pr-report` wherever it reads GitHub's rules rather than the checkout's `repo-settings/rulesets/main.json`, now read the required contexts through it, so a context required only by a classic branch protection rule is waited for rather than missed, and they ask for a hundred rules rather than GitHub's default page of thirty.
+- f020219: `pr-report` says of an issue labelled `pending` that `pending` is for pull requests and an issue is held with `priority:hold`.
+- 5185cec: Place every issue in one priority tier. `pr-report-core` reads the `priority:S`, `priority:A`, `priority:B`, `priority:C`, `priority:D`, `priority:hold` and `priority:close` issue labels (`issuePriorityOfLabels`, `issueStartRank`). `pr-description create` needs `--priority <tier>` and refuses while an open issue has a close title, unless each is named with `--not-duplicate`; the new `pr-description similar` lists the open issues a new one may repeat. `run-issue-resolver` takes issues by tier and leaves `priority:hold` and `priority:close`, `pr-report` names an issue with no tier or several, and `report-unowned-prs` files its issues under `priority:A`.
+- e73d0ad: `pr-description` and `open-pr --body-file` also refuse a description with a trailer (a `Start-After:` or `Claude-Session:` line, or a closing keyword) inside either half instead of after the `---` rule, with more than one `## Review` section in the original, or with one in the translation. `pr-description push` does not count moving a trailer out of a half as an edit to that half.
+- c90e8c5: `pr-description` and `open-pr --body-file` refuse a `## Review` section whose
+  first line does not state the level and the total of rounds in digits, in one of
+  these forms:
+
+    ```md
+    `/code-review high`, 3 rounds.
+    Review at `high`, 2 rounds.
+    Self-review at `high`, 1 round.
+    ```
+
+    `reviewOpeningOf` picks a section's opening line and `reviewOpeningRounds` reads
+    the total from it.
+
+- 10932ac: `start-issue` now says who started an issue. It takes `--by <claimant>` (a session URL, or any word unique to the claimant), which is required, and writes it into a claim comment beside the `in-progress` label. An issue someone else claimed is refused with their name and the time they claimed it. `--plan` labels an issue `planned` under a claim that lapses after 24 hours. `--release` takes either label off, and `--force` now goes with it to release someone else's claim. Two sessions starting one issue at the same moment no longer both get it: the claim is read back, and only the oldest one holds. `run-issue-resolver` claims under a name of its own for each run.
+
+    `pr-report-core` adds `issue-claim.mts` (`writeIssueClaimComment`, `parseIssueClaimComment`, `readIssueClaim`, `issueClaimApplies`, `PLANNED_CLAIM_LIFETIME_HOURS`) and exports `CLOCK_SKEW_MINUTES`.
+
+- bb577f6: Add `startable-issues`, which lists the open issues nobody has started in the order `run-issue-resolver` would hand them on — the same survey, by priority tier (`priority:S` first, `priority:D` last, `priority:hold` and `priority:close` held), the lowest number first within each — and says which startable ones it passed over and why. It writes nothing; `--limit` lists the first few and `--author` names whose issues it lists.
+
+    Add the `resolve-issues` skill to the Claude Code plugin: `/pr-merge-queue:resolve-issues N` goes down the issues `startable-issues` lists, passing over any that one pull request cannot finish, and takes the others one at a time until N pull requests are open: `start-issue` as it takes one, then its own pull request opened with `open-pr`.
+
+### Patch Changes
+
+- cd4efe4: `open-pr` refuses, before pushing, a run whose `--base` differs from the base of the pull request already open for the branch, instead of reporting it stacked while it still targets the old base, and one that names that pull request in its own `--merge-after` or `--merge-before`. Without `--base`, the open pull request's base is used, so a stacked one stays stacked. On a pull request opened earlier it writes the `Merge-After:` the run declares that the body does not name yet, says that `--title` and `--body-file` are not applied, and `--dry-run` and the final message say what is done for it.
+- ab618eb: `unblock-prs` decides whether a pull request needs a ruleset bypass merge for the head its rebase reached, not the head triage read, so a stacked pull request that loses an owned path on the rebase is armed rather than set aside `awaiting-bypass`, and one that gains one is not armed by it.
+- ba78a89: `unblock-prs` sets a released pull request aside as `checks-not-started` once its head has gone five minutes with required contexts unreported and nothing running on it — GitHub started no check workflow — and tries the next candidate, instead of holding the queue until `--watch-timeout`. `pr-report-core` adds `checks-not-started` to `SET_ASIDE_REASONS`, owned by a person and cleared when the base moves.
+- 8fd6ccc: `unblock-prs` no longer stalls the whole queue behind a pull request whose last push GitHub dropped, leaving its head, `refs/pull/<n>/head` and merge state behind its branch. A branch found at another commit before the rebase was always read as someone else pushing, so the cycle surveyed again, picked the same pull request, and never reached the next. The same mismatch still there ten minutes later now sets it aside as the new `head-out-of-sync` reason, with both commits, and the next candidate is tried; while it stays aside, its `UNKNOWN` merge state no longer makes every survey re-list. `pr-report-core` adds `head-out-of-sync` to `SET_ASIDE_REASONS`, owned by a person and not cleared by the base moving.
+- 4bca9a0: `unblock-prs` no longer re-lists the pull requests for a minute on every survey behind an armed pull request whose push GitHub dropped. When a survey finds an armed pull request `UNKNOWN`, it reads the branches' tips in one `git ls-remote --heads origin` and records one whose branch is not at the head GitHub shows. The next survey that finds the same mismatch does not wait on it; the first still does, since a push GitHub has yet to take in looks the same for a few seconds. A `merge-queued` one is set aside as `head-out-of-sync` once the mismatch has lasted `OUT_OF_SYNC_GRACE_MS`, before triage, wherever it stands in the queue. Before, only the candidate a cycle picked was checked, and only a set-aside this run held in memory stopped the wait.
+- 327bfab: `unblock-prs` no longer sets a pull request aside as checks-failed because of a red check left over from the round before, when some job of the new round is still queued and another one has already started. A queued check has no start time. It used to get a placeholder that read as year 1, which made the round look as if it began before every red check. While every job is still queued the round has no start time to compare against, and a red is judged, as before, only by whether its workflow has a newer run.
+- db4053a: `unblock-prs` reads a pull request's checks once per survey and once per watch poll, not twice. The required checks and the ones still running now come from the same answer, so a round that ends between two reads can no longer show as both unfinished and finished in a single verdict when the head's checks fit on one page of 100. The read also costs half the GraphQL requests it did.
+- 04da26a: `unblock-prs` no longer holds the queue for good behind a released pull request whose checks (or, for the version pull request, whether it was rebuilt on the tip) cannot be read. Unread at the same head for five surveys in a row, it is set aside as the new `read-failed` reason, with what failed, and the queue moves on — unless the same kind of read fails for the tip of the base too, which is GitHub failing rather than the pull request, and holds the queue instead. The log says which read failed. `pr-report-core` adds `read-failed` to `SET_ASIDE_REASONS`, owned by a person.
+- Updated dependencies [dd6abb2]
+- Updated dependencies [bb49866]
+- Updated dependencies [5185cec]
+- Updated dependencies [10932ac]
+- Updated dependencies [9c02332]
+- Updated dependencies [a28d46b]
+- Updated dependencies [ba78a89]
+- Updated dependencies [8fd6ccc]
+- Updated dependencies [04da26a]
+    - pr-report-core@0.3.0
+    - ts-repo-utils@10.7.3
+    - ts-fortress@12.4.4
+
 ## 0.4.0
 
 ### Minor Changes

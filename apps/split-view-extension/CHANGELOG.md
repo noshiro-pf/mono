@@ -1,5 +1,18 @@
 # split-view-extension
 
+## 0.8.0
+
+### Minor Changes
+
+- f4d582d: A split can hold one pane at a fixed width or height in pixels, the other pane taking the rest (`r737fpp` in a `layout=` spec), and dragging its divider keeps it in pixels. A pull request now opens with the diff held at 737px, in both layouts; beside the diff alone the conversation takes the rest of the page, and in three columns it is held at 577px, the widest its description gets with the reviewers and labels below it, the issue or the session taking the rest.
+
+### Patch Changes
+
+- c5370ee: A pull request opened in a split view shows its diff at 67%, in both the two- and the three-column layout, so that GitHub's file tree stays beside it.
+- 369f616: `Ctrl+R` / `F5` with the focus in a frame nested inside a pane's page (an embedded editor, a comment widget, `about:blank` and `srcdoc` frames included) reloads that pane rather than the whole tab, and `Alt+1..9` switches split views from there too: the nested frame hands the key up to the pane's own frame. A workspace shortcut the page has already handled is left to it, as the reload shortcut was.
+- react-utils@0.0.26
+    - ts-data-forge@14.11.0
+
 ## 0.7.5
 
 ### Patch Changes

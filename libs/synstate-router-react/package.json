@@ -83,7 +83,7 @@
   },
   "peerDependencies": {
     "react": ">=19.0.0",
-    "synstate": ">=7.0.0",
+    "synstate": ">=7.0.1",
     "synstate-router": ">=0.1.0"
   },
   "engines": {

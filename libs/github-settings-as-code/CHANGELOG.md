@@ -1,5 +1,16 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 4.0.7
+
+### Patch Changes
+
+- 4f54fa9: `apply` for rulesets and environments now writes back only the resources the declaration files name, instead of every live one. A ruleset or environment that exists only on GitHub is no longer adopted into the declarations, so the drift check keeps reporting it.
+- Updated dependencies [bb49866]
+- Updated dependencies [9c02332]
+- Updated dependencies [a28d46b]
+    - ts-repo-utils@10.7.3
+    - ts-fortress@12.4.4
+
 ## 4.0.6
 
 ### Patch Changes

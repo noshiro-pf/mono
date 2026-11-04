@@ -1,5 +1,12 @@
 # synstate-preact-signals
 
+## 7.0.1
+
+### Patch Changes
+
+- Updated dependencies [809aa3c]
+    - synstate@7.0.1
+
 ## 7.0.0
 
 ### Major Changes
