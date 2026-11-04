@@ -1,4 +1,10 @@
-import { memoNamed } from 'react-utils';
+import {
+  constant,
+  For,
+  mapBindable,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import type { ReadonlyRecord } from 'ts-type-forge';
 
 export type IconName =
@@ -32,36 +38,46 @@ export type IconName =
  * colouring them through the CSS it already has — dim, active, warning — and
  * `aria-hidden` because every button carrying one is labelled.
  */
-export const Icon = memoNamed(
-  'Icon',
-  ({ icon: iconName }: Readonly<{ icon: IconName }>) => {
-    const icon = icons[iconName];
+export const Icon = ({
+  icon,
+}: Readonly<{ icon: Bindable<IconName> | IconName }>): JSX.Element => {
+  const shape$ = mapBindable(
+    typeof icon === 'string' ? constant(icon) : icon,
+    (name) => icons[name],
+  );
 
-    return (
-      <svg
-        aria-hidden
-        className={'icon'}
-        focusable={'false'}
-        viewBox={'0 0 16 16'}
+  // A path apiece, as drawn before: one run of subpaths would differ where two
+  // outlines overlap, which is antialiased once rather than twice.
+  return (
+    <svg
+      aria-hidden={constant('true')}
+      class={constant('icon')}
+      viewBox={constant('0 0 16 16')}
+    >
+      <For
+        items={mapBindable(shape$, (shape) => shape.fills ?? [])}
+        key={(_, index) => index}
       >
-        {(icon.fills ?? []).map((d) => (
-          <path key={d} d={d} fill={'currentColor'} />
-        ))}
-        {(icon.strokes ?? []).map((d) => (
+        {(d$) => <path d={d$} fill={constant('currentColor')} />}
+      </For>
+      <For
+        items={mapBindable(shape$, (shape) => shape.strokes ?? [])}
+        key={(_, index) => index}
+      >
+        {(d$) => (
           <path
-            key={d}
-            d={d}
-            fill={'none'}
-            stroke={'currentColor'}
-            strokeLinecap={'round'}
-            strokeLinejoin={'round'}
-            strokeWidth={icon.width ?? 1.4}
+            d={d$}
+            fill={constant('none')}
+            stroke={constant('currentColor')}
+            stroke-linecap={constant('round')}
+            stroke-linejoin={constant('round')}
+            stroke-width={mapBindable(shape$, (shape) => shape.width ?? 1.4)}
           />
-        ))}
-      </svg>
-    );
-  },
-);
+        )}
+      </For>
+    </svg>
+  );
+};
 
 type IconShape = Readonly<{
   /** Outlines, in `currentColor`. */

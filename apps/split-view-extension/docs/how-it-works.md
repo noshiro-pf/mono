@@ -157,10 +157,9 @@ the toolbar button should open. Consequences:
   There used to be a cap — twenty, by last save — which is not compatible with
   a list: a layout on it has to stay until the user deletes it, however long
   ago it was opened.
-- **The workspace on screen and its layout are one piece of React state.** Two
-  would make "which id does this layout belong to" a question of which
-  `setState` React batched with which, and the wrong answer overwrites one
-  split view with another's panes.
+- **The workspace on screen and its layout are one piece of state.** Two would
+  make "which id does this layout belong to" a question of which write landed
+  first, and the wrong answer overwrites one split view with another's panes.
 - **Switching in place replaces every `iframe`.** The pane elements are keyed
   by workspace as well as by pane id, so switching loads the new workspace's
   addresses instead of navigating the old elements. That is the cost of the

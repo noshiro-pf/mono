@@ -18,7 +18,7 @@ and never read.
 | `chrome.storage.local`   | every saved split view, the list of them, per-site flags | until the extension is removed — survives rebuilds, reloads and restarts |
 | `chrome.storage.session` | the split view's tab id (and the diagnostics log)        | until the browser closes                                                 |
 | the page's URL           | which split view **this tab** is showing, and the view   | the tab: a reload, a session restore, `Ctrl+Shift+T`, a bookmark         |
-| React state              | the layout being edited, until the save debounce fires   | the page                                                                 |
+| the page's state         | the layout being edited, until the save debounce fires   | the page                                                                 |
 | nowhere                  | scroll position in a pane, form contents inside a frame  | —                                                                        |
 
 `local` and `session` both cap at `QUOTA_BYTES`, measured at 10,485,760 bytes
@@ -188,7 +188,7 @@ rectangles on the next render.
 | `sandboxed`     | yes    | yes       | the per-pane `sandbox` attribute; `false` is the 🔓 the user chose for a site that needs top-level navigation                 |
 | `zoom`          | yes    | yes       | `1` unless someone changed it. Applied by the page as a `transform` on the `iframe`, so it needs nothing from the framed site |
 | `historyLength` | yes    | **no**    | reset to `1` on load. It describes a frame that no longer exists                                                              |
-| `reloadToken`   | yes    | **no**    | reset to `0` on load. It is a React `key`, meaningless across a page load                                                     |
+| `reloadToken`   | yes    | **no**    | reset to `0` on load. It keys the `iframe` element, meaningless across a page load                                            |
 | `currentUrl`    | no     | —         | folded into `url` at save time, then dropped                                                                                  |
 | `title`         | no     | —         | belongs to the document the pane will load; the frame reports one within a second of loading                                  |
 
@@ -417,7 +417,7 @@ and for anything saved before the key was added.
 
 ## The page's own state
 
-One React state holds the pair, not two:
+One state holds the pair, not two:
 
 ```ts
 type Session = Readonly<{
@@ -427,9 +427,9 @@ type Session = Readonly<{
 ```
 
 Two pieces of state would make "which id does this layout belong to" a question
-of which `setState` React batched with which, and the wrong answer overwrites
-one split view with another's panes. `workspaceId` is `undefined` until the list
-has been read; nothing renders and nothing saves before then.
+of which write landed first, and the wrong answer overwrites one split view with
+another's panes. `workspaceId` is `undefined` until the list has been read;
+nothing renders and nothing saves before then.
 
 Every change to a layout goes through one pure reducer,
 `workspaceReducer(state, action)`:
@@ -450,9 +450,9 @@ Every change to a layout goes through one pure reducer,
 | `zoom`          | `paneId`, `in`/`out`/`reset`              | steps that pane along the zoom ladder. Nothing reloads: the frame is scaled from outside                                                       |
 | `activate`      | `paneId`                                  | which pane is highlighted                                                                                                                      |
 
-An action that changes nothing returns the **same** state object, so the
-frames' once-a-second reports cost nothing: React bails out of the update, and
-the debounced save never fires.
+An action that changes nothing returns the **same** state object, so the frames'
+once-a-second reports cost nothing: a state given the value it already holds
+passes nothing on, and the debounced save never fires.
 
 ## The page ↔ frame protocol
 

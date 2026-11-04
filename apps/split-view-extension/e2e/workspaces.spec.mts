@@ -129,11 +129,16 @@ test(
       .soft(page.getByRole('combobox').getByRole('option'))
       .toHaveText(['1: split-view-2', '2: split-view-1']);
 
+    // The one on screen stays the choice, wherever its option moved to.
+    await expect.soft(page.getByRole('combobox')).toHaveValue('e2e');
+
     await menu.getByRole('button', { name: '◀ Earlier' }).click();
 
     await expect
       .soft(page.getByRole('combobox').getByRole('option'))
       .toHaveText(['1: split-view-1', '2: split-view-2']);
+
+    await expect.soft(page.getByRole('combobox')).toHaveValue('e2e');
 
     await menu.getByRole('button', { name: 'Delete', exact: true }).click();
 
@@ -143,6 +148,15 @@ test(
       .toHaveCount(2);
 
     await menu.getByRole('button', { name: 'Really delete' }).click();
+
+    await expect
+      .soft(page.getByRole('combobox').getByRole('option'))
+      .toHaveText(['1: split-view-2']);
+
+    await expect.soft(page).toHaveTitle('1: split-view-2');
+
+    // Nothing saved the deleted one back while the switch away from it ran.
+    await page.reload();
 
     await expect
       .soft(page.getByRole('combobox').getByRole('option'))

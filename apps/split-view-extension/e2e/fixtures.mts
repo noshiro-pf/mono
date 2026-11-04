@@ -20,7 +20,7 @@ import * as path from 'node:path';
  * here too.
  *
  * A fixture's last parameter is named `provide`, not Playwright's `use`, which
- * the React hook rules would take for `React.use`.
+ * reads as a hook to a reader used to React.
  */
 export const test = base.extend<
   Readonly<{

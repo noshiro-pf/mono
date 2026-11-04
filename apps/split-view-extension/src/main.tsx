@@ -1,4 +1,4 @@
-import { createRoot } from 'react-dom/client';
+import { render } from 'synstate-dom';
 import { App } from './app.js';
 import './style.css';
 
@@ -16,9 +16,7 @@ const container = document.querySelector('#root');
 if (!Object.is(window.top, globalThis)) {
   console.warn('Split View does not run inside a frame.');
 } else if (container !== null) {
-  const root = createRoot(container);
-
-  root.render(<App />);
+  render(App, container);
 } else {
   throw new Error('Could not find root element');
 }

@@ -55,7 +55,7 @@ export type WorkspaceAction = Readonly<
  *
  * Two properties matter beyond the obvious. An action that changes nothing
  * returns the *same* state object, so that the frames' once-a-second reports do
- * not re-render the page or trigger a save. And a pane that stays in the tree
+ * not update the page or trigger a save. And a pane that stays in the tree
  * keeps its `PaneState` — including its address — across preset changes, so
  * switching from a 2x2 grid to three columns keeps the first three pages.
  */
@@ -350,9 +350,9 @@ const applyPreset = (
  *
  * An updater that returns the pane it was given means "nothing changed", and
  * this passes that through: the whole state comes back unchanged, which is the
- * property the page relies on to render and save nothing. Without it, holding
- * `Ctrl` and spinning the wheel at the end of the zoom ladder would re-render
- * and re-save on every notch.
+ * property the page relies on to update and save nothing. Without it, holding
+ * `Ctrl` and spinning the wheel at the end of the zoom ladder would update the
+ * page and save again on every notch.
  */
 const updatePane = (
   state: WorkspaceState,

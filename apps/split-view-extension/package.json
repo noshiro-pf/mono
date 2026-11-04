@@ -46,14 +46,13 @@
     "z:screenshots": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/screenshots.mts"
   },
   "dependencies": {
-    "react-utils": "workspace:*",
+    "synstate": "workspace:*",
+    "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
     "@types/chrome": "^0.3.6",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
@@ -61,8 +60,6 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
     "ts-type-forge": "workspace:*",
     "tsx": "catalog:",
     "vite": "catalog:"

@@ -1,5 +1,13 @@
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import { createState, derive, map, onScopeDispose } from 'synstate';
+import {
+  constant,
+  For,
+  If,
+  listenInScope,
+  subscribeInScope,
+  view,
+  type JSX,
+} from 'synstate-dom';
 import { Arr, fastDeepEqual, Num, unknownToString } from 'ts-data-forge';
 import {
   PaneDropIndicator,
@@ -7,6 +15,7 @@ import {
   Splitter,
   TopBar,
   WorkspacePicker,
+  type PaneView,
 } from './components/index.mjs';
 import {
   clampRatio,
@@ -16,9 +25,7 @@ import {
   type LayoutGeometry,
   type PaneDropTarget,
   type PaneId,
-  type PaneState,
   type PresetId,
-  type Rect,
   type SplitterRect,
   type WorkspaceState,
 } from './layout/index.mjs';
@@ -31,8 +38,6 @@ import {
   splitViewTabIdSessionKey,
   workspacePositionFromCode,
   workspaceShortcutCodeOf,
-  type IncomingMessageEvent,
-  type ShortcutKeyEvent,
 } from './shared/index.mjs';
 import {
   activateWorkspaceEntry,
@@ -92,131 +97,106 @@ const noticeMs = 6000;
  */
 const tabNoteIntervalMs = 30_000;
 
-/**
- * The workspace this tab is showing, and its layout, as one value.
- *
- * One value rather than two pieces of state because everything that saves reads
- * both, and a layout written under the wrong id is one workspace overwritten
- * with another's panes. Keeping them apart made that a question of which
- * `setState` React happened to batch with which.
- *
- * `workspaceId` is `undefined` until the list has been read: nothing is
- * rendered and nothing is saved before then, because a frame that loaded before
- * the header-stripping rule existed would be blocked by the very headers the
- * rule removes.
- */
-type Session = Readonly<{
-  workspaceId: string | undefined;
-  state: WorkspaceState;
-}>;
-
-/** A pane being dragged, and where it would land if let go now. */
-type PaneMove = Readonly<{
-  paneId: PaneId;
-  target: PaneDropTarget | undefined;
-}>;
-
-export const App = memoNamed('App', () => {
-  const [session, setSession] = React.useState<Session>(() => ({
-    workspaceId: undefined,
-    state: initialWorkspaceState(),
-  }));
-
-  const { state } = session;
+export const App = (): JSX.Element => {
+  const [session$, setSession, { updateState: updateSession }] =
+    createState<Session>({
+      workspaceId: undefined,
+      state: initialWorkspaceState(),
+    });
 
   /**
    * Applies a pane action to the workspace on screen.
    *
    * Returning the identical session when the reducer returns the identical
-   * state is what keeps the frames' once-a-second reports free: React bails out
-   * of an update that produces the object it already had.
+   * state is what keeps the frames' once-a-second reports free: a state that is
+   * given the value it already holds passes nothing on.
    */
-  const dispatch = React.useCallback((action: WorkspaceAction): void => {
-    setSession((current) => {
+  const dispatch = (action: WorkspaceAction): void => {
+    updateSession((current) => {
       const next = workspaceReducer(current.state, action);
 
       return next === current.state ? current : { ...current, state: next };
     });
-  }, []);
+  };
 
-  const [registry, setRegistry] = React.useState<WorkspaceRegistry>(
+  const [registry$, setRegistry] = createState<WorkspaceRegistry>(
     emptyWorkspaceRegistry,
   );
-
-  const [notice, setNotice] = React.useState<string | undefined>(undefined);
-
-  /**
-   * The session and the list as they are *now*.
-   *
-   * The callbacks below must not be rebuilt when either changes: switching
-   * workspaces has to save the layout on screen first, and a `switchWorkspace`
-   * with a new identity on every frame report would re-render the workspace bar
-   * and re-bind the keyboard listener once a second.
-   */
-  const mut_liveSession = React.useRef(session);
-
-  const mut_liveRegistry = React.useRef(registry);
-
-  React.useEffect(() => {
-    mut_liveSession.current = session;
-  }, [session]);
 
   /**
    * Adopts a list written by another tab, without writing it back.
    *
    * Every tab holds its own copy, so a workspace created in one has to reach
    * the other or the other's next write would drop it. The comparison is what
-   * keeps this tab's own writes — which arrive here too — from re-rendering
+   * keeps this tab's own writes — which arrive here too — from updating
    * anything.
    */
-  React.useEffect(
-    () =>
-      watchWorkspaceRegistry((written) => {
-        if (fastDeepEqual(written, mut_liveRegistry.current)) {
-          return;
-        }
-
-        mut_liveRegistry.current = written;
-
+  onScopeDispose(
+    watchWorkspaceRegistry((written) => {
+      if (!fastDeepEqual(written, registry$.getSnapshot().value)) {
         setRegistry(written);
-      }),
-    [],
+      }
+    }),
   );
 
   /** Writes the list to storage and to the page at once. */
-  const commitRegistry = React.useCallback((next: WorkspaceRegistry): void => {
-    if (next === mut_liveRegistry.current) {
+  const commitRegistry = (next: WorkspaceRegistry): void => {
+    if (next === registry$.getSnapshot().value) {
       return;
     }
-
-    mut_liveRegistry.current = next;
 
     setRegistry(next);
 
     saveWorkspaceRegistry(next).catch(console.error);
-  }, []);
+  };
 
-  const [stageSize, setStageSize] = React.useState<
+  const [notice$, setNotice] = createState<string | undefined>(undefined);
+
+  const mut_timers: {
+    notice: ReturnType<typeof setTimeout> | undefined;
+    save: ReturnType<typeof setTimeout> | undefined;
+  } = { notice: undefined, save: undefined };
+
+  /** Shows what an import or "open all" had to say, for a while. */
+  const showNotice = (text: string): void => {
+    clearTimeout(mut_timers.notice);
+
+    setNotice(text);
+
+    mut_timers.notice = setTimeout(() => {
+      setNotice(undefined);
+    }, noticeMs);
+  };
+
+  onScopeDispose(() => {
+    clearTimeout(mut_timers.notice);
+
+    clearTimeout(mut_timers.save);
+  });
+
+  const [stageSize$, setStageSize] = createState<
     Readonly<{ width: number; height: number }> | undefined
   >(undefined);
 
-  const [drag, setDrag] = React.useState<SplitterRect | undefined>(undefined);
+  const [drag$, setDrag] = createState<SplitterRect | undefined>(undefined);
 
   /**
    * The pane being dragged somewhere else, and where it would land.
    *
    * `target` is recomputed on every pointer move but replaced only when it
-   * names a different pane or a different side, so crossing a pane costs one
-   * render rather than one per pixel.
+   * names a different pane or a different side, so crossing a pane is one
+   * update rather than one per pixel.
    */
-  const [move, setMove] = React.useState<PaneMove | undefined>(undefined);
+  const [move$, setMove, { updateState: updateMove }] = createState<
+    PaneMove | undefined
+  >(undefined);
 
   /**
    * Whether the header-stripping rule is in place. `false` means every site
    * that refuses to be framed will refuse in a pane too, so it is worth saying
    * out loud rather than leaving as a pane that mysteriously stays blank.
    */
-  const [headerRuleActive, setHeaderRuleActive] = React.useState(true);
+  const [headerRuleActive$, setHeaderRuleActive] = createState(true);
 
   /**
    * Whether the extension may act on the sites at all. Chrome's per-extension
@@ -225,9 +205,11 @@ export const App = memoNamed('App', () => {
    * anything — which is indistinguishable from a broken rule until you look
    * here.
    */
-  const [hostAccessGranted, setHostAccessGranted] = React.useState(true);
+  const [hostAccessGranted$, setHostAccessGranted] = createState(true);
 
-  const stageRef = React.useRef<HTMLDivElement | null>(null);
+  const mut_stage: { element: HTMLDivElement | undefined } = {
+    element: undefined,
+  };
 
   /**
    * Re-asserts the header-stripping rule for whichever tab this page is in
@@ -235,7 +217,7 @@ export const App = memoNamed('App', () => {
    * and restored tab comes back with a different one, and a rule bound to the
    * old id matches nothing.
    */
-  const ensureRule = React.useCallback(async (): Promise<void> => {
+  const ensureRule = async (): Promise<void> => {
     setHostAccessGranted(
       await chrome.permissions.contains({ origins: ['<all_urls>'] }),
     );
@@ -263,7 +245,7 @@ export const App = memoNamed('App', () => {
     setHeaderRuleActive(
       initiatorRuleActive && (await ensureHeaderRule(tab.id)),
     );
-  }, []);
+  };
 
   /**
    * Records what this tab is, for "open every split view" to read back: which
@@ -275,8 +257,8 @@ export const App = memoNamed('App', () => {
    * needs no permission for this much: `pinned` is not one of the fields the
    * `tabs` permission guards, which are the URL, the title and the icon.
    */
-  const noteThisTab = React.useCallback(async (): Promise<void> => {
-    const { workspaceId } = mut_liveSession.current;
+  const noteThisTab = async (): Promise<void> => {
+    const { workspaceId } = session$.getSnapshot().value;
 
     if (workspaceId === undefined) {
       return;
@@ -292,110 +274,122 @@ export const App = memoNamed('App', () => {
 
     commitRegistry(
       setWorkspaceEntryPinned(
-        mut_liveRegistry.current,
+        registry$.getSnapshot().value,
         workspaceId,
         tab.pinned,
       ),
     );
-  }, [commitRegistry]);
+  };
 
-  const handleRequestHostAccess = React.useCallback((): void => {
-    const request = async (): Promise<void> => {
-      // Withheld host permissions can be asked for again, from a user gesture.
-      // If Chrome refuses — an enterprise policy does not negotiate — the
-      // toolbar keeps saying so.
-      await chrome.permissions.request({ origins: ['<all_urls>'] });
+  const requestHostAccess = async (): Promise<void> => {
+    // Withheld host permissions can be asked for again, from a user gesture.
+    // If Chrome refuses — an enterprise policy does not negotiate — the toolbar
+    // keeps saying so.
+    await chrome.permissions.request({ origins: ['<all_urls>'] });
 
-      await ensureRule();
-    };
+    await ensureRule();
+  };
 
-    request().catch(console.error);
-  }, [ensureRule]);
+  const handleRequestHostAccess = (): void => {
+    requestHostAccess().catch(console.error);
+  };
 
   /** Origins whose service workers a pane removes without being asked. */
-  const [resetOrigins, setResetOrigins] = React.useState<readonly string[]>([]);
+  const [resetOrigins$, setResetOrigins] = createState<readonly string[]>([]);
 
   // Another tab's toggle has to reach this one's panes too: read once, the list
   // stayed as it was here until this tab was reloaded.
-  React.useEffect(() => watchServiceWorkerResetOrigins(setResetOrigins), []);
+  onScopeDispose(watchServiceWorkerResetOrigins(setResetOrigins));
 
-  const handleToggleResetOrigin = React.useCallback(
-    (siteOrigin: string, enabled: boolean): void => {
-      const toggle = async (): Promise<void> => {
-        setResetOrigins(await setServiceWorkerResetOrigin(siteOrigin, enabled));
-      };
+  const handleToggleResetOrigin = (
+    siteOrigin: string,
+    enabled: boolean,
+  ): void => {
+    const toggle = async (): Promise<void> => {
+      setResetOrigins(await setServiceWorkerResetOrigin(siteOrigin, enabled));
+    };
 
-      toggle().catch(console.error);
-    },
-    [],
-  );
+    toggle().catch(console.error);
+  };
 
-  const [diagnostics, setDiagnostics] = React.useState<string | undefined>(
+  const [diagnostics$, setDiagnostics] = createState<string | undefined>(
     undefined,
   );
 
-  const handleCollectDiagnostics = React.useCallback((): void => {
-    const collect = async (): Promise<void> => {
-      const tab = await chrome.tabs.getCurrent();
+  const collectDiagnostics = async (): Promise<void> => {
+    const tab = await chrome.tabs.getCurrent();
 
-      const paneUrls = state.panes
-        .map((pane) => pane.currentUrl ?? pane.url)
-        .filter((url) => url !== '');
+    const paneUrls = session$
+      .getSnapshot()
+      .value.state.panes.map((pane) => pane.currentUrl ?? pane.url)
+      .filter((url) => url !== '');
 
-      setDiagnostics(await readRuleDiagnostics(tab?.id, paneUrls));
-    };
+    setDiagnostics(await readRuleDiagnostics(tab?.id, paneUrls));
+  };
 
-    collect().catch((error: unknown) => {
+  const handleCollectDiagnostics = (): void => {
+    collectDiagnostics().catch((error: unknown) => {
       setDiagnostics(unknownToString(error));
     });
-  }, [state.panes]);
+  };
 
-  React.useEffect(() => {
-    const initialize = async (): Promise<void> => {
-      await ensureRule();
+  /**
+   * Counts the writes of the session that wait on storage (a switch, an
+   * import's reload), so that only the last one asked for lands; and how many
+   * switches are still loading.
+   */
+  const mut_switches: { requested: number; loading: number } = {
+    requested: 0,
+    loading: 0,
+  };
 
-      // The URL says which split view this tab shows, and may say what it
-      // shows. `?ws=` wins where there is one — it is what a reload, a restored
-      // session and a bookmark carry — and the list's `activeId` answers when
-      // there is not, which is the toolbar button's case. A URL that describes
-      // a view without naming one is a new split view, as `+` makes one: it
-      // gets an id of its own and a place on the list.
-      const request = readWorkspaceUrl();
+  const initialize = async (): Promise<void> => {
+    await ensureRule();
 
-      const resolved = await resolveWorkspace(
-        {
-          workspaceId:
-            request.workspaceId ??
-            (request.state === undefined ? undefined : crypto.randomUUID()),
-          name: request.name,
-        },
-        Date.now(),
-        document.visibilityState === 'visible',
-      );
+    // The URL says which split view this tab shows, and may say what it shows.
+    // `?ws=` wins where there is one — it is what a reload, a restored session
+    // and a bookmark carry — and the list's `activeId` answers when there is
+    // not, which is the toolbar button's case. A URL that describes a view
+    // without naming one is a new split view, as `+` makes one: it gets an id
+    // of its own and a place on the list.
+    const request = readWorkspaceUrl();
 
-      // A view the URL describes is shown over the one saved under that id:
-      // the URL is written from the view whenever the view is saved, so on a
-      // reload the two agree, and where they differ the URL is a link that was
-      // made to show something.
-      const shown =
-        request.state ??
-        sessionStateOf(await loadWorkspaceState(resolved.workspaceId));
+    const resolved = await resolveWorkspace(
+      {
+        workspaceId:
+          request.workspaceId ??
+          (request.state === undefined ? undefined : crypto.randomUUID()),
+        name: request.name,
+      },
+      Date.now(),
+      document.visibilityState === 'visible',
+    );
 
+    // A view the URL describes is shown over the one saved under that id: the
+    // URL is written from the view whenever the view is saved, so on a reload
+    // the two agree, and where they differ the URL is a link that was made to
+    // show something.
+    const shown =
+      request.state ??
+      sessionStateOf(await loadWorkspaceState(resolved.workspaceId));
+
+    commitRegistry(resolved.registry);
+
+    // A Back pressed while this loaded has already asked for what to show.
+    if (mut_switches.requested === 0) {
       putWorkspaceInUrl(resolved.workspaceId, shown, 'replace');
 
-      commitRegistry(resolved.registry);
-
       setSession({ workspaceId: resolved.workspaceId, state: shown });
+    }
 
-      setResetOrigins(await loadServiceWorkerResetOrigins());
+    setResetOrigins(await loadServiceWorkerResetOrigins());
 
-      await pruneUnlistedWorkspaces(
-        resolved.registry.entries.map((entry) => entry.id),
-      );
-    };
+    await pruneUnlistedWorkspaces(
+      resolved.registry.entries.map((entry) => entry.id),
+    );
+  };
 
-    initialize().catch(console.error);
-  }, [ensureRule, commitRegistry]);
+  initialize().catch(console.error);
 
   /**
    * Shows another saved split view in this tab.
@@ -405,49 +399,83 @@ export const App = memoNamed('App', () => {
    * is `false` for exactly one caller — the one that has just deleted the
    * workspace being left, where saving it would write the record back.
    */
-  const switchWorkspace = React.useCallback(
-    (
-      workspaceId: string,
-      options: Readonly<{
-        history: 'none' | 'push' | 'replace';
-        saveCurrent: boolean;
-      }>,
-    ): void => {
-      const run = async (): Promise<void> => {
-        const live = mut_liveSession.current;
+  const showWorkspace = async (
+    workspaceId: string,
+    options: SwitchOptions,
+  ): Promise<void> => {
+    mut_switches.requested += 1;
 
-        if (live.workspaceId === workspaceId) {
-          return;
+    const request = mut_switches.requested;
+
+    const live = session$.getSnapshot().value;
+
+    if (live.workspaceId === workspaceId) {
+      // Back to the one on screen while another loads: that one is dropped
+      // below, and the URL, which a Back may have moved to it, comes back too.
+      if (mut_switches.loading > 0 && options.history !== 'none') {
+        putWorkspaceInUrl(workspaceId, live.state, options.history);
+      }
+
+      return;
+    }
+
+    mut_switches.loading += 1;
+
+    const shown = await (async () => {
+      try {
+        if (options.saveCurrent) {
+          await saveShown();
         }
 
-        if (options.saveCurrent && live.workspaceId !== undefined) {
-          await saveWorkspaceState(live.workspaceId, live.state);
-        }
+        return sessionStateOf(await loadWorkspaceState(workspaceId));
+      } finally {
+        mut_switches.loading -= 1;
+      }
+    })();
 
-        const shown = sessionStateOf(await loadWorkspaceState(workspaceId));
+    // A later switch was asked for while this one loaded — from the select,
+    // Alt+N or Back — and the last one asked for is the one to show, however
+    // the loads finish.
+    if (request !== mut_switches.requested) {
+      return;
+    }
 
-        setSession({ workspaceId, state: shown });
+    setSession({ workspaceId, state: shown });
 
-        if (options.history !== 'none') {
-          putWorkspaceInUrl(workspaceId, shown, options.history);
-        }
+    if (options.history !== 'none') {
+      putWorkspaceInUrl(workspaceId, shown, options.history);
+    }
 
-        commitRegistry(
-          activateWorkspaceEntry(mut_liveRegistry.current, workspaceId),
-        );
-      };
+    commitRegistry(
+      activateWorkspaceEntry(registry$.getSnapshot().value, workspaceId),
+    );
+  };
 
-      run().catch(console.error);
-    },
-    [commitRegistry],
-  );
+  const switchWorkspace = (
+    workspaceId: string,
+    options: SwitchOptions,
+  ): void => {
+    showWorkspace(workspaceId, options).catch(console.error);
+  };
 
-  const handleSwitchWorkspace = React.useCallback(
-    (workspaceId: string): void => {
-      switchWorkspace(workspaceId, { history: 'push', saveCurrent: true });
-    },
-    [switchWorkspace],
-  );
+  /** Writes the layout on screen, for whatever reads storage next. */
+  const saveShown = async (): Promise<void> => {
+    const live = session$.getSnapshot().value;
+
+    if (live.workspaceId !== undefined && isListed(live.workspaceId)) {
+      await saveWorkspaceState(live.workspaceId, live.state);
+    }
+  };
+
+  /**
+   * Whether the list still has `workspaceId`. A deleted one stays on screen
+   * until the switch away from it lands, and whatever saves it meanwhile — the
+   * debounce, `pagehide` — would write its record back.
+   */
+  const isListed = (workspaceId: string): boolean =>
+    registry$
+      .getSnapshot()
+      .value.entries.some((entry) => entry.id === workspaceId);
 
   /**
    * Adds a split view and opens it in a tab of its own.
@@ -457,90 +485,76 @@ export const App = memoNamed('App', () => {
    * new page reads it on load, and one that did not find the entry yet would
    * add its own under a name of its choosing.
    */
-  const handleCreateWorkspace = React.useCallback((): void => {
-    const create = async (): Promise<void> => {
-      const workspaceId = crypto.randomUUID();
+  const createWorkspace = async (): Promise<void> => {
+    const workspaceId = crypto.randomUUID();
 
-      const next = addWorkspaceEntry(mut_liveRegistry.current, {
-        id: workspaceId,
-        name: nextWorkspaceName(mut_liveRegistry.current),
-        createdAt: Date.now(),
-        pinned: false,
-      });
+    const current = registry$.getSnapshot().value;
 
-      mut_liveRegistry.current = next;
+    const next = addWorkspaceEntry(current, {
+      id: workspaceId,
+      name: nextWorkspaceName(current),
+      createdAt: Date.now(),
+      pinned: false,
+    });
 
-      setRegistry(next);
+    setRegistry(next);
 
-      await saveWorkspaceRegistry(next);
+    await saveWorkspaceRegistry(next);
+
+    await openWorkspaceInNewTab(workspaceId);
+  };
+
+  const handleCreateWorkspace = (): void => {
+    createWorkspace().catch(console.error);
+  };
+
+  const handleOpenWorkspaceInNewTab = (workspaceId: string): void => {
+    const openTab = async (): Promise<void> => {
+      // The layout on screen is written first, so that a second tab opened on
+      // the workspace being shown starts from what is on screen.
+      await saveShown();
 
       await openWorkspaceInNewTab(workspaceId);
     };
 
-    create().catch(console.error);
-  }, []);
+    openTab().catch(console.error);
+  };
 
-  const handleOpenWorkspaceInNewTab = React.useCallback(
-    (workspaceId: string): void => {
-      const openTab = async (): Promise<void> => {
-        // The layout on screen is written first, so that a second tab opened on
-        // the workspace being shown starts from what is on screen.
-        const live = mut_liveSession.current;
+  const openAllWorkspaces = async (): Promise<void> => {
+    // As above: what is on screen is written first, so that the tab opened on
+    // this workspace — if this one is not the tab it ends up in — starts from
+    // what is on screen rather than from the last save.
+    await saveShown();
 
-        if (live.workspaceId !== undefined) {
-          await saveWorkspaceState(live.workspaceId, live.state);
-        }
+    showNotice(
+      describeOpenedWorkspaces(
+        await openEveryWorkspaceInTabs(registry$.getSnapshot().value.entries),
+      ),
+    );
+  };
 
-        await openWorkspaceInNewTab(workspaceId);
-      };
+  const handleOpenAllWorkspaces = (): void => {
+    openAllWorkspaces().catch(console.error);
+  };
 
-      openTab().catch(console.error);
-    },
-    [],
-  );
+  const handleRenameWorkspace = (
+    workspaceId: string,
+    workspaceName: string,
+  ): void => {
+    commitRegistry(
+      renameWorkspaceEntry(
+        registry$.getSnapshot().value,
+        workspaceId,
+        workspaceName,
+      ),
+    );
+  };
 
-  const handleOpenAllWorkspaces = React.useCallback((): void => {
-    const openAll = async (): Promise<void> => {
-      // As above: what is on screen is written first, so that the tab opened on
-      // this workspace — if this one is not the tab it ends up in — starts from
-      // what is on screen rather than from the last save.
-      const live = mut_liveSession.current;
-
-      if (live.workspaceId !== undefined) {
-        await saveWorkspaceState(live.workspaceId, live.state);
-      }
-
-      setNotice(
-        describeOpenedWorkspaces(
-          await openEveryWorkspaceInTabs(mut_liveRegistry.current.entries),
-        ),
-      );
-    };
-
-    openAll().catch(console.error);
-  }, []);
-
-  const handleRenameWorkspace = React.useCallback(
-    (workspaceId: string, workspaceName: string): void => {
-      commitRegistry(
-        renameWorkspaceEntry(
-          mut_liveRegistry.current,
-          workspaceId,
-          workspaceName,
-        ),
-      );
-    },
-    [commitRegistry],
-  );
-
-  const handleMoveWorkspace = React.useCallback(
-    (workspaceId: string, offset: number): void => {
-      commitRegistry(
-        moveWorkspaceEntry(mut_liveRegistry.current, workspaceId, offset),
-      );
-    },
-    [commitRegistry],
-  );
+  const handleMoveWorkspace = (workspaceId: string, offset: number): void => {
+    commitRegistry(
+      moveWorkspaceEntry(registry$.getSnapshot().value, workspaceId, offset),
+    );
+  };
 
   /**
    * Deletes a saved split view, layout and all.
@@ -551,127 +565,108 @@ export const App = memoNamed('App', () => {
    * Deleting the last one leaves nothing to show, so a fresh empty workspace
    * takes its place — which is also how the list is reset.
    */
-  const handleRemoveWorkspace = React.useCallback(
-    (workspaceId: string): void => {
-      const remove = async (): Promise<void> => {
-        const without = removeWorkspaceEntry(
-          mut_liveRegistry.current,
-          workspaceId,
+  const handleRemoveWorkspace = (workspaceId: string): void => {
+    const remove = async (): Promise<void> => {
+      const without = removeWorkspaceEntry(
+        registry$.getSnapshot().value,
+        workspaceId,
+      );
+
+      // Off the list before the record goes, so that no save writes it back.
+      commitRegistry(without);
+
+      clearTimeout(mut_timers.save);
+
+      await removeWorkspaceState(workspaceId);
+
+      if (without.activeId === undefined) {
+        const replacement = crypto.randomUUID();
+
+        commitRegistry(
+          addWorkspaceEntry(without, {
+            id: replacement,
+            name: nextWorkspaceName(without),
+            createdAt: Date.now(),
+            pinned: false,
+          }),
         );
 
-        await removeWorkspaceState(workspaceId);
+        switchWorkspace(replacement, {
+          history: 'replace',
+          saveCurrent: false,
+        });
 
-        if (without.activeId === undefined) {
-          const replacement = crypto.randomUUID();
-
-          commitRegistry(
-            addWorkspaceEntry(without, {
-              id: replacement,
-              name: nextWorkspaceName(without),
-              createdAt: Date.now(),
-              pinned: false,
-            }),
-          );
-
-          switchWorkspace(replacement, {
-            history: 'replace',
-            saveCurrent: false,
-          });
-
-          return;
-        }
-
-        commitRegistry(without);
-
-        if (mut_liveSession.current.workspaceId === workspaceId) {
-          switchWorkspace(without.activeId, {
-            history: 'replace',
-            saveCurrent: false,
-          });
-        }
-      };
-
-      remove().catch(console.error);
-    },
-    [commitRegistry, switchWorkspace],
-  );
-
-  const handleExportWorkspaces = React.useCallback((): void => {
-    const write = async (): Promise<void> => {
-      // The export reads storage, and the layout on screen may not be in it
-      // yet.
-      const live = mut_liveSession.current;
-
-      if (live.workspaceId !== undefined) {
-        await saveWorkspaceState(live.workspaceId, live.state);
+        return;
       }
 
-      downloadJsonFile(
-        'split-views.json',
-        await exportWorkspacesAsJson(mut_liveRegistry.current),
+      if (session$.getSnapshot().value.workspaceId === workspaceId) {
+        switchWorkspace(without.activeId, {
+          history: 'replace',
+          saveCurrent: false,
+        });
+      }
+    };
+
+    remove().catch(console.error);
+  };
+
+  const exportWorkspaces = async (): Promise<void> => {
+    // The export reads storage, and the layout on screen may not be in it yet.
+    await saveShown();
+
+    downloadJsonFile(
+      'split-views.json',
+      await exportWorkspacesAsJson(registry$.getSnapshot().value),
+    );
+  };
+
+  const handleExportWorkspaces = (): void => {
+    exportWorkspaces().catch(console.error);
+  };
+
+  const handleImportWorkspaces = (text: string): void => {
+    const read = async (): Promise<void> => {
+      const result = await importWorkspacesFromJson(
+        registry$.getSnapshot().value,
+        text,
+        Date.now(),
       );
+
+      if (result === undefined) {
+        showNotice('Could not import: that is not a backup');
+
+        return;
+      }
+
+      commitRegistry(result.registry);
+
+      showNotice(
+        `Imported ${(result.added + result.replaced).toString()} (${result.added.toString()} new, ${result.replaced.toString()} replaced)`,
+      );
+
+      // The workspace on screen is one of the ones that may have just been
+      // overwritten in storage.
+      const { workspaceId } = session$.getSnapshot().value;
+
+      if (workspaceId === undefined) {
+        return;
+      }
+
+      mut_switches.requested += 1;
+
+      const request = mut_switches.requested;
+
+      const restored = await loadWorkspaceState(workspaceId);
+
+      // A switch asked for meanwhile shows its own split view, read after the
+      // import wrote it.
+      if (restored !== undefined && request === mut_switches.requested) {
+        setSession({ workspaceId, state: reconcileWorkspace(restored) });
+      }
     };
 
-    write().catch(console.error);
-  }, []);
-
-  const handleImportWorkspaces = React.useCallback(
-    (text: string): void => {
-      const read = async (): Promise<void> => {
-        const result = await importWorkspacesFromJson(
-          mut_liveRegistry.current,
-          text,
-          Date.now(),
-        );
-
-        if (result === undefined) {
-          setNotice('Could not import: that is not a backup');
-
-          return;
-        }
-
-        commitRegistry(result.registry);
-
-        setNotice(
-          `Imported ${(result.added + result.replaced).toString()} (${result.added.toString()} new, ${result.replaced.toString()} replaced)`,
-        );
-
-        // The workspace on screen is one of the ones that may have just been
-        // overwritten in storage.
-        const live = mut_liveSession.current;
-
-        if (live.workspaceId === undefined) {
-          return;
-        }
-
-        const restored = await loadWorkspaceState(live.workspaceId);
-
-        if (restored !== undefined) {
-          setSession({
-            workspaceId: live.workspaceId,
-            state: reconcileWorkspace(restored),
-          });
-        }
-      };
-
-      read().catch(console.error);
-    },
-    [commitRegistry],
-  );
-
-  React.useEffect(() => {
-    if (notice === undefined) {
-      return undefined;
-    }
-
-    const timer = setTimeout(() => {
-      setNotice(undefined);
-    }, noticeMs);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [notice]);
+    read().catch(console.error);
+  };
 
   /**
    * `Alt+1..9` selects the split view at that position in the list.
@@ -680,98 +675,87 @@ export const App = memoNamed('App', () => {
    * focus is inside a pane most of the time: this page's own `keydown`, and the
    * same key forwarded by the content script from whichever pane had the focus.
    */
-  React.useEffect(() => {
-    const switchToPosition = (code: string): void => {
-      const position = workspacePositionFromCode(code);
+  const switchToPosition = (code: string): void => {
+    const position = workspacePositionFromCode(code);
 
-      const entry =
-        position === undefined
-          ? undefined
-          : workspaceAtPosition(mut_liveRegistry.current, position);
+    const entry =
+      position === undefined
+        ? undefined
+        : workspaceAtPosition(registry$.getSnapshot().value, position);
 
-      if (entry !== undefined) {
-        switchWorkspace(entry.id, { history: 'push', saveCurrent: true });
-      }
-    };
+    if (entry !== undefined) {
+      switchWorkspace(entry.id, { history: 'push', saveCurrent: true });
+    }
+  };
 
-    const onKeyDown = (keyboardEvent: ShortcutKeyEvent): void => {
-      const code = workspaceShortcutCodeOf(keyboardEvent);
+  listenInScope(globalThis, 'keydown', (keyboardEvent) => {
+    if (!(keyboardEvent instanceof KeyboardEvent)) {
+      return;
+    }
 
-      if (code === undefined) {
-        return;
-      }
+    const code = workspaceShortcutCodeOf(keyboardEvent);
 
-      keyboardEvent.preventDefault();
+    if (code === undefined) {
+      return;
+    }
 
-      switchToPosition(code);
-    };
+    keyboardEvent.preventDefault();
 
-    const onMessage = (messageEvent: IncomingMessageEvent): void => {
-      const message = asFrameToPageMessage(messageEvent.data);
+    switchToPosition(code);
+  });
 
-      if (message?.kind === 'shortcut') {
-        switchToPosition(message.code);
-      }
-    };
+  listenInScope(globalThis, 'message', (messageEvent) => {
+    if (!(messageEvent instanceof MessageEvent)) {
+      return;
+    }
 
-    addEventListener('keydown', onKeyDown);
+    const message = asFrameToPageMessage(messageEvent.data);
 
-    addEventListener('message', onMessage);
-
-    return () => {
-      removeEventListener('keydown', onKeyDown);
-
-      removeEventListener('message', onMessage);
-    };
-  }, [switchWorkspace]);
+    if (message?.kind === 'shortcut') {
+      switchToPosition(message.code);
+    }
+  });
 
   // Switching pushes a history entry, so the browser's Back button walks back
   // through the split views visited in this tab.
-  React.useEffect(() => {
-    const onPopState = (): void => {
-      const workspaceId = workspaceIdFromUrl();
+  listenInScope(globalThis, 'popstate', () => {
+    const workspaceId = workspaceIdFromUrl();
 
-      if (workspaceId !== undefined) {
-        switchWorkspace(workspaceId, { history: 'none', saveCurrent: true });
-      }
-    };
-
-    addEventListener('popstate', onPopState);
-
-    return () => {
-      removeEventListener('popstate', onPopState);
-    };
-  }, [switchWorkspace]);
+    if (workspaceId !== undefined) {
+      switchWorkspace(workspaceId, { history: 'none', saveCurrent: true });
+    }
+  });
 
   // The tab's own title and favicon, so that a window of split views can be
   // told apart in the tab strip. Worked out first and applied only when it
   // changes: the view changes on every pointer move of a splitter drag, and the
   // favicon is drawn on a canvas.
-  const tabIdentity = React.useMemo(() => {
-    const { workspaceId: shown, state: shownState } = session;
+  subscribeInScope(
+    derive(
+      [registry$, session$],
+      (registry, { workspaceId: shown, state: shownState }) => {
+        if (shown === undefined) {
+          return undefined;
+        }
 
-    if (shown === undefined) {
-      return undefined;
-    }
+        const entry = workspaceEntryOf(registry, shown);
 
-    const entry = workspaceEntryOf(registry, shown);
+        const position = workspacePositionOf(registry, shown);
 
-    const position = workspacePositionOf(registry, shown);
-
-    return entry === undefined || position === undefined
-      ? undefined
-      : { position, label: tabLabelOf(shownState, entry.name) };
-  }, [registry, session]);
-
-  const tabPosition = tabIdentity?.position;
-
-  const tabLabel = tabIdentity?.label;
-
-  React.useEffect(() => {
-    if (tabPosition !== undefined && tabLabel !== undefined) {
-      applyTabIdentity(tabPosition, tabLabel);
-    }
-  }, [tabPosition, tabLabel]);
+        return entry === undefined || position === undefined
+          ? undefined
+          : { position, label: tabLabelOf(shownState, entry.name) };
+      },
+      {
+        equals: (a, b) => a?.position === b?.position && a?.label === b?.label,
+      },
+    ),
+    (tabIdentity) => {
+      if (tabIdentity !== undefined) {
+        applyTabIdentity(tabIdentity.position, tabIdentity.label);
+      }
+    },
+  );
 
   /**
    * When the tab's own notes are taken.
@@ -786,55 +770,41 @@ export const App = memoNamed('App', () => {
    * then left alone. The timer is the backstop for the rest — the focus can be
    * inside a pane, where neither event reaches this page.
    */
-  React.useEffect(() => {
-    const note = (): void => {
-      noteThisTab().catch(console.error);
-    };
+  const note = (): void => {
+    noteThisTab().catch(console.error);
+  };
 
-    note();
+  subscribeInScope(session$.pipe(map((session) => session.workspaceId)), note);
 
-    addEventListener('visibilitychange', note);
+  listenInScope(globalThis, 'visibilitychange', note);
 
-    addEventListener('blur', note);
+  listenInScope(globalThis, 'blur', note);
 
-    const timer = setInterval(note, tabNoteIntervalMs);
+  const noteTimer = setInterval(note, tabNoteIntervalMs);
 
-    return () => {
-      removeEventListener('visibilitychange', note);
-
-      removeEventListener('blur', note);
-
-      clearInterval(timer);
-    };
-  }, [noteThisTab, session.workspaceId]);
+  onScopeDispose(() => {
+    clearInterval(noteTimer);
+  });
 
   // Coming back to the tab is the moment a discarded-and-restored tab id would
   // have changed under us. It is also what makes this split view the one the
   // toolbar button and a `split.html` with no `?ws=` go back to, which a tab
   // that loaded behind another has not claimed yet.
-  React.useEffect(() => {
-    const onVisible = (): void => {
-      if (document.visibilityState !== 'visible') {
-        return;
-      }
+  listenInScope(globalThis, 'visibilitychange', () => {
+    if (document.visibilityState !== 'visible') {
+      return;
+    }
 
-      ensureRule().catch(console.error);
+    ensureRule().catch(console.error);
 
-      const { workspaceId } = mut_liveSession.current;
+    const { workspaceId } = session$.getSnapshot().value;
 
-      if (workspaceId !== undefined) {
-        commitRegistry(
-          activateWorkspaceEntry(mut_liveRegistry.current, workspaceId),
-        );
-      }
-    };
-
-    addEventListener('visibilitychange', onVisible);
-
-    return () => {
-      removeEventListener('visibilitychange', onVisible);
-    };
-  }, [ensureRule, commitRegistry]);
+    if (workspaceId !== undefined) {
+      commitRegistry(
+        activateWorkspaceEntry(registry$.getSnapshot().value, workspaceId),
+      );
+    }
+  });
 
   // Saving is debounced because a splitter drag changes the state on every
   // pointer move; `pagehide` is what covers a tab closed inside the window.
@@ -842,114 +812,87 @@ export const App = memoNamed('App', () => {
   // The URL is written at the same moment as storage, and only then: it is the
   // same snapshot, so a reload finds the two in agreement, and the browser
   // throttles a page that rewrites its history entry on every pointer move.
-  React.useEffect(() => {
-    const { workspaceId: saveTo, state: toSave } = session;
+  subscribeInScope(session$, ({ workspaceId: saveTo, state: toSave }) => {
+    clearTimeout(mut_timers.save);
 
-    if (saveTo === undefined) {
-      return undefined;
-    }
+    mut_timers.save =
+      saveTo === undefined
+        ? undefined
+        : setTimeout(() => {
+            if (!isListed(saveTo)) {
+              return;
+            }
 
-    const save = (): void => {
-      saveWorkspaceState(saveTo, toSave).catch(console.error);
-    };
+            saveWorkspaceState(saveTo, toSave).catch(console.error);
 
-    const timer = setTimeout(() => {
-      save();
+            putWorkspaceInUrl(saveTo, toSave, 'replace');
+          }, saveDebounceMs);
+  });
 
-      putWorkspaceInUrl(saveTo, toSave, 'replace');
-    }, saveDebounceMs);
-
-    addEventListener('pagehide', save);
-
-    return () => {
-      clearTimeout(timer);
-
-      removeEventListener('pagehide', save);
-    };
-  }, [session]);
-
-  React.useEffect(() => {
-    const element = stageRef.current;
-
-    if (element === null) {
-      return undefined;
-    }
-
-    const observer = new ResizeObserver(() => {
-      setStageSize({
-        width: element.clientWidth,
-        height: element.clientHeight,
-      });
-    });
-
-    observer.observe(element);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  listenInScope(globalThis, 'pagehide', () => {
+    saveShown().catch(console.error);
+  });
 
   // A drag is followed on `window` rather than on the divider, and the panes
   // stop taking pointer events while it lasts: a pointer over an `iframe` is
   // the frame's, not ours.
-  React.useEffect(() => {
-    const element = stageRef.current;
+  listenInScope(globalThis, 'pointermove', (pointerEvent) => {
+    const drag = drag$.getSnapshot().value;
 
-    if (drag === undefined || element === null) {
-      return undefined;
+    const element = mut_stage.element;
+
+    if (
+      drag === undefined ||
+      element === undefined ||
+      !(pointerEvent instanceof PointerEvent)
+    ) {
+      return;
     }
 
-    const onMove = (pointerEvent: PointerEvent): void => {
-      const stageBounds = element.getBoundingClientRect();
+    const stageBounds = element.getBoundingClientRect();
 
-      const ratio = ratioFromPointer(
-        drag,
-        pointerEvent.clientX - stageBounds.left,
-        pointerEvent.clientY - stageBounds.top,
-      );
+    const ratio = ratioFromPointer(
+      drag,
+      pointerEvent.clientX - stageBounds.left,
+      pointerEvent.clientY - stageBounds.top,
+    );
 
-      if (ratio === undefined) {
-        return;
-      }
+    if (ratio === undefined) {
+      return;
+    }
 
-      if (drag.fixed === undefined) {
-        dispatch({ type: 'set-ratio', path: drag.path, ratio });
+    if (drag.fixed === undefined) {
+      dispatch({ type: 'set-ratio', path: drag.path, ratio });
 
-        return;
-      }
+      return;
+    }
 
-      dispatch({
-        type: 'set-fixed-px',
-        path: drag.path,
-        px: fixedPxFromRatio(drag, drag.fixed, ratio),
-      });
-    };
+    dispatch({
+      type: 'set-fixed-px',
+      path: drag.path,
+      px: fixedPxFromRatio(drag, drag.fixed, ratio),
+    });
+  });
 
-    const onRelease = (): void => {
+  const endDrag = (): void => {
+    if (drag$.getSnapshot().value !== undefined) {
       setDrag(undefined);
-    };
+    }
+  };
 
-    addEventListener('pointermove', onMove);
+  listenInScope(globalThis, 'pointerup', endDrag);
 
-    addEventListener('pointerup', onRelease);
+  listenInScope(globalThis, 'pointercancel', endDrag);
 
-    addEventListener('pointercancel', onRelease);
+  const stateRoot$ = session$.pipe(map((session) => session.state.root));
 
-    return () => {
-      removeEventListener('pointermove', onMove);
-
-      removeEventListener('pointerup', onRelease);
-
-      removeEventListener('pointercancel', onRelease);
-    };
-  }, [drag, dispatch]);
-
-  const geometry = React.useMemo<LayoutGeometry | undefined>(
-    () =>
+  const geometry$ = derive(
+    [stateRoot$, stageSize$],
+    (root, stageSize): LayoutGeometry | undefined =>
       stageSize === undefined
         ? undefined
         : computeGeometry(
-            state.root,
+            root,
             {
               left: 0,
               top: 0,
@@ -958,12 +901,7 @@ export const App = memoNamed('App', () => {
             },
             gutterPx,
           ),
-    [state.root, stageSize],
   );
-
-  const handleMoveStart = React.useCallback((paneId: PaneId): void => {
-    setMove({ paneId, target: undefined });
-  }, []);
 
   /**
    * Follows a pane being dragged, and drops it.
@@ -973,174 +911,195 @@ export const App = memoNamed('App', () => {
    * pointer over an `iframe`, which belongs to the framed site. The stage turns
    * pointer events off for the frames while this is going on.
    */
-  React.useEffect(() => {
-    const element = stageRef.current;
+  const moveTargetAt = (
+    pointerEvent: Event,
+  ):
+    | Readonly<{ paneId: PaneId; target: PaneDropTarget | undefined }>
+    | undefined => {
+    const move = move$.getSnapshot().value;
 
-    const movedPaneId = move?.paneId;
+    const geometry = geometry$.getSnapshot().value;
+
+    const element = mut_stage.element;
 
     if (
-      movedPaneId === undefined ||
-      element === null ||
-      geometry === undefined
+      move === undefined ||
+      geometry === undefined ||
+      element === undefined ||
+      !(pointerEvent instanceof PointerEvent)
     ) {
       return undefined;
     }
 
-    const targetAt = (
-      pointerEvent: PointerEvent,
-    ): PaneDropTarget | undefined => {
-      const stageBounds = element.getBoundingClientRect();
+    const stageBounds = element.getBoundingClientRect();
 
-      return dropTargetAt(
+    return {
+      paneId: move.paneId,
+      target: dropTargetAt(
         geometry,
         {
           x: pointerEvent.clientX - stageBounds.left,
           y: pointerEvent.clientY - stageBounds.top,
         },
-        movedPaneId,
-      );
-    };
-
-    const onMove = (pointerEvent: PointerEvent): void => {
-      const target = targetAt(pointerEvent);
-
-      setMove((current) =>
-        current === undefined || isSameDropTarget(current.target, target)
-          ? current
-          : { ...current, target },
-      );
-    };
-
-    const onRelease = (pointerEvent: PointerEvent): void => {
-      const target = targetAt(pointerEvent);
-
-      setMove(undefined);
-
-      if (target !== undefined) {
-        dispatch({
-          type: 'move-pane',
-          paneId: movedPaneId,
-          targetPaneId: target.paneId,
-          zone: target.zone,
-        });
-      }
-    };
-
-    const onAbandon = (): void => {
-      setMove(undefined);
-    };
-
-    const onKeyDown = (keyboardEvent: Readonly<{ key: string }>): void => {
-      if (keyboardEvent.key === 'Escape') {
-        setMove(undefined);
-      }
-    };
-
-    addEventListener('pointermove', onMove);
-
-    addEventListener('pointerup', onRelease);
-
-    addEventListener('pointercancel', onAbandon);
-
-    addEventListener('keydown', onKeyDown);
-
-    return () => {
-      removeEventListener('pointermove', onMove);
-
-      removeEventListener('pointerup', onRelease);
-
-      removeEventListener('pointercancel', onAbandon);
-
-      removeEventListener('keydown', onKeyDown);
-    };
-  }, [move?.paneId, geometry, dispatch]);
-
-  const paneRects = React.useMemo<ReadonlyMap<PaneId, Rect>>(
-    () =>
-      new Map(
-        (geometry?.panes ?? []).map(
-          (entry) => [entry.paneId, entry.rect] as const,
-        ),
+        move.paneId,
       ),
-    [geometry],
-  );
+    };
+  };
 
-  /**
-   * Panes in id order, which never changes as the layout does.
-   *
-   * Moving an `iframe` within the DOM reloads it, so the elements are rendered
-   * as siblings in a fixed order and positioned from the geometry. Rendering
-   * them in tree order would reload half the panes on every split.
-   */
-  const orderedPanes = React.useMemo<readonly PaneState[]>(
-    () => Arr.toSorted(state.panes, (a, b) => a.id - b.id),
-    [state.panes],
-  );
+  listenInScope(globalThis, 'pointermove', (pointerEvent) => {
+    const found = moveTargetAt(pointerEvent);
+
+    if (found !== undefined) {
+      updateMove((current) =>
+        current === undefined || isSameDropTarget(current.target, found.target)
+          ? current
+          : { ...current, target: found.target },
+      );
+    }
+  });
+
+  listenInScope(globalThis, 'pointerup', (pointerEvent) => {
+    if (move$.getSnapshot().value === undefined) {
+      return;
+    }
+
+    // Read before the move is let go of, which is what `moveTargetAt` reads.
+    const found = moveTargetAt(pointerEvent);
+
+    setMove(undefined);
+
+    if (found?.target !== undefined) {
+      dispatch({
+        type: 'move-pane',
+        paneId: found.paneId,
+        targetPaneId: found.target.paneId,
+        zone: found.target.zone,
+      });
+    }
+  });
+
+  const abandonMove = (): void => {
+    if (move$.getSnapshot().value !== undefined) {
+      setMove(undefined);
+    }
+  };
+
+  listenInScope(globalThis, 'pointercancel', abandonMove);
+
+  listenInScope(globalThis, 'keydown', (keyboardEvent) => {
+    if (
+      keyboardEvent instanceof KeyboardEvent &&
+      keyboardEvent.key === 'Escape'
+    ) {
+      abandonMove();
+    }
+  });
 
   /**
    * A pane's address bar reaches the reducer through here, so that the rule is
    * back in place *before* the `iframe` starts loading. Doing it after would be
    * a race the frame usually wins.
    */
-  const handleNavigate = React.useCallback(
-    (paneId: PaneId, input: string): void => {
-      const navigate = async (): Promise<void> => {
-        await ensureRule();
+  const handleNavigate = (paneId: PaneId, input: string): void => {
+    const navigate = async (): Promise<void> => {
+      await ensureRule();
 
-        dispatch({ type: 'navigate', paneId, input });
-      };
+      dispatch({ type: 'navigate', paneId, input });
+    };
 
-      navigate().catch(console.error);
+    navigate().catch(console.error);
+  };
+
+  const handleMoveStart = (paneId: PaneId): void => {
+    setMove({ paneId, target: undefined });
+  };
+
+  /** Which pane is being moved; where it would land changes nothing below. */
+  const movedPaneId$ = move$.pipe(map((move) => move?.paneId));
+
+  /**
+   * Panes in id order, which never changes as the layout does, each with the
+   * rectangle the layout gives it.
+   *
+   * Moving an `iframe` within the DOM reloads it, so the elements are kept as
+   * siblings in a fixed order and positioned from the geometry. Keeping them in
+   * tree order would reload half the panes on every split. Nothing is shown
+   * before the workspace is known and the stage measured.
+   */
+  const paneSlots$ = derive(
+    [session$, geometry$, movedPaneId$],
+    ({ workspaceId, state }, geometry, movedPaneId): readonly PaneSlot[] => {
+      if (workspaceId === undefined || geometry === undefined) {
+        return [];
+      }
+
+      const rects = new Map(
+        geometry.panes.map((entry) => [entry.paneId, entry.rect] as const),
+      );
+
+      return Arr.generate(function* () {
+        for (const pane of Arr.toSorted(state.panes, (a, b) => a.id - b.id)) {
+          const rect = rects.get(pane.id);
+
+          if (rect !== undefined) {
+            yield {
+              key: `${workspaceId}:${pane.id.toString()}`,
+              paneId: pane.id,
+              view: {
+                pane,
+                rect,
+                active: pane.id === state.activePaneId,
+                canClose: state.panes.length > 1,
+                moving: movedPaneId === pane.id,
+              },
+            };
+          }
+        }
+      });
     },
-    [ensureRule, dispatch],
   );
 
-  const handleApplyPreset = React.useCallback(
-    (presetId: PresetId): void => {
-      dispatch({ type: 'apply-preset', presetId });
-    },
-    [dispatch],
+  const splitters$ = derive(
+    [session$, geometry$],
+    ({ workspaceId }, geometry): readonly SplitterRect[] =>
+      workspaceId === undefined || geometry === undefined
+        ? []
+        : geometry.splitters,
   );
 
-  const handleDragStart = React.useCallback((splitter: SplitterRect): void => {
-    setDrag(splitter);
-  }, []);
-
-  const ready = session.workspaceId !== undefined && geometry !== undefined;
+  const dropTarget$ = move$.pipe(map((move) => move?.target));
 
   /**
    * `--dragging` is what turns pointer events off for the frames, and both
    * kinds of drag need it: a pointer over a pane is the framed site's, not
    * ours.
    */
-  const stageClassName = React.useMemo<string>(
-    () =>
-      [
-        'stage',
-        drag === undefined && move === undefined
-          ? undefined
-          : 'stage--dragging',
-        move === undefined ? undefined : 'stage--moving',
-      ]
-        .filter((part) => part !== undefined)
-        .join(' '),
-    [drag, move],
+  const stageClassName$ = derive([drag$, move$], (drag, move) =>
+    [
+      'stage',
+      drag === undefined && move === undefined ? undefined : 'stage--dragging',
+      move === undefined ? undefined : 'stage--moving',
+    ]
+      .filter((part) => part !== undefined)
+      .join(' '),
   );
 
   return (
-    <div className={'app'}>
+    <div class={constant('app')}>
       <TopBar
-        diagnostics={diagnostics}
-        headerRuleActive={headerRuleActive}
-        hostAccessGranted={hostAccessGranted}
-        onApplyPreset={handleApplyPreset}
+        diagnostics={diagnostics$}
+        headerRuleActive={headerRuleActive$}
+        hostAccessGranted={hostAccessGranted$}
+        onApplyPreset={(presetId: PresetId) => {
+          dispatch({ type: 'apply-preset', presetId });
+        }}
         onCollectDiagnostics={handleCollectDiagnostics}
         onRequestHostAccess={handleRequestHostAccess}
       >
         <WorkspacePicker
-          activeId={session.workspaceId}
-          notice={notice}
-          registry={registry}
+          activeId={session$.pipe(map((session) => session.workspaceId))}
+          notice={notice$}
+          registry={registry$}
           onCreate={handleCreateWorkspace}
           onExport={handleExportWorkspaces}
           onImport={handleImportWorkspaces}
@@ -1149,50 +1108,96 @@ export const App = memoNamed('App', () => {
           onOpenInNewTab={handleOpenWorkspaceInNewTab}
           onRemove={handleRemoveWorkspace}
           onRename={handleRenameWorkspace}
-          onSwitch={handleSwitchWorkspace}
+          onSwitch={(workspaceId) =>
+            showWorkspace(workspaceId, { history: 'push', saveCurrent: true })
+          }
         />
       </TopBar>
 
-      <div ref={stageRef} className={stageClassName} data-e2e={'stage'}>
-        {!ready ? undefined : (
-          <>
-            {orderedPanes.map((pane) => {
-              const rect = paneRects.get(pane.id);
+      <div
+        ref={(element) => {
+          mut_stage.element = element;
 
-              return rect === undefined ? undefined : (
-                <PaneFrame
-                  key={`${session.workspaceId ?? ''}:${pane.id.toString()}`}
-                  active={pane.id === state.activePaneId}
-                  canClose={state.panes.length > 1}
-                  dispatch={dispatch}
-                  moving={move?.paneId === pane.id}
-                  pane={pane}
-                  rect={rect}
-                  resetOrigins={resetOrigins}
-                  onMoveStart={handleMoveStart}
-                  onNavigate={handleNavigate}
-                  onToggleResetOrigin={handleToggleResetOrigin}
-                />
-              );
-            })}
+          const observer = new ResizeObserver(() => {
+            setStageSize({
+              width: element.clientWidth,
+              height: element.clientHeight,
+            });
+          });
 
-            {geometry.splitters.map((splitter) => (
-              <Splitter
-                key={splitter.path.join('/')}
-                splitter={splitter}
-                onDragStart={handleDragStart}
-              />
-            ))}
+          observer.observe(element);
 
-            {move?.target === undefined ? undefined : (
-              <PaneDropIndicator target={move.target} />
-            )}
-          </>
-        )}
+          onScopeDispose(() => {
+            observer.disconnect();
+          });
+        }}
+        class={stageClassName$}
+        data-e2e={constant('stage')}
+      >
+        <For items={paneSlots$} key={(slot) => slot.key}>
+          {(slot$) => (
+            <PaneFrame
+              dispatch={dispatch}
+              paneId={slot$.getSnapshot().value.paneId}
+              resetOrigins={resetOrigins$}
+              view$={slot$.pipe(map((slot) => slot.view))}
+              onMoveStart={handleMoveStart}
+              onNavigate={handleNavigate}
+              onToggleResetOrigin={handleToggleResetOrigin}
+            />
+          )}
+        </For>
+
+        <For items={splitters$} key={(splitter) => splitter.path.join('/')}>
+          {(splitter$) => (
+            <Splitter splitter$={splitter$} onDragStart={setDrag} />
+          )}
+        </For>
+
+        <If
+          cond={view(dropTarget$, (target) => target !== undefined)}
+          then={<PaneDropIndicator target$={dropTarget$} />}
+        />
       </div>
     </div>
   );
-});
+};
+
+/**
+ * The workspace this tab is showing, and its layout, as one value.
+ *
+ * One value rather than two pieces of state because everything that saves reads
+ * both, and a layout written under the wrong id is one workspace overwritten
+ * with another's panes.
+ *
+ * `workspaceId` is `undefined` until the list has been read: nothing is
+ * rendered and nothing is saved before then, because a frame that loaded before
+ * the header-stripping rule existed would be blocked by the very headers the
+ * rule removes.
+ */
+type Session = Readonly<{
+  workspaceId: string | undefined;
+  state: WorkspaceState;
+}>;
+
+/** A pane being dragged, and where it would land if let go now. */
+type PaneMove = Readonly<{
+  paneId: PaneId;
+  target: PaneDropTarget | undefined;
+}>;
+
+/** How a switch of split view treats history and the one it leaves. */
+type SwitchOptions = Readonly<{
+  history: 'none' | 'push' | 'replace';
+  saveCurrent: boolean;
+}>;
+
+/** One pane on the stage, with what its frame is keyed by. */
+type PaneSlot = Readonly<{
+  key: string;
+  paneId: PaneId;
+  view: PaneView;
+}>;
 
 /**
  * Whether the drop would do the same thing as it would have a moment ago.
