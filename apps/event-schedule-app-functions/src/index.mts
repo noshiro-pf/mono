@@ -141,7 +141,15 @@ export const notifyAfterAnswerDeadlineEveryMinutes =
 
 export const userDeletionListener = regionSelected.auth
   .user()
-  .onDelete((user) => onUserDelete(db, user).catch(logger.error));
+  .onDelete((user) =>
+    // Logged, and rethrown so that a cleanup that failed is not recorded as
+    // done.
+    onUserDelete(db, user).catch((error: unknown) => {
+      logger.error(error);
+
+      throw error;
+    }),
+  );
 
 // https://firebase.google.com/docs/functions/manage-functions?hl=ja
 export const fetchEventListOfUser = regionSelected

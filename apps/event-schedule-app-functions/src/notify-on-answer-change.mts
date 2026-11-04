@@ -5,6 +5,7 @@ import {
   createMailBodyForAnswerDelete,
   createMailBodyForNewAnswer,
   createMailBodyForUpdatedAnswer,
+  isOnlyUserIdCleared,
 } from './functions/index.mjs';
 import { getEmail, getEventItem } from './get-event-item.mjs';
 import { createMailOptions, sendEmail } from './setup-mailer.mjs';
@@ -26,6 +27,19 @@ export const notifyOnAnswerChangeBody = async (
     writtenAt: number;
   }>,
 ): Promise<void> => {
+  if (
+    eventType === 'update' &&
+    answerItemBefore !== undefined &&
+    answerItemAfter !== undefined &&
+    isOnlyUserIdCleared(answerItemBefore, answerItemAfter)
+  ) {
+    logger.log(
+      'skipped because only user.id was cleared, as the answerer account was deleted.',
+    );
+
+    return;
+  }
+
   const [eventItem, email] = await Promise.all([
     getEventItem(db, eventId),
     getEmail(db, eventId),
