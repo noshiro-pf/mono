@@ -149,8 +149,8 @@ export type Reader = Readonly<{
   rateLimit: InitializedObservable<RateLimit | undefined>;
   /**
    * How long the page waits between two reads: {@link POLL_INTERVAL_MS}, or
-   * longer where a read costs more than half the budget can pay for at that
-   * pace (`pollIntervalFor` in `rate-limit.mts`).
+   * longer where a read costs more than a quarter of the budget can pay for at
+   * that pace (`pollIntervalFor` in `rate-limit.mts`).
    */
   pollIntervalMs: InitializedObservable<number>;
   /**
@@ -398,6 +398,10 @@ export const createReader = (deps: ReaderDeps): Reader => {
   const currentToken = (): string | undefined =>
     token.getSnapshot().value?.value;
 
+  // When the last read of the report was sent, for a tab shown again to tell
+  // whether the next is due yet.
+  let mut_lastReadAtMs: number | undefined = undefined;
+
   const read = (): void => {
     const tokenValue = currentToken();
 
@@ -406,6 +410,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
     }
 
     const startedAtMs = now();
+
+    mut_lastReadAtMs = startedAtMs;
 
     const issueCount = mut_issueCount;
 
@@ -597,10 +603,13 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
     // A hidden tab is a tab nobody is reading, and a forgotten one would
     // otherwise go on spending the budget for the rest of the day. So the poll
-    // timer exists only while the tab is shown: made when it is shown, right
-    // after the read that showing it asks for, so the next read is one interval
-    // after that one rather than wherever an older period had got to; and
-    // completed when it is hidden.
+    // timer exists only while the tab is shown, and is completed when it is
+    // hidden. Shown, it reads once the next read is due: at once when an
+    // interval has passed since the last, and otherwise when the rest of it has
+    // — every read costs the whole report's points, and a tab is shown again
+    // every time its reader comes back from a link to GitHub. Each read after
+    // that is one interval after the one before, rather than wherever an older
+    // period had got to.
     let mut_poll: PollTimer | undefined = undefined;
 
     const stopPolling = (): void => {
@@ -609,12 +618,54 @@ export const createReader = (deps: ReaderDeps): Reader => {
       mut_poll = undefined;
     };
 
+    /** Polls every interval from now. */
     const startPolling = (): void => {
       stopPolling();
 
       const everyMs = getPollIntervalMs();
 
       mut_poll = { ...pollEvery(counter(everyMs), read), everyMs };
+    };
+
+    const readAndPoll = (): void => {
+      read();
+
+      startPolling();
+    };
+
+    // How long until the next read is due, from the one sent last; none when
+    // there was none. A read that failed waits too: a failure can repeat on
+    // every read and cost points each time, and Refresh is there for a reader
+    // who wants to try again now.
+    const dueInMs = (): number => {
+      if (mut_lastReadAtMs === undefined) {
+        return 0;
+      }
+
+      const everyMs = getPollIntervalMs();
+
+      // At most an interval, for a clock that has been put back.
+      return Math.min(everyMs, everyMs - (now() - mut_lastReadAtMs));
+    };
+
+    /**
+     * Reads once the next read is due, and polls every interval from that read:
+     * at once if it is due now, and otherwise on a timer of its own for the
+     * rest of the interval.
+     */
+    const pollFromLastRead = (): void => {
+      const remainingMs = dueInMs();
+
+      if (remainingMs > 0) {
+        stopPolling();
+
+        mut_poll = {
+          ...pollEvery(counter(remainingMs), readAndPoll),
+          everyMs: getPollIntervalMs(),
+        };
+      } else {
+        readAndPoll();
+      }
     };
 
     if (isVisible()) {
@@ -631,9 +682,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
     const visibilitySubscription = visibilityChange.subscribe(() => {
       if (isVisible()) {
-        read();
-
-        startPolling();
+        pollFromLastRead();
       } else {
         stopPolling();
       }
@@ -773,10 +822,7 @@ const divergenceScale = (entries: readonly Entry[]): number =>
 
 type PollTimer = Readonly<{ stop: () => void; everyMs?: number }>;
 
-/**
- * Reads on every tick of `poll`. Whoever starts the timer has just read, so the
- * first tick comes one interval later.
- */
+/** Reads on every tick of `poll`. */
 const pollEvery = (
   poll: SynstateObservable<number>,
   read: () => void,

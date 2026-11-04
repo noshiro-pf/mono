@@ -452,26 +452,30 @@ the issues only the body names — a query made only when there are any.
 
 ## Staying current
 
-The page reads GitHub **every fifteen seconds while it is on screen**, again
-the moment a hidden tab is brought back, and at once when **Refresh** is
-pressed. A hidden tab reads nothing and has no poll timer running: hiding it
-stops the timer, and bringing it back starts a new one from the read it comes
-back to, so the next read is fifteen seconds after that one.
+The page reads GitHub **at most every fifteen seconds while it is on screen**,
+and at once when **Refresh** is pressed. A hidden tab reads nothing and has no
+poll timer running: hiding it stops the timer. Bringing it back reads at once
+when an interval has passed since the last read, and otherwise when the rest of
+the interval has, even after a read that failed (Refresh tries again now); each
+read after that is one interval after the one before. Every read costs the whole
+report's points, and a reader who follows links to GitHub and comes back shows
+the tab again dozens of times an hour; reading on each of those spent the budget
+faster than the interval says.
 
-**The interval is set by the budget.** GraphQL has no conditional request, so
-a read that finds nothing new costs the same as one that finds everything.
-Every fifteen seconds is 240 reads an hour, about 2,000 of the 5,000 points an
-account gets, which leaves the rest for whatever else that account does with
-GraphQL — `gh` included, since the budget is the account's.
+**The interval is set by the budget.** GraphQL has no conditional request, so a
+read that finds nothing new costs the same as one that finds everything.
+Every fifteen seconds is 240 reads an hour, so the page reads that often only
+while a read costs five points or fewer, which is a quarter of the 5,000 points
+an account gets; the rest is left for whatever else that account does with
+GraphQL — `gh` and `unblock-prs` included, since the budget is the account's.
 
 **A larger repository is read less often**, rather than spending the budget
-faster: after each read the page compares what the budget went down by with
-the time since the read before (`pollIntervalFor` in `rate-limit.mts`), and
-spaces the reads so that they spend about half of it, in steps of five
-seconds, never more often than fifteen seconds nor less often than five
-minutes. Whatever else the account spends meanwhile counts too, which slows
-the page rather than the account's other work. The token panel says the
-interval in use.
+faster: after each read the page compares what the budget went down by with the
+time since the read before (`pollIntervalFor` in `rate-limit.mts`), and spaces
+the reads so that they spend about a quarter of it, in steps of five seconds,
+never more often than fifteen seconds nor less often than five minutes. Whatever
+else the account spends meanwhile counts too, which slows the page rather than
+the account's other work. The token panel says the interval in use.
 
 **Every page of open issues is read again by every read after it**, one query
 a page, about a point each by GitHub's formula, so the list stays as current

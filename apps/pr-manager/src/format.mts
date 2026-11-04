@@ -25,7 +25,27 @@ export const describeAge = (epochMs: number, nowMs: number): string => {
 
   const amount = Num.divInt(elapsed, unit.millis);
 
-  return `${amount} ${unit.name}${amount === 1 ? '' : 's'} ago`;
+  return `${countOf(amount, unit.name)} ago`;
+};
+
+/**
+ * How long an interval is, in whole minutes and seconds: the poll interval moves
+ * in steps of five seconds, and a fraction of a minute ("4.833333333333333
+ * minutes") is what dividing it gave.
+ */
+export const describeInterval = (ms: number): string => {
+  const totalSeconds = Number.isFinite(ms)
+    ? Math.max(0, Math.round(ms / MS_PER_SECOND))
+    : 0;
+
+  const minutes = Num.divInt(totalSeconds, SECONDS_PER_MINUTE);
+
+  const rest = totalSeconds % SECONDS_PER_MINUTE;
+
+  return [
+    ...(minutes > 0 ? [countOf(minutes, 'minute')] : []),
+    ...(minutes === 0 || rest > 0 ? [countOf(rest, 'second')] : []),
+  ].join(' ');
 };
 
 /** Largest first, so the first one that fits is the one to say. */
@@ -55,7 +75,14 @@ const UNITS = [
 export const formatLocalTime = (epochMs: number): string =>
   LOCAL_TIME.format(epochMs);
 
+const MS_PER_SECOND = 1000;
+
+const SECONDS_PER_MINUTE = asNonZeroSafeInt(60);
+
 const LOCAL_TIME = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'medium',
   timeStyle: 'long',
 });
+
+const countOf = (count: number, unit: string): string =>
+  `${count} ${unit}${count === 1 ? '' : 's'}` as const;
