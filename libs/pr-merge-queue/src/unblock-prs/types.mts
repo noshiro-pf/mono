@@ -264,6 +264,7 @@ export type WatchOutcome =
   | 'awaiting-bypass'
   | 'behind-again'
   | 'checks-failed'
+  | 'checks-not-started'
   | 'closed'
   | 'error'
   | 'head-moved'

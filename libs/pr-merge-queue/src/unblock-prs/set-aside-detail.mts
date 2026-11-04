@@ -51,6 +51,16 @@ export const describeTimeout = (
   `after ${timeoutMin} min, still waiting on ${describeWaitingOn(summary)}` as const;
 
 /**
+ * The required contexts that never reported on a head where nothing else was
+ * left running: the workflows behind them were never started.
+ */
+export const describeNotStarted = (
+  summary: ChecksSummary,
+  graceMin: number,
+): string =>
+  `nothing ran on its head for ${graceMin} min and ${summary.missing.join(', ')} never reported: GitHub started no run for them` as const;
+
+/**
  * The files a rebase stopped on, or when git named none — a rebase can fail
  * before it reaches a merge — the end of what it printed.
  */

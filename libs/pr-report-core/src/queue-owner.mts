@@ -55,6 +55,7 @@ export const SET_ASIDE_REASONS = [
   'arm-failed',
   'awaiting-bypass',
   'checks-failed',
+  'checks-not-started',
   'head-out-of-sync',
   'not-merging',
   'push-failed',
@@ -206,6 +207,12 @@ const setAsideOwner = (
       return {
         owner: 'human',
         why: 'green, and only a ruleset bypass merges it',
+      };
+
+    case 'checks-not-started':
+      return {
+        owner: 'human',
+        why: 'GitHub started no run for a required check on its head; the base moving puts it back in the queue to be rebased in its turn, and a new commit pushed to the branch starts the checks sooner',
       };
 
     case 'head-out-of-sync':

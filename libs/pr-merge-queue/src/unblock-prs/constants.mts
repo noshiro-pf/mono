@@ -55,5 +55,15 @@ export const UNREAD_SURVEYS_BEFORE_SETTING_ASIDE = 5;
  */
 export const OUT_OF_SYNC_GRACE_MS = 10 * 60_000;
 
+/**
+ * How long a watched pull request may go with required contexts unreported and
+ * nothing at all running on its head before it is set aside as
+ * `checks-not-started` (`not-started.mts`). A released pull request's gates
+ * start within seconds, and once a round is under way something on the head is
+ * always running until the last aggregate reports, so a head this quiet for
+ * this long is one GitHub started no check workflow on.
+ */
+export const CHECKS_NOT_STARTED_GRACE_MS = 5 * 60_000;
+
 /** How many consecutive polling errors end a watch. */
 export const MAX_CONSECUTIVE_POLL_ERRORS = 5;

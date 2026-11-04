@@ -492,20 +492,21 @@ survey していないコミットが載っているので、このスクリプ�
 `--poll-interval`（既定30秒）待ってから、マージするか「しない」と確定するまで
 ポーリングします。各回で次の順に判定し、該当した時点で抜けます。
 
-| 条件                               | 結果                          |
-| :--------------------------------- | :---------------------------- |
-| PR の再取得に失敗                  | 連続5回で `error`、未満は継続 |
-| `MERGED`                           | `merged`                      |
-| `OPEN` でない                      | `closed`                      |
-| auto-merge が外れた（※）           | `auto-merge-disabled`         |
-| `skip-ci` が再付与された           | `skip-ci-labelled`            |
-| head が push したものと違う        | `head-moved`                  |
-| `BEHIND` / `DIRTY`                 | `behind-again`                |
-| 必須チェックが fail / cancel       | `checks-failed`               |
-| 全 green（bypass merge 待ちの PR） | `awaiting-bypass`             |
-| 全 green が規定回数続く            | `not-merging`                 |
-| `--watch-timeout`（既定90分）超過  | `timeout`                     |
-| SIGINT / SIGTERM                   | `stopped`                     |
+| 条件                                | 結果                          |
+| :---------------------------------- | :---------------------------- |
+| PR の再取得に失敗                   | 連続5回で `error`、未満は継続 |
+| `MERGED`                            | `merged`                      |
+| `OPEN` でない                       | `closed`                      |
+| auto-merge が外れた（※）            | `auto-merge-disabled`         |
+| `skip-ci` が再付与された            | `skip-ci-labelled`            |
+| head が push したものと違う         | `head-moved`                  |
+| `BEHIND` / `DIRTY`                  | `behind-again`                |
+| 必須チェックが fail / cancel        | `checks-failed`               |
+| 全 green（bypass merge 待ちの PR）  | `awaiting-bypass`             |
+| 全 green が規定回数続く             | `not-merging`                 |
+| 未報告の必須があり5分間何も動かない | `checks-not-started`          |
+| `--watch-timeout`（既定90分）超過   | `timeout`                     |
+| SIGINT / SIGTERM                    | `stopped`                     |
 
 ※ bypass merge 待ちの PR（「2」の8）は arm していないので、この行は見ません。
 
@@ -530,6 +531,19 @@ round のものとして、round が終わるまで待ちます。`open-pr` が�
 のものとして待ちます。`skip-ci` を付けた round のキャンセルが遅れると、その集約は
 新しい round が始まった後に赤くなるので、時刻では見分けられません（#2463 はこれで
 `checks-failed` になりました）。
+
+**必須 context が未報告のまま、head 上で何も実行中でない状態が5分続いたら
+`checks-not-started` として見送ります**（`CHECKS_NOT_STARTED_GRACE_MS`、
+`not-started.mts`）。解放した PR の gate は数秒で始まり、round が始まれば最後の
+集約が報告されるまで head 上の何かが必ず実行中なので、この形が続くのは GitHub が
+その context の workflow を起動しなかった場合です（#3263 は `pull_request_target`
+の workflow だけが走り、`pull_request` の run が1つも作られないまま2時間待ちまし
+た）。`--watch-timeout` まで待つ代わりに、同じサイクルで次の候補へ進みます。`main`
+が動けば見送りは解け、次に pick されたときの rebase が新しい head を作り、その push
+で workflow が起動します。up to date のまま Retry しても同じ head を watch し直す
+だけなので、すぐ走らせたいときは新しいコミットを push します。auto-merge は張っ
+たまま、`skip-ci` も外したままなので、GitHub が run を遅らせていただけなら、後か
+ら走った run が green になった時点で、その後に解放された PR と並んでマージされます。
 
 全部 green なのにマージされない場合は rebase では直せないので、連続 green 回
 数で打ち切ります。原因のうち未解決の会話と code owner の承認不足は triage が先
@@ -634,6 +648,7 @@ matrix の job まで読みます。どの失敗なら直せるか、何を実�
 | `already-in-base`                 |      ✓      |          ✓          |
 | `not-merging`                     |      ✓      |          ✓          |
 | `watch-timeout`                   |      ✓      |          ✓          |
+| `checks-not-started`              |      ✓      |          ✓          |
 | `checks-failed`                   |      ✓      |   **✗（意図的）**   |
 | `awaiting-bypass`                 |      ✓      |   **✗（意図的）**   |
 | `head-out-of-sync`                |      ✓      |   **✗（意図的）**   |
@@ -828,6 +843,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `demotions.mts`         | green のまま止まった PR をいつまで最後に回すか                |
 | `unread.mts`            | 読めない解放済み PR を何回待ってから見送るか                  |
 | `out-of-sync.mts`       | GitHub が push を取りこぼした PR をいつ見送るか               |
+| `not-started.mts`       | check workflow が起動されなかった PR をいつ見送るか           |
 | `options.mts`           | コマンドライン                                                |
 | `types.mts`             | 共有される型とスキーマ                                        |
 | `constants.mts`         | 待ち時間と諦めるまでの回数                                    |
@@ -1387,6 +1403,7 @@ first that matches:
 | a required check failed            | `checks-failed`                      |
 | green, and only a bypass merges it | `awaiting-bypass`                    |
 | green for the whole budget         | `not-merging`                        |
+| a required one unreported, 5m idle | `checks-not-started`                 |
 | past `--watch-timeout` (90m)       | `timeout`                            |
 | SIGINT / SIGTERM                   | `stopped`                            |
 
@@ -1416,6 +1433,20 @@ So is a failure whose workflow has a newer run still running: when the round
 `skip-ci` was put on for is slow to cancel, its aggregate goes red after the
 round replacing it has started, and the time alone cannot tell them apart
 (#2463 was set aside `checks-failed` so).
+
+**A head with a required context unreported and nothing running on it for five
+minutes is set aside as `checks-not-started`** (`CHECKS_NOT_STARTED_GRACE_MS`,
+`not-started.mts`). A released pull request's gates start within seconds, and
+once a round has started something on the head runs until the last aggregate
+reports, so a head that stays this quiet is one GitHub started no run for that
+context on (#3263: the `pull_request_target` workflows ran, no `pull_request`
+run was ever created, and the queue waited two hours). Rather than wait for
+`--watch-timeout`, the next candidate is tried in the same cycle.
+`main` moving clears it: the rebase when it is next picked is a new head, and
+that push starts the workflows. A retry while it is still up to date only
+watches the same head again; push a new commit to have GitHub start its checks
+now. It stays armed and released, so runs GitHub only delayed still merge it on
+green, beside whatever was released after it.
 
 A pull request that is green and still open is held by something a rebase
 cannot fix, so it is given a budget of consecutive green polls. An unresolved
@@ -1521,6 +1552,7 @@ A verdict lasts as long as the state it was reached in.
 | `already-in-base`                 |         ✓         |             ✓             |
 | `not-merging`                     |         ✓         |             ✓             |
 | `watch-timeout`                   |         ✓         |             ✓             |
+| `checks-not-started`              |         ✓         |             ✓             |
 | `checks-failed`                   |         ✓         |    **✗ (deliberate)**     |
 | `awaiting-bypass`                 |         ✓         |    **✗ (deliberate)**     |
 | `head-out-of-sync`                |         ✓         |    **✗ (deliberate)**     |
@@ -1725,6 +1757,7 @@ the pull request the other's and nobody moved it (#2267).
 | `demotions.mts`         | how long one that sat green without merging goes last         |
 | `unread.mts`            | how many surveys an unread released one holds the queue       |
 | `out-of-sync.mts`       | when one whose push GitHub dropped is set aside               |
+| `not-started.mts`       | when one GitHub started no check workflow on is set aside     |
 | `options.mts`           | the command line                                              |
 | `types.mts`             | the shapes every module passes around                         |
 | `constants.mts`         | how long it waits, and how long before it gives up            |

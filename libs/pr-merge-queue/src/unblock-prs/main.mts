@@ -708,6 +708,19 @@ const applyWatchOutcome = (
         detail: ended.detail ?? 'green but not merged',
       });
 
+    case 'checks-not-started':
+      log(
+        `#${pr.number}: GitHub started no run for a required check on its head; trying the next candidate, and this one again once the base moves.`,
+      );
+
+      return withSkip(skipped, {
+        number: pr.number,
+        headSha: pr.headRefOid,
+        baseSha,
+        reason: 'checks-not-started',
+        detail: ended.detail ?? 'a required check never started on its head',
+      });
+
     case 'timeout':
       log(`#${pr.number}: gave up waiting.`);
 
