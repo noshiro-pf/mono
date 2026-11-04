@@ -6,6 +6,8 @@ import {
   HtmlTable,
   InputGroup,
   Label,
+  Navbar,
+  NavbarGroup,
 } from 'blueprint-synstate';
 import { createState } from 'synstate';
 import { constant } from 'synstate-dom';
@@ -179,6 +181,29 @@ describe(HtmlTable, () => {
     assert.strictEqual(
       one(container, 'table').className,
       'bp6-html-table bp6-html-table-bordered bp6-compact',
+    );
+
+    unmount();
+  });
+});
+
+describe(Navbar, () => {
+  test('carries the test ids of the bar and its groups', () => {
+    const { container, unmount } = mountInto(() => (
+      <Navbar data-e2e={constant('bar')}>
+        <NavbarGroup align={'right'} data-e2e={constant('group')}>
+          <span />
+        </NavbarGroup>
+      </Navbar>
+    ));
+
+    const bar = one(container, '.bp6-navbar');
+
+    assert.strictEqual(bar.dataset['e2e'], 'bar');
+
+    assert.strictEqual(
+      one(bar, ':scope > .bp6-navbar-group.bp6-align-right').dataset['e2e'],
+      'group',
     );
 
     unmount();
