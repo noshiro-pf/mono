@@ -8,6 +8,7 @@ import {
   classifyChanges,
   isSpellCheckedByCi,
   readManifestDependencies,
+  stepEnvironment,
   type PackageInfo,
 } from './plan.mjs';
 
@@ -122,7 +123,6 @@ const plan = (files: readonly string[], coverage = true) =>
     base: 'abc123',
     rootScripts,
     coverage,
-    hasUntracked: false,
     spellChecked: files,
   });
 
@@ -167,6 +167,16 @@ describe('the code gate, read through gatePatterns', () => {
   });
 });
 
+describe('stepEnvironment', () => {
+  test('every step runs as CI does, against the base it was given', () => {
+    assert.deepStrictEqual(stepEnvironment('abc123'), {
+      CI: 'true',
+      CODEMOD_DIFF_BASE: 'abc123',
+      PROSE_DIFF_BASE: 'abc123',
+    });
+  });
+});
+
 describe('isSpellCheckedByCi', () => {
   test.each([
     ['libs/a/src/x.mts', true],
@@ -186,7 +196,6 @@ describe('isSpellCheckedByCi', () => {
       base: 'abc123',
       rootScripts,
       coverage: false,
-      hasUntracked: false,
       spellChecked: ['.claude/settings.json', 'CLAUDE.md'],
     }).find(({ args }) => args.includes('cspell'));
 
@@ -203,7 +212,7 @@ describe('classifyChanges', () => {
       [{ dir: 'libs/ts-data-forge', code: true }],
     );
 
-    assert.deepStrictEqual(sortedAreas(result), ['codemod', 'root-guards']);
+    assert.deepStrictEqual(sortedAreas(result), ['root-guards']);
   });
 
   test('a README touches its package as documents only', () => {
@@ -243,25 +252,13 @@ describe('classifyChanges', () => {
   });
 
   test.each([
-    ['tools/scripts/cmd/x.mts', ['codemod', 'root', 'root-guards']],
-    [
-      'tools/configs/vite-config.mts',
-      ['codemod', 'root', 'root-guards', 'shared-config'],
-    ],
-    ['eslint.config.mts', ['codemod', 'root', 'root-guards']],
+    ['tools/scripts/cmd/x.mts', ['root', 'root-guards']],
+    ['tools/configs/vite-config.mts', ['root', 'root-guards', 'shared-config']],
+    ['eslint.config.mts', ['root', 'root-guards']],
     ['tsconfig.json', ['root', 'root-guards']],
-    [
-      'libs/ts-data-forge/configs/vitest.config.mts',
-      ['codemod', 'root', 'root-guards'],
-    ],
-    [
-      'libs/ts-data-forge/eslint.config.mts',
-      ['codemod', 'root', 'root-guards'],
-    ],
-    [
-      'libs/ts-data-forge/samples/eslint.config.mts',
-      ['codemod', 'root', 'root-guards'],
-    ],
+    ['libs/ts-data-forge/configs/vitest.config.mts', ['root', 'root-guards']],
+    ['libs/ts-data-forge/eslint.config.mts', ['root', 'root-guards']],
+    ['libs/ts-data-forge/samples/eslint.config.mts', ['root', 'root-guards']],
     ['.markdownlint-cli2.mjs', ['prose', 'root']],
     ['tools/scripts/cmd/check-changed/README.md', ['prose']],
     ['.cspell.config.yaml', ['prose', 'spell-config']],
@@ -285,7 +282,7 @@ describe('buildPlan', () => {
       'run z:format-diff-from abc123',
       'libs/ts-data-forge: run gen',
       'run gen:verify-npm-packages',
-      'run z:ts-codemod --diff-from abc123',
+      'run fix:codemod:affected',
       'run z:format-diff-from abc123',
       'libs/ts-data-forge: run fix:lint',
       'libs/ts-data-forge: run check:types',
@@ -342,7 +339,7 @@ describe('buildPlan', () => {
 
     assert.notInclude(commands, 'libs/ts-data-forge: run check:types');
 
-    assert.notInclude(commands.join('\n'), 'z:ts-codemod');
+    assert.notInclude(commands, 'run fix:codemod:affected');
   });
 
   test('tools/ runs every root check, the tests on their own for coverage', () => {
@@ -392,49 +389,52 @@ describe('buildPlan', () => {
     );
   });
 
-  test('the codemod runs over the untracked files too when there are any', () => {
-    const steps = buildPlan({
-      classification: classify(['tools/scripts/cmd/new.mts']),
-      base: 'abc123',
-      rootScripts,
-      coverage: false,
-      hasUntracked: true,
-      spellChecked: [],
-    });
-
-    assert.deepStrictEqual(
-      steps
-        .filter(({ args }) => args.includes('z:ts-codemod'))
-        .map(({ args }) => args.join(' ')),
-      ['run z:ts-codemod --diff-from abc123', 'run z:ts-codemod --uncommitted'],
-    );
-  });
+  // `codemod-affected.mts` runs the codemod in full when the lockfile or a
+  // script naming its transformers changed, neither of which is TypeScript.
+  test.each(['pnpm-lock.yaml', '.github/workflows/code-check.yml'])(
+    'a change the code gate lets through runs the codemod: %s',
+    (file) => {
+      assert.include(commandsOf([file]), 'run fix:codemod:affected');
+    },
+  );
 
   test('the codemod output is formatted before it is linted', () => {
-    const steps = buildPlan({
-      classification: classify(['libs/ts-data-forge/src/array.mts']),
-      base: 'abc123',
-      rootScripts,
-      coverage: false,
-      hasUntracked: true,
-      spellChecked: [],
-    }).map(({ title }) => title);
+    const titles = plan(['libs/ts-data-forge/src/array.mts']).map(
+      ({ title }) => title,
+    );
 
     assert.deepStrictEqual(
-      steps.slice(
-        steps.indexOf('codemod over the diff'),
-        steps.indexOf('ts-data-forge: fix:lint') + 1,
+      titles.slice(
+        titles.indexOf('fix:codemod:affected'),
+        titles.indexOf('ts-data-forge: fix:lint') + 1,
       ),
       [
-        'codemod over the diff',
-        'codemod over the uncommitted files',
+        'fix:codemod:affected',
         'format what the codemod reprinted',
         'ts-data-forge: fix:lint',
       ],
     );
   });
 
-  test('a change with no TypeScript formats only before and after', () => {
+  test('check:ext runs in every package the diff touches, documents included', () => {
+    const steps = buildPlan({
+      classification: classifyChanges({
+        files: ['libs/ext/README.md'],
+        packages: [pkg('libs/ext', ['check:ext', 'check:types'])],
+        proseGate,
+      }),
+      base: 'abc123',
+      rootScripts,
+      coverage: false,
+      spellChecked: [],
+    }).map(({ title }) => title);
+
+    assert.include(steps, 'ext: check:ext');
+
+    assert.notInclude(steps, 'ext: check:types');
+  });
+
+  test('a prose-only change formats only before and after', () => {
     assert.deepStrictEqual(
       plan(['libs/ts-data-forge/README.md'])
         .filter(({ args }) =>

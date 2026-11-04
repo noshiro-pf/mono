@@ -1,5 +1,5 @@
 import { Arr, isRecord, isString } from 'ts-data-forge';
-import type { StrictPick } from 'ts-type-forge';
+import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import { entryPointTargets } from '../assert-deps-built.mjs';
 // The gate's own matcher, so that what check-changed calls prose is what CI
 // skips. It lives in the gate's script rather than tools/scripts/lib/ because
@@ -100,10 +100,6 @@ export const classifyChanges = ({
       mut_areas.add('prose');
     }
 
-    if (TYPESCRIPT_FILE.test(file)) {
-      mut_areas.add('codemod');
-    }
-
     if (file.startsWith('tools/configs/')) {
       mut_areas.add('shared-config');
     }
@@ -167,19 +163,20 @@ export const classifyChanges = ({
  *   more for what the fixers wrote (`fix:fmt:full` instead when Prettier's own
  *   config changed).
  *
- * The codemod is in the plan for any TypeScript change because no lint rule
- * stands behind it: `prefer-as-const` rewrites `as 'foo'` and says nothing
- * about an `as const` that is missing, so `code-check (fix:codemod:affected)`
- * is otherwise the first thing to mention it. It runs twice, once over the diff
- * from the base and once over the uncommitted files, because `--diff-from`
- * reads `git diff`, which leaves out untracked files.
+ * The codemod is in the plan because no lint rule stands behind it:
+ * `prefer-as-const` rewrites `as 'foo'` and says nothing about an `as const`
+ * that is missing, so `code-check (fix:codemod:affected)` is otherwise the
+ * first thing to mention it.
+ *
+ * What CI runs that no plan does is `CI_ONLY` in `reach.mts`, and
+ * `check:root:check-changed-reach` fails on anything else CI runs that no plan
+ * reaches.
  */
 export const buildPlan = ({
   classification,
   base,
   rootScripts,
   coverage,
-  hasUntracked,
   spellChecked,
 }: Readonly<{
   classification: Classification;
@@ -187,7 +184,6 @@ export const buildPlan = ({
   base: string;
   rootScripts: readonly string[];
   coverage: boolean;
-  hasUntracked: boolean;
   /** The changed files that still exist and are not ignored, for cspell. */
   spellChecked: readonly string[];
 }>): readonly Step[] => {
@@ -251,35 +247,25 @@ export const buildPlan = ({
       ? [rootStep('generate', 'gen:verify-npm-packages')]
       : []),
 
-    // The codemod before the lint, so that what it rewrites is linted too.
-    ...(areas.has('codemod')
-      ? Arr.toUnshifted({
-          title: 'codemod over the diff',
-          kind: 'fix',
-          cwd: '.',
-          args: ['run', 'z:ts-codemod', '--diff-from', base],
-        } as const)(
-          hasUntracked
-            ? [
-                {
-                  title: 'codemod over the uncommitted files',
-                  kind: 'fix',
-                  cwd: '.',
-                  args: ['run', 'z:ts-codemod', '--uncommitted'],
-                } as const,
-              ]
-            : [],
-        )
-      : []),
-
-    // The codemod parenthesizes what it reprints and leaves the formatter to
-    // take the parentheses off, and a lint rule can judge them meanwhile:
-    // oxlint's `no-invalid-void-type` rejects `() => (Promise<void> | void)`,
-    // on a line nobody changed (#2998). CI lints only the formatted tree. The
-    // root checks' `eslint --fix` lints it too, so this runs whether or not a
-    // package has a `fix:lint`.
-    ...(areas.has('codemod')
-      ? [formatStep('format what the codemod reprinted', base)]
+    // The codemod before the lint, so that what it rewrites is linted too, and
+    // as CI runs it: `fix:codemod:affected` runs it over the diff from
+    // `CODEMOD_DIFF_BASE` (which `main.mts` sets to the base), the untracked
+    // files included, or over everything when what decides its output changed
+    // (the lockfile, a script naming its transformers), which need not be
+    // TypeScript.
+    ...(areas.has('root-guards')
+      ? [
+          rootStep('fix', 'fix:codemod:affected'),
+          // The codemod parenthesizes what it reprints and leaves the formatter
+          // to take the parentheses off, and a lint rule can judge them
+          // meanwhile: oxlint's `no-invalid-void-type` rejects
+          // `() => (Promise<void> | void)`, on a line nobody changed (#2998).
+          // CI lints only the formatted tree. `fix:codemod:affected` formats
+          // once it is done, but not when the codemod fails; the root checks'
+          // `eslint --fix` lints too, so this runs whether or not a package has
+          // a `fix:lint`.
+          formatStep('format what the codemod reprinted', base),
+        ]
       : []),
 
     ...code.flatMap(({ pkg }) => packageStep(pkg, 'fix', 'fix:lint')),
@@ -300,6 +286,10 @@ export const buildPlan = ({
       ),
       ...packageStep(pkg, 'check', 'check:sumi'),
     ]),
+
+    // Every file in a package counts, a document included: CI runs it in
+    // `style-check.yml`, whose gate drops nothing but `experimental/`.
+    ...packages.flatMap(({ pkg }) => packageStep(pkg, 'check', 'check:ext')),
 
     ...rootSteps({ areas, rootScripts, coverage }),
 
@@ -358,6 +348,25 @@ export const buildPlan = ({
       : formatStep('format the diff (after)', base),
   ];
 };
+
+/**
+ * What every step runs with.
+ *
+ * - `CI=true`, as GitHub Actions sets it, since some tools read it:
+ *   typescript-estree then parses a linted file from disk rather than the text
+ *   it was given, and Vitest refuses `.only`. A test can pass without it and
+ *   fail in CI.
+ * - The base, so that what reads a diff reads this one: the codemod
+ *   (`fix:codemod:affected`) and the `check:prose` guards (`resolveDiffBase`)
+ *   otherwise fall back to the merge base with origin/main, which on a stacked
+ *   branch takes in the layer below.
+ */
+export const stepEnvironment = (base: string): ReadonlyRecord<string, string> =>
+  ({
+    CI: 'true',
+    CODEMOD_DIFF_BASE: base,
+    PROSE_DIFF_BASE: base,
+  }) as const;
 
 /**
  * Whether `check:cspell` reads a path: its glob takes in everything but
@@ -442,19 +451,21 @@ export const readManifestDependencies = (
  * `LICENSE` or `gen-license-files.mts` itself; `gen:license-files` runs on it
  * and on `manifest`, whose `license` and `private` fields decide what it writes.
  */
-export type Area =
-  | 'root'
-  | 'root-guards'
-  | 'prose'
-  | 'manifest'
-  | 'license'
-  | 'codemod'
-  | 'strict-lib'
-  | 'changeset'
-  | 'repo-settings'
-  | 'shared-config'
-  | 'spell-config'
-  | 'format-config';
+export const AREAS = [
+  'root',
+  'root-guards',
+  'prose',
+  'manifest',
+  'license',
+  'strict-lib',
+  'changeset',
+  'repo-settings',
+  'shared-config',
+  'spell-config',
+  'format-config',
+] as const;
+
+export type Area = (typeof AREAS)[number];
 
 export type Classification = Readonly<{
   packages: readonly Readonly<{ pkg: PackageInfo; code: boolean }>[];
