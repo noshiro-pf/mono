@@ -26,7 +26,7 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `skip-ci-label.yml`              | `pull_request_target`                  | the `no-skip-ci-label` commit status    |
 | `lint-pull-request.yml`          | `pull_request_target`                  | its three jobs, by name                 |
 | `release.yml`                    | `push` to `main`                       | none                                    |
-| `pnpm-update.yml`                | schedule                               | none; opens `chore/pnpm-update`         |
+| `pnpm-update.yml`                | schedule                               | none; opens/closes `chore/pnpm-update`  |
 | `node-support-update.yml`        | schedule                               | none; opens `chore/node-support-update` |
 | `deploy-pages.yml`               | `push` to `main`                       | none                                    |
 | `deploy-firestore.yml`           | `push` to `main`; `workflow_dispatch`  | none                                    |
@@ -787,9 +787,10 @@ can only narrow what the App already holds), so that the push triggers the
 `pull_request` workflows and the repository owner can auto-merge. Both:
 
 - **Reuse one fixed branch name** (`chore/pnpm-update`,
-  `chore/node-support-update`), rebuilt from `main` and force-pushed every
-  run, so a run that lands no update leaves no stale pull request behind and
-  there is only ever one open.
+  `chore/node-support-update`), rebuilt from `main` and force-pushed every run
+  that has an update, so there is only ever one open. A `pnpm-update.yml` run
+  that finds nothing to change pushes nothing, and closes the open pull request
+  instead (`close-obsolete`), since `main` already has what it carries.
 - **Authenticate the push inline** (`https://x-access-token:${GH_TOKEN}@…`),
   so the token is never written to git config.
 - **Name the lease.** `--force-with-lease` with no value compares against the
