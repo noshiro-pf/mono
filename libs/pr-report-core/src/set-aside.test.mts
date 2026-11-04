@@ -171,4 +171,15 @@ describe(setAsideStillApplies, () => {
       ),
     );
   });
+
+  // The rebase that a moved base brings is a new head, and the push that
+  // carries it is what starts the workflows GitHub did not start before.
+  test('ends with a moved base when no check run started on the head', () => {
+    assert.isFalse(
+      setAsideStillApplies(
+        { reason: 'checks-not-started', baseSha: BASE },
+        'b'.repeat(40),
+      ),
+    );
+  });
 });

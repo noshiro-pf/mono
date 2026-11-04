@@ -3,6 +3,7 @@ import {
   describeConflict,
   describeFailedChecks,
   describeHold,
+  describeNotStarted,
   describeTimeout,
 } from './set-aside-detail.mjs';
 import type { ChecksSummary } from './types.mjs';
@@ -64,6 +65,23 @@ describe(describeTimeout, () => {
     assert.strictEqual(
       describeTimeout(summary({ running: ['code-check (ws:fix:lint)'] }), 90),
       'after 90 min, still waiting on code-check (ws:fix:lint) (running)',
+    );
+  });
+});
+
+describe(describeNotStarted, () => {
+  test('names the required contexts that never reported', () => {
+    assert.strictEqual(
+      describeNotStarted(
+        summary({
+          missing: [
+            'code-check-result / result',
+            'style-check-result / result',
+          ],
+        }),
+        5,
+      ),
+      'nothing ran on its head for 5 min and code-check-result / result, style-check-result / result never reported: GitHub started no run for them',
     );
   });
 });

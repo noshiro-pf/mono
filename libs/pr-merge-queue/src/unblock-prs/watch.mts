@@ -10,15 +10,18 @@ import {
 } from './checks.mjs';
 import {
   BLOCKED_GREEN_POLLS_BEFORE_GIVING_UP,
+  CHECKS_NOT_STARTED_GRACE_MS,
   GREEN_POLLS_BEFORE_GIVING_UP,
   MAX_CONSECUTIVE_POLL_ERRORS,
 } from './constants.mjs';
 import { viewPullRequest, viewReviewDecision } from './github.mjs';
 import { isSkipCiLabelled } from './labels.mjs';
+import { observeNotStarted } from './not-started.mjs';
 import type { Options } from './options.mjs';
 import {
   describeFailedChecks,
   describeHold,
+  describeNotStarted,
   describeTimeout,
 } from './set-aside-detail.mjs';
 import type { PullRequest, Watched } from './types.mjs';
@@ -46,6 +49,8 @@ export const watch = async (
   const deadline = Date.now() + options.watchTimeoutMin * 60_000;
 
   let mut_greenPolls = 0;
+
+  let mut_notStartedSinceMs: number | undefined = undefined;
 
   let mut_errors = 0;
 
@@ -130,6 +135,25 @@ export const watch = async (
       log(`#${pr.number}: ${failed.detail}`);
 
       return { outcome: 'checks-failed', ...failed };
+    }
+
+    const notStarted = observeNotStarted(
+      mut_notStartedSinceMs,
+      summary,
+      Date.now(),
+    );
+
+    mut_notStartedSinceMs = notStarted.sinceEpochMs;
+
+    if (notStarted.gaveUp) {
+      const detail = describeNotStarted(
+        summary,
+        CHECKS_NOT_STARTED_GRACE_MS / 60_000,
+      );
+
+      log(`#${pr.number}: ${detail}`);
+
+      return { outcome: 'checks-not-started', detail };
     }
 
     if (summary.verdict === 'pending') {

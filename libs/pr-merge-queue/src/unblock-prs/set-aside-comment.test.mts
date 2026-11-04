@@ -80,6 +80,22 @@ describe(setAsideCommentBody, () => {
     );
   });
 
+  test('says a retry at the same head starts nothing, and what does', () => {
+    const body = setAsideCommentBody(
+      skip({
+        reason: 'checks-not-started',
+        detail:
+          'nothing ran on its head for 5 min and code-check-result / result never reported: GitHub started no run for them',
+      }),
+      'main',
+    );
+
+    assert.include(
+      body,
+      'It stays aside until the branch is pushed again or `main` moves, which rebases it onto a new head. A retry while it is still up to date only watches the same head again; push a new commit to have GitHub start its checks now.',
+    );
+  });
+
   test('folds what the command printed away, in a fence nothing inside closes', () => {
     const body = setAsideCommentBody(
       skip({ output: 'CONFLICT (content): ```\nhint: @someone' }),

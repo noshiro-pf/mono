@@ -101,7 +101,9 @@ const stays = (reason: SkipRecord['reason'], defaultBranch: string): string =>
       ? (`It stays aside until the branch is pushed again: rebasing it would only put the same checks through again. Tick the retry box to have it rebased and checked on the current \`${defaultBranch}\`.` as const)
       : reason === 'head-out-of-sync'
         ? 'It stays aside until GitHub shows another head: push a new commit to the branch, or close and reopen the pull request.'
-        : (`It stays aside until the branch is pushed again or \`${defaultBranch}\` moves.` as const);
+        : reason === 'checks-not-started'
+          ? (`It stays aside until the branch is pushed again or \`${defaultBranch}\` moves, which rebases it onto a new head. A retry while it is still up to date only watches the same head again; push a new commit to have GitHub start its checks now.` as const)
+          : (`It stays aside until the branch is pushed again or \`${defaultBranch}\` moves.` as const);
 
 /** What ended a set-aside, as the resolved line says it. */
 export type ResolvedBy = 'base-moved' | 'pushed' | 'retry';
