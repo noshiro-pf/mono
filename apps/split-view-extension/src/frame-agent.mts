@@ -2,7 +2,9 @@ import { Arr } from 'ts-data-forge';
 import {
   asNestedFrameMessage,
   asPageToFrameMessage,
+  asPaneOfFrameQuery,
   paneFrameNamePrefix,
+  paneIdOfFrameName,
   paneKeyOf,
   paneKeyRoute,
   splitViewMessageTag,
@@ -156,6 +158,33 @@ const main = (): void => {
       }
     }
   };
+
+  // The worker asks which pane this is when the context menu's "open to the
+  // right" or "open below" was chosen in this frame, so that the page splits
+  // this pane: the one the page assigned, or the one the frame's name says
+  // while a new document has not been assigned yet. Answered with `null` in a
+  // frame nested in a pane's page, which cannot know.
+  chrome.runtime.onMessage.addListener(
+    (value: unknown, sender, sendResponse: (answer: number | null) => void) => {
+      if (
+        sender.id !== chrome.runtime.id ||
+        asPaneOfFrameQuery(value) === undefined
+      ) {
+        return false;
+      }
+
+      const parentIsSplitPage =
+        document.location.ancestorOrigins[0] === ownExtensionOrigin();
+
+      sendResponse(
+        mut_paneId ??
+          (parentIsSplitPage ? paneIdOfFrameName(window.name) : undefined) ??
+          null,
+      );
+
+      return false;
+    },
+  );
 
   addEventListener('message', (messageEvent: IncomingMessageEvent) => {
     if (messageEvent.source !== window.parent) {

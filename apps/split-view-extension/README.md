@@ -75,6 +75,7 @@ a tab of its own.
 | add a split view (in a new tab)      | `＋` at the top left                                                             |
 | open one from a link                 | `split.html?layout=r70pp&url=…&url=…` — see [Open from a URL](#open-from-a-url)  |
 | open a GitHub pull request in one    | **⧉ Split view** on its page — see [GitHub pull requests](#github-pull-requests) |
+| open a link beside this page         | **Open in a split …** in its context menu — see [below](#from-the-context-menu)  |
 | switch split views in this tab       | the select at the top left, or `Alt+1` … `Alt+9`                                 |
 | rename, reorder, delete, back up     | **Edit** — with **Export** / **Import** for the whole list as one JSON file      |
 | reopen everything after an update    | the toolbar button, while no split view is open — or **Edit** → **↗ Open all**   |
@@ -168,6 +169,29 @@ same URL typed into the address bar opens. Being listed also lets those pages pu
 other sites with the refusal to be framed taken away — so a split view that
 finds itself framed draws nothing.
 
+### From the context menu
+
+Any web page has **Open in a split to the right** and **Open in a split below**
+in its context menu, under **Split View** (**右に分割して開く** and
+**下に分割して開く** when Chrome's language is Japanese). A link that is not to a
+web page — `mailto:`, say — does not have them, and neither do a selection or a
+text field.
+
+- **In a split view**, the pane the menu was opened in is split as its `||` or
+  `=` button splits it, and the link opens in the new pane; opened on the page
+  rather than on a link, the new pane is left empty. A frame embedded in a
+  pane's page cannot say which pane it is in, so from there the active pane is
+  split — the one whose toolbar was used last.
+- **In any other tab**, a new split view opens in its place, with the page on
+  the left or at the top and the link beside or below it, half and half, or an
+  empty pane when the menu was not opened on a link. The tab is closed once the
+  split view has opened, and is in Chrome's recently closed list like any other;
+  a pinned tab is kept. Each one is added to the list of split views, named
+  after the tab's title.
+
+They do nothing in an incognito window, where the page would be saved in the
+list.
+
 ### GitHub pull requests
 
 Every pull request page on github.com, in any repository, has a **⧉ Split view**
@@ -188,8 +212,8 @@ closed once the split view has opened, so the split view takes its place;
 keeps that tab.
 
 A link to a pull request — on GitHub, in a mail, in a chat — has **Open pull
-request in Split View** in its context menu, and so does a pull request's own
-page.
+request in Split View** in its context menu, under **Split View** with the items
+above, and so does a pull request's own page.
 
 The title, the issue and the session are read from the pull request's
 conversation page, as you see it, so a private repository works when you are
