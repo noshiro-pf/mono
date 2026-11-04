@@ -87,6 +87,29 @@ describe(planAutoFix, () => {
     });
   });
 
+  test('runs Prettier for the format-and-doc bundle, and builds nothing for it', () => {
+    // `z:ci:style-check:format-and-doc` is `fix:fmt:full` then `ws:doc`. Only
+    // Prettier writes tracked files there (`doc`'s output is untracked), so
+    // Prettier is the fix; a failed `ws:doc` leaves nothing changed, which
+    // declines it.
+    const plan = planAutoFix(
+      states([
+        ['style-check (z:ci:style-check:format-and-doc)', 'failed'],
+        ['style-check-result / result', 'failed'],
+      ]),
+      config,
+    );
+
+    assert.isTrue(Result.isOk(plan));
+
+    assert.deepStrictEqual(plan.value, {
+      before: ['pnpm install --frozen-lockfile'],
+      prepare: [],
+      commands: ['pnpm run fix:fmt:full'],
+      after: ['pnpm run fix:fmt:diff'],
+    });
+  });
+
   test('reruns the style-check bundle before any other fixer, on the tree as committed', () => {
     // Its `check:prose` diffs the tree against the base, so a generator's or a
     // lint fix's rewrite would read as lines the change touched.

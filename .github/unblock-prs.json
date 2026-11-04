@@ -30,6 +30,11 @@
         "context": "^style-check \\((z:ci:style-check:checks-and-generators)\\)$",
         "run": "pnpm run $1",
         "stage": -1
+      },
+      {
+        "context": "^style-check \\(z:ci:style-check:format-and-doc\\)$",
+        "run": "pnpm run fix:fmt:full",
+        "stage": 2
       }
     ],
     "after": ["pnpm run fix:fmt:diff"]

@@ -496,6 +496,13 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
   },
   {
     directory: ROOT_DIRECTORY,
+    scriptName: 'ws:check:e2e',
+    // `code-check.yml` runs it as two shards, `ws:check:e2e:shard-1` and
+    // `ws:check:e2e:shard-2`, which between them reach every app's `check:e2e`;
+    // that they partition the apps is in their filters.
+  },
+  {
+    directory: ROOT_DIRECTORY,
     scriptName: 'ws:check:types',
     // CI runs it as two halves, `ws:check:types:non-strict-lib` (in
     // `code-check.yml`) and `ws:check:types:strict-lib` (in
@@ -887,9 +894,38 @@ const readCheckWorkflows = async (): Promise<
 const indentOf = (line: string): number =>
   line.length - line.trimStart().length;
 
+/** The lines indented under each indented line that reads `heading`. */
+const blockUnder = (
+  lines: readonly string[],
+  heading: string,
+): readonly string[] =>
+  lines.flatMap((line, startIndex) => {
+    if (indentOf(line) === 0 || line.trim() !== heading) {
+      return [];
+    }
+
+    const indent = indentOf(line);
+
+    const rest = lines.slice(startIndex + 1);
+
+    const endIndex = rest.findIndex(
+      (next) => next.trim() !== '' && indentOf(next) <= indent,
+    );
+
+    return endIndex === -1 ? rest : rest.slice(0, endIndex);
+  });
+
+const singleValue = (text: string): readonly string[] => {
+  const entry = text.trim();
+
+  return entry === '' || entry.includes(' ') ? [] : [entry];
+};
+
 /**
- * The list items under `<key>:` inside a `matrix:` block, read by indentation
- * rather than by a pattern built from the key.
+ * The values of `<key>` in a matrix, read by indentation rather than by a
+ * pattern built from the key: the list items under `<key>:`, and the `<key>:`
+ * of each object under `include:`, where an entry carries its other properties
+ * beside it.
  */
 const collectMatrixEntries = (
   workflowFile: string,
@@ -897,35 +933,29 @@ const collectMatrixEntries = (
 ): readonly string[] => {
   const lines = workflowFile.split('\n');
 
-  const startIndex = lines.findIndex(
-    (line) => indentOf(line) > 0 && line.trim() === `${key}:`,
-  );
-
-  if (startIndex === -1) {
-    return [];
-  }
-
-  const indent = indentOf(lines[startIndex] ?? '');
-
-  const rest = lines.slice(startIndex + 1);
-
-  const endIndex = rest.findIndex(
-    (line) => line.trim() !== '' && indentOf(line) <= indent,
-  );
-
-  const block = endIndex === -1 ? rest : rest.slice(0, endIndex);
-
-  return block.flatMap((line) => {
+  const listed = blockUnder(lines, `${key}:`).flatMap((line) => {
     const trimmed = line.trim();
 
-    if (!trimmed.startsWith(LIST_ITEM)) {
-      return [];
-    }
-
-    const entry = trimmed.slice(LIST_ITEM.length).trim();
-
-    return entry === '' || entry.includes(' ') ? [] : [entry];
+    return !trimmed.startsWith(LIST_ITEM)
+      ? []
+      : singleValue(trimmed.slice(LIST_ITEM.length));
   });
+
+  const prefix = `${key}: ` as const;
+
+  const included = blockUnder(lines, 'include:').flatMap((line) => {
+    const trimmed = line.trim();
+
+    const property = trimmed.startsWith(LIST_ITEM)
+      ? trimmed.slice(LIST_ITEM.length).trimStart()
+      : trimmed;
+
+    return property.startsWith(prefix)
+      ? singleValue(property.slice(prefix.length))
+      : [];
+  });
+
+  return [...listed, ...included];
 };
 
 const LIST_ITEM = '- ';

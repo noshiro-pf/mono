@@ -19,9 +19,9 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * Nothing else catches it. Git auto-merges the insertion without a conflict,
  * and knip is not run by the fast checks, so the first sign is
- * `style-check (z:ci:style-check:checks-and-generators)` reporting a Prettier `SyntaxError` — a message
- * about formatting, several minutes into CI, that names neither knip nor the
- * entry that was damaged.
+ * `style-check (z:ci:style-check:format-and-doc)` reporting a Prettier
+ * `SyntaxError` — a message about formatting, several minutes into CI, that
+ * names neither knip nor the entry that was damaged.
  *
  * The nesting half matters because the brace arithmetic does not always come
  * out unbalanced: shift the insertion point and the same mistake yields a file

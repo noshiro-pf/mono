@@ -53,8 +53,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # 25, matching code-check.yml: `ws:doc`, the longest entry, was measured at
-    # 9m31s and 9m44s under a 10-minute cap — see "The work" in README.md.
+    # 25, matching code-check.yml: `ws:doc`, then the longest entry, was
+    # measured at 9m31s and 9m44s under a 10-minute cap — see "The work" in
+    # README.md.
     timeout-minutes: 25
 
     # The commit the `check:prose` guards that read a change compare the tree
@@ -69,18 +70,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Two entries, so that one pull request's jobs across the check
-        # workflows stay near sixteen of the account's twenty concurrent
-        # runners: `ws:doc`, which builds every package first, and one job
-        # for everything else (`z:ci:style-check:checks-and-generators`,
-        # `run-s --continue-on-error`, so every part of it reports even when
-        # an earlier one fails). As ten entries, most of these were a minute of
-        # setup for seconds of work, and they took ten runners at the moment
-        # code-check.yml's matrix was waiting for them. The parts, in the order
-        # they run: the checks first, on the tree as committed, as each ran in
-        # its own job (`check:prose` diffs it against the base, and a
-        # formatter's rewrite would read as lines the change touched), then
-        # the formatters and generators.
+        # Two entries of about six minutes each, so that one pull request's
+        # jobs across the check workflows stay at seventeen of the account's
+        # twenty concurrent runners (see the matrix of code-check.yml), each
+        # a `run-s --continue-on-error` bundle, so every part of it reports
+        # even when an earlier one fails. As ten entries, most of these were a
+        # minute of setup for seconds of work.
+        #
+        # `z:ci:style-check:checks-and-generators` builds the packages the
+        # others link to and runs, in this order, the checks, on the tree as
+        # committed, as each ran in its own job (`check:prose` diffs it
+        # against the base, and a formatter's rewrite would read as lines the
+        # change touched), then the generators, each compared against the
+        # tree as committed:
         #
         # - `check:prose`: the checks whose inputs are documents. They are here
         #   and not in `check:root` because `check:root` is a
@@ -90,9 +92,6 @@ jobs:
         # - `check:md`, which also applies the fixes markdownlint can make
         #   (`.markdownlint-cli2.mjs` sets `fix: true`), `check:cspell` and
         #   `ws:check:ext`.
-        # - `fix:fmt:full`, Prettier over the repository, before the
-        #   generators, so that each is compared against a formatted tree and
-        #   a formatter cannot tidy a stale generated file back into place.
         # - `strict-lib:fix:fmt`: oxfmt owns `strict-lib/`; Prettier ignores
         #   it.
         # - `gen:deps-graph`: `docs/package-dependencies.md` is generated from
@@ -119,16 +118,23 @@ jobs:
         #   share is starting `tsx` and Prettier, a single thread apiece, where
         #   a package's test runner already fills every core by itself.
         #
+        # `z:ci:style-check:format-and-doc` builds every package and runs
+        # `fix:fmt:full`, Prettier over the repository, then `ws:doc`, which
+        # reads each package's own `dist/`. Prettier is apart from the
+        # generators, so it cannot tidy a stale generated file back into
+        # place before the generator's output is compared.
+        #
         # The repository-clean step below is what turns the formatters and
-        # generators into checks. With them in one job, the paths it lists
-        # say which one wrote: `strict-lib/` is oxfmt's,
+        # generators into checks. The paths it lists say which one wrote: in
+        # the first entry, `strict-lib/` is oxfmt's,
         # `docs/package-dependencies.md` the dependency graph's, a `LICENSE`
-        # the license copier's, a Markdown file markdownlint's or Prettier's,
-        # a generated source (`index.mts`, rule types, an embedded sample)
-        # `ws:gen`'s, anything else Prettier's.
+        # the license copier's, a Markdown file markdownlint's, anything else
+        # (`index.mts`, rule types, an embedded sample) `ws:gen`'s; in the
+        # second, a package's documentation is `ws:doc`'s and anything else
+        # Prettier's.
         command:
           - z:ci:style-check:checks-and-generators
-          - ws:doc
+          - z:ci:style-check:format-and-doc
 
     steps:
       - name: Checkout
@@ -144,13 +150,12 @@ jobs:
       # built yet on a clean checkout, so both entries need the packages
       # emitted first; the rest of the bundle does not read dist/, and a build
       # writes only untracked output, so it runs on the tree as committed all
-      # the same. This workflow has no `build` job the way code-check.yml
-      # does because the two builds differ.
+      # the same. Each entry builds what it reads, as code-check.yml's do.
       #
-      # ws:gen reads no package's own dist/, only its siblings', so the bundle
+      # ws:gen reads no package's own dist/, only its siblings', so its bundle
       # builds just the packages another member links to (`ws:build:deps`),
       # skipping the apps' bundles. ws:doc also reads each package's own
-      # dist/, so it builds everything.
+      # dist/, so its bundle builds everything.
       #
       # `ws:check:ext` used to be on this list and is not: `check-ext.mts`
       # globs file names under `src/` and `scripts/` and resolves nothing, so
@@ -160,7 +165,7 @@ jobs:
         run: pnpm run ws:build:deps
 
       - name: Build all packages
-        if: matrix.command == 'ws:doc'
+        if: matrix.command == 'z:ci:style-check:format-and-doc'
         run: pnpm run ws:build
 
       # The checkout is one commit deep; `git show` and `git diff` need the

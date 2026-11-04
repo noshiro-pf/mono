@@ -142,6 +142,59 @@ describe('collectWorkflowCommands', () => {
     ]);
   });
 
+  test('reads the `include` entries of a matrix the workflow hands to `pnpm run`', () => {
+    const text = dedent`
+      jobs:
+        code-check:
+          strategy:
+            matrix:
+              include:
+                # A comment is not an entry.
+                - command: ws:fix:lint:apps
+                  build: ws:build:deps
+
+                - command: check:root
+                  build: ws:build
+                  browser: true
+          steps:
+            - run: pnpm run \${{ matrix.build }}
+            - name: Run "\${{ matrix.command }}"
+              run: pnpm run \${{ matrix.command }}
+    `;
+
+    assert.deepStrictEqual(collectWorkflowCommands(text), [
+      'check:root',
+      'ws:build',
+      'ws:build:deps',
+      'ws:fix:lint:apps',
+    ]);
+  });
+
+  test('reads every `include` block, not only the first', () => {
+    const text = dedent`
+      jobs:
+        first:
+          strategy:
+            matrix:
+              include:
+                - command: check:md
+          steps:
+            - run: pnpm run \${{ matrix.command }}
+        second:
+          strategy:
+            matrix:
+              include:
+                - command: check:prose
+          steps:
+            - run: pnpm run \${{ matrix.command }}
+    `;
+
+    assert.deepStrictEqual(collectWorkflowCommands(text), [
+      'check:md',
+      'check:prose',
+    ]);
+  });
+
   test('reads a step that names the script itself', () => {
     const text = dedent`
       jobs:

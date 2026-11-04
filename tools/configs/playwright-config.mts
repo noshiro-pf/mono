@@ -46,14 +46,25 @@ export const definePlaywrightAppConfig = ({
    * (`pnpm run dev`, given a minute to answer): the command that serves the
    * build (`preview`) and the one that makes it (`build`).
    *
-   * CI runs `preview` alone, over the `dist/` that `code-check.yml`'s build job
-   * made from the same commit and unpacks before `ws:check:e2e`; locally
+   * CI runs `preview` alone, over the `dist/` that the `code-check.yml` entry
+   * running this suite built with `ws:build` before it (`ws:build:deps` builds
+   * no app, so an entry with such a site has to name the whole build); locally
    * `build` runs first, so that a stale `dist/` is never what is measured. A
    * server already listening on the port is never reused, since it may be the
    * dev server or a preview of an older build: the port being taken fails the
    * run instead.
    */
-  server?: Readonly<{ build: string; preview: string; timeoutMs: number }>;
+  server?: Readonly<{
+    build: string;
+    preview: string;
+    /**
+     * The directory `build` writes, relative to the package. In CI it has to
+     * exist before the suite starts; when it does not, the server command fails
+     * and says so, rather than leaving `preview` to time out.
+     */
+    output: string;
+    timeoutMs: number;
+  }>;
 
   /**
    * The directory of the specs, `e2e` of the package unless another package's
@@ -66,11 +77,13 @@ export const definePlaywrightAppConfig = ({
 
   const isCi = process.env['CI'] !== undefined;
 
+  // In CI the build is checked for in the command rather than here: knip and
+  // other tools load this config too, under `CI` as well, with no app built.
   const serverCommand =
     server === undefined
       ? 'pnpm run dev'
       : isCi
-        ? server.preview
+        ? (`if [ -d ${server.output} ]; then ${server.preview}; else echo "${server.output}/ is missing: in CI this suite serves the build it finds, so the code-check.yml entry running it has to build with ws:build (ws:build:deps builds no app)." >&2; exit 1; fi` as const)
         : (`${server.build} && ${server.preview}` as const);
 
   const baseURL = `http://localhost:${port}${basePath}` as const;

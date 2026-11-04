@@ -469,9 +469,9 @@ rules keep it so:
   must not rewrite a source file (siblings in the same stage import it).
 
 **`build` compiles, strips and stops.** Checks go in `check:*` scripts
-(`ws:check:dist` for those reading `dist/`), generators in `gen:*` scripts
-named by the package's `gen`; anything added to `build.mts` is paid by every
-job that builds. `code-check.yml` builds once and hands `dist/` to the matrix.
+(`ws:check:dist` for those reading `dist/`), generators in `gen:*` scripts named
+by the package's `gen`; anything added to `build.mts` is paid by every job that
+builds, and every check job builds what it reads.
 
 The strip pass (`tools/configs/strip-dev-only-code.mts`, mechanism in
 `ts-repo-utils`) removes `import.meta.vitest` blocks, `expectType` statements,

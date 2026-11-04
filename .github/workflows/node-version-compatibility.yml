@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # install + ws:build + ws:check:test, per Node version.
+    # install + ws:build + ws:check:test or a shard of it, per job.
     # The 10 minutes this was set to when the repository held two packages
     # cut two of the three matrix entries off mid-test.
     timeout-minutes: 30
@@ -78,19 +78,26 @@ jobs:
         # here was the same tests on the same Node a second time, and the build
         # in front of them a second time.
         target: [minimum, lts]
-        # One job per version, running `ws:check:test` whole. It was two
-        # shards per version, each building again, to save about two and a
-        # half minutes of wall clock; four jobs then took four of the
-        # account's twenty runners at the moment code-check.yml's matrix
-        # started, and one pull request's jobs passed twenty. As one job a
-        # version takes about seven and a half minutes plus `gates` (measured
-        # by its shards' steps: a build of one and a half to two minutes, about
-        # five of tests), about half a minute under code-check.yml
-        # and two under the benchmark, and it saves a setup and a build per
-        # version. Should it outgrow code-check.yml, it lengthens the pull
-        # requests the benchmark skips; split it again then.
-        # `ws:check:test` is `--no-bail`, so one package's failure does not
-        # hide the rest.
+        # Three jobs: `minimum` runs `ws:check:test` whole, and `lts`, whose
+        # tests take longer, runs it in two shards, each building again. One
+        # pull request's jobs across the check workflows are kept at
+        # seventeen of the account's twenty runners and all start together
+        # after their gates (see the matrix of code-check.yml), so every job
+        # is sized to about the longest one: `minimum` whole, about 400
+        # seconds (a build of one and a half minutes, four and a half of
+        # tests). `lts` whole was about 470 and would be the longest of the
+        # pull request; its shards are about 300 each. The shards name the
+        # four slowest suites and exclude them, so a new package lands in the
+        # second. Each is `--no-bail`, so one package's failure does not hide
+        # the rest.
+        command:
+          - ws:check:test:shard-1
+          - ws:check:test:shard-2
+        exclude:
+          - target: minimum
+        include:
+          - target: minimum
+            command: ws:check:test
 
     steps:
       - name: Checkout
@@ -130,7 +137,7 @@ jobs:
         run: pnpm run ws:build
 
       - name: Test
-        run: pnpm run ws:check:test
+        run: pnpm run ${{ matrix.command }}
 
   # The one required status check for this workflow, reported as
   # `test-node-versions-result / result` — see "The aggregate job" in README.md.

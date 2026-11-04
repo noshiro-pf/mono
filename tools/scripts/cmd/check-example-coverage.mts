@@ -22,11 +22,12 @@ import { listLibraryDirs } from '../lib/repo-files.mjs';
  * is what answers "is this `@example` backed by a type-checked sample" — but it
  * only ever runs for a package that opted in, by having a
  * `scripts/cmd/embed-examples-in-jsdoc.mts` and reaching it from `doc`, which
- * is the script `ws:doc` runs and `style-check (ws:doc)` asserts the tree is
- * clean after. A package that never opted in is not a package that passes: it
- * is a package nothing looked at, and there is no failure to notice. That is
- * the one thing the per-package check cannot say about itself, so it is said
- * here, once, for every package at once.
+ * is the script `ws:doc` runs and
+ * `style-check (z:ci:style-check:format-and-doc)` asserts the tree is clean
+ * after. A package that never opted in is not a package that passes: it is a
+ * package nothing looked at, and there is no failure to notice. That is the one
+ * thing the per-package check cannot say about itself, so it is said here,
+ * once, for every package at once.
  *
  * The division is deliberate — this asks only whether the check runs, never
  * whether it would pass. Two implementations of "is this `@example` mapped"
@@ -90,7 +91,8 @@ export const checkExampleCoverage = async (): Promise<
         '`scripts/cmd/embed-examples-in-jsdoc.mts` calling the shared',
         '`embedExamplesInJsDoc`, a `scripts/cmd/embed-examples-in-jsdoc-map.mts`',
         'next to it, and a call from the package `doc` script — which is what',
-        '`ws:doc` runs, and `style-check (ws:doc)` checks the tree against.',
+        '`ws:doc` runs, and `style-check (z:ci:style-check:format-and-doc)`',
+        'checks the tree against.',
       ].join('\n'),
     );
   }

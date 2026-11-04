@@ -1,8 +1,9 @@
 name: Strict Lib Generation
 
 # Regenerates the strict standard library for every TypeScript minor and fails
-# when the result differs from what is committed, then type-checks it under
-# each minor (`ws:check:types:strict-lib`).
+# when the result differs from what is committed, and, in a job beside it,
+# type-checks the committed library under each minor
+# (`ws:check:types:strict-lib`).
 #
 # Everything under `strict-lib/v*/output/` is generated and tracked, and until
 # this workflow nothing in CI ran the generator: the other workflows only
@@ -129,7 +130,6 @@ jobs:
           ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
 
       - name: Set up pnpm, Node.js and the dependencies
-        id: setup
         uses: ./.github/actions/setup
 
       # No `ws:build`. Every harness runs `tsx` with
@@ -151,31 +151,50 @@ jobs:
       - name: Check if there is no file diff
         run: pnpm run z:assert-repo-is-clean
 
-      # The harnesses' own type checks: the committed strict lib, checked by
-      # each harness's own TypeScript minor. They are nine tenths
-      # of `ws:check:types`, and code-check.yml leaves them to this job so
-      # that its matrix holds one runner fewer. What they compile is under
-      # `strict-lib/`, plus the TypeScript version the lockfile pins and
-      # `ts-type-forge`'s types, none of which the gate above ignores. The
-      # other packages the build below produces are there for
-      # `assert-deps-built`, not read by `tsc`.
-      #
-      # After the diff check, so that the generator runs with no `dist/`, as
-      # measured above; and whatever it concluded, so that a stale output and
-      # a type error are both reported in one run. When the tree came out
-      # changed, this checks the regenerated output, and the job has failed
-      # already.
-      #
-      # `ws:build:deps` builds what the members link (`assert-deps-built.mts
-      # --workspace`, which the script starts with, asks for all of it), about
-      # a minute; the type checks are three waves of four `tsc` runs.
+  # The harnesses' own type checks: the committed strict lib, checked by each
+  # harness's own TypeScript minor. They are nine tenths of `ws:check:types`,
+  # and code-check.yml leaves them to this workflow. What they compile is
+  # under `strict-lib/`, plus the TypeScript version the lockfile pins and
+  # `ts-type-forge`'s types, none of which the gate above ignores. The other
+  # packages the build below produces are there for `assert-deps-built`, not
+  # read by `tsc`.
+  #
+  # A job of its own beside the generator rather than after it: the two take
+  # about three and six minutes, and one pull request's jobs all start
+  # together after their gates and are kept at seventeen runners, each about
+  # as long as the longest (see the matrix of code-check.yml), so one job of
+  # nine minutes would be the longest of the pull request. It checks the
+  # committed output; a stale one fails the generator's job.
+  #
+  # `ws:build:deps` builds what the members link (`assert-deps-built.mts
+  # --workspace`, which the script starts with, asks for all of it), under a
+  # minute; the type checks are three waves of four `tsc` runs.
+  strict-lib-types:
+    needs: gates
+    if: >-
+      !cancelled() &&
+      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
+      needs.gates.outputs.branch_up_to_date != 'false' &&
+      needs.gates.outputs.should_run != 'false' &&
+      needs.gates.outputs.reused_result == ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
+
+      - name: Set up pnpm, Node.js and the dependencies
+        uses: ./.github/actions/setup
+
       - name: Build what the workspace links
-        id: build-deps
-        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: pnpm run ws:build:deps
 
       - name: Type-check the strict-lib harnesses
-        if: ${{ !cancelled() && steps.build-deps.outcome == 'success' }}
         run: pnpm run ws:check:types:strict-lib
 
   # The one required status check for this workflow, reported as
@@ -184,6 +203,7 @@ jobs:
     needs:
       - gates
       - strict-lib-gen
+      - strict-lib-types
     # Not on a label event while `skip-ci` is on, so that putting the label on
     # supersedes no verdict — "A label event under `skip-ci`" in README.md.
     if: >-
