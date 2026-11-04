@@ -2,9 +2,12 @@ import dedent from 'dedent';
 import { toTree } from '../lib/repo-files.mjs';
 import {
   findPathReferences,
+  isMemberManifest,
   isResolved,
   judgeDocument,
   readDeclaredAbsent,
+  toPackageDirs,
+  type PackageDirs,
   type PathReference,
 } from './check-doc-paths.mjs';
 
@@ -22,11 +25,15 @@ const tree = toTree([
   'experimental/packages/old/README.md',
 ]);
 
+const noPackages: PackageDirs = new Map<string, readonly string[]>();
+
 const writtenIn = (
   text: string,
   relativePath = 'libs/pkg/README.md',
 ): readonly string[] =>
-  findPathReferences(text, relativePath, tree).map(({ written }) => written);
+  findPathReferences(text, relativePath, tree, noPackages).map(
+    ({ written }) => written,
+  );
 
 describe('findPathReferences', () => {
   test('reads a path from the root, the package and the directory', () => {
@@ -35,6 +42,7 @@ describe('findPathReferences', () => {
         'See `docs/a.md`, `src/index.mts` and `assets/c.png`.',
         'libs/pkg/docs/notes/b.md',
         tree,
+        noPackages,
       ),
       [
         { line: 1, written: 'docs/a.md', candidates: fromEach('docs/a.md') },
@@ -54,16 +62,19 @@ describe('findPathReferences', () => {
 
   test('reads a document beside its package.json from two places', () => {
     assert.deepStrictEqual(
-      findPathReferences('`docs/gone.md`', 'libs/pkg/README.md', tree).map(
-        ({ candidates }) => candidates,
-      ),
+      findPathReferences(
+        '`docs/gone.md`',
+        'libs/pkg/README.md',
+        tree,
+        noPackages,
+      ).map(({ candidates }) => candidates),
       [['docs/gone.md', 'libs/pkg/docs/gone.md']],
     );
   });
 
   test('reads a document at the root from the root alone', () => {
     assert.deepStrictEqual(
-      findPathReferences('`docs/gone.md`', 'CLAUDE.md', tree).map(
+      findPathReferences('`docs/gone.md`', 'CLAUDE.md', tree, noPackages).map(
         ({ candidates }) => candidates,
       ),
       [['docs/gone.md']],
@@ -140,6 +151,7 @@ describe('findPathReferences', () => {
         '`src/main.mts` and `docs/a.md`',
         'apps/site/src/content/docs/page.md',
         tree,
+        noPackages,
       ),
       [{ line: 1, written: 'docs/a.md', candidates: ['docs/a.md'] }],
     );
@@ -194,9 +206,180 @@ describe('findPathReferences', () => {
         'one\n\n`src/index.mts`',
         'libs/pkg/README.md',
         tree,
+        noPackages,
       ).map(({ line }) => line),
       [3],
     );
+  });
+});
+
+describe('findPathReferences, a file name a package name places', () => {
+  const packages: PackageDirs = new Map<string, readonly string[]>([
+    ['pkg', ['libs/pkg']],
+    ['@scope/site', ['apps/site']],
+    ['twice', ['libs/a', 'libs/b']],
+  ]);
+
+  const placed = (text: string): readonly PathReference[] =>
+    findPathReferences(text, 'docs/a.md', tree, packages);
+
+  test("reads `'s` after a bare or backticked name, and `の`", () => {
+    assert.deepStrictEqual(
+      placed(
+        "pkg's `README.md`, `pkg`’s `NEXT_MAJOR.md`, `@scope/site` の `SPEC.md`, pkgの`CHANGELOG.md`",
+      ),
+      [
+        {
+          line: 1,
+          written: 'libs/pkg/README.md',
+          candidates: ['libs/pkg/README.md'],
+        },
+        {
+          line: 1,
+          written: 'libs/pkg/NEXT_MAJOR.md',
+          candidates: ['libs/pkg/NEXT_MAJOR.md'],
+        },
+        {
+          line: 1,
+          written: 'apps/site/SPEC.md',
+          candidates: ['apps/site/SPEC.md'],
+        },
+        {
+          line: 1,
+          written: 'libs/pkg/CHANGELOG.md',
+          candidates: ['libs/pkg/CHANGELOG.md'],
+        },
+      ],
+    );
+  });
+
+  test('reads a name two directories declare from each', () => {
+    assert.deepStrictEqual(
+      placed("twice's `NEXT_MAJOR.md`").map(({ candidates }) => candidates),
+      [['libs/a/NEXT_MAJOR.md', 'libs/b/NEXT_MAJOR.md']],
+    );
+  });
+
+  test('leaves a name no package has, and a bare file name, alone', () => {
+    assert.deepStrictEqual(
+      placed(
+        "the package's `NEXT_MAJOR.md`, `README.md`, each one's `SPEC.md`, pkg-two's `README.md`",
+      ),
+      [],
+    );
+  });
+
+  test('reads only a Markdown file name of one segment', () => {
+    assert.deepStrictEqual(
+      placed(
+        "pkg's `package.json`, pkg's `index.mts`, pkg's `NEXT_MAJOR.mdx`, pkg's `a b.md`, pkg's `docs/a.md`",
+      ).filter(({ written }) => written.startsWith('libs/pkg/')),
+      [],
+    );
+  });
+
+  test('drops a trailing line number or anchor, and reads nothing else after the name', () => {
+    assert.deepStrictEqual(
+      placed(
+        "pkg's `README.md#usage`, pkg's `SPEC.md:12` and pkg's `GONE.md: see Usage`",
+      ).map(({ written }) => written),
+      ['libs/pkg/README.md', 'libs/pkg/SPEC.md'],
+    );
+  });
+
+  test('reads a sentence wrapped between the name and the file name, on the line it starts', () => {
+    assert.deepStrictEqual(
+      placed("one\nIt cites pkg's\n`GONE.md` there.\n\npkg's").map(
+        ({ line, written }) => ({ line, written }),
+      ),
+      [{ line: 2, written: 'libs/pkg/GONE.md' }],
+    );
+  });
+
+  test('leaves a sentence shown as code alone', () => {
+    assert.deepStrictEqual(placed("Write `` pkg's `GONE.md` `` there."), []);
+  });
+
+  test('reads a file name only when it is a code span of its own', () => {
+    assert.deepStrictEqual(placed("pkg's `GONE.md`` x"), []);
+
+    assert.deepStrictEqual(
+      placed("Use \\` and pkg's `GONE.md` here").map(({ written }) => written),
+      ['libs/pkg/GONE.md'],
+    );
+  });
+
+  test('leaves fenced code alone', () => {
+    assert.deepStrictEqual(
+      placed(dedent`
+        \`\`\`md
+        pkg's \`GONE.md\`
+        \`\`\`
+      `),
+      [],
+    );
+  });
+});
+
+describe('toPackageDirs', () => {
+  test("maps each member's name to the directories that declare it", () => {
+    assert.deepStrictEqual(
+      toPackageDirs([
+        { manifest: 'libs/a/package.json', text: '{"name":"a"}' },
+        { manifest: 'apps/a/package.json', text: '{"name":"a"}' },
+        { manifest: 'languages/sumi/x/package.json', text: '{"name":"x"}' },
+        {
+          manifest: 'strict-lib/v5.0/output/lib/package.json',
+          text: '{"name":"strict"}',
+        },
+      ]),
+      new Map<string, readonly string[]>([
+        ['a', ['libs/a', 'apps/a']],
+        ['x', ['languages/sumi/x']],
+        ['strict', ['strict-lib/v5.0/output/lib']],
+      ]),
+    );
+  });
+
+  test('leaves out a manifest that names nothing', () => {
+    assert.deepStrictEqual(
+      toPackageDirs([
+        { manifest: 'libs/nameless/package.json', text: '{}' },
+        { manifest: 'libs/broken/package.json', text: '{' },
+      ]),
+      noPackages,
+    );
+  });
+});
+
+describe('isMemberManifest', () => {
+  const workspaces = [
+    'libs/*',
+    'languages/*/*',
+    'strict-lib/v*/output/lib',
+  ] as const;
+
+  test('is true for a member the workspaces globs name', () => {
+    for (const manifest of [
+      'libs/a/package.json',
+      'languages/sumi/x/package.json',
+      'strict-lib/v5.0/output/lib/package.json',
+    ]) {
+      assert.isTrue(isMemberManifest(manifest, workspaces));
+    }
+  });
+
+  test('is false for anything else', () => {
+    for (const manifest of [
+      'package.json',
+      'libs/a/b/package.json',
+      'experimental/packages/old/package.json',
+      'verify-npm-packages/local/packages/a/package.json',
+      'strict-lib/v5.0/output/lib/libs/dom/package.json',
+      'libs/a/README.md',
+    ]) {
+      assert.isFalse(isMemberManifest(manifest, workspaces));
+    }
   });
 });
 

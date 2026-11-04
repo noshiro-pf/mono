@@ -1,5 +1,6 @@
 import dedent from 'dedent';
 import {
+  codeSpanRanges,
   codeSpans,
   markdownLines,
   tableCell,
@@ -135,5 +136,20 @@ describe('tableCell', () => {
       tableCell(String.raw`a\|b \r\n`),
       String.raw`a\\\|b \r\n`,
     );
+  });
+});
+
+describe('codeSpanRanges', () => {
+  test('gives where each span is, its backticks included', () => {
+    assert.deepStrictEqual(codeSpanRanges('a `b` c `` d`e ``'), [
+      { start: 2, end: 5 },
+      { start: 8, end: 17 },
+    ]);
+  });
+
+  test('reads an escaped backtick as text', () => {
+    assert.deepStrictEqual(codeSpanRanges('a \\` b `c`'), [
+      { start: 7, end: 10 },
+    ]);
   });
 });

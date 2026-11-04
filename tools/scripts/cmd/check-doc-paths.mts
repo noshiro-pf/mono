@@ -1,10 +1,19 @@
 import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { Arr, Result, unknownToString } from 'ts-data-forge';
+import {
+  Arr,
+  hasKey,
+  isRecord,
+  isString,
+  Json,
+  Result,
+  unknownToString,
+} from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { StrictOmit } from 'ts-type-forge';
 import {
+  codeSpanRanges,
   codeSpans,
   markdownLines,
   withoutCodeSpans,
@@ -60,6 +69,15 @@ import { projectRootPath } from '../project-root-path.mjs';
  * `.claude/skills/unblock-prs`), whose target the tree does not describe;
  * nor a path into `experimental/`, for the reason `isUnderExperimental` gives.
  *
+ * A Markdown file name of one segment is read only where the sentence says
+ * whose it is: a workspace package's name, bare or in backticks, then a
+ * possessive (`'s`, or `の` in Japanese), then the file name in backticks, as
+ * in "synstate's `NEXT_MAJOR.md`". That means the file in that package's
+ * directory, and has to be a tracked file there; it is written as that path
+ * from the root, which is also how a `doc-paths-ignore` declaration names it. A
+ * name that nothing places — `README.md`, "the package's `NEXT_MAJOR.md`" — is
+ * not read, since it has no fixed base.
+ *
  * A document that names a path that is not there on purpose — a file elsewhere,
  * one that is planned, one that was removed — declares it:
  * `<!-- doc-paths-ignore: .github/README.md -->`, anywhere in the document, as
@@ -73,13 +91,15 @@ export const checkDocPaths = async (): Promise<Result<CheckSummary, string>> =>
 
     const tree = toTree(tracked);
 
+    const packages = yield* Result.safeUnwrap(await readPackageDirs(tracked));
+
     const documents = tracked.filter(isRepositoryProse);
 
     const read = await Promise.all(
       documents.map(async (relativePath) =>
         Result.map(await readRepositoryFile(relativePath), (text) => ({
           relativePath,
-          references: findPathReferences(text, relativePath, tree),
+          references: findPathReferences(text, relativePath, tree, packages),
           declared: readDeclaredAbsent(text),
         })),
       ),
@@ -144,16 +164,21 @@ export const checkDocPaths = async (): Promise<Result<CheckSummary, string>> =>
  * Every code span in `fileText` that is read as a repository path, with the
  * paths from the repository root it may mean. `relativePath` is the document's
  * own path from the root; `tree` is what decides whether a first segment is
- * there to be named.
+ * there to be named; `packages` (each workspace package's name, and the
+ * directories that declare it) is what places a file name a sentence gives an
+ * owner to.
  */
 export const findPathReferences = (
   fileText: string,
   relativePath: string,
   tree: Tree,
+  packages: PackageDirs,
 ): readonly PathReference[] => {
   const bases = basesOf(relativePath, tree);
 
-  return markdownLines(fileText)
+  const lines = markdownLines(fileText);
+
+  return lines
     .filter(({ fenced }) => !fenced)
     .flatMap(({ line, text }) =>
       Arr.generate(function* () {
@@ -164,8 +189,113 @@ export const findPathReferences = (
             yield { line, ...reference };
           }
         }
+
+        // `line` is 1-based, so this is the line after it: a sentence wrapped
+        // between the package name and the file name is read whole.
+        const next = lines[line];
+
+        const following =
+          next === undefined || next.fenced ? '' : (`\n${next.text}` as const);
+
+        for (const reference of possessiveReferences(
+          text,
+          following,
+          packages,
+        )) {
+          yield { line, ...reference };
+        }
       }),
     );
+};
+
+/**
+ * Each workspace package's name and the directories whose tracked
+ * `package.json` declares it, read from the tree. The members are those the
+ * root `package.json`'s `workspaces` names, the list `pnpm-workspace.yaml`
+ * holds too.
+ */
+export const readPackageDirs = async (
+  tracked: readonly string[],
+): Promise<Result<PackageDirs, string>> => {
+  const root = await readRepositoryFile('package.json');
+
+  if (Result.isErr(root)) {
+    return root;
+  }
+
+  const workspaces = workspacesOf(root.value);
+
+  if (!Arr.isNonEmpty(workspaces)) {
+    return Result.err(
+      'the root package.json names no `workspaces`, which is where the package names are read from',
+    );
+  }
+
+  const read = await Promise.all(
+    tracked
+      .filter((manifest) => isMemberManifest(manifest, workspaces))
+      .map(async (manifest) =>
+        Result.map(await readRepositoryFile(manifest), (text) => ({
+          manifest,
+          text,
+        })),
+      ),
+  );
+
+  const firstError = read.find(Result.isErr);
+
+  if (firstError !== undefined) {
+    return Result.err(firstError.value);
+  }
+
+  return Result.ok(
+    toPackageDirs(
+      Arr.generate(function* () {
+        for (const result of read) {
+          if (Result.isOk(result)) {
+            yield result.value;
+          }
+        }
+      }),
+    ),
+  );
+};
+
+/**
+ * Whether `manifest` is the `package.json` of a member the `workspaces` globs
+ * name. A project under `verify-npm-packages/`, or a group manifest of a
+ * strict-lib bundle, is not a package a sentence names.
+ */
+export const isMemberManifest = (
+  manifest: string,
+  workspaces: readonly string[],
+): boolean =>
+  path.posix.basename(manifest) === 'package.json' &&
+  workspaces.some((pattern) =>
+    path.posix.matchesGlob(path.posix.dirname(manifest), pattern),
+  );
+
+/**
+ * Each package name the manifests declare, with the directories that declare
+ * it. A manifest with no `name`, or one that is not JSON, names nothing.
+ */
+export const toPackageDirs = (
+  manifests: readonly Readonly<{ manifest: string; text: string }>[],
+): PackageDirs => {
+  const mut_dirs = new Map<string, readonly string[]>();
+
+  for (const { manifest, text } of manifests) {
+    const name = nameOf(text);
+
+    if (name !== undefined) {
+      mut_dirs.set(
+        name,
+        Arr.toPushed(mut_dirs.get(name) ?? [], path.posix.dirname(manifest)),
+      );
+    }
+  }
+
+  return mut_dirs;
 };
 
 /**
@@ -223,6 +353,9 @@ export const judgeDocument = ({
   };
 };
 
+/** Each workspace package's name, and the directories that declare it. */
+export type PackageDirs = ReadonlyMap<string, readonly string[]>;
+
 /** A code span read as a repository path. */
 export type PathReference = Readonly<{
   /** 1-based. */
@@ -254,6 +387,18 @@ const SEGMENT = /^[\w.@+-]+$/u;
 const DOTS_ONLY = /^\.+$/u;
 
 const DECLARATION = /<!--\s*doc-paths-ignore:(?<paths>[^>]*?)-->/gu;
+
+/**
+ * A package name, bare or in backticks, its possessive (`'s`, `’s`, or `の`),
+ * and a one-segment file name in backticks, a trailing `:12` or `#anchor`
+ * allowed: "synstate's `NEXT_MAJOR.md`", "`synstate` の `NEXT_MAJOR.md`". The
+ * name starts where a word does.
+ */
+const POSSESSIVE =
+  /(?<![\w@/.-])(?:`(?<quoted>@?[\w./-]+)`|(?<bare>@?[\w./-]+))(?:['’]s\s+|\s*の\s*)(?<span>`(?<file>[\w.-]+\.md)(?<suffix>(?=[`#:])[^`]*)`)/gu;
+
+/** What may follow a placed file name in its span: nothing, `:12` or `#x`. */
+const LOCATION = /^(?:|:[\d:]+|#.*)$/u;
 
 /**
  * The directories a path in `relativePath` may be read from: the root, the
@@ -314,6 +459,99 @@ const toReference = (
   return candidates.some(isUnderExperimental)
     ? undefined
     : { written, candidates };
+};
+
+/**
+ * The file names that a package name on one line places, each as the paths from
+ * the root it may mean (one per directory declaring the name). The sentence may
+ * go on into `following`, the next line with its line break.
+ */
+const possessiveReferences = (
+  text: string,
+  following: string,
+  packages: PackageDirs,
+): readonly StrictOmit<PathReference, 'line'>[] => {
+  const joined = `${text}${following}` as const;
+
+  const matches = Array.from(joined.matchAll(POSSESSIVE)).filter(
+    (match) =>
+      match.index < text.length &&
+      packages.has(match.groups?.['quoted'] ?? match.groups?.['bare'] ?? '') &&
+      LOCATION.test(match.groups?.['suffix'] ?? ''),
+  );
+
+  if (!Arr.isNonEmpty(matches)) {
+    return [];
+  }
+
+  const spans = codeSpanRanges(joined);
+
+  return matches.flatMap((match) => {
+    const name = match.groups?.['quoted'] ?? match.groups?.['bare'] ?? '';
+
+    const file = match.groups?.['file'] ?? '';
+
+    const span = match.groups?.['span'] ?? '';
+
+    const dirs = packages.get(name);
+
+    const spanStart = match.index + match[0].length - span.length;
+
+    // The file name has to be a code span of its own, and the sentence not
+    // inside one: a sentence shown as code is an example.
+    const isFileSpan = spans.some(
+      ({ start, end }) =>
+        start === spanStart && end === spanStart + span.length,
+    );
+
+    const isExample = spans.some(
+      ({ start, end }) => start < match.index && match.index < end,
+    );
+
+    if (dirs === undefined || !isFileSpan || isExample) {
+      return [];
+    }
+
+    const candidates = dirs.map((dir) => path.posix.join(dir, file));
+
+    const [written] = candidates;
+
+    return written === undefined ? [] : [{ written, candidates }];
+  });
+};
+
+/** The `workspaces` globs of the root `package.json`, or none. */
+const workspacesOf = (manifestText: string): readonly string[] => {
+  const parsed = Json.parse(manifestText);
+
+  if (Result.isErr(parsed)) {
+    return [];
+  }
+
+  const manifest = parsed.value;
+
+  return isRecord(manifest) &&
+    hasKey(manifest, 'workspaces') &&
+    Arr.isArray(manifest.workspaces)
+    ? manifest.workspaces.filter(isString)
+    : [];
+};
+
+/** The `name` of a `package.json`, or `undefined` when it has none. */
+const nameOf = (manifestText: string): string | undefined => {
+  const parsed = Json.parse(manifestText);
+
+  if (Result.isErr(parsed)) {
+    return undefined;
+  }
+
+  const manifest = parsed.value;
+
+  return isRecord(manifest) &&
+    hasKey(manifest, 'name') &&
+    isString(manifest.name)
+    ? manifest.name
+    : undefined;
 };
 
 /** Whether a proper prefix of `relativePath` is a symlink on disk. */
