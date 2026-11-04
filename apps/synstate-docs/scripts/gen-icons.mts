@@ -106,8 +106,6 @@ const toIco = (
 const main = async (): Promise<void> => {
   const logo = await fs.readFile(logoPath);
 
-  // `Uint8Array#toBase64` arrived only in Node.js 25; `engines.node` is lower.
-  // eslint-disable-next-line unicorn/prefer-uint8array-base64
   const logoBase64 = logo.toString('base64');
 
   const logoDataUri = `data:image/png;base64,${logoBase64}` as const;

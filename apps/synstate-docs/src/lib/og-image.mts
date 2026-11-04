@@ -354,9 +354,6 @@ const logoPng = readFileSync(
   path.resolve(process.cwd(), 'public/favicon/logo-mark-256x256.png'),
 );
 
-// The site is built on every Node.js line CI tests, and `Uint8Array#toBase64`
-// arrived only in Node.js 25.
-// eslint-disable-next-line unicorn/prefer-uint8array-base64
 const logoBase64 = logoPng.toString('base64');
 
 const logoDataUri = `data:image/png;base64,${logoBase64}` as const;
