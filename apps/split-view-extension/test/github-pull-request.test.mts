@@ -280,7 +280,7 @@ describe('pullRequestSplitViewSearch', () => {
         ws: 'github-pull-request',
         name: 'GitHub pull request',
         title: '#2085 Fix the thing',
-        layout: 'r554fpr577fpp',
+        layout: 'r737fpr577fpp',
         url: [diff, conversation, issue],
         zoom: ['0.67', '0.75', '0.75'],
       },
@@ -301,7 +301,7 @@ describe('pullRequestSplitViewSearch', () => {
         ws: 'github-pull-request',
         name: 'GitHub pull request',
         title: '#2085 Fix the thing',
-        layout: 'r554fpr577fpp',
+        layout: 'r737fpr577fpp',
         url: [diff, conversation, session],
         zoom: ['0.67', '0.75', '1'],
       },
@@ -322,7 +322,7 @@ describe('pullRequestSplitViewSearch', () => {
         ws: 'github-pull-request',
         name: 'GitHub pull request',
         title: '#2085 Fix the thing',
-        layout: 'r554fpr577fpcpp',
+        layout: 'r737fpr577fpcpp',
         url: [diff, conversation, issue, session],
         zoom: ['0.67', '0.75', '0.75', '1'],
       },
@@ -337,7 +337,7 @@ describe('pullRequestSplitViewSearch', () => {
 
       assert.deepStrictEqual(
         [diffWidth, conversationWidth, issueWidth],
-        [554, 577, width - 554 - 577 - 2 * gutter],
+        [737, 577, width - 737 - 577 - 2 * gutter],
       );
     }
   });

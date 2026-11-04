@@ -46,7 +46,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('r554fpr577fpp');
+    expect(params.get('layout')).toBe('r737fpr577fpp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
@@ -64,7 +64,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('r554fpr577fpp');
+    expect(params.get('layout')).toBe('r737fpr577fpp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
@@ -82,7 +82,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('r554fpr577fpp');
+    expect(params.get('layout')).toBe('r737fpr577fpp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
@@ -100,7 +100,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('r554fpr577fpcpp');
+    expect(params.get('layout')).toBe('r737fpr577fpcpp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,

@@ -353,7 +353,7 @@ split view saves the address the pane is at, so without
 [`github-view-defaults-extension`](../../github-view-defaults-extension/README.md),
 which puts them back, the next time that split view opens the diff shows
 everything. When the pull request closes an issue, or names the Claude Code
-session it was written in, the diff is held at 554px, still at 67%, and the
+session it was written in, the diff is held at 737px, still at 67%, and the
 conversation at 577px, the widest its description gets with the reviewers and
 the labels below it, and the issue or the session takes the rest, to the right
 of the conversation; with both, the issue is stacked over the session. The first
