@@ -59,6 +59,7 @@ export const AnnotationCanvas = memoNamed<Props>(
                   object-fit: contain;
                   user-select: none;
                 `}
+                data-e2e={'sample-image'}
                 src={SampleImage}
               />
             </div>

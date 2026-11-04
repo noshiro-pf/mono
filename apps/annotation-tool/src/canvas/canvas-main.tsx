@@ -126,6 +126,7 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
   return (
     <canvas
       ref={canvasRef}
+      data-e2e={'annotation-canvas'}
       height={props.canvasSize.height}
       style={canvasStyle}
       width={props.canvasSize.width}
