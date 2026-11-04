@@ -34,13 +34,18 @@ export type CanvasAppState = {
   bboxList: PixiBbox[];
 };
 
-export const defaultCanvasAppState: CanvasAppState = {
-  pointerPos: { x: 0, y: 0 },
-  dragStartPoint: { x: 0, y: 0 },
-  dragEndPoint: { x: 0, y: 0 },
-  grabbingObject: { type: undefined },
-  verticalLine: undefined,
-  horizontalLine: undefined,
-  temporaryRect: undefined,
-  bboxList: [],
-} as const;
+/**
+ * A state of its own for each canvas: the pointer handlers mutate it in place,
+ * so one shared object would carry one canvas's boxes into the next.
+ */
+export const createCanvasAppState = (): CanvasAppState =>
+  ({
+    pointerPos: { x: 0, y: 0 },
+    dragStartPoint: { x: 0, y: 0 },
+    dragEndPoint: { x: 0, y: 0 },
+    grabbingObject: { type: undefined },
+    verticalLine: undefined,
+    horizontalLine: undefined,
+    temporaryRect: undefined,
+    bboxList: [],
+  }) as const;

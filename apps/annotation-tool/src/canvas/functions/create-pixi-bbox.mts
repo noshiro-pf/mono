@@ -7,6 +7,7 @@
 
 import { Graphics } from 'pixi.js-legacy';
 import { Num } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import type { Rect, Rgba } from 'ts-utils-additional';
 import { zIndex } from '../z-index.mjs';
 import {
@@ -40,7 +41,7 @@ export const createBbox = (
   borderWidthPx: number,
   pointWidthPx: number,
   borderColor: Rgba,
-): readonly [Graphics, Record<Direction, Graphics>] =>
+): readonly [Graphics, ReadonlyRecord<Direction, Graphics>] =>
   [
     createBboxRect(rect, borderWidthPx, borderColor),
     createBboxPoints(rect, pointWidthPx, borderColor),
@@ -91,7 +92,7 @@ const createBboxPoints = (
   rect: Rect,
   pointWidthPx: number,
   color: Rgba,
-): Record<Direction, Graphics> => {
+): ReadonlyRecord<Direction, Graphics> => {
   const pointWidthPxHalf = Num.roundToInt(pointWidthPx / 2);
 
   return mapBboxPoints(bboxPointsFromRect(rect), (direction, p) =>

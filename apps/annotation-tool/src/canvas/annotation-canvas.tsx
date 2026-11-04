@@ -1,8 +1,7 @@
-import { css } from '@emotion/react';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import type { Hue, RectSize } from 'ts-utils-additional';
 import { SampleImage } from '../assets/index.mjs';
+import * as styles from './annotation-canvas.module.css';
 import { CanvasMain } from './canvas-main.js';
 import { bgCheckerboardImg } from './img/index.mjs';
 import { defaultIdMaker, type AnnotationCanvasStyle } from './types/index.mjs';
@@ -10,78 +9,47 @@ import { defaultIdMaker, type AnnotationCanvasStyle } from './types/index.mjs';
 type Props = Readonly<{
   canvasStyles: AnnotationCanvasStyle;
   canvasSize: RectSize;
-  selectedHue: Hue;
+  selectedHue: Bindable<Hue>;
 }>;
 
-export const AnnotationCanvas = memoNamed<Props>(
-  'AnnotationCanvas',
-  (props: Props) => {
-    const idMaker = defaultIdMaker;
-
-    const rootStyle = React.useMemo<React.CSSProperties>(
-      () => ({
-        width: `${props.canvasSize.width}px`,
-        height: `${props.canvasSize.height}px`,
-      }),
-      [props.canvasSize],
-    );
-
-    const imgWrapperStyle = React.useMemo<React.CSSProperties>(
-      () => ({
-        height: '100%',
-        padding: `${props.canvasStyles.background.minPaddingPx}px`,
-      }),
-      [props.canvasStyles.background.minPaddingPx],
-    );
-
-    return (
-      <div
-        css={css`
-          background-image: url(${bgCheckerboardImg});
-        `}
-        style={rootStyle}
-      >
+/** The sample image on a checkerboard, under the canvas boxes are drawn on. */
+export const AnnotationCanvas = ({
+  canvasStyles,
+  canvasSize,
+  selectedHue,
+}: Props): JSX.Element => (
+  <div
+    style={{
+      'background-image': constant(`url(${bgCheckerboardImg})`),
+      width: constant(`${canvasSize.width}px`),
+      height: constant(`${canvasSize.height}px`),
+    }}
+  >
+    <div class={constant(styles.root)}>
+      <div class={constant(styles.layer)}>
         <div
-          css={css`
-            position: relative;
-            width: 100%;
-            height: 100%;
-          `}
+          class={constant(styles.imageWrapper)}
+          style={{
+            padding: constant(`${canvasStyles.background.minPaddingPx}px`),
+          }}
         >
-          <div css={absoluteWrapperStyle}>
-            <div style={imgWrapperStyle}>
-              {/* eslint-disable-next-line jsx-a11y/alt-text */}
-              <img
-                css={css`
-                  display: block;
-                  width: 100%;
-                  height: 100%;
-                  object-fit: contain;
-                  user-select: none;
-                `}
-                data-e2e={'sample-image'}
-                src={SampleImage}
-              />
-            </div>
-          </div>
-          <div css={absoluteWrapperStyle}>
-            <CanvasMain
-              canvasSize={props.canvasSize}
-              canvasStyles={props.canvasStyles}
-              idMaker={idMaker}
-              selectedHue={props.selectedHue}
-            />
-          </div>
+          {/* A sample to draw on, with nothing to say about it. */}
+          <img
+            alt={constant('')}
+            class={constant(styles.image)}
+            data-e2e={constant('sample-image')}
+            src={constant(SampleImage)}
+          />
         </div>
       </div>
-    );
-  },
+      <div class={constant(styles.layer)}>
+        <CanvasMain
+          canvasSize={canvasSize}
+          canvasStyles={canvasStyles}
+          idMaker={defaultIdMaker}
+          selectedHue={selectedHue}
+        />
+      </div>
+    </div>
+  </div>
 );
-
-const absoluteWrapperStyle = css`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-`;

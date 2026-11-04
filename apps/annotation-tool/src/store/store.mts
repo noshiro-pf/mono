@@ -1,60 +1,44 @@
-import { map } from 'synstate';
-import {
-  createBooleanState,
-  createReducer,
-  createState,
-} from 'synstate-react-hooks';
+import { createBooleanState, createReducer, createState } from 'synstate';
 import type { IdType, Label } from '../canvas/index.mjs';
 import { labelInit, labels } from '../constants/index.mjs';
 import { visibleLabelsReducer } from '../functions/index.mjs';
 import type { AppEventHandler } from '../types/index.mjs';
 
-// The state creators return tuples now, not objects.
-const [useSideBarIsHidden, { setTrue: hideSideBar, setFalse: showSideBar }] =
+const [labelListIsCollapsed$, { toggle: toggleLabelList }] =
   createBooleanState(false);
 
-const [, visibleLabelIndicesDispatcher, { state: visibleLabelIndices$ }] =
-  createReducer(
-    visibleLabelsReducer,
-    labels.map(() => true),
-  );
+const [labelVisibilityFlags$, labelVisibilityFlagsDispatcher] = createReducer(
+  visibleLabelsReducer,
+  labels.map(() => true),
+);
 
-const [useSelectedLabel, setSelectedLabel] = createState<Label>(labelInit);
+const [selectedLabel$, setSelectedLabel] = createState<Label>(labelInit);
 
 const selectLabel = (labelId: IdType): void => {
   setSelectedLabel(labels.find((l) => l.id === labelId) ?? labelInit);
 };
 
 const handlers: AppEventHandler = {
-  collapseLabelList: hideSideBar,
-  expandLabelList: showSideBar,
+  toggleLabelList,
   showAllLabels: () => {
-    visibleLabelIndicesDispatcher({ type: 'show-all' });
+    labelVisibilityFlagsDispatcher({ type: 'show-all' });
   },
   hideAllLabels: () => {
-    visibleLabelIndicesDispatcher({ type: 'hide-all' });
+    labelVisibilityFlagsDispatcher({ type: 'hide-all' });
   },
   flipLabelVisibility: (labelId) => {
     const index = labels.findIndex((l) => l.id === labelId);
 
-    visibleLabelIndicesDispatcher({ type: 'flip', index });
+    labelVisibilityFlagsDispatcher({ type: 'flip', index });
   },
   selectLabel,
 } as const;
 
-const visibleLabels$ = visibleLabelIndices$.pipe(
-  map((visibleLabelIndices) =>
-    labels.filter((_, i) => visibleLabelIndices[i] === true),
-  ),
-);
-
 export {
   handlers,
-  hideSideBar,
+  labelListIsCollapsed$,
+  labelVisibilityFlags$,
+  labelVisibilityFlagsDispatcher,
+  selectedLabel$,
   selectLabel,
-  showSideBar,
-  useSelectedLabel,
-  useSideBarIsHidden,
-  visibleLabelIndicesDispatcher,
-  visibleLabels$,
 };

@@ -7,13 +7,13 @@ export const [
   //
   saturationDarker,
   saturationLighter,
-]: readonly [Percent, Percent] = [80, 100] as const;
+]: FixedLengthTuple<2, Percent> = [80, 100] as const;
 
 export const [
   //
   lightnessDarker,
   lightnessLighter,
-]: readonly [Percent, Percent] = [50, 90] as const;
+]: FixedLengthTuple<2, Percent> = [50, 90] as const;
 
 // const highlightAlpha: Alpha = 0.4;
 

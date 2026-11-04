@@ -1,11 +1,17 @@
-import { useState } from 'better-react-use-state';
 import {
   Application,
   InteractionManager,
   settings as mut_settings,
 } from 'pixi.js-legacy';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import { onScopeDispose } from 'synstate';
+import {
+  constant,
+  createAfterUpdate,
+  subscribeInScope,
+  toObservable,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import {
   hslaToRgba,
@@ -19,8 +25,7 @@ import {
 } from './functions/index.mjs';
 import {
   canvasAppStateHandlerGenerator,
-  defaultCanvasAppState,
-  type CanvasAppState,
+  createCanvasAppState,
 } from './state/index.mjs';
 import type { AnnotationCanvasStyle, IdType, PixiApp } from './types/index.mjs';
 import { zIndex } from './z-index.mjs';
@@ -34,21 +39,73 @@ type Props = Readonly<{
   idMaker: () => IdType;
   canvasStyles: AnnotationCanvasStyle;
   canvasSize: RectSize;
-  selectedHue: Hue;
+  selectedHue: Bindable<Hue>;
 }>;
 
-export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+/**
+ * The PixiJS canvas boxes are drawn on, in the selected label's hue.
+ *
+ * The application is made once the canvas is in the document, and the pointer
+ * listeners are attached again whenever the hue changes, with the drawing state
+ * kept across: a box being drawn carries on in the new colour.
+ */
+export const CanvasMain = ({
+  idMaker,
+  canvasStyles,
+  canvasSize,
+  selectedHue,
+}: Props): JSX.Element => {
+  const afterUpdate = createAfterUpdate();
 
-  const [pixiApp, setPixiApp] = useState<PixiApp | undefined>(undefined);
+  const hue$ = toObservable(selectedHue);
 
-  React.useEffect(() => {
-    // should initialize in useEffect to wait for canvasRef.current initialization
+  // Mutated by the pointer handlers, and kept across their reattachment.
+  const canvasAppState = createCanvasAppState();
+
+  const mut_state: {
+    pixiApp: PixiApp | undefined;
+    interactionManager: InteractionManager | undefined;
+    /** The hue the listeners attached last draw new boxes in. */
+    hue: Hue | undefined;
+    removePointerEventListener: () => void;
+  } = {
+    pixiApp: undefined,
+    interactionManager: undefined,
+    hue: undefined,
+    removePointerEventListener: () => {},
+  };
+
+  const attachPointerEventListener = (hue: Hue): void => {
+    const { pixiApp } = mut_state;
+
+    // Another label of the same hue draws as this one does.
+    if (pixiApp === undefined || hue === mut_state.hue) {
+      return;
+    }
+
+    mut_state.hue = hue;
+
+    mut_state.removePointerEventListener();
+
+    mut_state.removePointerEventListener = addGlobalPointerEventListener(
+      pixiApp.app,
+      pixiApp.background,
+      canvasAppState,
+      canvasAppStateHandlerGenerator(
+        pixiApp,
+        idMaker,
+        canvasStyles,
+        newBboxColor(canvasStyles, hue),
+      ),
+    );
+  };
+
+  const createPixiApp = (canvas: HTMLCanvasElement): void => {
     const app = new Application({
-      width: props.canvasSize.width,
-      height: props.canvasSize.height,
+      width: canvasSize.width,
+      height: canvasSize.height,
       transparent: true,
-      view: canvasRef.current ?? undefined,
+      view: canvas,
       antialias: false,
     });
 
@@ -56,86 +113,55 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
 
     mut_interactionManager.cursorStyles['default'] = 'crosshair';
 
-    const globalPixiObjects = createGlobalPixiObjects({
+    mut_state.interactionManager = mut_interactionManager;
+
+    mut_state.pixiApp = {
       app,
-      canvasSize: props.canvasSize,
-      canvasStyles: props.canvasStyles,
-    });
-
-    setPixiApp({ app, ...globalPixiObjects });
-
-    return () => {
-      app.destroy();
+      ...createGlobalPixiObjects({ app, canvasSize, canvasStyles }),
     };
-  }, [props.canvasSize, props.canvasStyles, setPixiApp]);
 
-  const newBboxColor = React.useMemo<Readonly<{ border: Rgba; face: Rgba }>>(
-    () => ({
-      border: hslaToRgba(
-        Arr.toUnshifted(props.selectedHue)(
-          props.canvasStyles.bbox.borderColorSLA.notSelected,
-        ),
-      ),
-      face: hslaToRgba(
-        Arr.toUnshifted(props.selectedHue)(
-          props.canvasStyles.bbox.highlightedFaceColorSLA,
-        ),
-      ),
-    }),
-    [props.selectedHue, props.canvasStyles.bbox],
-  );
+    attachPointerEventListener(hue$.getSnapshot().value);
+  };
 
-  const stateRef = React.useRef<CanvasAppState>(defaultCanvasAppState);
+  subscribeInScope(hue$, attachPointerEventListener);
 
-  const canvasAppStateHandler = React.useMemo(
-    () =>
-      pixiApp === undefined
-        ? undefined
-        : canvasAppStateHandlerGenerator(
-            pixiApp,
-            props.idMaker,
-            props.canvasStyles,
-            newBboxColor,
-          ),
-    [pixiApp, props.idMaker, props.canvasStyles, newBboxColor],
-  );
+  onScopeDispose(() => {
+    mut_state.removePointerEventListener();
 
-  React.useEffect(() => {
-    if (pixiApp === undefined || canvasAppStateHandler === undefined) {
-      return;
-    }
+    // Not one of the application's own plugins, which `destroy` takes down.
+    mut_state.interactionManager?.destroy();
 
-    const removePointerEventListener = addGlobalPointerEventListener(
-      pixiApp.app,
-      pixiApp.background,
-      stateRef.current,
-      canvasAppStateHandler,
-    );
-
-    return () => {
-      removePointerEventListener();
-    };
-  }, [
-    pixiApp,
-    canvasAppStateHandler,
-    newBboxColor,
-    props.canvasSize,
-    props.canvasStyles,
-  ]);
+    mut_state.pixiApp?.app.destroy();
+  });
 
   return (
     <canvas
-      ref={canvasRef}
-      data-e2e={'annotation-canvas'}
-      height={props.canvasSize.height}
-      style={canvasStyle}
-      width={props.canvasSize.width}
+      ref={(canvas) => {
+        afterUpdate(() => {
+          createPixiApp(canvas);
+        });
+      }}
+      data-e2e={constant('annotation-canvas')}
+      height={constant(canvasSize.height)}
+      style={{
+        width: constant('100%'),
+        height: constant('100%'),
+        'z-index': constant(zIndex.canvasRoot.toString()),
+      }}
+      width={constant(canvasSize.width)}
     />
   );
-});
+};
 
-const canvasStyle: React.CSSProperties = {
-  width: '100%',
-  height: '100%',
-  zIndex: zIndex.canvasRoot,
-} as const;
+const newBboxColor = (
+  canvasStyles: AnnotationCanvasStyle,
+  hue: Hue,
+): Readonly<{ border: Rgba; face: Rgba }> =>
+  ({
+    border: hslaToRgba(
+      Arr.toUnshifted(hue)(canvasStyles.bbox.borderColorSLA.notSelected),
+    ),
+    face: hslaToRgba(
+      Arr.toUnshifted(hue)(canvasStyles.bbox.highlightedFaceColorSLA),
+    ),
+  }) as const;
