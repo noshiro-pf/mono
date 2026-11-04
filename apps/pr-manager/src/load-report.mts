@@ -48,11 +48,12 @@ import {
   type RulesetRequirements,
   type SetAside,
 } from 'pr-report-core';
+import type { ClaudeSession } from 'split-view-link';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import { loadBranchRules } from './branch-rules.mjs';
-import { parseClaudeSessions, type ClaudeSession } from './claude-session.mjs';
+import { parseClaudeSessions } from './claude-session.mjs';
 import type { ReportSource } from './constants.mjs';
 import {
   askGraphql,

@@ -1,12 +1,16 @@
+import {
+  claudeSessionUrlOf,
+  pullRequestSplitViewSearch,
+  splitViewPagePath,
+} from 'split-view-link';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   asGitHubMessage,
-  claudeSessionUrlOf,
   githubMessageTag,
   issueUrlOf,
   pullRequestOf,
-  pullRequestSplitViewSearch,
+  pullRequestWorkspace,
   type GitHubMessage,
 } from './github/index.mjs';
 import {
@@ -19,7 +23,6 @@ import {
   moveOpenSplitViewTab,
   paneIdOfAnswer,
   removeHeaderRule,
-  splitViewPagePath,
   splitViewTabIdSessionKey,
   workerMessageTag,
   type PaneOfFrameQuery,
@@ -312,6 +315,7 @@ const openPullRequest = async (
   }
 
   const search = pullRequestSplitViewSearch({
+    workspace: pullRequestWorkspace,
     pullRequest,
     title: message.title,
     issueUrl:

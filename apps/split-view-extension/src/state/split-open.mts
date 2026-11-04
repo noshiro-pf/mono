@@ -1,3 +1,8 @@
+import {
+  layoutQueryParam,
+  paneUrlQueryParam,
+  workspaceNameQueryParam,
+} from 'split-view-link';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   formatLayoutSpec,
@@ -6,11 +11,6 @@ import {
   type SplitAxis,
 } from '../layout/index.mjs';
 import { workerMessageTag, type SplitOpenRequest } from '../shared/index.mjs';
-import {
-  layoutQueryParam,
-  paneUrlQueryParam,
-  workspaceNameQueryParam,
-} from './workspace-url.mjs';
 
 /**
  * Whether the context menu was opened in a split view: on a tab whose page is

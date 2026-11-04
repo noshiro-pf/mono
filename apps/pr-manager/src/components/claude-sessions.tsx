@@ -1,5 +1,5 @@
+import type { ClaudeSession } from 'split-view-link';
 import { constant, For, If, view, type Bindable, type JSX } from 'synstate-dom';
-import type { ClaudeSession } from '../claude-session.mjs';
 import { ExternalLink } from './external-link.js';
 import { separator } from './linked-issues.js';
 

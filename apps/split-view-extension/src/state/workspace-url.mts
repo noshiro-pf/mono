@@ -1,3 +1,12 @@
+import {
+  layoutQueryParam,
+  paneSandboxQueryParam,
+  paneUrlQueryParam,
+  paneZoomQueryParam,
+  workspaceNameQueryParam,
+  workspaceQueryParam,
+  workspaceTitleQueryParam,
+} from 'split-view-link';
 import { Num, Result } from 'ts-data-forge';
 import {
   clampPaneZoom,
@@ -11,44 +20,16 @@ import {
   type PaneState,
   type WorkspaceState,
 } from '../layout/index.mjs';
-import { workspaceQueryParam } from '../shared/index.mjs';
 import { createPane, findPane } from './reducer.mjs';
 import { normalizeAddress } from './url.mjs';
 
 /**
- * The query parameters of `split.html`, which together describe a split view.
+ * What a `split.html` URL asks for. Each part is absent when the URL is.
  *
- * `ws` says *which* saved split view the tab shows; the rest say *what* it
- * shows, and are what the page writes back into the address bar as the view
- * changes — so the URL is always a link to what is on screen. A URL with only
- * `ws` is a pointer, and opens whatever is saved under that id; one with a
- * `layout` or an `url` is a request, and what it describes is shown and saved.
- *
- * - `layout`: a `LayoutNode` in the notation of `formatLayoutSpec`, or the id
- *   of a preset (`grid-2x2`). Left out, the addresses are put side by side.
- * - `url`, repeated: the panes' addresses in tree order, read as the address
- *   bar reads them. A pane beyond the last one is empty.
- * - `zoom`, repeated: the panes' zoom, `1` when absent.
- * - `sandbox`, repeated: `0` turns a pane's sandbox off. On when absent.
- * - `name`: what to call the split view, when this URL is what adds it to the
- *   list. Read once and not written back — the name is the list's, not the
- *   view's.
- * - `title`: what to call the tab. Part of the view, so saved and written
- *   back; see `WorkspaceState['title']`.
+ * The query parameters and what each means are `split-view-link`'s
+ * (`split-view-page.mts`), which the pages that link here build their URLs with
+ * too.
  */
-export const layoutQueryParam = 'layout';
-
-export const paneUrlQueryParam = 'url';
-
-export const paneZoomQueryParam = 'zoom';
-
-export const paneSandboxQueryParam = 'sandbox';
-
-export const workspaceNameQueryParam = 'name';
-
-export const workspaceTitleQueryParam = 'title';
-
-/** What a `split.html` URL asks for. Each part is absent when the URL is. */
 export type WorkspaceUrlRequest = Readonly<{
   workspaceId: string | undefined;
   name: string | undefined;

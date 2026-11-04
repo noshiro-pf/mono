@@ -46,6 +46,7 @@
     "z:screenshots": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/screenshots.mts"
   },
   "dependencies": {
+    "split-view-link": "workspace:*",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*"

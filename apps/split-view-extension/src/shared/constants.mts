@@ -1,9 +1,3 @@
-/** The extension page that hosts a split view. */
-export const splitViewPagePath = 'split.html';
-
-/** Query parameter naming which stored workspace a tab is showing. */
-export const workspaceQueryParam = 'ws';
-
 /**
  * The id given to the first workspace a fresh install creates.
  *
