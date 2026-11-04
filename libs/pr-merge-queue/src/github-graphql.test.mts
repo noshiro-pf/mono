@@ -30,6 +30,7 @@ import { queriesNotSent } from '../../../tools/configs/github-graphql-source-que
 import { parseJson, type ApiContext } from './lib/index.mjs';
 import { markReady } from './open-pr/index.mjs';
 import { createClient } from './pr-report/index.mjs';
+import { convertToDraft, disarmAutoMerge } from './rework-pr/index.mjs';
 import {
   armAutoMerge,
   listPullRequests,
@@ -50,7 +51,7 @@ describe('the GraphQL requests', () => {
 
     // One for each function in `sendEveryQuery`, and the follow-up that
     // `readIssueOrder` sends for an issue the pull request does not link.
-    assert.lengthOf(sent, 14);
+    assert.lengthOf(sent, 16);
 
     assert.isTrue(sent.some(({ operation }) => operation === 'UnlinkedIssues'));
 
@@ -153,6 +154,10 @@ const sendEveryQuery = async (): Promise<readonly Sent[]> => {
     await readHeadChecks(api, 1);
 
     await markReady(api, 'PR_node');
+
+    await disarmAutoMerge(api, 'PR_node');
+
+    await convertToDraft(api, 'PR_node');
 
     await createClient('token').facts(api.repo);
   } finally {
