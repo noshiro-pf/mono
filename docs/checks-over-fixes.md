@@ -24,6 +24,13 @@ surfaces, however it surfaced:
 - a manual step someone has to remember (keeping two declarations in sync,
   regenerating a file, registering something in a list).
 
+A CI failure that `check-changed` passed already says whether it could have
+caught it: the job's summary lists the entry's commands as `check-changed` would
+have run them for that diff ("When a check fails" in
+`.github/workflows/README.md`). A command under "Not planned for this diff" is a
+rule of `tools/scripts/cmd/check-changed/plan.mts` too narrow for the diff, and
+the pull request that fixes the failure widens that rule as well.
+
 To see which `/code-review` findings recur across pull requests, rather than
 within one, `pnpm run review-findings-digest` counts the findings the merged
 pull requests record in their `## Review` sections by class.

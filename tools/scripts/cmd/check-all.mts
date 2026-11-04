@@ -259,7 +259,7 @@ const PART_NEEDS: ReadonlyRecord<string, string> = {
   'ws:check:test:rules': 'Java',
 } as const;
 
-const MATRIX_WORKFLOWS = [
+export const MATRIX_WORKFLOWS = [
   '.github/workflows/code-check.yml',
   '.github/workflows/style-check.yml',
 ] as const;
