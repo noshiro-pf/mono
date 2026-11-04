@@ -1,9 +1,12 @@
-import { compareYmdhm } from 'ts-fortress-types';
-import { now } from '../utils/index.mjs';
+import { isAfterAnswerDeadline } from 'event-schedule-app-shared';
+import { DateUtils } from 'ts-fortress-types';
 
+/**
+ * Whether answers to the event are closed now: read in the event's own zone, as
+ * `firestore.rules` reads it, rather than the viewer's.
+ */
 export const eventIsAfterDeadline = (
   eventSchedule: EventSchedule | undefined,
 ): boolean =>
   eventSchedule !== undefined &&
-  eventSchedule.answerDeadline !== 'none' &&
-  compareYmdhm(now(), eventSchedule.answerDeadline) >= 0;
+  isAfterAnswerDeadline(eventSchedule, DateUtils.now());
