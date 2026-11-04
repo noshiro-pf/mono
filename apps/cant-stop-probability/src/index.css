@@ -30,6 +30,15 @@ a {
   text-decoration: none;
 }
 
+/*
+ * Blueprint draws a focus ring on `:focus`, so a tab or button clicked with
+ * the mouse keeps one; only keyboard focus is shown here. After the
+ * `blueprint.css` import, which it ties with on specificity.
+ */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 input[type='number'] {
   text-align: right;
 }

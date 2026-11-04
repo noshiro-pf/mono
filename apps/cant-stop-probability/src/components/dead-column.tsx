@@ -1,55 +1,48 @@
-import { ButtonGroup } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import { BpButton } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import type { DeepReadonly } from 'ts-type-forge';
-import type { TwoDiceSumValue } from '../types/index.mjs';
+import { Button, ButtonGroup } from 'blueprint-synstate';
+import { map } from 'synstate';
+import { constant, view, type JSX } from 'synstate-dom';
+import {
+  columnIds,
+  columnsAlive$,
+  hitSomeAliveColumnProbability$,
+  toggleColumn,
+} from '../store.mjs';
+import * as styles from './dead-column.module.css';
 
-type Props = DeepReadonly<{
-  columnsAliveWithHandler: {
-    columnId: TwoDiceSumValue;
-    alive: boolean;
-    toggle: () => void;
-  }[];
-  hitSomeAliveColumnProbability: number;
-}>;
+/**
+ * A toggle per column, pressed while it is closed, and the chance a roll hits
+ * one still open.
+ */
+export const DeadColumn = (): JSX.Element => (
+  <div>
+    <ButtonGroup>
+      {columnIds.map((columnId, index) => {
+        const closed$ = columnsAlive$.pipe(
+          map((alive) => alive[index] !== true),
+        );
 
-export const DeadColumn = memoNamed<Props>(
-  'DeadColumn',
-  ({ columnsAliveWithHandler, hitSomeAliveColumnProbability }) => (
-    <div>
-      <ButtonGroup>
-        {columnsAliveWithHandler.map(({ columnId, alive, toggle }) => (
-          <BpButton
-            key={columnId}
-            active={!alive}
-            aria-pressed={!alive}
-            nowrap
-            onClick={toggle}
+        return (
+          <Button
+            active={closed$}
+            aria-pressed={view(closed$, String)}
+            class={styles.toggle}
+            onClick={() => {
+              toggleColumn(index);
+            }}
           >
-            {alive ? (
-              <span>{columnId}</span>
-            ) : (
-              <span
-                css={css`
-                  text-decoration: line-through;
-                `}
-              >
-                {columnId}
-              </span>
-            )}
-          </BpButton>
-        ))}
-      </ButtonGroup>
-      <div
-        css={css`
-          padding: 10px;
-        `}
-        data-e2e={'hit-probability'}
-      >
-        {'確率： '}
-        {hitSomeAliveColumnProbability}
-      </div>
+            <span class={{ [styles.closed]: closed$ }}>
+              {constant(columnId)}
+            </span>
+          </Button>
+        );
+      })}
+    </ButtonGroup>
+    <div
+      class={constant(styles.probability)}
+      data-e2e={constant('hit-probability')}
+    >
+      {constant('確率： ')}
+      {view(hitSomeAliveColumnProbability$, String)}
     </div>
-  ),
+  </div>
 );
