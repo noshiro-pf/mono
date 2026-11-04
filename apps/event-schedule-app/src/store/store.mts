@@ -58,8 +58,15 @@ export const Router = createAppRouter();
 
 export const Auth = createAuthStore({ auth: api.auth, router: Router });
 
+/**
+ * The screens `useIsMobile` reports as narrow. Declared here rather than with
+ * the helpers below, because the media store reads it as it is created.
+ */
+const mobileMediaQuery = '(max-width: 600px)';
+
 const mediaStore = createMediaStore({
-  watchIsMobile: (onChange) => watchMediaQuery('(max-width: 600px)', onChange),
+  isMobile: () => matchMedia(mobileMediaQuery).matches,
+  watchIsMobile: (onChange) => watchMediaQuery(mobileMediaQuery, onChange),
 });
 
 export const { useIsMobile } = mediaStore;
@@ -229,8 +236,10 @@ export const UpdatePasswordPageStore = createUpdatePasswordPageStore({
  * Called once, from `main.tsx`, before the first render.
  *
  * Made on import, not here, because components import the stores by name:
- * the router (which reads `location`), `api` (which connects to Firebase) and
- * each page's toaster (which adds an element to `document.body`).
+ * the router (which reads `location`), `api` (which connects to Firebase), the
+ * media store (which reads `matchMedia`, so that the first render already has
+ * the screen width) and each page's toaster (which adds an element to
+ * `document.body`).
  */
 export const startStore = (): (() => void) => {
   const stopAuth = Auth.start();
