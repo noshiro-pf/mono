@@ -4,6 +4,7 @@ import { explicitCollectionTypeArguments } from './explicit-collection-type-argu
 import { functionOrder } from './function-order.mjs';
 import { jsxBooleanLogicalOperands } from './jsx-boolean-logical-operands.mjs';
 import { noDetachedJsdoc } from './no-detached-jsdoc.mjs';
+import { noExportTypeSideEffects } from './no-export-type-side-effects.mjs';
 import { noNegatedComparison } from './no-negated-comparison.mjs';
 import { noRaggedCommentWrap } from './no-ragged-comment-wrap.mjs';
 import { noRestrictedCastName } from './no-restricted-cast-name.mjs';
@@ -28,6 +29,7 @@ export const tsRestrictionsRules = {
   'function-order': functionOrder,
   'jsx-boolean-logical-operands': jsxBooleanLogicalOperands,
   'no-detached-jsdoc': noDetachedJsdoc,
+  'no-export-type-side-effects': noExportTypeSideEffects,
   'no-negated-comparison': noNegatedComparison,
   'no-ragged-comment-wrap': noRaggedCommentWrap,
   'no-restricted-cast-name': noRestrictedCastName,

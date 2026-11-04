@@ -118,6 +118,21 @@ namespace NoDetachedJsdoc {
 }
 
 /**
+ * @description Enforce a top-level `export type` qualifier on a re-export whose specifiers all have inline `type` qualifiers
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
+ *  ```
+ */
+namespace NoExportTypeSideEffects {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Invert the operator of a negated comparison instead of negating it (`!(a === b)` → `a !== b`, `!(a < b)` → `a >= b` when no operand can be NaN).
  *
  *  ```md
@@ -608,6 +623,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/function-order': FunctionOrder.RuleEntry;
   'ts-restrictions/jsx-boolean-logical-operands': JsxBooleanLogicalOperands.RuleEntry;
   'ts-restrictions/no-detached-jsdoc': NoDetachedJsdoc.RuleEntry;
+  'ts-restrictions/no-export-type-side-effects': NoExportTypeSideEffects.RuleEntry;
   'ts-restrictions/no-negated-comparison': NoNegatedComparison.RuleEntry;
   'ts-restrictions/no-ragged-comment-wrap': NoRaggedCommentWrap.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;

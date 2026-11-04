@@ -11,6 +11,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/jsx-boolean-logical-operands': 'error',
   'ts-restrictions/no-negated-comparison': 'error',
   'ts-restrictions/no-detached-jsdoc': 'error',
+  'ts-restrictions/no-export-type-side-effects': 'error',
   'ts-restrictions/no-ragged-comment-wrap': withDefaultOption('error'),
   'ts-restrictions/no-string-spread': 'error',
   'ts-restrictions/no-unnecessary-array-from': 'error',

@@ -51,6 +51,9 @@ export const typescriptEslintRules = {
       disallowTypeAnnotations: true,
     },
   ],
+  // Even on, it skips a specifier with an inline `type`, so it would not report
+  // `export { type A } from 'm'`; `ts-restrictions/no-export-type-side-effects`
+  // does.
   '@typescript-eslint/consistent-type-exports': [
     'off',
     { fixMixedExportsWithInlineTypeSpecifier: true },
@@ -410,7 +413,8 @@ export const typescriptEslintRules = {
   '@typescript-eslint/parameter-properties': withDefaultOption('error'),
 
   // `import { type A }` leaves `import {} from '...'` behind under
-  // --verbatimModuleSyntax; write `import type { A }` instead.
+  // --verbatimModuleSyntax; write `import type { A }` instead. The re-export
+  // twin is `ts-restrictions/no-export-type-side-effects`.
   '@typescript-eslint/no-import-type-side-effects': 'error',
 
   '@typescript-eslint/no-mixed-enums': 'error',

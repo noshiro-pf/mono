@@ -12,6 +12,7 @@ import {
   getImportedLocalName,
   getNamedImports,
   hasCommentWithin,
+  inlineTypeQualifierRange,
 } from '../src/index.mjs';
 import { probeRule, textOf } from './probe-rule.mjs';
 
@@ -705,6 +706,58 @@ ruleTester.run(
         code: 'probe(0);',
         output: null,
         errors: [{ messageId: 'result', data: { result: 'none' } }],
+      },
+    ],
+  },
+);
+
+ruleTester.run(
+  'inlineTypeQualifierRange',
+  probeRule((context) => {
+    const [declaration] = context.sourceCode.ast.body;
+
+    const specifier =
+      declaration?.type === AST_NODE_TYPES.ImportDeclaration ||
+      declaration?.type === AST_NODE_TYPES.ExportNamedDeclaration
+        ? declaration.specifiers[0]
+        : undefined;
+
+    const range =
+      specifier?.type === AST_NODE_TYPES.ImportSpecifier ||
+      specifier?.type === AST_NODE_TYPES.ExportSpecifier
+        ? inlineTypeQualifierRange(context.sourceCode, specifier)
+        : undefined;
+
+    return range === undefined
+      ? '(none)'
+      : JSON.stringify(context.sourceCode.text.slice(...range));
+  }),
+  {
+    valid: [],
+    invalid: [
+      {
+        name: 'an import specifier: `type` and the space after it',
+        code: dedent`
+          import { type A } from 'm';
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: '"type "' } }],
+      },
+      {
+        name: 'an export specifier: up to a comment, which stays',
+        code: dedent`
+          export { type /* kept */ A } from 'm';
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: '"type "' } }],
+      },
+      {
+        name: 'a value specifier has none',
+        code: dedent`
+          import { A } from 'm';
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: '(none)' } }],
       },
     ],
   },
