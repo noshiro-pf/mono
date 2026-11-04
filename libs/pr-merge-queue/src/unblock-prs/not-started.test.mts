@@ -63,37 +63,74 @@ describe(nothingStarted, () => {
 });
 
 describe(observeNotStarted, () => {
+  const fresh = { sinceEpochMs: undefined, refired: false } as const;
+
   test('starts the clock at the first poll that sees nothing started', () => {
-    assert.deepStrictEqual(observeNotStarted(undefined, neverStarted, T0), {
-      sinceEpochMs: T0,
-      gaveUp: false,
+    assert.deepStrictEqual(observeNotStarted(fresh, neverStarted, T0), {
+      wait: { sinceEpochMs: T0, refired: false },
+      action: 'wait',
     });
   });
 
   test('keeps the clock while the grace has not run out', () => {
     assert.deepStrictEqual(
-      observeNotStarted(T0, neverStarted, T0 + CHECKS_NOT_STARTED_GRACE_MS - 1),
-      { sinceEpochMs: T0, gaveUp: false },
+      observeNotStarted(
+        { sinceEpochMs: T0, refired: false },
+        neverStarted,
+        T0 + CHECKS_NOT_STARTED_GRACE_MS - 1,
+      ),
+      { wait: { sinceEpochMs: T0, refired: false }, action: 'wait' },
     );
   });
 
-  test('gives up once the grace has run out', () => {
+  // #3456: the set-aside clears only when `main` moves, which nothing may be
+  // about to do, so GitHub is asked once more before it.
+  test('re-fires the workflows once the first grace has run out, and starts the wait over', () => {
     assert.deepStrictEqual(
-      observeNotStarted(T0, neverStarted, T0 + CHECKS_NOT_STARTED_GRACE_MS),
-      { sinceEpochMs: T0, gaveUp: true },
+      observeNotStarted(
+        { sinceEpochMs: T0, refired: false },
+        neverStarted,
+        T0 + CHECKS_NOT_STARTED_GRACE_MS,
+      ),
+      { wait: { sinceEpochMs: undefined, refired: true }, action: 'refire' },
+    );
+  });
+
+  test('gives up once the grace after the re-fire has run out', () => {
+    const afterRefire = T0 + CHECKS_NOT_STARTED_GRACE_MS;
+
+    const started = observeNotStarted(
+      { sinceEpochMs: undefined, refired: true },
+      neverStarted,
+      afterRefire,
+    );
+
+    assert.deepStrictEqual(started, {
+      wait: { sinceEpochMs: afterRefire, refired: true },
+      action: 'wait',
+    });
+
+    assert.deepStrictEqual(
+      observeNotStarted(
+        started.wait,
+        neverStarted,
+        afterRefire + CHECKS_NOT_STARTED_GRACE_MS,
+      ),
+      { wait: { sinceEpochMs: afterRefire, refired: true }, action: 'give-up' },
     );
   });
 
   // A round between two jobs can show nothing running for a poll; a run that
-  // shows up at all is a round under way, and the wait starts over.
+  // shows up at all is a round under way, and the wait starts over. The
+  // re-fire is not given back: one per watch.
   test('stops the clock as soon as anything runs', () => {
     assert.deepStrictEqual(
       observeNotStarted(
-        T0,
+        { sinceEpochMs: T0, refired: true },
         { ...neverStarted, running: ['gates / check'] },
         T0 + CHECKS_NOT_STARTED_GRACE_MS,
       ),
-      { sinceEpochMs: undefined, gaveUp: false },
+      { wait: { sinceEpochMs: undefined, refired: true }, action: 'wait' },
     );
   });
 });

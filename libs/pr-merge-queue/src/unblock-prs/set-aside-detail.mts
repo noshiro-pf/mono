@@ -58,7 +58,7 @@ export const describeNotStarted = (
   summary: ChecksSummary,
   graceMin: number,
 ): string =>
-  `nothing ran on its head for ${graceMin} min and ${summary.missing.join(', ')} never reported: GitHub started no run for them` as const;
+  `nothing ran on its head for ${graceMin} min, nor for ${graceMin} more after its check workflows were re-fired, and ${summary.missing.join(', ')} never reported: GitHub started no run for them` as const;
 
 /**
  * The files a rebase stopped on, or when git named none — a rebase can fail

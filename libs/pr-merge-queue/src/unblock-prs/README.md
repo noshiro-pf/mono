@@ -212,7 +212,10 @@ PR は常に1本まで** に保ちます。`main` が動く前にマージでき
 #### ルール
 
 **このスクリプトが `skip-ci` を付けるのは、自分で外したばかりのラベルを戻して、
-同時に解放された別の PR に譲るときだけです。** 他の PR には付けません。以前は解放する前に他の解放済み PR 全部に `skip-ci` を付け
+同時に解放された別の PR に譲るときと、GitHub が check workflow を1つも起動しな
+かった解放済みの PR に付けてすぐ外すとき（`not-started.mts`）だけです。** 他の
+PR には付けません。後者も解放済みの PR は一度に1本のままです。watch している PR
+で、その横では何も解放せず、次の poll の前にラベルはもう外れています。以前は解放する前に他の解放済み PR 全部に `skip-ci` を付け
 ていましたが、bot が解放済みで開く依存更新 PR や、人が意図して解放した PR まで
 止めてしまうので、やめました。
 
@@ -560,9 +563,12 @@ workflow run が終わっていない間も、その fail は待ちます。「R
 commit status は round の開始に数えません。ずっと前から pending のものがあると、
 開始が前の round の赤より前になってしまいます。
 
-**必須 context が未報告のまま、head 上で何も実行中でない状態が5分続いたら
+**必須 context が未報告のまま、head 上で何も実行中でない状態が5分続いたら、
+ラベルのイベントをもう1回起こし、さらに5分同じ状態が続いたら
 `checks-not-started` として見送ります**（`CHECKS_NOT_STARTED_GRACE_MS`、
-`not-started.mts`）。解放した PR の gate は数秒で始まり、round が始まれば最後の
+`not-started.mts`）。ラベルのイベントは `skip-ci` を付けてすぐ外すもので、どの
+check workflow もこれで起動します。見送りは `main` が動いたときにしか解けず、
+これがワーカーの解放できる唯一の PR なら、ほかに `main` を動かすものはありません。解放した PR の gate は数秒で始まり、round が始まれば最後の
 集約が報告されるまで head 上の何かが必ず実行中なので、この形が続くのは GitHub が
 その context の workflow を起動しなかった場合です（#3263 は `pull_request_target`
 の workflow だけが走り、`pull_request` の run が1つも作られないまま2時間待ちまし
@@ -1109,10 +1115,14 @@ so the rule stays.
 #### The rule
 
 **This script puts `skip-ci` on a pull request only to give back the label it
-has just taken off, yielding to another released in the same moment.** It
-puts it on no other pull request. It used to pause every other released pull request before releasing its own,
-which stopped pull requests nobody had handed it: the dependency update the
-bot opens released, and one a person had released on purpose.
+has just taken off, yielding to another released in the same moment, or to take
+it off again at once from a released one GitHub started no check workflow for
+(`not-started.mts`).** It puts it on no other pull request. The second is still
+one released pull request at a time: the one being watched, which nothing else
+is released beside, and the label is off again before the next poll. It used to
+pause every other released pull request before releasing its own, which stopped
+pull requests nobody had handed it: the dependency update the bot opens
+released, and one a person had released on purpose.
 
 - **Pick nothing while one is in flight.** When triage finds a pull request
   in flight, this script watches it and rebases and releases nothing else
@@ -1497,13 +1507,17 @@ commit status count as the round's start: one pending since long ago would put
 it before the round before's reds.
 
 **A head with a required context unreported and nothing running on it for five
-minutes is set aside as `checks-not-started`** (`CHECKS_NOT_STARTED_GRACE_MS`,
-`not-started.mts`). A released pull request's gates start within seconds, and
-once a round has started something on the head runs until the last aggregate
-reports, so a head that stays this quiet is one GitHub started no run for that
-context on (#3263: the `pull_request_target` workflows ran, no `pull_request`
-run was ever created, and the queue waited two hours). Rather than wait for
-`--watch-timeout`, the next candidate is tried in the same cycle.
+minutes is given one more label event, and set aside as `checks-not-started`
+when five more minutes pass the same way** (`CHECKS_NOT_STARTED_GRACE_MS`,
+`not-started.mts`). The label event is `skip-ci` put back on and taken off at
+once, which every check workflow triggers on; the set-aside clears only when
+`main` moves, and when this is the one pull request the worker can release,
+nothing else is about to move it. A released pull request's gates start within
+seconds, and once a round has started something on the head runs until the last
+aggregate reports, so a head that stays this quiet is one GitHub started no run
+for that context on (#3263: the `pull_request_target` workflows ran, no
+`pull_request` run was ever created, and the queue waited two hours). Rather
+than wait for `--watch-timeout`, the next candidate is tried in the same cycle.
 `main` moving clears it: the rebase when it is next picked is a new head, and
 that push starts the workflows. A retry while it is still up to date only
 watches the same head again; push a new commit to have GitHub start its checks
