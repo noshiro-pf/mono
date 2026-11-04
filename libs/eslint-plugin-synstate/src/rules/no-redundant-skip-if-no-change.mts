@@ -7,11 +7,11 @@ import {
   buildCalleeResolver,
   getImportDeclarations,
   getRangeWithParens,
+  hasCommentWithin,
   isIdentifierNamed,
   isTypeWrapper,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
-import { hasCommentWithin } from './comments.mjs';
 import { SYNSTATE_MODULE } from './constants.mjs';
 import { pipeCallOf } from './functions.mjs';
 import { isShadowedCallee } from './synstate-callee.mjs';
