@@ -16,10 +16,12 @@ import { appDevPort } from './app-dev-ports.mjs';
  * there would make every `getByTestId` match nothing while the assertions read
  * as if they were checking something.
  *
- * Chromium only. CI installs one browser, headless
- * (`playwright install --only-shell chromium`), and these are smoke tests of
- * the app's own rendering rather than of browser differences; three engines
- * would triple the runtime for the same answer.
+ * Chromium only. CI installs one browser, the headless shell
+ * (`playwright install --only-shell chromium`) and, for the entry whose suites
+ * load an extension, the full build beside it (`browser: full` in
+ * `code-check.yml`). These are smoke tests of the app's own rendering rather
+ * than of browser differences; three engines would triple the runtime for the
+ * same answer.
  */
 export const definePlaywrightAppConfig = ({
   packageRoot,
