@@ -23,7 +23,10 @@ name: SynState Benchmark
 #   against that baseline, so a measurement could change nothing but the
 #   summary (see `Build`).
 # - A shared runner is noisy; `check-drift.mts` divides the runner out and
-#   calls drift only beyond 2× of a library's change relative to the others.
+#   calls drift a library's change relative to the others beyond 2× either
+#   way, a library or sweep point only one side has, or a library with no
+#   point measured on both sides, besides a results file the reference has
+#   and the committed side lacks. The summary it prints gives each verdict.
 
 on:
   push:
@@ -358,10 +361,13 @@ jobs:
       # this source and these versions: the cached baseline, or where there is
       # none — a branch that changes SynState or a compared library, or `main`
       # right after one merged — the one just taken. Not byte for byte, and not
-      # in milliseconds: `check-drift.mts` divides out the runner instance and
-      # calls drift only a change of a library relative to the others beyond
-      # what unchanged code moves by between runs. So a dependency bump that
-      # moves nothing keeps the published tables, and one that does moves them.
+      # in milliseconds: `check-drift.mts` divides out the runner instance, so
+      # a dependency bump that moves nothing keeps the published tables, and
+      # one that moves a library, or adds or removes one or a point, moves
+      # them. A library's change beyond what unchanged code moves by between
+      # runs is drift, and so are a library or sweep point only one side has
+      # and a library with no point measured on both sides; the summary it
+      # prints gives each verdict.
       - name: Judge the committed tables
         id: committed
         run: |
@@ -374,7 +380,11 @@ jobs:
             >>"${GITHUB_STEP_SUMMARY}"
 
       # Information for a pull request that changes SynState itself: whether
-      # this branch moved it by more than noise against the baseline.
+      # this branch's measurement differs from the baseline, by
+      # `check-drift.mts`'s rules. The baseline is passed as the committed
+      # side and this branch as the reference, so in the table this step adds
+      # to the summary "the committed tables" are the baseline and "the
+      # reference" is this branch.
       - name: Judge this branch's measurement
         id: branch
         if: >-
@@ -388,9 +398,9 @@ jobs:
             "$(pwd)/baseline" \
             >>"${GITHUB_STEP_SUMMARY}"
 
-      - name: Warn that this branch moved the numbers
+      - name: Warn that this branch's measurement differs from the baseline
         if: steps.branch.outputs.drifted == 'true'
-        run: echo '::warning title=Benchmark moved::This branch moved a library beyond run-to-run noise against the baseline. The job summary has the table.'
+        run: echo '::warning title=Benchmark differs from the baseline::The measurement of this branch differs from the baseline beyond run-to-run noise, or the two differ in the libraries or sweep points they measure. The last table of the job summary says which; there, the committed tables are the baseline.'
 
       # What to commit when the tables have drifted: the reference itself, so
       # that the next run judges the tables equal to it.
