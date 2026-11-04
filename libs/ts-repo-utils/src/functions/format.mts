@@ -110,8 +110,13 @@ export const formatFiles = async (
           // eslint-disable-next-line security/detect-non-literal-fs-filename
           const content = await fs.readFile(filePath, 'utf8');
 
-          // Resolve prettier config for this file
-          const prettierOptions = await prettier.resolveConfig(filePath);
+          // Resolve the config for this file as the Prettier CLI does, which
+          // reads `.editorconfig`; the API does only when asked. Without it a
+          // `max_line_length` there is ignored, and this formatter and the
+          // checks that read the CLI's width keep undoing each other.
+          const prettierOptions = await prettier.resolveConfig(filePath, {
+            editorconfig: true,
+          });
 
           // Format the content
           const formatted = await prettier.format(content, {
