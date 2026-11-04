@@ -44,6 +44,7 @@ import {
   restackBehind,
   restackRetargeted,
 } from './rebase.mjs';
+import { endsCycle } from './release-failure.mjs';
 import { firstInReleaseOrder, settleAfterRelease } from './release.mjs';
 import {
   describeResolvedBy,
@@ -1115,6 +1116,14 @@ const runCycle = async (
         reason: advanced.value.reason,
         detail: advanced.value.detail,
       });
+
+      if (endsCycle(advanced.value)) {
+        log(
+          `#${target.number}: GitHub may have caused that, and in an outage every candidate would fail the same way; releasing nothing else this cycle.`,
+        );
+
+        return { state: state(mut_skipped), next: 'idle', settled: skipped };
+      }
 
       continue;
     }

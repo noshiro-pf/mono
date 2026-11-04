@@ -391,6 +391,12 @@ export type RebaseFailure = Readonly<{
   detail: string;
   /** What the command that failed printed, when there is more than `detail`. */
   output?: string;
+  /**
+   * Set when the failure is the pull request's own — a real conflict, a stacked
+   * branch whose own commits cannot be told, nothing left to merge — rather
+   * than one GitHub or the network may have caused. See `release-failure.mts`.
+   */
+  ofPullRequest?: true;
 }>;
 
 /**

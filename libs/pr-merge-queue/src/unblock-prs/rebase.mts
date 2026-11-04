@@ -605,6 +605,8 @@ const rebaseInWorktree = async (
 ): Promise<Result<Rebased, RebaseFailure>> => {
   const branch = pr.headRefName;
 
+  // A conflict, and a stacked branch whose own commits cannot be told, are the
+  // pull request's own (`conflicted`); a read that fails is not.
   const rebaseFailed = (
     detail: string,
     output?: string,
@@ -612,6 +614,17 @@ const rebaseInWorktree = async (
     Result.err({
       reason: 'rebase-failed',
       detail,
+      ...(output === undefined ? {} : { output }),
+    });
+
+  const conflicted = (
+    detail: string,
+    output?: string,
+  ): Result<Rebased, RebaseFailure> =>
+    Result.err({
+      reason: 'rebase-failed',
+      detail,
+      ofPullRequest: true,
       ...(output === undefined ? {} : { output }),
     });
 
@@ -627,7 +640,7 @@ const rebaseInWorktree = async (
     );
 
   if (!contained && upstream?.required === true) {
-    return rebaseFailed(
+    return conflicted(
       `it does not contain ${upstream.sha.slice(0, 10)}, the head it was stacked on, so which commits are its own cannot be told`,
     );
   }
@@ -640,17 +653,17 @@ const rebaseInWorktree = async (
   );
 
   if (Result.isErr(rebased)) {
-    const conflicted = await git(
+    const unmerged = await git(
       'git diff --name-only --diff-filter=U',
       worktreeDir,
     );
 
     await git('git rebase --abort', worktreeDir);
 
-    return rebaseFailed(
+    return conflicted(
       describeConflict(
-        Result.isOk(conflicted)
-          ? conflicted.value.split('\n').filter((line) => line !== '')
+        Result.isOk(unmerged)
+          ? unmerged.value.split('\n').filter((line) => line !== '')
           : [],
         lastLines(rebased.value, 5),
         target.onto,
@@ -682,6 +695,7 @@ const rebaseInWorktree = async (
     return Result.err({
       reason: 'already-in-base',
       detail: `every commit is already in ${target.onto}; the pull request has nothing left to merge`,
+      ofPullRequest: true,
     });
   }
 

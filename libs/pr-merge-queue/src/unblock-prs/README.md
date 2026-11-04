@@ -439,8 +439,14 @@ version commit が「まだ消費していない changeset を含む先端」の
 5. rebase が no-op で、かつ `skip-ci` も付いていなかった場合だけ「GitHub の
    merge state が古かった」と判断し、30秒待って survey からやり直します。
 
-失敗（conflict / push 拒否 / auto-merge を張れない / ラベル除去失敗）した場合は記録して **同じサイクル
-内で次の候補へ** 進みます。キューが止まるわけではありません。
+失敗は記録します。PR 自身の失敗（本当の conflict / 自分のコミットが見分けられない
+stack のブランチ / マージするものが残っていない）は次の候補について何も言わないので、
+**同じサイクル内で次の候補へ** 進みます。それ以外（push 拒否 / fetch の失敗 /
+auto-merge を張れない / ラベル除去失敗）は GitHub が起こしたかもしれず、障害中は
+どの候補も同じように失敗するので、**そのサイクルではほかに何もリリースせず**、次の
+サイクルがキューをもう一度試します（`release-failure.mts`）。こうした失敗で1サイク
+ルに外す PR は多くても1本で、キュー全体を数秒で外し、`main` が動かないために
+GitHub の回復後も理由が消えない、ということは起きません。
 
 例外は **作業中にブランチが動いた場合** です（rebase 前の fetch で head が
 survey と違う / lease 負けで push が拒否され、remote の head が変わっている /
@@ -1356,9 +1362,16 @@ within each. Then:
    either, means GitHub's merge state was stale: wait thirty seconds and
    survey again.
 
-A failure — a real conflict, a refused push, auto-merge that could not be
-armed, a label that could not be removed — is recorded and **the next candidate is tried in the same cycle**.
-The queue does not stop.
+A failure is recorded. One that is the pull request's own — a real conflict, a
+stacked branch whose own commits cannot be told, nothing left to merge — says
+nothing about the next candidate, so **the next candidate is tried in the same
+cycle**. Any other — a refused push, a fetch that failed, auto-merge that could
+not be armed, a label that could not be removed — GitHub may have caused, and in
+an outage every candidate fails the same way, so **the cycle releases nothing
+else** and the next one tries the queue again (`release-failure.mts`). One pull
+request at most is set aside per cycle for such a failure, rather than the whole
+queue in seconds, with nothing to clear the reasons once GitHub recovers, since
+`main` does not move.
 
 The exception is **a branch that moved under it**: the head the fetch finds
 is not the one the survey saw, a push lost its lease to a head that has
