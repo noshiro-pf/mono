@@ -1,4 +1,4 @@
-import { Arr, Json, Optional, Result } from 'ts-data-forge';
+import { Arr, Json, Result } from 'ts-data-forge';
 import packageJson from '../../package.json' with { type: 'json' };
 import {
   flagOptionsDef,
@@ -15,97 +15,26 @@ export const calculate = (): void => {
 
   calculatorStore.resetResult();
 
-  const maybeHand = calculatorStore.handSorted.getSnapshot();
+  const hand = calculatorStore.handSorted.getSnapshot().value;
 
-  const maybeRevealedBlocks = calculatorStore.revealedBlocks.getSnapshot();
+  const revealedBlocks = calculatorStore.revealedBlocks.getSnapshot().value;
 
-  const maybeTurn = calculatorStore.turn.getSnapshot();
+  const turn = calculatorStore.turn.getSnapshot().value;
 
-  const maybeBakaze = calculatorStore.bakaze.getSnapshot().value;
+  const bakaze = calculatorStore.bakaze.getSnapshot().value;
 
-  const maybeJikaze = calculatorStore.jikaze.getSnapshot().value;
+  const jikaze = calculatorStore.jikaze.getSnapshot().value;
 
-  const maybeTehaiType = calculatorStore.tehaiType.getSnapshot().value;
+  const tehaiType = calculatorStore.tehaiType.getSnapshot().value;
 
-  const maybeDoraIndicators = calculatorStore.doraIndicators.getSnapshot();
+  const doraIndicators = calculatorStore.doraIndicators.getSnapshot().value;
 
-  const maybeNumRemainingTiles =
-    calculatorStore.numRemainingTiles.getSnapshot();
+  const numRemainingTiles =
+    calculatorStore.numRemainingTiles.getSnapshot().value;
 
-  const maybeFlagOptions = calculatorStore.flagOptions.getSnapshot();
+  const flagOptions = calculatorStore.flagOptions.getSnapshot().value;
 
-  const maybeMaximizeTarget = calculatorStore.maximizeTarget.getSnapshot();
-
-  if (Optional.isNone(maybeHand)) {
-    calculatorStore.setResult(
-      Result.err({ type: 'hand-is-undefined', message: '' } as const),
-    );
-  }
-
-  if (Optional.isNone(maybeRevealedBlocks)) {
-    calculatorStore.setResult(
-      Result.err({ type: 'revealedBlocks-is-undefined', message: '' } as const),
-    );
-  }
-
-  if (Optional.isNone(maybeTurn)) {
-    calculatorStore.setResult(
-      Result.err({ type: 'turn-is-undefined', message: '' } as const),
-    );
-  }
-
-  if (Optional.isNone(maybeDoraIndicators)) {
-    calculatorStore.setResult(
-      Result.err({ type: 'doraIndicators-is-undefined', message: '' } as const),
-    );
-  }
-
-  if (Optional.isNone(maybeNumRemainingTiles)) {
-    calculatorStore.setResult(
-      Result.err({
-        type: 'numRemainingTiles-is-undefined',
-        message: '',
-      } as const),
-    );
-  }
-
-  if (Optional.isNone(maybeFlagOptions)) {
-    calculatorStore.setResult(
-      Result.err({
-        type: 'flagOptions-is-undefined',
-        message: '',
-      } as const),
-    );
-  }
-
-  if (Optional.isNone(maybeMaximizeTarget)) {
-    calculatorStore.setResult(
-      Result.err({
-        type: 'maximizeTarget-is-undefined',
-        message: '',
-      } as const),
-    );
-  }
-
-  const revealedBlocks = maybeRevealedBlocks.value;
-
-  const bakaze = maybeBakaze;
-
-  const jikaze = maybeJikaze;
-
-  const turn = maybeTurn.value;
-
-  const numRemainingTiles = maybeNumRemainingTiles.value;
-
-  const flagOptions = maybeFlagOptions.value;
-
-  const maximizeTarget = maybeMaximizeTarget.value;
-
-  const tehaiType = maybeTehaiType;
-
-  const doraIndicators = maybeDoraIndicators.value;
-
-  const hand = maybeHand.value;
+  const maximizeTarget = calculatorStore.maximizeTarget.getSnapshot().value;
 
   // cspell:disable
   const payload: ApiPayload = {
