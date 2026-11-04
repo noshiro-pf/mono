@@ -27,6 +27,7 @@ import {
   type MergedHead,
 } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
+import { outOfSyncVerdict } from './out-of-sync.mjs';
 import {
   describeCommandFailure,
   describeConflict,
@@ -43,6 +44,8 @@ import type {
   Advanced,
   AdvancePlan,
   BranchOf,
+  Moved,
+  OutOfSync,
   PullRequest,
   RebaseFailure,
   RetargetedLayer,
@@ -200,7 +203,7 @@ export const advance = async (
   }
 
   if (rebased.value.kind === 'moved') {
-    return Result.ok({ kind: 'moved' });
+    return Result.ok(rebased.value);
   }
 
   const { head } = rebased.value;
@@ -285,9 +288,12 @@ export const restackRetargeted = async (
  * `stack.mts` says which pull requests are eligible.
  *
  * A rebase that conflicts, or a push that is refused, is a set-aside like any
- * other and is returned as one, tied to the head and the base it was tried at.
- * Resolves to those records and whether any branch moved — by this, or by
- * someone else under it — since either makes the survey stale.
+ * other and is returned as one, tied to the head and the base it was tried at,
+ * and so is a branch that has sat at a push GitHub never took in
+ * (`out-of-sync.mts`), which would otherwise send the loop back to the survey
+ * on every turn. Resolves to those records, the out-of-sync sightings, and
+ * whether any branch moved — by this, or by someone else under it — since
+ * either makes the survey stale.
  */
 export const restackBehind = async (
   pullRequests: readonly PullRequest[],
@@ -295,14 +301,22 @@ export const restackBehind = async (
   context: Readonly<{
     baseSha: string;
     skipped: SkipRecords;
+    outOfSync: OutOfSync;
     owners: ReadonlyMap<number, QueueOwner>;
     dryRun: boolean;
+    nowEpochMs: number;
   }>,
-): Promise<Readonly<{ skipped: SkipRecords; moved: boolean }>> => {
+): Promise<
+  Readonly<{ skipped: SkipRecords; outOfSync: OutOfSync; moved: boolean }>
+> => {
   const targets = autoRebaseTargets(pullRequests, defaultBranch, context);
 
   if (!Arr.isNonEmpty(targets)) {
-    return { skipped: context.skipped, moved: false };
+    return {
+      skipped: context.skipped,
+      outOfSync: context.outOfSync,
+      moved: false,
+    };
   }
 
   const fetched = await git(
@@ -316,12 +330,18 @@ export const restackBehind = async (
   if (Result.isErr(fetched)) {
     log(`Cannot fetch to see what is behind: ${lastLines(fetched.value, 2)}`);
 
-    return { skipped: context.skipped, moved: false };
+    return {
+      skipped: context.skipped,
+      outOfSync: context.outOfSync,
+      moved: false,
+    };
   }
 
   const stackParents = stackParentsOf(pullRequests, defaultBranch);
 
   let mut_skipped = context.skipped;
+
+  let mut_outOfSync = context.outOfSync;
 
   let mut_moved = false;
 
@@ -372,6 +392,27 @@ export const restackBehind = async (
     }
 
     if (rebased.value.kind === 'moved') {
+      const { branchAt } = rebased.value;
+
+      if (branchAt !== undefined) {
+        const verdict = outOfSyncVerdict(mut_outOfSync, pr, branchAt, {
+          baseSha: context.baseSha,
+          nowEpochMs: context.nowEpochMs,
+        });
+
+        mut_outOfSync = verdict.seen;
+
+        if (verdict.setAside !== undefined) {
+          log(
+            `#${pr.number}: behind ${defaultBranch}, and not rebased — ${verdict.setAside.detail}.`,
+          );
+
+          mut_skipped = withSkip(mut_skipped, verdict.setAside);
+
+          continue;
+        }
+      }
+
       mut_moved = true;
 
       continue;
@@ -398,7 +439,7 @@ export const restackBehind = async (
     );
   }
 
-  return { skipped: mut_skipped, moved: mut_moved };
+  return { skipped: mut_skipped, outOfSync: mut_outOfSync, moved: mut_moved };
 };
 
 /**
@@ -703,8 +744,10 @@ const rebaseAndPush = async (
     return rebaseFailed(`cannot resolve origin/${branch}: ${remoteHead.value}`);
   }
 
-  if (remoteHead.value.trim() !== pr.headRefOid) {
-    return Result.ok({ kind: 'moved' });
+  const branchAt = remoteHead.value.trim();
+
+  if (branchAt !== pr.headRefOid) {
+    return Result.ok({ kind: 'moved', branchAt });
   }
 
   const added = await git(
@@ -722,7 +765,7 @@ const rebaseAndPush = async (
   return result;
 };
 
-type Rebased = Readonly<{ kind: 'moved' } | { kind: 'rebased'; head: string }>;
+type Rebased = Moved | Readonly<{ kind: 'rebased'; head: string }>;
 
 /**
  * Takes `skip-ci` off, having first asked GitHub whether the pull request still

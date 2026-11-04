@@ -105,6 +105,20 @@ export type OwnSetAsideComment = Readonly<{
 export type Demotions = ReadonlyMap<number, string>;
 
 /**
+ * Pull request number → its branch found at a commit other than the head GitHub
+ * reports, first seen when. See `out-of-sync.mts`.
+ */
+export type OutOfSync = ReadonlyMap<number, OutOfSyncSighting>;
+
+export type OutOfSyncSighting = Readonly<{
+  /** The head GitHub reports for the pull request. */
+  headSha: string;
+  /** Where its branch was found instead. */
+  branchSha: string;
+  sinceEpochMs: number;
+}>;
+
+/**
  * What the ruleset asks of a review, read by `pr-report-core`'s
  * `review-hold.mts`.
  */
@@ -306,6 +320,7 @@ export type LoopState = Readonly<{
   skipped: SkipRecords;
   unread: UnreadStreaks;
   demoted: Demotions;
+  outOfSync: OutOfSync;
   tracked: ReadonlySet<number>;
   baseSha: string | undefined;
   quiet: Quiet;
@@ -331,15 +346,23 @@ export type CycleResult = Readonly<{
  * forward — which is neither progress nor a failure of the pull request.
  */
 export type Advanced = Readonly<
+  | Moved
   | {
       kind: 'advanced';
       head: string;
       /** {@link AdvancePlan.bypassAt} for `head`, which the watch goes by. */
       bypassReason: string | undefined;
     }
-  | { kind: 'moved' }
   | { kind: 'stale-merge-state' }
 >;
+
+/**
+ * The branch was not where the survey saw it. `branchAt` is where it was
+ * instead, when that was found before anything was done — which is also what
+ * GitHub dropping a push looks like (`out-of-sync.mts`); a lease lost later
+ * leaves it out.
+ */
+export type Moved = Readonly<{ kind: 'moved'; branchAt?: string }>;
 
 /**
  * What `autoFix` did about a failed head. `declined` covers everything that is

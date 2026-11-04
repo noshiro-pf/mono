@@ -160,4 +160,15 @@ describe(setAsideStillApplies, () => {
       ),
     );
   });
+
+  // GitHub never took in the branch's last push, and the base moving does not
+  // make it take it in; a comment rewritten on every merge would be noise.
+  test('outlives a moved base when the branch is out of sync with GitHub', () => {
+    assert.isTrue(
+      setAsideStillApplies(
+        { reason: 'head-out-of-sync', baseSha: BASE },
+        'b'.repeat(40),
+      ),
+    );
+  });
 });
