@@ -22,13 +22,12 @@ import {
   defaultCanvasAppState,
   type CanvasAppState,
 } from './state/index.mjs';
-import type { AnnotationCanvasStyle, IdType, PixiApp } from './types/index.mjs';
+import type {
+  AnnotationCanvasStyle,
+  IdType,
+  PixiGlobalObjects,
+} from './types/index.mjs';
 import { zIndex } from './z-index.mjs';
-
-// Pixi.js global settings
-mut_settings.SORTABLE_CHILDREN = true;
-
-mut_settings.ROUND_PIXELS = true;
 
 type Props = Readonly<{
   idMaker: () => IdType;
@@ -40,13 +39,24 @@ type Props = Readonly<{
 export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
-  const [pixiApp, setPixiApp] = useState<PixiApp | undefined>(undefined);
+  const [pixiGlobalObjects, setPixiGlobalObjects] = useState<
+    PixiGlobalObjects | undefined
+  >(undefined);
+
+  const [pixiApp, setPixiApp] = useState<Application | undefined>(undefined);
 
   React.useEffect(() => {
+    // Pixi.js global settings
+    mut_settings.SORTABLE_CHILDREN = true;
+
+    mut_settings.ROUND_PIXELS = true;
+
     // should initialize in useEffect to wait for canvasRef.current initialization
+    // The size is a placeholder: the renderer is resized to `props.canvasSize`
+    // below, so the application is not recreated when the size changes.
     const app = new Application({
-      width: props.canvasSize.width,
-      height: props.canvasSize.height,
+      width: 100,
+      height: 100,
       transparent: true,
       view: canvasRef.current ?? undefined,
       antialias: false,
@@ -56,18 +66,30 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
 
     mut_interactionManager.cursorStyles['default'] = 'crosshair';
 
-    const globalPixiObjects = createGlobalPixiObjects({
-      app,
-      canvasSize: props.canvasSize,
-      canvasStyles: props.canvasStyles,
-    });
-
-    setPixiApp({ app, ...globalPixiObjects });
+    setPixiApp(app);
 
     return () => {
       app.destroy();
     };
-  }, [props.canvasSize, props.canvasStyles, setPixiApp]);
+  }, [setPixiApp]);
+
+  React.useEffect(() => {
+    if (pixiApp === undefined) {
+      return;
+    }
+
+    const globalPixiObjects = createGlobalPixiObjects({
+      app: pixiApp,
+      canvasSize: props.canvasSize,
+      canvasStyles: props.canvasStyles,
+    });
+
+    setPixiGlobalObjects(globalPixiObjects);
+  }, [pixiApp, props.canvasSize, props.canvasStyles, setPixiGlobalObjects]);
+
+  React.useEffect(() => {
+    pixiApp?.renderer.resize(props.canvasSize.width, props.canvasSize.height);
+  }, [pixiApp, props.canvasSize]);
 
   const newBboxColor = React.useMemo<Readonly<{ border: Rgba; face: Rgba }>>(
     () => ({
@@ -89,34 +111,44 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
 
   const canvasAppStateHandler = React.useMemo(
     () =>
-      pixiApp === undefined
+      pixiApp === undefined || pixiGlobalObjects === undefined
         ? undefined
         : canvasAppStateHandlerGenerator(
             pixiApp,
+            pixiGlobalObjects,
             props.idMaker,
             props.canvasStyles,
             newBboxColor,
           ),
-    [pixiApp, props.idMaker, props.canvasStyles, newBboxColor],
+    [
+      pixiApp,
+      pixiGlobalObjects,
+      props.idMaker,
+      props.canvasStyles,
+      newBboxColor,
+    ],
   );
 
   React.useEffect(() => {
-    if (pixiApp === undefined || canvasAppStateHandler === undefined) {
+    if (
+      pixiApp === undefined ||
+      pixiGlobalObjects === undefined ||
+      canvasAppStateHandler === undefined
+    ) {
       return;
     }
 
     const removePointerEventListener = addGlobalPointerEventListener(
-      pixiApp.app,
-      pixiApp.background,
+      pixiApp,
+      pixiGlobalObjects.background,
       stateRef.current,
       canvasAppStateHandler,
     );
 
-    return () => {
-      removePointerEventListener();
-    };
+    return removePointerEventListener;
   }, [
     pixiApp,
+    pixiGlobalObjects,
     canvasAppStateHandler,
     newBboxColor,
     props.canvasSize,

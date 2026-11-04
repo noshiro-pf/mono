@@ -1,7 +1,8 @@
 import { css } from '@emotion/react';
 import { memoNamed } from 'react-utils';
+import { useResizeObserver } from 'resize-observer-react-hooks';
 import { useObservableValue } from 'synstate-react-hooks';
-import type { RectSize } from 'ts-utils-additional';
+import type { Rect } from 'ts-utils-additional';
 import {
   AnnotationCanvas,
   defaultAnnotationCanvasStyle,
@@ -27,8 +28,12 @@ export const App = memoNamed('App', () => {
 
   const visibleLabels = useObservableValue(visibleLabels$);
 
+  const [rootSize, rootRef] =
+    useResizeObserver<HTMLDivElement>(canvasDefaultSize);
+
   return (
     <div
+      ref={rootRef}
       css={css`
         width: 100vw;
         height: 100vh;
@@ -47,7 +52,7 @@ export const App = memoNamed('App', () => {
         `}
       >
         <AnnotationCanvas
-          canvasSize={canvasSize}
+          canvasSize={rootSize}
           canvasStyles={canvasStyles}
           selectedHue={selectedLabel.hue}
         />
@@ -75,8 +80,10 @@ export const App = memoNamed('App', () => {
 
 const sidebarWidthPx = 250;
 
-const canvasSize: RectSize = {
-  width: 600,
+const canvasDefaultSize: Rect = {
+  top: 0,
+  left: 0,
+  width: 800,
   height: 600,
 } as const;
 

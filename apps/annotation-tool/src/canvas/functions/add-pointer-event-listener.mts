@@ -3,7 +3,7 @@ import { Num } from 'ts-data-forge';
 import type { CanvasAppState, CanvasAppStateHandler } from '../state/index.mjs';
 
 export const addGlobalPointerEventListener = (
-  app: Application,
+  pixiApp: Application,
   mut_background: Sprite,
   state: CanvasAppState,
   stateHandler: CanvasAppStateHandler,
@@ -31,15 +31,18 @@ export const addGlobalPointerEventListener = (
 
   mut_background.addListener('pointerdown', pointerdownCallback);
 
-  app.renderer.view.addEventListener('pointermove', pointermoveCallback);
+  pixiApp.renderer.view.addEventListener('pointermove', pointermoveCallback);
 
-  app.renderer.view.addEventListener('pointerup', pointerupCallback);
+  pixiApp.renderer.view.addEventListener('pointerup', pointerupCallback);
 
   return () => {
     mut_background.removeAllListeners();
 
-    app.renderer.view.removeEventListener('pointermove', pointermoveCallback);
+    pixiApp.renderer.view.removeEventListener(
+      'pointermove',
+      pointermoveCallback,
+    );
 
-    app.renderer.view.removeEventListener('pointerup', pointerupCallback);
+    pixiApp.renderer.view.removeEventListener('pointerup', pointerupCallback);
   };
 };

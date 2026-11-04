@@ -1,17 +1,20 @@
 import { rectFrom2Points } from 'ts-utils-additional';
 import { updateBorderedRectangleGraphics } from '../../functions/index.mjs';
-import type { AnnotationCanvasStyle, PixiApp } from '../../types/index.mjs';
+import type {
+  AnnotationCanvasStyle,
+  PixiGlobalObjects,
+} from '../../types/index.mjs';
 import type { CanvasAppState } from '../canvas-state-type.mjs';
 
 export const onPointerDownOnBackground = (
   state: CanvasAppState,
   canvasStyles: AnnotationCanvasStyle,
-  mut_pixiApp: PixiApp,
+  mut_pixiGlobalObjects: PixiGlobalObjects,
 ): void => {
-  mut_pixiApp.temporaryRect.pixi.visible = true;
+  mut_pixiGlobalObjects.temporaryRect.pixi.visible = true;
 
   updateBorderedRectangleGraphics(
-    mut_pixiApp.temporaryRect.pixi,
+    mut_pixiGlobalObjects.temporaryRect.pixi,
     rectFrom2Points(state.dragStartPoint, state.dragEndPoint),
     canvasStyles.temporaryRectFaceColor,
     canvasStyles.temporaryRectBorderWidthPx,

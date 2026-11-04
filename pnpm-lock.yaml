@@ -545,6 +545,9 @@ importers:
       react-utils:
         specifier: workspace:*
         version: link:../react-utils
+      resize-observer-react-hooks:
+        specifier: workspace:*
+        version: link:../resize-observer-react-hooks
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate

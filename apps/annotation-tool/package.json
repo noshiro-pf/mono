@@ -42,6 +42,7 @@
     "normalize.css": "^8.0.1",
     "pixi.js-legacy": "^5.3.12",
     "react-utils": "workspace:*",
+    "resize-observer-react-hooks": "workspace:*",
     "synstate": "workspace:*",
     "synstate-react-hooks": "workspace:*",
     "ts-data-forge": "workspace:*",

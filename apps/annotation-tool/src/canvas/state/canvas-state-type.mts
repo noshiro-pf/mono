@@ -6,15 +6,14 @@
 // as it does elsewhere in the repository.
 
 import type { Sprite } from 'pixi.js-legacy';
-import type { Mutable } from 'ts-type-forge';
 import type { Point, Rect } from 'ts-utils-additional';
 import type { Direction } from '../functions/index.mjs';
 import type { PixiBbox, PixiTempRect } from '../types/index.mjs';
 
 export type CanvasAppState = {
-  pointerPos: Mutable<Point>;
-  dragStartPoint: Mutable<Point>;
-  dragEndPoint: Mutable<Point>;
+  pointerPos: Point;
+  dragStartPoint: Point;
+  dragEndPoint: Point;
   grabbingObject: Readonly<
     | {
         type: 'bbox-point';
@@ -28,10 +27,10 @@ export type CanvasAppState = {
     | { type: undefined }
   >;
 
-  verticalLine: Sprite | undefined;
-  horizontalLine: Sprite | undefined;
-  temporaryRect: PixiTempRect | undefined;
-  bboxList: PixiBbox[];
+  readonly verticalLine: Sprite | undefined;
+  readonly horizontalLine: Sprite | undefined;
+  readonly temporaryRect: PixiTempRect | undefined;
+  readonly bboxList: PixiBbox[];
 };
 
 export const defaultCanvasAppState: CanvasAppState = {

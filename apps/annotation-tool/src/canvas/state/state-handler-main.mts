@@ -5,6 +5,7 @@
 // which this layer depends on. The `mut_` prefix marks the deliberate mutation,
 // as it does elsewhere in the repository.
 
+import type { Application } from 'pixi.js-legacy';
 import type { Point, Rgba } from 'ts-utils-additional';
 import {
   turnOffHighlight,
@@ -14,8 +15,8 @@ import {
 import type {
   AnnotationCanvasStyle,
   IdType,
-  PixiApp,
   PixiBbox,
+  PixiGlobalObjects,
 } from '../types/index.mjs';
 import type { CanvasAppState } from './canvas-state-type.mjs';
 import {
@@ -42,7 +43,8 @@ export type CanvasAppStateHandler = (
 ) => void;
 
 export const canvasAppStateHandlerGenerator = (
-  pixiApp: PixiApp,
+  pixiApp: Application,
+  pixiGlobalObjects: PixiGlobalObjects,
   idMaker: () => IdType,
   canvasStyles: AnnotationCanvasStyle,
   newBboxColor: Readonly<{ border: Rgba; face: Rgba }>,
@@ -50,7 +52,7 @@ export const canvasAppStateHandlerGenerator = (
   function canvasAppStateHandler(mut_state, action) {
     switch (action.type) {
       case 'pointerMove':
-        onPointerMove(mut_state, action.pointerPos, pixiApp);
+        onPointerMove(mut_state, action.pointerPos, pixiGlobalObjects);
 
         break;
 
@@ -61,6 +63,7 @@ export const canvasAppStateHandlerGenerator = (
           newBboxColor,
           canvasStyles,
           pixiApp,
+          pixiGlobalObjects,
           canvasAppStateHandler,
         );
 
@@ -71,7 +74,7 @@ export const canvasAppStateHandlerGenerator = (
 
         onPointerDown(mut_state);
 
-        onPointerDownOnBackground(mut_state, canvasStyles, pixiApp);
+        onPointerDownOnBackground(mut_state, canvasStyles, pixiGlobalObjects);
 
         break;
 
