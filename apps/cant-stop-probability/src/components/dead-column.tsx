@@ -20,7 +20,13 @@ export const DeadColumn = memoNamed<Props>(
     <div>
       <ButtonGroup>
         {columnsAliveWithHandler.map(({ columnId, alive, toggle }) => (
-          <BpButton key={columnId} active={!alive} nowrap onClick={toggle}>
+          <BpButton
+            key={columnId}
+            active={!alive}
+            aria-pressed={!alive}
+            nowrap
+            onClick={toggle}
+          >
             {alive ? (
               <span>{columnId}</span>
             ) : (
@@ -39,6 +45,7 @@ export const DeadColumn = memoNamed<Props>(
         css={css`
           padding: 10px;
         `}
+        data-e2e={'hit-probability'}
       >
         {'確率： '}
         {hitSomeAliveColumnProbability}
