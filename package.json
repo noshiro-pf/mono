@@ -69,6 +69,7 @@
     "check:root:node-support": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-node-support.mts",
     "check:root:oxlint-rules": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-oxlint-rules.mts",
     "check:root:package-manager": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-package-manager.mts",
+    "check:root:required-scripts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-required-scripts.mts",
     "check:root:restart-unblock-prs-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-restart-unblock-prs-paths.mts",
     "check:root:strict-lib-dev-dependencies": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-dev-dependencies.mts",
     "check:root:strict-lib-links": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-links.mts",
