@@ -7,11 +7,17 @@ import {
   type EslintRulesOption,
 } from '../types/index.mjs';
 import {
+  nodeVersionRestrictedGlobals,
   nodeVersionRestrictedProperties,
   nodeVersionRestrictedSyntax,
 } from './node-version-gated-apis.mjs';
 
-export const restrictedGlobals = [
+/**
+ * {@link restrictedGlobals} without the globals not every Node.js this config
+ * supports has, for `eslintConfigForNodeJs` to add those back as its runtime
+ * lacks them.
+ */
+export const restrictedGlobalsWithoutNodeVersionGate = [
   {
     name: 'eval',
     message: 'Avoid using dangerous eval().',
@@ -40,6 +46,12 @@ export const restrictedGlobals = [
     message:
       "Use 'parse' from https://www.npmjs.com/package/query-string instead.",
   },
+] as const satisfies EslintRulesOption['no-restricted-globals'];
+
+export const restrictedGlobals = [
+  ...restrictedGlobalsWithoutNodeVersionGate,
+  // `Temporal` and the like, which not every Node.js this config supports has.
+  ...nodeVersionRestrictedGlobals,
 ] as const satisfies EslintRulesOption['no-restricted-globals'];
 
 export const restrictedGlobalsForBrowser = [
@@ -104,7 +116,12 @@ export const restrictedGlobalsForBrowser = [
   },
 ] as const satisfies EslintRulesOption['no-restricted-globals'];
 
-export const restrictedSyntax = [
+/**
+ * {@link restrictedSyntax} without the syntax and the APIs not every Node.js
+ * this config supports has, for `eslintConfigForNodeJs` to add those back as
+ * its runtime lacks them.
+ */
+export const restrictedSyntaxWithoutNodeVersionGate = [
   {
     // ban "in" operator
     selector: "BinaryExpression[operator='in']",
@@ -128,9 +145,12 @@ export const restrictedSyntax = [
   //   selector: "TSAsExpression[typeAnnotation.typeName.name!='const']",
   //   message: "Don't use `as`.",
   // },
+] as const satisfies EslintRulesOption['no-restricted-syntax'];
 
-  // `globalThis.Error.isError` and the like, which `no-restricted-properties`
-  // does not match.
+export const restrictedSyntax = [
+  ...restrictedSyntaxWithoutNodeVersionGate,
+  // `using`, and `globalThis.Error.isError` and the like, which
+  // `no-restricted-properties` does not match.
   ...nodeVersionRestrictedSyntax,
 ] as const satisfies EslintRulesOption['no-restricted-syntax'];
 

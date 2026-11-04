@@ -362,6 +362,7 @@ test(
 
     // Seven months from today, on the wall clock the page reads too: a month
     // past the end of Blueprint's default range.
+    // eslint-disable-next-line no-restricted-globals -- Playwright's Node.js, the repository's own (`volta.node`), has `Temporal`
     const day = Temporal.Now.plainDateISO()
       .add({ months: 7 })
       .toString()

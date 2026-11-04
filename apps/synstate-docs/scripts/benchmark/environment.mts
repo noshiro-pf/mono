@@ -157,6 +157,7 @@ const readMeasuredOn = (): string => {
   if (pinned === undefined || pinned === '') {
     // UTC, as the workflow pins it, so that a local run and CI name a day the
     // same way.
+    // eslint-disable-next-line no-restricted-globals -- run by the repository's own Node.js (`volta.node`), which has `Temporal`
     return Temporal.Now.plainDateISO('UTC').toString();
   }
 
@@ -170,6 +171,7 @@ const readMeasuredOn = (): string => {
   }
 
   // Throws on a day the calendar does not have (`2026-02-30`).
+  // eslint-disable-next-line no-restricted-globals -- as above
   return Temporal.PlainDate.from(pinned, { overflow: 'reject' }).toString();
 };
 

@@ -5,7 +5,9 @@ import * as path from 'node:path';
 import { Arr, isRecord, Num, Result } from 'ts-data-forge';
 import {
   nodeVersionGatedApis,
+  nodeVersionGatedGlobals,
   nodeVersionGatedStaticApis,
+  nodeVersionGatedSyntax,
 } from '../rules/index.mjs';
 import { eslintConfigForTypeScript } from './typescript.mjs';
 
@@ -171,6 +173,12 @@ describe(eslintConfigForTypeScript, () => {
   });
 
   describe('an API newer than the `engines.node` floor', () => {
+    const gated = [
+      ...nodeVersionGatedApis,
+      ...nodeVersionGatedGlobals,
+      ...nodeVersionGatedSyntax,
+    ] as const;
+
     test.each(nodeVersionGatedApis)(
       '`$name` written by hand is reported',
       async ({ object, property }) => {
@@ -233,10 +241,64 @@ describe(eslintConfigForTypeScript, () => {
       assert.isTrue(Result.isOk(floorMajor));
 
       assert.deepStrictEqual(
-        nodeVersionGatedApis.filter(
-          ({ nodeMajor }) => nodeMajor <= floorMajor.value,
+        gated.filter(
+          ({ nodeMajor }) =>
+            nodeMajor !== undefined && nodeMajor <= floorMajor.value,
         ),
         [],
+      );
+    });
+
+    // #3462: an entry's rules once lived in a comment, and nothing noticed one
+    // turned back on while its entry stood.
+    test.each(
+      gated.flatMap(({ name, rules }) => rules.map((rule) => ({ name, rule }))),
+    )('`$rule`, which writes `$name`, is off', async ({ rule }) => {
+      const config: unknown = await eslintWithoutFix.calculateConfigForFile(
+        path.join(packageRoot, 'src/entry-point.mts'),
+      );
+
+      assert.isTrue(isRecord(config) && isRecord(config['rules']));
+
+      const setting: unknown = config['rules'][rule];
+
+      const severity = Arr.isArray(setting) ? setting[0] : setting;
+
+      assert.include([0, 'off'], severity);
+    });
+
+    test.each(nodeVersionGatedGlobals)(
+      '`$name` written by hand is reported',
+      async ({ name }) => {
+        const [result] = await eslintWithoutFix.lintText(
+          `export const f = (): unknown => ${name};\n`,
+          { filePath: path.join(packageRoot, 'src/entry-point.mts') },
+        );
+
+        assert.isDefined(result);
+
+        expect(result.messages.map(({ ruleId }) => ruleId)).toContain(
+          'no-restricted-globals',
+        );
+      },
+    );
+
+    test('a `using` declaration written by hand is reported', async () => {
+      const [result] = await eslintWithoutFix.lintText(
+        dedent`
+          export const f = (resource: Disposable): void => {
+            using held = resource;
+
+            console.log(held);
+          };
+        `,
+        { filePath: path.join(packageRoot, 'src/entry-point.mts') },
+      );
+
+      assert.isDefined(result);
+
+      expect(result.messages.map(({ ruleId }) => ruleId)).toContain(
+        'no-restricted-syntax',
       );
     });
   });

@@ -7,7 +7,13 @@ import {
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
+import nodeSupport from './tools/configs/node-support.json' with { type: 'json' };
 import { projectRootPath } from './tools/scripts/project-root-path.mjs';
+
+// The repository's own tooling runs on `volta.node`, which is
+// `targets.current` (`check:root:node-support`), not on the `engines.node`
+// floor the published packages promise.
+const toolingNodeMajor = Number(nodeSupport.targets.current.split('.')[0]);
 
 export default [
   {
@@ -27,7 +33,7 @@ export default [
   eslintPluginTsDataForge.configs.recommended,
   eslintPluginTsFortress.configs.recommended,
 
-  eslintConfigForNodeJs(['tools/**']),
+  eslintConfigForNodeJs(['tools/**'], { nodeMajor: toolingNodeMajor }),
   {
     files: ['tools/**'],
     rules: defineKnownRules({
