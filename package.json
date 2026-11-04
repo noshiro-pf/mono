@@ -57,6 +57,7 @@
     "check:root:dist-lib-replacement": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-dist-lib-replacement.mts",
     "check:root:doc-generators": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-doc-generators.mts",
     "check:root:example-coverage": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-example-coverage.mts",
+    "check:root:firebase-emulator-hosts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-firebase-emulator-hosts.mts",
     "check:root:firebase-redirects": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-firebase-redirects.mts",
     "check:root:knip-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-knip-config.mts",
     "check:root:licenses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-licenses.mts",

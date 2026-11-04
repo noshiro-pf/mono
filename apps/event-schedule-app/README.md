@@ -44,7 +44,8 @@ The app reaches the emulators on the host name the page was opened from, so a
 phone opening the dev server by its LAN address (`pnpm run dev --host`) reaches
 them too — provided the emulators listen there as well: change each `"host"`
 under `emulators` in `firebase.json` to `"0.0.0.0"` while you do, and do not
-commit that change.
+commit that change. `check:root:firebase-emulator-hosts` fails, locally too,
+while it is in place.
 
 The emulators load `firestore.rules`, so what they let the app do is what
 production lets it do. CI's `@emulators` e2e tests run against them, but along

@@ -249,7 +249,9 @@ pnpm exec firebase emulators:start   # Java 21 以上が必要
 - ルールは `firestore.rules` をそのまま読み込み、ファイルを変えると読み直される。
 - 接続先のホストはページを開いたホスト名を使う。LAN の別の端末から開くときは、
   開発サーバーを `pnpm run dev -- --host` で、エミュレータも `firebase.json` の各項目に
-  `"host": "0.0.0.0"` を足して起動する。
+  `"host": "0.0.0.0"` を足して起動する。この `firebase.json` の変更はコミットしない。
+  コミットするとほかの開発者のエミュレータも LAN に開いてしまう。変更したままのあいだは
+  `check:root:firebase-emulator-hosts` が手元でも落ちるので、終わったら戻す。
 - エミュレータに接続している間、Firestore の端末内キャッシュはメモリにだけ置く。
   IndexedDB のキャッシュはプロジェクト単位なので、本番とエミュレータのデータが
   混ざらないようにするため。
