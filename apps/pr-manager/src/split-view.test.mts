@@ -110,15 +110,15 @@ describe(splitViewUrl, () => {
     ]);
   });
 
-  test('shows the conversation at 75% when it has the right 30% to itself', () => {
+  test('shows the diff at 67% beside the conversation at 75%', () => {
     const alone = paramsOf(
       splitViewUrl({ ...pullRequest, linkedIssues: [], claudeSessions: [] }),
     );
 
-    assert.deepStrictEqual(alone.getAll('zoom'), ['1', '0.75']);
+    assert.deepStrictEqual(alone.getAll('zoom'), ['0.67', '0.75']);
   });
 
-  test('shows the diff, the conversation and the issue at 75% in three columns', () => {
+  test('shows the diff at 67% and the conversation and the issue at 75% in three columns', () => {
     const all = paramsOf(
       splitViewUrl({
         ...pullRequest,
@@ -127,7 +127,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    assert.deepStrictEqual(all.getAll('zoom'), ['0.75', '0.75', '0.75', '1']);
+    assert.deepStrictEqual(all.getAll('zoom'), ['0.67', '0.75', '0.75', '1']);
 
     const sessionOnly = paramsOf(
       splitViewUrl({
@@ -137,7 +137,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    assert.deepStrictEqual(sessionOnly.getAll('zoom'), ['0.75', '0.75', '1']);
+    assert.deepStrictEqual(sessionOnly.getAll('zoom'), ['0.67', '0.75', '1']);
 
     const issueOnly = paramsOf(
       splitViewUrl({
@@ -147,7 +147,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    assert.deepStrictEqual(issueOnly.getAll('zoom'), ['0.75', '0.75', '0.75']);
+    assert.deepStrictEqual(issueOnly.getAll('zoom'), ['0.67', '0.75', '0.75']);
   });
 
   test('titles the tab with the number and the title of the pull request', () => {

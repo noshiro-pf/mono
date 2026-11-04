@@ -4,8 +4,8 @@ import type { Entry } from './load-report.mjs';
 
 /**
  * A link that opens a pull request in `split-view-extension`: the diff on the
- * left at the narrowest width that keeps GitHub's file tree, without whitespace
- * changes or the files marked viewed, and the conversation in the rest of the
+ * left at a width and a zoom that keep GitHub's file tree beside it, without
+ * whitespace changes or the files marked viewed, and the conversation in the rest of the
  * page. When the pull request closes an issue or names the Claude
  * Code session it was written in, the conversation is held at the widest its
  * description gets with the sidebar below it and that takes the rest, to the
@@ -18,8 +18,8 @@ import type { Entry } from './load-report.mjs';
  * The conversation and the issue are shown at 75%, so that more of each fits in
  * a pane narrower than GitHub lays them out for — the conversation beside the
  * diff alone too, so that it reads the same whatever shares the page. The diff
- * is at 100% beside the conversation alone and at 75% in three columns; the
- * session stays at 100%.
+ * is at 67% in either layout, which is what keeps GitHub's file tree beside it;
+ * the session stays at 100%.
  *
  * The tab is titled `#<number> <title>`, as a tab of the pull request on
  * GitHub would be with the number first.
@@ -56,7 +56,7 @@ export const splitViewUrl = (entry: SplitViewSource): string => {
 
   const diff = {
     url: `${entry.url}/files?${diffQuery}`,
-    zoom: Arr.isEmpty(others) ? full : reading,
+    zoom: diffZoom,
   } as const;
 
   const panes = [diff, conversation, ...others] as const;
@@ -118,10 +118,11 @@ const diffQuery = 'w=1&show-viewed-files=false';
  * to the conversation, whose description is what a pull request is reviewed in
  * now more than its diff.
  *
- * 737px is the narrowest the diff is at with GitHub's file tree beside it, at
- * the diff's 100%: below it the tree folds into a menu. Measured on the pane's
- * `<section>`, in the split view's own pixels, which are what a layout spec
- * holds a pane at, so the zoom of the split view's tab does not change it.
+ * 737px was measured as the narrowest the diff is at with GitHub's file tree
+ * beside it at the diff's 100%, on the pane's `<section>`, in the split view's
+ * own pixels, which are what a layout spec holds a pane at, so the zoom of the
+ * split view's tab does not change it. The tree has since been seen folded
+ * there all the same, so the diff is at `diffZoom` rather than 100%.
  */
 const diffBesideConversation = 'r737fpp';
 
@@ -129,10 +130,14 @@ const diffBesideConversation = 'r737fpp';
  * The diff, the conversation and the right column: the diff held at 554px, the
  * conversation at 577px, and the rest to the right column.
  *
- * 554px is the 737px of `diffBesideConversation` at the diff's 75% here: the
- * pane's 1px borders do not zoom, so it is (737 - 2) × 0.75 + 2, rounded up. 577px is the widest the conversation is at, at its 75%, with the
- * reviewers, the labels and the rest of the sidebar below the description: from
- * 578px they move beside it and the description narrows.
+ * 554px was derived from the 737px of `diffBesideConversation` for a diff at
+ * 75%, the pane's 1px borders, which do not zoom, left out: (737 - 2) × 0.75 +
+ * 2, rounded up. Neither number has been measured again at `diffZoom`, where
+ * both give the diff more room inside it than they did.
+ *
+ * 577px is the widest the conversation is at, at its 75%, with the reviewers,
+ * the labels and the rest of the sidebar below the description: from 578px they
+ * move beside it and the description narrows.
  */
 const threeColumns = 'r554fpr577fpp';
 
@@ -142,5 +147,11 @@ const threeColumnsStacked = 'r554fpr577fpcpp';
 /** 100%, where the extension's `zoom` leaves a pane when it is absent. */
 const full = 1;
 
-/** The conversation and the issue, and the diff in three columns. */
+/** The conversation and the issue. */
 const reading = 0.75;
+
+/**
+ * The diff, in either layout. At 100% in 737px, and at 75% in 554px, GitHub
+ * folds the file tree into a menu; at 67% it stays beside the diff.
+ */
+const diffZoom = 0.67;

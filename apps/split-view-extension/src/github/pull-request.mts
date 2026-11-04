@@ -99,8 +99,9 @@ export const claudeSessionUrlOfBody = (body: string): string | undefined =>
 /**
  * The query string of `split.html` that opens a pull request as the PR
  * Manager's links do (`apps/pr-manager/src/split-view.mts`): the diff, without
- * whitespace changes or the files already viewed, at the narrowest width that
- * keeps GitHub's file tree, beside the conversation in the rest of the page.
+ * whitespace changes or the files already viewed, at a width and a zoom that
+ * keep GitHub's file tree beside it, beside the conversation in the rest of the
+ * page.
  * When the pull request closes an issue or names the Claude Code session it was
  * written in, the conversation is held at a fixed width and that takes the
  * rest, to the right of the conversation; with both, the issue is stacked over
@@ -108,8 +109,8 @@ export const claudeSessionUrlOfBody = (body: string): string | undefined =>
  *
  * The conversation and the issue are at 75%, so that more of each fits — the
  * conversation beside the diff alone too, so that it reads the same whatever
- * shares the page. The diff is at 100% beside the conversation alone and at 75%
- * in three columns; the session is at 100%.
+ * shares the page. The diff is at 67% in either layout, which is what keeps
+ * GitHub's file tree beside it; the session is at 100%.
  *
  * Every pull request opened this way reuses one saved split view,
  * `github-pull-request`, rather than adding one to the list each time. It is
@@ -150,7 +151,7 @@ export const pullRequestSplitViewSearch = ({
 
   const diff = {
     url: `${pullRequest.url}/files?${diffQuery}`,
-    zoom: Arr.isEmpty(others) ? full : narrow,
+    zoom: diffZoom,
   } as const;
 
   const panes = [diff, conversation, ...others] as const;
@@ -254,8 +255,14 @@ const diffQuery = 'w=1&show-viewed-files=false';
 /** 100%, where the extension's `zoom` leaves a pane when it is absent. */
 const full = 1;
 
-/** The conversation and the issue, and the diff in three columns. */
+/** The conversation and the issue. */
 const narrow = 0.75;
+
+/**
+ * The diff, in either layout. The PR Manager's `diffZoom`
+ * (`apps/pr-manager/src/split-view.mts`) says why.
+ */
+const diffZoom = 0.67;
 
 /**
  * The diff beside the conversation alone, the diff held at 737px. The PR

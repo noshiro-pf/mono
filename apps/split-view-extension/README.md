@@ -126,11 +126,14 @@ chrome-extension://nifmgpafbfpgpcijgmfpcoonjbalbkhf/split.html
     ?layout=r737fpp
     &url=https://github.com/noshiro-pf/mono/pull/2052/files
     &url=https://github.com/noshiro-pf/mono/pull/2052
+    &zoom=0.67
+    &zoom=0.75
 ```
 
-That is a pull request's diff, 737px wide, beside its conversation in the rest
-of the page. The id in the host part is the one an unpacked build has wherever
-it is loaded from; a build installed from the store has an id of its own (see
+That is a pull request's diff, 737px wide at 67%, beside its conversation at 75%
+in the rest of the page. The id in the host part is the one an unpacked build
+has wherever it is loaded from; a build installed from the store has an id of
+its own (see
 [`docs/how-it-works.md`](./docs/how-it-works.md#the-list-and-what-it-is-keyed-to)).
 
 | parameter | means                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -172,18 +175,17 @@ button at the bottom left. It opens the pull request in a new tab the way the
 [PR
 Manager](../pr-manager/docs/design.md#opening-a-pull-request-in-a-split-view)'s
 links do: the diff, without whitespace changes or the files already marked
-viewed, at 737px — the narrowest that keeps GitHub's file tree beside it — and
-the conversation in the rest of the page. When the pull request closes an issue,
-or names the Claude Code session it was written in, the diff is held at 554px
-(737px at its 75% there), the conversation at 577px — the widest its description
-gets with the reviewers and the labels below it rather than beside it — and the
-rest goes to the issue or the session, to the right of the conversation; with
-both, the issue is stacked over the session. The conversation and the issue are
-at 75% so that more of each fits, as is the diff in three columns; the diff
-beside the conversation alone, and the session, are at 100%. The pull request's
-own tab is closed once the split view has opened, so the split view takes its
-place; `Ctrl`+click or a middle click opens it behind the current tab instead,
-and keeps that tab.
+viewed, at 737px and 67% — which keeps GitHub's file tree beside it — and the
+conversation in the rest of the page. When the pull request closes an issue, or
+names the Claude Code session it was written in, the diff is held at 554px,
+still at 67%, the conversation at 577px — the widest its description gets with
+the reviewers and the labels below it rather than beside it — and the rest goes
+to the issue or the session, to the right of the conversation; with both, the
+issue is stacked over the session. The conversation and the issue are at 75% so
+that more of each fits; the session is at 100%. The pull request's own tab is
+closed once the split view has opened, so the split view takes its place;
+`Ctrl`+click or a middle click opens it behind the current tab instead, and
+keeps that tab.
 
 A link to a pull request — on GitHub, in a mail, in a chat — has **Open pull
 request in Split View** in its context menu, and so does a pull request's own

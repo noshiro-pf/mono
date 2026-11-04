@@ -245,7 +245,7 @@ describe('pullRequestSplitViewSearch', () => {
 
   const session = 'https://claude.ai/code/session_015uv2FbmANuoW3w5XCgPMhW';
 
-  test('puts the diff at 100%, held at 737px, beside the conversation at 75%', () => {
+  test('puts the diff at 67%, held at 737px, beside the conversation at 75%', () => {
     assert.deepStrictEqual(
       read(
         pullRequestSplitViewSearch({
@@ -261,7 +261,7 @@ describe('pullRequestSplitViewSearch', () => {
         title: '#2085 Fix the thing',
         layout: 'r737fpp',
         url: [diff, conversation],
-        zoom: ['1', '0.75'],
+        zoom: ['0.67', '0.75'],
       },
     );
   });
@@ -282,7 +282,7 @@ describe('pullRequestSplitViewSearch', () => {
         title: '#2085 Fix the thing',
         layout: 'r554fpr577fpp',
         url: [diff, conversation, issue],
-        zoom: ['0.75', '0.75', '0.75'],
+        zoom: ['0.67', '0.75', '0.75'],
       },
     );
   });
@@ -303,7 +303,7 @@ describe('pullRequestSplitViewSearch', () => {
         title: '#2085 Fix the thing',
         layout: 'r554fpr577fpp',
         url: [diff, conversation, session],
-        zoom: ['0.75', '0.75', '1'],
+        zoom: ['0.67', '0.75', '1'],
       },
     );
   });
@@ -324,7 +324,7 @@ describe('pullRequestSplitViewSearch', () => {
         title: '#2085 Fix the thing',
         layout: 'r554fpr577fpcpp',
         url: [diff, conversation, issue, session],
-        zoom: ['0.75', '0.75', '0.75', '1'],
+        zoom: ['0.67', '0.75', '0.75', '1'],
       },
     );
   });
