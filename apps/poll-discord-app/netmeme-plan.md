@@ -10,13 +10,13 @@
 
 - コマンドは Discord のアプリケーションコマンド（スラッシュコマンド）ではなく、
   `messageCreate` で本文の先頭を `startsWith` で見ているだけの**テキストコマンド**
-  （`src/discord/send-poll-message.mts` の `sendMessageMain`）。
+  （`src-old/discord/send-poll-message.mts` の `sendMessageMain`）。
   `/netmeme` もこの方式に合わせる。
-- コマンド名は `src/constants.mts` の `triggerCommand` に集約され、開発環境では
+- コマンド名は `src-old/constants.mts` の `triggerCommand` に集約され、開発環境では
   `-dev` が付く。プレゼンス（`discord.mts`）にも列挙されている。
 - 引数は `"..."` で囲む流儀（`rpParseCommand`）。
 - ビルドは esbuild でファイル単位に `src/` → `build/` へ変換するだけで、
-  `src/assets/` のような非 TS ファイルはコピーされない（既存の 2 画像も未参照）。
+  `src-old/assets/` のような非 TS ファイルはコピーされない（既存の 2 画像も未参照）。
 - このパッケージにはテストの仕組み（vitest）がまだない。
 
 ## 2. 仕様

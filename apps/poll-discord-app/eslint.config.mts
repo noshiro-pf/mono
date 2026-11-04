@@ -26,12 +26,12 @@ export default [
   eslintPluginTsDataForge.configs.recommended,
   eslintPluginTsFortress.configs.recommended,
 
-  eslintConfigForVitest(['src/**/*.test.mts']),
+  eslintConfigForVitest(['src/**/*.test.mts', 'src-old/**/*.test.mts']),
 
-  eslintConfigForNodeJs(['src/**', 'scripts/**', 'configs/**']),
+  eslintConfigForNodeJs(['src/**', 'src-old/**', 'scripts/**', 'configs/**']),
 
   {
-    files: ['src/**'],
+    files: ['src/**', 'src-old/**'],
     rules: defineKnownRules({
       // The parameters this rule objects to are discord.js's own classes —
       // `Message`, `MessageReaction`, `Client`. They carry methods that mutate
@@ -43,7 +43,7 @@ export default [
   },
 
   {
-    files: ['src/utils/date-utils.mts'],
+    files: ['src-old/utils/date-utils.mts'],
     rules: defineKnownRules({
       // `Temporal` is not available on Node 22, which is the floor this
       // repository declares in `engines`. Revisit when that floor moves.

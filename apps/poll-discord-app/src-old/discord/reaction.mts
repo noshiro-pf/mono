@@ -1,7 +1,7 @@
 import type * as Discord from 'discord.js';
 import { ChannelType } from 'discord.js';
 import { Result, match } from 'ts-data-forge';
-import { emojis } from '../constants.mjs';
+import { emojis, numMessagesToFetch } from '../constants.mjs';
 import { firestoreApi } from '../firebase/index.mjs';
 import {
   createUserIdToDisplayNameMap,
@@ -54,7 +54,8 @@ const onRefreshClick = async (
   }
 
   const messages = await channel.messages.fetch({
-    around: reactionFilled.message.id,
+    after: reactionFilled.message.id,
+    limit: numMessagesToFetch,
   });
 
   const pollResult = await firestoreApi.getPollById(
@@ -146,6 +147,7 @@ const onMessageReactCommon = async (
     firestoreApi.updatePollUpdatedAt(pollId),
     channel.messages.fetch({
       after: dateOptionId,
+      limit: numMessagesToFetch,
     }),
   ]);
 

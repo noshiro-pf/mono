@@ -1,7 +1,7 @@
 import type * as Discord from 'discord.js';
 import { ChannelType } from 'discord.js';
 import { type IMap, Result } from 'ts-data-forge';
-import { triggerCommand } from '../constants.mjs';
+import { numMessagesToFetch, triggerCommand } from '../constants.mjs';
 import { firestoreApi } from '../firebase/index.mjs';
 import {
   createTitleString,
@@ -78,6 +78,7 @@ export const updatePollTitle = async (
     ),
     channel.messages.fetch({
       after: message.id,
+      limit: numMessagesToFetch,
     }),
   ]);
 

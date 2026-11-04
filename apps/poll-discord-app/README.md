@@ -8,6 +8,21 @@ Restored from `experimental/` — this is the first of the packages the monorepo
 consolidation parked there. See
 [docs/monorepo-consolidation.md](../../docs/monorepo-consolidation.md).
 
+## Work in progress: the move to slash commands
+
+The bot is being rewritten on Discord's slash commands (application commands).
+The text-command implementation described under "usage" below now lives in
+[`src-old`](./src-old); [`src`](./src) holds the rewrite, which so far registers
+a few sample commands (`/ping`, `/server`, `/user`, `/select`, `/tag`) to one
+guild and answers them. `build` and `start` run the rewrite.
+
+Registering the commands needs `CLIENT_ID` (the application ID) and `GUILD_ID`
+(the guild they are registered to) besides `DISCORD_TOKEN`.
+
+## Invite
+
+<https://discord.com/api/oauth2/authorize?client_id=822731455749685278&permissions=0&scope=bot%20applications.commands>
+
 ## usage
 
 In the development environment every command takes a `-dev` suffix: `/rp-dev`,
@@ -84,7 +99,8 @@ result
 - **The implicit globals are gone.** The app used to auto-import `Result`,
   `IMap`, `pipe` and the rest through `@noshiro/global-ts-utils` and an esbuild
   plugin; every one of them is now an ordinary import.
-- What `ts-data-forge` has no successor for is in [`src/utils`](./src/utils):
+- What `ts-data-forge` has no successor for is in
+  [`src-old/utils`](./src-old/utils):
   `match`, `mapOptional`, `noop`, the five `DateUtils` functions this app calls,
   and the days-of-week and alphabet constants. Each says where it came from.
 
@@ -100,8 +116,8 @@ pnpm run start   # node ./build/index.mjs
 
 `build` does not type-check; `pnpm run check:types` does.
 
-The Firebase config in `src/firebase/config.mts` is a web app config: public by
-design, and unchanged from before the consolidation.
+The Firebase config in `src-old/firebase/config.mts` is a web app config: public
+by design, and unchanged from before the consolidation.
 
 ## Links
 

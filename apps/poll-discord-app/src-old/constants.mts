@@ -20,3 +20,10 @@ export const emojis = {
 export const embedMessageColor = '#3e68b0';
 
 export const footerText = 'Last Update';
+
+/**
+ * How many messages after a poll's title message are fetched to find its date
+ * option messages. Without a limit Discord returns 50, which cuts off a poll
+ * with more options than that. Discord caps the limit at 100.
+ */
+export const numMessagesToFetch = 100;
