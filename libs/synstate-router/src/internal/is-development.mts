@@ -3,9 +3,13 @@
  *
  * `process.env.NODE_ENV` is written out in full because that is the expression
  * bundlers (Vite, webpack, esbuild) replace, in the application's build and in
- * a pre-bundled dependency alike: `true` in a development build, `false` in a
- * production one. Where nothing replaces it and there is no `process` (an
- * unbundled module in a browser), reading it throws and the warnings are off.
+ * a pre-bundled dependency alike: with the string `"development"` in a
+ * development build and `"production"` in a production one. Where nothing
+ * replaces it and there is no `process` (an unbundled module in a browser),
+ * reading it throws and the warnings are off.
+ *
+ * synstate reads it the same way
+ * (`libs/synstate/src/core/utils/is-development-build.mts`).
  */
 const isDevelopmentBuild = (): boolean => {
   try {

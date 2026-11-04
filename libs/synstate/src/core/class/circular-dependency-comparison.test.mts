@@ -14,7 +14,6 @@ import { Optional } from 'ts-data-forge';
 import { combine } from '../combine/index.mjs';
 import { source } from '../create/index.mjs';
 import { map } from '../operators/index.mjs';
-import { checksCircularDependency } from './child-observable-class.mjs';
 import {
   createSyncChildObservable,
   createTryUpdateNotImplemented,
@@ -23,53 +22,50 @@ import { createRootObservable } from './create-root-observable.mjs';
 
 describe('circular dependency comparison', () => {
   describe('SynState', () => {
-    // Only where the check runs: see `checksCircularDependency`.
-    test.runIf(checksCircularDependency)(
-      'detects cycle at construction time with a clear error message',
-      () => {
-        const root = createRootObservable(
-          { initialValue: Optional.some(0) },
-          () => ({}),
-        );
+    // The check is on in both test runs: see `circular-dependency.test.mts`.
+    test('detects cycle at construction time with a clear error message', () => {
+      const root = createRootObservable(
+        { initialValue: Optional.some(0) },
+        () => ({}),
+      );
 
-        const mut_childA = createSyncChildObservable(
-          {
-            parents: [root],
-            initialValue: Optional.some(0),
-          },
-          createTryUpdateNotImplemented,
-        );
+      const mut_childA = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-        const childB = createSyncChildObservable(
+      const childB = createSyncChildObservable(
+        {
+          parents: [mut_childA],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
+
+      // Simulate a cycle: mut_childA → childB → mut_childA
+      // In normal usage this is impossible — the check runs in every child
+      // constructor before the reference becomes available.
+      Object.defineProperty(mut_childA, 'parents', {
+        value: [childB],
+        writable: false,
+        configurable: true,
+      });
+
+      expect(() => {
+        createSyncChildObservable(
           {
             parents: [mut_childA],
             initialValue: Optional.some(0),
           },
           createTryUpdateNotImplemented,
         );
-
-        // Simulate a cycle: mut_childA → childB → mut_childA
-        // In normal usage this is impossible — the check runs in every child
-        // constructor before the reference becomes available.
-        Object.defineProperty(mut_childA, 'parents', {
-          value: [childB],
-          writable: false,
-          configurable: true,
-        });
-
-        expect(() => {
-          createSyncChildObservable(
-            {
-              parents: [mut_childA],
-              initialValue: Optional.some(0),
-            },
-            createTryUpdateNotImplemented,
-          );
-        }).toThrow(
-          'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
-        );
-      },
-    );
+      }).toThrow(
+        'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
+      );
+    });
 
     test('accepts valid DAG (diamond dependency)', () => {
       const a$ = source(0);

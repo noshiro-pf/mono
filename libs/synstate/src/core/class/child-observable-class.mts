@@ -2,7 +2,7 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import { hasKey, isRecord, Optional, type Some } from 'ts-data-forge';
+import { Optional, type Some } from 'ts-data-forge';
 import { panic } from 'ts-std-forge';
 import type { MutableSet } from 'ts-type-forge';
 import type {
@@ -20,7 +20,11 @@ import type {
   WithInitialValueOperator,
   Wrap,
 } from '../types/index.mjs';
-import { issueUnqueuedToken, maxDepth } from '../utils/index.mjs';
+import {
+  isDevelopmentBuild,
+  issueUnqueuedToken,
+  maxDepth,
+} from '../utils/index.mjs';
 import { ManagerObservableClass } from './manager-observable-class.mjs';
 import { ObservableBaseClass } from './observable-base-class.mjs';
 import { toNode, type ChildNode } from './observable-node.mjs';
@@ -395,17 +399,6 @@ const unregisterChild = (child: ChildNode): void => {
   }
 };
 
-const isDevelopmentProcess = (): boolean => {
-  const proc: unknown = Reflect.get(globalThis, 'process');
-
-  return (
-    isRecord(proc) &&
-    hasKey(proc, 'env') &&
-    isRecord(proc.env) &&
-    (!hasKey(proc.env, 'NODE_ENV') || proc.env.NODE_ENV !== 'production')
-  );
-};
-
 /**
  * Whether {@link registerChild} checks for a circular dependency: on in
  * development, off in production. The public API cannot make a cycle — a
@@ -414,7 +407,8 @@ const isDevelopmentProcess = (): boolean => {
  * node) against code that rewrites an observable's readonly `parents`, and
  * development is where that code runs first. It walks every ancestor of each
  * new observable, a cost production does not pay: the check is off when
- * `NODE_ENV` is `production`, and where there is no `process` (a browser
- * bundle).
+ * `NODE_ENV` is `production`, including a bundle whose bundler replaced
+ * `process.env.NODE_ENV`, and where nothing replaced it and there is no
+ * `process` (see {@link isDevelopmentBuild}).
  */
-export const checksCircularDependency: boolean = isDevelopmentProcess();
+const checksCircularDependency: boolean = isDevelopmentBuild();
