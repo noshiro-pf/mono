@@ -837,27 +837,15 @@ importers:
 
   apps/catan-dice:
     dependencies:
-      '@emotion/react':
-        specifier: ^11.14.0
-        version: 11.14.0(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0)
-      '@emotion/styled':
-        specifier: ^11.14.1
-        version: 11.14.1(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0))(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0)
       '@fontsource/roboto':
         specifier: ^5.3.0
         version: 5.3.0
-      '@mui/material':
-        specifier: ^9.5.0
-        version: 9.5.0(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0))(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      react-utils:
-        specifier: workspace:*
-        version: link:../react-utils
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
-      synstate-react-hooks:
+      synstate-dom:
         specifier: workspace:*
-        version: link:../../libs/synstate-react-hooks
+        version: link:../../libs/synstate-dom
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
@@ -865,12 +853,6 @@ importers:
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.64.1
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.3.0
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.3.0(@types/react@19.3.0)
       eslint:
         specifier: 'catalog:'
         version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -892,12 +874,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.10)
-      react:
-        specifier: 'catalog:'
-        version: 19.3.1
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.3.1(react@19.3.1)
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
