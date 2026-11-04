@@ -28,8 +28,10 @@
  * `summary.txt` per version lists the changed files for quick review.
  *
  * Prerequisite: every `vX.Y` series must have been generated already (so that
- * both `temp/copied` and `output/lib-files` are populated). Run `pnpm ws:gen`
- * first if unsure.
+ * both `temp/copied` and `output/lib-files` are populated). Run
+ * `pnpm run strict-lib:gen:with-codemod-fixed` first if unsure
+ * (`strict-lib:gen` reuses the gitignored `temp/codemod-fixed`, which a fresh
+ * clone lacks).
  */
 
 import * as fs from 'node:fs/promises';
