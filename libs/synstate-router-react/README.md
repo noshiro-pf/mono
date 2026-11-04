@@ -2,7 +2,7 @@
 
 React bindings for [synstate-router](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router): a `Routes` that requires a case for every page, a `Link` that takes an `Href` or an `ExternalHref`, never a plain string, and hooks.
 
-> **Status:** in development, not published yet. The design is in synstate-router's [SPEC.md](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-router/SPEC.md) (Japanese), section 5.
+> **Status:** at version 0.x, the API may still change in a minor release. The design is in synstate-router's [SPEC.md](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-router/SPEC.md) (Japanese), section 5.
 
 ## Example
 

@@ -2,7 +2,7 @@
 
 A client-side router for [SynState](https://github.com/noshiro-pf/mono/tree/main/libs/synstate) in which every destination, path parameter and search parameter the application writes is checked by the type checker, with no code generation and no module augmentation.
 
-> **Status:** in development, not published yet. This package has the route tree, the parameter codecs, `href`, matching and the router, which follows the browser history; [synstate-router-react](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router-react) and [synstate-router-dom](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router-dom) draw it. The design is in [SPEC.md](./SPEC.md) (Japanese).
+> **Status:** at version 0.x, the API may still change in a minor release. This package has the route tree, the parameter codecs, `href`, matching and the router, which follows the browser history; [synstate-router-react](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router-react) and [synstate-router-dom](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-router-dom) draw it. The design is in [SPEC.md](./SPEC.md) (Japanese).
 
 ## What it checks
 

@@ -10,7 +10,7 @@ synstate-router は SynState の上に作ったクライアントサイドルー
 描画には 2 つのバインディングがあります。React 向けの `synstate-router-react` と、[synstate-dom](/mono/synstate/ja/synstate-dom/introduction/) 向けの `synstate-router-dom` です。
 
 :::caution
-synstate-router は開発中で、まだ npm にありません。設計は [SPEC.md](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-router/SPEC.md) にあります。
+synstate-router はまだバージョン 0.x なので、マイナーリリースで API が変わることがあります。設計は [SPEC.md](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-router/SPEC.md) にあります。
 :::
 
 ## 何を検査するか
@@ -23,7 +23,7 @@ synstate-router は開発中で、まだ npm にありません。設計は [SPE
 
 ## インストール
 
-パッケージの公開後は、ルーター・そのバインディング・例が import するライブラリをインストールします（React バインディングには `react` 19 以降が必要です）。
+ルーター・そのバインディング・例が import するライブラリをインストールします（React バインディングには `react` 19 以降が必要です）。
 
 ```sh
 npm install react react-dom synstate synstate-router synstate-router-react ts-data-forge # React

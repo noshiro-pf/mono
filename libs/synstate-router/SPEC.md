@@ -5,7 +5,7 @@
 
 アプリが書く遷移先・パスパラメータ・検索パラメータをすべて型で検査し、現在地を synstate の Observable として配るクライアントサイドルーターの実装仕様。v1 の目標は「文字列で書いた URL がどこにも残らない」ことで、TanStack Router と同等以上の型安全性を、コード生成も module augmentation もなしに得る。
 
-- 状態: 仕様 v1 確定（2026-11-02）。実装は「11. 実装計画」の順に進めており、5（`synstate-router-dom`）まで入っている。
+- 状態: 仕様 v1 確定（2026-11-02）。「11. 実装計画」の 6 のうちサンプルアプリ・e2e・synstate-docs のページまで入り、3 パッケージの 0.1.0 を npm に公開した（2026-11-04）。残りは tiny-router-observable を使うアプリ（`event-schedule-app`・`profile`）の移行と tiny-router の引退。
 - 出典: issue [#1733](https://github.com/noshiro-pf/mono/issues/1733)、途中まで実装した branch [`archive/migrate/synstate--add-synstate-router`](https://github.com/noshiro-pf/mono/tree/archive/migrate/synstate--add-synstate-router)（その `libs/synstate-react-router/design-docs/` の DESIGN.md と api-design-research.md に議論がある）、`apps/tiny-router-observable` とその不具合 [#2912](https://github.com/noshiro-pf/mono/issues/2912)・[#2954](https://github.com/noshiro-pf/mono/issues/2954)・[#2956](https://github.com/noshiro-pf/mono/issues/2956)・[#3033](https://github.com/noshiro-pf/mono/issues/3033)。
 
 ## 1. 目的と範囲
