@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
   Arr,
+  asUint32,
   hasKey,
   isRecord,
   isString,
@@ -76,9 +77,9 @@ export const checkCiCommands = (): Promise<Result<CheckSummary, string>> =>
  * graph: an edge `a -> b` means that running `a` also runs `b`.
  *
  * Three kinds of edge are read out of the script bodies themselves — a local
- * `pnpm run`, an `npm-run-all` list, and a recursive `pnpm run --recursive`
- * that reaches the named script in every workspace package — and the rest come
- * from {@link DECLARED_COVERAGE}.
+ * `pnpm run`, an `npm-run-all` list, and a `pnpm run --recursive` (or one with
+ * a `--filter`) that reaches the named script in every workspace package its
+ * filters select — and the rest come from {@link DECLARED_COVERAGE}.
  */
 export const buildCoverageGraph = (
   manifests: readonly Manifest[],
@@ -92,9 +93,9 @@ export const buildCoverageGraph = (
   );
 
   const packageScriptNames = Arr.generate(function* () {
-    for (const { directory, scripts } of manifests) {
+    for (const { directory, name, scripts } of manifests) {
       if (directory !== ROOT_DIRECTORY) {
-        yield { directory, names: Object.keys(scripts) };
+        yield { directory, name, names: Object.keys(scripts) };
       }
     }
   });
@@ -111,11 +112,12 @@ export const buildCoverageGraph = (
         ),
       );
 
-      const recursive = invocations.recursive.flatMap((pattern) =>
-        packageScriptNames.flatMap(({ directory: packageDir, names }) =>
-          matchScriptNames(pattern, names).map((name) =>
-            toCommandId(packageDir, name),
-          ),
+      const recursive = invocations.recursive.flatMap(({ pattern, filters }) =>
+        selectMembers(filters, packageScriptNames).flatMap(
+          ({ directory: packageDir, names }) =>
+            matchScriptNames(pattern, names).map((name) =>
+              toCommandId(packageDir, name),
+            ),
         ),
       );
 
@@ -170,18 +172,29 @@ export const buildCoverageGraph = (
  * the manifest (`pnpm run '/check:prose:.-/'`), or a glob `npm-run-all` expands
  * the same way (`run-p check:test:-`).
  *
- * `recursive` holds what a `pnpm run --recursive` reaches, which is the named
- * script of every workspace package rather than a sibling of the caller. That
- * is the whole of what the `ws:` commands are, so it is what connects the
- * workflows' command names to the scripts each package defines.
+ * `recursive` holds what a `pnpm run --recursive`, or a `pnpm run` with a
+ * `--filter`, reaches, which is the named script of every workspace package
+ * rather than a sibling of the caller. That is the whole of what the `ws:`
+ * commands are, so it is what connects the workflows' command names to the
+ * scripts each package defines. Each carries its `--filter` selectors, which
+ * `buildCoverageGraph` applies: CI shards by them (`ws:fix:lint:apps`,
+ * `ws:check:test:shard-1`), and a shard reaches its own packages, not every
+ * package.
  */
 export const resolveScriptInvocations = (body: string): ScriptInvocations => {
   const mut_local: string[] = [];
 
-  const mut_recursive: string[] = [];
+  const mut_recursive: RecursiveInvocation[] = [];
 
   for (const matched of body.matchAll(PNPM_RUN)) {
     const tokens = tokenize(matched.groups?.['args'] ?? '');
+
+    // `--filter <selector>` takes the next token, which is not the script.
+    const filterValues = new Set(
+      tokens.flatMap((token, index) =>
+        FILTER_FLAGS.has(token) ? [index + 1] : [],
+      ),
+    );
 
     // Everything before the script name is a flag of pnpm's own (`--recursive`,
     // `--if-present`); everything after it is an argument handed to the script,
@@ -192,7 +205,9 @@ export const resolveScriptInvocations = (body: string): ScriptInvocations => {
     // checkout — is a different question from the one the bare script asks.
     // Whether a variant still covers the script it wraps is a judgement, so it
     // belongs in {@link DECLARED_COVERAGE} rather than being read off the body.
-    const targetIndex = tokens.findIndex((token) => !token.startsWith('-'));
+    const targetIndex = tokens.findIndex(
+      (token, index) => !token.startsWith('-') && !filterValues.has(index),
+    );
 
     const target = targetIndex === -1 ? undefined : tokens[targetIndex];
 
@@ -200,8 +215,25 @@ export const resolveScriptInvocations = (body: string): ScriptInvocations => {
       continue;
     }
 
-    if (tokens.some((token) => RECURSIVE_FLAGS.has(token))) {
-      mut_recursive.push(target);
+    const filters = tokens.flatMap((token, index) => {
+      if (filterValues.has(index)) {
+        return [token];
+      }
+
+      const prefix = Array.from(FILTER_FLAGS).find((flag) =>
+        token.startsWith(`${flag}=`),
+      );
+
+      return prefix === undefined ? [] : [token.slice(prefix.length + 1)];
+    });
+
+    // A filter runs the script in the packages it selects, `--recursive` or
+    // not.
+    if (
+      tokens.some((token) => RECURSIVE_FLAGS.has(token)) ||
+      Arr.isNonEmpty(filters)
+    ) {
+      mut_recursive.push({ pattern: target, filters });
     } else {
       mut_local.push(target);
     }
@@ -344,6 +376,8 @@ export const findUncoveredCommands = (
 export type Manifest = Readonly<{
   /** Relative to the repository root; `.` for the root manifest. */
   directory: string;
+  /** The package's `name`, which a `--filter` selector may give. */
+  name?: string;
   scripts: ReadonlyRecord<string, string>;
 }>;
 
@@ -358,7 +392,13 @@ export type CoverageGraph = Readonly<{
 
 export type ScriptInvocations = Readonly<{
   local: readonly string[];
-  recursive: readonly string[];
+  recursive: readonly RecursiveInvocation[];
+}>;
+
+export type RecursiveInvocation = Readonly<{
+  pattern: string;
+  /** The `--filter` selectors, as written. */
+  filters: readonly string[];
 }>;
 
 export type CheckWorkflow = Readonly<{
@@ -391,6 +431,20 @@ const RECURSIVE_FLAGS: ReadonlySet<string> = new Set<string>([
   '-r',
 ]);
 
+const FILTER_FLAGS: ReadonlySet<string> = new Set<string>([
+  '--filter',
+  '--filter-prod',
+  '-F',
+]);
+
+/**
+ * A selector this reads: a package name or a path, either with `*` globs, and
+ * `!` before it to exclude. The dependency forms (`...`, `^`, `[ref]`, `{…}`)
+ * select by what the graph does not know, so a filter that uses one selects
+ * every package, which over-reaches rather than drops a check.
+ */
+const UNREAD_SELECTOR = /\.\.\.|\^|\[|\{/u;
+
 const PNPM_RUN = /pnpm run (?<args>[^&|;\n]*)/gu;
 
 const RUN_ALL = /\brun-[sp] (?<args>[^&|;\n]*)/gu;
@@ -417,6 +471,9 @@ const VALUE_FLAGS: ReadonlySet<string> = new Set<string>([
   '--reporter',
   '--loglevel',
 ]);
+
+const QUOTED_RUN_VALUE =
+  /^(?<key>\s*(?:- )?run: )(?<quote>['"])(?<command>.*)\k<quote>\s*$/u;
 
 /** A step's `name:`, which may mention a command it does not run. */
 const STEP_NAME = /^(?:- )?name: /u;
@@ -619,6 +676,8 @@ export const collectWorkflowCommands = (
       (line) =>
         !line.trimStart().startsWith('#') && !STEP_NAME.test(line.trimStart()),
     )
+    // A `run:` value YAML quotes as a whole is the command, not a string in it.
+    .map((line) => line.replace(QUOTED_RUN_VALUE, '$<key>$<command>'))
     .flatMap((line) =>
       Array.from(line.matchAll(WORKFLOW_PNPM)).flatMap((matched) => {
         // A `pnpm` inside a quoted string is prose an `echo` prints, unless a
@@ -753,6 +812,7 @@ export const readManifests = async (): Promise<
 
   const workspaceManifests = packages.value
     .map((workspacePackage): Manifest => ({
+      name: workspacePackage.name,
       // `/`-separated, as check-changed names directories.
       directory: path
         .relative(projectRootPath, workspacePackage.path)
@@ -789,6 +849,136 @@ export const readCheckWorkflows = async (): Promise<
           }
         }),
       );
+};
+
+/**
+ * A script name against an `npm-run-all` glob, where `*` stands for any run of
+ * characters. Matched rather than compiled, so that nothing here builds a
+ * regular expression out of a string read from a manifest.
+ */
+const matchesGlob = (pattern: string, name: string): boolean => {
+  const segments = pattern.split('*');
+
+  if (Arr.isFixedLengthArray(1, segments)) {
+    return name === pattern;
+  }
+
+  const first = segments.at(0) ?? '';
+
+  const last = segments.at(-1) ?? '';
+
+  if (!name.startsWith(first) || !name.endsWith(last)) {
+    return false;
+  }
+
+  if (first.length + last.length > name.length) {
+    return false;
+  }
+
+  const mut_cursor = { at: first.length };
+
+  for (const segment of segments.slice(1, -1)) {
+    const found = name.indexOf(segment, mut_cursor.at);
+
+    if (found === -1) {
+      return false;
+    }
+
+    mut_cursor.at = found + segment.length;
+  }
+
+  return mut_cursor.at <= name.length - last.length;
+};
+
+/**
+ * A path selector against a directory, one `/`-separated segment at a time:
+ * `**` takes any number of segments, and within one `*` any run of characters
+ * ({@link matchesGlob}, which builds no regular expression from a manifest).
+ */
+const matchesPathGlob = (
+  globSegments: readonly string[],
+  pathSegments: readonly string[],
+): boolean => {
+  const [head, ...rest] = globSegments;
+
+  if (head === undefined) {
+    return Arr.isEmpty(pathSegments);
+  }
+
+  if (head === '**') {
+    return Arr.seq(asUint32(pathSegments.length + 1)).some((skipped) =>
+      matchesPathGlob(rest, pathSegments.slice(skipped)),
+    );
+  }
+
+  const [first, ...remaining] = pathSegments;
+
+  return (
+    first !== undefined &&
+    matchesGlob(head, first) &&
+    matchesPathGlob(rest, remaining)
+  );
+};
+
+/**
+ * The workspace members pnpm's `--filter` selectors pick: those one of the
+ * positive selectors picks (every member when none is given), less those a `!`
+ * one picks.
+ */
+const selectMembers = <
+  M extends Readonly<{ directory: string; name: string | undefined }>,
+>(
+  filters: readonly string[],
+  members: readonly M[],
+): readonly M[] => {
+  if (filters.some((selector) => UNREAD_SELECTOR.test(selector))) {
+    return members;
+  }
+
+  const included = filters.filter((selector) => !selector.startsWith('!'));
+
+  const excluded = filters
+    .filter((selector) => selector.startsWith('!'))
+    .map((selector) => selector.slice(1));
+
+  const picked = (selector: string): readonly M[] => {
+    if (selector.startsWith('.')) {
+      return members.filter(({ directory }) =>
+        matchesPathGlob(
+          selector.replace(/^\.\//u, '').split('/'),
+          directory.split('/'),
+        ),
+      );
+    }
+
+    const byName = members.filter(
+      ({ name }) => name !== undefined && matchesGlob(selector, name),
+    );
+
+    if (Arr.isNonEmpty(byName) || selector.includes('/')) {
+      return byName;
+    }
+
+    // pnpm lets an unscoped name select a scoped package of that name, when no
+    // package has the name itself and exactly one scope does.
+    const scoped = members.filter(
+      ({ name }) =>
+        name?.startsWith('@') === true &&
+        matchesGlob(selector, name.slice(name.indexOf('/') + 1)),
+    );
+
+    return Arr.isFixedLengthArray(1, scoped) ? scoped : [];
+  };
+
+  const kept = Arr.isEmpty(included)
+    ? members
+    : members.filter((member) =>
+        included.some((selector) => picked(selector).includes(member)),
+      );
+
+  return kept.filter((member) =>
+    excluded.every((selector) => !picked(selector).includes(member)),
+  );
 };
 
 /**
@@ -936,45 +1126,6 @@ const tokenize = (args: string): readonly string[] => {
 const QUOTES: ReadonlySet<string> = new Set<string>(["'", '"']);
 
 const WHITESPACE: ReadonlySet<string> = new Set<string>([' ', '\t']);
-
-/**
- * A script name against an `npm-run-all` glob, where `*` stands for any run of
- * characters. Matched rather than compiled, so that nothing here builds a
- * regular expression out of a string read from a manifest.
- */
-const matchesGlob = (pattern: string, name: string): boolean => {
-  const segments = pattern.split('*');
-
-  if (Arr.isFixedLengthArray(1, segments)) {
-    return name === pattern;
-  }
-
-  const first = segments.at(0) ?? '';
-
-  const last = segments.at(-1) ?? '';
-
-  if (!name.startsWith(first) || !name.endsWith(last)) {
-    return false;
-  }
-
-  if (first.length + last.length > name.length) {
-    return false;
-  }
-
-  const mut_cursor = { at: first.length };
-
-  for (const segment of segments.slice(1, -1)) {
-    const found = name.indexOf(segment, mut_cursor.at);
-
-    if (found === -1) {
-      return false;
-    }
-
-    mut_cursor.at = found + segment.length;
-  }
-
-  return mut_cursor.at <= name.length - last.length;
-};
 
 const reaches = (
   graph: CoverageGraph,

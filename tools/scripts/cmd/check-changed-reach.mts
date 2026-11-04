@@ -11,6 +11,8 @@ import {
 import {
   CI_ONLY,
   findUncovered,
+  groupByScript,
+  listDirectories,
   matchesCiOnly,
   stepCommands,
   type CiOnly,
@@ -280,44 +282,6 @@ type Summary = Readonly<{
   ciOnly: number;
 }>;
 
-/** The commands by script name, in the order first seen. */
-const groupByScript = (
-  entries: readonly Uncovered[],
-): readonly Readonly<{
-  scriptName: string;
-  directories: readonly string[];
-  origin: string;
-}>[] => {
-  const mut_groups = new Map<
-    string,
-    Readonly<{ directories: readonly string[]; origin: string }>
-  >();
-
-  for (const { command, origin } of entries) {
-    const { directory, scriptName } = splitCommandId(command);
-
-    const group = mut_groups.get(scriptName);
-
-    mut_groups.set(scriptName, {
-      directories: Arr.toPushed(group?.directories ?? [], directory),
-      origin: group?.origin ?? origin,
-    });
-  }
-
-  return Array.from(mut_groups, ([scriptName, group]) => ({
-    scriptName,
-    ...group,
-  }));
-};
-
-const listDirectories = (directories: readonly string[]): string => {
-  const shown = directories.slice(0, SHOWN_DIRECTORIES).join(', ');
-
-  return directories.length > SHOWN_DIRECTORIES
-    ? `${shown} and ${directories.length - SHOWN_DIRECTORIES} more`
-    : shown;
-};
-
 /**
  * A path for each area `classifyChanges` knows beyond a package's own files;
  * `checkChangedReach` fails when one of `AREAS` is touched by none of them.
@@ -337,8 +301,6 @@ const ROOT_SAMPLES = [
   'repo-settings/sample.json',
   'strict-lib/sample.mts',
 ] as const;
-
-const SHOWN_DIRECTORIES = 5;
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkChangedReach().catch((error: unknown) =>

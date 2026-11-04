@@ -325,6 +325,7 @@ export const buildPlan = ({
               title: 'cspell over the changed files',
               kind: 'check',
               cwd: '.',
+              narrows: 'check:cspell',
               args: [
                 'exec',
                 'cspell',
@@ -493,6 +494,11 @@ export type Step = Readonly<{
    * command, `vitest`.
    */
   coverage?: Readonly<{ packageDir: string }>;
+  /**
+   * The root script CI runs over everything that this step runs over the diff
+   * alone, for `check-changed-gap.mts` to tell the two apart.
+   */
+  narrows?: string;
 }>;
 
 const rootStep = (kind: StepKind, script: string): Step =>
@@ -567,6 +573,7 @@ const formatStep = (title: string, base: string): Step =>
     kind: 'format',
     cwd: '.',
     args: ['run', 'z:format-diff-from', base],
+    narrows: 'fix:fmt:full',
   }) as const;
 
 const packageStep = (

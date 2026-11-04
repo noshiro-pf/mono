@@ -434,6 +434,43 @@ describe('buildPlan', () => {
     assert.notInclude(steps, 'ext: check:types');
   });
 
+  // check-changed-gap.mts tells a step over the diff from the CI script over
+  // everything by this mark, so a new one that leaves it out misreports.
+  test('every step given the base or the changed files names what it narrows', () => {
+    assert.deepStrictEqual(
+      [
+        'libs/ts-data-forge/src/array.mts',
+        'libs/ts-data-forge/README.md',
+        '.prettierrc',
+      ].flatMap((file) =>
+        plan([file])
+          .filter(
+            ({ args, narrows }) =>
+              (args.includes('abc123') || args.includes(`./${file}`)) &&
+              narrows === undefined,
+          )
+          .map(({ title }) => title),
+      ),
+      [],
+    );
+  });
+
+  test('the steps that run a CI script over the diff alone say which', () => {
+    const steps = plan(['libs/ts-data-forge/src/array.mts']);
+
+    assert.deepStrictEqual(
+      steps
+        .filter(({ narrows }) => narrows !== undefined)
+        .map(({ title, narrows }) => `${title}: ${narrows}`),
+      [
+        'format the diff (before): fix:fmt:full',
+        'format what the codemod reprinted: fix:fmt:full',
+        'cspell over the changed files: check:cspell',
+        'format the diff (after): fix:fmt:full',
+      ],
+    );
+  });
+
   test('a prose-only change formats only before and after', () => {
     assert.deepStrictEqual(
       plan(['libs/ts-data-forge/README.md'])

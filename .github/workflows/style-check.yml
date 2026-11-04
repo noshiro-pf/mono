@@ -173,10 +173,30 @@ jobs:
         run: git fetch --no-tags --depth=1 origin "${PROSE_DIFF_BASE}"
 
       - name: Run "${{ matrix.command }}"
+        id: command
         run: pnpm run ${{ matrix.command }}
 
       - name: Check if there is no file diff
+        id: clean
         run: pnpm run z:assert-repo-is-clean
+
+      # Says in the job summary which of this entry's commands check-changed
+      # would have run for the diff ("When a check fails" in README.md). It
+      # reports; the job has failed already. Not after a failed setup or
+      # build, when the command never ran. Last, and capped, so that it cannot
+      # spend the job's time limit before the steps above.
+      - name: Say which of "${{ matrix.command }}"'s commands check-changed would have run
+        if: >-
+          failure() && github.event_name == 'pull_request' &&
+          (steps.command.outcome == 'failure' || steps.clean.outcome == 'failure')
+        continue-on-error: true
+        timeout-minutes: 2
+        env:
+          GAP_BASE: ${{ github.event.pull_request.base.sha }}
+          GAP_JOB: ${{ matrix.command }}
+        run: |
+          git fetch --no-tags --depth=1 origin "${GAP_BASE}"
+          pnpm run --silent z:check-changed-gap --job "${GAP_JOB}" --base "${GAP_BASE}" >> "${GITHUB_STEP_SUMMARY}"
 
   # The one required status check for this workflow, reported as
   # `style-check-result / result` — see "The aggregate job" in README.md.
