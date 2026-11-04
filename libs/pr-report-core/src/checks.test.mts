@@ -4,6 +4,7 @@ import {
   classifyCheckRun,
   classifyCommitStatus,
   combineContextStates,
+  outranks,
   reportedContexts,
   statesFromCheckRuns,
   summarizeChecks,
@@ -384,6 +385,28 @@ describe(statesFromCheckRuns, () => {
     ]);
 
     assert.strictEqual(states.get('coverage-main'), 'skipped');
+  });
+});
+
+describe(outranks, () => {
+  test('ranks a later suite first, whatever the run ids', () => {
+    assert.isTrue(
+      outranks({ checkSuiteId: 2, id: 1 }, { checkSuiteId: 1, id: 9 }),
+    );
+
+    assert.isFalse(
+      outranks({ checkSuiteId: 1, id: 9 }, { checkSuiteId: 2, id: 1 }),
+    );
+  });
+
+  test('ranks a re-run, a later run in the same suite, over the run before', () => {
+    assert.isTrue(
+      outranks({ checkSuiteId: 1, id: 11 }, { checkSuiteId: 1, id: 10 }),
+    );
+
+    assert.isFalse(
+      outranks({ checkSuiteId: 1, id: 10 }, { checkSuiteId: 1, id: 10 }),
+    );
   });
 });
 

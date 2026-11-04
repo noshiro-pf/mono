@@ -354,6 +354,7 @@ const check = (
     startedAt: completedAt,
     completedAt,
     workflow,
+    reRunAfter: false,
   }) as const;
 
 const running = (
@@ -453,10 +454,18 @@ describe(reportedChecksOf, () => {
   test('keeps only the latest run of a job in one workflow and event', () => {
     const checks = reportedChecksOf(
       [
-        checkRun('a', 'COMPLETED', 'CANCELLED', '2026-10-25T09:00:00Z'),
-        checkRun('a', 'IN_PROGRESS', null, '2026-10-25T11:00:00Z'),
+        checkRun('a', 'COMPLETED', 'CANCELLED', '2026-10-25T09:00:00Z', {
+          checkSuiteId: 1,
+          id: 10,
+        }),
+        checkRun('a', 'IN_PROGRESS', null, '2026-10-25T11:00:00Z', {
+          checkSuiteId: 2,
+          id: 20,
+        }),
         checkRun('a', 'COMPLETED', 'SUCCESS', '2026-10-25T08:00:00Z', {
           event: 'push',
+          checkSuiteId: 3,
+          id: 30,
         }),
       ],
       'all',
@@ -465,6 +474,90 @@ describe(reportedChecksOf, () => {
     assert.deepStrictEqual(
       checks.map(({ bucket }) => bucket),
       ['pending', 'pass'],
+    );
+  });
+
+  // #3334: a run not started yet has no start time, and ranking by it put a
+  // queued re-run behind the attempt it re-runs.
+  test('keeps a queued re-run of a job over the attempt that failed', () => {
+    const checks = reportedChecksOf(
+      [
+        checkRun('a', 'COMPLETED', 'FAILURE', '2026-10-25T09:00:00Z', {
+          checkSuiteId: 1,
+          id: 10,
+        }),
+        checkRun('a', 'QUEUED', null, null, { checkSuiteId: 1, id: 11 }),
+      ],
+      'all',
+    );
+
+    assert.deepStrictEqual(
+      checks.map(({ bucket }) => bucket),
+      ['pending'],
+    );
+  });
+
+  test('keeps a queued run of a newer round over the red of the round before', () => {
+    const checks = reportedChecksOf(
+      [
+        checkRun('a', 'QUEUED', null, null, { checkSuiteId: 2, id: 20 }),
+        checkRun('a', 'COMPLETED', 'CANCELLED', '2026-10-25T09:00:00Z', {
+          checkSuiteId: 1,
+          id: 10,
+        }),
+      ],
+      'all',
+    );
+
+    assert.deepStrictEqual(
+      checks.map(({ bucket }) => bucket),
+      ['pending'],
+    );
+  });
+
+  // Whether a run cancelled while still queued reports a start time is not
+  // something the ranking has to know: the newer suite wins either way.
+  test('keeps the newer round over a run cancelled before it started', () => {
+    const checks = reportedChecksOf(
+      [
+        checkRun('a', 'COMPLETED', 'CANCELLED', null, {
+          checkSuiteId: 1,
+          id: 10,
+        }),
+        checkRun('a', 'IN_PROGRESS', null, '2026-10-25T09:00:00Z', {
+          checkSuiteId: 2,
+          id: 20,
+        }),
+      ],
+      'all',
+    );
+
+    assert.deepStrictEqual(
+      checks.map(({ bucket }) => bucket),
+      ['pending'],
+    );
+  });
+
+  // GitHub answers a required context with the run in the suite of the greatest
+  // id, whichever run is newer (`pr-report-core`'s `statesFromCheckRuns`).
+  test('ranks runs by their check suite before their own id', () => {
+    const checks = reportedChecksOf(
+      [
+        checkRun('a', 'COMPLETED', 'SUCCESS', '2026-10-25T09:00:00Z', {
+          checkSuiteId: 1,
+          id: 30,
+        }),
+        checkRun('a', 'COMPLETED', 'FAILURE', '2026-10-25T08:00:00Z', {
+          checkSuiteId: 2,
+          id: 20,
+        }),
+      ],
+      'all',
+    );
+
+    assert.deepStrictEqual(
+      checks.map(({ bucket }) => bucket),
+      ['fail'],
     );
   });
 
@@ -533,6 +626,226 @@ describe(headChecksOf, () => {
         link: 'https://example.com/c',
       },
     ]);
+  });
+});
+
+describe('headChecksOf, then summarizeChecks', () => {
+  const required = ['code-check-result / result', 'no-skip-ci-label'] as const;
+
+  const summarize = (
+    contexts: readonly CheckContextNode[],
+  ): ReturnType<typeof summarizeChecks> => {
+    const head = headChecksOf(contexts);
+
+    return summarizeChecks(head.required, required, head.running);
+  };
+
+  // #3334: the queued re-run counted as the oldest run of its job, so the
+  // attempt it re-runs spoke for it.
+  test('waits on a queued re-run of a required job that failed', () => {
+    const summary = summarize([
+      checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
+        completedAt: '2026-10-25T09:00:00Z',
+        checkSuiteId: 1,
+        id: 10,
+        runId: 100,
+      }),
+      checkRun('code-check-result / result', 'QUEUED', null, null, {
+        checkSuiteId: 1,
+        id: 11,
+        runId: 100,
+      }),
+      statusContext('no-skip-ci-label', 'SUCCESS'),
+    ]);
+
+    assert.strictEqual(summary.verdict, 'pending');
+
+    assert.deepStrictEqual(summary.failedRuns, []);
+  });
+
+  // #3334: "Re-run failed jobs" queues the failed matrix job again, and the
+  // aggregate's own re-run is created only once that job is done, so until then
+  // the aggregate's red from the attempt before is all its context has.
+  test('waits on a red aggregate while a re-run of a job it needs is queued', () => {
+    const summary = summarize([
+      checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
+        isRequired: false,
+        checkSuiteId: 1,
+        id: 10,
+        runId: 100,
+      }),
+      checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
+        completedAt: '2026-10-25T09:00:00Z',
+        checkSuiteId: 1,
+        id: 11,
+        runId: 100,
+      }),
+      checkRun('code-check (ws:fix:lint)', 'QUEUED', null, null, {
+        isRequired: false,
+        checkSuiteId: 1,
+        id: 12,
+        runId: 100,
+      }),
+      statusContext('no-skip-ci-label', 'SUCCESS'),
+    ]);
+
+    assert.strictEqual(summary.verdict, 'pending');
+
+    assert.deepStrictEqual(summary.failedRuns, []);
+  });
+
+  // #3334: the new round's aggregate, queued, lost to the red the cancelled
+  // round left under the same name.
+  test("waits on a queued aggregate of the new round over the cancelled round's red", () => {
+    const summary = summarize([
+      checkRun('code-check-result / result', 'COMPLETED', 'CANCELLED', null, {
+        completedAt: '2026-10-25T09:00:00Z',
+        checkSuiteId: 1,
+        id: 10,
+        runId: 100,
+      }),
+      checkRun('code-check-result / result', 'QUEUED', null, null, {
+        checkSuiteId: 2,
+        id: 20,
+        runId: 200,
+      }),
+      statusContext('no-skip-ci-label', 'SUCCESS'),
+    ]);
+
+    assert.strictEqual(summary.verdict, 'pending');
+
+    assert.deepStrictEqual(summary.failedRuns, []);
+  });
+
+  // No check still running has a start time, so only the newer run of the red's
+  // workflow, its run id read from the links, says the red is the round before's.
+  test('waits on a red of the round before while every running check is queued', () => {
+    const summary = summarize([
+      checkRun('code-check-result / result', 'COMPLETED', 'CANCELLED', null, {
+        completedAt: '2026-10-25T09:00:00Z',
+        checkSuiteId: 1,
+        id: 10,
+        runId: 100,
+      }),
+      checkRun('code-check (ws:fix:lint)', 'QUEUED', null, null, {
+        isRequired: false,
+        checkSuiteId: 2,
+        id: 20,
+        runId: 200,
+      }),
+      statusContext('no-skip-ci-label', 'SUCCESS'),
+    ]);
+
+    assert.strictEqual(summary.verdict, 'pending');
+
+    assert.deepStrictEqual(summary.failedRuns, []);
+  });
+
+  // The window between a re-run job finishing and the aggregate that needs it
+  // being created again: nothing in the workflow run is pending, but the run
+  // has not finished.
+  test('waits on a red aggregate after a re-run of a job it needs passed, while its workflow run goes on', () => {
+    const summary = summarize([
+      checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
+        isRequired: false,
+        checkSuiteId: 1,
+        id: 10,
+        runId: 100,
+      }),
+      checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
+        completedAt: '2026-10-25T09:00:00Z',
+        checkSuiteId: 1,
+        id: 11,
+        runId: 100,
+      }),
+      checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'SUCCESS', null, {
+        isRequired: false,
+        checkSuiteId: 1,
+        id: 12,
+        runId: 100,
+      }),
+      statusContext('no-skip-ci-label', 'SUCCESS'),
+    ]);
+
+    assert.strictEqual(summary.verdict, 'pending');
+  });
+
+  test('fails on a red aggregate once the workflow run of a re-run has finished without a new one', () => {
+    const summary = summarize([
+      checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
+        isRequired: false,
+        checkSuiteId: 1,
+        id: 10,
+        runId: 100,
+        suiteStatus: 'COMPLETED',
+      }),
+      checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
+        completedAt: '2026-10-25T09:00:00Z',
+        checkSuiteId: 1,
+        id: 11,
+        runId: 100,
+        suiteStatus: 'COMPLETED',
+      }),
+      checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
+        isRequired: false,
+        checkSuiteId: 1,
+        id: 12,
+        runId: 100,
+        suiteStatus: 'COMPLETED',
+      }),
+      statusContext('no-skip-ci-label', 'SUCCESS'),
+    ]);
+
+    assert.strictEqual(summary.verdict, 'failing');
+  });
+
+  // Sibling jobs with no aggregate after them, as `lint-pull-request.yml`'s
+  // are: one still queued is not a re-run, and does not hold back the red of
+  // another.
+  test('fails on a red of the round still running while its sibling jobs are queued', () => {
+    const summary = summarize([
+      checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
+        completedAt: '2026-10-25T09:00:00Z',
+        checkSuiteId: 2,
+        id: 20,
+        runId: 200,
+      }),
+      checkRun('code-check (ws:fix:lint)', 'QUEUED', null, null, {
+        isRequired: false,
+        checkSuiteId: 2,
+        id: 21,
+        runId: 200,
+      }),
+      statusContext('no-skip-ci-label', 'SUCCESS'),
+    ]);
+
+    assert.strictEqual(summary.verdict, 'failing');
+  });
+
+  // #3334: a commit status set pending long ago is not when the round began,
+  // and taking it as that put the start before the round before's reds.
+  test('does not take a pending commit status as the start of the round', () => {
+    const summary = summarize([
+      statusContext('some-app', 'PENDING', '2026-10-25T08:00:00Z', {
+        isRequired: false,
+      }),
+      checkRun('code-check-result / result', 'COMPLETED', 'CANCELLED', null, {
+        workflow: 'other',
+        completedAt: '2026-10-25T09:00:00Z',
+      }),
+      checkRun(
+        'code-check (ws:fix:lint)',
+        'IN_PROGRESS',
+        null,
+        '2026-10-25T10:00:00Z',
+        { isRequired: false },
+      ),
+      statusContext('no-skip-ci-label', 'SUCCESS'),
+    ]);
+
+    assert.strictEqual(summary.verdict, 'pending');
+
+    assert.deepStrictEqual(summary.failedRuns, []);
   });
 });
 
@@ -669,28 +982,54 @@ const checkRun = (
   status: string,
   conclusion: string | null,
   startedAt: string | null = '2026-10-25T10:00:00Z',
-  { isRequired = true, event = 'pull_request' }: CheckRunOptions = {},
+  {
+    isRequired = true,
+    event = 'pull_request',
+    workflow = 'code-check',
+    completedAt = conclusion === null ? null : '2026-10-25T10:05:00Z',
+    checkSuiteId,
+    id,
+    runId,
+    suiteStatus = 'IN_PROGRESS',
+  }: CheckRunOptions = {},
 ): CheckContextNode =>
   ({
     __typename: 'CheckRun',
+    databaseId: id ?? null,
     name,
     status,
     conclusion,
     startedAt,
-    completedAt: conclusion === null ? null : ('2026-10-25T10:05:00Z' as const),
-    detailsUrl: `https://example.com/${name}`,
+    completedAt,
+    detailsUrl: linkOf(name, runId),
     isRequired,
     checkSuite: {
-      workflowRun: { event, workflow: { name: 'code-check' } },
+      databaseId: checkSuiteId ?? null,
+      status: suiteStatus,
+      workflowRun: { event, workflow: { name: workflow } },
     },
   }) as const;
 
-type CheckRunOptions = Readonly<{ isRequired?: boolean; event?: string }>;
+type CheckRunOptions = Readonly<{
+  isRequired?: boolean;
+  event?: string;
+  workflow?: string;
+  completedAt?: string | null;
+  /** Its check suite, which is its workflow run's: one per run, not attempt. */
+  checkSuiteId?: number;
+  /** The check run's own id; a re-run of the job is a new check run. */
+  id?: number;
+  /** The workflow run in its link, which a re-run keeps. */
+  runId?: number;
+  /** Its check suite's, `COMPLETED` once the workflow run has finished. */
+  suiteStatus?: string;
+}>;
 
 const statusContext = (
   context: string,
   state: string,
   createdAt = '2026-10-25T10:00:00Z',
+  { isRequired = true }: Readonly<{ isRequired?: boolean }> = {},
 ): CheckContextNode =>
   ({
     __typename: 'StatusContext',
@@ -698,5 +1037,5 @@ const statusContext = (
     state,
     targetUrl: null,
     createdAt,
-    isRequired: true,
+    isRequired,
   }) as const;

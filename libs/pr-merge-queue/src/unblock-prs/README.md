@@ -543,7 +543,16 @@ round のものとして、round が終わるまで待ちます。`open-pr` が�
 になりました）。同じ workflow のもっと新しい run がまだ実行中の fail も前の round
 のものとして待ちます。`skip-ci` を付けた round のキャンセルが遅れると、その集約は
 新しい round が始まった後に赤くなるので、時刻では見分けられません（#2463 はこれで
-`checks-failed` になりました）。
+`checks-failed` になりました）。同じ workflow と event の同じ job の run が複数あ
+るときに読むのは、最後に始まったものではなく、`pr-report` と同じく check suite、
+次にその中の check run で最も新しいものです。キューで待っている再実行や新しい
+round の集約はまだ開始時刻を持たず、開始時刻で順位を付けると置き換えるはずの赤に
+負けていました（#3334）。また、fail の後にその中の job が再実行された自分の
+workflow run が終わっていない間も、その fail は待ちます。「Re-run failed jobs」は
+失敗した job をもう一度キューに入れ、それを待つ集約はその job が終わるまで作り直
+されないからです。同じ名前の前の run がその run の中にある job を再実行と数え、それより前に作られた fail は、どの job の再実行であっても待ちます。一度しか実行されていない job は何も止めません。また
+commit status は round の開始に数えません。ずっと前から pending のものがあると、
+開始が前の round の赤より前になってしまいます。
 
 **必須 context が未報告のまま、head 上で何も実行中でない状態が5分続いたら
 `checks-not-started` として見送ります**（`CHECKS_NOT_STARTED_GRACE_MS`、
@@ -1450,9 +1459,9 @@ matrix.
 
 **Nothing on the head may still be running**, required or not. A required
 aggregate has no run in a new round until the jobs it waits on are done, so
-until then `--required` answers with the round before, and when that round
-was the one `skip-ci` skipped, every aggregate reads `skipped` and the commit
-looks green halfway through its matrix (#2069 was set aside `not-merging` so).
+until then `--required` answers with the round before, and when that round was
+the one `skip-ci` skipped, every aggregate reads `skipped` and the commit looks
+green halfway through its matrix (#2069 was set aside `not-merging` so).
 A failure is still acted on at once, unless it finished before the earliest
 check still running started: that one is the round before, and waits for the
 round to end. The round `skip-ci` cancels as `open-pr` opens a pull request
@@ -1460,8 +1469,19 @@ leaves its aggregates red, and reading that red as this round's set the first
 real round aside halfway through (#2246 was set aside `checks-failed` so).
 So is a failure whose workflow has a newer run still running: when the round
 `skip-ci` was put on for is slow to cancel, its aggregate goes red after the
-round replacing it has started, and the time alone cannot tell them apart
-(#2463 was set aside `checks-failed` so).
+round replacing it has started, and the time alone cannot tell them apart (#2463
+was set aside `checks-failed` so). Of several runs of one job in one workflow
+and event, the one read is the latest by check suite, then by check run in it,
+as `pr-report` ranks them — not the one that started last: a queued re-run, or
+the new round's queued aggregate, has no start yet, and ranked so it lost to the
+red it replaces (#3334). So does a failure wait while its own workflow run, with
+a job in it re-run after the failure, has not finished: "Re-run failed jobs"
+queues the failed job again, and the aggregate that needs it is not created
+again until that job is done. A job counts as re-run when the run holds an
+earlier run of the same name, and a failure created before one waits whichever
+job was re-run; a job that has run only once holds nothing back. Nor does a
+commit status count as the round's start: one pending since long ago would put
+it before the round before's reds.
 
 **A head with a required context unreported and nothing running on it for five
 minutes is set aside as `checks-not-started`** (`CHECKS_NOT_STARTED_GRACE_MS`,

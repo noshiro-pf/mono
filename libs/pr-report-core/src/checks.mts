@@ -299,11 +299,15 @@ export const summarizeChecks = ({
 };
 
 /**
- * Which of two runs of one name GitHub would answer with: the one in the
- * later-created suite, and within one suite the later run of it — a re-run
- * keeps the suite and takes a new run id.
+ * Whether `run` is the one of two runs of one name GitHub would answer with
+ * rather than `previous`: the one in the later-created suite, and within one
+ * suite the later run of it — a re-run keeps the suite and takes a new run id.
+ * Not the one that started later: a run still queued has not started.
  */
-const outranks = (run: CheckRunReport, previous: CheckRunReport): boolean =>
+export const outranks = (run: CheckRunRank, previous: CheckRunRank): boolean =>
   run.checkSuiteId === previous.checkSuiteId
     ? run.id > previous.id
     : run.checkSuiteId > previous.checkSuiteId;
+
+/** What {@link outranks} orders two check runs by, as {@link CheckRunReport} has them. */
+export type CheckRunRank = Readonly<{ checkSuiteId: number; id: number }>;
