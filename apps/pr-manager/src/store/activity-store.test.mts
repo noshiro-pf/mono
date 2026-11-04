@@ -3,7 +3,7 @@ import { Result } from 'ts-data-forge';
 import type { Answered } from '../graphql.mjs';
 import type { StoredToken } from '../token.mjs';
 import { dayKeyOf, type WeeklyActivity } from '../weekly-activity.mjs';
-import { createActivityStore } from './activity-store.mjs';
+import { createActivityStore, type ActivityDeps } from './activity-store.mjs';
 
 describe(createActivityStore, () => {
   test('reads nothing until it is opened, then reads the week', async () => {
@@ -158,6 +158,105 @@ describe(createActivityStore, () => {
     assert.strictEqual(loads.length, 2);
   });
 
+  test('a read that rejects says why, and the dialog can read again', async () => {
+    const { store, loads, fail } = setup();
+
+    store.openDialog();
+
+    fail(0, new Error('The connection was reset.'));
+
+    await settle();
+
+    assert.deepStrictEqual(store.status.getSnapshot().value, {
+      type: 'failed',
+      message: 'The connection was reset.',
+    });
+
+    store.closeDialog();
+
+    store.openDialog();
+
+    assert.strictEqual(loads.length, 2);
+
+    store.retry();
+
+    assert.strictEqual(loads.length, 3);
+  });
+
+  test.each([[''], [undefined], [null]])(
+    'a read that rejects with %o still says something',
+    async (reason) => {
+      const { store, fail } = setup();
+
+      store.openDialog();
+
+      fail(0, reason);
+
+      await settle();
+
+      assert.deepStrictEqual(store.status.getSnapshot().value, {
+        type: 'failed',
+        message: 'Could not count the week.',
+      });
+    },
+  );
+
+  test('a same-day read that rejects replaces the week held with why', async () => {
+    const { store, answer, fail } = setup();
+
+    store.openDialog();
+
+    answer(0, week(TODAY));
+
+    await settle();
+
+    store.closeDialog();
+
+    store.openDialog();
+
+    fail(1, new Error('The connection was reset.'));
+
+    await settle();
+
+    assert.deepStrictEqual(store.status.getSnapshot().value, {
+      type: 'failed',
+      message: 'The connection was reset.',
+    });
+  });
+
+  test('a load that throws before its promise is a failed read', async () => {
+    const { store } = setup(() => {
+      throw new RangeError('Invalid time value');
+    });
+
+    store.openDialog();
+
+    await settle();
+
+    assert.deepStrictEqual(store.status.getSnapshot().value, {
+      type: 'failed',
+      message: 'Invalid time value',
+    });
+  });
+
+  test('a rejection overtaken by a later read is dropped', async () => {
+    const { store, loads, answer, fail } = setup();
+
+    store.openDialog();
+
+    store.retry();
+
+    answer(1, week(TODAY));
+
+    fail(0, new Error('The connection was reset.'));
+
+    await settle();
+
+    assert.strictEqual(loads.length, 2);
+
+    assert.strictEqual(store.status.getSnapshot().value.type, 'ready');
+  });
+
   test('with no token it says so rather than asking', () => {
     const { store, loads, setToken } = setup();
 
@@ -225,10 +324,15 @@ const todayMergedOf = (
 
 const cancelNothing = (): void => undefined;
 
-const setup = (): Readonly<{
+/** `load` replaces the one that waits to be answered, for a load that throws. */
+const setup = (
+  load?: ActivityDeps['load'],
+): Readonly<{
   store: ReturnType<typeof createActivityStore>;
   loads: readonly Readonly<{ token: string; nowMs: number }>[];
   answer: (index: number, result: Answered<WeeklyActivity>['result']) => void;
+  /** Rejects the load, as one that throws does. */
+  fail: (index: number, error: unknown) => void;
   setNow: (ms: number) => void;
   setToken: (next: StoredToken | undefined) => void;
   timers: readonly Readonly<{ delayMs: number }>[];
@@ -238,6 +342,7 @@ const setup = (): Readonly<{
     token: string;
     nowMs: number;
     resolve: (answered: Answered<WeeklyActivity>) => void;
+    reject: (error: unknown) => void;
   }[] = [];
 
   const mut_timers: { delayMs: number; run: () => void }[] = [];
@@ -251,14 +356,16 @@ const setup = (): Readonly<{
 
   const store = createActivityStore({
     token: storedToken,
-    load: async (loadToken, nowMs) => {
-      const { promise, resolve } =
-        Promise.withResolvers<Answered<WeeklyActivity>>();
+    load:
+      load ??
+      (async (loadToken, nowMs) => {
+        const { promise, resolve, reject } =
+          Promise.withResolvers<Answered<WeeklyActivity>>();
 
-      mut_loads.push({ token: loadToken, nowMs, resolve });
+        mut_loads.push({ token: loadToken, nowMs, resolve, reject });
 
-      return promise;
-    },
+        return promise;
+      }),
     now: () => mut_clock.nowMs,
     setTimer: (delayMs, run) => {
       mut_timers.push({ delayMs, run });
@@ -280,6 +387,9 @@ const setup = (): Readonly<{
           ? Result.ok({ ...result.value, countedOn: dayKeyOf(asked.nowMs) })
           : result,
       });
+    },
+    fail: (index, error) => {
+      mut_loads[index]?.reject(error);
     },
     setNow: (ms) => {
       mut_clock.nowMs = ms;
