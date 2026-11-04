@@ -15,7 +15,11 @@ working tree, plus the untracked files. It needs what the checks need: a
 `pnpm install` and a `pnpm run ws:build:deps`. Every step runs with `CI=true`,
 as GitHub Actions sets it, because some tools read it: with it typescript-estree
 parses a linted file from disk rather than the text it was given, and Vitest
-refuses `.only`, so a test can pass without it and fail in CI.
+refuses `.only`, so a test can pass without it and fail in CI. It also runs with
+`CODEMOD_DIFF_BASE` and `PROSE_DIFF_BASE` set to the base, so that the codemod
+and the `check:prose` guards that read a diff read this one rather than the
+merge base with `origin/main`, which on a stacked branch takes in the layer
+below.
 
 ## What runs
 
@@ -40,19 +44,22 @@ by case. In order:
    package is built first (`build`) when an import of it resolves to `dist/`, so
    that they read it rebuilt; a dependent the diff touches runs its generator
    again after the build.
-3. **Fixers**: the codemod over the diff (`z:ts-codemod --diff-from`, plus
-   `--uncommitted` when there are untracked files, which `--diff-from` cannot
-   see), the diff formatted again, then `fix:lint` in every package whose code
+3. **Fixers**: the codemod as CI runs it, `fix:codemod:affected` with
+   `CODEMOD_DIFF_BASE` set to the base, for any change the code gate lets
+   through: over the diff and the untracked files, or over everything when what
+   decides its output changed (the lockfile, a script naming its transformers).
+   Then the diff formatted again, and `fix:lint` in every package whose code
    changed, so that what the codemod wrote is linted too. The format in between
    takes off the parentheses the codemod adds when it reprints a type: CI lints
    only the formatted tree, and a lint rule judging them would fail on a line
-   nobody changed.
-4. **Checks**: per package `check:types`, `check:test` (with coverage turned
-   on where the package has a `check:test:cov`) and `check:sumi`; the
-   `check:root:*` guards in parallel for any change the code gate lets
-   through, as CI runs them, and
-   the root program's `check:root:types`, `lint` and `test` only for what the
-   root `tsconfig.json` reads (`tools/`, the root configuration, any
+   nobody changed. `fix:codemod:affected` formats too, but not when the codemod
+   fails.
+4. **Checks**: per package `check:types`, `check:test` (with coverage turned on
+   where the package has a `check:test:cov`) and `check:sumi`, and `check:ext`
+   in every touched package, a document change included; the `check:root:*`
+   guards in parallel for any change the code gate lets through, as CI runs
+   them, and the root program's `check:root:types`, `lint` and `test` only for
+   what the root `tsconfig.json` reads (`tools/`, the root configuration, any
    `configs/`, `eslint.config*.mts` or `vite.config.mts`); `strict-lib:*` for
    `strict-lib/`; `check:knip` and `check:published-deps` for manifests;
    `check:md` for prose; `check:prose` always; cspell over the changed files,
@@ -87,6 +94,18 @@ codemod's reprinting, is not.
   A report, never a failure.
 
 ## What it leaves to CI
+
+`CI_ONLY` in `reach.mts` lists, each with its reason, the commands CI runs that
+no diff makes this run. `check:root:check-changed-reach`
+(`../check-changed-reach.mts`) builds the plan for a sample path in each package
+and each area, and fails on a command CI runs that no plan reaches and the list
+does not name, and on an entry that names nothing CI still leaves to itself. So
+a check, generator or fixer added to a workflow has to be planned here or
+declared CI's alone. An entry whose script leaves committed output, which CI's
+clean-tree check finds stale, names the generators that write it (`writtenBy`),
+and the package has to define one and some plan run each it defines:
+`verify:npm-packages` is CI's, `gen:verify-npm-packages` is not. It asks whether
+some diff's plan runs a command, not whether every diff that needs it does.
 
 What depends on a changed package is not built or checked beyond its generators,
 so a stale `dist/` in a dependent goes unnoticed; build first (`ws:build:deps`)

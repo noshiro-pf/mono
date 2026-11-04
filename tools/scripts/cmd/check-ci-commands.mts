@@ -401,7 +401,38 @@ const RUN_ALL = /\brun-[sp] (?<args>[^&|;\n]*)/gu;
  */
 const MATRIX_COMMAND = /pnpm run \$\{\{ matrix\.(?<key>[a-z_]+) \}\}/gu;
 
-const LITERAL_COMMAND = /run: pnpm run (?<scriptName>[\w:-]+)/gu;
+/** A `pnpm` in a workflow line, and what follows it up to a separator. */
+const WORKFLOW_PNPM = /(?:^|[\s;&|(])pnpm (?<rest>[^&|;\n#)]*)/gu;
+
+const PROSE_QUOTES: ReadonlySet<string> = new Set<string>(["'", '"', '`']);
+
+/** The `pnpm` flags whose value is the next word when not given with `=`. */
+const VALUE_FLAGS: ReadonlySet<string> = new Set<string>([
+  '--filter',
+  '--filter-prod',
+  '-F',
+  '--dir',
+  '-C',
+  '--workspace-concurrency',
+  '--reporter',
+  '--loglevel',
+]);
+
+/** A step's `name:`, which may mention a command it does not run. */
+const STEP_NAME = /^(?:- )?name: /u;
+
+const SCRIPT_NAME = /^[\w:-]+$/u;
+
+/** The flags that point a `pnpm` run at packages rather than the root. */
+const PACKAGE_FLAGS: ReadonlySet<string> = new Set<string>([
+  '--recursive',
+  '-r',
+  '--filter',
+  '--filter-prod',
+  '-F',
+  '--dir',
+  '-C',
+]);
 
 /** `node-version:` pins a version; `node-version-file:` reads `volta.node`. */
 const PINNED_NODE_VERSION = /^ *node-version: /mu;
@@ -557,8 +588,11 @@ type UncoveredDeclaration = Readonly<{
 }>;
 
 /**
- * The root scripts a workflow runs: every `run: pnpm run <name>` step, plus
- * every entry of a matrix key the workflow hands to `pnpm run`.
+ * The root scripts a workflow runs: every `pnpm run <name>` on a line that is
+ * not a comment or a step's `name:`, in a `run: |` block too, and every entry
+ * of a matrix key the workflow hands to `pnpm run`. A `pnpm` inside a quoted
+ * string is prose (unless `$(` runs it), and a run pointed at packages
+ * (`--filter`, `-r`, `--dir`) names a package script, which this leaves out.
  */
 export const collectWorkflowCommands = (
   workflowFile: string,
@@ -575,15 +609,58 @@ export const collectWorkflowCommands = (
     }),
   );
 
-  const literals = Arr.generate(function* () {
-    for (const matched of Array.from(workflowFile.matchAll(LITERAL_COMMAND))) {
-      const scriptName = matched.groups?.['scriptName'];
+  // Every `pnpm run <name>` outside a comment line, a `run: |` block's
+  // included: its first word that is not a flag, whatever follows it. A run
+  // pointed at packages names a package script, not a root one, and a matrix
+  // reference is read through the matrix below.
+  const literals = workflowFile
+    .split('\n')
+    .filter(
+      (line) =>
+        !line.trimStart().startsWith('#') && !STEP_NAME.test(line.trimStart()),
+    )
+    .flatMap((line) =>
+      Array.from(line.matchAll(WORKFLOW_PNPM)).flatMap((matched) => {
+        // A `pnpm` inside a quoted string is prose an `echo` prints, unless a
+        // `$(` runs it.
+        const before = line.slice(
+          0,
+          matched.index + matched[0].indexOf('pnpm'),
+        );
 
-      if (scriptName !== undefined) {
-        yield scriptName;
-      }
-    }
-  });
+        if (isInsideQuotes(before) && !before.trimEnd().endsWith('$(')) {
+          return [];
+        }
+
+        const tokens = tokenize(matched.groups?.['rest'] ?? '');
+
+        // `pnpm run`, not `pnpm exec vitest run`: `run` is pnpm's own first
+        // word, its flags and their values aside.
+        const runIndex = firstWord(tokens, 0);
+
+        if (tokens[runIndex] !== 'run') {
+          return [];
+        }
+
+        const nameIndex = firstWord(tokens, runIndex + 1);
+
+        // A flag before the name points the run at packages; one after it is
+        // the script's own argument.
+        if (
+          tokens
+            .slice(0, nameIndex === -1 ? tokens.length : nameIndex)
+            .some((token) => PACKAGE_FLAGS.has(token.split('=', 1)[0] ?? ''))
+        ) {
+          return [];
+        }
+
+        const name = tokens[nameIndex];
+
+        // A script name, not prose with punctuation (`run pnpm run fmt, and
+        // commit`) or a `${{ matrix.<key> }}`.
+        return name !== undefined && SCRIPT_NAME.test(name) ? [name] : [];
+      }),
+    );
 
   const fromMatrix = Array.from(matrixKeys).flatMap((key) =>
     collectMatrixEntries(workflowFile, key),
@@ -611,8 +688,108 @@ export const readScripts = (
   );
 };
 
-const toCommandId = (directory: string, scriptName: string): CommandId =>
+export const toCommandId = (directory: string, scriptName: string): CommandId =>
   `${directory}:${scriptName}` as const;
+
+/** The inverse of {@link toCommandId}; a directory holds no `:`. */
+export const splitCommandId = (
+  command: CommandId,
+): Readonly<{ directory: string; scriptName: string }> => {
+  const separator = command.indexOf(':');
+
+  return {
+    directory: command.slice(0, separator),
+    scriptName: command.slice(separator + 1),
+  };
+};
+
+export const reachableFrom = (
+  graph: CoverageGraph,
+  entryPoints: readonly CommandId[],
+): ReadonlySet<CommandId> => {
+  const mut_seen = new Set<CommandId>(entryPoints);
+
+  const mut_queue: CommandId[] = Array.from(entryPoints);
+
+  while (Arr.isNonEmpty(mut_queue)) {
+    const current = mut_queue.shift();
+
+    if (current === undefined) {
+      break;
+    }
+
+    const unseen = Array.from(graph.edges.get(current) ?? []).filter(
+      (next) => !mut_seen.has(next),
+    );
+
+    for (const next of unseen) {
+      mut_seen.add(next);
+    }
+
+    mut_queue.push(...unseen);
+  }
+
+  return mut_seen;
+};
+
+export const readManifests = async (): Promise<
+  Result<readonly Manifest[], string>
+> => {
+  const rootManifest = await readRootManifest();
+
+  if (Result.isErr(rootManifest)) {
+    return rootManifest;
+  }
+
+  const packages = await Result.fromPromise(
+    getWorkspacePackages(projectRootPath),
+  );
+
+  if (Result.isErr(packages)) {
+    return Result.err(
+      `Failed to list the workspace packages: ${unknownToString(packages.value)}`,
+    );
+  }
+
+  const workspaceManifests = packages.value
+    .map((workspacePackage): Manifest => ({
+      // `/`-separated, as check-changed names directories.
+      directory: path
+        .relative(projectRootPath, workspacePackage.path)
+        .split(path.sep)
+        .join('/'),
+      scripts: readScripts(workspacePackage.packageJson),
+    }))
+    .toSorted((a, b) => a.directory.localeCompare(b.directory));
+
+  return Result.ok(Arr.toUnshifted(rootManifest.value)(workspaceManifests));
+};
+
+export const readCheckWorkflows = async (): Promise<
+  Result<readonly CheckWorkflow[], string>
+> => {
+  const paths = await listWorkflowFiles();
+
+  if (Result.isErr(paths)) {
+    return paths;
+  }
+
+  const results = await Promise.all(paths.value.map(readWorkflow));
+
+  const failed = results.find(Result.isErr);
+
+  return failed !== undefined
+    ? Result.err(failed.value)
+    : Result.ok(
+        Arr.generate(function* () {
+          for (const result of results) {
+            if (!Result.isErr(result) && result.value !== undefined) {
+              yield result.value;
+            }
+          }
+        }),
+      );
+};
 
 /**
  * Whether a script's name says it is a check a pull request should get.
@@ -663,6 +840,53 @@ const isUncoveredByDesign = (directory: string, scriptName: string): boolean =>
       entry.scriptName === scriptName &&
       (entry.directory === undefined || entry.directory === directory),
   );
+
+/**
+ * The index of the first token from `from` on that is neither a flag nor the
+ * value of one ({@link VALUE_FLAGS}); -1 when there is none.
+ */
+const firstWord = (tokens: readonly string[], from: number): number =>
+  tokens.findIndex(
+    (token, index) =>
+      index >= from &&
+      !token.startsWith('-') &&
+      !(index > from && VALUE_FLAGS.has(tokens[index - 1] ?? '')),
+  );
+
+/**
+ * Whether the end of a line's text is inside a quoted string, the way a shell
+ * or a template literal reads one: a quote opens a string only outside another,
+ * and a backslash escapes the next character.
+ */
+const isInsideQuotes = (text: string): boolean => {
+  const mut_state = { open: '', escaped: false };
+
+  for (const character of text) {
+    if (mut_state.escaped) {
+      mut_state.escaped = false;
+
+      continue;
+    }
+
+    if (character === '\\' && mut_state.open !== "'") {
+      mut_state.escaped = true;
+
+      continue;
+    }
+
+    if (mut_state.open === '') {
+      mut_state.open = PROSE_QUOTES.has(character) ? character : '';
+
+      continue;
+    }
+
+    if (character === mut_state.open) {
+      mut_state.open = '';
+    }
+  }
+
+  return mut_state.open !== '';
+};
 
 /**
  * Whitespace-separated, with a quoted run kept together and unquoted.
@@ -752,35 +976,6 @@ const matchesGlob = (pattern: string, name: string): boolean => {
   return mut_cursor.at <= name.length - last.length;
 };
 
-const reachableFrom = (
-  graph: CoverageGraph,
-  entryPoints: readonly CommandId[],
-): ReadonlySet<CommandId> => {
-  const mut_seen = new Set<CommandId>(entryPoints);
-
-  const mut_queue: CommandId[] = Array.from(entryPoints);
-
-  while (Arr.isNonEmpty(mut_queue)) {
-    const current = mut_queue.shift();
-
-    if (current === undefined) {
-      break;
-    }
-
-    const unseen = Array.from(graph.edges.get(current) ?? []).filter(
-      (next) => !mut_seen.has(next),
-    );
-
-    for (const next of unseen) {
-      mut_seen.add(next);
-    }
-
-    mut_queue.push(...unseen);
-  }
-
-  return mut_seen;
-};
-
 const reaches = (
   graph: CoverageGraph,
   from: CommandId,
@@ -813,35 +1008,6 @@ const readRootManifest = async (): Promise<Result<Manifest, string>> => {
       });
 };
 
-const readManifests = async (): Promise<
-  Result<readonly Manifest[], string>
-> => {
-  const rootManifest = await readRootManifest();
-
-  if (Result.isErr(rootManifest)) {
-    return rootManifest;
-  }
-
-  const packages = await Result.fromPromise(
-    getWorkspacePackages(projectRootPath),
-  );
-
-  if (Result.isErr(packages)) {
-    return Result.err(
-      `Failed to list the workspace packages: ${unknownToString(packages.value)}`,
-    );
-  }
-
-  const workspaceManifests = packages.value
-    .map((workspacePackage): Manifest => ({
-      directory: path.relative(projectRootPath, workspacePackage.path),
-      scripts: readScripts(workspacePackage.packageJson),
-    }))
-    .toSorted((a, b) => a.directory.localeCompare(b.directory));
-
-  return Result.ok(Arr.toUnshifted(rootManifest.value)(workspaceManifests));
-};
-
 const readWorkflow = async (
   workflowPath: string,
 ): Promise<Result<CheckWorkflow | undefined, string>> => {
@@ -869,32 +1035,6 @@ const readWorkflow = async (
     commands: collectWorkflowCommands(contents.value),
     pinsNodeVersion: PINNED_NODE_VERSION.test(contents.value),
   });
-};
-
-const readCheckWorkflows = async (): Promise<
-  Result<readonly CheckWorkflow[], string>
-> => {
-  const paths = await listWorkflowFiles();
-
-  if (Result.isErr(paths)) {
-    return paths;
-  }
-
-  const results = await Promise.all(paths.value.map(readWorkflow));
-
-  const failed = results.find(Result.isErr);
-
-  return failed !== undefined
-    ? Result.err(failed.value)
-    : Result.ok(
-        Arr.generate(function* () {
-          for (const result of results) {
-            if (!Result.isErr(result) && result.value !== undefined) {
-              yield result.value;
-            }
-          }
-        }),
-      );
 };
 
 const indentOf = (line: string): number =>

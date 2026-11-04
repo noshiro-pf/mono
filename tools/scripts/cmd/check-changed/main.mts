@@ -4,11 +4,11 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as util from 'node:util';
-import { Arr, isRecord, isString, unknownToString } from 'ts-data-forge';
-import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
+import { Arr, Result, unknownToString } from 'ts-data-forge';
+import { isDirectlyExecuted } from 'ts-repo-utils';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { formatLineRanges, parseAddedLines } from '../../lib/diff-lines.mjs';
 import { projectRootPath } from '../../project-root-path.mjs';
-import { gatePatterns } from '../workflow-steps.mjs';
 import { findMissingChangesets, isChangesetFile } from './changesets.mjs';
 import {
   checkCommitMessages,
@@ -16,10 +16,11 @@ import {
   type Commit,
 } from './commit-messages.mjs';
 import { parseLcov, uncoveredChangedLines } from './coverage.mjs';
+import { readPackages, readProseGate, scriptsOf } from './packages.mjs';
 import {
   buildPlan,
   classifyChanges,
-  readManifestDependencies,
+  stepEnvironment,
   type PackageInfo,
   type Step,
 } from './plan.mjs';
@@ -63,18 +64,10 @@ const main = async (): Promise<number> => {
 
   const rootScripts = scriptsOf(await readJson('package.json'));
 
-  const gateCommand = rootScripts.get(CODE_GATE_SCRIPT);
+  const proseGate = readProseGate(rootScripts);
 
-  if (gateCommand === undefined) {
-    console.error(`The root package.json has no ${CODE_GATE_SCRIPT} script.`);
-
-    return 2;
-  }
-
-  const proseGate = gatePatterns(gateCommand);
-
-  if (!proseGate.ok) {
-    console.error(`${CODE_GATE_SCRIPT}: ${proseGate.message}`);
+  if (Result.isErr(proseGate)) {
+    console.error(proseGate.value);
 
     return 2;
   }
@@ -94,7 +87,6 @@ const main = async (): Promise<number> => {
     base,
     rootScripts: Array.from(rootScripts.keys()),
     coverage: options.coverage,
-    hasUntracked: Arr.isNonEmpty(untracked),
     spellChecked: existing.filter(
       (file) => !classification.ignored.includes(file),
     ),
@@ -128,10 +120,14 @@ const main = async (): Promise<number> => {
       : ([] as const)),
   ] as const;
 
+  const env = stepEnvironment(base);
+
   console.info(
     Arr.toUnshifted(
       plan.map((step, i) => `  ${i + 1}. ${describe(step)}`),
-      'Plan:',
+      `Plan (every step with ${Object.entries(env)
+        .map(([name, value]) => `${name}=${value}`)
+        .join(' ')}):`,
     ).join('\n'),
   );
 
@@ -139,6 +135,7 @@ const main = async (): Promise<number> => {
     ? ({ ran: [], failures: [], notes: [] } as const)
     : await runPlan({
         plan,
+        env,
         // Read when a coverage report is, not now: the formatter, the fixers
         // and the codemod run first and move the lines.
         readChangedLines: options.coverage
@@ -263,7 +260,7 @@ const reportCoverage = async ({
 };
 
 /**
- * Runs `pnpm` with the step's arguments and `CI=true`, its output passed
+ * Runs `pnpm` with the step's arguments and the run's `env`, its output passed
  * straight through.
  * A coverage step gets Vitest's options appended, which `pnpm run` hands on to
  * the last command of the script — `vitest` in the `check:test` of every
@@ -274,6 +271,7 @@ const reportCoverage = async ({
 const runPnpm = async (
   step: Step,
   reportsDirectory: string | undefined,
+  env: ReadonlyRecord<string, string>,
 ): Promise<number> => {
   const coverageArgs =
     reportsDirectory === undefined
@@ -297,10 +295,7 @@ const runPnpm = async (
   return new Promise((resolve) => {
     const child = spawn('pnpm', [...step.args, ...coverageArgs], {
       cwd: path.join(projectRootPath, step.cwd),
-      // As GitHub Actions sets it, since some tools read it: typescript-estree
-      // then parses a linted file from disk rather than the text it was given,
-      // and Vitest refuses `.only`. A test can pass without it and fail in CI.
-      env: { ...process.env, CI: 'true' },
+      env: { ...process.env, ...env },
       stdio: 'inherit',
     });
 
@@ -410,9 +405,12 @@ const describe = (step: Step): string => {
  */
 const runPlan = async ({
   plan,
+  env,
   readChangedLines,
 }: Readonly<{
   plan: readonly Step[];
+  /** What each step adds to the environment. */
+  env: ReadonlyRecord<string, string>;
   /** Absent with `--no-coverage`. */
   readChangedLines:
     (() => Promise<ReadonlyMap<string, readonly number[]>>) | undefined;
@@ -485,7 +483,7 @@ const runPlan = async ({
 
       const started = performance.now();
 
-      const exitCode = await runPnpm(step, reportsDirectory);
+      const exitCode = await runPnpm(step, reportsDirectory, env);
 
       const seconds = ((performance.now() - started) / 1000).toFixed(1);
 
@@ -754,39 +752,8 @@ const printSummary = ({
   );
 };
 
-const scriptsOf = (manifest: unknown): ReadonlyMap<string, string> => {
-  const scripts =
-    isRecord(manifest) && isRecord(manifest['scripts'])
-      ? manifest['scripts']
-      : ({} as const);
-
-  return new Map(
-    Arr.generate(function* () {
-      for (const [name, command] of Object.entries(scripts)) {
-        if (isString(command)) {
-          yield [name, command] as const;
-        }
-      }
-    }),
-  );
-};
-
-const readPackages = async (): Promise<readonly PackageInfo[]> => {
-  const workspace = await getWorkspacePackages(projectRootPath);
-
-  return workspace.map((pkg) => ({
-    name: pkg.name,
-    dir: path.relative(projectRootPath, pkg.path).split(path.sep).join('/'),
-    scripts: new Set(scriptsOf(pkg.packageJson).keys()),
-    isPrivate: isRecord(pkg.packageJson) && pkg.packageJson['private'] === true,
-    ...readManifestDependencies(pkg.packageJson),
-  }));
-};
-
 const readJson = async (file: string): Promise<unknown> =>
   JSON.parse(await readText(file));
-
-const CODE_GATE_SCRIPT = 'z:check-should-run:code-checks';
 
 const LINT_PULL_REQUEST = '.github/workflows/lint-pull-request.yml';
 

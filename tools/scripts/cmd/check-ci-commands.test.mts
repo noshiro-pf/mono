@@ -142,6 +142,105 @@ describe('collectWorkflowCommands', () => {
     ]);
   });
 
+  test('reads a `pnpm run` inside a `run: |` block, flags and arguments aside', () => {
+    const text = dedent`
+      jobs:
+        benchmark:
+          steps:
+            - name: Measure
+              run: |
+                git fetch --no-tags --depth=1 origin "\${BASE}"
+                pnpm run --silent bench:run --out result.json
+                # pnpm run not:this-one, a comment
+                echo done && pnpm run bench:report
+                echo '::error::then run pnpm run fmt, and commit the result.'
+    `;
+
+    assert.deepStrictEqual(collectWorkflowCommands(text), [
+      'bench:report',
+      'bench:run',
+    ]);
+  });
+
+  test('reads a substitution, and an argument that looks like a package flag', () => {
+    const text = dedent`
+      jobs:
+        a:
+          steps:
+            - run: |
+                out="$(pnpm run --silent check:foo)"
+                spaced="$( pnpm run check:spaced )"
+                pnpm run gen:report --dir out
+    `;
+
+    assert.deepStrictEqual(collectWorkflowCommands(text), [
+      'check:foo',
+      'check:spaced',
+      'gen:report',
+    ]);
+  });
+
+  test('leaves out prose, a step name and another program’s `run`', () => {
+    const text = dedent`
+      jobs:
+        a:
+          steps:
+            - name: Then pnpm run check:named
+              run: |
+                echo "::error::Run pnpm run fix:quoted and commit"
+                pnpm exec vitest run smoke
+    `;
+
+    assert.deepStrictEqual(collectWorkflowCommands(text), []);
+  });
+
+  test('reads past an apostrophe in a string, and a flag that takes a value', () => {
+    const text = dedent`
+      jobs:
+        a:
+          steps:
+            - run: echo "can't skip" && pnpm run check:after-quote
+            - run: pnpm run --workspace-concurrency 4 check:concurrent
+            - run: pnpm --reporter append-only run check:reported
+    `;
+
+    assert.deepStrictEqual(collectWorkflowCommands(text), [
+      'check:after-quote',
+      'check:concurrent',
+      'check:reported',
+    ]);
+  });
+
+  test('leaves out a `pnpm run` in a template literal', () => {
+    const text = dedent`
+      jobs:
+        a:
+          steps:
+            - uses: actions/github-script@v8
+              with:
+                script: |
+                  core.setFailed(\`Run pnpm run fix:fmt and commit\`);
+    `;
+
+    assert.deepStrictEqual(collectWorkflowCommands(text), []);
+  });
+
+  test('leaves out a `pnpm run` pointed at packages', () => {
+    const text = dedent`
+      jobs:
+        docs:
+          steps:
+            - run: |
+                pnpm --filter @synstate/docs run fix:fmt
+                pnpm run --filter=a gen:x
+                pnpm run -r check:types
+                pnpm run --dir apps/x build
+                pnpm --filter=b run gen:y
+    `;
+
+    assert.deepStrictEqual(collectWorkflowCommands(text), []);
+  });
+
   test('reads the `include` entries of a matrix the workflow hands to `pnpm run`', () => {
     const text = dedent`
       jobs:
