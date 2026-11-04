@@ -6,7 +6,9 @@
 import {
   combineContextStates,
   epochMsOf,
+  outranks,
   summarizeChecks as summarizeContexts,
+  type CheckRunRank,
   type ContextState,
 } from 'pr-report-core';
 import { Arr, Num, Result } from 'ts-data-forge';
@@ -35,6 +37,14 @@ export type ReportedCheck = Readonly<{
   completedAt: string | undefined;
   /** The workflow the job belongs to; empty for a commit status. */
   workflow: string;
+  /**
+   * Whether a job of the check run's own workflow run was re-run after it was
+   * created, and the workflow run has not finished: "Re-run failed jobs" queues
+   * the failed jobs again, and the aggregate that needs them gets a new run only
+   * once they are done, so until then the aggregate's red is the attempt
+   * before's. Always `false` for a commit status.
+   */
+  reRunAfter: boolean;
 }>;
 
 /**
@@ -43,7 +53,10 @@ export type ReportedCheck = Readonly<{
  */
 export type RunningCheck = Readonly<{
   name: string;
-  /** ISO 8601; `undefined` while the check is queued. */
+  /**
+   * ISO 8601; `undefined` while the check is queued, and for a commit status,
+   * whose one time is when it was set.
+   */
   startedAt: string | undefined;
   workflow: string;
   link: string;
@@ -84,18 +97,27 @@ export const probeCheckReads = async (
 /** The two lists of {@link HeadChecks}, from the contexts of one read. */
 export const headChecksOf = (
   contexts: readonly CheckContextNode[],
-): HeadChecks =>
-  ({
-    required: reportedChecksOf(contexts, 'required'),
-    running: reportedChecksOf(contexts, 'all')
-      .filter((check) => check.bucket === 'pending')
-      .map(({ name, startedAt, workflow, link }) => ({
+): HeadChecks => {
+  const latest = latestChecksOf(contexts);
+
+  return {
+    required: latest
+      .filter(([context]) => context.isRequired)
+      .map(([, check]) => check),
+    running: latest
+      .filter(([, check]) => check.bucket === 'pending')
+      .map(([context, { name, startedAt, workflow, link }]) => ({
         name,
-        startedAt,
+        // A commit status pending since it was set says nothing of when the
+        // round began, and one set long ago would put that before the reds of
+        // the round before.
+        startedAt:
+          context.__typename === 'StatusContext' ? undefined : startedAt,
         workflow,
         link,
       })),
-  }) as const;
+  } as const;
+};
 
 /**
  * What the head commit's checks say, as `gh pr checks` said it: each check run
@@ -111,28 +133,10 @@ export const headChecksOf = (
 export const reportedChecksOf = (
   contexts: readonly CheckContextNode[],
   which: 'all' | 'required',
-): readonly ReportedCheck[] => {
-  const mut_latest = new Map<string, CheckContextNode>();
-
-  for (const context of contexts) {
-    const key = keyOf(context);
-
-    const kept = mut_latest.get(key);
-
-    if (kept === undefined || startedAtOf(context) > startedAtOf(kept)) {
-      mut_latest.set(key, context);
-    }
-  }
-
-  const survivors = new Set(mut_latest.values());
-
-  return contexts
-    .filter(
-      (context) =>
-        survivors.has(context) && (which === 'all' || context.isRequired),
-    )
-    .map(reportedCheckOf);
-};
+): readonly ReportedCheck[] =>
+  latestChecksOf(contexts)
+    .filter(([context]) => which === 'all' || context.isRequired)
+    .map(([, check]) => check);
 
 /** A context of the head commit's status check rollup, as read. */
 export type CheckContextNode = t.TypeOf<typeof CheckContextNodeSchema>;
@@ -351,9 +355,11 @@ const CHECKS_QUERY = [
   '          nodes {',
   '            __typename',
   '            ... on CheckRun {',
-  '              name status conclusion startedAt completedAt detailsUrl',
-  '              isRequired(pullRequestNumber: $number)',
-  '              checkSuite { workflowRun { event workflow { name } } }',
+  '              databaseId name status conclusion startedAt completedAt',
+  '              detailsUrl isRequired(pullRequestNumber: $number)',
+  '              checkSuite {',
+  '                databaseId status workflowRun { event workflow { name } }',
+  '              }',
   '            }',
   '            ... on StatusContext {',
   '              context state targetUrl createdAt',
@@ -388,29 +394,36 @@ const ProbeAnswerSchema = t.record({
   }),
 });
 
+const CheckRunNodeSchema = t.record({
+  __typename: t.literal('CheckRun'),
+  databaseId: t.union([t.number(), t.nullType]),
+  name: t.string(),
+  status: t.string(),
+  conclusion: t.union([t.string(), t.nullType]),
+  startedAt: t.union([t.string(), t.nullType]),
+  completedAt: t.union([t.string(), t.nullType]),
+  detailsUrl: t.union([t.string(), t.nullType]),
+  isRequired: t.boolean(),
+  checkSuite: t.union([
+    t.record({
+      databaseId: t.union([t.number(), t.nullType]),
+      status: t.string(),
+      workflowRun: t.union([
+        t.record({
+          event: t.string(),
+          workflow: t.record({ name: t.string() }),
+        }),
+        t.nullType,
+      ]),
+    }),
+    t.nullType,
+  ]),
+});
+
+type CheckRunNode = t.TypeOf<typeof CheckRunNodeSchema>;
+
 const CheckContextNodeSchema = t.union([
-  t.record({
-    __typename: t.literal('CheckRun'),
-    name: t.string(),
-    status: t.string(),
-    conclusion: t.union([t.string(), t.nullType]),
-    startedAt: t.union([t.string(), t.nullType]),
-    completedAt: t.union([t.string(), t.nullType]),
-    detailsUrl: t.union([t.string(), t.nullType]),
-    isRequired: t.boolean(),
-    checkSuite: t.union([
-      t.record({
-        workflowRun: t.union([
-          t.record({
-            event: t.string(),
-            workflow: t.record({ name: t.string() }),
-          }),
-          t.nullType,
-        ]),
-      }),
-      t.nullType,
-    ]),
-  }),
+  CheckRunNodeSchema,
   t.record({
     __typename: t.literal('StatusContext'),
     context: t.string(),
@@ -462,11 +475,101 @@ const keyOf = (context: CheckContextNode): string =>
         context.checkSuite?.workflowRun?.event ?? '',
       ].join(':');
 
-/** When a run started, for ordering runs; one not started yet sorts first. */
-const startedAtOf = (context: CheckContextNode): string =>
-  (context.__typename === 'StatusContext'
-    ? context.createdAt
-    : context.startedAt) ?? '';
+/**
+ * A check run's suite and its own id, which order it among the other runs. A
+ * missing id counts as 0, as `pr-manager` counts it; GitHub gives every check
+ * run and suite one.
+ */
+const rankOf = (run: CheckRunNode): CheckRunRank =>
+  ({
+    checkSuiteId: run.checkSuite?.databaseId ?? 0,
+    id: run.databaseId ?? 0,
+  }) as const;
+
+/**
+ * Whether `context` is a later run than `kept`, which shares its key.
+ *
+ * Check runs are ranked by `pr-report-core`'s `outranks`, the order
+ * `statesFromCheckRuns` ranks them in: by check suite, then within one suite by
+ * their own id, which a re-run of a job gets a new and greater one of. Not by
+ * when they started: a run still queued has no start, and ranking it as the
+ * oldest let the red it replaces speak for it (#3334). Nor as the newest, since
+ * a run cancelled before it started may not have one either.
+ *
+ * A commit status shares a key only with a commit status, and its one time is
+ * when it was set.
+ */
+const supersedes = (
+  context: CheckContextNode,
+  kept: CheckContextNode,
+): boolean =>
+  context.__typename === 'StatusContext'
+    ? kept.__typename === 'StatusContext' && context.createdAt > kept.createdAt
+    : kept.__typename === 'CheckRun' && outranks(rankOf(context), rankOf(kept));
+
+/**
+ * Of each unfinished check suite that has a re-run in it — a job with an
+ * earlier run in the same suite — the greatest id of such a re-run.
+ */
+const latestReRunBySuite = (
+  contexts: readonly CheckContextNode[],
+): ReadonlyMap<number, number> => {
+  const mut_firstIdByJob = new Map<string, number>();
+
+  const mut_latestReRun = new Map<number, number>();
+
+  const runs = contexts.filter(
+    (context): context is CheckRunNode =>
+      context.__typename === 'CheckRun' &&
+      context.checkSuite !== null &&
+      context.checkSuite.status !== 'COMPLETED',
+  );
+
+  for (const run of runs) {
+    const { checkSuiteId, id } = rankOf(run);
+
+    const job = `${checkSuiteId}:${run.name}` as const;
+
+    mut_firstIdByJob.set(job, Math.min(id, mut_firstIdByJob.get(job) ?? id));
+  }
+
+  for (const run of runs) {
+    const { checkSuiteId, id } = rankOf(run);
+
+    if (id > (mut_firstIdByJob.get(`${checkSuiteId}:${run.name}`) ?? id)) {
+      mut_latestReRun.set(
+        checkSuiteId,
+        Math.max(id, mut_latestReRun.get(checkSuiteId) ?? id),
+      );
+    }
+  }
+
+  return mut_latestReRun;
+};
+
+/**
+ * Of the runs of each {@link keyOf}, the latest, in the order GitHub listed
+ * them.
+ */
+const latestOf = (
+  contexts: readonly CheckContextNode[],
+): readonly CheckContextNode[] => {
+  const mut_latest = new Map<string, CheckContextNode>();
+
+  for (const context of contexts) {
+    const key = keyOf(context);
+
+    const kept = mut_latest.get(key);
+
+    if (kept === undefined || supersedes(context, kept)) {
+      mut_latest.set(key, context);
+    }
+  }
+
+  const survivors = new Set(mut_latest.values());
+
+  return contexts.filter((context) => survivors.has(context));
+};
 
 /**
  * A check run's conclusion, or its status while it runs, or a commit status's
@@ -497,7 +600,20 @@ const bucketOf = (state: string): string => {
   }
 };
 
-const reportedCheckOf = (context: CheckContextNode): ReportedCheck =>
+/** {@link ReportedCheck}'s `reRunAfter`, of a check run. */
+const isBeforeReRun = (
+  run: CheckRunNode,
+  latestReRun: ReadonlyMap<number, number>,
+): boolean => {
+  const { checkSuiteId, id } = rankOf(run);
+
+  return (latestReRun.get(checkSuiteId) ?? 0) > id;
+};
+
+const reportedCheckOf = (
+  context: CheckContextNode,
+  latestReRun: ReadonlyMap<number, number>,
+): ReportedCheck =>
   context.__typename === 'StatusContext'
     ? ({
         name: context.context,
@@ -506,6 +622,7 @@ const reportedCheckOf = (context: CheckContextNode): ReportedCheck =>
         startedAt: context.createdAt,
         completedAt: context.createdAt,
         workflow: '',
+        reRunAfter: false,
       } as const)
     : ({
         name: context.name,
@@ -518,7 +635,22 @@ const reportedCheckOf = (context: CheckContextNode): ReportedCheck =>
         startedAt: context.startedAt ?? undefined,
         completedAt: context.completedAt ?? undefined,
         workflow: context.checkSuite?.workflowRun?.workflow.name ?? '',
+        reRunAfter: isBeforeReRun(context, latestReRun),
       } as const);
+
+/**
+ * The latest run of each {@link keyOf}, in the order GitHub listed them, each
+ * beside what it reports.
+ */
+const latestChecksOf = (
+  contexts: readonly CheckContextNode[],
+): readonly (readonly [CheckContextNode, ReportedCheck])[] => {
+  const reRuns = latestReRunBySuite(contexts);
+
+  return latestOf(contexts).map(
+    (context) => [context, reportedCheckOf(context, reRuns)] as const,
+  );
+};
 
 const isFailure = (check: ReportedCheck): boolean =>
   check.bucket === 'fail' || check.bucket === 'cancel';
@@ -548,14 +680,19 @@ const workflowRunId = (link: string): number | undefined => {
 };
 
 /**
- * Whether a newer run of the check's own workflow is still running. Run ids
- * only grow, so a higher one is a later run; a commit status has no workflow
- * and no run, and is never superseded.
+ * Whether a later run may still replace the check: a re-run in its own workflow
+ * run ({@link ReportedCheck}'s `reRunAfter`), or a newer run of its own
+ * workflow still running. Run ids only grow, so a higher one is a later run; a
+ * commit status has no workflow and no run, and is never superseded.
  */
 const isSuperseded = (
   check: ReportedCheck,
   running: readonly RunningCheck[],
 ): boolean => {
+  if (check.reRunAfter) {
+    return true;
+  }
+
   const runId = workflowRunId(check.link);
 
   return (
