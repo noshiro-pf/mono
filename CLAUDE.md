@@ -322,12 +322,10 @@ ingest the feed). Outside reports come through private vulnerability reporting
   title as it reads when the pull request is opened, or the URL alone when the
   session cannot see its title. Nothing checks it; the Pull Requests Manager
   reads it to link and open the session.
-- **A Claude Code session's proxy refuses GitHub's GraphQL**, which `open-pr`
-  needs only to take an existing draft out of draft, and which arming
-  auto-merge needs always — one more reason that is `unblock-prs`'s, run by
-  the author. **Do not teach a script the proxy's `ccr/` route**: it is not
-  GitHub's API and answers 404 from anywhere else, so it would be a code path
-  dead everywhere the command normally runs.
+- **A Claude Code session's proxy refuses GitHub's GraphQL**, which drafts and
+  auto-merge need (`open-pr`, `rework-pr`; arming is `unblock-prs`'s anyway).
+  **Do not teach a script the proxy's `ccr/` route**: not GitHub's API, it
+  answers 404 from anywhere else, a code path dead everywhere it would run.
 - **The `opened` run the label cancels leaves red `*-result` checks and "check
   failed" notifications naming nothing — ignore them**; they stay until
   `skip-ci` comes off, and `pr-report` marks them stale.
@@ -339,12 +337,15 @@ ingest the feed). Outside reports come through private vulnerability reporting
 - **The pull request stays the session's until it merges or closes.**
   Subscribe to its activity (`subscribe_pr_activity` where available) and end
   the turn to wait — do not poll. A small in-scope fix is amended onto the
-  branch's one commit; anything larger is a question. Claim one `unblock-prs`
-  set aside first (`pnpm run claim-pr -- <n> --by <session URL>`); refused,
-  leave it. `main` moving under the branch is `auto-rebase`'s: ask before
-  rebasing. An amend whose `--force-with-lease` push is refused has lost
-  nothing — `git fetch`, then
-  `git rebase --onto origin/<branch> <the head you knew>`, and push again.
+  branch's one commit between **`pnpm run rework-pr -- start`**, before the
+  first edit (`skip-ci` on, `merge-queued` off, auto-merge off, a draft), and
+  **`-- done`** (push, ready; `merge-queued` stays the author's); without
+  GraphQL, go on after its labels unless disarming failed: then it is the
+  author's. Anything larger is a question. Claim one `unblock-prs` set aside
+  instead (`pnpm run claim-pr -- <n> --by <session URL>`); refused, leave it.
+  `main` moving under the branch is `auto-rebase`'s: ask before rebasing. A
+  refused amend push has lost nothing: `git fetch`,
+  `git rebase --onto origin/<branch> <the head you knew>`, push again.
 - **Several pull requests from one session are stacked** (`main <- A <- B`),
   likeliest merge first, unless the paths are plainly disjoint: B is opened
   with `pnpm run open-pr -- --base <A's branch>`, so its diff is its own layer,
