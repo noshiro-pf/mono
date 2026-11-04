@@ -499,8 +499,10 @@ const formatViolations = (offending: readonly VisitedFile[]): string => {
       ),
     ),
     '',
-    'Run `pnpm run fix:japanese-parentheses` to rewrite them, or see CLAUDE.md,',
-    '"Japanese text" — a pair around a purely Latin run is not asked about.',
+    'Run `pnpm run fix:japanese-parentheses` to rewrite them. A pair is reported',
+    'only when it encloses Japanese and touches Japanese; a pair around a purely',
+    'Latin run is not asked about. The rule and what it never reads are in the',
+    `header of ${path.relative(projectRootPath, import.meta.filename)}.`,
   ].join('\n');
 };
 

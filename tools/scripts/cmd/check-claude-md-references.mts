@@ -15,7 +15,7 @@ import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
  * pointers had accumulated by the time this was written, all from one pass that
  * shortened the headings.
  *
- * A citation is read in four shapes, and nothing else is read at all:
+ * A citation is read in five shapes, and nothing else is read at all:
  *
  * - `CLAUDE.md, "Dependencies"` — and the run of headings that may follow it,
  *   as `CLAUDE.md`'s: "A", "B" and "C".
@@ -23,8 +23,10 @@ import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
  *   name.
  * - `CLAUDE.md の「CI」節`, where the trailing 節 is what makes it a citation
  *   rather than a quoted rule — `CLAUDE.md の「 `skip-ci` を付けてから
- *   auto-merge を武装する」` in release.yml quotes a sentence, not a heading,
- *   and is left alone.
+ *   auto-merge を武装する」` quotes a sentence, not a heading, and is left
+ *   alone.
+ * - `CLAUDE.md「Build」`, with the bracket directly after the name: a quoted
+ *   rule always has a particle (の, が) in between.
  * - `see "Japanese text"` inside `CLAUDE.md` itself, which is how its sections
  *   point at each other.
  *
@@ -100,6 +102,7 @@ export const collectCitations = (
     for (const match of [
       Array.from(flattened.matchAll(CITATION_LEADING)),
       Array.from(flattened.matchAll(CITATION_JAPANESE)),
+      Array.from(flattened.matchAll(CITATION_JAPANESE_ADJACENT)),
       options.selfReferences === true
         ? Array.from(flattened.matchAll(CITATION_SELF))
         : [],
@@ -150,6 +153,18 @@ const CITATION_LEADING =
 const CITATION_JAPANESE =
   /`?CLAUDE\.md`? ?の ?\u{300C}(?<heading>[^\u{300D}]+)\u{300D} ?節/gu;
 
+/**
+ * `CLAUDE.md「Build」`, the bracket directly after the file name (one space
+ * allowed). A quoted rule has a particle between the two (`CLAUDE.md の「…」を`,
+ * `CLAUDE.md が「…」と`), so this shape is read as a heading; a rule quoted
+ * without one is reported, and the fix is to quote it the usual way.
+ *
+ * The capture stops at the next opening bracket and at 80 characters, so an
+ * unclosed bracket does not swallow the paragraphs after it.
+ */
+const CITATION_JAPANESE_ADJACENT =
+  /`?CLAUDE\.md`? ?\u{300C}(?<heading>[^\u{300C}\u{300D}]{1,80})\u{300D}/gu;
+
 /** `see "Japanese text"`, which is how `CLAUDE.md` points at itself. */
 const CITATION_SELF = /(?:^|\W)[sS]ee\s+"(?<heading>[^"\n]+)"/gu;
 
@@ -178,10 +193,10 @@ const IGNORED_PREFIXES: readonly string[] = [
  *
  * The fixtures name sections that do not exist on purpose, and the
  * implementation cannot describe a citation without writing one — the shapes in
- * the header above are read as four citations of `"A"`, `"B"`, `"C"` and a
- * heading that was renamed. `check-japanese-parentheses.mts` excludes its own
- * fixtures by exact path for the same reason, and by exact path rather than a
- * directive comment so that the exclusion is visible from here.
+ * the header above are read as citations of `"A"`, `"B"`, `"C"` and headings
+ * that were renamed. `check-japanese-parentheses.mts` excludes its own fixtures
+ * by exact path for the same reason, and by exact path rather than a directive
+ * comment so that the exclusion is visible from here.
  */
 const IGNORED_PATHS: ReadonlySet<string> = new Set<string>([
   'tools/scripts/cmd/check-claude-md-references.mts',

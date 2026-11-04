@@ -75,6 +75,30 @@ describe('collectCitations', () => {
     );
   });
 
+  test('reads the Japanese form with the bracket directly after the file name', () => {
+    assert.deepStrictEqual(
+      collectCitations(
+        'TS に対してやっていることの Sumi 版 — CLAUDE.md「Build」）。',
+      ),
+      ['Build'],
+    );
+
+    assert.deepStrictEqual(collectCitations('`CLAUDE.md`「CI」を参照。'), [
+      'CI',
+    ]);
+
+    assert.deepStrictEqual(collectCitations('（ CLAUDE.md 「Build」）'), [
+      'Build',
+    ]);
+  });
+
+  test('does not read past an unclosed bracket', () => {
+    assert.deepStrictEqual(
+      collectCitations(`CLAUDE.md「Build。${'あ'.repeat(100)}「別の引用」`),
+      [],
+    );
+  });
+
   test('leaves a quoted rule alone, because it names no section', () => {
     assert.deepStrictEqual(
       collectCitations(
