@@ -27,7 +27,11 @@ import {
 } from './github.mjs';
 import { isSkipCiLabelled, wantsAutoRebase } from './labels.mjs';
 import type { Options } from './options.mjs';
-import { outOfSyncVerdict, pruneOutOfSync } from './out-of-sync.mjs';
+import {
+  observeAtSurvey,
+  outOfSyncVerdict,
+  pruneOutOfSync,
+} from './out-of-sync.mjs';
 import {
   idleWaitSec,
   initialQuiet,
@@ -787,15 +791,7 @@ const runCycle = async (
   options: Options,
   autoFixConfig: AutoFixConfig | undefined,
 ): Promise<CycleResult> => {
-  // Set aside as out of sync, so not worth re-listing for while GitHub keeps
-  // its merge state unknown.
-  const outOfSyncHeads = new Map(
-    Array.from(before.skipped.values())
-      .filter(({ reason }) => reason === 'head-out-of-sync')
-      .map(({ number, headSha }) => [number, headSha] as const),
-  );
-
-  const listed = await survey(api, defaultBranch, outOfSyncHeads);
+  const listed = await survey(api, defaultBranch, before.outOfSync);
 
   if (Result.isErr(listed)) {
     log(`Survey failed: ${listed.value}`);
@@ -820,7 +816,7 @@ const runCycle = async (
     defaultBranch,
     options.dryRun,
   ))
-    ? await survey(api, defaultBranch, outOfSyncHeads)
+    ? await survey(api, defaultBranch, before.outOfSync)
     : listed;
 
   if (Result.isErr(surveyed)) {
@@ -829,8 +825,13 @@ const runCycle = async (
     return { state: before, next: 'idle', settled: before.skipped };
   }
 
-  const { pullRequests, baseSha, requiredContexts, reviewRequirements } =
-    surveyed.value;
+  const {
+    pullRequests,
+    outOfSync: outOfSyncAtSurvey,
+    baseSha,
+    requiredContexts,
+    reviewRequirements,
+  } = surveyed.value;
 
   if (before.baseSha !== undefined && before.baseSha !== baseSha) {
     log(`${defaultBranch} moved to ${baseSha.slice(0, 10)}.`);
@@ -852,12 +853,27 @@ const runCycle = async (
 
   const demoted = pruneDemotions(before.demoted, pullRequests);
 
-  let mut_outOfSync = pruneOutOfSync(before.outOfSync, pullRequests);
+  // An armed pull request whose push GitHub dropped, wherever it stands in the
+  // queue: recorded, so that the next survey does not wait on it, and set aside
+  // once the mismatch has lasted, before triage, so that it is not picked.
+  // Written as a new record, so its comment is written too.
+  const observed = observeAtSurvey(
+    pruneOutOfSync(before.outOfSync, pullRequests),
+    skipped,
+    outOfSyncAtSurvey,
+    { baseSha, nowEpochMs: currentEpochMs() },
+  );
+
+  for (const note of observed.notes) {
+    log(note);
+  }
+
+  let mut_outOfSync = observed.seen;
 
   const triaged = await triage(api, pullRequests, {
     defaultBranch,
     baseSha,
-    skipped,
+    skipped: observed.skipped,
     claimed,
     demoted,
     requiredContexts,
@@ -906,7 +922,7 @@ const runCycle = async (
         reason: 'checks-failed',
         ...describeFailedChecks(summary),
       }),
-    skipped,
+    observed.skipped,
   );
 
   // One that stayed unread survey after survey is set aside, so that a read

@@ -1,11 +1,18 @@
 import { isoSeconds } from '../lib/index.mjs';
 import { OUT_OF_SYNC_GRACE_MS } from './constants.mjs';
 import {
+  observeAtSurvey,
   observeOutOfSync,
   outOfSyncVerdict,
   pruneOutOfSync,
 } from './out-of-sync.mjs';
-import type { OutOfSync, OutOfSyncSighting, PullRequest } from './types.mjs';
+import type {
+  OutOfSync,
+  OutOfSyncSighting,
+  PullRequest,
+  SkipRecord,
+  SkipRecords,
+} from './types.mjs';
 
 const HEAD = 'a'.repeat(40);
 
@@ -131,6 +138,98 @@ describe(outOfSyncVerdict, () => {
   });
 });
 
+describe(observeAtSurvey, () => {
+  const BASE = 'c'.repeat(40);
+
+  const found = [
+    { pr: { ...pullRequest(7, HEAD), labels: [queued] }, branchAt: BRANCH },
+  ] as const;
+
+  const noSkips: SkipRecords = new Map<number, SkipRecord>();
+
+  // The survey reads the branch of every armed pull request GitHub shows as
+  // UNKNOWN, so one far down the queue is seen as much as the next candidate,
+  // and the sighting is what lets the next survey stop waiting on it.
+  test('records a first sighting, and sets nothing aside', () => {
+    const observed = observeAtSurvey(none, noSkips, found, {
+      baseSha: BASE,
+      nowEpochMs: T0,
+    });
+
+    assert.deepStrictEqual(observed.seen, seenAt(T0));
+
+    assert.deepStrictEqual(observed.skipped, noSkips);
+
+    assert.deepStrictEqual(observed.notes, [
+      `#7: its branch is at eeeeeeeeee while GitHub shows aaaaaaaaaa as its head, and has been since ${isoSeconds(T0)}`,
+    ]);
+  });
+
+  test('sets it aside once the same mismatch has lasted the grace', () => {
+    const at = {
+      baseSha: BASE,
+      nowEpochMs: T0 + OUT_OF_SYNC_GRACE_MS,
+    } as const;
+
+    const { setAside } = outOfSyncVerdict(seenAt(T0), found[0].pr, BRANCH, at);
+
+    assert.isDefined(setAside);
+
+    assert.deepStrictEqual(observeAtSurvey(seenAt(T0), noSkips, found, at), {
+      seen: seenAt(T0),
+      skipped: new Map<number, SkipRecord>([[7, setAside]]),
+      notes: [`#7: ${setAside.detail}`],
+    });
+  });
+
+  // A bot's own armed pull request, say: not the queue's, so nothing here
+  // comments on it, but the next survey need not wait on it either.
+  test('only records one not labelled merge-queued', () => {
+    const at = {
+      baseSha: BASE,
+      nowEpochMs: T0 + OUT_OF_SYNC_GRACE_MS,
+    } as const;
+
+    const observed = observeAtSurvey(
+      seenAt(T0),
+      noSkips,
+      [{ pr: pullRequest(7, HEAD), branchAt: BRANCH }],
+      at,
+    );
+
+    assert.deepStrictEqual(observed, {
+      seen: seenAt(T0),
+      skipped: noSkips,
+      notes: [],
+    });
+  });
+
+  // Already set aside at that head — by this run, or by an earlier one whose
+  // comment was read back after a restart — so there is nothing to observe.
+  test('leaves one already set aside out of sync at that head alone', () => {
+    const skipped: SkipRecords = new Map<number, SkipRecord>([
+      [
+        7,
+        {
+          number: 7,
+          headSha: HEAD,
+          baseSha: BASE,
+          reason: 'head-out-of-sync',
+          detail: 'set aside by an earlier run, as its comment says',
+        },
+      ],
+    ]);
+
+    assert.deepStrictEqual(
+      observeAtSurvey(none, skipped, found, {
+        baseSha: BASE,
+        nowEpochMs: T0,
+      }),
+      { seen: none, skipped, notes: [] },
+    );
+  });
+});
+
 describe(pruneOutOfSync, () => {
   test('keeps a sighting while GitHub still reports the same head', () => {
     assert.deepStrictEqual(
@@ -154,6 +253,8 @@ describe(pruneOutOfSync, () => {
     );
   });
 });
+
+const queued = { name: 'merge-queued' } as const;
 
 const pullRequest = (number: number, headRefOid: string): PullRequest =>
   ({

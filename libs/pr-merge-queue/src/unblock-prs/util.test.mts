@@ -1,4 +1,4 @@
-import { headShaFromListing } from './util.mjs';
+import { branchTipsFromListing, headShaFromListing } from './util.mjs';
 
 describe(headShaFromListing, () => {
   const listing = [
@@ -22,5 +22,32 @@ describe(headShaFromListing, () => {
     assert.isUndefined(headShaFromListing(listing, 'release/main'));
 
     assert.isUndefined(headShaFromListing('', 'main'));
+  });
+});
+
+describe(branchTipsFromListing, () => {
+  test('maps each branch to its tip, by its whole name', () => {
+    assert.deepStrictEqual(
+      branchTipsFromListing(
+        [
+          '870363ea81583350b5f32664fa27c27fd7b6c9b2\trefs/heads/changeset-release/main',
+          '71f48d84b3fffa6a45b654836e9357153e1e949e\trefs/heads/main',
+          '',
+        ].join('\n'),
+      ),
+      new Map<string, string>([
+        ['changeset-release/main', '870363ea81583350b5f32664fa27c27fd7b6c9b2'],
+        ['main', '71f48d84b3fffa6a45b654836e9357153e1e949e'],
+      ]),
+    );
+  });
+
+  test('leaves out what is not a branch', () => {
+    assert.deepStrictEqual(
+      branchTipsFromListing(
+        '71f48d84b3fffa6a45b654836e9357153e1e949e\trefs/tags/v1.0.0',
+      ),
+      new Map<string, string>(),
+    );
   });
 });
