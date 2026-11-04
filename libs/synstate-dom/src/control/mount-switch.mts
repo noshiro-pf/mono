@@ -31,6 +31,8 @@ import { toNodes, type Mountable, type MountedNodes } from '../jsx/index.mjs';
  * A value that arrives before the anchor is in a parent (a later sibling wrote
  * it while the enclosing element was still mounting its children) is kept, and
  * the switch follows the latest one once the nodes it returned are inserted.
+ * A value the branch being mounted writes itself is applied once that branch is
+ * inserted (#3141).
  */
 export const mountSwitch = <V, K>(
   value: Bindable<V>,

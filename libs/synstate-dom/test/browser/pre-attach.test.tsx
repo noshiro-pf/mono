@@ -7,11 +7,13 @@ import {
   constant,
   For,
   If,
+  MatchOptional,
   Portal,
   render,
   view,
   type JSX,
 } from 'synstate-dom';
+import { Arr, Optional } from 'ts-data-forge';
 
 // An element mounts all its children before it appends them, and `render`
 // mounts the whole app before it appends it. A child mounted later that writes
@@ -485,6 +487,356 @@ describe('updates deferred by the mounts For, If and Portal open themselves', ()
     assert.strictEqual(container.textContent, 'else (written)');
 
     unmount();
+  });
+});
+
+const setupSelfWritingIf = (
+  initial: boolean,
+): Readonly<{
+  branch: () => JSX.Element;
+  setCond: (v: boolean) => void;
+  live: () => number;
+}> => {
+  const [cond$, setCond] = createState(initial);
+
+  const mut_live = { current: 0 };
+
+  const Live = ({
+    children,
+  }: Readonly<{ children: JSX.Element }>): JSX.Element => {
+    mut_live.current += 1;
+
+    onScopeDispose(() => {
+      mut_live.current -= 1;
+    });
+
+    return children;
+  };
+
+  // `then` writes the `cond` that chose it while it is mounted.
+  const WriteFalse = (): JSX.Element => {
+    setCond(false);
+
+    return <b>{constant('then')}</b>;
+  };
+
+  return {
+    branch: () => (
+      <If
+        cond={cond$}
+        then={
+          <Live>
+            <WriteFalse />
+          </Live>
+        }
+        else={
+          <Live>
+            <i>{constant('else')}</i>
+          </Live>
+        }
+      />
+    ),
+    setCond,
+    live: () => mut_live.current,
+  };
+};
+
+const setupSelfWritingFor = (
+  initial: readonly string[],
+): Readonly<{
+  rows: () => JSX.Element;
+  setItems: (v: readonly string[]) => void;
+  calls: ReadonlyMap<string, number>;
+  live: () => number;
+}> => {
+  const [items$, setItems] = createState<readonly string[]>(initial);
+
+  const mut_calls = new Map<string, number>();
+
+  const mut_live = { current: 0 };
+
+  const Row = ({ id }: Readonly<{ id: string }>): JSX.Element => {
+    mut_calls.set(id, (mut_calls.get(id) ?? 0) + 1);
+
+    mut_live.current += 1;
+
+    onScopeDispose(() => {
+      mut_live.current -= 1;
+    });
+
+    // Row `a` adds row `b` while it is mounted.
+    const current = items$.getSnapshot().value;
+
+    if (id === 'a' && !current.includes('b')) {
+      setItems(Arr.toPushed(current, 'b'));
+    }
+
+    return <li>{constant(id)}</li>;
+  };
+
+  return {
+    rows: () => (
+      <ul>
+        <For items={items$} key={(id) => id}>
+          {(id$) => <Row id={id$.getSnapshot().value} />}
+        </For>
+      </ul>
+    ),
+    setItems,
+    calls: mut_calls,
+    live: () => mut_live.current,
+  };
+};
+
+describe('a write from inside the branch or row being mounted (#3141)', () => {
+  describe.each(layouts)('%s', (_, layout) => {
+    test('If follows a write from the branch mounted first', () => {
+      const { branch, live } = setupSelfWritingIf(true);
+
+      const container = document.createElement('div');
+
+      const unmount = render(
+        () => layout(branch, () => <span>{constant('|')}</span>),
+        container,
+      );
+
+      assert.strictEqual(container.textContent, 'else|');
+
+      assert.strictEqual(live(), 1);
+
+      unmount();
+
+      assert.strictEqual(live(), 0);
+
+      assert.strictEqual(container.childNodes.length, 0);
+    });
+  });
+
+  test('If follows a write from the branch it switches to', () => {
+    const { branch, setCond, live } = setupSelfWritingIf(false);
+
+    const container = document.createElement('div');
+
+    const unmount = render(() => <div>{branch()}</div>, container);
+
+    assert.strictEqual(container.textContent, 'else');
+
+    setCond(true);
+
+    assert.strictEqual(container.textContent, 'else');
+
+    assert.strictEqual(live(), 1);
+
+    unmount();
+
+    assert.strictEqual(live(), 0);
+  });
+
+  test('MatchOptional follows a write from the branch it switches to', () => {
+    const [value$, setValue] = createState<Optional<number>>(Optional.none);
+
+    const mut_live = { current: 0 };
+
+    const Some = (): JSX.Element => {
+      mut_live.current += 1;
+
+      onScopeDispose(() => {
+        mut_live.current -= 1;
+      });
+
+      setValue(Optional.none);
+
+      return <b>{constant('some')}</b>;
+    };
+
+    const container = document.createElement('div');
+
+    const unmount = render(
+      () => (
+        <div>
+          <MatchOptional
+            value={value$}
+            some={() => <Some />}
+            none={<i>{constant('none')}</i>}
+          />
+        </div>
+      ),
+      container,
+    );
+
+    setValue(Optional.some(1));
+
+    assert.strictEqual(container.textContent, 'none');
+
+    assert.strictEqual(mut_live.current, 0);
+
+    unmount();
+  });
+
+  test('a write that never settles is an error, not a hang', () => {
+    const [cond$, setCond] = createState(false);
+
+    const Write = ({ to }: Readonly<{ to: boolean }>): JSX.Element => {
+      setCond(to);
+
+      return <b>{constant(to ? 'then' : 'else')}</b>;
+    };
+
+    // Each branch writes the value that chooses the other.
+    expect(() =>
+      render(
+        () => (
+          <div>
+            <If
+              cond={cond$}
+              then={<Write to={false} />}
+              else={<Write to={true} />}
+            />
+          </div>
+        ),
+        document.createElement('div'),
+      ),
+    ).toThrow('more than 100 times in a row');
+  });
+
+  test('a For row write that never settles is an error, not a hang', () => {
+    const [items$, setItems] = createState<readonly number[]>([0]);
+
+    // Each row adds the next key while it is mounted.
+    const Row = ({ n }: Readonly<{ n: number }>): JSX.Element => {
+      setItems(Arr.toPushed(items$.getSnapshot().value, n + 1));
+
+      return <li />;
+    };
+
+    expect(() =>
+      render(
+        () => (
+          <ul>
+            <For items={items$} key={(n) => n}>
+              {(n$) => <Row n={n$.getSnapshot().value} />}
+            </For>
+          </ul>
+        ),
+        document.createElement('div'),
+      ),
+    ).toThrow('more than 100 times in a row');
+  });
+
+  test.each([
+    ['directly in the disposed branch', (x: JSX.Element) => x],
+    [
+      'inside an element of the disposed branch',
+      (x: JSX.Element) => <div>{x}</div>,
+    ],
+  ] as const)(
+    'a write kept while a switch was disposed in the meantime does nothing: %s',
+    (_, wrap) => {
+      const [show$, setShow] = createState(true);
+
+      const [cond$, setCond] = createState(false);
+
+      // The writes from a mount warn that they happen during an update; nothing
+      // else may (a scope born disposed, a mount that belongs to no scope).
+      const warn = vi.fn();
+
+      vi.stubGlobal('console', { ...console, warn });
+
+      onTestFinished(() => {
+        vi.unstubAllGlobals();
+      });
+
+      const WriteBoth = (): JSX.Element => {
+        // Kept for the inner If, which the outer one then disposes.
+        setCond(false);
+
+        setShow(false);
+
+        return <b>{constant('then')}</b>;
+      };
+
+      const container = document.createElement('div');
+
+      const unmount = render(
+        () => (
+          <div>
+            <If
+              cond={show$}
+              then={wrap(
+                <If
+                  cond={cond$}
+                  then={<WriteBoth />}
+                  else={<i>{constant('else')}</i>}
+                />,
+              )}
+              else={<i>{constant('hidden')}</i>}
+            />
+          </div>
+        ),
+        container,
+      );
+
+      setCond(true);
+
+      assert.strictEqual(container.textContent, 'hidden');
+
+      assert.deepStrictEqual(
+        warn.mock.calls
+          .map((args: readonly unknown[]) => args[0])
+          .filter(
+            (message) =>
+              typeof message !== 'string' ||
+              !message.includes('while an update was propagating'),
+          ),
+        [],
+      );
+
+      unmount();
+    },
+  );
+
+  test('For follows a write from a row mounted first', () => {
+    const { rows, calls, live } = setupSelfWritingFor(['x', 'a']);
+
+    const container = document.createElement('div');
+
+    const unmount = render(rows, container);
+
+    assert.deepStrictEqual(
+      Array.from(container.querySelectorAll('li'), (li) => li.textContent),
+      ['x', 'a', 'b'],
+    );
+
+    assert.deepStrictEqual(Object.fromEntries(calls), { x: 1, a: 1, b: 1 });
+
+    assert.strictEqual(live(), 3);
+
+    unmount();
+
+    assert.strictEqual(live(), 0);
+  });
+
+  test('For follows a write from a row it adds', () => {
+    const { rows, setItems, calls, live } = setupSelfWritingFor(['x']);
+
+    const container = document.createElement('div');
+
+    const unmount = render(rows, container);
+
+    setItems(['x', 'a']);
+
+    assert.deepStrictEqual(
+      Array.from(container.querySelectorAll('li'), (li) => li.textContent),
+      ['x', 'a', 'b'],
+    );
+
+    assert.deepStrictEqual(Object.fromEntries(calls), { x: 1, a: 1, b: 1 });
+
+    assert.strictEqual(live(), 3);
+
+    unmount();
+
+    assert.strictEqual(live(), 0);
   });
 });
 

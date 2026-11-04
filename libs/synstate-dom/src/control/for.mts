@@ -39,6 +39,8 @@ import { longestIncreasingSubsequence } from './longest-increasing-subsequence.m
  * An update that arrives before the anchor is in a parent (a later sibling
  * wrote `items` while the enclosing element was still mounting its children) is
  * applied, with the latest `items`, once the nodes `For` returned are inserted.
+ * One that a row being mounted writes is applied, with the latest `items`, once
+ * the rows of the update under way are all mounted and inserted (#3141).
  *
  * `key` is required, as in React; `(_, i) => i` matches rows by position. A key
  * that appears twice is reported with `console.error`, and its later
