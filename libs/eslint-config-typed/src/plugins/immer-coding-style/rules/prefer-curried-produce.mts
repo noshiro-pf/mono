@@ -4,6 +4,10 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
+  buildCalleeResolver,
+  getImportDeclarations,
+  hasCommentWithin,
+  hasForeignBinding,
   isTypeWrapper,
   skipTypeWrappers,
   typeWrapperLayers,
@@ -21,8 +25,9 @@ type CallExpressionWithLegacyTypeParameters = TSESTree.CallExpression &
 /**
  * Rewrites `(state) => produce(state, recipe)` as `produce(recipe)`. The base
  * state is recognized through type wrappers (`produce(state satisfies State,
- * recipe)`), which change nothing at run time and go with the argument; the
- * type an `as` gives it is kept as the type argument (`produce<State>`).
+ * recipe)`), which change nothing at run time and go with the argument. The
+ * type argument is the call's own (`produce<State>(state, recipe)`), else the
+ * parameter's annotation, else the wrapper's return type.
  *
  * The curried form passes its extra arguments on to the recipe (`recipe(draft,
  * ...args)`), so `xs.map((s) => produce(s, r))` → `xs.map(produce(r))` would
@@ -37,7 +42,20 @@ type CallExpressionWithLegacyTypeParameters = TSESTree.CallExpression &
  * would have nowhere to declare, and so is a base under `!`
  * (`produce(state!, recipe)`): the curried form would take the draft's narrower
  * type, and its callers could no longer pass what the wrapper took.
- * An optional parameter is left alone for the same reason.
+ * An optional parameter is left alone for the same reason, and so is a base
+ * under an `as` or `<T>` whose type is not the parameter's annotation
+ * (`(state: State | undefined) => produce(state as State, recipe)`), or that
+ * casts an unannotated parameter, whose type may come from the context.
+ * A call under `as` or `<T>` (`produce(state, recipe) as View`) is left alone
+ * too, since no curried form returns the type it asserts.
+ *
+ * `produce` is immer's: a named, aliased, default or namespace import from
+ * `immer` that nothing nearer shadows. The call and its callee are read through
+ * type wrappers. A call under `satisfies` or `!`, and a callee or namespace
+ * object in any wrapper (`(produce as typeof produce)(state, recipe)`,
+ * `(immer as T).produce(…)`), are reported without a fix, which could not keep
+ * the wrapper; so is an updater with a comment outside the recipe, which the
+ * fix would delete.
  */
 export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
   meta: {
@@ -56,6 +74,63 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
   },
   create: (context) => {
     const sourceCode = context.sourceCode;
+
+    const immerImports = getImportDeclarations(sourceCode.ast, immerModule);
+
+    if (Arr.isEmpty(immerImports)) {
+      return {};
+    }
+
+    const resolveCallee = buildCalleeResolver(immerImports);
+
+    // immer 9 and earlier export `produce` as the default too.
+    const defaultImportNames: ReadonlySet<string> = new Set(
+      immerImports.flatMap((declaration) =>
+        Arr.generate(function* () {
+          for (const specifier of declaration.specifiers) {
+            if (specifier.type === AST_NODE_TYPES.ImportDefaultSpecifier) {
+              yield specifier.local.name;
+            }
+          }
+        }),
+      ),
+    );
+
+    const isImmerProduce = (
+      call: DeepReadonly<TSESTree.CallExpression>,
+    ): boolean => {
+      const callee = castDeepMutable(call.callee);
+
+      const canonicalName = resolveCallee(callee)?.canonicalName;
+
+      const unwrapped = skipTypeWrappers(callee);
+
+      if (
+        canonicalName !== 'produce' &&
+        canonicalName !== 'default' &&
+        !(
+          unwrapped.type === AST_NODE_TYPES.Identifier &&
+          defaultImportNames.has(unwrapped.name)
+        )
+      ) {
+        return false;
+      }
+
+      const bound =
+        unwrapped.type === AST_NODE_TYPES.MemberExpression
+          ? skipTypeWrappers(unwrapped.object)
+          : unwrapped;
+
+      return (
+        bound.type === AST_NODE_TYPES.Identifier &&
+        !hasForeignBinding(
+          sourceCode,
+          castDeepMutable(call),
+          bound.name,
+          immerModule,
+        )
+      );
+    };
 
     return {
       ArrowFunctionExpression: (
@@ -83,9 +158,17 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
 
         const { name: parameterName } = param;
 
-        const callExpression = node.body;
+        const callExpression = skipTypeWrappers(node.body);
 
-        if (!isProduceCall(callExpression)) {
+        // `(state) => produce(state, recipe) as View` returns a `View`, which
+        // no curried form does.
+        if (
+          callExpression.type !== AST_NODE_TYPES.CallExpression ||
+          !isImmerProduce(callExpression) ||
+          typeWrapperLayers(node.body).some(
+            (layer) => castTypeOf(layer) !== undefined,
+          )
+        ) {
           return;
         }
 
@@ -109,6 +192,24 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
           return;
         }
 
+        // `(state: State | undefined) => produce(state as State, recipe)`
+        // would become `produce<State>(recipe)`, which no longer takes
+        // `undefined`.
+        if (
+          assertsOtherType(
+            baseArgument,
+            param.typeAnnotation === undefined
+              ? undefined
+              : tokensText(
+                  sourceCode,
+                  castDeepMutable(param.typeAnnotation.typeAnnotation),
+                ),
+            sourceCode,
+          )
+        ) {
+          return;
+        }
+
         const baseIdentifier = findIdentifier(baseArgument, parameterName);
 
         if (baseIdentifier === undefined) {
@@ -119,10 +220,20 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
           return;
         }
 
+        const recipe = restArguments[0];
+
+        const isFixable =
+          node.body === callExpression &&
+          !hasWrappedCallee(callExpression) &&
+          !hasCommentWithin(sourceCode, castDeepMutable(node), [
+            [node.range[0], recipe.range[0]],
+            [recipe.range[1], node.range[1]],
+          ]);
+
         report(context, {
           arrowFunction: node,
-          baseArgument,
           callExpression,
+          isFixable,
           remainingArguments: restArguments,
           sourceCode,
         });
@@ -133,8 +244,8 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
 
 type ReportContext = Readonly<{
   arrowFunction: DeepReadonly<TSESTree.ArrowFunctionExpression>;
-  baseArgument: DeepReadonly<TSESTree.CallExpressionArgument>;
   callExpression: DeepReadonly<TSESTree.CallExpression>;
+  isFixable: boolean;
   remainingArguments: readonly DeepReadonly<TSESTree.CallExpressionArgument>[];
   sourceCode: Readonly<{
     getText: TSESLint.SourceCode['getText'];
@@ -161,23 +272,6 @@ const getTypeArguments = (
   }
 
   return undefined;
-};
-
-/**
- * The type the outermost `as` or `<T>` among `node`'s type wrappers gives it,
- * seen through `satisfies` and parentheses, or `undefined`.
- */
-const getAssertedType = (
-  node: DeepReadonly<TSESTree.Node>,
-): DeepReadonly<TSESTree.TypeNode> | undefined => {
-  if (
-    node.type === AST_NODE_TYPES.TSAsExpression ||
-    node.type === AST_NODE_TYPES.TSTypeAssertion
-  ) {
-    return node.typeAnnotation;
-  }
-
-  return isTypeWrapper(node) ? getAssertedType(node.expression) : undefined;
 };
 
 const getArrowFunctionParameterType = ({
@@ -220,12 +314,10 @@ const getArrowFunctionReturnType = ({
 
 const getTypeParametersText = ({
   arrowFunction,
-  baseArgument,
   callExpression,
   sourceCode,
 }: Readonly<{
   arrowFunction: DeepReadonly<TSESTree.ArrowFunctionExpression>;
-  baseArgument: DeepReadonly<TSESTree.CallExpressionArgument>;
   callExpression: DeepReadonly<TSESTree.CallExpression>;
   sourceCode: Readonly<{
     getText: TSESLint.SourceCode['getText'];
@@ -237,13 +329,8 @@ const getTypeParametersText = ({
     return sourceCode.getText(castDeepMutable(typeArguments));
   }
 
-  // `produce(state as State, recipe)` infers its base type from the cast.
-  const assertedType = getAssertedType(baseArgument);
-
-  if (assertedType !== undefined) {
-    return `<${sourceCode.getText(castDeepMutable(assertedType))}>`;
-  }
-
+  // A base under `as` or `<T>` gets this far only when the cast names the
+  // parameter's own type, so the annotation stands for both.
   const parameterType = getArrowFunctionParameterType({
     arrowFunction,
     sourceCode,
@@ -293,50 +380,107 @@ const report = (
   context: DeepReadonly<TSESLint.RuleContext<MessageIds, []>>,
   {
     arrowFunction,
-    baseArgument,
     callExpression,
+    isFixable,
     remainingArguments,
     sourceCode,
   }: ReportContext,
 ): void => {
-  const calleeText = sourceCode.getText(castDeepMutable(callExpression.callee));
+  const buildReplacement = (): string => {
+    const calleeText = sourceCode.getText(
+      castDeepMutable(callExpression.callee),
+    );
 
-  const typeParametersText = getTypeParametersText({
-    arrowFunction,
-    baseArgument,
-    callExpression,
-    sourceCode,
-  });
+    const typeParametersText = getTypeParametersText({
+      arrowFunction,
+      callExpression,
+      sourceCode,
+    });
 
-  const remainingArgumentsText = remainingArguments
-    .map((argument) =>
-      normalizeMultilineText(sourceCode.getText(castDeepMutable(argument))),
-    )
-    .join(', ');
+    const remainingArgumentsText = remainingArguments
+      .map((argument) =>
+        normalizeMultilineText(sourceCode.getText(castDeepMutable(argument))),
+      )
+      .join(', ');
 
-  const replacement =
-    `${calleeText}${typeParametersText}(${remainingArgumentsText})` as const;
+    return `${calleeText}${typeParametersText}(${remainingArgumentsText})`;
+  };
 
   context.report({
     node: castDeepMutable(arrowFunction),
     messageId: 'useCurriedProduce',
-    fix: (fixer) =>
-      fixer.replaceText(castDeepMutable(arrowFunction), replacement),
+    fix: isFixable
+      ? (fixer) =>
+          fixer.replaceText(castDeepMutable(arrowFunction), buildReplacement())
+      : null,
   });
 };
 
-const isProduceCall = (
-  node: DeepReadonly<TSESTree.Node>,
-): node is TSESTree.CallExpression => {
-  if (node.type !== AST_NODE_TYPES.CallExpression) {
-    return false;
-  }
+const immerModule = 'immer';
 
-  return (
-    node.callee.type === AST_NODE_TYPES.Identifier &&
-    node.callee.name === 'produce'
-  );
-};
+/**
+ * The type `node` casts to when it is `x as T` or `<T>x`, the wrappers that can
+ * change a value's type, or `undefined`.
+ */
+const castTypeOf = (
+  node: DeepReadonly<TSESTree.Node>,
+): DeepReadonly<TSESTree.TypeNode> | undefined =>
+  node.type === AST_NODE_TYPES.TSAsExpression ||
+  node.type === AST_NODE_TYPES.TSTypeAssertion
+    ? node.typeAnnotation
+    : undefined;
+
+/**
+ * Whether the callee, or the namespace object it reads `produce` from, is in a
+ * type wrapper: `(produce as T)(…)`, `(immer as T).produce(…)`. The fix would
+ * copy the wrapper, whose type need not have the curried overload.
+ */
+const hasWrappedCallee = ({
+  callee,
+}: DeepReadonly<TSESTree.CallExpression>): boolean =>
+  isTypeWrapper(callee) ||
+  (callee.type === AST_NODE_TYPES.MemberExpression &&
+    isTypeWrapper(callee.object));
+
+/**
+ * `node`'s tokens joined by single spaces, so that two spellings of a type that
+ * differ only in whitespace or comments compare equal.
+ */
+const tokensText = (
+  sourceCode: TokenSource,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.TypeNode,
+): string =>
+  sourceCode
+    .getTokens(node)
+    .map((token) => token.value)
+    .join(' ');
+
+/**
+ * Whether an `as` or `<T>` among `argument`'s type wrappers names a type other
+ * than the parameter's annotation, given as {@link tokensText} writes it, or
+ * names any type when the parameter has none (its type may come from the
+ * context). Such a cast may narrow what the wrapper takes, and the curried form
+ * would take only the narrower type.
+ */
+const assertsOtherType = (
+  argument: DeepReadonly<TSESTree.CallExpressionArgument>,
+  parameterType: string | undefined,
+  sourceCode: TokenSource,
+): boolean =>
+  argument.type !== AST_NODE_TYPES.SpreadElement &&
+  typeWrapperLayers(argument).some((layer) => {
+    const castType = castTypeOf(layer);
+
+    return (
+      castType !== undefined &&
+      tokensText(sourceCode, castDeepMutable(castType)) !== parameterType
+    );
+  });
+
+type TokenSource = Readonly<{
+  getTokens: TSESLint.SourceCode['getTokens'];
+}>;
 
 /**
  * `true` when `recipe` is an arrow function (through type wrappers) taking at

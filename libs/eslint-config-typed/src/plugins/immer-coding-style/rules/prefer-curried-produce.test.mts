@@ -224,24 +224,22 @@ describe('prefer-curried-produce fixes that would change the meaning', () => {
         code: dedent`
           import { produce } from 'immer';
 
-          const update = (state) =>
-            produce(state as State, (draft) => {
-              draft.count += 1;
+          const reset = (state: State) =>
+            produce((state as State) satisfies State, (draft) => {
+              draft.count = 0;
             });
-
-          const reset = (state: Wide) =>
-            produce((state as unknown as State) satisfies State, (draft) => {
+          const spaced = (state: State|undefined) =>
+            produce(state as State | undefined, (draft) => {
               draft.count = 0;
             });
         `,
         output: dedent`
           import { produce } from 'immer';
 
-          const update = produce<State>((draft) => {
-            draft.count += 1;
-          });
-
           const reset = produce<State>((draft) => {
+            draft.count = 0;
+          });
+          const spaced = produce<State|undefined>((draft) => {
             draft.count = 0;
           });
         `,
@@ -323,6 +321,314 @@ describe('prefer-curried-produce through type wrappers', () => {
           import { produce } from 'immer';
 
           const update = produce<State>((draft) => {
+            draft.count += 1;
+          });
+        `,
+        errors: [{ messageId: 'useCurriedProduce' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-curried-produce with a narrowing cast on the base', () => {
+  tester.run(ruleName, preferCurriedProduceRule, {
+    valid: [
+      {
+        name: 'an `as` narrower than the parameter would narrow what callers may pass',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const reset = (state: State | undefined) =>
+            produce(state as State, (draft) => {
+              draft.count = 0;
+            });
+          const widen = (state: Wide) =>
+            produce(state as unknown as State, (draft) => {
+              draft.count = 0;
+            });
+          const wrapped = (state: Wide) =>
+            produce((state as unknown as State) satisfies State, (draft) => {
+              draft.count = 0;
+            });
+          const angle = (state: Wide) =>
+            produce(<State>state, (draft) => {
+              draft.count = 0;
+            });
+        `,
+      },
+      {
+        name: 'a cast on an unannotated parameter, whose type may come from the context',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const update = (state) =>
+            produce(state as State, (draft) => {
+              draft.count += 1;
+            });
+          const f: (s: State | undefined) => State = (state) =>
+            produce(state as State, (draft) => {
+              draft.count += 1;
+            });
+          const ys = xs.map((s) => produce(s as unknown as State, () => undefined));
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'an `as` naming the parameter type is fixed',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const reset = (state: State) =>
+            produce(state as State, (draft) => {
+              draft.count = 0;
+            });
+        `,
+        output: dedent`
+          import { produce } from 'immer';
+
+          const reset = produce<State>((draft) => {
+            draft.count = 0;
+          });
+        `,
+        errors: [{ messageId: 'useCurriedProduce' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-curried-produce resolves produce to immer', () => {
+  tester.run(ruleName, preferCurriedProduceRule, {
+    valid: [
+      {
+        name: 'a local function named produce',
+        code: dedent`
+          const produce = (topic, callback) => callback(topic);
+
+          const send = (topic) => produce(topic, () => undefined);
+        `,
+      },
+      {
+        name: 'produce imported from another module',
+        code: dedent`
+          import { produce } from 'kafka';
+
+          const send = (topic) => produce(topic, () => undefined);
+        `,
+      },
+      {
+        name: 'a parameter that shadows the immer import',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const run = (produce) => (state) => produce(state, () => undefined);
+        `,
+      },
+      {
+        name: 'a shadowed namespace or default import',
+        code: dedent`
+          import * as immer from 'immer';
+          import produce from 'immer';
+
+          const a = (immer) => (state) => immer.produce(state, () => undefined);
+          const b = (immer) => (state) =>
+            (immer as ImmerLike).produce(state, () => undefined);
+          const c = () => {
+            const produce = (topic, callback) => callback(topic);
+
+            return (state) => produce(state, () => undefined);
+          };
+        `,
+      },
+      {
+        name: 'another immer export',
+        code: dedent`
+          import { createDraft as produce } from 'immer';
+
+          const run = (state) => produce(state, () => undefined);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'an aliased import',
+        code: dedent`
+          import { produce as update } from 'immer';
+
+          const next = (state) =>
+            update(state, (draft) => {
+              draft.count += 1;
+            });
+        `,
+        output: dedent`
+          import { produce as update } from 'immer';
+
+          const next = update((draft) => {
+            draft.count += 1;
+          });
+        `,
+        errors: [{ messageId: 'useCurriedProduce' }],
+      },
+      {
+        name: 'a default import (immer 9 and earlier)',
+        code: dedent`
+          import produce from 'immer';
+          import { default as update } from 'immer';
+          import * as immer from 'immer';
+
+          const a = (state) => produce(state, () => undefined);
+          const b = (state) => update(state, () => undefined);
+          const c = (state) => immer.default(state, () => undefined);
+        `,
+        output: dedent`
+          import produce from 'immer';
+          import { default as update } from 'immer';
+          import * as immer from 'immer';
+
+          const a = produce(() => undefined);
+          const b = update(() => undefined);
+          const c = immer.default(() => undefined);
+        `,
+        errors: [
+          { messageId: 'useCurriedProduce' },
+          { messageId: 'useCurriedProduce' },
+          { messageId: 'useCurriedProduce' },
+        ],
+      },
+      {
+        name: 'a namespace import',
+        code: dedent`
+          import * as immer from 'immer';
+
+          const next = (state: State) =>
+            immer.produce(state, (draft) => {
+              draft.count += 1;
+            });
+        `,
+        output: dedent`
+          import * as immer from 'immer';
+
+          const next = immer.produce<State>((draft) => {
+            draft.count += 1;
+          });
+        `,
+        errors: [{ messageId: 'useCurriedProduce' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-curried-produce with the call or callee in a type wrapper', () => {
+  tester.run(ruleName, preferCurriedProduceRule, {
+    valid: [
+      {
+        name: 'the call under `as` or `<T>`, whose return type no curried form keeps',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const a = (state: State) => produce(state, () => undefined) as View;
+          const b = (state) => <View>produce(state, () => undefined);
+          const c = (state) => (produce(state, () => undefined) satisfies State) as View;
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'the call in `satisfies` or `!` is reported but not fixed, since the fix cannot keep the wrapper',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const b = (state) => produce(state, () => undefined) satisfies State;
+          const c = (state) => produce(state, () => undefined)!;
+        `,
+        output: null,
+        errors: [
+          { messageId: 'useCurriedProduce' },
+          { messageId: 'useCurriedProduce' },
+        ],
+      },
+      {
+        name: 'the callee in a type wrapper is reported but not fixed',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const a = (state) => (produce as typeof produce)(state, () => undefined);
+          const b = (state) => (produce satisfies typeof produce)(state, () => undefined);
+        `,
+        output: null,
+        errors: [
+          { messageId: 'useCurriedProduce' },
+          { messageId: 'useCurriedProduce' },
+        ],
+      },
+      {
+        name: 'the namespace object in a type wrapper is reported but not fixed',
+        code: dedent`
+          import * as immer from 'immer';
+
+          const a = (state) => (immer as ImmerLike).produce(state, () => undefined);
+        `,
+        output: null,
+        errors: [{ messageId: 'useCurriedProduce' }],
+      },
+      {
+        name: 'parentheses around the call are not a wrapper',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const a = (state) => (produce(state, () => undefined));
+        `,
+        output: dedent`
+          import { produce } from 'immer';
+
+          const a = produce(() => undefined);
+        `,
+        errors: [{ messageId: 'useCurriedProduce' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-curried-produce keeps comments', () => {
+  tester.run(ruleName, preferCurriedProduceRule, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a comment outside the recipe is reported but not fixed',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const a = (state) => /* keep */ produce(state, () => undefined);
+          const b = (state) =>
+            produce(
+              state, // the base
+              () => undefined,
+            );
+          const c = (/* the state */ state) => produce(state, () => undefined);
+        `,
+        output: null,
+        errors: [
+          { messageId: 'useCurriedProduce' },
+          { messageId: 'useCurriedProduce' },
+          { messageId: 'useCurriedProduce' },
+        ],
+      },
+      {
+        name: 'a comment inside the recipe goes with it',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const update = (state) =>
+            produce(state, (draft) => {
+              // count up
+              draft.count += 1;
+            });
+        `,
+        output: dedent`
+          import { produce } from 'immer';
+
+          const update = produce((draft) => {
+            // count up
             draft.count += 1;
           });
         `,
