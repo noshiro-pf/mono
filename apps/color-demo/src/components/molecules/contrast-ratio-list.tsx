@@ -1,27 +1,31 @@
-import { css } from '@emotion/react';
-import { memoNamed } from 'react-utils';
-import type { PositiveFiniteNumber } from 'ts-data-forge';
+import type { InitializedObservable } from 'synstate';
+import { constant, For, view, type JSX } from 'synstate-dom';
+import * as styles from './contrast-ratio-list.module.css';
 
-type Props = Readonly<{ contrastRatioList: readonly PositiveFiniteNumber[] }>;
+type Props = Readonly<{
+  contrastRatioList: InitializedObservable<readonly IndexedRatio[]>;
+}>;
 
-export const ContrastRatioList = memoNamed<Props>(
-  'ContrastRatioList',
-  (props) => (
-    <div
-      css={css`
-        padding: 10px;
-        display: flex;
-      `}
-    >
-      <div>{'隣り合う二色のコントラスト比：'}</div>
-      {'['}
-      {props.contrastRatioList.map((r, i) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <div key={i} data-e2e={'contrast-ratio'}>
-          {`${r.toFixed(2)}, `}&nbsp;
+/** The contrast ratio of each two neighboring colors, to two places. */
+export const ContrastRatioList = ({
+  contrastRatioList,
+}: Props): JSX.Element => (
+  <div class={constant(styles.root)}>
+    <div>{constant('隣り合う二色のコントラスト比：')}</div>
+    {constant('[')}
+    <For items={contrastRatioList} key={({ index }) => index}>
+      {(item$) => (
+        <div data-e2e={constant('contrast-ratio')}>
+          {view(item$, ({ ratio }) => `${ratio.toFixed(2)}, ${noBreakSpace}`)}
         </div>
-      ))}
-      {']'}
-    </div>
-  ),
+      )}
+    </For>
+    {constant(']')}
+  </div>
 );
+
+/** Holds the ratios apart where the line would otherwise wrap them together. */
+const noBreakSpace = '\u{A0}';
+
+/** A ratio with its position in the list, which keys it. */
+type IndexedRatio = Readonly<{ index: number; ratio: number }>;

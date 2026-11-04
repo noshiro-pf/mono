@@ -1,0 +1,13 @@
+.root {
+  padding: 10px;
+}
+
+.list {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+}
+
+.item {
+  padding: 3px;
+}

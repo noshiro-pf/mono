@@ -1,27 +1,16 @@
-import { css } from '@emotion/react';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
-import { hslToStr, type Hsl } from 'ts-utils-additional';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
+import * as styles from './color-item.module.css';
 
 type Props = Readonly<{
-  hsl: Hsl;
+  /** A CSS colour. */
+  color: Bindable<string>;
 }>;
 
-export const ColorItem = memoNamed<Props>('ColorItem', (props) => {
-  const style = React.useMemo(
-    () => ({ backgroundColor: hslToStr(props.hsl) }),
-    [props.hsl],
-  );
-
-  return (
-    <div
-      css={css`
-        width: 30px;
-        height: 30px;
-        border-radius: 25%;
-      `}
-      data-e2e={'color-swatch'}
-      style={style}
-    />
-  );
-});
+/** A rounded square swatch of one colour. */
+export const ColorItem = ({ color }: Props): JSX.Element => (
+  <div
+    class={constant(styles.swatch)}
+    data-e2e={constant('color-swatch')}
+    style={{ 'background-color': color }}
+  />
+);

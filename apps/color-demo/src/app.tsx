@@ -1,46 +1,41 @@
-import { css } from '@emotion/react';
-import { Paper } from '@mui/material';
-import { useState } from 'better-react-use-state';
-import { MuiTabs } from 'react-mui-utils';
-import { ComponentSwitcher, memoNamed } from 'react-utils';
+import { constant, view, type JSX } from 'synstate-dom';
+import * as styles from './app.module.css';
 import {
   LuminanceVisualizer,
+  MuiPaper,
+  MuiTabs,
   TextColorContrastTable,
 } from './components/index.mjs';
+import { setTabIndex, tabIndex$ } from './store.mjs';
+
+export const App = (): JSX.Element => (
+  <div class={constant(styles.root)}>
+    <h1 class={constant(styles.title)} data-e2e={constant('title')}>
+      {constant('Color demo')}
+    </h1>
+    <MuiPaper variant={'elevation'}>
+      <MuiTabs
+        labels={labels}
+        tabIndex={tabIndex$}
+        tabIndexChange={setTabIndex}
+      />
+      {/* Both stay mounted, so that each keeps what was set in it. */}
+      <div
+        style={{
+          display: view(tabIndex$, (i) => (i === 0 ? undefined : 'none')),
+        }}
+      >
+        <LuminanceVisualizer />
+      </div>
+      <div
+        style={{
+          display: view(tabIndex$, (i) => (i === 1 ? undefined : 'none')),
+        }}
+      >
+        <TextColorContrastTable />
+      </div>
+    </MuiPaper>
+  </div>
+);
 
 const labels = ['luminance', 'text-color'] as const;
-
-export const App = memoNamed('App', () => {
-  const [tabIndex, setTabIndex] = useState(0);
-
-  return (
-    <div
-      css={css`
-        min-height: 100vh;
-        background-color: hsl(0, 0%, 33%);
-        padding: 10px;
-        overflow: auto;
-      `}
-    >
-      <h1
-        css={css`
-          color: white;
-        `}
-        data-e2e={'title'}
-      >
-        {'Color demo'}
-      </h1>
-      <Paper>
-        <MuiTabs
-          labels={labels}
-          tabIndex={tabIndex}
-          tabIndexChange={setTabIndex}
-        />
-        <ComponentSwitcher index={tabIndex}>
-          <LuminanceVisualizer />
-          <TextColorContrastTable />
-        </ComponentSwitcher>
-      </Paper>
-    </div>
-  );
-});
