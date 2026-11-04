@@ -2,6 +2,7 @@ export * from './backup.mjs';
 export * from './open-workspaces.mjs';
 export * from './reducer.mjs';
 export * from './registry.mjs';
+export * from './split-open.mjs';
 export * from './storage.mjs';
 export * from './sw-origins.mjs';
 export * from './tab-identity.mjs';

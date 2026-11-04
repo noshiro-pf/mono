@@ -31,6 +31,7 @@ import {
 } from './layout/index.mjs';
 import {
   asFrameToPageMessage,
+  asSplitOpenRequest,
   ensureHeaderRule,
   ensureInitiatorRule,
   readRuleDiagnostics,
@@ -714,6 +715,69 @@ export const App = (): JSX.Element => {
     if (message?.kind === 'shortcut') {
       switchToPosition(message.code);
     }
+  });
+
+  /**
+   * The context menu's "open to the right" or "open below", chosen in one of
+   * this tab's panes: the worker asks every split view page, and the one in the
+   * named tab splits the pane as its `||` or `=` button would, with the link in
+   * the new pane.
+   *
+   * Only the worker is listened to — a message with no `tab` — and not the
+   * content scripts, which run in pages this split view shows.
+   */
+  const onWorkerMessage = (
+    value: unknown,
+    sender: Readonly<{ id?: string | undefined; tab?: unknown }>,
+  ): false => {
+    const request = asSplitOpenRequest(value);
+
+    if (
+      request === undefined ||
+      sender.id !== chrome.runtime.id ||
+      sender.tab !== undefined
+    ) {
+      return false;
+    }
+
+    const splitOpen = async (): Promise<void> => {
+      const { workspaceId } = session$.getSnapshot().value;
+
+      // Asked each time: Chrome gives a discarded tab a new id.
+      const tab = await chrome.tabs.getCurrent();
+
+      if (workspaceId === undefined || tab?.id !== request.tabId) {
+        return;
+      }
+
+      // As before any pane loads an address: the rule that lets it be framed is
+      // put back first if it was lost.
+      await ensureRule();
+
+      // The pane was named in the split view the menu was opened in; one
+      // switched to meanwhile has panes of the same ids that are not it.
+      if (session$.getSnapshot().value.workspaceId !== workspaceId) {
+        return;
+      }
+
+      // No pane named splits the active one, as the reducer sees it.
+      dispatch({
+        type: 'split-open',
+        paneId: request.paneId,
+        axis: request.axis,
+        url: request.url,
+      });
+    };
+
+    splitOpen().catch(console.error);
+
+    return false;
+  };
+
+  chrome.runtime.onMessage.addListener(onWorkerMessage);
+
+  onScopeDispose(() => {
+    chrome.runtime.onMessage.removeListener(onWorkerMessage);
   });
 
   // Switching pushes a history entry, so the browser's Back button walks back

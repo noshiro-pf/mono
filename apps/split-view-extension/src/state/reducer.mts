@@ -47,6 +47,14 @@ export type WorkspaceAction = Readonly<
   | { type: 'set-ratio'; path: NodePath; ratio: number }
   | { type: 'set-sandboxed'; paneId: PaneId; sandboxed: boolean }
   | { type: 'split'; paneId: PaneId; axis: SplitAxis }
+  | {
+      type: 'split-open';
+      /** `undefined`, or a pane that is not there, splits the active pane. */
+      paneId: PaneId | undefined;
+      axis: SplitAxis;
+      /** What the new pane opens; `undefined` leaves it empty. */
+      url: string | undefined;
+    }
   | { type: 'zoom'; paneId: PaneId; step: PaneZoomStep }
 >;
 
@@ -70,20 +78,30 @@ export const workspaceReducer = (
     case 'apply-preset':
       return applyPreset(state, action.presetId);
 
-    case 'split': {
-      if (findPane(state, action.paneId) === undefined) {
-        return state;
-      }
+    case 'split':
+      return splitPane(state, action.paneId, action.axis, '');
 
-      const newPaneId = state.nextPaneId;
+    /**
+     * The split buttons' split, with the new pane opening an address: what the
+     * context menu's "open to the right" and "open below" do in a split view.
+     */
+    case 'split-open': {
+      // A pane that has gone since the menu was opened — closed, or a preset
+      // applied — splits the active one instead, as no pane named does.
+      const paneId =
+        action.paneId !== undefined &&
+        findPane(state, action.paneId) !== undefined
+          ? action.paneId
+          : state.activePaneId;
 
-      return {
-        ...state,
-        root: splitPaneAt(state.root, action.paneId, action.axis, newPaneId),
-        panes: Arr.toPushed(state.panes, createPane(newPaneId)),
-        nextPaneId: newPaneId + 1,
-        activePaneId: newPaneId,
-      };
+      return paneId === undefined
+        ? state
+        : splitPane(
+            state,
+            paneId,
+            action.axis,
+            normalizeAddress(action.url ?? ''),
+          );
     }
 
     /**
@@ -366,4 +384,25 @@ const updatePane = (
   return panes.every((pane, index) => pane === state.panes[index])
     ? state
     : { ...state, panes };
+};
+
+const splitPane = (
+  state: WorkspaceState,
+  paneId: PaneId,
+  axis: SplitAxis,
+  url: string,
+): WorkspaceState => {
+  if (findPane(state, paneId) === undefined) {
+    return state;
+  }
+
+  const newPaneId = state.nextPaneId;
+
+  return {
+    ...state,
+    root: splitPaneAt(state.root, paneId, axis, newPaneId),
+    panes: Arr.toPushed(state.panes, { ...createPane(newPaneId), url }),
+    nextPaneId: newPaneId + 1,
+    activePaneId: newPaneId,
+  };
 };

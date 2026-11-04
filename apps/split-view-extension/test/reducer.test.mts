@@ -82,6 +82,65 @@ describe('split and close', () => {
     assert.deepStrictEqual(state.activePaneId, 4);
   });
 
+  test('splitting to open a link puts the link in the new pane', () => {
+    const state = workspaceReducer(initialWorkspaceState(), {
+      type: 'split-open',
+      paneId: 1,
+      axis: 'column',
+      url: 'https://example.org/b',
+    });
+
+    assert.deepStrictEqual(paneIdsOf(state.root), [0, 1, 4, 2, 3]);
+
+    assert.deepStrictEqual(
+      state.panes.find((pane) => pane.id === 4)?.url,
+      'https://example.org/b',
+    );
+
+    assert.deepStrictEqual(state.activePaneId, 4);
+  });
+
+  test('splitting to open nothing leaves the new pane empty', () => {
+    const state = workspaceReducer(initialWorkspaceState(), {
+      type: 'split-open',
+      paneId: 0,
+      axis: 'row',
+      url: undefined,
+    });
+
+    assert.deepStrictEqual(paneIdsOf(state.root), [0, 4, 1, 2, 3]);
+
+    assert.deepStrictEqual(state.panes.find((pane) => pane.id === 4)?.url, '');
+  });
+
+  test('splitting to open a link in no named pane splits the active one', () => {
+    const state = workspaceReducer(
+      workspaceReducer(initialWorkspaceState(), {
+        type: 'activate',
+        paneId: 2,
+      }),
+      {
+        type: 'split-open',
+        paneId: undefined,
+        axis: 'row',
+        url: 'https://example.org/b',
+      },
+    );
+
+    assert.deepStrictEqual(paneIdsOf(state.root), [0, 1, 2, 4, 3]);
+  });
+
+  test('splitting to open a link in a pane that is gone splits the active one', () => {
+    const state = workspaceReducer(initialWorkspaceState(), {
+      type: 'split-open',
+      paneId: 99,
+      axis: 'row',
+      url: 'https://example.org/b',
+    });
+
+    assert.deepStrictEqual(paneIdsOf(state.root), [0, 4, 1, 2, 3]);
+  });
+
   test('closing removes the pane and its state', () => {
     const state = workspaceReducer(initialWorkspaceState(), {
       type: 'close',

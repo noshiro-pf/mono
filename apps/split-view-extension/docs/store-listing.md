@@ -117,9 +117,13 @@ a reload or the tab being closed. Local only; nothing is sent anywhere.
 **`contextMenus`**
 
 ```text
-Adds one item, "Open pull request in Split View", to the context menu of a link
-to a pull request on github.com and of a pull request's own page. It opens that
-pull request in a split view. The item is shown for those addresses only.
+Adds "Open pull request in Split View" to the context menu of a link to a pull
+request on github.com and of a pull request's own page, which opens that pull
+request in a split view and is shown for those addresses only; and "Open in a
+split to the right" and "Open in a split below" to the context menu of web
+pages and their links, which put the link, or an empty pane, beside the page in
+a split view: by splitting the pane in a split view, and in a new one in place
+of the tab anywhere else.
 ```
 
 **`favicon`**
