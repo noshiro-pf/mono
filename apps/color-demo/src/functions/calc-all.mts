@@ -10,7 +10,9 @@ import {
 } from 'ts-data-forge';
 import type { DeepReadonly, NonEmptyArray, Percent } from 'ts-type-forge';
 import {
+  getLuminanceListAccumulated,
   hslToRgb,
+  pickupHighContrastHues,
   relativeLuminance,
   toHue,
   variance,
@@ -20,9 +22,7 @@ import {
 import { huesDefault } from '../constants/index.mjs';
 import type { ColorResult, DivisionNumber } from '../types/index.mjs';
 import { hueListToContrastRatioList } from './get-contrast-ratio-list.mjs';
-import { getLuminanceListAccumulated } from './luminance-list-accumulated.mjs';
 import { normalizeList } from './normalize-list.mjs';
-import { pickupHighContrastHues } from './pickup-high-contrast-hues.mjs';
 
 export const calcAll = ({
   saturation,
@@ -122,7 +122,7 @@ export const calcAll = ({
     lightness,
     firstHue,
     false,
-  ).map((h) => toHue((h - firstHue + 360) % 360));
+  );
 
   const adjacentContrastRatioList_weighted: NonEmptyArray<PositiveFiniteNumber> =
     hueListToContrastRatioList(
@@ -152,7 +152,7 @@ export const calcAll = ({
     lightness,
     firstHue,
     true,
-  ).map((h) => toHue((h - firstHue + 360) % 360));
+  );
 
   const adjacentContrastRatioList_weighted_log: NonEmptyArray<PositiveFiniteNumber> =
     hueListToContrastRatioList(
@@ -165,7 +165,7 @@ export const calcAll = ({
     accumulatedDistribution: Arr.zip<
       NonEmptyArray<Hsl>,
       NonEmptyArray<NonNegativeFiniteNumber>
-    >(hslList, normalizeList(getLuminanceListAccumulated(luminanceList, true))),
+    >(hslList, normalizeList(getLuminanceListAccumulated(luminanceList))),
     pickedUpHues: pickedUpHues_weighted_log,
     adjacentContrastRatioList: adjacentContrastRatioList_weighted_log,
     adjacentContrastRatioVariance: variance(

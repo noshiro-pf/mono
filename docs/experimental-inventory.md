@@ -1982,3 +1982,9 @@ pending に載せていた値は常に `undefined` だったので、`AsyncData.
 置き換えていない。`color-demo-app` の `pickupHighContrastHues` ・
 `getLuminanceListAccumulated` も、`ts-utils-additional` の同名とは引数と累積の
 初期値が違うので、共通化していない。
+
+その後（2026-11）、`apps/color-demo` の `pickupHighContrastHues` ・
+`getLuminanceListAccumulated` のコピーは削除した。そのコピーと
+`ts-utils-additional` の同名との違いは引数（最初の色相と、対数を取るかどうか）
+だけだったので、`ts-utils-additional` 側がその 2 つを省略可能な引数として
+受け取るようにした（#2980）。
