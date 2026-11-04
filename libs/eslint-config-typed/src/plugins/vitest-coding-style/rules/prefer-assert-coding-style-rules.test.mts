@@ -786,3 +786,333 @@ describe('prefer-assert-is-false-over-expect-false with parenthesized operands',
     },
   );
 });
+
+describe('expect-to-assert fixes resolve the assert they write', () => {
+  ruleTester.run(
+    'prefer-assert-is-false-over-expect-false',
+    preferAssertIsFalseOverExpectFalseRule,
+    {
+      valid: [
+        {
+          name: 'expect with no argument has nothing to assert on',
+          code: 'expect().toBe(false);',
+        },
+        {
+          name: 'expect with a spread argument',
+          code: dedent`
+            declare const flags: readonly [boolean];
+            expect(...flags).toBe(false);
+          `,
+        },
+        {
+          name: 'expect with more arguments than a value and a message',
+          code: dedent`
+            declare const flag: boolean;
+            expect(flag, 'a', 'b').toBe(false);
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'the message argument of expect is kept',
+          code: dedent`
+            declare const flag: boolean;
+            expect(flag, 'flag is unset').toBe(false);
+          `,
+          output: dedent`
+            declare const flag: boolean;
+            assert.isFalse(flag, 'flag is unset');
+          `,
+          errors: [{ messageId: 'preferAssertIsFalseOverExpectFalse' }],
+        },
+        {
+          name: 'a namespace import of vitest reaches assert through it',
+          code: dedent`
+            import * as vt from 'vitest';
+            import { expect } from 'vitest';
+            declare const flag: boolean;
+            expect(flag).toBe(false);
+          `,
+          output: dedent`
+            import * as vt from 'vitest';
+            import { expect } from 'vitest';
+            declare const flag: boolean;
+            vt.assert.isFalse(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsFalseOverExpectFalse' }],
+        },
+        {
+          name: 'a type-only assert import becomes a value import',
+          code: dedent`
+            import { type assert, expect } from 'vitest';
+            declare const flag: boolean;
+            expect(flag).toBe(false);
+          `,
+          output: dedent`
+            import { assert, expect } from 'vitest';
+            declare const flag: boolean;
+            assert.isFalse(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsFalseOverExpectFalse' }],
+        },
+        {
+          name: 'an assert from node:assert in scope is reported, not fixed',
+          code: dedent`
+            import assert from 'node:assert';
+            import { expect } from 'vitest';
+            declare const flag: boolean;
+            expect(flag).toBe(false);
+          `,
+          output: null,
+          errors: [{ messageId: 'preferAssertIsFalseOverExpectFalse' }],
+        },
+        {
+          name: 'an assert from node:assert beside the expect global',
+          code: dedent`
+            import assert from 'node:assert';
+            declare const flag: boolean;
+            expect(flag).toBe(false);
+          `,
+          output: null,
+          errors: [{ messageId: 'preferAssertIsFalseOverExpectFalse' }],
+        },
+        {
+          name: 'a local assert shadowing the global is reported, not fixed',
+          code: dedent`
+            declare const flag: boolean;
+            export const f = (assert: unknown): void => {
+              expect(flag).toBe(false);
+            };
+          `,
+          output: null,
+          errors: [{ messageId: 'preferAssertIsFalseOverExpectFalse' }],
+        },
+        {
+          name: 'no assert in scope beside an imported expect: the import gains it',
+          code: dedent`
+            import { expect } from 'vitest';
+            declare const flag: boolean;
+            expect(flag).toBe(false);
+          `,
+          output: dedent`
+            import { expect, assert } from 'vitest';
+            declare const flag: boolean;
+            assert.isFalse(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsFalseOverExpectFalse' }],
+        },
+        {
+          name: 'an aliased expect import gains assert, before a trailing comma',
+          code: dedent`
+            import { describe, expect as e, } from 'vitest';
+            declare const flag: boolean;
+            e(flag).toBe(false);
+          `,
+          output: dedent`
+            import { describe, expect as e, assert, } from 'vitest';
+            declare const flag: boolean;
+            assert.isFalse(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsFalseOverExpectFalse' }],
+        },
+        {
+          name: 'Vitest’s assert under an alias is written by its local name',
+          code: dedent`
+            import assert from 'node:assert';
+            import { assert as va, expect } from 'vitest';
+            declare const flag: boolean;
+            expect(flag).toBe(false);
+          `,
+          output: dedent`
+            import assert from 'node:assert';
+            import { assert as va, expect } from 'vitest';
+            declare const flag: boolean;
+            va.isFalse(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsFalseOverExpectFalse' }],
+        },
+        {
+          name: 'Vitest’s assert imported under its own name',
+          code: dedent`
+            import { assert, expect } from 'vitest';
+            declare const flag: boolean;
+            expect(flag).toBe(false);
+          `,
+          output: dedent`
+            import { assert, expect } from 'vitest';
+            declare const flag: boolean;
+            assert.isFalse(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsFalseOverExpectFalse' }],
+        },
+      ],
+    },
+  );
+
+  ruleTester.run(
+    'prefer-assert-is-over-expect-true',
+    preferAssertIsTrueOverExpectTrueRule,
+    {
+      valid: [
+        {
+          name: 'expect with no argument has nothing to assert on',
+          code: 'expect().toBe(true);',
+        },
+        {
+          name: 'expect with a spread argument',
+          code: dedent`
+            declare const flags: readonly [boolean];
+            expect(...flags).toBe(true);
+          `,
+        },
+        {
+          name: 'expect with more arguments than a value and a message',
+          code: dedent`
+            declare const flag: boolean;
+            expect(flag, 'a', 'b').toBe(true);
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'an assert from node:assert in scope is reported, not fixed',
+          code: dedent`
+            import assert from 'node:assert';
+            import { expect } from 'vitest';
+            declare const flag: boolean;
+            expect(flag).toBe(true);
+          `,
+          output: null,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+        {
+          name: 'a local assert shadowing the global is reported, not fixed',
+          code: dedent`
+            declare const flag: boolean;
+            export const f = (assert: unknown): void => {
+              expect(flag).toBe(true);
+            };
+          `,
+          output: null,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+        {
+          name: 'a namespace import of vitest reaches assert through it',
+          code: dedent`
+            import * as vt from 'vitest';
+            import { expect } from 'vitest';
+            declare const flag: boolean;
+            expect(flag).toBe(true);
+          `,
+          output: dedent`
+            import * as vt from 'vitest';
+            import { expect } from 'vitest';
+            declare const flag: boolean;
+            vt.assert.isTrue(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+        {
+          name: 'a type-only assert import becomes a value import',
+          code: dedent`
+            import { type assert, expect } from 'vitest';
+            declare const flag: boolean;
+            expect(flag).toBe(true);
+          `,
+          output: dedent`
+            import { assert, expect } from 'vitest';
+            declare const flag: boolean;
+            assert.isTrue(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+        {
+          name: 'a namespace import of vitest reaches assert past a shadowing local',
+          code: dedent`
+            import * as vt from 'vitest';
+            declare const flag: boolean;
+            export const f = (assert: unknown): void => {
+              expect(flag).toBe(true);
+            };
+          `,
+          output: dedent`
+            import * as vt from 'vitest';
+            declare const flag: boolean;
+            export const f = (assert: unknown): void => {
+              vt.assert.isTrue(flag);
+            };
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+        {
+          name: 'a type named assert does not shadow the global',
+          code: dedent`
+            type assert = number;
+            declare const flag: boolean;
+            expect(flag).toBe(true);
+          `,
+          output: dedent`
+            type assert = number;
+            declare const flag: boolean;
+            assert.isTrue(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+        {
+          name: 'the message argument of expect is kept',
+          code: dedent`
+            declare const flag: boolean;
+            expect(flag, 'flag is set').toBe(true);
+          `,
+          output: dedent`
+            declare const flag: boolean;
+            assert.isTrue(flag, 'flag is set');
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+        {
+          name: 'a wrapped, aliased expect import gains assert',
+          code: dedent`
+            import { expect as e } from 'vitest';
+            declare const flag: boolean;
+            (e as typeof e)(flag).toBe(true);
+          `,
+          output: dedent`
+            import { expect as e, assert } from 'vitest';
+            declare const flag: boolean;
+            assert.isTrue(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+        {
+          name: 'no assert in scope beside an imported expect: the import gains it',
+          code: dedent`
+            import { expect } from 'vitest';
+            declare const flag: boolean;
+            expect(flag).toBe(true);
+          `,
+          output: dedent`
+            import { expect, assert } from 'vitest';
+            declare const flag: boolean;
+            assert.isTrue(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+        {
+          name: 'Vitest’s assert under an alias is written by its local name',
+          code: dedent`
+            import { assert as va, expect } from 'vitest';
+            declare const flag: boolean;
+            expect(flag).toBe(true);
+          `,
+          output: dedent`
+            import { assert as va, expect } from 'vitest';
+            declare const flag: boolean;
+            va.isTrue(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+      ],
+    },
+  );
+});

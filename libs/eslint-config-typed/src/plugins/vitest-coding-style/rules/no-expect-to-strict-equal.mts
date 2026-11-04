@@ -5,6 +5,10 @@ import {
 } from '@typescript-eslint/utils';
 import { getArgumentText, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
+import {
+  createVitestAssertFixer,
+  getVitestReceiver,
+} from './vitest-binding.mjs';
 
 type MessageIds = 'useAssert';
 
@@ -32,7 +36,9 @@ type CallExpressionWithLegacyTypeParameters = TSESTree.CallExpression &
  * recovered by adding a second assertion.
  *
  * The calls and the `expect` function are read through `as`, `satisfies`, `!`
- * and `<T>` (`expect(X)!.toStrictEqual(Y)`); `X` and `Y` keep theirs.
+ * and `<T>` (`expect(X)!.toStrictEqual(Y)`); `X` and `Y` keep theirs. `expect`
+ * is Vitest's only (`getVitestReceiver`), and the fix names Vitest's `assert`
+ * only (`createVitestAssertFixer`).
  */
 export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
   meta: {
@@ -45,12 +51,14 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
     schema: [],
     messages: {
       useAssert:
-        'Use `assert.deepStrictEqual(X, Y)` instead of `expect(X).toStrictEqual(Y)`.',
+        "Use Vitest's `assert.deepStrictEqual(X, Y)` instead of `expect(X).toStrictEqual(Y)`.",
     },
     defaultOptions: [],
   },
   create: (context) => {
     const sourceCode = context.sourceCode;
+
+    const vitestAssertFix = createVitestAssertFixer(sourceCode);
 
     return {
       CallExpression: (node) => {
@@ -62,7 +70,17 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
 
         const expectCall = skipTypeWrappers(callee.object);
 
-        if (!isExpectCall(expectCall)) {
+        if (expectCall.type !== AST_NODE_TYPES.CallExpression) {
+          return;
+        }
+
+        const expectReceiver = getVitestReceiver(
+          sourceCode,
+          expectCall.callee,
+          'expect',
+        );
+
+        if (expectReceiver === undefined) {
           return;
         }
 
@@ -93,11 +111,12 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
         context.report({
           node,
           messageId: 'useAssert',
-          fix: (fixer) =>
-            fixer.replaceText(
-              node,
-              `assert.deepStrictEqual(${actualText}, ${expectedWithCast})`,
-            ),
+          fix: vitestAssertFix(
+            node,
+            expectReceiver,
+            (assertName) =>
+              `${assertName}.deepStrictEqual(${actualText}, ${expectedWithCast})`,
+          ),
         });
       },
     };
@@ -114,19 +133,6 @@ const isToStrictEqualMember = (
   !callee.computed &&
   callee.property.type === AST_NODE_TYPES.Identifier &&
   callee.property.name === 'toStrictEqual';
-
-const isExpectCall = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Expression,
-): node is TSESTree.CallExpression => {
-  if (node.type !== AST_NODE_TYPES.CallExpression) {
-    return false;
-  }
-
-  const callee = skipTypeWrappers(node.callee);
-
-  return callee.type === AST_NODE_TYPES.Identifier && callee.name === 'expect';
-};
 
 const getModernTypeArguments = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
