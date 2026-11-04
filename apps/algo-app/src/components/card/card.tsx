@@ -1,4 +1,9 @@
-import { createBooleanState, type InitializedObservable } from 'synstate';
+import {
+  combine,
+  createBooleanState,
+  map,
+  type InitializedObservable,
+} from 'synstate';
 import {
   constant,
   derive,
@@ -13,6 +18,7 @@ import {
   darkGray,
   eyeIconColorDef,
   lightGray,
+  placeholderCardColor,
   type CardTextColor,
 } from '../../constants/index.mjs';
 import { fillCardSize, flipColor } from '../../functions/index.mjs';
@@ -25,6 +31,11 @@ import { EyeIcon } from './eye-icon.js';
 type Props = Readonly<{
   card: InitializedObservable<CardDisplay>;
   size: Bindable<Partial<RectSize>>;
+  /**
+   * Drawn as a blank placeholder that answers no click, as every card is before
+   * the game starts.
+   */
+  hidden?: InitializedObservable<boolean>;
   onClick?: () => void;
   /**
    * Reports where the card is after every value of `measureOn`, the current one
@@ -39,6 +50,7 @@ type Props = Readonly<{
 export const CardComponent = ({
   card,
   size,
+  hidden,
   onClick,
   rectReport,
 }: Props): JSX.Element => {
@@ -49,7 +61,25 @@ export const CardComponent = ({
 
   const color = mapBindable(card, (c) => c.color);
 
-  const textColor = mapBindable(card, (c): CardTextColor =>
+  // A placeholder shows neither face nor outline, and does not float.
+  const shown: InitializedObservable<CardDisplay> =
+    hidden === undefined
+      ? card
+      : combine([card, hidden]).pipe(
+          map(([c, isHidden]) =>
+            isHidden
+              ? ({
+                  ...c,
+                  visibilityFromMe: 'faceDown',
+                  float: 'never',
+                  showOutline: 'never',
+                  isClickable: false,
+                } as const)
+              : c,
+          ),
+        );
+
+  const textColor = mapBindable(shown, (c): CardTextColor =>
     c.visibilityFromMe === 'faceDownButVisibleToMe'
       ? c.color === 'black'
         ? darkGray
@@ -57,12 +87,12 @@ export const CardComponent = ({
       : flipColor(c.color),
   );
 
-  const eyeIconColor = mapBindable(card, (c) =>
+  const eyeIconColor = mapBindable(shown, (c) =>
     c.color === 'black' ? eyeIconColorDef.light : eyeIconColorDef.dark,
   );
 
   const showOutline = derive(
-    [card, isMouseOver],
+    [shown, isMouseOver],
     (c, over) =>
       c.showOutline === 'always' || (c.showOutline === 'onHover' && over),
   );
@@ -72,11 +102,16 @@ export const CardComponent = ({
 
   // Shared by both sides' rectangles.
   const rectStyle = {
-    stroke: derive([card, showOutline], (c, show) =>
+    stroke: derive([shown, showOutline], (c, show) =>
       show ? c.outlineColor : undefined,
     ),
     'stroke-width': mapBindable(showOutline, (show) => (show ? '8px' : '0px')),
-    fill: color,
+    fill:
+      hidden === undefined
+        ? color
+        : derive([color, hidden], (c, isHidden) =>
+            isHidden ? placeholderCardColor : c,
+          ),
   } as const;
 
   const outerRef =
@@ -93,9 +128,9 @@ export const CardComponent = ({
       <div
         class={constant(styles.wrapper)}
         style={{
-          cursor: view(card, (c) => (c.isClickable ? 'pointer' : 'default')),
+          cursor: view(shown, (c) => (c.isClickable ? 'pointer' : 'default')),
           transform: derive(
-            [card, isMouseOver],
+            [shown, isMouseOver],
             (c, over) =>
               `translateY(${
                 c.float === 'always' || (over && c.float === 'onHover')
@@ -107,7 +142,7 @@ export const CardComponent = ({
           width: mapBindable(cardSize, (s) => `${s.width}px`),
         }}
         onClick={() => {
-          if (card.getSnapshot().value.isClickable) {
+          if (shown.getSnapshot().value.isClickable) {
             onClick?.();
           }
         }}
@@ -116,18 +151,18 @@ export const CardComponent = ({
       >
         <CardSide
           color={color}
-          number={view(card, (c) =>
+          number={view(shown, (c) =>
             c.visibilityFromMe === 'faceDownButVisibleToMe'
               ? c.number
               : undefined,
           )}
           rectStyle={rectStyle}
           textColor={textColor}
-          turnedAway={view(card, (c) => c.visibilityFromMe === 'faceUp')}
+          turnedAway={view(shown, (c) => c.visibilityFromMe === 'faceUp')}
         >
           <If
             cond={view(
-              card,
+              shown,
               (c) =>
                 c.visibilityFromMe === 'faceDownButVisibleToCounter' ||
                 c.visibilityFromMe === 'faceDownButVisibleToMe',
@@ -137,12 +172,12 @@ export const CardComponent = ({
         </CardSide>
         <CardSide
           color={color}
-          number={view(card, (c) =>
+          number={view(shown, (c) =>
             c.visibilityFromMe === 'faceUp' ? c.number : undefined,
           )}
           rectStyle={rectStyle}
           textColor={textColor}
-          turnedAway={view(card, (c) => c.visibilityFromMe !== 'faceUp')}
+          turnedAway={view(shown, (c) => c.visibilityFromMe !== 'faceUp')}
         />
       </div>
     </div>

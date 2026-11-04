@@ -11,13 +11,17 @@ export const routes = defineRoutes({
     search: {
       id: search.string(),
       'player-id': search.string(),
+      // Present (with any value) in a development build, it deals a fixed hand
+      // and plays a scripted game: see `startAutoPlay`.
+      test: search.string(),
     },
   },
 });
 
 /**
- * The page of the room `roomId`: where a player joins it, or, with `playerId`,
- * the game as that player.
+ * The page of the room `roomId`: where a player joins it, or, with `playerId`
+ * (the id of the player's document in the room's `players`), the game as that
+ * player.
  */
 export const roomPage = (roomId: string, playerId?: string): Href =>
   routes.rooms.href({ search: { id: roomId, 'player-id': playerId } });

@@ -1,11 +1,12 @@
 import { Timestamp } from 'firebase/firestore';
 import { createState, source } from 'synstate';
 import { newRoom } from '../functions/index.mjs';
-import type {
-  Card,
-  GameStateActionFromDb,
-  GameStateActionToWrite,
-  Room,
+import {
+  toShuffleDef,
+  type Card,
+  type GameStateActionFromDb,
+  type GameStateActionToWrite,
+  type Room,
 } from '../types/index.mjs';
 import {
   createGameStateStore,
@@ -107,14 +108,12 @@ describe(createGameStateStore, () => {
 
     store.onTossCancel();
 
-    // Another player joining changes `players`. Written again, the action would
-    // reach every client twice, and a second `selectMyCard` unselects.
+    // The seats shuffled is a new snapshot of the room. Written again, the
+    // action would reach every client twice, and a second `selectMyCard`
+    // unselects.
     setRoom({
       ...roomWithId('a'),
-      players: [
-        { name: 'alice', online: true },
-        { name: 'bob', online: true },
-      ],
+      shuffleDef: toShuffleDef('1023'),
     });
 
     assert.deepStrictEqual(writtenTypes(written), [['a', 'cancelToss']]);
@@ -164,7 +163,7 @@ describe(createGameStateStore, () => {
 
     assert.deepStrictEqual(
       timers.map(([delayMs]) => delayMs),
-      [500, 2000],
+      [1000, 4000],
     );
 
     for (const [, run] of timers) {
@@ -277,6 +276,6 @@ const writtenTypes = (
 
 const roomWithId = (id: string): Room =>
   ({
-    ...newRoom(undefined, { name: 'alice', online: true }),
+    ...newRoom(undefined),
     id,
   }) as const;

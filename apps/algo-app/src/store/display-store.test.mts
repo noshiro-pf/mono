@@ -1,30 +1,83 @@
+import { Timestamp } from 'firebase/firestore';
 import { createState } from 'synstate';
 import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 import type { Rect } from 'ts-utils-additional';
 import { newRoom } from '../functions/index.mjs';
 import { initialGameState } from '../state/index.mjs';
-import type {
-  Card,
-  CardColor,
-  GameState,
-  NWES,
-  Room,
+import {
+  toShuffleDef,
+  type Card,
+  type CardColor,
+  type GameState,
+  type NWES,
+  type PlayerWithId,
+  type Room,
 } from '../types/index.mjs';
 import { createDisplayStore, type DisplayStore } from './display-store.mjs';
 
 describe(createDisplayStore, () => {
-  test('finds this player in the room by name', () => {
-    const { store, setRoom, setMyName } = setup();
+  test('finds the seat of this player by id', () => {
+    const { store, setRoom, setPlayers, setMyPlayerId } = setup();
 
     assert.isUndefined(store.myPlayerIndex.getSnapshot().value);
 
-    setRoom(roomWith(['alice', 'bob']));
+    setRoom(roomWith('0123'));
+
+    setPlayers(playersNamed(['alice', 'bob']));
 
     assert.isUndefined(store.myPlayerIndex.getSnapshot().value);
 
-    setMyName('bob');
+    setMyPlayerId('bob');
 
     assert.strictEqual(store.myPlayerIndex.getSnapshot().value, 1);
+  });
+
+  test('seats the players as the room shuffles them', () => {
+    const { store, setRoom, setPlayers, setMyPlayerId } = setup();
+
+    setPlayers(playersNamed(['alice', 'bob', 'carol', 'dave']));
+
+    setMyPlayerId('alice');
+
+    setRoom(roomWith('3102'));
+
+    assert.strictEqual(store.myPlayerIndex.getSnapshot().value, 2);
+
+    assert.deepStrictEqual(
+      store.displayValues.getSnapshot().value.playerNames,
+      { S: 'alice', W: 'carol', N: 'dave', E: 'bob' },
+    );
+  });
+
+  test('hides the cards and waits for four players before the game starts', () => {
+    const { store, setRoom, setPlayers } = setup();
+
+    setRoom(roomWith('0123'));
+
+    setPlayers(playersNamed(['alice', 'bob', 'carol']));
+
+    assert.isTrue(store.displayValues.getSnapshot().value.cardsAreHidden);
+
+    assert.strictEqual(
+      store.displayValues.getSnapshot().value.startGameButtonState,
+      'disabled',
+    );
+
+    setPlayers(playersNamed(['alice', 'bob', 'carol', 'dave']));
+
+    assert.strictEqual(
+      store.displayValues.getSnapshot().value.startGameButtonState,
+      'shown',
+    );
+
+    setRoom({ ...roomWith('0123'), state: 'playing' });
+
+    assert.isFalse(store.displayValues.getSnapshot().value.cardsAreHidden);
+
+    assert.strictEqual(
+      store.displayValues.getSnapshot().value.startGameButtonState,
+      'hidden',
+    );
   });
 
   test('highlights the name of the player whose turn it is, once the names are placed', () => {
@@ -43,8 +96,15 @@ describe(createDisplayStore, () => {
   });
 
   test('opens the toss balloon at the chosen card only on this player’s turn', () => {
-    const { store, setRoom, setMyName, setGameState, setCardPositions, calls } =
-      setup();
+    const {
+      store,
+      setRoom,
+      setPlayers,
+      setMyPlayerId,
+      setGameState,
+      setCardPositions,
+      calls,
+    } = setup();
 
     const positions = cardPositions();
 
@@ -57,13 +117,15 @@ describe(createDisplayStore, () => {
       cardChosenToToss: black6,
     });
 
-    setRoom(roomWith(['alice', 'bob']));
+    setRoom(roomWith('0123'));
 
-    setMyName('alice');
+    setPlayers(playersNamed(['alice', 'bob']));
+
+    setMyPlayerId('alice');
 
     assert.isUndefined(store.confirmTossBalloonProps.getSnapshot().value);
 
-    setMyName('bob');
+    setMyPlayerId('bob');
 
     const props = store.confirmTossBalloonProps.getSnapshot().value;
 
@@ -81,7 +143,7 @@ describe(createDisplayStore, () => {
   });
 
   test('draws no balloon before the cards are placed', () => {
-    const { store, setRoom, setMyName, setGameState } = setup();
+    const { store, setRoom, setPlayers, setMyPlayerId, setGameState } = setup();
 
     setGameState({
       ...initialGameState,
@@ -90,9 +152,11 @@ describe(createDisplayStore, () => {
       cardChosenToToss: black6,
     });
 
-    setRoom(roomWith(['alice']));
+    setRoom(roomWith('0123'));
 
-    setMyName('alice');
+    setPlayers(playersNamed(['alice']));
+
+    setMyPlayerId('alice');
 
     assert.isUndefined(store.confirmTossBalloonProps.getSnapshot().value);
 
@@ -107,7 +171,8 @@ type CardPositions = ReadonlyRecord<CardColor, FixedLengthTuple<12, Rect>>;
 type Setup = Readonly<{
   store: DisplayStore;
   setRoom: (room: Room | undefined) => void;
-  setMyName: (playerName: string | undefined) => void;
+  setPlayers: (players: readonly PlayerWithId[]) => void;
+  setMyPlayerId: (playerId: string | undefined) => void;
   setGameState: (gameState: GameState) => void;
   setCardPositions: (positions: CardPositions) => void;
   setPlayerNamePositions: (positions: ReadonlyRecord<NWES, Rect>) => void;
@@ -118,7 +183,11 @@ type Setup = Readonly<{
 const setup = (): Setup => {
   const [room, setRoom] = createState<Room | undefined>(undefined);
 
-  const [myName, setMyName] = createState<string | undefined>(undefined);
+  const [players, setPlayers] = createState<readonly PlayerWithId[]>([]);
+
+  const [myPlayerId, setMyPlayerId] = createState<string | undefined>(
+    undefined,
+  );
 
   const [gameState, setGameState] = createState<GameState>(initialGameState);
 
@@ -138,7 +207,8 @@ const setup = (): Setup => {
 
   const store = createDisplayStore({
     room,
-    myName,
+    players,
+    myPlayerId,
     gameState,
     onCardClick: record('onCardClick'),
     onTossCancel: record('onTossCancel'),
@@ -153,7 +223,8 @@ const setup = (): Setup => {
   return {
     store,
     setRoom,
-    setMyName,
+    setPlayers,
+    setMyPlayerId,
     setGameState,
     setCardPositions,
     setPlayerNamePositions,
@@ -163,12 +234,24 @@ const setup = (): Setup => {
 
 const black6: Card = { color: 'black', number: 6 } as const;
 
-const roomWith = (names: readonly string[]): Room =>
+const roomWith = (shuffleDef: string): Room =>
   ({
-    ...newRoom(undefined, { name: 'host', online: true }),
+    ...newRoom(undefined),
     id: 'a',
-    players: names.map((playerName) => ({ name: playerName, online: true })),
+    shuffleDef: toShuffleDef(shuffleDef),
   }) as const;
+
+/** Players who joined in this order, each with their name as their id. */
+const playersNamed = (names: readonly string[]): readonly PlayerWithId[] =>
+  names.map(
+    (name) =>
+      ({
+        id: name,
+        name,
+        online: true,
+        createdAt: Timestamp.fromMillis(0),
+      }) as const,
+  );
 
 const rect = (x: number, y: number): Rect =>
   ({

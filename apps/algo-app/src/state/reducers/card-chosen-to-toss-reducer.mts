@@ -18,6 +18,7 @@ export const cardChosenToTossReducer: Reducer<
       return curr;
     case 'cancelToss':
     case 'submitToss':
+    case 'initializePlayerCards':
     case 'goToNextTurn':
       return undefined;
   }

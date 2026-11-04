@@ -41,11 +41,11 @@ export const Root = (): JSX.Element => {
   // not from inside it.
   const afterUpdate = createAfterUpdate();
 
-  // The creator is already a player of the room, by the name they gave, so they
-  // open it as that player rather than on its join form.
-  subscribeInScope(roomStore.createRoom.response, ({ room, myName }) => {
+  // The creator is already the room's first player, so they open it as that
+  // player rather than on its join form.
+  subscribeInScope(roomStore.createRoom.response, ({ room, myPlayerId }) => {
     afterUpdate(() => {
-      router.push(roomPage(room.id, myName));
+      router.push(roomPage(room.id, myPlayerId));
     });
   });
 

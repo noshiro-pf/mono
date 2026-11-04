@@ -18,6 +18,7 @@ export const answerSelectedReducer: Reducer<
       return curr;
     case 'hideDecidedAnswerBalloon':
     case 'cancelAnswer':
+    case 'initializePlayerCards':
     case 'goToNextTurn':
       return undefined;
   }

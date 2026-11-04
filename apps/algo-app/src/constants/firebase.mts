@@ -7,3 +7,12 @@ export const firebaseConfig = {
   appId: '1:380574368956:web:706cfd949d32109d4a7cb9',
   measurementId: 'G-QWBD5Y044Q',
 } as const;
+
+/**
+ * Where `pnpm run emulators` serves Firestore: `emulators.firestore` of
+ * `firebase.json`, which a development build connects to.
+ */
+export const firestoreEmulator = {
+  host: 'localhost',
+  port: 8081,
+} as const;

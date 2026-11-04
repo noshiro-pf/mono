@@ -19,7 +19,8 @@ type Props = Readonly<{
   cardSize: InitializedObservable<RectSize>;
   rotate: 0 | 90 | 180 | 270;
   cards: Bindable<readonly CardWithDisplayValue[]>;
-  paddingPx: number;
+  paddingPx: InitializedObservable<number>;
+  cardsAreHidden: InitializedObservable<boolean>;
   /** When to measure the cards again: whatever may have moved them. */
   measureOn: InitializedObservable<unknown>;
   cardPositionsDispatcher: (
@@ -33,6 +34,7 @@ export const PlayerCardsArea = ({
   cardSize,
   cards,
   paddingPx,
+  cardsAreHidden,
   measureOn,
   cardPositionsDispatcher,
 }: Props): JSX.Element => {
@@ -45,7 +47,7 @@ export const PlayerCardsArea = ({
       <div
         class={constant(styles.rotate)}
         style={{
-          padding: constant(`${paddingPx}px`),
+          padding: view(paddingPx, (p) => `${p}px`),
           transform: constant(`rotate(${rotate}deg)`),
           width: view(areaSize, (s) => `${s.width}px`),
           height: view(areaSize, (s) => `${s.height}px`),
@@ -71,6 +73,7 @@ export const PlayerCardsArea = ({
                   cardPositionsDispatcher([c.color, c.number, rect]);
                 },
               }}
+              hidden={cardsAreHidden}
               size={cardSize}
               onClick={() => {
                 card$.getSnapshot().value.onClick();

@@ -23,11 +23,7 @@ type Props = Readonly<{
   ) => void;
 }>;
 
-const paddingPx = 5;
-
 const sidesWidth = playerNameRectSize.height;
-
-const containerPaddingPx = 7;
 
 /**
  * ```txt
@@ -85,6 +81,10 @@ export const Table = ({
 }: Props): JSX.Element => {
   const sizes = tableSize.pipe(map(sizesOf));
 
+  const paddingPx = sizes.pipe(map((s) => s.paddingPx));
+
+  const cardsAreHidden = displayValues.pipe(map((v) => v.cardsAreHidden));
+
   const areaSize = sizes.pipe(map((s) => s.areaSize));
 
   const cardSize = sizes.pipe(map((s) => s.cardSize));
@@ -103,7 +103,7 @@ export const Table = ({
         height: view(tableSize, (s) => `${s.height}px`),
         'grid-template-rows': view(areaSize, gridTrackSizes),
         'grid-template-columns': view(areaSize, gridTrackSizes),
-        padding: constant(`${containerPaddingPx}px`),
+        padding: view(sizes, (s) => `${s.containerPaddingPx}px`),
       }}
     >
       {seats.map(({ direction, rotate }) => (
@@ -113,6 +113,7 @@ export const Table = ({
             cardPositionsDispatcher={cardPositionsDispatcher}
             cardSize={cardSize}
             cards={view(displayValues, (v) => v.playerCards[direction])}
+            cardsAreHidden={cardsAreHidden}
             paddingPx={paddingPx}
             measureOn={measureOn}
             rotate={rotate}
@@ -124,7 +125,9 @@ export const Table = ({
           <PlayerName
             isInTurn={view(displayValues, (v) => v.turnPlayer === direction)}
             measureOn={measureOn}
-            playerName={`Player ${direction}`}
+            playerName={displayValues.pipe(
+              map((v) => v.playerNames[direction]),
+            )}
             rotate={rotate}
             onBoundingClientRectChange={(rect) => {
               playerNamePositionsDispatcher([direction, rect]);
@@ -146,12 +149,19 @@ const seats = [
   rotate: 0 | 90 | 180 | 270;
 }>[];
 
+/** The paddings grow with the table, so that the cards keep their share of it. */
 const sizesOf = (
   tableSize: RectSize,
 ): Readonly<{
   areaSize: RectSize;
   cardSize: RectSize;
+  paddingPx: number;
+  containerPaddingPx: number;
 }> => {
+  const paddingPx = Math.round(tableSize.width / 500);
+
+  const containerPaddingPx = Math.round(tableSize.width / 100);
+
   const innerRectWidth =
     tableSize.width - 2 * (sidesWidth + containerPaddingPx); /* px */
 
@@ -171,6 +181,8 @@ const sizesOf = (
   return {
     areaSize: { width: areaWidth, height: areaHeight },
     cardSize: { width: w, height: h },
+    paddingPx,
+    containerPaddingPx,
   };
 };
 

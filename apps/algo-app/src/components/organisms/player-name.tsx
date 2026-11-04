@@ -1,6 +1,12 @@
 import type { InitializedObservable } from 'synstate';
-import { constant, type Bindable, type JSX } from 'synstate-dom';
-import type { ReadonlyRecord } from 'ts-type-forge';
+import {
+  constant,
+  MatchOptional,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { Rect } from 'ts-utils-additional';
 import {
   playerNameRectPadding,
@@ -10,7 +16,8 @@ import { reportRectOn } from '../report-rect-on.mjs';
 import * as styles from './player-name.module.css';
 
 type Props = Readonly<{
-  playerName: string;
+  /** `undefined` while nobody sits here: drawn as dots, waiting for them. */
+  playerName: InitializedObservable<string | undefined>;
   rotate: 0 | 90 | 180 | 270;
   isInTurn: Bindable<boolean>;
   /** When to measure the name again: whatever may have moved it. */
@@ -27,51 +34,37 @@ export const PlayerName = ({
 }: Props): JSX.Element => {
   const ref = reportRectOn(measureOn, onBoundingClientRectChange);
 
+  // The name is laid out unturned, and the whole highlighter turned with the
+  // seat, so that every seat reads its name the same way up.
   return (
     <div class={constant(styles.wrapper)}>
-      <div class={{ [styles.inTurn]: isInTurn }}>
+      <div
+        class={{
+          [styles.highlighter]: constant(true),
+          [styles.inTurn]: isInTurn,
+        }}
+        style={{ transform: constant(`rotate(${rotate}deg)`) }}
+      >
         <div ref={ref}>
-          <div class={constant(styles.name)} style={rotateStyleOf(rotate)}>
-            {constant(playerName)}
+          <div
+            class={constant(styles.name)}
+            style={{
+              width: constant(
+                `${playerNameRectSize.width - 2 * playerNameRectPadding}px`,
+              ),
+              height: constant(
+                `${playerNameRectSize.height - 2 * playerNameRectPadding}px`,
+              ),
+            }}
+          >
+            <MatchOptional
+              none={<div class={constant(styles.loadingDots)} />}
+              some={(name) => <span>{name}</span>}
+              value={view(playerName, Optional.fromNullable)}
+            />
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-/**
- * Only 0 and 90 were ever handled; the other two are drawn as they are, as they
- * always were.
- */
-const rotateStyleOf = (
-  rotate: 0 | 90 | 180 | 270,
-): ReadonlyRecord<string, Bindable<string>> => {
-  switch (rotate) {
-    case 0:
-      return {
-        width: constant(
-          `${playerNameRectSize.width - 2 * playerNameRectPadding}px`,
-        ),
-        height: constant(
-          `${playerNameRectSize.height - 2 * playerNameRectPadding}px`,
-        ),
-      };
-
-    case 90:
-      return {
-        'text-orientation': constant('sideways'),
-        transform: constant('rotate(180deg)'),
-        width: constant(
-          `${playerNameRectSize.height - 2 * playerNameRectPadding}px`,
-        ),
-        height: constant(
-          `${playerNameRectSize.width - 2 * playerNameRectPadding}px`,
-        ),
-      };
-
-    case 180:
-    case 270:
-      return {};
-  }
 };

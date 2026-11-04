@@ -1,38 +1,40 @@
 import type { GameState } from '../types/index.mjs';
 
 export const initialGameState: GameState = {
+  // What the table draws before the game starts, when every card is a blank
+  // placeholder anyway: the deal is played in as `initializePlayerCards`.
   playerCards: [
     [
       { color: 'black', number: 0, visibleTo: 'self' },
       { color: 'black', number: 1, visibleTo: 'self' },
-      { color: 'white', number: 2, visibleTo: 'self' },
-      { color: 'black', number: 4, visibleTo: 'pair' },
+      { color: 'black', number: 2, visibleTo: 'self' },
+      { color: 'black', number: 3, visibleTo: 'self' },
+      { color: 'black', number: 4, visibleTo: 'self' },
       { color: 'black', number: 5, visibleTo: 'self' },
-      { color: 'white', number: 9, visibleTo: 'self' },
     ],
     [
-      { color: 'white', number: 5, visibleTo: 'everyone' },
       { color: 'black', number: 6, visibleTo: 'self' },
-      { color: 'white', number: 7, visibleTo: 'self' },
-      { color: 'black', number: 9, visibleTo: 'pair' },
+      { color: 'black', number: 7, visibleTo: 'self' },
+      { color: 'black', number: 8, visibleTo: 'self' },
+      { color: 'black', number: 9, visibleTo: 'self' },
       { color: 'black', number: 10, visibleTo: 'self' },
-      { color: 'white', number: 10, visibleTo: 'everyone' },
+      { color: 'black', number: 11, visibleTo: 'self' },
     ],
     [
       { color: 'white', number: 0, visibleTo: 'self' },
       { color: 'white', number: 1, visibleTo: 'self' },
-      { color: 'black', number: 2, visibleTo: 'self' },
-      { color: 'white', number: 4, visibleTo: 'pair' },
-      { color: 'black', number: 8, visibleTo: 'self' },
-      { color: 'white', number: 11, visibleTo: 'self' },
+      { color: 'white', number: 2, visibleTo: 'self' },
+      { color: 'white', number: 3, visibleTo: 'self' },
+      { color: 'white', number: 4, visibleTo: 'self' },
+      { color: 'white', number: 5, visibleTo: 'self' },
     ],
     [
-      { color: 'black', number: 3, visibleTo: 'everyone' },
-      { color: 'white', number: 3, visibleTo: 'self' },
-      { color: 'white', number: 6, visibleTo: 'pair' },
-      { color: 'black', number: 7, visibleTo: 'self' },
+      { color: 'white', number: 6, visibleTo: 'self' },
+      { color: 'white', number: 7, visibleTo: 'self' },
       { color: 'white', number: 8, visibleTo: 'self' },
-      { color: 'black', number: 11, visibleTo: 'everyone' },
+      { color: 'white', number: 9, visibleTo: 'self' },
+      { color: 'white', number: 10, visibleTo: 'self' },
+      { color: 'white', number: 11, visibleTo: 'self' },
     ],
   ],
 

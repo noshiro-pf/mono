@@ -42,14 +42,14 @@ export const newShuffleDef = (): ShuffleDef =>
     .map((list) => list.join(''))
     .map(toShuffleDef).value;
 
-export const newRoom = (
-  password: Room['password'],
-  player: Room['players'][0],
-): StrictOmit<Room, 'id'> =>
+/**
+ * A room nobody is in yet: its players are added to its `players` subcollection
+ * once it has an id, its creator first.
+ */
+export const newRoom = (password: Room['password']): StrictOmit<Room, 'id'> =>
   ({
     state: 'not-started',
     password,
-    players: [player],
     playerCards: randomizePlayerCards(),
     shuffleDef: newShuffleDef(),
   }) as const;

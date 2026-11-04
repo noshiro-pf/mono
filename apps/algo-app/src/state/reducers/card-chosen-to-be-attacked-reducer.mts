@@ -18,6 +18,7 @@ export const cardChosenToBeAttackedReducer: Reducer<
       return curr;
     case 'cancelAnswer':
     case 'hideDecidedAnswerBalloon':
+    case 'initializePlayerCards':
     case 'goToNextTurn':
       return undefined;
   }

@@ -17,6 +17,7 @@ export const decidedAnswerBalloonIsOpenReducer: Reducer<
     case 'selectMyCard':
     case 'hideDecidedAnswerBalloon':
     case 'cancelAnswer':
+    case 'initializePlayerCards':
     case 'goToNextTurn':
       return false;
   }

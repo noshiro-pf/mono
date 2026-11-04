@@ -8,6 +8,7 @@ import {
 import {
   cardEq,
   decrementPlayerIndex,
+  getShuffledPlayers,
   incrementPlayerIndex,
   sortCards,
 } from '../functions/index.mjs';
@@ -19,15 +20,25 @@ import type {
   GameState,
   NWES,
   PlayerIndex,
+  PlayerWithId,
+  RoomState,
+  ShuffleDef,
   VisibilityFromMe,
 } from '../types/index.mjs';
 
 export const mapToDisplayValue = ({
+  roomState,
   gameState,
+  shuffleDef,
+  players,
   myPlayerIndex,
   onCardClick,
 }: Readonly<{
+  roomState: RoomState;
   gameState: GameState;
+  shuffleDef: ShuffleDef;
+  /** In the order they joined; `shuffleDef` seats them. */
+  players: readonly PlayerWithId[];
   myPlayerIndex: PlayerIndex;
   onCardClick: (card: Card, playerDirectionFromMe: NWES) => void;
 }>): DisplayValues =>
@@ -35,6 +46,7 @@ export const mapToDisplayValue = ({
     playerCards: {
       S: mapPlayers6CardsToDisplayValue({
         direction: 'S',
+        roomState,
         player6Cards: gameState.playerCards[myPlayerIndex],
         gameState,
         myPlayerIndex,
@@ -42,6 +54,7 @@ export const mapToDisplayValue = ({
       }),
       W: mapPlayers6CardsToDisplayValue({
         direction: 'W',
+        roomState,
         player6Cards:
           gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 1)],
         gameState,
@@ -50,6 +63,7 @@ export const mapToDisplayValue = ({
       }),
       N: mapPlayers6CardsToDisplayValue({
         direction: 'N',
+        roomState,
         player6Cards:
           gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 2)],
         gameState,
@@ -58,6 +72,7 @@ export const mapToDisplayValue = ({
       }),
       E: mapPlayers6CardsToDisplayValue({
         direction: 'E',
+        roomState,
         player6Cards:
           gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 3)],
         gameState,
@@ -66,10 +81,19 @@ export const mapToDisplayValue = ({
       }),
     },
 
-    gameMessage: match(gameState.phase, {
-      ph010_selectMyCardToToss: dictionary.gameMessage.selectYourCardToToss,
-      ph020_firstAnswer: dictionary.gameMessage.selectYourCardAndAttack,
-      ph030_continuousAnswer: dictionary.gameMessage.selectYourCardToAttack,
+    playerNames: playerNamesOf(players, shuffleDef, myPlayerIndex),
+
+    cardsAreHidden: roomState === 'not-started',
+
+    gameMessage: match(roomState, {
+      'not-started': dictionary.gameMessage.startGame,
+      // TODO: which team won
+      finished: dictionary.gameMessage.gameEnded.youWin,
+      playing: match(gameState.phase, {
+        ph010_selectMyCardToToss: dictionary.gameMessage.selectYourCardToToss,
+        ph020_firstAnswer: dictionary.gameMessage.selectYourCardAndAttack,
+        ph030_continuousAnswer: dictionary.gameMessage.selectYourCardToAttack,
+      }),
     }),
     // Every branch of the original `match` was the same expression with the
     // matched value substituted, so it collapses to one call. `match` also
@@ -79,19 +103,45 @@ export const mapToDisplayValue = ({
         decrementPlayerIndex(gameState.currentPlayerIndex, myPlayerIndex)
       ],
 
+    roomState,
+
+    startGameButtonState:
+      roomState !== 'not-started'
+        ? 'hidden'
+        : Arr.isFixedLengthArray(4, players)
+          ? 'shown'
+          : 'disabled',
+
     endTurnButtonDisabled:
       gameState.phase !== 'ph030_continuousAnswer' || gameState.readonly,
   }) as const;
 
+const playerNamesOf = (
+  players: readonly PlayerWithId[],
+  shuffleDef: ShuffleDef,
+  myPlayerIndex: PlayerIndex,
+): DisplayValues['playerNames'] => {
+  const seated = getShuffledPlayers(players, shuffleDef);
+
+  return {
+    S: seated[myPlayerIndex]?.name,
+    W: seated[incrementPlayerIndex(myPlayerIndex, 1)]?.name,
+    N: seated[incrementPlayerIndex(myPlayerIndex, 2)]?.name,
+    E: seated[incrementPlayerIndex(myPlayerIndex, 3)]?.name,
+  } as const;
+};
+
 const mapPlayers6CardsToDisplayValue = ({
   direction,
   player6Cards,
+  roomState,
   gameState,
   myPlayerIndex,
   onCardClick,
 }: Readonly<{
   direction: NWES;
   player6Cards: FixedLengthTuple<6, CardWithVisibility>;
+  roomState: RoomState;
   gameState: StrictPick<
     GameState,
     | 'cardChosenToAttack'
@@ -126,7 +176,9 @@ const mapPlayers6CardsToDisplayValue = ({
       everyone: 'faceUp',
     } as const);
 
+    // No card is played before the game starts or after it ends.
     const isClickable: boolean =
+      roomState === 'playing' &&
       !gameState.readonly &&
       myPlayerIndex === gameState.currentPlayerIndex &&
       match(direction, {

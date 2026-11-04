@@ -1,10 +1,14 @@
 // cspell:ignore FFFD
+import { Timestamp } from 'firebase/firestore';
 import { Result } from 'ts-data-forge';
 import type { StrictOmit } from 'ts-type-forge';
 import type { RoomApi } from '../api/index.mjs';
-import { roomPage } from '../constants/index.mjs';
 import { newRoom } from '../functions/index.mjs';
-import type { GameStateActionFromDb, Player, Room } from '../types/index.mjs';
+import type {
+  GameStateActionFromDb,
+  PlayerWithId,
+  Room,
+} from '../types/index.mjs';
 import {
   createRoomStore,
   type CreatedRoom,
@@ -19,13 +23,23 @@ describe(createRoomStore, () => {
 
     store.setRoomId('a');
 
-    assert.deepStrictEqual(api.watching(), ['room:a', 'actions:a']);
+    assert.deepStrictEqual(api.watching(), [
+      'room:a',
+      'players:a',
+      'actions:a',
+    ]);
 
     const roomA = roomWithId('a');
 
     api.emitRoom('a', roomA);
 
     assert.strictEqual(store.room.getSnapshot().value, roomA);
+
+    const players = [playerWithId('p1', 'alice')];
+
+    api.emitPlayers('a', players);
+
+    assert.strictEqual(store.players.getSnapshot().value, players);
 
     const mut_received: (readonly GameStateActionFromDb[])[] = [];
 
@@ -39,7 +53,11 @@ describe(createRoomStore, () => {
 
     store.setRoomId('b');
 
-    assert.deepStrictEqual(api.watching(), ['room:b', 'actions:b']);
+    assert.deepStrictEqual(api.watching(), [
+      'room:b',
+      'players:b',
+      'actions:b',
+    ]);
   });
 
   test('watches an id set before it started', () => {
@@ -51,7 +69,11 @@ describe(createRoomStore, () => {
 
     store.start();
 
-    assert.deepStrictEqual(api.watching(), ['room:a', 'actions:a']);
+    assert.deepStrictEqual(api.watching(), [
+      'room:a',
+      'players:a',
+      'actions:a',
+    ]);
   });
 
   test('stop ends the watches and listens to no further id', () => {
@@ -70,17 +92,17 @@ describe(createRoomStore, () => {
     assert.deepStrictEqual(api.watching(), []);
   });
 
-  test('setMyName names the player, as a page opened as that player does', () => {
+  test('setMyPlayerId says which player this page is, as a page opened as one does', () => {
     const { store } = setup();
 
-    assert.isUndefined(store.myName.getSnapshot().value);
+    assert.isUndefined(store.myPlayerId.getSnapshot().value);
 
-    store.setMyName('bob');
+    store.setMyPlayerId('p1');
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'bob');
+    assert.strictEqual(store.myPlayerId.getSnapshot().value, 'p1');
   });
 
-  test("createRoom saves a room with the player in it, and answers with it and the creator's name", async () => {
+  test('createRoom saves a room, adds its creator as its first player, and answers with both', async () => {
     const { store, api } = setup();
 
     const mut_responses: CreatedRoom[] = [];
@@ -102,11 +124,19 @@ describe(createRoomStore, () => {
 
     assert.strictEqual(added.room.password, 'secret');
 
-    assert.deepStrictEqual(added.room.players, [
-      { name: 'alice', online: true },
-    ]);
-
     added.resolve('new-id');
+
+    await flush();
+
+    const [host] = api.addedPlayers;
+
+    assert.isDefined(host);
+
+    assert.strictEqual(host.roomId, 'new-id');
+
+    assert.strictEqual(host.playerName, 'alice');
+
+    host.resolve('host-id');
 
     const result = await pending;
 
@@ -116,25 +146,21 @@ describe(createRoomStore, () => {
 
     assert.strictEqual(res.id, 'new-id');
 
-    // With the creator's name, so that they open the room as the player they
-    // already are, not on its join form.
-    assert.deepStrictEqual(mut_responses, [{ room: res, myName: 'alice' }]);
+    // With the creator's player id, so that they open the room as the player
+    // they already are, not on its join form.
+    assert.deepStrictEqual(mut_responses, [
+      { room: res, myPlayerId: 'host-id' },
+    ]);
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'alice');
+    assert.strictEqual(store.myPlayerId.getSnapshot().value, 'host-id');
 
     assert.isFalse(store.createRoom.isWaitingResponse.getSnapshot().value);
 
     assert.isFalse(store.createRoom.hasFailed.getSnapshot().value);
   });
 
-  test('createRoom names the creator in a form the room page URL can carry', async () => {
+  test('createRoom saves the name in a form UTF-8 can hold', async () => {
     const { store, api } = setup();
-
-    const mut_responses: CreatedRoom[] = [];
-
-    store.createRoom.response.subscribe((created) => {
-      mut_responses.push(created);
-    });
 
     // A lone surrogate, as half of a pasted emoji leaves.
     const pending = store.createRoom.dispatch({
@@ -142,30 +168,19 @@ describe(createRoomStore, () => {
       password: undefined,
     });
 
-    const [added] = api.addedRooms;
+    api.addedRooms[0]?.resolve('new-id');
 
-    assert.isDefined(added);
+    await flush();
 
-    assert.deepStrictEqual(added.room.players, [
-      { name: 'alice\u{FFFD}', online: true },
-    ]);
+    const [host] = api.addedPlayers;
 
-    added.resolve('new-id');
+    assert.isDefined(host);
+
+    assert.strictEqual(host.playerName, 'alice\u{FFFD}');
+
+    host.resolve('host-id');
 
     await pending;
-
-    assert.deepStrictEqual(
-      mut_responses.map((created) => created.myName),
-      ['alice\u{FFFD}'],
-    );
-
-    assert.strictEqual(store.myName.getSnapshot().value, 'alice\u{FFFD}');
-
-    // What Root opens, which throws on a name that is not well-formed.
-    assert.strictEqual(
-      roomPage('new-id', mut_responses[0]?.myName),
-      '/rooms/?id=new-id&player-id=alice%EF%BF%BD',
-    );
   });
 
   test('createRoom that fails stops waiting, says so, and can be tried again', async () => {
@@ -202,7 +217,7 @@ describe(createRoomStore, () => {
 
     assert.deepStrictEqual(mut_responses, []);
 
-    assert.isUndefined(store.myName.getSnapshot().value);
+    assert.isUndefined(store.myPlayerId.getSnapshot().value);
 
     const retried = store.createRoom.dispatch({
       username: 'alice',
@@ -213,21 +228,42 @@ describe(createRoomStore, () => {
 
     assert.isTrue(store.createRoom.isWaitingResponse.getSnapshot().value);
 
-    const retriedRoom = api.addedRooms[1];
+    api.addedRooms[1]?.resolve('new-id');
 
-    assert.isDefined(retriedRoom);
+    await flush();
 
-    retriedRoom.resolve('new-id');
+    api.addedPlayers[0]?.resolve('host-id');
 
     const result2 = await retried;
 
     assert.isTrue(Result.isOk(result2));
 
     assert.deepStrictEqual(mut_responses, [
-      { room: result2.value, myName: 'alice' },
+      { room: result2.value, myPlayerId: 'host-id' },
     ]);
+  });
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'alice');
+  test('createRoom whose creator cannot be added fails the same way', async () => {
+    const { store, api } = setup();
+
+    const pending = store.createRoom.dispatch({
+      username: 'alice',
+      password: undefined,
+    });
+
+    api.addedRooms[0]?.resolve('new-id');
+
+    await flush();
+
+    api.addedPlayers[0]?.reject(new Error('offline'));
+
+    const result = await pending;
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.isTrue(store.createRoom.hasFailed.getSnapshot().value);
+
+    assert.isUndefined(store.myPlayerId.getSnapshot().value);
   });
 
   test('createRoom whose save throws instead of rejecting fails the same way', async () => {
@@ -244,12 +280,6 @@ describe(createRoomStore, () => {
       },
     });
 
-    const mut_responses: CreatedRoom[] = [];
-
-    store.createRoom.response.subscribe((created) => {
-      mut_responses.push(created);
-    });
-
     const result = await store.createRoom.dispatch({
       username: 'alice',
       password: undefined,
@@ -263,19 +293,17 @@ describe(createRoomStore, () => {
 
     assert.isTrue(store.createRoom.hasFailed.getSnapshot().value);
 
-    assert.deepStrictEqual(mut_responses, []);
-
-    assert.isUndefined(store.myName.getSnapshot().value);
+    assert.isUndefined(store.myPlayerId.getSnapshot().value);
   });
 
-  test('joinRoom adds the player to the room and takes the name', async () => {
+  test('joinRoom adds the player to the room and takes the id it was given', async () => {
     const { store, api } = setup();
 
     const pending = store.joinRoom.dispatch('a', 'bob');
 
     assert.isTrue(store.joinRoom.isWaitingResponse.getSnapshot().value);
 
-    assert.isUndefined(store.myName.getSnapshot().value);
+    assert.isUndefined(store.myPlayerId.getSnapshot().value);
 
     const [added] = api.addedPlayers;
 
@@ -283,27 +311,31 @@ describe(createRoomStore, () => {
 
     assert.strictEqual(added.roomId, 'a');
 
-    assert.deepStrictEqual(added.player, { name: 'bob', online: true });
+    assert.strictEqual(added.playerName, 'bob');
 
-    added.resolve();
+    added.resolve('bob-id');
 
-    await pending;
+    const result = await pending;
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'bob');
+    assert.deepStrictEqual(result, Result.ok('bob-id'));
+
+    assert.strictEqual(store.myPlayerId.getSnapshot().value, 'bob-id');
 
     assert.isFalse(store.joinRoom.isWaitingResponse.getSnapshot().value);
   });
 
-  test('joinRoom takes the name even when the player could not be added', async () => {
+  test('joinRoom that could not add the player has no id to go on as', async () => {
     const { store, api } = setup();
 
     const pending = store.joinRoom.dispatch('a', 'bob');
 
     api.addedPlayers[0]?.reject(new Error('offline'));
 
-    await pending;
+    const result = await pending;
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'bob');
+    assert.isTrue(Result.isErr(result));
+
+    assert.isUndefined(store.myPlayerId.getSnapshot().value);
 
     assert.isFalse(store.joinRoom.isWaitingResponse.getSnapshot().value);
   });
@@ -311,9 +343,10 @@ describe(createRoomStore, () => {
 
 type FakeApi = Readonly<{
   api: RoomApi;
-  /** What is watched now, as `room:<id>` and `actions:<id>`. */
+  /** What is watched now, as `room:<id>`, `players:<id>` and `actions:<id>`. */
   watching: () => readonly string[];
   emitRoom: (roomId: string, room: Room) => void;
+  emitPlayers: (roomId: string, players: readonly PlayerWithId[]) => void;
   emitActions: (
     roomId: string,
     actions: readonly GameStateActionFromDb[],
@@ -325,14 +358,19 @@ type FakeApi = Readonly<{
   }>[];
   addedPlayers: readonly Readonly<{
     roomId: string;
-    player: Player;
-    resolve: () => void;
+    playerName: string;
+    resolve: (playerId: string) => void;
     reject: (error: unknown) => void;
   }>[];
 }>;
 
 const fakeApi = (): FakeApi => {
   const mut_roomWatchers = new Map<string, (room: Room) => void>();
+
+  const mut_playerWatchers = new Map<
+    string,
+    (players: readonly PlayerWithId[]) => void
+  >();
 
   const mut_actionWatchers = new Map<
     string,
@@ -352,26 +390,29 @@ const fakeApi = (): FakeApi => {
 
         return promise;
       },
-      addPlayer: (roomId, player) => {
-        const { promise, resolve, reject } = Promise.withResolvers<undefined>();
+      addPlayer: (roomId, playerName) => {
+        const { promise, resolve, reject } = Promise.withResolvers<string>();
 
-        mut_addedPlayers.push({
-          roomId,
-          player,
-          resolve: () => {
-            resolve(undefined);
-          },
-          reject,
-        });
+        mut_addedPlayers.push({ roomId, playerName, resolve, reject });
 
         return promise;
       },
+      removePlayer: () => Promise.resolve(),
+      updateRoomState: () => Promise.resolve(),
+      updateShuffleDef: () => Promise.resolve(),
       addAction: () => Promise.resolve(),
       watchRoom: (roomId, onChange) => {
         mut_roomWatchers.set(roomId, onChange);
 
         return () => {
           mut_roomWatchers.delete(roomId);
+        };
+      },
+      watchPlayers: (roomId, onChange) => {
+        mut_playerWatchers.set(roomId, onChange);
+
+        return () => {
+          mut_playerWatchers.delete(roomId);
         };
       },
       watchActions: (roomId, onChange) => {
@@ -384,10 +425,14 @@ const fakeApi = (): FakeApi => {
     },
     watching: () => [
       ...Array.from(mut_roomWatchers.keys(), (id) => `room:${id}`),
+      ...Array.from(mut_playerWatchers.keys(), (id) => `players:${id}`),
       ...Array.from(mut_actionWatchers.keys(), (id) => `actions:${id}`),
     ],
     emitRoom: (roomId, emitted) => {
       mut_roomWatchers.get(roomId)?.(emitted);
+    },
+    emitPlayers: (roomId, players) => {
+      mut_playerWatchers.get(roomId)?.(players);
     },
     emitActions: (roomId, actions) => {
       mut_actionWatchers.get(roomId)?.(actions);
@@ -403,8 +448,22 @@ const setup = (): Readonly<{ store: RoomStore; api: FakeApi }> => {
   return { store: createRoomStore({ api: api.api }), api } as const;
 };
 
+/** Lets the promises settled so far run their continuations. */
+const flush = (): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
+
 const roomWithId = (id: string): Room =>
   ({
-    ...newRoom(undefined, { name: 'alice', online: true }),
+    ...newRoom(undefined),
     id,
+  }) as const;
+
+const playerWithId = (id: string, name: string): PlayerWithId =>
+  ({
+    id,
+    name,
+    online: true,
+    createdAt: Timestamp.fromMillis(0),
   }) as const;

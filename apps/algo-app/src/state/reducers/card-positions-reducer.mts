@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import { Arr } from 'ts-data-forge';
 import type { FixedLengthTuple, ReadonlyRecord, Reducer } from 'ts-type-forge';
 import type { Rect } from 'ts-utils-additional';
 import type { CardColor, CardNumber } from '../../types/index.mjs';
@@ -6,10 +6,14 @@ import type { CardColor, CardNumber } from '../../types/index.mjs';
 export const cardPositionsReducer: Reducer<
   ReadonlyRecord<CardColor, FixedLengthTuple<12, Rect>> | undefined,
   readonly [CardColor, CardNumber, Rect]
-> = (state, [color, number, rect]) =>
-  produce(state ?? initialState(), (mut_draft) => {
-    mut_draft[color][number] = rect;
-  });
+> = (state, [color, number, rect]) => {
+  const curr = state ?? initialState();
+
+  return {
+    ...curr,
+    [color]: Arr.toUpdated(curr[color], number, () => rect),
+  };
+};
 
 const defaultPosition = (): Rect =>
   ({ top: 0, left: 0, width: 0, height: 0 }) as const;

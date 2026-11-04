@@ -4,7 +4,7 @@
  *
  * An action played here is written to the room through `deps.addAction`; the
  * follow-ups of an answer are timed with `deps.setTimer`, and the auto play
- * with `deps.counter`, so the tests can run both by hand.
+ * (`auto-play.mts`) with `deps.counter`, so the tests can run both by hand.
  */
 
 import { serverTimestamp } from 'firebase/firestore';
@@ -15,39 +15,32 @@ import {
   merge,
   pairwise,
   scan,
-  skip,
   source,
-  take,
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
 import {
   Arr,
-  Num,
   Result,
-  SafeUint,
-  asSafeUint,
   asUint32,
   isNotUndefined,
   type SizeType,
 } from 'ts-data-forge';
-import type {
-  DeepReadonly,
-  NonEmptyTuple,
-  SafeUintWithSmallInt,
-} from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { time } from '../constants/index.mjs';
 import { returnFalse } from '../return-boolean.mjs';
 import { gameStateReducer, initialGameState } from '../state/index.mjs';
-import type {
-  Card,
-  GameState,
-  GameStateAction,
-  GameStateActionFromDb,
-  GameStateActionToWrite,
-  NWES,
-  Room,
+import {
+  toPlayerCardsRemote,
+  type Card,
+  type GameState,
+  type GameStateAction,
+  type GameStateActionFromDb,
+  type GameStateActionToWrite,
+  type NWES,
+  type Room,
 } from '../types/index.mjs';
+import { autoPlay, autoPlayPlayerCards } from './auto-play.mjs';
 
 export type GameStateDeps = Readonly<{
   room: SynstateObservable<Room | undefined>;
@@ -81,8 +74,13 @@ export type GameStateStore = Readonly<{
    */
   onAnswerSubmit: () => void;
   onTurnEndClick: () => void;
-  /** Starts writing to the room and the auto play; returns what stops both. */
+  /** Starts writing to the room; returns what stops it. */
   start: () => () => void;
+  /**
+   * Deals the fixed hand of the auto play and plays its script, as a
+   * development build does with `?test`; returns what stops the script.
+   */
+  startAutoPlay: () => () => void;
 }>;
 
 export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
@@ -211,19 +209,39 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
       timestamp: serverTimestamp(),
     });
 
-    deps.setTimer(autoPlaySpeedRate * time.showJudge, () => {
+    deps.setTimer(time.showJudge, () => {
       gameStateDispatcher({
         type: 'showJudgeOnDecidedAnswer',
         timestamp: serverTimestamp(),
       });
     });
 
-    deps.setTimer(autoPlaySpeedRate * (time.showJudge + time.hideJudge), () => {
+    deps.setTimer(time.showJudge + time.hideJudge, () => {
       gameStateDispatcher({
         type: 'hideDecidedAnswerBalloon',
         timestamp: serverTimestamp(),
       });
     });
+  };
+
+  const startAutoPlay = (): (() => void) => {
+    gameStateDispatcher({
+      type: 'initializePlayerCards',
+      timestamp: serverTimestamp(),
+      cards: toPlayerCardsRemote(autoPlayPlayerCards),
+    });
+
+    const autoPlaying = autoPlay(deps.counter).subscribe((action) => {
+      if (action.type === 'submitAnswer') {
+        onAnswerSubmit();
+      } else {
+        gameStateDispatcher(action);
+      }
+    });
+
+    return () => {
+      autoPlaying.unsubscribe();
+    };
   };
 
   const onTurnEndClick = (): void => {
@@ -283,17 +301,6 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
         }
       });
 
-    const autoPlaying = autoPlay(deps.counter).subscribe((action) => {
-      // turn off auto play
-      if (returnFalse()) {
-        if (action.type === 'submitAnswer') {
-          onAnswerSubmit();
-        } else {
-          gameStateDispatcher(action);
-        }
-      }
-    });
-
     const loggingState = gameState
       .pipe(pairwise())
       .subscribe(([prev, curr]) => {
@@ -317,8 +324,6 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
 
       playedHere.complete();
 
-      autoPlaying.unsubscribe();
-
       loggingState.unsubscribe();
 
       loggingAction.unsubscribe();
@@ -336,189 +341,6 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
     onAnswerSubmit,
     onTurnEndClick,
     start,
+    startAutoPlay,
   };
 };
-
-const autoPlaySpeedRate = 0.5;
-
-// auto play
-
-const actionsToAutoPlay = [
-  [
-    {
-      type: 'selectMyCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'black', number: 6 },
-    },
-    {
-      type: 'submitToss',
-      timestamp: serverTimestamp(),
-    },
-    {
-      type: 'selectMyCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'white', number: 7 },
-    },
-    {
-      type: 'selectOpponentCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'black', number: 8 },
-    },
-    {
-      type: 'selectAnswer',
-      timestamp: serverTimestamp(),
-      answer: { color: 'black', number: 9 },
-    },
-    {
-      type: 'submitAnswer',
-      timestamp: serverTimestamp(),
-    },
-  ],
-  [
-    {
-      type: 'selectMyCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'white', number: 1 },
-    },
-    {
-      type: 'submitToss',
-      timestamp: serverTimestamp(),
-    },
-    {
-      type: 'selectMyCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'black', number: 8 },
-    },
-    {
-      type: 'selectOpponentCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'black', number: 6 },
-    },
-    {
-      type: 'selectAnswer',
-      timestamp: serverTimestamp(),
-      answer: { color: 'black', number: 7 },
-    },
-    {
-      type: 'submitAnswer',
-      timestamp: serverTimestamp(),
-    },
-  ],
-  [
-    {
-      type: 'selectMyCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'white', number: 8 },
-    },
-    {
-      type: 'submitToss',
-      timestamp: serverTimestamp(),
-    },
-    {
-      type: 'selectMyCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'white', number: 3 },
-    },
-    {
-      type: 'selectOpponentCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'white', number: 0 },
-    },
-    {
-      type: 'selectAnswer',
-      timestamp: serverTimestamp(),
-      answer: { color: 'white', number: 1 },
-    },
-    {
-      type: 'submitAnswer',
-      timestamp: serverTimestamp(),
-    },
-  ],
-  [
-    {
-      type: 'selectMyCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'black', number: 5 },
-    },
-    {
-      type: 'submitToss',
-      timestamp: serverTimestamp(),
-    },
-    {
-      type: 'selectMyCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'black', number: 0 },
-    },
-    {
-      type: 'selectOpponentCard',
-      timestamp: serverTimestamp(),
-      card: { color: 'black', number: 6 },
-    },
-    {
-      type: 'selectAnswer',
-      timestamp: serverTimestamp(),
-      answer: { color: 'black', number: 7 },
-    },
-    {
-      type: 'submitAnswer',
-      timestamp: serverTimestamp(),
-    },
-  ],
-  // Not `satisfies NonEmptyArray<…>`: that type carries a brand only a guard
-  // can establish, and a `const` tuple literal is already statically non-empty.
-] as const;
-
-const autoPlayMargin = asSafeUint(1 + (time.showJudge + time.hideJudge) / 1000);
-
-const actionsToAutoPlayStream = (
-  counter: GameStateDeps['counter'],
-  // The structural non-empty tuple rather than `NonEmptyArray`, which carries a
-  // brand a `const` tuple literal cannot have. Both give `actions[0]` without
-  // `| undefined`, which is all this needs.
-  actions: NonEmptyTuple<GameStateActionToWrite>,
-  numSkip: SafeUintWithSmallInt,
-): SynstateObservable<GameStateActionToWrite> => {
-  // Counting emissions with `scan` emits `actions[i]` on the i-th tick.
-  // `skip` shifts the timer's own value, so the count has to be kept separately
-  // rather than read off the tick.
-  const ticks = counter(autoPlaySpeedRate * 1000);
-
-  return (Num.isPositive(numSkip) ? ticks.pipe(skip(numSkip)) : ticks)
-    .pipe(take(Arr.length(actions)))
-    .pipe(scan((i: number) => i + 1, -1))
-    .pipe(map((i) => actions[i] ?? actions[0]));
-};
-
-const autoPlay = (
-  counter: GameStateDeps['counter'],
-): SynstateObservable<GameStateActionToWrite> =>
-  merge([
-    actionsToAutoPlayStream(counter, actionsToAutoPlay[0], 0),
-    actionsToAutoPlayStream(
-      counter,
-      actionsToAutoPlay[1],
-      SafeUint.add(autoPlayMargin, Arr.length(actionsToAutoPlay[0])),
-    ),
-    actionsToAutoPlayStream(
-      counter,
-      actionsToAutoPlay[2],
-      asSafeUint(
-        autoPlayMargin +
-          actionsToAutoPlay[0].length +
-          autoPlayMargin +
-          actionsToAutoPlay[1].length,
-      ),
-    ),
-    actionsToAutoPlayStream(
-      counter,
-      actionsToAutoPlay[3],
-      asSafeUint(
-        autoPlayMargin +
-          actionsToAutoPlay[0].length +
-          autoPlayMargin +
-          actionsToAutoPlay[1].length +
-          autoPlayMargin +
-          actionsToAutoPlay[2].length,
-      ),
-    ),
-  ] as const);

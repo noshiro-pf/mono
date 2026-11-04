@@ -2,6 +2,9 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 
 export type CustomColor = '#383838' | 'red' | 'rgb(48, 255, 135)';
 
+/** The fill of a card drawn as a blank placeholder, before the game starts. */
+export const placeholderCardColor = '#808080';
+
 export const outlineColorDef = {
   green: 'rgb(48, 255, 135)',
   red: 'red',

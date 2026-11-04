@@ -14,14 +14,20 @@ import * as styles from './my-cards.module.css';
 type Props = Readonly<{
   cards: Bindable<readonly Card[]>;
   height: InitializedObservable<number>;
+  cardsAreHidden: InitializedObservable<boolean>;
 }>;
 
-const paddingPx = 2;
+export const MyCards = ({
+  cards,
+  height,
+  cardsAreHidden,
+}: Props): JSX.Element => {
+  // The padding grows with the footer, so that the cards keep their share of it.
+  const paddingPx = height.pipe(map(paddingOf));
 
-export const MyCards = ({ cards, height }: Props): JSX.Element => {
   const cardSize: InitializedObservable<RectSize> = height.pipe(
     map((h) => {
-      const cardHeight = h - 4 * paddingPx;
+      const cardHeight = h - 4 * paddingOf(h);
 
       return { width: (2 / 3) * cardHeight, height: cardHeight };
     }),
@@ -33,7 +39,7 @@ export const MyCards = ({ cards, height }: Props): JSX.Element => {
       style={{
         height: view(height, (h) => `${h}px`),
         'background-color': constant(darkGray),
-        '--my-cards-gap': constant(`${paddingPx}px`),
+        '--my-cards-gap': view(paddingPx, (p) => `${p}px`),
       }}
     >
       <For items={cards} key={cardToString}>
@@ -42,6 +48,7 @@ export const MyCards = ({ cards, height }: Props): JSX.Element => {
             card={card$.pipe(
               map((card) => faceUpCard(card), { equals: isSameCardDisplay }),
             )}
+            hidden={cardsAreHidden}
             size={cardSize}
           />
         )}
@@ -49,3 +56,5 @@ export const MyCards = ({ cards, height }: Props): JSX.Element => {
     </div>
   );
 };
+
+const paddingOf = (height: number): number => Math.round(height / 30);

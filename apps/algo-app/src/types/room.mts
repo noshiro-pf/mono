@@ -2,7 +2,6 @@ import { expectType, tp } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { FixedLengthTuple, StrictOmit } from 'ts-type-forge';
 import { cardTypeDef } from './card-type.mjs';
-import { playerTypeDef } from './player.mjs';
 import { shuffleDefType } from './shuffle-def.mjs';
 
 const playerCardsTypeDef = t.tuple(
@@ -18,12 +17,14 @@ const playerCardsTypeDef = t.tuple(
 
 const roomStateList = ['not-started', 'playing', 'finished'] as const;
 
+// The players are not a field of the room but its subcollection
+// `rooms/{id}/players`, so that each has an id of its own and joining is an
+// `addDoc` rather than an update of the room.
 const commonRecordTypeDefs = {
   password: t.union([t.string(''), t.undefinedType], {
     defaultType: t.undefinedType,
   }),
   shuffleDef: shuffleDefType,
-  players: t.array(playerTypeDef),
   state: t.enumType(roomStateList, {
     defaultValue: 'not-started',
   }),
@@ -55,6 +56,8 @@ export type Room = StrictOmit<RoomRemote, 'playerCards'> &
 
 expectType<(typeof roomStateList)[number], Room['state']>('=');
 
+export type RoomState = Room['state'];
+
 export const assertIsRoomRemote: (a: unknown) => asserts a is RoomRemote =
   roomRemoteTypeDef.assertIs;
 
@@ -65,7 +68,6 @@ export const convertRoomRemoteToRoom = (
   ({
     id,
     password: roomRemote.password,
-    players: roomRemote.players,
     shuffleDef: roomRemote.shuffleDef,
     state: roomRemote.state,
     playerCards: [
@@ -81,7 +83,6 @@ export const convertRoomToRoomRemote = (
 ): RoomRemote =>
   ({
     password: room.password,
-    players: room.players,
     shuffleDef: room.shuffleDef,
     state: room.state,
     playerCards: {

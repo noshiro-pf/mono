@@ -1,4 +1,7 @@
 .root {
   width: 100vw;
   height: 100vh;
+  /* Below this the table and the floating buttons overlap: the page scrolls. */
+  min-width: 800px;
+  min-height: 600px;
 }

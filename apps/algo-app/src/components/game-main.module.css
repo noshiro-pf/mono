@@ -20,15 +20,43 @@
   align-items: center;
 }
 
-.endTurnButtonWrapper {
+/* The buttons float over the corners of the screen. */
+.floatButtons {
   position: absolute;
-  right: 20px;
-  bottom: 20px;
+  z-index: var(--z-button);
+}
+
+.floatButtons > *,
+.lobbyButtons > * {
+  margin: 20px;
+}
+
+.lobbyButtons {
+  display: contents;
+}
+
+.northWest {
+  left: 0;
+  top: 0;
+}
+
+.southEast {
+  right: 0;
+  bottom: 0;
+}
+
+.buttonWrapper {
   width: 120px;
   height: 60px;
 }
 
-.endTurnButton {
+.twoLineButton > .floatButton {
+  display: block;
+  font-size: 14px;
+  white-space: normal;
+}
+
+.floatButton {
   transition: background 0.3s ease 0s;
   text-transform: uppercase;
   font-family: 'Bebas Neue', sans-serif;
@@ -39,22 +67,23 @@
   height: 60px;
   width: 120px;
   padding: 0px 15px;
-  top: 0px;
   font-weight: 400;
   font-size: 18px;
   border-radius: 5px;
-  position: absolute;
   background: rgb(60 60 60);
-  z-index: 1;
-  left: 0px;
   cursor: pointer;
+  user-select: none;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.endTurnButton:active {
+.floatButton:active:not(:disabled) {
   transform: translate(5px, 5px);
 }
 
-.endTurnButton:disabled {
+.floatButton:disabled {
   background: rgb(185 185 185);
   cursor: not-allowed;
 }

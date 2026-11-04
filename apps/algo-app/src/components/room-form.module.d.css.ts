@@ -2,6 +2,8 @@
 
 export declare const block: string;
 
+export declare const body: string;
+
 export declare const buttonWrapper: string;
 
 export declare const centering: string;

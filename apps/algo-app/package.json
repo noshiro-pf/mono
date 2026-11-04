@@ -17,6 +17,7 @@
     "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && vitest --config ./configs/vitest.config.mts run",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "dev": "vite --config ./configs/vite.config.mts",
+    "emulators": "firebase emulators:start --only firestore --import ./firebase-emulator-exports",
     "fix:fmt": "pnpm run z:format-uncommitted --cwd .",
     "fix:fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
     "fix:fmt:full": "prettier --write .",

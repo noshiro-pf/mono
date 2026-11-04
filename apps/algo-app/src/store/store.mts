@@ -6,13 +6,19 @@
 
 import { counter } from 'synstate';
 import { createFirestoreRoomApi } from '../api/index.mjs';
-import { firebaseConfig } from '../constants/index.mjs';
+import { firebaseConfig, firestoreEmulator } from '../constants/index.mjs';
+import { newShuffleDef } from '../functions/index.mjs';
 import { createDisplayStore } from './display-store.mjs';
+import { createGameMainStore } from './game-main-store.mjs';
 import { createGameStateStore } from './game-state-store.mjs';
 import { createPositionStore } from './position-store.mjs';
 import { createRoomStore } from './room-store.mjs';
 
-const roomApi = createFirestoreRoomApi(firebaseConfig);
+// A development build reads and writes the local emulator, never the real
+// database.
+const roomApi = createFirestoreRoomApi(firebaseConfig, {
+  emulator: import.meta.env.DEV ? firestoreEmulator : undefined,
+});
 
 export const roomStore = createRoomStore({ api: roomApi });
 
@@ -32,9 +38,17 @@ export const gameStateStore = createGameStateStore({
 
 export const positionStore = createPositionStore();
 
+export const gameMainStore = createGameMainStore({
+  api: roomApi,
+  room: roomStore.room,
+  myPlayerId: roomStore.myPlayerId,
+  newShuffleDef,
+});
+
 export const displayStore = createDisplayStore({
   room: roomStore.room,
-  myName: roomStore.myName,
+  players: roomStore.players,
+  myPlayerId: roomStore.myPlayerId,
   gameState: gameStateStore.gameState,
   onCardClick: gameStateStore.onCardClick,
   onTossCancel: gameStateStore.onTossCancel,

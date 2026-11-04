@@ -6,22 +6,23 @@
 import { combine, map, type InitializedObservable } from 'synstate';
 import type { StrictPick } from 'ts-type-forge';
 import type { Rect } from 'ts-utils-additional';
-import { getCardDirection } from '../functions/index.mjs';
+import { getCardDirection, getShuffledPlayers } from '../functions/index.mjs';
 import { mapToDisplayValue } from '../state/index.mjs';
-import type {
-  CardNumber,
-  ConfirmTossBalloonProps,
-  DecidedAnswerBalloonProps,
-  DisplayValues,
-  PlayerIndex,
-  SelectAnswerBalloonProps,
+import {
+  toShuffleDef,
+  type CardNumber,
+  type ConfirmTossBalloonProps,
+  type DecidedAnswerBalloonProps,
+  type DisplayValues,
+  type PlayerIndex,
+  type SelectAnswerBalloonProps,
 } from '../types/index.mjs';
 import type { GameStateStore } from './game-state-store.mjs';
 import type { PositionStore } from './position-store.mjs';
 import type { RoomStore } from './room-store.mjs';
 
 export type DisplayDeps = Readonly<
-  StrictPick<RoomStore, 'myName' | 'room'> &
+  StrictPick<RoomStore, 'myPlayerId' | 'players' | 'room'> &
     StrictPick<
       GameStateStore,
       | 'gameState'
@@ -51,25 +52,25 @@ export type DisplayStore = Readonly<{
 }>;
 
 export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
+  // The seat this player is in: its place among the players as the room's
+  // `shuffleDef` seats them, not the order they joined in.
   const myPlayerIndex: InitializedObservable<PlayerIndex | undefined> = combine(
-    [deps.room, deps.myName],
+    [deps.room, deps.players, deps.myPlayerId],
   ).pipe(
-    map(([room, myName]) => {
-      if (room === undefined || myName === undefined) {
+    map(([room, players, myPlayerId]) => {
+      if (room === undefined || myPlayerId === undefined) {
         return undefined;
       }
 
-      const index: number = room.players.findIndex((p) => p.name === myName);
+      const index: number = getShuffledPlayers(
+        players,
+        room.shuffleDef,
+      ).findIndex((p) => p?.id === myPlayerId);
 
-      if (index === 0 || index === 1 || index === 2 || index === 3) {
-        return index;
-      }
-
-      console.warn(
-        `myName should be one of { 0, 1, 2, 3 }. result is "${index}". `,
-      );
-
-      return undefined;
+      // Not seated also while the players are still being read.
+      return index === 0 || index === 1 || index === 2 || index === 3
+        ? index
+        : undefined;
     }),
   );
 
@@ -85,11 +86,16 @@ export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
 
   const displayValues: InitializedObservable<DisplayValues> = combine([
     deps.gameState,
+    deps.room,
+    deps.players,
     myPlayerIndex,
   ]).pipe(
-    map(([gameState, playerIndex]) =>
+    map(([gameState, room, players, playerIndex]) =>
       mapToDisplayValue({
+        roomState: room?.state ?? 'not-started',
         gameState,
+        shuffleDef: room?.shuffleDef ?? toShuffleDef('0123'),
+        players,
         myPlayerIndex: playerIndex ?? 0,
         onCardClick: deps.onCardClick,
       }),

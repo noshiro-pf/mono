@@ -1,4 +1,3 @@
-import { produce } from 'immer';
 import type { ReadonlyRecord, Reducer } from 'ts-type-forge';
 import type { Rect } from 'ts-utils-additional';
 import type { NWES } from '../../types/index.mjs';
@@ -6,10 +5,10 @@ import type { NWES } from '../../types/index.mjs';
 export const playerNamePositionsReducer: Reducer<
   ReadonlyRecord<NWES, Rect> | undefined,
   readonly [NWES, Rect]
-> = (state, [direction, rect]) =>
-  produce(state ?? initialState(), (mut_draft) => {
-    mut_draft[direction] = rect;
-  });
+> = (state, [direction, rect]) => ({
+  ...(state ?? initialState()),
+  [direction]: rect,
+});
 
 const initialState = (): ReadonlyRecord<NWES, Rect> =>
   ({

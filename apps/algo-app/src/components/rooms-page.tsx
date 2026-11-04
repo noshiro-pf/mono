@@ -1,4 +1,4 @@
-import { map, type InitializedObservable } from 'synstate';
+import { map, onScopeDispose, type InitializedObservable } from 'synstate';
 import {
   createAfterUpdate,
   MatchOptional,
@@ -10,7 +10,7 @@ import type { PageMatchOf, PageValues } from 'synstate-router';
 import { Optional } from 'ts-data-forge';
 import type { Rect } from 'ts-utils-additional';
 import type { routes } from '../constants/index.mjs';
-import { roomStore } from '../store/index.mjs';
+import { gameStateStore, roomStore } from '../store/index.mjs';
 import { GameMain } from './game-main.js';
 import { JoinRoomPage } from './join-room-page.js';
 import { NotFoundPage } from './not-found-page.js';
@@ -52,9 +52,29 @@ export const RoomsPage = ({ values$, windowSize }: Props): JSX.Element => {
   subscribeInScope(playerId, (id) => {
     if (id !== undefined) {
       afterUpdate(() => {
-        roomStore.setMyName(id);
+        roomStore.setMyPlayerId(id);
       });
     }
+  });
+
+  // `?test` deals a fixed hand and plays a scripted game, in a development
+  // build only, and once per page.
+  const mut_autoPlay: { stop: (() => void) | undefined } = { stop: undefined };
+
+  subscribeInScope(values$, (values) => {
+    if (
+      import.meta.env.DEV &&
+      values.search.test !== undefined &&
+      mut_autoPlay.stop === undefined
+    ) {
+      afterUpdate(() => {
+        mut_autoPlay.stop ??= gameStateStore.startAutoPlay();
+      });
+    }
+  });
+
+  onScopeDispose(() => {
+    mut_autoPlay.stop?.();
   });
 
   return (

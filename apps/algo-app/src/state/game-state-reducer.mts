@@ -1,8 +1,11 @@
-import { produce } from 'immer';
+import { match } from 'ts-data-forge';
 import type { Reducer } from 'ts-type-forge';
 import { cardEq } from '../functions/index.mjs';
-import type { GameState, GameStateAction } from '../types/index.mjs';
-import { faceUpCard, goToNextTurn, tossCard } from './draft-modifier/index.mjs';
+import {
+  fromPlayerCardsRemote,
+  type GameState,
+  type GameStateAction,
+} from '../types/index.mjs';
 import {
   answerSelectedReducer,
   cardChosenToAttackReducer,
@@ -13,159 +16,144 @@ import {
   readonlyReducer,
   selectAnswerBalloonIsOpenReducer,
 } from './reducers/index.mjs';
+import { faceUpCard, goToNextTurn, tossCard } from './update-fn/index.mjs';
 
 export const gameStateReducer: Reducer<
   GameState,
   readonly GameStateAction[]
 > = (state, actions) => actions.reduce(gameStateReducer1Step, state);
 
+const reduceFields = (
+  state: GameState,
+  action: GameStateAction,
+): GameState => ({
+  ...state,
+  answerSelected: answerSelectedReducer(state.answerSelected, action),
+  cardChosenToToss: match(state.phase, {
+    ph010_selectMyCardToToss: cardChosenToTossReducer(
+      state.cardChosenToToss,
+      action,
+    ),
+    ph020_firstAnswer: state.cardChosenToToss,
+    ph030_continuousAnswer: state.cardChosenToToss,
+  }),
+  cardChosenToAttack: match(state.phase, {
+    ph010_selectMyCardToToss: state.cardChosenToAttack,
+    ph020_firstAnswer: cardChosenToAttackReducer(
+      state.cardChosenToAttack,
+      action,
+    ),
+    ph030_continuousAnswer: cardChosenToAttackReducer(
+      state.cardChosenToAttack,
+      action,
+    ),
+  }),
+  cardChosenToBeAttacked: cardChosenToBeAttackedReducer(
+    state.cardChosenToBeAttacked,
+    action,
+  ),
+  confirmTossBalloonIsOpen: confirmTossBalloonIsOpenReducer(
+    state.confirmTossBalloonIsOpen,
+    action,
+  ),
+  selectAnswerBalloonIsOpen: selectAnswerBalloonIsOpenReducer(
+    state.selectAnswerBalloonIsOpen,
+    action,
+  ),
+  decidedAnswerBalloonIsOpen: decidedAnswerBalloonIsOpenReducer(
+    state.decidedAnswerBalloonIsOpen,
+    action,
+  ),
+  readonly: readonlyReducer(state.readonly, action),
+});
+
+const afterJudge = (state: GameState): GameState => {
+  switch (state.judgeResult) {
+    case 'x':
+      return goToNextTurn({ ...state, cardChosenToAttack: undefined });
+
+    case 'o':
+      return state.phase === 'ph020_firstAnswer'
+        ? { ...state, phase: 'ph030_continuousAnswer' }
+        : state;
+
+    case undefined:
+      return state;
+  }
+};
+
+const applyAction = (state: GameState, action: GameStateAction): GameState => {
+  switch (action.type) {
+    case 'selectMyCard':
+    case 'selectOpponentCard':
+    case 'selectAnswer':
+    case 'cancelToss':
+    case 'cancelAnswer':
+      return state;
+
+    case 'initializePlayerCards':
+      return { ...state, playerCards: fromPlayerCardsRemote(action.cards) };
+
+    case 'submitToss':
+      if (state.cardChosenToToss === undefined) {
+        console.warn(
+          'gameState.cardChosenToToss should not be undefined here.',
+        );
+
+        return state;
+      }
+
+      return {
+        ...tossCard(state, state.cardChosenToToss),
+        phase: 'ph020_firstAnswer',
+      };
+
+    case 'submitAnswer':
+      return { ...state, readonly: true };
+
+    case 'showJudgeOnDecidedAnswer': {
+      if (state.answerSelected === undefined) {
+        console.warn('gameState.answerSelected should not be undefined here.');
+
+        return state;
+      }
+
+      if (state.cardChosenToBeAttacked === undefined) {
+        console.warn(
+          'gameState.cardChosenToBeAttacked should not be undefined here.',
+        );
+
+        return state;
+      }
+
+      const judgeResult = cardEq(
+        state.answerSelected,
+        state.cardChosenToBeAttacked,
+      )
+        ? 'o'
+        : 'x';
+
+      const judged: GameState = { ...state, judgeResult };
+
+      return judgeResult === 'o'
+        ? faceUpCard(judged, judged.cardChosenToBeAttacked)
+        : faceUpCard(judged, judged.cardChosenToAttack);
+    }
+
+    case 'hideDecidedAnswerBalloon':
+      return { ...afterJudge(state), judgeResult: undefined };
+
+    case 'goToNextTurn':
+      return goToNextTurn(state);
+  }
+};
+
+/**
+ * The fields each have a reducer of their own, run first; what an action does
+ * beyond them is `applyAction`. Written without `immer`: every step returns a
+ * new state.
+ */
 const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
   state,
   action,
-) =>
-  produce(state, (mut_draft) => {
-    mut_draft.answerSelected = answerSelectedReducer(
-      state.answerSelected,
-      action,
-    );
-
-    switch (state.phase) {
-      case 'ph010_selectMyCardToToss':
-        mut_draft.cardChosenToToss = cardChosenToTossReducer(
-          state.cardChosenToToss,
-          action,
-        );
-
-        break;
-
-      case 'ph020_firstAnswer':
-      case 'ph030_continuousAnswer':
-        mut_draft.cardChosenToAttack = cardChosenToAttackReducer(
-          state.cardChosenToAttack,
-          action,
-        );
-
-        break;
-    }
-
-    mut_draft.cardChosenToBeAttacked = cardChosenToBeAttackedReducer(
-      state.cardChosenToBeAttacked,
-      action,
-    );
-
-    mut_draft.confirmTossBalloonIsOpen = confirmTossBalloonIsOpenReducer(
-      state.confirmTossBalloonIsOpen,
-      action,
-    );
-
-    mut_draft.selectAnswerBalloonIsOpen = selectAnswerBalloonIsOpenReducer(
-      state.selectAnswerBalloonIsOpen,
-      action,
-    );
-
-    mut_draft.decidedAnswerBalloonIsOpen = decidedAnswerBalloonIsOpenReducer(
-      state.decidedAnswerBalloonIsOpen,
-      action,
-    );
-
-    mut_draft.readonly = readonlyReducer(mut_draft.readonly, action);
-
-    switch (action.type) {
-      case 'selectMyCard':
-      case 'selectOpponentCard':
-      case 'selectAnswer':
-      case 'cancelToss':
-      case 'cancelAnswer':
-        break;
-
-      case 'submitToss':
-        if (state.cardChosenToToss === undefined) {
-          console.warn(
-            'gameState.cardChosenToToss should not be undefined here.',
-          );
-
-          return;
-        }
-
-        tossCard(mut_draft, state.cardChosenToToss);
-
-        mut_draft.phase = 'ph020_firstAnswer';
-
-        break;
-
-      case 'submitAnswer':
-        mut_draft.readonly = true;
-
-        break;
-
-      case 'showJudgeOnDecidedAnswer':
-        if (mut_draft.answerSelected === undefined) {
-          console.warn(
-            'gameState.answerSelected should not be undefined here.',
-          );
-
-          return;
-        }
-
-        if (mut_draft.cardChosenToBeAttacked === undefined) {
-          console.warn(
-            'gameState.cardChosenToBeAttacked should not be undefined here.',
-          );
-
-          return;
-        }
-
-        mut_draft.judgeResult = cardEq(
-          mut_draft.answerSelected,
-          mut_draft.cardChosenToBeAttacked,
-        )
-          ? 'o'
-          : 'x';
-
-        switch (mut_draft.judgeResult) {
-          case 'o':
-            faceUpCard(mut_draft, mut_draft.cardChosenToBeAttacked);
-
-            break;
-          case 'x':
-            faceUpCard(mut_draft, mut_draft.cardChosenToAttack);
-
-            break;
-        }
-
-        break;
-
-      case 'hideDecidedAnswerBalloon':
-        switch (mut_draft.judgeResult) {
-          case 'x':
-            mut_draft.cardChosenToAttack = undefined;
-
-            goToNextTurn(mut_draft);
-
-            break;
-          case 'o':
-            switch (mut_draft.phase) {
-              case 'ph020_firstAnswer':
-                mut_draft.phase = 'ph030_continuousAnswer';
-
-                break;
-              case 'ph010_selectMyCardToToss':
-              case 'ph030_continuousAnswer':
-                break;
-            }
-
-            break;
-          case undefined:
-            break;
-        }
-
-        mut_draft.judgeResult = undefined;
-
-        break;
-
-      case 'goToNextTurn':
-        goToNextTurn(mut_draft);
-
-        break;
-    }
-  });
+) => applyAction(reduceFields(state, action), action);

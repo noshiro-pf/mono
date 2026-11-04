@@ -48,6 +48,7 @@
     --z-cards: 3;
     --z-player-name: 3;
     --z-balloon: 4;
+    --z-button: 5;
     --balloon-color: hsl(0, 0%, 30%);
     --in-turn-color: rgb(80, 158, 188);
   }
