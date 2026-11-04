@@ -77,6 +77,7 @@
     "check:root:tsconfig-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-tsconfig-paths.mts",
     "check:root:types": "node ./tools/scripts/cmd/assert-deps-built.mts && tsc -p ./tsconfig.json --noEmit",
     "check:root:workflow-event-name": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-workflow-event-name.mts",
+    "check:root:workflow-timeouts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-workflow-timeouts.mts",
     "check:root:workspace-globs": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-workspace-globs.mts",
     "check-all": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-all.mts",
     "check-changed": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-changed/main.mts",

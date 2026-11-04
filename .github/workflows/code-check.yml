@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    timeout-minutes: 25
+    timeout-minutes: 15
     # What `fix:codemod:affected` diffs against: the pull request's base, the
     # commit before the push on `main`, and nothing on a manual run, which
     # runs it in full.
@@ -312,7 +312,9 @@ jobs:
     permissions:
       actions: read
       contents: read
-    timeout-minutes: 25
+    # Above the 15-minute ceiling (`check:root:workflow-timeouts`): every
+    # coverage shard in a row has taken up to 12m30s.
+    timeout-minutes: 20
 
     steps:
       - name: Checkout

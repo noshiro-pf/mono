@@ -53,10 +53,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # install + ws:build + ws:check:test or a shard of it, per job.
-    # The 10 minutes this was set to when the repository held two packages
-    # cut two of the three matrix entries off mid-test.
-    timeout-minutes: 30
+    # install + ws:build + ws:check:test or a shard of it, per job, which has
+    # taken under ten minutes. The 10 minutes this was set to when the
+    # repository held two packages cut two of the three matrix entries off
+    # mid-test.
+    timeout-minutes: 15
 
     strategy:
       fail-fast: false
