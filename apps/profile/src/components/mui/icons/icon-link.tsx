@@ -18,7 +18,9 @@ export const IconLink = ({ href, label, path }: Props): JSX.Element => (
     rel={constant('noreferrer')}
     target={constant('_blank')}
   >
+    {/* Drawing only: the link is named by its `aria-label`. */}
     <svg
+      aria-hidden={constant(true)}
       fill={constant('none')}
       height={constant(32)}
       viewBox={constant('0 0 24 24')}

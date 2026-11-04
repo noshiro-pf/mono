@@ -282,16 +282,28 @@ test(
 );
 
 test(
-  'the product cards show their screenshots',
+  'the product cards show their screenshots, each named',
   { tag: '@smoke' },
   async ({ page }) => {
     await page.goto('/mono/profile/products/');
 
-    const images = page.getByTestId('root').getByRole('img');
+    const root = page.getByTestId('root');
+
+    const images = root.getByRole('img');
 
     await expect.soft(images.first()).toBeVisible();
 
     expect.soft(await images.count()).toBeGreaterThanOrEqual(10);
+
+    // A screenshot is named by its product's title. An image with no name, such
+    // as an icon left exposed, or one named by its bundled asset URL is not.
+    await expect
+      .soft(
+        root.getByRole('img', {
+          name: /^$|^(?:\/|data:|https?:)|\.(?:avif|gif|jpe?g|png|svg|webp)(?:$|[?#])/iu,
+        }),
+      )
+      .toHaveCount(0);
   },
 );
 
@@ -304,6 +316,10 @@ test(
     const banner = page.getByRole('banner');
 
     await expect.soft(banner.getByRole('link')).toHaveCount(2);
+
+    // The links are named by `aria-label`, so their icons are drawing only, and
+    // the cat image is decoration.
+    await expect.soft(banner.getByRole('img')).toHaveCount(0);
 
     await expect
       .soft(banner.getByRole('link', { name: 'Twitter' }))
