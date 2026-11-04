@@ -54,13 +54,13 @@ export const isRunningLow = (rateLimit: RateLimit): boolean =>
 export type BudgetSample = Readonly<{ rateLimit: RateLimit; atMs: number }>;
 
 /**
- * How often to read so that the page spends about half of the account's budget
- * — what reading every {@link POLL_INTERVAL_MS} spends on this repository —
- * measured by what the budget went down by between two reads:
- * a larger repository costs more a read, and is read less often rather than
- * spending the whole budget, never less often than
- * {@link MAX_POLL_INTERVAL_MS}. Anything else the account spends in between
- * counts too, which slows the page rather than the account's other work.
+ * How often to read so that the page spends about a quarter of the account's
+ * budget, measured by what the budget went down by between two reads: every
+ * {@link POLL_INTERVAL_MS} while a read costs five points or fewer, and less
+ * often where a read costs more, rather than spending the whole budget, never
+ * less often than {@link MAX_POLL_INTERVAL_MS}. Anything else the account
+ * spends in between counts too, which slows the page rather than the account's
+ * other work.
  *
  * The interval it has, when the two say nothing about the cost: no read before,
  * a window that refilled in between, or no time between them.
@@ -110,8 +110,12 @@ export const pollIntervalFor = ({
 /** Five minutes: past that, the page has stopped being current. */
 export const MAX_POLL_INTERVAL_MS = 300_000;
 
-/** The share of the budget the page's reads may spend. */
-const POLL_BUDGET_SHARE = 0.5;
+/**
+ * The share of the budget the page's reads may spend: a quarter, so that a page
+ * left open leaves most of the account's budget to what else it runs —
+ * `unblock-prs`, `gh`, a second tab or device.
+ */
+const POLL_BUDGET_SHARE = 0.25;
 
 /** Intervals in steps of five seconds, so that noise does not move them. */
 const POLL_INTERVAL_STEP_MS = 5000;

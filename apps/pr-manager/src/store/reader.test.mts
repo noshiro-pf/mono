@@ -161,7 +161,7 @@ describe(createReader, () => {
     assert.strictEqual(loads.length, 3);
   });
 
-  test('reads less often when a read costs more than half the budget allows', async () => {
+  test('reads less often when a read costs more than a quarter of the budget allows', async () => {
     const { reader, loads, timers, clock } = setup(TOKEN_A);
 
     reader.start();
@@ -172,19 +172,19 @@ describe(createReader, () => {
 
     timers.fire(POLL_INTERVAL_MS);
 
-    // 30 points in 15 seconds: one read every 45 seconds spends 2,500 an hour.
+    // 30 points in 15 seconds: one read every 90 seconds spends 1,250 an hour.
     clock.set(16_000);
 
     await answer(loads, 1, Result.ok(readAt(16_000)), budget(3970));
 
-    assert.strictEqual(reader.pollIntervalMs.getSnapshot().value, 45_000);
+    assert.strictEqual(reader.pollIntervalMs.getSnapshot().value, 90_000);
 
-    // The fifteen-second timer is gone, and the next read is 45 seconds on.
+    // The fifteen-second timer is gone, and the next read is 90 seconds on.
     assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
 
-    assert.strictEqual(timers.running(45_000), 1);
+    assert.strictEqual(timers.running(90_000), 1);
 
-    timers.fire(45_000);
+    timers.fire(90_000);
 
     assert.strictEqual(loads.length, 3);
   });
@@ -212,24 +212,155 @@ describe(createReader, () => {
 
     assert.strictEqual(loads.length, 1);
 
-    clock.set(9_000);
+    clock.set(20_000);
 
     visibility.show();
 
     assert.strictEqual(loads.length, 2);
 
-    assert.strictEqual(reader.nowMs.getSnapshot().value, 9_000);
+    assert.strictEqual(reader.nowMs.getSnapshot().value, 20_000);
+  });
+
+  // Each read costs the whole report's points, and a reader going back and forth
+  // between this tab and GitHub showed it dozens of times an hour, every one a
+  // read the poll interval never counted.
+  test('a tab shown again within an interval of the last read waits out the rest of it', () => {
+    const { reader, loads, clock, timers, visibility } = setup(TOKEN_A);
+
+    reader.start();
+
+    visibility.hide();
+
+    clock.set(5_000);
+
+    visibility.show();
+
+    assert.strictEqual(loads.length, 1);
+
+    assert.strictEqual(reader.nowMs.getSnapshot().value, 5_000);
+
+    assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
+
+    assert.strictEqual(timers.running(10_000), 1);
+
+    clock.set(15_000);
+
+    timers.fire(10_000);
+
+    assert.strictEqual(loads.length, 2);
+
+    // Then the interval as ever, from that read.
+    assert.strictEqual(timers.running(10_000), 0);
+
+    assert.strictEqual(timers.running(POLL_INTERVAL_MS), 1);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    assert.strictEqual(loads.length, 3);
+  });
+
+  // A failure can repeat on every read, and each costs points.
+  test('a tab shown again after a read that failed waits out the interval too', async () => {
+    const { reader, loads, clock, timers, visibility } = setup(TOKEN_A);
+
+    reader.start();
+
+    await answer(loads, 0, Result.err('offline'), LIMIT);
+
+    visibility.hide();
+
+    clock.set(5_000);
+
+    visibility.show();
+
+    assert.strictEqual(loads.length, 1);
+
+    assert.strictEqual(timers.running(10_000), 1);
+  });
+
+  test('a tab shown again beside a poll that failed waits out the interval', async () => {
+    const { reader, loads, clock, timers, visibility } = setup(TOKEN_A);
+
+    reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(0)), LIMIT);
+
+    clock.set(15_000);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    await answer(loads, 1, Result.err('refused'), LIMIT);
+
+    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+      type: 'ready',
+      pollError: 'refused',
+      refreshing: false,
+    });
+
+    visibility.hide();
+
+    clock.set(20_000);
+
+    visibility.show();
+
+    assert.strictEqual(loads.length, 2);
+
+    assert.strictEqual(timers.running(10_000), 1);
+  });
+
+  test('a tab shown again waits at most an interval, for a clock put back', () => {
+    const { reader, loads, clock, timers, visibility } = setup(TOKEN_A);
+
+    clock.set(10_000);
+
+    reader.start();
+
+    visibility.hide();
+
+    clock.set(0);
+
+    visibility.show();
+
+    assert.strictEqual(loads.length, 1);
+
+    assert.strictEqual(timers.running(25_000), 0);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    assert.strictEqual(loads.length, 2);
+  });
+
+  test('a tab hidden before the rest of the interval is out reads nothing', () => {
+    const { reader, loads, clock, timers, visibility } = setup(TOKEN_A);
+
+    reader.start();
+
+    visibility.hide();
+
+    clock.set(5_000);
+
+    visibility.show();
+
+    visibility.hide();
+
+    assert.strictEqual(timers.running(10_000), 0);
+
+    timers.fire(10_000);
+
+    assert.strictEqual(loads.length, 1);
   });
 
   // The failure this is here to prevent: a tab that came back was read at once
   // and then again at whatever point the old period had reached, which could be
   // a second later.
   test('a tab that comes back polls from the read it came back to', () => {
-    const { reader, loads, timers, visibility } = setup(TOKEN_A);
+    const { reader, loads, clock, timers, visibility } = setup(TOKEN_A);
 
     reader.start();
 
     visibility.hide();
+
+    clock.set(POLL_INTERVAL_MS);
 
     visibility.show();
 
@@ -245,7 +376,7 @@ describe(createReader, () => {
   });
 
   test('a tab opened hidden reads once, and polls only once it is shown', () => {
-    const { reader, loads, timers, visibility } = setup(TOKEN_A);
+    const { reader, loads, clock, timers, visibility } = setup(TOKEN_A);
 
     visibility.set(false);
 
@@ -254,6 +385,8 @@ describe(createReader, () => {
     assert.strictEqual(loads.length, 1);
 
     assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
+
+    clock.set(POLL_INTERVAL_MS);
 
     visibility.show();
 

@@ -80,8 +80,10 @@ export const repositoryUrl = (source: ReportSource): string =>
  * follow-up, about 9 points against this repository by GitHub's formula, and
  * GraphQL has no conditional request: a read that finds nothing new costs the
  * same as one that finds everything. Every fifteen seconds is 240 reads an
- * hour, about 2,000 of the 5,000 points an account gets — which leaves the rest
- * for everything else that account does with GraphQL, `gh` included.
+ * hour, which the page keeps to a quarter of the 5,000 points an account gets
+ * only while a read costs five points or fewer; a read costing more is spaced
+ * out further, so that the rest is left for everything else that account does
+ * with GraphQL, `gh` and `unblock-prs` included.
  *
  * **Refresh** is not bound by this. It reads at once, because a reader who
  * presses it wants now rather than the next tick.

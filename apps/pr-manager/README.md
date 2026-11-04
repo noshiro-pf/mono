@@ -56,9 +56,11 @@ repository shown.
 - **Layout**: one, two or three columns, the blocks in any order, any block
   hidden, or the whole page fitted to the window.
 
-The page reads GitHub every fifteen seconds while the tab is visible, less
-often on a repository large enough that this would spend more than half the
-token account's budget, and stops while the tab is hidden.
+The page reads GitHub at most every fifteen seconds while the tab is visible,
+less often where that would spend more than a quarter of the token account's
+budget — a read costing more than five points — and stops while the tab is
+hidden. A tab shown again reads at once only when that interval has passed since
+its last read.
 
 ## What your repository can add
 
@@ -138,9 +140,9 @@ The "remember" choice is still off by default, because a page published
 there later would be on the same site.
 
 - The page spends the token account's GraphQL budget: about 9 points a read with
-  fifty pull requests open, a few more for each further twenty, 2,000 or so of
-  the 5,000 an hour. On a larger repository it reads less often, so that it
-  keeps to about half the budget.
+  fifty pull requests open, and a few more for each further twenty. Where a read
+  costs more than five points it reads less often than every fifteen seconds, so
+  that it keeps to about a quarter of the 5,000 an hour.
   The panel shows what is left and how often it reads.
 
 ## Limits
