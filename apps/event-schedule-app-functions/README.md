@@ -64,12 +64,20 @@ ignored by git and not deployed.
 
 ## Deploy
 
+A push to `main` that changes this package, a workspace package it bundles or
+the lockfile deploys the functions: `deploy-event-schedule-app.yml`, described
+in [docs/event-schedule-app-deploy.md](../../docs/event-schedule-app-deploy.md).
+It builds here, writes the discovery manifest (`functions.yaml`) so that the
+deploy does not start the functions, and deploys without `--force`, so a change
+that deletes a function fails there. Delete one by hand:
+
 ```sh
 cd ../event-schedule-app
 pnpm dlx firebase-tools@15 deploy --only functions
 ```
 
-`predeploy` in `firebase.json` runs the build. The functions are 1st gen
-(`firebase-functions/v1`) on Node.js 22, as they were deployed before;
-moving to 2nd gen renames every function, so it is a change of its own.
+`predeploy` in `firebase.json` runs the build; the workflow removes it, having
+built already. The functions are 1st gen (`firebase-functions/v1`) on Node.js
+22, as they were deployed before; moving to 2nd gen renames every function, so
+it is a change of its own.
 Node.js 22 on 1st gen is supported until 2027-10-31.

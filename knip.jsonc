@@ -80,10 +80,19 @@
   //   `tools/configs/chrome-extension-packaging.mts` — the signing key is
   //   read out of `pass`, and `openssl` derives the extension id from it.
   //
-  // And one that is installed, but not at the root: `firebase`, which
+  // And two that are installed, but not at the root: `firebase`, which
   // `.github/workflows/deploy-firestore.yml` runs from the deployed app's own
-  // `node_modules/.bin` (each app declares `firebase-tools`).
-  "ignoreBinaries": ["diff", "firebase", "openssl", "pass"],
+  // `node_modules/.bin` (each app declares `firebase-tools`), and
+  // `firebase-functions`, which `.github/workflows/deploy-event-schedule-app.yml`
+  // runs from `functions-build/node_modules/.bin` to write the Functions
+  // discovery manifest (`apps/event-schedule-app-functions` declares it).
+  "ignoreBinaries": [
+    "diff",
+    "firebase",
+    "firebase-functions",
+    "openssl",
+    "pass",
+  ],
 
   "workspaces": {
     // **A new entry goes after the previous entry's closing `},`**, never

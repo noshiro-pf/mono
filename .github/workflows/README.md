@@ -30,6 +30,7 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `node-support-update.yml`        | schedule                               | none; opens/closes `chore/node-support-update` |
 | `deploy-pages.yml`               | `push` to `main`                       | none                                           |
 | `deploy-firestore.yml`           | `push` to `main`; `workflow_dispatch`  | none                                           |
+| `deploy-event-schedule-app.yml`  | `push` to `main`; `workflow_dispatch`  | none                                           |
 | `restart-unblock-prs.yml`        | `push` to `main`                       | none; files the author's restart TODO          |
 | `link-check.yml`                 | pull requests, path-filtered; schedule | none; other people's servers decide it         |
 | `e2e-production.yml`             | schedule; `workflow_dispatch`          | none; the live sites decide it                 |
@@ -228,9 +229,10 @@ written, rather than every job that takes the steps.
   `engine-strict` in `node-version-compatibility.yml` and deliberately not in
   `node-support-update.yml`'s canary, `ignore-scripts` in `release.yml`'s
   publishing job, `install: false` in `pnpm-update.yml`, which changes pnpm
-  before it installs anything, and in `deploy-firestore.yml` and
-  `e2e-production.yml`, which install one app rather than the workspace, and
-  `pnpm: false` in `check-gates.yml`, whose diff check runs on Node.js alone.
+  before it installs anything, and in `deploy-firestore.yml`,
+  `deploy-event-schedule-app.yml`'s deploy job and `e2e-production.yml`, which
+  install one app rather than the workspace, and `pnpm: false` in
+  `check-gates.yml`, whose diff check runs on Node.js alone.
 - **The checkout stays in the caller.** A local action is read from the
   workspace, so it cannot be resolved before something has checked it out.
 - **A composite action is a file in the tree**, read when its step starts
@@ -755,12 +757,13 @@ to this.
 
 ## Jobs that hold a key
 
-Four workflows push, open pull requests, publish or deploy: `pnpm-update.yml`,
-`node-support-update.yml`, `release.yml`, `deploy-firestore.yml`. Each runs
-third-party code somewhere in the same run (`pnpm install` and every `tsx`
-invocation execute the dependency tree; `allowBuilds` gates install scripts,
-not the import-time code of the toolchain), and each holds a key that can
-write. Three rules, and the shapes below are made of them:
+Five workflows push, open pull requests, publish or deploy: `pnpm-update.yml`,
+`node-support-update.yml`, `release.yml`, `deploy-firestore.yml`,
+`deploy-event-schedule-app.yml`. Each runs third-party code somewhere in the
+same run (`pnpm install` and every `tsx` invocation execute the dependency tree;
+`allowBuilds` gates install scripts, not the import-time code of the toolchain),
+and each holds a key that can write. Three rules, and the shapes below are made
+of them:
 
 - **A `run:` block is the definition GitHub resolved** when the run started.
   A file in the tree is read at invocation instead, after anything that ran
@@ -785,14 +788,18 @@ environment, and the only thing that crosses is an artifact, which it applies
 or unpacks rather than executes.
 
 So the job that runs the dependency tree holds nothing (`contents: read`,
-`persist-credentials: false` on its checkout, so no token is in the git
-config either), and the job that holds the key installs nothing and runs
-nothing out of the working tree. `pnpm-update.yml` crosses a patch,
-`release.yml` a `dist/` tarball.
+`persist-credentials: false` on its checkout, so no token is in the git config
+either), and the job that holds the key installs nothing and runs nothing out of
+the working tree. `pnpm-update.yml` crosses a patch, `release.yml` a `dist/`
+tarball.
 `node-support-update.yml` is the one that is not split, and says why.
-`deploy-firestore.yml` holds a Google Cloud credential and has nothing to
-split off: it builds nothing, installs with `--ignore-scripts`, and the one
+`deploy-firestore.yml` holds a Google Cloud credential and has nothing to split
+off: it builds nothing, installs with `--ignore-scripts`, and the one
 third-party tree it runs is firebase-tools, the tool that uses the credential.
+`deploy-event-schedule-app.yml` does build, so it is split: `build` crosses the
+Hosting and Functions output as tarballs, which `deploy` checks before it
+unpacks them, and the functions' discovery manifest, so that firebase-tools does
+not start the functions with the credential in hand.
 
 ### Pushing a branch and opening a pull request
 

@@ -18,8 +18,10 @@
 
 ## 対象外
 
-- **`event-schedule-app`・`event-schedule-app-functions`・`poll-discord-app`**：
-  本番で実ユーザーがいるので、デプロイは今も手で行う。
+- **`event-schedule-app`・`event-schedule-app-functions`**：Hosting と
+  Functions も一緒に、`deploy-event-schedule-app.yml` がデプロイする
+  （`docs/event-schedule-app-deploy.md`。この workflow との違いもそこにある）。
+- **`poll-discord-app`**：本番で実ユーザーがいるので、デプロイは今も手で行う。
 - **Pages へ 301 を返すだけの `firebase.json`**（`annotation-tool` など）：一度
   デプロイしたら終わりで、継続的なデプロイは要らない。
 
