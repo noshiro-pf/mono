@@ -18,6 +18,9 @@
  * anywhere below them, since landing what is high means landing what holds it
  * up first, and "none" sits between mid and low.
  *
+ * **The drafts** are one switch: switched off, a draft is hidden whatever else
+ * it is, which leaves what nobody is still working on.
+ *
  * What is hidden gives its place to what is shown below it, so the tree stays a
  * tree. Everything is shown, in merge order, by default.
  *
@@ -25,16 +28,18 @@
  * bookmark or a pasted link opens on the same pull requests; only what differs
  * from {@link DEFAULT_MERGE_ORDER_VIEW} is written:
  * `prs.hide=queued.setAside` (the statuses switched off), `prs.only=failing`
- * (the ones picked), `prs.hidePriority=low.none` and `prs.sort=priority`. A
- * name it does not know is dropped, so a URL written by an older page, or
- * edited by hand, still opens.
+ * (the ones picked), `prs.hidePriority=low.none`, `prs.hideDrafts=1` and
+ * `prs.sort=priority`. A name it does not know is dropped, so a URL written by
+ * an older page, or edited by hand, still opens.
  *
  * **Searched for on GitHub** ({@link githubSearchOf}) as far as GitHub's search
  * can say it, for the block's "on GitHub" link.
  *
- * A draft is not one of the statuses: it is always shown, and its badge on the
- * card says what it is. Nor is being behind the base, which the card's ahead /
- * behind bar says. A choice saved while either was one drops it.
+ * A draft is not one of the statuses, which are counts a pull request is under
+ * as well as whatever else it is, and which "only" can pick; its switch is
+ * beside the priorities, and its badge on the card says what it is. Nor is
+ * being behind the base, which the card's ahead / behind bar says. A choice
+ * saved while either was a status drops it.
  */
 
 import {
@@ -55,9 +60,11 @@ import {
 } from './priority.mjs';
 import {
   currentSearch,
+  flagParam,
   namesParam,
   rewriteSearch,
   searchOf,
+  setFlagParam,
   setNamesParam,
 } from './url.mjs';
 
@@ -132,6 +139,7 @@ export type MergeOrderView = Readonly<{
   /** What is picked; nothing picked is no narrowing. */
   onlyStatuses: readonly StatusFilter[];
   hiddenPriorities: readonly Priority[];
+  hideDrafts: boolean;
   sort: MergeOrderSort;
 }>;
 
@@ -139,6 +147,7 @@ export const DEFAULT_MERGE_ORDER_VIEW: MergeOrderView = {
   hiddenStatuses: [],
   onlyStatuses: [],
   hiddenPriorities: [],
+  hideDrafts: false,
   sort: 'order',
 } as const;
 
@@ -147,6 +156,7 @@ export const statusesOf = (entry: Entry): readonly StatusFilter[] =>
   STATUS_FILTERS.filter((filter) => STATUS_TESTS[filter](entry));
 
 export const isShown = (entry: Entry, view: MergeOrderView): boolean =>
+  !(view.hideDrafts && entry.isDraft) &&
   !view.hiddenPriorities.includes(priorityOf(entry.labels)) &&
   shownByStatus(statusesOf(entry), view);
 
@@ -286,6 +296,7 @@ export type MergeOrderCounts = Readonly<{
   open: Count;
   statuses: ReadonlyRecord<StatusFilter, Count>;
   priorities: ReadonlyRecord<Priority, Count>;
+  drafts: Count;
 }>;
 
 /**
@@ -328,6 +339,10 @@ export const countView = (
       low: underPriority('low'),
       none: underPriority('none'),
     },
+    drafts: countUnder(entries, (entry) => entry.isDraft, {
+      ...view,
+      hideDrafts: false,
+    }),
   } as const;
 };
 
@@ -359,6 +374,9 @@ export const togglePriority = (
     ...view,
     hiddenPriorities: toggled(PRIORITIES, view.hiddenPriorities, priority),
   }) as const;
+
+export const toggleDrafts = (view: MergeOrderView): MergeOrderView =>
+  ({ ...view, hideDrafts: !view.hideDrafts }) as const;
 
 export const withSort = (
   view: MergeOrderView,
@@ -394,7 +412,8 @@ export type MergeOrderSearch = Readonly<{
  *
  * `none` switched off asks for one of the priority labels. A pull request
  * carrying several, which the page counts as `none`, is where the two can still
- * differ, either way. The order is not searched for: GitHub has no merge order.
+ * differ, either way. Drafts switched off are `draft:false`. The order is not
+ * searched for: GitHub has no merge order.
  */
 export const githubSearchOf = (view: MergeOrderView): MergeOrderSearch => {
   const hiddenLabels = labelsOf(view.hiddenStatuses).map(notLabelQualifier);
@@ -421,6 +440,7 @@ export const githubSearchOf = (view: MergeOrderView): MergeOrderSearch => {
         ? [anyLabelQualifier(pickedLabels)]
         : []),
       ...priorities,
+      ...(view.hideDrafts ? ['draft:false'] : []),
     ],
     unhidden: view.hiddenStatuses.filter(
       (filter) => STATUS_LABELS[filter] === undefined,
@@ -466,6 +486,7 @@ export const mergeOrderViewFromSearch = (search: string): MergeOrderView => {
       (each) => !hiddenStatuses.includes(each),
     ),
     hiddenPriorities: namesParam(PRIORITIES, params.getAll(PARAM.hidePriority)),
+    hideDrafts: flagParam(params, PARAM.hideDrafts),
     sort: params.get(PARAM.sort) === 'priority' ? 'priority' : 'order',
   };
 };
@@ -482,6 +503,8 @@ export const searchWithMergeOrderView = (
   setNamesParam(params, PARAM.only, view.onlyStatuses);
 
   setNamesParam(params, PARAM.hidePriority, view.hiddenPriorities);
+
+  setFlagParam(params, PARAM.hideDrafts, view.hideDrafts);
 
   if (view.sort === 'priority') {
     params.set(PARAM.sort, view.sort);
@@ -574,6 +597,7 @@ const PARAM = {
   hide: 'prs.hide',
   only: 'prs.only',
   hidePriority: 'prs.hidePriority',
+  hideDrafts: 'prs.hideDrafts',
   sort: 'prs.sort',
 } as const;
 

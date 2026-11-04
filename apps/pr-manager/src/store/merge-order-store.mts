@@ -23,6 +23,7 @@ import {
   countView,
   githubSearchOf,
   statusFiltersOf,
+  toggleDrafts,
   toggleOnly,
   togglePriority,
   toggleStatus,
@@ -49,13 +50,17 @@ export type MergeOrderStore = Readonly<{
   view: InitializedObservable<MergeOrderView>;
   /** The merge order with what the view hides taken out, in its order. */
   roots: InitializedObservable<LoadedReport['roots']>;
-  /** What the counts and the priorities read, as the view leaves them. */
+  /**
+   * What the counts, the priorities and the drafts read, as the view leaves
+   * them.
+   */
   counts: InitializedObservable<MergeOrderCounts>;
   /** The view as a GitHub search, for the block's "on GitHub" link. */
   search: InitializedObservable<MergeOrderSearch>;
   toggleStatus: (filter: StatusFilter) => void;
   toggleOnly: (filter: StatusFilter) => void;
   togglePriority: (priority: Priority) => void;
+  toggleDrafts: () => void;
   setSort: (sort: MergeOrderSort) => void;
   /** Saves every change from now on; returns what stops it. */
   start: () => () => void;
@@ -108,6 +113,9 @@ export const createMergeOrderStore = (
     },
     togglePriority: (priority) => {
       updateView((current) => togglePriority(current, priority));
+    },
+    toggleDrafts: () => {
+      updateView(toggleDrafts);
     },
     setSort: (sort) => {
       updateView((current) => withSort(current, sort));

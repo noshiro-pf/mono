@@ -18,6 +18,7 @@ import {
   STATUS_FILTERS,
   statusesOf,
   statusFiltersOf,
+  toggleDrafts,
   toggleOnly,
   togglePriority,
   toggleStatus,
@@ -200,6 +201,16 @@ describe(isShown, () => {
     assert.isTrue(isShown(entry(2, { labels: [label('priority:mid')] }), view));
   });
 
+  test('with drafts switched off, a draft is hidden whatever else it is', () => {
+    const view = toggleDrafts(toggleOnly(DEFAULT_MERGE_ORDER_VIEW, 'failing'));
+
+    assert.isFalse(
+      isShown(entry(1, { isDraft: true, verdict: 'failing' }), view),
+    );
+
+    assert.isTrue(isShown(entry(2, { verdict: 'failing' }), view));
+  });
+
   test('with some statuses picked, a pull request under any of them is shown, whatever else it is, and one under none is not', () => {
     const view = toggleOnly(
       toggleOnly(DEFAULT_MERGE_ORDER_VIEW, 'failing'),
@@ -375,6 +386,57 @@ describe(countView, () => {
   });
 });
 
+describe('countView: drafts', () => {
+  const entries = [
+    entry(1, { isDraft: true }),
+    entry(2, { isDraft: true, labels: [label('priority:low')] }),
+    entry(3),
+  ] as const;
+
+  test('switched on, is how many of the list are drafts', () => {
+    assert.deepStrictEqual(
+      countView(entries, togglePriority(DEFAULT_MERGE_ORDER_VIEW, 'low'))
+        .drafts,
+      { shown: 1, total: 2 },
+    );
+  });
+
+  test('switched off, is how many switching them back on would show', () => {
+    const counts = countView(entries, toggleDrafts(DEFAULT_MERGE_ORDER_VIEW));
+
+    assert.deepStrictEqual(counts.drafts, { shown: 2, total: 2 });
+
+    assert.deepStrictEqual(counts.open, { shown: 1, total: 3 });
+
+    // #2, a draft, is low; the other counts leave out what the list does.
+    assert.deepStrictEqual(counts.priorities.low, { shown: 0, total: 1 });
+
+    assert.deepStrictEqual(counts.priorities.none, { shown: 1, total: 2 });
+  });
+
+  test('switched off, leaves the drafts out of the status counts too', () => {
+    const counts = countView(
+      [
+        entry(1, { isDraft: true, labels: [label('merge-queued')] }),
+        entry(2, { labels: [label('merge-queued')] }),
+      ],
+      toggleDrafts(DEFAULT_MERGE_ORDER_VIEW),
+    );
+
+    assert.deepStrictEqual(counts.statuses.queued, { shown: 1, total: 2 });
+  });
+});
+
+describe(toggleDrafts, () => {
+  test('switches drafts off and back on', () => {
+    const once = toggleDrafts(DEFAULT_MERGE_ORDER_VIEW);
+
+    assert.isTrue(once.hideDrafts);
+
+    assert.deepStrictEqual(toggleDrafts(once), DEFAULT_MERGE_ORDER_VIEW);
+  });
+});
+
 describe(toggleStatus, () => {
   test('hides a shown status and shows a hidden one, keeping the list in its own order', () => {
     const once = toggleStatus(
@@ -541,6 +603,14 @@ describe(githubSearchOf, () => {
     });
   });
 
+  test('drafts switched off are left out', () => {
+    assert.deepStrictEqual(searchFor({ hideDrafts: true }), {
+      qualifiers: ['draft:false'],
+      unhidden: [],
+      unpicked: [],
+    });
+  });
+
   test('the order is not a search', () => {
     assert.deepStrictEqual(searchFor({ sort: 'priority' }), {
       qualifiers: [],
@@ -580,6 +650,7 @@ describe(mergeOrderViewFromSearch, () => {
       hiddenStatuses: ['queued', 'setAside'],
       onlyStatuses: ['failing'],
       hiddenPriorities: ['low', 'none'],
+      hideDrafts: true,
       sort: 'priority',
     } as const;
 
@@ -587,7 +658,7 @@ describe(mergeOrderViewFromSearch, () => {
 
     assert.strictEqual(
       search,
-      '?prs.hide=queued.setAside&prs.only=failing&prs.hidePriority=low.none&prs.sort=priority',
+      '?prs.hide=queued.setAside&prs.only=failing&prs.hidePriority=low.none&prs.hideDrafts=1&prs.sort=priority',
     );
 
     assert.deepStrictEqual(mergeOrderViewFromSearch(search), view);
@@ -631,7 +702,7 @@ describe(searchWithMergeOrderView, () => {
   test('writes the default as no parameter, and leaves the others where they were', () => {
     assert.strictEqual(
       searchWithMergeOrderView(
-        '?a=1&prs.hide=queued&prs.sort=priority&b=2',
+        '?a=1&prs.hide=queued&prs.hideDrafts=1&prs.sort=priority&b=2',
         DEFAULT_MERGE_ORDER_VIEW,
       ),
       '?a=1&b=2',

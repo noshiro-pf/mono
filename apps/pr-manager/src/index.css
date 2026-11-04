@@ -2653,14 +2653,16 @@ a:focus-visible {
  * wrap: its chips say what they are (a start state in the DAG's words, a
  * label with its colour), and the `<fieldset>` keeps its name for a screen
  * reader. The merge order keeps `priority`, without which `none` would say
- * nothing, and its sort says `order` for `merge order` instead.
+ * nothing, but not `state`, since `draft` says what it is; its sort says
+ * `order` for `merge order` instead.
  */
 @container filter-bar (width < 27rem) {
   .summary-row:has(> :nth-child(5)) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .issues-list-controls .filter-group-name {
+  .issues-list-controls .filter-group-name,
+  .state-group-name {
     display: none;
   }
 

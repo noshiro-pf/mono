@@ -48,8 +48,10 @@ repository shown.
   behind its base, whether it waits for a code owner's approval, whether it
   is a draft, whether auto-merge is armed, its labels and the issues it
   closes.
-- **Counts that filter**: open, failing, awaiting code owner, pending. Click
-  one to hide what it counts, or its **only** button to show nothing else.
+- **Counts that filter**: open, failing, awaiting code owner, pending. Click one
+  to hide what it counts, or its **only** button to show nothing else.
+  The priorities and the drafts are switches too, so a draft still being worked
+  on can be left out.
 - **Running workflows**, **what merged in the last week**, and **the open
   issues**, as a list you can filter and sort, or as a **DAG** of what each
   issue waits for.

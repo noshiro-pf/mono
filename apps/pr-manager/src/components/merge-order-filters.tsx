@@ -22,9 +22,9 @@ import { OfTotal, StatTile, StatToggle } from './stat-tile.js';
 
 /**
  * What the merge order leads with: the counts, each a switch for the pull
- * requests it counts with an `only` switch in its corner, then the priorities,
- * which are switches too, and the order. What a switch does is
- * `merge-order-view.mts`, which keeps the choice in the URL.
+ * requests it counts with an `only` switch in its corner, then the priorities
+ * and, under `state`, the drafts, which are switches too, and the order. What a
+ * switch does is `merge-order-view.mts`, which keeps the choice in the URL.
  *
  * Each number is what the list below shows (`countView` in
  * `merge-order-view.mts`), and, when the switches leave some of them out, how
@@ -32,9 +32,10 @@ import { OfTotal, StatTile, StatToggle } from './stat-tile.js';
  * against, and the whole is still a glance away. `open` is the one count that
  * is not a switch: hiding every open pull request is not a view of them. The
  * first three counts are `pr-report-core`'s, the same `pnpm run pr-report`
- * leads with, less its `draft` and `behind`, which are not drawn: a draft is
- * always shown, and its card's badge says so, and how far behind the base a
- * pull request is is its card's ahead / behind bar.
+ * leads with, less its `draft` and `behind`, which are not drawn as counts: the
+ * drafts are the switch under `state`, and each card's badge says which it is,
+ * and how far behind the base a pull request is is its card's ahead / behind
+ * bar.
  * `set aside` and `awaiting code owner` are what stops a pull request that
  * is otherwise ready, and are only this page's, as is `pending`, the
  * `pending` label an author puts on what they are holding back, which is
@@ -136,6 +137,32 @@ export const MergeOrderFilters = (): JSX.Element => {
         </fieldset>
 
         <fieldset
+          aria-label={constant('State')}
+          class={constant('filter-group')}
+        >
+          <span class={constant('filter-group-name state-group-name')}>
+            {constant('state')}
+          </span>
+          <button
+            aria-pressed={view(view$, ({ hideDrafts }) =>
+              (!hideDrafts).toString(),
+            )}
+            class={constant('filter-chip')}
+            title={constant(
+              'Drafts, which are still being worked on; switched off, they are hidden whatever else they are.',
+            )}
+            type={constant('button')}
+            onClick={toggleDrafts}
+          >
+            {constant('draft')}
+            <span class={constant('filter-chip-count')}>
+              {view(counts$, ({ drafts }) => drafts.shown)}
+              <OfTotal count={view(counts$, ({ drafts }) => drafts)} />
+            </span>
+          </button>
+        </fieldset>
+
+        <fieldset
           aria-label={constant('Sort')}
           class={constant('theme-switch')}
         >
@@ -185,6 +212,10 @@ const STATUS_TONES = {
   awaitingReview: 'warning',
   pending: undefined,
 } as const satisfies ReadonlyRecord<StatusFilter, StatusRole | undefined>;
+
+const toggleDrafts = (): void => {
+  mergeOrderStore.toggleDrafts();
+};
 
 const sortBy = (sort: MergeOrderSort) => (): void => {
   mergeOrderStore.setSort(sort);
