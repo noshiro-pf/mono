@@ -4,11 +4,7 @@ import {
   Arr,
   asUint32,
   hasKey,
-  isRecord,
-  isString,
   Json,
-  Obj,
-  Optional,
   Result,
   unknownToString,
 } from 'ts-data-forge';
@@ -20,6 +16,7 @@ import {
   CI_JOB_BUILD,
   CI_JOB_COMMAND,
 } from '../lib/ci-job-options.mjs';
+import { readScripts } from '../lib/manifest-scripts.mjs';
 import { optionValues, readPnpmRun, readRunAll } from '../lib/pnpm-command.mjs';
 import { listWorkflowFiles } from '../lib/repo-files.mjs';
 import { readShellCommands } from '../lib/shell-commands.mjs';
@@ -635,7 +632,7 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
     scriptName: 'ws:check:e2e',
     // `code-check.yml` runs it as two shards, `ws:check:e2e:shard-1` and
     // `ws:check:e2e:shard-2`, which between them reach every app's `check:e2e`;
-    // that they partition the apps is in their filters.
+    // that their filters partition the apps is `check:root:workspace-shards`.
   },
   {
     directory: ROOT_DIRECTORY,
@@ -645,7 +642,8 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
     // `strict-lib-gen.yml`), which between them reach every package's
     // `check:types`. As with `ws:check:lint` below, neither covers the root
     // command on its own; that the halves partition the packages is in their
-    // filters, `!./strict-lib/**` and `./strict-lib/**`.
+    // filters, `!./strict-lib/**` and `./strict-lib/**`
+    // (`check:root:workspace-shards`).
   },
   {
     directory: ROOT_DIRECTORY,
@@ -654,7 +652,8 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
     // `ws:fix:lint:non-apps`, which between them reach every package's
     // `fix:lint` — and through it `check:lint`. Neither half covers the root
     // command on its own, so no `DECLARED_COVERAGE` edge says so; that the
-    // halves partition the packages is in their filters.
+    // halves partition the packages is in their filters
+    // (`check:root:workspace-shards`).
   },
   {
     // Every package that defines one.
@@ -867,25 +866,6 @@ export const resolvePackageRuns = (
   }
 
   return { commands: Arr.uniq(mut_commands), problems: mut_problems };
-};
-
-/** A manifest's `scripts`, the string-valued entries only. */
-export const readScripts = (
-  manifest: unknown,
-): ReadonlyRecord<string, string> => {
-  if (!isRecord(manifest) || !hasKey(manifest, 'scripts')) {
-    return {};
-  }
-
-  const scripts = manifest.scripts;
-
-  if (!isRecord(scripts)) {
-    return {};
-  }
-
-  return Obj.filterMap(scripts, (body) =>
-    isString(body) ? Optional.some(body) : Optional.none,
-  );
 };
 
 export const toCommandId = (directory: string, scriptName: string): CommandId =>

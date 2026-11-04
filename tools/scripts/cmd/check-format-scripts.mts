@@ -2,8 +2,8 @@ import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { readScripts } from '../lib/manifest-scripts.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
-import { readScripts } from './check-ci-commands.mjs';
 
 /**
  * Fails when a workspace member formats with Prettier other than through
