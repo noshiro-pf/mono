@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files-branded/lib.es5.d.ts b/v5.7/output/lib-files-branded/lib.es5.d.ts
-index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c54646ff1b07 100644
+index b8e4d9057523bf774c9db2fc27ba9d57d0159f9c..31a4853cd4c4ce4063913f5cfcbc5369cf25a762 100644
 --- a/v5.6/output/lib-files-branded/lib.es5.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.es5.d.ts
-@@ -2179,11 +2179,13 @@ interface ArrayBufferConstructor {
+@@ -2222,11 +2222,13 @@ interface ArrayBufferConstructor {
  }
  declare const ArrayBuffer: ArrayBufferConstructor;
  
@@ -18,7 +18,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The length in bytes of the array.
-@@ -2196,8 +2198,8 @@ interface ArrayBufferView {
+@@ -2239,8 +2241,8 @@ interface ArrayBufferView {
    readonly byteOffset: NumberType.TypedArraySize;
  }
  
@@ -29,7 +29,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
    readonly byteLength: NumberType.TypedArraySize;
    readonly byteOffset: NumberType.TypedArraySize;
    /**
-@@ -2375,14 +2377,17 @@ interface DataView {
+@@ -2418,14 +2420,17 @@ interface DataView {
      littleEndian?: boolean,
    ): void;
  }
@@ -52,7 +52,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  }
  declare const DataView: DataViewConstructor;
  
-@@ -2390,7 +2395,7 @@ declare const DataView: DataViewConstructor;
+@@ -2433,7 +2438,7 @@ declare const DataView: DataViewConstructor;
   * A typed array of 8-bit integer values. The contents are initialized to 0. If the requested
   * number of bytes could not be allocated an exception is raised.
   */
@@ -61,7 +61,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
    /**
     * The size in bytes of each element in the array.
     */
-@@ -2399,7 +2404,7 @@ interface Int8Array {
+@@ -2442,7 +2447,7 @@ interface Int8Array {
    /**
     * The ArrayBuffer instance referenced by the array.
     */
@@ -70,7 +70,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The length in bytes of the array.
-@@ -2438,7 +2443,7 @@ interface Int8Array {
+@@ -2481,7 +2486,7 @@ interface Int8Array {
      predicate: (
        value: import('ts-type-forge').Int8,
        index: NumberType.TypedArraySize,
@@ -79,7 +79,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -2468,10 +2473,10 @@ interface Int8Array {
+@@ -2511,10 +2516,10 @@ interface Int8Array {
      predicate: (
        value: import('ts-type-forge').Int8,
        index: NumberType.TypedArraySize,
@@ -92,7 +92,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -2486,7 +2491,7 @@ interface Int8Array {
+@@ -2529,7 +2534,7 @@ interface Int8Array {
      predicate: (
        value: import('ts-type-forge').Int8,
        index: NumberType.TypedArraySize,
@@ -101,7 +101,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): import('ts-type-forge').Int8 | undefined;
-@@ -2504,7 +2509,7 @@ interface Int8Array {
+@@ -2547,7 +2552,7 @@ interface Int8Array {
      predicate: (
        value: import('ts-type-forge').Int8,
        index: NumberType.TypedArraySize,
@@ -110,7 +110,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
-@@ -2520,7 +2525,7 @@ interface Int8Array {
+@@ -2563,7 +2568,7 @@ interface Int8Array {
      callbackfn: (
        value: import('ts-type-forge').Int8,
        index: NumberType.TypedArraySize,
@@ -119,7 +119,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => void,
      thisArg?: unknown,
    ): void;
-@@ -2571,10 +2576,10 @@ interface Int8Array {
+@@ -2614,10 +2619,10 @@ interface Int8Array {
      callbackfn: (
        value: import('ts-type-forge').Int8,
        index: NumberType.TypedArraySize,
@@ -132,7 +132,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -2591,7 +2596,7 @@ interface Int8Array {
+@@ -2634,7 +2639,7 @@ interface Int8Array {
        previousValue: import('ts-type-forge').Int8,
        currentValue: import('ts-type-forge').Int8,
        currentIndex: NumberType.TypedArraySize,
@@ -141,7 +141,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int8,
    ): import('ts-type-forge').Int8;
    reduce(
-@@ -2599,7 +2604,7 @@ interface Int8Array {
+@@ -2642,7 +2647,7 @@ interface Int8Array {
        previousValue: import('ts-type-forge').Int8,
        currentValue: import('ts-type-forge').Int8,
        currentIndex: NumberType.TypedArraySize,
@@ -150,7 +150,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int8,
      initialValue: import('ts-type-forge').Int8,
    ): import('ts-type-forge').Int8;
-@@ -2619,7 +2624,7 @@ interface Int8Array {
+@@ -2662,7 +2667,7 @@ interface Int8Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Int8,
        currentIndex: NumberType.TypedArraySize,
@@ -159,7 +159,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -2639,7 +2644,7 @@ interface Int8Array {
+@@ -2682,7 +2687,7 @@ interface Int8Array {
        previousValue: import('ts-type-forge').Int8,
        currentValue: import('ts-type-forge').Int8,
        currentIndex: NumberType.TypedArraySize,
@@ -168,7 +168,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int8,
    ): import('ts-type-forge').Int8;
    reduceRight(
-@@ -2647,7 +2652,7 @@ interface Int8Array {
+@@ -2690,7 +2695,7 @@ interface Int8Array {
        previousValue: import('ts-type-forge').Int8,
        currentValue: import('ts-type-forge').Int8,
        currentIndex: NumberType.TypedArraySize,
@@ -177,7 +177,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int8,
      initialValue: import('ts-type-forge').Int8,
    ): import('ts-type-forge').Int8;
-@@ -2667,7 +2672,7 @@ interface Int8Array {
+@@ -2710,7 +2715,7 @@ interface Int8Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Int8,
        currentIndex: NumberType.TypedArraySize,
@@ -186,7 +186,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -2675,7 +2680,7 @@ interface Int8Array {
+@@ -2718,7 +2723,7 @@ interface Int8Array {
    /**
     * Reverses the elements in an Array.
     */
@@ -195,7 +195,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Sets a value or an array of values.
-@@ -2695,7 +2700,7 @@ interface Int8Array {
+@@ -2738,7 +2743,7 @@ interface Int8Array {
    slice(
      start?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -204,7 +204,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -2709,7 +2714,7 @@ interface Int8Array {
+@@ -2752,7 +2757,7 @@ interface Int8Array {
      predicate: (
        value: import('ts-type-forge').Int8,
        index: NumberType.TypedArraySize,
@@ -213,7 +213,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -2739,7 +2744,7 @@ interface Int8Array {
+@@ -2782,7 +2787,7 @@ interface Int8Array {
    subarray(
      begin?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -222,7 +222,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Converts a number to a string by using the current locale.
-@@ -2752,21 +2757,22 @@ interface Int8Array {
+@@ -2795,21 +2800,22 @@ interface Int8Array {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -254,7 +254,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The size in bytes of each element in the array.
-@@ -2777,13 +2783,15 @@ interface Int8ArrayConstructor {
+@@ -2820,13 +2826,15 @@ interface Int8ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -272,7 +272,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -2795,7 +2803,7 @@ interface Int8ArrayConstructor {
+@@ -2838,7 +2846,7 @@ interface Int8ArrayConstructor {
      arrayLike: ArrayLike<T>,
      mapfn: (v: T, k: NumberType.TypedArraySize) => import('ts-type-forge').Int8,
      thisArg?: unknown,
@@ -281,7 +281,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  }
  declare const Int8Array: Int8ArrayConstructor;
  
-@@ -2803,7 +2811,7 @@ declare const Int8Array: Int8ArrayConstructor;
+@@ -2846,7 +2854,7 @@ declare const Int8Array: Int8ArrayConstructor;
   * A typed array of 8-bit unsigned integer values. The contents are initialized to 0. If the
   * requested number of bytes could not be allocated an exception is raised.
   */
@@ -290,7 +290,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
    /**
     * The size in bytes of each element in the array.
     */
-@@ -2812,7 +2820,7 @@ interface Uint8Array {
+@@ -2855,7 +2863,7 @@ interface Uint8Array {
    /**
     * The ArrayBuffer instance referenced by the array.
     */
@@ -299,7 +299,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The length in bytes of the array.
-@@ -2851,7 +2859,7 @@ interface Uint8Array {
+@@ -2894,7 +2902,7 @@ interface Uint8Array {
      predicate: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -308,7 +308,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -2881,10 +2889,10 @@ interface Uint8Array {
+@@ -2924,10 +2932,10 @@ interface Uint8Array {
      predicate: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -321,7 +321,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -2899,7 +2907,7 @@ interface Uint8Array {
+@@ -2942,7 +2950,7 @@ interface Uint8Array {
      predicate: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -330,7 +330,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): import('ts-type-forge').Uint8 | undefined;
-@@ -2917,7 +2925,7 @@ interface Uint8Array {
+@@ -2960,7 +2968,7 @@ interface Uint8Array {
      predicate: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -339,7 +339,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
-@@ -2933,7 +2941,7 @@ interface Uint8Array {
+@@ -2976,7 +2984,7 @@ interface Uint8Array {
      callbackfn: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -348,7 +348,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => void,
      thisArg?: unknown,
    ): void;
-@@ -2984,10 +2992,10 @@ interface Uint8Array {
+@@ -3027,10 +3035,10 @@ interface Uint8Array {
      callbackfn: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -361,7 +361,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -3004,7 +3012,7 @@ interface Uint8Array {
+@@ -3047,7 +3055,7 @@ interface Uint8Array {
        previousValue: import('ts-type-forge').Uint8,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -370,7 +370,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint8,
    ): import('ts-type-forge').Uint8;
    reduce(
-@@ -3012,7 +3020,7 @@ interface Uint8Array {
+@@ -3055,7 +3063,7 @@ interface Uint8Array {
        previousValue: import('ts-type-forge').Uint8,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -379,7 +379,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint8,
      initialValue: import('ts-type-forge').Uint8,
    ): import('ts-type-forge').Uint8;
-@@ -3032,7 +3040,7 @@ interface Uint8Array {
+@@ -3075,7 +3083,7 @@ interface Uint8Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -388,7 +388,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -3052,7 +3060,7 @@ interface Uint8Array {
+@@ -3095,7 +3103,7 @@ interface Uint8Array {
        previousValue: import('ts-type-forge').Uint8,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -397,7 +397,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint8,
    ): import('ts-type-forge').Uint8;
    reduceRight(
-@@ -3060,7 +3068,7 @@ interface Uint8Array {
+@@ -3103,7 +3111,7 @@ interface Uint8Array {
        previousValue: import('ts-type-forge').Uint8,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -406,7 +406,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint8,
      initialValue: import('ts-type-forge').Uint8,
    ): import('ts-type-forge').Uint8;
-@@ -3080,7 +3088,7 @@ interface Uint8Array {
+@@ -3123,7 +3131,7 @@ interface Uint8Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -415,7 +415,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -3088,7 +3096,7 @@ interface Uint8Array {
+@@ -3131,7 +3139,7 @@ interface Uint8Array {
    /**
     * Reverses the elements in an Array.
     */
@@ -424,7 +424,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Sets a value or an array of values.
-@@ -3108,7 +3116,7 @@ interface Uint8Array {
+@@ -3151,7 +3159,7 @@ interface Uint8Array {
    slice(
      start?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -433,7 +433,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -3122,7 +3130,7 @@ interface Uint8Array {
+@@ -3165,7 +3173,7 @@ interface Uint8Array {
      predicate: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -442,7 +442,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -3152,7 +3160,7 @@ interface Uint8Array {
+@@ -3195,7 +3203,7 @@ interface Uint8Array {
    subarray(
      begin?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -451,7 +451,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Converts a number to a string by using the current locale.
-@@ -3165,22 +3173,24 @@ interface Uint8Array {
+@@ -3208,22 +3216,24 @@ interface Uint8Array {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -485,7 +485,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The size in bytes of each element in the array.
-@@ -3191,13 +3201,17 @@ interface Uint8ArrayConstructor {
+@@ -3234,13 +3244,17 @@ interface Uint8ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -505,7 +505,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -3212,7 +3226,7 @@ interface Uint8ArrayConstructor {
+@@ -3255,7 +3269,7 @@ interface Uint8ArrayConstructor {
        k: NumberType.TypedArraySize,
      ) => import('ts-type-forge').Uint8,
      thisArg?: unknown,
@@ -514,7 +514,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  }
  declare const Uint8Array: Uint8ArrayConstructor;
  
-@@ -3220,7 +3234,9 @@ declare const Uint8Array: Uint8ArrayConstructor;
+@@ -3263,7 +3277,9 @@ declare const Uint8Array: Uint8ArrayConstructor;
   * A typed array of 8-bit unsigned integer (clamped) values. The contents are initialized to 0.
   * If the requested number of bytes could not be allocated an exception is raised.
   */
@@ -525,7 +525,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
    /**
     * The size in bytes of each element in the array.
     */
-@@ -3229,7 +3245,7 @@ interface Uint8ClampedArray {
+@@ -3272,7 +3288,7 @@ interface Uint8ClampedArray {
    /**
     * The ArrayBuffer instance referenced by the array.
     */
@@ -534,7 +534,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The length in bytes of the array.
-@@ -3268,7 +3284,7 @@ interface Uint8ClampedArray {
+@@ -3311,7 +3327,7 @@ interface Uint8ClampedArray {
      predicate: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -543,7 +543,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -3298,10 +3314,10 @@ interface Uint8ClampedArray {
+@@ -3341,10 +3357,10 @@ interface Uint8ClampedArray {
      predicate: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -556,7 +556,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -3316,7 +3332,7 @@ interface Uint8ClampedArray {
+@@ -3359,7 +3375,7 @@ interface Uint8ClampedArray {
      predicate: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -565,7 +565,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): import('ts-type-forge').Uint8 | undefined;
-@@ -3334,7 +3350,7 @@ interface Uint8ClampedArray {
+@@ -3377,7 +3393,7 @@ interface Uint8ClampedArray {
      predicate: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -574,7 +574,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
-@@ -3350,7 +3366,7 @@ interface Uint8ClampedArray {
+@@ -3393,7 +3409,7 @@ interface Uint8ClampedArray {
      callbackfn: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -583,7 +583,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => void,
      thisArg?: unknown,
    ): void;
-@@ -3401,10 +3417,10 @@ interface Uint8ClampedArray {
+@@ -3444,10 +3460,10 @@ interface Uint8ClampedArray {
      callbackfn: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -596,7 +596,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -3421,7 +3437,7 @@ interface Uint8ClampedArray {
+@@ -3464,7 +3480,7 @@ interface Uint8ClampedArray {
        previousValue: import('ts-type-forge').Uint8,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -605,7 +605,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint8,
    ): import('ts-type-forge').Uint8;
    reduce(
-@@ -3429,7 +3445,7 @@ interface Uint8ClampedArray {
+@@ -3472,7 +3488,7 @@ interface Uint8ClampedArray {
        previousValue: import('ts-type-forge').Uint8,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -614,7 +614,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint8,
      initialValue: import('ts-type-forge').Uint8,
    ): import('ts-type-forge').Uint8;
-@@ -3449,7 +3465,7 @@ interface Uint8ClampedArray {
+@@ -3492,7 +3508,7 @@ interface Uint8ClampedArray {
        previousValue: U,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -623,7 +623,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -3469,7 +3485,7 @@ interface Uint8ClampedArray {
+@@ -3512,7 +3528,7 @@ interface Uint8ClampedArray {
        previousValue: import('ts-type-forge').Uint8,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -632,7 +632,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint8,
    ): import('ts-type-forge').Uint8;
    reduceRight(
-@@ -3477,7 +3493,7 @@ interface Uint8ClampedArray {
+@@ -3520,7 +3536,7 @@ interface Uint8ClampedArray {
        previousValue: import('ts-type-forge').Uint8,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -641,7 +641,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint8,
      initialValue: import('ts-type-forge').Uint8,
    ): import('ts-type-forge').Uint8;
-@@ -3497,7 +3513,7 @@ interface Uint8ClampedArray {
+@@ -3540,7 +3556,7 @@ interface Uint8ClampedArray {
        previousValue: U,
        currentValue: import('ts-type-forge').Uint8,
        currentIndex: NumberType.TypedArraySize,
@@ -650,7 +650,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -3505,7 +3521,7 @@ interface Uint8ClampedArray {
+@@ -3548,7 +3564,7 @@ interface Uint8ClampedArray {
    /**
     * Reverses the elements in an Array.
     */
@@ -659,7 +659,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Sets a value or an array of values.
-@@ -3525,7 +3541,7 @@ interface Uint8ClampedArray {
+@@ -3568,7 +3584,7 @@ interface Uint8ClampedArray {
    slice(
      start?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -668,7 +668,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -3539,7 +3555,7 @@ interface Uint8ClampedArray {
+@@ -3582,7 +3598,7 @@ interface Uint8ClampedArray {
      predicate: (
        value: import('ts-type-forge').Uint8,
        index: NumberType.TypedArraySize,
@@ -677,7 +677,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -3569,7 +3585,7 @@ interface Uint8ClampedArray {
+@@ -3612,7 +3628,7 @@ interface Uint8ClampedArray {
    subarray(
      begin?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -686,7 +686,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Converts a number to a string by using the current locale.
-@@ -3582,22 +3598,24 @@ interface Uint8ClampedArray {
+@@ -3625,22 +3641,24 @@ interface Uint8ClampedArray {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -720,7 +720,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The size in bytes of each element in the array.
-@@ -3608,13 +3626,17 @@ interface Uint8ClampedArrayConstructor {
+@@ -3651,13 +3669,17 @@ interface Uint8ClampedArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -740,7 +740,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -3629,7 +3651,7 @@ interface Uint8ClampedArrayConstructor {
+@@ -3672,7 +3694,7 @@ interface Uint8ClampedArrayConstructor {
        k: NumberType.TypedArraySize,
      ) => import('ts-type-forge').Uint8,
      thisArg?: unknown,
@@ -749,7 +749,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  }
  declare const Uint8ClampedArray: Uint8ClampedArrayConstructor;
  
-@@ -3637,7 +3659,7 @@ declare const Uint8ClampedArray: Uint8ClampedArrayConstructor;
+@@ -3680,7 +3702,7 @@ declare const Uint8ClampedArray: Uint8ClampedArrayConstructor;
   * A typed array of 16-bit signed integer values. The contents are initialized to 0. If the
   * requested number of bytes could not be allocated an exception is raised.
   */
@@ -758,7 +758,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
    /**
     * The size in bytes of each element in the array.
     */
-@@ -3646,7 +3668,7 @@ interface Int16Array {
+@@ -3689,7 +3711,7 @@ interface Int16Array {
    /**
     * The ArrayBuffer instance referenced by the array.
     */
@@ -767,7 +767,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The length in bytes of the array.
-@@ -3685,7 +3707,7 @@ interface Int16Array {
+@@ -3728,7 +3750,7 @@ interface Int16Array {
      predicate: (
        value: import('ts-type-forge').Int16,
        index: NumberType.TypedArraySize,
@@ -776,7 +776,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -3715,10 +3737,10 @@ interface Int16Array {
+@@ -3758,10 +3780,10 @@ interface Int16Array {
      predicate: (
        value: import('ts-type-forge').Int16,
        index: NumberType.TypedArraySize,
@@ -789,7 +789,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -3733,7 +3755,7 @@ interface Int16Array {
+@@ -3776,7 +3798,7 @@ interface Int16Array {
      predicate: (
        value: import('ts-type-forge').Int16,
        index: NumberType.TypedArraySize,
@@ -798,7 +798,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): import('ts-type-forge').Int16 | undefined;
-@@ -3751,7 +3773,7 @@ interface Int16Array {
+@@ -3794,7 +3816,7 @@ interface Int16Array {
      predicate: (
        value: import('ts-type-forge').Int16,
        index: NumberType.TypedArraySize,
@@ -807,7 +807,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
-@@ -3767,7 +3789,7 @@ interface Int16Array {
+@@ -3810,7 +3832,7 @@ interface Int16Array {
      callbackfn: (
        value: import('ts-type-forge').Int16,
        index: NumberType.TypedArraySize,
@@ -816,7 +816,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => void,
      thisArg?: unknown,
    ): void;
-@@ -3818,10 +3840,10 @@ interface Int16Array {
+@@ -3861,10 +3883,10 @@ interface Int16Array {
      callbackfn: (
        value: import('ts-type-forge').Int16,
        index: NumberType.TypedArraySize,
@@ -829,7 +829,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -3838,7 +3860,7 @@ interface Int16Array {
+@@ -3881,7 +3903,7 @@ interface Int16Array {
        previousValue: import('ts-type-forge').Int16,
        currentValue: import('ts-type-forge').Int16,
        currentIndex: NumberType.TypedArraySize,
@@ -838,7 +838,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int16,
    ): import('ts-type-forge').Int16;
    reduce(
-@@ -3846,7 +3868,7 @@ interface Int16Array {
+@@ -3889,7 +3911,7 @@ interface Int16Array {
        previousValue: import('ts-type-forge').Int16,
        currentValue: import('ts-type-forge').Int16,
        currentIndex: NumberType.TypedArraySize,
@@ -847,7 +847,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int16,
      initialValue: import('ts-type-forge').Int16,
    ): import('ts-type-forge').Int16;
-@@ -3866,7 +3888,7 @@ interface Int16Array {
+@@ -3909,7 +3931,7 @@ interface Int16Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Int16,
        currentIndex: NumberType.TypedArraySize,
@@ -856,7 +856,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -3886,7 +3908,7 @@ interface Int16Array {
+@@ -3929,7 +3951,7 @@ interface Int16Array {
        previousValue: import('ts-type-forge').Int16,
        currentValue: import('ts-type-forge').Int16,
        currentIndex: NumberType.TypedArraySize,
@@ -865,7 +865,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int16,
    ): import('ts-type-forge').Int16;
    reduceRight(
-@@ -3894,7 +3916,7 @@ interface Int16Array {
+@@ -3937,7 +3959,7 @@ interface Int16Array {
        previousValue: import('ts-type-forge').Int16,
        currentValue: import('ts-type-forge').Int16,
        currentIndex: NumberType.TypedArraySize,
@@ -874,7 +874,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int16,
      initialValue: import('ts-type-forge').Int16,
    ): import('ts-type-forge').Int16;
-@@ -3914,7 +3936,7 @@ interface Int16Array {
+@@ -3957,7 +3979,7 @@ interface Int16Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Int16,
        currentIndex: NumberType.TypedArraySize,
@@ -883,7 +883,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -3922,7 +3944,7 @@ interface Int16Array {
+@@ -3965,7 +3987,7 @@ interface Int16Array {
    /**
     * Reverses the elements in an Array.
     */
@@ -892,7 +892,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Sets a value or an array of values.
-@@ -3942,7 +3964,7 @@ interface Int16Array {
+@@ -3985,7 +4007,7 @@ interface Int16Array {
    slice(
      start?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -901,7 +901,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -3956,7 +3978,7 @@ interface Int16Array {
+@@ -3999,7 +4021,7 @@ interface Int16Array {
      predicate: (
        value: import('ts-type-forge').Int16,
        index: NumberType.TypedArraySize,
@@ -910,7 +910,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -3986,7 +4008,7 @@ interface Int16Array {
+@@ -4029,7 +4051,7 @@ interface Int16Array {
    subarray(
      begin?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -919,7 +919,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Converts a number to a string by using the current locale.
-@@ -3999,22 +4021,24 @@ interface Int16Array {
+@@ -4042,22 +4064,24 @@ interface Int16Array {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -953,7 +953,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The size in bytes of each element in the array.
-@@ -4025,13 +4049,17 @@ interface Int16ArrayConstructor {
+@@ -4068,13 +4092,17 @@ interface Int16ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -973,7 +973,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -4046,7 +4074,7 @@ interface Int16ArrayConstructor {
+@@ -4089,7 +4117,7 @@ interface Int16ArrayConstructor {
        k: NumberType.TypedArraySize,
      ) => import('ts-type-forge').Int16,
      thisArg?: unknown,
@@ -982,7 +982,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  }
  declare const Int16Array: Int16ArrayConstructor;
  
-@@ -4054,7 +4082,7 @@ declare const Int16Array: Int16ArrayConstructor;
+@@ -4097,7 +4125,7 @@ declare const Int16Array: Int16ArrayConstructor;
   * A typed array of 16-bit unsigned integer values. The contents are initialized to 0. If the
   * requested number of bytes could not be allocated an exception is raised.
   */
@@ -991,7 +991,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
    /**
     * The size in bytes of each element in the array.
     */
-@@ -4063,7 +4091,7 @@ interface Uint16Array {
+@@ -4106,7 +4134,7 @@ interface Uint16Array {
    /**
     * The ArrayBuffer instance referenced by the array.
     */
@@ -1000,7 +1000,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The length in bytes of the array.
-@@ -4102,7 +4130,7 @@ interface Uint16Array {
+@@ -4145,7 +4173,7 @@ interface Uint16Array {
      predicate: (
        value: import('ts-type-forge').Uint16,
        index: NumberType.TypedArraySize,
@@ -1009,7 +1009,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -4132,10 +4160,10 @@ interface Uint16Array {
+@@ -4175,10 +4203,10 @@ interface Uint16Array {
      predicate: (
        value: import('ts-type-forge').Uint16,
        index: NumberType.TypedArraySize,
@@ -1022,7 +1022,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -4150,7 +4178,7 @@ interface Uint16Array {
+@@ -4193,7 +4221,7 @@ interface Uint16Array {
      predicate: (
        value: import('ts-type-forge').Uint16,
        index: NumberType.TypedArraySize,
@@ -1031,7 +1031,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): import('ts-type-forge').Uint16 | undefined;
-@@ -4168,7 +4196,7 @@ interface Uint16Array {
+@@ -4211,7 +4239,7 @@ interface Uint16Array {
      predicate: (
        value: import('ts-type-forge').Uint16,
        index: NumberType.TypedArraySize,
@@ -1040,7 +1040,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
-@@ -4184,7 +4212,7 @@ interface Uint16Array {
+@@ -4227,7 +4255,7 @@ interface Uint16Array {
      callbackfn: (
        value: import('ts-type-forge').Uint16,
        index: NumberType.TypedArraySize,
@@ -1049,7 +1049,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => void,
      thisArg?: unknown,
    ): void;
-@@ -4235,10 +4263,10 @@ interface Uint16Array {
+@@ -4278,10 +4306,10 @@ interface Uint16Array {
      callbackfn: (
        value: import('ts-type-forge').Uint16,
        index: NumberType.TypedArraySize,
@@ -1062,7 +1062,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -4255,7 +4283,7 @@ interface Uint16Array {
+@@ -4298,7 +4326,7 @@ interface Uint16Array {
        previousValue: import('ts-type-forge').Uint16,
        currentValue: import('ts-type-forge').Uint16,
        currentIndex: NumberType.TypedArraySize,
@@ -1071,7 +1071,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint16,
    ): import('ts-type-forge').Uint16;
    reduce(
-@@ -4263,7 +4291,7 @@ interface Uint16Array {
+@@ -4306,7 +4334,7 @@ interface Uint16Array {
        previousValue: import('ts-type-forge').Uint16,
        currentValue: import('ts-type-forge').Uint16,
        currentIndex: NumberType.TypedArraySize,
@@ -1080,7 +1080,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint16,
      initialValue: import('ts-type-forge').Uint16,
    ): import('ts-type-forge').Uint16;
-@@ -4283,7 +4311,7 @@ interface Uint16Array {
+@@ -4326,7 +4354,7 @@ interface Uint16Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Uint16,
        currentIndex: NumberType.TypedArraySize,
@@ -1089,7 +1089,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -4303,7 +4331,7 @@ interface Uint16Array {
+@@ -4346,7 +4374,7 @@ interface Uint16Array {
        previousValue: import('ts-type-forge').Uint16,
        currentValue: import('ts-type-forge').Uint16,
        currentIndex: NumberType.TypedArraySize,
@@ -1098,7 +1098,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint16,
    ): import('ts-type-forge').Uint16;
    reduceRight(
-@@ -4311,7 +4339,7 @@ interface Uint16Array {
+@@ -4354,7 +4382,7 @@ interface Uint16Array {
        previousValue: import('ts-type-forge').Uint16,
        currentValue: import('ts-type-forge').Uint16,
        currentIndex: NumberType.TypedArraySize,
@@ -1107,7 +1107,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint16,
      initialValue: import('ts-type-forge').Uint16,
    ): import('ts-type-forge').Uint16;
-@@ -4331,7 +4359,7 @@ interface Uint16Array {
+@@ -4374,7 +4402,7 @@ interface Uint16Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Uint16,
        currentIndex: NumberType.TypedArraySize,
@@ -1116,7 +1116,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -4339,7 +4367,7 @@ interface Uint16Array {
+@@ -4382,7 +4410,7 @@ interface Uint16Array {
    /**
     * Reverses the elements in an Array.
     */
@@ -1125,7 +1125,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Sets a value or an array of values.
-@@ -4359,7 +4387,7 @@ interface Uint16Array {
+@@ -4402,7 +4430,7 @@ interface Uint16Array {
    slice(
      start?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -1134,7 +1134,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -4373,7 +4401,7 @@ interface Uint16Array {
+@@ -4416,7 +4444,7 @@ interface Uint16Array {
      predicate: (
        value: import('ts-type-forge').Uint16,
        index: NumberType.TypedArraySize,
@@ -1143,7 +1143,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -4403,7 +4431,7 @@ interface Uint16Array {
+@@ -4446,7 +4474,7 @@ interface Uint16Array {
    subarray(
      begin?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -1152,7 +1152,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Converts a number to a string by using the current locale.
-@@ -4416,22 +4444,24 @@ interface Uint16Array {
+@@ -4459,22 +4487,24 @@ interface Uint16Array {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -1186,7 +1186,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The size in bytes of each element in the array.
-@@ -4442,13 +4472,17 @@ interface Uint16ArrayConstructor {
+@@ -4485,13 +4515,17 @@ interface Uint16ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -1206,7 +1206,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -4463,14 +4497,14 @@ interface Uint16ArrayConstructor {
+@@ -4506,14 +4540,14 @@ interface Uint16ArrayConstructor {
        k: NumberType.TypedArraySize,
      ) => import('ts-type-forge').Uint16,
      thisArg?: unknown,
@@ -1223,7 +1223,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
    /**
     * The size in bytes of each element in the array.
     */
-@@ -4479,7 +4513,7 @@ interface Int32Array {
+@@ -4522,7 +4556,7 @@ interface Int32Array {
    /**
     * The ArrayBuffer instance referenced by the array.
     */
@@ -1232,7 +1232,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The length in bytes of the array.
-@@ -4518,7 +4552,7 @@ interface Int32Array {
+@@ -4561,7 +4595,7 @@ interface Int32Array {
      predicate: (
        value: import('ts-type-forge').Int32,
        index: NumberType.TypedArraySize,
@@ -1241,7 +1241,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -4548,10 +4582,10 @@ interface Int32Array {
+@@ -4591,10 +4625,10 @@ interface Int32Array {
      predicate: (
        value: import('ts-type-forge').Int32,
        index: NumberType.TypedArraySize,
@@ -1254,7 +1254,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -4566,7 +4600,7 @@ interface Int32Array {
+@@ -4609,7 +4643,7 @@ interface Int32Array {
      predicate: (
        value: import('ts-type-forge').Int32,
        index: NumberType.TypedArraySize,
@@ -1263,7 +1263,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): import('ts-type-forge').Int32 | undefined;
-@@ -4584,7 +4618,7 @@ interface Int32Array {
+@@ -4627,7 +4661,7 @@ interface Int32Array {
      predicate: (
        value: import('ts-type-forge').Int32,
        index: NumberType.TypedArraySize,
@@ -1272,7 +1272,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
-@@ -4600,7 +4634,7 @@ interface Int32Array {
+@@ -4643,7 +4677,7 @@ interface Int32Array {
      callbackfn: (
        value: import('ts-type-forge').Int32,
        index: NumberType.TypedArraySize,
@@ -1281,7 +1281,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => void,
      thisArg?: unknown,
    ): void;
-@@ -4651,10 +4685,10 @@ interface Int32Array {
+@@ -4694,10 +4728,10 @@ interface Int32Array {
      callbackfn: (
        value: import('ts-type-forge').Int32,
        index: NumberType.TypedArraySize,
@@ -1294,7 +1294,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -4671,7 +4705,7 @@ interface Int32Array {
+@@ -4714,7 +4748,7 @@ interface Int32Array {
        previousValue: import('ts-type-forge').Int32,
        currentValue: import('ts-type-forge').Int32,
        currentIndex: NumberType.TypedArraySize,
@@ -1303,7 +1303,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int32,
    ): import('ts-type-forge').Int32;
    reduce(
-@@ -4679,7 +4713,7 @@ interface Int32Array {
+@@ -4722,7 +4756,7 @@ interface Int32Array {
        previousValue: import('ts-type-forge').Int32,
        currentValue: import('ts-type-forge').Int32,
        currentIndex: NumberType.TypedArraySize,
@@ -1312,7 +1312,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int32,
      initialValue: import('ts-type-forge').Int32,
    ): import('ts-type-forge').Int32;
-@@ -4699,7 +4733,7 @@ interface Int32Array {
+@@ -4742,7 +4776,7 @@ interface Int32Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Int32,
        currentIndex: NumberType.TypedArraySize,
@@ -1321,7 +1321,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -4719,7 +4753,7 @@ interface Int32Array {
+@@ -4762,7 +4796,7 @@ interface Int32Array {
        previousValue: import('ts-type-forge').Int32,
        currentValue: import('ts-type-forge').Int32,
        currentIndex: NumberType.TypedArraySize,
@@ -1330,7 +1330,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int32,
    ): import('ts-type-forge').Int32;
    reduceRight(
-@@ -4727,7 +4761,7 @@ interface Int32Array {
+@@ -4770,7 +4804,7 @@ interface Int32Array {
        previousValue: import('ts-type-forge').Int32,
        currentValue: import('ts-type-forge').Int32,
        currentIndex: NumberType.TypedArraySize,
@@ -1339,7 +1339,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Int32,
      initialValue: import('ts-type-forge').Int32,
    ): import('ts-type-forge').Int32;
-@@ -4747,7 +4781,7 @@ interface Int32Array {
+@@ -4790,7 +4824,7 @@ interface Int32Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Int32,
        currentIndex: NumberType.TypedArraySize,
@@ -1348,7 +1348,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -4755,7 +4789,7 @@ interface Int32Array {
+@@ -4798,7 +4832,7 @@ interface Int32Array {
    /**
     * Reverses the elements in an Array.
     */
@@ -1357,7 +1357,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Sets a value or an array of values.
-@@ -4775,7 +4809,7 @@ interface Int32Array {
+@@ -4818,7 +4852,7 @@ interface Int32Array {
    slice(
      start?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -1366,7 +1366,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -4789,7 +4823,7 @@ interface Int32Array {
+@@ -4832,7 +4866,7 @@ interface Int32Array {
      predicate: (
        value: import('ts-type-forge').Int32,
        index: NumberType.TypedArraySize,
@@ -1375,7 +1375,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -4819,7 +4853,7 @@ interface Int32Array {
+@@ -4862,7 +4896,7 @@ interface Int32Array {
    subarray(
      begin?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -1384,7 +1384,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Converts a number to a string by using the current locale.
-@@ -4832,22 +4866,24 @@ interface Int32Array {
+@@ -4875,22 +4909,24 @@ interface Int32Array {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -1418,7 +1418,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The size in bytes of each element in the array.
-@@ -4858,13 +4894,17 @@ interface Int32ArrayConstructor {
+@@ -4901,13 +4937,17 @@ interface Int32ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -1438,7 +1438,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -4879,7 +4919,7 @@ interface Int32ArrayConstructor {
+@@ -4922,7 +4962,7 @@ interface Int32ArrayConstructor {
        k: NumberType.TypedArraySize,
      ) => import('ts-type-forge').Int32,
      thisArg?: unknown,
@@ -1447,7 +1447,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  }
  declare const Int32Array: Int32ArrayConstructor;
  
-@@ -4887,7 +4927,7 @@ declare const Int32Array: Int32ArrayConstructor;
+@@ -4930,7 +4970,7 @@ declare const Int32Array: Int32ArrayConstructor;
   * A typed array of 32-bit unsigned integer values. The contents are initialized to 0. If the
   * requested number of bytes could not be allocated an exception is raised.
   */
@@ -1456,7 +1456,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
    /**
     * The size in bytes of each element in the array.
     */
-@@ -4896,7 +4936,7 @@ interface Uint32Array {
+@@ -4939,7 +4979,7 @@ interface Uint32Array {
    /**
     * The ArrayBuffer instance referenced by the array.
     */
@@ -1465,7 +1465,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The length in bytes of the array.
-@@ -4935,7 +4975,7 @@ interface Uint32Array {
+@@ -4978,7 +5018,7 @@ interface Uint32Array {
      predicate: (
        value: import('ts-type-forge').Uint32,
        index: NumberType.TypedArraySize,
@@ -1474,7 +1474,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -4965,10 +5005,10 @@ interface Uint32Array {
+@@ -5008,10 +5048,10 @@ interface Uint32Array {
      predicate: (
        value: import('ts-type-forge').Uint32,
        index: NumberType.TypedArraySize,
@@ -1487,7 +1487,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -4983,7 +5023,7 @@ interface Uint32Array {
+@@ -5026,7 +5066,7 @@ interface Uint32Array {
      predicate: (
        value: import('ts-type-forge').Uint32,
        index: NumberType.TypedArraySize,
@@ -1496,7 +1496,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): import('ts-type-forge').Uint32 | undefined;
-@@ -5001,7 +5041,7 @@ interface Uint32Array {
+@@ -5044,7 +5084,7 @@ interface Uint32Array {
      predicate: (
        value: import('ts-type-forge').Uint32,
        index: NumberType.TypedArraySize,
@@ -1505,7 +1505,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
-@@ -5017,7 +5057,7 @@ interface Uint32Array {
+@@ -5060,7 +5100,7 @@ interface Uint32Array {
      callbackfn: (
        value: import('ts-type-forge').Uint32,
        index: NumberType.TypedArraySize,
@@ -1514,7 +1514,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => void,
      thisArg?: unknown,
    ): void;
-@@ -5068,10 +5108,10 @@ interface Uint32Array {
+@@ -5111,10 +5151,10 @@ interface Uint32Array {
      callbackfn: (
        value: import('ts-type-forge').Uint32,
        index: NumberType.TypedArraySize,
@@ -1527,7 +1527,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -5088,7 +5128,7 @@ interface Uint32Array {
+@@ -5131,7 +5171,7 @@ interface Uint32Array {
        previousValue: import('ts-type-forge').Uint32,
        currentValue: import('ts-type-forge').Uint32,
        currentIndex: NumberType.TypedArraySize,
@@ -1536,7 +1536,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint32,
    ): import('ts-type-forge').Uint32;
    reduce(
-@@ -5096,7 +5136,7 @@ interface Uint32Array {
+@@ -5139,7 +5179,7 @@ interface Uint32Array {
        previousValue: import('ts-type-forge').Uint32,
        currentValue: import('ts-type-forge').Uint32,
        currentIndex: NumberType.TypedArraySize,
@@ -1545,7 +1545,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint32,
      initialValue: import('ts-type-forge').Uint32,
    ): import('ts-type-forge').Uint32;
-@@ -5116,7 +5156,7 @@ interface Uint32Array {
+@@ -5159,7 +5199,7 @@ interface Uint32Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Uint32,
        currentIndex: NumberType.TypedArraySize,
@@ -1554,7 +1554,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -5136,7 +5176,7 @@ interface Uint32Array {
+@@ -5179,7 +5219,7 @@ interface Uint32Array {
        previousValue: import('ts-type-forge').Uint32,
        currentValue: import('ts-type-forge').Uint32,
        currentIndex: NumberType.TypedArraySize,
@@ -1563,7 +1563,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint32,
    ): import('ts-type-forge').Uint32;
    reduceRight(
-@@ -5144,7 +5184,7 @@ interface Uint32Array {
+@@ -5187,7 +5227,7 @@ interface Uint32Array {
        previousValue: import('ts-type-forge').Uint32,
        currentValue: import('ts-type-forge').Uint32,
        currentIndex: NumberType.TypedArraySize,
@@ -1572,7 +1572,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Uint32,
      initialValue: import('ts-type-forge').Uint32,
    ): import('ts-type-forge').Uint32;
-@@ -5164,7 +5204,7 @@ interface Uint32Array {
+@@ -5207,7 +5247,7 @@ interface Uint32Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Uint32,
        currentIndex: NumberType.TypedArraySize,
@@ -1581,7 +1581,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -5172,7 +5212,7 @@ interface Uint32Array {
+@@ -5215,7 +5255,7 @@ interface Uint32Array {
    /**
     * Reverses the elements in an Array.
     */
@@ -1590,7 +1590,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Sets a value or an array of values.
-@@ -5192,7 +5232,7 @@ interface Uint32Array {
+@@ -5235,7 +5275,7 @@ interface Uint32Array {
    slice(
      start?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -1599,7 +1599,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -5206,7 +5246,7 @@ interface Uint32Array {
+@@ -5249,7 +5289,7 @@ interface Uint32Array {
      predicate: (
        value: import('ts-type-forge').Uint32,
        index: NumberType.TypedArraySize,
@@ -1608,7 +1608,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -5236,7 +5276,7 @@ interface Uint32Array {
+@@ -5279,7 +5319,7 @@ interface Uint32Array {
    subarray(
      begin?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -1617,7 +1617,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Converts a number to a string by using the current locale.
-@@ -5249,22 +5289,24 @@ interface Uint32Array {
+@@ -5292,22 +5332,24 @@ interface Uint32Array {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -1651,7 +1651,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The size in bytes of each element in the array.
-@@ -5275,13 +5317,17 @@ interface Uint32ArrayConstructor {
+@@ -5318,13 +5360,17 @@ interface Uint32ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -1671,7 +1671,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -5296,7 +5342,7 @@ interface Uint32ArrayConstructor {
+@@ -5339,7 +5385,7 @@ interface Uint32ArrayConstructor {
        k: NumberType.TypedArraySize,
      ) => import('ts-type-forge').Uint32,
      thisArg?: unknown,
@@ -1680,7 +1680,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  }
  declare const Uint32Array: Uint32ArrayConstructor;
  
-@@ -5304,7 +5350,7 @@ declare const Uint32Array: Uint32ArrayConstructor;
+@@ -5347,7 +5393,7 @@ declare const Uint32Array: Uint32ArrayConstructor;
   * A typed array of 32-bit float values. The contents are initialized to 0. If the requested number
   * of bytes could not be allocated an exception is raised.
   */
@@ -1689,7 +1689,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
    /**
     * The size in bytes of each element in the array.
     */
-@@ -5313,7 +5359,7 @@ interface Float32Array {
+@@ -5356,7 +5402,7 @@ interface Float32Array {
    /**
     * The ArrayBuffer instance referenced by the array.
     */
@@ -1698,7 +1698,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The length in bytes of the array.
-@@ -5352,7 +5398,7 @@ interface Float32Array {
+@@ -5395,7 +5441,7 @@ interface Float32Array {
      predicate: (
        value: import('ts-type-forge').Float32,
        index: NumberType.TypedArraySize,
@@ -1707,7 +1707,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -5382,10 +5428,10 @@ interface Float32Array {
+@@ -5425,10 +5471,10 @@ interface Float32Array {
      predicate: (
        value: import('ts-type-forge').Float32,
        index: NumberType.TypedArraySize,
@@ -1720,7 +1720,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -5400,7 +5446,7 @@ interface Float32Array {
+@@ -5443,7 +5489,7 @@ interface Float32Array {
      predicate: (
        value: import('ts-type-forge').Float32,
        index: NumberType.TypedArraySize,
@@ -1729,7 +1729,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): import('ts-type-forge').Float32 | undefined;
-@@ -5418,7 +5464,7 @@ interface Float32Array {
+@@ -5461,7 +5507,7 @@ interface Float32Array {
      predicate: (
        value: import('ts-type-forge').Float32,
        index: NumberType.TypedArraySize,
@@ -1738,7 +1738,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
-@@ -5434,7 +5480,7 @@ interface Float32Array {
+@@ -5477,7 +5523,7 @@ interface Float32Array {
      callbackfn: (
        value: import('ts-type-forge').Float32,
        index: NumberType.TypedArraySize,
@@ -1747,7 +1747,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => void,
      thisArg?: unknown,
    ): void;
-@@ -5485,10 +5531,10 @@ interface Float32Array {
+@@ -5528,10 +5574,10 @@ interface Float32Array {
      callbackfn: (
        value: import('ts-type-forge').Float32,
        index: NumberType.TypedArraySize,
@@ -1760,7 +1760,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -5505,7 +5551,7 @@ interface Float32Array {
+@@ -5548,7 +5594,7 @@ interface Float32Array {
        previousValue: import('ts-type-forge').Float32,
        currentValue: import('ts-type-forge').Float32,
        currentIndex: NumberType.TypedArraySize,
@@ -1769,7 +1769,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Float32,
    ): import('ts-type-forge').Float32;
    reduce(
-@@ -5513,7 +5559,7 @@ interface Float32Array {
+@@ -5556,7 +5602,7 @@ interface Float32Array {
        previousValue: import('ts-type-forge').Float32,
        currentValue: import('ts-type-forge').Float32,
        currentIndex: NumberType.TypedArraySize,
@@ -1778,7 +1778,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Float32,
      initialValue: import('ts-type-forge').Float32,
    ): import('ts-type-forge').Float32;
-@@ -5533,7 +5579,7 @@ interface Float32Array {
+@@ -5576,7 +5622,7 @@ interface Float32Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Float32,
        currentIndex: NumberType.TypedArraySize,
@@ -1787,7 +1787,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -5553,7 +5599,7 @@ interface Float32Array {
+@@ -5596,7 +5642,7 @@ interface Float32Array {
        previousValue: import('ts-type-forge').Float32,
        currentValue: import('ts-type-forge').Float32,
        currentIndex: NumberType.TypedArraySize,
@@ -1796,7 +1796,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Float32,
    ): import('ts-type-forge').Float32;
    reduceRight(
-@@ -5561,7 +5607,7 @@ interface Float32Array {
+@@ -5604,7 +5650,7 @@ interface Float32Array {
        previousValue: import('ts-type-forge').Float32,
        currentValue: import('ts-type-forge').Float32,
        currentIndex: NumberType.TypedArraySize,
@@ -1805,7 +1805,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Float32,
      initialValue: import('ts-type-forge').Float32,
    ): import('ts-type-forge').Float32;
-@@ -5581,7 +5627,7 @@ interface Float32Array {
+@@ -5624,7 +5670,7 @@ interface Float32Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Float32,
        currentIndex: NumberType.TypedArraySize,
@@ -1814,7 +1814,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -5589,7 +5635,7 @@ interface Float32Array {
+@@ -5632,7 +5678,7 @@ interface Float32Array {
    /**
     * Reverses the elements in an Array.
     */
@@ -1823,7 +1823,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Sets a value or an array of values.
-@@ -5609,7 +5655,7 @@ interface Float32Array {
+@@ -5652,7 +5698,7 @@ interface Float32Array {
    slice(
      start?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -1832,7 +1832,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -5623,7 +5669,7 @@ interface Float32Array {
+@@ -5666,7 +5712,7 @@ interface Float32Array {
      predicate: (
        value: import('ts-type-forge').Float32,
        index: NumberType.TypedArraySize,
@@ -1841,7 +1841,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -5653,7 +5699,7 @@ interface Float32Array {
+@@ -5696,7 +5742,7 @@ interface Float32Array {
    subarray(
      begin?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -1850,7 +1850,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Converts a number to a string by using the current locale.
-@@ -5666,22 +5712,24 @@ interface Float32Array {
+@@ -5709,22 +5755,24 @@ interface Float32Array {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -1884,7 +1884,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The size in bytes of each element in the array.
-@@ -5692,13 +5740,17 @@ interface Float32ArrayConstructor {
+@@ -5735,13 +5783,17 @@ interface Float32ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -1904,7 +1904,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -5713,7 +5765,7 @@ interface Float32ArrayConstructor {
+@@ -5756,7 +5808,7 @@ interface Float32ArrayConstructor {
        k: NumberType.TypedArraySize,
      ) => import('ts-type-forge').Float32,
      thisArg?: unknown,
@@ -1913,7 +1913,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  }
  declare const Float32Array: Float32ArrayConstructor;
  
-@@ -5721,7 +5773,7 @@ declare const Float32Array: Float32ArrayConstructor;
+@@ -5764,7 +5816,7 @@ declare const Float32Array: Float32ArrayConstructor;
   * A typed array of 64-bit float values. The contents are initialized to 0. If the requested
   * number of bytes could not be allocated an exception is raised.
   */
@@ -1922,7 +1922,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
    /**
     * The size in bytes of each element in the array.
     */
-@@ -5730,7 +5782,7 @@ interface Float64Array {
+@@ -5773,7 +5825,7 @@ interface Float64Array {
    /**
     * The ArrayBuffer instance referenced by the array.
     */
@@ -1931,7 +1931,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The length in bytes of the array.
-@@ -5769,7 +5821,7 @@ interface Float64Array {
+@@ -5812,7 +5864,7 @@ interface Float64Array {
      predicate: (
        value: import('ts-type-forge').Float64,
        index: NumberType.TypedArraySize,
@@ -1940,7 +1940,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -5799,10 +5851,10 @@ interface Float64Array {
+@@ -5842,10 +5894,10 @@ interface Float64Array {
      predicate: (
        value: import('ts-type-forge').Float64,
        index: NumberType.TypedArraySize,
@@ -1953,7 +1953,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -5817,7 +5869,7 @@ interface Float64Array {
+@@ -5860,7 +5912,7 @@ interface Float64Array {
      predicate: (
        value: import('ts-type-forge').Float64,
        index: NumberType.TypedArraySize,
@@ -1962,7 +1962,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): import('ts-type-forge').Float64 | undefined;
-@@ -5835,7 +5887,7 @@ interface Float64Array {
+@@ -5878,7 +5930,7 @@ interface Float64Array {
      predicate: (
        value: import('ts-type-forge').Float64,
        index: NumberType.TypedArraySize,
@@ -1971,7 +1971,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
-@@ -5851,7 +5903,7 @@ interface Float64Array {
+@@ -5894,7 +5946,7 @@ interface Float64Array {
      callbackfn: (
        value: import('ts-type-forge').Float64,
        index: NumberType.TypedArraySize,
@@ -1980,7 +1980,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => void,
      thisArg?: unknown,
    ): void;
-@@ -5902,10 +5954,10 @@ interface Float64Array {
+@@ -5945,10 +5997,10 @@ interface Float64Array {
      callbackfn: (
        value: import('ts-type-forge').Float64,
        index: NumberType.TypedArraySize,
@@ -1993,7 +1993,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -5922,7 +5974,7 @@ interface Float64Array {
+@@ -5965,7 +6017,7 @@ interface Float64Array {
        previousValue: import('ts-type-forge').Float64,
        currentValue: import('ts-type-forge').Float64,
        currentIndex: NumberType.TypedArraySize,
@@ -2002,7 +2002,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Float64,
    ): import('ts-type-forge').Float64;
    reduce(
-@@ -5930,7 +5982,7 @@ interface Float64Array {
+@@ -5973,7 +6025,7 @@ interface Float64Array {
        previousValue: import('ts-type-forge').Float64,
        currentValue: import('ts-type-forge').Float64,
        currentIndex: NumberType.TypedArraySize,
@@ -2011,7 +2011,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Float64,
      initialValue: import('ts-type-forge').Float64,
    ): import('ts-type-forge').Float64;
-@@ -5950,7 +6002,7 @@ interface Float64Array {
+@@ -5993,7 +6045,7 @@ interface Float64Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Float64,
        currentIndex: NumberType.TypedArraySize,
@@ -2020,7 +2020,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -5970,7 +6022,7 @@ interface Float64Array {
+@@ -6013,7 +6065,7 @@ interface Float64Array {
        previousValue: import('ts-type-forge').Float64,
        currentValue: import('ts-type-forge').Float64,
        currentIndex: NumberType.TypedArraySize,
@@ -2029,7 +2029,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Float64,
    ): import('ts-type-forge').Float64;
    reduceRight(
-@@ -5978,7 +6030,7 @@ interface Float64Array {
+@@ -6021,7 +6073,7 @@ interface Float64Array {
        previousValue: import('ts-type-forge').Float64,
        currentValue: import('ts-type-forge').Float64,
        currentIndex: NumberType.TypedArraySize,
@@ -2038,7 +2038,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => import('ts-type-forge').Float64,
      initialValue: import('ts-type-forge').Float64,
    ): import('ts-type-forge').Float64;
-@@ -5998,7 +6050,7 @@ interface Float64Array {
+@@ -6041,7 +6093,7 @@ interface Float64Array {
        previousValue: U,
        currentValue: import('ts-type-forge').Float64,
        currentIndex: NumberType.TypedArraySize,
@@ -2047,7 +2047,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => U,
      initialValue: U,
    ): U;
-@@ -6006,7 +6058,7 @@ interface Float64Array {
+@@ -6049,7 +6101,7 @@ interface Float64Array {
    /**
     * Reverses the elements in an Array.
     */
@@ -2056,7 +2056,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Sets a value or an array of values.
-@@ -6026,7 +6078,7 @@ interface Float64Array {
+@@ -6069,7 +6121,7 @@ interface Float64Array {
    slice(
      start?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -2065,7 +2065,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -6040,7 +6092,7 @@ interface Float64Array {
+@@ -6083,7 +6135,7 @@ interface Float64Array {
      predicate: (
        value: import('ts-type-forge').Float64,
        index: NumberType.TypedArraySize,
@@ -2074,7 +2074,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -6070,7 +6122,7 @@ interface Float64Array {
+@@ -6113,7 +6165,7 @@ interface Float64Array {
    subarray(
      begin?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -2083,7 +2083,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Converts a number to a string by using the current locale.
-@@ -6083,22 +6135,24 @@ interface Float64Array {
+@@ -6126,22 +6178,24 @@ interface Float64Array {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -2117,7 +2117,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * The size in bytes of each element in the array.
-@@ -6109,13 +6163,17 @@ interface Float64ArrayConstructor {
+@@ -6152,13 +6206,17 @@ interface Float64ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -2137,7 +2137,7 @@ index 2b14bbca26534599a78f7b46f17c64817df391dd..45d2e3c4555bffe575385761b5e6c546
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -6130,7 +6188,7 @@ interface Float64ArrayConstructor {
+@@ -6173,7 +6231,7 @@ interface Float64ArrayConstructor {
        k: NumberType.TypedArraySize,
      ) => import('ts-type-forge').Float64,
      thisArg?: unknown,

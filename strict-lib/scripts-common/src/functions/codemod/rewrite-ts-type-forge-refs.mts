@@ -1,4 +1,5 @@
 import * as ts from 'typescript';
+import { brandedNumberFromTypeUtils } from '../../convert-dts/constants.mjs';
 
 const TS_TYPE_FORGE = 'ts-type-forge';
 
@@ -11,27 +12,9 @@ const TS_TYPE_FORGE = 'ts-type-forge';
  * the per-version lib-check (`skipLibCheck: false`).
  */
 const tsTypeForgeTypeNames: ReadonlySet<string> = new Set<string>([
-  // brandedNumberFromTypeUtils
-  'FiniteNumber',
-  'Int',
-  'NaNType',
-  'NEGATIVE_INFINITY',
-  'POSITIVE_INFINITY',
-  'PositiveNumber',
-  'NonNegativeNumber',
-  'InfiniteNumber',
-  'Int16',
-  'Uint16',
-  'Int32',
-  'Uint32',
-  'Float16',
-  'Float32',
-  'Float64',
-  'BigInt64',
-  'BigUint64',
-  'SafeInt',
-  'SafeUint',
-  'NegativeInt32',
+  // Spread rather than restated, so a name the converter learns through
+  // `brandedNumber` is rewritten without a second list to keep in step.
+  ...brandedNumberFromTypeUtils,
   'SmallInt',
   // utility types used in signatures / StrictLibInternals bodies
   'WidenLiteral',

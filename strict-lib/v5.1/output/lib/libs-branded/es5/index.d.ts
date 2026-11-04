@@ -798,12 +798,30 @@ interface Math {
   abs<N extends import('ts-type-forge').SmallInt>(
     x: N,
   ): import('ts-type-forge').AbsoluteValue<N>;
+  abs<N extends import('ts-type-forge').NonNegativeFiniteNumber>(x: N): N;
   abs<N extends import('ts-type-forge').FiniteNumber>(
     x: N,
-  ): import('ts-type-forge').IntersectBrand<
-    N,
-    import('ts-type-forge').NonNegativeNumber
-  >;
+  ): N extends import('ts-type-forge').NonNegativeNumber
+    ? N
+    : N extends import('ts-type-forge').Int16
+      ? N extends import('ts-type-forge').NonZeroNumber
+        ? import('ts-type-forge').PositiveUint16
+        : import('ts-type-forge').Uint16
+      : N extends import('ts-type-forge').Int32
+        ? N extends import('ts-type-forge').NonZeroNumber
+          ? import('ts-type-forge').PositiveUint32
+          : import('ts-type-forge').Uint32
+        : N extends import('ts-type-forge').SafeInt
+          ? N extends import('ts-type-forge').NonZeroNumber
+            ? import('ts-type-forge').PositiveSafeInt
+            : import('ts-type-forge').SafeUint
+          : N extends import('ts-type-forge').Int
+            ? N extends import('ts-type-forge').NonZeroNumber
+              ? import('ts-type-forge').PositiveInt
+              : import('ts-type-forge').NonNegativeInt
+            : N extends import('ts-type-forge').NonZeroNumber
+              ? import('ts-type-forge').PositiveFiniteNumber
+              : import('ts-type-forge').NonNegativeFiniteNumber;
   abs(
     x: number,
   ):
@@ -838,9 +856,18 @@ interface Math {
    * Returns the smallest integer greater than or equal to its numeric argument.
    * @param x A numeric expression.
    */
+  ceil<N extends import('ts-type-forge').Int>(x: N): N;
   ceil<N extends import('ts-type-forge').FiniteNumber>(
     x: N,
-  ): import('ts-type-forge').IntersectBrand<N, import('ts-type-forge').Int>;
+  ): N extends import('ts-type-forge').Int
+    ? N
+    : N extends import('ts-type-forge').PositiveNumber
+      ? import('ts-type-forge').PositiveInt
+      : N extends import('ts-type-forge').NonNegativeNumber
+        ? import('ts-type-forge').NonNegativeInt
+        : N extends import('ts-type-forge').NonPositiveNumber
+          ? import('ts-type-forge').NonPositiveInt
+          : import('ts-type-forge').Int;
   ceil(
     x: number,
   ):
@@ -865,9 +892,18 @@ interface Math {
    * Returns the greatest integer less than or equal to its numeric argument.
    * @param x A numeric expression.
    */
+  floor<N extends import('ts-type-forge').Int>(x: N): N;
   floor<N extends import('ts-type-forge').FiniteNumber>(
     x: N,
-  ): import('ts-type-forge').IntersectBrand<N, import('ts-type-forge').Int>;
+  ): N extends import('ts-type-forge').Int
+    ? N
+    : N extends import('ts-type-forge').NonNegativeNumber
+      ? import('ts-type-forge').NonNegativeInt
+      : N extends import('ts-type-forge').NegativeNumber
+        ? import('ts-type-forge').NegativeInt
+        : N extends import('ts-type-forge').NonPositiveNumber
+          ? import('ts-type-forge').NonPositiveInt
+          : import('ts-type-forge').Int;
   floor(
     x: number,
   ):
@@ -901,9 +937,16 @@ interface Math {
    * Returns a supplied numeric expression rounded to the nearest integer.
    * @param x The value to be rounded to the nearest integer.
    */
+  round<N extends import('ts-type-forge').Int>(x: N): N;
   round<N extends import('ts-type-forge').FiniteNumber>(
     x: N,
-  ): import('ts-type-forge').IntersectBrand<N, import('ts-type-forge').Int>;
+  ): N extends import('ts-type-forge').Int
+    ? N
+    : N extends import('ts-type-forge').NonNegativeNumber
+      ? import('ts-type-forge').NonNegativeInt
+      : N extends import('ts-type-forge').NonPositiveNumber
+        ? import('ts-type-forge').NonPositiveInt
+        : import('ts-type-forge').Int;
   round(
     x: number,
   ):

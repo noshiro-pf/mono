@@ -1,8 +1,8 @@
 diff --git a/v5.8/output/lib-files-branded/lib.es5.d.ts b/v5.9/output/lib-files-branded/lib.es5.d.ts
-index bce1d8262b0f93173ff7a634d34a06d269b39d25..5373a29d92167895437a412e085e23d3affab05a 100644
+index c15b9c601989e21c47dfa5ef5c8bca90c93f6a7c..c941e48c0128e6df73da3bd6834db6146816b4e1 100644
 --- a/v5.8/output/lib-files-branded/lib.es5.d.ts
 +++ b/v5.9/output/lib-files-branded/lib.es5.d.ts
-@@ -1342,6 +1342,7 @@ interface JSON {
+@@ -1385,6 +1385,7 @@ interface JSON {
     * @param text A valid JSON string.
     * @param reviver A function that transforms the results. This function is called for each member of the object.
     * If a member contains nested objects, the nested objects are transformed before the parent object is.
@@ -10,7 +10,7 @@ index bce1d8262b0f93173ff7a634d34a06d269b39d25..5373a29d92167895437a412e085e23d3
     */
    parse(
      text: string,
-@@ -1352,6 +1353,7 @@ interface JSON {
+@@ -1395,6 +1396,7 @@ interface JSON {
     * @param value A JavaScript value, usually an object or array, to be converted.
     * @param replacer A function that transforms the results.
     * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
@@ -18,7 +18,7 @@ index bce1d8262b0f93173ff7a634d34a06d269b39d25..5373a29d92167895437a412e085e23d3
     */
    stringify(
      value: unknown,
-@@ -1363,6 +1365,7 @@ interface JSON {
+@@ -1406,6 +1408,7 @@ interface JSON {
     * @param value A JavaScript value, usually an object or array, to be converted.
     * @param replacer An array of strings and numbers that acts as an approved list for selecting the object properties that will be stringified.
     * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
@@ -26,7 +26,7 @@ index bce1d8262b0f93173ff7a634d34a06d269b39d25..5373a29d92167895437a412e085e23d3
     */
    stringify(
      value: unknown,
-@@ -1698,7 +1701,9 @@ interface Array<T> {
+@@ -1741,7 +1744,9 @@ interface Array<T> {
    /**
     * Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements.
     * @param start The zero-based location in the array from which to start removing elements.
@@ -37,7 +37,7 @@ index bce1d8262b0f93173ff7a634d34a06d269b39d25..5373a29d92167895437a412e085e23d3
     * @returns An array containing the elements that were deleted.
     */
    splice(
-@@ -1708,7 +1713,9 @@ interface Array<T> {
+@@ -1751,7 +1756,9 @@ interface Array<T> {
    /**
     * Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements.
     * @param start The zero-based location in the array from which to start removing elements.
