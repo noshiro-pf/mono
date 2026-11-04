@@ -42,7 +42,7 @@
     "ts-fortress": "workspace:*"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
     "dedent": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",

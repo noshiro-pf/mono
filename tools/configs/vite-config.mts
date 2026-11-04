@@ -164,7 +164,14 @@ export const defineViteConfig = ({
   return {
     test: {
       coverage: {
-        provider: 'v8',
+        // istanbul instruments only the files `include` names, as Vite
+        // transforms them; V8's precise coverage slows every function the
+        // process runs. Suites that run the TypeScript compiler or ESLint took
+        // two to three and a half times as long under V8 (eslint-config-typed
+        // 86 s, eslint-plugin-ts-data-forge 70 s; 40 s and 20 s under istanbul,
+        // on four cores), and the rest no less.
+        // Branch counts differ slightly between the two.
+        provider: 'istanbul',
         reporter: ['html', 'lcov', 'text'],
         include: castMutable(coverage?.include) ?? ['src/**/*.mts'],
         exclude: castMutable(coverage?.exclude) ?? [

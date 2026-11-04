@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",

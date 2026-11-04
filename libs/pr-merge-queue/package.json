@@ -95,7 +95,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
     "cspell": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
