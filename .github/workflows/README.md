@@ -79,20 +79,23 @@ on:
   reports nothing at all (see "A label event under `skip-ci`").
 - **No `edited`, no `issue_comment`.** Such a run cancels the one in progress
   (see "Concurrency") and its skipped aggregate supersedes the last verdict.
-- **`push` to `main`**, where the gate asks whether the pushed tree already
-  has a verdict (see "Reusing a verdict"). A merge of an up-to-date branch is
-  a squash whose tree is the pull request's head's, so it normally does, and
-  the push costs the gate job and nothing else; running the whole matrix
-  there instead once cost 108 runner-minutes per merge to confirm what the
-  pull request had confirmed. A merge the ruleset was bypassed for (out of
-  date, `skip-ci` still on, red) may land a tree that has no verdict, and then
-  the checks run on `main` in full. Nothing has to tell the two apart, and
-  nobody has to remember to run anything by hand. `code-check.yml`'s
-  `coverage-main` job runs on `main` whatever the verdict, because Codecov
-  compares a pull request's coverage against the base commit's report and the
-  base commit is on `main`. On `main` the aggregate holds no merge; it is
-  what a later run on the same tree reuses, and a red one is the signal that
-  a bypass merge landed something broken.
+- **`push` to `main`**, where the gate asks whether the pushed tree already has
+  a verdict (see "Reusing a verdict"). A merge of an up-to-date branch is a
+  squash whose tree is the pull request's head's, so it normally does, and the
+  push costs the gate job and nothing else; running the whole matrix there
+  instead once cost 108 runner-minutes per merge to confirm what the pull
+  request had confirmed. A merge the ruleset was bypassed for (out of date,
+  `skip-ci` still on, red) may land a tree that has no verdict, and then the
+  checks run on `main` in full. Nothing has to tell the two apart, and nobody
+  has to remember to run anything by hand. `code-check.yml`'s `coverage-main`
+  job runs on `main` whatever the verdict, because Codecov compares a pull
+  request's coverage against the base commit's report and the base commit is on
+  `main`; so does `synstate-benchmark.yml`'s `benchmark`, which stores the
+  baseline the next pull request is compared with. Both take what the pull
+  request's run already made of the tree (see "Reusing what a pull request
+  produced"). On `main` the aggregate holds no merge; it is what a later run on
+  the same tree reuses, and a red one is the signal that a bypass merge landed
+  something broken.
 - **`workflow_dispatch`** is how the checks are asked for from the Actions
   tab. Such a run is exempt from every gate: there is no pull request to be
   behind anything, and no verdict is reused.
@@ -473,6 +476,32 @@ last wins, so a flake re-run to green supersedes the red a later run reused
 from it. A verdict that was itself reused is a verdict like any other; its
 `reused_from` names the run it came from, so the original is one link further
 on each time.
+
+#### Reusing what a pull request produced
+
+Two jobs run on a push to `main` even when the verdict is reused, because what
+they produce is not a verdict: `coverage-main` uploads the base commit's
+coverage report to Codecov, and `benchmark` stores the baseline the next pull
+request's measurement is compared with. Both are a function of the tree, so the
+pull request's run of the same tree already made them, and producing them again
+cost a merge about eleven runner-minutes and one runner for ten minutes, while
+the next pull request in the queue was starting its checks. So the pull
+request's run keeps them as artifacts (`coverage-<index>`,
+`synstate-benchmark-<run id>`), and the push takes them instead.
+
+The lookup is `.github/actions/find-run-of-tree`: the newest completed run of
+the same workflow on the checked-out commit's tree, from this repository's own
+branches, whose gate recorded its verdict as one about the tree, and that still
+holds a matching artifact. By the tree, as a verdict is, and not by
+`reused_from`, because the run whose verdict was reused may itself have reused
+one and then holds nothing. A fork's run is never taken: its artifacts come from
+workflow files the fork wrote. `coverage-main` takes only a successful run,
+since a failed shard kept no reports; `benchmark` takes a failed one too,
+because what fails there is the committed tables, not the measurement.
+
+Where no run of the tree holds the artifact — it expired, or the merge bypassed
+the checks — the job produces it as it used to, so the lookup can only save
+work, never skip it.
 
 #### Why a workflow of its own
 

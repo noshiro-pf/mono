@@ -14,7 +14,10 @@ name: SynState Benchmark
 #   hand-kept list of those would miss the next one.
 # - On `main` the job runs even when the verdict is reused, because that run
 #   is what stores the baseline the next pull request is compared with. The
-#   aggregate still reports the reused verdict.
+#   aggregate still reports the reused verdict. What it stores is the
+#   measurement the merged pull request's run took of the same tree, when one
+#   did; only a tree no run measured is measured on `main` (see "Reusing what
+#   a pull request produced" in README.md).
 # - Nothing is built or measured when `main` already stored a baseline for
 #   exactly this source and these versions: the committed tables are judged
 #   against that baseline, so a measurement could change nothing but the
@@ -76,7 +79,10 @@ jobs:
     # this moves, every baseline cache key moves with it — the image is part of
     # the key below — so the tables are re-measured rather than silently mixed.
     runs-on: ubuntu-24.04
+    # `actions: read` to find and download the measurement a pull request's
+    # run took of this tree.
     permissions:
+      actions: read
       contents: read
     # Five scenarios. The cascaded diamond spends three 5-second timeouts on
     # RxJS, and the equality cut-off one each on four libraries, after
@@ -107,13 +113,20 @@ jobs:
       # SynState's own version is not enough for SynState: the workspace
       # package keeps its version until a release, so a rewrite of its core
       # measured against a baseline of the old one reads as drift on `main`
-      # until then. The digest of every workspace package's source (SynState
-      # and whatever it is built from, without a list to keep) and of the
-      # benchmark itself — the scenario files, the runners, and the deep
+      # until then. The digest of the source of every workspace package the
+      # docs app reaches through `dependencies` (SynState and what it is built
+      # from, read from the workspace graph rather than kept as a list) and of
+      # the benchmark itself — the scenario files, the runners, and the deep
       # chain's adapters and the spring-demo modules they load, which live
-      # with the interactive demos — therefore
-      # joins the key; test files are left out, since they change nothing
-      # measured.
+      # with the interactive demos — therefore joins the key; test files are
+      # left out, since they change nothing measured. `devDependencies` are
+      # left out too: the ESLint packages and the build tooling change no
+      # number, and keying on every package's source made a pull request that
+      # touched any of them measure for ten minutes. Every workspace package a
+      # scenario imports (`synstate`, `ts-data-forge`, `ts-type-forge`) is in
+      # that closure. The digest is of `git ls-files -s`, the blob of each
+      # file, and the file list is filtered by `awk` rather than by an
+      # `:(exclude)` pathspec.
       #
       # The `vN` is for a change of what is measured that none of that sees,
       # and bumping it is what makes `main` re-measure; without it the
@@ -121,14 +134,34 @@ jobs:
       # libraries run their production builds (`production-builds.mts`).
       - name: Compute the baseline cache key
         id: key
-        env:
-          SOURCE_DIGEST: ${{ hashFiles('libs/*/src/**', '!libs/*/src/**/*.test.mts', 'libs/synstate/samples/docs-site/benchmark/**', 'apps/synstate-docs/scripts/benchmark/**', 'apps/synstate-docs/src/components/throughput-demo/adapters/**', '!apps/synstate-docs/src/components/throughput-demo/adapters/**/*.test.mts', 'apps/synstate-docs/src/components/spring-demo/**/*.mts', '!apps/synstate-docs/src/components/spring-demo/**/*.test.mts') }}
         run: |
           set -euo pipefail
           libs="$(pnpm --filter @synstate/docs run --silent z:benchmark:version-key)"
           node_major="$(node -p 'process.versions.node.split(".")[0]')"
+          mapfile -t packages < <(pnpm --filter-prod '@synstate/docs^...' ls --depth -1 --parseable)
+          if [ "${#packages[@]}" -eq 0 ]; then
+            echo '::error::pnpm listed no workspace package that @synstate/docs depends on.'
+            exit 1
+          fi
+          sources=()
+          for package in "${packages[@]}"; do
+            sources+=("$(realpath --relative-to=. "${package}")/src")
+          done
+          echo "Sources: ${sources[*]}"
+          source_digest="$(
+            {
+              git ls-files -s -- "${sources[@]}" \
+                libs/synstate/samples/docs-site/benchmark \
+                apps/synstate-docs/scripts/benchmark \
+                apps/synstate-docs/src/components/throughput-demo/adapters
+              git ls-files -s -- apps/synstate-docs/src/components/spring-demo |
+                awk '$4 ~ /\.mts$/'
+            } |
+              awk '$4 !~ /\.test\.mts$/' |
+              sha256sum
+          )"
           prefix="synstate-benchmark-v2-ubuntu-24.04-node${node_major}-${libs}-src"
-          key="${prefix}${SOURCE_DIGEST:0:12}"
+          key="${prefix}${source_digest:0:12}"
           echo "prefix=${prefix}" >>"${GITHUB_OUTPUT}"
           echo "value=${key}" >>"${GITHUB_OUTPUT}"
           echo "Baseline key: ${key}"
@@ -155,6 +188,40 @@ jobs:
       - name: Keep the committed tables
         run: cp -R apps/synstate-docs/src/data committed
 
+      # On `main` with no baseline for this key, the pull request that brought
+      # this tree usually measured it already: the same source, versions,
+      # image and Node, so the same key. Its measurement becomes the baseline
+      # in place of a second one, a minute or so after the merge rather than
+      # ten, so that the next pull request in the queue, whose benchmark
+      # restores its key about two minutes after the merge, usually finds it;
+      # when it does not, it measures, as every one did before. Where no run
+      # of this tree holds a measurement —
+      # an exact hit there, an expired artifact, a merge that bypassed the
+      # checks — it is measured here as before. A failed run's measurement is
+      # taken too: it failed on the committed tables, not on what it measured.
+      - name: Find a measurement of this tree
+        id: measured
+        if: >-
+          github.event_name == 'push' &&
+          steps.baseline.outputs.cache-hit != 'true'
+        uses: ./.github/actions/find-run-of-tree
+        with:
+          workflow: synstate-benchmark.yml
+          artifact-pattern: '^synstate-benchmark-[0-9]+$'
+          conclusion: any
+
+      - name: Take that measurement
+        id: taken
+        if: steps.measured.outputs.run-id != ''
+        # A download that fails measures here instead.
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: synstate-benchmark-${{ steps.measured.outputs.run-id }}
+          path: apps/synstate-docs/src/data
+          run-id: ${{ steps.measured.outputs.run-id }}
+          github-token: ${{ github.token }}
+
       # Not on an exact hit, and neither is any step that reads the
       # measurement. The verdict there is the committed tables against the
       # baseline (`Judge the committed tables`), which a measurement does not
@@ -164,9 +231,12 @@ jobs:
       # minutes of a runner on every pull request that changed no library
       # source, no benchmark file and no compared version. The docs app's
       # `doc`, which this build also runs, is code-check.yml's `build` to fail
-      # on the same tree.
+      # on the same tree. Nor where the measurement was taken from a pull
+      # request's run of this tree, which built it.
       - name: Build
-        if: steps.baseline.outputs.cache-hit != 'true'
+        if: >-
+          steps.baseline.outputs.cache-hit != 'true' &&
+          steps.taken.outcome != 'success'
         run: pnpm run ws:build
 
       # The tables only, without `gen:benchmark-doc`: a near tie in one noisy
@@ -182,7 +252,9 @@ jobs:
       # committed in, so the diff below counts changed numbers, not
       # reformatted lines.
       - name: Measure
-        if: steps.baseline.outputs.cache-hit != 'true'
+        if: >-
+          steps.baseline.outputs.cache-hit != 'true' &&
+          steps.taken.outcome != 'success'
         run: |
           set -euo pipefail
           BENCHMARK_MEASURED_ON="$(date -u +%F)"

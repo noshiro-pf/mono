@@ -1,0 +1,106 @@
+name: Find an earlier run of this tree
+
+# What a push to `main` reuses from the pull request it merged: the run of the
+# same workflow on the same tree that already produced an artifact, so that
+# the push does not produce it again. See "Reusing what a pull request
+# produced" in .github/workflows/README.md.
+#
+# By the tree rather than by the run whose verdict `check-gates.yml` reused,
+# because that run may itself have reused a verdict (a label event after the
+# checks reported) and then holds no artifact at all.
+
+description: >-
+  The id of the newest completed run of a workflow, on the tree of the
+  checked-out commit and from this repository's own branches, that holds an
+  unexpired artifact whose name matches a pattern. Empty when there is none,
+  or when the lookup fails, which the caller reads as "produce it here".
+
+inputs:
+  workflow:
+    description: The workflow's file name, such as `code-check.yml`.
+    required: true
+  artifact-pattern:
+    description: >-
+      A regular expression (jq's `test`) that the artifact's name has to
+      match.
+    required: true
+  conclusion:
+    description: >-
+      `success` to consider only runs that succeeded, `any` for success or
+      failure. A cancelled run is never considered.
+    required: false
+    default: success
+
+outputs:
+  run-id:
+    description: The run's id, or empty.
+    value: ${{ steps.find.outputs.run-id }}
+
+runs:
+  using: composite
+  steps:
+    - name: Look for a run of this tree that holds the artifact
+      id: find
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        WORKFLOW: ${{ inputs.workflow }}
+        ARTIFACT_PATTERN: ${{ inputs.artifact-pattern }}
+        CONCLUSION: ${{ inputs.conclusion }}
+      run: |
+        set -uo pipefail
+
+        produce_it_here() {
+          echo "${1}"
+          echo 'run-id=' >>"${GITHUB_OUTPUT}"
+          exit 0
+        }
+
+        case "${CONCLUSION}" in
+          success | any) ;;
+          *)
+            echo "::error::Input conclusion is \"${CONCLUSION}\"; expected success or any."
+            exit 1
+            ;;
+        esac
+
+        if ! TREE_SHA="$(git rev-parse 'HEAD^{tree}' 2>&1)"; then
+          produce_it_here "Could not read the checked-out tree: ${TREE_SHA}"
+        fi
+        export TREE_SHA
+
+        # Newest first. A fork's run is never taken: its artifacts are made by
+        # workflow files the fork wrote.
+        if ! run_ids="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW}/runs?status=completed&per_page=100" \
+          --jq '.workflow_runs[]
+            | select(.id != (env.GITHUB_RUN_ID | tonumber))
+            | select(.conclusion == "success" or (env.CONCLUSION == "any" and .conclusion == "failure"))
+            | select(.head_commit.tree_id == env.TREE_SHA)
+            | select(.head_repository.full_name == env.GITHUB_REPOSITORY)
+            | .id' 2>&1)"; then
+          produce_it_here "Could not list the runs of ${WORKFLOW}: ${run_ids}"
+        fi
+
+        for run_id in ${run_ids}; do
+          # As check-gates.yml reuses a verdict: only from a run whose gate
+          # recorded it as one about the tree. A pull request onto another
+          # branch runs its head merged into that base's workflow files.
+          if ! about_tree="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?filter=latest&per_page=100" \
+            --jq 'any(.jobs[].steps[]?; .name == "Verdict reusable by tree: true")' 2>&1)"; then
+            produce_it_here "Could not list the jobs of run ${run_id}: ${about_tree}"
+          fi
+          if [ "${about_tree}" != 'true' ]; then
+            continue
+          fi
+          if ! count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts?per_page=100" \
+            --jq '[.artifacts[] | select(.expired | not) | select(.name | test(env.ARTIFACT_PATTERN))] | length' 2>&1)"; then
+            produce_it_here "Could not list the artifacts of run ${run_id}: ${count}"
+          fi
+          if [ "${count}" -gt 0 ]; then
+            echo "Run ${run_id} of ${WORKFLOW} is on tree ${TREE_SHA} and holds ${count} artifact(s) matching ${ARTIFACT_PATTERN}."
+            echo "run-id=${run_id}" >>"${GITHUB_OUTPUT}"
+            exit 0
+          fi
+        done
+
+        produce_it_here "No completed run of ${WORKFLOW} on tree ${TREE_SHA} holds an artifact matching ${ARTIFACT_PATTERN}."
