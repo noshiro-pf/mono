@@ -132,13 +132,13 @@ npx unblock-prs --dry-run --once   # what it would do, changing nothing
 npx unblock-prs                    # run until Ctrl+C
 ```
 
-It rebases and fixes in throwaway `git worktree`s, so the checkout it runs
-from is never touched and you can keep working in it. It surveys every 30 seconds while the queue
-moves and every 5 minutes once it sits still; one Ctrl+C finishes the
-current step and stops. It arms auto-merge through GitHub's GraphQL API, so
-run it where that is reachable. `--help` lists the options;
-[`src/unblock-prs/README.md`](./src/unblock-prs/README.md), "Options", says
-what each does.
+It rebases and fixes in throwaway `git worktree`s, so the checkout it runs from
+is never touched and you can keep working in it. It surveys every minute while
+the queue moves and every 5 minutes once it sits still; one Ctrl+C finishes the
+current step and stops. It arms auto-merge through GitHub's GraphQL API, so run
+it where that is reachable. `--help` lists the options;
+[`src/unblock-prs/README.md`](./src/unblock-prs/README.md), "Options", says what
+each does.
 
 [GitHub Pull Requests Manager](https://noshiro-pf.github.io/mono/pr-manager/)
 shows all of it on one page, on any repository that has a `merge-queued`

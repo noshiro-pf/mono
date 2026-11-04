@@ -502,7 +502,7 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
 
 #### 4. watch
 
-`--poll-interval`（既定30秒）待ってから、マージするか「しない」と確定するまで
+`--poll-interval`（既定60秒）待ってから、マージするか「しない」と確定するまで
 ポーリングします。各回で次の順に判定し、該当した時点で抜けます。
 
 | 条件                                | 結果                          |
@@ -571,8 +571,8 @@ commit status は round の開始に数えません。ずっと前から pending
 数で打ち切ります。原因のうち未解決の会話と code owner の承認不足は triage が先
 に見つけて解放しないので（「2」の8）、ここに来るのはそれ以外です。たとえばマー
 ジ権限の無い人が auto-merge を有効にした、このスクリプトが読まない rule に引っ
-かかっている、などです。GitHub 自身が mergeable と言っている場合は3回、`BLOCKED` の
-まま green の場合は8回。後者が長いのは、check run が superseded された直後の一
+かかっている、などです。GitHub 自身が mergeable と言っている場合は2回、`BLOCKED` の
+まま green の場合は5回。後者が長いのは、check run が superseded された直後の一
 瞬がこの形になるためです。
 
 #### 4a. fixer の差分だけで落ちたなら直す
@@ -704,8 +704,8 @@ rebase や「4a」の push では解けません。記憶はプロセスの中�
 何もすることがなければ待ってから再 survey します。待ち時間は一覧が動いている
 かどうかで変わります。open な PR の一覧（head、merge state、ラベル、
 auto-merge、draft、本文）、レビュー待ちの理由、`main` の tip が
-`--idle-after`（既定10回）続けて
-前回の survey と同じになるまでは `--active-interval`（既定30秒）、それ以降は
+`--idle-after`（既定5回）続けて
+前回の survey と同じになるまでは `--active-interval`（既定60秒）、それ以降は
 `--idle-interval`（既定300秒）です。何か変われば短い間隔に戻ります。今キュー
 に入れた PR を数分放置しないためです。
 
@@ -715,10 +715,10 @@ auto-merge、draft、本文）、レビュー待ちの理由、`main` の tip �
 | :------------------------ | ---: | :------------------------------------------- |
 | `--once`                  |      | 1サイクルだけ実行して終了                    |
 | `--dry-run`               |      | survey と報告だけ行い、何も変更しない        |
-| `--active-interval <sec>` |   30 | 一覧が動いている間の再 survey までの待ち時間 |
-| `--idle-after <n>`        |   10 | 何回続けて変化が無ければ長い間隔にするか     |
+| `--active-interval <sec>` |   60 | 一覧が動いている間の再 survey までの待ち時間 |
+| `--idle-after <n>`        |    5 | 何回続けて変化が無ければ長い間隔にするか     |
 | `--idle-interval <sec>`   |  300 | 一覧が止まった後の再 survey までの待ち時間   |
-| `--poll-interval <sec>`   |   30 | watch 中のポーリング間隔                     |
+| `--poll-interval <sec>`   |   60 | watch 中のポーリング間隔                     |
 | `--watch-timeout <min>`   |   90 | 1本を諦めるまでの時間                        |
 | `--no-auto-fix`           |      | 「4a」の自動修正をしない                     |
 | `--repo <owner/name>`     |      | `origin` が指さないリポジトリを扱う          |
@@ -1425,7 +1425,7 @@ branch left to sleep included — is not moved by this step.
 
 #### 4. Watch
 
-After one `--poll-interval` (30s by default), poll until it merges or until
+After one `--poll-interval` (60s by default), poll until it merges or until
 something says it will not. Each poll tests these in order and leaves on the
 first that matches:
 
@@ -1497,14 +1497,14 @@ watches the same head again; push a new commit to have GitHub start its checks
 now. It stays armed and released, so runs GitHub only delayed still merge it on
 green, beside whatever was released after it.
 
-A pull request that is green and still open is held by something a rebase
-cannot fix, so it is given a budget of consecutive green polls. An unresolved
-conversation or a missing code-owner approval is caught by triage before
-release (step 2, item 8), so what reaches this point is anything else, such as
+A pull request that is green and still open is held by something a rebase cannot
+fix, so it is given a budget of consecutive green polls. An unresolved
+conversation or a missing code-owner approval is caught by triage before release
+(step 2, item 8), so what reaches this point is anything else, such as
 auto-merge armed by someone who may not merge, or a rule this script does not
-read. The budget is three when GitHub itself calls it mergeable, eight while it still reads
-`BLOCKED`, because that combination is also what a check run that has just
-been superseded looks like for a moment.
+read. The budget is two when GitHub itself calls it mergeable, five while it
+still reads `BLOCKED`, because that combination is also what a check run that
+has just been superseded looks like for a moment.
 
 #### 4a. Fix a failure that is only a fixer's diff
 
@@ -1631,13 +1631,13 @@ A pull request this run acted on that has left the open list by the next
 survey is reported as merged or closed. Nothing else would notice one that
 merged minutes after the watch gave up on it.
 
-With nothing to do, the loop sleeps and surveys again, for how long depending
-on whether the list is still moving. It sleeps `--active-interval` (30s) until
-`--idle-after` (10) surveys in a row have seen the same open pull requests
-(head, merge state, labels, auto-merge, draft flag, body), the same reasons a
-review holds any of them, and the same tip of `main`, and `--idle-interval` (300s) from then on. Any change brings it back
-to the short interval, so a pull request queued a moment ago is not left for
-minutes.
+With nothing to do, the loop sleeps and surveys again, for how long depending on
+whether the list is still moving. It sleeps `--active-interval` (60s) until
+`--idle-after` (5) surveys in a row have seen the same open pull requests (head,
+merge state, labels, auto-merge, draft flag, body), the same reasons a review
+holds any of them, and the same tip of `main`, and `--idle-interval` (300s) from
+then on. Any change brings it back to the short interval, so a pull request
+queued a moment ago is not left for minutes.
 
 ### Options
 
@@ -1645,10 +1645,10 @@ minutes.
 | :------------------------ | ------: | :----------------------------------------- |
 | `--once`                  |         | run one cycle and exit                     |
 | `--dry-run`               |         | survey and report, change nothing          |
-| `--active-interval <sec>` |      30 | wait between surveys while the list moves  |
-| `--idle-after <n>`        |      10 | unchanged surveys before the long wait     |
+| `--active-interval <sec>` |      60 | wait between surveys while the list moves  |
+| `--idle-after <n>`        |       5 | unchanged surveys before the long wait     |
 | `--idle-interval <sec>`   |     300 | wait between surveys once it has sat still |
-| `--poll-interval <sec>`   |      30 | wait between polls of the watched one      |
+| `--poll-interval <sec>`   |      60 | wait between polls of the watched one      |
 | `--watch-timeout <min>`   |      90 | give up on one pull request after this     |
 | `--no-auto-fix`           |         | skip the fix in "4a"                       |
 | `--repo <owner/name>`     |         | the repository, when `origin` is not it    |
