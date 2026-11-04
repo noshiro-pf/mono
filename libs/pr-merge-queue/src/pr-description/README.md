@@ -18,8 +18,8 @@ same thing.
    `## Review` など）。
 2. `## <heading>` の行と、その下に訳文。訳文の見出しは原文の見出しを1段下げた
    もので、同じ順に並べます。
-3. 訳文の後の最初の `---` 行と、その後のトレーラ（closing keyword、
-   `Start-After:`、`Claude-Session:` など）。
+3. 訳文の後の最初の `---` 行と、その後のトレーラ（`Start-After:`、
+   `Claude-Session:`、pull request なら closing keyword）。
 
 片方だけを書き換えると、原文と訳文の内容が食い違います。このコマンドは、
 **読むときは訳文を省き、書くときは両方が対応していることを確かめます**。
@@ -29,6 +29,7 @@ pnpm run pr-description -- read 1901                        # 訳文を省いて
 pnpm run pr-description -- pull 1901 --file ./d.md           # 編集用に保存
 pnpm run pr-description -- push 1901 --file ./d.md           # 書き戻す
 pnpm run pr-description -- check --file ./d.md               # 投稿前に確かめる
+pnpm run pr-description -- check --file ./d.md --issue       # issue の本文として確かめる
 pnpm run pr-description -- similar --title 'fix: x' --keyword onUserDelete  # 重複を探す
 pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  # issue を作る
 ```
@@ -59,14 +60,17 @@ pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  #
   （原文が見出しの無い段落で始まるなら、訳文はそこに `### 概要` のような見出しを
   1つ足してもかまいません）。
 - `#N` の参照が片方にしか無い（コード、表、`Merge-After:` などの宣言、
-  closing keyword の中は数えません）。
+  pull request の closing keyword の中は数えません）。
 - 訳文にコードブロック、表、画像がある。どれも原文に1度だけ置き、訳文はそれを
   参照します。
 - 訳文に `Merge-After:` の行がある。ツールは本文のどこにあっても読むので、
   食い違った写しも効いてしまいます。原文に1度だけ置きます。
-- トレーラ（`Start-After:`・`Claude-Session:` の行、closing keyword）が原文か
-  訳文の中にある。ツールと GitHub はどこにあっても読むので、訳文の後の `---`
-  行より後に1度だけ置きます。
+- トレーラ（`Start-After:`・`Claude-Session:` の行、pull request なら closing
+  keyword）が原文か訳文の中にある。ツールと GitHub はどこにあっても読むので、
+  訳文の後の `---` 行より後に1度だけ置きます。GitHub は issue の本文の closing
+  keyword では何もしないので、issue（`create`、issue への `push`、
+  `check --issue`）ではただの文として扱い、`#N` も数えます。`push` は番号が
+  issue か pull request かを GitHub から読みます。
 - `## Review`（`## Review (…)` のような後ろに続きのある見出しも含む）が原文に
   2つ以上ある、または訳文にある。ツールが読むのは本文で最初の1つだけです。
   訳文の節は `### レビュー` です。
@@ -100,16 +104,17 @@ pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  #
 When `.github/unblock-prs.json` names a `translation.heading` (`日本語` here),
 a description is the original, which tools and sessions read; then a
 `## <heading>` line and the translation, its headings the original's one level
-down in the same order; then, from the first `---` line after it, the
-trailers — closing keywords, `Start-After:`, `Claude-Session:`. Halves edited
-one at a time drift apart, so **reading leaves the translation out, and every
-write checks that the halves still mirror each other**.
+down in the same order; then, from the first `---` line after it, the trailers —
+`Start-After:`, `Claude-Session:`, and in a pull request closing keywords.
+Halves edited one at a time drift apart, so **reading leaves the translation
+out, and every write checks that the halves still mirror each other**.
 
 ```bash
 pnpm run pr-description -- read 1901                        # translation left out
 pnpm run pr-description -- pull 1901 --file ./d.md           # save it to edit
 pnpm run pr-description -- push 1901 --file ./d.md           # write it back
 pnpm run pr-description -- check --file ./d.md               # before posting
+pnpm run pr-description -- check --file ./d.md --issue       # as an issue's
 pnpm run pr-description -- similar --title 'fix: x' --keyword onUserDelete  # look for duplicates
 pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  # file an issue
 ```
@@ -134,16 +139,18 @@ the open issues with a close title and those that name a `--keyword` as written
 - the translation's headings are not the original's one level down, in order
   (where the original opens with prose under no heading, the translation may
   give it one, such as `### 概要`);
-- a `#N` appears in one half only, counting neither code, tables,
-  declarations nor closing keywords;
+- a `#N` appears in one half only, counting neither code, tables, declarations
+  nor a pull request's closing keywords;
 - the translation holds code, a table or an image, which appear once, in the
   original, for the translation to refer to;
 - the translation holds a `Merge-After:` line: the tools read it wherever it is,
   so a copy that drifted would be obeyed too, and it appears once, in the
   original;
-- either half holds a trailer — a `Start-After:` or `Claude-Session:` line or a
-  closing keyword — which the tools and GitHub read wherever it is, so it
-  appears once, after the `---` rule;
+- either half holds a trailer — a `Start-After:` or `Claude-Session:` line, or
+  in a pull request a closing keyword — which the tools and GitHub read wherever
+  it is, so it appears once, after the `---` rule. GitHub acts on no closing
+  keyword in an issue, so there (`create`, `push` to an issue, `check --issue`)
+  one is prose and its `#N` counts; `push` asks GitHub which the number is;
 - the original has more than one `## Review` section, a suffixed heading such as
   `## Review (…)` included, or the translation has one: the tools read the
   first in the body. The translation's is `### レビュー`;

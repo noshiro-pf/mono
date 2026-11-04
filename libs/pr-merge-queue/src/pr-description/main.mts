@@ -13,8 +13,10 @@ import { readConfig } from '../unblock-prs/index.mjs';
 import {
   changedParts,
   checkDescription,
+  descriptionKindOf,
   readableDescription,
   splitDescription,
+  type DescriptionKind,
 } from './body.mjs';
 import type {
   Command,
@@ -48,7 +50,11 @@ export const runDescription = async (
 
   switch (command.kind) {
     case 'check':
-      return check(command.file, heading);
+      return check(
+        command.file,
+        heading,
+        command.issue ? 'issue' : 'pull-request',
+      );
 
     case 'read':
     case 'pull':
@@ -84,12 +90,14 @@ export const runDescription = async (
 /**
  * Why `body` may not be posted, or `undefined` when it may: with a translation
  * heading configured, a body whose halves do not mirror each other, or that has
- * a trailer or a `## Review` out of its place (`./body.mts`).
+ * a trailer or a `## Review` out of its place (`./body.mts`); what is a trailer
+ * depends on whether `body` is an issue's or a pull request's.
  * `open-pr --body-file` asks the same before it pushes.
  */
 export const descriptionProblems = (
   body: string,
   heading: string | undefined,
+  kind: DescriptionKind,
 ): string | undefined => {
   if (heading === undefined) {
     return undefined;
@@ -101,7 +109,7 @@ export const descriptionProblems = (
     return parts.value;
   }
 
-  const problems = checkDescription(parts.value);
+  const problems = checkDescription(parts.value, kind);
 
   return Arr.isNonEmpty(problems)
     ? `the description is not laid out as the original, its translation, then the trailers:\n${problems.map((p) => `- ${p}`).join('\n')}`
@@ -141,25 +149,38 @@ const writeText = async (
     : Result.ok(undefined);
 };
 
+/**
+ * The description of `#number`, and whether it is a pull request's: the issues
+ * route answers both, and says which by `pull_request`.
+ */
 const readBody = async (
   api: ApiContext,
   number: number,
-): Promise<Result<string, string>> => {
+): Promise<
+  Result<Readonly<{ body: string; kind: DescriptionKind }>, string>
+> => {
   const issue = await rest(
     api,
     'GET',
     `/issues/${number}`,
-    t.record({ body: t.union([t.string(), t.nullType]) }),
+    t.record({
+      body: t.union([t.string(), t.nullType]),
+      pull_request: t.optional(t.record({})),
+    }),
   );
 
   return Result.isErr(issue)
     ? Result.err(`cannot read #${number}: ${issue.value}`)
-    : Result.ok(lf(issue.value.body ?? ''));
+    : Result.ok({
+        body: lf(issue.value.body ?? ''),
+        kind: descriptionKindOf(issue.value),
+      });
 };
 
 const check = async (
   file: string,
   heading: string | undefined,
+  kind: DescriptionKind,
 ): Promise<Result<string, string>> => {
   if (heading === undefined) {
     return Result.err(
@@ -173,7 +194,7 @@ const check = async (
     return body;
   }
 
-  const problems = descriptionProblems(body.value, heading);
+  const problems = descriptionProblems(body.value, heading, kind);
 
   return problems === undefined
     ? Result.ok(`${file}: the original and its translation mirror each other`)
@@ -185,13 +206,19 @@ const readDescription = async (
   number: number,
   heading: string | undefined,
 ): Promise<Result<string, string>> => {
-  const body = await readBody(api, number);
+  const read = await readBody(api, number);
 
-  if (heading === undefined || Result.isErr(body)) {
-    return body;
+  if (Result.isErr(read)) {
+    return read;
   }
 
-  const parts = splitDescription(body.value, heading);
+  const { body } = read.value;
+
+  if (heading === undefined) {
+    return Result.ok(body);
+  }
+
+  const parts = splitDescription(body, heading);
 
   if (Result.isErr(parts)) {
     // Read in full rather than refused: what a reader needs is the text, and a
@@ -199,7 +226,7 @@ const readDescription = async (
     // translation to leave out.
     log(`#${number}: ${parts.value}; printed in full`);
 
-    return body;
+    return Result.ok(body);
   }
 
   return Result.ok(readableDescription(parts.value, heading));
@@ -230,11 +257,13 @@ const pull = async (
   file: string,
   heading: string | undefined,
 ): Promise<Result<string, string>> => {
-  const body = await readBody(api, number);
+  const read = await readBody(api, number);
 
-  if (Result.isErr(body)) {
-    return body;
+  if (Result.isErr(read)) {
+    return read;
   }
+
+  const { body, kind } = read.value;
 
   const pending = await pendingEdit(file);
 
@@ -243,14 +272,14 @@ const pull = async (
   }
 
   for (const path of [file, pulledPath(file)]) {
-    const written = await writeText(path, body.value);
+    const written = await writeText(path, body);
 
     if (Result.isErr(written)) {
       return written;
     }
   }
 
-  const problems = descriptionProblems(body.value, heading);
+  const problems = descriptionProblems(body, heading, kind);
 
   return Result.ok(
     [
@@ -272,6 +301,7 @@ const lopsidedEdit = (
   before: string,
   after: string,
   heading: string,
+  kind: DescriptionKind,
 ): string | undefined => {
   const was = splitDescription(before, heading);
 
@@ -281,7 +311,7 @@ const lopsidedEdit = (
     return undefined;
   }
 
-  const changed = changedParts(was.value, is.value);
+  const changed = changedParts(was.value, is.value, kind);
 
   return changed.original === changed.translation
     ? undefined
@@ -315,7 +345,9 @@ const push = async (
     return current;
   }
 
-  if (lf(current.value) !== lf(pulled.value)) {
+  const { body, kind } = current.value;
+
+  if (body !== lf(pulled.value)) {
     // Another writer — `open-pr --merge-before`, a person — got there first,
     // and writing over it would silently drop what they wrote.
     return Result.err(
@@ -327,14 +359,14 @@ const push = async (
     return Result.ok(`#${number}: unchanged, nothing written`);
   }
 
-  const problems = descriptionProblems(edited.value, heading);
+  const problems = descriptionProblems(edited.value, heading, kind);
 
   if (problems !== undefined) {
     return Result.err(`${file}: ${problems}`);
   }
 
   if (heading !== undefined && !wordingOnly) {
-    const lopsided = lopsidedEdit(pulled.value, edited.value, heading);
+    const lopsided = lopsidedEdit(pulled.value, edited.value, heading, kind);
 
     if (lopsided !== undefined) {
       return Result.err(`${file}: ${lopsided}`);
@@ -377,7 +409,7 @@ const readOpenIssues = async (
     ? Result.err(`cannot read the open issues: ${read.value}`)
     : Result.ok(
         read.value
-          .filter((issue) => issue.pull_request === undefined)
+          .filter((issue) => descriptionKindOf(issue) === 'issue')
           .map(({ number, title, body, html_url: url }) => ({
             number,
             title,
@@ -398,7 +430,7 @@ const create = async (
     return body;
   }
 
-  const problems = descriptionProblems(body.value, heading);
+  const problems = descriptionProblems(body.value, heading, 'issue');
 
   if (problems !== undefined) {
     return Result.err(`${command.file}: ${problems}`);

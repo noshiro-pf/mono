@@ -4,6 +4,7 @@ import { Result } from 'ts-data-forge';
 import {
   changedParts,
   checkDescription,
+  descriptionKindOf,
   readableDescription,
   reviewOpeningOf,
   reviewOpeningRounds,
@@ -141,7 +142,7 @@ describe(splitDescription, () => {
 
 describe(checkDescription, () => {
   test('passes halves that mirror each other', () => {
-    assert.deepStrictEqual(checkDescription(split(BODY)), []);
+    assert.deepStrictEqual(checkDescription(split(BODY), 'pull-request'), []);
   });
 
   test('names headings that do not mirror', () => {
@@ -152,6 +153,7 @@ describe(checkDescription, () => {
           '### 概要\n\nあ。\n\n### 実行したチェック',
         ),
       ),
+      'pull-request',
     );
 
     assert.strictEqual(problems.length, 1);
@@ -162,7 +164,7 @@ describe(checkDescription, () => {
   test('lets the translation title prose the original opens with', () => {
     const titled = BODY.replace('パーサを直す', '### 概要\n\nパーサを直す');
 
-    assert.deepStrictEqual(checkDescription(split(titled)), []);
+    assert.deepStrictEqual(checkDescription(split(titled), 'pull-request'), []);
 
     // One heading for the opening, and no more.
     assert.isNotEmpty(
@@ -170,24 +172,32 @@ describe(checkDescription, () => {
         split(
           titled.replace('### レビュー', '### 補足\n\nあ。\n\n### レビュー'),
         ),
+        'pull-request',
       ),
     );
 
     assert.deepStrictEqual(
-      checkDescription(split('A.\n\n## 日本語\n\n### 概要\n\nあ。')),
+      checkDescription(
+        split('A.\n\n## 日本語\n\n### 概要\n\nあ。'),
+        'pull-request',
+      ),
       [],
     );
   });
 
   test('wants the translation one level down', () => {
     assert.isNotEmpty(
-      checkDescription(split(BODY.replace('### レビュー', '## レビュー'))),
+      checkDescription(
+        split(BODY.replace('### レビュー', '## レビュー')),
+        'pull-request',
+      ),
     );
   });
 
   test('names a reference only one half makes', () => {
     const problems = checkDescription(
       split(BODY.replace('- 先送り: 残り (#13)。', '- 先送り: 残り。')),
+      'pull-request',
     );
 
     assert.strictEqual(problems.length, 1);
@@ -215,7 +225,7 @@ describe(checkDescription, () => {
       \`#6\` と書く。
     `);
 
-    assert.deepStrictEqual(checkDescription(parts), []);
+    assert.deepStrictEqual(checkDescription(parts, 'pull-request'), []);
   });
 
   test('keeps code, tables and images in the original', () => {
@@ -234,6 +244,7 @@ describe(checkDescription, () => {
 
         ![shot](https://example.com/a.png)
       `),
+      'pull-request',
     );
 
     assert.strictEqual(problems.length, 3);
@@ -249,6 +260,7 @@ describe(checkDescription, () => {
         Merge-After: #1
         Closes #2
       `),
+      'pull-request',
     );
 
     assert.strictEqual(problems.length, 2);
@@ -277,6 +289,7 @@ describe(checkDescription, () => {
 
           ${trailer}
         `),
+        'pull-request',
       ),
       [
         `the original has the trailer "${trailer}"; ${TRAILER_RULE}`,
@@ -302,8 +315,66 @@ describe(checkDescription, () => {
 
           あ。
         `),
+        'pull-request',
       ),
       [`the original has the trailer "${trailer}"; ${TRAILER_RULE}`],
+    );
+  });
+
+  test('reads a closing keyword in an issue as prose, not as a trailer', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          The workaround in #5 resolves #10 only partly.
+
+          ## 日本語
+
+          #5 の回避策は #10 を一部しか解決しない。
+        `),
+        'issue',
+      ),
+      [],
+    );
+  });
+
+  test('counts the reference a closing keyword in an issue names', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(
+          'This resolves #10 only partly.\n\n## 日本語\n\n一部しか解決しない。',
+        ),
+        'issue',
+      ),
+      ['the original names #10 and the translation does not'],
+    );
+  });
+
+  const ISSUE_TRAILER_RULE =
+    'Start-After: and Claude-Session: lines are read wherever they are, so each appears once, after the "---" rule that ends the translation';
+
+  test.each([
+    'Start-After: #3',
+    'Claude-Session: https://claude.ai/code/session_1',
+  ])('keeps the trailer %s out of either half of an issue', (trailer) => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A.
+
+          ${trailer}
+
+          ## 日本語
+
+          あ。
+
+          ${trailer}
+        `),
+        'issue',
+      ),
+      [
+        `the original has the trailer "${trailer}"; ${ISSUE_TRAILER_RULE}`,
+        `the translation has the trailer "${trailer}"; ${ISSUE_TRAILER_RULE}`,
+      ],
     );
   });
 
@@ -319,6 +390,7 @@ describe(checkDescription, () => {
 
           あ。
         `),
+        'pull-request',
       ),
       [
         'the translation has a "## Review" heading; the tools read the first in the body, so the findings go under the original\'s and the translation titles its own section "### <translated heading>"',
@@ -340,6 +412,7 @@ describe(checkDescription, () => {
 
           \`Closes #2\` を書く。
         `),
+        'pull-request',
       ),
       [],
     );
@@ -367,6 +440,7 @@ describe(checkDescription, () => {
 
           い。
         `),
+        'pull-request',
       ),
       [
         'the original has a "## Review" section 2 times; the tools read the first, so the findings go under one',
@@ -387,6 +461,7 @@ describe(checkDescription, () => {
         split(
           `## Review\n\n${opening}\n\n- Fixed: a.\n\n## 日本語\n\n### レビュー\n\nあ。`,
         ),
+        'pull-request',
       ),
       [],
     );
@@ -406,6 +481,7 @@ describe(checkDescription, () => {
     assert.deepStrictEqual(
       checkDescription(
         split(`## Review\n\n${opening}\n\n## 日本語\n\n### レビュー\n\nあ。`),
+        'pull-request',
       ),
       [
         `the "## Review" section opens with "${opening}"; ${REVIEW_OPENING_RULE}`,
@@ -419,6 +495,7 @@ describe(checkDescription, () => {
         split(
           '## Review\n\n### Round 1\n\n- Fixed: a.\n\n## 日本語\n\n### レビュー\n\n#### 1 回目\n\nあ。',
         ),
+        'pull-request',
       ),
       [
         `the "## Review" section opens with "### Round 1"; ${REVIEW_OPENING_RULE}`,
@@ -432,6 +509,7 @@ describe(checkDescription, () => {
         split(
           '## Review\n\n## Checks\n\nA.\n\n## 日本語\n\n### レビュー\n\n### チェック\n\nあ。',
         ),
+        'pull-request',
       ),
       [`the "## Review" section is empty; ${REVIEW_OPENING_RULE}`],
     );
@@ -441,6 +519,7 @@ describe(checkDescription, () => {
     assert.deepStrictEqual(
       checkDescription(
         split('A.\n\n## Review\n\n## 日本語\n\nあ。\n\n### レビュー'),
+        'pull-request',
       ),
       [`the "## Review" section is empty; ${REVIEW_OPENING_RULE}`],
     );
@@ -462,6 +541,7 @@ describe(checkDescription, () => {
 
           あ。
         `),
+        'pull-request',
       ),
       [],
     );
@@ -511,7 +591,7 @@ describe(changedParts, () => {
 
   test('sees neither half change when only the trailers do', () => {
     assert.deepStrictEqual(
-      changedParts(before, split(`${BODY}\nStart-After: #9`)),
+      changedParts(before, split(`${BODY}\nStart-After: #9`), 'pull-request'),
       { original: false, translation: false },
     );
   });
@@ -526,6 +606,7 @@ describe(changedParts, () => {
             '## Review\n',
           ),
         ),
+        'pull-request',
       ),
       { original: false, translation: false },
     );
@@ -536,8 +617,23 @@ describe(changedParts, () => {
       changedParts(
         split('A.\n\nCloses #11\n\n## 日本語\n\nあ。'),
         split('A.\n\n## 日本語\n\nあ。\n\n---\n\nCloses #11'),
+        'pull-request',
       ),
       { original: false, translation: false },
+    );
+  });
+
+  test('counts an edit to a line of an issue that has a closing keyword', () => {
+    const issue =
+      'The fix resolves #10 partly.\n\n## 日本語\n\nこの修正は #10 を一部解決する。';
+
+    assert.deepStrictEqual(
+      changedParts(
+        split(issue),
+        split(issue.replace('partly', 'in part')),
+        'issue',
+      ),
+      { original: true, translation: false },
     );
   });
 
@@ -546,6 +642,7 @@ describe(changedParts, () => {
       changedParts(
         before,
         split(BODY.replace('Merge-After: #10', 'Merge-After: #10, #14')),
+        'pull-request',
       ),
       { original: false, translation: false },
     );
@@ -553,14 +650,37 @@ describe(changedParts, () => {
 
   test('sees each half change', () => {
     assert.deepStrictEqual(
-      changedParts(before, split(BODY.replace('the rest', 'the remainder'))),
+      changedParts(
+        before,
+        split(BODY.replace('the rest', 'the remainder')),
+        'pull-request',
+      ),
       { original: true, translation: false },
     );
 
     assert.deepStrictEqual(
-      changedParts(before, split(BODY.replace('残り', 'その他'))),
+      changedParts(
+        before,
+        split(BODY.replace('残り', 'その他')),
+        'pull-request',
+      ),
       { original: false, translation: true },
     );
+  });
+});
+
+describe(descriptionKindOf, () => {
+  test('reads a pull request by the pull_request key the issues route sets', () => {
+    assert.strictEqual(
+      descriptionKindOf({ pull_request: { url: 'https://example.com' } }),
+      'pull-request',
+    );
+  });
+
+  test('reads an issue without it', () => {
+    assert.strictEqual(descriptionKindOf({}), 'issue');
+
+    assert.strictEqual(descriptionKindOf({ pull_request: undefined }), 'issue');
   });
 });
 

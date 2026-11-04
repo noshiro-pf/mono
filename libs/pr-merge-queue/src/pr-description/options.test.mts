@@ -52,7 +52,13 @@ describe(parseOptions, () => {
     assert.deepStrictEqual(Result.unwrapOk(parsed('check', '--file', 'd.md')), {
       kind: 'check',
       file: 'd.md',
+      issue: false,
     });
+
+    assert.deepStrictEqual(
+      Result.unwrapOk(parsed('check', '--file', 'd.md', '--issue')),
+      { kind: 'check', file: 'd.md', issue: true },
+    );
 
     assert.deepStrictEqual(
       Result.unwrapOk(
