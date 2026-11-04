@@ -8,6 +8,7 @@ import { settingsFilePath } from '../settings-file-path.mjs';
 import { getAllEnvironments, setEnvironment } from './api/index.mjs';
 import type { EnvironmentSettings } from './constants.mjs';
 import { readEnvironmentFiles } from './read-environment-contents.mjs';
+import { selectDeclaredEnvironments } from './select-declared-environments.mjs';
 
 /**
  * `repo-settings/environments/*.json` を Settings > Environments に反映する。
@@ -27,9 +28,14 @@ export const applyEnvironments = async (): Promise<void> => {
     await setEnvironment(environment);
   }
 
-  // 反映後の実際の値でローカルのファイルを更新する
+  // 反映後の実際の値で、宣言したファイルだけを更新する。 GitHub が値を
+  // 正規化したり受け付けなかったりしたものが diff に出る。宣言に無い環境まで
+  // 書くと、 drift 検査が報せるはずのものが宣言として取り込まれてしまう。
   {
-    const applied = await getAllEnvironments();
+    const applied = selectDeclaredEnvironments(
+      await getAllEnvironments(),
+      environments,
+    );
 
     for (const environment of applied) {
       const str = JSON.stringify(environment, undefined, 2);
