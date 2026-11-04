@@ -7,15 +7,19 @@ import { Num } from 'ts-data-forge';
  *
  * Every box is the same width, so a fraction of the strip's scroll width is the
  * same fraction of the queue, which is how the map is drawn. The running box
- * stays at the start of the strip as the rest scroll under it, so once the
- * strip is scrolled, what is in view of the rest starts where that box ends.
+ * stays at the start of the strip as the rest scroll under it, so what is in
+ * view of the rest starts where that box ends, and moves as far as the strip is
+ * scrolled: a frame dragged on the map stays under the pointer.
  */
 
 /** Whether some of the queue is out of view, which is when the map is drawn. */
 export const overflows = (strip: QueueStrip): boolean =>
   strip.scrollWidth > strip.width;
 
-/** The part of the queue in view, as fractions of the whole. */
+/**
+ * The part of the queue in view beside the running box held at the start, as
+ * fractions of the whole. The running box itself is always in view.
+ */
 export const windowOf = (
   strip: QueueStrip,
 ): Readonly<{ start: number; size: number }> => {
@@ -25,7 +29,7 @@ export const windowOf = (
     return { start: 0, size: 1 };
   }
 
-  const start = scrolled(strip) ? strip.left + strip.held : 0;
+  const start = strip.left + strip.held;
 
   const end = strip.left + strip.width;
 
@@ -41,11 +45,33 @@ export const windowOf = (
  * end lets it.
  */
 export const scrollLeftAt = (strip: QueueStrip, fraction: number): number =>
-  Num.clamp(
+  scrollable(
+    strip,
     fraction * strip.scrollWidth - (strip.width + strip.held) / 2,
-    0,
-    Math.max(0, strip.scrollWidth - strip.width),
   );
+
+/**
+ * Whether the point of the map at `fraction` is inside the frame round the part
+ * in view, which is where a press starts dragging the frame as it is rather
+ * than first moving it there.
+ */
+export const inWindow = (strip: QueueStrip, fraction: number): boolean => {
+  const { start, size } = windowOf(strip);
+
+  return start <= fraction && fraction <= start + size;
+};
+
+/**
+ * Where to scroll the strip to when the frame is dragged `delta` of the map's
+ * width across, from a drag that started with the strip scrolled to `from`, or
+ * as near as either end lets it. Measured from where the drag started, so that
+ * a pointer moved back to where it was pressed puts the strip back too.
+ */
+export const draggedLeft = (
+  strip: QueueStrip,
+  from: number,
+  delta: number,
+): number => scrollable(strip, from + delta * strip.scrollWidth);
 
 /**
  * Whether some of the queue is out of view before and after what is in view,
@@ -101,3 +127,7 @@ export const NO_STRIP: QueueStrip = {
 } as const;
 
 const scrolled = (strip: QueueStrip): boolean => strip.left >= 1;
+
+/** `left`, or the nearer end of how far the strip scrolls. */
+const scrollable = (strip: QueueStrip, left: number): number =>
+  Num.clamp(left, 0, Math.max(0, strip.scrollWidth - strip.width));

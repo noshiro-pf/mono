@@ -3,12 +3,19 @@ import {
   onScopeDispose,
   type InitializedObservable,
 } from 'synstate';
-import { NO_STRIP, scrollLeftAt, type QueueStrip } from '../queue-strip.mjs';
+import {
+  draggedLeft,
+  inWindow,
+  NO_STRIP,
+  scrollLeftAt,
+  type QueueStrip,
+} from '../queue-strip.mjs';
+import type { QueueMapRelease } from './queue-map.js';
 
 /**
  * The Queue block's strip of boxes (`queue-section.tsx`), measured: a `ref` to
  * hand the list that scrolls, what it is to be handed as its `onScroll`, where
- * it is as last measured, and a way to scroll it to a point of the map. Called
+ * it is as last measured, and what a press and a drag on the map do to it. Called
  * while the block is mounted; what it listens to is released with the scope it
  * was called in.
  *
@@ -21,16 +28,44 @@ export const queueStripBox = (): Readonly<{
   ref: (element: HTMLElement) => void;
   onScroll: () => void;
   strip$: InitializedObservable<QueueStrip>;
-  /** Scrolls so that the point of the map at `fraction` is in the middle. */
-  jumpTo: (fraction: number) => void;
+  /**
+   * Pressed on the map at `fraction` of its width. Inside the frame round the
+   * part in view, the strip stops where it is, to be dragged from there as a
+   * scroll bar's thumb is; outside, a drag starts from where the point is in
+   * the middle.
+   */
+  press: (fraction: number) => void;
+  /** The pointer pressed on the map has moved, to `fraction` of its width. */
+  dragTo: (fraction: number) => void;
+  /**
+   * The press on the map is over. A click outside the frame scrolls the strip,
+   * smoothly, to where a drag would have started; a pointer lost to it, as when
+   * a touch turns out to scroll the page, puts the strip back where it was.
+   */
+  release: (how: QueueMapRelease) => void;
 }> => {
   const mut_state: {
     list: HTMLElement | undefined;
     /** A measurement asked for and not yet taken. */
     frame: number | undefined;
+    /**
+     * Where on the map the pointer was pressed, and where the strip was, or is
+     * being scrolled to, then.
+     */
+    drag:
+      | Readonly<{
+          at: number;
+          from: number;
+          /** Where the strip was before the press. */
+          before: number;
+          /** Pressed outside the frame. */
+          outside: boolean;
+        }>
+      | undefined;
   } = {
     list: undefined,
     frame: undefined,
+    drag: undefined,
   };
 
   const [strip$, setStrip] = createState<QueueStrip>(NO_STRIP);
@@ -99,11 +134,65 @@ export const queueStripBox = (): Readonly<{
     },
     onScroll: request,
     strip$,
-    jumpTo: (fraction) => {
-      mut_state.list?.scrollTo({
-        left: scrollLeftAt(strip$.getSnapshot().value, fraction),
-        behavior: 'smooth',
+    press: (fraction) => {
+      const { list } = mut_state;
+
+      if (list === undefined) {
+        return;
+      }
+
+      const strip = strip$.getSnapshot().value;
+
+      // Where the strip is now rather than as last measured: a frame grabbed
+      // while a jump is still scrolling it stops under the pointer.
+      const before = list.scrollLeft;
+
+      if (!inWindow(strip, fraction)) {
+        mut_state.drag = {
+          at: fraction,
+          from: scrollLeftAt(strip, fraction),
+          before,
+          outside: true,
+        };
+
+        return;
+      }
+
+      mut_state.drag = { at: fraction, from: before, before, outside: false };
+
+      // Scrolling ends a smooth scroll still under way (CSSOM View).
+      list.scrollTo({ left: before, behavior: 'instant' });
+    },
+    dragTo: (fraction) => {
+      const { drag, list } = mut_state;
+
+      if (drag === undefined || list === undefined) {
+        return;
+      }
+
+      list.scrollTo({
+        left: draggedLeft(
+          strip$.getSnapshot().value,
+          drag.from,
+          fraction - drag.at,
+        ),
+        behavior: 'instant',
       });
+    },
+    release: (how) => {
+      const { drag, list } = mut_state;
+
+      mut_state.drag = undefined;
+
+      if (drag === undefined || list === undefined) {
+        return;
+      }
+
+      if (how === 'lost') {
+        list.scrollTo({ left: drag.before, behavior: 'instant' });
+      } else if (how === 'click' && drag.outside) {
+        list.scrollTo({ left: drag.from, behavior: 'smooth' });
+      }
     },
   };
 };

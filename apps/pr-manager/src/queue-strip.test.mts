@@ -1,5 +1,7 @@
 import {
+  draggedLeft,
   edgesOf,
+  inWindow,
   NO_STRIP,
   overflows,
   scrollLeftAt,
@@ -34,20 +36,24 @@ describe(windowOf, () => {
     assert.deepStrictEqual(windowOf(strip(1000)), { start: 0.25, size: 0.2 });
   });
 
-  test('leaves out what the running box covers once the strip is scrolled', () => {
+  test('leaves out the running box and what it covers', () => {
     // Boxes 10 (under the running one) to 17 are in view; 11 to 17 are seen.
     assert.deepStrictEqual(windowOf(strip(1000, 100)), {
       start: 0.275,
       size: 0.175,
     });
 
-    // Not scrolled, the running box is itself the first in view; nor off the
-    // start by a fraction of a pixel.
-    assert.deepStrictEqual(windowOf(strip(0, 100)), { start: 0, size: 0.2 });
+    // Not scrolled, the running box is in its own place, before the rest.
+    assert.deepStrictEqual(windowOf(strip(0, 100)), {
+      start: 0.025,
+      size: 0.175,
+    });
+  });
 
-    assert.deepStrictEqual(windowOf(strip(0.4, 100)), {
-      start: 0,
-      size: 0.2001,
+  test('moves as far as the strip is scrolled', () => {
+    assert.deepStrictEqual(windowOf(strip(40, 100)), {
+      start: 0.035,
+      size: 0.175,
     });
   });
 
@@ -76,6 +82,51 @@ describe(scrollLeftAt, () => {
 
   test('does not scroll a strip that fits', () => {
     expect(scrollLeftAt(fits, 0.9)).toBe(0);
+  });
+});
+
+describe(inWindow, () => {
+  test('is whether a point of the map is inside the frame', () => {
+    // The frame is 0.25–0.45.
+    assert.isTrue(inWindow(strip(1000), 0.3));
+
+    assert.isTrue(inWindow(strip(1000), 0.25));
+
+    assert.isTrue(inWindow(strip(1000), 0.45));
+
+    assert.isFalse(inWindow(strip(1000), 0.2));
+
+    assert.isFalse(inWindow(strip(1000), 0.5));
+  });
+
+  test('leaves out what the running box covers', () => {
+    // The frame is 0.275–0.45.
+    assert.isFalse(inWindow(strip(1000, 100), 0.26));
+
+    assert.isTrue(inWindow(strip(1000, 100), 0.28));
+  });
+});
+
+describe(draggedLeft, () => {
+  test('moves the strip as far as the frame was dragged across the map', () => {
+    // A tenth of the map is a tenth of the queue, 400px.
+    expect(draggedLeft(strip(1000), 1000, 0.1)).toBe(1400);
+
+    expect(draggedLeft(strip(1000), 1000, -0.1)).toBe(600);
+  });
+
+  test('goes from where the drag started, not where the strip is now', () => {
+    expect(draggedLeft(strip(1300), 1000, 0.1)).toBe(1400);
+  });
+
+  test('stops at either end', () => {
+    expect(draggedLeft(strip(1000), 1000, -0.5)).toBe(0);
+
+    expect(draggedLeft(strip(1000), 1000, 0.9)).toBe(3200);
+  });
+
+  test('does not scroll a strip that fits', () => {
+    expect(draggedLeft(fits, 0, 0.3)).toBe(0);
   });
 });
 
