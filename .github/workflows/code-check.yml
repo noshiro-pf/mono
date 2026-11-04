@@ -99,8 +99,9 @@ jobs:
         #
         # Each entry says what it needs beside its command: `build`, the
         # script that builds what it reads; `browser`, Playwright's headless
-        # Chromium; `java`, the Firebase emulators' runtime; `coverage`, that
-        # it uploads coverage reports; `diff-base`, the commit
+        # Chromium, or with `full` the full build as well, which a suite that
+        # loads an extension needs; `java`, the Firebase emulators' runtime;
+        # `coverage`, that it uploads coverage reports; `diff-base`, the commit
         # `CODEMOD_DIFF_BASE` names, fetched.
         include:
           # `ws:fix:lint` in two halves, `apps/` and the rest, each with
@@ -171,10 +172,11 @@ jobs:
           # The whole `ws:build`: synstate-docs' suite runs against its
           # production build, served by `preview` alone in CI
           # (`tools/configs/playwright-config.mts`), and `ws:build:deps` builds
-          # no app.
+          # no app. `full`: an extension's suite loads its build, and lands
+          # here as every new suite does.
           - command: ws:check:e2e:shard-2
             build: ws:build
-            browser: true
+            browser: full
 
           - command: ws:check:test:browser
             build: ws:build:deps
@@ -199,13 +201,15 @@ jobs:
       # `ws:check:test:cov` needs a browser too: the synstate adapters' hooks
       # only run in one, so their coverage would otherwise be reported as zero.
       # The end-to-end tests drive one, which is the whole point of them.
-      # `--only-shell`: every launch here is headless, which Playwright runs on
-      # `chromium-headless-shell`, so the full Chromium build would be
-      # downloaded for nothing. Only the extensions' `pack:crx` and `smoke`
-      # need it, and CI runs neither.
+      # `--only-shell`: a headless launch on Playwright's default channel runs
+      # on `chromium-headless-shell`, so the full Chromium build would be
+      # downloaded for nothing. A launch with `channel: 'chromium'` runs on the
+      # full build, and loading an extension needs one, so the entry whose
+      # suites load one says `browser: full`. The extensions' `pack:crx` and
+      # `smoke` need it too, and CI runs neither.
       - name: Install Playwright Browsers
         if: matrix.browser
-        run: pnpm exec playwright install --only-shell chromium
+        run: pnpm exec playwright install ${{ case(matrix.browser == 'full', 'chromium', '--only-shell chromium') }}
 
       # Firestore and Pub/Sub need Java 21 or later. firebase-tools is already
       # a catalog-pinned dependency of each app; no Firebase login is needed.

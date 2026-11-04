@@ -220,7 +220,9 @@ const checkAll = async (): Promise<void> => {
   // - `ws:check:test:browser`, `ws:check:e2e` and `ws:check:e2e:emulators`
   //   need Playwright's browsers, which `pnpm install` does not fetch —
   //   `code-check.yml` runs `playwright install --only-shell chromium` before
-  //   them — and the last needs Java 21 for the Firebase emulators as well.
+  //   them, and the full build too for `ws:check:e2e:shard-2`, whose suites
+  //   may load an extension — and the last needs Java 21 for the Firebase
+  //   emulators as well.
   //   Run them directly, or let CI.
   // - `ws:check:test:rules` needs Java 21 for the Firestore emulator, which
   //   `code-check.yml` sets up before it. Run it directly, or let CI.
