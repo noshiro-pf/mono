@@ -1,45 +1,84 @@
-import { constant, type Bindable, type JSX } from 'synstate-dom';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 
 /** The icons this package draws. */
 export type IconName = keyof typeof ICON_PATHS_16;
 
-type Props = Readonly<{
-  icon: IconName;
-  /** Classes after Blueprint's own, such as `rdp-nav_icon`. */
-  class?: string;
-  style?: Bindable<string>;
-}>;
+/** The icons this package also draws at 20px, `IconSize.LARGE`. */
+export type IconName20 = keyof typeof ICON_PATHS_20;
+
+type Props = Readonly<
+  {
+    /** Classes after Blueprint's own, such as `rdp-nav_icon`. */
+    class?: string;
+    style?: Bindable<string>;
+  } & (
+    | {
+        /** A name, or one that changes: the drawing follows it. */
+        icon: Bindable<IconName> | IconName;
+        size?: 16;
+      }
+    | {
+        icon: Bindable<IconName20> | IconName20;
+        /** `IconSize.LARGE`: the 20px drawing, not the 16px one scaled. */
+        size: 20;
+      }
+  )
+>;
 
 /**
- * Blueprint's `Icon` at 16px: `span.bp6-icon.bp6-icon-<name>` round the inline
- * SVG, which is what Blueprint's style sheets size and colour.
+ * Blueprint's `Icon` at 16px, or at 20px for the icons in {@link IconName20}:
+ * `span.bp6-icon.bp6-icon-<name>` round the inline SVG, which is what
+ * Blueprint's style sheets size and colour.
  *
  * Hidden from assistive technology, always: each icon here sits on a control
  * whose own label says what it does. Blueprint gives the SVG a `<title>`
  * instead where it is told to, which synstate-dom would create in the HTML
  * namespace rather than the SVG one.
  */
-export const Icon = ({ icon, class: className, style }: Props): JSX.Element => (
-  <span
-    aria-hidden={constant('true')}
-    class={constant(
-      className === undefined
-        ? `bp6-icon bp6-icon-${icon}`
-        : `bp6-icon bp6-icon-${icon} ${className}`,
-    )}
-    {...(style === undefined ? {} : { style })}
-  >
-    <svg
-      data-icon={constant(icon)}
-      height={constant(16)}
-      role={constant('img')}
-      viewBox={constant('0 0 16 16')}
-      width={constant(16)}
+export const Icon = ({
+  class: className,
+  style,
+  icon,
+  size,
+}: Props): JSX.Element => {
+  const pixels = size ?? 16;
+
+  const name$: Bindable<string> =
+    typeof icon === 'string' ? constant(icon) : icon;
+
+  const path$ =
+    size === 20
+      ? mapBindable(
+          typeof icon === 'string' ? constant(icon) : icon,
+          (name) => ICON_PATHS_20[name],
+        )
+      : mapBindable(
+          typeof icon === 'string' ? constant(icon) : icon,
+          (name) => ICON_PATHS_16[name],
+        );
+
+  return (
+    <span
+      aria-hidden={constant('true')}
+      class={mapBindable(name$, (name) =>
+        className === undefined
+          ? `bp6-icon bp6-icon-${name}`
+          : `bp6-icon bp6-icon-${name} ${className}`,
+      )}
+      {...(style === undefined ? {} : { style })}
     >
-      <path d={constant(ICON_PATHS_16[icon])} fill-rule={constant('evenodd')} />
-    </svg>
-  </span>
-);
+      <svg
+        data-icon={name$}
+        height={constant(pixels)}
+        role={constant('img')}
+        viewBox={constant(`0 0 ${pixels.toString()} ${pixels.toString()}`)}
+        width={constant(pixels)}
+      >
+        <path d={path$} fill-rule={constant('evenodd')} />
+      </svg>
+    </span>
+  );
+};
 
 /**
  * The 16px paths of Blueprint's icons, as `@blueprintjs/icons` (6.14) has them
@@ -62,12 +101,20 @@ const ICON_PATHS_16 = {
     'M15 0H1C.45 0 0 .45 0 1v10c0 .55.45 1 1 1h4.75l-.5 2H4c-.55 0-1 .45-1 1s.45 1 1 1h8c.55 0 1-.45 1-1s-.45-1-1-1h-1.25l-.5-2H15c.55 0 1-.45 1-1V1c0-.55-.45-1-1-1m-1 10H2V2h12z',
   'double-caret-vertical':
     'M5 7h6a1.003 1.003 0 0 0 .71-1.71l-3-3C8.53 2.11 8.28 2 8 2s-.53.11-.71.29l-3 3A1.003 1.003 0 0 0 5 7m6 2H5a1.003 1.003 0 0 0-.71 1.71l3 3c.18.18.43.29.71.29s.53-.11.71-.29l3-3A1.003 1.003 0 0 0 11 9',
+  'double-chevron-down':
+    'M7.29 8.71c.18.18.43.29.71.29s.53-.11.71-.29l4-4a1.003 1.003 0 0 0-1.42-1.42L8 6.59l-3.29-3.3a1.003 1.003 0 0 0-1.42 1.42zM12 8c-.28 0-.53.11-.71.29L8 11.59l-3.29-3.3a1.003 1.003 0 0 0-1.42 1.42l4 4c.18.18.43.29.71.29s.53-.11.71-.29l4-4A1.003 1.003 0 0 0 12 8',
+  'double-chevron-up':
+    'M4 8c.28 0 .53-.11.71-.29L8 4.41l3.29 3.29c.18.19.43.3.71.3a1.003 1.003 0 0 0 .71-1.71l-4-4C8.53 2.11 8.28 2 8 2s-.53.11-.71.29l-4 4A1.003 1.003 0 0 0 4 8m4.71-.71C8.53 7.11 8.28 7 8 7s-.53.11-.71.29l-4 4a1.003 1.003 0 0 0 1.42 1.42L8 9.41l3.29 3.29c.18.19.43.3.71.3a1.003 1.003 0 0 0 .71-1.71z',
   duplicate:
     'M15 0H5c-.55 0-1 .45-1 1v2h2V2h8v7h-1v2h2c.55 0 1-.45 1-1V1c0-.55-.45-1-1-1m-4 4H1c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h10c.55 0 1-.45 1-1V5c0-.55-.45-1-1-1m-1 10H2V6h8z',
   error:
     'M7.99-.01c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8m1 13h-2v-2h2zm0-3h-2v-7h2z',
   export:
     'M4 6c.28 0 .53-.11.71-.29L7 3.41V11c0 .55.45 1 1 1s1-.45 1-1V3.41l2.29 2.29c.18.19.43.3.71.3a1.003 1.003 0 0 0 .71-1.71l-4-4C8.53.11 8.28 0 8 0s-.53.11-.71.29l-4 4A1.003 1.003 0 0 0 4 6m11 5c-.55 0-1 .45-1 1v2H2v-2c0-.55-.45-1-1-1s-1 .45-1 1v3c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1',
+  'eye-off':
+    'M16 7.97V7.9a.67.67 0 0 0-.17-.36c-.49-.63-1.07-1.2-1.65-1.72l-3.16 2.26a2.98 2.98 0 0 1-2.98 2.9c-.31 0-.6-.06-.88-.15L5.09 12.3c.44.19.9.36 1.37.47.97.23 1.94.24 2.92.05.88-.17 1.74-.54 2.53-.98 1.25-.7 2.39-1.67 3.38-2.75.18-.2.37-.41.53-.62.09-.1.15-.22.17-.36v-.1c.01-.02.01-.03.01-.04m-.43-4.17c.25-.18.43-.46.43-.8 0-.55-.45-1-1-1-.22 0-.41.08-.57.2l-.01-.01-2.67 1.91c-.69-.38-1.41-.69-2.17-.87a6.8 6.8 0 0 0-2.91-.05c-.88.18-1.74.54-2.53.99-1.25.7-2.39 1.67-3.38 2.75-.18.2-.37.41-.53.62-.23.29-.23.63-.01.92.51.66 1.11 1.25 1.73 1.79.18.16.38.29.56.44l-2.09 1.5.01.01c-.25.18-.43.46-.43.8 0 .55.45 1 1 1 .22 0 .41-.08.57-.2l.01.01 14-10zm-10.41 5a3 3 0 0 1-.11-.8 2.99 2.99 0 0 1 2.99-2.98c.62 0 1.19.21 1.66.53z',
+  'eye-open':
+    'M8.002 7.003a1.003 1.003 0 0 0 0 2.005 1.003 1.003 0 0 0 0-2.005m7.988.972v-.07a.7.7 0 0 0-.17-.36c-.509-.673-1.118-1.264-1.737-1.806-1.328-1.173-2.846-2.155-4.523-2.546a6.7 6.7 0 0 0-2.925-.06c-.889.18-1.738.541-2.546.992C2.84 4.837 1.692 5.81.694 6.902c-.18.211-.36.411-.53.632a.74.74 0 0 0 0 .932c.51.672 1.119 1.264 1.738 1.805 1.328 1.173 2.846 2.156 4.523 2.547.968.23 1.947.24 2.925.04.889-.18 1.738-.542 2.546-.993 1.248-.712 2.397-1.684 3.395-2.777.18-.2.37-.411.54-.632.09-.1.149-.23.169-.36v-.1c0-.01-.01-.01-.01-.02m-7.988 3.038a3 3 0 0 1-2.995-3.008 3 3 0 0 1 2.995-3.008 3 3 0 0 1 2.996 3.008 3 3 0 0 1-2.996 3.008',
   'filter-list':
     'M9 8c0 .55.45 1 1 1h5c.55 0 1-.45 1-1s-.45-1-1-1h-5c-.55 0-1 .45-1 1m3-6c0-.55-.45-1-1-1H1a1.003 1.003 0 0 0-.71 1.71L4 6.41V12a1.003 1.003 0 0 0 1.71.71l2-2c.18-.18.29-.43.29-.71V6.41l3.71-3.71c.18-.17.29-.42.29-.7m3 8h-5c-.55 0-1 .45-1 1s.45 1 1 1h5c.55 0 1-.45 1-1s-.45-1-1-1m0 3h-5c-.55 0-1 .45-1 1s.45 1 1 1h5c.55 0 1-.45 1-1s-.45-1-1-1',
   flash:
@@ -86,4 +133,15 @@ const ICON_PATHS_16 = {
     'M14.49 3.99h-13c-.28 0-.5.22-.5.5s.22.5.5.5h.5v10c0 .55.45 1 1 1h10c.55 0 1-.45 1-1v-10h.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5m-8.5 9c0 .55-.45 1-1 1s-1-.45-1-1v-6c0-.55.45-1 1-1s1 .45 1 1zm3 0c0 .55-.45 1-1 1s-1-.45-1-1v-6c0-.55.45-1 1-1s1 .45 1 1zm3 0c0 .55-.45 1-1 1s-1-.45-1-1v-6c0-.55.45-1 1-1s1 .45 1 1zm2-12h-4c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1h-4c-.55 0-1 .45-1 1v1h14v-1c0-.55-.45-1-1-1',
   'warning-sign':
     'm15.84 13.5.01-.01-7-12-.01.01c-.17-.3-.48-.5-.85-.5s-.67.2-.85.5l-.01-.01-7 12 .01.01c-.09.15-.15.31-.15.5 0 .55.45 1 1 1h14c.55 0 1-.45 1-1 0-.19-.06-.35-.15-.5m-6.85-.51h-2v-2h2zm0-3h-2v-5h2z',
+} as const;
+
+/**
+ * The 20px paths, as `lib/esm/generated/20px/paths/` has them: Blueprint draws
+ * `IconSize.LARGE` from these rather than scaling the 16px ones.
+ */
+const ICON_PATHS_20 = {
+  'eye-off':
+    'M20 9.96v-.08a.8.8 0 0 0-.21-.43c-.55-.69-1.19-1.3-1.85-1.87l-3.93 2.62a3.966 3.966 0 0 1-3.96 3.77c-.47 0-.91-.1-1.33-.24l-2.24 1.49c.52.21 1.05.39 1.6.51 1.21.27 2.43.28 3.64.05 1.11-.21 2.17-.64 3.17-1.18 1.56-.84 2.99-2 4.23-3.3.23-.24.46-.49.67-.75a.87.87 0 0 0 .21-.43zm-.46-5.14c.27-.18.46-.47.46-.82 0-.55-.45-1-1-1-.21 0-.39.08-.54.18l-.01-.02L15 5.46c-.95-.53-1.95-.96-3.01-1.2a9.2 9.2 0 0 0-3.65-.04c-1.11.21-2.17.64-3.17 1.18-1.56.84-2.99 2-4.23 3.3-.23.24-.46.48-.67.75-.27.34-.27.76 0 1.1.64.79 1.39 1.5 2.16 2.15.26.21.52.41.79.61L.44 15.16l.01.02A1 1 0 0 0 0 16c0 .55.45 1 1 1 .21 0 .39-.08.54-.18l.01.02 18-12zm-8.67 3.4c-.25-.12-.53-.2-.83-.2-1.1 0-1.99.89-1.99 1.99 0 .03.02.06.02.09l-1.78 1.19c-.14-.4-.22-.83-.22-1.28 0-2.19 1.78-3.97 3.98-3.97 1.01 0 1.91.38 2.61 1z',
+  'eye-open':
+    'M10.01 7.984A2.01 2.01 0 0 0 8.012 9.99c0 1.103.9 2.006 1.998 2.006a2.01 2.01 0 0 0 1.998-2.006c0-1.103-.9-2.006-1.998-2.006M20 9.96v-.08a.83.83 0 0 0-.21-.442c-.64-.802-1.398-1.514-2.168-2.166-1.658-1.404-3.566-2.587-5.664-3.058a9 9 0 0 0-3.656-.05c-1.11.2-2.178.641-3.177 1.183-1.569.852-2.997 2.016-4.246 3.33-.23.25-.46.49-.67.761-.279.351-.279.773 0 1.124.64.802 1.4 1.514 2.169 2.166 1.658 1.404 3.566 2.577 5.664 3.058a9 9 0 0 0 3.656.05c1.11-.21 2.178-.651 3.177-1.193 1.569-.852 2.997-2.016 4.246-3.33.23-.24.46-.49.67-.751A.86.86 0 0 0 20 10.12zM10.01 14a4.003 4.003 0 0 1-3.996-4.01 4.003 4.003 0 0 1 3.996-4.011 4.003 4.003 0 0 1 3.996 4.011 4.003 4.003 0 0 1-3.996 4.011',
 } as const;

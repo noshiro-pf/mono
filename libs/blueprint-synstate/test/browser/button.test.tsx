@@ -1,5 +1,5 @@
-import { Button, ButtonGroup } from 'blueprint-synstate';
-import { createState } from 'synstate';
+import { Button, ButtonGroup, Icon } from 'blueprint-synstate';
+import { createState, map } from 'synstate';
 import { constant } from 'synstate-dom';
 import { mountInto, one } from './helpers.mjs';
 
@@ -92,6 +92,74 @@ describe(Button, () => {
     one(container, '.bp6-button-group > button').click();
 
     assert.strictEqual(mut_clicks, 1);
+
+    unmount();
+  });
+
+  test('redraws an icon whose name changes', () => {
+    const [open$, setOpen] = createState(true);
+
+    const { container, unmount } = mountInto(() => (
+      <Button
+        aria-label={constant('Labels')}
+        endIcon={open$.pipe(
+          map((open) => (open ? 'chevron-up' : 'chevron-down')),
+        )}
+        icon={open$.pipe(
+          map((open) => (open ? 'double-chevron-up' : 'double-chevron-down')),
+        )}
+      />
+    ));
+
+    const [icon, endIcon] = Array.from(
+      container.querySelectorAll(':scope button > .bp6-icon'),
+    );
+
+    assert.isTrue(
+      icon?.classList.contains('bp6-icon-double-chevron-up') ?? false,
+    );
+
+    assert.isTrue(endIcon?.classList.contains('bp6-icon-chevron-up') ?? false);
+
+    setOpen(false);
+
+    assert.isTrue(
+      icon?.classList.contains('bp6-icon-double-chevron-down') ?? false,
+    );
+
+    assert.isTrue(
+      endIcon?.classList.contains('bp6-icon-chevron-down') ?? false,
+    );
+
+    assert.strictEqual(
+      one<SVGSVGElement>(container, '.bp6-icon-double-chevron-down > svg')
+        .dataset['icon'],
+      'double-chevron-down',
+    );
+
+    unmount();
+  });
+});
+
+describe(Icon, () => {
+  test('draws the 20px drawing at 20px, not the 16px one scaled', () => {
+    const { container, unmount } = mountInto(() => (
+      <Icon icon={'eye-open'} size={20} />
+    ));
+
+    const svg = one<SVGSVGElement>(container, 'svg');
+
+    assert.strictEqual(svg.getAttribute('width'), '20');
+
+    assert.strictEqual(svg.getAttribute('height'), '20');
+
+    assert.strictEqual(svg.getAttribute('viewBox'), '0 0 20 20');
+
+    // The start of `@blueprintjs/icons`' 20px eye-open, which the 16px one does
+    // not share.
+    assert.isTrue(
+      one(svg, 'path').getAttribute('d')?.startsWith('M10.01 7.984') ?? false,
+    );
 
     unmount();
   });

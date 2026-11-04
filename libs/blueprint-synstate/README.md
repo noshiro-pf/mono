@@ -47,31 +47,32 @@ unmount();
 
 ## What is implemented
 
-| Component          | Blueprint's        | Notes                                                                                                                                 |
-| :----------------- | :----------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
-| `Button`           | `Button`           | `variant` may change after mount; no `loading` spinner.                                                                               |
-| `ButtonGroup`      | `ButtonGroup`      |                                                                                                                                       |
-| `Callout`          | `Callout`          | The icon defaults to the intent's, as Blueprint's does.                                                                               |
-| `Card`             | `Card`             |                                                                                                                                       |
-| `Checkbox`         | `Checkbox`         | No indeterminate state.                                                                                                               |
-| `DateInput`        | `DateInput`        | The popover is drawn in place, positioned `fixed`, as `usePortal: false` and `positioningStrategy: 'fixed'`.                          |
-| `DatePicker`       | `DatePicker`       | react-day-picker's markup and keyboard navigation; month and weekday names from `Intl`.                                               |
-| `FileInput`        | `FileInput`        |                                                                                                                                       |
-| `HtmlSelect`       | `HTMLSelect`       | The wrapper is a `<span>`, so that it may sit inside a `<label>`.                                                                     |
-| `HtmlTable`        | `HTMLTable`        |                                                                                                                                       |
-| `Icon`             | `Icon` (16px SVG)  | The few icons the components above draw, and those an app built on them has needed.                                                   |
-| `InputGroup`       | `InputGroup`       | A `leftIcon`, but no elements beside the input. `onChange` is the DOM's `change`; `onInput` every keystroke.                          |
-| `Label`            | `Label`            | Wraps its control, so that the control needs no `id`.                                                                                 |
-| `Navbar`           | `Navbar`           |                                                                                                                                       |
-| `NavbarGroup`      | `NavbarGroup`      |                                                                                                                                       |
-| `NumericInput`     | `NumericInput`     | For a number value; see [Numeric input](#numeric-input).                                                                              |
-| `NumericInputView` | `NumericInput`     | Its markup alone, with the text as its value; see [Numeric input](#numeric-input).                                                    |
-| `Radio`            | `Radio`            |                                                                                                                                       |
-| `RadioGroup`       | `RadioGroup`       | As a `radiogroup`, labelled by its `label`.                                                                                           |
-| `SegmentedControl` | `SegmentedControl` | As a `radiogroup`.                                                                                                                    |
-| `Spinner`          | `Spinner`          | With no value, as an indeterminate progress bar.                                                                                      |
-| `Tabs`             | `Tabs`             | As `renderActiveTabPanelOnly`, without `animate`. A tab with no `panel` is a title alone, with no `aria-controls` or `aria-expanded`. |
-| `TimePicker`       | `TimePicker`       | To the minute, on a 24-hour clock.                                                                                                    |
+| Component          | Blueprint's        | Notes                                                                                                                                                       |
+| :----------------- | :----------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`           | `Button`           | `variant` may change after mount; no `loading` spinner.                                                                                                     |
+| `ButtonGroup`      | `ButtonGroup`      |                                                                                                                                                             |
+| `Callout`          | `Callout`          | The icon defaults to the intent's, as Blueprint's does.                                                                                                     |
+| `Card`             | `Card`             |                                                                                                                                                             |
+| `Checkbox`         | `Checkbox`         | No indeterminate state.                                                                                                                                     |
+| `Collapse`         | `Collapse`         | The same 200ms slide, through the same inline heights and transforms, from the body's height as the closing starts. No `transitionDuration` or `component`. |
+| `DateInput`        | `DateInput`        | The popover is drawn in place, positioned `fixed`, as `usePortal: false` and `positioningStrategy: 'fixed'`.                                                |
+| `DatePicker`       | `DatePicker`       | react-day-picker's markup and keyboard navigation; month and weekday names from `Intl`.                                                                     |
+| `FileInput`        | `FileInput`        |                                                                                                                                                             |
+| `HtmlSelect`       | `HTMLSelect`       | The wrapper is a `<span>`, so that it may sit inside a `<label>`.                                                                                           |
+| `HtmlTable`        | `HTMLTable`        |                                                                                                                                                             |
+| `Icon`             | `Icon` (SVG)       | The few icons the components above draw, and those an app built on them has needed; a few at 20px (`IconSize.LARGE`) too.                                   |
+| `InputGroup`       | `InputGroup`       | A `leftIcon`, but no elements beside the input. `onChange` is the DOM's `change`; `onInput` every keystroke.                                                |
+| `Label`            | `Label`            | Wraps its control, so that the control needs no `id`.                                                                                                       |
+| `Navbar`           | `Navbar`           |                                                                                                                                                             |
+| `NavbarGroup`      | `NavbarGroup`      |                                                                                                                                                             |
+| `NumericInput`     | `NumericInput`     | For a number value; see [Numeric input](#numeric-input).                                                                                                    |
+| `NumericInputView` | `NumericInput`     | Its markup alone, with the text as its value; see [Numeric input](#numeric-input).                                                                          |
+| `Radio`            | `Radio`            |                                                                                                                                                             |
+| `RadioGroup`       | `RadioGroup`       | As a `radiogroup`, labelled by its `label`.                                                                                                                 |
+| `SegmentedControl` | `SegmentedControl` | As a `radiogroup`.                                                                                                                                          |
+| `Spinner`          | `Spinner`          | With no value, as an indeterminate progress bar.                                                                                                            |
+| `Tabs`             | `Tabs`             | As `renderActiveTabPanelOnly`, without `animate`. A tab with no `panel` is a title alone, with no `aria-controls` or `aria-expanded`.                       |
+| `TimePicker`       | `TimePicker`       | To the minute, on a 24-hour clock.                                                                                                                          |
 
 Values are strings, as the browser's own inputs hold them: `YYYY-MM-DD` for a date, `YYYY-MM-DDTHH:mm` for a date with a `timePrecision`, `HH:mm` for a time, and `''` for none. They are wall-clock times with no time zone, so no time zone is offered.
 
