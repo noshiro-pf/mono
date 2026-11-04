@@ -69,10 +69,10 @@ by case. In order:
 5. **Format** again, for what the fixers wrote (`fix:fmt:full` instead when
    `.prettierrc` or `.prettierignore` changed).
 
-A path the code gate ignores (the `--paths-ignore` list of
-`z:check-should-run:code-checks`, read from the root `package.json`) touches
-its package's documents only: the generators run, the type check and tests do
-not, as CI's would not. `experimental/` is outside everything.
+A path the code gate ignores (the `code` list of
+`tools/configs/gate-ignore-lists.json`, which `code-check.yml`'s gate reads)
+touches its package's documents only: the generators run, the type check and
+tests do not, as CI's would not. `experimental/` is outside everything.
 
 Every step runs whatever failed before it, and every step is watched for what
 it writes. What is still changed at the end is listed under the step that

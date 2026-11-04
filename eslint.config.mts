@@ -44,4 +44,17 @@ export default [
       'import-x/no-default-export': 'off',
     }),
   },
+  {
+    // The diff gate and the install step run before anything is installed, so
+    // this file imports `node:*` alone (its test holds it). Every rule of this
+    // plugin is about ts-data-forge's API, and its fixes write an import of a
+    // package that is not there yet, so all of them are off here, the ones it
+    // adds later included.
+    files: ['tools/scripts/cmd/workflow-steps.mts'],
+    rules: Object.fromEntries(
+      Object.keys(eslintPluginTsDataForge.configs.recommended.rules).map(
+        (rule) => [rule, 'off'] as const,
+      ),
+    ),
+  },
 ] satisfies readonly FlatConfig[];

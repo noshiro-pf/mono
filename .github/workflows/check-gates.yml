@@ -13,7 +13,7 @@ on:
     inputs:
       diff-scope:
         description: >-
-          Which ignore list in the root `package.json` to gate on: `code` for
+          Which list of tools/configs/gate-ignore-lists.json to gate on: `code` for
           code-check.yml, node-version-compatibility.yml and
           synstate-benchmark.yml, `style` for
           style-check.yml, `strict-lib` for strict-lib-gen.yml. `none` skips
@@ -304,9 +304,9 @@ jobs:
         with:
           ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
 
-      # Node.js alone: the diff check reads the ignore list from the root
-      # package.json and needs no pnpm, store or install, which were most of
-      # this job's time.
+      # Node.js alone: the diff check reads the ignore list from
+      # tools/configs/gate-ignore-lists.json and needs no pnpm, store or
+      # install, which were most of this job's time.
       - name: Set up Node.js
         if: steps.checkout.outcome == 'success'
         uses: ./.github/actions/setup

@@ -65,9 +65,7 @@ export const checkChangedReach = (): Promise<Result<Summary, string>> =>
       return Result.err('The root package.json has no scripts.');
     }
 
-    const proseGate = yield* Result.safeUnwrap(
-      readProseGate(new Map(Object.entries(rootScripts))),
-    );
+    const proseGate = yield* Result.safeUnwrap(readProseGate());
 
     const local = yield* Result.safeUnwrap(
       planReach({

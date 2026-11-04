@@ -365,13 +365,11 @@ const main = async (): Promise<Result<string, string>> => {
 
   const manifests = manifestsRead.value;
 
-  const rootScripts = new Map(
-    Object.entries(
-      manifests.find(({ directory }) => directory === '.')?.scripts ?? {},
-    ),
+  const rootScripts = Object.keys(
+    manifests.find(({ directory }) => directory === '.')?.scripts ?? {},
   );
 
-  const proseGate = readProseGate(rootScripts);
+  const proseGate = readProseGate();
 
   if (Result.isErr(proseGate)) {
     return proseGate;
@@ -386,7 +384,7 @@ const main = async (): Promise<Result<string, string>> => {
   const plan = buildPlan({
     classification,
     base: from,
-    rootScripts: Array.from(rootScripts.keys()),
+    rootScripts,
     // As a local run plans it by default.
     coverage: true,
     // As check-changed passes them: the files that still exist, less those

@@ -38,7 +38,7 @@ jobs:
       pull-requests: read
     with:
       # The same ignore list code-check.yml gates on, which is why it lives in
-      # the root package.json rather than in either workflow.
+      # tools/configs/gate-ignore-lists.json rather than in either workflow.
       diff-scope: code
       result-job: test-node-versions-result / result
 

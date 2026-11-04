@@ -17,12 +17,12 @@ import { matchesGatePattern } from '../workflow-steps.mjs';
  * repository-wide areas they touch.
  *
  * A path belongs to the workspace member whose directory is its longest prefix.
- * Under a package, a path the code gate ignores (`proseGate`, the patterns
- * `z:check-should-run:code-checks` gives `code-check.yml`) touches the
- * package's documents only: its generators run, its type check and tests do
- * not, as CI's would not. `strict-lib/` is one area whatever member a path is
- * in, because its harnesses are checked by the root `strict-lib:*` scripts
- * rather than their own; `experimental/` is outside everything.
+ * Under a package, a path the code gate ignores (`proseGate`, the `code` list
+ * of `tools/configs/gate-ignore-lists.json` that `code-check.yml` gates on)
+ * touches the package's documents only: its generators run, its type check and
+ * tests do not, as CI's would not. `strict-lib/` is one area whatever member a
+ * path is in, because its harnesses are checked by the root `strict-lib:*`
+ * scripts rather than their own; `experimental/` is outside everything.
  */
 export const classifyChanges = ({
   files,

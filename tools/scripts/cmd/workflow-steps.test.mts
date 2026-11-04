@@ -5,25 +5,26 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Arr, isRecord, isString } from 'ts-data-forge';
+import { Arr, isRecord } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   firstFileToCheck,
-  gatePatterns,
   installArgs,
   matchesGatePattern,
+  parseGateLists,
   parseShouldRunArgs,
   planDiffCheck,
   readBoolean,
   readChoice,
+  readGateList,
 } from './workflow-steps.mjs';
 
 const scriptPath = fileURLToPath(
   new URL('workflow-steps.mts', import.meta.url),
 );
 
-const rootManifest = fileURLToPath(
-  new URL('../../../package.json', import.meta.url),
+const gateListsFile = fileURLToPath(
+  new URL('../../configs/gate-ignore-lists.json', import.meta.url),
 );
 
 describe('readChoice / readBoolean', () => {
@@ -175,7 +176,7 @@ describe('check-diff', () => {
         ok: true,
         value: {
           fetch: '+refs/heads/main:refs/remotes/origin/main',
-          script: 'z:check-should-run:code-checks',
+          scope: 'code',
           base: 'origin/main',
         },
       },
@@ -195,7 +196,7 @@ describe('check-diff', () => {
         value: {
           fetch:
             '+refs/heads/feat/lower-layer:refs/remotes/origin/feat/lower-layer',
-          script: 'z:check-should-run:code-checks',
+          scope: 'code',
           base: 'origin/feat/lower-layer',
         },
       },
@@ -213,7 +214,7 @@ describe('check-diff', () => {
         ok: true,
         value: {
           fetch: beforeSha,
-          script: 'z:check-should-run:strict-lib-checks',
+          scope: 'strict-lib',
           base: beforeSha,
         },
       },
@@ -251,37 +252,51 @@ describe('check-diff', () => {
   });
 });
 
+const lists = (value: unknown): string => JSON.stringify(value);
+
 describe('the ignore lists', () => {
-  test('reads the patterns of a gate script', () => {
+  test('reads the three lists', () => {
     assert.deepStrictEqual(
-      gatePatterns(
-        "pnpm run z:check-should-run --paths-ignore 'docs/' --paths-ignore '**.md'",
+      parseGateLists(
+        lists({ code: ['docs/', '**.md'], style: [], 'strict-lib': ['apps/'] }),
       ),
-      { ok: true, value: ['docs/', '**.md'] },
+      {
+        ok: true,
+        value: { code: ['docs/', '**.md'], style: [], 'strict-lib': ['apps/'] },
+      },
     );
   });
 
-  test('refuses a script it would read differently from the shell', () => {
-    // The step reads the list from the command line rather than running it, so
-    // anything but single-quoted `--paths-ignore` values would be a pattern the
-    // shell passes and this does not see.
-    for (const command of [
-      'pnpm run z:check-should-run --paths-ignore docs/',
-      "pnpm run z:check-should-run --paths-ignore 'docs/' --base-branch x",
-      'pnpm run z:check-should-run --paths-ignore "docs/"',
-      "pnpm run something-else --paths-ignore 'docs/'",
+  test('a lists file it cannot read is an error, not a throw', () => {
+    assert.deepStrictEqual(readGateList('code', '/nonexistent'), {
+      ok: false,
+      message:
+        'Could not read tools/configs/gate-ignore-lists.json in /nonexistent: ENOENT',
+    });
+  });
+
+  test('refuses a file that is not exactly the three lists of strings', () => {
+    for (const text of [
+      'not json',
+      lists(['docs/']),
+      lists({ code: [], style: [] }),
+      lists({ code: [], style: [], 'strict-lib': [], extra: [] }),
+      lists({ code: 'docs/', style: [], 'strict-lib': [] }),
+      lists({ code: [1], style: [], 'strict-lib': [] }),
     ]) {
-      assert.isFalse(gatePatterns(command).ok);
+      assert.isFalse(parseGateLists(text).ok);
     }
   });
 
   test('refuses a pattern of a shape it does not match', () => {
     assert.deepStrictEqual(
-      gatePatterns("pnpm run z:check-should-run --paths-ignore 'src/*/x.ts'"),
+      parseGateLists(
+        lists({ code: ['src/*/x.ts'], style: [], 'strict-lib': [] }),
+      ),
       {
         ok: false,
         message:
-          'Unsupported --paths-ignore pattern "src/*/x.ts": only `dir/`, `**.ext`, `**/name`, `*.ext`, `dir/**/*.ext` and a plain path are understood.',
+          'tools/configs/gate-ignore-lists.json, list code: Unsupported ignore pattern "src/*/x.ts": only `dir/`, `**.ext`, `**/name`, `*.ext`, `dir/**/*.ext` and a plain path are understood.',
       },
     );
   });
@@ -312,34 +327,13 @@ describe('the ignore lists', () => {
     assert.strictEqual(matchesGatePattern(file, pattern), expected);
   });
 
-  test('every gate script of the root package.json is read', () => {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const manifest: unknown = JSON.parse(fs.readFileSync(rootManifest, 'utf8'));
+  test("the repository's lists are read", () => {
+    const parsed = parseGateLists(
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.readFileSync(gateListsFile, 'utf8'),
+    );
 
-    const scripts =
-      isRecord(manifest) && isRecord(manifest['scripts'])
-        ? Object.entries(manifest['scripts']).filter(([name]) =>
-            name.startsWith('z:check-should-run:'),
-          )
-        : ([] as const);
-
-    assert.deepStrictEqual(scripts.map(([name]) => name).toSorted(), [
-      'z:check-should-run:code-checks',
-      'z:check-should-run:strict-lib-checks',
-      'z:check-should-run:style-checks',
-    ]);
-
-    for (const [name, command] of scripts) {
-      const patterns = isString(command)
-        ? gatePatterns(command)
-        : ({ ok: false, message: 'not a string' } as const);
-
-      // The name and the message, so that a failure says which list and why.
-      assert.deepStrictEqual(
-        { name, error: patterns.ok ? undefined : patterns.message },
-        { name, error: undefined },
-      );
-    }
+    assert.deepStrictEqual(parsed.ok ? undefined : parsed.message, undefined);
   });
 
   test('the first file on no pattern is what makes the checks run', () => {
@@ -360,17 +354,51 @@ describe('should-run', () => {
   test('reads the patterns and the base, origin/main by default', () => {
     assert.deepStrictEqual(
       parseShouldRunArgs(['--paths-ignore', 'docs/', '--paths-ignore', '*.md']),
-      { ok: true, value: { patterns: ['docs/', '*.md'], base: 'origin/main' } },
+      {
+        ok: true,
+        value: {
+          patterns: ['docs/', '*.md'],
+          base: 'origin/main',
+          label: 'the --paths-ignore list',
+        },
+      },
     );
 
     assert.deepStrictEqual(
       parseShouldRunArgs(['--base-branch', 'abc', '--paths-ignore', 'docs/']),
-      { ok: true, value: { patterns: ['docs/'], base: 'abc' } },
+      {
+        ok: true,
+        value: {
+          patterns: ['docs/'],
+          base: 'abc',
+          label: 'the --paths-ignore list',
+        },
+      },
     );
+  });
+
+  test('reads a scope as that list of the repository', () => {
+    const parsed = parseShouldRunArgs(['--scope', 'style']);
+
+    // The file itself, read apart from the code under test.
+    const file: unknown = JSON.parse(
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- the repository's lists file.
+      fs.readFileSync(gateListsFile, 'utf8'),
+    );
+
+    assert.deepStrictEqual(parsed.ok ? undefined : parsed.message, undefined);
+
+    assert.deepStrictEqual(parsed.ok ? parsed.value : undefined, {
+      patterns: isRecord(file) ? file['style'] : undefined,
+      base: 'origin/main',
+      label: 'the style list',
+    });
   });
 
   test('refuses what the gate would not read', () => {
     for (const args of [
+      ['--scope', 'none'],
+      ['--scope', 'code', '--paths-ignore', 'docs/'],
       ['--paths-ignore'],
       ['--base', 'x'],
       ['--paths-ignore', 'docs/', 'extra'],
@@ -414,14 +442,12 @@ const makeBinDir = (): string => {
   );
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
+  fs.mkdirSync(path.join(dir, 'tools/configs'), { recursive: true });
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   fs.writeFileSync(
-    path.join(dir, 'package.json'),
-    JSON.stringify({
-      scripts: {
-        'z:check-should-run:code-checks':
-          "pnpm run z:check-should-run --paths-ignore 'docs/' --paths-ignore '**.md'",
-      },
-    }),
+    path.join(dir, 'tools/configs/gate-ignore-lists.json'),
+    JSON.stringify({ code: ['docs/', '**.md'], style: [], 'strict-lib': [] }),
   );
 
   return dir;
@@ -676,7 +702,7 @@ describe('the script, run the way the workflows run it', () => {
       code: 0,
       stdout: [
         `fake git: fetch --depth=1 origin ${before}`,
-        'should_run=true: libs/a/src/x.mts is on no pattern of z:check-should-run:code-checks (3 changed files).',
+        'should_run=true: libs/a/src/x.mts is on no pattern of the code list (3 changed files).',
         '',
       ].join('\n'),
     });
@@ -706,7 +732,7 @@ describe('the script, run the way the workflows run it', () => {
       code: 0,
       stdout: [
         'fake git: fetch --depth=1 origin +refs/heads/main:refs/remotes/origin/main',
-        'should_run=false: every one of the 2 changed files is on a pattern of z:check-should-run:code-checks.',
+        'should_run=false: every one of the 2 changed files is on a pattern of the code list.',
         '',
       ].join('\n'),
     });
@@ -715,20 +741,32 @@ describe('the script, run the way the workflows run it', () => {
     assert.strictEqual(fs.readFileSync(output, 'utf8'), 'should_run=false\n');
   });
 
-  test('`check-diff` stops on a scope whose script is not in package.json', async () => {
-    const result = await run(['check-diff'], {
-      DIFF_SCOPE: 'style',
-      GITHUB_REF_NAME: '2058/merge',
-      BASE_REF: 'main',
-      GITHUB_OUTPUT: makeOutput(),
-      FAKE_DIFF: 'docs/a.ts',
-    });
+  test('`check-diff` stops on a lists file it cannot read', async () => {
+    const binDir = makeBinDir();
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(
+      path.join(binDir, 'tools/configs/gate-ignore-lists.json'),
+      JSON.stringify({ code: [] }),
+    );
+
+    const result = await run(
+      ['check-diff'],
+      {
+        DIFF_SCOPE: 'style',
+        GITHUB_REF_NAME: '2058/merge',
+        BASE_REF: 'main',
+        GITHUB_OUTPUT: makeOutput(),
+        FAKE_DIFF: 'docs/a.ts',
+      },
+      binDir,
+    );
 
     assert.deepStrictEqual(result, {
       code: 1,
       stdout: [
         'fake git: fetch --depth=1 origin +refs/heads/main:refs/remotes/origin/main',
-        '::error::package.json has no z:check-should-run:style-checks script.',
+        '::error::tools/configs/gate-ignore-lists.json holds the lists code, style and strict-lib and nothing else, each an array of strings.',
         '',
       ].join('\n'),
     });

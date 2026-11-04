@@ -22,7 +22,7 @@ const packages = [
   pkg('apps/b', ['check:types']),
 ] as const;
 
-// The shape `z:check-should-run:code-checks` has, cut down.
+// The shape of the `code` gate list, cut down.
 const proseGate = [
   'docs/',
   '**.md',
