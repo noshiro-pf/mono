@@ -3698,6 +3698,119 @@ describe(convertToReadonlyTransformer, () => {
           type Mixed = (number & Readonly<{ a: string }>) | Readonly<{ b: number }>;
         `,
       },
+      // A comment between the type and its `)` is trivia of the `)`, so text
+      // built from the type alone leaves it out.
+      {
+        name: 'A comment before the `)` of a union member',
+        source: dedent`
+          type T = Array<(A /* x */) | (B)>;
+        `,
+        expected: dedent`
+          type T = readonly (A | /* x */ B)[];
+        `,
+      },
+      {
+        name: 'A comment before the `)` around a whole union',
+        source: dedent`
+          type T = Array<(A | B /* x */)>;
+        `,
+        expected: dedent`
+          type T = readonly (A | B /* x */)[];
+        `,
+      },
+      {
+        name: 'A comment before the `)` of a member outside a type argument',
+        source: dedent`
+          type T = (A /* x */) | (B);
+        `,
+        expected: dedent`
+          type T = A | /* x */ B;
+        `,
+      },
+      {
+        name: 'A comment before the `)` of a lone parenthesized type',
+        source: dedent`
+          type T = (A /* x */);
+        `,
+        expected: dedent`
+          type T = A /* x */;
+        `,
+      },
+      {
+        name: 'A comment before the `>` of Array',
+        source: dedent`
+          type T = Array<A /* x */>;
+        `,
+        expected: dedent`
+          type T = readonly A /* x */[];
+        `,
+      },
+      {
+        name: 'A line comment before the `>` of Array keeps its line break',
+        source: dedent`
+          type T = Array<
+            A // about A
+          >[];
+        `,
+        expected: dedent`
+          type T = readonly (readonly (
+            A // about A
+          )[])[];
+        `,
+      },
+      {
+        // TypeScript does not read `[]` after a line break as an array suffix,
+        // so the `)` stays to keep it on the comment's line.
+        name: 'A line comment before the `)` of an array element keeps the `)`',
+        source: dedent`
+          type T = (
+            A // about A
+          )[];
+        `,
+        expected: dedent`
+          type T = readonly (
+            A // about A
+          )[];
+        `,
+      },
+      {
+        name: 'A line comment before the `)` of an indexed access keeps the `)`',
+        source: dedent`
+          type T = (
+            A // about A
+          )['k'];
+        `,
+        expected: dedent`
+          type T = (
+            A // about A
+          )['k'];
+        `,
+      },
+      {
+        // Before a `|` the line break changes nothing, so the parentheses go.
+        name: 'A line comment before the `)` of a union member',
+        source: dedent`
+          type T =
+            | (A // about A
+              )
+            | B;
+        `,
+        expected: dedent`
+          type T =
+            | A
+            // about A
+            | B;
+        `,
+      },
+      {
+        name: 'A block comment before the `)` of an array element',
+        source: dedent`
+          type T = (A /* x */)[];
+        `,
+        expected: dedent`
+          type T = readonly A /* x */[];
+        `,
+      },
     ])('$name', testFn);
   });
 
