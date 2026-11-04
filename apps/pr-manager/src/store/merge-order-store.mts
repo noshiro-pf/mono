@@ -21,6 +21,7 @@ import type { Entry, LoadedReport } from '../load-report.mjs';
 import {
   arrangeMergeOrder,
   countView,
+  githubSearchOf,
   statusFiltersOf,
   toggleOnly,
   togglePriority,
@@ -28,6 +29,7 @@ import {
   withAvailable,
   withSort,
   type MergeOrderCounts,
+  type MergeOrderSearch,
   type MergeOrderSort,
   type MergeOrderView,
   type StatusFilter,
@@ -49,6 +51,8 @@ export type MergeOrderStore = Readonly<{
   roots: InitializedObservable<LoadedReport['roots']>;
   /** What the counts and the priorities read, as the view leaves them. */
   counts: InitializedObservable<MergeOrderCounts>;
+  /** The view as a GitHub search, for the block's "on GitHub" link. */
+  search: InitializedObservable<MergeOrderSearch>;
   toggleStatus: (filter: StatusFilter) => void;
   toggleOnly: (filter: StatusFilter) => void;
   togglePriority: (priority: Priority) => void;
@@ -92,6 +96,9 @@ export const createMergeOrderStore = (
       .pipe(skipIfNoChange(fastDeepEqual)),
     counts: combine([deps.entries, applied])
       .pipe(map(([entries, current]) => countView(entries, current)))
+      .pipe(skipIfNoChange(fastDeepEqual)),
+    search: applied
+      .pipe(map(githubSearchOf))
       .pipe(skipIfNoChange(fastDeepEqual)),
     toggleStatus: (filter) => {
       updateView((current) => toggleStatus(current, filter));

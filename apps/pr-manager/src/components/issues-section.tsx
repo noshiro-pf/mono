@@ -9,6 +9,10 @@ import {
 } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { newIssueUrl, openIssuesUrl } from '../github-links.mjs';
+import {
+  githubIssuesSearchOf,
+  githubIssuesSearchTitle,
+} from '../issues-search.mjs';
 import { isUnread } from '../part-failures.mjs';
 import {
   issuesListStore,
@@ -32,11 +36,12 @@ import { Timestamp } from './timestamp.js';
  * What is open that is not a pull request, most recently updated first, by
  * priority or by start state, and narrowed by tier and `in progress`
  * (`issues-summary.tsx`) and by start state, label and a search of the titles
- * (`issues-list-filters.tsx`). Each row says how the issue stands for being
- * started and what it waits for (`issue-start-row.tsx`). The DAG is narrowed by
- * the tiers and `in progress` alone, which lead either view with how many
- * issues are shown of how many are open: what an issue drawn waits on is drawn,
- * whatever its priority (`omitFilteredIssues`).
+ * (`issues-list-filters.tsx`), which its "on GitHub" link carries as far as
+ * GitHub's search can (`issues-search.mts`). Each row says how the issue stands
+ * for being started and what it waits for (`issue-start-row.tsx`). The
+ * DAG is narrowed by the tiers and `in progress` alone, which lead either view
+ * with how many issues are shown of how many are open: what an issue drawn
+ * waits on is drawn, whatever its priority (`omitFilteredIssues`).
  *
  * Last, because it is the one section that is not about the queue: a reader
  * asks "what is in flight" first and "what is waiting to be started" second.
@@ -65,6 +70,12 @@ export const IssuesSection = (): JSX.Element => {
 
   const dag = view(issuesViewStore.view, (shown) => shown === 'dag');
 
+  // The filters as a GitHub search, for the "on GitHub" link.
+  const search = derive(
+    [issuesListStore.view, issuesListStore.query, issuesViewStore.view],
+    githubIssuesSearchOf,
+  );
+
   return (
     <section class={constant('section')}>
       <h2 class={constant('section-title')}>
@@ -79,7 +90,10 @@ export const IssuesSection = (): JSX.Element => {
         )}
         {constant(' ')}
         <ExternalLink
-          href={constant(openIssuesUrl(reportSource))}
+          href={mapBindable(search, ({ qualifiers }) =>
+            openIssuesUrl(reportSource, qualifiers),
+          )}
+          title={mapBindable(search, githubIssuesSearchTitle)}
           variant={'section-link'}
         >
           {constant('on GitHub')}

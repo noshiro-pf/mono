@@ -1,21 +1,29 @@
+import { Arr } from 'ts-data-forge';
 /**
  * Where on GitHub each block's list is, for the "on GitHub" link in its title
  * (`workflow-runs.mts` has the Actions tab's), and where a new issue is
  * written. Each follows the repository the page reads, so `?repo=` sends a
  * reader to that repository's lists rather than this one's.
  */
-
 import { repositoryUrl, type ReportSource } from './constants.mjs';
 import { MERGED_WITHIN_DAYS } from './load-report.mjs';
 import { mergedSearch } from './report-query.mjs';
 
 /**
- * Every open pull request, which is what the merge order is drawn from;
- * GitHub cannot order them by `Merge-After:`, so this is the set, not the
+ * The open pull requests the merge order is drawn from, narrowed by
+ * `qualifiers` (`githubSearchOf` in `merge-order-view.mts`) to what its filters
+ * show; GitHub cannot order them by `Merge-After:`, so this is the set, not the
  * order.
  */
-export const openPullRequestsUrl = (source: ReportSource): string =>
-  searchUrl(source, 'pulls', 'is:pr is:open');
+export const openPullRequestsUrl = (
+  source: ReportSource,
+  qualifiers: readonly string[] = [],
+): string =>
+  searchUrl(
+    source,
+    'pulls',
+    Arr.toUnshifted('is:pr is:open')(qualifiers).join(' '),
+  );
 
 /**
  * The search the merged block reads ({@link mergedSearch}), for a window ending
@@ -36,9 +44,20 @@ export const mergedPullRequestsUrl = (
     ).replace(/^\S+ /u, ''),
   );
 
-/** The open issues, most recently updated first, as the list starts. */
-export const openIssuesUrl = (source: ReportSource): string =>
-  searchUrl(source, 'issues', 'is:issue is:open sort:updated-desc');
+/**
+ * The open issues, narrowed by `qualifiers` (`githubIssuesSearchOf` in
+ * `issues-search.mts`) to what the block's filters show, most recently updated
+ * first, as the list starts.
+ */
+export const openIssuesUrl = (
+  source: ReportSource,
+  qualifiers: readonly string[] = [],
+): string =>
+  searchUrl(
+    source,
+    'issues',
+    ['is:issue is:open', ...qualifiers, 'sort:updated-desc'].join(' '),
+  );
 
 /**
  * The template picker, which GitHub skips for the blank form where the
