@@ -122,17 +122,31 @@ jobs:
         # generators, so it cannot tidy a stale generated file back into
         # place before the generator's output is compared.
         #
-        # The repository-clean step below is what turns the formatters and
-        # generators into checks. The paths it lists say which one wrote: in
+        # `z:ci-job`'s clean-tree check is what turns the formatters and
+        # generators into checks. It names the entry that wrote, which is a
+        # whole bundle, so the paths it lists say which part wrote: in
         # the first entry, `strict-lib/` is oxfmt's,
         # `docs/package-dependencies.md` the dependency graph's, a `LICENSE`
         # the license copier's, a Markdown file markdownlint's, anything else
         # (`index.mts`, rule types, an embedded sample) `ws:gen`'s; in the
         # second, a package's documentation is `ws:doc`'s and anything else
         # Prettier's.
-        command:
-          - z:ci:style-check:checks-and-generators
-          - z:ci:style-check:format-and-doc
+        #
+        # Each entry builds what it reads. ws:doc and ws:gen load each
+        # package's sources, which import workspace siblings and resolve
+        # through their `exports` map to dist/, which a clean checkout does
+        # not have. ws:gen reads no package's own dist/, only its siblings', so
+        # its bundle builds just the packages another member links to
+        # (`ws:build:deps`); ws:doc also reads each package's own dist/, so its
+        # bundle builds everything. The rest of a bundle does not read dist/,
+        # and a build writes only untracked output, so it runs on the tree as
+        # committed all the same. `ws:check:ext` globs file names and resolves
+        # nothing, so it needs no build.
+        include:
+          - command: z:ci:style-check:checks-and-generators
+            build: ws:build:deps
+          - command: z:ci:style-check:format-and-doc
+            build: ws:build
 
     steps:
       - name: Checkout
@@ -143,52 +157,30 @@ jobs:
       - name: Set up pnpm, Node.js and the dependencies
         uses: ./.github/actions/setup
 
-      # ws:doc and ws:gen load each package's sources, which import workspace
-      # siblings and resolve through their `exports` map to dist/. Nothing is
-      # built yet on a clean checkout, so both entries need the packages
-      # emitted first; the rest of the bundle does not read dist/, and a build
-      # writes only untracked output, so it runs on the tree as committed all
-      # the same. Each entry builds what it reads, as code-check.yml's do.
-      #
-      # ws:gen reads no package's own dist/, only its siblings', so its bundle
-      # builds just the packages another member links to (`ws:build:deps`),
-      # skipping the apps' bundles. ws:doc also reads each package's own
-      # dist/, so its bundle builds everything.
-      #
-      # `ws:check:ext` used to be on this list and is not: `check-ext.mts`
-      # globs file names under `src/` and `scripts/` and resolves nothing, so
-      # the build it was paying for did nothing for it.
-      - name: Build the packages the others link to
-        if: matrix.command == 'z:ci:style-check:checks-and-generators'
-        run: pnpm run ws:build:deps
-
-      - name: Build all packages
-        if: matrix.command == 'z:ci:style-check:format-and-doc'
-        run: pnpm run ws:build
-
       # The checkout is one commit deep; `git show` and `git diff` need the
       # base as well.
       - name: Fetch the base the `check:prose` guards compare with
         if: matrix.command == 'z:ci:style-check:checks-and-generators'
         run: git fetch --no-tags --depth=1 origin "${PROSE_DIFF_BASE}"
 
-      - name: Run "${{ matrix.command }}"
+      # The build, the command and the clean-tree check, as `check-all` runs
+      # them too: a step that changed the tree fails the job and is named
+      # ("The work" in README.md).
+      - name: Run "${{ matrix.command }}" after "${{ matrix.build }}"
         id: command
-        run: pnpm run ${{ matrix.command }}
-
-      - name: Check if there is no file diff
-        id: clean
-        run: pnpm run z:assert-repo-is-clean
+        run: pnpm run z:ci-job --build ${{ matrix.build }} --command ${{ matrix.command }}
 
       # Says in the job summary which of this entry's commands check-changed
       # would have run for the diff ("When a check fails" in README.md). It
-      # reports; the job has failed already. Not after a failed setup or
-      # build, when the command never ran. Last, and capped, so that it cannot
+      # reports; the job has failed already. Not after a failed setup, nor
+      # after a failed build (`z:ci-job` says so in `build-failed`), when the
+      # command never ran. Last, and capped, so that it cannot
       # spend the job's time limit before the steps above.
       - name: Say which of "${{ matrix.command }}"'s commands check-changed would have run
         if: >-
           failure() && github.event_name == 'pull_request' &&
-          (steps.command.outcome == 'failure' || steps.clean.outcome == 'failure')
+          steps.command.outcome == 'failure' &&
+          steps.command.outputs.build-failed != 'true'
         continue-on-error: true
         timeout-minutes: 2
         env:

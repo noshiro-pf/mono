@@ -215,6 +215,12 @@ export const CI_ONLY: readonly CiOnly[] = [
   },
   {
     directory: '.',
+    scriptName: 'z:ci-job',
+    reason:
+      "Runs a matrix entry's build and the entry and checks the tree; the entry and the build are judged as CI entries themselves.",
+  },
+  {
+    directory: '.',
     scriptName: 'z:check-changed-gap',
     reason:
       'Says, after a failed check, which of its commands check-changed would have run; it checks nothing.',

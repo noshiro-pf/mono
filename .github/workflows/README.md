@@ -590,14 +590,18 @@ each caller passes it as `result-job: <name>-result / result`.
   letting one cancel the others hides their results, and the aggregate
   reports the cancelled ones as a failure, so the pull request would be
   blocked on an unrelated failure with nothing to read.
-- **`pnpm run z:assert-repo-is-clean`** after the command. For a `fix:` or
-  `gen:` entry that is the check: the command rewrites, and a dirty tree is
-  the failure.
-- **A matrix entry is `pnpm run <script>`.** `pnpm run check:root:ci-commands`
-  asks whether any entry duplicates another and whether any check script runs
+- **A matrix job of `code-check.yml` and `style-check.yml` is one
+  `pnpm run z:ci-job --build <build> --command <entry>`**
+  (`tools/scripts/cmd/ci-job.mts`): what the entry reads is built, the entry
+  runs, and a step that changed the tree fails the job, naming itself and the
+  files. For a `fix:` or `gen:` entry that is the check: the command rewrites,
+  and a dirty tree is the failure. `pnpm run check-all` runs the same entries,
+  read from these workflows, through the same runner. `strict-lib-gen.yml` still
+  ends in `pnpm run z:assert-repo-is-clean`.
+- **A matrix entry is a root script.** `pnpm run check:root:ci-commands` asks
+  whether any entry duplicates another and whether any check script runs
   nowhere. What a script body cannot show is declared in `DECLARED_COVERAGE`;
-  `UNCOVERED_BY_DESIGN` is a list of claims, each with a reason, not a
-  silencer.
+  `UNCOVERED_BY_DESIGN` is a list of claims, each with a reason, not a silencer.
 - **`timeout-minutes` is for a command that hangs, not a slow runner.** It is 15
   or less (`pnpm run check:root:workflow-timeouts`), more than twice the six and
   a half minutes a check job takes (see the next point); a 10-minute cap was

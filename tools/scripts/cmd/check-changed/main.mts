@@ -1,5 +1,3 @@
-import { spawn, spawnSync } from 'node:child_process';
-import * as fsSync from 'node:fs';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -9,6 +7,14 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { isChangesetPath, listChangesetBumps } from '../../lib/changesets.mjs';
 import { formatLineRanges, parseAddedLines } from '../../lib/diff-lines.mjs';
+import {
+  diffSnapshots,
+  git,
+  isRegularFile,
+  snapshotTree,
+  spawnPnpm,
+  splitZ,
+} from '../../lib/step-runner.mjs';
 import { projectRootPath } from '../../project-root-path.mjs';
 import { findMissingChangesets } from './changesets.mjs';
 import {
@@ -293,89 +299,12 @@ const runPnpm = async (
           '--coverage.reportOnFailure=true',
         ] as const);
 
-  return new Promise((resolve) => {
-    const child = spawn('pnpm', [...step.args, ...coverageArgs], {
-      cwd: path.join(projectRootPath, step.cwd),
-      env: { ...process.env, ...env },
-      stdio: 'inherit',
-    });
-
-    child.on('error', () => {
-      resolve(COMMAND_NOT_RUN);
-    });
-
-    child.on('close', (code) => {
-      resolve(code ?? 1);
-    });
+  return spawnPnpm({
+    args: [...step.args, ...coverageArgs],
+    cwd: step.cwd,
+    env,
   });
 };
-
-/** Whether a repository-relative path is a regular file now. */
-const isRegularFile = (file: string): boolean => {
-  try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a path git status listed.
-    return fsSync.statSync(path.join(projectRootPath, file)).isFile();
-  } catch {
-    return false;
-  }
-};
-
-const splitZ = (output: string): readonly string[] =>
-  output.split('\0').filter((entry) => entry !== '');
-
-const git = (args: readonly string[], input?: string): string => {
-  const result = spawnSync('git', args, {
-    cwd: projectRootPath,
-    encoding: 'utf8',
-    maxBuffer: GIT_MAX_BUFFER,
-    ...(input === undefined ? {} : { input }),
-  });
-
-  if (result.status !== 0) {
-    throw new Error(`git ${args.join(' ')} failed:\n${result.stderr}`);
-  }
-
-  return result.stdout;
-};
-
-/**
- * Every path `git status` reports, with a hash of what is on disk, so that two
- * snapshots tell which files a step wrote — including a file that was already
- * modified before it ran, which `git status` alone cannot.
- */
-const snapshotTree = (): ReadonlyMap<string, string> => {
-  const files = splitZ(
-    git([
-      'status',
-      '--porcelain=v1',
-      '-z',
-      '--untracked-files=all',
-      '--no-renames',
-    ]),
-  ).map((entry) => entry.slice(STATUS_PREFIX_LENGTH));
-
-  // One `git hash-object` for all of them. It fails as a whole on a path that
-  // is not a regular file — deleted, or the `dir/` of an untracked nested
-  // repository — so those are set apart first.
-  const hashed = files.filter(isRegularFile);
-
-  const hashes = Arr.isEmpty(hashed)
-    ? ([] as const)
-    : git(['hash-object', '--stdin-paths'], hashed.join('\n')).split('\n');
-
-  const hashOf = new Map(hashed.map((file, i) => [file, hashes[i] ?? '']));
-
-  return new Map(files.map((file) => [file, hashOf.get(file) ?? 'not a file']));
-};
-
-/** The paths whose content differs between two {@link snapshotTree}s. */
-const diffSnapshots = (
-  before: ReadonlyMap<string, string>,
-  after: ReadonlyMap<string, string>,
-): readonly string[] =>
-  Arr.uniq([...before.keys(), ...after.keys()])
-    .filter((file) => before.get(file) !== after.get(file))
-    .toSorted();
 
 /** A step as the plan prints it, a long argument list cut short. */
 const describe = (step: Step): string => {
@@ -783,18 +712,10 @@ const readJson = async (file: string): Promise<unknown> =>
 
 const LINT_PULL_REQUEST = '.github/workflows/lint-pull-request.yml';
 
-/** `XY ` before each path of `git status --porcelain=v1`. */
-const STATUS_PREFIX_LENGTH = 3;
-
 const DESCRIBED_ARGS = 8;
 
 /** Ranges of uncovered lines listed per file before the rest is counted. */
 const REPORTED_RANGES = 12;
-
-const GIT_MAX_BUFFER = 256 * 1024 * 1024;
-
-/** The shell's "command not found", for a `pnpm` that could not be spawned. */
-const COMMAND_NOT_RUN = 127;
 
 const RECORD_SEPARATOR = '\u{1E}';
 

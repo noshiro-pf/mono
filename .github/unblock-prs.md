@@ -64,7 +64,10 @@ stop and ask.
   `style-check (z:ci:style-check:checks-and-generators)` run
   `pnpm run ws:build:deps`. Do the same locally or they fail for the wrong
   reason.
-- Every job ends with `z:assert-repo-is-clean`. So
+- A `code-check` or `style-check` job is one
+  `pnpm run z:ci-job --build <build> --command <entry>`, which builds, runs the
+  entry and fails when a step changed the tree, naming it; run that to reproduce
+  one (`strict-lib-gen` still ends with `z:assert-repo-is-clean`). So
   `z:ci:style-check:checks-and-generators` (its markdownlint, oxfmt, generators
   and `ws:gen`), `z:ci:style-check:format-and-doc` (Prettier and `ws:doc`),
   `fix:codemod:affected` and the `ws:fix:lint` halves fail by _changing_ files.
