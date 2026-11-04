@@ -44,7 +44,7 @@ export const ColoredDistribution = memoNamed<Props>(
               justify-content: flex-end;
             `}
           >
-            <Bar style={style} />
+            <Bar data-e2e={'distribution-bar'} style={style} />
           </div>
         ))}
       </div>

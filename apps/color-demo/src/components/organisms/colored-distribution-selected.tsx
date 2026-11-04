@@ -29,7 +29,7 @@ export const ColoredDistributionSelected = memoNamed<Props>(
       <Root>
         {accumulatedDistributionWithStyle.map(({ hsl, style }) => (
           <BarWrapper key={hsl[0]}>
-            <Bar style={style} />
+            <Bar data-e2e={'distribution-bar'} style={style} />
           </BarWrapper>
         ))}
       </Root>

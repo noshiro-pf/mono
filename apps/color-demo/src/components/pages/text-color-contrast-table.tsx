@@ -83,7 +83,7 @@ export const TextColorContrastTable = memoNamed(
   () => (
     <Root>
       <PaperCustomized variant={'outlined'}>
-        <Table>
+        <Table data-e2e={'contrast-table'}>
           <TableHead>
             <TableRow>
               <TableCell align={'center'}>{'Saturation（彩度）'}</TableCell>

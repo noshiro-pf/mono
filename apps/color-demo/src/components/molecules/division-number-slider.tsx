@@ -16,7 +16,7 @@ export const DivisionNumberSlider = memoNamed<Props>(
         padding: 10px 0;
       `}
     >
-      <div>{'分割数'}</div>
+      <div id={'division-number'}>{'分割数'}</div>
       <MuiSlider
         ariaLabelledby={'division-number'}
         max={30}
