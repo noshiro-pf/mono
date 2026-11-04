@@ -43,3 +43,7 @@ words:
   - prpp
   - rppp
   - fpcpp
+  # The `srcdoc` attribute of an `iframe`, whose document is `about:srcdoc`:
+  # one of the frames the content script also runs in, as the docs, the
+  # source and the changelog say.
+  - srcdoc

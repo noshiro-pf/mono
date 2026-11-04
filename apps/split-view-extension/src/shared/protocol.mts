@@ -1,5 +1,6 @@
 import { hasKey, isRecord } from 'ts-data-forge';
 import type { UnknownRecord } from 'ts-type-forge';
+import { workspacePositionFromCode, type PaneKey } from './shortcuts.mjs';
 
 /**
  * Tags every `postMessage` the split view sends or accepts.
@@ -94,6 +95,20 @@ export type FrameToPageMessage = Readonly<
       step: 'in' | 'out';
     }
 >;
+
+/**
+ * Sent by a frame nested inside a pane's page, up to the frame that contains
+ * it, when one of the keys a pane takes is pressed there.
+ *
+ * Only the pane's own frame is assigned a pane, so a frame nested inside it
+ * cannot act on the key itself: it hands the key up, frame by frame, until a
+ * frame that was assigned one handles it as its own.
+ */
+export type NestedFrameMessage = Readonly<{
+  tag: typeof splitViewMessageTag;
+  kind: 'nested-key';
+  key: PaneKey;
+}>;
 
 /**
  * Validates a message from a frame.
@@ -199,6 +214,51 @@ export const asFrameToPageMessage = (
   }
 
   return undefined;
+};
+
+/**
+ * Validates a message from a frame nested inside a pane's page.
+ *
+ * The sender is whatever the pane's page embeds, an advertisement or a widget
+ * included. The frame that receives one acts on it only when it comes from the
+ * child frame the focus is in, so what a forged one can do is reload the pane
+ * or switch to another of the user's own split views from the frame the user is
+ * typing in — which is what pressing the key there would have done anyway.
+ */
+export const asNestedFrameMessage = (
+  value: unknown,
+): NestedFrameMessage | undefined => {
+  if (
+    !isTaggedMessage(value) ||
+    !hasKey(value, 'kind') ||
+    value.kind !== 'nested-key' ||
+    !hasKey(value, 'key') ||
+    !isRecord(value.key) ||
+    !hasKey(value.key, 'kind')
+  ) {
+    return undefined;
+  }
+
+  const { key } = value;
+
+  if (key.kind === 'reload') {
+    return {
+      tag: splitViewMessageTag,
+      kind: 'nested-key',
+      key: { kind: 'reload' },
+    };
+  }
+
+  return key.kind === 'workspace' &&
+    hasKey(key, 'code') &&
+    typeof key.code === 'string' &&
+    workspacePositionFromCode(key.code) !== undefined
+    ? {
+        tag: splitViewMessageTag,
+        kind: 'nested-key',
+        key: { kind: 'workspace', code: key.code },
+      }
+    : undefined;
 };
 
 /** Validates a message from the page, as seen by the frame. */

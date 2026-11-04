@@ -102,6 +102,52 @@ export const isReloadShortcut = (keyEvent: ShortcutKeyEvent): boolean => {
   return isR && (keyEvent.ctrlKey || keyEvent.metaKey);
 };
 
+/** A key a pane takes from the browser, as `paneKeyOf` names it. */
+export type PaneKey = Readonly<
+  { kind: 'reload' } | { kind: 'workspace'; code: string }
+>;
+
+/**
+ * Which of the keys a pane takes a keydown is, if any: the reload shortcut or a
+ * workspace shortcut, unless the site has already taken it.
+ */
+export const paneKeyOf = (keyEvent: ShortcutKeyEvent): PaneKey | undefined => {
+  if (keyEvent.defaultPrevented) {
+    return undefined;
+  }
+
+  if (isReloadShortcut(keyEvent)) {
+    return { kind: 'reload' };
+  }
+
+  const code = workspaceShortcutCodeOf(keyEvent);
+
+  return code === undefined ? undefined : { kind: 'workspace', code };
+};
+
+/**
+ * What a frame not assigned a pane does with one of the keys a pane takes, by
+ * where it is. An assigned frame acts on the key itself.
+ *
+ * Only the pane's own frame is assigned a pane, so a frame nested in a pane's
+ * page hands the key up, and the nearest frame up the chain that is a pane acts
+ * on it. The pane's own frame reloads itself even before the page has assigned
+ * it, since that needs no one's answer; a frame directly in the split view page
+ * that is not named as a pane is not one, and leaves the key alone.
+ */
+export const paneKeyRoute = (
+  frame: Readonly<{
+    parentIsSplitPage: boolean;
+    namedAsPane: boolean;
+  }>,
+  key: PaneKey,
+): PaneKeyRoute =>
+  !frame.parentIsSplitPage
+    ? 'hand-up'
+    : key.kind === 'reload' && frame.namedAsPane
+      ? 'reload-self'
+      : 'leave';
+
 /** The 1-based workspace position a shortcut names. */
 export const workspacePositionFromCode = (code: string): number | undefined => {
   const digit = digitCodePattern.exec(code)?.[1];
@@ -110,6 +156,13 @@ export const workspacePositionFromCode = (code: string): number | undefined => {
     ? undefined
     : Result.unwrapOkOr(Num.safeParseInt(digit), Number.NaN);
 };
+
+/**
+ * What a frame not assigned a pane does with one of the keys a pane takes:
+ * `reload-self` as a pane the page has not assigned yet, `hand-up` to the frame
+ * that contains this one, or `leave` it to the browser.
+ */
+export type PaneKeyRoute = 'reload-self' | 'hand-up' | 'leave';
 
 const digitCodePattern = /^Digit([1-9])$/u;
 

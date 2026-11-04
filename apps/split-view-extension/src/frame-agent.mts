@@ -1,14 +1,17 @@
 import { Arr } from 'ts-data-forge';
 import {
+  asNestedFrameMessage,
   asPageToFrameMessage,
-  isReloadShortcut,
   paneFrameNamePrefix,
+  paneKeyOf,
+  paneKeyRoute,
   splitViewMessageTag,
-  workspaceShortcutCodeOf,
   zoomStepFromWheel,
   type FrameCommand,
   type FrameToPageMessage,
   type IncomingMessageEvent,
+  type NestedFrameMessage,
+  type PaneKey,
   type ShortcutKeyEvent,
   type ZoomWheelEvent,
 } from './shared/index.mjs';
@@ -54,7 +57,8 @@ const main = (): void => {
 
   // The pane this frame belongs to, and the origin to answer on. Both are
   // learned from the page's `assign` message rather than assumed, so a frame
-  // that was never assigned stays silent.
+  // that was never assigned reports nothing; it only hands up the keys a pane
+  // takes (`takePaneKey`).
   let mut_paneId: number | undefined = undefined;
 
   let mut_replyOrigin: string | undefined = undefined;
@@ -93,8 +97,77 @@ const main = (): void => {
     window.parent.postMessage(message, mut_replyOrigin);
   };
 
+  /**
+   * Acts on one of the keys a pane takes: reloads this pane, or forwards the
+   * workspace shortcut to the page. A frame not assigned a pane does what
+   * `paneKeyRoute` says instead. Returns whether the key was taken, so that the
+   * browser does not act on it as well.
+   */
+  const takePaneKey = (key: PaneKey): boolean => {
+    if (mut_paneId !== undefined && mut_replyOrigin !== undefined) {
+      if (key.kind === 'reload') {
+        runCommand('reload');
+
+        return true;
+      }
+
+      const message: FrameToPageMessage = {
+        tag: splitViewMessageTag,
+        kind: 'shortcut',
+        paneId: mut_paneId,
+        code: key.code,
+      } as const;
+
+      window.parent.postMessage(message, mut_replyOrigin);
+
+      return true;
+    }
+
+    const route = paneKeyRoute(
+      {
+        parentIsSplitPage:
+          document.location.ancestorOrigins[0] === ownExtensionOrigin(),
+        namedAsPane: window.name.startsWith(paneFrameNamePrefix),
+      },
+      key,
+    );
+
+    switch (route) {
+      case 'leave':
+        return false;
+
+      case 'reload-self':
+        runCommand('reload');
+
+        return true;
+
+      case 'hand-up': {
+        const handedUp: NestedFrameMessage = {
+          tag: splitViewMessageTag,
+          kind: 'nested-key',
+          key,
+        } as const;
+
+        // Any origin: the frame above is whatever site the pane's page is, and
+        // the message says only which key was pressed.
+        window.parent.postMessage(handedUp, '*');
+
+        return true;
+      }
+    }
+  };
+
   addEventListener('message', (messageEvent: IncomingMessageEvent) => {
     if (messageEvent.source !== window.parent) {
+      const nested = asNestedFrameMessage(messageEvent.data);
+
+      // Only from the child frame the focus is in, so that a frame the user is
+      // not typing in — an advertisement beside the form — cannot press the key
+      // for them.
+      if (nested !== undefined && isFocusedChildFrame(messageEvent.source)) {
+        takePaneKey(nested.key);
+      }
+
       return;
     }
 
@@ -137,8 +210,8 @@ const main = (): void => {
    *
    * `Alt+1..9` switches split views, and the focus is inside a pane most of the
    * time — where the page's own `keydown` listener never sees the key, because
-   * a key event does not cross a frame boundary. A frame that has not been
-   * assigned a pane stays silent, as it does for everything else.
+   * a key event does not cross a frame boundary. For the same reason a frame
+   * nested in the pane's page hands the key up (`takePaneKey`).
    *
    * The reload is the same one the pane's toolbar button asks of this frame.
    * A site that binds `Ctrl+R` itself and has already taken the key keeps it:
@@ -146,38 +219,11 @@ const main = (): void => {
    * after the site's own.
    */
   addEventListener('keydown', (keyboardEvent: ShortcutKeyEvent) => {
-    if (
-      mut_paneId !== undefined &&
-      !keyboardEvent.defaultPrevented &&
-      isReloadShortcut(keyboardEvent)
-    ) {
+    const key = paneKeyOf(keyboardEvent);
+
+    if (key !== undefined && takePaneKey(key)) {
       keyboardEvent.preventDefault();
-
-      runCommand('reload');
-
-      return;
     }
-
-    const code = workspaceShortcutCodeOf(keyboardEvent);
-
-    if (
-      code === undefined ||
-      mut_paneId === undefined ||
-      mut_replyOrigin === undefined
-    ) {
-      return;
-    }
-
-    keyboardEvent.preventDefault();
-
-    const message: FrameToPageMessage = {
-      tag: splitViewMessageTag,
-      kind: 'shortcut',
-      paneId: mut_paneId,
-      code,
-    } as const;
-
-    window.parent.postMessage(message, mut_replyOrigin);
   });
 
   /**
@@ -289,6 +335,12 @@ const removeServiceWorkers = async (): Promise<number> => {
 const keepServiceWorkersAway = (): void => {
   const { origin: siteOrigin } = document.location;
 
+  // A `data:` frame, or an `about:blank` or `srcdoc` one, which the agent runs
+  // in only to hand keys up: an opaque origin, so none on the list.
+  if (siteOrigin === 'null') {
+    return;
+  }
+
   let mut_onList = false;
 
   const sweep = (): void => {
@@ -352,6 +404,39 @@ const runCommand = (command: FrameCommand): void => {
   document.location.reload();
 };
 
+const deepActiveElement = (element: Element | null): Element | null => {
+  // `openOrClosedShadowRoot` sees a closed root too, which `shadowRoot` does
+  // not.
+  const root =
+    element instanceof HTMLElement
+      ? chrome.dom.openOrClosedShadowRoot(element)
+      : null;
+
+  const inner = root?.activeElement ?? null;
+
+  return inner === null ? element : deepActiveElement(inner);
+};
+
+/**
+ * Whether a message came from the frame directly inside this document that has
+ * the focus: the element focused here is the `iframe` or `object` showing it,
+ * whether the focus is in that frame or further down — looked for through
+ * shadow roots, where `document.activeElement` names only the host.
+ */
+const isFocusedChildFrame = (source: unknown): boolean => {
+  const focused = deepActiveElement(document.activeElement);
+
+  return (
+    (focused instanceof HTMLIFrameElement ||
+      focused instanceof HTMLObjectElement) &&
+    focused.contentWindow === source
+  );
+};
+
+/** `chrome-extension://<id>`, the origin of the split view page. */
+const ownExtensionOrigin = (): string =>
+  `chrome-extension://${chrome.runtime.id}` as const;
+
 const isSplitViewFrame = (): boolean => {
   // Empty for a top-level document, so this is also the "am I in a frame at
   // all" test, which is what makes the check cheap on ordinary pages.
@@ -361,12 +446,11 @@ const isSplitViewFrame = (): boolean => {
     return false;
   }
 
-  if (window.name.startsWith(paneFrameNamePrefix)) {
-    return true;
-  }
-
-  return ancestors.some((ancestor) =>
-    ancestor.startsWith('chrome-extension://'),
+  // Otherwise, below this extension's own page, not any extension's: a frame
+  // some other extension's page embeds is none of ours.
+  return (
+    window.name.startsWith(paneFrameNamePrefix) ||
+    ancestors.includes(ownExtensionOrigin())
   );
 };
 

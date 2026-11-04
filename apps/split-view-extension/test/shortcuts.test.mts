@@ -1,6 +1,8 @@
 import {
   createPane,
   isReloadShortcut,
+  paneKeyOf,
+  paneKeyRoute,
   paneNode,
   splitNode,
   tabLabelOf,
@@ -25,7 +27,7 @@ const keyEvent = (
     preventDefault: () => undefined,
   }) as const;
 
-const reloadKey = (
+const keyDown = (
   key: string,
   code: string,
   modifiers?: Readonly<{
@@ -33,8 +35,9 @@ const reloadKey = (
     ctrl?: boolean;
     meta?: boolean;
     shift?: boolean;
+    defaultPrevented?: boolean;
   }>,
-): Parameters<typeof isReloadShortcut>[0] =>
+): Parameters<typeof paneKeyOf>[0] =>
   ({
     altKey: modifiers?.alt ?? false,
     ctrlKey: modifiers?.ctrl ?? false,
@@ -42,7 +45,7 @@ const reloadKey = (
     shiftKey: modifiers?.shift ?? false,
     key,
     code,
-    defaultPrevented: false,
+    defaultPrevented: modifiers?.defaultPrevented ?? false,
     preventDefault: () => undefined,
   }) as const;
 
@@ -94,53 +97,120 @@ describe('workspaceShortcutCodeOf', () => {
 
 describe('isReloadShortcut', () => {
   test('takes Ctrl+R, and Cmd+R on macOS', () => {
-    assert.isTrue(isReloadShortcut(reloadKey('r', 'KeyR', { ctrl: true })));
+    assert.isTrue(isReloadShortcut(keyDown('r', 'KeyR', { ctrl: true })));
 
-    assert.isTrue(isReloadShortcut(reloadKey('r', 'KeyR', { meta: true })));
+    assert.isTrue(isReloadShortcut(keyDown('r', 'KeyR', { meta: true })));
   });
 
   test('takes the hard reload too', () => {
     assert.isTrue(
-      isReloadShortcut(reloadKey('R', 'KeyR', { ctrl: true, shift: true })),
+      isReloadShortcut(keyDown('R', 'KeyR', { ctrl: true, shift: true })),
     );
 
-    assert.isTrue(isReloadShortcut(reloadKey('F5', 'F5', { ctrl: true })));
+    assert.isTrue(isReloadShortcut(keyDown('F5', 'F5', { ctrl: true })));
   });
 
   test('takes F5, with Shift or without', () => {
-    assert.isTrue(isReloadShortcut(reloadKey('F5', 'F5')));
+    assert.isTrue(isReloadShortcut(keyDown('F5', 'F5')));
 
-    assert.isTrue(isReloadShortcut(reloadKey('F5', 'F5', { shift: true })));
+    assert.isTrue(isReloadShortcut(keyDown('F5', 'F5', { shift: true })));
   });
 
   test('takes no R without Ctrl or Cmd, and none with Alt', () => {
-    assert.isFalse(isReloadShortcut(reloadKey('r', 'KeyR')));
+    assert.isFalse(isReloadShortcut(keyDown('r', 'KeyR')));
 
-    assert.isFalse(isReloadShortcut(reloadKey('r', 'KeyR', { alt: true })));
+    assert.isFalse(isReloadShortcut(keyDown('r', 'KeyR', { alt: true })));
 
     assert.isFalse(
-      isReloadShortcut(reloadKey('r', 'KeyR', { ctrl: true, alt: true })),
+      isReloadShortcut(keyDown('r', 'KeyR', { ctrl: true, alt: true })),
     );
 
-    assert.isFalse(isReloadShortcut(reloadKey('F5', 'F5', { alt: true })));
+    assert.isFalse(isReloadShortcut(keyDown('F5', 'F5', { alt: true })));
   });
 
   test('takes no other key', () => {
-    assert.isFalse(isReloadShortcut(reloadKey('t', 'KeyT', { ctrl: true })));
+    assert.isFalse(isReloadShortcut(keyDown('t', 'KeyT', { ctrl: true })));
 
-    assert.isFalse(isReloadShortcut(reloadKey('F6', 'F6')));
+    assert.isFalse(isReloadShortcut(keyDown('F6', 'F6')));
   });
 
   // Chrome reads the letter a Latin layout types, and falls back to the
   // physical key only for a layout that types no Latin letter.
   test('follows the letter the layout types', () => {
     // Dvorak: R is where QWERTY has O, and QWERTY's R types P.
-    assert.isTrue(isReloadShortcut(reloadKey('r', 'KeyO', { ctrl: true })));
+    assert.isTrue(isReloadShortcut(keyDown('r', 'KeyO', { ctrl: true })));
 
-    assert.isFalse(isReloadShortcut(reloadKey('p', 'KeyR', { ctrl: true })));
+    assert.isFalse(isReloadShortcut(keyDown('p', 'KeyR', { ctrl: true })));
 
     // Russian: the R key types к.
-    assert.isTrue(isReloadShortcut(reloadKey('к', 'KeyR', { ctrl: true })));
+    assert.isTrue(isReloadShortcut(keyDown('к', 'KeyR', { ctrl: true })));
+  });
+});
+
+describe(paneKeyOf, () => {
+  test('names the reload shortcut', () => {
+    assert.deepStrictEqual(paneKeyOf(keyDown('r', 'KeyR', { ctrl: true })), {
+      kind: 'reload',
+    });
+
+    assert.deepStrictEqual(paneKeyOf(keyDown('F5', 'F5')), {
+      kind: 'reload',
+    });
+  });
+
+  test('leaves a key the site has already taken', () => {
+    assert.isUndefined(
+      paneKeyOf(keyDown('r', 'KeyR', { ctrl: true, defaultPrevented: true })),
+    );
+
+    assert.isUndefined(
+      paneKeyOf(keyDown('¡', 'Digit1', { alt: true, defaultPrevented: true })),
+    );
+  });
+
+  test('names a workspace shortcut by its key', () => {
+    assert.deepStrictEqual(paneKeyOf(keyDown('¡', 'Digit1', { alt: true })), {
+      kind: 'workspace',
+      code: 'Digit1',
+    });
+  });
+
+  test('leaves every other key', () => {
+    assert.isUndefined(paneKeyOf(keyDown('r', 'KeyR')));
+
+    assert.isUndefined(paneKeyOf(keyDown('1', 'Digit1')));
+  });
+});
+
+describe(paneKeyRoute, () => {
+  const reload = { kind: 'reload' } as const;
+
+  const workspace = { kind: 'workspace', code: 'Digit2' } as const;
+
+  test('a nested frame hands either key up', () => {
+    for (const namedAsPane of [false, true]) {
+      const frame = { parentIsSplitPage: false, namedAsPane } as const;
+
+      assert.strictEqual(paneKeyRoute(frame, reload), 'hand-up');
+
+      assert.strictEqual(paneKeyRoute(frame, workspace), 'hand-up');
+    }
+  });
+
+  test('a pane not assigned yet reloads itself and leaves the shortcut', () => {
+    const frame = { parentIsSplitPage: true, namedAsPane: true } as const;
+
+    assert.strictEqual(paneKeyRoute(frame, reload), 'reload-self');
+
+    assert.strictEqual(paneKeyRoute(frame, workspace), 'leave');
+  });
+
+  test('a frame in the split view page that is no pane leaves both', () => {
+    const frame = { parentIsSplitPage: true, namedAsPane: false } as const;
+
+    assert.strictEqual(paneKeyRoute(frame, reload), 'leave');
+
+    assert.strictEqual(paneKeyRoute(frame, workspace), 'leave');
   });
 });
 
