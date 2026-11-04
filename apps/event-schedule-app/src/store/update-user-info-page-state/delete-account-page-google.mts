@@ -24,36 +24,34 @@ import type {
 } from './account-deps.mjs';
 import type { UpdateUserInfoDialog } from './update-user-info-dialog-state.mjs';
 
-export type DeleteAccountCreatedWithGoogleDeps<User, ReauthCredential> =
-  Readonly<{
-    api: Readonly<{
-      auth: StrictPick<
-        AccountAuthApi<User, ReauthCredential>,
-        'deleteUser' | 'googleSignInWithPopup' | 'reauthenticateWithCredential'
-      >;
-    }>;
+export type DeleteAccountCreatedWithGoogleDeps<User> = Readonly<{
+  api: Readonly<{
     auth: StrictPick<
-      AccountAuth<User>,
-      'fireAuthUser$' | 'getFireAuthUserSnapshot'
+      AccountAuthApi<User, unknown>,
+      'deleteUser' | 'reauthenticateWithGooglePopup'
     >;
-    /** Which dialog is open; this one closes itself when done. */
-    dialog: StrictPick<
-      UpdateUserInfoDialog,
-      'closeDialog' | 'openingDialogType$'
-    >;
-    /** Where the dialog says whether it went through. */
-    toast: Promise<Toaster>;
   }>;
+  auth: StrictPick<
+    AccountAuth<User>,
+    'fireAuthUser$' | 'getFireAuthUserSnapshot'
+  >;
+  /** Which dialog is open; this one closes itself when done. */
+  dialog: StrictPick<
+    UpdateUserInfoDialog,
+    'closeDialog' | 'openingDialogType$'
+  >;
+  /** Where the dialog says whether it went through. */
+  toast: Promise<Toaster>;
+}>;
 
 /**
  * The dialog that deletes an account made with Google: confirming the email,
- * signing in with Google again, and deleting the user.
+ * re-authenticating the user with Google, and deleting the user.
  */
 export const createDeleteAccountCreatedWithGoogleStore = <
   User extends AccountUser,
-  ReauthCredential,
 >(
-  deps: DeleteAccountCreatedWithGoogleDeps<User, ReauthCredential>,
+  deps: DeleteAccountCreatedWithGoogleDeps<User>,
 ): DeleteAccountCreatedWithGoogle => {
   const dc = dict.accountSettings;
 
@@ -126,44 +124,21 @@ export const createDeleteAccountCreatedWithGoogleStore = <
 
     setTrueIsWaitingResponse();
 
-    const signInResult = await deps.api.auth.googleSignInWithPopup();
+    const res1 = await deps.api.auth.reauthenticateWithGooglePopup(user);
 
-    const credential: ReauthCredential | undefined = Result.unwrapOkOr(
-      signInResult,
-      undefined,
-    );
-
-    // The popup failed, was closed, or gave no credential. The dialog stays
-    // open so that signing in can be tried again.
-    if (credential === undefined) {
-      console.error('error occurred on googleSignInWithPopup:', signInResult);
-
+    // The dialog stays open so that re-authenticating can be tried again.
+    if (Result.isErr(res1)) {
       setFalseIsWaitingResponse();
 
-      showToast({
-        toast: deps.toast,
-        message: dc.reauthenticate.message.error,
-        intent: 'danger',
-      });
+      if (POPUP_DISMISSED_CODES.has(res1.value.code)) {
+        return;
+      }
 
-      return;
-    }
-
-    const res1 = await deps.api.auth.reauthenticateWithCredential(
-      user,
-      credential,
-    );
-
-    if (Result.isErr(res1)) {
       console.error(
-        'error occurred on reauthenticateWithCredential:',
+        'error occurred on reauthenticateWithGooglePopup:',
         res1.value.code,
         res1.value.message,
       );
-
-      setFalseIsWaitingResponse();
-
-      deps.dialog.closeDialog();
 
       showToast({
         toast: deps.toast,
@@ -230,6 +205,15 @@ export const createDeleteAccountCreatedWithGoogleStore = <
     inputEmailHandler,
   } as const;
 };
+
+/**
+ * The codes Firebase gives a popup the user closed, or one a newer popup
+ * replaced: a cancel, not a failure, so nothing is shown or logged.
+ */
+const POPUP_DISMISSED_CODES: ReadonlySet<string> = new Set<string>([
+  'auth/popup-closed-by-user',
+  'auth/cancelled-popup-request',
+]);
 
 export type DeleteAccountCreatedWithGoogle = Readonly<{
   state: InitializedObservable<
