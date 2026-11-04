@@ -459,6 +459,7 @@ const SET_ASIDE_WORDS = {
   'arm-failed': 'arm failed',
   'awaiting-bypass': 'bypass',
   'checks-failed': 'checks',
+  'head-out-of-sync': 'out of sync',
   'not-merging': 'not merging',
   'push-failed': 'push failed',
   'read-failed': 'unreadable',

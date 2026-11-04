@@ -63,11 +63,14 @@ import {
 
 /**
  * Lists the open pull requests, re-listing a few times while GitHub is still
- * computing a merge state (`UNKNOWN`) for one that matters.
+ * computing a merge state (`UNKNOWN`) for one that matters
+ * ({@link awaitsMergeState}). `outOfSync` is pull request number → the head
+ * it was set aside `head-out-of-sync` at.
  */
 export const survey = async (
   api: ApiContext,
   defaultBranch: string,
+  outOfSync: ReadonlyMap<number, string> = new Map<number, string>(),
 ): Promise<Result<Survey, string>> => {
   let mut_attempt = 0;
 
@@ -76,10 +79,7 @@ export const survey = async (
   while (
     Result.isOk(mut_listed) &&
     mut_attempt < UNKNOWN_STATE_RETRIES &&
-    mut_listed.value.some(
-      (pr) =>
-        pr.mergeStateStatus === 'UNKNOWN' && isRecord(pr.autoMergeRequest),
-    ) &&
+    mut_listed.value.some((pr) => awaitsMergeState(pr, outOfSync)) &&
     !stopRequested()
   ) {
     mut_attempt += 1;
@@ -115,6 +115,21 @@ export const survey = async (
     },
   });
 };
+
+/**
+ * Whether a survey re-lists for `pr`: armed, so its merge state is what decides
+ * whether it merges, and `UNKNOWN`. Not one set aside as `head-out-of-sync` at
+ * the head GitHub reports: GitHub dropped its branch's last push, its state
+ * stays unknown for as long as that lasts, and re-listing would only delay
+ * every survey until a person pushes.
+ */
+export const awaitsMergeState = (
+  pr: PullRequest,
+  outOfSync: ReadonlyMap<number, string>,
+): boolean =>
+  pr.mergeStateStatus === 'UNKNOWN' &&
+  isRecord(pr.autoMergeRequest) &&
+  outOfSync.get(pr.number) !== pr.headRefOid;
 
 export const triage = async (
   api: ApiContext,

@@ -1,5 +1,6 @@
 import { parseCodeOwners, reviewHold, type ReviewState } from 'pr-report-core';
 import {
+  awaitsMergeState,
   bypassOfRead,
   describeAction,
   orderCandidates,
@@ -143,6 +144,40 @@ describe(describeAction, () => {
         },
       ),
       'rebase onto main, leave auto-merge off (the author is the only owner, so it needs a bypass merge), then take skip-ci off it',
+    );
+  });
+});
+
+describe(awaitsMergeState, () => {
+  const unknown = pullRequest({ number: 7, mergeStateStatus: 'UNKNOWN' });
+
+  test('waits for an armed pull request GitHub is still computing', () => {
+    assert.isTrue(awaitsMergeState(unknown, new Map<number, string>()));
+  });
+
+  test('does not wait for one with nothing armed', () => {
+    assert.isFalse(
+      awaitsMergeState(
+        { ...unknown, autoMergeRequest: null },
+        new Map<number, string>(),
+      ),
+    );
+  });
+
+  // GitHub never took in its branch's last push, so its state stays unknown for
+  // as long as that lasts, and every survey would re-list for nothing.
+  test('does not wait for one set aside as out of sync at that head', () => {
+    assert.isFalse(
+      awaitsMergeState(
+        unknown,
+        new Map<number, string>([[7, unknown.headRefOid]]),
+      ),
+    );
+  });
+
+  test('waits again once GitHub reports another head', () => {
+    assert.isTrue(
+      awaitsMergeState(unknown, new Map<number, string>([[7, 'b'.repeat(40)]])),
     );
   });
 });

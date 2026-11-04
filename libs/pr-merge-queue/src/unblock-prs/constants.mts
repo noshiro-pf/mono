@@ -46,5 +46,14 @@ export const BLOCKED_GREEN_POLLS_BEFORE_GIVING_UP = 8;
  */
 export const UNREAD_SURVEYS_BEFORE_SETTING_ASIDE = 5;
 
+/**
+ * How long a branch may stay at a commit other than the head GitHub reports for
+ * its pull request before the pull request is set aside as `head-out-of-sync`
+ * (`out-of-sync.mts`). GitHub takes a push in within seconds, so a mismatch
+ * that outlives this is a push it dropped, not someone else's push still on its
+ * way.
+ */
+export const OUT_OF_SYNC_GRACE_MS = 10 * 60_000;
+
 /** How many consecutive polling errors end a watch. */
 export const MAX_CONSECUTIVE_POLL_ERRORS = 5;

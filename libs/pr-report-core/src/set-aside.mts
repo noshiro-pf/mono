@@ -152,7 +152,8 @@ export const setAsideApplies = (
  * more — except two whose head a rebase would only put through the same matrix
  * again: `checks-failed`, which the push that carries the fix clears, and
  * `awaiting-bypass`, green and waiting for a ruleset bypass merge, which does
- * not wait for the base.
+ * not wait for the base. Nor does `head-out-of-sync`: GitHub not having taken
+ * in the branch's last push is not something the base moving changes.
  */
 export const setAsideStillApplies = (
   setAside: Readonly<{ reason: string; baseSha: string }>,
@@ -160,6 +161,7 @@ export const setAsideStillApplies = (
 ): boolean =>
   setAside.reason === 'checks-failed' ||
   setAside.reason === 'awaiting-bypass' ||
+  setAside.reason === 'head-out-of-sync' ||
   setAside.baseSha === baseTip;
 
 /** The first line starts with this, so the comment is found by it. */

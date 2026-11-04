@@ -135,6 +135,7 @@ describe(queueOwner, () => {
     'unlabel-failed',
     'push-failed',
     'watch-timeout',
+    'head-out-of-sync',
   ] as const)('is a person’s when set aside %s', (reason) => {
     assert.strictEqual(
       queueOwner({ ...queued, setAside: standing(reason) })?.owner,

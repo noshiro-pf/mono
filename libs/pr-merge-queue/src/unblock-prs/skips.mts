@@ -20,8 +20,8 @@ import type {
 
 /**
  * A verdict lasts as long as the state it was reached in. Every reason is tied
- * to the head, so a push to the branch clears it; all but `checks-failed` are
- * tied to the base as well.
+ * to the head, so a push to the branch clears it; all but `checks-failed`,
+ * `awaiting-bypass` and `head-out-of-sync` are tied to the base as well.
  *
  * The base is what makes the difference to a pull request that sat green
  * without merging or ran out of watch time: once the base moves that pull
@@ -39,6 +39,10 @@ import type {
  * base, and a rebase each time anything else merged would run the matrix again
  * for nothing. Its comment's retry box is how a person asks for a run on the
  * current tip.
+ *
+ * Nor is `head-out-of-sync`: GitHub not having taken in the branch's last push
+ * is not something the base moving changes, and a comment rewritten after every
+ * merge would say nothing new.
  *
  * The rule is `pr-report-core`'s `setAsideApplies`, because the Pull Requests
  * Manager page applies the same rule to the comment this script leaves on the

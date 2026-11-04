@@ -446,6 +446,20 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 せることになるからです。`/unblock-prs` skill はこのスクリプトと並行して動く前
 提で書かれています。
 
+ただし **GitHub が push を取りこぼす** ことがあります。ブランチは動いたのに、PR
+の head・`refs/pull/<n>/head`・merge state が古いまま追従しません。この状態で
+は毎回同じ PR を pick し、毎回 rebase 前の fetch で「動いた」と判断して survey
+に戻るので、その後ろのキューが一切進みません。そこで rebase 前の fetch で見つけ
+た食い違い（GitHub の head とブランチの先端の組）を覚えておき、同じ食い違いが
+10分（`OUT_OF_SYNC_GRACE_MS`）続いたら `head-out-of-sync` として見送り、同じ
+サイクル内で次の候補へ進みます（`out-of-sync.mts`）。GitHub は push を数秒で取
+り込むので、10分続く食い違いは書き込み中の誰かではありません。ブランチに誰も
+survey していないコミットが載っているので、このスクリプトはそこへ push しませ
+ん。解除は人の仕事で、ブランチに新しいコミットを push するか、PR を close し
+て reopen します。見送っている間は、その PR の `UNKNOWN` を待って survey を
+再取得することもしません。「3a」の積み直しで同じ食い違いを見つけた場合も同じ
+扱いで、survey に戻り続けることはありません。
+
 #### 3a. 待っている PR を main に積み直す
 
 「3」で動かす候補が無いとき（進行中の PR も、pick する候補も無いとき）だけ、
@@ -622,6 +636,7 @@ matrix の job まで読みます。どの失敗なら直せるか、何を実�
 | `watch-timeout`                   |      ✓      |          ✓          |
 | `checks-failed`                   |      ✓      |   **✗（意図的）**   |
 | `awaiting-bypass`                 |      ✓      |   **✗（意図的）**   |
+| `head-out-of-sync`                |      ✓      |   **✗（意図的）**   |
 
 衝突の判定がキャッシュされないのはこのためです。衝突していた相手のコミットが
 base の移動と一緒に消えたかもしれないので、`main` が動けば記録は捨てられ、次の
@@ -630,7 +645,10 @@ rebase しても同じマトリクスが同じように落ちるだけで、直�
 です。`awaiting-bypass` も同じく base に紐付けません。待っている bypass merge
 は base の移動を待たないので、他の PR がマージされるたびに rebase してマトリク
 スを回し直しても無駄になるだけです。最新の `main` の上で確かめ直したいときは、
-comment の再試行ボックスにチェックを入れます。
+comment の再試行ボックスにチェックを入れます。`head-out-of-sync` も base に紐
+付けません。GitHub が push を取りこぼしたことは `main` が動いても変わらないから
+です。ここでの「push」は GitHub が取り込んだ push、つまり PR の head が変わる
+ことです。
 
 `not-merging` の PR は、記録が消えた後も **candidate の最後**（version PR より
 後ろ）に回されます。`main` が動けば記録は消えて `BEHIND` の candidate に戻り
@@ -809,6 +827,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `set-aside-comment.mts` | 見送りの comment の文章                                       |
 | `demotions.mts`         | green のまま止まった PR をいつまで最後に回すか                |
 | `unread.mts`            | 読めない解放済み PR を何回待ってから見送るか                  |
+| `out-of-sync.mts`       | GitHub が push を取りこぼした PR をいつ見送るか               |
 | `options.mts`           | コマンドライン                                                |
 | `types.mts`             | 共有される型とスキーマ                                        |
 | `constants.mts`         | 待ち時間と諦めるまでの回数                                    |
@@ -1306,6 +1325,21 @@ next candidate would start a second matrix beside the one the other writer is
 about to start. The `/unblock-prs` skill is written to run alongside this
 script.
 
+But **GitHub sometimes drops a push**: the branch moves, and the pull request's
+head, `refs/pull/<n>/head` and merge state never follow. Then every cycle picks
+the same pull request, finds the branch elsewhere before the rebase, and surveys
+again, and nothing behind it in the queue ever moves. So the mismatch found
+before the rebase — GitHub's head and the branch's tip — is remembered, and the
+same mismatch still there 10 minutes later (`OUT_OF_SYNC_GRACE_MS`) sets the
+pull request aside as `head-out-of-sync`, and the next candidate is tried in the
+same cycle (`out-of-sync.mts`). GitHub takes a push in within seconds, so a
+mismatch that lasts 10 minutes is no writer at work. The script does not push to
+that branch, which holds commits nobody surveyed; clearing it is a person's, by
+pushing a new commit to the branch or closing and reopening the pull request.
+While it is set aside, its `UNKNOWN` merge state no longer makes a survey
+re-list. The same mismatch found by a rebase in 3a is read the same way, rather
+than sending the loop back to the survey on every turn.
+
 #### 3a. Keep waiting pull requests on the tip
 
 Only when step 3 has nothing to act on — nothing in flight and no candidate to
@@ -1489,15 +1523,18 @@ A verdict lasts as long as the state it was reached in.
 | `watch-timeout`                   |         ✓         |             ✓             |
 | `checks-failed`                   |         ✓         |    **✗ (deliberate)**     |
 | `awaiting-bypass`                 |         ✓         |    **✗ (deliberate)**     |
+| `head-out-of-sync`                |         ✓         |    **✗ (deliberate)**     |
 
 So a conflict verdict is never cached across a base that moved: the commit it
 conflicted with may have gone with it. `checks-failed` is the exception —
-rebasing would put the same failing matrix through again, and fixing the
-failure is a person's job, so the push that carries the fix is what clears it.
+rebasing would put the same failing matrix through again, and fixing the failure
+is a person's job, so the push that carries the fix is what clears it.
 `awaiting-bypass` is not tied to the base either: the bypass merge it waits for
-does not wait for the base, and rebasing it each time anything else merged
-would run the matrix again for nothing. Its comment's retry box is how a person
-asks for a run on the current `main`.
+does not wait for the base, and rebasing it each time anything else merged would
+run the matrix again for nothing. Its comment's retry box is how a person asks
+for a run on the current `main`. Nor is `head-out-of-sync`: `main` moving does
+not change GitHub having dropped a push. The push that clears it is one
+GitHub takes in, which changes the pull request's head.
 
 A `not-merging` pull request is also **picked last** from then on, after the
 version pull request, and this outlives the record. `main` moving clears the
@@ -1687,6 +1724,7 @@ the pull request the other's and nobody moved it (#2267).
 | `set-aside-comment.mts` | the prose of the set-aside comment                            |
 | `demotions.mts`         | how long one that sat green without merging goes last         |
 | `unread.mts`            | how many surveys an unread released one holds the queue       |
+| `out-of-sync.mts`       | when one whose push GitHub dropped is set aside               |
 | `options.mts`           | the command line                                              |
 | `types.mts`             | the shapes every module passes around                         |
 | `constants.mts`         | how long it waits, and how long before it gives up            |

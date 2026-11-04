@@ -55,6 +55,7 @@ export const SET_ASIDE_REASONS = [
   'arm-failed',
   'awaiting-bypass',
   'checks-failed',
+  'head-out-of-sync',
   'not-merging',
   'push-failed',
   'read-failed',
@@ -205,6 +206,12 @@ const setAsideOwner = (
       return {
         owner: 'human',
         why: 'green, and only a ruleset bypass merges it',
+      };
+
+    case 'head-out-of-sync':
+      return {
+        owner: 'human',
+        why: 'GitHub never took in the last push to its branch, so it still shows an older head; push to the branch again, or close and reopen it',
       };
 
     case 'not-merging':

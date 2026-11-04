@@ -27,6 +27,7 @@ import {
 } from './github.mjs';
 import { isSkipCiLabelled, wantsAutoRebase } from './labels.mjs';
 import type { Options } from './options.mjs';
+import { outOfSyncVerdict, pruneOutOfSync } from './out-of-sync.mjs';
 import {
   idleWaitSec,
   initialQuiet,
@@ -67,6 +68,7 @@ import type {
   Demotions,
   IssueOrder,
   LoopState,
+  OutOfSyncSighting,
   PullRequest,
   SkipRecord,
   SkipRecords,
@@ -137,7 +139,10 @@ import { watch } from './watch.mjs';
  *    candidate is tried in the same cycle. A branch that moved under the
  *    rebase is not one of those: someone else — the skill, or a person — is
  *    moving it, so nothing is recorded and the cycle surveys again rather
- *    than start a second matrix on the next candidate.
+ *    than start a second matrix on the next candidate — unless the branch
+ *    has sat at the same commit GitHub never took in for
+ *    `OUT_OF_SYNC_GRACE_MS`, when it is set aside as `head-out-of-sync` and
+ *    the next candidate is tried (`out-of-sync.mts`).
  *    When there is no candidate and nothing in flight, a pull request paused
  *    by `skip-ci` and labelled `auto-rebase` or `merge-queued` that is behind
  *    is rebased onto the tip instead, with its layers — under the label the
@@ -260,7 +265,8 @@ import { watch } from './watch.mjs';
  * - `github.mts` — everything that reads or writes GitHub or `git`, and
  *   nothing that decides. The API client, the runner and the quoting are
  *   `../lib/`'s (`src/lib/`).
- * - `labels.mts`, `skips.mts`, `demotions.mts`, `options.mts`, `types.mts`,
+ * - `labels.mts`, `skips.mts`, `demotions.mts`, `out-of-sync.mts`,
+ *   `options.mts`, `types.mts`,
  *   `constants.mts`, `util.mts` — the vocabulary.
  */
 export const unblockPrs = async (
@@ -298,6 +304,7 @@ export const unblockPrs = async (
     skipped: new Map<number, SkipRecord>(),
     unread: new Map<number, Readonly<{ headSha: string; surveys: number }>>(),
     demoted: new Map<number, string>(),
+    outOfSync: new Map<number, OutOfSyncSighting>(),
     tracked: new Set<number>(),
     baseSha: undefined,
     quiet: initialQuiet,
@@ -767,7 +774,15 @@ const runCycle = async (
   options: Options,
   autoFixConfig: AutoFixConfig | undefined,
 ): Promise<CycleResult> => {
-  const listed = await survey(api, defaultBranch);
+  // Set aside as out of sync, so not worth re-listing for while GitHub keeps
+  // its merge state unknown.
+  const outOfSyncHeads = new Map(
+    Array.from(before.skipped.values())
+      .filter(({ reason }) => reason === 'head-out-of-sync')
+      .map(({ number, headSha }) => [number, headSha] as const),
+  );
+
+  const listed = await survey(api, defaultBranch, outOfSyncHeads);
 
   if (Result.isErr(listed)) {
     log(`Survey failed: ${listed.value}`);
@@ -792,7 +807,7 @@ const runCycle = async (
     defaultBranch,
     options.dryRun,
   ))
-    ? await survey(api, defaultBranch)
+    ? await survey(api, defaultBranch, outOfSyncHeads)
     : listed;
 
   if (Result.isErr(surveyed)) {
@@ -823,6 +838,8 @@ const runCycle = async (
   );
 
   const demoted = pruneDemotions(before.demoted, pullRequests);
+
+  let mut_outOfSync = pruneOutOfSync(before.outOfSync, pullRequests);
 
   const triaged = await triage(api, pullRequests, {
     defaultBranch,
@@ -857,6 +874,7 @@ const runCycle = async (
       skipped: nextSkipped,
       unread: unread.streaks,
       demoted: nextDemoted,
+      outOfSync: mut_outOfSync,
       tracked: nextTracked,
       baseSha,
       quiet,
@@ -990,20 +1008,23 @@ const runCycle = async (
   }
 
   // Only when the queue has nothing to do: `main` is about to move again
-  // otherwise, and a push now would be undone by the next merge.
+  // otherwise, and a push now would be undone by the next merge. With no
+  // candidate, nothing below has anything to do either.
   if (Arr.isEmpty(triaged.candidates)) {
     const behind = await restackBehind(pullRequests, defaultBranch, {
       baseSha,
       skipped: mut_skipped,
+      outOfSync: mut_outOfSync,
       owners: triaged.owners,
       dryRun: options.dryRun,
+      nowEpochMs: currentEpochMs(),
     });
 
-    mut_skipped = behind.skipped;
-
-    if (behind.moved) {
-      return { state: state(mut_skipped), next: 'survey', settled: skipped };
-    }
+    return {
+      state: { ...state(behind.skipped), outOfSync: behind.outOfSync },
+      next: behind.moved ? 'survey' : options.dryRun ? 'stop' : 'idle',
+      settled: skipped,
+    };
   }
 
   if (options.dryRun) {
@@ -1070,14 +1091,44 @@ const runCycle = async (
     }
 
     if (advanced.value.kind === 'moved') {
-      // Someone else is moving this one — the skill, or a person. Whatever they
-      // pushed is likely to start a matrix, so rather than start a second on
-      // the next candidate, survey again and take what is there.
+      const { branchAt } = advanced.value;
+
+      if (branchAt === undefined) {
+        // Someone else is moving this one — the skill, or a person. Whatever
+        // they pushed is likely to start a matrix, so rather than start a
+        // second on the next candidate, survey again and take what is there.
+        log(
+          `#${target.number} moved while this run was moving it; leaving it to whoever pushed, and surveying again.`,
+        );
+
+        return { state: state(mut_skipped), next: 'survey', settled: skipped };
+      }
+
+      // Found elsewhere before anything was done: the same, unless GitHub
+      // dropped that push and goes on showing the old head. See
+      // `out-of-sync.mts`.
+      const verdict = outOfSyncVerdict(mut_outOfSync, target, branchAt, {
+        baseSha,
+        nowEpochMs: currentEpochMs(),
+      });
+
+      mut_outOfSync = verdict.seen;
+
+      if (verdict.setAside === undefined) {
+        log(
+          `#${target.number} moved while this run was moving it (${verdict.mismatch}); leaving it to whoever pushed, and surveying again.`,
+        );
+
+        return { state: state(mut_skipped), next: 'survey', settled: skipped };
+      }
+
       log(
-        `#${target.number} moved while this run was moving it; leaving it to whoever pushed, and surveying again.`,
+        `#${target.number}: ${verdict.setAside.detail}. Moving on to the next.`,
       );
 
-      return { state: state(mut_skipped), next: 'survey', settled: skipped };
+      mut_skipped = withSkip(mut_skipped, verdict.setAside);
+
+      continue;
     }
 
     if (advanced.value.kind === 'stale-merge-state') {
