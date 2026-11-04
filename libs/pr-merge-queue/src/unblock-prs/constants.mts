@@ -27,7 +27,7 @@ export const STALE_STATE_PAUSE_MS = 30_000;
  * this is what is left: auto-merge armed by someone who may not merge, or a
  * rule nothing here reads.
  */
-export const GREEN_POLLS_BEFORE_GIVING_UP = 3;
+export const GREEN_POLLS_BEFORE_GIVING_UP = 2;
 
 /**
  * The same, for a pull request GitHub still calls `BLOCKED` while every
@@ -35,13 +35,13 @@ export const GREEN_POLLS_BEFORE_GIVING_UP = 3;
  * the checks do not cover, but it is also what a check run that has just been
  * superseded looks like for a moment, so it is given longer.
  */
-export const BLOCKED_GREEN_POLLS_BEFORE_GIVING_UP = 8;
+export const BLOCKED_GREEN_POLLS_BEFORE_GIVING_UP = 5;
 
 /**
  * How many surveys in a row a released pull request may stay unread at the same
  * head before it is set aside as `read-failed` (`unread.mts`). Long enough that
  * GitHub failing for a few minutes holds the queue rather than setting anything
- * aside; each survey is seconds apart while the list is changing and
+ * aside; each survey is `--active-interval` apart while the list is changing and
  * `--idle-interval` apart once it is not.
  */
 export const UNREAD_SURVEYS_BEFORE_SETTING_ASIDE = 5;

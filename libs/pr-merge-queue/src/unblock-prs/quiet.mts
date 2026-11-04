@@ -1,7 +1,7 @@
 /**
  * How long the loop sleeps when there is nothing to do: briefly while the list
- * is still changing, so a pull request queued a moment ago is picked up in
- * seconds, and at the idle interval once it has sat still for a while.
+ * is still changing, so a pull request queued a moment ago is picked up within
+ * a minute, and at the idle interval once it has sat still for a while.
  */
 
 import { isRecord } from 'ts-data-forge';

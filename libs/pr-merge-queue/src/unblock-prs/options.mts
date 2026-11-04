@@ -37,10 +37,10 @@ export type Options = Readonly<{
 export const defaultOptions: Options = {
   once: false,
   dryRun: false,
-  activeIntervalSec: 30,
-  idleAfter: 10,
+  activeIntervalSec: 60,
+  idleAfter: 5,
   idleIntervalSec: 300,
-  pollIntervalSec: 30,
+  pollIntervalSec: 60,
   watchTimeoutMin: 90,
   autoFix: true,
   repo: undefined,
