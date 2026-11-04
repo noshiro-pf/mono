@@ -216,31 +216,34 @@ pull request waiting on nothing but a cycle member is drawn as a root.
 ## Filtering and sorting the merge order
 
 The merge order leads with the counts — open, queued, failing, set aside,
-awaiting code owner, pending — and **each count but `open` is a switch** for
-the pull requests it counts: clicking one hides them, whatever else they are,
-so switching off `queued` leaves what is still waiting for a review, switching
-off `pending` leaves out what carries the `pending` label an author puts on a
-pull request they are holding back, and one under none of the counts is
-always shown. Each also carries an **only** button
-in its corner: once any is picked, only a pull request under a picked count is
-shown, whatever else it is, so picking `failing` leaves what is failing,
-queued or not. A count switched off still hides what it counts, and a count is
-never both: picking one switches it back on, and switching one off unpicks it.
-A draft is not among them: it is always shown, and its badge says it is one.
+awaiting code owner, pending — and **each count but `open` is a switch** for the
+pull requests it counts: clicking one hides them, whatever else they are, so
+switching off `queued` leaves what is still waiting for a review, switching off
+`pending` leaves out what carries the `pending` label an author puts on a pull
+request they are holding back, and one under none of the counts is always shown.
+Each also carries an **only** button in its corner: once any is picked, only a
+pull request under a picked count is shown, whatever else it is, so picking
+`failing` leaves what is failing, queued or not. A count switched off still
+hides what it counts, and a count is never both: picking one switches it back
+on, and switching one off unpicks it.
+A draft is not among them: its badge says it is one, and its switch is below.
 Nor is being behind the base, which the card's ahead / behind bar shows.
 
 Below them, the `priority:high`, `priority:mid` and `priority:low` labels are
-switches too, with **none** for a pull request carrying no one of them (or
-more than one), and the order is either the merge order or **priority**.
-Sorted by priority, the pull requests at each level of the tree are ordered
-by the highest priority in them or anywhere below them, since landing a high
-one means landing what holds it up first; none sits between mid and low.
+switches too, with **none** for a pull request carrying no one of them (or more
+than one). Beside them, under **state** (a name dropped on a narrow screen),
+**draft** is one more switch: switched off, a draft is hidden whatever else it
+is, which leaves what nobody is still working on. The order is either the merge
+order or **priority**.
+Sorted by priority, the pull requests at each level of the tree are ordered by
+the highest priority in them or anywhere below them, since landing a high one
+means landing what holds it up first; none sits between mid and low.
 
-**Every number is what the list below shows**, and when the switches leave
-some out, how many there are in all follows it in small: `2 of 8` open,
-`1 of 3` queued. A count or a priority switched off reads how many switching
-it back on would show, struck through, rather than the nothing the list has
-of it.
+**Every number is what the list below shows**, and when the switches leave some
+out, how many there are in all follows it in small: `2 of 8` open, `1 of 3`
+queued. Anything switched off — a count, a priority or the drafts — reads how
+many turning it back on would show, struck through, rather than the nothing the
+list has of it.
 
 The counts and the switches below them **stay in view while the merge order
 scrolls under them**, with its title — under the toolbar when the header is
@@ -260,8 +263,8 @@ and two tabs can show two different ones. Only what differs from the default
 is written:
 
 - The merge order: `prs.hide=queued.setAside` (the statuses switched off),
-  `prs.only=failing` (the ones picked), `prs.hidePriority=low.none` and
-  `prs.sort=priority`.
+  `prs.only=failing` (the ones picked), `prs.hidePriority=low.none`,
+  `prs.hideDrafts=1` and `prs.sort=priority`.
 - The open issues: `issues=dag` (the DAG rather than the list), and
   `dag.zoom=125` or `dag.zoom=fit` for the DAG;
   `issues.hidePriority=hold.close`, `issues.onlyPriority=S.A`, and

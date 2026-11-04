@@ -91,6 +91,31 @@ describe(createMergeOrderStore, () => {
     });
   });
 
+  test('switches the drafts off and back on', () => {
+    const { store, setEntries } = setup();
+
+    setEntries([{ ...entry(1, []), isDraft: true }, entry(2, [])]);
+
+    store.toggleDrafts();
+
+    assert.deepStrictEqual(
+      store.roots.getSnapshot().value.map(({ number }) => number),
+      [2],
+    );
+
+    assert.deepStrictEqual(store.counts.getSnapshot().value.drafts, {
+      shown: 1,
+      total: 1,
+    });
+
+    store.toggleDrafts();
+
+    assert.deepStrictEqual(
+      store.roots.getSnapshot().value.map(({ number }) => number),
+      [1, 2],
+    );
+  });
+
   test('ignores what the view says of the queue where there is none, and keeps it', () => {
     const { store, setEntries, setQueue } = setup();
 
@@ -144,6 +169,7 @@ const STORED: MergeOrderView = {
   hiddenStatuses: ['queued', 'setAside'],
   onlyStatuses: [],
   hiddenPriorities: [],
+  hideDrafts: false,
   sort: 'order',
 } as const;
 
