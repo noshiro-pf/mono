@@ -1,5 +1,6 @@
 import { createState } from 'synstate';
 import { constant, derive, If, type JSX } from 'synstate-dom';
+import { Result } from 'ts-data-forge';
 import { dictionary } from '../constants/index.mjs';
 import { roomStore } from '../store/index.mjs';
 import { Button, Input, Spinner } from './bp/index.mjs';
@@ -19,6 +20,11 @@ export const CreateRoomPage = (): JSX.Element => {
   const onCreateRoomButtonClick = (): void => {
     roomStore.createRoom
       .dispatch({ username: getUsername(), password: getPassword() })
+      .then((result) => {
+        if (Result.isErr(result)) {
+          console.error(result.value);
+        }
+      })
       .catch(console.error);
   };
 
@@ -67,6 +73,14 @@ export const CreateRoomPage = (): JSX.Element => {
             </div>
           </Button>
         </div>
+        <If
+          cond={roomStore.createRoom.hasFailed}
+          then={
+            <div class={constant(styles.error)} role={constant('alert')}>
+              {constant(dc.failed)}
+            </div>
+          }
+        />
       </div>
     </div>
   );

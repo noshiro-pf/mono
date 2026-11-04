@@ -29,6 +29,7 @@ export const dictionary = {
       placeholder: 'algo master',
     },
     button: '部屋を作成',
+    failed: '部屋を作成できませんでした。もう一度お試しください。',
   },
 
   joinRoom: {
