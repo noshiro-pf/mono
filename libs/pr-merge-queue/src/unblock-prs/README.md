@@ -261,8 +261,12 @@ ruleset（最新の `main` の上で必須チェックが全部緑）が別に�
 #### 1. survey
 
 GraphQL で open な PR を新しい順に100件まで取得します（`body` を含む — 順序をそこから読
-むため）。`mergeStateStatus` が `UNKNOWN` の PR があれば10秒おきに最大6回引き
-直します。GitHub が計算中の状態を「up-to-date」と誤読しないためです。あわせて
+むため）。auto-merge が有効で `mergeStateStatus` が `UNKNOWN` の PR があれば
+10秒おきに最大6回引き直します。GitHub が計算中の状態を「up-to-date」と誤読しな
+いためです。ただしそのような PR があるときは `git ls-remote --heads origin` で
+ブランチの先端も1回で読み、ブランチが GitHub の表示する head と違い、前の
+survey でも同じ所にあった PR は待ちません。GitHub が push を取りこぼしており、
+待っても `UNKNOWN` のままだからです（下の「GitHub が push を取りこぼす」）。あわせて
 `origin/main` の SHA と、`main` に適用されている rule を取得します。rule から
 読むのは、必須の status check の一覧と、レビューへの2つの要件（code owner の承
 認、会話の解決）です。宣言ファイルではなく GitHub が実際に適用しているものを読
@@ -456,9 +460,18 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 り込むので、10分続く食い違いは書き込み中の誰かではありません。ブランチに誰も
 survey していないコミットが載っているので、このスクリプトはそこへ push しませ
 ん。解除は人の仕事で、ブランチに新しいコミットを push するか、PR を close し
-て reopen します。見送っている間は、その PR の `UNKNOWN` を待って survey を
-再取得することもしません。「3a」の積み直しで同じ食い違いを見つけた場合も同じ
-扱いで、survey に戻り続けることはありません。
+て reopen します。「3a」の積み直しで同じ食い違いを見つけた場合も同じ扱いで、
+survey に戻り続けることはありません。
+
+同じ食い違いは survey でも見つけます。auto-merge が有効で `UNKNOWN` の PR の
+ブランチが head と違えば、survey は食い違いを同じように覚え、`merge-queued` の
+PR なら10分続いたところで triage の前に見送ります。候補の順番で先頭に来なくて
+も見送られます。最初に見つけた survey はいつも通り待ちます。GitHub がまだ取り込
+んでいないだけの push も数秒はこう見え、その待ちがリリース済みの PR を進行中と
+読ませているからです。同じ食い違いを前の survey が覚えていれば、次からは待ちま
+せん。そのため、キューの後ろにいる PR が survey を毎回1分ずつ止め続けることはな
+く、再起動の直後に1回待つだけです。ラベルの無い PR は覚えるだけで、見送りも
+コメントもしません。
 
 #### 3a. 待っている PR を main に積み直す
 
@@ -1136,18 +1149,24 @@ exits immediately.
 
 #### 1. Survey
 
-GraphQL for the open pull requests, newest first and up to a hundred, `body` included — that is where the
-order is read from. While any of them reports `mergeStateStatus: UNKNOWN` the
-list is fetched again, up to six times at ten-second intervals, so a state
-GitHub is still computing is never read as up to date. The tip of
-`origin/main` is read too, and so are the rules GitHub applies to `main`: the
-contexts they require, and whether they require a code owner's approval and
-every conversation resolved. These are the rules GitHub enforces, not the ones
-declared under `repo-settings/`. The tip is read by its whole ref name
-(`refs/heads/main`): `git ls-remote origin main` matches on the tail of the
-name, so it lists `changeset-release/main` too, and first. Read as `main`, the
-version pull request's head ties each set-aside to a base that never moves,
-and nothing is tried again when `main` does.
+GraphQL for the open pull requests, newest first and up to a hundred, `body`
+included — that is where the order is read from. While any armed one reports
+`mergeStateStatus: UNKNOWN` the list is fetched again, up to six times at
+ten-second intervals, so a state
+GitHub is still computing is never read as up to date. When there is such a pull
+request, the branches' tips are read too, in one `git ls-remote --heads origin`,
+and one whose branch is not at the head GitHub shows, where an earlier survey
+found it too, is not waited on: GitHub dropped its push, and its state stays
+unknown however long the survey waits (see "GitHub sometimes drops a push"
+below). The tip of `origin/main` is read too, and so are the rules GitHub
+applies to `main`: the contexts they require, and whether they require a code
+owner's approval and every conversation resolved.
+These are the rules GitHub enforces, not the ones declared under
+`repo-settings/`. The tip is read by its whole ref name (`refs/heads/main`):
+`git ls-remote origin main` matches on the tail of the name, so it lists
+`changeset-release/main` too, and first. Read as `main`, the version pull
+request's head ties each set-aside to a base that never moves, and nothing is
+tried again when `main` does.
 
 #### 1a. Restack the layers GitHub moved
 
@@ -1352,9 +1371,19 @@ same cycle (`out-of-sync.mts`). GitHub takes a push in within seconds, so a
 mismatch that lasts 10 minutes is no writer at work. The script does not push to
 that branch, which holds commits nobody surveyed; clearing it is a person's, by
 pushing a new commit to the branch or closing and reopening the pull request.
-While it is set aside, its `UNKNOWN` merge state no longer makes a survey
-re-list. The same mismatch found by a rebase in 3a is read the same way, rather
-than sending the loop back to the survey on every turn.
+The same mismatch found by a rebase in 3a is read the same way, rather than
+sending the loop back to the survey on every turn.
+
+The survey finds the same mismatch too. When an armed `UNKNOWN` pull request's
+branch is not at its head, the survey remembers the mismatch the same way and,
+for one labelled `merge-queued`, sets it aside before triage once it has lasted
+10 minutes, without its first reaching the front of the candidate order. The
+first survey to find it still waits as ever: a push GitHub has yet to take in
+looks the same for a few seconds, and that wait is what keeps a released pull
+request read as in flight. Once an earlier survey has remembered the same
+mismatch, the survey no longer waits on it, so one far down the queue no longer
+holds every survey for a minute, and a restart costs one wait. One without the
+label is only remembered, never set aside or commented on.
 
 #### 3a. Keep waiting pull requests on the tip
 

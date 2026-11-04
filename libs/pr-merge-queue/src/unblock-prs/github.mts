@@ -44,7 +44,7 @@ import {
   type PullRequest,
   type ReviewStateAt,
 } from './types.mjs';
-import { headShaFromListing } from './util.mjs';
+import { branchTipsFromListing, headShaFromListing } from './util.mjs';
 
 /**
  * The credential and the repository every call here takes, and the branch the
@@ -217,6 +217,15 @@ export const remoteSha = async (
     ? Result.err(`origin has no branch named ${branch}`)
     : Result.ok(sha);
 };
+
+/**
+ * The tip of every branch on `origin`, by name, in one request: what a survey
+ * compares the heads GitHub shows with (`triage.mts`).
+ */
+export const remoteBranchTips = async (): Promise<
+  Result<ReadonlyMap<string, string>, string>
+> =>
+  Result.map(await git('git ls-remote --heads origin'), branchTipsFromListing);
 
 /**
  * What GitHub enforces on the branch, every ruleset that applies to it and a

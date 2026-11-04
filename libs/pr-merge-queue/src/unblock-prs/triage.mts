@@ -36,6 +36,7 @@ import {
   readBranchRules,
   readNativeStack,
   readReviewStates,
+  remoteBranchTips,
   remoteSha,
 } from './github.mjs';
 import { isSkipCiLabelled, priorityOf } from './labels.mjs';
@@ -46,6 +47,8 @@ import type {
   ChecksSummary,
   Classification,
   Demotions,
+  OutOfSync,
+  OutOfSyncSighting,
   PullRequest,
   Survey,
   Triage,
@@ -64,22 +67,24 @@ import {
 /**
  * Lists the open pull requests, re-listing a few times while GitHub is still
  * computing a merge state (`UNKNOWN`) for one that matters
- * ({@link awaitsMergeState}). `outOfSync` is pull request number → the head
- * it was set aside `head-out-of-sync` at.
+ * ({@link awaitsMergeState}). With them, the armed ones GitHub shows as
+ * `UNKNOWN` whose branch is somewhere else ({@link outOfSyncAtSurvey}), which
+ * the cycle records and sets aside once the mismatch has lasted
+ * (`out-of-sync.mts`). `seen` is what earlier surveys recorded.
  */
 export const survey = async (
   api: ApiContext,
   defaultBranch: string,
-  outOfSync: ReadonlyMap<number, string> = new Map<number, string>(),
+  seen: OutOfSync = new Map<number, OutOfSyncSighting>(),
 ): Promise<Result<Survey, string>> => {
   let mut_attempt = 0;
 
-  let mut_listed = await listPullRequests(api);
+  let mut_listed = await listWithBranches(api);
 
   while (
     Result.isOk(mut_listed) &&
     mut_attempt < UNKNOWN_STATE_RETRIES &&
-    mut_listed.value.some((pr) => awaitsMergeState(pr, outOfSync)) &&
+    awaitsAny(mut_listed.value, seen) &&
     !stopRequested()
   ) {
     mut_attempt += 1;
@@ -90,7 +95,7 @@ export const survey = async (
 
     await pause(UNKNOWN_STATE_RETRY_MS);
 
-    mut_listed = await listPullRequests(api);
+    mut_listed = await listWithBranches(api);
   }
 
   if (Result.isErr(mut_listed)) {
@@ -106,7 +111,11 @@ export const survey = async (
   const rules = await readRules(api, defaultBranch);
 
   return Result.ok({
-    pullRequests: mut_listed.value,
+    pullRequests: mut_listed.value.pullRequests,
+    outOfSync: outOfSyncAtSurvey(
+      mut_listed.value.pullRequests,
+      mut_listed.value.branchTips,
+    ),
     baseSha: baseSha.value,
     requiredContexts: rules.requiredContexts,
     reviewRequirements: {
@@ -118,18 +127,54 @@ export const survey = async (
 
 /**
  * Whether a survey re-lists for `pr`: armed, so its merge state is what decides
- * whether it merges, and `UNKNOWN`. Not one set aside as `head-out-of-sync` at
- * the head GitHub reports: GitHub dropped its branch's last push, its state
- * stays unknown for as long as that lasts, and re-listing would only delay
- * every survey until a person pushes.
+ * whether it merges, and `UNKNOWN` — unless its branch (`branchAt`, `undefined`
+ * when unread) is not at the head GitHub shows, and an earlier survey found it
+ * at the same place (`seen`). Then GitHub dropped the branch's last push, its
+ * state stays unknown for as long as that lasts, and re-listing would only
+ * delay every survey until a person pushes, whether or not it has been set
+ * aside yet and wherever it stands in the queue.
+ *
+ * The first survey to find a mismatch still waits: a push GitHub has yet to
+ * take in looks the same for a few seconds, and that wait is what keeps a
+ * released pull request from being read as anything but in flight.
  */
 export const awaitsMergeState = (
   pr: PullRequest,
-  outOfSync: ReadonlyMap<number, string>,
-): boolean =>
-  pr.mergeStateStatus === 'UNKNOWN' &&
-  isRecord(pr.autoMergeRequest) &&
-  outOfSync.get(pr.number) !== pr.headRefOid;
+  branchAt: string | undefined,
+  seen: OutOfSync,
+): boolean => {
+  const sighting = seen.get(pr.number);
+
+  return (
+    isArmedUnknown(pr) &&
+    (branchAt === undefined ||
+      branchAt === pr.headRefOid ||
+      sighting?.headSha !== pr.headRefOid ||
+      sighting.branchSha !== branchAt)
+  );
+};
+
+/**
+ * The armed pull requests GitHub shows as `UNKNOWN` whose branch is not at the
+ * head GitHub shows, with where it is instead.
+ */
+export const outOfSyncAtSurvey = (
+  pullRequests: readonly PullRequest[],
+  branchTips: ReadonlyMap<string, string>,
+): Survey['outOfSync'] =>
+  Arr.generate(function* () {
+    for (const pr of pullRequests) {
+      const branchAt = branchTipOf(pr, branchTips);
+
+      if (
+        branchAt !== undefined &&
+        branchAt !== pr.headRefOid &&
+        isArmedUnknown(pr)
+      ) {
+        yield { pr, branchAt } as const;
+      }
+    }
+  });
 
 export const triage = async (
   api: ApiContext,
@@ -836,3 +881,64 @@ type ReviewRead = Readonly<{ head: string; hold: ReviewHold | undefined }>;
  */
 const isConflicting = (pr: PullRequest): boolean =>
   pr.mergeStateStatus === 'DIRTY';
+
+/** What one listing of a survey read. */
+type Listing = Readonly<{
+  pullRequests: readonly PullRequest[];
+  branchTips: ReadonlyMap<string, string>;
+}>;
+
+/**
+ * Where `pr`'s branch is on `origin`, or `undefined` when it cannot be said: a
+ * fork's branch is not on `origin`, and one of the same name there is another.
+ */
+const branchTipOf = (
+  pr: PullRequest,
+  branchTips: ReadonlyMap<string, string>,
+): string | undefined =>
+  pr.isCrossRepository ? undefined : branchTips.get(pr.headRefName);
+
+/** Whether a survey re-lists for anything in `listing`. */
+const awaitsAny = (listing: Listing, seen: OutOfSync): boolean =>
+  listing.pullRequests.some((pr) =>
+    awaitsMergeState(pr, branchTipOf(pr, listing.branchTips), seen),
+  );
+
+const isArmedUnknown = (pr: PullRequest): boolean =>
+  pr.mergeStateStatus === 'UNKNOWN' && isRecord(pr.autoMergeRequest);
+
+/**
+ * The open pull requests, and — only when one is armed and `UNKNOWN`, since
+ * nothing else needs them — the tips of `origin`'s branches. A listing of the
+ * branches that fails reads none, so every such pull request is waited on, as
+ * before the branches were read.
+ */
+const listWithBranches = async (
+  api: ApiContext,
+): Promise<Result<Listing, string>> => {
+  const listed = await listPullRequests(api);
+
+  if (Result.isErr(listed)) {
+    return listed;
+  }
+
+  if (!listed.value.some(isArmedUnknown)) {
+    return Result.ok({
+      pullRequests: listed.value,
+      branchTips: new Map<string, string>(),
+    });
+  }
+
+  const tips = await remoteBranchTips();
+
+  if (Result.isErr(tips)) {
+    log(
+      `Cannot list the branches to compare with an UNKNOWN pull request's head; waiting on its merge state. (${lastLines(tips.value, 2)})`,
+    );
+  }
+
+  return Result.ok({
+    pullRequests: listed.value,
+    branchTips: Result.isOk(tips) ? tips.value : new Map<string, string>(),
+  });
+};

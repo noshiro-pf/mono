@@ -22,11 +22,15 @@
 import { Arr } from 'ts-data-forge';
 import { isoSeconds } from '../lib/index.mjs';
 import { OUT_OF_SYNC_GRACE_MS } from './constants.mjs';
+import { isMergeQueued } from './labels.mjs';
+import { withSkip } from './skips.mjs';
 import type {
   OutOfSync,
   OutOfSyncSighting,
   PullRequest,
   SkipRecord,
+  SkipRecords,
+  Survey,
 } from './types.mjs';
 
 /**
@@ -71,6 +75,64 @@ export const outOfSyncVerdict = (
       : undefined,
   };
 };
+
+/**
+ * {@link outOfSyncVerdict} for each pull request a survey found armed and
+ * `UNKNOWN` with its branch elsewhere (`Survey['outOfSync']`). The sighting is
+ * what lets the next survey stop waiting on it (`awaitsMergeState`), and one
+ * labelled `merge-queued` is set aside once the mismatch has lasted, as much
+ * far down the queue as the next candidate is. One without the label is not
+ * this script's to set aside or log, so it is only recorded. One already set
+ * aside as `head-out-of-sync` at that head is left alone: there is nothing more
+ * to observe. `notes` is what to log, one line each.
+ */
+export const observeAtSurvey = (
+  seen: OutOfSync,
+  skipped: SkipRecords,
+  found: Survey['outOfSync'],
+  at: Readonly<{ baseSha: string; nowEpochMs: number }>,
+): Readonly<{
+  seen: OutOfSync;
+  skipped: SkipRecords;
+  notes: readonly string[];
+}> =>
+  found.reduce<
+    Readonly<{
+      seen: OutOfSync;
+      skipped: SkipRecords;
+      notes: readonly string[];
+    }>
+  >(
+    (acc, { pr, branchAt }) => {
+      const standing = acc.skipped.get(pr.number);
+
+      if (
+        standing?.reason === 'head-out-of-sync' &&
+        standing.headSha === pr.headRefOid
+      ) {
+        return acc;
+      }
+
+      const verdict = outOfSyncVerdict(acc.seen, pr, branchAt, at);
+
+      if (!isMergeQueued(pr)) {
+        return { ...acc, seen: verdict.seen };
+      }
+
+      return {
+        seen: verdict.seen,
+        skipped:
+          verdict.setAside === undefined
+            ? acc.skipped
+            : withSkip(acc.skipped, verdict.setAside),
+        notes: Arr.toPushed(
+          acc.notes,
+          `#${pr.number}: ${verdict.setAside?.detail ?? verdict.mismatch}`,
+        ),
+      };
+    },
+    { seen, skipped, notes: [] },
+  );
 
 /**
  * Records that `sighting.number`'s branch was found at `branchSha` while GitHub

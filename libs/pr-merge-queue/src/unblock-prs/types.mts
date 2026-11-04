@@ -135,6 +135,11 @@ export type ReviewStateAt = ReviewState & Readonly<{ head: string }>;
 
 export type Survey = Readonly<{
   pullRequests: readonly PullRequest[];
+  /**
+   * The armed pull requests GitHub shows as `UNKNOWN` whose branch is not at
+   * the head GitHub shows, and where it is instead (`out-of-sync.mts`).
+   */
+  outOfSync: readonly Readonly<{ pr: PullRequest; branchAt: string }>[];
   /** The tip of the default branch at the time of the survey. */
   baseSha: string;
   /** The contexts the ruleset requires, empty when they cannot be read. */

@@ -5,6 +5,7 @@
  */
 
 import { setTimeout as sleep } from 'node:timers/promises';
+import { Arr } from 'ts-data-forge';
 import { log } from '../lib/index.mjs';
 
 /**
@@ -43,11 +44,26 @@ export const stopRequested = (): boolean => stopController.signal.aborted;
 export const headShaFromListing = (
   listing: string,
   branch: string,
-): string | undefined =>
-  listing
-    .split('\n')
-    .map((line) => line.trim().split(/\s+/u))
-    .find(([, ref]) => ref === `refs/heads/${branch}`)?.[0];
+): string | undefined => branchTipsFromListing(listing).get(branch);
+
+/**
+ * Each branch `git ls-remote` lists, by its name without `refs/heads/`, mapped to
+ * its tip. Anything that is not a branch is left out.
+ */
+export const branchTipsFromListing = (
+  listing: string,
+): ReadonlyMap<string, string> =>
+  new Map(
+    Arr.generate(function* () {
+      for (const line of listing.split('\n')) {
+        const [sha, ref] = line.trim().split(/\s+/u, 2);
+
+        if (sha !== undefined && ref?.startsWith('refs/heads/') === true) {
+          yield [ref.slice('refs/heads/'.length), sha] as const;
+        }
+      }
+    }),
+  );
 
 export const lastLines = (text: string, count: number): string =>
   text.trim().split('\n').slice(-count).join('\n');

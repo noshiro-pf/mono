@@ -4,9 +4,10 @@ import {
   bypassOfRead,
   describeAction,
   orderCandidates,
+  outOfSyncAtSurvey,
   priorityPhrase,
 } from './triage.mjs';
-import type { PullRequest } from './types.mjs';
+import type { OutOfSync, OutOfSyncSighting, PullRequest } from './types.mjs';
 
 describe(orderCandidates, () => {
   // The ranks themselves are `pr-report-core`'s; what this run demoted is what
@@ -151,33 +152,87 @@ describe(describeAction, () => {
 describe(awaitsMergeState, () => {
   const unknown = pullRequest({ number: 7, mergeStateStatus: 'UNKNOWN' });
 
+  const elsewhere = 'e'.repeat(40);
+
+  const none: OutOfSync = new Map<number, OutOfSyncSighting>();
+
+  const sighted = (branchSha: string): OutOfSync =>
+    new Map<number, OutOfSyncSighting>([
+      [7, { headSha: unknown.headRefOid, branchSha, sinceEpochMs: 0 }],
+    ]);
+
   test('waits for an armed pull request GitHub is still computing', () => {
-    assert.isTrue(awaitsMergeState(unknown, new Map<number, string>()));
+    assert.isTrue(awaitsMergeState(unknown, unknown.headRefOid, none));
+  });
+
+  // No listing of the branches says nothing against the merge state: wait, as
+  // before anything compared them.
+  test('waits for one whose branch was not read', () => {
+    assert.isTrue(awaitsMergeState(unknown, undefined, sighted(elsewhere)));
   });
 
   test('does not wait for one with nothing armed', () => {
     assert.isFalse(
       awaitsMergeState(
         { ...unknown, autoMergeRequest: null },
-        new Map<number, string>(),
+        unknown.headRefOid,
+        none,
       ),
     );
+  });
+
+  // A push GitHub has yet to take in looks like this for a few seconds, and
+  // that wait is what keeps a released pull request read as in flight.
+  test('waits for one whose branch is elsewhere when no survey has seen it', () => {
+    assert.isTrue(awaitsMergeState(unknown, elsewhere, none));
   });
 
   // GitHub never took in its branch's last push, so its state stays unknown for
-  // as long as that lasts, and every survey would re-list for nothing.
-  test('does not wait for one set aside as out of sync at that head', () => {
-    assert.isFalse(
-      awaitsMergeState(
-        unknown,
-        new Map<number, string>([[7, unknown.headRefOid]]),
-      ),
-    );
+  // as long as that lasts, and every survey would re-list for nothing — whether
+  // or not this run has set it aside yet, and whatever its place in the queue.
+  test('does not wait for one an earlier survey found at the same place', () => {
+    assert.isFalse(awaitsMergeState(unknown, elsewhere, sighted(elsewhere)));
   });
 
-  test('waits again once GitHub reports another head', () => {
+  test('waits again once its branch has moved since', () => {
     assert.isTrue(
-      awaitsMergeState(unknown, new Map<number, string>([[7, 'b'.repeat(40)]])),
+      awaitsMergeState(unknown, 'f'.repeat(40), sighted(elsewhere)),
+    );
+  });
+});
+
+describe(outOfSyncAtSurvey, () => {
+  const head = 'a'.repeat(40);
+
+  const elsewhere = 'e'.repeat(40);
+
+  const branches = new Map<string, string>([
+    ['feature/1', elsewhere],
+    ['feature/2', head],
+    ['feature/3', elsewhere],
+    ['feature/4', elsewhere],
+    ['feature/5', elsewhere],
+  ]);
+
+  test('names the armed UNKNOWN pull requests whose branch is elsewhere', () => {
+    assert.deepStrictEqual(
+      outOfSyncAtSurvey(
+        [
+          unknownPullRequest({ number: 1 }),
+          // At the head GitHub shows: still computing.
+          unknownPullRequest({ number: 2 }),
+          // Nothing armed: no survey waits on it.
+          unknownPullRequest({ number: 3, autoMergeRequest: null }),
+          // A state GitHub has computed.
+          pullRequest({ number: 4 }),
+          // A fork's branch is not on origin, so a same-named one says nothing.
+          unknownPullRequest({ number: 5, isCrossRepository: true }),
+          // No branch of that name: nothing to compare.
+          unknownPullRequest({ number: 6 }),
+        ],
+        branches,
+      ).map(({ pr, branchAt }) => [pr.number, branchAt]),
+      [[1, elsewhere]],
     );
   });
 });
@@ -289,3 +344,7 @@ const pullRequest = (
     labels: [queued],
     ...fields,
   }) as const;
+
+const unknownPullRequest = (
+  fields: Partial<PullRequest> & Readonly<{ number: number }>,
+): PullRequest => pullRequest({ mergeStateStatus: 'UNKNOWN', ...fields });
