@@ -7,5 +7,8 @@ export default definePlaywrightAppConfig({
   packageRoot: workspaceRootPath,
   // The suite of the React app, run against this one: the two draw the same
   // pages, and one suite is what keeps them so.
-  testDir: path.resolve(workspaceRootPath, '../synstate-router-sample-app/e2e'),
+  testDir: path.resolve(
+    workspaceRootPath,
+    '../synstate-router-react-sample-app/e2e',
+  ),
 });

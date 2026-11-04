@@ -193,7 +193,7 @@ assert.strictEqual(
 );
 ```
 
-レイアウトは入れ子にできます。`<Routes prefix cases={...}>` はページがどのトップレベルのノードの下にあるかで分岐し、`<Routes under={routes.products} cases={...}>` はその枝のページだけを要求します。`cases` のオブジェクトは、コンポーネントの外で（アプリケーションではモジュールのトップレベルで）一度だけ書いてください。React の lint 規則は描画中に作ったオブジェクトや関数を props に渡すことを拒否しますし、そうすれば `Routes` は毎回同じオブジェクトを受け取ります。[サンプルアプリ](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-router-sample-app)は、レイアウト・検索パラメータ・リダイレクトをこの書き方で示しています。
+レイアウトは入れ子にできます。`<Routes prefix cases={...}>` はページがどのトップレベルのノードの下にあるかで分岐し、`<Routes under={routes.products} cases={...}>` はその枝のページだけを要求します。`cases` のオブジェクトは、コンポーネントの外で（アプリケーションではモジュールのトップレベルで）一度だけ書いてください。React の lint 規則は描画中に作ったオブジェクトや関数を props に渡すことを拒否しますし、そうすれば `Routes` は毎回同じオブジェクトを受け取ります。[サンプルアプリ](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-router-react-sample-app)は、レイアウト・検索パラメータ・リダイレクトをこの書き方で示しています。
 
 ## synstate-dom
 
@@ -286,7 +286,7 @@ unmount();
 
 ## データ取得
 
-synstate-router は loader を持ちません。ページのデータはルーターに従う SynState のグラフです。`router.at(node)` は、ページがそのノード以下にある間はノードの値の `Optional.some` を、それ以外では `Optional.none` を持ちます。`switchMap` と `fromAbortablePromise` で値ごとにデータを取得します。`switchMap` はグラフを組んだ時点で元の Observable が持っている id も射影するので、アプリケーションが最初に開いたページのリクエストは、購読があるかどうかにかかわらずその時点で始まります。その後は新しい id のたびに、置き換えられたリクエストを中断します。[サンプルアプリ](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-router-sample-app/src/store)は、グラフを store のモジュールの最上位で組み、ページを離れたことを idle の値に写すので、リクエストは中断されその結果は捨てられます。コンポーネントは store を読んで dispatch するだけで、自分では何も取得しません。
+synstate-router は loader を持ちません。ページのデータはルーターに従う SynState のグラフです。`router.at(node)` は、ページがそのノード以下にある間はノードの値の `Optional.some` を、それ以外では `Optional.none` を持ちます。`switchMap` と `fromAbortablePromise` で値ごとにデータを取得します。`switchMap` はグラフを組んだ時点で元の Observable が持っている id も射影するので、アプリケーションが最初に開いたページのリクエストは、購読があるかどうかにかかわらずその時点で始まります。その後は新しい id のたびに、置き換えられたリクエストを中断します。[サンプルアプリ](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-router-react-sample-app/src/store)は、グラフを store のモジュールの最上位で組み、ページを離れたことを idle の値に写すので、リクエストは中断されその結果は捨てられます。コンポーネントは store を読んで dispatch するだけで、自分では何も取得しません。
 
 ```tsx
 const routes = defineRoutes({

@@ -1,4 +1,4 @@
-# synstate-router-sample-app
+# synstate-router-react-sample-app
 
 ## 0.0.1
 
