@@ -67,7 +67,10 @@ import type {
  * `MapType`, `SetType` — is an error, and so is a type without a `structure`
  * (one written by hand rather than built by this package). As a union member it
  * is left out instead, since a JSON value is never of it:
- * `nullable(t.string())` is a string.
+ * `nullable(t.string())` is a string. Only a member no JSON value is of is left
+ * out; one with such a part that may be left out (an optional property, the
+ * elements of an array that may be empty) or an example that is not JSON is an
+ * error, as it is outside a union.
  *
  * @example
  * ```ts
@@ -142,7 +145,8 @@ export type JsonSchemaConversionError = Readonly<{
   /**
    * - `'not-json'` — no JSON value is of the type (`bigint`, `symbol`,
    *   `undefinedType`, `MapType`, `SetType`, or a literal or enum value of
-   *   those).
+   *   those), or of any member of a union (one may be a record, tuple or
+   *   non-empty array that requires such a type).
    * - `'opaque'` — the type has no `structure` to read.
    * - `'unsatisfiable'` — the type accepts no value that the schema could
    *   state (a `multipleOf` of 0).
@@ -672,6 +676,92 @@ const discriminatorOf = (
   });
 };
 
+type Resolve = StructureOf<'recursion'>['resolve'];
+
+/**
+ * Whether no JSON value is of `type`, by its structure: one of the kinds with
+ * no JSON value, a literal or enum of none, a union of only such members, an
+ * intersection, refinement, brand or recursion of one, or a record, tuple or
+ * non-empty array that requires a value of one. A part that may be left out (an
+ * optional property, the elements of an array that may be empty) leaves JSON
+ * values of the type. A recursion met again while deciding is taken to have
+ * none, so that one with no other way out is found to have none.
+ */
+const hasNoJsonValue = (
+  type: UnknownType,
+  visiting: ReadonlySet<Resolve> = new Set<Resolve>(),
+): boolean => {
+  const { structure } = type;
+
+  switch (structure?.kind) {
+    case 'bigint':
+    case 'symbol':
+    case 'undefined':
+    case 'map':
+    case 'set':
+      return true;
+
+    case 'literal':
+      return !isJsonPrimitive(structure.value);
+
+    case 'enum':
+      return !structure.values.some(isJsonPrimitive);
+
+    case 'union':
+      return structure.memberTypes.every((member) =>
+        hasNoJsonValue(member, visiting),
+      );
+
+    case 'intersection':
+      return structure.memberTypes.some((member) =>
+        hasNoJsonValue(member, visiting),
+      );
+
+    case 'refine':
+    case 'brand':
+      return hasNoJsonValue(structure.baseType, visiting);
+
+    case 'recursion': {
+      if (visiting.has(structure.resolve)) {
+        return true;
+      }
+
+      return hasNoJsonValue(
+        structure.resolve(),
+        new Set<Resolve>([...visiting, structure.resolve]),
+      );
+    }
+
+    case 'record':
+      return Object.values(structure.shape).some(
+        (property) =>
+          property.optional !== true && hasNoJsonValue(property, visiting),
+      );
+
+    case 'tuple':
+      return structure.elementTypes.some((element) =>
+        hasNoJsonValue(element, visiting),
+      );
+
+    case 'array':
+      return (
+        (structure.minLength ?? 0) > 0 &&
+        hasNoJsonValue(structure.elementType, visiting)
+      );
+
+    case undefined:
+    case 'string':
+    case 'number':
+    case 'boolean':
+    case 'null':
+    case 'unknown':
+    case 'templateLiteral':
+    case 'integerRange':
+    case 'keyValueRecord':
+      return false;
+  }
+};
+
 const unionSchema = (
   type: UnknownType,
   structure: StructureOf<'union'>,
@@ -680,57 +770,49 @@ const unionSchema = (
 ): ConversionResult => {
   // A union nested directly in this one contributes its members, as it does for
   // validation.
-  const members = flattenUnionMembers(structure.memberTypes);
-
-  const converted = members.map((member) => ({
-    member,
-    result: convert(member, defs, path),
-  }));
-
+  //
   // A member no JSON value can be of never matches a JSON value, so it adds
-  // nothing to the union's schema — unless it is all the union has.
-  const representable = converted.filter(
-    ({ result }) =>
-      Result.isOk(result) ||
-      result.value.some(({ kind }) => kind !== 'not-json'),
+  // nothing to the union's schema — unless it is all the union has. Its
+  // structure says so (`hasNoJsonValue`), not an error converting it: a member
+  // with such a part that may be left out (`{}` of a record whose `bigint`
+  // property is optional, `[]` of an array of `bigint`) or with an example that
+  // is not JSON has JSON values, and is an error here as it is outside a union.
+  const members = flattenUnionMembers(structure.memberTypes).filter(
+    (member) => !hasNoJsonValue(member),
   );
 
-  if (!Arr.isNonEmpty(representable)) {
+  if (!Arr.isNonEmpty(members)) {
     return failure(
       'not-json',
       type,
       path,
-      'no member of the union is of a JSON kind',
+      'no JSON value is of any member of the union',
     );
   }
 
-  const keyword = discriminatorOf(representable.map(({ member }) => member));
+  if (Arr.isFixedLengthTuple(1, members)) {
+    return convert(members[0], defs, path);
+  }
+
+  const keyword = discriminatorOf(members);
 
   return collect(
-    representable.map(({ result }, i) =>
-      // Re-pointed: the members were converted before their index was known.
-      Result.mapErr(result, (errors) =>
-        errors.map((error) => ({
-          ...error,
-          schemaPath: toPointer([
-            ...path,
-            keyword === undefined ? 'anyOf' : 'oneOf',
-            i.toString(),
-          ]),
-        })),
-      ),
+    members.map((member, i) =>
+      convert(member, defs, [
+        ...path,
+        keyword === undefined ? 'anyOf' : 'oneOf',
+        i.toString(),
+      ]),
     ),
-    (schemas) =>
-      Arr.isFixedLengthTuple(1, schemas)
-        ? schemas[0]
-        : keyword === undefined
-          ? { anyOf: schemas }
-          : {
-              // Every member is a record here.
-              type: 'object',
-              oneOf: schemas,
-              discriminator: { propertyName: keyword },
-            },
+    (schemas): JsonSchema =>
+      keyword === undefined
+        ? { anyOf: schemas }
+        : {
+            // Every member is a record here.
+            type: 'object',
+            oneOf: schemas,
+            discriminator: { propertyName: keyword },
+          },
   );
 };
 
