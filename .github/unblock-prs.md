@@ -26,11 +26,13 @@ want of `actions: write`, say so, release the claim and leave it.
 ## Reproducing a check
 
 **The check name is the command.** `style-check (X)` and `code-check (X)` both
-run `pnpm run X` at the repository root, so `code-check (fix:codemod:full)`
-reproduces as `pnpm run fix:codemod:full`. A bundle (`z:ci:code-check:*`,
-`z:ci:style-check:*`) runs its parts with `run-s --continue-on-error`; when a
-part fails, its log names it, and that part is the command to rerun. When only
-the clean-tree step fails, rerun the whole bundle:
+run `pnpm run X` at the repository root, so `code-check (fix:codemod:affected)`
+reproduces as `pnpm run fix:codemod:affected`, which diffs against the merge
+base with `origin/main` where CI diffs against the pull request's base. A bundle
+(`z:ci:code-check:*`, `z:ci:style-check:*`) runs its parts with
+`run-s --continue-on-error`; when a part fails, its log names it, and that part
+is the command to rerun. When only the clean-tree step fails, rerun the whole
+bundle:
 `z:ci:style-check:checks-and-generators` rewrites through markdownlint, oxfmt
 and three generators, and `z:ci:style-check:format-and-doc` through Prettier.
 Five checks do not follow that rule:
@@ -64,7 +66,7 @@ stop and ask.
 - Every job ends with `z:assert-repo-is-clean`. So
   `z:ci:style-check:checks-and-generators` (its markdownlint, oxfmt, generators
   and `ws:gen`), `z:ci:style-check:format-and-doc` (Prettier and `ws:doc`),
-  `fix:codemod:full` and the `ws:fix:lint` halves fail by _changing_ files.
+  `fix:codemod:affected` and the `ws:fix:lint` halves fail by _changing_ files.
 - `code-check` and `node-version-compatibility` jobs gate on
   `z:check-should-run:code-checks`, and `style-check` jobs on
   `z:check-should-run:style-checks`; both diff against `origin/main`. A job

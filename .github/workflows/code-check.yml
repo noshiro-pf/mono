@@ -72,6 +72,11 @@ jobs:
     permissions:
       contents: read
     timeout-minutes: 25
+    # What `fix:codemod:affected` diffs against: the pull request's base, the
+    # commit before the push on `main`, and nothing on a manual run, which
+    # runs it in full.
+    env:
+      CODEMOD_DIFF_BASE: ${{ case(github.event_name == 'pull_request', github.event.pull_request.base.sha, github.event_name == 'push', github.event.before, '') }}
 
     strategy:
       fail-fast: false
@@ -95,7 +100,8 @@ jobs:
         # Each entry says what it needs beside its command: `build`, the
         # script that builds what it reads; `browser`, Playwright's headless
         # Chromium; `java`, the Firebase emulators' runtime; `coverage`, that
-        # it uploads coverage reports.
+        # it uploads coverage reports; `diff-base`, the commit
+        # `CODEMOD_DIFF_BASE` names, fetched.
         include:
           # `ws:fix:lint` in two halves, `apps/` and the rest, each with
           # `--no-sort`: pnpm's topological order kept one package in flight
@@ -107,8 +113,15 @@ jobs:
           - command: ws:fix:lint:non-apps
             build: ws:build:deps
 
-          - command: fix:codemod:full
+          # The codemod over the files that differ from the base, and over
+          # everything only when what decides its output changed: the
+          # transformers are syntactic and work one file at a time, so a file
+          # the change did not touch was normalized on the base already
+          # (`tools/scripts/cmd/codemod-affected.mts`). In full it is about
+          # 165 seconds of a 260-second job.
+          - command: fix:codemod:affected
             build: ws:build:deps
+            diff-base: true
 
           # The root guards, about 175 seconds.
           - command: check:root
@@ -218,6 +231,12 @@ jobs:
 
       - name: Build what "${{ matrix.command }}" reads
         run: pnpm run ${{ matrix.build }}
+
+      # The checkout is one commit deep, and `git diff` needs the base too.
+      # Empty on a manual run, which asks for everything.
+      - name: Fetch the base the codemod diffs against
+        if: matrix.diff-base && env.CODEMOD_DIFF_BASE != ''
+        run: git fetch --no-tags --depth=1 origin "${CODEMOD_DIFF_BASE}"
 
       # The browser tests used to be wrapped in a two-attempt retry, because
       # one file at a time would fail to load. The cause was Vite optimizing a
