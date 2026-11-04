@@ -265,17 +265,26 @@ const narrow = 0.75;
 const diffZoom = 0.67;
 
 /**
- * The diff beside the conversation alone, the diff held at 737px. The PR
- * Manager's `diffBesideConversation` says why.
+ * The width the diff is held at, in either layout. The PR Manager's `diffWidth`
+ * (`apps/pr-manager/src/split-view.mts`) says why.
  */
-const diffBesideConversation = 'r737fpp';
+const diffWidth = 737;
+
+/**
+ * The width the conversation is held at in three columns. The PR Manager's
+ * `conversationWidth` says why.
+ */
+const conversationWidth = 577;
+
+/** The diff beside the conversation alone, the diff held at `diffWidth`. */
+const diffBesideConversation = `r${diffWidth}fpp` as const;
 
 /**
  * The diff, the conversation and the right column, the diff and the
- * conversation held at fixed widths. The PR Manager's `threeColumns`
- * (`apps/pr-manager/src/split-view.mts`) says why those.
+ * conversation held at fixed widths.
  */
-const threeColumns = 'r554fpr577fpp';
+const threeColumns = `r${diffWidth}fpr${conversationWidth}fpp` as const;
 
 /** `threeColumns`, with the right column stacked in two. */
-const threeColumnsStacked = 'r554fpr577fpcpp';
+const threeColumnsStacked =
+  `r${diffWidth}fpr${conversationWidth}fpcpp` as const;

@@ -177,7 +177,7 @@ Manager](../pr-manager/docs/design.md#opening-a-pull-request-in-a-split-view)'s
 links do: the diff, without whitespace changes or the files already marked
 viewed, at 737px and 67% — which keeps GitHub's file tree beside it — and the
 conversation in the rest of the page. When the pull request closes an issue, or
-names the Claude Code session it was written in, the diff is held at 554px,
+names the Claude Code session it was written in, the diff is held at 737px,
 still at 67%, the conversation at 577px — the widest its description gets with
 the reviewers and the labels below it rather than beside it — and the rest goes
 to the issue or the session, to the right of the conversation; with both, the

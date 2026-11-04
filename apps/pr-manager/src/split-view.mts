@@ -114,35 +114,44 @@ const workspaceName = 'PR Manager';
 const diffQuery = 'w=1&show-viewed-files=false';
 
 /**
- * The diff beside the conversation alone: the diff held at 737px and the rest
- * to the conversation, whose description is what a pull request is reviewed in
- * now more than its diff.
+ * The width the diff is held at, in either layout.
  *
  * 737px was measured as the narrowest the diff is at with GitHub's file tree
  * beside it at the diff's 100%, on the pane's `<section>`, in the split view's
  * own pixels, which are what a layout spec holds a pane at, so the zoom of the
  * split view's tab does not change it. The tree has since been seen folded
  * there all the same, so the diff is at `diffZoom` rather than 100%.
+ *
+ * It is the same in three columns, not scaled down by the diff's zoom: a
+ * smaller zoom did not make up for a narrower pane. At 554px and 67%, about
+ * 824px inside the pane, the tree was folded; at 737px and 67% it stays.
  */
-const diffBesideConversation = 'r737fpp';
+const diffWidth = 737;
 
 /**
- * The diff, the conversation and the right column: the diff held at 554px, the
- * conversation at 577px, and the rest to the right column.
- *
- * 554px was derived from the 737px of `diffBesideConversation` for a diff at
- * 75%, the pane's 1px borders, which do not zoom, left out: (737 - 2) × 0.75 +
- * 2, rounded up. Neither number has been measured again at `diffZoom`, where
- * both give the diff more room inside it than they did.
- *
- * 577px is the widest the conversation is at, at its 75%, with the reviewers,
- * the labels and the rest of the sidebar below the description: from 578px they
- * move beside it and the description narrows.
+ * The width the conversation is held at in three columns: the widest it is at,
+ * at its 75%, with the reviewers, the labels and the rest of the sidebar below
+ * the description. From 578px they move beside it and the description narrows.
  */
-const threeColumns = 'r554fpr577fpp';
+const conversationWidth = 577;
+
+/**
+ * The diff beside the conversation alone: the diff held at `diffWidth` and the
+ * rest to the conversation, whose description is what a pull request is
+ * reviewed in now more than its diff.
+ */
+const diffBesideConversation = `r${diffWidth}fpp` as const;
+
+/**
+ * The diff, the conversation and the right column: the diff held at
+ * `diffWidth`, the conversation at `conversationWidth`, and the rest to the
+ * right column.
+ */
+const threeColumns = `r${diffWidth}fpr${conversationWidth}fpp` as const;
 
 /** `threeColumns`, with the right column stacked in two. */
-const threeColumnsStacked = 'r554fpr577fpcpp';
+const threeColumnsStacked =
+  `r${diffWidth}fpr${conversationWidth}fpcpp` as const;
 
 /** 100%, where the extension's `zoom` leaves a pane when it is absent. */
 const full = 1;
@@ -151,7 +160,7 @@ const full = 1;
 const reading = 0.75;
 
 /**
- * The diff, in either layout. At 100% in 737px, and at 75% in 554px, GitHub
- * folds the file tree into a menu; at 67% it stays beside the diff.
+ * The diff, in either layout. At `diffWidth` GitHub folds the file tree into a
+ * menu at 100% and keeps it beside the diff at 67%, in both layouts.
  */
 const diffZoom = 0.67;
