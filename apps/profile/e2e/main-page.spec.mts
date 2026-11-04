@@ -103,3 +103,142 @@ test(
       .toHaveText('執筆物');
   },
 );
+
+test(
+  'the selected tab is the one marked selected',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    const tabs = page.getByTestId('tabs');
+
+    await expect
+      .soft(tabs.getByTestId('tab-0'))
+      .toHaveAttribute('aria-selected', 'true');
+
+    await tabs.getByTestId('tab-3').click();
+
+    await expect
+      .soft(tabs.getByTestId('tab-3'))
+      .toHaveAttribute('aria-selected', 'true');
+
+    await expect
+      .soft(tabs.getByTestId('tab-0'))
+      .toHaveAttribute('aria-selected', 'false');
+  },
+);
+
+test(
+  'the browser history moves between tabs',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByTestId('tabs').getByTestId('tab-4').click();
+
+    await expect
+      .soft(page.getByTestId('root').getByRole('heading').nth(0))
+      .toHaveText('執筆物');
+
+    await page.goBack();
+
+    await expect.soft(page).toHaveURL(/\/mono\/profile\/career\/$/u);
+
+    await expect
+      .soft(page.getByTestId('root').getByRole('heading').nth(0))
+      .toHaveText('Links');
+  },
+);
+
+test(
+  'clicking the selected tab adds no history entry',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    const writingsTab = page.getByTestId('tabs').getByTestId('tab-4');
+
+    await writingsTab.click();
+
+    await expect.soft(writingsTab).toHaveAttribute('aria-selected', 'true');
+
+    await writingsTab.click();
+
+    await page.goBack();
+
+    await expect.soft(page).toHaveURL(/\/mono\/profile\/career\/$/u);
+
+    await expect
+      .soft(page.getByTestId('root').getByRole('heading').nth(0))
+      .toHaveText('Links');
+  },
+);
+
+test(
+  'a path that names no tab opens the first one',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    // The router's redirect, which the dev server reaches for any path. The
+    // Pages site has pages at the tabs' paths only.
+    await page.goto('/mono/profile/no-such-tab/');
+
+    await expect.soft(page).toHaveURL(/\/mono\/profile\/career\/$/u);
+  },
+);
+
+test(
+  'the self-introduction embeds the videos with their attributes',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    // The page is checked, not YouTube.
+    await page.route(/youtube\.com/u, async (route) =>
+      route.fulfill({ status: 200, contentType: 'text/html', body: '' }),
+    );
+
+    await page.goto('/mono/profile/biography/');
+
+    const videos = page.getByTestId('root').getByTestId('video');
+
+    await expect.soft(videos).toHaveCount(2);
+
+    await expect.soft(videos.nth(0)).toHaveAttribute('allowfullscreen');
+
+    await expect.soft(videos.nth(0)).toHaveAttribute('frameborder', '0');
+
+    await expect.soft(videos.nth(0)).toHaveAttribute('width', '560');
+  },
+);
+
+test(
+  'the product cards show their screenshots',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/mono/profile/products/');
+
+    const images = page.getByTestId('root').getByRole('img');
+
+    await expect.soft(images.first()).toBeVisible();
+
+    expect.soft(await images.count()).toBeGreaterThanOrEqual(10);
+  },
+);
+
+test(
+  'the header links to the accounts',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    const banner = page.getByRole('banner');
+
+    await expect.soft(banner.getByRole('link')).toHaveCount(2);
+
+    await expect
+      .soft(banner.getByRole('link', { name: 'Twitter' }))
+      .toHaveAttribute('href', 'https://twitter.com/noshiro_piko');
+
+    await expect
+      .soft(banner.getByRole('link', { name: 'GitHub' }))
+      .toHaveAttribute('href', 'https://github.com/noshiro-pf');
+  },
+);

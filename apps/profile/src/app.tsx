@@ -1,8 +1,6 @@
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useEffect, useMemo } from 'preact/hooks';
-import { useObservableValue } from 'synstate-preact-hooks';
-import { Arr, asUint32, match, Optional } from 'ts-data-forge';
+import { constant, If, view, type JSX } from 'synstate-dom';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import * as styles from './app.module.css';
 import {
   BiographyMdx,
   CareerMdx,
@@ -10,158 +8,82 @@ import {
   SkillsMdx,
 } from './assets/index.mjs';
 import {
-  GithubIconLink,
+  IconLink,
   LastUpdatedAt,
-  MuiAppBar,
   MuiTabs,
   Products,
-  TwitterIconLink,
   Writings,
 } from './components/index.mjs';
-import { labelList, links, routeList, routes } from './constants/index.mjs';
-import { Router } from './router.mjs';
+import { accounts, labelList, tabKeys } from './constants/index.mjs';
+import { selectTab, tabIndex$ } from './router.mjs';
 
-const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
-  // eslint-disable-next-line unicorn/prefer-array-index-of
-  const res = routeList.findIndex((e) => e === `/${pathNameLast}/`);
-
-  return res === -1 ? undefined : res;
-};
-
-const tabIndexOnChange = (tabIdx: number): void => {
-  if (!Arr.indexIsInRange(routeList, asUint32(tabIdx))) {
-    return;
-  }
-
-  const route = routeList[tabIdx];
-
-  if (route !== undefined) {
-    Router.push(route);
-  }
-};
-
-const LiSpacedBlock = styled('div')`
-  li {
-    margin: 7px 0;
-  }
-`;
-
-const pages = {
-  [routes.career]: (
-    <LiSpacedBlock>
-      <CareerMdx />
-    </LiSpacedBlock>
-  ),
-  [routes.biography]: (
-    <LiSpacedBlock>
-      <BiographyMdx />
-    </LiSpacedBlock>
-  ),
-  [routes.skills]: <SkillsMdx />,
-  [routes.products]: <Products />,
-  [routes.writings]: <Writings />,
-} as const;
-
-export const App = memoNamed('App', () => {
-  const { pathname } = useObservableValue(Router.state);
-
-  const pathNameLast = useMemo(
-    () =>
-      Optional.unwrapOr(
-        Arr.last(pathname.split('/').filter((s) => s !== '')),
-        '',
-      ),
-    [pathname],
-  );
-
-  // pathnameと対応させるため、routerを使ってタブ切り替えを制御
-  const tabIndex = useMemo(
-    () => pathNameLastToIndex(pathNameLast),
-    [pathNameLast],
-  );
-
-  useEffect(() => {
-    if (tabIndex === undefined) {
-      Router.redirect(routes.career);
-    }
-  }, [pathname, tabIndex]);
-
-  return (
-    <Root data-e2e={'root'}>
-      <AppBarFlex>
-        <IconButtons>
-          <IconButton title={'ねこかわいい'}>
-            <ImgStyled src={CatIconImage} />
-          </IconButton>
-        </IconButtons>
-
-        <div data-e2e={'tabs'}>
-          <MuiTabs
-            labels={labelList}
-            scrollable
-            tabIndex={tabIndex ?? 0}
-            tabIndexChange={tabIndexOnChange}
+export const App = (): JSX.Element => (
+  <div class={constant(styles.root)} data-e2e={constant('root')}>
+    <header class={constant(styles.appBar)}>
+      <div class={constant(styles.iconButtons)}>
+        <div
+          class={constant(styles.iconButton)}
+          title={constant('ねこかわいい')}
+        >
+          <img
+            alt={constant('')}
+            class={constant(styles.catIcon)}
+            src={constant(CatIconImage)}
           />
         </div>
+      </div>
 
-        <IconButtons>
-          <IconButton title={links.twitter}>
-            <TwitterIconLink />
-          </IconButton>
-          <IconButton title={links.github}>
-            <GithubIconLink />
-          </IconButton>
-        </IconButtons>
-      </AppBarFlex>
+      <div data-e2e={constant('tabs')}>
+        <MuiTabs
+          labels={labelList}
+          tabIndex={tabIndex$}
+          tabIndexChange={selectTab}
+        />
+      </div>
 
-      <LastUpdatedWrapper>
-        <LastUpdatedAt />
-      </LastUpdatedWrapper>
+      <div class={constant(styles.iconButtons)}>
+        {accounts.map((account) => (
+          <div
+            class={constant(styles.iconButton)}
+            title={constant(account.href)}
+          >
+            <IconLink {...account} />
+          </div>
+        ))}
+      </div>
+    </header>
 
-      <ContentWrapper>{match(pathname, pages, undefined)}</ContentWrapper>
-    </Root>
-  );
-});
+    <div class={constant(styles.lastUpdated)}>
+      <LastUpdatedAt />
+    </div>
 
-const Root = styled('div')`
-  min-height: 100vh;
-`;
+    <div class={constant(styles.content)}>
+      {tabKeys.map((key, index) => (
+        <If
+          cond={view(tabIndex$, (selected) => selected === index)}
+          then={pages[key]}
+        />
+      ))}
+    </div>
+  </div>
+);
 
-const LastUpdatedWrapper = styled('div')`
-  padding: 10px 15px 0 0;
-  display: flex;
-  justify-content: flex-end;
-`;
-
-const ContentWrapper = styled('div')`
-  padding: 0 20px 20px 20px;
-
-  max-width: 100vw;
-  text-overflow: ellipsis;
-  overflow-x: hidden;
-`;
-
-const AppBarFlex = styled(MuiAppBar)`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const IconButtons = styled('div')`
-  display: flex;
-  margin-right: 20px;
-`;
-
-const IconButton = styled('div')`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0 8px;
-`;
-
-const ImgStyled = styled('img')`
-  width: 32px;
-  object-fit: contain;
-  border-radius: 50%;
-`;
+/**
+ * What each tab shows. These are descriptions: `If` builds one only while its
+ * tab is selected.
+ */
+const pages = {
+  career: (
+    <div class={constant(styles.liSpaced)}>
+      <CareerMdx />
+    </div>
+  ),
+  biography: (
+    <div class={constant(styles.liSpaced)}>
+      <BiographyMdx />
+    </div>
+  ),
+  skills: <SkillsMdx />,
+  products: <Products />,
+  writings: <Writings />,
+} as const satisfies ReadonlyRecord<(typeof tabKeys)[number], JSX.Element>;

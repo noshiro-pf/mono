@@ -12,7 +12,7 @@ import { pagesAppBase } from '../../../tools/configs/pages-apps.mjs';
 
 const base: UserConfig = defineViteAppConfig({
   packageRoot: workspaceRootPath,
-  framework: 'preact',
+  framework: 'synstate-dom',
   // Served from the repository's Pages site rather than a host of its own, so
   // the asset URLs carry the whole prefix. The table it comes from is the one
   // `build-pages-site.mts` copies by.
@@ -23,13 +23,24 @@ const base: UserConfig = defineViteAppConfig({
 
 /**
  * `src/assets/*.mdx` is the page copy. `jsxImportSource` has to match the
- * package's tsconfig so the compiled MDX uses preact's runtime.
+ * package's tsconfig so the compiled MDX uses synstate-dom's runtime. That
+ * runtime takes attribute names as HTML spells them (`class`, `for`) and style
+ * properties as CSS does (`font-size`), so MDX is told to keep both: its
+ * default React spelling would hand it `className`, set as an attribute of that
+ * name, and `fontSize`, which `style.setProperty` ignores.
  *
  * Copied because Vite declares `plugins` mutable while everything that builds
  * an array under the strict standard library hands back a readonly one.
  */
 const plugins: PluginOption[] = Array.from(
-  Arr.toPushed(base.plugins ?? [], rollup({ jsxImportSource: 'preact' })),
+  Arr.toPushed(
+    base.plugins ?? [],
+    rollup({
+      jsxImportSource: 'synstate-dom',
+      elementAttributeNameCase: 'html',
+      stylePropertyNameCase: 'css',
+    }),
+  ),
 );
 
 export default { ...base, plugins } satisfies UserConfig;

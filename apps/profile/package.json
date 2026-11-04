@@ -21,7 +21,8 @@
     "fix:fmt:full": "prettier --write .",
     "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
-    "gen": "run-s gen:index",
+    "gen": "run-s gen:index gen:css-module-types",
+    "gen:css-module-types": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-css-module-types.mts",
     "gen:index": "run-s gen:index:src fix:fmt",
     "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --min-depth 1 --exclude 'assets/**'",
     "preview": "vite preview --config ./configs/vite.config.mts",
@@ -31,11 +32,8 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
-    "better-preact-use-state": "workspace:*",
-    "goober": "^2.1.19",
-    "preact-utils": "workspace:*",
-    "resize-observer-preact-hooks": "workspace:*",
-    "synstate-preact-hooks": "workspace:*",
+    "synstate": "workspace:*",
+    "synstate-dom": "workspace:*",
     "tiny-router-observable": "workspace:*",
     "ts-data-forge": "workspace:*"
   },
@@ -48,7 +46,6 @@
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
     "npm-run-all2": "catalog:",
-    "preact": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",

@@ -1,28 +1,25 @@
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { MuiCard, MuiCardContent, MuiTypography } from '../mui/index.mjs';
+import { constant, type JSX } from 'synstate-dom';
+import type { WritingsInfo } from '../../types/index.mjs';
+import { MuiCard, MuiTypography } from '../mui/index.mjs';
 
-export const WritingsElement = memoNamed<
-  Readonly<{
-    link: string;
-    title: string;
-    subtitle: string;
-    body: string;
-  }>
->('WritingsElement', ({ link, title, subtitle, body }) => (
-  <CardStyled>
-    <MuiCardContent>
-      <MuiTypography variant={'title'}>
-        <a href={link} rel={'noopener noreferrer'} target={'_blank'}>
-          {title}
-        </a>
-      </MuiTypography>
-      <MuiTypography variant={'subtitle1'}>{subtitle}</MuiTypography>
-      <MuiTypography variant={'body1'}>{body}</MuiTypography>
-    </MuiCardContent>
-  </CardStyled>
-));
+type Props = Readonly<{
+  writing: WritingsInfo;
+}>;
 
-const CardStyled = styled(MuiCard)`
-  margin: 10px;
-`;
+export const WritingsElement = ({ writing }: Props): JSX.Element => (
+  <MuiCard>
+    <MuiTypography variant={'title'}>
+      <a
+        href={constant(writing.link)}
+        rel={constant('noopener noreferrer')}
+        target={constant('_blank')}
+      >
+        {constant(writing.title)}
+      </a>
+    </MuiTypography>
+    <MuiTypography variant={'subtitle1'}>
+      {constant(writing.subtitle)}
+    </MuiTypography>
+    <MuiTypography variant={'body1'}>{constant(writing.body)}</MuiTypography>
+  </MuiCard>
+);

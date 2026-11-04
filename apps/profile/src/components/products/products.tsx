@@ -1,33 +1,17 @@
-import { memoNamed } from 'preact-utils';
+import { constant, type JSX } from 'synstate-dom';
 import { products } from '../../assets/index.mjs';
 import { ProductsElementView } from './products-element-view.js';
 
-export const Products = memoNamed('Products', () => (
+export const Products = (): JSX.Element => (
   <div>
-    <h1>{'制作物'}</h1>
-    <h2>{'ライブラリ'}</h2>
-    {products.libraries.map((app) => (
-      <ProductsElementView
-        key={app.id}
-        description={app.description}
-        imageUrl={app.imageUrl}
-        implementation={app.implementation}
-        link={app.link}
-        subtitle={app.subtitle}
-        title={app.title}
-      />
+    <h1>{constant('制作物')}</h1>
+    <h2>{constant('ライブラリ')}</h2>
+    {products.libraries.map((product) => (
+      <ProductsElementView product={product} />
     ))}
-    <h2>{'ウェブアプリ'}</h2>
-    {products.webApps.map((app) => (
-      <ProductsElementView
-        key={app.id}
-        description={app.description}
-        imageUrl={app.imageUrl}
-        implementation={app.implementation}
-        link={app.link}
-        subtitle={app.subtitle}
-        title={app.title}
-      />
+    <h2>{constant('ウェブアプリ')}</h2>
+    {products.webApps.map((product) => (
+      <ProductsElementView product={product} />
     ))}
   </div>
-));
+);

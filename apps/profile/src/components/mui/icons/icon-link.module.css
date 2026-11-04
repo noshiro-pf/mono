@@ -1,0 +1,7 @@
+/*
+ * The link wraps the whole icon. As a flex item of its own, it is as tall as
+ * the icon, with no line box adding a descender below it.
+ */
+.link {
+  display: flex;
+}
