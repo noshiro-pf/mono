@@ -35,12 +35,15 @@ export type RoomStore = Readonly<{
    */
   setMyName: (myName: string) => void;
   createRoom: Readonly<{
-    /** The room just created, with its id. */
-    response: SynstateObservable<Room>;
+    /** The room just created, with its id, and its creator's name. */
+    response: SynstateObservable<CreatedRoom>;
     isWaitingResponse: InitializedObservable<boolean>;
     /** Whether the last try could not save the room; cleared by the next. */
     hasFailed: InitializedObservable<boolean>;
-    /** Resolves with the room created, or with why it could not be saved. */
+    /**
+     * Resolves with the room created, or with why it could not be saved. The
+     * name is made well-formed first; `response` carries the name used.
+     */
     dispatch: (
       payload: Readonly<{
         username: string;
@@ -66,7 +69,7 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
   const [myName, setMyName] = createState<string | undefined>(undefined);
 
   const createRoom = (() => {
-    const response = source<Room>();
+    const response = source<CreatedRoom>();
 
     const [isWaitingResponse, { setState: setIsWaitingResponse }] =
       createBooleanState(false);
@@ -79,11 +82,16 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
         password: string | undefined;
       }>,
     ): Promise<Result<Room, unknown>> => {
+      // The room page's URL carries the name, and a lone surrogate (half of a
+      // pasted emoji) cannot be written into one: it is replaced first, so that
+      // the room and the URL hold the same name.
+      const username = payload.username.toWellFormed();
+
       setHasFailed(false);
 
       setIsWaitingResponse(true);
 
-      const added = await save(payload);
+      const added = await save({ ...payload, username });
 
       if (Result.isErr(added)) {
         setHasFailed(true);
@@ -91,9 +99,9 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
         return added;
       }
 
-      setMyName(payload.username);
+      setMyName(username);
 
-      response.next(added.value);
+      response.next({ room: added.value, myName: username });
 
       return added;
     };
@@ -200,3 +208,9 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
     start,
   };
 };
+
+/**
+ * A room just created, and the name its creator is already a player of it by,
+ * so that they open the room as that player.
+ */
+export type CreatedRoom = Readonly<{ room: Room; myName: string }>;

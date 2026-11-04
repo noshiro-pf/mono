@@ -1,9 +1,15 @@
+// cspell:ignore FFFD
 import { Result } from 'ts-data-forge';
 import type { StrictOmit } from 'ts-type-forge';
 import type { RoomApi } from '../api/index.mjs';
+import { roomPage } from '../constants/index.mjs';
 import { newRoom } from '../functions/index.mjs';
 import type { GameStateActionFromDb, Player, Room } from '../types/index.mjs';
-import { createRoomStore, type RoomStore } from './room-store.mjs';
+import {
+  createRoomStore,
+  type CreatedRoom,
+  type RoomStore,
+} from './room-store.mjs';
 
 describe(createRoomStore, () => {
   test('watches the room the id names once started, and the next one instead', () => {
@@ -74,10 +80,10 @@ describe(createRoomStore, () => {
     assert.strictEqual(store.myName.getSnapshot().value, 'bob');
   });
 
-  test('createRoom saves a room with the player in it, and answers with its id', async () => {
+  test("createRoom saves a room with the player in it, and answers with it and the creator's name", async () => {
     const { store, api } = setup();
 
-    const mut_responses: Room[] = [];
+    const mut_responses: CreatedRoom[] = [];
 
     store.createRoom.response.subscribe((created) => {
       mut_responses.push(created);
@@ -110,7 +116,9 @@ describe(createRoomStore, () => {
 
     assert.strictEqual(res.id, 'new-id');
 
-    assert.deepStrictEqual(mut_responses, [res]);
+    // With the creator's name, so that they open the room as the player they
+    // already are, not on its join form.
+    assert.deepStrictEqual(mut_responses, [{ room: res, myName: 'alice' }]);
 
     assert.strictEqual(store.myName.getSnapshot().value, 'alice');
 
@@ -119,10 +127,51 @@ describe(createRoomStore, () => {
     assert.isFalse(store.createRoom.hasFailed.getSnapshot().value);
   });
 
+  test('createRoom names the creator in a form the room page URL can carry', async () => {
+    const { store, api } = setup();
+
+    const mut_responses: CreatedRoom[] = [];
+
+    store.createRoom.response.subscribe((created) => {
+      mut_responses.push(created);
+    });
+
+    // A lone surrogate, as half of a pasted emoji leaves.
+    const pending = store.createRoom.dispatch({
+      username: 'alice\u{D83D}',
+      password: undefined,
+    });
+
+    const [added] = api.addedRooms;
+
+    assert.isDefined(added);
+
+    assert.deepStrictEqual(added.room.players, [
+      { name: 'alice\u{FFFD}', online: true },
+    ]);
+
+    added.resolve('new-id');
+
+    await pending;
+
+    assert.deepStrictEqual(
+      mut_responses.map((created) => created.myName),
+      ['alice\u{FFFD}'],
+    );
+
+    assert.strictEqual(store.myName.getSnapshot().value, 'alice\u{FFFD}');
+
+    // What Root opens, which throws on a name that is not well-formed.
+    assert.strictEqual(
+      roomPage('new-id', mut_responses[0]?.myName),
+      '/rooms/?id=new-id&player-id=alice%EF%BF%BD',
+    );
+  });
+
   test('createRoom that fails stops waiting, says so, and can be tried again', async () => {
     const { store, api } = setup();
 
-    const mut_responses: Room[] = [];
+    const mut_responses: CreatedRoom[] = [];
 
     store.createRoom.response.subscribe((created) => {
       mut_responses.push(created);
@@ -174,7 +223,9 @@ describe(createRoomStore, () => {
 
     assert.isTrue(Result.isOk(result2));
 
-    assert.deepStrictEqual(mut_responses, [result2.value]);
+    assert.deepStrictEqual(mut_responses, [
+      { room: result2.value, myName: 'alice' },
+    ]);
 
     assert.strictEqual(store.myName.getSnapshot().value, 'alice');
   });
@@ -193,7 +244,7 @@ describe(createRoomStore, () => {
       },
     });
 
-    const mut_responses: Room[] = [];
+    const mut_responses: CreatedRoom[] = [];
 
     store.createRoom.response.subscribe((created) => {
       mut_responses.push(created);
