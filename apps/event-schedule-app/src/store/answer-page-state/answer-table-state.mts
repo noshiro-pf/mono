@@ -9,7 +9,6 @@ import {
   expectType,
   ifThen,
   mapNullable,
-  match,
   pipe,
   tp,
 } from 'ts-data-forge';
@@ -251,12 +250,9 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
                     ).map(([[iconId, point, comment], weight]) => ({
                       iconId,
                       point,
-                      showPoint: match(iconId, {
-                        good: point !== eventSchedule.answerIcons.good.point,
-                        fair: point !== eventSchedule.answerIcons.fair.point,
-                        poor: point !== eventSchedule.answerIcons.poor.point,
-                        none: false,
-                      }),
+                      showPoint:
+                        iconId === 'fair' &&
+                        point !== eventSchedule.answerIcons.fair.point,
                       weight,
                       comment,
                     })),

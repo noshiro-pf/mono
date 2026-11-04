@@ -1,3 +1,4 @@
+export * from './bp-button-overflow-hidden.js';
 export * from './description.js';
 export * from './form-label.js';
 export * from './icon.js';

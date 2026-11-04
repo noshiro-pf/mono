@@ -1,5 +1,6 @@
 export * from './answer-page-state/index.mjs';
 export * from './auth-store.mjs';
+export * from './batch-update-page-state/index.mjs';
 export * from './confirm-email-dialog-state.mjs';
 export * from './create-event-schedule-page/index.mjs';
 export * from './event-list-page-state/index.mjs';

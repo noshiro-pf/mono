@@ -119,6 +119,9 @@ export const NavBar = memoNamed('NavBar', () => {
               <ItemAnchor onClick={forNonLoggedInUserDialogState[1].setTrue}>
                 {dc.list}
               </ItemAnchor>
+              <ItemAnchor onClick={forNonLoggedInUserDialogState[1].setTrue}>
+                {dc.batchUpdatePage}
+              </ItemAnchor>
               <ForNonLoggedInUserDialog
                 cancel={forNonLoggedInUserDialogState[1].setFalse}
                 isOpen={forNonLoggedInUserDialogState[0]}
@@ -144,6 +147,12 @@ export const NavBar = memoNamed('NavBar', () => {
                 onClick={routerLinkClickHandler}
               >
                 {dc.list}
+              </ItemAnchor>
+              <ItemAnchor
+                href={Routes.routes.batchUpdatePage}
+                onClick={routerLinkClickHandler}
+              >
+                {dc.batchUpdatePage}
               </ItemAnchor>
               <Item>
                 <span>{dc.auth.userName.prefix}</span>

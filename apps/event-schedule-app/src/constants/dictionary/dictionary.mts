@@ -1,5 +1,6 @@
 import { accountSettingsDictionary } from './account-settings.mjs';
 import { answerPageDictionary } from './answer-page.mjs';
+import { batchUpdatePageDictionary } from './batch-update-page.mjs';
 import { commonDictionary } from './common.mjs';
 import { createEventResultDialogDictionary } from './create-event-result-dialog.mjs';
 import { errorMessagesDictionary } from './error-messages.mjs';
@@ -18,6 +19,7 @@ export const dict = {
 
   header: headerDictionary,
   eventListPage: eventListPageDictionary,
+  batchUpdatePage: batchUpdatePageDictionary,
   eventSettingsPage: eventSettingsPageDictionary,
   resultPage: resultPageDictionary,
   iconDescriptionDefault: iconDescriptionDefaultDictionary,

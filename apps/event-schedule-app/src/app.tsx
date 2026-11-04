@@ -1,7 +1,9 @@
 import { css } from '@emotion/react';
 import { memoNamed } from 'react-utils';
+import { expectType } from 'ts-data-forge';
 import {
   AnswerPage,
+  BatchUpdatePage,
   CreateEventSchedule,
   EditEventSchedule,
   EventListPage,
@@ -15,6 +17,18 @@ import { Router } from './store/index.mjs';
 
 export const App = memoNamed('App', () => {
   const show = Router.useShowPage();
+
+  // A page added to the router and not shown here fails this.
+  expectType<
+    keyof typeof show,
+    | 'answerPage'
+    | 'batchUpdatePage'
+    | 'createPage'
+    | 'editPage'
+    | 'eventListPage'
+    | 'registerPage'
+    | 'signInPage'
+  >('=');
 
   return (
     <ErrorBoundary>
@@ -34,6 +48,8 @@ export const App = memoNamed('App', () => {
           <AnswerPage />
         ) : show.eventListPage ? (
           <EventListPage />
+        ) : show.batchUpdatePage ? (
+          <BatchUpdatePage />
         ) : show.registerPage ? (
           <RegisterPage />
         ) : show.signInPage ? (

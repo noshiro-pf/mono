@@ -1,5 +1,6 @@
 export * from './account-settings.mjs';
 export * from './answer-page.mjs';
+export * from './batch-update-page.mjs';
 export * from './common.mjs';
 export * from './create-event-result-dialog.mjs';
 export * from './datetime.mjs';

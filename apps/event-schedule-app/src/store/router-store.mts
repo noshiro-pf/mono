@@ -51,6 +51,7 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
       answerPage$: pathSegments$.pipe(map(Routes.isRoute.answerPage)),
       editPage$: pathSegments$.pipe(map(Routes.isRoute.editPage)),
       eventListPage$: pathSegments$.pipe(map(Routes.isRoute.eventListPage)),
+      batchUpdatePage$: pathSegments$.pipe(map(Routes.isRoute.batchUpdatePage)),
       registerPage$: pathSegments$.pipe(map(Routes.isRoute.registerPage)),
       signInPage$: pathSegments$.pipe(map(Routes.isRoute.signInPage)),
     },
@@ -61,6 +62,7 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
       answerPage: boolean;
       editPage: boolean;
       eventListPage: boolean;
+      batchUpdatePage: boolean;
       registerPage: boolean;
       signInPage: boolean;
     }> => {
@@ -72,6 +74,10 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
 
       const eventListPage = useObservableValue(router.isRoute.eventListPage$);
 
+      const batchUpdatePage = useObservableValue(
+        router.isRoute.batchUpdatePage$,
+      );
+
       const registerPage = useObservableValue(router.isRoute.registerPage$);
 
       const signInPage = useObservableValue(router.isRoute.signInPage$);
@@ -81,6 +87,7 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
         answerPage,
         editPage,
         eventListPage,
+        batchUpdatePage,
         registerPage,
         signInPage,
       };
@@ -103,6 +110,7 @@ export type AppRouter = Router &
       answerPage$: InitializedObservable<boolean>;
       editPage$: InitializedObservable<boolean>;
       eventListPage$: InitializedObservable<boolean>;
+      batchUpdatePage$: InitializedObservable<boolean>;
       registerPage$: InitializedObservable<boolean>;
       signInPage$: InitializedObservable<boolean>;
     }>;
@@ -112,6 +120,7 @@ export type AppRouter = Router &
       answerPage: boolean;
       editPage: boolean;
       eventListPage: boolean;
+      batchUpdatePage: boolean;
       registerPage: boolean;
       signInPage: boolean;
     }>;

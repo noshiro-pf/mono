@@ -1,4 +1,5 @@
 export * from './answer-page/index.mjs';
+export * from './batch-update-page/index.mjs';
 export * from './create-event-schedule/index.mjs';
 export * from './event-list-page/index.mjs';
 export * from './not-found-page.js';

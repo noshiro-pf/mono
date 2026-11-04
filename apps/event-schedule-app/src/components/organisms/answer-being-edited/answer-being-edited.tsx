@@ -30,7 +30,7 @@ import {
   WidthRestrictedInputWrapper,
 } from '../../styled/index.mjs';
 import { DatetimeRangeCell } from '../answer-table/index.mjs';
-import { BatchInputAnswerForm } from '../batch-input-field.js';
+import { BatchInputAnswerForm } from '../batch-input-form.js';
 import {
   DeleteAnswerButton,
   ForNonLoggedInUserDialog,

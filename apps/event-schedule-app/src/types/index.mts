@@ -4,6 +4,7 @@ export * from './answer-table-cell.mjs';
 export * from './answers-rank.mjs';
 export * from './answers-score.mjs';
 export * from './assert-is-credential-error.mjs';
+export * from './batch-update-table.mjs';
 export * from './detailed-filter-icon.mjs';
 export * from './event-schedule-settings-common-state.mjs';
 export * from './event-schedule-validation.mjs';

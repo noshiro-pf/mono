@@ -21,6 +21,7 @@ import {
   createAnswerTableStore,
 } from './answer-page-state/index.mjs';
 import { createAuthStore } from './auth-store.mjs';
+import { createBatchUpdateAnswersStore } from './batch-update-page-state/index.mjs';
 import { createConfirmEmailDialogStore } from './confirm-email-dialog-state.mjs';
 import {
   createCreateEventScheduleStore,
@@ -105,6 +106,11 @@ export const EventListStore = createEventListStore({
 });
 
 export const { eventList$ } = EventListStore;
+
+export const BatchUpdateAnswersStore = createBatchUpdateAnswersStore({
+  eventList$,
+  fireAuthUser$: Auth.fireAuthUser$,
+});
 
 const answerFilterQueryParam = createAnswerFilterQueryParam({ router: Router });
 

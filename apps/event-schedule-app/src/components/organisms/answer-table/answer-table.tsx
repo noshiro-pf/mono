@@ -1,4 +1,3 @@
-import { Button } from '@blueprintjs/core';
 import styled from '@emotion/styled';
 import * as React from 'react';
 import { HTMLTableBorderedStyled2 } from 'react-blueprintjs-utils';
@@ -12,7 +11,11 @@ import {
   AnswerPageStore,
   AnswerTableStore,
 } from '../../../store/index.mjs';
-import { CustomIcon, RequiredParticipantIcon } from '../../atoms/index.mjs';
+import {
+  BpButtonOverflowHidden,
+  CustomIcon,
+  RequiredParticipantIcon,
+} from '../../atoms/index.mjs';
 import { CommentButton } from './comment-button.js';
 import { DatetimeRangeCell } from './datetime-range-cell.js';
 import { FilterByIconPopover } from './filter-by-icon-popover/index.mjs';
@@ -281,16 +284,6 @@ const RequiredParticipantIconStyled = styled.div`
   position: absolute;
   top: -5px;
   left: 5px;
-`;
-
-const BpButtonOverflowHidden = styled(Button)`
-  max-width: 100%;
-  overflow-x: hidden;
-
-  & > span {
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-  }
 `;
 
 const SummaryCellStyle = styled.div`
