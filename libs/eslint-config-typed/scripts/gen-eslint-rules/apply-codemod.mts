@@ -116,7 +116,11 @@ export const applyTransformationsToFile = async (
         // needs the whole file.
         [replaceRecordWithUnknownRecordTransformer()],
       ),
-      [convertToReadonlyTransformer()],
+      // Transformed one statement at a time, each `export` statement would get
+      // an import of its own spliced into it, and every other statement
+      // `Readonly<Record<K, V>>`; `restoreTsTypeForgeImport` in `main.mts`
+      // imports `ReadonlyRecord` into the file afterwards instead.
+      [convertToReadonlyTransformer({ importStyle: 'global' })],
     );
 
     // Check if the code was actually changed

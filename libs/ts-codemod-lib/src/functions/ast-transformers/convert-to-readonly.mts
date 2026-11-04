@@ -49,6 +49,10 @@ import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'convert-to-readonly';
 
+const READONLY_RECORD_NAME = 'ReadonlyRecord';
+
+const READONLY_RECORD_MODULE = 'ts-type-forge';
+
 export const convertToReadonlyTransformer = (
   options?: ReadonlyTransformerOptions,
 ): TsMorphTransformer => {
@@ -92,6 +96,7 @@ export const convertToReadonlyTransformer = (
       options?.mutablePropertyPrefixes ?? DEFAULT_MUTABLE_PREFIXES,
     ),
     recordStyle: options?.recordStyle ?? 'ReadonlyRecord',
+    importStyle: options?.importStyle ?? 'named',
     debugPrint: options?.debug === true ? console.debug : () => {},
     replaceNode:
       options?.debug === true
@@ -102,8 +107,30 @@ export const convertToReadonlyTransformer = (
   return {
     name: TRANSFORMER_NAME,
     transform: (sourceAst) => {
+      const scope =
+        optionsInternal.recordStyle === 'ReadonlyRecord' &&
+        optionsInternal.importStyle === 'named'
+          ? readonlyRecordScope(sourceAst.compilerNode)
+          : 'in-scope';
+
+      // An import would turn a script into a module, and its declarations would
+      // stop being global (a `global.d.ts`); in a file whose top level declares
+      // the name as a value or a namespace, it could clash. Either gets the
+      // built-in style instead.
+      const mayImport =
+        scope === 'free' && tsm.ts.isExternalModule(sourceAst.compilerNode);
+
+      const fileOptions: ReadonlyTransformerOptionsInternal =
+        scope !== 'in-scope' && !mayImport
+          ? ({ ...optionsInternal, recordStyle: 'Readonly<Record>' } as const)
+          : optionsInternal;
+
       for (const node of sourceAst.getChildren()) {
-        transformNode(node, initialReadonlyContext, optionsInternal);
+        transformNode(node, initialReadonlyContext, fileOptions);
+      }
+
+      if (mayImport && referencesReadonlyRecord(sourceAst.compilerNode)) {
+        addReadonlyRecordImport(sourceAst);
       }
     },
   };
@@ -201,9 +228,8 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
    * - `"ReadonlyRecord"`: Uses the `ReadonlyRecord` type utility provided by
    *   `ts-type-forge` (as the `ts-type-forge/prefer-readonly-or-mutable-record`
    *   ESLint rule suggests). Occurrences of `Readonly<Record<K, V>>` are also
-   *   unified to `ReadonlyRecord<K, V>`. Note that no import statement is
-   *   added, so `ReadonlyRecord` has to be available in the transformed code
-   *   (e.g. globally via `ts-type-forge`'s `global.d.mts`).
+   *   unified to `ReadonlyRecord<K, V>`. How the name is brought into scope
+   *   is set by `importStyle`.
    * - `"Readonly<Record>"`: Uses only built-in utility types
    *   (`Readonly<Record<K, V>>`). Occurrences of `ReadonlyRecord<K, V>` are
    *   also unified to `Readonly<Record<K, V>>`.
@@ -214,6 +240,29 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
    * @default 'ReadonlyRecord'
    */
   recordStyle?: 'Readonly<Record>' | 'ReadonlyRecord';
+
+  /**
+   * How `ReadonlyRecord` is brought into scope with `recordStyle:
+   * "ReadonlyRecord"` (the same choice as the `importStyle` option of
+   * `eslint-plugin-ts-type-forge`).
+   *
+   * - `"named"`: When the transformer writes `ReadonlyRecord` into a file that
+   *   does not mention the name yet, it also imports it — `import type {
+   *   ReadonlyRecord } from 'ts-type-forge';`, merged into an existing named
+   *   import of `ts-type-forge` where there is one. A file that already
+   *   imports, declares or uses the name (as a global from
+   *   `ts-type-forge/global`) is left to resolve it as before. A script (a
+   *   file with no import or export), which an import would turn into a
+   *   module, and a file whose top level declares the name as a value only,
+   *   which an import could clash with, get `Readonly<Record<K, V>>` instead.
+   * - `"global"`: Imports are never touched, so `ReadonlyRecord` has to be in
+   *   scope already: globally via `ts-type-forge/global`, or by an import the
+   *   caller writes itself (as when transforming a file one statement at a
+   *   time, where each statement would otherwise get an import of its own).
+   *
+   * @default 'named'
+   */
+  importStyle?: 'global' | 'named';
 
   debug?: boolean;
 }>;
@@ -235,6 +284,8 @@ type ReadonlyTransformerOptionsInternal = Readonly<{
   mutablePropertyPrefixes: ISet<string>;
 
   recordStyle: 'Readonly<Record>' | 'ReadonlyRecord';
+
+  importStyle: 'global' | 'named';
 
   debugPrint: (...args: readonly unknown[]) => void;
   replaceNode: (node: tsm.Node, newNodeText: string) => void;
@@ -498,6 +549,268 @@ const transformNode = (
 
   for (const child of node.getChildren()) {
     transformNode(child, initialReadonlyContext, options);
+  }
+};
+
+/**
+ * The names a top-level statement binds, and whether each can name a type (an
+ * import can).
+ */
+const topLevelBindings = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  statement: tsm.ts.Statement,
+): readonly Readonly<{ name: string; isType: boolean }>[] => {
+  if (tsm.ts.isImportDeclaration(statement)) {
+    const clause = statement.importClause;
+
+    const bindings = clause?.namedBindings;
+
+    // A namespace import cannot name a type.
+    const namespaceImport =
+      bindings !== undefined && tsm.ts.isNamespaceImport(bindings)
+        ? ([{ name: bindings.name.text, isType: false }] as const)
+        : ([] as const);
+
+    const named =
+      bindings !== undefined && tsm.ts.isNamedImports(bindings)
+        ? bindings.elements.map((element) => ({
+            name: element.name.text,
+            isType: true,
+          }))
+        : ([] as const);
+
+    const defaultImport =
+      clause?.name === undefined
+        ? ([] as const)
+        : ([{ name: clause.name.text, isType: true }] as const);
+
+    return [...defaultImport, ...namespaceImport, ...named];
+  }
+
+  if (tsm.ts.isImportEqualsDeclaration(statement)) {
+    return [{ name: statement.name.text, isType: true }];
+  }
+
+  if (
+    tsm.ts.isTypeAliasDeclaration(statement) ||
+    tsm.ts.isInterfaceDeclaration(statement) ||
+    tsm.ts.isClassDeclaration(statement) ||
+    tsm.ts.isEnumDeclaration(statement)
+  ) {
+    return statement.name === undefined
+      ? []
+      : [{ name: statement.name.text, isType: true }];
+  }
+
+  if (
+    (tsm.ts.isFunctionDeclaration(statement) ||
+      tsm.ts.isModuleDeclaration(statement)) &&
+    statement.name !== undefined &&
+    tsm.ts.isIdentifier(statement.name)
+  ) {
+    return [{ name: statement.name.text, isType: false }];
+  }
+
+  if (tsm.ts.isVariableStatement(statement)) {
+    return statement.declarationList.declarations.flatMap((declaration) =>
+      tsm.ts.isIdentifier(declaration.name)
+        ? [{ name: declaration.name.text, isType: false }]
+        : [],
+    );
+  }
+
+  return [];
+};
+
+/**
+ * Whether the file has a type reference to `ReadonlyRecord` (an `extends` or
+ * `implements` clause included).
+ */
+const referencesReadonlyRecord = (node: tsm.ts.Node): boolean =>
+  (tsm.ts.isTypeReferenceNode(node) &&
+    tsm.ts.isIdentifier(node.typeName) &&
+    node.typeName.text === READONLY_RECORD_NAME) ||
+  (tsm.ts.isExpressionWithTypeArguments(node) &&
+    tsm.ts.isIdentifier(node.expression) &&
+    node.expression.text === READONLY_RECORD_NAME) ||
+  (tsm.ts.forEachChild(
+    node,
+    (child) => referencesReadonlyRecord(child) || undefined,
+  ) ??
+    false);
+
+/**
+ * Whether `ReadonlyRecord` can be written in the file as it is, with
+ * `importStyle: "named"`:
+ *
+ * - `"in-scope"`: the top level imports it or declares it as a type, or the
+ *   file has a type reference to it, which without either relies on a global.
+ * - `"taken"`: the top level declares it as a value or a namespace only, which
+ *   an import of the name could clash with (an exported one does).
+ * - `"free"`: neither; it can be imported.
+ *
+ * A qualified name (`tf.ReadonlyRecord`), a property name, the original name of
+ * an aliased import (`ReadonlyRecord as RR`) and a declaration in an inner
+ * scope bind nothing at the top level, so they do not count.
+ */
+const readonlyRecordScope = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceFile: tsm.ts.SourceFile,
+): 'free' | 'in-scope' | 'taken' => {
+  const topLevelNames = sourceFile.statements.flatMap(topLevelBindings);
+
+  return topLevelNames.some(
+    ({ name, isType }) => isType && name === READONLY_RECORD_NAME,
+  ) || referencesReadonlyRecord(sourceFile)
+    ? 'in-scope'
+    : topLevelNames.some(({ name }) => name === READONLY_RECORD_NAME)
+      ? 'taken'
+      : 'free';
+};
+
+/**
+ * `end`, moved past the comments that start on the same line after it: one such
+ * as `// eslint-disable-line` is about that line.
+ */
+const endOfLineComments = (text: string, end: number): number =>
+  tsm.ts.getTrailingCommentRanges(text, end)?.at(-1)?.end ?? end;
+
+/**
+ * Where a new import goes in a file with no import and no directive prologue:
+ * before the first statement, and before the run of JSDoc and `//` comments
+ * right above it with no blank line in between (its documentation, an
+ * `eslint-disable-next-line`), which belong to it. A comment separated from it
+ * by a blank line, a `/* ... *\/` comment (a file-wide `eslint-disable`, a
+ * license), a `///` directive, a pragma (`@ts-nocheck`, `@jsxImportSource`),
+ * which TypeScript reads only above the first statement, and a shebang stay
+ * above the import.
+ */
+const newImportPosition = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceFile: tsm.SourceFile,
+): number => {
+  const text = sourceFile.getFullText();
+
+  const first = sourceFile.getStatements().at(0);
+
+  if (first === undefined) {
+    return text.length;
+  }
+
+  const comments =
+    tsm.ts.getLeadingCommentRanges(text, first.getFullStart()) ?? [];
+
+  let mut_position = first.getStart();
+
+  for (const comment of comments.toReversed()) {
+    const commentText = text.slice(comment.pos, comment.end);
+
+    if (
+      /\n[^\S\n]*\n/u.test(text.slice(comment.end, mut_position)) ||
+      commentText.startsWith('///') ||
+      (commentText.startsWith('/*') && !commentText.startsWith('/**')) ||
+      /@(?:ts-nocheck|ts-check|jsx)/u.test(commentText)
+    ) {
+      break;
+    }
+
+    mut_position = comment.pos;
+  }
+
+  return mut_position;
+};
+
+/** The leading `'use client';`-like statements of the file. */
+const directivePrologue = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceFile: tsm.SourceFile,
+): readonly tsm.ts.Statement[] => {
+  const statements = sourceFile.compilerNode.statements;
+
+  const end = statements.findIndex(
+    (statement) =>
+      !(
+        tsm.ts.isExpressionStatement(statement) &&
+        tsm.ts.isStringLiteral(statement.expression)
+      ),
+  );
+
+  return statements.slice(0, end === -1 ? statements.length : end);
+};
+
+const insertReadonlyRecordImport = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceFile: tsm.SourceFile,
+  text: string,
+): void => {
+  const imports = sourceFile.getImportDeclarations();
+
+  const hosts = imports.filter(
+    (decl) =>
+      decl.getModuleSpecifierValue() === READONLY_RECORD_MODULE &&
+      tsm.Node.isNamedImports(decl.getImportClause()?.getNamedBindings()),
+  );
+
+  const host = hosts.find((decl) => decl.isTypeOnly()) ?? hosts.at(0);
+
+  if (host !== undefined) {
+    // `import type { ..., type X }` is an error: the declaration already makes
+    // every name type-only.
+    host.addNamedImport({
+      name: READONLY_RECORD_NAME,
+      isTypeOnly: !host.isTypeOnly(),
+    });
+
+    return;
+  }
+
+  // `import type`, not `import { type X }`, which `verbatimModuleSyntax` keeps
+  // as `import {} from 'ts-type-forge'`, a module with nothing to run.
+  const declaration =
+    `import type { ${READONLY_RECORD_NAME} } from '${READONLY_RECORD_MODULE}';` as const;
+
+  const anchorEnd =
+    imports.at(-1)?.getEnd() ?? directivePrologue(sourceFile).at(-1)?.end;
+
+  if (anchorEnd === undefined) {
+    sourceFile.insertText(newImportPosition(sourceFile), `${declaration}\n\n`);
+  } else {
+    sourceFile.insertText(
+      endOfLineComments(text, anchorEnd),
+      `\n${declaration}`,
+    );
+  }
+};
+
+/**
+ * Imports `ReadonlyRecord` from `ts-type-forge`: into the braces of an existing
+ * import of the module where there is one, or else as a new declaration —
+ * after the last import, else after the directive prologue, else before the
+ * first statement and the comments attached to it (see
+ * {@link newImportPosition}). The line breaks follow the file's.
+ */
+const addReadonlyRecordImport = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceFile: tsm.SourceFile,
+): void => {
+  const text = sourceFile.getFullText();
+
+  // ts-morph writes its line breaks as the project's setting says, so the
+  // setting follows the file's for the edit.
+  const { manipulationSettings } = sourceFile.getProject();
+
+  const newLineKind = manipulationSettings.getNewLineKind();
+
+  manipulationSettings.set({
+    newLineKind: text.includes('\r\n')
+      ? tsm.NewLineKind.CarriageReturnLineFeed
+      : tsm.NewLineKind.LineFeed,
+  });
+
+  try {
+    insertReadonlyRecordImport(sourceFile, text);
+  } finally {
+    manipulationSettings.set({ newLineKind });
   }
 };
 

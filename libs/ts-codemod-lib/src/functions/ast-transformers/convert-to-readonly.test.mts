@@ -215,6 +215,13 @@ describe(convertToReadonlyTransformer, () => {
 
     describe('Records', () => {
       describe('recordStyle: "ReadonlyRecord" (default)', () => {
+        // These sources are scripts, which get `Readonly<Record<K, V>>` unless
+        // the name is in scope; how it is brought into scope is tested in
+        // convert-to-readonly-record-import.test.mts.
+        const options = {
+          importStyle: 'global',
+        } as const satisfies ReadonlyTransformerOptions;
+
         test.each([
           {
             name: 'Type alias',
@@ -224,6 +231,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = ReadonlyRecord<string, number>
             `,
+            options,
           },
           {
             name: 'ReadonlyRecord<K, V> is unchanged',
@@ -233,6 +241,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = ReadonlyRecord<string, number>
             `,
+            options,
           },
           {
             name: 'Readonly<Record<K, V>> is unified to ReadonlyRecord<K, V>',
@@ -242,6 +251,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = ReadonlyRecord<string, number>
             `,
+            options,
           },
           {
             name: 'Redundant Readonly<ReadonlyRecord<K, V>> is normalized',
@@ -251,6 +261,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = ReadonlyRecord<string, number>
             `,
+            options,
           },
           {
             name: 'Value type is converted recursively',
@@ -260,6 +271,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = ReadonlyRecord<string, readonly number[]>
             `,
+            options,
           },
           {
             name: 'Value type inside Readonly<Record<K, V>> is converted recursively',
@@ -269,6 +281,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = ReadonlyRecord<string, readonly number[]>
             `,
+            options,
           },
           {
             name: 'Value type inside ReadonlyRecord<K, V> is converted recursively',
@@ -278,6 +291,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = ReadonlyRecord<string, readonly number[]>
             `,
+            options,
           },
           {
             name: 'In type literal member',
@@ -287,6 +301,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = Readonly<{ a: ReadonlyRecord<string, number> }>
             `,
+            options,
           },
           {
             name: 'In function args',
@@ -296,6 +311,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               function foo(a: ReadonlyRecord<string, number>, b: Promise<ReadonlyRecord<string, number>>) {}
             `,
+            options,
           },
           {
             name: 'DeepReadonly<Record<K, V>> is unchanged',
@@ -305,6 +321,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = DeepReadonly<Record<string, number[]>>
             `,
+            options,
           },
           {
             name: 'DeepReadonly<ReadonlyRecord<K, V>> is unchanged',
@@ -314,6 +331,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = DeepReadonly<ReadonlyRecord<string, number>>
             `,
+            options,
           },
           {
             name: 'Record<K, V> under indexed access is kept as is',
@@ -323,6 +341,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = Record<string, number>[string]
             `,
+            options,
           },
           {
             name: 'ReadonlyRecord<K, V> under indexed access is unchanged',
@@ -332,6 +351,7 @@ describe(convertToReadonlyTransformer, () => {
             expected: dedent`
               type Foo = ReadonlyRecord<string, number>[string]
             `,
+            options,
           },
         ])('$name', testFn);
       });
