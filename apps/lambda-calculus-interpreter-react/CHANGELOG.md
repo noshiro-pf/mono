@@ -1,5 +1,16 @@
 # lambda-calculus-interpreter-react
 
+## 0.0.28
+
+### Patch Changes
+
+- Updated dependencies [809aa3c]
+    - synstate@7.0.1
+    - lambda-calculus-interpreter-core@0.0.13
+    - react-utils@0.0.26
+    - synstate-react-hooks@7.0.1
+    - ts-data-forge@14.11.0
+
 ## 0.0.27
 
 ### Patch Changes

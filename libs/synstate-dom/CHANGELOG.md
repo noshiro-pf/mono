@@ -1,5 +1,18 @@
 # synstate-dom
 
+## 0.7.1
+
+### Patch Changes
+
+- 6c4fd99: A boolean on an `aria-*` attribute is written as `"true"` or `"false"`, as React does, instead of as an empty attribute, which `aria-*` reads as its default: `aria-busy={pending$}` now says what it means. `aria-*` props are typed `Bindable<boolean | number | string | undefined>`.
+- 6f059fc: `For`, `If`, `MatchOptional` and `MatchResult` follow a write from inside the row or branch they are mounting: a branch that writes the value that chose it, on its first mount or on a later switch, now leaves the branch for the latest value with one live scope, and a `For` row that writes `items` while it is mounted no longer leaves its key in two rows or the write unapplied.
+
+    A row or branch that keeps writing a value that chooses another one, so that the writes never settle, is an error after 100 of them.
+
+- Updated dependencies [809aa3c]
+    - synstate@7.0.1
+    - ts-data-forge@14.11.0
+
 ## 0.7.0
 
 ### Minor Changes

@@ -1,5 +1,17 @@
 # annotation-tool
 
+## 0.0.25
+
+### Patch Changes
+
+- Updated dependencies [809aa3c]
+    - synstate@7.0.1
+    - react-utils@0.0.26
+    - ts-utils-additional@0.0.10
+    - better-react-use-state@1.0.1
+    - synstate-react-hooks@7.0.1
+    - ts-data-forge@14.11.0
+
 ## 0.0.24
 
 ### Patch Changes

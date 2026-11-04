@@ -1,5 +1,12 @@
 # eslint-plugin-ts-fortress
 
+## 1.3.14
+
+### Patch Changes
+
+- Updated dependencies [292016d]
+    - eslint-rule-forge@0.6.0
+
 ## 1.3.13
 
 ### Patch Changes

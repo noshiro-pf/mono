@@ -1,5 +1,20 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.5.0
+
+### Minor Changes
+
+- 3bc80ae: `unicorn/prefer-error-is-error` is off and `unicorn/no-instanceof-builtins` no longer fixes `instanceof Error` into `Error.isError`, which Node.js 22 (still in `engines`) does not have; `no-restricted-properties` now reports a hand-written `Error.isError`, and its options are exported as `restrictedProperties`.
+- 29cc0e8: `ts-restrictions/no-ragged-comment-wrap` resolves its default width as Prettier does: a Prettier configuration's `overrides` for the file apply, and with no `printWidth` there, the `.editorconfig` `max_line_length` is read (`off` turns the rule off) before falling back to 80.
+- 63deb4b: `unicorn/prefer-promise-try`, `unicorn/prefer-regexp-escape`, `unicorn/prefer-uint8array-base64` and `unicorn/prefer-get-or-insert-computed` are off, because their fixes write `Promise.try`, `RegExp.escape`, `Uint8Array` base64 and `Map#getOrInsertComputed`, which Node.js 22 (still in `engines`) does not have. A hand-written call to any of these or to `Error.isError` is reported by `no-restricted-properties`, and its `globalThis.`-qualified form by `no-restricted-syntax`, both built from the new `nodeVersionGatedApis` table (exported with `nodeVersionGatedStaticApis`, `nodeVersionRestrictedProperties` and `nodeVersionRestrictedSyntax`).
+- 6c94060: Add `ts-restrictions/require-ime-guard-on-enter`, enabled as an error. It reports a comparison of a keyboard event's `key` or `code` with `'Enter'` (or `'NumpadEnter'`) by `===`, `!==`, `==`, `!=` or a `case` of a `switch` on it when nothing checks the same event for input method composition. Without that check, the Enter that confirms a conversion triggers the handler too, and a half-typed Japanese value is submitted. The check is a call that passes the event to one of the `guardFunctions` option's names (default `["isImeKeyDown"]`, the helper `synstate-dom` exports, which also covers Safari's Enter after `compositionend`), or a read of `isComposing` on the event or on a React event's `nativeEvent`. It may be in the same condition or anywhere else on the same variable, such as an early return before a `switch`.
+
+### Patch Changes
+
+- e6e9860: `total-functions/no-hidden-type-assertions` finds a type parameter under every kind of type node — parentheses, type predicates, rest and optional tuple elements, mapped, constructor, template literal and `typeof` types, and the parameters of method and call signatures — and no longer counts a shadowing type parameter of the same name as a use. A generic type guard whose type parameter only its predicate uses (`<T>(x: unknown) => x is T`, or `asserts x is T`) is now reported when called with a type argument other than `unknown` or `never`, or with none.
+- Updated dependencies [292016d]
+    - eslint-rule-forge@0.6.0
+
 ## 7.4.0
 
 ### Minor Changes
