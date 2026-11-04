@@ -1,4 +1,5 @@
 export * from './create-reducer-with-actions.mjs';
+export * from './is-http-url.mjs';
 export * from './log.mjs';
 export * from './map-none-to-undefined.mjs';
 export * from './pad2.mjs';

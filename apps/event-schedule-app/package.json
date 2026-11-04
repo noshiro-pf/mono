@@ -59,8 +59,7 @@
     "tiny-router-react-hooks": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*",
-    "ts-fortress-types": "workspace:*",
-    "url-regex": "^5.0.0"
+    "ts-fortress-types": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
