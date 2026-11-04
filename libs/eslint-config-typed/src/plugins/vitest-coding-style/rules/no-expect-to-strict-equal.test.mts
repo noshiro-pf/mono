@@ -107,3 +107,118 @@ describe('no-expect-to-strict-equal with parenthesized operands', () => {
     ],
   });
 });
+
+describe('no-expect-to-strict-equal resolves expect and assert', () => {
+  tester.run('no-expect-to-strict-equal', noExpectToStrictEqualRule, {
+    valid: [
+      {
+        name: 'Playwright’s expect',
+        code: dedent`
+          import { expect } from '@playwright/test';
+          expect(actual).toStrictEqual(expected);
+        `,
+      },
+      {
+        name: 'toStrictEqual on something other than a call',
+        code: 'matcher.toStrictEqual(expected);',
+      },
+      {
+        name: 'a local expect',
+        code: dedent`
+          const expect = makeExpect();
+          expect(actual).toStrictEqual(expected);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'an expect aliased from vitest',
+        code: dedent`
+          import { assert, expect as e } from 'vitest';
+          e(actual).toStrictEqual(expected);
+        `,
+        output: dedent`
+          import { assert, expect as e } from 'vitest';
+          assert.deepStrictEqual(actual, expected);
+        `,
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'an assert from node:assert in scope is reported, not fixed',
+        code: dedent`
+          import assert from 'node:assert';
+          import { expect } from 'vitest';
+          expect(actual).toStrictEqual(expected);
+        `,
+        output: null,
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'a local assert shadowing the global is reported, not fixed',
+        code: dedent`
+          export const f = (assert) => {
+            expect(actual).toStrictEqual(expected);
+          };
+        `,
+        output: null,
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'an assert from node:assert beside the expect global',
+        code: dedent`
+          import assert from 'node:assert';
+          expect(actual).toStrictEqual(expected);
+        `,
+        output: null,
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'no assert in scope beside an imported expect: the import gains it',
+        code: dedent`
+          import { expect } from 'vitest';
+          expect(actual).toStrictEqual(expected);
+        `,
+        output: dedent`
+          import { expect, assert } from 'vitest';
+          assert.deepStrictEqual(actual, expected);
+        `,
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'several fixes in one file add the import once',
+        code: dedent`
+          import { expect } from 'vitest';
+          expect(a).toStrictEqual(b);
+          expect(c).toStrictEqual(d);
+        `,
+        output: [
+          dedent`
+            import { expect, assert } from 'vitest';
+            assert.deepStrictEqual(a, b);
+            expect(c).toStrictEqual(d);
+          `,
+          dedent`
+            import { expect, assert } from 'vitest';
+            assert.deepStrictEqual(a, b);
+            assert.deepStrictEqual(c, d);
+          `,
+        ],
+        errors: [{ messageId: 'useAssert' }, { messageId: 'useAssert' }],
+      },
+      {
+        name: 'Vitest’s assert under an alias is written by its local name',
+        code: dedent`
+          import assert from 'node:assert';
+          import { assert as va, expect } from 'vitest';
+          expect(actual).toStrictEqual(expected);
+        `,
+        output: dedent`
+          import assert from 'node:assert';
+          import { assert as va, expect } from 'vitest';
+          va.deepStrictEqual(actual, expected);
+        `,
+        errors: [{ messageId: 'useAssert' }],
+      },
+    ],
+  });
+});

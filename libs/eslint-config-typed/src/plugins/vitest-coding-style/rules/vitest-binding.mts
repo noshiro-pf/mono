@@ -4,7 +4,11 @@ import {
   TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { skipTypeWrappers } from 'eslint-rule-forge';
+import {
+  bindValueImportsAt,
+  isLocallyBound,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 
 /**
@@ -65,6 +69,90 @@ export const getVitestReceiver = (
       : variable.defs.every((def) => isVitestImportOf(def, expectedName));
 
   return isVitestBinding ? receiver : undefined;
+};
+
+/**
+ * For one file, a function that gives the fix for a rule rewriting the Vitest
+ * `expect(…)` call `node` into a call on Vitest's `assert` — `replacement`
+ * builds the new text from the name `assert` is reached by — or `null` when no
+ * name can be written safely, in which case the rule reports without a fix. A
+ * bare `assert.` would name `node:assert`'s, which has no `isTrue` and whose
+ * `deepStrictEqual` compares prototypes, or a binding the file does not have.
+ *
+ * `expectReceiver` is the `expect` identifier `getVitestReceiver` returned for
+ * `node`.
+ *
+ * - `expect` unbound in the file, and no value named `assert` declared where
+ *   `node` is (a type of that name does not count): Vitest's globals are on,
+ *   and `assert` is one of them.
+ * - Otherwise `assert` is bound as `bindValueImportsAt` binds an export of
+ *   `'vitest'`: by its local name when imported (`import { assert as a }`),
+ *   through a namespace import, or else added to an import from `'vitest'`;
+ *   no fix when `assert` is bound to anything else at `node` (`node:assert`,
+ *   a local, a parameter). Fixes that add the import overlap, so `--fix`
+ *   applies one per pass.
+ *
+ * `bindValueImportsAt` is set up on the first report that needs it and shared
+ * by the rest of the file's.
+ */
+export const createVitestAssertFixer = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+): ((
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  expectReceiver: TSESTree.Identifier,
+  replacement: (assertName: string) => string,
+) => TSESLint.ReportFixFunction | null) => {
+  let mut_bindingAt: ReturnType<typeof bindValueImportsAt> | undefined =
+    undefined;
+
+  return (node, expectReceiver, replacement) => {
+    if (
+      !isLocallyBound(sourceCode, expectReceiver, expectReceiver.name) &&
+      !isValueBound(sourceCode.getScope(node), 'assert')
+    ) {
+      return (fixer) => fixer.replaceText(node, replacement('assert'));
+    }
+
+    mut_bindingAt ??= bindValueImportsAt(sourceCode, 'vitest', ['assert']);
+
+    const binding = mut_bindingAt(node);
+
+    const localName = binding?.localNames[0];
+
+    return binding === undefined || localName === undefined
+      ? null
+      : (fixer) =>
+          Arr.toPushed(
+            binding.edits(fixer),
+            fixer.replaceText(node, replacement(localName)),
+          );
+  };
+};
+
+/**
+ * Whether `name`, read as a value in `scope`, meets a binding the file
+ * declares. A type alias, interface or type parameter does not shadow a value,
+ * so `type assert = …` leaves the global `assert` reachable.
+ */
+const isValueBound = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  scope: TSESLint.Scope.Scope | null,
+  name: string,
+): boolean => {
+  if (scope === null) {
+    return false;
+  }
+
+  const variable = scope.set.get(name);
+
+  return (
+    variable?.defs.some(
+      (def) => def.type !== TSESLint.Scope.DefinitionType.Type,
+    ) === true || isValueBound(scope.upper, name)
+  );
 };
 
 const isVitestImportOf = (

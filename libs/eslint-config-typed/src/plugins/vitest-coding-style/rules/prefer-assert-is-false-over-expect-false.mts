@@ -10,7 +10,10 @@ import {
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
-import { getVitestReceiver } from './vitest-binding.mjs';
+import {
+  createVitestAssertFixer,
+  getVitestReceiver,
+} from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsFalseOverExpectFalse';
 
@@ -22,7 +25,8 @@ type Options = readonly [];
  * `satisfies`, `!` and `<T>`; `X` keeps its wrappers, and is a boolean only if
  * the type at every layer of them is one: a widening `as` is the author saying
  * it may not be, and a narrowing one (`v as boolean` on an `unknown`, `flag!`)
- * does not make the value a boolean.
+ * does not make the value a boolean. The fix names Vitest's `assert` only
+ * (`createVitestAssertFixer`).
  */
 export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
   MessageIds,
@@ -38,7 +42,7 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
     schema: [],
     messages: {
       preferAssertIsFalseOverExpectFalse:
-        'Use assert.isFalse(X) instead of expect(X).toBe(false)',
+        "Use Vitest's assert.isFalse(X) instead of expect(X).toBe(false)",
     },
     defaultOptions: [],
   },
@@ -46,6 +50,8 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
     const parserServices = ESLintUtils.getParserServices(context);
 
     const checker = parserServices.program.getTypeChecker();
+
+    const vitestAssertFix = createVitestAssertFixer(context.sourceCode);
 
     return {
       CallExpression: (node) => {
@@ -65,41 +71,62 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
             ? rawExpected
             : skipTypeWrappers(rawExpected);
 
+        // The syntax first: the scope lookup is paid only by a candidate.
         if (
-          expectCall.type === AST_NODE_TYPES.CallExpression &&
-          getVitestReceiver(context.sourceCode, expectCall.callee, 'expect') !==
-            undefined &&
-          callee.property.type === AST_NODE_TYPES.Identifier &&
-          callee.property.name === 'toBe' &&
-          Arr.isFixedLengthTuple(1, node.arguments) &&
-          expected?.type === AST_NODE_TYPES.Literal &&
-          expected.value === false
+          expectCall.type !== AST_NODE_TYPES.CallExpression ||
+          callee.property.type !== AST_NODE_TYPES.Identifier ||
+          callee.property.name !== 'toBe' ||
+          !Arr.isFixedLengthTuple(1, node.arguments) ||
+          expected?.type !== AST_NODE_TYPES.Literal ||
+          expected.value !== false
         ) {
-          const arg = expectCall.arguments[0];
-
-          if (
-            arg !== undefined &&
-            !typeWrapperLayers(arg).every((layer) => {
-              const type = checker.getTypeAtLocation(
-                parserServices.esTreeNodeToTSNodeMap.get(layer),
-              );
-
-              return (type.flags & ts.TypeFlags.Boolean) !== 0;
-            })
-          ) {
-            return;
-          }
-
-          const argText =
-            arg === undefined ? '' : getArgumentText(context.sourceCode, arg);
-
-          context.report({
-            node,
-            messageId: 'preferAssertIsFalseOverExpectFalse',
-            fix: (fixer) =>
-              fixer.replaceText(node, `assert.isFalse(${argText})`),
-          });
+          return;
         }
+
+        const expectReceiver = getVitestReceiver(
+          context.sourceCode,
+          expectCall.callee,
+          'expect',
+        );
+
+        if (expectReceiver === undefined) {
+          return;
+        }
+
+        const [arg, ...messageArgs] = expectCall.arguments;
+
+        if (
+          arg === undefined ||
+          arg.type === AST_NODE_TYPES.SpreadElement ||
+          messageArgs.length > 1 ||
+          messageArgs.some(
+            (messageArg) => messageArg.type === AST_NODE_TYPES.SpreadElement,
+          ) ||
+          !typeWrapperLayers(arg).every((layer) => {
+            const type = checker.getTypeAtLocation(
+              parserServices.esTreeNodeToTSNodeMap.get(layer),
+            );
+
+            return (type.flags & ts.TypeFlags.Boolean) !== 0;
+          })
+        ) {
+          return;
+        }
+
+        // `expect(X, message)` keeps its message: `assert.is*` takes one too.
+        const argText = Arr.toUnshifted(arg)(messageArgs)
+          .map((a) => getArgumentText(context.sourceCode, a))
+          .join(', ');
+
+        context.report({
+          node,
+          messageId: 'preferAssertIsFalseOverExpectFalse',
+          fix: vitestAssertFix(
+            node,
+            expectReceiver,
+            (assertName) => `${assertName}.isFalse(${argText})`,
+          ),
+        });
       },
     };
   },
