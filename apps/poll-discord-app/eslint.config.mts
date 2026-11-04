@@ -2,6 +2,7 @@ import {
   defineKnownRules,
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
+  eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
@@ -25,7 +26,9 @@ export default [
   eslintPluginTsDataForge.configs.recommended,
   eslintPluginTsFortress.configs.recommended,
 
-  eslintConfigForNodeJs(['src/**', 'scripts/**']),
+  eslintConfigForVitest(['src/**/*.test.mts']),
+
+  eslintConfigForNodeJs(['src/**', 'scripts/**', 'configs/**']),
 
   {
     files: ['src/**'],
@@ -49,7 +52,7 @@ export default [
   },
 
   {
-    files: ['scripts/**'],
+    files: ['scripts/**', 'configs/**'],
     rules: defineKnownRules({
       '@typescript-eslint/explicit-function-return-type': 'off',
       'import-x/no-default-export': 'off',
