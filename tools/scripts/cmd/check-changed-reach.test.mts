@@ -215,4 +215,77 @@ describe('findReachViolations', () => {
 
     assert.include(violations[0], '`doc` in libs/both to CI');
   });
+
+  // #3445: a package whose `doc` writes nothing committed defines no
+  // generator, and a directory-scoped entry is how it says so.
+  describe('a directory-scoped entry takes precedence over a global one', () => {
+    const doc = {
+      scriptName: 'doc',
+      reason: 'reads dist/',
+      writtenBy: ['gen:readme', 'gen:jsdoc'],
+    } as const;
+
+    const exemption = {
+      directory: 'libs/plain',
+      scriptName: 'doc',
+      reason: 'typedoc output only, which is untracked',
+    } as const;
+
+    const uncovered = [
+      { command: 'libs/plain:doc', origin: 'style-check.yml: ws:doc' },
+      { command: 'libs/both:doc', origin: 'style-check.yml: ws:doc' },
+    ] as const;
+
+    const defined = new Set<string>(['libs/both:gen:readme']);
+
+    test('so a package that writes nothing committed can be exempted', () => {
+      assert.deepStrictEqual(
+        findReachViolations({
+          uncovered,
+          ciOnly: [doc, exemption],
+          localReach: defined,
+          defined,
+        }),
+        [],
+      );
+
+      const violations = findReachViolations({
+        uncovered,
+        ciOnly: [doc],
+        localReach: defined,
+        defined,
+      });
+
+      assert.lengthOf(violations, 1);
+
+      assert.include(violations[0], '`doc` in libs/plain to CI');
+    });
+
+    test('and a renamed generator still fails where no entry exempts it', () => {
+      const violations = findReachViolations({
+        uncovered,
+        ciOnly: [doc, exemption],
+        localReach: new Set<string>(),
+        defined: new Set<string>(),
+      });
+
+      assert.lengthOf(violations, 1);
+
+      assert.include(violations[0], '`doc` in libs/both to CI');
+    });
+
+    test('and an exemption of a package that defines a listed generator fails', () => {
+      const violations = findReachViolations({
+        uncovered,
+        ciOnly: [doc, { ...exemption, directory: 'libs/both' }],
+        localReach: defined,
+        defined,
+      });
+
+      assert.include(
+        violations.join('\n'),
+        'names `doc` in libs/both as writing nothing committed, but the package defines `gen:readme`',
+      );
+    });
+  });
 });

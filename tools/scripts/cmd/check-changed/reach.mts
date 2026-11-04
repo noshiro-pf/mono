@@ -124,6 +124,23 @@ export const matchesCiOnly = (entry: CiOnly, command: CommandId): boolean => {
   );
 };
 
+/**
+ * The {@link CI_ONLY} entry that applies to a command: of those that name it,
+ * the one naming its directory, then the one naming the longest directory it is
+ * under, then the one naming no directory. So a directory-scoped entry stands
+ * in for a global one there — for a package whose `doc` writes nothing
+ * committed, say, which the global `doc` entry's `writtenBy` would hold to
+ * generators it does not have.
+ */
+export const applicableCiOnly = (
+  ciOnly: readonly CiOnly[],
+  command: CommandId,
+): CiOnly | undefined =>
+  ciOnly
+    .filter((entry) => matchesCiOnly(entry, command))
+    .toSorted((a, b) => specificity(b) - specificity(a))
+    .at(0);
+
 /** The commands by script name, in the order first seen. */
 export const groupByScript = (
   entries: readonly Uncovered[],
@@ -176,7 +193,8 @@ export type Uncovered = Readonly<{
 /**
  * What CI runs that no diff makes `check-changed` run, on purpose. Each entry
  * is applied to every manifest that defines the script unless it names a
- * directory. The README beside this file says the same in prose; this is the
+ * directory; where several name a command, the most specific applies
+ * ({@link applicableCiOnly}). The README beside this file says the same in prose; this is the
  * list a new CI command has to join, with its reason, or be planned instead.
  */
 export const CI_ONLY: readonly CiOnly[] = [
@@ -269,7 +287,11 @@ export const CI_ONLY: readonly CiOnly[] = [
 ] as const;
 
 export type CiOnly = Readonly<{
-  /** Every manifest when absent; every one under it when it ends in `/`. */
+  /**
+   * Every manifest when absent; every one under it when it ends in `/`. Where
+   * several entries name a command, the most specific applies
+   * ({@link applicableCiOnly}).
+   */
   directory?: string;
   scriptName: string;
   reason: string;
@@ -283,6 +305,14 @@ export type CiOnly = Readonly<{
 }>;
 
 const SHOWN_DIRECTORIES = 5;
+
+/** A directory named exactly, then a longer prefix, then none. */
+const specificity = (entry: CiOnly): number =>
+  entry.directory === undefined
+    ? 0
+    : entry.directory.endsWith('/')
+      ? entry.directory.length
+      : Number.MAX_SAFE_INTEGER;
 
 const DEPS_BUILT_GUARD =
   /^node (?:\.\/|(?:\.\.\/)+)tools\/scripts\/cmd\/assert-deps-built\.mts(?: --workspace)?$/u;

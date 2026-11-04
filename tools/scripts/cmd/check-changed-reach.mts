@@ -9,6 +9,7 @@ import {
   type PackageInfo,
 } from './check-changed/plan.mjs';
 import {
+  applicableCiOnly,
   CI_ONLY,
   findUncovered,
   groupByScript,
@@ -199,6 +200,10 @@ export const planReach = ({
  * listing the directories it is in. And for an entry with a `writtenBy`, the
  * directories CI leaves the script to itself in where a generator it lists and
  * the package defines is reached by no plan, or the package defines none.
+ * Where several entries name a command the most specific applies
+ * (`applicableCiOnly`), so a directory-scoped entry with no `writtenBy` exempts
+ * a package whose output is not committed; one that exempts a package defining
+ * a generator a less specific entry lists is a violation too.
  */
 export const findReachViolations = ({
   uncovered,
@@ -213,9 +218,12 @@ export const findReachViolations = ({
   /** Every script a manifest defines. */
   defined: ReadonlySet<CommandId>;
 }>): readonly string[] => {
-  const unplanned = uncovered.filter(({ command }) =>
-    ciOnly.every((entry) => !matchesCiOnly(entry, command)),
-  );
+  const applied = uncovered.map((entry) => ({
+    ...entry,
+    applies: applicableCiOnly(ciOnly, entry.command),
+  }));
+
+  const unplanned = applied.filter(({ applies }) => applies === undefined);
 
   const missing = groupByScript(unplanned).map(
     ({ scriptName, directories, origin }) =>
@@ -228,13 +236,12 @@ export const findReachViolations = ({
   );
 
   const stale = ciOnly
-    .filter((entry) =>
-      uncovered.every(({ command }) => !matchesCiOnly(entry, command)),
-    )
+    .filter((entry) => applied.every(({ applies }) => applies !== entry))
     .map((entry) =>
       [
         `CI_ONLY in check-changed/reach.mts names \`${entry.scriptName}\`${entry.directory === undefined ? '' : ` in ${entry.directory}`},`,
-        'which CI no longer runs or check-changed now runs; remove the entry.',
+        'which CI no longer runs, check-changed now runs, or a more specific entry',
+        'covers wherever it matches; remove the entry.',
       ].join(' '),
     );
 
@@ -249,15 +256,11 @@ export const findReachViolations = ({
       return [];
     }
 
-    const unwritten = uncovered.filter(({ command }) => {
-      const { directory } = splitCommandId(command);
-
-      const generators = writtenBy
-        .map((generator) => toCommandId(directory, generator))
-        .filter((generator) => defined.has(generator));
+    const unwritten = applied.filter(({ command, applies }) => {
+      const generators = definedGenerators(command, writtenBy, defined);
 
       return (
-        matchesCiOnly(entry, command) &&
+        applies === entry &&
         (Arr.isEmpty(generators) ||
           generators.some((generator) => !localReach.has(generator)))
       );
@@ -273,7 +276,45 @@ export const findReachViolations = ({
     );
   });
 
-  return [...missing, ...stale, ...withoutGenerator];
+  // An exemption is only for a package with no generator to run: one that
+  // defines one a less specific entry lists would have its output go stale with
+  // nothing planned to say so.
+  const wrongExemption = applied.flatMap(({ command, applies }) => {
+    if (applies === undefined || applies.writtenBy !== undefined) {
+      return [];
+    }
+
+    const shadowed = ciOnly
+      .filter((entry) => entry !== applies && matchesCiOnly(entry, command))
+      .flatMap((entry) =>
+        definedGenerators(command, entry.writtenBy ?? [], defined),
+      );
+
+    return Arr.isNonEmpty(shadowed)
+      ? [
+          [
+            `CI_ONLY in check-changed/reach.mts names \`${applies.scriptName}\` in ${applies.directory ?? 'every package'} as writing nothing committed,`,
+            `but the package defines ${Arr.uniq(shadowed.map((generator) => `\`${splitCommandId(generator).scriptName}\``)).join(', ')}.`,
+            'Remove the entry, or give it that `writtenBy`.',
+          ].join(' '),
+        ]
+      : [];
+  });
+
+  return [...missing, ...stale, ...withoutGenerator, ...wrongExemption];
+};
+
+/** The generators of `writtenBy` the command's directory defines. */
+const definedGenerators = (
+  command: CommandId,
+  writtenBy: readonly string[],
+  defined: ReadonlySet<CommandId>,
+): readonly CommandId[] => {
+  const { directory } = splitCommandId(command);
+
+  return writtenBy
+    .map((generator) => toCommandId(directory, generator))
+    .filter((generator) => defined.has(generator));
 };
 
 type Summary = Readonly<{
