@@ -1107,10 +1107,53 @@ describe('Arr transformations', () => {
 
       const zipped = zip(xs, ys);
 
-      expectType<typeof zipped, readonly [readonly [1, number]]>('=');
+      // `ys` may be shorter than `xs`, so the pair is optional.
+      expectType<typeof zipped, readonly [(readonly [1, number])?]>('=');
 
       test('case 3', () => {
         assert.deepStrictEqual(zipped, [[1, 4]]);
+      });
+    }
+
+    {
+      const xs = [1, 2] as const;
+
+      const ys: readonly number[] = [] as const;
+
+      const zipped = zip(xs, ys);
+
+      expectType<
+        typeof zipped,
+        readonly [(readonly [1, number])?, (readonly [2, number])?]
+      >('=');
+
+      test('a tuple zipped with an empty plain array is empty', () => {
+        assert.deepStrictEqual(zipped, []);
+
+        expectType<(typeof zipped)[0], readonly [1, number] | undefined>('=');
+
+        assert.isUndefined(zipped[0]);
+      });
+    }
+
+    {
+      const xs: readonly number[] = [] as const;
+
+      const ys = [1, 2] as const;
+
+      const zipped = zip(xs, ys);
+
+      expectType<
+        typeof zipped,
+        readonly [(readonly [number, 1])?, (readonly [number, 2])?]
+      >('=');
+
+      test('an empty plain array zipped with a tuple is empty', () => {
+        assert.deepStrictEqual(zipped, []);
+
+        expectType<(typeof zipped)[0], readonly [number, 1] | undefined>('=');
+
+        assert.isUndefined(zipped[0]);
       });
     }
 

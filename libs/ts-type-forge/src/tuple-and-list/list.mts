@@ -209,8 +209,20 @@ export namespace List {
 
   /**
    * Creates pairs of elements from two readonly arrays or tuples `A` and `B`.
-   * If the arrays/tuples have different lengths, the resulting type reflects pairing up to the shortest length,
-   * potentially using the general element type for the longer array if one is a general array.
+   * Zipping stops at the shorter input, so a pair is required only while both
+   * inputs still have a leading required element. Once one side runs out of
+   * them, the pairs the other side's leading elements would form are optional:
+   * they may be missing. The result ends where either side's fixed length ends;
+   * only when both sides go on with a rest does it end in an unsized array of
+   * pairs.
+   *
+   * Only leading required elements count. A tuple with optional elements
+   * (`[A, B?]`) or with elements after a rest (`[...A[], B]`) is read from that
+   * point on as possibly empty and as long as the other side, so some of its
+   * pairs come out optional, or widened by `undefined`, where an exact answer
+   * would not need them to be, and the result can lose its length bound
+   * (`Zip<[1, 2?], readonly string[]>` ends in an unsized rest). The result
+   * never claims a pair that may be missing.
    * @template A - The first readonly array or tuple.
    * @template B - The second readonly array or tuple.
    * @returns A readonly array/tuple of pairs `readonly [A[i], B[i]]`.
@@ -219,8 +231,9 @@ export namespace List {
    * type Z1 = List.Zip<[1, 2], ['a', 'b']>; // readonly [[1, 'a'], [2, 'b']]
    * type Z2 = List.Zip<[1, 2, 3], ['a', 'b']>; // readonly [[1, 'a'], [2, 'b']]
    * type Z3 = List.Zip<readonly number[], readonly string[]>; // readonly (readonly [number, string])[]
-   * type Z4 = List.Zip<[1, 2], readonly string[]>; // readonly [[1, string], [2, string]]
-   * type Z5 = List.Zip<readonly number[], ['a', 'b']>; // readonly [[number, 'a'], [number, 'b']]
+   * type Z4 = List.Zip<[1, 2], readonly string[]>; // readonly [[1, string]?, [2, string]?]
+   * type Z5 = List.Zip<readonly number[], ['a', 'b']>; // readonly [[number, 'a']?, [number, 'b']?]
+   * type Z6 = List.Zip<[1, 2], readonly [string, ...string[]]>; // readonly [[1, string], [2, string]?]
    * ```
    */
   export type Zip<
@@ -232,10 +245,16 @@ export namespace List {
       ? readonly []
       : A extends NonEmptyTuple<unknown>
         ? B extends NonEmptyTuple<unknown>
-          ? readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>] // both A and B has at least 1 element
-          : readonly [readonly [Head<A>, B[number]], ...Zip<Tail<A>, Tail<B>>] // A has at least 1 element but B has at least 0 element
+          ? readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>] // both A and B have at least 1 element
+          : readonly [
+              (readonly [Head<A>, B[number]])?,
+              ...Zip<Tail<A>, Tail<B>>,
+            ] // only A is sure to have one; B may already be exhausted
         : B extends NonEmptyTuple<unknown>
-          ? readonly [readonly [A[number], Head<B>], ...Zip<Tail<A>, Tail<B>>] // B has at least 1 element but A has at least 0 element
+          ? readonly [
+              (readonly [A[number], Head<B>])?,
+              ...Zip<Tail<A>, Tail<B>>,
+            ] // only B is sure to have one; A may already be exhausted
           : readonly (readonly [A[number], B[number]])[];
 
   /**

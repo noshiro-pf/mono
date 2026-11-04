@@ -806,8 +806,8 @@ For detailed information on all types, see the [Full API Reference](https://nosh
     - [List.SetAt](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/tuple-and-list/list.mts#L172)
     - [List.Flatten](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/tuple-and-list/list.mts#L189)
     - [List.Concat](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/tuple-and-list/list.mts#L205)
-    - [List.Zip](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/tuple-and-list/list.mts#L226)
-    - [List.Partition](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/tuple-and-list/list.mts#L255)
+    - [List.Zip](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/tuple-and-list/list.mts#L239)
+    - [List.Partition](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/tuple-and-list/list.mts#L274)
 - src/tuple-and-list/make-tuple.mts
     - [MakeTuple](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/tuple-and-list/make-tuple.mts#L15)
 - src/tuple-and-list/tuple.mts

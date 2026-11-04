@@ -1,5 +1,6 @@
 import { expectType } from 'ts-data-forge';
 import type { DeepReadonly } from '../record/index.mjs';
+import type { Index } from '../type-level-integer/index.mjs';
 import type { FixedLengthTuple } from './length-constrained-tuple.mjs';
 import type { List } from './list.mjs';
 
@@ -292,6 +293,12 @@ import type { List } from './list.mjs';
     List.Zip<FixedLengthTuple<32, 1>, FixedLengthTuple<32, 2>>
   >('<=');
 
+  // The one-sided branch recurses as deep as the both-sided one.
+  expectType<
+    List.Zip<FixedLengthTuple<32, 1>, readonly number[]>['length'],
+    Index<33>
+  >('=');
+
   expectType<
     List.Zip<readonly [1, 2, 3], readonly [4, 5]>,
     readonly [readonly [1, 4], readonly [2, 5]]
@@ -307,19 +314,66 @@ import type { List } from './list.mjs';
     readonly [readonly [number, string]]
   >('=');
 
+  // A side that may be shorter than the other's fixed prefix makes the pairs
+  // past its own guaranteed length optional: zipping stops at the shorter
+  // input, so they exist only when that side is long enough.
   expectType<
     List.Zip<readonly [number], readonly [...string[]]>,
-    readonly [readonly [number, string]]
+    readonly [(readonly [number, string])?]
+  >('=');
+
+  expectType<
+    List.Zip<readonly [1, 2], readonly string[]>,
+    readonly [(readonly [1, string])?, (readonly [2, string])?]
+  >('=');
+
+  expectType<
+    List.Zip<readonly number[], readonly ['a', 'b']>,
+    readonly [(readonly [number, 'a'])?, (readonly [number, 'b'])?]
+  >('=');
+
+  expectType<
+    List.Zip<readonly [1, 2], readonly [string, ...string[]]>,
+    readonly [readonly [1, string], (readonly [2, string])?]
+  >('=');
+
+  expectType<
+    List.Zip<readonly [string, ...string[]], readonly [1, 2]>,
+    readonly [readonly [string, 1], (readonly [string, 2])?]
+  >('=');
+
+  expectType<
+    List.Zip<readonly [1, ...number[]], readonly string[]>,
+    readonly [(readonly [1, string])?, ...(readonly [number, string])[]]
+  >('=');
+
+  // Only leading required elements are counted. Elements after a rest, or
+  // optional ones, give a sound but imprecise answer: here B has at least two
+  // elements, yet the second pair is optional.
+  expectType<
+    List.Zip<readonly [1, 2], readonly [string, ...string[], number]>,
+    readonly [readonly [1, string], (readonly [2, string | number])?]
+  >('=');
+
+  // B has at most two elements, yet a third optional pair is still emitted, and
+  // the second pair's element includes `undefined`.
+  expectType<
+    List.Zip<readonly [1, 2, 3], readonly [string, string?]>,
+    readonly [
+      readonly [1, string],
+      (readonly [2, string | undefined])?,
+      (readonly [3, string | undefined])?,
+    ]
   >('=');
 
   expectType<
     List.Zip<readonly [string, ...string[]], readonly [number, number, number]>,
     readonly [
       readonly [string, number],
-      readonly [string, number],
-      readonly [string, number],
+      (readonly [string, number])?,
+      (readonly [string, number])?,
     ]
-  >('~='); // "=" にできない原因は不明
+  >('=');
 
   expectType<
     List.Zip<
@@ -328,8 +382,8 @@ import type { List } from './list.mjs';
     >,
     readonly [
       readonly [boolean, number],
-      readonly [string, number],
-      readonly [string, number],
+      (readonly [string, number])?,
+      (readonly [string, number])?,
     ]
   >('=');
 
@@ -340,8 +394,8 @@ import type { List } from './list.mjs';
     >,
     readonly [
       readonly [number, boolean],
-      readonly [number, string],
-      readonly [number, string],
+      (readonly [number, string])?,
+      (readonly [number, string])?,
       ...(readonly [number, string])[],
     ]
   >('=');
@@ -353,8 +407,8 @@ import type { List } from './list.mjs';
     >,
     readonly [
       readonly [boolean, number],
-      readonly [string, number],
-      readonly [string, number],
+      (readonly [string, number])?,
+      (readonly [string, number])?,
       ...(readonly [string, number])[],
     ]
   >('=');
