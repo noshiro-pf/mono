@@ -1,11 +1,28 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, asUint32, Result, unknownToString } from 'ts-data-forge';
+import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import {
+  CI_JOB,
+  CI_JOB_BUILD,
+  CI_JOB_COMMAND,
+} from '../lib/ci-job-options.mjs';
+import {
+  optionValues,
+  readPnpmRun,
+  type PnpmRun,
+} from '../lib/pnpm-command.mjs';
 import { listWorkflowFiles } from '../lib/repo-files.mjs';
+import { readShellCommands } from '../lib/shell-commands.mjs';
+import {
+  expandVariable,
+  matrixKeyOf,
+  readMatrix,
+  readWorkflowJobs,
+  type WorkflowJob,
+} from '../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { MATRIX_WORKFLOWS } from './check-all.mjs';
-import { readMatrixInclude } from './check-ci-commands.mjs';
 import { parseWorkflowTriggers } from './check-workflow-event-name.mjs';
 
 /**
@@ -59,8 +76,11 @@ export const checkCiJobShape = (): Promise<Result<number, string>> =>
  * (a job with a `matrix:`) of a check workflow either runs `z:ci-job`, and then
  * carries the report and no clean-tree step of its own, or runs its entries
  * some other way, which its workflow has to be allowed to do. Read job by job,
- * leaving out comments and step names, so that one job's step answers for no
- * other and a mention is not a run.
+ * through the YAML parser and the shell reader that `check-ci-commands.mts` and
+ * `check-all.mts` read the workflows with, so that one job's step answers for
+ * no other, a mention is not a run, and a run is a run however the line is
+ * written (joined by `|` or `$(…)`, continued with `\`, a matrix value handed
+ * on through a variable).
  */
 export const findJobShapeViolations = ({
   workflows,
@@ -77,44 +97,28 @@ export const findJobShapeViolations = ({
   checkAllWorkflows: readonly string[];
   rawAllowed: readonly RawAllowance[];
 }>): readonly string[] => {
-  const jobs = workflows.flatMap(({ relativePath, text, isCheck }) =>
-    splitJobs(text)
-      .filter(({ lines }) => lines.some((line) => MATRIX_KEY.test(line)))
-      .map(({ name, lines }) => {
-        const runs = (pattern: RegExp): boolean =>
-          lines.some((line) => pattern.test(line));
+  const read = workflows.map((workflow) => ({
+    ...workflow,
+    jobs: readWorkflowJobs(workflow.text),
+  }));
 
-        // Each command of a line on its own: `a && b` runs both.
-        const commands = lines.flatMap((line) => line.split(/&&|;|\|\|/u));
+  const unparsed = Arr.generate(function* () {
+    for (const { relativePath, isCheck, jobs: parsed } of read) {
+      if (isCheck && Result.isErr(parsed)) {
+        yield `${relativePath}: ${parsed.value}`;
+      }
+    }
+  });
 
-        // What check-all reads, read the way it reads it.
-        const entries = readMatrixInclude(lines.join('\n'));
-
-        const ciJobLines = lines.filter((line) => CI_JOB_RUN.test(line));
-
-        return {
-          relativePath,
-          isCheck,
-          label: `${relativePath} (job \`${name}\`)`,
-          throughCiJob: Arr.isNonEmpty(ciJobLines),
-          // A matrix entry run beside `z:ci-job`, outside it; the report step
-          // names the entry and runs none.
-          alsoBare: commands.some(
-            (command) =>
-              BARE_MATRIX_RUN.test(command) &&
-              !CI_JOB_RUN.test(command) &&
-              !GAP_REPORT.test(command),
-          ),
-          readable:
-            Arr.isNonEmpty(entries) &&
-            entries.every(({ command }) => command !== undefined) &&
-            ciJobLines.every((line) => CI_JOB_COMMAND.test(line)) &&
-            (entries.every(({ build }) => build === undefined) ||
-              ciJobLines.every((line) => CI_JOB_BUILD.test(line))),
-          reports: runs(GAP_REPORT),
-          assertsClean: runs(CLEAN_TREE_ASSERTION),
-        };
-      }),
+  const jobs = read.flatMap(({ relativePath, isCheck, jobs: parsed }) =>
+    (Result.isOk(parsed) ? parsed.value : [])
+      .filter(({ matrix }) => matrix !== undefined)
+      .map((job) => ({
+        relativePath,
+        isCheck,
+        label: `${relativePath} (job \`${job.name}\`)`,
+        ...readJob(job),
+      })),
   );
 
   const checkJobs = jobs.filter(({ isCheck }) => isCheck);
@@ -144,16 +148,22 @@ export const findJobShapeViolations = ({
   const checkAllSet = new Set<string>(checkAllWorkflows);
 
   return [
+    ...unparsed,
     ...checkJobs.flatMap(
       ({
         relativePath,
         label,
         throughCiJob,
         alsoBare,
-        readable,
+        unreadable,
         reports,
         assertsClean,
+        problems,
       }) => [
+        ...problems.map(
+          (problem) =>
+            `${label}: ${problem}. Write the step in a form this reads, so that what it runs is judged.`,
+        ),
         ...(!throughCiJob && !allowed.has(relativePath)
           ? [
               `${label} runs its matrix entries without \`z:ci-job\`. Run each through \`pnpm run z:ci-job --build \${{ matrix.build }} --command \${{ matrix.command }}\`, so that a write names its step and \`check-all\` runs it too, or add the workflow to RAW_MATRIX_ALLOWED in check-ci-job-shape.mts with the reason.`,
@@ -164,9 +174,9 @@ export const findJobShapeViolations = ({
               `${label} runs a matrix entry with \`pnpm run \${{ matrix.<key> }}\` beside \`z:ci-job\`; run every entry through \`z:ci-job\`.`,
             ]
           : []),
-        ...(throughCiJob && !readable
+        ...(throughCiJob && unreadable !== undefined
           ? [
-              `${label} runs \`z:ci-job\` on a matrix \`check-all\` cannot read: it reads the \`include:\` entries and their \`command\` and \`build\`, handed on as \`--command \${{ matrix.command }}\`.`,
+              `${label} runs \`z:ci-job\` on a matrix \`check-all\` cannot read (${unreadable}): it reads the \`include:\` entries and their \`command\` and \`build\`, handed on as \`--command \${{ matrix.command }}\` and \`--build \${{ matrix.build }}\`.`,
             ]
           : []),
         ...(throughCiJob && !reports
@@ -223,105 +233,107 @@ const RAW_MATRIX_ALLOWED: readonly RawAllowance[] = [
   },
 ] as const;
 
-/** A `matrix:` key, block or flow style (`strategy: { matrix: … }`). */
-const MATRIX_KEY = /(?:^|[\s{,])matrix:/u;
+/** The matrix key the value of `flag` names, `--flag x` or `--flag=x`. */
+const optionValue = (
+  args: readonly string[],
+  flag: string,
+): string | undefined =>
+  matrixKeyOf(optionValues(args, new Set<string>([flag])).at(0) ?? '');
 
-const CI_JOB_BUILD = /--build\s+\$\{\{\s*matrix\.build\s*\}\}/u;
+/** Why `check-all` could not read a `z:ci-job` job's matrix, if it could not. */
+const unreadableMatrix = (
+  job: WorkflowJob,
+  ciJobRuns: readonly PnpmRun[],
+): string | undefined => {
+  const matrix = readMatrix(job.matrix);
 
-// Each script name ends where no name character follows, so that `z:ci-job-x`
-// is not `z:ci-job`.
-const CI_JOB_RUN = /\bpnpm run z:ci-job(?![\w:-])/u;
-
-const CI_JOB_COMMAND = /--command\s+\$\{\{\s*matrix\.command\s*\}\}/u;
-
-const BARE_MATRIX_RUN = /\bpnpm run [^\n]*\$\{\{\s*matrix\./u;
-
-const GAP_REPORT = /\bpnpm run --silent z:check-changed-gap(?![\w:-])/u;
-
-const CLEAN_TREE_ASSERTION = /\bpnpm run z:assert-repo-is-clean(?![\w:-])/u;
-
-const STEP_NAME = /^\s*(?:- )?name: /u;
-
-/**
- * A line without its trailing ` # comment`: the first ` #` outside quotes, as a
- * shell or YAML reads one.
- */
-const withoutTrailingComment = (line: string): string => {
-  const mut_state = { open: '' };
-
-  // By UTF-16 unit, as `line[index]` and `slice` count; every character tested
-  // is ASCII.
-  for (const index of Arr.seq(asUint32(line.length))) {
-    const character = line[index] ?? '';
-
-    if (mut_state.open !== '') {
-      mut_state.open = character === mut_state.open ? '' : mut_state.open;
-
-      continue;
-    }
-
-    if (character === "'" || character === '"') {
-      mut_state.open = character;
-
-      continue;
-    }
-
-    if (character === '#' && (index === 0 || line[index - 1] === ' ')) {
-      return line.slice(0, index).trimEnd();
-    }
+  if (Result.isErr(matrix)) {
+    return matrix.value;
   }
 
-  return line;
+  const { include, lists } = matrix.value;
+
+  const listed = Object.keys(lists);
+
+  if (Arr.isNonEmpty(listed)) {
+    return `${listed.map((key) => `\`${key}\``).join(', ')} given as a list`;
+  }
+
+  if (Arr.isEmpty(include)) {
+    return 'no `include:` entries';
+  }
+
+  if (include.some(({ command }) => command === undefined)) {
+    return 'an `include:` entry without a `command`';
+  }
+
+  if (
+    ciJobRuns.some((run) => optionValue(run.args, CI_JOB_COMMAND) !== 'command')
+  ) {
+    return `a \`${CI_JOB}\` not handed \`${CI_JOB_COMMAND} \${{ matrix.command }}\``;
+  }
+
+  return include.some(({ build }) => build !== undefined) &&
+    ciJobRuns.some((run) => optionValue(run.args, CI_JOB_BUILD) !== 'build')
+    ? `a \`${CI_JOB}\` not handed \`${CI_JOB_BUILD} \${{ matrix.build }}\``
+    : undefined;
 };
 
 /**
- * Each job under `jobs:`, its name and its lines, without comment lines, step
- * names and trailing comments: a job key is a line at the indentation of the
- * first one.
+ * What a matrix job runs, by the scripts of its `pnpm run`s: through `z:ci-job`
+ * or a matrix value run bare beside it, the report, a clean-tree assertion, why
+ * `check-all` could not read its matrix, and what the shell reader could not
+ * read.
  */
-const splitJobs = (
-  text: string,
-): readonly Readonly<{ name: string; lines: readonly string[] }>[] => {
-  const lines = text
-    .replaceAll('\r', '')
-    .split('\n')
-    .filter(
-      (line) => !line.trimStart().startsWith('#') && !STEP_NAME.test(line),
-    )
-    .map(withoutTrailingComment);
-
-  const start = lines.findIndex((line) => line.trimEnd() === 'jobs:');
-
-  if (start === -1) {
-    return [];
-  }
-
-  const rest = lines.slice(start + 1);
-
-  // The block ends at the next top-level key (`env:`, `concurrency:`).
-  const end = rest.findIndex((line) => line !== '' && !line.startsWith(' '));
-
-  const body = end === -1 ? rest : rest.slice(0, end);
-
-  const first = body.find((line) => line.trim() !== '');
-
-  if (first === undefined) {
-    return [];
-  }
-
-  const indent = first.length - first.trimStart().length;
-
-  const isKey = (line: string): boolean =>
-    line.length - line.trimStart().length === indent &&
-    line.trimEnd().endsWith(':');
-
-  const starts = body.flatMap((line, index) => (isKey(line) ? [index] : []));
-
-  return starts.map((startIndex, position) => ({
-    name: (body[startIndex] ?? '').trim().slice(0, -1),
-    lines: body.slice(startIndex + 1, starts.at(position + 1) ?? body.length),
+const readJob = (
+  job: WorkflowJob,
+): Readonly<{
+  throughCiJob: boolean;
+  alsoBare: boolean;
+  unreadable: string | undefined;
+  reports: boolean;
+  assertsClean: boolean;
+  problems: readonly string[];
+}> => {
+  const readings = job.steps.map((step) => ({
+    step,
+    reading: readShellCommands(step.run ?? ''),
   }));
+
+  const runs = readings.flatMap(({ step, reading }) =>
+    Arr.generate(function* () {
+      for (const words of reading.commands) {
+        const run = readPnpmRun(
+          words.map((word) =>
+            expandVariable(word, { ...job.env, ...step.env }),
+          ),
+        );
+
+        if (run !== undefined) {
+          yield run;
+        }
+      }
+    }),
+  );
+
+  const ciJobRuns = runs.filter(({ script }) => script === CI_JOB);
+
+  const runsScript = (script: string): boolean =>
+    runs.some((run) => run.script === script);
+
+  return {
+    throughCiJob: Arr.isNonEmpty(ciJobRuns),
+    alsoBare: runs.some(({ script }) => matrixKeyOf(script) !== undefined),
+    unreadable: unreadableMatrix(job, ciJobRuns),
+    reports: runsScript(GAP_REPORT),
+    assertsClean: runsScript(CLEAN_TREE_ASSERTION),
+    problems: readings.flatMap(({ reading }) => reading.problems),
+  };
 };
+
+const GAP_REPORT = 'z:check-changed-gap';
+
+const CLEAN_TREE_ASSERTION = 'z:assert-repo-is-clean';
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkCiJobShape().catch((error: unknown) =>

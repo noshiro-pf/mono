@@ -53,6 +53,13 @@ const violations = (
 ): readonly string[] =>
   findJobShapeViolations({ workflows, checkAllWorkflows, rawAllowed });
 
+/** `text` with `from` replaced, which it must contain. */
+const replaced = (text: string, from: string, to: string): string => {
+  assert.include(text, from);
+
+  return text.replace(from, () => to);
+};
+
 const allow = (relativePath: string, reason = 'other Node versions') =>
   ({ relativePath, reason }) as const;
 
@@ -153,7 +160,7 @@ describe('findJobShapeViolations', () => {
       [
         workflow(
           '.github/workflows/a.yml',
-          `${ciJobWorkflow}\n        - run: pnpm run z:assert-repo-is-clean`,
+          `${ciJobWorkflow}\n      - run: pnpm run z:assert-repo-is-clean`,
         ),
       ],
       ['.github/workflows/a.yml'],
@@ -192,7 +199,7 @@ describe('findJobShapeViolations', () => {
       [
         workflow(
           '.github/workflows/a.yml',
-          `${ciJobWorkflow}\n        - run: pnpm run \${{ matrix.command }}`,
+          `${ciJobWorkflow}\n      - run: pnpm run \${{ matrix.command }}`,
         ),
       ],
       ['.github/workflows/a.yml'],
@@ -302,7 +309,8 @@ describe('findJobShapeViolations', () => {
         test:
           strategy: { matrix: { command: [a] } }
           steps:
-            - run: echo "step #1" && pnpm run \${{ matrix.command }}
+            # A plain scalar would end at \` #\`, for GitHub too.
+            - run: 'echo "step #1" && pnpm run \${{ matrix.command }}'
     `;
 
     const found = violations([workflow('.github/workflows/c.yml', odd)], []);
@@ -370,5 +378,126 @@ describe('findJobShapeViolations', () => {
     assert.lengthOf(found, 1);
 
     assert.include(found[0], 'pull request');
+  });
+
+  test.each([
+    [
+      'through a variable',
+      dedent`
+        - env:
+            COMMAND: \${{ matrix.command }}
+          run: pnpm run "\${COMMAND}"
+      `,
+    ],
+    // eslint-disable-next-line no-template-curly-in-string -- a GitHub Actions expression, not a template.
+    ['after a pipe', '- run: echo start | pnpm run ${{ matrix.command }}'],
+    // eslint-disable-next-line no-template-curly-in-string -- a GitHub Actions expression, not a template.
+    ['in the background', '- run: true & pnpm run ${{ matrix.command }}'],
+    // eslint-disable-next-line no-template-curly-in-string -- a GitHub Actions expression, not a template.
+    ['in a substitution', '- run: echo "$(pnpm run ${{ matrix.command }})"'],
+  ] as const)(
+    'a matrix entry run bare %s beside z:ci-job is a violation',
+    (_, step) => {
+      const found = violations(
+        [
+          workflow(
+            '.github/workflows/a.yml',
+            `${ciJobWorkflow}\n${step.replaceAll(/^/gmu, ' '.repeat(6))}`,
+          ),
+        ],
+        ['.github/workflows/a.yml'],
+      );
+
+      assert.lengthOf(found, 1);
+
+      assert.include(found[0], 'beside');
+    },
+  );
+
+  test('a z:ci-job call continued over lines is read whole', () => {
+    const continued = replaced(
+      ciJobWorkflow,
+      // eslint-disable-next-line no-template-curly-in-string -- a GitHub Actions expression, not a template.
+      'run: pnpm run z:ci-job --build ${{ matrix.build }} --command ${{ matrix.command }}',
+      // eslint-disable-next-line no-template-curly-in-string -- a GitHub Actions expression, not a template.
+      'run: |\n            pnpm run z:ci-job \\\n              --build ${{ matrix.build }} \\\n              --command ${{ matrix.command }}',
+    );
+
+    assert.deepStrictEqual(
+      violations(
+        [workflow('.github/workflows/a.yml', continued)],
+        ['.github/workflows/a.yml'],
+      ),
+      [],
+    );
+  });
+
+  test('an apostrophe or a character outside the BMP opens no quote before a comment', () => {
+    const commented = replaced(
+      ciJobWorkflow,
+      '\n    steps:',
+      [
+        '',
+        '    env:',
+        "      NOTE: can't stop # pnpm run z:assert-repo-is-clean",
+        '      PARTY: 🎉 # pnpm run z:assert-repo-is-clean',
+        '    steps:',
+      ].join('\n'),
+    );
+
+    assert.deepStrictEqual(
+      violations(
+        [workflow('.github/workflows/a.yml', commented)],
+        ['.github/workflows/a.yml'],
+      ),
+      [],
+    );
+  });
+
+  test('an `include:` with a comment after it, its entries led by `name:`, is read', () => {
+    const named = replaced(
+      ciJobWorkflow,
+      '        include:\n          - command: check:root',
+      '        include: # the entries\n          - name: root\n            command: check:root',
+    );
+
+    assert.deepStrictEqual(
+      violations(
+        [workflow('.github/workflows/a.yml', named)],
+        ['.github/workflows/a.yml'],
+      ),
+      [],
+    );
+  });
+
+  // check-all reads the `include:` entries alone; `needs: [a, b]` is no matrix.
+  test('a matrix key given as a list beside `include:` is a violation', () => {
+    const listed = replaced(
+      replaced(
+        ciJobWorkflow,
+        '        include:',
+        '        command: [check:md, check:prose]\n        include:',
+      ),
+      '    strategy:',
+      '    needs: [gates, other]\n    strategy:',
+    );
+
+    const found = violations(
+      [workflow('.github/workflows/a.yml', listed)],
+      ['.github/workflows/a.yml'],
+    );
+
+    assert.lengthOf(found, 1);
+
+    assert.include(found[0], '`command` given as a list');
+  });
+
+  test('a workflow YAML cannot parse is a violation', () => {
+    const found = violations(
+      [workflow('.github/workflows/a.yml', 'jobs:\n  a: [\n')],
+      [],
+    );
+
+    assert.lengthOf(found, 1);
   });
 });

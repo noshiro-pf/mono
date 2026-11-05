@@ -30,11 +30,29 @@ const proseGate = [
   '.prettierrc',
 ] as const;
 
-const reach = planReach({
-  packages,
-  proseGate,
-  rootScripts: ['check:root:a', 'check:root:types', 'check:prose'],
-});
+// The root scripts the plans run, which a step that names one the root does not
+// define makes an error.
+const rootScripts = [
+  'check:root:a',
+  'check:root:types',
+  'check:prose',
+  'z:format-diff-from',
+  'gen:verify-npm-packages',
+  'fix:codemod:affected',
+  'check:md',
+  'gen:deps-graph',
+  'gen:license-files',
+  'check:knip',
+  'check:published-deps',
+  'check:cspell',
+  'fix:fmt:full',
+  'check:cspell:changeset',
+  'strict-lib:check:types',
+  'strict-lib:check:lint',
+  'strict-lib:fix:fmt',
+] as const;
+
+const reach = planReach({ packages, proseGate, rootScripts });
 
 describe('samplePaths', () => {
   test('a source file, a document and a manifest in every package', () => {

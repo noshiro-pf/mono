@@ -14,8 +14,23 @@ import {
 } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import { Regex } from 'ts-std-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
+import {
+  CI_JOB,
+  CI_JOB_BUILD,
+  CI_JOB_COMMAND,
+} from '../lib/ci-job-options.mjs';
+import { optionValues, readPnpmRun, readRunAll } from '../lib/pnpm-command.mjs';
 import { listWorkflowFiles } from '../lib/repo-files.mjs';
+import { readShellCommands } from '../lib/shell-commands.mjs';
+import {
+  expandVariable,
+  matrixKeyOf,
+  matrixValues,
+  readMatrix,
+  readWorkflowJobs,
+  type Matrix,
+} from '../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { parseWorkflowTriggers } from './check-workflow-event-name.mjs';
 
@@ -54,7 +69,23 @@ export const checkCiCommands = (): Promise<Result<CheckSummary, string>> =>
 
     const workflows = yield* Result.safeUnwrap(await readCheckWorkflows());
 
+    const unread = [
+      ...graph.problems,
+      ...workflows.flatMap(({ relativePath, problems }) =>
+        problems.map((problem) => `${relativePath}: ${problem}`),
+      ),
+      ...workflows.flatMap(({ relativePath, packageRuns }) =>
+        resolvePackageRuns(packageRuns, manifests).problems.map(
+          (problem) => `${relativePath}: ${problem}`,
+        ),
+      ),
+    ].map(
+      (problem) =>
+        `${problem}. Write it in a form this reads, so that what it runs is judged.`,
+    );
+
     const violations = [
+      ...unread,
       ...findRedundantCommands(workflows, graph),
       ...findUncoveredCommands(workflows, manifests, graph),
     ] as const;
@@ -92,19 +123,21 @@ export const buildCoverageGraph = (
     ),
   );
 
-  const packageScriptNames = Arr.generate(function* () {
-    for (const { directory, name, scripts } of manifests) {
-      if (directory !== ROOT_DIRECTORY) {
-        yield { directory, name, names: Object.keys(scripts) };
-      }
-    }
-  });
+  const members = membersOf(manifests);
+
+  const mut_problems: string[] = [];
 
   const derived = manifests.flatMap(({ directory, scripts }) => {
     const siblingNames = Object.keys(scripts);
 
     return Object.entries(scripts).flatMap(([scriptName, body]) => {
+      const from = toCommandId(directory, scriptName);
+
       const invocations = resolveScriptInvocations(body);
+
+      mut_problems.push(
+        ...invocations.problems.map((problem) => `${from}: ${problem}`),
+      );
 
       const local = invocations.local.flatMap((pattern) =>
         matchScriptNames(pattern, siblingNames).map((name) =>
@@ -112,19 +145,50 @@ export const buildCoverageGraph = (
         ),
       );
 
-      const recursive = invocations.recursive.flatMap(({ pattern, filters }) =>
-        selectMembers(filters, packageScriptNames).flatMap(
-          ({ directory: packageDir, names }) =>
+      const recursive = invocations.recursive.flatMap(
+        ({ pattern, filters }) => {
+          const selected = selectMembers(filters, members);
+
+          if (Result.isErr(selected)) {
+            mut_problems.push(`${from}: ${selected.value}`);
+
+            return [];
+          }
+
+          return selected.value.flatMap(({ directory: packageDir, names }) =>
             matchScriptNames(pattern, names).map((name) =>
               toCommandId(packageDir, name),
             ),
-        ),
+          );
+        },
       );
 
-      return [...local, ...recursive].map((to) => ({
-        from: toCommandId(directory, scriptName),
-        to,
-      }));
+      // `pnpm --dir <path>`, relative to the manifest whose script runs it.
+      const pointed = invocations.pointed.flatMap(
+        ({ pattern, directory: target, fromRoot }) => {
+          const resolved = path.posix.normalize(
+            fromRoot === true ? target : path.posix.join(directory, target),
+          );
+
+          const member = members.find(
+            (candidate) => candidate.directory === resolved,
+          );
+
+          if (member === undefined) {
+            mut_problems.push(
+              `${from}: \`--dir ${target}\` names ${resolved}, which is no workspace member`,
+            );
+
+            return [];
+          }
+
+          return matchScriptNames(pattern, member.names).map((name) =>
+            toCommandId(resolved, name),
+          );
+        },
+      );
+
+      return [...local, ...recursive, ...pointed].map((to) => ({ from, to }));
     });
   });
 
@@ -163,14 +227,16 @@ export const buildCoverageGraph = (
     addEdge(edge);
   }
 
-  return { commands, edges: mut_edges };
+  return { commands, edges: mut_edges, problems: mut_problems };
 };
 
 /**
  * The scripts one script body runs, as patterns rather than names: a body may
  * name a script (`pnpm run check:md`), a regular expression pnpm expands over
  * the manifest (`pnpm run '/check:prose:.-/'`), or a glob `npm-run-all` expands
- * the same way (`run-p check:test:-`).
+ * the same way (`run-p check:test:-`). The body is read as the shell reads it
+ * (`shell-commands.mts`), and each command as pnpm or `npm-run-all` reads its
+ * words (`pnpm-command.mts`), so a flag's value is no script.
  *
  * `recursive` holds what a `pnpm run --recursive`, or a `pnpm run` with a
  * `--filter`, reaches, which is the named script of every workspace package
@@ -179,73 +245,63 @@ export const buildCoverageGraph = (
  * scripts each package defines. Each carries its `--filter` selectors, which
  * `buildCoverageGraph` applies: CI shards by them (`ws:fix:lint:apps`,
  * `ws:check:test:shard-1`), and a shard reaches its own packages, not every
- * package.
+ * package. `pointed` holds a `pnpm --dir <path> run`, the path as written.
+ *
+ * A script run with arguments of its own is left out. Everything after the
+ * script name is handed to it, and an argument can change what the script
+ * does: `verify:npm-packages:published` is `pnpm run verify:npm-packages
+ * --published`, and what `--published` selects — the versions pinned under
+ * verify-npm-packages/published rather than tarballs packed from the checkout
+ * — is a different question from the one the bare script asks. Whether a
+ * variant still covers the script it wraps is a judgement, so it belongs in
+ * {@link DECLARED_COVERAGE} rather than being read off the body; an
+ * `npm-run-all` entry with arguments (`"gen:x -- --all"`) is the same.
  */
 export const resolveScriptInvocations = (body: string): ScriptInvocations => {
+  const reading = readShellCommands(body);
+
   const mut_local: string[] = [];
 
   const mut_recursive: RecursiveInvocation[] = [];
 
-  for (const matched of body.matchAll(PNPM_RUN)) {
-    const tokens = tokenize(matched.groups?.['args'] ?? '');
+  const mut_pointed: PointedInvocation[] = [];
 
-    // `--filter <selector>` takes the next token, which is not the script.
-    const filterValues = new Set(
-      tokens.flatMap((token, index) =>
-        FILTER_FLAGS.has(token) ? [index + 1] : [],
-      ),
-    );
+  for (const words of reading.commands) {
+    const run = readPnpmRun(words);
 
-    // Everything before the script name is a flag of pnpm's own (`--recursive`,
-    // `--if-present`); everything after it is an argument handed to the script,
-    // and an argument can change what the script does.
-    // `verify:npm-packages:published` is `pnpm run verify:npm-packages
-    // --published`, and what `--published` selects — the versions pinned
-    // under verify-npm-packages/published rather than tarballs packed from the
-    // checkout — is a different question from the one the bare script asks.
-    // Whether a variant still covers the script it wraps is a judgement, so it
-    // belongs in {@link DECLARED_COVERAGE} rather than being read off the body.
-    const targetIndex = tokens.findIndex(
-      (token, index) => !token.startsWith('-') && !filterValues.has(index),
-    );
+    if (run !== undefined) {
+      if (Arr.isNonEmpty(run.args)) {
+        continue;
+      }
 
-    const target = targetIndex === -1 ? undefined : tokens[targetIndex];
+      // A filter runs the script in the packages it selects, `--recursive` or
+      // not.
+      if (run.recursive || Arr.isNonEmpty(run.filters)) {
+        mut_recursive.push({ pattern: run.script, filters: run.filters });
+      } else if (run.workspaceRoot) {
+        mut_pointed.push({
+          pattern: run.script,
+          directory: '.',
+          fromRoot: true,
+        });
+      } else if (run.directory !== undefined && run.directory !== '.') {
+        mut_pointed.push({ pattern: run.script, directory: run.directory });
+      } else {
+        mut_local.push(run.script);
+      }
 
-    if (target === undefined || tokens.length > targetIndex + 1) {
       continue;
     }
 
-    const filters = tokens.flatMap((token, index) => {
-      if (filterValues.has(index)) {
-        return [token];
-      }
-
-      const prefix = Array.from(FILTER_FLAGS).find((flag) =>
-        token.startsWith(`${flag}=`),
-      );
-
-      return prefix === undefined ? [] : [token.slice(prefix.length + 1)];
-    });
-
-    // A filter runs the script in the packages it selects, `--recursive` or
-    // not.
-    if (
-      tokens.some((token) => RECURSIVE_FLAGS.has(token)) ||
-      Arr.isNonEmpty(filters)
-    ) {
-      mut_recursive.push({ pattern: target, filters });
-    } else {
-      mut_local.push(target);
-    }
+    mut_local.push(...(readRunAll(words)?.scripts ?? []));
   }
 
-  for (const matched of body.matchAll(RUN_ALL)) {
-    const tokens = tokenize(matched.groups?.['args'] ?? '');
-
-    mut_local.push(...tokens.filter((token) => !token.startsWith('-')));
-  }
-
-  return { local: mut_local, recursive: mut_recursive };
+  return {
+    local: mut_local,
+    recursive: mut_recursive,
+    pointed: mut_pointed,
+    problems: reading.problems,
+  };
 };
 
 /**
@@ -344,9 +400,10 @@ export const findUncoveredCommands = (
   manifests: readonly Manifest[],
   graph: CoverageGraph,
 ): readonly string[] => {
-  const entryPoints = workflows.flatMap(({ commands }) =>
-    commands.map((command) => toCommandId(ROOT_DIRECTORY, command)),
-  );
+  const entryPoints = workflows.flatMap(({ commands, packageRuns }) => [
+    ...commands.map((command) => toCommandId(ROOT_DIRECTORY, command)),
+    ...resolvePackageRuns(packageRuns, manifests).commands,
+  ]);
 
   const covered = reachableFrom(graph, entryPoints);
 
@@ -388,11 +445,24 @@ type Edge = Readonly<{ from: CommandId; to: CommandId }>;
 export type CoverageGraph = Readonly<{
   commands: ReadonlySet<CommandId>;
   edges: ReadonlyMap<CommandId, ReadonlySet<CommandId>>;
+  /** What a script body says that this could not read. */
+  problems: readonly string[];
 }>;
 
 export type ScriptInvocations = Readonly<{
   local: readonly string[];
   recursive: readonly RecursiveInvocation[];
+  pointed: readonly PointedInvocation[];
+  /** What the body says that the shell reader could not read. */
+  problems: readonly string[];
+}>;
+
+export type PointedInvocation = Readonly<{
+  pattern: string;
+  /** `--dir` / `-C`, as written. */
+  directory: string;
+  /** `-w`: the directory is the root's, not the manifest's. */
+  fromRoot?: boolean;
 }>;
 
 export type RecursiveInvocation = Readonly<{
@@ -403,8 +473,26 @@ export type RecursiveInvocation = Readonly<{
 
 export type CheckWorkflow = Readonly<{
   relativePath: string;
+  /** The root scripts it runs. */
   commands: readonly string[];
+  /** What it runs in packages, resolved by {@link resolvePackageRuns}. */
+  packageRuns: readonly PackageRun[];
+  /** What it says that this could not read. */
+  problems: readonly string[];
   pinsNodeVersion: boolean;
+}>;
+
+export type WorkflowCommands = StrictPick<
+  CheckWorkflow,
+  'commands' | 'packageRuns' | 'problems'
+>;
+
+/** A `pnpm run` pointed at packages by `--filter`, `-r` or `--dir`. */
+export type PackageRun = Readonly<{
+  scripts: readonly string[];
+  filters: readonly string[];
+  /** `--dir`, or the step's working directory, from the repository root. */
+  directory: string | undefined;
 }>;
 
 type CheckSummary = Readonly<{
@@ -426,72 +514,24 @@ const ROOT_DIRECTORY = '.';
  */
 const PULL_REQUEST_EVENT = 'pull_request';
 
-const RECURSIVE_FLAGS: ReadonlySet<string> = new Set<string>([
-  '--recursive',
-  '-r',
-]);
-
-const FILTER_FLAGS: ReadonlySet<string> = new Set<string>([
-  '--filter',
-  '--filter-prod',
-  '-F',
-]);
-
 /**
  * A selector this reads: a package name or a path, either with `*` globs, and
  * `!` before it to exclude. The dependency forms (`...`, `^`, `[ref]`, `{…}`)
- * select by what the graph does not know, so a filter that uses one selects
- * every package, which over-reaches rather than drops a check.
+ * select by what the graph does not know, so a filter that uses one is reported
+ * rather than read as selecting every package, which would hide a gap in what
+ * it reaches.
  */
 const UNREAD_SELECTOR = /\.\.\.|\^|\[|\{/u;
 
-const PNPM_RUN = /pnpm run (?<args>[^&|;\n]*)/gu;
-
-const RUN_ALL = /\brun-[sp] (?<args>[^&|;\n]*)/gu;
-
-/**
- * A matrix key handed on as a script: `pnpm run ${{ matrix.<key> }}`, or a
- * `--command` / `--build` of `z:ci-job`, which is how both matrix workflows run
- * the entry and what it reads.
- */
-const MATRIX_COMMAND =
-  /(?:pnpm run|--command|--build) \$\{\{ matrix\.(?<key>[a-z_]+) \}\}/gu;
-
-/** A `pnpm` in a workflow line, and what follows it up to a separator. */
-const WORKFLOW_PNPM = /(?:^|[\s;&|(])pnpm (?<rest>[^&|;\n#)]*)/gu;
-
-const PROSE_QUOTES: ReadonlySet<string> = new Set<string>(["'", '"', '`']);
-
-/** The `pnpm` flags whose value is the next word when not given with `=`. */
-const VALUE_FLAGS: ReadonlySet<string> = new Set<string>([
-  '--filter',
-  '--filter-prod',
-  '-F',
-  '--dir',
-  '-C',
-  '--workspace-concurrency',
-  '--reporter',
-  '--loglevel',
-]);
-
-const QUOTED_RUN_VALUE =
-  /^(?<key>\s*(?:- )?run: )(?<quote>['"])(?<command>.*)\k<quote>\s*$/u;
-
-/** A step's `name:`, which may mention a command it does not run. */
-const STEP_NAME = /^(?:- )?name: /u;
-
 const SCRIPT_NAME = /^[\w:-]+$/u;
 
-/** The flags that point a `pnpm` run at packages rather than the root. */
-const PACKAGE_FLAGS: ReadonlySet<string> = new Set<string>([
-  '--recursive',
-  '-r',
-  '--filter',
-  '--filter-prod',
-  '-F',
-  '--dir',
-  '-C',
+/** The `z:ci-job` options that name a root script it runs. */
+const CI_JOB_SCRIPT_OPTIONS: ReadonlySet<string> = new Set<string>([
+  CI_JOB_COMMAND,
+  CI_JOB_BUILD,
 ]);
+
+const WORKSPACE_EXPRESSION = /^\$\{\{\s*github\.workspace\s*\}\}\/?$/u;
 
 /** `node-version:` pins a version; `node-version-file:` reads `volta.node`. */
 const PINNED_NODE_VERSION = /^ *node-version: /mu;
@@ -647,87 +687,186 @@ type UncoveredDeclaration = Readonly<{
 }>;
 
 /**
- * The root scripts a workflow runs: every `pnpm run <name>` on a line that is
- * not a comment or a step's `name:`, in a `run: |` block too, and every entry
- * of a matrix key the workflow hands to `pnpm run`. A `pnpm` inside a quoted
- * string is prose (unless `$(` runs it), and a run pointed at packages
- * (`--filter`, `-r`, `--dir`) names a package script, which this leaves out.
+ * What a workflow runs: every `pnpm run` of a step's `run:` script, read as the
+ * shell reads it, a variable the step's or job's `env:` gives a matrix value
+ * read through it; a matrix value as each value the job's matrix gives the key,
+ * and a `z:ci-job`'s `--command` and `--build` the same way. A run in the root
+ * names a root script; one pointed at packages (`--filter`, `-r`, `--dir`, a
+ * `working-directory`) is kept for {@link resolvePackageRuns}. A script it
+ * cannot name — one an expression or a variable gives, or a matrix key the
+ * matrix does not hold — is a problem, not a run left out.
  */
 export const collectWorkflowCommands = (
   workflowFile: string,
-): readonly string[] => {
-  const matrixKeys = new Set(
-    Arr.generate(function* () {
-      for (const matched of Array.from(workflowFile.matchAll(MATRIX_COMMAND))) {
-        const key = matched.groups?.['key'];
+): WorkflowCommands => {
+  const jobs = readWorkflowJobs(workflowFile);
 
-        if (key !== undefined) {
-          yield key;
-        }
+  if (Result.isErr(jobs)) {
+    return { commands: [], packageRuns: [], problems: [jobs.value] };
+  }
+
+  const mut_commands: string[] = [];
+
+  const mut_packageRuns: PackageRun[] = [];
+
+  const mut_problems: string[] = [];
+
+  for (const job of jobs.value) {
+    const matrix = readMatrix(job.matrix);
+
+    for (const [index, step] of job.steps.entries()) {
+      if (step.run === undefined) {
+        continue;
       }
-    }),
-  );
 
-  // Every `pnpm run <name>` outside a comment line, a `run: |` block's
-  // included: its first word that is not a flag, whatever follows it. A run
-  // pointed at packages names a package script, not a root one, and a matrix
-  // reference is read through the matrix below.
-  const literals = workflowFile
-    .split('\n')
-    .filter(
-      (line) =>
-        !line.trimStart().startsWith('#') && !STEP_NAME.test(line.trimStart()),
-    )
-    // A `run:` value YAML quotes as a whole is the command, not a string in it.
-    .map((line) => line.replace(QUOTED_RUN_VALUE, '$<key>$<command>'))
-    .flatMap((line) =>
-      Array.from(line.matchAll(WORKFLOW_PNPM)).flatMap((matched) => {
-        // A `pnpm` inside a quoted string is prose an `echo` prints, unless a
-        // `$(` runs it.
-        const before = line.slice(
-          0,
-          matched.index + matched[0].indexOf('pnpm'),
+      const where = `job \`${job.name}\`, step ${index + 1}` as const;
+
+      const reading = readShellCommands(step.run);
+
+      mut_problems.push(
+        ...reading.problems.map((problem) => `${where}: ${problem}`),
+      );
+
+      const env = { ...job.env, ...step.env } as const;
+
+      for (const words of reading.commands) {
+        const run = readPnpmRun(words.map((word) => expandVariable(word, env)));
+
+        if (run === undefined) {
+          continue;
+        }
+
+        const named = Arr.toUnshifted(run.script)(
+          run.script === CI_JOB
+            ? optionValues(run.args, CI_JOB_SCRIPT_OPTIONS)
+            : [],
+        ).map((word) => scriptsNamedBy(word, matrix));
+
+        for (const result of named) {
+          if (Result.isErr(result)) {
+            mut_problems.push(`${where}: ${result.value}`);
+          }
+        }
+
+        const scripts = named.flatMap((result) =>
+          Result.isOk(result) ? result.value : [],
         );
 
-        if (isInsideQuotes(before) && !before.trimEnd().endsWith('$(')) {
-          return [];
-        }
+        // `-w` runs from the workspace root wherever the step is.
+        const base =
+          run.workspaceRoot || isRootDirectory(step.workingDirectory)
+            ? undefined
+            : step.workingDirectory;
 
-        const tokens = tokenize(matched.groups?.['rest'] ?? '');
-
-        // `pnpm run`, not `pnpm exec vitest run`: `run` is pnpm's own first
-        // word, its flags and their values aside.
-        const runIndex = firstWord(tokens, 0);
-
-        if (tokens[runIndex] !== 'run') {
-          return [];
-        }
-
-        const nameIndex = firstWord(tokens, runIndex + 1);
-
-        // A flag before the name points the run at packages; one after it is
-        // the script's own argument.
+        // pnpm resolves a path selector, and picks `-r`'s packages, from the
+        // working directory; this resolves them from the root.
         if (
-          tokens
-            .slice(0, nameIndex === -1 ? tokens.length : nameIndex)
-            .some((token) => PACKAGE_FLAGS.has(token.split('=', 1)[0] ?? ''))
+          base !== undefined &&
+          (run.recursive || Arr.isNonEmpty(run.filters))
         ) {
-          return [];
+          mut_problems.push(
+            `${where}: a run pointed at packages from the working directory \`${base}\`, which this does not read`,
+          );
+
+          continue;
         }
 
-        const name = tokens[nameIndex];
+        // `-w` overrides `--dir` too.
+        const directory =
+          run.workspaceRoot || run.directory === undefined
+            ? base
+            : base === undefined
+              ? run.directory
+              : path.posix.join(base, run.directory);
 
-        // A script name, not prose with punctuation (`run pnpm run fmt, and
-        // commit`) or a `${{ matrix.<key> }}`.
-        return name !== undefined && SCRIPT_NAME.test(name) ? [name] : [];
-      }),
-    );
+        if (
+          run.recursive ||
+          Arr.isNonEmpty(run.filters) ||
+          !isRootDirectory(directory)
+        ) {
+          mut_packageRuns.push({ scripts, filters: run.filters, directory });
+        } else {
+          mut_commands.push(...scripts);
+        }
+      }
+    }
+  }
 
-  const fromMatrix = Array.from(matrixKeys).flatMap((key) =>
-    collectMatrixEntries(workflowFile, key),
-  );
+  return {
+    commands: Arr.uniq(mut_commands).toSorted(),
+    packageRuns: mut_packageRuns,
+    problems: mut_problems,
+  };
+};
 
-  return Arr.uniq([...literals, ...fromMatrix]).toSorted();
+/**
+ * The commands a workflow's package runs reach, `<directory>:<script>`: those
+ * of each package a run's `--filter` selectors pick (every one, for `-r` with
+ * none), or of the package its `--dir` names. A run that reaches no package
+ * that defines the script, or names a directory or selector this cannot read,
+ * is a problem.
+ */
+export const resolvePackageRuns = (
+  runs: readonly PackageRun[],
+  manifests: readonly Manifest[],
+): Readonly<{
+  commands: readonly CommandId[];
+  problems: readonly string[];
+}> => {
+  const members = membersOf(manifests);
+
+  const mut_commands: CommandId[] = [];
+
+  const mut_problems: string[] = [];
+
+  for (const { scripts, filters, directory } of runs) {
+    const selected =
+      directory === undefined
+        ? selectMembers(filters, members)
+        : Arr.isNonEmpty(filters)
+          ? Result.err(
+              `\`--dir ${directory}\` beside \`--filter\`, which this does not read`,
+            )
+          : directory.includes('$')
+            ? Result.err(
+                `a directory an expression or a variable gives (\`${directory}\`)`,
+              )
+            : Result.ok(
+                members.filter(
+                  (member) =>
+                    member.directory === path.posix.normalize(directory),
+                ),
+              );
+
+    if (Result.isErr(selected)) {
+      mut_problems.push(selected.value);
+
+      continue;
+    }
+
+    for (const script of scripts) {
+      const reached = selected.value.flatMap(({ directory: dir, names }) =>
+        matchScriptNames(script, names).map((name) => toCommandId(dir, name)),
+      );
+
+      if (Arr.isEmpty(reached)) {
+        mut_problems.push(
+          `\`pnpm run ${script}\` pointed at packages (${
+            directory === undefined && Arr.isEmpty(filters)
+              ? '-r'
+              : [
+                  ...filters.map((filter) => `--filter ${filter}`),
+                  ...(directory === undefined ? [] : [`--dir ${directory}`]),
+                ].join(' ')
+          }) reaches no package that defines it`,
+        );
+      }
+
+      mut_commands.push(...reached);
+    }
+  }
+
+  return { commands: Arr.uniq(mut_commands), problems: mut_problems };
 };
 
 /** A manifest's `scripts`, the string-valued entries only. */
@@ -854,46 +993,35 @@ export const readCheckWorkflows = async (): Promise<
 };
 
 /**
- * The entries under a matrix's `include:`, each with its properties as written
- * (`command`, `build`, `browser: 'true'`); `check-all.mts` runs them.
+ * The entries under the `include:` of every job's matrix, each with its
+ * properties as strings (`command`, `build`, `browser: 'true'`);
+ * `check-all.mts` runs them. A workflow YAML cannot parse, or a matrix whose
+ * entries are not in the file, is an error.
  */
 export const readMatrixInclude = (
   workflowFile: string,
-): readonly ReadonlyRecord<string, string>[] => {
-  const mut_entries: Map<string, string>[] = [];
+): Result<readonly ReadonlyRecord<string, string>[], string> => {
+  const jobs = readWorkflowJobs(workflowFile);
 
-  for (const line of blockUnder(workflowFile.split('\n'), 'include:')) {
-    const trimmed = line.trim();
-
-    if (trimmed === '' || trimmed.startsWith('#')) {
-      continue;
-    }
-
-    const isItem = trimmed.startsWith(LIST_ITEM);
-
-    const property = isItem
-      ? trimmed.slice(LIST_ITEM.length).trimStart()
-      : trimmed;
-
-    const separator = property.indexOf(': ');
-
-    if (separator === -1) {
-      continue;
-    }
-
-    if (isItem || !Arr.isNonEmpty(mut_entries)) {
-      mut_entries.push(new Map<string, string>());
-    }
-
-    const mut_entry = mut_entries.at(-1);
-
-    mut_entry?.set(
-      property.slice(0, separator),
-      unquoteYamlScalar(property.slice(separator + 2)),
-    );
+  if (Result.isErr(jobs)) {
+    return jobs;
   }
 
-  return mut_entries.map((entry) => Object.fromEntries(entry));
+  const matrices = jobs.value
+    .filter(({ matrix }) => matrix !== undefined)
+    .map(({ name, matrix }) => ({ name, matrix: readMatrix(matrix) }));
+
+  const unread = matrices.find(({ matrix }) => Result.isErr(matrix));
+
+  if (unread !== undefined && Result.isErr(unread.matrix)) {
+    return Result.err(`job \`${unread.name}\`: ${unread.matrix.value}`);
+  }
+
+  return Result.ok(
+    matrices.flatMap(({ matrix }) =>
+      Result.isOk(matrix) ? matrix.value.include : [],
+    ),
+  );
 };
 
 export const readRootManifest = async (): Promise<Result<Manifest, string>> => {
@@ -993,64 +1121,138 @@ const matchesPathGlob = (
 
 /**
  * The workspace members pnpm's `--filter` selectors pick: those one of the
- * positive selectors picks (every member when none is given), less those a `!`
- * one picks.
+ * positive selectors picks (every package when none is given; the root only
+ * when one names it, `.`), less those a `!` one picks. A selector of a form
+ * this does not read ({@link UNREAD_SELECTOR}) is an error.
  */
 const selectMembers = <
   M extends Readonly<{ directory: string; name: string | undefined }>,
 >(
   filters: readonly string[],
   members: readonly M[],
-): readonly M[] => {
-  if (filters.some((selector) => UNREAD_SELECTOR.test(selector))) {
-    return members;
+): Result<readonly M[], string> => {
+  const unread = filters.filter((selector) => UNREAD_SELECTOR.test(selector));
+
+  if (Arr.isNonEmpty(unread)) {
+    return Result.err(
+      `a \`--filter\` selector of a form this does not read: ${unread.map((selector) => `\`${selector}\``).join(', ')}`,
+    );
   }
 
-  const included = filters.filter((selector) => !selector.startsWith('!'));
+  const packages = members.filter(
+    ({ directory }) => directory !== ROOT_DIRECTORY,
+  );
 
-  const excluded = filters
-    .filter((selector) => selector.startsWith('!'))
-    .map((selector) => selector.slice(1));
+  const picked = (selector: string): ReadonlySet<M> => {
+    if (selector === '.' || selector === './') {
+      return new Set<M>(
+        members.filter(({ directory }) => directory === ROOT_DIRECTORY),
+      );
+    }
 
-  const picked = (selector: string): readonly M[] => {
     if (selector.startsWith('.')) {
-      return members.filter(({ directory }) =>
-        matchesPathGlob(
-          selector.replace(/^\.\//u, '').split('/'),
-          directory.split('/'),
+      return new Set<M>(
+        packages.filter(({ directory }) =>
+          matchesPathGlob(
+            selector.replace(/^\.\//u, '').split('/'),
+            directory.split('/'),
+          ),
         ),
       );
     }
 
-    const byName = members.filter(
+    const byName = packages.filter(
       ({ name }) => name !== undefined && matchesGlob(selector, name),
     );
 
-    if (Arr.isNonEmpty(byName) || selector.includes('/')) {
-      return byName;
+    // pnpm lets an unscoped name select a scoped package of that name, when no
+    // package has the name itself and exactly one scope does; a selector that
+    // is scoped itself falls back to nothing.
+    if (
+      Arr.isNonEmpty(byName) ||
+      selector.includes('/') ||
+      selector.startsWith('@')
+    ) {
+      return new Set<M>(byName);
     }
 
-    // pnpm lets an unscoped name select a scoped package of that name, when no
-    // package has the name itself and exactly one scope does.
-    const scoped = members.filter(
+    const scoped = packages.filter(
       ({ name }) =>
         name?.startsWith('@') === true &&
         matchesGlob(selector, name.slice(name.indexOf('/') + 1)),
     );
 
-    return Arr.isFixedLengthArray(1, scoped) ? scoped : [];
+    return new Set<M>(Arr.isFixedLengthArray(1, scoped) ? scoped : []);
   };
 
-  const kept = Arr.isEmpty(included)
-    ? members
-    : members.filter((member) =>
-        included.some((selector) => picked(selector).includes(member)),
-      );
+  // Each selector matched once, not once per member.
+  const included = filters
+    .filter((selector) => !selector.startsWith('!'))
+    .map(picked);
 
-  return kept.filter((member) =>
-    excluded.every((selector) => !picked(selector).includes(member)),
+  const excluded = filters
+    .filter((selector) => selector.startsWith('!'))
+    .map((selector) => picked(selector.slice(1)));
+
+  const kept = Arr.isEmpty(included)
+    ? packages
+    : members.filter((member) => included.some((set) => set.has(member)));
+
+  return Result.ok(
+    kept.filter((member) => excluded.every((set) => !set.has(member))),
   );
 };
+
+/** Each manifest as a member a selector may pick, with its script names. */
+const membersOf = (
+  manifests: readonly Manifest[],
+): readonly Readonly<{
+  directory: string;
+  name: string | undefined;
+  names: readonly string[];
+}>[] =>
+  manifests.map(({ directory, name, scripts }) => ({
+    directory,
+    name,
+    names: Object.keys(scripts),
+  }));
+
+/**
+ * The root scripts a word of a workflow's `pnpm run` names: the word itself, or
+ * each value the job's matrix gives the key `${{ matrix.<key> }}` names. Any
+ * other expansion is an error, since what it runs is not in the file.
+ */
+const scriptsNamedBy = (
+  word: string,
+  matrix: Result<Matrix, string>,
+): Result<readonly string[], string> => {
+  const key = matrixKeyOf(word);
+
+  if (key !== undefined) {
+    if (Result.isErr(matrix)) {
+      return Result.err(`\`${word}\` names ${matrix.value}`);
+    }
+
+    const values = matrixValues(matrix.value, key);
+
+    return Arr.isNonEmpty(values)
+      ? Result.ok(values)
+      : Result.err(`\`${word}\` names a key its job's matrix does not give`);
+  }
+
+  return SCRIPT_NAME.test(word) || word.startsWith('/')
+    ? Result.ok([word])
+    : Result.err(`a script named by \`${word}\`, which this cannot read`);
+};
+
+/**
+ * Whether a step's working directory is the repository root: none, `.`, `./`,
+ * or `${{ github.workspace }}`, which is where the checkout is.
+ */
+const isRootDirectory = (directory: string | undefined): boolean =>
+  directory === undefined ||
+  path.posix.normalize(directory).replace(/\/$/u, '') === '.' ||
+  WORKSPACE_EXPRESSION.test(directory);
 
 /**
  * Whether a script's name says it is a check a pull request should get.
@@ -1103,102 +1305,6 @@ const isUncoveredByDesign = (directory: string, scriptName: string): boolean =>
       (entry.directory === undefined || entry.directory === directory),
   );
 
-/**
- * The index of the first token from `from` on that is neither a flag nor the
- * value of one ({@link VALUE_FLAGS}); -1 when there is none.
- */
-const firstWord = (tokens: readonly string[], from: number): number =>
-  tokens.findIndex(
-    (token, index) =>
-      index >= from &&
-      !token.startsWith('-') &&
-      !(index > from && VALUE_FLAGS.has(tokens[index - 1] ?? '')),
-  );
-
-/**
- * Whether the end of a line's text is inside a quoted string, the way a shell
- * or a template literal reads one: a quote opens a string only outside another,
- * and a backslash escapes the next character.
- */
-const isInsideQuotes = (text: string): boolean => {
-  const mut_state = { open: '', escaped: false };
-
-  for (const character of text) {
-    if (mut_state.escaped) {
-      mut_state.escaped = false;
-
-      continue;
-    }
-
-    if (character === '\\' && mut_state.open !== "'") {
-      mut_state.escaped = true;
-
-      continue;
-    }
-
-    if (mut_state.open === '') {
-      mut_state.open = PROSE_QUOTES.has(character) ? character : '';
-
-      continue;
-    }
-
-    if (character === mut_state.open) {
-      mut_state.open = '';
-    }
-  }
-
-  return mut_state.open !== '';
-};
-
-/**
- * Whitespace-separated, with a quoted run kept together and unquoted.
- *
- * Scanned by hand rather than matched: the alternation a quote-aware pattern
- * needs is the shape `security/detect-unsafe-regex` rejects, and a script body
- * is short enough that the scan is the simpler of the two anyway.
- */
-const tokenize = (args: string): readonly string[] => {
-  const mut_tokens: string[] = [];
-
-  let mut_current: string[] = [];
-
-  const mut_state = { quote: '' };
-
-  const flush = (): void => {
-    if (Arr.isEmpty(mut_current)) {
-      return;
-    }
-
-    mut_tokens.push(mut_current.join(''));
-
-    mut_current = [];
-  };
-
-  for (const character of args) {
-    if (mut_state.quote !== '') {
-      if (character === mut_state.quote) {
-        mut_state.quote = '';
-      } else {
-        mut_current.push(character);
-      }
-    } else if (QUOTES.has(character)) {
-      mut_state.quote = character;
-    } else if (WHITESPACE.has(character)) {
-      flush();
-    } else {
-      mut_current.push(character);
-    }
-  }
-
-  flush();
-
-  return mut_tokens;
-};
-
-const QUOTES: ReadonlySet<string> = new Set<string>(["'", '"']);
-
-const WHITESPACE: ReadonlySet<string> = new Set<string>([' ', '\t']);
-
 const reaches = (
   graph: CoverageGraph,
   from: CommandId,
@@ -1229,97 +1335,10 @@ const readWorkflow = async (
 
   return Result.ok({
     relativePath,
-    commands: collectWorkflowCommands(contents.value),
+    ...collectWorkflowCommands(contents.value),
     pinsNodeVersion: PINNED_NODE_VERSION.test(contents.value),
   });
 };
-
-/**
- * A plain YAML scalar as its value: a trailing ` # comment` taken off, and the
- * quotes around a quoted one.
- */
-const unquoteYamlScalar = (text: string): string => {
-  const value = text.trim();
-
-  const quote = value.at(0);
-
-  if ((quote === "'" || quote === '"') && value.indexOf(quote, 1) > 0) {
-    return value.slice(1, value.indexOf(quote, 1));
-  }
-
-  const comment = value.indexOf(' #');
-
-  return (comment === -1 ? value : value.slice(0, comment)).trim();
-};
-
-const indentOf = (line: string): number =>
-  line.length - line.trimStart().length;
-
-/** The lines indented under each indented line that reads `heading`. */
-const blockUnder = (
-  lines: readonly string[],
-  heading: string,
-): readonly string[] =>
-  lines.flatMap((line, startIndex) => {
-    if (indentOf(line) === 0 || line.trim() !== heading) {
-      return [];
-    }
-
-    const indent = indentOf(line);
-
-    const rest = lines.slice(startIndex + 1);
-
-    const endIndex = rest.findIndex(
-      (next) => next.trim() !== '' && indentOf(next) <= indent,
-    );
-
-    return endIndex === -1 ? rest : rest.slice(0, endIndex);
-  });
-
-const singleValue = (text: string): readonly string[] => {
-  const entry = text.trim();
-
-  return entry === '' || entry.includes(' ') ? [] : [entry];
-};
-
-/**
- * The values of `<key>` in a matrix, read by indentation rather than by a
- * pattern built from the key: the list items under `<key>:`, and the `<key>:`
- * of each object under `include:`, where an entry carries its other properties
- * beside it.
- */
-const collectMatrixEntries = (
-  workflowFile: string,
-  key: string,
-): readonly string[] => {
-  const lines = workflowFile.split('\n');
-
-  const listed = blockUnder(lines, `${key}:`).flatMap((line) => {
-    const trimmed = line.trim();
-
-    return !trimmed.startsWith(LIST_ITEM)
-      ? []
-      : singleValue(trimmed.slice(LIST_ITEM.length));
-  });
-
-  const prefix = `${key}: ` as const;
-
-  const included = blockUnder(lines, 'include:').flatMap((line) => {
-    const trimmed = line.trim();
-
-    const property = trimmed.startsWith(LIST_ITEM)
-      ? trimmed.slice(LIST_ITEM.length).trimStart()
-      : trimmed;
-
-    return property.startsWith(prefix)
-      ? singleValue(property.slice(prefix.length))
-      : [];
-  });
-
-  return [...listed, ...included];
-};
-
-const LIST_ITEM = '- ';
 
 const formatViolations = (violations: readonly string[]): string =>
   [

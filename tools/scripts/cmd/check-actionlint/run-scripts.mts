@@ -6,11 +6,13 @@ import { Arr, Num, Result } from 'ts-data-forge';
  * itself, which are linted as they are written; the names of its `inputs`,
  * which its expressions may reference; and what could not be read.
  *
- * A line scanner rather than a YAML parser, as the workflow guards here read
- * workflows: the shape is one sequence of steps whose `shell:` and `run:` sit
- * at the step's own indentation, and a parser would be a dependency for one
- * level of nesting. **What it does not read is reported, never skipped**: a
- * step with no `shell:` (GitHub refuses it anyway), a folded `>` scalar, a
+ * A line scanner rather than the YAML parser the command guards read workflows
+ * with (`tools/scripts/lib/workflow-jobs.mts`): what this hands on is where in
+ * `action.yml` each script starts, for the line numbers of what is found in it,
+ * which a parsed value does not carry; and the shape is one sequence of steps
+ * whose `shell:` and `run:` sit at the step's own indentation. **What it does
+ * not read is reported, never skipped**: a step with no `shell:` (GitHub
+ * refuses it anyway), a folded `>` scalar, a
  * double-quoted one with an escape, a one-line scalar continued on the next
  * line, `runs:` or `steps:` written in flow style (`{ … }`, `[ … ]`), and — the
  * net under all of them — any `run:` key under `runs:`, quoted, as an explicit

@@ -33,11 +33,10 @@ export const readPnpmWorkspaceGlobs = async (): Promise<
 /**
  * The entries of the top-level `packages` block sequence.
  *
- * There is no YAML parser among the root's dependencies, so this reads the one
- * shape the file uses — `packages:` alone on its line, then `- <glob>` items
- * (plain, `'single'` or `"double"` quoted, without escapes), with comments and
- * blank lines between them — and refuses any other rather than returning a
- * partial list.
+ * This reads the one shape the file uses — `packages:` alone on its line, then
+ * `- <glob>` items (plain, `'single'` or `"double"` quoted, without escapes),
+ * with comments and blank lines between them — and refuses any other rather
+ * than returning a partial list.
  */
 export const parseWorkspacePackages = (
   content: string,

@@ -39,9 +39,10 @@ export const checkCodecovBuilds = (): Promise<Result<CheckSummary, string>> =>
 
 /**
  * The matrix entries that upload coverage: the `coverage: true` keys of the
- * `- command:` entries, read with a line scanner as the other workflow guards
- * read theirs. Only a key at an entry's own indentation counts, so an action
- * input or a comment naming it is not an entry.
+ * `- command:` entries, read with a line scanner, not yet through the YAML
+ * parser of `tools/scripts/lib/workflow-jobs.mts`. Only a key at an entry's own
+ * indentation counts, so an action input or a comment naming it is not an
+ * entry.
  */
 export const countCoverageEntries = (workflowFile: string): number => {
   const lines = workflowFile.split('\n');

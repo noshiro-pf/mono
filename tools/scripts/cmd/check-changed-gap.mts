@@ -71,7 +71,7 @@ export const describeGap = ({
   const mut_planned: string[] = [];
 
   for (const step of plan) {
-    const commands = stepCommands(step);
+    const commands = stepCommands(step, graph.commands);
 
     if (Result.isErr(commands)) {
       return commands;
