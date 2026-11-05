@@ -1,8 +1,8 @@
-import { spawnSync } from 'node:child_process';
 import * as util from 'node:util';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
+import { plural } from '../lib/plural.mjs';
+import { git, splitZ } from '../lib/step-runner.mjs';
 import { readPackages, readProseGate } from './check-changed/packages.mjs';
 import {
   buildPlan,
@@ -185,11 +185,6 @@ const GROUPS: readonly Readonly<{ name: GroupName; meaning: string }>[] = [
   },
 ] as const;
 
-const GIT_MAX_BUFFER = 256 * 1024 * 1024;
-
-const plural = (count: number, noun: string): string =>
-  `${count} ${noun}${count === 1 ? '' : 's'}` as const;
-
 const classify = ({
   command,
   localReach,
@@ -305,21 +300,19 @@ const main = async (): Promise<Result<string, string>> => {
   // The diff from the merge base, as check-changed takes it. CI's checkout is
   // one commit deep, where there is none; the gate runs a check only on a
   // branch up to date with its base, so the base is the fork point there.
-  const mergeBase = spawnSync('git', ['merge-base', 'HEAD', base], {
-    cwd: projectRootPath,
-    encoding: 'utf8',
-  });
+  const mergeBase = Result.fromThrowable(() =>
+    git(['merge-base', 'HEAD', base]),
+  );
 
-  const from = mergeBase.status === 0 ? mergeBase.stdout.trim() : base;
+  const from = Result.isOk(mergeBase) ? mergeBase.value.trim() : base;
 
   // The committed diff, as the pushed branch has it: the job's own steps may
   // have left files behind, which are not the change.
   const listDiff = (
     filter: readonly string[],
   ): Result<readonly string[], string> => {
-    const diff = spawnSync(
-      'git',
-      [
+    const diff = Result.fromThrowable(() =>
+      git([
         'diff',
         '--name-only',
         '--no-renames',
@@ -328,14 +321,13 @@ const main = async (): Promise<Result<string, string>> => {
         from,
         'HEAD',
         '--',
-      ],
-      { cwd: projectRootPath, encoding: 'utf8', maxBuffer: GIT_MAX_BUFFER },
+      ]),
     );
 
-    return diff.status === 0
-      ? Result.ok(diff.stdout.split('\0').filter((file) => file !== ''))
+    return Result.isOk(diff)
+      ? Result.ok(splitZ(diff.value))
       : Result.err(
-          `git diff ${from} HEAD failed (fetch the base first): ${diff.stderr.trim()}`,
+          `${unknownToString(diff.value).trim()}\n(fetch the base first)`,
         );
   };
 

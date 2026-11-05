@@ -1,9 +1,16 @@
 import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as util from 'node:util';
-import { Arr, asPositiveUint32, unknownToString } from 'ts-data-forge';
+import { Arr, asPositiveUint32, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { diffSnapshots, snapshotTree, spawnPnpm } from '../lib/step-runner.mjs';
+import { plural } from '../lib/plural.mjs';
+import {
+  diffSnapshots,
+  git,
+  snapshotTree,
+  spawnPnpm,
+  splitZ,
+} from '../lib/step-runner.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -29,10 +36,10 @@ export const runJob = async ({
   command: string;
   build: string | undefined;
   /**
-   * Whether a tree changed before the first step fails the job, and the diff of
-   * what the steps wrote is printed: in CI (`GITHUB_ACTIONS`), where the
-   * checkout starts clean and a change is what setup or `pnpm install` wrote.
-   * Not on a working tree: `check-all`, or `z:ci-job` run by hand.
+   * Whether a tree changed before the first step fails the job: in CI
+   * (`GITHUB_ACTIONS`), where the checkout starts clean and a change is what
+   * setup or `pnpm install` wrote. Not on a working tree: `check-all`, or
+   * `z:ci-job` run by hand to reproduce a job, which still prints the diff.
    */
   requireCleanStart: boolean;
 }>): Promise<JobOutcome> => {
@@ -68,11 +75,9 @@ export const runJob = async ({
     }
   }
 
-  // Only on a tree that started clean, where the diff is the steps' alone;
-  // `check-all`'s working tree may hold edits of its own.
-  if (requireCleanStart) {
-    printWrites(Arr.uniq(mut_results.flatMap(({ wrote }) => wrote)));
-  }
+  const wrote = Arr.uniq(mut_results.flatMap((result) => result.wrote));
+
+  printWrites(writesToShow({ written: wrote, changedAtStart: initial }));
 
   return {
     failures: [
@@ -83,6 +88,64 @@ export const runJob = async ({
     ],
     buildFailed:
       build !== undefined && (mut_results.at(0)?.exitCode ?? 1) !== 0,
+    wrote,
+  };
+};
+
+/**
+ * Of the files the steps wrote, those whose diff is the steps' alone, and those
+ * changed before the first step too, whose diff from the index would show edits
+ * that were already on the tree (a local run's, or an earlier `check-all`
+ * entry's) as the steps' own.
+ */
+export const writesToShow = ({
+  written,
+  changedAtStart,
+}: Readonly<{
+  written: readonly string[];
+  changedAtStart: ReadonlyMap<string, string>;
+}>): Readonly<{
+  shown: readonly string[];
+  alreadyChanged: readonly string[];
+}> =>
+  ({
+    shown: written.filter((file) => !changedAtStart.has(file)),
+    alreadyChanged: written.filter((file) => changedAtStart.has(file)),
+  }) as const;
+
+/**
+ * The `git` invocations that print what the steps wrote: one `git diff` per
+ * batch of tracked files, with literal pathspecs so that thousands of rewritten
+ * files stay under the argument limit, and a `git diff --no-index` from nothing
+ * for each of the first {@link NEW_FILES_SHOWN} new files, which `git diff`
+ * alone would leave out (`z:assert-repo-is-clean` showed them by `git add -N`
+ * first; this leaves the index alone). The new files past those are named, not
+ * shown, so that a generator writing a directory of them does not bury the
+ * failure under their content.
+ */
+export const diffInvocations = ({
+  files,
+  untracked,
+}: Readonly<{
+  files: readonly string[];
+  untracked: ReadonlySet<string>;
+}>): Readonly<{
+  invocations: readonly (readonly string[])[];
+  newFilesNotShown: readonly string[];
+}> => {
+  const newFiles = files.filter((file) => untracked.has(file));
+
+  return {
+    invocations: [
+      ...Arr.partition(
+        files.filter((file) => !untracked.has(file)),
+        DIFF_BATCH,
+      ).map((batch) => [...DIFF_ARGS, '--', ...batch]),
+      ...newFiles
+        .slice(0, NEW_FILES_SHOWN)
+        .map((file) => [...DIFF_ARGS, '--no-index', '--', '/dev/null', file]),
+    ],
+    newFilesNotShown: newFiles.slice(NEW_FILES_SHOWN),
   };
 };
 
@@ -135,6 +198,8 @@ export type JobOutcome = Readonly<{
   failures: readonly string[];
   /** Whether the build ran and failed, so that the entry never ran. */
   buildFailed: boolean;
+  /** The paths the steps changed, together. */
+  wrote: readonly string[];
 }>;
 
 export type StepResult = Readonly<{
@@ -146,36 +211,122 @@ export type StepResult = Readonly<{
 
 const DIFF_BATCH = asPositiveUint32(500);
 
+const NEW_FILES_SHOWN = 20;
+
+const DIFF_ARGS = [
+  '--no-pager',
+  '--literal-pathspecs',
+  'diff',
+  '--no-ext-diff',
+  '--no-color',
+] as const;
+
+/** `git diff --no-index` exits 1 when the two sides differ, as a new file does. */
+const DIFFERENCES_FOUND = 1;
+
 const USAGE =
   'Usage: pnpm run z:ci-job [--build <root script>] --command <root script>';
 
 /**
- * What a step wanted the files it changed to hold, as `z:assert-repo-is-clean`
- * printed it (an untracked file is listed, not shown). Literal pathspecs, in
- * batches, so that thousands of rewritten files stay under the argument limit.
+ * Prints the diffs of `files`; the files whose diff it did not show, the new
+ * ones past the first few, and every one a failed git left out.
  */
-const printWrites = (written: readonly string[]): void => {
-  for (const batch of Arr.partition(written, DIFF_BATCH)) {
-    const result = spawnSync(
-      'git',
-      [
-        '--no-pager',
-        '--literal-pathspecs',
-        'diff',
-        '--no-ext-diff',
-        '--no-color',
-        '--',
-        ...batch,
-      ],
-      { cwd: projectRootPath, stdio: 'inherit' },
+const printDiffs = (files: readonly string[]): readonly string[] => {
+  if (Arr.isEmpty(files)) {
+    return [];
+  }
+
+  const untracked = Result.fromThrowable(
+    () =>
+      new Set<string>(
+        Arr.partition(files, DIFF_BATCH).flatMap((batch) =>
+          splitZ(
+            git([
+              '--literal-pathspecs',
+              'ls-files',
+              '--others',
+              '--exclude-standard',
+              '-z',
+              '--',
+              ...batch,
+            ]),
+          ),
+        ),
+      ),
+  );
+
+  if (Result.isErr(untracked)) {
+    console.error(
+      `git ls-files of the changed files failed: ${unknownToString(untracked.value)}`,
     );
 
-    if (result.error !== undefined || result.status !== 0) {
+    return files;
+  }
+
+  const { invocations, newFilesNotShown } = diffInvocations({
+    files,
+    untracked: untracked.value,
+  });
+
+  const failedAt = invocations.findIndex((args) => {
+    const result = spawnSync('git', args, {
+      cwd: projectRootPath,
+      stdio: 'inherit',
+    });
+
+    const failed =
+      result.error !== undefined ||
+      (result.status !== 0 && result.status !== DIFFERENCES_FOUND);
+
+    if (failed) {
       console.error(
         `git diff of the changed files failed: ${unknownToString(result.error ?? result.signal ?? result.status)}`,
       );
+    }
 
-      return;
+    return failed;
+  });
+
+  // Every invocation ends in its files, after the `--`.
+  return failedAt === -1
+    ? newFilesNotShown
+    : [
+        ...invocations
+          .slice(failedAt)
+          .flatMap((args) => args.slice(args.indexOf('--') + 1))
+          .filter((file) => file !== '/dev/null'),
+        ...newFilesNotShown,
+      ];
+};
+
+/**
+ * What a step wanted the files it changed to hold, as `z:assert-repo-is-clean`
+ * printed it, new files' content included ({@link diffInvocations}); and the
+ * names of the files whose diff is not shown, the new ones past those and the
+ * ones whose diff would not be the steps' alone ({@link writesToShow}). A git
+ * that fails here is reported and the diff left out, the names still listed:
+ * the job's verdict does not depend on it.
+ */
+const printWrites = ({
+  shown,
+  alreadyChanged,
+}: ReturnType<typeof writesToShow>): void => {
+  const notShown = printDiffs(shown);
+
+  for (const [heading, files] of [
+    [
+      `And ${plural(notShown.length, 'more file')} whose diff is not shown:`,
+      notShown,
+    ],
+    [
+      'Changed before the first step too, so their diff is not shown (it would hold the edits already there):',
+      alreadyChanged,
+    ],
+  ] as const) {
+    if (Arr.isNonEmpty(files)) {
+      console.info(
+        Arr.toUnshifted(heading)(files.map((file) => `  ${file}`)).join('\n'),
+      );
     }
   }
 };
