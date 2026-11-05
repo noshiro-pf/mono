@@ -13,26 +13,26 @@ GitHub shows a `.github/README.md` in place of the root one.
 
 ## Inventory
 
-| Workflow                         | Runs on                                | Reports a required context              |
-| :------------------------------- | :------------------------------------- | :-------------------------------------- |
-| `code-check.yml`                 | pull requests; `push` to `main`        | `code-check-result / result`            |
-| `style-check.yml`                | pull requests; `push` to `main`        | `style-check-result / result`           |
-| `strict-lib-gen.yml`             | pull requests; `push` to `main`        | `strict-lib-gen-result / result`        |
-| `node-version-compatibility.yml` | pull requests; `push` to `main`        | `test-node-versions-result / result`    |
-| `verify-published-packages.yml`  | pull requests; `push` to `main`        | `verify-published-result / result`      |
-| `synstate-benchmark.yml`         | pull requests; `push` to `main`        | `synstate-benchmark-result / result`    |
-| `check-gates.yml`                | `workflow_call`, from the six above    | none; it is the gate the six share      |
-| `check-result.yml`               | `workflow_call`, from the six above    | the six above; it is their aggregate    |
-| `skip-ci-label.yml`              | `pull_request_target`                  | the `no-skip-ci-label` commit status    |
-| `lint-pull-request.yml`          | `pull_request_target`                  | its three jobs, by name                 |
-| `release.yml`                    | `push` to `main`                       | none                                    |
-| `pnpm-update.yml`                | schedule                               | none; opens/closes `chore/pnpm-update`  |
-| `node-support-update.yml`        | schedule                               | none; opens `chore/node-support-update` |
-| `deploy-pages.yml`               | `push` to `main`                       | none                                    |
-| `deploy-firestore.yml`           | `push` to `main`; `workflow_dispatch`  | none                                    |
-| `restart-unblock-prs.yml`        | `push` to `main`                       | none; files the author's restart TODO   |
-| `link-check.yml`                 | pull requests, path-filtered; schedule | none; other people's servers decide it  |
-| `e2e-production.yml`             | schedule; `workflow_dispatch`          | none; the live sites decide it          |
+| Workflow                         | Runs on                                | Reports a required context                     |
+| :------------------------------- | :------------------------------------- | :--------------------------------------------- |
+| `code-check.yml`                 | pull requests; `push` to `main`        | `code-check-result / result`                   |
+| `style-check.yml`                | pull requests; `push` to `main`        | `style-check-result / result`                  |
+| `strict-lib-gen.yml`             | pull requests; `push` to `main`        | `strict-lib-gen-result / result`               |
+| `node-version-compatibility.yml` | pull requests; `push` to `main`        | `test-node-versions-result / result`           |
+| `verify-published-packages.yml`  | pull requests; `push` to `main`        | `verify-published-result / result`             |
+| `synstate-benchmark.yml`         | pull requests; `push` to `main`        | `synstate-benchmark-result / result`           |
+| `check-gates.yml`                | `workflow_call`, from the six above    | none; it is the gate the six share             |
+| `check-result.yml`               | `workflow_call`, from the six above    | the six above; it is their aggregate           |
+| `skip-ci-label.yml`              | `pull_request_target`                  | the `no-skip-ci-label` commit status           |
+| `lint-pull-request.yml`          | `pull_request_target`                  | its three jobs, by name                        |
+| `release.yml`                    | `push` to `main`                       | none                                           |
+| `pnpm-update.yml`                | schedule                               | none; opens/closes `chore/pnpm-update`         |
+| `node-support-update.yml`        | schedule                               | none; opens/closes `chore/node-support-update` |
+| `deploy-pages.yml`               | `push` to `main`                       | none                                           |
+| `deploy-firestore.yml`           | `push` to `main`; `workflow_dispatch`  | none                                           |
+| `restart-unblock-prs.yml`        | `push` to `main`                       | none; files the author's restart TODO          |
+| `link-check.yml`                 | pull requests, path-filtered; schedule | none; other people's servers decide it         |
+| `e2e-production.yml`             | schedule; `workflow_dispatch`          | none; the live sites decide it                 |
 
 The required contexts are listed in `repo-settings/rulesets/main.json`. Every
 one of them is either an aggregate job (see "The aggregate job") or a job that
@@ -803,9 +803,9 @@ can only narrow what the App already holds), so that the push triggers the
 
 - **Reuse one fixed branch name** (`chore/pnpm-update`,
   `chore/node-support-update`), rebuilt from `main` and force-pushed every run
-  that has an update, so there is only ever one open. A `pnpm-update.yml` run
-  that finds nothing to change pushes nothing, and closes the open pull request
-  instead (`close-obsolete`), since `main` already has what it carries.
+  that has an update, so there is only ever one open. A run of either that finds
+  nothing to change pushes nothing, and closes the open pull request instead
+  (`close-obsolete`), since `main` already has what it carries.
 - **Authenticate the push inline** (`https://x-access-token:${GH_TOKEN}@…`),
   so the token is never written to git config.
 - **Name the lease.** `--force-with-lease` with no value compares against the
