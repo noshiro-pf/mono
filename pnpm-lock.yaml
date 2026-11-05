@@ -2336,6 +2336,15 @@ importers:
       solid-js:
         specifier: 'catalog:'
         version: 1.9.17
+      synstate-router:
+        specifier: workspace:*
+        version: link:../../libs/synstate-router
+      synstate-router-dom:
+        specifier: workspace:*
+        version: link:../../libs/synstate-router-dom
+      synstate-router-react:
+        specifier: workspace:*
+        version: link:../../libs/synstate-router-react
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
