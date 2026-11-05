@@ -18,11 +18,7 @@ import {
   GREEN_POLLS_BEFORE_GIVING_UP,
   MAX_CONSECUTIVE_POLL_ERRORS,
 } from './constants.mjs';
-import {
-  addSkipCiLabel,
-  viewPullRequest,
-  viewReviewDecision,
-} from './github.mjs';
+import { addSkipCiLabel, viewPullRequest } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
 import { observeNotStarted, type NotStartedWait } from './not-started.mjs';
 import type { Options } from './options.mjs';
@@ -32,6 +28,7 @@ import {
   describeNotStarted,
   describeTimeout,
 } from './set-aside-detail.mjs';
+import { readHoldAt, type ReviewContext } from './triage.mjs';
 import type { PullRequest, Watched } from './types.mjs';
 import { pause, stopRequested } from './util.mjs';
 
@@ -45,6 +42,9 @@ import { pause, stopRequested } from './util.mjs';
  * nothing will merge it on green, so the watch ends at the verdict: failed as
  * for any other, or green and `awaiting-bypass`, with the reason for the
  * comment to say.
+ *
+ * `reviewContext` is what the review of one that goes green and does not merge
+ * is read with, to say what holds it.
  */
 export const watch = async (
   api: ApiContext,
@@ -53,6 +53,7 @@ export const watch = async (
   requiredContexts: readonly string[],
   options: Options,
   bypassReason: string | undefined,
+  reviewContext: ReviewContext,
 ): Promise<Watched> => {
   const deadline = Date.now() + options.watchTimeoutMin * 60_000;
 
@@ -221,13 +222,11 @@ export const watch = async (
       );
 
       if (mut_greenPolls >= budget) {
-        const reviewDecision = await viewReviewDecision(api, pr.number);
-
         return {
           outcome: 'not-merging',
           detail: describeHold(
             current.mergeStateStatus,
-            Result.isOk(reviewDecision) ? reviewDecision.value : undefined,
+            await readHoldAt(api, pr.number, expectedHead, reviewContext),
           ),
         };
       }

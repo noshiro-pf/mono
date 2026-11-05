@@ -224,7 +224,7 @@ const setAsideOwner = (
     case 'not-merging':
       return {
         owner: 'human',
-        why: 'green but not merging; something the worker cannot read holds it',
+        why: 'green but not merging; something a rebase cannot fix holds it',
       };
 
     case 'read-failed':

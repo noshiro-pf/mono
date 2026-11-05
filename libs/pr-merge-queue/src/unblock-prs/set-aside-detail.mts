@@ -8,7 +8,8 @@
  * runs, and what the command printed.
  */
 
-import { Arr } from 'ts-data-forge';
+import type { ReviewHold } from 'pr-report-core';
+import { Arr, Result } from 'ts-data-forge';
 import { describeWaitingOn } from './checks.mjs';
 import type { ChecksSummary } from './types.mjs';
 
@@ -25,22 +26,26 @@ export const describeFailedChecks = (
   }) as const;
 
 /**
- * What holds a pull request whose required checks are all green.
- * `reviewDecision` is GitHub's: `REVIEW_REQUIRED` when a review the rules ask
- * for is missing, which with `required_approving_review_count: 0` leaves a code
- * owner's; empty when the rules ask for none.
+ * What holds a pull request whose required checks are all green, from its
+ * review as read at the watched head (`pr-report-core`'s `reviewHold`, which
+ * triage reads too): the approval it waits for, or the conversations. GitHub's
+ * `reviewDecision` cannot say this — it describes branch protection, not a
+ * ruleset, and is `null` here. What is left once the review shows no hold is a
+ * guess — `reviewHold` holds nothing where it cannot tell, a team owner or
+ * files past what was read, nor where the ruleset asks no review — and so is
+ * everything when it could not be read.
  */
 export const describeHold = (
   mergeStateStatus: string,
-  reviewDecision: string | undefined,
+  review: Result<ReviewHold | undefined, string>,
 ): string => {
   const head = `green but ${mergeStateStatus}` as const;
 
-  return reviewDecision === 'REVIEW_REQUIRED'
-    ? `${head}: a required review is missing (a code owner?)`
-    : reviewDecision === 'CHANGES_REQUESTED'
-      ? `${head}: changes requested`
-      : `${head}: an unresolved conversation, or armed by who may not merge?`;
+  return Result.isErr(review)
+    ? `${head}: its review could not be read (${review.value}); a code owner's approval, an unresolved conversation, or armed by who may not merge?`
+    : review.value === undefined
+      ? `${head}: nothing the worker could tell from its review holds it (not an owner team's approval, nor files past what it read); armed by who may not merge?`
+      : `${head}: ${review.value.reason}`;
 };
 
 /** What the watch was still waiting on when it gave up. */

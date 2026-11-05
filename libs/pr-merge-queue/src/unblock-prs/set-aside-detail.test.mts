@@ -1,3 +1,4 @@
+import { Result } from 'ts-data-forge';
 import {
   describeCommandFailure,
   describeConflict,
@@ -35,28 +36,45 @@ describe(describeFailedChecks, () => {
 });
 
 describe(describeHold, () => {
-  test('says a review is missing', () => {
+  test('names the approval the review waits for', () => {
     assert.strictEqual(
-      describeHold('BLOCKED', 'REVIEW_REQUIRED'),
-      'green but BLOCKED: a required review is missing (a code owner?)',
+      describeHold(
+        'BLOCKED',
+        Result.ok({
+          kind: 'held',
+          reason: 'waiting for @noshiro-pf to approve .github/CODEOWNERS',
+        }),
+      ),
+      'green but BLOCKED: waiting for @noshiro-pf to approve .github/CODEOWNERS',
     );
   });
 
-  test('says changes were requested', () => {
+  test('says when only a bypass merges it', () => {
     assert.strictEqual(
-      describeHold('BLOCKED', 'CHANGES_REQUESTED'),
-      'green but BLOCKED: changes requested',
+      describeHold(
+        'BLOCKED',
+        Result.ok({
+          kind: 'bypass',
+          reason: '@a is the only owner of .github/CODEOWNERS and its author',
+        }),
+      ),
+      'green but BLOCKED: @a is the only owner of .github/CODEOWNERS and its author',
     );
   });
 
   // #2069 was set aside as "green but not merged", which named nothing.
-  test('names what is left when no review is missing', () => {
-    for (const reviewDecision of ['APPROVED', '', undefined]) {
-      assert.strictEqual(
-        describeHold('CLEAN', reviewDecision),
-        'green but CLEAN: an unresolved conversation, or armed by who may not merge?',
-      );
-    }
+  test('names what is left when the review shows no hold', () => {
+    assert.strictEqual(
+      describeHold('CLEAN', Result.ok(undefined)),
+      "green but CLEAN: nothing the worker could tell from its review holds it (not an owner team's approval, nor files past what it read); armed by who may not merge?",
+    );
+  });
+
+  test('guesses only when the review could not be read', () => {
+    assert.strictEqual(
+      describeHold('BLOCKED', Result.err('HTTP 502')),
+      "green but BLOCKED: its review could not be read (HTTP 502); a code owner's approval, an unresolved conversation, or armed by who may not merge?",
+    );
   });
 });
 
