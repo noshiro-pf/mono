@@ -98,15 +98,20 @@ export type DeepMutable<T> = T extends Primitive
  * @returns A new type with all nested properties marked as optional.
  * @example
  * ```ts
- * type Data = { a: number; b: { c: string[]; d: Map<number, boolean> } };
+ * type Data = { a: number; b: { c: string[]; d: Map<number, { e: string }> } };
  * type PartialData = DeepPartial<Data>;
- * // Result: {
- * //   a?: number;
- * //   b?: {
- * //     c?: (string | undefined)[] | undefined;
- * //     d?: ReadonlyMap<number | undefined, boolean | undefined> | undefined;
- * //   } | undefined;
- * // }
+ *
+ * expectType<
+ *   PartialData,
+ *   // Result:
+ *   {
+ *     a?: number;
+ *     b?: {
+ *       c?: (string | undefined)[];
+ *       d?: Map<number, { e?: string }>;
+ *     };
+ *   }
+ * >('=');
  * ```
  */
 export type DeepPartial<T> = T extends Primitive
