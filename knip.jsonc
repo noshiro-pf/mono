@@ -391,11 +391,6 @@
       "project": ["**/*.{mts,ts,tsx}"],
     },
 
-    "apps/better-preact-use-state": {
-      "entry": ["src/index.mts"],
-      "project": ["**/*.mts"],
-    },
-
     // Not an Astro site like the entry above assumes: a single entry point.
     "apps/preact-utils": {
       "entry": ["src/index.mts"],
