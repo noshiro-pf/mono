@@ -19,6 +19,7 @@ import {
   type ChangesetFile,
 } from '../lib/changesets.mjs';
 import { resolveDiffBase } from '../lib/diff-base.mjs';
+import { markdownLines } from '../lib/markdown.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -172,26 +173,15 @@ export const listReminders = ({
  * `Undecided`.
  */
 export const listStockItems = (markdown: string): readonly StockItem[] =>
-  markdown.split('\n').reduce<
+  markdownLines(markdown).reduce<
     Readonly<{
-      fence: string | undefined;
       undecided: boolean;
       items: readonly StockItem[];
     }>
   >(
-    (state, line) => {
-      const fenceMatch = FENCE.exec(line)?.[1];
-
-      if (state.fence !== undefined) {
-        return fenceMatch !== undefined &&
-          fenceMatch[0] === state.fence[0] &&
-          fenceMatch.length >= state.fence.length
-          ? { ...state, fence: undefined }
-          : state;
-      }
-
-      if (fenceMatch !== undefined) {
-        return { ...state, fence: fenceMatch };
+    (state, { text: line, fenced }) => {
+      if (fenced) {
+        return state;
       }
 
       const heading = HEADING.exec(line)?.[1];
@@ -215,7 +205,7 @@ export const listStockItems = (markdown: string): readonly StockItem[] =>
             }),
           };
     },
-    { fence: undefined, undecided: false, items: [] },
+    { undecided: false, items: [] },
   ).items;
 
 export type StockItem = Readonly<{
@@ -264,9 +254,6 @@ const SELF = path.resolve(
   projectRootPath,
   'tools/scripts/cmd/check-next-major.mts',
 );
-
-/** An opening or closing code fence, capturing its marker. */
-const FENCE = /^\s{0,3}(`{3,}|~{3,})/u;
 
 /** An ATX heading, capturing its text. */
 const HEADING = /^\s{0,3}#{1,6}\s+(.*?)\s*#*\s*$/u;

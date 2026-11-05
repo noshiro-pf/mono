@@ -77,6 +77,34 @@ describe('listStockItems', () => {
 
     assert.deepStrictEqual(items, [{ text: 'an item', undecided: false }]);
   });
+
+  test('ignores list items in a fence indented under an item', () => {
+    const items = listStockItems(
+      [
+        '- an item',
+        '',
+        '    ```md',
+        '- not an item',
+        '    ```',
+        '- another',
+      ].join('\n'),
+    );
+
+    assert.deepStrictEqual(items, [
+      { text: 'an item', undecided: false },
+      { text: 'another', undecided: false },
+    ]);
+  });
+
+  test('reads CRLF line endings', () => {
+    const items = listStockItems(
+      ['## Undecided', '```', '- still code', '```', '- an item', ''].join(
+        '\r\n',
+      ),
+    );
+
+    assert.deepStrictEqual(items, [{ text: 'an item', undecided: true }]);
+  });
 });
 
 describe('checkNextMajor', () => {
