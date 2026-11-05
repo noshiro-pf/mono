@@ -1,10 +1,8 @@
 import { createState, derive, map, onScopeDispose } from 'synstate';
 import {
   constant,
-  createAfterUpdate,
   If,
   isImeKeyDown,
-  listenInScope,
   toObservable,
   view,
   type Bindable,
@@ -23,18 +21,9 @@ import {
   toDateValue,
   type WallClock,
 } from '../date/index.mjs';
-import {
-  ARROW_BORDER_PATH,
-  ARROW_FILL_PATH,
-  ARROW_SIZE,
-  ARROW_STAND_OFF,
-  focusablesIn,
-  isInside,
-  placeBottomStart,
-  uniqueId,
-  type PopoverPosition,
-} from '../internal/index.mjs';
+import { focusablesIn, isInside, uniqueId } from '../internal/index.mjs';
 import { DatePicker, type DatePickerOptions } from './date-picker.js';
+import { DatePopover } from './date-popover-parts.js';
 
 type Props = DatePickerOptions &
   Readonly<{
@@ -146,6 +135,10 @@ export const DateInput = ({
 
   const [isOpen$, setOpen] = createState(false);
 
+  // The shortcut picked last, drawn as picked each time the calendar opens, as
+  // Blueprint's `DateInput` keeps it.
+  const [shortcutIndex$, setShortcutIndex] = createState(-1);
+
   const [focused$, setFocused] = createState(false);
 
   // What the input shows while it has the focus.
@@ -248,247 +241,63 @@ export const DateInput = ({
     onChange(next);
   };
 
-  const Overlay = (): JSX.Element => {
-    const [position$, setPosition] = createState<Optional<PopoverPosition>>(
-      Optional.none,
-    );
-
-    const [phase$, setPhase] = createState<'enter' | 'active' | 'done'>(
-      'enter',
-    );
-
-    const afterUpdate = createAfterUpdate();
-
-    const placement$ = position$.pipe(
-      map((position) =>
-        Optional.isSome(position) ? position.value.placement : 'bottom',
-      ),
-    );
-
-    const mut_container: { element: HTMLDivElement | undefined } = {
-      element: undefined,
-    };
-
-    const place = (): void => {
-      const { target } = mut_elements;
-
-      const container = mut_container.element;
-
-      if (target === undefined || container === undefined) {
-        return;
-      }
-
-      setPosition(
-        Optional.some(
-          placeBottomStart(
-            target.getBoundingClientRect(),
-            { width: container.offsetWidth, height: container.offsetHeight },
-            {
-              width: document.documentElement.clientWidth,
-              height: window.innerHeight,
-            },
-          ),
-        ),
-      );
-    };
-
-    listenInScope(globalThis, 'resize', place);
-
-    listenInScope(document, 'scroll', place, { capture: true, passive: true });
-
-    listenInScope(
-      document,
-      'mousedown',
-      (event) => {
-        const pressed = event.target;
-
-        if (
-          pressed instanceof Node &&
-          mut_elements.target?.contains(pressed) !== true &&
-          mut_container.element?.contains(pressed) !== true
-        ) {
-          setOpen(false);
-        }
-      },
-      { capture: true },
-    );
-
-    // Blueprint's enter transition: `-enter`, then `-enter-active` from the
-    // next frame for the 300ms it runs, then `-enter-done`.
-    const mut_transition: {
-      frame: number;
-      timer: ReturnType<typeof setTimeout> | undefined;
-    } = { frame: 0, timer: undefined };
-
-    onScopeDispose(() => {
-      cancelAnimationFrame(mut_transition.frame);
-
-      clearTimeout(mut_transition.timer);
-    });
-
-    afterUpdate(() => {
-      place();
-
-      mut_transition.frame = requestAnimationFrame(() => {
-        setPhase('active');
-      });
-
-      mut_transition.timer = setTimeout(() => {
-        setPhase('done');
-      }, TRANSITION_MS);
-    });
-
-    return (
+  const Overlay = (): JSX.Element => (
+    <DatePopover
+      getTarget={() => mut_elements.target}
+      popoverClass={'bp6-date-input-popover'}
+      onEscape={() => {
+        focusInput(true);
+      }}
+      onOutsidePress={() => {
+        setOpen(false);
+      }}
+    >
       <div
-        aria-live={constant('polite')}
-        class={constant('bp6-overlay bp6-overlay-open bp6-overlay-inline')}
+        ref={(content) => {
+          mut_elements.content = content;
+
+          onScopeDispose(() => {
+            mut_elements.content = undefined;
+          });
+        }}
+        aria-label={constant('date picker')}
+        id={constant(popoverId)}
+        role={constant('dialog')}
       >
         <div
-          ref={(container) => {
-            mut_container.element = container;
-
-            const observer = new ResizeObserver(() => {
-              place();
-            });
-
-            observer.observe(container);
-
-            onScopeDispose(() => {
-              observer.disconnect();
-            });
-          }}
-          class={{
-            'bp6-popover-transition-container': constant(true),
-            'bp6-overlay-content': constant(true),
-            'bp6-popover-enter': view(phase$, (phase) => phase !== 'done'),
-            'bp6-popover-enter-active': view(
-              phase$,
-              (phase) => phase === 'active',
-            ),
-            'bp6-popover-enter-done': view(phase$, (phase) => phase === 'done'),
-          }}
-          style={{
-            position: constant('fixed'),
-            left: view(position$, (position) =>
-              Optional.isSome(position) ? `${position.value.left}px` : '0px',
-            ),
-            top: view(position$, (position) =>
-              Optional.isSome(position) ? `${position.value.top}px` : '0px',
-            ),
-          }}
-          onKeyDown={(event) => {
-            // The Escape that cancels what an input method is composing, in the
-            // time picker's fields, is the input method's.
-            if (event.key !== 'Escape' || isImeKeyDown(event)) {
-              return;
+          tabIndex={constant(0)}
+          onFocus={(event) => {
+            if (isInside(event.relatedTarget, mut_elements.content)) {
+              focusInput(false);
+            } else {
+              focusables()[0]?.focus();
             }
-
-            event.preventDefault();
-
-            event.stopPropagation();
-
-            focusInput(true);
           }}
-        >
-          <div
-            class={view(
-              placement$,
-              (placement) =>
-                `bp6-popover bp6-popover-placement-${placement} bp6-date-input-popover`,
-            )}
-            style={{
-              'transform-origin': view(position$, (position) =>
-                Optional.isSome(position)
-                  ? `${position.value.arrowLeft + ARROW_SIZE / 2}px ${position.value.placement === 'top' ? 'bottom' : 'top'}`
-                  : undefined,
-              ),
-            }}
-          >
-            <div
-              aria-hidden={constant('true')}
-              class={constant('bp6-popover-arrow')}
-              data-popper-arrow={constant('')}
-              style={{
-                left: view(position$, (position) =>
-                  Optional.isSome(position)
-                    ? `${position.value.arrowLeft}px`
-                    : undefined,
-                ),
-                top: view(placement$, (placement) =>
-                  placement === 'bottom' ? ARROW_STAND_OFF : undefined,
-                ),
-                bottom: view(placement$, (placement) =>
-                  placement === 'top' ? ARROW_STAND_OFF : undefined,
-                ),
-              }}
-            >
-              <svg
-                style={view(
-                  placement$,
-                  (placement) =>
-                    `transform: rotate(${placement === 'top' ? -90 : 90}deg);`,
-                )}
-                viewBox={constant(`0 0 ${ARROW_SIZE} ${ARROW_SIZE}`)}
-              >
-                <path
-                  class={constant('bp6-popover-arrow-border')}
-                  d={constant(ARROW_BORDER_PATH)}
-                />
-                <path
-                  class={constant('bp6-popover-arrow-fill')}
-                  d={constant(ARROW_FILL_PATH)}
-                />
-              </svg>
-            </div>
-            <div class={constant('bp6-popover-content')}>
-              <div
-                ref={(content) => {
-                  mut_elements.content = content;
-
-                  onScopeDispose(() => {
-                    mut_elements.content = undefined;
-                  });
-                }}
-                aria-label={constant('date picker')}
-                id={constant(popoverId)}
-                role={constant('dialog')}
-              >
-                <div
-                  tabIndex={constant(0)}
-                  onFocus={(event) => {
-                    if (isInside(event.relatedTarget, mut_elements.content)) {
-                      focusInput(false);
-                    } else {
-                      focusables()[0]?.focus();
-                    }
-                  }}
-                />
-                <DatePicker
-                  {...pickerOptions}
-                  value={derive([value$, shown$], (current, shown) =>
-                    shown.error ? '' : current,
-                  )}
-                  onChange={(next) => {
-                    changeFromPicker(next, false);
-                  }}
-                />
-                <div
-                  tabIndex={constant(0)}
-                  onFocus={(event) => {
-                    if (isInside(event.relatedTarget, mut_elements.content)) {
-                      focusInput(true);
-                    } else {
-                      focusables().at(-1)?.focus();
-                    }
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        />
+        <DatePicker
+          {...pickerOptions}
+          selectedShortcutIndex={shortcutIndex$}
+          onShortcutChange={setShortcutIndex}
+          value={derive([value$, shown$], (current, shown) =>
+            shown.error ? '' : current,
+          )}
+          onChange={(next) => {
+            changeFromPicker(next, false);
+          }}
+        />
+        <div
+          tabIndex={constant(0)}
+          onFocus={(event) => {
+            if (isInside(event.relatedTarget, mut_elements.content)) {
+              focusInput(true);
+            } else {
+              focusables().at(-1)?.focus();
+            }
+          }}
+        />
       </div>
-    );
-  };
+    </DatePopover>
+  );
 
   return (
     <>
@@ -611,5 +420,3 @@ export const DateInput = ({
 };
 
 type Shown = Readonly<{ text: string; error: boolean }>;
-
-const TRANSITION_MS = 300;

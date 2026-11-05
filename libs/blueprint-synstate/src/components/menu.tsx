@@ -8,6 +8,9 @@ type Props = Readonly<{
   size?: Size;
   /** Classes after Blueprint's own. */
   class?: string;
+  'aria-label'?: string;
+  /** Puts the menu itself in the tab order, as Blueprint's `tabIndex` does. */
+  tabIndex?: number;
   'data-e2e'?: string;
 }>;
 
@@ -16,12 +19,16 @@ export const Menu = ({
   children,
   size = 'medium',
   class: className,
+  'aria-label': ariaLabel,
+  tabIndex,
   'data-e2e': e2e,
 }: Props): JSX.Element => (
   <ul
+    aria-label={ariaLabel === undefined ? undefined : constant(ariaLabel)}
     class={classObject([className, 'bp6-menu', sizeClass(size)])}
     data-e2e={e2e === undefined ? undefined : constant(e2e)}
     role={constant('menu')}
+    tabIndex={tabIndex === undefined ? undefined : constant(tabIndex)}
   >
     {children}
   </ul>

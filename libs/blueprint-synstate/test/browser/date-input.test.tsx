@@ -206,6 +206,83 @@ describe(DateInput, () => {
     unmount();
   });
 
+  test('a shortcut picks its value, and is drawn as picked when the calendar opens again', async () => {
+    fixNow();
+
+    const { value$, onChange, changes } = controlled('2026-10-09T18:00');
+
+    const { container, unmount } = mountInto(() => (
+      <DateInput
+        {...RANGE}
+        shortcuts={[
+          { label: 'Today', value: '2026-10-23T23:59', includeTime: true },
+          { label: 'Tomorrow', value: '2026-10-24T23:59', includeTime: true },
+          { label: 'Too late', value: '2040-01-01T23:59', includeTime: true },
+          { label: 'In a week', value: '2026-10-30T09:00' },
+        ]}
+        timePrecision={'minute'}
+        value={value$}
+        onChange={onChange}
+      />
+    ));
+
+    const input = one<HTMLInputElement>(container, 'input');
+
+    input.focus();
+
+    await settle();
+
+    const items = (): readonly HTMLElement[] =>
+      all(container, '.bp6-daterangepicker-shortcuts a.bp6-menu-item');
+
+    assert.deepStrictEqual(
+      items().map((item) => item.classList.contains('bp6-disabled')),
+      [false, false, true, false],
+    );
+
+    // The time changes with it, so the calendar stays open.
+    items()[1]?.click();
+
+    await settle();
+
+    assert.strictEqual(value$.getSnapshot().value, '2026-10-24T23:59');
+
+    assert.strictEqual(all(container, '.bp6-overlay').length, 1);
+
+    assert.deepStrictEqual(
+      items().map((item) => item.classList.contains('bp6-active')),
+      [false, true, false, false],
+    );
+
+    // One out of range is not taken.
+    items()[2]?.click();
+
+    await settle();
+
+    // Without `includeTime`, the value's time is kept; with the month and the
+    // time unchanged, it closes.
+    items()[3]?.click();
+
+    await settle();
+
+    assert.deepStrictEqual(changes, ['2026-10-24T23:59', '2026-10-30T23:59']);
+
+    assert.strictEqual(all(container, '.bp6-overlay').length, 0);
+
+    input.blur();
+
+    input.focus();
+
+    await settle();
+
+    assert.deepStrictEqual(
+      items().map((item) => item.classList.contains('bp6-active')),
+      [false, false, false, true],
+    );
+
+    unmount();
+  });
+
   test('Escape closes the calendar without reaching the page', async () => {
     fixNow();
 
