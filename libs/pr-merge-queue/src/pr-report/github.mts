@@ -25,6 +25,7 @@ import {
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { currentEpochMs, parseJson, send } from '../lib/index.mjs';
+import { describeUnreadableChecks } from './checks-unreadable.mjs';
 import { parseClosingIssueRefs } from './linked-issues.mjs';
 
 /**
@@ -494,26 +495,35 @@ export const createClient = (
     repo: RepoRef,
     sha: string,
   ): Promise<
-    Readonly<{ reported: ReadonlyMap<string, ContextState>; running: boolean }>
+    Result<
+      Readonly<{
+        reported: ReadonlyMap<string, ContextState>;
+        running: boolean;
+      }>,
+      string
+    >
   > => {
     const prefix = `/repos/${repo.owner}/${repo.name}/commits/${sha}` as const;
 
     const runs = await checkRuns(prefix, await workflowRounds(repo, sha));
+
+    if (Result.isErr(runs)) {
+      return Result.err(`check runs: ${runs.value}`);
+    }
 
     const statuses = await getJson(
       `${prefix}/status?per_page=${PAGE_SIZE}`,
       CombinedStatusSchema,
     );
 
-    const runList = Result.isErr(runs) ? ([] as const) : runs.value;
+    if (Result.isErr(statuses)) {
+      return Result.err(`commit statuses: ${statuses.value}`);
+    }
 
-    return {
-      reported: reportedContexts(
-        runList,
-        Result.isErr(statuses) ? [] : statuses.value.statuses,
-      ),
-      running: anyRunInProgress(runList),
-    };
+    return Result.ok({
+      reported: reportedContexts(runs.value, statuses.value.statuses),
+      running: anyRunInProgress(runs.value),
+    });
   };
 
   /**
@@ -870,12 +880,25 @@ export const createClient = (
 
       const mut_facts: PullRequestFacts[] = [];
 
+      const mut_unreadable: Readonly<{ number: number; error: string }>[] = [];
+
       for (const pr of listed.value) {
         const body = pr.body ?? '';
 
         const compared = await comparison(repo, pr.base.ref, pr.head.sha);
 
-        const checks = await contextStates(repo, pr.head.sha);
+        const read = await contextStates(repo, pr.head.sha);
+
+        if (Result.isErr(read)) {
+          mut_unreadable.push({ number: pr.number, error: read.value });
+        }
+
+        const checks = Result.isErr(read)
+          ? ({
+              reported: new Map<string, ContextState>(),
+              running: false,
+            } as const)
+          : read.value;
 
         mut_facts.push({
           number: pr.number,
@@ -906,11 +929,17 @@ export const createClient = (
         });
       }
 
-      return mut_state.rateLimited
-        ? Result.err(
-            'The GitHub rate limit was spent part way through, so this report would have been missing commit counts and check verdicts without saying which.\nSet GH_TOKEN or GITHUB_TOKEN to raise it from 60 requests an hour to 5000.',
-          )
-        : Result.ok(mut_facts);
+      if (mut_state.rateLimited) {
+        return Result.err(
+          'The GitHub rate limit was spent part way through, so this report would have been missing commit counts and check verdicts without saying which.\nSet GH_TOKEN or GITHUB_TOKEN to raise it from 60 requests an hour to 5000.',
+        );
+      }
+
+      const unreadable = describeUnreadableChecks(mut_unreadable);
+
+      return unreadable === undefined
+        ? Result.ok(mut_facts)
+        : Result.err(unreadable);
     },
   };
 };
