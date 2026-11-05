@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "pr-report-core": "workspace:*",
+    "split-view-link": "workspace:*",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*",

@@ -1,4 +1,5 @@
-import { Arr, Num, Result } from 'ts-data-forge';
+import { claudeSessionTrailersOf } from 'split-view-link';
+import { Num, Result } from 'ts-data-forge';
 
 /**
  * A pull request on github.com, by its conversation tab's address.
@@ -73,110 +74,26 @@ export const pullRequestTitleOf = (
 };
 
 /**
- * A Claude Code session's address, or `undefined` for anything else — which is
- * what is checked of a link read off a page before a pane is pointed at it.
- */
-export const claudeSessionUrlOf = (address: string): string | undefined =>
-  claudeSessionUrlPattern.test(address) ? address : undefined;
-
-/**
- * The first Claude Code session a pull request's description names on a
- * `Claude-Session:` line — `Claude-Session: [<title>](<url>)`, or the URL alone
- * — as the PR Manager reads it (`apps/pr-manager/src/claude-session.mts`): at
- * the start of a line, in
- * any case, and only a `https://claude.ai/code/session_…` URL, so a trailer is
- * not a way to put an arbitrary page in a pane.
+ * The first Claude Code session a pull request's description names, as the PR
+ * Manager reads it: `claudeSessionTrailersOf` of `split-view-link`.
  *
  * The description is read off GitHub's rendering of it, with each link written
  * back as `[<text>](<href>)` — a bare URL is rendered as a link to itself — and
  * the code blocks left out, which is where the PR Manager does not look either.
  */
 export const claudeSessionUrlOfBody = (body: string): string | undefined =>
-  Array.from(body.matchAll(trailerLinePattern), (line) =>
-    sessionUrlOfTrailer((line.groups?.['value'] ?? '').trim()),
-  ).find((url) => url !== undefined);
+  claudeSessionTrailersOf(body)[0]?.url;
 
 /**
- * The query string of `split.html` that opens a pull request as the PR
- * Manager's links do (`apps/pr-manager/src/split-view.mts`): the diff, without
- * whitespace changes or the files already viewed, at a width and a zoom that
- * keep GitHub's file tree beside it, beside the conversation in the rest of the
- * page.
- * When the pull request closes an issue or names the Claude Code session it was
- * written in, the conversation is held at a fixed width and that takes the
- * rest, to the right of the conversation; with both, the issue is stacked over
- * the session.
- *
- * The conversation and the issue are at 75%, so that more of each fits — the
- * conversation beside the diff alone too, so that it reads the same whatever
- * shares the page. The diff is at 67% in either layout, which is what keeps
- * GitHub's file tree beside it; the session is at 100%.
- *
- * Every pull request opened this way reuses one saved split view,
- * `github-pull-request`, rather than adding one to the list each time. It is
- * not the PR Manager's `pr-manager`, so the two do not overwrite each other.
- *
- * Escaped as a form is, one pair at a time because `url` repeats; the page
- * writes the readable form back into its address bar once it has loaded.
+ * The saved split view a pull request opened from GitHub reuses, rather than
+ * adding one to the list each time. It is not the PR Manager's `pr-manager`, so
+ * the two do not overwrite each other. What it is opened with is
+ * `pullRequestSplitViewSearch`'s.
  */
-export const pullRequestSplitViewSearch = ({
-  pullRequest,
-  title,
-  issueUrl,
-  sessionUrl,
-}: Readonly<{
-  pullRequest: PullRequest;
-  title: string | undefined;
-  issueUrl: string | undefined;
-  sessionUrl: string | undefined;
-}>): string => {
-  const conversation = { url: pullRequest.url, zoom: narrow } as const;
-
-  // What goes to the right of the conversation, the issue over the session when
-  // there are both.
-  const others = [
-    ...(issueUrl === undefined
-      ? ([] as const)
-      : ([{ url: issueUrl, zoom: narrow }] as const)),
-    ...(sessionUrl === undefined
-      ? ([] as const)
-      : ([{ url: sessionUrl, zoom: full }] as const)),
-  ] as const;
-
-  const layout = Arr.isEmpty(others)
-    ? diffBesideConversation
-    : Arr.isFixedLengthArray(1, others)
-      ? threeColumns
-      : threeColumnsStacked;
-
-  const diff = {
-    url: `${pullRequest.url}/files?${diffQuery}`,
-    zoom: diffZoom,
-  } as const;
-
-  const panes = [diff, conversation, ...others] as const;
-
-  const params = [
-    ['ws', workspaceId],
-    ['name', workspaceName],
-    [
-      'title',
-      title === undefined
-        ? (`#${pullRequest.number}` as const)
-        : (`#${pullRequest.number} ${title}` as const),
-    ],
-    ['layout', layout],
-    ...panes.map(({ url }) => ['url', url] as const),
-    ...panes.map(({ zoom }) => ['zoom', zoom.toString()] as const),
-  ] as const;
-
-  const query = params
-    .map(([key, value]) => new URLSearchParams({ [key]: value }))
-    .map((pair) => pair.toString())
-    .join('&');
-
-  return `?${query}`;
-};
+export const pullRequestWorkspace = {
+  id: 'github-pull-request',
+  name: 'GitHub pull request',
+} as const;
 
 /**
  * `https://github.com/<owner>/<repo>/<kind>/<number>` and its number, for an
@@ -212,12 +129,6 @@ const repositoryItemOf = (
     : undefined;
 };
 
-/** A trailer's value, linked or bare, as a session's address. */
-const sessionUrlOfTrailer = (value: string): string | undefined =>
-  claudeSessionUrlOf(
-    linkedTrailerPattern.exec(value)?.groups?.['url'] ?? value,
-  );
-
 /** An owner is letters, digits and hyphens. */
 const ownerPattern = /^[a-z\d-]+$/iu;
 
@@ -232,59 +143,3 @@ const pullRequestLabelPattern = /^Pull Request #\d+$/u;
 
 /** What `github-view-defaults-extension` puts in front of the title. */
 const numberPrefixPattern = /^#\d+ /u;
-
-const claudeSessionUrlPattern =
-  /^https:\/\/claude\.ai\/code\/session_[0-9A-Za-z]+$/u;
-
-const trailerLinePattern =
-  /^[^\S\n]*claude-session[^\S\n]*:(?<value>[^\n]*)$/gimu;
-
-/** `[<title>](<url>)` */
-const linkedTrailerPattern = /^\[.*\]\((?<url>[^()\s]*)\)$/u;
-
-const workspaceId = 'github-pull-request';
-
-const workspaceName = 'GitHub pull request';
-
-/**
- * The diff with whitespace changes hidden (`w=1`), and without the files
- * already marked viewed (`show-viewed-files=false`).
- */
-const diffQuery = 'w=1&show-viewed-files=false';
-
-/** 100%, where the extension's `zoom` leaves a pane when it is absent. */
-const full = 1;
-
-/** The conversation and the issue. */
-const narrow = 0.75;
-
-/**
- * The diff, in either layout. The PR Manager's `diffZoom`
- * (`apps/pr-manager/src/split-view.mts`) says why.
- */
-const diffZoom = 0.67;
-
-/**
- * The width the diff is held at, in either layout. The PR Manager's `diffWidth`
- * (`apps/pr-manager/src/split-view.mts`) says why.
- */
-const diffWidth = 737;
-
-/**
- * The width the conversation is held at in three columns. The PR Manager's
- * `conversationWidth` says why.
- */
-const conversationWidth = 577;
-
-/** The diff beside the conversation alone, the diff held at `diffWidth`. */
-const diffBesideConversation = `r${diffWidth}fpp` as const;
-
-/**
- * The diff, the conversation and the right column, the diff and the
- * conversation held at fixed widths.
- */
-const threeColumns = `r${diffWidth}fpr${conversationWidth}fpp` as const;
-
-/** `threeColumns`, with the right column stacked in two. */
-const threeColumnsStacked =
-  `r${diffWidth}fpr${conversationWidth}fpcpp` as const;

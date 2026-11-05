@@ -366,6 +366,13 @@
       "project": ["**/*.mts"],
     },
 
+    // Not an Astro site like the entry below assumes: plain TypeScript with a
+    // single entry point, imported from source by its siblings.
+    "apps/split-view-link": {
+      "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
+      "project": ["**/*.mts"],
+    },
+
     // Not an Astro site like the entry below assumes: a single entry point.
     "apps/numeric-input-utils": {
       "entry": ["src/index.mts"],

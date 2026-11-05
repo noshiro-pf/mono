@@ -1,9 +1,6 @@
+import { splitViewPagePath, workspaceQueryParam } from 'split-view-link';
 import { Num, Result } from 'ts-data-forge';
-import {
-  readOpenSplitViewTabs,
-  splitViewPagePath,
-  workspaceQueryParam,
-} from '../shared/index.mjs';
+import { readOpenSplitViewTabs } from '../shared/index.mjs';
 import type { WorkspaceEntry } from './registry.mjs';
 
 /** Opens one workspace in a tab of its own. */

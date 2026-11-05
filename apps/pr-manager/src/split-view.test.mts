@@ -1,8 +1,11 @@
+// cspell:ignore nifmgpafbfpgpcijgmfpcoonjbalbkhf
 import type { LinkedIssue } from 'pr-report-core';
-import type { ClaudeSession } from './claude-session.mjs';
+import type { ClaudeSession } from 'split-view-link';
 import { splitViewUrl } from './split-view.mjs';
 
 describe(splitViewUrl, () => {
+  // The layout and the zoom are `split-view-link`'s, and tested there; what is
+  // tested here is what the PR Manager passes it.
   const pullRequestUrl = 'https://github.com/noshiro-pf/mono/pull/2062';
 
   // Whitespace changes hidden, and files marked viewed left out.
@@ -27,34 +30,6 @@ describe(splitViewUrl, () => {
     expect(url.pathname).toBe('/split.html');
   });
 
-  test('holds the diff at 737px beside the conversation', () => {
-    const params = paramsOf(
-      splitViewUrl({ ...pullRequest, linkedIssues: [], claudeSessions: [] }),
-    );
-
-    expect(params.get('layout')).toBe('r737fpp');
-
-    assert.deepStrictEqual(params.getAll('url'), [diffUrl, pullRequestUrl]);
-  });
-
-  test('adds the closed issue on the right, the diff and the conversation held', () => {
-    const params = paramsOf(
-      splitViewUrl({
-        ...pullRequest,
-        linkedIssues: [issue(1880)],
-        claudeSessions: [],
-      }),
-    );
-
-    expect(params.get('layout')).toBe('r737fpr577fpp');
-
-    assert.deepStrictEqual(params.getAll('url'), [
-      diffUrl,
-      pullRequestUrl,
-      'https://github.com/noshiro-pf/mono/issues/1880',
-    ]);
-  });
-
   test('takes only the first of several issues', () => {
     const params = paramsOf(
       splitViewUrl({
@@ -73,25 +48,7 @@ describe(splitViewUrl, () => {
     ]);
   });
 
-  test('puts the Claude Code session right of the conversation, the diff and the conversation held', () => {
-    const params = paramsOf(
-      splitViewUrl({
-        ...pullRequest,
-        linkedIssues: [],
-        claudeSessions: [session('01First')],
-      }),
-    );
-
-    expect(params.get('layout')).toBe('r737fpr577fpp');
-
-    assert.deepStrictEqual(params.getAll('url'), [
-      diffUrl,
-      pullRequestUrl,
-      'https://claude.ai/code/session_01First',
-    ]);
-  });
-
-  test('puts the issue stacked over the session right of the conversation', () => {
+  test('takes only the first of several sessions, under the issue', () => {
     const params = paramsOf(
       splitViewUrl({
         ...pullRequest,
@@ -100,54 +57,12 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('r737fpr577fpcpp');
-
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
       pullRequestUrl,
       'https://github.com/noshiro-pf/mono/issues/1880',
       'https://claude.ai/code/session_01First',
     ]);
-  });
-
-  test('shows the diff at 67% beside the conversation at 75%', () => {
-    const alone = paramsOf(
-      splitViewUrl({ ...pullRequest, linkedIssues: [], claudeSessions: [] }),
-    );
-
-    assert.deepStrictEqual(alone.getAll('zoom'), ['0.67', '0.75']);
-  });
-
-  test('shows the diff at 67% and the conversation and the issue at 75% in three columns', () => {
-    const all = paramsOf(
-      splitViewUrl({
-        ...pullRequest,
-        linkedIssues: [issue(1880)],
-        claudeSessions: [session('01First')],
-      }),
-    );
-
-    assert.deepStrictEqual(all.getAll('zoom'), ['0.67', '0.75', '0.75', '1']);
-
-    const sessionOnly = paramsOf(
-      splitViewUrl({
-        ...pullRequest,
-        linkedIssues: [],
-        claudeSessions: [session('01First')],
-      }),
-    );
-
-    assert.deepStrictEqual(sessionOnly.getAll('zoom'), ['0.67', '0.75', '1']);
-
-    const issueOnly = paramsOf(
-      splitViewUrl({
-        ...pullRequest,
-        linkedIssues: [issue(1880)],
-        claudeSessions: [],
-      }),
-    );
-
-    assert.deepStrictEqual(issueOnly.getAll('zoom'), ['0.67', '0.75', '0.75']);
   });
 
   test('titles the tab with the number and the title of the pull request', () => {

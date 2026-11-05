@@ -1,0 +1,11 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../../.cspell.config.yaml'
+words:
+  # The tail of the four-pane layout `src/pull-request.mts` asks for (the
+  # conversation, then the issue over the session), named in the module and its
+  # test.
+  - fpcpp

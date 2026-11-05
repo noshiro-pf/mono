@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "libReplacement": true,
+    // Runs in the extension, whose manifest asks for Chrome 116: ES2023 is the
+    // newest ECMAScript edition it implements whole, so a newer language API,
+    // such as the iterator helpers of Chrome 122, does not type-check here.
+    // The DOM lib is not capped: a DOM API newer than Chrome 116 still does.
+    "lib": ["ES2023", "DOM", "DOM.Iterable"]
+  },
+  "include": ["./src", "./test", "./scripts", "./configs"]
+}
