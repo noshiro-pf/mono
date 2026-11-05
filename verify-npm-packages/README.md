@@ -74,6 +74,16 @@ import することになり、`SyntaxError: does not provide an export named ..
 が `synstate-dom` の peer 範囲を書き換えるので、version PR はこれ無しでは
 「作業ツリーが汚れていないか」で落ちる。
 
+生成はどちらの空間でも、publish されるパッケージのどれでもない
+`packages/<name>/` を消す（改名・削除・private 化されたパッケージの残骸）。
+`published/` の残りはレジストリを読まないと書けないが、何を残してよいかは読まずに
+決まるので、`local/` を生成する `gen:verify-npm-packages` と `verify:npm-packages`
+は `published/` からもそれを消す（上の「`published/` を再生成するのは
+`verify:npm-packages:published`」の唯一の例外）。逆に
+`verify:npm-packages:published` は `local/` に触れない。そうしないと
+パッケージを消した PR では `published/` の残骸が残り、次の `pnpm-update` の
+パッチにその削除が入って弾かれる。
+
 ## 独立性をどう担保しているか
 
 依存を宣言し忘れたパッケージを検出するには、各 project が**自分の宣言した依存しか

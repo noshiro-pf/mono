@@ -265,7 +265,7 @@ export const CI_ONLY: readonly CiOnly[] = [
     directory: '.',
     scriptName: 'verify:npm-packages',
     reason:
-      'Packs and installs every published package. Its committed `local/` copies are `gen:verify-npm-packages`, which check-changed runs.',
+      'Packs and installs every published package. Its committed `local/` copies, and the removal from both spaces of the project of a package that is gone, are `gen:verify-npm-packages`, which check-changed runs.',
     writtenBy: ['gen:verify-npm-packages'],
   },
   {
