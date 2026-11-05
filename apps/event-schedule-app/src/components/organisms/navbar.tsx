@@ -5,8 +5,8 @@ import {
   MenuItem,
   Popover,
 } from 'blueprint-synstate';
-import { createState } from 'synstate';
-import { constant, If, view, type JSX, type View } from 'synstate-dom';
+import { createState, map, type InitializedObservable } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import {
   aboutThisAppUrl,
   dict,
@@ -39,8 +39,10 @@ export const NavBar = (): JSX.Element => {
 
   const openingDialog$ = UpdateUserInfoDialogStore.openingDialogType$;
 
-  const isOpening = (type: UpdateUserInfoDialogType): View<boolean> =>
-    view(openingDialog$, (opening) => opening === type);
+  const isOpening = (
+    type: UpdateUserInfoDialogType,
+  ): InitializedObservable<boolean> =>
+    openingDialog$.pipe(map((opening) => opening === type));
 
   return (
     <div class={constant(styles.navbar)}>
@@ -60,7 +62,7 @@ export const NavBar = (): JSX.Element => {
       <div class={constant(styles.row2)}>
         <div class={constant(styles.flex)}>
           <If
-            cond={view(Auth.fireAuthUser$, (user) => user === undefined)}
+            cond={Auth.fireAuthUser$.pipe(map((user) => user === undefined))}
             then={
               <>
                 <a
@@ -115,7 +117,7 @@ export const NavBar = (): JSX.Element => {
                       class={constant(styles.anchor)}
                       data-e2e={constant('nav-user-menu')}
                     >
-                      {view(Auth.displayName$, (name) => name ?? '')}
+                      {inlineMap(Auth.displayName$, (name) => name ?? '')}
                     </a>
                   </Popover>
                   <span>{constant(dc.auth.userName.suffix)}</span>

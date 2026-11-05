@@ -2,7 +2,7 @@ import { createState, onScopeDispose } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  derive,
+  deriveBindable,
   mapBindable,
   toObservable,
   type Bindable,
@@ -333,7 +333,7 @@ export const RangeSlider = ({
         )}
         role={constant('slider')}
         style={{
-          left: derive([at$, layouts$], (at, layouts) => {
+          left: deriveBindable([at$, layouts$], (at, layouts) => {
             const element = mut_elements.handles[index];
 
             return layouts === 0 || element === undefined

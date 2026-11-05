@@ -34,8 +34,7 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
         だけで動きます。Babel や Vite のプラグインを設定する必要はありません。
     </Card>
     <Card title="リアクティブかどうかが型でわかる" icon="approve-check">
-        データを受け取るスロットに渡せるのは
-        Observable・`constant(...)`・`view(...)`
+        データを受け取るスロットに渡せるのは Observable か `constant(...)`
         だけで、素の値は渡せません。うっかりスナップショットを読んで渡しても、更新されないビューができあがるのではなく、型エラーになります。props
         も値を読み出したものではなく Bindable
         そのものなので、分割代入しても、デフォルト値を付けても壊れません。

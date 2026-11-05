@@ -1,6 +1,6 @@
 import { debounce, withInitialValue } from 'synstate';
 import {
-  derive,
+  deriveBindable,
   mapBindable,
   toObservable,
   type Bindable,
@@ -16,13 +16,12 @@ export const SearchSummary = ({
   query,
   hits,
 }: SearchSummaryProps): JSX.Element => {
-  // A constant `hits` gives a constant, an observable a `map` node, and a view
-  // a composed view.
+  // A constant `hits` gives a constant, and an observable a `map` node.
   const hitsLabel = mapBindable(hits, (n) => (n === 1 ? '1 hit' : `${n} hits`));
 
   // All constants: `fn` runs once and the result is a constant.
-  // Otherwise: `combine` and `map`.
-  const heading = derive([query, hits], (q, n) =>
+  // Otherwise: one node, synstate's `derive`.
+  const heading = deriveBindable([query, hits], (q, n) =>
     n === 0 ? `Nothing for "${q}"` : `Results for "${q}"`,
   );
 

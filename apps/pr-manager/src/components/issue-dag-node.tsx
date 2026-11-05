@@ -1,5 +1,12 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, derive, For, If, view, type JSX } from 'synstate-dom';
+import {
+  constant,
+  deriveBindable,
+  For,
+  If,
+  inlineMap,
+  type JSX,
+} from 'synstate-dom';
 import { Num } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import {
@@ -49,17 +56,20 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
   const lines$ = placed$.pipe(map(({ node }) => linesOf(node)));
 
   return (
-    <SvgLink href={url} title={view(placed$, ({ node }) => describeNode(node))}>
+    <SvgLink
+      href={url}
+      title={placed$.pipe(map(({ node }) => describeNode(node)))}
+    >
       <g
         class={constant('issue-dag-node')}
         data-kind={constant(kind)}
-        data-pending={view(placed$, ({ node }) => node.pending.toString())}
-        data-priority={view(placed$, ({ node }) => node.priority)}
-        data-state={view(placed$, ({ node }) => node.state)}
-        transform={view(placed$, ({ x, y }) => `translate(${x} ${y})`)}
+        data-pending={inlineMap(placed$, ({ node }) => node.pending.toString())}
+        data-priority={inlineMap(placed$, ({ node }) => node.priority)}
+        data-state={inlineMap(placed$, ({ node }) => node.state)}
+        transform={inlineMap(placed$, ({ x, y }) => `translate(${x} ${y})`)}
       >
         <If
-          cond={view(placed$, ({ node }) => isRingedTier(node.priority))}
+          cond={placed$.pipe(map(({ node }) => isRingedTier(node.priority)))}
           then={
             kind === 'pull-request' ? (
               <rect
@@ -101,7 +111,7 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
               <tspan
                 dominant-baseline={constant('central')}
                 x={constant(NODE_WIDTH / 2)}
-                y={derive(
+                y={deriveBindable(
                   [index$, lines$],
                   (index, lines) =>
                     NODE_HEIGHT / 2 +
@@ -132,11 +142,11 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
           </text>
         </g>
         <If
-          cond={view(placed$, ({ node }) => node.priority !== 'none')}
+          cond={placed$.pipe(map(({ node }) => node.priority !== 'none'))}
           then={
             <g
               class={constant('issue-dag-priority')}
-              data-priority={view(placed$, ({ node }) => node.priority)}
+              data-priority={inlineMap(placed$, ({ node }) => node.priority)}
               transform={constant(
                 `translate(${PRIORITY_X} ${-PRIORITY_HEIGHT / 2})`,
               )}
@@ -152,7 +162,7 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
                 x={constant(PRIORITY_WIDTH / 2)}
                 y={constant(PRIORITY_HEIGHT / 2)}
               >
-                {view(placed$, ({ node }) => node.priority)}
+                {inlineMap(placed$, ({ node }) => node.priority)}
               </text>
             </g>
           }

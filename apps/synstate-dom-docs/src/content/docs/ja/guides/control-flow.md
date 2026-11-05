@@ -31,8 +31,8 @@ const Login = (): JSX.Element => <main>{constant('Please log in')}</main>;
 ## `MatchOptional` と `MatchResult`
 
 ```tsx
-import { createState, type InitializedObservable } from 'synstate';
-import { constant, MatchOptional, view, type JSX } from 'synstate-dom';
+import { createState, map, type InitializedObservable } from 'synstate';
+import { constant, MatchOptional, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 
 type User = Readonly<{ name: string }>;
@@ -52,13 +52,13 @@ export const Account = (): JSX.Element => (
 const Profile = ({
     user$,
 }: Readonly<{ user$: InitializedObservable<User> }>): JSX.Element => (
-    <p>{view(user$, (u) => `Signed in as ${u.name}`)}</p>
+    <p>{user$.pipe(map((u) => `Signed in as ${u.name}`))}</p>
 );
 ```
 
 ```tsx
-import { createState } from 'synstate';
-import { constant, MatchResult, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, MatchResult, type JSX } from 'synstate-dom';
 import { Result } from 'ts-data-forge';
 
 const [parsed$] = createState<Result<number, string>>(Result.ok(0));
@@ -68,7 +68,9 @@ export const ParsedValue = (): JSX.Element => (
         value={parsed$}
         ok={(value$) => <output>{value$}</output>}
         err={(error$) => (
-            <p role={constant('alert')}>{view(error$, (e) => `Error: ${e}`)}</p>
+            <p role={constant('alert')}>
+                {error$.pipe(map((e) => `Error: ${e}`))}
+            </p>
         )}
     />
 );
@@ -82,7 +84,7 @@ export const ParsedValue = (): JSX.Element => (
 
 ```tsx
 import { createState } from 'synstate';
-import { For, view, type JSX } from 'synstate-dom';
+import { For, inlineMap, type JSX } from 'synstate-dom';
 
 type Row = Readonly<{ id: number; label: string }>;
 
@@ -99,8 +101,8 @@ export const Table = (): JSX.Element => (
         <For items={rows$} key={(row) => row.id}>
             {(row$, index$) => (
                 <li>
-                    {view(index$, (i) => `${i + 1}. `)}
-                    {view(row$, (row) => row.label)}
+                    {inlineMap(index$, (i) => `${i + 1}. `)}
+                    {inlineMap(row$, (row) => row.label)}
                 </li>
             )}
         </For>

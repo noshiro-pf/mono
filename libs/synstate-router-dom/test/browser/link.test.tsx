@@ -1,5 +1,5 @@
-import { createState } from 'synstate';
-import { constant, view } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant } from 'synstate-dom';
 import { externalHref, type ExternalHref, type Href } from 'synstate-router';
 import { asSafeInt } from 'ts-data-forge';
 import { mountInto, nextTask, routes, setup } from './fixture.js';
@@ -274,7 +274,7 @@ describe('Link', () => {
     unmount();
   });
 
-  test('reads a view `to` when clicked', () => {
+  test('reads an observable `to` when clicked', () => {
     const {
       router,
       bound: { Link },
@@ -284,10 +284,12 @@ describe('Link', () => {
 
     const { container, unmount } = mountInto(() => (
       <Link
-        to={view(external$, (external) =>
-          external
-            ? externalHref(`${location.origin}/settings/`)
-            : routes.settings.href(),
+        to={external$.pipe(
+          map((external) =>
+            external
+              ? externalHref(`${location.origin}/settings/`)
+              : routes.settings.href(),
+          ),
         )}
       >
         {constant('settings')}
@@ -296,7 +298,7 @@ describe('Link', () => {
 
     const anchor = anchorIn(container);
 
-    // The destination changed after the view was opened, to the same page as an
+    // The destination changed after the Link was mounted, to the same page as an
     // ExternalHref: the click reads it and leaves it to the browser.
     setExternal(true);
 

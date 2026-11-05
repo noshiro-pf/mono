@@ -1,4 +1,5 @@
-import { constant, type JSX, view } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import {
   inputAreaString$,
   outputAreaString$,
@@ -30,7 +31,9 @@ export const App = (): JSX.Element => (
         e2eId={'output-area'}
         maxHeightPx={800}
         minHeightPx={500}
-        value={view(outputAreaString$, (output) => output ?? 'Parse error.')}
+        value={outputAreaString$.pipe(
+          map((output) => output ?? 'Parse error.'),
+        )}
       />
     </div>
   </div>

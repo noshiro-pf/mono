@@ -1,12 +1,12 @@
 import { Button } from 'blueprint-synstate';
-import type { InitializedObservable } from 'synstate';
+import { map, type InitializedObservable } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
   If,
+  inlineMap,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -50,12 +50,12 @@ export const AnswerTable = ({
   editAnswerButtonIsDisabled,
   holidaysJpDefinition,
 }: Props): JSX.Element => {
-  const dateMinimized = derive(
+  const dateMinimized = deriveBindable(
     [tableIsMinimized$, dateStringIsMinimized$],
     (table, date) => table || date,
   );
 
-  const iconsShown = view(answerIconIsHidden$, (hidden) => !hidden);
+  const iconsShown = answerIconIsHidden$.pipe(map((hidden) => !hidden));
 
   return (
     <table
@@ -129,8 +129,8 @@ export const AnswerTable = ({
                   else={
                     <Button
                       class={styles.nameButton}
-                      text={view(answer$, (a) => a.user.name)}
-                      title={view(answer$, (a) => a.user.name)}
+                      text={answer$.pipe(map((a) => a.user.name))}
+                      title={answer$.pipe(map((a) => a.user.name))}
                       variant={constant('minimal')}
                       onClick={() => {
                         AnswerPageStore.onAnswerClick(
@@ -139,10 +139,10 @@ export const AnswerTable = ({
                       }}
                     />
                   }
-                  then={<>{view(answer$, (a) => a.user.name)}</>}
+                  then={<>{inlineMap(answer$, (a) => a.user.name)}</>}
                 />
                 <If
-                  cond={view(answer$, (a) => a.isRequiredParticipants)}
+                  cond={answer$.pipe(map((a) => a.isRequiredParticipants))}
                   then={
                     <div class={constant(styles.requiredParticipantIcon)}>
                       <RequiredParticipantIcon />
@@ -163,7 +163,7 @@ export const AnswerTable = ({
               <tr
                 data-e2e={constant('answer-table-row')}
                 style={{
-                  'background-color': view(row$, (r) => r.backgroundColor),
+                  'background-color': inlineMap(row$, (r) => r.backgroundColor),
                 }}
               >
                 <td class={constant('sticky horizontal')}>
@@ -176,20 +176,20 @@ export const AnswerTable = ({
                 </td>
                 <td data-e2e={constant('score')}>
                   <span>
-                    {view(row$, (r) => Num.roundAt(r.score, 2).toString())}
+                    {inlineMap(row$, (r) => Num.roundAt(r.score, 2).toString())}
                   </span>
                 </td>
                 <If
                   cond={iconsShown}
                   then={
                     <For
-                      items={view(row$, (r) => r.answerSummaryRow ?? [])}
+                      items={row$.pipe(map((r) => r.answerSummaryRow ?? []))}
                       key={(_, index) => index}
                     >
                       {(count$) => (
                         <td>
                           <div class={constant(styles.summaryCell)}>
-                            <span>{view(count$, String)}</span>
+                            <span>{inlineMap(count$, String)}</span>
                             <span class={constant(styles.xSmall)}>
                               {constant(dc.numAnswersUnit)}
                             </span>
@@ -200,7 +200,7 @@ export const AnswerTable = ({
                   }
                 />
                 <For
-                  items={view(row$, (r) => r.answerTableRow ?? [])}
+                  items={row$.pipe(map((r) => r.answerTableRow ?? []))}
                   key={(_, index) => index}
                 >
                   {(cell$) => (
@@ -238,10 +238,10 @@ export const AnswerTable = ({
               <td class={constant(styles.answerCell)}>
                 <div>
                   <If
-                    cond={view(answer$, (a) => a.comment !== '')}
+                    cond={answer$.pipe(map((a) => a.comment !== ''))}
                     then={
                       <CommentButton
-                        comment={view(answer$, (a) => a.comment)}
+                        comment={answer$.pipe(map((a) => a.comment))}
                       />
                     }
                   />
@@ -262,7 +262,7 @@ const AnswerCell = ({
   cell: InitializedObservable<AnswerTableCell>;
 }>): JSX.Element => (
   <For
-    items={view(cell, (c) => (c.iconId === 'none' ? [] : [c.iconId]))}
+    items={cell.pipe(map((c) => (c.iconId === 'none' ? [] : [c.iconId])))}
     key={(iconId) => iconId}
   >
     {(iconId$) => (
@@ -270,10 +270,10 @@ const AnswerCell = ({
         <div class={constant(styles.iconAndString)}>
           <CustomIcon iconName={iconId$.getSnapshot().value} />
           <If
-            cond={view(cell, (c) => c.showPoint)}
+            cond={cell.pipe(map((c) => c.showPoint))}
             then={
               <span class={constant(styles.annotation)}>
-                {view(
+                {inlineMap(
                   cell,
                   (c) =>
                     `${dict.common.brace.start}${c.point}${dict.common.brace.end}`,
@@ -282,7 +282,7 @@ const AnswerCell = ({
             }
           />
           <If
-            cond={derive(
+            cond={deriveBindable(
               [cell, tableIsMinimized$],
               (c, minimized) => c.weight !== 1 && !minimized,
             )}
@@ -291,20 +291,20 @@ const AnswerCell = ({
                 <span class={constant(styles.weightTimes)}>
                   {constant(dc.times)}
                 </span>
-                <div>{view(cell, (c) => c.weight.toString())}</div>
+                <div>{inlineMap(cell, (c) => c.weight.toString())}</div>
               </span>
             }
           />
         </div>
         <If
-          cond={derive(
+          cond={deriveBindable(
             [cell, tableIsMinimized$],
             (c, minimized) => c.comment !== '' && !minimized,
           )}
           then={
             <span class={constant(styles.cellComment)}>
               <CommentButton
-                comment={view(cell, (c) => c.comment)}
+                comment={cell.pipe(map((c) => c.comment))}
                 useSmallButton
               />
             </span>

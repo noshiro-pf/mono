@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, mapBindable, view, type Bindable } from 'synstate-dom';
+import { constant, mapBindable, type Bindable } from 'synstate-dom';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { Rect, RectSize } from 'ts-utils-additional';
 import type { NWES } from '../../types/index.mjs';
@@ -55,8 +55,8 @@ export const balloonPositionStyle = (
   );
 
   return {
-    top: view(position, (p) => p.top),
-    left: view(position, (p) => p.left),
+    top: position.pipe(map((p) => p.top)),
+    left: position.pipe(map((p) => p.left)),
   } as const;
 };
 

@@ -1,10 +1,10 @@
-import type { InitializedObservable } from 'synstate';
+import { map, type InitializedObservable } from 'synstate';
 import {
   constant,
   createAfterUpdate,
+  inlineMap,
   isImeKeyDown,
   subscribeInScope,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Num } from 'ts-data-forge';
@@ -30,7 +30,7 @@ export const DagEdgeDelete = ({
   onDelete,
   onDismiss,
 }: Props): JSX.Element => {
-  const label = view(button, (state) => state.label);
+  const label = button.pipe(map((state) => state.label));
 
   return (
     // An SVG has no <button>: the group takes its role, focus and keys.
@@ -61,7 +61,7 @@ export const DagEdgeDelete = ({
       data-e2e={constant('dag-edge-delete')}
       role={constant('button')}
       tabindex={constant(0)}
-      transform={view(button, ({ at }) => `translate(${at.x} ${at.y})`)}
+      transform={inlineMap(button, ({ at }) => `translate(${at.x} ${at.y})`)}
       onBlur={onDismiss}
       onClick={(clicked) => {
         // Not a click on the background, which would only dismiss it.
@@ -94,11 +94,11 @@ export const DagEdgeDelete = ({
       <SvgTitle>{label}</SvgTitle>
       <circle
         class={constant('dag-edge-delete-circle')}
-        r={view(button, radius)}
+        r={inlineMap(button, radius)}
       />
       <path
         class={constant('dag-edge-delete-cross')}
-        d={view(button, (state) => {
+        d={inlineMap(button, (state) => {
           const cross = radius(state) * CROSS_RATIO;
 
           return `M ${-cross} ${-cross} L ${cross} ${cross} M ${cross} ${-cross} L ${-cross} ${cross}`;

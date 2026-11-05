@@ -2,9 +2,9 @@ import { combine } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  derive,
+  deriveBindable,
+  inlineMap,
   subscribeInScope,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
@@ -51,7 +51,7 @@ export const EditEventScheduleEmailVerified = (): JSX.Element => {
   return (
     <>
       <div class={constant(styles.subTitle)}>
-        {view(eventSchedule$, (e) => dc.editSubTitle(e?.title ?? ''))}
+        {inlineMap(eventSchedule$, (e) => dc.editSubTitle(e?.title ?? ''))}
       </div>
 
       <EventScheduleSettingCommon
@@ -66,7 +66,7 @@ export const EditEventScheduleEmailVerified = (): JSX.Element => {
           onConfirmClick={EditEventScheduleStore.onBackToAnswerPage}
         />
         <ResetEditButton
-          disabled={derive(
+          disabled={deriveBindable(
             [isLoading$, hasNoChanges$],
             (loading, noChanges) => loading || noChanges,
           )}
@@ -74,7 +74,7 @@ export const EditEventScheduleEmailVerified = (): JSX.Element => {
         />
         <div data-e2e={constant('submit-button')}>
           <SubmitEditingEventButton
-            disabled={derive(
+            disabled={deriveBindable(
               [commonState$, isLoading$, hasNoChanges$],
               (s, loading, noChanges) =>
                 !s.eventScheduleValidationOk || loading || noChanges,

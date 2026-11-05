@@ -3,7 +3,7 @@
 // of the barrel.
 import {
   constant,
-  derive,
+  deriveBindable,
   If,
   mapBindable,
   type Bindable,
@@ -24,7 +24,7 @@ export const disabledWhileLoading = (
 ): Bindable<boolean> | undefined =>
   loading === undefined
     ? disabled
-    : derive([disabled ?? constant(false), loading], (d, l) => d || l);
+    : deriveBindable([disabled ?? constant(false), loading], (d, l) => d || l);
 
 /** `bp6-button` and the classes its props add. */
 export const buttonClass = ({
@@ -62,7 +62,7 @@ export const buttonClass = ({
         'bp6-active',
         active === undefined || disabled === undefined
           ? active
-          : derive([active, disabled], (a, d) => a && !d),
+          : deriveBindable([active, disabled], (a, d) => a && !d),
       ],
       ['bp6-disabled', disabled],
       ['bp6-loading', loading],

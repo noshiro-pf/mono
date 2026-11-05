@@ -1,5 +1,5 @@
-import { createState, type InitializedObservable } from 'synstate';
-import { constant, MatchOptional, view, type JSX } from 'synstate-dom';
+import { createState, map, type InitializedObservable } from 'synstate';
+import { constant, MatchOptional, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 
 type User = Readonly<{ name: string }>;
@@ -19,5 +19,5 @@ export const Account = (): JSX.Element => (
 const Profile = ({
   user$,
 }: Readonly<{ user$: InitializedObservable<User> }>): JSX.Element => (
-  <p>{view(user$, (u) => `Signed in as ${u.name}`)}</p>
+  <p>{user$.pipe(map((u) => `Signed in as ${u.name}`))}</p>
 );

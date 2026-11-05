@@ -1,5 +1,5 @@
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   absentBlocks,
@@ -53,14 +53,14 @@ export const BlockLayout = ({ blocks }: Props): JSX.Element => {
   return (
     <div
       class={constant('block-layout')}
-      data-columns={view(layout$, ({ columns }) => columns.toString())}
-      data-mode={view(layout$, ({ mode }) => mode)}
-      style={view(layout$, gridOf)}
+      data-columns={inlineMap(layout$, ({ columns }) => columns.toString())}
+      data-mode={inlineMap(layout$, ({ mode }) => mode)}
+      style={inlineMap(layout$, gridOf)}
     >
       <BlockColumn blocks={blocks} ids$={shownIn(({ left }) => left)} />
 
       <If
-        cond={view(layout$, ({ columns }) => columns === 3)}
+        cond={layout$.pipe(map(({ columns }) => columns === 3))}
         then={
           <>
             <ColumnDivider position={'first'} />
@@ -74,7 +74,7 @@ export const BlockLayout = ({ blocks }: Props): JSX.Element => {
       />
 
       <If
-        cond={view(layout$, ({ columns }) => columns !== 1)}
+        cond={layout$.pipe(map(({ columns }) => columns !== 1))}
         then={
           <>
             <ColumnDivider position={'last'} />

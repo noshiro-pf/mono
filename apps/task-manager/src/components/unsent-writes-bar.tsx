@@ -1,4 +1,5 @@
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, If, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { sessionStore } from '../store/index.mjs';
 
@@ -9,7 +10,9 @@ import { sessionStore } from '../store/index.mjs';
  */
 export const UnsentWritesBar = (): JSX.Element => (
   <If
-    cond={view(sessionStore.signOutState, (state) => state === 'unsent-writes')}
+    cond={sessionStore.signOutState.pipe(
+      map((state) => state === 'unsent-writes'),
+    )}
     then={
       <div
         class={constant('bp6-callout bp6-intent-warning notice-bar')}

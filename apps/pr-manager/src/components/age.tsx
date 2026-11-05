@@ -1,4 +1,4 @@
-import { derive, type Bindable, type JSX } from 'synstate-dom';
+import { deriveBindable, type Bindable, type JSX } from 'synstate-dom';
 import { describeAge } from '../format.mjs';
 import { reader } from '../store/index.mjs';
 
@@ -15,5 +15,5 @@ type Props = Readonly<{
  * to what changed.
  */
 export const Age = ({ epochMs }: Props): JSX.Element => (
-  <>{derive([epochMs, reader.nowMs], describeAge)}</>
+  <>{deriveBindable([epochMs, reader.nowMs], describeAge)}</>
 );

@@ -7,16 +7,16 @@ import {
   TagInput,
 } from 'blueprint-synstate';
 import html2canvas from 'html2canvas';
-import { scan, type InitializedObservable } from 'synstate';
+import { map, scan, type InitializedObservable } from 'synstate';
 import {
   For,
   If,
   constant,
   createAfterUpdate,
-  derive,
+  deriveBindable,
+  inlineMap,
   mapBindable,
   subscribeInScope,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -72,7 +72,7 @@ export const AnswerPage = (): JSX.Element => {
     AnswerFilterAndSortStore.restoreFromQueryParams();
   });
 
-  const status$ = derive(
+  const status$ = deriveBindable(
     [errorType$, Router.eventId$, eventSchedule$, answersFiltered$],
     (errorType, eventId, eventSchedule, answers): Status =>
       errorType?.type.type === 'not-found'
@@ -180,15 +180,15 @@ const AnswerPageOk = ({
   eventSchedule$: InitializedObservable<EventSchedule>;
   answers$: InitializedObservable<readonly Answer[]>;
 }>): JSX.Element => {
-  const afterDeadline$ = view(eventScheduleDefined$, eventIsAfterDeadline);
+  const afterDeadline$ = eventScheduleDefined$.pipe(map(eventIsAfterDeadline));
 
   const sectionState$ = AnswerPageStore.answerBeingEditedSectionState$;
 
-  const loggedIn$ = view(Auth.fireAuthUser$, (u) => u?.uid !== undefined);
+  const loggedIn$ = Auth.fireAuthUser$.pipe(map((u) => u?.uid !== undefined));
 
   // 「後で回答」ボタンを表示するかどうか。
   // ログイン済み & 回答済みの場合のみ非表示、それ以外の場合は表示。
-  const showAnswerLaterButton$ = derive(
+  const showAnswerLaterButton$ = deriveBindable(
     [afterDeadline$, Auth.fireAuthUser$, answers$],
     (afterDeadline, fireAuthUser, answers) =>
       !afterDeadline &&
@@ -243,7 +243,7 @@ const AnswerPageOk = ({
     }
   };
 
-  const answerIcons$ = view(eventScheduleDefined$, (e) => e.answerIcons);
+  const answerIcons$ = eventScheduleDefined$.pipe(map((e) => e.answerIcons));
 
   return (
     <>
@@ -356,7 +356,7 @@ const AnswerPageOk = ({
               </div>
 
               <button
-                aria-expanded={view(
+                aria-expanded={inlineMap(
                   AnswerTableStore.detailedFilterIsOpen$,
                   (open) => (open ? 'true' : 'false'),
                 )}
@@ -371,9 +371,8 @@ const AnswerPageOk = ({
                   <Icon
                     class={styles.toggleDetailedFilterSettingsIcon}
                     icon={'plus'}
-                    style={view(
-                      AnswerTableStore.detailedFilterIsOpen$,
-                      (open) => (open ? 'transform: rotate(135deg);' : ''),
+                    style={AnswerTableStore.detailedFilterIsOpen$.pipe(
+                      map((open) => (open ? 'transform: rotate(135deg);' : '')),
                     )}
                   />
                 </div>
@@ -426,11 +425,10 @@ const AnswerPageOk = ({
             >
               <AnswerTable
                 answers={answers$}
-                datetimeSpecification={view(
-                  eventScheduleDefined$,
-                  (e) => e.datetimeSpecification,
+                datetimeSpecification={eventScheduleDefined$.pipe(
+                  map((e) => e.datetimeSpecification),
                 )}
-                editAnswerButtonIsDisabled={derive(
+                editAnswerButtonIsDisabled={deriveBindable(
                   [sectionState$, afterDeadline$],
                   (state, afterDeadline) => state !== 'hidden' || afterDeadline,
                 )}
@@ -495,7 +493,7 @@ const AnswerPageOk = ({
           </div>
         </div>
         <If
-          cond={derive(
+          cond={deriveBindable(
             [sectionState$, afterDeadline$],
             (state, afterDeadline) => state === 'hidden' && !afterDeadline,
           )}
@@ -520,7 +518,7 @@ const AnswerPageOk = ({
         data-e2e={constant('answer-being-edited-section')}
       >
         <For
-          items={derive(
+          items={deriveBindable(
             [sectionState$, afterDeadline$],
             (state, afterDeadline) =>
               state === 'hidden' || afterDeadline ? [] : [state],

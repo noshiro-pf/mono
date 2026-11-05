@@ -1,12 +1,12 @@
 import { isObservable, onScopeDispose } from 'synstate';
 import { hasKey, isBoolean, isRecord, unknownToString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import type { Bindable } from '../constant/index.mjs';
+import type { ElementBindable } from '../constant/index.mjs';
 import {
   attributeNameOf,
   bindValue,
+  inlineMapTag,
   propertyNames,
-  viewTag,
 } from '../internal/index.mjs';
 import { listenInScope } from '../scope/index.mjs';
 
@@ -69,19 +69,19 @@ const writeAriaAttribute = (
 };
 
 /**
- * Every value is a `Bindable` at run time: what is neither an observable nor a
- * view is a constant. An omitted prop is `undefined`, which is not.
+ * Every value is an `ElementBindable` at run time: what is neither an observable nor an
+ * inline map is a constant. An omitted prop is `undefined`, which is not.
  */
-const isBindable = (value: unknown): value is Bindable<unknown> =>
+const isBindable = (value: unknown): value is ElementBindable<unknown> =>
   value !== undefined && value !== null;
 
-/** `class` and `style` in their object form: neither an observable nor a view. */
+/** `class` and `style` in their object form: neither an observable nor an inline map. */
 const isPlainObject = (
   value: unknown,
 ): value is ReadonlyRecord<string, unknown> =>
-  isRecord(value) && !isObservable(value) && !hasKey(value, viewTag);
+  isRecord(value) && !isObservable(value) && !hasKey(value, inlineMapTag);
 
-const bindClass = (element: Element, value: Bindable<unknown>): void => {
+const bindClass = (element: Element, value: ElementBindable<unknown>): void => {
   if (!isPlainObject(value)) {
     bindValue(value, (v) => {
       writeAttribute(element, 'class', v);
@@ -107,7 +107,7 @@ const bindClass = (element: Element, value: Bindable<unknown>): void => {
   }
 };
 
-const bindStyle = (element: Element, value: Bindable<unknown>): void => {
+const bindStyle = (element: Element, value: ElementBindable<unknown>): void => {
   if (!(element instanceof HTMLElement || element instanceof SVGElement)) {
     return;
   }
@@ -212,7 +212,7 @@ const controlledOf = (element: HTMLInputElement): Controlled => {
 const bindControlled = (
   element: HTMLInputElement,
   key: ControlledKey,
-  value: Bindable<unknown>,
+  value: ElementBindable<unknown>,
 ): void => {
   const mut_bound: { current: unknown } = { current: undefined };
 

@@ -1,6 +1,6 @@
 import { HtmlSelect } from 'blueprint-synstate';
-import type { InitializedObservable } from 'synstate';
-import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
 import { dependencyTypes } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
@@ -42,11 +42,11 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
 
   const errorId = `dependency-row-error-${key}` as const;
 
-  const isError = view(row, ({ check }) => check?.status === 'error');
+  const isError = row.pipe(map(({ check }) => check?.status === 'error'));
 
   return (
     <li
-      class={view(
+      class={inlineMap(
         row,
         ({ check }) =>
           `bp6-card bp6-compact dependency-row${check?.status === 'error' ? ' invalid' : ''}`,
@@ -57,15 +57,17 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
         <label class={constant('bp6-label dependency-source')}>
           {constant(m.dependencies.source)}
           <HtmlSelect
-            aria-describedby={view(row, ({ check }) =>
-              check?.status === 'error' ? errorId : undefined,
+            aria-describedby={row.pipe(
+              map(({ check }) =>
+                check?.status === 'error' ? errorId : undefined,
+              ),
             )}
-            aria-invalid={view(row, ({ check }) =>
-              (check?.status === 'error').toString(),
+            aria-invalid={row.pipe(
+              map(({ check }) => (check?.status === 'error').toString()),
             )}
             data-e2e={constant('dependency-source')}
             fill
-            value={view(row, (r) => r.row.source)}
+            value={row.pipe(map((r) => r.row.source))}
             onChange={(changed) => {
               editorStore.updateDependencyRow(key, {
                 source: parseSourceValue(changed.currentTarget.value),
@@ -76,36 +78,37 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
               {constant(m.dependencies.choose)}
             </option>
             <If
-              cond={view(
-                row,
-                (r) =>
-                  r.row.source !== '' &&
-                  r.options.every(({ value }) => value !== r.row.source),
+              cond={row.pipe(
+                map(
+                  (r) =>
+                    r.row.source !== '' &&
+                    r.options.every(({ value }) => value !== r.row.source),
+                ),
               )}
               then={
-                <option value={view(row, (r) => r.row.source)}>
+                <option value={inlineMap(row, (r) => r.row.source)}>
                   {constant(m.dependencies.missingSource)}
                 </option>
               }
             />
-            <For items={view(row, (r) => r.options)} key={(o) => o.value}>
+            <For items={row.pipe(map((r) => r.options))} key={(o) => o.value}>
               {(option$) => (
-                <option value={view(option$, ({ value }) => value)}>
-                  {view(option$, ({ label }) => label)}
+                <option value={inlineMap(option$, ({ value }) => value)}>
+                  {inlineMap(option$, ({ label }) => label)}
                 </option>
               )}
             </For>
           </HtmlSelect>
         </label>
         <If
-          cond={view(row, (r) => r.row.source.startsWith('task:'))}
+          cond={row.pipe(map((r) => r.row.source.startsWith('task:')))}
           then={
             <label class={constant('bp6-label dependency-type')}>
               {constant(m.dependencies.type)}
               <HtmlSelect
                 data-e2e={constant('dependency-type')}
                 fill
-                value={view(row, (r) => r.row.type)}
+                value={row.pipe(map((r) => r.row.type))}
                 onChange={(changed) => {
                   const type = dependencyTypes.find(
                     (t) => t === changed.currentTarget.value,
@@ -135,7 +138,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
                 {constant(m.dependencies.type)}
               </span>
               <span class={constant('dependency-type-fixed bp6-text-muted')}>
-                {view(row, (r) =>
+                {inlineMap(row, (r) =>
                   r.row.source.startsWith('milestone:')
                     ? m.dependencies.afterReached
                     : m.dependencies.noType,
@@ -153,7 +156,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
             min={constant('0')}
             step={constant('1')}
             type={constant('number')}
-            value={view(row, (r) => r.row.lagDays)}
+            value={inlineMap(row, (r) => r.row.lagDays)}
             onInput={(changed) => {
               editorStore.updateDependencyRow(key, {
                 lagDays: changed.currentTarget.value,
@@ -170,7 +173,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
             min={constant('0')}
             step={constant('1')}
             type={constant('number')}
-            value={view(row, (r) => r.row.lagHours)}
+            value={inlineMap(row, (r) => r.row.lagHours)}
             onInput={(changed) => {
               editorStore.updateDependencyRow(key, {
                 lagHours: changed.currentTarget.value,
@@ -179,7 +182,9 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
           />
         </label>
         <button
-          aria-label={view(row, ({ name }) => m.dependencies.removeRow(name))}
+          aria-label={inlineMap(row, ({ name }) =>
+            m.dependencies.removeRow(name),
+          )}
           class={constant('bp6-button bp6-minimal dependency-remove')}
           data-e2e={constant('dependency-remove')}
           type={constant('button')}
@@ -201,24 +206,24 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
             id={constant(errorId)}
             role={constant('alert')}
           >
-            {view(row, ({ check }) =>
+            {inlineMap(row, ({ check }) =>
               check?.status === 'error' ? check.message : '',
             )}
           </p>
         }
         else={
           <If
-            cond={view(row, ({ met }) => met !== undefined)}
+            cond={row.pipe(map(({ met }) => met !== undefined))}
             then={
               <p class={constant('dependency-row-message')}>
                 <span
-                  class={view(
+                  class={inlineMap(
                     row,
                     ({ met }) =>
                       `bp6-tag bp6-minimal ${met === true ? 'bp6-intent-success' : 'bp6-intent-warning'}`,
                   )}
                 >
-                  {view(row, ({ met }) =>
+                  {inlineMap(row, ({ met }) =>
                     met === true ? m.dependencies.met : m.dependencies.unmet,
                   )}
                 </span>

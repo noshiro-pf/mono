@@ -1,13 +1,12 @@
-import type { InitializedObservable } from 'synstate';
+import { map, type InitializedObservable } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
+  inlineMap,
   MatchOptional,
-  view,
   type Bindable,
   type JSX,
-  type View,
 } from 'synstate-dom';
 import { Arr, Num, Optional } from 'ts-data-forge';
 import {
@@ -49,7 +48,7 @@ export const WeeklyActivity = (): JSX.Element => {
     <>
       <button
         class={constant('header-button')}
-        disabled={view(tokenStore.token, (token) => token === undefined)}
+        disabled={inlineMap(tokenStore.token, (token) => token === undefined)}
         title={constant(
           `Pull requests merged and issues closed today and on each of the last ${WEEK_LENGTH} days`,
         )}
@@ -70,10 +69,12 @@ export const WeeklyActivity = (): JSX.Element => {
         </h2>
 
         <MatchOptional
-          value={view(status$, (status) =>
-            status.type === 'ready'
-              ? Optional.some(status.activity)
-              : Optional.none,
+          value={status$.pipe(
+            map((status) =>
+              status.type === 'ready'
+                ? Optional.some(status.activity)
+                : Optional.none,
+            ),
           )}
           some={(activity$) => <ActivitySections activity$={activity$} />}
           none={
@@ -139,11 +140,11 @@ const CountCell = ({ day, kind, scaleMax }: CellProps): JSX.Element => (
     <div class={constant('weekly-activity-cell')}>
       <span class={constant('weekly-activity-count')}>
         <ExternalLink
-          href={derive([day], (counted) =>
+          href={deriveBindable([day], (counted) =>
             activitySearchUrl(reportSource, kind, counted),
           )}
         >
-          {derive([day], (counted) => counted[kind].toString())}
+          {deriveBindable([day], (counted) => counted[kind].toString())}
         </ExternalLink>
       </span>
       <span
@@ -154,7 +155,7 @@ const CountCell = ({ day, kind, scaleMax }: CellProps): JSX.Element => (
           class={constant('weekly-activity-bar')}
           data-kind={constant(kind)}
           style={{
-            width: derive([day, scaleMax], (counted, max) =>
+            width: deriveBindable([day, scaleMax], (counted, max) =>
               Num.isNonZero(max)
                 ? `${Num.div(counted[kind] * 100, max)}%`
                 : '0%',
@@ -176,8 +177,8 @@ const DayRow = ({
 }>): JSX.Element => (
   <tr>
     <th scope={constant('row')}>
-      <time dateTime={derive([day], ({ key }) => key)}>
-        {derive([day], ({ startMs }) => DAY_LABEL.format(startMs))}
+      <time dateTime={deriveBindable([day], ({ key }) => key)}>
+        {deriveBindable([day], ({ startMs }) => DAY_LABEL.format(startMs))}
       </time>
     </th>
     <CountCell day={day} kind={'merged'} scaleMax={scaleMax} />
@@ -195,7 +196,10 @@ const WeekTable = ({
   <table class={constant('weekly-activity-table')}>
     <ColumnHeads />
     <tbody>
-      <For items={view(activity$, ({ days }) => days)} key={(day) => day.key}>
+      <For
+        items={activity$.pipe(map(({ days }) => days))}
+        key={(day) => day.key}
+      >
         {(day$) => <DayRow day={day$} scaleMax={scaleMax} />}
       </For>
     </tbody>
@@ -204,14 +208,14 @@ const WeekTable = ({
         <th scope={constant('row')}>{constant('Total')}</th>
         <td class={constant('weekly-activity-total')}>
           <span class={constant('weekly-activity-count')}>
-            {view(activity$, ({ days: all }) =>
+            {inlineMap(activity$, ({ days: all }) =>
               all.reduce((sum, day) => sum + day.merged, 0),
             )}
           </span>
         </td>
         <td class={constant('weekly-activity-total')}>
           <span class={constant('weekly-activity-count')}>
-            {view(activity$, ({ days: all }) =>
+            {inlineMap(activity$, ({ days: all }) =>
               all.reduce((sum, day) => sum + day.closed, 0),
             )}
           </span>
@@ -224,12 +228,17 @@ const WeekTable = ({
 const ActivitySections = ({
   activity$,
 }: Readonly<{ activity$: InitializedObservable<Week> }>): JSX.Element => {
-  const today = view(activity$, (activity) => activity.today);
+  const today = activity$.pipe(map((activity) => activity.today));
 
-  const scaleMax = view(activity$, ({ days: all, today: current }) =>
-    Math.max(
-      0,
-      ...Arr.toPushed(all, current).flatMap((day) => [day.merged, day.closed]),
+  const scaleMax = activity$.pipe(
+    map(({ days: all, today: current }) =>
+      Math.max(
+        0,
+        ...Arr.toPushed(all, current).flatMap((day) => [
+          day.merged,
+          day.closed,
+        ]),
+      ),
     ),
   );
 
@@ -246,7 +255,7 @@ const ActivitySections = ({
         <h3 class={constant('weekly-activity-heading')} id={constant(TODAY_ID)}>
           {constant('Today ')}
           <span class={constant('weekly-activity-as-of')}>
-            {view(
+            {inlineMap(
               activity$,
               (activity) =>
                 `so far, as of ${TIME_LABEL.format(activity.countedAtMs)}`,
@@ -272,9 +281,11 @@ type CellProps = Readonly<{
 
 const failedOf = (
   status$: InitializedObservable<ActivityStatus>,
-): View<Optional<string>> =>
-  view(status$, (status) =>
-    status.type === 'failed' ? Optional.some(status.message) : Optional.none,
+): InitializedObservable<Optional<string>> =>
+  status$.pipe(
+    map((status) =>
+      status.type === 'failed' ? Optional.some(status.message) : Optional.none,
+    ),
   );
 
 /** The reader's locale, as the time of reading is (`format.mts`). */

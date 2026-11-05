@@ -2,8 +2,8 @@ import type { InitializedObservable } from 'synstate';
 import {
   constant,
   If,
+  inlineMap,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -35,7 +35,7 @@ export const DatetimeRangeCell = ({
   holidaysJpDefinition,
 }: Props): JSX.Element => {
   const colored = {
-    color: view(holidaysJpDefinition, (holidays) => {
+    color: inlineMap(holidaysJpDefinition, (holidays) => {
       const dayValue = ymd2day(ymd);
 
       return dayValue === 0 || holidays.has(ymd)

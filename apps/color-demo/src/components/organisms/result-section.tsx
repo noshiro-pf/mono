@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import { hslToStr } from 'ts-utils-additional';
 import type { ColorResult } from '../../types/index.mjs';
 import { ContrastRatioList } from '../molecules/index.mjs';
@@ -57,7 +57,7 @@ export const ResultSection = ({
     />
     <div class={constant(styles.variance)} data-e2e={constant('variance')}>
       {constant('コントラスト比の分散：')}
-      {view(colorResult, (result) =>
+      {inlineMap(colorResult, (result) =>
         result.adjacentContrastRatioVariance.toString(),
       )}
     </div>

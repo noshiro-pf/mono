@@ -1,5 +1,6 @@
 import { Icon } from 'blueprint-synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { dagFilterStore, narrowStore, uiStore } from '../store/index.mjs';
 import {
@@ -19,7 +20,7 @@ import {
  */
 export const DagSettingsButton = (): JSX.Element => (
   <button
-    aria-expanded={view(uiStore.settingsPanel, (placement) =>
+    aria-expanded={inlineMap(uiStore.settingsPanel, (placement) =>
       (placement !== undefined).toString(),
     )}
     aria-haspopup={constant('dialog')}
@@ -36,7 +37,9 @@ export const DagSettingsButton = (): JSX.Element => (
       {constant(m.settings.title)}
     </span>
     <If
-      cond={view(dagFilterStore.filter, (filter) => !isDagFilterEmpty(filter))}
+      cond={dagFilterStore.filter.pipe(
+        map((filter) => !isDagFilterEmpty(filter)),
+      )}
       then={
         <span
           class={constant('dag-settings-filtered')}

@@ -274,14 +274,14 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       ],
     },
     {
-      name: 'synstate-dom’s derive, mapBindable and toObservable',
+      name: 'synstate-dom’s deriveBindable, mapBindable and toObservable',
       filename: tsx,
       code: dedent`
-        import { derive, mapBindable, toObservable } from 'synstate-dom';
+        import { deriveBindable, mapBindable, toObservable } from 'synstate-dom';
         const Row = () => (
           <button
             onClick={() => {
-              keep(derive([a$], (a) => a));
+              keep(deriveBindable([a$], (a) => a));
               keep(mapBindable(a$, (a) => a));
               keep(toObservable(label));
             }}

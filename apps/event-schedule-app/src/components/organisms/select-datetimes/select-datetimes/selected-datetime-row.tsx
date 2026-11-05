@@ -1,6 +1,6 @@
 import { Button } from 'blueprint-synstate';
-import type { InitializedObservable } from 'synstate';
-import { constant, view, type Bindable, type JSX } from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { TimeRangeView, YmdInput } from '../../../molecules/index.mjs';
 import * as styles from '../select-datetimes.module.css';
 
@@ -30,14 +30,14 @@ export const SelectedDatetimeRow = ({
     <div class={constant(styles.rowInputs)}>
       <div class={constant(styles.rowDate)}>
         <YmdInput
-          ymd={view(datetimeRange, (r) => r.ymd)}
+          ymd={datetimeRange.pipe(map((r) => r.ymd))}
           onYmdChange={onYmdChange}
         />
       </div>
       <div class={constant(styles.rowTime)}>
         <TimeRangeView
           datetimeSpecification={datetimeSpecification}
-          timeRange={view(datetimeRange, (r) => r.timeRange)}
+          timeRange={datetimeRange.pipe(map((r) => r.timeRange))}
           onRangeEndChange={onRangeEndChange}
           onRangeStartChange={onRangeStartChange}
         />

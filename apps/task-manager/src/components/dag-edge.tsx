@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import type { DagEdgeRecord } from './dag-canvas-scene.mjs';
 import { DagEdgeLabel } from './dag-edge-label.js';
 
@@ -23,18 +23,18 @@ type Props = Readonly<{
  * so there is nothing to delete.
  */
 export const DagEdge = ({ record }: Props): JSX.Element => {
-  const path = view(record, ({ edge }) => edge.path);
+  const path = record.pipe(map(({ edge }) => edge.path));
 
   return (
     <g
       class={constant('dag-edge')}
       data-e2e={constant('dag-edge')}
-      data-edge-id={view(record, ({ edge }) => edge.id)}
-      data-from={view(record, ({ edge }) => edge.from)}
-      data-implied={view(record, ({ edge }) => edge.implied.toString())}
-      data-routed={view(record, ({ edge }) => edge.routed.toString())}
-      data-selected={view(record, ({ selected }) => selected.toString())}
-      data-to={view(record, ({ edge }) => edge.to)}
+      data-edge-id={inlineMap(record, ({ edge }) => edge.id)}
+      data-from={inlineMap(record, ({ edge }) => edge.from)}
+      data-implied={inlineMap(record, ({ edge }) => edge.implied.toString())}
+      data-routed={inlineMap(record, ({ edge }) => edge.routed.toString())}
+      data-selected={inlineMap(record, ({ selected }) => selected.toString())}
+      data-to={inlineMap(record, ({ edge }) => edge.to)}
     >
       <path
         class={constant('dag-edge-line')}
@@ -42,7 +42,7 @@ export const DagEdge = ({ record }: Props): JSX.Element => {
         marker-end={constant('url(#dag-arrow)')}
       />
       <If
-        cond={view(record, ({ edge }) => !edge.implied)}
+        cond={record.pipe(map(({ edge }) => !edge.implied))}
         then={
           <path
             class={constant('dag-edge-hit')}

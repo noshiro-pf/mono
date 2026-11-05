@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
 import { formatWhen, type MilestoneRow } from '../view-model/index.mjs';
@@ -23,25 +23,25 @@ export const MilestoneItem = ({ row }: Props): JSX.Element => (
       }}
     >
       <span
-        class={view(
+        class={inlineMap(
           row,
           ({ reachedAt }) =>
             `bp6-tag bp6-round milestone-badge ${reachedAt === undefined ? 'pending' : 'reached'}`,
         )}
       >
-        {view(row, ({ reachedAt }) =>
+        {inlineMap(row, ({ reachedAt }) =>
           reachedAt === undefined ? m.list.unreached : m.list.reached,
         )}
       </span>
       <span class={constant('milestone-title')}>
-        {view(row, ({ milestone }) => milestone.title)}
+        {inlineMap(row, ({ milestone }) => milestone.title)}
       </span>
       <span class={constant('milestone-meta')}>
         <If
-          cond={view(row, ({ milestone }) => milestone.date !== undefined)}
+          cond={row.pipe(map(({ milestone }) => milestone.date !== undefined))}
           then={
             <span>
-              {view(row, ({ milestone }) =>
+              {inlineMap(row, ({ milestone }) =>
                 milestone.date === undefined
                   ? ''
                   : formatWhen(milestone.date, milestone.dateAllDay),
@@ -50,16 +50,16 @@ export const MilestoneItem = ({ row }: Props): JSX.Element => (
           }
         />
         <If
-          cond={view(row, ({ milestone }) => milestone.requiresManualCheck)}
+          cond={row.pipe(map(({ milestone }) => milestone.requiresManualCheck))}
           then={
             <span
-              class={view(
+              class={inlineMap(
                 row,
                 ({ awaitingCheck }) =>
                   `bp6-tag bp6-minimal ${awaitingCheck ? 'bp6-intent-warning' : 'bp6-intent-success'}`,
               )}
             >
-              {view(row, ({ awaitingCheck }) =>
+              {inlineMap(row, ({ awaitingCheck }) =>
                 awaitingCheck ? m.list.awaitingCheck : m.list.checked,
               )}
             </span>

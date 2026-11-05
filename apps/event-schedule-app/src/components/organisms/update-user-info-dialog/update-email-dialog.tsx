@@ -1,11 +1,6 @@
 import { Button, FormGroup, InputGroup } from 'blueprint-synstate';
-import {
-  constant,
-  mapBindable,
-  view,
-  type Bindable,
-  type JSX,
-} from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { UpdateEmailPageStore } from '../../../store/index.mjs';
 import { LockButton } from '../../molecules/index.mjs';
@@ -25,13 +20,15 @@ export const UpdateEmailDialog = ({
   dialogIsOpen,
   currentEmail,
 }: Props): JSX.Element => {
-  const isWaitingResponse = view(state, (s) => s.formState.isWaitingResponse);
+  const isWaitingResponse = state.pipe(
+    map((s) => s.formState.isWaitingResponse),
+  );
 
-  const emailIntent = view(state, (s) => s.emailFormIntent);
+  const emailIntent = state.pipe(map((s) => s.emailFormIntent));
 
-  const passwordIntent = view(state, (s) => s.passwordFormIntent);
+  const passwordIntent = state.pipe(map((s) => s.passwordFormIntent));
 
-  const passwordIsOpen = view(state, (s) => s.passwordIsOpen);
+  const passwordIsOpen = state.pipe(map((s) => s.passwordIsOpen));
 
   return (
     <UpdateUserInfoDialogTemplate
@@ -46,7 +43,7 @@ export const UpdateEmailDialog = ({
           </FormGroup>
           <FormGroup
             class={styles.field}
-            helperText={view(state, (s) => s.formState.email.error)}
+            helperText={state.pipe(map((s) => s.formState.email.error))}
             intent={emailIntent}
             label={constant(dc.updateEmail.newEmail)}
           >
@@ -57,7 +54,7 @@ export const UpdateEmailDialog = ({
               disabled={isWaitingResponse}
               intent={emailIntent}
               type={'email'}
-              value={view(state, (s) => s.formState.email.inputValue)}
+              value={state.pipe(map((s) => s.formState.email.inputValue))}
               onInput={({ currentTarget }) => {
                 UpdateEmailPageStore.inputEmailHandler(currentTarget.value);
               }}
@@ -65,7 +62,7 @@ export const UpdateEmailDialog = ({
           </FormGroup>
           <FormGroup
             class={styles.field}
-            helperText={view(state, (s) => s.formState.password.error)}
+            helperText={state.pipe(map((s) => s.formState.password.error))}
             intent={passwordIntent}
             label={constant(dc.reauthenticate.password)}
           >
@@ -84,7 +81,7 @@ export const UpdateEmailDialog = ({
               type={mapBindable(passwordIsOpen, (open) =>
                 open ? 'text' : 'password',
               )}
-              value={view(state, (s) => s.formState.password.inputValue)}
+              value={state.pipe(map((s) => s.formState.password.inputValue))}
               onInput={({ currentTarget }) => {
                 UpdateEmailPageStore.inputPasswordHandler(currentTarget.value);
               }}
@@ -96,7 +93,7 @@ export const UpdateEmailDialog = ({
       isWaitingResponse={isWaitingResponse}
       submitButton={
         <Button
-          disabled={view(state, (s) => s.enterButtonDisabled)}
+          disabled={state.pipe(map((s) => s.enterButtonDisabled))}
           intent={'primary'}
           loading={isWaitingResponse}
           text={constant(dc.button.update)}

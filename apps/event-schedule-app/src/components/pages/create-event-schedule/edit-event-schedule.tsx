@@ -1,5 +1,11 @@
 import { Spinner } from 'blueprint-synstate';
-import { For, constant, derive, mapBindable, type JSX } from 'synstate-dom';
+import {
+  For,
+  constant,
+  deriveBindable,
+  mapBindable,
+  type JSX,
+} from 'synstate-dom';
 import { Result } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import { EventScheduleStore, Router } from '../../../store/index.mjs';
@@ -11,7 +17,7 @@ import { FetchEventScheduleError } from './error.js';
 const dc = dict.eventSettingsPage;
 
 export const EditEventSchedule = (): JSX.Element => {
-  const status$ = derive(
+  const status$ = deriveBindable(
     [Router.eventId$, EventScheduleStore.result$],
     (eventId, result): Status =>
       result !== undefined && Result.isErr(result)

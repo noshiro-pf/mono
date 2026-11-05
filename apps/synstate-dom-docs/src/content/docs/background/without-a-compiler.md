@@ -21,7 +21,7 @@ The Solid column is based on the README of [babel-plugin-jsx-dom-expressions](ht
 ## What it costs
 
 - **No template cloning.** Every element gets its own `createElement` call, so creating many rows takes longer than in Solid. The [benchmark](/mono/synstate-dom/background/benchmark/) shows by how much.
-- **More to write.** You cannot write an expression such as `count() * 2` in place; you write `view(count$, (n) => n * 2)` or `count$.pipe(map(...))` instead. Several inputs take `derive`, an element shown depending on an updating value takes `If`, and a fixed string becomes `constant('...')`. Writing that means learning these helpers and, beyond them, synstate's operators. In return, the types show you what is reactive, and props need no special handling ([Props are plain JavaScript](/mono/synstate-dom/guides/components/#props-are-plain-javascript)).
+- **More to write.** You cannot write an expression such as `count() * 2` in place; you write `count$.pipe(map((n) => n * 2))` instead. Several inputs take `deriveBindable`, an element shown depending on an updating value takes `If`, and a fixed string becomes `constant('...')`. Writing that means learning these helpers and, beyond them, synstate's operators. In return, the types show you what is reactive, and props need no special handling ([Props are plain JavaScript](/mono/synstate-dom/guides/components/#props-are-plain-javascript)).
 
 ## Prior art
 

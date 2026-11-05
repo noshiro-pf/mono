@@ -1,5 +1,5 @@
 import { createState, map } from 'synstate';
-import { constant, For, If, render, view, type JSX } from 'synstate-dom';
+import { constant, For, If, inlineMap, render, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -53,22 +53,22 @@ const TodoApp = (): JSX.Element => {
         {constant('Add')}
       </button>
       <If
-        cond={view(todos$, Arr.isNonEmpty)}
+        cond={todos$.pipe(map(Arr.isNonEmpty))}
         then={
           <ul>
             <For items={todos$} key={(todo) => todo.id}>
               {(todo$, index$) => (
-                <li class={{ done: view(todo$, (todo) => todo.done) }}>
+                <li class={{ done: inlineMap(todo$, (todo) => todo.done) }}>
                   <label>
                     <input
                       type={constant('checkbox')}
-                      checked={view(todo$, (todo) => todo.done)}
+                      checked={inlineMap(todo$, (todo) => todo.done)}
                       onChange={() => {
                         toggle(todo$.getSnapshot().value.id);
                       }}
                     />
-                    {view(index$, (i) => `${i + 1}. `)}
-                    {view(todo$, (todo) => todo.title)}
+                    {inlineMap(index$, (i) => `${i + 1}. `)}
+                    {inlineMap(todo$, (todo) => todo.title)}
                   </label>
                 </li>
               )}
@@ -77,7 +77,7 @@ const TodoApp = (): JSX.Element => {
         }
         else={<p>{constant('Nothing to do.')}</p>}
       />
-      <p>{view(remaining$, (n) => `${n} remaining`)}</p>
+      <p>{remaining$.pipe(map((n) => `${n} remaining`))}</p>
     </section>
   );
 };

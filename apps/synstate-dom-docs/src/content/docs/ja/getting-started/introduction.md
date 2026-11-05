@@ -14,11 +14,11 @@ synstate-dom はまだ 0.x なので、マイナーリリースでも API が変
 - **コンポーネントは 1 回しか呼ばれません。** マウント時に実行されて DOM の記述を返したら、それきり二度と呼ばれません。その後に変わるのは、渡された Observable に束縛した DOM だけです。
 - **更新は葉に直接届きます。** 状態が変わると、synstate がその変化をグラフ全体に 1 回の同期的でグリッチのない伝播で伝え、束縛された属性・プロパティ・テキストノードにそれぞれ直接書き込みます。差分を取ることはありません。
 - **依存は値として渡します。** コンポーネントが依存するのは、渡された Observable そのものです。そのため、実行中に依存を追跡する必要もなければ、Solid のように JSX の式を遅延させるためにコンパイルする必要もありません。詳しくは[コンパイラなしで成り立つ理由](/mono/synstate-dom/ja/background/without-a-compiler/)を見てください。
-- **何がリアクティブかは型を見ればわかります。** データを受け取るスロットは `Bindable<T>`、つまり初期値ありの Observable・`constant(...)`・`view(...)` のどれかを受け付けます。素の値を渡すと型エラーになるので、うっかりスナップショットを渡してしまうことがありません。詳しくは [Bindable](/mono/synstate-dom/ja/guides/bindable/) を見てください。
+- **何がリアクティブかは型を見ればわかります。** データを受け取るスロットは `Bindable<T>`、つまり初期値ありの Observable か `constant(...)`を受け付けます。素の値を渡すと型エラーになるので、うっかりスナップショットを渡してしまうことがありません。詳しくは [Bindable](/mono/synstate-dom/ja/guides/bindable/) を見てください。
 
     Solid では、シグナルを読んだ式を渡しても固定値を渡しても props の型は同じ素の `T` です。なので、リアクティブに更新させたい値とそうでない値を型で区別できず、間違った方を型で弾くこともできません。コンポーネント本体で props を一度だけ読んだり分割代入したりすると更新は黙って止まってしまい、それに気づかせてくれるのは lint（eslint-plugin-solid の `solid/reactivity` と `solid/no-destructure`）だけです。synstate-dom では、更新されるかどうかは `Bindable` 型かどうかそのものなので、シグネチャを見ればわかりますし、`tsc` がチェックしてくれます。
 
-    また props は値を読み出したものではなく `Bindable` そのものなので、props だからといって特別な扱いは要りません。分割代入しても、デフォルト値を付けても、残りをまとめて渡しても、コンポーネント本体で計算しても構いません。その代わり、更新し続けたい派生値は JSX の中の式ではなく、Bindable として（`mapBindable` や `derive` で）組み立てる必要があります。詳しくは [props は普通の JavaScript の値](/mono/synstate-dom/ja/guides/components/#props-は普通の-javascript-の値)を見てください。
+    また props は値を読み出したものではなく `Bindable` そのものなので、props だからといって特別な扱いは要りません。分割代入しても、デフォルト値を付けても、残りをまとめて渡しても、コンポーネント本体で計算しても構いません。その代わり、更新し続けたい派生値は JSX の中の式ではなく、Bindable として（`mapBindable` や `deriveBindable` で）組み立てる必要があります。詳しくは [props は普通の JavaScript の値](/mono/synstate-dom/ja/guides/components/#props-は普通の-javascript-の値)を見てください。
 
 - **後始末はスコープがしてくれます。** `If` / `Match` の各分岐と `For` の各行は、それぞれスコープの中でマウントされます。マウント中に作った派生と購読はそのスコープに属し、スコープと一緒に破棄されます。詳しくは[ライフサイクルとスコープ](/mono/synstate-dom/ja/guides/lifecycle/)を見てください。
 

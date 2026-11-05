@@ -1,4 +1,4 @@
-import { constant, view, type JSX, type View } from 'synstate-dom';
+import { constant, inlineMap, type InlineMap, type JSX } from 'synstate-dom';
 import type { IssuesView } from '../issues-view-settings.mjs';
 import { issuesViewStore } from '../store/index.mjs';
 
@@ -36,8 +36,8 @@ export const IssuesViewSwitch = (): JSX.Element => (
   </fieldset>
 );
 
-const pressedFor = (shown: IssuesView): View<string> =>
-  view(issuesViewStore.view, (current) => (current === shown).toString());
+const pressedFor = (shown: IssuesView): InlineMap<string> =>
+  inlineMap(issuesViewStore.view, (current) => (current === shown).toString());
 
 const choose = (shown: IssuesView) => (): void => {
   issuesViewStore.choose(shown);

@@ -1,5 +1,5 @@
 import { combine, map } from 'synstate';
-import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { m } from '../i18n/index.mjs';
 import { clockStore, dataStore } from '../store/index.mjs';
@@ -22,7 +22,7 @@ export const MilestoneSection = (): JSX.Element => {
         </h2>
       </div>
       <If
-        cond={view(rows$, Arr.isEmpty)}
+        cond={rows$.pipe(map(Arr.isEmpty))}
         then={
           <p class={constant('bp6-text-muted')}>
             {constant(m.list.noMilestones)}

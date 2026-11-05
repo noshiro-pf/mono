@@ -14,9 +14,9 @@ import {
   constant,
   createAfterUpdate,
   For,
+  inlineMap,
   mapBindable,
   subscribeInScope,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -231,7 +231,7 @@ export const Calendar = ({
           disabled={constant(disabled)}
           name={constant('day')}
           role={constant('gridcell')}
-          tabIndex={view(focusTarget$, (target) =>
+          tabIndex={inlineMap(focusTarget$, (target) =>
             !outside && target === key ? 0 : -1,
           )}
           type={constant('button')}
@@ -274,7 +274,7 @@ export const Calendar = ({
             id={constant(captionId)}
             role={constant('presentation')}
           >
-            {view(display$, (index) => {
+            {inlineMap(display$, (index) => {
               const { year, month } = monthOfIndex(index);
 
               return names.caption(year, month);
@@ -285,7 +285,7 @@ export const Calendar = ({
           <HtmlSelect
             aria-label={constant(labels.month)}
             class={'bp6-datepicker-month-select'}
-            iconStyle={view(caretRight$, (right) => `right: ${right}px;`)}
+            iconStyle={caretRight$.pipe(map((right) => `right: ${right}px;`))}
             minimal
             name={'months'}
             selectRef={(select) => {
@@ -312,8 +312,8 @@ export const Calendar = ({
                 });
               });
             }}
-            value={view(display$, (index) =>
-              (monthOfIndex(index).month - 1).toString(),
+            value={display$.pipe(
+              map((index) => (monthOfIndex(index).month - 1).toString()),
             )}
             onChange={(changed) => {
               const month = parseInteger(changed.currentTarget.value);
@@ -330,8 +330,10 @@ export const Calendar = ({
           >
             <For items={monthOptions$} key={(option) => option.value}>
               {(option$) => (
-                <option value={view(option$, (o) => (o.value - 1).toString())}>
-                  {view(option$, (o) => o.label)}
+                <option
+                  value={inlineMap(option$, (o) => (o.value - 1).toString())}
+                >
+                  {inlineMap(option$, (o) => o.label)}
                 </option>
               )}
             </For>
@@ -343,8 +345,8 @@ export const Calendar = ({
             class={'bp6-datepicker-year-select'}
             minimal
             name={'years'}
-            value={view(display$, (index) =>
-              monthOfIndex(index).year.toString(),
+            value={display$.pipe(
+              map((index) => monthOfIndex(index).year.toString()),
             )}
             onChange={(changed) => {
               const year = parseInteger(changed.currentTarget.value);
@@ -362,10 +364,10 @@ export const Calendar = ({
             <For items={yearOptions$} key={(option) => option.year}>
               {(option$) => (
                 <option
-                  disabled={view(option$, (o) => o.disabled)}
-                  value={view(option$, (o) => o.year.toString())}
+                  disabled={inlineMap(option$, (o) => o.disabled)}
+                  value={inlineMap(option$, (o) => o.year.toString())}
                 >
-                  {view(option$, (o) => o.year.toString())}
+                  {inlineMap(option$, (o) => o.year.toString())}
                 </option>
               )}
             </For>
@@ -378,7 +380,7 @@ export const Calendar = ({
           class={constant(
             'bp6-button bp6-minimal bp6-datepicker-nav-button bp6-datepicker-nav-button-previous',
           )}
-          disabled={view(display$, (index) => index <= minIndex)}
+          disabled={inlineMap(display$, (index) => index <= minIndex)}
           name={constant('previous-month')}
           type={constant('button')}
           onClick={() => {
@@ -392,7 +394,7 @@ export const Calendar = ({
           class={constant(
             'bp6-button bp6-minimal bp6-datepicker-nav-button bp6-datepicker-nav-button-next',
           )}
-          disabled={view(display$, (index) => index >= maxIndex)}
+          disabled={inlineMap(display$, (index) => index >= maxIndex)}
           name={constant('next-month')}
           type={constant('button')}
           onClick={() => {
@@ -426,7 +428,10 @@ export const Calendar = ({
       </thead>
       <tbody class={constant('rdp-tbody')}>
         {/* One row per month, so that a month's days are built once. */}
-        <For items={view(display$, (index) => [index])} key={(index) => index}>
+        <For
+          items={display$.pipe(map((index) => [index]))}
+          key={(index) => index}
+        >
           {(index$) => {
             const shown = index$.getSnapshot().value;
 

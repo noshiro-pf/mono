@@ -7,7 +7,7 @@ import {
 import {
   constant,
   createAfterUpdate,
-  derive,
+  deriveBindable,
   isImeKeyDown,
   mapBindable,
   subscribeInScope,
@@ -395,7 +395,10 @@ export const NumericInput = <N extends number>({
   ): Bindable<boolean> | undefined =>
     bound$ === undefined
       ? undefined
-      : derive([decoded$, bound$], (n, b) => !Number.isNaN(n) && reached(n, b));
+      : deriveBindable(
+          [decoded$, bound$],
+          (n, b) => !Number.isNaN(n) && reached(n, b),
+        );
 
   const incrementDisabled = atBound(max$, (n, b) => n >= b);
 
@@ -542,7 +545,7 @@ export const NumericInput = <N extends number>({
       // A number the text shows is read out clamped to the bounds as they are,
       // so that it stays within the bounds read out with it; text that is none
       // reads out no value.
-      aria-valuenow={derive(
+      aria-valuenow={deriveBindable(
         [
           decoded$,
           min$ ?? constant(Number.NEGATIVE_INFINITY),
@@ -741,4 +744,8 @@ const either = (
   a: Bindable<boolean> | undefined,
   b: Bindable<boolean> | undefined,
 ): Bindable<boolean> | undefined =>
-  a === undefined ? b : b === undefined ? a : derive([a, b], (x, y) => x || y);
+  a === undefined
+    ? b
+    : b === undefined
+      ? a
+      : deriveBindable([a, b], (x, y) => x || y);

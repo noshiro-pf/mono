@@ -1,5 +1,5 @@
 import { derive, map, type InitializedObservable } from 'synstate';
-import { constant, If, MatchOptional, view, type JSX } from 'synstate-dom';
+import { constant, If, inlineMap, MatchOptional, type JSX } from 'synstate-dom';
 import { AsyncData, Optional } from 'ts-std-forge';
 import type { SafeInt } from 'ts-type-forge';
 import { fetchProduct, type ProductDetail } from '../api/index.mjs';
@@ -33,25 +33,30 @@ export const ProductPage = ({ item$ }: Props): JSX.Element => {
   const nextId$ = page$.pipe(map((page) => page.product?.next));
 
   return (
-    <section aria-busy={view(data$, AsyncData.isPending)}>
-      <h1>{view(page$, (page) => page.title)}</h1>
+    <section aria-busy={inlineMap(data$, AsyncData.isPending)}>
+      <h1>{inlineMap(page$, (page) => page.title)}</h1>
       <If
-        cond={view(page$, (page) => page.found)}
+        cond={page$.pipe(map((page) => page.found))}
         then={
           <>
             {/* One line each, filled or not, so nothing below moves. */}
             <p class={constant('line')}>
-              {view(page$, (page) => page.product?.description ?? '')}
+              {inlineMap(page$, (page) => page.product?.description ?? '')}
             </p>
             <p class={constant('line')}>
-              {view(page$, (page) =>
+              {inlineMap(page$, (page) =>
                 page.product === undefined ? '' : `¥${page.product.price}`,
               )}
             </p>
             <p>
               <Link
-                to={view(productId$, (productId) =>
-                  routes.products.item.href({ productId }, { hash: 'reviews' }),
+                to={productId$.pipe(
+                  map((productId) =>
+                    routes.products.item.href(
+                      { productId },
+                      { hash: 'reviews' },
+                    ),
+                  ),
                 )}
               >
                 {constant('Jump to reviews')}
@@ -62,12 +67,14 @@ export const ProductPage = ({ item$ }: Props): JSX.Element => {
             <h2 id={constant('reviews')}>{constant('Reviews')}</h2>
             <p>{constant('No reviews yet.')}</p>
             <MatchOptional
-              value={view(nextId$, (nextId) =>
-                nextId === undefined
-                  ? Optional.none
-                  : Optional.some(
-                      routes.products.item.href({ productId: nextId }),
-                    ),
+              value={nextId$.pipe(
+                map((nextId) =>
+                  nextId === undefined
+                    ? Optional.none
+                    : Optional.some(
+                        routes.products.item.href({ productId: nextId }),
+                      ),
+                ),
               )}
               some={(next$) => (
                 <p>

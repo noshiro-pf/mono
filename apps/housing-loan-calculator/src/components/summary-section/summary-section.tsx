@@ -1,4 +1,10 @@
-import { constant, derive, If, mapBindable, type JSX } from 'synstate-dom';
+import {
+  constant,
+  deriveBindable,
+  If,
+  mapBindable,
+  type JSX,
+} from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
 import { loanStore } from '../../store/index.mjs';
 import { DataItem } from './data-item.js';
@@ -45,7 +51,7 @@ export const SummarySection = (): JSX.Element => (
     <DataItem
       data-e2e-description={'paymentsSumDescription'}
       data-e2e-title={'paymentsSumTitle'}
-      description={derive(
+      description={deriveBindable(
         [loanStore.inputs, loanStore.calculatedValues],
         (s, v) =>
           `${(s.borrowingTotalManYen + v.interestSumManYen).toFixed(2)}万円`,

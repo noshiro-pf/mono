@@ -416,7 +416,7 @@ const SYNSTATE_LASTING_FACTORIES: ReadonlySet<string> = new Set<string>([
  * constants they create nothing, but a handler has no reason to call them so.
  */
 const DOM_DERIVING_FACTORIES: ReadonlySet<string> = new Set<string>([
-  'derive',
+  'deriveBindable',
   'mapBindable',
   'toObservable',
 ]);

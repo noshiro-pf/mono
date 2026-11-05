@@ -1,4 +1,5 @@
-import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { formatLocalTime } from '../format.mjs';
 import { mergedPullRequestsUrl } from '../github-links.mjs';
@@ -24,8 +25,8 @@ export const MergedSection = (): JSX.Element => (
       {constant(`Merged in the last ${daysOf(MERGED_WITHIN_DAYS)} `)}
       <ExternalLink
         // From the last read, so a page left open keeps its window.
-        href={view(reader.readAt, (readAt) =>
-          mergedPullRequestsUrl(reportSource, readAt),
+        href={reader.readAt.pipe(
+          map((readAt) => mergedPullRequestsUrl(reportSource, readAt)),
         )}
         variant={'section-link'}
       >
@@ -37,7 +38,7 @@ export const MergedSection = (): JSX.Element => (
 
     <If
       // Whether the list has not been read yet.
-      cond={view(reader.reading, (reading) => reading.includes('merged'))}
+      cond={reader.reading.pipe(map((reading) => reading.includes('merged')))}
       then={
         <p class={constant('section-note')}>{constant('Reading GitHub…')}</p>
       }
@@ -45,10 +46,12 @@ export const MergedSection = (): JSX.Element => (
         <If
           // Not "nothing merged" when the list was not read, which the note
           // above says.
-          cond={view(reader.failed, (failed) => !isUnread(failed, 'merged'))}
+          cond={reader.failed.pipe(
+            map((failed) => !isUnread(failed, 'merged')),
+          )}
           then={
             <If
-              cond={view(reader.merged, Arr.isEmpty)}
+              cond={reader.merged.pipe(map(Arr.isEmpty))}
               then={
                 <p class={constant('section-note')}>
                   {constant('Nothing merged in that window.')}
@@ -61,50 +64,52 @@ export const MergedSection = (): JSX.Element => (
                       <li class={constant('merged-item')}>
                         <div class={constant('pull-request-heading')}>
                           <span class={constant('pull-request-number')}>
-                            {view(pr$, (pr) => `#${pr.number}`)}
+                            {inlineMap(pr$, (pr) => `#${pr.number}`)}
                           </span>
                           <ExternalLink
-                            href={view(pr$, (pr) => pr.url)}
+                            href={pr$.pipe(map((pr) => pr.url))}
                             variant={'pull-request-title'}
                           >
-                            {view(pr$, (pr) => pr.title)}
+                            {inlineMap(pr$, (pr) => pr.title)}
                           </ExternalLink>
                         </div>
 
                         <div class={constant('pull-request-row')}>
                           <span
                             class={constant('merged-when')}
-                            title={view(pr$, (pr) =>
+                            title={inlineMap(pr$, (pr) =>
                               formatLocalTime(pr.mergedAtEpochMs),
                             )}
                           >
                             {constant('merged ')}
                             <Age
-                              epochMs={view(pr$, (pr) => pr.mergedAtEpochMs)}
+                              epochMs={pr$.pipe(
+                                map((pr) => pr.mergedAtEpochMs),
+                              )}
                             />
-                            {view(pr$, (pr) => ` by ${pr.author}`)}
+                            {inlineMap(pr$, (pr) => ` by ${pr.author}`)}
                           </span>
 
                           <span class={constant('branch')}>
                             <span aria-hidden={constant('true')}>
                               {constant('⎇ ')}
                             </span>
-                            {view(pr$, (pr) => pr.headRef)}
+                            {inlineMap(pr$, (pr) => pr.headRef)}
                           </span>
 
                           <If
-                            cond={view(pr$, (pr) =>
-                              Arr.isNonEmpty(pr.linkedIssues),
+                            cond={pr$.pipe(
+                              map((pr) => Arr.isNonEmpty(pr.linkedIssues)),
                             )}
                             then={
                               <LinkedIssues
-                                issues={view(pr$, (pr) => pr.linkedIssues)}
+                                issues={pr$.pipe(map((pr) => pr.linkedIssues))}
                               />
                             }
                           />
 
                           <For
-                            items={view(pr$, (pr) => pr.labels)}
+                            items={pr$.pipe(map((pr) => pr.labels))}
                             key={(label) => label.name}
                           >
                             {(label$) => <LabelChip label={label$} />}

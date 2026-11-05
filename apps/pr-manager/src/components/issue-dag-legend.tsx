@@ -1,4 +1,5 @@
-import { constant, For, If, view, type JSX, type View } from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
 import type { IssueGraph, IssueNodeState } from '../issue-graph.mjs';
 import { isFadedTier, isRingedTier } from '../priority.mjs';
 import { issuesViewStore } from '../store/index.mjs';
@@ -11,8 +12,9 @@ import { legendStates, stateLabels } from './issue-dag-states.mjs';
 export const IssueDagLegend = (): JSX.Element => {
   const graph$ = issuesViewStore.graph;
 
-  const has = (test: (graph: IssueGraph) => boolean): View<boolean> =>
-    view(graph$, test);
+  const has = (
+    test: (graph: IssueGraph) => boolean,
+  ): InitializedObservable<boolean> => graph$.pipe(map(test));
 
   return (
     <ul aria-label={constant('Key')} class={constant('issue-dag-legend')}>
@@ -42,15 +44,15 @@ export const IssueDagLegend = (): JSX.Element => {
           </li>
         }
       />
-      <For items={view(graph$, keysOf)} key={(key) => key.id}>
+      <For items={graph$.pipe(map(keysOf))} key={(key) => key.id}>
         {(key$) => (
           <li>
             <span
               class={constant('issue-dag-swatch')}
-              data-kind={view(key$, ({ kind }) => kind)}
-              data-state={view(key$, ({ state }) => state)}
+              data-kind={inlineMap(key$, ({ kind }) => kind)}
+              data-state={inlineMap(key$, ({ state }) => state)}
             />
-            {view(key$, ({ label }) => label)}
+            {inlineMap(key$, ({ label }) => label)}
           </li>
         )}
       </For>

@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import {
   ISSUE_START_SWITCHES,
@@ -48,7 +48,7 @@ export const IssuesListFilters = (): JSX.Element => {
           class={constant('theme-switch')}
         >
           <button
-            aria-pressed={view(view$, ({ sort }) =>
+            aria-pressed={inlineMap(view$, ({ sort }) =>
               (sort === 'updated').toString(),
             )}
             class={constant('theme-switch-option')}
@@ -59,7 +59,7 @@ export const IssuesListFilters = (): JSX.Element => {
             {constant('updated')}
           </button>
           <button
-            aria-pressed={view(view$, ({ sort }) =>
+            aria-pressed={inlineMap(view$, ({ sort }) =>
               (sort === 'priority').toString(),
             )}
             class={constant('theme-switch-option')}
@@ -72,7 +72,7 @@ export const IssuesListFilters = (): JSX.Element => {
             {constant('priority')}
           </button>
           <button
-            aria-pressed={view(view$, ({ sort }) =>
+            aria-pressed={inlineMap(view$, ({ sort }) =>
               (sort === 'start').toString(),
             )}
             class={constant('theme-switch-option')}
@@ -93,7 +93,7 @@ export const IssuesListFilters = (): JSX.Element => {
           <span class={constant('filter-group-name')}>{constant('start')}</span>
           {ISSUE_START_SWITCHES.map((start) => (
             <button
-              aria-pressed={view(view$, ({ hiddenStarts }) =>
+              aria-pressed={inlineMap(view$, ({ hiddenStarts }) =>
                 (!hiddenStarts.includes(start)).toString(),
               )}
               class={constant('filter-chip')}
@@ -107,15 +107,17 @@ export const IssuesListFilters = (): JSX.Element => {
             >
               {constant(stateLabels[start])}
               <span class={constant('filter-chip-count')}>
-                {view(counts$, ({ starts }) => starts[start].shown)}
-                <OfTotal count={view(counts$, ({ starts }) => starts[start])} />
+                {inlineMap(counts$, ({ starts }) => starts[start].shown)}
+                <OfTotal
+                  count={counts$.pipe(map(({ starts }) => starts[start]))}
+                />
               </span>
             </button>
           ))}
         </fieldset>
 
         <If
-          cond={view(counts$, ({ labels }) => Arr.isNonEmpty(labels))}
+          cond={counts$.pipe(map(({ labels }) => Arr.isNonEmpty(labels)))}
           then={
             <fieldset
               aria-label={constant('Labels')}
@@ -125,7 +127,7 @@ export const IssuesListFilters = (): JSX.Element => {
                 {constant('label')}
               </span>
               <For
-                items={view(counts$, ({ labels }) => labels)}
+                items={counts$.pipe(map(({ labels }) => labels))}
                 key={(label) => label.name}
               >
                 {(label$) => <LabelPick label$={label$} />}
@@ -153,9 +155,9 @@ const LabelPick = ({
 
   return (
     <button
-      aria-pressed={view(label$, ({ picked }) => picked.toString())}
+      aria-pressed={inlineMap(label$, ({ picked }) => picked.toString())}
       class={constant('filter-chip label-pick')}
-      title={view(label$, ({ picked }) =>
+      title={inlineMap(label$, ({ picked }) =>
         picked
           ? `Picked. Click to stop showing only the issues labelled ${labelName}.`
           : `Click to show only the issues labelled ${labelName}, and any others picked.`,
@@ -166,13 +168,13 @@ const LabelPick = ({
       }}
     >
       <If
-        cond={view(label$, ({ color }) => color !== undefined)}
+        cond={label$.pipe(map(({ color }) => color !== undefined))}
         then={
           <span
             aria-hidden={constant('true')}
             class={constant('label-pick-dot')}
             style={{
-              'background-color': view(label$, ({ color }) =>
+              'background-color': inlineMap(label$, ({ color }) =>
                 color === undefined ? undefined : chipColors(color).background,
               ),
             }}
@@ -181,8 +183,8 @@ const LabelPick = ({
       />
       {constant(labelName)}
       <span class={constant('filter-chip-count')}>
-        {view(label$, ({ count }) => count.shown)}
-        <OfTotal count={view(label$, ({ count }) => count)} />
+        {inlineMap(label$, ({ count }) => count.shown)}
+        <OfTotal count={label$.pipe(map(({ count }) => count))} />
       </span>
     </button>
   );

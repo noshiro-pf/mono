@@ -5,13 +5,13 @@ import {
   InputGroup,
   Label,
 } from 'blueprint-synstate';
-import { createState } from 'synstate';
+import { createState, map } from 'synstate';
 import {
   constant,
   For,
   If,
+  inlineMap,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -30,11 +30,11 @@ type Props = Readonly<{
 export const AppHeader = ({ userName }: Props): JSX.Element => {
   const [confirmingDelete$, setConfirmingDelete] = createState(false);
 
-  const plans$ = view(planStore.plans, (s) =>
-    s.type === 'loaded' ? s.plans : [],
+  const plans$ = planStore.plans.pipe(
+    map((s) => (s.type === 'loaded' ? s.plans : [])),
   );
 
-  const noPlan$ = view(planStore.currentPlan, (p) => p === undefined);
+  const noPlan$ = planStore.currentPlan.pipe(map((p) => p === undefined));
 
   return (
     <header class={constant('app-header')}>
@@ -50,13 +50,15 @@ export const AppHeader = ({ userName }: Props): JSX.Element => {
             size={'small'}
             variant={constant('outlined')}
             data-e2e={constant('sign-out')}
-            disabled={view(sessionStore.signOutState, (s) => s !== 'idle')}
+            disabled={sessionStore.signOutState.pipe(map((s) => s !== 'idle'))}
             title={mapBindable(
               userName,
               (name) => `${name} としてサインイン中`,
             )}
-            text={view(sessionStore.signOutState, (s) =>
-              s === 'waiting' ? 'サインアウト中…' : 'サインアウト',
+            text={sessionStore.signOutState.pipe(
+              map((s) =>
+                s === 'waiting' ? 'サインアウト中…' : 'サインアウト',
+              ),
             )}
             onClick={sessionStore.signOut}
           />
@@ -67,7 +69,7 @@ export const AppHeader = ({ userName }: Props): JSX.Element => {
           <HtmlSelect
             data-e2e={constant('plan-select')}
             disabled={noPlan$}
-            value={view(planStore.currentPlan, (p) => p?.id ?? '')}
+            value={planStore.currentPlan.pipe(map((p) => p?.id ?? ''))}
             onChange={(e) => {
               planStore.selectPlan(e.currentTarget.value);
 
@@ -76,8 +78,8 @@ export const AppHeader = ({ userName }: Props): JSX.Element => {
           >
             <For items={plans$} key={(plan) => plan.id}>
               {(plan$) => (
-                <option value={view(plan$, (p) => p.id)}>
-                  {view(plan$, (p) => p.name)}
+                <option value={inlineMap(plan$, (p) => p.id)}>
+                  {inlineMap(plan$, (p) => p.name)}
                 </option>
               )}
             </For>
@@ -87,7 +89,7 @@ export const AppHeader = ({ userName }: Props): JSX.Element => {
           <InputGroup
             data-e2e={constant('plan-name')}
             disabled={noPlan$}
-            value={view(planStore.currentPlan, (p) => p?.name ?? '')}
+            value={planStore.currentPlan.pipe(map((p) => p?.name ?? ''))}
             onChange={(e) => {
               planStore.renamePlan(e.currentTarget.value);
             }}
@@ -120,7 +122,7 @@ export const AppHeader = ({ userName }: Props): JSX.Element => {
             cond={confirmingDelete$}
             then={
               <span class={constant('actions')}>
-                {view(
+                {inlineMap(
                   planStore.currentPlan,
                   (p) => `「${p?.name ?? ''}」を削除しますか？`,
                 )}

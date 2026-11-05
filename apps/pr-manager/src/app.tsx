@@ -1,11 +1,11 @@
-import { createState, onScopeDispose } from 'synstate';
+import { createState, map, onScopeDispose } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   If,
+  inlineMap,
   mapBindable,
   MatchOptional,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
@@ -65,16 +65,15 @@ export const App = (): JSX.Element => {
 
   const { folded } = headerStore;
 
-  const noToken = view(tokenStore.token, (token) => token === undefined);
+  const noToken = tokenStore.token.pipe(map((token) => token === undefined));
 
-  const ready = derive(
+  const ready = deriveBindable(
     [tokenStore.token, loadStatus],
     (token, status) => token !== undefined && status.type === 'ready',
   );
 
-  const refreshing = view(
-    loadStatus,
-    (status) => status.type === 'ready' && status.refreshing,
+  const refreshing = loadStatus.pipe(
+    map((status) => status.type === 'ready' && status.refreshing),
   );
 
   const [headerHeight, setHeaderHeight] = createState(0);
@@ -88,9 +87,11 @@ export const App = (): JSX.Element => {
   return (
     <main
       class={constant('page')}
-      data-header={view(folded, (isFolded) => (isFolded ? 'folded' : 'full'))}
+      data-header={inlineMap(folded, (isFolded) =>
+        isFolded ? 'folded' : 'full',
+      )}
       data-mode={layoutStore.mode}
-      style={{ '--header-height': view(headerHeight, (h) => `${h}px`) }}
+      style={{ '--header-height': inlineMap(headerHeight, (h) => `${h}px`) }}
     >
       <header
         ref={observeHeight(setHeaderHeight)}
@@ -121,10 +122,12 @@ export const App = (): JSX.Element => {
 
         <div class={constant('header-actions')}>
           <MatchOptional
-            value={view(loadStatus, (status) =>
-              status.type === 'ready'
-                ? Optional.fromNullable(status.pollError)
-                : Optional.none,
+            value={loadStatus.pipe(
+              map((status) =>
+                status.type === 'ready'
+                  ? Optional.fromNullable(status.pollError)
+                  : Optional.none,
+              ),
             )}
             some={(pollError$) => (
               <span class={constant('poll-error')} title={pollError$}>
@@ -143,7 +146,7 @@ export const App = (): JSX.Element => {
 
           <button
             class={constant('refresh-button')}
-            disabled={derive(
+            disabled={deriveBindable(
               [noToken, refreshing],
               (none, busy) => none || busy,
             )}
@@ -160,12 +163,15 @@ export const App = (): JSX.Element => {
       {/* Folded, the panel goes too — unless there is no token, when it is
           the one thing the page has to ask for. */}
       <If
-        cond={derive([folded, noToken], (isFolded, none) => !isFolded || none)}
+        cond={deriveBindable(
+          [folded, noToken],
+          (isFolded, none) => !isFolded || none,
+        )}
         then={<TokenPanel />}
       />
 
       <If
-        cond={derive(
+        cond={deriveBindable(
           [ready, folded],
           (isReady, isFolded) => isReady && !isFolded,
         )}

@@ -10,11 +10,11 @@ import {
   createAfterUpdate,
   For,
   If,
+  inlineMap,
   isImeKeyDown,
   listenInScope,
   MatchOptional,
   subscribeInScope,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
@@ -1002,7 +1002,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
       class={constant('dag-canvas')}
     >
       <figcaption class={constant('visually-hidden')}>
-        {view(mode, (current) => captions[current])}
+        {inlineMap(mode, (current) => captions[current])}
       </figcaption>
       <svg
         ref={(svg) => {
@@ -1023,29 +1023,33 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
             { capture: true },
           );
         }}
-        aria-label={view(mode, (current) =>
+        aria-label={inlineMap(mode, (current) =>
           current === 'tile' ? captions.tile : undefined,
         )}
         class={constant('dag-svg')}
-        data-animating={view(animated, (moved) =>
+        data-animating={inlineMap(animated, (moved) =>
           (moved !== undefined).toString(),
         )}
-        data-connect={view(combine([handle$, connecting$]), ([handle, arrow]) =>
-          (handle !== undefined || arrow !== undefined).toString(),
+        data-connect={inlineMap(
+          combine([handle$, connecting$]),
+          ([handle, arrow]) =>
+            (handle !== undefined || arrow !== undefined).toString(),
         )}
         data-e2e={constant('dag-canvas')}
-        data-lasso={view(
+        data-lasso={inlineMap(
           combine([arrangeable, lassoTool$]),
           ([canArrange, tool]) => (canArrange && tool !== undefined).toString(),
         )}
-        data-mode={view(mode, (current) => current)}
-        data-motion={view(
+        data-mode={inlineMap(mode, (current) => current)}
+        data-motion={inlineMap(
           combine([animationSettingStore.setting, reducedMotionStore.matches]),
           ([setting, reduced]) => shouldAnimate(setting, reduced).toString(),
         )}
         // In 「タイル」, focusable — by Tab, or by a press on it — as a
         // scrolled box is, so that its keys work with no task focused.
-        tabindex={view(mode, (current) => (current === 'tile' ? 0 : undefined))}
+        tabindex={inlineMap(mode, (current) =>
+          current === 'tile' ? 0 : undefined,
+        )}
         onClick={onClick}
         onFocusIn={onFocusIn}
         onFocusOut={() => {
@@ -1074,26 +1078,26 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           {arrowMarker('dag-arrow-connect')}
           {arrowMarker('dag-arrow-refused')}
           <If
-            cond={view(clipTop, (top) => top !== undefined)}
+            cond={clipTop.pipe(map((top) => top !== undefined))}
             then={
               <clipPath id={constant('dag-tile-clip')}>
                 <rect
                   height={constant('100%')}
                   width={constant('100%')}
                   x={constant(0)}
-                  y={view(clipTop, (top) => top ?? 0)}
+                  y={inlineMap(clipTop, (top) => top ?? 0)}
                 />
               </clipPath>
             }
           />
         </defs>
         <g
-          clip-path={view(clipTop, (top) =>
+          clip-path={inlineMap(clipTop, (top) =>
             top === undefined ? undefined : 'url(#dag-tile-clip)',
           )}
         >
           <g
-            transform={view(
+            transform={inlineMap(
               scene.drawnTransform,
               ({ x, y, scale }) => `translate(${x} ${y}) scale(${scale})`,
             )}
@@ -1102,7 +1106,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
               {(record) => <DagGroupFrame record={record} />}
             </For>
             <If
-              cond={view(scene.edgesHidden, (hidden) => !hidden)}
+              cond={scene.edgesHidden.pipe(map((hidden) => !hidden))}
               then={
                 // Mounted afresh when they come back, which fades them in.
                 <g class={constant('dag-edges')}>
@@ -1118,11 +1122,11 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
             <For items={scene.nodes} key={({ node }) => node.id}>
               {(record) => (
                 <MatchOptional
-                  value={view(record, taskRecordOf)}
+                  value={record.pipe(map(taskRecordOf))}
                   some={(task) => <DagTaskNode record={task} />}
                   none={
                     <MatchOptional
-                      value={view(record, milestoneRecordOf)}
+                      value={record.pipe(map(milestoneRecordOf))}
                       some={(milestone) => (
                         <DagMilestoneNode record={milestone} />
                       )}
@@ -1142,11 +1146,11 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
               )}
             />
             <If
-              cond={view(lasso$, (points) => points !== undefined)}
+              cond={lasso$.pipe(map((points) => points !== undefined))}
               then={
                 <path
                   class={constant('dag-lasso')}
-                  d={view(lasso$, (points) => lassoPathData(points ?? []))}
+                  d={inlineMap(lasso$, (points) => lassoPathData(points ?? []))}
                   data-e2e={constant('dag-lasso')}
                 />
               }
@@ -1159,15 +1163,15 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
         </g>
       </svg>
       <If
-        cond={view(thumb, (at) => at !== undefined)}
+        cond={thumb.pipe(map((at) => at !== undefined))}
         then={
           <div
             aria-hidden={constant('true')}
             class={constant('dag-scroll-thumb')}
             data-e2e={constant('dag-scroll-thumb')}
             style={{
-              top: view(thumb, (at) => `${at?.top ?? 0}px`),
-              height: view(thumb, (at) => `${at?.height ?? 0}px`),
+              top: inlineMap(thumb, (at) => `${at?.top ?? 0}px`),
+              height: inlineMap(thumb, (at) => `${at?.height ?? 0}px`),
             }}
           />
         }
@@ -1183,12 +1187,15 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           then={
             <>
               <button
-                aria-pressed={view(lassoTool$, (tool) =>
+                aria-pressed={inlineMap(lassoTool$, (tool) =>
                   (tool === 'freehand').toString(),
                 )}
                 class={{
                   'bp6-button': constant(true),
-                  'bp6-active': view(lassoTool$, (tool) => tool === 'freehand'),
+                  'bp6-active': inlineMap(
+                    lassoTool$,
+                    (tool) => tool === 'freehand',
+                  ),
                 }}
                 data-e2e={constant('dag-lasso-tool')}
                 title={constant(m.dag.lassoTitle)}
@@ -1202,12 +1209,12 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
                 {constant(m.dag.lasso)}
               </button>
               <button
-                aria-pressed={view(lassoTool$, (tool) =>
+                aria-pressed={inlineMap(lassoTool$, (tool) =>
                   (tool === 'rectangle').toString(),
                 )}
                 class={{
                   'bp6-button': constant(true),
-                  'bp6-active': view(
+                  'bp6-active': inlineMap(
                     lassoTool$,
                     (tool) => tool === 'rectangle',
                   ),
@@ -1227,7 +1234,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           }
         />
         <If
-          cond={view(mode, (current) => current !== 'tile')}
+          cond={mode.pipe(map((current) => current !== 'tile'))}
           then={
             <>
               <button
@@ -1261,7 +1268,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           type={constant('button')}
           onClick={pressFit}
         >
-          {view(combine([mode, arcZoom$]), ([current, zoom]) =>
+          {inlineMap(combine([mode, arcZoom$]), ([current, zoom]) =>
             current === 'arc' && zoom === 'whole'
               ? m.dag.actualSize
               : m.dag.fitAll,

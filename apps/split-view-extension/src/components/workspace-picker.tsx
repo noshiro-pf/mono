@@ -1,6 +1,7 @@
 import {
   createBooleanState,
   derive,
+  map,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -8,9 +9,9 @@ import {
   createAfterUpdate,
   For,
   If,
+  inlineMap,
   listenInScope,
   subscribeInScope,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -130,7 +131,7 @@ export const WorkspacePicker = ({
         title={constant(
           'The split view shown in this tab. Alt+1..9 switches too.',
         )}
-        value={view(activeId, (id) => id ?? '')}
+        value={inlineMap(activeId, (id) => id ?? '')}
         onChange={(changeEvent) => {
           const mut_select = changeEvent.currentTarget;
 
@@ -152,11 +153,11 @@ export const WorkspacePicker = ({
         }}
       >
         <For
-          items={view(registry, (list) => list.entries)}
+          items={registry.pipe(map((list) => list.entries))}
           key={(entry) => entry.id}
         >
           {(entry$, index$) => (
-            <option value={view(entry$, (entry) => entry.id)}>
+            <option value={inlineMap(entry$, (entry) => entry.id)}>
               {derive(
                 [entry$, index$],
                 (entry, index) => `${(index + 1).toString()}: ${entry.name}`,
@@ -176,7 +177,9 @@ export const WorkspacePicker = ({
       </button>
 
       <button
-        aria-expanded={view(editing$, (shown) => (shown ? 'true' : 'false'))}
+        aria-expanded={inlineMap(editing$, (shown) =>
+          shown ? 'true' : 'false',
+        )}
         class={constant('top-bar__button')}
         title={constant(
           'Rename, reorder or delete this split view, open one or all of them in tabs, export and import',

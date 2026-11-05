@@ -32,7 +32,7 @@ const pageSamples: readonly (readonly [
     'guides/bindable.md',
     [
       'bindable/01-constant.tsx',
-      'bindable/02-view.tsx',
+      'bindable/02-map.tsx',
       'bindable/03-helpers.tsx',
     ],
   ],

@@ -1,9 +1,10 @@
+import { map } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
+  inlineMap,
   mapBindable,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
@@ -50,17 +51,17 @@ export const MergeOrderFilters = (): JSX.Element => {
     <div class={constant('merge-order-filters')}>
       <div
         class={constant('summary-row')}
-        data-picking={view(view$, ({ onlyStatuses }) =>
+        data-picking={inlineMap(view$, ({ onlyStatuses }) =>
           Arr.isNonEmpty(onlyStatuses).toString(),
         )}
       >
         <StatTile
           label={'open'}
-          total={view(counts$, ({ open }) => open.total)}
-          value={view(counts$, ({ open }) => open.shown)}
+          total={counts$.pipe(map(({ open }) => open.total))}
+          value={counts$.pipe(map(({ open }) => open.shown))}
         />
         <For
-          items={view(reader.features, statusFiltersOf)}
+          items={reader.features.pipe(map(statusFiltersOf))}
           key={(filter) => filter}
         >
           {(filter$) => {
@@ -68,7 +69,7 @@ export const MergeOrderFilters = (): JSX.Element => {
             const filter = filter$.getSnapshot().value;
 
             // Not known while what it is counted from is still being read.
-            const count = derive(
+            const count = deriveBindable(
               [reader.summary, counts$],
               (summary, counts): Count | undefined =>
                 summary[filter] === undefined
@@ -79,12 +80,11 @@ export const MergeOrderFilters = (): JSX.Element => {
             return (
               <StatToggle
                 label={STATUS_NAMES[filter]}
-                only={view(view$, ({ onlyStatuses }) =>
-                  onlyStatuses.includes(filter),
+                only={view$.pipe(
+                  map(({ onlyStatuses }) => onlyStatuses.includes(filter)),
                 )}
-                pressed={view(
-                  view$,
-                  ({ hiddenStatuses }) => !hiddenStatuses.includes(filter),
+                pressed={view$.pipe(
+                  map(({ hiddenStatuses }) => !hiddenStatuses.includes(filter)),
                 )}
                 tone={mapBindable(count, (c) =>
                   (c?.shown ?? 0) > 0 ? STATUS_TONES[filter] : undefined,
@@ -113,7 +113,7 @@ export const MergeOrderFilters = (): JSX.Element => {
           </span>
           {PRIORITIES.map((priority) => (
             <button
-              aria-pressed={view(view$, ({ hiddenPriorities }) =>
+              aria-pressed={inlineMap(view$, ({ hiddenPriorities }) =>
                 (!hiddenPriorities.includes(priority)).toString(),
               )}
               class={constant('filter-chip')}
@@ -124,11 +124,13 @@ export const MergeOrderFilters = (): JSX.Element => {
             >
               {constant(PRIORITY_NAMES[priority])}
               <span class={constant('filter-chip-count')}>
-                {view(counts$, ({ priorities }) => priorities[priority].shown)}
+                {inlineMap(
+                  counts$,
+                  ({ priorities }) => priorities[priority].shown,
+                )}
                 <OfTotal
-                  count={view(
-                    counts$,
-                    ({ priorities }) => priorities[priority],
+                  count={counts$.pipe(
+                    map(({ priorities }) => priorities[priority]),
                   )}
                 />
               </span>
@@ -144,7 +146,7 @@ export const MergeOrderFilters = (): JSX.Element => {
             {constant('state')}
           </span>
           <button
-            aria-pressed={view(view$, ({ hideDrafts }) =>
+            aria-pressed={inlineMap(view$, ({ hideDrafts }) =>
               (!hideDrafts).toString(),
             )}
             class={constant('filter-chip')}
@@ -156,8 +158,8 @@ export const MergeOrderFilters = (): JSX.Element => {
           >
             {constant('draft')}
             <span class={constant('filter-chip-count')}>
-              {view(counts$, ({ drafts }) => drafts.shown)}
-              <OfTotal count={view(counts$, ({ drafts }) => drafts)} />
+              {inlineMap(counts$, ({ drafts }) => drafts.shown)}
+              <OfTotal count={counts$.pipe(map(({ drafts }) => drafts))} />
             </span>
           </button>
         </fieldset>
@@ -168,7 +170,7 @@ export const MergeOrderFilters = (): JSX.Element => {
         >
           <button
             aria-label={constant('merge order')}
-            aria-pressed={view(view$, ({ sort }) =>
+            aria-pressed={inlineMap(view$, ({ sort }) =>
               (sort === 'order').toString(),
             )}
             class={constant('theme-switch-option')}
@@ -187,7 +189,7 @@ export const MergeOrderFilters = (): JSX.Element => {
             </span>
           </button>
           <button
-            aria-pressed={view(view$, ({ sort }) =>
+            aria-pressed={inlineMap(view$, ({ sort }) =>
               (sort === 'priority').toString(),
             )}
             class={constant('theme-switch-option')}

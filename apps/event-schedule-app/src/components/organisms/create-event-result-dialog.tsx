@@ -9,7 +9,7 @@ import { createBooleanState, filter } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  derive,
+  deriveBindable,
   If,
   mapBindable,
   subscribeInScope,
@@ -47,7 +47,7 @@ export const CreateEventResultDialog = ({
     afterUpdate(resetLinkIsUsed);
   });
 
-  const backIsDisabled = derive(
+  const backIsDisabled = deriveBindable(
     [isLoading, linkIsUsed$],
     (loading, used) => loading || !used,
   );

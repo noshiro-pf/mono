@@ -1,5 +1,11 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, For, view, type Bindable, type JSX } from 'synstate-dom';
+import {
+  constant,
+  For,
+  inlineMap,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import type { Rect, RectSize } from 'ts-utils-additional';
 import { cardToString } from '../../functions/index.mjs';
 import type {
@@ -47,13 +53,13 @@ export const PlayerCardsArea = ({
         style={{
           padding: constant(`${paddingPx}px`),
           transform: constant(`rotate(${rotate}deg)`),
-          width: view(areaSize, (s) => `${s.width}px`),
-          height: view(areaSize, (s) => `${s.height}px`),
+          width: inlineMap(areaSize, (s) => `${s.width}px`),
+          height: inlineMap(areaSize, (s) => `${s.height}px`),
           top: isSide
-            ? view(areaSize, (s) => `${(s.width - s.height) / 2}px`)
+            ? inlineMap(areaSize, (s) => `${(s.width - s.height) / 2}px`)
             : constant('0px'),
           left: isSide
-            ? view(areaSize, (s) => `${-(s.width - s.height) / 2}px`)
+            ? inlineMap(areaSize, (s) => `${-(s.width - s.height) / 2}px`)
             : constant('0px'),
         }}
       >

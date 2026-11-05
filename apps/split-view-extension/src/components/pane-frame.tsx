@@ -10,9 +10,9 @@ import {
   createAfterUpdate,
   For,
   If,
+  inlineMap,
   listenInScope,
   subscribeInScope,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Arr, fastDeepEqual } from 'ts-data-forge';
@@ -620,10 +620,12 @@ export const PaneFrame = ({
     );
   };
 
-  const sandboxTitle = view(pane$, (pane) =>
-    pane.sandboxed
-      ? 'Turn the sandbox off (this page will be able to reach the frames above it)'
-      : 'Turn the sandbox on',
+  const sandboxTitle = pane$.pipe(
+    map((pane) =>
+      pane.sandboxed
+        ? 'Turn the sandbox off (this page will be able to reach the frames above it)'
+        : 'Turn the sandbox on',
+    ),
   );
 
   return (
@@ -640,15 +642,15 @@ export const PaneFrame = ({
           { capture: true },
         );
       }}
-      class={view(view$, (paneView) =>
+      class={inlineMap(view$, (paneView) =>
         paneClassName(paneView.active, paneView.moving),
       )}
       data-e2e={constant('pane')}
       style={{
-        left: view(rect$, (rect) => `${rect.left}px`),
-        top: view(rect$, (rect) => `${rect.top}px`),
-        width: view(rect$, (rect) => `${rect.width}px`),
-        height: view(rect$, (rect) => `${rect.height}px`),
+        left: inlineMap(rect$, (rect) => `${rect.left}px`),
+        top: inlineMap(rect$, (rect) => `${rect.top}px`),
+        width: inlineMap(rect$, (rect) => `${rect.width}px`),
+        height: inlineMap(rect$, (rect) => `${rect.height}px`),
       }}
     >
       <header class={constant('pane__bar')}>
@@ -672,7 +674,7 @@ export const PaneFrame = ({
         <button
           aria-label={constant('Back')}
           class={constant('pane__button')}
-          disabled={view(
+          disabled={inlineMap(
             pane$,
             (pane) => pane.currentUrl === undefined || pane.historyLength <= 1,
           )}
@@ -687,7 +689,7 @@ export const PaneFrame = ({
         <button
           aria-label={constant('Forward')}
           class={constant('pane__button')}
-          disabled={view(pane$, (pane) => pane.currentUrl === undefined)}
+          disabled={inlineMap(pane$, (pane) => pane.currentUrl === undefined)}
           title={constant('Forward')}
           type={constant('button')}
           onClick={() => {
@@ -699,7 +701,7 @@ export const PaneFrame = ({
         <button
           aria-label={constant('Reload')}
           class={constant('pane__button')}
-          disabled={view(pane$, (pane) => pane.url === '')}
+          disabled={inlineMap(pane$, (pane) => pane.url === '')}
           title={constant('Reload')}
           type={constant('button')}
           onClick={handleReload}
@@ -719,12 +721,12 @@ export const PaneFrame = ({
           }}
         >
           <If
-            cond={view(address$, (address) => address !== '')}
+            cond={address$.pipe(map((address) => address !== ''))}
             then={
               <img
                 alt={constant('')}
                 class={constant('pane__favicon')}
-                src={view(address$, faviconUrlOf)}
+                src={inlineMap(address$, faviconUrlOf)}
               />
             }
           />
@@ -744,18 +746,20 @@ export const PaneFrame = ({
         </form>
 
         <If
-          cond={view(compact$, (compact) => !compact)}
+          cond={compact$.pipe(map((compact) => !compact))}
           then={<PaneZoomControls pane$={pane$} onZoom={handleZoom} />}
         />
 
         <If
-          cond={view(load$, (load) => load.serviceWorkersRemoved !== undefined)}
+          cond={load$.pipe(
+            map((load) => load.serviceWorkersRemoved !== undefined),
+          )}
           then={
             <span
               class={constant('pane__warning')}
               title={constant('Service workers removed')}
             >
-              {view(
+              {inlineMap(
                 load$,
                 (load) => `SW-${load.serviceWorkersRemoved?.toString() ?? ''}`,
               )}
@@ -764,7 +768,7 @@ export const PaneFrame = ({
         />
 
         <If
-          cond={view(model$, (model) => model.blocked)}
+          cond={model$.pipe(map((model) => model.blocked))}
           then={
             <span
               class={constant('pane__warning')}
@@ -778,13 +782,13 @@ export const PaneFrame = ({
         />
 
         <If
-          cond={view(compact$, (compact) => !compact)}
+          cond={compact$.pipe(map((compact) => !compact))}
           then={
             <>
               <button
                 aria-label={constant('Open in a new tab')}
                 class={constant('pane__button')}
-                disabled={view(address$, (address) => address === '')}
+                disabled={inlineMap(address$, (address) => address === '')}
                 title={constant('Open in a new tab')}
                 type={constant('button')}
                 onClick={handleOpenExternally}
@@ -793,7 +797,7 @@ export const PaneFrame = ({
               </button>
               <button
                 aria-label={sandboxTitle}
-                class={view(pane$, (pane) =>
+                class={inlineMap(pane$, (pane) =>
                   pane.sandboxed
                     ? 'pane__button'
                     : 'pane__button pane__button--warn',
@@ -803,8 +807,8 @@ export const PaneFrame = ({
                 onClick={handleToggleSandbox}
               >
                 <Icon
-                  icon={view(pane$, (pane) =>
-                    pane.sandboxed ? 'lock' : 'unlock',
+                  icon={pane$.pipe(
+                    map((pane) => (pane.sandboxed ? 'lock' : 'unlock')),
                   )}
                 />
               </button>
@@ -831,7 +835,7 @@ export const PaneFrame = ({
         />
 
         <If
-          cond={view(menuItems$, Arr.isNonEmpty)}
+          cond={menuItems$.pipe(map(Arr.isNonEmpty))}
           then={
             <span
               ref={(element) => {
@@ -840,7 +844,7 @@ export const PaneFrame = ({
               class={constant('pane__menu')}
             >
               <button
-                aria-expanded={view(load$, (load) =>
+                aria-expanded={inlineMap(load$, (load) =>
                   load.menuOpen ? 'true' : 'false',
                 )}
                 aria-label={constant('More for this pane')}
@@ -855,7 +859,7 @@ export const PaneFrame = ({
               </button>
 
               <If
-                cond={view(load$, (load) => load.menuOpen)}
+                cond={load$.pipe(map((load) => load.menuOpen))}
                 then={
                   <div
                     ref={listenForMenuClose}
@@ -893,7 +897,7 @@ export const PaneFrame = ({
         <button
           aria-label={constant('Close this pane')}
           class={constant('pane__button')}
-          disabled={view(view$, (paneView) => !paneView.canClose)}
+          disabled={inlineMap(view$, (paneView) => !paneView.canClose)}
           title={constant('Close this pane')}
           type={constant('button')}
           onClick={() => {
@@ -908,8 +912,8 @@ export const PaneFrame = ({
         {/* Keyed by the address, so that the helper is a new element, and a new
             load, for every clear. */}
         <For
-          items={view(load$, (load) =>
-            load.resetUrl === undefined ? [] : [load.resetUrl],
+          items={load$.pipe(
+            map((load) => (load.resetUrl === undefined ? [] : [load.resetUrl])),
           )}
           key={(resetUrl) => resetUrl}
         >
@@ -930,7 +934,7 @@ export const PaneFrame = ({
           )}
         </For>
         <If
-          cond={view(pane$, (pane) => pane.url === '')}
+          cond={pane$.pipe(map((pane) => pane.url === ''))}
           then={
             <div class={constant('pane__empty')}>
               {constant('Type an address in the bar above')}
@@ -941,7 +945,7 @@ export const PaneFrame = ({
               // Empty for an empty address, as the `If` is: the two hear of it
               // in the same update, and a row still here then would bind `src`
               // to `''` on its way out.
-              items={view(pane$, (pane) => (pane.url === '' ? [] : [pane]))}
+              items={pane$.pipe(map((pane) => (pane.url === '' ? [] : [pane])))}
               key={frameKeyOf}
             >
               {(shown$) => (
@@ -968,9 +972,9 @@ export const PaneFrame = ({
                   // navigation.
                   src={shown$.pipe(map((pane) => pane.url))}
                   style={{
-                    zoom: view(shown$, (pane) => zoomStyleOf(pane.zoom)),
+                    zoom: inlineMap(shown$, (pane) => zoomStyleOf(pane.zoom)),
                   }}
-                  title={view(shown$, labelOf)}
+                  title={inlineMap(shown$, labelOf)}
                   onLoad={handleFrameLoad}
                 />
               )}
@@ -981,19 +985,20 @@ export const PaneFrame = ({
         {/* Over the frame rather than instead of it: the element stays in the
             document, because taking it out and putting it back is a reload. */}
         <If
-          cond={view(model$, (model) => model.showFallback)}
+          cond={model$.pipe(map((model) => model.showFallback))}
           then={
             <PaneFallback
-              address={view(model$, (model) =>
-                model.agentSeen ? undefined : model.address,
+              address={model$.pipe(
+                map((model) => (model.agentSeen ? undefined : model.address)),
               )}
-              canClearServiceWorkers={view(
-                model$,
-                (model) => model.canClearServiceWorkers,
+              canClearServiceWorkers={model$.pipe(
+                map((model) => model.canClearServiceWorkers),
               )}
-              canOpenExternally={view(model$, (model) => model.address !== '')}
-              canReload={view(model$, (model) => model.canRetry)}
-              refusal={view(model$, (model) => model.browserRefusal)}
+              canOpenExternally={model$.pipe(
+                map((model) => model.address !== ''),
+              )}
+              canReload={model$.pipe(map((model) => model.canRetry))}
+              refusal={model$.pipe(map((model) => model.browserRefusal))}
               onClearServiceWorkers={handleResetServiceWorkers}
               onDismiss={() => {
                 patchLoad({ fallbackDismissed: true });

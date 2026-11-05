@@ -1,5 +1,5 @@
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import { Num, asPositiveFiniteNumber } from 'ts-data-forge';
 import type { Rect, RectSize } from 'ts-utils-additional';
 import { playerNameRectSize } from '../../constants/index.mjs';
@@ -99,10 +99,10 @@ export const Table = ({
     <div
       class={constant(styles.table)}
       style={{
-        width: view(tableSize, (s) => `${s.width}px`),
-        height: view(tableSize, (s) => `${s.height}px`),
-        'grid-template-rows': view(areaSize, gridTrackSizes),
-        'grid-template-columns': view(areaSize, gridTrackSizes),
+        width: inlineMap(tableSize, (s) => `${s.width}px`),
+        height: inlineMap(tableSize, (s) => `${s.height}px`),
+        'grid-template-rows': inlineMap(areaSize, gridTrackSizes),
+        'grid-template-columns': inlineMap(areaSize, gridTrackSizes),
         padding: constant(`${containerPaddingPx}px`),
       }}
     >
@@ -112,7 +112,7 @@ export const Table = ({
             areaSize={areaSize}
             cardPositionsDispatcher={cardPositionsDispatcher}
             cardSize={cardSize}
-            cards={view(displayValues, (v) => v.playerCards[direction])}
+            cards={displayValues.pipe(map((v) => v.playerCards[direction]))}
             paddingPx={paddingPx}
             measureOn={measureOn}
             rotate={rotate}
@@ -122,7 +122,9 @@ export const Table = ({
       {seats.map(({ direction, rotate }) => (
         <div style={{ 'grid-area': constant(direction.toLowerCase()) }}>
           <PlayerName
-            isInTurn={view(displayValues, (v) => v.turnPlayer === direction)}
+            isInTurn={displayValues.pipe(
+              map((v) => v.turnPlayer === direction),
+            )}
             measureOn={measureOn}
             playerName={`Player ${direction}`}
             rotate={rotate}

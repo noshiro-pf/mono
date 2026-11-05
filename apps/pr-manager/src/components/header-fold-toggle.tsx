@@ -1,4 +1,5 @@
-import { constant, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import { headerStore } from '../store/index.mjs';
 import { BadgeIcon } from './badge-icon.js';
 
@@ -13,10 +14,12 @@ import { BadgeIcon } from './badge-icon.js';
  */
 export const HeaderFoldToggle = (): JSX.Element => (
   <button
-    aria-expanded={view(headerStore.folded, (folded) => (!folded).toString())}
+    aria-expanded={inlineMap(headerStore.folded, (folded) =>
+      (!folded).toString(),
+    )}
     aria-label={constant('Full header')}
     class={constant('header-button header-fold-toggle')}
-    title={view(headerStore.folded, (folded) =>
+    title={inlineMap(headerStore.folded, (folded) =>
       folded
         ? 'Show the full header, the token panel and when the report was read'
         : 'Fold the header into this toolbar, for more room below',
@@ -25,8 +28,8 @@ export const HeaderFoldToggle = (): JSX.Element => (
     onClick={headerStore.toggle}
   >
     <BadgeIcon
-      path={view(headerStore.folded, (folded) =>
-        folded ? CHEVRON_DOWN : CHEVRON_UP,
+      path={headerStore.folded.pipe(
+        map((folded) => (folded ? CHEVRON_DOWN : CHEVRON_UP)),
       )}
     />
   </button>

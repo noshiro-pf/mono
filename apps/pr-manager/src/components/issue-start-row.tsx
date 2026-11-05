@@ -1,10 +1,11 @@
+import { map } from 'synstate';
 import {
   constant,
   For,
   If,
+  inlineMap,
   mapBindable,
   MatchOptional,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -40,34 +41,34 @@ export const IssueStartRow = ({ issue, start }: Props): JSX.Element => (
         <>
           <span
             class={constant('badge issue-start')}
-            data-state={view(some$, ({ state }) => state)}
-            title={view(some$, ({ state, marked }) =>
+            data-state={inlineMap(some$, ({ state }) => state)}
+            title={inlineMap(some$, ({ state, marked }) =>
               Arr.toUnshifted(explainState({ kind: 'issue', state, marked }))(
                 markedNote({ state, marked }),
               ).join('\n'),
             )}
           >
-            {view(some$, ({ state }) => stateLabels[state])}
+            {inlineMap(some$, ({ state }) => stateLabels[state])}
           </span>
 
           <If
-            cond={view(some$, ({ named }) => Arr.isNonEmpty(named))}
+            cond={some$.pipe(map(({ named }) => Arr.isNonEmpty(named)))}
             then={
               <span class={constant('issue-start-named')}>
                 {constant('after ')}
                 <For
-                  items={view(some$, ({ named }) => named)}
+                  items={some$.pipe(map(({ named }) => named))}
                   key={(node) => node.number}
                 >
                   {(node$, index$) => (
                     <>
-                      {view(index$, separator)}
+                      {inlineMap(index$, separator)}
                       <ExternalLink
-                        dataState={view(node$, (node) => node.state)}
-                        href={view(node$, (node) => node.url)}
-                        title={view(node$, describeNode)}
+                        dataState={node$.pipe(map((node) => node.state))}
+                        href={node$.pipe(map((node) => node.url))}
+                        title={node$.pipe(map(describeNode))}
                       >
-                        {view(node$, (node) => `#${node.number}`)}
+                        {inlineMap(node$, (node) => `#${node.number}`)}
                       </ExternalLink>
                     </>
                   )}

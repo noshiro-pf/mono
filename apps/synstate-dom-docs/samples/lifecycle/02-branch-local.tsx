@@ -1,5 +1,5 @@
 import { createBooleanState, createState, map } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 const [showStats$] = createBooleanState(false);
@@ -18,5 +18,5 @@ const Stats = (): JSX.Element => {
   // Created only while the branch is shown, and disposed when it closes.
   const total$ = samples$.pipe(map(Arr.sum));
 
-  return <p>{view(total$, (t) => `Total: ${t}`)}</p>;
+  return <p>{total$.pipe(map((t) => `Total: ${t}`))}</p>;
 };

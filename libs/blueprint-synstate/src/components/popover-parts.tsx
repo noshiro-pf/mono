@@ -17,18 +17,19 @@ import {
 import {
   createState,
   derive,
+  map,
   onScopeDispose,
   type InitializedObservable,
 } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  derive as deriveBindable,
+  deriveBindable,
+  inlineMap,
   isImeKeyDown,
   mapBindable,
   subscribeInScope,
   toObservable,
-  view,
   type Bindable,
   type Child,
   type ClassObject,
@@ -395,7 +396,7 @@ export const PopoverCore = ({
 
   subscribeInScope(open$, decorateTarget);
 
-  const basePlacement$ = view(placement$, basePlacementOf);
+  const basePlacement$ = placement$.pipe(map(basePlacementOf));
 
   /**
    * `div.bp6-popover-transition-container` and what it holds, mounted as the
@@ -523,7 +524,7 @@ export const PopoverCore = ({
             ['bp6-popover-open', open$],
             [
               'bp6-active',
-              view(open$, (open) => open && !isControlled && !isHover),
+              inlineMap(open$, (open) => open && !isControlled && !isHover),
             ],
           ],
         )}

@@ -1,7 +1,8 @@
+import { map } from 'synstate';
 import {
   constant,
+  inlineMap,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -31,7 +32,7 @@ export const IssueTierGroup = ({ row, counts$ }: Props): JSX.Element => {
     <div
       aria-label={constant(GROUP_NAMES[row])}
       class={constant(`stat-group tiers-${row}`)}
-      data-picking={view(view$, ({ onlyPriorities }) =>
+      data-picking={inlineMap(view$, ({ onlyPriorities }) =>
         Arr.isNonEmpty(onlyPriorities).toString(),
       )}
       role={constant('group')}
@@ -41,10 +42,12 @@ export const IssueTierGroup = ({ row, counts$ }: Props): JSX.Element => {
           <StatToggle
             description={TIER_MEANINGS[priority]}
             label={priority}
-            only={view(view$, ({ onlyPriorities }) =>
-              onlyPriorities.includes(priority),
+            only={view$.pipe(
+              map(({ onlyPriorities }) => onlyPriorities.includes(priority)),
             )}
-            pressed={view(view$, (filter) => isPriorityShown(priority, filter))}
+            pressed={view$.pipe(
+              map((filter) => isPriorityShown(priority, filter)),
+            )}
             subject={PRIORITY_SUBJECTS[priority]}
             total={mapBindable(
               counts$,

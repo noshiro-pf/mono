@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import type { QueueSlot } from '../queue-view.mjs';
 import { ExternalLink } from './external-link.js';
 import { RunStateIcon } from './run-state-icon.js';
@@ -19,7 +19,7 @@ type Props = Readonly<{
  */
 export const QueueSlotBox = ({ slot$, onShow, onHide }: Props): JSX.Element => (
   <ExternalLink
-    href={view(slot$, (slot) => slot.url)}
+    href={slot$.pipe(map((slot) => slot.url))}
     variant={'queue-link'}
     onEnter={() => {
       onShow(slot$.getSnapshot().value.number);
@@ -27,36 +27,36 @@ export const QueueSlotBox = ({ slot$, onShow, onHide }: Props): JSX.Element => (
     onLeave={onHide}
   >
     <If
-      cond={view(slot$, (slot) => slot.priority !== 'none')}
+      cond={slot$.pipe(map((slot) => slot.priority !== 'none'))}
       then={
         <span
           class={constant('queue-priority')}
-          data-priority={view(slot$, (slot) => slot.priority)}
+          data-priority={inlineMap(slot$, (slot) => slot.priority)}
         >
-          {view(slot$, (slot) => slot.priority)}
+          {inlineMap(slot$, (slot) => slot.priority)}
         </span>
       }
     />
 
     <span class={constant('queue-number')}>
       <If
-        cond={view(slot$, (slot) => slot.kind === 'running')}
+        cond={slot$.pipe(map((slot) => slot.kind === 'running'))}
         then={<RunStateIcon kind={'running'} label={'running'} />}
       />
-      {view(slot$, (slot) => `#${slot.number}`)}
+      {inlineMap(slot$, (slot) => `#${slot.number}`)}
     </span>
 
     <If
-      cond={view(slot$, (slot) => slot.note !== undefined)}
+      cond={slot$.pipe(map((slot) => slot.note !== undefined))}
       then={
         <span class={constant('queue-note')}>
-          {view(slot$, (slot) => slot.note ?? '')}
+          {inlineMap(slot$, (slot) => slot.note ?? '')}
         </span>
       }
     />
 
     <span class={constant('visually-hidden')}>
-      {view(slot$, (slot) =>
+      {inlineMap(slot$, (slot) =>
         slot.detail === undefined
           ? ` ${slot.title}`
           : ` ${slot.title} — ${slot.detail}`,

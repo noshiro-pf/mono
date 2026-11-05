@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 
 type Props<A> = Readonly<{
   source: InitializedObservable<A>;
@@ -16,23 +16,29 @@ export const DagEdgeLabel = <A,>({ source, pick }: Props<A>): JSX.Element => {
 
   return (
     <If
-      cond={view(source, (value) => pick(value).labelBox !== undefined)}
+      cond={source.pipe(map((value) => pick(value).labelBox !== undefined))}
       then={
         <g class={constant('dag-edge-label')}>
           <rect
-            height={view(source, (value) => box(value).height)}
+            height={inlineMap(source, (value) => box(value).height)}
             rx={constant(4)}
-            width={view(source, (value) => box(value).width)}
-            x={view(source, (value) => box(value).x)}
-            y={view(source, (value) => box(value).y)}
+            width={inlineMap(source, (value) => box(value).width)}
+            x={inlineMap(source, (value) => box(value).x)}
+            y={inlineMap(source, (value) => box(value).y)}
           />
           <text
             dominant-baseline={constant('central')}
             text-anchor={constant('middle')}
-            x={view(source, (value) => box(value).x + box(value).width / 2)}
-            y={view(source, (value) => box(value).y + box(value).height / 2)}
+            x={inlineMap(
+              source,
+              (value) => box(value).x + box(value).width / 2,
+            )}
+            y={inlineMap(
+              source,
+              (value) => box(value).y + box(value).height / 2,
+            )}
           >
-            {view(source, (value) => pick(value).label)}
+            {inlineMap(source, (value) => pick(value).label)}
           </text>
         </g>
       }

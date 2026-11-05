@@ -1,4 +1,11 @@
-import { constant, derive, MatchOptional, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import {
+  constant,
+  deriveBindable,
+  inlineMap,
+  MatchOptional,
+  type JSX,
+} from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 import { describeInterval } from '../format.mjs';
 import { isRunningLow, type RateLimit } from '../rate-limit.mjs';
@@ -20,13 +27,13 @@ import { ExternalLink } from './external-link.js';
 export const TokenPanel = (): JSX.Element => {
   const { token } = tokenStore;
 
-  const noToken = view(token, (held) => held === undefined);
+  const noToken = inlineMap(token, (held) => held === undefined);
 
   // Said in the sentence as well as shown in the colour: the reserved status
   // steps are not allowed to carry a meaning on their own here, and a reader
   // who cannot tell the two greys apart still has to learn that the page is
   // about to stop being able to look.
-  const low = view(
+  const low = inlineMap(
     reader.rateLimit,
     (rateLimit) => rateLimit !== undefined && isRunningLow(rateLimit),
   );
@@ -34,14 +41,17 @@ export const TokenPanel = (): JSX.Element => {
   return (
     <details class={constant('token-panel')} open={noToken}>
       <summary class={constant('token-summary')}>
-        {view(token, (held) =>
+        {inlineMap(token, (held) =>
           held === undefined ? 'A token is needed' : 'Reading with a token',
         )}
       </summary>
 
       <div class={constant('token-body')}>
         <p class={{ 'token-state': constant(true), 'token-state-low': low }}>
-          {derive([token, reader.rateLimit, reader.pollIntervalMs], stateWords)}
+          {deriveBindable(
+            [token, reader.rateLimit, reader.pollIntervalMs],
+            stateWords,
+          )}
         </p>
 
         <form
@@ -63,7 +73,7 @@ export const TokenPanel = (): JSX.Element => {
             autocomplete={constant('off')}
             class={constant('token-input')}
             id={constant(INPUT_ID)}
-            placeholder={view(token, (held) =>
+            placeholder={inlineMap(token, (held) =>
               held === undefined ? 'ghp_… or github_pat_…' : '••••••••',
             )}
             type={constant('password')}
@@ -105,7 +115,7 @@ export const TokenPanel = (): JSX.Element => {
         </form>
 
         <MatchOptional
-          value={view(tokenStore.saveError, Optional.fromNullable)}
+          value={tokenStore.saveError.pipe(map(Optional.fromNullable))}
           some={(saveError$) => (
             <p class={constant('token-error')}>{saveError$}</p>
           )}

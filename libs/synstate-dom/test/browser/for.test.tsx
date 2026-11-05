@@ -3,9 +3,9 @@ import {
   constant,
   For,
   If,
+  inlineMap,
   Portal,
   render,
-  view,
   type JSX,
 } from 'synstate-dom';
 
@@ -53,8 +53,8 @@ const setup = (
 
     return (
       <li>
-        {view(index$, (i) => `${i}:`)}
-        {view(item$, (i) => i.name)}
+        {inlineMap(index$, (i) => `${i}:`)}
+        {inlineMap(item$, (i) => i.name)}
       </li>
     );
   };
@@ -194,7 +194,7 @@ describe(For, () => {
       <For items={items$} key={(s) => s}>
         {(item$) => (
           <b>
-            {view(suffix$, (s) => {
+            {inlineMap(suffix$, (s) => {
               mut_runs.current += 1;
 
               return `${item$.getSnapshot().value}${s}`;
@@ -339,7 +339,7 @@ describe(For, () => {
         <For items={items$} key={(s) => s}>
           {(item$) => (
             <li>
-              {view(suffix$, (s) => {
+              {inlineMap(suffix$, (s) => {
                 mut_runs.current += 1;
 
                 return `${item$.getSnapshot().value}${s}`;

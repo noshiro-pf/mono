@@ -7,14 +7,14 @@ import {
   Spinner,
 } from 'blueprint-synstate';
 import { UserId, UserName } from 'event-schedule-app-shared';
+import { map } from 'synstate';
 import {
   For,
   If,
   constant,
   createAfterUpdate,
-  derive,
+  deriveBindable,
   mapBindable,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Arr, Result, match } from 'ts-data-forge';
@@ -38,18 +38,20 @@ export const EventListPage = (): JSX.Element => {
   // After the update that opened the page.
   createAfterUpdate()(EventListStore.fetchEventList);
 
-  const sortedEventList$ = view(eventList$, (eventList) =>
-    // TODO: backend でソートするようにする
-    eventList?.toSorted(
-      (a, b) =>
-        (b.eventScheduleMetadata.createdAtMillis ??
-          Date.parse(b.eventScheduleMetadata.createdAt)) -
-        (a.eventScheduleMetadata.createdAtMillis ??
-          Date.parse(a.eventScheduleMetadata.createdAt)),
+  const sortedEventList$ = eventList$.pipe(
+    map((eventList) =>
+      // TODO: backend でソートするようにする
+      eventList?.toSorted(
+        (a, b) =>
+          (b.eventScheduleMetadata.createdAtMillis ??
+            Date.parse(b.eventScheduleMetadata.createdAt)) -
+          (a.eventScheduleMetadata.createdAtMillis ??
+            Date.parse(a.eventScheduleMetadata.createdAt)),
+      ),
     ),
   );
 
-  const formElementsAreDisabled = derive(
+  const formElementsAreDisabled = deriveBindable(
     [
       EventListStore.refreshButtonIsDisabled$,
       EventListStore.refreshButtonIsLoading$,
@@ -57,17 +59,17 @@ export const EventListPage = (): JSX.Element => {
     (disabled, loading) => disabled || loading,
   );
 
-  const archiveOrUnArchive$ = view(
-    EventListPageFilterStore.filterOptionState$,
-    (option) =>
+  const archiveOrUnArchive$ = EventListPageFilterStore.filterOptionState$.pipe(
+    map((option) =>
       match(option, {
         archive: 'unarchive',
         inProgress: 'archive',
       } as const),
+    ),
   );
 
   // Every card is drawn again when the list, the user or the filter changes.
-  const listDrawing$ = derive(
+  const listDrawing$ = deriveBindable(
     [sortedEventList$, Auth.fireAuthUser$, archiveOrUnArchive$],
     (eventList, fireAuthUser, archiveOrUnArchive) =>
       ({

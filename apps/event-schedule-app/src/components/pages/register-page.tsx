@@ -1,5 +1,6 @@
 import { Button, FormGroup, InputGroup } from 'blueprint-synstate';
-import { constant, mapBindable, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, mapBindable, type JSX } from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
 import { RegisterPageStore } from '../../store/index.mjs';
 import { LockButton } from '../molecules/index.mjs';
@@ -16,15 +17,17 @@ const dc = dict.register;
 const { state } = RegisterPageStore;
 
 export const RegisterPage = (): JSX.Element => {
-  const isWaitingResponse = view(state, (s) => s.formState.isWaitingResponse);
+  const isWaitingResponse = state.pipe(
+    map((s) => s.formState.isWaitingResponse),
+  );
 
-  const usernameIntent = view(state, (s) => s.usernameFormIntent);
+  const usernameIntent = state.pipe(map((s) => s.usernameFormIntent));
 
-  const emailIntent = view(state, (s) => s.emailFormIntent);
+  const emailIntent = state.pipe(map((s) => s.emailFormIntent));
 
-  const passwordIntent = view(state, (s) => s.passwordFormIntent);
+  const passwordIntent = state.pipe(map((s) => s.passwordFormIntent));
 
-  const passwordIsOpen = view(state, (s) => s.passwordIsOpen);
+  const passwordIsOpen = state.pipe(map((s) => s.passwordIsOpen));
 
   return (
     <div class={constant(styles.wrapper)} data-e2e={constant('register-page')}>
@@ -38,7 +41,7 @@ export const RegisterPage = (): JSX.Element => {
             <div>
               <FormGroup
                 class={styles.field}
-                helperText={view(state, (s) => s.formState.username.error)}
+                helperText={state.pipe(map((s) => s.formState.username.error))}
                 intent={usernameIntent}
                 label={constant(dc.username)}
               >
@@ -48,7 +51,9 @@ export const RegisterPage = (): JSX.Element => {
                   disabled={isWaitingResponse}
                   intent={usernameIntent}
                   type={'text'}
-                  value={view(state, (s) => s.formState.username.inputValue)}
+                  value={state.pipe(
+                    map((s) => s.formState.username.inputValue),
+                  )}
                   onInput={({ currentTarget }) => {
                     RegisterPageStore.inputUsernameHandler(currentTarget.value);
                   }}
@@ -57,7 +62,7 @@ export const RegisterPage = (): JSX.Element => {
 
               <FormGroup
                 class={styles.field}
-                helperText={view(state, (s) => s.formState.email.error)}
+                helperText={state.pipe(map((s) => s.formState.email.error))}
                 intent={emailIntent}
                 label={constant(dc.email)}
               >
@@ -68,7 +73,7 @@ export const RegisterPage = (): JSX.Element => {
                   intent={emailIntent}
                   placeholder={constant('sample@gmail.com')}
                   type={'email'}
-                  value={view(state, (s) => s.formState.email.inputValue)}
+                  value={state.pipe(map((s) => s.formState.email.inputValue))}
                   onInput={({ currentTarget }) => {
                     RegisterPageStore.inputEmailHandler(currentTarget.value);
                   }}
@@ -77,9 +82,8 @@ export const RegisterPage = (): JSX.Element => {
 
               <FormGroup
                 class={styles.field}
-                helperText={view(
-                  state,
-                  (s) => s.formState.password.password.error,
+                helperText={state.pipe(
+                  map((s) => s.formState.password.password.error),
                 )}
                 intent={passwordIntent}
                 label={constant(dc.password)}
@@ -90,9 +94,8 @@ export const RegisterPage = (): JSX.Element => {
                   disabled={isWaitingResponse}
                   intent={passwordIntent}
                   type={'password'}
-                  value={view(
-                    state,
-                    (s) => s.formState.password.password.inputValue,
+                  value={state.pipe(
+                    map((s) => s.formState.password.password.inputValue),
                   )}
                   onInput={({ currentTarget }) => {
                     RegisterPageStore.inputPasswordHandler(currentTarget.value);
@@ -102,9 +105,8 @@ export const RegisterPage = (): JSX.Element => {
 
               <FormGroup
                 class={styles.field}
-                helperText={view(
-                  state,
-                  (s) => s.formState.password.passwordConfirmation.error,
+                helperText={state.pipe(
+                  map((s) => s.formState.password.passwordConfirmation.error),
                 )}
                 intent={passwordIntent}
                 label={constant(dc.verifyPassword)}
@@ -123,9 +125,11 @@ export const RegisterPage = (): JSX.Element => {
                   type={mapBindable(passwordIsOpen, (open) =>
                     open ? 'text' : 'password',
                   )}
-                  value={view(
-                    state,
-                    (s) => s.formState.password.passwordConfirmation.inputValue,
+                  value={state.pipe(
+                    map(
+                      (s) =>
+                        s.formState.password.passwordConfirmation.inputValue,
+                    ),
                   )}
                   onInput={({ currentTarget }) => {
                     RegisterPageStore.inputPasswordConfirmationHandler(
@@ -139,7 +143,7 @@ export const RegisterPage = (): JSX.Element => {
             <div class={constant(styles.buttonWrapper)}>
               <Button
                 data-e2e={constant('register-button')}
-                disabled={view(state, (s) => s.enterButtonDisabled)}
+                disabled={state.pipe(map((s) => s.enterButtonDisabled))}
                 fill
                 intent={'primary'}
                 loading={isWaitingResponse}
@@ -149,7 +153,7 @@ export const RegisterPage = (): JSX.Element => {
             </div>
 
             <OtherErrorMessages
-              otherErrors={view(state, (s) => s.formState.otherErrors)}
+              otherErrors={state.pipe(map((s) => s.formState.otherErrors))}
             />
           </form>
 

@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
 import {
   LARGE_NODE_LINE_HEIGHT,
   type LaidOutNode,
@@ -32,44 +32,51 @@ export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
     // An SVG has no <button>: the group takes its role, focus and keys.
 
     <g
-      aria-label={view(record, (r) => r.view.ariaLabel)}
-      class={view(
+      aria-label={inlineMap(record, (r) => r.view.ariaLabel)}
+      class={inlineMap(
         record,
         (r) =>
           `dag-node dag-milestone ${r.view.reached ? 'reached' : 'pending'}${r.size === 'standard' ? '' : ` ${r.size}`}${r.dragging ? ' dragging' : ''}${r.selected ? ' selected' : ''}`,
       )}
       data-e2e={constant('dag-node')}
-      data-highlight={view(record, (r) => r.highlight)}
+      data-highlight={inlineMap(record, (r) => r.highlight)}
       data-node-id={constant(first.id)}
-      data-outside={view(record, (r) => r.outside.toString())}
-      data-selected={view(record, (r) => r.selected.toString())}
-      opacity={view(record, (r) => r.opacity)}
+      data-outside={inlineMap(record, (r) => r.outside.toString())}
+      data-selected={inlineMap(record, (r) => r.selected.toString())}
+      opacity={inlineMap(record, (r) => r.opacity)}
       role={constant('button')}
       tabindex={constant(0)}
-      transform={view(record, ({ node }) => `translate(${node.x} ${node.y})`)}
+      transform={inlineMap(
+        record,
+        ({ node }) => `translate(${node.x} ${node.y})`,
+      )}
       onClick={openNode}
       onKeyDown={onKeyDown}
     >
       <SvgTitle>
-        {view(record, ({ view: v, size }) =>
-          size === 'compact' && v.date !== undefined
-            ? `${v.title}\n${v.date}`
-            : v.title,
+        {record.pipe(
+          map(({ view: v, size }) =>
+            size === 'compact' && v.date !== undefined
+              ? `${v.title}\n${v.date}`
+              : v.title,
+          ),
         )}
       </SvgTitle>
       <polygon
         class={constant('dag-node-shape')}
-        points={view(record, (r) => hexagonOf(r.node))}
+        points={inlineMap(record, (r) => hexagonOf(r.node))}
       />
       <For
-        items={view(record, (r) => {
-          const lines = titleLines(r);
+        items={record.pipe(
+          map((r) => {
+            const lines = titleLines(r);
 
-          return lines.map(
-            (text, line) =>
-              ({ text, y: lineY(r, lines.length, line) }) as const,
-          );
-        })}
+            return lines.map(
+              (text, line) =>
+                ({ text, y: lineY(r, lines.length, line) }) as const,
+            );
+          }),
+        )}
         key={(_, line) => line}
       >
         {(line$) => (
@@ -77,28 +84,28 @@ export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
             class={constant('dag-node-title')}
             dominant-baseline={constant('central')}
             text-anchor={constant('middle')}
-            x={view(record, (r) => r.node.width / 2)}
-            y={view(line$, ({ y }) => y)}
+            x={inlineMap(record, (r) => r.node.width / 2)}
+            y={inlineMap(line$, ({ y }) => y)}
           >
-            {view(line$, ({ text }) => text)}
+            {inlineMap(line$, ({ text }) => text)}
           </text>
         )}
       </For>
       <If
-        cond={view(record, withDate)}
+        cond={record.pipe(map(withDate))}
         then={
           <text
             class={constant('dag-node-meta')}
             dominant-baseline={constant('central')}
             text-anchor={constant('middle')}
-            x={view(record, (r) => r.node.width / 2)}
-            y={view(record, (r) => {
+            x={inlineMap(record, (r) => r.node.width / 2)}
+            y={inlineMap(record, (r) => {
               const lines = titleLineCount(r);
 
               return lineY(r, lines, lines);
             })}
           >
-            {view(record, (r) => r.view.date ?? '')}
+            {inlineMap(record, (r) => r.view.date ?? '')}
           </text>
         }
       />

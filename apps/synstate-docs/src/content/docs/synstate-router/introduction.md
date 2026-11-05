@@ -30,7 +30,7 @@ npm install react react-dom synstate synstate-router synstate-router-react ts-da
 npm install synstate synstate-dom synstate-router synstate-router-dom ts-data-forge # synstate-dom
 ```
 
-The examples below leave out their imports. The route tree, the codecs and the router come from `synstate-router`, the components from the binding, `render`, `constant` and `view` from `synstate-dom`, `renderToStaticMarkup` from `react-dom/server`, operators such as `switchMap` from `synstate`, and `asSafeInt`, `Optional` and `Result` from `ts-data-forge`. `fetchProductName` stands in for the application's own request function.
+The examples below leave out their imports. The route tree, the codecs and the router come from `synstate-router`, the components from the binding, `render`, `constant` and `inlineMap` from `synstate-dom`, `renderToStaticMarkup` from `react-dom/server`, operators such as `switchMap` from `synstate`, and `asSafeInt`, `Optional` and `Result` from `ts-data-forge`. `fetchProductName` stands in for the application's own request function.
 
 ## Defining routes
 
@@ -200,7 +200,8 @@ Layouts nest: `<Routes prefix cases={...}>` branches on the top-level node the p
 `createRouterComponents(router)` returns `Routes` and `Link` for synstate-dom. A case is called once when its page is entered, with an Observable of `{ params, search, withSearch }`; new params and search of the same route flow through it, and only a new route mounts another case.
 
 ```tsx
-import { constant, render, view } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, inlineMap, render } from 'synstate-dom';
 import {
     createMemoryBrowser,
     createRouter,
@@ -248,10 +249,12 @@ const unmount = render(
                     // through the observable.
                     products: (list$) => (
                         <Link
-                            to={view(list$, (list) =>
-                                list.withSearch({
-                                    page: asSafeInt(list.search.page + 1),
-                                }),
+                            to={list$.pipe(
+                                map((list) =>
+                                    list.withSearch({
+                                        page: asSafeInt(list.search.page + 1),
+                                    }),
+                                ),
                             )}
                         >
                             {constant('Next page')}
@@ -259,7 +262,7 @@ const unmount = render(
                     ),
                     'products.item': (item$) => (
                         <h1>
-                            {view(
+                            {inlineMap(
                                 item$,
                                 (item) => `Product ${item.params.productId}`,
                             )}

@@ -1,5 +1,6 @@
 import { Card } from 'blueprint-synstate';
-import { constant, If, view, type Bindable, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, If, inlineMap, type Bindable, type JSX } from 'synstate-dom';
 import { planStore } from '../../store/index.mjs';
 import { AppHeader } from './app-header.js';
 import { UnsentWritesBar, WriteErrorBar } from './notice-bars.js';
@@ -19,19 +20,21 @@ export const MainScreen = ({ userName }: Props): JSX.Element => {
       <UnsentWritesBar />
       <WriteErrorBar />
       <If
-        cond={view(currentPlan, (p) => p !== undefined)}
+        cond={currentPlan.pipe(map((p) => p !== undefined))}
         then={<Workspace />}
         else={
           <Card
-            aria-busy={view(plans, (s) => (s.type === 'loading').toString())}
+            aria-busy={plans.pipe(
+              map((s) => (s.type === 'loading').toString()),
+            )}
           >
             <p
               data-e2e={constant('plans-status')}
-              role={view(plans, (s) =>
+              role={inlineMap(plans, (s) =>
                 s.type === 'error' ? 'alert' : 'status',
               )}
             >
-              {view(plans, (s) =>
+              {inlineMap(plans, (s) =>
                 s.type === 'loading'
                   ? '読み込み中…'
                   : s.type === 'error'

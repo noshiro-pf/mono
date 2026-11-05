@@ -1,5 +1,6 @@
 import { Card } from 'blueprint-synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { LivingCostItem } from '../../domain/index.mjs';
 import { input$, updateSection } from '../../store/index.mjs';
@@ -20,7 +21,7 @@ export const LivingCostTab = (): JSX.Element => (
       <EditableTable
         caption="日常生活費"
         e2e="living-costs"
-        items={view(input$, (i) => i.livingCosts)}
+        items={input$.pipe(map((i) => i.livingCosts))}
         columns={columns}
         update={(fn) => {
           updateSection('livingCosts', fn);
@@ -37,8 +38,8 @@ export const LivingCostTab = (): JSX.Element => (
         <OutputField
           label="合計（月額）"
           e2e="living-cost-total"
-          value={view(input$, (i) =>
-            formatYen(Arr.sum(i.livingCosts.map((c) => c.monthly))),
+          value={input$.pipe(
+            map((i) => formatYen(Arr.sum(i.livingCosts.map((c) => c.monthly)))),
           )}
         />
       </div>

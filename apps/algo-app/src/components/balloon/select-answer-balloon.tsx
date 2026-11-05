@@ -1,5 +1,5 @@
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { RectSize } from 'ts-utils-additional';
 import { dictionary, outlineColorDef } from '../../constants/index.mjs';
@@ -42,7 +42,7 @@ export const SelectAnswerBalloon = ({ props }: Props): JSX.Element => {
 
   return (
     <div
-      class={balloonClasses(view(props, (p) => p.arrowDirection))}
+      class={balloonClasses(props.pipe(map((p) => p.arrowDirection)))}
       style={{
         ...balloonSizeStyle(balloonSize),
         ...balloonPositionStyle(props, balloonSize),
@@ -95,9 +95,11 @@ export const SelectAnswerBalloon = ({ props }: Props): JSX.Element => {
             {constant(dictionary.cancel)}
           </Button>
           <Button
-            disabled={view(
-              props,
-              (p) => p.submitButtonIsDisabled || p.selectedNumber === undefined,
+            disabled={props.pipe(
+              map(
+                (p) =>
+                  p.submitButtonIsDisabled || p.selectedNumber === undefined,
+              ),
             )}
             onClick={() => {
               props.getSnapshot().value.submitAnswer();

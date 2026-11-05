@@ -1,5 +1,5 @@
 import { createState, getCurrentScope, map, type Scope } from 'synstate';
-import { constant, Fragment, render, view, type JSX } from 'synstate-dom';
+import { constant, Fragment, inlineMap, render, type JSX } from 'synstate-dom';
 
 const mountInto = (
   app: () => JSX.Element,
@@ -38,7 +38,7 @@ describe(render, () => {
         <p>
           {count$}
           {constant(' / ')}
-          {view(count$, (n) => n * 2)}
+          {inlineMap(count$, (n) => n * 2)}
         </p>
       );
     };

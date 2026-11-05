@@ -1,6 +1,6 @@
 import { Button, ButtonGroup } from 'blueprint-synstate';
 import { map } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import {
   columnIds,
   columnsAlive$,
@@ -24,7 +24,7 @@ export const DeadColumn = (): JSX.Element => (
         return (
           <Button
             active={closed$}
-            aria-pressed={view(closed$, String)}
+            aria-pressed={closed$.pipe(map(String))}
             class={styles.toggle}
             onClick={() => {
               toggleColumn(index);
@@ -42,7 +42,7 @@ export const DeadColumn = (): JSX.Element => (
       data-e2e={constant('hit-probability')}
     >
       {constant('確率： ')}
-      {view(hitSomeAliveColumnProbability$, String)}
+      {inlineMap(hitSomeAliveColumnProbability$, String)}
     </div>
   </div>
 );

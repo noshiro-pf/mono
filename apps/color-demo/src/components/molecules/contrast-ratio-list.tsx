@@ -1,5 +1,5 @@
 import type { InitializedObservable } from 'synstate';
-import { constant, For, view, type JSX } from 'synstate-dom';
+import { constant, For, inlineMap, type JSX } from 'synstate-dom';
 import * as styles from './contrast-ratio-list.module.css';
 
 type Props = Readonly<{
@@ -16,7 +16,10 @@ export const ContrastRatioList = ({
     <For items={contrastRatioList} key={({ index }) => index}>
       {(item$) => (
         <div data-e2e={constant('contrast-ratio')}>
-          {view(item$, ({ ratio }) => `${ratio.toFixed(2)}, ${noBreakSpace}`)}
+          {inlineMap(
+            item$,
+            ({ ratio }) => `${ratio.toFixed(2)}, ${noBreakSpace}`,
+          )}
         </div>
       )}
     </For>

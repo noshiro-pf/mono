@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 
 // Called once. Only the text node and the `disabled` attribute bound to
 // `count$` change afterwards.
@@ -12,11 +12,13 @@ export const Counter = (): JSX.Element => {
   return (
     <section>
       <h2>{constant('Counter')}</h2>
-      <p data-e2e={constant('count')}>{view(count$, (n) => `Count: ${n}`)}</p>
+      <p data-e2e={constant('count')}>
+        {inlineMap(count$, (n) => `Count: ${n}`)}
+      </p>
       <button
         type={constant('button')}
         data-e2e={constant('decrement')}
-        disabled={view(count$, (n) => n <= 0)}
+        disabled={inlineMap(count$, (n) => n <= 0)}
         onClick={() => {
           updateCount((n) => n - 1);
         }}

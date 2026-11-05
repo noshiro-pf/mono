@@ -1,8 +1,8 @@
 import {
   constant,
+  inlineMap,
   mapBindable,
   MatchOptional,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -30,14 +30,14 @@ export const SetAsideBadge = ({ entry }: Props): JSX.Element => (
     some={(shown$) => (
       <span
         class={constant('badge')}
-        data-status={view(shown$, ({ setAside }) =>
+        data-status={inlineMap(shown$, ({ setAside }) =>
           setAside.current ? 'critical' : 'neutral',
         )}
-        title={view(shown$, titleOf)}
+        title={inlineMap(shown$, titleOf)}
       >
         <BadgeIcon path={constant(SET_ASIDE_ICON)} />
 
-        {view(shown$, ({ setAside: { current, reason } }) =>
+        {inlineMap(shown$, ({ setAside: { current, reason } }) =>
           current
             ? `set aside: ${reason.replaceAll('-', ' ')}`
             : `was set aside: ${reason.replaceAll('-', ' ')}`,

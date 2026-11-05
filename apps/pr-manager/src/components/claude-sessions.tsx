@@ -1,5 +1,13 @@
 import type { ClaudeSession } from 'split-view-link';
-import { constant, For, If, view, type Bindable, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import {
+  constant,
+  For,
+  If,
+  inlineMap,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { ExternalLink } from './external-link.js';
 import { separator } from './linked-issues.js';
 
@@ -16,15 +24,15 @@ export const ClaudeSessions = ({ sessions }: Props): JSX.Element => (
     {constant('Claude Code ')}
     <For items={sessions} key={(session) => session.url}>
       {(session$, index$) => {
-        const url = view(session$, (session) => session.url);
+        const url = session$.pipe(map((session) => session.url));
 
         return (
           <>
-            {view(index$, separator)}
+            {inlineMap(index$, separator)}
             <ExternalLink href={url}>
               <If
-                cond={view(session$, (session) => session.title === '')}
-                else={<>{view(session$, (session) => session.title)}</>}
+                cond={session$.pipe(map((session) => session.title === ''))}
+                else={<>{inlineMap(session$, (session) => session.title)}</>}
                 then={<span class={constant('claude-session-url')}>{url}</span>}
               />
             </ExternalLink>

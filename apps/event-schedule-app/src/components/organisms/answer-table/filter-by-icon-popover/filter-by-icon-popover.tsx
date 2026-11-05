@@ -1,6 +1,6 @@
 import { Popover } from 'blueprint-synstate';
-import { createBooleanState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { createBooleanState, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { dict } from '../../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../../store/index.mjs';
 import { CustomIconButton } from '../../../molecules/index.mjs';
@@ -14,9 +14,8 @@ export const FilterByIconPopover = ({ answerIconId }: Props): JSX.Element => {
   const [isOpen$, { setTrue: handleOpen, setFalse: handleClose }] =
     createBooleanState(false);
 
-  const state = view(
-    AnswerFilterAndSortStore.filterState$,
-    (s) => s.iconState[answerIconId],
+  const state = AnswerFilterAndSortStore.filterState$.pipe(
+    map((s) => s.iconState[answerIconId]),
   );
 
   return (
@@ -31,9 +30,8 @@ export const FilterByIconPopover = ({ answerIconId }: Props): JSX.Element => {
             AnswerFilterAndSortStore.enableFilteringByIcon(answerIconId);
           }}
           state={state}
-          upperLimit={view(
-            AnswerFilterAndSortStore.filterState$,
-            (s) => s.iconState.upperLimit,
+          upperLimit={AnswerFilterAndSortStore.filterState$.pipe(
+            map((s) => s.iconState.upperLimit),
           )}
           onClose={handleClose}
           onMaxChange={(value) => {
@@ -49,9 +47,8 @@ export const FilterByIconPopover = ({ answerIconId }: Props): JSX.Element => {
       onClose={handleClose}
     >
       <CustomIconButton
-        active={view(
-          AnswerFilterAndSortStore.filterState$,
-          (s) => s.iconState[answerIconId].enabled,
+        active={AnswerFilterAndSortStore.filterState$.pipe(
+          map((s) => s.iconState[answerIconId].enabled),
         )}
         iconName={answerIconId}
         outlined

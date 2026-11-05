@@ -1,4 +1,4 @@
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import * as styles from './app.module.css';
 import {
   LuminanceVisualizer,
@@ -22,14 +22,14 @@ export const App = (): JSX.Element => (
       {/* Both stay mounted, so that each keeps what was set in it. */}
       <div
         style={{
-          display: view(tabIndex$, (i) => (i === 0 ? undefined : 'none')),
+          display: inlineMap(tabIndex$, (i) => (i === 0 ? undefined : 'none')),
         }}
       >
         <LuminanceVisualizer />
       </div>
       <div
         style={{
-          display: view(tabIndex$, (i) => (i === 1 ? undefined : 'none')),
+          display: inlineMap(tabIndex$, (i) => (i === 1 ? undefined : 'none')),
         }}
       >
         <TextColorContrastTable />

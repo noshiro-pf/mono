@@ -1,6 +1,6 @@
 import { Card } from 'blueprint-synstate';
-import { createState } from 'synstate';
-import { constant, view, type Bindable, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import {
   withAge,
@@ -36,7 +36,7 @@ export const InvestmentTab = ({
 
   const listOf = <K extends ListKey>(key: K): EditableListProps<K> =>
     ({
-      items: view(input$, (i) => i[account][key]),
+      items: input$.pipe(map((i) => i[account][key])),
       update: (fn) => {
         update((a) => ({ ...a, [key]: fn(a[key]) }));
       },
@@ -49,14 +49,14 @@ export const InvestmentTab = ({
         <div class={constant('form')}>
           <NumberField
             label="評価額（円）"
-            value={view(input$, (i) => i[account].initialValue)}
+            value={input$.pipe(map((i) => i[account].initialValue))}
             onChange={(initialValue) => {
               update((a) => ({ ...a, initialValue }));
             }}
           />
           <NumberField
             label="元金（円）"
-            value={view(input$, (i) => i[account].initialPrincipal)}
+            value={input$.pipe(map((i) => i[account].initialPrincipal))}
             onChange={(initialPrincipal) => {
               update((a) => ({ ...a, initialPrincipal }));
             }}
@@ -64,7 +64,7 @@ export const InvestmentTab = ({
           {isNisa ? (
             <NumberField
               label="生涯投資枠の利用額（円）"
-              value={view(input$, (i) => i[account].initialUsedQuota)}
+              value={input$.pipe(map((i) => i[account].initialUsedQuota))}
               onChange={(initialUsedQuota) => {
                 update((a) => ({ ...a, initialUsedQuota }));
               }}
@@ -125,7 +125,7 @@ export const InvestmentTab = ({
         </div>
         <ResultTable
           caption="評価額の推移（円）"
-          rows={view(result$, (r) => withAge(r[account], r.birth))}
+          rows={result$.pipe(map((r) => withAge(r[account], r.birth)))}
           columns={isNisa ? nisaColumns : taxableColumns}
           monthOf={(r) => r.month}
           ageOf={(r) => r.age}

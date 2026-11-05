@@ -1,9 +1,10 @@
+import { map } from 'synstate';
 import {
   constant,
   For,
   If,
+  inlineMap,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -16,10 +17,10 @@ export const AnswerPageNotes = ({ notes }: Props): JSX.Element => (
   <For items={mapBindable(notes, splitStringByWhitespace)} key={(_, i) => i}>
     {(word$) => (
       <If
-        cond={view(word$, isHttpUrl)}
+        cond={word$.pipe(map(isHttpUrl))}
         then={
           <a
-            href={view(word$, linkHref)}
+            href={inlineMap(word$, linkHref)}
             rel={constant('noopener noreferrer')}
             target={constant('_blank')}
           >

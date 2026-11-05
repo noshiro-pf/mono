@@ -1,9 +1,9 @@
+import { map } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   If,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -62,7 +62,7 @@ export const IssuesSummary = (): JSX.Element => {
           value={mapBindable(counts$, ({ open }) => open.shown)}
         />
         <If
-          cond={derive(
+          cond={deriveBindable(
             [counts$, view$],
             ({ inProgress }, { hideInProgress, onlyInProgress }) =>
               inProgress.total > 0 || hideInProgress || onlyInProgress,
@@ -70,9 +70,9 @@ export const IssuesSummary = (): JSX.Element => {
           then={
             <StatToggle
               label={'in progress'}
-              only={view(view$, ({ onlyInProgress }) => onlyInProgress)}
+              only={view$.pipe(map(({ onlyInProgress }) => onlyInProgress))}
               pickWith={'both'}
-              pressed={view(view$, ({ hideInProgress }) => !hideInProgress)}
+              pressed={view$.pipe(map(({ hideInProgress }) => !hideInProgress))}
               subject={
                 'the issues in progress: those that can start, and that an open pull request closes or that are labelled in-progress'
               }
@@ -92,7 +92,7 @@ export const IssuesSummary = (): JSX.Element => {
 
 /** The counts of the view shown, the list's or the DAG's. */
 const shownCounts = (): Bindable<IssueFilterCounts> =>
-  derive(
+  deriveBindable(
     [issuesViewStore.view, issuesListStore.counts, issuesViewStore.counts],
     (shown, list, dag) => (shown === 'dag' ? dag : list),
   );

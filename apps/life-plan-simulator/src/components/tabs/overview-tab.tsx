@@ -1,5 +1,6 @@
 import { Card } from 'blueprint-synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import {
   ageAt,
@@ -15,7 +16,7 @@ import { NumberField, OutputField, TextField } from '../fields/index.mjs';
 
 /** `収支グラフ` シート: 前提の入力、判定、グラフ。 */
 export const OverviewTab = (): JSX.Element => {
-  const chartData = view(result$, toChartData);
+  const chartData = result$.pipe(map(toChartData));
 
   return (
     <div class={constant('tab-body')}>
@@ -23,8 +24,10 @@ export const OverviewTab = (): JSX.Element => {
         <h2 class={constant('bp6-heading')}>{constant('判定')}</h2>
         <ul class={constant('checks')} data-e2e={constant('checks')}>
           {checkItems.map(({ label, pick }) => (
-            <li class={{ ng: view(result$, (r) => pick(r) !== undefined) }}>
-              {view(result$, (r) => {
+            <li
+              class={{ ng: inlineMap(result$, (r) => pick(r) !== undefined) }}
+            >
+              {inlineMap(result$, (r) => {
                 const failed = pick(r);
 
                 return failed === undefined
@@ -51,7 +54,7 @@ export const OverviewTab = (): JSX.Element => {
           <TextField
             label="生年月"
             type="month"
-            value={view(input$, (i) => i.profile.birth)}
+            value={input$.pipe(map((i) => i.profile.birth))}
             onChange={(birth) => {
               updateSection('profile', (p) => ({ ...p, birth }));
             }}
@@ -59,14 +62,14 @@ export const OverviewTab = (): JSX.Element => {
           <TextField
             label="シミュレーション開始年月"
             type="month"
-            value={view(input$, (i) => i.profile.start)}
+            value={input$.pipe(map((i) => i.profile.start))}
             onChange={(start) => {
               updateSection('profile', (p) => ({ ...p, start }));
             }}
           />
           <NumberField
             label="何歳まで計算するか"
-            value={view(input$, (i) => i.profile.endAge)}
+            value={input$.pipe(map((i) => i.profile.endAge))}
             onChange={(endAge) => {
               updateSection('profile', (p) => ({ ...p, endAge }));
             }}
@@ -81,7 +84,7 @@ export const OverviewTab = (): JSX.Element => {
               label={f.label}
               unit={f.unit}
               e2e={f.e2e}
-              value={view(input$, (i) => i.assumptions[f.key])}
+              value={input$.pipe(map((i) => i.assumptions[f.key]))}
               onChange={(value) => {
                 updateSection('assumptions', (a) => ({ ...a, [f.key]: value }));
               }}
@@ -90,7 +93,9 @@ export const OverviewTab = (): JSX.Element => {
           <TextField
             label="現預金の下限の判定を始める年月"
             type="month"
-            value={view(input$, (i) => i.assumptions.cashThresholdCheckFrom)}
+            value={input$.pipe(
+              map((i) => i.assumptions.cashThresholdCheckFrom),
+            )}
             onChange={(cashThresholdCheckFrom) => {
               updateSection('assumptions', (a) => ({
                 ...a,
@@ -100,8 +105,10 @@ export const OverviewTab = (): JSX.Element => {
           />
           <OutputField
             label="日常生活費（月、開始時点）"
-            value={view(input$, (i) =>
-              formatYen(Arr.sum(i.livingCosts.map((c) => c.monthly))),
+            value={input$.pipe(
+              map((i) =>
+                formatYen(Arr.sum(i.livingCosts.map((c) => c.monthly))),
+              ),
             )}
           />
         </div>

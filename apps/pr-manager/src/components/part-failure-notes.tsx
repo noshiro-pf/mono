@@ -1,4 +1,5 @@
-import { constant, For, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, For, type JSX } from 'synstate-dom';
 import type { ReadPart } from '../load-report.mjs';
 import { failureNotes } from '../part-failures.mjs';
 import { reader } from '../store/index.mjs';
@@ -16,7 +17,7 @@ type Props = Readonly<{
  */
 export const PartFailureNotes = ({ parts }: Props): JSX.Element => (
   <For
-    items={view(reader.failed, (failed) => failureNotes(failed, parts))}
+    items={reader.failed.pipe(map((failed) => failureNotes(failed, parts)))}
     key={(note) => note}
   >
     {(note$) => (

@@ -1,7 +1,14 @@
 /** @jsxImportSource synstate-dom */
 // embed-sample-code-ignore-above
 import { createState, map } from 'synstate';
-import { constant, For, If, isImeKeyDown, view, type JSX } from 'synstate-dom';
+import {
+  constant,
+  For,
+  If,
+  inlineMap,
+  isImeKeyDown,
+  type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -42,7 +49,7 @@ export const TodoDemo = (): JSX.Element => (
       </button>
     </div>
     <If
-      cond={view(todos$, Arr.isNonEmpty)}
+      cond={todos$.pipe(map(Arr.isNonEmpty))}
       then={
         <ul class={constant('list')}>
           <For items={todos$} key={(todo) => todo.id}>
@@ -50,16 +57,16 @@ export const TodoDemo = (): JSX.Element => (
               mut_rowsCreated.count += 1;
 
               return (
-                <li class={{ done: view(todo$, (t) => t.done) }}>
+                <li class={{ done: inlineMap(todo$, (t) => t.done) }}>
                   <label>
                     <input
                       type={constant('checkbox')}
-                      checked={view(todo$, (t) => t.done)}
+                      checked={inlineMap(todo$, (t) => t.done)}
                       onChange={() => {
                         toggle(todo$.getSnapshot().value.id);
                       }}
                     />
-                    {view(todo$, (t) => ` ${t.title}`)}
+                    {inlineMap(todo$, (t) => ` ${t.title}`)}
                   </label>
                   <span class={constant('note')}>
                     {constant(`row #${mut_rowsCreated.count}`)}
@@ -81,7 +88,7 @@ export const TodoDemo = (): JSX.Element => (
       else={<p>{constant('Nothing to do.')}</p>}
     />
     <p class={constant('status')}>
-      {view(remaining$, (n) => `${n} remaining`)}
+      {remaining$.pipe(map((n) => `${n} remaining`))}
     </p>
   </div>
 );

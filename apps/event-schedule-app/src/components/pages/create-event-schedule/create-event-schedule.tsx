@@ -1,9 +1,9 @@
 import { Button } from 'blueprint-synstate';
+import { map } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  derive,
-  view,
+  deriveBindable,
   type JSX,
 } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
@@ -33,7 +33,7 @@ export const CreateEventSchedule = (): JSX.Element => {
       />
       <ButtonsWrapperForEventSettingsPage>
         <ResetButton
-          disabled={derive(
+          disabled={deriveBindable(
             [isLoading$, hasNoChanges$],
             (loading, noChanges) => loading || noChanges,
           )}
@@ -41,7 +41,7 @@ export const CreateEventSchedule = (): JSX.Element => {
         />
         <Button
           data-e2e={constant('create-button')}
-          disabled={view(commonState$, (s) => !s.eventScheduleValidationOk)}
+          disabled={commonState$.pipe(map((s) => !s.eventScheduleValidationOk))}
           intent={'primary'}
           loading={isLoading$}
           text={constant(dc.createEventButton)}

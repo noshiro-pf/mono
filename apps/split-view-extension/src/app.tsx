@@ -5,7 +5,6 @@ import {
   If,
   listenInScope,
   subscribeInScope,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Arr, fastDeepEqual, Num, unknownToString } from 'ts-data-forge';
@@ -1219,7 +1218,7 @@ export const App = (): JSX.Element => {
         </For>
 
         <If
-          cond={view(dropTarget$, (target) => target !== undefined)}
+          cond={dropTarget$.pipe(map((target) => target !== undefined))}
           then={<PaneDropIndicator target$={dropTarget$} />}
         />
       </div>

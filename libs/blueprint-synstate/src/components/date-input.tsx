@@ -2,9 +2,9 @@ import { createState, derive, map, onScopeDispose } from 'synstate';
 import {
   constant,
   If,
+  inlineMap,
   isImeKeyDown,
   toObservable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -327,7 +327,7 @@ export const DateInput = ({
             mut_elements.input = input;
           }}
           aria-controls={constant(popoverId)}
-          aria-expanded={view(open$, String)}
+          aria-expanded={inlineMap(open$, String)}
           aria-haspopup={constant('menu')}
           autocomplete={constant('off')}
           class={constant('bp6-input')}

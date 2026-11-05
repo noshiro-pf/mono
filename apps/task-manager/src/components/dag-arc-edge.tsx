@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import type { DagArcRecord } from './dag-canvas-scene.mjs';
 import { DagEdgeLabel } from './dag-edge-label.js';
 import { SvgTitle } from './svg-title.js';
@@ -15,7 +15,7 @@ type Props = Readonly<{
  * both its `aria-label` and its `<title>`, the tooltip.
  */
 export const DagArcEdge = ({ record }: Props): JSX.Element => {
-  const name = view(record, ({ arc }) => arc.ariaLabel);
+  const name = record.pipe(map(({ arc }) => arc.ariaLabel));
 
   return (
     // An SVG has no <img>: the group is one, named by its label.
@@ -24,16 +24,16 @@ export const DagArcEdge = ({ record }: Props): JSX.Element => {
       aria-label={name}
       class={constant('dag-edge dag-arc')}
       data-e2e={constant('dag-arc')}
-      data-from={view(record, ({ arc }) => arc.from)}
-      data-highlight={view(record, ({ highlight }) => highlight)}
-      data-to={view(record, ({ arc }) => arc.to)}
+      data-from={inlineMap(record, ({ arc }) => arc.from)}
+      data-highlight={inlineMap(record, ({ highlight }) => highlight)}
+      data-to={inlineMap(record, ({ arc }) => arc.to)}
       role={constant('img')}
     >
       <SvgTitle>{name}</SvgTitle>
       <path
         class={constant('dag-edge-line')}
-        d={view(record, ({ arc }) => arc.path)}
-        marker-end={view(record, ({ highlight }) =>
+        d={inlineMap(record, ({ arc }) => arc.path)}
+        marker-end={inlineMap(record, ({ highlight }) =>
           highlight === 'on' ? 'url(#dag-arrow-highlight)' : 'url(#dag-arrow)',
         )}
       />

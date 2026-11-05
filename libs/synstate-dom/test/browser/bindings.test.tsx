@@ -1,5 +1,5 @@
 import { createState, just } from 'synstate';
-import { constant, render, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, render, type JSX } from 'synstate-dom';
 
 const mountInto = (
   app: () => JSX.Element,
@@ -191,11 +191,11 @@ describe('attributes', () => {
     );
   });
 
-  test('accepts a view', () => {
+  test('accepts an inline map', () => {
     const [count$, setCount] = createState(0);
 
     const { container } = mountInto(() => (
-      <button disabled={view(count$, (n) => n === 0)} />
+      <button disabled={inlineMap(count$, (n) => n === 0)} />
     ));
 
     const button = container.querySelector('button');
@@ -437,7 +437,7 @@ describe('controlled checked', () => {
       <>
         {(['a', 'b'] as const).map((choice) => (
           <input
-            checked={view(choice$, (c) => c === choice)}
+            checked={inlineMap(choice$, (c) => c === choice)}
             name={constant('controlled-taken')}
             type={constant('radio')}
             onChange={() => {
@@ -666,5 +666,53 @@ describe('removing attributes', () => {
     setValue('a');
 
     assert.strictEqual(select?.value, 'a');
+  });
+});
+
+describe(inlineMap, () => {
+  test('writes a result again only when it is not Object.is the last one written', () => {
+    const [count$, setCount] = createState(0);
+
+    const { container } = mountInto(() => (
+      <p title={inlineMap(count$, (n) => (n % 2 === 0 ? 'even' : 'odd'))}>
+        {inlineMap(count$, (n) => (n < 10 ? 'small' : 'large'))}
+      </p>
+    ));
+
+    const p = container.querySelector('p');
+
+    assert.isNotNull(p);
+
+    const observer = new MutationObserver(() => {});
+
+    observer.observe(p, {
+      attributes: true,
+      characterData: true,
+      subtree: true,
+    });
+
+    setCount(2);
+
+    assert.deepStrictEqual(observer.takeRecords(), []);
+
+    setCount(3);
+
+    assert.deepStrictEqual(
+      observer.takeRecords().map((r) => r.type),
+      ['attributes'],
+    );
+
+    setCount(13);
+
+    assert.deepStrictEqual(
+      observer.takeRecords().map((r) => r.type),
+      ['characterData'],
+    );
+
+    observer.disconnect();
+
+    assert.strictEqual(p.getAttribute('title'), 'odd');
+
+    assert.strictEqual(p.textContent, 'large');
   });
 });

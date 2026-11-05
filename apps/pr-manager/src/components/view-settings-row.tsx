@@ -2,8 +2,8 @@ import { combine, map, type InitializedObservable } from 'synstate';
 import {
   constant,
   If,
+  inlineMap,
   mapBindable,
-  view,
   type Bindable,
   type Child,
   type JSX,
@@ -63,23 +63,23 @@ export const ViewSettingsRow = ({
   // before a move.
   const current = (): Row => row$.getSnapshot().value;
 
-  const leftName = view(row$, ({ columns }) =>
-    column === 2 && columns === 3 ? 'middle' : 'left',
+  const leftName = row$.pipe(
+    map(({ columns }) => (column === 2 && columns === 3 ? 'middle' : 'left')),
   );
 
-  const rightName = view(row$, ({ columns }) =>
-    column === 0 && columns === 3 ? 'middle' : 'right',
+  const rightName = row$.pipe(
+    map(({ columns }) => (column === 0 && columns === 3 ? 'middle' : 'right')),
   );
 
   return (
     <li
       class={constant('view-settings-block')}
-      data-hidden={view(row$, ({ hidden }) => hidden.toString())}
+      data-hidden={inlineMap(row$, ({ hidden }) => hidden.toString())}
     >
       <span class={constant('view-settings-name')}>{constant(blockName)}</span>
 
       <If
-        cond={view(row$, ({ index }) => index > 0)}
+        cond={row$.pipe(map(({ index }) => index > 0))}
         then={
           <MoveButton
             label={constant(`Move ${blockName} up`)}
@@ -94,7 +94,7 @@ export const ViewSettingsRow = ({
       />
 
       <If
-        cond={view(row$, ({ index, count }) => index < count - 1)}
+        cond={row$.pipe(map(({ index, count }) => index < count - 1))}
         then={
           <MoveButton
             label={constant(`Move ${blockName} down`)}
@@ -127,7 +127,7 @@ export const ViewSettingsRow = ({
       />
 
       <If
-        cond={view(row$, ({ columns }) => column < columns - 1)}
+        cond={row$.pipe(map(({ columns }) => column < columns - 1))}
         then={
           <MoveButton
             label={mapBindable(
@@ -145,7 +145,7 @@ export const ViewSettingsRow = ({
       />
 
       <If
-        cond={view(row$, ({ absent }) => absent)}
+        cond={row$.pipe(map(({ absent }) => absent))}
         then={
           <span
             class={constant('view-settings-height')}
@@ -159,7 +159,7 @@ export const ViewSettingsRow = ({
         else={
           <>
             <If
-              cond={view(row$, ({ hidden }) => hidden)}
+              cond={row$.pipe(map(({ hidden }) => hidden))}
               then={
                 <span class={constant('view-settings-height')}>
                   {constant('hidden')}
@@ -167,7 +167,7 @@ export const ViewSettingsRow = ({
               }
               else={
                 <If
-                  cond={view(row$, ({ mode }) => mode === 'fill')}
+                  cond={row$.pipe(map(({ mode }) => mode === 'fill'))}
                   then={
                     <ShareControls blockName={blockName} id={id} row$={row$} />
                   }
@@ -179,7 +179,7 @@ export const ViewSettingsRow = ({
             />
 
             <button
-              aria-label={view(
+              aria-label={inlineMap(
                 row$,
                 ({ hidden }) => `${hidden ? 'Show' : 'Hide'} ${blockName}`,
               )}
@@ -189,7 +189,7 @@ export const ViewSettingsRow = ({
                 layoutStore.setHidden(id, !current().hidden);
               }}
             >
-              {view(row$, ({ hidden }) => (hidden ? 'Show' : 'Hide'))}
+              {inlineMap(row$, ({ hidden }) => (hidden ? 'Show' : 'Hide'))}
             </button>
           </>
         }
@@ -260,7 +260,7 @@ const ShareControls = ({ id, blockName, row$ }: ControlsProps): JSX.Element => {
         class={constant('view-settings-height')}
         title={constant('Its part of the column')}
       >
-        {view(row$, ({ percent }) => `${percent}%`)}
+        {inlineMap(row$, ({ percent }) => `${percent}%`)}
       </span>
 
       <MoveButton
@@ -284,7 +284,7 @@ const ShareControls = ({ id, blockName, row$ }: ControlsProps): JSX.Element => {
       </MoveButton>
 
       <If
-        cond={view(row$, ({ share }) => share !== undefined)}
+        cond={row$.pipe(map(({ share }) => share !== undefined))}
         then={
           <button
             aria-label={constant(
@@ -321,7 +321,7 @@ const HeightControls = ({
 
   return (
     <If
-      cond={view(row$, ({ height }) => height === undefined)}
+      cond={row$.pipe(map(({ height }) => height === undefined))}
       then={
         <>
           <span class={constant('view-settings-height')}>
@@ -343,7 +343,7 @@ const HeightControls = ({
       else={
         <>
           <span class={constant('view-settings-height')}>
-            {view(row$, ({ height }) => `${height ?? 0}px`)}
+            {inlineMap(row$, ({ height }) => `${height ?? 0}px`)}
           </span>
 
           <MoveButton

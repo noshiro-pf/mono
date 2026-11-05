@@ -1,11 +1,11 @@
-import type { InitializedObservable } from 'synstate';
+import { map, type InitializedObservable } from 'synstate';
 import {
   constant,
   For,
   If,
+  inlineMap,
   mapBindable,
   MatchOptional,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -32,7 +32,7 @@ import { Timestamp } from './timestamp.js';
 export const WorkflowRunsSection = (): JSX.Element => (
   <section class={constant('section')}>
     <h2 class={constant('section-title')}>
-      {view(reader.runs, (runs) =>
+      {inlineMap(reader.runs, (runs) =>
         runs.type === 'ready' ? titleOf(runs.list) : 'Running workflows',
       )}
       {constant(' ')}
@@ -42,14 +42,16 @@ export const WorkflowRunsSection = (): JSX.Element => (
     </h2>
 
     <MatchOptional
-      value={view(reader.runs, readyOf)}
+      value={reader.runs.pipe(map(readyOf))}
       some={(ready$) => <RunList ready$={ready$} />}
       none={
         <MatchOptional
-          value={view(reader.runs, (runs) =>
-            runs.type === 'failed'
-              ? Optional.some(runs.message)
-              : Optional.none,
+          value={reader.runs.pipe(
+            map((runs) =>
+              runs.type === 'failed'
+                ? Optional.some(runs.message)
+                : Optional.none,
+            ),
           )}
           some={(message$) => (
             <p
@@ -118,10 +120,10 @@ const RunList = ({
 }: Readonly<{ ready$: InitializedObservable<Ready> }>): JSX.Element => (
   <>
     <MatchOptional
-      value={view(ready$, ({ error }) => Optional.fromNullable(error))}
+      value={ready$.pipe(map(({ error }) => Optional.fromNullable(error)))}
       some={(error$) => (
         <p class={constant('section-note')} data-status={constant('critical')}>
-          {view(
+          {inlineMap(
             error$,
             (error) =>
               `The last read failed, so this is the one before it: ${error}`,
@@ -131,7 +133,7 @@ const RunList = ({
     />
 
     <If
-      cond={view(ready$, ({ list }) => Arr.isEmpty(list.runs))}
+      cond={ready$.pipe(map(({ list }) => Arr.isEmpty(list.runs)))}
       then={
         <p class={constant('section-note')}>
           {constant('No workflow is running.')}
@@ -140,32 +142,35 @@ const RunList = ({
       else={
         <ul class={constant('run-list')}>
           <For
-            items={view(ready$, ({ list }) => list.runs)}
+            items={ready$.pipe(map(({ list }) => list.runs))}
             key={(run) => run.id}
           >
             {(run$) => (
               <li class={constant('run-item')}>
                 <div class={constant('pull-request-heading')}>
-                  <RunStateMark state={view(run$, (run) => run.state)} />
+                  <RunStateMark state={run$.pipe(map((run) => run.state))} />
 
                   <ExternalLink
-                    href={view(run$, (run) => run.url)}
+                    href={run$.pipe(map((run) => run.url))}
                     variant={'pull-request-title'}
                   >
-                    {view(run$, (run) => run.title)}
+                    {inlineMap(run$, (run) => run.title)}
                   </ExternalLink>
                 </div>
 
                 <div class={constant('pull-request-row')}>
                   <span>
-                    {view(run$, (run) => `${run.workflow} #${run.runNumber}`)}
+                    {inlineMap(
+                      run$,
+                      (run) => `${run.workflow} #${run.runNumber}`,
+                    )}
                   </span>
 
-                  <span>{view(run$, (run) => run.event)}</span>
+                  <span>{inlineMap(run$, (run) => run.event)}</span>
 
                   <MatchOptional
-                    value={view(run$, (run) =>
-                      Optional.fromNullable(run.branch),
+                    value={run$.pipe(
+                      map((run) => Optional.fromNullable(run.branch)),
                     )}
                     some={(branch$) => (
                       <span class={constant('branch')}>
@@ -178,11 +183,11 @@ const RunList = ({
                   />
 
                   <Timestamp
-                    iso={view(run$, (run) => run.createdAt)}
+                    iso={run$.pipe(map((run) => run.createdAt))}
                     label={'started'}
                   />
 
-                  <span>{view(run$, (run) => `by ${run.actor}`)}</span>
+                  <span>{inlineMap(run$, (run) => `by ${run.actor}`)}</span>
                 </div>
               </li>
             )}

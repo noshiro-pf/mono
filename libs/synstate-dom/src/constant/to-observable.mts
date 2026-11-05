@@ -1,20 +1,15 @@
-import { isObservable, just, map, type InitializedObservable } from 'synstate';
-import { isView } from '../internal/index.mjs';
+import { isObservable, just, type InitializedObservable } from 'synstate';
 import type { Bindable } from './bindable.mjs';
 
 /**
  * Turns a {@link Bindable} into an observable: a constant becomes `just(value)`,
- * a view becomes `source.pipe(map(fn))`, and an observable is returned as is.
+ * and an observable is returned as is.
  *
  * Only for where an observable is really needed, such as the projection of a
  * `switchMap`: a constant made into an observable joins the graph, which
- * {@link mapBindable} and {@link derive} avoid.
+ * {@link mapBindable} and {@link deriveBindable} avoid.
  */
 export const toObservable = <T,>(
   bindable: Bindable<T>,
 ): InitializedObservable<T> =>
-  isView(bindable)
-    ? bindable.open((source, fn) => source.pipe(map(fn)))
-    : isObservable(bindable)
-      ? bindable
-      : just(bindable);
+  isObservable(bindable) ? bindable : just(bindable);

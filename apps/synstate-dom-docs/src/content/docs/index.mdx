@@ -34,10 +34,10 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
         `jsxImportSource`. There is no Babel or Vite plugin to configure.
     </Card>
     <Card title="Reactivity in the types" icon="approve-check">
-        Wherever JSX takes data, you pass an observable, a `constant(...)` or a
-        `view(...)`, never a plain value. So if you read a snapshot by mistake,
-        you get a type error instead of a view that silently stops updating. And
-        a prop holds the bindable itself, not a value read from it, so you can
+        Wherever JSX takes data, you pass an observable or a `constant(...)`,
+        never a plain value. So if you read a snapshot by mistake, you get a
+        type error instead of a view that silently stops updating. And a prop
+        holds the bindable itself, not a value read from it, so you can
         destructure props or give them defaults without breaking anything.
     </Card>
     <Card title="No leaks by construction" icon="random">

@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
 import {
   LARGE_NODE_LINE_HEIGHT,
   textWidthUnits,
@@ -34,49 +34,54 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
     () => record.getSnapshot().value.movable,
   );
 
-  const compact = view(record, (r) => r.size === 'compact');
+  const compact = record.pipe(map((r) => r.size === 'compact'));
 
-  const large = view(record, (r) => r.size === 'large');
+  const large = record.pipe(map((r) => r.size === 'large'));
 
   return (
     // An SVG has no <button>: the group takes its role, focus and keys.
 
     <g
-      aria-label={view(record, (r) => r.view.ariaLabel)}
-      class={view(
+      aria-label={inlineMap(record, (r) => r.view.ariaLabel)}
+      class={inlineMap(
         record,
         (r) =>
           `dag-node dag-task status-${r.view.status}${r.size === 'standard' ? '' : ` ${r.size}`}${r.dragging ? ' dragging' : ''}${r.selected ? ' selected' : ''}`,
       )}
       data-e2e={constant('dag-node')}
-      data-highlight={view(record, (r) => r.highlight)}
+      data-highlight={inlineMap(record, (r) => r.highlight)}
       data-node-id={constant(first.id)}
-      data-outside={view(record, (r) => r.outside.toString())}
-      data-priority={view(record, (r) => r.view.priority.toString())}
-      data-selected={view(record, (r) => r.selected.toString())}
-      opacity={view(record, (r) => r.opacity)}
+      data-outside={inlineMap(record, (r) => r.outside.toString())}
+      data-priority={inlineMap(record, (r) => r.view.priority.toString())}
+      data-selected={inlineMap(record, (r) => r.selected.toString())}
+      opacity={inlineMap(record, (r) => r.opacity)}
       role={constant('button')}
       tabindex={constant(0)}
-      transform={view(record, ({ node }) => `translate(${node.x} ${node.y})`)}
+      transform={inlineMap(
+        record,
+        ({ node }) => `translate(${node.x} ${node.y})`,
+      )}
       onClick={openNode}
       onKeyDown={onKeyDown}
     >
       <SvgTitle>
-        {view(record, ({ view: v, size }) =>
-          size === 'compact'
-            ? m.dag.compactTitle(v.title, v.due, priorityLabels[v.priority])
-            : v.title,
+        {record.pipe(
+          map(({ view: v, size }) =>
+            size === 'compact'
+              ? m.dag.compactTitle(v.title, v.due, priorityLabels[v.priority])
+              : v.title,
+          ),
         )}
       </SvgTitle>
       <g class={constant('dag-node-body')}>
         <If
-          cond={view(record, (r) => r.view.priority === 1)}
+          cond={record.pipe(map((r) => r.view.priority === 1))}
           then={
             <rect
               class={constant('dag-node-ring')}
-              height={view(record, (r) => r.node.height + 2 * RING_GAP)}
-              rx={view(record, (r) => cornerOf(r) + RING_GAP)}
-              width={view(record, (r) => r.node.width + 2 * RING_GAP)}
+              height={inlineMap(record, (r) => r.node.height + 2 * RING_GAP)}
+              rx={inlineMap(record, (r) => cornerOf(r) + RING_GAP)}
+              width={inlineMap(record, (r) => r.node.width + 2 * RING_GAP)}
               x={constant(-RING_GAP)}
               y={constant(-RING_GAP)}
             />
@@ -84,9 +89,9 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
         />
         <rect
           class={constant('dag-node-shape')}
-          height={view(record, (r) => r.node.height)}
-          rx={view(record, cornerOf)}
-          width={view(record, (r) => r.node.width)}
+          height={inlineMap(record, (r) => r.node.height)}
+          rx={inlineMap(record, cornerOf)}
+          width={inlineMap(record, (r) => r.node.width)}
         />
         <If
           cond={compact}
@@ -95,9 +100,9 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
               class={constant('dag-node-title')}
               dominant-baseline={constant('central')}
               x={constant(10)}
-              y={view(record, (r) => r.node.height / 2)}
+              y={inlineMap(record, (r) => r.node.height / 2)}
             >
-              {view(record, (r) => r.view.compactTitle)}
+              {inlineMap(record, (r) => r.view.compactTitle)}
             </text>
           }
           else={
@@ -106,11 +111,13 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
                 cond={large}
                 then={
                   <For
-                    items={view(record, (r) =>
-                      r.view.largeTitle.map((text, line) => ({
-                        text,
-                        y: largeLineY(r, line),
-                      })),
+                    items={record.pipe(
+                      map((r) =>
+                        r.view.largeTitle.map((text, line) => ({
+                          text,
+                          y: largeLineY(r, line),
+                        })),
+                      ),
                     )}
                     key={(_, line) => line}
                   >
@@ -119,9 +126,9 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
                         class={constant('dag-node-title')}
                         dominant-baseline={constant('central')}
                         x={constant(12)}
-                        y={view(line$, ({ y }) => y)}
+                        y={inlineMap(line$, ({ y }) => y)}
                       >
-                        {view(line$, ({ text }) => text)}
+                        {inlineMap(line$, ({ text }) => text)}
                       </text>
                     )}
                   </For>
@@ -132,36 +139,36 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
                     x={constant(12)}
                     y={constant(22)}
                   >
-                    {view(record, (r) => r.view.shortTitle)}
+                    {inlineMap(record, (r) => r.view.shortTitle)}
                   </text>
                 }
               />
               <text
-                class={view(record, (r) =>
+                class={inlineMap(record, (r) =>
                   r.view.overdue ? 'dag-node-meta overdue' : 'dag-node-meta',
                 )}
                 x={constant(12)}
-                y={view(record, metaY)}
+                y={inlineMap(record, metaY)}
               >
-                {view(record, (r) => r.view.due)}
+                {inlineMap(record, (r) => r.view.due)}
               </text>
             </>
           }
         />
         <If
-          cond={view(record, (r) => r.view.warning)}
+          cond={record.pipe(map((r) => r.view.warning))}
           then={
             <text
               class={constant('dag-node-warning')}
-              dominant-baseline={view(record, (r) =>
+              dominant-baseline={inlineMap(record, (r) =>
                 r.size === 'compact' ? 'central' : undefined,
               )}
               text-anchor={constant('end')}
-              x={view(
+              x={inlineMap(
                 record,
                 (r) => r.node.width - (r.size === 'compact' ? 8 : 10),
               )}
-              y={view(record, (r) =>
+              y={inlineMap(record, (r) =>
                 r.size === 'compact' ? r.node.height / 2 : metaY(r),
               )}
             >
@@ -170,11 +177,11 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
           }
         />
         <If
-          cond={view(record, (r) => r.view.priority !== 3)}
+          cond={record.pipe(map((r) => r.view.priority !== 3))}
           then={
             <g
               class={constant('dag-node-priority')}
-              transform={view(
+              transform={inlineMap(
                 record,
                 (r) =>
                   `translate(${r.node.width - PRIORITY_INSET - PRIORITY_WIDTH} ${-PRIORITY_HEIGHT / 2})`,
@@ -191,7 +198,7 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
                 x={constant(PRIORITY_WIDTH / 2)}
                 y={constant(PRIORITY_HEIGHT / 2)}
               >
-                {view(record, (r) => priorityLabels[r.view.priority])}
+                {inlineMap(record, (r) => priorityLabels[r.view.priority])}
               </text>
             </g>
           }

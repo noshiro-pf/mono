@@ -1,5 +1,12 @@
 import { Collapse } from 'blueprint-synstate';
-import { constant, For, view, type Bindable, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import {
+  constant,
+  For,
+  inlineMap,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
 import { CheckboxView } from '../../molecules/index.mjs';
@@ -68,8 +75,8 @@ export const DetailedFilterCollapse = ({ isOpen }: Props): JSX.Element => (
                 <CheckboxWrapper>
                   <CheckboxView
                     disabled={filterView((s) => !s.respondent.enabled)}
-                    state={view(respondent$, (r) =>
-                      r.checkState.checked ? 'checked' : 'none',
+                    state={respondent$.pipe(
+                      map((r) => (r.checkState.checked ? 'checked' : 'none')),
                     )}
                     onCheck={(checked) => {
                       respondent$
@@ -77,7 +84,7 @@ export const DetailedFilterCollapse = ({ isOpen }: Props): JSX.Element => (
                         .value.checkState.onCheck(checked);
                     }}
                   />
-                  <span>{view(respondent$, (r) => r.username)}</span>
+                  <span>{inlineMap(respondent$, (r) => r.username)}</span>
                 </CheckboxWrapper>
               </div>
             )}

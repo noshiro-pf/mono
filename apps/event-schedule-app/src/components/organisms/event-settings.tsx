@@ -2,7 +2,6 @@ import { createEventEmitter, map, type InitializedObservable } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -73,7 +72,7 @@ export const EventSettings = ({
         elementToToggle={
           <NotificationSettingsComponent
             answerDeadline={answerDeadline}
-            disabled={view(useNotification, (use) => !use)}
+            disabled={useNotification.pipe(map((use) => !use))}
             focusEmailInput$={focusEmailInput$}
             notificationSettingsWithEmail={notificationSettingsWithEmail.pipe(
               map(

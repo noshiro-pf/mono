@@ -46,8 +46,4 @@ export const createLink =
  * observable for it: `Link` needs the destination only when it is clicked.
  */
 const readerOf = <T extends string>(bindable: Bindable<T>): (() => T) =>
-  typeof bindable === 'string'
-    ? () => bindable
-    : isObservable(bindable)
-      ? () => bindable.getSnapshot().value
-      : bindable.open((source, fn) => () => fn(source.getSnapshot().value));
+  isObservable(bindable) ? () => bindable.getSnapshot().value : () => bindable;

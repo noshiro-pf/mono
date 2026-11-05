@@ -1,4 +1,5 @@
-import { constant, render, view } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, inlineMap, render } from 'synstate-dom';
 import {
   createMemoryBrowser,
   createRouter,
@@ -46,15 +47,19 @@ const unmount = render(
           // through the observable.
           products: (list$) => (
             <Link
-              to={view(list$, (list) =>
-                list.withSearch({ page: asSafeInt(list.search.page + 1) }),
+              to={list$.pipe(
+                map((list) =>
+                  list.withSearch({ page: asSafeInt(list.search.page + 1) }),
+                ),
               )}
             >
               {constant('Next page')}
             </Link>
           ),
           'products.item': (item$) => (
-            <h1>{view(item$, (item) => `Product ${item.params.productId}`)}</h1>
+            <h1>
+              {inlineMap(item$, (item) => `Product ${item.params.productId}`)}
+            </h1>
           ),
           settings: undefined, // not drawn yet: falls to notFound
         }}

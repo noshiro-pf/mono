@@ -21,7 +21,7 @@ Solid 側の説明は、Solid の JSX を変換する [babel-plugin-jsx-dom-expr
 ## 代わりに払っているもの
 
 - **テンプレートを複製しません。** 要素は 1 つずつ `createElement` で作ります。そのため多くの行を作るときは Solid より時間がかかります。どのくらいかかるかは[ベンチマーク](/mono/synstate-dom/ja/background/benchmark/)を見てください。
-- **書く量が増えます。** `count() * 2` のような式をその場に書けないので、`view(count$, (n) => n * 2)` や `count$.pipe(map(...))` と書きます。入力が複数なら `derive`、更新される値によって要素を出し分けるなら `If` を使い、固定の文字列も `constant('...')` と書きます。書くにはこれらのヘルパーと、その先では synstate のオペレーターを知っている必要があります。その代わり、何がリアクティブかが型に表れ、props に特別な扱いが要りません（[props は普通の JavaScript の値](/mono/synstate-dom/ja/guides/components/#props-は普通の-javascript-の値)）。
+- **書く量が増えます。** `count() * 2` のような式をその場に書けないので、`count$.pipe(map((n) => n * 2))` と書きます。入力が複数なら `deriveBindable`、更新される値によって要素を出し分けるなら `If` を使い、固定の文字列も `constant('...')` と書きます。書くにはこれらのヘルパーと、その先では synstate のオペレーターを知っている必要があります。その代わり、何がリアクティブかが型に表れ、props に特別な扱いが要りません（[props は普通の JavaScript の値](/mono/synstate-dom/ja/guides/components/#props-は普通の-javascript-の値)）。
 
 ## 先行例
 

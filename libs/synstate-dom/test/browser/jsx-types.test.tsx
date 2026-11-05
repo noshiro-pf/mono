@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import { expectType } from 'ts-data-forge';
 
 describe('JSX types', () => {
@@ -65,7 +65,7 @@ describe('element props types', () => {
 
     const ok = (
       <input
-        value={view(count$, (n) => n.toString())}
+        value={inlineMap(count$, (n) => n.toString())}
         disabled={constant(false)}
         tabIndex={count$}
       />
@@ -147,7 +147,10 @@ describe('optional attributes', () => {
       <>
         <div aria-label={label$} data-x={label$} title={label$} />
         <svg>
-          <g role={constant('img')} opacity={view(label$, () => undefined)} />
+          <g
+            role={constant('img')}
+            opacity={inlineMap(label$, () => undefined)}
+          />
         </svg>
       </>
     );

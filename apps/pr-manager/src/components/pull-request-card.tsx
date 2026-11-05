@@ -2,9 +2,9 @@ import {
   constant,
   For,
   If,
+  inlineMap,
   mapBindable,
   MatchOptional,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -135,13 +135,13 @@ export const PullRequestCard = ({ entry, scaleMax }: Props): JSX.Element => (
         some={(stackedOn$) => (
           <span
             class={constant('stacked-on')}
-            title={view(
+            title={inlineMap(
               stackedOn$,
               (stackedOn) =>
                 `Its base is the branch of #${stackedOn}, so its diff is its own layer. GitHub moves it onto the base of #${stackedOn} once that one merges.`,
             )}
           >
-            {view(stackedOn$, (stackedOn) => `stacked on #${stackedOn}`)}
+            {inlineMap(stackedOn$, (stackedOn) => `stacked on #${stackedOn}`)}
           </span>
         )}
       />

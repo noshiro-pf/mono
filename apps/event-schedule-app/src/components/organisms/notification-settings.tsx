@@ -3,7 +3,7 @@ import type { InitializedObservable, Observable } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  derive,
+  deriveBindable,
   mapBindable,
   subscribeInScope,
   type Bindable,
@@ -61,7 +61,7 @@ export const NotificationSettingsComponent = ({
 
   /** Off unless the deadline is more than `days` days away. */
   const disabledUnlessDeadlineIsAfter = (days: number): Bindable<boolean> =>
-    derive(
+    deriveBindable(
       [disabled, useAnswerDeadline, answerDeadline],
       (d, use, deadline) =>
         d ||
@@ -70,7 +70,7 @@ export const NotificationSettingsComponent = ({
         ymdhmDateDiff(deadline, now()) <= days,
     );
 
-  const invalidEmail$ = derive(
+  const invalidEmail$ = deriveBindable(
     [disabled, settings$],
     (d, s) => !d && !isEmailString(s.email),
   );

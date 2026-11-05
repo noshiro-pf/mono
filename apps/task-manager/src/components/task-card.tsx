@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
 import {
@@ -20,7 +20,7 @@ type Props = Readonly<{
 export const TaskCard = ({ row }: Props): JSX.Element => (
   <li>
     <button
-      class={view(row, ({ status }) =>
+      class={inlineMap(row, ({ status }) =>
         status === 'done' ? 'bp6-card task-card done' : 'bp6-card task-card',
       )}
       data-e2e={constant('task-row')}
@@ -30,39 +30,38 @@ export const TaskCard = ({ row }: Props): JSX.Element => (
       }}
     >
       <span class={constant('task-card-top')}>
-        <StatusBadge displayStatus={view(row, ({ status }) => status)} />
+        <StatusBadge displayStatus={row.pipe(map(({ status }) => status))} />
         <If
-          cond={view(row, (r) => r.startedWithUnmetDependencies)}
+          cond={row.pipe(map((r) => r.startedWithUnmetDependencies))}
           then={<WarningBadge />}
         />
         <span class={constant('task-card-priority')}>
-          {view(row, ({ task }) =>
+          {inlineMap(row, ({ task }) =>
             m.list.priority(priorityLabels[task.priority]),
           )}
         </span>
       </span>
       <span class={constant('task-card-title')}>
-        {view(row, ({ task }) => task.title)}
+        {inlineMap(row, ({ task }) => task.title)}
       </span>
       <span class={constant('task-card-meta')}>
         <DueDate
-          dueDate={view(row, ({ task }) => dueOf(task))}
-          overdue={view(row, ({ overdue }) => overdue)}
+          dueDate={row.pipe(map(({ task }) => dueOf(task)))}
+          overdue={row.pipe(map(({ overdue }) => overdue))}
         />
         <If
-          cond={view(
-            row,
-            ({ task }) => formatEstimate(task.estimateHours) !== '',
+          cond={row.pipe(
+            map(({ task }) => formatEstimate(task.estimateHours) !== ''),
           )}
           then={
             <span>
-              {view(row, ({ task }) =>
+              {inlineMap(row, ({ task }) =>
                 m.list.estimate(formatEstimate(task.estimateHours)),
               )}
             </span>
           }
         />
-        <LabelChips labels={view(row, ({ task }) => task.labels)} />
+        <LabelChips labels={row.pipe(map(({ task }) => task.labels))} />
       </span>
     </button>
   </li>

@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import type { RectSize } from 'ts-utils-additional';
 import type { DecidedAnswerBalloonProps } from '../../types/index.mjs';
 import {
@@ -43,7 +43,7 @@ export const DecidedAnswerBalloon = ({ props }: Props): JSX.Element => {
       }}
     >
       <div
-        class={balloonClasses(view(props, (p) => p.arrowDirection))}
+        class={balloonClasses(props.pipe(map((p) => p.arrowDirection)))}
         style={balloonSizeStyle(balloonSize)}
       >
         <div
@@ -67,7 +67,7 @@ export const DecidedAnswerBalloon = ({ props }: Props): JSX.Element => {
         height={constant(symbolSize)}
         style={{
           ...symbolStyle,
-          opacity: view(props, (p) => (p.showSymbol === 'o' ? '1' : '0')),
+          opacity: inlineMap(props, (p) => (p.showSymbol === 'o' ? '1' : '0')),
         }}
         viewBox={constant('0 0 100 100')}
         width={constant(symbolSize)}
@@ -87,7 +87,7 @@ export const DecidedAnswerBalloon = ({ props }: Props): JSX.Element => {
         height={constant(symbolSize)}
         style={{
           ...symbolStyle,
-          opacity: view(props, (p) => (p.showSymbol === 'x' ? '1' : '0')),
+          opacity: inlineMap(props, (p) => (p.showSymbol === 'x' ? '1' : '0')),
         }}
         viewBox={constant('0 0 104 104')}
         width={constant(symbolSize)}

@@ -1,5 +1,12 @@
 import type { LinkedIssue } from 'pr-report-core';
-import { constant, For, view, type Bindable, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import {
+  constant,
+  For,
+  inlineMap,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { ExternalLink } from './external-link.js';
 
 type Props = Readonly<{ issues: Bindable<readonly LinkedIssue[]> }>;
@@ -20,14 +27,14 @@ export const LinkedIssues = ({ issues }: Props): JSX.Element => (
     <For items={issues} key={(issue) => issue.number}>
       {(issue$, index$) => (
         <>
-          {view(index$, separator)}
+          {inlineMap(index$, separator)}
           <ExternalLink
-            dataState={view(issue$, (issue) => issue.state)}
-            href={view(issue$, (issue) => issue.url)}
+            dataState={issue$.pipe(map((issue) => issue.state))}
+            href={issue$.pipe(map((issue) => issue.url))}
           >
-            {view(issue$, (issue) => `#${issue.number}`)}
+            {inlineMap(issue$, (issue) => `#${issue.number}`)}
           </ExternalLink>
-          {view(issue$, (issue) =>
+          {inlineMap(issue$, (issue) =>
             issue.title === '' ? '' : ` ${issue.title}`,
           )}
         </>

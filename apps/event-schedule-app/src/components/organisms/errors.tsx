@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, If, type JSX } from 'synstate-dom';
 import { dict, errorFontColor } from '../../constants/index.mjs';
 import type { EventScheduleValidation } from '../../types/index.mjs';
 import { Description } from '../atoms/index.mjs';
@@ -20,7 +20,7 @@ export const EventSchedulePropertiesErrors = ({
     text: string,
   ): JSX.Element => (
     <If
-      cond={view(eventScheduleValidation, (v) => !isValid(v))}
+      cond={eventScheduleValidation.pipe(map((v) => !isValid(v)))}
       then={<Description color={errorFontColor} text={constant(text)} />}
     />
   );

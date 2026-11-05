@@ -1,4 +1,5 @@
-import { constant, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { listSettingsStore } from '../store/index.mjs';
 import { SortEditor } from './sort-editor.js';
@@ -11,7 +12,10 @@ export const ListToolbar = (): JSX.Element => (
   <div class={constant('list-toolbar')}>
     <label class={constant('bp6-control bp6-switch toolbar-switch')}>
       <input
-        checked={view(listSettingsStore.settings, ({ hideDone }) => hideDone)}
+        checked={inlineMap(
+          listSettingsStore.settings,
+          ({ hideDone }) => hideDone,
+        )}
         class={constant('bp6-control-input')}
         data-e2e={constant('hide-done')}
         type={constant('checkbox')}
@@ -31,7 +35,7 @@ export const ListToolbar = (): JSX.Element => (
         data-e2e={'list-sort-editor'}
         emptyNote={m.list.noSortKeys}
         label={m.list.sortKeys}
-        sort={view(listSettingsStore.settings, ({ sort }) => sort)}
+        sort={listSettingsStore.settings.pipe(map(({ sort }) => sort))}
       />
     </details>
   </div>

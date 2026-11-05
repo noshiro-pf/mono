@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import { Num } from 'ts-data-forge';
 import { outlineOf, type LaidOutNode, type Point } from '../dag/index.mjs';
 import type { ConnectOverlayState } from './dag-canvas-scene.mjs';
@@ -21,29 +21,29 @@ export const DagConnectOverlay = ({ overlay }: Props): JSX.Element => (
     aria-hidden={constant('true')}
     class={constant('dag-connect')}
     data-e2e={constant('dag-connect')}
-    data-refused={view(overlay, ({ target }) =>
+    data-refused={inlineMap(overlay, ({ target }) =>
       (target?.refused ?? false).toString(),
     )}
   >
     <If
-      cond={view(overlay, (state) => around(state)?.kind === 'task')}
+      cond={overlay.pipe(map((state) => around(state)?.kind === 'task'))}
       then={
         <rect
           class={constant('dag-connect-target')}
-          height={view(overlay, (state) => around(state)?.height ?? 0)}
+          height={inlineMap(overlay, (state) => around(state)?.height ?? 0)}
           rx={constant(TASK_RX + TARGET_GAP)}
-          width={view(overlay, (state) => around(state)?.width ?? 0)}
-          x={view(overlay, (state) => around(state)?.x ?? 0)}
-          y={view(overlay, (state) => around(state)?.y ?? 0)}
+          width={inlineMap(overlay, (state) => around(state)?.width ?? 0)}
+          x={inlineMap(overlay, (state) => around(state)?.x ?? 0)}
+          y={inlineMap(overlay, (state) => around(state)?.y ?? 0)}
         />
       }
     />
     <If
-      cond={view(overlay, (state) => around(state)?.kind === 'milestone')}
+      cond={overlay.pipe(map((state) => around(state)?.kind === 'milestone'))}
       then={
         <polygon
           class={constant('dag-connect-target')}
-          points={view(overlay, (state) => {
+          points={inlineMap(overlay, (state) => {
             const node = around(state);
 
             return node === undefined
@@ -56,28 +56,28 @@ export const DagConnectOverlay = ({ overlay }: Props): JSX.Element => (
       }
     />
     <If
-      cond={view(overlay, ({ connecting }) => connecting !== undefined)}
+      cond={overlay.pipe(map(({ connecting }) => connecting !== undefined))}
       then={
         <line
           class={constant('dag-connect-line')}
-          marker-end={view(overlay, ({ target }) =>
+          marker-end={inlineMap(overlay, ({ target }) =>
             target?.refused === true
               ? 'url(#dag-arrow-refused)'
               : 'url(#dag-arrow-connect)',
           )}
-          x1={view(overlay, ({ anchor }) => anchor.x)}
-          x2={view(overlay, (state) => arrowTo(state).x)}
-          y1={view(overlay, ({ anchor }) => anchor.y)}
-          y2={view(overlay, (state) => arrowTo(state).y)}
+          x1={inlineMap(overlay, ({ anchor }) => anchor.x)}
+          x2={inlineMap(overlay, (state) => arrowTo(state).x)}
+          y1={inlineMap(overlay, ({ anchor }) => anchor.y)}
+          y2={inlineMap(overlay, (state) => arrowTo(state).y)}
         />
       }
     />
     <circle
       class={constant('dag-connect-handle')}
-      cx={view(overlay, ({ anchor }) => anchor.x)}
-      cy={view(overlay, ({ anchor }) => anchor.y)}
+      cx={inlineMap(overlay, ({ anchor }) => anchor.x)}
+      cy={inlineMap(overlay, ({ anchor }) => anchor.y)}
       data-e2e={constant('dag-connect-handle')}
-      r={view(overlay, ({ scale }) =>
+      r={inlineMap(overlay, ({ scale }) =>
         Num.isNonZero(scale)
           ? Num.div(HANDLE_RADIUS_PX, scale)
           : HANDLE_RADIUS_PX,

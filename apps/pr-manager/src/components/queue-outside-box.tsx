@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import type { OutsideNode } from '../queue-view.mjs';
 import { ExternalLink } from './external-link.js';
 
@@ -20,7 +20,7 @@ export const QueueOutsideBox = ({
   onHide,
 }: Props): JSX.Element => (
   <ExternalLink
-    href={view(node$, (node) => node.url)}
+    href={node$.pipe(map((node) => node.url))}
     variant={'queue-link'}
     onEnter={() => {
       onShow(node$.getSnapshot().value.number);
@@ -28,14 +28,14 @@ export const QueueOutsideBox = ({
     onLeave={onHide}
   >
     <span class={constant('queue-number')}>
-      {view(node$, (node) => `#${node.number}`)}
+      {inlineMap(node$, (node) => `#${node.number}`)}
     </span>
     <span class={constant('queue-note')}>
-      {view(node$, (node) => `${node.reason} · ${node.owner}`)}
+      {inlineMap(node$, (node) => `${node.reason} · ${node.owner}`)}
     </span>
 
     <span class={constant('visually-hidden')}>
-      {view(node$, (node) => ` ${node.title} — ${node.detail}`)}
+      {inlineMap(node$, (node) => ` ${node.title} — ${node.detail}`)}
     </span>
   </ExternalLink>
 );

@@ -1,5 +1,5 @@
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import type { RelaxedExtract } from 'ts-type-forge';
 import { m } from '../i18n/index.mjs';
 import {
@@ -55,7 +55,9 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
 
   return (
     <>
-      <MilestoneExplanation collapsed={view(editor, ({ isNew }) => !isNew)} />
+      <MilestoneExplanation
+        collapsed={editor.pipe(map(({ isNew }) => !isNew))}
+      />
       <div class={constant('form-grid')}>
         <label class={constant('bp6-label field field-wide')}>
           {constant(m.fields.title)}
@@ -64,7 +66,7 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
             data-e2e={constant('title-input')}
             required={constant(true)}
             type={constant('text')}
-            value={view(editor, ({ draft }) => draft.title)}
+            value={inlineMap(editor, ({ draft }) => draft.title)}
             onInput={(changed) => {
               editorStore.updateMilestoneDraft({
                 title: changed.currentTarget.value,
@@ -73,7 +75,7 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
           />
         </label>
         <GroupField
-          value={view(editor, ({ draft }) => draft.groupId)}
+          value={editor.pipe(map(({ draft }) => draft.groupId))}
           onChange={(changed) => {
             editorStore.updateMilestoneDraft({
               groupId: changed.currentTarget.value,
@@ -88,8 +90,8 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
           <DateTimeField
             id={'milestone-date'}
             label={m.nodeDialog.milestoneDate}
-            allDay={view(editor, ({ draft }) => draft.dateAllDay)}
-            value={view(editor, ({ draft }) => draft.date)}
+            allDay={editor.pipe(map(({ draft }) => draft.dateAllDay))}
+            value={editor.pipe(map(({ draft }) => draft.date))}
             onAllDayChange={editorStore.setAllDay}
             onChange={(date) => {
               editorStore.updateMilestoneDraft({ date });
@@ -98,7 +100,10 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
           <div class={constant('field field-wide')}>
             <label class={constant('bp6-control bp6-checkbox')}>
               <input
-                checked={view(editor, ({ draft }) => draft.requiresManualCheck)}
+                checked={inlineMap(
+                  editor,
+                  ({ draft }) => draft.requiresManualCheck,
+                )}
                 class={constant('bp6-control-input')}
                 type={constant('checkbox')}
                 onChange={(changed) => {
@@ -111,13 +116,12 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
               {constant(m.nodeDialog.requiresCheck)}
             </label>
             <If
-              cond={view(editor, ({ draft }) => draft.requiresManualCheck)}
+              cond={editor.pipe(map(({ draft }) => draft.requiresManualCheck))}
               then={
                 <div class={constant('manual-check')}>
                   <If
-                    cond={view(
-                      editor,
-                      ({ draft }) => draft.checkedAt === undefined,
+                    cond={editor.pipe(
+                      map(({ draft }) => draft.checkedAt === undefined),
                     )}
                     then={
                       <>
@@ -135,7 +139,7 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
                     else={
                       <>
                         <span>
-                          {view(editor, ({ draft }) =>
+                          {inlineMap(editor, ({ draft }) =>
                             draft.checkedAt === undefined
                               ? ''
                               : m.nodeDialog.checkedAt(
@@ -174,7 +178,7 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
         <textarea
           class={constant('bp6-input bp6-fill')}
           rows={constant(3)}
-          value={view(editor, ({ draft }) => draft.description)}
+          value={inlineMap(editor, ({ draft }) => draft.description)}
           onInput={(changed) => {
             editorStore.updateMilestoneDraft({
               description: changed.currentTarget.value,

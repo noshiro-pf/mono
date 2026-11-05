@@ -27,7 +27,7 @@ synstate の派生は遅延評価ではありません。読まれていても�
 
 ```tsx
 import { createState, map } from 'synstate';
-import { type JSX, view } from 'synstate-dom';
+import type { JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 // The store: module level, so it belongs to no scope and lives as long as the
@@ -39,7 +39,7 @@ export const CartTotal = (): JSX.Element => {
     // scope this component is mounted in and is disposed with it.
     const total$ = cart$.pipe(map(Arr.sum));
 
-    return <p>{view(total$, (t) => `Total: ${t}`)}</p>;
+    return <p>{total$.pipe(map((t) => `Total: ${t}`))}</p>;
 };
 ```
 
@@ -47,7 +47,7 @@ export const CartTotal = (): JSX.Element => {
 
 ```tsx
 import { createBooleanState, createState, map } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 const [showStats$] = createBooleanState(false);
@@ -66,7 +66,7 @@ const Stats = (): JSX.Element => {
     // Created only while the branch is shown, and disposed when it closes.
     const total$ = samples$.pipe(map(Arr.sum));
 
-    return <p>{view(total$, (t) => `Total: ${t}`)}</p>;
+    return <p>{total$.pipe(map((t) => `Total: ${t}`))}</p>;
 };
 ```
 

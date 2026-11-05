@@ -1,4 +1,11 @@
-import { constant, derive, If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import {
+  constant,
+  deriveBindable,
+  If,
+  inlineMap,
+  type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { MAX_SCALE, MIN_SCALE } from '../dag-zoom.mjs';
 import { issuesViewStore } from '../store/index.mjs';
@@ -12,7 +19,7 @@ import { issuesViewStore } from '../store/index.mjs';
  */
 export const IssueDagZoom = (): JSX.Element => (
   <If
-    cond={view(issuesViewStore.graph, ({ nodes }) => Arr.isNonEmpty(nodes))}
+    cond={issuesViewStore.graph.pipe(map(({ nodes }) => Arr.isNonEmpty(nodes)))}
     then={<Zoom />}
   />
 );
@@ -42,7 +49,7 @@ const Zoom = (): JSX.Element => {
         <button
           aria-label={constant('Zoom out')}
           class={constant('view-switch-option')}
-          disabled={view(scale$, (scale) => scale <= MIN_SCALE)}
+          disabled={inlineMap(scale$, (scale) => scale <= MIN_SCALE)}
           title={constant('Zoom out')}
           type={constant('button')}
           onClick={zoomOut}
@@ -54,13 +61,13 @@ const Zoom = (): JSX.Element => {
           aria-live={constant('polite')}
           class={constant('issue-dag-zoom-level')}
         >
-          {view(scale$, (scale) => `${Math.round(scale * 100)}%`)}
+          {inlineMap(scale$, (scale) => `${Math.round(scale * 100)}%`)}
         </output>
 
         <button
           aria-label={constant('Zoom in')}
           class={constant('view-switch-option')}
-          disabled={view(scale$, (scale) => scale >= MAX_SCALE)}
+          disabled={inlineMap(scale$, (scale) => scale >= MAX_SCALE)}
           title={constant('Zoom in')}
           type={constant('button')}
           onClick={zoomIn}
@@ -74,7 +81,7 @@ const Zoom = (): JSX.Element => {
         class={constant('view-switch')}
       >
         <button
-          aria-pressed={view(fitted$, String)}
+          aria-pressed={inlineMap(fitted$, String)}
           class={constant('view-switch-option')}
           title={constant('The whole graph in the box, however large it is')}
           type={constant('button')}
@@ -84,7 +91,7 @@ const Zoom = (): JSX.Element => {
         </button>
 
         <button
-          aria-pressed={derive([fitted$, scale$], (fitted, scale) =>
+          aria-pressed={deriveBindable([fitted$, scale$], (fitted, scale) =>
             (!fitted && scale === 1).toString(),
           )}
           class={constant('view-switch-option')}

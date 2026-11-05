@@ -8,8 +8,8 @@ description: 属性、プロパティ、class、style、イベント、ref、SVG
 ## 属性とプロパティ
 
 ```tsx
-import { createBooleanState, createState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { createBooleanState, createState, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 
 const [name$, setName] = createState('');
 
@@ -37,7 +37,7 @@ export const SignUp = (): JSX.Element => (
         {/* A boolean attribute is removed while its value is `false`. */}
         <button
             type={constant('submit')}
-            disabled={view(agreed$, (agreed) => !agreed)}
+            disabled={agreed$.pipe(map((agreed) => !agreed))}
         >
             {constant('Sign up')}
         </button>
@@ -52,8 +52,8 @@ export const SignUp = (): JSX.Element => (
 ## `class` と `style`
 
 ```tsx
-import { createBooleanState, createState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { createBooleanState, createState, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 
 const [isActive$] = createBooleanState(false);
 
@@ -63,13 +63,13 @@ export const Item = (): JSX.Element => (
     // One `Bindable<boolean>` per class name: each is toggled on its own.
     <li class={{ item: constant(true), active: isActive$ }}>
         {/* Or the whole class as one string. Never both on one element. */}
-        <span class={view(isActive$, (active) => (active ? 'on' : 'off'))}>
+        <span class={isActive$.pipe(map((active) => (active ? 'on' : 'off')))}>
             {constant('status')}
         </span>
         {/* One `Bindable<string>` per hyphenated CSS property name. */}
         <div
             style={{
-                width: view(progress$, (p) => `${p * 100}%`),
+                width: progress$.pipe(map((p) => `${p * 100}%`)),
                 'background-color': constant('teal'),
             }}
         />
@@ -83,8 +83,8 @@ export const Item = (): JSX.Element => (
 ## イベントと `ref`
 
 ```tsx
-import { createState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 
 const [position$, setPosition] = createState('');
 
@@ -112,7 +112,7 @@ export const Pad = (): JSX.Element => (
     >
         {constant('Pointer at ')}
         {position$}
-        {view(width$, (w) => ` in a pad ${Math.round(w)}px wide`)}
+        {width$.pipe(map((w) => ` in a pad ${Math.round(w)}px wide`))}
     </div>
 );
 ```
@@ -123,8 +123,8 @@ export const Pad = (): JSX.Element => (
 ## SVG
 
 ```tsx
-import { createState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 
 const [radius$] = createState(10);
 
@@ -135,7 +135,7 @@ export const Dot = (): JSX.Element => (
             cx={constant(50)}
             cy={constant(50)}
             r={radius$}
-            fill={view(radius$, (r) => (r > 30 ? 'tomato' : 'teal'))}
+            fill={radius$.pipe(map((r) => (r > 30 ? 'tomato' : 'teal')))}
         />
     </svg>
 );

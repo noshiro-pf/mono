@@ -1,11 +1,11 @@
 import { Button, Dialog, FormGroup, InputGroup } from 'blueprint-synstate';
+import { map } from 'synstate';
 import {
   constant,
   createAfterUpdate,
   isImeKeyDown,
   listenInScope,
   subscribeInScope,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -53,7 +53,7 @@ export const ConfirmEmailDialog = ({
     });
   });
 
-  const intent = view(state, (s) => s.emailFormIntent);
+  const intent = state.pipe(map((s) => s.emailFormIntent));
 
   return (
     <Dialog
@@ -69,7 +69,7 @@ export const ConfirmEmailDialog = ({
         <p>{constant(dc.editButtonConfirmDialogMessage)}</p>
         <div class={constant(styles.inputWrapper)}>
           <FormGroup
-            helperText={view(state, (s) => s.formState.email.error)}
+            helperText={state.pipe(map((s) => s.formState.email.error))}
             intent={intent}
             label={constant('')}
           >
@@ -84,7 +84,7 @@ export const ConfirmEmailDialog = ({
                 />
               }
               type={'email'}
-              value={view(state, (s) => s.formState.email.inputValue)}
+              value={state.pipe(map((s) => s.formState.email.inputValue))}
               onInput={({ currentTarget }) => {
                 ConfirmEmailDialogStore.inputEmailHandler(currentTarget.value);
               }}
@@ -100,9 +100,9 @@ export const ConfirmEmailDialog = ({
             onClick={ConfirmEmailDialogStore.cancelClickHandler}
           />
           <Button
-            disabled={view(state, (s) => s.enterButtonDisabled)}
+            disabled={state.pipe(map((s) => s.enterButtonDisabled))}
             intent={'primary'}
-            loading={view(state, (s) => s.formState.isWaitingResponse)}
+            loading={state.pipe(map((s) => s.formState.isWaitingResponse))}
             text={constant(dict.common.buttonText.decide)}
             onClick={ConfirmEmailDialogStore.enterClickHandler}
           />

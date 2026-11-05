@@ -5,7 +5,7 @@ import {
 } from 'synstate';
 import { Arr } from 'ts-data-forge';
 import type { NonEmptyTuple } from 'ts-type-forge';
-import { asConstant, isView } from '../internal/index.mjs';
+import { asConstant } from '../internal/index.mjs';
 import type { Bindable, BindableValue } from './bindable.mjs';
 import { toObservable } from './to-observable.mjs';
 
@@ -14,11 +14,13 @@ import { toObservable } from './to-observable.mjs';
  *
  * When every input is a constant, `fn` runs once and the result is a constant:
  * a static part of the view never enters the graph. Otherwise the constants
- * become `just` and the views are turned into observables, and the result is
- * synstate's `derive` over them: one observable, which passes on a result only
+ * become `just`, and the result is synstate's `derive` over them: one observable, which passes on a result only
  * when it is not `Object.is` the one it holds.
  */
-export const derive = <const BS extends NonEmptyTuple<Bindable<unknown>>, R>(
+export const deriveBindable = <
+  const BS extends NonEmptyTuple<Bindable<unknown>>,
+  R,
+>(
   bindables: BS,
   fn: (...values: BindableValues<BS>) => R,
 ): Bindable<R> => {
@@ -47,4 +49,4 @@ export type BindableValues<BS extends readonly Bindable<unknown>[]> = Readonly<{
 }>;
 
 const isConstant = (bindable: Bindable<unknown>): boolean =>
-  !isView(bindable) && !isObservable(bindable);
+  !isObservable(bindable);

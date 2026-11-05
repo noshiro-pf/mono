@@ -4,7 +4,7 @@ import {
   map,
   type InitializedObservable,
 } from 'synstate';
-import { constant, render, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, render, type JSX } from 'synstate-dom';
 import type { ScenarioFramework } from '../scenario.mjs';
 import {
   changedValuesOnly,
@@ -30,7 +30,7 @@ import {
 /**
  * The inputs are states, and every figure is a node of its own, made with
  * `combine` and `map` from the figures it is computed from. The cells bind the
- * figures with `view`, which formats them without adding a node.
+ * figures with `inlineMap`, which formats them without adding a node.
  *
  * Measured twice: as written, and with a `skipIfNoChange` after every figure
  * (see {@link FigureOutput}).
@@ -125,16 +125,16 @@ const synstateDomLoanWith = (
         <table>
           <tbody>
             <tr>
-              <td>{view(payment$, yen)}</td>
-              <td>{view(totalInterest$, yen)}</td>
-              <td>{view(repaymentMonths$, (n) => n.toString())}</td>
+              <td>{inlineMap(payment$, yen)}</td>
+              <td>{inlineMap(totalInterest$, yen)}</td>
+              <td>{inlineMap(repaymentMonths$, (n) => n.toString())}</td>
             </tr>
             {yearRows.map((row, year) => (
               <tr>
                 <td>{constant((year + 1).toString())}</td>
-                <td>{view(row.interest$, yen)}</td>
-                <td>{view(row.repaid$, yen)}</td>
-                <td>{view(row.balance$, yen)}</td>
+                <td>{inlineMap(row.interest$, yen)}</td>
+                <td>{inlineMap(row.repaid$, yen)}</td>
+                <td>{inlineMap(row.balance$, yen)}</td>
               </tr>
             ))}
           </tbody>
