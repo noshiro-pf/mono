@@ -1,6 +1,6 @@
 ---
 name: resolve-issues
-description: Implement the N open issues to take next — startable by their `Start-After:`, not started or planned by anyone, written by the token's account, by priority tier (`priority:S` first) — choosing them with `startable-issues` rather than by judgement, marking each started with `start-issue`, and taking each to its own pull request opened with `open-pr`. Use when asked to implement, work through or resolve the open issues, to pick the next issues and do them, or to "do N issues". The argument is N (1 when omitted).
+description: Implement the N open issues to take next — startable by their `Start-After:`, not started or planned by anyone, written by the token's account, by priority tier (`priority:S` first) — choosing them with `startable-issues` rather than by judgement, marking each started with `start-issue`, and taking each to its own pull request opened with `open-pr`, the pull requests of a run stacked serially in the order taken. Use when asked to implement, work through or resolve the open issues, to pick the next issues and do them, or to "do N issues". The argument is N (1 when omitted).
 argument-hint: '[N]'
 ---
 
@@ -13,9 +13,10 @@ a question for the person who asked, before anything is labelled.
 
 Read the repository's instructions first — `CLAUDE.md`, `AGENTS.md`, a
 contributing guide. Where they say more than this file (how a pull request is
-committed, reviewed, described and opened; whether several from one session are
-stacked; where a security finding goes), they win; this file says how the issues
-are chosen and handed over.
+committed, reviewed, described and opened; where a security finding goes), they
+win; this file says how the issues are chosen and handed over, and how the pull
+requests it opens relate: one serial stack (step 3), whatever the repository
+says of several pull requests from one session.
 
 **The commands** below — `startable-issues`, `start-issue`, `open-pr` — are the
 package `pr-merge-queue`'s. Run each the way the repository runs it: a script of
@@ -83,11 +84,23 @@ no issue marked that nobody is on.
 
 ## 3. Implement one
 
-- **A branch of its own, from the latest default branch** (`git fetch` first),
-  unless the repository's instructions say how several pull requests from one
-  session relate; this repository's stack them unless their paths are plainly
-  disjoint (`open-pr --base <the branch below>`). Use the checkout you were
-  started in when it has nothing of yours uncommitted, and a worktree otherwise.
+- **A branch of its own, stacked on the last pull request this run opened**
+  (`open-pr --base <that branch>`), or from the latest default branch
+  (`git fetch` first) until one is opened. Every pull request of a run goes in
+  one serial stack, in the order taken, even where paths are plainly disjoint
+  and no `Merge-After:` or `Start-After:` relates them: with no other pull
+  request in its way, the stack can then be queued as it stands and its layers
+  merge without conflicting with each other, and no judgement of whether two of
+  them overlap is needed. The order taken already satisfies the dependencies,
+  since no listed issue waits on another still open. One given up on adds no
+  layer and its unfinished work stays off the stack: the next is branched from
+  the last one opened, not from where the session stands. Use the checkout you
+  were started in when it has nothing of yours uncommitted, and a worktree
+  otherwise.
+- **A fix amended onto a lower layer carries every layer above it along**, the
+  one still being written included (commit it first): replay each onto the new
+  head below it (`git rebase --onto <new> <old>`) and push the opened ones again
+  with `--force-with-lease`.
 - **Work only on that issue.** What turns up beyond it is an issue to file, not
   more of this pull request.
 - **Follow the repository's instructions to the pull request**: its tests, its
@@ -114,4 +127,5 @@ why. Then the ones passed over in step 2 with the reason, and in one line what
 run locally: its checks have not run yet under `skip-ci`.
 
 The pull requests stay this session's as the repository's instructions say
-(watching their activity, amending a fix): do that for each one opened.
+(watching their activity, amending a fix): do that for each one opened, carrying
+the layers above along as step 3 says.

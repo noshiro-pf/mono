@@ -197,9 +197,13 @@ and `priority:close` included), by tier — `priority:S` first, then `A`, `B`,
 list, the skill passes over any issue that one pull request cannot finish
 without a person's decision, and takes the others one at a time until N pull
 requests are open: `start-issue` as it takes one, then the repository's own
-instructions to a pull request opened with `open-pr`, held by `skip-ci`. One it
-stops on gets a comment saying what it needs, which the next run reads, and
-`start-issue --release`.
+instructions to a pull request opened with `open-pr`, held by `skip-ci`. The
+pull requests of one run form one serial stack in the order taken, each after
+the first opened with `--base` on the one before, even where nothing orders them
+and whatever the repository says of stacking, so that the whole stack can be
+queued as it stands and its layers merge without conflicting with each other.
+One it stops on gets a comment saying what it needs, which the next run reads,
+and `start-issue --release`.
 
 ### Without a session, on the Claude API
 
