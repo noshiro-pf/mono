@@ -1,9 +1,5 @@
 import { Num, Result } from 'ts-data-forge';
-import {
-  readOpenSplitViewTabs,
-  splitViewPagePath,
-  workspaceQueryParam,
-} from '../shared/index.mjs';
+import { readOpenSplitViewTabs, splitViewPagePath } from '../shared/index.mjs';
 import type { WorkspaceEntry } from './registry.mjs';
 
 /** Opens one workspace in a tab of its own. */
@@ -120,29 +116,17 @@ export const describeOpenedWorkspaces = ({
   } already open.` as const;
 };
 
-const openWorkspaceTab = async (
-  workspaceId: string,
-  pinned: boolean,
-  active: boolean,
-): Promise<void> => {
-  const url = new URL(chrome.runtime.getURL(splitViewPagePath));
-
-  url.searchParams.set(workspaceQueryParam, workspaceId);
-
-  await chrome.tabs.create({ url: url.href, pinned, active });
-};
-
-const tabIsOpen = async (tabId: string): Promise<boolean> => {
-  const id = Result.unwrapOkOr(Num.safeParseFloat(tabId), Number.NaN);
-
-  if (!Number.isSafeInteger(id)) {
-    return false;
-  }
-
+/**
+ * Whether a tab of the given id is open and still on the split view page.
+ *
+ * A tab the user navigated to another address keeps its open-tab record — only
+ * closing the tab takes it off — so the tab existing is not enough.
+ */
+export const tabShowsSplitView = async (tabId: number): Promise<boolean> => {
   try {
-    await chrome.tabs.get(id);
+    const tab = await chrome.tabs.get(tabId);
 
-    return true;
+    return showsSplitView(tab, chrome.runtime.getURL(splitViewPagePath));
   } catch {
     // Closed, or closed while the service worker was asleep and never taken off
     // the list.
@@ -150,7 +134,53 @@ const tabIsOpen = async (tabId: string): Promise<boolean> => {
   }
 };
 
-/** The workspaces a tab is showing right now, tabs that have gone dropped. */
+/**
+ * Whether a tab is on the split view page, or on its way there: `url` is what
+ * it shows, `pendingUrl` where it is navigating to. Any query and hash, so any
+ * split view; a tab whose address cannot be read is not counted.
+ */
+export const showsSplitView = (
+  tab: Readonly<{ url?: string; pendingUrl?: string }>,
+  splitViewPageUrl: string,
+): boolean => {
+  const page = pageOf(splitViewPageUrl);
+
+  return (
+    page !== undefined &&
+    [tab.url, tab.pendingUrl].some(
+      (address) => address !== undefined && pageOf(address) === page,
+    )
+  );
+};
+
+/**
+ * An address less its query and hash, or `undefined` for one that does not
+ * parse.
+ *
+ * Not `origin`, which a URL parser outside the browser leaves `null` for every
+ * `chrome-extension:` address; and `new URL` in a `try`, because `URL.parse`
+ * is newer than the Chrome the manifest declares as its minimum.
+ */
+const pageOf = (address: string): string | undefined => {
+  try {
+    const { protocol, host, pathname } = new URL(address);
+
+    return `${protocol}//${host}${pathname}`;
+  } catch {
+    return undefined;
+  }
+};
+
+const tabIsOpen = async (tabId: string): Promise<boolean> => {
+  const id = Result.unwrapOkOr(Num.safeParseFloat(tabId), Number.NaN);
+
+  return Number.isSafeInteger(id) && tabShowsSplitView(id);
+};
+
+/**
+ * The workspaces a tab is showing right now, tabs that have gone or navigated
+ * away dropped.
+ */
 const openWorkspaceIds = async (): Promise<ReadonlySet<string>> => {
   const openTabs = await readOpenSplitViewTabs();
 

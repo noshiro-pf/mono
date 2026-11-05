@@ -1,5 +1,6 @@
 import {
   describeOpenedWorkspaces,
+  showsSplitView,
   workspaceTabsToOpen,
   type WorkspaceEntry,
 } from '../src/index.mjs';
@@ -102,5 +103,50 @@ describe('describeOpenedWorkspaces', () => {
       describeOpenedWorkspaces({ opened: 0, alreadyOpen: 0 }),
       'There is no saved split view to open.',
     );
+  });
+});
+
+describe(showsSplitView, () => {
+  const page = 'chrome-extension://abcdefghijklmnop/split.html';
+
+  test('a tab on the split view page, whichever split view', () => {
+    assert.isTrue(
+      showsSplitView({ url: `${page}?ws=a&layout=columns-2` }, page),
+    );
+
+    assert.isTrue(showsSplitView({ url: page }, page));
+  });
+
+  test('a tab navigated away from it', () => {
+    assert.isFalse(showsSplitView({ url: 'https://github.com/' }, page));
+
+    assert.isFalse(
+      showsSplitView(
+        { url: 'chrome-extension://abcdefghijklmnop/other.html?ws=a' },
+        page,
+      ),
+    );
+
+    assert.isFalse(
+      showsSplitView(
+        { url: 'chrome-extension://another-extension/split.html?ws=a' },
+        page,
+      ),
+    );
+  });
+
+  test('a tab on its way back to it', () => {
+    assert.isTrue(
+      showsSplitView(
+        { url: 'https://github.com/', pendingUrl: `${page}?ws=a` },
+        page,
+      ),
+    );
+  });
+
+  test('a tab whose address cannot be read', () => {
+    assert.isFalse(showsSplitView({}, page));
+
+    assert.isFalse(showsSplitView({ url: 'not a URL' }, page));
   });
 });

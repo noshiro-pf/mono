@@ -25,6 +25,7 @@ import {
   isAnyWorkspaceOpen,
   loadWorkspaceRegistry,
   openEveryWorkspaceInTabs,
+  tabShowsSplitView,
 } from './state/index.mjs';
 
 /**
@@ -220,7 +221,9 @@ const focusExistingSplitView = async (): Promise<boolean> => {
 
   const tabId: unknown = stored[splitViewTabIdSessionKey];
 
-  if (typeof tabId !== 'number') {
+  // A tab navigated away from the split view keeps the key — only closing it
+  // takes the key off — and focusing it would show some other page.
+  if (typeof tabId !== 'number' || !(await tabShowsSplitView(tabId))) {
     return false;
   }
 
