@@ -874,6 +874,34 @@ const commentsBetween = (
   return mut_comments.join('');
 };
 
+/**
+ * The comments between `inner` and the last token of `outer` (the `)` of a
+ * parenthesized type, the `>` of a type reference), after a space, or `''` when
+ * there are none. They are trivia of that token, so neither node's text carries
+ * them, and a replacement of `outer` built from `inner` drops them unless it
+ * adds these.
+ *
+ * `breaksLine` says the text holds a line break: a `// ...` comment ends with
+ * one, and a `/* ... *\/` comment may span lines. The break must not land in
+ * front of a token TypeScript reads only on the line before it, such as the
+ * `[]` of an array type (`isFollowedByLineSensitiveToken`).
+ */
+const commentsBeforeClosingToken = (
+  outer: tsm.Node,
+  inner: tsm.Node,
+): Readonly<{ text: string; breaksLine: boolean }> => {
+  const comments = commentsBetween(
+    outer.getSourceFile(),
+    inner.getEnd(),
+    outer.getEnd() - 1,
+  );
+
+  return {
+    text: comments === '' ? '' : (` ${comments}` as const),
+    breaksLine: comments.includes('\n'),
+  };
+};
+
 /** `DeepReadonly<T>` |-> `T`, anything else |-> `undefined` */
 const getDeepReadonlyTypeArg = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -1083,13 +1111,21 @@ const transformTypeReferenceNode = (
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const T = node.getTypeArguments()[0]!;
 
+    // The comments between `T` and `>` stay inside the parentheses around `T`,
+    // written out here because `wrapWithParentheses` trims its argument:
+    // a `// ...` at its end would lose its line break and comment out the `)`.
+    const trailingComments = commentsBeforeClosingToken(node, T).text;
+
+    const element =
+      trailingComments === ''
+        ? wrapWithParentheses(T.getFullText())
+        : (`(${T.getFullText().trim()}${trailingComments})` as const);
+
     options.replaceNode(
       node,
       readonlyContext.type === 'DeepReadonly'
-        ? wrapWithParentheses(`${wrapWithParentheses(T.getFullText())}[]`)
-        : wrapWithParentheses(
-            `readonly ${wrapWithParentheses(T.getFullText())}[]`,
-          ),
+        ? wrapWithParentheses(`${element}[]`)
+        : wrapWithParentheses(`readonly ${element}[]`),
     );
 
     return;
@@ -2416,6 +2452,28 @@ const transformUnionOrIntersectionTypeNodeImpl = (
   );
 };
 
+/**
+ * Whether the token after `node` changes meaning when a line break comes before
+ * it: TypeScript reads the `[]` of an array type, the `[K]` of an indexed access
+ * and the `extends` of a conditional type only on the line of the type before
+ * them.
+ */
+const isFollowedByLineSensitiveToken = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.TypeNode,
+): boolean => {
+  const parent = node.getParent();
+
+  return (
+    parent !== undefined &&
+    (parent.isKind(tsm.SyntaxKind.ArrayType) ||
+      (parent.isKind(tsm.SyntaxKind.IndexedAccessType) &&
+        parent.getObjectTypeNode() === node) ||
+      (parent.isKind(tsm.SyntaxKind.ConditionalType) &&
+        parent.getCheckType() === node))
+  );
+};
+
 /** Convert ((T)) -> (T) recursively */
 const transformParenthesizedTypeNode = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -2434,7 +2492,7 @@ const transformParenthesizedTypeNode = (
 
   const T = node.getTypeNode();
 
-  if (
+  const unwraps =
     // remove () if T is TypeReferenceNode e.g. `(Readonly<A>) |-> Readonly<A>`
     T.isKind(tsm.SyntaxKind.TypeReference) ||
     // remove () if T is ArrayTypeNode e.g. `(A[]) |-> A[]`
@@ -2456,10 +2514,22 @@ const transformParenthesizedTypeNode = (
     // outer layer here means each pass removes exactly the layer the wrapping
     // added, so the parentheses no longer grow without bound (which previously
     // overflowed the parser stack on inputs like `type T = (('a' | 'b'))`).
-    T.isKind(tsm.SyntaxKind.ParenthesizedType)
-  ) {
-    options.replaceNode(node, T.getFullText());
+    T.isKind(tsm.SyntaxKind.ParenthesizedType);
+
+  if (!unwraps) {
+    return;
   }
+
+  // `getFullText` carries the comments between `(` and `T`, but not those
+  // between `T` and `)`. When those break the line and what follows the `)` is
+  // read differently after a line break, the parentheses stay.
+  const trailingComments = commentsBeforeClosingToken(node, T);
+
+  if (trailingComments.breaksLine && isFollowedByLineSensitiveToken(node)) {
+    return;
+  }
+
+  options.replaceNode(node, `${T.getFullText()}${trailingComments.text}`);
 };
 
 /**
