@@ -180,6 +180,69 @@ describe('parse', () => {
 
     expect(result.value.text).toBe('hello');
   });
+
+  test('should return what the reviver returns for the root, even if it is not JSON', () => {
+    const result = Json.parse('{"a":1}', (key, value) =>
+      key === '' ? undefined : value,
+    );
+
+    assert.isTrue(Result.isOk(result));
+
+    expect(result.value).toBeUndefined();
+  });
+
+  test('should delete an object property and leave an array hole where the reviver returns undefined', () => {
+    const result = Json.parse('{"a":1,"b":[1,2,3]}', (key, value) =>
+      key === 'a' || key === '1' ? undefined : value,
+    );
+
+    assert.isTrue(Result.isOk(result));
+
+    const revived: unknown = result.value;
+
+    assert.isTrue(isRecord(revived));
+
+    assert.isFalse(hasKey(revived, 'a'));
+
+    assert.isTrue(hasKey(revived, 'b'));
+
+    const arr = revived.b;
+
+    assert.isTrue(Array.isArray(arr));
+
+    expect(arr).toHaveLength(3);
+
+    expect(arr[0]).toBe(1);
+
+    expect(arr[1]).toBeUndefined();
+
+    expect(arr[2]).toBe(3);
+
+    // With the same elements, only a hole at index 1 makes these differ.
+    expect(arr).not.toStrictEqual([1, undefined, 3]);
+  });
+
+  test('should pass the reviver the children it has already revived', () => {
+    const mut_seen: unknown[] = [];
+
+    const result = Json.parse('{"inner":{"n":1}}', (key, value) => {
+      if (key === 'inner') {
+        mut_seen.push(structuredClone(value));
+
+        return 'replaced';
+      }
+
+      if (key === '') {
+        mut_seen.push(structuredClone(value));
+      }
+
+      return value;
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.deepStrictEqual(mut_seen, [{ n: 1 }, { inner: 'replaced' }]);
+  });
 });
 
 describe('stringify', () => {

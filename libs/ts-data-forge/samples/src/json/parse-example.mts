@@ -1,5 +1,5 @@
 // Example: src/json/json.mts (parse)
-import { Json, Result } from 'ts-data-forge';
+import { isRecord, Json, Result } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {
@@ -28,6 +28,15 @@ if (import.meta.vitest !== undefined) {
     );
 
     assert.isTrue(Result.isOk(withReviver));
+
+    // With a reviver, the result is whatever the reviver returned, not JSON:
+    // `created` is a `Date` here although it is typed `JsonValue`. Widen it to
+    // `unknown` before narrowing it.
+    const revived: unknown = withReviver.value;
+
+    assert.isTrue(isRecord(revived));
+
+    assert.instanceOf(revived['created'], Date);
 
     // embed-sample-code-ignore-below
   });

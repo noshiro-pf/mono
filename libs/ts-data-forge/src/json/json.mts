@@ -48,6 +48,15 @@ export namespace Json {
    * );
    *
    * assert.isTrue(Result.isOk(withReviver));
+   *
+   * // With a reviver, the result is whatever the reviver returned, not JSON:
+   * // `created` is a `Date` here although it is typed `JsonValue`. Widen it to
+   * // `unknown` before narrowing it.
+   * const revived: unknown = withReviver.value;
+   *
+   * assert.isTrue(isRecord(revived));
+   *
+   * assert.instanceOf(revived['created'], Date);
    * ```
    *
    * @param text - A valid JSON string to parse. Can contain any valid JSON data
@@ -55,10 +64,19 @@ export namespace Json {
    * @param reviver - Optional function that transforms parsed values. Called
    *   for each key-value pair in the JSON. The function receives the key name
    *   and parsed value, and should return the transformed value. For nested
-   *   objects, inner objects are processed before outer objects.
+   *   objects, inner objects are processed before outer objects, so the
+   *   `value` an outer object is passed holds what the reviver already
+   *   returned for its children, which need not be JSON (see `@returns`).
+   *   Returning
+   *   `undefined` for a child deletes that property from an object and leaves
+   *   a hole in an array. The root is passed with the key `''`.
    * @returns A `Result<JsonValue, string>` containing:
    *
-   *   - On success: `Result.ok(parsedValue)` where `parsedValue` is the parsed JSON
+   *   - On success: `Result.ok(parsedValue)` where `parsedValue` is the parsed
+   *       JSON. With a reviver it is whatever the reviver returned for the root
+   *       (a `Date`, `undefined`, ...), which is not checked to be JSON although
+   *       it is typed `JsonValue`; widen it to `unknown` before narrowing it,
+   *       as the example does.
    *   - On failure: `Result.err(errorMessage)` where `errorMessage` describes the
    *       parsing error
    */
