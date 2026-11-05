@@ -305,7 +305,11 @@ export const eslintUnicornRules = {
   'unicorn/prefer-await': 'off',
 
   'unicorn/prefer-direct-iteration': 'error',
-  'unicorn/prefer-dispose': 'error',
+  /**
+   * Off. It suggests `using`, which Node.js 22, still supported by this config,
+   * does not parse. `nodeVersionGatedSyntax` reports a hand-written one.
+   */
+  'unicorn/prefer-dispose': 'off',
   'unicorn/prefer-early-return': withDefaultOption('error'),
   /**
    * Off. The fix writes `Map#getOrInsertComputed`, which not every Node.js this
@@ -332,6 +336,7 @@ export const eslintUnicornRules = {
    * `new Map(Iterator.concat(a, b))`, but `Iterator.concat` is not in every
    * Node.js version this config supports, and the TypeScript standard library
    * does not declare it, so the fix turns a lint error into TS2339.
+   * `nodeVersionGatedApis` reports a hand-written one.
    */
   'unicorn/prefer-iterator-concat': 'off',
   'unicorn/prefer-iterator-to-array': 'error',
@@ -365,7 +370,11 @@ export const eslintUnicornRules = {
   'unicorn/prefer-string-match-all': 'error',
   'unicorn/prefer-string-pad-start-end': 'error',
   'unicorn/prefer-string-repeat': withDefaultOption('error'),
-  'unicorn/prefer-temporal': withDefaultOption('error'),
+  /**
+   * Off. It steers `Date` code to `Temporal`, which not every Node.js this
+   * config supports has. `nodeVersionGatedGlobals` reports a hand-written one.
+   */
+  'unicorn/prefer-temporal': 'off',
   'unicorn/prefer-type-literal-last': 'error',
   /**
    * Off. It steers `atob`, `btoa` and `Buffer` code to `Uint8Array.fromBase64`
@@ -614,8 +623,16 @@ export const eslintUnicornRules = {
   'unicorn/no-unused-iterator-helper': 'error',
   'unicorn/no-useless-set-construction': 'error',
   'unicorn/no-using-resource-escape': 'error',
-  'unicorn/prefer-iterator-zip': 'error',
-  'unicorn/prefer-temporal-conversion': 'error',
+  /**
+   * Off. The fix writes `Iterator.zip`, which no Node.js release has yet.
+   * `nodeVersionGatedApis` reports a hand-written one.
+   */
+  'unicorn/prefer-iterator-zip': 'off',
+  /**
+   * Off. It converts to and from `Temporal`, as `unicorn/prefer-temporal`
+   * (above), whose reason it shares.
+   */
+  'unicorn/prefer-temporal-conversion': 'off',
 
   /**
    * Off, though the plugin recommends it. Guards here are written one condition
@@ -632,8 +649,9 @@ export const eslintUnicornRules = {
   'unicorn/prefer-json-import': 'off',
 
   /**
-   * `Uint8Array#toHex()` and `Uint8Array.fromHex()` are not in every Node.js
-   * version this config supports; not recommended by the plugin either.
+   * Off. `Uint8Array#toHex()` and `Uint8Array.fromHex()` are not in every
+   * Node.js version this config supports; not recommended by the plugin either.
+   * `nodeVersionGatedApis` reports a hand-written one.
    */
   'unicorn/prefer-uint8array-hex': 'off',
 

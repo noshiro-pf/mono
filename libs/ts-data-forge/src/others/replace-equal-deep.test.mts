@@ -1,5 +1,3 @@
-// A `Date` is one of the values compared whole, so the cases build some.
-/* eslint-disable unicorn/prefer-temporal */
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { hasKey, isRecord } from '../guard/index.mjs';

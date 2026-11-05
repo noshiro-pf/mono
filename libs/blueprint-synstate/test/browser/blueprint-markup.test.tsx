@@ -223,9 +223,7 @@ const noPanelControlled = (line: string): string =>
     .replace(/\[aria-expanded=(?:true|false)\]/u, '');
 
 /** A date for Blueprint React's pickers, which take a `Date`. */
-const blueprintDate = (isoLocal: string): Date =>
-  // eslint-disable-next-line unicorn/prefer-temporal -- Blueprint React's pickers take a Date
-  new Date(isoLocal);
+const blueprintDate = (isoLocal: string): Date => new Date(isoLocal);
 
 const cases: readonly Case[] = [
   [

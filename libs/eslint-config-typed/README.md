@@ -367,6 +367,15 @@ export default [
 ] satisfies readonly FlatConfig[];
 ```
 
+The presets report the built-in APIs, globals and syntax that the oldest
+Node.js in this package's `engines.node` lacks (`Temporal`, `Iterator.zip`,
+`using`, …), and turn off the rules whose fixes would write them. Files that run
+only on a known newer Node.js, such as a repository's own scripts, pass its
+major: `eslintConfigForNodeJs(['scripts/**'], { nodeMajor: 26 })` allows what
+Node.js 26 has and still reports what it lacks. With `nodeMajor` the preset sets
+the options of `no-restricted-globals`, `no-restricted-properties` and
+`no-restricted-syntax` for those files, replacing any set before it.
+
 ### Node.js TypeScript Project
 
 ```tsx

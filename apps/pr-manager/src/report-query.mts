@@ -269,7 +269,6 @@ export const mergedSearch = (
   // `Date` rather than `Temporal`, which not every browser the page may be
   // opened in has yet (`epochMsOf` in pr-report-core says the same); only the
   // ISO form, which ECMAScript defines exactly, is read off it.
-  // eslint-disable-next-line unicorn/prefer-temporal
   const since = new Date(sinceMs);
 
   const day = since.toISOString().slice(0, 10);
