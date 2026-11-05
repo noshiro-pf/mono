@@ -481,7 +481,11 @@ const checkBodyFile = async (
     return read;
   }
 
-  const problems = descriptionProblems(read.value, config.value?.translation);
+  const problems = descriptionProblems(
+    read.value,
+    config.value?.translation,
+    'pull-request',
+  );
 
   return problems === undefined
     ? Result.ok(undefined)

@@ -14,7 +14,12 @@ export type Command =
   | PushCommand
   | SimilarCommand
   | Readonly<
-      | { kind: 'check'; file: string }
+      | {
+          kind: 'check';
+          file: string;
+          /** The file is an issue's description, not a pull request's. */
+          issue: boolean;
+        }
       | {
           kind: 'pull';
           number: number;
@@ -66,7 +71,9 @@ export const HELP = [
   '  push <number> --file <path>     write an edited one back: refused when GitHub',
   '                                  changed it since the pull, or one half changed',
   '                                  and the other did not',
-  '  check --file <path>             check a description before it is posted',
+  '  check --file <path> [--issue]   check a description before it is posted;',
+  "                                  --issue for an issue's, where a closing",
+  '                                  keyword is prose rather than a trailer',
   '  similar --title <text> [--keyword <word>]...',
   '                                  list the open issues a new one may repeat:',
   '                                  close titles, and those naming a keyword',
@@ -168,7 +175,10 @@ const parseNumbered = (
 const parseCheck = (
   args: readonly string[],
 ): Result<Command | 'help', string> => {
-  const parsed = parseCommandArgs(args, { file: { type: 'string' } });
+  const parsed = parseCommandArgs(args, {
+    file: { type: 'string' },
+    issue: { type: 'boolean', default: false },
+  });
 
   if (Result.isErr(parsed)) {
     return parsed;
@@ -178,11 +188,11 @@ const parseCheck = (
     return Result.ok('help');
   }
 
-  const { file } = parsed.value;
+  const { file, issue } = parsed.value;
 
   return file === undefined
     ? Result.err('check needs --file <path>')
-    : Result.ok({ kind: 'check', file });
+    : Result.ok({ kind: 'check', file, issue });
 };
 
 const parseCreate = (

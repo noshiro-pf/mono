@@ -21,9 +21,25 @@ export type DescriptionParts = Readonly<{
   original: string;
   /** What follows the heading, up to the first `---` rule. */
   translation: string;
-  /** That rule and everything after it — closing keywords, trailers — or `''`. */
+  /** That rule and everything after it — the trailers ({@link DescriptionKind}) — or `''`. */
   trailers: string;
 }>;
+
+/**
+ * What a description belongs to. GitHub closes an issue by a closing keyword
+ * anywhere in a pull request's description, and acts on none in an issue's, so
+ * in an issue one is prose.
+ */
+export type DescriptionKind = 'issue' | 'pull-request';
+
+/**
+ * Whether an answer from the REST issues route is an issue or a pull request:
+ * the route answers both, and sets `pull_request` on pull requests alone.
+ */
+export const descriptionKindOf = (
+  issue: Readonly<{ pull_request?: unknown }>,
+): DescriptionKind =>
+  issue.pull_request === undefined ? 'issue' : 'pull-request';
 
 /**
  * `body` cut into its {@link DescriptionParts}: the original ends at the one
@@ -99,9 +115,9 @@ export const splitDescription = (
  *   refers to them.
  * - `Merge-After:` appears once, in the original: it is read wherever it is,
  *   so a second copy that drifted would be obeyed as well.
- * - The trailers — `Start-After:` and `Claude-Session:` lines and closing
- *   keywords — are in neither half; they follow the rule that ends the
- *   translation, so that each appears once, where the layout puts it.
+ * - The trailers — `Start-After:` and `Claude-Session:` lines, and in a pull
+ *   request closing keywords — are in neither half; they follow the rule that
+ *   ends the translation, so that each appears once, where the layout puts it.
  * - The original has at most one `## Review`, and the translation none: the
  *   tools read the first they find in the body.
  * - The original's `## Review` opens with the level and the total of rounds,
@@ -110,6 +126,7 @@ export const splitDescription = (
  */
 export const checkDescription = (
   parts: DescriptionParts,
+  kind: DescriptionKind,
 ): readonly string[] => {
   const original = visibleLines(parts.original);
 
@@ -134,9 +151,9 @@ export const checkDescription = (
     originalHeadings.length === compared.length &&
     originalHeadings.every((h, i) => compared[i]?.level === h.level + 1);
 
-  const originalRefs = referencesIn(original);
+  const originalRefs = referencesIn(original, kind);
 
-  const translationRefs = referencesIn(translation);
+  const translationRefs = referencesIn(translation, kind);
 
   const missingFromTranslation = onlyIn(originalRefs, translationRefs);
 
@@ -174,8 +191,8 @@ export const checkDescription = (
     translation.some((line) => MERGE_AFTER.test(line))
       ? 'the translation has a Merge-After: line; it is read wherever it is, so it appears once, in the original'
       : undefined,
-    trailerProblem('original', original),
-    trailerProblem('translation', translation),
+    trailerProblem('original', original, kind),
+    trailerProblem('translation', translation, kind),
     reviews > 1
       ? `the original has a "## Review" section ${reviews} times; the tools read the first, so the findings go under one`
       : undefined,
@@ -233,16 +250,20 @@ export const reviewOpeningRounds = (line: string): number | undefined => {
  * runs of blank lines, the `Merge-After:` line and trailer lines do not count:
  * the first two change nothing a reader sees, the third is a declaration,
  * maintained by `open-pr` and with no counterpart in the translation, and a
- * trailer belongs in neither half, so moving one out of a half is no edit.
+ * trailer of `kind` belongs in neither half, so moving one out of a half is no
+ * edit.
  */
 export const changedParts = (
   before: DescriptionParts,
   after: DescriptionParts,
+  kind: DescriptionKind,
 ): Readonly<{ original: boolean; translation: boolean }> =>
   ({
-    original: normalized(before.original) !== normalized(after.original),
+    original:
+      normalized(before.original, kind) !== normalized(after.original, kind),
     translation:
-      normalized(before.translation) !== normalized(after.translation),
+      normalized(before.translation, kind) !==
+      normalized(after.translation, kind),
   }) as const;
 
 /**
@@ -323,19 +344,22 @@ const REFERENCE = /(?<![\w./&-])#(?<number>\d+)\b/gu;
 const stripInlineCode = (line: string): string =>
   line.replaceAll(/(`+)[^`]*?\1/gu, '');
 
-const isTrailer = (line: string): boolean =>
-  TRAILER_LINE.test(line) || CLOSING_KEYWORD.test(stripInlineCode(line));
+/** A closing keyword is a trailer in a pull request's description only. */
+const isTrailer = (line: string, kind: DescriptionKind): boolean =>
+  TRAILER_LINE.test(line) ||
+  (kind === 'pull-request' && CLOSING_KEYWORD.test(stripInlineCode(line)));
 
 /** The first trailer `half` holds, as a problem; `undefined` when none. */
 const trailerProblem = (
   half: 'original' | 'translation',
   lines: readonly string[],
+  kind: DescriptionKind,
 ): string | undefined => {
-  const trailer = lines.find(isTrailer);
+  const trailer = lines.find((line) => isTrailer(line, kind));
 
   return trailer === undefined
     ? undefined
-    : `the ${half} has the trailer "${trailer.trim()}"; Start-After: and Claude-Session: lines and closing keywords are read wherever they are, so each appears once, after the "---" rule that ends the translation`;
+    : `the ${half} has the trailer "${trailer.trim()}"; Start-After: and Claude-Session: lines${kind === 'pull-request' ? ' and closing keywords' : ''} are read wherever they are, so each appears once, after the "---" rule that ends the translation`;
 };
 
 const headingOf = (line: string): readonly Heading[] => {
@@ -396,11 +420,15 @@ const visibleLines = (text: string): readonly string[] =>
   outsideCodeFences(text).split('\n');
 
 /**
- * The `#N` a half names, outside code, table rows, declarations and closing
- * keywords: a table, like code, appears in the original only, and the rest are
- * read by tools, not translated.
+ * The `#N` a half names, outside code, table rows, declarations and, in a pull
+ * request, closing keywords: a table, like code, appears in the original only,
+ * and the rest are read by tools, not translated. In an issue a closing keyword
+ * is prose, translated like any other.
  */
-const referencesIn = (lines: readonly string[]): ReadonlySet<number> =>
+const referencesIn = (
+  lines: readonly string[],
+  kind: DescriptionKind,
+): ReadonlySet<number> =>
   new Set(
     lines
       .filter(
@@ -409,7 +437,10 @@ const referencesIn = (lines: readonly string[]): ReadonlySet<number> =>
           !DECLARATION.test(line) &&
           !MERGE_BEFORE_NOTE.test(line),
       )
-      .map((line) => stripInlineCode(line).replaceAll(CLOSING_KEYWORDS, ''))
+      .map(stripInlineCode)
+      .map((line) =>
+        kind === 'pull-request' ? line.replaceAll(CLOSING_KEYWORDS, '') : line,
+      )
       .flatMap((line) =>
         Array.from(line.matchAll(REFERENCE), (match) =>
           Number(match.groups?.['number']),
@@ -417,11 +448,11 @@ const referencesIn = (lines: readonly string[]): ReadonlySet<number> =>
       ),
   );
 
-const normalized = (text: string): string =>
+const normalized = (text: string, kind: DescriptionKind): string =>
   text
     .split('\n')
     .map((line) => line.trimEnd())
-    .filter((line) => !MERGE_AFTER.test(line) && !isTrailer(line))
+    .filter((line) => !MERGE_AFTER.test(line) && !isTrailer(line, kind))
     .join('\n')
     .replaceAll(/\n{3,}/gu, '\n\n')
     .trim();

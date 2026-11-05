@@ -53,10 +53,11 @@ name that; or drop the declaration if it is only a better order.
 English first, then the Japanese under `## 日本語`, its headings the
 English's one level down (`CLAUDE.md`, "Japanese text"); trailers —
 `Start-After:` — after a `---` rule at the end. Say what happens, where (paths,
-links pinned to a commit), and what done looks like. Check it:
+links pinned to a commit), and what done looks like. A closing keyword
+(`resolves #N`) is prose in an issue, where GitHub acts on none. Check it:
 
 ```bash
-pnpm run pr-description -- check --file <path>
+pnpm run pr-description -- check --file <path> --issue
 ```
 
 ## 5. Create it
