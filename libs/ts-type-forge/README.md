@@ -840,7 +840,7 @@ For detailed information on all types, see the [Full API Reference](https://nosh
     - [IntRange](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/int-range.mts#L30)
     - [IntRangeInclusive](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/int-range.mts#L79)
 - src/type-level-integer/max.mts
-    - [Max](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/max.mts#L18)
+    - [Max](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/max.mts#L17)
 - src/type-level-integer/min.mts
     - [Min](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/min.mts#L17)
 - src/type-level-integer/seq.mts
