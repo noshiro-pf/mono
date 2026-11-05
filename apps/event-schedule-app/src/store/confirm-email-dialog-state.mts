@@ -4,7 +4,6 @@ import {
   filter,
   type InitializedObservable,
   map,
-  mapTo,
   merge,
 } from 'synstate';
 import { Result } from 'ts-data-forge';
@@ -24,10 +23,13 @@ import type { AppRouter } from './router-store.mjs';
 
 export type ConfirmEmailDialogDeps = Readonly<{
   api: Readonly<{ event: StrictPick<Api['event'], 'verifyEmail'> }>;
-  router: StrictPick<AppRouter, 'back' | 'eventId$' | 'isRoute'>;
+  router: StrictPick<AppRouter, 'back' | 'editPageLeaves$' | 'eventId$'>;
   eventSchedule$: InitializedObservable<EventSchedule | undefined>;
-  /** Told the email once it is confirmed. */
-  editEventSchedule: StrictPick<EditEventSchedule, 'setEmailVerified'>;
+  /** Told the email once it is confirmed, and the dialog stays closed while it is. */
+  editEventSchedule: StrictPick<
+    EditEventSchedule,
+    'emailVerified$' | 'setEmailVerified'
+  >;
   /** Where the dialog says whether the email was confirmed. */
   toast: Promise<Toaster>;
 }>;
@@ -42,21 +44,14 @@ export const createConfirmEmailDialogStore = (
 ): ConfirmEmailDialog => {
   const dc = dict.answerPage.eventInfo.verifyEmailDialog;
 
-  const leftEditPage$ = deps.router.isRoute.editPage$.pipe(
-    filter((isEditPage) => !isEditPage),
-  );
-
-  const [, dispatchEmailIsVerified, { state: emailIsVerified$ }] =
-    createReducerWithActions(
-      (_: boolean, verified: boolean) => verified,
-      false,
-      [leftEditPage$.pipe(mapTo(false))],
-    );
-
-  const isOpen$ = combine([emailIsVerified$, deps.eventSchedule$]).pipe(
+  const isOpen$ = combine([
+    deps.editEventSchedule.emailVerified$,
+    deps.eventSchedule$,
+  ]).pipe(
     map(
-      ([verified, eventSchedule]) =>
-        eventSchedule?.notificationSettings !== 'none' && !verified,
+      ([emailVerified, eventSchedule]) =>
+        eventSchedule?.notificationSettings !== 'none' &&
+        emailVerified === undefined,
     ),
   );
 
@@ -65,9 +60,13 @@ export const createConfirmEmailDialogStore = (
       confirmEmailDialogFormStateReducer,
       confirmEmailDialogFormInitialState,
       [
-        merge([leftEditPage$, isOpen$.pipe(filter((isOpen) => !isOpen))]).pipe(
-          map(() => ({ type: 'reset' }) as const),
-        ),
+        // The form starts again when the page is left, when another event's
+        // page opens, and once the dialog closes.
+        merge([
+          deps.router.editPageLeaves$,
+          deps.router.eventId$,
+          isOpen$.pipe(filter((isOpen) => !isOpen)),
+        ]).pipe(map(() => ({ type: 'reset' }) as const)),
       ],
     );
 
@@ -98,11 +97,25 @@ export const createConfirmEmailDialogStore = (
       return;
     }
 
+    const visit = deps.router.editPageLeaves$.getSnapshot().value;
+
     const verifyEmailResult = await deps.api.event.verifyEmail(eventId, email);
 
     if (Result.isErr(verifyEmailResult)) {
       console.error(verifyEmailResult.value);
+    }
 
+    // The page was left while the check ran, even if it has been opened again,
+    // or moved to another event: the form was reset, and the answer is for a
+    // visit already over.
+    if (
+      deps.router.editPageLeaves$.getSnapshot().value !== visit ||
+      deps.router.eventId$.getSnapshot().value !== eventId
+    ) {
+      return;
+    }
+
+    if (Result.isErr(verifyEmailResult)) {
       dispatch({
         type: 'setOtherError',
         payload: verifyEmailResult.value.message,
@@ -122,15 +135,13 @@ export const createConfirmEmailDialogStore = (
       case 'ok':
         dispatch({ type: 'done' });
 
-        deps.editEventSchedule.setEmailVerified(email);
+        deps.editEventSchedule.setEmailVerified(eventId, email);
 
         showToast({
           toast: deps.toast,
           message: dc.success,
           intent: 'success',
         });
-
-        dispatchEmailIsVerified(true);
 
         break;
     }

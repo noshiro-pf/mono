@@ -66,7 +66,7 @@ const createToggleSectionStateManager = <A,>({
   toggleState: Readonly<{
     setTrue: () => void;
     setFalse: () => void;
-    toggle: () => boolean;
+    state: InitializedObservable<boolean>;
     resetState: () => void;
   }>;
   initialState: A;
@@ -74,15 +74,28 @@ const createToggleSectionStateManager = <A,>({
   valueToBeSetWhenTurnedOn?: () => A;
   setValue: (a: A) => void;
 }>): ToggleSectionManagerState => {
-  const toggle = (): void => {
-    const nextState = toggleState.toggle();
+  // Turning the section off clears its value, and turning it on sets the one
+  // given for that, whether from the switch or from an event being loaded: a
+  // section keeps nothing from before.
+  const turnOff = (): void => {
+    toggleState.setFalse();
 
-    if (nextState) {
-      if (valueToBeSetWhenTurnedOn !== undefined) {
-        setValue(valueToBeSetWhenTurnedOn());
-      }
+    setValue(valueToBeSetWhenTurnedOff());
+  };
+
+  const turnOn = (): void => {
+    toggleState.setTrue();
+
+    if (valueToBeSetWhenTurnedOn !== undefined) {
+      setValue(valueToBeSetWhenTurnedOn());
+    }
+  };
+
+  const toggle = (): void => {
+    if (toggleState.state.getSnapshot().value) {
+      turnOff();
     } else {
-      setValue(valueToBeSetWhenTurnedOff());
+      turnOn();
     }
   };
 
@@ -95,7 +108,7 @@ const createToggleSectionStateManager = <A,>({
   return {
     toggle,
     resetState,
-    turnOff: toggleState.setFalse,
-    turnOn: toggleState.setTrue,
+    turnOff,
+    turnOn,
   };
 };
