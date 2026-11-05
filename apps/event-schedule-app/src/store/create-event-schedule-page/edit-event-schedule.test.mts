@@ -1,8 +1,8 @@
 import { EventSchedule, NotificationSettings } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
-import { createMemoryBrowser } from 'tiny-router-observable';
+import { createMemoryBrowser } from 'synstate-router';
 import { Result } from 'ts-data-forge';
-import { answerIconsInitialValue } from '../../constants/index.mjs';
+import { answerIconsInitialValue, routes } from '../../constants/index.mjs';
 import { createAppRouter, type AppRouter } from '../router-store.mjs';
 import {
   createEditEventScheduleStore,
@@ -133,7 +133,7 @@ describe(createEditEventScheduleStore, () => {
     assert.isTrue(store.hasNoChanges$.getSnapshot().value);
 
     // Another event, with no notifications and so no email to confirm.
-    router.push('/event/xyz/edit/');
+    router.push(routes.event.answer.edit.href({ eventId: 'xyz' }));
 
     assert.isUndefined(store.emailVerified$.getSnapshot().value);
 
@@ -156,9 +156,9 @@ describe(createEditEventScheduleStore, () => {
 
     // Saved with the notifications turned off, then edited again: the event
     // asks for no email, and the one confirmed before is not taken.
-    router.push('/event/abc/');
+    router.push(routes.event.answer.href({ eventId: 'abc' }));
 
-    router.push('/event/abc/edit/');
+    router.push(routes.event.answer.edit.href({ eventId: 'abc' }));
 
     assert.isUndefined(store.emailVerified$.getSnapshot().value);
 
@@ -172,7 +172,7 @@ describe(createEditEventScheduleStore, () => {
 
     store.setEventSchedule(withNotifications, undefined);
 
-    router.push('/event/xyz/edit/');
+    router.push(routes.event.answer.edit.href({ eventId: 'xyz' }));
 
     store.setEventSchedule(fromDatabase, undefined);
 
@@ -190,7 +190,7 @@ describe(createEditEventScheduleStore, () => {
 
     assert.isTrue(store.hasNoChanges$.getSnapshot().value);
 
-    router.push('/event/xyz/edit/');
+    router.push(routes.event.answer.edit.href({ eventId: 'xyz' }));
 
     store.setEventSchedule(fromDatabase, undefined);
 

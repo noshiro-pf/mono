@@ -27,7 +27,7 @@ import {
 import { DateUtils } from 'ts-fortress-types';
 import type { DeepReadonly, ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
-import { Routes, datetimeRange2str, dict } from '../../constants/index.mjs';
+import { datetimeRange2str, dict, routes } from '../../constants/index.mjs';
 import {
   answerSelectionReducer,
   datetimeRangeFromMapKey,
@@ -485,7 +485,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
   /* @internal */
   const onEditButtonClickImpl = (eventId: string | undefined): void => {
     if (eventId !== undefined) {
-      deps.router.push(Routes.routes.editPage(eventId));
+      deps.router.push(routes.event.answer.edit.href({ eventId }));
     }
   };
 

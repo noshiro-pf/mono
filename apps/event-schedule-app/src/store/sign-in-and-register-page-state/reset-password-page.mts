@@ -1,8 +1,9 @@
 import { type InitializedObservable, combine, filter, map } from 'synstate';
+import type { Href } from 'synstate-router';
 import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
-import { Routes, dict } from '../../constants/index.mjs';
+import { dict, routes } from '../../constants/index.mjs';
 import {
   type ResetPasswordPageState,
   resetPasswordPageHasError,
@@ -15,7 +16,7 @@ import type { AppRouter } from '../router-store.mjs';
 
 export type ResetPasswordPageDeps = Readonly<{
   api: Readonly<{ auth: StrictPick<Api['auth'], 'sendPasswordResetEmail'> }>;
-  router: StrictPick<AppRouter, 'isRoute' | 'pageToBack$' | 'redirect'>;
+  router: StrictPick<AppRouter, 'isActive' | 'pageToBack$' | 'replace'>;
   /** Where the page says whether it went through. */
   toast: Promise<Toaster>;
 }>;
@@ -33,7 +34,8 @@ export const createResetPasswordPageStore = (
     resetPasswordPageStateReducer,
     resetPasswordPageInitialState,
     [
-      deps.router.isRoute.signInPage$
+      deps.router
+        .isActive(routes.signIn)
         .pipe(filter((isSignInPage) => !isSignInPage))
         .pipe(map(() => ({ type: 'reset' }) as const)),
     ],
@@ -59,7 +61,7 @@ export const createResetPasswordPageStore = (
     })),
   );
 
-  const submit = async (pageToBack: string | undefined): Promise<void> => {
+  const submit = async (pageToBack: Href | undefined): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (resetPasswordPageHasError(s)) {
@@ -106,9 +108,9 @@ export const createResetPasswordPageStore = (
     });
 
     if (pageToBack !== undefined) {
-      deps.router.redirect(pageToBack);
+      deps.router.replace(pageToBack);
     } else {
-      deps.router.redirect(Routes.routes.createPage);
+      deps.router.replace(routes.create.href());
     }
   };
 

@@ -816,9 +816,12 @@ importers:
       synstate-dom:
         specifier: workspace:*
         version: link:../../libs/synstate-dom
-      tiny-router-observable:
+      synstate-router:
         specifier: workspace:*
-        version: link:../tiny-router-observable
+        version: link:../../libs/synstate-router
+      synstate-router-dom:
+        specifier: workspace:*
+        version: link:../../libs/synstate-router-dom
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge

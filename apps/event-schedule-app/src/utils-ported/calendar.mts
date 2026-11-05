@@ -84,17 +84,3 @@ export const isEmailString = (str: string): boolean =>
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
     str,
   );
-
-/**
- * Resolves a relative path against the current document.
- *
- * Ported from `@noshiro/ts-utils-additional`; `ts-data-forge` has no successor.
- * The anchor element does the resolving, which is what the original relied on.
- */
-export const toAbsolutePath = (relativePath: string): string => {
-  const mut_element = document.createElement('a');
-
-  mut_element.href = relativePath;
-
-  return mut_element.href;
-};

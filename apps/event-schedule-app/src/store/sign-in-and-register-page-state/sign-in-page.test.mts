@@ -1,6 +1,7 @@
 import { createState } from 'synstate';
-import { createMemoryBrowser } from 'tiny-router-observable';
+import { createMemoryBrowser } from 'synstate-router';
 import { Result } from 'ts-data-forge';
+import { routes } from '../../constants/index.mjs';
 import { createAppRouter } from '../router-store.mjs';
 import { createSignInPageStore, type SignInPage } from './sign-in-page.mjs';
 
@@ -105,7 +106,7 @@ const setup = (
 
   const router = createAppRouter(browser);
 
-  router.push('/signIn/');
+  router.push(routes.signIn.href());
 
   const [googleSignInButtonDisabledState, setGoogleSignInUnderWay] =
     createState(false);

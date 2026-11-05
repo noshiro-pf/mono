@@ -12,7 +12,7 @@ import type { Api } from '../../api/index.mjs';
 import {
   dict,
   eventScheduleInitialValue,
-  Routes,
+  routes,
 } from '../../constants/index.mjs';
 import {
   collectEventSettingsPageDiff,
@@ -204,14 +204,12 @@ export const createEditEventScheduleStore = (
     ),
   );
 
-  const answerPagePath$ = deps.router.eventId$.pipe(
-    map((eventId) => Routes.routes.answerPage(eventId ?? '')),
-  );
-
   const onBackToAnswerPage = (): void => {
-    const answerPagePath = answerPagePath$.getSnapshot().value;
+    const eventId = deps.router.eventId$.getSnapshot().value;
 
-    deps.router.push(answerPagePath);
+    if (eventId !== undefined) {
+      deps.router.push(routes.event.answer.href({ eventId }));
+    }
   };
 
   const saveToDatabase = async (): Promise<void> => {

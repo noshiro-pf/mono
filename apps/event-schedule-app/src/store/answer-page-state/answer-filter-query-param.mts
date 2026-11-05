@@ -2,6 +2,7 @@ import {
   Arr,
   ISet,
   Num,
+  Optional,
   Result,
   expectType,
   isSafeUint,
@@ -11,7 +12,7 @@ import {
 } from 'ts-data-forge';
 import { YearMonthDate } from 'ts-fortress-types';
 import type { StrictPick } from 'ts-type-forge';
-import { Routes } from '../../constants/index.mjs';
+import { answerTableQuery, routes } from '../../constants/index.mjs';
 import type {
   AnswerFilterState,
   AnswerFilterStateAction,
@@ -25,12 +26,15 @@ import {
 import type { AppRouter } from '../router-store.mjs';
 
 export type AnswerFilterQueryParamDeps = Readonly<{
-  router: StrictPick<AppRouter, 'state' | 'updateQueryParams'>;
+  router: StrictPick<AppRouter, 'at' | 'setSearch'>;
 }>;
 
 /**
- * The answer table's sort and filters, written to and read from the URL's query
- * string, so that a link opens the table as it was.
+ * The answer table's sort and filters, written to and read from the answer
+ * page's query string (declared on `routes.event.answer`), so that a link opens
+ * the table as it was. Each write replaces the history entry. The edit page is
+ * below the answer page and matches too; outside both, nothing is read or
+ * written.
  */
 export const createAnswerFilterQueryParam = (
   deps: AnswerFilterQueryParamDeps,
@@ -39,23 +43,10 @@ export const createAnswerFilterQueryParam = (
     'date' | 'score',
     'asc' | 'desc',
   ]): void => {
-    deps.router.updateQueryParams(
-      (urlSearchParams) => {
-        if (sortKey === 'date') {
-          urlSearchParams.delete(keyDef.sortBy);
-        } else {
-          urlSearchParams.set(keyDef.sortBy, sortKey);
-        }
-
-        if (sortOrder === 'asc') {
-          urlSearchParams.delete(keyDef.sortOrder);
-        } else {
-          urlSearchParams.set(keyDef.sortOrder, sortOrder);
-        }
-
-        return urlSearchParams;
-      },
-      { method: 'replaceState' },
+    deps.router.setSearch(
+      routes.event.answer,
+      (prev) => ({ ...prev, 'sort-by': sortKey, 'sort-order': sortOrder }),
+      { replace: true },
     );
   };
 
@@ -72,114 +63,35 @@ export const createAnswerFilterQueryParam = (
       '=',
     );
 
-    deps.router.updateQueryParams(
-      (urlSearchParams) => {
-        if (
+    deps.router.setSearch(
+      routes.event.answer,
+      (prev) => ({
+        ...prev,
+        date:
           dateRange.enabled &&
           dateRange.value.start !== undefined &&
           dateRange.value.end !== undefined
-        ) {
-          urlSearchParams.set(
-            keyDef.date,
-            range2str(
-              ymd2str(dateRange.value.start),
-              ymd2str(dateRange.value.end),
-            ),
-          );
-        } else {
-          urlSearchParams.delete(keyDef.date);
-        }
-
-        if (dayOfWeek.enabled) {
-          urlSearchParams.set(
-            keyDef.dayOfWeek,
-            dayOfWeekToStr(dayOfWeek.value),
-          );
-        } else {
-          urlSearchParams.delete(keyDef.dayOfWeek);
-        }
-
-        if (filledDateOnly) {
-          urlSearchParams.set(
-            keyDef.filledDateOnly,
-            filledDateOnlyToStr(filledDateOnly),
-          );
-        } else {
-          urlSearchParams.delete(keyDef.filledDateOnly);
-        }
-
-        if (rank.enabled) {
-          urlSearchParams.set(keyDef.rank, num2str(rank.value));
-        } else {
-          urlSearchParams.delete(keyDef.rank);
-        }
-
-        if (scoreRange.enabled) {
-          urlSearchParams.set(
-            keyDef.score,
-            range2str(
+            ? range2str(
+                ymd2str(dateRange.value.start),
+                ymd2str(dateRange.value.end),
+              )
+            : undefined,
+        day: dayOfWeek.enabled ? dayOfWeekToStr(dayOfWeek.value) : undefined,
+        'filled-date-only': filledDateOnly,
+        rank: rank.enabled ? num2str(rank.value) : undefined,
+        score: scoreRange.enabled
+          ? range2str(
               num2str(scoreRange.value.min),
               num2str(scoreRange.value.max),
-            ),
-          );
-        } else {
-          urlSearchParams.delete(keyDef.score);
-        }
-
-        if (iconState.good.enabled) {
-          urlSearchParams.set(
-            keyDef.good,
-            range2str(num2str(iconState.good.min), num2str(iconState.good.max)),
-          );
-        } else {
-          urlSearchParams.delete(keyDef.good);
-        }
-
-        if (iconState.fair.enabled) {
-          urlSearchParams.set(
-            keyDef.fair,
-            range2str(num2str(iconState.fair.min), num2str(iconState.fair.max)),
-          );
-        } else {
-          urlSearchParams.delete(keyDef.fair);
-        }
-
-        if (iconState.poor.enabled) {
-          urlSearchParams.set(
-            keyDef.poor,
-            range2str(num2str(iconState.poor.min), num2str(iconState.poor.max)),
-          );
-        } else {
-          urlSearchParams.delete(keyDef.poor);
-        }
-
-        if (iconState.goodPlusFair.enabled) {
-          urlSearchParams.set(
-            keyDef.goodPlusFair,
-            range2str(
-              num2str(iconState.goodPlusFair.min),
-              num2str(iconState.goodPlusFair.max),
-            ),
-          );
-        } else {
-          urlSearchParams.delete(keyDef.goodPlusFair);
-        }
-
-        if (iconState.fairPlusPoor.enabled) {
-          urlSearchParams.set(
-            keyDef.fairPlusPoor,
-            range2str(
-              num2str(iconState.fairPlusPoor.min),
-              num2str(iconState.fairPlusPoor.max),
-            ),
-          );
-        } else {
-          urlSearchParams.delete(keyDef.fairPlusPoor);
-        }
-
-        return urlSearchParams;
-      },
-      { method: 'replaceState' },
+            )
+          : undefined,
+        good: iconRangeToStr(iconState.good),
+        fair: iconRangeToStr(iconState.fair),
+        poor: iconRangeToStr(iconState.poor),
+        'good-fair': iconRangeToStr(iconState.goodPlusFair),
+        'fair-poor': iconRangeToStr(iconState.fairPlusPoor),
+      }),
+      { replace: true },
     );
   };
 
@@ -189,20 +101,15 @@ export const createAnswerFilterQueryParam = (
     ) => void,
     filterStateDispatch: (action: AnswerFilterStateAction) => void,
   ): void => {
-    const queryParams = deps.router.state.getSnapshot().value.searchParams;
+    const values = deps.router.at(routes.event.answer).getSnapshot().value;
 
-    const sortKey =
-      queryParams.get(keyDef.sortBy) === Routes.queryParamValue.sortBy.score
-        ? 'score'
-        : 'date';
+    if (Optional.isNone(values)) {
+      return;
+    }
 
-    const sortOrder =
-      queryParams.get(keyDef.sortOrder) ===
-      Routes.queryParamValue.sortOrder.desc
-        ? 'desc'
-        : 'asc';
+    const query = values.value.search;
 
-    setSortOrderAndKey([sortKey, sortOrder]);
+    setSortOrderAndKey([query['sort-by'], query['sort-order']]);
 
     const parseRank = (s: string): AnswerRank | undefined =>
       pipe(s)
@@ -214,74 +121,35 @@ export const createAnswerFilterQueryParam = (
         .map(Num.from)
         .map((a) => (isAnswersScore(a) ? a : undefined)).value;
 
-    // `asSafeUint` throws on anything that is not a non-negative safe integer,
-    // `NaN` included, so it cannot be the inner call: a query parameter someone
-    // typed by hand would take the whole page down rather than be ignored.
-    // Guard first, cast second.
-    const parseSafeUint = (s: string): SafeUint | undefined => {
-      const parsed = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
-
-      return isSafeUint(parsed) ? parsed : undefined;
-    };
-
     filterStateDispatch({
       type: 'setFromUrlQueryParams',
       values: {
-        dateRange: pipe(queryParams.get(keyDef.date))
+        dateRange: pipe(query.date)
           .mapNullable(rangeFromStr)
           .mapNullable((range) => ({
             start: ymdFromStr(range.a),
             end: ymdFromStr(range.b),
           })).value ?? { start: undefined, end: undefined },
 
-        dayOfWeek: pipe(queryParams.get(keyDef.dayOfWeek)).mapNullable(
-          dayOfWeekFromStr,
-        ).value,
+        dayOfWeek: pipe(query.day).mapNullable(dayOfWeekFromStr).value,
 
-        rank: pipe(queryParams.get(keyDef.rank)).mapNullable(parseRank).value,
+        rank: pipe(query.rank).mapNullable(parseRank).value,
 
-        scoreRange: pipe(queryParams.get(keyDef.score))
+        scoreRange: pipe(query.score)
           .mapNullable(rangeFromStr)
           .mapNullable((range) => ({
             min: parseScore(range.a),
             max: parseScore(range.b),
           })).value ?? { min: undefined, max: undefined },
 
-        filledDateOnly: pipe(
-          queryParams.get(keyDef.filledDateOnly),
-        ).mapNullable(filledDateOnlyFromStr).value,
+        filledDateOnly: query['filled-date-only'],
 
         iconState: {
-          good: pipe(queryParams.get(keyDef.good))
-            .mapNullable(rangeFromStr)
-            .mapNullable((range) => ({
-              min: parseSafeUint(range.a),
-              max: parseSafeUint(range.b),
-            })).value ?? { min: undefined, max: undefined },
-          fair: pipe(queryParams.get(keyDef.fair))
-            .mapNullable(rangeFromStr)
-            .mapNullable((range) => ({
-              min: parseSafeUint(range.a),
-              max: parseSafeUint(range.b),
-            })).value ?? { min: undefined, max: undefined },
-          poor: pipe(queryParams.get(keyDef.poor))
-            .mapNullable(rangeFromStr)
-            .mapNullable((range) => ({
-              min: parseSafeUint(range.a),
-              max: parseSafeUint(range.b),
-            })).value ?? { min: undefined, max: undefined },
-          goodPlusFair: pipe(queryParams.get(keyDef.goodPlusFair))
-            .mapNullable(rangeFromStr)
-            .mapNullable((range) => ({
-              min: parseSafeUint(range.a),
-              max: parseSafeUint(range.b),
-            })).value ?? { min: undefined, max: undefined },
-          fairPlusPoor: pipe(queryParams.get(keyDef.fairPlusPoor))
-            .mapNullable(rangeFromStr)
-            .mapNullable((range) => ({
-              min: parseSafeUint(range.a),
-              max: parseSafeUint(range.b),
-            })).value ?? { min: undefined, max: undefined },
+          good: iconRangeFromStr(query.good),
+          fair: iconRangeFromStr(query.fair),
+          poor: iconRangeFromStr(query.poor),
+          goodPlusFair: iconRangeFromStr(query['good-fair']),
+          fairPlusPoor: iconRangeFromStr(query['fair-poor']),
         },
       },
     });
@@ -307,8 +175,6 @@ export type AnswerFilterQueryParam = Readonly<{
     filterStateDispatch: (action: AnswerFilterStateAction) => void,
   ) => void;
 }>;
-
-const keyDef = Routes.queryParamKey.answerTableState;
 
 const num2str = (n: number): string => Num.roundAt(n, 2).toString(10);
 
@@ -344,10 +210,10 @@ const dayOfWeekToStr = (
   }>,
 ): string =>
   (['Sun', 'Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat'] as const)
-    .map((key) => tp(Routes.queryParamValue.dayAbbrDef[key], value[key]))
+    .map((key) => tp(answerTableQuery.dayAbbr[key], value[key]))
     .filter(([_key, checked]) => checked)
     .map(([key]) => key)
-    .join(Routes.queryParamValue.dayElementDelim);
+    .join(answerTableQuery.dayElementDelim);
 
 const dayOfWeekFromStr = (
   str: string,
@@ -360,32 +226,51 @@ const dayOfWeekFromStr = (
   Fri: boolean;
   Sat: boolean;
 }> => {
-  const set = ISet.create(str.split(Routes.queryParamValue.dayElementDelim));
+  const set = ISet.create(str.split(answerTableQuery.dayElementDelim));
 
   return {
-    Sun: set.has(Routes.queryParamValue.dayAbbrDef.Sun),
-    Mon: set.has(Routes.queryParamValue.dayAbbrDef.Mon),
-    Tue: set.has(Routes.queryParamValue.dayAbbrDef.Tue),
-    Wed: set.has(Routes.queryParamValue.dayAbbrDef.Wed),
-    Thr: set.has(Routes.queryParamValue.dayAbbrDef.Thr),
-    Fri: set.has(Routes.queryParamValue.dayAbbrDef.Fri),
-    Sat: set.has(Routes.queryParamValue.dayAbbrDef.Sat),
+    Sun: set.has(answerTableQuery.dayAbbr.Sun),
+    Mon: set.has(answerTableQuery.dayAbbr.Mon),
+    Tue: set.has(answerTableQuery.dayAbbr.Tue),
+    Wed: set.has(answerTableQuery.dayAbbr.Wed),
+    Thr: set.has(answerTableQuery.dayAbbr.Thr),
+    Fri: set.has(answerTableQuery.dayAbbr.Fri),
+    Sat: set.has(answerTableQuery.dayAbbr.Sat),
   };
 };
 
 const range2str = (a: string, b: string): string =>
-  `${a}${Routes.queryParamValue.rangeDelim}${b}` as const;
+  `${a}${answerTableQuery.rangeDelim}${b}` as const;
 
 const rangeFromStr = (
   rangeStr: string,
 ): Readonly<{ a: string; b: string }> | undefined => {
-  const res = rangeStr.split(Routes.queryParamValue.rangeDelim);
+  const res = rangeStr.split(answerTableQuery.rangeDelim);
 
   return Arr.isFixedLengthTuple(2, res) ? { a: res[0], b: res[1] } : undefined;
 };
 
-const filledDateOnlyToStr = (value: boolean): string =>
-  value ? Routes.queryParamValue.filledDateOnlyEnabled : '';
+const iconRangeToStr = (
+  range: Readonly<{ enabled: boolean; min: number; max: number }>,
+): string | undefined =>
+  range.enabled ? range2str(num2str(range.min), num2str(range.max)) : undefined;
 
-const filledDateOnlyFromStr = (value: string): boolean =>
-  value === Routes.queryParamValue.filledDateOnlyEnabled;
+// `asSafeUint` throws on anything that is not a non-negative safe integer,
+// `NaN` included, so it cannot be the inner call: a query parameter someone
+// typed by hand would take the whole page down rather than be ignored. Guard
+// first, cast second.
+const parseSafeUint = (s: string): SafeUint | undefined => {
+  const parsed = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+
+  return isSafeUint(parsed) ? parsed : undefined;
+};
+
+const iconRangeFromStr = (
+  value: string | undefined,
+): Readonly<{ min: SafeUint | undefined; max: SafeUint | undefined }> =>
+  pipe(value)
+    .mapNullable(rangeFromStr)
+    .mapNullable((range) => ({
+      min: parseSafeUint(range.a),
+      max: parseSafeUint(range.b),
+    })).value ?? { min: undefined, max: undefined };

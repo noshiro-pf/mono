@@ -1,6 +1,6 @@
 import { Alert } from 'blueprint-synstate';
 import { constant, type Bindable, type JSX } from 'synstate-dom';
-import { dict, introductionUrl, Routes } from '../../../constants/index.mjs';
+import { dict, introductionUrl, routes } from '../../../constants/index.mjs';
 import { Router } from '../../../store/index.mjs';
 import { maxWidthModalClass } from '../../styled/index.mjs';
 import * as styles from './for-non-logged-in-user-button.module.css';
@@ -46,5 +46,5 @@ export const ForNonLoggedInUserDialog = ({
 );
 
 const onConfirmClick = (): void => {
-  Router.push(Routes.routes.signInPage);
+  Router.push(routes.signIn.href());
 };

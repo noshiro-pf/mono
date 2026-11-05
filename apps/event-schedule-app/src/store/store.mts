@@ -12,7 +12,6 @@ import {
   createToaster,
   fetchHolidaysJson,
 } from '../functions/index.mjs';
-import { toAbsolutePath } from '../utils-ported/index.mjs';
 import { now } from '../utils/index.mjs';
 import {
   createAnswerFilterAndSortStore,
@@ -142,7 +141,7 @@ export const CreateEventScheduleStore = createCreateEventScheduleStore({
     globalThis.isSecureContext
       ? globalThis.navigator.clipboard.writeText(text)
       : Promise.resolve(),
-  toAbsolutePath,
+  router: Router,
   now,
   saveDelayMs: 500,
   toast: createToaster(),

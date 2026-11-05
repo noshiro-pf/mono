@@ -47,7 +47,8 @@
     "normalize.css": "^8.0.1",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
-    "tiny-router-observable": "workspace:*",
+    "synstate-router": "workspace:*",
+    "synstate-router-dom": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*",
     "ts-fortress-types": "workspace:*"

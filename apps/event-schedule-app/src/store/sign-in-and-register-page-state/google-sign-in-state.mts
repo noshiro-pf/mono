@@ -1,7 +1,8 @@
 import { type InitializedObservable, createBooleanState } from 'synstate';
+import type { Href } from 'synstate-router';
 import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
-import { Routes, dict } from '../../constants/index.mjs';
+import { dict, routes } from '../../constants/index.mjs';
 import { showToast } from '../../functions/index.mjs';
 import type { AppRouter } from '../router-store.mjs';
 
@@ -12,7 +13,7 @@ export type GoogleSignInDeps = Readonly<{
       googleSignInWithPopup: () => Promise<Result<unknown, unknown>>;
     }>;
   }>;
-  router: StrictPick<AppRouter, 'pageToBack$' | 'redirect'>;
+  router: StrictPick<AppRouter, 'pageToBack$' | 'replace'>;
   /** Where the page says whether it went through. */
   toast: Promise<Toaster>;
 }>;
@@ -37,7 +38,7 @@ export const createGoogleSignInStore = (
   ] = createBooleanState(false);
 
   const googleSignInSubmit = async (
-    pageToBack: string | undefined,
+    pageToBack: Href | undefined,
   ): Promise<void> => {
     disableGoogleSignInButton();
 
@@ -59,9 +60,9 @@ export const createGoogleSignInStore = (
       });
 
       if (pageToBack !== undefined) {
-        deps.router.redirect(pageToBack);
+        deps.router.replace(pageToBack);
       } else {
-        deps.router.redirect(Routes.routes.createPage);
+        deps.router.replace(routes.create.href());
       }
     }
   };

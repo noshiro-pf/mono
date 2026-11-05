@@ -1,12 +1,13 @@
-import { createMemoryBrowser } from 'tiny-router-observable';
+import { createMemoryBrowser, type Href } from 'synstate-router';
 import { Result } from 'ts-data-forge';
+import { routes } from '../../constants/index.mjs';
 import { createAppRouter } from '../router-store.mjs';
 import { createGoogleSignInStore } from './google-sign-in-state.mjs';
 import { createResetPasswordPageStore } from './reset-password-page.mjs';
 
 describe(createGoogleSignInStore, () => {
   test('signs in, then goes back to the page it was asked from', async () => {
-    const { browser, router, toasts } = routerAt('/signIn/');
+    const { browser, router, toasts } = routerAt(routes.signIn.href());
 
     const store = createGoogleSignInStore({
       api: {
@@ -32,7 +33,7 @@ describe(createGoogleSignInStore, () => {
   });
 
   test('stays and says so when it fails', async () => {
-    const { browser, router, toasts } = routerAt('/signIn/');
+    const { browser, router, toasts } = routerAt(routes.signIn.href());
 
     const store = createGoogleSignInStore({
       api: {
@@ -56,7 +57,7 @@ describe(createGoogleSignInStore, () => {
 
 describe(createResetPasswordPageStore, () => {
   test('sends the email, then goes back to the page it was asked from', async () => {
-    const { browser, router, toasts } = routerAt('/signIn/');
+    const { browser, router, toasts } = routerAt(routes.signIn.href());
 
     const mut_sent: string[] = [];
 
@@ -86,7 +87,7 @@ describe(createResetPasswordPageStore, () => {
   });
 
   test('says when no such user exists, and stays', async () => {
-    const { browser, router, toasts } = routerAt('/signIn/');
+    const { browser, router, toasts } = routerAt(routes.signIn.href());
 
     const store = createResetPasswordPageStore({
       api: {
@@ -113,9 +114,9 @@ describe(createResetPasswordPageStore, () => {
   });
 });
 
-/** A router that came to `pathname` from an event's answer page. */
+/** A router that came to `href` from an event's answer page. */
 const routerAt = (
-  pathname: string,
+  href: Href,
 ): Readonly<{
   browser: ReturnType<typeof createMemoryBrowser>;
   router: ReturnType<typeof createAppRouter>;
@@ -125,7 +126,7 @@ const routerAt = (
 
   const router = createAppRouter(browser);
 
-  router.push(pathname);
+  router.push(href);
 
   const mut_toasts = { count: 0 };
 

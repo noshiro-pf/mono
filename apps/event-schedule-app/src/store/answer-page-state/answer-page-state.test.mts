@@ -1,6 +1,6 @@
 import { Answer, EventSchedule } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
-import { createMemoryBrowser } from 'tiny-router-observable';
+import { createMemoryBrowser } from 'synstate-router';
 import { Result } from 'ts-data-forge';
 import { createAppRouter } from '../router-store.mjs';
 import {

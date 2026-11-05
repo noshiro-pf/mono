@@ -1,7 +1,8 @@
 import { combine, filter, map, type InitializedObservable } from 'synstate';
+import type { Href } from 'synstate-router';
 import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
-import { Routes, dict } from '../../constants/index.mjs';
+import { dict, routes } from '../../constants/index.mjs';
 import {
   showToast,
   signInPageHasError,
@@ -28,7 +29,7 @@ export type SignInPageDeps = Readonly<{
       >;
     }>;
   }>;
-  router: StrictPick<AppRouter, 'isRoute' | 'pageToBack$' | 'redirect'>;
+  router: StrictPick<AppRouter, 'isActive' | 'pageToBack$' | 'replace'>;
   /** Signing in waits while a Google sign-in is under way. */
   googleSignIn: StrictPick<GoogleSignIn, 'googleSignInButtonDisabledState'>;
   /** Where the page says whether it went through. */
@@ -42,9 +43,9 @@ export type SignInPageDeps = Readonly<{
 export const createSignInPageStore = (deps: SignInPageDeps): SignInPage => {
   const dc = dict.register;
 
-  const left$ = deps.router.isRoute.signInPage$.pipe(
-    filter((isPage) => !isPage),
-  );
+  const left$ = deps.router
+    .isActive(routes.signIn)
+    .pipe(filter((isPage) => !isPage));
 
   const [formState$, dispatch] = createReducerWithActions(
     signInPageStateReducer,
@@ -91,7 +92,7 @@ export const createSignInPageStore = (deps: SignInPageDeps): SignInPage => {
     ),
   );
 
-  const submit = async (pageToBack: string | undefined): Promise<void> => {
+  const submit = async (pageToBack: Href | undefined): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (signInPageHasError(s)) {
@@ -147,9 +148,9 @@ export const createSignInPageStore = (deps: SignInPageDeps): SignInPage => {
       });
 
       if (pageToBack !== undefined) {
-        deps.router.redirect(pageToBack);
+        deps.router.replace(pageToBack);
       } else {
-        deps.router.redirect(Routes.routes.createPage);
+        deps.router.replace(routes.create.href());
       }
     }
   };

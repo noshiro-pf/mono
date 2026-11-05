@@ -1,35 +1,53 @@
-import { Arr, IMap } from 'ts-data-forge';
+import { defineRoutes, param, search } from 'synstate-router';
 
-const pathSegment = {
-  createPage: 'create',
-  answerPage: 'event',
-  editPageSuffix: 'edit',
-  eventListPage: 'event-list',
-  registerUser: 'register',
-  signIn: 'signIn',
+/**
+ * The answer table's sort and filters in the answer page's query string, so
+ * that a link opens the table as it was. A default is left out of the URL. The
+ * edit page, below the answer page, can carry them too; nothing writes them
+ * there.
+ */
+const answerTableSearch = {
+  'sort-by': search.literal(['date', 'score'], { default: 'date' }),
+  'sort-order': search.literal(['asc', 'desc'], { default: 'asc' }),
+  'filled-date-only': search.boolean({ default: false }),
+  rank: search.string(),
+  score: search.string(),
+  /** `YYYY-M-D--YYYY-M-D` */
+  date: search.string(),
+  /** The days of {@link answerTableQuery.dayAbbr}, joined by `-`. */
+  day: search.string(),
+  good: search.string(),
+  fair: search.string(),
+  poor: search.string(),
+  'good-fair': search.string(),
+  'fair-poor': search.string(),
 } as const;
 
-const queryParamKey = {
-  answerTableState: {
-    sortBy: 'sort-by',
-    sortOrder: 'sort-order',
-    rank: 'rank',
-    score: 'score',
-    date: 'date',
-    dayOfWeek: 'day',
-    filledDateOnly: 'filled-date-only',
-    good: 'good',
-    fair: 'fair',
-    poor: 'poor',
-    goodPlusFair: 'good-fair',
-    fairPlusPoor: 'fair-poor',
+/**
+ * The app's pages. `/` names none of its own: the router sends it to the create
+ * page.
+ */
+export const routes = defineRoutes({
+  root: { segment: '' },
+  create: {},
+  event: {
+    page: false,
+    children: {
+      answer: {
+        params: { eventId: param.string },
+        search: answerTableSearch,
+        children: { edit: {} },
+      },
+    },
   },
-} as const;
+  eventList: { segment: 'event-list' },
+  register: {},
+  signIn: {},
+});
 
-const queryParamValue = {
-  sortBy: { score: 'score', date: 'date' },
-  sortOrder: { desc: 'desc', asc: 'asc' },
-  dayAbbrDef: {
+/** How the answer table's query values are written. */
+export const answerTableQuery = {
+  dayAbbr: {
     Sun: 'su',
     Mon: 'mo',
     Tue: 'tu',
@@ -40,63 +58,4 @@ const queryParamValue = {
   },
   dayElementDelim: '-',
   rangeDelim: '--',
-  filledDateOnlyEnabled: 'true',
-} as const;
-
-const routes = {
-  createPage: `/${pathSegment.createPage}/`,
-
-  answerPage: (eventId: string) => `/${pathSegment.answerPage}/${eventId}/`,
-
-  editPage: (eventId: string) =>
-    `/${pathSegment.answerPage}/${eventId}/${pathSegment.editPageSuffix}/`,
-
-  eventListPage: `/${pathSegment.eventListPage}/`,
-
-  registerPage: `/${pathSegment.registerUser}/`,
-  signInPage: `/${pathSegment.signIn}/`,
-} as const;
-
-const isRoute = {
-  createPage: (pathSegments: readonly string[]): boolean =>
-    Arr.isFixedLengthTuple(1, pathSegments) &&
-    pathSegments[0] === pathSegment.createPage,
-
-  /** PathSegments[1] is `event-id` */
-  answerPage: (pathSegments: readonly string[]): boolean =>
-    Arr.isFixedLengthTuple(2, pathSegments) &&
-    pathSegments[0] === pathSegment.answerPage,
-
-  /** PathSegments[1] is `event-id` */
-  editPage: (pathSegments: readonly string[]): boolean =>
-    Arr.isFixedLengthTuple(3, pathSegments) &&
-    pathSegments[0] === pathSegment.answerPage &&
-    pathSegments[2] === pathSegment.editPageSuffix,
-
-  eventListPage: (pathSegments: readonly string[]): boolean =>
-    Arr.isFixedLengthTuple(1, pathSegments) &&
-    pathSegments[0] === pathSegment.eventListPage,
-
-  registerPage: (pathSegments: readonly string[]): boolean =>
-    Arr.isFixedLengthTuple(1, pathSegments) &&
-    pathSegments[0] === pathSegment.registerUser,
-
-  signInPage: (pathSegments: readonly string[]): boolean =>
-    Arr.isFixedLengthTuple(1, pathSegments) &&
-    pathSegments[0] === pathSegment.signIn,
-} as const;
-
-const redirectRules = IMap.create<string, string>([['/', routes.createPage]]);
-
-const getEventIdFromPathname = (
-  pathSegments: readonly string[],
-): string | undefined => pathSegments[1];
-
-export const Routes = {
-  queryParamKey,
-  queryParamValue,
-  routes,
-  isRoute,
-  redirectRules,
-  getEventIdFromPathname,
 } as const;
