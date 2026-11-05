@@ -4,8 +4,9 @@ import { Arr, unknownToString } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { readScripts } from '../lib/manifest-scripts.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
-import { matchScriptNames, readScripts } from './check-ci-commands.mjs';
+import { matchScriptNames } from './check-ci-commands.mjs';
 
 /**
  * Fails when a package's `doc` writes a committed file through a generator its
