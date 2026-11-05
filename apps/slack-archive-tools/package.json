@@ -16,15 +16,14 @@
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "fix:fmt": "pnpm run z:format-uncommitted --cwd .",
     "fix:fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
-    "fix:fmt:full": "pnpm run z:prettier .",
+    "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
     "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
     "test": "pnpm run check:test",
     "watch:test": "vitest --config ./configs/vitest.config.mts watch",
     "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
     "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
-    "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
-    "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"
+    "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts"
   },
   "dependencies": {
     "ts-data-forge": "workspace:*",

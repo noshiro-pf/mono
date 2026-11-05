@@ -64,6 +64,7 @@
     "check:root:example-coverage": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-example-coverage.mts",
     "check:root:firebase-emulator-hosts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-firebase-emulator-hosts.mts",
     "check:root:firebase-redirects": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-firebase-redirects.mts",
+    "check:root:format-scripts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-format-scripts.mts",
     "check:root:knip-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-knip-config.mts",
     "check:root:licenses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-licenses.mts",
     "check:root:lint": "node ./tools/scripts/cmd/assert-deps-built.mts && pnpm run z:eslint './tools/{scripts,configs}/**/*.mts' --fix",

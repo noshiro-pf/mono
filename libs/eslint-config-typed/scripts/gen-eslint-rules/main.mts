@@ -5,6 +5,8 @@ import * as path from 'node:path';
 import { Arr, Result } from 'ts-data-forge';
 import { $, glob, isDirectlyExecuted } from 'ts-repo-utils';
 import type { NonEmptyArray } from 'ts-type-forge';
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how packages reach its shared scripts
+import { formatPackage } from '../../../../tools/configs/format-package.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import {
   applyTransformationsToFile,
@@ -68,9 +70,11 @@ export const generateRulesType = async (
     // `ReadonlyRecord`), so restore the import before organize-imports prunes
     // it.
     await restoreTsTypeForgeImport(targetFileNames);
-
-    await fmt(targetFileNames);
   }
+
+  // A Prettier failure does not stop the run, so that the passes below still
+  // run over every file; the run fails at its end.
+  const formattedBeforePostLint = fmt(targetFileNames);
 
   {
     console.info('running `oxlint --fix` (post codemod) ...');
@@ -80,8 +84,12 @@ export const generateRulesType = async (
     // The ts-type-forge rules introduce usages of its types, so the import has
     // to be restored before organize-imports prunes it for the last time.
     await restoreTsTypeForgeImport(targetFileNames);
+  }
 
-    await fmt(targetFileNames);
+  const formattedLast = fmt(targetFileNames);
+
+  if (!formattedBeforePostLint || !formattedLast) {
+    throw new Error('Prettier failed on the generated files; see above.');
   }
 };
 
@@ -139,19 +147,19 @@ const tsTypeForgeImportPattern =
 /** ts-type-forge の import 文を挿入する位置の目印 */
 const eslintImportPattern = /import[\s\w]*\{[^}]*\}\s*from\s*'eslint';/u;
 
-const fmt = async (targetFileNames?: NonEmptyArray<string>): Promise<void> => {
+/** Formats the generated files; `false` when Prettier failed (it said why). */
+const fmt = (targetFileNames?: NonEmptyArray<string>): boolean => {
   console.info('formatting code ...');
 
-  const targetPattern =
-    targetFileNames === undefined
-      ? 'src/types/rules/*.mts'
-      : targetFileNames.map((name) => `src/types/rules/${name}`).join(' ');
-
-  const result = await $(`pnpm exec prettier --write ${targetPattern}`);
-
-  if (Result.isErr(result)) {
-    console.error(result.value);
-  }
+  return (
+    formatPackage({
+      cwd: projectRootPath,
+      patterns:
+        targetFileNames === undefined
+          ? ['src/types/rules/*.mts']
+          : targetFileNames.map((name) => `src/types/rules/${name}`),
+    }) === 0
+  );
 };
 
 const generate = async (

@@ -39,7 +39,7 @@
     "fix:codemod:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer append-as-const --transformer convert-to-readonly '{src,scripts,samples}/**/*.mts' && pnpm run fix:fmt",
     "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
     "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
-    "fix:fmt:full": "prettier --write .",
+    "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
     "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:index gen:readme",

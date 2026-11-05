@@ -57,7 +57,7 @@
     "gen:readme": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
     "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
     "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
-    "fix:fmt:full": "prettier --write .",
+    "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
     "gen:rule-types": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-eslint-rules/main.mts",
     "gen:index": "run-s gen:index:src fix:fmt",
     "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json scripts/cmd/gen-index.mts",

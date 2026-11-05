@@ -512,9 +512,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -582,9 +579,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -652,9 +646,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -710,9 +701,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -768,9 +756,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -856,9 +841,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -926,9 +908,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -981,9 +960,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1024,9 +1000,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1088,9 +1061,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1143,9 +1113,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1204,9 +1171,6 @@ importers:
       preact:
         specifier: 'catalog:'
         version: 10.29.8(preact-render-to-string@6.8.1)
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1265,9 +1229,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1317,9 +1278,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1384,9 +1342,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1457,9 +1412,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1500,9 +1452,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1546,9 +1495,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1677,9 +1623,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1732,9 +1675,6 @@ importers:
       preact:
         specifier: 'catalog:'
         version: 10.29.8(preact-render-to-string@6.8.1)
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1787,9 +1727,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1860,9 +1797,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1924,9 +1858,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1973,9 +1904,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2031,9 +1959,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2077,9 +2002,6 @@ importers:
       preact:
         specifier: 'catalog:'
         version: 10.29.8(preact-render-to-string@6.8.1)
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2117,9 +2039,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2212,9 +2131,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2258,9 +2174,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2464,9 +2377,6 @@ importers:
       playwright:
         specifier: 'catalog:'
         version: 1.64.1
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2565,9 +2475,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2620,9 +2527,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2690,9 +2594,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2769,9 +2670,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2830,9 +2728,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2879,9 +2774,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -2928,9 +2820,6 @@ importers:
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@7.0.2)
@@ -2983,9 +2872,6 @@ importers:
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -3038,9 +2924,6 @@ importers:
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -3080,9 +2963,6 @@ importers:
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -3141,9 +3021,6 @@ importers:
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
