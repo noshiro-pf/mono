@@ -9,6 +9,7 @@ import { Result, isNotUndefined } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import {
+  credentialErrorOf,
   showToast,
   updateEmailPageHasError,
   updateEmailPageInitialState,
@@ -149,8 +150,11 @@ export const createUpdateEmailPageStore = <
     );
 
     if (Result.isErr(res1)) {
-      switch (res1.value.code) {
-        case 'auth/wrong-password':
+      switch (credentialErrorOf(res1.value.code)) {
+        // The email signed in with is the user's own, so only the password can
+        // be wrong.
+        case 'wrongPassword':
+        case 'wrongEmailOrPassword':
           dispatch({
             type: 'setPasswordError',
             payload: dc.reauthenticate.message.wrongPassword,
@@ -158,7 +162,10 @@ export const createUpdateEmailPageStore = <
 
           break;
 
-        default:
+        // Signing in again reports an email of no account as
+        // `auth/user-mismatch`, not `auth/user-not-found`.
+        case 'userNotFound':
+        case undefined:
           console.error(
             'error occurred on reauthenticateWithCredential:',
             res1.value.code,

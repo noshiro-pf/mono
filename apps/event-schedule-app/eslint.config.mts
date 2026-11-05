@@ -63,7 +63,10 @@ export default [
   {
     // An event's times are wall-clock times in the zone it was made in
     // (`timezoneOffsetMinutes`), and `firestore.rules` reads them there (#3097).
-    // The same two rules are in `apps/event-schedule-app-functions/eslint.config.mts`.
+    // The same two time rules are in `apps/event-schedule-app-functions/eslint.config.mts`;
+    // the first rule below, on auth error codes, is this app's alone. The
+    // rules share one block, and so its ignores, since a later block setting
+    // the same rule would replace these options rather than add to them.
     files: ['src/**'],
     ignores: [
       // A test stubs `TZ` to show the code does not depend on it.
@@ -71,10 +74,21 @@ export default [
       // Compares the deadline being edited with the editor's clock, which is
       // the event's zone: saving stores the editor's offset with the event.
       'src/components/organisms/notification-settings.tsx',
+      // The one place the password-failure codes below are matched.
+      'src/functions/credential-error.mts',
     ],
     rules: defineKnownRules({
       'ts-restrictions/no-restricted-syntax': [
         'error',
+        {
+          // Under email enumeration protection a wrong password is
+          // `auth/invalid-credential`, so a form matching one code misses the
+          // other (#2955).
+          selector:
+            ':matches(Literal[value=/^auth\\/(wrong-password|invalid-credential)$/u], TemplateElement[value.cooked=/^auth\\/(wrong-password|invalid-credential)$/u])',
+          message:
+            'Read a failed password sign-in with `credentialErrorOf` from src/functions/credential-error.mts, which knows every code Firebase reports it as.',
+        },
         {
           selector:
             ":matches(Literal[value='Asia/Tokyo'], TemplateElement[value.cooked='Asia/Tokyo'])",

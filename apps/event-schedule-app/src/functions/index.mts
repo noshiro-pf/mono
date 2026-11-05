@@ -1,4 +1,5 @@
 export * from './answers-page/index.mjs';
+export * from './credential-error.mjs';
 export * from './date-input-text.mjs';
 export * from './event-settings-page-diff.mjs';
 export * from './fetch-holidays.mjs';
