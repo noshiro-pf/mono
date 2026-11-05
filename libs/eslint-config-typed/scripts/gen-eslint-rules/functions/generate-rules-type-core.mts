@@ -1,9 +1,14 @@
 import type { DeprecatedInfo } from '@eslint/core';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { compile, type Options } from 'json-schema-to-typescript';
-import { Arr, castDeepMutable } from 'ts-data-forge';
+import { Arr, castDeepMutable, expectType } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import type { Rule, Rules } from '../../../src/index.mjs';
+import type {
+  EslintNRules,
+  EslintReactRules,
+  Rule,
+  Rules,
+} from '../../../src/index.mjs';
 import { immerCodingStyleRules } from '../../../src/plugins/immer-coding-style/rules/rules.mjs';
 import { reactCodingStyleRules } from '../../../src/plugins/react-coding-style/rules/rules.mjs';
 import { strictDependenciesRules } from '../../../src/plugins/strict-dependencies/rules/index.mjs';
@@ -35,7 +40,10 @@ import {
   renameTitleToOptions,
 } from './fix-schema/index.mjs';
 import { isDeprecated } from './is-deprecated.mjs';
-import { normalizeSchemaToArray } from './normalize-schema-to-array.mjs';
+import {
+  isObjectFormSchema,
+  normalizeSchemaToArray,
+} from './normalize-schema-to-array.mjs';
 import {
   metaToString,
   rawSchemaToString,
@@ -88,14 +96,18 @@ export const generateRulesTypeCore = async (
       docs: string;
       deprecated: boolean | DeprecatedInfo;
       schema: JSONSchema4[];
+      spreadsOptions: boolean;
       schemaToPrint: JSONSchema4 | JSONSchema4[];
     }[]
   > = rules.map(([ruleName, { meta }]) => {
+    const rawSchema = falseToUndefined(meta?.schema);
+
     const fixedSchema: readonly JSONSchema4[] = normalizeSchemaToArray(
       falseToUndefined(
         pluginName === '@typescript-eslint/eslint-plugin' ||
           pluginName === '@stylistic/eslint-plugin'
           ? // Temporary workaround because schema changes made the compilation fail
+            // (`deepReplace` takes `false`, which JSON round-trips, but not `undefined`)
             deepReplace(meta?.schema, '#/items/0/', '#/')
           : meta?.schema,
       ),
@@ -192,6 +204,9 @@ export const generateRulesTypeCore = async (
     return {
       ruleName,
       schema: fixedSchema,
+      // Decided before normalization, which makes `{ type: 'array' }` and
+      // `[{ type: 'array' }]` look the same.
+      spreadsOptions: isObjectFormSchema(rawSchema),
       deprecated: meta?.deprecated ?? false,
       // schemaToPrint: falseToUndefined(meta?.schema) ?? [],
       schemaToPrint: fixedSchema,
@@ -216,6 +231,7 @@ const createResult = async (
       docs: string;
       deprecated: boolean | DeprecatedInfo;
       schema: JSONSchema4[];
+      spreadsOptions: boolean;
       schemaToPrint: JSONSchema4 | JSONSchema4[];
     }[]
   >,
@@ -226,7 +242,9 @@ const createResult = async (
     '/* cSpell:disable */',
     "import type { Linter } from 'eslint';",
     tsTypeForgeImportStatement,
-    ...(schemaList.some(({ schema }) => Arr.isFixedLengthArray(1, schema))
+    // An object-form schema always normalizes to one schema, so every rule that
+    // spreads takes the `case 1` branch below.
+    ...(schemaList.some((s) => !isDeprecated(s.deprecated) && s.spreadsOptions)
       ? [
           '',
           `type SpreadOptionsIfIsArray<T extends readonly [${RuleSeverityForNoOption}, unknown]> =`,
@@ -242,6 +260,7 @@ const createResult = async (
     schemaToPrint,
     ruleName,
     schema,
+    spreadsOptions,
   } of schemaList) {
     const namespaceName = toCapitalCase(ruleName);
 
@@ -294,7 +313,12 @@ const createResult = async (
             generatorOption.explicitRuleDefaultOption
               ? `"off" | ${RuleSeverityWithDefaultOption}`
               : 'Linter.StringSeverity',
-            `   | SpreadOptionsIfIsArray<readonly [${RuleSeverityForNoOption}, Options]>;`,
+            // An object-form schema validates the whole options array, so an
+            // array-typed `Options` is the options themselves. In an
+            // array-form schema it is the first option, kept as one element.
+            spreadsOptions
+              ? `   | SpreadOptionsIfIsArray<readonly [${RuleSeverityForNoOption}, Options]>;`
+              : `   | readonly [${RuleSeverityForNoOption}, Options];`,
             '',
           );
 
@@ -485,3 +509,96 @@ const getRules = async (
       );
   }
 };
+
+if (import.meta.vitest !== undefined) {
+  /** The text of `RuleEntry` in the namespace generated for `ruleName`. */
+  const ruleEntryOf = (generated: string, ruleName: string): string => {
+    const namespaceStart = generated.indexOf(
+      `namespace ${toCapitalCase(ruleName)} {`,
+    );
+
+    assert.isAtLeast(namespaceStart, 0);
+
+    const entryStart = generated.indexOf(
+      'export type RuleEntry =',
+      namespaceStart,
+    );
+
+    assert.isAtLeast(entryStart, 0);
+
+    // `RuleEntry` must be this namespace's, not the next one's. The next
+    // `namespace` keyword ends this one; a `}` does not, since the compiled
+    // `Options` may close a brace at column 0.
+    const nextNamespace = generated.indexOf('\nnamespace ', namespaceStart);
+
+    assert.isTrue(nextNamespace === -1 || entryStart < nextNamespace);
+
+    const entryEnd = generated.indexOf(';', entryStart);
+
+    assert.isAtLeast(entryEnd, 0);
+
+    return generated
+      .slice(entryStart, entryEnd + 1)
+      .replaceAll(/\s+/gu, ' ')
+      .trim();
+  };
+
+  const notSpread =
+    'export type RuleEntry = "off" | Linter.Severity | readonly [Linter.StringSeverity, Options];';
+
+  type CallbackReturn = EslintNRules['n/callback-return'];
+
+  type NoInvalidHtmlAttr = EslintReactRules['react/no-invalid-html-attribute'];
+
+  // The committed rule types take the documented array option as one element;
+  // the elements as separate options, which ESLint refuses, do not type-check.
+  expectType<readonly ['error', readonly ['done', 'next']], CallbackReturn>(
+    '<=',
+  );
+
+  expectType<readonly ['error', 'done', 'next'], CallbackReturn>('!<=');
+
+  expectType<readonly ['error', readonly ['rel']], NoInvalidHtmlAttr>('<=');
+
+  expectType<readonly ['error', 'rel'], NoInvalidHtmlAttr>('!<=');
+
+  describe(generateRulesTypeCore, () => {
+    test('spreads the options of an object-form schema, which validates the whole options array', async () => {
+      const generated = await generateRulesTypeCore(
+        'EslintRules',
+        'eslint',
+        undefined,
+      );
+
+      // `consistent-this`: `schema: { type: 'array', … }`
+      expect(ruleEntryOf(generated, 'consistent-this')).toBe(
+        'export type RuleEntry = "off" | Linter.Severity | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;',
+      );
+    });
+
+    test('keeps an array-valued first option of an array-form schema as one element', async () => {
+      const generated = await generateRulesTypeCore(
+        'EslintNRules',
+        'eslint-plugin-n',
+        undefined,
+      );
+
+      // `callback-return`: `schema: [{ type: 'array', … }]`
+      expect(ruleEntryOf(generated, 'callback-return')).toBe(notSpread);
+
+      expect(ruleEntryOf(generated, 'no-restricted-import')).toBe(notSpread);
+    });
+
+    test('keeps the array-valued first option of react/no-invalid-html-attribute as one element', async () => {
+      const generated = await generateRulesTypeCore(
+        'EslintReactRules',
+        'eslint-plugin-react',
+        undefined,
+      );
+
+      expect(ruleEntryOf(generated, 'no-invalid-html-attribute')).toBe(
+        notSpread,
+      );
+    });
+  });
+}

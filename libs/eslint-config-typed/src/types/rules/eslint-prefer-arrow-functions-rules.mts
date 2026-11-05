@@ -1,12 +1,6 @@
 /* cSpell:disable */
 import type { Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<
-  T extends readonly [Linter.StringSeverity, unknown],
-> = T[1] extends readonly unknown[]
-  ? readonly [Linter.StringSeverity, ...T[1]]
-  : T;
-
 /**
  * @description Auto-fix plain Functions into Arrow Functions, in all cases where conversion would result in the same behaviour
  * @link https://github.com/JamieMason/prefer-arrow-functions
@@ -112,9 +106,7 @@ namespace PreferArrowFunctions {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 export type EslintPreferArrowFunctionRules = Readonly<{
