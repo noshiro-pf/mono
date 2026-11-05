@@ -36,8 +36,8 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  *   packages they run, `BUILD_TOOL_PACKAGES`, which are followed too. Files no
  *   build reads (`IGNORED_IN_PACKAGES`) are left out.
  *
- * The ts-data-forge rules are turned off line by line below: ts-data-forge is
- * not installed when this runs.
+ * The ts-data-forge rules are off for this file (`scriptsRunBeforeInstall` in
+ * `tools/configs/`): ts-data-forge is not installed when this runs.
  *
  * **Run with `node`, not `tsx` or `pnpm run`**, for the reasons the header of
  * `workflow-steps.mts` gives: the job installs nothing, so this imports only
@@ -157,7 +157,6 @@ export const parseTargets = (json: string): Parsed<readonly Target[]> => {
     return { ok: false, message: `TARGETS is not JSON: ${parsed.message}` };
   }
 
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array, ts-data-forge/prefer-canonical-length-guard -- not installed when this runs (see the header)
   if (!Array.isArray(parsed.value) || parsed.value.length === 0) {
     return { ok: false, message: 'TARGETS must be a non-empty array.' };
   }
@@ -185,7 +184,6 @@ export const parseTargets = (json: string): Parsed<readonly Target[]> => {
       };
     }
 
-    // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- not installed when this runs (see the header)
     if (packages.length === 0 && paths.length === 0) {
       return { ok: false, message: `${only}: names no packages and no paths.` };
     }
@@ -210,7 +208,6 @@ export const targetPathspecs = (
   packages: ReadonlyMap<string, WorkspacePackage>,
   buildToolPackages: readonly string[] = BUILD_TOOL_PACKAGES,
 ): Parsed<readonly string[]> => {
-  // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- not installed when this runs (see the header)
   const bundlesPackages = target.packages.length > 0;
 
   const dirs = dependencyDirs(
@@ -456,13 +453,11 @@ const readJson = (root: string, file: string): unknown => {
 
 /** `value[key]` when `value` is an object with `key` of its own. */
 const field = (value: unknown, key: string): unknown =>
-  // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- not installed when this runs (see the header)
   typeof value === 'object' && value !== null
     ? Object.entries(value).find(([k]) => k === key)?.[1]
     : undefined;
 
 const stringList = (value: unknown): readonly string[] | undefined => {
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array -- not installed when this runs (see the header)
   if (!Array.isArray(value)) {
     return undefined;
   }

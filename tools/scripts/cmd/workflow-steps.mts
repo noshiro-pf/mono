@@ -310,10 +310,12 @@ export const readGateList = (
   scope: GateScope,
   root = '.',
 ): Parsed<readonly string[]> => {
+  const file = path.resolve(root, GATE_LISTS_FILE);
+
   const text = (() => {
     try {
       // eslint-disable-next-line security/detect-non-literal-fs-filename -- the lists file of the repository given.
-      return fs.readFileSync(`${root}/${GATE_LISTS_FILE}`, 'utf8');
+      return fs.readFileSync(file, 'utf8');
     } catch (error: unknown) {
       return {
         error:
@@ -327,7 +329,7 @@ export const readGateList = (
   if (typeof text !== 'string') {
     return {
       ok: false,
-      message: `Could not read ${GATE_LISTS_FILE} in ${path.resolve(root)}: ${text.error}`,
+      message: `Could not read ${file}: ${text.error}`,
     };
   }
 

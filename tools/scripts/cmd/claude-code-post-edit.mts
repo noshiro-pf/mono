@@ -192,7 +192,6 @@ const readText = (file: string): string | undefined => {
 };
 
 const isObject = (value: unknown): value is UnknownRecord =>
-  // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- ts-data-forge may not be installed when this runs (see the header).
   typeof value === 'object' && value !== null;
 
 /** Whether the package's own lint runs oxlint, so its verdict is the package's. */

@@ -150,7 +150,7 @@ export const formatReport = ({
             ? diff
             : `${diff.slice(0, MAX_DIFF_LENGTH)}\n[truncated; read the rest with \`git diff ${range} -- CLAUDE.md\`]`,
         ]),
-    ...(isEmpty(referenced)
+    ...(referenced.length === 0
       ? []
       : [
           '',
@@ -246,11 +246,6 @@ const git = (cwd: string, args: readonly string[]): string | undefined => {
   return result.status === 0 ? result.stdout.trim() : undefined;
 };
 
-/** `Arr.isEmpty` from `ts-data-forge`, inlined (see the header). */
-const isEmpty = (xs: readonly unknown[]): boolean =>
-  // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge may not be installed when this runs (see the header).
-  xs.length === 0;
-
 /**
  * The report for `seen..tip`: `undefined` when nothing the session loaded
  * changed, `FAILED` when git could not say.
@@ -287,23 +282,24 @@ const buildReport = (
     ({ path: file }) => !isMemoryFile(file) && references.has(file),
   );
 
-  if (isEmpty(memoryFiles) && isEmpty(referenced)) {
+  if (memoryFiles.length === 0 && referenced.length === 0) {
     return undefined;
   }
 
-  const diff = isEmpty(memoryFiles)
-    ? undefined
-    : git(cwd, [
-        'diff',
-        '--no-color',
-        '--no-ext-diff',
-        seen,
-        tip,
-        '--',
-        ...memoryFiles.map(({ path: file }) => file),
-      ]);
+  const diff =
+    memoryFiles.length === 0
+      ? undefined
+      : git(cwd, [
+          'diff',
+          '--no-color',
+          '--no-ext-diff',
+          seen,
+          tip,
+          '--',
+          ...memoryFiles.map(({ path: file }) => file),
+        ]);
 
-  return diff === undefined && !isEmpty(memoryFiles)
+  return diff === undefined && memoryFiles.length > 0
     ? FAILED
     : formatReport({ seen, tip, diff, referenced });
 };
@@ -420,7 +416,6 @@ const parseJson = (text: string): unknown => {
 };
 
 const isObject = (value: unknown): value is UnknownRecord =>
-  // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- ts-data-forge may not be installed when this runs (see the header).
   typeof value === 'object' && value !== null;
 
 /**

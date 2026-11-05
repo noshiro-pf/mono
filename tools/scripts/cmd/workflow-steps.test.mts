@@ -5,7 +5,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Arr, isRecord } from 'ts-data-forge';
+import { Arr, isRecord, isString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   firstFileToCheck,
@@ -271,7 +271,7 @@ describe('the ignore lists', () => {
     assert.deepStrictEqual(readGateList('code', '/nonexistent'), {
       ok: false,
       message:
-        'Could not read tools/configs/gate-ignore-lists.json in /nonexistent: ENOENT',
+        'Could not read /nonexistent/tools/configs/gate-ignore-lists.json: ENOENT',
     });
   });
 
@@ -386,10 +386,17 @@ describe('should-run', () => {
       fs.readFileSync(gateListsFile, 'utf8'),
     );
 
+    // A malformed file is reported as one, not as the parser disagreeing.
+    assert.isTrue(isRecord(file));
+
+    const style = file['style'];
+
+    assert.isTrue(Arr.isArray(style) && style.every(isString));
+
     assert.deepStrictEqual(parsed.ok ? undefined : parsed.message, undefined);
 
     assert.deepStrictEqual(parsed.ok ? parsed.value : undefined, {
-      patterns: isRecord(file) ? file['style'] : undefined,
+      patterns: style,
       base: 'origin/main',
       label: 'the style list',
     });
