@@ -527,7 +527,10 @@ a:focus-visible {
  * A switch tile and its `only` switch, which sits over the tile's top right
  * corner, clear of the number, and is always drawn: the page is opened on
  * phones, where nothing hovers. Its pill is small, so the area it answers to
- * reaches a little past it.
+ * reaches a little past it, but no further than the pill is from the tile's
+ * edges: past the right one of the last tile in a row, it would make the
+ * block scroll sideways, which the issues block in the DAG, having no
+ * padding at its right, draws as a second scroll bar under the graph's.
  */
 .stat-cell {
   display: flex;
@@ -539,6 +542,9 @@ a:focus-visible {
 }
 
 .stat-only {
+  --only-offset: 0.45rem;
+  --only-reach: 0.4rem;
+
   background: var(--surface);
   border: 1px solid var(--baseline);
   border-radius: 999px;
@@ -549,13 +555,20 @@ a:focus-visible {
   line-height: 1.2;
   padding: 0.15rem 0.5rem;
   position: absolute;
-  right: 0.45rem;
-  top: 0.45rem;
+  right: var(--only-offset);
+  top: var(--only-offset);
 }
 
+/*
+ * Placed against the pill's padding box, so that a reach as long as the
+ * pill's offset still stops the width of its border short of the tile's edge.
+ */
 .stat-only::after {
+  --edge-reach: calc(-1 * min(var(--only-reach), var(--only-offset)));
+
   content: '';
-  inset: -0.4rem;
+  inset: var(--edge-reach) var(--edge-reach) calc(-1 * var(--only-reach))
+    calc(-1 * var(--only-reach));
   position: absolute;
 }
 
@@ -2597,10 +2610,10 @@ a:focus-visible {
   }
 
   .stat-only {
+    --only-offset: 0.3rem;
+
     font-size: 0.625rem;
     padding: 0.1rem 0.35rem;
-    right: 0.3rem;
-    top: 0.3rem;
   }
 
   .merge-order-controls,
