@@ -186,22 +186,29 @@ with a person:
 
 ```text
 /pr-merge-queue:resolve-issues 3
+/pr-merge-queue:resolve-issues 20 synstate
 ```
 
 It does not choose them itself: `startable-issues` lists the issues
-`run-issue-resolver` (below) would hand on, in the same order and by the same
-code — startable by their `Start-After:`, not started or planned, written by the
-token's account (`--author` names others), not held by a label (`priority:hold`
-and `priority:close` included), by tier — `priority:S` first, then `A`, `B`,
-`C`, no tier and `D` — the lowest number first within each. Going down that
-list, the skill passes over any issue that one pull request cannot finish
-without a person's decision, and takes the others one at a time until N pull
-requests are open: `start-issue` as it takes one, then the repository's own
-instructions to a pull request opened with `open-pr`, held by `skip-ci`. The
-pull requests of one run form one serial stack in the order taken, each after
-the first opened with `--base` on the one before, even where nothing orders them
-and whatever the repository says of stacking, so that the whole stack can be
-queued as it stands and its layers merge without conflicting with each other.
+`run-issue-resolver` (below) would hand on, by the same code — startable by
+their `Start-After:`, not started or planned, written by the token's account
+(`--author` names others), not held by a label (`priority:hold` and
+`priority:close` included) — and orders them for a run that takes several. Each
+issue's themes are the scope its title starts with and the packages its body
+names by path. With no theme named, every `priority:S` comes first, then the
+highest-tier issue left with the rest of its theme whatever their tier (`D` only
+after a `D`), then the next; an issue below `priority:S` whose theme another
+session has started on is left to that session. With a theme named (`synstate`
+takes `synstate-dom` too), that theme alone, its own `priority:S` first, so that
+runs in several sessions can be split by theme. Going down that list, the skill
+passes over any issue that one pull request cannot finish without a person's
+decision, and takes the others one at a time until N pull requests are open:
+`start-issue` as it takes one, then the repository's own instructions to a pull
+request opened with `open-pr`, held by `skip-ci`. The pull requests of one run
+form one serial stack in the order taken, each after the first opened with
+`--base` on the one before, even where nothing orders them and whatever the
+repository says of stacking, so that the whole stack can be queued as it stands
+and its layers merge without conflicting with each other.
 One it stops on gets a comment saying what it needs, which the next run reads,
 and `start-issue --release`.
 

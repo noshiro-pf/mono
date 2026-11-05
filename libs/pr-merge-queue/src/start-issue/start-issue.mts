@@ -309,6 +309,22 @@ const refusePullRequest: Refusal = {
   overridable: false,
 } as const;
 
+/**
+ * Who holds a standing claim on issue `number`, read as `start-issue` reads it
+ * (only `viewer`'s own comments count); `undefined` when nobody does.
+ * `startable-issues` reads it to tell a theme its caller is on from one another
+ * session is on.
+ */
+export const readIssueClaimant = async (
+  context: ApiContext,
+  number: number,
+  viewer: string,
+): Promise<Result<string | undefined, string>> =>
+  Result.map(
+    await readClaim(context, number, viewer),
+    (comment) => holdingClaim(comment)?.by,
+  );
+
 const refuseNothingToStart = (issue: IssueFacts): Refusal | undefined =>
   issue.pullRequest
     ? refusePullRequest
