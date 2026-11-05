@@ -1,5 +1,5 @@
 import dedent from 'dedent';
-import { findMissingChangesets, isChangesetFile } from './changesets.mjs';
+import { findMissingChangesets } from './changesets.mjs';
 
 describe('findMissingChangesets', () => {
   const released = [
@@ -46,6 +46,26 @@ describe('findMissingChangesets', () => {
     );
   });
 
+  test('a changeset naming the package with `none` covers it', () => {
+    assert.deepStrictEqual(
+      findMissingChangesets({
+        changedFiles: [
+          'libs/ts-data-forge/src/array.mts',
+          '.changeset/quiet-cats.md',
+        ],
+        released,
+        changesets: [
+          {
+            file: '.changeset/quiet-cats.md',
+            content:
+              "---\n'ts-data-forge': none # internal only\n---\n\nRefactor.\n",
+          },
+        ],
+      }),
+      [],
+    );
+  });
+
   test('changes outside src/ and in other packages need none', () => {
     assert.deepStrictEqual(
       findMissingChangesets({
@@ -60,16 +80,5 @@ describe('findMissingChangesets', () => {
       }),
       [],
     );
-  });
-});
-
-describe('isChangesetFile', () => {
-  test.each([
-    ['.changeset/brave-cats.md', true],
-    ['.changeset/README.md', false],
-    ['.changeset/config.json', false],
-    ['libs/x/.changeset/a.md', false],
-  ] as const)('%s → %s', (file, expected) => {
-    assert.strictEqual(isChangesetFile(file), expected);
   });
 });

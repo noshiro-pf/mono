@@ -7,9 +7,10 @@ import * as util from 'node:util';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { isChangesetPath, listChangesetBumps } from '../../lib/changesets.mjs';
 import { formatLineRanges, parseAddedLines } from '../../lib/diff-lines.mjs';
 import { projectRootPath } from '../../project-root-path.mjs';
-import { findMissingChangesets, isChangesetFile } from './changesets.mjs';
+import { findMissingChangesets } from './changesets.mjs';
 import {
   checkCommitMessages,
   readJapanesePattern,
@@ -642,7 +643,7 @@ const checkChangesets = async (
   const released = packages.filter((_, i) => isReleased[i] === true);
 
   const changesetFiles = await filterExisting(
-    changedFiles.filter(isChangesetFile),
+    changedFiles.filter(isChangesetPath),
   );
 
   const changesets = await Promise.all(
@@ -652,13 +653,38 @@ const checkChangesets = async (
     })),
   );
 
-  const missing = findMissingChangesets({ changedFiles, released, changesets });
+  // A changeset `changeset version` would refuse is reported by
+  // `check:cspell:changeset` and every release guard; here it is a warning
+  // beside the rest, so that the checks after this one still run.
+  const parsed = changesets.map((changeset) => ({
+    changeset,
+    result: Result.fromThrowable(() => listChangesetBumps([changeset])),
+  }));
+
+  const unreadable = Arr.generate(function* () {
+    for (const { result } of parsed) {
+      if (Result.isErr(result)) {
+        yield unknownToString(result.value);
+      }
+    }
+  });
+
+  const missing = findMissingChangesets({
+    changedFiles,
+    released,
+    changesets: parsed
+      .filter(({ result }) => Result.isOk(result))
+      .map(({ changeset }) => changeset),
+  });
 
   return Arr.isNonEmpty(missing)
-    ? [
-        `src/ changed and no changeset in the diff names ${missing.join(', ')}. If the change is user-visible, run \`pnpm changeset\` (CLAUDE.md, "Releases").`,
-      ]
-    : [];
+    ? Arr.toPushed(
+        unreadable,
+        Arr.isNonEmpty(unreadable)
+          ? `src/ changed and no readable changeset in the diff names ${missing.join(', ')}. Fix the unreadable one above if it is meant to; otherwise, if the change is user-visible, run \`pnpm changeset\` (CLAUDE.md, "Releases").`
+          : `src/ changed and no changeset in the diff names ${missing.join(', ')}. If the change is user-visible, run \`pnpm changeset\` (CLAUDE.md, "Releases").`,
+      )
+    : unreadable;
 };
 
 /**

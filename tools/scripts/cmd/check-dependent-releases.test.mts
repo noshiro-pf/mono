@@ -606,6 +606,24 @@ describe('checkDependentReleases', () => {
     );
   });
 
+  test('does not take a `none` for a changeset releasing the dependent', () => {
+    const result = check({
+      changesets: [
+        changeset({ core: 'major', wrapper: 'major', plugin: 'none' }),
+      ],
+      packages: Arr.toPushed(defaultPackages, {
+        ...pkg('plugin', '1.2.0'),
+        dependencies: listDependencies({
+          peerDependencies: { core: '>=3.1.0' },
+        }),
+      }),
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.include(result.value.warnings[0], '  - plugin@1.2.0');
+  });
+
   test('holds a peer range the break stays in when another field pins the dependent to the workspace version', () => {
     const result = check({
       changesets: [changeset({ core: 'major', wrapper: 'major' })],
