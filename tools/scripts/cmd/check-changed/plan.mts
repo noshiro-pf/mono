@@ -84,11 +84,14 @@ export const classifyChanges = ({
       mut_areas.add('manifest');
     }
 
-    if (DEPS_GRAPH_FILES.has(file)) {
+    if (readsGeneratorInput(file, ROOT_GENERATORS['gen:deps-graph'].inputs)) {
       mut_areas.add('deps-graph');
     }
 
-    if (file === LICENSE_GENERATOR || basename(file) === 'LICENSE') {
+    if (
+      readsGeneratorInput(file, ROOT_GENERATORS['gen:license-files'].inputs) ||
+      basename(file) === 'LICENSE'
+    ) {
       mut_areas.add('license');
     }
 
@@ -449,16 +452,62 @@ export const readManifestDependencies = (
 };
 
 /**
+ * The root generators a change to what they read runs: each with its entry
+ * file, and the files and directories (ending in `/`) its output depends on —
+ * the generator, what it writes (so a hand edit is put back), and the library
+ * code it calls (#3336). `generator-inputs.test.mts` holds `inputs` to the
+ * import graph of `entry`.
+ */
+export const ROOT_GENERATORS = {
+  'gen:deps-graph': {
+    entry: 'tools/scripts/cmd/gen-dependency-graph.mts',
+    inputs: [
+      'tools/scripts/cmd/gen-dependency-graph.mts',
+      'docs/package-dependencies.md',
+      'tools/scripts/project-root-path.mts',
+      'libs/ts-repo-utils/src/functions/workspace-utils/',
+      'libs/ts-repo-utils/src/functions/assert-path-exists.mts',
+      'libs/ts-repo-utils/src/functions/diff.mts',
+      'libs/ts-repo-utils/src/functions/exec-async.mts',
+      'libs/ts-repo-utils/src/functions/format.mts',
+      'libs/ts-repo-utils/src/functions/glob.mts',
+      'libs/ts-repo-utils/src/functions/is-directly-executed.mts',
+    ],
+  },
+  'gen:license-files': {
+    entry: 'tools/scripts/cmd/gen-license-files.mts',
+    inputs: [
+      'tools/scripts/cmd/gen-license-files.mts',
+      'tools/scripts/project-root-path.mts',
+      'libs/ts-repo-utils/src/functions/is-directly-executed.mts',
+    ],
+  },
+} as const satisfies ReadonlyRecord<
+  string,
+  Readonly<{ entry: string; inputs: readonly string[] }>
+>;
+
+/** Whether `file` is one of `inputs`, or under one ending in `/`. */
+export const readsGeneratorInput = (
+  file: string,
+  inputs: readonly string[],
+): boolean =>
+  inputs.some((input) =>
+    input.endsWith('/') ? file.startsWith(input) : file === input,
+  );
+
+/**
  * What a change touches beyond its package. `root` asks for every
  * `check:root:*` (tools/ and the root configuration); `root-guards` for the
  * guards alone, without the root program's own type check, lint and tests.
  * `root-guards` is any change that is not prose alone, and
  * `gen:verify-npm-packages` runs on it for that reason: narrowing it to what
  * the guards read would leave that generator's copies stale. `license` is a
- * `LICENSE` or `gen-license-files.mts` itself; `gen:license-files` runs on it
- * and on `manifest`, whose `license` and `private` fields decide what it writes.
- * `deps-graph` is `gen-dependency-graph.mts` or the document it writes, which
- * `gen:deps-graph` otherwise regenerates only for a `manifest`.
+ * `LICENSE` or what `gen:license-files` reads ({@link ROOT_GENERATORS});
+ * `gen:license-files` runs on it and on `manifest`, whose `license` and
+ * `private` fields decide what it writes. `deps-graph` is what `gen:deps-graph`
+ * reads, the document it writes included, which it otherwise regenerates only
+ * for a `manifest`.
  */
 export const AREAS = [
   'root',
@@ -685,13 +734,6 @@ const FORMAT_CONFIG: ReadonlySet<string> = new Set<string>([
 const CONFIGS_SEGMENT = /(?:^|\/)configs\//u;
 
 const TYPESCRIPT_FILE = /\.(?:ts|mts|tsx)$/u;
-
-const DEPS_GRAPH_FILES: ReadonlySet<string> = new Set<string>([
-  'tools/scripts/cmd/gen-dependency-graph.mts',
-  'docs/package-dependencies.md',
-]);
-
-const LICENSE_GENERATOR = 'tools/scripts/cmd/gen-license-files.mts';
 
 const MANIFEST_FILES: ReadonlySet<string> = new Set<string>([
   'package.json',
