@@ -78,7 +78,7 @@
   },
   "peerDependencies": {
     "synstate": ">=7.0.1",
-    "synstate-dom": ">=0.7.1",
+    "synstate-dom": ">=0.8.0",
     "synstate-router": ">=0.1.0"
   },
   "engines": {

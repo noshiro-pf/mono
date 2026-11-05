@@ -1,5 +1,31 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.6.0
+
+### Minor Changes
+
+- 490ca88: Turns off `unicorn/prefer-temporal`, `unicorn/prefer-temporal-conversion`, `unicorn/prefer-iterator-zip` and `unicorn/prefer-dispose`, whose fixes and suggestions write `Temporal`, `Iterator.zip` and `using`, which Node.js 22, still in `engines.node`, lacks. `no-restricted-properties`, `no-restricted-globals` and `no-restricted-syntax` now also report a hand-written `Uint8Array.fromHex`, `#toHex`, `#setFromHex`, `#setFromBase64`, `Iterator.concat`, `Iterator.zip`, `Temporal` and `using` declaration. Each entry of the gated tables names its rules, and a test holds them off while the entry stands.
+
+    `eslintConfigForNodeJs(files, { nodeMajor })` lifts the gate for files that run only on a known Node.js, such as a repository's own scripts: what that runtime has is allowed, and what it lacks is still reported. `nodeVersionGateAt(nodeMajor)` gives the three rules' options for it.
+
+- 23fad6b: New rule `ts-restrictions/no-export-type-side-effects`, on in the preset: a re-export whose specifiers are all inline `type` (`export { type A } from 'm'`) is emitted under `verbatimModuleSyntax` as `export {} from 'm'`, a runtime load of `m`, and is fixed to `export type { A } from 'm'`. It is the re-export twin of `@typescript-eslint/no-import-type-side-effects`.
+
+### Patch Changes
+
+- 0588417: `immer-coding-style/prefer-curried-produce` reports only a `produce` imported from `immer` (named, aliased, default or through a namespace import) that nothing nearer shadows, so a local or another library's `produce(topic, callback)` is no longer rewritten.
+
+    It no longer fixes an updater whose base is cast to a type other than the parameter's annotation, such as `(state: State | undefined) => produce(state as State, recipe)`, into `produce<State>(recipe)`, which narrowed what callers may pass. Such an updater, and one that casts an unannotated parameter, is now left alone.
+
+    It now also reports, without a fix, an updater whose call is under `satisfies` or `!`, or whose callee or namespace object is in a type wrapper (`(produce as typeof produce)(state, recipe)`), which it did not see before. An updater with a comment outside the recipe is still reported, but the fix, which deleted the comment, is withheld.
+
+- 2d97845: `vitest-coding-style`'s `prefer-assert-is-true-over-expect-true`, `prefer-assert-is-false-over-expect-false` and `no-expect-to-strict-equal` fixes now name Vitest's `assert` where they write it: its local name when imported under an alias, through a namespace import of `vitest`, added to the `vitest` import when `expect` is imported and `assert` is not, and no fix when `assert` is bound to something else there, such as `node:assert`. `no-expect-to-strict-equal` now reports only Vitest's `expect`, a global or an import from `vitest`, as the other two already do: not a Playwright or local one, and, for now, not one destructured from the test context or `import.meta.vitest`. The two `toBe` rules no longer report an `expect` call they cannot carry over — no argument, a spread argument, or more than a value and a message — and their fix keeps the message of `expect(X, message)` (`assert.isTrue(X, message)`) instead of dropping it.
+- Updated dependencies [23fad6b]
+- Updated dependencies [36ffebb]
+- Updated dependencies [23bfcbe]
+    - eslint-rule-forge@0.7.0
+    - ts-data-forge@14.11.1
+    - ts-type-forge@9.2.3
+
 ## 7.5.0
 
 ### Minor Changes

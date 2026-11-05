@@ -1,5 +1,20 @@
 # task-manager
 
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies [32680ca]
+- Updated dependencies [2fc0052]
+- Updated dependencies [36ffebb]
+- Updated dependencies [23bfcbe]
+- Updated dependencies [c8ab3c9]
+    - blueprint-synstate@0.7.0
+    - ts-data-forge@14.11.1
+    - synstate-dom@0.8.0
+    - synstate@7.0.1
+    - ts-fortress@12.4.4
+
 ## 0.0.19
 
 ### Patch Changes

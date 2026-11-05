@@ -1,5 +1,15 @@
 ## [10.1.8](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.7...v10.1.8) (2026-08-09)
 
+## 10.7.4
+
+### Patch Changes
+
+- 22cef42: The formatter behind `formatFiles`, `formatFilesGlob`, `formatUncommittedFiles`, `formatDiffFrom` and the `format-*` commands resolves each file's Prettier options with `.editorconfig` included, as the `prettier` CLI does. **This can change what they write**: where the Prettier configuration does not set the option, an `.editorconfig` `max_line_length`, `indent_style`, `indent_size` / `tab_width`, `end_of_line` or `quote_type` now applies, so a file these commands format reads the same as after `prettier --write`.
+- Updated dependencies [36ffebb]
+- Updated dependencies [23bfcbe]
+    - ts-data-forge@14.11.1
+    - ts-type-forge@9.2.3
+
 ## 10.7.3
 
 ### Patch Changes

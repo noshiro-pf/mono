@@ -1,5 +1,24 @@
 # blueprint-synstate
 
+## 0.7.0
+
+### Minor Changes
+
+- 32680ca: `Collapse`, Blueprint's sliding region, with `keepChildrenMounted`. `Icon` draws `eye-open` and `eye-off` at 20px (`size={20}`, Blueprint's `IconSize.LARGE`), and `double-chevron-up`, `double-chevron-down`, `eye-open` and `eye-off` at 16px; its `icon`, and a `Button`'s `icon` and `endIcon`, may be a name that changes. `Button` passes `aria-controls` and `aria-expanded` on.
+- 2fc0052: `NumericInput` disables its up button while the text is at or past `max`, and its down button at or past `min`, as Blueprint's does. `NumericInputView` takes them as the new `incrementDisabled` and `decrementDisabled`, and a disabled step button now has `bp6-disabled`, as Blueprint draws it.
+
+    A bound that moves onto the button being held stops its repeat, and the number read out follows the bounds as they move. Empty text is taken as no number, whatever `decode` returns for it: blur, Enter or a step from it commits from `normalize(NaN)`, where a `decode` such as `Number` used to make it 0. A disabled `NumericInputView` gives its input `aria-disabled`, as Blueprint's does.
+
+### Patch Changes
+
+- Updated dependencies [36ffebb]
+- Updated dependencies [23bfcbe]
+- Updated dependencies [c8ab3c9]
+    - ts-data-forge@14.11.1
+    - ts-type-forge@9.2.3
+    - synstate-dom@0.8.0
+    - synstate@7.0.1
+
 ## 0.6.0
 
 ### Minor Changes
