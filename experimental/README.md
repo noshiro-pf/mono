@@ -33,6 +33,5 @@ anchored one. A pattern with no slash other than a trailing one matched at any
 depth below the package, so its root copy is `<new path>/**/<pattern>`. The
 last matching pattern wins, so a negated one goes below every root pattern it
 overrides. Prettier run from the package directory reads no root ignore file,
-so give the package the `z:prettier` script of `libs/ts-fortress/package.json`,
-which passes `--ignore-path ../../.gitignore`, and make its `fix:fmt:full`
-`pnpm run z:prettier .`.
+so the package's `fix:fmt:full` runs `tools/scripts/cmd/format-package.mts`,
+which passes them; `check:root:format-scripts` names the exact command.

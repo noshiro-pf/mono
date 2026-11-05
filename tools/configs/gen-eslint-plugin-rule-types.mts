@@ -1,8 +1,9 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, unknownToString } from 'ts-data-forge';
-import { $, Result } from 'ts-repo-utils';
+import { Result } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { formatPackage } from './format-package.mjs';
 
 /**
  * What the generator reads from a rule. Structural, so that a plugin's rules
@@ -64,13 +65,14 @@ export const genEslintPluginRuleTypes = async ({
   }
 
   // Normalize import order and line wrapping with the repo's Prettier config.
-  const fmtResult = await $(`pnpm run z:prettier "${ruleTypesPath}"`, {
+  const fmtStatus = formatPackage({
     cwd: packageRoot,
+    patterns: [ruleTypesPath],
   });
 
-  if (Result.isErr(fmtResult)) {
+  if (fmtStatus !== 0) {
     return Result.err(
-      `Failed to format the generated file: ${fmtResult.value.message}`,
+      `Failed to format the generated file: Prettier exited with ${fmtStatus}`,
     );
   }
 

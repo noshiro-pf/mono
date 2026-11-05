@@ -152,8 +152,8 @@ apps/event-schedule-app/functions-build
 # and .prettierignore only from the directory it runs in, so a pattern in a
 # nested .gitignore keeps git quiet while the root `fix:fmt:full` goes on
 # reformatting the generated files anyway. A package's
-# own `fix:fmt:full` reaches this file only through `--ignore-path` (the
-# `z:prettier` script).
+# own `fix:fmt:full` reaches this file only through `--ignore-path`, which
+# tools/scripts/cmd/format-package.mts passes (`check:root:format-scripts`).
 # --------------------------------------------------------------------------
 
 # Local inputs and outputs of the Slack archive tools.

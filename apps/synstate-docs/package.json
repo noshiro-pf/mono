@@ -26,7 +26,7 @@
     "doc": "run-s gen:bundle-size gen:jsdoc-examples gen:jsdoc gen:readme gen:benchmark-doc fix:fmt",
     "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
     "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
-    "fix:fmt:full": "pnpm run z:prettier .",
+    "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
     "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:bundle-size gen:jsdoc-examples gen:jsdoc gen:readme gen:benchmark-doc fix:fmt",
@@ -49,8 +49,7 @@
     "z:benchmark:measure": "run-s z:benchmark:derived-chain z:benchmark:cascaded-diamond z:benchmark:conditional-fan-out z:benchmark:deep-chain z:benchmark:equality-cut-off",
     "z:benchmark:version-key": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/print-version-key.mts",
     "z:build:synstate": "pnpm --filter synstate run build",
-    "z:bundle-size:measure": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/measure-bundle-size-comparison.mts",
-    "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"
+    "z:bundle-size:measure": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/measure-bundle-size-comparison.mts"
   },
   "dependencies": {
     "@astrojs/preact": "^6.1.1",

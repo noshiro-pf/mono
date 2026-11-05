@@ -17,7 +17,7 @@
     "dev": "astro dev",
     "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
     "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
-    "fix:fmt:full": "pnpm run z:prettier .",
+    "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
     "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:samples gen:benchmark gen:bundle-size fix:fmt",
@@ -25,8 +25,7 @@
     "gen:bundle-size": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-bundle-size.mts",
     "gen:samples": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-samples.mts",
     "preview": "astro preview",
-    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch",
-    "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"
+    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.42.6",
