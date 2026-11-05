@@ -48,12 +48,17 @@ commit that change. `check:root:firebase-emulator-hosts` fails, locally too,
 while it is in place.
 
 The emulators load `firestore.rules`, so what they let the app do is what
-production lets it do. CI's `@emulators` e2e tests run against them, but along
-one path only: an anonymous user creating an event, answering it, editing it
-and filtering the answers. Nothing tests what the rules deny or what they let a signed-in user do, so
-check a change there by hand before
-`pnpm exec firebase deploy --only firestore:rules`, the only thing that puts
-it in production.
+production lets it do. CI's `@emulators` e2e tests run against them along the
+paths a person takes: an anonymous user creating, answering (adding, updating
+and deleting an answer), editing (with the author's email check) and filtering
+an event; a registered one signing in, listing the events they answered, asking
+for a new password, and changing their name, password and email in the account
+settings before deleting the account. Google sign-in is not tested, and the Auth
+emulator does not apply production's sign-in settings, such as email enumeration
+protection, which changes the errors Auth answers.
+Nothing tests what the rules deny, so check a change there by hand before
+`pnpm exec firebase deploy --only firestore:rules`, the only thing that puts it
+in production.
 
 The Firestore and Pub/Sub emulators need Java (JDK 21 or later), and the
 emulators run through the `firebase-tools` this package declares, so nothing
@@ -63,7 +68,7 @@ else is installed.
 
 ```sh
 pnpm run check:e2e            # smoke tests; leaves out @emulators and @production
-pnpm run check:e2e:emulators  # the tests that write to Firestore
+pnpm run check:e2e:emulators  # the tests that need Auth, Firestore or Functions
 pnpm run check:e2e:production # the @smoke and @production tests, against the site
 ```
 

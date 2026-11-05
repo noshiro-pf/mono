@@ -57,6 +57,7 @@ export const DeleteAccountDialog = memoNamed<Props>(
               autoComplete={'new-password'}
               // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
+              data-e2e={'verify-email'}
               disabled={formState.isWaitingResponse}
               intent={emailFormIntent}
               type={'email'}
@@ -72,6 +73,7 @@ export const DeleteAccountDialog = memoNamed<Props>(
             <BpInput
               // suppress auto complete
               autoComplete={'new-password'}
+              data-e2e={'password'}
               disabled={formState.isWaitingResponse}
               intent={passwordFormIntent}
               rightElement={passwordLockButton}

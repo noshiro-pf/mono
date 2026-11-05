@@ -36,6 +36,7 @@ export const ParagraphWithSwitch = memoNamed<Props>(
       >
         <div>{title}</div>
         <SwitchWithoutLabelStyled
+          aria-label={title}
           checked={toggleState}
           inline
           onChange={onToggle}

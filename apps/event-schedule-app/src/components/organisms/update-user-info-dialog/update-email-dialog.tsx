@@ -59,6 +59,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
               autoComplete={'username'}
               // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
+              data-e2e={'new-email'}
               disabled={formState.isWaitingResponse}
               intent={emailFormIntent}
               type={'email'}
@@ -73,6 +74,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
           >
             <BpInput
               autoComplete={'current-password'}
+              data-e2e={'password'}
               disabled={formState.isWaitingResponse}
               intent={passwordFormIntent}
               rightElement={passwordLockButton}

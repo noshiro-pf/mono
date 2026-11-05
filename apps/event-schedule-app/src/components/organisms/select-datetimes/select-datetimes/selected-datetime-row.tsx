@@ -80,7 +80,12 @@ export const SelectedDatetimeRow = memoNamed<Props>(
           variant={'minimal'}
           onClick={onDuplicateClick}
         />
-        <Button icon={'trash'} variant={'minimal'} onClick={onDeleteClick} />
+        <Button
+          data-e2e={'delete-button'}
+          icon={'trash'}
+          variant={'minimal'}
+          onClick={onDeleteClick}
+        />
       </div>
     </div>
   ),

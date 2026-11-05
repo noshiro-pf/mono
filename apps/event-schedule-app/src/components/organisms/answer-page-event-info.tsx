@@ -42,6 +42,7 @@ export const AnswerPageEventInfo = memoNamed<Props>(
           css={css`
             grid-area: value1;
           `}
+          data-e2e={'event-title'}
         >
           {eventSchedule.title}
         </TableValue>

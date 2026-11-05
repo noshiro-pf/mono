@@ -38,6 +38,7 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
             <BpInput
               // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
+              data-e2e={'new-display-name'}
               disabled={formState.isWaitingResponse}
               intent={displayNameFormIntent}
               type={'text'}

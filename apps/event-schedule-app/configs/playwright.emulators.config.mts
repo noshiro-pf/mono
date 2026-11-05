@@ -24,6 +24,7 @@ if (webServer === undefined || Arr.isArray(webServer)) {
 export default {
   ...config,
   grep: /@emulators/u,
+  use: { ...config.use, timezoneId: 'Asia/Tokyo' },
   webServer: {
     ...webServer,
     reuseExistingServer: false,

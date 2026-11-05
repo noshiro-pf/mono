@@ -99,7 +99,7 @@ export const EventListItemComponent = memoNamed<Props>(
     );
 
     return (
-      <ListItem onClick={onLinkClick}>
+      <ListItem data-e2e={'event-list-item'} onClick={onLinkClick}>
         <Header>
           <SectionTitleFlex title={dc.listItem.name(eventSchedule.title)}>
             {dc.listItem.name(eventSchedule.title)}

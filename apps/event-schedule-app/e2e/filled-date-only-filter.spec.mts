@@ -1,10 +1,9 @@
-import { type BrowserContext, expect, type Page, test } from '@playwright/test';
-import type { DeepReadonly } from 'ts-type-forge';
+import { expect, test } from '@playwright/test';
 import {
   answerPageLoadTimeout,
   createAnswer,
+  createEventAndOpenAnswerPage,
   emulatorTestTimeout,
-  firestoreWriteTimeout,
 } from './answer-page-steps.mjs';
 
 // The "全員回答済みの候補日のみ表示" filter of the answer page: the checkbox, the
@@ -22,7 +21,10 @@ test(
   async ({ page, context }) => {
     test.setTimeout(emulatorTestTimeout);
 
-    const answerPage = await createEventAndOpenAnswerPage(page, context);
+    const answerPage = await createEventAndOpenAnswerPage(page, context, {
+      title: '全員回答済みフィルター',
+      numDates,
+    });
 
     // Alice answers every date, Bob only the first one, so the first date is
     // the only one everybody has answered.
@@ -122,53 +124,3 @@ test(
     await expect.soft(answerPage).not.toHaveURL(/filled-date-only/u);
   },
 );
-
-/** Creates an event with `numDates` candidate dates and opens its answer page. */
-const createEventAndOpenAnswerPage = async (
-  page: DeepReadonly<Page>,
-  context: DeepReadonly<BrowserContext>,
-): Promise<Page> => {
-  await page.goto('/');
-
-  const createPage = page.getByTestId('create-page');
-
-  await createPage.getByTestId('title').fill('全員回答済みフィルター');
-
-  // The page starts with today selected; deselect it, so that the dates are
-  // exactly the three picked below, whichever day the test runs on. `nth`
-  // counts the days of this month only, so these are the 11th to the 13th.
-  await createPage.getByRole('gridcell', { selected: true }).click();
-
-  const daysOfThisMonth = createPage.getByRole('gridcell', {
-    disabled: false,
-  });
-
-  await daysOfThisMonth.nth(10).click();
-
-  await daysOfThisMonth.nth(11).click();
-
-  await daysOfThisMonth.nth(12).click();
-
-  await expect
-    .soft(createPage.getByTestId('selected-datetime-row'))
-    .toHaveCount(numDates);
-
-  await createPage.getByTestId('create-button').click();
-
-  await expect
-    .soft(
-      page
-        .getByTestId('create-event-result-dialog-body')
-        .getByTestId('url-wrapper'),
-    )
-    .toBeVisible({ timeout: firestoreWriteTimeout });
-
-  const pagePromise = context.waitForEvent('page');
-
-  await page
-    .getByTestId('create-event-result-dialog-footer')
-    .getByTestId('open-answer-page-button')
-    .click();
-
-  return pagePromise;
-};
