@@ -1,5 +1,11 @@
 # synstate
 
+## 7.0.2
+
+### Patch Changes
+
+- 54a6cc3: `switchMap` and `mergeMap` dispose what a projection made when the projection, or the subscription to the observable it returned, throws on a value the source emits later, rather than holding it until the next projection that succeeds (`switchMap`) or until the operator completes (`mergeMap`).
+
 ## 7.0.1
 
 ### Patch Changes

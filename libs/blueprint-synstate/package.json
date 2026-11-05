@@ -83,7 +83,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "synstate": ">=7.0.1",
+    "synstate": ">=7.0.2",
     "synstate-dom": ">=0.8.0",
     "ts-data-forge": ">=14.12.1"
   },

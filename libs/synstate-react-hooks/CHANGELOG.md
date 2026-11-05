@@ -1,5 +1,12 @@
 # synstate-react-hooks
 
+## 7.0.2
+
+### Patch Changes
+
+- Updated dependencies [54a6cc3]
+    - synstate@7.0.2
+
 ## 7.0.1
 
 ### Patch Changes

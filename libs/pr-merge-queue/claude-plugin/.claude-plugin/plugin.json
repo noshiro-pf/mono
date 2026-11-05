@@ -1,6 +1,6 @@
 {
   "name": "pr-merge-queue",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "The unblock-prs skill: fix the pull requests the pr-merge-queue worker set aside, one at a time, claimed first and pushed with the worker's own push. The resolve-issues skill: implement the open issues to take next, highest priority first, each to its own pull request, stacked serially in the order taken.",
   "author": { "name": "noshiro-pf" },
   "homepage": "https://github.com/noshiro-pf/mono/tree/main/libs/pr-merge-queue",

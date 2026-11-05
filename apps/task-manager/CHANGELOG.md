@@ -1,5 +1,14 @@
 # task-manager
 
+## 0.0.23
+
+### Patch Changes
+
+- Updated dependencies [54a6cc3]
+    - synstate@7.0.2
+    - blueprint-synstate@0.8.1
+    - synstate-dom@0.8.0
+
 ## 0.0.22
 
 ### Patch Changes

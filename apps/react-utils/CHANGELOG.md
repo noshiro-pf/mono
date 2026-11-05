@@ -1,5 +1,12 @@
 # react-utils
 
+## 0.0.30
+
+### Patch Changes
+
+- Updated dependencies [54a6cc3]
+    - synstate@7.0.2
+
 ## 0.0.29
 
 ### Patch Changes
