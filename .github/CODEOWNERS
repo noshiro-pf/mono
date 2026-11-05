@@ -1,15 +1,31 @@
 # 所有者を宣言するのはパスを絞ったここだけ。
 #
-# `main` の ruleset が `require_code_owner_review` を有効にしているため、この
-# ファイルに現れるパスを触る pull request は code owner の承認なしにマージでき
-# ない。裏を返せば、ここに書いたパスは**そのぶん auto-merge が止まる**という
-# ことなので、書く基準は「無審査で main に入ったら困るか」ひとつ。
+# enforced-by: Validate code owners
 #
-# 以前は `* @noshiro-pf` だった。所有者が全ファイルに付いている状態で
-# `require_code_owner_review` を立てると、依存更新を含む全ての pull request が
-# 承認待ちになり、`pnpm-update` の auto-merge が成立しなくなる。所有の意味が
-# 「レビュー依頼の宛先」から「マージのゲート」に変わったので、範囲もそれに
-# 合わせて絞ってある。
+# 上の行が、このファイルを誰が強制しているかの宣言。`main` の ruleset は
+# `require_code_owner_review` を有効にしていない。代わりに必須チェック
+# `Validate code owners`（`lint-pull-request.yml` の `code-owners` ジョブ）が、
+# ここに挙がったパスを触る pull request を、作り手がそのパスの所有者であるか、
+# 所有者が approve していない限り赤にする。`pr-report-core` はこの行を読み、名前のチェックが ruleset の必須
+# チェックにあるときに同じ規則で承認待ちを数える（`code-owners.mts`）。
+#
+# ruleset の `require_code_owner_review` では、作者が自分の pull request を
+# approve できないので、所有者自身の pull request が毎回 ruleset bypass でしか
+# マージできなかった。守りたい相手は所有者ではなく、bot（`pnpm-update`）と
+# 外部の pull request なので、作り手で判定するチェックに置き換えてある。
+#
+# 書く基準は「所有者以外が書いたものが無審査で main に入ったら困るか」ひとつ。
+# ここに書いたパスを触る bot の pull request は、所有者が approve するまで
+# auto-merge が止まる。
+#
+# パターンは、チェックが読める形に限る: 先頭が `/` で、ワイルドカードを含まず、
+# 末尾が `/` ならディレクトリ、そうでなければ 1 つのファイル。所有者は `@login`。
+# それ以外の行があると、チェックはこのファイルを読めないとして赤になる。
+#
+# 以前は `* @noshiro-pf` だった。所有者が全ファイルに付いていると、依存更新を
+# 含む全ての pull request が承認待ちになり、`pnpm-update` の auto-merge が成立
+# しなくなる。所有の意味が「レビュー依頼の宛先」から「マージのゲート」に変わった
+# ので、範囲もそれに合わせて絞ってある。
 
 # ここが本命。悪意ある依存が `pnpm-update` のジョブ内でコードを実行できた場合、
 # 作業ツリーに細工した workflow ファイルを置いておけば、後続ステップの

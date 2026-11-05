@@ -1671,6 +1671,28 @@ describe(loadReport, () => {
     });
   });
 
+  // `require_code_owner_review` off, and a required check that `CODEOWNERS`
+  // names enforcing the file instead: that check counts the author as approving
+  // what they own, so only someone else's pull request waits.
+  test('counts the author as approving what they own where a required check enforces CODEOWNERS', async () => {
+    const own = await loadEnforced('someone');
+
+    assert.isTrue(own.features.codeOwnerReview);
+
+    assert.deepStrictEqual(own.entries[0]?.codeOwnerReview, {
+      state: 'approved',
+    });
+
+    const others = await loadEnforced('owner');
+
+    assert.deepStrictEqual(others.entries[0]?.codeOwnerReview, {
+      state: 'required',
+      paths: ['.github/workflows/a.yml'],
+      owners: ['owner'],
+      authorOwns: false,
+    });
+  });
+
   // Most repositories but this one: the page is still the merge order and the
   // checks, judged over whatever reported.
   test('where the default branch requires nothing, judges every context reported on the head', async () => {
@@ -2811,3 +2833,36 @@ const keywordHtml = (keyword: string, number: number): string =>
     ` data-hovercard-url="/noshiro-pf/mono/issues/${number}/hovercard"`,
     ` href="https://github.com/noshiro-pf/mono/issues/${number}">#${number}</a>.</p>`,
   ].join('');
+
+/** A read where a required check enforces a `CODEOWNERS` naming `owner`. */
+const loadEnforced = (owner: string): Promise<LoadedReport> =>
+  load(
+    answering(
+      report(
+        [pullRequest({ number: 7, files: ['.github/workflows/a.yml'] })],
+        [],
+        undefined,
+        NO_ISSUES,
+        {
+          codeOwners: {
+            text: `# enforced-by: Validate code owners\n/.github/workflows/ @${owner}\n`,
+          },
+        },
+        restAnswers({
+          rules: [
+            {
+              type: 'pull_request',
+              parameters: { require_code_owner_review: false },
+            },
+            {
+              type: 'required_status_checks',
+              parameters: {
+                required_status_checks: [{ context: 'Validate code owners' }],
+              },
+            },
+          ],
+        }),
+      ),
+      answer('Compare', { compare_7: null }),
+    ).fetchImpl,
+  );

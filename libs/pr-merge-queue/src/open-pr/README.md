@@ -24,8 +24,10 @@ them.
 ### auto-merge を張らない理由
 
 `main` の ruleset は `required_approving_review_count: 0` なので、
-`.github/CODEOWNERS` が挙げるパスの外では、auto-merge の張られた PR は緑に
-なった瞬間にマージされます。レビューが済んでいるかどうかは関係ありません。
+auto-merge の張られた PR は、レビューが済んでいるかどうかに関係なく、緑に
+なった瞬間にマージされます（`.github/CODEOWNERS` が挙げるパスでも、作者が
+そのパスの所有者ならそうです。所有者のアカウントで動くどのセッションの PR も、
+これに当たります）。
 stack する PR（下記）ならなおさらで、base は ruleset の掛からないブランチなので、
 張った瞬間に下の層のブランチへマージされかねません。
 
@@ -167,8 +169,9 @@ adds `merge-queued`, which is a person's statement that the pull request has
 been reviewed, and **never arms auto-merge**.
 
 **Why it arms nothing.** The `main` ruleset asks for
-`required_approving_review_count: 0`, so outside the paths `.github/CODEOWNERS`
-lists an armed pull request merges the moment it goes green, reviewed or not.
+`required_approving_review_count: 0`, so an armed pull request merges the moment
+it goes green, reviewed or not — on a path `.github/CODEOWNERS` lists too, when
+its author owns that path, as the owner's account (and every session's) does.
 A stacked one (below) is worse off: its base is a branch no ruleset covers, so
 armed it could merge into the layer below at once. So **`unblock-prs` arms a
 pull request when it picks it**, which it does only once it is labelled

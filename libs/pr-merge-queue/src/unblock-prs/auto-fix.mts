@@ -14,11 +14,21 @@
 
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { statesFromCheckRuns, type ContextState } from 'pr-report-core';
+import {
+  ownersOf,
+  parseCodeOwners,
+  statesFromCheckRuns,
+  type ContextState,
+} from 'pr-report-core';
 import { Arr, Num, Result } from 'ts-data-forge';
 import { git, log, sh, type ApiContext } from '../lib/index.mjs';
 import { CONFIG_PATH, type AutoFixConfig } from './config.mjs';
-import { listCheckRuns, remoteSha, removeWorktree } from './github.mjs';
+import {
+  CODE_OWNERS_PATH,
+  listCheckRuns,
+  remoteSha,
+  removeWorktree,
+} from './github.mjs';
 import type { AutoFixed, PullRequest } from './types.mjs';
 import { lastLines, stopRequested } from './util.mjs';
 
@@ -222,6 +232,66 @@ export const WORKTREE_ROOT = path.join(
 );
 
 /**
+ * Which of `files` a `CODEOWNERS` text gives owners. A fixer runs the
+ * dependency tree, and what it writes is amended onto the pull request and
+ * pushed in the queue's name: where a required check counts the author as
+ * approving what they own, such a change would merge on the author's standing
+ * without anyone having read it. So a fix that touches an owned path is left to
+ * a person whatever enforces the file.
+ */
+export const ownedPaths = (
+  files: readonly string[],
+  codeOwnersText: string,
+): readonly string[] => {
+  const rules = parseCodeOwners(codeOwnersText);
+
+  return files.filter((file) => Arr.isNonEmpty(ownersOf(file, rules)));
+};
+
+/**
+ * `CODEOWNERS` at `ref`, resolved to a commit first so that nothing a later
+ * step does to the ref changes what is read: `''` when there is no such file,
+ * an error when it cannot be read, which a caller declines on rather than
+ * reading as empty.
+ */
+export const readCodeOwnersAt = async (
+  ref: string,
+  worktreeDir: string,
+): Promise<Result<string, string>> => {
+  const base = await git(`git rev-parse --verify ${sh(ref)}`, worktreeDir);
+
+  if (Result.isErr(base)) {
+    return Result.err(`cannot resolve ${ref}: ${base.value}`);
+  }
+
+  const at = base.value.trim();
+
+  const listed = await git(
+    `git ls-tree --name-only ${sh(at)} -- ${sh(CODE_OWNERS_PATH)}`,
+    worktreeDir,
+  );
+
+  if (Result.isErr(listed)) {
+    return Result.err(`cannot list ${CODE_OWNERS_PATH}: ${listed.value}`);
+  }
+
+  if (listed.value.trim() === '') {
+    return Result.ok('');
+  }
+
+  const read = await git(
+    `git show ${sh(`${at}:${CODE_OWNERS_PATH}`)}`,
+    worktreeDir,
+  );
+
+  return Result.isErr(read)
+    ? Result.err(
+        `cannot read ${CODE_OWNERS_PATH} at ${ref}: ${lastLines(read.value, 2)}`,
+      )
+    : read;
+};
+
+/**
  * The first fixer `name` matches, with its command: `$1` to `$9` replaced by
  * the capture groups, shell-quoted, since a context's name is whatever the job
  * that reported it chose.
@@ -271,6 +341,19 @@ const fixInWorktree = async (
     return declined(
       `the branch is ${commits.value.trim()} commits on ${defaultBranch}, and only one is amended`,
     );
+  }
+
+  // `CODEOWNERS` as the default branch has it — the one a merge is judged by —
+  // read before any step runs, at a commit rather than a ref a step could move.
+  // A file that is not there owns nothing; one that cannot be read declines,
+  // since reading it as empty would let through what it is here to stop.
+  const codeOwners = await readCodeOwnersAt(
+    `origin/${defaultBranch}`,
+    worktreeDir,
+  );
+
+  if (Result.isErr(codeOwners)) {
+    return declined(codeOwners.value);
   }
 
   const steps = [
@@ -326,6 +409,28 @@ const fixInWorktree = async (
   }
 
   const sha = newHead.value.trim();
+
+  // What the amend changed, from the commits themselves rather than the index,
+  // judged by the `CODEOWNERS` read before any step ran.
+  const changed = await git(
+    `git diff --name-only --no-renames -z ${sh(head)} ${sh(sha)}`,
+    worktreeDir,
+  );
+
+  if (Result.isErr(changed)) {
+    return declined(`cannot list what the fix changed: ${changed.value}`);
+  }
+
+  const owned = ownedPaths(
+    changed.value.split('\0').filter((file) => file !== ''),
+    codeOwners.value,
+  );
+
+  if (Arr.isNonEmpty(owned)) {
+    return declined(
+      `the fix changes ${owned.join(', ')}, which ${CODE_OWNERS_PATH} gives owners, and a fix pushed in someone's name is not their review of it`,
+    );
+  }
 
   const branch = pr.headRefName;
 

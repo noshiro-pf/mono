@@ -3,13 +3,19 @@ import { Result } from 'ts-data-forge';
 import {
   awaitsMergeState,
   bypassOfRead,
+  codeOwnersClassification,
   describeAction,
   holdOfRead,
   orderCandidates,
   outOfSyncAtSurvey,
   priorityPhrase,
 } from './triage.mjs';
-import type { OutOfSync, OutOfSyncSighting, PullRequest } from './types.mjs';
+import type {
+  ChecksSummary,
+  OutOfSync,
+  OutOfSyncSighting,
+  PullRequest,
+} from './types.mjs';
 
 describe(orderCandidates, () => {
   // The ranks themselves are `pr-report-core`'s; what this run demoted is what
@@ -385,3 +391,73 @@ const pullRequest = (
 const unknownPullRequest = (
   fields: Partial<PullRequest> & Readonly<{ number: number }>,
 ): PullRequest => pullRequest({ mergeStateStatus: 'UNKNOWN', ...fields });
+
+describe(codeOwnersClassification, () => {
+  const check = 'Validate code owners';
+
+  const link = 'https://github.com/o/r/actions/runs/7/job/8';
+
+  const failing = (failed: readonly string[]): ChecksSummary =>
+    ({
+      verdict: 'failing',
+      passed: [],
+      failed,
+      failedRuns: failed.map((name) => ({ name, link })),
+      pending: [],
+      skipped: [],
+      missing: [],
+      notRun: [],
+      running: [],
+      required: 8,
+    }) as const;
+
+  test('holds one still waiting for an owner to approve', () => {
+    assert.deepStrictEqual(
+      codeOwnersClassification(failing([check]), check, {
+        kind: 'held',
+        reason: 'waiting for @owner to approve .github/workflows/a.yml',
+      }),
+      {
+        kind: 'held',
+        reason: 'waiting for @owner to approve .github/workflows/a.yml',
+      },
+    );
+  });
+
+  // The check cannot see an approval given after it ran, so it is run again.
+  test('re-runs one approved since, at the failed check', () => {
+    assert.deepStrictEqual(
+      codeOwnersClassification(failing([check]), check, undefined),
+      { kind: 'rerun', link, summary: failing([check]) },
+    );
+  });
+
+  // Another check failing beside it is a failure no approval clears.
+  test('leaves alone one that fails anything else as well', () => {
+    assert.isUndefined(
+      codeOwnersClassification(
+        failing([check, 'Validate PR title']),
+        check,
+        undefined,
+      ),
+    );
+  });
+
+  test('leaves alone a repository whose CODEOWNERS no check enforces', () => {
+    assert.isUndefined(
+      codeOwnersClassification(failing([check]), undefined, undefined),
+    );
+  });
+
+  test('leaves alone one that is not failing', () => {
+    assert.isUndefined(
+      codeOwnersClassification(
+        { ...failing([]), verdict: 'passed' },
+        check,
+        undefined,
+      ),
+    );
+
+    assert.isUndefined(codeOwnersClassification(undefined, check, undefined));
+  });
+});

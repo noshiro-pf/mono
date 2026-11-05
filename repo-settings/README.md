@@ -32,7 +32,7 @@
   足さなければ、動きはするが何も止めない。マトリクスのエントリを増やす分には
   何も要らない。required にしてあるコンテキストは、集約ジョブ（`*-result`）か、
   リポジトリのコードを走らせないもの（`no-skip-ci-label` の commit status と
-  `lint-pull-request.yml` の 3 つのジョブ）のどちらかで、作業そのものをする
+  `lint-pull-request.yml` の 4 つのジョブ）のどちらかで、作業そのものをする
   ジョブは一つも入っていない。理由は `.github/workflows/README.md` の
   「The aggregate job」と `CLAUDE.md` の「CI」節。
 - **ここに書いてあってどのワークフローも報告しないコンテキストは、いつまでも
@@ -41,12 +41,15 @@
   request が rebase されるまで全部 blocked に見えることを見込んでおく。
 - **squash merge が必須で、admin の bypass は `pull_request` モードだけ。**
   bypass を広げないこと。直接 push を検査するものは無い。
-- `.github/CODEOWNERS` を通知リストではなくマージゲートにしているのは
-  `require_code_owner_review`。そこに挙がったパスでは `pnpm-update` の
-  auto-merge が止まる — それが狙いで（ あの App token は `workflows: write`
-  を持つ ）、owner 自身の pull request もそのパスでは ruleset bypass で
-  マージすることになる理由でもある。どのパスを挙げ、どのパスをあえて挙げて
-  いないかは `.github/CODEOWNERS` 自身に書いてある。
+- **`require_code_owner_review` は `false` のままにする。** `.github/CODEOWNERS`
+  をマージゲートにしているのは ruleset ではなく、必須チェック
+  `Validate code owners`（`lint-pull-request.yml` の `code-owners` ジョブ）。挙がったパスを触る pull request は、作り手が
+  所有者であるか、所有者が head を approve していなければ赤になる。ruleset の
+  規則は作り手を区別できず、作者は自分の pull request を approve できないので、
+  `true` にすると owner 自身の pull request がそのパスでは毎回 ruleset bypass
+  でしかマージできなくなる。守りたい相手は bot（ `pnpm-update` の App token は
+  `workflows: write` を持つ ）と外部の pull request。どのパスを挙げ、どの
+  パスをあえて挙げていないかは `.github/CODEOWNERS` 自身に書いてある。
 
 - **stacked pull request の中間層（ base が `main` でない PR ）には ruleset を
   掛けない。** 掛けられるのは required status checks か pull request ルール

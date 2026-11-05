@@ -271,6 +271,15 @@ export type HeadChecks = Readonly<{
   running: readonly RunningCheck[];
 }>;
 
+/** The run id in a job's link (`…/actions/runs/<id>/job/<id>`). */
+export const workflowRunId = (link: string): number | undefined => {
+  const id = /\/actions\/runs\/(\d+)\//u.exec(link)?.[1];
+
+  return id === undefined
+    ? undefined
+    : Result.unwrapOkOr(Num.safeParseInt(id), undefined);
+};
+
 /**
  * One page of the head commit's contexts, from `after` on; `null` when the head
  * has no rollup yet.
@@ -669,15 +678,6 @@ const stateOf = (check: ReportedCheck, ofRoundBefore: boolean): ContextState =>
       : check.bucket === 'skipping'
         ? 'skipped'
         : 'passed';
-
-/** The run id in a job's link (`…/actions/runs/<id>/job/<id>`). */
-const workflowRunId = (link: string): number | undefined => {
-  const id = /\/actions\/runs\/(\d+)\//u.exec(link)?.[1];
-
-  return id === undefined
-    ? undefined
-    : Result.unwrapOkOr(Num.safeParseInt(id), undefined);
-};
 
 /**
  * Whether a later run may still replace the check: a re-run in its own workflow

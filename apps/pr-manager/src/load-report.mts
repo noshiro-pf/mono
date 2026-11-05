@@ -20,7 +20,9 @@ import {
   buildEntries,
   closingIssuesIn,
   closingKeywordIssuesIn,
+  codeOwnerGate,
   codeOwnerReview,
+  codeOwnersEnforcedBy,
   epochMsOf,
   parseCodeOwners,
   parseMergeAfter,
@@ -399,7 +401,14 @@ export const loadReport = async (
     checks: readChecks(ask),
     // The details follow the changed files where the rules ask for a code
     // owner, which the last read's rules still say where these fail.
-    details: readDetails(ask, repo, orKept(rules, previous.rules)),
+    details: readDetails(
+      ask,
+      repo,
+      orKept(rules, previous.rules),
+      pullsOrKept.then(({ result }) =>
+        Result.isOk(result) ? result.value.codeOwnersEnforcedBy : undefined,
+      ),
+    ),
     comparisons: pullsOrKept.then(async ({ result }) =>
       Result.isOk(result)
         ? readComparisons(ask, result.value.pulls)
@@ -641,6 +650,8 @@ type PullsPart = Readonly<{
   /** Whether the repository has the `merge-queued` label. */
   queue: boolean;
   codeOwners: readonly CodeOwnersRule[];
+  /** The required check `CODEOWNERS` says enforces it, if it names one. */
+  codeOwnersEnforcedBy: string | undefined;
   pulls: readonly OpenPullRequest[];
 }>;
 
@@ -826,6 +837,8 @@ const readPullRequests = async (
       defaultBranch: defaultBranchRef?.name ?? '',
       queue: queueLabel !== null,
       codeOwners: owners === null ? [] : parseCodeOwners(owners.text),
+      codeOwnersEnforcedBy:
+        owners === null ? undefined : codeOwnersEnforcedBy(owners.text),
       pulls: openNodesOf(pages.value),
     }),
   };
@@ -1233,13 +1246,15 @@ const linkedIssuesOf = (
 /**
  * Each open pull request's details, with the issues its body closes. The
  * changed files are paged through only when the default branch asks for a code
- * owner's review, since that is all they are read for — which its rules say, so
- * this waits for them before asking for more pages.
+ * owner's review, since that is all they are read for — which its rules say, or
+ * a required check `CODEOWNERS` names (`enforcedBy`), so this waits for them
+ * before asking for more pages.
  */
 const readDetails = async (
   ask: Ask,
   repo: RepoRef,
   rules: Promise<Answered<RulesetRequirements>>,
+  enforcedBy: Promise<string | undefined>,
 ): Promise<Answered<ReadonlyMap<number, DetailsPart>>> => {
   const answered = await readOpenPages({
     ask,
@@ -1253,7 +1268,11 @@ const readDetails = async (
 
   const { result: ruled } = await rules;
 
-  const wantFiles = Result.isOk(ruled) && ruled.value.requireCodeOwnerReview;
+  // The pull requests' read only when the rules alone do not decide it.
+  const wantFiles =
+    Result.isOk(ruled) &&
+    (ruled.value.requireCodeOwnerReview ||
+      codeOwnerGate(ruled.value, await enforcedBy) !== undefined);
 
   const followedUp = await followUpRounds({
     operationName: 'MoreFiles',
@@ -1959,7 +1978,13 @@ const assemble = ({
   settled: boolean;
 }>): LoadedReport => {
   // Without the pull requests, the page is the sections that do not need them.
-  const { defaultBranch, queue, codeOwners, pulls } = known.pulls ?? NO_PULLS;
+  const {
+    defaultBranch,
+    queue,
+    codeOwners,
+    codeOwnersEnforcedBy: enforcedBy,
+    pulls,
+  } = known.pulls ?? NO_PULLS;
 
   // A part that failed is not being read any more, nor is anything once the
   // read is over: what a card lacks then — a part kept from the last read has
@@ -1969,6 +1994,12 @@ const assemble = ({
 
   const requirements = known.rules;
 
+  // What enforces `CODEOWNERS`: the ruleset, or a required check it names.
+  const gate =
+    requirements === undefined
+      ? undefined
+      : codeOwnerGate(requirements, enforcedBy);
+
   const required =
     requirements !== undefined && Arr.isNonEmpty(requirements.requiredContexts)
       ? requirements.requiredContexts
@@ -1976,7 +2007,12 @@ const assemble = ({
 
   const features: RepoFeatures = {
     requiredChecks: required !== undefined,
-    codeOwnerReview: requirements?.requireCodeOwnerReview ?? true,
+    // Until the pull requests answer, `CODEOWNERS` is not read either, and an
+    // `enforced-by:` line may yet turn the review on.
+    codeOwnerReview:
+      requirements === undefined ||
+      known.pulls === undefined ||
+      gate !== undefined,
     queue,
   } as const;
 
@@ -2035,12 +2071,13 @@ const assemble = ({
         details === undefined || requirements === undefined
           ? { state: 'unknown' }
           : codeOwnerReview({
-              required: requirements.requireCodeOwnerReview,
+              required: gate !== undefined,
               rules: codeOwners,
               files: details.files,
               filesComplete: details.filesComplete,
               approvers: approversOf(details.node),
               author: entry.author,
+              authorApproves: gate === 'check',
             }),
       claudeSessions: parseClaudeSessions(entry.body),
       checksUnread:
@@ -2121,6 +2158,7 @@ const assemble = ({
               requireConversationResolution:
                 requirements.requireConversationResolution,
               codeOwners,
+              codeOwnerGate: gate,
             },
             pulls: Arr.generate(function* () {
               for (const entry of report.entries) {
@@ -2152,6 +2190,7 @@ const NO_PULLS: PullsPart = {
   // again on the next read.
   queue: false,
   codeOwners: [],
+  codeOwnersEnforcedBy: undefined,
   pulls: [],
 } as const;
 

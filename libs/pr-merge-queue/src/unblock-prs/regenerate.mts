@@ -13,8 +13,9 @@
 
 import { Arr, Result } from 'ts-data-forge';
 import { git, sh } from '../lib/index.mjs';
-import { withCaptures } from './auto-fix.mjs';
+import { ownedPaths, readCodeOwnersAt, withCaptures } from './auto-fix.mjs';
 import type { RegenerateConfig } from './config.mjs';
+import { CODE_OWNERS_PATH } from './github.mjs';
 import { describeConflict } from './set-aside-detail.mjs';
 import { lastLines, stopRequested } from './util.mjs';
 
@@ -115,6 +116,23 @@ export const resolveByRegenerating = async (
     );
   }
 
+  // As auto-fix does: what the steps write is amended and pushed in the queue's
+  // name, and a path `CODEOWNERS` lists would merge on the author's standing
+  // with nobody having read it. Read before any step runs.
+  const codeOwners = await readCodeOwnersAt(onto, worktreeDir);
+
+  if (Result.isErr(codeOwners)) {
+    return refused(codeOwners.value, false);
+  }
+
+  // What the steps write is judged against the commit before them, so that a
+  // step that commits by itself is judged too.
+  const headBefore = await git('git rev-parse HEAD', worktreeDir);
+
+  if (Result.isErr(headBefore)) {
+    return refused(`cannot read the head: ${headBefore.value}`, false);
+  }
+
   const before = config?.before ?? [];
 
   for (const step of [...before, ...commands]) {
@@ -144,8 +162,28 @@ export const resolveByRegenerating = async (
     );
   }
 
+  const staged = await git(
+    `git add --all && git diff --cached --name-only --no-renames -z ${sh(headBefore.value.trim())}`,
+    worktreeDir,
+  );
+
+  if (Result.isErr(staged)) {
+    return refused(`cannot list what was generated: ${staged.value}`, false);
+  }
+
+  const owned = ownedPaths(
+    staged.value.split('\0').filter((file) => file !== ''),
+    codeOwners.value,
+  );
+
+  if (Arr.isNonEmpty(owned)) {
+    return refused(
+      `conflicts with ${onto} only in generated files (${files.join(', ')}), but generating them again changes ${owned.join(', ')}, which ${CODE_OWNERS_PATH} gives owners: a person takes it`,
+    );
+  }
+
   const amended = await git(
-    'git add --all && git commit --quiet --amend --no-edit',
+    'git commit --quiet --amend --no-edit',
     worktreeDir,
   );
 

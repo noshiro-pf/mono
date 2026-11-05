@@ -27,6 +27,7 @@ import {
   readIssueOrder,
   readOwnComments,
   readSetAsideComments,
+  rerunFailedJobs,
   viewPullRequest,
   writeSetAsideCommentOn,
 } from './github.mjs';
@@ -948,6 +949,35 @@ const runCycle = async (
       }),
     observed.skipped,
   );
+
+  // Failing only the check that enforces `CODEOWNERS`, and approved since: the
+  // check runs again and reads the approval. A run re-run as often as
+  // `rerunFailedJobs` allows and still red is failing like any other.
+  for (const { pr, link, summary } of triaged.rerun) {
+    const rerun = await rerunFailedJobs(api, link);
+
+    if (Result.isOk(rerun) && rerun.value === 'rerun') {
+      log(
+        `#${pr.number}: approved since its code-owner check failed; re-running that check's failed jobs.`,
+      );
+
+      continue;
+    }
+
+    log(
+      Result.isErr(rerun)
+        ? `#${pr.number}: cannot re-run its code-owner check (${lastLines(rerun.value, 2)}); setting it aside as failing.`
+        : `#${pr.number}: its code-owner check has been re-run and is still red; setting it aside as failing.`,
+    );
+
+    mut_skipped = withSkip(mut_skipped, {
+      number: pr.number,
+      headSha: pr.headRefOid,
+      baseSha,
+      reason: 'checks-failed',
+      ...describeFailedChecks(summary),
+    });
+  }
 
   // One that stayed unread survey after survey is set aside, so that a read
   // failing for good does not hold the queue for good. See `unread.mts`.

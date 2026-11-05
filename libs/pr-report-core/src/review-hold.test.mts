@@ -123,6 +123,49 @@ describe(reviewHold, () => {
     );
   });
 
+  describe('where a required check enforces CODEOWNERS', () => {
+    // The check counts the author as approving what they own, so the owner's
+    // own pull request waits for nobody — no bypass merge either.
+    test('holds nothing an owner wrote', () => {
+      assert.isUndefined(reviewHold(state({ author: 'Owner' }), byCheck()));
+    });
+
+    test('holds one someone else wrote until an owner approves it', () => {
+      assert.deepStrictEqual(
+        reviewHold(state(), byCheck()),
+        held('waiting for @owner to approve .github/workflows/ci.yml'),
+      );
+
+      assert.isUndefined(
+        reviewHold(state({ approvers: ['owner'] }), byCheck()),
+      );
+    });
+
+    // Under the ruleset's rule the author cannot approve, whatever the check
+    // says, so that rule decides (`codeOwnerGate` says which).
+    test('follows the gate when it is the ruleset', () => {
+      assert.deepStrictEqual(
+        reviewHold(
+          state({ author: 'owner' }),
+          byCheck({ codeOwnerGate: 'ruleset' }),
+        ),
+        bypass(
+          '@owner is the only owner of .github/workflows/ci.yml and its author, who may not approve it',
+        ),
+      );
+    });
+
+    test('still holds an unresolved conversation', () => {
+      assert.deepStrictEqual(
+        reviewHold(
+          state({ author: 'owner', unresolvedConversations: 1 }),
+          byCheck(),
+        ),
+        held('1 unresolved review conversation'),
+      );
+    });
+  });
+
   // A changed file past what could be read might be owned, but "might" is not a
   // reason to hold the queue: the watch still catches a pull request that goes
   // green and does not merge.
@@ -161,3 +204,10 @@ const state = (overrides: Partial<ReviewState> = {}): ReviewState =>
     unresolvedConversations: 0,
     ...overrides,
   }) as const;
+
+const byCheck = (overrides: Partial<ReviewRules> = {}): ReviewRules =>
+  rules({
+    requireCodeOwnerReview: false,
+    codeOwnerGate: 'check',
+    ...overrides,
+  });

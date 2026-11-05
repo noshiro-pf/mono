@@ -78,6 +78,7 @@ optional, make it say more; **How to use** in the header sums them up:
 | a `pending` label on a pull request                                             | counts it as held back, can hide it or show it alone    |
 | required status checks in a ruleset or branch protection rule                   | judges the checks by those alone, not every check       |
 | a ruleset asking for code owner review, and a `CODEOWNERS` file                 | shows which pull requests wait for a code owner         |
+| `# enforced-by: <check>` in `CODEOWNERS`, naming a required check               | the same, counting the author as owning what they own   |
 
 What `Start-After:` means, and how an issue's wait carries over to the pull
 request closing it, is

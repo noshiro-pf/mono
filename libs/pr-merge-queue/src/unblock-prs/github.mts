@@ -31,6 +31,7 @@ import {
   type ApiContext,
   type GraphqlVariables,
 } from '../lib/index.mjs';
+import { workflowRunId } from './checks.mjs';
 import {
   issueOrderOf,
   unlinkedClosingIssues,
@@ -699,6 +700,51 @@ export const armAutoMerge = async (
   graphql(api, ARM_MUTATION, { id: nodeId });
 
 /**
+ * Re-runs the failed jobs of the Actions run a failed check belongs to, `link`
+ * being that check's page (`…/actions/runs/<run>/job/<job>`), unless the run
+ * has been re-run {@link RERUNS} times already, so that a check that fails for
+ * a reason a re-run does not change is not run for ever. More than one, since a
+ * person may have re-run it by hand before the approval it was waiting for.
+ * `'already'` says the budget is spent.
+ */
+export const rerunFailedJobs = async (
+  api: ApiContext,
+  link: string,
+): Promise<Result<'already' | 'rerun', string>> => {
+  const runId = workflowRunId(link);
+
+  if (runId === undefined) {
+    return Result.err(`not an Actions run's page: ${link}`);
+  }
+
+  const run = await rest(
+    api,
+    'GET',
+    `/actions/runs/${runId}`,
+    t.record({ run_attempt: t.number() }),
+  );
+
+  if (Result.isErr(run)) {
+    return run;
+  }
+
+  if (run.value.run_attempt > RERUNS) {
+    return Result.ok('already');
+  }
+
+  const rerun = await rest(
+    api,
+    'POST',
+    `/actions/runs/${runId}/rerun-failed-jobs`,
+    t.unknown(),
+  );
+
+  return Result.isErr(rerun) ? rerun : Result.ok('rerun');
+};
+
+const RERUNS = 2;
+
+/**
  * Every check run GitHub Actions reported on one commit, every job of every
  * workflow rather than only the required aggregates, so that a failure can be
  * traced to the matrix entry under the aggregate. Other apps' runs — the
@@ -878,7 +924,7 @@ const askRepository = async (
   });
 };
 
-const CODE_OWNERS_PATH = '.github/CODEOWNERS';
+export const CODE_OWNERS_PATH = '.github/CODEOWNERS';
 
 /** One page of a list inside a pull request. */
 const PAGE_SIZE = 100;
