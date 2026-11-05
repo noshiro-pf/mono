@@ -35,13 +35,11 @@ describe(maxLengthArray, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (Result.isErr(result)) {
-      assert.deepStrictEqual(result.value[0]?.details, {
-        kind: 'array-max-length',
-        maxLength: 3,
-        actualLength: 4,
-      });
-    }
+    assert.deepStrictEqual(result.value[0]?.details, {
+      kind: 'array-max-length',
+      maxLength: 3,
+      actualLength: 4,
+    });
   });
 
   test('fill trims down to the bound', () => {

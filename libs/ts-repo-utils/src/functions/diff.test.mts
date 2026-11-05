@@ -106,9 +106,7 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          assert.isTrue(Arr.isArray(result.value));
-        }
+        assert.isTrue(Arr.isArray(result.value));
       } finally {
         await cleanup();
       }
@@ -133,11 +131,9 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          const files = result.value;
+        const files = result.value;
 
-          expect(files).toContain(testFilePath);
-        }
+        expect(files).toContain(testFilePath);
       } finally {
         await cleanup();
       }
@@ -173,9 +169,7 @@ describe('diff', () => {
 
           assert.isTrue(Result.isOk(result));
 
-          if (Result.isOk(result)) {
-            expect(result.value).toContain(testFilePath);
-          }
+          expect(result.value).toContain(testFilePath);
         } finally {
           process.chdir(originalCwd);
         }
@@ -210,11 +204,9 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          const files = result.value;
+        const files = result.value;
 
-          expect(files).not.toContain(testFilePath);
-        }
+        expect(files).not.toContain(testFilePath);
       } finally {
         await cleanup();
       }
@@ -255,13 +247,11 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          const files = result.value;
+        const files = result.value;
 
-          expect(files).toContain(newFilePath);
+        expect(files).toContain(newFilePath);
 
-          expect(files).not.toContain(modifyFilePath);
-        }
+        expect(files).not.toContain(modifyFilePath);
       } finally {
         await cleanup();
       }
@@ -277,15 +267,13 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          const files = result.value;
+        const files = result.value;
 
-          // Verify no deleted files are included (status 'D')
-          for (const file of files) {
-            expectTypeOf(file).toBeString();
+        // Verify no deleted files are included (status 'D')
+        for (const file of files) {
+          expectTypeOf(file).toBeString();
 
-            expect(file.length).toBeGreaterThan(0);
-          }
+          expect(file.length).toBeGreaterThan(0);
         }
       } finally {
         await cleanup();
@@ -301,7 +289,7 @@ describe('diff', () => {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
         // Should always return a Result, either Ok or Err
-        assert.isTrue(Result.isOk(result) || Result.isErr(result));
+        assert.isTrue(Result.isResult(result));
       } finally {
         await cleanup();
       }
@@ -317,17 +305,15 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          const files = result.value;
+        const files = result.value;
 
-          // Each file should be a non-empty string
-          for (const file of files) {
-            expectTypeOf(file).toBeString();
+        // Each file should be a non-empty string
+        for (const file of files) {
+          expectTypeOf(file).toBeString();
 
-            expect(file.trim()).toBe(file); // No leading/trailing whitespace
+          expect(file.trim()).toBe(file); // No leading/trailing whitespace
 
-            expect(file.length).toBeGreaterThan(0);
-          }
+          expect(file.length).toBeGreaterThan(0);
         }
       } finally {
         await cleanup();
@@ -344,9 +330,7 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          assert.isTrue(Arr.isArray(result.value));
-        }
+        assert.isTrue(Arr.isArray(result.value));
       } finally {
         await cleanup();
       }
@@ -364,9 +348,7 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          assert.isTrue(Arr.isArray(result.value));
-        }
+        assert.isTrue(Arr.isArray(result.value));
       } finally {
         await cleanup();
       }
@@ -394,11 +376,9 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          const files = result.value;
+        const files = result.value;
 
-          expect(files).toContain(testFilePath);
-        }
+        expect(files).toContain(testFilePath);
       } finally {
         await cleanup();
       }
@@ -434,13 +414,11 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          const files = result.value;
+        const files = result.value;
 
-          expect(files).toContain(filePath1);
+        expect(files).toContain(filePath1);
 
-          expect(files).toContain(filePath2);
-        }
+        expect(files).toContain(filePath2);
       } finally {
         await cleanup();
       }
@@ -482,11 +460,9 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(resultExclude));
 
-        if (Result.isOk(resultExclude)) {
-          const files = resultExclude.value;
+        const filesExcluded = resultExclude.value;
 
-          expect(files).not.toContain(testFilePath);
-        }
+        expect(filesExcluded).not.toContain(testFilePath);
 
         // Test with excludeDeleted = false
         // First verify the file is actually staged for deletion by checking git status
@@ -506,11 +482,9 @@ describe('diff', () => {
 
           assert.isTrue(Result.isOk(resultInclude));
 
-          if (Result.isOk(resultInclude)) {
-            const files = resultInclude.value;
+          const filesIncluded = resultInclude.value;
 
-            expect(files).toContain(testFilePath);
-          }
+          expect(filesIncluded).toContain(testFilePath);
         } else {
           // If the file is not properly staged for deletion, just log and skip the assertion
           console.warn(
@@ -532,15 +506,13 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          const files = result.value;
+        const files = result.value;
 
-          // Each file should be a non-empty string
-          for (const file of files) {
-            expectTypeOf(file).toBeString();
+        // Each file should be a non-empty string
+        for (const file of files) {
+          expectTypeOf(file).toBeString();
 
-            expect(file.trim()).toBe(file); // No leading/trailing whitespace
-          }
+          expect(file.trim()).toBe(file); // No leading/trailing whitespace
         }
       } finally {
         await cleanup();
@@ -557,9 +529,7 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          assert.isTrue(Arr.isArray(result.value));
-        }
+        assert.isTrue(Arr.isArray(result.value));
       } finally {
         await cleanup();
       }
@@ -574,7 +544,7 @@ describe('diff', () => {
         const result = await repoFunctions.getStagedFiles({ silent: true });
 
         // Should always return a Result, either Ok or Err
-        assert.isTrue(Result.isOk(result) || Result.isErr(result));
+        assert.isTrue(Result.isResult(result));
       } finally {
         await cleanup();
       }
@@ -592,9 +562,7 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          assert.isTrue(Arr.isArray(result.value));
-        }
+        assert.isTrue(Arr.isArray(result.value));
       } finally {
         await cleanup();
       }
@@ -630,11 +598,9 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          const files = result.value;
+        const files = result.value;
 
-          expect(files).toContain(testFilePath);
-        }
+        expect(files).toContain(testFilePath);
       } finally {
         await cleanup();
       }
@@ -681,13 +647,11 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          const files = result.value;
+        const files = result.value;
 
-          expect(files).toContain(filePath1);
+        expect(files).toContain(filePath1);
 
-          expect(files).toContain(filePath2);
-        }
+        expect(files).toContain(filePath2);
       } finally {
         await cleanup();
       }
@@ -725,11 +689,9 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(resultExclude));
 
-        if (Result.isOk(resultExclude)) {
-          const files = resultExclude.value;
+        const filesExcluded = resultExclude.value;
 
-          expect(files).not.toContain(testFilePath);
-        }
+        expect(filesExcluded).not.toContain(testFilePath);
 
         // Test with excludeDeleted = false
         const resultInclude = await repoFunctions.getModifiedFiles({
@@ -739,11 +701,9 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(resultInclude));
 
-        if (Result.isOk(resultInclude)) {
-          const files = resultInclude.value;
+        const filesIncluded = resultInclude.value;
 
-          expect(files).toContain(testFilePath);
-        }
+        expect(filesIncluded).toContain(testFilePath);
       } finally {
         await cleanup();
       }
@@ -759,15 +719,13 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          const files = result.value;
+        const files = result.value;
 
-          // Each file should be a non-empty string
-          for (const file of files) {
-            expectTypeOf(file).toBeString();
+        // Each file should be a non-empty string
+        for (const file of files) {
+          expectTypeOf(file).toBeString();
 
-            expect(file.trim()).toBe(file); // No leading/trailing whitespace
-          }
+          expect(file.trim()).toBe(file); // No leading/trailing whitespace
         }
       } finally {
         await cleanup();
@@ -784,9 +742,7 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          assert.isTrue(Arr.isArray(result.value));
-        }
+        assert.isTrue(Arr.isArray(result.value));
       } finally {
         await cleanup();
       }
@@ -801,7 +757,7 @@ describe('diff', () => {
         const result = await repoFunctions.getModifiedFiles({ silent: true });
 
         // Should always return a Result, either Ok or Err
-        assert.isTrue(Result.isOk(result) || Result.isErr(result));
+        assert.isTrue(Result.isResult(result));
       } finally {
         await cleanup();
       }
@@ -913,7 +869,7 @@ describe('diff', () => {
           silent: true,
         });
 
-        assert.isTrue(Result.isOk(result) || Result.isErr(result));
+        assert.isTrue(Result.isResult(result));
       } finally {
         await cleanup();
       }
@@ -954,9 +910,7 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(result));
 
-        if (Result.isOk(result)) {
-          expect(result.value).toContain(testFilePath);
-        }
+        expect(result.value).toContain(testFilePath);
       } finally {
         await cleanup();
       }
@@ -998,12 +952,7 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(resultInclude));
 
-        if (Result.isOk(resultInclude)) {
-          assert.sameMembers(resultInclude.value, [
-            sourcePath,
-            destinationPath,
-          ]);
-        }
+        assert.sameMembers(resultInclude.value, [sourcePath, destinationPath]);
 
         // `git mv` stages the rename, so the staged list reads it the same way.
         const stagedInclude = await repoFunctions.getStagedFiles({
@@ -1013,12 +962,7 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(stagedInclude));
 
-        if (Result.isOk(stagedInclude)) {
-          assert.sameMembers(stagedInclude.value, [
-            sourcePath,
-            destinationPath,
-          ]);
-        }
+        assert.sameMembers(stagedInclude.value, [sourcePath, destinationPath]);
 
         const resultExclude = await repoFunctions.getDiffFrom('HEAD', {
           silent: true,
@@ -1026,9 +970,7 @@ describe('diff', () => {
 
         assert.isTrue(Result.isOk(resultExclude));
 
-        if (Result.isOk(resultExclude)) {
-          assert.deepStrictEqual(resultExclude.value, [destinationPath]);
-        }
+        assert.deepStrictEqual(resultExclude.value, [destinationPath]);
       } finally {
         await cleanup();
       }

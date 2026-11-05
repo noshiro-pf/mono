@@ -60,8 +60,6 @@ describe(settingsFilePath, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (Result.isErr(result)) {
-      assert.isTrue(result.value.message.includes('../release'));
-    }
+    assert.isTrue(result.value.message.includes('../release'));
   });
 });

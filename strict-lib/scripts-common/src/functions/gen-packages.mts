@@ -184,7 +184,7 @@ const createPackages = async (
     packageDirList.map((a) => path.resolve(outDir, a.packageRelativePath)),
   );
 
-  const results = await Promise.all(
+  await Promise.all(
     packageDirList.map(async ({ filename, packageRelativePath }) => {
       const outputDir = path.resolve(outDir, packageRelativePath);
 
@@ -241,55 +241,49 @@ const createPackages = async (
       // exactly the set those devDependencies name. Sub-libs (`es2020/bigint`)
       // and everything branded are reachable through the group's own
       // `<reference lib>` graph and are never resolved by name.
-      if (!config.useBrandedNumber && !packageRelativePath.includes('/')) {
-        const outputFile = path.resolve(outputDir, 'package.json');
-
-        // Non-branded and top-level by the guard above, so neither the
-        // `-branded` suffix nor flattening a nested path applies here.
-        const subPackageName =
-          `${versionConfig.libName}-${packageRelativePath}` as const;
-
-        await fs.writeFile(
-          outputFile,
-
-          JSON.stringify({
-            name: subPackageName,
-            version: subPackageVersion,
-            private: false,
-            description: 'Strict TypeScript lib',
-            repository: {
-              type: 'git',
-              url: versionConfig.repo,
-            },
-            license: versionConfig.license,
-            author: 'noshiro-pf <noshiro.pf@gmail.com>',
-            sideEffects: false,
-            type: 'module',
-            types: './index.d.ts',
-            // ts-type-forge is a real runtime-resolvable dependency: the
-            // generated lib references its types via `import('ts-type-forge')`,
-            // so consumers must have it installed (not merely provide it).
-            dependencies: {
-              [typeUtilsName]: tsTypeForgeRange,
-            },
-            peerDependencies: {
-              typescript: versionConfig.typescriptVersionRange,
-            },
-          }),
-        );
-
-        console.info(`${outputFile} generated.`);
+      if (config.useBrandedNumber || packageRelativePath.includes('/')) {
+        return;
       }
 
-      return Result.ok(undefined);
+      const packageJsonFile = path.resolve(outputDir, 'package.json');
+
+      // Non-branded and top-level by the guard above, so neither the
+      // `-branded` suffix nor flattening a nested path applies here.
+      const subPackageName =
+        `${versionConfig.libName}-${packageRelativePath}` as const;
+
+      await fs.writeFile(
+        packageJsonFile,
+
+        JSON.stringify({
+          name: subPackageName,
+          version: subPackageVersion,
+          private: false,
+          description: 'Strict TypeScript lib',
+          repository: {
+            type: 'git',
+            url: versionConfig.repo,
+          },
+          license: versionConfig.license,
+          author: 'noshiro-pf <noshiro.pf@gmail.com>',
+          sideEffects: false,
+          type: 'module',
+          types: './index.d.ts',
+          // ts-type-forge is a real runtime-resolvable dependency: the
+          // generated lib references its types via `import('ts-type-forge')`,
+          // so consumers must have it installed (not merely provide it).
+          dependencies: {
+            [typeUtilsName]: tsTypeForgeRange,
+          },
+          peerDependencies: {
+            typescript: versionConfig.typescriptVersionRange,
+          },
+        }),
+      );
+
+      console.info(`${packageJsonFile} generated.`);
     }),
   );
-
-  for (const res of results) {
-    if (Result.isErr(res)) {
-      return res;
-    }
-  }
 
   return Result.ok(undefined);
 };

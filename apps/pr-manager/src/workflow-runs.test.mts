@@ -34,10 +34,6 @@ describe(loadWorkflowRuns, () => {
 
     assert.isTrue(Result.isOk(loaded));
 
-    if (Result.isErr(loaded)) {
-      return;
-    }
-
     assert.deepStrictEqual(
       sent.map(({ state }) => state).toSorted(),
       RUN_STATES.toSorted(),
@@ -96,10 +92,6 @@ describe(loadWorkflowRuns, () => {
 
     assert.isTrue(Result.isOk(loaded));
 
-    if (Result.isErr(loaded)) {
-      return;
-    }
-
     assert.deepStrictEqual(
       loaded.value.runs.map(({ id }) => id),
       [5],
@@ -127,10 +119,6 @@ describe(loadWorkflowRuns, () => {
 
     assert.isTrue(Result.isOk(loaded));
 
-    if (Result.isErr(loaded)) {
-      return;
-    }
-
     assert.strictEqual(loaded.value.totalCount, RUNS_PER_STATE + 50);
 
     assert.strictEqual(loaded.value.runs.length, RUNS_PER_STATE);
@@ -147,10 +135,6 @@ describe(loadWorkflowRuns, () => {
     });
 
     assert.isTrue(Result.isOk(loaded));
-
-    if (Result.isErr(loaded)) {
-      return;
-    }
 
     assert.strictEqual(loaded.value.totalCount, 150);
 
@@ -171,10 +155,6 @@ describe(loadWorkflowRuns, () => {
 
     assert.isTrue(Result.isOk(loaded));
 
-    if (Result.isErr(loaded)) {
-      return;
-    }
-
     const [first] = loaded.value.runs;
 
     assert.strictEqual(first?.workflow, '');
@@ -192,9 +172,7 @@ describe(loadWorkflowRuns, () => {
 
     assert.isTrue(Result.isErr(loaded));
 
-    if (Result.isErr(loaded)) {
-      assert.include(loaded.value, 'would not accept the token');
-    }
+    assert.include(loaded.value, 'would not accept the token');
   });
 
   test('says when the REST budget is spent', async () => {
@@ -205,9 +183,7 @@ describe(loadWorkflowRuns, () => {
 
     assert.isTrue(Result.isErr(loaded));
 
-    if (Result.isErr(loaded)) {
-      assert.include(loaded.value, 'REST rate limit');
-    }
+    assert.include(loaded.value, 'REST rate limit');
   });
 
   test('fails on an answer of another shape', async () => {
@@ -222,9 +198,7 @@ describe(loadWorkflowRuns, () => {
 
     assert.isTrue(Result.isErr(loaded));
 
-    if (Result.isErr(loaded)) {
-      assert.include(loaded.value, 'not the shape this page expects');
-    }
+    assert.include(loaded.value, 'not the shape this page expects');
   });
 
   test('names the workflow runs when the answer is not JSON', async () => {
@@ -235,12 +209,10 @@ describe(loadWorkflowRuns, () => {
 
     assert.isTrue(Result.isErr(loaded));
 
-    if (Result.isErr(loaded)) {
-      assert.include(
-        loaded.value,
-        'GitHub answered the workflow runs with something that is not JSON (200',
-      );
-    }
+    assert.include(
+      loaded.value,
+      'GitHub answered the workflow runs with something that is not JSON (200',
+    );
   });
 
   test('fails without the network, rather than throwing', async () => {
@@ -251,9 +223,7 @@ describe(loadWorkflowRuns, () => {
 
     assert.isTrue(Result.isErr(loaded));
 
-    if (Result.isErr(loaded)) {
-      assert.include(loaded.value, 'Could not reach the GitHub API');
-    }
+    assert.include(loaded.value, 'Could not reach the GitHub API');
   });
 });
 

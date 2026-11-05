@@ -1065,9 +1065,7 @@ describe(formatUncommittedFiles, () => {
 
       assert.isTrue(Result.isErr(result));
 
-      if (Result.isErr(result)) {
-        assert.deepStrictEqual(result.value, error);
-      }
+      assert.deepStrictEqual(result.value, error);
     } finally {
       await cleanupTest();
     }
@@ -1090,9 +1088,7 @@ describe(formatUncommittedFiles, () => {
 
       assert.isTrue(Result.isErr(result));
 
-      if (Result.isErr(result)) {
-        assert.deepStrictEqual(result.value, error);
-      }
+      assert.deepStrictEqual(result.value, error);
     } finally {
       await cleanupTest();
     }
@@ -1115,9 +1111,7 @@ describe(formatUncommittedFiles, () => {
 
       assert.isTrue(Result.isErr(result));
 
-      if (Result.isErr(result)) {
-        assert.deepStrictEqual(result.value, error);
-      }
+      assert.deepStrictEqual(result.value, error);
     } finally {
       await cleanupTest();
     }
@@ -1221,7 +1215,7 @@ describe(formatUncommittedFiles, () => {
       const result = await formatUncommittedFiles({ silent: true });
 
       // Should handle error gracefully
-      assert.isTrue(Result.isOk(result) || Result.isErr(result));
+      assert.isTrue(Result.isResult(result));
     } finally {
       await cleanupTest();
     }

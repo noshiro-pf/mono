@@ -150,10 +150,7 @@ describe(applyRework, () => {
 
     assert.isTrue(Result.isErr(applied));
 
-    assert.include(
-      Result.isErr(applied) ? applied.value : '',
-      'no longer open',
-    );
+    assert.include(applied.value, 'no longer open');
 
     assert.deepStrictEqual(ran, ['dequeue']);
   });

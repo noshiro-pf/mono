@@ -264,10 +264,6 @@ describe(loadWeeklyActivity, () => {
 
     assert.isTrue(Result.isOk(loaded.result));
 
-    if (Result.isErr(loaded.result)) {
-      return;
-    }
-
     assert.strictEqual(sent[0]?.headers['Authorization'], 'Bearer secret');
 
     assert.strictEqual(loaded.result.value.countedOn, '2026-10-18');
@@ -336,10 +332,6 @@ describe(loadWeeklyActivity, () => {
     });
 
     assert.isTrue(Result.isErr(loaded.result));
-
-    if (Result.isOk(loaded.result)) {
-      return;
-    }
 
     assert.include(loaded.result.value, 'Something went wrong.');
   });

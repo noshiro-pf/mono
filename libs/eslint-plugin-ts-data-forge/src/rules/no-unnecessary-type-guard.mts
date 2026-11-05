@@ -7,8 +7,12 @@ import {
 import {
   buildCalleeResolver,
   getImportDeclarations,
+  isTypeWrapper,
+  skipTypeWrappers,
   typeWrapperLayers,
+  type ResolvedCallee,
 } from 'eslint-rule-forge';
+import { isString } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { TS_DATA_FORGE_MODULE } from './constants.mjs';
@@ -46,6 +50,7 @@ type GuardSpec = DeepReadonly<
     }
   | { kind: 'nonEmptyString' }
   | { kind: 'record' }
+  | { kind: 'variant'; tags: string[] }
 >;
 
 /**
@@ -63,6 +68,27 @@ const BRAND_MARKER_PROPERTY =
  * `N >= 1` (the string cannot be empty).
  */
 const MIN_LENGTH_BRAND_KEY = 'MinLength';
+
+/**
+ * The `$$tag` discriminants of the algebraic data types' variants. A variant
+ * guard compares nothing else, so the tags of the argument's union members
+ * decide its result.
+ */
+const SOME_TAG = 'ts-data-forge::Optional.some';
+
+const NONE_TAG = 'ts-data-forge::Optional.none';
+
+const OK_TAG = 'ts-data-forge::Result.ok';
+
+const ERR_TAG = 'ts-data-forge::Result.err';
+
+const WARN_TAG = 'ts-data-forge::Result.warn';
+
+const IDLE_TAG = 'ts-data-forge::AsyncData.idle';
+
+const PENDING_TAG = 'ts-data-forge::AsyncData.pending';
+
+const TAG_PROPERTY = '$$tag';
 
 const NULLISH_REPLACEMENTS_EXCLUDE: ReadonlyRecord<string, string> = {
   undefined: 'isNotUndefined',
@@ -101,6 +127,19 @@ const GUARD_SPECS: DeepReadonly<ReadonlyRecord<string, GuardSpec>> = {
   },
   isNonEmptyString: { kind: 'nonEmptyString' },
   isRecord: { kind: 'record' },
+  // The variant guards are members of an exported object, named by both.
+  'Optional.isSome': { kind: 'variant', tags: [SOME_TAG] },
+  'Optional.isNone': { kind: 'variant', tags: [NONE_TAG] },
+  'Result.isOk': { kind: 'variant', tags: [OK_TAG] },
+  'Result.isErr': { kind: 'variant', tags: [ERR_TAG] },
+  'TernaryResult.isOk': { kind: 'variant', tags: [OK_TAG] },
+  'TernaryResult.isWarn': { kind: 'variant', tags: [WARN_TAG] },
+  'TernaryResult.isErr': { kind: 'variant', tags: [ERR_TAG] },
+  'AsyncData.isIdle': { kind: 'variant', tags: [IDLE_TAG] },
+  'AsyncData.isPending': { kind: 'variant', tags: [PENDING_TAG] },
+  'AsyncData.isOk': { kind: 'variant', tags: [OK_TAG] },
+  'AsyncData.isErr': { kind: 'variant', tags: [ERR_TAG] },
+  'AsyncData.isSettled': { kind: 'variant', tags: [OK_TAG, ERR_TAG] },
 } as const;
 
 const DEFERRED_OR_OPAQUE_FLAGS =
@@ -176,6 +215,108 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
       );
 
       const resolveGuard = buildCalleeResolver(tsDataForgeImports);
+
+      // `Optional.isNone(x)`, `tf.Optional.isNone(x)`: a guard that is a member
+      // of an exported object, named `Optional.isNone` in `GUARD_SPECS`.
+      const resolveMemberGuard = (
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+        callee: TSESTree.Expression,
+      ): ResolvedCallee | undefined => {
+        const member = skipTypeWrappers(callee);
+
+        if (
+          member.type !== AST_NODE_TYPES.MemberExpression ||
+          member.computed ||
+          member.property.type !== AST_NODE_TYPES.Identifier
+        ) {
+          return undefined;
+        }
+
+        const owner = resolveGuard(member.object);
+
+        return owner === undefined
+          ? undefined
+          : {
+              canonicalName: `${owner.canonicalName}.${member.property.name}`,
+              propertyNode: member.property,
+              isNamespace: owner.isNamespace,
+            };
+      };
+
+      /**
+       * Whether `node`, alone or under `!` and type wrappers, is the argument an
+       * assertion function asserts: `assert.isTrue(Optional.isSome(x))` checks
+       * at run time what the type only claims, so it is not a guard that could
+       * go.
+       */
+      const isAssertedArgument = (
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+        node: TSESTree.Node,
+      ): boolean => {
+        const { parent } = node;
+
+        if (parent === undefined) {
+          return false;
+        }
+
+        if (
+          isTypeWrapper(parent) ||
+          (parent.type === AST_NODE_TYPES.UnaryExpression &&
+            parent.operator === '!')
+        ) {
+          return isAssertedArgument(parent);
+        }
+
+        if (parent.type !== AST_NODE_TYPES.CallExpression) {
+          return false;
+        }
+
+        const index = (parent.arguments as readonly TSESTree.Node[]).indexOf(
+          node,
+        );
+
+        if (index === -1) {
+          return false;
+        }
+
+        const signature = checker.getResolvedSignature(
+          parserServices.esTreeNodeToTSNodeMap.get(parent),
+        );
+
+        const predicate =
+          signature === undefined
+            ? undefined
+            : checker.getTypePredicateOfSignature(signature);
+
+        return (
+          predicate?.kind === ts.TypePredicateKind.AssertsIdentifier &&
+          predicate.parameterIndex === index
+        );
+      };
+
+      /**
+       * Whether `argument` reads a binding that a function other than its own
+       * assigns, directly or through a property. TypeScript keeps narrowing
+       * across calls — after `let x: Optional<T> = Optional.none;
+       * xs.forEach(() => { x = … });`, `x` is still `None` — so the type says
+       * nothing about the value there.
+       */
+      const readsClosureAssignedBinding = (
+        argument: DeepReadonly<TSESTree.Expression>,
+      ): boolean => {
+        const [start, end] = argument.range;
+
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        const scope = sourceCode.getScope(argument as TSESTree.Node);
+
+        return scope.references.some(
+          (reference) =>
+            reference.identifier.range[0] >= start &&
+            reference.identifier.range[1] <= end &&
+            reference.resolved !== null &&
+            isAssignedFromAnotherFunction(reference.resolved),
+        );
+      };
 
       // One binding per replacement guard, however many reports use it.
       const guardAt = tsDataForgeValueAtByName(sourceCode);
@@ -268,7 +409,8 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
             return;
           }
 
-          const resolved = resolveGuard(node.callee);
+          const resolved =
+            resolveGuard(node.callee) ?? resolveMemberGuard(node.callee);
 
           if (resolved === undefined) {
             return;
@@ -283,6 +425,10 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
           const spec = GUARD_SPECS[canonicalName];
 
           if (spec === undefined) {
+            return;
+          }
+
+          if (readsClosureAssignedBinding(argument)) {
             return;
           }
 
@@ -312,7 +458,9 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
           }
 
           if (verdict.kind === 'constant') {
-            reportConstant(node, canonicalName, verdict.value, argument);
+            if (!isAssertedArgument(node)) {
+              reportConstant(node, canonicalName, verdict.value, argument);
+            }
           } else {
             reportReplace(
               node,
@@ -390,6 +538,28 @@ const isGuaranteedRecord = (
   !isCallableType(type, checker) &&
   !checker.isArrayType(type) &&
   !checker.isTupleType(type);
+
+/**
+ * The string literal a (non-union) type's `$$tag` property holds, or
+ * `undefined` when it has none: `Some<number>` gives
+ * `'ts-data-forge::Optional.some'`.
+ */
+const variantTagOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): string | undefined => {
+  const tagSymbol = type.getProperty(TAG_PROPERTY);
+
+  if (tagSymbol === undefined) {
+    return undefined;
+  }
+
+  const tagType = checker.getTypeOfSymbol(tagSymbol);
+
+  return tagType.isStringLiteral() ? tagType.value : undefined;
+};
 
 /** Classifies a single (non-union) type into a primitive {@link Atom}. */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -576,6 +746,20 @@ const verdictOf = (
           ? ({ kind: 'constant', value: false } as const)
           : undefined;
 
+    case 'variant': {
+      const tags = parts.map((p) => variantTagOf(p, checker));
+
+      if (!tags.every(isString)) {
+        return undefined; // a member the tag does not identify
+      }
+
+      return tags.every((tag) => spec.tags.includes(tag))
+        ? ({ kind: 'constant', value: true } as const)
+        : tags.every((tag) => !spec.tags.includes(tag))
+          ? ({ kind: 'constant', value: false } as const)
+          : undefined;
+    }
+
     case 'nonEmptyString': {
       const nonNullishParts = parts.filter((p) => {
         const atom = classifyAtom(p);
@@ -649,6 +833,61 @@ const ATOM_ORDER: readonly AtomKey[] = [
   'bigint',
   'symbol',
 ] as const;
+
+/** Whether a member expression is the target of an assignment or update. */
+const isMemberAssignmentTarget = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  member: TSESTree.MemberExpression,
+): boolean => {
+  const { parent } = member;
+
+  return (
+    (parent.type === AST_NODE_TYPES.AssignmentExpression &&
+      parent.left === member) ||
+    (parent.type === AST_NODE_TYPES.UpdateExpression &&
+      parent.argument === member)
+  );
+};
+
+/**
+ * Whether `node` starts a member chain that is assigned to or updated:
+ * `state` in `state.found = …`, `(state as S).a.b++` or `state.n += 1`.
+ */
+const isAssignedThrough = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): boolean => {
+  const { parent } = node;
+
+  if (parent === undefined) {
+    return false;
+  }
+
+  if (isTypeWrapper(parent)) {
+    return isAssignedThrough(parent);
+  }
+
+  return (
+    parent.type === AST_NODE_TYPES.MemberExpression &&
+    parent.object === node &&
+    (isMemberAssignmentTarget(parent) || isAssignedThrough(parent))
+  );
+};
+
+/**
+ * Whether a function other than the one declaring `variable` assigns it, or
+ * assigns a property reached from it (`state.found = …`).
+ */
+const isAssignedFromAnotherFunction = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  variable: TSESLint.Scope.Variable,
+): boolean =>
+  variable.references.some(
+    (reference) =>
+      reference.from.variableScope !== variable.scope.variableScope &&
+      ((reference.isWrite() && reference.init !== true) ||
+        isAssignedThrough(reference.identifier)),
+  );
 
 /**
  * Returns `true` when evaluating the expression cannot have observable side

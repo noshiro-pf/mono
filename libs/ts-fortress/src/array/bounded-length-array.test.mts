@@ -46,14 +46,12 @@ describe(boundedLengthArray, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (Result.isErr(result)) {
-      assert.deepStrictEqual(result.value[0]?.details, {
-        kind: 'array-range-length',
-        minLength: 1,
-        maxLength: 3,
-        actualLength: 0,
-      });
-    }
+    assert.deepStrictEqual(result.value[0]?.details, {
+      kind: 'array-range-length',
+      minLength: 1,
+      maxLength: 3,
+      actualLength: 0,
+    });
   });
 
   test('fill pads or trims to fit the bounds', () => {

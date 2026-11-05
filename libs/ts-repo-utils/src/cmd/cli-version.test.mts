@@ -54,7 +54,7 @@ const reportedVersion = async (binName: string): Promise<string> => {
 
   assert.isTrue(Result.isOk(result));
 
-  return Result.isOk(result) ? result.value.stdout.trim() : '';
+  return result.value.stdout.trim();
 };
 
 describe('CLI --version', () => {

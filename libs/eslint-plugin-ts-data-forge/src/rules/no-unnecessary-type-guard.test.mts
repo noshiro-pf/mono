@@ -29,6 +29,15 @@ describe('no-unnecessary-type-guard', () => {
         `,
       },
       {
+        name: 'isUndefined on undefined handed to an assertion function, which checks at run time what the type says',
+        code: dedent`
+          import { isUndefined } from 'ts-data-forge';
+          declare const assertIsTrue: (value: unknown) => asserts value is true;
+          declare const x: undefined;
+          assertIsTrue(isUndefined(x));
+        `,
+      },
+      {
         name: 'isRecord on an object type without an index signature of its own',
         code: dedent`
           import { isRecord } from 'ts-data-forge';
@@ -616,6 +625,537 @@ describe('no-unnecessary-type-guard through type wrappers', () => {
           const y = isUndefined(x satisfies string | null | undefined);
         `,
         errors: [{ messageId: 'replaceTypeGuard' }],
+      },
+    ],
+  });
+});
+
+describe('no-unnecessary-type-guard on the variant guards of Optional, Result, TernaryResult and AsyncData', () => {
+  tester.run('no-unnecessary-type-guard', noUnnecessaryTypeGuard, {
+    valid: [
+      {
+        name: 'Optional.isNone on an Optional',
+        code: dedent`
+          import { Optional } from 'ts-data-forge';
+          declare const x: Optional<number>;
+          const y = Optional.isNone(x);
+        `,
+      },
+      {
+        name: 'Optional.isSome on a generic Optional',
+        code: dedent`
+          import { Optional, type UnknownOptional } from 'ts-data-forge';
+          const f = <O extends UnknownOptional>(x: O): boolean => Optional.isSome(x);
+        `,
+      },
+      {
+        name: 'Optional.isSome on any',
+        code: dedent`
+          import { Optional } from 'ts-data-forge';
+          declare const x: any;
+          const y = Optional.isSome(x);
+        `,
+      },
+      {
+        name: 'Optional.isNone on a union with a member that has no tag',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number> | Readonly<{ value: number }>;
+          const y = Optional.isNone(x);
+        `,
+      },
+      {
+        name: 'Result.isOk on a Result',
+        code: dedent`
+          import { Result } from 'ts-data-forge';
+          declare const x: Result<number, string>;
+          const y = Result.isOk(x);
+        `,
+      },
+      {
+        name: 'Optional.isSome on a Some widened to an Optional: the `as` is the author saying it may be None',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = Optional.isSome(x as Optional<number>);
+        `,
+      },
+      {
+        name: 'Optional.isSome on a Some handed to an assertion function, which checks at run time what the type says',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const assertIsTrue: (value: unknown) => asserts value is true;
+          declare const x: Some<number>;
+          assertIsTrue(Optional.isSome(x));
+        `,
+      },
+      {
+        name: 'Result.isErr on an Ok handed to a truthiness assertion',
+        code: dedent`
+          import { Result, type Ok } from 'ts-data-forge';
+          declare const assertFalsy: (value: unknown) => asserts value;
+          declare const x: Ok<number>;
+          assertFalsy(!Result.isErr(x));
+        `,
+      },
+      {
+        name: 'Optional.isSome on a Some handed to an assertion function under `satisfies`',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const assertIsTrue: (value: unknown) => asserts value is true;
+          declare const x: Some<number>;
+          assertIsTrue(Optional.isSome(x) satisfies boolean);
+        `,
+      },
+      {
+        name: 'Optional.isSome on a Some handed to an assertion function under `as`',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const assertIsTrue: (value: unknown) => asserts value is true;
+          declare const x: Some<number>;
+          assertIsTrue(Optional.isSome(x) as boolean);
+        `,
+      },
+      {
+        name: 'Optional.isNone on an Optional cast to Some: the cast does not make the value Some',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Optional<number>;
+          const y = Optional.isNone(x as Some<number>);
+        `,
+      },
+      {
+        name: 'Optional.isSome on a `let` a closure reassigns, which TypeScript still narrows to its initial None',
+        code: dedent`
+          import { Optional } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          let mut_found: Optional<number> = Optional.none;
+          xs.forEach((x) => {
+            mut_found = Optional.some(x);
+          });
+          const y = Optional.isSome(mut_found);
+        `,
+      },
+      {
+        name: 'Optional.isSome on a property a closure assigns, which TypeScript still narrows to the None assigned before',
+        code: dedent`
+          import { Optional } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const mut_state: { found: Optional<number> };
+          mut_state.found = Optional.none;
+          xs.forEach((x) => {
+            mut_state.found = Optional.some(x);
+          });
+          const y = Optional.isSome(mut_state.found);
+        `,
+      },
+      {
+        name: 'Optional.isSome on a conditional between `let`s a closure reassigns',
+        code: dedent`
+          import { Optional } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const flag: boolean;
+          let mut_a: Optional<number> = Optional.none;
+          let mut_b: Optional<number> = Optional.none;
+          xs.forEach((x) => {
+            mut_a = Optional.some(x);
+            mut_b = Optional.some(x);
+          });
+          const y = Optional.isSome(flag ? mut_a : mut_b);
+        `,
+      },
+      {
+        name: 'isUndefined on a `let` a closure reassigns, which TypeScript still narrows to its initial undefined',
+        code: dedent`
+          import { isUndefined } from 'ts-data-forge';
+          declare const xs: readonly string[];
+          let mut_last: string | undefined = undefined;
+          xs.forEach((x) => {
+            mut_last = x;
+          });
+          const y = isUndefined(mut_last);
+        `,
+      },
+      {
+        name: 'a member named isNone of an Optional that is not ts-data-forge',
+        code: dedent`
+          import { Optional } from 'another-library';
+          declare const x: Readonly<{ $$tag: 'ts-data-forge::Optional.some' }>;
+          const y = Optional.isNone(x);
+        `,
+      },
+      {
+        name: 'a member of Optional that is not a variant guard',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = Optional.isOptional(x);
+        `,
+      },
+      {
+        name: 'Optional.isNone ignored by option',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = Optional.isNone(x);
+        `,
+        options: [{ ignore: ['Optional.isNone'] }],
+      },
+      {
+        name: 'TernaryResult.isWarn on a TernaryResult',
+        code: dedent`
+          import { TernaryResult } from 'ts-data-forge';
+          declare const x: TernaryResult<number, string, boolean>;
+          const y = TernaryResult.isWarn(x);
+        `,
+      },
+      {
+        name: 'AsyncData.isSettled on an AsyncData',
+        code: dedent`
+          import { AsyncData } from 'ts-data-forge';
+          declare const x: AsyncData<number, string>;
+          const y = AsyncData.isSettled(x);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'Optional.isNone on a Some (always false)',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = Optional.isNone(x);
+        `,
+        output: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = false;
+        `,
+        errors: [
+          { messageId: 'alwaysFalse', data: { name: 'Optional.isNone' } },
+        ],
+      },
+      {
+        name: 'Optional.isSome on a Some (always true)',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = Optional.isSome(x);
+        `,
+        output: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = true;
+        `,
+        errors: [
+          { messageId: 'alwaysTrue', data: { name: 'Optional.isSome' } },
+        ],
+      },
+      {
+        name: 'Optional.isSome on a None (always false)',
+        code: dedent`
+          import { Optional } from 'ts-data-forge';
+          const x = Optional.none;
+          const y = Optional.isSome(x);
+        `,
+        output: dedent`
+          import { Optional } from 'ts-data-forge';
+          const x = Optional.none;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'Optional.isNone on a None (always true)',
+        code: dedent`
+          import { Optional, type None } from 'ts-data-forge';
+          declare const x: None;
+          const y = Optional.isNone(x);
+        `,
+        output: dedent`
+          import { Optional, type None } from 'ts-data-forge';
+          declare const x: None;
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'Optional.isNone on the snapshot of an InitializedObservable-like store, without a fix because the call is dropped',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const store: Readonly<{ getSnapshot: () => Some<number> }>;
+          if (Optional.isNone(store.getSnapshot())) {
+            console.log('unreachable');
+          }
+        `,
+        output: null,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'Optional.isNone on a union of two Some types',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number> | Some<string>;
+          const y = Optional.isNone(x);
+        `,
+        output: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number> | Some<string>;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'Optional.isSome on an Optional already narrowed by an earlier guard',
+        code: dedent`
+          import { Optional } from 'ts-data-forge';
+          declare const x: Optional<number>;
+          if (Optional.isNone(x)) {
+            throw new Error('none');
+          }
+          const y = Optional.isSome(x);
+        `,
+        output: dedent`
+          import { Optional } from 'ts-data-forge';
+          declare const x: Optional<number>;
+          if (Optional.isNone(x)) {
+            throw new Error('none');
+          }
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'Optional.isSome on a Some under `!`, which narrows nothing here',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = Optional.isSome(x!);
+        `,
+        output: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'Optional.isNone on a Some under `satisfies`',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = Optional.isNone((x satisfies Optional<number>));
+        `,
+        output: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'an Optional imported under another name',
+        code: dedent`
+          import { Optional as O, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = O.isNone(x);
+        `,
+        output: dedent`
+          import { Optional as O, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = false;
+        `,
+        errors: [
+          { messageId: 'alwaysFalse', data: { name: 'Optional.isNone' } },
+        ],
+      },
+      {
+        name: 'Optional reached through a namespace import',
+        code: dedent`
+          import * as tf from 'ts-data-forge';
+          declare const x: tf.Some<number>;
+          const y = tf.Optional.isNone(x);
+        `,
+        output: dedent`
+          import * as tf from 'ts-data-forge';
+          declare const x: tf.Some<number>;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'the guard under a type wrapper of its own',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = (Optional as typeof Optional).isNone(x);
+        `,
+        output: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'Optional.isSome on a Some as the argument of a call that asserts another parameter',
+        code: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const assertSecond: (label: unknown, value: unknown) => asserts value;
+          declare const x: Some<number>;
+          assertSecond(Optional.isSome(x), true);
+        `,
+        output: dedent`
+          import { Optional, type Some } from 'ts-data-forge';
+          declare const assertSecond: (label: unknown, value: unknown) => asserts value;
+          declare const x: Some<number>;
+          assertSecond(true, true);
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'Result.isOk on an Ok (always true)',
+        code: dedent`
+          import { Result } from 'ts-data-forge';
+          const x = Result.ok(1);
+          const y = Result.isOk(x);
+        `,
+        output: dedent`
+          import { Result } from 'ts-data-forge';
+          const x = Result.ok(1);
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue', data: { name: 'Result.isOk' } }],
+      },
+      {
+        name: 'Result.isErr on an Ok (always false)',
+        code: dedent`
+          import { Result, type Ok } from 'ts-data-forge';
+          declare const x: Ok<number>;
+          const y = Result.isErr(x);
+        `,
+        output: dedent`
+          import { Result, type Ok } from 'ts-data-forge';
+          declare const x: Ok<number>;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse', data: { name: 'Result.isErr' } }],
+      },
+      {
+        name: 'Result.isErr on an Err (always true)',
+        code: dedent`
+          import { Result, type Err } from 'ts-data-forge';
+          declare const x: Err<string>;
+          const y = Result.isErr(x);
+        `,
+        output: dedent`
+          import { Result, type Err } from 'ts-data-forge';
+          declare const x: Err<string>;
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'TernaryResult.isWarn on a TernaryOk (always false)',
+        code: dedent`
+          import { TernaryResult, type TernaryOk } from 'ts-data-forge';
+          declare const x: TernaryOk<number>;
+          const y = TernaryResult.isWarn(x);
+        `,
+        output: dedent`
+          import { TernaryResult, type TernaryOk } from 'ts-data-forge';
+          declare const x: TernaryOk<number>;
+          const y = false;
+        `,
+        errors: [
+          { messageId: 'alwaysFalse', data: { name: 'TernaryResult.isWarn' } },
+        ],
+      },
+      {
+        name: 'AsyncData.isSettled on an Ok or an AsyncErr (always true)',
+        code: dedent`
+          import { AsyncData, type AsyncErr, type Ok } from 'ts-data-forge';
+          declare const x: Ok<number> | AsyncErr<number, string>;
+          const y = AsyncData.isSettled(x);
+        `,
+        output: dedent`
+          import { AsyncData, type AsyncErr, type Ok } from 'ts-data-forge';
+          declare const x: Ok<number> | AsyncErr<number, string>;
+          const y = true;
+        `,
+        errors: [
+          { messageId: 'alwaysTrue', data: { name: 'AsyncData.isSettled' } },
+        ],
+      },
+      {
+        name: 'Optional.isSome on a `let` no closure reassigns (always false)',
+        code: dedent`
+          import { Optional } from 'ts-data-forge';
+          let mut_found: Optional<number> = Optional.none;
+          const y = Optional.isSome(mut_found);
+        `,
+        output: dedent`
+          import { Optional } from 'ts-data-forge';
+          let mut_found: Optional<number> = Optional.none;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'TernaryResult.isWarn on a TernaryWarn (always true)',
+        code: dedent`
+          import { TernaryResult, type TernaryWarn } from 'ts-data-forge';
+          declare const x: TernaryWarn<number, string>;
+          const y = TernaryResult.isWarn(x);
+        `,
+        output: dedent`
+          import { TernaryResult, type TernaryWarn } from 'ts-data-forge';
+          declare const x: TernaryWarn<number, string>;
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'AsyncData.isIdle on an AsyncIdle (always true)',
+        code: dedent`
+          import { AsyncData, type AsyncIdle } from 'ts-data-forge';
+          declare const x: AsyncIdle;
+          const y = AsyncData.isIdle(x);
+        `,
+        output: dedent`
+          import { AsyncData, type AsyncIdle } from 'ts-data-forge';
+          declare const x: AsyncIdle;
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'AsyncData.isPending on an AsyncPending (always true)',
+        code: dedent`
+          import { AsyncData, type AsyncPending } from 'ts-data-forge';
+          declare const x: AsyncPending<number>;
+          const y = AsyncData.isPending(x);
+        `,
+        output: dedent`
+          import { AsyncData, type AsyncPending } from 'ts-data-forge';
+          declare const x: AsyncPending<number>;
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'AsyncData.isPending on an AsyncIdle (always false)',
+        code: dedent`
+          import { AsyncData, type AsyncIdle } from 'ts-data-forge';
+          declare const x: AsyncIdle;
+          const y = AsyncData.isPending(x);
+        `,
+        output: dedent`
+          import { AsyncData, type AsyncIdle } from 'ts-data-forge';
+          declare const x: AsyncIdle;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
       },
     ],
   });
