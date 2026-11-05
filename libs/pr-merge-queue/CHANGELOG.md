@@ -1,5 +1,28 @@
 # pr-merge-queue
 
+## 0.6.0
+
+### Minor Changes
+
+- 2101cd3: Add `rework-pr`, which takes the current branch's pull request out of the queue while more work goes into it (`start`: `skip-ci` on, `merge-queued` off, auto-merge disarmed, a draft) and gives it back for review once that work is pushed (`done`: push with `--force-with-lease`, mark it ready).
+
+### Patch Changes
+
+- f0f8dc0: `open-pr --merge-before N` refuses a cycle against the `Merge-After:` of the pull request's body as the run leaves it, not only against what the run declares: the body of a pull request open already, and the order carried from the `Start-After:` of the issues it closes, are now checked before `N`'s body is written. Such a run stops with nothing written into `N`, after `skip-ci` and `auto-rebase` are on.
+- 54652b6: `pr-report` fails, naming each pull request and what failed, when the check runs or the commit statuses of a pull request cannot be read, as it does when the rate limit is spent. It used to read such a failure as nothing reported, so every required context of that pull request came out `missing` and its verdict `pending`, as if CI had not started.
+- eee1ea8: `unblock-prs` now waits 60 seconds by default, instead of 30, between polls of the pull request it watches (`--poll-interval`) and between surveys while the list is changing (`--active-interval`), and slows to `--idle-interval` after 5 unchanged surveys instead of 10, so that still happens after about five minutes. This halves what the queue spends of the account's GraphQL budget, at the cost of noticing a merge about 15 seconds later on average. A watched pull request that is green and not merging is given up on after 2 polls (5 while GitHub reads `BLOCKED`) instead of 3 (8), which keeps those waits at least as long as they were. A released pull request whose reads keep failing now holds the queue for about five minutes, instead of two and a half, before it is set aside as `read-failed`.
+- c9d5ffa: `unblock-prs` ends its cycle after a release failure GitHub may have caused — a refused push, a failed fetch, auto-merge that could not be armed, a label that could not be removed — instead of trying the next candidate. In an outage every candidate failed the same way, so the whole queue was set aside within one cycle, and nothing cleared the reasons once GitHub recovered. A failure that is the pull request's own (a real conflict, a stacked branch whose commits cannot be told, nothing left to merge) still moves on to the next candidate.
+- 670c1d3: `unblock-prs` ranks the runs of one job in one workflow and event by check suite, then by check run id, as `pr-report` does, rather than by when they started, and waits on a red required check while its own workflow run, with a job in it re-run after the red, has not finished. A queued re-run of a failed job, or the new round's queued aggregate, is waited on instead of losing to the red it replaces, and a pending commit status no longer counts as the start of a round. `pr-report-core` exports `outranks`, the ranking `statesFromCheckRuns` uses, and its `CheckRunRank` type.
+- 41c97fd: `unblock-prs` re-fires the check workflows once before it sets a released pull request aside as `checks-not-started`: after five minutes with a required context unreported and nothing running on the head, it puts `skip-ci` back on and takes it off, which every check workflow triggers on, and waits five minutes more. The set-aside clears only when `main` moves, so when that pull request was the only one the worker could release, the queue used to stay stalled until a person moved it.
+- Updated dependencies [22cef42]
+- Updated dependencies [36ffebb]
+- Updated dependencies [23bfcbe]
+- Updated dependencies [670c1d3]
+    - ts-repo-utils@10.7.4
+    - ts-data-forge@14.11.1
+    - ts-type-forge@9.2.3
+    - pr-report-core@0.4.0
+
 ## 0.5.0
 
 ### Minor Changes

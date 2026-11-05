@@ -1,5 +1,16 @@
 # eslint-rule-forge
 
+## 0.7.0
+
+### Minor Changes
+
+- 23fad6b: New `inlineTypeQualifierRange(sourceCode, specifier)`: the range a fix removes to drop the inline `type` of an import or export specifier, up to whatever follows it so that a comment there stays. `bindValueImports` uses it for the edit that turns `import { type x }` into a value import.
+
+### Patch Changes
+
+- Updated dependencies [23bfcbe]
+    - ts-type-forge@9.2.3
+
 ## 0.6.0
 
 ### Minor Changes
