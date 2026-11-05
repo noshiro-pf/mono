@@ -24,15 +24,14 @@ import { dict } from '../constants/index.mjs';
 import { isProduction } from '../env.mjs';
 import { createToaster, showToast } from '../functions/index.mjs';
 import { api } from '../store/index.mjs';
+import { createUncaughtErrorReporter } from './report-uncaught.mjs';
 
 if (isProduction) {
-  addEventListener('error', (ev) => {
-    const errorString = unknownToString(ev.error);
+  const reporter = createUncaughtErrorReporter(api.sendReport);
 
-    console.error(errorString);
+  addEventListener('error', reporter.onError);
 
-    api.sendReport({ error: errorString }).catch(console.error);
-  });
+  addEventListener('unhandledrejection', reporter.onUnhandledRejection);
 }
 
 type State = Readonly<{
@@ -144,13 +143,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
     this.setState({ description: value });
   };
 
-  // eslint-disable-next-line react/no-unused-class-component-methods, @typescript-eslint/class-methods-use-this, @typescript-eslint/prefer-readonly-parameter-types
-  readonly onUnhandledRejection = (ev: PromiseRejectionEvent): void => {
-    ev.promise.catch((error: unknown) => {
-      showErrorToast(unknownToString(error));
-    });
-  };
-
   override render(): React.ReactNode {
     const {
       error,
@@ -251,7 +243,3 @@ export class ErrorBoundary extends React.Component<Props, State> {
 const dc = dict.errorMessages.errorHandler;
 
 const toast = createToaster();
-
-const showErrorToast = (error: React.ReactNode): void => {
-  showToast({ toast, intent: 'danger', message: error });
-};
