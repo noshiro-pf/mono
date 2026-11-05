@@ -164,9 +164,11 @@ jobs:
           # about half of it, and every other app by excluding it, so a new
           # suite lands there. The first rides with five checks of under
           # forty seconds each: `check:knip`, `check:published-deps`,
-          # `strict-lib:check:types`, `strict-lib:check:lint`
-          # (`strict-lib/`'s own scripts, which no `ws:*` entry reaches) and
-          # `ws:check:sumi` (the Sumi lint of the dogfood packages).
+          # `strict-lib:check:types`, `strict-lib:check:lint` (the
+          # `strict-lib/` tooling and converter, which no member's own check
+          # script covers; the harnesses are workspace members, and their
+          # `check:types` is strict-lib-gen.yml's) and `ws:check:sumi` (the
+          # Sumi lint of the dogfood packages).
           - command: z:ci:code-check:e2e-1-and-quick
             build: ws:build:deps
             browser: true
