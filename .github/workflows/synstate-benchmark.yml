@@ -127,11 +127,12 @@ jobs:
       # left out, since they change nothing measured. `devDependencies` are
       # left out too: the ESLint packages and the build tooling change no
       # number, and keying on every package's source made a pull request that
-      # touched any of them measure for ten minutes. Every workspace package a
-      # scenario imports (`synstate`, `ts-data-forge`, `ts-type-forge`) is in
-      # that closure. The digest is of `git ls-files -s`, the blob of each
-      # file, and the file list is filtered by `awk` rather than by an
-      # `:(exclude)` pathspec.
+      # touched any of them measure for ten minutes. That every workspace
+      # package a benchmark source imports is in that closure, every file it
+      # imports by a relative path is in the directories below, and this step
+      # reads both, is `check:root:synstate-benchmark-imports`'s to check. The digest is of
+      # `git ls-files -s`, the blob of each file, and the file list is filtered
+      # by `awk` rather than by an `:(exclude)` pathspec.
       #
       # The `vN` is for a change of what is measured that none of that sees,
       # and bumping it is what makes `main` re-measure; without it the
