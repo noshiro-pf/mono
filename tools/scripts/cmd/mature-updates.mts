@@ -89,7 +89,8 @@ import type { ReleaseBinaryPin } from '../lib/release-binaries.mjs';
  * namespaces). The same constraint is why version segments stay digit strings
  * compared by length and then lexically (the `ts-data-forge` rules object to
  * `Number()` and `parseInt`, and the helper they want is not there to import),
- * and why the `eslint-disable` lines below exist. `Temporal` is what Node 26
+ * and why the root `eslint.config.mts` turns those rules off here
+ * (`scriptsRunBeforeInstall` in `tools/configs/`). `Temporal` is what Node 26
  * has, so the script needs the Node the workflow runs on (`volta.node`), not
  * the floor of the compatibility matrix. The test runs the file under `node`
  * against a fake `pnpm` and a fake GitHub API to keep all of this true.
@@ -114,7 +115,6 @@ export const main = async (argv: readonly string[]): Promise<void> => {
     }
 
     case 'release-binaries': {
-      // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing -- ts-data-forge is not installed when this runs (see the header).
       const to = parseToOption(argv.slice(3));
 
       if (to === 'invalid') {
@@ -281,7 +281,6 @@ export const selectMatureRelease = (
       .filter(({ parsed }) => compareVersions(parsed, floor) > 0)
       .map(({ release }) => release.tag),
     // `newer` is in ascending order, and so are the lines taken from it.
-    // eslint-disable-next-line ts-data-forge/prefer-arr-uniq -- ts-data-forge is not installed when this runs (see the header).
     linesWaiting: Array.from(
       new Set(
         newer
@@ -582,7 +581,6 @@ export const updateReleaseBinaryPins = async (
     }
   }
 
-  // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge is not installed when this runs (see the header).
   if (mut_moved.length > 0) {
     writePins(configPath, mut_next);
   }
@@ -651,11 +649,9 @@ export type StableVersion = Readonly<{
 // ---------------------------------------------------------------------------
 
 const isRecord = (value: unknown): value is ReadonlyRecord<string, unknown> =>
-  // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- ts-data-forge is not installed when this runs (see the header).
   typeof value === 'object' && value !== null;
 
 const isListOfStrings = (value: unknown): value is readonly string[] =>
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array -- ts-data-forge is not installed when this runs (see the header).
   Array.isArray(value) && value.every((v) => typeof v === 'string');
 
 const parseRegistryMetadata = (raw: unknown): RegistryMetadata | undefined => {
@@ -770,7 +766,6 @@ const stripTagPrefix = (tag: string): string => tag.replace(/^v/u, '');
 const isListOfRecords = (
   value: unknown,
 ): value is readonly ReadonlyRecord<string, unknown>[] =>
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array -- ts-data-forge is not installed when this runs (see the header).
   Array.isArray(value) && value.every(isRecord);
 
 const parseRelease = (raw: ReadonlyRecord<string, unknown>): Release =>
@@ -1082,7 +1077,6 @@ const movePin = (
   return {
     ...raw,
     version: stripTagPrefix(tag),
-    // eslint-disable-next-line ts-data-forge/prefer-obj-over-entries-round-trip -- ts-data-forge is not installed when this runs (see the header).
     assets: Object.fromEntries(
       Object.entries(assets).map(([platform, asset]) => [
         platform,
@@ -1187,16 +1181,13 @@ const parseToOption = (
   argsAsGiven: readonly string[],
 ): ReleaseBinaryTarget | 'invalid' | undefined => {
   // `pnpm run update-release-binaries -- --to …` forwards the `--` as well.
-  // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing -- ts-data-forge is not installed when this runs (see the header).
   const args = argsAsGiven[0] === '--' ? argsAsGiven.slice(1) : argsAsGiven;
 
-  // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge is not installed when this runs (see the header).
   if (args.length === 0) {
     return undefined;
   }
 
   const target =
-    // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge is not installed when this runs (see the header).
     args.length === 2 && args[0] === '--to' && args[1] !== undefined
       ? /^(?<name>[^@\s]+)@(?<version>\S+)$/u.exec(args[1])?.groups
       : undefined;

@@ -61,7 +61,6 @@ export const main = (argv: readonly string[]): void => {
 
   const missing = findMissingBuilds(rootDir, startDirs);
 
-  // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge is not built when this runs (see the header).
   if (missing.length === 0) {
     return;
   }
@@ -91,7 +90,6 @@ export const findMissingBuilds = (
             !fs.existsSync(path.resolve(packageDir, target)),
         ),
     }))
-    // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge is not built when this runs (see the header).
     .filter(({ missing }) => missing.length > 0);
 
 /**
@@ -117,7 +115,6 @@ export const findLinkedPackages = (
     ]),
   );
 
-  // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge is not built when this runs (see the header).
   while (mut_frontier.length > 0) {
     const mut_next: Edge[] = [];
 
@@ -152,7 +149,6 @@ export const findLinkedPackages = (
  * read without a YAML parser.
  */
 export const workspaceStartDirs = (rootDir: string): readonly string[] =>
-  // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing -- ts-data-forge is not built when this runs (see the header).
   [rootDir, ...workspaceMembers(rootDir)] as const;
 
 /**
@@ -175,7 +171,6 @@ export const entryPointTargets = (manifest: unknown): readonly string[] => {
       typeof target === 'string' && !target.includes('*'),
   );
 
-  // eslint-disable-next-line ts-data-forge/prefer-arr-uniq -- ts-data-forge is not built when this runs (see the header).
   return Array.from(new Set(targets));
 };
 
@@ -212,7 +207,6 @@ type DependencyField = 'dependencies' | 'peerDependencies' | 'devDependencies';
 type Edge = Readonly<{ packageDir: string; neededBy: string }>;
 
 const isRecord = (value: unknown): value is ReadonlyRecord<string, unknown> =>
-  // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- ts-data-forge is not built when this runs (see the header).
   typeof value === 'object' && value !== null;
 
 const exportTargets = (value: unknown): readonly unknown[] =>
@@ -314,7 +308,6 @@ const workspaceMembers = (rootDir: string): readonly string[] => {
 
   const patterns = isRecord(manifest) ? manifest['workspaces'] : undefined;
 
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array -- ts-data-forge is not built when this runs (see the header).
   if (!Array.isArray(patterns)) {
     return [];
   }

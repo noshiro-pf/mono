@@ -8,6 +8,7 @@ import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
 import nodeSupport from './tools/configs/node-support.json' with { type: 'json' };
+import { scriptsRunBeforeInstall } from './tools/configs/scripts-run-before-install.mjs';
 import { projectRootPath } from './tools/scripts/project-root-path.mjs';
 
 // The repository's own tooling runs on `volta.node`, which is
@@ -45,12 +46,11 @@ export default [
     }),
   },
   {
-    // The diff gate and the install step run before anything is installed, so
-    // this file imports `node:*` alone (its test holds it). Every rule of this
-    // plugin is about ts-data-forge's API, and its fixes write an import of a
-    // package that is not there yet, so all of them are off here, the ones it
-    // adds later included.
-    files: ['tools/scripts/cmd/workflow-steps.mts'],
+    // These run before ts-data-forge can be imported, so they import `node:*`
+    // alone. Every rule of this plugin is about ts-data-forge's API, and its
+    // fixes write an import of a package that is not there yet, so all of them
+    // are off here, the ones it adds later included.
+    files: [...scriptsRunBeforeInstall],
     rules: Object.fromEntries(
       Object.keys(eslintPluginTsDataForge.configs.recommended.rules).map(
         (rule) => [rule, 'off'] as const,
