@@ -148,6 +148,185 @@ describe('switchMap releases only the inner observables its projection created (
   });
 });
 
+describe('switchMap and mergeMap release at once what a projection that threw on a later value made (#3134)', () => {
+  test('switchMap: disposes it at the throw, and goes on switching', () => {
+    const user$ = source<number>();
+
+    const other$ = source<number>(0);
+
+    const mut_disposed: number[] = [];
+
+    const current$ = user$.pipe(
+      switchMap((u) => {
+        onScopeDispose(() => {
+          mut_disposed.push(u);
+        });
+
+        // Made in the projection's scope before it throws.
+        other$.pipe(map((v) => v + u));
+
+        if (u === 2) {
+          panic('projection failed');
+        }
+
+        return just(u);
+      }),
+    );
+
+    const mut_values: number[] = [];
+
+    current$.subscribe((v) => {
+      mut_values.push(v);
+    });
+
+    user$.next(1);
+
+    expect(() => {
+      user$.next(2);
+    }).toThrow('projection failed');
+
+    assert.deepStrictEqual(mut_disposed, [1, 2]);
+
+    assert.isFalse(toNode(other$).hasChild);
+
+    user$.next(3);
+
+    assert.deepStrictEqual(mut_values, [1, 3]);
+
+    current$.complete();
+
+    assert.deepStrictEqual(mut_disposed, [1, 2, 3]);
+  });
+
+  test('switchMap: keeps the inner a write from inside the projection switched to before it threw', () => {
+    const user$ = source<number>();
+
+    const mut_disposed: number[] = [];
+
+    const current$ = user$.pipe(
+      switchMap((u) => {
+        onScopeDispose(() => {
+          mut_disposed.push(u);
+        });
+
+        if (u === 1) {
+          user$.next(2);
+
+          panic('projection failed');
+        }
+
+        return source<number>();
+      }),
+    );
+
+    current$.subscribe(() => {});
+
+    expect(() => {
+      user$.next(1);
+    }).toThrow('projection failed');
+
+    assert.deepStrictEqual(mut_disposed, [1]);
+
+    current$.complete();
+
+    assert.deepStrictEqual(mut_disposed, [1, 2]);
+  });
+
+  test('switchMap: disposes it at once when subscribing to the inner observable throws', () => {
+    const user$ = source<number>();
+
+    const mut_disposed: number[] = [];
+
+    const current$ = user$.pipe(
+      switchMap((u) => {
+        onScopeDispose(() => {
+          mut_disposed.push(u);
+        });
+
+        return source<number>(u);
+      }),
+    );
+
+    current$.subscribe(() => {
+      panic('subscriber failed');
+    });
+
+    expect(() => {
+      user$.next(1);
+    }).toThrow('subscriber failed');
+
+    assert.deepStrictEqual(mut_disposed, [1]);
+  });
+
+  test('mergeMap: disposes it at the throw, not when mergeMap completes', () => {
+    const click$ = source<number>();
+
+    const other$ = source<number>(0);
+
+    const mut_disposed: number[] = [];
+
+    const merged$ = click$.pipe(
+      mergeMap((n) => {
+        onScopeDispose(() => {
+          mut_disposed.push(n);
+        });
+
+        if (n === 2) {
+          // Made in the projection's scope before it throws.
+          other$.pipe(map((v) => v + n));
+
+          panic('projection failed');
+        }
+
+        // Kept live, so that neither it nor `mergeMap` completes.
+        return source<number>();
+      }),
+    );
+
+    merged$.subscribe(() => {});
+
+    click$.next(1);
+
+    expect(() => {
+      click$.next(2);
+    }).toThrow('projection failed');
+
+    assert.deepStrictEqual(mut_disposed, [2]);
+
+    assert.isFalse(toNode(other$).hasChild);
+
+    merged$.complete();
+
+    assert.deepStrictEqual(mut_disposed, [2, 1]);
+  });
+
+  test('mergeMap: disposes it at once when subscribing to the inner observable throws', () => {
+    const click$ = source<number>();
+
+    const mut_disposed: number[] = [];
+
+    const merged$ = click$.pipe(
+      mergeMap((n) => {
+        onScopeDispose(() => {
+          mut_disposed.push(n);
+        });
+
+        return source<number>(n);
+      }),
+    );
+
+    merged$.subscribe(() => {
+      panic('subscriber failed');
+    });
+
+    expect(() => {
+      click$.next(1);
+    }).toThrow('subscriber failed');
+
+    assert.deepStrictEqual(mut_disposed, [1]);
+  });
+});
+
 describe('the scope switchMap and mergeMap were created in (#2335)', () => {
   test('disposing it releases what their projections created, and the shared inners survive', () => {
     const user$ = source<number>();
@@ -361,32 +540,6 @@ describe('mergeMap releases an inner observable as soon as it completes (#2769)'
     merged$.complete();
 
     assert.deepStrictEqual(mut_disposed, [1, 2]);
-  });
-
-  test('disposes what a projection that threw made when mergeMap completes', () => {
-    const click$ = source<number>();
-
-    const mut_disposed: number[] = [];
-
-    const merged$ = click$.pipe(
-      mergeMap((n) => {
-        onScopeDispose(() => {
-          mut_disposed.push(n);
-        });
-
-        return panic('projection failed');
-      }),
-    );
-
-    merged$.subscribe(() => {});
-
-    expect(() => {
-      click$.next(1);
-    }).toThrow('projection failed');
-
-    merged$.complete();
-
-    assert.deepStrictEqual(mut_disposed, [1]);
   });
 
   test('releases an inner observable when mergeMap completes while subscribing to it', () => {

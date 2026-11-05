@@ -17,6 +17,7 @@ import type {
   Subscription,
   UpdateToken,
 } from '../types/index.mjs';
+import { runUndoingOnThrow } from '../utils/index.mjs';
 
 /**
  * Projects each source value to an observable and merges all inner observables.
@@ -30,6 +31,8 @@ import type {
  * `mergeMap` completes, whichever comes first. An observable it only returns —
  * one created outside the projection and shared with others — is unsubscribed
  * and left running.
+ *
+ * If the projection or the subscription to it throws, its scope is disposed.
  *
  * @template A - The type of values from the source
  * @template B - The type of values from the projected observable
@@ -184,24 +187,37 @@ class MergeMapObservableClass<A, B>
   #project(value: A, updateToken: UpdateToken): void {
     const innerScope = createScope(this.#ownerScope);
 
-    // Held before the projection runs, so that `teardown` disposes what it made
-    // even if it throws, or if `mergeMap` completes while the inner observable
+    // Held before the projection runs, so that `teardown` releases it if
+    // `mergeMap` completes during the projection or while the inner observable
     // is being subscribed.
     this.#mut_liveInners.set(innerScope, undefined);
 
-    const observable = innerScope.run(() => this.#mapToObservable(value));
+    // Released at once if the projection throws, or the subscription does,
+    // rather than held until `mergeMap` completes.
+    runUndoingOnThrow(
+      () => {
+        const observable = innerScope.run(() => this.#mapToObservable(value));
 
-    const subscription = this.subscribeInner(observable, updateToken, () => {
-      this.#releaseInner(innerScope);
-    });
+        const subscription = this.subscribeInner(
+          observable,
+          updateToken,
+          () => {
+            this.#releaseInner(innerScope);
+          },
+        );
 
-    if (this.#mut_liveInners.has(innerScope)) {
-      this.#mut_liveInners.set(innerScope, subscription);
-    } else {
-      // Released while it was subscribed: the inner observable completed
-      // (`just(x)`), or `mergeMap` did.
-      subscription.unsubscribe();
-    }
+        if (this.#mut_liveInners.has(innerScope)) {
+          this.#mut_liveInners.set(innerScope, subscription);
+        } else {
+          // Released while it was subscribed: the inner observable completed
+          // (`just(x)`), or `mergeMap` did.
+          subscription.unsubscribe();
+        }
+      },
+      () => {
+        this.#releaseInner(innerScope);
+      },
+    );
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
