@@ -757,8 +757,8 @@ For detailed information on all types, see the [Full API Reference](https://nosh
 - src/record/deep.mts
     - [DeepReadonly](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/deep.mts#L33)
     - [DeepMutable](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/deep.mts#L69)
-    - [DeepPartial](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/deep.mts#L112)
-    - [DeepRequired](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/deep.mts#L149)
+    - [DeepPartial](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/deep.mts#L117)
+    - [DeepRequired](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/deep.mts#L154)
 - src/record/partial.mts
     - [PartiallyPartial](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/partial.mts#L22)
     - [PartiallyOptional](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/partial.mts#L38)
