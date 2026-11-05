@@ -1345,7 +1345,7 @@ converter 側の `RelaxedExclude` 回避 3 箇所は削除した。
 唯一欠けていて `Circular dependency detected` になった。さらに
 `ws-gen-with-codemod-fixed-stages.mts` にはスクリプトが 1 つも向いていなかった。
 **このリポジトリのチェックアウトで実際に必要な入口はそれ**である
-（`gen` は gitignore 対象の `temp/codemod-fixed` を再利用し、`gen:full` は
+（`gen:lib` は gitignore 対象の `temp/codemod-fixed` を再利用し、`gen:full` は
 ネットワーク取得から始まる）。リリース経路が `gen:packages` しか回さないので
 誰も気づいていなかった。
 

@@ -7,8 +7,8 @@ export const projectRootPath = path.resolve(import.meta.dirname, '..');
  *
  * The stage runners need it rather than {@link projectRootPath}: they read the
  * root manifest to discover the workspace globs, and `strict-lib/` is a
- * directory inside the workspace, not a workspace of its own. Packages that do
- * not define the script being run are skipped, so pointing at the real root
- * costs nothing.
+ * directory inside the workspace, not a workspace of its own. They keep to the
+ * harnesses themselves (`run-in-harnesses.mts`), so pointing at the real root
+ * reaches no other member.
  */
 export const workspaceRootPath = path.resolve(import.meta.dirname, '../..');
