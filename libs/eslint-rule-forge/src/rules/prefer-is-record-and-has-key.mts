@@ -16,13 +16,25 @@ import {
  * Builds a rule that replaces `Object.hasOwn(obj, key)` and `key in obj` with
  * `isRecord(obj) && hasKey(obj, key)` imported from `moduleName`, or with
  * `hasKey(obj, key)` alone when `obj` is already a record.
+ *
+ * `key in obj` is fixed only on an object type literal or a mapped type with a
+ * string index signature; anywhere else the rewrite is a suggestion, because
+ * `hasKey` checks own properties where `in` walks the prototype chain
+ * (`'then' in promise`, `'size' in map`, a class method) and `isRecord` rejects
+ * the functions `in` accepts.
  */
 export const createPreferIsRecordAndHasKey = ({
   moduleName,
 }: Readonly<{
   /** The module that exports `isRecord` and `hasKey`. */
   moduleName: string;
-}>): TSESLint.RuleModule<'useIsRecordAndHasKey' | 'useHasKey', readonly []> =>
+}>): TSESLint.RuleModule<
+  | 'useIsRecordAndHasKey'
+  | 'useHasKey'
+  | 'inReadsPrototypeChain'
+  | 'suggestOwnPropertyCheck',
+  readonly []
+> =>
   ({
     meta: {
       type: 'suggestion',
@@ -30,10 +42,13 @@ export const createPreferIsRecordAndHasKey = ({
         description: `Replace \`Object.hasOwn(obj, key)\` or \`key in obj\` with \`isRecord(obj) && hasKey(obj, key)\` from ${moduleName}`,
       },
       fixable: 'code',
+      hasSuggestions: true,
       schema: [],
       messages: {
-        useIsRecordAndHasKey: `Replace \`{{original}}\` with \`{{isRecord}}({{objName}}) && {{hasKey}}({{objName}}, {{keyName}})\` from ${moduleName}.`,
-        useHasKey: `Replace \`{{original}}\` with \`{{hasKey}}({{objName}}, {{keyName}})\` from ${moduleName}.`,
+        useIsRecordAndHasKey: `Replace \`{{original}}\` with \`{{replacement}}\` from ${moduleName}.`,
+        useHasKey: `Replace \`{{original}}\` with \`{{replacement}}\` from ${moduleName}.`,
+        inReadsPrototypeChain: `\`{{original}}\` also finds keys on the prototype chain (a Promise's \`then\`, a Map's \`size\`, a class method) and on functions; \`{{replacement}}\` from ${moduleName} checks own properties of a non-function object only. Replace it where that is what is meant.`,
+        suggestOwnPropertyCheck: `Replace with \`{{replacement}}\` from ${moduleName}, which checks own properties only.`,
       },
       defaultOptions: [],
     },
@@ -59,6 +74,20 @@ export const createPreferIsRecordAndHasKey = ({
         );
 
       /**
+       * Whether the object, already known to be a record, is a plain object
+       * type at every layer, so that it has no methods of its own on a
+       * prototype for `in` to find. The members of `Object.prototype` are the
+       * one difference left between `in` and `hasKey` there: the fix accepts it
+       * for a key read at run time, and a literal key naming one
+       * (`'constructor' in rec`) is left to a suggestion.
+       */
+      const isPlainObject = (
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+        expression: TSESTree.Expression,
+      ): boolean =>
+        typeHoldsAtEveryLayer(sourceCode, expression, isPlainObjectType);
+
+      /**
        * Whether the object may be an array at some layer of type wrappers.
        * `isRecord` rejects an array, so `'0' in xs` would turn from `true` to
        * `false`; a widening cast to a type that may be an array is the author
@@ -78,6 +107,11 @@ export const createPreferIsRecordAndHasKey = ({
 
       const mut_nodesToFix: {
         node: TSESTree.CallExpression | TSESTree.BinaryExpression;
+        /**
+         * Whether the node is `key in obj`, which reads the prototype chain
+         * that `hasKey` does not.
+         */
+        isIn: boolean;
         objExpression: TSESTree.Expression;
         keyExpression: TSESTree.Expression;
       }[] = [];
@@ -120,6 +154,7 @@ export const createPreferIsRecordAndHasKey = ({
 
           mut_nodesToFix.push({
             node,
+            isIn: false,
             objExpression: objArg,
             keyExpression: keyArg,
           });
@@ -145,6 +180,7 @@ export const createPreferIsRecordAndHasKey = ({
 
           mut_nodesToFix.push({
             node,
+            isIn: true,
             objExpression,
             keyExpression,
           });
@@ -166,7 +202,12 @@ export const createPreferIsRecordAndHasKey = ({
             'hasKey',
           ]);
 
-          for (const { node, objExpression, keyExpression } of mut_nodesToFix) {
+          for (const {
+            node,
+            isIn,
+            objExpression,
+            keyExpression,
+          } of mut_nodesToFix) {
             // A record-typed object makes the `isRecord(...)` conjunct always
             // true, so it is left out of the replacement entirely.
             const needsIsRecord = !isKnownRecord(objExpression);
@@ -192,29 +233,49 @@ export const createPreferIsRecordAndHasKey = ({
               // `isRecord(obj) && hasKey(obj, key)` evaluates `obj` twice.
               (!needsIsRecord || isSideEffectFree(objExpression));
 
+            const hasKeyCall = `${hasKeyName ?? 'hasKey'}(${objText}, ${keyText})`;
+
+            const replacement = needsIsRecord
+              ? `${isRecordName ?? 'isRecord'}(${objText}) && ${hasKeyCall}`
+              : hasKeyCall;
+
+            const data = {
+              original: sourceCode.getText(node),
+              replacement,
+            } as const;
+
+            const fix: TSESLint.ReportFixFunction | null = fixable
+              ? (fixer) => [
+                  ...binding.edits(fixer),
+                  fixer.replaceText(
+                    node,
+                    needsIsRecord ? `(${replacement})` : replacement,
+                  ),
+                ]
+              : null;
+
+            // Off a plain record the object may be a class instance, a
+            // built-in or a function, and the rewrite is the author's
+            // decision.
+            const suggestOnly =
+              isIn &&
+              (needsIsRecord ||
+                !isPlainObject(objExpression) ||
+                namesObjectPrototypeMember(keyExpression));
+
             context.report({
               node,
-              messageId: needsIsRecord ? 'useIsRecordAndHasKey' : 'useHasKey',
-              data: {
-                original: sourceCode.getText(node),
-                objName: objText,
-                keyName: keyText,
-                // The names a fix here writes; where none can bind them, the
-                // exports' own.
-                isRecord: isRecordName ?? 'isRecord',
-                hasKey: hasKeyName ?? 'hasKey',
-              },
-              fix: fixable
-                ? (fixer) => [
-                    ...binding.edits(fixer),
-                    fixer.replaceText(
-                      node,
-                      needsIsRecord
-                        ? `(${isRecordName}(${objText}) && ${hasKeyName}(${objText}, ${keyText}))`
-                        : `${hasKeyName}(${objText}, ${keyText})`,
-                    ),
-                  ]
-                : null,
+              messageId: suggestOnly
+                ? 'inReadsPrototypeChain'
+                : needsIsRecord
+                  ? 'useIsRecordAndHasKey'
+                  : 'useHasKey',
+              data,
+              fix: suggestOnly ? null : fix,
+              suggest:
+                suggestOnly && fix !== null
+                  ? [{ messageId: 'suggestOwnPropertyCheck', data, fix }]
+                  : [],
             });
           }
         },
@@ -240,6 +301,57 @@ const isSideEffectFree = (
       isSideEffectFree(node.object))
   );
 };
+
+const objectPrototypeMembers: ReadonlySet<string> = new Set(
+  Object.getOwnPropertyNames(Object.prototype),
+);
+
+/**
+ * Whether `key` is a string literal naming a member of `Object.prototype`,
+ * which `in` finds on every object and `hasKey` on none that does not own it.
+ */
+const namesObjectPrototypeMember = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  wrapped: TSESTree.Expression,
+): boolean => {
+  const key = skipTypeWrappers(wrapped);
+
+  return (
+    key.type === AST_NODE_TYPES.Literal &&
+    typeof key.value === 'string' &&
+    objectPrototypeMembers.has(key.value)
+  );
+};
+
+/**
+ * Whether every member of `type` is an object type literal, an object literal
+ * or a mapped type (`Record<string, V>`) none of whose properties a class or an
+ * interface declares. A class, an interface, a type parameter, or a mapped type
+ * over one of them (`Readonly<Bag>`) may stand for an instance whose methods
+ * live on a prototype, so it is not counted.
+ */
+const isPlainObjectType = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean =>
+  type.isUnionOrIntersection()
+    ? type.types.every((member) => isPlainObjectType(member, checker))
+    : (type.flags & ts.TypeFlags.Object) !== 0 &&
+      ((type.getSymbol()?.flags ?? 0) &
+        (ts.SymbolFlags.TypeLiteral | ts.SymbolFlags.ObjectLiteral)) !==
+        0 &&
+      checker
+        .getPropertiesOfType(type)
+        .every(
+          (property) =>
+            property.declarations?.every(
+              (declaration) =>
+                !ts.isClassLike(declaration.parent) &&
+                !ts.isInterfaceDeclaration(declaration.parent),
+            ) ?? true,
+        );
 
 /**
  * Whether a value of `type` may be an array or a tuple: some member of a union

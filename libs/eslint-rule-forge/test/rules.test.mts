@@ -102,11 +102,29 @@ ruleTester.run(
             messageId: 'useIsRecordAndHasKey',
             data: {
               original: "Object.hasOwn(obj, 'a')",
-              objName: 'obj',
-              keyName: "'a'",
-              isRecord: 'lib.isRecord',
-              hasKey: 'lib.hasKey',
+              replacement: "lib.isRecord(obj) && lib.hasKey(obj, 'a')",
             },
+          },
+        ],
+      },
+      {
+        name: 'suggests `in` from the module it is given, without type information',
+        code: dedent`
+          const ok = 'a' in obj;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'my-lib';
+                  const ok = (isRecord(obj) && hasKey(obj, 'a'));
+                `,
+              },
+            ],
           },
         ],
       },
