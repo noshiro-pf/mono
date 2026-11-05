@@ -1,7 +1,5 @@
-import { build } from 'esbuild';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { gzipSync } from 'node:zlib';
 import { Arr } from 'ts-data-forge';
 import bundleSizeComparison from '../src/data/bundle-size-comparison.json' with { type: 'json' };
 import {
@@ -10,6 +8,7 @@ import {
   bundleSizeScenarioNames,
   checkMeasuredSources,
   everythingRowName,
+  measureSynstateAloneKb,
   renderBundleSizeBreakdown,
   renderBundleSizeEnvironment,
   renderBundleSizeTable,
@@ -17,18 +16,10 @@ import {
 } from './bundle-size-comparison.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
-// This package lives in apps/ while the packages it measures live in libs/, so
-// they are no longer siblings.
-const synstateDistPath = path.resolve(
-  workspaceRootPath,
-  '../../libs/synstate/dist/index.mjs',
-);
-
-const reactHooksDistPath = path.resolve(
-  workspaceRootPath,
-  '../../libs/synstate-react-hooks/dist/index.mjs',
-);
-
+/**
+ * The pages that quote the size of `synstate` itself, which the Bundle Size
+ * pages set beside their tables.
+ */
 const targetMarkdownFiles: readonly string[] = [
   path.resolve(
     workspaceRootPath,
@@ -60,36 +51,6 @@ const comparisonPages = [
     ),
   },
 ] as const;
-
-const measureBundleSize = async (
-  entryPoint: string,
-  externals: readonly string[],
-): Promise<Readonly<{ minifiedBytes: number; gzippedBytes: number }>> => {
-  const res = await build({
-    entryPoints: [entryPoint],
-    bundle: true,
-    minify: true,
-    write: false,
-    format: 'esm',
-    external: Array.from(externals),
-  });
-
-  const minified = res.outputFiles[0]?.contents;
-
-  if (minified === undefined) {
-    throw new Error(`esbuild produced no output for ${entryPoint}`);
-  }
-
-  const gzipped = gzipSync(minified);
-
-  return {
-    minifiedBytes: minified.byteLength,
-    gzippedBytes: gzipped.byteLength,
-  };
-};
-
-const formatKB = (bytes: number): string =>
-  (bytes / 1024).toFixed(1).replace(/\.0$/u, '');
 
 const replacePlaceholder = (
   content: string,
@@ -125,61 +86,39 @@ const replacePlaceholder = (
     );
 };
 
+/** Whether `content` holds both markers of `name`, in either comment style. */
+const hasMarkers = (content: string, name: string): boolean =>
+  (content.includes(`<!-- bundle-size:${name} -->`) &&
+    content.includes(`<!-- /bundle-size:${name} -->`)) ||
+  (content.includes(`{/* bundle-size:${name} */}`) &&
+    content.includes(`{/* /bundle-size:${name} */}`));
+
 /** A table has to stand in paragraphs of its own, apart from the markers. */
 const block = (text: string): string => `\n\n${text}\n\n` as const;
 
 const embedBundleSize = async (): Promise<void> => {
-  const comparisonContents = await renderComparisonPages();
-
-  // Measure synstate
   console.info('Measuring bundle size for synstate...');
 
-  // Every runtime dependency is external: the number is meant to be the size of
-  // this package, not of its dependency tree inlined. `ts-std-forge` joined the
-  // list when synstate took the panic path from it (Sumi D-48) — leaving it out
-  // measured all of ts-std-forge as if it were synstate's own code and reported
-  // 8.7 kB against an actual 4.7 kB.
-  const synstate = await measureBundleSize(synstateDistPath, [
-    'ts-data-forge',
-    'ts-std-forge',
-  ]);
+  const synstateKb = await measureSynstateAloneKb();
 
-  console.info(
-    `  synstate: ${formatKB(synstate.minifiedBytes)} kB minified, ${formatKB(synstate.gzippedBytes)} kB gzipped`,
-  );
+  const comparisonContents = await renderComparisonPages(synstateKb);
 
-  // Measure synstate-react-hooks
-  console.info('Measuring bundle size for synstate-react-hooks...');
+  const quoted = `~${synstateKb} kB min+gzip` as const;
 
-  const reactHooks = await measureBundleSize(reactHooksDistPath, [
-    'ts-data-forge',
-    'synstate',
-    'react',
-  ]);
-
-  console.info(
-    `  synstate-react-hooks: ${formatKB(reactHooks.minifiedBytes)} kB minified, ${formatKB(reactHooks.gzippedBytes)} kB gzipped`,
-  );
-
-  // Replace placeholders in markdown files
   for (const mdPath of targetMarkdownFiles) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    let mut_content = await fs.readFile(mdPath, 'utf8');
+    const content = await fs.readFile(mdPath, 'utf8');
 
-    mut_content = replacePlaceholder(
-      mut_content,
-      'synstate',
-      `~${formatKB(synstate.gzippedBytes)} kB min+gzip`,
-    );
-
-    mut_content = replacePlaceholder(
-      mut_content,
-      'synstate-react-hooks',
-      `~${formatKB(reactHooks.gzippedBytes)} kB min+gzip`,
-    );
+    if (!hasMarkers(content, 'synstate')) {
+      throw new Error(`${mdPath} has no pair of bundle-size:synstate markers`);
+    }
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.writeFile(mdPath, mut_content, 'utf8');
+    await fs.writeFile(
+      mdPath,
+      replacePlaceholder(content, 'synstate', quoted),
+      'utf8',
+    );
 
     console.info(`✓ Updated bundle size in ${path.basename(mdPath)}`);
   }
@@ -322,10 +261,10 @@ const claimsOfTheResults = (
       ),
     },
     {
-      en: '**SynState** is under 5 kB in every scenario row with either bundler.',
-      ja: '**SynState** は、どちらのバンドラーでもシナリオの行がすべて 5 kB 未満です。',
+      en: '**SynState** is 5 kB or under in every scenario row with either bundler.',
+      ja: '**SynState** は、どちらのバンドラーでもシナリオの行がすべて 5 kB 以下です。',
       holds: forEveryTable('SynState', bundleSizeScenarioNames, (values) =>
-        values.every((value) => value < 50),
+        values.every((value) => value <= 50),
       ),
     },
     {
@@ -440,9 +379,9 @@ type Claim = Readonly<{ en: string; ja: string; holds: boolean }>;
  * measurement, the implementations, every marker and every claim of the prose
  * checked first, so that nothing is written when one fails.
  */
-const renderComparisonPages = async (): Promise<
-  readonly Readonly<{ path: string; content: string }>[]
-> => {
+const renderComparisonPages = async (
+  synstateKb: string,
+): Promise<readonly Readonly<{ path: string; content: string }>[]> => {
   const comparison: BundleSizeComparison = bundleSizeComparison;
 
   await checkMeasuredSources(comparison);
@@ -451,27 +390,36 @@ const renderComparisonPages = async (): Promise<
 
   return Promise.all(
     comparisonPages.map(async (page) => {
+      // The tables stand in paragraphs of their own; the size of `synstate`
+      // alone sits inside a sentence.
       const replacements = [
         [
           'comparison-environment',
-          renderBundleSizeEnvironment(comparison, page.language),
+          block(renderBundleSizeEnvironment(comparison, page.language)),
         ],
         [
           'comparison-gzip',
-          renderBundleSizeTable(comparison, 'vite', 'gzip', page.language),
+          block(
+            renderBundleSizeTable(comparison, 'vite', 'gzip', page.language),
+          ),
         ],
         [
           'comparison-brotli',
-          renderBundleSizeTable(comparison, 'vite', 'brotli', page.language),
+          block(
+            renderBundleSizeTable(comparison, 'vite', 'brotli', page.language),
+          ),
         ],
         [
           'comparison-esbuild-gzip',
-          renderBundleSizeTable(comparison, 'esbuild', 'gzip', page.language),
+          block(
+            renderBundleSizeTable(comparison, 'esbuild', 'gzip', page.language),
+          ),
         ],
         [
           'comparison-breakdown',
-          renderBundleSizeBreakdown(comparison, page.language),
+          block(renderBundleSizeBreakdown(comparison, page.language)),
         ],
+        ['comparison-synstate-alone', `${synstateKb} kB`],
       ] as const;
 
       // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -494,7 +442,7 @@ const renderComparisonPages = async (): Promise<
         path: page.path,
         content: replacements.reduce(
           (acc, [name, replacement]) =>
-            replacePlaceholder(acc, name, block(replacement)),
+            replacePlaceholder(acc, name, replacement),
           content,
         ),
       };

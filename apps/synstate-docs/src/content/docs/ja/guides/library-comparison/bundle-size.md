@@ -11,7 +11,7 @@ sidebar:
 
 - **すべてのエクスポート**： ライブラリのエントリポイントのエクスポートをすべて丸ごと残したもの。`synstate`・`rxjs`・`mobx`・`jotai/vanilla` と `jotai/vanilla/utils`・`@reduxjs/toolkit`・`solid-js`・`@preact/signals-core`・`zustand/vanilla`・`valtio/vanilla` です。上限として読んでください。アプリケーションに残るのは import したものだけです。Jotai は、React バインディングを除いて同じ関数をエクスポートする vanilla のエントリポイントで測っています。
 - **シナリオの行**： そのシナリオの実装が import しているエクスポート（たとえばダイヤモンドでは `synstate` の `createState`・`derive`・`map`）を、tree-shaking で落ちないようにすべて生かしたもの。バンドルはその実装が必要とするライブラリのコードです。実装自身のループと、ベンチマークのハーネスが呼ぶ ts-data-forge のヘルパーは数えません。数えると、ts-data-forge に自分で依存している SynState 以外のすべてのライブラリに上乗せされてしまうからです。ベンチマークが 1 つのライブラリを 2 通りで測っているシナリオでは、「(naive …)」と付いていない自然な書き方の方を使います。ダッシュは、そのライブラリを測っていないシナリオです。
-- **依存込み**： `synstate` は `ts-data-forge`・`ts-std-forge` と、Redux Toolkit は Redux・Immer・Reselect と、RxJS は tslib と一緒にバンドルします。これがアプリケーションがダウンロードするものです。[はじめに](/mono/synstate/ja/getting-started/introduction/)に載せているサイズは測り方が違い、依存を除いた `synstate` のすべてのエクスポートを、1,024 バイトを 1 とする KiB で表した値です。
+- **依存込み**： `synstate` は `ts-data-forge`・`ts-std-forge` と、Redux Toolkit は Redux・Immer・Reselect と、RxJS は tslib と一緒にバンドルします。これがアプリケーションがダウンロードするものです。[トップページ](/mono/synstate/ja/)・[はじめに](/mono/synstate/ja/getting-started/introduction/)・README に載せているサイズは、これとは違って `synstate` 単体の値です。すべてのエクスポートを、ここと同じ esbuild の設定で、ただし ts-data-forge と ts-std-forge を除いてバンドルし、minify ＋ gzip で <!-- bundle-size:comparison-synstate-alone -->7.1 kB<!-- /bundle-size:comparison-synstate-alone --> です。サイトのジェネレーターが現在のソースから計測するため、下の表より新しいことがあります。
 
 どのバンドルも、ブラウザ向けに minify し、すべてのライブラリを本番ビルド（`process.env.NODE_ENV` と `import.meta.env.MODE` を `production`）で含めて、2 回ビルドします。本番モードで `browser` と `production` の export 条件を解決する Vite と、ライセンスコメントを除いた esbuild です。2 つのバンドラは tree-shaking で落とすコードが同じではなく、その差はライブラリによって大きく違うので、両方を載せます。gzip はレベル 9、Brotli は品質 11 です。1 kB は 1,000 バイトで、小さいほど良い値です。
 
@@ -19,7 +19,7 @@ sidebar:
 
 <!-- bundle-size:comparison-environment -->
 
-Vite 8.3.5 と esbuild 0.28.2 でバンドル。`synstate`、`ts-data-forge`、`ts-std-forge` はこのリポジトリのソースからビルドしており、マニフェストのバージョン（`synstate 6.2.1`, `ts-data-forge 14.10.2`, `ts-std-forge 0.5.2`）にまだ含まれない変更を含むことがあります。その他のバージョン: `rxjs 7.8.2`, `jotai 3.0.1`, `mobx 7.1.0`, `@reduxjs/toolkit 2.13.0`, `zustand 5.0.15`, `valtio 2.3.2`, `solid-js 1.9.17`, `@preact/signals-core 1.14.4`。
+Vite 8.3.5 と esbuild 0.28.2 でバンドル。`synstate`、`ts-data-forge`、`ts-std-forge` はこのリポジトリのソースからビルドしており、マニフェストのバージョン（`synstate 7.0.0`, `ts-data-forge 14.11.0`, `ts-std-forge 0.5.3`）にまだ含まれない変更を含むことがあります。その他のバージョン: `rxjs 7.8.2`, `jotai 3.0.1`, `mobx 7.1.0`, `@reduxjs/toolkit 2.13.0`, `zustand 5.0.15`, `valtio 2.3.2`, `solid-js 1.9.17`, `@preact/signals-core 1.14.4`。
 
 <!-- /bundle-size:comparison-environment -->
 
@@ -29,7 +29,7 @@ Vite 8.3.5 と esbuild 0.28.2 でバンドル。`synstate`、`ts-data-forge`、`
 
 | シナリオ (kB)                                                                                                    | **SynState** | RxJS | MobX | Jotai | Redux | Solid | Preact Signals | Zustand | Valtio |
 | :--------------------------------------------------------------------------------------------------------------- | -----------: | ---: | ---: | ----: | ----: | ----: | -------------: | ------: | -----: |
-| すべてのエクスポート                                                                                             |          8.3 | 17.5 | 15.1 |   4.8 |  14.2 |   8.4 |            2.0 |     0.3 |    1.5 |
+| すべてのエクスポート                                                                                             |          8.4 | 17.5 | 15.1 |   4.8 |  14.2 |   8.4 |            2.0 |     0.3 |    1.5 |
 | [単一ステート](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-単一ステート)                     |          3.2 |  3.3 | 11.3 |   2.4 |   7.1 |   2.3 |            1.6 |     0.2 |    1.0 |
 | [派生チェーン](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-派生チェーン)                     |          3.8 |  3.6 | 11.3 |   2.4 |   8.5 |   2.4 |            1.6 |       — |      — |
 | [ダイヤモンド依存関係](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-ダイヤモンド依存関係)     |          4.1 |  6.0 | 11.3 |   2.4 |   8.5 |   2.4 |            1.6 |       — |      — |
@@ -52,7 +52,7 @@ Vite 8.3.5 と esbuild 0.28.2 でバンドル。`synstate`、`ts-data-forge`、`
 | [ダイヤモンド依存関係](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-ダイヤモンド依存関係)     |          3.8 |  5.5 | 10.3 |   2.2 |   7.8 |   2.2 |            1.5 |       — |      — |
 | [ディープチェーン](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-ディープチェーンスループット) |          3.0 |  5.5 | 10.4 |   2.3 |   3.4 |   2.2 |            1.5 |       — |      — |
 | [カスケードダイヤモンド](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-カスケードダイヤモンド) |          3.8 |  5.5 | 10.3 |   2.2 |   7.8 |   2.2 |            1.5 |       — |      — |
-| [条件付きファンアウト](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-条件付きファンアウト)     |          3.9 |  5.2 | 10.3 |   2.2 |   3.4 |   2.2 |            1.5 |       — |      — |
+| [条件付きファンアウト](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-条件付きファンアウト)     |          4.0 |  5.2 | 10.3 |   2.2 |   3.4 |   2.2 |            1.5 |       — |      — |
 | [等値カットオフ](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-等値カットオフ)                 |          3.5 |  5.5 | 10.3 |   2.2 |   7.8 |   2.2 |            1.5 |       — |      — |
 
 <!-- /bundle-size:comparison-brotli -->
@@ -63,13 +63,13 @@ Vite 8.3.5 と esbuild 0.28.2 でバンドル。`synstate`、`ts-data-forge`、`
 
 | シナリオ (kB)                                                                                                    | **SynState** | RxJS | MobX | Jotai | Redux | Solid | Preact Signals | Zustand | Valtio |
 | :--------------------------------------------------------------------------------------------------------------- | -----------: | ---: | ---: | ----: | ----: | ----: | -------------: | ------: | -----: |
-| すべてのエクスポート                                                                                             |          9.7 | 18.6 | 15.8 |   5.1 |  15.2 |   8.7 |            2.0 |     0.3 |    1.6 |
+| すべてのエクスポート                                                                                             |          9.8 | 18.6 | 15.8 |   5.1 |  15.2 |   8.7 |            2.0 |     0.3 |    1.6 |
 | [単一ステート](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-単一ステート)                     |          3.8 |  3.5 | 12.0 |   2.5 |   8.5 |   2.7 |            1.6 |     0.3 |    1.0 |
 | [派生チェーン](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-派生チェーン)                     |          4.4 |  3.8 | 11.9 |   2.5 |  10.1 |   2.8 |            1.7 |       — |      — |
 | [ダイヤモンド依存関係](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-ダイヤモンド依存関係)     |          4.7 |  6.4 | 11.9 |   2.5 |  10.1 |   2.8 |            1.7 |       — |      — |
 | [ディープチェーン](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-ディープチェーンスループット) |          3.9 |  6.4 | 12.1 |   2.7 |   5.1 |   2.8 |            1.7 |       — |      — |
 | [カスケードダイヤモンド](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-カスケードダイヤモンド) |          4.7 |  6.4 | 11.9 |   2.5 |  10.1 |   2.8 |            1.7 |       — |      — |
-| [条件付きファンアウト](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-条件付きファンアウト)     |          4.9 |  6.1 | 11.9 |   2.5 |   5.1 |   2.8 |            1.7 |       — |      — |
+| [条件付きファンアウト](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-条件付きファンアウト)     |          5.0 |  6.1 | 11.9 |   2.5 |   5.1 |   2.8 |            1.7 |       — |      — |
 | [等値カットオフ](/mono/synstate/ja/guides/library-comparison/benchmark/#シナリオ-等値カットオフ)                 |          4.4 |  6.4 | 11.9 |   2.5 |  10.1 |   2.8 |            1.7 |       — |      — |
 
 <!-- /bundle-size:comparison-esbuild-gzip -->
@@ -95,7 +95,7 @@ Vite 8.3.5 と esbuild 0.28.2 でバンドル。`synstate`、`ts-data-forge`、`
 
 ## 結果の読み方
 
-- **SynState** は、どちらのバンドラーでもシナリオの行がすべて 5 kB 未満です。どの行でも MobX より小さく、単一ステートと派生チェーン以外のシナリオ（ダイヤモンド、ディープチェーン、カスケードダイヤモンド、条件付きファンアウト、等値カットオフ）では RxJS よりも小さくなります。どのシナリオの行でも、esbuild の値と Vite の値の差は 1 kB 以内です。
+- **SynState** は、どちらのバンドラーでもシナリオの行がすべて 5 kB 以下です。どの行でも MobX より小さく、単一ステートと派生チェーン以外のシナリオ（ダイヤモンド、ディープチェーン、カスケードダイヤモンド、条件付きファンアウト、等値カットオフ）では RxJS よりも小さくなります。どのシナリオの行でも、esbuild の値と Vite の値の差は 1 kB 以内です。
 - **RxJS** は operator を 1 つずつ別のモジュールにしているので、行は実装が import する operator に応じて大きくなります。単一ステートでは `BehaviorSubject` だけ、ダイヤモンドでは `combineLatest` と `map` も加わります。
 - **MobX** は一部でも使うとライブラリの大部分が残るので、シナリオの行はほとんど変わりません。
 - **Redux** は、実装が `createSlice` を使う行で Immer を含みます。`createSlice` の reducer は Immer の draft を使うからです。ディープチェーンと条件付きファンアウトは `createAction` に照合する素の reducer で書いているので、Immer を含みません。
