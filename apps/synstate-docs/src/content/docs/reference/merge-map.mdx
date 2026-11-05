@@ -20,6 +20,8 @@ creates is disposed when the observable it returned completes, or when
 `mergeMap` completes, whichever comes first. An observable it only returns —
 one created outside the projection and shared with others — is unsubscribed
 and left running.
+
+If the projection or the subscription to it throws, its scope is disposed.
 {/* /jsdoc-description */}
 
 ## Marble Diagram

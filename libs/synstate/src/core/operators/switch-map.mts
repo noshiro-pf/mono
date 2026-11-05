@@ -16,6 +16,7 @@ import type {
   SwitchMapOperatorObservable,
   UpdateToken,
 } from '../types/index.mjs';
+import { runUndoingOnThrow } from '../utils/index.mjs';
 
 /**
  * Projects each source value to an observable, subscribes to it, and emits its values.
@@ -29,6 +30,8 @@ import type {
  * creates is disposed when the next value switches away from it and when
  * `switchMap` completes. An observable it only returns — one created outside
  * the projection and shared with others — is unsubscribed and left running.
+ *
+ * If the projection or the subscription to it throws, its scope is disposed.
  *
  * @template A - The type of values from the source
  * @template B - The type of values from the projected observable
@@ -176,9 +179,27 @@ class SwitchMapObservableClass<A, B>
 
     this.#mut_innerScope = innerScope;
 
-    const observable = innerScope.run(() => this.#mapToObservable(value));
+    this.#mut_subscription = undefined;
 
-    this.#mut_subscription = this.subscribeInner(observable, updateToken);
+    // What the projection made is disposed at once if it throws, or if the
+    // subscription does, rather than at the next projection that succeeds.
+    runUndoingOnThrow(
+      () => {
+        const observable = innerScope.run(() => this.#mapToObservable(value));
+
+        this.#mut_subscription = this.subscribeInner(observable, updateToken);
+      },
+      () => {
+        // A write from inside the projection may have switched again already.
+        if (this.#mut_innerScope === innerScope) {
+          this.#mut_innerScope = undefined;
+
+          this.#mut_subscription = undefined;
+        }
+
+        innerScope.dispose();
+      },
+    );
   }
 
   override tryUpdate(updateToken: UpdateToken): void {

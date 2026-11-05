@@ -24,6 +24,7 @@ import {
   isDevelopmentBuild,
   issueUnqueuedToken,
   maxDepth,
+  runUndoingOnThrow,
 } from '../utils/index.mjs';
 import { ManagerObservableClass } from './manager-observable-class.mjs';
 import { ObservableBaseClass } from './observable-base-class.mjs';
@@ -225,20 +226,14 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
       return;
     }
 
-    // A flag and `finally` rather than `catch` and rethrow: Sumi bans
-    // `try..catch`, and the exception is never caught on its way to `pipe`.
-    let mut_projected = false;
-
-    // @sumi-expect-error exceptions/no-try
-    try {
-      project(sn.value, issueUnqueuedToken());
-
-      mut_projected = true;
-    } finally {
-      if (!mut_projected) {
+    runUndoingOnThrow(
+      () => {
+        project(sn.value, issueUnqueuedToken());
+      },
+      () => {
         this.dispose();
-      }
-    }
+      },
+    );
   }
 
   /**

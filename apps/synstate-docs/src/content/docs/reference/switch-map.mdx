@@ -20,6 +20,8 @@ The projection runs in a scope of its own (see `createScope`): what it
 creates is disposed when the next value switches away from it and when
 `switchMap` completes. An observable it only returns — one created outside
 the projection and shared with others — is unsubscribed and left running.
+
+If the projection or the subscription to it throws, its scope is disposed.
 {/* /jsdoc-description */}
 
 ## Marble Diagram
