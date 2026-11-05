@@ -248,7 +248,7 @@ pnpm exec firebase emulators:start   # Java 21 以上が必要
   Google アカウントは要らず、データも本番のユーザー ID に紐づかない。
 - ルールは `firestore.rules` をそのまま読み込み、ファイルを変えると読み直される。
 - 接続先のホストはページを開いたホスト名を使う。LAN の別の端末から開くときは、
-  開発サーバーを `pnpm run dev -- --host` で、エミュレータも `firebase.json` の各項目に
+  開発サーバーを `pnpm run dev --host` で、エミュレータも `firebase.json` の各項目に
   `"host": "0.0.0.0"` を足して起動する。この `firebase.json` の変更はコミットしない。
   コミットするとほかの開発者のエミュレータも LAN に開いてしまう。変更したままのあいだは
   `check:root:firebase-emulator-hosts` が手元でも落ちるので、終わったら戻す。
