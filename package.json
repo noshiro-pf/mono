@@ -184,6 +184,7 @@
     "z:ci:code-check:e2e-1-and-quick": "run-s --continue-on-error check:knip check:published-deps strict-lib:check:types strict-lib:check:lint ws:check:sumi ws:check:e2e:shard-1",
     "z:ci:style-check:checks-and-generators": "run-s --continue-on-error check:prose check:md check:cspell ws:check:ext strict-lib:fix:fmt gen:deps-graph gen:license-files ws:gen",
     "z:ci:style-check:format-and-doc": "run-s --continue-on-error fix:fmt:full ws:doc",
+    "z:ci-job": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/ci-job.mts",
     "z:eslint": "NODE_OPTIONS='--max-old-space-size=6144' TIMING=1 eslint",
     "z:format-diff-from": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/ts-repo-utils/src/cmd/format-diff-from.mts",
     "z:format-uncommitted": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/ts-repo-utils/src/cmd/format-uncommitted.mts",

@@ -236,9 +236,6 @@ jobs:
           path: node_modules/.cache/release-binaries/archives
           key: release-binaries-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/configs/release-binaries.json') }}
 
-      - name: Build what "${{ matrix.command }}" reads
-        run: pnpm run ${{ matrix.build }}
-
       # The checkout is one commit deep, and `git diff` needs the base too.
       # Empty on a manual run, which asks for everything.
       - name: Fetch the base the codemod diffs against
@@ -250,13 +247,12 @@ jobs:
       # dependency mid-run and reloading the page; naming those dependencies in
       # each package's `optimizeDepsInclude` removed it, so a failure here is
       # now a failure rather than something to try again.
-      - name: Run "${{ matrix.command }}"
+      # The build, the command and the clean-tree check, as `check-all` runs
+      # them too: a step that changed the tree fails the job and is named
+      # ("The work" in README.md).
+      - name: Run "${{ matrix.command }}" after "${{ matrix.build }}"
         id: command
-        run: pnpm run ${{ matrix.command }}
-
-      - name: Check if there is no file diff
-        id: clean
-        run: pnpm run z:assert-repo-is-clean
+        run: pnpm run z:ci-job --build ${{ matrix.build }} --command ${{ matrix.command }}
 
       # Whatever the rest of the bundle concluded: a coverage shard shares its
       # job with checks that have nothing to do with coverage, and Codecov
@@ -287,13 +283,15 @@ jobs:
 
       # Says in the job summary which of this entry's commands check-changed
       # would have run for the diff ("When a check fails" in README.md). It
-      # reports; the job has failed already. Not after a failed setup or
-      # build, when the command never ran. Last, and capped, so that it cannot
+      # reports; the job has failed already. Not after a failed setup, nor
+      # after a failed build (`z:ci-job` says so in `build-failed`), when the
+      # command never ran. Last, and capped, so that it cannot
       # spend the job's time limit before the steps above.
       - name: Say which of "${{ matrix.command }}"'s commands check-changed would have run
         if: >-
           failure() && github.event_name == 'pull_request' &&
-          (steps.command.outcome == 'failure' || steps.clean.outcome == 'failure')
+          steps.command.outcome == 'failure' &&
+          steps.command.outputs.build-failed != 'true'
         continue-on-error: true
         timeout-minutes: 2
         env:

@@ -7,6 +7,7 @@ import {
   findRedundantCommands,
   findUncoveredCommands,
   matchScriptNames,
+  readMatrixInclude,
   resolveScriptInvocations,
   type CheckWorkflow,
   type Manifest,
@@ -139,6 +140,41 @@ describe('matchScriptNames', () => {
   });
 });
 
+describe('readMatrixInclude', () => {
+  test('reads each `include` entry with its properties', () => {
+    const text = dedent`
+      jobs:
+        code-check:
+          strategy:
+            matrix:
+              include:
+                # A comment is not a property.
+                - command: ws:fix:lint:apps
+                  build: ws:build:deps
+
+                - command: ws:check:e2e:shard-2
+                  build: ws:build
+                  browser: true
+
+                - command: 'ws:check:test:browser' # a quoted value
+                  build: ws:build:deps # and a comment
+                  browser: "true"
+          steps:
+            - run: pnpm run z:ci-job --command \${{ matrix.command }}
+    `;
+
+    assert.deepStrictEqual(readMatrixInclude(text), [
+      { command: 'ws:fix:lint:apps', build: 'ws:build:deps' },
+      { command: 'ws:check:e2e:shard-2', build: 'ws:build', browser: 'true' },
+      {
+        command: 'ws:check:test:browser',
+        build: 'ws:build:deps',
+        browser: 'true',
+      },
+    ]);
+  });
+});
+
 describe('collectWorkflowCommands', () => {
   test('reads the entries of a matrix the workflow hands to `pnpm run`', () => {
     const text = dedent`
@@ -159,6 +195,26 @@ describe('collectWorkflowCommands', () => {
     assert.deepStrictEqual(collectWorkflowCommands(text), [
       'check:md',
       'check:prose',
+    ]);
+  });
+
+  test('reads the matrix keys a `z:ci-job` step hands on', () => {
+    const text = dedent`
+      jobs:
+        code-check:
+          strategy:
+            matrix:
+              include:
+                - command: check:root
+                  build: ws:build:deps
+          steps:
+            - run: pnpm run z:ci-job --build \${{ matrix.build }} --command \${{ matrix.command }}
+    `;
+
+    assert.deepStrictEqual(collectWorkflowCommands(text), [
+      'check:root',
+      'ws:build:deps',
+      'z:ci-job',
     ]);
   });
 

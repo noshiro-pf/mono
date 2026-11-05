@@ -450,10 +450,12 @@ const PNPM_RUN = /pnpm run (?<args>[^&|;\n]*)/gu;
 const RUN_ALL = /\brun-[sp] (?<args>[^&|;\n]*)/gu;
 
 /**
- * `pnpm run ${{ matrix.<key> }}`, which is how both matrix workflows invoke the
- * entry they are running.
+ * A matrix key handed on as a script: `pnpm run ${{ matrix.<key> }}`, or a
+ * `--command` / `--build` of `z:ci-job`, which is how both matrix workflows run
+ * the entry and what it reads.
  */
-const MATRIX_COMMAND = /pnpm run \$\{\{ matrix\.(?<key>[a-z_]+) \}\}/gu;
+const MATRIX_COMMAND =
+  /(?:pnpm run|--command|--build) \$\{\{ matrix\.(?<key>[a-z_]+) \}\}/gu;
 
 /** A `pnpm` in a workflow line, and what follows it up to a separator. */
 const WORKFLOW_PNPM = /(?:^|[\s;&|(])pnpm (?<rest>[^&|;\n#)]*)/gu;
@@ -571,9 +573,9 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
   {
     directory: ROOT_DIRECTORY,
     scriptName: 'check-all',
-    // The aggregate of aggregates, and a human aid rather than a CI job: it
-    // exists to be faster than GitHub Actions, not to agree with it. CI is the
-    // gate; see #1965 and the note at the end of check-all.mts.
+    // A human aid rather than a CI job: it runs the matrix entries of
+    // code-check.yml and style-check.yml, read from them, so each is reached
+    // here through its own workflow; its header says what it leaves out.
   },
   {
     directory: ROOT_DIRECTORY,
@@ -849,6 +851,75 @@ export const readCheckWorkflows = async (): Promise<
           }
         }),
       );
+};
+
+/**
+ * The entries under a matrix's `include:`, each with its properties as written
+ * (`command`, `build`, `browser: 'true'`); `check-all.mts` runs them.
+ */
+export const readMatrixInclude = (
+  workflowFile: string,
+): readonly ReadonlyRecord<string, string>[] => {
+  const mut_entries: Map<string, string>[] = [];
+
+  for (const line of blockUnder(workflowFile.split('\n'), 'include:')) {
+    const trimmed = line.trim();
+
+    if (trimmed === '' || trimmed.startsWith('#')) {
+      continue;
+    }
+
+    const isItem = trimmed.startsWith(LIST_ITEM);
+
+    const property = isItem
+      ? trimmed.slice(LIST_ITEM.length).trimStart()
+      : trimmed;
+
+    const separator = property.indexOf(': ');
+
+    if (separator === -1) {
+      continue;
+    }
+
+    if (isItem || !Arr.isNonEmpty(mut_entries)) {
+      mut_entries.push(new Map<string, string>());
+    }
+
+    const mut_entry = mut_entries.at(-1);
+
+    mut_entry?.set(
+      property.slice(0, separator),
+      unquoteYamlScalar(property.slice(separator + 2)),
+    );
+  }
+
+  return mut_entries.map((entry) => Object.fromEntries(entry));
+};
+
+export const readRootManifest = async (): Promise<Result<Manifest, string>> => {
+  const manifestPath = path.join(projectRootPath, 'package.json');
+
+  const contents = await Result.fromPromise(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFile(manifestPath, 'utf8'),
+  );
+
+  if (Result.isErr(contents)) {
+    return Result.err(
+      `Failed to read package.json: ${unknownToString(contents.value)}`,
+    );
+  }
+
+  const parsed = Json.parse(contents.value);
+
+  return Result.isErr(parsed)
+    ? Result.err(
+        `Failed to parse package.json: ${unknownToString(parsed.value)}`,
+      )
+    : Result.ok({
+        directory: ROOT_DIRECTORY,
+        scripts: readScripts(parsed.value),
+      });
 };
 
 /**
@@ -1133,32 +1204,6 @@ const reaches = (
   to: CommandId,
 ): boolean => from !== to && reachableFrom(graph, [from]).has(to);
 
-const readRootManifest = async (): Promise<Result<Manifest, string>> => {
-  const manifestPath = path.join(projectRootPath, 'package.json');
-
-  const contents = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(manifestPath, 'utf8'),
-  );
-
-  if (Result.isErr(contents)) {
-    return Result.err(
-      `Failed to read package.json: ${unknownToString(contents.value)}`,
-    );
-  }
-
-  const parsed = Json.parse(contents.value);
-
-  return Result.isErr(parsed)
-    ? Result.err(
-        `Failed to parse package.json: ${unknownToString(parsed.value)}`,
-      )
-    : Result.ok({
-        directory: ROOT_DIRECTORY,
-        scripts: readScripts(parsed.value),
-      });
-};
-
 const readWorkflow = async (
   workflowPath: string,
 ): Promise<Result<CheckWorkflow | undefined, string>> => {
@@ -1186,6 +1231,24 @@ const readWorkflow = async (
     commands: collectWorkflowCommands(contents.value),
     pinsNodeVersion: PINNED_NODE_VERSION.test(contents.value),
   });
+};
+
+/**
+ * A plain YAML scalar as its value: a trailing ` # comment` taken off, and the
+ * quotes around a quoted one.
+ */
+const unquoteYamlScalar = (text: string): string => {
+  const value = text.trim();
+
+  const quote = value.at(0);
+
+  if ((quote === "'" || quote === '"') && value.indexOf(quote, 1) > 0) {
+    return value.slice(1, value.indexOf(quote, 1));
+  }
+
+  const comment = value.indexOf(' #');
+
+  return (comment === -1 ? value : value.slice(0, comment)).trim();
 };
 
 const indentOf = (line: string): number =>
