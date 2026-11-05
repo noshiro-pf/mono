@@ -1,13 +1,14 @@
 ---
 name: resolve-issues
-description: Implement the N open issues to take next — startable by their `Start-After:`, not started or planned by anyone, written by the token's account, by priority tier (`priority:S` first) — choosing them with `startable-issues` rather than by judgement, marking each started with `start-issue`, and taking each to its own pull request opened with `open-pr`, the pull requests of a run stacked serially in the order taken. Use when asked to implement, work through or resolve the open issues, to pick the next issues and do them, or to "do N issues". The argument is N (1 when omitted).
-argument-hint: '[N]'
+description: Implement the N open issues to take next — startable by their `Start-After:`, not started or planned by anyone, written by the token's account, `priority:S` first and then one theme's issues together (or the theme named) — choosing them with `startable-issues` rather than by judgement, marking each started with `start-issue`, and taking each to its own pull request opened with `open-pr`, the pull requests of a run stacked serially in the order taken. Use when asked to implement, work through or resolve the open issues, to pick the next issues and do them, to "do N issues", or to do the issues of a theme ("do 20 synstate issues"). The arguments are N (1 when omitted) and an optional theme.
+argument-hint: '[N] [theme]'
 ---
 
 # Implement the next N issues
 
-N is `$ARGUMENTS`: a positive whole number, 1 when it is empty. Anything else is
-a question for the person who asked, before anything is labelled.
+`$ARGUMENTS` is N, a positive whole number (1 when it is empty), and then
+optionally a theme: `20 synstate` is twenty issues about synstate. Anything else
+is a question for the person who asked, before anything is labelled.
 
 ## Before anything: the repository's own rules
 
@@ -29,15 +30,18 @@ logged it in.
 ## 1. List what may be started
 
 ```bash
-startable-issues --limit <N + 10>
+startable-issues --limit <N + 10> --by <claimant> [--theme <theme>]
 ```
 
-It prints the startable issues in the order to take them, one per line, then
-what it passed over and why. The ten past N are for the ones step 2 passes over;
-when those run out too, run it again without `--limit`.
+`<claimant>` is this session's own word for itself, the one it gives
+`start-issue --by` in step 2: its session URL, or any other word unique to it.
+`--theme` is the theme named, if one was. It prints the startable issues in the
+order to take them, one per line with their themes in braces, then what it
+passed over and why. The ten past N are for the ones step 2 passes over; when
+those run out too, run it again without `--limit`.
 
-**The order is the choice; do not re-rank it.** It is the order
-`run-issue-resolver` hands issues to its sessions, decided by the same code:
+**The order is the choice; do not re-rank it.** Which issues are startable is
+decided by the code `run-issue-resolver` uses:
 
 - **Startable** — nothing its `Start-After:` (or GitHub's "blocked by") names is
   still open, it is labelled neither `in-progress` nor `planned`, and no open
@@ -55,8 +59,23 @@ when those run out too, run it again without `--limit`.
   `priority:S`, `priority:A`, `priority:B`, `priority:C`, then those with no
   tier (or several), then `priority:D`; the lowest number first within each.
 
-When it prints `No issue to start.`, report that and what it passed over, and
-end.
+And the order groups them by **theme** — the scope a title starts with and the
+packages its body names by path — so that one run takes related issues, sees
+each while it writes the next, and stacks them where they cannot conflict:
+
+- **No theme named**: every `priority:S` first; then the highest-tier issue left
+  and the rest of its theme, whatever their tier (`D` only after a `D`); then
+  the next theme. Where the list moves on to another theme, go on with it.
+- **A theme named**: that theme alone (`synstate` takes `synstate-dom` too), its
+  own `priority:S` first; another theme's are left, so that runs split by theme
+  stay apart. Fewer than N is fine: do those and end, rather than go beyond it.
+- **A theme another session is on** — one of its issues started by another
+  claimant — is left to it: with no theme named, its issues below `priority:S`
+  are named at the end and not listed; with that theme named, the first line
+  says so, and that is a question for the person before anything is labelled.
+
+When it prints `No issue to start.`, or that the theme named has no startable
+issue, report that and what it passed over, and end.
 
 ## 2. Take them one at a time
 
@@ -78,8 +97,9 @@ no issue marked that nobody is on.
    and what it needs, with nothing since that supplies it, settles this as no.
    If not, pass over it and say why in the report. A choice the person who
    invoked this can make in a sentence is not a reason to pass: ask them.
-3. **Mark it started:** `start-issue <n>`. Refused means someone may be on it:
-   pass over it. Never `--force` unless the person says so for that issue.
+3. **Mark it started:** `start-issue <n> --by <claimant>`. Refused means someone
+   may be on it: pass over it. Never `--force` unless the person says so for
+   that issue.
 4. **Implement it** (step 3), then take the next.
 
 ## 3. Implement one
@@ -113,8 +133,8 @@ no issue marked that nobody is on.
 - **If you stop without a pull request** — it turned out larger than it read, or
   needs a person after all — leave a comment on the issue saying where you
   stopped and what it needs, and take the mark off with
-  `start-issue <n> --release`. The comment is what step 2 reads the next time
-  the issue is listed.
+  `start-issue <n> --release --by <claimant>`. The comment is what step 2 reads
+  the next time the issue is listed.
 - A security finding goes where the repository's security policy says, never to
   an issue or pull request in a public repository: if that is what the work
   turns up, stop there for that issue.
