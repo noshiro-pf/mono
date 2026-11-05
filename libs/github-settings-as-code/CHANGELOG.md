@@ -1,5 +1,16 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 4.0.8
+
+### Patch Changes
+
+- bdcd28c: The README now covers the `environments` and `vulnerability-alerts` targets: the target and managed-settings tables, and how `apply` and `backup` treat the Dependabot alerts file.
+- Updated dependencies [6d6c016]
+- Updated dependencies [7b52a2d]
+- Updated dependencies [1394a6b]
+    - ts-type-forge@9.2.4
+    - ts-data-forge@14.12.1
+
 ## 4.0.7
 
 ### Patch Changes

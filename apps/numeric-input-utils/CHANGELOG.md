@@ -1,5 +1,12 @@
 # numeric-input-utils
 
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies [7b52a2d]
+    - ts-data-forge@14.12.1
+
 ## 0.0.15
 
 ### Patch Changes

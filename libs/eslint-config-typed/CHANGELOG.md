@@ -1,5 +1,23 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.7.0
+
+### Minor Changes
+
+- 78395d0: New rule `ts-restrictions/no-date-only-string-to-date`, on as `error` in the preset: it reports an ISO date-only string — `'YYYY'`, `'YYYY-MM'` or `'YYYY-MM-DD'` — given to `new Date` or `Date.parse` (`globalThis.Date` and `Date['parse']` included). `Date` reads such a string as midnight UTC, not local midnight, so the local getters (`getDate`, `getMonth`, …) give the day before wherever the offset is negative. Build the date from its numbers, or write the time and zone (`'2026-11-03T00:00:00Z'`) when UTC is meant.
+
+    The argument is judged by its type, so a literal at the call, a `const` holding one and a row of an `as const` table are reported, and a `string` is not. The argument and the callee are read through `as`, `satisfies`, `!` and `<T>`. The `functions` option names further callees, called or constructed, that pass their first argument to `new Date`, as dotted paths such as `'DateUtils.from'`.
+
+### Patch Changes
+
+- b4640ca: `vitest-coding-style/no-expect-to-strict-equal` reports `expect(X, message).toStrictEqual(Y)` too, and its fix keeps the message: `assert.deepStrictEqual(X, Y, message)`. Because the message is then evaluated after `Y`, the fix is written only when that order cannot matter — the message or `Y` is a literal, or neither may have a side effect — and the call is otherwise reported, as `useAssertMovingMessage`, without a fix. A spread argument or three or more arguments to `expect` are still left alone.
+- 4cee32f: `total-functions/no-hidden-type-assertions` reports fewer calls that assert nothing. With TypeScript 5.8 and later it also asks the type arguments the checker resolved for a call, besides the written type argument or default: a call whose type argument is neither written nor inferred, such as `isT(v)` for `isT<T>(x: unknown): x is T` or `f()` for `f<T>(): T`, resolves it to `unknown` and is no longer reported, while one inferred from the contextual type, as in `const s: string = f()`, still is, unless the type parameter defaults to `unknown` or `never` as before. Each type parameter only the return type uses is judged on its own, so one that a value parameter uses no longer needs a `never` default for the call to pass. A cast to a type guard or assertion function of `unknown` or `never`, or to `asserts x`, asserts nothing. The message says that a type argument inferred from the context counts too.
+- Updated dependencies [6d6c016]
+- Updated dependencies [7b52a2d]
+- Updated dependencies [1394a6b]
+    - ts-type-forge@9.2.4
+    - ts-data-forge@14.12.1
+
 ## 7.6.1
 
 ### Patch Changes

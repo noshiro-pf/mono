@@ -1,5 +1,15 @@
 # color-demo
 
+## 0.0.26
+
+### Patch Changes
+
+- Updated dependencies [7b52a2d]
+    - ts-data-forge@14.12.1
+    - ts-utils-additional@0.0.13
+    - synstate@7.0.1
+    - synstate-dom@0.8.0
+
 ## 0.0.25
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 ## [7.2.1](https://github.com/noshiro-pf/ts-type-forge/compare/v7.2.0...v7.2.1) (2026-07-21)
 
+## 9.2.4
+
+### Patch Changes
+
+- 6d6c016: Correct the `DeepPartial` example: a `Map` property stays a mutable `Map` whose keys and values are made deeply partial (a primitive stays as it is), not `ReadonlyMap<K | undefined, V | undefined>`. The sample now asserts the result with `expectType`.
+- 1394a6b: Correct the TSDoc of `Max`: it returns the largest member of `N`, not the smallest integer greater than every member.
+
 ## 9.2.3
 
 ### Patch Changes

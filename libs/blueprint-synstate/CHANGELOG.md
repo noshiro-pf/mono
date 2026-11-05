@@ -1,5 +1,18 @@
 # blueprint-synstate
 
+## 0.8.1
+
+### Patch Changes
+
+- 487763f: `createToaster` adds its `div` to the container with the first toast shown rather than as it is made, so a toaster that never shows a toast leaves nothing in the page. `remove` now also drops its toasts and those waiting to be shown, and a toast shown after it is ignored.
+- Updated dependencies [6d6c016]
+- Updated dependencies [7b52a2d]
+- Updated dependencies [1394a6b]
+    - ts-type-forge@9.2.4
+    - ts-data-forge@14.12.1
+    - synstate@7.0.1
+    - synstate-dom@0.8.0
+
 ## 0.8.0
 
 ### Minor Changes
