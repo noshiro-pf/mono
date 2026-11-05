@@ -4,3 +4,6 @@ version: '0.2'
 # otherwise lose the root dictionaries and ignorePaths.
 import:
   - '../../.cspell.config.yaml'
+words:
+  # Blueprint's `Text` prop, used across its components, tests and README.
+  - ellipsize
