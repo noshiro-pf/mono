@@ -90,15 +90,25 @@ ruleTester.run(
     valid: [],
     invalid: [
       {
-        name: 'imports from the module it is given, keeping isRecord without type information',
+        name: 'suggests, from the module it is given, keeping isRecord without type information',
         code: dedent`
           const ok = Object.hasOwn(obj, 'a');
         `,
-        output: dedent`
-          import { isRecord, hasKey } from 'my-lib';
-          const ok = (isRecord(obj) && hasKey(obj, 'a'));
-        `,
-        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+        output: null,
+        errors: [
+          {
+            messageId: 'hasOwnAcceptsFunctions',
+            suggestions: [
+              {
+                messageId: 'suggestRecordCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'my-lib';
+                  const ok = (isRecord(obj) && hasKey(obj, 'a'));
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'writes through a namespace import, and names what it writes',
@@ -106,17 +116,23 @@ ruleTester.run(
           import * as lib from 'my-lib';
           const ok = Object.hasOwn(obj, 'a');
         `,
-        output: dedent`
-          import * as lib from 'my-lib';
-          const ok = (lib.isRecord(obj) && lib.hasKey(obj, 'a'));
-        `,
+        output: null,
         errors: [
           {
-            messageId: 'useIsRecordAndHasKey',
+            messageId: 'hasOwnAcceptsFunctions',
             data: {
               original: "Object.hasOwn(obj, 'a')",
               replacement: "lib.isRecord(obj) && lib.hasKey(obj, 'a')",
             },
+            suggestions: [
+              {
+                messageId: 'suggestRecordCheck',
+                output: dedent`
+                  import * as lib from 'my-lib';
+                  const ok = (lib.isRecord(obj) && lib.hasKey(obj, 'a'));
+                `,
+              },
+            ],
           },
         ],
       },
