@@ -40,4 +40,44 @@ describe(deadlinePassed, () => {
       deadlinePassed(deadline, newYork, 10, Date.parse('2026-11-01T23:11:00Z')),
     );
   });
+
+  // The window is half-open: a run sees a deadline at its own instant, and not
+  // one a full window before it, so consecutive runs share no instant.
+  test('is true at the deadline itself', () => {
+    assert.isTrue(
+      deadlinePassed(deadline, newYork, 10, Date.parse('2026-11-01T23:00:00Z')),
+    );
+  });
+
+  test('is true up to just before a full window after the deadline', () => {
+    assert.isTrue(
+      deadlinePassed(
+        deadline,
+        newYork,
+        10,
+        Date.parse('2026-11-01T23:09:59.999Z'),
+      ),
+    );
+  });
+
+  test('is false a full window after the deadline', () => {
+    assert.isFalse(
+      deadlinePassed(deadline, newYork, 10, Date.parse('2026-11-01T23:10:00Z')),
+    );
+  });
+
+  test('a deadline on a run boundary is seen by one run alone', () => {
+    // Runs at 17:50, 18:00 and 18:10 New York time, the deadline at 18:00. The
+    // closed window `0 <= diff <= window` sent the mail from the last two.
+    const runs = [
+      '2026-11-01T22:50:00Z',
+      '2026-11-01T23:00:00Z',
+      '2026-11-01T23:10:00Z',
+    ] as const;
+
+    assert.deepStrictEqual(
+      runs.map((run) => deadlinePassed(deadline, newYork, 10, Date.parse(run))),
+      [false, true, false],
+    );
+  });
 });
