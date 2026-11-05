@@ -92,6 +92,16 @@ describe('element props types', () => {
     assert.isDefined([select, input, video, link]);
   });
 
+  test('a key written as a property takes no undefined (#3000)', () => {
+    // @ts-expect-error `autocorrect` is a property: `false` turns it off
+    const input = <input autocorrect={constant(undefined)} />;
+
+    // @ts-expect-error `async` is a property: `false` turns it off
+    const script = <script async={constant(undefined)} />;
+
+    assert.isDefined([input, script]);
+  });
+
   test('class takes a string or an object, never both', () => {
     const [on$] = createState(true);
 

@@ -126,10 +126,11 @@ type IsWritable<E, K extends keyof E> =
  * (`hash` … `username`), the text of `<a>`, `<option>`, `<script>` and
  * `<title>` (`text`), media playback state (`currentTime` … `volume`), and form
  * control state (`returnValue` … `length`), and the obsolete `ch` and `chOff`
- * of table cells, whose attributes are `char` and `charoff`. A property written as a property is
- * in `propertyNames`, and one whose attribute is spelt differently in
- * `attributeNameOf`. Checked in Chromium by setting the attribute and reading
- * the property back.
+ * of table cells, whose attributes are `char` and `charoff`. A property written
+ * as a property is in `propertyNames`, and one whose attribute is spelt
+ * differently in `attributeNameOf`. `test/browser/reflected-keys.test.tsx`
+ * binds every key that is left and reads the property back in Chromium, from
+ * the list `gen:reflected-keys` writes from these types.
  *
  * The keys are left out of every element, so a name that is an attribute on one
  * element and not on another goes by the common case: `<body>`'s obsolete
