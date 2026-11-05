@@ -5,6 +5,7 @@ import {
   isNonZeroInt16,
   NonZeroInt16,
 } from './non-zero-int16.mjs';
+import { isPositiveUint16, type PositiveUint16 } from './positive-uint16.mjs';
 
 describe('NonZeroInt16 test', () => {
   describe(asNonZeroInt16, () => {
@@ -137,6 +138,16 @@ describe('NonZeroInt16 test', () => {
     const b = asNonZeroInt16(50);
 
     const c = asNonZeroInt16(-30);
+
+    test('abs of MIN_VALUE is typed PositiveUint16', () => {
+      const result = NonZeroInt16.abs(asNonZeroInt16(NonZeroInt16.MIN_VALUE));
+
+      expectType<typeof result, PositiveUint16>('=');
+
+      expect(result).toBe(2 ** 15);
+
+      assert.isTrue(isPositiveUint16(result));
+    });
 
     test('abs', () => {
       expect(NonZeroInt16.abs(a)).toBe(100);

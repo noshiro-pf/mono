@@ -1,4 +1,4 @@
-import type { Int16 as TtfImported_Int16 } from 'ts-type-forge';
+import type { Int16 as TtfImported_Int16, Uint16 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import {
   MAX_VALUE,
@@ -83,10 +83,11 @@ export const Int16 = {
   /**
    * Returns the absolute value of an integer in [-2^15, 2^15).
    *
-   * The result is non-negative and keeps the `Int16` brand.
+   * The result is typed `Uint16`, not `Int16`: the range is asymmetric, and
+   * `abs(MIN_VALUE)` is `MAX_VALUE + 1`.
    *
    * @param a - The integer value
-   * @returns The absolute value as a non-negative `Int16`
+   * @returns The absolute value as a `Uint16`
    */
   abs,
 
@@ -176,6 +177,8 @@ export const Int16 = {
    */
   div,
 } as const;
+
+expectType<ReturnType<typeof Int16.abs>, Uint16>('=');
 
 expectType<
   keyof typeof Int16,

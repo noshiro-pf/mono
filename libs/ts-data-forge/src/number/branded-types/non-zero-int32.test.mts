@@ -5,6 +5,7 @@ import {
   isNonZeroInt32,
   NonZeroInt32,
 } from './non-zero-int32.mjs';
+import { isPositiveUint32, type PositiveUint32 } from './positive-uint32.mjs';
 
 describe('NonZeroInt32 test', () => {
   describe(asNonZeroInt32, () => {
@@ -137,6 +138,16 @@ describe('NonZeroInt32 test', () => {
     const b = asNonZeroInt32(500_000);
 
     const c = asNonZeroInt32(-300_000);
+
+    test('abs of MIN_VALUE is typed PositiveUint32', () => {
+      const result = NonZeroInt32.abs(asNonZeroInt32(NonZeroInt32.MIN_VALUE));
+
+      expectType<typeof result, PositiveUint32>('=');
+
+      expect(result).toBe(2 ** 31);
+
+      assert.isTrue(isPositiveUint32(result));
+    });
 
     test('abs', () => {
       expect(NonZeroInt32.abs(a)).toBe(1_000_000);

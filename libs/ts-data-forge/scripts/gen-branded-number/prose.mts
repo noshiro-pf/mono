@@ -81,10 +81,13 @@ export const methodProse = (
 
     case 'abs':
       return {
-        description: `Returns the absolute value of ${tn}.\n\nThe result is non-negative and keeps the \`${t}\` brand.${config.precision === 'may-lose' ? ' Note that `Math.abs(Number.MIN_SAFE_INTEGER)` exceeds `Number.MAX_SAFE_INTEGER`, so use `SafeInt` for guaranteed precision.' : ''}`,
+        description: `Returns the absolute value of ${tn}.\n\n${config.absType === undefined ? `The result is non-negative and keeps the \`${t}\` brand.` : `The result is typed \`${config.absType}\`, not \`${t}\`: the range is asymmetric, and \`abs(MIN_VALUE)\` is \`MAX_VALUE + 1\`.`}${config.precision === 'may-lose' ? ' Note that `Math.abs(Number.MIN_SAFE_INTEGER)` exceeds `Number.MAX_SAFE_INTEGER`, so use `SafeInt` for guaranteed precision.' : ''}`,
         hasExample: true,
         params: [{ name: 'a', desc: `The ${nounOf(config)} value` }],
-        returns: `The absolute value as a non-negative \`${t}\``,
+        returns:
+          config.absType === undefined
+            ? `The absolute value as a non-negative \`${t}\``
+            : `The absolute value as a \`${config.absType}\``,
       };
 
     case 'min':

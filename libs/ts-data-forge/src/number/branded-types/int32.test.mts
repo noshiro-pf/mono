@@ -2,6 +2,7 @@ import { expectType } from '../../expect-type.mjs';
 import { range } from '../../iterator/index.mjs';
 import { asInt32, Int32, isInt32 } from './int32.mjs';
 import { asNonZeroInt32 } from './non-zero-int32.mjs';
+import { isUint32, type Uint32 } from './uint32.mjs';
 
 describe('Int32 test', () => {
   describe(asInt32, () => {
@@ -124,6 +125,16 @@ describe('Int32 test', () => {
     const b = asInt32(500_000);
 
     const c = asInt32(-300_000);
+
+    test('abs of MIN_VALUE is typed Uint32', () => {
+      const result = Int32.abs(asInt32(Int32.MIN_VALUE));
+
+      expectType<typeof result, Uint32>('=');
+
+      expect(result).toBe(2 ** 31);
+
+      assert.isTrue(isUint32(result));
+    });
 
     test('abs', () => {
       expect(Int32.abs(a)).toBe(1_000_000);

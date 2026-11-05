@@ -168,9 +168,10 @@ const renderImports = (config: BrandedNumberConfig): string =>
     `import type { ${config.ttfType} as TtfImported_${config.ttfType} } from 'ts-type-forge';`,
     // Emitted as separate statements; `prettier-plugin-organize-imports` merges
     // and sorts them into the single `ts-type-forge` import.
-    ...(config.extraTtfTypes ?? []).map(
-      (t) => `import type { ${t} } from 'ts-type-forge';`,
-    ),
+    ...[
+      ...(config.extraTtfTypes ?? []),
+      ...(config.absType === undefined ? [] : [config.absType]),
+    ].map((t) => `import type { ${t} } from 'ts-type-forge';`),
     ...(config.extraImports ?? []),
     ...(config.numberClassParams !== undefined
       ? ["import { expectType } from '../../expect-type.mjs';"]
@@ -395,6 +396,12 @@ const renderExpectType = (config: BrandedNumberConfig): readonly string[] => {
   return [
     ...(config.trailingExpectTypeExtra !== undefined
       ? ['', config.trailingExpectTypeExtra]
+      : []),
+    ...(config.absType !== undefined
+      ? [
+          '',
+          `expectType<ReturnType<typeof ${config.pascalName}.abs>, ${config.absType}>('=');`,
+        ]
       : []),
     '',
     `expectType<keyof typeof ${config.pascalName}, keyof ${numberClass}>('=');`,
