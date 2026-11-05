@@ -364,6 +364,16 @@ describe('buildPlan', () => {
     assert.include(commandsOf([file]), 'run gen:deps-graph');
   });
 
+  // #3336: what the generator calls is what it reads, too.
+  test('a library function the generator calls regenerates the dependency graph', () => {
+    assert.include(
+      commandsOf([
+        'libs/ts-repo-utils/src/functions/workspace-utils/get-workspace-packages.mts',
+      ]),
+      'run gen:deps-graph',
+    );
+  });
+
   test('a source file does not regenerate the dependency graph', () => {
     assert.notInclude(
       commandsOf(['libs/ts-data-forge/src/array.mts']),
