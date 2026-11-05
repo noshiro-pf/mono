@@ -72,6 +72,30 @@ export const getVitestReceiver = (
 };
 
 /**
+ * The value and the optional message of a Vitest `expect(X)` or
+ * `expect(X, message)` call, or `undefined` for a call a rule cannot carry over
+ * to `assert`: no argument, a spread argument, or more than two.
+ */
+export const getExpectOperands = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  expectCall: TSESTree.CallExpression,
+):
+  | Readonly<{
+      actual: TSESTree.Expression;
+      message: TSESTree.Expression | undefined;
+    }>
+  | undefined => {
+  const [actual, message, ...rest] = expectCall.arguments;
+
+  return actual === undefined ||
+    actual.type === AST_NODE_TYPES.SpreadElement ||
+    message?.type === AST_NODE_TYPES.SpreadElement ||
+    !Arr.isEmpty(rest)
+    ? undefined
+    : { actual, message };
+};
+
+/**
  * For one file, a function that gives the fix for a rule rewriting the Vitest
  * `expect(…)` call `node` into a call on Vitest's `assert` — `replacement`
  * builds the new text from the name `assert` is reached by — or `null` when no

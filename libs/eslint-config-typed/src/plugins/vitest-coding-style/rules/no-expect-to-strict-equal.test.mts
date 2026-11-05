@@ -47,6 +47,132 @@ tester.run('no-expect-to-strict-equal', noExpectToStrictEqualRule, {
   ],
 });
 
+describe('no-expect-to-strict-equal with a message', () => {
+  tester.run('no-expect-to-strict-equal', noExpectToStrictEqualRule, {
+    valid: [
+      {
+        name: 'a spread argument to expect',
+        code: dedent`
+          expect(...args).toStrictEqual(expected);
+          expect(actual, ...messages).toStrictEqual(expected);
+        `,
+      },
+      {
+        name: 'three or more arguments to expect',
+        code: "expect(actual, 'context', extra).toStrictEqual(expected);",
+      },
+      {
+        name: 'no argument to expect',
+        code: 'expect().toStrictEqual(expected);',
+      },
+    ],
+    invalid: [
+      {
+        name: 'the message is forwarded as the third argument',
+        code: "expect(actual, 'context').toStrictEqual(expected);",
+        output: "assert.deepStrictEqual(actual, expected, 'context');",
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'a static message is fixed whatever the expected value does',
+        code: dedent`
+          expect(actual, 'context').toStrictEqual(next());
+          expect(actual, \`context\`).toStrictEqual(next());
+        `,
+        output: dedent`
+          assert.deepStrictEqual(actual, next(), 'context');
+          assert.deepStrictEqual(actual, next(), \`context\`);
+        `,
+        errors: [{ messageId: 'useAssert' }, { messageId: 'useAssert' }],
+      },
+      {
+        name: 'a message with an effect is fixed when the expected value is a literal',
+        code: dedent`
+          expect(actual, describe()).toStrictEqual('x');
+          expect(actual, \`case \${c?.name}\`).toStrictEqual(c?.expected);
+        `,
+        output: dedent`
+          assert.deepStrictEqual(actual, 'x', describe());
+          assert.deepStrictEqual(actual, c?.expected, \`case \${c?.name}\`);
+        `,
+        errors: [{ messageId: 'useAssert' }, { messageId: 'useAssert' }],
+      },
+      {
+        name: 'a message expression and a type argument, with an expected value that has no effect',
+        code: dedent`
+          expect(actual, \`case \${c.name}\`).toStrictEqual<Foo>({
+            foo: c.expected,
+            bar: [1, -x, a ? b : 'c'],
+          });
+        `,
+        output: dedent`
+          assert.deepStrictEqual(actual, ({
+            foo: c.expected,
+            bar: [1, -x, a ? b : 'c'],
+          }) as Foo, \`case \${c.name}\`);
+        `,
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'a wrapped message keeps its wrapper; parentheses are dropped',
+        code: dedent`
+          expect(actual, 'context' as string).toStrictEqual(expected);
+          expect(actual, 'context' satisfies string).toStrictEqual(expected);
+          expect(actual, <string>context).toStrictEqual(expected);
+          expect(actual, context!).toStrictEqual(expected);
+          expect(actual, (context)).toStrictEqual(expected);
+        `,
+        output: dedent`
+          assert.deepStrictEqual(actual, expected, 'context' as string);
+          assert.deepStrictEqual(actual, expected, 'context' satisfies string);
+          assert.deepStrictEqual(actual, expected, <string>context);
+          assert.deepStrictEqual(actual, expected, context!);
+          assert.deepStrictEqual(actual, expected, context);
+        `,
+        errors: [
+          { messageId: 'useAssert' },
+          { messageId: 'useAssert' },
+          { messageId: 'useAssert' },
+          { messageId: 'useAssert' },
+          { messageId: 'useAssert' },
+        ],
+      },
+      {
+        name: 'a non-static message whose order against an effect could matter: reported, not fixed',
+        code: dedent`
+          expect(next(), \`step \${i++}\`).toStrictEqual(table[i]);
+          expect(actual, label).toStrictEqual(advance());
+          expect(actual, label).toStrictEqual(await load());
+          expect(actual, \`case \${state}\`).toStrictEqual({ ...step() });
+          expect(actual, (log(), 'context')).toStrictEqual(expected);
+          expect(actual, describe() as string).toStrictEqual(expected);
+          expect(actual, label).toStrictEqual((count = 1) satisfies number);
+          expect(actual, label).toStrictEqual(table[k++]);
+          expect(actual, label).toStrictEqual({ [next()]: 1 });
+          expect(actual, label).toStrictEqual(new Foo());
+          expect(actual, label).toStrictEqual(delete table.k);
+          expect(actual, label).toStrictEqual(tag\`x\`);
+        `,
+        output: null,
+        errors: [
+          { messageId: 'useAssertMovingMessage' },
+          { messageId: 'useAssertMovingMessage' },
+          { messageId: 'useAssertMovingMessage' },
+          { messageId: 'useAssertMovingMessage' },
+          { messageId: 'useAssertMovingMessage' },
+          { messageId: 'useAssertMovingMessage' },
+          { messageId: 'useAssertMovingMessage' },
+          { messageId: 'useAssertMovingMessage' },
+          { messageId: 'useAssertMovingMessage' },
+          { messageId: 'useAssertMovingMessage' },
+          { messageId: 'useAssertMovingMessage' },
+          { messageId: 'useAssertMovingMessage' },
+        ],
+      },
+    ],
+  });
+});
+
 describe('no-expect-to-strict-equal through type wrappers', () => {
   tester.run('no-expect-to-strict-equal', noExpectToStrictEqualRule, {
     valid: [

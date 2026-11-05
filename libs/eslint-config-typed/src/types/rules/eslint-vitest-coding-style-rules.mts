@@ -2,7 +2,7 @@
 import type { Linter } from 'eslint';
 
 /**
- * @description Disallow `expect(X).toStrictEqual(Y)` in favor of `assert.deepStrictEqual(X, Y)`, which constrains X and Y to a single type at compile time (`toStrictEqual` type-checks neither); note that it compares structure only, so pin a prototype with `assert.instanceOf`.
+ * @description Disallow `expect(X).toStrictEqual(Y)` (and `expect(X, message)`) in favor of `assert.deepStrictEqual(X, Y)` (`assert.deepStrictEqual(X, Y, message)`), which constrains X and Y to a single type at compile time (`toStrictEqual` type-checks neither); note that it compares structure only, so pin a prototype with `assert.instanceOf`.
  *
  *  ```md
  *  | key        | value      |

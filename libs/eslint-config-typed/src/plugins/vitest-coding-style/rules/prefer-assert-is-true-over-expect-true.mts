@@ -12,6 +12,7 @@ import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
 import {
   createVitestAssertFixer,
+  getExpectOperands,
   getVitestReceiver,
 } from './vitest-binding.mjs';
 
@@ -93,16 +94,11 @@ export const preferAssertIsTrueOverExpectTrueRule: TSESLint.RuleModule<
           return;
         }
 
-        const [arg, ...messageArgs] = expectCall.arguments;
+        const operands = getExpectOperands(expectCall);
 
         if (
-          arg === undefined ||
-          arg.type === AST_NODE_TYPES.SpreadElement ||
-          messageArgs.length > 1 ||
-          messageArgs.some(
-            (messageArg) => messageArg.type === AST_NODE_TYPES.SpreadElement,
-          ) ||
-          !typeWrapperLayers(arg).every((layer) => {
+          operands === undefined ||
+          !typeWrapperLayers(operands.actual).every((layer) => {
             const type = checker.getTypeAtLocation(
               parserServices.esTreeNodeToTSNodeMap.get(layer),
             );
@@ -114,7 +110,8 @@ export const preferAssertIsTrueOverExpectTrueRule: TSESLint.RuleModule<
         }
 
         // `expect(X, message)` keeps its message: `assert.is*` takes one too.
-        const argText = Arr.toUnshifted(arg)(messageArgs)
+        const argText = [operands.actual, operands.message]
+          .filter((a) => a !== undefined)
           .map((a) => getArgumentText(context.sourceCode, a))
           .join(', ');
 
