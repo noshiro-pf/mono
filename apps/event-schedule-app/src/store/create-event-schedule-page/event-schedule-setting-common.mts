@@ -75,7 +75,7 @@ export const createEventScheduleSettingStore = (
     initialToggleState: eventScheduleInitialValue.answerDeadline !== 'none',
     initialState: mapNoneToUndefined(eventScheduleInitialValue.answerDeadline),
     valueToBeSetWhenTurnedOff: () => undefined,
-    valueToBeSetWhenTurnedOn: () => answerDeadlineInitialValue,
+    valueToBeSetWhenTurnedOn: answerDeadlineInitialValue,
   });
 
   const [answerIcons$, setAnswerIcons, { resetState: resetAnswerIcons }] =

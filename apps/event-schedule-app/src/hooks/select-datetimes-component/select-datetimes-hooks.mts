@@ -98,7 +98,7 @@ export const useSelectDatetimesHooks = (
     dispatch({
       type: 'addClick',
       datetimeRange: {
-        ymd: yearMonthDateInitialValue,
+        ymd: yearMonthDateInitialValue(),
         timeRange: mostFrequentTimeRange,
       },
     });
@@ -145,7 +145,7 @@ export const useSelectDatetimesHooks = (
           id: index,
           datetimeRange,
           onYmdChange: (ymd: YearMonthDate | undefined) => {
-            onDatetimeRangeYmdChange(index, ymd ?? yearMonthDateInitialValue);
+            onDatetimeRangeYmdChange(index, ymd ?? yearMonthDateInitialValue());
           },
           onRangeStartChange: (hm: HoursMinutes) => {
             onDatetimeRangeStartChange(index, hm);

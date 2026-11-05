@@ -6,6 +6,7 @@ import {
   ISetMapped,
   Optional,
   asSafeUint,
+  isNotUndefined,
   mapNullable,
 } from 'ts-data-forge';
 import { compareYearMonthDate } from 'ts-fortress-types';
@@ -15,7 +16,6 @@ import type {
   MonthEnum,
   SafeUint,
 } from 'ts-type-forge';
-import { yearMonthDateInitialValue } from '../constants/index.mjs';
 import {
   type CalendarCurrentPageReducerState,
   type SelectedDatesReducerAction,
@@ -176,7 +176,8 @@ export const useMultipleDatePickerState = (
         f({
           type: 'fill-column',
           dates: dates
-            .map((week) => week[w] ?? yearMonthDateInitialValue)
+            .map((week) => week[w])
+            .filter(isNotUndefined)
             .filter((d) => d.month === calendarCurrentPage.month),
         });
       }),
