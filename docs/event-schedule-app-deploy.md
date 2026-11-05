@@ -66,6 +66,7 @@ Functions は lockfile の変更だけでも選ばれるが、firebase-tools が
 | 並び               | project ごとに 1 つ。古い run は自分で見送る                                                  | workflow 全体で 1 本ずつ。re-run された古い run は、`main` が変えた target を見送る      |
 | environment        | `firebase-deploy`                                                                             | `event-schedule-app-deploy`                                                              |
 | サービスアカウント | `firestore-deploy@noshiro-pf-ci`（ルールとインデックスだけ）                                  | `event-schedule-app-deploy@noshiro-pf-ci`（`event-schedule-app` の project だけ）        |
+| API の利用の数え先 | `noshiro-pf-ci`（そこで API を有効にする。#2658）                                             | `event-schedule-app`（`GOOGLE_CLOUD_QUOTA_PROJECT`）                                     |
 | 承認               | 無し                                                                                          | 無し                                                                                     |
 
 2 つのサービスアカウントは、同じ Workload Identity provider を通るが、それぞれ
@@ -81,6 +82,17 @@ Hosting と Functions のロールは `deploy-firestore.yml` からは使えな�
 `firestore-deploy` にだけ、`event-schedule-app-deploy` を名指すトークンは
 `event-schedule-app-deploy` にだけなれる。provider の条件は、environment と
 workflow の組を 2 つだけ通す。
+
+**API の利用は、デプロイ先の `event-schedule-app` に数える。** サービスアカウントで
+呼んだ API は、何もしなければそのアカウントの project（`noshiro-pf-ci`）の利用に
+なり、そこで API が有効でないと 403 になる（#2658）。`noshiro-pf-ci` は課金
+アカウントを持たないので、Functions のデプロイが使う Cloud Build・Artifact
+Registry・Cloud Scheduler・Secret Manager はそこで有効にできない。そこで workflow
+の Deploy の step は `GOOGLE_CLOUD_QUOTA_PROJECT` を `event-schedule-app` にし、
+firebase-tools はすべての呼び出しに `x-goog-user-project` を付ける。手でデプロイ
+してきた project なので、要る API はどれも有効になっている。数え先にするには
+その project での `serviceusage.services.use`（Service Usage Consumer）が要る。
+`noshiro-pf-ci` に数えられるのは、資格情報の交換（STS・IAM Credentials）だけ。
 
 ### 一度だけ行う設定
 
@@ -119,16 +131,15 @@ gcloud iam service-accounts add-iam-policy-binding "$SA" \
   --project "$HOST_PROJECT" --role roles/iam.workloadIdentityUser \
   --member "principalSet://iam.googleapis.com/${POOL}/attribute.environment/event-schedule-app-deploy"
 
-# 4. firebase-tools が呼ぶ API を noshiro-pf-ci でも有効にする
-#    （サービスアカウントで呼んだ分はこの project の利用として数えられる。#2658）。
-gcloud services enable firebasehosting.googleapis.com cloudfunctions.googleapis.com \
-  cloudscheduler.googleapis.com secretmanager.googleapis.com \
-  artifactregistry.googleapis.com cloudbuild.googleapis.com \
-  --project "$HOST_PROJECT"
+# 4. noshiro-pf-ci で API を足すことはしない。デプロイの呼び出しは
+#    GOOGLE_CLOUD_QUOTA_PROJECT で event-schedule-app に数える（上の「認証」）。
+#    noshiro-pf-ci は課金アカウントを持たず、Cloud Build・Artifact Registry・
+#    Cloud Scheduler・Secret Manager を有効にできない。
 
 # 5. event-schedule-app の project でのロール。
 gcloud iam roles create firebaseProjectGetter --project "$PROJECT" \
-  --title "Firebase project getter" --permissions firebase.projects.get --stage GA
+  --title "Firebase project getter" \
+  --permissions firebase.projects.get,resourcemanager.projects.get --stage GA
 for role in roles/firebasehosting.admin roles/cloudfunctions.developer \
   roles/cloudscheduler.admin roles/artifactregistry.reader \
   roles/firebaserules.admin roles/datastore.indexAdmin \
@@ -159,9 +170,13 @@ pnpm --dir apps/event-schedule-app exec firebase functions:artifacts:setpolicy -
 （Cloud Functions Developer）、毎日・毎分の通知の Cloud Scheduler のジョブ
 （Cloud Scheduler Admin）、cleanup policy の確認（Artifact Registry Reader）、
 ルールとインデックス（`docs/firestore-deploy.md` と同じ 2 つ）、API の有効化の
-確認（Service Usage Consumer）、`firebase.projects.get`。足りなければ、
-`docs/firestore-deploy.md` と同じく、失敗した run のエラーが権限の名前を出すので、
-それを含む最小のロールを足し、ここにも書き足す。
+確認と利用をこの project に数えること（Service Usage Consumer）、カスタムロールの
+`firebase.projects.get` と `resourcemanager.projects.get`（project のメタデータを
+読むだけ。前者は firebase-tools がどの deploy でも最初に、後者は Functions の
+準備で使う）。カスタムロールを作ったあとで権限を足すときは
+`gcloud iam roles update firebaseProjectGetter --project "$PROJECT" --add-permissions <権限>`。
+足りなければ、`docs/firestore-deploy.md` と同じく、失敗した run のエラーが権限の
+名前を出すので、それを含む最小のロールを足し、ここにも書き足す。
 
 ### リポジトリ側
 
