@@ -1,7 +1,9 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
+import { ESLintUtils } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { Arr, asUint32 } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { noHiddenTypeAssertions } from './no-hidden-type-assertions.mjs';
 
 const ruleTester = new RuleTester({
@@ -262,6 +264,52 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
         export const r3 = isU(1);
       `,
     },
+    // A type argument the call neither writes nor lets the checker infer
+    // resolves to `unknown`, so the call asserts nothing: a type guard, an
+    // assertion function, functions returning their type parameter, and one
+    // whose other type parameter is inferred from an argument
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function isT<T>(x: unknown): x is T;
+        declare const v: unknown;
+        export const r1 = isT(v);
+        declare function assertT<T>(x: unknown): asserts x is T;
+        assertT(v);
+        declare function f<T>(): T;
+        export const r3 = f();
+        declare function g<T>(): readonly T[];
+        export const r4 = g();
+        declare function h<E, A>(a: A): E | A;
+        export const r5 = h('a');
+      `,
+    },
+    // A `never` default passes the call even where the checker infers the type
+    // parameter from the contextual type
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function ok<S, E = never>(s: S): { ok: S } | { err: E };
+        export const r1: { ok: number } | { err: string } = ok(1);
+        declare const right: <E = never, A = never>(a: A) => E | A;
+        export const r2: string | number = right(1);
+      `,
+    },
+    // A cast to a guard of `unknown` or `never`, or to an assertion of
+    // truthiness alone, asserts nothing
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function isT<T>(x: unknown): x is T;
+        declare function assertT<T>(x: unknown): asserts x is T;
+        declare const v: unknown;
+        export const r1 = (isT as (x: unknown) => x is unknown)(v);
+        export const r2 = (isT as (x: unknown) => x is never)(v);
+        (assertT as (x: unknown) => asserts x is unknown)(v);
+        (assertT as (x: unknown) => asserts x is never)(v);
+        (assertT as (x: unknown) => asserts x)(v);
+      `,
+    },
     // A type parameter that only constrains, or defaults, one of the returned
     // function's own is not looked for, as before: here the returned function
     // hands back what its caller passes
@@ -468,9 +516,9 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
       ],
     },
     // A type parameter is found in the return type under each kind of type
-    // node: parentheses, a type predicate (called with a type argument or none,
-    // or asserting), the parameters of a method or call signature, constructor,
-    // mapped, template literal and `typeof` types
+    // node: parentheses, a type predicate (narrowing or asserting), the
+    // parameters of a method or call signature, constructor, mapped, template
+    // literal and `typeof` types
     {
       filename: 'file.ts',
       code: dedent`
@@ -491,11 +539,40 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
         declare const g8: <U>() => U;
         declare function f8<T>(): typeof g8<T>;
         export const r8 = f8<string>();
-        export const r9 = f2(1);
-        declare function f10<T>(x: unknown): asserts x is T;
-        f10<string>(1);
+        declare function f9<T>(x: unknown): asserts x is T;
+        f9<string>(1);
       `,
-      errors: Arr.create(10, { messageId: 'errorStringGeneric' } as const),
+      errors: Arr.create(9, { messageId: 'errorStringGeneric' } as const),
+    },
+    // A type argument the checker resolves to something other than `unknown`
+    // asserts it, though none is written: inferred from the contextual type,
+    // the type parameter's constraint, or an `any` default
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(): T;
+        export const r1: string = f();
+        declare function k<T>(): Promise<T>;
+        export const r2: Promise<string> = k();
+        declare function g<T extends string>(): T;
+        export const r3 = g();
+        declare function h<T = any>(): T;
+        export const r4 = h();
+      `,
+      errors: Arr.create(4, { messageId: 'errorStringGeneric' } as const),
+    },
+    // A cast to a type guard or an assertion function of a type other than
+    // `unknown` or `never`
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function isT<T>(x: unknown): x is T;
+        declare function assertT<T>(x: unknown): asserts x is T;
+        declare const v: unknown;
+        (assertT as (x: unknown) => asserts x is string)(v);
+        export const r2 = (isT as (x: unknown) => x is unknown[])(v);
+      `,
+      errors: Arr.create(2, { messageId: 'errorStringGeneric' } as const),
     },
     // A cast of a function whose type parameter only a type predicate uses
     {
@@ -528,6 +605,102 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
     },
   ],
 } as const);
+
+// TypeScript before 5.8 has no public `getTypeArgumentsForResolvedSignature`:
+// a call is judged by its written type argument or the type parameter's
+// default, and one that writes neither is reported
+ruleTester.run(
+  'no-hidden-type-assertions without resolved type arguments',
+  withoutResolvedTypeArguments(noHiddenTypeAssertions),
+  {
+    valid: [
+      {
+        filename: 'file.ts',
+        code: dedent`
+          declare function isT<T>(x: unknown): x is T;
+          declare const v: unknown;
+          export const r1 = isT<unknown>(v);
+          declare function f<T = never>(): T;
+          export const r2 = f();
+          declare const right: <E = never, A = never>(a: A) => E | A;
+          export const r3 = right('a');
+        `,
+      },
+    ],
+    invalid: [
+      {
+        filename: 'file.ts',
+        code: dedent`
+          declare function isT<T>(x: unknown): x is T;
+          declare const v: unknown;
+          export const r1 = isT(v);
+          export const r2 = isT<string>(v);
+          declare function f<T = any>(): T;
+          export const r3 = f();
+        `,
+        errors: Arr.create(3, { messageId: 'errorStringGeneric' } as const),
+      },
+    ],
+  } as const,
+);
+
+/**
+ * `rule` run with a type checker that lacks
+ * `getTypeArgumentsForResolvedSignature`, as TypeScript before 5.8 does.
+ */
+function withoutResolvedTypeArguments(
+  rule: typeof noHiddenTypeAssertions,
+): typeof noHiddenTypeAssertions {
+  return {
+    ...rule,
+    create: (context) => {
+      const parserServices = ESLintUtils.getParserServices(context);
+
+      const checker = overriding(
+        parserServices.program.getTypeChecker(),
+        'getTypeArgumentsForResolvedSignature',
+        undefined,
+      );
+
+      return rule.create(
+        overriding(
+          context,
+          'sourceCode',
+          overriding(context.sourceCode, 'parserServices', {
+            ...parserServices,
+            program: overriding(
+              parserServices.program,
+              'getTypeChecker',
+              () => checker,
+            ),
+          }),
+        ),
+      );
+    },
+  };
+}
+
+/**
+ * `base` with its property `key` read as `value`, which may be `undefined` to
+ * stand for an older version of `base` that lacks it. The proxy's target is a
+ * copy, since a frozen `base` may not report one of its own properties
+ * differently.
+ */
+const overriding = <
+  K extends PropertyKey,
+  T extends Partial<ReadonlyRecord<K, unknown>>,
+>(
+  base: T,
+  key: K,
+  value: T[K] | undefined,
+): T =>
+  new Proxy(
+    { ...base },
+    {
+      get: (_target, property) =>
+        property === key ? value : Reflect.get(base, property),
+    },
+  );
 
 /** `inner` wrapped in `Readonly<…>` `depth` times. */
 function nested(depth: number, inner: string): string {
