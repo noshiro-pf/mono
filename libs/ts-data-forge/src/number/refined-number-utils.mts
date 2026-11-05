@@ -3,13 +3,24 @@ import type {
   ChangeBaseBrand,
   GetBrandValuePart,
   Int,
+  Int16,
+  Int32,
   IntersectBrand,
+  NonNegativeInt16,
   NonNegativeNumber,
+  NonZeroInt,
+  NonZeroInt16,
+  NonZeroInt32,
   NonZeroNumber,
   PositiveNumber,
+  PositiveUint16,
+  PositiveUint32,
   RelaxedExclude,
+  SafeInt,
   StrictPick,
   TypeEq,
+  Uint16,
+  Uint32,
   UnknownBrand,
   UnwrapBrandFalseKeys,
   UnwrapBrandTrueKeys,
@@ -92,6 +103,47 @@ export namespace TsDataForgeInternals {
         : IntersectBrand<N, NonNegativeNumber>;
 
     /**
+     * The type of `abs` of a branded number type. A signed range bounded by
+     * `-2^k <= x < 2^k` is asymmetric — `abs(-2^k)` is `2^k`, outside it — so
+     * `Int16` maps to `Uint16` and `Int32` to `Uint32` (`PositiveUint16` and
+     * `PositiveUint32` for the non-zero ones); every other type keeps its
+     * brands and gains the non-negative one.
+     *
+     * @template N - A branded number type
+     * @internal
+     */
+    export type ToAbs<N extends UnknownNumberBrand> =
+      N extends NonNegativeNumber
+        ? ToNonNegative<N>
+        : N extends Int16
+          ? N extends NonZeroNumber
+            ? PositiveUint16
+            : Uint16
+          : N extends Int32
+            ? N extends NonZeroNumber
+              ? PositiveUint32
+              : Uint32
+            : ToNonNegative<N>;
+
+    expectType<ToAbs<Int16>, Uint16>('=');
+
+    expectType<ToAbs<NonZeroInt16>, PositiveUint16>('=');
+
+    expectType<ToAbs<Int32>, Uint32>('=');
+
+    expectType<ToAbs<NonZeroInt32>, PositiveUint32>('=');
+
+    expectType<ToAbs<Int>, ToNonNegative<Int>>('=');
+
+    expectType<ToAbs<SafeInt>, ToNonNegative<SafeInt>>('=');
+
+    expectType<ToAbs<NonZeroInt>, ToNonNegative<NonZeroInt>>('=');
+
+    expectType<ToAbs<Uint32>, Uint32>('=');
+
+    expectType<ToAbs<NonNegativeInt16>, NonNegativeInt16>('=');
+
+    /**
      * Removes the non-zero brand constraint from a branded number type. Used
      * when operations may produce zero values.
      *
@@ -153,7 +205,7 @@ export namespace TsDataForgeInternals {
         : 'positive' extends classes
           ? unknown
           : Readonly<{
-              abs: (x: N) => ToNonNegative<N>;
+              abs: (x: N) => ToAbs<N>;
             }>) &
       ('positive' extends classes
         ? Readonly<{
@@ -250,7 +302,7 @@ export namespace TsDataForgeInternals {
 
       is: (a: number) => a is ElementType;
 
-      abs: (x: ElementTypeWithSmallInt) => ToNonNegative<ElementType>;
+      abs: (x: ElementTypeWithSmallInt) => ToAbs<ElementType>;
 
       min: (...values: readonly ElementTypeWithSmallInt[]) => ElementType;
 
@@ -407,9 +459,9 @@ export namespace TsDataForgeInternals {
 
       const clampOrCastFn: (a: number) => ElementType = fromNumber ?? castType;
 
-      const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
+      const abs = (x: ElementTypeWithSmallInt): ToAbs<ElementType> =>
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        Math.abs(clampOrCastFn(x)) as ToNonNegative<ElementType>;
+        Math.abs(clampOrCastFn(x)) as ToAbs<ElementType>;
 
       const min_ = (
         ...values: readonly ElementTypeWithSmallInt[]

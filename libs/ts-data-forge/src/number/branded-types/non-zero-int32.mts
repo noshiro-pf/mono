@@ -1,4 +1,7 @@
-import type { NonZeroInt32 as TtfImported_NonZeroInt32 } from 'ts-type-forge';
+import type {
+  PositiveUint32,
+  NonZeroInt32 as TtfImported_NonZeroInt32,
+} from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import {
   MAX_VALUE,
@@ -85,10 +88,11 @@ export const NonZeroInt32 = {
   /**
    * Returns the absolute value of a non-zero integer in [-2^31, 2^31).
    *
-   * The result is non-negative and keeps the `NonZeroInt32` brand.
+   * The result is typed `PositiveUint32`, not `NonZeroInt32`: the range is
+   * asymmetric, and `abs(MIN_VALUE)` is `MAX_VALUE + 1`.
    *
    * @param a - The non-zero integer value
-   * @returns The absolute value as a non-negative `NonZeroInt32`
+   * @returns The absolute value as a `PositiveUint32`
    */
   abs,
 
@@ -151,6 +155,8 @@ export const NonZeroInt32 = {
    */
   mul,
 } as const;
+
+expectType<ReturnType<typeof NonZeroInt32.abs>, PositiveUint32>('=');
 
 expectType<
   keyof typeof NonZeroInt32,

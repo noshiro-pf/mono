@@ -2,6 +2,7 @@ import { expectType } from '../../expect-type.mjs';
 import { range } from '../../iterator/index.mjs';
 import { asInt16, Int16, isInt16 } from './int16.mjs';
 import { asNonZeroInt16 } from './non-zero-int16.mjs';
+import { isUint16, type Uint16 } from './uint16.mjs';
 
 describe('Int16 test', () => {
   describe(asInt16, () => {
@@ -124,6 +125,16 @@ describe('Int16 test', () => {
     const b = asInt16(50);
 
     const c = asInt16(-30);
+
+    test('abs of MIN_VALUE is typed Uint16', () => {
+      const result = Int16.abs(asInt16(Int16.MIN_VALUE));
+
+      expectType<typeof result, Uint16>('=');
+
+      expect(result).toBe(2 ** 15);
+
+      assert.isTrue(isUint16(result));
+    });
 
     test('abs', () => {
       expect(Int16.abs(a)).toBe(100);

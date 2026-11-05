@@ -108,6 +108,14 @@ export type BrandedNumberConfig = Readonly<{
    */
   enumSpec?: Readonly<{ wideBase: string; hasAbs: boolean }>;
 
+  /**
+   * The type `abs` returns when the range is asymmetric (`-2^k <= x < 2^k`), so
+   * that `abs(MIN_VALUE)` is outside it. The generated module asserts that its
+   * `abs` returns this type, which `ToAbs` in
+   * `src/number/refined-number-utils.mts` decides.
+   */
+  absType?: string;
+
   // --- prose flags ---
   /** `'floor'` for integer division, `'exact'` for float division. */
   division: 'floor' | 'exact';
@@ -284,6 +292,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     minValueExpr: '-(2 ** 15)',
     maxValueExpr: '2 ** 15 - 1',
     typeNameInMessage: 'an integer in [-2^15, 2^15)',
+    absType: 'Uint16',
     namespaceKeys: KEYS_BOUNDED_ABS,
     numberClassParams: "'int' | 'range'",
     division: 'floor',
@@ -302,6 +311,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     minValueExpr: '-(2 ** 31)',
     maxValueExpr: '2 ** 31 - 1',
     typeNameInMessage: 'an integer in [-2^31, 2^31)',
+    absType: 'Uint32',
     namespaceKeys: KEYS_BOUNDED_ABS,
     numberClassParams: "'int' | 'range'",
     division: 'floor',
@@ -607,6 +617,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     minValueExpr: '-(2 ** 15)',
     maxValueExpr: '2 ** 15 - 1',
     typeNameInMessage: 'a non-zero integer in [-2^15, 2^15)',
+    absType: 'PositiveUint16',
     namespaceKeys: KEYS_NONZERO_BOUNDED_ABS,
     numberClassParams: "'int' | 'range', 'mul'",
     division: 'floor',
@@ -626,6 +637,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     minValueExpr: '-(2 ** 31)',
     maxValueExpr: '2 ** 31 - 1',
     typeNameInMessage: 'a non-zero integer in [-2^31, 2^31)',
+    absType: 'PositiveUint32',
     namespaceKeys: KEYS_NONZERO_BOUNDED_ABS,
     numberClassParams: "'int' | 'range', 'mul'",
     division: 'floor',

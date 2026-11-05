@@ -1,4 +1,4 @@
-import type { Int32 as TtfImported_Int32 } from 'ts-type-forge';
+import type { Int32 as TtfImported_Int32, Uint32 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import {
   MAX_VALUE,
@@ -83,10 +83,11 @@ export const Int32 = {
   /**
    * Returns the absolute value of an integer in [-2^31, 2^31).
    *
-   * The result is non-negative and keeps the `Int32` brand.
+   * The result is typed `Uint32`, not `Int32`: the range is asymmetric, and
+   * `abs(MIN_VALUE)` is `MAX_VALUE + 1`.
    *
    * @param a - The integer value
-   * @returns The absolute value as a non-negative `Int32`
+   * @returns The absolute value as a `Uint32`
    */
   abs,
 
@@ -176,6 +177,8 @@ export const Int32 = {
    */
   div,
 } as const;
+
+expectType<ReturnType<typeof Int32.abs>, Uint32>('=');
 
 expectType<
   keyof typeof Int32,
