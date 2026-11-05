@@ -19,15 +19,24 @@ ruleTester.run(
   'createPreferIsNonNullObject',
   createPreferIsNonNullObject({ moduleName: 'my-lib' }),
   {
-    valid: [],
+    valid: [
+      {
+        name: 'leaves a name the file does not declare alone',
+        code: dedent`
+          const ok = typeof u === 'object' && u !== null;
+        `,
+      },
+    ],
     invalid: [
       {
         name: 'imports from the module it is given',
         code: dedent`
+          const u: unknown = {};
           const ok = typeof u === 'object' && u !== null;
         `,
         output: dedent`
           import { isNonNullObject } from 'my-lib';
+          const u: unknown = {};
           const ok = isNonNullObject(u);
         `,
         errors: [{ messageId: 'useIsNonNullObject' }],
@@ -36,10 +45,12 @@ ruleTester.run(
         name: 'names the alias the fix writes',
         code: dedent`
           import { isNonNullObject as isObj } from 'my-lib';
+          const u: unknown = {};
           const ok = typeof u === 'object' && u !== null;
         `,
         output: dedent`
           import { isNonNullObject as isObj } from 'my-lib';
+          const u: unknown = {};
           const ok = isObj(u);
         `,
         errors: [
@@ -53,10 +64,12 @@ ruleTester.run(
         name: 'writes through a namespace import',
         code: dedent`
           import * as lib from 'my-lib';
+          const u: unknown = {};
           const ok = typeof u === 'object' && u !== null;
         `,
         output: dedent`
           import * as lib from 'my-lib';
+          const u: unknown = {};
           const ok = lib.isNonNullObject(u);
         `,
         errors: [
