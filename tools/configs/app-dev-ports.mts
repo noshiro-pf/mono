@@ -12,11 +12,9 @@ import { hasKey, isRecord } from 'ts-data-forge';
  *
  * The numbers are arbitrary; that they are distinct is the point.
  */
-const appDevPorts = {
+export const appDevPorts = {
   'algo-app': 5181,
   'annotation-tool': 5182,
-  'blueprintjs-playground': 5183,
-  'blueprintjs-playground-styled': 5184,
   'cant-stop-probability': 5185,
   'catan-dice': 5186,
   'color-demo': 5187,
@@ -30,7 +28,7 @@ const appDevPorts = {
   'pr-manager': 5194,
   profile: 5193,
   // Not a dev server: the pages its e2e shows in panes (`z:e2e-pages`).
-  'split-view-extension': 5201,
+  'split-view-extension': 5202,
   'synstate-docs': 5198,
   'synstate-dom-sample-app': 5196,
   'synstate-router-dom-sample-app': 5200,

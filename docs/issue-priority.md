@@ -73,7 +73,7 @@ open な issue はどれも、**優先度の段を表す `priority:<段>` ラベ
 - **おもちゃ**: `algo-app`、`housing-loan-calculator`、`mahjong-calculator-app`、
   `mahjong-scoring-tool`、`lambda-calculus-interpreter-*`、`color-demo`、
   `annotation-tool`、`synstate-dom-benchmark`、`cant-stop-probability`、
-  `catan-dice`、`blueprintjs-playground*`。
+  `catan-dice`。
 - **置き換わる予定（`hold`）**: synstate-dom への移行で消える React 向けの
   `apps/` 内ユーティリティ — `react-utils`、`preact-utils`、`react-utils-styled`、
   `react-blueprintjs-utils`、`numeric-input-utils`、`tiny-router-observable`、

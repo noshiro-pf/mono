@@ -329,19 +329,22 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 
 ### React 側の apps 7 つは、連れてくる utils が全部揃っている
 
-| app                                     | 行数 | 追加で要る utils             |
-| :-------------------------------------- | ---: | :--------------------------- |
-| `annotation-tool`                       | 2006 | **なし**                     |
-| ~~`blueprintjs-playground-styled`~~     | 1701 | 大半が復元済みだった（下節） |
-| ~~`housing-loan-calculator-app`~~       | 1143 | 復元済み（下節）             |
-| ~~`cant-stop-probability-app`~~         |  653 | 復元済み（下節）             |
-| ~~`catan-dice-app`~~                    |  471 | **なし**                     |
-| ~~`lambda-calculus-interpreter-react`~~ |  196 | 復元済み（下節）             |
-| ~~`blueprintjs-playground`~~            |   92 | 復元済み（下節）             |
+| app                                     | 行数 | 追加で要る utils                         |
+| :-------------------------------------- | ---: | :--------------------------------------- |
+| `annotation-tool`                       | 2006 | **なし**                                 |
+| ~~`blueprintjs-playground-styled`~~     | 1701 | 大半が復元済みだった。のちに削除（下節） |
+| ~~`housing-loan-calculator-app`~~       | 1143 | 復元済み（下節）                         |
+| ~~`cant-stop-probability-app`~~         |  653 | 復元済み（下節）                         |
+| ~~`catan-dice-app`~~                    |  471 | **なし**                                 |
+| ~~`lambda-calculus-interpreter-react`~~ |  196 | 復元済み（下節）                         |
+| ~~`blueprintjs-playground`~~            |   92 | 復元済み。のちに削除（下節）             |
 
 `blueprintjs-playground-styled` が依存する `blueprint-css` は「中身が無い」箱なので、
 `@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
 step 3 で `poll-discord-app` から始めたときと同じ性格の作業になる。
+
+（2 つの `blueprintjs-playground*` は復元したのち 2026-11-03 に削除した。戻すもの
+ではない。下の各節の注記を参照。）
 
 ~~`color-demo-app`（1097 行）~~だけは ~~`react-mui-utils`（245 行）~~が要る。
 
@@ -528,6 +531,13 @@ Installation・Usage・API Reference・Benefits があり、ライブラリの�
 （報告すべき未使用依存が無いため）が、それは検査されていないだけである。
 
 ## `blueprintjs-playground-styled` の復元（2026-09-01）
+
+> **2026-11-03 に削除した。** Blueprint と目で比べる役目は `blueprint-synstate`
+> のブラウザテスト（マークアップと画素の突き合わせ）が引き継いだ。ここで描いていた
+> `react-blueprintjs-utils` の部品は比べる相手を失ったが、それを使う
+> `event-schedule-app` は `blueprint-synstate` へ移る途中（#2649）で、移り終えれば
+> 部品ごと要らなくなる。中身は `git log -- apps/blueprintjs-playground-styled`
+> から辿れる。
 
 **1701 行のうち、実際に未復元だったのは 100 行ほどだった。** 残りは
 `apps/react-blueprintjs-utils` に既に入っている。行数だけを見て見積もると
@@ -773,6 +783,9 @@ step 3 で復元した 18 パッケージは**コピー＆修正**で入れた�
 
 ## `blueprintjs-playground` の復元（2026-09-01）
 
+> **2026-11-03 に `blueprintjs-playground-styled` とともに削除した**（理由は
+> その節の注記）。中身は `git log -- apps/blueprintjs-playground` から辿れる。
+
 `blueprintjs-playground-styled` の**素の双子**。同じデモページを、こちらは
 Blueprint 自身の `NumericInput` / `InputGroup` で描く。2 つ並んで初めて
 「Blueprint の実物」対「スクラッチで組んだ同等品」という比較になる。
@@ -805,7 +818,8 @@ bundler の関心事で、このリポジトリでは何もビルドしない。
 
 `#1754` で分けた 4 つ（`blueprintjs-playground` ・
 `cant-stop-probability-app` ・ `blueprintjs-playground-styled` ・
-`housing-loan-calculator-app`）がすべて復元済みになった。React 側に残るのは
+`housing-loan-calculator-app`）がすべて復元済みになった（2 つの playground は
+のちに削除した）。React 側に残るのは
 **外部依存の判断が要る 3 つ**である。
 
 | app               | 要る npm 依存                                  |
