@@ -1,4 +1,7 @@
-import type { EslintRulesOption } from 'eslint-config-typed';
+import {
+  restrictedImportsOptions,
+  type EslintRulesOption,
+} from 'eslint-config-typed';
 
 export const restrictedImports = [
   {
@@ -16,7 +19,9 @@ export const restrictedImports = [
     ],
     patterns: [
       {
-        regex: String.raw`^(\.\/|\.\.\/)+index\.(js|ts|d\.ts|mjs|mts|d\.mts|cjs|cts|d\.cts|jsx|tsx)$`,
+        // The base pattern's own regex, so that `check:root:restricted-imports`
+        // recognizes it; only the message is this package's.
+        regex: restrictedImportsOptions.patterns[0].regex,
         message:
           'Do not specify index.mjs directly by relative path. Import it via the parent directory name (e.g. ./X/index.mjs) or move the shared module to a sibling file (e.g. ./X.mjs).',
       },
