@@ -1,5 +1,19 @@
 ## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
 
+## 4.2.0
+
+### Minor Changes
+
+- 865e9de: `replace-record-with-unknown-record` now places its `UnknownRecord` import as `convert-to-readonly` places `ReadonlyRecord`'s, through one shared helper, `ensureTsTypeForgeTypeImport(sourceFile, name)`, now exported for custom transformers: a new `import type { UnknownRecord } from 'ts-type-forge';` goes after the last import, after a directive prologue or below a shebang instead of above them, a merge into an `import type { … }` no longer writes `type UnknownRecord` inside it, a namespace import gets a declaration beside it, and the file's CRLF line breaks are kept. A new import from either transformer takes the quotes of the file's last import or directive, single quotes when it has neither.
+
+### Patch Changes
+
+- Updated dependencies [6d6c016]
+- Updated dependencies [7b52a2d]
+- Updated dependencies [1394a6b]
+    - ts-type-forge@9.2.4
+    - ts-data-forge@14.12.1
+
 ## 4.1.1
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # pr-merge-queue
 
+## 0.8.0
+
+### Minor Changes
+
+- 847daae: `pr-description check --issue` checks a file as an issue's description. In one, where GitHub acts on no closing keyword, `create`, `push` to an issue and `check --issue` read a closing keyword (`resolves #10`) in either half as prose; `push` asks GitHub whether the number is an issue or a pull request.
+
+### Patch Changes
+
+- Updated dependencies [6d6c016]
+- Updated dependencies [7b52a2d]
+- Updated dependencies [1394a6b]
+    - ts-type-forge@9.2.4
+    - ts-data-forge@14.12.1
+
 ## 0.7.0
 
 ### Minor Changes

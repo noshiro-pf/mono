@@ -1,5 +1,13 @@
 # slack-archive-tools
 
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies [7b52a2d]
+    - ts-data-forge@14.12.1
+    - ts-fortress@12.4.5
+
 ## 0.0.18
 
 ### Patch Changes
