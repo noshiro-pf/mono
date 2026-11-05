@@ -1,6 +1,5 @@
 import { UserName } from 'event-schedule-app-shared';
 import { asSafeUint } from 'ts-data-forge';
-import { DateUtils, YearMonthDateFromDate } from 'ts-fortress-types';
 import type { NonEmptyTuple, RelaxedExtract } from 'ts-type-forge';
 import {
   AnswerFilterState,
@@ -75,8 +74,15 @@ type ActionOf<T extends AnswerFilterStateAction['type']> = RelaxedExtract<
   Readonly<{ type: T }>
 >;
 
-const date = (iso: string): YearMonthDate =>
-  YearMonthDateFromDate(DateUtils.from(iso));
+/**
+ * The calendar date itself. A `"YYYY-MM-DD"` read through `Date` would be UTC
+ * midnight, the day before in local time west of UTC (#3076).
+ */
+const ymd = (
+  year: number,
+  month: YearMonthDate['month'],
+  date: YearMonthDate['date'],
+): YearMonthDate => ({ year: asSafeUint(year), month, date }) as const;
 
 const userName = UserName.cast('alice');
 
@@ -106,25 +112,25 @@ const actionSamples: Readonly<{
   'set-dateRange': [
     {
       type: 'set-dateRange',
-      range: { start: date('2026-11-05'), end: date('2026-11-03') },
+      range: { start: ymd(2026, 11, 5), end: ymd(2026, 11, 3) },
     },
     {
       type: 'set-dateRange',
-      range: { start: date('2026-11-10'), end: date('2026-11-12') },
+      range: { start: ymd(2026, 11, 10), end: ymd(2026, 11, 12) },
     },
     {
       type: 'set-dateRange',
-      range: { start: date('2026-11-10'), end: date('2026-11-20') },
+      range: { start: ymd(2026, 11, 10), end: ymd(2026, 11, 20) },
     },
   ],
   'set-dateRangeDefaultValue': [
     {
       type: 'set-dateRangeDefaultValue',
-      range: { start: date('2026-11-01'), end: date('2026-11-30') },
+      range: { start: ymd(2026, 11, 1), end: ymd(2026, 11, 30) },
     },
     {
       type: 'set-dateRangeDefaultValue',
-      range: { start: date('2026-12-01'), end: date('2026-12-31') },
+      range: { start: ymd(2026, 12, 1), end: ymd(2026, 12, 31) },
     },
   ],
   'set-dayOfWeek': [
@@ -225,7 +231,7 @@ const actionSamples: Readonly<{
         filledDateOnly: true,
         rank: 4,
         scoreRange: { min: 0.3, max: undefined },
-        dateRange: { start: date('2026-11-03'), end: undefined },
+        dateRange: { start: ymd(2026, 11, 3), end: undefined },
         dayOfWeek: undefined,
       },
     },

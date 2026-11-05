@@ -9,6 +9,7 @@ import {
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
+import { dateUtilsRules } from '../../tools/configs/eslint-date-utils.mjs';
 import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 
 const thisDir = import.meta.dirname;
@@ -105,6 +106,8 @@ export default [
     }),
   },
   eslintConfigForPlaywright(['e2e/**']),
+
+  { rules: defineKnownRules(dateUtilsRules) },
 
   // Last, so that nothing above turns these back on.
   eslintConfigOffForOxlint,

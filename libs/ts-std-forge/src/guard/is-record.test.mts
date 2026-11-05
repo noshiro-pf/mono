@@ -72,7 +72,7 @@ describe(isRecord, () => {
     test('Date is a record', () => {
       expectType<Date, UnknownRecord>('!<=');
 
-      const unk: unknown = new Date('2020-01-01');
+      const unk: unknown = new Date('2020-01-01T00:00:00Z');
 
       assert.isTrue(isRecord(unk));
     });
