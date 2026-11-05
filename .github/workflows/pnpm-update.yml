@@ -55,6 +55,13 @@ name: pnpm update
 # the fixed branch name, the lease and the labels are in README.md under
 # "Jobs that hold a key", and this file says only what is its own. A third
 # job, `close-obsolete`, holds `GITHUB_TOKEN` alone and runs nothing but `gh`.
+#
+# It runs on the default branch only. A dispatch on any other ref skips
+# `update`, and every job after it with it: `commit` would otherwise rebuild
+# `chore/pnpm-update` on that ref's commits and open them into `main` queued
+# and armed, with nothing reviewing them — its path check judges the patch,
+# not the commits under it. `rebuild-pnpm-update` dispatches on the default
+# branch; to take an update early, dispatch there too.
 
 on:
   schedule:
@@ -98,6 +105,10 @@ jobs:
   # a key. What crosses to `commit` is a patch, which it applies rather than
   # executes.
   update:
+    # The default branch only; see the header. A tag is not a branch, so the
+    # full ref is compared.
+    if: >-
+      github.ref == format('refs/heads/{0}', case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main'))
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -476,11 +487,11 @@ jobs:
   # hands it back. Closing it is that hand-back. Closed rather than pushed
   # `main`'s tip, which would leave an empty pull request open for nothing.
   #
-  # Only on the default branch: a run dispatched on another ref finds that
-  # ref's tree up to date, which says nothing about `main`'s. A published-pin
-  # refresh that failed before writing (it is continued past) can make a run
-  # of no change close a pull request that carried pin moves; the next run
-  # that reaches npm opens them again.
+  # Only on the default branch, as `update` is: a run dispatched on another ref
+  # would find that ref's tree up to date, which says nothing about `main`'s.
+  # A published-pin refresh that failed before writing (it is continued past)
+  # can make a run of no change close a pull request that carried pin moves;
+  # the next run that reaches npm opens them again.
   #
   # `gh` alone, no checkout: nothing from the tree runs here. `GITHUB_TOKEN`
   # rather than the App token, because a close needs to trigger no workflow.
@@ -491,9 +502,7 @@ jobs:
   # that does not come off is a warning, since the close is what matters.
   close-obsolete:
     needs: update
-    if: >-
-      needs.update.outputs.changed == 'false' &&
-      github.ref_name == case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main')
+    if: needs.update.outputs.changed == 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
