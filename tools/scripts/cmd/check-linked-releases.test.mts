@@ -1,36 +1,7 @@
 import { Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import type { ChangesetFile } from '../lib/changesets.mjs';
-import {
-  checkLinkedReleases,
-  parseReleaseGroups,
-} from './check-linked-releases.mjs';
-
-describe('parseReleaseGroups', () => {
-  test('reads the groups', () => {
-    assert.deepStrictEqual(
-      parseReleaseGroups('{ "linked": [["a", "b"], ["c"]] }', 'linked'),
-      Result.ok([['a', 'b'], ['c']]),
-    );
-  });
-
-  test('reads the key asked for', () => {
-    assert.deepStrictEqual(
-      parseReleaseGroups('{ "fixed": [["a-*"]], "linked": [["b"]] }', 'fixed'),
-      Result.ok([['a-*']]),
-    );
-  });
-
-  test('reads no group from a config without the key', () => {
-    assert.deepStrictEqual(parseReleaseGroups('{}', 'linked'), Result.ok([]));
-  });
-
-  test('rejects a key of another shape', () => {
-    assert.isTrue(
-      Result.isErr(parseReleaseGroups('{ "linked": ["a", "b"] }', 'linked')),
-    );
-  });
-});
+import { readReleaseConfig, type ChangesetFile } from '../lib/changesets.mjs';
+import { checkLinkedReleases } from './check-linked-releases.mjs';
 
 describe('checkLinkedReleases', () => {
   test('passes a group no breaking release is pending in', () => {
@@ -105,16 +76,38 @@ describe('checkLinkedReleases', () => {
     assert.isTrue(Result.isOk(result));
   });
 
-  test('fails a group naming what is not a workspace package', () => {
+  // #3309: read as check:prose:dependent-releases reads it, the glob expanded,
+  // rather than refused as a name no package has.
+  test('reads a glob member of a linked group as changesets does', () => {
+    const config = readReleaseConfig(
+      { linked: [['core', 'wrap*']] },
+      Array.from(VERSIONS, ([name, version]) => ({ name, version })),
+    );
+
+    assert.isTrue(Result.isOk(config));
+
+    assert.deepStrictEqual(config.value.linked, [['core', 'wrapper']]);
+
     const result = checkLinkedReleases({
-      changesets: [],
-      linked: [['core', 'wrapper-*']],
+      changesets: [changeset({ core: 'major' })],
+      linked: config.value.linked,
       versions: VERSIONS,
     });
 
     assert.isTrue(Result.isErr(result));
 
-    assert.include(result.value, 'without a glob:\n\n  - wrapper-*');
+    assert.include(result.value, '  - wrapper');
+  });
+
+  test('refuses a config naming what is not a workspace package', () => {
+    assert.isTrue(
+      Result.isErr(
+        readReleaseConfig(
+          { linked: [['core', 'missing']] },
+          Array.from(VERSIONS, ([name, version]) => ({ name, version })),
+        ),
+      ),
+    );
   });
 });
 

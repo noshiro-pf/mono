@@ -1,6 +1,5 @@
 import { assembleReleasePlan } from '@changesets/assemble-release-plan';
-import { validateConfig } from '@changesets/config';
-import type { NewChangeset, Packages } from '@changesets/types';
+import type { NewChangeset } from '@changesets/types';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
@@ -8,7 +7,6 @@ import {
   hasKey,
   isRecord,
   isString,
-  Json,
   Result,
   unknownToString,
 } from 'ts-data-forge';
@@ -16,9 +14,14 @@ import { getWorkspacePackages, glob, isDirectlyExecuted } from 'ts-repo-utils';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import {
+  CHANGESETS_CONFIG_FILE,
   isBreaking,
+  isBreakingRelease,
   listChangesetBumps,
   readChangesets,
+  readChangesetsConfigFile,
+  readReleaseConfig,
+  toChangesetsWorkspace,
   type Bump,
   type ChangesetBump,
   type ChangesetFile,
@@ -122,21 +125,15 @@ export const checkDependentReleases = ({
 
   const bumps = listChangesetBumps(changesets);
 
-  const workspace = toChangesetsPackages(packages);
+  const workspace = toChangesetsWorkspace(packages);
 
-  const validated = validateConfig(config, workspace);
+  const validated = readReleaseConfig(config, packages);
 
-  if (validated.config === undefined) {
-    return Result.err(
-      [
-        `❌ ${CONFIG_FILE} is not a config changesets accepts:`,
-        '',
-        ...validated.errors.map((error) => `  - ${error}`),
-      ].join('\n'),
-    );
+  if (Result.isErr(validated)) {
+    return validated;
   }
 
-  const changesetsConfig = validated.config;
+  const changesetsConfig = validated.value;
 
   const groups: readonly ReleaseGroup[] = [
     ...changesetsConfig.fixed.map((members) => ({
@@ -149,14 +146,17 @@ export const checkDependentReleases = ({
     })),
   ] as const;
 
-  /** What `changeset version` releases of `planned`, by name. */
+  /**
+   * What `changeset version` releases of `planned`: each package it releases,
+   * by name, with the version it moves from and to.
+   */
   const planReleases = (
     planned: readonly ChangesetBump[],
-  ): Result<ReadonlySet<string>, string> =>
+  ): Result<ReadonlyMap<string, PlannedRelease>, string> =>
     Result.mapErr(
       Result.fromThrowable(
         () =>
-          new Set(
+          new Map(
             assembleReleasePlan(
               Array.from(toNewChangesets(planned)),
               workspace,
@@ -164,7 +164,19 @@ export const checkDependentReleases = ({
               undefined,
             )
               .releases.filter(({ type }) => type !== 'none')
-              .map(({ name }) => name),
+              // From the version in the manifest: the plan reports a member of
+              // a release group as moving from the group's version, which a
+              // lagging member never had.
+              .map(
+                ({ name, oldVersion, newVersion }) =>
+                  [
+                    name,
+                    {
+                      from: versions.get(name) ?? oldVersion ?? '',
+                      to: newVersion ?? '',
+                    },
+                  ] as const,
+              ),
           ),
       ),
       unknownToString,
@@ -179,13 +191,39 @@ export const checkDependentReleases = ({
   }
 
   // The packages `changeset version` releases.
-  const releasing = plan.value;
+  const releasing: ReadonlySet<string> = new Set(plan.value.keys());
+
+  /**
+   * What makes `name`'s release breaking: the changesets that give it, or one
+   * of its release groups, a breaking bump; or else the release plan, when it
+   * moves the package across a major with no such changeset — a lagging member
+   * of a `fixed` or `linked` group taken to the group's version (#3309).
+   */
+  const pendingOf = (name: string): readonly Pending[] => {
+    const causes = findBreaking(name, bumps, groups, versions);
+
+    if (Arr.isNonEmpty(causes)) {
+      return causes;
+    }
+
+    const planned = plan.value.get(name);
+
+    return planned !== undefined && isBreakingRelease(planned.from, planned.to)
+      ? [
+          {
+            file: CHANGESETS_CONFIG_FILE,
+            name,
+            bump: 'patch',
+            via: undefined,
+            planned,
+          },
+        ]
+      : [];
+  };
 
   const breakingDependents = new Set(
     packages
-      .filter(({ name }) =>
-        Arr.isNonEmpty(findBreaking(name, bumps, groups, versions)),
-      )
+      .filter(({ name }) => Arr.isNonEmpty(pendingOf(name)))
       .map(({ name }) => name),
   );
 
@@ -317,7 +355,7 @@ export const checkDependentReleases = ({
   // The edges whose dependency breaks and whose dependent says nothing of it.
   const unannounced: readonly UnannouncedEdge[] = Arr.generate(function* () {
     for (const edge of classified) {
-      const pending = findBreaking(edge.dependency, bumps, groups, versions);
+      const pending = pendingOf(edge.dependency);
 
       if (Arr.isNonEmpty(pending) && !breakingDependents.has(edge.dependent)) {
         yield { ...edge, pending };
@@ -646,7 +684,15 @@ type Pending = Readonly<{
   bump: Bump;
   /** The kind of release group that carries the bump, if not the package's own. */
   via: ReleaseGroup['kind'] | undefined;
+  /**
+   * Set when no changeset gives a breaking bump and the release plan moves the
+   * package across a major all the same.
+   */
+  planned?: PlannedRelease;
 }>;
+
+/** The versions a release moves a package from and to. */
+type PlannedRelease = Readonly<{ from: string; to: string }>;
 
 /**
  * Corrections of re-export detection, each with the reason it is a claim and
@@ -655,8 +701,6 @@ type Pending = Readonly<{
 const OVERRIDES: readonly ExposureOverride[] = [] as const;
 
 const SELF_RELATIVE = 'tools/scripts/cmd/check-dependent-releases.mts';
-
-const CONFIG_FILE = '.changeset/config.json';
 
 /** The directory the strict standard library bundles sit under. */
 const STRICT_LIB_DIR = 'strict-lib';
@@ -694,49 +738,14 @@ const describePending = (
   dependency: string,
   pending: readonly Pending[],
 ): readonly string[] =>
-  pending.map(
-    ({ file, name, bump, via }) =>
-      `  - ${file} gives ${name} "${bump}"${via === undefined ? '' : `, which the ${via} group carries to ${dependency}`}`,
+  pending.map(({ file, name, bump, via, planned }) =>
+    planned === undefined
+      ? `  - ${file} gives ${name} "${bump}"${via === undefined ? '' : `, which the ${via} group carries to ${dependency}`}`
+      : `  - the release plan takes ${name} from ${planned.from} to ${planned.to}: a release group in ${file} carries it to the group's version`,
   );
 
 const breakingBumpOf = (version: string): Bump =>
   version.startsWith('0.') ? 'minor' : 'major';
-
-/**
- * The workspace as `@changesets/assemble-release-plan` reads it. Only the
- * runtime fields are given: a `devDependencies` edge releases nothing. Nor is
- * `private`: a published package cannot depend on a private one, and a private
- * one is never a checked dependent, so how `privatePackages` treats it changes
- * no edge.
- */
-const toChangesetsPackages = (
-  packages: readonly WorkspacePackage[],
-): Packages =>
-  ({
-    rootDir: PLAN_ROOT,
-    rootPackage: {
-      dir: PLAN_ROOT,
-      packageJson: { name: PLAN_ROOT_NAME, version: '0.0.0' },
-    },
-    packages: packages.map(({ name, version, dependencies }) => ({
-      dir: path.posix.join(PLAN_ROOT, name),
-      packageJson: {
-        name,
-        version,
-        ...Object.fromEntries(
-          RUNTIME_DEPENDENCY_FIELDS.map((field) => [
-            field,
-            Object.fromEntries(
-              dependencies
-                .filter((dependency) => dependency.field === field)
-                .map((dependency) => [dependency.name, dependency.range]),
-            ),
-          ]),
-        ),
-      },
-    })),
-    tool: { type: 'pnpm' },
-  }) as const;
 
 /** The changesets as `@changesets/assemble-release-plan` reads them. */
 const toNewChangesets = (
@@ -750,15 +759,6 @@ const toNewChangesets = (
       releases: named.map(({ name, bump }) => ({ name, type: bump })),
     }),
   );
-
-/**
- * Where the release plan places the workspace. Only the dependency fields and
- * versions decide a plan, not where a package is.
- */
-const PLAN_ROOT = '/workspace';
-
-/** A name no package can have, for the workspace root the plan asks for. */
-const PLAN_ROOT_NAME = '(workspace root)';
 
 /**
  * Why an edge holds the release: `subject` names the edge, `why` says what the
@@ -965,28 +965,10 @@ const readReExports = async (
   return new Map(entries);
 };
 
-const readConfig = async (): Promise<unknown> => {
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  const config = await fs.readFile(
-    path.resolve(projectRootPath, CONFIG_FILE),
-    'utf8',
-  );
-
-  const parsed = Json.parse(config);
-
-  if (Result.isErr(parsed)) {
-    throw new Error(
-      `${CONFIG_FILE} is not JSON: ${unknownToString(parsed.value)}`,
-    );
-  }
-
-  return parsed.value;
-};
-
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await Promise.all([
     readChangesets(),
-    readConfig(),
+    readChangesetsConfigFile(),
     readPackages(),
   ])
     .then(async ([changesets, config, packages]) =>

@@ -322,6 +322,37 @@ describe('checkDependentReleases', () => {
     );
   });
 
+  // #3309: a lagging member of a fixed group is released at the group's
+  // version, a major for its consumers, though its changeset says "patch".
+  test('holds a lagging fixed member a patch takes across a major', () => {
+    const result = check({
+      changesets: [changeset({ lagging: 'patch' })],
+      packages: [
+        pkg('leader', '2.0.0'),
+        pkg('lagging', '1.4.0'),
+        pkg('wrapper', '3.0.0', ['lagging']),
+      ],
+      groups: [{ kind: 'fixed', members: ['leader', 'lagging'] }],
+      reExports: new Map<string, ReadonlyMap<string, readonly string[]>>([
+        [
+          'wrapper',
+          new Map<string, readonly string[]>([
+            ['lagging', ['libs/wrapper/src/index.mts']],
+          ]),
+        ],
+      ]),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      '  - the release plan takes lagging from 1.4.0 to 2.0.1',
+    );
+
+    assert.include(result.value, 'Add a changeset giving wrapper "major"');
+  });
+
   test('reads a fixed group written as a glob', () => {
     const result = check({
       changesets: [changeset({ 'core-b': 'major' })],
