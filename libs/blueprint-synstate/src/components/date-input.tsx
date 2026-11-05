@@ -25,6 +25,8 @@ import {
 } from '../date/index.mjs';
 import {
   ARROW_SIZE,
+  focusablesIn,
+  isInside,
   placeBottomStart,
   uniqueId,
   type PopoverPosition,
@@ -206,16 +208,7 @@ export const DateInput = ({
 
   // What Tab reaches in the calendar, its two ends left out.
   const focusables = (): readonly HTMLElement[] =>
-    mut_elements.content === undefined
-      ? ([] as const)
-      : Array.from(
-          mut_elements.content.querySelectorAll<HTMLElement>(FOCUSABLE),
-        )
-          .filter(
-            (element) =>
-              element.tabIndex >= 0 && !element.hasAttribute('disabled'),
-          )
-          .slice(1, -1);
+    focusablesIn(mut_elements.content).slice(1, -1);
 
   const changeFromPicker = (next: string, viaEnter: boolean): void => {
     const nextClock = parseWallClock(next);
@@ -616,8 +609,6 @@ export const DateInput = ({
 
 type Shown = Readonly<{ text: string; error: boolean }>;
 
-const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]';
-
 const TRANSITION_MS = 300;
 
 /** Half the arrow less the 4px it overlaps the popover, as Blueprint has it. */
@@ -629,8 +620,3 @@ const ARROW_BORDER_PATH =
 
 const ARROW_FILL_PATH =
   'M8.787 7.036c1.22-1.125 2.21-3.376 2.21-5.03V0v30-2.005c0-1.654-.983-3.9-2.21-5.03l-7.183-6.616c-.81-.746-.802-1.96 0-2.7l7.183-6.614z';
-
-const isInside = (
-  target: EventTarget | null,
-  container: Element | undefined,
-): boolean => target instanceof Node && container?.contains(target) === true;

@@ -37,6 +37,7 @@ import {
   TextArea,
   TimePicker,
   type IconName,
+  type IconName20,
 } from 'blueprint-synstate';
 import { createElement as h, type ReactElement } from 'react';
 import { flushSync } from 'react-dom';
@@ -85,6 +86,12 @@ type Case = readonly [
   ours: () => JSX.Element,
 ];
 
+/** A disabled `<button>` is out of the tab order without `tabindex`. */
+export const disabledButtonTabIndex = (line: string): string =>
+  /^\s*button\.[\w.-]*\.bp6-disabled\b/u.test(line)
+    ? line.replace('[tabindex=-1]', '')
+    : line;
+
 /**
  * `Intl`'s short weekday names (`Sun`), which this library's pickers show, for
  * Blueprint's, which shows date-fns's shortest (`Su`) and which `Intl` has no
@@ -103,12 +110,6 @@ const htmlSelectWrapper = (line: string): string =>
     /^\s*div(?=[\w.-]*\.bp6-html-select\b)/u,
     (match) => `${match.slice(0, -'div'.length)}span`,
   );
-
-/** A disabled `<button>` is out of the tab order without `tabindex`. */
-const disabledButtonTabIndex = (line: string): string =>
-  /^\s*button\.[\w.-]*\.bp6-disabled\b/u.test(line)
-    ? line.replace('[tabindex=-1]', '')
-    : line;
 
 /**
  * Blueprint points a tab with no panel at a panel id that is never rendered,
@@ -167,6 +168,7 @@ const allIcons = [
   'saved',
   'search',
   'send-message',
+  'small-cross',
   'sort',
   'sort-asc',
   'sort-desc',
@@ -182,6 +184,24 @@ const allIcons = [
 
 // A name added to the library and not here fails this.
 expectType<(typeof allIcons)[number], IconName>('=');
+
+/** Every icon this library also draws from the 20px paths. */
+const allLargeIcons = [
+  'archive',
+  'confirm',
+  'disable',
+  'error',
+  'eye-off',
+  'eye-open',
+  'lock',
+  'reset',
+  'search',
+  'trash',
+  'unarchive',
+  'warning-sign',
+] as const satisfies readonly IconName20[];
+
+expectType<(typeof allLargeIcons)[number], IconName20>('=');
 
 export const cases: readonly Case[] = [
   [
@@ -913,6 +933,27 @@ export const cases: readonly Case[] = [
       <div>
         {allIcons.map((icon) => (
           <Icon icon={icon} />
+        ))}
+      </div>
+    ),
+  ],
+  [
+    'Every large icon',
+    {
+      element: () =>
+        h(
+          'div',
+          null,
+          allLargeIcons.map((icon) =>
+            h(Blueprint.Icon, { key: icon, icon, size: 20 }),
+          ),
+        ),
+      deliberate: [],
+    },
+    () => (
+      <div>
+        {allLargeIcons.map((icon) => (
+          <Icon icon={icon} size={20} />
         ))}
       </div>
     ),
