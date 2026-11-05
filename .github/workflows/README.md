@@ -229,7 +229,7 @@ written, rather than every job that takes the steps.
   `engine-strict` in `node-version-compatibility.yml` and deliberately not in
   `node-support-update.yml`'s canary, `ignore-scripts` in `release.yml`'s
   publishing job, `install: false` in `pnpm-update.yml`, which changes pnpm
-  before it installs anything, and in `deploy-firestore.yml`,
+  before it installs anything, and in `deploy-firestore.yml`'s deploy job,
   `deploy-event-schedule-app.yml`'s deploy job and `e2e-production.yml`, which
   install one app rather than the workspace, and `pnpm: false` in
   `check-gates.yml`, whose diff check runs on Node.js alone.
@@ -797,9 +797,13 @@ either), and the job that holds the key installs nothing and runs nothing out of
 the working tree. `pnpm-update.yml` crosses a patch, `release.yml` a `dist/`
 tarball.
 `node-support-update.yml` is the one that is not split, and says why.
-`deploy-firestore.yml` holds a Google Cloud credential and has nothing to split
-off: it builds nothing, installs with `--ignore-scripts`, and the one
-third-party tree it runs is firebase-tools, the tool that uses the credential.
+`deploy-firestore.yml` holds a Google Cloud credential. Its rules tests, which
+install and build the workspace, run in a job of their own that holds no key,
+before the deploy; what crosses is a job output, the names of the apps that
+passed, which a deploy job reads as data and only to stand down, so it can
+narrow the plan job's matrix but never add to it. The deploy job installs one
+app with `--ignore-scripts`, and the one third-party tree it runs is
+firebase-tools, the tool that uses the credential.
 `deploy-event-schedule-app.yml` does build, so it is split: `build` crosses the
 Hosting and Functions output as tarballs, which `deploy` checks before it
 unpacks them, and the functions' discovery manifest, so that firebase-tools does
