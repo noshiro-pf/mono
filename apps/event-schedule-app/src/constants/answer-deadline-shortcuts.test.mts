@@ -17,4 +17,12 @@ describe(createAnswerDeadlineShortcuts, () => {
       ],
     );
   });
+
+  test('"1 month later" from 31 January is the end of February', () => {
+    const oneMonthLater = createAnswerDeadlineShortcuts(
+      new Date(2027, 0, 31, 9, 0),
+    ).find(({ label }) => label === '1 month later');
+
+    assert.strictEqual(oneMonthLater?.value, '2027-02-28T23:59');
+  });
 });

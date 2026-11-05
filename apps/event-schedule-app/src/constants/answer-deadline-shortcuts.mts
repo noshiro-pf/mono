@@ -4,7 +4,6 @@ import {
   type DatePickerShortcut,
 } from 'blueprint-synstate';
 import { DateUtils } from 'ts-fortress-types';
-import type { MonthEnum } from 'ts-type-forge';
 import { addDays, endOfDay } from '../utils/index.mjs';
 
 /**
@@ -28,11 +27,7 @@ const shortcuts = [
   { label: '2 week later', shift: addDays(14) },
   {
     label: '1 month later',
-    shift: DateUtils.updateLocaleMonth(
-      (v) =>
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        (v + 1) as MonthEnum,
-    ),
+    shift: DateUtils.addLocaleMonths(1),
   },
 ] as const satisfies readonly Readonly<{
   label: string;
