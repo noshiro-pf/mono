@@ -188,6 +188,62 @@ describe('the toaster beside Blueprint React', () => {
 });
 
 describe(createToaster, () => {
+  test('adds nothing to its container until a toast is shown', async () => {
+    const host = stage();
+
+    const toaster = createToaster({}, host);
+
+    onTestFinished(() => {
+      toaster.remove();
+
+      host.remove();
+    });
+
+    // A toaster made as a module loads may never show a toast, and would
+    // otherwise leave an empty element at the end of the body.
+    assert.strictEqual(host.childNodes.length, 0);
+
+    toaster.show({ message: constant('Saved.'), timeout: 0 });
+
+    await nextFrame();
+
+    assert.strictEqual(host.childNodes.length, 1);
+
+    assert.isNotNull(host.querySelector('.bp6-toast'));
+
+    toaster.remove();
+
+    assert.strictEqual(host.childNodes.length, 0);
+  });
+
+  test('ignores a toast shown once it is removed', () => {
+    const host = stage();
+
+    onTestFinished(() => {
+      host.remove();
+    });
+
+    const toaster = createToaster({}, host);
+
+    toaster.show({ message: constant('Saving.'), timeout: 0 });
+
+    toaster.remove();
+
+    assert.deepStrictEqual(toaster.getToasts(), []);
+
+    // A toast shown late, as by a handler still waiting on a request.
+    const keys = [
+      toaster.show({ message: constant('Saved.'), timeout: 0 }),
+      toaster.show({ message: constant('Saved.'), timeout: 0 }),
+    ] as const;
+
+    assert.strictEqual(host.childNodes.length, 0);
+
+    assert.deepStrictEqual(toaster.getToasts(), []);
+
+    assert.notStrictEqual(keys[0], keys[1]);
+  });
+
   test('dismisses a toast once its timeout is over, and says so', async () => {
     const toaster = mountedToaster();
 

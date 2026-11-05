@@ -1,21 +1,5 @@
-import {
-  createToaster as createBlueprintToaster,
-  type OverlayToasterProps,
-} from 'blueprint-synstate';
 import { constant, type Child } from 'synstate-dom';
 import { match } from 'ts-data-forge';
-
-/** The app's toaster, at the top of `container`; the Escape key clears it. */
-export const createToaster = (
-  props?: OverlayToasterProps,
-  container: HTMLElement = document.body,
-): Promise<Toaster> =>
-  Promise.resolve(
-    createBlueprintToaster(
-      { canEscapeKeyClear: true, position: 'top', ...props },
-      container,
-    ),
-  );
 
 export const showToast = ({
   isCloseButtonShown = true,

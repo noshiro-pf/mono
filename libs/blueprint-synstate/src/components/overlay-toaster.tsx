@@ -75,7 +75,10 @@ export type Toaster = Readonly<{
   clear: () => void;
   /** The toasts shown, newest first. */
   getToasts: () => readonly ShownToast[];
-  /** Takes the toaster out of the page. */
+  /**
+   * Takes the toaster out of the page, with its toasts and those waiting to be
+   * shown. A toast shown after this is ignored.
+   */
   remove: () => void;
 }>;
 
@@ -85,6 +88,8 @@ export type ShownToast = ToastProps & Readonly<{ key: string }>;
  * Blueprint's `OverlayToaster.create`: a toaster drawn in place at the end of
  * `container`, `div.bp6-overlay.bp6-toast-container` once a toast is first
  * shown, with each toast animated in and out as Blueprint's style sheets do.
+ * Its `div` joins `container` with that first toast, where Blueprint's joins as
+ * the toaster is made.
  * Toasts are shown at least 50 ms apart, as Blueprint queues them, so that
  * their animations keep up.
  *
@@ -106,6 +111,10 @@ export const createToaster = (
     );
   }
 
+  // Added to `container` as the first toast is shown, not here, so that a
+  // toaster that never shows one leaves nothing in the page.
+  const root = document.createElement('div');
+
   const [rows$, setRows] = createState<readonly Row[]>([]);
 
   // The overlay has been drawn: it stays, and a toast shown from now on enters
@@ -118,12 +127,26 @@ export const createToaster = (
     rowId: number;
     queue: ShownToast[];
     queueTimer: ReturnType<typeof setTimeout> | undefined;
-  } = { keyId: 0, rowId: 0, queue: [], queueTimer: undefined };
+    /** `remove` has been called: a toast shown from now on is ignored. */
+    removed: boolean;
+  } = {
+    keyId: 0,
+    rowId: 0,
+    queue: [],
+    queueTimer: undefined,
+    removed: false,
+  };
 
   const shown = (): readonly Row[] =>
     rows$.getSnapshot().value.filter(({ leaving }) => !leaving);
 
   const showNow = (toast: ShownToast): void => {
+    const isFirst = !hasOpened$.getSnapshot().value;
+
+    if (isFirst) {
+      container.append(root);
+    }
+
     const rows = shown();
 
     if (maxToasts !== undefined && rows.length === maxToasts) {
@@ -138,7 +161,7 @@ export const createToaster = (
       id: mut_toaster.rowId,
       toast,
       leaving: false,
-      appears: !hasOpened$.getSnapshot().value,
+      appears: isFirst,
     } as const;
 
     mut_toaster.rowId += 1;
@@ -198,6 +221,10 @@ export const createToaster = (
       return toast.key;
     }
 
+    if (mut_toaster.removed) {
+      return toast.key;
+    }
+
     if (mut_toaster.queueTimer === undefined) {
       showNow(toast);
 
@@ -247,10 +274,6 @@ export const createToaster = (
     setRows(rows$.getSnapshot().value.filter((row) => row.id !== id));
   };
 
-  const root = document.createElement('div');
-
-  container.append(root);
-
   const unmount = render(
     () => (
       <ToastContainer
@@ -275,9 +298,17 @@ export const createToaster = (
     clear,
     getToasts: () => shown().map(({ toast }) => toast),
     remove: () => {
+      mut_toaster.removed = true;
+
       clearTimeout(mut_toaster.queueTimer);
 
+      mut_toaster.queueTimer = undefined;
+
+      mut_toaster.queue = [];
+
       unmount();
+
+      setRows([]);
 
       root.remove();
     },

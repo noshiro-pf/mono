@@ -11,5 +11,5 @@ export * from './normalize-event-schedule.mjs';
 export * from './reducers/index.mjs';
 export * from './select-datetimes-component/index.mjs';
 export * from './the-name-is-already-used.mjs';
-export * from './toaster.js';
+export * from './toaster.mjs';
 export * from './ymd-to-day-in-week.mjs';

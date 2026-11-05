@@ -20,8 +20,8 @@ import {
 } from '../components/index.mjs';
 import { dict } from '../constants/index.mjs';
 import { isProduction } from '../env.mjs';
-import { createToaster, showToast } from '../functions/index.mjs';
-import { api } from '../store/index.mjs';
+import { showToast } from '../functions/index.mjs';
+import { api, toaster } from '../store/index.mjs';
 import * as styles from './error-boundary.module.css';
 import { createUncaughtErrorReporter } from './report-uncaught.mjs';
 
@@ -94,7 +94,7 @@ const ErrorScreen = ({ error }: Readonly<{ error: unknown }>): JSX.Element => {
 
         if (Result.isErr(res)) {
           showToast({
-            toast,
+            toast: toaster,
             intent: 'danger',
             message: (
               <div>
@@ -105,7 +105,7 @@ const ErrorScreen = ({ error }: Readonly<{ error: unknown }>): JSX.Element => {
           });
         } else {
           showToast({
-            toast,
+            toast: toaster,
             intent: 'success',
             message: dc.sendReport.success,
           });
@@ -188,5 +188,3 @@ const ErrorScreen = ({ error }: Readonly<{ error: unknown }>): JSX.Element => {
 };
 
 const dc = dict.errorMessages.errorHandler;
-
-const toast = createToaster();
