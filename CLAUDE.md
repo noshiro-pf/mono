@@ -497,9 +497,9 @@ stage tables (`gen:deps-graph`).
 - **e2e** (`apps/*/e2e`, Playwright via `tools/configs/playwright-config.mts`):
   the test id attribute is `data-e2e`; one worker, Chromium only; ports come
   from `tools/configs/app-dev-ports.mts`, which the Vite config reads too. A
-  browser project must list every third-party module its tests reach in
-  `optimizeDepsInclude`, or Vite's first-import optimization reloads the page
-  mid-run — reproducible only after deleting `node_modules/.vite`.
+  browser project lists every third-party module its tests reach in
+  `optimizeDepsInclude`: nothing else is optimized (`noDiscovery`), so a
+  CommonJS one left out fails as "does not provide an export named …".
 
 ## Coding style
 

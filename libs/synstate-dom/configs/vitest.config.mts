@@ -30,5 +30,7 @@ export default defineViteConfig({
     provider: playwright(),
     includeSource: [],
     include: ['test/browser/**/*.test.{mts,tsx}'],
+    // See the comment on `optimizeDepsInclude` in the shared config.
+    optimizeDepsInclude: ['vitest > expect-type'],
   },
 });

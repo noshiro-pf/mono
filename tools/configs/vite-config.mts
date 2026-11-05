@@ -66,13 +66,14 @@ export const defineViteConfig = ({
         /**
          * Every third-party module the browser tests reach, named up front.
          *
-         * Vite pre-bundles dependencies by scanning the test files. Anything
-         * the scan misses is optimized on first import instead, and that
-         * reloads the page mid-run — which surfaces as "Failed to fetch
-         * dynamically imported module" for whichever file was loading at the
-         * time. The scan misses two kinds of module here: one imported by a
-         * workspace sibling rather than by a test file, and one imported by a
-         * test file the scan has not reached yet.
+         * Vite optimizes these and nothing else (`noDiscovery`, below). With
+         * discovery on, a module its scan missed — one imported by a workspace
+         * sibling rather than by a test file, or by a test file the scan had
+         * not reached — was optimized on first import instead, which reloaded
+         * the page mid-run and dropped the tests still loading. Now an ES
+         * module left out is served as it is, and a CommonJS one fails to load
+         * ("does not provide an export named …"), failing the run; add it here.
+         * `vitest > expect-type` is one: Vitest imports it.
          *
          * A module the package does not itself depend on has to be named
          * through the sibling that does — `'ts-fortress > @sindresorhus/is'` —
@@ -153,6 +154,13 @@ export const defineViteConfig = ({
           },
           optimizeDeps: {
             include: castMutable(browser.optimizeDepsInclude),
+            // No discovery: Vite optimizes `include` and nothing else, so a
+            // module missing from it is never optimized on first import, which
+            // reloaded the page and dropped the tests still loading — with a
+            // cold cache, as in CI, blueprint-synstate ran 40 of its 346 tests
+            // and passed (#3421). An ES module missing from it is served as it
+            // is; a CommonJS one fails to load, and fails the run.
+            noDiscovery: true,
           },
         } as const satisfies TestProjectConfiguration);
 
