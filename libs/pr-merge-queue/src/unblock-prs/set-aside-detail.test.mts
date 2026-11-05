@@ -81,7 +81,7 @@ describe(describeNotStarted, () => {
         }),
         5,
       ),
-      'nothing ran on its head for 5 min and code-check-result / result, style-check-result / result never reported: GitHub started no run for them',
+      'nothing ran on its head for 5 min, nor for 5 more after its check workflows were re-fired, and code-check-result / result, style-check-result / result never reported: GitHub started no run for them',
     );
   });
 });

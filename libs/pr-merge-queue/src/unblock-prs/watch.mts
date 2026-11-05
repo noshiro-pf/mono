@@ -1,8 +1,12 @@
 /** Polling one pull request until it merges, or until it will not. */
 
-import { isMergeableState } from 'pr-report-core';
+import {
+  isMergeableState,
+  MERGE_QUEUED_LABEL,
+  SKIP_CI_LABEL,
+} from 'pr-report-core';
 import { isRecord, Result } from 'ts-data-forge';
-import { log, type ApiContext } from '../lib/index.mjs';
+import { log, removeLabel, type ApiContext } from '../lib/index.mjs';
 import {
   describeWaitingOn,
   readHeadChecks,
@@ -14,9 +18,13 @@ import {
   GREEN_POLLS_BEFORE_GIVING_UP,
   MAX_CONSECUTIVE_POLL_ERRORS,
 } from './constants.mjs';
-import { viewPullRequest, viewReviewDecision } from './github.mjs';
-import { isSkipCiLabelled } from './labels.mjs';
-import { observeNotStarted } from './not-started.mjs';
+import {
+  addSkipCiLabel,
+  viewPullRequest,
+  viewReviewDecision,
+} from './github.mjs';
+import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
+import { observeNotStarted, type NotStartedWait } from './not-started.mjs';
 import type { Options } from './options.mjs';
 import {
   describeFailedChecks,
@@ -50,7 +58,10 @@ export const watch = async (
 
   let mut_greenPolls = 0;
 
-  let mut_notStartedSinceMs: number | undefined = undefined;
+  let mut_notStarted: NotStartedWait = {
+    sinceEpochMs: undefined,
+    refired: false,
+  };
 
   let mut_errors = 0;
 
@@ -137,15 +148,39 @@ export const watch = async (
       return { outcome: 'checks-failed', ...failed };
     }
 
-    const notStarted = observeNotStarted(
-      mut_notStartedSinceMs,
-      summary,
-      Date.now(),
-    );
+    const notStarted = observeNotStarted(mut_notStarted, summary, Date.now());
 
-    mut_notStartedSinceMs = notStarted.sinceEpochMs;
+    mut_notStarted = notStarted.wait;
 
-    if (notStarted.gaveUp) {
+    // Not for one a person has taken out of the queue meanwhile: the label
+    // event would start the matrix they asked to hold. The second grace sets it
+    // aside instead.
+    if (notStarted.action === 'refire' && !isMergeQueued(current)) {
+      log(
+        `#${pr.number}: nothing ran on its head, and ${MERGE_QUEUED_LABEL} is off it now, so the check workflows are not re-fired.`,
+      );
+
+      continue;
+    }
+
+    if (notStarted.action === 'refire') {
+      log(
+        `#${pr.number}: nothing ran on its head for ${CHECKS_NOT_STARTED_GRACE_MS / 60_000} min; putting ${SKIP_CI_LABEL} back on and taking it off, so that GitHub starts the check workflows again.`,
+      );
+
+      const refired = await refire(api, pr.number);
+
+      if (Result.isErr(refired)) {
+        // An add that failed leaves the head as it was, and the second grace
+        // sets it aside; a removal that failed leaves the label on, which the
+        // next poll reports as `skip-ci-labelled`.
+        log(`#${pr.number}: could not re-fire the workflows: ${refired.value}`);
+      }
+
+      continue;
+    }
+
+    if (notStarted.action === 'give-up') {
       const detail = describeNotStarted(
         summary,
         CHECKS_NOT_STARTED_GRACE_MS / 60_000,
@@ -211,4 +246,26 @@ export const watch = async (
   }
 
   return { outcome: 'stopped' };
+};
+
+/**
+ * Puts `skip-ci` back on a released pull request and takes it off again, so
+ * that its `unlabeled` event starts the check workflows GitHub did not start
+ * for the head (`not-started.mts`).
+ */
+const refire = async (
+  api: ApiContext,
+  prNumber: number,
+): Promise<Result<undefined, string>> => {
+  const added = await addSkipCiLabel(api, prNumber);
+
+  if (Result.isErr(added)) {
+    return Result.err(`cannot add ${SKIP_CI_LABEL}: ${added.value}`);
+  }
+
+  const removed = await removeLabel(api, prNumber, SKIP_CI_LABEL);
+
+  return Result.isErr(removed)
+    ? Result.err(`cannot remove ${SKIP_CI_LABEL} again: ${removed.value}`)
+    : Result.ok(undefined);
 };
