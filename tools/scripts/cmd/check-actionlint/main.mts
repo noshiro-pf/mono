@@ -5,6 +5,7 @@ import * as path from 'node:path';
 import { Arr, isRecord, Num, Result, unknownToString } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { plural } from '../../lib/plural.mjs';
 import {
   downloadWithFetch,
   installReleaseBinary,
@@ -182,7 +183,7 @@ export const checkActionlint = async ({
     !Arr.isNonEmpty(failures)
   ) {
     return Result.ok(
-      `Nothing to report in the workflows or in the steps of ${checkedActions} composite action${checkedActions === 1 ? '' : 's'} (${versions}).`,
+      `Nothing to report in the workflows or in the steps of ${plural(checkedActions, 'composite action')} (${versions}).`,
     );
   }
 

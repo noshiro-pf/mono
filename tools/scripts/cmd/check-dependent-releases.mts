@@ -27,6 +27,7 @@ import {
   type ChangesetFile,
 } from '../lib/changesets.mjs';
 import { RUNTIME_DEPENDENCY_FIELDS } from '../lib/dependency-fields.mjs';
+import { plural } from '../lib/plural.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -794,7 +795,7 @@ const describeFiles = (files: readonly string[]): string => {
 
   return others === 0
     ? ` (${files[0]})`
-    : ` (${files[0]} and ${others} other file${others === 1 ? '' : 's'})`;
+    : ` (${files[0]} and ${plural(others, 'other file')})`;
 };
 
 const isExported = (statement: DeepReadonly<ts.Statement>): boolean =>

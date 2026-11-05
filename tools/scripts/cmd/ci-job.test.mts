@@ -1,4 +1,10 @@
-import { dirtyStartFailures, jobFailures, jobSteps } from './ci-job.mjs';
+import {
+  diffInvocations,
+  dirtyStartFailures,
+  jobFailures,
+  jobSteps,
+  writesToShow,
+} from './ci-job.mjs';
 
 describe('jobSteps', () => {
   test('the build, then the command', () => {
@@ -73,5 +79,82 @@ describe('dirtyStartFailures', () => {
 
   test('a clean start is no failure', () => {
     assert.deepStrictEqual(dirtyStartFailures([]), []);
+  });
+});
+
+describe('writesToShow', () => {
+  // A local run, or a later `check-all` entry: the diff from the index of a
+  // file already changed would show those edits as the step's.
+  test('a file changed before the first step is named, not diffed', () => {
+    assert.deepStrictEqual(
+      writesToShow({
+        written: ['docs/a.md', 'libs/a/src/index.mts'],
+        changedAtStart: new Map<string, string>([['docs/a.md', 'abc']]),
+      }),
+      { shown: ['libs/a/src/index.mts'], alreadyChanged: ['docs/a.md'] },
+    );
+  });
+
+  test('on a tree that started clean, every write is diffed', () => {
+    assert.deepStrictEqual(
+      writesToShow({
+        written: ['docs/a.md'],
+        changedAtStart: new Map<string, string>(),
+      }),
+      { shown: ['docs/a.md'], alreadyChanged: [] },
+    );
+  });
+});
+
+describe('diffInvocations', () => {
+  const base = [
+    '--no-pager',
+    '--literal-pathspecs',
+    'diff',
+    '--no-ext-diff',
+    '--no-color',
+  ] as const;
+
+  // `git diff` alone lists nothing for a file the index does not have.
+  test('a new file is diffed from nothing, a tracked one from the index', () => {
+    assert.deepStrictEqual(
+      diffInvocations({
+        files: ['docs/a.md', 'docs/new.md'],
+        untracked: new Set<string>(['docs/new.md']),
+      }),
+      {
+        invocations: [
+          [...base, '--', 'docs/a.md'],
+          [...base, '--no-index', '--', '/dev/null', 'docs/new.md'],
+        ],
+        newFilesNotShown: [],
+      },
+    );
+  });
+
+  test('tracked files are diffed in batches of 500', () => {
+    const files = Array.from({ length: 501 }, (_, i) => `f${i}`);
+
+    assert.deepStrictEqual(
+      diffInvocations({ files, untracked: new Set<string>() }).invocations.map(
+        (args) => args.length - base.length - 1,
+      ),
+      [500, 1],
+    );
+  });
+
+  // A generator that writes a directory of new files would otherwise bury the
+  // failure under their content.
+  test('new files past the first 20 are named, not shown', () => {
+    const files = Array.from({ length: 22 }, (_, i) => `new/f${i}`);
+
+    const { invocations, newFilesNotShown } = diffInvocations({
+      files,
+      untracked: new Set<string>(files),
+    });
+
+    assert.lengthOf(invocations, 20);
+
+    assert.deepStrictEqual(newFilesNotShown, ['new/f20', 'new/f21']);
   });
 });
