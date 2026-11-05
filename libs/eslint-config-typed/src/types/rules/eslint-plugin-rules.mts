@@ -1,12 +1,6 @@
 /* cSpell:disable */
 import type { Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<
-  T extends readonly [Linter.StringSeverity, unknown],
-> = T[1] extends readonly unknown[]
-  ? readonly [Linter.StringSeverity, ...T[1]]
-  : T;
-
 /**
  * @description enforce consistent use of `output` assertions in rule tests
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/consistent-output.md
@@ -41,9 +35,7 @@ namespace ConsistentOutput {
   export type Options = 'always' | 'consistent';
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -96,9 +88,7 @@ namespace MetaPropertyOrdering {
   export type Options = readonly string[];
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -227,9 +217,7 @@ namespace NoIncompleteMetaSchema {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -355,9 +343,7 @@ namespace NoIncorrectMetaSchema {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -500,9 +486,7 @@ namespace NoPropertyInNode {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -666,9 +650,7 @@ namespace ReportMessageFormat {
   export type Options = string;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -727,9 +709,7 @@ namespace RequireMetaDocsDescription {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -772,9 +752,7 @@ namespace RequireMetaDocsRecommended {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -817,9 +795,7 @@ namespace RequireMetaDocsUrl {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -861,9 +837,7 @@ namespace RequireMetaFixable {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -955,9 +929,7 @@ namespace RequireMetaSchema {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -1019,9 +991,7 @@ namespace RequireTestCaseName {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -1074,9 +1044,7 @@ namespace TestCasePropertyOrdering {
   export type Options = readonly string[];
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -1116,9 +1084,7 @@ namespace TestCaseShorthandStrings {
     'as-needed' | 'never' | 'consistent' | 'consistent-as-needed';
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**

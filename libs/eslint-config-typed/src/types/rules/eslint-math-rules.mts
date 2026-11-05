@@ -1,12 +1,6 @@
 /* cSpell:disable */
 import type { Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<
-  T extends readonly [Linter.StringSeverity, unknown],
-> = T[1] extends readonly unknown[]
-  ? readonly [Linter.StringSeverity, ...T[1]]
-  : T;
-
 /**
  * @description enforce the conversion to absolute values to be the method you prefer
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/abs.html
@@ -51,9 +45,7 @@ namespace Abs {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -362,9 +354,7 @@ namespace PreferMathSumPrecise {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -407,9 +397,7 @@ namespace PreferMathTrunc {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**

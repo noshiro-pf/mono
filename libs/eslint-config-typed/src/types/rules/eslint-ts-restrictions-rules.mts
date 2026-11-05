@@ -52,9 +52,7 @@ namespace CheckDestructuringCompleteness {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -187,9 +185,7 @@ namespace NoRaggedCommentWrap {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -567,9 +563,7 @@ namespace PreferTernary {
   export type Options = 'always' | 'only-single-line';
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -612,9 +606,7 @@ namespace RequireImeGuardOnEnter {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 export type EslintTsRestrictionsRules = Readonly<{
