@@ -4,6 +4,7 @@ import dedent from 'dedent';
 import { expectType } from 'ts-data-forge';
 import type { MonoTypeFunction, ReadonlyRecord } from 'ts-type-forge';
 import { generateKeyValueRecordFromKeys } from '../functions/utils/node-utils.mjs';
+import { brandedNumberFromTypeUtils } from './constants.mjs';
 
 export type ConverterConfig = Readonly<{
   commentOutDeprecated: boolean;
@@ -187,29 +188,6 @@ export const enumType = generateKeyValueRecordFromKeys([
   'Int8',
   'Uint8',
 ] as const);
-
-const brandedNumberFromTypeUtils = [
-  'FiniteNumber',
-  'Int',
-  'NaNType',
-  'NEGATIVE_INFINITY',
-  'POSITIVE_INFINITY',
-  'PositiveNumber',
-  'NonNegativeNumber',
-  'InfiniteNumber',
-  'Int16',
-  'Uint16',
-  'Int32',
-  'Uint32',
-  'Float16',
-  'Float32',
-  'Float64',
-  'BigInt64',
-  'BigUint64',
-  'SafeInt',
-  'SafeUint',
-  'NegativeInt32',
-] as const;
 
 const brandedNumbers = [
   'StringSize',

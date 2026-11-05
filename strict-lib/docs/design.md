@@ -50,7 +50,8 @@ strict-typescript-lib/
 │       ├── tsconfig.lib-check.json      # 生成 lib 検証ベース (dom flavor)
 │       ├── tsconfig.lib-check.webworker.json
 │       ├── lib-check-entry.ts           # lib-check 用の entry（生成 lib へのアサーション）
-│       └── lib-check-entry.since-5.4.ts # 同、v5.4 以降のハーネスだけが読むもの
+│       ├── lib-check-entry.since-5.4.ts # 同、v5.4 以降のハーネスだけが読むもの
+│       └── lib-check-entry.branded.ts   # 同、branded 版。lib-files-check.branded が読む
 ├── scripts/
 │   ├── project-root-path.mts
 │   └── cmd/
