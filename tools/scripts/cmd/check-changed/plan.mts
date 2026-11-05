@@ -84,6 +84,10 @@ export const classifyChanges = ({
       mut_areas.add('manifest');
     }
 
+    if (DEPS_GRAPH_FILES.has(file)) {
+      mut_areas.add('deps-graph');
+    }
+
     if (file === LICENSE_GENERATOR || basename(file) === 'LICENSE') {
       mut_areas.add('license');
     }
@@ -229,7 +233,9 @@ export const buildPlan = ({
         }) as const,
     ),
 
-    ...(areas.has('manifest') ? [rootStep('generate', 'gen:deps-graph')] : []),
+    ...(areas.has('manifest') || areas.has('deps-graph')
+      ? [rootStep('generate', 'gen:deps-graph')]
+      : []),
 
     // Every published package's LICENSE is written from the license its
     // manifest declares, which `style-check.yml` regenerates and then asserts a
@@ -451,6 +457,8 @@ export const readManifestDependencies = (
  * the guards read would leave that generator's copies stale. `license` is a
  * `LICENSE` or `gen-license-files.mts` itself; `gen:license-files` runs on it
  * and on `manifest`, whose `license` and `private` fields decide what it writes.
+ * `deps-graph` is `gen-dependency-graph.mts` or the document it writes, which
+ * `gen:deps-graph` otherwise regenerates only for a `manifest`.
  */
 export const AREAS = [
   'root',
@@ -458,6 +466,7 @@ export const AREAS = [
   'prose',
   'manifest',
   'license',
+  'deps-graph',
   'strict-lib',
   'changeset',
   'repo-settings',
@@ -676,6 +685,11 @@ const FORMAT_CONFIG: ReadonlySet<string> = new Set<string>([
 const CONFIGS_SEGMENT = /(?:^|\/)configs\//u;
 
 const TYPESCRIPT_FILE = /\.(?:ts|mts|tsx)$/u;
+
+const DEPS_GRAPH_FILES: ReadonlySet<string> = new Set<string>([
+  'tools/scripts/cmd/gen-dependency-graph.mts',
+  'docs/package-dependencies.md',
+]);
 
 const LICENSE_GENERATOR = 'tools/scripts/cmd/gen-license-files.mts';
 

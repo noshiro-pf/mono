@@ -1,7 +1,12 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, isRecord, isString, Obj, unknownToString } from 'ts-data-forge';
-import { formatFiles, glob, isDirectlyExecuted, Result } from 'ts-repo-utils';
+import {
+  formatFiles,
+  getWorkspacePackages,
+  isDirectlyExecuted,
+  Result,
+} from 'ts-repo-utils';
 import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -70,16 +75,23 @@ export const genDependencyGraph = async (): Promise<
 
 type PackageInfo = Readonly<{
   name: string;
-  dir: string;
   runtime: ReadonlyRecord<string, string>;
   dev: ReadonlyRecord<string, string>;
   peer: ReadonlyRecord<string, string>;
 }>;
 
-const workspaceGlobs = ['libs/*', 'apps/*', 'tools/*'] as const;
-
 const stringRecord = (value: unknown): ReadonlyRecord<string, string> =>
   isRecord(value) ? Obj.filter(value, isString) : ({} as const);
+
+const toPackageInfo = (manifest: unknown): PackageInfo | undefined =>
+  !isRecord(manifest) || typeof manifest['name'] !== 'string'
+    ? undefined
+    : ({
+        name: manifest['name'],
+        runtime: stringRecord(manifest['dependencies']),
+        dev: stringRecord(manifest['devDependencies']),
+        peer: stringRecord(manifest['peerDependencies']),
+      } as const);
 
 const readPackage = async (dir: string): Promise<PackageInfo | undefined> => {
   const result = await Result.fromPromise(
@@ -87,41 +99,27 @@ const readPackage = async (dir: string): Promise<PackageInfo | undefined> => {
     fs.readFile(path.join(dir, 'package.json'), 'utf8'),
   );
 
-  if (Result.isErr(result)) {
-    return undefined;
-  }
-
-  const parsed: unknown = JSON.parse(result.value);
-
-  if (!isRecord(parsed) || typeof parsed['name'] !== 'string') {
-    return undefined;
-  }
-
-  return {
-    name: parsed['name'],
-    dir: path.relative(projectRootPath, dir),
-    runtime: stringRecord(parsed['dependencies']),
-    dev: stringRecord(parsed['devDependencies']),
-    peer: stringRecord(parsed['peerDependencies']),
-  };
+  return Result.isErr(result)
+    ? undefined
+    : toPackageInfo(JSON.parse(result.value));
 };
 
+/**
+ * The members `ws:build` orders: `getWorkspacePackages` expands the root
+ * `workspaces`, so a member glob added there is in the graph with no edit here.
+ * It concatenates each glob's matches, so a member two globs match is kept
+ * once, and the paths are sorted by code unit so the output does not depend on
+ * the machine's collation.
+ */
 const readWorkspacePackages = async (): Promise<readonly PackageInfo[]> => {
-  const dirLists = await Promise.all(
-    workspaceGlobs.map(async (pattern) => {
-      const result = await glob(pattern, {
-        cwd: projectRootPath,
-        onlyDirectories: true,
-        absolute: true,
-      });
+  const members = await getWorkspacePackages(projectRootPath);
 
-      return Result.isErr(result) ? [] : result.value;
-    }),
-  );
+  const byPath = new Map(members.map((pkg) => [pkg.path, pkg.packageJson]));
 
-  const infos = await Promise.all(dirLists.flat().toSorted().map(readPackage));
-
-  return infos.filter((info) => info !== undefined);
+  return Array.from(byPath.keys())
+    .toSorted()
+    .map((dir) => toPackageInfo(byPath.get(dir)))
+    .filter((info) => info !== undefined);
 };
 
 /** Keeps only the entries that name a package in this repository. */
@@ -360,9 +358,15 @@ const render = (
  * document is regenerated as a whole rather than hand-edited.
  */
 const cycleNotes: readonly string[] = [
-  '## 内部依存はすべて `workspace:` である',
+  '## 内部依存は `workspace:` である',
   '',
-  '自作パッケージを npm の公開版で参照している箇所はもう無い。',
+  '例外は strict-lib の公開バンドル（`strict-ts-lib-vX.Y`）の `ts-type-forge` で、',
+  'バンドルは `output/lib` をそのまま公開するので、その依存は利用者向けのレンジのまま',
+  '書かれ、npm から解決される。`ws:build` は名前で順序を決めるので、上の段階表では',
+  'それでも `ts-type-forge` の後に置かれる。',
+  '`peerDependencies` は利用者向けのレンジで書き、同じパッケージを',
+  '`devDependencies` に `workspace:*` で並べて、リポジトリ内ではそちらで解決する。',
+  '',
   '`pnpm install` 直後（`dist/` がまだ 1 つも無い状態）から `pnpm run ws:build`',
   'が通る。',
   '',
@@ -372,7 +376,7 @@ const cycleNotes: readonly string[] = [
   '',
   'ビルドスクリプトは `ts-repo-utils` や `ts-data-forge` を**実行**する。',
   'パッケージ名で解決すると `dist/` が要り、`ts-type-forge`（第 1 段階）の',
-  'ビルドが `ts-data-forge`（第 2 段階）を必要とする循環になる。',
+  'ビルドがそれより後の段階の `ts-data-forge` を必要とする循環になる。',
   '',
   '`tools/configs/tsconfig.tsx.json` がこれらの名前をソースへ写像し、',
   'すべての `tsx` 起動が `--tsconfig` でそれを読む。`tsx` がその場で',
@@ -395,7 +399,7 @@ const cycleNotes: readonly string[] = [
   '',
   '### 3. ビルド順は実行時依存だけで決める',
   '',
-  '各パッケージは自分が使うツールチェーンを devDependency として',
+  '各パッケージ（strict-lib の公開バンドルを除く）は自分が使うツールチェーンを devDependency として',
   '`workspace:*` で宣言している。`eslint-config-typed` は `ts-data-forge` に',
   '依存するので、これは必ず循環する。',
   '',

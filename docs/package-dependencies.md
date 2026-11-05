@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 72 個。
+このリポジトリの workspace パッケージは 102 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -54,6 +54,11 @@ graph LR
   tiny_router_react_hooks["tiny-router-react-hooks"]
   ts_fortress_types["ts-fortress-types"]
   ts_utils_additional["ts-utils-additional"]
+  _sumi_lang_checker["@sumi-lang/checker"]
+  _sumi_lang_cli["@sumi-lang/cli"]
+  _sumi_lang_conformance["@sumi-lang/conformance"]
+  _sumi_lang_eslint_config["@sumi-lang/eslint-config"]
+  _sumi_lang_oxlint_config["@sumi-lang/oxlint-config"]
   better_preact_use_state["better-preact-use-state"]
   better_react_use_state["better-react-use-state"]
   blueprint_synstate["blueprint-synstate"]
@@ -84,6 +89,31 @@ graph LR
   ts_repo_utils["ts-repo-utils"]
   ts_std_forge["ts-std-forge"]
   ts_type_forge["ts-type-forge"]
+  strict_ts_lib_scripts_common["strict-ts-lib-scripts-common"]
+  strict_ts_lib_v5_0_source["strict-ts-lib-v5.0-source"]
+  strict_ts_lib_v5_0["strict-ts-lib-v5.0"]
+  strict_ts_lib_v5_1_source["strict-ts-lib-v5.1-source"]
+  strict_ts_lib_v5_1["strict-ts-lib-v5.1"]
+  strict_ts_lib_v5_2_source["strict-ts-lib-v5.2-source"]
+  strict_ts_lib_v5_2["strict-ts-lib-v5.2"]
+  strict_ts_lib_v5_3_source["strict-ts-lib-v5.3-source"]
+  strict_ts_lib_v5_3["strict-ts-lib-v5.3"]
+  strict_ts_lib_v5_4_source["strict-ts-lib-v5.4-source"]
+  strict_ts_lib_v5_4["strict-ts-lib-v5.4"]
+  strict_ts_lib_v5_5_source["strict-ts-lib-v5.5-source"]
+  strict_ts_lib_v5_5["strict-ts-lib-v5.5"]
+  strict_ts_lib_v5_6_source["strict-ts-lib-v5.6-source"]
+  strict_ts_lib_v5_6["strict-ts-lib-v5.6"]
+  strict_ts_lib_v5_7_source["strict-ts-lib-v5.7-source"]
+  strict_ts_lib_v5_7["strict-ts-lib-v5.7"]
+  strict_ts_lib_v5_8_source["strict-ts-lib-v5.8-source"]
+  strict_ts_lib_v5_8["strict-ts-lib-v5.8"]
+  strict_ts_lib_v5_9_source["strict-ts-lib-v5.9-source"]
+  strict_ts_lib_v5_9["strict-ts-lib-v5.9"]
+  strict_ts_lib_v6_0_source["strict-ts-lib-v6.0-source"]
+  strict_ts_lib_v6_0["strict-ts-lib-v6.0"]
+  strict_ts_lib_v7_0_source["strict-ts-lib-v7.0-source"]
+  strict_ts_lib_v7_0["strict-ts-lib-v7.0"]
   algo_app --> synstate
   algo_app --> synstate_dom
   algo_app --> synstate_router
@@ -233,6 +263,14 @@ graph LR
   ts_fortress_types --> ts_data_forge
   ts_fortress_types --> ts_fortress
   ts_utils_additional --> ts_data_forge
+  _sumi_lang_checker --> ts_data_forge
+  _sumi_lang_cli --> _sumi_lang_checker
+  _sumi_lang_cli --> _sumi_lang_oxlint_config
+  _sumi_lang_cli --> ts_data_forge
+  _sumi_lang_conformance --> _sumi_lang_checker
+  _sumi_lang_conformance --> ts_data_forge
+  _sumi_lang_oxlint_config --> eslint_rule_forge
+  _sumi_lang_oxlint_config --> ts_data_forge
   blueprint_synstate --> ts_type_forge
   blueprint_synstate --> synstate
   blueprint_synstate --> synstate_dom
@@ -314,6 +352,18 @@ graph LR
   ts_repo_utils --> ts_data_forge
   ts_repo_utils --> ts_type_forge
   ts_std_forge --> ts_type_forge
+  strict_ts_lib_v5_0 --> ts_type_forge
+  strict_ts_lib_v5_1 --> ts_type_forge
+  strict_ts_lib_v5_2 --> ts_type_forge
+  strict_ts_lib_v5_3 --> ts_type_forge
+  strict_ts_lib_v5_4 --> ts_type_forge
+  strict_ts_lib_v5_5 --> ts_type_forge
+  strict_ts_lib_v5_6 --> ts_type_forge
+  strict_ts_lib_v5_7 --> ts_type_forge
+  strict_ts_lib_v5_8 --> ts_type_forge
+  strict_ts_lib_v5_9 --> ts_type_forge
+  strict_ts_lib_v6_0 --> ts_type_forge
+  strict_ts_lib_v7_0 --> ts_type_forge
 ```
 
 ## ビルド順
@@ -326,15 +376,15 @@ graph LR
 
 ### `ws:build` が使う段階
 
-| 段階 | パッケージ                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| ---: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|    1 | `synstate-dom-docs`, `tiny-router-preact-hooks`, `tiny-router-react-hooks`, `better-preact-use-state`, `better-react-use-state`, `ts-type-forge`                                                                                                                                                                                                                                                                                                                                                     |
-|    2 | `eslint-rule-forge`, `ts-std-forge`                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-|    3 | `eslint-plugin-synstate`, `eslint-plugin-ts-std-forge`, `ts-data-forge`                                                                                                                                                                                                                                                                                                                                                                                                                              |
-|    4 | `github-view-defaults-extension`, `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `ts-utils-additional`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`                                                                                                            |
-|    5 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `pr-report-core`, `synstate-dom`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `synstate-router`, `ts-codemod-cli`                                                                                                                                                                      |
-|    6 | `catan-dice`, `color-demo`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `lambda-calculus-interpreter-synstate-dom`, `mahjong-calculator-app`, `pr-manager`, `profile`, `react-blueprintjs-utils`, `react-utils-styled`, `split-view-extension`, `@synstate/docs`, `synstate-dom-benchmark`, `synstate-dom-sample-app`, `blueprint-synstate`, `github-settings-as-code`, `pr-merge-queue`, `synstate-router-dom`, `synstate-router-react` |
-|    7 | `algo-app`, `annotation-tool`, `cant-stop-probability`, `event-schedule-app`, `event-schedule-app-functions`, `housing-loan-calculator`, `life-plan-simulator`, `react-mui-utils`, `synstate-router-dom-sample-app`, `synstate-router-react-sample-app`, `task-manager`                                                                                                                                                                                                                              |
+| 段階 | パッケージ                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ---: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|    1 | `synstate-dom-docs`, `tiny-router-preact-hooks`, `tiny-router-react-hooks`, `@sumi-lang/eslint-config`, `better-preact-use-state`, `better-react-use-state`, `ts-type-forge`, `strict-ts-lib-scripts-common`, `strict-ts-lib-v5.0-source`, `strict-ts-lib-v5.1-source`, `strict-ts-lib-v5.2-source`, `strict-ts-lib-v5.3-source`, `strict-ts-lib-v5.4-source`, `strict-ts-lib-v5.5-source`, `strict-ts-lib-v5.6-source`, `strict-ts-lib-v5.7-source`, `strict-ts-lib-v5.8-source`, `strict-ts-lib-v5.9-source`, `strict-ts-lib-v6.0-source`, `strict-ts-lib-v7.0-source` |
+|    2 | `eslint-rule-forge`, `ts-std-forge`, `strict-ts-lib-v5.0`, `strict-ts-lib-v5.1`, `strict-ts-lib-v5.2`, `strict-ts-lib-v5.3`, `strict-ts-lib-v5.4`, `strict-ts-lib-v5.5`, `strict-ts-lib-v5.6`, `strict-ts-lib-v5.7`, `strict-ts-lib-v5.8`, `strict-ts-lib-v5.9`, `strict-ts-lib-v6.0`, `strict-ts-lib-v7.0`                                                                                                                                                                                                                                                              |
+|    3 | `eslint-plugin-synstate`, `eslint-plugin-ts-std-forge`, `ts-data-forge`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+|    4 | `github-view-defaults-extension`, `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `ts-utils-additional`, `@sumi-lang/checker`, `@sumi-lang/oxlint-config`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`                                                                                                                              |
+|    5 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `@sumi-lang/cli`, `@sumi-lang/conformance`, `octokit-safe-types`, `pr-report-core`, `synstate-dom`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `synstate-router`, `ts-codemod-cli`                                                                                                                                                                                              |
+|    6 | `catan-dice`, `color-demo`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `lambda-calculus-interpreter-synstate-dom`, `mahjong-calculator-app`, `pr-manager`, `profile`, `react-blueprintjs-utils`, `react-utils-styled`, `split-view-extension`, `@synstate/docs`, `synstate-dom-benchmark`, `synstate-dom-sample-app`, `blueprint-synstate`, `github-settings-as-code`, `pr-merge-queue`, `synstate-router-dom`, `synstate-router-react`                                                                     |
+|    7 | `algo-app`, `annotation-tool`, `cant-stop-probability`, `event-schedule-app`, `event-schedule-app-functions`, `housing-loan-calculator`, `life-plan-simulator`, `react-mui-utils`, `synstate-router-dom-sample-app`, `synstate-router-react-sample-app`, `task-manager`                                                                                                                                                                                                                                                                                                  |
 
 ### 参考: devDependencies も含めた場合
 
@@ -425,6 +475,15 @@ graph LR
 | `ts-fortress-types`                        | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                   |
 | `ts-utils-additional`                      | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                         |
 | `ts-utils-additional`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                     |
+| `@sumi-lang/checker`                       | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                         |
+| `@sumi-lang/checker`                       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                                                                                                                             |
+| `@sumi-lang/cli`                           | dep  | `@sumi-lang/checker`&nbsp;`workspace:*`<br>`@sumi-lang/oxlint-config`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                             |
+| `@sumi-lang/cli`                           | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                                                                                                                             |
+| `@sumi-lang/conformance`                   | dep  | `@sumi-lang/checker`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                              |
+| `@sumi-lang/conformance`                   | dev  | `@sumi-lang/cli`&nbsp;`workspace:*`<br>`@sumi-lang/eslint-config`&nbsp;`workspace:*`<br>`@sumi-lang/oxlint-config`&nbsp;`workspace:*`<br>`eslint-config-typed`&nbsp;`workspace:*`                                                                                                                                                                                                          |
+| `@sumi-lang/eslint-config`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                               |
+| `@sumi-lang/oxlint-config`                 | dep  | `eslint-rule-forge`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                               |
+| `@sumi-lang/oxlint-config`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                                                                                                                             |
 | `better-preact-use-state`                  | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                               |
 | `better-react-use-state`                   | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                               |
 | `blueprint-synstate`                       | dep  | `ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                                                                                         |
@@ -453,16 +512,16 @@ graph LR
 | `pr-report-core`                           | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-fortress`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                                                     |
 | `pr-report-core`                           | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                   |
 | `synstate`                                 | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-std-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                              |
-| `synstate`                                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`synstate-react-hooks-compat`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                  |
+| `synstate`                                 | dev  | `@sumi-lang/cli`&nbsp;`workspace:*`<br>`eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`synstate-react-hooks-compat`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`           |
 | `synstate-dom`                             | dep  | `ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                                                                                         |
 | `synstate-dom`                             | peer | `synstate`&nbsp;`>=7.0.1`<br>`ts-data-forge`&nbsp;`>=14.11.1`                                                                                                                                                                                                                                                                                                                              |
 | `synstate-dom`                             | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                            |
 | `synstate-preact-hooks`                    | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                  |
-| `synstate-preact-hooks`                    | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                   |
+| `synstate-preact-hooks`                    | dev  | `@sumi-lang/cli`&nbsp;`workspace:*`<br>`eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                            |
 | `synstate-preact-signals`                  | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                  |
 | `synstate-preact-signals`                  | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                   |
 | `synstate-react-hooks`                     | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                  |
-| `synstate-react-hooks`                     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                   |
+| `synstate-react-hooks`                     | dev  | `@sumi-lang/cli`&nbsp;`workspace:*`<br>`eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                            |
 | `synstate-react-hooks-compat`              | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                  |
 | `synstate-react-hooks-compat`              | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                   |
 | `synstate-router`                          | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                                                   |
@@ -481,14 +540,39 @@ graph LR
 | `ts-data-forge`                            | dep  | `ts-std-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                                                                                                                                    |
 | `ts-data-forge`                            | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                       |
 | `ts-fortress`                              | dep  | `ts-data-forge`&nbsp;`workspace:~`<br>`ts-std-forge`&nbsp;`workspace:~`<br>`ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                                                                                              |
-| `ts-fortress`                              | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                     |
+| `ts-fortress`                              | dev  | `@sumi-lang/cli`&nbsp;`workspace:*`<br>`eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                              |
 | `ts-repo-utils`                            | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                                                   |
 | `ts-repo-utils`                            | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                         |
 | `ts-std-forge`                             | dep  | `ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                                                                                                                                                                         |
 | `ts-std-forge`                             | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                             |
 | `ts-type-forge`                            | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                 |
+| `strict-ts-lib-scripts-common`             | dev  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                         |
+| `strict-ts-lib-v5.0-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v5.0`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
+| `strict-ts-lib-v5.1-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v5.1`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
+| `strict-ts-lib-v5.2-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v5.2`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
+| `strict-ts-lib-v5.3-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v5.3`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
+| `strict-ts-lib-v5.4-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v5.4`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
+| `strict-ts-lib-v5.5-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v5.5`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
+| `strict-ts-lib-v5.6-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v5.6`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
+| `strict-ts-lib-v5.7-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v5.7`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
+| `strict-ts-lib-v5.8-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v5.8`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
+| `strict-ts-lib-v5.9-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v5.9`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
+| `strict-ts-lib-v6.0-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v6.0`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
+| `strict-ts-lib-v7.0-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                    |
+| `strict-ts-lib-v7.0`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                              |
 
-72 / 72 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+90 / 102 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 
@@ -503,15 +587,22 @@ root はワークスペースメンバーではないので、上のビルド順
 | `eslint-plugin-ts-type-forge` | `workspace:*` |
 | `pr-merge-queue`              | `workspace:*` |
 | `pr-report-core`              | `workspace:*` |
+| `strict-ts-lib-v7.0`          | `workspace:*` |
 | `ts-data-forge`               | `workspace:*` |
 | `ts-fortress`                 | `workspace:*` |
 | `ts-repo-utils`               | `workspace:*` |
 | `ts-std-forge`                | `workspace:*` |
 | `ts-type-forge`               | `workspace:*` |
 
-## 内部依存はすべて `workspace:` である
+## 内部依存は `workspace:` である
 
-自作パッケージを npm の公開版で参照している箇所はもう無い。
+例外は strict-lib の公開バンドル（`strict-ts-lib-vX.Y`）の `ts-type-forge` で、
+バンドルは `output/lib` をそのまま公開するので、その依存は利用者向けのレンジのまま
+書かれ、npm から解決される。`ws:build` は名前で順序を決めるので、上の段階表では
+それでも `ts-type-forge` の後に置かれる。
+`peerDependencies` は利用者向けのレンジで書き、同じパッケージを
+`devDependencies` に `workspace:*` で並べて、リポジトリ内ではそちらで解決する。
+
 `pnpm install` 直後（`dist/` がまだ 1 つも無い状態）から `pnpm run ws:build`
 が通る。
 
@@ -521,7 +612,7 @@ root はワークスペースメンバーではないので、上のビルド順
 
 ビルドスクリプトは `ts-repo-utils` や `ts-data-forge` を**実行**する。
 パッケージ名で解決すると `dist/` が要り、`ts-type-forge`（第 1 段階）の
-ビルドが `ts-data-forge`（第 2 段階）を必要とする循環になる。
+ビルドがそれより後の段階の `ts-data-forge` を必要とする循環になる。
 
 `tools/configs/tsconfig.tsx.json` がこれらの名前をソースへ写像し、
 すべての `tsx` 起動が `--tsconfig` でそれを読む。`tsx` がその場で
@@ -544,7 +635,7 @@ root はワークスペースメンバーではないので、上のビルド順
 
 ### 3. ビルド順は実行時依存だけで決める
 
-各パッケージは自分が使うツールチェーンを devDependency として
+各パッケージ（strict-lib の公開バンドルを除く）は自分が使うツールチェーンを devDependency として
 `workspace:*` で宣言している。`eslint-config-typed` は `ts-data-forge` に
 依存するので、これは必ず循環する。
 
