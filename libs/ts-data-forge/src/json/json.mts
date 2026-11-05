@@ -39,65 +39,103 @@ export namespace Json {
    * }
    *
    * assert.isTrue(Result.isErr(failed));
-   *
-   * // With reviver
-   * const jsonWithDate = '{"created": "2024-01-01T00:00:00.000Z"}';
-   *
-   * const withReviver = Json.parse(jsonWithDate, (key, value) =>
-   *   key === 'created' && typeof value === 'string' ? new Date(value) : value,
-   * );
-   *
-   * assert.isTrue(Result.isOk(withReviver));
-   *
-   * // With a reviver, the result is whatever the reviver returned, not JSON:
-   * // `created` is a `Date` here although it is typed `JsonValue`. Widen it to
-   * // `unknown` before narrowing it.
-   * const revived: unknown = withReviver.value;
-   *
-   * assert.isTrue(isRecord(revived));
-   *
-   * assert.instanceOf(revived['created'], Date);
    * ```
    *
    * @param text - A valid JSON string to parse. Can contain any valid JSON data
    *   type: primitives (string, number, boolean, null), arrays, or objects.
-   * @param reviver - Optional function that transforms parsed values. Called
-   *   for each key-value pair in the JSON. The function receives the key name
-   *   and parsed value, and should return the transformed value. For nested
-   *   objects, inner objects are processed before outer objects, so the
-   *   `value` an outer object is passed holds what the reviver already
-   *   returned for its children, which need not be JSON (see `@returns`).
-   *   Returning
-   *   `undefined` for a child deletes that property from an object and leaves
-   *   a hole in an array. The root is passed with the key `''`.
    * @returns A `Result<JsonValue, string>` containing:
    *
    *   - On success: `Result.ok(parsedValue)` where `parsedValue` is the parsed
-   *       JSON. With a reviver it is whatever the reviver returned for the root
-   *       (a `Date`, `undefined`, ...), which is not checked to be JSON although
-   *       it is typed `JsonValue`; widen it to `unknown` before narrowing it,
-   *       as the example does.
+   *       JSON.
    *   - On failure: `Result.err(errorMessage)` where `errorMessage` describes the
    *       parsing error
+   *
+   *   The form that takes a reviver is deprecated: its result is whatever the
+   *   reviver returned, which need not be JSON although it is typed
+   *   `JsonValue`. Use {@link parseWithReviver}, which types it `unknown`.
    */
-  export const parse = (
+  export const parse: Parse = (
     text: string,
     reviver?: (this: unknown, key: string, value: JsonValue) => unknown,
-  ): Result<JsonValue, string> => {
+  ): Result<JsonValue, string> =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- without a reviver the result is JSON; with one, the deprecated form types it `JsonValue` as it always did
+    parseWithReviver(text, reviver as Reviver | undefined) as Result<
+      JsonValue,
+      string
+    >;
+
+  /**
+   * Safely converts a JSON string into a JavaScript value, passing each value
+   * through `reviver` as `JSON.parse` does, without throwing exceptions.
+   *
+   * The result is whatever the reviver returned for the root, built from what
+   * it returned for every child, so it is typed `unknown`: narrow it before
+   * use.
+   *
+   * @example
+   *
+   * ```ts
+   * const jsonWithDate = '{"created": "2024-01-01T00:00:00.000Z"}';
+   *
+   * const revived = Json.parseWithReviver(jsonWithDate, (key, value) =>
+   *   key === 'created' && typeof value === 'string' ? new Date(value) : value,
+   * );
+   *
+   * assert.isTrue(Result.isOk(revived));
+   *
+   * // The result is whatever the reviver returned, typed `unknown`: here
+   * // `created` is a `Date`, not JSON.
+   * const root = Result.unwrapOkOr(revived, undefined);
+   *
+   * assert.isTrue(isRecord(root));
+   *
+   * assert.instanceOf(root['created'], Date);
+   * ```
+   *
+   * @param text - A valid JSON string to parse.
+   * @param reviver - Called for each key-value pair, children before their
+   *   parent, so the `value` a parent is passed holds what the reviver already
+   *   returned for its children, which need not be JSON. Returning `undefined`
+   *   for a child deletes that property from an object and leaves a hole in an
+   *   array. The root is passed with the key `''`. `undefined` parses as
+   *   {@link parse} does, typed `unknown`.
+   * @returns `Result.ok` of what the reviver returned for the root, or
+   *   `Result.err` of a message describing the parsing error.
+   */
+  export const parseWithReviver = (
+    text: string,
+    reviver: Reviver | undefined,
+  ): Result<unknown, string> => {
     try {
-      return Result.ok(
-        JSON.parse(
-          text,
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          reviver as (this: unknown, key: string, value: unknown) => unknown,
-        ),
-      );
+      return Result.ok(JSON.parse(text, reviver));
     } catch (error: unknown) {
       const errStr = unknownToString(error);
 
       return Result.err(errStr);
     }
   };
+
+  /** What {@link parseWithReviver} calls for each key-value pair. */
+  export type Reviver = (this: unknown, key: string, value: unknown) => unknown;
+
+  /** The call signatures of {@link parse}. */
+  // Two signatures rather than one with an optional reviver, so that the one
+  // taking a reviver carries `@deprecated` and the other does not.
+  /* eslint-disable @typescript-eslint/unified-signatures */
+  type Parse = {
+    (text: string): Result<JsonValue, string>;
+
+    /**
+     * @deprecated Use `Json.parseWithReviver`, whose result is typed
+     *   `unknown`: a reviver need not return JSON. The next major removes this
+     *   form (`NEXT_MAJOR.md`).
+     */
+    (
+      text: string,
+      reviver?: (this: unknown, key: string, value: JsonValue) => unknown,
+    ): Result<JsonValue, string>;
+  };
+  /* eslint-enable @typescript-eslint/unified-signatures */
 
   /**
    * Safely converts a JavaScript value to a JSON string without throwing
