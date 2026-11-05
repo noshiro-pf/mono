@@ -617,8 +617,8 @@ root はワークスペースメンバーではないので、上のビルド順
 
 自作 CLI（`gen-index-ts` / `format-uncommitted` / `repo-settings` …）も
 `node_modules/.bin` の実体ではなく CLI ソースを `tsx` 経由で呼ぶ。
-ビルド前に走る CI ステップ（`check-should-run-type-checks` など）が
-これに当たる。
+例えば各パッケージの `z:gen-index-ts` スクリプトは
+`libs/ts-repo-utils/src/cmd/gen-index-ts.mts` を `tsx` で実行する。
 
 ### 2. ビルドは公開するものだけを型チェックする
 
@@ -653,10 +653,12 @@ devDependencies ではなく `dependencies` に置く必要がある
 エラーにする。`scripts/**` と `configs/**` でこのルールを無効化していた
 override も外してある。
 
-検証されない箇所が 1 つだけある: `eslint.config.mts` 自身は
-`eslint-config-typed` が既定で ignore しているため lint されない。
-そこから import する `eslint-config-typed` と `eslint-plugin-ts-*` は
-規約として明示的に宣言している。
+`eslint.config.mts` 自身は `eslint-config-typed` が既定で ignore する
+ため、この lint では検証されない。root と `libs/*`・`apps/*` のものは
+`check:published-deps` が別途検証する（devDependencies からの import は
+許される）。対象は `tools/configs/eslint.published-deps.mts` と root の
+`check:published-deps` スクリプトの glob の両方で決まり、`languages/*/*`
+と `strict-lib/` のものはまだ検証されていない。
 
 バージョンは `pnpm-workspace.yaml` の `catalog:` が単一の情報源。
 各パッケージは `"eslint": "catalog:"` と書く。公開パッケージの
