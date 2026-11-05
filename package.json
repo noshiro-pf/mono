@@ -56,6 +56,7 @@
     "check:root:auto-fix-contexts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-auto-fix-contexts.mts",
     "check:root:check-changed-reach": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-changed-reach.mts",
     "check:root:ci-commands": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-ci-commands.mts",
+    "check:root:ci-job-shape": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-ci-job-shape.mts",
     "check:root:codecov-builds": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-codecov-builds.mts",
     "check:root:deps-built-guard": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-deps-built-guard.mts",
     "check:root:dist-lib-replacement": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-dist-lib-replacement.mts",

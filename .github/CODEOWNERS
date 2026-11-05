@@ -32,6 +32,18 @@
 # られた状態は、次に誰かが `apply` を実行した瞬間に効く。
 /repo-settings/ @noshiro-pf
 
+# diff gate の無視リスト。パスを足すとそのワークフローはそのパスだけの差分を
+# 黙ってスキップし、誤って足しても何も失敗しない（ワークフローが読むパスかどう
+# かは人にしか判断できない）。めったに変わらないので、ゲートにしても auto-merge
+# はほとんど止まらない。
+/tools/configs/gate-ignore-lists.json @noshiro-pf
+
+# 上のリストを読んでスキップを決める gate のコード（`check-diff`）と、setup
+# action が `pnpm install` の前に動かす install ステップ。パターンの照合が変わ
+# ればリストを足したのと同じことが黙って起き、install はすべてのジョブで依存を
+# 入れる。どちらもめったに変わらない。
+/tools/scripts/cmd/workflow-steps.mts @noshiro-pf
+
 # あえて入れていないもの:
 #
 # - `pnpm-workspace.yaml` — `minimumReleaseAge` と `allowBuilds` という供給
