@@ -2,6 +2,7 @@ import { parseMergeAfter } from 'pr-report-core';
 import {
   existingConflict,
   mergeAfterTrailer,
+  mergeBeforeCycle,
   mergeBeforeNote,
   resolveBase,
   undeclared,
@@ -173,6 +174,29 @@ describe(undeclared, () => {
     assert.deepStrictEqual(
       undeclared('```\nMerge-After: #1901\n```\n', [1901]),
       [1901],
+    );
+  });
+});
+
+// #2790: the cycle check before the push sees only what this run declares,
+// not what the body already says or what the issues it closes add to it.
+describe(mergeBeforeCycle, () => {
+  test('names a --merge-before number the final body merges after', () => {
+    assert.strictEqual(
+      mergeBeforeCycle([7, 9], 'Merge-After: #9\n\nSummary.'),
+      9,
+    );
+  });
+
+  test('passes when the body names none of them', () => {
+    assert.isUndefined(mergeBeforeCycle([7], 'Merge-After: #3\n\nSummary.'));
+
+    assert.isUndefined(mergeBeforeCycle([7], 'Summary.'));
+  });
+
+  test('reads no declaration inside a code fence', () => {
+    assert.isUndefined(
+      mergeBeforeCycle([7], ['```md', 'Merge-After: #7', '```'].join('\n')),
     );
   });
 });

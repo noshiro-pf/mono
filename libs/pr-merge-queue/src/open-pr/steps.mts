@@ -140,4 +140,19 @@ export const undeclared = (
   return Arr.uniq(declared.filter((n) => !named.has(n)));
 };
 
+/**
+ * The first `--merge-before` number that `body` — this pull request's own, as
+ * it stands once this run has written into it — declares with `Merge-After:`:
+ * writing this one into that one's `Merge-After:` would have each wait on the
+ * other. `undefined` when there is none.
+ */
+export const mergeBeforeCycle = (
+  mergeBefore: readonly number[],
+  body: string,
+): number | undefined => {
+  const named = new Set(parseMergeAfter(body));
+
+  return mergeBefore.find((n) => named.has(n));
+};
+
 const MERGE_AFTER_LINE = /^\s*merge-after\s*:/iu;

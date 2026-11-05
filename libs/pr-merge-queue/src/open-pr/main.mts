@@ -27,6 +27,7 @@ import type { Options } from './options.mjs';
 import {
   existingConflict,
   mergeAfterTrailer,
+  mergeBeforeCycle,
   mergeBeforeNote,
   resolveBase,
   undeclared,
@@ -210,16 +211,15 @@ export const openPullRequest = async (
     return carried;
   }
 
+  // Its failure is returned once the labels are on: the pull request exists by
+  // now, and one left without `skip-ci` would start its checks.
   const declared = await declareBefore(
     api,
     prNumber.value,
     options.mergeBefore,
     defaultBranch,
+    carried.value,
   );
-
-  if (Result.isErr(declared)) {
-    return declared;
-  }
 
   const labelled = await addLabel(api, prNumber.value, SKIP_CI_LABEL);
 
@@ -237,6 +237,10 @@ export const openPullRequest = async (
 
   log(`#${prNumber.value}: ${AUTO_REBASE_LABEL} is on`);
 
+  if (Result.isErr(declared)) {
+    return declared;
+  }
+
   return Result.ok(
     [
       `#${prNumber.value}: ${existing.value === undefined ? 'opened' : 'open already'}, ${SKIP_CI_LABEL} and ${AUTO_REBASE_LABEL} on, auto-merge left unarmed.`,
@@ -251,13 +255,14 @@ export const openPullRequest = async (
  * GitHub to say which issues those are; and, into a pull request that was open
  * already, what this run declares (the layer below, `--merge-after`) and its
  * body does not, since only a body this run writes starts with it. A run on a
- * body that says them already writes nothing.
+ * body that says them already writes nothing. Resolves to the body as it now
+ * stands, which `declareBefore` checks its successors against.
  */
 const carryStartAfter = async (
   api: ApiContext,
   prNumber: number,
   declared: readonly number[],
-): Promise<Result<undefined, string>> => {
+): Promise<Result<string, string>> => {
   const order = await missingInheritedOrder(api, prNumber, declared);
 
   if (Result.isErr(order)) {
@@ -271,14 +276,12 @@ const carryStartAfter = async (
   const toWrite = [...notYet, ...missing] as const;
 
   if (!Arr.isNonEmpty(toWrite)) {
-    return Result.ok(undefined);
+    return Result.ok(body);
   }
 
-  const updated = await updateBody(
-    api,
-    prNumber,
-    withMergeAfter(body, toWrite),
-  );
+  const written = withMergeAfter(body, toWrite);
+
+  const updated = await updateBody(api, prNumber, written);
 
   if (Result.isErr(updated)) {
     return Result.err(`cannot write the Merge-After: ${updated.value}`);
@@ -296,7 +299,7 @@ const carryStartAfter = async (
     );
   }
 
-  return Result.ok(undefined);
+  return Result.ok(written);
 };
 
 /**
@@ -331,13 +334,27 @@ const checkSuccessors = async (
  * Writes `prNumber` into the `Merge-After:` of each `--merge-before` pull
  * request, read again now rather than when it was checked, so that an edit made
  * in between is kept. One that names it already is left as it is.
+ *
+ * Nothing is written when `ownBody` — this pull request's body as this run left
+ * it — already merges after one of them. `checkSuccessors` saw only what this
+ * run declares; the body of a pull request open already, and the order the
+ * issues it closes add, are known only now (#2790).
  */
 const declareBefore = async (
   api: ApiContext,
   prNumber: number,
   mergeBefore: readonly number[],
   defaultBranch: string,
+  ownBody: string,
 ): Promise<Result<undefined, string>> => {
+  const cycle = mergeBeforeCycle(mergeBefore, ownBody);
+
+  if (cycle !== undefined) {
+    return Result.err(
+      `#${prNumber}'s body says Merge-After #${cycle} (written there before, or from the Start-After of an issue it closes), so --merge-before #${cycle} would be a cycle; nothing was written into any --merge-before pull request`,
+    );
+  }
+
   for (const number of mergeBefore) {
     if (number === prNumber) {
       return Result.err(
