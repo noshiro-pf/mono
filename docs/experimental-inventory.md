@@ -1,7 +1,7 @@
 <!-- cspell:ignore catan dezero firebaserc idfn Ymdhm -->
 
 <!-- Paths under experimental/packages/, and paths that were renamed or removed since. -->
-<!-- doc-paths-ignore: tools/eslint-custom-rules apps/io-ts-types apps/better-preact-use-state apps/event-schedule-app/configs/playwright.config.ts -->
+<!-- doc-paths-ignore: tools/eslint-custom-rules apps/io-ts-types apps/better-preact-use-state apps/event-schedule-app/configs/playwright.config.ts apps/tiny-router-react-hooks -->
 
 # `experimental/` の棚卸し
 
@@ -87,24 +87,27 @@ UI 違い。復元するなら core + どちらか 1 つ。
 
 app に連れられて来るもの。単体で復元する理由は薄い。
 
-| util                           | 行数 | 用途                        |
-| :----------------------------- | ---: | :-------------------------- |
-| `react-blueprintjs-utils`      | 4432 | Blueprint.js の薄いラッパ   |
-| `react-utils`                  |  487 | React hooks 詰め合わせ      |
-| `preact-utils`                 |  472 | 同上の Preact 版            |
-| `react-utils-styled`           |  347 | styled 版                   |
-| `numeric-input-utils`          |  287 | 数値入力の状態管理          |
-| `react-mui-utils`              |  245 | MUI ラッパ                  |
-| `tiny-router-observable`       |  185 | 自作ルータ（syncflow 依存） |
-| `tiny-router-react-hooks`      |  140 | 同上                        |
-| `tiny-router-preact-hooks`     |  140 | 同上                        |
-| `better-react-use-state`       |   75 | `useState` の readonly 版   |
-| `better-preact-use-state`      |   74 | 同上                        |
-| `resize-observer-react-hooks`  |   55 | ResizeObserver hook         |
-| `resize-observer-preact-hooks` |   55 | 同上                        |
+| util                           | 行数 | 用途                                            |
+| :----------------------------- | ---: | :---------------------------------------------- |
+| `react-blueprintjs-utils`      | 4432 | Blueprint.js の薄いラッパ                       |
+| `react-utils`                  |  487 | React hooks 詰め合わせ                          |
+| `preact-utils`                 |  472 | 同上の Preact 版                                |
+| `react-utils-styled`           |  347 | styled 版                                       |
+| `numeric-input-utils`          |  287 | 数値入力の状態管理                              |
+| `react-mui-utils`              |  245 | MUI ラッパ                                      |
+| `tiny-router-observable`       |  185 | 自作ルータ（syncflow 依存・復元後に削除・下記） |
+| `tiny-router-react-hooks`      |  140 | その React hooks（復元後に削除・下記）          |
+| `tiny-router-preact-hooks`     |  140 | その Preact hooks（復元後に削除・下記）         |
+| `better-react-use-state`       |   75 | `useState` の readonly 版                       |
+| `better-preact-use-state`      |   74 | 同上                                            |
+| `resize-observer-react-hooks`  |   55 | ResizeObserver hook                             |
+| `resize-observer-preact-hooks` |   55 | 同上                                            |
 
-`tiny-router-*` は `syncflow` に依存しているので、復元するなら `synstate` へ
+`tiny-router-observable` は `syncflow` に依存しているので、復元するなら `synstate` へ
 書き換えることになる。`react-utils-styled` はどの app からも参照されていない。
+
+（2026-11-05 追記）`tiny-router-*` の 3 つは復元したあと、`libs/synstate-router`
+に置き換えて削除した（#3362）。
 
 ### others / slides（6 個）
 

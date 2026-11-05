@@ -60,7 +60,7 @@ export const products: DeepReadonly<{
     },
     {
       id: 'tiny-router-observable',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/apps/tiny-router-observable',
+      link: 'https://github.com/noshiro-pf/mono/tree/04646e536b68d01e9806b99ed51f7a238568e30e/apps/tiny-router-observable',
       title: 'tiny-router-observable',
       subtitle: '簡易的なRouterライブラリ',
       description: 'React Router より簡単なAPIのライブラリが欲しかったので自作',
