@@ -33,11 +33,12 @@ by case. In order:
    a manifest, the lockfile, a `LICENSE` or its generator, and
    `gen:verify-npm-packages` for any change that is not prose alone, since its
    committed `local/` copies are written from `smoke/`, the manifests and the
-   generator's own code. **A generator that changes the tree fails the run**,
-   naming itself and the files; that is the dirty tree CI's
-   `assert-repo-is-clean` reports with no hint which generator wrote it. Only
-   the run in which it writes fails: a later run cannot tell its output, left
-   uncommitted, from a hand edit, so commit it before moving on.
+   generator's own code (it also removes a gone package's project from
+   `published/`). **A generator that changes the tree fails the run**, naming
+   itself and the files; that is the dirty tree CI's `assert-repo-is-clean`
+   reports with no hint which generator wrote it. Only the run in which it
+   writes fails: a later run cannot tell its output, left uncommitted, from a
+   hand edit, so commit it before moving on.
    After the touched packages' own, `gen` runs in every member that declares (in
    any dependency field) a package whose code changed, since a generator can
    read what its package declares: the synstate docs measure synstate's bundle
