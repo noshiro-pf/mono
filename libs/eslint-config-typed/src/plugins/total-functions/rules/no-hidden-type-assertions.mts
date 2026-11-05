@@ -9,6 +9,7 @@ import {
 } from '@typescript-eslint/utils';
 import { typeWrapperLayers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
+import type { StrictPick } from 'ts-type-forge';
 import {
   forEachChild,
   isIdentifier,
@@ -21,6 +22,8 @@ import {
   SyntaxKind,
   type Symbol as TsSymbol,
   type Type,
+  type TypeChecker,
+  type TypeNode,
   type TypeParameterDeclaration,
 } from 'typescript';
 import { createRule } from './common.mjs';
@@ -36,7 +39,7 @@ export const noHiddenTypeAssertions = createRule({
     },
     messages: {
       errorStringGeneric:
-        'Do not use hidden type assertions. Specify `unknown` or `never` instead of an arbitrary type argument.',
+        'Do not use hidden type assertions. Set the type argument to `unknown` or `never` rather than to an arbitrary type, whether written or inferred from the context.',
     },
     schema: [],
     defaultOptions: [],
@@ -45,6 +48,31 @@ export const noHiddenTypeAssertions = createRule({
     const parserServices = ESLintUtils.getParserServices(context);
 
     const checker = parserServices.program.getTypeChecker();
+
+    /**
+     * `getTypeArgumentsForResolvedSignature` is public from TypeScript 5.8; the
+     * peer range reaches back to 5.0, where a call is judged by its written
+     * type argument or the type parameter's default alone.
+     */
+    const checkerFrom58: Partial<
+      StrictPick<TypeChecker, 'getTypeArgumentsForResolvedSignature'>
+    > = checker;
+
+    /**
+     * The type a call sets the type parameter at `index` to by what it writes:
+     * its type argument or, failing one, the parameter's default.
+     */
+    const writtenTypeArgumentOrDefault = (
+      typeArguments: readonly TypeNode[] | undefined,
+      index: number,
+      typeParameter: TypeParameterDeclaration,
+    ): Type | undefined => {
+      const typeNode = typeArguments?.[index] ?? typeParameter.default;
+
+      return typeNode === undefined
+        ? undefined
+        : checker.getTypeAtLocation(typeNode);
+    };
 
     /**
      * Whether `node` or a node under it is a type reference resolving to
@@ -74,19 +102,16 @@ export const noHiddenTypeAssertions = createRule({
           false));
 
     /**
-     * The type parameters of `declaration` that its return type uses, with
-     * their positional index (to look up the corresponding type arguments), or
-     * `undefined` when its return type uses none of them.
+     * The type parameters of `declaration` that its return type uses and no
+     * (value) parameter does, with their positional index (to look up the
+     * corresponding type arguments), or `undefined` when there are none. A call
+     * that sets one of them to anything but `unknown` or `never` is a hidden
+     * type assertion; a type parameter a value parameter uses is set by the
+     * argument instead.
      */
-    const typeParamsUsedInReturnTypeOf = (
+    const hiddenTypeParamsOf = (
       declaration: SignatureDeclaration,
-    ):
-      | readonly Readonly<{
-          typeParameter: TypeParameterDeclaration;
-          symbol: TsSymbol;
-          index: number;
-        }>[]
-      | undefined => {
+    ): HiddenTypeParams => {
       const { typeParameters, type: returnType } = declaration;
 
       if (
@@ -97,66 +122,37 @@ export const noHiddenTypeAssertions = createRule({
         return undefined;
       }
 
-      const used = typeParameters.flatMap((typeParameter, index) => {
+      const hidden = typeParameters.flatMap((typeParameter, index) => {
         const symbol = checker.getSymbolAtLocation(typeParameter.name);
 
         return symbol !== undefined &&
-          referencesTypeParameter(returnType, symbol)
-          ? [{ typeParameter, symbol, index }]
+          referencesTypeParameter(returnType, symbol) &&
+          !declaration.parameters.some(
+            (parameter) =>
+              parameter.type !== undefined &&
+              referencesTypeParameter(parameter.type, symbol),
+          )
+          ? [{ typeParameter, index }]
           : [];
       });
 
-      return Arr.isNonEmpty(used) ? used : undefined;
+      return Arr.isNonEmpty(hidden) ? hidden : undefined;
     };
-
-    /**
-     * Whether every type parameter of `declaration` that its return type uses
-     * also appears in at least one (value) parameter. If so, the function
-     * probably isn't a hidden type assertion.
-     */
-    const returnTypeParamsAppearInValueParams = (
-      declaration: SignatureDeclaration,
-      typeParamsUsedInReturnType: readonly Readonly<{ symbol: TsSymbol }>[],
-    ): boolean =>
-      typeParamsUsedInReturnType.every(({ symbol }) =>
-        declaration.parameters.some(
-          (parameter) =>
-            parameter.type !== undefined &&
-            referencesTypeParameter(parameter.type, symbol),
-        ),
-      );
 
     const mut_analysisCache = new WeakMap<
       SignatureDeclaration,
-      SignatureAnalysis
+      HiddenTypeParams
     >();
 
-    /**
-     * What a call of `declaration` needs to know of it, computed once per
-     * declaration: the type parameters its return type uses (`undefined` as for
-     * {@link typeParamsUsedInReturnTypeOf}), and whether each of them appears
-     * in a value parameter too.
-     */
+    /** {@link hiddenTypeParamsOf}, computed once per declaration. */
     const analyzeSignature = (
       declaration: SignatureDeclaration,
-    ): SignatureAnalysis => {
+    ): HiddenTypeParams => {
       if (mut_analysisCache.has(declaration)) {
         return mut_analysisCache.get(declaration);
       }
 
-      const typeParamsUsedInReturnType =
-        typeParamsUsedInReturnTypeOf(declaration);
-
-      const analysis: SignatureAnalysis =
-        typeParamsUsedInReturnType === undefined
-          ? undefined
-          : ({
-              typeParamsUsedInReturnType,
-              appearInValueParams: returnTypeParamsAppearInValueParams(
-                declaration,
-                typeParamsUsedInReturnType,
-              ),
-            } as const);
+      const analysis = hiddenTypeParamsOf(declaration);
 
       mut_analysisCache.set(declaration, analysis);
 
@@ -178,9 +174,7 @@ export const noHiddenTypeAssertions = createRule({
           return false;
         }
 
-        const analysis = analyzeSignature(declaration);
-
-        return analysis !== undefined && !analysis.appearInValueParams;
+        return analyzeSignature(declaration) !== undefined;
       });
 
     /**
@@ -191,7 +185,9 @@ export const noHiddenTypeAssertions = createRule({
      * function is assignable to every instantiation of it. Every layer
      * under the outermost cast is asked, so that `parse as unknown as () =>
      * Foo` is seen too. A call whose result is `unknown` or `never` asserts
-     * nothing.
+     * nothing; for a type guard or an assertion function, that is the type it
+     * narrows to, and one asserting truthiness alone (`asserts x`) asserts no
+     * type.
      */
     const isCallThroughCastOfHiddenTypeAssertion = (
       node: TSESTree.CallExpression,
@@ -209,9 +205,14 @@ export const noHiddenTypeAssertions = createRule({
         return false;
       }
 
-      const returnType = callSignature.getReturnType();
+      const predicate = checker.getTypePredicateOfSignature(callSignature);
 
-      if (isTypeUnknownType(returnType) || isTypeNeverType(returnType)) {
+      const assertedType =
+        predicate === undefined
+          ? callSignature.getReturnType()
+          : predicate.type;
+
+      if (assertedType === undefined || isUnknownOrNever(assertedType)) {
         return false;
       }
 
@@ -260,41 +261,37 @@ export const noHiddenTypeAssertions = createRule({
           return;
         }
 
-        // Of all the type parameters that appear in the return type, is each
-        // set to `unknown` or `never` in this specific call, by its type
-        // argument or, failing one, its default? If so, this is safe even if
-        // the function being called is a hidden type assertion.
-        const allCorrespondingTypeArgumentsAreUnknownType =
-          analysis.typeParamsUsedInReturnType.every(
-            ({ index, typeParameter }) => {
-              const typeArgument = (tsExpressionNode.typeArguments ?? [])[
-                index
-              ];
+        // Is a type parameter that only the return type uses set to anything
+        // but `unknown` or `never` in this specific call? Both what the checker
+        // resolved and what the call writes (its type argument or, failing one,
+        // the default) are asked, and either being `unknown` or `never` will
+        // do. A type argument neither written nor inferred resolves to its
+        // default or constraint, or else to `unknown`, since a predicate
+        // return infers nothing; one inferred from the contextual type is what
+        // the call asserts, unless the default is `unknown` or `never`, as
+        // before resolved type arguments were asked: a `never` default says the
+        // type parameter is meant to go unused, as `E` in
+        // `ok<S, E = never>(s: S): Ok<S> | Err<E>`.
+        const resolvedTypeArguments =
+          checkerFrom58.getTypeArgumentsForResolvedSignature?.(callSignature);
 
-              const typeArgumentType =
-                typeArgument !== undefined
-                  ? checker.getTypeAtLocation(typeArgument)
-                  : undefined;
+        const assertsSomething = analysis.some(({ index, typeParameter }) => {
+          const resolved = resolvedTypeArguments?.[index];
 
-              const typeParamDefaultType =
-                typeParameter.default !== undefined
-                  ? checker.getTypeAtLocation(typeParameter.default)
-                  : undefined;
+          if (resolved !== undefined && isUnknownOrNever(resolved)) {
+            return false;
+          }
 
-              const typeToCheck = typeArgumentType ?? typeParamDefaultType;
-
-              return (
-                typeToCheck !== undefined &&
-                (isTypeUnknownType(typeToCheck) || isTypeNeverType(typeToCheck))
-              );
-            },
+          const written = writtenTypeArgumentOrDefault(
+            tsExpressionNode.typeArguments,
+            index,
+            typeParameter,
           );
 
-        if (allCorrespondingTypeArgumentsAreUnknownType) {
-          return;
-        }
+          return written === undefined || !isUnknownOrNever(written);
+        });
 
-        if (!analysis.appearInValueParams) {
+        if (assertsSomething) {
           context.report({
             node,
             messageId: 'errorStringGeneric',
@@ -305,13 +302,12 @@ export const noHiddenTypeAssertions = createRule({
   },
 } as const);
 
-type SignatureAnalysis =
-  | Readonly<{
-      typeParamsUsedInReturnType: readonly Readonly<{
-        typeParameter: TypeParameterDeclaration;
-        symbol: TsSymbol;
-        index: number;
-      }>[];
-      appearInValueParams: boolean;
-    }>
+type HiddenTypeParams =
+  | readonly Readonly<{
+      typeParameter: TypeParameterDeclaration;
+      index: number;
+    }>[]
   | undefined;
+
+const isUnknownOrNever = (type: Type): boolean =>
+  isTypeUnknownType(type) || isTypeNeverType(type);
