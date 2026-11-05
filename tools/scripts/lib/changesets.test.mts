@@ -116,26 +116,31 @@ describe('isChangesetPath', () => {
   });
 });
 
-describe('@changesets/parse', () => {
-  // The guards read front matter with the root's `@changesets/parse`, and are
-  // right only while it is the one `changeset version` reads it with.
-  test('is the version `@changesets/cli` reads changesets with', () => {
-    const fromRoot = createRequire(
-      path.resolve(projectRootPath, 'package.json'),
-    );
+describe('the changesets packages the guards read with', () => {
+  // The guards read changesets with these root devDependencies, and are right
+  // only while each is the copy `changeset version` uses.
+  const fromRoot = createRequire(path.resolve(projectRootPath, 'package.json'));
 
-    const fromRead = createRequire(
-      createRequire(fromRoot.resolve('@changesets/cli/package.json')).resolve(
-        '@changesets/read/package.json',
-      ),
-    );
+  const fromCli = createRequire(
+    fromRoot.resolve('@changesets/cli/package.json'),
+  );
 
-    // pnpm links one copy per version, so one version is one real path.
+  const fromRead = createRequire(
+    fromCli.resolve('@changesets/read/package.json'),
+  );
+
+  // pnpm links one copy per version, so one version is one real path.
+  test.each([
+    ['@changesets/parse', fromRead],
+    ['@changesets/assemble-release-plan', fromCli],
+    ['@changesets/config', fromCli],
+    ['@changesets/types', fromCli],
+  ] as const)('%s is the copy `@changesets/cli` uses', (name, from) => {
     assert.strictEqual(
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      fs.realpathSync(fromRoot.resolve('@changesets/parse/package.json')),
+      fs.realpathSync(fromRoot.resolve(`${name}/package.json`)),
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      fs.realpathSync(fromRead.resolve('@changesets/parse/package.json')),
+      fs.realpathSync(from.resolve(`${name}/package.json`)),
     );
   });
 });

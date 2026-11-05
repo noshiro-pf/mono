@@ -1,3 +1,6 @@
+import { assembleReleasePlan } from '@changesets/assemble-release-plan';
+import { validateConfig } from '@changesets/config';
+import type { NewChangeset, Packages } from '@changesets/types';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
@@ -5,6 +8,7 @@ import {
   hasKey,
   isRecord,
   isString,
+  Json,
   Result,
   unknownToString,
 } from 'ts-data-forge';
@@ -21,7 +25,6 @@ import {
 } from '../lib/changesets.mjs';
 import { RUNTIME_DEPENDENCY_FIELDS } from '../lib/dependency-fields.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
-import { parseReleaseGroups } from './check-linked-releases.mjs';
 
 /**
  * Holds a breaking release of a workspace package until every published package
@@ -46,12 +49,15 @@ import { parseReleaseGroups } from './check-linked-releases.mjs';
  *   `>=<version>`), and consumers install the peer themselves, so updating the
  *   dependent alone asks them to take the dependency's break. That follows
  *   from the edge, whatever `src/` does with it, so the check fails as for a
- *   re-export, and no override applies. The dependent is released with the
- *   dependency when any of its fields names it as `workspace:*`, `workspace:^`
- *   or `workspace:~`, which no breaking release stays in, and when a changeset
- *   names it or a member of a `fixed` group it is in. A peer edge with neither, such as
- *   `>=6.2.1` on a dependent nothing else releases, moves nothing, and is read
- *   as any other edge.
+ *   re-export. Whether the dependent is released is what `changeset version`
+ *   would decide: the release plan `@changesets/assemble-release-plan` makes of
+ *   the changesets and `.changeset/config.json`, which releases a dependent
+ *   whose range the dependency's next version leaves (`workspace:^`,
+ *   `^6.2.1`), one another released dependency reaches, and the members of a
+ *   `fixed` group. A peer edge the plan does not release, such as `>=6.2.1` on
+ *   a dependent nothing else releases, moves nothing, and is read as any other
+ *   edge. No override applies to a peer edge any breaking release of the
+ *   dependency releases.
  * - **re-export** — its `src/` exports a binding it imports from the
  *   dependency, as such or as an alias ({@link findReExportedPackages}), read
  *   as TypeScript syntax. The dependency's break is, nearly always, the
@@ -61,7 +67,9 @@ import { parseReleaseGroups } from './check-linked-releases.mjs';
  *   get through — a type in the dependent's signatures, the behavior of a
  *   function or a CLI built on the dependency — but whether it does depends on
  *   what broke, which no reading of the edge can tell. These are listed,
- *   grouped by dependency, without holding the release. The dependents' own
+ *   grouped by dependency, without holding the release; those the plan does
+ *   not release apart, since where a range of theirs admits the new version,
+ *   their consumers get it with no release of theirs. The dependents' own
  *   tests run against the new dependency in the same pull request, which
  *   catches the behavior they cover; the list is for what they do not.
  *
@@ -71,9 +79,9 @@ import { parseReleaseGroups } from './check-linked-releases.mjs';
  *
  * A package's breaking release, the dependency's or the dependent's, is read
  * from its own changesets and from the `fixed` and `linked` groups in
- * `.changeset/config.json`: a breaking bump of any member counts for every
- * member. For `linked` that is what `check:prose:linked-releases` already
- * requires the changesets to say.
+ * `.changeset/config.json` (as `@changesets/config` reads it, globs expanded):
+ * a breaking bump of any member counts for every member. For `linked` that is
+ * what `check:prose:linked-releases` already requires the changesets to say.
  *
  * A breaking bump is `major`, or `minor` while the package is still `0.x`.
  * The dependents checked are the published workspace packages, other than the
@@ -92,13 +100,14 @@ import { parseReleaseGroups } from './check-linked-releases.mjs';
  */
 export const checkDependentReleases = ({
   changesets,
-  groups,
+  config,
   packages,
   reExports,
   overrides,
 }: Readonly<{
   changesets: readonly ChangesetFile[];
-  groups: readonly ReleaseGroup[];
+  /** `.changeset/config.json`, parsed as JSON. */
+  config: unknown;
   packages: readonly WorkspacePackage[];
   /**
    * Per dependent, the packages its `src/` re-exports from, each with the files
@@ -112,6 +121,65 @@ export const checkDependentReleases = ({
   );
 
   const bumps = listChangesetBumps(changesets);
+
+  const workspace = toChangesetsPackages(packages);
+
+  const validated = validateConfig(config, workspace);
+
+  if (validated.config === undefined) {
+    return Result.err(
+      [
+        `❌ ${CONFIG_FILE} is not a config changesets accepts:`,
+        '',
+        ...validated.errors.map((error) => `  - ${error}`),
+      ].join('\n'),
+    );
+  }
+
+  const changesetsConfig = validated.config;
+
+  const groups: readonly ReleaseGroup[] = [
+    ...changesetsConfig.fixed.map((members) => ({
+      kind: 'fixed' as const,
+      members,
+    })),
+    ...changesetsConfig.linked.map((members) => ({
+      kind: 'linked' as const,
+      members,
+    })),
+  ] as const;
+
+  /** What `changeset version` releases of `planned`, by name. */
+  const planReleases = (
+    planned: readonly ChangesetBump[],
+  ): Result<ReadonlySet<string>, string> =>
+    Result.mapErr(
+      Result.fromThrowable(
+        () =>
+          new Set(
+            assembleReleasePlan(
+              Array.from(toNewChangesets(planned)),
+              workspace,
+              changesetsConfig,
+              undefined,
+            )
+              .releases.filter(({ type }) => type !== 'none')
+              .map(({ name }) => name),
+          ),
+      ),
+      unknownToString,
+    );
+
+  const plan = planReleases(bumps);
+
+  if (Result.isErr(plan)) {
+    return Result.err(
+      `❌ changesets cannot make a release plan of the changesets: ${plan.value}`,
+    );
+  }
+
+  // The packages `changeset version` releases.
+  const releasing = plan.value;
 
   const breakingDependents = new Set(
     packages
@@ -136,12 +204,38 @@ export const checkDependentReleases = ({
           version,
           peerRange: declared.find(({ field }) => field === 'peerDependencies')
             ?.range,
-          pinned: declared.some(({ range }) =>
-            PINNED_WORKSPACE_RANGES.has(range),
-          ),
         }),
       ),
     );
+
+  // What any breaking release of `dependency` releases, one plan per dependency
+  // an override of a peer edge names.
+  const releasedWithBreak = new Map(
+    Arr.uniq(
+      overrides
+        .filter(({ dependency, dependents }) =>
+          edges.some(
+            (edge) =>
+              edge.dependency === dependency &&
+              dependents.includes(edge.dependent) &&
+              edge.peerRange !== undefined,
+          ),
+        )
+        .map(({ dependency }) => dependency),
+    ).map(
+      (dependency) =>
+        [
+          dependency,
+          planReleases([
+            {
+              file: '(override check)',
+              name: dependency,
+              bump: breakingBumpOf(versions.get(dependency) ?? ''),
+            },
+          ]),
+        ] as const,
+    ),
+  );
 
   const staleOverrides = overrides.flatMap(
     ({ dependency, dependents, exposure }) =>
@@ -158,10 +252,20 @@ export const checkDependentReleases = ({
           ];
         }
 
-        if (edge.peerRange !== undefined && edge.pinned) {
-          return [
-            `${key}: ${dependent} names ${dependency} in its peerDependencies and is released with any breaking release of it, which holds its release whatever src/ does. Remove the entry.`,
-          ];
+        const withBreak = releasedWithBreak.get(dependency);
+
+        if (withBreak !== undefined && edge.peerRange !== undefined) {
+          if (Result.isErr(withBreak)) {
+            return [
+              `${key}: changesets cannot plan a breaking release of ${dependency} alone, by which the override is judged: ${withBreak.value}`,
+            ];
+          }
+
+          if (withBreak.value.has(dependent)) {
+            return [
+              `${key}: ${dependent} names ${dependency} in its peerDependencies and is released with any breaking release of it, which holds its release whatever src/ does. Remove the entry.`,
+            ];
+          }
         }
 
         const detected = reExports.get(dependent)?.has(dependency) === true;
@@ -190,37 +294,8 @@ export const checkDependentReleases = ({
       .filter((key, index, keys) => keys.indexOf(key) !== index),
   ).map((key) => `${key}: overridden more than once. Keep one entry.`);
 
-  // The packages a changeset releases whatever their dependencies do.
-  const releasedAnyway = new Set(
-    packages
-      .filter(({ name }) =>
-        bumps.some(
-          // `none` names a package and releases nothing.
-          (bump) =>
-            bump.bump !== 'none' &&
-            (bump.name === name ||
-              groups.some(
-                ({ kind, members }) =>
-                  kind === 'fixed' &&
-                  members.some((pattern) =>
-                    matchesGroupMember(pattern, name),
-                  ) &&
-                  members.some((pattern) =>
-                    matchesGroupMember(pattern, bump.name),
-                  ),
-              )),
-        ),
-      )
-      .map(({ name }) => name),
-  );
-
-  const exposureOf = ({
-    dependency,
-    dependent,
-    peerRange,
-    pinned,
-  }: Edge): EdgeKind =>
-    peerRange !== undefined && (pinned || releasedAnyway.has(dependent))
+  const exposureOf = ({ dependency, dependent, peerRange }: Edge): EdgeKind =>
+    peerRange !== undefined && releasing.has(dependent)
       ? ({ kind: 'peer', range: peerRange } as const)
       : ({
           kind:
@@ -290,23 +365,52 @@ export const checkDependentReleases = ({
       unannounced.filter(({ exposure }) => exposure.kind === 'review'),
       ({ dependency }) => dependency,
     ),
-    ([dependency, reviewed]) =>
-      [
+    ([dependency, reviewed]) => {
+      const patched = reviewed.filter(({ dependent }) =>
+        releasing.has(dependent),
+      );
+
+      const unreleased = reviewed.filter(
+        ({ dependent }) => !releasing.has(dependent),
+      );
+
+      return [
         `${dependency} has a breaking release pending:`,
         '',
         ...describePending(dependency, reviewed[0]?.pending ?? []),
         '',
-        'and these dependents of it are given no breaking bump, so changesets',
-        'would release each as a dependency patch:',
-        '',
-        ...reviewed.map(
-          ({ dependent, version }) => `  - ${dependent}@${version}`,
-        ),
-        '',
-        'Where the change reaches what one of them exposes — a type in its',
-        'signatures, the behavior of a function or a CLI built on it — give that',
-        'one a breaking changeset of its own; where it does not, the patch is right.',
-      ].join('\n'),
+        ...(Arr.isNonEmpty(patched)
+          ? [
+              'and these dependents of it are given no breaking bump, so changesets',
+              'would release each with what a changeset gives it, or as a dependency',
+              'patch:',
+              '',
+              ...patched.map(
+                ({ dependent, version }) => `  - ${dependent}@${version}`,
+              ),
+              '',
+              'Where the change reaches what one of them exposes — a type in its',
+              'signatures, the behavior of a function or a CLI built on it — give that',
+              'one a breaking changeset of its own; where it does not, the patch is right.',
+            ]
+          : []),
+        ...(Arr.isNonEmpty(patched) && Arr.isNonEmpty(unreleased) ? [''] : []),
+        ...(Arr.isNonEmpty(unreleased)
+          ? [
+              `${Arr.isNonEmpty(patched) ? 'And these' : 'and these dependents of it'}, which changesets does not release:`,
+              '',
+              ...unreleased.map(
+                ({ dependent, version }) => `  - ${dependent}@${version}`,
+              ),
+              '',
+              `Where a range of theirs admits the new ${dependency}, their consumers get`,
+              'it with no release of theirs, and a release of theirs would not stop',
+              'that: where the change reaches what one of them exposes, narrow that',
+              'range and release it.',
+            ]
+          : []),
+      ].join('\n');
+    },
   );
 
   if (Arr.isNonEmpty(violations)) {
@@ -461,10 +565,6 @@ export const listDependencies = (
       : [];
   });
 
-/** Whether `name` is matched by a `fixed` or `linked` group member pattern. */
-export const matchesGroupMember = (pattern: string, name: string): boolean =>
-  path.posix.matchesGlob(name, pattern);
-
 export type WorkspacePackage = Readonly<{
   name: string;
   version: string;
@@ -487,9 +587,9 @@ export type Dependency = Readonly<{
   range: string;
 }>;
 
-export type ReleaseGroup = Readonly<{
+type ReleaseGroup = Readonly<{
   kind: 'fixed' | 'linked';
-  /** As written in the config; a member may be a glob. */
+  /** Package names, the config's globs expanded by `@changesets/config`. */
   members: readonly string[];
 }>;
 
@@ -521,11 +621,6 @@ type Edge = Readonly<{
   version: string;
   /** As written in the dependent's `peerDependencies`, if it is there. */
   peerRange: string | undefined;
-  /**
-   * Whether a field names it as one of {@link PINNED_WORKSPACE_RANGES}, so that
-   * any breaking release of the dependency releases the dependent.
-   */
-  pinned: boolean;
 }>;
 
 type UnannouncedEdge = Edge &
@@ -561,16 +656,6 @@ const OVERRIDES: readonly ExposureOverride[] = [] as const;
 
 const SELF_RELATIVE = 'tools/scripts/cmd/check-dependent-releases.mts';
 
-/**
- * The `peerDependencies` ranges that pin a dependent to the dependency's current
- * line, so that changesets releases the dependent on any breaking release.
- */
-const PINNED_WORKSPACE_RANGES: ReadonlySet<string> = new Set<string>([
-  'workspace:*',
-  'workspace:^',
-  'workspace:~',
-]);
-
 const CONFIG_FILE = '.changeset/config.json';
 
 /** The directory the strict standard library bundles sit under. */
@@ -589,15 +674,13 @@ const findBreaking = (
     .map((bump) => ({ ...bump, via: undefined }));
 
   const viaGroups = groups
-    .filter(({ members }) =>
-      members.some((pattern) => matchesGroupMember(pattern, name)),
-    )
+    .filter(({ members }) => members.includes(name))
     .flatMap(({ kind, members }) =>
       bumps
         .filter(
           (bump) =>
             bump.name !== name &&
-            members.some((pattern) => matchesGroupMember(pattern, bump.name)) &&
+            members.includes(bump.name) &&
             isBreaking(bump.bump, version),
         )
         .map((bump) => ({ ...bump, via: kind })),
@@ -618,6 +701,64 @@ const describePending = (
 
 const breakingBumpOf = (version: string): Bump =>
   version.startsWith('0.') ? 'minor' : 'major';
+
+/**
+ * The workspace as `@changesets/assemble-release-plan` reads it. Only the
+ * runtime fields are given: a `devDependencies` edge releases nothing. Nor is
+ * `private`: a published package cannot depend on a private one, and a private
+ * one is never a checked dependent, so how `privatePackages` treats it changes
+ * no edge.
+ */
+const toChangesetsPackages = (
+  packages: readonly WorkspacePackage[],
+): Packages =>
+  ({
+    rootDir: PLAN_ROOT,
+    rootPackage: {
+      dir: PLAN_ROOT,
+      packageJson: { name: PLAN_ROOT_NAME, version: '0.0.0' },
+    },
+    packages: packages.map(({ name, version, dependencies }) => ({
+      dir: path.posix.join(PLAN_ROOT, name),
+      packageJson: {
+        name,
+        version,
+        ...Object.fromEntries(
+          RUNTIME_DEPENDENCY_FIELDS.map((field) => [
+            field,
+            Object.fromEntries(
+              dependencies
+                .filter((dependency) => dependency.field === field)
+                .map((dependency) => [dependency.name, dependency.range]),
+            ),
+          ]),
+        ),
+      },
+    })),
+    tool: { type: 'pnpm' },
+  }) as const;
+
+/** The changesets as `@changesets/assemble-release-plan` reads them. */
+const toNewChangesets = (
+  bumps: readonly ChangesetBump[],
+): readonly NewChangeset[] =>
+  Array.from(
+    Map.groupBy(bumps, ({ file }) => file),
+    ([file, named]) => ({
+      id: file,
+      summary: '',
+      releases: named.map(({ name, bump }) => ({ name, type: bump })),
+    }),
+  );
+
+/**
+ * Where the release plan places the workspace. Only the dependency fields and
+ * versions decide a plan, not where a package is.
+ */
+const PLAN_ROOT = '/workspace';
+
+/** A name no package can have, for the workspace root the plan asks for. */
+const PLAN_ROOT_NAME = '(workspace root)';
 
 /**
  * Why an edge holds the release: `subject` names the edge, `why` says what the
@@ -824,34 +965,34 @@ const readReExports = async (
   return new Map(entries);
 };
 
-const readGroups = async (): Promise<readonly ReleaseGroup[]> => {
+const readConfig = async (): Promise<unknown> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const config = await fs.readFile(
     path.resolve(projectRootPath, CONFIG_FILE),
     'utf8',
   );
 
-  return (['fixed', 'linked'] as const).flatMap((kind) => {
-    const groups = parseReleaseGroups(config, kind);
+  const parsed = Json.parse(config);
 
-    if (Result.isErr(groups)) {
-      throw new Error(groups.value);
-    }
+  if (Result.isErr(parsed)) {
+    throw new Error(
+      `${CONFIG_FILE} is not JSON: ${unknownToString(parsed.value)}`,
+    );
+  }
 
-    return groups.value.map((members) => ({ kind, members }));
-  });
+  return parsed.value;
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await Promise.all([
     readChangesets(),
-    readGroups(),
+    readConfig(),
     readPackages(),
   ])
-    .then(async ([changesets, groups, packages]) =>
+    .then(async ([changesets, config, packages]) =>
       checkDependentReleases({
         changesets,
-        groups,
+        config,
         packages,
         reExports: await readReExports(packages),
         overrides: OVERRIDES,
@@ -870,6 +1011,6 @@ if (isDirectlyExecuted(import.meta.url)) {
   }
 
   console.info(
-    `${result.value.edges} runtime dependency edge(s) between workspace packages, ${result.value.reExports} of them re-exports and ${result.value.peers} peer dependencies released with them; no breaking release reaches a re-exporting or peer dependent as a patch.`,
+    `${result.value.edges} runtime dependency edge(s) between workspace packages, ${result.value.reExports} of them re-exports and ${result.value.peers} peer edge(s) whose dependent the pending changesets release; no breaking release reaches a re-exporting or peer dependent as a patch.`,
   );
 }

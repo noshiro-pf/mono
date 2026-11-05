@@ -6,9 +6,7 @@ import {
   checkDependentReleases,
   findReExportedPackages,
   listDependencies,
-  matchesGroupMember,
   type ExposureOverride,
-  type ReleaseGroup,
   type WorkspacePackage,
 } from './check-dependent-releases.mjs';
 
@@ -120,25 +118,6 @@ describe('findReExportedPackages', () => {
     );
 
     assert.deepStrictEqual(packages, []);
-  });
-});
-
-describe('matchesGroupMember', () => {
-  test('matches a name and a glob', () => {
-    assert.isTrue(matchesGroupMember('core', 'core'));
-
-    assert.isTrue(
-      matchesGroupMember(
-        'strict-ts-lib-v*-source',
-        'strict-ts-lib-v5.0-source',
-      ),
-    );
-
-    assert.isFalse(matchesGroupMember('core', 'core-x'));
-
-    assert.isFalse(
-      matchesGroupMember('strict-ts-lib-v*-source', 'strict-ts-lib-v5.0'),
-    );
   });
 });
 
@@ -255,7 +234,8 @@ describe('checkDependentReleases', () => {
         '  - .changeset/change.md gives core "major"',
         '',
         'and these dependents of it are given no breaking bump, so changesets',
-        'would release each as a dependency patch:',
+        'would release each with what a changeset gives it, or as a dependency',
+        'patch:',
         '',
         '  - typed@1.0.0',
         '  - user@4.0.0',
@@ -348,7 +328,8 @@ describe('checkDependentReleases', () => {
       packages: [
         pkg('core-a', '1.0.0'),
         pkg('core-b', '1.0.0'),
-        pkg('wrapper', '2.0.0', ['core-a']),
+        pkg('other-core', '1.0.0'),
+        pkg('wrapper', '2.0.0', ['core-a', 'other-core']),
       ],
       groups: [{ kind: 'fixed', members: ['core-*'] }],
       reExports: new Map<string, ReadonlyMap<string, readonly string[]>>([
@@ -356,6 +337,7 @@ describe('checkDependentReleases', () => {
           'wrapper',
           new Map<string, readonly string[]>([
             ['core-a', ['libs/wrapper/src/index.mts']],
+            ['other-core', ['libs/wrapper/src/index.mts']],
           ]),
         ],
       ]),
@@ -364,6 +346,8 @@ describe('checkDependentReleases', () => {
     assert.isTrue(Result.isErr(result));
 
     assert.include(result.value, 'which the fixed group carries to core-a');
+
+    assert.notInclude(result.value, 'wrapper re-exports other-core');
   });
 
   test('takes an overriding re-export that detection misses', () => {
@@ -565,7 +549,7 @@ describe('checkDependentReleases', () => {
 
     assert.include(result.value, 'wrapper has core in its peerDependencies');
 
-    assert.notInclude(result.value, 'wrapper re-exports core');
+    assert.notInclude(result.value, 'wrapper re-exports other-core');
   });
 
   test('reads a peer range the break stays in as any other edge, while nothing else releases the dependent', () => {
@@ -694,6 +678,152 @@ describe('checkDependentReleases', () => {
     );
   });
 
+  test.each(['^3.1.0', 'workspace:^3.1.0', '>=3 <4'])(
+    'holds a peer edge written as %s, which a breaking release leaves',
+    (range) => {
+      const result = check({
+        changesets: [changeset({ core: 'major' })],
+        packages: [
+          pkg('core', '3.1.0'),
+          {
+            ...pkg('plugin', '1.2.0'),
+            dependencies: listDependencies({
+              peerDependencies: { core: range },
+            }),
+          },
+        ],
+      });
+
+      assert.isTrue(Result.isErr(result));
+
+      assert.include(
+        result.value,
+        `plugin has core in its peerDependencies as "${range}", whose breaking release is pending:`,
+      );
+    },
+  );
+
+  test('holds a peer edge whose dependent another dependency releases', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major', types: 'major' })],
+      packages: [
+        pkg('core', '3.1.0'),
+        pkg('types', '2.0.0'),
+        {
+          ...pkg('blueprint', '1.0.0'),
+          dependencies: listDependencies({
+            dependencies: { types: 'workspace:^' },
+            peerDependencies: { core: '>=3.1.0' },
+          }),
+        },
+      ],
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      'blueprint has core in its peerDependencies as ">=3.1.0", whose breaking release is pending:',
+    );
+  });
+
+  test('lists apart a reviewed dependent that changesets does not release', () => {
+    const result = check({
+      changesets: [changeset({ core: 'major' })],
+      packages: [
+        pkg('core', '3.1.0'),
+        pkg('typed', '1.0.0', ['core']),
+        {
+          ...pkg('loose', '1.0.0'),
+          dependencies: listDependencies({ dependencies: { core: '>=3' } }),
+        },
+      ],
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    const [warning] = result.value.warnings;
+
+    assert.include(warning, 'or as a dependency\npatch:\n\n  - typed@1.0.0\n');
+
+    assert.include(
+      warning,
+      'And these, which changesets does not release:\n\n  - loose@1.0.0\n',
+    );
+
+    assert.include(warning, 'narrow that\nrange and release it.');
+  });
+
+  test('fails an override of a peer edge written as an explicit range a breaking release leaves', () => {
+    const result = check({
+      changesets: [],
+      packages: [
+        pkg('core', '3.1.0'),
+        {
+          ...pkg('plugin', '1.2.0'),
+          dependencies: listDependencies({
+            peerDependencies: { core: '^3.1.0' },
+          }),
+        },
+      ],
+      overrides: [
+        { dependency: 'core', dependents: ['plugin'], exposure: 'review' },
+      ],
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      'core → plugin ("review"): plugin names core in its peerDependencies and is released with any breaking release of it',
+    );
+  });
+
+  test('accepts an override of a peer edge whose range admits a breaking release', () => {
+    const result = check({
+      changesets: [],
+      packages: [
+        pkg('core', '3.1.0'),
+        {
+          ...pkg('plugin', '1.2.0'),
+          dependencies: listDependencies({
+            peerDependencies: { core: '>=3.1.0' },
+          }),
+        },
+      ],
+      reExports: new Map<string, ReadonlyMap<string, readonly string[]>>([
+        [
+          'plugin',
+          new Map<string, readonly string[]>([
+            ['core', ['libs/plugin/src/index.mts']],
+          ]),
+        ],
+      ]),
+      overrides: [
+        { dependency: 'core', dependents: ['plugin'], exposure: 'review' },
+      ],
+    });
+
+    assert.isTrue(Result.isOk(result));
+  });
+
+  test('fails a config changesets refuses', () => {
+    const result = check({
+      changesets: [],
+      groups: [
+        { kind: 'fixed', members: ['core', 'sibling'] },
+        { kind: 'linked', members: ['core', 'wrapper'] },
+      ],
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      '.changeset/config.json is not a config changesets accepts:',
+    );
+  });
+
   test('fails an edge overridden twice', () => {
     const result = check({
       changesets: [],
@@ -759,14 +889,25 @@ const check = ({
   overrides = [],
 }: Readonly<{
   changesets: readonly ChangesetFile[];
-  groups?: readonly ReleaseGroup[];
+  /** As written in `.changeset/config.json`; a member may be a glob. */
+  groups?: readonly Readonly<{
+    kind: 'fixed' | 'linked';
+    members: readonly string[];
+  }>[];
   packages?: readonly WorkspacePackage[];
   reExports?: ReadonlyMap<string, ReadonlyMap<string, readonly string[]>>;
   overrides?: readonly ExposureOverride[];
 }>): ReturnType<typeof checkDependentReleases> =>
   checkDependentReleases({
     changesets,
-    groups,
+    config: {
+      fixed: groups
+        .filter(({ kind }) => kind === 'fixed')
+        .map(({ members }) => members),
+      linked: groups
+        .filter(({ kind }) => kind === 'linked')
+        .map(({ members }) => members),
+    },
     packages,
     reExports,
     overrides,
