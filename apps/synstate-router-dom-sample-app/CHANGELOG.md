@@ -1,5 +1,15 @@
 # synstate-router-dom-sample-app
 
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies [54a6cc3]
+    - synstate@7.0.2
+    - synstate-dom@0.8.0
+    - synstate-router@0.1.0
+    - synstate-router-dom@0.1.0
+
 ## 0.0.5
 
 ### Patch Changes

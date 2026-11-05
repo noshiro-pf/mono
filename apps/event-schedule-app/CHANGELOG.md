@@ -1,5 +1,16 @@
 # event-schedule-app
 
+## 0.0.34
+
+### Patch Changes
+
+- Updated dependencies [54a6cc3]
+    - synstate@7.0.2
+    - blueprint-synstate@0.8.1
+    - synstate-dom@0.8.0
+    - synstate-router@0.1.0
+    - synstate-router-dom@0.1.0
+
 ## 0.0.33
 
 ### Patch Changes

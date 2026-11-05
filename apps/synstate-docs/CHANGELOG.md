@@ -1,5 +1,16 @@
 # @synstate/docs
 
+## 0.0.34
+
+### Patch Changes
+
+- Updated dependencies [54a6cc3]
+    - synstate@7.0.2
+    - synstate-dom@0.8.0
+    - synstate-preact-hooks@7.0.2
+    - synstate-preact-signals@7.0.2
+    - synstate-react-hooks@7.0.2
+
 ## 0.0.33
 
 ### Patch Changes

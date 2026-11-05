@@ -71,7 +71,7 @@
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {
-    "synstate": ">=7.0.1"
+    "synstate": ">=7.0.2"
   },
   "engines": {
     "node": ">=22.23.4",

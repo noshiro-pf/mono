@@ -1,5 +1,14 @@
 # cant-stop-probability
 
+## 0.0.33
+
+### Patch Changes
+
+- Updated dependencies [54a6cc3]
+    - synstate@7.0.2
+    - blueprint-synstate@0.8.1
+    - synstate-dom@0.8.0
+
 ## 0.0.32
 
 ### Patch Changes
