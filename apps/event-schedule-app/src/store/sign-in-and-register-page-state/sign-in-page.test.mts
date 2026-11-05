@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'tiny-router-observable';
 import { Result } from 'ts-data-forge';
@@ -96,6 +95,7 @@ const fakeToaster = (onShow: () => number): Toaster =>
     dismiss: () => undefined,
     clear: () => undefined,
     getToasts: () => [],
+    remove: () => undefined,
   }) as const;
 
 const setup = (

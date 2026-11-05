@@ -33,6 +33,8 @@ type Props = Readonly<{
   disabled?: Bindable<boolean>;
   readOnly?: Bindable<boolean>;
   rows?: number;
+  /** The `maxlength` attribute: the most characters that can be typed. */
+  maxLength?: number;
   /** Classes after Blueprint's own. */
   class?: string;
   id?: string;
@@ -59,6 +61,7 @@ export const TextArea = ({
   disabled,
   readOnly,
   rows,
+  maxLength,
   class: className,
   id,
   'aria-label': ariaLabel,
@@ -87,6 +90,7 @@ export const TextArea = ({
     id={id === undefined ? undefined : constant(id)}
     placeholder={placeholder}
     readOnly={readOnly}
+    maxLength={maxLength === undefined ? undefined : constant(maxLength)}
     rows={rows === undefined ? undefined : constant(rows)}
     value={value}
     onChange={onChange}

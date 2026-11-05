@@ -1,10 +1,13 @@
-import { memoNamed } from 'react-utils';
+import type { Bindable, JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { ButtonWithConfirm } from './button-with-confirm.js';
 
 const dc = dict.eventSettingsPage.resetEditButton;
 
-type Props = Readonly<{ onConfirmClick: () => void; disabled?: boolean }>;
+type Props = Readonly<{
+  onConfirmClick: () => void;
+  disabled?: Bindable<boolean>;
+}>;
 
 const buttonConfig = { name: dc.name } as const;
 
@@ -21,15 +24,15 @@ const toastConfig = {
   intent: 'success',
 } as const;
 
-export const ResetEditButton = memoNamed<Props>(
-  'ResetEditButton',
-  ({ onConfirmClick, disabled }) => (
-    <ButtonWithConfirm
-      buttonConfig={buttonConfig}
-      dialogConfig={dialogConfig}
-      disabled={disabled}
-      toastConfig={toastConfig}
-      onConfirmClick={onConfirmClick}
-    />
-  ),
+export const ResetEditButton = ({
+  onConfirmClick,
+  disabled,
+}: Props): JSX.Element => (
+  <ButtonWithConfirm
+    buttonConfig={buttonConfig}
+    dialogConfig={dialogConfig}
+    disabled={disabled}
+    toastConfig={toastConfig}
+    onConfirmClick={onConfirmClick}
+  />
 );

@@ -1,99 +1,84 @@
-import * as React from 'react';
-import {
-  DatePickerDayHolidayStyled,
-  DatePickerDayOutlinedSelectedReadonlyHolidayStyled,
-  DatePickerDayOutlinedSelectedReadonlySaturdayStyled,
-  DatePickerDayOutlinedSelectedReadonlyStyled,
-  DatePickerDayOutside,
-  DatePickerDayReadonlyHolidayStyled,
-  DatePickerDayReadonlySaturdayStyled,
-  DatePickerDayReadonlyStyled,
-  DatePickerDaySaturdayStyled,
-  DatePickerDaySelectedReadonlyStyled,
-  DatePickerDaySelectedStyled,
-  DatePickerDayStyled,
-  DatePickerDayWrapperStyled,
-} from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { match } from 'ts-data-forge';
+import type { InitializedObservable } from 'synstate';
+import { constant, view, type JSX } from 'synstate-dom';
+import { Arr } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
+import type { CalendarCell } from '../../hooks/index.mjs';
+import * as styles from './multiple-date-picker.module.css';
 
 type Props = Readonly<{
-  ymd: YearMonthDate;
-  onClick?: () => void;
-  selected: boolean;
-  useOutlinedSelectedStyle?: boolean;
-  outside: boolean;
-  dayType: DayType;
-  holidayJpName: string | undefined;
+  cell: InitializedObservable<CalendarCell>;
+  /** Absent for a read-only picker. */
+  onClick: ((ymd: YearMonthDate) => void) | undefined;
+  useOutlinedSelectedStyle: boolean;
 }>;
 
-export const DatePickerDate = memoNamed<Props>(
-  'DatePickerDate',
-  ({
-    ymd,
-    onClick,
-    selected,
-    outside,
-    useOutlinedSelectedStyle = false,
-    dayType,
-    holidayJpName,
-  }) => {
-    const dateString = React.useMemo<string>(
-      () => DateUtils.create(ymd.year, ymd.month, ymd.date).toString(),
-      [ymd],
-    );
+export const DatePickerDate = ({
+  cell,
+  onClick,
+  useOutlinedSelectedStyle,
+}: Props): JSX.Element => (
+  <div
+    aria-disabled={view(cell, (c) => (c.outside ? 'true' : 'false'))}
+    aria-label={view(cell, ({ ymd }) =>
+      DateUtils.create(ymd.year, ymd.month, ymd.date).toString(),
+    )}
+    aria-selected={view(cell, (c) => (c.selected ? 'true' : 'false'))}
+    class={view(cell, (c) =>
+      dayClass(c, onClick !== undefined, useOutlinedSelectedStyle),
+    )}
+    role={constant('gridcell')}
+    tabIndex={constant(-1)}
+    title={view(cell, (c) => c.holidayJpName)}
+    onClick={
+      onClick === undefined
+        ? undefined
+        : () => {
+            const { outside, ymd } = cell.getSnapshot().value;
 
-    const DatePickerDayResolved = React.useMemo(() => {
-      if (onClick === undefined) {
-        // readonly
-        return selected
-          ? useOutlinedSelectedStyle
-            ? match(dayType, {
-                holiday: DatePickerDayOutlinedSelectedReadonlyHolidayStyled,
-                Sunday: DatePickerDayOutlinedSelectedReadonlyHolidayStyled,
-                Saturday: DatePickerDayOutlinedSelectedReadonlySaturdayStyled,
-                normal: DatePickerDayOutlinedSelectedReadonlyStyled,
-              })
-            : DatePickerDaySelectedReadonlyStyled
-          : outside
-            ? DatePickerDayOutside
-            : match(dayType, {
-                holiday: DatePickerDayReadonlyHolidayStyled,
-                Sunday: DatePickerDayReadonlyHolidayStyled,
-                Saturday: DatePickerDayReadonlySaturdayStyled,
-                normal: DatePickerDayReadonlyStyled,
-              });
-      }
-
-      // button
-      return selected
-        ? outside
-          ? DatePickerDaySelectedReadonlyStyled
-          : DatePickerDaySelectedStyled
-        : outside
-          ? DatePickerDayOutside
-          : match(dayType, {
-              holiday: DatePickerDayHolidayStyled,
-              Sunday: DatePickerDayHolidayStyled,
-              Saturday: DatePickerDaySaturdayStyled,
-              normal: DatePickerDayStyled,
-            });
-    }, [dayType, onClick, selected, outside, useOutlinedSelectedStyle]);
-
-    return (
-      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
-      <DatePickerDayResolved
-        aria-disabled={outside}
-        aria-label={dateString}
-        aria-selected={selected}
-        role={'gridcell'}
-        tabIndex={-1}
-        title={holidayJpName}
-        onClick={outside ? undefined : onClick}
-      >
-        <DatePickerDayWrapperStyled>{ymd.date}</DatePickerDayWrapperStyled>
-      </DatePickerDayResolved>
-    );
-  },
+            if (!outside) {
+              onClick(ymd);
+            }
+          }
+    }
+  >
+    <div class={constant(styles.dayWrapper)}>
+      {view(cell, (c) => c.ymd.date.toString())}
+    </div>
+  </div>
 );
+
+/**
+ * The classes of a day, as react-blueprintjs-utils picked one styled cell for
+ * it: a read-only picker draws no hover, and a selected day outside the month
+ * is drawn selected but does not take a click.
+ */
+const dayClass = (
+  { selected, outside, dayType }: CalendarCell,
+  clickable: boolean,
+  outlined: boolean,
+): string => {
+  const color =
+    dayType === 'Saturday'
+      ? styles.saturday
+      : dayType === 'normal'
+        ? undefined
+        : styles.holiday;
+
+  const classes: readonly (string | undefined)[] = selected
+    ? clickable
+      ? outside
+        ? ([styles.selected] as const)
+        : ([styles.selected, styles.selectedClickable] as const)
+      : outlined
+        ? ([styles.outlinedSelected, color] as const)
+        : ([styles.selected] as const)
+    : outside
+      ? ([styles.outside] as const)
+      : clickable
+        ? ([styles.clickable, color] as const)
+        : ([color] as const);
+
+  return Arr.toUnshifted(styles.day)(classes)
+    .filter((c) => c !== undefined)
+    .join(' ');
+};

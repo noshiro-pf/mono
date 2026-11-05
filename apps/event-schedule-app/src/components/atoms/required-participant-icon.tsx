@@ -1,9 +1,6 @@
-import { Icon } from '@blueprintjs/core';
-import { memoNamed } from 'react-utils';
+import { Icon } from 'blueprint-synstate';
+import type { JSX } from 'synstate-dom';
 
-const iconSize = 12;
-
-export const RequiredParticipantIcon = memoNamed(
-  'RequiredParticipantIcon',
-  () => <Icon icon={'star'} intent={'primary'} size={iconSize} />,
+export const RequiredParticipantIcon = (): JSX.Element => (
+  <Icon icon={'star'} intent={'primary'} size={12} />
 );

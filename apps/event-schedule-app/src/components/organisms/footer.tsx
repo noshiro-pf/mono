@@ -1,17 +1,15 @@
-import { css } from '@emotion/react';
-import { memoNamed } from 'react-utils';
+import { constant, type JSX } from 'synstate-dom';
 import { aboutThisAppUrl, dict } from '../../constants/index.mjs';
+import * as styles from './footer.module.css';
 
-export const Footer = memoNamed('Footer', () => (
-  <div
-    css={css`
-      padding: 10px;
-      display: flex;
-      justify-content: flex-end;
-    `}
-  >
-    <a href={aboutThisAppUrl} rel={'noopener noreferrer'} target={'_blank'}>
-      {dict.aboutThisApp}
+export const Footer = (): JSX.Element => (
+  <div class={constant(styles.footer)}>
+    <a
+      href={constant(aboutThisAppUrl)}
+      rel={constant('noopener noreferrer')}
+      target={constant('_blank')}
+    >
+      {constant(dict.aboutThisApp)}
     </a>
   </div>
-));
+);

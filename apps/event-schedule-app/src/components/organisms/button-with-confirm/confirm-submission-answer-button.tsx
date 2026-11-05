@@ -1,31 +1,21 @@
-import { ButtonNowrapStyled } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
+import { Button } from 'blueprint-synstate';
+import { constant, If, type Bindable, type JSX } from 'synstate-dom';
 import { match } from 'ts-data-forge';
-import type { StrictOmit } from 'ts-type-forge';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerPageStore } from '../../../store/index.mjs';
+import { nowrapClass } from '../../styled/index.mjs';
 import { ButtonWithConfirm } from './button-with-confirm.js';
 
 const dc = dict.answerPage.answerBeingEdited;
 
 type Props = Readonly<{
-  hasUnanswered: boolean;
-  loading: boolean;
-  disabled: boolean;
+  hasUnanswered: Bindable<boolean>;
+  loading: Bindable<boolean>;
+  disabled: Bindable<boolean>;
   mode: 'creating' | 'editing';
 }>;
 
 const buttonConfigBase = { icon: 'tick', intent: 'primary' } as const;
-
-const buttonConfigCreating = {
-  ...buttonConfigBase,
-  name: dc.submitButton.create,
-} as const;
-
-const buttonConfigEditing = {
-  ...buttonConfigBase,
-  name: dc.submitButton.update,
-} as const;
 
 const dialogConfigBase = {
   icon: 'confirm',
@@ -34,52 +24,42 @@ const dialogConfigBase = {
   cancelButtonText: dict.common.buttonText.cancel,
 } as const;
 
-const dialogConfigCreating = {
-  ...dialogConfigBase,
-  confirmButtonText: dc.submitButton.create,
-} as const;
+/** Sends the answer; asks first while some dates are left unanswered. */
+export const SubmitAnswerButtonWithConfirmation = ({
+  hasUnanswered,
+  loading,
+  disabled,
+  mode,
+}: Props): JSX.Element => {
+  const name = match(mode, {
+    creating: dc.submitButton.create,
+    editing: dc.submitButton.update,
+  });
 
-const dialogConfigEditing = {
-  ...dialogConfigBase,
-  confirmButtonText: dc.submitButton.update,
-} as const;
-
-export const SubmitAnswerButtonWithConfirmation = memoNamed<Props>(
-  'SubmitAnswerButtonWithConfirmation',
-  ({ hasUnanswered, loading, disabled, mode }) =>
-    hasUnanswered ? (
-      <ButtonWithConfirm
-        buttonConfig={match(mode, {
-          creating: buttonConfigCreating,
-          editing: buttonConfigEditing,
-        })}
-        dialogConfig={match(mode, {
-          creating: dialogConfigCreating,
-          editing: dialogConfigEditing,
-        })}
-        disabled={disabled}
-        loading={loading}
-        onConfirmClick={AnswerPageStore.onSubmitAnswerClickPromise}
-      />
-    ) : (
-      <SubmitAnswerButton disabled={disabled} loading={loading} mode={mode} />
-    ),
-);
-
-const SubmitAnswerButton = memoNamed<StrictOmit<Props, 'hasUnanswered'>>(
-  'SubmitAnswerButton',
-  ({ loading, disabled, mode }) => (
-    <ButtonNowrapStyled
-      data-e2e={'submit-answer-button'}
-      disabled={disabled}
-      icon={'tick'}
-      intent={'primary'}
-      loading={loading}
-      text={match(mode, {
-        creating: dc.submitButton.create,
-        editing: dc.submitButton.update,
-      })}
-      onClick={AnswerPageStore.onSubmitAnswerClick}
+  return (
+    <If
+      cond={hasUnanswered}
+      then={
+        <ButtonWithConfirm
+          buttonConfig={{ ...buttonConfigBase, name }}
+          dialogConfig={{ ...dialogConfigBase, confirmButtonText: name }}
+          disabled={disabled}
+          loading={loading}
+          onConfirmClick={AnswerPageStore.onSubmitAnswerClickPromise}
+        />
+      }
+      else={
+        <Button
+          class={nowrapClass}
+          data-e2e={constant('submit-answer-button')}
+          disabled={disabled}
+          icon={'tick'}
+          intent={'primary'}
+          loading={loading}
+          text={constant(name)}
+          onClick={AnswerPageStore.onSubmitAnswerClick}
+        />
+      }
     />
-  ),
-);
+  );
+};

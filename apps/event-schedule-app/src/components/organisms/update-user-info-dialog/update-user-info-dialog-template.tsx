@@ -1,47 +1,45 @@
-import { Button, Classes } from '@blueprintjs/core';
-import { DialogWithMaxWidth } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
+import { Button, Dialog } from 'blueprint-synstate';
+import { constant, type Bindable, type Child, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
-import { ButtonsWrapperAlignEnd } from '../../styled/index.mjs';
+import { UpdateUserInfoDialogStore } from '../../../store/index.mjs';
+import {
+  ButtonsWrapperAlignEnd,
+  maxWidthModalClass,
+} from '../../styled/index.mjs';
 
 type Props = Readonly<{
-  body: React.ReactNode;
-  submitButton: React.ReactNode;
-  dialogIsOpen: boolean;
-  closeDialog: () => void;
+  body: Child;
+  submitButton: Child;
+  dialogIsOpen: Bindable<boolean>;
   title: string;
-  isWaitingResponse: boolean;
+  isWaitingResponse: Bindable<boolean>;
 }>;
 
-export const UpdateUserInfoDialogTemplate = memoNamed<Props>(
-  'UpdateUserInfoDialogTemplate',
-  ({
-    body,
-    submitButton,
-    dialogIsOpen,
-    closeDialog,
-    title,
-    isWaitingResponse,
-  }) => (
-    <DialogWithMaxWidth
-      icon={'user'}
-      isOpen={dialogIsOpen}
-      title={title}
-      onClose={closeDialog}
-    >
-      <div className={Classes.DIALOG_BODY}>{body}</div>
-      <div className={Classes.DIALOG_FOOTER}>
-        <ButtonsWrapperAlignEnd>
-          <Button
-            disabled={isWaitingResponse}
-            intent={'none'}
-            onClick={closeDialog}
-          >
-            {dict.common.buttonText.cancel}
-          </Button>
-          {submitButton}
-        </ButtonsWrapperAlignEnd>
-      </div>
-    </DialogWithMaxWidth>
-  ),
+export const UpdateUserInfoDialogTemplate = ({
+  body,
+  submitButton,
+  dialogIsOpen,
+  title,
+  isWaitingResponse,
+}: Props): JSX.Element => (
+  <Dialog
+    class={maxWidthModalClass}
+    icon={'user'}
+    isOpen={dialogIsOpen}
+    title={constant(title)}
+    onClose={UpdateUserInfoDialogStore.closeDialog}
+  >
+    <div class={constant('bp6-dialog-body')}>{body}</div>
+    <div class={constant('bp6-dialog-footer')}>
+      <ButtonsWrapperAlignEnd>
+        <Button
+          disabled={isWaitingResponse}
+          intent={'none'}
+          text={constant(dict.common.buttonText.cancel)}
+          onClick={UpdateUserInfoDialogStore.closeDialog}
+        />
+        {submitButton}
+      </ButtonsWrapperAlignEnd>
+    </div>
+  </Dialog>
 );

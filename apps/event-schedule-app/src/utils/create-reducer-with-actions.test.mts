@@ -10,7 +10,7 @@ describe('createReducerWithActions', () => {
     const [page$, setPage] = createState<'form' | 'other'>('form');
 
     const warn = captureWarnings(() => {
-      const [, dispatch, { state, getSnapshot }] = createReducerWithActions(
+      const [state, dispatch, { getSnapshot }] = createReducerWithActions(
         (_: string, action: 'input' | 'reset') =>
           match(action, { input: 'a', reset: '' }),
         '',

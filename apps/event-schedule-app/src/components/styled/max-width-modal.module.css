@@ -1,0 +1,5 @@
+/* An Alert or a Dialog as wide as its contents, up to 500px or 90% of the screen. */
+.maxWidth {
+  width: unset;
+  max-width: min(90vw, 500px);
+}

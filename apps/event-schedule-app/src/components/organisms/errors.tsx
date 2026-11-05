@@ -1,51 +1,40 @@
-import { css } from '@emotion/react';
-import { memoNamed } from 'react-utils';
+import type { InitializedObservable } from 'synstate';
+import { constant, If, view, type JSX } from 'synstate-dom';
 import { dict, errorFontColor } from '../../constants/index.mjs';
 import type { EventScheduleValidation } from '../../types/index.mjs';
 import { Description } from '../atoms/index.mjs';
+import * as styles from './errors.module.css';
 
 const dc = dict.eventSettingsPage;
 
-type Props = Readonly<{ eventScheduleValidation: EventScheduleValidation }>;
+type Props = Readonly<{
+  eventScheduleValidation: InitializedObservable<EventScheduleValidation>;
+}>;
 
-export const EventSchedulePropertiesErrors = memoNamed<Props>(
-  'EventSchedulePropertiesErrors',
-  ({ eventScheduleValidation }) => (
-    <div
-      css={css`
-        margin: 10px;
-      `}
-    >
-      {eventScheduleValidation.title ? undefined : (
-        <Description
-          color={errorFontColor}
-          text={dc.errorMessages.titleIsEmpty}
-        />
+/** What keeps the event from being saved, one line each. */
+export const EventSchedulePropertiesErrors = ({
+  eventScheduleValidation,
+}: Props): JSX.Element => {
+  const error = (
+    isValid: (v: EventScheduleValidation) => boolean,
+    text: string,
+  ): JSX.Element => (
+    <If
+      cond={view(eventScheduleValidation, (v) => !isValid(v))}
+      then={<Description color={errorFontColor} text={constant(text)} />}
+    />
+  );
+
+  return (
+    <div class={constant(styles.errors)}>
+      {error((v) => v.title, dc.errorMessages.titleIsEmpty)}
+      {error((v) => v.datetimeRangeList, dc.errorMessages.datetimeIsEmpty)}
+      {error((v) => v.notificationEmail, dict.common.error.invalidEmail)}
+      {error(
+        (v) => v.notificationItems,
+        dc.errorMessages.atLeastOneNotificationCheckRequired,
       )}
-      {eventScheduleValidation.datetimeRangeList ? undefined : (
-        <Description
-          color={errorFontColor}
-          text={dc.errorMessages.datetimeIsEmpty}
-        />
-      )}
-      {eventScheduleValidation.notificationEmail ? undefined : (
-        <Description
-          color={errorFontColor}
-          text={dict.common.error.invalidEmail}
-        />
-      )}
-      {eventScheduleValidation.notificationItems ? undefined : (
-        <Description
-          color={errorFontColor}
-          text={dc.errorMessages.atLeastOneNotificationCheckRequired}
-        />
-      )}
-      {eventScheduleValidation.answerIcons ? undefined : (
-        <Description
-          color={errorFontColor}
-          text={dc.errorMessages.answerIcons}
-        />
-      )}
+      {error((v) => v.answerIcons, dc.errorMessages.answerIcons)}
     </div>
-  ),
-);
+  );
+};

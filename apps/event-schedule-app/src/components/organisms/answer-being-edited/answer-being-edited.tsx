@@ -1,32 +1,34 @@
-import { FormGroup } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import { useBoolState } from 'better-react-use-state';
-import * as React from 'react';
+import { Button, FormGroup, InputGroup, TextArea } from 'blueprint-synstate';
+import { createBooleanState, map, type InitializedObservable } from 'synstate';
 import {
-  BpInput,
-  BpTextArea,
-  ButtonNowrapStyled,
-  CheckboxView,
-  HTMLTableBorderedStyled2,
-} from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
-import { mapNullable, match, type IMapMapped } from 'ts-data-forge';
+  constant,
+  derive,
+  For,
+  If,
+  mapBindable,
+  view,
+  type Bindable,
+  type BindableValue,
+  type JSX,
+} from 'synstate-dom';
+import type { IMapMapped } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
-import { theNameIsAlreadyUsedFn } from '../../../functions/index.mjs';
-import { useFormError } from '../../../hooks/index.mjs';
+import { createFormError } from '../../../hooks/index.mjs';
 import { AnswerPageStore, Auth } from '../../../store/index.mjs';
 import { Description } from '../../atoms/index.mjs';
 import {
-  AnswerIconFairPointInput,
-  AnswerIconGoodPoint,
-  AnswerIconPoorPoint,
+  AnswerIconPointCell,
+  CheckboxView,
   CustomIconButton,
   CustomScrollbarWrapper,
 } from '../../molecules/index.mjs';
 import {
+  answerCommentCellClass,
+  answerInputTableClass,
+  answerPointCellClass,
+  borderedTableClass,
   ButtonsWrapperAlignEnd,
+  nowrapClass,
   WidthRestrictedInputWrapper,
 } from '../../styled/index.mjs';
 import { DatetimeRangeCell } from '../answer-table/index.mjs';
@@ -37,360 +39,332 @@ import {
   SubmitAnswerButtonWithConfirmation,
 } from '../button-with-confirm/index.mjs';
 import { ParagraphWithSwitch } from '../paragraph-with-switch.js';
+import * as styles from './answer-being-edited.module.css';
 import { WeightSetting } from './weight-setting.js';
 
 const dc = dict.answerPage.answerBeingEdited;
 
 type Props = Readonly<{
-  eventSchedule: EventSchedule;
-  answers: readonly Answer[];
-  answerBeingEdited: Answer;
+  eventSchedule: InitializedObservable<EventSchedule>;
+  answerBeingEdited: InitializedObservable<Answer>;
+  /** Fixed while the section is drawn: the page draws it again for another. */
   answerBeingEditedSectionState: 'creating' | 'editing';
-  submitButtonIsLoading: boolean;
-  submitButtonIsDisabled: boolean;
-  selectedAnswerUserName: UserName | undefined;
-  holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
+  submitButtonIsLoading: Bindable<boolean>;
+  submitButtonIsDisabled: Bindable<boolean>;
+  holidaysJpDefinition: InitializedObservable<
+    IMapMapped<YearMonthDate, string, YmdKey>
+  >;
 }>;
 
-export const AnswerBeingEdited = memoNamed<Props>(
-  'AnswerBeingEdited',
-  ({
+export const AnswerBeingEdited = ({
+  eventSchedule,
+  answerBeingEdited,
+  answerBeingEditedSectionState,
+  submitButtonIsLoading,
+  submitButtonIsDisabled,
+  holidaysJpDefinition,
+}: Props): JSX.Element => {
+  // The store's rule, as the submit button's: every answer, filtered out or
+  // not, and again as the answers are read again.
+  const [showUserNameError$, touchUserName] = createFormError(
+    AnswerPageStore.userNameIsInvalid$,
+  );
+
+  const [
+    forNonLoggedInUserDialogIsOpen$,
+    {
+      setTrue: openForNonLoggedInUserDialog,
+      setFalse: closeForNonLoggedInUserDialog,
+    },
+  ] = createBooleanState(false);
+
+  const intent = view(showUserNameError$, (e) =>
+    e ? ('danger' as const) : ('primary' as const),
+  );
+
+  const datetimeSpecification = view(
     eventSchedule,
-    answers,
-    answerBeingEdited,
-    answerBeingEditedSectionState,
-    submitButtonIsLoading,
-    submitButtonIsDisabled,
-    selectedAnswerUserName,
-    holidaysJpDefinition,
-  }) => {
-    const [showUserNameError, onUserNameChangeLocal, onUserNameBlur] =
-      useFormError(
-        answerBeingEdited.user.name,
-        (v) =>
-          v === '' ||
-          theNameIsAlreadyUsedFn(v, answers, selectedAnswerUserName),
-        AnswerPageStore.onUserNameChange,
-      );
+    (e) => e.datetimeSpecification,
+  );
 
-    const theNameIsAlreadyUsed = useObservableValue(
-      AnswerPageStore.theNameIsAlreadyUsed$,
-    );
+  const {
+    batchInputFieldIsOpen$,
+    checkboxesState$,
+    answerBeingEditedList$,
+    iconHeader$,
+  } = AnswerPageStore;
 
-    const iconHeader = useObservableValue(AnswerPageStore.iconHeader$);
-
-    const answerBeingEditedList = useObservableValue(
-      AnswerPageStore.answerBeingEditedList$,
-    );
-
-    const hasUnanswered = useObservableValue(AnswerPageStore.hasUnanswered$);
-
-    const fireAuthUser = Auth.useFireAuthUser();
-
-    const forNonLoggedInUserDialogState = useBoolState(false);
-
-    const batchInputFieldIsOpen = AnswerPageStore.useBatchInputFieldIsOpen();
-
-    const checkboxesState = AnswerPageStore.useCheckboxesState();
-
-    const helperText = React.useMemo(
-      () =>
-        showUserNameError ? (
-          theNameIsAlreadyUsed ? (
-            dc.theNameIsAlreadyUsed
-          ) : (
-            dc.nameIsRequired
-          )
-        ) : (
-          <div
-            css={css`
-              height: 1rem;
-            `}
-          />
-        ),
-      [showUserNameError, theNameIsAlreadyUsed],
-    );
-
-    return (
-      <>
-        <WidthRestrictedInputWrapper>
-          <FormGroup
-            helperText={helperText}
-            intent={showUserNameError ? 'danger' : 'primary'}
-            label={dc.yourName}
-          >
-            <BpInput
-              // eslint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus
-              data-e2e={'username'}
-              intent={showUserNameError ? 'danger' : 'primary'}
-              value={answerBeingEdited.user.name}
-              onBlur={onUserNameBlur}
-              onValueChange={
+  return (
+    <>
+      <WidthRestrictedInputWrapper>
+        <FormGroup
+          helperText={derive(
+            [showUserNameError$, AnswerPageStore.theNameIsAlreadyUsed$],
+            (shown, used) =>
+              shown
+                ? used
+                  ? dc.theNameIsAlreadyUsed
+                  : dc.nameIsRequired
+                : undefined,
+          )}
+          intent={intent}
+          label={constant(dc.yourName)}
+        >
+          <InputGroup
+            autoFocus
+            data-e2e={constant('username')}
+            intent={intent}
+            value={view(answerBeingEdited, (a) => a.user.name)}
+            onBlur={touchUserName}
+            onInput={({ currentTarget }) => {
+              AnswerPageStore.onUserNameChange(
                 // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-                onUserNameChangeLocal as (v: string) => void
-              }
-            />
-          </FormGroup>
-        </WidthRestrictedInputWrapper>
-        <TableWrapper>
-          <HTMLTableBorderedStyled2
-            css={css`
-              th,
-              td {
-                padding: 6px;
-              }
-            `}
-          >
-            <thead>
-              {mapNullable(iconHeader, (a) => (
+                currentTarget.value as UserName,
+              );
+
+              touchUserName();
+            }}
+          />
+          {/* Room for the message, so that the form does not move with it. */}
+          <If
+            cond={mapBindable(showUserNameError$, (c) => !c)}
+            then={
+              <div class={constant('bp6-form-helper-text')}>
+                <div class={constant(styles.helperSpacer)} />
+              </div>
+            }
+          />
+        </FormGroup>
+      </WidthRestrictedInputWrapper>
+      <CustomScrollbarWrapper class={styles.tableWrapper}>
+        <table
+          class={constant(`${borderedTableClass} ${answerInputTableClass}`)}
+        >
+          <thead>
+            <For
+              items={view(iconHeader$, (h) => (h === undefined ? [] : [h]))}
+              key={() => 0}
+            >
+              {(header$) => (
                 <tr>
-                  {batchInputFieldIsOpen ? (
+                  <If
+                    cond={batchInputFieldIsOpen$}
+                    then={
+                      <th>
+                        <CheckboxView
+                          state={derive(
+                            [checkboxesState$, answerBeingEditedList$],
+                            (checked, list) =>
+                              checked.size === list.length
+                                ? 'checked'
+                                : checked.size === 0
+                                  ? 'none'
+                                  : 'indeterminate',
+                          )}
+                          onCheck={AnswerPageStore.onCheckAll}
+                        />
+                      </th>
+                    }
+                  />
+                  <th />
+                  {(['good', 'fair', 'poor'] as const).map((iconId) => (
                     <th>
-                      <CheckboxView
-                        state={
-                          checkboxesState.size === answerBeingEditedList.length
-                            ? 'checked'
-                            : checkboxesState.size === 0
-                              ? 'none'
-                              : 'indeterminate'
-                        }
-                        onCheck={AnswerPageStore.onCheckAll}
+                      <CustomIconButton
+                        data-e2e={`col-${iconId}-button`}
+                        iconName={iconId}
+                        title={view(header$, (h) => h[iconId].iconDescription)}
+                        onClick={() => {
+                          header$.getSnapshot().value[iconId].onClick();
+                        }}
                       />
                     </th>
-                  ) : undefined}
-                  <th />
-                  <th>
-                    <CustomIconButton
-                      data-e2e={'col-good-button'}
-                      iconName={'good'}
-                      title={a.good.iconDescription}
-                      onClick={a.good.onClick}
-                    />
-                  </th>
-                  <th>
-                    <CustomIconButton
-                      data-e2e={'col-fair-button'}
-                      iconName={'fair'}
-                      title={a.fair.iconDescription}
-                      onClick={a.fair.onClick}
-                    />
-                  </th>
-                  <th>
-                    <CustomIconButton
-                      data-e2e={'col-poor-button'}
-                      iconName={'poor'}
-                      title={a.poor.iconDescription}
-                      onClick={a.poor.onClick}
-                    />
-                  </th>
-                  <th>{dc.table.header.score}</th>
-                  <th>{dc.table.header.comment}</th>
+                  ))}
+                  <th>{constant(dc.table.header.score)}</th>
+                  <th>{constant(dc.table.header.comment)}</th>
                 </tr>
-              ))}
-            </thead>
-            <tbody>
-              {answerBeingEditedList.map(
-                ({
-                  key,
-                  datetimeRange,
-                  answerSelectionValue: { point, iconId, comment },
-                  buttons,
-                  onPointChange,
-                  onCommentChange: onCellCommentChange,
-                  onCheck,
-                }) => (
-                  <tr key={key} data-e2e={'answer-being-edited-row'}>
-                    {batchInputFieldIsOpen ? (
-                      <td>
-                        <CheckboxView
-                          state={
-                            checkboxesState.has(datetimeRange)
-                              ? 'checked'
-                              : 'none'
-                          }
-                          onCheck={onCheck}
-                        />
-                      </td>
-                    ) : undefined}
+              )}
+            </For>
+          </thead>
+          <tbody>
+            <For items={answerBeingEditedList$} key={(row) => row.key}>
+              {(row$) => {
+                const row = (): BindableValue<typeof row$> =>
+                  row$.getSnapshot().value;
+
+                const iconId = view(row$, (r) => r.answerSelectionValue.iconId);
+
+                return (
+                  <tr data-e2e={constant('answer-being-edited-row')}>
+                    <If
+                      cond={batchInputFieldIsOpen$}
+                      then={
+                        <td>
+                          <CheckboxView
+                            state={derive(
+                              [checkboxesState$, row$],
+                              (checked, r) =>
+                                checked.has(r.datetimeRange)
+                                  ? 'checked'
+                                  : 'none',
+                            )}
+                            onCheck={(checked) => {
+                              row().onCheck(checked);
+                            }}
+                          />
+                        </td>
+                      }
+                    />
                     <td>
                       <DatetimeRangeCell
-                        datetimeRange={datetimeRange}
-                        datetimeSpecification={
-                          eventSchedule.datetimeSpecification
-                        }
+                        datetimeRange={row().datetimeRange}
+                        datetimeSpecification={datetimeSpecification}
                         holidaysJpDefinition={holidaysJpDefinition}
-                        minimized={false}
+                        minimized={constant(false)}
+                      />
+                    </td>
+                    {(['good', 'fair', 'poor'] as const).map((id) => (
+                      <td>
+                        <CustomIconButton
+                          active={mapBindable(iconId, (i) => i === id)}
+                          data-e2e={id === 'good' ? 'good-button' : undefined}
+                          iconColor={mapBindable(iconId, (i) =>
+                            i === id ? 'blue' : 'gray',
+                          )}
+                          iconName={id}
+                          title={view(row$, (r) => r.buttons[id].description)}
+                          onClick={() => {
+                            row().buttons[id].onClick();
+                          }}
+                        />
+                      </td>
+                    ))}
+                    <td class={constant(answerPointCellClass)}>
+                      <AnswerIconPointCell
+                        iconId={iconId}
+                        point={view(row$, (r) => r.answerSelectionValue.point)}
+                        onPointChange={(point) => {
+                          row().onPointChange(point);
+                        }}
                       />
                     </td>
                     <td>
-                      <CustomIconButton
-                        active={iconId === 'good'}
-                        data-e2e={'good-button'}
-                        iconColor={iconId === 'good' ? 'blue' : 'gray'}
-                        iconName={'good'}
-                        title={buttons.good.description}
-                        onClick={buttons.good.onClick}
-                      />
-                    </td>
-                    <td>
-                      <CustomIconButton
-                        active={iconId === 'fair'}
-                        iconColor={iconId === 'fair' ? 'blue' : 'gray'}
-                        iconName={'fair'}
-                        title={buttons.fair.description}
-                        onClick={buttons.fair.onClick}
-                      />
-                    </td>
-                    <td>
-                      <CustomIconButton
-                        active={iconId === 'poor'}
-                        iconColor={iconId === 'poor' ? 'blue' : 'gray'}
-                        iconName={'poor'}
-                        title={buttons.poor.description}
-                        onClick={buttons.poor.onClick}
-                      />
-                    </td>
-                    <td
-                      css={css`
-                        min-width: 87px;
-                        max-width: 87px;
-                      `}
-                    >
-                      {match(iconId, {
-                        none: undefined,
-                        good: <AnswerIconGoodPoint />,
-                        poor: <AnswerIconPoorPoint />,
-                        fair: (
-                          <AnswerIconFairPointInput
-                            disabled={false}
-                            value={point}
-                            onValueChange={onPointChange}
-                          />
-                        ),
-                      })}
-                    </td>
-                    <td>
-                      <BpTextArea
-                        css={css`
-                          resize: vertical;
-                          min-height: 38px;
-                        `}
+                      <TextArea
+                        class={answerCommentCellClass}
                         rows={1}
-                        value={comment}
-                        onValueChange={onCellCommentChange}
+                        value={view(
+                          row$,
+                          (r) => r.answerSelectionValue.comment,
+                        )}
+                        onInput={({ currentTarget }) => {
+                          row().onCommentChange(currentTarget.value);
+                        }}
                       />
                     </td>
                   </tr>
-                ),
-              )}
-            </tbody>
-          </HTMLTableBorderedStyled2>
-          <BatchInputAnswerForm
-            answerIcons={eventSchedule.answerIcons}
-            applyBatchInput={AnswerPageStore.applyBatchInput}
-            isOpen={batchInputFieldIsOpen}
-            toggleOpen={AnswerPageStore.toggleBatchInputField}
+                );
+              }}
+            </For>
+          </tbody>
+        </table>
+        <BatchInputAnswerForm
+          answerIcons={eventSchedule.pipe(mapAnswerIcons)}
+          applyBatchInput={AnswerPageStore.applyBatchInput}
+          isOpen={batchInputFieldIsOpen$}
+          toggleOpen={AnswerPageStore.toggleBatchInputField}
+        />
+      </CustomScrollbarWrapper>
+      <WidthRestrictedInputWrapper>
+        <FormGroup label={constant(dc.comments)}>
+          <TextArea
+            autoResize
+            fill
+            value={view(answerBeingEdited, (a) => a.comment)}
+            onInput={({ currentTarget }) => {
+              AnswerPageStore.onCommentChange(currentTarget.value);
+            }}
           />
-        </TableWrapper>
-        <WidthRestrictedInputWrapper>
-          <FormGroup label={dc.comments}>
-            <BpTextArea
-              autoResize
-              fill
-              value={answerBeingEdited.comment}
-              onValueChange={AnswerPageStore.onCommentChange}
-            />
-          </FormGroup>
-        </WidthRestrictedInputWrapper>
-        <Paragraph>
-          <ParagraphWithSwitch
-            description={dc.required.description}
-            elementToToggle={undefined}
-            hideContentIfToggleIsFalse={false}
-            title={dc.required.title}
-            toggleState={answerBeingEdited.isRequiredParticipants}
-            onToggle={AnswerPageStore.toggleRequiredSection}
+        </FormGroup>
+      </WidthRestrictedInputWrapper>
+      <div class={constant(styles.paragraph)}>
+        <ParagraphWithSwitch
+          description={dc.required.description}
+          elementToToggle={[]}
+          title={dc.required.title}
+          toggleState={view(answerBeingEdited, (a) => a.isRequiredParticipants)}
+          onToggle={AnswerPageStore.toggleRequiredSection}
+        />
+      </div>
+      <div class={constant(styles.paragraph)}>
+        <div class={constant(styles.weightRow)}>
+          <WeightSetting
+            weight={view(answerBeingEdited, (a) => a.weight)}
+            onWeightChange={AnswerPageStore.onWeightChange}
           />
-        </Paragraph>
-        <Paragraph>
-          <div
-            css={css`
-              margin-bottom: 5px;
-            `}
-          >
-            <WeightSetting
-              weight={answerBeingEdited.weight}
-              onWeightChange={AnswerPageStore.onWeightChange}
-            />
-          </div>
-          {dc.weight.description.map((d, i) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <Description key={i} text={d} />
-          ))}
-        </Paragraph>
+        </div>
+        {dc.weight.description.map((d) => (
+          <Description text={constant(d)} />
+        ))}
+      </div>
 
-        <Paragraph>
-          {fireAuthUser === undefined ? (
+      <div class={constant(styles.paragraph)}>
+        <If
+          cond={view(Auth.fireAuthUser$, (user) => user === undefined)}
+          else={
+            <ParagraphWithSwitch
+              description={view(answerBeingEdited, (a) =>
+                a.user.id === null
+                  ? dc.protected.description.disabled
+                  : dc.protected.description.enabled,
+              )}
+              elementToToggle={[]}
+              title={dc.protected.title}
+              toggleState={view(answerBeingEdited, (a) => a.user.id !== null)}
+              onToggle={AnswerPageStore.toggleProtectedSection}
+            />
+          }
+          then={
             <>
               <ParagraphWithSwitch
                 description={dc.protected.description.disabled}
-                elementToToggle={undefined}
-                hideContentIfToggleIsFalse={false}
+                elementToToggle={[]}
                 title={dc.protected.title}
-                toggleState={false}
-                onToggle={forNonLoggedInUserDialogState[1].setTrue}
+                toggleState={constant(false)}
+                onToggle={openForNonLoggedInUserDialog}
               />
               <ForNonLoggedInUserDialog
-                cancel={forNonLoggedInUserDialogState[1].setFalse}
-                isOpen={forNonLoggedInUserDialogState[0]}
+                cancel={closeForNonLoggedInUserDialog}
+                isOpen={forNonLoggedInUserDialogIsOpen$}
               />
             </>
-          ) : (
-            <ParagraphWithSwitch
-              description={
-                dc.protected.description[
-                  answerBeingEdited.user.id === null ? 'disabled' : 'enabled'
-                ]
-              }
-              elementToToggle={undefined}
-              hideContentIfToggleIsFalse={false}
-              title={dc.protected.title}
-              toggleState={answerBeingEdited.user.id !== null}
-              onToggle={AnswerPageStore.toggleProtectedSection}
-            />
-          )}
-        </Paragraph>
+          }
+        />
+      </div>
 
-        <ButtonsWrapperAlignEnd data-e2e={'buttons'}>
-          <ButtonNowrapStyled
-            disabled={submitButtonIsLoading}
-            intent={'none'}
-            text={dict.common.buttonText.cancel}
-            onClick={AnswerPageStore.onCancelEditingAnswer}
-          />
-          {answerBeingEditedSectionState === 'editing' ? (
-            <DeleteAnswerButton
-              loading={submitButtonIsLoading}
-              onConfirmDeleteAnswer={AnswerPageStore.onDeleteAnswerClick}
-            />
-          ) : undefined}
-          <SubmitAnswerButtonWithConfirmation
-            disabled={submitButtonIsDisabled}
-            hasUnanswered={hasUnanswered}
+      <ButtonsWrapperAlignEnd data-e2e={'buttons'}>
+        <Button
+          class={nowrapClass}
+          disabled={submitButtonIsLoading}
+          intent={'none'}
+          text={constant(dict.common.buttonText.cancel)}
+          onClick={AnswerPageStore.onCancelEditingAnswer}
+        />
+        {answerBeingEditedSectionState === 'editing' ? (
+          <DeleteAnswerButton
             loading={submitButtonIsLoading}
-            mode={answerBeingEditedSectionState}
+            onConfirmDeleteAnswer={AnswerPageStore.onDeleteAnswerClick}
           />
-        </ButtonsWrapperAlignEnd>
-      </>
-    );
-  },
-);
+        ) : (
+          []
+        )}
+        <SubmitAnswerButtonWithConfirmation
+          disabled={submitButtonIsDisabled}
+          hasUnanswered={AnswerPageStore.hasUnanswered$}
+          loading={submitButtonIsLoading}
+          mode={answerBeingEditedSectionState}
+        />
+      </ButtonsWrapperAlignEnd>
+    </>
+  );
+};
 
-const Paragraph = styled.div`
-  margin: 20px 0;
-`;
-
-const TableWrapper = styled(CustomScrollbarWrapper)`
-  margin-bottom: 15px;
-`;
+const mapAnswerIcons = map((e: EventSchedule) => e.answerIcons);

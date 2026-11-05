@@ -1,4 +1,5 @@
-import { memoNamed } from 'react-utils';
+import { map, type InitializedObservable } from 'synstate';
+import type { JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import type {
   EventScheduleSettingCommonState,
@@ -15,61 +16,54 @@ import {
 const dc = dict.eventSettingsPage;
 
 type Props = Readonly<{
-  state: EventScheduleSettingCommonState;
+  state$: InitializedObservable<EventScheduleSettingCommonState>;
   handlers: EventScheduleSettingCommonStateHandler;
 }>;
 
-export const EventScheduleSettingCommon = memoNamed<Props>(
-  'EventScheduleSettingCommon',
-  ({
-    state: {
-      title,
-      notes,
-      datetimeSpecification,
-      datetimeRangeList,
-      useAnswerDeadline,
-      answerDeadline,
-      answerIcons,
-      useNotification,
-      notificationSettingsWithEmail,
-      eventScheduleValidation,
-    },
-    handlers: {
-      setTitle,
-      setNotes,
-      setDatetimeSpecification,
-      setDatetimeRangeList,
-      toggleAnswerDeadlineSection,
-      setAnswerDeadline,
-      setAnswerIcons,
-      toggleNotificationSection,
-      setNotificationSettingsWithEmail,
-    },
-  }) => (
+export const EventScheduleSettingCommon = ({
+  state$,
+  handlers: {
+    setTitle,
+    setNotes,
+    setDatetimeSpecification,
+    setDatetimeRangeList,
+    toggleAnswerDeadlineSection,
+    setAnswerDeadline,
+    setAnswerIcons,
+    toggleNotificationSection,
+    setNotificationSettingsWithEmail,
+  },
+}: Props): JSX.Element => {
+  const field = <K extends keyof EventScheduleSettingCommonState>(
+    key: K,
+  ): InitializedObservable<EventScheduleSettingCommonState[K]> =>
+    state$.pipe(map((s) => s[key]));
+
+  return (
     <>
       <Section sectionTitle={dc.section1.titleAndNotesSectionTitle}>
         <NameAndNotes
-          notes={notes}
-          title={title}
+          notes={field('notes')}
+          title={field('title')}
           onNotesChange={setNotes}
           onTitleChange={setTitle}
         />
       </Section>
       <Section sectionTitle={dc.section2.selectDatesSectionTitle}>
         <SelectDatetimes
-          datetimeList={datetimeRangeList}
-          datetimeSpecification={datetimeSpecification}
+          datetimeList={field('datetimeRangeList')}
+          datetimeSpecification={field('datetimeSpecification')}
           onDatetimeListChange={setDatetimeRangeList}
           onDatetimeSpecificationChange={setDatetimeSpecification}
         />
       </Section>
       <Section sectionTitle={dc.section3.otherSettingsTitle}>
         <EventSettings
-          answerDeadline={answerDeadline}
-          answerIcons={answerIcons}
-          notificationSettingsWithEmail={notificationSettingsWithEmail}
-          useAnswerDeadline={useAnswerDeadline}
-          useNotification={useNotification}
+          answerDeadline={field('answerDeadline')}
+          answerIcons={field('answerIcons')}
+          notificationSettingsWithEmail={field('notificationSettingsWithEmail')}
+          useAnswerDeadline={field('useAnswerDeadline')}
+          useNotification={field('useNotification')}
           onAnswerDeadlineChange={setAnswerDeadline}
           onAnswerIconsChange={setAnswerIcons}
           onNotificationSettingsWithEmailChange={
@@ -81,8 +75,8 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
       </Section>
 
       <EventSchedulePropertiesErrors
-        eventScheduleValidation={eventScheduleValidation}
+        eventScheduleValidation={field('eventScheduleValidation')}
       />
     </>
-  ),
-);
+  );
+};

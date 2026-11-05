@@ -1,63 +1,35 @@
-import { useNumericInputWithStepState } from 'numeric-input-utils';
-import * as React from 'react';
-import { NumericInputView } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { Num, Result } from 'ts-data-forge';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
+import { asSafeUint } from 'ts-data-forge';
 import type { SafeUint } from 'ts-type-forge';
 import {
   clampAndRoundNumIcons,
   iconFilterNumericInputConfig,
 } from '../../constants/index.mjs';
+import { AppNumericInput } from './app-numeric-input.js';
 
 type Props = Readonly<{
-  count: SafeUint;
+  count: Bindable<SafeUint>;
   onCountChange: (value: SafeUint) => void;
-  disabled?: boolean;
-  max: SafeUint;
+  disabled?: Bindable<boolean>;
+  max: Bindable<SafeUint>;
 }>;
 
-export const IconCountNumericInput = memoNamed<Props>(
-  'IconCountNumericInput',
-  ({ count: valueFromProps, max, disabled = false, onCountChange }) => {
-    const normalizeValue = React.useCallback(
-      (value: number): SafeUint => clampAndRoundNumIcons(value, max),
-      [max],
-    );
-
-    const {
-      state,
-      setState,
-      onDecrementMouseDown,
-      onIncrementMouseDown,
-      submit,
-      onKeyDown,
-    } = useNumericInputWithStepState<SafeUint>({
-      onValueChange: onCountChange,
-      normalize: normalizeValue,
-      decode: (s) =>
-        normalizeValue(Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN)),
-      encode: (s) => s.toString(),
-      valueFromProps,
-      step: iconFilterNumericInputConfig.step,
-    });
-
-    const inputProps = React.useMemo(
-      () => ({ min: 0, max, onKeyDown }),
-      [max, onKeyDown],
-    );
-
-    return (
-      <NumericInputView
-        disabled={disabled}
-        fillSpace
-        inputProps={inputProps}
-        selectOnFocus
-        valueAsStr={state}
-        onDecrementMouseDown={onDecrementMouseDown}
-        onIncrementMouseDown={onIncrementMouseDown}
-        onInputBlur={submit}
-        onInputStringChange={setState}
-      />
-    );
-  },
+export const IconCountNumericInput = ({
+  count,
+  max,
+  disabled,
+  onCountChange,
+}: Props): JSX.Element => (
+  <AppNumericInput
+    disabled={disabled}
+    max={max}
+    min={constant(0)}
+    // Already clamped to `max`, which the input does before this.
+    normalize={(value) => clampAndRoundNumIcons(value, unbounded)}
+    step={iconFilterNumericInputConfig.step}
+    value={count}
+    onValueChange={onCountChange}
+  />
 );
+
+const unbounded = asSafeUint(Number.MAX_SAFE_INTEGER);

@@ -139,7 +139,7 @@ test('create event', { tag: '@emulators' }, async ({ page, context }) => {
     const fairPointInput = editEventSchedulePage
       .getByTestId('icon-settings')
       .getByTestId('fair-point-input')
-      .getByRole('textbox');
+      .getByRole('spinbutton');
 
     await fairPointInput.clear();
 

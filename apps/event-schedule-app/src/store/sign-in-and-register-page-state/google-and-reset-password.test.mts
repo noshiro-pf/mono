@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import { createMemoryBrowser } from 'tiny-router-observable';
 import { Result } from 'ts-data-forge';
 import { createAppRouter } from '../router-store.mjs';
@@ -143,6 +142,7 @@ const routerAt = (
         dismiss: () => undefined,
         clear: () => undefined,
         getToasts: () => [],
+        remove: () => undefined,
       },
       count: () => mut_toasts.count,
     },

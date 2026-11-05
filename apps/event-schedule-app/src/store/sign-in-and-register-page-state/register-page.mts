@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import { type InitializedObservable, combine, filter, map } from 'synstate';
 import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
@@ -34,6 +33,11 @@ export type RegisterPageDeps<User> = Readonly<{
       }>;
     }>;
   }>;
+  /**
+   * Read again once the name is set: Firebase sets it on the user it holds and
+   * reports no change.
+   */
+  auth: Readonly<{ emitAuthStateChange: () => void }>;
   router: StrictPick<AppRouter, 'isRoute' | 'pageToBack$' | 'redirect'>;
   /** Registering waits while a Google sign-in is under way. */
   googleSignIn: StrictPick<GoogleSignIn, 'googleSignInButtonDisabledState'>;
@@ -54,7 +58,7 @@ export const createRegisterPageStore = <User,>(
     filter((isPage) => !isPage),
   );
 
-  const [, dispatch, { state: formState$ }] = createReducerWithActions(
+  const [formState$, dispatch] = createReducerWithActions(
     registerPageStateReducer,
     registerPageInitialState,
     [left$.pipe(map(() => ({ type: 'reset' }) as const))],
@@ -185,6 +189,8 @@ export const createRegisterPageStore = <User,>(
 
       return;
     }
+
+    deps.auth.emitAuthStateChange();
 
     dispatch({ type: 'done' });
 

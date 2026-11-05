@@ -1,12 +1,11 @@
-import type { InitializedObservable } from 'synstate';
-import { createState } from 'synstate-react-hooks';
+import { type InitializedObservable, createState } from 'synstate';
 
 /** Which of the account dialogs is open, if any. */
 export const createUpdateUserInfoDialogStore = (): UpdateUserInfoDialog => {
   const [
-    useOpeningDialogType,
+    openingDialogType$,
     setOpeningDialogType,
-    { state: openingDialogType$, resetState: closeDialog },
+    { resetState: closeDialog },
   ] = createState<UpdateUserInfoDialogType | undefined>(undefined);
 
   const changeUsername = (): void => {
@@ -31,7 +30,6 @@ export const createUpdateUserInfoDialogStore = (): UpdateUserInfoDialog => {
 
   return {
     openingDialogType$,
-    useOpeningDialogType,
     closeDialog,
     changeUsername,
     changeEmail,
@@ -52,7 +50,6 @@ export type UpdateUserInfoDialog = Readonly<{
   openingDialogType$: InitializedObservable<
     UpdateUserInfoDialogType | undefined
   >;
-  useOpeningDialogType: () => UpdateUserInfoDialogType | undefined;
   closeDialog: () => void;
   changeUsername: () => void;
   changeEmail: () => void;

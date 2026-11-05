@@ -1,5 +1,7 @@
 export * from './add-element-button.js';
 export * from './answer-icon-point-input/index.mjs';
+export * from './app-numeric-input.js';
+export * from './checkbox-view.js';
 export * from './custom-icon-button.js';
 export * from './custom-scrollbar-wrapper.js';
 export * from './icon-count-numeric-input.js';
@@ -9,3 +11,4 @@ export * from './score-numeric-input.js';
 export * from './section.js';
 export * from './time-range.js';
 export * from './weight-numeric-input.js';
+export * from './ymd-input.js';

@@ -1,0 +1,8 @@
+.screen {
+  height: 100vh;
+}
+
+.log {
+  max-height: 200px;
+  overflow-y: auto;
+}

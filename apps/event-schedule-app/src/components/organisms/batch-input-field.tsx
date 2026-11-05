@@ -1,28 +1,28 @@
-import { Button } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import * as React from 'react';
+import { Button, TextArea } from 'blueprint-synstate';
+import { createState, type InitializedObservable } from 'synstate';
 import {
-  BpTextArea,
-  ButtonNowrapStyled,
-  HTMLTableBorderedStyled2,
-} from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { createState as createStateBase } from 'synstate';
-import { createState } from 'synstate-react-hooks';
-import { match } from 'ts-data-forge';
-import type { DeepReadonly } from 'ts-type-forge';
+  constant,
+  If,
+  mapBindable,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
+import { AnswerIconPointCell, CustomIconButton } from '../molecules/index.mjs';
 import {
-  AnswerIconFairPointInput,
-  AnswerIconGoodPoint,
-  AnswerIconPoorPoint,
-  CustomIconButton,
-} from '../molecules/index.mjs';
-import { ButtonsWrapper } from '../styled/index.mjs';
+  answerCommentCellClass,
+  answerInputTableClass,
+  answerPointCellClass,
+  borderedTableClass,
+  ButtonsWrapper,
+  nowrapClass,
+} from '../styled/index.mjs';
+import * as styles from './batch-input-field.module.css';
 
-type Props = DeepReadonly<{
-  isOpen: boolean;
-  answerIcons: EventSchedule['answerIcons'];
+type Props = Readonly<{
+  isOpen: Bindable<boolean>;
+  answerIcons: InitializedObservable<EventSchedule['answerIcons']>;
   toggleOpen: () => void;
   applyBatchInput: (
     result: Readonly<{
@@ -33,159 +33,115 @@ type Props = DeepReadonly<{
   ) => void;
 }>;
 
-export const BatchInputAnswerForm = memoNamed<Props>(
-  'BatchInputAnswerForm',
-  ({ isOpen, answerIcons, toggleOpen, applyBatchInput }) => {
-    const comment = useComment();
-
-    const selectedIconId = useSelectedIconId();
-
-    const point = useFairPoint();
-
-    React.useEffect(() => {
-      setDefaultFairPoint(answerIcons.fair.point);
-    }, [answerIcons.fair.point]);
-
-    const onApplyBatchInputClick = React.useCallback(() => {
-      applyBatchInput({ comment, selectedIconId, point });
-    }, [applyBatchInput, comment, point, selectedIconId]);
-
-    return (
-      <div>
-        <ButtonsWrapper>
-          <Button
-            active={isOpen}
-            icon={'edit'}
-            intent={'success'}
-            onClick={toggleOpen}
-          >
-            {isOpen ? dc.batchInput.closeButton : dc.batchInput.openButton}
-          </Button>
-        </ButtonsWrapper>
-        {isOpen ? (
-          <div>
-            <div
-              css={css`
-                margin: 5px;
-                display: flex;
-                align-items: center;
-              `}
-            >
-              <HTMLTableBorderedStyled2
-                css={css`
-                  th,
-                  td {
-                    padding: 6px;
-                  }
-                `}
-              >
-                <tbody>
-                  <tr>
-                    <td>
-                      <CustomIconButton
-                        active={selectedIconId === 'good'}
-                        iconColor={selectedIconId === 'good' ? 'blue' : 'gray'}
-                        iconName={'good'}
-                        title={answerIcons.good.description}
-                        onClick={onGoodClick}
-                      />
-                    </td>
-                    <td>
-                      <CustomIconButton
-                        active={selectedIconId === 'fair'}
-                        iconColor={selectedIconId === 'fair' ? 'blue' : 'gray'}
-                        iconName={'fair'}
-                        title={answerIcons.fair.description}
-                        onClick={onFairClick}
-                      />
-                    </td>
-                    <td>
-                      <CustomIconButton
-                        active={selectedIconId === 'poor'}
-                        iconColor={selectedIconId === 'poor' ? 'blue' : 'gray'}
-                        iconName={'poor'}
-                        title={answerIcons.poor.description}
-                        onClick={onPoorClick}
-                      />
-                    </td>
-                    <td
-                      css={css`
-                        min-width: 87px;
-                        max-width: 87px;
-                      `}
-                    >
-                      {match(selectedIconId, {
-                        none: undefined,
-                        good: <AnswerIconGoodPoint />,
-                        poor: <AnswerIconPoorPoint />,
-                        fair: (
-                          <AnswerIconFairPointInput
-                            disabled={false}
-                            value={point}
-                            onValueChange={setFairPoint}
-                          />
-                        ),
-                      })}
-                    </td>
-                    <td>
-                      <BpTextArea
-                        css={css`
-                          resize: vertical;
-                          min-height: 38px;
-                        `}
-                        rows={1}
-                        value={comment}
-                        onValueChange={setComment}
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </HTMLTableBorderedStyled2>
-
-              <div>
-                <ButtonNowrapStyled
-                  icon={'tick'}
-                  intent={'none'}
-                  onClick={onApplyBatchInputClick}
-                >
-                  {dc.batchInput.apply}
-                </ButtonNowrapStyled>
-              </div>
-            </div>
-          </div>
-        ) : undefined}
-      </div>
-    );
-  },
-);
-
 const dc = dict.answerPage.answerBeingEdited;
 
-const [useComment, setComment] = createState('');
+export const BatchInputAnswerForm = ({
+  isOpen,
+  answerIcons,
+  toggleOpen,
+  applyBatchInput,
+}: Props): JSX.Element => (
+  <div>
+    <ButtonsWrapper>
+      <Button
+        active={isOpen}
+        icon={'edit'}
+        intent={'success'}
+        text={mapBindable(isOpen, (open) =>
+          open ? dc.batchInput.closeButton : dc.batchInput.openButton,
+        )}
+        onClick={toggleOpen}
+      />
+    </ButtonsWrapper>
+    <If
+      cond={isOpen}
+      then={
+        <div>
+          <div class={constant(styles.batchRow)}>
+            <table
+              class={constant(`${borderedTableClass} ${answerInputTableClass}`)}
+            >
+              <tbody>
+                <tr>
+                  {(['good', 'fair', 'poor'] as const).map((iconId) => (
+                    <td>
+                      <CustomIconButton
+                        active={view(selectedIconId$, (s) => s === iconId)}
+                        iconColor={view(selectedIconId$, (s) =>
+                          s === iconId ? 'blue' : 'gray',
+                        )}
+                        iconName={iconId}
+                        title={view(answerIcons, (a) => a[iconId].description)}
+                        onClick={() => {
+                          onIconClick(
+                            iconId,
+                            answerIcons.getSnapshot().value.fair.point,
+                          );
+                        }}
+                      />
+                    </td>
+                  ))}
+                  <td class={constant(answerPointCellClass)}>
+                    <AnswerIconPointCell
+                      iconId={selectedIconId$}
+                      point={fairPoint$}
+                      onPointChange={setFairPoint}
+                    />
+                  </td>
+                  <td>
+                    <TextArea
+                      class={answerCommentCellClass}
+                      rows={1}
+                      value={comment$}
+                      onInput={({ currentTarget }) => {
+                        setComment(currentTarget.value);
+                      }}
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-const [
-  useSelectedIconId,
-  ,
-  { updateState: updateSelectedIconId, getSnapshot: getSelectedIconIdSnapshot },
-] = createState<AnswerIconIdWithNone>('none');
+            <div>
+              <Button
+                class={nowrapClass}
+                icon={'tick'}
+                intent={'none'}
+                text={constant(dc.batchInput.apply)}
+                onClick={() => {
+                  applyBatchInput({
+                    comment: comment$.getSnapshot().value,
+                    selectedIconId: selectedIconId$.getSnapshot().value,
+                    point: fairPoint$.getSnapshot().value,
+                  });
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      }
+    />
+  </div>
+);
 
-const [, setDefaultFairPoint, { getSnapshot: getDefaultFairPointSnapshot }] =
-  createStateBase<AnswerIconPoint>(0);
+// Kept for the page's lifetime, as the batch input was.
+const [comment$, setComment] = createState('');
 
-const [useFairPoint, setFairPoint] = createState<AnswerIconPoint>(0);
+const [selectedIconId$, , { updateState: updateSelectedIconId }] =
+  createState<AnswerIconIdWithNone>('none');
 
-const onGoodClick = (): void => {
-  updateSelectedIconId((prev) => (prev === 'good' ? 'none' : 'good'));
-};
+const [fairPoint$, setFairPoint] = createState<AnswerIconPoint>(0);
 
-const onFairClick = (): void => {
-  updateSelectedIconId((prev) => (prev === 'fair' ? 'none' : 'fair'));
+/** Flips the icon; fair starts from the point the event gives it. */
+const onIconClick = (
+  iconId: AnswerIconId,
+  defaultFairPoint: AnswerIconPoint,
+): void => {
+  const next = updateSelectedIconId((prev) =>
+    prev === iconId ? 'none' : iconId,
+  );
 
-  if (getSelectedIconIdSnapshot() === 'fair') {
-    setFairPoint(getDefaultFairPointSnapshot());
+  if (next === 'fair') {
+    setFairPoint(defaultFairPoint);
   }
-};
-
-const onPoorClick = (): void => {
-  updateSelectedIconId((prev) => (prev === 'poor' ? 'none' : 'poor'));
 };

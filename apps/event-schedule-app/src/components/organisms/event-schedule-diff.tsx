@@ -1,10 +1,15 @@
-import { css } from '@emotion/react';
-import { memoNamed } from 'react-utils';
-import { mapNullable } from 'ts-data-forge';
+import {
+  constant,
+  For,
+  mapBindable,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
 import type { EventSettingsPageDiffResult } from '../../functions/index.mjs';
+import * as styles from './event-schedule-diff.module.css';
 
-type Props = Readonly<{ diff: EventSettingsPageDiffResult }>;
+type Props = Readonly<{ diff: Bindable<EventSettingsPageDiffResult> }>;
 
 const list1 = [
   'title',
@@ -20,138 +25,132 @@ const list2 = [
 
 const dc = dict.eventSettingsPage.diff;
 
-export const EventScheduleDiff = memoNamed<Props>(
-  'EventScheduleDiff',
-  ({ diff }) => (
-    <div
-      css={css`
-        margin: 10px 20px;
-      `}
-    >
-      <div
-        css={css`
-          padding: 15px 20px;
-          border-radius: 5px;
-          border-style: solid;
-          border-color: gray;
-        `}
-      >
-        <div
-          css={css`
-            margin: 5px;
-          `}
-        >
-          {dc.title}
-        </div>
-        <ul data-e2e={'diff-ul'}>
-          {list1.map((li) =>
-            mapNullable(diff[li], (s) => (
-              <li key={li}>
-                {dc.items[li]}
-                {s}
-              </li>
-            )),
-          )}
+/** What the edit changes, drawn again whenever it changes. */
+export const EventScheduleDiff = ({ diff }: Props): JSX.Element => (
+  <div class={constant(styles.root)}>
+    <div class={constant(styles.box)}>
+      <div class={constant(styles.title)}>{constant(dc.title)}</div>
+      <ul data-e2e={constant('diff-ul')}>
+        <For items={mapBindable(diff, (d) => [d])} key={(d) => d}>
+          {(diff$) => <DiffItems diff={diff$.getSnapshot().value} />}
+        </For>
+      </ul>
+    </div>
+  </div>
+);
 
-          {/* datetimeRangeList */}
-          {mapNullable(diff.datetimeRangeList, (list) => (
-            <>
-              <li>{dc.items.datetimeRangeList.title}</li>
-              <ul>
-                <li>{dc.items.datetimeRangeList.added}</li>
-                <ul>
-                  {list.added.map((li) => (
-                    <li key={li}>{li}</li>
-                  ))}
-                </ul>
-                <li>{dc.items.datetimeRangeList.deleted}</li>
-                <ul>
-                  {list.deleted.map((li) => (
-                    <li key={li}>{li}</li>
-                  ))}
-                </ul>
-              </ul>
-            </>
-          ))}
+const text = (s: string): JSX.Element => <>{constant(s)}</>;
 
-          {/* notificationSettings */}
-          {mapNullable(diff.notificationSettings, (list) => (
-            <>
-              <li>{dc.items.notificationSettings.title}</li>
-              <ul>
-                {list.map((li) => (
-                  <li key={li}>{li}</li>
-                ))}
-              </ul>
-            </>
-          ))}
+const li = (...children: readonly JSX.Element[]): JSX.Element => (
+  <li>{children}</li>
+);
 
-          {list2.map((li) =>
-            mapNullable(diff[li], (s) => (
-              <li key={li}>
-                {dc.items[li]}
-                {s}
-              </li>
-            )),
-          )}
+const DiffItems = ({
+  diff,
+}: Readonly<{ diff: EventSettingsPageDiffResult }>): JSX.Element => {
+  const { answerIcons } = diff;
 
-          {/* answerIcons */}
-          {diff.answerIcons.good.description === undefined &&
-          diff.answerIcons.fair.description === undefined &&
-          diff.answerIcons.fair.point === undefined &&
-          diff.answerIcons.poor.description === undefined ? undefined : (
-            <li>
-              {dc.items.answerIcons.title}
-              <ul>
-                {mapNullable(diff.answerIcons.good.description, (s) => (
-                  <li>
-                    {dc.items.answerIcons.good.title}
-                    <ul>
-                      <li>
-                        {dc.items.answerIcons.good.description}
-                        {s}
-                      </li>
-                    </ul>
-                  </li>
-                ))}
+  const fairChanged =
+    answerIcons.fair.description !== undefined ||
+    answerIcons.fair.point !== undefined;
 
-                {diff.answerIcons.fair.description === undefined &&
-                diff.answerIcons.fair.point === undefined ? undefined : (
-                  <li>
-                    {dc.items.answerIcons.fair.title}
-                    <ul>
-                      {mapNullable(diff.answerIcons.fair.description, (s) => (
-                        <li>
-                          {dc.items.answerIcons.fair.description}
-                          {s}
-                        </li>
-                      ))}
-                      {mapNullable(diff.answerIcons.fair.point, (s) => (
-                        <li>
-                          {dc.items.answerIcons.fair.point}
-                          {s}
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
+  const iconsChanged =
+    answerIcons.good.description !== undefined ||
+    fairChanged ||
+    answerIcons.poor.description !== undefined;
+
+  return (
+    <>
+      {list1.map((key) => {
+        const s = diff[key];
+
+        return s === undefined ? [] : li(text(dc.items[key]), text(s));
+      })}
+
+      {/* datetimeRangeList */}
+      {diff.datetimeRangeList === undefined ? (
+        []
+      ) : (
+        <>
+          {li(text(dc.items.datetimeRangeList.title))}
+          <ul>
+            {li(text(dc.items.datetimeRangeList.added))}
+            <ul>{diff.datetimeRangeList.added.map((s) => li(text(s)))}</ul>
+            {li(text(dc.items.datetimeRangeList.deleted))}
+            <ul>{diff.datetimeRangeList.deleted.map((s) => li(text(s)))}</ul>
+          </ul>
+        </>
+      )}
+
+      {/* notificationSettings */}
+      {diff.notificationSettings === undefined ? (
+        []
+      ) : (
+        <>
+          {li(text(dc.items.notificationSettings.title))}
+          <ul>{diff.notificationSettings.map((s) => li(text(s)))}</ul>
+        </>
+      )}
+
+      {list2.map((key) => {
+        const s = diff[key];
+
+        return s === undefined ? [] : li(text(dc.items[key]), text(s));
+      })}
+
+      {/* answerIcons */}
+      {iconsChanged ? (
+        <li>
+          {constant(dc.items.answerIcons.title)}
+          <ul>
+            {answerIcons.good.description === undefined
+              ? []
+              : li(
+                  text(dc.items.answerIcons.good.title),
+                  <ul>
+                    {li(
+                      text(dc.items.answerIcons.good.description),
+                      text(answerIcons.good.description),
+                    )}
+                  </ul>,
                 )}
 
-                {mapNullable(diff.answerIcons.poor.description, (s) => (
-                  <li>
-                    {dc.items.answerIcons.poor.title}
-                    <ul>
-                      <li>
-                        {dc.items.answerIcons.poor.description}
-                        {s}
-                      </li>
-                    </ul>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          )}
-        </ul>
-      </div>
-    </div>
-  ),
-);
+            {fairChanged
+              ? li(
+                  text(dc.items.answerIcons.fair.title),
+                  <ul>
+                    {answerIcons.fair.description === undefined
+                      ? []
+                      : li(
+                          text(dc.items.answerIcons.fair.description),
+                          text(answerIcons.fair.description),
+                        )}
+                    {answerIcons.fair.point === undefined
+                      ? []
+                      : li(
+                          text(dc.items.answerIcons.fair.point),
+                          text(answerIcons.fair.point),
+                        )}
+                  </ul>,
+                )
+              : []}
+
+            {answerIcons.poor.description === undefined
+              ? []
+              : li(
+                  text(dc.items.answerIcons.poor.title),
+                  <ul>
+                    {li(
+                      text(dc.items.answerIcons.poor.description),
+                      text(answerIcons.poor.description),
+                    )}
+                  </ul>,
+                )}
+          </ul>
+        </li>
+      ) : (
+        []
+      )}
+    </>
+  );
+};

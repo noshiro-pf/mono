@@ -74,12 +74,14 @@ export const ButtonContents = ({
   text,
   children,
   icon,
+  iconElement,
   endIcon,
   loading,
 }: Readonly<{
   text: Bindable<string> | undefined;
   children: Child | undefined;
   icon: Bindable<IconName> | IconName | undefined;
+  iconElement?: Child | undefined;
   endIcon: Bindable<IconName> | IconName | undefined;
   loading: Bindable<boolean> | undefined;
 }>): JSX.Element => (
@@ -92,7 +94,7 @@ export const ButtonContents = ({
         then={<Spinner class={'bp6-button-spinner'} size={SpinnerSize.SMALL} />}
       />
     )}
-    {icon === undefined ? [] : <Icon icon={icon} />}
+    {icon === undefined ? (iconElement ?? []) : <Icon icon={icon} />}
     {text === undefined && children === undefined ? (
       []
     ) : (

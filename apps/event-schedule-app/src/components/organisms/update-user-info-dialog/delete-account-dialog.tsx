@@ -1,129 +1,100 @@
-import { Button, FormGroup } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import * as React from 'react';
-import { BpInput } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
-import { dict } from '../../../constants/index.mjs';
+import { Button, FormGroup, InputGroup } from 'blueprint-synstate';
 import {
-  DeleteAccountPageStore,
-  UpdateUserInfoDialogStore,
-} from '../../../store/index.mjs';
-import { Label } from '../../atoms/index.mjs';
+  constant,
+  mapBindable,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import { dict } from '../../../constants/index.mjs';
+import { DeleteAccountPageStore } from '../../../store/index.mjs';
 import { LockButton } from '../../molecules/index.mjs';
 import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template.js';
+import * as styles from './update-user-info-dialog.module.css';
 
 const dc = dict.accountSettings;
 
-type Props = Readonly<{ dialogIsOpen: boolean }>;
+type Props = Readonly<{ dialogIsOpen: Bindable<boolean> }>;
 
-export const DeleteAccountDialog = memoNamed<Props>(
-  'DeleteAccountDialog',
-  ({ dialogIsOpen }) => {
-    const {
-      formState,
-      enterButtonDisabled,
-      emailFormIntent,
-      passwordFormIntent,
-      passwordIsOpen,
-    } = useObservableValue(DeleteAccountPageStore.state);
+const { state } = DeleteAccountPageStore;
 
-    const passwordLockButton = React.useMemo(
-      () => (
-        <LockButton
-          disabled={formState.isWaitingResponse}
-          passwordIsOpen={passwordIsOpen}
-          onLockClick={DeleteAccountPageStore.togglePasswordLock}
-        />
-      ),
-      [formState.isWaitingResponse, passwordIsOpen],
-    );
+export const DeleteAccountDialog = ({ dialogIsOpen }: Props): JSX.Element => {
+  const isWaitingResponse = view(state, (s) => s.formState.isWaitingResponse);
 
-    const body = React.useMemo(
-      () => (
-        <div
-          css={css`
-            width: 300px;
-            height: 160px;
-          `}
-        >
+  const emailIntent = view(state, (s) => s.emailFormIntent);
+
+  const passwordIntent = view(state, (s) => s.passwordFormIntent);
+
+  const passwordIsOpen = view(state, (s) => s.passwordIsOpen);
+
+  return (
+    <UpdateUserInfoDialogTemplate
+      body={
+        <div class={constant(styles.deleteAccountBody)}>
           <FormGroup
-            helperText={formState.email.error}
-            intent={emailFormIntent}
-            label={verifyEmailInputLabel}
+            class={styles.field}
+            helperText={view(state, (s) => s.formState.email.error)}
+            intent={emailIntent}
+            label={constant(dc.deleteAccount.verifyEmail)}
           >
-            <BpInput
+            <InputGroup
               // suppress auto complete
               autoComplete={'new-password'}
-              // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
-              data-e2e={'verify-email'}
-              disabled={formState.isWaitingResponse}
-              intent={emailFormIntent}
+              data-e2e={constant('verify-email')}
+              disabled={isWaitingResponse}
+              intent={emailIntent}
               type={'email'}
-              value={formState.email.inputValue}
-              onValueChange={DeleteAccountPageStore.inputEmailHandler}
+              value={view(state, (s) => s.formState.email.inputValue)}
+              onInput={({ currentTarget }) => {
+                DeleteAccountPageStore.inputEmailHandler(currentTarget.value);
+              }}
             />
           </FormGroup>
           <FormGroup
-            helperText={formState.password.error}
-            intent={passwordFormIntent}
-            label={passwordInputLabel}
+            class={styles.field}
+            helperText={view(state, (s) => s.formState.password.error)}
+            intent={passwordIntent}
+            label={constant(dc.reauthenticate.password)}
           >
-            <BpInput
+            <InputGroup
               // suppress auto complete
               autoComplete={'new-password'}
-              data-e2e={'password'}
-              disabled={formState.isWaitingResponse}
-              intent={passwordFormIntent}
-              rightElement={passwordLockButton}
-              type={passwordIsOpen ? 'text' : 'password'}
-              value={formState.password.inputValue}
-              onValueChange={DeleteAccountPageStore.inputPasswordHandler}
+              data-e2e={constant('password')}
+              disabled={isWaitingResponse}
+              intent={passwordIntent}
+              rightElement={
+                <LockButton
+                  disabled={isWaitingResponse}
+                  passwordIsOpen={passwordIsOpen}
+                  onLockClick={DeleteAccountPageStore.togglePasswordLock}
+                />
+              }
+              type={mapBindable(passwordIsOpen, (open) =>
+                open ? 'text' : 'password',
+              )}
+              value={view(state, (s) => s.formState.password.inputValue)}
+              onInput={({ currentTarget }) => {
+                DeleteAccountPageStore.inputPasswordHandler(
+                  currentTarget.value,
+                );
+              }}
             />
           </FormGroup>
         </div>
-      ),
-      [
-        emailFormIntent,
-        formState.email.error,
-        formState.email.inputValue,
-        formState.isWaitingResponse,
-        formState.password.error,
-        formState.password.inputValue,
-        passwordFormIntent,
-        passwordIsOpen,
-        passwordLockButton,
-      ],
-    );
-
-    const submitButton = React.useMemo(
-      () => (
+      }
+      dialogIsOpen={dialogIsOpen}
+      isWaitingResponse={isWaitingResponse}
+      submitButton={
         <Button
-          disabled={enterButtonDisabled}
+          disabled={view(state, (s) => s.enterButtonDisabled)}
           intent={'danger'}
-          loading={formState.isWaitingResponse}
+          loading={isWaitingResponse}
+          text={constant(dc.button.deleteAccount)}
           onClick={DeleteAccountPageStore.enterClickHandler}
-        >
-          {dc.button.deleteAccount}
-        </Button>
-      ),
-      [enterButtonDisabled, formState.isWaitingResponse],
-    );
-
-    return (
-      <UpdateUserInfoDialogTemplate
-        body={body}
-        closeDialog={UpdateUserInfoDialogStore.closeDialog}
-        dialogIsOpen={dialogIsOpen}
-        isWaitingResponse={formState.isWaitingResponse}
-        submitButton={submitButton}
-        title={dc.deleteAccount.title}
-      />
-    );
-  },
-);
-
-const passwordInputLabel = <Label>{dc.reauthenticate.password}</Label>;
-
-const verifyEmailInputLabel = <Label>{dc.deleteAccount.verifyEmail}</Label>;
+        />
+      }
+      title={dc.deleteAccount.title}
+    />
+  );
+};

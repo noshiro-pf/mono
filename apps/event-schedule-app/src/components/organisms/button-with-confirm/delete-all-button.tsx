@@ -1,4 +1,4 @@
-import { memoNamed } from 'react-utils';
+import type { JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { ButtonWithConfirm } from './button-with-confirm.js';
 
@@ -25,14 +25,11 @@ const toastConfig = {
   intent: 'none',
 } as const;
 
-export const DeleteAllButton = memoNamed<Props>(
-  'DeleteAllButton',
-  ({ onConfirmDeleteAll }) => (
-    <ButtonWithConfirm
-      buttonConfig={buttonConfig}
-      dialogConfig={dialogConfig}
-      toastConfig={toastConfig}
-      onConfirmClick={onConfirmDeleteAll}
-    />
-  ),
+export const DeleteAllButton = ({ onConfirmDeleteAll }: Props): JSX.Element => (
+  <ButtonWithConfirm
+    buttonConfig={buttonConfig}
+    dialogConfig={dialogConfig}
+    toastConfig={toastConfig}
+    onConfirmClick={onConfirmDeleteAll}
+  />
 );

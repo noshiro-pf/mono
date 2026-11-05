@@ -1,0 +1,12 @@
+.paragraph {
+  margin: 5px 0;
+}
+
+.smaller {
+  font-size: smaller;
+}
+
+.link {
+  font-size: smaller;
+  text-decoration: underline;
+}

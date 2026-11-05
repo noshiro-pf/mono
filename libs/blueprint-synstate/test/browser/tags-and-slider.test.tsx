@@ -256,6 +256,28 @@ describe(TagInput, () => {
 
     assert.isTrue(input.disabled);
   });
+
+  test("puts a tag's data-e2e on its span, and on no other", () => {
+    const { container, unmount } = mountInto(() => (
+      <TagInput
+        values={constant([
+          { value: 'Marked', 'data-e2e': 'marked-tag' },
+          { value: 'Plain' },
+        ])}
+      />
+    ));
+
+    onTestFinished(unmount);
+
+    const tags = Array.from(container.querySelectorAll('span.bp6-tag'));
+
+    assert.deepStrictEqual(
+      tags.map((tag) =>
+        tag instanceof HTMLElement ? tag.dataset['e2e'] : undefined,
+      ),
+      ['marked-tag', undefined],
+    );
+  });
 });
 
 describe('RangeSlider beside Blueprint React', () => {

@@ -1,5 +1,4 @@
-import { type InitializedObservable, map } from 'synstate';
-import { createState, useObservableValue } from 'synstate-react-hooks';
+import { createState, type InitializedObservable, map } from 'synstate';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../api/index.mjs';
 import { Routes } from '../constants/index.mjs';
@@ -18,11 +17,30 @@ export type AuthDeps = Readonly<{
  * signing out. Firebase is `deps.auth`, so a test hands it a fake.
  */
 export const createAuthStore = (deps: AuthDeps): AuthStore => {
-  const [
-    useFireAuthUser,
-    setFireAuthUser,
-    { state: fireAuthUser$, getSnapshot: getFireAuthUserSnapshot },
-  ] = createState<FireAuthUser | undefined>(undefined);
+  // Firebase updates a profile in place, so the user object read again after
+  // `updateProfile` is the one already held: the name and email are copied out
+  // each time, so that what shows them is told of the change.
+  const [snapshot$, setSnapshot, { getSnapshot }] = createState<AuthSnapshot>(
+    toSnapshot(undefined),
+  );
+
+  const setFireAuthUser = (user: FireAuthUser | undefined): void => {
+    setSnapshot(toSnapshot(user));
+  };
+
+  const getFireAuthUserSnapshot = (): FireAuthUser | undefined =>
+    getSnapshot().user;
+
+  const fireAuthUser$: InitializedObservable<FireAuthUser | undefined> =
+    snapshot$.pipe(map((s) => s.user));
+
+  const displayName$: InitializedObservable<string | null> = snapshot$.pipe(
+    map((s) => s.displayName),
+  );
+
+  const email$: InitializedObservable<string | null> = snapshot$.pipe(
+    map((s) => s.email),
+  );
 
   const passwordProviderIncluded$: InitializedObservable<boolean> =
     fireAuthUser$.pipe(
@@ -31,9 +49,6 @@ export const createAuthStore = (deps: AuthDeps): AuthStore => {
           user?.providerData.some((p) => p.providerId === 'password') ?? false,
       ),
     );
-
-  const usePasswordProviderIncluded = (): boolean =>
-    useObservableValue(passwordProviderIncluded$);
 
   const emitAuthStateChange = (): void => {
     setFireAuthUser(deps.auth.currentUser());
@@ -60,10 +75,10 @@ export const createAuthStore = (deps: AuthDeps): AuthStore => {
 
   return {
     fireAuthUser$,
+    displayName$,
+    email$,
     getFireAuthUserSnapshot,
     passwordProviderIncluded$,
-    useFireAuthUser,
-    usePasswordProviderIncluded,
     emitAuthStateChange,
     signOut,
     signOutClick,
@@ -71,12 +86,27 @@ export const createAuthStore = (deps: AuthDeps): AuthStore => {
   } as const;
 };
 
+type AuthSnapshot = Readonly<{
+  user: FireAuthUser | undefined;
+  displayName: string | null;
+  email: string | null;
+}>;
+
+const toSnapshot = (user: FireAuthUser | undefined): AuthSnapshot =>
+  ({
+    user,
+    displayName: user?.displayName ?? null,
+    email: user?.email ?? null,
+  }) as const;
+
 export type AuthStore = Readonly<{
   fireAuthUser$: InitializedObservable<FireAuthUser | undefined>;
+  /** The user's name, followed through a profile changed in place. */
+  displayName$: InitializedObservable<string | null>;
+  /** The user's email, followed through a profile changed in place. */
+  email$: InitializedObservable<string | null>;
   getFireAuthUserSnapshot: () => FireAuthUser | undefined;
   passwordProviderIncluded$: InitializedObservable<boolean>;
-  useFireAuthUser: () => FireAuthUser | undefined;
-  usePasswordProviderIncluded: () => boolean;
   /** Reads the signed-in user again, for a change Firebase does not report. */
   emitAuthStateChange: () => void;
   signOut: () => Promise<void>;

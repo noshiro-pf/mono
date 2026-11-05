@@ -1,0 +1,28 @@
+.single {
+  margin: 5px;
+}
+
+.nowrap {
+  margin: 5px;
+  display: flex;
+  align-items: center;
+
+  & > * {
+    margin-right: 5px; /* margin between this button and the next button */
+    margin-bottom: 5px; /* margin between this button and the buttons on next line */
+  }
+}
+
+.wrap {
+  flex-wrap: wrap-reverse;
+  margin-top: 10px;
+}
+
+.alignEnd {
+  justify-content: flex-end;
+}
+
+.eventSettingsPage {
+  justify-content: flex-start;
+  margin: 20px;
+}

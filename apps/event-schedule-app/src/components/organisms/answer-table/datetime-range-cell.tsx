@@ -1,8 +1,15 @@
-import * as React from 'react';
-import { calendarDateColor } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { type IMapMapped, match } from 'ts-data-forge';
+import type { InitializedObservable } from 'synstate';
 import {
+  constant,
+  If,
+  mapBindable,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import type { IMapMapped } from 'ts-data-forge';
+import {
+  calendarDateColor,
   dict,
   hm2str,
   ymd2dayStr,
@@ -14,82 +21,65 @@ const dc = dict.common.date;
 
 type Props = Readonly<{
   datetimeRange: DatetimeRange;
-  datetimeSpecification: DatetimeSpecificationEnumType;
-  minimized: boolean;
-  holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
+  datetimeSpecification: Bindable<DatetimeSpecificationEnumType>;
+  minimized: Bindable<boolean>;
+  holidaysJpDefinition: InitializedObservable<
+    IMapMapped<YearMonthDate, string, YmdKey>
+  >;
 }>;
 
-export const DatetimeRangeCell = memoNamed<Props>(
-  'DatetimeRangeCell',
-  ({
-    datetimeRange,
-    datetimeSpecification,
-    minimized,
-    holidaysJpDefinition,
-  }) => {
-    const colored: React.CSSProperties = React.useMemo(() => {
-      const dayValue = ymd2day(datetimeRange.ymd);
+export const DatetimeRangeCell = ({
+  datetimeRange: { ymd, timeRange },
+  datetimeSpecification,
+  minimized,
+  holidaysJpDefinition,
+}: Props): JSX.Element => {
+  const colored = {
+    color: view(holidaysJpDefinition, (holidays) => {
+      const dayValue = ymd2day(ymd);
 
-      return {
-        color: match(
-          holidaysJpDefinition.has(datetimeRange.ymd)
-            ? 'holiday'
-            : dayValue === 0
-              ? 'Sunday'
-              : dayValue === 6
-                ? 'Saturday'
-                : 'normal',
-          {
-            holiday: calendarDateColor.sunday,
-            Sunday: calendarDateColor.sunday,
-            Saturday: calendarDateColor.saturday,
-            normal: calendarDateColor.normal,
-          },
-        ),
-      };
-    }, [holidaysJpDefinition, datetimeRange.ymd]);
+      return dayValue === 0 || holidays.has(ymd)
+        ? calendarDateColor.sunday
+        : dayValue === 6
+          ? calendarDateColor.saturday
+          : calendarDateColor.normal;
+    }),
+  } as const;
 
-    return minimized ? (
-      <span
-        style={colored}
-      >{`${datetimeRange.ymd.month}/${datetimeRange.ymd.date}`}</span>
-    ) : (
-      match(datetimeSpecification, {
-        noStartEndSpecified: (
-          <>
-            <span>{ymd2str(datetimeRange.ymd)}</span>
-            <span style={colored}>{ymd2dayStr(datetimeRange.ymd)}</span>
-          </>
-        ),
-        startSpecified: (
-          <>
-            <span>{ymd2str(datetimeRange.ymd)}</span>
-            <span style={colored}>{ymd2dayStr(datetimeRange.ymd)}</span>
-            <span> </span>
-            <span>{hm2str(datetimeRange.timeRange.start)}</span>
-            <span>{dc.timeRangeTilde}</span>
-          </>
-        ),
-        endSpecified: (
-          <>
-            <span>{ymd2str(datetimeRange.ymd)}</span>
-            <span style={colored}>{ymd2dayStr(datetimeRange.ymd)}</span>
-            <span> </span>
-            <span>{dc.timeRangeTilde}</span>
-            <span>{hm2str(datetimeRange.timeRange.end)}</span>
-          </>
-        ),
-        startAndEndSpecified: (
-          <>
-            <span>{ymd2str(datetimeRange.ymd)}</span>
-            <span style={colored}>{ymd2dayStr(datetimeRange.ymd)}</span>
-            <span> </span>
-            <span>{hm2str(datetimeRange.timeRange.start)}</span>
-            <span>{dc.timeRangeTilde}</span>
-            <span>{hm2str(datetimeRange.timeRange.end)}</span>
-          </>
-        ),
-      })
-    );
-  },
-);
+  const has = (
+    pick: (spec: DatetimeSpecificationEnumType) => boolean,
+  ): Bindable<boolean> => mapBindable(datetimeSpecification, pick);
+
+  return (
+    <If
+      cond={minimized}
+      else={
+        <>
+          <span>{constant(ymd2str(ymd))}</span>
+          <span style={colored}>{constant(ymd2dayStr(ymd))}</span>
+          <If
+            cond={has((s) => s !== 'noStartEndSpecified')}
+            then={<span>{constant(' ')}</span>}
+          />
+          <If
+            cond={has(
+              (s) => s === 'startSpecified' || s === 'startAndEndSpecified',
+            )}
+            then={<span>{constant(hm2str(timeRange.start))}</span>}
+          />
+          <If
+            cond={has((s) => s !== 'noStartEndSpecified')}
+            then={<span>{constant(dc.timeRangeTilde)}</span>}
+          />
+          <If
+            cond={has(
+              (s) => s === 'endSpecified' || s === 'startAndEndSpecified',
+            )}
+            then={<span>{constant(hm2str(timeRange.end))}</span>}
+          />
+        </>
+      }
+      then={<span style={colored}>{constant(`${ymd.month}/${ymd.date}`)}</span>}
+    />
+  );
+};

@@ -486,6 +486,74 @@ describe(Dialog, () => {
     unmount();
   });
 
+  test('writes nothing while the update that opens or closes it propagates', async () => {
+    const warn = vi.fn();
+
+    vi.stubGlobal('console', { ...console, warn });
+
+    onTestFinished(() => {
+      // cspell:disable-next-line
+      vi.unstubAllGlobals();
+    });
+
+    const [isOpen$, setIsOpen] = createState(false);
+
+    const { unmount } = mounted(() => (
+      <Dialog isOpen={isOpen$}>
+        <div class={constant('bp6-dialog-body')} />
+      </Dialog>
+    ));
+
+    setIsOpen(true);
+
+    await transitioned();
+
+    assert.isTrue(
+      one('.bp6-dialog-container').classList.contains('bp6-overlay-enter-done'),
+    );
+
+    setIsOpen(false);
+
+    await transitioned();
+
+    assert.isNull(document.querySelector('.bp6-dialog-container'));
+
+    assert.deepStrictEqual(warn.mock.calls, []);
+
+    unmount();
+  });
+
+  test('opens with the appear transition when an opening before it was closed again in the same update', async () => {
+    const [isOpen$, setIsOpen] = createState(false);
+
+    const { unmount } = mounted(() => (
+      <Dialog isOpen={isOpen$}>
+        <div class={constant('bp6-dialog-body')} />
+      </Dialog>
+    ));
+
+    setIsOpen(true);
+
+    setIsOpen(false);
+
+    await transitioned();
+
+    // It never opened, so a lazy one has drawn nothing yet.
+    assert.isNull(document.querySelector('.bp6-overlay'));
+
+    setIsOpen(true);
+
+    await transitioned();
+
+    assert.isTrue(
+      one('.bp6-dialog-container').classList.contains(
+        'bp6-overlay-appear-done',
+      ),
+    );
+
+    unmount();
+  });
+
   test('gives focus back to the element from before it first opened, when it is opened again during the exit', async () => {
     const [isOpen$, setIsOpen] = createState(false);
 

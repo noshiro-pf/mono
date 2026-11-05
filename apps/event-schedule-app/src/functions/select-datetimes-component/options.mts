@@ -20,4 +20,4 @@ export const selectorOptions = [
     label: dc.datetimeSpecificationOptions.startAndEndSpecified,
     value: datetimeSpecificationOptions.startAndEndSpecified,
   },
-] as const satisfies readonly OptionProps[];
+] as const satisfies readonly Readonly<{ label: string; value: string }>[];

@@ -1,79 +1,55 @@
-import { Button, Icon, PopoverNext } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import { useBoolState } from 'better-react-use-state';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import { Button, Icon, Popover } from 'blueprint-synstate';
+import { createBooleanState } from 'synstate';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { ButtonsWrapperAlignEnd } from '../../styled/index.mjs';
+import * as styles from './answer-table.module.css';
 
-type Props = Readonly<{ comment: string; useSmallButton?: boolean }>;
+type Props = Readonly<{ comment: Bindable<string>; useSmallButton?: boolean }>;
 
-export const CommentButton = memoNamed<Props>(
-  'CommentButton',
-  ({ comment, useSmallButton = false }) => {
-    const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
-      useBoolState(false);
+export const CommentButton = ({
+  comment,
+  useSmallButton = false,
+}: Props): JSX.Element => {
+  const [isOpen$, { setTrue: handleOpen, setFalse: handleClose }] =
+    createBooleanState(false);
 
-    const popoverContent = React.useMemo(
-      () => (
-        <div
-          css={css`
-            padding: 10px;
-            max-width: 250px;
-          `}
-        >
-          <div
-            css={css`
-              margin: 10px;
-              overflow-wrap: anywhere;
-              white-space: pre-line;
-            `}
-          >
-            {comment}
-          </div>
+  return (
+    <Popover
+      arrow={false}
+      canEscapeKeyClose
+      content={
+        <div class={constant(styles.commentPopover)}>
+          <div class={constant(styles.commentText)}>{comment}</div>
           <ButtonsWrapperAlignEnd>
             <Button
               intent={'none'}
-              text={dict.common.buttonText.close}
+              text={constant(dict.common.buttonText.close)}
               onClick={handleClose}
             />
           </ButtonsWrapperAlignEnd>
         </div>
-      ),
-      [comment, handleClose],
-    );
-
-    return (
-      <PopoverNext
-        arrow={false}
-        canEscapeKeyClose
-        content={popoverContent}
-        isOpen={isOpen}
-        placement={'top'}
-        onClose={handleClose}
-      >
-        {useSmallButton ? (
-          <Button
-            css={css`
-              min-height: 16px !important;
-              min-width: 16px !important;
-            `}
-            icon={icon}
-            size={'small'}
-            variant={'minimal'}
-            onClick={handleOpen}
-          />
-        ) : (
-          <Button
-            icon={'comment'}
-            size={'small'}
-            variant={'minimal'}
-            onClick={handleOpen}
-          />
-        )}
-      </PopoverNext>
-    );
-  },
-);
-
-const icon = <Icon icon={'comment'} size={12} />;
+      }
+      isOpen={isOpen$}
+      placement={'top'}
+      onClose={handleClose}
+    >
+      {useSmallButton ? (
+        <Button
+          class={styles.smallCommentButton}
+          iconElement={<Icon icon={'comment'} size={12} />}
+          size={'small'}
+          variant={constant('minimal')}
+          onClick={handleOpen}
+        />
+      ) : (
+        <Button
+          icon={'comment'}
+          size={'small'}
+          variant={constant('minimal')}
+          onClick={handleOpen}
+        />
+      )}
+    </Popover>
+  );
+};

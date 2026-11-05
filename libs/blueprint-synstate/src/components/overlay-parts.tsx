@@ -139,18 +139,22 @@ export const Overlay = ({
     leaveStack(self);
   });
 
+  // What the transitions are heading for, known at once: the phase itself is
+  // written after the update that changed `isOpen`, never during it.
+  const mut_target = { showing: false, hasOpened: !lazy };
+
   subscribeInScope(isOpen$, (open) => {
     const { first } = mut_mounted;
 
     mut_mounted.first = false;
 
-    const current = phase$.getSnapshot().value;
-
-    const showing = current !== 'closed' && !current.startsWith('exit');
-
-    if (open === showing) {
+    if (open === mut_target.showing) {
       return;
     }
+
+    const current = phase$.getSnapshot().value;
+
+    mut_target.showing = open;
 
     clearTimeout(mut_transition.timer);
 
@@ -174,55 +178,70 @@ export const Overlay = ({
       // react-transition-group's `appear`: opened as its transition group is
       // mounted, which is with the overlay, or, for a lazy one, as it first
       // opens.
-      const kind =
-        first || (lazy && !hasOpened$.getSnapshot().value) ? 'appear' : 'enter';
-
-      // The body first, so that the empty overlay is not drawn for a moment.
-      setPhase(kind);
-
-      setHasOpened(true);
+      const kind = first || !mut_target.hasOpened ? 'appear' : 'enter';
 
       afterUpdate(() => {
         if (!stillCurrent()) {
           return;
         }
 
-        setPhase(`${kind}-active`);
+        // With `hasOpened$`, and only for an opening that happens: one closed
+        // again in the same update never drew anything.
+        mut_target.hasOpened = true;
 
-        mut_transition.timer = setTimeout(() => {
-          setPhase(kind === 'appear' ? 'appear-done' : 'enter-done');
-        }, transitionDuration);
+        // The body first, so that the empty overlay is not drawn for a moment.
+        setPhase(kind);
+
+        setHasOpened(true);
+
+        afterUpdate(() => {
+          if (!stillCurrent()) {
+            return;
+          }
+
+          setPhase(`${kind}-active`);
+
+          mut_transition.timer = setTimeout(() => {
+            setPhase(kind === 'appear' ? 'appear-done' : 'enter-done');
+          }, transitionDuration);
+        });
       });
     } else {
       leaveStack(self);
 
-      setPhase('exit');
-
       afterUpdate(() => {
         if (!stillCurrent()) {
           return;
         }
 
-        setPhase('exit-active');
+        setPhase('exit');
 
-        mut_transition.timer = setTimeout(() => {
-          // Focus that an overlay still open holds stays there; otherwise it
-          // goes back, if what had it is still in the page.
-          const giveBack = !focusIsInStack();
-
-          setPhase('closed');
-
-          const { before } = mut_focus;
-
-          if (
-            shouldReturnFocusOnClose &&
-            giveBack &&
-            before instanceof HTMLElement &&
-            before.isConnected
-          ) {
-            before.focus();
+        afterUpdate(() => {
+          if (!stillCurrent()) {
+            return;
           }
-        }, transitionDuration);
+
+          setPhase('exit-active');
+
+          mut_transition.timer = setTimeout(() => {
+            // Focus that an overlay still open holds stays there; otherwise it
+            // goes back, if what had it is still in the page.
+            const giveBack = !focusIsInStack();
+
+            setPhase('closed');
+
+            const { before } = mut_focus;
+
+            if (
+              shouldReturnFocusOnClose &&
+              giveBack &&
+              before instanceof HTMLElement &&
+              before.isConnected
+            ) {
+              before.focus();
+            }
+          }, transitionDuration);
+        });
       });
     }
   });

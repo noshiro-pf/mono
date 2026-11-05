@@ -1,6 +1,4 @@
-import type { Toaster } from '@blueprintjs/core';
-import type { InitializedObservable } from 'synstate';
-import { createBooleanState } from 'synstate-react-hooks';
+import { type InitializedObservable, createBooleanState } from 'synstate';
 import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { Routes, dict } from '../../constants/index.mjs';
@@ -29,10 +27,10 @@ export const createGoogleSignInStore = (
   const dc = dict.register;
 
   const [
-    useGoogleSignInButtonDisabled,
+    googleSignInButtonDisabledState,
     {
       getSnapshot: getGoogleSignInButtonDisabledStateSnapshot,
-      state: googleSignInButtonDisabledState,
+
       setTrue: disableGoogleSignInButton,
       setFalse: enableGoogleSignInButton,
     },
@@ -81,7 +79,6 @@ export const createGoogleSignInStore = (
 
   return {
     googleSignInButtonDisabledState,
-    useGoogleSignInButtonDisabled,
     googleSignInClickHandler,
   } as const;
 };
@@ -89,6 +86,5 @@ export const createGoogleSignInStore = (
 export type GoogleSignIn = Readonly<{
   /** Whether a Google sign-in is under way. */
   googleSignInButtonDisabledState: InitializedObservable<boolean>;
-  useGoogleSignInButtonDisabled: () => boolean;
   googleSignInClickHandler: () => void;
 }>;

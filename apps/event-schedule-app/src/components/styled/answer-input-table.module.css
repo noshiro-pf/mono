@@ -1,0 +1,17 @@
+/* The answer form's table and the batch input's, over the bordered table. */
+.table {
+  th,
+  td {
+    padding: 6px;
+  }
+}
+
+.pointCell {
+  min-width: 87px;
+  max-width: 87px;
+}
+
+.cellComment {
+  resize: vertical;
+  min-height: 38px;
+}

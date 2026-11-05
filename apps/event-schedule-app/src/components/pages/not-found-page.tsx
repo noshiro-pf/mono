@@ -1,23 +1,23 @@
-import { Icon, NonIdealState } from '@blueprintjs/core';
-import { Anchor } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { createRouterLinkClickHandler } from 'tiny-router-react-hooks';
+import { Icon, NonIdealState } from 'blueprint-synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { Routes, dict } from '../../constants/index.mjs';
+import { routerLinkClick } from '../../functions/index.mjs';
 import { Router } from '../../store/index.mjs';
+import * as styles from './not-found-page.module.css';
 
-export const NotFoundPage = memoNamed('NotFoundPage', () => (
-  <NonIdealState action={action} icon={'search'} title={dict.pageNotFound} />
-));
-
-const onClick = createRouterLinkClickHandler({
-  replace: false,
-  pushFn: Router.push,
-  redirectFn: Router.redirect,
-});
-
-const action = (
-  <Anchor href={Routes.routes.createPage} onClick={onClick}>
-    <Icon icon={'home'} />
-    {dict.topPage}
-  </Anchor>
+export const NotFoundPage = (): JSX.Element => (
+  <NonIdealState
+    action={
+      <a
+        class={constant(styles.anchor)}
+        href={constant(Routes.routes.createPage)}
+        onClick={routerLinkClick(Router.push)}
+      >
+        <Icon icon={'home'} />
+        {constant(dict.topPage)}
+      </a>
+    }
+    icon={'search'}
+    title={constant(dict.pageNotFound)}
+  />
 );

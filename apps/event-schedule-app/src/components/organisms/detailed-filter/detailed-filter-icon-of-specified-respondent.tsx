@@ -1,11 +1,18 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import { CheckboxView } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
+import {
+  constant,
+  derive,
+  For,
+  mapBindable,
+  view,
+  type JSX,
+  type View,
+} from 'synstate-dom';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
 import { CustomIcon } from '../../atoms/index.mjs';
+import { CheckboxView } from '../../molecules/index.mjs';
+import { filterView } from './filter-state.mjs';
 import {
   CheckboxWithRightLabel,
   CheckboxWrapper,
@@ -13,146 +20,102 @@ import {
   FilterItemContent,
   HorizontalCheckboxesWrapper,
 } from './styled.js';
+import * as styles from './styled.module.css';
 
 const dc = dict.answerPage.detailedFilter;
 
-type Props = DeepReadonly<{
-  enabled: boolean;
-  goodDisabled: boolean;
-  fairDisabled: boolean;
-  poorDisabled: boolean;
-  noneDisabled: boolean;
-  checkState: {
-    key: string;
-    username: string;
-    checkState: ReadonlyRecord<
-      AnswerIconIdWithNone,
-      { checked: boolean; onCheck: (value: boolean) => void }
-    >;
-  }[];
-}>;
-
 const iconSize = 14; /* px */
 
-/* 特定の回答者の記号で絞り込み */
-export const DetailedFilterIconOfSpecifiedRespondent = memoNamed<Props>(
-  'DetailedFilterIconOfSpecifiedRespondent',
-  ({
-    enabled,
-    goodDisabled,
-    fairDisabled,
-    poorDisabled,
-    noneDisabled,
-    checkState,
-  }) => (
-    <>
-      <FilterItem>
-        <CheckboxWrapper>
-          <CheckboxView
-            state={enabled ? 'checked' : 'none'}
-            onCheck={
-              AnswerFilterAndSortStore.setEnabledFilteringByIconOfSpecifiedRespondent
-            }
-          />
-          <span>{dc.filterItems.iconOfSpecifiedRespondent.title}</span>
-        </CheckboxWrapper>
-      </FilterItem>
-
-      <FilterItemContent>
-        {checkState.map((respondent, index) => (
-          <div
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}
-            css={css`
-              display: flex;
-              align-items: center;
-            `}
-          >
-            <div
-              css={css`
-                width: 60px;
-                margin-right: 10px;
-                overflow-x: hidden;
-                white-space: nowrap;
-                display: inline-block;
-                text-overflow: ellipsis;
-              `}
-            >
-              {respondent.username}
-            </div>
-            <HorizontalCheckboxesWrapper>
-              <CheckboxWithRightLabel>
-                <CheckboxView
-                  disabled={!enabled || goodDisabled}
-                  state={
-                    !goodDisabled && respondent.checkState.good.checked
-                      ? 'checked'
-                      : 'none'
-                  }
-                  onCheck={respondent.checkState.good.onCheck}
-                />
-                <CheckboxLabelIcon>
-                  <CustomIcon iconName={'good'} size={iconSize} />
-                </CheckboxLabelIcon>
-              </CheckboxWithRightLabel>
-
-              <CheckboxWithRightLabel>
-                <CheckboxView
-                  disabled={!enabled || fairDisabled}
-                  state={
-                    !fairDisabled && respondent.checkState.fair.checked
-                      ? 'checked'
-                      : 'none'
-                  }
-                  onCheck={respondent.checkState.fair.onCheck}
-                />
-                <CheckboxLabelIcon>
-                  <CustomIcon iconName={'fair'} size={iconSize} />
-                </CheckboxLabelIcon>
-              </CheckboxWithRightLabel>
-
-              <CheckboxWithRightLabel>
-                <CheckboxView
-                  disabled={!enabled || poorDisabled}
-                  state={
-                    !poorDisabled && respondent.checkState.poor.checked
-                      ? 'checked'
-                      : 'none'
-                  }
-                  onCheck={respondent.checkState.poor.onCheck}
-                />
-                <CheckboxLabelIcon>
-                  <CustomIcon iconName={'poor'} size={iconSize} />
-                </CheckboxLabelIcon>
-              </CheckboxWithRightLabel>
-
-              <CheckboxWithRightLabel>
-                <CheckboxView
-                  disabled={!enabled || noneDisabled}
-                  state={
-                    !noneDisabled && respondent.checkState.none.checked
-                      ? 'checked'
-                      : 'none'
-                  }
-                  onCheck={respondent.checkState.none.onCheck}
-                />
-                <CheckboxLabel>
-                  {dc.filterItems.iconOfSpecifiedRespondent.unanswered}
-                </CheckboxLabel>
-              </CheckboxWithRightLabel>
-            </HorizontalCheckboxesWrapper>
-          </div>
-        ))}
-      </FilterItemContent>
-    </>
+/** Whether no date can have the icon, so that filtering by it is pointless. */
+const iconDisabled: ReadonlyRecord<AnswerIconIdWithNone, View<boolean>> = {
+  good: filterView(
+    ({ iconState }) =>
+      iconState.good.max === 0 || iconState.goodPlusFair.max === 0,
   ),
+  fair: filterView(
+    ({ iconState }) =>
+      iconState.fair.max === 0 ||
+      iconState.goodPlusFair.max === 0 ||
+      iconState.fairPlusPoor.max === 0,
+  ),
+  poor: filterView(
+    ({ iconState }) =>
+      iconState.poor.max === 0 || iconState.fairPlusPoor.max === 0,
+  ),
+  none: filterView((s) => s.filledDateOnly),
+} as const;
+
+const enabled = filterView((s) => s.iconOfSpecifiedRespondent.enabled);
+
+/* 特定の回答者の記号で絞り込み */
+export const DetailedFilterIconOfSpecifiedRespondent = (): JSX.Element => (
+  <>
+    <FilterItem>
+      <CheckboxWrapper>
+        <CheckboxView
+          state={mapBindable(enabled, (e) => (e ? 'checked' : 'none'))}
+          onCheck={
+            AnswerFilterAndSortStore.setEnabledFilteringByIconOfSpecifiedRespondent
+          }
+        />
+        <span>{constant(dc.filterItems.iconOfSpecifiedRespondent.title)}</span>
+      </CheckboxWrapper>
+    </FilterItem>
+
+    <FilterItemContent>
+      <For
+        items={AnswerFilterAndSortStore.iconOfSpecifiedRespondentCheckState$}
+        key={(_, index) => index}
+      >
+        {(respondent$) => {
+          const checkbox = (icon: AnswerIconIdWithNone): JSX.Element => (
+            <CheckboxView
+              disabled={derive(
+                [enabled, iconDisabled[icon]],
+                (isEnabled, isDisabled) => !isEnabled || isDisabled,
+              )}
+              state={derive(
+                [respondent$, iconDisabled[icon]],
+                (respondent, isDisabled) =>
+                  !isDisabled && respondent.checkState[icon].checked
+                    ? 'checked'
+                    : 'none',
+              )}
+              onCheck={(checked) => {
+                respondent$
+                  .getSnapshot()
+                  .value.checkState[icon].onCheck(checked);
+              }}
+            />
+          );
+
+          return (
+            <div class={constant(styles.respondentRow)}>
+              <div class={constant(styles.respondentName)}>
+                {view(respondent$, (r) => r.username)}
+              </div>
+              <HorizontalCheckboxesWrapper>
+                {(['good', 'fair', 'poor'] as const).map((icon) => (
+                  <CheckboxWithRightLabel>
+                    {checkbox(icon)}
+                    <div class={constant(styles.checkboxLabelIcon)}>
+                      <CustomIcon iconName={icon} size={iconSize} />
+                    </div>
+                  </CheckboxWithRightLabel>
+                ))}
+                <CheckboxWithRightLabel>
+                  {checkbox('none')}
+                  <div class={constant(styles.checkboxLabel)}>
+                    {constant(
+                      dc.filterItems.iconOfSpecifiedRespondent.unanswered,
+                    )}
+                  </div>
+                </CheckboxWithRightLabel>
+              </HorizontalCheckboxesWrapper>
+            </div>
+          );
+        }}
+      </For>
+    </FilterItemContent>
+  </>
 );
-
-const CheckboxLabel = styled.div`
-  margin-left: 5px;
-`;
-
-const CheckboxLabelIcon = styled(CheckboxLabel)`
-  width: ${iconSize}px;
-  height: ${iconSize}px; // 明示的に指定しないとなぜか高さが18pxくらいになってしまう…
-`;

@@ -9,6 +9,7 @@ import {
   type JSX,
 } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
+import type { StrictOmit } from 'ts-type-forge';
 import {
   dateRange,
   formatDateText,
@@ -22,11 +23,23 @@ import {
   type WallClock,
 } from '../date/index.mjs';
 import { focusablesIn, isInside, uniqueId } from '../internal/index.mjs';
-import { DatePicker, type DatePickerOptions } from './date-picker.js';
+import {
+  DatePicker,
+  type DatePickerOptions,
+  type DatePickerShortcut,
+} from './date-picker.js';
 import { DatePopover } from './date-popover-parts.js';
 
-type Props = DatePickerOptions &
+type Props = StrictOmit<DatePickerOptions, 'shortcuts'> &
   Readonly<{
+    /**
+     * Drawn in a menu before the calendar; none if omitted. A function is
+     * called each time the calendar opens, for shortcuts counted from the day
+     * it opens on, and draws none that time when it returns `undefined`.
+     */
+    shortcuts?:
+      | readonly DatePickerShortcut[]
+      | (() => readonly DatePickerShortcut[] | undefined);
     /**
      * `YYYY-MM-DDTHH:mm` with a `timePrecision`, `YYYY-MM-DD` without, and `''`
      * for none.
@@ -94,6 +107,7 @@ export const DateInput = ({
   parseDate,
   invalidDateMessage = 'Invalid date',
   outOfRangeMessage = 'Out of range',
+  shortcuts,
   ...pickerOptions
 }: Props): JSX.Element => {
   const { timePrecision } = pickerOptions;
@@ -276,6 +290,7 @@ export const DateInput = ({
         />
         <DatePicker
           {...pickerOptions}
+          shortcuts={typeof shortcuts === 'function' ? shortcuts() : shortcuts}
           selectedShortcutIndex={shortcutIndex$}
           onShortcutChange={setShortcutIndex}
           value={derive([value$, shown$], (current, shown) =>

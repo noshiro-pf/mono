@@ -1,0 +1,56 @@
+.grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: repeat(3, auto);
+  grid-template-areas:
+    'label1 value1'
+    'label2 value2'
+    'label3 value3';
+}
+
+.cell {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: left;
+  vertical-align: text-top;
+}
+
+.label {
+  grid-area: label;
+  white-space: nowrap;
+  padding-right: 10px;
+  font-weight: bolder;
+}
+
+.value {
+  grid-area: value;
+  white-space: pre-line;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.label1 {
+  grid-area: label1;
+}
+
+.value1 {
+  grid-area: value1;
+}
+
+.label2 {
+  grid-area: label2;
+}
+
+.value2 {
+  grid-area: value2;
+  white-space: pre-wrap;
+}
+
+.label3 {
+  grid-area: label3;
+}
+
+.value3 {
+  grid-area: value3;
+}

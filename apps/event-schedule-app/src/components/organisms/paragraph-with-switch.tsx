@@ -1,53 +1,57 @@
-import { css } from '@emotion/react';
-import { SwitchWithoutLabelStyled } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { mapNullable } from 'ts-data-forge';
+import { Switch } from 'blueprint-synstate';
+import {
+  constant,
+  For,
+  type Bindable,
+  type Child,
+  type JSX,
+  type View,
+} from 'synstate-dom';
+import { Arr } from 'ts-data-forge';
 import { Description } from '../atoms/index.mjs';
+import * as styles from './paragraph-with-switch.module.css';
 
 type Props = Readonly<{
   title: string;
-  description?: readonly string[];
-  toggleState: boolean;
+  /** Lines under the title; a `View` of them for lines that change. */
+  description?: View<readonly string[]> | readonly string[];
+  toggleState: Bindable<boolean>;
   onToggle: () => void;
-  hideContentIfToggleIsFalse: boolean;
-  elementToToggle: React.ReactNode;
+  elementToToggle: Child;
 }>;
 
-export const ParagraphWithSwitch = memoNamed<Props>(
-  'ParagraphWithSwitch',
-  ({
-    elementToToggle,
-    hideContentIfToggleIsFalse,
-    onToggle,
-    title,
-    toggleState,
-    description,
-  }) => (
-    <div>
-      <div
-        css={css`
-          display: flex;
-          align-items: center;
-          margin-bottom: 5px;
-          & > * {
-            margin-right: 5px;
-          }
-        `}
-      >
-        <div>{title}</div>
-        <SwitchWithoutLabelStyled
-          aria-label={title}
-          checked={toggleState}
-          inline
-          onChange={onToggle}
-        />
-      </div>
-      {mapNullable(
-        description,
-        // eslint-disable-next-line react/no-array-index-key
-        (s) => s.map((d, i) => <Description key={i} text={d} />),
-      )}
-      {hideContentIfToggleIsFalse && !toggleState ? undefined : elementToToggle}
+/** A setting turned on and off by the switch beside its title. */
+export const ParagraphWithSwitch = ({
+  elementToToggle,
+  onToggle,
+  title,
+  toggleState,
+  description,
+}: Props): JSX.Element => (
+  <div>
+    <div class={constant(styles.titleRow)}>
+      <div>{constant(title)}</div>
+      <Switch
+        aria-label={constant(title)}
+        checked={toggleState}
+        class={styles.switchControl}
+        inline
+        onChange={onToggle}
+      />
     </div>
-  ),
+    {description === undefined ? (
+      []
+    ) : isLines(description) ? (
+      description.map((d) => <Description text={constant(d)} />)
+    ) : (
+      <For items={description} key={(_, index) => index}>
+        {(line$) => <Description text={line$} />}
+      </For>
+    )}
+    {elementToToggle}
+  </div>
 );
+
+const isLines = (
+  description: View<readonly string[]> | readonly string[],
+): description is readonly string[] => Arr.isArray(description);

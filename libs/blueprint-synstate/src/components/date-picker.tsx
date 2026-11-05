@@ -82,6 +82,8 @@ export type DatePickerOptions = Readonly<{
   clearButtonText?: string;
   /** Marks today on the calendar. */
   highlightCurrentDay?: boolean;
+  /** The year menu before the month menu, as Blueprint's `reverseMonthAndYearMenus`. */
+  reverseMonthAndYearMenus?: boolean;
   timePickerProps?: Readonly<{
     showArrowButtons?: boolean;
     labels?: Partial<TimePickerLabels>;
@@ -139,6 +141,7 @@ export const DatePicker = ({
   todayButtonText = 'Today',
   clearButtonText = 'Clear',
   highlightCurrentDay = false,
+  reverseMonthAndYearMenus = false,
   timePickerProps,
   labels: labelOverrides,
   shortcuts,
@@ -283,9 +286,15 @@ export const DatePicker = ({
   return (
     <div
       class={constant(
-        highlightCurrentDay
-          ? 'bp6-datepicker bp6-datepicker-highlight-current-day'
-          : 'bp6-datepicker',
+        [
+          'bp6-datepicker',
+          ...(highlightCurrentDay
+            ? ['bp6-datepicker-highlight-current-day']
+            : []),
+          ...(reverseMonthAndYearMenus
+            ? ['bp6-datepicker-reverse-month-and-year']
+            : []),
+        ].join(' '),
       )}
     >
       {shortcuts === undefined ? (

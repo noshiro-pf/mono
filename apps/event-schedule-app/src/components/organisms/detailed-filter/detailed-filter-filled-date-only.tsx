@@ -1,25 +1,21 @@
-import { CheckboxView } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
+import { constant, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
+import { CheckboxView } from '../../molecules/index.mjs';
+import { filterView } from './filter-state.mjs';
 import { CheckboxWrapper, FilterItem } from './styled.js';
 
 const dc = dict.answerPage.detailedFilter;
 
-type Props = Readonly<{ filledDateOnly: boolean }>;
-
 /* 全員回答済みの候補日のみ表示 */
-export const DetailedFilterFilledDateOnly = memoNamed<Props>(
-  'DetailedFilterFilledDateOnly',
-  ({ filledDateOnly }) => (
-    <FilterItem>
-      <CheckboxWrapper data-e2e={'filled-date-only-filter'}>
-        <CheckboxView
-          state={filledDateOnly ? 'checked' : 'none'}
-          onCheck={AnswerFilterAndSortStore.setOnlyFilledDate}
-        />
-        <span>{dc.filterItems.filledDateOnly}</span>
-      </CheckboxWrapper>
-    </FilterItem>
-  ),
+export const DetailedFilterFilledDateOnly = (): JSX.Element => (
+  <FilterItem>
+    <CheckboxWrapper data-e2e={'filled-date-only-filter'}>
+      <CheckboxView
+        state={filterView((s) => (s.filledDateOnly ? 'checked' : 'none'))}
+        onCheck={AnswerFilterAndSortStore.setOnlyFilledDate}
+      />
+      <span>{constant(dc.filterItems.filledDateOnly)}</span>
+    </CheckboxWrapper>
+  </FilterItem>
 );

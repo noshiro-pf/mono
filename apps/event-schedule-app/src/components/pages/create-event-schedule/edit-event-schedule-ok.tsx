@@ -1,35 +1,15 @@
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
-import {
-  ConfirmEmailDialogStore,
-  EditEventScheduleStore,
-} from '../../../store/index.mjs';
+import { If, mapBindable, type JSX } from 'synstate-dom';
+import { ConfirmEmailDialogStore } from '../../../store/index.mjs';
 import { ConfirmEmailDialog } from '../../organisms/index.mjs';
 import { EditEventScheduleEmailVerified } from './edit-event-schedule-email-verified.js';
 
-type Props = Readonly<{ eventScheduleFromDb: EventSchedule }>;
-
-export const EditEventScheduleOk = memoNamed<Props>(
-  'EditEventScheduleOk',
-  ({ eventScheduleFromDb }) => {
-    const editPageIsHidden = useObservableValue(
-      ConfirmEmailDialogStore.isOpen$,
-    );
-
-    const emailVerified = useObservableValue(
-      EditEventScheduleStore.emailVerified$,
-    );
-
-    return (
-      <>
-        {editPageIsHidden ? undefined : (
-          <EditEventScheduleEmailVerified
-            emailVerified={emailVerified}
-            eventScheduleFromDb={eventScheduleFromDb}
-          />
-        )}
-        <ConfirmEmailDialog isOpen={editPageIsHidden} />
-      </>
-    );
-  },
+/** The edit form, hidden while the author's email is being asked for. */
+export const EditEventScheduleOk = (): JSX.Element => (
+  <>
+    <If
+      cond={mapBindable(ConfirmEmailDialogStore.isOpen$, (open) => !open)}
+      then={<EditEventScheduleEmailVerified />}
+    />
+    <ConfirmEmailDialog isOpen={ConfirmEmailDialogStore.isOpen$} />
+  </>
 );

@@ -1,0 +1,157 @@
+.table {
+  :global(.sticky) {
+    position: sticky;
+    z-index: 1;
+    background-color: white;
+
+    &:global(.horizontal) {
+      left: 0;
+    }
+  }
+
+  &.minimized {
+    td,
+    th {
+      padding: 5px;
+    }
+  }
+}
+
+/* Over the table's own cell padding, as the inline style it was. */
+.table .answerCell {
+  min-width: 80px;
+  max-width: 80px;
+  overflow-x: hidden;
+  padding: 5px;
+  position: relative;
+}
+
+.table.minimized .answerCell {
+  min-width: 60px;
+  max-width: 60px;
+  padding: 3px;
+}
+
+.requiredParticipantIcon {
+  position: absolute;
+  top: -5px;
+  left: 5px;
+}
+
+.nameButton {
+  max-width: 100%;
+  overflow-x: hidden;
+
+  & > span {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.summaryCell {
+  vertical-align: baseline;
+}
+
+.xSmall {
+  font-size: x-small;
+}
+
+.paddedSpan {
+  margin: 0 5px;
+}
+
+.answerIconCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconAndString {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.annotation {
+  margin-left: 3px;
+  display: flex;
+  font-size: x-small;
+}
+
+.weightTimes {
+  margin: 0 1px;
+}
+
+.cellComment {
+  margin-left: 3px;
+}
+
+.iconHeaderCell {
+  padding: 0 !important;
+}
+
+.centering {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.topLeftCell {
+  display: flex;
+  align-items: center;
+}
+
+.datetimeHeaderCell {
+  flex: 1;
+}
+
+.commentPopover {
+  padding: 10px;
+  max-width: 250px;
+}
+
+.commentText {
+  margin: 10px;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.smallCommentButton {
+  min-height: 16px !important;
+  min-width: 16px !important;
+}
+
+.filterPopover {
+  padding: 10px;
+}
+
+.filterRow {
+  margin: 3px;
+  display: flex;
+  align-items: center;
+  width: 162px;
+}
+
+.filterInput {
+  flex: 0 0 120px;
+}
+
+.filterSuffix {
+  white-space: nowrap;
+  margin-left: 5px;
+}
+
+.filterFooter {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.filterSwitch {
+  margin: 5px 10px;
+}
+
+.switchWithoutMargin {
+  margin: 0 !important;
+}

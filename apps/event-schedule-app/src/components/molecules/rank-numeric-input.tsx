@@ -1,61 +1,31 @@
-import { useNumericInputWithStepState } from 'numeric-input-utils';
-import * as React from 'react';
-import { NumericInputView } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { Num, Result } from 'ts-data-forge';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import {
   answerRankNumericInputConfig,
   clampAndRoundAnswerRank,
 } from '../../constants/index.mjs';
 import type { AnswerRank } from '../../types/index.mjs';
+import { AppNumericInput } from './app-numeric-input.js';
 
 type Props = Readonly<{
-  value: AnswerRank;
+  value: Bindable<AnswerRank>;
   onValueChange: (value: AnswerRank) => void;
-  disabled?: boolean;
+  disabled?: Bindable<boolean>;
 }>;
 
 const { majorStep: step, min, max } = answerRankNumericInputConfig;
 
-export const RankNumericInput = memoNamed<Props>(
-  'RankNumericInput',
-  ({ value: valueFromProps, disabled = false, onValueChange }) => {
-    const {
-      state,
-      setState,
-      onDecrementMouseDown,
-      onIncrementMouseDown,
-      submit,
-      onKeyDown,
-    } = useNumericInputWithStepState({
-      onValueChange,
-      normalize: clampAndRoundAnswerRank,
-      decode: (s) =>
-        clampAndRoundAnswerRank(
-          Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN),
-        ),
-      encode: (s) => s.toString(),
-      valueFromProps,
-      step,
-    });
-
-    const inputProps = React.useMemo(
-      () => ({ min, max, step, onKeyDown }),
-      [onKeyDown],
-    );
-
-    return (
-      <NumericInputView
-        disabled={disabled}
-        fillSpace
-        inputProps={inputProps}
-        selectOnFocus
-        valueAsStr={state}
-        onDecrementMouseDown={onDecrementMouseDown}
-        onIncrementMouseDown={onIncrementMouseDown}
-        onInputBlur={submit}
-        onInputStringChange={setState}
-      />
-    );
-  },
+export const RankNumericInput = ({
+  value,
+  disabled,
+  onValueChange,
+}: Props): JSX.Element => (
+  <AppNumericInput
+    disabled={disabled}
+    max={constant(max)}
+    min={constant(min)}
+    normalize={clampAndRoundAnswerRank}
+    step={step}
+    value={value}
+    onValueChange={onValueChange}
+  />
 );

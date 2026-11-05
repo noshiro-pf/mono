@@ -795,24 +795,9 @@ importers:
       '@blueprintjs/datetime':
         specifier: ^6.3.0
         version: 6.3.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@blueprintjs/datetime2':
-        specifier: ^3.3.0
-        version: 3.3.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@blueprintjs/icons':
-        specifier: ^6.14.1
-        version: 6.14.1(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@blueprintjs/select':
-        specifier: ^6.4.0
-        version: 6.4.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@emotion/react':
-        specifier: ^11.14.0
-        version: 11.14.0(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0)
-      '@emotion/styled':
-        specifier: ^11.14.1
-        version: 11.14.1(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0))(@types/react@19.3.0)(react@19.3.1)(supports-color@7.2.0)
-      better-react-use-state:
+      blueprint-synstate:
         specifier: workspace:*
-        version: link:../../libs/better-react-use-state
+        version: link:../../libs/blueprint-synstate
       event-schedule-app-shared:
         specifier: workspace:*
         version: link:../event-schedule-app-shared
@@ -825,30 +810,15 @@ importers:
       normalize.css:
         specifier: ^8.0.1
         version: 8.0.1
-      numeric-input-utils:
-        specifier: workspace:*
-        version: link:../numeric-input-utils
-      react-blueprintjs-utils:
-        specifier: workspace:*
-        version: link:../react-blueprintjs-utils
-      react-utils:
-        specifier: workspace:*
-        version: link:../react-utils
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
       synstate-dom:
         specifier: workspace:*
         version: link:../../libs/synstate-dom
-      synstate-react-hooks:
-        specifier: workspace:*
-        version: link:../../libs/synstate-react-hooks
       tiny-router-observable:
         specifier: workspace:*
         version: link:../tiny-router-observable
-      tiny-router-react-hooks:
-        specifier: workspace:*
-        version: link:../tiny-router-react-hooks
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
@@ -862,12 +832,6 @@ importers:
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.64.1
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.3.0
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.3.0(@types/react@19.3.0)
       eslint:
         specifier: 'catalog:'
         version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -898,12 +862,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.10)
-      react:
-        specifier: 'catalog:'
-        version: 19.3.1
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.3.1(react@19.3.1)
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge

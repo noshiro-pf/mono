@@ -1,4 +1,4 @@
-import { memoNamed } from 'react-utils';
+import type { Bindable, JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { ButtonWithConfirm } from './button-with-confirm.js';
 
@@ -6,7 +6,7 @@ const dc = dict.answerPage.answerBeingEdited.deleteButton;
 
 type Props = Readonly<{
   onConfirmDeleteAnswer: () => Promise<void>;
-  loading: boolean;
+  loading: Bindable<boolean>;
 }>;
 
 const buttonConfig = {
@@ -28,15 +28,15 @@ const toastConfig = {
   intent: 'success',
 } as const;
 
-export const DeleteAnswerButton = memoNamed<Props>(
-  'DeleteAnswerButton',
-  ({ onConfirmDeleteAnswer, loading }) => (
-    <ButtonWithConfirm
-      buttonConfig={buttonConfig}
-      dialogConfig={dialogConfig}
-      loading={loading}
-      toastConfig={toastConfig}
-      onConfirmClick={onConfirmDeleteAnswer}
-    />
-  ),
+export const DeleteAnswerButton = ({
+  onConfirmDeleteAnswer,
+  loading,
+}: Props): JSX.Element => (
+  <ButtonWithConfirm
+    buttonConfig={buttonConfig}
+    dialogConfig={dialogConfig}
+    loading={loading}
+    toastConfig={toastConfig}
+    onConfirmClick={onConfirmDeleteAnswer}
+  />
 );

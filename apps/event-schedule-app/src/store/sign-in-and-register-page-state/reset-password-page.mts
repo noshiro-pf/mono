@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import { type InitializedObservable, combine, filter, map } from 'synstate';
 import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
@@ -30,7 +29,7 @@ export const createResetPasswordPageStore = (
 ): ResetPasswordPage => {
   const dc = dict.register;
 
-  const [, dispatch, { state: formState$ }] = createReducerWithActions(
+  const [formState$, dispatch] = createReducerWithActions(
     resetPasswordPageStateReducer,
     resetPasswordPageInitialState,
     [

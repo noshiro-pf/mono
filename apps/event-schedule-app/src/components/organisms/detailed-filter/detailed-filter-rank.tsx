@@ -1,59 +1,35 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import { CheckboxView } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import type { DeepReadonly } from 'ts-type-forge';
+import { constant, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
-import type { AnswerRank } from '../../../types/index.mjs';
-import { RankNumericInput } from '../../molecules/index.mjs';
+import { CheckboxView, RankNumericInput } from '../../molecules/index.mjs';
+import { filterView } from './filter-state.mjs';
 import { CheckboxWrapper, FilterItem } from './styled.js';
+import * as styles from './styled.module.css';
 
 const dc = dict.answerPage.detailedFilter;
 
-type Props = DeepReadonly<{ enabled: boolean; rank: AnswerRank }>;
-
-export const DetailedFilterRank = memoNamed<Props>(
-  'DetailedFilterRank',
-  ({ enabled, rank }) => (
-    <FilterItem>
-      <CheckboxWrapper>
-        <CheckboxView
-          state={enabled ? 'checked' : 'none'}
-          onCheck={AnswerFilterAndSortStore.setEnabledFilteringByRank}
+export const DetailedFilterRank = (): JSX.Element => (
+  <FilterItem>
+    <CheckboxWrapper>
+      <CheckboxView
+        state={filterView((s) => (s.rank.enabled ? 'checked' : 'none'))}
+        onCheck={AnswerFilterAndSortStore.setEnabledFilteringByRank}
+      />
+    </CheckboxWrapper>
+    <div class={constant(styles.rank)}>
+      <span class={constant(styles.nowrap)}>
+        {constant(dc.filterItems.rankPrefix)}
+      </span>
+      <div class={constant(styles.rankInput)}>
+        <RankNumericInput
+          disabled={filterView((s) => !s.rank.enabled)}
+          value={filterView((s) => s.rank.value)}
+          onValueChange={AnswerFilterAndSortStore.setRank}
         />
-      </CheckboxWrapper>
-      <div
-        css={css`
-          display: flex;
-          margin-right: 40px;
-          align-items: center;
-
-          & > * {
-            margin: 3px;
-          }
-        `}
-      >
-        <SimpleText>{dc.filterItems.rankPrefix}</SimpleText>
-
-        <div
-          css={css`
-            max-width: 80px;
-          `}
-        >
-          <RankNumericInput
-            disabled={!enabled}
-            value={rank}
-            onValueChange={AnswerFilterAndSortStore.setRank}
-          />
-        </div>
-
-        <SimpleText>{dc.filterItems.rankSuffix}</SimpleText>
       </div>
-    </FilterItem>
-  ),
+      <span class={constant(styles.nowrap)}>
+        {constant(dc.filterItems.rankSuffix)}
+      </span>
+    </div>
+  </FilterItem>
 );
-
-const SimpleText = styled.span`
-  white-space: nowrap;
-`;

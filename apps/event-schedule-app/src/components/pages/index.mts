@@ -4,5 +4,5 @@ export * from './event-list-page/index.mjs';
 export * from './not-found-page.js';
 export * from './register-page.js';
 export * from './reset-password-page.js';
+export * from './shared-auth-parts.js';
 export * from './sign-in-page.js';
-export * from './ui-parts-test.js';

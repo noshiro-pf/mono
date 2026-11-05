@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import { type InitializedObservable, combine, filter, map } from 'synstate';
 import { Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
@@ -54,7 +53,7 @@ export const createDeleteAccountPageStore = <
     filter((openingDialog) => openingDialog === undefined),
   );
 
-  const [, dispatch, { state: formState$ }] = createReducerWithActions(
+  const [formState$, dispatch] = createReducerWithActions(
     deleteAccountPageStateReducer,
     deleteAccountPageInitialState,
     [dialogClosed$.pipe(map(() => ({ type: 'reset' }) as const))],

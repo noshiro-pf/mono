@@ -1,180 +1,161 @@
-import { Button, FormGroup } from '@blueprintjs/core';
-import styled from '@emotion/styled';
-import * as React from 'react';
-import { BpInput } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { useObservableValue } from 'synstate-react-hooks';
+import { Button, FormGroup, InputGroup } from 'blueprint-synstate';
+import { constant, mapBindable, view, type JSX } from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
-import { GoogleSignInStore, RegisterPageStore } from '../../store/index.mjs';
-import { GoogleIcon, Label } from '../atoms/index.mjs';
+import { RegisterPageStore } from '../../store/index.mjs';
 import { LockButton } from '../molecules/index.mjs';
 import { NavBar } from '../organisms/index.mjs';
-import { SignInStyled } from '../styled/index.mjs';
+import {
+  GoogleSignInSection,
+  OtherErrorMessages,
+  preventSubmit,
+} from './shared-auth-parts.js';
+import * as styles from './sign-in.module.css';
 
 const dc = dict.register;
 
-const returnFalse = (): false => false;
+const { state } = RegisterPageStore;
 
-export const RegisterPage = memoNamed('RegisterPage', () => {
-  const googleSignInButtonDisabled =
-    GoogleSignInStore.useGoogleSignInButtonDisabled();
+export const RegisterPage = (): JSX.Element => {
+  const isWaitingResponse = view(state, (s) => s.formState.isWaitingResponse);
 
-  const {
-    formState,
-    enterButtonDisabled,
-    usernameFormIntent,
-    emailFormIntent,
-    passwordFormIntent,
-    passwordIsOpen,
-  } = useObservableValue(RegisterPageStore.state);
+  const usernameIntent = view(state, (s) => s.usernameFormIntent);
 
-  const passwordLockButton = React.useMemo(
-    () => (
-      <LockButton
-        disabled={formState.isWaitingResponse}
-        passwordIsOpen={passwordIsOpen}
-        onLockClick={RegisterPageStore.togglePasswordLock}
-      />
-    ),
-    [formState.isWaitingResponse, passwordIsOpen],
-  );
+  const emailIntent = view(state, (s) => s.emailFormIntent);
+
+  const passwordIntent = view(state, (s) => s.passwordFormIntent);
+
+  const passwordIsOpen = view(state, (s) => s.passwordIsOpen);
 
   return (
-    <SignInStyled.Wrapper data-e2e={'register-page'}>
+    <div class={constant(styles.wrapper)} data-e2e={constant('register-page')}>
       <NavBar />
 
-      <SignInStyled.Centering>
-        <FormRectWrapper>
-          <SignInStyled.FormRect onSubmit={returnFalse}>
-            <SignInStyled.FormGroups>
+      <div class={constant(styles.centering)}>
+        <div
+          class={constant(`${styles.formRectWrapper} ${styles.registerRect}`)}
+        >
+          <form class={constant(styles.formRect)} onSubmit={preventSubmit}>
+            <div>
               <FormGroup
-                helperText={formState.username.error}
-                intent={usernameFormIntent}
-                label={usernameInputLabel}
+                class={styles.field}
+                helperText={view(state, (s) => s.formState.username.error)}
+                intent={usernameIntent}
+                label={constant(dc.username)}
               >
-                <BpInput
-                  // eslint-disable-next-line jsx-a11y/no-autofocus
+                <InputGroup
                   autoFocus
-                  data-e2e={'username'}
-                  disabled={formState.isWaitingResponse}
-                  intent={usernameFormIntent}
+                  data-e2e={constant('username')}
+                  disabled={isWaitingResponse}
+                  intent={usernameIntent}
                   type={'text'}
-                  value={formState.username.inputValue}
-                  onValueChange={RegisterPageStore.inputUsernameHandler}
+                  value={view(state, (s) => s.formState.username.inputValue)}
+                  onInput={({ currentTarget }) => {
+                    RegisterPageStore.inputUsernameHandler(currentTarget.value);
+                  }}
                 />
               </FormGroup>
 
               <FormGroup
-                helperText={formState.email.error}
-                intent={emailFormIntent}
-                label={emailInputLabel}
+                class={styles.field}
+                helperText={view(state, (s) => s.formState.email.error)}
+                intent={emailIntent}
+                label={constant(dc.email)}
               >
-                <BpInput
+                <InputGroup
                   autoComplete={'username'}
-                  data-e2e={'email'}
-                  disabled={formState.isWaitingResponse}
-                  intent={emailFormIntent}
-                  placeholder={'sample@gmail.com'}
+                  data-e2e={constant('email')}
+                  disabled={isWaitingResponse}
+                  intent={emailIntent}
+                  placeholder={constant('sample@gmail.com')}
                   type={'email'}
-                  value={formState.email.inputValue}
-                  onValueChange={RegisterPageStore.inputEmailHandler}
+                  value={view(state, (s) => s.formState.email.inputValue)}
+                  onInput={({ currentTarget }) => {
+                    RegisterPageStore.inputEmailHandler(currentTarget.value);
+                  }}
                 />
               </FormGroup>
 
               <FormGroup
-                helperText={formState.password.password.error}
-                intent={passwordFormIntent}
-                label={newPasswordInputLabel}
+                class={styles.field}
+                helperText={view(
+                  state,
+                  (s) => s.formState.password.password.error,
+                )}
+                intent={passwordIntent}
+                label={constant(dc.password)}
               >
-                <BpInput
+                <InputGroup
                   autoComplete={'new-password'}
-                  data-e2e={'password'}
-                  disabled={formState.isWaitingResponse}
-                  intent={passwordFormIntent}
+                  data-e2e={constant('password')}
+                  disabled={isWaitingResponse}
+                  intent={passwordIntent}
                   type={'password'}
-                  value={formState.password.password.inputValue}
-                  onValueChange={RegisterPageStore.inputPasswordHandler}
+                  value={view(
+                    state,
+                    (s) => s.formState.password.password.inputValue,
+                  )}
+                  onInput={({ currentTarget }) => {
+                    RegisterPageStore.inputPasswordHandler(currentTarget.value);
+                  }}
                 />
               </FormGroup>
 
               <FormGroup
-                helperText={formState.password.passwordConfirmation.error}
-                intent={passwordFormIntent}
-                label={verifyPasswordInputLabel}
+                class={styles.field}
+                helperText={view(
+                  state,
+                  (s) => s.formState.password.passwordConfirmation.error,
+                )}
+                intent={passwordIntent}
+                label={constant(dc.verifyPassword)}
               >
-                <BpInput
-                  data-e2e={'verify-password'}
-                  disabled={formState.isWaitingResponse}
-                  intent={passwordFormIntent}
-                  rightElement={passwordLockButton}
-                  type={passwordIsOpen ? 'text' : 'password'}
-                  value={formState.password.passwordConfirmation.inputValue}
-                  onValueChange={
-                    RegisterPageStore.inputPasswordConfirmationHandler
+                <InputGroup
+                  data-e2e={constant('verify-password')}
+                  disabled={isWaitingResponse}
+                  intent={passwordIntent}
+                  rightElement={
+                    <LockButton
+                      disabled={isWaitingResponse}
+                      passwordIsOpen={passwordIsOpen}
+                      onLockClick={RegisterPageStore.togglePasswordLock}
+                    />
                   }
+                  type={mapBindable(passwordIsOpen, (open) =>
+                    open ? 'text' : 'password',
+                  )}
+                  value={view(
+                    state,
+                    (s) => s.formState.password.passwordConfirmation.inputValue,
+                  )}
+                  onInput={({ currentTarget }) => {
+                    RegisterPageStore.inputPasswordConfirmationHandler(
+                      currentTarget.value,
+                    );
+                  }}
                 />
               </FormGroup>
-            </SignInStyled.FormGroups>
+            </div>
 
-            <SignInStyled.ButtonWrapper>
+            <div class={constant(styles.buttonWrapper)}>
               <Button
-                data-e2e={'register-button'}
-                disabled={enterButtonDisabled}
+                data-e2e={constant('register-button')}
+                disabled={view(state, (s) => s.enterButtonDisabled)}
                 fill
                 intent={'primary'}
-                loading={formState.isWaitingResponse}
+                loading={isWaitingResponse}
+                text={constant(dc.registerButton)}
                 onClick={RegisterPageStore.enterClickHandler}
-              >
-                {dc.registerButton}
-              </Button>
-            </SignInStyled.ButtonWrapper>
+              />
+            </div>
 
-            <SignInStyled.OtherErrorMessages>
-              {formState.otherErrors}
-            </SignInStyled.OtherErrorMessages>
-          </SignInStyled.FormRect>
+            <OtherErrorMessages
+              otherErrors={view(state, (s) => s.formState.otherErrors)}
+            />
+          </form>
 
-          {
-            <>
-              <SignInStyled.SeparatorWrapper>
-                <SignInStyled.Separator />
-                <SignInStyled.SepText>{dc.separator}</SignInStyled.SepText>
-              </SignInStyled.SeparatorWrapper>
-
-              <SignInStyled.ButtonWrapper>
-                <SignInStyled.GoogleButton
-                  disabled={googleSignInButtonDisabled}
-                  fill
-                  intent={'none'}
-                  variant={'outlined'}
-                  onClick={GoogleSignInStore.googleSignInClickHandler}
-                >
-                  <SignInStyled.GoogleButtonContentWrapper>
-                    <SignInStyled.GoogleIconWrapper>
-                      <GoogleIcon />
-                    </SignInStyled.GoogleIconWrapper>
-                    <SignInStyled.GoogleLoginButtonText>
-                      {dc.google.register}
-                    </SignInStyled.GoogleLoginButtonText>
-                  </SignInStyled.GoogleButtonContentWrapper>
-                </SignInStyled.GoogleButton>
-              </SignInStyled.ButtonWrapper>
-            </>
-          }
-        </FormRectWrapper>
-      </SignInStyled.Centering>
-    </SignInStyled.Wrapper>
+          <GoogleSignInSection text={dc.google.register} />
+        </div>
+      </div>
+    </div>
   );
-});
-
-const FormRectWrapper = styled(SignInStyled.FormRectWrapperBase)`
-  height: 510px;
-`;
-
-const usernameInputLabel = <Label>{dc.username}</Label>;
-
-const emailInputLabel = <Label>{dc.email}</Label>;
-
-const newPasswordInputLabel = <Label>{dc.password}</Label>;
-
-const verifyPasswordInputLabel = <Label>{dc.verifyPassword}</Label>;
+};

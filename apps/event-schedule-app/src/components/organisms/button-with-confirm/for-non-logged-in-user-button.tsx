@@ -1,59 +1,50 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import { AlertWithMaxWidth } from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
+import { Alert } from 'blueprint-synstate';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { dict, introductionUrl, Routes } from '../../../constants/index.mjs';
 import { Router } from '../../../store/index.mjs';
+import { maxWidthModalClass } from '../../styled/index.mjs';
+import * as styles from './for-non-logged-in-user-button.module.css';
 
 const dc = dict.forNonLoggedInUser;
 
-type Props = Readonly<{ isOpen: boolean; cancel: () => void }>;
+type Props = Readonly<{ isOpen: Bindable<boolean>; cancel: () => void }>;
+
+/** Says that what was pressed needs an account, and offers to sign in. */
+export const ForNonLoggedInUserDialog = ({
+  isOpen,
+  cancel,
+}: Props): JSX.Element => (
+  <Alert
+    canEscapeKeyCancel
+    canOutsideClickCancel
+    cancelButtonText={constant(dict.common.buttonText.cancel)}
+    class={maxWidthModalClass}
+    confirmButtonText={constant(dc.confirmButton)}
+    icon={'lock'}
+    intent={'primary'}
+    isOpen={isOpen}
+    onCancel={cancel}
+    onConfirm={onConfirmClick}
+  >
+    <p>{constant(dc.message)}</p>
+    <div class={constant(styles.paragraph)}>
+      <span class={constant(styles.smaller)}>{constant(dc.description)}</span>
+    </div>
+    <div class={constant(styles.paragraph)}>
+      <span class={constant(styles.smaller)}>{constant(dc.link.prefix)}</span>
+      <a
+        class={constant(styles.link)}
+        href={constant(introductionUrl)}
+        rel={constant('noopener noreferrer')}
+        target={constant('_blank')}
+      >
+        {constant(dc.link.body)}
+      </a>
+      <span class={constant(styles.smaller)}>{constant(dc.link.suffix)}</span>
+    </div>
+  </Alert>
+);
 
 const onConfirmClick = (): void => {
   Router.push(Routes.routes.signInPage);
 };
-
-export const ForNonLoggedInUserDialog = memoNamed<Props>(
-  'ForNonLoggedInUserDialog',
-  ({ isOpen, cancel }) => (
-    <AlertWithMaxWidth
-      canEscapeKeyCancel
-      canOutsideClickCancel
-      cancelButtonText={dict.common.buttonText.cancel}
-      confirmButtonText={dc.confirmButton}
-      icon={'lock'}
-      intent={'primary'}
-      isOpen={isOpen}
-      onCancel={cancel}
-      onConfirm={onConfirmClick}
-    >
-      <p>{dc.message}</p>
-      <Paragraph>
-        <Smaller>{dc.description}</Smaller>
-      </Paragraph>
-      <Paragraph>
-        <Smaller>{dc.link.prefix}</Smaller>
-        <a
-          css={css`
-            font-size: smaller;
-            text-decoration: underline;
-          `}
-          href={introductionUrl}
-          rel={'noopener noreferrer'}
-          target={'_blank'}
-        >
-          {dc.link.body}
-        </a>
-        <Smaller>{dc.link.suffix}</Smaller>
-      </Paragraph>
-    </AlertWithMaxWidth>
-  ),
-);
-
-const Paragraph = styled.div`
-  margin: 5px 0;
-`;
-
-const Smaller = styled.span`
-  font-size: smaller;
-`;

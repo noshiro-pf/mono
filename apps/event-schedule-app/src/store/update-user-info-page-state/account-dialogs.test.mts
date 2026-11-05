@@ -1,5 +1,5 @@
-import type { Toaster } from '@blueprintjs/core';
 import { createState } from 'synstate';
+import { constant } from 'synstate-dom';
 import { Result } from 'ts-data-forge';
 import { dict } from '../../constants/index.mjs';
 import type {
@@ -136,7 +136,9 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
     { code: 'auth/cancelled-popup-request', toasts: [], errors: 0 },
     {
       code: 'auth/user-mismatch',
-      toasts: [['danger', dict.accountSettings.reauthenticate.message.error]],
+      toasts: [
+        ['danger', constant(dict.accountSettings.reauthenticate.message.error)],
+      ],
       errors: 1,
     },
   ] as const)(
@@ -386,6 +388,7 @@ const fakeToaster: Toaster = {
   dismiss: () => undefined,
   clear: () => undefined,
   getToasts: () => [],
+  remove: () => undefined,
 } as const;
 
 const settle = async (): Promise<void> => {

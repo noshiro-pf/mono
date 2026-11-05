@@ -1,5 +1,11 @@
 import { onScopeDispose } from 'synstate';
-import { constant, type Bindable, type Child, type JSX } from 'synstate-dom';
+import {
+  constant,
+  createAfterUpdate,
+  type Bindable,
+  type Child,
+  type JSX,
+} from 'synstate-dom';
 import { classObject, intentToggles, sizeClass } from '../internal/index.mjs';
 import { Icon, type IconName } from './icon.js';
 import type { Intent, Size } from './intent.mjs';
@@ -15,8 +21,8 @@ type Props = Readonly<{
   /** The `autocomplete` hint, such as `current-password`. */
   autoComplete?: AutoFill;
   /**
-   * The `autofocus` attribute: the input a `<dialog>` focuses as it opens, or
-   * the page as it loads.
+   * Focused once drawn, as React's `autoFocus`, and marked with the `autofocus`
+   * attribute that an overlay looks for as it opens.
    */
   autoFocus?: boolean;
   /** One that changes, as a password shown and hidden, is written as it does. */
@@ -41,6 +47,8 @@ type Props = Readonly<{
   /** Classes after Blueprint's own on the wrapper. */
   class?: string;
   id?: string;
+  /** Called with the `<input>`, as Blueprint's `inputRef` is. */
+  inputRef?: (input: HTMLInputElement) => void;
   'aria-label'?: Bindable<string>;
   'data-e2e'?: Bindable<string | undefined>;
 }>;
@@ -72,12 +80,23 @@ export const InputGroup = ({
   fill = false,
   class: className,
   id,
+  inputRef,
   'aria-label': ariaLabel,
   'data-e2e': e2e,
 }: Props): JSX.Element => {
   const mut_parts: { input: HTMLInputElement | undefined } = {
     input: undefined,
   };
+
+  if (autoFocus) {
+    // As React's `autoFocus`, which Blueprint's passes on: once drawn, at any
+    // time. The attribute alone is honoured once per page, by the first.
+    createAfterUpdate()(() => {
+      if (mut_parts.input?.isConnected === true) {
+        mut_parts.input.focus();
+      }
+    });
+  }
 
   return (
     <div
@@ -94,6 +113,8 @@ export const InputGroup = ({
       <input
         ref={(input) => {
           mut_parts.input = input;
+
+          inputRef?.(input);
         }}
         aria-label={ariaLabel}
         autocomplete={

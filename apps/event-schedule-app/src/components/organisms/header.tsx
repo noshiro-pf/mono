@@ -1,43 +1,18 @@
-import { Icon } from '@blueprintjs/core';
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import { memoNamed } from 'react-utils';
+import { Icon } from 'blueprint-synstate';
+import { constant, type JSX } from 'synstate-dom';
+import * as styles from './header.module.css';
 import { NavBar } from './navbar.js';
 
 type Props = Readonly<{ title: string }>;
 
-export const Header = memoNamed<Props>('Header', ({ title }) => (
+export const Header = ({ title }: Props): JSX.Element => (
   <div>
     <NavBar />
-    <div
-      css={css`
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        margin: 0 20px;
-      `}
-    >
-      <Title>
+    <div class={constant(styles.row)}>
+      <span class={constant(styles.title)}>
         <Icon icon={'timeline-events'} size={28} />
-        <div>{title}</div>
-      </Title>
+        <div>{constant(title)}</div>
+      </span>
     </div>
   </div>
-));
-
-const Title = styled.span`
-  display: flex;
-  align-items: center;
-  & > * {
-    margin-right: 10px;
-  }
-
-  margin: 20px 0;
-
-  /* h1 style */
-  font-size: 2em;
-  font-weight: bold;
-  color: black !important;
-  text-decoration: none !important;
-`;
+);

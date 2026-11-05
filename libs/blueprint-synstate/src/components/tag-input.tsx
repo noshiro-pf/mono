@@ -22,6 +22,8 @@ export type TagInputValue = Readonly<{
   value: string;
   intent?: Intent;
   minimal?: boolean;
+  /** On the tag's `span.bp6-tag`. */
+  'data-e2e'?: string;
   /**
    * Called by its remove button in place of the input's `onRemove`, as an
    * `onRemove` in Blueprint's `tagProps` is; Backspace and Delete still call
@@ -246,6 +248,7 @@ export const TagInput = ({
               tag.intent ?? 'none',
               tag.minimal ?? false,
               tag.removable,
+              tag['data-e2e'] ?? '',
             ].join('__')
           }
         >
@@ -255,6 +258,7 @@ export const TagInput = ({
               intent: tagIntent,
               minimal,
               removable,
+              'data-e2e': tagE2e,
             } = tag$.getSnapshot().value;
 
             // Part of the key, so that it is the same for the row's life.
@@ -265,6 +269,7 @@ export const TagInput = ({
                 active={mapBindable(activeIndex$, (active) => active === index)}
                 intent={tagIntent ?? 'none'}
                 minimal={minimal ?? false}
+                {...(tagE2e === undefined ? {} : { 'data-e2e': tagE2e })}
                 {...(!removable
                   ? {}
                   : {

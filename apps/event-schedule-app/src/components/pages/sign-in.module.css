@@ -1,0 +1,150 @@
+/* The sign-in, register and password-reset forms. */
+
+.wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.centering {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.formRectWrapper {
+  width: 340px;
+  min-height: max-content;
+  border-radius: 10px;
+  background-color: white;
+  filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  padding: 40px 50px;
+}
+
+.signInRect {
+  height: 420px;
+}
+
+.registerRect {
+  height: 510px;
+}
+
+.resetPasswordRect {
+  height: 320px;
+  position: relative;
+}
+
+.formRect {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* The grey label above each input. */
+.field > :global(.bp6-label) {
+  color: #757575;
+  font-size: 12px;
+}
+
+.passwordResetWrapper {
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.passwordReset {
+  color: #106ba3;
+  cursor: pointer;
+  font-size: 12px;
+  /* A button drawn as the link it was. */
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  line-height: inherit;
+}
+
+.buttonWrapper {
+  margin: 10px 0;
+}
+
+.otherErrorMessages {
+  color: red;
+  font-size: 12px;
+  margin: 10px 0;
+  max-height: 50px;
+  overflow-y: auto;
+}
+
+.separatorWrapper {
+  height: 30px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.separator {
+  margin: 0;
+  width: 100%;
+  position: absolute;
+}
+
+.sepText {
+  background: #ffffff;
+  text-align: center;
+  padding: 0 15px;
+  color: darkgray;
+  position: absolute;
+}
+
+.googleButton:global(.bp6-button) {
+  padding: 11px 12px;
+}
+
+.googleButtonContentWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 18px;
+}
+
+.googleLoginButtonText {
+  font-family: 'Roboto';
+  font-weight: 600;
+  font-size: 14px;
+  color: #6d6d6d;
+}
+
+.googleIconWrapper {
+  padding-right: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.backButtonWrapper {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.content {
+  margin-top: 30px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.title {
+  font-size: x-large;
+  margin-bottom: 20px;
+}

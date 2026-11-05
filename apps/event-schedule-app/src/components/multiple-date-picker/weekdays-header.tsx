@@ -1,80 +1,46 @@
-import { css } from '@emotion/react';
-import * as React from 'react';
-import {
-  DatePickerWeekdayReadonlyStyled,
-  DatePickerWeekdaysRowStyled,
-  DatePickerWeekdaysStyled,
-  DatePickerWeekdayStyled,
-} from 'react-blueprintjs-utils';
-import { memoNamed } from 'react-utils';
-import { mapNullable } from 'ts-data-forge';
+import { constant, For, type JSX } from 'synstate-dom';
 import type { DayOfWeekIndex } from 'ts-type-forge';
 import { daysOfWeekList } from '../../utils-ported/index.mjs';
+import * as styles from './multiple-date-picker.module.css';
 
-type Props = Readonly<{ onClick?: (w: DayOfWeekIndex) => void }>;
-
-export const WeekdaysHeader = memoNamed<Props>(
-  'WeekdaysHeader',
-  ({ onClick }) => {
-    const listWithHandler = React.useMemo(
-      () =>
-        daysOfWeekList.en.map((w, idx) => ({
-          ...w,
-          onClickHandler: mapNullable(onClick, (f) => () => {
-            f(
-              // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-              idx as DayOfWeekIndex,
-            );
-          }),
-        })),
-      [onClick],
-    );
-
-    return (
-      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
-      <DatePickerWeekdaysStyled role={'rowgroup'}>
-        {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role */}
-        <DatePickerWeekdaysRowStyled role={'row'}>
-          {listWithHandler.map(({ name: title, abbr, onClickHandler }) => (
-            <HeaderCell
-              key={title}
-              abbr={abbr}
-              title={title}
-              onClick={onClickHandler}
-            />
-          ))}
-        </DatePickerWeekdaysRowStyled>
-      </DatePickerWeekdaysStyled>
-    );
-  },
-);
-
-type PropsHeaderCell = Readonly<{
-  title: string;
-  abbr: string;
-  onClick?: () => void;
+type Props = Readonly<{
+  /** Absent for a read-only picker. */
+  onClick: ((w: DayOfWeekIndex) => void) | undefined;
 }>;
 
-const HeaderCell = memoNamed<PropsHeaderCell>(
-  'HeaderCell',
-  ({ title, abbr, onClick }) => {
-    const DatePickerWeekdayResolved =
-      onClick === undefined
-        ? DatePickerWeekdayReadonlyStyled
-        : DatePickerWeekdayStyled;
+export const WeekdaysHeader = ({ onClick }: Props): JSX.Element => (
+  <div class={constant(styles.weekdays)} role={constant('rowgroup')}>
+    <div class={constant(styles.row)} role={constant('row')}>
+      <For items={constant(daysOfWeekList.en)} key={(w) => w.name}>
+        {(w$, index$) => {
+          const { name, abbr } = w$.getSnapshot().value;
 
-    return (
-      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
-      <DatePickerWeekdayResolved role={'columnheader'} onClick={onClick}>
-        <abbr
-          css={css`
-            text-decoration: none !important;
-          `}
-          title={title}
-        >
-          {abbr}
-        </abbr>
-      </DatePickerWeekdayResolved>
-    );
-  },
+          return (
+            <div
+              class={constant(
+                onClick === undefined
+                  ? styles.weekday
+                  : `${styles.weekday} ${styles.weekdayClickable}`,
+              )}
+              role={constant('columnheader')}
+              onClick={
+                onClick === undefined
+                  ? undefined
+                  : () => {
+                      onClick(
+                        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+                        index$.getSnapshot().value as DayOfWeekIndex,
+                      );
+                    }
+              }
+            >
+              <abbr class={constant(styles.abbr)} title={constant(name)}>
+                {constant(abbr)}
+              </abbr>
+            </div>
+          );
+        }}
+      </For>
+    </div>
+  </div>
 );

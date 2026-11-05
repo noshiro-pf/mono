@@ -1,114 +1,113 @@
-import { Button, Classes, FormGroup } from '@blueprintjs/core';
-import styled from '@emotion/styled';
-import * as React from 'react';
-import { BpInput, DialogWithMaxWidth } from 'react-blueprintjs-utils';
-import { memoNamed, useKeyEventListener } from 'react-utils';
-import { isImeKeyDown } from 'synstate-dom';
-import { useObservableValue } from 'synstate-react-hooks';
-import { isString, pipe } from 'ts-data-forge';
+import { Button, Dialog, FormGroup, InputGroup } from 'blueprint-synstate';
+import {
+  constant,
+  createAfterUpdate,
+  isImeKeyDown,
+  listenInScope,
+  subscribeInScope,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import { isString } from 'ts-data-forge';
 import { dict } from '../../constants/index.mjs';
 import { Auth, ConfirmEmailDialogStore } from '../../store/index.mjs';
-import { ButtonsWrapperAlignEnd } from '../styled/index.mjs';
+import {
+  ButtonsWrapperAlignEnd,
+  maxWidthModalClass,
+} from '../styled/index.mjs';
+import * as styles from './dialogs.module.css';
 
 const dc = dict.answerPage.eventInfo.verifyEmailDialog;
 
-type ConfirmEmailDialogProps = Readonly<{ isOpen: boolean }>;
+type ConfirmEmailDialogProps = Readonly<{ isOpen: Bindable<boolean> }>;
 
-export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
-  'ConfirmEmailDialog',
-  ({ isOpen }) => {
-    const state = useObservableValue(ConfirmEmailDialogStore.state);
+const { state } = ConfirmEmailDialogStore;
 
-    const helperText = React.useMemo(
-      () =>
-        pipe(state.formState.email.error).mapNullable((s) => <div>{s}</div>)
-          .value,
-      [state.formState.email.error],
-    );
+export const ConfirmEmailDialog = ({
+  isOpen,
+}: ConfirmEmailDialogProps): JSX.Element => {
+  listenInScope(globalThis, 'keydown', (event) => {
+    if (
+      event instanceof KeyboardEvent &&
+      event.key === 'Enter' &&
+      !isImeKeyDown(event)
+    ) {
+      ConfirmEmailDialogStore.enterClickHandler();
+    }
+  });
 
-    const onKeyDown = React.useCallback((ev: KeyboardEvent) => {
-      if (ev.key === 'Enter' && !isImeKeyDown(ev)) {
-        ConfirmEmailDialogStore.enterClickHandler();
-      }
-    }, []);
+  const afterUpdate = createAfterUpdate();
 
-    useKeyEventListener(onKeyDown, () => {});
+  // ログイン済みならemailを自動入力してsubmit
+  subscribeInScope(Auth.email$, (email) => {
+    if (!isString(email)) {
+      return;
+    }
 
-    const fireAuthUser = Auth.useFireAuthUser();
-
-    /** ログイン済みならemailを自動入力してsubmit */
-    React.useEffect(() => {
-      const email = fireAuthUser?.email;
-
-      if (!isString(email)) {
-        return;
-      }
-
+    // Once the update that brought the user has finished.
+    afterUpdate(() => {
       ConfirmEmailDialogStore.inputEmailHandler(email);
 
       ConfirmEmailDialogStore.enterClickHandler();
-    }, [fireAuthUser?.email]);
+    });
+  });
 
-    return (
-      <DialogWithMaxWidth
-        canEscapeKeyClose={false}
-        canOutsideClickClose={false}
-        icon={'key'}
-        isCloseButtonShown={false}
-        isOpen={isOpen}
-        title={dc.editButtonConfirmDialogTitle}
-      >
-        <div className={Classes.DIALOG_BODY}>
-          <p>{dc.editButtonConfirmDialogMessage}</p>
-          <InputWrapperWithMinHeight>
-            <FormGroup
-              helperText={helperText}
-              intent={state.emailFormIntent}
-              label={''}
-            >
-              <BpInput
-                // eslint-disable-next-line jsx-a11y/no-autofocus
-                autoFocus
-                intent={state.emailFormIntent}
-                rightElement={resetInputButton}
-                type={'email'}
-                value={state.formState.email.inputValue}
-                onValueChange={ConfirmEmailDialogStore.inputEmailHandler}
-              />
-            </FormGroup>
-          </InputWrapperWithMinHeight>
+  const intent = view(state, (s) => s.emailFormIntent);
+
+  return (
+    <Dialog
+      canEscapeKeyClose={false}
+      canOutsideClickClose={false}
+      class={maxWidthModalClass}
+      icon={'key'}
+      isCloseButtonShown={false}
+      isOpen={isOpen}
+      title={constant(dc.editButtonConfirmDialogTitle)}
+    >
+      <div class={constant('bp6-dialog-body')}>
+        <p>{constant(dc.editButtonConfirmDialogMessage)}</p>
+        <div class={constant(styles.inputWrapper)}>
+          <FormGroup
+            helperText={view(state, (s) => s.formState.email.error)}
+            intent={intent}
+            label={constant('')}
+          >
+            <InputGroup
+              autoFocus
+              intent={intent}
+              rightElement={
+                <Button
+                  icon={'cross'}
+                  variant={constant('minimal')}
+                  onClick={ConfirmEmailDialogStore.resetInput}
+                />
+              }
+              type={'email'}
+              value={view(state, (s) => s.formState.email.inputValue)}
+              onInput={({ currentTarget }) => {
+                ConfirmEmailDialogStore.inputEmailHandler(currentTarget.value);
+              }}
+            />
+          </FormGroup>
         </div>
-        <div className={Classes.DIALOG_FOOTER}>
-          <ButtonsWrapperAlignEnd>
-            <Button
-              intent={'none'}
-              onClick={ConfirmEmailDialogStore.cancelClickHandler}
-            >
-              {dc.back}
-            </Button>
-            <Button
-              disabled={state.enterButtonDisabled}
-              intent={'primary'}
-              loading={state.formState.isWaitingResponse}
-              onClick={ConfirmEmailDialogStore.enterClickHandler}
-            >
-              {dict.common.buttonText.decide}
-            </Button>
-          </ButtonsWrapperAlignEnd>
-        </div>
-      </DialogWithMaxWidth>
-    );
-  },
-);
-
-const InputWrapperWithMinHeight = styled('div')`
-  min-height: 72px;
-`;
-
-const resetInputButton = (
-  <Button
-    icon={'cross'}
-    variant={'minimal'}
-    onClick={ConfirmEmailDialogStore.resetInput}
-  />
-);
+      </div>
+      <div class={constant('bp6-dialog-footer')}>
+        <ButtonsWrapperAlignEnd>
+          <Button
+            intent={'none'}
+            text={constant(dc.back)}
+            onClick={ConfirmEmailDialogStore.cancelClickHandler}
+          />
+          <Button
+            disabled={view(state, (s) => s.enterButtonDisabled)}
+            intent={'primary'}
+            loading={view(state, (s) => s.formState.isWaitingResponse)}
+            text={constant(dict.common.buttonText.decide)}
+            onClick={ConfirmEmailDialogStore.enterClickHandler}
+          />
+        </ButtonsWrapperAlignEnd>
+      </div>
+    </Dialog>
+  );
+};

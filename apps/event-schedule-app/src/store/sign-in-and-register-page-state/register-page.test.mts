@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'tiny-router-observable';
 import { Result } from 'ts-data-forge';
@@ -9,7 +8,7 @@ import {
 } from './register-page.mjs';
 
 describe(createRegisterPageStore, () => {
-  test('creates the user, names them, sends the verification, then goes back', async () => {
+  test('creates the user, names them, sends the verification, reads the user again, then goes back', async () => {
     const { store, browser, calls } = setup(() =>
       Result.ok({ user: { uid: 'u1' } }),
     );
@@ -24,6 +23,8 @@ describe(createRegisterPageStore, () => {
       'createUser alice@example.com',
       'displayName u1 alice',
       'sendEmailVerification u1',
+      // Firebase reports no change for a name set in place.
+      'emitAuthStateChange',
     ]);
 
     assert.strictEqual(browser.url().pathname, '/event/abc/');
@@ -117,6 +118,11 @@ const setup = (
         },
       },
     },
+    auth: {
+      emitAuthStateChange: () => {
+        mut_calls.push('emitAuthStateChange');
+      },
+    },
     router,
     googleSignIn: { googleSignInButtonDisabledState },
     toast: Promise.resolve(fakeToaster),
@@ -130,6 +136,7 @@ const fakeToaster: Toaster = {
   dismiss: () => undefined,
   clear: () => undefined,
   getToasts: () => [],
+  remove: () => undefined,
 } as const;
 
 const settle = async (): Promise<void> => {

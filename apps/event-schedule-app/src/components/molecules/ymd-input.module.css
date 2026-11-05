@@ -1,0 +1,5 @@
+/* Above Blueprint's `.bp6-input-group .bp6-input { width: 100% }`, as the
+   inline width react-blueprintjs-utils' `BpDatePicker` gave its input was. */
+.ymdInput :global(.bp6-input-group .bp6-input) {
+  width: 90px;
+}

@@ -27,6 +27,7 @@ type Props = Readonly<
     | 'endIcon'
     | 'fill'
     | 'icon'
+    | 'iconElement'
     | 'intent'
     | 'loading'
     | 'size'
@@ -60,6 +61,7 @@ export const AnchorButton = ({
   text,
   children,
   icon,
+  iconElement,
   endIcon,
   intent = 'none',
   variant = constant('solid'),
@@ -145,6 +147,7 @@ export const AnchorButton = ({
         children={children}
         endIcon={endIcon}
         icon={icon}
+        iconElement={iconElement}
         loading={loading}
         text={text}
       />

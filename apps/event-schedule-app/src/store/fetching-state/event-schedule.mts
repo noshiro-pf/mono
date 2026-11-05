@@ -1,5 +1,6 @@
 import {
   createEventEmitter,
+  createState,
   filter,
   merge,
   throttle,
@@ -9,7 +10,6 @@ import {
   type InitializedObservable,
   type Subscription,
 } from 'synstate';
-import { createState } from 'synstate-react-hooks';
 import { Result, isNotUndefined } from 'ts-data-forge';
 import type { Api } from '../../api/index.mjs';
 
@@ -31,7 +31,6 @@ export type EventScheduleResult =
 export type EventScheduleFetcher = Readonly<{
   result$: InitializedObservable<EventScheduleResult>;
   eventSchedule$: InitializedObservable<EventSchedule | undefined>;
-  useEventScheduleResult: () => EventScheduleResult;
   /** Reads the event again, unless one was requested within `throttleMs`. */
   fetchEventSchedule: () => void;
   /**
@@ -58,11 +57,8 @@ export const createEventScheduleStore = (
     throttle(deps.throttleMs),
   );
 
-  const [
-    useEventScheduleResult,
-    setEventScheduleResult,
-    { state: eventScheduleResult$ },
-  ] = createState<EventScheduleResult>(undefined);
+  const [eventScheduleResult$, setEventScheduleResult] =
+    createState<EventScheduleResult>(undefined);
 
   const result$ = eventScheduleResult$;
 
@@ -125,7 +121,6 @@ export const createEventScheduleStore = (
   return {
     result$,
     eventSchedule$,
-    useEventScheduleResult,
     fetchEventSchedule,
     refetchEventScheduleAfterWrite,
     start,

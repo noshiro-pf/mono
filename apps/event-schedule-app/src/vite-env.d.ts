@@ -1,19 +1,10 @@
-/// <reference types="react" />
-/// <reference types="react-dom" />
-
 /// <reference types="vite/client" />
 
 import type {
-  HTMLInputProps as HTMLInputProps_,
-  HTMLSelectProps as HTMLSelectProps_,
   IconName as IconName_,
-  InputGroupProps as InputGroupProps_,
   Intent as Intent_,
-  OptionProps as OptionProps_,
-  PopperModifiers as PopperModifiers_,
   Toaster as Toaster_,
-} from '@blueprintjs/core';
-import type { DateInputProps } from '@blueprintjs/datetime';
+} from 'blueprint-synstate';
 import type {
   AnswerIconIdWithNone as AnswerIconIdWithNone_,
   AnswerIconId as AnswerIconId_,
@@ -39,7 +30,6 @@ import type {
   YearMonthDate as YearMonthDate_,
   Ymdhm as Ymdhm_,
 } from 'ts-fortress-types';
-import type { StrictExclude } from 'ts-type-forge';
 import type {
   AnswerSelectionMapKey as AnswerSelectionMapKey_,
   DatetimeRangeMapKey as DatetimeRangeMapKey_,
@@ -59,29 +49,12 @@ declare global {
     readonly VITE_FIREBASE_EMULATORS?: string;
   }
 
-  /* @blueprintjs/core */
-  type HTMLInputProps = HTMLInputProps_;
-
-  type HTMLSelectProps = HTMLSelectProps_;
-
+  /* blueprint-synstate */
   type IconName = IconName_;
-
-  type InputGroupProps = InputGroupProps_;
 
   type Intent = Intent_;
 
   type Toaster = Toaster_;
-
-  type OptionProps = OptionProps_;
-
-  type PopperModifiers = PopperModifiers_;
-
-  /* @blueprintjs/datetime */
-  type DatePickerShortcut = Readonly<
-    ArrayElement<
-      StrictExclude<DateInputProps['shortcuts'], boolean | undefined>
-    >
-  >;
 
   /* ts-fortress-types */
   type DatetimeRange = DatetimeRange_;

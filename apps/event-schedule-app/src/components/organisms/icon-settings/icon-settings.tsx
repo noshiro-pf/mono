@@ -1,6 +1,10 @@
-import { css } from '@emotion/react';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import {
+  constant,
+  toObservable,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import {
   iconListReducer,
@@ -8,80 +12,55 @@ import {
 } from '../../../functions/index.mjs';
 import { Description } from '../../atoms/index.mjs';
 import { AnswerIconRow } from './icon-setting-row.js';
+import * as styles from './icon-settings.module.css';
 
 const dc = dict.eventSettingsPage.section3.iconSettings;
 
 type Props = Readonly<{
-  answerIcons: AnswerIconSettings;
+  answerIcons: Bindable<AnswerIconSettings>;
   onAnswerIconsChange: (value: AnswerIconSettings) => void;
 }>;
 
-export const AnswerIconSettingsComponent = memoNamed<Props>(
-  'AnswerIconSettings',
-  ({ answerIcons, onAnswerIconsChange }) => {
-    const dispatch = React.useCallback(
-      (action: IconListReducerAction) => {
-        onAnswerIconsChange(iconListReducer(answerIcons, action));
-      },
-      [answerIcons, onAnswerIconsChange],
-    );
+export const AnswerIconSettingsComponent = ({
+  answerIcons,
+  onAnswerIconsChange,
+}: Props): JSX.Element => {
+  const answerIcons$ = toObservable(answerIcons);
 
-    const onOkDescriptionChange = React.useCallback(
-      (description: string) => {
-        dispatch({ type: 'update-description', iconId: 'good', description });
-      },
-      [dispatch],
+  const dispatch = (action: IconListReducerAction): void => {
+    onAnswerIconsChange(
+      iconListReducer(answerIcons$.getSnapshot().value, action),
     );
+  };
 
-    const onNeitherDescriptionChange = React.useCallback(
-      (description: string) => {
-        dispatch({ type: 'update-description', iconId: 'fair', description });
-      },
-      [dispatch],
-    );
+  const onDescriptionChange =
+    (iconId: AnswerIconId) =>
+    (description: string): void => {
+      dispatch({ type: 'update-description', iconId, description });
+    };
 
-    const onNeitherPointChange = React.useCallback(
-      (point: AnswerIconPoint) => {
-        dispatch({ type: 'update-point', iconId: 'fair', point });
-      },
-      [dispatch],
-    );
-
-    const onNgDescriptionChange = React.useCallback(
-      (description: string) => {
-        dispatch({ type: 'update-description', iconId: 'poor', description });
-      },
-      [dispatch],
-    );
-
-    return (
-      <div
-        css={css`
-          & > * {
-            margin-bottom: 5px;
-          }
-        `}
-        data-e2e={'icon-settings'}
-      >
-        <div>{dc.title}</div>
-        <Description text={dc.description} />
-        <AnswerIconRow
-          answerIcon={answerIcons.good}
-          iconId={'good'}
-          onDescriptionChange={onOkDescriptionChange}
-        />
-        <AnswerIconRow
-          answerIcon={answerIcons.fair}
-          iconId={'fair'}
-          onDescriptionChange={onNeitherDescriptionChange}
-          onPointChange={onNeitherPointChange}
-        />
-        <AnswerIconRow
-          answerIcon={answerIcons.poor}
-          iconId={'poor'}
-          onDescriptionChange={onNgDescriptionChange}
-        />
-      </div>
-    );
-  },
-);
+  return (
+    <div class={constant(styles.settings)} data-e2e={constant('icon-settings')}>
+      <div>{constant(dc.title)}</div>
+      <Description text={constant(dc.description)} />
+      <AnswerIconRow
+        answerIcon={view(answerIcons$, (a) => a.good)}
+        iconId={'good'}
+        onDescriptionChange={onDescriptionChange('good')}
+      />
+      <AnswerIconRow
+        answerIcon={view(answerIcons$, (a) => a.fair)}
+        iconId={'fair'}
+        onDescriptionChange={onDescriptionChange('fair')}
+        onPointChange={(point) => {
+          dispatch({ type: 'update-point', iconId: 'fair', point });
+        }}
+      />
+      <AnswerIconRow
+        answerIcon={view(answerIcons$, (a) => a.poor)}
+        iconId={'poor'}
+        onDescriptionChange={onDescriptionChange('poor')}
+      />
+    </div>
+  );
+};

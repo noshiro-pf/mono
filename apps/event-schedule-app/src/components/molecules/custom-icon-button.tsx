@@ -1,35 +1,33 @@
-import { Button } from '@blueprintjs/core';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import { Button } from 'blueprint-synstate';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { CustomIcon } from '../atoms/index.mjs';
 
 type Props = Readonly<{
-  active?: boolean;
+  active?: Bindable<boolean>;
   'data-e2e'?: string;
   iconName: AnswerIconIdWithNone;
   outlined?: boolean;
-  iconColor?: string;
-  title: string;
+  iconColor?: Bindable<string>;
+  title: Bindable<string>;
   onClick: () => void;
 }>;
 
-export const CustomIconButton = memoNamed<Props>(
-  'CustomIconButton',
-  (props) => {
-    const icon = React.useMemo(
-      () => <CustomIcon color={props.iconColor} iconName={props.iconName} />,
-      [props.iconColor, props.iconName],
-    );
-
-    return (
-      <Button
-        active={props.active}
-        data-e2e={props['data-e2e']}
-        icon={icon}
-        title={props.title}
-        variant={props.outlined === true ? 'outlined' : 'minimal'}
-        onClick={props.onClick}
-      />
-    );
-  },
+/** A button drawn as an answer icon, ○ △ ×. */
+export const CustomIconButton = ({
+  active,
+  'data-e2e': e2e,
+  iconName,
+  outlined = false,
+  iconColor,
+  title,
+  onClick,
+}: Props): JSX.Element => (
+  <Button
+    active={active}
+    data-e2e={e2e === undefined ? undefined : constant(e2e)}
+    iconElement={<CustomIcon color={iconColor} iconName={iconName} />}
+    title={title}
+    variant={constant(outlined ? 'outlined' : 'minimal')}
+    onClick={onClick}
+  />
 );

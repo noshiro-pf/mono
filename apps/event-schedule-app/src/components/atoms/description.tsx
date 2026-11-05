@@ -1,32 +1,26 @@
-import { css } from '@emotion/react';
-import * as React from 'react';
-import { memoNamed } from 'react-utils';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 import { descriptionFontColor } from '../../constants/index.mjs';
+import * as styles from './description.module.css';
 
-type Props = Readonly<{ text: string; error?: boolean; color?: string }>;
+type Props = Readonly<{
+  text: Bindable<string>;
+  error?: Bindable<boolean>;
+  /** In place of the normal or error colour. */
+  color?: string;
+}>;
 
-export const Description = memoNamed<Props>(
-  'Description',
-  ({ text, error = false, color }) => {
-    const style = React.useMemo(
-      () => ({
-        color:
-          color ??
-          (error ? descriptionFontColor.error : descriptionFontColor.normal),
-      }),
-      [color, error],
-    );
-
-    return (
-      <div
-        css={css`
-          font-size: smaller;
-          margin-bottom: 5px;
-        `}
-        style={style}
-      >
-        {text}
-      </div>
-    );
-  },
+export const Description = ({ text, error, color }: Props): JSX.Element => (
+  <div
+    class={constant(styles.description)}
+    style={{
+      color:
+        color === undefined
+          ? mapBindable(error ?? constant(false), (e) =>
+              e ? descriptionFontColor.error : descriptionFontColor.normal,
+            )
+          : constant(color),
+    }}
+  >
+    {text}
+  </div>
 );

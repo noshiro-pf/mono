@@ -6,12 +6,11 @@ import {
   scan,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { useObservableValue } from 'synstate-react-hooks';
 import { Arr, match } from 'ts-data-forge';
 import type { Reducer } from 'ts-type-forge';
 
 /**
- * `createReducer` of `synstate-react-hooks`, whose state also follows
+ * A reducer, as synstate's `createReducer` is, whose state also follows
  * `actions`: observables of actions derived from elsewhere, such as a reset
  * when a page is left.
  *
@@ -24,10 +23,9 @@ export const createReducerWithActions = <S, A>(
   initialState: S,
   actions: readonly SynstateObservable<NoInfer<A>>[],
 ): readonly [
-  useCurrentValue: () => S,
+  state: InitializedObservable<S>,
   dispatch: (action: A) => S,
   utils: Readonly<{
-    state: InitializedObservable<S>;
     getSnapshot: () => S;
     initialState: S;
   }>,
@@ -46,9 +44,7 @@ export const createReducerWithActions = <S, A>(
     return getSnapshot();
   };
 
-  const useCurrentValue = (): S => useObservableValue(state);
-
-  return [useCurrentValue, dispatch, { state, getSnapshot, initialState }];
+  return [state, dispatch, { getSnapshot, initialState }];
 };
 
 /**
@@ -62,7 +58,7 @@ export const createToggleState = (
   state: InitializedObservable<boolean>;
   toggle: () => void;
 }> => {
-  const [, dispatch, { state }] = createReducerWithActions(
+  const [state, dispatch] = createReducerWithActions(
     (isOn: boolean, action: 'toggle' | 'reset') =>
       match(action, { toggle: !isOn, reset: false }),
     false,

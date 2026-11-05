@@ -283,6 +283,76 @@ describe(DateInput, () => {
     unmount();
   });
 
+  test('shortcuts given as a function are made again each time the calendar opens, and none are drawn for undefined', async () => {
+    fixNow();
+
+    const { value$, onChange } = controlled('');
+
+    const mut_labels = ['Today'];
+
+    const mut_none = { value: false };
+
+    const { container, unmount } = mountInto(() => (
+      <DateInput
+        {...RANGE}
+        shortcuts={() =>
+          mut_none.value
+            ? undefined
+            : mut_labels.map((label) => ({ label, value: '2026-10-23T23:59' }))
+        }
+        value={value$}
+        onChange={onChange}
+      />
+    ));
+
+    const input = one<HTMLInputElement>(container, 'input');
+
+    const labels = (): readonly (string | null)[] =>
+      all(container, '.bp6-daterangepicker-shortcuts a.bp6-menu-item').map(
+        (item) => item.textContent,
+      );
+
+    input.focus();
+
+    await settle();
+
+    assert.deepStrictEqual(labels(), ['Today']);
+
+    assert.isFalse(press(input, 'Escape'));
+
+    await settle();
+
+    // As a day passing while the page stays open would change them.
+    mut_labels.splice(0, 1, 'Yesterday', 'Today');
+
+    input.blur();
+
+    input.focus();
+
+    await settle();
+
+    assert.deepStrictEqual(labels(), ['Yesterday', 'Today']);
+
+    assert.isFalse(press(input, 'Escape'));
+
+    await settle();
+
+    // None at all that time, as on a narrow screen: no menu and no divider.
+    mut_none.value = true;
+
+    input.blur();
+
+    input.focus();
+
+    await settle();
+
+    assert.isNull(container.querySelector('.bp6-daterangepicker-shortcuts'));
+
+    assert.isNull(container.querySelector('.bp6-divider'));
+
+    unmount();
+  });
+
   test('Escape closes the calendar without reaching the page', async () => {
     fixNow();
 

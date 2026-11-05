@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
+import { constant, type Child, type JSX } from 'synstate-dom';
+import * as styles from './section-title.module.css';
 
-export const SectionTitle = styled.div`
-  margin-top: 10px;
-  margin-bottom: 10px;
-  color: #106ba3;
-  font-weight: bold;
-`;
+type Props = Readonly<{ children: Child }>;
+
+export const SectionTitle = ({ children }: Props): JSX.Element => (
+  <div class={constant(styles.title)}>{children}</div>
+);

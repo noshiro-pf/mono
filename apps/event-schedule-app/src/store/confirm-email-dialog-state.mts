@@ -1,4 +1,3 @@
-import type { Toaster } from '@blueprintjs/core';
 import {
   combine,
   filter,
@@ -55,7 +54,7 @@ export const createConfirmEmailDialogStore = (
     ),
   );
 
-  const [, dispatch, { state: formState$, getSnapshot: getFormStateSnapshot }] =
+  const [formState$, dispatch, { getSnapshot: getFormStateSnapshot }] =
     createReducerWithActions(
       confirmEmailDialogFormStateReducer,
       confirmEmailDialogFormInitialState,

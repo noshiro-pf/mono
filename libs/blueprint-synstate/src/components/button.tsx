@@ -17,6 +17,11 @@ export type ButtonProps = Readonly<{
   children?: Child;
   /** Drawn before the text; one that changes is redrawn as it does. */
   icon?: Bindable<IconName> | IconName;
+  /**
+   * Drawn as it is in place of `icon`, such as an `<svg>` of the app's own, as
+   * Blueprint draws an element given as its icon.
+   */
+  iconElement?: Child;
   /** Drawn after the text; one that changes is redrawn as it does. */
   endIcon?: Bindable<IconName> | IconName;
   intent?: Intent;
@@ -60,6 +65,7 @@ export const Button = ({
   text,
   children,
   icon,
+  iconElement,
   endIcon,
   intent = 'none',
   variant = constant('solid'),
@@ -112,6 +118,7 @@ export const Button = ({
         children={children}
         endIcon={endIcon}
         icon={icon}
+        iconElement={iconElement}
         loading={loading}
         text={text}
       />
