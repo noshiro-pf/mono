@@ -1,12 +1,10 @@
+import { constant, type Bindable, type Child, type JSX } from 'synstate-dom';
 import {
-  constant,
-  mapBindable,
-  type Bindable,
-  type Child,
-  type JSX,
-} from 'synstate-dom';
-import { classObject, intentClass, sizeClass } from '../internal/index.mjs';
-import { Icon, type IconName } from './icon.js';
+  buttonClass,
+  ButtonContents,
+  disabledWhileLoading,
+} from './button-parts.js';
+import type { IconName } from './icon.js';
 import type { Intent, Size } from './intent.mjs';
 
 /** How a {@link Button} is drawn: filled, without a border until hovered, or bordered. */
@@ -29,6 +27,11 @@ export type ButtonProps = Readonly<{
   /** Drawn pressed (`bp6-active`). */
   active?: Bindable<boolean>;
   disabled?: Bindable<boolean>;
+  /**
+   * A spinner over the contents, which Blueprint's style sheets hide; the
+   * button is disabled meanwhile.
+   */
+  loading?: Bindable<boolean>;
   type?: 'button' | 'reset' | 'submit';
   /** Classes after Blueprint's own. */
   class?: string;
@@ -51,7 +54,7 @@ export type ButtonProps = Readonly<{
  * `span.bp6-button-text` and the end icon, as Blueprint draws them.
  *
  * `disabled` also sets `bp6-disabled`, which Blueprint's style sheets draw a
- * disabled button by. No `loading` spinner.
+ * disabled button by; so does `loading`.
  */
 export const Button = ({
   text,
@@ -63,7 +66,8 @@ export const Button = ({
   size = 'medium',
   fill = false,
   active,
-  disabled,
+  disabled: disabledProp,
+  loading,
   type = 'button',
   class: className,
   title,
@@ -76,45 +80,41 @@ export const Button = ({
   'aria-controls': ariaControls,
   'aria-expanded': ariaExpanded,
   'data-e2e': e2e,
-}: ButtonProps): JSX.Element => (
-  <button
-    aria-checked={ariaChecked}
-    aria-controls={ariaControls}
-    aria-expanded={ariaExpanded}
-    aria-label={ariaLabel}
-    aria-pressed={ariaPressed}
-    class={classObject(
-      [
-        'bp6-button',
-        intentClass(intent),
-        sizeClass(size),
-        fill && 'bp6-fill',
+}: ButtonProps): JSX.Element => {
+  const disabled = disabledWhileLoading(disabledProp, loading);
+
+  return (
+    <button
+      aria-checked={ariaChecked}
+      aria-controls={ariaControls}
+      aria-expanded={ariaExpanded}
+      aria-label={ariaLabel}
+      aria-pressed={ariaPressed}
+      class={buttonClass({
+        intent,
+        variant,
+        size,
+        fill,
+        active,
+        disabled,
+        loading,
         className,
-      ],
-      [
-        ['bp6-minimal', mapBindable(variant, (v) => v === 'minimal')],
-        ['bp6-outlined', mapBindable(variant, (v) => v === 'outlined')],
-        ['bp6-active', active],
-        ['bp6-disabled', disabled],
-      ],
-    )}
-    data-e2e={e2e}
-    disabled={disabled}
-    role={role === undefined ? undefined : constant(role)}
-    tabIndex={tabIndex}
-    title={title}
-    type={constant(type)}
-    onClick={onClick}
-  >
-    {icon === undefined ? [] : <Icon icon={icon} />}
-    {text === undefined && children === undefined ? (
-      []
-    ) : (
-      <span class={constant('bp6-button-text')}>
-        {text ?? []}
-        {children ?? []}
-      </span>
-    )}
-    {endIcon === undefined ? [] : <Icon icon={endIcon} />}
-  </button>
-);
+      })}
+      data-e2e={e2e}
+      disabled={disabled}
+      role={role === undefined ? undefined : constant(role)}
+      tabIndex={tabIndex}
+      title={title}
+      type={constant(type)}
+      onClick={onClick}
+    >
+      <ButtonContents
+        children={children}
+        endIcon={endIcon}
+        icon={icon}
+        loading={loading}
+        text={text}
+      />
+    </button>
+  );
+};

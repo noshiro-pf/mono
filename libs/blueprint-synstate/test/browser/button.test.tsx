@@ -39,11 +39,13 @@ describe(Button, () => {
       'minimal' | 'outlined' | 'solid'
     >('solid');
 
+    const [active$, setActive] = createState(false);
+
     const [disabled$, setDisabled] = createState(false);
 
     const { container, unmount } = mountInto(() => (
       <Button
-        active={disabled$}
+        active={active$}
         disabled={disabled$}
         text={constant('Go')}
         variant={variant$}
@@ -64,13 +66,18 @@ describe(Button, () => {
 
     assert.isTrue(button.classList.contains('bp6-outlined'));
 
+    setActive(true);
+
+    assert.isTrue(button.classList.contains('bp6-active'));
+
     setDisabled(true);
 
     assert.isTrue(button.disabled);
 
     assert.isTrue(button.classList.contains('bp6-disabled'));
 
-    assert.isTrue(button.classList.contains('bp6-active'));
+    // Not drawn pressed while it cannot be pressed, as Blueprint's.
+    assert.isFalse(button.classList.contains('bp6-active'));
 
     unmount();
   });
