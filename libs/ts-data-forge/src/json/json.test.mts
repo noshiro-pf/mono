@@ -125,7 +125,9 @@ describe('parse', () => {
 
     expect(() => Json.parse('undefined')).not.toThrow();
   });
+});
 
+describe('parseWithReviver', () => {
   test('should use reviver function to transform values', () => {
     const dateReviver = (_key: string, value: unknown): unknown =>
       typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/u.test(value)
@@ -134,7 +136,7 @@ describe('parse', () => {
 
     const jsonString = '{"name":"test","created":"2023-12-01T10:00:00.000Z"}';
 
-    const result = Json.parse(jsonString, dateReviver);
+    const result = Json.parseWithReviver(jsonString, dateReviver);
 
     assert.isTrue(Result.isOk(result));
 
@@ -157,7 +159,7 @@ describe('parse', () => {
         ? Result.unwrapOkOr(Num.safeParseInt(value), Number.NaN)
         : value;
 
-    const result = Json.parse(
+    const result = Json.parseWithReviver(
       '{"number":"42","text":"hello"}',
       transformReviver,
     );
@@ -182,7 +184,7 @@ describe('parse', () => {
   });
 
   test('should return what the reviver returns for the root, even if it is not JSON', () => {
-    const result = Json.parse('{"a":1}', (key, value) =>
+    const result = Json.parseWithReviver('{"a":1}', (key, value) =>
       key === '' ? undefined : value,
     );
 
@@ -192,7 +194,7 @@ describe('parse', () => {
   });
 
   test('should delete an object property and leave an array hole where the reviver returns undefined', () => {
-    const result = Json.parse('{"a":1,"b":[1,2,3]}', (key, value) =>
+    const result = Json.parseWithReviver('{"a":1,"b":[1,2,3]}', (key, value) =>
       key === 'a' || key === '1' ? undefined : value,
     );
 
@@ -225,7 +227,7 @@ describe('parse', () => {
   test('should pass the reviver the children it has already revived', () => {
     const mut_seen: unknown[] = [];
 
-    const result = Json.parse('{"inner":{"n":1}}', (key, value) => {
+    const result = Json.parseWithReviver('{"inner":{"n":1}}', (key, value) => {
       if (key === 'inner') {
         mut_seen.push(structuredClone(value));
 
@@ -242,6 +244,26 @@ describe('parse', () => {
     assert.isTrue(Result.isOk(result));
 
     assert.deepStrictEqual(mut_seen, [{ n: 1 }, { inner: 'replaced' }]);
+  });
+
+  test('parses as parse does with no reviver', () => {
+    assert.deepStrictEqual(
+      Json.parseWithReviver('{"a":[1,2]}', undefined),
+      Result.ok({ a: [1, 2] }),
+    );
+
+    assert.isTrue(Result.isErr(Json.parseWithReviver('{{{', undefined)));
+  });
+});
+
+describe('parse with a reviver (deprecated)', () => {
+  test('still revives, as parseWithReviver does', () => {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- the form under test
+    const result = Json.parse('{"a":1}', (key, value) =>
+      key === 'a' ? 2 : value,
+    );
+
+    assert.deepStrictEqual(result, Result.ok({ a: 2 }));
   });
 });
 

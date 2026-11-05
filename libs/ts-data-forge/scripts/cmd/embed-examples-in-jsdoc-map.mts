@@ -467,6 +467,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sourcePath: 'src/json/json.mts',
     sampleFiles: [
       'samples/src/json/parse-example.mts',
+      'samples/src/json/parse-with-reviver-example.mts',
       'samples/src/json/stringify-example.mts',
       'samples/src/json/stringify-selected-example.mts',
       'samples/src/json/stringify-sorted-key-example.mts',
