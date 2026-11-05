@@ -123,6 +123,9 @@ pnpm run pr-report -- --issues-limit 10 # open な issue の最大件数
 
 - 1ページ（100件）しか読みません。それを超えたら数えるのをやめて失敗します。
   半分を全体として報告しないためです。
+- PR の check run か commit status を読めなかったときも、どの PR の何が読めなかったか
+  を挙げて失敗します。読めないままだと、その PR の required context がすべて
+  missing、判定が pending と出て、失敗している PR が CI 未開始に見えるからです。
 - 手動リンクの issue はトークン無しでは見えません（上記）。
 - cycle は描かずに名指しで報告します。cycle の members は木に出てきません。
 
@@ -230,6 +233,11 @@ It reads one page of a hundred pull requests and fails rather than reporting a
 part of them as the whole. Pull requests on a `Merge-After` cycle are named in
 their own section instead of being drawn, since there is no position in a
 merge order to draw them at.
+
+It fails too when the check runs or the commit statuses of a pull request cannot
+be read, naming each pull request and what failed. Read as nothing, they would
+show every required context of it missing and its verdict pending: a failing
+pull request reported as one whose CI has not started.
 
 The script only prints. A Claude routine and `/unblock-prs` run the same
 command and read what it prints. Each entry of `--format json` also carries
