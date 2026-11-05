@@ -239,6 +239,54 @@ describe('check-diff', () => {
     }
   });
 
+  // A queue stacks the queued pull requests on `main`, one commit each, and
+  // judges each layer on its own commit against the layer below, as a stacked
+  // pull request is: the commit and its parent, wherever the run is.
+  test('diffs a run asked to against its parent', () => {
+    for (const ref of ['queue/2', 'main']) {
+      assert.deepStrictEqual(
+        planDiffCheck({
+          DIFF_SCOPE: 'code',
+          GITHUB_REF_NAME: ref,
+          GITHUB_SHA: beforeSha,
+          BEFORE: '',
+          DIFF_PARENT: 'true',
+        }),
+        {
+          ok: true,
+          value: { fetch: beforeSha, depth: 2, scope: 'code', base: 'HEAD^' },
+        },
+      );
+    }
+  });
+
+  test('refuses to diff against a parent it cannot name', () => {
+    for (const sha of ['', 'HEAD', 'abc123']) {
+      assert.isFalse(
+        planDiffCheck({
+          DIFF_SCOPE: 'code',
+          GITHUB_REF_NAME: 'queue/1',
+          GITHUB_SHA: sha,
+          BEFORE: '',
+          DIFF_PARENT: 'true',
+        }).ok,
+      );
+    }
+  });
+
+  test('diffs a manual run as before when not asked to', () => {
+    assert.deepStrictEqual(
+      planDiffCheck({
+        DIFF_SCOPE: 'code',
+        GITHUB_REF_NAME: 'main',
+        GITHUB_SHA: beforeSha,
+        BEFORE: '',
+        DIFF_PARENT: 'false',
+      }),
+      { ok: true, value: 'run-everything' },
+    );
+  });
+
   test('refuses a scope it does not know', () => {
     assert.deepStrictEqual(
       planDiffCheck({

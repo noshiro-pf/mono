@@ -19,6 +19,13 @@ on:
       - unlabeled
 
   workflow_dispatch:
+    # See "Triggers" in README.md: a queue judges each layer it stacks on its
+    # own commit, against the layer below.
+    inputs:
+      diff-parent:
+        description: Diff the commit against its parent, as a queue layer is judged.
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.event_name == 'push', github.sha, github.ref) }}
@@ -64,9 +71,10 @@ jobs:
     # package's version there, as a version pull request is the one tree that
     # raises a version past its base, and `markdown-wrap` reads only the
     # paragraphs the change touched. On `main` it is the commit before the
-    # push; a manual run compares the tree with itself.
+    # push; a queue layer (`diff-parent`) compares with its parent, and any
+    # other manual run compares the tree with itself.
     env:
-      PROSE_DIFF_BASE: ${{ case(github.event_name == 'pull_request', github.event.pull_request.base.sha, github.event_name == 'push', github.event.before, github.sha) }}
+      PROSE_DIFF_BASE: ${{ case(github.event_name == 'pull_request', github.event.pull_request.base.sha, github.event_name == 'push', github.event.before, inputs.diff-parent, 'HEAD^', github.sha) }}
 
     strategy:
       fail-fast: false
@@ -164,7 +172,12 @@ jobs:
       # base as well.
       - name: Fetch the base the `check:prose` guards compare with
         if: matrix.command == 'z:ci:style-check:checks-and-generators'
-        run: git fetch --no-tags --depth=1 origin "${PROSE_DIFF_BASE}"
+        run: |
+          if [ "${PROSE_DIFF_BASE}" = 'HEAD^' ]; then
+            git fetch --no-tags --depth=2 origin "${GITHUB_SHA}"
+          else
+            git fetch --no-tags --depth=1 origin "${PROSE_DIFF_BASE}"
+          fi
 
       # The build, the command and the clean-tree check, as `check-all` runs
       # them too: a step that changed the tree fails the job and is named

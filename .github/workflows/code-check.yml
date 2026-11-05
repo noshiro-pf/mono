@@ -21,6 +21,13 @@ on:
       - unlabeled
 
   workflow_dispatch:
+    # See "Triggers" in README.md: a queue judges each layer it stacks on its
+    # own commit, against the layer below.
+    inputs:
+      diff-parent:
+        description: Diff the commit against its parent, as a queue layer is judged.
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.event_name == 'push', github.sha, github.ref) }}
@@ -73,10 +80,10 @@ jobs:
       contents: read
     timeout-minutes: 15
     # What `fix:codemod:affected` diffs against: the pull request's base, the
-    # commit before the push on `main`, and nothing on a manual run, which
-    # runs it in full.
+    # commit before the push on `main`, a queue layer's parent (`diff-parent`),
+    # and nothing on any other manual run, which runs it in full.
     env:
-      CODEMOD_DIFF_BASE: ${{ case(github.event_name == 'pull_request', github.event.pull_request.base.sha, github.event_name == 'push', github.event.before, '') }}
+      CODEMOD_DIFF_BASE: ${{ case(github.event_name == 'pull_request', github.event.pull_request.base.sha, github.event_name == 'push', github.event.before, inputs.diff-parent, 'HEAD^', '') }}
 
     strategy:
       fail-fast: false
@@ -240,10 +247,16 @@ jobs:
           key: release-binaries-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/configs/release-binaries.json') }}
 
       # The checkout is one commit deep, and `git diff` needs the base too.
-      # Empty on a manual run, which asks for everything.
+      # Empty on a manual run, which asks for everything. A queue layer's base
+      # is its parent, which deepening the checkout by one commit brings in.
       - name: Fetch the base the codemod diffs against
         if: matrix.diff-base && env.CODEMOD_DIFF_BASE != ''
-        run: git fetch --no-tags --depth=1 origin "${CODEMOD_DIFF_BASE}"
+        run: |
+          if [ "${CODEMOD_DIFF_BASE}" = 'HEAD^' ]; then
+            git fetch --no-tags --depth=2 origin "${GITHUB_SHA}"
+          else
+            git fetch --no-tags --depth=1 origin "${CODEMOD_DIFF_BASE}"
+          fi
 
       # The browser tests used to be wrapped in a two-attempt retry, because
       # one file at a time would fail to load. The cause was Vite optimizing a

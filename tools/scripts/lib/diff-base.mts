@@ -4,8 +4,9 @@ import { projectRootPath } from '../project-root-path.mjs';
 /**
  * The commit the `check:prose` guards that read a change compare the tree with:
  * `PROSE_DIFF_BASE`, which `style-check.yml` sets to the base of the pull
- * request (the commit before the push on `main`, the tree itself on a manual
- * run) and fetches, or else the merge base of `HEAD` and `origin/main`.
+ * request (the commit before the push on `main`, `HEAD^` for a queue layer
+ * dispatched with `diff-parent`, the tree itself on any other manual run) and
+ * fetches, or else the merge base of `HEAD` and `origin/main`.
  * `variable` names another environment variable for a caller that is not one of
  * those guards.
  *
