@@ -1,7 +1,9 @@
 import viteReact from '@vitejs/plugin-react';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { UserConfig, Plugin as VitePlugin } from 'vite';
+import { Arr, hasKey, isRecord } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import { parseSync, type UserConfig, type Plugin as VitePlugin } from 'vite';
 import { appDevPort } from './app-dev-ports.mjs';
 
 /**
@@ -52,6 +54,9 @@ export const defineViteAppConfig = ({
    *
    * Left off by the Firebase-hosted apps, which are served at the root of their
    * own domain.
+   *
+   * Given, it also brings {@link staleBuildRecovery}: the next deploy of the
+   * Pages site removes the chunks of this build.
    */
   base?: string;
   /**
@@ -83,6 +88,7 @@ export const defineViteAppConfig = ({
 
     plugins: [
       ...(framework === 'react' ? [viteReact({ jsxImportSource })] : []),
+      ...(base === undefined ? [] : [staleBuildRecovery(base)]),
       ...(routePaths === undefined ? [] : [routeEntryPages(routePaths)]),
     ],
   };
@@ -125,6 +131,193 @@ export const writeRouteEntryPages = (
     fs.copyFileSync(indexHtml, path.resolve(routeDir, 'index.html'));
   }
 };
+
+/**
+ * Recovers the page from a chunk an older build left behind, and fails the
+ * build on an `import()` it would not recover from.
+ *
+ * Every push to `main` replaces the whole Pages site, so a page opened from the
+ * browser's cache can run a build whose chunks are no longer served. What the
+ * page does then is `stale-build-recovery.mts`; this puts it in the entry
+ * chunk, as a module script ahead of the app's own in `index.html`, so it
+ * listens before any of the app's own code runs. It learns of a failed `import()`
+ * from Vite's preload helper, which wraps the `import()` calls Vite can see the
+ * target of; {@link unwrappedDynamicImports} is what fails the build on any
+ * other.
+ *
+ * Build-only: the dev server serves every module itself, from no older build.
+ */
+export const staleBuildRecovery = (base: string): VitePlugin =>
+  ({
+    name: 'vite-app-config:stale-build-recovery',
+    apply: 'build',
+    resolveId: (id) => (id === RECOVERY_SRC ? RECOVERY_ID : undefined),
+    load: (id) =>
+      id === RECOVERY_ID
+        ? [
+            `import { installStaleBuildRecovery } from ${JSON.stringify(RECOVERY_MODULE)};`,
+            `installStaleBuildRecovery(${JSON.stringify(`stale-build-reloaded-at:${base}`)});`,
+          ].join('\n')
+        : undefined,
+    // A tag of the `pre` hook is written into the page before Vite bundles its
+    // scripts, so the recovery is bundled with them, and `head-prepend` puts it
+    // first in document order.
+    transformIndexHtml: {
+      order: 'pre',
+      handler: (html) => ({
+        html,
+        tags: [
+          {
+            tag: 'script',
+            attrs: { type: 'module', src: RECOVERY_SRC },
+            injectTo: 'head-prepend',
+          },
+        ],
+      }),
+    },
+    generateBundle: {
+      order: 'post',
+      handler: (_options, bundle): void => {
+        const outputs = Object.values(bundle);
+
+        const holdsRecovery = outputs.some(
+          (output) =>
+            output.type === 'chunk' && output.moduleIds.includes(RECOVERY_ID),
+        );
+
+        if (!holdsRecovery) {
+          throw new Error(
+            'stale-build-recovery: no chunk of the build holds the recovery that was put into index.html.',
+          );
+        }
+
+        const unwrapped = outputs.flatMap((output) =>
+          // Most chunks have no import() at all, and parsing is not free.
+          output.type === 'chunk' && output.code.includes('import(')
+            ? unwrappedDynamicImports(output.code).map(
+                (call) => `${output.fileName}: ${call}` as const,
+              )
+            : [],
+        );
+
+        if (Arr.isNonEmpty(unwrapped)) {
+          throw new Error(
+            Arr.toUnshifted(
+              "stale-build-recovery: Vite's preload helper does not wrap these import() calls, so a page whose build is gone from the site would not reload when they fail (tools/configs/stale-build-recovery.mts). Give each a string literal path Vite can resolve:",
+            )(unwrapped.map((line) => `  ${line}`)).join('\n'),
+          );
+        }
+      },
+    },
+  }) as const;
+
+/**
+ * The `import()` calls in a built chunk that Vite's preload helper does not
+ * wrap, as written there. The helper is called as
+ * `__vitePreload(() => import('./chunk.js'), deps)`; the function it is given
+ * is sometimes an `async` one that picks names out of the module. Once
+ * minified, the helper is called by a plain name, or is itself the function
+ * called where the build is one chunk. So an `import()` passes when the
+ * function nearest around it is the first argument, of two or more, of a call
+ * to a plain name or a function, and its path is a string written out.
+ * Anything else is reported, including shapes the helper may take in a later
+ * Vite, which this would then have to learn.
+ */
+export const unwrappedDynamicImports = (code: string): readonly string[] => {
+  const mut_found: string[] = [];
+
+  const visit = (node: AstNode, wrapped: boolean): void => {
+    if (
+      node.type === 'ImportExpression' &&
+      (!wrapped || !isStaticString(node['source']))
+    ) {
+      mut_found.push(code.slice(Number(node['start']), Number(node['end'])));
+    }
+
+    const helperFactory = helperFactoryOf(node);
+
+    for (const value of Object.values(node)) {
+      for (const child of Arr.isArray(value) ? value : [value]) {
+        if (isAstNode(child)) {
+          visit(
+            child,
+            child === helperFactory ||
+              (!FUNCTION_TYPES.has(child.type) && wrapped),
+          );
+        }
+      }
+    }
+  };
+
+  const { program, errors } = parseSync('chunk.js', code);
+
+  if (Arr.isNonEmpty(errors) || !isAstNode(program)) {
+    throw new Error(
+      `stale-build-recovery: a built chunk does not parse: ${errors.map((error) => error.message).join('; ')}`,
+    );
+  }
+
+  visit(program, false);
+
+  return mut_found;
+};
+
+/** The `src` `index.html` names the recovery by, and the module behind it. */
+const RECOVERY_SRC = '/@stale-build-recovery';
+
+const RECOVERY_ID = '\0vite-app-config:stale-build-recovery';
+
+const RECOVERY_MODULE = path.resolve(
+  import.meta.dirname,
+  'stale-build-recovery.mts',
+);
+
+const FUNCTION_TYPES: ReadonlySet<string> = new Set<string>([
+  'ArrowFunctionExpression',
+  'FunctionExpression',
+  'FunctionDeclaration',
+]);
+
+type AstNode = ReadonlyRecord<string, unknown> & Readonly<{ type: string }>;
+
+const isAstNode = (value: unknown): value is AstNode =>
+  isRecord(value) && hasKey(value, 'type') && typeof value.type === 'string';
+
+/**
+ * The function handed to what may be the preload helper, if `node` is a call of
+ * one.
+ */
+const helperFactoryOf = (node: AstNode): unknown => {
+  if (node.type !== 'CallExpression') {
+    return undefined;
+  }
+
+  const callee = node['callee'];
+
+  const args = node['arguments'];
+
+  if (
+    !isAstNode(callee) ||
+    (callee.type !== 'Identifier' && callee.type !== 'FunctionExpression') ||
+    !Arr.isArray(args) ||
+    args.length < 2
+  ) {
+    return undefined;
+  }
+
+  const [factory] = args;
+
+  return isAstNode(factory) && FUNCTION_TYPES.has(factory.type)
+    ? factory
+    : undefined;
+};
+
+const isStaticString = (node: unknown): boolean =>
+  isAstNode(node) &&
+  ((node.type === 'Literal' && typeof node['value'] === 'string') ||
+    (node.type === 'TemplateLiteral' &&
+      Arr.isArray(node['expressions']) &&
+      Arr.isEmpty(node['expressions'])));
 
 const routeEntryPages = (routePaths: readonly string[]): VitePlugin =>
   ({
