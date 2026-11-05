@@ -1,8 +1,5 @@
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-import { isRecord, isString } from 'ts-data-forge';
 import { projectRootPath } from '../../project-root-path.mjs';
-import { gatePatterns, matchesGatePattern } from '../workflow-steps.mjs';
+import { matchesGatePattern, readGateList } from '../workflow-steps.mjs';
 import {
   buildPlan,
   classifyChanges,
@@ -88,22 +85,8 @@ const rootScripts = [
   'check:knip',
 ] as const;
 
-/** The gate list as the root package.json gives it. */
-const proseGateResult = (() => {
-  const manifest: unknown = JSON.parse(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a fixed path in this repository.
-    fs.readFileSync(path.join(projectRootPath, 'package.json'), 'utf8'),
-  );
-
-  const scripts =
-    isRecord(manifest) && isRecord(manifest['scripts'])
-      ? manifest['scripts']
-      : ({} as const);
-
-  const command = scripts['z:check-should-run:code-checks'];
-
-  return gatePatterns(isString(command) ? command : '');
-})();
+/** The gate's `code` list, as `tools/configs/gate-ignore-lists.json` gives it. */
+const proseGateResult = readGateList('code', projectRootPath);
 
 // Empty when the list is not read, which the first test below reports by its
 // message rather than failing the whole file at import.
@@ -131,7 +114,7 @@ const commandsOf = (files: readonly string[], coverage = true) =>
     ({ cwd, args }) => `${cwd === '.' ? '' : `${cwd}: `}${args.join(' ')}`,
   );
 
-describe('the code gate, read through gatePatterns', () => {
+describe('the code gate, read through readGateList', () => {
   test('understand every pattern the code gate has', () => {
     assert.deepStrictEqual(
       proseGateResult.ok ? undefined : proseGateResult.message,

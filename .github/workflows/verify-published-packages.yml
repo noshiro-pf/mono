@@ -51,10 +51,10 @@ jobs:
       pull-requests: read
     with:
       # `none`: the one job below gates itself in shell, against a merge base
-      # and a single directory rather than against one of the root
-      # package.json's ignore lists. Asking check-gates.yml for that answer
-      # would cost it a checkout and an install to save the one runner this
-      # workflow has.
+      # and a single directory rather than against one of the ignore lists of
+      # tools/configs/gate-ignore-lists.json. Asking check-gates.yml for that
+      # answer would cost it a checkout and an install to save the one runner
+      # this workflow has.
       diff-scope: none
       result-job: verify-published-result / result
 

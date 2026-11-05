@@ -332,13 +332,13 @@ booted, since a job-level `if` is evaluated by GitHub itself:
   onto `main` when that layer merges. A pull request onto any other branch is
   checked as it is.
 - **A diff that touches nothing the workflow reads**, decided by
-  `workflow-steps.mts check-diff` against one of the three
-  `z:check-should-run:*` ignore lists in the root `package.json`, which it reads
-  from the script's command line rather than running it, so that the job needs
-  Node.js and nothing installed. A list holds single-quoted `--paths-ignore`
-  values of the shapes `matchesGatePattern` names, and the step fails on
-  anything else rather than reading it otherwise than the shell would. Running
-  the script by hand on a branch up to date with its base gives the same answer.
+  `workflow-steps.mts check-diff` against one of the three ignore lists in
+  `tools/configs/gate-ignore-lists.json`, which it reads with Node.js alone, so
+  that the job needs nothing installed. A list holds patterns of the shapes
+  `matchesGatePattern` names, and the step fails on a file of any other shape
+  rather than reading it some way of its own. `check-changed` reads the `code`
+  list from the same file. `pnpm run z:check-should-run --scope <list>` on a
+  branch up to date with its base gives the gate's answer.
   A deleted file counts, and a renamed one by both names, so that a diff that
   only deletes code, or moves it onto a pattern, still runs the checks. The diff
   is against the pull request's own base, so a stacked layer is judged on its
@@ -379,8 +379,8 @@ condition of its own.
 
 #### The ignore lists
 
-The three lists are JSON in the root `package.json` and can carry no comment
-of their own, so what they mean is here:
+The three lists are JSON (`tools/configs/gate-ignore-lists.json`) and can carry
+no comment of their own, so what they mean is here:
 
 - **A path goes on a list only when no command that workflow runs reads it.**
   `articles/` is not on the style list because Prettier formats it; `**.md`

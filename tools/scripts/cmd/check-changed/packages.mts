@@ -2,7 +2,7 @@ import * as path from 'node:path';
 import { Arr, isRecord, isString, Result } from 'ts-data-forge';
 import { getWorkspacePackages } from 'ts-repo-utils';
 import { projectRootPath } from '../../project-root-path.mjs';
-import { gatePatterns } from '../workflow-steps.mjs';
+import { readGateList } from '../workflow-steps.mjs';
 import { readManifestDependencies, type PackageInfo } from './plan.mjs';
 
 /** The workspace members, as `plan.mts` reads them. */
@@ -37,26 +37,12 @@ export const scriptsOf = (manifest: unknown): ReadonlyMap<string, string> => {
 };
 
 /**
- * The paths the code gate ignores, read from the root script that gives
- * `code-check.yml` its list, so that what check-changed calls prose is what CI
- * skips.
+ * The paths the code gate ignores, from the list `code-check.yml`'s gate reads
+ * (`tools/configs/gate-ignore-lists.json`), so that what check-changed calls
+ * prose is what CI skips.
  */
-export const readProseGate = (
-  rootScripts: ReadonlyMap<string, string>,
-): Result<readonly string[], string> => {
-  const command = rootScripts.get(CODE_GATE_SCRIPT);
+export const readProseGate = (): Result<readonly string[], string> => {
+  const patterns = readGateList('code', projectRootPath);
 
-  if (command === undefined) {
-    return Result.err(
-      `The root package.json has no ${CODE_GATE_SCRIPT} script.`,
-    );
-  }
-
-  const patterns = gatePatterns(command);
-
-  return patterns.ok
-    ? Result.ok(patterns.value)
-    : Result.err(`${CODE_GATE_SCRIPT}: ${patterns.message}`);
+  return patterns.ok ? Result.ok(patterns.value) : Result.err(patterns.message);
 };
-
-const CODE_GATE_SCRIPT = 'z:check-should-run:code-checks';

@@ -71,12 +71,12 @@ stop and ask.
   `z:ci:style-check:checks-and-generators` (its markdownlint, oxfmt, generators
   and `ws:gen`), `z:ci:style-check:format-and-doc` (Prettier and `ws:doc`),
   `fix:codemod:affected` and the `ws:fix:lint` halves fail by _changing_ files.
-- `code-check` and `node-version-compatibility` jobs gate on
-  `z:check-should-run:code-checks`, and `style-check` jobs on
-  `z:check-should-run:style-checks`; both diff against `origin/main`. A job
-  that reports green having skipped its steps is expected on a docs-only
-  branch (or, for every workflow, an `experimental/`-only one), not a problem
-  to chase.
+- `code-check` and `node-version-compatibility` jobs gate on the `code` list of
+  `tools/configs/gate-ignore-lists.json`, and `style-check` jobs on its `style`
+  list (`pnpm run z:check-should-run --scope <list>` answers as the gate does);
+  both diff against `origin/main`. A job that reports green having skipped its
+  steps is expected on a docs-only branch (or, for every workflow, an
+  `experimental/`-only one), not a problem to chase.
 
 `grep ELIFECYCLE` in a job log names the command that actually failed.
 

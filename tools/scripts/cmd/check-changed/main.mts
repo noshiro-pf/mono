@@ -71,7 +71,7 @@ const main = async (): Promise<number> => {
 
   const rootScripts = scriptsOf(await readJson('package.json'));
 
-  const proseGate = readProseGate(rootScripts);
+  const proseGate = readProseGate();
 
   if (Result.isErr(proseGate)) {
     console.error(proseGate.value);

@@ -29,8 +29,8 @@ questions decide that, and the second is the one that is easy to skip.
   look. `knip.jsonc` says where a new entry goes and `devOnlyCode` says what
   may join it, for that reason. Keep at most a pointer here.
 - **One file, and it cannot** — JSON takes no comments, so the declarations
-  under `repo-settings/` and the ignore lists in the root `package.json` have
-  nowhere else to say it, and the rule stays here.
+  under `repo-settings/` and `tools/configs/gate-ignore-lists.json` have nowhere
+  else to say it, and the rule stays here.
 - **No single file** — a rule addressed to whoever is working rather than to
   whoever is editing one file (session conduct, how a release is queued, what
   a commit message is) stays here.
@@ -209,8 +209,8 @@ particular to it. Here is only what a session has to act on.
   Re-examine a reused failure with "Re-run all jobs", not "Re-run failed jobs".
 - **A branch behind `main` runs nothing**; the update re-runs everything. A
   stacked one behind the pull request below it is the same, until restacked.
-- **A diff a workflow does not read skips it**, by the `z:check-should-run:*`
-  ignore lists in the root `package.json`; what may go on one is in the
+- **A diff a workflow does not read skips it**, by the ignore lists in
+  `tools/configs/gate-ignore-lists.json`; what may go on one is in the
   README. Adding a path wrongly fails nothing.
 
 ## Spell checking

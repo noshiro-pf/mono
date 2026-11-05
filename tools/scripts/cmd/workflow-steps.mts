@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as util from 'node:util';
 // A top-level `import type`, not the inline `import { type … }`: Node erases
@@ -35,8 +36,8 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  * runs there with the same reach. `check-diff` installs and runs no dependency:
  * what runs before it in its job is the tree's own setup action,
  * Node.js alone, and the lists it reads are the pull request's own either way,
- * as they were when the step ran a list's script. Its job holds nothing that
- * can write. A step that must not trust the tree — the path check in
+ * as they were when they were read out of package.json. Its job holds nothing
+ * that can write. A step that must not trust the tree — the path check in
  * pnpm-update.yml's `commit` job — stays inline. See "Setup" in
  * .github/workflows/README.md.
  *
@@ -63,7 +64,6 @@ export const main = (argv: readonly string[]): void => {
     }
 
     case 'should-run': {
-      // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing -- ts-data-forge is not installed when this runs (see the header).
       runShouldRun(argv.slice(3), process.env);
 
       break;
@@ -199,17 +199,15 @@ export const installArgs = (
 export const planDiffCheck = (
   env: Env,
 ): Parsed<
-  | Readonly<{ fetch: string; script: GateScript; base: string }>
-  | 'run-everything'
+  Readonly<{ fetch: string; scope: GateScope; base: string }> | 'run-everything'
 > => {
-  const scope = readChoice(env, 'diff-scope', ['code', 'style', 'strict-lib']);
+  const chosen = readChoice(env, 'diff-scope', GATE_SCOPES);
 
-  if (!scope.ok) {
-    return scope;
+  if (!chosen.ok) {
+    return chosen;
   }
 
-  const script: GateScript =
-    `z:check-should-run:${scope.value}-checks` as const;
+  const scope = chosen.value;
 
   if (env['GITHUB_REF_NAME'] !== 'main') {
     const baseRef = env['BASE_REF'] ?? '';
@@ -220,7 +218,7 @@ export const planDiffCheck = (
       ok: true,
       value: {
         fetch: `+refs/heads/${branch}:refs/remotes/origin/${branch}`,
-        script,
+        scope,
         base: `origin/${branch}`,
       },
     };
@@ -230,41 +228,119 @@ export const planDiffCheck = (
 
   return before === '' || /^0+$/u.test(before)
     ? { ok: true, value: 'run-everything' }
-    : { ok: true, value: { fetch: before, script, base: before } };
+    : { ok: true, value: { fetch: before, scope, base: before } };
 };
 
 /**
- * The patterns of a `z:check-should-run:*` script, read from its command line.
- *
- * The gate reads the list rather than running the script, because running it
- * takes `pnpm`, which the gate does without. So the command line has to be one
- * the reading cannot get wrong: `pnpm run z:check-should-run` and nothing after
- * it but `--paths-ignore '<pattern>'`, each pattern of a shape
+ * The three ignore lists, read from {@link GATE_LISTS_FILE}: an object with the
+ * scopes as its keys and nothing else, each a list of patterns of the shapes
  * {@link matchesGatePattern} understands. Anything else is refused rather than
- * read differently from the shell.
+ * read some way of its own: a list the gate misreads skips checks.
  */
-export const gatePatterns = (command: string): Parsed<readonly string[]> => {
-  const rest = command.startsWith(GATE_COMMAND)
-    ? command.slice(GATE_COMMAND.length)
-    : undefined;
+export const parseGateLists = (
+  text: string,
+): Parsed<ReadonlyRecord<GateScope, readonly string[]>> => {
+  const parsed = (() => {
+    try {
+      const value: unknown = JSON.parse(text);
 
-  if (rest?.replaceAll(PATTERN_ARGUMENT, '') !== '') {
+      return value;
+    } catch {
+      return undefined;
+    }
+  })();
+
+  const shapeError = {
+    ok: false,
+    message: `${GATE_LISTS_FILE} holds the lists ${GATE_SCOPES.slice(0, -1).join(', ')} and ${GATE_SCOPES.at(-1) ?? ''} and nothing else, each an array of strings.`,
+  } as const;
+
+  if (!isRecord(parsed) || Object.keys(parsed).length !== GATE_SCOPES.length) {
+    return shapeError;
+  }
+
+  const mut_lists = new Map<GateScope, readonly string[]>();
+
+  for (const scope of GATE_SCOPES) {
+    const list = parsed[scope];
+
+    if (!Array.isArray(list)) {
+      return shapeError;
+    }
+
+    const strings = list.filter(
+      (pattern: unknown) => typeof pattern === 'string',
+    );
+
+    if (strings.length !== list.length) {
+      return shapeError;
+    }
+
+    const patterns = validatePatterns(strings);
+
+    if (!patterns.ok) {
+      return {
+        ok: false,
+        message: `${GATE_LISTS_FILE}, list ${scope}: ${patterns.message}`,
+      };
+    }
+
+    mut_lists.set(scope, patterns.value);
+  }
+
+  // Every scope was set above, or the function returned.
+  const listOf = (scope: GateScope): readonly string[] =>
+    mut_lists.get(scope) ?? [];
+
+  return {
+    ok: true,
+    value: {
+      code: listOf('code'),
+      style: listOf('style'),
+      'strict-lib': listOf('strict-lib'),
+    },
+  };
+};
+
+/**
+ * One list of {@link GATE_LISTS_FILE}, in the repository at `root` (the working
+ * directory, where the workflows and `pnpm run` run this).
+ */
+export const readGateList = (
+  scope: GateScope,
+  root = '.',
+): Parsed<readonly string[]> => {
+  const text = (() => {
+    try {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- the lists file of the repository given.
+      return fs.readFileSync(`${root}/${GATE_LISTS_FILE}`, 'utf8');
+    } catch (error: unknown) {
+      return {
+        error:
+          isRecord(error) && typeof error['code'] === 'string'
+            ? error['code']
+            : 'unreadable',
+      };
+    }
+  })();
+
+  if (typeof text !== 'string') {
     return {
       ok: false,
-      message: `Expected \`${GATE_COMMAND}\` followed only by \`--paths-ignore '<pattern>'\`, got: ${command}`,
+      message: `Could not read ${GATE_LISTS_FILE} in ${path.resolve(root)}: ${text.error}`,
     };
   }
 
-  return validatePatterns(
-    Array.from(rest.matchAll(PATTERN_ARGUMENT), (match) => match[1] ?? ''),
-  );
+  const lists = parseGateLists(text);
+
+  return lists.ok ? { ok: true, value: lists.value[scope] } : lists;
 };
 
 /**
- * Whether a repository-relative path matches a `--paths-ignore` pattern, in the
- * shapes the lists use, each answering as micromatch does with `{ dot: true }`,
- * which is how `check-should-run` of ts-repo-utils matched them when the gate
- * ran it: `dir/` (everything under it), `**.ext` (that extension at any depth),
+ * Whether a repository-relative path matches an ignore pattern, in the shapes
+ * the lists use, each answering as micromatch does with `{ dot: true }`, which
+ * is how `check-should-run` of ts-repo-utils matched them when the gate ran it:
+ * `dir/` (everything under it), `**.ext` (that extension at any depth),
  * `** /name` (that file name in any directory, the root included), `*.ext`
  * (that extension at the root), `dir/** /*.ext` (that extension at any depth
  * under the directory) and a plain path.
@@ -293,8 +369,9 @@ export const firstFileToCheck = (
 };
 
 /**
- * The command line of `should-run`: `--paths-ignore <pattern>`, repeated, and
- * `--base-branch <revision>`, `origin/main` when it is not given.
+ * The command line of `should-run`: `--scope <scope>`, the list of that name,
+ * or `--paths-ignore <pattern>`, repeated, and `--base-branch <revision>`,
+ * `origin/main` when it is not given.
  */
 export const parseShouldRunArgs = (
   args: readonly string[],
@@ -303,34 +380,64 @@ export const parseShouldRunArgs = (
     const { values } = util.parseArgs({
       args: Array.from(args),
       options: {
+        scope: { type: 'string' },
         'paths-ignore': { type: 'string', multiple: true, default: [] },
         'base-branch': { type: 'string', default: 'origin/main' },
       },
     });
 
-    const patterns = validatePatterns(values['paths-ignore']);
+    const { scope } = values;
+
+    if (scope !== undefined && values['paths-ignore'].length > 0) {
+      return { ok: false, message: USAGE_SHOULD_RUN(args) };
+    }
+
+    const chosen =
+      scope === undefined
+        ? undefined
+        : readChoice({ SCOPE: scope }, 'scope', GATE_SCOPES);
+
+    if (chosen !== undefined && !chosen.ok) {
+      return chosen;
+    }
+
+    const patterns =
+      chosen === undefined
+        ? validatePatterns(values['paths-ignore'])
+        : readGateList(chosen.value);
 
     return patterns.ok
       ? {
           ok: true,
-          value: { patterns: patterns.value, base: values['base-branch'] },
+          value: {
+            patterns: patterns.value,
+            base: values['base-branch'],
+            label:
+              chosen === undefined
+                ? 'the --paths-ignore list'
+                : `the ${chosen.value} list`,
+          },
         }
       : patterns;
   } catch {
     // `util.parseArgs` throws on an unknown option, a missing value or a
     // positional argument.
-    return {
-      ok: false,
-      message: `Usage: should-run [--base-branch <revision>] [--paths-ignore <pattern>]..., got: ${args.join(' ')}`,
-    };
+    return { ok: false, message: USAGE_SHOULD_RUN(args) };
   }
 };
 
-export type GateScript = `z:check-should-run:${string}-checks`;
+/** Where the ignore lists are, relative to the repository root. */
+export const GATE_LISTS_FILE = 'tools/configs/gate-ignore-lists.json';
+
+export const GATE_SCOPES = ['code', 'style', 'strict-lib'] as const;
+
+export type GateScope = (typeof GATE_SCOPES)[number];
 
 export type ShouldRunArgs = Readonly<{
   patterns: readonly string[];
   base: string;
+  /** What the patterns are, for the answer. */
+  label: string;
 }>;
 
 type PatternShape = Readonly<
@@ -342,9 +449,8 @@ type PatternShape = Readonly<
   | { kind: 'path'; path: string }
 >;
 
-const GATE_COMMAND = 'pnpm run z:check-should-run';
-
-const PATTERN_ARGUMENT = / --paths-ignore '([^']+)'/gu;
+const USAGE_SHOULD_RUN = (args: readonly string[]): string =>
+  `Usage: should-run [--base-branch <revision>] (--scope <${GATE_SCOPES.join(' | ')}> | [--paths-ignore <pattern>]...), got: ${args.join(' ')}` as const;
 
 const DIRECTORY_EXTENSION = /^(?<prefix>[^*]+\/)\*\*\/\*(?<suffix>\.[^/]+)$/u;
 
@@ -354,7 +460,7 @@ const GLOB_SYNTAX = /[!()*+,?@[\]{}]/u;
 const MAX_DIFF_BYTES = 256 * 1024 * 1024;
 
 const unsupportedPattern = (pattern: string): string =>
-  `Unsupported --paths-ignore pattern "${pattern}": only \`dir/\`, \`**.ext\`, \`**/name\`, \`*.ext\`, \`dir/**/*.ext\` and a plain path are understood.` as const;
+  `Unsupported ignore pattern "${pattern}": only \`dir/\`, \`**.ext\`, \`**/name\`, \`*.ext\`, \`dir/**/*.ext\` and a plain path are understood.` as const;
 
 /** Its shape, when every part of it but the glob syntax is a literal. */
 const patternShape = (pattern: string): PatternShape | undefined => {
@@ -501,19 +607,7 @@ const runInstall = (env: Env): void => {
 };
 
 const isRecord = (value: unknown): value is ReadonlyRecord<string, unknown> =>
-  // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- ts-data-forge is not installed when this runs (see the header).
   typeof value === 'object' && value !== null;
-
-/** A script of the root `package.json`; the steps run at the root. */
-const rootScript = (name: string): string | undefined => {
-  const manifest: unknown = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-
-  const scripts = isRecord(manifest) ? manifest['scripts'] : undefined;
-
-  const command = isRecord(scripts) ? scripts[name] : undefined;
-
-  return typeof command === 'string' ? command : undefined;
-};
 
 /**
  * The files that differ between `base` and the working tree. A deleted file
@@ -598,28 +692,24 @@ const runDiffCheck = (env: Env): void => {
 
   runOrExit('git', ['fetch', '--depth=1', 'origin', plan.fetch]);
 
-  const command =
-    rootScript(plan.script) ??
-    exitWithError(`package.json has no ${plan.script} script.`);
-
   answerShouldRun({
-    label: plan.script,
+    label: `the ${plan.scope} list`,
     base: plan.base,
-    patterns: orExit(gatePatterns(command)),
+    patterns: orExit(readGateList(plan.scope)),
     output,
   });
 };
 
 /**
  * `z:check-should-run`: the answer `check-diff` gives, for the patterns and the
- * base on the command line, so that running a list's script by hand gives the
- * gate's answer.
+ * base on the command line, so that `--scope <list>` by hand gives the gate's
+ * answer.
  */
 const runShouldRun = (args: readonly string[], env: Env): void => {
-  const { patterns, base } = orExit(parseShouldRunArgs(args));
+  const { patterns, base, label } = orExit(parseShouldRunArgs(args));
 
   answerShouldRun({
-    label: 'the --paths-ignore list',
+    label,
     base,
     patterns,
     output: env['GITHUB_OUTPUT'],

@@ -15,14 +15,15 @@ name: Strict Lib Generation
 # A workflow of its own rather than a matrix entry elsewhere, because neither
 # existing gate fits what the generator reads:
 #
-# - code-check.yml gates on `z:check-should-run:code-checks`, which ignores
+# - code-check.yml gates on the `code` list of the gate's ignore lists
+#   (tools/configs/gate-ignore-lists.json), which ignores
 #   `**.md`. The generator copies each harness's `CHANGELOG.md` into the
 #   published bundle, so a markdown-only diff — a `chore: version packages`
 #   branch is exactly that — can change the output and would skip the check.
 # - style-check.yml gates on almost nothing, which is right for formatting but
 #   would regenerate the library on every pull request in the repository.
 #
-# So it gates on `z:check-should-run:strict-lib-checks`, a list of its own.
+# So it gates on the `strict-lib` list, a list of its own.
 #
 # The check workflow shape — triggers, concurrency, `permissions: {}`, the
 # gate, the aggregate — is in README.md.
@@ -49,8 +50,8 @@ concurrency:
 permissions: {}
 
 jobs:
-  # The ignore list is `z:check-should-run:strict-lib-checks` in the root
-  # `package.json`. A pull request is skipped only when *every* changed path
+  # The ignore list is `strict-lib` in tools/configs/gate-ignore-lists.json.
+  # A pull request is skipped only when *every* changed path
   # matches it, so a pattern belongs there only when nothing below can read the
   # paths it matches. Why each entry is there, and why some are not:
   #
@@ -83,7 +84,7 @@ jobs:
   #
   # - `**.md`: each harness's `CHANGELOG.md` is copied into the published
   #   bundle, and the bundle's `README.md` is generated. This is why the
-  #   workflow does not share code-check.yml's `code-checks` list.
+  #   workflow does not share code-check.yml's `code` list.
   # - `**.txt`: `output/diff-from-prev/*/summary.txt` is generated output.
   # - `libs/`: the generator imports `ts-data-forge`, `ts-repo-utils`,
   #   `ts-type-forge` and `ts-fortress` from their sources through

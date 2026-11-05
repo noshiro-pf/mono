@@ -1,0 +1,37 @@
+{
+  "code": [
+    "experimental/",
+    "docs/",
+    "LICENSE",
+    ".editorconfig",
+    ".gitignore",
+    ".prettierrc",
+    ".prettierignore",
+    ".cspell.config.yaml",
+    "**/cspell.config.yaml",
+    ".markdownlint-cli2.mjs",
+    "**.md",
+    "**.txt"
+  ],
+  "style": ["experimental/"],
+  "strict-lib": [
+    "experimental/",
+    "docs/",
+    "articles/",
+    "books/",
+    "apps/",
+    "languages/",
+    "verify-npm-packages/",
+    "repo-settings/",
+    ".changeset/",
+    "LICENSE",
+    ".editorconfig",
+    ".prettierrc",
+    ".prettierignore",
+    ".cspell.config.yaml",
+    "**/cspell.config.yaml",
+    ".markdownlint-cli2.mjs",
+    "*.md",
+    "libs/**/*.md"
+  ]
+}
