@@ -79,7 +79,8 @@
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*",
-    "ts-repo-utils": "workspace:*"
+    "ts-repo-utils": "workspace:*",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "synstate": ">=7.0.1",
