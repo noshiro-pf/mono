@@ -1,4 +1,5 @@
 import { Arr, Result } from 'ts-data-forge';
+import { readRunAll } from '../../lib/pnpm-command.mjs';
 import {
   reachableFrom,
   resolveScriptInvocations,
@@ -18,33 +19,52 @@ import type { Step } from './plan.mjs';
  */
 
 /**
- * The scripts a step runs. A `pnpm run` with arguments runs the script it
- * names; `run-p` runs each script it lists; the cspell over the changed files
- * runs no script (it is `check:cspell` narrowed to them, and a change to a
- * cspell config runs `check:cspell` itself). Any other form is an error, so
- * that a new kind of step is taught here rather than silently reaching nothing.
+ * The scripts a step runs. A `pnpm run` runs the script it names, with whatever
+ * arguments narrow it (`z:format-diff-from <base>`): the question here is
+ * whether some plan runs the script at all. `run-p` runs each script it lists;
+ * the cspell over the changed files runs no script (it is `check:cspell`
+ * narrowed to them, and a change to a cspell config runs `check:cspell`
+ * itself). Any other form is an error, and so is a flag or a script its
+ * directory does not define in the script's place, so that a new kind of step,
+ * or a renamed script, is taught here rather than silently reaching nothing.
  */
 export const stepCommands = (
   step: Step,
+  /** Every `<directory>:<script>` a manifest defines. */
+  defined: ReadonlySet<CommandId>,
 ): Result<readonly CommandId[], string> => {
   const [verb, program, ...rest] = step.args;
 
-  if (verb === 'run' && program !== undefined) {
-    return Result.ok(
-      Arr.toUnshifted(toCommandId(step.cwd, program))(
-        program === 'check:test' && step.coverage !== undefined
-          ? [toCommandId(step.cwd, 'check:test:cov')]
-          : [],
-      ),
+  const named = (
+    scripts: readonly string[],
+    extra: readonly CommandId[] = [],
+  ): Result<readonly CommandId[], string> => {
+    const commands = scripts.map((script) => toCommandId(step.cwd, script));
+
+    const unknown = scripts.filter(
+      (_, index) => !defined.has(commands[index] ?? ''),
+    );
+
+    return Arr.isNonEmpty(unknown) || Arr.isEmpty(scripts)
+      ? Result.err(
+          `check-changed's step "${step.title}" runs ${Arr.isEmpty(scripts) ? 'no script' : unknown.map((script) => `\`${script}\``).join(', ')}, which ${step.cwd === '.' ? 'the root' : step.cwd} does not define; correct the step in check-changed/plan.mts.`,
+        )
+      : Result.ok([...commands, ...extra]);
+  };
+
+  if (verb === 'run' && program !== undefined && !program.startsWith('-')) {
+    return named(
+      [program],
+      program === 'check:test' && step.coverage !== undefined
+        ? [toCommandId(step.cwd, 'check:test:cov')]
+        : [],
     );
   }
 
   if (verb === 'exec' && program === 'run-p') {
-    return Result.ok(
-      rest
-        .filter((token) => !token.startsWith('-'))
-        .map((script) => toCommandId(step.cwd, script)),
-    );
+    const list = readRunAll(Arr.toUnshifted(program)(rest));
+
+    return named([...(list?.scripts ?? []), ...(list?.withArguments ?? [])]);
   }
 
   if (verb === 'exec' && program === 'cspell') {
@@ -112,12 +132,17 @@ export const findUncovered = ({
   })).toSorted((a, b) => a.command.localeCompare(b.command));
 };
 
-/** Whether a {@link CI_ONLY} entry names a command. */
+/**
+ * Whether a {@link CI_ONLY} entry names a command: its script, or every script
+ * that begins as it does before a trailing `*`.
+ */
 export const matchesCiOnly = (entry: CiOnly, command: CommandId): boolean => {
   const { directory, scriptName } = splitCommandId(command);
 
   return (
-    entry.scriptName === scriptName &&
+    (entry.scriptName.endsWith('*')
+      ? scriptName.startsWith(entry.scriptName.slice(0, -1))
+      : entry.scriptName === scriptName) &&
     (entry.directory === undefined ||
       entry.directory === directory ||
       (entry.directory.endsWith('/') && directory.startsWith(entry.directory)))
@@ -243,6 +268,18 @@ export const CI_ONLY: readonly CiOnly[] = [
     reason: 'Needs Java and the Firebase emulators.',
   },
   {
+    directory: 'apps/event-schedule-app-functions',
+    scriptName: 'build',
+    reason:
+      "Built by the app's `check:e2e:emulators` for the emulators to load; it writes only its untracked output.",
+  },
+  {
+    directory: 'apps/synstate-docs',
+    scriptName: 'z:benchmark:*',
+    reason:
+      "`synstate-benchmark.yml`'s measurement, its comparison with the base branch's and its check of the committed tables against both; numbers from another machine would mean nothing.",
+  },
+  {
     scriptName: 'check:test:rules',
     reason: 'Needs Java and the Firebase emulators.',
   },
@@ -299,6 +336,7 @@ export type CiOnly = Readonly<{
    * ({@link applicableCiOnly}).
    */
   directory?: string;
+  /** A script, or with a trailing `*` every script beginning as it does. */
   scriptName: string;
   reason: string;
   /**

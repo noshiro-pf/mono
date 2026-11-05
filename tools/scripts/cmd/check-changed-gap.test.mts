@@ -122,6 +122,7 @@ describe('describeGap', () => {
         scripts: {
           'fix:fmt:full': 'prettier --write .',
           'fix:fmt:diff': 'pnpm run z:format-diff-from origin/main',
+          'z:format-diff-from': 'tsx format-diff-from.mts',
         },
       },
     ] as const;

@@ -16,6 +16,16 @@ const step = (cwd: string, args: readonly string[]): Step =>
   ({ title: args.join(' '), kind: 'check', cwd, args }) as const;
 
 describe('stepCommands', () => {
+  const defined = new Set<string>([
+    'libs/a:check:types',
+    'libs/a:check:test',
+    'libs/a:check:test:cov',
+    '.:fix:codemod:affected',
+    '.:z:format-diff-from',
+    '.:check:root:a',
+    '.:check:root:b',
+  ]);
+
   test.each([
     [step('libs/a', ['run', 'check:types']), ['libs/a:check:types']],
     [step('.', ['run', 'fix:codemod:affected']), ['.:fix:codemod:affected']],
@@ -44,13 +54,25 @@ describe('stepCommands', () => {
     ],
     [step('.', ['exec', 'cspell', '--no-progress', './a.md']), []],
   ] as const)('%j runs %j', (given, expected) => {
-    assert.deepStrictEqual(stepCommands(given), Result.ok(expected));
+    assert.deepStrictEqual(stepCommands(given, defined), Result.ok(expected));
   });
 
   test('a step of an unknown form is an error, not nothing', () => {
     assert.isTrue(
-      Result.isErr(stepCommands(step('.', ['exec', 'eslint', '.']))),
+      Result.isErr(stepCommands(step('.', ['exec', 'eslint', '.']), defined)),
     );
+  });
+
+  test.each([
+    ['a flag in the script’s place', step('.', ['run', '--silent', 'x'])],
+    ['a script its directory does not define', step('libs/a', ['run', 'gone'])],
+    [
+      'a listed script its directory does not define',
+      step('.', ['exec', 'run-p', '--print-label', 'check:root:a', 'gone']),
+    ],
+    ['a list of nothing', step('.', ['exec', 'run-p', '--print-label'])],
+  ] as const)('%s is an error', (_, given) => {
+    assert.isTrue(Result.isErr(stepCommands(given, defined)));
   });
 });
 

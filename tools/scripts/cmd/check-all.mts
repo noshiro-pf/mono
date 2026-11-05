@@ -60,15 +60,26 @@ const checkAll = async (): Promise<number> => {
   });
 
   const matrices = await Promise.all(
-    MATRIX_WORKFLOWS.map(async (workflow) =>
-      readMatrixInclude(
+    MATRIX_WORKFLOWS.map(async (workflow) => ({
+      workflow,
+      entries: readMatrixInclude(
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- a fixed path in this repository.
         await fs.readFile(path.join(projectRootPath, workflow), 'utf8'),
       ),
-    ),
+    })),
   );
 
-  const entries = matrices.flat();
+  const unread = matrices.find(({ entries: read }) => Result.isErr(read));
+
+  if (unread !== undefined && Result.isErr(unread.entries)) {
+    console.error(`${unread.workflow}: ${unread.entries.value}`);
+
+    return 2;
+  }
+
+  const entries = matrices.flatMap(({ entries: read }) =>
+    Result.isOk(read) ? read.value : [],
+  );
 
   const rootManifest = await readRootManifest();
 

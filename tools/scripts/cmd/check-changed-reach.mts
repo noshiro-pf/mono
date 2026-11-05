@@ -24,6 +24,7 @@ import {
   reachableFrom,
   readCheckWorkflows,
   readManifests,
+  resolvePackageRuns,
   splitCommandId,
   toCommandId,
   type CommandId,
@@ -85,11 +86,18 @@ export const checkChangedReach = (): Promise<Result<Summary, string>> =>
 
     const graph = buildCoverageGraph(manifests);
 
-    const ciEntries = workflows.flatMap(({ relativePath, commands }) =>
-      commands.map((command) => ({
-        origin: `${relativePath}: ${command}`,
-        command: toCommandId('.', command),
-      })),
+    const ciEntries = workflows.flatMap(
+      ({ relativePath, commands, packageRuns }) => [
+        ...commands.map((command) => ({
+          origin: `${relativePath}: ${command}`,
+          command: toCommandId('.', command),
+        })),
+        // What a run pointed at packages reaches; what it cannot resolve is
+        // check:root:ci-commands' to report.
+        ...resolvePackageRuns(packageRuns, manifests).commands.map(
+          (command) => ({ origin: `${relativePath}: ${command}`, command }),
+        ),
+      ],
     );
 
     const localReach = reachableFrom(graph, local.commands);
@@ -153,6 +161,13 @@ export const planReach = ({
 
   const mut_areas = new Set<Area>();
 
+  const defined = new Set<CommandId>([
+    ...rootScripts.map((script) => toCommandId('.', script)),
+    ...packages.flatMap(({ dir, scripts }) =>
+      Array.from(scripts, (script) => toCommandId(dir, script)),
+    ),
+  ]);
+
   for (const file of samplePaths(packages)) {
     const classification = classifyChanges({
       files: [file],
@@ -173,7 +188,7 @@ export const planReach = ({
     });
 
     for (const step of plan) {
-      const commands = stepCommands(step);
+      const commands = stepCommands(step, defined);
 
       if (Result.isErr(commands)) {
         return commands;

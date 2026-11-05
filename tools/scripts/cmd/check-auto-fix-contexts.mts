@@ -74,8 +74,10 @@ export const checkAutoFixContexts = (): Promise<Result<CheckSummary, string>> =>
  * `pnpm run ${{ matrix.<key> }}`, one per entry of `<key>`, named as GitHub
  * names them: the job's `name:` with the entry put in, or `<job> (<entry>)`.
  *
- * Read with a line scanner, as the other workflow guards read them. A job whose
- * checks it cannot name exactly is left out, with why, rather than guessed at:
+ * Read with a line scanner, not yet through the YAML parser of
+ * `tools/scripts/lib/workflow-jobs.mts` as the command guards read workflows. A
+ * job whose checks it cannot name exactly is left out, with why, rather than
+ * guessed at:
  * entries that are an expression, a matrix with `exclude:`, a `name:` that
  * reads another property, a job with no matrix expression in its name whose
  * entries carry other properties (GitHub names those by all of them), and a

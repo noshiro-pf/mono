@@ -62,8 +62,8 @@ export const checkWorkflowEventName = (): Promise<
  * The trigger events of a workflow and the event names its expressions compare
  * against, read with a line scanner rather than a YAML parser — as
  * `check-minimum-release-age.mts` reads `pnpm-workspace.yaml`. Both sit at a
- * fixed depth in a file whose shape is stable, and a parser would be a
- * dependency taken on for one nesting level.
+ * fixed depth in a file whose shape is stable; the command guards read the rest
+ * of a workflow through `tools/scripts/lib/workflow-jobs.mts`.
  */
 export const parseWorkflowTriggers = (
   workflowFile: string,
