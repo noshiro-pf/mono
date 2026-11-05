@@ -132,6 +132,7 @@ export const Overlay = ({
   const self: OverlayEntry = {
     elements: mut_elements,
     marksBody: hasBackdrop && usePortal,
+    autoFocuses: autoFocus,
   } as const;
 
   onScopeDispose(() => {
@@ -228,10 +229,14 @@ export const Overlay = ({
 
   // One toggle per class, shared by the four elements that carry them.
   const transitionToggles = transitionClassNames.map(
-    ([name, phases]) =>
+    ([name]) =>
       [
         `${transitionName}-${name}`,
-        view(phase$, (phase) => phases.includes(phase)),
+        view(phase$, (phase) =>
+          transitionClassesOf(transitionName, phase).includes(
+            `${transitionName}-${name}`,
+          ),
+        ),
       ] as const,
   );
 
@@ -254,6 +259,7 @@ export const Overlay = ({
       isOpen$={isOpen$}
       isOverlayOrAbove={(target) => isInStackFrom(self, target)}
       isThisOnTop={() => isOnTop(self)}
+      isUnderNoFocusTaker={() => noFocusTakerAbove(self)}
       setElement={(name, element) => {
         mut_elements[name] = element;
       }}
@@ -294,7 +300,49 @@ export const Overlay = ({
   );
 };
 
-type Phase =
+/** It is the overlay on top. */
+export const isOnTop = (entry: OverlayEntry): boolean =>
+  mut_overlayStack.at(-1) === entry;
+
+export const enterStack = (entry: OverlayEntry): void => {
+  // Read first: `includes` narrows `entry` to `never` past its early return.
+  const { marksBody } = entry;
+
+  if (mut_overlayStack.includes(entry)) {
+    return;
+  }
+
+  mut_overlayStack.push(entry);
+
+  if (marksBody) {
+    document.body.classList.add('bp6-overlay-open');
+  }
+};
+
+export const leaveStack = (entry: OverlayEntry): void => {
+  const index = mut_overlayStack.indexOf(entry);
+
+  if (index === -1) {
+    return;
+  }
+
+  mut_overlayStack.splice(index, 1);
+
+  if (mut_overlayStack.every(({ marksBody }) => !marksBody)) {
+    document.body.classList.remove('bp6-overlay-open');
+  }
+};
+
+/** The transition classes on while in `phase`, after `prefix`. */
+export const transitionClassesOf = (
+  prefix: string,
+  phase: Phase,
+): readonly string[] =>
+  transitionClassNames
+    .filter(([, phases]) => phases.includes(phase))
+    .map(([name]) => `${prefix}-${name}`);
+
+export type Phase =
   | 'appear-active'
   | 'appear-done'
   | 'appear'
@@ -305,7 +353,7 @@ type Phase =
   | 'exit-active'
   | 'exit';
 
-type OverlayElements = Readonly<{
+export type OverlayElements = Readonly<{
   /** `div.bp6-overlay`. */
   overlay: HTMLElement | undefined;
   /** The focus trap before the content. */
@@ -315,10 +363,12 @@ type OverlayElements = Readonly<{
 }>;
 
 /** An overlay in {@link mut_overlayStack}, told apart by identity. */
-type OverlayEntry = Readonly<{
+export type OverlayEntry = Readonly<{
   elements: OverlayElements;
   /** It has a backdrop in a portal, which marks the body. */
   marksBody: boolean;
+  /** It brings focus inside itself as it opens (`autoFocus`). */
+  autoFocuses: boolean;
 }>;
 
 /**
@@ -338,7 +388,8 @@ const transitionClassNames: readonly (readonly [string, readonly Phase[]])[] = [
 
 /**
  * The open overlays, the last opened last, as Blueprint's overlay stack: the
- * one on top alone keeps focus inside itself, and the body carries
+ * one on top alone holds focus inside itself against focus moving out (a press
+ * on a backdrop, or an opening, may still bring it in), and the body carries
  * `bp6-overlay-open`, which Blueprint's style sheets stop the page scrolling
  * by, while any with a backdrop in a portal is open.
  */
@@ -348,6 +399,7 @@ const mut_overlayStack: OverlayEntry[] = [];
 const OverlayBody = ({
   isOpen$,
   isThisOnTop,
+  isUnderNoFocusTaker,
   isOverlayOrAbove,
   elements,
   setElement,
@@ -364,6 +416,11 @@ const OverlayBody = ({
 }: Readonly<{
   isOpen$: InitializedObservable<boolean>;
   isThisOnTop: () => boolean;
+  /**
+   * No overlay opened after this one takes focus as it opens: one that does
+   * not, as a tooltip or a toaster, leaves this one to take it.
+   */
+  isUnderNoFocusTaker: () => boolean;
   /** `target` is in this overlay or in one opened over it. */
   isOverlayOrAbove: (target: EventTarget | null) => boolean;
   /** Read from the `Overlay`, which owns them. */
@@ -405,14 +462,17 @@ const OverlayBody = ({
 
   const mut_frame = { id: 0 };
 
+  // Its own, so that neither this nor the opening's cancels the other.
+  const mut_backdropFrame = { id: 0 };
+
   // As it opens, and as it is opened again during its exit: on the next frame,
-  // once it is laid out, if it is still the one on top by then.
+  // once it is laid out, unless one opened over it by then has taken focus.
   subscribeInScope(isOpen$, (open) => {
     cancelAnimationFrame(mut_frame.id);
 
     if (open && autoFocus) {
       mut_frame.id = requestAnimationFrame(() => {
-        if (isThisOnTop()) {
+        if (isUnderNoFocusTaker()) {
           bringFocusInside();
         }
       });
@@ -421,6 +481,8 @@ const OverlayBody = ({
 
   onScopeDispose(() => {
     cancelAnimationFrame(mut_frame.id);
+
+    cancelAnimationFrame(mut_backdropFrame.id);
 
     setElement('overlay', undefined);
 
@@ -575,9 +637,20 @@ const OverlayBody = ({
               onClose?.(event);
             }
 
-            if (isThisOnTop()) {
-              bringFocusInside();
+            // As Blueprint's, whatever is open over it, and on the next frame:
+            // the press moves focus to the body once its handlers are done.
+            if (!enforceFocus) {
+              return;
             }
+
+            cancelAnimationFrame(mut_backdropFrame.id);
+
+            // Not into one the press has closed, which is on its way out.
+            mut_backdropFrame.id = requestAnimationFrame(() => {
+              if (isOpen$.getSnapshot().value) {
+                bringFocusInside();
+              }
+            });
           }}
         />
       ) : (
@@ -638,8 +711,14 @@ const focusIsInStack = (): boolean =>
     isInside(document.activeElement, entry.elements.overlay),
   );
 
-const isOnTop = (entry: OverlayEntry): boolean =>
-  mut_overlayStack.at(-1) === entry;
+const noFocusTakerAbove = (entry: OverlayEntry): boolean => {
+  const index = mut_overlayStack.indexOf(entry);
+
+  return (
+    index !== -1 &&
+    mut_overlayStack.slice(index + 1).every(({ autoFocuses }) => !autoFocuses)
+  );
+};
 
 /** `target` is in `entry`'s overlay or in one opened after it. */
 const isInStackFrom = (
@@ -657,33 +736,4 @@ const isInStackFrom = (
         target !== overlay && isInside(target, overlay),
     )
   );
-};
-
-const enterStack = (entry: OverlayEntry): void => {
-  // Read first: `includes` narrows `entry` to `never` past its early return.
-  const { marksBody } = entry;
-
-  if (mut_overlayStack.includes(entry)) {
-    return;
-  }
-
-  mut_overlayStack.push(entry);
-
-  if (marksBody) {
-    document.body.classList.add('bp6-overlay-open');
-  }
-};
-
-const leaveStack = (entry: OverlayEntry): void => {
-  const index = mut_overlayStack.indexOf(entry);
-
-  if (index === -1) {
-    return;
-  }
-
-  mut_overlayStack.splice(index, 1);
-
-  if (mut_overlayStack.every(({ marksBody }) => !marksBody)) {
-    document.body.classList.remove('bp6-overlay-open');
-  }
 };

@@ -1,4 +1,3 @@
-// cspell:ignore unhover
 // Popover, Tooltip and the submenus of MenuItem beside Blueprint React's, and
 // how they behave. They are drawn in a portal, or opened by the pointer, so they
 // are compared here rather than among `blueprint-cases.tsx`.
@@ -18,7 +17,7 @@ import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { createState } from 'synstate';
 import { constant, If, render, type JSX } from 'synstate-dom';
-import { page, userEvent } from 'vitest/browser';
+import { userEvent } from 'vitest/browser';
 import { mountBlueprint } from './blueprint-cases.js';
 import {
   freezeAnimations,
@@ -28,7 +27,7 @@ import {
   settle,
   transitioned,
 } from './helpers.mjs';
-import { linesOf } from './markup-lines.mjs';
+import { linesAfter, shotAfter, stage } from './stage.mjs';
 
 const ignore = (): void => {};
 
@@ -876,90 +875,12 @@ describe(Tooltip, () => {
   });
 });
 
-/** A fixed stage in the middle of the page, so that both sides place alike. */
-const stage = (): HTMLElement => {
-  const host = document.createElement('div');
-
-  host.style.setProperty('display', 'flex');
-
-  host.style.setProperty('align-items', 'center');
-
-  host.style.setProperty('justify-content', 'center');
-
-  host.style.setProperty('width', '480px');
-
-  host.style.setProperty('height', '360px');
-
-  document.body.append(host);
-
-  return host;
-};
-
 const theButtonIn = (host: HTMLElement): HTMLButtonElement => {
   const button = host.querySelector('button');
 
   assert.isNotNull(button);
 
   return button;
-};
-
-/**
- * Mounts a side on the stage, brings it to the state compared, and reads the
- * markup of the stage and of every portal it draws in.
- */
-const linesAfter = async (
-  mount: (on: HTMLElement) => () => void,
-  open: (on: HTMLElement) => Promise<void>,
-): Promise<readonly string[]> => {
-  const host = stage();
-
-  const unmount = mount(host);
-
-  try {
-    await open(host);
-
-    await settle();
-
-    const portals = document.createElement('div');
-
-    for (const portal of document.querySelectorAll('.bp6-portal')) {
-      portals.append(portal.cloneNode(true));
-    }
-
-    return [...linesOf(host), '--- portals', ...linesOf(portals)];
-  } finally {
-    unmount();
-
-    host.remove();
-
-    await userEvent.unhover(document.body);
-
-    await transitioned();
-  }
-};
-
-/** As {@link linesAfter}, a picture of the stage, as base64 PNG. */
-const shotAfter = async (
-  mount: (on: HTMLElement) => () => void,
-  open: (on: HTMLElement) => Promise<void>,
-): Promise<string> => {
-  const host = stage();
-
-  const unmount = mount(host);
-
-  try {
-    await open(host);
-
-    return await page.screenshot({ element: host, save: false });
-  } finally {
-    unmount();
-
-    host.remove();
-
-    await userEvent.unhover(document.body);
-
-    await transitioned();
-  }
 };
 
 /** Mounts `app` on a stage, and unmounts it when the test finishes. */
