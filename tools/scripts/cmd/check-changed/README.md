@@ -63,10 +63,12 @@ by case. In order:
    them, and the root program's `check:root:types`, `lint` and `test` only for
    what the root `tsconfig.json` reads (`tools/`, the root configuration, any
    `configs/`, `eslint.config*.mts` or `vite.config.mts`); `strict-lib:*` for
-   `strict-lib/`; `check:knip` and `check:published-deps` for manifests;
-   `check:md` for prose; `check:prose` always; cspell over the changed files,
-   and `check:cspell:changeset` for a changeset (the whole `check:cspell`
-   instead when a `cspell.config.yaml` changed).
+   `strict-lib/`; `check:knip` for any change the code gate lets through, as CI
+   runs it, and `check:published-deps` for a manifest or for what it lints (a
+   published package's `src/`, an `eslint.config.mts`); `check:md` for prose;
+   `check:prose` always; cspell over the changed files, and
+   `check:cspell:changeset` for a changeset (the whole `check:cspell` instead
+   when a `cspell.config.yaml` changed).
 5. **Format** again, for what the fixers wrote (`fix:fmt:full` instead when
    `.prettierrc` or `.prettierignore` changed).
 

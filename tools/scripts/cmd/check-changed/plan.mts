@@ -95,6 +95,12 @@ export const classifyChanges = ({
       mut_areas.add('license');
     }
 
+    // What `check:published-deps` lints: the published packages' `src/` and the
+    // ESLint configs that name them.
+    if (PUBLISHED_DEPS_INPUT.test(file)) {
+      mut_areas.add('published-source');
+    }
+
     // Only its tooling's checks: the generators rewrite thousands of files and
     // are `strict-lib-gen.yml`'s, as they are not `check-all`'s either.
     if (file.startsWith('strict-lib/')) {
@@ -310,11 +316,18 @@ export const buildPlan = ({
         ]
       : []),
 
-    ...(areas.has('manifest')
-      ? [
-          rootStep('check', 'check:knip'),
-          rootStep('check', 'check:published-deps'),
-        ]
+    // As CI runs it, for any change its code gate lets through: knip reads
+    // modules of every kind, tsconfig `types` and the workflows, so removing a
+    // dependency's last use leaves it unused with no manifest in the diff
+    // (#3042), and no list of file kinds here would keep up with its plugins.
+    ...(areas.has('manifest') || areas.has('root-guards')
+      ? [rootStep('check', 'check:knip')]
+      : []),
+
+    // Only for what it lints: an import added to `src/` can name what the
+    // package does not publish, with no manifest in the diff.
+    ...(areas.has('manifest') || areas.has('published-source')
+      ? [rootStep('check', 'check:published-deps')]
       : []),
 
     ...(areas.has('prose') ? [rootStep('check', 'check:md')] : []),
@@ -507,13 +520,15 @@ export const readsGeneratorInput = (
  * `gen:license-files` runs on it and on `manifest`, whose `license` and
  * `private` fields decide what it writes. `deps-graph` is what `gen:deps-graph`
  * reads, the document it writes included, which it otherwise regenerates only
- * for a `manifest`.
+ * for a `manifest`. `published-source` is what `check:published-deps` lints
+ * (`PUBLISHED_DEPS_INPUT`), which runs on it and on `manifest`.
  */
 export const AREAS = [
   'root',
   'root-guards',
   'prose',
   'manifest',
+  'published-source',
   'license',
   'deps-graph',
   'strict-lib',
@@ -734,6 +749,14 @@ const FORMAT_CONFIG: ReadonlySet<string> = new Set<string>([
 const CONFIGS_SEGMENT = /(?:^|\/)configs\//u;
 
 const TYPESCRIPT_FILE = /\.(?:ts|mts|tsx)$/u;
+
+/**
+ * What `check:published-deps` lints, by the globs its script in the root
+ * `package.json` names: TypeScript under the `src/` of a `libs/` or `apps/`
+ * member, and the ESLint configs.
+ */
+const PUBLISHED_DEPS_INPUT =
+  /^(?:(?:libs|apps)\/[^/]+\/(?:src\/.+\.(?:mts|ts|tsx)|eslint\.config\.mts)|eslint\.config\.mts)$/u;
 
 const MANIFEST_FILES: ReadonlySet<string> = new Set<string>([
   'package.json',
