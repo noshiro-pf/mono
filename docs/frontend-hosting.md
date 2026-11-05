@@ -63,6 +63,16 @@ base path は router の `basePath` に `import.meta.env.BASE_URL` を渡して�
 ルーティングする。`<a href>` はブラウザがオリジンから解決するので、リンクには
 base を付けた URL を書く。synstate-router では `Link` と `router.toUrl` が付ける。
 
+## デプロイで消えた chunk
+
+`main` への push ごとにサイト全体が置き換わり、前のビルドの chunk は配信され
+なくなる。ブラウザのキャッシュから開いたページは古いビルドのまま動き、その
+`import()` が失敗する。`base` を渡したアプリには `vite-app-config.mts` の
+`staleBuildRecovery` が入り、そのときページを 1 回だけ読み直す（タブとアプリ
+ごとに 1 分に 1 回まで。中身は `tools/configs/stale-build-recovery.mts`）。
+Vite の preload helper が包まない `import()`（パスを計算するもの）はこの回復を
+通らないので、ビルドが失敗する。`import()` にはパスを文字列で書く。
+
 ## Pages から出るとき
 
 Pages には、サーバー側で 301 を返す設定（Firebase の `redirects`、Netlify の

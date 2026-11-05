@@ -1,7 +1,14 @@
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { writeRouteEntryPages } from './vite-app-config.mjs';
+import { hasKey, isRecord } from 'ts-data-forge';
+import { build } from 'vite';
+import {
+  defineViteAppConfig,
+  staleBuildRecovery,
+  unwrappedDynamicImports,
+  writeRouteEntryPages,
+} from './vite-app-config.mjs';
 
 /** A build output directory holding `index.html`, removed once `fn` returns. */
 const withBuild = (fn: (outDir: string) => void): void => {
@@ -50,5 +57,186 @@ describe(writeRouteEntryPages, () => {
         writeRouteEntryPages(outDir, ['/create/']);
       });
     });
+  });
+});
+
+/** A one-page app in a directory of its own, removed once `fn` settles. */
+const withApp = async (
+  main: string,
+  fn: (appRoot: string) => Promise<void>,
+): Promise<void> => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'vite-app-config-app-'));
+
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(path.join(root, 'src'));
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(
+      path.join(root, 'index.html'),
+      '<!doctype html><html><head></head><body><script type="module" src="/src/main.js"></script></body></html>',
+    );
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(path.join(root, 'src', 'main.js'), main);
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(
+      path.join(root, 'src', 'later.js'),
+      'export const later = 1;\n',
+    );
+
+    await fn(root);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+};
+
+/**
+ * Builds the app at `root` with the recovery, and gives the entry chunk: the
+ * one script the built `index.html` names.
+ */
+const buildApp = async (root: string): Promise<string> => {
+  await build({
+    root,
+    base: '/mono/app/',
+    logLevel: 'silent',
+    configFile: false,
+    build: { outDir: path.join(root, 'build'), emptyOutDir: true },
+    plugins: [staleBuildRecovery('/mono/app/')],
+  });
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  const html = fs.readFileSync(path.join(root, 'build', 'index.html'), 'utf8');
+
+  const scripts = Array.from(
+    html.matchAll(
+      /<script type="module" crossorigin src="\/mono\/app\/([^"]+)"/gu,
+    ),
+    (match) => match[1],
+  );
+
+  assert.strictEqual(scripts.length, 1);
+
+  const [entry] = scripts;
+
+  assert.isDefined(entry);
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  return fs.readFileSync(path.join(root, 'build', entry), 'utf8');
+};
+
+/** The names of the plugins `config` lists directly. */
+const pluginNames = (
+  config: Readonly<{ plugins?: readonly unknown[] }>,
+): readonly unknown[] =>
+  (config.plugins ?? []).map((plugin) =>
+    isRecord(plugin) && hasKey(plugin, 'name') ? plugin.name : undefined,
+  );
+
+describe(staleBuildRecovery, () => {
+  test('listens for a failed chunk before the app runs', async () => {
+    await withApp(
+      "console.log('app');\nawait import('./later.js');\n",
+      async (root) => {
+        const entry = await buildApp(root);
+
+        const listening = entry.indexOf('stale-build-reloaded-at:/mono/app/');
+
+        expect(listening).toBeGreaterThanOrEqual(0);
+
+        expect(listening).toBeLessThan(entry.indexOf('console.log(`app`)'));
+
+        assert.include(entry, 'addEventListener(`vite:preloadError`');
+      },
+    );
+  });
+
+  test('fails the build on an import() the recovery does not see', async () => {
+    await withApp(
+      'const name = location.hash;\nawait import(/* @vite-ignore */ name);\n',
+      async (root) => {
+        await expect(buildApp(root)).rejects.toThrow(
+          /does not wrap these import\(\) calls/u,
+        );
+      },
+    );
+  });
+
+  test('is added for an app published to Pages, and only then', () => {
+    const packageRoot = path.resolve(
+      import.meta.dirname,
+      '../../apps/catan-dice',
+    );
+
+    assert.include(
+      pluginNames(
+        defineViteAppConfig({
+          packageRoot,
+          framework: 'preact',
+          base: '/mono/catan-dice/',
+        }),
+      ),
+      'vite-app-config:stale-build-recovery',
+    );
+
+    assert.notInclude(
+      pluginNames(defineViteAppConfig({ packageRoot, framework: 'preact' })),
+      'vite-app-config:stale-build-recovery',
+    );
+  });
+});
+
+describe(unwrappedDynamicImports, () => {
+  test('passes an import() wrapped by the preload helper', () => {
+    assert.deepStrictEqual(
+      unwrappedDynamicImports(
+        'const a = await e(() => import(`./a-x1.js`), __vite__mapDeps([0, 1]));',
+      ),
+      [],
+    );
+  });
+
+  test('passes one the helper wraps with its destructuring', () => {
+    assert.deepStrictEqual(
+      unwrappedDynamicImports(
+        'const { f } = await xa(async () => { let { f: e } = await import(`./f-x1.js`); return { f: e }; }, []);',
+      ),
+      [],
+    );
+  });
+
+  test('passes one whose module the helper is given converted', () => {
+    assert.deepStrictEqual(
+      unwrappedDynamicImports(
+        'await Up(() => import(`./elk-x1.js`).then((t) => t.default), void 0);',
+      ),
+      [],
+    );
+  });
+
+  test('reports a bare import()', () => {
+    assert.deepStrictEqual(
+      unwrappedDynamicImports('const a = await import(`./a-x1.js`);'),
+      ['import(`./a-x1.js`)'],
+    );
+  });
+
+  test('reports one whose specifier is computed', () => {
+    assert.deepStrictEqual(
+      unwrappedDynamicImports(
+        'const a = await e(() => import(name), __vite__mapDeps([0]));',
+      ),
+      ['import(name)'],
+    );
+  });
+
+  test('reports one in a function that is not handed to a helper', () => {
+    assert.deepStrictEqual(
+      unwrappedDynamicImports(
+        'const load = () => import(`./a-x1.js`); obj.run(() => import(`./b-x1.js`), []);',
+      ),
+      ['import(`./a-x1.js`)', 'import(`./b-x1.js`)'],
+    );
   });
 });
