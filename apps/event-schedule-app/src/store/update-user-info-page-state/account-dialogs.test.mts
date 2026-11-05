@@ -196,6 +196,241 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
       assert.deepStrictEqual(shown, toasts);
     },
   );
+
+  test('deletes nothing when the dialog is closed while the Google popup is open', async () => {
+    const popup = Promise.withResolvers<Result<unknown, AuthError>>();
+
+    const { deps, calls, dialog } = setup({
+      reauthenticateWithGoogle: () => popup.promise,
+    });
+
+    const store = createDeleteAccountCreatedWithGoogleStore(deps);
+
+    const showToast = vi.spyOn(fakeToaster, 'show');
+
+    onTestFinished(() => {
+      showToast.mockRestore();
+    });
+
+    dialog.deleteAccountCreatedWithGoogle();
+
+    store.inputEmailHandler('alice@example.com');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.isTrue(store.state.getSnapshot().value.isWaitingResponse);
+
+    dialog.closeDialog();
+
+    popup.resolve(Result.ok(undefined));
+
+    await settle();
+
+    assert.deepStrictEqual(calls, ['reauthenticateWithGooglePopup alice']);
+
+    assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
+
+    assert.deepStrictEqual(showToast.mock.calls, []);
+  });
+
+  test('starts no second submit while the first is waiting', async () => {
+    const popup = Promise.withResolvers<Result<unknown, AuthError>>();
+
+    const { deps, calls, dialog } = setup({
+      reauthenticateWithGoogle: () => popup.promise,
+    });
+
+    const store = createDeleteAccountCreatedWithGoogleStore(deps);
+
+    dialog.deleteAccountCreatedWithGoogle();
+
+    store.inputEmailHandler('alice@example.com');
+
+    store.enterClickHandler();
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.deepStrictEqual(calls, ['reauthenticateWithGooglePopup alice']);
+
+    popup.resolve(Result.ok(undefined));
+
+    await settle();
+
+    assert.deepStrictEqual(calls, [
+      'reauthenticateWithGooglePopup alice',
+      'deleteUser alice',
+    ]);
+  });
+
+  test('a submit from before a reopen leaves the new one waiting', async () => {
+    const popups = [
+      Promise.withResolvers<Result<unknown, AuthError>>(),
+      Promise.withResolvers<Result<unknown, AuthError>>(),
+    ] as const;
+
+    const { deps, calls, dialog } = setup({
+      reauthenticateWithGoogle: () => {
+        const popup = popups.at(
+          calls.filter((call) => call === 'reauthenticateWithGooglePopup alice')
+            .length - 1,
+        );
+
+        assert.isDefined(popup);
+
+        return popup.promise;
+      },
+    });
+
+    const store = createDeleteAccountCreatedWithGoogleStore(deps);
+
+    const showToast = vi.spyOn(fakeToaster, 'show');
+
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    onTestFinished(() => {
+      showToast.mockRestore();
+
+      consoleError.mockRestore();
+    });
+
+    dialog.deleteAccountCreatedWithGoogle();
+
+    store.inputEmailHandler('alice@example.com');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    dialog.closeDialog();
+
+    dialog.deleteAccountCreatedWithGoogle();
+
+    store.inputEmailHandler('alice@example.com');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    popups[0].resolve(
+      Result.err({ code: 'auth/user-mismatch', message: 'mismatch' }),
+    );
+
+    await settle();
+
+    assert.isTrue(store.state.getSnapshot().value.isWaitingResponse);
+
+    assert.deepStrictEqual(showToast.mock.calls, []);
+
+    // Logged, but neither said nor ending the new submit's wait.
+    assert.strictEqual(consoleError.mock.calls.length, 1);
+
+    popups[1].resolve(Result.ok(undefined));
+
+    await settle();
+
+    assert.deepStrictEqual(calls, [
+      'reauthenticateWithGooglePopup alice',
+      'reauthenticateWithGooglePopup alice',
+      'deleteUser alice',
+    ]);
+
+    assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
+  });
+
+  test('stops quietly at a rejection after the dialog was closed', async () => {
+    const popup = Promise.withResolvers<Result<unknown, AuthError>>();
+
+    const { deps, calls, dialog } = setup({
+      reauthenticateWithGoogle: () => popup.promise,
+    });
+
+    const store = createDeleteAccountCreatedWithGoogleStore(deps);
+
+    const showToast = vi.spyOn(fakeToaster, 'show');
+
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    onTestFinished(() => {
+      showToast.mockRestore();
+
+      consoleError.mockRestore();
+    });
+
+    dialog.deleteAccountCreatedWithGoogle();
+
+    store.inputEmailHandler('alice@example.com');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    dialog.closeDialog();
+
+    popup.reject(new Error('network'));
+
+    await settle();
+
+    assert.deepStrictEqual(calls, ['reauthenticateWithGooglePopup alice']);
+
+    assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
+
+    assert.deepStrictEqual(showToast.mock.calls, []);
+
+    assert.strictEqual(consoleError.mock.calls.length, 1);
+  });
+
+  test("ends the wait and reports a rejection as the step's error", async () => {
+    const { deps, calls, dialog } = setup({
+      reauthenticateWithGoogle: () => Promise.reject(new Error('network')),
+    });
+
+    const store = createDeleteAccountCreatedWithGoogleStore(deps);
+
+    const showToast = vi.spyOn(fakeToaster, 'show');
+
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    onTestFinished(() => {
+      showToast.mockRestore();
+
+      consoleError.mockRestore();
+    });
+
+    dialog.deleteAccountCreatedWithGoogle();
+
+    store.inputEmailHandler('alice@example.com');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.deepStrictEqual(calls, ['reauthenticateWithGooglePopup alice']);
+
+    assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
+
+    // As when re-authenticating returns an error: the dialog stays open.
+    assert.strictEqual(
+      dialog.openingDialogType$.getSnapshot().value,
+      'deleteAccountCreatedWithGoogle',
+    );
+
+    assert.deepStrictEqual(
+      showToast.mock.calls.map(([props]) => [props.intent, props.message]),
+      [['danger', constant(dict.accountSettings.reauthenticate.message.error)]],
+    );
+
+    assert.strictEqual(consoleError.mock.calls.length, 1);
+  });
 });
 
 describe(createUpdateDisplayNamePageStore, () => {
@@ -322,7 +557,8 @@ const setup = (
   options?: Readonly<{
     signedIn?: boolean;
     reauthenticate?: Result<unknown, AuthError>;
-    reauthenticateWithGoogle?: Result<unknown, AuthError>;
+    reauthenticateWithGoogle?:
+      Result<unknown, AuthError> | (() => Promise<Result<unknown, AuthError>>);
   }>,
 ): Setup => {
   const user = options?.signedIn === false ? undefined : alice;
@@ -347,9 +583,11 @@ const setup = (
           reauthenticateWithGooglePopup: (u) => {
             mut_calls.push(`reauthenticateWithGooglePopup ${u.name}`);
 
-            return Promise.resolve(
-              options?.reauthenticateWithGoogle ?? Result.ok(undefined),
-            );
+            const reauth = options?.reauthenticateWithGoogle;
+
+            return typeof reauth === 'function'
+              ? reauth()
+              : Promise.resolve(reauth ?? Result.ok(undefined));
           },
           reauthenticateWithCredential: (u, credential) => {
             mut_calls.push(`reauthenticate ${u.name} ${credential}`);
