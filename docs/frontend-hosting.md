@@ -134,5 +134,7 @@ Firebase をバックエンドとして使い続けるアプリ（`algo-app`、
 
 `algo-app`・`life-plan-simulator`・`task-manager` の Firestore のルールと
 インデックスは `deploy-firestore.yml` が自動でデプロイする
-（`docs/firestore-deploy.md`）。実ユーザーのいる `event-schedule-app` と
-`poll-discord-app` のデプロイは、まだ手で行う。
+（`docs/firestore-deploy.md`）。`event-schedule-app` は Hosting・Functions・
+ルールを `deploy-event-schedule-app.yml` がデプロイする
+（`docs/event-schedule-app-deploy.md`）。実ユーザーのいる `poll-discord-app` の
+デプロイは、まだ手で行う。

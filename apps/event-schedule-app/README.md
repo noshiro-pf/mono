@@ -56,9 +56,10 @@ for a new password, and changing their name, password and email in the account
 settings before deleting the account. Google sign-in is not tested, and the Auth
 emulator does not apply production's sign-in settings, such as email enumeration
 protection, which changes the errors Auth answers.
-Nothing tests what the rules deny, so check a change there by hand before
-`pnpm exec firebase deploy --only firestore:rules`, the only thing that puts it
-in production.
+Nothing tests what the rules deny, so check a change there by hand before it
+merges: `deploy-event-schedule-app.yml` deploys the rules, the site and the
+functions once they reach `main`
+([docs/event-schedule-app-deploy.md](../../docs/event-schedule-app-deploy.md)).
 
 The Firestore and Pub/Sub emulators need Java (JDK 21 or later), and the
 emulators run through the `firebase-tools` this package declares, so nothing

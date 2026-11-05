@@ -1,0 +1,428 @@
+# cspell:ignore temurin
+
+name: Deploy event-schedule-app
+
+# Deploys event-schedule-app to its Firebase project: the Hosting site
+# (`apps/event-schedule-app`), the Cloud Functions
+# (`apps/event-schedule-app-functions`) and the Firestore rules and indexes,
+# each when what it is built from has changed. The GCP setup, the roles and how
+# this differs from deploy-firestore.yml are in docs/event-schedule-app-deploy.md.
+#
+# **What is deployed is chosen against the last run that succeeded**, not the
+# push before this one: `tools/scripts/cmd/firebase-deploy-plan.mts` diffs that
+# run's commit against this one, per target, over the target's own paths and,
+# for Hosting and Functions, the workspace packages they bundle. A run that
+# failed, or that GitHub cancelled while it waited, is therefore made good by
+# the next run, which deploys everything since the last success.
+#
+# Split as README.md's "Jobs that hold a key" asks. `plan` and `build` run the
+# tree and hold nothing; `deploy` holds the Google Cloud credential and runs
+# nothing out of the tree but firebase-tools, which reads the checkout and the
+# build output as data. Two things keep firebase-tools from running the tree
+# with the key in hand: `build` writes the functions' discovery manifest
+# (`functions.yaml`), which firebase-tools reads instead of starting the
+# functions to ask them, and `deploy` removes every `predeploy` / `postdeploy`
+# hook from `firebase.json`, the build having already happened.
+#
+# Before anything is deployed, `build` runs the emulator end-to-end tests: the
+# pull request checks ran them on the tree, but a merge that bypassed them, or
+# a `main` that two pull requests changed together, is not deployed untested.
+
+on:
+  push:
+    branches:
+      - main
+
+  # Deploys every target from the tip of main: a redeploy, or the first deploy.
+  # A rollback is a revert merged to main.
+  workflow_dispatch:
+
+permissions: {}
+
+# One run at a time, never cancelled halfway: a half-done deploy can leave the
+# functions and the site out of step. GitHub keeps one waiting run per group and
+# cancels an older waiting one for a newer; nothing is lost by that, because the
+# newer run deploys everything since the last success (see above).
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+env:
+  # Also in `.firebaserc`, which the deploy job checks against it.
+  PROJECT: event-schedule-app
+
+  # What each `firebase deploy --only` target is built from
+  # (`firebase-deploy-plan.mts` says how they are read). `firebase.json` and
+  # `.firebaserc` configure all three.
+  TARGETS: >-
+    [
+      {
+        "only": "firestore",
+        "paths": [
+          "apps/event-schedule-app/firebase.json",
+          "apps/event-schedule-app/.firebaserc",
+          "apps/event-schedule-app/firestore.rules",
+          "apps/event-schedule-app/firestore.indexes.json"
+        ]
+      },
+      {
+        "only": "functions",
+        "packages": ["apps/event-schedule-app-functions"],
+        "paths": [
+          "apps/event-schedule-app/firebase.json",
+          "apps/event-schedule-app/.firebaserc"
+        ]
+      },
+      {
+        "only": "hosting",
+        "packages": ["apps/event-schedule-app"]
+      }
+    ]
+
+jobs:
+  plan:
+    name: Pick the targets to deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      actions: read # to find the last run that succeeded
+      contents: read
+
+    outputs:
+      only: ${{ steps.pick.outputs.only }}
+      pathspecs: ${{ steps.pick.outputs.pathspecs }}
+
+    steps:
+      # The tip alone; the last deployed commit is fetched below, and the
+      # diff between the two reads their trees, no blob.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          filter: blob:none
+
+      - name: Set up Node.js
+        uses: ./.github/actions/setup
+        with:
+          pnpm: 'false'
+          install: 'false'
+
+      # A dispatch deploys everything; so does a push with no successful run
+      # before it, or whose last one is not behind this commit (main never
+      # rewrites its history, so that would be a surprise worth a full
+      # deploy). The compare API answers `ahead` or `identical` exactly when
+      # the last one is an ancestor; any failure to ask stops the run rather
+      # than deploying everything.
+      - name: Find the last deployed commit
+        id: base
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$GITHUB_REF" != 'refs/heads/main' ]]; then
+            echo "::error::Run from main; the deploy environment refuses any other ref."
+            exit 1
+          fi
+
+          base=''
+          if [[ "$EVENT_NAME" != 'workflow_dispatch' ]]; then
+            base="$(gh api \
+              "repos/${GITHUB_REPOSITORY}/actions/workflows/deploy-event-schedule-app.yml/runs?branch=main&status=success&per_page=1" \
+              --jq '.workflow_runs[0].head_sha // ""')"
+            if [[ -n "$base" ]]; then
+              status="$(gh api "repos/${GITHUB_REPOSITORY}/compare/${base}...${SHA}" --jq .status)"
+              if [[ "$status" == 'ahead' || "$status" == 'identical' ]]; then
+                git fetch --no-tags --depth=1 --filter=blob:none origin "$base"
+              else
+                echo "::warning::The last deployed commit ${base} is not behind ${SHA} (compare says '${status}'); deploying everything."
+                base=''
+              fi
+            fi
+          fi
+
+          echo "Last deployed commit: ${base:-(none)}"
+          echo "base=${base}" >>"${GITHUB_OUTPUT}"
+
+      - name: Pick the targets whose files changed
+        id: pick
+        env:
+          BASE: ${{ steps.base.outputs.base }}
+          HEAD: ${{ github.sha }}
+        run: node ./tools/scripts/cmd/firebase-deploy-plan.mts
+
+  build:
+    name: Test and build
+    needs: plan
+    if: needs.plan.outputs.only != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up pnpm, Node.js and the dependencies
+        uses: ./.github/actions/setup
+
+      - name: Build the workspace packages the apps import
+        run: pnpm run ws:build:deps
+
+      - name: Install Chromium for Playwright
+        run: pnpm exec playwright install --only-shell chromium
+
+      # The Firestore and Pub/Sub emulators need Java 21 or later.
+      - name: Set up Java for the Firebase emulators
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # Whatever is being deployed: the rules are exercised through the app as
+      # much as the code is.
+      - name: Run the emulator end-to-end tests
+        run: pnpm --dir apps/event-schedule-app run check:e2e:emulators
+
+      # Each target's output is packed alone, so the deploy job unpacks only
+      # what it deploys. `node_modules` (the build's link into the workspace)
+      # and `.secret.local` (the emulator's dummy secret) are left out; neither
+      # is deployed (`functions.ignore`).
+      #
+      # The manifest is what `firebase deploy` would otherwise learn by
+      # starting the functions, given the environment firebase-tools gives
+      # that call. `FIREBASE_CONFIG` would come from the project's
+      # `adminSdkConfig`, which needs credentials, so it carries the project id
+      # alone. The bin reads its directory argument only when given two
+      # arguments, so it is run from the directory instead.
+      - name: Build and pack the targets
+        env:
+          ONLY: ${{ needs.plan.outputs.only }}
+        run: |
+          set -euo pipefail
+          out="${RUNNER_TEMP}/deploy"
+          mkdir -p "$out"
+          app=apps/event-schedule-app
+
+          if [[ ",${ONLY}," == *,hosting,* ]]; then
+            pnpm --dir "$app" run build
+            tar -C "$app" -czf "${out}/hosting.tar.gz" build
+          fi
+
+          if [[ ",${ONLY}," == *,functions,* ]]; then
+            pnpm --dir apps/event-schedule-app-functions run build
+            (
+              cd "${app}/functions-build"
+              config="$(jq -cn --arg p "$PROJECT" '{ projectId: $p }')"
+              FUNCTIONS_MANIFEST_OUTPUT_PATH="${PWD}/functions.yaml" \
+                GCLOUD_PROJECT="$PROJECT" \
+                FIREBASE_CONFIG="$config" \
+                CLOUD_RUNTIME_CONFIG="$(jq -cn --argjson c "$config" '{ firebase: $c }')" \
+                ./node_modules/.bin/firebase-functions
+            )
+            tar -C "$app" --exclude=node_modules --exclude=.secret.local \
+              -czf "${out}/functions.tar.gz" functions-build
+          fi
+
+          ls -lh "$out"
+
+      - name: Upload the build output
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: deploy
+          path: ${{ runner.temp }}/deploy
+          if-no-files-found: ignore
+          retention-days: 1
+
+  deploy:
+    name: Deploy
+    needs: [plan, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Limited to main. The Workload Identity provider also requires this name
+    # in the token, and only a token naming it may act as the service account
+    # below, so a run without it gets no credential.
+    environment:
+      name: event-schedule-app-deploy
+      url: https://event-schedule-app.web.app
+
+    permissions:
+      contents: read
+      id-token: write # to exchange for the service account's credential
+
+    env:
+      PLANNED: ${{ needs.plan.outputs.only }}
+      PATHSPECS: ${{ needs.plan.outputs.pathspecs }}
+      SHA: ${{ github.sha }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Runs are serialized, so this matters for a re-run of an older run: a
+      # target that main has changed since is left to the run for that change,
+      # which deploys the newer files whether it ran before this one or will
+      # run after.
+      - name: Leave out the targets main has changed since
+        id: current
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin main
+          kept=()
+          IFS=, read -ra planned <<<"$PLANNED"
+          for target in "${planned[@]}"; do
+            # Checked first: a jq failure inside the process substitution
+            # would leave no pathspecs, and a diff of the whole tree would
+            # leave the target out with nothing red.
+            if ! jq -e --arg t "$target" '.[$t] | arrays | length > 0' <<<"$PATHSPECS" >/dev/null; then
+              echo "::error::The plan gave ${target} no pathspecs."
+              exit 1
+            fi
+            mapfile -t specs < <(jq -r --arg t "$target" '.[$t][]' <<<"$PATHSPECS")
+            status=0
+            git diff --quiet --no-renames "$SHA" FETCH_HEAD -- "${specs[@]}" || status=$?
+            case "$status" in
+              0) kept+=("$target") ;;
+              1) echo "::notice::main has changed ${target} since ${SHA}; the run for that change deploys it." ;;
+              *) exit "$status" ;;
+            esac
+          done
+          only="$(IFS=,; echo "${kept[*]}")"
+          echo "Deploying: ${only:-(nothing)}"
+          echo "only=${only}" >>"${GITHUB_OUTPUT}"
+
+      # `install: false`: the step below installs the one app, not the
+      # workspace.
+      - name: Set up pnpm and Node.js
+        if: steps.current.outputs.only != ''
+        uses: ./.github/actions/setup
+        with:
+          install: 'false'
+
+      # As deploy-firestore.yml does: the app with its install scripts off,
+      # and nothing run from what that brings but firebase-tools, whose version
+      # comes from `pnpm-lock.yaml` (the `catalog:` entry).
+      - name: Install firebase-tools
+        if: steps.current.outputs.only != ''
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile --ignore-scripts --filter ./apps/event-schedule-app
+          apps/event-schedule-app/node_modules/.bin/firebase --version
+
+      - name: Download the build output
+        if: steps.current.outputs.only != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: deploy
+          path: ${{ runner.temp }}/deploy
+
+      # The artifact comes from a job that ran the dependency tree, so it is
+      # read as hostile. Only the outputs of the targets being deployed are
+      # unpacked, each into an empty directory, and one is refused if it holds
+      # anything but files and directories under its own top directory, a
+      # `node_modules` that firebase-tools could start, or a `.env` or
+      # `.secret.local` that firebase-tools would deploy as the functions'
+      # environment. Without `functions.yaml` firebase-tools would start the
+      # functions to discover them. `firebase.json` and the rules come from the
+      # checkout, never from the artifact.
+      - name: Unpack the build output
+        if: steps.current.outputs.only != ''
+        env:
+          ONLY: ${{ steps.current.outputs.only }}
+        working-directory: apps/event-schedule-app
+        run: |
+          set -euo pipefail
+          unpack() {
+            local tarball="${RUNNER_TEMP}/deploy/$1.tar.gz" output="$2"
+            if tar -tzf "$tarball" | grep -Ev "^${output}(/|\$)" | grep -q .; then
+              echo "::error::The $1 output holds more than ${output}/."
+              exit 1
+            fi
+            if tar -tzf "$tarball" | grep -Eq '(^|/)(node_modules|\.\.|\.env[^/]*|\.secret\.local)(/|$)'; then
+              echo "::error::The $1 output holds a node_modules, a '..', a .env or a .secret.local."
+              exit 1
+            fi
+            local unpacked="${RUNNER_TEMP}/unpacked-$1"
+            mkdir "$unpacked"
+            tar -C "$unpacked" --no-same-owner -xzf "$tarball" -- "$output"
+            if find "$unpacked" ! -type f ! -type d | grep -q .; then
+              echo "::error::The $1 output holds something other than files and directories."
+              exit 1
+            fi
+            if [[ -e "$output" ]]; then
+              echo "::error::apps/event-schedule-app/${output} is in the checkout."
+              exit 1
+            fi
+            mv "${unpacked}/${output}" "$output"
+          }
+
+          if [[ ",${ONLY}," == *,hosting,* ]]; then
+            unpack hosting build
+          fi
+          if [[ ",${ONLY}," == *,functions,* ]]; then
+            unpack functions functions-build
+            if [[ ! -f functions-build/functions.yaml ]]; then
+              echo '::error::No functions.yaml; firebase-tools would start the functions to discover them.'
+              exit 1
+            fi
+          fi
+
+      # The `functions` hook is the build, which has happened in `build`; any
+      # hook would run the tree with the key in hand.
+      - name: Check the Firebase config and remove its hooks
+        if: steps.current.outputs.only != ''
+        working-directory: apps/event-schedule-app
+        run: |
+          set -euo pipefail
+          default="$(jq -r '.projects.default' .firebaserc)"
+          if [[ "$default" != "$PROJECT" ]]; then
+            echo "::error::.firebaserc names ${default}, but the workflow names ${PROJECT}."
+            exit 1
+          fi
+          jq 'walk(if type == "object" then del(.predeploy, .postdeploy) else . end)' \
+            firebase.json >"${RUNNER_TEMP}/firebase.json"
+          mv "${RUNNER_TEMP}/firebase.json" firebase.json
+
+      - name: Check the Google Cloud variables
+        if: steps.current.outputs.only != ''
+        env:
+          PROVIDER: ${{ vars.FIREBASE_DEPLOY_WORKLOAD_IDENTITY_PROVIDER }}
+          SERVICE_ACCOUNT: ${{ vars.EVENT_SCHEDULE_APP_DEPLOY_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$PROVIDER" || -z "$SERVICE_ACCOUNT" ]]; then
+            echo '::error::FIREBASE_DEPLOY_WORKLOAD_IDENTITY_PROVIDER and EVENT_SCHEDULE_APP_DEPLOY_SERVICE_ACCOUNT have to be set; see docs/event-schedule-app-deploy.md.'
+            exit 1
+          fi
+
+      # Install and unpack come before this step ("Jobs that hold a key").
+      - name: Authenticate to Google Cloud
+        if: steps.current.outputs.only != ''
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ vars.FIREBASE_DEPLOY_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.EVENT_SCHEDULE_APP_DEPLOY_SERVICE_ACCOUNT }}
+
+      # No `--force`: a deploy that would delete a function, or that needs a
+      # prompt answered, fails instead of answering it. Unchanged functions are
+      # skipped by firebase-tools (it compares source hashes), so a target
+      # chosen by a lockfile change alone costs time, not a redeploy.
+      - name: Deploy
+        if: steps.current.outputs.only != ''
+        working-directory: apps/event-schedule-app
+        env:
+          ONLY: ${{ steps.current.outputs.only }}
+        # The binary itself, not `pnpm exec` (see deploy-firestore.yml).
+        run: |
+          ./node_modules/.bin/firebase deploy --non-interactive \
+            --project "$PROJECT" --only "$ONLY" --message "$SHA"

@@ -6,15 +6,17 @@ name: Deploy Firestore rules
 # the code that relies on them rather than with the next version bump.
 #
 # `TARGETS` names each app and its Firebase project explicitly. The other
-# `firebase.json` files in `apps/` either belong to an app with real users,
-# whose deploys are still made by hand, or only redirect an old Hosting URL to
-# Pages and are deployed once. Adding an app here deploys nothing until its
+# `firebase.json` files in `apps/` belong to event-schedule-app, which
+# deploy-event-schedule-app.yml deploys with its Hosting and Functions, to an
+# app with real users whose deploys are still made by hand, or only redirect an
+# old Hosting URL to Pages and are deployed once. Adding an app here deploys nothing until its
 # rules next change; dispatch the workflow for it once.
 #
 # The key is a Workload Identity Federation credential for a service account
-# that may only replace rules and indexes. The provider admits only this
-# workflow on main in the `firebase-deploy` environment; the setup is in
-# docs/firestore-deploy.md.
+# that may only replace rules and indexes. The provider admits this workflow
+# on main only in the `firebase-deploy` environment, and only a token naming
+# that environment may act as the service account; the setup is in
+# docs/firestore-deploy.md and docs/event-schedule-app-deploy.md.
 
 on:
   push:
