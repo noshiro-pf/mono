@@ -96,10 +96,13 @@ export const rp3060dParseCommand = (
 export const gpParseGroupingCommandArgument = (
   commandArguments: string,
 ): Result<readonly [NumGroups, readonly string[]], undefined> => {
-  const numGroups = Result.unwrapOkOr(
-    Num.safeParseInt(commandArguments),
-    Number.NaN,
-  );
+  // The count is the first token; the quoted names follow it. Only a run of
+  // decimal digits is a count, so `0x2` or `2.5` is not read as one.
+  const countToken = commandArguments.trimStart().split(/\s/u, 1)[0] ?? '';
+
+  const numGroups = /^\d+$/u.test(countToken)
+    ? Result.unwrapOkOr(Num.safeParseInt(countToken), Number.NaN)
+    : Number.NaN;
 
   if (!isNumGroups(numGroups)) {
     return Result.err(undefined);
