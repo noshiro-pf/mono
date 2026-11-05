@@ -1,5 +1,12 @@
 # @sumi-lang/checker
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [39ac703]
+    - ts-data-forge@14.12.0
+
 ## 0.0.9
 
 ### Patch Changes

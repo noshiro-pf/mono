@@ -1,5 +1,17 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.6.1
+
+### Patch Changes
+
+- 8128f6c: A rule whose `meta.schema` is an array with one array-valued option now takes that option as one element of its entry, as ESLint does: `'n/callback-return': ['error', ['done', 'next']]` type-checks and `['error', 'done', 'next']`, which ESLint refuses at load, no longer does. The same goes for `n/no-restricted-import`, `n/no-restricted-require`, `playwright/no-restricted-locators`, `playwright/no-restricted-roles`, `eslint-plugin/meta-property-ordering`, `eslint-plugin/test-case-property-ordering` and `react/no-invalid-html-attribute`. Rules whose schema is a single object, such as `consistent-this`, still spread their options. For these eight rules, `['error']` with no option no longer type-checks, as is already the case for every other rule with positional options; write `'error'`.
+- Updated dependencies [9c5c814]
+- Updated dependencies [95c464f]
+- Updated dependencies [b2ce1b1]
+- Updated dependencies [39ac703]
+    - eslint-rule-forge@0.8.0
+    - ts-data-forge@14.12.0
+
 ## 7.6.0
 
 ### Minor Changes

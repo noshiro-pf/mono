@@ -1,5 +1,0 @@
----
-'eslint-plugin-ts-data-forge': minor
----
-
-`no-unnecessary-type-guard` reports the variant guards of the algebraic data types when the argument's type already decides them: `Optional.isSome` / `isNone`, `Result.isOk` / `isErr`, `TernaryResult.isOk` / `isWarn` / `isErr` and `AsyncData.isIdle` / `isPending` / `isOk` / `isErr` / `isSettled`, called through a named, aliased or namespace import of `ts-data-forge`. `Optional.isNone(x)` on an `x` typed `Some<…>` is always `false`, and `Optional.isSome(x)` on it always `true`. The `ignore` option names them as `Optional.isNone`. A guard whose result is constant is no longer reported when it is the argument an assertion function asserts, such as `assert.isTrue(Optional.isSome(x))`, which checks at run time what the type claims. Nor is any guard reported whose argument reads a binding that another function assigns, directly or through a property: TypeScript keeps a `let`'s narrowing across the call that runs that function, so after `let x: Optional<T> = Optional.none; xs.forEach(() => { x = Optional.some(…); });` it still types `x` as `None`, and folding `Optional.isSome(x)` to `false` would change what runs.
