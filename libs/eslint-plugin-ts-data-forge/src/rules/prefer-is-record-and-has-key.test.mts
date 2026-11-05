@@ -36,6 +36,118 @@ describe('prefer-is-record-and-has-key', () => {
       },
     ],
     invalid: [
+      // #3267: `Object.hasOwn` answers for a function's own properties, and
+      // `isRecord` rejects every function, so the rewrite is fixed only where
+      // the object cannot be one.
+      {
+        name: 'suggests, not fixes, Object.hasOwn on a function',
+        code: dedent`
+          declare const fn: () => void;
+          const ok = Object.hasOwn(fn, 'k');
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'hasOwnAcceptsFunctions',
+            suggestions: [
+              {
+                messageId: 'suggestRecordCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-data-forge';
+                  declare const fn: () => void;
+                  const ok = (isRecord(fn) && hasKey(fn, 'k'));
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'suggests, not fixes, Object.hasOwn on a class constructor',
+        code: dedent`
+          declare class Widget {
+            static readonly k: number;
+          }
+          const ok = Object.hasOwn(Widget, 'k');
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'hasOwnAcceptsFunctions',
+            suggestions: [
+              {
+                messageId: 'suggestRecordCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-data-forge';
+                  declare class Widget {
+                    static readonly k: number;
+                  }
+                  const ok = (isRecord(Widget) && hasKey(Widget, 'k'));
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'suggests, not fixes, Object.hasOwn on object',
+        code: dedent`
+          declare const o: object;
+          const ok = Object.hasOwn(o, 'k');
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'hasOwnAcceptsFunctions',
+            suggestions: [
+              {
+                messageId: 'suggestRecordCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-data-forge';
+                  declare const o: object;
+                  const ok = (isRecord(o) && hasKey(o, 'k'));
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'suggests, not fixes, Object.hasOwn on unknown',
+        code: dedent`
+          declare const u: unknown;
+          const ok = Object.hasOwn(u, 'k');
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'hasOwnAcceptsFunctions',
+            suggestions: [
+              {
+                messageId: 'suggestRecordCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-data-forge';
+                  declare const u: unknown;
+                  const ok = (isRecord(u) && hasKey(u, 'k'));
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'still fixes Object.hasOwn on a plain object type, which cannot be a function',
+        code: dedent`
+          declare const plain: { readonly k?: number };
+          const ok = Object.hasOwn(plain, 'k');
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-data-forge';
+          declare const plain: { readonly k?: number };
+          const ok = (isRecord(plain) && hasKey(plain, 'k'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
       {
         name: 'drops isRecord when the object already has a string index signature',
         code: dedent`
@@ -63,25 +175,35 @@ describe('prefer-is-record-and-has-key', () => {
         errors: [{ messageId: 'useHasKey' }],
       },
       {
-        name: 'keeps isRecord for an index-signature-carrying callable',
+        name: 'keeps isRecord for an index-signature-carrying callable, as a suggestion',
         code: dedent`
           type Callable = { (): void; [key: string]: unknown };
           declare const obj: Callable;
           const ok = Object.hasOwn(obj, 'a');
         `,
-        output: dedent`
-          import { isRecord, hasKey } from 'ts-data-forge';
-          type Callable = { (): void; [key: string]: unknown };
-          declare const obj: Callable;
-          const ok = (isRecord(obj) && hasKey(obj, 'a'));
-        `,
-        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+        output: null,
+        errors: [
+          {
+            messageId: 'hasOwnAcceptsFunctions',
+            suggestions: [
+              {
+                messageId: 'suggestRecordCheck',
+                output: dedent`
+                  import { isRecord, hasKey } from 'ts-data-forge';
+                  type Callable = { (): void; [key: string]: unknown };
+                  declare const obj: Callable;
+                  const ok = (isRecord(obj) && hasKey(obj, 'a'));
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'imports isRecord once when both forms appear in a file',
         code: dedent`
           declare const rec: Record<string, unknown>;
-          declare const unk: unknown;
+          declare const unk: { readonly b?: number } | null;
           const a = Object.hasOwn(rec, 'a');
           const b = Object.hasOwn(unk, 'b');
         `,
@@ -89,14 +211,14 @@ describe('prefer-is-record-and-has-key', () => {
           dedent`
             import { hasKey } from 'ts-data-forge';
             declare const rec: Record<string, unknown>;
-            declare const unk: unknown;
+            declare const unk: { readonly b?: number } | null;
             const a = hasKey(rec, 'a');
             const b = Object.hasOwn(unk, 'b');
           `,
           dedent`
             import { hasKey, isRecord } from 'ts-data-forge';
             declare const rec: Record<string, unknown>;
-            declare const unk: unknown;
+            declare const unk: { readonly b?: number } | null;
             const a = hasKey(rec, 'a');
             const b = (isRecord(unk) && hasKey(unk, 'b'));
           `,
@@ -455,7 +577,7 @@ describe('prefer-is-record-and-has-key where the rewrite would change behavior',
         output: null,
         errors: [
           { messageId: 'inReadsPrototypeChain' },
-          { messageId: 'useIsRecordAndHasKey' },
+          { messageId: 'hasOwnAcceptsFunctions' },
           { messageId: 'inReadsPrototypeChain' },
         ],
       },
