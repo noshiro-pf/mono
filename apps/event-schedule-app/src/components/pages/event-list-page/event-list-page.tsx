@@ -19,13 +19,14 @@ import {
 } from 'synstate-dom';
 import { Arr, Result, match } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
-import { createToaster, showToast } from '../../../functions/index.mjs';
+import { showToast } from '../../../functions/index.mjs';
 import {
   Auth,
   EventListPageFilterStore,
   EventListStore,
   api,
   eventList$,
+  toaster,
 } from '../../../store/index.mjs';
 import { Header } from '../../organisms/index.mjs';
 import { EventListItemComponent } from './event-list-item.js';
@@ -220,8 +221,6 @@ export const EventListPage = (): JSX.Element => {
   );
 };
 
-const toast = createToaster();
-
 const archiveOrUnarchiveHandler =
   (archiveOrUnarchive: 'archive' | 'unarchive') =>
   async (eventId: string, user: User): Promise<void> => {
@@ -230,10 +229,14 @@ const archiveOrUnarchiveHandler =
     if (Result.isErr(result)) {
       console.error(result.value);
 
-      showToast({ toast, message: dc.errorOccurred, intent: 'danger' });
+      showToast({
+        toast: toaster,
+        message: dc.errorOccurred,
+        intent: 'danger',
+      });
     } else {
       showToast({
-        toast,
+        toast: toaster,
         message: match(archiveOrUnarchive, {
           archive: dc.archivingDone,
           unarchive: dc.unArchivingDone,

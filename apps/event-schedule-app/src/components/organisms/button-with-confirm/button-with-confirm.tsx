@@ -2,7 +2,8 @@ import { Button, type IconName, type IconName20 } from 'blueprint-synstate';
 import { createState, onScopeDispose } from 'synstate';
 import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { hasKey, isRecord } from 'ts-data-forge';
-import { createToaster, showToast } from '../../../functions/index.mjs';
+import { showToast } from '../../../functions/index.mjs';
+import { toaster } from '../../../store/index.mjs';
 import { nowrapClass } from '../../styled/index.mjs';
 import { ConfirmDialog } from './confirm-dialog.js';
 
@@ -26,8 +27,6 @@ type Props = Readonly<{
   }>;
   toastConfig?: Readonly<{ message: string; intent: Intent }>;
 }>;
-
-const toast = createToaster();
 
 /** A button that asks in an alert before it does what it says. */
 export const ButtonWithConfirm = ({
@@ -53,7 +52,7 @@ export const ButtonWithConfirm = ({
   const afterConfirm = (): void => {
     if (toastConfig !== undefined) {
       showToast({
-        toast,
+        toast: toaster,
         message: toastConfig.message,
         intent: toastConfig.intent,
       });

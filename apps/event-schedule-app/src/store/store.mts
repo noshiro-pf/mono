@@ -5,11 +5,11 @@
  * Nothing else creates a store, or reaches Firebase other than through `api`.
  */
 
+import { createToaster } from 'blueprint-synstate';
 import { createApi, initializeFirebase } from '../api/index.mjs';
 import { fetchThrottleTime } from '../constants/index.mjs';
 import {
   EventScheduleAppLocalStorage,
-  createToaster,
   fetchHolidaysJson,
 } from '../functions/index.mjs';
 import { now } from '../utils/index.mjs';
@@ -54,6 +54,12 @@ import {
 export const api = createApi(initializeFirebase());
 
 export const Router = createAppRouter();
+
+/**
+ * The app's one toaster, which every store and page shows its toasts in, so
+ * that toasts shown at once stack rather than overlap.
+ */
+export const toaster: Promise<Toaster> = Promise.resolve(createToaster());
 
 export const Auth = createAuthStore({ auth: api.auth, router: Router });
 
@@ -126,7 +132,7 @@ export const AnswerPageStore = createAnswerPageStore({
   auth: Auth,
   router: Router,
   eventSchedule$,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 export const CreateEventScheduleStore = createCreateEventScheduleStore({
@@ -144,7 +150,7 @@ export const CreateEventScheduleStore = createCreateEventScheduleStore({
   router: Router,
   now,
   saveDelayMs: 500,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 export const EditEventScheduleStore = createEditEventScheduleStore({
@@ -153,7 +159,7 @@ export const EditEventScheduleStore = createEditEventScheduleStore({
   answers: AnswersStore,
   eventSchedule: EventScheduleStore,
   router: Router,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 export const ConfirmEmailDialogStore = createConfirmEmailDialogStore({
@@ -161,13 +167,13 @@ export const ConfirmEmailDialogStore = createConfirmEmailDialogStore({
   router: Router,
   eventSchedule$,
   editEventSchedule: EditEventScheduleStore,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 export const GoogleSignInStore = createGoogleSignInStore({
   api,
   router: Router,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 export const RegisterPageStore = createRegisterPageStore({
@@ -175,20 +181,20 @@ export const RegisterPageStore = createRegisterPageStore({
   auth: Auth,
   router: Router,
   googleSignIn: GoogleSignInStore,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 export const ResetPasswordPageStore = createResetPasswordPageStore({
   api,
   router: Router,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 export const SignInPageStore = createSignInPageStore({
   api,
   router: Router,
   googleSignIn: GoogleSignInStore,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 export const UpdateUserInfoDialogStore = createUpdateUserInfoDialogStore();
@@ -197,7 +203,7 @@ export const DeleteAccountPageStore = createDeleteAccountPageStore({
   api,
   auth: Auth,
   dialog: UpdateUserInfoDialogStore,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 export const DeleteAccountCreatedWithGoogleStore =
@@ -205,28 +211,28 @@ export const DeleteAccountCreatedWithGoogleStore =
     api,
     auth: Auth,
     dialog: UpdateUserInfoDialogStore,
-    toast: createToaster(),
+    toast: toaster,
   });
 
 export const UpdateDisplayNamePageStore = createUpdateDisplayNamePageStore({
   api,
   auth: Auth,
   dialog: UpdateUserInfoDialogStore,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 export const UpdateEmailPageStore = createUpdateEmailPageStore({
   api,
   auth: Auth,
   dialog: UpdateUserInfoDialogStore,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 export const UpdatePasswordPageStore = createUpdatePasswordPageStore({
   api,
   auth: Auth,
   dialog: UpdateUserInfoDialogStore,
-  toast: createToaster(),
+  toast: toaster,
 });
 
 /**
@@ -238,8 +244,8 @@ export const UpdatePasswordPageStore = createUpdatePasswordPageStore({
  * Made on import, not here, because components import the stores by name:
  * the router (which reads `location`), `api` (which connects to Firebase), the
  * media store (which reads `matchMedia`, so that the first read of `isMobile$`
- * already has the screen width) and each page's toaster (which adds an element to
- * `document.body`).
+ * already has the screen width) and the toaster (which draws into
+ * `document.body` and listens for Escape on `document`).
  */
 export const startStore = (): (() => void) => {
   const stopAuth = Auth.start();
