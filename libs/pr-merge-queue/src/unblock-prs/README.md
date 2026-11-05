@@ -618,6 +618,11 @@ matrix の job まで読みます。どの失敗なら直せるか、何を実�
 `run` の `$1`〜`$9` は `context` のキャプチャで、シェル用にクォートして埋め込み
 ます。`fixers` は `stage` の小さい順、同じ `stage` ならコマンド順に実行します。
 
+このリポジトリでは、`prepare` か `fixers` の `context` が PR のワークフローの
+matrix が作るどのチェックも受け持たないと `check:root:auto-fix-contexts` が失敗
+するので、matrix の entry を改名したりまとめたりするときはパターンも一緒に直しま
+す。今後の entry のために残すパターンは、理由とともにそこに列挙します。
+
 このリポジトリの設定では、失敗した job が **すべて** `code-check (X)` か
 `style-check (X)` で、`X` が `fix:` か `gen:` のコマンド（`ws:` /
 `strict-lib:` 付きも含む）か、style-check のまとめた entry
@@ -1566,6 +1571,11 @@ resolved by hand and names `rebuild` instead.
 
 In `run`, `$1` to `$9` are `context`'s capture groups, shell-quoted. Fixers run
 by `stage`, lowest first, and within a stage by command.
+
+Here, `check:root:auto-fix-contexts` fails when a `prepare` or `fixers`
+`context` takes no check the pull request workflows' matrices produce, so
+renaming or bundling a matrix entry has to move its pattern with it. A pattern
+kept for an entry to come is listed there with its reason.
 
 This repository's configuration fixes a failure when **every** job that failed
 is a `code-check (X)` or `style-check (X)` entry whose `X` is a `fix:` or `gen:`
