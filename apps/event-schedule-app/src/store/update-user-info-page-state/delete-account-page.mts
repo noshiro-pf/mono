@@ -4,6 +4,7 @@ import type { StrictPick } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import {
   type DeleteAccountPageState,
+  credentialErrorOf,
   deleteAccountPageHasError,
   deleteAccountPageInitialState,
   deleteAccountPageStateReducer,
@@ -116,8 +117,8 @@ export const createDeleteAccountPageStore = <
     );
 
     if (Result.isErr(res1)) {
-      switch (res1.value.code) {
-        case 'auth/wrong-password':
+      switch (credentialErrorOf(res1.value.code)) {
+        case 'wrongPassword':
           dispatch({
             type: 'setPasswordError',
             payload: dc.reauthenticate.message.wrongPassword,
@@ -125,7 +126,19 @@ export const createDeleteAccountPageStore = <
 
           break;
 
-        default:
+        // The email is typed here too, so either of the two may be wrong.
+        case 'wrongEmailOrPassword':
+          dispatch({
+            type: 'setPasswordError',
+            payload: dc.reauthenticate.message.wrongEmailOrPassword,
+          });
+
+          break;
+
+        // Signing in again reports an email of no account as
+        // `auth/user-mismatch`, not `auth/user-not-found`.
+        case 'userNotFound':
+        case undefined:
           console.error(
             'error occurred on reauthenticateWithCredential:',
             res1.value.code,
@@ -195,7 +208,13 @@ export const createDeleteAccountPageStore = <
   };
 
   const inputEmailHandler = (value: string): void => {
-    dispatch({ type: 'inputEmail', payload: value });
+    const s = dispatch({ type: 'inputEmail', payload: value });
+
+    // That message may be about the email, so changing the email answers it as
+    // well as retyping the password does.
+    if (s.password.error === dc.reauthenticate.message.wrongEmailOrPassword) {
+      dispatch({ type: 'inputPassword', payload: s.password.inputValue });
+    }
   };
 
   const inputPasswordHandler = (value: string): void => {

@@ -1,7 +1,7 @@
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'synstate-router';
 import { Result } from 'ts-data-forge';
-import { routes } from '../../constants/index.mjs';
+import { dict, routes } from '../../constants/index.mjs';
 import { createAppRouter } from '../router-store.mjs';
 import { createSignInPageStore, type SignInPage } from './sign-in-page.mjs';
 
@@ -22,10 +22,92 @@ describe(createSignInPageStore, () => {
     assert.strictEqual(toasts.count, 1);
   });
 
-  test('says which field is wrong', async () => {
-    const { store, browser } = setup(() =>
-      Result.err({ code: 'auth/wrong-password', message: '' }),
+  test.each([
+    {
+      code: 'auth/wrong-password',
+      email: undefined,
+      password: dict.register.message.error.wrongPassword,
+    },
+    {
+      code: 'auth/user-not-found',
+      email: dict.register.message.error.userNotFound,
+      password: undefined,
+    },
+    // Email enumeration protection reports both of the above this way, so the
+    // page cannot say which of the two is wrong.
+    {
+      code: 'auth/invalid-credential',
+      email: undefined,
+      password: dict.register.message.error.wrongEmailOrPassword,
+    },
+  ] as const)(
+    'says which field is wrong on $code, without a toast',
+    async ({ code, email, password }) => {
+      const { store, browser, toasts } = setup(() =>
+        Result.err({ code, message: '' }),
+      );
+
+      fill(store);
+
+      store.enterClickHandler();
+
+      await settle();
+
+      const { formState } = store.state.getSnapshot().value;
+
+      assert.strictEqual(formState.email.error, email);
+
+      assert.strictEqual(formState.password.error, password);
+
+      assert.isUndefined(formState.otherErrors);
+
+      assert.strictEqual(toasts.count, 0);
+
+      assert.strictEqual(browser.url().pathname, '/signIn/');
+    },
+  );
+
+  test.each([
+    { code: 'auth/invalid-credential', cleared: true },
+    { code: 'auth/wrong-password', cleared: false },
+  ] as const)(
+    'after $code, fixing the email clears the password error: $cleared',
+    async ({ code, cleared }) => {
+      const { store } = setup(() => Result.err({ code, message: '' }));
+
+      fill(store);
+
+      store.enterClickHandler();
+
+      await settle();
+
+      store.inputEmailHandler('alicia@example.com');
+
+      const { formState, enterButtonDisabled } =
+        store.state.getSnapshot().value;
+
+      // The message says the email may be what was wrong, so fixing it lets the
+      // form be sent again without retyping the password.
+      assert.strictEqual(formState.password.error === undefined, cleared);
+
+      assert.strictEqual(formState.password.inputValue, 'password123');
+
+      assert.strictEqual(enterButtonDisabled, !cleared);
+    },
+  );
+
+  test('any other failure is a toast, with the message under the form', async () => {
+    const { store, toasts } = setup(() =>
+      Result.err({ code: 'auth/too-many-requests', message: 'slow down' }),
     );
+
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    onTestFinished(() => {
+      consoleError.mockRestore();
+    });
 
     fill(store);
 
@@ -33,9 +115,13 @@ describe(createSignInPageStore, () => {
 
     await settle();
 
-    assert.isDefined(store.state.getSnapshot().value.formState.password.error);
+    const { formState } = store.state.getSnapshot().value;
 
-    assert.strictEqual(browser.url().pathname, '/signIn/');
+    assert.isUndefined(formState.password.error);
+
+    assert.strictEqual(formState.otherErrors, 'slow down');
+
+    assert.strictEqual(toasts.count, 1);
   });
 
   test('does nothing while the form has an error', async () => {

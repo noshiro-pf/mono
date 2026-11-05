@@ -4,6 +4,7 @@ import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { dict, routes } from '../../constants/index.mjs';
 import {
+  credentialErrorOf,
   showToast,
   signInPageHasError,
   signInPageInitialState,
@@ -105,24 +106,32 @@ export const createSignInPageStore = (deps: SignInPageDeps): SignInPage => {
     );
 
     if (Result.isErr(signInResult)) {
-      switch (signInResult.value.code) {
-        case 'auth/user-not-found':
+      switch (credentialErrorOf(signInResult.value.code)) {
+        case 'userNotFound':
           dispatch({
             type: 'setEmailError',
-            payload: dict.register.message.error.userNotFound,
+            payload: dc.message.error.userNotFound,
           });
 
           break;
 
-        case 'auth/wrong-password':
+        case 'wrongPassword':
           dispatch({
             type: 'setPasswordError',
-            payload: dict.register.message.error.wrongPassword,
+            payload: dc.message.error.wrongPassword,
           });
 
           break;
 
-        default:
+        case 'wrongEmailOrPassword':
+          dispatch({
+            type: 'setPasswordError',
+            payload: dc.message.error.wrongEmailOrPassword,
+          });
+
+          break;
+
+        case undefined:
           console.error(signInResult.value);
 
           dispatch({
@@ -156,7 +165,13 @@ export const createSignInPageStore = (deps: SignInPageDeps): SignInPage => {
   };
 
   const inputEmailHandler = (value: string): void => {
-    dispatch({ type: 'inputEmail', payload: value });
+    const s = dispatch({ type: 'inputEmail', payload: value });
+
+    // That message may be about the email, so changing the email answers it as
+    // well as retyping the password does.
+    if (s.password.error === dc.message.error.wrongEmailOrPassword) {
+      dispatch({ type: 'inputPassword', payload: s.password.inputValue });
+    }
   };
 
   const inputPasswordHandler = (value: string): void => {

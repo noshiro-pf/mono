@@ -27,6 +27,7 @@ export const signInAndRegisterPageDictionary = {
       weakPassword: 'パスワードは6文字以上で入力してください。',
       userNotFound: 'ユーザーが見つかりません。',
       wrongPassword: 'パスワードが間違っています。',
+      wrongEmailOrPassword: 'メールアドレスまたはパスワードが間違っています。',
       unknownErrorOnRegister: 'アカウント作成に失敗しました。',
       unknownErrorOnSignIn: 'ログインに失敗しました。',
       unknownErrorOnSendingResetPasswordEmail:
