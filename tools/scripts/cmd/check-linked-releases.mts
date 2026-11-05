@@ -1,20 +1,22 @@
-import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
   Arr,
   hasKey,
   isRecord,
   isString,
-  Json,
   Result,
   unknownToString,
 } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import {
+  CHANGESETS_CONFIG_FILE,
   isBreaking,
   listChangesetBumps,
   readChangesets,
+  readChangesetsConfigFile,
+  readReleaseConfig,
   type ChangesetFile,
+  type ReleasePackage,
 } from '../lib/changesets.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -42,9 +44,12 @@ import { projectRootPath } from '../project-root-path.mjs';
  * - changesets in `.changeset/` give some members of a linked group a breaking
  *   bump — `major`, or `minor` while the member is still `0.x` — and leave
  *   others out;
- * - a linked group names something that is not a workspace package, which
- *   `changeset` would reject only when it next runs — at release time — and a
- *   glob would silently take in a package added later.
+ * - `.changeset/config.json` is not one `changeset version` accepts — a group
+ *   naming what is not a workspace package, say — which it would reject only
+ *   when it next runs, at release time.
+ *
+ * The groups are read as `changeset version` reads them, globs expanded
+ * (`readReleaseConfig`), as `check:prose:dependent-releases` reads them.
  *
  * It is a `check:prose` guard because a changeset is Markdown, and
  * `code-check.yml` skips a diff of Markdown alone.
@@ -62,19 +67,6 @@ export const checkLinkedReleases = ({
   const bumps = listChangesetBumps(changesets);
 
   const violations = linked.flatMap((group): readonly string[] => {
-    const unknown = group.filter((name) => !versions.has(name));
-
-    if (Arr.isNonEmpty(unknown)) {
-      return [
-        [
-          `The linked group [${group.join(', ')}] names what is not a workspace`,
-          'package. List each member by its package name, without a glob:',
-          '',
-          ...unknown.map((name) => `  - ${name}`),
-        ].join('\n'),
-      ];
-    }
-
     const breaking = Arr.generate(function* () {
       for (const name of group) {
         const version = versions.get(name) ?? '';
@@ -118,7 +110,7 @@ export const checkLinkedReleases = ({
   return Arr.isNonEmpty(violations)
     ? Result.err(
         [
-          `❌ ${violations.length} problem(s) with the linked groups in ${CONFIG_FILE}:`,
+          `❌ ${violations.length} problem(s) with the linked groups in ${CHANGESETS_CONFIG_FILE}:`,
           '',
           ...violations.flatMap((violation) => [violation, '']),
           `Why a linked group releases its majors together: ${path.relative(projectRootPath, SELF)}.`,
@@ -127,76 +119,43 @@ export const checkLinkedReleases = ({
     : Result.ok(linked.length);
 };
 
-/**
- * The `fixed` or `linked` groups of a changesets config. A config without the
- * key has none; one whose key is not a list of lists of strings is an error.
- */
-export const parseReleaseGroups = (
-  config: string,
-  key: 'fixed' | 'linked',
-): Result<readonly (readonly string[])[], string> => {
-  const parsed = Json.parse(config);
-
-  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
-    return Result.err(`${CONFIG_FILE} is not a JSON object.`);
-  }
-
-  if (!hasKey(parsed.value, key)) {
-    return Result.ok([]);
-  }
-
-  const groups = parsed.value[key];
-
-  if (
-    !Arr.isArray(groups) ||
-    !groups.every(
-      (group): group is readonly string[] =>
-        Arr.isArray(group) && group.every(isString),
-    )
-  ) {
-    return Result.err(
-      `${CONFIG_FILE}: "${key}" is not a list of lists of package names.`,
-    );
-  }
-
-  return Result.ok(groups);
-};
-
-const CONFIG_FILE = '.changeset/config.json';
-
 const SELF = path.resolve(
   projectRootPath,
   'tools/scripts/cmd/check-linked-releases.mts',
 );
 
-const readVersions = async (): Promise<ReadonlyMap<string, string>> => {
+/** Every workspace package with a version, as a release config reads it. */
+const readPackages = async (): Promise<readonly ReleasePackage[]> => {
   const packages = await getWorkspacePackages(projectRootPath);
 
-  return new Map(
-    Arr.generate(function* () {
-      for (const pkg of packages) {
-        if (
-          isRecord(pkg.packageJson) &&
-          hasKey(pkg.packageJson, 'version') &&
-          isString(pkg.packageJson.version)
-        ) {
-          yield [pkg.name, pkg.packageJson.version] as const;
-        }
+  return Arr.generate(function* () {
+    for (const pkg of packages) {
+      if (
+        isRecord(pkg.packageJson) &&
+        hasKey(pkg.packageJson, 'version') &&
+        isString(pkg.packageJson.version)
+      ) {
+        yield { name: pkg.name, version: pkg.packageJson.version } as const;
       }
-    }),
-  );
+    }
+  });
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await Promise.all([
     readChangesets(),
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(path.resolve(projectRootPath, CONFIG_FILE), 'utf8'),
-    readVersions(),
+    readChangesetsConfigFile(),
+    readPackages(),
   ])
-    .then(([changesets, config, versions]) =>
-      Result.flatMap(parseReleaseGroups(config, 'linked'), (linked) =>
-        checkLinkedReleases({ changesets, linked, versions }),
+    .then(([changesets, config, packages]) =>
+      Result.flatMap(readReleaseConfig(config, packages), ({ linked }) =>
+        checkLinkedReleases({
+          changesets,
+          linked,
+          versions: new Map(
+            packages.map(({ name, version }) => [name, version] as const),
+          ),
+        }),
       ),
     )
     .catch((error: unknown) => Result.err(unknownToString(error)));
