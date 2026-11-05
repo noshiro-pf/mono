@@ -1,5 +1,32 @@
 # blueprint-synstate
 
+## 0.8.0
+
+### Minor Changes
+
+- 1c656e9: Add `DateRangePicker` and `DateRangeInput`, showing one month, in Blueprint's markup. The picker draws the range picked and, while the pointer is over a day, the range a press there would make; the input opens it below its two fields, takes days typed and moves each end by the arrow keys, as Blueprint's does. `DatePicker` and `DateInput` take `shortcuts`, drawn in a menu before the calendar.
+
+    An overlay such as `Dialog` no longer closes on an Escape that a control in it has taken, as `DateInput` and `DateRangeInput` do to close their calendar.
+
+- 7bf9cc6: Add `Dialog` and `Alert`, drawn in a portal over a backdrop with Blueprint's transitions, focus traps and body class, and the `small-cross` icon, the 20px drawings of the icons an `Alert` shows, and icon size 40.
+- 1a77fc3: Add what event-schedule-app needed in moving off Blueprint React: `iconElement` on `Button` and `AnchorButton` for an icon of the app's own; `color`, `intent` and the 12 and 28 pixel sizes on `Icon`; `inputRef` on `InputGroup`; `reverseMonthAndYearMenus` on `DatePicker`; `shortcuts` on `DateInput` given as a function, made again each time the calendar opens; `vertical` on `ButtonGroup`; `maxLength` on `TextArea`; and `data-e2e` on each `TagInput` value, put on its tag.
+
+    `InputGroup` with `autoFocus` takes focus as it is drawn, at any time, as React's `autoFocus` does; the attribute alone is honoured once per page.
+
+    An overlay such as `Dialog` writes its transition phase after the update that opened or closed it, not during it, so opening one no longer has synstate warn of a write while an update propagates.
+
+- 669356e: Add `AnchorButton`, `ControlGroup`, `FormGroup`, `NonIdealState`, `Switch` and `TextArea` (with `autoResize`), a `loading` state on `Button`, a `rightElement`, `onBlur`, `autoComplete` and `autoFocus` on `InputGroup`, 27 more icons, and icon sizes 32 and 48 drawn from the 20px set. `InputGroup`'s `intent` and `type` may now change after mount. `Button` is no longer drawn pressed (`bp6-active`) while it is disabled, as Blueprint's is not.
+- a1c4ec3: Add `Popover`, `Tooltip`, `Menu` and `MenuItem`, placed by Floating UI with Blueprint's middleware, and the `caret-right` icon. An overlay that has opened now leaves its empty `div.bp6-overlay` behind once it closes, as Blueprint's does.
+- 87ed877: Add `Tag`, `TagInput`, `RangeSlider` and `BpText` (Blueprint's `Text`), in Blueprint's markup. `TagInput` adds what is typed, pasted or left on blur, and moves through and removes its tags by the keys; `RangeSlider` is dragged, pressed on its track and keyed, each handle stopping at the other. `MenuItem` now cuts its text short through `BpText`.
+- da75f32: Add `createToaster`, Blueprint's `OverlayToaster.create`: toasts that queue, time out, pause under the pointer, and animate in and out as Blueprint's style sheets do. A dialog opened with a toast on show still takes focus, and a press on its backdrop brings focus back whatever is open over it, as Blueprint's do.
+
+### Patch Changes
+
+- Updated dependencies [39ac703]
+    - ts-data-forge@14.12.0
+    - synstate@7.0.1
+    - synstate-dom@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

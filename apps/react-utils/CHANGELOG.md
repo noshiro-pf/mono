@@ -1,5 +1,15 @@
 # react-utils
 
+## 0.0.28
+
+### Patch Changes
+
+- Updated dependencies [39ac703]
+    - ts-data-forge@14.12.0
+    - better-react-use-state@1.0.1
+    - synstate@7.0.1
+    - ts-std-forge@0.5.3
+
 ## 0.0.27
 
 ### Patch Changes

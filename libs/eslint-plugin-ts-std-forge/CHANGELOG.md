@@ -1,5 +1,21 @@
 # eslint-plugin-ts-std-forge
 
+## 0.1.21
+
+### Patch Changes
+
+- 9c5c814: `prefer-is-non-null-object` (eslint-plugin-ts-data-forge and eslint-plugin-ts-std-forge) and the `createPreferIsNonNullObject` factory it is built from (eslint-rule-forge) no longer report, or rewrite, `typeof u === 'object' && u !== null` when `u` is a global or a `declare`d name. `typeof window === 'object' && window !== null` returns `false` where `window` does not exist, while `isNonNullObject(window)` throws a `ReferenceError`. The other order, `u !== null && typeof u === 'object'`, already reads `u` and is fixed as before, as is either order on a name the file creates at runtime — a variable, a parameter, a value import.
+
+    eslint-rule-forge also exports `isRuntimeBound(sourceCode, node, name)`, which tells whether a name read at a node is a value the file creates at runtime rather than a global, a `declare`d name, a type-only import or a `const enum`.
+
+- 95c464f: `prefer-is-record-and-has-key` no longer auto-fixes `key in obj` unless `obj` is typed as a plain record: `Record<string, …>`, or an object type literal or object literal with a string index signature, none of whose properties a class or an interface declares. On a class, an interface, a type parameter, a mapped type over a class (`Readonly<Bag>`) or anything else, always without type information, and for a literal key naming a member of `Object.prototype` (`'constructor' in rec`), it reports `inReadsPrototypeChain` and offers the rewrite as a suggestion. `hasKey` checks own properties where `in` walks the prototype chain, and `isRecord` rejects functions, so the fix turned `'then' in promise`, `'size' in map`, a class method check and `'name' in fn` from `true` to `false`. The fix on a plain record still turns a key read at run time that names an `Object.prototype` member from `true` to `false`.
+- b2ce1b1: `prefer-is-record-and-has-key` fixes `Object.hasOwn(obj, key)` into `isRecord(obj) && hasKey(obj, key)` only when type information shows that `obj` cannot be a function at any layer of type wrappers: no call or construct signature, and not `object`, `unknown`, `any`, `Function` or a type parameter constrained by one of them. `isRecord` rejects every function, which `Object.hasOwn` accepts (`Object.hasOwn(fn, 'name')`, a class's static members), so the fix turned those from `true` to `false`. Elsewhere, and without type information, the rewrite is a suggestion that says so.
+- Updated dependencies [9c5c814]
+- Updated dependencies [95c464f]
+- Updated dependencies [b2ce1b1]
+    - eslint-rule-forge@0.8.0
+    - ts-std-forge@0.5.3
+
 ## 0.1.20
 
 ### Patch Changes
