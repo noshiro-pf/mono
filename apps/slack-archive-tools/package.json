@@ -27,8 +27,7 @@
   },
   "dependencies": {
     "ts-data-forge": "workspace:*",
-    "ts-fortress": "workspace:*",
-    "ts-repo-utils": "workspace:*"
+    "ts-fortress": "workspace:*"
   },
   "devDependencies": {
     "eslint": "catalog:",
@@ -36,7 +35,6 @@
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
-    "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "ts-type-forge": "workspace:*",
