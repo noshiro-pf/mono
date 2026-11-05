@@ -2,12 +2,13 @@
 import { Arr } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
 import { hasDisableNextLineComment } from '../functions/index.mjs';
-import { replaceNodeWithText } from '../utils/index.mjs';
+import {
+  ensureTsTypeForgeTypeImport,
+  replaceNodeWithText,
+} from '../utils/index.mjs';
 import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'replace-record-with-unknown-record';
-
-const UNKNOWN_RECORD_MODULE = 'ts-type-forge';
 
 const UNKNOWN_RECORD_NAME = 'UnknownRecord';
 
@@ -15,9 +16,8 @@ const UNKNOWN_RECORD_NAME = 'UnknownRecord';
  * Replaces `Readonly<Record<string, unknown>>`, `Record<string, unknown>`, and
  * index signatures `[k: string]: unknown` with `UnknownRecord`.
  *
- * When a replacement occurs, also inserts
- * `import { type UnknownRecord } from 'ts-type-forge';` at the top of the
- * source file (or merges into an existing import from `'ts-type-forge'`).
+ * When a replacement occurs, also imports `UnknownRecord` from `ts-type-forge`
+ * as {@link ensureTsTypeForgeTypeImport} does.
  */
 export const replaceRecordWithUnknownRecordTransformer =
   (): TsMorphTransformer =>
@@ -30,7 +30,7 @@ export const replaceRecordWithUnknownRecordTransformer =
         );
 
         if (containerModifications.includes(true)) {
-          ensureUnknownRecordImport(sourceAst);
+          ensureTsTypeForgeTypeImport(sourceAst, UNKNOWN_RECORD_NAME);
         }
       },
     }) as const;
@@ -276,32 +276,4 @@ const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): boolean => {
       return node.getTypeArguments().map(visitTypeNode).includes(true);
     }
   }
-};
-
-const ensureUnknownRecordImport = (sourceFile: tsm.SourceFile): void => {
-  const existingImport = sourceFile
-    .getImportDeclarations()
-    .find((decl) => decl.getModuleSpecifierValue() === UNKNOWN_RECORD_MODULE);
-
-  if (existingImport === undefined) {
-    sourceFile.insertImportDeclaration(0, {
-      moduleSpecifier: UNKNOWN_RECORD_MODULE,
-      namedImports: [{ name: UNKNOWN_RECORD_NAME, isTypeOnly: true }],
-    });
-
-    return;
-  }
-
-  const alreadyImported = existingImport
-    .getNamedImports()
-    .some((ni) => ni.getName() === UNKNOWN_RECORD_NAME);
-
-  if (alreadyImported) {
-    return;
-  }
-
-  existingImport.addNamedImport({
-    name: UNKNOWN_RECORD_NAME,
-    isTypeOnly: true,
-  });
 };
