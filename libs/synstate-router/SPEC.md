@@ -1,11 +1,12 @@
 # synstate-router 実装仕様
 
 <!-- cspell:ignore Rocon Chicane Valibot ArkType typegen splat devtools -->
+<!-- doc-paths-ignore: apps/tiny-router-observable -->
 
 アプリが書く遷移先・パスパラメータ・検索パラメータをすべて型で検査し、現在地を synstate の Observable として配るクライアントサイドルーターの実装仕様。v1 の目標は「文字列で書いた URL がどこにも残らない」ことで、TanStack Router と同等以上の型安全性を、コード生成も module augmentation もなしに得る。
 
-- 状態: 仕様 v1 確定（2026-11-02）。「11. 実装計画」の 6 のうちサンプルアプリ・e2e・synstate-docs のページまで入り、3 パッケージの 0.1.0 を npm に公開した（2026-11-04）。残りは tiny-router-observable を使うアプリ（`event-schedule-app`・`profile`）の移行と tiny-router の引退。
-- 出典: issue [#1733](https://github.com/noshiro-pf/mono/issues/1733)、`apps/tiny-router-observable` とその不具合 [#2912](https://github.com/noshiro-pf/mono/issues/2912)・[#2954](https://github.com/noshiro-pf/mono/issues/2954)・[#2956](https://github.com/noshiro-pf/mono/issues/2956)・[#3033](https://github.com/noshiro-pf/mono/issues/3033)。
+- 状態: 仕様 v1 確定（2026-11-02）。「11. 実装計画」の 6 のうちサンプルアプリ・e2e・synstate-docs のページまで入り、3 パッケージの 0.1.0 を npm に公開した（2026-11-04）。`event-schedule-app`・`profile` を移し終え（#3400・#3401）、tiny-router-* を削除して 6 を終えた（2026-11-05）。
+- 出典: issue [#1733](https://github.com/noshiro-pf/mono/issues/1733)、[`apps/tiny-router-observable`](https://github.com/noshiro-pf/mono/tree/04646e536b68d01e9806b99ed51f7a238568e30e/apps/tiny-router-observable)（削除済み）とその不具合 [#2912](https://github.com/noshiro-pf/mono/issues/2912)・[#2954](https://github.com/noshiro-pf/mono/issues/2954)・[#2956](https://github.com/noshiro-pf/mono/issues/2956)・[#3033](https://github.com/noshiro-pf/mono/issues/3033)。
 
 ## 1. 目的と範囲
 
@@ -391,7 +392,7 @@ const App = (): JSX.Element => (
 - [TanStack Router](https://github.com/TanStack/router): 文字列 pattern + ツリー。module augmentation と生成したルートツリーで型を通す。
 - [Type Route](https://github.com/zilch/type-route): パラメータ型の明示宣言。フラット構造のみ。
 - [Chicane](https://github.com/swan-io/chicane): 文字列 pattern + フラット。union 型パラメータ。
-- `apps/tiny-router-observable`: Observable ベースの既存ルーター。履歴層の出発点。
+- [`apps/tiny-router-observable`](https://github.com/noshiro-pf/mono/tree/04646e536b68d01e9806b99ed51f7a238568e30e/apps/tiny-router-observable): Observable ベースの既存ルーター。履歴層の出発点。synstate-router に置き換えて削除した。
 
 ## 10. 今後のタスク（React Router・TanStack Router にあって v1 にない機能）
 

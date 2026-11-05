@@ -372,18 +372,8 @@
       "project": ["**/*.mts"],
     },
 
-    "apps/tiny-router-observable": {
-      "entry": ["src/index.mts"],
-      "project": ["**/*.mts"],
-    },
-
     // Not an Astro site like the entry below assumes: a single entry point.
     "apps/resize-observer-react-hooks": {
-      "entry": ["src/index.mts"],
-      "project": ["**/*.mts"],
-    },
-
-    "apps/tiny-router-react-hooks": {
       "entry": ["src/index.mts"],
       "project": ["**/*.mts"],
     },
@@ -395,12 +385,6 @@
     },
 
     "apps/better-preact-use-state": {
-      "entry": ["src/index.mts"],
-      "project": ["**/*.mts"],
-    },
-
-    // Not an Astro site like the entry below assumes: a single entry point.
-    "apps/tiny-router-preact-hooks": {
       "entry": ["src/index.mts"],
       "project": ["**/*.mts"],
     },

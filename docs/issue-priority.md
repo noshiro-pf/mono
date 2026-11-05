@@ -76,8 +76,7 @@ open な issue はどれも、**優先度の段を表す `priority:<段>` ラベ
   `catan-dice`。
 - **置き換わる予定（`hold`）**: synstate-dom への移行で消える React 向けの
   `apps/` 内ユーティリティ — `react-utils`、`preact-utils`、`react-utils-styled`、
-  `react-blueprintjs-utils`、`numeric-input-utils`、`tiny-router-observable`、
-  `tiny-router-react-hooks`、`tiny-router-preact-hooks`。`event-schedule-app` の
+  `react-blueprintjs-utils`、`numeric-input-utils`。`event-schedule-app` の
   移行（#2649）が済んだら、残っている issue を閉じるか見直す。
 
 ## `Start-After:` との関係
