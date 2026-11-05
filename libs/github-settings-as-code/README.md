@@ -26,14 +26,16 @@ repo-settings <command> [target] [options]
 | `apply`  | Apply the local settings files to GitHub                               |
 | `backup` | Re-snapshot the local settings files from the current values on GitHub |
 
-| Target          | Files                                             | `apply` | `backup` |
-| --------------- | ------------------------------------------------- | ------- | -------- |
-| `all` (default) | All of the below                                  | ✅      | ✅       |
-| `repository`    | `repo-settings/repository-settings/settings.json` | ✅      | ✅       |
-| `rulesets`      | `repo-settings/rulesets/*.json`                   | ✅      | ✅       |
-| `variables`     | `repo-settings/variables/settings.json`           | ✅      | ✅       |
-| `actions`       | `repo-settings/actions-settings/settings.json`    | ✅      | ✅       |
-| `pages`         | `repo-settings/pages/settings.json`               | ✅      | ✅       |
+| Target                 | Files                                              | `apply` | `backup` |
+| ---------------------- | -------------------------------------------------- | ------- | -------- |
+| `all` (default)        | All of the below                                   | ✅      | ✅       |
+| `repository`           | `repo-settings/repository-settings/settings.json`  | ✅      | ✅       |
+| `rulesets`             | `repo-settings/rulesets/*.json`                    | ✅      | ✅       |
+| `variables`            | `repo-settings/variables/settings.json`            | ✅      | ✅       |
+| `actions`              | `repo-settings/actions-settings/settings.json`     | ✅      | ✅       |
+| `pages`                | `repo-settings/pages/settings.json`                | ✅      | ✅       |
+| `environments`         | `repo-settings/environments/*.json`                | ✅      | ✅       |
+| `vulnerability-alerts` | `repo-settings/vulnerability-alerts/settings.json` | ✅      | ✅       |
 
 ```sh
 repo-settings apply
@@ -81,14 +83,19 @@ under `permissions:`).
 
 ## Managed settings
 
-| File                                              | Location on GitHub                                     |
-| ------------------------------------------------- | ------------------------------------------------------ |
-| `repo-settings/repository-settings/settings.json` | Settings > General                                     |
-| `repo-settings/rulesets/*.json`                   | Settings > Rules > Rulesets                            |
-| `repo-settings/actions-settings/settings.json`    | Settings > Actions > General                           |
-| `repo-settings/pages/settings.json`               | Settings > Pages > Build and deployment                |
-| `repo-settings/variables/settings.json`           | Settings > Secrets and variables > Actions > Variables |
+| File                                               | Location on GitHub                                     |
+| -------------------------------------------------- | ------------------------------------------------------ |
+| `repo-settings/repository-settings/settings.json`  | Settings > General                                     |
+| `repo-settings/rulesets/*.json`                    | Settings > Rules > Rulesets                            |
+| `repo-settings/actions-settings/settings.json`     | Settings > Actions > General                           |
+| `repo-settings/pages/settings.json`                | Settings > Pages > Build and deployment                |
+| `repo-settings/variables/settings.json`            | Settings > Secrets and variables > Actions > Variables |
+| `repo-settings/environments/*.json`                | Settings > Environments                                |
+| `repo-settings/vulnerability-alerts/settings.json` | Settings > Advanced Security > Dependabot alerts       |
 
-In a repository without `repo-settings/pages/settings.json`, Pages is left
-untouched, so that a repository that does not use Pages never has it enabled by
-mistake.
+In a repository without `repo-settings/pages/settings.json`, `apply` leaves
+Pages untouched, so that a repository that does not use Pages never has it
+enabled by mistake. Without `repo-settings/vulnerability-alerts/settings.json`,
+`apply` likewise leaves Dependabot alerts as they are, rather than read the
+absence as "disable". `backup` always writes that file, even when the alerts are
+off, and from then on `apply` enforces it.
