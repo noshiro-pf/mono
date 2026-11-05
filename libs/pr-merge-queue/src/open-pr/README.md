@@ -116,7 +116,10 @@ B の番号を足し（無ければ先頭に行を作り）、B の本文の先�
 待っている PR の本文を読めば待つ理由がわかる、という前提を保つためです。
 名指した PR が open でなければ、また version PR（`blocks-release` を使います）
 や、この PR が後にマージされる相手（stack の下の層を含む）であれば、push の前に
-止まります。既に A がこの PR を名指していれば A は書き換えません。
+止まります。B ができてから分かる B の順序（既に開いていた B の本文の
+`Merge-After:` と、閉じる issue から足される順序）は、書き込んだ後、A に書く前に
+確かめます。そこで A を名指していれば、`skip-ci` と `auto-rebase` を付けた後、A
+に何も書かずに止まります。既に A がこの PR を名指していれば A は書き換えません。
 
 ### stacked PR
 
@@ -246,15 +249,18 @@ without it; this is the body stating the order. An issue linked by hand in
 the sidebar is not seen.
 
 **`--merge-before` is for work found to come first after the pull request
-needing it was opened.** Opening that work, B, with `--merge-before '#A'`
-adds B's number to the `Merge-After:` line of A's body once B exists (or
-writes one at the top), and opens B's body with a `Merges before #A, …` line.
-The declaration is A's `Merge-After:` alone; there is no reverse syntax such
-as `Merge-Before:`, so that why a pull request waits is always in its own
-body. The script stops before pushing when a pull request named is not open,
-is the version pull request (label B `blocks-release` instead), or is one B
-merges after, the layer it is stacked on included. A body that names B
-already is left alone.
+needing it was opened.** Opening that work, B, with `--merge-before '#A'` adds
+B's number to the `Merge-After:` line of A's body once B exists (or writes one
+at the top), and opens B's body with a `Merges before #A, …` line.
+The declaration is A's `Merge-After:` alone; there is no reverse syntax such as
+`Merge-Before:`, so that why a pull request waits is always in its own body. The
+script stops before pushing when a pull request named is not open, is the
+version pull request (label B `blocks-release` instead), or is one B merges
+after, the layer it is stacked on included. What B merges after only once B
+exists — the `Merge-After:` of B's body when it was open already, and the order
+the issues it closes add — is checked once it is written, before A is:
+naming A there stops the run with nothing written into A, after `skip-ci` and
+`auto-rebase` are on. A body that names B already is left alone.
 
 A `--base` that is another open pull request's branch stacks this one on it:
 the diff is its own layer, and `unblock-prs` and the reports treat it as
