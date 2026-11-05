@@ -25,6 +25,7 @@ export default defineViteConfig({
     optimizeDepsInclude: [
       '@blueprintjs/core',
       '@blueprintjs/datetime',
+      '@floating-ui/dom',
       'react',
       'react-dom',
       'react-dom/client',

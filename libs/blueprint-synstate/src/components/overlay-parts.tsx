@@ -1,7 +1,8 @@
-// Blueprint's `Overlay2` as `Dialog` and `Alert` use it: a portal into the
-// body, a backdrop, the content, and the focus traps round it, with
-// react-transition-group's classes as Blueprint's style sheets animate them.
-// Not part of the package's API: `gen:index:src` leaves it out of the barrel.
+// Blueprint's `Overlay2`, as `Dialog`, `Alert` and the popovers use it: a portal
+// into the body (or the overlay in place), an optional backdrop, the content,
+// and the focus traps round it, with react-transition-group's classes as
+// Blueprint's style sheets animate them. Not part of the package's API:
+// `gen:index:src` leaves it out of the barrel.
 import {
   createState,
   onScopeDispose,
@@ -21,7 +22,6 @@ import {
   type ClassObject,
   type JSX,
 } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
 import { classObject, focusablesIn, isInside } from '../internal/index.mjs';
 
 export type OverlayProps = Readonly<{
@@ -30,29 +30,66 @@ export type OverlayProps = Readonly<{
   onClose?: (event: Event) => void;
   /** Escape asks to close (`canEscapeKeyClose`, on by default). */
   canEscapeKeyClose?: boolean;
-  /** A press on the backdrop asks to close (`canOutsideClickClose`). */
+  /**
+   * A press on the backdrop asks to close, or, with none, a press anywhere
+   * outside the overlay and those opened over it (`canOutsideClickClose`).
+   */
   canOutsideClickClose?: boolean;
+  /** A backdrop under the content, which also marks the body; on by default. */
+  hasBackdrop?: boolean;
+  /** Focus is brought inside as it opens; on by default. */
+  autoFocus?: boolean;
+  /** Focus is kept inside while it is the overlay on top; on by default. */
+  enforceFocus?: boolean;
+  /** Focus goes back where it was once it has closed; on by default. */
+  shouldReturnFocusOnClose?: boolean;
+  /** In `div.bp6-portal` at the end of the body; otherwise in place. */
+  usePortal?: boolean;
+  /**
+   * Nothing is drawn until it first opens; on by default. Off, an empty
+   * `div.bp6-overlay` is there from the start, as a popover's is. Either way,
+   * once it has opened, the empty one stays after it closes, as Blueprint's.
+   */
+  lazy?: boolean;
+  /** The prefix of the transition's classes: `bp6-overlay` by default. */
+  transitionName?: string;
+  /** How long the enter and exit transitions run: 300ms by default. */
+  transitionDuration?: number;
   /** Classes on `div.bp6-overlay`, after Blueprint's own. */
   class: string;
   /**
    * The content, given the classes that make it the overlay's content:
-   * `bp6-overlay-content` and the transition's. It sets `tabindex="0"` on
-   * itself, as Blueprint does.
+   * `bp6-overlay-content` and the transition's, and the `tabindex` Blueprint
+   * gives it, `0` where focus is brought or kept inside.
    */
-  content: (contentProps: Readonly<{ class: ClassObject }>) => JSX.Element;
+  content: (
+    contentProps: Readonly<{
+      class: ClassObject;
+      tabIndex: number | undefined;
+    }>,
+  ) => JSX.Element;
 }>;
 
 /**
  * Draws `content` over the page while `isOpen` is on, and for the exit
  * transition after: in `div.bp6-portal` at the end of the body, over a
  * backdrop, with focus brought inside and kept there while it is the overlay on
- * top, and given back where it was once it has closed.
+ * top, and given back where it was once it has closed; each of those as the
+ * props leave on.
  */
 export const Overlay = ({
   isOpen,
   onClose,
   canEscapeKeyClose = true,
   canOutsideClickClose = true,
+  hasBackdrop = true,
+  autoFocus = true,
+  enforceFocus = true,
+  shouldReturnFocusOnClose = true,
+  usePortal = true,
+  lazy = true,
+  transitionName = 'bp6-overlay',
+  transitionDuration = 300,
   class: className,
   content,
 }: OverlayProps): JSX.Element => {
@@ -88,9 +125,14 @@ export const Overlay = ({
 
   const mut_mounted = { first: true };
 
+  const [hasOpened$, setHasOpened] = createState(!lazy);
+
   // This overlay in Blueprint's overlay stack, from the opening to the closing,
   // not through the exit transition.
-  const self: OverlayEntry = { elements: mut_elements } as const;
+  const self: OverlayEntry = {
+    elements: mut_elements,
+    marksBody: hasBackdrop && usePortal,
+  } as const;
 
   onScopeDispose(() => {
     leaveStack(self);
@@ -128,10 +170,16 @@ export const Overlay = ({
         mut_focus.before = document.activeElement;
       }
 
-      // Opened as it is mounted: react-transition-group's `appear`.
-      const kind = first ? 'appear' : 'enter';
+      // react-transition-group's `appear`: opened as its transition group is
+      // mounted, which is with the overlay, or, for a lazy one, as it first
+      // opens.
+      const kind =
+        first || (lazy && !hasOpened$.getSnapshot().value) ? 'appear' : 'enter';
 
+      // The body first, so that the empty overlay is not drawn for a moment.
       setPhase(kind);
+
+      setHasOpened(true);
 
       afterUpdate(() => {
         if (!stillCurrent()) {
@@ -165,7 +213,12 @@ export const Overlay = ({
 
           const { before } = mut_focus;
 
-          if (giveBack && before instanceof HTMLElement && before.isConnected) {
+          if (
+            shouldReturnFocusOnClose &&
+            giveBack &&
+            before instanceof HTMLElement &&
+            before.isConnected
+          ) {
             before.focus();
           }
         }, transitionDuration);
@@ -177,7 +230,7 @@ export const Overlay = ({
   const transitionToggles = transitionClassNames.map(
     ([name, phases]) =>
       [
-        `bp6-overlay-${name}`,
+        `${transitionName}-${name}`,
         view(phase$, (phase) => phases.includes(phase)),
       ] as const,
   );
@@ -187,27 +240,56 @@ export const Overlay = ({
 
   const shown = view(phase$, (phase) => phase !== 'closed');
 
+  const body = (
+    <OverlayBody
+      autoFocus={autoFocus}
+      canEscapeKeyClose={canEscapeKeyClose}
+      canOutsideClickClose={canOutsideClickClose}
+      className={className}
+      content={content}
+      elements={() => mut_elements}
+      enforceFocus={enforceFocus}
+      hasBackdrop={hasBackdrop}
+      inline={!usePortal}
+      isOpen$={isOpen$}
+      isOverlayOrAbove={(target) => isInStackFrom(self, target)}
+      isThisOnTop={() => isOnTop(self)}
+      setElement={(name, element) => {
+        mut_elements[name] = element;
+      }}
+      transitionClass={transitionClass}
+      onClose={onClose}
+    />
+  );
+
+  const inPortal = (element: JSX.Element): JSX.Element =>
+    usePortal ? (
+      <Portal>
+        <div class={constant('bp6-portal')}>{element}</div>
+      </Portal>
+    ) : (
+      element
+    );
+
   return (
     <If
       cond={shown}
-      then={
-        <Portal>
-          <OverlayBody
-            canEscapeKeyClose={canEscapeKeyClose}
-            canOutsideClickClose={canOutsideClickClose}
-            className={className}
-            content={content}
-            isOpen$={isOpen$}
-            isThisOnTop={() => isOnTop(self)}
-            elements={() => mut_elements}
-            setElement={(name, element) => {
-              mut_elements[name] = element;
-            }}
-            transitionClass={transitionClass}
-            onClose={onClose}
-          />
-        </Portal>
+      else={
+        <If
+          cond={hasOpened$}
+          then={inPortal(
+            <div
+              aria-live={constant('polite')}
+              class={classObject([
+                'bp6-overlay',
+                !usePortal && 'bp6-overlay-inline',
+                className,
+              ])}
+            />,
+          )}
+        />
       }
+      then={inPortal(body)}
     />
   );
 };
@@ -233,15 +315,15 @@ type OverlayElements = Readonly<{
 }>;
 
 /** An overlay in {@link mut_overlayStack}, told apart by identity. */
-type OverlayEntry = Readonly<{ elements: OverlayElements }>;
-
-/** How long the enter and exit transitions run: Blueprint's 300ms. */
-const transitionDuration = 300;
+type OverlayEntry = Readonly<{
+  elements: OverlayElements;
+  /** It has a backdrop in a portal, which marks the body. */
+  marksBody: boolean;
+}>;
 
 /**
  * The classes react-transition-group's `CSSTransition` gives each child of the
- * overlay, with Blueprint's `bp6-overlay` prefix, and the phases in which each
- * is on.
+ * overlay, after the transition's prefix, and the phases in which each is on.
  */
 const transitionClassNames: readonly (readonly [string, readonly Phase[]])[] = [
   ['appear', ['appear', 'appear-active']],
@@ -258,7 +340,7 @@ const transitionClassNames: readonly (readonly [string, readonly Phase[]])[] = [
  * The open overlays, the last opened last, as Blueprint's overlay stack: the
  * one on top alone keeps focus inside itself, and the body carries
  * `bp6-overlay-open`, which Blueprint's style sheets stop the page scrolling
- * by, while any is open.
+ * by, while any with a backdrop in a portal is open.
  */
 const mut_overlayStack: OverlayEntry[] = [];
 
@@ -266,17 +348,24 @@ const mut_overlayStack: OverlayEntry[] = [];
 const OverlayBody = ({
   isOpen$,
   isThisOnTop,
+  isOverlayOrAbove,
   elements,
   setElement,
   onClose,
   canEscapeKeyClose,
   canOutsideClickClose,
+  hasBackdrop,
+  autoFocus,
+  enforceFocus,
+  inline,
   className,
   content,
   transitionClass,
 }: Readonly<{
   isOpen$: InitializedObservable<boolean>;
   isThisOnTop: () => boolean;
+  /** `target` is in this overlay or in one opened over it. */
+  isOverlayOrAbove: (target: EventTarget | null) => boolean;
   /** Read from the `Overlay`, which owns them. */
   elements: () => OverlayElements;
   setElement: (
@@ -286,6 +375,11 @@ const OverlayBody = ({
   onClose: ((event: Event) => void) | undefined;
   canEscapeKeyClose: boolean;
   canOutsideClickClose: boolean;
+  hasBackdrop: boolean;
+  autoFocus: boolean;
+  enforceFocus: boolean;
+  /** In place, not in a portal (`bp6-overlay-inline`). */
+  inline: boolean;
   className: string;
   content: OverlayProps['content'];
   transitionClass: (base: string) => ClassObject;
@@ -316,7 +410,7 @@ const OverlayBody = ({
   subscribeInScope(isOpen$, (open) => {
     cancelAnimationFrame(mut_frame.id);
 
-    if (open) {
+    if (open && autoFocus) {
       mut_frame.id = requestAnimationFrame(() => {
         if (isThisOnTop()) {
           bringFocusInside();
@@ -343,6 +437,7 @@ const OverlayBody = ({
       const { target } = event;
 
       if (
+        !enforceFocus ||
         target === document ||
         !isThisOnTop() ||
         isInside(target, elements().overlay)
@@ -359,38 +454,84 @@ const OverlayBody = ({
     { capture: true },
   );
 
+  // The event being dispatched as it is drawn, as the press that opened it, is
+  // not one it hears: Blueprint listens from an effect, after that event. Only
+  // `window.event` says which that is; a time or a timer would also drop a
+  // press made as it was drawn.
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
+  const drawnDuring = window.event;
+
+  // With no backdrop, a press outside this overlay and those over it.
+  listenInScope(document, 'mousedown', (event) => {
+    if (
+      hasBackdrop ||
+      !canOutsideClickClose ||
+      event === drawnDuring ||
+      !isOpen$.getSnapshot().value ||
+      isOverlayOrAbove(event.target)
+    ) {
+      return;
+    }
+
+    onClose?.(event);
+  });
+
+  // An overlay that does not take focus, as a tooltip, hears Escape from the
+  // document while it is the one on top.
+  listenInScope(document, 'keydown', (event) => {
+    if (
+      autoFocus ||
+      !canEscapeKeyClose ||
+      !(event instanceof KeyboardEvent) ||
+      event.key !== 'Escape' ||
+      isImeKeyDown(event) ||
+      !isOpen$.getSnapshot().value ||
+      !isThisOnTop()
+    ) {
+      return;
+    }
+
+    onClose?.(event);
+
+    event.stopPropagation();
+
+    event.preventDefault();
+  });
+
+  const takesFocus = autoFocus || enforceFocus;
+
   return (
-    <div class={constant('bp6-portal')}>
-      <div
-        ref={(overlay) => {
-          setElement('overlay', overlay);
-        }}
-        aria-live={constant('polite')}
-        class={classObject(
-          ['bp6-overlay', className],
-          [['bp6-overlay-open', isOpen$]],
-        )}
-        onKeyDown={(event) => {
-          // An Escape that cancels what an input method is composing is not one
-          // that closes.
-          if (
-            !(canEscapeKeyClose && event.key === 'Escape') ||
-            isImeKeyDown(event)
-          ) {
-            return;
-          }
+    <div
+      ref={(overlay) => {
+        setElement('overlay', overlay);
+      }}
+      aria-live={constant('polite')}
+      class={classObject(
+        ['bp6-overlay', inline && 'bp6-overlay-inline', className],
+        [['bp6-overlay-open', isOpen$]],
+      )}
+      onKeyDown={(event) => {
+        // An Escape that cancels what an input method is composing is not one
+        // that closes.
+        if (
+          !(canEscapeKeyClose && event.key === 'Escape') ||
+          isImeKeyDown(event)
+        ) {
+          return;
+        }
 
-          // One during the exit is still the overlay's, though it has already
-          // closed.
-          if (isOpen$.getSnapshot().value) {
-            onClose?.(event);
-          }
+        // One during the exit is still the overlay's, though it has already
+        // closed.
+        if (isOpen$.getSnapshot().value) {
+          onClose?.(event);
+        }
 
-          event.stopPropagation();
+        event.stopPropagation();
 
-          event.preventDefault();
-        }}
-      >
+        event.preventDefault();
+      }}
+    >
+      {takesFocus ? (
         <div
           ref={(start) => {
             setElement('start', start);
@@ -423,6 +564,10 @@ const OverlayBody = ({
             }
           }}
         />
+      ) : (
+        []
+      )}
+      {hasBackdrop ? (
         <div
           class={transitionClass('bp6-overlay-backdrop')}
           onMouseDown={(event) => {
@@ -435,7 +580,14 @@ const OverlayBody = ({
             }
           }}
         />
-        {content({ class: transitionClass('bp6-overlay-content') })}
+      ) : (
+        []
+      )}
+      {content({
+        class: transitionClass('bp6-overlay-content'),
+        tabIndex: takesFocus ? 0 : undefined,
+      })}
+      {enforceFocus ? (
         <div
           ref={(end) => {
             setElement('end', end);
@@ -464,7 +616,9 @@ const OverlayBody = ({
             }
           }}
         />
-      </div>
+      ) : (
+        []
+      )}
     </div>
   );
 };
@@ -487,14 +641,37 @@ const focusIsInStack = (): boolean =>
 const isOnTop = (entry: OverlayEntry): boolean =>
   mut_overlayStack.at(-1) === entry;
 
+/** `target` is in `entry`'s overlay or in one opened after it. */
+const isInStackFrom = (
+  entry: OverlayEntry,
+  target: EventTarget | null,
+): boolean => {
+  const index = mut_overlayStack.indexOf(entry);
+
+  return (
+    index !== -1 &&
+    mut_overlayStack.slice(index).some(
+      ({ elements: { overlay } }) =>
+        // A press on the overlay's own element, not on what it holds, is
+        // outside it, as Blueprint counts it.
+        target !== overlay && isInside(target, overlay),
+    )
+  );
+};
+
 const enterStack = (entry: OverlayEntry): void => {
+  // Read first: `includes` narrows `entry` to `never` past its early return.
+  const { marksBody } = entry;
+
   if (mut_overlayStack.includes(entry)) {
     return;
   }
 
   mut_overlayStack.push(entry);
 
-  document.body.classList.add('bp6-overlay-open');
+  if (marksBody) {
+    document.body.classList.add('bp6-overlay-open');
+  }
 };
 
 const leaveStack = (entry: OverlayEntry): void => {
@@ -506,7 +683,7 @@ const leaveStack = (entry: OverlayEntry): void => {
 
   mut_overlayStack.splice(index, 1);
 
-  if (Arr.isEmpty(mut_overlayStack)) {
+  if (mut_overlayStack.every(({ marksBody }) => !marksBody)) {
     document.body.classList.remove('bp6-overlay-open');
   }
 };
