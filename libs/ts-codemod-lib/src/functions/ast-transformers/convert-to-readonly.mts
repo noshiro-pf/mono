@@ -35,6 +35,7 @@ import {
   type ReadonlyTypeReferenceNode,
 } from '../functions/index.mjs';
 import {
+  ensureTsTypeForgeTypeImport,
   replaceNodeWithDebugPrint,
   replaceNodeWithText,
 } from '../utils/index.mjs';
@@ -50,8 +51,6 @@ import type { TsMorphTransformer } from './types.mjs';
 const TRANSFORMER_NAME = 'convert-to-readonly';
 
 const READONLY_RECORD_NAME = 'ReadonlyRecord';
-
-const READONLY_RECORD_MODULE = 'ts-type-forge';
 
 export const convertToReadonlyTransformer = (
   options?: ReadonlyTransformerOptions,
@@ -130,7 +129,7 @@ export const convertToReadonlyTransformer = (
       }
 
       if (mayImport && referencesReadonlyRecord(sourceAst.compilerNode)) {
-        addReadonlyRecordImport(sourceAst);
+        ensureTsTypeForgeTypeImport(sourceAst, READONLY_RECORD_NAME);
       }
     },
   };
@@ -666,152 +665,6 @@ const readonlyRecordScope = (
     : topLevelNames.some(({ name }) => name === READONLY_RECORD_NAME)
       ? 'taken'
       : 'free';
-};
-
-/**
- * `end`, moved past the comments that start on the same line after it: one such
- * as `// eslint-disable-line` is about that line.
- */
-const endOfLineComments = (text: string, end: number): number =>
-  tsm.ts.getTrailingCommentRanges(text, end)?.at(-1)?.end ?? end;
-
-/**
- * Where a new import goes in a file with no import and no directive prologue:
- * before the first statement, and before the run of JSDoc and `//` comments
- * right above it with no blank line in between (its documentation, an
- * `eslint-disable-next-line`), which belong to it. A comment separated from it
- * by a blank line, a `/* ... *\/` comment (a file-wide `eslint-disable`, a
- * license), a `///` directive, a pragma (`@ts-nocheck`, `@jsxImportSource`),
- * which TypeScript reads only above the first statement, and a shebang stay
- * above the import.
- */
-const newImportPosition = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceFile: tsm.SourceFile,
-): number => {
-  const text = sourceFile.getFullText();
-
-  const first = sourceFile.getStatements().at(0);
-
-  if (first === undefined) {
-    return text.length;
-  }
-
-  const comments =
-    tsm.ts.getLeadingCommentRanges(text, first.getFullStart()) ?? [];
-
-  let mut_position = first.getStart();
-
-  for (const comment of comments.toReversed()) {
-    const commentText = text.slice(comment.pos, comment.end);
-
-    if (
-      /\n[^\S\n]*\n/u.test(text.slice(comment.end, mut_position)) ||
-      commentText.startsWith('///') ||
-      (commentText.startsWith('/*') && !commentText.startsWith('/**')) ||
-      /@(?:ts-nocheck|ts-check|jsx)/u.test(commentText)
-    ) {
-      break;
-    }
-
-    mut_position = comment.pos;
-  }
-
-  return mut_position;
-};
-
-/** The leading `'use client';`-like statements of the file. */
-const directivePrologue = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceFile: tsm.SourceFile,
-): readonly tsm.ts.Statement[] => {
-  const statements = sourceFile.compilerNode.statements;
-
-  const end = statements.findIndex(
-    (statement) =>
-      !(
-        tsm.ts.isExpressionStatement(statement) &&
-        tsm.ts.isStringLiteral(statement.expression)
-      ),
-  );
-
-  return statements.slice(0, end === -1 ? statements.length : end);
-};
-
-const insertReadonlyRecordImport = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceFile: tsm.SourceFile,
-  text: string,
-): void => {
-  const imports = sourceFile.getImportDeclarations();
-
-  const hosts = imports.filter(
-    (decl) =>
-      decl.getModuleSpecifierValue() === READONLY_RECORD_MODULE &&
-      tsm.Node.isNamedImports(decl.getImportClause()?.getNamedBindings()),
-  );
-
-  const host = hosts.find((decl) => decl.isTypeOnly()) ?? hosts.at(0);
-
-  if (host !== undefined) {
-    // `import type { ..., type X }` is an error: the declaration already makes
-    // every name type-only.
-    host.addNamedImport({
-      name: READONLY_RECORD_NAME,
-      isTypeOnly: !host.isTypeOnly(),
-    });
-
-    return;
-  }
-
-  // `import type`, not `import { type X }`, which `verbatimModuleSyntax` keeps
-  // as `import {} from 'ts-type-forge'`, a module with nothing to run.
-  const declaration =
-    `import type { ${READONLY_RECORD_NAME} } from '${READONLY_RECORD_MODULE}';` as const;
-
-  const anchorEnd =
-    imports.at(-1)?.getEnd() ?? directivePrologue(sourceFile).at(-1)?.end;
-
-  if (anchorEnd === undefined) {
-    sourceFile.insertText(newImportPosition(sourceFile), `${declaration}\n\n`);
-  } else {
-    sourceFile.insertText(
-      endOfLineComments(text, anchorEnd),
-      `\n${declaration}`,
-    );
-  }
-};
-
-/**
- * Imports `ReadonlyRecord` from `ts-type-forge`: into the braces of an existing
- * import of the module where there is one, or else as a new declaration —
- * after the last import, else after the directive prologue, else before the
- * first statement and the comments attached to it (see
- * {@link newImportPosition}). The line breaks follow the file's.
- */
-const addReadonlyRecordImport = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceFile: tsm.SourceFile,
-): void => {
-  const text = sourceFile.getFullText();
-
-  // ts-morph writes its line breaks as the project's setting says, so the
-  // setting follows the file's for the edit.
-  const { manipulationSettings } = sourceFile.getProject();
-
-  const newLineKind = manipulationSettings.getNewLineKind();
-
-  manipulationSettings.set({
-    newLineKind: text.includes('\r\n')
-      ? tsm.NewLineKind.CarriageReturnLineFeed
-      : tsm.NewLineKind.LineFeed,
-  });
-
-  try {
-    insertReadonlyRecordImport(sourceFile, text);
-  } finally {
-    manipulationSettings.set({ newLineKind });
-  }
 };
 
 //

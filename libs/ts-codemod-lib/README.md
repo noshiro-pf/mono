@@ -405,7 +405,7 @@ const transformedCode = transformSourceCode(originalCode, isTsx, [
 ]);
 
 const expected = dedent`
-  import { type UnknownRecord } from "ts-type-forge";
+  import type { UnknownRecord } from 'ts-type-forge';
 
   export type A = Readonly<{
     name?: string;
