@@ -80,6 +80,8 @@ A handler runs outside every scope: by the time it is called, no `run` is execut
 
 Instead, have the handler write to a state, and derive from that state at mount time. If later work really has to create an observable, say after an `await`, grab the scope with `getCurrentScope()` while the component is mounting, and wrap the later work in that scope's `run`.
 
+The same holds after an `await` inside a component: the component runs in its scope only until it returns, so in an `async` function it starts, what comes after the first `await` runs with no scope current. `no-observable-in-handler` reports an observable created, or a `subscribe` made, there too; code before the first `await`, and work in the `run` of a scope taken before it, are accepted.
+
 ## Effects that last as long as the component
 
 A component is called once, so what another library would run in an effect is started in the component's body and stopped when its scope is disposed.
