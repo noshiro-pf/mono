@@ -1,0 +1,5 @@
+---
+'pr-merge-queue': minor
+---
+
+`unblock-prs` resolves the rebase of a `merge-queued` pull request that conflicts only in generated files instead of setting it aside (it runs the branch's install and generators, so a pull request labelled only `auto-rebase` is set aside as before). `.github/unblock-prs.json` declares them under `regenerate`: `before` (an install) and `generators`, each a `path` pattern and the `run` that writes it (`$1` to `$9` being the path's capture groups). The worker takes the base's side of each conflicted file, finishes the rebase, runs the generators, amends what they wrote onto the pull request's one commit and pushes; a generator that gives the base's version back, or a conflict that also takes in a hand-written file, is set aside as before, the comment naming which files could have been generated again; a failed install ends the cycle, as any failure the network may cause does. `--no-auto-fix` turns it off too. The rebase's worktree moves from the OS temp directory to the auto-fix's, where an install works.

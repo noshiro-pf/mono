@@ -50,19 +50,19 @@ export const configOf = (
 
   const translation = file.translation?.heading;
 
-  if (file.autoFix === undefined) {
-    return Result.ok({ autoFix: undefined, generatedBranches, translation });
-  }
-
-  const { ignore, before, prepare, fixers, after } = file.autoFix;
-
   const patterns = [
-    ...ignore.map((pattern, i) => [`autoFix.ignore[${i}]`, pattern] as const),
-    ...prepare.map(
+    ...(file.autoFix?.ignore ?? []).map(
+      (pattern, i) => [`autoFix.ignore[${i}]`, pattern] as const,
+    ),
+    ...(file.autoFix?.prepare ?? []).map(
       ({ context }, i) => [`autoFix.prepare[${i}].context`, context] as const,
     ),
-    ...fixers.map(
+    ...(file.autoFix?.fixers ?? []).map(
       ({ context }, i) => [`autoFix.fixers[${i}].context`, context] as const,
+    ),
+    ...(file.regenerate?.generators ?? []).map(
+      ({ path: pattern }, i) =>
+        [`regenerate.generators[${i}].path`, pattern] as const,
     ),
   ] as const;
 
@@ -76,6 +76,27 @@ export const configOf = (
       `${source}: not a regular expression: ${invalid.join(', ')}`,
     );
   }
+
+  const regenerate =
+    file.regenerate === undefined
+      ? undefined
+      : ({
+          before: file.regenerate.before,
+          generators: file.regenerate.generators.map(
+            ({ path: pattern, run }) => ({ path: compileValid(pattern), run }),
+          ),
+        } as const);
+
+  if (file.autoFix === undefined) {
+    return Result.ok({
+      autoFix: undefined,
+      generatedBranches,
+      translation,
+      regenerate,
+    });
+  }
+
+  const { ignore, before, prepare, fixers, after } = file.autoFix;
 
   return Result.ok({
     autoFix: {
@@ -94,6 +115,7 @@ export const configOf = (
     },
     generatedBranches,
     translation,
+    regenerate,
   });
 };
 
@@ -159,6 +181,38 @@ export const ConfigFileSchema = t.annotate(
         },
       ),
     ),
+    regenerate: t.optional(
+      t.annotate(
+        t.strictRecord({
+          before: t.annotate(t.array(t.string()), {
+            description:
+              'Commands run first, before any generator: what the generators need (an install).',
+          }),
+          generators: t.annotate(
+            t.array(
+              t.strictRecord({
+                path: t.annotate(regex(), {
+                  description:
+                    'A regular expression for a path, from the repository root, that the command writes whole.',
+                }),
+                run: t.annotate(t.string(), {
+                  description:
+                    "The command that writes it, where $1 to $9 are the path's capture groups, shell-quoted.",
+                }),
+              }),
+            ),
+            {
+              description:
+                'The first whose `path` matches a conflicted file decides how it is written again; a conflicted file none matches is resolved by hand.',
+            },
+          ),
+        }),
+        {
+          description:
+            "How to resolve a rebase whose conflicts are all in generated files: take the base's side of each, finish the rebase, run `before` and the generators, and amend what they wrote onto the pull request's one commit. A file the generators leave as the base has it, though the pull request changed it, stops this: the generator did not reproduce the pull request's side. Absent: every conflict is set aside, as it is when any conflicted file is not generated.",
+        },
+      ),
+    ),
     generatedBranches: t.optional(
       t.annotate(
         t.array(
@@ -207,6 +261,14 @@ export type Config = Readonly<{
   generatedBranches: readonly GeneratedBranch[];
   /** The heading descriptions are translated under, when they are. */
   translation: string | undefined;
+  /** How a conflict in generated files is resolved, when it is. */
+  regenerate: RegenerateConfig | undefined;
+}>;
+
+/** The files the repository generates whole, and how each is written again. */
+export type RegenerateConfig = Readonly<{
+  before: readonly string[];
+  generators: readonly Readonly<{ path: RegExp; run: string }>[];
 }>;
 
 /** A branch the repository builds rather than writes. */

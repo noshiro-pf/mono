@@ -65,6 +65,39 @@
       "required": ["ignore", "before", "prepare", "fixers", "after"],
       "additionalProperties": false
     },
+    "regenerate": {
+      "description": "How to resolve a rebase whose conflicts are all in generated files: take the base's side of each, finish the rebase, run `before` and the generators, and amend what they wrote onto the pull request's one commit. A file the generators leave as the base has it, though the pull request changed it, stops this: the generator did not reproduce the pull request's side. Absent: every conflict is set aside, as it is when any conflicted file is not generated.",
+      "type": "object",
+      "properties": {
+        "before": {
+          "description": "Commands run first, before any generator: what the generators need (an install).",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "generators": {
+          "description": "The first whose `path` matches a conflicted file decides how it is written again; a conflicted file none matches is resolved by hand.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "description": "A regular expression for a path, from the repository root, that the command writes whole.",
+                "type": "string",
+                "format": "regex"
+              },
+              "run": {
+                "description": "The command that writes it, where $1 to $9 are the path's capture groups, shell-quoted.",
+                "type": "string"
+              }
+            },
+            "required": ["path", "run"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["before", "generators"],
+      "additionalProperties": false
+    },
     "generatedBranches": {
       "description": "Branches the repository generates whole, lockfile and all, such as a dependency update. A conflict on one is resolved by building it again, never by a rebase resolved by hand: push-fixed-pr refuses that push, and the skill runs `rebuild` instead.",
       "type": "array",

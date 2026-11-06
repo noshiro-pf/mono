@@ -11,7 +11,12 @@ import { currentEpochMs, log, type ApiContext } from '../lib/index.mjs';
 import { autoFix } from './auto-fix.mjs';
 import { probeCheckReads } from './checks.mjs';
 import { standingClaims } from './claims.mjs';
-import { CONFIG_PATH, readConfig, type AutoFixConfig } from './config.mjs';
+import {
+  CONFIG_PATH,
+  readConfig,
+  type AutoFixConfig,
+  type RegenerateConfig,
+} from './config.mjs';
 import {
   STALE_STATE_PAUSE_MS,
   UNREAD_SURVEYS_BEFORE_SETTING_ASIDE,
@@ -294,6 +299,12 @@ export const unblockPrs = async (
 
   const autoFixConfig = options.autoFix ? config.value?.autoFix : undefined;
 
+  // A regenerated file is a push of the worker's own, as an auto-fix is, so
+  // `--no-auto-fix` turns both off.
+  const regenerateConfig = options.autoFix
+    ? config.value?.regenerate
+    : undefined;
+
   if (autoFixConfig === undefined && options.autoFix) {
     log(
       `No autoFix in ${CONFIG_PATH}: a failed check is reported, never fixed here.`,
@@ -324,6 +335,7 @@ export const unblockPrs = async (
       mut_state,
       options,
       autoFixConfig,
+      regenerateConfig,
     );
 
     if (!options.dryRun) {
@@ -794,6 +806,7 @@ const runCycle = async (
   before: LoopState,
   options: Options,
   autoFixConfig: AutoFixConfig | undefined,
+  regenerateConfig: RegenerateConfig | undefined,
 ): Promise<CycleResult> => {
   const listed = await survey(api, defaultBranch, before.outOfSync);
 
@@ -1057,6 +1070,7 @@ const runCycle = async (
       owners: triaged.owners,
       dryRun: options.dryRun,
       nowEpochMs: currentEpochMs(),
+      regenerate: regenerateConfig,
     });
 
     return {
@@ -1113,6 +1127,7 @@ const runCycle = async (
         triaged.stackParents,
         target.number,
       ).flatMap((number) => pullRequests.filter((pr) => pr.number === number)),
+      regenerate: regenerateConfig,
     });
 
     if (Result.isErr(advanced)) {

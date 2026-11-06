@@ -39,6 +39,19 @@
     ],
     "after": ["pnpm run fix:fmt:diff"]
   },
+  "regenerate": {
+    "before": ["pnpm install --frozen-lockfile"],
+    "generators": [
+      {
+        "path": "^docs/package-dependencies\\.md$",
+        "run": "pnpm run gen:deps-graph"
+      },
+      {
+        "path": "^((?:apps|libs)/[^/]+)/src/.*(?<=/)index\\.mts$",
+        "run": "pnpm --dir $1 run gen:index"
+      }
+    ]
+  },
   "generatedBranches": [
     {
       "branch": "chore/pnpm-update",

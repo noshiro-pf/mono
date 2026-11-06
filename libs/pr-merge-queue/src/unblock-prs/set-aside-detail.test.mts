@@ -112,6 +112,18 @@ describe(describeConflict, () => {
     );
   });
 
+  test('names the conflicting files that could be generated again', () => {
+    assert.strictEqual(
+      describeConflict(
+        ['docs/package-dependencies.md', 'src/a.mts'],
+        'CONFLICT (content): …',
+        'main',
+        ['docs/package-dependencies.md'],
+      ),
+      'conflicts with main in docs/package-dependencies.md, src/a.mts; only docs/package-dependencies.md could be generated again',
+    );
+  });
+
   test("falls back to git's own words when no file is named", () => {
     assert.strictEqual(
       describeConflict([], 'error: could not apply 1234abc\nhint: …', 'main'),
