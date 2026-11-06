@@ -66,16 +66,51 @@ export const setAsideCommentBody = (
   );
 };
 
-/** The one line a comment is rewritten to: what it was, what ended it, when. */
+/**
+ * What a comment is rewritten to: one line saying what it was, what ended it
+ * and when, then what the set-aside said (its detail, failed checks and output)
+ * under a fold. Without that, nothing would say afterwards what held the queue
+ * up: which files conflicted, which checks failed (#3593).
+ */
 export const resolvedCommentBody = (
   setAside: SetAside,
   resolvedBy: ResolvedBy,
   defaultBranch: string,
   atEpochMs: number,
-): string =>
-  writeResolvedComment(
-    `Resolved at ${isoSeconds(atEpochMs)}: no longer set aside (\`${setAside.reason}\` at \`${short(setAside.headSha)}\`) — ${describeResolvedBy(resolvedBy, defaultBranch)}.`,
+  previous = '',
+): string => {
+  const said = whatItSaid(previous);
+
+  return writeResolvedComment(
+    Arr.toUnshifted(
+      `Resolved at ${isoSeconds(atEpochMs)}: no longer set aside (\`${setAside.reason}\` at \`${short(setAside.headSha)}\`) — ${describeResolvedBy(resolvedBy, defaultBranch)}.`,
+    )(
+      said === ''
+        ? []
+        : [
+            '',
+            '<details><summary>What it said</summary>',
+            '',
+            said,
+            '',
+            '</details>',
+          ],
+    ).join('\n'),
   );
+};
+
+/**
+ * The prose of a set-aside comment `body`, without its record line and its
+ * retry box, which only the open set-aside acts on.
+ */
+export const whatItSaid = (body: string): string =>
+  body
+    .trim()
+    .split(/\r?\n/u)
+    .filter((line, i) => !(i === 0 && line.trimStart().startsWith('<!--')))
+    .filter((line) => !/^- \[[ x]\] /iu.test(line.trim()))
+    .join('\n')
+    .trim();
 
 export const describeResolvedBy = (
   resolvedBy: ResolvedBy,

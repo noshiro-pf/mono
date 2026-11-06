@@ -97,6 +97,8 @@ export type OwnSetAsideComment = Readonly<{
   /** The REST id, which editing it takes. */
   databaseId: number;
   says: SetAsideComment;
+  /** As written, so that rewriting it as resolved can keep what it said. */
+  body: string;
 }>;
 
 /**

@@ -160,7 +160,13 @@ export const settleSkips = (
             : undefined;
 
     return [
-      { number, databaseId: comment.databaseId, setAside, resolvedBy } as const,
+      {
+        number,
+        databaseId: comment.databaseId,
+        body: comment.body,
+        setAside,
+        resolvedBy,
+      } as const,
     ];
   });
 
@@ -198,9 +204,9 @@ export const settleSkips = (
       new Map(Array.from(skipped).filter(([number]) => !retried.has(number))),
     ),
     resolved: Arr.generate(function* () {
-      for (const { number, databaseId, setAside, resolvedBy } of judged) {
+      for (const { number, databaseId, body, setAside, resolvedBy } of judged) {
         if (resolvedBy !== undefined) {
-          yield { number, databaseId, setAside, resolvedBy };
+          yield { number, databaseId, body, setAside, resolvedBy };
         }
       }
     }),
@@ -211,6 +217,8 @@ export const settleSkips = (
 export type Resolution = Readonly<{
   number: number;
   databaseId: number;
+  /** The comment as it is, which the rewrite keeps under a fold. */
+  body: string;
   setAside: SetAside;
   resolvedBy: ResolvedBy;
 }>;

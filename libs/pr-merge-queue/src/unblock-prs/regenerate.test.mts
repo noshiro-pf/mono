@@ -118,7 +118,7 @@ describe(resolveByRegenerating, () => {
       resolved,
       Result.err({
         detail:
-          'conflicts with main in a.txt, gen.txt; only gen.txt could be generated again',
+          'conflicts with main in a.txt, gen.txt (changed there by #41); only gen.txt could be generated again',
         ofPullRequest: true,
       }),
     );
@@ -216,6 +216,28 @@ describe(resolveByRegenerating, () => {
     await fs.rm(dir, { recursive: true });
   });
 
+  test('leaves out the merged layer the branch was stacked on', async () => {
+    const { dir, output } = await conflictedRebase(false);
+
+    const resolved = await resolveByRegenerating(
+      dir,
+      undefined,
+      'main',
+      output,
+      [41],
+    );
+
+    assert.deepStrictEqual(
+      resolved,
+      Result.err({
+        detail: 'conflicts with main in gen.txt',
+        ofPullRequest: true,
+      }),
+    );
+
+    await fs.rm(dir, { recursive: true });
+  });
+
   test('aborts and names the conflict when nothing is regenerated', async () => {
     const { dir, output } = await conflictedRebase(false);
 
@@ -229,7 +251,7 @@ describe(resolveByRegenerating, () => {
     assert.deepStrictEqual(
       resolved,
       Result.err({
-        detail: 'conflicts with main in gen.txt',
+        detail: 'conflicts with main in gen.txt (changed there by #41)',
         ofPullRequest: true,
       }),
     );
@@ -263,7 +285,7 @@ const conflictedRebase = async (
     'git add --all && git commit --quiet -m pr',
     'git checkout --quiet main',
     String.raw`printf 'A\n' > a.txt && cp a.txt gen.txt`,
-    'git add --all && git commit --quiet -m main',
+    'git add --all && git commit --quiet -m "main (#41)"',
     'git checkout --quiet pr',
   ] as const;
 

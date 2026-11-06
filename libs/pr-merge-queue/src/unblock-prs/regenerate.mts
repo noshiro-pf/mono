@@ -71,6 +71,7 @@ export const resolveByRegenerating = async (
   config: RegenerateConfig | undefined,
   onto: string,
   output: string,
+  carried: readonly number[] = [],
 ): Promise<Result<readonly string[], RegenerationRefused>> => {
   const refused = (
     detail: string,
@@ -81,7 +82,7 @@ export const resolveByRegenerating = async (
   const resolved = await takeBaseSides(
     worktreeDir,
     config,
-    onto,
+    { onto, carried },
     output,
     [],
     [],
@@ -172,6 +173,42 @@ const emptied = (
   `conflicts with ${onto} only in generated files (${files.join(', ')}), and its commit changes nothing else, so taking ${onto}'s side of them leaves it empty${output === '' ? '' : `: ${output}`}` as const;
 
 /**
+ * The merged pull requests that changed `files` on `onto` since the base the
+ * branch was rebased from, by the `(#N)` a squash merge ends its subject with:
+ * the other side of the conflict, but `carried`: a merged lower layer the
+ * branch was stacked on, whose changes it contains. Read mid-rebase, where
+ * `ORIG_HEAD` is the head being rebased; empty when that cannot be read.
+ */
+const changedOnBase = async (
+  worktreeDir: string,
+  onto: string,
+  files: readonly string[],
+  carried: readonly number[],
+): Promise<readonly number[]> => {
+  const base = await git(`git merge-base ORIG_HEAD ${sh(onto)}`, worktreeDir);
+
+  if (Result.isErr(base) || !Arr.isNonEmpty(files)) {
+    return [];
+  }
+
+  const subjects = await git(
+    `git log --format=%s ${sh(`${base.value.trim()}..${onto}`)} -- ${files.map(sh).join(' ')}`,
+    worktreeDir,
+  );
+
+  return Result.isErr(subjects)
+    ? []
+    : Arr.uniq(
+        subjects.value
+          .split('\n')
+          .map((subject) => SQUASH_SUBJECT.exec(subject)?.groups?.['number'])
+          .filter((number) => number !== undefined)
+          .map(Number)
+          .filter((number) => !carried.includes(number)),
+      );
+};
+
+/**
  * Takes `onto`'s side of every conflicted file and continues, for as long as
  * the rebase stops on files `config` regenerates. Resolves to every file taken
  * so and the commands that write them again, once the rebase has finished.
@@ -179,7 +216,7 @@ const emptied = (
 const takeBaseSides = async (
   worktreeDir: string,
   config: RegenerateConfig | undefined,
-  onto: string,
+  target: Readonly<{ onto: string; carried: readonly number[] }>,
   output: string,
   files: readonly string[],
   commands: readonly string[],
@@ -189,6 +226,8 @@ const takeBaseSides = async (
     string
   >
 > => {
+  const { onto, carried } = target;
+
   const unmerged = await git(
     'git diff --name-only --diff-filter=U',
     worktreeDir,
@@ -205,7 +244,15 @@ const takeBaseSides = async (
   }
 
   if (config === undefined || !Arr.isNonEmpty(conflicted)) {
-    return Result.err(describeConflict(conflicted, lastLines(output, 5), onto));
+    return Result.err(
+      describeConflict(
+        conflicted,
+        lastLines(output, 5),
+        onto,
+        [],
+        await changedOnBase(worktreeDir, onto, conflicted, carried),
+      ),
+    );
   }
 
   const plan = planRegeneration(conflicted, config);
@@ -217,6 +264,7 @@ const takeBaseSides = async (
         lastLines(output, 5),
         onto,
         conflicted.filter((file) => !plan.value.includes(file)),
+        await changedOnBase(worktreeDir, onto, conflicted, carried),
       ),
     );
   }
@@ -249,12 +297,15 @@ const takeBaseSides = async (
     : takeBaseSides(
         worktreeDir,
         config,
-        onto,
+        target,
         continued.value,
         sofar.files,
         sofar.commands,
       );
 };
+
+/** A squash merge's subject ends with its pull request: `… (#123)`. */
+const SQUASH_SUBJECT = /\(#(?<number>\d+)\)$/u;
 
 /** The first generator `file` matches, by its place in the list. */
 const commandFor = (

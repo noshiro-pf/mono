@@ -69,7 +69,12 @@ type RebaseTarget = Readonly<{
   onto: string;
   /** Refspecs to fetch from `origin` besides the branch itself. */
   fetch: readonly string[];
-  upstream: Readonly<{ sha: string; required: boolean }> | undefined;
+  /**
+   * The head the branch was stacked on, and, when it is a merged layer, its
+   * number: what the branch carries of it is not the other side of a conflict.
+   */
+  upstream:
+    Readonly<{ sha: string; required: boolean; number?: number }> | undefined;
   /**
    * How a conflict only in generated files is resolved (`regenerate.mts`);
    * every conflict is set aside when `undefined`.
@@ -199,7 +204,7 @@ export const advance = async (
     upstream:
       merged === undefined
         ? undefined
-        : { sha: merged.headSha, required: false },
+        : { sha: merged.headSha, required: false, number: merged.number },
     regenerate: plan.regenerate,
   });
 
@@ -669,6 +674,7 @@ const rebaseInWorktree = async (
       target.regenerate,
       target.onto,
       rebased.value,
+      target.upstream?.number === undefined ? [] : [target.upstream.number],
     );
 
     if (Result.isErr(regenerated)) {
@@ -1008,7 +1014,7 @@ const restackOffMerged = async (
   const rebased = await rebaseAndPush(pr, {
     onto: mergeCommit,
     fetch: [],
-    upstream: { sha: headSha, required: true },
+    upstream: { sha: headSha, required: true, number },
     regenerate: undefined,
   });
 

@@ -93,6 +93,7 @@
     "check-changed": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-changed/main.mts",
     "claim-pr": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/pr-merge-queue/src/cmd/claim-pr.mts",
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
+    "conflict-report": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/conflict-report/main.mts",
     "coverage:normalize-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/normalize-coverage-paths.mts",
     "fix:codemod": "pnpm run z:ts-codemod --uncommitted && pnpm run fix:fmt",
     "fix:codemod:affected": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/codemod-affected.mts && pnpm run fix:fmt",
