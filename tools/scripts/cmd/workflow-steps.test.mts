@@ -9,6 +9,7 @@ import { Arr, isRecord, isString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   firstFileToCheck,
+  ignoredBy,
   installArgs,
   matchesGatePattern,
   parseGateLists,
@@ -26,6 +27,8 @@ const scriptPath = fileURLToPath(
 const gateListsFile = fileURLToPath(
   new URL('../../configs/gate-ignore-lists.json', import.meta.url),
 );
+
+const projectRoot = fileURLToPath(new URL('../../..', import.meta.url));
 
 describe('readChoice / readBoolean', () => {
   test('reads an input from the environment variable named after it', () => {
@@ -296,7 +299,7 @@ describe('the ignore lists', () => {
       {
         ok: false,
         message:
-          'tools/configs/gate-ignore-lists.json, list code: Unsupported ignore pattern "src/*/x.ts": only `dir/`, `**.ext`, `**/name`, `*.ext`, `dir/**/*.ext` and a plain path are understood.',
+          'tools/configs/gate-ignore-lists.json, list code: Unsupported ignore pattern "src/*/x.ts": only `dir/` (whose segments may be `*`), `**.ext`, `**/name`, `*.ext`, `dir/**/*.ext` and a plain path are understood, each optionally after a `!` that excepts what it matches.',
       },
     );
   });
@@ -323,8 +326,65 @@ describe('the ignore lists', () => {
     ['libsx/a.md', 'libs/**/*.md', false],
     ['LICENSE', 'LICENSE', true],
     ['libs/a/LICENSE', 'LICENSE', false],
+    ['apps/a/src/x.md', 'apps/*/src/', true],
+    ['apps/a/src/b/.x.md', 'apps/*/src/', true],
+    ['apps/.a/src/x.md', 'apps/*/src/', true],
+    ['apps/a/x.md', 'apps/*/src/', false],
+    ['apps/src/x.md', 'apps/*/src/', false],
+    ['apps/a/src-old/x.md', 'apps/*/src/', false],
+    ['apps/a/b/src/x.md', 'apps/*/src/', false],
   ] as const)('%s against %s: %s', (file, pattern, expected) => {
     assert.strictEqual(matchesGatePattern(file, pattern), expected);
+  });
+
+  test.each([
+    'apps/a*/',
+    'apps/**/src/',
+    'apps//src/',
+    '*/',
+    '!*/*/',
+    '!',
+    '!!docs/',
+    '!src/*/x.ts',
+  ])('refuses %s', (pattern) => {
+    assert.isFalse(
+      parseGateLists(lists({ code: [pattern], style: [], 'strict-lib': [] }))
+        .ok,
+    );
+  });
+
+  // An exception is not an ignore pattern of its own, so it is read only
+  // together with the list (`ignoredBy`).
+  test('a single exception is not matched on its own', () => {
+    assert.throws(
+      () => matchesGatePattern('apps/a/src/x.md', '!apps/*/src/'),
+      /Unsupported/u,
+    );
+  });
+
+  test.each([
+    ['apps/a/src/x.md', false],
+    ['apps/a/README.md', true],
+    ['apps/a/src/x.mts', false],
+    ['docs/a.md', false],
+  ] as const)(
+    'a file on a `!` pattern counts whatever else matches it: %s is ignored: %s',
+    (file, expected) => {
+      assert.strictEqual(
+        ignoredBy(['**.md', 'docs/', '!apps/*/src/', '!docs/'])(file),
+        expected,
+      );
+    },
+  );
+
+  test('the order of the patterns does not matter', () => {
+    assert.isFalse(ignoredBy(['!apps/*/src/', '**.md'])('apps/a/src/x.md'));
+
+    assert.isFalse(ignoredBy(['**.md', '!apps/*/src/'])('apps/a/src/x.md'));
+  });
+
+  test('an exception alone ignores nothing', () => {
+    assert.isFalse(ignoredBy(['!apps/*/src/'])('docs/a.md'));
   });
 
   test("the repository's lists are read", () => {
@@ -347,6 +407,32 @@ describe('the ignore lists', () => {
     );
 
     assert.isUndefined(firstFileToCheck([], ['docs/']));
+
+    assert.strictEqual(
+      firstFileToCheck(
+        ['README.md', 'apps/a/src/x.md'],
+        ['**.md', '!apps/*/src/'],
+      ),
+      'apps/a/src/x.md',
+    );
+  });
+
+  test("the repository's code list counts an app's pages and nothing else under **.md", () => {
+    const code = readGateList('code', projectRoot);
+
+    const patterns = code.ok ? code.value : ([] as const);
+
+    assert.isNotEmpty(patterns);
+
+    assert.isFalse(
+      ignoredBy(patterns)(
+        'apps/synstate-docs/src/content/docs/ja/getting-started/installation.md',
+      ),
+    );
+
+    assert.isTrue(ignoredBy(patterns)('apps/synstate-docs/README.md'));
+
+    assert.isTrue(ignoredBy(patterns)('libs/ts-data-forge/README.md'));
   });
 });
 
@@ -709,7 +795,7 @@ describe('the script, run the way the workflows run it', () => {
       code: 0,
       stdout: [
         `fake git: fetch --depth=1 origin ${before}`,
-        'should_run=true: libs/a/src/x.mts is on no pattern of the code list (3 changed files).',
+        'should_run=true: the code list does not ignore libs/a/src/x.mts (3 changed files).',
         '',
       ].join('\n'),
     });
@@ -739,7 +825,7 @@ describe('the script, run the way the workflows run it', () => {
       code: 0,
       stdout: [
         'fake git: fetch --depth=1 origin +refs/heads/main:refs/remotes/origin/main',
-        'should_run=false: every one of the 2 changed files is on a pattern of the code list.',
+        'should_run=false: the code list ignores every one of the 2 changed files.',
         '',
       ].join('\n'),
     });

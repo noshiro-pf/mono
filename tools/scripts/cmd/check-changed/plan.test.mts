@@ -1,5 +1,5 @@
 import { projectRootPath } from '../../project-root-path.mjs';
-import { matchesGatePattern, readGateList } from '../workflow-steps.mjs';
+import { ignoredBy, readGateList } from '../workflow-steps.mjs';
 import {
   buildPlan,
   classifyChanges,
@@ -123,9 +123,7 @@ describe('the code gate, read through readGateList', () => {
 
     assert.isNotEmpty(proseGate);
 
-    for (const pattern of proseGate) {
-      assert.doesNotThrow(() => matchesGatePattern('x', pattern));
-    }
+    assert.doesNotThrow(() => ignoredBy(proseGate)('x'));
   });
 
   test.each([
@@ -138,15 +136,15 @@ describe('the code gate, read through readGateList', () => {
     ['libs/a/LICENSE', false],
     ['libs/a/src/x.mts', false],
     ['tools/scripts/cmd/x.mts', false],
+    ['apps/a/README.md', true],
+    // A page an app builds, which its e2e checks judge (#2817).
+    ['apps/a/src/content/docs/ja/page.md', false],
   ] as const)('%s is prose: %s', (file, expected) => {
-    assert.strictEqual(
-      proseGate.some((pattern) => matchesGatePattern(file, pattern)),
-      expected,
-    );
+    assert.strictEqual(ignoredBy(proseGate)(file), expected);
   });
 
   test('a pattern of an unknown shape throws rather than misfiling', () => {
-    assert.throws(() => matchesGatePattern('a', 'src/*/x.ts'), /Unsupported/u);
+    assert.throws(() => ignoredBy(['src/*/x.ts'])('a'), /Unsupported/u);
   });
 });
 
@@ -250,6 +248,11 @@ describe('classifyChanges', () => {
     ['libs/ts-data-forge/samples/eslint.config.mts', ['root', 'root-guards']],
     ['.markdownlint-cli2.mjs', ['prose', 'root']],
     ['tools/scripts/cmd/check-changed/README.md', ['prose']],
+    // Code to the gate, and still Markdown for `check:md`.
+    [
+      'apps/synstate-docs/src/content/docs/ja/getting-started/installation.md',
+      ['prose', 'root-guards'],
+    ],
     ['.cspell.config.yaml', ['prose', 'spell-config']],
     ['libs/ts-data-forge/cspell.config.yaml', ['prose', 'spell-config']],
     ['.prettierrc', ['format-config', 'prose']],

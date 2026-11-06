@@ -387,10 +387,15 @@ no comment of their own, so what they mean is here:
   is not on the strict-lib list because the changelogs are copied into the
   bundles. Adding a path wrongly fails nothing; it makes the workflow skip a
   diff it was the one thing meant to judge.
+- **An entry after a `!` is an exception**: a file it matches counts, whatever
+  other entry of the same list matches it, and wherever in the list it stands.
+  Unlike a `.gitignore`, order means nothing.
 - **`code`** (`code-check.yml`, `node-version-compatibility.yml`,
-  `synstate-benchmark.yml`) drops
-  `experimental/`, `docs/`, `**.md`, `**.txt` and the style tools'
-  configuration.
+  `synstate-benchmark.yml`) drops `experimental/`, `docs/`, `**.md`, `**.txt`
+  and the style tools' configuration, except under `apps/*/src/`
+  (`!apps/*/src/`). A page there is what an app builds, and its e2e checks (that
+  a Japanese table fits as its English one does, say) run in `code-check.yml`
+  alone, so a diff touching only that page is the one they judge.
 - **`style`** (`style-check.yml`) drops `experimental/` and nothing else: its
   matrix checks markdown, `ws:doc` regenerates the package READMEs, and
   `ws:check:ext` globs every file under the directories it is given, so `code`
