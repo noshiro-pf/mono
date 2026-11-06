@@ -15,7 +15,6 @@ import {
   createAfterUpdate,
   For,
   mapBindable,
-  subscribeInScope,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -290,7 +289,7 @@ export const Calendar = ({
             minimal
             name={'months'}
             selectRef={(select) => {
-              subscribeInScope(display$, (index) => {
+              display$.subscribe((index) => {
                 afterUpdate(() => {
                   const container = select.parentElement?.parentElement;
 

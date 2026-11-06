@@ -4,7 +4,6 @@ import {
   createAfterUpdate,
   deriveBindable,
   If,
-  subscribeInScope,
   toObservable,
   type Bindable,
   type Child,
@@ -153,7 +152,7 @@ export const Collapse = ({
   // Once the update that changed `isOpen` has finished, since a state is not
   // written while another is propagating; and to the value it has then, so that
   // a change undone in the same task moves nothing.
-  subscribeInScope(isOpen$, () => {
+  isOpen$.subscribe(() => {
     afterUpdate(() => {
       follow(isOpen$.getSnapshot().value);
     });

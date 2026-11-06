@@ -1186,6 +1186,26 @@ describe('follow', () => {
     assert.strictEqual(browser.url().pathname, '/');
   });
 
+  test('outlives the scope it was started in, until stopped', async () => {
+    const { router } = setup();
+
+    const [href$, setHref] = createState<Href>(routes.home.href());
+
+    const scope = createScope();
+
+    const stopFollowing = scope.run(() => router.follow(href$));
+
+    scope.dispose();
+
+    setHref(routes.settings.href());
+
+    await Promise.resolve();
+
+    assert.strictEqual(current(router.match).route, 'settings');
+
+    stopFollowing();
+  });
+
   test('dispose stops following and drops a pending scroll', async () => {
     const { router, browser } = setup();
 

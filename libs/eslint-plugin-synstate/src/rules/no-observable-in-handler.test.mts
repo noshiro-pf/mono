@@ -235,6 +235,79 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
         };
       `,
     },
+    {
+      name: 'a subscription made at mount time, which the scope ends',
+      filename: tsx,
+      code: dedent`
+        import { createState } from 'synstate';
+        const Row = () => {
+          const [count$] = createState(0);
+          count$.subscribe(log);
+          return <button onClick={() => { log(count$); }} />;
+        };
+      `,
+    },
+    {
+      name: 'a subscription made in a handler under `untracked`, which keeps it on purpose',
+      filename: tsx,
+      code: dedent`
+        import { createState, untracked } from 'synstate';
+        const [count$] = createState(0);
+        const Row = () => <button onClick={() => { untracked(() => count$.subscribe(log)); }} />;
+      `,
+    },
+    {
+      name: 'subscribe on a const bound to an observable that completes by itself',
+      filename: tsx,
+      code: dedent`
+        import { just, timer } from 'synstate';
+        const flash$ = timer(300);
+        const one$ = just(1);
+        const Row = () => <button onClick={() => { flash$.subscribe(log); one$.subscribe(log); }} />;
+      `,
+    },
+    {
+      name: 'subscribe on a pipe of an observable that completes by itself, or ended by take',
+      filename: tsx,
+      code: dedent`
+        import { createState, map, take, timer } from 'synstate';
+        const [count$] = createState(0);
+        const first = take(1);
+        const flash$ = timer(300).pipe(map(() => false));
+        const once$ = count$.pipe(take(1));
+        const chained$ = timer(300).pipe(map(() => 1)).pipe(map((n) => n + 1));
+        const bound$ = count$.pipe(first);
+        const Row = () => (
+          <button
+            onClick={() => {
+              flash$.subscribe(log);
+              once$.subscribe(log);
+              chained$.subscribe(log);
+              bound$.subscribe(log);
+            }}
+          />
+        );
+      `,
+    },
+    {
+      name: 'subscribe on something not known to be a synstate observable',
+      filename: tsx,
+      code: dedent`
+        const Row = ({ emitter }) => <button onClick={() => { emitter.subscribe(log); }} />;
+      `,
+    },
+    {
+      name: 'unsubscribing in a handler',
+      filename: tsx,
+      code: dedent`
+        import { createState } from 'synstate';
+        const [count$] = createState(0);
+        const Row = () => {
+          const subscription = count$.subscribe(log);
+          return <button onClick={() => { subscription.unsubscribe(); }} />;
+        };
+      `,
+    },
   ],
   invalid: [
     {
@@ -550,6 +623,78 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
         { messageId: 'observableInHandler', line: 4 },
         { messageId: 'observableInHandler', line: 5 },
         { messageId: 'observableInHandler', line: 6 },
+      ],
+    },
+    {
+      name: 'subscribe on a state in an inline handler',
+      filename: tsx,
+      code: dedent`
+        import { createState } from 'synstate';
+        const [count$] = createState(0);
+        const Row = () => <button onClick={() => { count$.subscribe(log); }} />;
+      `,
+      errors: [{ messageId: 'subscriptionInHandler', line: 3, column: 44 }],
+    },
+    {
+      name: 'subscribe on an observable made by a synstate factory, in a listener and a function it calls',
+      filename: tsx,
+      code: dedent`
+        import { source } from 'synstate';
+        import { listenInScope } from 'synstate-dom';
+        const ticks$ = source();
+        const follow = () => { ticks$.subscribe(log); };
+        listenInScope(window, 'resize', () => { follow(); });
+      `,
+      errors: [{ messageId: 'subscriptionInHandler', line: 4 }],
+    },
+    {
+      name: 'subscribe on a const piped from a lasting observable with no ending operator',
+      filename: tsx,
+      code: dedent`
+        import { createState, map } from 'synstate';
+        const [count$] = createState(0);
+        const doubled$ = count$.pipe(map((n) => n * 2));
+        const Row = () => <button onClick={() => { doubled$.subscribe(log); }} />;
+      `,
+      errors: [{ messageId: 'subscriptionInHandler', line: 4 }],
+    },
+    {
+      name: 'subscribe on a pipe ended only by takeUntil or takeWhile',
+      filename: tsx,
+      code: dedent`
+        import { createState, takeUntil, takeWhile } from 'synstate';
+        const [count$] = createState(0);
+        const [closed$] = createState(false);
+        const untilClosed$ = count$.pipe(takeUntil(closed$));
+        const whileSmall$ = count$.pipe(takeWhile((n) => n < 10));
+        const Row = () => <button onClick={() => { untilClosed$.subscribe(log); whileSmall$.subscribe(log); }} />;
+      `,
+      errors: [
+        { messageId: 'subscriptionInHandler', line: 6 },
+        { messageId: 'subscriptionInHandler', line: 6 },
+      ],
+    },
+    {
+      name: 'a const that pipes back into itself does not overflow the stack',
+      filename: tsx,
+      code: dedent`
+        import { map } from 'synstate';
+        const a$ = b$.pipe(map((x) => x));
+        const b$ = a$.pipe(map((x) => x));
+        const Row = () => <button onClick={() => { a$.subscribe(log); }} />;
+      `,
+      errors: [{ messageId: 'subscriptionInHandler', line: 4 }],
+    },
+    {
+      name: 'subscribe on an observable derived in the handler reports both',
+      filename: tsx,
+      code: dedent`
+        import { map } from 'synstate';
+        const Row = () => <button onClick={() => { count$.pipe(map((n) => n * 2)).subscribe(log); }} />;
+      `,
+      errors: [
+        { messageId: 'observableInHandler', line: 2 },
+        { messageId: 'subscriptionInHandler', line: 2 },
       ],
     },
   ],

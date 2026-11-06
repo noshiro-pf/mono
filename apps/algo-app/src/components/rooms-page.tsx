@@ -1,10 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import {
-  createAfterUpdate,
-  MatchOptional,
-  subscribeInScope,
-  type JSX,
-} from 'synstate-dom';
+import { createAfterUpdate, MatchOptional, type JSX } from 'synstate-dom';
 import type { PageMatchOf, PageValues } from 'synstate-router';
 import { Optional } from 'ts-data-forge';
 import type { Rect } from 'ts-utils-additional';
@@ -40,7 +35,7 @@ export const RoomsPage = ({ values$, windowSize }: Props): JSX.Element => {
   // not from inside it.
   const afterUpdate = createAfterUpdate();
 
-  subscribeInScope(roomId, (id) => {
+  roomId.subscribe((id) => {
     if (id !== undefined) {
       afterUpdate(() => {
         roomStore.setRoomId(id);
@@ -48,7 +43,7 @@ export const RoomsPage = ({ values$, windowSize }: Props): JSX.Element => {
     }
   });
 
-  subscribeInScope(playerId, (id) => {
+  playerId.subscribe((id) => {
     if (id !== undefined) {
       afterUpdate(() => {
         roomStore.setMyName(id);

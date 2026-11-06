@@ -1,33 +1,5 @@
-import { createScope, createState } from 'synstate';
-import {
-  createAfterUpdate,
-  listenInScope,
-  subscribeInScope,
-} from './scope-effects.mjs';
-
-describe(subscribeInScope, () => {
-  test('follows the source, the current value first, until the scope is disposed', () => {
-    const scope = createScope(undefined);
-
-    const [source, setSource] = createState(0);
-
-    const mut_received: number[] = [];
-
-    scope.run(() => {
-      subscribeInScope(source, (value) => {
-        mut_received.push(value);
-      });
-    });
-
-    setSource(1);
-
-    scope.dispose();
-
-    setSource(2);
-
-    assert.deepStrictEqual(mut_received, [0, 1]);
-  });
-});
+import { createScope } from 'synstate';
+import { createAfterUpdate, listenInScope } from './scope-effects.mjs';
 
 describe(createAfterUpdate, () => {
   test('runs the work in a microtask, and drops it once the scope is disposed', async () => {

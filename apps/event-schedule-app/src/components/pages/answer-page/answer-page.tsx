@@ -15,7 +15,6 @@ import {
   createAfterUpdate,
   deriveBindable,
   mapBindable,
-  subscribeInScope,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -207,7 +206,7 @@ const AnswerPageOk = ({
 
   const afterUpdate = createAfterUpdate();
 
-  subscribeInScope(sectionState$, (state) => {
+  sectionState$.subscribe((state) => {
     switch (state) {
       case 'creating':
       case 'editing':

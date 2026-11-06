@@ -4,12 +4,7 @@ import {
   withInitialValue,
   type InitializedObservable,
 } from 'synstate';
-import {
-  createAfterUpdate,
-  mountable,
-  subscribeInScope,
-  type JSX,
-} from 'synstate-dom';
+import { createAfterUpdate, mountable, type JSX } from 'synstate-dom';
 import {
   matchAt,
   pageValues,
@@ -114,7 +109,7 @@ export const createRoutes = <R extends AnyRoutes>(
       // the update unmounted is dropped.
       const afterUpdate = createAfterUpdate();
 
-      subscribeInScope(router.match, () => {
+      router.match.subscribe(() => {
         afterUpdate(router.flushScroll);
       });
 

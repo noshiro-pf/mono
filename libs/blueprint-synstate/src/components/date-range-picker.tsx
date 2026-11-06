@@ -2,7 +2,6 @@ import { createState, derive, map } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  subscribeInScope,
   toObservable,
   type Bindable,
   type JSX,
@@ -120,7 +119,7 @@ export const DateRangePicker = ({
     range: value$.getSnapshot().value,
   };
 
-  subscribeInScope(value$, (range) => {
+  value$.subscribe((range) => {
     const previous = mut_previous.range;
 
     mut_previous.range = range;

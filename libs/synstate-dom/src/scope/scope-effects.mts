@@ -1,21 +1,5 @@
-import { onScopeDispose, type Observable } from 'synstate';
+import { onScopeDispose } from 'synstate';
 import type { StrictPick } from 'ts-type-forge';
-
-/**
- * Calls `next` with every value of `source`, the current one first, until the
- * current scope is disposed — what a component that is called once does in
- * place of an effect.
- */
-export const subscribeInScope = <A,>(
-  source: Observable<A>,
-  next: (value: A) => void,
-): void => {
-  const subscription = source.subscribe(next);
-
-  onScopeDispose(() => {
-    subscription.unsubscribe();
-  });
-};
 
 /** Listens to `type` on `target` until the current scope is disposed. */
 export const listenInScope = (

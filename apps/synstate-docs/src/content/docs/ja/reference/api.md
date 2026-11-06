@@ -97,12 +97,12 @@ SynStateはアプリケーションの状態を管理するためのシンプル
 
 ページの一部をマウント・破棄する UI 束縛のような、SynState の上に載るライブラリのための API。モジュールのトップレベルで定義したアプリの状態はどのスコープにも属さず、これを使う必要はない。
 
-- `createScope(parent?)`: スコープを作る。`scope.run(body)` の中で同期的に作られた Observable はそのスコープに属し、`scope.dispose()` は派生元の共有された Observable を complete せずにそれらを dispose する。`parent` を渡すと親と一緒に dispose される。
+- `createScope(parent?)`: スコープを作る。`scope.run(body)` の中で同期的に作られた Observable はそのスコープに属し、`scope.dispose()` は派生元の共有された Observable を complete せずにそれらを dispose する。そこで行った `subscribe` もそのスコープに属し、`dispose()` で購読が解除される。`parent` を渡すと親と一緒に dispose される。
 - `getCurrentScope()`: `run` を実行中のスコープ（無ければ `undefined`）。スコープに入るのは同期的に作られたものだけなので、`await` の後の処理は同期部分で取っておいたスコープの `run` で包む。
 - `onScopeDispose(cleanup)`: 現在のスコープが dispose されるときに `cleanup` を呼ぶ。
-- `untracked(body)`: 現在のスコープ無しで `body` を呼び、その中で作られたものを囲むスコープより長く生かす。
+- `untracked(body)`: 現在のスコープ無しで `body` を呼び、その中で作られたものと購読を、囲むスコープより長く生かす。
 
-`dispose()` は子スコープ、`onScopeDispose` の関数、所有する Observable の順に、それぞれ新しいものから破棄する。dispose 済みのスコープで `run` すると warning を出し、その中で作られたものはどのスコープにも属さない。
+`dispose()` は購読、子スコープ、`onScopeDispose` の関数、所有する Observable の順に、それぞれ新しいものから破棄する。そのため、スコープの中で行った購読は、`onScopeDispose` の関数が書いた値も、スコープやその子が dispose する Observable の complete も受け取らない。更新の伝搬と complete の通知は、どのスコープが値を書いたか、complete したかによらずスコープ無しで行われるので、それを受けて subscriber が行った購読や作った Observable は、subscriber 自身がスコープを `run` しない限りどのスコープにも属さない。dispose 済みのスコープで `run` すると warning を出し、その中で作られたものはどのスコープにも属さない。
 
 ### ユーティリティ
 

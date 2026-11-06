@@ -216,7 +216,7 @@ synstate derivations are not lazy: a derivation is computed whenever its parent 
 - `If`, `MatchOptional` and `MatchResult`: mount one branch at a time in a scope of its own, rebuilt only when the condition or the tag changes.
 - `For`: one row per key, each in a scope of its own; `item$` and `index$` are derived from `items`, and rows are moved as little as the longest increasing subsequence allows.
 - `Portal`: mounts its children into another element, in the scope where it is written.
-- `subscribeInScope`, `listenInScope` and `createAfterUpdate`: what a component, called once, does in place of an effect. A subscription or an event listener lasts until the current scope is disposed, and work runs in a microtask once the update under way has finished, dropped if the scope has been disposed by then.
+- `listenInScope` and `createAfterUpdate`: what a component, called once, does in place of an effect, with synstate's `subscribe`. A subscription made while a component mounts, like an event listener added by `listenInScope`, lasts until the current scope is disposed; work given to `createAfterUpdate` runs in a microtask once the update under way has finished, dropped if the scope has been disposed by then.
 - `isImeKeyDown(event)`: whether a key down belongs to an input method, so that a handler for Enter or Escape leaves it alone. That is a key sent while a composition is going on, or the Enter or Escape that confirmed or cancelled one, which Safari sends after `compositionend` with key code 229.
 
 ## Naming

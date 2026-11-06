@@ -1,7 +1,6 @@
 import {
   constant,
   createAfterUpdate,
-  subscribeInScope,
   toObservable,
   type Bindable,
   type Child,
@@ -81,7 +80,7 @@ export const HtmlSelect = ({
 
         const afterUpdate = createAfterUpdate();
 
-        subscribeInScope(value$, () => {
+        value$.subscribe(() => {
           afterUpdate(() => {
             mut_select.value = value$.getSnapshot().value;
           });

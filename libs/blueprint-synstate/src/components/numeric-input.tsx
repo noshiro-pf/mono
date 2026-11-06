@@ -10,7 +10,6 @@ import {
   deriveBindable,
   isImeKeyDown,
   mapBindable,
-  subscribeInScope,
   toObservable,
   type Bindable,
   type JSX,
@@ -341,7 +340,7 @@ export const NumericInput = <N extends number>({
 
   // A state is not written while another is still propagating, so the text
   // follows the value once the update that brought it has finished.
-  subscribeInScope(value$, (current) => {
+  value$.subscribe((current) => {
     if (mut_following) {
       afterUpdate(() => {
         setText(encode(current));
@@ -441,7 +440,7 @@ export const NumericInput = <N extends number>({
   onScopeDispose(endPress);
 
   if (viewProps.disabled !== undefined) {
-    subscribeInScope(toObservable(viewProps.disabled), (disabled) => {
+    toObservable(viewProps.disabled).subscribe((disabled) => {
       if (!disabled) {
         return;
       }
@@ -459,7 +458,7 @@ export const NumericInput = <N extends number>({
     [decrementDisabled, 'down'],
   ] as const) {
     if (boundReached !== undefined) {
-      subscribeInScope(toObservable(boundReached), (reached) => {
+      toObservable(boundReached).subscribe((reached) => {
         if (!(reached && mut_press.button === button)) {
           return;
         }

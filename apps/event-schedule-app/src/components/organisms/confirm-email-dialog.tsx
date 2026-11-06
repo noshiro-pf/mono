@@ -5,7 +5,6 @@ import {
   createAfterUpdate,
   isImeKeyDown,
   listenInScope,
-  subscribeInScope,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -40,7 +39,7 @@ export const ConfirmEmailDialog = ({
   const afterUpdate = createAfterUpdate();
 
   // ログイン済みならemailを自動入力してsubmit
-  subscribeInScope(Auth.email$, (email) => {
+  Auth.email$.subscribe((email) => {
     if (!isString(email)) {
       return;
     }
