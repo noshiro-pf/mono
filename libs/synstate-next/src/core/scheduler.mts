@@ -60,8 +60,11 @@ export type EffectNode = {
   run: () => void;
 };
 
-/** idle: no update; drain: visiting nodes; effects: running effects. */
-type Phase = 'drain' | 'effects' | 'idle';
+/**
+ * idle: no update; drain: visiting nodes; effects: running effects; settle:
+ * applying the deferred writes and the queued emissions once the effects ran.
+ */
+type Phase = 'drain' | 'effects' | 'idle' | 'settle';
 
 // Module state. The arrays keep their length in a counter: `length = 0` drops
 // the backing store and reallocates it on the next push, which used to cost
@@ -73,6 +76,8 @@ const mut_state = {
   /** Counts the rounds that took `pending`; see `isPending`. */
   pendingGeneration: 1,
   phase: 'idle' as Phase,
+  /** The epoch of the latest round; see `awaitsEffects`. */
+  roundEpoch: 0,
   batchDepth: 0,
   pendingLength: 0,
   effectsLength: 0,
@@ -89,8 +94,11 @@ const mut_state = {
 /** Nodes that emitted outside the drain: writes, async operators. */
 const mut_pending: (DerivedNode | undefined)[] = [];
 
-/** Writes made during the drain, applied once it ends. */
-const mut_deferred: ((() => void) | undefined)[] = [];
+/**
+ * Writes made during the drain, and emissions that wait for the effects (see
+ * `deferEmission`), applied in order once the effects have run.
+ */
+const mut_deferred: ((() => void) | QueuedEmitter | undefined)[] = [];
 
 /**
  * What waits for the next round to have propagated; see `afterNextRound`.
@@ -147,6 +155,21 @@ export const isPending = (node: DerivedNode): boolean =>
   node.queuedAt === -mut_state.pendingGeneration;
 
 /**
+ * Whether `node` emitted in the round under way and that round's effects have
+ * yet to run (or are running): they read its value, so nothing may overwrite it
+ * before the round is over.
+ */
+export const awaitsEffects = (node: DerivedNode): boolean =>
+  isPropagating() && node.changedAt === mut_state.roundEpoch;
+
+/**
+ * Whether a round is draining or running its effects: what it carries has yet
+ * to reach every effect.
+ */
+export const isPropagating = (): boolean =>
+  mut_state.phase === 'drain' || mut_state.phase === 'effects';
+
+/**
  * Calls `emitter.emitNext` once the next round has propagated, to emit a value
  * that had to wait for it: an event source written twice before a round
  * delivers each value in a round of its own. The rounds it starts do not count
@@ -161,6 +184,17 @@ export const afterNextRound = (emitter: QueuedEmitter): void => {
 /** Applies `write` once the drain ends. */
 export const deferWrite = (write: () => void): void => {
   mut_deferred[mut_state.deferredLength] = write;
+
+  mut_state.deferredLength += 1;
+};
+
+/**
+ * Calls `emitter.emitNext` where a deferred write made now would apply: once
+ * the drain and the effects of the round under way have run, in order with the
+ * writes deferred before it. An exception calls `drop` instead.
+ */
+export const deferEmission = (emitter: QueuedEmitter): void => {
+  mut_deferred[mut_state.deferredLength] = emitter;
 
   mut_state.deferredLength += 1;
 };
@@ -400,7 +434,16 @@ const clearQueues = (): void => {
 
   mut_state.pendingLength = 0;
 
-  mut_deferred.fill(undefined, 0, mut_state.deferredLength);
+  // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
+  for (let mut_i = 0; mut_i < mut_state.deferredLength; mut_i += 1) {
+    const write = mut_deferred[mut_i];
+
+    mut_deferred[mut_i] = undefined;
+
+    if (write !== undefined && typeof write !== 'function') {
+      write.drop();
+    }
+  }
 
   mut_state.deferredLength = 0;
 
@@ -499,6 +542,8 @@ const flushRounds = (): void => {
 
         const { epoch } = mut_state;
 
+        mut_state.roundEpoch = epoch;
+
         mut_state.phase = 'drain';
 
         const length = mut_state.pendingLength;
@@ -525,7 +570,7 @@ const flushRounds = (): void => {
         runEffects();
       }
 
-      mut_state.phase = 'effects';
+      mut_state.phase = 'settle';
 
       // A write outside the drain goes to `pending`, so the list cannot grow
       // while it runs, and an exception leaves it for `clearQueues`.
@@ -536,7 +581,11 @@ const flushRounds = (): void => {
 
         mut_deferred[mut_i] = undefined;
 
-        write();
+        if (typeof write === 'function') {
+          write();
+        } else {
+          write.emitNext();
+        }
       }
 
       mut_state.deferredLength = 0;

@@ -1,11 +1,5 @@
 import { noValue, ObservableClass, view } from './observable-class.mjs';
-import {
-  afterNextRound,
-  deferWrite,
-  isDraining,
-  isPending,
-  type QueuedEmitter,
-} from './scheduler.mjs';
+import { deferWrite, isDraining } from './scheduler.mjs';
 import type { InitializedObservable, Observable } from './types.mjs';
 
 /** A value that the application writes. */
@@ -91,93 +85,19 @@ class StateClass<A> extends ObservableClass<A> {
 
 /**
  * Every `next` propagates. A value written while the previous one still waits
- * for its round (twice in a batch, or twice from effects) waits in `#mut_queue`
- * and is delivered in a round of its own, in order.
+ * for its round (twice in a batch, or twice from effects) is delivered in a
+ * round of its own, in order; see `publishEvent`.
  */
 class SourceClass<A> extends ObservableClass<A> {
-  /** Values waiting for a round, each boxed: `A` may include `undefined`. */
-  #mut_queue: { readonly value: A }[];
-
-  /** The index in `#mut_queue` of the next value to deliver. */
-  #mut_head: number;
-
-  readonly #emitter: QueuedEmitter;
-
   constructor() {
     super(noValue, 0);
-
-    this.#mut_queue = [];
-
-    this.#mut_head = 0;
-
-    this.#emitter = {
-      emitNext: () => {
-        this.#emitQueued();
-      },
-      drop: () => {
-        this.#dropQueue();
-      },
-    };
-  }
-
-  #hasQueued(): boolean {
-    return this.#mut_head < this.#mut_queue.length;
-  }
-
-  #emitQueued(): void {
-    const head = this.#mut_queue[this.#mut_head];
-
-    if (head === undefined || this.disposed) {
-      this.#dropQueue();
-
-      return;
-    }
-
-    this.#mut_head += 1;
-
-    this.publish(head.value);
-
-    if (this.#hasQueued()) {
-      afterNextRound(this.#emitter);
-    } else {
-      this.#dropQueue();
-    }
-  }
-
-  /** Empties the queue: delivered, or abandoned after an exception. */
-  #dropQueue(): void {
-    this.#mut_queue = [];
-
-    this.#mut_head = 0;
   }
 
   next(value: A): void {
-    if (isDraining()) {
-      deferWrite(() => {
-        this.next(value);
-      });
-
-      return;
-    }
-
     if (this.disposed) {
       return;
     }
 
-    if (this.#hasQueued()) {
-      this.#mut_queue.push({ value });
-
-      return;
-    }
-
-    if (isPending(this)) {
-      this.#mut_queue.push({ value });
-
-      afterNextRound(this.#emitter);
-
-      return;
-    }
-
-    this.publish(value);
+    this.publishEvent(value);
   }
 }

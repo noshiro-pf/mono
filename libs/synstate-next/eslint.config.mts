@@ -73,6 +73,9 @@ export default [
                 'QueuedNode',
               ],
             },
+            // What `fromAbortablePromise` hands its factory: the factory
+            // listens on it, which a readonly type would not let it do.
+            { from: 'lib', name: ['AbortSignal'] },
           ],
         },
       ],

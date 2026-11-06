@@ -1,6 +1,6 @@
 import {
   DerivedClass,
-  EffectClass,
+  InnerFollower,
   Owner,
   noValue,
   toNode,
@@ -33,6 +33,9 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
 
   #mut_inner: Owner | undefined;
 
+  /** The inner observable followed, for `settled`. */
+  #mut_innerNode: ObservableClass<B> | undefined;
+
   constructor(
     parent: ObservableClass<A>,
     project: (value: A) => Observable<B>,
@@ -44,6 +47,8 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
     this.#project = project;
 
     this.#mut_inner = undefined;
+
+    this.#mut_innerNode = undefined;
 
     const v = parent.current;
 
@@ -64,9 +69,11 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
     owner.run(() => {
       const inner = toNode(this.#project(value));
 
+      this.#mut_innerNode = inner;
+
       // The constructor makes it the inner's child and gives it to `owner`.
       // oxlint-disable-next-line eslint/no-new
-      new InnerFollower(inner, this);
+      new InnerFollower(inner, this, undefined);
 
       const v = inner.current;
 
@@ -74,6 +81,10 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
         this.current = v;
       }
     });
+  }
+
+  override get settled(): boolean {
+    return super.settled && (this.#mut_innerNode?.settled ?? true);
   }
 
   /** Called by the follower when the inner observable emits later. */
@@ -100,26 +111,8 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
 
     this.#mut_inner = undefined;
 
+    this.#mut_innerNode = undefined;
+
     super.teardown();
-  }
-}
-
-type InnerTarget<B> = Readonly<{ innerEmitted: (value: B) => void }>;
-
-class InnerFollower<B> extends EffectClass<B> {
-  readonly #target: InnerTarget<B>;
-
-  constructor(inner: ObservableClass<B>, target: InnerTarget<B>) {
-    super(inner);
-
-    this.#target = target;
-  }
-
-  run(): void {
-    const v = this.source.current;
-
-    if (v !== noValue) {
-      this.#target.innerEmitted(v);
-    }
   }
 }
