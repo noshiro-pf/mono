@@ -73,9 +73,13 @@ by case. In order:
    `.prettierrc` or `.prettierignore` changed).
 
 A path the code gate ignores (the `code` list of
-`tools/configs/gate-ignore-lists.json`, which `code-check.yml`'s gate reads)
-touches its package's documents only: the generators run, the type check and
-tests do not, as CI's would not. `experimental/` is outside everything.
+`tools/configs/gate-ignore-lists.json`, which `code-check.yml`'s gate reads,
+less what its `!` exceptions take back) touches its package's documents only:
+the generators run, the type check and tests do not, as CI's would not. A
+Markdown page the gate excepts, under `apps/*/src/`, is code and still gets
+`check:md`, which reads it unless `.markdownlint-cli2.mjs` leaves it out (as it
+does every page under a `docs/` directory). `experimental/` is outside
+everything.
 
 Every step runs whatever failed before it, and every step is watched for what
 it writes. What is still changed at the end is listed under the step that

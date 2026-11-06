@@ -342,32 +342,58 @@ export const readGateList = (
  * Whether a repository-relative path matches an ignore pattern, in the shapes
  * the lists use, each answering as micromatch does with `{ dot: true }`, which
  * is how `check-should-run` of ts-repo-utils matched them when the gate ran it:
- * `dir/` (everything under it), `**.ext` (that extension at any depth),
+ * `dir/` (everything under it; a segment that is `*` stands for any one
+ * directory, as in `apps/* /src/`), `**.ext` (that extension at any depth),
  * `** /name` (that file name in any directory, the root included), `*.ext`
  * (that extension at the root), `dir/** /*.ext` (that extension at any depth
  * under the directory) and a plain path.
  *
  * Any other shape throws, so that a pattern added to a list and not understood
- * here is a loud failure rather than a quiet misfiling.
+ * here is a loud failure rather than a quiet misfiling. One pattern only, never
+ * a list's `!` exception, which throws here: a list is read by
+ * {@link ignoredBy}.
  */
 export const matchesGatePattern = (file: string, pattern: string): boolean =>
   matchesShape(file, shapeOrThrow(pattern));
 
 /**
- * The first changed file on none of the patterns, which is what makes the
- * checks run; `undefined` when every one is on a pattern, or none changed.
- * Throws, as {@link matchesGatePattern} does, on a pattern of a shape it does
- * not understand, whatever the files.
+ * Whether a list ignores a path, the list read once: one of its patterns
+ * matches the path, and none of its exceptions does. An exception is a pattern
+ * after a `!`, and it takes what it matches out of every other pattern of the
+ * list wherever it stands in it, unlike a `.gitignore`, where a later line
+ * overrides an earlier one: a list is a set, and its order is no meaning to
+ * keep. Throws, as {@link matchesGatePattern} does, on a pattern of a shape it
+ * does not understand, whatever the paths.
+ */
+export const ignoredBy = (
+  patterns: readonly string[],
+): ((file: string) => boolean) => {
+  const ignore = patterns
+    .filter((pattern) => !pattern.startsWith(EXCEPT))
+    .map(shapeOrThrow);
+
+  const except = patterns
+    .filter((pattern) => pattern.startsWith(EXCEPT))
+    .map((pattern) => shapeOrThrow(withoutExcept(pattern)));
+
+  return (file) =>
+    ignore.some((shape) => matchesShape(file, shape)) &&
+    except.every((shape) => !matchesShape(file, shape));
+};
+
+/**
+ * The first changed file the patterns do not ignore ({@link ignoredBy}), which
+ * is what makes the checks run; `undefined` when every one is ignored, or none
+ * changed. Throws on a pattern of a shape it does not understand, whatever the
+ * files.
  */
 export const firstFileToCheck = (
   files: readonly string[],
   patterns: readonly string[],
 ): string | undefined => {
-  const shapes = patterns.map(shapeOrThrow);
+  const isIgnored = ignoredBy(patterns);
 
-  return files.find((file) =>
-    shapes.every((shape) => !matchesShape(file, shape)),
-  );
+  return files.find((file) => !isIgnored(file));
 };
 
 /**
@@ -443,7 +469,7 @@ export type ShouldRunArgs = Readonly<{
 }>;
 
 type PatternShape = Readonly<
-  | { kind: 'directory'; prefix: string }
+  | { kind: 'directory'; segments: readonly string[] }
   | { kind: 'extension'; suffix: string }
   | { kind: 'name'; name: string }
   | { kind: 'root-extension'; suffix: string }
@@ -462,7 +488,13 @@ const GLOB_SYNTAX = /[!()*+,?@[\]{}]/u;
 const MAX_DIFF_BYTES = 256 * 1024 * 1024;
 
 const unsupportedPattern = (pattern: string): string =>
-  `Unsupported ignore pattern "${pattern}": only \`dir/\`, \`**.ext\`, \`**/name\`, \`*.ext\`, \`dir/**/*.ext\` and a plain path are understood.` as const;
+  `Unsupported ignore pattern "${pattern}": only \`dir/\` (whose segments may be \`*\`), \`**.ext\`, \`**/name\`, \`*.ext\`, \`dir/**/*.ext\` and a plain path are understood, each optionally after a \`!\` that excepts what it matches.` as const;
+
+/** What marks an exception in a list. */
+const EXCEPT = '!';
+
+/** A segment of a `dir/` pattern that stands for any one directory. */
+const ANY_SEGMENT = '*';
 
 /** Its shape, when every part of it but the glob syntax is a literal. */
 const patternShape = (pattern: string): PatternShape | undefined => {
@@ -476,7 +508,10 @@ const patternShape = (pattern: string): PatternShape | undefined => {
           suffix: groups['suffix'] ?? '',
         } as const)
       : pattern.endsWith('/')
-        ? ({ kind: 'directory', prefix: pattern } as const)
+        ? ({
+            kind: 'directory',
+            segments: pattern.slice(0, -1).split('/'),
+          } as const)
         : pattern.startsWith('**.')
           ? ({ kind: 'extension', suffix: pattern.slice('**'.length) } as const)
           : pattern.startsWith('**/')
@@ -494,26 +529,39 @@ const patternShape = (pattern: string): PatternShape | undefined => {
     shape.kind === 'directory-extension' ||
     shape.kind === 'path';
 
-  const literals = Object.entries(shape)
-    .filter(([key]) => key !== 'kind')
-    .map(([, literal]) => literal);
+  const literals =
+    shape.kind === 'directory'
+      ? shape.segments.filter((segment) => segment !== ANY_SEGMENT)
+      : Object.entries(shape)
+          .filter(([key]) => key !== 'kind')
+          .map(([, literal]) => literal);
 
-  return literals.every(
-    (literal) =>
-      literal !== '' &&
-      !GLOB_SYNTAX.test(literal) &&
-      (mayHoldSlash || !literal.includes('/')),
-  )
+  // A directory needs a literal segment: `*/` alone would take in every file
+  // below the root, an exception that leaves its list ignoring nothing.
+  return literals.length > 0 &&
+    literals.every(
+      (literal) =>
+        literal !== '' &&
+        !GLOB_SYNTAX.test(literal) &&
+        (mayHoldSlash || !literal.includes('/')),
+    )
     ? shape
     : undefined;
 };
 
-/** `patterns`, when every one of them has a shape the matcher understands. */
+/** A pattern with the `!` of an exception taken off. */
+const withoutExcept = (pattern: string): string =>
+  pattern.startsWith(EXCEPT) ? pattern.slice(EXCEPT.length) : pattern;
+
+/**
+ * `patterns`, when every one of them, or of their exceptions after the `!`, has
+ * a shape the matcher understands.
+ */
 const validatePatterns = (
   patterns: readonly string[],
 ): Parsed<readonly string[]> => {
   const unsupported = patterns.find(
-    (pattern) => patternShape(pattern) === undefined,
+    (pattern) => patternShape(withoutExcept(pattern)) === undefined,
   );
 
   return unsupported === undefined
@@ -533,8 +581,18 @@ const shapeOrThrow = (pattern: string): PatternShape => {
 
 const matchesShape = (file: string, shape: PatternShape): boolean => {
   switch (shape.kind) {
-    case 'directory':
-      return file.startsWith(shape.prefix);
+    case 'directory': {
+      const parts = file.split('/');
+
+      // A file under it, so one segment more at least.
+      return (
+        parts.length > shape.segments.length &&
+        shape.segments.every(
+          (segment, index) =>
+            segment === ANY_SEGMENT || parts[index] === segment,
+        )
+      );
+    }
 
     case 'extension':
       return file.endsWith(shape.suffix);
@@ -665,10 +723,10 @@ const answerShouldRun = ({
 
   console.log(
     fileToCheck !== undefined
-      ? `should_run=true: ${fileToCheck} is on no pattern of ${label} (${files.length} changed files).`
+      ? `should_run=true: ${label} does not ignore ${fileToCheck} (${files.length} changed files).`
       : anyFile === undefined
         ? `should_run=false: no file changed against ${base}.`
-        : `should_run=false: every one of the ${files.length} changed files is on a pattern of ${label}.`,
+        : `should_run=false: ${label} ignores every one of the ${files.length} changed files.`,
   );
 
   if (output !== undefined) {

@@ -6,7 +6,7 @@ import { entryPointTargets } from '../assert-deps-built.mjs';
 // that script runs under plain `node`, which resolves an import by the name
 // written, and the imports here name `.mjs` files that only tsx maps to `.mts`
 // (assert-deps-built.mts above is shared the same way, for the same reason).
-import { matchesGatePattern } from '../workflow-steps.mjs';
+import { ignoredBy } from '../workflow-steps.mjs';
 /**
  * Which commands a set of changed paths needs: the pure half of
  * `check-changed`, which `main.mts` feeds with what git and the manifests say.
@@ -18,11 +18,12 @@ import { matchesGatePattern } from '../workflow-steps.mjs';
  *
  * A path belongs to the workspace member whose directory is its longest prefix.
  * Under a package, a path the code gate ignores (`proseGate`, the `code` list
- * of `tools/configs/gate-ignore-lists.json` that `code-check.yml` gates on)
- * touches the package's documents only: its generators run, its type check and
- * tests do not, as CI's would not. `strict-lib/` is one area whatever member a
- * path is in, because its harnesses are checked by the root `strict-lib:*`
- * scripts rather than their own; `experimental/` is outside everything.
+ * of `tools/configs/gate-ignore-lists.json` that `code-check.yml` gates on, its
+ * `!` exceptions included) touches the package's documents only: its generators
+ * run, its type check and tests do not, as CI's would not. `strict-lib/` is one
+ * area whatever member a path is in, because its harnesses are checked by the
+ * root `strict-lib:*` scripts rather than their own; `experimental/` is outside
+ * everything.
  */
 export const classifyChanges = ({
   files,
@@ -42,6 +43,8 @@ export const classifyChanges = ({
 
   const byDepth = packages.toSorted((a, b) => b.dir.length - a.dir.length);
 
+  const isProse = ignoredBy(proseGate);
+
   for (const file of files) {
     if (file.startsWith('experimental/')) {
       mut_ignored.push(file);
@@ -49,9 +52,7 @@ export const classifyChanges = ({
       continue;
     }
 
-    const prose = proseGate.some((pattern) =>
-      matchesGatePattern(file, pattern),
-    );
+    const prose = isProse(file);
 
     // CI runs `check:root` on every diff its code gate lets through, and the
     // guards in it read package files too (`check:root:example-coverage` reads
@@ -109,7 +110,9 @@ export const classifyChanges = ({
       continue;
     }
 
-    if (prose) {
+    // A page an app builds is code to the gate (`!apps/*/src/`), and still
+    // Markdown, which `check:md` reads unless its `ignores` leave it out.
+    if (prose || file.endsWith('.md')) {
       mut_areas.add('prose');
     }
 

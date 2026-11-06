@@ -11,7 +11,8 @@
     "**/cspell.config.yaml",
     ".markdownlint-cli2.mjs",
     "**.md",
-    "**.txt"
+    "**.txt",
+    "!apps/*/src/"
   ],
   "style": ["experimental/"],
   "strict-lib": [
