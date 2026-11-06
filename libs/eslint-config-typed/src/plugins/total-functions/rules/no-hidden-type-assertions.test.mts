@@ -322,8 +322,143 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
         export const r2 = g<string>();
       `,
     },
+    // A type parameter an argument supplies is not judged, whatever the
+    // context: the optional parameter given, an annotated callback, a rest
+    // parameter given an argument or a spread
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function g<T>(x?: T): T;
+        export const r1: string = g('a');
+        declare function k<T>(cb: (t: T) => void): T;
+        export const r2: string = k((t: string) => {});
+        declare function r<T>(...xs: readonly T[]): T;
+        export const r3: string = r('a');
+        declare const xs: readonly string[];
+        export const r4: string = r(...xs);
+        declare function m<T>(x: NoInfer<T>, y: T): T;
+        export const r5: string = m('a', 'b');
+      `,
+    },
+    // A type parameter no argument supplies and no context infers resolves to
+    // \`unknown\`, so the call asserts nothing
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function g<T>(x?: T): T;
+        export const r1 = g();
+        declare function parse<T = unknown>(): T;
+        export const r2 = parse();
+      `,
+    },
+    // A \`never\` default written nowhere passes where the declared return type
+    // is a union with a member the type parameter is not in: the value may be
+    // that member, as \`ok(1)\` is \`{ ok: number }\`
+    {
+      filename: 'file.ts',
+      code: dedent`
+        type Result<S, E> = { ok: S } | { err: E };
+        declare function ok2<S, E = never>(s: S): Result<S, E>;
+        export const r1: Result<number, string> = ok2(1);
+        declare function maybe<T = never>(): T | undefined;
+        export const r2: string | undefined = maybe();
+        declare function wrap<T = never>(): { v: T | null } | undefined;
+        export const r3: { v: string | null } | undefined = wrap();
+        type Box<T> = { v: T };
+        declare function boxed<T = never>(): Box<T> | undefined;
+        export const r4: Box<string> | undefined = boxed();
+      `,
+    },
   ],
   invalid: [
+    // A type parameter only an omitted optional parameter mentions is inferred
+    // from the context alone
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function g<T>(x?: T): T;
+        export const r1: string = g();
+      `,
+      errors: [{ messageId: 'errorStringGeneric' }],
+    },
+    // \`NoInfer\` keeps the argument from supplying it
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function h<T>(x: NoInfer<T>): T;
+        export const r1: string = h('a');
+      `,
+      errors: [{ messageId: 'errorStringGeneric' }],
+    },
+    // A callback mentioning it only among its parameters, given a lambda with
+    // an unannotated parameter, takes its type from the context too
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function k<T>(cb: (t: T) => void): T;
+        export const r1: string = k((t) => {});
+      `,
+      errors: [{ messageId: 'errorStringGeneric' }],
+    },
+    // A cast of a function whose only mention of the type parameter among its
+    // parameters is under \`NoInfer\` is a cast of a hidden type assertion
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function h<T>(x: NoInfer<T>): T;
+        export const r1 = (h as (x: string) => string)('a');
+      `,
+      errors: [{ messageId: 'errorStringGeneric' }],
+    },
+    // A rest parameter given nothing supplies nothing
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function r<T>(...xs: readonly T[]): T;
+        export const r1: string = r();
+      `,
+      errors: [{ messageId: 'errorStringGeneric' }],
+    },
+    // An \`unknown\` default does not pass a type argument the context infers
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function parse<T = unknown>(): T;
+        export const r1: string = parse();
+      `,
+      errors: [{ messageId: 'errorStringGeneric' }],
+    },
+    // Nor does a \`never\` default where the return type is the type parameter
+    // alone
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function parse<T = never>(): T;
+        export const r1: string = parse();
+      `,
+      errors: [{ messageId: 'errorStringGeneric' }],
+    },
+    // Nor where every member of the union has the type parameter in it
+    {
+      filename: 'file.ts',
+      code: dedent`
+        type Box<T> = { v: T };
+        declare function both<T = never>(): Box<T> | { w: readonly T[] };
+        export const r1: Box<string> | { w: readonly string[] } = both();
+        declare function nullable<T = never>(): { v: T | null } | { w: T };
+        export const r2: { v: string | null } | { w: string } = nullable();
+      `,
+      errors: Arr.create(2, { messageId: 'errorStringGeneric' } as const),
+    },
+    // A \`never\` default does not pass a type argument the call writes
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function ok<S, E = never>(s: S): { ok: S } | { err: E };
+        export const r1 = ok<number, string>(1);
+      `,
+      errors: [{ messageId: 'errorStringGeneric' }],
+    },
     // Hidden type assertion set to arbitrary type
     {
       filename: 'file.ts',
