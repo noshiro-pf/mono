@@ -5,7 +5,7 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import type { Scope } from '../types/index.mjs';
+import type { ObservableBase, Scope } from '../types/index.mjs';
 import {
   getCurrentScopeInternals,
   runWithScope,
@@ -27,6 +27,16 @@ import {
  * stands alone and lives until its own `dispose()`. A parent that is already
  * disposed gives a scope that is born disposed, with a warning.
  *
+ * With `after`, every observable derived in the scope (and in its child scopes)
+ * updates after `after` in an update that reaches both, however few steps it is
+ * from the source. A switch that mounts a branch in the scope when `after`
+ * changes passes it, so that the switch, hearing `after`, disposes a branch
+ * that no longer applies before the branch computes the value that rules it
+ * out. It orders one update only: an `after` that emits in an update of its own
+ * (`debounce`, `switchMap`) is not ahead of what the source's update reaches
+ * first. A subscription made in the branch directly to the source still hears
+ * the value when the source emits.
+ *
  * Intended for authors of libraries built on synstate rather than for
  * application code; state defined at module level belongs to no scope and lives
  * as long as the page.
@@ -35,10 +45,18 @@ import {
  * (`scope.dispose()`) rather than taking them off it.
  *
  * @param parent - The scope whose disposal also disposes the new one
+ * @param options - `after`: the observable that what the scope derives updates
+ *   after
  * @returns The new scope
  */
-export const createScope = (parent?: Scope): Scope =>
-  new ScopeClass(parent instanceof ScopeClass ? parent : undefined);
+export const createScope = (
+  parent?: Scope,
+  options?: Readonly<{ after?: ObservableBase<unknown> }>,
+): Scope =>
+  new ScopeClass(
+    parent instanceof ScopeClass ? parent : undefined,
+    options?.after === undefined ? 0 : options.after.depth + 1,
+  );
 
 /**
  * Returns the scope whose `run` is executing, or `undefined` outside every
@@ -117,9 +135,12 @@ class ScopeClass implements ScopeInternals {
   #mut_subscriptions: ScopeSubscription[] | undefined;
   #mut_goneSubscriptions: number;
   #mut_isDisposed: boolean;
+  readonly depthFloor: number;
 
-  constructor(parent: ScopeClass | undefined) {
+  constructor(parent: ScopeClass | undefined, depthFloor: number) {
     this.#parent = parent;
+
+    this.depthFloor = Math.max(parent?.depthFloor ?? 0, depthFloor);
 
     this.#mut_children = undefined;
 

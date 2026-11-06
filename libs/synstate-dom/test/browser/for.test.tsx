@@ -207,6 +207,46 @@ describe(For, () => {
     assert.strictEqual(mut_runs.current, before + 1);
   });
 
+  test('disposes the row of a key that goes before it computes from the items that drop it (#3605)', () => {
+    const [items$, setItems] = createState<readonly Item[]>([
+      item('a', 'A'),
+      item('b', 'B'),
+    ]);
+
+    const mut_seen: (string | undefined)[] = [];
+
+    // Reads the list by id, as a row may: the row of a removed id would find
+    // nothing.
+    const Row = ({ id }: Readonly<{ id: string }>): JSX.Element => (
+      <b>
+        {items$.pipe(
+          map((xs) => {
+            const name = xs.find((x) => x.id === id)?.name;
+
+            mut_seen.push(name);
+
+            return name ?? 'unreachable';
+          }),
+        )}
+      </b>
+    );
+
+    // Derived, so that `For`'s own view of the list is deeper than the row's.
+    const shown$ = items$.pipe(map((xs) => xs));
+
+    const { container } = mountInto(() => (
+      <For items={shown$} key={(i) => i.id}>
+        {(item$) => <Row id={item$.getSnapshot().value.id} />}
+      </For>
+    ));
+
+    setItems([item('a', 'A')]);
+
+    assert.strictEqual(container.textContent, 'A');
+
+    assert.notInclude(mut_seen, undefined);
+  });
+
   test('keeps rows whose top level switches when they move', () => {
     const [items$, setItems] = createState<readonly string[]>(['a', 'b']);
 

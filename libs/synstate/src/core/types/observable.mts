@@ -31,8 +31,9 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
   kind: Kind;
 
   /**
-   * One more than the deepest observable this one is derived from; 0 for a
-   * root. An update reaches observables in ascending depth, so every parent has
+   * One more than the deepest observable this one is derived from, or more when
+   * it is created in a scope made with `after` (`createScope`); 0 for a root.
+   * An update reaches observables in ascending depth, so every parent has
    * emitted before its child reads it.
    */
   depth: Kind extends 'root' ? 0 : number;

@@ -97,7 +97,7 @@ For complex scenarios, SynState provides observable-based APIs:
 
 For libraries built on SynState, such as a UI binding that mounts and unmounts parts of a page. Application state defined at module level belongs to no scope and needs none of this.
 
-- `createScope(parent?)`: Create a scope. Observables created synchronously inside `scope.run(body)` belong to it, and `scope.dispose()` disposes them without completing the shared observables they were derived from. A `subscribe` made there belongs to it too, and `dispose()` unsubscribes it. With `parent`, it is disposed together with the parent.
+- `createScope(parent?, { after? })`: Create a scope. Observables created synchronously inside `scope.run(body)` belong to it, and `scope.dispose()` disposes them without completing the shared observables they were derived from. A `subscribe` made there belongs to it too, and `dispose()` unsubscribes it. With `parent`, it is disposed together with the parent. With `after`, every observable derived in the scope and its child scopes updates after `after`, however few steps it is from the source; a switch that mounts a branch in the scope passes the value it switches on, so that it disposes a branch the next value rules out before the branch computes that value.
 - `getCurrentScope()`: The scope whose `run` is executing, if any. Take it while still synchronous and wrap work after an `await` in its `run`, since only what is created synchronously joins a scope.
 - `onScopeDispose(cleanup)`: Call `cleanup` when the current scope is disposed.
 - `untracked(body)`: Call `body` with no current scope, so that what it creates, and what it subscribes, outlives the surrounding scope.

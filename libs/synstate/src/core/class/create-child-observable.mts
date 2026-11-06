@@ -99,7 +99,8 @@ type ChildObservableConfigBase<P extends NonEmptyUnknownList> = Readonly<{
    * in ascending depth, so an observable `tryUpdate` reads with `getSnapshot`
    * without being its child (`withCurrentValueFrom`'s second source) has to be
    * shallower than this one too, or this one reads its value from before the
-   * update: pass `1 + Math.max(...)` over both then.
+   * update: pass `1 + Math.max(...)` over both then. Either is raised to the
+   * floor of the scope it is created in (`createScope`'s `after`).
    */
   depth?: number;
 }>;

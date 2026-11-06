@@ -29,6 +29,12 @@ export type ScopeSubscription = Readonly<{
  */
 export type ScopeInternals = Scope &
   Readonly<{
+    /**
+     * The least depth of an observable created in the scope (`createScope`'s
+     * `after`, inherited from the parent): 0 when it follows nothing.
+     */
+    depthFloor: number;
+
     /** Takes `node` into the scope. */
     adopt: (node: ScopeMember) => void;
 
