@@ -1,3 +1,4 @@
+import { replaceEqualDeep, type ReplaceEqualDeepOptions } from 'ts-data-forge';
 import { noValue, ObservableClass, view } from './observable-class.mjs';
 import { deferWrite, isDraining } from './scheduler.mjs';
 import type { InitializedObservable, Observable } from './types.mjs';
@@ -21,8 +22,23 @@ export type Source<A> = Observable<A> &
   }>;
 
 export type StateOptions<A> = Readonly<{
-  /** Decides whether a write changes anything. Defaults to `Object.is`. */
-  equals?: (a: A, b: A) => boolean;
+  /**
+   * Decides whether a write changes anything, given the value held first and
+   * the next one second (after `keepEqualParts`). A write it finds equal passes
+   * nothing on and keeps the value held, identity included. Defaults to
+   * `Object.is`; pass `() => false` to pass on every write.
+   */
+  equals?: (current: A, next: A) => boolean;
+  /**
+   * Whether a write keeps the parts of the value it did not change: every part
+   * of the written value deeply equal to the same part of the current one is
+   * replaced by that part (`replaceEqualDeep` of ts-data-forge), so a reader of
+   * an unchanged part keeps its object, and a deeply equal value passes nothing
+   * on. For a value written whole from a source that answers with a new object
+   * each time. Array items are matched by index, or by `{ key }`. Defaults to
+   * `false`.
+   */
+  keepEqualParts?: boolean | ReplaceEqualDeepOptions;
 }>;
 
 /**
@@ -33,18 +49,33 @@ export type StateOptions<A> = Readonly<{
  * update. Neither interrupts the update under way.
  */
 export const state = <A,>(initial: A, options?: StateOptions<A>): State<A> =>
-  view(new StateClass(initial, options?.equals ?? Object.is));
+  view(
+    new StateClass(
+      initial,
+      options?.equals ?? Object.is,
+      keepOptionsOf(options?.keepEqualParts ?? false),
+    ),
+  );
 
 /** Creates an event source, holding no value until its first `next`. */
 export const source = <A,>(): Source<A> => view(new SourceClass<A>());
 
 class StateClass<A> extends ObservableClass<A> {
-  readonly #equals: (a: A, b: A) => boolean;
+  readonly #equals: (current: A, next: A) => boolean;
 
-  constructor(initial: A, equals: (a: A, b: A) => boolean) {
+  /** `replaceEqualDeep`'s options, or `false` to write values as given. */
+  readonly #keep: ReplaceEqualDeepOptions | false;
+
+  constructor(
+    initial: A,
+    equals: (current: A, next: A) => boolean,
+    keep: ReplaceEqualDeepOptions | false,
+  ) {
     super(initial, 0);
 
     this.#equals = equals;
+
+    this.#keep = keep;
   }
 
   set(value: A): void {
@@ -60,13 +91,17 @@ class StateClass<A> extends ObservableClass<A> {
       return;
     }
 
-    const current = this.current;
+    // A state always holds a value, so `value` does not throw.
+    const current = this.value;
 
-    if (current !== noValue && this.#equals(current, value)) {
-      return;
+    const next =
+      this.#keep === false
+        ? value
+        : replaceEqualDeep(current, value, this.#keep);
+
+    if (!this.#equals(current, next)) {
+      this.publish(next);
     }
-
-    this.publish(value);
   }
 
   update(fn: (current: A) => A): void {
@@ -101,3 +136,8 @@ class SourceClass<A> extends ObservableClass<A> {
     this.publishEvent(value);
   }
 }
+
+const keepOptionsOf = (
+  keepEqualParts: boolean | ReplaceEqualDeepOptions,
+): ReplaceEqualDeepOptions | false =>
+  keepEqualParts === true ? ({} as const) : keepEqualParts;

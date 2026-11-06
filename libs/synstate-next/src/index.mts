@@ -24,3 +24,4 @@ export {
 } from './core/index.mjs';
 export * from './operators/index.mjs';
 export * from './sources/index.mjs';
+export * from './utils/index.mjs';

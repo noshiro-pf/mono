@@ -27,7 +27,8 @@ synstate や synstate-dom に入れたバグ修正・セキュリティ修正・
 
 ## What is here
 
-- `state`, `source`, `batch`, owners (`createOwner`, `onCleanup`, `untracked`).
+- `state` (with the options `equals` and `keepEqualParts`), `source`, `batch`,
+  owners (`createOwner`, `onCleanup`, `untracked`).
 - The sources `timer`, `counter`, `fromPromise`, `fromAbortablePromise`,
   `fromSubscribable`, `just` and `empty`.
 - `pipe` with the operators `map`, `filter`, `scan`, `withInitialValue`,
@@ -35,5 +36,7 @@ synstate や synstate-dom に入れたバグ修正・セキュリティ修正・
   `skipWhile`, `takeUntil`, `skipUntil`, `withCurrentValueFrom`,
   `withBufferedFrom`, `debounce`, `throttle`, `audit`, `switchMap` and
   `mergeMap`, and `derive`, `combine`, `merge` and `zip`.
+- The helpers `createState`, `createReducer`, `createBooleanState`,
+  `createEventEmitter` and `createValueEmitter`.
 - `synstate-next/internal`: the node and effect classes, for synstate-dom-next
   only.
