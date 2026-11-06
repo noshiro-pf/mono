@@ -64,16 +64,16 @@ export default [
 
 ## Rules
 
-| Rule                             | Description                                                                                                                                                                                    |
-| :------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `no-identity-map`                | Require `skipIfNoChange()` instead of `map((x) => x)`, which changes no value and only stops a repeated one. Fixable.                                                                          |
-| `no-observable-in-handler`       | Disallow deriving or subscribing to an observable in an event handler or listener. The handler runs outside every scope, so the observable is never disposed and the subscription never ended. |
-| `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal (`Object.is`) to the one before. Fixable.           |
-| `no-throw-in-operator`           | Disallow `throw` in a function passed to a synstate operator. The exception stops the update midway, leaving part of the graph updated; return a `Result` instead.                             |
-| `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                                   |
-| `no-write-during-propagation`    | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders.                 |
-| `prefer-derive`                  | Require `derive(parents, fn)` instead of `combine(parents).pipe(map(fn))`, which is two observables and builds a tuple on every update. Fixable.                                               |
-| `prefer-map-to`                  | Require `mapTo(c)` instead of `map(() => c)`. `map` stops a result equal to the one it holds, so a `map` to a constant emits once and never again. Fixable.                                    |
+| Rule                             | Description                                                                                                                                                                                                                |
+| :------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-identity-map`                | Require `skipIfNoChange()` instead of `map((x) => x)`, which changes no value and only stops a repeated one. Fixable.                                                                                                      |
+| `no-observable-in-handler`       | Disallow deriving or subscribing to an observable in an event handler or listener, or after an `await` in a component. Both run outside every scope, so the observable is never disposed and the subscription never ended. |
+| `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal (`Object.is`) to the one before. Fixable.                                       |
+| `no-throw-in-operator`           | Disallow `throw` in a function passed to a synstate operator. The exception stops the update midway, leaving part of the graph updated; return a `Result` instead.                                                         |
+| `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                                                               |
+| `no-write-during-propagation`    | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders.                                             |
+| `prefer-derive`                  | Require `derive(parents, fn)` instead of `combine(parents).pipe(map(fn))`, which is two observables and builds a tuple on every update. Fixable.                                                                           |
+| `prefer-map-to`                  | Require `mapTo(c)` instead of `map(() => c)`. `map` stops a result equal to the one it holds, so a `map` to a constant emits once and never again. Fixable.                                                                |
 
 ### `no-identity-map`
 
@@ -155,6 +155,29 @@ Two ways out are accepted:
 - take the scope with `getCurrentScope()` at mount time and create the
   observable, or subscribe, inside its `run(…)` callback, which also covers work
   after an `await`.
+
+Code after an `await` in a component runs outside every scope too. A component
+runs in its scope only until it returns, and an `async` function it starts, such
+as `void (async () => { await ready; count$.subscribe(log); })()`, is resumed
+later with no scope current. So the same creations and subscriptions are
+reported, with their own message, in an `async` function that contains JSX or is
+written inside a function that does (JSX passed to a `render` call, such as
+synstate-dom's `render(() => <App />, root)` or React's `root.render(<App />)`,
+does not count, so a bootstrap that renders the app is not a component),
+wherever they may run after an `await`: after it in source order, when it is in
+the call's own callee or arguments, in the body of a `for await`, and in the
+body, test or update of a loop that awaits, which run again after it. An `await`
+that may be skipped still counts. A function of the file that such code calls by
+name is read as it is for a handler; a function is otherwise judged by where it
+is written, a function declaration too, so write one that runs before the
+`await` above it.
+
+Code before the first `await` still runs in the scope and is not reported.
+Neither is work in the `run` of a scope taken with `getCurrentScope()` before
+the `await`, nor under `untracked(…)`. An `async` callback of `run` is no
+exception: its scope is current only until the callback's first `await`, so what
+follows it is reported. An `async` function outside a component is not read, nor
+is a callback scheduled with `.then`, `setTimeout` or the like.
 
 Any `run` is trusted to choose a scope that something disposes, except one on a
 scope made on the spot with no parent: `createScope()`,
