@@ -260,7 +260,7 @@ export const planDiffCheck = (
 const FULL_SHA = /^[0-9a-f]{40}$/u;
 
 /**
- * The three ignore lists, read from {@link GATE_LISTS_FILE}: an object with the
+ * The ignore lists, read from {@link GATE_LISTS_FILE}: an object with the
  * scopes as its keys and nothing else, each a list of patterns of the shapes
  * {@link matchesGatePattern} understands. Anything else is refused rather than
  * read some way of its own: a list the gate misreads skips checks.
@@ -324,6 +324,7 @@ export const parseGateLists = (
     ok: true,
     value: {
       code: listOf('code'),
+      runtime: listOf('runtime'),
       style: listOf('style'),
       'strict-lib': listOf('strict-lib'),
     },
@@ -485,7 +486,7 @@ export const parseShouldRunArgs = (
 /** Where the ignore lists are, relative to the repository root. */
 export const GATE_LISTS_FILE = 'tools/configs/gate-ignore-lists.json';
 
-export const GATE_SCOPES = ['code', 'style', 'strict-lib'] as const;
+export const GATE_SCOPES = ['code', 'runtime', 'style', 'strict-lib'] as const;
 
 export type GateScope = (typeof GATE_SCOPES)[number];
 

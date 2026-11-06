@@ -44,9 +44,11 @@ jobs:
       contents: read
       pull-requests: read
     with:
-      # The same ignore list code-check.yml gates on, which is why it lives in
-      # tools/configs/gate-ignore-lists.json rather than in either workflow.
-      diff-scope: code
+      # What code-check.yml's list ignores, but for the app pages it takes
+      # back: nothing in them depends on the Node.js version this matrix
+      # varies. tools/configs/gate-ignore-lists.json keeps both lists side by
+      # side (see "The ignore lists" in README.md).
+      diff-scope: runtime
       result-job: test-node-versions-result / result
 
   test-node-versions:

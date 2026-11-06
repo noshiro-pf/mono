@@ -14,7 +14,7 @@ on:
       diff-scope:
         description: >-
           Which list of tools/configs/gate-ignore-lists.json to gate on: `code` for
-          code-check.yml, node-version-compatibility.yml and
+          code-check.yml, `runtime` for node-version-compatibility.yml and
           synstate-benchmark.yml, `style` for
           style-check.yml, `strict-lib` for strict-lib-gen.yml. `none` skips
           the diff question altogether, for the one workflow that gates itself
