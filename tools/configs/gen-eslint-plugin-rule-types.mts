@@ -14,6 +14,7 @@ type RuleMeta = Readonly<{
   docs?: Readonly<{ description?: string }>;
   deprecated?: unknown;
   fixable?: string;
+  hasSuggestions?: boolean;
   schema?: unknown;
 }>;
 
@@ -138,12 +139,6 @@ export const generateRuleTypesFileContent = ({
       '',
       ...(hasAnyOptions
         ? [
-            'type SpreadOptionsIfIsArray<',
-            '  T extends readonly [Linter.StringSeverity, unknown],',
-            '> = T[1] extends readonly unknown[]',
-            '  ? readonly [Linter.StringSeverity, ...T[1]]',
-            '  : T;',
-            '',
             '/**',
             ' * Extracts the options tuple type of a rule from its TypeScript implementation,',
             ' * so that option types stay in sync with the rule source without converting',
@@ -202,6 +197,8 @@ type RuleInfo = Readonly<{
   type: string;
   deprecated: boolean;
   fixable: string;
+  /** `meta.hasSuggestions`; `undefined` when the rule does not declare it. */
+  hasSuggestions: boolean | undefined;
   /** `meta.schema`, embedded as JSON in the `Options` JSDoc. */
   schema: unknown;
   hasOptions: boolean;
@@ -223,6 +220,7 @@ const toRuleInfo = (name: string, meta: RuleMeta): RuleInfo => {
     type: meta.type,
     deprecated: meta.deprecated !== undefined && meta.deprecated !== false,
     fixable: meta.fixable ?? 'false',
+    hasSuggestions: meta.hasSuggestions,
     schema,
     hasOptions: Arr.isArray(schema)
       ? Arr.isNonEmpty(schema)
@@ -231,10 +229,16 @@ const toRuleInfo = (name: string, meta: RuleMeta): RuleInfo => {
 };
 
 const generateMetaTable = (rule: RuleInfo): readonly string[] => {
+  // A row for `hasSuggestions` only when the rule declares it, as
+  // eslint-config-typed's generator writes it: a suggestion-only rule reads
+  // `fixable | false`, and this row is what says it still offers a rewrite.
   const rows = [
     ['type', rule.type],
     ['deprecated', rule.deprecated.toString()],
     ['fixable', rule.fixable],
+    ...(rule.hasSuggestions === undefined
+      ? ([] as const)
+      : ([['hasSuggestions', rule.hasSuggestions.toString()]] as const)),
   ] as const;
 
   const keyWidth = Math.max('key'.length, ...rows.map(([key]) => key.length));
@@ -285,7 +289,9 @@ const generateRuleNamespace = (rule: RuleInfo): readonly string[] =>
           '  export type RuleEntry =',
           "    | 'off'",
           '    | Linter.Severity',
-          '    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;',
+          // `Options` is the first option whole, so it is never spread: ESLint
+          // hands `['error', ['a', 'b']]` to the rule as `[['a', 'b']]`.
+          '    | readonly [Linter.StringSeverity, Options];',
         ] as const)
       : (['  export type RuleEntry = Linter.StringSeverity;'] as const)),
     '}',

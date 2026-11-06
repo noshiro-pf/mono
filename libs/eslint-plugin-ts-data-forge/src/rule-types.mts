@@ -8,12 +8,6 @@ import type { Linter } from 'eslint';
 import { expectType } from 'ts-data-forge';
 import type { tsDataForgeRules } from './rules/index.mjs';
 
-type SpreadOptionsIfIsArray<
-  T extends readonly [Linter.StringSeverity, unknown],
-> = T[1] extends readonly unknown[]
-  ? readonly [Linter.StringSeverity, ...T[1]]
-  : T;
-
 /**
  * Extracts the options tuple type of a rule from its TypeScript implementation,
  * so that option types stay in sync with the rule source without converting
@@ -76,11 +70,12 @@ namespace PreferCanonicalLengthCast {
  * @description Replace the filter-and-map idiom `xs.flatMap((x) => (cond ? [f(x)] : []))` with a loop in `Arr.generate` from ts-data-forge.
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferArrGenerate {
@@ -136,11 +131,12 @@ namespace PreferArrSum {
  * @description Replace `Array.from(new Set(xs))` / `[...new Set(xs)]` with `Arr.uniq(xs)` from ts-data-forge.
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferArrUniq {
@@ -196,11 +192,12 @@ namespace PreferRangeForLoop {
  * @description Replace `Object.hasOwn(obj, key)` or `key in obj` with `isRecord(obj) && hasKey(obj, key)` from ts-data-forge
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferIsRecordAndHasKey {
@@ -211,11 +208,12 @@ namespace PreferIsRecordAndHasKey {
  * @description Replace `parseInt(x)` or `Number.parseInt(x, 10)` with `Result.unwrapOkOr(Num.safeParseInt(x), Number.NaN)` from ts-data-forge.
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | false      |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferNumSafeParseInt {
@@ -226,11 +224,12 @@ namespace PreferNumSafeParseInt {
  * @description Replace `parseFloat(x)`, `Number.parseFloat(x)`, or `Number(x)` (when x is a string) with `Result.unwrapOkOr(Num.safeParseFloat(x), Number.NaN)` from ts-data-forge.
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | false      |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferNumSafeParseFloat {
@@ -290,9 +289,7 @@ namespace NoUnnecessaryTypeGuard {
   >;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -329,11 +326,12 @@ namespace PreferObjOverEntriesRoundTrip {
  * @description Replace `pipe(x).map(mapNullable(fn))` with `pipe(x).mapNullable(fn)`.
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferPipeMapNullable {

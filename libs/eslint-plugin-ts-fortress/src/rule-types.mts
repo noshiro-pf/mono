@@ -8,12 +8,6 @@ import type { Linter } from 'eslint';
 import { expectType } from 'ts-data-forge';
 import type { tsFortressRules } from './rules/index.mjs';
 
-type SpreadOptionsIfIsArray<
-  T extends readonly [Linter.StringSeverity, unknown],
-> = T[1] extends readonly unknown[]
-  ? readonly [Linter.StringSeverity, ...T[1]]
-  : T;
-
 /**
  * Extracts the options tuple type of a rule from its TypeScript implementation,
  * so that option types stay in sync with the rule source without converting
@@ -64,9 +58,7 @@ namespace NoTypeOnlyCodec {
   export type Options = NonNullable<RuleOptionsOf<'no-type-only-codec'>[0]>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -120,9 +112,7 @@ namespace PreferNamespaceImport {
   >;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -168,9 +158,7 @@ namespace PreferSchemaOverGuardChain {
   >;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 export type EslintTsFortressRules = Readonly<{

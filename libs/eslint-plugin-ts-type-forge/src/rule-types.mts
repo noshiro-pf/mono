@@ -8,12 +8,6 @@ import type { Linter } from 'eslint';
 import { expectType } from 'ts-data-forge';
 import type { tsTypeForgeRules } from './rules/index.mjs';
 
-type SpreadOptionsIfIsArray<
-  T extends readonly [Linter.StringSeverity, unknown],
-> = T[1] extends readonly unknown[]
-  ? readonly [Linter.StringSeverity, ...T[1]]
-  : T;
-
 /**
  * Extracts the options tuple type of a rule from its TypeScript implementation,
  * so that option types stay in sync with the rule source without converting
@@ -86,9 +80,7 @@ namespace PreferCanonicalLengthConstrainedTuple {
   >;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -130,20 +122,19 @@ namespace PreferCanonicalMutableRecord {
   >;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
  * @description Replace the built-in `Record` with the ts-type-forge `ReadonlyRecord` or `MutableRecord`, so that the mutability of the record is stated rather than implied.
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | false      |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferReadonlyOrMutableRecord {
@@ -174,20 +165,19 @@ namespace PreferReadonlyOrMutableRecord {
   >;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
  * @description Replace the built-in `Exclude` / `Extract` / `Omit` / `Pick` with the ts-type-forge `Strict*` or `Relaxed*` counterpart, so that the unchecked second argument becomes an explicit choice.
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | false      |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferStrictOrRelaxedUtilityType {
@@ -218,9 +208,7 @@ namespace PreferStrictOrRelaxedUtilityType {
   >;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 export type EslintTsTypeForgeRules = Readonly<{

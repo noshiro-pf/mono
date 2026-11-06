@@ -102,6 +102,39 @@ describe('generateRuleTypesFileContent', () => {
     );
   });
 
+  test('keeps an array-valued first option as one element of the rule entry', () => {
+    const arrayOptionRule = {
+      meta: {
+        type: 'suggestion',
+        docs: { description: 'Prefer baz.' },
+        schema: [{ type: 'array', items: { type: 'string' } }],
+      },
+    } as const;
+
+    const content = generateRuleTypesFileContent({
+      pluginPrefix: 'ts-fortress',
+      expectTypeFrom: 'ts-data-forge',
+      rules: { 'prefer-baz': arrayOptionRule },
+    });
+
+    assert.isTrue(Result.isOk(content));
+
+    // ESLint passes `['error', ['a', 'b']]` to the rule as `[['a', 'b']]`;
+    // spreading the array into the entry would accept `['error', 'a', 'b']`,
+    // which ESLint refuses, and reject the valid form.
+    assert.notInclude(content.value, 'SpreadOptionsIfIsArray');
+
+    assert.include(
+      content.value,
+      [
+        '  export type RuleEntry =',
+        "    | 'off'",
+        '    | Linter.Severity',
+        '    | readonly [Linter.StringSeverity, Options];',
+      ].join('\n'),
+    );
+  });
+
   test('writes the rule metadata into the JSDoc', () => {
     const content = generateRuleTypesFileContent({
       pluginPrefix: 'ts-fortress',
@@ -125,6 +158,52 @@ describe('generateRuleTypesFileContent', () => {
     );
 
     assert.include(content.value, '   *     "type": "object"');
+  });
+
+  test('writes a hasSuggestions row for a rule that offers suggestions', () => {
+    const suggestionRule = {
+      meta: {
+        type: 'suggestion',
+        docs: { description: 'Prefer qux.' },
+        hasSuggestions: true,
+        schema: [],
+      },
+    } as const;
+
+    const content = generateRuleTypesFileContent({
+      pluginPrefix: 'ts-data-forge',
+      expectTypeFrom: 'ts-data-forge',
+      rules: { 'prefer-qux': suggestionRule, 'no-foo': noOptionRule },
+    });
+
+    assert.isTrue(Result.isOk(content));
+
+    assert.include(
+      content.value,
+      [
+        ' *  | key            | value      |',
+        ' *  | :------------- | :--------- |',
+        ' *  | type           | suggestion |',
+        ' *  | deprecated     | false      |',
+        ' *  | fixable        | false      |',
+        ' *  | hasSuggestions | true       |',
+        ' *  ```',
+      ].join('\n'),
+    );
+
+    // A rule that does not declare it gets no row, as in eslint-config-typed's
+    // generated types.
+    assert.include(
+      content.value,
+      [
+        ' *  | key        | value   |',
+        ' *  | :--------- | :------ |',
+        ' *  | type       | problem |',
+        ' *  | deprecated | false   |',
+        ' *  | fixable    | false   |',
+        ' *  ```',
+      ].join('\n'),
+    );
   });
 
   test('asserts with expectType that the generated names match the rules object', () => {

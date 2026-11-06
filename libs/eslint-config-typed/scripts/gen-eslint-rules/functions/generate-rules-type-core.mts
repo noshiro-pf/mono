@@ -1,4 +1,5 @@
 import type { DeprecatedInfo } from '@eslint/core';
+import { tsDataForgeRules } from 'eslint-plugin-ts-data-forge';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { compile, type Options } from 'json-schema-to-typescript';
 import { Arr, castDeepMutable, expectType } from 'ts-data-forge';
@@ -482,6 +483,11 @@ const getRules = async (
     case eslintPlugins.EslintImmerCodingStyleRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return Object.entries(immerCodingStyleRules as unknown as Rules);
+
+    // A workspace plugin with no default export: its rules object is named.
+    case eslintPlugins.EslintTsDataForgeRules.pluginName:
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      return Object.entries(tsDataForgeRules as unknown as Rules);
 
     case eslintPlugins.EslintTotalFunctions.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion

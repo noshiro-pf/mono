@@ -181,6 +181,12 @@ export const eslintPlugins = {
     rulePrefix: 'immer-coding-style/',
     outputFileName: 'eslint-immer-coding-style-rules.mts',
   },
+  EslintTsDataForgeRules: {
+    typeName: 'EslintTsDataForgeRules',
+    pluginName: 'eslint-plugin-ts-data-forge',
+    rulePrefix: 'ts-data-forge/',
+    outputFileName: 'eslint-ts-data-forge-rules.mts',
+  },
   EslintTsRestrictionsRules: {
     typeName: 'EslintTsRestrictionsRules',
     pluginName: 'eslint-plugin-ts-restrictions',
