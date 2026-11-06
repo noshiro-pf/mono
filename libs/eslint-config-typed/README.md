@@ -582,6 +582,7 @@ The shape of the rule option varies depending on the rule, so please check the c
 
 - Provides the `ts-restrictions/*` rules; `eslintTsRestrictionsRules` lists each one with the severity the preset sets. `ts-restrictions/no-restricted-syntax` duplicates ESLint's `no-restricted-syntax` rule.
 - Can be used to set the error level to `error` or `warn` as needed.
+- Some rules are an upstream rule wrapped: `ts-restrictions/prefer-global-this` is `unicorn/prefer-global-this` without the reports `globalThis` cannot answer, and `ts-restrictions/prefer-catch` is `promise/prefer-catch` with its fix offered only as a suggestion, because the fix rewrites `p.then(a, b)` into `p.catch(b).then(a)`, which runs `a` after a rejection too. The preset turns each upstream rule off beside its wrapper. A rule whose `--fix` turns out to change what code does is wrapped the same way (`suggestionOnly` in `src/plugins/ts-restrictions/rules/suggestion-only.mts`) rather than turned off, so that its reports stay.
 
 Example:
 

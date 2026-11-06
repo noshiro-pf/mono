@@ -17,6 +17,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/no-string-spread': 'error',
   'ts-restrictions/no-unnecessary-array-from': 'error',
   'ts-restrictions/no-unnecessary-coalesce-undefined': 'error',
+  'ts-restrictions/prefer-catch': 'error',
   'ts-restrictions/prefer-curried-call': 'error',
   'ts-restrictions/prefer-dedent': 'error',
   'ts-restrictions/prefer-global-this': 'error',

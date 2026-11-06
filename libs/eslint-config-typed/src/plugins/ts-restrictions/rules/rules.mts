@@ -13,6 +13,7 @@ import { noRestrictedSyntax } from './no-restricted-syntax.mjs';
 import { noStringSpread } from './no-string-spread.mjs';
 import { noUnnecessaryArrayFrom } from './no-unnecessary-array-from.mjs';
 import { noUnnecessaryCoalesceUndefined } from './no-unnecessary-coalesce-undefined.mjs';
+import { preferCatch } from './prefer-catch.mjs';
 import { preferCurriedCall } from './prefer-curried-call.mjs';
 import { preferDedent } from './prefer-dedent.mjs';
 import { preferGlobalThis } from './prefer-global-this.mjs';
@@ -39,6 +40,7 @@ export const tsRestrictionsRules = {
   'no-string-spread': noStringSpread,
   'no-unnecessary-array-from': noUnnecessaryArrayFrom,
   'no-unnecessary-coalesce-undefined': noUnnecessaryCoalesceUndefined,
+  'prefer-catch': preferCatch,
   'prefer-curried-call': preferCurriedCall,
   'prefer-dedent': preferDedent,
   'prefer-global-this': preferGlobalThis,

@@ -72,7 +72,7 @@ class FromPromiseObservableClass<A, E = unknown>
     // the promise's (#2931). A `.catch` after `.then` would take both, and is
     // also a step later.
     promise
-      // eslint-disable-next-line unicorn/prefer-then-catch -- its suggestion, `.then(onFulfilled).catch(onRejected)`, would take what a subscriber throws too
+      // eslint-disable-next-line unicorn/prefer-then-catch, ts-restrictions/prefer-catch -- its suggestion, `.then(onFulfilled).catch(onRejected)`, would take what a subscriber throws too
       .then(
         (value) => {
           if (this.isCompleted) {

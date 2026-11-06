@@ -34,7 +34,7 @@ class FromPromiseClass<A, E> extends AsyncSourceClass<Result<A, E>> {
     // rejection becomes an `err`: what a subscriber throws on the `ok` value is
     // not the promise's, and goes to `rethrowOutOfPromise`.
     promise
-      // eslint-disable-next-line unicorn/prefer-then-catch -- its suggestion would take what a subscriber throws for the promise's rejection
+      // eslint-disable-next-line unicorn/prefer-then-catch, ts-restrictions/prefer-catch -- its suggestion would take what a subscriber throws for the promise's rejection
       .then(
         (value) => {
           this.deliver(Result.ok(value), true);
@@ -65,7 +65,7 @@ class FromAbortablePromiseClass<A, E> extends AsyncSourceClass<Result<A, E>> {
 
     // See `FromPromiseClass`.
     request
-      // eslint-disable-next-line unicorn/prefer-then-catch -- see `FromPromiseClass`
+      // eslint-disable-next-line unicorn/prefer-then-catch, ts-restrictions/prefer-catch -- see `FromPromiseClass`
       .then(
         (value) => {
           this.deliver(Result.ok(value), true);

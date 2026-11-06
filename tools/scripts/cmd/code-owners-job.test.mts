@@ -201,19 +201,17 @@ const runJob = async ({
           GITHUB_STEP_SUMMARY: path.join(dir, 'summary.md'),
         },
       })
-      .then(
-        ({ stdout, stderr }) => ({
-          passed: true,
-          output: `${stdout}${stderr}`,
-        }),
-        // A failed command rejects with what it wrote on the error.
-        (error: unknown) => ({
-          passed: false,
-          output: isRecord(error)
-            ? [error['stdout'], error['stderr']].filter(isString).join('')
-            : 'the command could not be run',
-        }),
-      );
+      .then(({ stdout, stderr }) => ({
+        passed: true,
+        output: `${stdout}${stderr}`,
+      }))
+      // A failed command rejects with what it wrote on the error.
+      .catch((error: unknown) => ({
+        passed: false,
+        output: isRecord(error)
+          ? [error['stdout'], error['stderr']].filter(isString).join('')
+          : 'the command could not be run',
+      }));
 
     return result;
   } finally {
