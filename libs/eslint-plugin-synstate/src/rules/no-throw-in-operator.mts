@@ -6,6 +6,7 @@ import {
 import {
   buildCalleeResolver,
   getImportDeclarations,
+  isShadowedCallee,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { SYNSTATE_MODULE } from './constants.mjs';
@@ -15,7 +16,6 @@ import {
   localFunctionOf,
   type FunctionNode,
 } from './functions.mjs';
-import { isShadowedCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -88,7 +88,12 @@ export const noThrowInOperator: TSESLint.RuleModule<MessageIds, Options> = {
           mut_namedCalls.push(node);
         }
 
-        if (resolveCallee(node.callee) !== undefined) {
+        const resolved = resolveCallee(node.callee);
+
+        if (
+          resolved !== undefined &&
+          !isShadowedCallee(sourceCode, resolved, SYNSTATE_MODULE)
+        ) {
           mut_operatorCalls.push(node);
         }
       },
@@ -140,11 +145,7 @@ export const noThrowInOperator: TSESLint.RuleModule<MessageIds, Options> = {
         /** The functions synstate operators call while an update propagates. */
         const callbacks = new Set(
           mut_operatorCalls
-            .filter(
-              (call) =>
-                !isShadowedCallee(sourceCode, call.callee) &&
-                isPipeArgument(call),
-            )
+            .filter(isPipeArgument)
             .flatMap((call) => call.arguments.flatMap(functionValuesOf))
             .flatMap((expression) => {
               const callback = localFunctionOf(sourceCode, expression);

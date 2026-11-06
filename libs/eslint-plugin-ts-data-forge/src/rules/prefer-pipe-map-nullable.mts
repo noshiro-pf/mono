@@ -8,7 +8,7 @@ import {
   getArgumentText,
   getImportDeclarations,
   hasCommentWithin,
-  hasForeignBinding,
+  isShadowedCallee,
   isTypeWrapper,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
@@ -91,21 +91,11 @@ export const preferPipeMapNullable: TSESLint.RuleModule<MessageIds, Options> = {
       name: string,
       moduleName: string,
     ): boolean => {
-      if (resolve(callee)?.canonicalName !== name) {
-        return false;
-      }
-
-      const unwrapped = skipTypeWrappers(callee);
-
-      // The named import itself, or the namespace of `m.f`.
-      const binding =
-        unwrapped.type === AST_NODE_TYPES.MemberExpression
-          ? skipTypeWrappers(unwrapped.object)
-          : unwrapped;
+      const resolved = resolve(callee);
 
       return (
-        binding.type === AST_NODE_TYPES.Identifier &&
-        !hasForeignBinding(sourceCode, binding, binding.name, moduleName)
+        resolved?.canonicalName === name &&
+        !isShadowedCallee(sourceCode, resolved, moduleName)
       );
     };
 

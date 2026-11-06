@@ -6,11 +6,11 @@ import {
 import {
   buildCalleeResolver,
   getImportDeclarations,
+  isShadowedCallee,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { SYNSTATE_MODULE } from './constants.mjs';
 import { mayStopByItself } from './counter-options.mjs';
-import { isShadowedCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -105,6 +105,6 @@ const isSynstateCounter = (
 
   return (
     resolved?.canonicalName === 'counter' &&
-    !isShadowedCallee(sourceCode, callee)
+    !isShadowedCallee(sourceCode, resolved, SYNSTATE_MODULE)
   );
 };

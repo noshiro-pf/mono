@@ -7,6 +7,10 @@ import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import { mutablePrefix } from '../../../constants/index.mjs';
+import {
+  buildImmerProduceResolver,
+  type ImmerProduce,
+} from './immer-produce.mjs';
 
 type MessageIds = 'requireMutPrefix';
 
@@ -16,10 +20,13 @@ type MessageIds = 'requireMutPrefix';
  * mutated, so an unprefixed draft is otherwise reported on every line that
  * writes to it, with a message that does not say the fix is a rename.
  *
- * The recipe is the second argument of `produce` / `produceWithPatches` when it
- * is a function literal, and otherwise the first when that one is (the curried
- * form). A destructured draft and one that is never referenced are left alone;
- * a draft with a default value is reported.
+ * The recipe is the second argument of immer's `produce` / `produceWithPatches`
+ * when it is a function literal, and otherwise the first when that one is (the
+ * curried form). The callee is immer's only, through an import from `immer`
+ * that nothing nearer shadows (`buildImmerProduceResolver`): a `produce` from
+ * another module, a local one or a parameter is not. A destructured draft and
+ * one that is never referenced are left alone; a draft with a default value is
+ * reported.
  *
  * The fix renames the parameter and its references. It is withheld when it
  * could change the code's meaning or add shadowing; `canRename` lists the
@@ -38,82 +45,86 @@ export const mutPrefixedDraftRule: TSESLint.RuleModule<MessageIds> = {
     },
     defaultOptions: [],
   },
-  create: (context) => ({
-    CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
-      const recipe = findRecipe(node);
+  create: (context) => {
+    const resolveProduce = buildImmerProduceResolver(context.sourceCode);
 
-      if (recipe === undefined) {
-        return;
-      }
+    return {
+      CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
+        const recipe = findRecipe(node, resolveProduce);
 
-      const param = draftParameterOf(recipe);
+        if (recipe === undefined) {
+          return;
+        }
 
-      if (param === undefined || param.name.startsWith(mutablePrefix)) {
-        return;
-      }
+        const param = draftParameterOf(recipe);
 
-      const scope = context.sourceCode.scopeManager?.scopes.find(
-        (s) =>
-          s.type === TSESLint.Scope.ScopeType.function &&
-          s.block.range[0] === recipe.range[0] &&
-          s.block.range[1] === recipe.range[1],
-      );
+        if (param === undefined || param.name.startsWith(mutablePrefix)) {
+          return;
+        }
 
-      if (scope === undefined) {
-        return;
-      }
+        const scope = context.sourceCode.scopeManager?.scopes.find(
+          (s) =>
+            s.type === TSESLint.Scope.ScopeType.function &&
+            s.block.range[0] === recipe.range[0] &&
+            s.block.range[1] === recipe.range[1],
+        );
 
-      const variable = scope.set.get(param.name);
+        if (scope === undefined) {
+          return;
+        }
 
-      // The scope manager's own node, which `report` and the fixer take as it
-      // is.
-      const declared = variable?.identifiers[0];
+        const variable = scope.set.get(param.name);
 
-      if (variable === undefined || declared === undefined) {
-        return;
-      }
+        // The scope manager's own node, which `report` and the fixer take as it
+        // is.
+        const declared = variable?.identifiers[0];
 
-      // The parameter's node includes its type annotation, and its name may be
-      // spelt with escapes (`\u0064raft`), so the name's token is renamed.
-      const nameToken = context.sourceCode.getFirstToken(declared);
+        if (variable === undefined || declared === undefined) {
+          return;
+        }
 
-      const references = usesOf(variable);
+        // The parameter's node includes its type annotation, and its name may be
+        // spelt with escapes (`\u0064raft`), so the name's token is renamed.
+        const nameToken = context.sourceCode.getFirstToken(declared);
 
-      if (nameToken === null || Arr.isEmpty(references)) {
-        return;
-      }
+        const references = usesOf(variable);
 
-      const suggested = `${mutablePrefix}${param.name}` as const;
+        if (nameToken === null || Arr.isEmpty(references)) {
+          return;
+        }
 
-      context.report({
-        loc: nameToken.loc,
-        messageId: 'requireMutPrefix',
-        data: { name: param.name, suggested },
-        fix: canRename(scope, variable, suggested)
-          ? (fixer) =>
-              Arr.toUnshifted(
-                references.map(({ identifier }) =>
-                  identifier.parent.type === AST_NODE_TYPES.Property &&
-                  identifier.parent.shorthand &&
-                  identifier.parent.value === identifier
-                    ? fixer.insertTextAfter(identifier, `: ${suggested}`)
-                    : fixer.replaceText(identifier, suggested),
-                ),
-                fixer.replaceText(nameToken, suggested),
-              )
-          : null,
-      });
-    },
-  }),
+        const suggested = `${mutablePrefix}${param.name}` as const;
+
+        context.report({
+          loc: nameToken.loc,
+          messageId: 'requireMutPrefix',
+          data: { name: param.name, suggested },
+          fix: canRename(scope, variable, suggested, resolveProduce)
+            ? (fixer) =>
+                Arr.toUnshifted(
+                  references.map(({ identifier }) =>
+                    identifier.parent.type === AST_NODE_TYPES.Property &&
+                    identifier.parent.shorthand &&
+                    identifier.parent.value === identifier
+                      ? fixer.insertTextAfter(identifier, `: ${suggested}`)
+                      : fixer.replaceText(identifier, suggested),
+                  ),
+                  fixer.replaceText(nameToken, suggested),
+                )
+            : null,
+        });
+      },
+    };
+  },
 } as const;
 
 type FunctionNode =
   TSESTree.ArrowFunctionExpression | TSESTree.FunctionExpression;
 
-const produceNames: ReadonlySet<string> = new Set<string>([
-  'produce',
-  'produceWithPatches',
-]);
+/** What `buildImmerProduceResolver` returns for one file. */
+type ProduceResolver = (
+  callee: DeepReadonly<TSESTree.Expression>,
+) => ImmerProduce | undefined;
 
 const isFunctionNode = (
   node: DeepReadonly<TSESTree.Node>,
@@ -123,13 +134,9 @@ const isFunctionNode = (
 
 const findRecipe = (
   node: DeepReadonly<TSESTree.CallExpression>,
+  resolveProduce: ProduceResolver,
 ): DeepReadonly<FunctionNode> | undefined => {
-  const callee = skipTypeWrappers(node.callee);
-
-  if (
-    callee.type !== AST_NODE_TYPES.Identifier ||
-    !produceNames.has(callee.name)
-  ) {
+  if (resolveProduce(node.callee) === undefined) {
     return undefined;
   }
 
@@ -196,11 +203,13 @@ const outsideTypeWrappers = (
 
 const isRecipe = (
   node: DeepReadonly<TSESTree.Node>,
+  resolveProduce: ProduceResolver,
 ): node is DeepReadonly<FunctionNode> => {
   const call = outsideTypeWrappers(node.parent);
 
   return (
-    call?.type === AST_NODE_TYPES.CallExpression && findRecipe(call) === node
+    call?.type === AST_NODE_TYPES.CallExpression &&
+    findRecipe(call, resolveProduce) === node
   );
 };
 
@@ -211,6 +220,7 @@ const isRecipe = (
 const isDraftNameOfRecipeAround = (
   scope: DeepReadonly<TSESLint.Scope.Scope>,
   name: string,
+  resolveProduce: ProduceResolver,
 ): boolean => {
   const { upper } = scope;
 
@@ -225,11 +235,11 @@ const isDraftNameOfRecipeAround = (
   return (
     // Only a function's parent is known not to be `null` (the `Program`'s).
     (isFunctionNode(block) &&
-      isRecipe(block) &&
+      isRecipe(block, resolveProduce) &&
       draftParameterOf(block)?.name === name &&
       outer !== undefined &&
       Arr.isNonEmpty(usesOf(outer))) ||
-    isDraftNameOfRecipeAround(upper, name)
+    isDraftNameOfRecipeAround(upper, name, resolveProduce)
   );
 };
 
@@ -274,6 +284,7 @@ const canRename = (
   scope: DeepReadonly<TSESLint.Scope.Scope>,
   variable: DeepReadonly<TSESLint.Scope.Variable>,
   newName: string,
+  resolveProduce: ProduceResolver,
 ): boolean =>
   !isDeclaredWithin(scope, newName) &&
   !isDeclaredAround(scope, newName) &&
@@ -284,7 +295,7 @@ const canRename = (
       (reference.identifier.name !== newName &&
         reference.identifier.name !== 'eval'),
   ) &&
-  !isDraftNameOfRecipeAround(scope, variable.name) &&
+  !isDraftNameOfRecipeAround(scope, variable.name, resolveProduce) &&
   Arr.isFixedLengthArray(1, variable.defs) &&
   variable.references.every(
     // A default value is an initializing write of the parameter.
