@@ -5,6 +5,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
+  asNode,
   createGetLayerTypes,
   invertedComparisonText,
   isComparison,
@@ -239,7 +240,3 @@ const STATEMENT_BOUNDARIES: ReadonlySet<string> = new Set<string>([
 
 /** A statement starting so would continue the line before it without `;`. */
 const STARTS_CONTINUING_A_LINE = /^[([`+\-/]/u;
-
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

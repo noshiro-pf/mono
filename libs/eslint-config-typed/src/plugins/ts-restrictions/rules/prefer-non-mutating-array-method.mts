@@ -5,6 +5,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
+  asNode,
   createGetLayerTypes,
   isTypeWrapper,
   skipTypeWrappers,
@@ -286,7 +287,3 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
     };
   },
 } as const;
-
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

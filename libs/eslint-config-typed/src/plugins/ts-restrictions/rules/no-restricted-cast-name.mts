@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { asNode } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 
 type FixWithOption = Readonly<
@@ -353,7 +354,3 @@ const ANY_EXPRESSION_PARENT_TYPES: ReadonlySet<AST_NODE_TYPES> =
     AST_NODE_TYPES.TemplateLiteral,
     AST_NODE_TYPES.VariableDeclarator,
   ]);
-
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

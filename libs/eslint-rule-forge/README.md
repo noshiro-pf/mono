@@ -133,6 +133,12 @@ The range and the text of a node leave out the parentheses written around it.
 | :-------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mayHaveEffect` | whether moving or dropping a node may be observed: `ASTUtils.hasSideEffect` plus a tagged template and an iterator spread, not inside a function |
 
+## Nodes
+
+| Helper   | What it gives                                                                                          |
+| :------- | :----------------------------------------------------------------------------------------------------- |
+| `asNode` | a `DeepReadonly` node typed as the mutable one, for an API that takes a mutable node and only reads it |
+
 ## Imports and bindings
 
 | Helper                     | What it gives                                                                                                                                                       |

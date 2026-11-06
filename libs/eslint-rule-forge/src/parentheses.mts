@@ -5,6 +5,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import type { DeepReadonly } from 'ts-type-forge';
+import { asNode } from './nodes.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
@@ -64,11 +65,3 @@ export const getArgumentText = (
 
   return node.type === AST_NODE_TYPES.SequenceExpression ? `(${text})` : text;
 };
-
-/**
- * The parser's node, which the token store takes as mutable, for one that this
- * package only reads.
- */
-const asNode = (node: DeepReadonly<TSESTree.Node>): TSESTree.Node =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as TSESTree.Node;

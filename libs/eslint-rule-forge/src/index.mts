@@ -3,6 +3,7 @@ export * from './comments.mjs';
 export * from './effects.mjs';
 export * from './imports.mjs';
 export * from './negation.mjs';
+export * from './nodes.mjs';
 export * from './parentheses.mjs';
 export * from './rules/index.mjs';
 export * from './statements.mjs';

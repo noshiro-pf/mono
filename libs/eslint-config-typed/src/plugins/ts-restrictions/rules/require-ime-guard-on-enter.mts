@@ -5,7 +5,11 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { createGetLayerTypes, skipTypeWrappers } from 'eslint-rule-forge';
+import {
+  asNode,
+  createGetLayerTypes,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
@@ -305,14 +309,6 @@ const rootOf = (
     ? rootOf(inner.object)
     : inner;
 };
-
-/**
- * The `@typescript-eslint/utils` helpers take mutable nodes; this rule only
- * ever reads them.
- */
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;
 
 /**
  * The variable `node`'s root names (`event` for `event.nativeEvent`), so that a

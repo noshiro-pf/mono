@@ -5,6 +5,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
+  asNode,
   getRangeWithParens,
   mayHaveEffect,
   skipTypeWrappers,
@@ -355,7 +356,3 @@ const TIGHTER_BINARY_OPERATORS: ReadonlySet<string> = new Set<string>([
   '%',
   '**',
 ]);
-
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;
