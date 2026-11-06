@@ -1,12 +1,6 @@
 /* cSpell:disable */
 import type { Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<
-  T extends readonly [Linter.StringSeverity, unknown],
-> = T[1] extends readonly unknown[]
-  ? readonly [Linter.StringSeverity, ...T[1]]
-  : T;
-
 /**
  * @description Unify non-mutating array element addition/removal patterns (`slice` / `toSpliced` / `filter` / `concat` / spread) into the corresponding ts-data-forge functions: `Arr.tail`, `Arr.skip`, `Arr.take`, `Arr.butLast`, `Arr.skipLast`, `Arr.takeLast`, `Arr.toUnshifted`, `Arr.toPushed`.
  *
@@ -23,7 +17,7 @@ namespace PreferCanonicalArraySlicing {
 }
 
 /**
- * @description Replace `xs.length >= n` with `Arr.isMinLengthArray(xs, n)` from ts-data-forge.
+ * @description Normalize array-length checks to their canonical `Arr` guard: `xs.length <op> n` becomes the matching `Arr.is*` guard, and a degenerate guard becomes the named one for its family (`Arr.isFixedLengthArray(0, xs)` → `Arr.isEmpty`, `Arr.isFixedLengthTuple(0, xs)` → `Arr.isEmptyTuple`).
  *
  *  ```md
  *  | key        | value      |
@@ -33,12 +27,12 @@ namespace PreferCanonicalArraySlicing {
  *  | fixable    | code       |
  *  ```
  */
-namespace PreferArrIsMinLengthArray {
+namespace PreferCanonicalLengthGuard {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * @description Replace `xs.length <= n` with `Arr.isMaxLengthArray(xs, n)` from ts-data-forge.
+ * @description Normalize an `Arr` length cast whose bounds are degenerate (e.g. `Arr.asMinLengthArray(1, xs)`, `Arr.asFixedLengthTuple(0, xs)`) to the cast that names that constraint directly, staying within the branded `*Array` or structural `*Tuple` family.
  *
  *  ```md
  *  | key        | value      |
@@ -48,37 +42,23 @@ namespace PreferArrIsMinLengthArray {
  *  | fixable    | code       |
  *  ```
  */
-namespace PreferArrIsMaxLengthArray {
+namespace PreferCanonicalLengthCast {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * @description Replace `xs.length >= min && xs.length <= max` with `Arr.isBoundedLengthArray(xs, min, max)` from ts-data-forge.
+ * @description Replace the filter-and-map idiom `xs.flatMap((x) => (cond ? [f(x)] : []))` with a loop in `Arr.generate` from ts-data-forge.
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
-namespace PreferArrIsBoundedLengthArray {
-  export type RuleEntry = Linter.StringSeverity;
-}
-
-/**
- * @description Replace `xs.length === n` with `Arr.isFixedLengthArray(xs, n)` from ts-data-forge.
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
- *  ```
- */
-namespace PreferArrIsFixedLengthArray {
+namespace PreferArrGenerate {
   export type RuleEntry = Linter.StringSeverity;
 }
 
@@ -98,7 +78,7 @@ namespace PreferArrIsArray {
 }
 
 /**
- * @description Replace `xs.length > 0` with `Arr.isNonEmpty(xs)` from ts-data-forge.
+ * @description Report an accumulated value rebuilt from scratch for every element — `xs.map((_, i) => f(...xs.slice(0, i + 1)))`, or a `reduce` that spreads its accumulator into a new array — and point at `Arr.scan` from ts-data-forge, which does the same in one pass
  *
  *  ```md
  *  | key        | value      |
@@ -108,7 +88,7 @@ namespace PreferArrIsArray {
  *  | fixable    | code       |
  *  ```
  */
-namespace PreferArrIsNonEmpty {
+namespace PreferArrScan {
   export type RuleEntry = Linter.StringSeverity;
 }
 
@@ -128,6 +108,22 @@ namespace PreferArrSum {
 }
 
 /**
+ * @description Replace `Array.from(new Set(xs))` / `[...new Set(xs)]` with `Arr.uniq(xs)` from ts-data-forge.
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace PreferArrUniq {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Replace branded number type assertions (e.g., `as Int`) with corresponding functions (e.g., `asInt()`) from ts-data-forge.
  *
  *  ```md
@@ -143,7 +139,7 @@ namespace PreferAsInt {
 }
 
 /**
- * @description Replace `typeof u === "object" && u !== null` with `isNonNullObject(u)` from ts-data-forge.
+ * @description Replace `typeof u === "object" && u !== null`, in either order and anywhere in an `&&` chain, with `isNonNullObject(u)` from ts-data-forge.
  *
  *  ```md
  *  | key        | value      |
@@ -176,11 +172,12 @@ namespace PreferRangeForLoop {
  * @description Replace `Object.hasOwn(obj, key)` or `key in obj` with `isRecord(obj) && hasKey(obj, key)` from ts-data-forge
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferIsRecordAndHasKey {
@@ -188,14 +185,14 @@ namespace PreferIsRecordAndHasKey {
 }
 
 /**
- * @description Replace `parseInt(x, 10)` with `Result.unwrapOkOr(Num.safeParseInt(x), Number.NaN)` from ts-data-forge.
+ * @description Replace `parseInt(x)` or `Number.parseInt(x, 10)` with `Result.unwrapOkOr(Num.safeParseInt(x), Number.NaN)` from ts-data-forge.
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferNumSafeParseInt {
@@ -206,6 +203,21 @@ namespace PreferNumSafeParseInt {
  * @description Replace `parseFloat(x)`, `Number.parseFloat(x)`, or `Number(x)` (when x is a string) with `Result.unwrapOkOr(Num.safeParseFloat(x), Number.NaN)` from ts-data-forge.
  *
  *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace PreferNumSafeParseFloat {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Remove a side-effect-only `import 'ts-data-forge';`, which binds no name and, the package being `sideEffects: false`, does nothing.
+ *
+ *  ```md
  *  | key        | value      |
  *  | :--------- | :--------- |
  *  | type       | suggestion |
@@ -213,7 +225,7 @@ namespace PreferNumSafeParseInt {
  *  | fixable    | code       |
  *  ```
  */
-namespace PreferNumSafeParseFloat {
+namespace NoSideEffectImport {
   export type RuleEntry = Linter.StringSeverity;
 }
 
@@ -258,9 +270,7 @@ namespace NoUnnecessaryTypeGuard {
   }>;
 
   export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
 /**
@@ -278,23 +288,57 @@ namespace PreferComparisonOverNullishGuard {
   export type RuleEntry = Linter.StringSeverity;
 }
 
+/**
+ * @description Replace an `Object.fromEntries(Object.entries(record).map/filter/flatMap(...))` round trip with `Obj.map` / `Obj.filter` / `Obj.filterMap` from ts-data-forge.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferObjOverEntriesRoundTrip {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Replace `pipe(x).map(mapNullable(fn))` with `pipe(x).mapNullable(fn)`.
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace PreferPipeMapNullable {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-canonical-array-slicing': PreferCanonicalArraySlicing.RuleEntry;
-  'ts-data-forge/prefer-arr-is-min-length-array': PreferArrIsMinLengthArray.RuleEntry;
-  'ts-data-forge/prefer-arr-is-max-length-array': PreferArrIsMaxLengthArray.RuleEntry;
-  'ts-data-forge/prefer-arr-is-bounded-length-array': PreferArrIsBoundedLengthArray.RuleEntry;
-  'ts-data-forge/prefer-arr-is-fixed-length-array': PreferArrIsFixedLengthArray.RuleEntry;
+  'ts-data-forge/prefer-canonical-length-guard': PreferCanonicalLengthGuard.RuleEntry;
+  'ts-data-forge/prefer-canonical-length-cast': PreferCanonicalLengthCast.RuleEntry;
+  'ts-data-forge/prefer-arr-generate': PreferArrGenerate.RuleEntry;
   'ts-data-forge/prefer-arr-is-array': PreferArrIsArray.RuleEntry;
-  'ts-data-forge/prefer-arr-is-non-empty': PreferArrIsNonEmpty.RuleEntry;
+  'ts-data-forge/prefer-arr-scan': PreferArrScan.RuleEntry;
   'ts-data-forge/prefer-arr-sum': PreferArrSum.RuleEntry;
+  'ts-data-forge/prefer-arr-uniq': PreferArrUniq.RuleEntry;
   'ts-data-forge/prefer-as-int': PreferAsInt.RuleEntry;
   'ts-data-forge/prefer-is-non-null-object': PreferIsNonNullObject.RuleEntry;
   'ts-data-forge/prefer-range-for-loop': PreferRangeForLoop.RuleEntry;
   'ts-data-forge/prefer-is-record-and-has-key': PreferIsRecordAndHasKey.RuleEntry;
   'ts-data-forge/prefer-num-safe-parse-int': PreferNumSafeParseInt.RuleEntry;
   'ts-data-forge/prefer-num-safe-parse-float': PreferNumSafeParseFloat.RuleEntry;
+  'ts-data-forge/no-side-effect-import': NoSideEffectImport.RuleEntry;
   'ts-data-forge/no-unnecessary-type-guard': NoUnnecessaryTypeGuard.RuleEntry;
   'ts-data-forge/prefer-comparison-over-nullish-guard': PreferComparisonOverNullishGuard.RuleEntry;
+  'ts-data-forge/prefer-obj-over-entries-round-trip': PreferObjOverEntriesRoundTrip.RuleEntry;
+  'ts-data-forge/prefer-pipe-map-nullable': PreferPipeMapNullable.RuleEntry;
 }>;
 
 export type EslintTsDataForgeRulesOption = Readonly<{

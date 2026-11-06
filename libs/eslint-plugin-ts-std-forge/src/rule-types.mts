@@ -27,11 +27,12 @@ namespace PreferIsNonNullObject {
  * @description Replace `Object.hasOwn(obj, key)` or `key in obj` with `isRecord(obj) && hasKey(obj, key)` from ts-std-forge
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferIsRecordAndHasKey {
@@ -72,11 +73,12 @@ namespace PreferSafeArrayLengthGuard {
  * @description Replace `parseFloat(x)`, `Number.parseFloat(x)`, or `Number(x)` (when x is a string) with `Result.unwrapOkOr(SafeNumber.parse(x), Number.NaN)` from ts-std-forge.
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | false      |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferSafeNumberParse {
@@ -87,11 +89,12 @@ namespace PreferSafeNumberParse {
  * @description Replace `parseInt(x)` or `Number.parseInt(x, 10)` with `Result.unwrapOkOr(SafeNumber.parseInteger(x), Number.NaN)` from ts-std-forge.
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | false      |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferSafeNumberParseInteger {
