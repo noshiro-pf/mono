@@ -3,7 +3,7 @@ import {
   type ParserServicesWithTypeInformation,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper } from 'eslint-rule-forge';
+import { asNode, isTypeWrapper } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
@@ -152,7 +152,3 @@ export const createIsCopyNeededBySatisfies = (
 
   return isCopyNeededBySatisfies;
 };
-
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

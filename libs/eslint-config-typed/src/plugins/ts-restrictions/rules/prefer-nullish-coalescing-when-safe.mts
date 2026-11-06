@@ -5,9 +5,13 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { createGetLayerTypes, skipTypeWrappers } from 'eslint-rule-forge';
+import {
+  asNode,
+  createGetLayerTypes,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
-import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 
 type Options = readonly [];
@@ -640,11 +644,3 @@ const isSideEffectFreeSimpleExpression = (
   node.type === AST_NODE_TYPES.Identifier ||
   (node.type === AST_NODE_TYPES.TemplateLiteral &&
     Arr.isEmpty(node.expressions));
-
-/**
- * The `@typescript-eslint/utils` helpers take mutable nodes; this rule only
- * ever reads them.
- */
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

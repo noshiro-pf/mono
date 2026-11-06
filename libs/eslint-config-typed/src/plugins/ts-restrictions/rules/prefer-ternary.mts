@@ -5,6 +5,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
+  asNode,
   getRangeWithParens,
   mayHaveEffect,
   parenthesesDepth,
@@ -657,11 +658,3 @@ const isUnicornShape = (chain: Chain): boolean =>
 
 const isSingleLine = (node: DeepReadonly<TSESTree.Node>): boolean =>
   node.loc.start.line === node.loc.end.line;
-
-/**
- * The `@typescript-eslint/utils` helpers take mutable nodes; the rule only ever
- * reads them.
- */
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

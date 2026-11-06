@@ -2,10 +2,12 @@ import {
   AST_NODE_TYPES,
   ESLintUtils,
   type TSESLint,
-  type TSESTree,
 } from '@typescript-eslint/utils';
-import { createGetLayerTypes, skipTypeWrappers } from 'eslint-rule-forge';
-import type { DeepReadonly } from 'ts-type-forge';
+import {
+  asNode,
+  createGetLayerTypes,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
 import {
   createIsArrayOrTupleType,
   createIsCopyNeededBySatisfies,
@@ -170,7 +172,3 @@ export const noUnnecessaryArrayFrom: TSESLint.RuleModule<MessageIds, Options> =
       };
     },
   } as const;
-
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

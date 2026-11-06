@@ -5,6 +5,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
+  asNode,
   createGetLayerTypes,
   isComparison,
   isTypeWrapper,
@@ -228,7 +229,3 @@ const booleanLiteralValue = (
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const constituentsOf = (type: ts.Type): readonly ts.Type[] =>
   type.isUnion() ? type.types : ([type] as const);
-
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

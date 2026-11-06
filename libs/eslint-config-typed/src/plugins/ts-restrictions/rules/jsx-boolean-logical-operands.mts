@@ -4,7 +4,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { createGetLayerTypes, isTypeWrapper } from 'eslint-rule-forge';
+import { asNode, createGetLayerTypes, isTypeWrapper } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { jsxValuePositionOf, type JsxValuePosition } from './jsx-utils.mjs';
@@ -191,7 +191,3 @@ const typeIsBoolean = (
 
   return false;
 };
-
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

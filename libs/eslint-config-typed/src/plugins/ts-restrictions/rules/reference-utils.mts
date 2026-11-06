@@ -3,7 +3,7 @@ import {
   ASTUtils,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
+import { asNode, isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 
 /**
@@ -54,14 +54,6 @@ export const isSameReference = (
     : name === staticPropertyName(right) &&
         isSameReference(left.object, right.object);
 };
-
-/**
- * The `@typescript-eslint/utils` helpers take mutable nodes; this module only
- * ever reads them.
- */
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;
 
 const staticPropertyName = (
   node: DeepReadonly<TSESTree.MemberExpression>,

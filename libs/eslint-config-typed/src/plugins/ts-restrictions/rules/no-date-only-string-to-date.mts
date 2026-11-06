@@ -5,6 +5,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
+  asNode,
   createGetLayerTypes,
   isRuntimeBound,
   skipTypeWrappers,
@@ -327,7 +328,3 @@ const namePath = (node: DeepReadonly<TSESTree.Node>): string | undefined => {
     ? undefined
     : `${object}.${name}`;
 };
-
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the same node, its readonly view
-  node as T;

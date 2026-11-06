@@ -6,6 +6,7 @@ import {
 } from '@typescript-eslint/utils';
 import type { DeepReadonly, StrictPick } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { asNode } from './nodes.mjs';
 import { typeWrapperLayers } from './type-wrappers.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
@@ -228,14 +229,6 @@ const precedenceOf = (node: DeepReadonly<TSESTree.Node>): Precedence => {
 
   return LOOSER_THAN_LOGICAL.has(node.type) ? 'looser' : 'tighter';
 };
-
-/**
- * The parser's node, which the source code and the token store take as mutable,
- * for one that this package only reads.
- */
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;
 
 const shortNegationOf = (
   node: DeepReadonly<TSESTree.Expression>,

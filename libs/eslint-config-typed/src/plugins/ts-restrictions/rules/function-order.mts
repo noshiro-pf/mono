@@ -4,7 +4,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
+import { asNode, isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly, FixedLengthTuple, StrictPick } from 'ts-type-forge';
 
@@ -274,14 +274,6 @@ const FUNCTION_NODE_TYPES: ReadonlySet<AST_NODE_TYPES> =
     AST_NODE_TYPES.FunctionDeclaration,
     AST_NODE_TYPES.FunctionExpression,
   ]);
-
-/**
- * The `@typescript-eslint/utils` APIs take mutable nodes; this module only ever
- * reads them.
- */
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;
 
 const isFunctionExpression = (
   node: DeepReadonly<TSESTree.Expression> | null,

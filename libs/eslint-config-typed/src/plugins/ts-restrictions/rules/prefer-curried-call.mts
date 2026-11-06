@@ -5,6 +5,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
+  asNode,
   createGetLayerTypes,
   isTypeWrapper,
   skipTypeWrappers,
@@ -622,7 +623,3 @@ const PARENTHESES_FREE_CALLEE_TYPES: ReadonlySet<AST_NODE_TYPES> =
     AST_NODE_TYPES.MemberExpression,
     AST_NODE_TYPES.CallExpression,
   ]);
-
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;
