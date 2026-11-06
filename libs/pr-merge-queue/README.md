@@ -14,20 +14,20 @@ The commands read the repository from `origin` in the current directory and
 authenticate with `GH_TOKEN` or `GITHUB_TOKEN`, falling back to `gh auth token`
 when neither is set.
 
-| command                 | what it does                                                                                |
-| :---------------------- | :------------------------------------------------------------------------------------------ |
-| `open-pr`               | pushes the current branch and opens its pull request, held by `skip-ci`                     |
-| `pr-description`        | reads and writes a description kept in two languages, checking the halves agree             |
-| `unblock-prs`           | lands the `merge-queued` pull requests one at a time, in the order they declare             |
-| `pr-report`             | reports every open pull request: merge order, required checks, how far behind               |
-| `claim-pr`              | claims a pull request `unblock-prs` set aside, so that nothing else touches it              |
-| `push-fixed-pr`         | pushes the fix to a pull request you claimed and hands it back to the queue                 |
-| `rework-pr`             | takes the current branch's pull request out of the queue for more work, and back for review |
-| `report-unowned-prs`    | files an issue (`priority:A`) for each queued pull request everyone waits on others for     |
-| `start-issue`           | labels an issue `in-progress` and names who started it, refusing one someone is on          |
-| `startable-issues`      | lists the open issues nobody has started, in the order to take them                         |
-| `run-unblock-prs-skill` | runs the `unblock-prs` skill without a person, on the Claude API, when it has work          |
-| `run-issue-resolver`    | starts the open issues nobody has started, one Claude API session each                      |
+| command                 | what it does                                                                                          |
+| :---------------------- | :---------------------------------------------------------------------------------------------------- |
+| `open-pr`               | pushes the current branch and opens its pull request, held by `skip-ci`                               |
+| `pr-description`        | reads and writes a description kept in two languages, checking the halves agree                       |
+| `unblock-prs`           | lands the `merge-queued` pull requests one at a time, in the order they declare                       |
+| `pr-report`             | reports every open pull request: merge order, required checks, how far behind                         |
+| `claim-pr`              | claims a pull request `unblock-prs` set aside, so that nothing else touches it                        |
+| `push-fixed-pr`         | pushes the fix to a pull request you claimed and hands it back to the queue                           |
+| `rework-pr`             | takes the current branch's pull request out of the queue for more work, and back into it or to review |
+| `report-unowned-prs`    | files an issue (`priority:A`) for each queued pull request everyone waits on others for               |
+| `start-issue`           | labels an issue `in-progress` and names who started it, refusing one someone is on                    |
+| `startable-issues`      | lists the open issues nobody has started, in the order to take them                                   |
+| `run-unblock-prs-skill` | runs the `unblock-prs` skill without a person, on the Claude API, when it has work                    |
+| `run-issue-resolver`    | starts the open issues nobody has started, one Claude API session each                                |
 
 Each one prints its options with `--help`. How the queue reads a pull request
 (the labels, `Merge-After:`, stacks) and what `unblock-prs` does at each step
@@ -117,9 +117,23 @@ before the first change — `skip-ci` on, `merge-queued` off, auto-merge disarme
 a draft, so nothing merges half of it — and **`rework-pr done`**, which pushes
 it with `--force-with-lease --force-if-includes`, so that a push someone else
 made meanwhile is refused even after a fetch, and marks it ready for review
-again. Queueing it again is step 2. Drafts and auto-merge are GraphQL only, so
-where GraphQL is refused `start` holds it by the labels alone and says so,
-unless it was armed, when it fails: disarming it is then the author's.
+again. `done` takes one of two flags, by whether the work changes what the
+description says:
+
+- **`--requeue`** — it does not, so nothing the author queued needs reading
+  again: `done` puts `merge-queued` back last, and the queue takes it from
+  there. Only a label `start` took off is put back, and only while nobody has
+  put it on or taken it off since: `start` writes down GitHub's event of taking
+  it off under the clone's git directory, and `done` puts the label back only
+  while that event is still the label's last. A pull request the author had not
+  queued, or has decided about again, stays theirs to queue (step 2), and so
+  does one whose `start` ran in another clone.
+- **`--review`** — it does: rewrite the description, and `merge-queued` stays
+  off until the author has read the change and queues it again (step 2).
+
+Drafts and auto-merge are GraphQL only, so where GraphQL is refused `start`
+holds it by the labels alone and says so, unless it was armed, when it fails:
+disarming it is then the author's.
 
 ### Running the worker
 

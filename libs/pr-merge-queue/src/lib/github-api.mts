@@ -400,7 +400,19 @@ export const removeLabel = async (
   context: ApiContext,
   prNumber: number,
   label: string,
-): Promise<Result<undefined, string>> => {
+): Promise<Result<undefined, string>> =>
+  Result.map(await takeLabelOff(context, prNumber, label), () => undefined);
+
+/**
+ * {@link removeLabel}, saying which it was: this call took the label off
+ * (`removed`), or it was off already (`absent`) — someone else's doing, for a
+ * caller that read it as on.
+ */
+export const takeLabelOff = async (
+  context: ApiContext,
+  prNumber: number,
+  label: string,
+): Promise<Result<'removed' | 'absent', string>> => {
   // One path segment, whatever the name holds. The rule's premise, building a
   // query string, is not what this is.
   // eslint-disable-next-line no-restricted-globals
@@ -413,9 +425,11 @@ export const removeLabel = async (
     t.unknown(),
   );
 
-  return Result.isOk(removed) || removed.value.startsWith('404 ')
-    ? Result.ok(undefined)
-    : removed;
+  return Result.isOk(removed)
+    ? Result.ok('removed')
+    : removed.value.startsWith('404 ')
+      ? Result.ok('absent')
+      : removed;
 };
 
 /** One request to the API, before anything is made of the answer. */
