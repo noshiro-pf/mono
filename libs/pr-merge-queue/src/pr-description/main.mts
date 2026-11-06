@@ -112,7 +112,7 @@ export const descriptionProblems = (
   const problems = checkDescription(parts.value, kind);
 
   return Arr.isNonEmpty(problems)
-    ? `the description is not laid out as the original, its translation, then the trailers:\n${problems.map((p) => `- ${p}`).join('\n')}`
+    ? `the description cannot be posted as it is:\n${problems.map((p) => `- ${p}`).join('\n')}`
     : undefined;
 };
 
@@ -197,7 +197,9 @@ const check = async (
   const problems = descriptionProblems(body.value, heading, kind);
 
   return problems === undefined
-    ? Result.ok(`${file}: the original and its translation mirror each other`)
+    ? Result.ok(
+        `${file}: the original and its translation mirror each other, and the deferred findings give their reasons`,
+      )
     : Result.err(`${file}: ${problems}`);
 };
 

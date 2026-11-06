@@ -311,11 +311,12 @@ ingest the feed). Outside reports come through private vulnerability reporting
   alone. `docs/pr-screenshots.md` says how.
 - **The last step before `open-pr`, and before pushing any later amend, is
   `/code-review high`** (`medium` for prose with no code sample), run as
-  `docs/code-review-loop.md` says — what a later round reads, and when the
-  loop ends, by the third round at the latest. Fix each finding, defer it to an issue, or dismiss it
-  with the reason in the description. Deferred issues are filed once the pull
-  request exists, ending with `Start-After:` naming it, and linked from it. A
-  security finding deferred or dismissed goes to `mono-security`, never here.
+  `docs/code-review-loop.md` says — what a later round reads, and when the loop
+  ends, by the third round at the latest. Fix each finding or dismiss it with
+  the reason in the description; **defer it to an issue only when out of
+  scope**, never for its round. Deferred issues are filed once the pull request
+  exists, ending with `Start-After:` naming it, and linked from it. A security
+  finding deferred or dismissed goes to `mono-security`, never here.
 - **A Claude Code session names itself in the description**, on a line of its
   own outside a code fence: `Claude-Session: [<title>](<session URL>)`, the
   title as it reads when the pull request is opened, or the URL alone when the
