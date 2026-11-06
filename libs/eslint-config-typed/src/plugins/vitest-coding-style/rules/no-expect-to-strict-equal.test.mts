@@ -89,13 +89,39 @@ describe('no-expect-to-strict-equal with a message', () => {
         name: 'a message with an effect is fixed when the expected value is a literal',
         code: dedent`
           expect(actual, describe()).toStrictEqual('x');
-          expect(actual, \`case \${c?.name}\`).toStrictEqual(c?.expected);
         `,
         output: dedent`
           assert.deepStrictEqual(actual, 'x', describe());
+        `,
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'a message and an expected value with no effect are fixed',
+        code: dedent`
+          expect(actual, \`case \${c?.name}\`).toStrictEqual(c?.expected);
+        `,
+        output: dedent`
           assert.deepStrictEqual(actual, c?.expected, \`case \${c?.name}\`);
         `,
-        errors: [{ messageId: 'useAssert' }, { messageId: 'useAssert' }],
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'a tagged template only in a function body runs nothing when evaluated, so it is fixed',
+        code: dedent`
+          expect(actual, \`case \${c.name}\`).toStrictEqual({ render: () => html\`<p/>\` });
+        `,
+        output: dedent`
+          assert.deepStrictEqual(actual, { render: () => html\`<p/>\` }, \`case \${c.name}\`);
+        `,
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'spreading an iterator into the expected value may change what the message reads',
+        code: dedent`
+          expect(actual, \`seen \${it.count}\`).toStrictEqual([...it]);
+        `,
+        output: null,
+        errors: [{ messageId: 'useAssertMovingMessage' }],
       },
       {
         name: 'a message expression and a type argument, with an expected value that has no effect',

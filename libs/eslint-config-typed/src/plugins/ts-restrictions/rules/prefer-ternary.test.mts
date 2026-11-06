@@ -17,6 +17,15 @@ describe('prefer-ternary', () => {
   tester.run('prefer-ternary', preferTernary, {
     valid: [
       {
+        name: 'let then if: a call or a tagged template as the initial value is not merged',
+        code: dedent`
+          let x = f();
+          if (a) x = 2;
+          let y = tag\`1\`;
+          if (a) y = 2;
+        `,
+      },
+      {
         name: 'a branch with more than one statement',
         code: dedent`
           function f(a) {

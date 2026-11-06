@@ -1,12 +1,14 @@
 import {
   AST_NODE_TYPES,
-  ASTUtils,
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { getArgumentText, skipTypeWrappers } from 'eslint-rule-forge';
+import {
+  getArgumentText,
+  mayHaveEffect,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
-import type { DeepReadonly } from 'ts-type-forge';
 import {
   createVitestAssertFixer,
   getExpectOperands,
@@ -121,31 +123,23 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
             ? expectedText
             : `(${expectedText}) as ${typeArgumentText}`;
 
-        if (messageArgument === undefined) {
-          context.report({
-            node,
-            messageId: 'useAssert',
-            fix: vitestAssertFix(
-              node,
-              expectReceiver,
-              (assertName) =>
-                `${assertName}.deepStrictEqual(${actualText}, ${expectedWithCast})`,
-            ),
-          });
-
-          return;
-        }
-
         // `expect(X, message)` keeps its message as the third argument of
         // `assert.deepStrictEqual`, which evaluates it after `Y` rather than
         // before: fixed only when that order cannot matter.
-        const messageText = getArgumentText(sourceCode, messageArgument);
-
         const isReorderSafe =
+          messageArgument === undefined ||
           isStaticLiteral(messageArgument) ||
           isStaticLiteral(expectedArgument) ||
           (!mayHaveEffect(messageArgument, sourceCode) &&
             !mayHaveEffect(expectedArgument, sourceCode));
+
+        const argumentsText = [
+          actualText,
+          expectedWithCast,
+          ...(messageArgument === undefined
+            ? []
+            : [getArgumentText(sourceCode, messageArgument)]),
+        ].join(', ');
 
         context.report({
           node,
@@ -155,7 +149,7 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
                 node,
                 expectReceiver,
                 (assertName) =>
-                  `${assertName}.deepStrictEqual(${actualText}, ${expectedWithCast}, ${messageText})`,
+                  `${assertName}.deepStrictEqual(${argumentsText})`,
               )
             : null,
         });
@@ -181,43 +175,6 @@ const isStaticLiteral = (
       Arr.isEmpty(unwrapped.expressions))
   );
 };
-
-/** Whether `value` is, or holds anywhere below it, a tagged template. */
-const containsTaggedTemplate = (
-  value: unknown,
-  visitorKeys: DeepReadonly<TSESLint.SourceCode.VisitorKeys>,
-): boolean => {
-  if (Arr.isArray(value)) {
-    return value.some((element: unknown) =>
-      containsTaggedTemplate(element, visitorKeys),
-    );
-  }
-
-  if (!isRecord(value) || typeof value['type'] !== 'string') {
-    return false;
-  }
-
-  return (
-    value['type'] === 'TaggedTemplateExpression' ||
-    (visitorKeys[value['type']] ?? []).some((key) =>
-      containsTaggedTemplate(value[key], visitorKeys),
-    )
-  );
-};
-
-/**
- * Whether evaluating `node` may have a side effect: `ASTUtils.hasSideEffect`,
- * which takes getters and implicit conversions to be pure, plus a tagged
- * template anywhere in it, which is a call that `hasSideEffect` does not count.
- */
-const mayHaveEffect = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceCode: TSESLint.SourceCode,
-): boolean =>
-  ASTUtils.hasSideEffect(node, sourceCode) ||
-  containsTaggedTemplate(node, sourceCode.visitorKeys);
 
 /** Whether `callee`, with its type wrappers taken off, is `<x>.toStrictEqual`. */
 const isToStrictEqualMember = (
