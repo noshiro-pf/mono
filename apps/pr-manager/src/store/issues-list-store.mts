@@ -66,7 +66,10 @@ export type IssuesListStore = Readonly<{
    * that a change to the rest of the view derives nothing there.
    */
   filter: InitializedObservable<IssueFilter>;
-  /** What the reader typed to search the titles by; empty is no search. */
+  /**
+   * What the reader typed to search the titles and numbers by; empty is no
+   * search.
+   */
   query: InitializedObservable<string>;
   /**
    * The open issues with what the view and the search hide taken out, in the

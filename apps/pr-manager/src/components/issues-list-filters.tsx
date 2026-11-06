@@ -13,12 +13,12 @@ import { OfTotal } from './stat-tile.js';
 
 /**
  * What the list of open issues leads with: a search of the titles, matched as
- * it is typed whatever the case, and not kept in the URL; the order, beside the
- * search so that the two share a line where the chips do not; the start states,
- * switches as the merge order's priorities are (`merge-order-filters.tsx`), in
- * the DAG's words, save `in progress`, which is with the counts; the labels,
- * each a pick. What each does is `issues-list-view.mts`, which keeps the choice
- * in the URL.
+ * it is typed whatever the case, or of the numbers (`123` or `#123`), and not
+ * kept in the URL; the order, beside the search so that the two share a line
+ * where the chips do not; the start states, switches as the merge order's
+ * priorities are (`merge-order-filters.tsx`), in the DAG's words, save `in
+ * progress`, which is with the counts; the labels, each a pick. What each does
+ * is `issues-list-view.mts`, which keeps the choice in the URL.
  *
  * Each number is how many of what it counts the list shows, followed in small
  * by how many there are when that is more — the merge order's counts, for
@@ -32,10 +32,10 @@ export const IssuesListFilters = (): JSX.Element => {
     <div class={constant('issues-list-controls-box')}>
       <div class={constant('issues-list-controls')}>
         <input
-          aria-label={constant('Search issue titles')}
+          aria-label={constant('Search issue titles and numbers')}
           autocomplete={constant('off')}
           class={constant('issues-search')}
-          placeholder={constant('Search titles')}
+          placeholder={constant('Search titles or #number')}
           type={constant('search')}
           value={issuesListStore.query}
           onInput={(typed) => {
