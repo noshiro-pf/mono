@@ -655,6 +655,53 @@ describe('parseReview', () => {
     ]);
   });
 
+  test('a bold label alone on its line labels the bullets under it', () => {
+    const review = parseReview(dedent`
+      ## Review
+
+      \`/code-review high\`, 3 rounds.
+
+      **Fixed**
+
+      - a stale README
+
+      **Deferred**
+
+      - (predates) the old helper (#13)
+      - the rest (#14)
+    `);
+
+    assert.deepStrictEqual(review?.findings, [
+      { disposition: 'fixed', text: 'a stale README', issues: [] },
+      {
+        disposition: 'deferred',
+        text: '(predates) the old helper (#13)',
+        issues: [13],
+        reason: 'predates',
+      },
+      { disposition: 'deferred', text: 'the rest (#14)', issues: [14] },
+    ]);
+  });
+
+  test('a bold paragraph that names no disposition keeps the label above it', () => {
+    const review = parseReview(dedent`
+      ## Review
+
+      Deferred to #13:
+
+      - a
+
+      **Round 2**
+
+      - b
+    `);
+
+    assert.deepStrictEqual(summary(review?.findings ?? []), [
+      ['deferred', 'a'],
+      ['deferred', 'b'],
+    ]);
+  });
+
   test('one round with no findings', () => {
     assert.deepStrictEqual(
       parseReview(dedent`
@@ -670,5 +717,28 @@ describe('parseReview', () => {
 
   test('a description without a review section', () => {
     assert.isUndefined(parseReview('## What changes\n\nA dependency bump.'));
+  });
+});
+
+describe('the Deferred list pr-description checks', () => {
+  /**
+   * Every deferred finding read from the shape `pr-description` asks for
+   * carries the reason its item opens with.
+   */
+  test.each([
+    '**Deferred**\n\n- (predates) a (#13).\n- (too large) b (#14).',
+    '**Deferred**\n\n- (predates) a (#13),\n  continued.\n\n**Fixed**\n\n- b.',
+    '**Deferred**\n\n1. (predates) a (#13).\n2. **(another change)** b (#14).',
+    '**Fixed**\n\n- the parser now reads a deferral tag.\n\n**Deferred**: none.',
+  ])('reads a reason for every deferral in %j', (lines) => {
+    const deferred = (
+      parseReview(`## Review\n\n\`/code-review high\`, 3 rounds.\n\n${lines}`)
+        ?.findings ?? []
+    ).filter((finding) => finding.disposition === 'deferred');
+
+    assert.deepStrictEqual(
+      deferred.filter((finding) => finding.reason === undefined),
+      [],
+    );
   });
 });

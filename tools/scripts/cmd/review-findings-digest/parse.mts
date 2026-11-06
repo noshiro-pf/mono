@@ -1,5 +1,10 @@
 // cspell:ignore xhigh
-import { reviewOpeningOf, reviewOpeningRounds } from 'pr-merge-queue';
+import {
+  deferralReasonOf,
+  reviewOpeningOf,
+  reviewOpeningRounds,
+  type DeferralReason,
+} from 'pr-merge-queue';
 import { Arr, Num, Result } from 'ts-data-forge';
 
 /**
@@ -121,7 +126,14 @@ export const findingsIn = (section: ReviewSection): readonly Finding[] => {
 
       const heading = block.text.startsWith('#');
 
-      if (heading || block.text.endsWith(':')) {
+      // `**Fixed**` alone on its line labels the bullets under it, as a
+      // trailing colon does: the shape `docs/code-review-loop.md` gives. A bold
+      // paragraph that names no disposition (`**Round 2**`) changes nothing.
+      if (
+        heading ||
+        block.text.endsWith(':') ||
+        (BOLD_LABEL.test(block.text) && lastCue(block.text) !== undefined)
+      ) {
         mut_current = lastCue(block.text) ?? sectionDefault;
 
         mut_labelIssues = issuesIn(block.text);
@@ -217,6 +229,8 @@ export type Finding = Readonly<{
   text: string;
   /** The issues a deferred finding was deferred to. */
   issues: readonly number[];
+  /** Why a deferred finding is out of scope, when it opens with a tag that says. */
+  reason?: DeferralReason;
 }>;
 
 export type ReviewRecord = Readonly<{
@@ -334,6 +348,9 @@ const PLAIN_LABEL =
   /^(?:Fixed|Dismissed|Deferred|Not changed|Not fixed|Kept|Withdrawn)(?:| to #\d+):\s*/u;
 
 const BULLET = /^(\s*)(?:[-*+]|\d+[.)])\s+(.*)$/u;
+
+/** `**Fixed**`, `**Deferred**`: a bold label alone, with no colon. */
+const BOLD_LABEL = /^(?:\*\*|__)[^*_]{1,40}(?:\*\*|__)$/u;
 
 const LABEL_GAP = /^[^\n.:]{0,60}:/u;
 
@@ -464,11 +481,15 @@ const makeFinding = (
 
   const own = issuesIn(text);
 
+  const reason =
+    disposition === 'deferred' ? deferralReasonOf(text) : undefined;
+
   return {
     disposition,
     text,
     issues:
       disposition !== 'deferred' ? [] : Arr.isNonEmpty(own) ? own : labelIssues,
+    ...(reason === undefined ? {} : { reason }),
   };
 };
 

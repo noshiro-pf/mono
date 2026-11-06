@@ -1,3 +1,4 @@
+import { DEFERRAL_REASONS, type DeferralReason } from 'pr-merge-queue';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { oneLine, tableCell } from '../../lib/markdown.mjs';
@@ -55,6 +56,7 @@ export const buildDigest = ({
         pulls: Arr.uniq(inCategory.map((finding) => finding.pull)),
       };
     }),
+    deferredByReason: countByReason(findings),
     other: findings
       .filter((finding) => !Arr.isNonEmpty(finding.categories))
       .map(({ pull, disposition, text }) => ({ pull, disposition, text })),
@@ -112,10 +114,14 @@ export const renderMarkdown = (digest: Digest): string => {
     '## Deferred',
     '',
     ...(Arr.isNonEmpty(deferred)
-      ? deferred.map(
-          ({ pull, issues, text }) =>
-            `- #${pull}${Arr.isNonEmpty(issues) ? ` → ${issues.map((n) => `#${n}`).join(', ')}` : ''}: ${oneLine(text)}`,
-        )
+      ? [
+          byReason(digest.deferredByReason),
+          '',
+          ...deferred.map(
+            ({ pull, issues, text }) =>
+              `- #${pull}${Arr.isNonEmpty(issues) ? ` → ${issues.map((n) => `#${n}`).join(', ')}` : ''}: ${oneLine(text)}`,
+          ),
+        ]
       : ['None.']),
     '',
     '## Other (no class matched)',
@@ -153,6 +159,8 @@ export type Digest = Readonly<{
     counts: DispositionCounts;
     pulls: readonly number[];
   }>[];
+  /** The deferred findings counted by the reason each opens with. */
+  deferredByReason: ReasonCounts;
   other: readonly Readonly<{
     pull: number;
     disposition: Disposition;
@@ -177,6 +185,8 @@ type ClassifiedFinding = Finding &
 
 type DispositionCounts = ReadonlyRecord<Disposition, number>;
 
+type ReasonCounts = ReadonlyRecord<DeferralReason | 'none', number>;
+
 const countByDisposition = (
   findings: readonly Readonly<{ disposition: Disposition }>[],
 ): DispositionCounts =>
@@ -186,6 +196,36 @@ const countByDisposition = (
     deferred: findings.filter((f) => f.disposition === 'deferred').length,
     unknown: findings.filter((f) => f.disposition === 'unknown').length,
   }) as const;
+
+/** How many deferred findings give each reason, and how many give none. */
+const countByReason = (
+  findings: readonly Readonly<{
+    disposition: Disposition;
+    reason?: DeferralReason;
+  }>[],
+): ReasonCounts => {
+  const deferred = findings.filter((f) => f.disposition === 'deferred');
+
+  const mut_counts = new Map<DeferralReason | undefined, number>();
+
+  for (const { reason } of deferred) {
+    mut_counts.set(reason, (mut_counts.get(reason) ?? 0) + 1);
+  }
+
+  return {
+    predates: mut_counts.get('predates') ?? 0,
+    'another change': mut_counts.get('another change') ?? 0,
+    'too large': mut_counts.get('too large') ?? 0,
+    none: mut_counts.get(undefined) ?? 0,
+  };
+};
+
+/** "By reason: 2 predates, 0 another change, 1 too large, 1 with none." */
+const byReason = (counts: ReasonCounts): string =>
+  `By reason: ${Arr.toPushed(
+    DEFERRAL_REASONS.map((reason) => `${counts[reason]} ${reason}`),
+    `${counts.none} with none`,
+  ).join(', ')}.` as const;
 
 const diffSize = (
   pull: Readonly<{

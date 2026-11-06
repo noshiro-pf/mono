@@ -27,7 +27,9 @@ const BODY = dedent`
 
   \`/code-review high\`, 2 rounds.
 
-  - Deferred: the rest (#13).
+  **Deferred**
+
+  - (too large) the rest (#13).
 
   ## 日本語
 
@@ -49,6 +51,12 @@ const BODY = dedent`
 
 const split = (body: string): DescriptionParts =>
   Result.unwrapThrow(splitDescription(body, HEADING));
+
+/** A Review section of `lines`, its translation naming what they name. */
+const review = (lines: string): DescriptionParts =>
+  split(
+    `## Review\n\n\`/code-review high\`, 3 rounds.\n\n${lines}\n\n## 日本語\n\n### レビュー\n\nあ ${(lines.match(/#\d+/gu) ?? []).join(' ')}。`,
+  );
 
 describe(splitDescription, () => {
   test('splits at the heading and at the first rule after it', () => {
@@ -525,6 +533,177 @@ describe(checkDescription, () => {
     );
   });
 
+  test('takes deferred findings that each open with a reason', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        review(dedent`
+          **Fixed**
+
+          - a thing.
+
+          **Deferred**
+
+          - (predates) b, which the change does not touch (#13).
+          - (another change) c,
+            continued on a second line.
+              - a nested note.
+          - **(too large)** d, a check over every package (#14),
+            deferred with its \`check:root\` script.
+
+          **Dismissed**
+
+          - e.
+        `),
+        'pull-request',
+      ),
+      [],
+    );
+  });
+
+  test.each([
+    '**Deferred**: none.',
+    '**Deferred:** None',
+    'Deferred: none',
+    '**Deferred**\n\nNone.',
+  ])('takes a Deferred line that says none, as %j', (label) => {
+    assert.deepStrictEqual(checkDescription(review(label), 'pull-request'), []);
+  });
+
+  test.each([
+    [
+      '**Deferred**\n\n- (predates) b (#13).\n- c, left for later (#14).',
+      'c, left for later (#14).',
+    ],
+    [
+      '**Deferred**\n\n  - (predates) b (#13).\n- c, left for later (#14).',
+      'c, left for later (#14).',
+    ],
+    [
+      '**Deferred**\n\n  - (predates) b (#13).\n\t- c, left for later (#14).',
+      'c, left for later (#14).',
+    ],
+    [
+      '**Deferred**\n\n- (predates) b (#13),\n  Fixed upstream.\n- c, left for later (#14).',
+      'c, left for later (#14).',
+    ],
+    [
+      '**Deferred**\n\n- (round 3) b (#13).\n- (too large) c (#14).',
+      '(round 3) b (#13).',
+    ],
+    [
+      '**Deferred**\n- (predates) b\nwrapped tail (#13).\n- c, left for later (#14).',
+      'c, left for later (#14).',
+    ],
+  ] as const)(
+    'names the deferred finding with no reason in %j',
+    (lines, item) => {
+      assert.deepStrictEqual(checkDescription(review(lines), 'pull-request'), [
+        `the deferred finding "${item}" opens with no reason; ${DEFERRAL_RULE}`,
+      ]);
+    },
+  );
+
+  test.each([
+    '**Deferred**\n\n1. (predates) b (#13).\n2. (too large) c (#14).',
+    '**Deferred**\n\n  - (predates) b (#13).\n  - (too large) c (#14).',
+    '**Deferred**\n- (predates) b (#13).',
+    '**Deferred**\n\n- (predates) b (#13).\n\tcontinued, deferred later.',
+    '**Deferred**\n\n- (predates): b (#13).\n- (Too large) c (#14).\n- *(another change)* d (#15).',
+  ])(
+    'takes a numbered or indented list under the Deferred line, %j',
+    (lines) => {
+      assert.deepStrictEqual(
+        checkDescription(review(lines), 'pull-request'),
+        [],
+      );
+    },
+  );
+
+  test('refuses a Deferred line that lists nothing', () => {
+    assert.deepStrictEqual(
+      checkDescription(review('**Deferred**\n\nNothing.'), 'pull-request'),
+      [`the "**Deferred**" line lists nothing ${NONE_HINT}; ${DEFERRAL_RULE}`],
+    );
+
+    assert.deepStrictEqual(
+      checkDescription(
+        review('**Fixed**\n\n- a.\n\n**Deferred**'),
+        'pull-request',
+      ),
+      [`the "**Deferred**" line lists nothing ${NONE_HINT}; ${DEFERRAL_RULE}`],
+    );
+  });
+
+  test.each([
+    '**Deferred**\n\n- (predates) a (#13).\n\n**Round 3**\n\n- b (#14).',
+    '**Deferred**\n\n- (predates) a (#13).\n\n**Dismissed**\n\n- b, as intended.',
+    '- Deferred: b (#13).',
+    'Deferred to #13: b; c.',
+    '**Fixed**\n\n- the parser now reads `Deferred:` labels.',
+    '**Fixed**\n\n- a wrapped finding whose next line reads\n  Deferred:\n- b.',
+  ])(
+    'reads the list under a Deferred line only, up to its end, in %j',
+    (lines) => {
+      assert.deepStrictEqual(
+        checkDescription(review(lines), 'pull-request'),
+        [],
+      );
+    },
+  );
+
+  test('shortens a long finding without splitting a character', () => {
+    const long = `b ${'x'.repeat(57)}😀 more` as const;
+
+    assert.deepStrictEqual(
+      checkDescription(review(`**Deferred**\n\n- ${long}`), 'pull-request'),
+      [
+        `the deferred finding "b ${'x'.repeat(57)}😀…" opens with no reason; ${DEFERRAL_RULE}`,
+      ],
+    );
+  });
+
+  test('reads deferrals in the Review section only, outside code', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          **Deferred**
+
+          - a note in the summary.
+
+          ## Review
+
+          \`/code-review high\`, 1 round.
+
+          \`\`\`md
+          **Deferred**
+
+          - an example.
+          \`\`\`
+
+          ## Checks
+
+          **Deferred**
+
+          - not a finding.
+
+          ## 日本語
+
+          あ。
+
+          ### レビュー
+
+          い。
+
+          ### チェック
+
+          う。
+        `),
+        'pull-request',
+      ),
+      [],
+    );
+  });
+
   test('reads the Review opening outside code fences only', () => {
     assert.deepStrictEqual(
       checkDescription(
@@ -547,6 +726,12 @@ describe(checkDescription, () => {
     );
   });
 });
+
+const NONE_HINT =
+  '(with nothing deferred, write "**Deferred**: none." or leave the line out)';
+
+const DEFERRAL_RULE =
+  'a deferred finding is an item under a "**Deferred**" line, opening with why it is out of scope: (predates), (another change) or (too large); a finding in scope is fixed in the pull request, whatever round raised it (docs/code-review-loop.md)';
 
 const REVIEW_OPENING_RULE =
   'it opens with the level and the total of rounds in digits, as "`/code-review high`, 3 rounds.", "Review at `high`, 2 rounds." or "Self-review at `high`, 1 round."';

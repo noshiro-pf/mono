@@ -82,6 +82,12 @@ pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  #
   `review-findings-digest` はこの行から合計を読みます。この形より前に書いた
   description は、両方の最初の行を直すか、原文だけを直して `--wording-only` で
   `push` します。
+- 原文の `## Review` の `**Deferred**` の行の下の項目（箇条書きか番号付き）が、
+  範囲外である理由 `(predates)`・`(another change)`・`(too large)` のどれかで
+  始まっていない、またはその行の下に項目も none もない。範囲内の指摘は何回目のラウンドで
+  出ても元の pull request で直します（`docs/code-review-loop.md`）。
+  `review-findings-digest` は理由ごとに数え、ほかの形で書いた先送りは理由なしと
+  して数えます。`**Deferred**: none.` はかまいません。この形より前に書いた description も同じように直します。
 
 `push` はさらに次を確かめます。
 
@@ -162,6 +168,13 @@ the open issues with a close title and those that name a `--keyword` as written
   `review-findings-digest` reads the total from it. A description written before
   this form has its opening fixed in both halves, or in the original alone with
   `push --wording-only`.
+- an item (bulleted or numbered) under a `**Deferred**` line in the original's
+  `## Review` does not open with why it is out of scope — `(predates)`,
+  `(another change)` or `(too large)` — or the line has neither items nor "none"
+  under it. A finding in scope is fixed in the pull request whatever round
+  raised it (`docs/code-review-loop.md`); `review-findings-digest` counts
+  deferrals by reason, and one written in any other shape as one with none.
+  `**Deferred**: none.` is fine. A description written before this rule is fixed the same way.
 
 `push` also refuses when the description changed on GitHub since the `pull`
 (`open-pr --merge-before` writes into other pull requests' bodies), and when

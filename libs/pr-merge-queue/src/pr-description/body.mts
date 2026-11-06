@@ -14,6 +14,7 @@
 
 import { outsideCodeFences } from 'pr-report-core';
 import { Arr, Num, Result } from 'ts-data-forge';
+import { deferralProblemsIn } from './review-section.mjs';
 
 /** A description cut where its translation begins and where it ends. */
 export type DescriptionParts = Readonly<{
@@ -123,6 +124,11 @@ export const splitDescription = (
  * - The original's `## Review` opens with the level and the total of rounds,
  *   in the form {@link reviewOpeningRounds} reads, so that a count is read,
  *   not guessed.
+ * - Each finding the original's `## Review` defers is a bullet under a
+ *   `**Deferred**` line, opening with why it is out of scope
+ *   ({@link deferralProblemsIn}): a finding in scope is fixed in the pull
+ *   request, and a deferral with no reason reads as one deferred for the
+ *   round it came in.
  */
 export const checkDescription = (
   parts: DescriptionParts,
@@ -163,7 +169,14 @@ export const checkDescription = (
 
   const reviews = original.filter((line) => REVIEW_HEADING.test(line)).length;
 
-  const reviewOpening = reviewOpeningIn(original);
+  const reviewSection = reviewSectionIn(original);
+
+  const reviewOpening =
+    reviewSection === undefined
+      ? undefined
+      : reviewOpeningOf(reviewSection.join('\n'));
+
+  const deferrals = deferralProblemsIn(reviewSection ?? []);
 
   return [
     mirrored
@@ -205,6 +218,7 @@ export const checkDescription = (
       : reviewOpening === ''
         ? `the "## Review" section is empty; ${REVIEW_OPENING_RULE}`
         : `the "## Review" section opens with "${reviewOpening}"; ${REVIEW_OPENING_RULE}`,
+    ...deferrals,
   ].filter((problem) => problem !== undefined);
 };
 
@@ -404,15 +418,23 @@ const onlyIn = (
     .map((n) => `#${n}`);
 
 /**
- * The opening of the first `## Review` section in `lines` ({@link reviewOpeningOf}),
- * or `undefined` when there is no such heading.
+ * The lines under the first `## Review` heading in `lines`, up to the next `#`
+ * or `##` heading, or `undefined` when there is no such heading.
  */
-const reviewOpeningIn = (lines: readonly string[]): string | undefined => {
+const reviewSectionIn = (
+  lines: readonly string[],
+): readonly string[] | undefined => {
   const start = lines.findIndex((line) => REVIEW_HEADING.test(line));
 
-  return start === -1
-    ? undefined
-    : reviewOpeningOf(lines.slice(start + 1).join('\n'));
+  if (start === -1) {
+    return undefined;
+  }
+
+  const rest = lines.slice(start + 1);
+
+  const end = rest.findIndex((line) => SECTION_HEADING.test(line));
+
+  return end === -1 ? rest : rest.slice(0, end);
 };
 
 /** `text`'s lines with fenced code blanked out; `text` is LF only, as {@link splitDescription} leaves it. */

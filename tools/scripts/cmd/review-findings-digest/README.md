@@ -13,10 +13,11 @@ pnpm run review-findings-digest -- --last 50 --format json
 ```
 
 `--format md` (the default) prints a rounds-per-pull-request table with each
-one's diff size, the classes with their counts by disposition (fixed,
-dismissed, deferred, unstated), the deferred findings with the issues they
-went to, and every finding no class matched, verbatim. `--format json` prints
-the same data. Progress goes to stderr.
+one's diff size, the classes with their counts by disposition (fixed, dismissed,
+deferred, unstated), the deferred findings with the issues they went to and a
+count by the reason each opens with (`(predates)`, `(another change)`,
+`(too large)`, or none), and every finding no class matched, verbatim.
+`--format json` prints the same data. Progress goes to stderr.
 
 It reads the REST API only, because a Claude Code session's proxy refuses
 GraphQL, with the token and repository resolution of `pr-merge-queue`
@@ -29,8 +30,10 @@ GraphQL, with the token and repository resolution of `pr-merge-queue`
 - `github.mts` pages through the closed pull requests, newest update first,
   until no later page can hold one in range, and fetches the diff size of
   those with a `## Review` section.
-- `parse.mts` reads one description: the section, the levels, the stated
-  round count, and the findings with their disposition.
+- `parse.mts` reads one description: the section, the levels, the stated round
+  count, and the findings with their disposition. A deferred finding's reason is
+  read by `pr-merge-queue`'s `deferralReasonOf`, the one `pr-description` checks
+  the `**Deferred**` list with.
 - `classify.mts` is the table of classes, one keyword pattern each.
 - `digest.mts` counts and renders.
 

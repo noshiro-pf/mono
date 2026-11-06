@@ -84,6 +84,25 @@ round dismissed, costs as much as the first.
   it again. A later round cannot tell whether a fix broke what a dismissal
   relied on, so check that when writing the fix, and widen the next round if
   it did.
+- **Fix it here unless it is out of scope.** A finding is fixed in this pull
+  request, whatever round raised it and however many lines the fix takes, when
+  it is about code or prose the change adds or alters, or about what the change
+  set out to do. A defect in the change's own new code is never deferred. Defer
+  only a finding that is out of scope, and say which way, as the tag its bullet
+  under **Deferred** opens with:
+    - `(predates)` — the problem was there before the change, in code the change
+      does not otherwise need to touch;
+    - `(another change)` — fixing it pursues a different goal, or reaches
+      packages or files the change has no reason to touch;
+    - `(too large)` — the fix would make the pull request several times its
+      size, such as a check or rule over the whole repository.
+
+    A question of what the change should do is asked in the thread, not
+    deferred. Splitting work that belongs together gains nothing: it is reviewed
+    and checked twice. `pr-description` and `open-pr --body-file` refuse an item
+    under **Deferred** with no tag; `review-findings-digest` counts deferrals by
+    tag, and one written in any other shape as one with none.
+
 - **Ask what would have caught it** ([`checks-over-fixes.md`](./checks-over-fixes.md)) for each finding
   that could recur, and add the check or say why there is none.
 
@@ -97,18 +116,17 @@ The loop ends at the first of:
   wording, wherever it is written: a false sentence in a README is a finding
   like any other;
 - a round that raises only findings the ledger already dismisses;
-- the third round. What it finds is fixed here only when the fix is local
-  and the checks it touches cover it; anything larger is deferred to an
-  issue, or asked in the thread when it is a question of what the change
-  should do. Do not start a fourth round to make it go away.
+- the third round. What it finds goes where "Fix it here unless it is out of
+  scope" sends it, as in any other round. Do not start a fourth round.
 
 A fix the third round asked for that changes behavior — anything but wording —
-is read once more, by `/code-review medium` given that fix alone (mark the
-branch as for a later round). That read is not a fourth round, and nothing it
-finds is fixed here: a finding goes to an issue, and one that shows the fix
-itself is wrong takes the fix out, its finding deferred with it. Otherwise the
-last fixes of a long loop are the only code that reaches `main` with no review
-at all.
+is read by `/code-review medium` given that fix alone (mark the branch as for a
+later round). That read is not a fourth round. What it finds in scope is fixed
+here, and a fix of that which changes behavior is read the same way, given that
+fix alone. When a second such read still finds something in scope, stop and ask
+in the thread, rather than reading again or deferring it. Otherwise the last
+fixes of a long loop are the only code that reaches `main` with no review at
+all.
 
 ## What counts as a round
 
@@ -153,9 +171,10 @@ before this form changes the opening in both halves, or in the original alone
 with `pr-description push --wording-only`.
 
 The section then lists the findings under **Fixed**, **Dismissed** (each with
-its reason) and **Deferred** (each with its issue). Keep that shape: it is what
-a reader, and anything that later mines the descriptions for recurring findings,
-can parse.
+its reason) and **Deferred** (each a bullet opening with its tag and naming its
+issue, `- (predates) … (#123)`; with nothing deferred, the label is left out or
+reads `**Deferred**: none.`). Keep that shape: it is what a reader, and anything
+that later mines the descriptions for recurring findings, can parse.
 The Japanese half of the description (`CLAUDE.md`, "Japanese text")
 translates the section under `### レビュー`, never a second `## Review`: the
 digest reads the first `## Review` alone, and only the English one parses.

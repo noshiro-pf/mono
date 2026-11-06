@@ -121,4 +121,56 @@ describe('renderMarkdown', () => {
       '- #12 (dismissed): **`autocomplete="off"`**: the browser ignores it anyway.',
     );
   });
+
+  test('counts the deferred by the reason each opens with', () => {
+    const digest = buildDigest({
+      range: 'Merged since 2026-10-01',
+      pulls: [
+        {
+          number: 9,
+          title: 'fix: y',
+          url: 'https://github.com/o/r/pull/9',
+          mergedAt: '2026-10-27T00:00:00Z',
+          body: dedent`
+            ## Review
+
+            \`/code-review high\`, 3 rounds.
+
+            **Deferred**
+
+            - (predates) the old helper (#13)
+            - (predates) the other helper (#14)
+            - (too large) a check over every package (#15)
+            - the rest (#16)
+          `,
+          additions: 3,
+          deletions: 1,
+        },
+      ],
+    });
+
+    const markdown = renderMarkdown(digest);
+
+    assert.include(
+      markdown,
+      'By reason: 2 predates, 0 another change, 1 too large, 1 with none.',
+    );
+
+    assert.deepStrictEqual(digest.deferredByReason, {
+      predates: 2,
+      'another change': 0,
+      'too large': 1,
+      none: 1,
+    });
+
+    assert.include(markdown, '- #9 → #13: (predates) the old helper (#13)');
+  });
+
+  test('says None under Deferred when nothing was deferred', () => {
+    const markdown = renderMarkdown(buildDigest({ range: 'r', pulls: [] }));
+
+    assert.include(markdown, '## Deferred\n\nNone.\n');
+
+    assert.notInclude(markdown, 'By reason');
+  });
 });
