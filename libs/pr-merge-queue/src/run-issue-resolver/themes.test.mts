@@ -1,8 +1,10 @@
 import {
+  apartFrom,
   issueThemes,
   orderByTheme,
   primaryThemes,
   themeMatches,
+  withoutHeldThemes,
   type ThemedIssue,
 } from './themes.mjs';
 
@@ -352,5 +354,41 @@ describe(orderByTheme, () => {
 
       assert.deepStrictEqual(order.heldBack, []);
     });
+  });
+});
+
+describe(withoutHeldThemes, () => {
+  test('takes every S, and the rest whose primary themes nobody started on', () => {
+    const order = withoutHeldThemes(
+      [
+        themed(1, 'S', ['unblock-prs']),
+        themed(2, 'other', ['unblock-prs', 'pr-merge-queue']),
+        themed(3, 'other', ['synstate', 'unblock-prs'], ['synstate']),
+        themed(4, 'D', []),
+      ],
+      new Map<string, readonly number[]>([['unblock-prs', [90]]]),
+    );
+
+    assert.deepStrictEqual(numbers(order.taken), [1, 3, 4]);
+
+    assert.deepStrictEqual(order.heldBack, [
+      { number: 2, themes: ['unblock-prs'] },
+    ]);
+  });
+});
+
+describe(apartFrom, () => {
+  test('keeps a second issue of one theme out of the same pick', () => {
+    const taken = [themed(1, 'other', ['synstate'])] as const;
+
+    assert.isFalse(apartFrom(taken, themed(2, 'other', ['synstate'])));
+
+    assert.isTrue(
+      apartFrom(taken, themed(3, 'other', ['synstate', 'ci'], ['ci'])),
+    );
+
+    assert.isTrue(apartFrom(taken, themed(4, 'S', ['synstate'])));
+
+    assert.isTrue(apartFrom(taken, themed(5, 'other', [])));
   });
 });

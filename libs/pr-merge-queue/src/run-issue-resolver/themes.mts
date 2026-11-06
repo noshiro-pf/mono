@@ -152,6 +152,43 @@ export const orderByTheme = <I extends ThemedIssue>(
   };
 };
 
+/**
+ * The issues `run-issue-resolver` may start (#3598), in today's order: every
+ * `S`, whatever its themes, then an issue only when none of its primary themes
+ * is one a started issue is on (`held`). The rest are returned in `heldBack`,
+ * with the themes that hold them. Within one pick, {@link apartFrom} keeps two
+ * sessions started together off one theme.
+ */
+export const withoutHeldThemes = <I extends ThemedIssue>(
+  issues: readonly I[],
+  held: ReadonlyMap<string, readonly number[]>,
+): ThemeOrder<I> => {
+  const blocking = (issue: I): readonly string[] =>
+    issue.tier === 'S'
+      ? ([] as const)
+      : issue.primary.filter((theme) => held.has(theme));
+
+  return {
+    taken: issues.filter((issue) => !Arr.isNonEmpty(blocking(issue))),
+    heldBack: issues
+      .filter((issue) => Arr.isNonEmpty(blocking(issue)))
+      .map((issue) => ({ number: issue.number, themes: blocking(issue) })),
+  };
+};
+
+/**
+ * Whether `next` may be started beside the issues `taken` in the same pick: an
+ * `S` always, any other only when none of its primary themes is one of theirs.
+ */
+export const apartFrom = (
+  taken: readonly ThemedIssue[],
+  next: ThemedIssue,
+): boolean =>
+  next.tier === 'S' ||
+  next.primary.every((theme) =>
+    taken.every((issue) => !issue.primary.includes(theme)),
+  );
+
 /** What {@link orderByTheme} reads of an issue. */
 export type ThemedIssue = Readonly<{
   number: number;

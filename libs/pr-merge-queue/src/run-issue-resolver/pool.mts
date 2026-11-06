@@ -223,9 +223,11 @@ export const runPool = async <C extends Readonly<{ number: number }>>(
         ? surveyed.value.fresh.filter(({ number }) => !mut_running.has(number))
         : ([] as const);
 
-      const ready = offered
-        .filter(({ number }) => (mut_retryAt.get(number) ?? now) <= now)
-        .slice(0, slots);
+      const ready = pickApart(
+        offered.filter(({ number }) => (mut_retryAt.get(number) ?? now) <= now),
+        slots,
+        steps.apart,
+      );
 
       const held = offered
         .filter(({ number }) => (mut_retryAt.get(number) ?? now) > now)
@@ -368,6 +370,30 @@ export const CAP_PER_AVERAGE = 3;
 /** What share of the total a session started before any issue is resolved may spend. */
 export const FIRST_CAP_SHARE = 0.25;
 
+/**
+ * Up to `slots` of `ready`, in order, each one `apart` allows beside those
+ * taken before it; the first `slots` when there is no `apart`.
+ */
+export const pickApart = <C,>(
+  ready: readonly C[],
+  slots: number,
+  apart: ((taken: readonly C[], next: C) => boolean) | undefined,
+): readonly C[] => {
+  const mut_taken: C[] = [];
+
+  for (const candidate of ready) {
+    if (mut_taken.length >= slots) {
+      break;
+    }
+
+    if (apart === undefined || apart(mut_taken, candidate)) {
+      mut_taken.push(candidate);
+    }
+  }
+
+  return mut_taken;
+};
+
 const average = (costs: NonEmptyArray<number>): number =>
   Num.div(Arr.sum(costs), asPositiveInt(costs.length));
 
@@ -407,6 +433,12 @@ export type PoolSteps<C extends Readonly<{ number: number }>> = Readonly<{
   stopRequested: () => boolean;
   now: () => number;
   log: (message: string) => void;
+  /**
+   * Whether `next` may start beside the candidates `taken` in the same pick;
+   * every one may when absent. `run-issue-resolver` keeps two sessions started
+   * together off one theme with it (#3598).
+   */
+  apart?: (taken: readonly C[], next: C) => boolean;
 }>;
 
 /**

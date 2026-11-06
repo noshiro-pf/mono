@@ -2,6 +2,7 @@ import { setTimeout as sleep } from 'node:timers/promises';
 import { Result } from 'ts-data-forge';
 import {
   capForNext,
+  pickApart,
   runPool,
   type PoolLimits,
   type PoolSteps,
@@ -541,3 +542,17 @@ describe(capForNext, () => {
     );
   });
 });
+
+describe(pickApart, () => {
+  test('takes the first slots when nothing keeps them apart', () => {
+    assert.deepStrictEqual(pickApart([1, 2, 3], 2, undefined), [1, 2]);
+  });
+
+  test('passes over one apart refuses, and takes the next', () => {
+    assert.deepStrictEqual(pickApart([1, 3, 2, 4, 5], 2, otherParity), [1, 2]);
+  });
+});
+
+/** Apart when no number taken has the same parity. */
+const otherParity = (taken: readonly number[], next: number): boolean =>
+  taken.every((each) => each % 2 !== next % 2);
