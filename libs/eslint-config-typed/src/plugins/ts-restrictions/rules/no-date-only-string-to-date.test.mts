@@ -89,8 +89,61 @@ describe('no-date-only-string-to-date', () => {
         code: "DateUtils.to('2026-11-03');",
         options: withDateUtils,
       },
+      {
+        name: 'new Date with several arguments reads numbers, not a string',
+        code: "const year = '2026';\nnew Date(year, 10, 3);",
+      },
+      {
+        name: 'new Date with a spread argument',
+        code: "declare const parts: readonly ['2026-11-03'];\nnew Date(...parts);",
+      },
+      {
+        name: 'globalThis.Date with several arguments',
+        code: "new globalThis.Date('2026', 10, 3);",
+      },
+      {
+        name: 'a template literal type, which is no literal',
+        // eslint-disable-next-line no-template-curly-in-string -- the code linted
+        code: 'declare const d: `${number}-01`;\nnew Date(d);',
+      },
+      {
+        name: 'a template literal type behind a type parameter',
+        // eslint-disable-next-line no-template-curly-in-string -- the code linted
+        code: 'const f = <T extends `${number}-01`>(t: T) => new Date(t);',
+      },
     ],
     invalid: [
+      {
+        name: 'Date.parse reads its first argument whatever follows',
+        code: "(Date.parse as (s: string, x: number) => number)('2026-11-03', 1);",
+        errors: [{ messageId, data: { callee: 'Date.parse' } }],
+      },
+      {
+        name: 'a function named in options with several arguments',
+        code: "DateUtils.from('2026-11-03', 'Asia/Tokyo');",
+        options: withDateUtils,
+        errors: [{ messageId, data: { callee: 'DateUtils.from' } }],
+      },
+      {
+        name: 'new Date with one argument after a spread-free check',
+        code: "const day = '2026-11-03';\nnew Date(day);",
+        errors: [{ messageId, data: { callee: 'Date' } }],
+      },
+      {
+        name: 'an indexed access on a type parameter',
+        code: "const f = <T extends { day: '2026-11-03' }>(t: T) => new Date(t.day);",
+        errors: [{ messageId, data: { callee: 'Date' } }],
+      },
+      {
+        name: 'an indexed access type',
+        code: "const f = <T extends { day: '2026-11-03' }>(d: T['day']) => new Date(d);",
+        errors: [{ messageId, data: { callee: 'Date' } }],
+      },
+      {
+        name: 'an indexed access with a generic key',
+        code: "const f = <T extends Readonly<Record<string, '2026-11-03'>>, K extends string>(t: T, k: K) => new Date(t[k]);",
+        errors: [{ messageId, data: { callee: 'Date' } }],
+      },
       {
         name: 'a date',
         code: "new Date('2026-11-03');",
