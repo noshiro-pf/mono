@@ -47,13 +47,31 @@ const tsconfigPath = path.resolve(thisDir, './tsconfig.gen.json');
 export const generateRulesType = async (
   targetFileNames?: NonEmptyArray<string>,
 ): Promise<void> => {
+  if (targetFileNames !== undefined) {
+    const unknown = unknownTargetFileNames(targetFileNames);
+
+    if (Arr.isNonEmpty(unknown)) {
+      throw new Error(
+        [
+          `Not a generated file: ${unknown.join(', ')}.`,
+          `Name files of src/types/rules/ by their base name: ${Object.values(
+            eslintPlugins,
+          )
+            .map((plugin) => plugin.outputFileName)
+            .join(', ')}.`,
+        ].join('\n'),
+      );
+    }
+  }
+
   {
     const result = await generate(targetFileNames);
 
+    // Thrown rather than logged, so that the run, and `ws:gen` with it, fails.
     if (result.type === 'error') {
-      console.error(result.error);
-
-      return;
+      throw new Error('Generating the rule types failed.', {
+        cause: result.error,
+      });
     }
   }
 
@@ -93,16 +111,34 @@ export const generateRulesType = async (
   }
 };
 
-/** 生成対象として指定されたファイル名だけに絞り込む（未指定なら全件） */
-const filterTargetFiles = (
+/**
+ * 生成対象として指定されたファイル名だけに絞り込む（未指定なら全件）。名前は
+ * ベース名で完全一致させる: `fmt` と `generate` が同じ名前を同じ意味で読むように。
+ */
+export const filterTargetFiles = (
   allFiles: readonly string[],
-  targetFileNames: NonEmptyArray<string> | undefined,
+  targetFileNames: readonly string[] | undefined,
 ): readonly string[] =>
   targetFileNames === undefined
     ? allFiles
     : allFiles.filter((filePath) =>
-        targetFileNames.some((name) => filePath.endsWith(name)),
+        targetFileNames.includes(path.basename(filePath)),
       );
+
+/**
+ * The names given that are not the output file of a plugin: a path, a suffix or
+ * a misspelling, which would otherwise select nothing to generate while the
+ * later passes read it differently.
+ */
+export const unknownTargetFileNames = (
+  targetFileNames: readonly string[],
+): readonly string[] => {
+  const outputFileNames: ReadonlySet<string> = new Set(
+    Object.values(eslintPlugins).map((plugin) => plugin.outputFileName),
+  );
+
+  return targetFileNames.filter((name) => !outputFileNames.has(name));
+};
 
 /** 生成ファイルの ts-type-forge の import 文を、全型を含む形に戻す */
 const restoreTsTypeForgeImport = async (
@@ -304,4 +340,39 @@ if (isDirectlyExecuted(import.meta.url)) {
 
     await generateRulesType();
   }
+}
+
+if (import.meta.vitest !== undefined) {
+  describe(filterTargetFiles, () => {
+    test('selects a file by its base name only', () => {
+      assert.deepStrictEqual(
+        filterTargetFiles(
+          ['/r/src/types/rules/eslint-n-rules.mts', '/r/src/types/rules/x.mts'],
+          ['eslint-n-rules.mts'],
+        ),
+        ['/r/src/types/rules/eslint-n-rules.mts'],
+      );
+
+      assert.deepStrictEqual(
+        filterTargetFiles(
+          ['/r/src/types/rules/eslint-n-rules.mts'],
+          ['n-rules.mts'],
+        ),
+        [],
+      );
+    });
+  });
+
+  describe(unknownTargetFileNames, () => {
+    test('names what is not a plugin output file', () => {
+      assert.deepStrictEqual(
+        unknownTargetFileNames([
+          'eslint-n-rules.mts',
+          'rules/eslint-n-rules.mts',
+          'n-rules.mts',
+        ]),
+        ['rules/eslint-n-rules.mts', 'n-rules.mts'],
+      );
+    });
+  });
 }

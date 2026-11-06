@@ -1,7 +1,9 @@
+import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
-import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
+import { getWorkspacePackages, glob, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import * as ts from 'typescript';
 import { readScripts } from '../lib/manifest-scripts.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -19,19 +21,33 @@ import { projectRootPath } from '../project-root-path.mjs';
  * its patterns, climbing the same way (a path copied from a member of another
  * depth fails only when that generator is next run).
  *
+ * A member's generator code under `scripts/` is held to the same: it does not
+ * import Prettier or run the `prettier` command, but calls `formatPackage` from
+ * `tools/configs/format-package.mts` on what it wrote. Code is read through the
+ * TypeScript parser, so a comment that names the command is not a use; a
+ * command assembled from pieces (`'pret' + 'tier'`) is not seen.
+ *
  * The root `package.json` is not a member: Prettier run there reads the root
  * ignore files on its own.
  */
 export const checkFormatScripts = async (): Promise<Result<number, string>> => {
   const members = await getWorkspacePackages(projectRootPath);
 
-  const offenders = members.flatMap((member) => {
+  const scriptOffenders = members.flatMap((member) => {
     const dir = path.relative(projectRootPath, member.path);
 
     return findFormatScriptProblems(dir, readScripts(member.packageJson)).map(
       (problem) => `${dir}: ${problem}`,
     );
   });
+
+  const codeOffendersByMember = await Promise.all(
+    members.map((member) => findPrettierInMember(member.path)),
+  );
+
+  const codeOffenders = codeOffendersByMember.flat();
+
+  const offenders = [...scriptOffenders, ...codeOffenders] as const;
 
   return Arr.isNonEmpty(offenders)
     ? Result.err(
@@ -44,7 +60,8 @@ export const checkFormatScripts = async (): Promise<Result<number, string>> => {
           '`.gitignore` ignores; `format-package.mts` passes the root files.',
           'Set `fix:fmt:full` to the command named; any other script runs that',
           'command, climbing as many `../` as named, with its file patterns',
-          'appended, instead of `prettier`.',
+          'appended, instead of `prettier`. Generator code calls `formatPackage`',
+          'from `tools/configs/format-package.mts` on the files it wrote.',
         ].join('\n'),
       )
     : Result.ok(members.length);
@@ -89,6 +106,107 @@ export const findFormatScriptProblems = (
       .map(([name]) => `\`${name}\` runs Prettier directly`),
   ];
 };
+
+/**
+ * Where `text`, the source of `fileName`, starts Prettier itself: an import of
+ * `prettier` (or a subpath), static or dynamic, or the `prettier` command in a
+ * string or a template. Each is `<fileName>:<line>: <what>`.
+ */
+export const findPrettierInSource = (
+  fileName: string,
+  text: string,
+): readonly string[] => {
+  const sourceFile = ts.createSourceFile(
+    fileName,
+    text,
+    ts.ScriptTarget.Latest,
+    true,
+  );
+
+  const at = (node: ts.Node, what: string): string =>
+    `${fileName}:${sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1}: ${what}` as const;
+
+  const visit = (node: ts.Node): readonly string[] => {
+    const here = ((): readonly string[] => {
+      if (
+        (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
+        node.moduleSpecifier !== undefined &&
+        ts.isStringLiteral(node.moduleSpecifier) &&
+        isPrettierModule(node.moduleSpecifier.text)
+      ) {
+        return [at(node, `imports \`${node.moduleSpecifier.text}\``)];
+      }
+
+      if (
+        ts.isCallExpression(node) &&
+        node.expression.kind === ts.SyntaxKind.ImportKeyword
+      ) {
+        const [specifier] = node.arguments;
+
+        return specifier !== undefined &&
+          ts.isStringLiteralLike(specifier) &&
+          isPrettierModule(specifier.text)
+          ? [at(node, `imports \`${specifier.text}\``)]
+          : [];
+      }
+
+      if (
+        ts.isStringLiteralLike(node) ||
+        ts.isTemplateHead(node) ||
+        ts.isTemplateMiddle(node) ||
+        ts.isTemplateTail(node)
+      ) {
+        return isModuleSpecifier(node) || !RUNS_PRETTIER.test(node.text)
+          ? []
+          : [at(node, 'runs `prettier`')];
+      }
+
+      return [];
+    })();
+
+    return [...here, ...node.getChildren(sourceFile).flatMap(visit)];
+  };
+
+  return visit(sourceFile);
+};
+
+/** {@link findPrettierInSource} over a member's `scripts/`, tests aside. */
+const findPrettierInMember = async (
+  memberPath: string,
+): Promise<readonly string[]> => {
+  const files = await glob('scripts/**/*.{mts,ts,mjs,js}', {
+    cwd: memberPath,
+    absolute: true,
+    ignore: ['**/*.test.*', '**/node_modules/**'],
+  });
+
+  if (Result.isErr(files)) {
+    throw new Error(unknownToString(files.value));
+  }
+
+  const found = await Promise.all(
+    files.value.map(async (file) =>
+      findPrettierInSource(
+        path.relative(projectRootPath, file),
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.readFile(file, 'utf8'),
+      ),
+    ),
+  );
+
+  return found.flat();
+};
+
+const isPrettierModule = (specifier: string): boolean =>
+  specifier === 'prettier' || specifier.startsWith('prettier/');
+
+/** Whether `node` is the module of an import, which is judged as one. */
+const isModuleSpecifier = (node: ts.Node): boolean =>
+  ((ts.isImportDeclaration(node.parent) ||
+    ts.isExportDeclaration(node.parent)) &&
+    node.parent.moduleSpecifier === node) ||
+  (ts.isCallExpression(node.parent) &&
+    node.parent.expression.kind === ts.SyntaxKind.ImportKeyword);
 
 const FORMAT_PACKAGE = 'tools/scripts/cmd/format-package.mts';
 

@@ -1,7 +1,8 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { format } from 'prettier';
 import { glob, Result } from 'ts-repo-utils';
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how packages reach its shared scripts
+import { formatPackage } from '../../../../tools/configs/format-package.mjs';
 import {
   extractTypeExports,
   type NamespaceExport,
@@ -79,21 +80,27 @@ export const genEntryPoint = async (
     '',
   ] as const;
 
-  const formatted = await format(lines.join('\n'), {
-    parser: 'typescript',
-    singleQuote: true,
-    trailingComma: 'all',
-  });
-
   try {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.writeFile(entryPointFilePath, formatted, 'utf8');
+    await fs.writeFile(entryPointFilePath, lines.join('\n'), 'utf8');
 
     console.info(
       `Successfully generated ${entryPointFilePath} with ${publicNames.length} public type re-exports.`,
     );
   } catch (error) {
     console.error(`Error writing ${entryPointFilePath}:`, error);
+  }
+
+  // Prettier with the root config and ignore files, as every member formats
+  // (`check:root:format-scripts`). Outside the `try` above, so that a failure
+  // fails the run.
+  if (
+    formatPackage({
+      cwd: path.resolve(srcDir, '..'),
+      patterns: [entryPointFilePath],
+    }) !== 0
+  ) {
+    throw new Error(`Prettier failed on ${entryPointFilePath}; see above.`);
   }
 };
 
