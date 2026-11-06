@@ -240,6 +240,7 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
               canonicalName: `${owner.canonicalName}.${member.property.name}`,
               propertyNode: member.property,
               isNamespace: owner.isNamespace,
+              bindingNode: owner.bindingNode,
             };
       };
 

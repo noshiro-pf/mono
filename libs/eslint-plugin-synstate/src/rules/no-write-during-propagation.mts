@@ -7,6 +7,7 @@ import {
 import {
   buildCalleeResolver,
   getImportDeclarations,
+  isShadowedCallee,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import * as ts from 'typescript';
@@ -18,7 +19,6 @@ import {
   localFunctionOf,
   type FunctionNode,
 } from './functions.mjs';
-import { isShadowedCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -86,15 +86,8 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
     ): string | undefined => {
       const resolved = resolveCallee(call.callee);
 
-      if (resolved === undefined) {
-        return undefined;
-      }
-
-      return isShadowedCallee(
-        sourceCode,
-        call.callee,
-        SYNSTATE_AND_WRAPPER_MODULES,
-      )
+      return resolved === undefined ||
+        isShadowedCallee(sourceCode, resolved, SYNSTATE_AND_WRAPPER_MODULES)
         ? undefined
         : resolved.canonicalName;
     };

@@ -8,10 +8,11 @@ import {
   getImportDeclarations,
   getRangeWithParens,
   hasCommentWithin,
+  isShadowedCallee,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { SYNSTATE_MODULE } from './constants.mjs';
-import { buildCalleeRewriter, isShadowedCallee } from './synstate-callee.mjs';
+import { buildCalleeRewriter } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -66,7 +67,7 @@ export const noIdentityMap: TSESLint.RuleModule<MessageIds, Options> = {
         if (
           resolved?.canonicalName !== 'map' ||
           node.arguments.length !== 1 ||
-          isShadowedCallee(sourceCode, node.callee)
+          isShadowedCallee(sourceCode, resolved, SYNSTATE_MODULE)
         ) {
           return;
         }

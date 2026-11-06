@@ -8,6 +8,7 @@ import {
   buildCalleeResolver,
   getImportDeclarations,
   isLocallyBound,
+  isShadowedCallee,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { SYNSTATE_AND_WRAPPER_MODULES } from './constants.mjs';
@@ -19,7 +20,6 @@ import {
   localFunctionOf,
   type FunctionNode,
 } from './functions.mjs';
-import { isShadowedCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -69,24 +69,24 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       callee: TSESTree.Expression,
     ): string | undefined => {
-      const name = resolveSynstate(callee)?.canonicalName;
+      const resolved = resolveSynstate(callee);
 
-      return name === undefined ||
-        isShadowedCallee(sourceCode, callee, SYNSTATE_AND_WRAPPER_MODULES)
+      return resolved === undefined ||
+        isShadowedCallee(sourceCode, resolved, SYNSTATE_AND_WRAPPER_MODULES)
         ? undefined
-        : name;
+        : resolved.canonicalName;
     };
 
     const domExportOf = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       callee: TSESTree.Expression,
     ): string | undefined => {
-      const name = resolveDom(callee)?.canonicalName;
+      const resolved = resolveDom(callee);
 
-      return name === undefined ||
-        isShadowedCallee(sourceCode, callee, DOM_ONLY)
+      return resolved === undefined ||
+        isShadowedCallee(sourceCode, resolved, SYNSTATE_DOM_MODULE)
         ? undefined
-        : name;
+        : resolved.canonicalName;
     };
 
     const mut_handlers = new Set<FunctionNode>();
@@ -394,8 +394,6 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 } as const;
 
 const SYNSTATE_DOM_MODULE = 'synstate-dom';
-
-const DOM_ONLY: readonly string[] = [SYNSTATE_DOM_MODULE] as const;
 
 /** `onClick`, `onInput`: a prop whose value JSX treats as an event handler. */
 const HANDLER_PROP = /^on[A-Z]/u;

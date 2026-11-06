@@ -135,7 +135,8 @@ The range and the text of a node leave out the parentheses written around it.
 | `getNamedImports`          | the export names those declarations import                                                                                                                          |
 | `getImportedLocalName`     | the local name an export is imported as (`'y'` for `import { x as y }`)                                                                                             |
 | `importedNameOf`           | the export name an import specifier imports (`'x'` for `import { x as y }`)                                                                                         |
-| `buildCalleeResolver`      | which export a callee calls, through aliases, namespace imports and type wrappers                                                                                   |
+| `buildCalleeResolver`      | which export a callee calls, through aliases, default and namespace imports and type wrappers, and the identifier whose binding decides it                          |
+| `isShadowedCallee`         | whether what `buildCalleeResolver` resolved is shadowed where it is called: that identifier is bound to something other than the module's import                    |
 | `bindValueImports`         | the local names to write for exports, and the edits binding them as values (in the existing import)                                                                 |
 | `bindValueImportsAt`       | the same at a node, through a namespace import (`ns.x`) when there is one and no local binding shadows it, or `undefined` where a name is taken                     |
 | `buildNamedImportFix`      | a fix inserting a new `import { … } from '<module>';` after the directive prologue                                                                                  |
@@ -154,6 +155,7 @@ import {
     buildCalleeResolver,
     getImportDeclarations,
     hasForeignBinding,
+    isShadowedCallee,
     type ValueImportBinding,
 } from 'eslint-rule-forge';
 
@@ -182,7 +184,12 @@ export const preferIsNullish: TSESLint.RuleModule<'preferIsNullish'> = {
             CallExpression: (node) => {
                 const resolved = resolve(node.callee);
 
-                if (resolved?.canonicalName !== 'isNull') {
+                // The resolver matches spellings; a parameter or local named `isNull`
+                // (or `lib`) where the call is made is not `my-lib`'s.
+                if (
+                    resolved?.canonicalName !== 'isNull' ||
+                    isShadowedCallee(sourceCode, resolved, MODULE)
+                ) {
                     return;
                 }
 

@@ -8,6 +8,7 @@ import {
   getImportDeclarations,
   getRangeWithParens,
   hasCommentWithin,
+  isShadowedCallee,
   isTypeWrapper,
   skipTypeWrappers,
   type ResolvedCallee,
@@ -16,7 +17,7 @@ import { SYNSTATE_MODULE } from './constants.mjs';
 import { pipeCallOf } from './functions.mjs';
 import { identityOf } from './no-identity-map.mjs';
 import { constantBodyOf } from './prefer-map-to.mjs';
-import { buildCalleeRewriter, isShadowedCallee } from './synstate-callee.mjs';
+import { buildCalleeRewriter } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -81,7 +82,7 @@ export const preferDerive: TSESLint.RuleModule<MessageIds, Options> = {
 
       return resolved !== undefined &&
         names.includes(resolved.canonicalName) &&
-        !isShadowedCallee(sourceCode, call.callee)
+        !isShadowedCallee(sourceCode, resolved, SYNSTATE_MODULE)
         ? { call, resolved }
         : undefined;
     };

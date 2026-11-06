@@ -4,16 +4,14 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
-  buildCalleeResolver,
-  getImportDeclarations,
   hasCommentWithin,
-  hasForeignBinding,
   isTypeWrapper,
   skipTypeWrappers,
   typeWrapperLayers,
 } from 'eslint-rule-forge';
 import { Arr, castDeepMutable, hasKey, isRecord } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
+import { buildImmerProduceResolver } from './immer-produce.mjs';
 
 type MessageIds = 'useCurriedProduce';
 
@@ -75,62 +73,11 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
   create: (context) => {
     const sourceCode = context.sourceCode;
 
-    const immerImports = getImportDeclarations(sourceCode.ast, immerModule);
-
-    if (Arr.isEmpty(immerImports)) {
-      return {};
-    }
-
-    const resolveCallee = buildCalleeResolver(immerImports);
-
-    // immer 9 and earlier export `produce` as the default too.
-    const defaultImportNames: ReadonlySet<string> = new Set(
-      immerImports.flatMap((declaration) =>
-        Arr.generate(function* () {
-          for (const specifier of declaration.specifiers) {
-            if (specifier.type === AST_NODE_TYPES.ImportDefaultSpecifier) {
-              yield specifier.local.name;
-            }
-          }
-        }),
-      ),
-    );
+    const resolveProduce = buildImmerProduceResolver(sourceCode);
 
     const isImmerProduce = (
       call: DeepReadonly<TSESTree.CallExpression>,
-    ): boolean => {
-      const callee = castDeepMutable(call.callee);
-
-      const canonicalName = resolveCallee(callee)?.canonicalName;
-
-      const unwrapped = skipTypeWrappers(callee);
-
-      if (
-        canonicalName !== 'produce' &&
-        canonicalName !== 'default' &&
-        !(
-          unwrapped.type === AST_NODE_TYPES.Identifier &&
-          defaultImportNames.has(unwrapped.name)
-        )
-      ) {
-        return false;
-      }
-
-      const bound =
-        unwrapped.type === AST_NODE_TYPES.MemberExpression
-          ? skipTypeWrappers(unwrapped.object)
-          : unwrapped;
-
-      return (
-        bound.type === AST_NODE_TYPES.Identifier &&
-        !hasForeignBinding(
-          sourceCode,
-          castDeepMutable(call),
-          bound.name,
-          immerModule,
-        )
-      );
-    };
+    ): boolean => resolveProduce(call.callee) === 'produce';
 
     return {
       ArrowFunctionExpression: (
@@ -415,8 +362,6 @@ const report = (
       : null,
   });
 };
-
-const immerModule = 'immer';
 
 /**
  * The type `node` casts to when it is `x as T` or `<T>x`, the wrappers that can

@@ -62,9 +62,10 @@ export const isRuntimeBound = (
 
 /**
  * Whether `name`, read at `node`, resolves to a binding that is not an import
- * from `moduleName` — a declaration, a parameter, or an import from another
- * module. A fix that makes code at `node` refer to `moduleName`'s export `name`
- * has to give up then, because the name would refer to that binding instead.
+ * from `moduleName` (or from any of them, given several) — a declaration, a
+ * parameter, or an import from another module. A fix that makes code at `node`
+ * refer to `moduleName`'s export `name` has to give up then, because the name
+ * would refer to that binding instead.
  *
  * The innermost binding decides: an import from `moduleName` at the top of the
  * file does not help a name a function shadows around `node`. A binding with no
@@ -79,11 +80,18 @@ export const hasForeignBinding = (
   sourceCode: TSESLint.SourceCode,
   node: TSESTree.Node,
   name: string,
-  moduleName: string,
+  moduleName: string | readonly string[],
 ): boolean => {
   const variable = findShadowingVariable(sourceCode.getScope(node), name);
 
-  return variable?.defs.some((def) => !isImportFrom(def, moduleName)) ?? false;
+  const moduleNames: readonly string[] =
+    typeof moduleName === 'string' ? ([moduleName] as const) : moduleName;
+
+  return (
+    variable?.defs.some((def) =>
+      moduleNames.every((m) => !isImportFrom(def, m)),
+    ) ?? false
+  );
 };
 
 /**

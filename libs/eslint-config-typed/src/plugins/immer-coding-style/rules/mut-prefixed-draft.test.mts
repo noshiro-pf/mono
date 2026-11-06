@@ -19,8 +19,55 @@ describe('mut-prefixed-draft', () => {
   tester.run(ruleName, mutPrefixedDraftRule, {
     valid: [
       {
+        name: 'A produce from another module',
+        code: dedent`
+          import { produce } from 'kafka';
+          produce(topic, (msg) => {
+            msg.x = 1;
+          });
+        `,
+      },
+      {
+        name: 'A produce with no import',
+        code: dedent`
+          produce(state, (draft) => {
+            draft.count += 1;
+          });
+        `,
+      },
+      {
+        name: 'A local produce',
+        code: dedent`
+          const produce = (base, recipe) => recipe(base);
+          produce(state, (draft) => {
+            draft.count += 1;
+          });
+        `,
+      },
+      {
+        name: "A parameter shadowing immer's produce",
+        code: dedent`
+          import { produce } from 'immer';
+          const run = (produce) =>
+            produce(state, (draft) => {
+              draft.count += 1;
+            });
+        `,
+      },
+      {
+        name: 'A namespace import shadowed by a parameter',
+        code: dedent`
+          import * as immer from 'immer';
+          const run = (immer) =>
+            immer.produce(state, (draft) => {
+              draft.count += 1;
+            });
+        `,
+      },
+      {
         name: 'Curried recipe with a mut_ draft',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce((mut_draft) => {
             mut_draft.count += 1;
           });
@@ -29,6 +76,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'Recipe with a mut_ draft',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (mut_draft) => {
             mut_draft.count += 1;
           });
@@ -37,6 +85,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'produceWithPatches with a mut_ draft',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const [next] = produceWithPatches(state, (mut_draft) => {
             mut_draft.count += 1;
           });
@@ -45,24 +94,28 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A draft that is never referenced',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (_draft) => undefined);
         `,
       },
       {
         name: 'A draft with a default value that is never used',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce((draft = initial) => undefined);
         `,
       },
       {
         name: 'A function literal base state of a call with a patch listener',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce((x) => x, recipe, (patches) => patches.length);
         `,
       },
       {
         name: 'A function literal base state followed by a spread',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce((x) => {
             x.a = 1;
           }, ...rest);
@@ -71,6 +124,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A spread first argument hides which function is the recipe',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(...args, (patches) => {
             patches.push(1);
           });
@@ -79,12 +133,14 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A recipe without parameters',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, () => undefined);
         `,
       },
       {
         name: 'A destructured draft is left alone',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, ({ items }) => {
             items.push(1);
           });
@@ -93,12 +149,14 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A recipe passed by name',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, recipe);
         `,
       },
       {
         name: 'Another function named differently',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = create(state, (draft) => {
             draft.count += 1;
           });
@@ -107,6 +165,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A patch listener is not the recipe',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, recipe, (patches) => {
             patches.push(1);
           });
@@ -115,13 +174,63 @@ describe('mut-prefixed-draft', () => {
     ],
     invalid: [
       {
+        name: "immer's produce under an alias",
+        code: dedent`
+          import { produce as p } from 'immer';
+          p(state, (draft) => {
+            draft.count += 1;
+          });
+        `,
+        output: dedent`
+          import { produce as p } from 'immer';
+          p(state, (mut_draft) => {
+            mut_draft.count += 1;
+          });
+        `,
+        errors: [{ messageId: 'requireMutPrefix' }],
+      },
+      {
+        name: "immer's default export (immer 9 and earlier)",
+        code: dedent`
+          import produce from 'immer';
+          produce(state, (draft) => {
+            draft.count += 1;
+          });
+        `,
+        output: dedent`
+          import produce from 'immer';
+          produce(state, (mut_draft) => {
+            mut_draft.count += 1;
+          });
+        `,
+        errors: [{ messageId: 'requireMutPrefix' }],
+      },
+      {
+        name: 'A namespace import of immer',
+        code: dedent`
+          import * as immer from 'immer';
+          immer.produceWithPatches(state, (draft) => {
+            draft.count += 1;
+          });
+        `,
+        output: dedent`
+          import * as immer from 'immer';
+          immer.produceWithPatches(state, (mut_draft) => {
+            mut_draft.count += 1;
+          });
+        `,
+        errors: [{ messageId: 'requireMutPrefix' }],
+      },
+      {
         name: 'Curried recipe',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce((draft) => {
             draft.count += 1;
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce((mut_draft) => {
             mut_draft.count += 1;
           });
@@ -136,11 +245,13 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'Curried recipe with an initial state',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce((draft, delta: number) => {
             draft.count += delta;
           }, initialState);
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce((mut_draft, delta: number) => {
             mut_draft.count += delta;
           }, initialState);
@@ -150,12 +261,14 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'Recipe of a non-curried call, with a type annotation',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft: Draft<State>) => {
             draft.count += 1;
             draft.items.push(draft.count);
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (mut_draft: Draft<State>) => {
             mut_draft.count += 1;
             mut_draft.items.push(mut_draft.count);
@@ -166,11 +279,13 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A function expression recipe',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, function (s) {
             s.count += 1;
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, function (mut_s) {
             mut_s.count += 1;
           });
@@ -180,11 +295,13 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A function expression recipe with a this annotation',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, function (this: unknown, s: State) {
             s.count += 1;
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, function (this: unknown, mut_s: State) {
             mut_s.count += 1;
           });
@@ -194,11 +311,13 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'produceWithPatches',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const [next, patches] = produceWithPatches(state, (draft) => {
             draft.count += 1;
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const [next, patches] = produceWithPatches(state, (mut_draft) => {
             mut_draft.count += 1;
           });
@@ -208,6 +327,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A reference in a nested function and a shorthand property',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft) => {
             items.forEach((item) => {
               draft.items.push(item);
@@ -216,6 +336,7 @@ describe('mut-prefixed-draft', () => {
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (mut_draft) => {
             items.forEach((item) => {
               mut_draft.items.push(item);
@@ -228,11 +349,13 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A draft with a default value',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce((draft = initial) => {
             draft.count += 1;
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce((mut_draft = initial) => {
             mut_draft.count += 1;
           });
@@ -242,6 +365,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'Reported without a fix when the draft is the target of a shorthand pattern with a default',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft) => {
             ({ draft = fallback } = source);
             draft.count += 1;
@@ -253,6 +377,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'Reported without a fix when the draft is reassigned',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft) => {
             for (draft of drafts) {
               draft.count += 1;
@@ -265,6 +390,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'Reported without a fix when the recipe declares the name again',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft) => {
             draft.count = 1;
             function draft() {}
@@ -276,11 +402,13 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A function base state: the second argument is the recipe',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(() => 1, (draft) => {
             draft.count += 1;
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(() => 1, (mut_draft) => {
             mut_draft.count += 1;
           });
@@ -290,6 +418,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'Reported without a fix when the new name would shadow an outer draft',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (mut_draft) => {
             mut_draft.items = produce(mut_draft.items, (draft) => {
               draft.push(1);
@@ -301,13 +430,15 @@ describe('mut-prefixed-draft', () => {
       },
       {
         name: 'A parameter name spelt with an escape',
-        code: String.raw`produce(state, (\u0064raft) => { draft.count += 1; });`,
-        output: 'produce(state, (mut_draft) => { mut_draft.count += 1; });',
+        code: `import { produce } from 'immer';\n${String.raw`produce(state, (\u0064raft) => { draft.count += 1; });`}`,
+        output:
+          "import { produce } from 'immer';\nproduce(state, (mut_draft) => { mut_draft.count += 1; });",
         errors: [{ messageId: 'requireMutPrefix' }],
       },
       {
         name: 'Nested recipes whose drafts share a name: only the outer one is fixed',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft) => {
             draft.items = produce(draft.items, (draft) => {
               draft.push(1);
@@ -315,6 +446,7 @@ describe('mut-prefixed-draft', () => {
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (mut_draft) => {
             mut_draft.items = produce(mut_draft.items, (draft) => {
               draft.push(1);
@@ -329,6 +461,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'Reported without a fix when the recipe reads an undeclared global of the new name',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft) => {
             draft.items = mut_draft;
           });
@@ -339,12 +472,14 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'An outer binding of the same name that is not a recipe draft',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const f = (draft) =>
             produce(draft, (draft) => {
               draft.count += 1;
             });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const f = (draft) =>
             produce(draft, (mut_draft) => {
               mut_draft.count += 1;
@@ -355,6 +490,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'Reported without a fix when the recipe calls eval',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft) => {
             eval('draft.x = 1');
             draft.y = 1;
@@ -366,6 +502,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A non-recipe binding between two recipe drafts of the same name',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (x) => {
             x.a = 1;
             const f = (x) =>
@@ -375,6 +512,7 @@ describe('mut-prefixed-draft', () => {
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (mut_x) => {
             mut_x.a = 1;
             const f = (x) =>
@@ -391,6 +529,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'An unused outer draft of the same name does not hold the fix back',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft) =>
             produce(other, (draft) => {
               draft.b = 1;
@@ -398,6 +537,7 @@ describe('mut-prefixed-draft', () => {
           );
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft) =>
             produce(other, (mut_draft) => {
               mut_draft.b = 1;
@@ -409,6 +549,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'An extra parameter of a curried recipe is not a draft',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce((d, draft) => {
             d.x = produce(draft, (draft) => {
               draft.y = 1;
@@ -416,6 +557,7 @@ describe('mut-prefixed-draft', () => {
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce((mut_d, draft) => {
             mut_d.x = produce(draft, (mut_draft) => {
               mut_draft.y = 1;
@@ -430,12 +572,14 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A type of the new name does not hold the fix back',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           type mut_draft = 1;
           const next = produce(state, (draft) => {
             draft.a = 1;
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           type mut_draft = 1;
           const next = produce(state, (mut_draft) => {
             mut_draft.a = 1;
@@ -446,6 +590,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'A type reference to the new name does not hold the fix back',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           type mut_draft = 1;
           const next = produce(state, (draft) => {
             const v: mut_draft = 1;
@@ -453,6 +598,7 @@ describe('mut-prefixed-draft', () => {
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           type mut_draft = 1;
           const next = produce(state, (mut_draft) => {
             const v: mut_draft = 1;
@@ -464,6 +610,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'Reported without a fix when the new name is declared inside the recipe',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft) => {
             const mut_draft = [];
             draft.items = mut_draft;
@@ -475,6 +622,7 @@ describe('mut-prefixed-draft', () => {
       {
         name: 'Reported without a fix when the recipe reads an outer binding of the new name',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const mut_draft = [];
           const next = produce(state, (draft) => {
             draft.items = mut_draft;
@@ -494,11 +642,13 @@ describe('mut-prefixed-draft through type wrappers', () => {
       {
         name: 'A recipe wrapped in satisfies',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce(((draft) => {
             draft.count += 1;
           }) satisfies Recipe);
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce(((mut_draft) => {
             mut_draft.count += 1;
           }) satisfies Recipe);
@@ -508,11 +658,13 @@ describe('mut-prefixed-draft through type wrappers', () => {
       {
         name: 'A recipe of a non-curried call wrapped in as',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state as State, ((draft) => {
             draft.count += 1;
           }) as Recipe);
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state as State, ((mut_draft) => {
             mut_draft.count += 1;
           }) as Recipe);
@@ -522,11 +674,13 @@ describe('mut-prefixed-draft through type wrappers', () => {
       {
         name: 'A callee wrapped in a non-null assertion',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce!((draft) => {
             draft.count += 1;
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const update = produce!((mut_draft) => {
             mut_draft.count += 1;
           });
@@ -536,6 +690,7 @@ describe('mut-prefixed-draft through type wrappers', () => {
       {
         name: 'An outer recipe wrapped in as still holds back a nested fix',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, ((draft) => {
             draft.items = produce(draft.items, (draft) => {
               draft.push(1);
@@ -543,6 +698,7 @@ describe('mut-prefixed-draft through type wrappers', () => {
           }) as Recipe);
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, ((mut_draft) => {
             mut_draft.items = produce(mut_draft.items, (draft) => {
               draft.push(1);
@@ -557,11 +713,13 @@ describe('mut-prefixed-draft through type wrappers', () => {
       {
         name: 'A recipe in an angle-bracket type assertion',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, <Recipe>((draft) => {
             draft.count += 1;
           }));
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, <Recipe>((mut_draft) => {
             mut_draft.count += 1;
           }));
@@ -571,11 +729,13 @@ describe('mut-prefixed-draft through type wrappers', () => {
       {
         name: 'A draft referenced through a type wrapper',
         code: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (draft) => {
             (draft satisfies State).count += 1;
           });
         `,
         output: dedent`
+          import { produce, produceWithPatches } from 'immer';
           const next = produce(state, (mut_draft) => {
             (mut_draft satisfies State).count += 1;
           });

@@ -69,13 +69,22 @@ export type ResolvedCallee = Readonly<{
 
   /** Whether the call goes through a namespace import (`m.f(...)`). */
   isNamespace: boolean;
+
+  /**
+   * The identifier whose binding decides what is called: the callee itself for
+   * a named or default import, the namespace object for a namespace
+   * import — inside the type wrappers either is read through. Whether
+   * something nearer shadows it is {@link isShadowedCallee}'s to say.
+   */
+  bindingNode: TSESTree.Identifier;
 }>;
 
 /**
  * Builds a function that says which export of the module `declarations`
  * import a callee calls, or `undefined` when it calls none of them. It knows
- * named imports, aliased ones (`import { f as g }` → `g(...)` calls `f`) and
- * namespace imports (`import * as m` → `m.f(...)`), and reads both the callee
+ * named imports, aliased ones (`import { f as g }` → `g(...)` calls `f`),
+ * default imports (`import d` → `d(...)` calls `default`) and namespace
+ * imports (`import * as m` → `m.f(...)`), and reads both the callee
  * and a namespace object through their type wrappers:
  * `(f as (u: unknown) => boolean)(x)` and `(m as typeof m).f(x)` still call
  * `f`.
@@ -99,7 +108,9 @@ export const buildCalleeResolver = (
     specifiers.flatMap((specifier) =>
       specifier.type === AST_NODE_TYPES.ImportSpecifier
         ? [[specifier.local.name, importedNameOf(specifier)] as const]
-        : [],
+        : specifier.type === AST_NODE_TYPES.ImportDefaultSpecifier
+          ? [[specifier.local.name, 'default'] as const]
+          : [],
     ),
   );
 
@@ -113,7 +124,12 @@ export const buildCalleeResolver = (
 
       return canonicalName === undefined
         ? undefined
-        : { canonicalName, propertyNode: callee, isNamespace: false };
+        : {
+            canonicalName,
+            propertyNode: callee,
+            isNamespace: false,
+            bindingNode: callee,
+          };
     }
 
     if (
@@ -132,12 +148,33 @@ export const buildCalleeResolver = (
           canonicalName: callee.property.name,
           propertyNode: callee.property,
           isNamespace: true,
+          bindingNode: object,
         }
       : undefined;
   };
 
   return resolve;
 };
+
+/**
+ * Whether what `resolved` names is shadowed where it is read: its
+ * {@link ResolvedCallee.bindingNode} resolves to something other than an import
+ * from `moduleNames` — a parameter, a local, an import from another module
+ * ({@link hasForeignBinding}). `buildCalleeResolver` matches the callee's
+ * spelling against the file's imports, so a rule calls this before it acts on
+ * the export it resolved.
+ */
+export const isShadowedCallee = (
+  sourceCode: TSESLint.SourceCode,
+  resolved: ResolvedCallee,
+  moduleNames: string | readonly string[],
+): boolean =>
+  hasForeignBinding(
+    sourceCode,
+    resolved.bindingNode,
+    resolved.bindingNode.name,
+    moduleNames,
+  );
 
 /**
  * A fix that inserts `import { <specifiers> } from '<moduleName>';` at the top

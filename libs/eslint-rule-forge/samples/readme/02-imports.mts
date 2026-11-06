@@ -4,6 +4,7 @@ import {
   buildCalleeResolver,
   getImportDeclarations,
   hasForeignBinding,
+  isShadowedCallee,
   type ValueImportBinding,
 } from 'eslint-rule-forge';
 
@@ -32,7 +33,12 @@ export const preferIsNullish: TSESLint.RuleModule<'preferIsNullish'> = {
       CallExpression: (node) => {
         const resolved = resolve(node.callee);
 
-        if (resolved?.canonicalName !== 'isNull') {
+        // The resolver matches spellings; a parameter or local named `isNull`
+        // (or `lib`) where the call is made is not `my-lib`'s.
+        if (
+          resolved?.canonicalName !== 'isNull' ||
+          isShadowedCallee(sourceCode, resolved, MODULE)
+        ) {
           return;
         }
 

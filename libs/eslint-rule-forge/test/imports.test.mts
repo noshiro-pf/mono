@@ -13,6 +13,7 @@ import {
   getNamedImports,
   hasCommentWithin,
   inlineTypeQualifierRange,
+  isShadowedCallee,
 } from '../src/index.mjs';
 import { probeRule, textOf } from './probe-rule.mjs';
 
@@ -97,32 +98,140 @@ ruleTester.run(
 
     return resolved === undefined
       ? '(none)'
-      : `${resolved.canonicalName} ${textOf(context, resolved.propertyNode)} ${resolved.isNamespace}`;
+      : `${resolved.canonicalName} ${textOf(context, resolved.propertyNode)} ${resolved.isNamespace} ${textOf(context, resolved.bindingNode)}`;
   }),
   {
     valid: [],
     invalid: [
-      ['f(x)', 'f f false'],
-      ['g(x)', 'f g false'],
-      ['(g as (u: unknown) => boolean)(x)', 'f g false'],
-      ['g!(x)', 'f g false'],
-      ['m.f(x)', 'f f true'],
-      ['n.f(x)', 'f f true'],
-      ['(m as typeof m).f(x)', 'f f true'],
-      ['m!.f(x)', 'f f true'],
+      ['f(x)', 'f f false f'],
+      ['g(x)', 'f g false g'],
+      ['(g as (u: unknown) => boolean)(x)', 'f g false g'],
+      ['g!(x)', 'f g false g'],
+      ['m.f(x)', 'f f true m'],
+      ['n.f(x)', 'f f true n'],
+      ['(m as typeof m).f(x)', 'f f true m'],
+      ['m!.f(x)', 'f f true m'],
+      ['d(x)', 'default d false d'],
+      ['(d as typeof d)(x)', 'default d false d'],
+      ['e(x)', 'default e false e'],
       ['m["f"](x)', '(none)'],
       ['other(x)', '(none)'],
       ['o.f(x)', '(none)'],
+      ['p(x)', '(none)'],
     ].map(([call, result]) => ({
       code: dedent`
         import { f, f as g } from 'm';
+        import d from 'm';
+        import { default as e } from 'm';
         import * as m from 'm';
         import * as n from 'm';
         import * as o from 'other';
+        import p from 'other';
         probe(${call});
       `,
       errors: [{ messageId: 'result', data: { result } }],
     })),
+  },
+);
+
+ruleTester.run(
+  'isShadowedCallee',
+  probeRule((context, argument) => {
+    if (argument.type !== AST_NODE_TYPES.CallExpression) {
+      return 'not a call';
+    }
+
+    const resolved = buildCalleeResolver(
+      getImportDeclarations(context.sourceCode.ast, 'm'),
+    )(argument.callee);
+
+    return resolved === undefined
+      ? '(none)'
+      : isShadowedCallee(context.sourceCode, resolved, 'm').toString();
+  }),
+  {
+    valid: [],
+    invalid: [
+      {
+        name: 'the import itself',
+        code: dedent`
+          import { f } from 'm';
+          probe(f(x));
+        `,
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+      {
+        name: 'a default import',
+        code: dedent`
+          import f from 'm';
+          probe(f(x));
+        `,
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+      {
+        name: 'a parameter shadowing the import',
+        code: dedent`
+          import { f } from 'm';
+          const g = (f: () => void) => probe(f(x));
+        `,
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a parameter shadowing the namespace object',
+        code: dedent`
+          import * as m from 'm';
+          const g = (m: { f: () => void }) => probe(m.f(x));
+        `,
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'the namespace object read through a type wrapper',
+        code: dedent`
+          import * as m from 'm';
+          probe((m as typeof m).f(x));
+        `,
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+    ],
+  },
+);
+
+ruleTester.run(
+  'isShadowedCallee with several modules',
+  probeRule((context, argument) => {
+    if (argument.type !== AST_NODE_TYPES.CallExpression) {
+      return 'not a call';
+    }
+
+    const resolved = buildCalleeResolver([
+      ...getImportDeclarations(context.sourceCode.ast, 'm'),
+      ...getImportDeclarations(context.sourceCode.ast, 'n'),
+    ])(argument.callee);
+
+    return resolved === undefined
+      ? '(none)'
+      : isShadowedCallee(context.sourceCode, resolved, ['m', 'n']).toString();
+  }),
+  {
+    valid: [],
+    invalid: [
+      {
+        name: 'an import from either module',
+        code: dedent`
+          import { g } from 'n';
+          probe(g(x));
+        `,
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+      {
+        name: 'a local shadowing it',
+        code: dedent`
+          import { g } from 'n';
+          function h() { const g = () => 0; probe(g(x)); }
+        `,
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+    ],
   },
 );
 

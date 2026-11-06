@@ -9,12 +9,12 @@ import {
   getRangeWithParens,
   hasCommentWithin,
   isIdentifierNamed,
+  isShadowedCallee,
   isTypeWrapper,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { SYNSTATE_MODULE } from './constants.mjs';
 import { pipeCallOf } from './functions.mjs';
-import { isShadowedCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -73,12 +73,12 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
         return false;
       }
 
-      const canonicalName = resolveCallee(unwrapped.callee)?.canonicalName;
+      const resolved = resolveCallee(unwrapped.callee);
 
       return (
-        canonicalName !== undefined &&
-        names.includes(canonicalName) &&
-        !isShadowedCallee(sourceCode, unwrapped.callee)
+        resolved !== undefined &&
+        names.includes(resolved.canonicalName) &&
+        !isShadowedCallee(sourceCode, resolved, SYNSTATE_MODULE)
       );
     };
 
