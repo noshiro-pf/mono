@@ -2,7 +2,6 @@ import { map, type InitializedObservable } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  inlineMap,
   isImeKeyDown,
   subscribeInScope,
   type JSX,
@@ -61,7 +60,7 @@ export const DagEdgeDelete = ({
       data-e2e={constant('dag-edge-delete')}
       role={constant('button')}
       tabindex={constant(0)}
-      transform={inlineMap(button, ({ at }) => `translate(${at.x} ${at.y})`)}
+      transform={button.pipe(map(({ at }) => `translate(${at.x} ${at.y})`))}
       onBlur={onDismiss}
       onClick={(clicked) => {
         // Not a click on the background, which would only dismiss it.
@@ -94,15 +93,17 @@ export const DagEdgeDelete = ({
       <SvgTitle>{label}</SvgTitle>
       <circle
         class={constant('dag-edge-delete-circle')}
-        r={inlineMap(button, radius)}
+        r={button.pipe(map(radius))}
       />
       <path
         class={constant('dag-edge-delete-cross')}
-        d={inlineMap(button, (state) => {
-          const cross = radius(state) * CROSS_RATIO;
+        d={button.pipe(
+          map((state) => {
+            const cross = radius(state) * CROSS_RATIO;
 
-          return `M ${-cross} ${-cross} L ${cross} ${cross} M ${cross} ${-cross} L ${-cross} ${cross}`;
-        })}
+            return `M ${-cross} ${-cross} L ${cross} ${cross} M ${cross} ${-cross} L ${-cross} ${cross}`;
+          }),
+        )}
       />
     </g>
   );

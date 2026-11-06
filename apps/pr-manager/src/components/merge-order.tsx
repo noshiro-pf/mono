@@ -5,7 +5,6 @@ import {
   deriveBindable,
   For,
   If,
-  inlineMap,
   mapBindable,
   type Bindable,
   type JSX,
@@ -60,7 +59,7 @@ export const MergeOrder = ({ nodes, depth }: Props): JSX.Element => {
               then={
                 <div class={constant('pull-request-repeated')}>
                   <ExternalLink href={row$.pipe(map(({ entry }) => entry.url))}>
-                    {inlineMap(row$, ({ node }) => `#${node.number}`)}
+                    {row$.pipe(map(({ node }) => `#${node.number}`))}
                   </ExternalLink>
                   {constant(' — shown above')}
                 </div>

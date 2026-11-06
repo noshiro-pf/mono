@@ -1,6 +1,6 @@
 import { HtmlSelect } from 'blueprint-synstate';
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import type { RelaxedExtract } from 'ts-type-forge';
 import { priorities, progresses } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
@@ -71,7 +71,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
             data-e2e={constant('title-input')}
             required={constant(true)}
             type={constant('text')}
-            value={inlineMap(editor, ({ draft }) => draft.title)}
+            value={editor.pipe(map(({ draft }) => draft.title))}
             onInput={(changed) => {
               editorStore.updateTaskDraft({
                 title: changed.currentTarget.value,
@@ -159,7 +159,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
             min={constant('0')}
             step={constant('0.5')}
             type={constant('number')}
-            value={inlineMap(editor, ({ draft }) => draft.estimateHours)}
+            value={editor.pipe(map(({ draft }) => draft.estimateHours))}
             onInput={(changed) => {
               editorStore.updateTaskDraft({
                 estimateHours: changed.currentTarget.value,
@@ -192,7 +192,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           <textarea
             class={constant('bp6-input bp6-fill')}
             rows={constant(3)}
-            value={inlineMap(editor, ({ draft }) => draft.description)}
+            value={editor.pipe(map(({ draft }) => draft.description))}
             onInput={(changed) => {
               editorStore.updateTaskDraft({
                 description: changed.currentTarget.value,

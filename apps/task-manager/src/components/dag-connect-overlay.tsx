@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import { Num } from 'ts-data-forge';
 import { outlineOf, type LaidOutNode, type Point } from '../dag/index.mjs';
 import type { ConnectOverlayState } from './dag-canvas-scene.mjs';
@@ -21,8 +21,8 @@ export const DagConnectOverlay = ({ overlay }: Props): JSX.Element => (
     aria-hidden={constant('true')}
     class={constant('dag-connect')}
     data-e2e={constant('dag-connect')}
-    data-refused={inlineMap(overlay, ({ target }) =>
-      (target?.refused ?? false).toString(),
+    data-refused={overlay.pipe(
+      map(({ target }) => (target?.refused ?? false).toString()),
     )}
   >
     <If
@@ -30,11 +30,11 @@ export const DagConnectOverlay = ({ overlay }: Props): JSX.Element => (
       then={
         <rect
           class={constant('dag-connect-target')}
-          height={inlineMap(overlay, (state) => around(state)?.height ?? 0)}
+          height={overlay.pipe(map((state) => around(state)?.height ?? 0))}
           rx={constant(TASK_RX + TARGET_GAP)}
-          width={inlineMap(overlay, (state) => around(state)?.width ?? 0)}
-          x={inlineMap(overlay, (state) => around(state)?.x ?? 0)}
-          y={inlineMap(overlay, (state) => around(state)?.y ?? 0)}
+          width={overlay.pipe(map((state) => around(state)?.width ?? 0))}
+          x={overlay.pipe(map((state) => around(state)?.x ?? 0))}
+          y={overlay.pipe(map((state) => around(state)?.y ?? 0))}
         />
       }
     />
@@ -43,15 +43,17 @@ export const DagConnectOverlay = ({ overlay }: Props): JSX.Element => (
       then={
         <polygon
           class={constant('dag-connect-target')}
-          points={inlineMap(overlay, (state) => {
-            const node = around(state);
+          points={overlay.pipe(
+            map((state) => {
+              const node = around(state);
 
-            return node === undefined
-              ? ''
-              : outlineOf(node)
-                  .map(({ x, y }) => `${x},${y}`)
-                  .join(' ');
-          })}
+              return node === undefined
+                ? ''
+                : outlineOf(node)
+                    .map(({ x, y }) => `${x},${y}`)
+                    .join(' ');
+            }),
+          )}
         />
       }
     />
@@ -60,27 +62,31 @@ export const DagConnectOverlay = ({ overlay }: Props): JSX.Element => (
       then={
         <line
           class={constant('dag-connect-line')}
-          marker-end={inlineMap(overlay, ({ target }) =>
-            target?.refused === true
-              ? 'url(#dag-arrow-refused)'
-              : 'url(#dag-arrow-connect)',
+          marker-end={overlay.pipe(
+            map(({ target }) =>
+              target?.refused === true
+                ? 'url(#dag-arrow-refused)'
+                : 'url(#dag-arrow-connect)',
+            ),
           )}
-          x1={inlineMap(overlay, ({ anchor }) => anchor.x)}
-          x2={inlineMap(overlay, (state) => arrowTo(state).x)}
-          y1={inlineMap(overlay, ({ anchor }) => anchor.y)}
-          y2={inlineMap(overlay, (state) => arrowTo(state).y)}
+          x1={overlay.pipe(map(({ anchor }) => anchor.x))}
+          x2={overlay.pipe(map((state) => arrowTo(state).x))}
+          y1={overlay.pipe(map(({ anchor }) => anchor.y))}
+          y2={overlay.pipe(map((state) => arrowTo(state).y))}
         />
       }
     />
     <circle
       class={constant('dag-connect-handle')}
-      cx={inlineMap(overlay, ({ anchor }) => anchor.x)}
-      cy={inlineMap(overlay, ({ anchor }) => anchor.y)}
+      cx={overlay.pipe(map(({ anchor }) => anchor.x))}
+      cy={overlay.pipe(map(({ anchor }) => anchor.y))}
       data-e2e={constant('dag-connect-handle')}
-      r={inlineMap(overlay, ({ scale }) =>
-        Num.isNonZero(scale)
-          ? Num.div(HANDLE_RADIUS_PX, scale)
-          : HANDLE_RADIUS_PX,
+      r={overlay.pipe(
+        map(({ scale }) =>
+          Num.isNonZero(scale)
+            ? Num.div(HANDLE_RADIUS_PX, scale)
+            : HANDLE_RADIUS_PX,
+        ),
       )}
     />
   </g>

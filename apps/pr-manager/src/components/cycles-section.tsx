@@ -2,7 +2,6 @@ import { map } from 'synstate';
 import {
   constant,
   For,
-  inlineMap,
   mapBindable,
   type Bindable,
   type JSX,
@@ -38,7 +37,7 @@ export const CyclesSection = (): JSX.Element => (
             <For items={cycle$} key={(prNumber) => prNumber}>
               {(prNumber$, index$) => (
                 <>
-                  {inlineMap(index$, (index) => (index === 0 ? '' : ' → '))}
+                  {index$.pipe(map((index) => (index === 0 ? '' : ' → ')))}
                   <PullRequestLink prNumber={prNumber$} />
                 </>
               )}

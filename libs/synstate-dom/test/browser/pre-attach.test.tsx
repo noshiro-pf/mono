@@ -1,5 +1,6 @@
 import {
   createState,
+  map,
   onScopeDispose,
   type InitializedObservable,
 } from 'synstate';
@@ -7,7 +8,6 @@ import {
   constant,
   For,
   If,
-  inlineMap,
   MatchOptional,
   Portal,
   render,
@@ -51,7 +51,7 @@ const setupFor = (): Readonly<{
       mut_live.current -= 1;
     });
 
-    return <li>{inlineMap(item$, (i) => i.id)}</li>;
+    return <li>{item$.pipe(map((i) => i.id))}</li>;
   };
 
   const rows = (): JSX.Element => (
@@ -326,7 +326,7 @@ describe('updates deferred by the mounts For, If and Portal open themselves', ()
                 {(id$) => {
                   mut_built.push(id$.getSnapshot().value);
 
-                  return <b>{inlineMap(id$, (id) => id)}</b>;
+                  return <b>{id$.pipe(map((id) => id))}</b>;
                 }}
               </For>
             }
@@ -377,7 +377,7 @@ describe('updates deferred by the mounts For, If and Portal open themselves', ()
             else={<WriteLater />}
           />
           <For items={items$} key={(id) => id}>
-            {(id$) => <b>{inlineMap(id$, (id) => id)}</b>}
+            {(id$) => <b>{id$.pipe(map((id) => id))}</b>}
           </For>
           <WriteFirst />
         </div>

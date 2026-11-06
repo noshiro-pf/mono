@@ -1,12 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import {
-  constant,
-  deriveBindable,
-  For,
-  If,
-  inlineMap,
-  type JSX,
-} from 'synstate-dom';
+import { constant, deriveBindable, For, If, type JSX } from 'synstate-dom';
 import { Num } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import {
@@ -63,10 +56,10 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
       <g
         class={constant('issue-dag-node')}
         data-kind={constant(kind)}
-        data-pending={inlineMap(placed$, ({ node }) => node.pending.toString())}
-        data-priority={inlineMap(placed$, ({ node }) => node.priority)}
-        data-state={inlineMap(placed$, ({ node }) => node.state)}
-        transform={inlineMap(placed$, ({ x, y }) => `translate(${x} ${y})`)}
+        data-pending={placed$.pipe(map(({ node }) => node.pending.toString()))}
+        data-priority={placed$.pipe(map(({ node }) => node.priority))}
+        data-state={placed$.pipe(map(({ node }) => node.state))}
+        transform={placed$.pipe(map(({ x, y }) => `translate(${x} ${y})`))}
       >
         <If
           cond={placed$.pipe(map(({ node }) => isRingedTier(node.priority)))}
@@ -146,7 +139,7 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
           then={
             <g
               class={constant('issue-dag-priority')}
-              data-priority={inlineMap(placed$, ({ node }) => node.priority)}
+              data-priority={placed$.pipe(map(({ node }) => node.priority))}
               transform={constant(
                 `translate(${PRIORITY_X} ${-PRIORITY_HEIGHT / 2})`,
               )}
@@ -162,7 +155,7 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
                 x={constant(PRIORITY_WIDTH / 2)}
                 y={constant(PRIORITY_HEIGHT / 2)}
               >
-                {inlineMap(placed$, ({ node }) => node.priority)}
+                {placed$.pipe(map(({ node }) => node.priority))}
               </text>
             </g>
           }

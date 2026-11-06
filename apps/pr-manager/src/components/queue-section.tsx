@@ -5,7 +5,6 @@ import {
   deriveBindable,
   For,
   If,
-  inlineMap,
   MatchOptional,
   type JSX,
 } from 'synstate-dom';
@@ -83,7 +82,7 @@ export const QueueSection = (): JSX.Element => {
                 "In the order unblock-prs would pick them. A pull request one of its runs saw green without merging goes last there; that lives in the run's memory and is not shown here.",
               )}
             >
-              {inlineMap(queue$, countsOf)}
+              {queue$.pipe(map(countsOf))}
             </span>
           )}
           value={queue}
@@ -165,7 +164,7 @@ const QueueUnordered = (): JSX.Element => {
                         map(({ number, title }) => `#${number} ${title}`),
                       )}
                     >
-                      {inlineMap(entry$, ({ number }) => `#${number}`)}
+                      {entry$.pipe(map(({ number }) => `#${number}`))}
                     </ExternalLink>
                   </li>
                 )}
@@ -287,20 +286,20 @@ const QueueBody = ({
             then={
               <div class={constant('queue-row')}>
                 <span class={constant('queue-base')}>
-                  {inlineMap(queue$, (queue) => queue.base)}
+                  {queue$.pipe(map((queue) => queue.base))}
                   <span aria-hidden={constant('true')}>{constant(' ←')}</span>
                 </span>
 
                 <div
                   class={constant('queue-track')}
-                  data-overflows={inlineMap(strip.strip$, (s) =>
-                    overflows(s).toString(),
+                  data-overflows={strip.strip$.pipe(
+                    map((s) => overflows(s).toString()),
                   )}
-                  data-more-before={inlineMap(strip.strip$, (s) =>
-                    edgesOf(s).before.toString(),
+                  data-more-before={strip.strip$.pipe(
+                    map((s) => edgesOf(s).before.toString()),
                   )}
-                  data-more-after={inlineMap(strip.strip$, (s) =>
-                    edgesOf(s).after.toString(),
+                  data-more-after={strip.strip$.pipe(
+                    map((s) => edgesOf(s).after.toString()),
                   )}
                 >
                   <If
@@ -325,10 +324,9 @@ const QueueBody = ({
                       {(slot$, index$) => (
                         <li
                           class={constant('queue-slot')}
-                          data-kind={inlineMap(slot$, (slot) => slot.kind)}
-                          data-priority={inlineMap(
-                            slot$,
-                            (slot) => slot.priority,
+                          data-kind={slot$.pipe(map((slot) => slot.kind))}
+                          data-priority={slot$.pipe(
+                            map((slot) => slot.priority),
                           )}
                         >
                           <QueueSlotBox

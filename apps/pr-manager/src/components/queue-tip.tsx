@@ -1,5 +1,5 @@
 import { type InitializedObservable, map } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 
 /** What the tooltip shows. */
 export type QueueTipContent = Readonly<{
@@ -27,17 +27,17 @@ export const QueueTip = ({ tip }: Props): JSX.Element => (
   <span
     aria-hidden={constant('true')}
     class={constant('queue-tip')}
-    data-side={inlineMap(tip, ({ side }) => side)}
+    data-side={tip.pipe(map(({ side }) => side))}
   >
     <span class={constant('queue-tip-number')}>
-      {inlineMap(tip, ({ number }) => `#${number} `)}
+      {tip.pipe(map(({ number }) => `#${number} `))}
     </span>
-    {inlineMap(tip, ({ title }) => title)}
+    {tip.pipe(map(({ title }) => title))}
     <If
       cond={tip.pipe(map(({ detail }) => detail !== undefined))}
       then={
         <span class={constant('queue-tip-detail')}>
-          {inlineMap(tip, ({ detail }) => detail ?? '')}
+          {tip.pipe(map(({ detail }) => detail ?? ''))}
         </span>
       }
     />

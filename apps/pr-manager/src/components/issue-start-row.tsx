@@ -3,7 +3,6 @@ import {
   constant,
   For,
   If,
-  inlineMap,
   mapBindable,
   MatchOptional,
   type Bindable,
@@ -41,14 +40,16 @@ export const IssueStartRow = ({ issue, start }: Props): JSX.Element => (
         <>
           <span
             class={constant('badge issue-start')}
-            data-state={inlineMap(some$, ({ state }) => state)}
-            title={inlineMap(some$, ({ state, marked }) =>
-              Arr.toUnshifted(explainState({ kind: 'issue', state, marked }))(
-                markedNote({ state, marked }),
-              ).join('\n'),
+            data-state={some$.pipe(map(({ state }) => state))}
+            title={some$.pipe(
+              map(({ state, marked }) =>
+                Arr.toUnshifted(explainState({ kind: 'issue', state, marked }))(
+                  markedNote({ state, marked }),
+                ).join('\n'),
+              ),
             )}
           >
-            {inlineMap(some$, ({ state }) => stateLabels[state])}
+            {some$.pipe(map(({ state }) => stateLabels[state]))}
           </span>
 
           <If
@@ -62,13 +63,13 @@ export const IssueStartRow = ({ issue, start }: Props): JSX.Element => (
                 >
                   {(node$, index$) => (
                     <>
-                      {inlineMap(index$, separator)}
+                      {index$.pipe(map(separator))}
                       <ExternalLink
                         dataState={node$.pipe(map((node) => node.state))}
                         href={node$.pipe(map((node) => node.url))}
                         title={node$.pipe(map(describeNode))}
                       >
-                        {inlineMap(node$, (node) => `#${node.number}`)}
+                        {node$.pipe(map((node) => `#${node.number}`))}
                       </ExternalLink>
                     </>
                   )}

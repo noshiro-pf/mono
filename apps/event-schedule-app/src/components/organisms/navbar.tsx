@@ -6,7 +6,7 @@ import {
   Popover,
 } from 'blueprint-synstate';
 import { createState, map, type InitializedObservable } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import {
   aboutThisAppUrl,
   dict,
@@ -117,7 +117,7 @@ export const NavBar = (): JSX.Element => {
                       class={constant(styles.anchor)}
                       data-e2e={constant('nav-user-menu')}
                     >
-                      {inlineMap(Auth.displayName$, (name) => name ?? '')}
+                      {Auth.displayName$.pipe(map((name) => name ?? ''))}
                     </a>
                   </Popover>
                   <span>{constant(dc.auth.userName.suffix)}</span>

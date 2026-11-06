@@ -8,7 +8,6 @@ import { createState, map, onScopeDispose } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  inlineMap,
   isImeKeyDown,
   listenInScope,
   type Child,
@@ -167,23 +166,25 @@ export const DatePopover = ({
         class={{
           'bp6-popover-transition-container': constant(true),
           'bp6-overlay-content': constant(true),
-          'bp6-popover-enter': inlineMap(phase$, (phase) => phase !== 'done'),
-          'bp6-popover-enter-active': inlineMap(
-            phase$,
-            (phase) => phase === 'active',
+          'bp6-popover-enter': phase$.pipe(map((phase) => phase !== 'done')),
+          'bp6-popover-enter-active': phase$.pipe(
+            map((phase) => phase === 'active'),
           ),
-          'bp6-popover-enter-done': inlineMap(
-            phase$,
-            (phase) => phase === 'done',
+          'bp6-popover-enter-done': phase$.pipe(
+            map((phase) => phase === 'done'),
           ),
         }}
         style={{
           position: constant('fixed'),
-          left: inlineMap(position$, (position) =>
-            Optional.isSome(position) ? `${position.value.left}px` : '0px',
+          left: position$.pipe(
+            map((position) =>
+              Optional.isSome(position) ? `${position.value.left}px` : '0px',
+            ),
           ),
-          top: inlineMap(position$, (position) =>
-            Optional.isSome(position) ? `${position.value.top}px` : '0px',
+          top: position$.pipe(
+            map((position) =>
+              Optional.isSome(position) ? `${position.value.top}px` : '0px',
+            ),
           ),
         }}
         onKeyDown={(event) => {
@@ -201,16 +202,19 @@ export const DatePopover = ({
         }}
       >
         <div
-          class={inlineMap(
-            placement$,
-            (placement) =>
-              `bp6-popover bp6-popover-placement-${placement} ${popoverClass}`,
+          class={placement$.pipe(
+            map(
+              (placement) =>
+                `bp6-popover bp6-popover-placement-${placement} ${popoverClass}`,
+            ),
           )}
           style={{
-            'transform-origin': inlineMap(position$, (position) =>
-              Optional.isSome(position)
-                ? `${position.value.arrowLeft + ARROW_SIZE / 2}px ${position.value.placement === 'top' ? 'bottom' : 'top'}`
-                : undefined,
+            'transform-origin': position$.pipe(
+              map((position) =>
+                Optional.isSome(position)
+                  ? `${position.value.arrowLeft + ARROW_SIZE / 2}px ${position.value.placement === 'top' ? 'bottom' : 'top'}`
+                  : undefined,
+              ),
             ),
           }}
         >
@@ -219,24 +223,31 @@ export const DatePopover = ({
             class={constant('bp6-popover-arrow')}
             data-popper-arrow={constant('')}
             style={{
-              left: inlineMap(position$, (position) =>
-                Optional.isSome(position)
-                  ? `${position.value.arrowLeft}px`
-                  : undefined,
+              left: position$.pipe(
+                map((position) =>
+                  Optional.isSome(position)
+                    ? `${position.value.arrowLeft}px`
+                    : undefined,
+                ),
               ),
-              top: inlineMap(placement$, (placement) =>
-                placement === 'bottom' ? ARROW_STAND_OFF : undefined,
+              top: placement$.pipe(
+                map((placement) =>
+                  placement === 'bottom' ? ARROW_STAND_OFF : undefined,
+                ),
               ),
-              bottom: inlineMap(placement$, (placement) =>
-                placement === 'top' ? ARROW_STAND_OFF : undefined,
+              bottom: placement$.pipe(
+                map((placement) =>
+                  placement === 'top' ? ARROW_STAND_OFF : undefined,
+                ),
               ),
             }}
           >
             <svg
-              style={inlineMap(
-                placement$,
-                (placement) =>
-                  `transform: rotate(${placement === 'top' ? -90 : 90}deg);`,
+              style={placement$.pipe(
+                map(
+                  (placement) =>
+                    `transform: rotate(${placement === 'top' ? -90 : 90}deg);`,
+                ),
               )}
               viewBox={constant(`0 0 ${ARROW_SIZE} ${ARROW_SIZE}`)}
             >

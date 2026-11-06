@@ -1,8 +1,7 @@
-import type { InitializedObservable } from 'synstate';
+import { map, type InitializedObservable } from 'synstate';
 import {
   constant,
   deriveBindable,
-  inlineMap,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -36,8 +35,8 @@ export const SortKeyRow = ({
       </span>
       <span class={constant('sort-key-controls')}>
         <button
-          aria-label={inlineMap(spec, (s) =>
-            m.sort.toggleOrder(label(s), sortOrderLabels[s.order]),
+          aria-label={spec.pipe(
+            map((s) => m.sort.toggleOrder(label(s), sortOrderLabels[s.order])),
           )}
           class={constant('bp6-button bp6-small')}
           type={constant('button')}
@@ -45,14 +44,16 @@ export const SortKeyRow = ({
             actions.toggleOrder(currentIndex());
           }}
         >
-          {inlineMap(spec, (s) =>
-            s.order === 'asc' ? m.sort.ascending : m.sort.descending,
+          {spec.pipe(
+            map((s) =>
+              s.order === 'asc' ? m.sort.ascending : m.sort.descending,
+            ),
           )}
         </button>
         <button
-          aria-label={inlineMap(spec, (s) => m.sort.moveUp(label(s)))}
+          aria-label={spec.pipe(map((s) => m.sort.moveUp(label(s))))}
           class={constant('bp6-button bp6-small bp6-minimal')}
-          disabled={inlineMap(index, (i) => i === 0)}
+          disabled={index.pipe(map((i) => i === 0))}
           type={constant('button')}
           onClick={() => {
             actions.moveKey(currentIndex(), -1);
@@ -61,7 +62,7 @@ export const SortKeyRow = ({
           {constant('▲')}
         </button>
         <button
-          aria-label={inlineMap(spec, (s) => m.sort.moveDown(label(s)))}
+          aria-label={spec.pipe(map((s) => m.sort.moveDown(label(s))))}
           class={constant('bp6-button bp6-small bp6-minimal')}
           disabled={deriveBindable([index, count], (i, n) => i === n - 1)}
           type={constant('button')}
@@ -72,7 +73,7 @@ export const SortKeyRow = ({
           {constant('▼')}
         </button>
         <button
-          aria-label={inlineMap(spec, (s) => m.sort.remove(label(s)))}
+          aria-label={spec.pipe(map((s) => m.sort.remove(label(s))))}
           class={constant('bp6-button bp6-small bp6-minimal')}
           type={constant('button')}
           onClick={() => {

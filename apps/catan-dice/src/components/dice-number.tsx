@@ -1,11 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import {
-  type Bindable,
-  constant,
-  inlineMap,
-  type JSX,
-  mapBindable,
-} from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { type Bindable, constant, type JSX, mapBindable } from 'synstate-dom';
 import * as styles from './dice-number.module.css';
 
 type Props = Readonly<{
@@ -19,9 +13,8 @@ export const DiceNumber = ({ value, opacity, e2eId }: Props): JSX.Element => (
     class={constant(styles.diceNumber)}
     data-e2e={constant(e2eId)}
     style={{
-      'border-color': inlineMap(
-        opacity,
-        (alpha) => `rgba(143, 186, 255, ${alpha})`,
+      'border-color': opacity.pipe(
+        map((alpha) => `rgba(143, 186, 255, ${alpha})`),
       ),
     }}
   >

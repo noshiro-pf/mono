@@ -10,7 +10,6 @@ import {
   createAfterUpdate,
   For,
   If,
-  inlineMap,
   isImeKeyDown,
   type JSX,
 } from 'synstate-dom';
@@ -346,9 +345,7 @@ export const LabelInput = ({
                 {label$}
               </span>
               <button
-                aria-label={inlineMap(label$, (label) =>
-                  m.labels.remove(label),
-                )}
+                aria-label={label$.pipe(map((label) => m.labels.remove(label)))}
                 class={constant('label-chip-remove')}
                 type={constant('button')}
                 value={label$}
@@ -375,11 +372,11 @@ export const LabelInput = ({
             ),
           )}
           aria-autocomplete={constant('list')}
-          aria-controls={inlineMap(shown$, (shown) =>
-            shown ? listId : undefined,
+          aria-controls={shown$.pipe(
+            map((shown) => (shown ? listId : undefined)),
           )}
-          aria-expanded={inlineMap(shown$, (shown) =>
-            shown ? 'true' : 'false',
+          aria-expanded={shown$.pipe(
+            map((shown) => (shown ? 'true' : 'false')),
           )}
           autocapitalize={constant('off')}
           autocomplete={constant('off')}
@@ -460,14 +457,16 @@ export const LabelInput = ({
             <For items={options$} key={(option) => option.label}>
               {(option$) => (
                 <li
-                  aria-selected={inlineMap(option$, ({ active }) =>
-                    active ? 'true' : 'false',
+                  aria-selected={option$.pipe(
+                    map(({ active }) => (active ? 'true' : 'false')),
                   )}
-                  class={inlineMap(option$, ({ active }) =>
-                    active ? 'label-suggestion active' : 'label-suggestion',
+                  class={option$.pipe(
+                    map(({ active }) =>
+                      active ? 'label-suggestion active' : 'label-suggestion',
+                    ),
                   )}
                   data-e2e={constant('label-suggestion')}
-                  id={inlineMap(option$, (option) => option.id)}
+                  id={option$.pipe(map((option) => option.id))}
                   role={constant('option')}
                   // Focusable, so that the focus a tap may take from the box
                   // stays in the list (`onBlur`).
@@ -479,7 +478,7 @@ export const LabelInput = ({
                     mut_box?.focus();
                   }}
                 >
-                  {inlineMap(option$, ({ label }) => label)}
+                  {option$.pipe(map(({ label }) => label))}
                 </li>
               )}
             </For>

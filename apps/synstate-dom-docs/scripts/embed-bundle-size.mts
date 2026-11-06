@@ -3,7 +3,8 @@ import * as path from 'node:path';
 import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
-import { embedInto, type Embedded } from './embed-markers.mjs';
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how apps reach its shared scripts
+import * as markers from '../../../tools/scripts/lib/embed-markers.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
@@ -49,7 +50,7 @@ export const embedBundleSize = async (): Promise<Result<undefined, string>> => {
         );
       }
 
-      const embedded = embedInto(
+      const embedded = markers.embedInto(
         page,
         'bundle-size',
         render(parsed.value, locale),
@@ -502,7 +503,7 @@ const missingClaims = (page: string, locale: Locale): readonly string[] => {
 const render = (
   bundleSize: BundleSize,
   locale: Locale,
-): ReadonlyRecord<string, Embedded> => {
+): ReadonlyRecord<string, markers.Embedded> => {
   const applicationName = (application: string): string => {
     if (locale === 'en') {
       return application;

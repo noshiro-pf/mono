@@ -1,10 +1,5 @@
-import {
-  constant,
-  inlineMap,
-  mapBindable,
-  type Bindable,
-  type JSX,
-} from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 import type { Mutable } from 'ts-type-forge';
 import { m } from '../i18n/index.mjs';
 import {
@@ -95,16 +90,17 @@ export const AppHeader = ({ userName }: Props): JSX.Element => (
       </label>
       <button
         class={constant('bp6-button bp6-minimal')}
-        disabled={inlineMap(
-          sessionStore.signOutState,
-          (state) => state !== 'idle',
+        disabled={sessionStore.signOutState.pipe(
+          map((state) => state !== 'idle'),
         )}
         title={mapBindable(userName, (name) => m.header.signedInAs(name))}
         type={constant('button')}
         onClick={sessionStore.signOut}
       >
-        {inlineMap(sessionStore.signOutState, (state) =>
-          state === 'waiting' ? m.header.signingOut : m.header.signOut,
+        {sessionStore.signOutState.pipe(
+          map((state) =>
+            state === 'waiting' ? m.header.signingOut : m.header.signOut,
+          ),
         )}
       </button>
     </div>

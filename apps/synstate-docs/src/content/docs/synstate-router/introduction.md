@@ -30,7 +30,7 @@ npm install react react-dom synstate synstate-router synstate-router-react ts-da
 npm install synstate synstate-dom synstate-router synstate-router-dom ts-data-forge # synstate-dom
 ```
 
-The examples below leave out their imports. The route tree, the codecs and the router come from `synstate-router`, the components from the binding, `render`, `constant` and `inlineMap` from `synstate-dom`, `renderToStaticMarkup` from `react-dom/server`, operators such as `switchMap` from `synstate`, and `asSafeInt`, `Optional` and `Result` from `ts-data-forge`. `fetchProductName` stands in for the application's own request function.
+The examples below leave out their imports. The route tree, the codecs and the router come from `synstate-router`, the components from the binding, `render` and `constant` from `synstate-dom`, `renderToStaticMarkup` from `react-dom/server`, operators such as `switchMap` from `synstate`, and `asSafeInt`, `Optional` and `Result` from `ts-data-forge`. `fetchProductName` stands in for the application's own request function.
 
 ## Defining routes
 
@@ -201,7 +201,7 @@ Layouts nest: `<Routes prefix cases={...}>` branches on the top-level node the p
 
 ```tsx
 import { map } from 'synstate';
-import { constant, inlineMap, render } from 'synstate-dom';
+import { constant, render } from 'synstate-dom';
 import {
     createMemoryBrowser,
     createRouter,
@@ -262,9 +262,11 @@ const unmount = render(
                     ),
                     'products.item': (item$) => (
                         <h1>
-                            {inlineMap(
-                                item$,
-                                (item) => `Product ${item.params.productId}`,
+                            {item$.pipe(
+                                map(
+                                    (item) =>
+                                        `Product ${item.params.productId}`,
+                                ),
                             )}
                         </h1>
                     ),

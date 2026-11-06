@@ -1,9 +1,9 @@
 ---
 title: synstate-dom
-description: A compiler-free, fine-grained UI library that binds synstate observables directly to the DOM.
+description: SynState's UI library. A compiler-free, fine-grained UI library that binds SynState observables directly to the DOM.
 template: splash
 hero:
-    tagline: Pass synstate observables straight into JSX. Your component runs once, and after that only the attributes, properties and text you bound to an observable change. No compiler, no virtual DOM.
+    tagline: The UI library for SynState. Pass its observables straight into JSX. Your component runs once, and after that only the attributes, properties and text you bound to an observable change. No compiler, no virtual DOM.
     actions:
         - text: Get Started
           link: /mono/synstate-dom/getting-started/introduction/
@@ -24,6 +24,16 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
 ## Features
 
 <CardGrid>
+    <Card title="Made for SynState" icon="star">
+
+synstate-dom is the UI library that connects most directly to SynState's runtime: the graph ends in the DOM, with nothing converted on the way. In [SynState's benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page), SynState stays within {/* bench:summary/synstate-worst-over-fastest */}2.7{/* /bench */}× of the fastest library in every scenario: {/* bench:summary/synstate-alone-in-single-digits */}the only library measured in all of them whose worst case stays in single digits{/* /bench */}.
+
+    </Card>
+    <Card title="Simple, and rarely slow" icon="pencil">
+
+One way to write each thing, rather than extra forms that only win a row of a benchmark. On the operations of js-framework-benchmark, its slowest operation takes {/* benchmark:worst/synstate-dom */}1.56{/* /benchmark */}× the fastest library's time: {/* benchmark:placement/behind */}behind Solid, Preact and Preact + Signals{/* /benchmark */}, and well ahead of React's {/* benchmark:worst/react */}3.79{/* /benchmark */}×.
+
+    </Card>
     <Card title="Fine-grained, called once" icon="rocket">
         Your component function is called once, when it mounts. After that, an
         update travels through the synstate graph and writes straight to the one
@@ -45,4 +55,5 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
         own. Close a branch or remove a row, and every derivation and
         subscription made inside it goes away with it.
     </Card>
+
 </CardGrid>

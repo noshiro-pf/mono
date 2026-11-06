@@ -1,5 +1,5 @@
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, If, inlineMap, MatchOptional, type JSX } from 'synstate-dom';
+import { constant, If, MatchOptional, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import type { GraphLayout } from '../dag/index.mjs';
 import { m } from '../i18n/index.mjs';
@@ -43,8 +43,8 @@ export const DagView = (): JSX.Element => {
 
   return (
     <main
-      aria-busy={inlineMap(autoLayout, ({ type }) =>
-        (type === 'computing').toString(),
+      aria-busy={autoLayout.pipe(
+        map(({ type }) => (type === 'computing').toString()),
       )}
       class={constant('dag-view')}
       data-e2e={constant('dag-view')}
@@ -69,10 +69,12 @@ export const DagView = (): JSX.Element => {
                 class={constant('bp6-callout bp6-intent-danger dag-message')}
                 role={constant('alert')}
               >
-                {inlineMap(autoLayout, (layoutState) =>
-                  layoutState.type === 'error'
-                    ? m.dag.layoutFailed(layoutState.message)
-                    : '',
+                {autoLayout.pipe(
+                  map((layoutState) =>
+                    layoutState.type === 'error'
+                      ? m.dag.layoutFailed(layoutState.message)
+                      : '',
+                  ),
                 )}
               </p>
             }

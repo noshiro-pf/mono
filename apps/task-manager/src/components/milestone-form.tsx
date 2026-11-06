@@ -1,5 +1,5 @@
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import type { RelaxedExtract } from 'ts-type-forge';
 import { m } from '../i18n/index.mjs';
 import {
@@ -66,7 +66,7 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
             data-e2e={constant('title-input')}
             required={constant(true)}
             type={constant('text')}
-            value={inlineMap(editor, ({ draft }) => draft.title)}
+            value={editor.pipe(map(({ draft }) => draft.title))}
             onInput={(changed) => {
               editorStore.updateMilestoneDraft({
                 title: changed.currentTarget.value,
@@ -100,9 +100,8 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
           <div class={constant('field field-wide')}>
             <label class={constant('bp6-control bp6-checkbox')}>
               <input
-                checked={inlineMap(
-                  editor,
-                  ({ draft }) => draft.requiresManualCheck,
+                checked={editor.pipe(
+                  map(({ draft }) => draft.requiresManualCheck),
                 )}
                 class={constant('bp6-control-input')}
                 type={constant('checkbox')}
@@ -139,12 +138,14 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
                     else={
                       <>
                         <span>
-                          {inlineMap(editor, ({ draft }) =>
-                            draft.checkedAt === undefined
-                              ? ''
-                              : m.nodeDialog.checkedAt(
-                                  formatDateTime(draft.checkedAt),
-                                ),
+                          {editor.pipe(
+                            map(({ draft }) =>
+                              draft.checkedAt === undefined
+                                ? ''
+                                : m.nodeDialog.checkedAt(
+                                    formatDateTime(draft.checkedAt),
+                                  ),
+                            ),
                           )}
                         </span>
                         <button
@@ -178,7 +179,7 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
         <textarea
           class={constant('bp6-input bp6-fill')}
           rows={constant(3)}
-          value={inlineMap(editor, ({ draft }) => draft.description)}
+          value={editor.pipe(map(({ draft }) => draft.description))}
           onInput={(changed) => {
             editorStore.updateMilestoneDraft({
               description: changed.currentTarget.value,

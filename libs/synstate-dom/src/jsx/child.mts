@@ -1,15 +1,14 @@
 import { isObservable } from 'synstate';
 import { Arr, hasKey, isNumber, isRecord, isString } from 'ts-data-forge';
-import type { ElementBindable } from '../constant/index.mjs';
-import { bindValue, inlineMapTag, mountableTag } from '../internal/index.mjs';
+import type { Bindable } from '../constant/index.mjs';
+import { bindValue, mountableTag } from '../internal/index.mjs';
 import type { Mountable, MountedNodes } from './mountable.mjs';
 
 /**
  * What a JSX element accepts as a child. Text must be a `Bindable` like any
  * other data: `<p>{constant('big')}</p>`, never `<p>big</p>` (SPEC.md 5.1).
  */
-export type Child =
-  ElementBindable<number | string> | Mountable | readonly Child[];
+export type Child = Bindable<number | string> | Mountable | readonly Child[];
 
 /**
  * Mounts a child in the current scope and returns its nodes in order: a
@@ -46,8 +45,7 @@ export const isChild = (value: unknown): value is Child =>
   isString(value) ||
   isNumber(value) ||
   isObservable(value) ||
-  (isRecord(value) &&
-    (hasKey(value, mountableTag) || hasKey(value, inlineMapTag)));
+  (isRecord(value) && hasKey(value, mountableTag));
 
 const isMountable = (child: Child): child is Mountable =>
   isRecord(child) && hasKey(child, mountableTag);

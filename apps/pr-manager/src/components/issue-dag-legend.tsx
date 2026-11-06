@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, For, If, type JSX } from 'synstate-dom';
 import type { IssueGraph, IssueNodeState } from '../issue-graph.mjs';
 import { isFadedTier, isRingedTier } from '../priority.mjs';
 import { issuesViewStore } from '../store/index.mjs';
@@ -49,10 +49,10 @@ export const IssueDagLegend = (): JSX.Element => {
           <li>
             <span
               class={constant('issue-dag-swatch')}
-              data-kind={inlineMap(key$, ({ kind }) => kind)}
-              data-state={inlineMap(key$, ({ state }) => state)}
+              data-kind={key$.pipe(map(({ kind }) => kind))}
+              data-state={key$.pipe(map(({ state }) => state))}
             />
-            {inlineMap(key$, ({ label }) => label)}
+            {key$.pipe(map(({ label }) => label))}
           </li>
         )}
       </For>
