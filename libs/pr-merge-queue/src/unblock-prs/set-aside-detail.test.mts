@@ -124,6 +124,19 @@ describe(describeConflict, () => {
     );
   });
 
+  test('names the merged pull requests that changed the files', () => {
+    assert.strictEqual(
+      describeConflict(
+        ['a.mts'],
+        'CONFLICT (content): …',
+        'main',
+        [],
+        [41, 42],
+      ),
+      'conflicts with main in a.mts (changed there by #41, #42)',
+    );
+  });
+
   test("falls back to git's own words when no file is named", () => {
     assert.strictEqual(
       describeConflict([], 'error: could not apply 1234abc\nhint: …', 'main'),

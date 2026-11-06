@@ -147,6 +147,40 @@ describe(resolvedCommentBody, () => {
       'Resolved at 2026-09-29T01:02:03Z: no longer set aside (`rebase-failed` at `cccccccccc`) — `main` moved.',
     );
   });
+
+  test('keeps what the set-aside said under a fold, without its record or its box', () => {
+    const body = resolvedCommentBody(
+      { reason: 'checks-failed', headSha: HEAD, baseSha: BASE },
+      'pushed',
+      'main',
+      Date.parse('2026-09-29T01:02:03.456Z'),
+      setAsideCommentBody(
+        skip({
+          reason: 'checks-failed',
+          detail: 'failed: code-check-result / result',
+          failedChecks: [{ name: 'code-check (lint)', link: 'https://x/1' }],
+        }),
+        'main',
+      ),
+    );
+
+    assert.deepStrictEqual(parseSetAsideComment(body), { kind: 'resolved' });
+
+    const lines = body.split('\n');
+
+    assert.strictEqual(
+      lines[2],
+      'Resolved at 2026-09-29T01:02:03Z: no longer set aside (`checks-failed` at `cccccccccc`) — the branch was pushed.',
+    );
+
+    assert.include(body, '<details><summary>What it said</summary>');
+
+    assert.include(body, '- [code-check (lint)](https://x/1)');
+
+    assert.notInclude(body, 'unblock-prs:set-aside reason=');
+
+    assert.notInclude(body, '- [ ] ');
+  });
 });
 
 const HEAD = 'c'.repeat(40);

@@ -933,7 +933,7 @@ const ownSetAsideComment = (
       const says = parseSetAsideComment(body);
 
       if (databaseId !== null && says !== undefined) {
-        yield { databaseId, says };
+        yield { databaseId, says, body };
       }
     }
   }).at(0);

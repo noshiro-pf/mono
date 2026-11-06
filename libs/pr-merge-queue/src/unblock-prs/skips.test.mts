@@ -57,7 +57,7 @@ describe(unannouncedSkips, () => {
     assert.deepStrictEqual(
       unannouncedSkips(
         withSkip(none, record),
-        comments([7, { databaseId: 0, says: { kind: 'resolved' } }]),
+        comments([7, { databaseId: 0, says: { kind: 'resolved' }, body: '' }]),
       ),
       [record],
     );
@@ -104,6 +104,7 @@ describe(settleSkips, () => {
           {
             number: 7,
             databaseId: 107,
+            body: STANDING_BODY,
             setAside: SET_ASIDE,
             resolvedBy: 'pushed',
           },
@@ -196,7 +197,7 @@ describe(settleSkips, () => {
       settleSkips(
         none,
         comments(
-          [7, { databaseId: 107, says: { kind: 'resolved' } }],
+          [7, { databaseId: 107, says: { kind: 'resolved' }, body: '' }],
           [8, standingComment()],
           [
             9,
@@ -235,7 +236,10 @@ const standingComment = (
       setAside: overrides.setAside ?? SET_ASIDE,
       retry: overrides.retry ?? false,
     },
+    body: STANDING_BODY,
   }) as const;
+
+const STANDING_BODY = 'the comment as written';
 
 /** Each pull request's comment, with a database id of 100 more than its number. */
 const comments = (

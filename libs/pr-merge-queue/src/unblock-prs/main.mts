@@ -440,7 +440,13 @@ const settleWithComments = async (
     baseSha,
   );
 
-  for (const { number, databaseId, setAside, resolvedBy } of settled.resolved) {
+  for (const {
+    number,
+    databaseId,
+    body,
+    setAside,
+    resolvedBy,
+  } of settled.resolved) {
     log(
       `#${number}: no longer set aside (${setAside.reason}) — ${describeResolvedBy(resolvedBy, defaultBranch)}${resolvedBy === 'retry' ? '; trying it again' : ''}.`,
     );
@@ -458,6 +464,7 @@ const settleWithComments = async (
         resolvedBy,
         defaultBranch,
         currentEpochMs(),
+        body,
       ),
     );
 
