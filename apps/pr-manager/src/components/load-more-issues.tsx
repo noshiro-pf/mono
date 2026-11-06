@@ -1,8 +1,8 @@
+import { map } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   MatchOptional,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -20,7 +20,7 @@ type Props = Readonly<{
  * did not if it did not.
  */
 export const LoadMoreIssues = ({ notListed }: Props): JSX.Element => {
-  const loading = view(reader.moreIssues, ({ type }) => type === 'loading');
+  const loading = reader.moreIssues.pipe(map(({ type }) => type === 'loading'));
 
   return (
     <div class={constant('load-more')}>
@@ -30,7 +30,7 @@ export const LoadMoreIssues = ({ notListed }: Props): JSX.Element => {
         type={constant('button')}
         onClick={reader.loadMoreIssues}
       >
-        {derive([loading, notListed], (isLoading, count) =>
+        {deriveBindable([loading, notListed], (isLoading, count) =>
           isLoading
             ? 'Reading…'
             : count > 0
@@ -40,10 +40,12 @@ export const LoadMoreIssues = ({ notListed }: Props): JSX.Element => {
       </button>
 
       <MatchOptional
-        value={view(reader.moreIssues, (moreIssues) =>
-          moreIssues.type === 'failed'
-            ? Optional.some(moreIssues.message)
-            : Optional.none,
+        value={reader.moreIssues.pipe(
+          map((moreIssues) =>
+            moreIssues.type === 'failed'
+              ? Optional.some(moreIssues.message)
+              : Optional.none,
+          ),
         )}
         some={(message$) => (
           <span class={constant('poll-error')}>{message$}</span>

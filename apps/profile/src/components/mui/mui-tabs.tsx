@@ -1,5 +1,5 @@
 import type { InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import * as styles from './mui-tabs.module.css';
 
 type Props = Readonly<{
@@ -24,7 +24,7 @@ export const MuiTabs = ({
       <div class={constant(styles.flexContainer)} role={constant('tablist')}>
         {labels.map((label, index) => (
           <button
-            aria-selected={view(tabIndex, (selected) =>
+            aria-selected={inlineMap(tabIndex, (selected) =>
               selected === index ? 'true' : 'false',
             )}
             class={constant(styles.tab)}
@@ -44,7 +44,7 @@ export const MuiTabs = ({
       </div>
       <span
         class={constant(styles.indicator)}
-        style={{ '--tab-index': view(tabIndex, (i) => i.toString()) }}
+        style={{ '--tab-index': inlineMap(tabIndex, (i) => i.toString()) }}
       />
     </div>
   </div>

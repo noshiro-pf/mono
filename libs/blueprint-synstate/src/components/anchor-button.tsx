@@ -1,7 +1,7 @@
 import { createState } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   isImeKeyDown,
   mapBindable,
   type Bindable,
@@ -94,13 +94,13 @@ export const AnchorButton = ({
         active:
           active === undefined
             ? keyHeld$
-            : derive([active, keyHeld$], (a, k) => a || k),
+            : deriveBindable([active, keyHeld$], (a, k) => a || k),
         disabled,
         loading,
         className,
       })}
       data-e2e={e2e}
-      href={derive([disabled, href], (d, h) => (d ? undefined : h))}
+      href={deriveBindable([disabled, href], (d, h) => (d ? undefined : h))}
       rel={rel === undefined ? undefined : constant(rel)}
       role={constant('button')}
       tabIndex={mapBindable(disabled, (d) => (d ? -1 : 0))}

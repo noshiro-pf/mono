@@ -1,5 +1,5 @@
-import { createState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 
 const [position$, setPosition] = createState('');
 
@@ -27,6 +27,6 @@ export const Pad = (): JSX.Element => (
   >
     {constant('Pointer at ')}
     {position$}
-    {view(width$, (w) => ` in a pad ${Math.round(w)}px wide`)}
+    {width$.pipe(map((w) => ` in a pad ${Math.round(w)}px wide`))}
   </div>
 );

@@ -1,5 +1,5 @@
-import { createState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 
 const [radius$] = createState(10);
 
@@ -10,7 +10,7 @@ export const Dot = (): JSX.Element => (
       cx={constant(50)}
       cy={constant(50)}
       r={radius$}
-      fill={view(radius$, (r) => (r > 30 ? 'tomato' : 'teal'))}
+      fill={radius$.pipe(map((r) => (r > 30 ? 'tomato' : 'teal')))}
     />
   </svg>
 );

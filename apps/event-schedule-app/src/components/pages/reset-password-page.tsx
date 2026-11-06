@@ -1,5 +1,6 @@
 import { Button, FormGroup, InputGroup } from 'blueprint-synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
 import { ResetPasswordPageStore } from '../../store/index.mjs';
 import { preventSubmit } from './shared-auth-parts.js';
@@ -14,9 +15,11 @@ const { state } = ResetPasswordPageStore;
 export const ResetPasswordPage = ({
   hidePasswordResetForm,
 }: Props): JSX.Element => {
-  const isWaitingResponse = view(state, (s) => s.formState.isWaitingResponse);
+  const isWaitingResponse = state.pipe(
+    map((s) => s.formState.isWaitingResponse),
+  );
 
-  const intent = view(state, (s) => s.emailFormIntent);
+  const intent = state.pipe(map((s) => s.emailFormIntent));
 
   return (
     <div
@@ -41,7 +44,7 @@ export const ResetPasswordPage = ({
           <div>
             <FormGroup
               class={styles.field}
-              helperText={view(state, (s) => s.formState.email.error)}
+              helperText={state.pipe(map((s) => s.formState.email.error))}
               intent={intent}
               label={constant(dc.email)}
             >
@@ -52,7 +55,7 @@ export const ResetPasswordPage = ({
                 disabled={isWaitingResponse}
                 intent={intent}
                 type={'email'}
-                value={view(state, (s) => s.formState.email.inputValue)}
+                value={state.pipe(map((s) => s.formState.email.inputValue))}
                 onInput={({ currentTarget }) => {
                   ResetPasswordPageStore.inputEmailHandler(currentTarget.value);
                 }}
@@ -63,7 +66,7 @@ export const ResetPasswordPage = ({
           <div class={constant(styles.buttonWrapper)}>
             <Button
               data-e2e={constant('reset-password-button')}
-              disabled={view(state, (s) => s.enterButtonDisabled)}
+              disabled={state.pipe(map((s) => s.enterButtonDisabled))}
               fill
               intent={'primary'}
               loading={isWaitingResponse}

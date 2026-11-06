@@ -1,12 +1,12 @@
 import { createState, map, onScopeDispose } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
+  inlineMap,
   isImeKeyDown,
   mapBindable,
   toObservable,
-  view,
   type Bindable,
   type Child,
   type JSX,
@@ -238,7 +238,7 @@ export const TagInput = ({
       <div class={constant('bp6-tag-input-values')}>
         {/* Drawn afresh as a tag's look, or whether it may be removed, changes. */}
         <For
-          items={derive([values$, disabled$], (tags, isDisabled) =>
+          items={deriveBindable([values$, disabled$], (tags, isDisabled) =>
             tags.map((tag) => ({ ...tag, removable: !isDisabled })),
           )}
           key={(tag, index) =>
@@ -300,7 +300,7 @@ export const TagInput = ({
           placeholder={
             placeholder === undefined
               ? undefined
-              : view(hasTag$, (has) => (has ? undefined : placeholder))
+              : inlineMap(hasTag$, (has) => (has ? undefined : placeholder))
           }
           onFocus={() => {
             setIsInputFocused(true);

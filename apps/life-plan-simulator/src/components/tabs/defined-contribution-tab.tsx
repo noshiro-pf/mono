@@ -1,6 +1,6 @@
 import { Card } from 'blueprint-synstate';
-import { createState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import {
   formatYearMonth,
   withAge,
@@ -37,7 +37,7 @@ export const DefinedContributionTab = (): JSX.Element => {
         <div class={constant('form')}>
           <NumberField
             label="開始時点の評価額（円）"
-            value={view(input$, (i) => i.definedContribution.initialValue)}
+            value={input$.pipe(map((i) => i.definedContribution.initialValue))}
             onChange={(initialValue) => {
               updateSection('definedContribution', (d) => ({
                 ...d,
@@ -48,16 +48,15 @@ export const DefinedContributionTab = (): JSX.Element => {
           <TextField
             label="加入した年月"
             type="month"
-            value={view(input$, (i) => i.definedContribution.joinedAt)}
+            value={input$.pipe(map((i) => i.definedContribution.joinedAt))}
             onChange={(joinedAt) => {
               updateSection('definedContribution', (d) => ({ ...d, joinedAt }));
             }}
           />
           <NumberField
             label="一括受給の前に 60〜64 歳で毎年受け取る額（円）"
-            value={view(
-              input$,
-              (i) => i.definedContribution.installmentAge60To64,
+            value={input$.pipe(
+              map((i) => i.definedContribution.installmentAge60To64),
             )}
             onChange={(installmentAge60To64) => {
               updateSection('definedContribution', (d) => ({
@@ -68,9 +67,8 @@ export const DefinedContributionTab = (): JSX.Element => {
           />
           <NumberField
             label="一括受給の前に 65〜68 歳で毎年受け取る額（円）"
-            value={view(
-              input$,
-              (i) => i.definedContribution.installmentAge65To68,
+            value={input$.pipe(
+              map((i) => i.definedContribution.installmentAge65To68),
             )}
             onChange={(installmentAge65To68) => {
               updateSection('definedContribution', (d) => ({
@@ -81,7 +79,7 @@ export const DefinedContributionTab = (): JSX.Element => {
           />
           <NumberField
             label="一括受給額（税引き後）のうち積立 NISA に入れる額（円）"
-            value={view(input$, (i) => i.definedContribution.lumpSumToNisa)}
+            value={input$.pipe(map((i) => i.definedContribution.lumpSumToNisa))}
             onChange={(lumpSumToNisa) => {
               updateSection('definedContribution', (d) => ({
                 ...d,
@@ -91,9 +89,8 @@ export const DefinedContributionTab = (): JSX.Element => {
           />
           <CheckboxField
             label="一括受給額の残りを投信（課税枠）に入れる"
-            value={view(
-              input$,
-              (i) => i.definedContribution.lumpSumRestToTaxable,
+            value={input$.pipe(
+              map((i) => i.definedContribution.lumpSumRestToTaxable),
             )}
             onChange={(lumpSumRestToTaxable) => {
               updateSection('definedContribution', (d) => ({
@@ -109,46 +106,45 @@ export const DefinedContributionTab = (): JSX.Element => {
         <div class={constant('form')}>
           <OutputField
             label="一括受取年月"
-            value={view(result$, (r) =>
-              formatYearMonth(r.definedContribution.lumpSumMonth),
+            value={result$.pipe(
+              map((r) => formatYearMonth(r.definedContribution.lumpSumMonth)),
             )}
           />
           <OutputField
             label="一括受取額（税引き前）"
-            value={view(result$, (r) =>
-              formatYen(r.definedContribution.lumpSum.gross),
+            value={result$.pipe(
+              map((r) => formatYen(r.definedContribution.lumpSum.gross)),
             )}
           />
           <OutputField
             label="勤続（加入）年数"
-            value={view(
-              result$,
-              (r) => `${r.definedContribution.lumpSum.years} 年`,
+            value={result$.pipe(
+              map((r) => `${r.definedContribution.lumpSum.years} 年`),
             )}
           />
           <OutputField
             label="退職所得控除"
-            value={view(result$, (r) =>
-              formatYen(r.definedContribution.lumpSum.deduction),
+            value={result$.pipe(
+              map((r) => formatYen(r.definedContribution.lumpSum.deduction)),
             )}
           />
           <OutputField
             label="課税退職所得金額"
-            value={view(result$, (r) =>
-              formatYen(r.definedContribution.lumpSum.taxable),
+            value={result$.pipe(
+              map((r) => formatYen(r.definedContribution.lumpSum.taxable)),
             )}
           />
           <OutputField
             label="所得税・住民税"
-            value={view(result$, (r) =>
-              formatYen(r.definedContribution.lumpSum.tax),
+            value={result$.pipe(
+              map((r) => formatYen(r.definedContribution.lumpSum.tax)),
             )}
           />
           <OutputField
             label="一括受取額（税引き後）"
             e2e="dc-lump-sum"
-            value={view(result$, (r) =>
-              formatYen(r.definedContribution.lumpSum.afterTax),
+            value={result$.pipe(
+              map((r) => formatYen(r.definedContribution.lumpSum.afterTax)),
             )}
           />
         </div>
@@ -163,8 +159,8 @@ export const DefinedContributionTab = (): JSX.Element => {
         </div>
         <ResultTable
           caption="確定拠出年金（円）"
-          rows={view(result$, (r) =>
-            withAge(r.definedContribution.months, r.birth),
+          rows={result$.pipe(
+            map((r) => withAge(r.definedContribution.months, r.birth)),
           )}
           columns={columns}
           monthOf={(r) => r.month}

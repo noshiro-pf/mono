@@ -1,10 +1,9 @@
 import { Button, TextArea } from 'blueprint-synstate';
-import { createState, type InitializedObservable } from 'synstate';
+import { createState, map, type InitializedObservable } from 'synstate';
 import {
   constant,
   If,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -66,12 +65,14 @@ export const BatchInputAnswerForm = ({
                   {(['good', 'fair', 'poor'] as const).map((iconId) => (
                     <td>
                       <CustomIconButton
-                        active={view(selectedIconId$, (s) => s === iconId)}
-                        iconColor={view(selectedIconId$, (s) =>
-                          s === iconId ? 'blue' : 'gray',
+                        active={selectedIconId$.pipe(map((s) => s === iconId))}
+                        iconColor={selectedIconId$.pipe(
+                          map((s) => (s === iconId ? 'blue' : 'gray')),
                         )}
                         iconName={iconId}
-                        title={view(answerIcons, (a) => a[iconId].description)}
+                        title={answerIcons.pipe(
+                          map((a) => a[iconId].description),
+                        )}
                         onClick={() => {
                           onIconClick(
                             iconId,

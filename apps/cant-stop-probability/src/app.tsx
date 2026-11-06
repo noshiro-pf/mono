@@ -1,5 +1,6 @@
 import { Navbar, NavbarGroup, Tabs, type TabProps } from 'blueprint-synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, If, type JSX } from 'synstate-dom';
 import * as styles from './app.module.css';
 import { DeadColumn, ProbabilityTable } from './components/index.mjs';
 import { selectedTabId$, setSelectedTabId, type TabId } from './store.mjs';
@@ -18,11 +19,11 @@ export const App = (): JSX.Element => (
     </Navbar>
     <div class={constant(styles.content)}>
       <If
-        cond={view(selectedTabId$, (id) => id === 'table')}
+        cond={selectedTabId$.pipe(map((id) => id === 'table'))}
         then={<ProbabilityTable />}
       />
       <If
-        cond={view(selectedTabId$, (id) => id === 'deadColumnUI')}
+        cond={selectedTabId$.pipe(map((id) => id === 'deadColumnUI'))}
         then={<DeadColumn />}
       />
     </div>

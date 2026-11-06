@@ -11,7 +11,6 @@ import {
   If,
   mapBindable,
   subscribeInScope,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -221,7 +220,7 @@ export const WorkspaceEditor = ({
           {constant('Import')}
 
           <For
-            items={view(importNonce$, (nonce) => [nonce])}
+            items={importNonce$.pipe(map((nonce) => [nonce]))}
             key={(nonce) => nonce}
           >
             {() => (

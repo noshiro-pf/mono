@@ -7,7 +7,7 @@ A component is a function from props to `JSX.Element`, and it is called once, wh
 
 ## Props are bindables
 
-When a component takes data, type the prop as `Bindable<T>`. Its caller can then pass an observable, a constant or a `view`:
+When a component takes data, type the prop as `Bindable<T>`. Its caller can then pass an observable or a constant:
 
 ```tsx
 import { createState } from 'synstate';
@@ -54,17 +54,17 @@ const Inbox = (): JSX.Element => (
 render(Inbox, document.body);
 ```
 
-With `mapBindable` and `derive` (see [Bindable values](/mono/synstate-dom/guides/bindable/#receiving-a-bindable-mapbindable-derive-toobservable)), a constant passed in stays a constant and never enters the graph.
+With `mapBindable` and `deriveBindable` (see [Bindable values](/mono/synstate-dom/guides/bindable/#receiving-a-bindable-mapbindable-derivebindable-toobservable)), a constant passed in stays a constant and never enters the graph.
 
 ## Props are plain JavaScript
 
-A prop that takes data holds a bindable (an observable, a constant or a view) itself, not a value read from it, so nothing about it is special. The usual JavaScript ways of handling a function's arguments all work on props, and the updates keep flowing:
+A prop that takes data holds a bindable (an observable or a constant) itself, not a value read from it, so nothing about it is special. The usual JavaScript ways of handling a function's arguments all work on props, and the updates keep flowing:
 
 ```tsx
 import { createState } from 'synstate';
 import {
     constant,
-    derive,
+    deriveBindable,
     If,
     mapBindable,
     type Bindable,
@@ -93,7 +93,8 @@ export const Compose = (): JSX.Element => (
 const remainingOf = (
     value: Bindable<string>,
     maxLength: Bindable<number>,
-): Bindable<number> => derive([value, maxLength], (v, max) => max - v.length);
+): Bindable<number> =>
+    deriveBindable([value, maxLength], (v, max) => max - v.length);
 
 // A component called only while its branch is mounted, so its text is derived
 // only while it is shown.
@@ -161,8 +162,8 @@ In Solid, each of these comes with a rule. Props are an object of getters, so re
 
 That freedom comes from props being bindables rather than values, and it cuts the other way too. In Solid, a derived value is an expression, such as `{props.maxLength - props.value.length}` in JSX, and the compiler keeps it up to date. In synstate-dom you cannot write that expression inline. You pass the computation to a function that builds the derivation as a new bindable:
 
-- from one input: `mapBindable` (or, when you hold an observable, `view` or `pipe(map(...))`);
-- from several inputs: `derive([a, b], fn)`;
+- from one input: `mapBindable` (or, when you hold an observable, `pipe(map(...))`, or `inlineMap` where bindings are many, for an element's slot only);
+- from several inputs: `deriveBindable([a, b], fn)`;
 - anything that waits, filters or debounces: synstate's operators, reached through `toObservable`, with `withInitialValue` before the result is bound;
 - an element shown depending on an updating value: `If` given a `Bindable<boolean>` (or `MatchOptional` / `MatchResult`), not `&&` or `? :` around JSX.
 
@@ -234,4 +235,4 @@ There is no `createContext`. Keep application state in a module-level store that
 
 ## Naming
 
-The library's own props have no `$` suffix (`cond`, `items`, `value`), because they take a `Bindable`, which may be a constant or a view as well as an observable. The samples do give a `$` suffix to variables that hold an observable (`count$`, `item$`), as the synstate documentation does. Neither is enforced, and whether your own components' props carry the suffix is up to you.
+The library's own props have no `$` suffix (`cond`, `items`, `value`), because they take a `Bindable`, which may be a constant as well as an observable. The samples do give a `$` suffix to variables that hold an observable (`count$`, `item$`), as the synstate documentation does. Neither is enforced, and whether your own components' props carry the suffix is up to you.

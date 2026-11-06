@@ -10,8 +10,8 @@ import {
   createAfterUpdate,
   For,
   If,
+  inlineMap,
   isImeKeyDown,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
@@ -344,7 +344,9 @@ export const LabelInput = ({
                 {label$}
               </span>
               <button
-                aria-label={view(label$, (label) => m.labels.remove(label))}
+                aria-label={inlineMap(label$, (label) =>
+                  m.labels.remove(label),
+                )}
                 class={constant('label-chip-remove')}
                 type={constant('button')}
                 value={label$}
@@ -371,8 +373,12 @@ export const LabelInput = ({
             ),
           )}
           aria-autocomplete={constant('list')}
-          aria-controls={view(shown$, (shown) => (shown ? listId : undefined))}
-          aria-expanded={view(shown$, (shown) => (shown ? 'true' : 'false'))}
+          aria-controls={inlineMap(shown$, (shown) =>
+            shown ? listId : undefined,
+          )}
+          aria-expanded={inlineMap(shown$, (shown) =>
+            shown ? 'true' : 'false',
+          )}
           autocapitalize={constant('off')}
           autocomplete={constant('off')}
           class={constant('label-input-text')}
@@ -452,14 +458,14 @@ export const LabelInput = ({
             <For items={options$} key={(option) => option.label}>
               {(option$) => (
                 <li
-                  aria-selected={view(option$, ({ active }) =>
+                  aria-selected={inlineMap(option$, ({ active }) =>
                     active ? 'true' : 'false',
                   )}
-                  class={view(option$, ({ active }) =>
+                  class={inlineMap(option$, ({ active }) =>
                     active ? 'label-suggestion active' : 'label-suggestion',
                   )}
                   data-e2e={constant('label-suggestion')}
-                  id={view(option$, (option) => option.id)}
+                  id={inlineMap(option$, (option) => option.id)}
                   role={constant('option')}
                   // Focusable, so that the focus a tap may take from the box
                   // stays in the list (`onBlur`).
@@ -471,7 +477,7 @@ export const LabelInput = ({
                     mut_box?.focus();
                   }}
                 >
-                  {view(option$, ({ label }) => label)}
+                  {inlineMap(option$, ({ label }) => label)}
                 </li>
               )}
             </For>

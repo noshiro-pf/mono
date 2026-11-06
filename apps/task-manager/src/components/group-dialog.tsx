@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, MatchOptional, view, type JSX } from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, If, inlineMap, MatchOptional, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 import type { RelaxedExclude } from 'ts-type-forge';
 import { m } from '../i18n/index.mjs';
@@ -33,8 +33,10 @@ export const GroupDialog = (): JSX.Element => (
     }}
   >
     <MatchOptional
-      value={view(groupEditorStore.editor, (editor) =>
-        editor.type === 'closed' ? Optional.none : Optional.some(editor),
+      value={groupEditorStore.editor.pipe(
+        map((editor) =>
+          editor.type === 'closed' ? Optional.none : Optional.some(editor),
+        ),
       )}
       some={(editor$) => <GroupForm editor={editor$} />}
     />
@@ -61,7 +63,7 @@ const GroupForm = ({
   >
     <div class={constant('bp6-dialog-header')}>
       <h2 class={constant('bp6-heading')} id={constant(TITLE_ID)}>
-        {view(editor, ({ isNew }) =>
+        {inlineMap(editor, ({ isNew }) =>
           isNew ? m.groups.newGroup : m.nodeKinds.group,
         )}
       </h2>
@@ -76,13 +78,13 @@ const GroupForm = ({
     </div>
     <div class={constant('bp6-dialog-body node-dialog-body')}>
       <If
-        cond={view(editor, ({ error }) => error !== undefined)}
+        cond={editor.pipe(map(({ error }) => error !== undefined))}
         then={
           <p
             class={constant('bp6-callout bp6-intent-danger')}
             role={constant('alert')}
           >
-            {view(editor, ({ error }) => error ?? '')}
+            {inlineMap(editor, ({ error }) => error ?? '')}
           </p>
         }
       />
@@ -93,7 +95,7 @@ const GroupForm = ({
           data-e2e={constant('group-title-input')}
           required={constant(true)}
           type={constant('text')}
-          value={view(editor, ({ title }) => title)}
+          value={inlineMap(editor, ({ title }) => title)}
           onInput={(input) => {
             groupEditorStore.setTitle(input.currentTarget.value);
           }}
@@ -103,11 +105,11 @@ const GroupForm = ({
     </div>
     <div class={constant('bp6-dialog-footer node-dialog-footer')}>
       <If
-        cond={view(editor, ({ isNew }) => isNew)}
+        cond={editor.pipe(map(({ isNew }) => isNew))}
         then={<span />}
         else={
           <If
-            cond={view(editor, ({ confirmingDelete }) => confirmingDelete)}
+            cond={editor.pipe(map(({ confirmingDelete }) => confirmingDelete))}
             then={
               <fieldset
                 aria-label={constant(m.common.deleteConfirmation)}

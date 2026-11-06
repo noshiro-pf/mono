@@ -1,11 +1,11 @@
+import type { InitializedObservable } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
+  inlineMap,
   mapBindable,
-  view,
   type JSX,
-  type View,
 } from 'synstate-dom';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { dict } from '../../../constants/index.mjs';
@@ -27,7 +27,10 @@ const dc = dict.answerPage.detailedFilter;
 const iconSize = 14; /* px */
 
 /** Whether no date can have the icon, so that filtering by it is pointless. */
-const iconDisabled: ReadonlyRecord<AnswerIconIdWithNone, View<boolean>> = {
+const iconDisabled: ReadonlyRecord<
+  AnswerIconIdWithNone,
+  InitializedObservable<boolean>
+> = {
   good: filterView(
     ({ iconState }) =>
       iconState.good.max === 0 || iconState.goodPlusFair.max === 0,
@@ -70,11 +73,11 @@ export const DetailedFilterIconOfSpecifiedRespondent = (): JSX.Element => (
         {(respondent$) => {
           const checkbox = (icon: AnswerIconIdWithNone): JSX.Element => (
             <CheckboxView
-              disabled={derive(
+              disabled={deriveBindable(
                 [enabled, iconDisabled[icon]],
                 (isEnabled, isDisabled) => !isEnabled || isDisabled,
               )}
-              state={derive(
+              state={deriveBindable(
                 [respondent$, iconDisabled[icon]],
                 (respondent, isDisabled) =>
                   !isDisabled && respondent.checkState[icon].checked
@@ -92,7 +95,7 @@ export const DetailedFilterIconOfSpecifiedRespondent = (): JSX.Element => (
           return (
             <div class={constant(styles.respondentRow)}>
               <div class={constant(styles.respondentName)}>
-                {view(respondent$, (r) => r.username)}
+                {inlineMap(respondent$, (r) => r.username)}
               </div>
               <HorizontalCheckboxesWrapper>
                 {(['good', 'fair', 'poor'] as const).map((icon) => (

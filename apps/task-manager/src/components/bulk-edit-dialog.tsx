@@ -1,6 +1,13 @@
 import { HtmlSelect } from 'blueprint-synstate';
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, For, If, MatchOptional, view, type JSX } from 'synstate-dom';
+import {
+  constant,
+  For,
+  If,
+  inlineMap,
+  MatchOptional,
+  type JSX,
+} from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import type { RelaxedExclude } from 'ts-type-forge';
 import {
@@ -53,8 +60,10 @@ export const BulkEditDialog = (): JSX.Element => (
     }}
   >
     <MatchOptional
-      value={view(bulkEditStore.editor, (editor) =>
-        editor.type === 'closed' ? Optional.none : Optional.some(editor),
+      value={bulkEditStore.editor.pipe(
+        map((editor) =>
+          editor.type === 'closed' ? Optional.none : Optional.some(editor),
+        ),
       )}
       some={(editor$) => <BulkEditForm editor={editor$} />}
     />
@@ -134,7 +143,7 @@ const BulkEditForm = ({
           class={constant('bp6-text-muted')}
           data-e2e={constant('bulk-edit-summary')}
         >
-          {view(counts$, ({ tasks, milestones }) =>
+          {inlineMap(counts$, ({ tasks, milestones }) =>
             [
               tasks > 0 ? m.bulkEdit.tasks(tasks) : undefined,
               milestones > 0 ? m.bulkEdit.milestones(milestones) : undefined,
@@ -143,7 +152,7 @@ const BulkEditForm = ({
               .join(m.common.listSeparator),
           )}
           {constant(m.bulkEdit.lead)}
-          {view(counts$, ({ tasks, milestones }) =>
+          {inlineMap(counts$, ({ tasks, milestones }) =>
             milestones > 0 && tasks > 0
               ? m.bulkEdit.milestonesHaveNoProgress
               : '',
@@ -151,7 +160,7 @@ const BulkEditForm = ({
         </p>
         <div class={constant('form-grid')}>
           <If
-            cond={view(counts$, ({ tasks }) => tasks > 0)}
+            cond={counts$.pipe(map(({ tasks }) => tasks > 0))}
             then={
               <>
                 <label class={constant('bp6-label field')}>
@@ -159,7 +168,7 @@ const BulkEditForm = ({
                   <HtmlSelect
                     data-e2e={constant('bulk-progress-select')}
                     fill
-                    value={view(editor, ({ progress }) => progress ?? KEEP)}
+                    value={editor.pipe(map(({ progress }) => progress ?? KEEP))}
                     onChange={(changed) => {
                       const { value } = changed.currentTarget;
 
@@ -191,7 +200,7 @@ const BulkEditForm = ({
                   }}
                 />
                 <If
-                  cond={view(labels$, Arr.isNonEmpty)}
+                  cond={labels$.pipe(map(Arr.isNonEmpty))}
                   then={
                     <fieldset
                       class={constant('field field-wide bulk-remove-labels')}
@@ -238,7 +247,7 @@ const BulkEditForm = ({
             <HtmlSelect
               data-e2e={constant('bulk-group-select')}
               fill
-              value={view(editor, ({ group }) => groupValue(group))}
+              value={editor.pipe(map(({ group }) => groupValue(group)))}
               onChange={(changed) => {
                 const { value } = changed.currentTarget;
 
@@ -261,8 +270,10 @@ const BulkEditForm = ({
               <option value={constant(NONE)}>{constant(m.common.none)}</option>
               <For items={dataStore.groups} key={(group) => group.id}>
                 {(group$) => (
-                  <option value={view(group$, ({ id }) => `${GROUP}${id}`)}>
-                    {view(group$, ({ title }) => title)}
+                  <option
+                    value={inlineMap(group$, ({ id }) => `${GROUP}${id}`)}
+                  >
+                    {inlineMap(group$, ({ title }) => title)}
                   </option>
                 )}
               </For>

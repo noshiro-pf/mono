@@ -30,7 +30,7 @@ npm install react react-dom synstate synstate-router synstate-router-react ts-da
 npm install synstate synstate-dom synstate-router synstate-router-dom ts-data-forge # synstate-dom
 ```
 
-以下の例は import を省いています。ルートツリー・codec・ルーターは `synstate-router` から、コンポーネントはバインディングから、`render`・`constant`・`view` は `synstate-dom` から、`renderToStaticMarkup` は `react-dom/server` から、`switchMap` などの operator は `synstate` から、`asSafeInt`・`Optional`・`Result` は `ts-data-forge` から import します。`fetchProductName` はアプリケーション自身のリクエスト関数の代わりです。
+以下の例は import を省いています。ルートツリー・codec・ルーターは `synstate-router` から、コンポーネントはバインディングから、`render`・`constant`・`inlineMap` は `synstate-dom` から、`renderToStaticMarkup` は `react-dom/server` から、`switchMap` などの operator は `synstate` から、`asSafeInt`・`Optional`・`Result` は `ts-data-forge` から import します。`fetchProductName` はアプリケーション自身のリクエスト関数の代わりです。
 
 ## ルートの定義
 
@@ -200,7 +200,8 @@ assert.strictEqual(
 `createRouterComponents(router)` は synstate-dom 向けの `Routes` と `Link` を返します。case はそのページに入ったときに一度だけ呼ばれ、`{ params, search, withSearch }` の Observable を受け取ります。同じルートの新しい params と検索パラメータはその Observable に流れ、別の case をマウントするのはルートが変わったときだけです。
 
 ```tsx
-import { constant, render, view } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, inlineMap, render } from 'synstate-dom';
 import {
     createMemoryBrowser,
     createRouter,
@@ -248,10 +249,12 @@ const unmount = render(
                     // through the observable.
                     products: (list$) => (
                         <Link
-                            to={view(list$, (list) =>
-                                list.withSearch({
-                                    page: asSafeInt(list.search.page + 1),
-                                }),
+                            to={list$.pipe(
+                                map((list) =>
+                                    list.withSearch({
+                                        page: asSafeInt(list.search.page + 1),
+                                    }),
+                                ),
                             )}
                         >
                             {constant('Next page')}
@@ -259,7 +262,7 @@ const unmount = render(
                     ),
                     'products.item': (item$) => (
                         <h1>
-                            {view(
+                            {inlineMap(
                                 item$,
                                 (item) => `Product ${item.params.productId}`,
                             )}

@@ -21,15 +21,15 @@ Set the JSX transform to this package in `tsconfig.json`:
 A component is called once. What changes afterwards is only the DOM bound to the observables it was given:
 
 ```tsx
-import { createState } from 'synstate';
-import { constant, render, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, render, type JSX } from 'synstate-dom';
 
 const [count$, _setCount, { updateState: updateCount }] = createState(0);
 
 // Called once. Only the text node bound to `count$` changes afterwards.
 const Counter = (): JSX.Element => (
     <div>
-        <p>{view(count$, (n) => `Count: ${n}`)}</p>
+        <p>{count$.pipe(map((n) => `Count: ${n}`))}</p>
         <button
             type={constant('button')}
             onClick={() => {
@@ -51,7 +51,7 @@ Text in JSX is a `Bindable` too: write `constant('Add')`, not `Add`, so that a v
 
 ```tsx
 import { createState, map } from 'synstate';
-import { constant, For, If, render, view, type JSX } from 'synstate-dom';
+import { constant, For, If, inlineMap, render, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -105,20 +105,23 @@ const TodoApp = (): JSX.Element => {
                 {constant('Add')}
             </button>
             <If
-                cond={view(todos$, Arr.isNonEmpty)}
+                cond={todos$.pipe(map(Arr.isNonEmpty))}
                 then={
                     <ul>
                         <For items={todos$} key={(todo) => todo.id}>
                             {(todo$, index$) => (
                                 <li
                                     class={{
-                                        done: view(todo$, (todo) => todo.done),
+                                        done: inlineMap(
+                                            todo$,
+                                            (todo) => todo.done,
+                                        ),
                                     }}
                                 >
                                     <label>
                                         <input
                                             type={constant('checkbox')}
-                                            checked={view(
+                                            checked={inlineMap(
                                                 todo$,
                                                 (todo) => todo.done,
                                             )}
@@ -129,8 +132,8 @@ const TodoApp = (): JSX.Element => {
                                                 );
                                             }}
                                         />
-                                        {view(index$, (i) => `${i + 1}. `)}
-                                        {view(todo$, (todo) => todo.title)}
+                                        {inlineMap(index$, (i) => `${i + 1}. `)}
+                                        {inlineMap(todo$, (todo) => todo.title)}
                                     </label>
                                 </li>
                             )}
@@ -139,7 +142,7 @@ const TodoApp = (): JSX.Element => {
                 }
                 else={<p>{constant('Nothing to do.')}</p>}
             />
-            <p>{view(remaining$, (n) => `${n} remaining`)}</p>
+            <p>{remaining$.pipe(map((n) => `${n} remaining`))}</p>
         </section>
     );
 };
@@ -147,7 +150,7 @@ const TodoApp = (): JSX.Element => {
 render(TodoApp, document.body);
 ```
 
-A component that takes data takes `Bindable<T>`, so that its caller can pass an observable, a constant or a `view` alike. Props are bindables rather than values, so destructuring them loses nothing:
+A component that takes data takes `Bindable<T>`, so that its caller can pass an observable or a constant alike. Props are bindables rather than values, so destructuring them loses nothing:
 
 ```tsx
 import { createState } from 'synstate';
@@ -204,12 +207,12 @@ synstate derivations are not lazy: a derivation is computed whenever its parent 
 ## What is implemented
 
 - `Constant<T>` and `constant(value)`: a value written once and never updated.
-- `Bindable<T>`: what a slot that takes data accepts, `InitializedObservable<T> | Constant<T> | View<T>`. A plain value is a type error.
-- `view(source, fn)`: an observable and a light transformation, bound without creating a node in the graph.
-- `mapBindable`, `derive` and `toObservable`: helpers for a component that receives a `Bindable`. Constants stay constants and never enter the graph.
+- `Bindable<T>`: what a slot that takes data accepts, `InitializedObservable<T> | Constant<T>`. A plain value is a type error. A slot of an intrinsic element takes `ElementBindable<T>`, which adds `InlineMap<T>`.
+- `inlineMap(source, fn)`: an optimization of `source.pipe(map(fn))` for places with many bindings, such as `For` rows: bound without creating a node in the graph, and not shared between bindings. Only a slot of an intrinsic element takes it, directly or through a prop that a component spreads onto one (a `Child`, or `Link`'s `<a>` attributes); a prop typed `Bindable` does not.
+- `mapBindable`, `deriveBindable` and `toObservable`: helpers for a component that receives a `Bindable`. Constants stay constants and never enter the graph.
 - The JSX runtime (`"jsx": "react-jsx"`, `"jsxImportSource": "synstate-dom"`): a JSX expression is a lazy `Mountable` description, and a component is called once, when it is mounted.
 - `render(App, container)`: mounts `App` in a root scope and returns the function that unmounts it.
-- Element props: attributes and DOM properties typed from `lib.dom.d.ts` (`Bindable<T>` of each writable primitive property), `aria-*` (also a number, and a boolean written as `"true"` / `"false"`) and `data-*`, `class` as a string or a `{ name: Bindable<boolean> }` object, `style` as a string or a per-property object, and `onClick`-style event handlers. SVG elements are created in the SVG namespace and take a fixed list of attributes.
+- Element props: attributes and DOM properties typed from `lib.dom.d.ts` (`ElementBindable<T>` of each writable primitive property), `aria-*` (also a number, and a boolean written as `"true"` / `"false"`) and `data-*`, `class` as a string or a `{ name: ElementBindable<boolean> }` object, `style` as a string or a per-property object, and `onClick`-style event handlers. SVG elements are created in the SVG namespace and take a fixed list of attributes.
 - A bound `checked` or `indeterminate` of an `<input>` is controlled: after a `change`, the input is drawn as its bound value again before the next frame is painted, so a change the owner does not take in `onChange` undoes itself. For a checkbox the user toggles freely, use `defaultChecked`. A radio group is set back as a whole when every button of it is bound.
 - `If`, `MatchOptional` and `MatchResult`: mount one branch at a time in a scope of its own, rebuilt only when the condition or the tag changes.
 - `For`: one row per key, each in a scope of its own; `item$` and `index$` are derived from `items`, and rows are moved as little as the longest increasing subsequence allows.
@@ -219,4 +222,4 @@ synstate derivations are not lazy: a derivation is computed whenever its parent 
 
 ## Naming
 
-The library's own props and parameters carry no `$` suffix (`cond`, `items`, `value`): they take a `Bindable`, which may be a constant or a view as well as an observable, and the type already says which. The samples name variables that hold an observable with a `$` suffix (`count$`, `item$`), as the synstate documentation does, to tell them from plain values at a glance. Nothing enforces it; whether a component's own props carry the suffix is up to its author.
+The library's own props and parameters carry no `$` suffix (`cond`, `items`, `value`): they take a `Bindable`, which may be a constant as well as an observable, and the type already says which. The samples name variables that hold an observable with a `$` suffix (`count$`, `item$`), as the synstate documentation does, to tell them from plain values at a glance. Nothing enforces it; whether a component's own props carry the suffix is up to its author.

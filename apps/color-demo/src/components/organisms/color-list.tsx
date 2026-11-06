@@ -1,5 +1,5 @@
 import type { InitializedObservable } from 'synstate';
-import { constant, derive, For, type JSX } from 'synstate-dom';
+import { constant, deriveBindable, For, type JSX } from 'synstate-dom';
 import { hslToStr, type Hue } from 'ts-utils-additional';
 import { lightness$, saturation$ } from '../../store.mjs';
 import { ColorItem } from '../atoms/index.mjs';
@@ -22,7 +22,7 @@ export const ColorList = ({ hueList }: Props): JSX.Element => (
         {(item$) => (
           <div class={constant(styles.item)}>
             <ColorItem
-              color={derive(
+              color={deriveBindable(
                 [item$, saturation$, lightness$],
                 ({ hue }, saturation, lightness) =>
                   hslToStr([hue, saturation, lightness]),

@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import { editorStore } from '../store/index.mjs';
 import {
   formatEstimate,
@@ -22,15 +22,15 @@ type Props = Readonly<{
  */
 export const TaskTableRow = ({ row }: Props): JSX.Element => (
   <tr
-    class={view(row, ({ status }) =>
+    class={inlineMap(row, ({ status }) =>
       status === 'done' ? 'task-row done' : 'task-row',
     )}
   >
     <td>
       <span class={constant('badges')}>
-        <StatusBadge displayStatus={view(row, ({ status }) => status)} />
+        <StatusBadge displayStatus={row.pipe(map(({ status }) => status))} />
         <If
-          cond={view(row, (r) => r.startedWithUnmetDependencies)}
+          cond={row.pipe(map((r) => r.startedWithUnmetDependencies))}
           then={<WarningBadge />}
         />
       </span>
@@ -47,24 +47,24 @@ export const TaskTableRow = ({ row }: Props): JSX.Element => (
           });
         }}
       >
-        {view(row, ({ task }) => task.title)}
+        {inlineMap(row, ({ task }) => task.title)}
       </button>
     </td>
     <td>
-      {view(
+      {inlineMap(
         row,
         ({ task }) => `${task.priority} ${priorityLabels[task.priority]}`,
       )}
     </td>
     <td>
       <DueDate
-        dueDate={view(row, ({ task }) => dueOf(task))}
-        overdue={view(row, ({ overdue }) => overdue)}
+        dueDate={row.pipe(map(({ task }) => dueOf(task)))}
+        overdue={row.pipe(map(({ overdue }) => overdue))}
       />
     </td>
     <td>
-      <LabelChips labels={view(row, ({ task }) => task.labels)} />
+      <LabelChips labels={row.pipe(map(({ task }) => task.labels))} />
     </td>
-    <td>{view(row, ({ task }) => formatEstimate(task.estimateHours))}</td>
+    <td>{inlineMap(row, ({ task }) => formatEstimate(task.estimateHours))}</td>
   </tr>
 );

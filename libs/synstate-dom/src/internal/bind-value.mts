@@ -1,10 +1,10 @@
 import { isObservable, type InitializedObservable } from 'synstate';
-import type { Bindable } from '../constant/index.mjs';
+import type { ElementBindable } from '../constant/index.mjs';
 import { subscribeInScope } from '../scope/index.mjs';
-import { isView } from './is-view.mjs';
+import { isInlineMap } from './is-inline-map.mjs';
 
 /**
- * Writes the value of a {@link Bindable} with `write`, and again on every
+ * Writes the value of an {@link ElementBindable} with `write`, and again on every
  * update (SPEC.md 7.1).
  *
  * - A constant is written once.
@@ -12,16 +12,33 @@ import { isView } from './is-view.mjs';
  * - Any other observable is subscribed to, and the subscription is released
  *   when the current scope is disposed.
  *
- * A view is the same as its source, with its function applied before `write`.
+ * An inline map is the same as its source, with its function applied before `write`,
+ * and a result `Object.is` the one this binding last wrote is not written
+ * again, as `map` passes on no such result.
  */
 export const bindValue = <T,>(
-  bindable: Bindable<T>,
+  bindable: ElementBindable<T>,
   write: (value: T) => void,
 ): void => {
-  if (isView(bindable)) {
+  if (isInlineMap(bindable)) {
     bindable.open((source, fn) => {
+      const mut_last: { written: boolean; value: T | undefined } = {
+        written: false,
+        value: undefined,
+      };
+
       bindObservable(source, (value) => {
-        write(fn(value));
+        const next = fn(value);
+
+        if (mut_last.written && Object.is(mut_last.value, next)) {
+          return;
+        }
+
+        mut_last.written = true;
+
+        mut_last.value = next;
+
+        write(next);
       });
     });
 

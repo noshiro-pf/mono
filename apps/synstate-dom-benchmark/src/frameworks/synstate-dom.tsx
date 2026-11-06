@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { constant, For, render, view, type JSX } from 'synstate-dom';
+import { constant, For, inlineMap, render, type JSX } from 'synstate-dom';
 import type { BenchApp, Framework } from '../bench-app.mjs';
 import {
   createRowFactory,
@@ -30,9 +30,9 @@ export const synstateDom: Framework = {
               const { id } = row$.getSnapshot().value;
 
               return (
-                <tr class={{ danger: view(selected$, (s) => s === id) }}>
+                <tr class={{ danger: inlineMap(selected$, (s) => s === id) }}>
                   <td>{constant(id)}</td>
-                  <td>{view(row$, (row) => row.label)}</td>
+                  <td>{inlineMap(row$, (row) => row.label)}</td>
                 </tr>
               );
             }}

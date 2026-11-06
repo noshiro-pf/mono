@@ -61,7 +61,7 @@ description: js-framework-benchmark の操作と、値どうしがグラフで�
 
 - **行の作成**は、コンパイラがないことがいちばん効いてくるところです。Solid は行ごとにコンパイル済みの `<template>` を複製しますが、synstate-dom はノードごとに `createElement` を呼び、動的な葉をそれぞれ購読で束縛します。さらに行ごとに要素のための synstate のノードも作ります（位置を受け取る行ではもう 1 つ作りますが、この表の行は受け取りません。[制御構文](/mono/synstate-dom/ja/guides/control-flow/#for)の `For` を参照）。行の作成と破棄にかかる時間はノード数にほぼ比例して増えます。
 - **部分更新**は、実装によって通る経路が違います。Solid・Preact + Signals・VanJS はラベルごとに signal を持っていて、変わる 100 個に書き込みます。synstate-dom はドキュメントでおすすめしているとおり配列全体を置き換え、各行の `item$` が前回の要素と比べるので、要素が変わった 100 行だけが DOM に書き込みます。Preact と React は新しい状態から表を再描画し、props が変わった `memo` の行だけが描画し直されます。
-- **行の選択**では、Solid は `createSelector` のおかげで 2 行にしか触れず、Preact と React は `memo` の行を 2 つ再描画します。synstate-dom では各行が選択状態を `view` で束縛しているので、1,000 個の `view` がすべて実行されて各行のクラスが切り替わります。Preact + Signals も同じように、行ごとの `useComputed` を再計算します。
+- **行の選択**では、Solid は `createSelector` のおかげで 2 行にしか触れず、Preact と React は `memo` の行を 2 つ再描画します。synstate-dom では各行が選択状態を `inlineMap` で束縛しているので、1,000 個の `inlineMap` がすべて実行され、結果が変わった 2 行のクラスが切り替わります。Preact + Signals も同じように、行ごとの `useComputed` を再計算します。
 
 ## シナリオ
 
@@ -132,7 +132,7 @@ js-framework-benchmark の操作では、どの実装も同じ表をマウント
 
 どの実装も、そのライブラリ自身のドキュメントか、js-framework-benchmark のエントリーがこういう表を書くときのやり方に従っています。
 
-- **synstate-dom**：行は `createState` の中の 1 つのイミュータブルな配列で、`For` が各行の値をそこから派生させます。選択状態は、各行が `view` で束縛する state です。ドキュメントでおすすめしている書き方そのままで、チューニングはしていません。
+- **synstate-dom**：行は `createState` の中の 1 つのイミュータブルな配列で、`For` が各行の値をそこから派生させます。選択状態は、各行が `inlineMap` で束縛する state です。ドキュメントでおすすめしている書き方そのままで、チューニングはしていません。
 - **Solid**：ラベルごとの signal、行オブジェクトに対する `For`、選択には `createSelector` を使うので、選択で触れるのは 2 行だけです。`vite-plugin-solid` でコンパイルします。
 - **Preact + Signals**：ラベルごとの signal と、行ごとに `useComputed` で求めるクラスを、どちらも signal として DOM に束縛します。リストはキー付きで再描画します。
 - **Preact** と **React**：行と選択状態を、トップの `useState` で 1 つのイミュータブルな状態として持ちます。各行は、ラベルと選択中かどうかを受け取る `memo` コンポーネントです。React は変更ごとに `flushSync` で描画し、Preact はマイクロタスクで描画します。

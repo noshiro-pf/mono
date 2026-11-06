@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { For, view, type JSX } from 'synstate-dom';
+import { For, inlineMap, type JSX } from 'synstate-dom';
 
 type Row = Readonly<{ id: number; label: string }>;
 
@@ -16,8 +16,8 @@ export const Table = (): JSX.Element => (
     <For items={rows$} key={(row) => row.id}>
       {(row$, index$) => (
         <li>
-          {view(index$, (i) => `${i + 1}. `)}
-          {view(row$, (row) => row.label)}
+          {inlineMap(index$, (i) => `${i + 1}. `)}
+          {inlineMap(row$, (row) => row.label)}
         </li>
       )}
     </For>

@@ -1,4 +1,5 @@
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { openPullRequestsUrl } from '../github-links.mjs';
@@ -43,10 +44,12 @@ const blocks: ReadonlyRecord<BlockId, JSX.Element> = {
           <h2 class={constant('section-title')}>
             {constant('Merge order ')}
             <ExternalLink
-              href={view(mergeOrderStore.search, ({ qualifiers }) =>
-                openPullRequestsUrl(reportSource, qualifiers),
+              href={mergeOrderStore.search.pipe(
+                map(({ qualifiers }) =>
+                  openPullRequestsUrl(reportSource, qualifiers),
+                ),
               )}
-              title={view(mergeOrderStore.search, githubSearchTitle)}
+              title={mergeOrderStore.search.pipe(map(githubSearchTitle))}
               variant={'section-link'}
             >
               {constant('on GitHub')}
@@ -54,18 +57,20 @@ const blocks: ReadonlyRecord<BlockId, JSX.Element> = {
           </h2>
           <If
             // Counts of pull requests that were not read would all be 0.
-            cond={view(reader.failed, (failed) => !isUnread(failed, 'pulls'))}
+            cond={reader.failed.pipe(
+              map((failed) => !isUnread(failed, 'pulls')),
+            )}
             then={<MergeOrderFilters />}
           />
         </div>
         <PartFailureNotes parts={OPEN_PARTS} />
         <If
-          cond={view(reader.entries, Arr.isNonEmpty)}
+          cond={reader.entries.pipe(map(Arr.isNonEmpty))}
           then={
             <If
               // The merge order as the filters leave it
               // (`merge-order-view.mts`).
-              cond={view(mergeOrderStore.roots, Arr.isNonEmpty)}
+              cond={mergeOrderStore.roots.pipe(map(Arr.isNonEmpty))}
               then={<MergeOrder depth={0} nodes={mergeOrderStore.roots} />}
               else={
                 <p class={constant('section-note')}>
@@ -79,7 +84,9 @@ const blocks: ReadonlyRecord<BlockId, JSX.Element> = {
           else={
             <If
               // Not "none" when they were not read, which the note above says.
-              cond={view(reader.failed, (failed) => !isUnread(failed, 'pulls'))}
+              cond={reader.failed.pipe(
+                map((failed) => !isUnread(failed, 'pulls')),
+              )}
               then={
                 <p class={constant('section-note')}>
                   {constant('No open pull requests.')}
@@ -90,7 +97,10 @@ const blocks: ReadonlyRecord<BlockId, JSX.Element> = {
         />
       </section>
 
-      <If cond={view(reader.cycles, Arr.isNonEmpty)} then={<CyclesSection />} />
+      <If
+        cond={reader.cycles.pipe(map(Arr.isNonEmpty))}
+        then={<CyclesSection />}
+      />
     </>
   ),
   queue: <QueueSection />,

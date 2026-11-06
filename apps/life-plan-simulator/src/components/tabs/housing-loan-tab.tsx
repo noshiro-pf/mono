@@ -1,6 +1,6 @@
 import { Card } from 'blueprint-synstate';
-import { createState } from 'synstate';
-import { constant, derive, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, deriveBindable, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { housingConditions, housingTypes } from '../../data/index.mjs';
 import {
@@ -32,13 +32,13 @@ import {
 export const HousingLoanTab = (): JSX.Element => {
   const [granularity$, setGranularity] = createState<Granularity>('year');
 
-  const loan$ = view(result$, (r) => r.housingLoan);
+  const loan$ = result$.pipe(map((r) => r.housingLoan));
 
-  const summary = derive([loan$], (loan) =>
+  const summary = deriveBindable([loan$], (loan) =>
     summarizeHousingLoan(loan.schedule),
   );
 
-  const rows = view(result$, (r) => toRows(r.housingLoan, r.birth));
+  const rows = result$.pipe(map((r) => toRows(r.housingLoan, r.birth)));
 
   return (
     <div class={constant('tab-body')}>
@@ -53,7 +53,7 @@ export const HousingLoanTab = (): JSX.Element => {
           <NumberField
             label="借入額（円）"
             e2e="loan-principal"
-            value={view(input$, (i) => i.housingLoan.principal)}
+            value={input$.pipe(map((i) => i.housingLoan.principal))}
             onChange={(principal) => {
               updateSection('housingLoan', (l) => ({ ...l, principal }));
             }}
@@ -61,7 +61,7 @@ export const HousingLoanTab = (): JSX.Element => {
           <NumberField
             label="返済年数（年）"
             e2e="loan-term"
-            value={view(input$, (i) => i.housingLoan.termYears)}
+            value={input$.pipe(map((i) => i.housingLoan.termYears))}
             onChange={(termYears) => {
               updateSection('housingLoan', (l) => ({ ...l, termYears }));
             }}
@@ -69,7 +69,7 @@ export const HousingLoanTab = (): JSX.Element => {
           <TextField
             label="返済開始月"
             type="month"
-            value={view(input$, (i) => i.housingLoan.start)}
+            value={input$.pipe(map((i) => i.housingLoan.start))}
             onChange={(start) => {
               updateSection('housingLoan', (l) => ({ ...l, start }));
             }}
@@ -77,7 +77,7 @@ export const HousingLoanTab = (): JSX.Element => {
           <NumberField
             label="初期金利（年 %）"
             unit="percent"
-            value={view(input$, (i) => i.housingLoan.initialRate)}
+            value={input$.pipe(map((i) => i.housingLoan.initialRate))}
             onChange={(initialRate) => {
               updateSection('housingLoan', (l) => ({ ...l, initialRate }));
             }}
@@ -85,7 +85,7 @@ export const HousingLoanTab = (): JSX.Element => {
           <NumberField
             label="5 年ごとの金利の上昇率（%）"
             unit="percent"
-            value={view(input$, (i) => i.housingLoan.rateIncreasePer5Years)}
+            value={input$.pipe(map((i) => i.housingLoan.rateIncreasePer5Years))}
             onChange={(rateIncreasePer5Years) => {
               updateSection('housingLoan', (l) => ({
                 ...l,
@@ -96,7 +96,7 @@ export const HousingLoanTab = (): JSX.Element => {
           <NumberField
             label="上限金利（年 %）"
             unit="percent"
-            value={view(input$, (i) => i.housingLoan.maxRate)}
+            value={input$.pipe(map((i) => i.housingLoan.maxRate))}
             onChange={(maxRate) => {
               updateSection('housingLoan', (l) => ({ ...l, maxRate }));
             }}
@@ -112,7 +112,7 @@ export const HousingLoanTab = (): JSX.Element => {
               id,
               label: housingTypes.find((h) => h.id === id)?.label ?? id,
             }))}
-            value={view(input$, (i) => i.housingLoan.houseType)}
+            value={input$.pipe(map((i) => i.housingLoan.houseType))}
             onChange={(houseType) => {
               updateSection('housingLoan', (l) => ({ ...l, houseType }));
             }}
@@ -123,14 +123,14 @@ export const HousingLoanTab = (): JSX.Element => {
               id,
               label: housingConditions.find((c) => c.id === id)?.label ?? id,
             }))}
-            value={view(input$, (i) => i.housingLoan.houseCondition)}
+            value={input$.pipe(map((i) => i.housingLoan.houseCondition))}
             onChange={(houseCondition) => {
               updateSection('housingLoan', (l) => ({ ...l, houseCondition }));
             }}
           />
           <CheckboxField
             label="子育て世帯・若者夫婦世帯"
-            value={view(input$, (i) => i.housingLoan.childRearing)}
+            value={input$.pipe(map((i) => i.housingLoan.childRearing))}
             onChange={(childRearing) => {
               updateSection('housingLoan', (l) => ({ ...l, childRearing }));
             }}
@@ -143,26 +143,26 @@ export const HousingLoanTab = (): JSX.Element => {
           <OutputField
             label="初回の返済額"
             e2e="loan-first-payment"
-            value={derive([summary], (s) => formatYen(s.firstPayment))}
+            value={deriveBindable([summary], (s) => formatYen(s.firstPayment))}
           />
           <OutputField
             label="最大の返済額"
-            value={derive([summary], (s) => formatYen(s.maxPayment))}
+            value={deriveBindable([summary], (s) => formatYen(s.maxPayment))}
           />
           <OutputField
             label="総返済額"
             e2e="loan-total-payment"
-            value={derive([summary], (s) => formatYen(s.totalPayment))}
+            value={deriveBindable([summary], (s) => formatYen(s.totalPayment))}
           />
           <OutputField
             label="住宅ローン控除の合計"
-            value={derive([loan$], (l) =>
+            value={deriveBindable([loan$], (l) =>
               formatYen(Arr.sum(l.deductions.map((d) => d.amount))),
             )}
           />
           <OutputField
             label="総返済額 - 住宅ローン控除"
-            value={derive([summary, loan$], (s, l) =>
+            value={deriveBindable([summary, loan$], (s, l) =>
               formatYen(
                 s.totalPayment - Arr.sum(l.deductions.map((d) => d.amount)),
               ),

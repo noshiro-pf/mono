@@ -1,11 +1,12 @@
 import type { TreeNode } from 'pr-report-core';
+import { map } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
   If,
+  inlineMap,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -32,7 +33,7 @@ type Props = Readonly<{
  * that are new.
  */
 export const MergeOrder = ({ nodes, depth }: Props): JSX.Element => {
-  const rows = derive([nodes, reader.byNumber], rowsOf());
+  const rows = deriveBindable([nodes, reader.byNumber], rowsOf());
 
   return (
     <ul
@@ -53,31 +54,31 @@ export const MergeOrder = ({ nodes, depth }: Props): JSX.Element => {
         {(row$) => (
           <li>
             <If
-              cond={view(row$, ({ node }) => node.repeated)}
+              cond={row$.pipe(map(({ node }) => node.repeated))}
               // Declared after more than one predecessor, so it is drawn under
               // each and expanded under the first only.
               then={
                 <div class={constant('pull-request-repeated')}>
-                  <ExternalLink href={view(row$, ({ entry }) => entry.url)}>
-                    {view(row$, ({ node }) => `#${node.number}`)}
+                  <ExternalLink href={row$.pipe(map(({ entry }) => entry.url))}>
+                    {inlineMap(row$, ({ node }) => `#${node.number}`)}
                   </ExternalLink>
                   {constant(' — shown above')}
                 </div>
               }
               else={
                 <PullRequestCard
-                  entry={view(row$, ({ entry }) => entry)}
+                  entry={row$.pipe(map(({ entry }) => entry))}
                   scaleMax={reader.scaleMax}
                 />
               }
             />
 
             <If
-              cond={view(row$, ({ node }) => Arr.isNonEmpty(node.children))}
+              cond={row$.pipe(map(({ node }) => Arr.isNonEmpty(node.children)))}
               then={
                 <MergeOrder
                   depth={depth + 1}
-                  nodes={view(row$, ({ node }) => node.children)}
+                  nodes={row$.pipe(map(({ node }) => node.children))}
                 />
               }
             />

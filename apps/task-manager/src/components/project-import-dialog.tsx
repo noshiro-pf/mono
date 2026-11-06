@@ -1,4 +1,5 @@
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { projectFileStore, type ProjectImport } from '../store/index.mjs';
 import { followModal } from './follow-modal.mjs';
@@ -35,12 +36,14 @@ export const ProjectImportDialog = (): JSX.Element => (
     </div>
     <div class={constant('bp6-dialog-body node-dialog-body')}>
       <p data-e2e={constant('project-import-message')}>
-        {view(projectFileStore.importState, message)}
+        {inlineMap(projectFileStore.importState, message)}
       </p>
       <If
-        cond={view(
-          projectFileStore.importState,
-          (state) => state.type === 'confirming' && state.problem !== undefined,
+        cond={projectFileStore.importState.pipe(
+          map(
+            (state) =>
+              state.type === 'confirming' && state.problem !== undefined,
+          ),
         )}
         then={
           <p
@@ -48,20 +51,20 @@ export const ProjectImportDialog = (): JSX.Element => (
             data-e2e={constant('project-import-problem')}
             role={constant('alert')}
           >
-            {view(projectFileStore.importState, (state) =>
+            {inlineMap(projectFileStore.importState, (state) =>
               state.type === 'confirming' ? (state.problem ?? '') : '',
             )}
           </p>
         }
       />
       <If
-        cond={view(projectFileStore.importState, isRefused)}
+        cond={projectFileStore.importState.pipe(map(isRefused))}
         then={
           <p
             class={constant('project-import-errors')}
             data-e2e={constant('project-import-errors')}
           >
-            {view(projectFileStore.importState, (state) =>
+            {inlineMap(projectFileStore.importState, (state) =>
               state.type === 'refused' ? state.errors.join('\n') : '',
             )}
           </p>
@@ -72,7 +75,7 @@ export const ProjectImportDialog = (): JSX.Element => (
       <span />
       <div class={constant('bp6-dialog-footer-actions')}>
         <If
-          cond={view(projectFileStore.importState, isConfirming)}
+          cond={projectFileStore.importState.pipe(map(isConfirming))}
           then={
             <>
               <button

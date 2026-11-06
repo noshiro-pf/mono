@@ -1,4 +1,5 @@
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, If, type JSX } from 'synstate-dom';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as styles from './app.module.css';
 import {
@@ -60,7 +61,7 @@ export const App = (): JSX.Element => (
     <div class={constant(styles.content)}>
       {tabKeys.map((key, index) => (
         <If
-          cond={view(tabIndex$, (selected) => selected === index)}
+          cond={tabIndex$.pipe(map((selected) => selected === index))}
           then={pages[key]}
         />
       ))}

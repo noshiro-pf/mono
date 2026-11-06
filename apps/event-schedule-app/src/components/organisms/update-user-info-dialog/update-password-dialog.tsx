@@ -1,11 +1,6 @@
 import { Button, FormGroup, InputGroup } from 'blueprint-synstate';
-import {
-  constant,
-  mapBindable,
-  view,
-  type Bindable,
-  type JSX,
-} from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import { UpdatePasswordPageStore } from '../../../store/index.mjs';
 import { LockButton } from '../../molecules/index.mjs';
@@ -25,15 +20,17 @@ export const UpdatePasswordDialog = ({
   dialogIsOpen,
   currentEmail,
 }: Props): JSX.Element => {
-  const isWaitingResponse = view(state, (s) => s.formState.isWaitingResponse);
+  const isWaitingResponse = state.pipe(
+    map((s) => s.formState.isWaitingResponse),
+  );
 
-  const oldPasswordIntent = view(state, (s) => s.oldPasswordFormIntent);
+  const oldPasswordIntent = state.pipe(map((s) => s.oldPasswordFormIntent));
 
-  const newPasswordIntent = view(state, (s) => s.newPasswordFormIntent);
+  const newPasswordIntent = state.pipe(map((s) => s.newPasswordFormIntent));
 
-  const oldPasswordIsOpen = view(state, (s) => s.oldPasswordIsOpen);
+  const oldPasswordIsOpen = state.pipe(map((s) => s.oldPasswordIsOpen));
 
-  const newPasswordIsOpen = view(state, (s) => s.newPasswordIsOpen);
+  const newPasswordIsOpen = state.pipe(map((s) => s.newPasswordIsOpen));
 
   return (
     <UpdateUserInfoDialogTemplate
@@ -54,7 +51,7 @@ export const UpdatePasswordDialog = ({
           </FormGroup>
           <FormGroup
             class={styles.field}
-            helperText={view(state, (s) => s.formState.oldPassword.error)}
+            helperText={state.pipe(map((s) => s.formState.oldPassword.error))}
             intent={oldPasswordIntent}
             label={constant(dc.updatePassword.oldPassword)}
           >
@@ -74,7 +71,7 @@ export const UpdatePasswordDialog = ({
               type={mapBindable(oldPasswordIsOpen, (open) =>
                 open ? 'text' : 'password',
               )}
-              value={view(state, (s) => s.formState.oldPassword.inputValue)}
+              value={state.pipe(map((s) => s.formState.oldPassword.inputValue))}
               onInput={({ currentTarget }) => {
                 UpdatePasswordPageStore.inputOldPasswordHandler(
                   currentTarget.value,
@@ -84,9 +81,8 @@ export const UpdatePasswordDialog = ({
           </FormGroup>
           <FormGroup
             class={styles.field}
-            helperText={view(
-              state,
-              (s) => s.formState.newPassword.password.error,
+            helperText={state.pipe(
+              map((s) => s.formState.newPassword.password.error),
             )}
             intent={newPasswordIntent}
             label={constant(dc.updatePassword.newPassword)}
@@ -97,9 +93,8 @@ export const UpdatePasswordDialog = ({
               disabled={isWaitingResponse}
               intent={newPasswordIntent}
               type={'password'}
-              value={view(
-                state,
-                (s) => s.formState.newPassword.password.inputValue,
+              value={state.pipe(
+                map((s) => s.formState.newPassword.password.inputValue),
               )}
               onInput={({ currentTarget }) => {
                 UpdatePasswordPageStore.inputNewPasswordHandler(
@@ -110,9 +105,8 @@ export const UpdatePasswordDialog = ({
           </FormGroup>
           <FormGroup
             class={styles.field}
-            helperText={view(
-              state,
-              (s) => s.formState.newPassword.passwordConfirmation.error,
+            helperText={state.pipe(
+              map((s) => s.formState.newPassword.passwordConfirmation.error),
             )}
             intent={newPasswordIntent}
             label={constant(dc.updatePassword.verifyNewPassword)}
@@ -132,9 +126,11 @@ export const UpdatePasswordDialog = ({
               type={mapBindable(newPasswordIsOpen, (open) =>
                 open ? 'text' : 'password',
               )}
-              value={view(
-                state,
-                (s) => s.formState.newPassword.passwordConfirmation.inputValue,
+              value={state.pipe(
+                map(
+                  (s) =>
+                    s.formState.newPassword.passwordConfirmation.inputValue,
+                ),
               )}
               onInput={({ currentTarget }) => {
                 UpdatePasswordPageStore.inputNewPasswordConfirmationHandler(
@@ -149,7 +145,7 @@ export const UpdatePasswordDialog = ({
       isWaitingResponse={isWaitingResponse}
       submitButton={
         <Button
-          disabled={view(state, (s) => s.enterButtonDisabled)}
+          disabled={state.pipe(map((s) => s.enterButtonDisabled))}
           intent={'primary'}
           loading={isWaitingResponse}
           text={constant(dc.button.update)}

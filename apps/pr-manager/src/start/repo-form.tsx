@@ -1,5 +1,5 @@
-import { createState } from 'synstate';
-import { constant, MatchOptional, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, MatchOptional, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 import { parseRepository, searchWithRepository } from '../constants.mjs';
 import { navigateToSearch } from '../url.mjs';
@@ -76,7 +76,7 @@ export const RepoForm = ({ initial, initialError }: Props): JSX.Element => {
       </form>
 
       <MatchOptional
-        value={view(error, Optional.fromNullable)}
+        value={error.pipe(map(Optional.fromNullable))}
         some={(error$) => (
           <p class={constant('repo-switch-error')} role={constant('alert')}>
             {error$}

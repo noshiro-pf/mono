@@ -1,4 +1,5 @@
-import { constant, If, view, type Bindable, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, If, type Bindable, type JSX } from 'synstate-dom';
 import { uiStore } from '../store/index.mjs';
 import { AppHeader } from './app-header.js';
 import { BulkEditDialog } from './bulk-edit-dialog.js';
@@ -24,7 +25,7 @@ export const MainScreen = ({ userName }: Props): JSX.Element => (
     <UnsentWritesBar />
     <NoticeBar />
     <If
-      cond={view(uiStore.view, (v) => v === 'list')}
+      cond={uiStore.view.pipe(map((v) => v === 'list'))}
       then={<ListView />}
       else={<DagView />}
     />

@@ -1,4 +1,5 @@
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import type { DagDirection } from '../dag/index.mjs';
 import { m } from '../i18n/index.mjs';
 import { dagLayoutStore, dagViewModeStore } from '../store/index.mjs';
@@ -31,7 +32,7 @@ export const DagToolbar = ({ toolbarRef }: Props): JSX.Element => (
   >
     <DagViewModeSwitch />
     <If
-      cond={view(dagViewModeStore.mode, isArrangeable)}
+      cond={dagViewModeStore.mode.pipe(map(isArrangeable))}
       then={
         <>
           <fieldset
@@ -60,14 +61,14 @@ const directionButton = (
   direction: DagDirection,
   label: string,
 ): JSX.Element => {
-  const pressed = view(
+  const pressed = inlineMap(
     dagLayoutStore.arrangement,
     (arrangement) => arrangement.direction === direction,
   );
 
   return (
     <button
-      aria-pressed={view(dagLayoutStore.arrangement, (arrangement) =>
+      aria-pressed={inlineMap(dagLayoutStore.arrangement, (arrangement) =>
         (arrangement.direction === direction).toString(),
       )}
       class={{ 'bp6-button': constant(true), 'bp6-active': pressed }}

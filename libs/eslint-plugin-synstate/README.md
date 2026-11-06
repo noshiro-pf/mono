@@ -109,8 +109,8 @@ bundle does not have.
 The rule reports a call that creates an observable that keeps working while it
 lives — `.pipe(…)` with a synstate operator (written there or bound to a `const`
 of the file), `combine`, `derive`, `merge`, `zip`, `fromSubscribable`, a
-`counter` without a `times` option, and synstate-dom's `derive`, `mapBindable`
-and `toObservable` — inside:
+`counter` without a `times` option, and synstate-dom's `deriveBindable`,
+`mapBindable` and `toObservable` — inside:
 
 - a JSX prop whose name starts with `on` and a capital letter, including either
   side of a condition (`enabled ? handler : undefined`);

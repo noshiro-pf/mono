@@ -1,8 +1,9 @@
+import { map } from 'synstate';
 import {
   constant,
   For,
+  inlineMap,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -27,7 +28,9 @@ export const CyclesSection = (): JSX.Element => (
     </p>
     <ul>
       <For
-        items={view(reader.cycles, (cycles) => cycles.filter(Arr.isNonEmpty))}
+        items={reader.cycles.pipe(
+          map((cycles) => cycles.filter(Arr.isNonEmpty)),
+        )}
         key={(cycle) => cycle.join('-')}
       >
         {(cycle$) => (
@@ -35,13 +38,13 @@ export const CyclesSection = (): JSX.Element => (
             <For items={cycle$} key={(prNumber) => prNumber}>
               {(prNumber$, index$) => (
                 <>
-                  {view(index$, (index) => (index === 0 ? '' : ' → '))}
+                  {inlineMap(index$, (index) => (index === 0 ? '' : ' → '))}
                   <PullRequestLink prNumber={prNumber$} />
                 </>
               )}
             </For>
             {constant(' → back to ')}
-            <PullRequestLink prNumber={view(cycle$, ([first]) => first)} />
+            <PullRequestLink prNumber={cycle$.pipe(map(([first]) => first))} />
           </li>
         )}
       </For>

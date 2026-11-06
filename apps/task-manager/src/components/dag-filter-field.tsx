@@ -1,11 +1,10 @@
 import { combine, map } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
   If,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -31,7 +30,7 @@ export const DagFilterField = (): JSX.Element => {
 
   const labels$ = dataStore.state.pipe(map(taskLabels));
 
-  const nothingToChoose = derive(
+  const nothingToChoose = deriveBindable(
     [groups, labels$],
     (gs, ls) => Arr.isEmpty(gs) && Arr.isEmpty(ls),
   );
@@ -45,7 +44,7 @@ export const DagFilterField = (): JSX.Element => {
         {constant(m.settings.filter)}
       </legend>
       <If
-        cond={view(groups, Arr.isNonEmpty)}
+        cond={groups.pipe(map(Arr.isNonEmpty))}
         then={
           <fieldset
             class={constant('settings-field-control dag-filter-choices')}
@@ -60,14 +59,14 @@ export const DagFilterField = (): JSX.Element => {
                     map(([f, { id }]) => f.groups.includes(id)),
                   )}
                   e2e={'dag-filter-group'}
-                  title={view(group$, ({ title }) => title)}
-                  value={view(group$, ({ id }) => id)}
+                  title={group$.pipe(map(({ title }) => title))}
+                  value={group$.pipe(map(({ id }) => id))}
                   onChange={onGroupChange}
                 />
               )}
             </For>
             <Choice
-              checked={view(filter, (f) => f.groups.includes(undefined))}
+              checked={filter.pipe(map((f) => f.groups.includes(undefined)))}
               e2e={'dag-filter-group'}
               title={constant(m.settings.noGroup)}
               value={constant('')}
@@ -77,7 +76,7 @@ export const DagFilterField = (): JSX.Element => {
         }
       />
       <If
-        cond={view(labels$, Arr.isNonEmpty)}
+        cond={labels$.pipe(map(Arr.isNonEmpty))}
         then={
           <fieldset
             class={constant('settings-field-control dag-filter-choices')}
@@ -99,7 +98,7 @@ export const DagFilterField = (): JSX.Element => {
               )}
             </For>
             <Choice
-              checked={view(filter, (f) => f.labels.includes(undefined))}
+              checked={filter.pipe(map((f) => f.labels.includes(undefined)))}
               e2e={'dag-filter-label'}
               title={constant(m.settings.noLabel)}
               value={constant('')}
@@ -114,7 +113,7 @@ export const DagFilterField = (): JSX.Element => {
         )}
       </p>
       <If
-        cond={view(filter, (f) => !isDagFilterEmpty(f))}
+        cond={filter.pipe(map((f) => !isDagFilterEmpty(f)))}
         then={
           <button
             class={constant('bp6-button bp6-small')}

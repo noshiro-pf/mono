@@ -1,10 +1,10 @@
-import { createBooleanState, type InitializedObservable } from 'synstate';
+import { createBooleanState, map, type InitializedObservable } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   If,
+  inlineMap,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -61,18 +61,18 @@ export const CardComponent = ({
     c.color === 'black' ? eyeIconColorDef.light : eyeIconColorDef.dark,
   );
 
-  const showOutline = derive(
+  const showOutline = deriveBindable(
     [card, isMouseOver],
     (c, over) =>
       c.showOutline === 'always' || (c.showOutline === 'onHover' && over),
   );
 
   // The values above feed several slots each, so they are nodes of their own;
-  // a value that feeds one slot is a `view`.
+  // a value that feeds one slot is an `inlineMap`.
 
   // Shared by both sides' rectangles.
   const rectStyle = {
-    stroke: derive([card, showOutline], (c, show) =>
+    stroke: deriveBindable([card, showOutline], (c, show) =>
       show ? c.outlineColor : undefined,
     ),
     'stroke-width': mapBindable(showOutline, (show) => (show ? '8px' : '0px')),
@@ -93,8 +93,10 @@ export const CardComponent = ({
       <div
         class={constant(styles.wrapper)}
         style={{
-          cursor: view(card, (c) => (c.isClickable ? 'pointer' : 'default')),
-          transform: derive(
+          cursor: inlineMap(card, (c) =>
+            c.isClickable ? 'pointer' : 'default',
+          ),
+          transform: deriveBindable(
             [card, isMouseOver],
             (c, over) =>
               `translateY(${
@@ -116,33 +118,38 @@ export const CardComponent = ({
       >
         <CardSide
           color={color}
-          number={view(card, (c) =>
-            c.visibilityFromMe === 'faceDownButVisibleToMe'
-              ? c.number
-              : undefined,
+          number={card.pipe(
+            map((c) =>
+              c.visibilityFromMe === 'faceDownButVisibleToMe'
+                ? c.number
+                : undefined,
+            ),
           )}
           rectStyle={rectStyle}
           textColor={textColor}
-          turnedAway={view(card, (c) => c.visibilityFromMe === 'faceUp')}
+          turnedAway={card.pipe(map((c) => c.visibilityFromMe === 'faceUp'))}
         >
           <If
-            cond={view(
-              card,
-              (c) =>
-                c.visibilityFromMe === 'faceDownButVisibleToCounter' ||
-                c.visibilityFromMe === 'faceDownButVisibleToMe',
+            cond={card.pipe(
+              map(
+                (c) =>
+                  c.visibilityFromMe === 'faceDownButVisibleToCounter' ||
+                  c.visibilityFromMe === 'faceDownButVisibleToMe',
+              ),
             )}
             then={<EyeIcon color={eyeIconColor} />}
           />
         </CardSide>
         <CardSide
           color={color}
-          number={view(card, (c) =>
-            c.visibilityFromMe === 'faceUp' ? c.number : undefined,
+          number={card.pipe(
+            map((c) =>
+              c.visibilityFromMe === 'faceUp' ? c.number : undefined,
+            ),
           )}
           rectStyle={rectStyle}
           textColor={textColor}
-          turnedAway={view(card, (c) => c.visibilityFromMe !== 'faceUp')}
+          turnedAway={card.pipe(map((c) => c.visibilityFromMe !== 'faceUp'))}
         />
       </div>
     </div>

@@ -5,7 +5,12 @@ import {
   toDateValue,
   type WallClock,
 } from 'blueprint-synstate';
-import { derive, mapBindable, type Bindable, type JSX } from 'synstate-dom';
+import {
+  deriveBindable,
+  mapBindable,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { DateUtils } from 'ts-fortress-types';
 import { createAnswerDeadlineShortcuts, dict } from '../../constants/index.mjs';
 import {
@@ -26,7 +31,7 @@ export const AnswerDeadlineDatepicker = ({
   answerDeadline,
   onAnswerDeadlineChange,
 }: Props): JSX.Element => {
-  const showError$ = derive(
+  const showError$ = deriveBindable(
     [useAnswerDeadline, answerDeadline],
     (use, deadline) => use && deadline === undefined,
   );

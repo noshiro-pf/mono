@@ -3,9 +3,9 @@ import {
   constant,
   For,
   If,
+  inlineMap,
   MatchOptional,
   render,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
@@ -49,7 +49,7 @@ describe('mount and unmount leave nothing running', () => {
                 <For items={items$} key={(item) => item.id}>
                   {(item$, index$) => (
                     <li>
-                      {view(
+                      {inlineMap(
                         index$,
                         counted((i) => `${i + 1}. `),
                       )}
@@ -67,7 +67,7 @@ describe('mount and unmount leave nothing running', () => {
             value={selected$}
             some={(id$) => (
               <b>
-                {view(
+                {inlineMap(
                   id$,
                   counted((id) => id),
                 )}

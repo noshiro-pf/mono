@@ -1,6 +1,6 @@
 import {
   constant,
-  derive,
+  deriveBindable,
   If,
   mapBindable,
   MatchOptional,
@@ -157,7 +157,7 @@ const StatValue = ({
   <span class={constant('stat-value')}>
     {mapBindable(value, (shown) => shown ?? READING)}
     <MatchOptional
-      value={derive([value, total], (shown, all) =>
+      value={deriveBindable([value, total], (shown, all) =>
         shown === undefined || all === undefined
           ? Optional.none
           : Optional.some({ shown, total: all }),

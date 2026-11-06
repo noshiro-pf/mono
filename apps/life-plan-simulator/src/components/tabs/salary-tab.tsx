@@ -1,6 +1,6 @@
 import { Card } from 'blueprint-synstate';
-import { createState } from 'synstate';
-import { constant, derive, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, deriveBindable, type JSX } from 'synstate-dom';
 import {
   ageAt,
   deriveSalaryEntry,
@@ -37,7 +37,7 @@ export const SalaryTab = (): JSX.Element => {
         <EditableTable
           caption="年収の推移"
           e2e="salary-history"
-          items={view(input$, (i) => i.salaryHistory)}
+          items={input$.pipe(map((i) => i.salaryHistory))}
           columns={historyColumns}
           update={(fn) => {
             updateSection('salaryHistory', fn);
@@ -65,7 +65,7 @@ export const SalaryTab = (): JSX.Element => {
         <ResultTable
           caption="給与・賞与の手取り（円）"
           e2e="salary-table"
-          rows={view(result$, (r) => withAge(r.salary, r.birth))}
+          rows={result$.pipe(map((r) => withAge(r.salary, r.birth)))}
           columns={salaryColumns}
           monthOf={(r) => r.month}
           ageOf={(r) => r.age}
@@ -87,7 +87,7 @@ const historyColumns: readonly EditableColumn<SalaryHistoryEntry>[] = [
     kind: 'derived',
     header: '年齢',
     render: (row$) =>
-      derive([input$, row$], (input, row) => {
+      deriveBindable([input$, row$], (input, row) => {
         const start = parseYearMonth(row.start);
 
         return start === undefined
@@ -123,13 +123,13 @@ const historyColumns: readonly EditableColumn<SalaryHistoryEntry>[] = [
     kind: 'derived',
     header: '月収（額面）',
     render: (row$) =>
-      view(row$, (r) => formatAmount(deriveSalaryEntry(r).monthlyGross)),
+      row$.pipe(map((r) => formatAmount(deriveSalaryEntry(r).monthlyGross))),
   },
   {
     kind: 'derived',
     header: '年収（賞与込み）',
     render: (row$) =>
-      view(row$, (r) => formatAmount(deriveSalaryEntry(r).annualIncome)),
+      row$.pipe(map((r) => formatAmount(deriveSalaryEntry(r).annualIncome))),
   },
 ] as const;
 

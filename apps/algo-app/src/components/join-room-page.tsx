@@ -3,7 +3,7 @@ import {
   createState,
   type InitializedObservable,
 } from 'synstate';
-import { constant, derive, If, type JSX } from 'synstate-dom';
+import { constant, deriveBindable, If, type JSX } from 'synstate-dom';
 import { dictionary, roomPage } from '../constants/index.mjs';
 import { router } from '../router.mjs';
 import { roomStore } from '../store/index.mjs';
@@ -101,7 +101,7 @@ export const JoinRoomPage = ({ roomId }: Props): JSX.Element => {
             intent={'primary'}
             // Joining checks the password against the room, so it waits for the
             // room.
-            disabled={derive(
+            disabled={deriveBindable(
               [username, room, loading],
               (name, r, isLoading) =>
                 name === '' || r === undefined || isLoading,

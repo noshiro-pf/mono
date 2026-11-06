@@ -1,6 +1,6 @@
 import {
   constant,
-  derive,
+  deriveBindable,
   If,
   mapBindable,
   MatchOptional,
@@ -73,7 +73,7 @@ export const CommitDivergence = ({ entry, scaleMax }: Props): JSX.Element => (
                 <span
                   class={constant('divergence-bar')}
                   style={{
-                    'inline-size': derive(
+                    'inline-size': deriveBindable(
                       [shown$, scaleMax],
                       ({ behindBy }, max) => share(behindBy, max),
                     ),
@@ -84,7 +84,7 @@ export const CommitDivergence = ({ entry, scaleMax }: Props): JSX.Element => (
                 <span
                   class={constant('divergence-bar')}
                   style={{
-                    'inline-size': derive(
+                    'inline-size': deriveBindable(
                       [shown$, scaleMax],
                       ({ aheadBy }, max) => share(aheadBy, max),
                     ),

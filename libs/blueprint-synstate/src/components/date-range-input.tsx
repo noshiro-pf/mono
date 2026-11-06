@@ -3,9 +3,9 @@ import {
   constant,
   createAfterUpdate,
   If,
+  inlineMap,
   isImeKeyDown,
   toObservable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -759,7 +759,7 @@ export const DateRangeInput = ({
         ref={(target) => {
           mut_elements.target = target;
         }}
-        aria-expanded={view(open$, String)}
+        aria-expanded={inlineMap(open$, String)}
         aria-haspopup={constant('menu')}
         class={{
           'bp6-control-group': constant(true),

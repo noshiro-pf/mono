@@ -29,15 +29,15 @@ npm install synstate-dom synstate
 ## 最初のコンポーネント
 
 ```tsx
-import { createState } from 'synstate';
-import { constant, render, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, render, type JSX } from 'synstate-dom';
 
 const [count$, _setCount, { updateState: updateCount }] = createState(0);
 
 // Called once. Only the text node bound to `count$` changes afterwards.
 const Counter = (): JSX.Element => (
     <div>
-        <p>{view(count$, (n) => `Count: ${n}`)}</p>
+        <p>{count$.pipe(map((n) => `Count: ${n}`))}</p>
         <button
             type={constant('button')}
             onClick={() => {

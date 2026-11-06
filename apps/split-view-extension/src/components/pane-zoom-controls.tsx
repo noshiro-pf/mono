@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import {
   formatPaneZoom,
   steppedPaneZoom,
@@ -23,7 +23,7 @@ export const PaneZoomControls = ({
       <button
         aria-label={constant('Zoom out')}
         class={constant('pane__button')}
-        disabled={view(
+        disabled={inlineMap(
           pane$,
           (pane) => steppedPaneZoom(pane.zoom, 'out') === pane.zoom,
         )}
@@ -36,7 +36,10 @@ export const PaneZoomControls = ({
         <Icon icon={'minus'} />
       </button>
       <button
-        aria-label={view(zoomLabel$, (label) => `Zoom ${label}. Back to 100%`)}
+        aria-label={inlineMap(
+          zoomLabel$,
+          (label) => `Zoom ${label}. Back to 100%`,
+        )}
         class={constant('pane__zoom')}
         title={constant('Back to 100%')}
         type={constant('button')}
@@ -49,7 +52,7 @@ export const PaneZoomControls = ({
       <button
         aria-label={constant('Zoom in')}
         class={constant('pane__button')}
-        disabled={view(
+        disabled={inlineMap(
           pane$,
           (pane) => steppedPaneZoom(pane.zoom, 'in') === pane.zoom,
         )}

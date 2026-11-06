@@ -22,7 +22,7 @@ synstate-dom はまだバージョン 0.x なので、マイナーリリース�
 - **コンポーネントは一度だけ実行されます。** マウント時に呼ばれて DOM の記述を返し、その後は二度と呼ばれません。メモ化するものはなく、変わる値はコンポーネントの本体ではなく Observable から読みます。
 - **更新は末端へ直接届きます。** 変更は SynState のグリッチのない 1 回の伝搬でグラフを通り、synstate-dom がそれを束縛された各ノードに書き込みます。差分を取ることはなく、古い入力と新しい入力の混ざった値をノードが表示することもありません。
 - **継ぎ目がありません。** `debounce`・`switchMap`・リクエストは、最後に表示されるテキストと同じグラフのノードです。別のライブラリへの橋渡しでは、そこを通る値がすべて変換され、その途中でイベントは値になってしまいます。
-- **何が更新されるかを型が示します。** データを受け取る props と子はすべて `Bindable<T>`、つまり初期値を持つ Observable、`constant(…)`、`view(…)` のいずれかを受け取ります。ただの値は型エラーになるので、スナップショットを誤って渡すことはありません。
+- **何が更新されるかを型が示します。** データを受け取る props と子はすべて `Bindable<T>`、つまり初期値を持つ Observable か `constant(…)` のどちらかを受け取ります。ただの値は型エラーになるので、スナップショットを誤って渡すことはありません。
 - **スコープが後片付けをします。** `If` と `Match` の各分岐と `For` の各行はスコープの中でマウントされ、そこで作ったものはスコープと一緒に破棄されます。
 
 SynState を描画する 3 つの方法の比較：
@@ -163,7 +163,7 @@ import {
     switchMap,
     withInitialValue,
 } from 'synstate';
-import { constant, For, view, type JSX } from 'synstate-dom';
+import { constant, For, type JSX } from 'synstate-dom';
 import { Result } from 'ts-data-forge';
 
 type Search = Readonly<
@@ -226,7 +226,7 @@ export const SearchDemo = (): JSX.Element => (
                 }}
             />
         </label>
-        <p class={constant('status')}>{view(search$, describe)}</p>
+        <p class={constant('status')}>{search$.pipe(map(describe))}</p>
         <ul class={constant('list')}>
             <For items={hits$} key={(fruit) => fruit}>
                 {(fruit$) => <li>{fruit$}</li>}
@@ -272,7 +272,14 @@ const describe = (search: Search): string => {
 
 ```tsx
 import { createState, map } from 'synstate';
-import { constant, For, If, isImeKeyDown, view, type JSX } from 'synstate-dom';
+import {
+    constant,
+    For,
+    If,
+    inlineMap,
+    isImeKeyDown,
+    type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -313,7 +320,7 @@ export const TodoDemo = (): JSX.Element => (
             </button>
         </div>
         <If
-            cond={view(todos$, Arr.isNonEmpty)}
+            cond={todos$.pipe(map(Arr.isNonEmpty))}
             then={
                 <ul class={constant('list')}>
                     <For items={todos$} key={(todo) => todo.id}>
@@ -322,12 +329,17 @@ export const TodoDemo = (): JSX.Element => (
 
                             return (
                                 <li
-                                    class={{ done: view(todo$, (t) => t.done) }}
+                                    class={{
+                                        done: inlineMap(todo$, (t) => t.done),
+                                    }}
                                 >
                                     <label>
                                         <input
                                             type={constant('checkbox')}
-                                            checked={view(todo$, (t) => t.done)}
+                                            checked={inlineMap(
+                                                todo$,
+                                                (t) => t.done,
+                                            )}
                                             onChange={() => {
                                                 toggle(
                                                     todo$.getSnapshot().value
@@ -335,7 +347,7 @@ export const TodoDemo = (): JSX.Element => (
                                                 );
                                             }}
                                         />
-                                        {view(todo$, (t) => ` ${t.title}`)}
+                                        {inlineMap(todo$, (t) => ` ${t.title}`)}
                                     </label>
                                     <span class={constant('note')}>
                                         {constant(
@@ -361,7 +373,7 @@ export const TodoDemo = (): JSX.Element => (
             else={<p>{constant('Nothing to do.')}</p>}
         />
         <p class={constant('status')}>
-            {view(remaining$, (n) => `${n} remaining`)}
+            {remaining$.pipe(map((n) => `${n} remaining`))}
         </p>
     </div>
 );
@@ -404,7 +416,7 @@ todo を追加・切り替え・削除して、**row #** の表示を見てく�
 
 ## 次に読むもの
 
-- [Bindable な値](/mono/synstate-dom/ja/guides/bindable/) — `constant`・`view`・`derive` と、ただの値が拒否される理由。
+- [Bindable な値](/mono/synstate-dom/ja/guides/bindable/) — `constant`・`inlineMap`・`deriveBindable` と、ただの値が拒否される理由。
 - [コンポーネント](/mono/synstate-dom/ja/guides/components/) — props はただの JavaScript であること、子、一度だけ実行されるもの。
 - [制御フロー](/mono/synstate-dom/ja/guides/control-flow/) — `If`・`Match`・`For`・`Portal`。
 - [ライフサイクルとスコープ](/mono/synstate-dom/ja/guides/lifecycle/) — 何がいつ破棄されるか。

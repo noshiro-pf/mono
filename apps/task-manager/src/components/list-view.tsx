@@ -1,5 +1,5 @@
 import { combine, map } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { m } from '../i18n/index.mjs';
 import {
@@ -38,7 +38,7 @@ export const ListView = (): JSX.Element => {
           <ListToolbar />
         </div>
         <If
-          cond={view(dataStore.status, (status) => status === 'loading')}
+          cond={dataStore.status.pipe(map((status) => status === 'loading'))}
           then={
             <output class={constant('bp6-text-muted')}>
               {constant(m.app.loading)}
@@ -46,7 +46,7 @@ export const ListView = (): JSX.Element => {
           }
           else={
             <If
-              cond={view(rows$, Arr.isEmpty)}
+              cond={rows$.pipe(map(Arr.isEmpty))}
               then={
                 <p class={constant('bp6-text-muted')}>
                   {constant(m.list.noTasks)}

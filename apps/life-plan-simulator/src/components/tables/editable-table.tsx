@@ -1,6 +1,6 @@
 import { Button, HtmlTable } from 'blueprint-synstate';
-import type { InitializedObservable } from 'synstate';
-import { constant, For, view, type Bindable, type JSX } from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, For, type Bindable, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { NumberInput, TextInput, type NumberUnit } from '../fields/index.mjs';
 
@@ -130,7 +130,7 @@ const cell = <T extends Readonly<{ id: number }>>(
           label={column.header}
           unit={column.unit ?? 'plain'}
           size={'small'}
-          value={view(row$, column.get)}
+          value={row$.pipe(map(column.get))}
           onChange={(value) => {
             updateRow(row$.getSnapshot().value.id, (row) =>
               column.set(row, value),
@@ -146,7 +146,7 @@ const cell = <T extends Readonly<{ id: number }>>(
           label={column.header}
           type={column.kind}
           size={'small'}
-          value={view(row$, column.get)}
+          value={row$.pipe(map(column.get))}
           onChange={(value) => {
             updateRow(row$.getSnapshot().value.id, (row) =>
               column.set(row, value),

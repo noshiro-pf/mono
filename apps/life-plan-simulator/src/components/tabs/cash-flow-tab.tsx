@@ -1,6 +1,11 @@
 import { Card } from 'blueprint-synstate';
-import { createState, type InitializedObservable } from 'synstate';
-import { constant, derive, view, type Bindable, type JSX } from 'synstate-dom';
+import { createState, map, type InitializedObservable } from 'synstate';
+import {
+  constant,
+  deriveBindable,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type {
   CashFlowMonth,
@@ -30,7 +35,7 @@ export const CashFlowTab = (): JSX.Element => {
         <div class={constant('form')}>
           <NumberField
             label="家賃（円 / 月）"
-            value={view(input$, (i) => i.rent.monthly)}
+            value={input$.pipe(map((i) => i.rent.monthly))}
             onChange={(monthly) => {
               updateSection('rent', (r) => ({ ...r, monthly }));
             }}
@@ -38,7 +43,7 @@ export const CashFlowTab = (): JSX.Element => {
           <TextField
             label="この年月より前まで払う"
             type="month"
-            value={view(input$, (i) => i.rent.until)}
+            value={input$.pipe(map((i) => i.rent.until))}
             onChange={(until) => {
               updateSection('rent', (r) => ({ ...r, until }));
             }}
@@ -49,7 +54,7 @@ export const CashFlowTab = (): JSX.Element => {
         <h2 class={constant('bp6-heading')}>{constant('何年かおきの支出')}</h2>
         <EditableTable
           caption="何年かおきの支出"
-          items={view(input$, (i) => i.periodicExpenses)}
+          items={input$.pipe(map((i) => i.periodicExpenses))}
           columns={periodicColumns}
           update={(fn) => {
             updateSection('periodicExpenses', fn);
@@ -68,7 +73,7 @@ export const CashFlowTab = (): JSX.Element => {
         <h2 class={constant('bp6-heading')}>{constant('臨時収入')}</h2>
         <EditableTable
           caption="臨時収入"
-          items={view(input$, (i) => i.oneOffIncomes)}
+          items={input$.pipe(map((i) => i.oneOffIncomes))}
           columns={oneOffColumns}
           update={(fn) => {
             updateSection('oneOffIncomes', fn);
@@ -80,7 +85,7 @@ export const CashFlowTab = (): JSX.Element => {
         <h2 class={constant('bp6-heading')}>{constant('臨時支出')}</h2>
         <EditableTable
           caption="臨時支出"
-          items={view(input$, (i) => i.oneOffExpenses)}
+          items={input$.pipe(map((i) => i.oneOffExpenses))}
           columns={oneOffColumns}
           update={(fn) => {
             updateSection('oneOffExpenses', fn);
@@ -100,7 +105,7 @@ export const CashFlowTab = (): JSX.Element => {
         <div class={constant('form')}>
           <NumberField
             label="購入額（円）"
-            value={view(input$, (i) => i.oldNisa.amount)}
+            value={input$.pipe(map((i) => i.oldNisa.amount))}
             onChange={(amount) => {
               updateSection('oldNisa', (o) => ({ ...o, amount }));
             }}
@@ -108,7 +113,7 @@ export const CashFlowTab = (): JSX.Element => {
           <TextField
             label="購入した年月"
             type="month"
-            value={view(input$, (i) => i.oldNisa.purchasedAt)}
+            value={input$.pipe(map((i) => i.oldNisa.purchasedAt))}
             onChange={(purchasedAt) => {
               updateSection('oldNisa', (o) => ({ ...o, purchasedAt }));
             }}
@@ -116,7 +121,7 @@ export const CashFlowTab = (): JSX.Element => {
           <TextField
             label="売却する年月"
             type="month"
-            value={view(input$, (i) => i.oldNisa.sellAt)}
+            value={input$.pipe(map((i) => i.oldNisa.sellAt))}
             onChange={(sellAt) => {
               updateSection('oldNisa', (o) => ({ ...o, sellAt }));
             }}
@@ -134,7 +139,7 @@ export const CashFlowTab = (): JSX.Element => {
         <ResultTable
           caption="収支（円）"
           e2e="cash-flow-table"
-          rows={view(result$, (r) => r.rows)}
+          rows={result$.pipe(map((r) => r.rows))}
           columns={cashFlowColumns}
           monthOf={(r) => r.month}
           ageOf={(r) => r.age}
@@ -197,7 +202,7 @@ const periodicStat = (
   row$: InitializedObservable<PeriodicExpense>,
   fn: (amounts: readonly number[]) => string,
 ): Bindable<string> =>
-  derive([input$, result$, row$], (input, result, row) => {
+  deriveBindable([input$, result$, row$], (input, result, row) => {
     const index = input.periodicExpenses.findIndex((e) => e.id === row.id);
 
     return fn(result.rows.map((m) => m.periodicItems[index] ?? 0));

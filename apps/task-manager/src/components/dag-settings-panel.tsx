@@ -1,10 +1,11 @@
+import { map } from 'synstate';
 import {
   constant,
   If,
+  inlineMap,
   listenInScope,
-  view,
+  type InlineMap,
   type JSX,
-  type View,
 } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { dagViewModeStore, uiStore } from '../store/index.mjs';
@@ -41,8 +42,8 @@ import { NodeSizeField } from './node-size-field.js';
 export const DagSettingsPanel = (): JSX.Element => {
   const popoverStyle = (
     property: 'top' | 'right' | 'maxHeight',
-  ): View<string | undefined> =>
-    view(uiStore.settingsPanel, (placement) =>
+  ): InlineMap<string | undefined> =>
+    inlineMap(uiStore.settingsPanel, (placement) =>
       placement?.kind === 'popover' ? `${placement[property]}px` : undefined,
     );
 
@@ -75,7 +76,7 @@ export const DagSettingsPanel = (): JSX.Element => {
       aria-labelledby={constant(TITLE_ID)}
       class={constant('bp6-card settings-panel')}
       data-e2e={constant('dag-settings-panel')}
-      data-placement={view(
+      data-placement={inlineMap(
         uiStore.settingsPanel,
         (placement) => placement?.kind,
       )}
@@ -113,7 +114,7 @@ export const DagSettingsPanel = (): JSX.Element => {
           <DagShowDoneField />
           <NodeSizeField />
           <If
-            cond={view(dagViewModeStore.mode, (mode) => mode !== 'dag')}
+            cond={dagViewModeStore.mode.pipe(map((mode) => mode !== 'dag'))}
             then={<DiagramSortField />}
           />
           <AnimationSettingField />

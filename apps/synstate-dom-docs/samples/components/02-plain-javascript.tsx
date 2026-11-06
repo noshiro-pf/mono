@@ -1,7 +1,7 @@
 import { createState } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   If,
   mapBindable,
   type Bindable,
@@ -30,7 +30,8 @@ export const Compose = (): JSX.Element => (
 const remainingOf = (
   value: Bindable<string>,
   maxLength: Bindable<number>,
-): Bindable<number> => derive([value, maxLength], (v, max) => max - v.length);
+): Bindable<number> =>
+  deriveBindable([value, maxLength], (v, max) => max - v.length);
 
 // A component called only while its branch is mounted, so its text is derived
 // only while it is shown.

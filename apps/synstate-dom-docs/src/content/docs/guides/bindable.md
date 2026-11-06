@@ -1,17 +1,18 @@
 ---
 title: Bindable values
-description: constant, view, and what a slot that takes data accepts.
+description: constant, inlineMap, and what a slot that takes data accepts.
 ---
 
 Every place in JSX that takes data (an attribute, a DOM property, a text child, or a prop of a component the library provides) accepts a `Bindable<T>`:
 
-| `Bindable<T>` is one of    | what happens when it is bound                                       |
-| :------------------------- | :------------------------------------------------------------------ |
-| `InitializedObservable<T>` | written once with its current value, then again on every new value  |
-| `Constant<T>`              | written once; nothing is subscribed                                 |
-| `View<T>`                  | its source is subscribed, and each value is transformed and written |
+| `Bindable<T>` is one of    | what happens when it is bound                                      |
+| :------------------------- | :----------------------------------------------------------------- |
+| `InitializedObservable<T>` | written once with its current value, then again on every new value |
+| `Constant<T>`              | written once; nothing is subscribed                                |
 
 An observable that has already completed, such as `just(...)`, is treated like a constant: written once and never subscribed to.
+
+A slot of an intrinsic element (an attribute, a DOM property, a text child, a value of the `class` or `style` object) also takes an `inlineMap(...)`, the optimization described below. Its type is `ElementBindable<T>`. A prop typed `Bindable`, and the helpers that receive one, never see it. A prop that a component passes to an element unchanged, such as a `Child` or the `<a>` attributes that `Link` spreads onto its anchor, may hold one.
 
 ## `constant`
 
@@ -47,23 +48,23 @@ Things that are not data take plain values: event handlers, `ref`, the `key` fun
 - `constant(obs$)` is a type error too.
 - If `constant` is too long to type, rename it on import: `import { constant as c } from 'synstate-dom'`.
 
-## `view`
+## Transforming an observable: `pipe(map)`, and `inlineMap` where bindings are many
 
-`view(source$, fn)` pairs an observable with a light transformation, and you can pass it wherever a `Bindable` goes:
+To show an observable transformed, write `source$.pipe(map(fn))`. Created inside a component, the `map` node belongs to the component's scope and is disposed with it. In a `For` row, where every row adds its bindings, `inlineMap(source$, fn)` given straight to a slot of an element does the same without the node:
 
 ```tsx
-import { createState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, For, inlineMap, type JSX } from 'synstate-dom';
 
 const [count$, setCount] = createState(0);
 
 export const Counter = (): JSX.Element => (
     <div>
-        {/* `view` transforms in the subscriber: no node joins the graph. */}
-        <p>{view(count$, (n) => `${n} items`)}</p>
+        {/* A `map` node, created in the component: it lives while it is mounted. */}
+        <p>{count$.pipe(map((n) => `${n} items`))}</p>
         <button
             type={constant('button')}
-            disabled={view(count$, (n) => n === 0)}
+            disabled={count$.pipe(map((n) => n === 0))}
             onClick={() => {
                 setCount(0);
             }}
@@ -72,28 +73,48 @@ export const Counter = (): JSX.Element => (
         </button>
     </div>
 );
+
+type Item = Readonly<{ id: number; price: number }>;
+
+const [items$] = createState<readonly Item[]>([
+    { id: 1, price: 120 },
+    { id: 2, price: 80 },
+]);
+
+export const PriceList = (): JSX.Element => (
+    <ul>
+        <For items={items$} key={(item) => item.id}>
+            {/* A binding in every row: `inlineMap` saves a node in each. */}
+            {(item$) => (
+                <li>{inlineMap(item$, (item) => `${item.price} yen`)}</li>
+            )}
+        </For>
+    </ul>
+);
 ```
 
-A `view` adds no node to the synstate graph. The binding subscribes to `source$` itself and runs each value through `fn` before writing it. With a single input there is no way for a glitch to happen, and it is shorter to write than `count$.pipe(map(fn))`.
+`inlineMap` is an optimization of `pipe(map)`, and the name says so. It adds no node to the synstate graph: the binding subscribes to `source$` itself, runs each value through `fn`, and writes the result unless it is `Object.is` the one it wrote last, which is what a `map` node passes on. In a `For` of 1,000 rows with four such bindings each, mounting is about 5% faster, updating every row about 15%, and disposing about 35%; with a few bindings the difference is too small to measure.
 
-`fn` runs on every value, once for each place you bound the view. Pass the same `view` to two places and it runs twice, because the two share nothing. For a heavy transformation, or one whose result several bindings use, make a node with `pipe(map(...))` instead.
+What it gives up is sharing, and being an observable. An inline map is not an observable: it has no `pipe` or `subscribe`, and only a slot of an element takes it, directly or through a prop passed to one unchanged, such as a `Child`. A prop typed `Bindable` (`If`'s `cond` and `For`'s `items` included) does not. A `map` node computes `fn` once per update and holds the result, which every binding, `getSnapshot()` and operator then reads. An inline map holds nothing: passed to two places, `fn` runs twice, and nothing else can read the result. For a heavy transformation, or one whose result several bindings use, keep the node.
 
-## Receiving a `Bindable`: `mapBindable`, `derive`, `toObservable`
+Only `map` has such a form. Several sources (`deriveBindable`) need the node to see all of them after the update: subscribers are called while it propagates, so a subscriber of one would see the others before they update. An operator with state (`scan`) would keep it per binding.
+
+## Receiving a `Bindable`: `mapBindable`, `deriveBindable`, `toObservable`
 
 Inside a component that takes `label: Bindable<string>`, you cannot call `label.pipe(...)`, because `label` may be a constant. Three helpers cover that case:
 
-| helper              | given constants                     | given an observable                    | given a view                 |
-| :------------------ | :---------------------------------- | :------------------------------------- | :--------------------------- |
-| `mapBindable(b, f)` | applies `f` once, returns constant  | `b.pipe(map(f))`                       | a composed view; no node     |
-| `derive([a, b], f)` | all constants: `f` once, a constant | `combine` + `map`, constants as `just` | views made observables first |
-| `toObservable(b)`   | `just(b)`                           | `b` itself                             | `source.pipe(map(fn))`       |
+| helper                      | given constants                     | given an observable           |
+| :-------------------------- | :---------------------------------- | :---------------------------- |
+| `mapBindable(b, f)`         | applies `f` once, returns constant  | `b.pipe(map(f))`              |
+| `deriveBindable([a, b], f)` | all constants: `f` once, a constant | `derive`, constants as `just` |
+| `toObservable(b)`           | `just(b)`                           | `b` itself                    |
 
 Anything derived from constants stays a constant, so the static parts of a view never enter the graph.
 
 ```tsx
 import { debounce, withInitialValue } from 'synstate';
 import {
-    derive,
+    deriveBindable,
     mapBindable,
     toObservable,
     type Bindable,
@@ -109,15 +130,14 @@ export const SearchSummary = ({
     query,
     hits,
 }: SearchSummaryProps): JSX.Element => {
-    // A constant `hits` gives a constant, an observable a `map` node, and a view
-    // a composed view.
+    // A constant `hits` gives a constant, and an observable a `map` node.
     const hitsLabel = mapBindable(hits, (n) =>
         n === 1 ? '1 hit' : `${n} hits`,
     );
 
     // All constants: `fn` runs once and the result is a constant.
-    // Otherwise: `combine` and `map`.
-    const heading = derive([query, hits], (q, n) =>
+    // Otherwise: one node, synstate's `derive`.
+    const heading = deriveBindable([query, hits], (q, n) =>
         n === 0 ? `Nothing for "${q}"` : `Results for "${q}"`,
     );
 
@@ -136,4 +156,4 @@ export const SearchSummary = ({
 };
 ```
 
-Use `toObservable` only where you really need an observable, such as to apply an operator. Turning a constant into an observable adds it to the graph, which `mapBindable` and `derive` avoid.
+Use `toObservable` only where you really need an observable, such as to apply an operator. Turning a constant into an observable adds it to the graph, which `mapBindable` and `deriveBindable` avoid.

@@ -7,7 +7,7 @@ description: Bindable を受け取り特別な扱いの要らない props、一�
 
 ## props は Bindable で受け取る
 
-データを受け取るコンポーネントは、props を `Bindable<T>` で受け取ります。呼び出す側は、Observable・定数・`view` のどれでも渡せます。
+データを受け取るコンポーネントは、props を `Bindable<T>` で受け取ります。呼び出す側は、Observable と定数のどちらでも渡せます。
 
 ```tsx
 import { createState } from 'synstate';
@@ -54,17 +54,17 @@ const Inbox = (): JSX.Element => (
 render(Inbox, document.body);
 ```
 
-`mapBindable` と `derive` を使えば（[Bindable](/mono/synstate-dom/ja/guides/bindable/#bindable-を受け取る側-mapbindablederivetoobservable) を参照）、渡された定数は定数のままで、グラフに入ることもありません。
+`mapBindable` と `deriveBindable` を使えば（[Bindable](/mono/synstate-dom/ja/guides/bindable/#bindable-を受け取る側-mapbindablederivebindabletoobservable) を参照）、渡された定数は定数のままで、グラフに入ることもありません。
 
 ## props は普通の JavaScript の値
 
-データを受け取る props に入っているのは、値を読み出したものではなく Bindable（Observable・定数・`view`）そのものなので、特別に気をつけることはありません。関数の引数を扱ういつもの JavaScript の書き方が props にもそのまま使え、更新も止まりません。
+データを受け取る props に入っているのは、値を読み出したものではなく Bindable（Observable か定数）そのものなので、特別に気をつけることはありません。関数の引数を扱ういつもの JavaScript の書き方が props にもそのまま使え、更新も止まりません。
 
 ```tsx
 import { createState } from 'synstate';
 import {
     constant,
-    derive,
+    deriveBindable,
     If,
     mapBindable,
     type Bindable,
@@ -93,7 +93,8 @@ export const Compose = (): JSX.Element => (
 const remainingOf = (
     value: Bindable<string>,
     maxLength: Bindable<number>,
-): Bindable<number> => derive([value, maxLength], (v, max) => max - v.length);
+): Bindable<number> =>
+    deriveBindable([value, maxLength], (v, max) => max - v.length);
 
 // A component called only while its branch is mounted, so its text is derived
 // only while it is shown.
@@ -161,8 +162,8 @@ Solid では、これらのどれにもルールが付いてきます。props �
 
 この自由さは props が値ではなく Bindable であることから来ていて、裏返すと制約にもなります。Solid では、派生した値は `{props.maxLength - props.value.length}` のような JSX の中の式で、コンパイラが最新に保ってくれます。synstate-dom では、その式を JSX にそのまま書くことはできません。計算を関数に渡して、派生を新しい Bindable として組み立てます。
 
-- 入力が 1 つなら `mapBindable`（Observable を持っているなら `view` や `pipe(map(...))` でも）
-- 入力が複数なら `derive([a, b], fn)`
+- 入力が 1 つなら `mapBindable`（Observable を持っているなら `pipe(map(...))`、束縛が多い所では要素のスロットに限り `inlineMap` でも）
+- 入力が複数なら `deriveBindable([a, b], fn)`
 - 待つ・絞り込む・debounce するといった処理は、`toObservable` を通して synstate のオペレーターで（束縛する前に `withInitialValue` で初期値を付けます）
 - 更新される値によって要素を出し分けるなら、JSX を `&&` や `? :` で囲むのではなく、`Bindable<boolean>` を渡した `If`（か `MatchOptional`・`MatchResult`）で
 
@@ -234,4 +235,4 @@ const Card = ({ title, children }: CardProps): JSX.Element => (
 
 ## 命名
 
-ライブラリ自身の props には `$` を付けていません（`cond`、`items`、`value`）。受け取るのは `Bindable` で、Observable だけでなく定数や `view` のこともあるからです。一方サンプルでは、synstate のドキュメントと同じく、Observable を持つ変数に `$` を付けています（`count$`、`item$`）。どちらも強制ではありません。自作コンポーネントの props に付けるかどうかは、作る人が決めてください。
+ライブラリ自身の props には `$` を付けていません（`cond`、`items`、`value`）。受け取るのは `Bindable` で、Observable だけでなく定数のこともあるからです。一方サンプルでは、synstate のドキュメントと同じく、Observable を持つ変数に `$` を付けています（`count$`、`item$`）。どちらも強制ではありません。自作コンポーネントの props に付けるかどうかは、作る人が決めてください。

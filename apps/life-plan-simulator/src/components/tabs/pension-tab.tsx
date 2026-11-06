@@ -1,5 +1,6 @@
 import { Card, HtmlTable } from 'blueprint-synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import { input$, result$, updateSection } from '../../store/index.mjs';
 import { formatAmount, formatYen } from '../../utils/index.mjs';
 import { NumberField, OutputField } from '../fields/index.mjs';
@@ -19,35 +20,37 @@ export const PensionTab = (): JSX.Element => (
       <div class={constant('form')}>
         <NumberField
           label="基礎年金の加入月数"
-          value={view(input$, (i) => i.pension.basicPensionMonths)}
+          value={input$.pipe(map((i) => i.pension.basicPensionMonths))}
           onChange={(basicPensionMonths) => {
             updateSection('pension', (p) => ({ ...p, basicPensionMonths }));
           }}
         />
         <OutputField
           label="厚生年金の加入年数"
-          value={view(result$, (r) => `${r.pension.enrolledYears} 年`)}
+          value={result$.pipe(map((r) => `${r.pension.enrolledYears} 年`))}
         />
         <OutputField
           label="平均年収"
-          value={view(result$, (r) => formatYen(r.pension.averageAnnualIncome))}
+          value={result$.pipe(
+            map((r) => formatYen(r.pension.averageAnnualIncome)),
+          )}
         />
         <OutputField
           label="老齢厚生年金（報酬比例部分）"
-          value={view(result$, (r) => formatYen(r.pension.welfarePension))}
+          value={result$.pipe(map((r) => formatYen(r.pension.welfarePension)))}
         />
         <OutputField
           label="老齢基礎年金"
-          value={view(result$, (r) => formatYen(r.pension.basicPension))}
+          value={result$.pipe(map((r) => formatYen(r.pension.basicPension)))}
         />
         <OutputField
           label="年金合計（年額）"
           e2e="pension-annual"
-          value={view(result$, (r) => formatYen(r.pension.annualAt65))}
+          value={result$.pipe(map((r) => formatYen(r.pension.annualAt65)))}
         />
         <OutputField
           label="年金合計（月額）"
-          value={view(result$, (r) => formatYen(r.pension.annualAt65 / 12))}
+          value={result$.pipe(map((r) => formatYen(r.pension.annualAt65 / 12)))}
         />
       </div>
     </Card>
@@ -81,7 +84,7 @@ export const PensionTab = (): JSX.Element => (
             {Array.from({ length: 16 }, (_, i) => (
               <tr
                 class={{
-                  selected: view(
+                  selected: inlineMap(
                     input$,
                     (input) =>
                       Math.floor(input.assumptions.pensionStartAge) === 60 + i,
@@ -91,7 +94,7 @@ export const PensionTab = (): JSX.Element => (
                 <th scope={constant('row')}>{constant(`${60 + i} 歳`)}</th>
                 {cells.map((cell) => (
                   <td>
-                    {view(result$, (r) => {
+                    {inlineMap(result$, (r) => {
                       const row = r.pension.byStartAge[i];
 
                       return row === undefined ? '' : cell(row);

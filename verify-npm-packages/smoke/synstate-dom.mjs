@@ -4,7 +4,7 @@ import * as assert from 'node:assert/strict';
 import { createState } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
   If,
   isImeKeyDown,
@@ -23,7 +23,7 @@ import { Fragment, jsx, jsxs } from 'synstate-dom/jsx-runtime';
 const [count, setCount] = createState(1);
 
 // A constant is the value itself at run time, and stays one through
-// `mapBindable` and `derive`, so it never becomes a graph node.
+// `mapBindable` and `deriveBindable`, so it never becomes a graph node.
 const label = constant('count');
 
 assert.equal(label, 'count');
@@ -34,7 +34,7 @@ assert.equal(
 );
 
 // An observable passed in comes back as a derived observable.
-const text = derive([label, count], (l, n) => `${l}: ${n}`);
+const text = deriveBindable([label, count], (l, n) => `${l}: ${n}`);
 
 const mut_seen = [];
 

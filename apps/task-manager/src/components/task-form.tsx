@@ -1,6 +1,6 @@
 import { HtmlSelect } from 'blueprint-synstate';
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import type { RelaxedExtract } from 'ts-type-forge';
 import { priorities, progresses } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
@@ -71,7 +71,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
             data-e2e={constant('title-input')}
             required={constant(true)}
             type={constant('text')}
-            value={view(editor, ({ draft }) => draft.title)}
+            value={inlineMap(editor, ({ draft }) => draft.title)}
             onInput={(changed) => {
               editorStore.updateTaskDraft({
                 title: changed.currentTarget.value,
@@ -84,7 +84,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           <HtmlSelect
             data-e2e={constant('progress-select')}
             fill
-            value={view(editor, ({ draft }) => draft.progress)}
+            value={editor.pipe(map(({ draft }) => draft.progress))}
             onChange={(changed) => {
               const progress = progresses.find(
                 (p) => p === changed.currentTarget.value,
@@ -107,9 +107,9 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
             {constant(m.fields.status)}
           </span>
           <span class={constant('badges')} data-e2e={constant('draft-status')}>
-            <StatusBadge displayStatus={view(insight$, (i) => i.status)} />
+            <StatusBadge displayStatus={insight$.pipe(map((i) => i.status))} />
             <If
-              cond={view(insight$, (i) => i.startedWithUnmetDependencies)}
+              cond={insight$.pipe(map((i) => i.startedWithUnmetDependencies))}
               then={<WarningBadge />}
             />
           </span>
@@ -118,7 +118,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           {constant(m.fields.priority)}
           <HtmlSelect
             fill
-            value={view(editor, ({ draft }) => draft.priority.toString())}
+            value={editor.pipe(map(({ draft }) => draft.priority.toString()))}
             onChange={(changed) => {
               const priority = priorities.find(
                 (p) => p.toString() === changed.currentTarget.value,
@@ -144,8 +144,8 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
         <DateTimeField
           id={'task-due-date'}
           label={m.fields.dueDate}
-          allDay={view(editor, ({ draft }) => draft.dueAllDay)}
-          value={view(editor, ({ draft }) => draft.dueDate)}
+          allDay={editor.pipe(map(({ draft }) => draft.dueAllDay))}
+          value={editor.pipe(map(({ draft }) => draft.dueDate))}
           onAllDayChange={editorStore.setAllDay}
           onChange={(dueDate) => {
             editorStore.updateTaskDraft({ dueDate });
@@ -159,7 +159,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
             min={constant('0')}
             step={constant('0.5')}
             type={constant('number')}
-            value={view(editor, ({ draft }) => draft.estimateHours)}
+            value={inlineMap(editor, ({ draft }) => draft.estimateHours)}
             onInput={(changed) => {
               editorStore.updateTaskDraft({
                 estimateHours: changed.currentTarget.value,
@@ -168,7 +168,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           />
         </label>
         <GroupField
-          value={view(editor, ({ draft }) => draft.groupId)}
+          value={editor.pipe(map(({ draft }) => draft.groupId))}
           onChange={(changed) => {
             editorStore.updateTaskDraft({
               groupId: changed.currentTarget.value,
@@ -192,7 +192,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           <textarea
             class={constant('bp6-input bp6-fill')}
             rows={constant(3)}
-            value={view(editor, ({ draft }) => draft.description)}
+            value={inlineMap(editor, ({ draft }) => draft.description)}
             onInput={(changed) => {
               editorStore.updateTaskDraft({
                 description: changed.currentTarget.value,

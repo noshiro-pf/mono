@@ -1,7 +1,7 @@
 import {
   constant,
+  inlineMap,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -95,12 +95,15 @@ export const AppHeader = ({ userName }: Props): JSX.Element => (
       </label>
       <button
         class={constant('bp6-button bp6-minimal')}
-        disabled={view(sessionStore.signOutState, (state) => state !== 'idle')}
+        disabled={inlineMap(
+          sessionStore.signOutState,
+          (state) => state !== 'idle',
+        )}
         title={mapBindable(userName, (name) => m.header.signedInAs(name))}
         type={constant('button')}
         onClick={sessionStore.signOut}
       >
-        {view(sessionStore.signOutState, (state) =>
+        {inlineMap(sessionStore.signOutState, (state) =>
           state === 'waiting' ? m.header.signingOut : m.header.signOut,
         )}
       </button>

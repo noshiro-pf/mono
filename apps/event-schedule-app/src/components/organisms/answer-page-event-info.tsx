@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, mapBindable, view, type JSX } from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, If, inlineMap, mapBindable, type JSX } from 'synstate-dom';
 import { dict, ymdhm2strWithDay } from '../../constants/index.mjs';
 import { eventIsAfterDeadline } from '../../functions/index.mjs';
 import { Description } from '../atoms/index.mjs';
@@ -12,7 +12,7 @@ type Props = Readonly<{ eventSchedule: InitializedObservable<EventSchedule> }>;
 
 /** The event's title, notes and answer deadline. */
 export const AnswerPageEventInfo = ({ eventSchedule }: Props): JSX.Element => {
-  const afterDeadline$ = view(eventSchedule, eventIsAfterDeadline);
+  const afterDeadline$ = eventSchedule.pipe(map(eventIsAfterDeadline));
 
   return (
     <div class={constant(styles.grid)}>
@@ -23,27 +23,27 @@ export const AnswerPageEventInfo = ({ eventSchedule }: Props): JSX.Element => {
         class={constant(value(styles.value1))}
         data-e2e={constant('event-title')}
       >
-        {view(eventSchedule, (e) => e.title)}
+        {inlineMap(eventSchedule, (e) => e.title)}
       </div>
       <div class={constant(label(styles.label2))}>
         {constant(dc.eventInfo.notes)}
       </div>
       <div class={constant(value(styles.value2))}>
-        <AnswerPageNotes notes={view(eventSchedule, (e) => e.notes)} />
+        <AnswerPageNotes notes={eventSchedule.pipe(map((e) => e.notes))} />
       </div>
       <div class={constant(label(styles.label3))}>
         {constant(dc.eventInfo.answerDeadline)}
       </div>
       <div class={constant(value(styles.value3))}>
         <If
-          cond={view(eventSchedule, (e) => e.answerDeadline === 'none')}
+          cond={eventSchedule.pipe(map((e) => e.answerDeadline === 'none'))}
           then={
             <div>{constant(dict.answerPage.eventInfo.noAnswerDeadline)}</div>
           }
           else={
             <>
               <div>
-                {view(eventSchedule, (e) =>
+                {inlineMap(eventSchedule, (e) =>
                   e.answerDeadline === 'none'
                     ? ''
                     : ymdhm2strWithDay(e.answerDeadline),

@@ -294,20 +294,22 @@ const App = (): JSX.Element => (
         cases={{
             home: () => <Home />,
             products: (m) => (
-                <ProductList page={view(m, (x) => x.search.page)} />
+                <ProductList page={m.pipe(map((x) => x.search.page))} />
             ),
             'products.new': () => <NewProduct />,
             'products.item': (m) => (
-                <ProductDetail productId={view(m, (x) => x.params.productId)} />
+                <ProductDetail
+                    productId={m.pipe(map((x) => x.params.productId))}
+                />
             ),
             'products.item.reviews.item': (m) => <Review match={m} />,
             sandbox: undefined,
             'sandbox.projects': (m) => (
-                <Projects env={view(m, (x) => x.params.env)} />
+                <Projects env={m.pipe(map((x) => x.params.env))} />
             ),
             users: () => <UserList />,
             'users.item': (m) => (
-                <UserDetail userId={view(m, (x) => x.params.userId)} />
+                <UserDetail userId={m.pipe(map((x) => x.params.userId))} />
             ),
             settings: () => <Settings />,
         }}

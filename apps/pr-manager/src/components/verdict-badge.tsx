@@ -1,7 +1,7 @@
 import type { ChecksSummary } from 'pr-report-core';
 import {
   constant,
-  derive,
+  deriveBindable,
   If,
   mapBindable,
   type Bindable,
@@ -37,7 +37,7 @@ type Props = Readonly<{
  * are shown. The names are on hover.
  */
 export const VerdictBadge = ({ checks, unread }: Props): JSX.Element => {
-  const shown = derive(
+  const shown = deriveBindable(
     [checks, unread, reader.features],
     (summary, reason, { requiredChecks }) =>
       reason === undefined
@@ -56,7 +56,7 @@ export const VerdictBadge = ({ checks, unread }: Props): JSX.Element => {
       {mapBindable(shown, ({ label }) => label)}
 
       <If
-        cond={derive(
+        cond={deriveBindable(
           [checks, unread],
           (summary, reason) => summary !== undefined && reason === undefined,
         )}

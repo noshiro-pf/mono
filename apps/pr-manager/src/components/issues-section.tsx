@@ -1,10 +1,11 @@
+import { map } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
   If,
+  inlineMap,
   mapBindable,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
@@ -62,16 +63,18 @@ export const IssuesSection = (): JSX.Element => {
   const issues$ = reader.issues;
 
   // Whether the list has not been read yet.
-  const reading = view(reader.reading, (parts) => parts.includes('issues'));
+  const reading = reader.reading.pipe(map((parts) => parts.includes('issues')));
 
   // Whether the read of it failed with no list to keep, which the note under
   // the title says: the list is not empty, it is not there.
-  const unread = view(reader.failed, (failed) => isUnread(failed, 'issues'));
+  const unread = reader.failed.pipe(
+    map((failed) => isUnread(failed, 'issues')),
+  );
 
-  const dag = view(issuesViewStore.view, (shown) => shown === 'dag');
+  const dag = issuesViewStore.view.pipe(map((shown) => shown === 'dag'));
 
   // The filters as a GitHub search, for the "on GitHub" link.
-  const search = derive(
+  const search = deriveBindable(
     [issuesListStore.view, issuesListStore.query, issuesViewStore.view],
     githubIssuesSearchOf,
   );
@@ -79,7 +82,7 @@ export const IssuesSection = (): JSX.Element => {
   return (
     <section class={constant('section')}>
       <h2 class={constant('section-title')}>
-        {derive(
+        {deriveBindable(
           [reading, unread, issues$],
           (isReading, isUnreadNow, { items, totalCount }) =>
             isReading || isUnreadNow
@@ -115,7 +118,7 @@ export const IssuesSection = (): JSX.Element => {
       </div>
 
       <If
-        cond={derive(
+        cond={deriveBindable(
           [reading, issues$],
           (isReading, { items }) => !isReading && Arr.isNonEmpty(items),
         )}
@@ -144,12 +147,11 @@ export const IssuesSection = (): JSX.Element => {
       />
 
       <If
-        cond={view(issues$, ({ endCursor }) => endCursor !== undefined)}
+        cond={issues$.pipe(map(({ endCursor }) => endCursor !== undefined))}
         then={
           <LoadMoreIssues
-            notListed={view(
-              issues$,
-              ({ items, totalCount }) => totalCount - items.length,
+            notListed={issues$.pipe(
+              map(({ items, totalCount }) => totalCount - items.length),
             )}
           />
         }
@@ -162,14 +164,14 @@ const PARTS = ['issues'] as const;
 
 const IssueList = (): JSX.Element => (
   <If
-    cond={view(reader.issues, ({ items }) => Arr.isEmpty(items))}
+    cond={reader.issues.pipe(map(({ items }) => Arr.isEmpty(items)))}
     then={<p class={constant('section-note')}>{constant('No open issues.')}</p>}
     else={
       <If
-        cond={view(issuesListStore.items, Arr.isEmpty)}
+        cond={issuesListStore.items.pipe(map(Arr.isEmpty))}
         then={
           <p class={constant('section-note')}>
-            {view(issuesListStore.query, (query) =>
+            {inlineMap(issuesListStore.query, (query) =>
               query.trim() === ''
                 ? 'No open issue has the priorities and labels picked.'
                 : 'No open issue with the priorities and labels picked has a title matching the search.',
@@ -183,19 +185,19 @@ const IssueList = (): JSX.Element => (
                 <li class={constant('issue-item')}>
                   <div class={constant('pull-request-heading')}>
                     <span class={constant('pull-request-number')}>
-                      {view(issue$, (issue) => `#${issue.number}`)}
+                      {inlineMap(issue$, (issue) => `#${issue.number}`)}
                     </span>
                     <ExternalLink
-                      href={view(issue$, (issue) => issue.url)}
+                      href={issue$.pipe(map((issue) => issue.url))}
                       variant={'pull-request-title'}
                     >
-                      {view(issue$, (issue) => issue.title)}
+                      {inlineMap(issue$, (issue) => issue.title)}
                     </ExternalLink>
                   </div>
 
                   <IssueStartRow
                     issue={issue$}
-                    start={derive(
+                    start={deriveBindable(
                       [issuesListStore.starts, issue$],
                       (starts, { number }) => starts.get(number),
                     )}
@@ -203,17 +205,19 @@ const IssueList = (): JSX.Element => (
 
                   <div class={constant('pull-request-row')}>
                     <Timestamp
-                      iso={view(issue$, (issue) => issue.updatedAt)}
+                      iso={issue$.pipe(map((issue) => issue.updatedAt))}
                       label={'updated'}
                     />
 
-                    <span>{view(issue$, (issue) => `by ${issue.author}`)}</span>
+                    <span>
+                      {inlineMap(issue$, (issue) => `by ${issue.author}`)}
+                    </span>
 
                     <If
-                      cond={view(issue$, (issue) => issue.comments > 0)}
+                      cond={issue$.pipe(map((issue) => issue.comments > 0))}
                       then={
                         <span>
-                          {view(
+                          {inlineMap(
                             issue$,
                             ({ comments }) =>
                               `${comments} comment${comments === 1 ? '' : 's'}`,
@@ -223,7 +227,7 @@ const IssueList = (): JSX.Element => (
                     />
 
                     <For
-                      items={view(issue$, (issue) => issue.labels)}
+                      items={issue$.pipe(map((issue) => issue.labels))}
                       key={(label) => label.name}
                     >
                       {(label$) => <LabelChip label={label$} />}

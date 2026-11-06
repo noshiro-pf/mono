@@ -3,9 +3,9 @@ import {
   constant,
   For,
   If,
+  inlineMap,
   mapBindable,
   MatchOptional,
-  view,
   type JSX,
 } from 'synstate-dom';
 import type { Href } from 'synstate-router';
@@ -46,7 +46,7 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
 
   return (
     <section
-      aria-busy={view(data$, AsyncData.isPending)}
+      aria-busy={inlineMap(data$, AsyncData.isPending)}
       data-e2e={constant('products')}
     >
       <h1>{constant('Products')}</h1>
@@ -55,7 +55,7 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
         <input
           data-e2e={constant('search')}
           type={constant('search')}
-          value={view(search$, (search) => search.q ?? '')}
+          value={inlineMap(search$, (search) => search.q ?? '')}
           onInput={(inputEvent) => {
             searchProducts(inputEvent.currentTarget.value);
           }}
@@ -68,11 +68,11 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
         <SortLink list$={list$} sort={'price'} />
       </p>
       <If
-        cond={view(data$, AsyncData.isPending)}
+        cond={data$.pipe(map(AsyncData.isPending))}
         then={<p data-e2e={constant('loading')}>{constant('Loading…')}</p>}
       />
       <If
-        cond={view(data$, AsyncData.isErr)}
+        cond={data$.pipe(map(AsyncData.isErr))}
         then={
           <p role={constant('alert')}>
             {constant('Could not load the products.')}
@@ -93,11 +93,13 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
                   {(p$) => (
                     <li>
                       <Link
-                        to={view(p$, (p) =>
-                          routes.products.item.href({ productId: p.id }),
+                        to={p$.pipe(
+                          map((p) =>
+                            routes.products.item.href({ productId: p.id }),
+                          ),
                         )}
                       >
-                        {view(p$, (p) => `${p.name} — ¥${p.price}`)}
+                        {inlineMap(p$, (p) => `${p.name} — ¥${p.price}`)}
                       </Link>
                     </li>
                   )}
@@ -110,7 +112,7 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
       />
       <nav aria-label={constant('Pages')}>
         <If
-          cond={view(search$, (search) => search.page > 1)}
+          cond={search$.pipe(map((search) => search.page > 1))}
           then={
             <Link to={derive([list$, data$], previousHref)}>
               {constant('Previous')}
@@ -118,7 +120,7 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
           }
         />
         <span data-e2e={constant('page')}>
-          {view(search$, (search) => ` Page ${search.page} `)}
+          {inlineMap(search$, (search) => ` Page ${search.page} `)}
         </span>
         <If
           cond={derive(
@@ -128,8 +130,10 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
           )}
           then={
             <Link
-              to={view(list$, (list) =>
-                list.withSearch({ page: asPageNumber(list.search.page + 1) }),
+              to={list$.pipe(
+                map((list) =>
+                  list.withSearch({ page: asPageNumber(list.search.page + 1) }),
+                ),
               )}
             >
               {constant('Next')}

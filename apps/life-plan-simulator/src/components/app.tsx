@@ -1,4 +1,5 @@
-import { If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { If, type JSX } from 'synstate-dom';
 import { sessionStore } from '../store/index.mjs';
 import { MainScreen, SignInScreen, StartingScreen } from './screens/index.mjs';
 
@@ -11,26 +12,25 @@ export const App = (): JSX.Element => {
 
   return (
     <If
-      cond={view(session, (s) => s.type === 'starting')}
+      cond={session.pipe(map((s) => s.type === 'starting'))}
       then={<StartingScreen />}
       else={
         <If
-          cond={view(session, (s) => s.type === 'signed-out')}
+          cond={session.pipe(map((s) => s.type === 'signed-out'))}
           then={
             <SignInScreen
-              error={view(session, (s) =>
-                s.type === 'signed-out' ? s.error : undefined,
+              error={session.pipe(
+                map((s) => (s.type === 'signed-out' ? s.error : undefined)),
               )}
-              signingIn={view(
-                session,
-                (s) => s.type === 'signed-out' && s.signingIn,
+              signingIn={session.pipe(
+                map((s) => s.type === 'signed-out' && s.signingIn),
               )}
             />
           }
           else={
             <MainScreen
-              userName={view(session, (s) =>
-                s.type === 'signed-in' ? s.userName : '',
+              userName={session.pipe(
+                map((s) => (s.type === 'signed-in' ? s.userName : '')),
               )}
             />
           }

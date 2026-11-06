@@ -1,5 +1,11 @@
 import { HtmlTable } from 'blueprint-synstate';
-import { constant, derive, For, mapBindable, type JSX } from 'synstate-dom';
+import {
+  constant,
+  deriveBindable,
+  For,
+  mapBindable,
+  type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { dict } from '../../constants/index.mjs';
 import { loanStore } from '../../store/index.mjs';
@@ -46,7 +52,7 @@ const repaymentType$ = mapBindable(loanStore.inputs, (s) => s.repaymentType);
 
 // From the repayment type alone, so that a change to another input, which
 // starts a calculation, does not format the rows again before its result.
-const rows = derive(
+const rows = deriveBindable(
   [repaymentType$, loanStore.calculatedValues],
   paymentTableRows,
 );

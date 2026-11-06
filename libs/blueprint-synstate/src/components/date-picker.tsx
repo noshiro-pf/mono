@@ -4,7 +4,6 @@ import {
   createAfterUpdate,
   subscribeInScope,
   toObservable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -311,7 +310,9 @@ export const DatePicker = ({
 
               return (
                 <MenuItem
-                  active={view(shortcutIndex$, (picked) => picked === index)}
+                  active={shortcutIndex$.pipe(
+                    map((picked) => picked === index),
+                  )}
                   disabled={
                     Optional.isNone(clock) ||
                     !isDayInRange(clock.value, min, max)
@@ -349,8 +350,10 @@ export const DatePicker = ({
             <TimePicker
               labels={timePickerProps?.labels ?? {}}
               showArrowButtons={timePickerProps?.showArrowButtons ?? false}
-              value={view(value$, (current) =>
-                Optional.isSome(current) ? formatTime(current.value) : '',
+              value={value$.pipe(
+                map((current) =>
+                  Optional.isSome(current) ? formatTime(current.value) : '',
+                ),
               )}
               onChange={(time) => {
                 const current = selected();

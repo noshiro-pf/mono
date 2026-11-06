@@ -1,6 +1,6 @@
 import { Button, FormGroup, InputGroup } from 'blueprint-synstate';
-import { createBooleanState } from 'synstate';
-import { constant, If, mapBindable, view, type JSX } from 'synstate-dom';
+import { createBooleanState, map } from 'synstate';
+import { constant, If, mapBindable, type JSX } from 'synstate-dom';
 import { dict } from '../../constants/index.mjs';
 import { SignInPageStore } from '../../store/index.mjs';
 import { LockButton } from '../molecules/index.mjs';
@@ -23,13 +23,15 @@ export const SignInPage = (): JSX.Element => {
     { setTrue: showResetForm, setFalse: hideResetForm },
   ] = createBooleanState(false);
 
-  const isWaitingResponse = view(state, (s) => s.formState.isWaitingResponse);
+  const isWaitingResponse = state.pipe(
+    map((s) => s.formState.isWaitingResponse),
+  );
 
-  const emailIntent = view(state, (s) => s.emailFormIntent);
+  const emailIntent = state.pipe(map((s) => s.emailFormIntent));
 
-  const passwordIntent = view(state, (s) => s.passwordFormIntent);
+  const passwordIntent = state.pipe(map((s) => s.passwordFormIntent));
 
-  const passwordIsOpen = view(state, (s) => s.passwordIsOpen);
+  const passwordIsOpen = state.pipe(map((s) => s.passwordIsOpen));
 
   return (
     <div class={constant(styles.wrapper)} data-e2e={constant('sign-in-page')}>
@@ -46,7 +48,7 @@ export const SignInPage = (): JSX.Element => {
                 <div>
                   <FormGroup
                     class={styles.field}
-                    helperText={view(state, (s) => s.formState.email.error)}
+                    helperText={state.pipe(map((s) => s.formState.email.error))}
                     intent={emailIntent}
                     label={constant(dc.email)}
                   >
@@ -59,7 +61,9 @@ export const SignInPage = (): JSX.Element => {
                       intent={emailIntent}
                       placeholder={constant('sample@gmail.com')}
                       type={'email'}
-                      value={view(state, (s) => s.formState.email.inputValue)}
+                      value={state.pipe(
+                        map((s) => s.formState.email.inputValue),
+                      )}
                       onInput={({ currentTarget }) => {
                         SignInPageStore.inputEmailHandler(currentTarget.value);
                       }}
@@ -68,7 +72,9 @@ export const SignInPage = (): JSX.Element => {
 
                   <FormGroup
                     class={styles.field}
-                    helperText={view(state, (s) => s.formState.password.error)}
+                    helperText={state.pipe(
+                      map((s) => s.formState.password.error),
+                    )}
                     intent={passwordIntent}
                     label={constant(dc.password)}
                   >
@@ -88,9 +94,8 @@ export const SignInPage = (): JSX.Element => {
                       type={mapBindable(passwordIsOpen, (open) =>
                         open ? 'text' : 'password',
                       )}
-                      value={view(
-                        state,
-                        (s) => s.formState.password.inputValue,
+                      value={state.pipe(
+                        map((s) => s.formState.password.inputValue),
                       )}
                       onInput={({ currentTarget }) => {
                         SignInPageStore.inputPasswordHandler(
@@ -115,7 +120,7 @@ export const SignInPage = (): JSX.Element => {
                 <div class={constant(styles.buttonWrapper)}>
                   <Button
                     data-e2e={constant('sign-in-button')}
-                    disabled={view(state, (s) => s.enterButtonDisabled)}
+                    disabled={state.pipe(map((s) => s.enterButtonDisabled))}
                     fill
                     intent={'primary'}
                     loading={isWaitingResponse}
@@ -125,7 +130,7 @@ export const SignInPage = (): JSX.Element => {
                 </div>
 
                 <OtherErrorMessages
-                  otherErrors={view(state, (s) => s.formState.otherErrors)}
+                  otherErrors={state.pipe(map((s) => s.formState.otherErrors))}
                 />
               </form>
 

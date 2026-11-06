@@ -1,4 +1,10 @@
-import { constant, derive, view, type Bindable, type JSX } from 'synstate-dom';
+import {
+  constant,
+  deriveBindable,
+  inlineMap,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { themeStore } from '../store/index.mjs';
 import { effectiveTheme, type ColorScheme } from '../theme.mjs';
 import { BadgeIcon } from './badge-icon.js';
@@ -13,7 +19,7 @@ import { BadgeIcon } from './badge-icon.js';
  */
 export const ThemeSwitch = (): JSX.Element => {
   const shownIs = (look: ColorScheme): Bindable<string> =>
-    derive([themeStore.theme, themeStore.system], (theme, system) =>
+    deriveBindable([themeStore.theme, themeStore.system], (theme, system) =>
       (effectiveTheme(theme, system) === look).toString(),
     );
 
@@ -21,7 +27,7 @@ export const ThemeSwitch = (): JSX.Element => {
     <fieldset
       aria-label={constant('Theme')}
       class={constant('theme-switch')}
-      title={view(themeStore.theme, (theme) =>
+      title={inlineMap(themeStore.theme, (theme) =>
         theme === 'auto'
           ? 'Following the system. Picking the other look keeps it in the URL.'
           : 'Chosen here, and kept in the URL. Picking what the system shows follows the system again.',

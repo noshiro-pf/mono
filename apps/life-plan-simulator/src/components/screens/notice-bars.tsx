@@ -1,5 +1,6 @@
 import { Button, Callout } from 'blueprint-synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import { planStore, sessionStore } from '../../store/index.mjs';
 
 /**
@@ -9,7 +10,9 @@ import { planStore, sessionStore } from '../../store/index.mjs';
  */
 export const UnsentWritesBar = (): JSX.Element => (
   <If
-    cond={view(sessionStore.signOutState, (state) => state === 'unsent-writes')}
+    cond={sessionStore.signOutState.pipe(
+      map((state) => state === 'unsent-writes'),
+    )}
     then={
       <Callout
         class={'notice-bar'}
@@ -41,10 +44,12 @@ export const UnsentWritesBar = (): JSX.Element => (
 /** Says that a write was refused, until it is dismissed. */
 export const WriteErrorBar = (): JSX.Element => (
   <If
-    cond={view(planStore.writeError, (message) => message !== undefined)}
+    cond={planStore.writeError.pipe(map((message) => message !== undefined))}
     then={
       <Callout class={'notice-bar'} intent={'danger'} role={'alert'}>
-        <span>{view(planStore.writeError, (message) => message ?? '')}</span>
+        <span>
+          {inlineMap(planStore.writeError, (message) => message ?? '')}
+        </span>
         <Button
           icon={'cross'}
           variant={constant('minimal')}

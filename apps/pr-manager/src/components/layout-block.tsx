@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, view, type Child, type JSX } from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, If, inlineMap, type Child, type JSX } from 'synstate-dom';
 import type { BlockId } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
 
@@ -135,7 +135,7 @@ export const LayoutBlock = ({
       class={constant('layout-block')}
       data-block={constant(id)}
       style={{
-        'flex-grow': view(placement$, ({ share }) => share?.toString()),
+        'flex-grow': inlineMap(placement$, ({ share }) => share?.toString()),
       }}
     >
       <div
@@ -143,11 +143,11 @@ export const LayoutBlock = ({
           mut_elements.body = element;
         }}
         class={constant('block-body')}
-        data-sized={view(placement$, ({ height, share }) =>
+        data-sized={inlineMap(placement$, ({ height, share }) =>
           (height !== undefined || share !== undefined).toString(),
         )}
         style={{
-          height: view(placement$, ({ height }) =>
+          height: inlineMap(placement$, ({ height }) =>
             height === undefined ? undefined : `${height}px`,
           ),
         }}
@@ -158,15 +158,14 @@ export const LayoutBlock = ({
       <If
         // The last block of a column in the `fill` mode has nothing to share
         // with.
-        cond={view(
-          placement$,
-          ({ share, next }) => share === undefined || next !== undefined,
+        cond={placement$.pipe(
+          map(({ share, next }) => share === undefined || next !== undefined),
         )}
         then={
           <div
             aria-hidden={constant('true')}
             class={constant('row-divider')}
-            title={view(placement$, ({ share }) =>
+            title={inlineMap(placement$, ({ share }) =>
               share === undefined
                 ? 'Drag to set the height; double-click for the natural height'
                 : 'Drag to share the height with the block below; double-click to even them',

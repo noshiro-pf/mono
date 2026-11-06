@@ -22,7 +22,7 @@ synstate-dom is at version 0.x, so its API may still change in a minor release.
 - **A component runs once.** It is called when it mounts and returns a description of the DOM. It is never called again, so there is nothing to memoize, and a value that changes is read from its Observable rather than from the component body.
 - **Updates go straight to the leaves.** A change propagates through the graph in SynState's single, glitch-free pass, and synstate-dom writes it into each bound node. Nothing is diffed, and no node shows a value computed from a mix of old and new inputs.
 - **No seam.** `debounce`, `switchMap` and a request are nodes of the same graph as the text they end in. A bridge to another library converts every value that crosses it, and turns an event into a value as it goes.
-- **The types say what updates.** Every prop and child that takes data takes a `Bindable<T>`: an Observable with an initial value, a `constant(…)` or a `view(…)`. A plain value is a type error, so a snapshot cannot be passed by mistake.
+- **The types say what updates.** Every prop and child that takes data takes a `Bindable<T>`: an Observable with an initial value or a `constant(…)`. A plain value is a type error, so a snapshot cannot be passed by mistake.
 - **Scopes clean up.** Each branch of `If` and `Match` and each row of `For` is mounted in a scope, and what it creates is disposed with it.
 
 How the three ways to render SynState compare:
@@ -163,7 +163,7 @@ import {
     switchMap,
     withInitialValue,
 } from 'synstate';
-import { constant, For, view, type JSX } from 'synstate-dom';
+import { constant, For, type JSX } from 'synstate-dom';
 import { Result } from 'ts-data-forge';
 
 type Search = Readonly<
@@ -226,7 +226,7 @@ export const SearchDemo = (): JSX.Element => (
                 }}
             />
         </label>
-        <p class={constant('status')}>{view(search$, describe)}</p>
+        <p class={constant('status')}>{search$.pipe(map(describe))}</p>
         <ul class={constant('list')}>
             <For items={hits$} key={(fruit) => fruit}>
                 {(fruit$) => <li>{fruit$}</li>}
@@ -272,7 +272,14 @@ Type quickly, then pause:
 
 ```tsx
 import { createState, map } from 'synstate';
-import { constant, For, If, isImeKeyDown, view, type JSX } from 'synstate-dom';
+import {
+    constant,
+    For,
+    If,
+    inlineMap,
+    isImeKeyDown,
+    type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -313,7 +320,7 @@ export const TodoDemo = (): JSX.Element => (
             </button>
         </div>
         <If
-            cond={view(todos$, Arr.isNonEmpty)}
+            cond={todos$.pipe(map(Arr.isNonEmpty))}
             then={
                 <ul class={constant('list')}>
                     <For items={todos$} key={(todo) => todo.id}>
@@ -322,12 +329,17 @@ export const TodoDemo = (): JSX.Element => (
 
                             return (
                                 <li
-                                    class={{ done: view(todo$, (t) => t.done) }}
+                                    class={{
+                                        done: inlineMap(todo$, (t) => t.done),
+                                    }}
                                 >
                                     <label>
                                         <input
                                             type={constant('checkbox')}
-                                            checked={view(todo$, (t) => t.done)}
+                                            checked={inlineMap(
+                                                todo$,
+                                                (t) => t.done,
+                                            )}
                                             onChange={() => {
                                                 toggle(
                                                     todo$.getSnapshot().value
@@ -335,7 +347,7 @@ export const TodoDemo = (): JSX.Element => (
                                                 );
                                             }}
                                         />
-                                        {view(todo$, (t) => ` ${t.title}`)}
+                                        {inlineMap(todo$, (t) => ` ${t.title}`)}
                                     </label>
                                     <span class={constant('note')}>
                                         {constant(
@@ -361,7 +373,7 @@ export const TodoDemo = (): JSX.Element => (
             else={<p>{constant('Nothing to do.')}</p>}
         />
         <p class={constant('status')}>
-            {view(remaining$, (n) => `${n} remaining`)}
+            {remaining$.pipe(map((n) => `${n} remaining`))}
         </p>
     </div>
 );
@@ -404,7 +416,7 @@ Add, toggle and remove todos, and watch the **row #** labels:
 
 ## Where to Go Next
 
-- [Bindable values](/mono/synstate-dom/guides/bindable/) — `constant`, `view`, `derive` and why a plain value is rejected.
+- [Bindable values](/mono/synstate-dom/guides/bindable/) — `constant`, `inlineMap`, `deriveBindable` and why a plain value is rejected.
 - [Components](/mono/synstate-dom/guides/components/) — props are plain JavaScript, children, and what runs once.
 - [Control flow](/mono/synstate-dom/guides/control-flow/) — `If`, `Match`, `For` and `Portal`.
 - [Lifecycle and scopes](/mono/synstate-dom/guides/lifecycle/) — what is disposed, and when.

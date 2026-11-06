@@ -1,12 +1,12 @@
-import { createState, onScopeDispose } from 'synstate';
+import { createState, map, onScopeDispose } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  derive,
+  deriveBindable,
   If,
+  inlineMap,
   subscribeInScope,
   toObservable,
-  view,
   type Bindable,
   type Child,
   type JSX,
@@ -160,24 +160,24 @@ export const Collapse = ({
     });
   });
 
-  const isContentVisible = view(phase$, (phase) => phase !== 'closed');
+  const isContentVisible = phase$.pipe(map((phase) => phase !== 'closed'));
 
   const body = (
     <div
       ref={(element) => {
         mut_state.body = element;
       }}
-      aria-hidden={view(phase$, (phase) =>
+      aria-hidden={inlineMap(phase$, (phase) =>
         phase === 'closed' ? 'true' : 'false',
       )}
       class={constant('bp6-collapse-body')}
       style={{
-        transform: derive([phase$, bodyHeight$], (phase, bodyHeight) =>
+        transform: deriveBindable([phase$, bodyHeight$], (phase, bodyHeight) =>
           phase === 'closed' || phase === 'closing'
             ? `translateY(-${bodyHeight.toString()}px)`
             : 'translateY(0)',
         ),
-        transition: view(phase$, (phase) =>
+        transition: inlineMap(phase$, (phase) =>
           phase === 'open' ? 'none' : undefined,
         ),
       }}
@@ -194,13 +194,13 @@ export const Collapse = ({
     <div
       class={classObject(['bp6-collapse', className])}
       style={{
-        height: derive([phase$, height$], (phase, height) =>
+        height: deriveBindable([phase$, height$], (phase, height) =>
           phase === 'closed' ? undefined : phase === 'open' ? 'auto' : height,
         ),
-        'overflow-y': view(phase$, (phase) =>
+        'overflow-y': inlineMap(phase$, (phase) =>
           phase === 'open' ? 'visible' : undefined,
         ),
-        transition: view(phase$, (phase) =>
+        transition: inlineMap(phase$, (phase) =>
           phase === 'open' ? 'none' : undefined,
         ),
       }}

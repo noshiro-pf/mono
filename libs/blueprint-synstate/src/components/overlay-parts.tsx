@@ -5,6 +5,7 @@
 // `gen:index:src` leaves it out of the barrel.
 import {
   createState,
+  map,
   onScopeDispose,
   type InitializedObservable,
 } from 'synstate';
@@ -12,12 +13,12 @@ import {
   constant,
   createAfterUpdate,
   If,
+  inlineMap,
   isImeKeyDown,
   listenInScope,
   Portal,
   subscribeInScope,
   toObservable,
-  view,
   type Bindable,
   type ClassObject,
   type JSX,
@@ -251,7 +252,7 @@ export const Overlay = ({
     ([name]) =>
       [
         `${transitionName}-${name}`,
-        view(phase$, (phase) =>
+        inlineMap(phase$, (phase) =>
           transitionClassesOf(transitionName, phase).includes(
             `${transitionName}-${name}`,
           ),
@@ -262,7 +263,7 @@ export const Overlay = ({
   const transitionClass = (base: string): ClassObject =>
     classObject([base], transitionToggles);
 
-  const shown = view(phase$, (phase) => phase !== 'closed');
+  const shown = phase$.pipe(map((phase) => phase !== 'closed'));
 
   const body = (
     <OverlayBody

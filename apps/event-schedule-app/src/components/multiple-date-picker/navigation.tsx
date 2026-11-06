@@ -1,6 +1,6 @@
 import { Button, HtmlSelect } from 'blueprint-synstate';
-import type { InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { Arr, asSafeUint, mapNullable, Num, SafeUint } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
 import type { MonthEnum } from 'ts-type-forge';
@@ -40,7 +40,7 @@ export const DatepickerNav = ({
     />
     <HtmlSelect
       minimal
-      value={view(calendarCurrentPage, (p) => p.year.toString())}
+      value={calendarCurrentPage.pipe(map((p) => p.year.toString()))}
       onChange={({ currentTarget }) => {
         onYearChange(
           mapNullable(Num.from(currentTarget.value), asSafeUint) ?? thisYear,
@@ -55,7 +55,7 @@ export const DatepickerNav = ({
     </HtmlSelect>
     <HtmlSelect
       minimal
-      value={view(calendarCurrentPage, (p) => p.month.toString())}
+      value={calendarCurrentPage.pipe(map((p) => p.month.toString()))}
       onChange={({ currentTarget }) => {
         onMonthChange(
           mapNullable(

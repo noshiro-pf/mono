@@ -1,10 +1,5 @@
-import {
-  constant,
-  toObservable,
-  view,
-  type Bindable,
-  type JSX,
-} from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, toObservable, type Bindable, type JSX } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
 import {
   iconListReducer,
@@ -44,12 +39,12 @@ export const AnswerIconSettingsComponent = ({
       <div>{constant(dc.title)}</div>
       <Description text={constant(dc.description)} />
       <AnswerIconRow
-        answerIcon={view(answerIcons$, (a) => a.good)}
+        answerIcon={answerIcons$.pipe(map((a) => a.good))}
         iconId={'good'}
         onDescriptionChange={onDescriptionChange('good')}
       />
       <AnswerIconRow
-        answerIcon={view(answerIcons$, (a) => a.fair)}
+        answerIcon={answerIcons$.pipe(map((a) => a.fair))}
         iconId={'fair'}
         onDescriptionChange={onDescriptionChange('fair')}
         onPointChange={(point) => {
@@ -57,7 +52,7 @@ export const AnswerIconSettingsComponent = ({
         }}
       />
       <AnswerIconRow
-        answerIcon={view(answerIcons$, (a) => a.poor)}
+        answerIcon={answerIcons$.pipe(map((a) => a.poor))}
         iconId={'poor'}
         onDescriptionChange={onDescriptionChange('poor')}
       />

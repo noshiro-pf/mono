@@ -1,5 +1,5 @@
-import { createState, type InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { createState, type InitializedObservable, map } from 'synstate';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import { Arr, asUint32, Num } from 'ts-data-forge';
 import * as styles from './mui-slider.module.css';
 
@@ -52,7 +52,9 @@ export const MuiSlider = ({
     );
   };
 
-  const percent = view(value, (v) => `${toPercent(v, min, max)}%`);
+  const percent = value.pipe(map((v) => `${toPercent(v, min, max)}%`));
+
+  const label = value.pipe(map((v) => v.toString()));
 
   const change = (next: number): void => {
     if (next !== value.getSnapshot().value) {
@@ -119,7 +121,7 @@ export const MuiSlider = ({
           <span
             class={{
               [styles.mark]: constant(true),
-              [styles.markActive]: view(value, (v) => v >= markValue),
+              [styles.markActive]: inlineMap(value, (v) => v >= markValue),
             }}
             data-index={constant(index.toString())}
             style={{ left: constant(`${toPercent(markValue, min, max)}%`) }}
@@ -141,7 +143,7 @@ export const MuiSlider = ({
           min={constant(min.toString())}
           step={constant(step.toString())}
           type={constant('range')}
-          value={view(value, (v) => v.toString())}
+          value={label}
           onInput={(event) => {
             change(event.currentTarget.valueAsNumber);
           }}
@@ -151,7 +153,7 @@ export const MuiSlider = ({
           class={constant(styles.valueLabel)}
         >
           <span>
-            <span>{view(value, (v) => v.toString())}</span>
+            <span>{label}</span>
           </span>
         </span>
       </span>

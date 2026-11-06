@@ -1,9 +1,10 @@
 import { epochMsOf } from 'pr-report-core';
+import { map } from 'synstate';
 import {
   constant,
+  inlineMap,
   mapBindable,
   MatchOptional,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -31,10 +32,12 @@ export const Timestamp = ({ label, iso }: Props): JSX.Element => (
       <span class={constant('timestamp')}>
         {constant(`${label} `)}
         <time
-          dateTime={view(instant$, (instant) => instant.iso)}
-          title={view(instant$, (instant) => formatLocalTime(instant.epochMs))}
+          dateTime={inlineMap(instant$, (instant) => instant.iso)}
+          title={inlineMap(instant$, (instant) =>
+            formatLocalTime(instant.epochMs),
+          )}
         >
-          <Age epochMs={view(instant$, (instant) => instant.epochMs)} />
+          <Age epochMs={instant$.pipe(map((instant) => instant.epochMs))} />
         </time>
       </span>
     )}

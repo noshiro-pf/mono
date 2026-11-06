@@ -9,7 +9,7 @@ import {
   switchMap,
   withInitialValue,
 } from 'synstate';
-import { constant, For, view, type JSX } from 'synstate-dom';
+import { constant, For, type JSX } from 'synstate-dom';
 import { Result } from 'ts-data-forge';
 
 type Search = Readonly<
@@ -63,7 +63,7 @@ export const SearchDemo = (): JSX.Element => (
         }}
       />
     </label>
-    <p class={constant('status')}>{view(search$, describe)}</p>
+    <p class={constant('status')}>{search$.pipe(map(describe))}</p>
     <ul class={constant('list')}>
       <For items={hits$} key={(fruit) => fruit}>
         {(fruit$) => <li>{fruit$}</li>}

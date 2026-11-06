@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { render, view, type JSX } from 'synstate-dom';
+import { inlineMap, render, type JSX } from 'synstate-dom';
 import type { CounterFramework } from './counter.mjs';
 
 export const synstateDomCounter: CounterFramework = {
@@ -13,7 +13,7 @@ export const synstateDomCounter: CounterFramework = {
           updateState((n) => n + 1);
         }}
       >
-        {view(count$, String)}
+        {inlineMap(count$, String)}
       </button>
     );
 

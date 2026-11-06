@@ -1,4 +1,5 @@
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, If, inlineMap, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { nodeRefOf } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
@@ -16,7 +17,7 @@ import {
  */
 export const DagSelectionBar = (): JSX.Element => (
   <If
-    cond={view(dagSelectionStore.selected, Arr.isNonEmpty)}
+    cond={dagSelectionStore.selected.pipe(map(Arr.isNonEmpty))}
     then={
       <div
         aria-label={constant(m.dag.selection)}
@@ -29,7 +30,7 @@ export const DagSelectionBar = (): JSX.Element => (
           then={
             <>
               <output data-e2e={constant('dag-bulk-delete-question')}>
-                {view(dagSelectionStore.selected, (ids) =>
+                {inlineMap(dagSelectionStore.selected, (ids) =>
                   m.dag.confirmDeleteSelected(ids.length),
                 )}
               </output>
@@ -53,7 +54,7 @@ export const DagSelectionBar = (): JSX.Element => (
           else={
             <>
               <output data-e2e={constant('dag-selection-count')}>
-                {view(dagSelectionStore.selected, (ids) =>
+                {inlineMap(dagSelectionStore.selected, (ids) =>
                   m.dag.selected(ids.length),
                 )}
               </output>

@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, If, MatchOptional, view, type JSX } from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, If, inlineMap, MatchOptional, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 import type { RelaxedExclude } from 'ts-type-forge';
 import { m } from '../i18n/index.mjs';
@@ -40,8 +40,10 @@ export const NodeDialog = (): JSX.Element => (
     }}
   >
     <MatchOptional
-      value={view(editorStore.editor, (editor) =>
-        editor.type === 'closed' ? Optional.none : Optional.some(editor),
+      value={editorStore.editor.pipe(
+        map((editor) =>
+          editor.type === 'closed' ? Optional.none : Optional.some(editor),
+        ),
       )}
       some={(editor$) => <NodeForm editor={editor$} />}
     />
@@ -89,7 +91,7 @@ const NodeForm = ({
   <form class={constant('node-dialog-form')} onSubmit={onSubmit}>
     <div class={constant('bp6-dialog-header')}>
       <h2 class={constant('bp6-heading')} id={constant(TITLE_ID)}>
-        {view(editor, ({ type, isNew }) =>
+        {inlineMap(editor, ({ type, isNew }) =>
           type === 'task'
             ? isNew
               ? m.nodeDialog.newTask
@@ -110,36 +112,38 @@ const NodeForm = ({
     </div>
     <div class={constant('bp6-dialog-body node-dialog-body')}>
       <If
-        cond={view(editor, ({ error }) => error !== undefined)}
+        cond={editor.pipe(map(({ error }) => error !== undefined))}
         then={
           <p
             class={constant('bp6-callout bp6-intent-danger')}
             role={constant('alert')}
           >
-            {view(editor, ({ error }) => error ?? '')}
+            {inlineMap(editor, ({ error }) => error ?? '')}
           </p>
         }
       />
       <MatchOptional
-        value={view(editor, (e) =>
-          e.type === 'task' ? Optional.some(e) : Optional.none,
+        value={editor.pipe(
+          map((e) => (e.type === 'task' ? Optional.some(e) : Optional.none)),
         )}
         some={(task$) => <TaskForm editor={task$} />}
       />
       <MatchOptional
-        value={view(editor, (e) =>
-          e.type === 'milestone' ? Optional.some(e) : Optional.none,
+        value={editor.pipe(
+          map((e) =>
+            e.type === 'milestone' ? Optional.some(e) : Optional.none,
+          ),
         )}
         some={(milestone$) => <MilestoneForm editor={milestone$} />}
       />
     </div>
     <div class={constant('bp6-dialog-footer node-dialog-footer')}>
       <If
-        cond={view(editor, ({ isNew }) => isNew)}
+        cond={editor.pipe(map(({ isNew }) => isNew))}
         then={<span />}
         else={
           <DeleteControls
-            confirming={view(editor, (e) => e.confirmingDelete)}
+            confirming={editor.pipe(map((e) => e.confirmingDelete))}
           />
         }
       />

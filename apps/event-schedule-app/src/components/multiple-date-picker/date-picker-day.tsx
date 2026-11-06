@@ -1,5 +1,5 @@
 import type { InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
 import type { CalendarCell } from '../../hooks/index.mjs';
@@ -18,17 +18,17 @@ export const DatePickerDate = ({
   useOutlinedSelectedStyle,
 }: Props): JSX.Element => (
   <div
-    aria-disabled={view(cell, (c) => (c.outside ? 'true' : 'false'))}
-    aria-label={view(cell, ({ ymd }) =>
+    aria-disabled={inlineMap(cell, (c) => (c.outside ? 'true' : 'false'))}
+    aria-label={inlineMap(cell, ({ ymd }) =>
       DateUtils.create(ymd.year, ymd.month, ymd.date).toString(),
     )}
-    aria-selected={view(cell, (c) => (c.selected ? 'true' : 'false'))}
-    class={view(cell, (c) =>
+    aria-selected={inlineMap(cell, (c) => (c.selected ? 'true' : 'false'))}
+    class={inlineMap(cell, (c) =>
       dayClass(c, onClick !== undefined, useOutlinedSelectedStyle),
     )}
     role={constant('gridcell')}
     tabIndex={constant(-1)}
-    title={view(cell, (c) => c.holidayJpName)}
+    title={inlineMap(cell, (c) => c.holidayJpName)}
     onClick={
       onClick === undefined
         ? undefined
@@ -42,7 +42,7 @@ export const DatePickerDate = ({
     }
   >
     <div class={constant(styles.dayWrapper)}>
-      {view(cell, (c) => c.ymd.date.toString())}
+      {inlineMap(cell, (c) => c.ymd.date.toString())}
     </div>
   </div>
 );

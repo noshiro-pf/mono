@@ -3,7 +3,6 @@ import {
   createAfterUpdate,
   MatchOptional,
   subscribeInScope,
-  view,
   type JSX,
 } from 'synstate-dom';
 import type { PageMatchOf, PageValues } from 'synstate-router';
@@ -64,10 +63,10 @@ export const RoomsPage = ({ values$, windowSize }: Props): JSX.Element => {
         <MatchOptional
           none={<JoinRoomPage roomId={roomId$} />}
           some={() => <GameMain windowSize={windowSize} />}
-          value={view(playerId, Optional.fromNullable)}
+          value={playerId.pipe(map(Optional.fromNullable))}
         />
       )}
-      value={view(roomId, Optional.fromNullable)}
+      value={roomId.pipe(map(Optional.fromNullable))}
     />
   );
 };

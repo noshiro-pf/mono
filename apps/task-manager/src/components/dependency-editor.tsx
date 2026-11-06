@@ -4,7 +4,7 @@ import {
   map,
   type InitializedObservable,
 } from 'synstate';
-import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { Dependency, NodeRef } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
@@ -85,7 +85,7 @@ export const DependencyEditor = ({
   return (
     <div class={constant('dependency-editor')}>
       <If
-        cond={view(rows$, Arr.isEmpty)}
+        cond={rows$.pipe(map(Arr.isEmpty))}
         then={
           <p class={constant('bp6-text-muted')}>
             {constant(m.dependencies.none)}
@@ -112,7 +112,9 @@ export const DependencyEditor = ({
           {constant(m.dependencies.add)}
         </button>
         <If
-          cond={view(options$, (options) => options.some(({ done }) => done))}
+          cond={options$.pipe(
+            map((options) => options.some(({ done }) => done)),
+          )}
           then={
             <label
               class={constant(

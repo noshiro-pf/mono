@@ -1,11 +1,11 @@
 import { Switch } from 'blueprint-synstate';
+import type { InitializedObservable } from 'synstate';
 import {
   constant,
   For,
   type Bindable,
   type Child,
   type JSX,
-  type View,
 } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { Description } from '../atoms/index.mjs';
@@ -13,8 +13,8 @@ import * as styles from './paragraph-with-switch.module.css';
 
 type Props = Readonly<{
   title: string;
-  /** Lines under the title; a `View` of them for lines that change. */
-  description?: View<readonly string[]> | readonly string[];
+  /** Lines under the title; an `InlineMap` of them for lines that change. */
+  description?: InitializedObservable<readonly string[]> | readonly string[];
   toggleState: Bindable<boolean>;
   onToggle: () => void;
   elementToToggle: Child;
@@ -53,5 +53,5 @@ export const ParagraphWithSwitch = ({
 );
 
 const isLines = (
-  description: View<readonly string[]> | readonly string[],
+  description: InitializedObservable<readonly string[]> | readonly string[],
 ): description is readonly string[] => Arr.isArray(description);

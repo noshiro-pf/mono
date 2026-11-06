@@ -1,4 +1,4 @@
-import { constant, derive, If, type JSX } from 'synstate-dom';
+import { constant, deriveBindable, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import {
   chooseLang,
@@ -68,7 +68,7 @@ export const LanguageField = (): JSX.Element => (
 );
 
 /** While a reload would cut something short. */
-const busy = derive(
+const busy = deriveBindable(
   [projectFileStore.importing, sessionStore.session, sessionStore.signOutState],
   (importing, session, signOut) =>
     importing ||

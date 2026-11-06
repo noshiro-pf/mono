@@ -1,5 +1,5 @@
 import { createState, map } from 'synstate';
-import { constant, render, view, type JSX } from 'synstate-dom';
+import { constant, inlineMap, render, type JSX } from 'synstate-dom';
 import type { ScenarioFramework } from '../scenario.mjs';
 import {
   changedValuesOnly,
@@ -21,7 +21,7 @@ import {
 
 /**
  * The zoom is a state, the level a node mapped from it, and every label a node
- * mapped from the level. The cells bind the figures with `view`, which formats
+ * mapped from the level. The cells bind the figures with `inlineMap`, which formats
  * them without adding a node.
  *
  * Measured twice: as written, and with a `skipIfNoChange` after every figure
@@ -48,14 +48,14 @@ const synstateDomZoomWith = (
         <table>
           <tbody>
             <tr>
-              <td>{view(zoom$, zoomText)}</td>
-              <td>{view(level$, (level) => level.toString())}</td>
-              <td>{view(shownCount$, (count) => count.toString())}</td>
+              <td>{inlineMap(zoom$, zoomText)}</td>
+              <td>{inlineMap(level$, (level) => level.toString())}</td>
+              <td>{inlineMap(shownCount$, (count) => count.toString())}</td>
             </tr>
             {sizes.slice(0, shownPlaces).map((size$, index) => (
               <tr>
                 <td>{constant((index + 1).toString())}</td>
-                <td>{view(size$, labelText)}</td>
+                <td>{inlineMap(size$, labelText)}</td>
               </tr>
             ))}
           </tbody>

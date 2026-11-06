@@ -1,9 +1,9 @@
 import { createState, derive, map } from 'synstate';
 import {
   constant,
+  inlineMap,
   isImeKeyDown,
   toObservable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -144,7 +144,7 @@ export const TimePicker = ({
         class={{
           'bp6-timepicker-input': constant(true),
           [`bp6-timepicker-${unit}`]: constant(true),
-          'bp6-intent-danger': view(
+          'bp6-intent-danger': inlineMap(
             text$,
             (text) => !isTimeUnitText(unit, text),
           ),

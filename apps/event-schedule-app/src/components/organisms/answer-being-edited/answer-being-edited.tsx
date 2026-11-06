@@ -2,11 +2,10 @@ import { Button, FormGroup, InputGroup, TextArea } from 'blueprint-synstate';
 import { createBooleanState, map, type InitializedObservable } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
   If,
   mapBindable,
-  view,
   type Bindable,
   type BindableValue,
   type JSX,
@@ -78,13 +77,12 @@ export const AnswerBeingEdited = ({
     },
   ] = createBooleanState(false);
 
-  const intent = view(showUserNameError$, (e) =>
-    e ? ('danger' as const) : ('primary' as const),
+  const intent = showUserNameError$.pipe(
+    map((e) => (e ? ('danger' as const) : ('primary' as const))),
   );
 
-  const datetimeSpecification = view(
-    eventSchedule,
-    (e) => e.datetimeSpecification,
+  const datetimeSpecification = eventSchedule.pipe(
+    map((e) => e.datetimeSpecification),
   );
 
   const {
@@ -98,7 +96,7 @@ export const AnswerBeingEdited = ({
     <>
       <WidthRestrictedInputWrapper>
         <FormGroup
-          helperText={derive(
+          helperText={deriveBindable(
             [showUserNameError$, AnswerPageStore.theNameIsAlreadyUsed$],
             (shown, used) =>
               shown
@@ -114,7 +112,7 @@ export const AnswerBeingEdited = ({
             autoFocus
             data-e2e={constant('username')}
             intent={intent}
-            value={view(answerBeingEdited, (a) => a.user.name)}
+            value={answerBeingEdited.pipe(map((a) => a.user.name))}
             onBlur={touchUserName}
             onInput={({ currentTarget }) => {
               AnswerPageStore.onUserNameChange(
@@ -142,7 +140,7 @@ export const AnswerBeingEdited = ({
         >
           <thead>
             <For
-              items={view(iconHeader$, (h) => (h === undefined ? [] : [h]))}
+              items={iconHeader$.pipe(map((h) => (h === undefined ? [] : [h])))}
               key={() => 0}
             >
               {(header$) => (
@@ -152,7 +150,7 @@ export const AnswerBeingEdited = ({
                     then={
                       <th>
                         <CheckboxView
-                          state={derive(
+                          state={deriveBindable(
                             [checkboxesState$, answerBeingEditedList$],
                             (checked, list) =>
                               checked.size === list.length
@@ -172,7 +170,9 @@ export const AnswerBeingEdited = ({
                       <CustomIconButton
                         data-e2e={`col-${iconId}-button`}
                         iconName={iconId}
-                        title={view(header$, (h) => h[iconId].iconDescription)}
+                        title={header$.pipe(
+                          map((h) => h[iconId].iconDescription),
+                        )}
                         onClick={() => {
                           header$.getSnapshot().value[iconId].onClick();
                         }}
@@ -191,7 +191,9 @@ export const AnswerBeingEdited = ({
                 const row = (): BindableValue<typeof row$> =>
                   row$.getSnapshot().value;
 
-                const iconId = view(row$, (r) => r.answerSelectionValue.iconId);
+                const iconId = row$.pipe(
+                  map((r) => r.answerSelectionValue.iconId),
+                );
 
                 return (
                   <tr data-e2e={constant('answer-being-edited-row')}>
@@ -200,7 +202,7 @@ export const AnswerBeingEdited = ({
                       then={
                         <td>
                           <CheckboxView
-                            state={derive(
+                            state={deriveBindable(
                               [checkboxesState$, row$],
                               (checked, r) =>
                                 checked.has(r.datetimeRange)
@@ -231,7 +233,9 @@ export const AnswerBeingEdited = ({
                             i === id ? 'blue' : 'gray',
                           )}
                           iconName={id}
-                          title={view(row$, (r) => r.buttons[id].description)}
+                          title={row$.pipe(
+                            map((r) => r.buttons[id].description),
+                          )}
                           onClick={() => {
                             row().buttons[id].onClick();
                           }}
@@ -241,7 +245,9 @@ export const AnswerBeingEdited = ({
                     <td class={constant(answerPointCellClass)}>
                       <AnswerIconPointCell
                         iconId={iconId}
-                        point={view(row$, (r) => r.answerSelectionValue.point)}
+                        point={row$.pipe(
+                          map((r) => r.answerSelectionValue.point),
+                        )}
                         onPointChange={(point) => {
                           row().onPointChange(point);
                         }}
@@ -251,9 +257,8 @@ export const AnswerBeingEdited = ({
                       <TextArea
                         class={answerCommentCellClass}
                         rows={1}
-                        value={view(
-                          row$,
-                          (r) => r.answerSelectionValue.comment,
+                        value={row$.pipe(
+                          map((r) => r.answerSelectionValue.comment),
                         )}
                         onInput={({ currentTarget }) => {
                           row().onCommentChange(currentTarget.value);
@@ -278,7 +283,7 @@ export const AnswerBeingEdited = ({
           <TextArea
             autoResize
             fill
-            value={view(answerBeingEdited, (a) => a.comment)}
+            value={answerBeingEdited.pipe(map((a) => a.comment))}
             onInput={({ currentTarget }) => {
               AnswerPageStore.onCommentChange(currentTarget.value);
             }}
@@ -290,14 +295,16 @@ export const AnswerBeingEdited = ({
           description={dc.required.description}
           elementToToggle={[]}
           title={dc.required.title}
-          toggleState={view(answerBeingEdited, (a) => a.isRequiredParticipants)}
+          toggleState={answerBeingEdited.pipe(
+            map((a) => a.isRequiredParticipants),
+          )}
           onToggle={AnswerPageStore.toggleRequiredSection}
         />
       </div>
       <div class={constant(styles.paragraph)}>
         <div class={constant(styles.weightRow)}>
           <WeightSetting
-            weight={view(answerBeingEdited, (a) => a.weight)}
+            weight={answerBeingEdited.pipe(map((a) => a.weight))}
             onWeightChange={AnswerPageStore.onWeightChange}
           />
         </div>
@@ -308,17 +315,21 @@ export const AnswerBeingEdited = ({
 
       <div class={constant(styles.paragraph)}>
         <If
-          cond={view(Auth.fireAuthUser$, (user) => user === undefined)}
+          cond={Auth.fireAuthUser$.pipe(map((user) => user === undefined))}
           else={
             <ParagraphWithSwitch
-              description={view(answerBeingEdited, (a) =>
-                a.user.id === null
-                  ? dc.protected.description.disabled
-                  : dc.protected.description.enabled,
+              description={answerBeingEdited.pipe(
+                map((a) =>
+                  a.user.id === null
+                    ? dc.protected.description.disabled
+                    : dc.protected.description.enabled,
+                ),
               )}
               elementToToggle={[]}
               title={dc.protected.title}
-              toggleState={view(answerBeingEdited, (a) => a.user.id !== null)}
+              toggleState={answerBeingEdited.pipe(
+                map((a) => a.user.id !== null),
+              )}
               onToggle={AnswerPageStore.toggleProtectedSection}
             />
           }

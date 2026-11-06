@@ -1,5 +1,5 @@
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, If, MatchOptional, view, type JSX } from 'synstate-dom';
+import { constant, If, inlineMap, MatchOptional, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import type { GraphLayout } from '../dag/index.mjs';
 import { m } from '../i18n/index.mjs';
@@ -43,17 +43,18 @@ export const DagView = (): JSX.Element => {
 
   return (
     <main
-      aria-busy={view(autoLayout, ({ type }) =>
+      aria-busy={inlineMap(autoLayout, ({ type }) =>
         (type === 'computing').toString(),
       )}
       class={constant('dag-view')}
       data-e2e={constant('dag-view')}
     >
       <If
-        cond={view(
-          dataStore.state,
-          ({ tasks, milestones }) =>
-            Arr.isEmpty(tasks) && Arr.isEmpty(milestones),
+        cond={dataStore.state.pipe(
+          map(
+            ({ tasks, milestones }) =>
+              Arr.isEmpty(tasks) && Arr.isEmpty(milestones),
+          ),
         )}
         then={
           <p class={constant('bp6-text-muted dag-message')}>
@@ -62,13 +63,13 @@ export const DagView = (): JSX.Element => {
         }
         else={
           <If
-            cond={view(autoLayout, ({ type }) => type === 'error')}
+            cond={autoLayout.pipe(map(({ type }) => type === 'error'))}
             then={
               <p
                 class={constant('bp6-callout bp6-intent-danger dag-message')}
                 role={constant('alert')}
               >
-                {view(autoLayout, (layoutState) =>
+                {inlineMap(autoLayout, (layoutState) =>
                   layoutState.type === 'error'
                     ? m.dag.layoutFailed(layoutState.message)
                     : '',

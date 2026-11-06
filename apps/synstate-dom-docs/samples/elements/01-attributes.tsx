@@ -1,5 +1,5 @@
-import { createBooleanState, createState } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { createBooleanState, createState, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 
 const [name$, setName] = createState('');
 
@@ -27,7 +27,7 @@ export const SignUp = (): JSX.Element => (
     {/* A boolean attribute is removed while its value is `false`. */}
     <button
       type={constant('submit')}
-      disabled={view(agreed$, (agreed) => !agreed)}
+      disabled={agreed$.pipe(map((agreed) => !agreed))}
     >
       {constant('Sign up')}
     </button>

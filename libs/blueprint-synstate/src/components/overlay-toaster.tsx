@@ -1,6 +1,7 @@
 import {
   createState,
   derive,
+  map,
   onScopeDispose,
   type InitializedObservable,
 } from 'synstate';
@@ -13,7 +14,6 @@ import {
   listenInScope,
   render,
   subscribeInScope,
-  view,
   type Child,
   type JSX,
 } from 'synstate-dom';
@@ -474,7 +474,10 @@ const ToastView = ({
       onMouseLeave={startTimeout}
     >
       {/* Drawn afresh as the toast is replaced by one with its key. */}
-      <For items={view(row$, ({ toast }) => [toast])} key={(toast) => toast}>
+      <For
+        items={row$.pipe(map(({ toast }) => [toast]))}
+        key={(toast) => toast}
+      >
         {(toast$) => {
           const toast = toast$.getSnapshot().value;
 

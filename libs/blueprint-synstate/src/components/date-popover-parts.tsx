@@ -8,9 +8,9 @@ import { createState, map, onScopeDispose } from 'synstate';
 import {
   constant,
   createAfterUpdate,
+  inlineMap,
   isImeKeyDown,
   listenInScope,
-  view,
   type Child,
   type JSX,
 } from 'synstate-dom';
@@ -167,19 +167,22 @@ export const DatePopover = ({
         class={{
           'bp6-popover-transition-container': constant(true),
           'bp6-overlay-content': constant(true),
-          'bp6-popover-enter': view(phase$, (phase) => phase !== 'done'),
-          'bp6-popover-enter-active': view(
+          'bp6-popover-enter': inlineMap(phase$, (phase) => phase !== 'done'),
+          'bp6-popover-enter-active': inlineMap(
             phase$,
             (phase) => phase === 'active',
           ),
-          'bp6-popover-enter-done': view(phase$, (phase) => phase === 'done'),
+          'bp6-popover-enter-done': inlineMap(
+            phase$,
+            (phase) => phase === 'done',
+          ),
         }}
         style={{
           position: constant('fixed'),
-          left: view(position$, (position) =>
+          left: inlineMap(position$, (position) =>
             Optional.isSome(position) ? `${position.value.left}px` : '0px',
           ),
-          top: view(position$, (position) =>
+          top: inlineMap(position$, (position) =>
             Optional.isSome(position) ? `${position.value.top}px` : '0px',
           ),
         }}
@@ -198,13 +201,13 @@ export const DatePopover = ({
         }}
       >
         <div
-          class={view(
+          class={inlineMap(
             placement$,
             (placement) =>
               `bp6-popover bp6-popover-placement-${placement} ${popoverClass}`,
           )}
           style={{
-            'transform-origin': view(position$, (position) =>
+            'transform-origin': inlineMap(position$, (position) =>
               Optional.isSome(position)
                 ? `${position.value.arrowLeft + ARROW_SIZE / 2}px ${position.value.placement === 'top' ? 'bottom' : 'top'}`
                 : undefined,
@@ -216,21 +219,21 @@ export const DatePopover = ({
             class={constant('bp6-popover-arrow')}
             data-popper-arrow={constant('')}
             style={{
-              left: view(position$, (position) =>
+              left: inlineMap(position$, (position) =>
                 Optional.isSome(position)
                   ? `${position.value.arrowLeft}px`
                   : undefined,
               ),
-              top: view(placement$, (placement) =>
+              top: inlineMap(placement$, (placement) =>
                 placement === 'bottom' ? ARROW_STAND_OFF : undefined,
               ),
-              bottom: view(placement$, (placement) =>
+              bottom: inlineMap(placement$, (placement) =>
                 placement === 'top' ? ARROW_STAND_OFF : undefined,
               ),
             }}
           >
             <svg
-              style={view(
+              style={inlineMap(
                 placement$,
                 (placement) =>
                   `transform: rotate(${placement === 'top' ? -90 : 90}deg);`,

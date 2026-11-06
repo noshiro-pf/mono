@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { constant, derive, If, type JSX } from 'synstate-dom';
+import { constant, deriveBindable, If, type JSX } from 'synstate-dom';
 import { Result } from 'ts-data-forge';
 import { dictionary } from '../constants/index.mjs';
 import { roomStore } from '../store/index.mjs';
@@ -58,7 +58,7 @@ export const CreateRoomPage = (): JSX.Element => {
         <div class={constant(styles.buttonWrapper)}>
           <Button
             intent={'primary'}
-            disabled={derive(
+            disabled={deriveBindable(
               [username, loading],
               (name, isLoading) => name === '' || isLoading,
             )}

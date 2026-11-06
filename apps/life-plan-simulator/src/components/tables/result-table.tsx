@@ -1,10 +1,10 @@
 import { HtmlTable } from 'blueprint-synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
+  inlineMap,
   mapBindable,
-  view,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -38,7 +38,7 @@ export const ResultTable = <R,>({
   granularity: Bindable<Granularity>;
   e2e?: string;
 }>): JSX.Element => {
-  const displayRows = derive([rows, granularity], (rs, g) =>
+  const displayRows = deriveBindable([rows, granularity], (rs, g) =>
     toDisplayRows(rs, g, columns, monthOf, ageOf),
   );
 
@@ -68,9 +68,11 @@ export const ResultTable = <R,>({
           <For items={displayRows} key={(row) => row.key}>
             {(row$) => (
               <tr>
-                <th scope={constant('row')}>{view(row$, (r) => r.label)}</th>
+                <th scope={constant('row')}>
+                  {inlineMap(row$, (r) => r.label)}
+                </th>
                 {columns.map((_, j) => (
-                  <td>{view(row$, (r) => r.cells[j] ?? '')}</td>
+                  <td>{inlineMap(row$, (r) => r.cells[j] ?? '')}</td>
                 ))}
               </tr>
             )}

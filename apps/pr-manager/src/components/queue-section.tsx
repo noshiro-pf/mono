@@ -2,11 +2,11 @@ import { MERGE_QUEUED_LABEL } from 'pr-report-core';
 import { createState, map, type InitializedObservable } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
   If,
+  inlineMap,
   MatchOptional,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
@@ -45,7 +45,7 @@ import { RunStateIcon } from './run-state-icon.js';
  */
 export const QueueSection = (): JSX.Element => {
   // `undefined` while what it is decided from is still being read.
-  const queue = view(reader.queue, Optional.fromNullable);
+  const queue = reader.queue.pipe(map(Optional.fromNullable));
 
   return (
     <section class={constant('section queue-section')}>
@@ -59,7 +59,7 @@ export const QueueSection = (): JSX.Element => {
                 "In the order unblock-prs would pick them. A pull request one of its runs saw green without merging goes last there; that lives in the run's memory and is not shown here.",
               )}
             >
-              {view(queue$, countsOf)}
+              {inlineMap(queue$, countsOf)}
             </span>
           )}
           value={queue}
@@ -95,7 +95,7 @@ const QueueUnordered = (): JSX.Element => {
 
   // Whether the parts the order needs may still come: a read is out, and none
   // of them has failed with nothing kept.
-  const coming = derive(
+  const coming = deriveBindable(
     [reader.fetching, reader.failed],
     (isFetching, failed) =>
       isFetching && OPEN_PARTS.every((part) => !isUnread(failed, part)),
@@ -111,11 +111,11 @@ const QueueUnordered = (): JSX.Element => {
       />
 
       <If
-        cond={view(queued, Arr.isNonEmpty)}
+        cond={queued.pipe(map(Arr.isNonEmpty))}
         then={
           <div class={constant('queue-unordered')}>
             <span class={constant('queue-unordered-label')}>
-              {derive(
+              {deriveBindable(
                 [queued, coming],
                 (entries, isComing) =>
                   `${entries.length} labelled merge-queued, order ${isComing ? 'not known yet' : 'not read'}`,
@@ -126,13 +126,12 @@ const QueueUnordered = (): JSX.Element => {
                 {(entry$) => (
                   <li>
                     <ExternalLink
-                      href={view(entry$, ({ url }) => url)}
-                      title={view(
-                        entry$,
-                        ({ number, title }) => `#${number} ${title}`,
+                      href={entry$.pipe(map(({ url }) => url))}
+                      title={entry$.pipe(
+                        map(({ number, title }) => `#${number} ${title}`),
                       )}
                     >
-                      {view(entry$, ({ number }) => `#${number}`)}
+                      {inlineMap(entry$, ({ number }) => `#${number}`)}
                     </ExternalLink>
                   </li>
                 )}
@@ -241,36 +240,37 @@ const QueueBody = ({
 
   return (
     <If
-      cond={view(
-        queue$,
-        (queue) =>
-          !Arr.isNonEmpty(queue.slots) && !Arr.isNonEmpty(queue.outside),
+      cond={queue$.pipe(
+        map(
+          (queue) =>
+            !Arr.isNonEmpty(queue.slots) && !Arr.isNonEmpty(queue.outside),
+        ),
       )}
       else={
         <>
           <If
-            cond={view(queue$, (queue) => Arr.isNonEmpty(queue.slots))}
+            cond={queue$.pipe(map((queue) => Arr.isNonEmpty(queue.slots)))}
             then={
               <div class={constant('queue-row')}>
                 <span class={constant('queue-base')}>
-                  {view(queue$, (queue) => queue.base)}
+                  {inlineMap(queue$, (queue) => queue.base)}
                   <span aria-hidden={constant('true')}>{constant(' ←')}</span>
                 </span>
 
                 <div
                   class={constant('queue-track')}
-                  data-overflows={view(strip.strip$, (s) =>
+                  data-overflows={inlineMap(strip.strip$, (s) =>
                     overflows(s).toString(),
                   )}
-                  data-more-before={view(strip.strip$, (s) =>
+                  data-more-before={inlineMap(strip.strip$, (s) =>
                     edgesOf(s).before.toString(),
                   )}
-                  data-more-after={view(strip.strip$, (s) =>
+                  data-more-after={inlineMap(strip.strip$, (s) =>
                     edgesOf(s).after.toString(),
                   )}
                 >
                   <If
-                    cond={view(strip.strip$, overflows)}
+                    cond={strip.strip$.pipe(map(overflows))}
                     then={
                       <QueueMap
                         slots$={slots$}
@@ -291,8 +291,11 @@ const QueueBody = ({
                       {(slot$, index$) => (
                         <li
                           class={constant('queue-slot')}
-                          data-kind={view(slot$, (slot) => slot.kind)}
-                          data-priority={view(slot$, (slot) => slot.priority)}
+                          data-kind={inlineMap(slot$, (slot) => slot.kind)}
+                          data-priority={inlineMap(
+                            slot$,
+                            (slot) => slot.priority,
+                          )}
                         >
                           <QueueSlotBox
                             slot$={slot$}
@@ -300,7 +303,7 @@ const QueueBody = ({
                             onShow={show}
                           />
                           <span class={constant('queue-place')}>
-                            {derive(
+                            {deriveBindable(
                               [slot$, index$, running$],
                               (slot, index, running) =>
                                 placeOf(slot, index - running),
@@ -313,7 +316,10 @@ const QueueBody = ({
 
                   <MatchOptional
                     some={(tip$) => <QueueTip tip={tip$} />}
-                    value={derive([queue$, shown$, strip.strip$], slotTipOf)}
+                    value={deriveBindable(
+                      [queue$, shown$, strip.strip$],
+                      slotTipOf,
+                    )}
                   />
                 </div>
               </div>
@@ -322,7 +328,7 @@ const QueueBody = ({
 
           <div class={constant('queue-foot')}>
             <If
-              cond={view(queue$, (queue) => Arr.isNonEmpty(queue.outside))}
+              cond={queue$.pipe(map((queue) => Arr.isNonEmpty(queue.outside)))}
               then={
                 <div class={constant('queue-outside')}>
                   <span class={constant('queue-outside-label')}>
@@ -330,7 +336,7 @@ const QueueBody = ({
                   </span>
                   <ul class={constant('queue-outside-list')}>
                     <For
-                      items={view(queue$, (queue) => queue.outside)}
+                      items={queue$.pipe(map((queue) => queue.outside))}
                       key={(node) => node.number}
                     >
                       {(node$) => (
@@ -352,7 +358,7 @@ const QueueBody = ({
 
             <MatchOptional
               some={(tip$) => <QueueTip tip={tip$} />}
-              value={derive([queue$, shown$], outsideTipOf)}
+              value={deriveBindable([queue$, shown$], outsideTipOf)}
             />
           </div>
         </>

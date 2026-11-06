@@ -1,10 +1,11 @@
+import { map } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
   If,
+  inlineMap,
   MatchOptional,
-  view,
   type JSX,
 } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
@@ -34,11 +35,11 @@ import { SvgTitle } from './svg-elements.js';
  */
 export const IssueDag = (): JSX.Element => (
   <If
-    cond={view(issuesViewStore.graph, ({ nodes }) => Arr.isNonEmpty(nodes))}
+    cond={issuesViewStore.graph.pipe(map(({ nodes }) => Arr.isNonEmpty(nodes)))}
     then={<Dag />}
     else={
       <p class={constant('section-note')}>
-        {derive(
+        {deriveBindable(
           [reader.issues, issuesListStore.filter, issuesViewStore.counts],
           ({ items }, { hideInProgress }, { open, inProgress }) =>
             Arr.isEmpty(items)
@@ -89,14 +90,14 @@ const Dag = (): JSX.Element => {
       >
         <svg
           class={constant('issue-dag-svg')}
-          height={derive([layout$, scale$], (layout, scale) =>
+          height={deriveBindable([layout$, scale$], (layout, scale) =>
             Math.floor(layout.height * scale),
           )}
-          viewBox={view(
+          viewBox={inlineMap(
             layout$,
             ({ width, height }) => `0 0 ${width} ${height}`,
           )}
-          width={derive([layout$, scale$], (layout, scale) =>
+          width={deriveBindable([layout$, scale$], (layout, scale) =>
             Math.floor(layout.width * scale),
           )}
         >
@@ -121,12 +122,12 @@ const Dag = (): JSX.Element => {
           </defs>
 
           <g class={constant('issue-dag-edges')}>
-            <For items={view(layout$, ({ edges }) => edges)} key={edgeKey}>
+            <For items={layout$.pipe(map(({ edges }) => edges))} key={edgeKey}>
               {(edge$) => (
                 <path
                   class={constant('issue-dag-edge')}
-                  d={view(edge$, ({ path }) => path)}
-                  data-kind={view(edge$, ({ kind }) => kind)}
+                  d={inlineMap(edge$, ({ path }) => path)}
+                  data-kind={inlineMap(edge$, ({ kind }) => kind)}
                   // The kind is in the key, so it is the one the row was made
                   // with.
                   marker-end={
@@ -140,14 +141,16 @@ const Dag = (): JSX.Element => {
           </g>
 
           <MatchOptional
-            value={view(layout$, ({ unconnectedLabel }) =>
-              Optional.fromNullable(unconnectedLabel),
+            value={layout$.pipe(
+              map(({ unconnectedLabel }) =>
+                Optional.fromNullable(unconnectedLabel),
+              ),
             )}
             some={(at$) => (
               <text
                 class={constant('issue-dag-group-label')}
-                x={view(at$, ({ x }) => x)}
-                y={view(at$, ({ y }) => y)}
+                x={inlineMap(at$, ({ x }) => x)}
+                y={inlineMap(at$, ({ y }) => y)}
               >
                 {constant('No dependencies drawn either way')}
               </text>
@@ -156,7 +159,7 @@ const Dag = (): JSX.Element => {
 
           <g class={constant('issue-dag-nodes')}>
             <For
-              items={derive([layout$, graph$], placedNodesOf)}
+              items={deriveBindable([layout$, graph$], placedNodesOf)}
               key={({ node }) => node.number}
             >
               {(placed$) => <IssueDagNode placed$={placed$} />}
