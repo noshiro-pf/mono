@@ -173,12 +173,12 @@ type ElementProps<E extends Element> = Readonly<
 >;
 ```
 
-- **属性とプロパティを区別する。** `value`・`checked`・`selected`・`indeterminate` など、ユーザー操作で属性と実体がずれるものはプロパティとして書く（`el[key] = v`）。それ以外は `setAttribute`。区別の一覧は 1 つの定数表に置き、型と実行時の両方がそれを読む。HTML の要素が属性として受け付けるキーは、どれも束縛するとプロパティに効くことをブラウザのテストで確かめる（SVG の属性、`aria-*`・`data-*` は対象外）。キーの一覧は `gen:reflected-keys` が型から書き出し、TypeScript の更新で増えたキーもテストに入る。
+- **属性とプロパティを区別する。** `value`・`checked`・`selected`・`indeterminate` など、ユーザー操作で属性と実体がずれるものはプロパティとして書く（`el[key] = v`）。それ以外は `setAttribute`。区別の一覧は 1 つの定数表に置き、型と実行時の両方がそれを読む。HTML の要素が属性として受け付けるキーは、どれも束縛するとプロパティに効くことをブラウザのテストで確かめる（SVG の属性は下の「SVG」で別に確かめる。`aria-*`・`data-*` は対象外）。キーの一覧は `gen:reflected-keys` が型から書き出し、TypeScript の更新で増えたキーもテストに入る。
 - **イベント** は `on` + `HTMLElementEventMap` のキーを PascalCase にしたもの（`onClick`）。引数は `ev: HTMLElementEventMap[K] & Readonly<{ currentTarget: E }>`。値は関数のみで Observable は受け付けない（決定事項 4 の例外）。
 - **`ref`** は要素を作った直後、子をマウントする前に 1 回呼ぶ。属性・プロパティの束縛もイベントの登録もまだ行われていない（「6.3」）。
 - 真偽属性（`disabled` など）は `Bindable<boolean>` で受け、`false` で属性を外す。
 - **イベントの props 名**は、イベント名が小文字の 1 語（`pointerdown`）で単語の境目が分からないので、イベント名から props 名（`onPointerDown`）への対応表を型で持つ。表が `HTMLElementEventMap` と `SVGElementEventMap` のキーをすべて覆うことはテストで確かめる。実行時は props 名を小文字にすればイベント名に戻るので、表を読まない。
-- **SVG** の要素は `SVGElementTagNameMap` のうち HTML に無いタグを SVG の名前空間で作る。`a`・`script`・`style`・`title` は HTML にもあるので、どこに書いても HTML の要素になる。SVG のプロパティは `SVGAnimatedLength` などで属性の型を読み取れないので、受け付ける属性は一覧で持つ。
+- **SVG** の要素は `SVGElementTagNameMap` のうち HTML に無いタグを SVG の名前空間で作る。`a`・`script`・`style`・`title` は HTML にもあるので、どこに書いても HTML の要素になる。SVG のプロパティは `SVGAnimatedLength` などで属性の型を読み取れないので、受け付ける属性は一覧で持つ。一覧の各名前は、その属性を持つ要素に束縛すると DOM のインターフェース（`SVGAnimated*`）か、表示属性なら計算済みスタイルに効くことをブラウザのテストで確かめる。`setAttribute` は SVG の要素では大文字と小文字を区別するので、綴りや大文字小文字を誤った名前（`viewbox`）はそこで落ちる。
 
 生成した型がエディタの補完と型検査で重すぎないかを、最初の実装で `tsc --extendedDiagnostics` で測る。
 
