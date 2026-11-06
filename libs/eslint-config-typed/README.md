@@ -687,6 +687,11 @@ resolving the binding is what keeps `assert(x)` imported from `node:assert`
 (which has no `isTrue`) out of it, and what lets
 `import { assert as a } from 'vitest'` be recognized — the fixes then keep the
 local name instead of writing one the file does not have.
+An `expect` destructured from a test's context
+(`test.concurrent('x', ({ expect }) => …)`) or from `import.meta.vitest` is
+Vitest's too and is reported, without a fix: the context has no `assert`, and an
+in-source test reaches Vitest only through that handle, so neither a global
+`assert` nor an added import can be named for it.
 
 #### react-coding-style
 
