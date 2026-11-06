@@ -83,8 +83,8 @@ export const ParsedValue = (): JSX.Element => (
 ## `For`
 
 ```tsx
-import { createState } from 'synstate';
-import { For, inlineMap, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { For, type JSX } from 'synstate-dom';
 
 type Row = Readonly<{ id: number; label: string }>;
 
@@ -101,8 +101,8 @@ export const Table = (): JSX.Element => (
         <For items={rows$} key={(row) => row.id}>
             {(row$, index$) => (
                 <li>
-                    {inlineMap(index$, (i) => `${i + 1}. `)}
-                    {inlineMap(row$, (row) => row.label)}
+                    {index$.pipe(map((i) => `${i + 1}. `))}
+                    {row$.pipe(map((row) => row.label))}
                 </li>
             )}
         </For>

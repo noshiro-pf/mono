@@ -2,6 +2,8 @@
 
 A compiler-free, fine-grained UI library that binds [synstate](https://github.com/noshiro-pf/mono/tree/main/libs/synstate) observables directly to the DOM.
 
+It is the UI library for SynState: the graph you build with SynState's operators ends in the DOM node bound to it, with nothing converted on the way and no component re-run to read a value. Its API keeps one way to write each thing (a transformed value is `source.pipe(map(fn))` wherever it is bound) rather than adding forms that only win a row of a benchmark. How it compares with Solid, Preact, React and VanJS is on the [benchmark page](https://noshiro-pf.github.io/mono/synstate-dom/background/benchmark/).
+
 > [!NOTE]
 > Version 0.x: the API may still change in a minor release. The design is in [`SPEC.md`](./SPEC.md) (Japanese).
 
@@ -51,7 +53,7 @@ Text in JSX is a `Bindable` too: write `constant('Add')`, not `Add`, so that a v
 
 ```tsx
 import { createState, map } from 'synstate';
-import { constant, For, If, inlineMap, render, type JSX } from 'synstate-dom';
+import { constant, For, If, render, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -112,18 +114,16 @@ const TodoApp = (): JSX.Element => {
                             {(todo$, index$) => (
                                 <li
                                     class={{
-                                        done: inlineMap(
-                                            todo$,
-                                            (todo) => todo.done,
+                                        done: todo$.pipe(
+                                            map((todo) => todo.done),
                                         ),
                                     }}
                                 >
                                     <label>
                                         <input
                                             type={constant('checkbox')}
-                                            checked={inlineMap(
-                                                todo$,
-                                                (todo) => todo.done,
+                                            checked={todo$.pipe(
+                                                map((todo) => todo.done),
                                             )}
                                             onChange={() => {
                                                 toggle(
@@ -132,8 +132,8 @@ const TodoApp = (): JSX.Element => {
                                                 );
                                             }}
                                         />
-                                        {inlineMap(index$, (i) => `${i + 1}. `)}
-                                        {inlineMap(todo$, (todo) => todo.title)}
+                                        {index$.pipe(map((i) => `${i + 1}. `))}
+                                        {todo$.pipe(map((todo) => todo.title))}
                                     </label>
                                 </li>
                             )}
@@ -202,17 +202,16 @@ render(Inbox, document.body);
 synstate derivations are not lazy: a derivation is computed whenever its parent changes, read or not. Two habits keep a derivation from being computed for a view that is not shown:
 
 1. **Create a derivation only a view reads inside the component**, not next to the store. It then exists only while something is bound to it.
-2. **Create what a branch shows inside the branch** (the `then` of `If`, the function of `MatchOptional`), not before choosing between two of them.
+2. **Create what a branch shows inside the branch** (a component the `then` of `If` mounts, the function of `MatchOptional`), not before choosing between two of them. JSX written straight into `then` is evaluated before `If` chooses, so a `pipe(map(...))` in it belongs to the enclosing component and keeps computing while the branch is hidden; a branch with many bindings goes in a component of its own.
 
 ## What is implemented
 
 - `Constant<T>` and `constant(value)`: a value written once and never updated.
-- `Bindable<T>`: what a slot that takes data accepts, `InitializedObservable<T> | Constant<T>`. A plain value is a type error. A slot of an intrinsic element takes `ElementBindable<T>`, which adds `InlineMap<T>`.
-- `inlineMap(source, fn)`: an optimization of `source.pipe(map(fn))` for places with many bindings, such as `For` rows: bound without creating a node in the graph, and not shared between bindings. Only a slot of an intrinsic element takes it, directly or through a prop that a component spreads onto one (a `Child`, or `Link`'s `<a>` attributes); a prop typed `Bindable` does not.
+- `Bindable<T>`: what a slot that takes data accepts, `InitializedObservable<T> | Constant<T>`. A plain value is a type error. To show an observable transformed, bind `source.pipe(map(fn))`.
 - `mapBindable`, `deriveBindable` and `toObservable`: helpers for a component that receives a `Bindable`. Constants stay constants and never enter the graph.
 - The JSX runtime (`"jsx": "react-jsx"`, `"jsxImportSource": "synstate-dom"`): a JSX expression is a lazy `Mountable` description, and a component is called once, when it is mounted.
 - `render(App, container)`: mounts `App` in a root scope and returns the function that unmounts it.
-- Element props: attributes and DOM properties typed from `lib.dom.d.ts` (`ElementBindable<T>` of each writable primitive property), `aria-*` (also a number, and a boolean written as `"true"` / `"false"`) and `data-*`, `class` as a string or a `{ name: ElementBindable<boolean> }` object, `style` as a string or a per-property object, and `onClick`-style event handlers. SVG elements are created in the SVG namespace and take a fixed list of attributes.
+- Element props: attributes and DOM properties typed from `lib.dom.d.ts` (`Bindable<T>` of each writable primitive property), `aria-*` (also a number, and a boolean written as `"true"` / `"false"`) and `data-*`, `class` as a string or a `{ name: Bindable<boolean> }` object, `style` as a string or a per-property object, and `onClick`-style event handlers. SVG elements are created in the SVG namespace and take a fixed list of attributes.
 - A bound `checked` or `indeterminate` of an `<input>` is controlled: after a `change`, the input is drawn as its bound value again before the next frame is painted, so a change the owner does not take in `onChange` undoes itself. For a checkbox the user toggles freely, use `defaultChecked`. A radio group is set back as a whole when every button of it is bound.
 - `If`, `MatchOptional` and `MatchResult`: mount one branch at a time in a scope of its own, rebuilt only when the condition or the tag changes.
 - `For`: one row per key, each in a scope of its own; `item$` and `index$` are derived from `items`, and rows are moved as little as the longest increasing subsequence allows.

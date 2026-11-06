@@ -1,5 +1,5 @@
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import { Num, asPositiveFiniteNumber } from 'ts-data-forge';
 import type { Rect, RectSize } from 'ts-utils-additional';
 import { playerNameRectSize } from '../../constants/index.mjs';
@@ -99,10 +99,10 @@ export const Table = ({
     <div
       class={constant(styles.table)}
       style={{
-        width: inlineMap(tableSize, (s) => `${s.width}px`),
-        height: inlineMap(tableSize, (s) => `${s.height}px`),
-        'grid-template-rows': inlineMap(areaSize, gridTrackSizes),
-        'grid-template-columns': inlineMap(areaSize, gridTrackSizes),
+        width: tableSize.pipe(map((s) => `${s.width}px`)),
+        height: tableSize.pipe(map((s) => `${s.height}px`)),
+        'grid-template-rows': areaSize.pipe(map(gridTrackSizes)),
+        'grid-template-columns': areaSize.pipe(map(gridTrackSizes)),
         padding: constant(`${containerPaddingPx}px`),
       }}
     >

@@ -13,7 +13,6 @@ import {
   constant,
   createAfterUpdate,
   If,
-  inlineMap,
   isImeKeyDown,
   listenInScope,
   Portal,
@@ -252,9 +251,11 @@ export const Overlay = ({
     ([name]) =>
       [
         `${transitionName}-${name}`,
-        inlineMap(phase$, (phase) =>
-          transitionClassesOf(transitionName, phase).includes(
-            `${transitionName}-${name}`,
+        phase$.pipe(
+          map((phase) =>
+            transitionClassesOf(transitionName, phase).includes(
+              `${transitionName}-${name}`,
+            ),
           ),
         ),
       ] as const,

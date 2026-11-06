@@ -1,5 +1,5 @@
 import { type InitializedObservable, map } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import type { QueueSlot } from '../queue-view.mjs';
 import { ExternalLink } from './external-link.js';
 import { RunStateIcon } from './run-state-icon.js';
@@ -31,9 +31,9 @@ export const QueueSlotBox = ({ slot$, onShow, onHide }: Props): JSX.Element => (
       then={
         <span
           class={constant('queue-priority')}
-          data-priority={inlineMap(slot$, (slot) => slot.priority)}
+          data-priority={slot$.pipe(map((slot) => slot.priority))}
         >
-          {inlineMap(slot$, (slot) => slot.priority)}
+          {slot$.pipe(map((slot) => slot.priority))}
         </span>
       }
     />
@@ -43,23 +43,25 @@ export const QueueSlotBox = ({ slot$, onShow, onHide }: Props): JSX.Element => (
         cond={slot$.pipe(map((slot) => slot.kind === 'running'))}
         then={<RunStateIcon kind={'running'} label={'running'} />}
       />
-      {inlineMap(slot$, (slot) => `#${slot.number}`)}
+      {slot$.pipe(map((slot) => `#${slot.number}`))}
     </span>
 
     <If
       cond={slot$.pipe(map((slot) => slot.note !== undefined))}
       then={
         <span class={constant('queue-note')}>
-          {inlineMap(slot$, (slot) => slot.note ?? '')}
+          {slot$.pipe(map((slot) => slot.note ?? ''))}
         </span>
       }
     />
 
     <span class={constant('visually-hidden')}>
-      {inlineMap(slot$, (slot) =>
-        slot.detail === undefined
-          ? ` ${slot.title}`
-          : ` ${slot.title} — ${slot.detail}`,
+      {slot$.pipe(
+        map((slot) =>
+          slot.detail === undefined
+            ? ` ${slot.title}`
+            : ` ${slot.title} — ${slot.detail}`,
+        ),
       )}
     </span>
   </ExternalLink>

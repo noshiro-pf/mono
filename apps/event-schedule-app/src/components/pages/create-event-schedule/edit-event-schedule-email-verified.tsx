@@ -1,9 +1,8 @@
-import { combine } from 'synstate';
+import { combine, map } from 'synstate';
 import {
   constant,
   createAfterUpdate,
   deriveBindable,
-  inlineMap,
   subscribeInScope,
   type JSX,
 } from 'synstate-dom';
@@ -51,7 +50,7 @@ export const EditEventScheduleEmailVerified = (): JSX.Element => {
   return (
     <>
       <div class={constant(styles.subTitle)}>
-        {inlineMap(eventSchedule$, (e) => dc.editSubTitle(e?.title ?? ''))}
+        {eventSchedule$.pipe(map((e) => dc.editSubTitle(e?.title ?? '')))}
       </div>
 
       <EventScheduleSettingCommon

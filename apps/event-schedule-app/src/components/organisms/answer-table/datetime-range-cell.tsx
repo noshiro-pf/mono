@@ -1,8 +1,7 @@
-import type { InitializedObservable } from 'synstate';
+import { map, type InitializedObservable } from 'synstate';
 import {
   constant,
   If,
-  inlineMap,
   mapBindable,
   type Bindable,
   type JSX,
@@ -35,15 +34,17 @@ export const DatetimeRangeCell = ({
   holidaysJpDefinition,
 }: Props): JSX.Element => {
   const colored = {
-    color: inlineMap(holidaysJpDefinition, (holidays) => {
-      const dayValue = ymd2day(ymd);
+    color: holidaysJpDefinition.pipe(
+      map((holidays) => {
+        const dayValue = ymd2day(ymd);
 
-      return dayValue === 0 || holidays.has(ymd)
-        ? calendarDateColor.sunday
-        : dayValue === 6
-          ? calendarDateColor.saturday
-          : calendarDateColor.normal;
-    }),
+        return dayValue === 0 || holidays.has(ymd)
+          ? calendarDateColor.sunday
+          : dayValue === 6
+            ? calendarDateColor.saturday
+            : calendarDateColor.normal;
+      }),
+    ),
   } as const;
 
   const has = (

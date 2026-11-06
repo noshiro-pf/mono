@@ -13,7 +13,7 @@ import * as styles from './paragraph-with-switch.module.css';
 
 type Props = Readonly<{
   title: string;
-  /** Lines under the title; an `InlineMap` of them for lines that change. */
+  /** Lines under the title; an observable of them for lines that change. */
   description?: InitializedObservable<readonly string[]> | readonly string[];
   toggleState: Bindable<boolean>;
   onToggle: () => void;

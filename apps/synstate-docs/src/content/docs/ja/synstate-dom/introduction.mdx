@@ -19,6 +19,10 @@ synstate-dom はまだバージョン 0.x なので、マイナーリリース�
 
 ## synstate-dom を使う理由
 
+synstate-dom は SynState のランタイムに最も直接つながる UI ライブラリで、それがこのライブラリの存在理由です。
+
+- **SynState の速さがそのまま画面に届きます。** [ベンチマークの概要](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)では、SynState はどのシナリオでも最速のライブラリの {/* bench:summary/synstate-worst-over-fastest */}2.7{/* /bench */} 倍以内に収まります。{/* bench:summary/synstate-alone-in-single-digits */}すべてのシナリオで計測したライブラリのうち、最悪のケースでも1桁倍に収まるのは SynState だけです{/* /bench */}。synstate-dom はそのグラフと DOM の間に何も挟みません。
+- **シンプルな API で、遅くなる場面が少ない。** synstate-dom は、ベンチマークの 1 行だけで勝つための書き方を増やさず、1 つのことに 1 つの書き方を保ちます。変換した値はどこに束縛するときも `source$.pipe(map(fn))` です。js-framework-benchmark の操作では、最も遅い操作でも最速のライブラリの {/* benchmark:worst/synstate-dom */}1.56{/* /benchmark */} 倍です。{/* benchmark:placement/behind */}Solid・Preact・Preact + Signals には及びません{/* /benchmark */}が、最も遅い操作が {/* benchmark:worst/react */}3.79{/* /benchmark */} 倍の React を大きく下回ります。詳しくは[ベンチマーク](/mono/synstate-dom/ja/background/benchmark/#結果の読み方)を見てください。
 - **コンポーネントは一度だけ実行されます。** マウント時に呼ばれて DOM の記述を返し、その後は二度と呼ばれません。メモ化するものはなく、変わる値はコンポーネントの本体ではなく Observable から読みます。
 - **更新は末端へ直接届きます。** 変更は SynState のグリッチのない 1 回の伝搬でグラフを通り、synstate-dom がそれを束縛された各ノードに書き込みます。差分を取ることはなく、古い入力と新しい入力の混ざった値をノードが表示することもありません。
 - **継ぎ目がありません。** `debounce`・`switchMap`・リクエストは、最後に表示されるテキストと同じグラフのノードです。別のライブラリへの橋渡しでは、そこを通る値がすべて変換され、その途中でイベントは値になってしまいます。
@@ -272,14 +276,7 @@ const describe = (search: Search): string => {
 
 ```tsx
 import { createState, map } from 'synstate';
-import {
-    constant,
-    For,
-    If,
-    inlineMap,
-    isImeKeyDown,
-    type JSX,
-} from 'synstate-dom';
+import { constant, For, If, isImeKeyDown, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -330,15 +327,14 @@ export const TodoDemo = (): JSX.Element => (
                             return (
                                 <li
                                     class={{
-                                        done: inlineMap(todo$, (t) => t.done),
+                                        done: todo$.pipe(map((t) => t.done)),
                                     }}
                                 >
                                     <label>
                                         <input
                                             type={constant('checkbox')}
-                                            checked={inlineMap(
-                                                todo$,
-                                                (t) => t.done,
+                                            checked={todo$.pipe(
+                                                map((t) => t.done),
                                             )}
                                             onChange={() => {
                                                 toggle(
@@ -347,7 +343,7 @@ export const TodoDemo = (): JSX.Element => (
                                                 );
                                             }}
                                         />
-                                        {inlineMap(todo$, (t) => ` ${t.title}`)}
+                                        {todo$.pipe(map((t) => ` ${t.title}`))}
                                     </label>
                                     <span class={constant('note')}>
                                         {constant(
@@ -416,7 +412,7 @@ todo を追加・切り替え・削除して、**row #** の表示を見てく�
 
 ## 次に読むもの
 
-- [Bindable な値](/mono/synstate-dom/ja/guides/bindable/) — `constant`・`inlineMap`・`deriveBindable` と、ただの値が拒否される理由。
+- [Bindable な値](/mono/synstate-dom/ja/guides/bindable/) — `constant`・`pipe(map)`・`deriveBindable` と、ただの値が拒否される理由。
 - [コンポーネント](/mono/synstate-dom/ja/guides/components/) — props はただの JavaScript であること、子、一度だけ実行されるもの。
 - [制御フロー](/mono/synstate-dom/ja/guides/control-flow/) — `If`・`Match`・`For`・`Portal`。
 - [ライフサイクルとスコープ](/mono/synstate-dom/ja/guides/lifecycle/) — 何がいつ破棄されるか。

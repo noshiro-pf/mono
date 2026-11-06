@@ -1,5 +1,5 @@
 import { type InitializedObservable, map } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
 import { formatWhen, type MilestoneRow } from '../view-model/index.mjs';
@@ -23,28 +23,33 @@ export const MilestoneItem = ({ row }: Props): JSX.Element => (
       }}
     >
       <span
-        class={inlineMap(
-          row,
-          ({ reachedAt }) =>
-            `bp6-tag bp6-round milestone-badge ${reachedAt === undefined ? 'pending' : 'reached'}`,
+        class={row.pipe(
+          map(
+            ({ reachedAt }) =>
+              `bp6-tag bp6-round milestone-badge ${reachedAt === undefined ? 'pending' : 'reached'}`,
+          ),
         )}
       >
-        {inlineMap(row, ({ reachedAt }) =>
-          reachedAt === undefined ? m.list.unreached : m.list.reached,
+        {row.pipe(
+          map(({ reachedAt }) =>
+            reachedAt === undefined ? m.list.unreached : m.list.reached,
+          ),
         )}
       </span>
       <span class={constant('milestone-title')}>
-        {inlineMap(row, ({ milestone }) => milestone.title)}
+        {row.pipe(map(({ milestone }) => milestone.title))}
       </span>
       <span class={constant('milestone-meta')}>
         <If
           cond={row.pipe(map(({ milestone }) => milestone.date !== undefined))}
           then={
             <span>
-              {inlineMap(row, ({ milestone }) =>
-                milestone.date === undefined
-                  ? ''
-                  : formatWhen(milestone.date, milestone.dateAllDay),
+              {row.pipe(
+                map(({ milestone }) =>
+                  milestone.date === undefined
+                    ? ''
+                    : formatWhen(milestone.date, milestone.dateAllDay),
+                ),
               )}
             </span>
           }
@@ -53,14 +58,17 @@ export const MilestoneItem = ({ row }: Props): JSX.Element => (
           cond={row.pipe(map(({ milestone }) => milestone.requiresManualCheck))}
           then={
             <span
-              class={inlineMap(
-                row,
-                ({ awaitingCheck }) =>
-                  `bp6-tag bp6-minimal ${awaitingCheck ? 'bp6-intent-warning' : 'bp6-intent-success'}`,
+              class={row.pipe(
+                map(
+                  ({ awaitingCheck }) =>
+                    `bp6-tag bp6-minimal ${awaitingCheck ? 'bp6-intent-warning' : 'bp6-intent-success'}`,
+                ),
               )}
             >
-              {inlineMap(row, ({ awaitingCheck }) =>
-                awaitingCheck ? m.list.awaitingCheck : m.list.checked,
+              {row.pipe(
+                map(({ awaitingCheck }) =>
+                  awaitingCheck ? m.list.awaitingCheck : m.list.checked,
+                ),
               )}
             </span>
           }

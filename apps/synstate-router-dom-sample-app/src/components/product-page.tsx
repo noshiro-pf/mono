@@ -1,5 +1,5 @@
 import { derive, map, type InitializedObservable } from 'synstate';
-import { constant, If, inlineMap, MatchOptional, type JSX } from 'synstate-dom';
+import { constant, If, MatchOptional, type JSX } from 'synstate-dom';
 import { AsyncData, Optional } from 'ts-std-forge';
 import type { SafeInt } from 'ts-type-forge';
 import { fetchProduct, type ProductDetail } from '../api/index.mjs';
@@ -33,19 +33,21 @@ export const ProductPage = ({ item$ }: Props): JSX.Element => {
   const nextId$ = page$.pipe(map((page) => page.product?.next));
 
   return (
-    <section aria-busy={inlineMap(data$, AsyncData.isPending)}>
-      <h1>{inlineMap(page$, (page) => page.title)}</h1>
+    <section aria-busy={data$.pipe(map(AsyncData.isPending))}>
+      <h1>{page$.pipe(map((page) => page.title))}</h1>
       <If
         cond={page$.pipe(map((page) => page.found))}
         then={
           <>
             {/* One line each, filled or not, so nothing below moves. */}
             <p class={constant('line')}>
-              {inlineMap(page$, (page) => page.product?.description ?? '')}
+              {page$.pipe(map((page) => page.product?.description ?? ''))}
             </p>
             <p class={constant('line')}>
-              {inlineMap(page$, (page) =>
-                page.product === undefined ? '' : `¥${page.product.price}`,
+              {page$.pipe(
+                map((page) =>
+                  page.product === undefined ? '' : `¥${page.product.price}`,
+                ),
               )}
             </p>
             <p>

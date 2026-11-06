@@ -1,7 +1,7 @@
+import { map } from 'synstate';
 import {
   constant,
   deriveBindable,
-  inlineMap,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -27,10 +27,12 @@ export const ThemeSwitch = (): JSX.Element => {
     <fieldset
       aria-label={constant('Theme')}
       class={constant('theme-switch')}
-      title={inlineMap(themeStore.theme, (theme) =>
-        theme === 'auto'
-          ? 'Following the system. Picking the other look keeps it in the URL.'
-          : 'Chosen here, and kept in the URL. Picking what the system shows follows the system again.',
+      title={themeStore.theme.pipe(
+        map((theme) =>
+          theme === 'auto'
+            ? 'Following the system. Picking the other look keeps it in the URL.'
+            : 'Chosen here, and kept in the URL. Picking what the system shows follows the system again.',
+        ),
       )}
     >
       <button

@@ -8,7 +8,7 @@
 
 ```tsx
 import { map } from 'synstate';
-import { constant, inlineMap, render } from 'synstate-dom';
+import { constant, render } from 'synstate-dom';
 import {
     createMemoryBrowser,
     createRouter,
@@ -69,9 +69,11 @@ const unmount = render(
                     ),
                     'products.item': (item$) => (
                         <h1>
-                            {inlineMap(
-                                item$,
-                                (item) => `Product ${item.params.productId}`,
+                            {item$.pipe(
+                                map(
+                                    (item) =>
+                                        `Product ${item.params.productId}`,
+                                ),
                             )}
                         </h1>
                     ),

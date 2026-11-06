@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, For, If, type JSX } from 'synstate-dom';
 import {
   LARGE_NODE_LINE_HEIGHT,
   type LaidOutNode,
@@ -32,23 +32,23 @@ export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
     // An SVG has no <button>: the group takes its role, focus and keys.
 
     <g
-      aria-label={inlineMap(record, (r) => r.view.ariaLabel)}
-      class={inlineMap(
-        record,
-        (r) =>
-          `dag-node dag-milestone ${r.view.reached ? 'reached' : 'pending'}${r.size === 'standard' ? '' : ` ${r.size}`}${r.dragging ? ' dragging' : ''}${r.selected ? ' selected' : ''}`,
+      aria-label={record.pipe(map((r) => r.view.ariaLabel))}
+      class={record.pipe(
+        map(
+          (r) =>
+            `dag-node dag-milestone ${r.view.reached ? 'reached' : 'pending'}${r.size === 'standard' ? '' : ` ${r.size}`}${r.dragging ? ' dragging' : ''}${r.selected ? ' selected' : ''}`,
+        ),
       )}
       data-e2e={constant('dag-node')}
-      data-highlight={inlineMap(record, (r) => r.highlight)}
+      data-highlight={record.pipe(map((r) => r.highlight))}
       data-node-id={constant(first.id)}
-      data-outside={inlineMap(record, (r) => r.outside.toString())}
-      data-selected={inlineMap(record, (r) => r.selected.toString())}
-      opacity={inlineMap(record, (r) => r.opacity)}
+      data-outside={record.pipe(map((r) => r.outside.toString()))}
+      data-selected={record.pipe(map((r) => r.selected.toString()))}
+      opacity={record.pipe(map((r) => r.opacity))}
       role={constant('button')}
       tabindex={constant(0)}
-      transform={inlineMap(
-        record,
-        ({ node }) => `translate(${node.x} ${node.y})`,
+      transform={record.pipe(
+        map(({ node }) => `translate(${node.x} ${node.y})`),
       )}
       onClick={openNode}
       onKeyDown={onKeyDown}
@@ -64,7 +64,7 @@ export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
       </SvgTitle>
       <polygon
         class={constant('dag-node-shape')}
-        points={inlineMap(record, (r) => hexagonOf(r.node))}
+        points={record.pipe(map((r) => hexagonOf(r.node)))}
       />
       <For
         items={record.pipe(
@@ -84,10 +84,10 @@ export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
             class={constant('dag-node-title')}
             dominant-baseline={constant('central')}
             text-anchor={constant('middle')}
-            x={inlineMap(record, (r) => r.node.width / 2)}
-            y={inlineMap(line$, ({ y }) => y)}
+            x={record.pipe(map((r) => r.node.width / 2))}
+            y={line$.pipe(map(({ y }) => y))}
           >
-            {inlineMap(line$, ({ text }) => text)}
+            {line$.pipe(map(({ text }) => text))}
           </text>
         )}
       </For>
@@ -98,14 +98,16 @@ export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
             class={constant('dag-node-meta')}
             dominant-baseline={constant('central')}
             text-anchor={constant('middle')}
-            x={inlineMap(record, (r) => r.node.width / 2)}
-            y={inlineMap(record, (r) => {
-              const lines = titleLineCount(r);
+            x={record.pipe(map((r) => r.node.width / 2))}
+            y={record.pipe(
+              map((r) => {
+                const lines = titleLineCount(r);
 
-              return lineY(r, lines, lines);
-            })}
+                return lineY(r, lines, lines);
+              }),
+            )}
           >
-            {inlineMap(record, (r) => r.view.date ?? '')}
+            {record.pipe(map((r) => r.view.date ?? ''))}
           </text>
         }
       />

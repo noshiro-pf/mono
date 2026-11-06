@@ -1,5 +1,5 @@
 import { map } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import type { DagDirection } from '../dag/index.mjs';
 import { m } from '../i18n/index.mjs';
 import { dagLayoutStore, dagViewModeStore } from '../store/index.mjs';
@@ -61,15 +61,14 @@ const directionButton = (
   direction: DagDirection,
   label: string,
 ): JSX.Element => {
-  const pressed = inlineMap(
-    dagLayoutStore.arrangement,
-    (arrangement) => arrangement.direction === direction,
+  const pressed = dagLayoutStore.arrangement.pipe(
+    map((arrangement) => arrangement.direction === direction),
   );
 
   return (
     <button
-      aria-pressed={inlineMap(dagLayoutStore.arrangement, (arrangement) =>
-        (arrangement.direction === direction).toString(),
+      aria-pressed={dagLayoutStore.arrangement.pipe(
+        map((arrangement) => (arrangement.direction === direction).toString()),
       )}
       class={{ 'bp6-button': constant(true), 'bp6-active': pressed }}
       data-e2e={constant(`dag-direction-${direction}`)}

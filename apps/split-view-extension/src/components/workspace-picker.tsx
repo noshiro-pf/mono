@@ -9,7 +9,6 @@ import {
   createAfterUpdate,
   For,
   If,
-  inlineMap,
   listenInScope,
   subscribeInScope,
   type Bindable,
@@ -131,7 +130,7 @@ export const WorkspacePicker = ({
         title={constant(
           'The split view shown in this tab. Alt+1..9 switches too.',
         )}
-        value={inlineMap(activeId, (id) => id ?? '')}
+        value={activeId.pipe(map((id) => id ?? ''))}
         onChange={(changeEvent) => {
           const mut_select = changeEvent.currentTarget;
 
@@ -157,7 +156,7 @@ export const WorkspacePicker = ({
           key={(entry) => entry.id}
         >
           {(entry$, index$) => (
-            <option value={inlineMap(entry$, (entry) => entry.id)}>
+            <option value={entry$.pipe(map((entry) => entry.id))}>
               {derive(
                 [entry$, index$],
                 (entry, index) => `${(index + 1).toString()}: ${entry.name}`,
@@ -177,8 +176,8 @@ export const WorkspacePicker = ({
       </button>
 
       <button
-        aria-expanded={inlineMap(editing$, (shown) =>
-          shown ? 'true' : 'false',
+        aria-expanded={editing$.pipe(
+          map((shown) => (shown ? 'true' : 'false')),
         )}
         class={constant('top-bar__button')}
         title={constant(

@@ -1,5 +1,5 @@
-import { createState, just } from 'synstate';
-import { constant, inlineMap, render, type JSX } from 'synstate-dom';
+import { createState, just, map } from 'synstate';
+import { constant, render, type JSX } from 'synstate-dom';
 
 const mountInto = (
   app: () => JSX.Element,
@@ -191,11 +191,11 @@ describe('attributes', () => {
     );
   });
 
-  test('accepts an inline map', () => {
+  test('binds a mapped observable to a DOM property', () => {
     const [count$, setCount] = createState(0);
 
     const { container } = mountInto(() => (
-      <button disabled={inlineMap(count$, (n) => n === 0)} />
+      <button disabled={count$.pipe(map((n) => n === 0))} />
     ));
 
     const button = container.querySelector('button');
@@ -437,7 +437,7 @@ describe('controlled checked', () => {
       <>
         {(['a', 'b'] as const).map((choice) => (
           <input
-            checked={inlineMap(choice$, (c) => c === choice)}
+            checked={choice$.pipe(map((c) => c === choice))}
             name={constant('controlled-taken')}
             type={constant('radio')}
             onChange={() => {
@@ -669,13 +669,13 @@ describe('removing attributes', () => {
   });
 });
 
-describe(inlineMap, () => {
+describe('a mapped observable', () => {
   test('writes a result again only when it is not Object.is the last one written', () => {
     const [count$, setCount] = createState(0);
 
     const { container } = mountInto(() => (
-      <p title={inlineMap(count$, (n) => (n % 2 === 0 ? 'even' : 'odd'))}>
-        {inlineMap(count$, (n) => (n < 10 ? 'small' : 'large'))}
+      <p title={count$.pipe(map((n) => (n % 2 === 0 ? 'even' : 'odd')))}>
+        {count$.pipe(map((n) => (n < 10 ? 'small' : 'large')))}
       </p>
     ));
 

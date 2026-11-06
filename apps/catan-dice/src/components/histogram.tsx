@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import { Arr, asSafeUint, Num, Optional, SafeUint } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import * as styles from './histogram.module.css';
@@ -21,9 +21,8 @@ export const Histogram = ({ sumCount }: Props): JSX.Element => {
           class={constant(styles.rollCount)}
           data-e2e={constant('roll-count')}
         >
-          {inlineMap(
-            sumCount,
-            (counts) => `N = ${counts.reduce(SafeUint.add, 0)}`,
+          {sumCount.pipe(
+            map((counts) => `N = ${counts.reduce(SafeUint.add, 0)}`),
           )}
         </div>
       </div>
@@ -35,13 +34,12 @@ export const Histogram = ({ sumCount }: Props): JSX.Element => {
                 class={constant(styles.bar)}
                 data-e2e={constant(`histogram-count-${sum}`)}
                 style={{
-                  height: inlineMap(
-                    bars$,
-                    (bars) => bars[index]?.height ?? '0%',
+                  height: bars$.pipe(
+                    map((bars) => bars[index]?.height ?? '0%'),
                   ),
                 }}
               >
-                {inlineMap(bars$, (bars) => bars[index]?.label ?? '')}
+                {bars$.pipe(map((bars) => bars[index]?.label ?? ''))}
               </div>
             </div>
             <div class={constant(styles.label)}>{constant(sum)}</div>

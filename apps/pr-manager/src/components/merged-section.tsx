@@ -1,5 +1,5 @@
 import { map } from 'synstate';
-import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { formatLocalTime } from '../format.mjs';
 import { mergedPullRequestsUrl } from '../github-links.mjs';
@@ -64,21 +64,21 @@ export const MergedSection = (): JSX.Element => (
                       <li class={constant('merged-item')}>
                         <div class={constant('pull-request-heading')}>
                           <span class={constant('pull-request-number')}>
-                            {inlineMap(pr$, (pr) => `#${pr.number}`)}
+                            {pr$.pipe(map((pr) => `#${pr.number}`))}
                           </span>
                           <ExternalLink
                             href={pr$.pipe(map((pr) => pr.url))}
                             variant={'pull-request-title'}
                           >
-                            {inlineMap(pr$, (pr) => pr.title)}
+                            {pr$.pipe(map((pr) => pr.title))}
                           </ExternalLink>
                         </div>
 
                         <div class={constant('pull-request-row')}>
                           <span
                             class={constant('merged-when')}
-                            title={inlineMap(pr$, (pr) =>
-                              formatLocalTime(pr.mergedAtEpochMs),
+                            title={pr$.pipe(
+                              map((pr) => formatLocalTime(pr.mergedAtEpochMs)),
                             )}
                           >
                             {constant('merged ')}
@@ -87,14 +87,14 @@ export const MergedSection = (): JSX.Element => (
                                 map((pr) => pr.mergedAtEpochMs),
                               )}
                             />
-                            {inlineMap(pr$, (pr) => ` by ${pr.author}`)}
+                            {pr$.pipe(map((pr) => ` by ${pr.author}`))}
                           </span>
 
                           <span class={constant('branch')}>
                             <span aria-hidden={constant('true')}>
                               {constant('⎇ ')}
                             </span>
-                            {inlineMap(pr$, (pr) => pr.headRef)}
+                            {pr$.pipe(map((pr) => pr.headRef))}
                           </span>
 
                           <If

@@ -1,5 +1,5 @@
 import { combine, map, type InitializedObservable } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   absentBlocks,
@@ -57,9 +57,9 @@ export const BlockLayout = ({ blocks }: Props): JSX.Element => {
   return (
     <div
       class={constant('block-layout')}
-      data-columns={inlineMap(layout$, ({ columns }) => columns.toString())}
-      data-mode={inlineMap(layout$, ({ mode }) => mode)}
-      style={inlineMap(layout$, gridOf)}
+      data-columns={layout$.pipe(map(({ columns }) => columns.toString()))}
+      data-mode={layout$.pipe(map(({ mode }) => mode))}
+      style={layout$.pipe(map(gridOf))}
     >
       <BlockColumn blocks={blocks} panes$={shownIn(({ left }) => left)} />
 

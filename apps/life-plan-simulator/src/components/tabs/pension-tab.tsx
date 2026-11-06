@@ -1,6 +1,6 @@
 import { Card, HtmlTable } from 'blueprint-synstate';
 import { map } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import { input$, result$, updateSection } from '../../store/index.mjs';
 import { formatAmount, formatYen } from '../../utils/index.mjs';
 import { NumberField, OutputField } from '../fields/index.mjs';
@@ -84,21 +84,25 @@ export const PensionTab = (): JSX.Element => (
             {Array.from({ length: 16 }, (_, i) => (
               <tr
                 class={{
-                  selected: inlineMap(
-                    input$,
-                    (input) =>
-                      Math.floor(input.assumptions.pensionStartAge) === 60 + i,
+                  selected: input$.pipe(
+                    map(
+                      (input) =>
+                        Math.floor(input.assumptions.pensionStartAge) ===
+                        60 + i,
+                    ),
                   ),
                 }}
               >
                 <th scope={constant('row')}>{constant(`${60 + i} 歳`)}</th>
                 {cells.map((cell) => (
                   <td>
-                    {inlineMap(result$, (r) => {
-                      const row = r.pension.byStartAge[i];
+                    {result$.pipe(
+                      map((r) => {
+                        const row = r.pension.byStartAge[i];
 
-                      return row === undefined ? '' : cell(row);
-                    })}
+                        return row === undefined ? '' : cell(row);
+                      }),
+                    )}
                   </td>
                 ))}
               </tr>

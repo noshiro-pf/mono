@@ -1,6 +1,6 @@
 ---
 title: Bindable
-description: constant と inlineMap、そしてデータを受け取るスロットに何を渡せるか。
+description: constant と pipe(map)、そしてデータを受け取るスロットに何を渡せるか。
 ---
 
 JSX でデータを受け取る場所（属性、DOM のプロパティ、テキストの子要素、ライブラリが提供するコンポーネントの props）は、どれも `Bindable<T>` を受け付けます。
@@ -11,8 +11,6 @@ JSX でデータを受け取る場所（属性、DOM のプロパティ、テキ
 | `Constant<T>`              | 1 回だけ書いて、購読はしない                        |
 
 完了済みの Observable（`just(...)` など）も、定数と同じく 1 回だけ書いて購読はしません。
-
-組み込み要素のスロット（属性、DOM のプロパティ、テキストの子要素、`class` や `style` のオブジェクトの値）は、後で説明する最適化の `inlineMap(...)` も受け付けます。その型は `ElementBindable<T>` です。`Bindable` 型の props と、`Bindable` を受け取る補助関数には渡りません。コンポーネントが要素にそのまま渡す props（`Child` や、`Link` がアンカーに展開する `<a>` の属性など）は含むことがあります。
 
 ## `constant`
 
@@ -48,13 +46,13 @@ export const Stale = (): JSX.Element => <p>{count$.getSnapshot().value}</p>;
 - `constant(obs$)` も型エラーになります。
 - `constant` が長いと感じたら、import するときに名前を変えてください：`import { constant as c } from 'synstate-dom'`。
 
-## Observable を変換する: `pipe(map)`、束縛が多い所では `inlineMap`
+## Observable を変換する: `pipe(map)`
 
-Observable を変換して表示するには `source$.pipe(map(fn))` と書きます。コンポーネントの中で作った `map` のノードはそのコンポーネントのスコープに属し、一緒に破棄されます。行ごとに束縛が増える `For` の行では、`inlineMap(source$, fn)` を要素のスロットに直接渡せば、同じことがノードなしでできます。
+Observable を変換して表示するには `source$.pipe(map(fn))` と書きます。束縛のための別の書き方はなく、スロットは `map` のノードをほかの Observable と同じように受け取ります。コンポーネントの中や `For` の行の中で作ったノードはそのスコープに属し、一緒に破棄されます。
 
 ```tsx
 import { createState, map } from 'synstate';
-import { constant, For, inlineMap, type JSX } from 'synstate-dom';
+import { constant, For, type JSX } from 'synstate-dom';
 
 const [count$, setCount] = createState(0);
 
@@ -84,20 +82,16 @@ const [items$] = createState<readonly Item[]>([
 export const PriceList = (): JSX.Element => (
     <ul>
         <For items={items$} key={(item) => item.id}>
-            {/* A binding in every row: `inlineMap` saves a node in each. */}
+            {/* One `map` node per row, disposed with the row. */}
             {(item$) => (
-                <li>{inlineMap(item$, (item) => `${item.price} yen`)}</li>
+                <li>{item$.pipe(map((item) => `${item.price} yen`))}</li>
             )}
         </For>
     </ul>
 );
 ```
 
-`inlineMap` は `pipe(map)` の最適化で、名前もそれを表しています。synstate のグラフにノードを作らず、束縛が `source$` を直接購読し、値が来るたびに `fn` を通して書き込みます。前回書いた結果と `Object.is` で等しければ書きません。これは `map` のノードが下流に流す値と同じです。1 行に 4 つずつ束縛がある 1,000 行の `For` では、マウントが約 5%、全行の更新が約 15%、破棄が約 35% 速くなります。束縛が数個なら差は測れないほど小さいです。
-
-代わりに失うのは、結果の共有と、Observable であることです。受け付けるのは要素のスロットと、`Child` のように要素にそのまま渡される props だけで、`Bindable` 型の props（`If` の `cond` や `For` の `items` も含む）には渡せず、`pipe` も `subscribe` もありません。`map` のノードは更新 1 回につき `fn` を 1 回だけ計算して結果を保持し、すべての束縛、`getSnapshot()`、operator がその結果を読みます。`inlineMap` は何も保持しないので、2 か所に渡せば `fn` は 2 回呼ばれ、結果を他から読むこともできません。重い変換や、複数の場所で使う値はノードのままにしましょう。
-
-この形があるのは `map` だけです。入力が複数ある変換（`deriveBindable`）は、更新が全部の入力に届いた後に計算するためにノードが必要です。購読者は伝播の途中で呼ばれるので、1 つの入力の購読者からは、他の入力がまだ更新前に見えてしまいます。状態を持つ operator（`scan`）は、状態が束縛ごとにできてしまいます。
+`map` のノードは更新 1 回につき `fn` を 1 回だけ計算し、前回と `Object.is` で等しくない結果だけを下流に流すので、束縛が DOM に書くのは表示が変わったときだけです。結果はほかと同じ Observable なので、複数の束縛、`getSnapshot()`、さらに続く operator がすべて読めます。
 
 ## `Bindable` を受け取る側: `mapBindable`、`deriveBindable`、`toObservable`
 

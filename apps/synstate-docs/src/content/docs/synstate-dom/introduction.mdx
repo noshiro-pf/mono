@@ -19,6 +19,10 @@ synstate-dom is at version 0.x, so its API may still change in a minor release.
 
 ## Why synstate-dom
 
+synstate-dom is the UI library that connects most directly to SynState's runtime, and that is what it is for.
+
+- **SynState's speed reaches the screen.** In the [benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page), SynState stays within {/* bench:summary/synstate-worst-over-fastest */}2.7{/* /bench */}× of the fastest library in every scenario: {/* bench:summary/synstate-alone-in-single-digits */}the only library measured in all of them whose worst case stays in single digits{/* /bench */}. synstate-dom puts nothing between that graph and the DOM.
+- **A simple API that is rarely slow.** synstate-dom keeps one way to write each thing rather than adding forms that only win a row of a benchmark: a transformed value is `source$.pipe(map(fn))` wherever it is bound. On the operations of js-framework-benchmark, its slowest operation takes {/* benchmark:worst/synstate-dom */}1.56{/* /benchmark */}× the fastest library's time: {/* benchmark:placement/behind */}behind Solid, Preact and Preact + Signals{/* /benchmark */}, and well ahead of React, whose slowest takes {/* benchmark:worst/react */}3.79{/* /benchmark */}×. See [Benchmark](/mono/synstate-dom/background/benchmark/#reading-the-results).
 - **A component runs once.** It is called when it mounts and returns a description of the DOM. It is never called again, so there is nothing to memoize, and a value that changes is read from its Observable rather than from the component body.
 - **Updates go straight to the leaves.** A change propagates through the graph in SynState's single, glitch-free pass, and synstate-dom writes it into each bound node. Nothing is diffed, and no node shows a value computed from a mix of old and new inputs.
 - **No seam.** `debounce`, `switchMap` and a request are nodes of the same graph as the text they end in. A bridge to another library converts every value that crosses it, and turns an event into a value as it goes.
@@ -272,14 +276,7 @@ Type quickly, then pause:
 
 ```tsx
 import { createState, map } from 'synstate';
-import {
-    constant,
-    For,
-    If,
-    inlineMap,
-    isImeKeyDown,
-    type JSX,
-} from 'synstate-dom';
+import { constant, For, If, isImeKeyDown, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -330,15 +327,14 @@ export const TodoDemo = (): JSX.Element => (
                             return (
                                 <li
                                     class={{
-                                        done: inlineMap(todo$, (t) => t.done),
+                                        done: todo$.pipe(map((t) => t.done)),
                                     }}
                                 >
                                     <label>
                                         <input
                                             type={constant('checkbox')}
-                                            checked={inlineMap(
-                                                todo$,
-                                                (t) => t.done,
+                                            checked={todo$.pipe(
+                                                map((t) => t.done),
                                             )}
                                             onChange={() => {
                                                 toggle(
@@ -347,7 +343,7 @@ export const TodoDemo = (): JSX.Element => (
                                                 );
                                             }}
                                         />
-                                        {inlineMap(todo$, (t) => ` ${t.title}`)}
+                                        {todo$.pipe(map((t) => ` ${t.title}`))}
                                     </label>
                                     <span class={constant('note')}>
                                         {constant(
@@ -416,7 +412,7 @@ Add, toggle and remove todos, and watch the **row #** labels:
 
 ## Where to Go Next
 
-- [Bindable values](/mono/synstate-dom/guides/bindable/) — `constant`, `inlineMap`, `deriveBindable` and why a plain value is rejected.
+- [Bindable values](/mono/synstate-dom/guides/bindable/) — `constant`, `pipe(map)`, `deriveBindable` and why a plain value is rejected.
 - [Components](/mono/synstate-dom/guides/components/) — props are plain JavaScript, children, and what runs once.
 - [Control flow](/mono/synstate-dom/guides/control-flow/) — `If`, `Match`, `For` and `Portal`.
 - [Lifecycle and scopes](/mono/synstate-dom/guides/lifecycle/) — what is disposed, and when.

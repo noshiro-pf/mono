@@ -1,5 +1,5 @@
 import { type InitializedObservable, map } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import type { OutsideNode } from '../queue-view.mjs';
 import { ExternalLink } from './external-link.js';
 
@@ -28,14 +28,14 @@ export const QueueOutsideBox = ({
     onLeave={onHide}
   >
     <span class={constant('queue-number')}>
-      {inlineMap(node$, (node) => `#${node.number}`)}
+      {node$.pipe(map((node) => `#${node.number}`))}
     </span>
     <span class={constant('queue-note')}>
-      {inlineMap(node$, (node) => `${node.reason} · ${node.owner}`)}
+      {node$.pipe(map((node) => `${node.reason} · ${node.owner}`))}
     </span>
 
     <span class={constant('visually-hidden')}>
-      {inlineMap(node$, (node) => ` ${node.title} — ${node.detail}`)}
+      {node$.pipe(map((node) => ` ${node.title} — ${node.detail}`))}
     </span>
   </ExternalLink>
 );

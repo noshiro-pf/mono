@@ -25,7 +25,6 @@ import {
   constant,
   createAfterUpdate,
   deriveBindable,
-  inlineMap,
   isImeKeyDown,
   mapBindable,
   subscribeInScope,
@@ -524,7 +523,7 @@ export const PopoverCore = ({
             ['bp6-popover-open', open$],
             [
               'bp6-active',
-              inlineMap(open$, (open) => open && !isControlled && !isHover),
+              open$.pipe(map((open) => open && !isControlled && !isHover)),
             ],
           ],
         )}

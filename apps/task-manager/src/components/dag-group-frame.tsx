@@ -1,5 +1,5 @@
 import { type InitializedObservable, map } from 'synstate';
-import { constant, inlineMap, isImeKeyDown, type JSX } from 'synstate-dom';
+import { constant, isImeKeyDown, type JSX } from 'synstate-dom';
 import { frameTitle, GROUP_HEADER, GROUP_PADDING } from '../dag/index.mjs';
 import { m } from '../i18n/index.mjs';
 import { groupEditorStore } from '../store/index.mjs';
@@ -24,28 +24,28 @@ export const DagGroupFrame = ({ record }: Props): JSX.Element => {
 
   return (
     <g
-      class={inlineMap(
-        record,
-        ({ frame, dragging }) =>
-          `dag-group${frame.empty ? ' empty' : ''}${dragging ? ' dragging' : ''}`,
+      class={record.pipe(
+        map(
+          ({ frame, dragging }) =>
+            `dag-group${frame.empty ? ' empty' : ''}${dragging ? ' dragging' : ''}`,
+        ),
       )}
-      data-drop={inlineMap(record, ({ drop }) => drop)}
+      data-drop={record.pipe(map(({ drop }) => drop))}
       data-e2e={constant('dag-group')}
-      transform={inlineMap(
-        record,
-        ({ frame }) => `translate(${frame.x} ${frame.y})`,
+      transform={record.pipe(
+        map(({ frame }) => `translate(${frame.x} ${frame.y})`),
       )}
     >
       <rect
         class={constant('dag-group-frame')}
-        height={inlineMap(record, ({ frame }) => frame.height)}
+        height={record.pipe(map(({ frame }) => frame.height))}
         rx={constant(GROUP_CORNER_RADIUS)}
-        width={inlineMap(record, ({ frame }) => frame.width)}
+        width={record.pipe(map(({ frame }) => frame.width))}
       />
       {/* An SVG has no <button>: the title takes its role, focus and keys. */}
       {}
       <g
-        aria-label={inlineMap(record, (r) => m.dag.group(r.title))}
+        aria-label={record.pipe(map((r) => m.dag.group(r.title)))}
         class={constant('dag-group-header')}
         data-e2e={constant('dag-group-header')}
         data-group-id={constant(id)}
@@ -72,7 +72,7 @@ export const DagGroupFrame = ({ record }: Props): JSX.Element => {
           class={constant('dag-group-header-area')}
           height={constant(GROUP_HEADER)}
           rx={constant(GROUP_CORNER_RADIUS)}
-          width={inlineMap(record, ({ frame }) => frame.width)}
+          width={record.pipe(map(({ frame }) => frame.width))}
         />
         <text
           class={constant('dag-group-title')}
@@ -80,7 +80,7 @@ export const DagGroupFrame = ({ record }: Props): JSX.Element => {
           x={constant(GROUP_PADDING)}
           y={constant(GROUP_HEADER / 2)}
         >
-          {inlineMap(record, (r) => frameTitle(r.title, r.frame.width))}
+          {record.pipe(map((r) => frameTitle(r.title, r.frame.width)))}
         </text>
       </g>
     </g>

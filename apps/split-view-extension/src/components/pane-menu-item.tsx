@@ -1,5 +1,5 @@
 import { type InitializedObservable, map } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import { Icon, type IconName } from './icon.js';
 
 /** One row of a pane's menu. `onChosen` is told which row was chosen. */
@@ -11,14 +11,16 @@ export const PaneMenuItem = ({
   onChosen: (choice: PaneMenuChoice) => void;
 }>): JSX.Element => (
   <button
-    aria-pressed={inlineMap(item$, (item) => item.pressed?.toString())}
-    class={inlineMap(item$, (item) =>
-      item.tone === 'warn'
-        ? 'pane__menu-item pane__menu-item--warn'
-        : 'pane__menu-item',
+    aria-pressed={item$.pipe(map((item) => item.pressed?.toString()))}
+    class={item$.pipe(
+      map((item) =>
+        item.tone === 'warn'
+          ? 'pane__menu-item pane__menu-item--warn'
+          : 'pane__menu-item',
+      ),
     )}
-    disabled={inlineMap(item$, (item) => item.disabled ?? false)}
-    title={inlineMap(item$, (item) => item.title)}
+    disabled={item$.pipe(map((item) => item.disabled ?? false))}
+    title={item$.pipe(map((item) => item.title))}
     type={constant('button')}
     onClick={() => {
       onChosen(item$.getSnapshot().value.choice);
@@ -26,7 +28,7 @@ export const PaneMenuItem = ({
   >
     <Icon icon={item$.pipe(map((item) => item.icon))} />
 
-    {inlineMap(item$, (item) => item.label)}
+    {item$.pipe(map((item) => item.label))}
   </button>
 );
 

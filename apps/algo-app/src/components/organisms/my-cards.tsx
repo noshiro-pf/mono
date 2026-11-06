@@ -1,11 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import {
-  constant,
-  For,
-  inlineMap,
-  type Bindable,
-  type JSX,
-} from 'synstate-dom';
+import { constant, For, type Bindable, type JSX } from 'synstate-dom';
 import type { RectSize } from 'ts-utils-additional';
 import { darkGray } from '../../constants/index.mjs';
 import { cardToString } from '../../functions/index.mjs';
@@ -37,7 +31,7 @@ export const MyCards = ({ cards, height }: Props): JSX.Element => {
     <div
       class={constant(styles.cards)}
       style={{
-        height: inlineMap(height, (h) => `${h}px`),
+        height: height.pipe(map((h) => `${h}px`)),
         'background-color': constant(darkGray),
         '--my-cards-gap': constant(`${paddingPx}px`),
       }}

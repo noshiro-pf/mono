@@ -3,7 +3,6 @@ import {
   constant,
   createAfterUpdate,
   If,
-  inlineMap,
   isImeKeyDown,
   toObservable,
   type Bindable,
@@ -759,7 +758,7 @@ export const DateRangeInput = ({
         ref={(target) => {
           mut_elements.target = target;
         }}
-        aria-expanded={inlineMap(open$, String)}
+        aria-expanded={open$.pipe(map(String))}
         aria-haspopup={constant('menu')}
         class={{
           'bp6-control-group': constant(true),

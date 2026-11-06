@@ -3,7 +3,6 @@ import {
   constant,
   deriveBindable,
   For,
-  inlineMap,
   mapBindable,
   type JSX,
 } from 'synstate-dom';
@@ -51,8 +50,8 @@ export const MergeOrderFilters = (): JSX.Element => {
     <div class={constant('merge-order-filters')}>
       <div
         class={constant('summary-row')}
-        data-picking={inlineMap(view$, ({ onlyStatuses }) =>
-          Arr.isNonEmpty(onlyStatuses).toString(),
+        data-picking={view$.pipe(
+          map(({ onlyStatuses }) => Arr.isNonEmpty(onlyStatuses).toString()),
         )}
       >
         <StatTile
@@ -113,8 +112,10 @@ export const MergeOrderFilters = (): JSX.Element => {
           </span>
           {PRIORITIES.map((priority) => (
             <button
-              aria-pressed={inlineMap(view$, ({ hiddenPriorities }) =>
-                (!hiddenPriorities.includes(priority)).toString(),
+              aria-pressed={view$.pipe(
+                map(({ hiddenPriorities }) =>
+                  (!hiddenPriorities.includes(priority)).toString(),
+                ),
               )}
               class={constant('filter-chip')}
               type={constant('button')}
@@ -124,9 +125,8 @@ export const MergeOrderFilters = (): JSX.Element => {
             >
               {constant(PRIORITY_NAMES[priority])}
               <span class={constant('filter-chip-count')}>
-                {inlineMap(
-                  counts$,
-                  ({ priorities }) => priorities[priority].shown,
+                {counts$.pipe(
+                  map(({ priorities }) => priorities[priority].shown),
                 )}
                 <OfTotal
                   count={counts$.pipe(
@@ -146,8 +146,8 @@ export const MergeOrderFilters = (): JSX.Element => {
             {constant('state')}
           </span>
           <button
-            aria-pressed={inlineMap(view$, ({ hideDrafts }) =>
-              (!hideDrafts).toString(),
+            aria-pressed={view$.pipe(
+              map(({ hideDrafts }) => (!hideDrafts).toString()),
             )}
             class={constant('filter-chip')}
             title={constant(
@@ -158,7 +158,7 @@ export const MergeOrderFilters = (): JSX.Element => {
           >
             {constant('draft')}
             <span class={constant('filter-chip-count')}>
-              {inlineMap(counts$, ({ drafts }) => drafts.shown)}
+              {counts$.pipe(map(({ drafts }) => drafts.shown))}
               <OfTotal count={counts$.pipe(map(({ drafts }) => drafts))} />
             </span>
           </button>
@@ -170,8 +170,8 @@ export const MergeOrderFilters = (): JSX.Element => {
         >
           <button
             aria-label={constant('merge order')}
-            aria-pressed={inlineMap(view$, ({ sort }) =>
-              (sort === 'order').toString(),
+            aria-pressed={view$.pipe(
+              map(({ sort }) => (sort === 'order').toString()),
             )}
             class={constant('theme-switch-option')}
             title={constant(
@@ -189,8 +189,8 @@ export const MergeOrderFilters = (): JSX.Element => {
             </span>
           </button>
           <button
-            aria-pressed={inlineMap(view$, ({ sort }) =>
-              (sort === 'priority').toString(),
+            aria-pressed={view$.pipe(
+              map(({ sort }) => (sort === 'priority').toString()),
             )}
             class={constant('theme-switch-option')}
             title={constant(

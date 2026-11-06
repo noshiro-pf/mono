@@ -1,6 +1,6 @@
 import { HtmlSelect } from 'blueprint-synstate';
 import { map, type InitializedObservable } from 'synstate';
-import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, For, If, type JSX } from 'synstate-dom';
 import { dependencyTypes } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
@@ -46,10 +46,11 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
 
   return (
     <li
-      class={inlineMap(
-        row,
-        ({ check }) =>
-          `bp6-card bp6-compact dependency-row${check?.status === 'error' ? ' invalid' : ''}`,
+      class={row.pipe(
+        map(
+          ({ check }) =>
+            `bp6-card bp6-compact dependency-row${check?.status === 'error' ? ' invalid' : ''}`,
+        ),
       )}
       data-e2e={constant('dependency-row')}
     >
@@ -86,15 +87,15 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
                 ),
               )}
               then={
-                <option value={inlineMap(row, (r) => r.row.source)}>
+                <option value={row.pipe(map((r) => r.row.source))}>
                   {constant(m.dependencies.missingSource)}
                 </option>
               }
             />
             <For items={row.pipe(map((r) => r.options))} key={(o) => o.value}>
               {(option$) => (
-                <option value={inlineMap(option$, ({ value }) => value)}>
-                  {inlineMap(option$, ({ label }) => label)}
+                <option value={option$.pipe(map(({ value }) => value))}>
+                  {option$.pipe(map(({ label }) => label))}
                 </option>
               )}
             </For>
@@ -138,10 +139,12 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
                 {constant(m.dependencies.type)}
               </span>
               <span class={constant('dependency-type-fixed bp6-text-muted')}>
-                {inlineMap(row, (r) =>
-                  r.row.source.startsWith('milestone:')
-                    ? m.dependencies.afterReached
-                    : m.dependencies.noType,
+                {row.pipe(
+                  map((r) =>
+                    r.row.source.startsWith('milestone:')
+                      ? m.dependencies.afterReached
+                      : m.dependencies.noType,
+                  ),
                 )}
               </span>
             </div>
@@ -156,7 +159,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
             min={constant('0')}
             step={constant('1')}
             type={constant('number')}
-            value={inlineMap(row, (r) => r.row.lagDays)}
+            value={row.pipe(map((r) => r.row.lagDays))}
             onInput={(changed) => {
               editorStore.updateDependencyRow(key, {
                 lagDays: changed.currentTarget.value,
@@ -173,7 +176,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
             min={constant('0')}
             step={constant('1')}
             type={constant('number')}
-            value={inlineMap(row, (r) => r.row.lagHours)}
+            value={row.pipe(map((r) => r.row.lagHours))}
             onInput={(changed) => {
               editorStore.updateDependencyRow(key, {
                 lagHours: changed.currentTarget.value,
@@ -182,8 +185,8 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
           />
         </label>
         <button
-          aria-label={inlineMap(row, ({ name }) =>
-            m.dependencies.removeRow(name),
+          aria-label={row.pipe(
+            map(({ name }) => m.dependencies.removeRow(name)),
           )}
           class={constant('bp6-button bp6-minimal dependency-remove')}
           data-e2e={constant('dependency-remove')}
@@ -206,8 +209,10 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
             id={constant(errorId)}
             role={constant('alert')}
           >
-            {inlineMap(row, ({ check }) =>
-              check?.status === 'error' ? check.message : '',
+            {row.pipe(
+              map(({ check }) =>
+                check?.status === 'error' ? check.message : '',
+              ),
             )}
           </p>
         }
@@ -217,14 +222,17 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
             then={
               <p class={constant('dependency-row-message')}>
                 <span
-                  class={inlineMap(
-                    row,
-                    ({ met }) =>
-                      `bp6-tag bp6-minimal ${met === true ? 'bp6-intent-success' : 'bp6-intent-warning'}`,
+                  class={row.pipe(
+                    map(
+                      ({ met }) =>
+                        `bp6-tag bp6-minimal ${met === true ? 'bp6-intent-success' : 'bp6-intent-warning'}`,
+                    ),
                   )}
                 >
-                  {inlineMap(row, ({ met }) =>
-                    met === true ? m.dependencies.met : m.dependencies.unmet,
+                  {row.pipe(
+                    map(({ met }) =>
+                      met === true ? m.dependencies.met : m.dependencies.unmet,
+                    ),
                   )}
                 </span>
               </p>
