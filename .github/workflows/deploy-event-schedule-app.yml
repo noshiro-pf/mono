@@ -417,11 +417,20 @@ jobs:
       # prompt answered, fails instead of answering it. Unchanged functions are
       # skipped by firebase-tools (it compares source hashes), so a target
       # chosen by a lockfile change alone costs time, not a redeploy.
+      #
+      # `GOOGLE_CLOUD_QUOTA_PROJECT` bills every call firebase-tools makes to
+      # the project being deployed, which has every API the deploy uses
+      # enabled. Without it the calls count against the service account's own
+      # project, noshiro-pf-ci, which has no billing account and so cannot
+      # enable Cloud Build, Artifact Registry, Cloud Scheduler or Secret
+      # Manager. Billing to it takes `serviceusage.services.use` there (Service
+      # Usage Consumer, docs/event-schedule-app-deploy.md).
       - name: Deploy
         if: steps.current.outputs.only != ''
         working-directory: apps/event-schedule-app
         env:
           ONLY: ${{ steps.current.outputs.only }}
+          GOOGLE_CLOUD_QUOTA_PROJECT: ${{ env.PROJECT }}
         # The binary itself, not `pnpm exec` (see deploy-firestore.yml).
         run: |
           ./node_modules/.bin/firebase deploy --non-interactive \
