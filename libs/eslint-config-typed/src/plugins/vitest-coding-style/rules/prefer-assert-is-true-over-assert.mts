@@ -38,7 +38,7 @@ export const preferAssertIsTrueOverAssertRule: TSESLint.RuleModule<
         context.sourceCode,
         node.callee,
         'assert',
-      );
+      )?.identifier;
 
       if (bareCallee !== undefined) {
         if (Arr.isEmpty(node.arguments)) {
@@ -71,7 +71,7 @@ export const preferAssertIsTrueOverAssertRule: TSESLint.RuleModule<
           context.sourceCode,
           callee.object,
           'assert',
-        );
+        )?.identifier;
 
         if (
           receiver !== undefined &&
