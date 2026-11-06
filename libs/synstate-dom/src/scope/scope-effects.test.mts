@@ -27,6 +27,58 @@ describe(subscribeInScope, () => {
 
     assert.deepStrictEqual(mut_received, [0, 1]);
   });
+
+  test('passes on a write the first call makes to the source (#3280)', () => {
+    const scope = createScope(undefined);
+
+    const [count, setCount] = createState(-1);
+
+    const mut_received: number[] = [];
+
+    scope.run(() => {
+      subscribeInScope(count, (value) => {
+        mut_received.push(value);
+
+        if (value < 0) {
+          setCount(0);
+        }
+      });
+    });
+
+    assert.deepStrictEqual(mut_received, [-1, 0]);
+
+    setCount(1);
+
+    scope.dispose();
+
+    assert.deepStrictEqual(mut_received, [-1, 0, 1]);
+  });
+
+  test('passes on the value the first call writes once, however many writes it makes', () => {
+    const scope = createScope(undefined);
+
+    const [count, setCount] = createState(-1);
+
+    const mut_received: number[] = [];
+
+    scope.run(() => {
+      subscribeInScope(count, (value) => {
+        mut_received.push(value);
+
+        if (value !== -1) {
+          return;
+        }
+
+        setCount(5);
+
+        setCount(0);
+      });
+    });
+
+    scope.dispose();
+
+    assert.deepStrictEqual(mut_received, [-1, 0]);
+  });
 });
 
 describe(createAfterUpdate, () => {

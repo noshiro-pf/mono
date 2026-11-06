@@ -1,20 +1,39 @@
 import { onScopeDispose, type Observable } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 
 /**
  * Calls `next` with every value of `source`, the current one first, until the
  * current scope is disposed — what a component that is called once does in
  * place of an effect.
+ *
+ * A value the first call writes to `source` itself (a clamp, a default) is
+ * passed to `next` as well, once, after the first call has returned.
  */
 export const subscribeInScope = <A,>(
   source: Observable<A>,
   next: (value: A) => void,
 ): void => {
+  // `subscribe` delivers the current value before it adds the subscriber, so a
+  // write the first `next` makes reaches no subscriber (#3280); it is passed on
+  // once the subscription is in place.
+  const { updateToken } = source;
+
   const subscription = source.subscribe(next);
 
   onScopeDispose(() => {
     subscription.unsubscribe();
   });
+
+  if (source.updateToken === updateToken) {
+    return;
+  }
+
+  const snapshot = source.getSnapshot();
+
+  if (Optional.isSome(snapshot)) {
+    next(snapshot.value);
+  }
 };
 
 /** Listens to `type` on `target` until the current scope is disposed. */

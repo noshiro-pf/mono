@@ -236,7 +236,7 @@ type MountedNodes = Node | readonly Node[];
 
 コンポーネントの中で effect の代わりに使う補助関数を `scope/` から公開する。どれも現在のスコープの `onScopeDispose` に後始末を登録する。
 
-- `subscribeInScope(source, next)`: 購読し、スコープの破棄で解除する。束縛（「7.1」）が完了していない Observable を購読するのもこれで行う。
+- `subscribeInScope(source, next)`: 購読し、スコープの破棄で解除する。束縛（「7.1」）が完了していない Observable を購読するのもこれで行う。最初の `next` が `source` 自身に書いた値（範囲への丸め、既定値）も、最初の呼び出しが返った後に一度 `next` に渡す。synstate の `subscribe` は購読者を加える前に現在の値を渡すので、そのままではその書き込みはどの購読者にも届かない。
 - `listenInScope(target, type, listener, options)`: `window` などコンポーネントが描く要素以外のイベントを、スコープの破棄まで聞く。要素のイベントの束縛（「7.2」）もこれで行う。
 - `createAfterUpdate()`: 処理を microtask で実行する関数を返す。進行中の更新が終わり、DOM が書かれた後に実行されるので、状態に書き込める。最初のマウントの後に実行したい処理にも使う。それまでにスコープが破棄されていれば捨てる。
 
