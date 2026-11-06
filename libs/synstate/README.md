@@ -771,7 +771,7 @@ For complex scenarios, SynState provides observable-based APIs:
 
 #### Scopes (for library authors)
 
-- `createScope(parent?)`: Create a scope; observables created and subscriptions made synchronously inside `scope.run(body)` belong to it and are disposed or unsubscribed by `scope.dispose()`
+- `createScope(parent?, { after? })`: Create a scope; observables created and subscriptions made synchronously inside `scope.run(body)` belong to it and are disposed or unsubscribed by `scope.dispose()`, and with `after` the observables derived in it update after `after`
 - `getCurrentScope()`: The scope whose `run` is executing, if any
 - `onScopeDispose(cleanup)`: Call `cleanup` when the current scope is disposed
 - `untracked(body)`: Call `body` with no current scope, so that what it creates or subscribes outlives the surrounding scope

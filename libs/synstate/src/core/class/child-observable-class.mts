@@ -21,9 +21,10 @@ import type {
   Wrap,
 } from '../types/index.mjs';
 import {
+  atScopeFloor,
+  childDepth,
   isDevelopmentBuild,
   issueUnqueuedToken,
-  maxDepth,
   runUndoingOnThrow,
 } from '../utils/index.mjs';
 import { ManagerObservableClass } from './manager-observable-class.mjs';
@@ -39,7 +40,8 @@ type ChildObservableConfig<A, P extends NonEmptyUnknownList> = Readonly<{
    * in ascending depth, so an observable `tryUpdate` reads with `getSnapshot`
    * without being its child (`withCurrentValueFrom`'s second source) has to be
    * shallower than this one too, or this one reads its value from before the
-   * update: pass `1 + Math.max(...)` over both then.
+   * update: pass `1 + Math.max(...)` over both then. Either is raised to the
+   * floor of the scope it is created in (`createScope`'s `after`).
    */
   depth?: number;
 
@@ -61,14 +63,10 @@ export class SyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   #mut_isAttached: boolean;
   readonly parents: Wrap<P>;
 
-  constructor({
-    parents,
-    depth = 1 + maxDepth(parents),
-    initialValue,
-  }: ChildObservableConfig<A, P>) {
+  constructor({ parents, depth, initialValue }: ChildObservableConfig<A, P>) {
     super({
       kind: 'sync child',
-      depth,
+      depth: depth === undefined ? childDepth(parents) : atScopeFloor(depth),
       initialValue,
     });
 
@@ -145,14 +143,10 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   #mut_isAttached: boolean;
   readonly parents: Wrap<P>;
 
-  constructor({
-    parents,
-    depth = 1 + maxDepth(parents),
-    initialValue,
-  }: ChildObservableConfig<A, P>) {
+  constructor({ parents, depth, initialValue }: ChildObservableConfig<A, P>) {
     super({
       kind: 'async child',
-      depth,
+      depth: depth === undefined ? childDepth(parents) : atScopeFloor(depth),
       initialValue,
     });
 

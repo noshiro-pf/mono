@@ -32,6 +32,12 @@ export type ScopeInternals = Scope &
     /** Whether `dispose()` has run, or the scope was born disposed. */
     isDisposed: boolean;
 
+    /**
+     * The least depth of an observable created in the scope (`createScope`'s
+     * `after`, inherited from the parent): 0 when it follows nothing.
+     */
+    depthFloor: number;
+
     /** Takes `node` into the scope. */
     adopt: (node: ScopeMember) => void;
 

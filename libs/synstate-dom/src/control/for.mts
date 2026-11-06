@@ -67,6 +67,10 @@ export const For = <T,>({
       map((list) => toEntries(list, key)),
     );
 
+    // What a row derives updates after `entries$`, so that a row the next
+    // `items` drops is disposed before it computes from them (#3605).
+    const rowScopeOptions = { after: entries$ } as const;
+
     // `index$` is a node of its own in every row, visited on every update of
     // `items`; a `children` that declares no second parameter is not given one,
     // as Solid's `For` does.
@@ -93,7 +97,7 @@ export const For = <T,>({
       rowKey: unknown,
       entry: Entry<T>,
     ): readonly ChildNode[] => {
-      const scope = createScope(parent);
+      const scope = createScope(parent, rowScopeOptions);
 
       const start = document.createComment('');
 
