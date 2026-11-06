@@ -12,7 +12,10 @@ open な issue はどれも、**優先度の段を表す `priority:<段>` ラベ
   `pnpm run pr-report` の issue の節に `no priority tier` /
   `several priority tiers` と出る。見つけたら段を付ける。
 - `run-issue-resolver` は着手できる issue を段の順（`S`、`A`、`B`、`C`、段なし、
-  `D`）に取り、`hold` と `close` は取らない。
+  `D`）に取り、`hold` と `close` は取らない。ただし `S` より下の issue は、主な
+  テーマ（タイトルの scope と、それが属するパッケージ）がすでに着手された issue
+  か、同時に始めるほかのセッションの issue と同じなら、空くまで待たせる（#3598）。
+  `/resolve-issues` はテーマごとにまとめて取る（`startable-issues`）。
 
 ## 段
 

@@ -1,38 +1,33 @@
 import { issuePriorityOfLabels, type ReportIssue } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
-import * as t from 'ts-fortress';
-import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   parseCommandArgs,
   positiveInteger,
   resolveApiContext,
-  restAllPages,
   tokenFromEnv,
   viewerLogin,
-  type ApiContext,
 } from '../lib/index.mjs';
 import { readReport } from '../pr-report/index.mjs';
 import {
   attemptedFile,
   issueNumbers,
   ISSUES_LIMIT,
+  issuesByTheme,
   loadAttempted,
+  orderByTheme,
   parseAuthors,
   passedOverNotes,
+  readIssueBodies,
+  startedByOthers,
   surveyIssues,
+  themedCandidates,
+  themeMatches,
   type IssueCandidate,
   type IssueSurvey,
-} from '../run-issue-resolver/index.mjs';
-import { readIssueClaimant } from '../start-issue/index.mjs';
-import { WORKTREE_ROOT } from '../unblock-prs/index.mjs';
-import {
-  issueThemes,
-  orderByTheme,
-  primaryThemes,
-  themeMatches,
   type ThemedIssue,
   type ThemeOrder,
-} from './themes.mjs';
+} from '../run-issue-resolver/index.mjs';
+import { WORKTREE_ROOT } from '../unblock-prs/index.mjs';
 
 /** What `startable-issues --help` prints. */
 export const STARTABLE_ISSUES_HELP = [
@@ -111,9 +106,7 @@ export const startableIssues = async (
       mergedLimit: 1,
       issuesLimit: ISSUES_LIMIT,
     }),
-    restAllPages(context.value, '/issues', IssueBodyListSchema, {
-      query: { state: 'open' },
-    }),
+    readIssueBodies(context.value),
   ]);
 
   if (Result.isErr(read)) {
@@ -130,21 +123,9 @@ export const startableIssues = async (
 
   // Without the descriptions the themes come from the titles alone: they order
   // the list, and are no reason to print none of it.
-  const bodies = Result.isOk(listed)
-    ? issueBodies(listed.value)
-    : new Map<number, string>();
+  const bodies = Result.isOk(listed) ? listed.value : new Map<number, string>();
 
   const { issues } = read.value.report;
-
-  const themesOf =
-    (themesFrom: typeof issueThemes) =>
-    (number: number): readonly string[] => {
-      const issue = issues.find((each) => each.number === number);
-
-      return issue === undefined
-        ? []
-        : themesFrom(issue.title, bodies.get(number) ?? '');
-    };
 
   const survey = surveyIssues(
     issues,
@@ -152,20 +133,16 @@ export const startableIssues = async (
     attempted.value,
   );
 
-  const candidates = survey.fresh.map((each): ThemedCandidate => ({
-    ...each,
-    tier: tierOf(issues.find(({ number }) => number === each.number)),
-    themes: themesOf(issueThemes)(each.number),
-    primary: themesOf(primaryThemes)(each.number),
-  }));
+  const candidates = themedCandidates(survey.fresh, issues, bodies);
 
   const others = await startedByOthers(context.value, issues, args.by);
 
   const held = issuesByTheme(
-    others.started.map((number) => ({
-      number,
-      themes: themesOf(primaryThemes)(number),
-    })),
+    themedCandidates(
+      others.started.map((number) => ({ number })),
+      issues,
+      bodies,
+    ).map(({ number, primary }) => ({ number, themes: primary })),
   );
 
   return Result.ok(
@@ -188,24 +165,6 @@ export const startableIssues = async (
       ],
     }),
   );
-};
-
-/**
- * Each theme of `issues`, with the issues about it: of the issues another
- * session started, what `orderByTheme` holds back.
- */
-export const issuesByTheme = (
-  issues: readonly Readonly<{ number: number; themes: readonly string[] }>[],
-): ReadonlyMap<string, readonly number[]> => {
-  const mut_held = new Map<string, readonly number[]>();
-
-  for (const { number, themes } of issues) {
-    for (const theme of themes) {
-      mut_held.set(theme, Arr.toPushed(mut_held.get(theme) ?? [], number));
-    }
-  }
-
-  return mut_held;
 };
 
 /**
@@ -293,52 +252,6 @@ export const renderStartable = ({
   ].join('\n');
 };
 
-/**
- * Of the started issues and who claims each (`undefined`: no claim; an error:
- * it could not be read), the ones someone other than `by` is on. One whose
- * claim could not be read counts as another's, and a note says so: holding a
- * theme back by mistake costs less than two sessions on one.
- */
-export const othersStarted = (
-  claimants: readonly Readonly<{
-    number: number;
-    claimant: Result<string | undefined, string>;
-  }>[],
-  by: string,
-): Readonly<{ started: readonly number[]; notes: readonly string[] }> => {
-  const unread = claimants.filter(({ claimant }) => Result.isErr(claimant));
-
-  return {
-    started: claimants
-      .filter(
-        ({ claimant }) => !(Result.isOk(claimant) && claimant.value === by),
-      )
-      .map(({ number }) => number),
-    notes: Arr.isNonEmpty(unread)
-      ? [
-          `${issueNumbers(unread.map(({ number }) => number))}: who started them could not be read; counted as another session's.`,
-        ]
-      : [],
-  };
-};
-
-/**
- * Each open issue's description, by number, from a listing of `/issues`;
- * pull requests left out.
- */
-export const issueBodies = (
-  listed: readonly Readonly<{
-    number: number;
-    body?: string | null;
-    pull_request?: ReadonlyRecord<string, unknown>;
-  }>[],
-): ReadonlyMap<number, string> =>
-  new Map<number, string>(
-    listed
-      .filter(({ pull_request }) => pull_request === undefined)
-      .map(({ number, body }) => [number, body ?? ''] as const),
-  );
-
 /** The command line, or `'help'` when it asked for the help. */
 export const parseStartableIssuesArgs = (
   args: readonly string[],
@@ -404,66 +317,6 @@ export type ThemedCandidate = IssueCandidate & ThemedIssue;
 
 /** How many themes a theme named with no issue lists. */
 const THEMES_LISTED = 20;
-
-const IssueBodyListSchema = t.array(
-  t.record({
-    number: t.number(),
-    body: t.optional(t.union([t.string(), t.nullType])),
-    pull_request: t.optional(t.record({})),
-  }),
-);
-
-const tierOf = (issue: ReportIssue | undefined): ThemedIssue['tier'] => {
-  const tier =
-    issue === undefined
-      ? 'none'
-      : issuePriorityOfLabels(issue.labels.map(({ name }) => name));
-
-  return tier === 'S' || tier === 'D' ? tier : 'other';
-};
-
-/**
- * The started issues (`in-progress`: labelled so, or closed by an open pull
- * request) that someone other than `by` is on: every one when `by` is
- * `undefined`, one with no claim naming its claimant too, and one whose claim
- * could not be read, with a note.
- */
-const startedByOthers = async (
-  context: ApiContext,
-  issues: readonly ReportIssue[],
-  by: string | undefined,
-): Promise<
-  Readonly<{ started: readonly number[]; notes: readonly string[] }>
-> => {
-  const started = issues
-    .filter(({ start }) => start === 'in-progress')
-    .map(({ number }) => number);
-
-  if (by === undefined || !Arr.isNonEmpty(started)) {
-    return { started, notes: [] };
-  }
-
-  const viewer = await viewerLogin(context.token);
-
-  if (Result.isErr(viewer)) {
-    return {
-      started,
-      notes: [
-        `Who started the started issues could not be read (${viewer.value}): every one counts as another session's.`,
-      ],
-    };
-  }
-
-  return othersStarted(
-    await Promise.all(
-      started.map(async (number) => ({
-        number,
-        claimant: await readIssueClaimant(context, number, viewer.value),
-      })),
-    ),
-    by,
-  );
-};
 
 /** `ci: #90, #91; tooling: #92`. */
 const describeHeld = (

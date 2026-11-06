@@ -305,7 +305,12 @@ account wrote (`--author` names others), leaves any labelled `question`,
 first by tier — `priority:S`, `priority:A`, `priority:B`, `priority:C`, then one
 with no tier, then `priority:D` — and the oldest first within a tier; it leaves
 `priority:hold` and `priority:close` as it leaves `pending`. One issue per
-session, up to three sessions at once (`--concurrency`), never two on one issue.
+session, up to three sessions at once (`--concurrency`), never two on one issue,
+nor two on one theme: an issue below `priority:S` whose primary themes (its
+title's scope, with the package that scope lives in) are those of a started
+issue — any claimant's, this run's sessions and a `/resolve-issues` run included
+— or of an issue it is starting beside it, waits until they are free, so that
+sessions working at once keep to separate packages.
 It looks again as soon as a session ends, and every 30 minutes
 (`--interval-min`) while a slot is free.
 

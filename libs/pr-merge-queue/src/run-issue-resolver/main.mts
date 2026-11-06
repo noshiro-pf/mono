@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { IN_PROGRESS_LABEL } from 'pr-report-core';
+import { IN_PROGRESS_LABEL, type ReportIssue } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { StrictOmit } from 'ts-type-forge';
@@ -38,6 +38,12 @@ import {
   attemptedRecorder,
   loadAttempted,
 } from './attempted.mjs';
+import {
+  issuesByTheme,
+  readIssueBodies,
+  startedByOthers,
+  themedCandidates,
+} from './held-themes.mjs';
 import type { Options } from './options.mjs';
 import {
   firstCapUsd,
@@ -59,6 +65,7 @@ import {
   surveyIssues,
   type IssueCandidate,
 } from './survey.mjs';
+import { apartFrom, withoutHeldThemes, type ThemedIssue } from './themes.mjs';
 import { hitItsCap, judgeIssueSession, type IssueAfter } from './verdict.mjs';
 
 /**
@@ -231,6 +238,7 @@ export const runIssueResolver = async (
       stopRequested,
       now: Date.now,
       log,
+      apart: apartFrom,
     },
   );
 };
@@ -415,6 +423,61 @@ const roundOf = (
   }) as const;
 
 /**
+ * `fresh` themed, with what `withoutHeldThemes` holds back left out (#3598):
+ * an issue below `priority:S` mainly about a theme a started issue is on —
+ * another session's, a `/resolve-issues` run's, or one this run started, since
+ * it counts whoever claimed it. Within one pick, the pool's `apart`
+ * (`apartFrom`) keeps sessions started together off one theme. What cannot be
+ * read is said in a note, and the themes then come from the titles alone.
+ */
+const apartByTheme = async (
+  context: ApiContext,
+  issues: readonly ReportIssue[],
+  fresh: readonly IssueCandidate[],
+): Promise<
+  Readonly<{
+    fresh: readonly (IssueCandidate & ThemedIssue)[];
+    notes: readonly string[];
+  }>
+> => {
+  const read = await readIssueBodies(context);
+
+  const bodies = Result.isOk(read) ? read.value : new Map<number, string>();
+
+  const started = await startedByOthers(context, issues, undefined);
+
+  const held = issuesByTheme(
+    themedCandidates(
+      started.started.map((number) => ({ number })),
+      issues,
+      bodies,
+    ).map(({ number, primary }) => ({ number, themes: primary })),
+  );
+
+  const picked = withoutHeldThemes(
+    themedCandidates(fresh, issues, bodies),
+    held,
+  );
+
+  return {
+    fresh: picked.taken,
+    notes: [
+      ...(Result.isErr(read)
+        ? [
+            `The issues' descriptions could not be read (${read.value}): themes come from the titles alone.`,
+          ]
+        : []),
+      ...started.notes,
+      ...(Arr.isNonEmpty(picked.heldBack)
+        ? [
+            `${issueNumbers(picked.heldBack.map(({ number }) => number))}: startable, but a started issue is on their theme (${Arr.uniq(picked.heldBack.flatMap(({ themes }) => themes)).join(', ')}); waiting until it is free.`,
+          ]
+        : []),
+    ],
+  };
+};
+
+/**
  * What a look finds to start, and what it has to leave; in a dry run, says what
  * it would start and offers nothing.
  */
@@ -428,7 +491,10 @@ const survey = async (
   cutOff: ReadonlyMap<number, string | undefined>,
 ): Promise<
   Result<
-    Readonly<{ fresh: readonly IssueCandidate[]; notes: string }>,
+    Readonly<{
+      fresh: readonly (IssueCandidate & ThemedIssue)[];
+      notes: string;
+    }>,
     RunError
   >
 > => {
@@ -466,17 +532,26 @@ const survey = async (
     mut_held.set(number, updatedAt);
   }
 
-  const found = surveyIssues(
+  const surveyed = surveyIssues(
     read.value.report.issues,
     new Set<string>(authors),
     mut_held,
   );
+
+  const themed = await apartByTheme(
+    context,
+    read.value.report.issues,
+    surveyed.fresh,
+  );
+
+  const found = { ...surveyed, fresh: themed.fresh } as const;
 
   const stoppedAtCap = found.left.filter(
     (number) => cutOff.has(number) && !mut_attempted.has(number),
   );
 
   const notes = [
+    ...themed.notes,
     ...passedOverNotes(found, authors, stoppedAtCap),
     ...(Arr.isNonEmpty(found.fresh) ? [] : ['No issue to start.']),
   ].join('\n');
