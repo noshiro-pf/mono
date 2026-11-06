@@ -11,7 +11,7 @@ import {
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import type * as ts from 'typescript';
+import * as ts from 'typescript';
 
 type Options = readonly [
   Readonly<{
@@ -40,13 +40,18 @@ type MessageIds = 'dateOnlyString';
  * ## What it sees
  *
  * The first argument is judged by its type: a string literal type that is a
- * date alone, or a union, an intersection (a branded literal) or a type
- * parameter's constraint with one. So a literal written at the call is seen,
- * and so is a `const` holding one or a row of an `as const` table; a `string`
- * is not, whatever it holds at run time. It is reported when any layer of its
+ * date alone, or a union, an intersection (a branded literal) or the constraint
+ * of a generic type (a type parameter, `T[K]`) with one. So a literal written
+ * at the call is seen, and so is a `const` holding one or a row of an
+ * `as const` table; a `string` is not, whatever it holds at run time. It is reported when any layer of its
  * `as` / `satisfies` / `!` / `<T>` wrappers has such a type, since a widening
  * cast does not change the string, and when a branch of a `?:`, `??` or `||`, or
  * the right of `&&`, does, since `x ?? '2026-11-03'` is a `string` once `x` is.
+ *
+ * `new Date` with more than one argument, or a spread, reads each argument as a
+ * number of the local date and time and parses no string, so it is left alone.
+ * `Date.parse` and the `functions` below still parse their first argument,
+ * whatever follows it.
  *
  * The callee is read through those wrappers and through `?.`, and a computed
  * member with a static key (`Date['parse']`) is the same member. A `Date`
@@ -104,7 +109,9 @@ export const noDateOnlyStringToDate: TSESLint.RuleModule<MessageIds, Options> =
       /**
        * Whether `type` is, or has as a member, a string literal type that is a
        * date alone: through unions, intersections (a branded literal) and the
-       * constraint of a type parameter.
+       * constraint of a generic type — a type parameter, an indexed access
+       * (`T['day']`). A template literal type is its own constraint, so that is
+       * where the descent stops.
        */
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- a checker's type, which it hands out mutable
       const isDateOnlyType = (type: ts.Type): boolean => {
@@ -116,20 +123,27 @@ export const noDateOnlyStringToDate: TSESLint.RuleModule<MessageIds, Options> =
           return type.types.some(isDateOnlyType);
         }
 
-        const constraint = type.isTypeParameter()
-          ? checker.getBaseConstraintOfType(type)
-          : undefined;
+        if ((type.flags & ts.TypeFlags.Instantiable) === 0) {
+          return false;
+        }
 
-        return constraint !== undefined && isDateOnlyType(constraint);
+        const constraint = checker.getBaseConstraintOfType(type);
+
+        return (
+          constraint !== undefined &&
+          constraint !== type &&
+          isDateOnlyType(constraint)
+        );
       };
 
       /**
-       * Whether `callee` is the global `Date` or `globalThis.Date`: not a
-       * binding the file declares.
+       * Whether `node`, whose name path is `path`, is the global `Date` or
+       * `globalThis.Date`: not a binding the file declares.
        */
-      const isGlobalDate = (callee: DeepReadonly<TSESTree.Node>): boolean => {
-        const path = namePath(callee);
-
+      const isGlobalDate = (
+        node: DeepReadonly<TSESTree.Node>,
+        path: string | undefined,
+      ): boolean => {
         const root =
           path === 'Date'
             ? 'Date'
@@ -139,7 +153,7 @@ export const noDateOnlyStringToDate: TSESLint.RuleModule<MessageIds, Options> =
 
         return (
           root !== undefined &&
-          !isRuntimeBound(context.sourceCode, asNode(callee), root)
+          !isRuntimeBound(context.sourceCode, asNode(node), root)
         );
       };
 
@@ -148,28 +162,22 @@ export const noDateOnlyStringToDate: TSESLint.RuleModule<MessageIds, Options> =
         callee: DeepReadonly<TSESTree.Expression>,
         isNew: boolean,
       ): string | undefined => {
-        if (isNew && isGlobalDate(callee)) {
+        const value = unwrapCallee(callee);
+
+        const path = namePath(value);
+
+        if (isNew && isGlobalDate(value, path)) {
           return 'Date';
         }
-
-        const unwrapped = skipTypeWrappers(callee);
-
-        // `(Date?.parse)` is `Date.parse` wherever it is not `undefined`.
-        const value =
-          unwrapped.type === AST_NODE_TYPES.ChainExpression
-            ? skipTypeWrappers(unwrapped.expression)
-            : unwrapped;
 
         if (
           !isNew &&
           value.type === AST_NODE_TYPES.MemberExpression &&
           memberName(value) === 'parse' &&
-          isGlobalDate(value.object)
+          isGlobalDate(value.object, namePath(value.object))
         ) {
           return 'Date.parse';
         }
-
-        const path = namePath(value);
 
         return path !== undefined && functions.has(path) ? path : undefined;
       };
@@ -206,16 +214,28 @@ export const noDateOnlyStringToDate: TSESLint.RuleModule<MessageIds, Options> =
       const check = (
         node: DeepReadonly<TSESTree.CallExpression | TSESTree.NewExpression>,
       ): void => {
+        // The syntax first: the callee's scope lookup and the argument's type
+        // are paid only by a candidate.
+        const first = node.arguments[0];
+
+        if (first === undefined) {
+          return;
+        }
+
         const callee = checkedCallee(
           node.callee,
           node.type === AST_NODE_TYPES.NewExpression,
         );
 
-        const first = node.arguments[0];
-
         if (
           callee === undefined ||
-          first === undefined ||
+          // `new Date(y, m, d)` reads numbers, and a spread may be several.
+          (callee === 'Date' &&
+            node.type === AST_NODE_TYPES.NewExpression &&
+            (node.arguments.length > 1 ||
+              node.arguments.some(
+                (argument) => argument.type === AST_NODE_TYPES.SpreadElement,
+              ))) ||
           !isDateOnlyString(first)
         ) {
           return;
@@ -270,18 +290,26 @@ const memberName = (
       : undefined;
 
 /**
- * `node` as a dotted path of names (`globalThis.Date`, `DateUtils.from`), read
- * through type wrappers and string-keyed computed members, or `undefined` for
- * anything else.
+ * `node` read through its type wrappers and an optional chain around them:
+ * `(Date?.parse)` is `Date.parse` wherever it is not `undefined`.
  */
-const namePath = (node: DeepReadonly<TSESTree.Node>): string | undefined => {
+const unwrapCallee = (
+  node: DeepReadonly<TSESTree.Node>,
+): DeepReadonly<TSESTree.Node> => {
   const unwrapped = skipTypeWrappers(node);
 
-  // `(globalThis?.Date)` is `globalThis.Date` wherever it is not `undefined`.
-  const value =
-    unwrapped.type === AST_NODE_TYPES.ChainExpression
-      ? skipTypeWrappers(unwrapped.expression)
-      : unwrapped;
+  return unwrapped.type === AST_NODE_TYPES.ChainExpression
+    ? skipTypeWrappers(unwrapped.expression)
+    : unwrapped;
+};
+
+/**
+ * `node` as a dotted path of names (`globalThis.Date`, `DateUtils.from`), read
+ * through type wrappers, optional chains and string-keyed computed members, or
+ * `undefined` for anything else.
+ */
+const namePath = (node: DeepReadonly<TSESTree.Node>): string | undefined => {
+  const value = unwrapCallee(node);
 
   if (value.type === AST_NODE_TYPES.Identifier) {
     return value.name;
