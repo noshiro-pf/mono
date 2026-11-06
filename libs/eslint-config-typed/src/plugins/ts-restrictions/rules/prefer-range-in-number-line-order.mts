@@ -4,7 +4,11 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { getRangeWithParens, skipTypeWrappers } from 'eslint-rule-forge';
+import {
+  getRangeWithParens,
+  mayHaveEffect,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly, FixedLengthTuple } from 'ts-type-forge';
 
@@ -192,7 +196,7 @@ export const preferRangeInNumberLineOrder: TSESLint.RuleModule<
 
       if (
         [first.left, first.right, second.left, second.right].some((operand) =>
-          ASTUtils.hasSideEffect(asNode(operand), sourceCode),
+          mayHaveEffect(asNode(operand), sourceCode),
         )
       ) {
         context.report({

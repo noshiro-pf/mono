@@ -6,6 +6,7 @@ import {
 } from '@typescript-eslint/utils';
 import {
   bindValueImportsAt,
+  getArgumentText,
   isTypeWrapper,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
@@ -84,12 +85,7 @@ export const getVitestReceiver = (
 export const getExpectOperands = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   expectCall: TSESTree.CallExpression,
-):
-  | Readonly<{
-      actual: TSESTree.Expression;
-      message: TSESTree.Expression | undefined;
-    }>
-  | undefined => {
+): ExpectOperands | undefined => {
   const [actual, message, ...rest] = expectCall.arguments;
 
   return actual === undefined ||
@@ -99,6 +95,27 @@ export const getExpectOperands = (
     ? undefined
     : { actual, message };
 };
+
+/** What {@link getExpectOperands} returns. */
+export type ExpectOperands = Readonly<{
+  actual: TSESTree.Expression;
+  message: TSESTree.Expression | undefined;
+}>;
+
+/**
+ * The text of `expect(X)`'s or `expect(X, message)`'s operands as the arguments
+ * of an `assert.*` call: `X`, then the message when there is one.
+ */
+export const getExpectOperandsText = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  operands: ExpectOperands,
+): string =>
+  [operands.actual, operands.message]
+    .filter((operand) => operand !== undefined)
+    .map((operand) => getArgumentText(sourceCode, operand))
+    .join(', ');
 
 /**
  * For one file, a function that gives the fix for a rule rewriting the Vitest

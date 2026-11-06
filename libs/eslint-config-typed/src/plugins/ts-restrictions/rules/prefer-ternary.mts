@@ -6,6 +6,7 @@ import {
 } from '@typescript-eslint/utils';
 import {
   getRangeWithParens,
+  mayHaveEffect,
   parenthesesDepth,
   siblingOf,
 } from 'eslint-rule-forge';
@@ -349,7 +350,7 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
         declarator.id.name !== left.name ||
         isTernary(init) ||
         (isOnlySingleLine && !isSingleLine(init)) ||
-        ASTUtils.hasSideEffect(asNode(init), sourceCode)
+        mayHaveEffect(asNode(init), sourceCode)
       ) {
         return undefined;
       }

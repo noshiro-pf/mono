@@ -278,6 +278,29 @@ describe('prefer-range-in-number-line-order', () => {
           errors: [{ messageId: 'preferNumberLineOrder' }],
         },
         {
+          name: 'a tagged template operand, which calls its tag, is only suggested',
+          code: dedent`
+            declare const n: (s: TemplateStringsArray) => number;
+            const y = n\`x\` >= 0 && n\`x\` < 10;
+          `,
+          output: null,
+          errors: [
+            {
+              messageId: 'preferNumberLineOrder',
+              suggestions: [
+                {
+                  messageId: 'reorderRange',
+                  data: { replacement: '0 <= n`x` && n`x` < 10' },
+                  output: dedent`
+                    declare const n: (s: TemplateStringsArray) => number;
+                    const y = 0 <= n\`x\` && n\`x\` < 10;
+                  `,
+                },
+              ],
+            },
+          ],
+        },
+        {
           name: 'an operand with a side effect is only suggested',
           code: dedent`
             declare const f: () => number;

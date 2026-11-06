@@ -3,16 +3,13 @@ import {
   ESLintUtils,
   type TSESLint,
 } from '@typescript-eslint/utils';
-import {
-  getArgumentText,
-  skipTypeWrappers,
-  typeWrapperLayers,
-} from 'eslint-rule-forge';
+import { skipTypeWrappers, typeWrapperLayers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
 import {
   createVitestAssertFixer,
   getExpectOperands,
+  getExpectOperandsText,
   getVitestReceiver,
 } from './vitest-binding.mjs';
 
@@ -110,10 +107,7 @@ export const preferAssertIsTrueOverExpectTrueRule: TSESLint.RuleModule<
         }
 
         // `expect(X, message)` keeps its message: `assert.is*` takes one too.
-        const argText = [operands.actual, operands.message]
-          .filter((a) => a !== undefined)
-          .map((a) => getArgumentText(context.sourceCode, a))
-          .join(', ');
+        const argText = getExpectOperandsText(context.sourceCode, operands);
 
         context.report({
           node,

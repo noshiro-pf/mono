@@ -127,6 +127,12 @@ The range and the text of a node leave out the parentheses written around it.
 | :---------- | :------------------------------------------------------------------------------------------- |
 | `siblingOf` | the statement after (`1`) or before (`-1`) a node in its statement list, through an `export` |
 
+## Side effects
+
+| Helper          | What it gives                                                                                                                                    |
+| :-------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mayHaveEffect` | whether moving or dropping a node may be observed: `ASTUtils.hasSideEffect` plus a tagged template and an iterator spread, not inside a function |
+
 ## Imports and bindings
 
 | Helper                     | What it gives                                                                                                                                                       |

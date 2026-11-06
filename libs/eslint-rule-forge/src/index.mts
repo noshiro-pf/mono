@@ -1,5 +1,6 @@
 export * from './bindings.mjs';
 export * from './comments.mjs';
+export * from './effects.mjs';
 export * from './imports.mjs';
 export * from './negation.mjs';
 export * from './parentheses.mjs';
