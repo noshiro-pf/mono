@@ -22,6 +22,7 @@ import { Arr, isRecord, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import {
   addLabel,
+  currentEpochMs,
   git,
   graphql,
   graphqlQuery,
@@ -37,6 +38,7 @@ import {
   unlinkedClosingIssues,
   type ClosingIssueAnswer,
 } from './merge-after.mjs';
+import { LAYER_TIMEOUT_MS } from './speculate-plan.mjs';
 import {
   PullRequestSchema,
   type BaseChange,
@@ -705,12 +707,14 @@ export const armAutoMerge = async (
  * has been re-run {@link RERUNS} times already, so that a check that fails for
  * a reason a re-run does not change is not run for ever. More than one, since a
  * person may have re-run it by hand before the approval it was waiting for.
- * `'already'` says the budget is spent.
+ * See {@link rerunOf} for what each answer says. A dry run reads the run and
+ * asks for nothing.
  */
 export const rerunFailedJobs = async (
   api: ApiContext,
   link: string,
-): Promise<Result<'already' | 'rerun', string>> => {
+  dryRun: boolean,
+): Promise<Result<Rerun, string>> => {
   const runId = workflowRunId(link);
 
   if (runId === undefined) {
@@ -721,15 +725,21 @@ export const rerunFailedJobs = async (
     api,
     'GET',
     `/actions/runs/${runId}`,
-    t.record({ run_attempt: t.number() }),
+    t.record({
+      run_attempt: t.number(),
+      status: t.union([t.string(), t.nullType]),
+      run_started_at: t.optional(t.union([t.string(), t.nullType])),
+    }),
   );
 
   if (Result.isErr(run)) {
     return run;
   }
 
-  if (run.value.run_attempt > RERUNS) {
-    return Result.ok('already');
+  const decided = rerunOf(run.value, currentEpochMs());
+
+  if (decided !== 'rerun' || dryRun) {
+    return Result.ok(decided);
   }
 
   const rerun = await rest(
@@ -742,7 +752,43 @@ export const rerunFailedJobs = async (
   return Result.isErr(rerun) ? rerun : Result.ok('rerun');
 };
 
+/** What {@link rerunFailedJobs} found, and did unless on a dry run. */
+export type Rerun = 'already' | 'rerun' | 'running' | 'stuck';
+
 const RERUNS = 2;
+
+/**
+ * What {@link rerunFailedJobs} does with a run as GitHub reads it: `'running'`
+ * while its latest attempt has not completed, since a re-run is refused then
+ * and the check turns by itself, and `'stuck'` once that attempt has gone on
+ * longer than {@link RUN_TIMEOUT_MS}; `'already'` once the budget is spent;
+ * `'rerun'` otherwise. An attempt whose start GitHub does not give is waited
+ * for, as a queue layer's is (`isStuck`).
+ */
+export const rerunOf = (
+  run: Readonly<{
+    run_attempt: number;
+    status: string | null;
+    run_started_at?: string | null | undefined;
+  }>,
+  nowMs: number,
+): Rerun => {
+  if (run.status !== 'completed') {
+    const startedMs = Date.parse(run.run_started_at ?? '');
+
+    return Number.isNaN(startedMs) || nowMs - startedMs <= RUN_TIMEOUT_MS
+      ? 'running'
+      : 'stuck';
+  }
+
+  return run.run_attempt > RERUNS ? 'already' : 'rerun';
+};
+
+/**
+ * As long as a queue layer's runs are waited for: the code-owner check is one
+ * short job, but it waits for a runner behind the same matrices.
+ */
+export const RUN_TIMEOUT_MS = LAYER_TIMEOUT_MS;
 
 /**
  * Every check run GitHub Actions reported on one commit, every job of every

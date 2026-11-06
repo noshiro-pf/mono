@@ -1,5 +1,11 @@
 import type { SetAside } from 'pr-report-core';
-import { newSkips, settleSkips, unannouncedSkips, withSkip } from './skips.mjs';
+import {
+  newSkips,
+  setAsideFailing,
+  settleSkips,
+  unannouncedSkips,
+  withSkip,
+} from './skips.mjs';
 import type {
   OwnSetAsideComment,
   PullRequest,
@@ -38,6 +44,18 @@ describe(newSkips, () => {
         changed,
       ]);
     }
+  });
+});
+
+describe(setAsideFailing, () => {
+  // Taken up from a comment after a restart, a record has no `failedChecks`.
+  test('names those set aside for a failure, whatever links their record holds', () => {
+    const records = new Map<number, SkipRecord>([
+      [1, skip({ number: 1, reason: 'checks-failed' })],
+      [2, skip({ number: 2, reason: 'rebase-failed' })],
+    ]);
+
+    assert.deepStrictEqual(Array.from(setAsideFailing(records)), [1]);
   });
 });
 

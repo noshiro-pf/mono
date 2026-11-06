@@ -71,6 +71,18 @@ export const pruneSkips = (
       .map((skip) => [skip.number, skip] as const),
   );
 
+/**
+ * The pull requests set aside for a failure, which keep the red run of their
+ * layer. By the record's reason rather than the links it holds: a record taken up
+ * from a comment after a restart has none (`settleSkips`).
+ */
+export const setAsideFailing = (skipped: SkipRecords): ReadonlySet<number> =>
+  new Set<number>(
+    Array.from(skipped.values())
+      .filter(({ reason }) => reason === 'checks-failed')
+      .map(({ number }) => number),
+  );
+
 export const withSkip = (skipped: SkipRecords, skip: SkipRecord): SkipRecords =>
   new Map<number, SkipRecord>([...skipped, [skip.number, skip]]);
 

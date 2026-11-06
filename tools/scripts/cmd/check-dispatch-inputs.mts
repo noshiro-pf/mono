@@ -17,6 +17,11 @@ import { projectRootPath } from '../project-root-path.mjs';
  * that did not declare it would refuse that dispatch, and one that declared it
  * as a string would hand the gate whatever was typed; either way that workflow
  * would judge the layer otherwise than the rest, and nothing else says so.
+ *
+ * The queue dispatches the workflows `.github/unblock-prs.json` lists under
+ * `speculate.workflows`, which therefore has to be exactly the gate's callers:
+ * one left out would not check the layers, and the pull request would run it in
+ * full when its turn came.
  */
 export const checkDispatchInputs = (): Promise<Result<number, string>> =>
   Result.safeTry(async function* () {
@@ -33,14 +38,53 @@ export const checkDispatchInputs = (): Promise<Result<number, string>> =>
       })),
     );
 
-    const violations = findDispatchInputViolations(workflows);
+    const violations = yield* Result.safeUnwrap(
+      findDispatchInputViolations(workflows),
+    );
 
-    return Result.isErr(violations)
-      ? violations
-      : Arr.isNonEmpty(violations.value.messages)
-        ? Result.err(violations.value.messages.join('\n'))
-        : Result.ok(violations.value.callers);
+    const configured = yield* Result.safeUnwrap(await readSpeculateWorkflows());
+
+    const messages = [
+      ...violations.messages,
+      ...speculateWorkflowViolations(violations.callerNames, configured),
+    ] as const;
+
+    return Arr.isNonEmpty(messages)
+      ? Result.err(messages.join('\n'))
+      : Result.ok(violations.callerNames.length);
   });
+
+/**
+ * What is wrong with `speculate.workflows` against the gate's callers, by file
+ * name; nothing when the repository does not check ahead.
+ */
+export const speculateWorkflowViolations = (
+  callers: readonly string[],
+  configured: readonly string[] | undefined,
+): readonly string[] => {
+  if (configured === undefined) {
+    return [];
+  }
+
+  const listed = new Set(configured);
+
+  const calling = new Set(callers);
+
+  return [
+    ...callers
+      .filter((name) => !listed.has(name))
+      .map(
+        (name) =>
+          `${UNBLOCK_PRS_CONFIG}: speculate.workflows leaves out ${name}, which calls check-gates.yml: the layers would not be checked by it.`,
+      ),
+    ...configured
+      .filter((name) => !calling.has(name))
+      .map(
+        (name) =>
+          `${UNBLOCK_PRS_CONFIG}: speculate.workflows names ${name}, which does not call check-gates.yml.`,
+      ),
+  ];
+};
 
 /**
  * What is wrong with the workflows, one message each, and how many call the
@@ -50,7 +94,7 @@ export const checkDispatchInputs = (): Promise<Result<number, string>> =>
 export const findDispatchInputViolations = (
   workflows: readonly Readonly<{ relativePath: string; text: string }>[],
 ): Result<
-  Readonly<{ callers: number; messages: readonly string[] }>,
+  Readonly<{ callerNames: readonly string[]; messages: readonly string[] }>,
   string
 > => {
   const parsed = workflows.map(({ relativePath, text }) => ({
@@ -86,7 +130,9 @@ export const findDispatchInputViolations = (
   }
 
   return Result.ok({
-    callers: callers.length,
+    callerNames: callers.map(({ relativePath }) =>
+      path.posix.basename(relativePath),
+    ),
     messages: callers.flatMap(({ relativePath, workflow }) =>
       dispatchInputViolations(workflow).map(
         (message) => `${relativePath}: ${message}`,
@@ -138,6 +184,8 @@ export const dispatchInputViolations = (
   ];
 };
 
+const UNBLOCK_PRS_CONFIG = '.github/unblock-prs.json';
+
 const GATES_WORKFLOW = './.github/workflows/check-gates.yml';
 
 const callsGates = (workflow: unknown): boolean => {
@@ -148,6 +196,40 @@ const callsGates = (workflow: unknown): boolean => {
     Object.values(jobs).some(
       (job) => isRecord(job) && job['uses'] === GATES_WORKFLOW,
     )
+  );
+};
+
+/** `speculate.workflows` of the queue's configuration, if it checks ahead. */
+const readSpeculateWorkflows = async (): Promise<
+  Result<readonly string[] | undefined, string>
+> => {
+  const read = await Result.fromPromise(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- the repository's own configuration file.
+    fs.readFile(path.join(projectRootPath, UNBLOCK_PRS_CONFIG), 'utf8'),
+  );
+
+  if (Result.isErr(read)) {
+    return Result.ok(undefined);
+  }
+
+  const parsed = Result.fromThrowable((): unknown => JSON.parse(read.value));
+
+  if (Result.isErr(parsed)) {
+    return Result.err(
+      `${UNBLOCK_PRS_CONFIG}: ${unknownToString(parsed.value)}`,
+    );
+  }
+
+  const speculate = isRecord(parsed.value)
+    ? parsed.value['speculate']
+    : undefined;
+
+  const workflows = isRecord(speculate) ? speculate['workflows'] : undefined;
+
+  return Result.ok(
+    Arr.isArray(workflows)
+      ? workflows.filter((name): name is string => typeof name === 'string')
+      : undefined,
   );
 };
 

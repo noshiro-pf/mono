@@ -50,6 +50,21 @@ export const configOf = (
 
   const translation = file.translation?.heading;
 
+  const speculate = file.speculate;
+
+  if (
+    speculate !== undefined &&
+    (!Number.isSafeInteger(speculate.depth) ||
+      speculate.depth < 1 ||
+      !Arr.isNonEmpty(speculate.workflows) ||
+      speculate.workflows.some((name) => !WORKFLOW_FILE.test(name)) ||
+      Arr.uniq(speculate.workflows).length !== speculate.workflows.length)
+  ) {
+    return Result.err(
+      `${source}: speculate needs a whole depth of 1 or more and at least one workflow, each a file name of .github/workflows (such as code-check.yml) named once`,
+    );
+  }
+
   const patterns = [
     ...(file.autoFix?.ignore ?? []).map(
       (pattern, i) => [`autoFix.ignore[${i}]`, pattern] as const,
@@ -93,6 +108,7 @@ export const configOf = (
       generatedBranches,
       translation,
       regenerate,
+      speculate,
     });
   }
 
@@ -116,8 +132,12 @@ export const configOf = (
     generatedBranches,
     translation,
     regenerate,
+    speculate,
   });
 };
+
+/** A workflow file name, as `speculate.workflows` names one. */
+const WORKFLOW_FILE = /^[\w.-]+\.ya?ml$/u;
 
 /** Declared before its first use, which runs at load: a string `configOf` compiles; `regex` is all the schema can say about it. */
 const regex = (): t.Type<string> => t.annotate(t.string(), { format: 'regex' });
@@ -232,6 +252,24 @@ export const ConfigFileSchema = t.annotate(
         },
       ),
     ),
+    speculate: t.optional(
+      t.annotate(
+        t.strictRecord({
+          workflows: t.annotate(t.array(t.string()), {
+            description:
+              'The file names of the check workflows to dispatch on each layer, such as `code-check.yml`: every workflow that reports a required context. Each takes the `diff-parent` input.',
+          }),
+          depth: t.annotate(t.number(), {
+            description:
+              'How many queued pull requests are stacked and checked ahead at most, the first included.',
+          }),
+        }),
+        {
+          description:
+            'Check queued pull requests ahead of their turn: the leading ones are stacked on the default branch, one commit each, each on a `queue/pr-<number>` branch, and the workflows are dispatched on each with `diff-parent`. A pull request is released once its layer is green, and the gate reuses that verdict. Absent: one pull request is checked at a time.',
+        },
+      ),
+    ),
     translation: t.optional(
       t.annotate(
         t.strictRecord({
@@ -263,12 +301,19 @@ export type Config = Readonly<{
   translation: string | undefined;
   /** How a conflict in generated files is resolved, when it is. */
   regenerate: RegenerateConfig | undefined;
+  /** Checking queued pull requests ahead of their turn, when it is on. */
+  speculate: SpeculateConfig | undefined;
 }>;
 
 /** The files the repository generates whole, and how each is written again. */
 export type RegenerateConfig = Readonly<{
   before: readonly string[];
   generators: readonly Readonly<{ path: RegExp; run: string }>[];
+}>;
+
+export type SpeculateConfig = Readonly<{
+  workflows: readonly string[];
+  depth: number;
 }>;
 
 /** A branch the repository builds rather than writes. */

@@ -21,6 +21,8 @@ export * from './release.mjs';
 export * from './set-aside-comment.mjs';
 export * from './set-aside-detail.mjs';
 export * from './skips.mjs';
+export * from './speculate-plan.mjs';
+export * from './speculate.mjs';
 export * from './stack.mjs';
 export * from './triage.mjs';
 export * from './types.mjs';

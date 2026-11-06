@@ -52,6 +52,17 @@
       }
     ]
   },
+  "speculate": {
+    "workflows": [
+      "code-check.yml",
+      "style-check.yml",
+      "strict-lib-gen.yml",
+      "node-version-compatibility.yml",
+      "verify-published-packages.yml",
+      "synstate-benchmark.yml"
+    ],
+    "depth": 2
+  },
   "generatedBranches": [
     {
       "branch": "chore/pnpm-update",

@@ -221,6 +221,8 @@ PR には付けません。後者も解放済みの PR は一度に1本のまま
 
 - **in flight の PR があれば、他を pick しない。** triage が in flight と判断
   した PR があれば、それを watch して rebase も解放もしません（「3」）。
+  code-owner チェックを再実行中の解放済み PR も、チェックが緑になればマージ
+  されるので、同じように他を止めます。
 - **解放済みで読めない PR は、5回続いたら見送る。** 解放済みの PR のチェック
   （version PR なら tip の上に作り直されたか）が読めない間は、matrix が走って
   いるかもしれないので、他を解放しません。同じ head のまま5回続けて読めな
@@ -396,7 +398,10 @@ pick も「3a」の rebase もしません。
     PR もレビューを読み、まだ承認待ちなら held に、承認済みならそのチェックの
     run の失敗したジョブを再実行します（`rerunFailedJobs`）。人が承認前に手で
     再実行していることもあるので、run あたり2回まで再実行し、それでも赤なら
-    ほかの **failing** と同じく `checks-failed` で見送ります。
+    ほかの **failing** と同じく `checks-failed` で見送ります。解放済みの PR の
+    チェックが再実行されている間は、他を解放しません（「in flight の PR が
+    あれば、他を pick しない」）。`RUN_TIMEOUT_MS` のうちに終わらない run も
+    `checks-failed` で見送ります。
 
     triage が読む変更ファイルは rebase 前の head のもので、rebase で変わり得
     ます。所有者付きのパスを触った下の層の commit を抱えたままの stacked PR
@@ -521,6 +526,47 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
 **`auto-rebase` ラベル**は `open-pr` が stack の全層に付けます。対象は base が
 `main` の層だけなので、上の層は下の層がマージされるまで一緒に運ばれるだけです。
 付いていない PR は、寝かせてあるブランチも含めて、この節では動かしません。
+
+#### 3b. 順番より先に検証する（`speculate`）
+
+`.github/unblock-prs.json` に `speculate` があると、「3」で candidate を解放
+する前に、先頭から `depth` 本までの candidate を順番より先に検証します
+（`speculate.mts`、判断は `speculate-plan.mts`）。
+
+- 各 candidate のコミットを、`origin/main` との merge base から1コミットに
+  まとめて、1本下の段（先頭なら `main`）の上に積み、`queue/pr-<番号>` に
+  push します。コミットには `Queue-Layer: <番号> <head>` のトレーラを付け、
+  次の survey はこれと tree でどの段がまだ立っているかを判断します。何も
+  覚えないので、worker を再起動しても枝の状態から続きます。
+- `speculate.workflows` の workflow を、各段に `diff-parent` 付きで dispatch
+  します。各段は自分のコミットだけを、1本下の段と比べて判定されます。次の
+  段を dispatch するのは、下の段の gate が終わり、ジョブがすべて開始してか
+  らで、赤の段の上には積みません。
+- 先頭の candidate は、その段が緑になってから、ほかを置いて1本だけ解放しま
+  す。`main` に rebase した head は段と同じ tree なので、gate がその判定を
+  再利用し、マトリクスは走り直しません。
+- 先頭の段が赤なら、その PR を `checks-failed` で見送ります。赤の run は見送り
+  の comment のリンク先なので残します。落ちたジョブがすべて設定された fixer の
+  受け持ちなら、代わりに段の run と枝を消して PR を解放し、PR 自身の run が落ち
+  たところで「4a」がそのジョブを読めるようにします。消せなくても解放します。
+  その場合は解放先で見送られることがあります。
+- 先頭より上の赤は、まだマージされていない（されないかもしれない）PR の上での
+  失敗です。その段は先頭になるまで待ちます。下の段がマージされれば `main` の
+  tree の上にあり、キューを離れれば作り直されます。その上には積まず、積んであ
+  れば落とします。走っている run は取り消し、それ以外は削除し、枝を消します。
+  下にまだ走っている段がある赤は、まだ誰のものとも言えません。
+- version PR、bypass でしかマージできない PR、fork の PR、コミットが下の段と
+  衝突する PR では積むのを止め、その PR は従来どおり単独で解放されます。
+- もう立っていない段（head が動いた、見送られた、下の段が作り直された）も
+  同じく落とします。candidate が1本もなくなったときも同様で、残すのは、それで
+  見送られた PR の赤の run だけです。run を落とせなければ、次の survey が
+  見つけられるよう枝を残し、落とせるまで作り直しません。
+  PR がマージされた段は、`main` への push がその run の成果物を読むので、枝だけ
+  を消します。
+- 読み込みや push、dispatch が失敗した survey、先頭の段が 40 分を超えて走って
+  いるとき、先頭の段で workflow が3回取り消されたときは、先頭を従来どおり解放
+  します。最悪でもマトリクスが2回走るだけです。段を待つ間は、待ち時間を短いほう
+  の間隔に保ちます。
 
 #### 4. watch
 
@@ -908,6 +954,8 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `release.mts`           | 解放されている PR を1本に保つ                                 |
 | `watch.mts`             | 1本をマージまでポーリング                                     |
 | `auto-fix.mts`          | fixer の差分だけの失敗を直して push                           |
+| `speculate.mts`         | 順番より先の検証 — 段の枝と run を読み、積み、dispatch する   |
+| `speculate-plan.mts`    | 順番より先の検証で何をするかの判断                            |
 | `config.mts`            | `.github/unblock-prs.json` を読む                             |
 | `quiet.mts`             | 何もない時にどれだけ待つか                                    |
 | `checks.mts`            | マージが何を待っているか                                      |
@@ -1167,9 +1215,10 @@ pause every other released pull request before releasing its own, which stopped
 pull requests nobody had handed it: the dependency update the bot opens
 released, and one a person had released on purpose.
 
-- **Pick nothing while one is in flight.** When triage finds a pull request
-  in flight, this script watches it and rebases and releases nothing else
-  ("3").
+- **Pick nothing while one is in flight.** When triage finds a pull request in
+  flight, this script watches it and rebases and releases nothing else ("3"). A
+  released one whose code-owner check is re-run is about to merge too, once the
+  check turns, and holds the rest the same way.
 - **Set aside one left unread for five surveys.** While a released pull
   request's checks (or, for the version pull request, whether it was rebuilt on
   the tip) cannot be read, it may be running a matrix, so nothing else is
@@ -1362,7 +1411,10 @@ merge-base` says whether the branch was built on the current tip of the
     approved since, the failed jobs of that check's run are re-run
     (`rerunFailedJobs`). Up to twice a run, since a person may have re-run it
     by hand before the approval; still red after that, it is set aside
-    `checks-failed` like any other **failing** one.
+    `checks-failed` like any other **failing** one, as is one whose run has
+    not finished within `RUN_TIMEOUT_MS`. While a released one's check runs
+    again, nothing else is released (see "Pick nothing while one is in
+    flight").
 
     The changed files triage reads are the head before the rebase, and a
     rebase can change them: a stacked pull request still carrying the commit
@@ -1503,6 +1555,50 @@ waiting its turn, to its own changes.
 it; only a layer based on `main` is a target, so the layers above are carried
 along until the one below merges. A pull request with neither label — a
 branch left to sleep included — is not moved by this step.
+
+#### 3b. Check ahead of the turn (`speculate`)
+
+With `speculate` in `.github/unblock-prs.json`, step 3 first checks up to
+`depth` of the leading candidates ahead of their turn (`speculate.mts`, what is
+decided in `speculate-plan.mts`).
+
+- Each candidate's commits, from its merge base with `origin/main`, are squashed
+  into one commit on the layer below (`main` for the first) and pushed to
+  `queue/pr-<number>`. The commit carries a `Queue-Layer: <number> <head>`
+  trailer, by which, and by trees, the next survey tells which layers still
+  stand. Nothing is remembered: a restarted worker carries on from the branches.
+- The `speculate.workflows` are dispatched on each layer with `diff-parent`, so
+  each layer is judged on its own commit against the layer below. The next layer
+  is dispatched only once the layers below have finished their gate and started
+  every job, and never on top of a red layer.
+- The first candidate is released, alone, once its layer is green. Its head
+  rebased onto `main` has the layer's tree, so the gate reuses that verdict and
+  the matrix does not run again.
+- A red first layer sets its pull request aside `checks-failed`, its red run
+  kept, as what the set-aside comment links to. When only jobs a configured
+  fixer settles failed, the layer's runs and branch go and the pull request is
+  released instead, so that its own run fails where "4a" can read the jobs. It
+  is released even if they cannot go, and may then be set aside there.
+- A red layer above the first failed on top of pull requests that have not
+  merged and may not. It waits until it is first: on `main`'s tree once the
+  layers below merge, or rebuilt if they leave the queue. Nothing is built above
+  it, and what already was is dropped: runs still going cancelled, the others
+  deleted, branches removed. A red layer over one still running is nobody's yet.
+- The stack stops at the version pull request, one only a bypass merges, a
+  fork's, or one whose commits conflict with the layers below; that one is
+  released on its own, as before.
+- A layer no longer standing (its head moved, its pull request set aside, a
+  layer below built again) is dropped the same way, also when the queue has
+  drained and no candidate is left, keeping only the red run of one set aside
+  for it. Its branch stays while its runs cannot be dropped, so that a later
+  survey finds them, and it is not built again until they are. One whose pull
+  request merged loses its branch alone: the push to `main` reads that run's
+  artifacts.
+- A survey whose reads, pushes or dispatches fail, one whose first layer has run
+  for over 40 minutes, and one whose first layer has had a workflow cancelled
+  three times releases the first candidate as before; the worst that does is a
+  matrix run twice. While a layer is waited for, the survey stays at the active
+  interval.
 
 #### 4. Watch
 
@@ -1915,6 +2011,8 @@ the pull request the other's and nobody moved it (#2267).
 | `release.mts`           | holding the queue to one released pull request                |
 | `watch.mts`             | polling one pull request until it merges, or will not         |
 | `auto-fix.mts`          | fixing and pushing a failure that is only a fixer's diff      |
+| `speculate.mts`         | checking ahead — reading, building and dispatching the layers |
+| `speculate-plan.mts`    | what checking ahead decides                                   |
 | `config.mts`            | reading `.github/unblock-prs.json`                            |
 | `quiet.mts`             | how long to sleep when there is nothing to do                 |
 | `checks.mts`            | what the merge is waiting for                                 |
