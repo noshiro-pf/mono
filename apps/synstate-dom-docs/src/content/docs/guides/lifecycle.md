@@ -76,15 +76,15 @@ That leaves one case: a heavy derivation defined globally and read only rarely. 
 
 ## Event handlers
 
-A handler runs outside every scope: by the time it is called, no `run` is executing. So an observable you create in a handler, such as `a$.pipe(map(...))`, belongs to no scope and keeps being computed even after its row or branch is gone. synstate-dom gives no warning at run time. The `no-observable-in-handler` rule of [eslint-plugin-synstate](https://www.npmjs.com/package/eslint-plugin-synstate) reports such an observable instead: one derived in an `onClick`-style prop or a listener passed to `listenInScope` or `addEventListener`, in a callback written inside it, or in a function of the same file it calls by name. Work inside the `run` of a scope taken at mount time is accepted. What the rule follows, and what it misses, is in the [plugin's README](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-plugin-synstate#no-observable-in-handler).
+A handler runs outside every scope: by the time it is called, no `run` is executing. So an observable you create in a handler, such as `a$.pipe(map(...))`, belongs to no scope and keeps being computed even after its row or branch is gone, and a `subscribe` made there is never unsubscribed. synstate-dom gives no warning at run time. The `no-observable-in-handler` rule of [eslint-plugin-synstate](https://www.npmjs.com/package/eslint-plugin-synstate) reports such an observable, and such a `subscribe`, instead: one made in an `onClick`-style prop or a listener passed to `listenInScope` or `addEventListener`, in a callback written inside it, or in a function of the same file it calls by name. Work inside the `run` of a scope taken at mount time is accepted. What the rule follows, and what it misses, is in the [plugin's README](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-plugin-synstate#no-observable-in-handler).
 
 Instead, have the handler write to a state, and derive from that state at mount time. If later work really has to create an observable, say after an `await`, grab the scope with `getCurrentScope()` while the component is mounting, and wrap the later work in that scope's `run`.
 
 ## Effects that last as long as the component
 
-A component is called once, so what another library would run in an effect is started in the component's body and stopped when its scope is disposed. Three helpers do that:
+A component is called once, so what another library would run in an effect is started in the component's body and stopped when its scope is disposed.
 
-- `subscribeInScope(source, next)` calls `next` with every value of `source`, the current one first, and unsubscribes when the scope is disposed.
+- synstate's `source.subscribe(next)` calls `next` with every value of `source`, the current one first. Made while the component mounts, it belongs to the component's scope, which unsubscribes it when disposed, as it disposes the observables created there. To keep a subscription past the scope, make it inside `untracked`.
 - `listenInScope(target, type, listener, options)` adds an event listener to something other than an element the component draws, such as `window` or `document`, and removes it when the scope is disposed. For an element the component draws, use its `onClick`-style props.
 - `createAfterUpdate()` returns a function that runs work in a microtask, after the update under way has finished. By then the DOM bound to that update has been written and the propagation is over, so the work may write to a state: a write made while another state is still propagating is what synstate warns of. It is also how work runs after the first mount, because a component's nodes are attached to the document only once the whole description they are in is mounted. Work for a scope disposed by then is dropped.
 
@@ -94,7 +94,6 @@ import {
     constant,
     createAfterUpdate,
     listenInScope,
-    subscribeInScope,
     type JSX,
 } from 'synstate-dom';
 
@@ -104,9 +103,9 @@ export const SearchBox = (): JSX.Element => {
         sessionStorage.getItem('search') ?? '',
     );
 
-    // Saves the query whenever it changes, until the component's scope is
-    // disposed: what an effect would do.
-    subscribeInScope(query$, (query) => {
+    // Saves the query whenever it changes. Subscribed while the component mounts,
+    // so the component's scope unsubscribes it: what an effect would do.
+    query$.subscribe((query) => {
         sessionStorage.setItem('search', query);
     });
 

@@ -7,7 +7,6 @@ import { onScopeDispose } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  subscribeInScope,
   toObservable,
   type Bindable,
   type JSX,
@@ -123,7 +122,7 @@ export const CanvasMain = ({
     attachPointerEventListener(hue$.getSnapshot().value);
   };
 
-  subscribeInScope(hue$, attachPointerEventListener);
+  hue$.subscribe(attachPointerEventListener);
 
   onScopeDispose(() => {
     mut_state.removePointerEventListener();

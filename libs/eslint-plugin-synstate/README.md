@@ -64,16 +64,16 @@ export default [
 
 ## Rules
 
-| Rule                             | Description                                                                                                                                                                          |
-| :------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `no-identity-map`                | Require `skipIfNoChange()` instead of `map((x) => x)`, which changes no value and only stops a repeated one. Fixable.                                                                |
-| `no-observable-in-handler`       | Disallow deriving an observable in an event handler or listener. The handler runs outside every scope, so the observable is never disposed and its parents keep computing it.        |
-| `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal (`Object.is`) to the one before. Fixable. |
-| `no-throw-in-operator`           | Disallow `throw` in a function passed to a synstate operator. The exception stops the update midway, leaving part of the graph updated; return a `Result` instead.                   |
-| `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                         |
-| `no-write-during-propagation`    | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders.       |
-| `prefer-derive`                  | Require `derive(parents, fn)` instead of `combine(parents).pipe(map(fn))`, which is two observables and builds a tuple on every update. Fixable.                                     |
-| `prefer-map-to`                  | Require `mapTo(c)` instead of `map(() => c)`. `map` stops a result equal to the one it holds, so a `map` to a constant emits once and never again. Fixable.                          |
+| Rule                             | Description                                                                                                                                                                                    |
+| :------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-identity-map`                | Require `skipIfNoChange()` instead of `map((x) => x)`, which changes no value and only stops a repeated one. Fixable.                                                                          |
+| `no-observable-in-handler`       | Disallow deriving or subscribing to an observable in an event handler or listener. The handler runs outside every scope, so the observable is never disposed and the subscription never ended. |
+| `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal (`Object.is`) to the one before. Fixable.           |
+| `no-throw-in-operator`           | Disallow `throw` in a function passed to a synstate operator. The exception stops the update midway, leaving part of the graph updated; return a `Result` instead.                             |
+| `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                                   |
+| `no-write-during-propagation`    | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders.                 |
+| `prefer-derive`                  | Require `derive(parents, fn)` instead of `combine(parents).pipe(map(fn))`, which is two observables and builds a tuple on every update. Fixable.                                               |
+| `prefer-map-to`                  | Require `mapTo(c)` instead of `map(() => c)`. `map` stops a result equal to the one it holds, so a `map` to a constant emits once and never again. Fixable.                                    |
 
 ### `no-identity-map`
 
@@ -137,18 +137,30 @@ with `times` are not reported: they compute nothing more, or complete by
 themselves. synstate-dom's factories are reported whatever their arguments,
 although given only constants they create nothing.
 
+A `.subscribe(…)` in the same places is reported too. A subscription made while
+a scope runs is ended by that scope, as an observable created there is disposed;
+one made in a handler belongs to none, and nothing ends it. The receiver has to
+be known to be a synstate observable: a call of a synstate export or a creation
+above, a `const` bound to one, the first element destructured from such a call
+(`const [count$] = createState(0)`), or, with type information, any expression
+typed as an observable. One that completes by itself, such as `timer(300)`,
+`just(x)`, a `counter` with `times`, a `.pipe` of one of those, or a `.pipe`
+with `take`, ends its subscriptions and is not reported. `takeUntil` and
+`takeWhile` do not count: they end it only if their notifier emits or their
+predicate fails.
+
 Two ways out are accepted:
 
 - have the handler write to a state, and derive from that state at mount time;
 - take the scope with `getCurrentScope()` at mount time and create the
-  observable inside its `run(…)` callback, which also covers work after an
-  `await`.
+  observable, or subscribe, inside its `run(…)` callback, which also covers work
+  after an `await`.
 
 Any `run` is trusted to choose a scope that something disposes, except one on a
 scope made on the spot with no parent: `createScope()`,
 `createScope(undefined)`, `createScope(null)`, `createScope(void 0)` or
-`createScope(getCurrentScope())`. `untracked(…)` is accepted, for an
-observable meant to belong to no scope, and so is the app passed to
+`createScope(getCurrentScope())`. `untracked(…)` is accepted, for an observable
+or a subscription meant to belong to no scope, and so is the app passed to
 synstate-dom's `render`, whose root scope the function it returns disposes.
 
 It recognizes the factories imported from `synstate`, its wrapper packages and

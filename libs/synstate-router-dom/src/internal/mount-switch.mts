@@ -5,7 +5,7 @@ import {
   type InitializedObservable,
   type Scope,
 } from 'synstate';
-import { subscribeInScope, toNodes, type Mountable } from 'synstate-dom';
+import { toNodes, type Mountable } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 /**
@@ -31,7 +31,7 @@ export const mountSwitch = <V, K>(
     initialNodes: readonly ChildNode[];
   } = { current: undefined, initialNodes: [] };
 
-  subscribeInScope(value, (v) => {
+  value.subscribe((v) => {
     const key = keyOf(v);
 
     if (mut_state.current !== undefined) {

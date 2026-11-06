@@ -13,7 +13,6 @@ import {
   isImeKeyDown,
   listenInScope,
   MatchOptional,
-  subscribeInScope,
   type JSX,
 } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
@@ -523,49 +522,46 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     map(({ nodes }) => nodes.map(({ id }) => id).join(' ')),
   );
 
-  subscribeInScope(
-    combine([structureKey, dagLayoutStore.fitRequests, mode]),
-    () => {
-      if (mut_fitted.queued) {
-        return;
+  combine([structureKey, dagLayoutStore.fitRequests, mode]).subscribe(() => {
+    if (mut_fitted.queued) {
+      return;
+    }
+
+    mut_fitted.queued = true;
+
+    afterUpdate(() => {
+      mut_fitted.queued = false;
+
+      const from = getTransform();
+
+      const currentMode = mode.getSnapshot().value;
+
+      const requests = dagLayoutStore.fitRequests.getSnapshot().value;
+
+      const asked =
+        mut_fitted.mode !== currentMode || mut_fitted.requests !== requests;
+
+      if (mut_fitted.mode !== currentMode) {
+        setArcZoom('whole');
       }
 
-      mut_fitted.queued = true;
+      mut_fitted.mode = currentMode;
 
-      afterUpdate(() => {
-        mut_fitted.queued = false;
+      mut_fitted.requests = requests;
 
-        const from = getTransform();
+      fit();
 
-        const currentMode = mode.getSnapshot().value;
-
-        const requests = dagLayoutStore.fitRequests.getSnapshot().value;
-
-        const asked =
-          mut_fitted.mode !== currentMode || mut_fitted.requests !== requests;
-
-        if (mut_fitted.mode !== currentMode) {
-          setArcZoom('whole');
-        }
-
-        mut_fitted.mode = currentMode;
-
-        mut_fitted.requests = requests;
-
-        fit();
-
-        setViewFrom(
-          asked &&
-            dagLayoutStore.animationProgress.getSnapshot().value !== undefined
-            ? from
-            : undefined,
-        );
-      });
-    },
-  );
+      setViewFrom(
+        asked &&
+          dagLayoutStore.animationProgress.getSnapshot().value !== undefined
+          ? from
+          : undefined,
+      );
+    });
+  });
 
   // Put there at once with the nodes: at the end, or when they are stopped.
-  subscribeInScope(dagLayoutStore.animationProgress, (progress) => {
+  dagLayoutStore.animationProgress.subscribe((progress) => {
     if (progress !== undefined) {
       return;
     }
@@ -579,7 +575,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
   // No handle outside the mode the reader arranges, nor while the nodes move to
   // their places: it would be on a node that is not there.
-  subscribeInScope(scene.connectable, (nodes) => {
+  scene.connectable.subscribe((nodes) => {
     if (Arr.isNonEmpty(nodes)) {
       return;
     }

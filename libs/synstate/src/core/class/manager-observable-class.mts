@@ -2,6 +2,7 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 import type { ManagerObservableKind } from '../types/index.mjs';
+import { getCurrentScopeInternals, runWithScope } from '../utils/index.mjs';
 import { ObservableBaseClass } from './observable-base-class.mjs';
 import {
   beginPropagation,
@@ -24,15 +25,8 @@ export class ManagerObservableClass<
   Kind extends ManagerObservableKind,
   Depth extends number,
 > extends ObservableBaseClass<A, Kind, Depth> {
-  /** Emits `nextValue` and propagates it to the descendants. */
-  protected startUpdate(nextValue: A): void {
-    // Nothing to propagate to (a branch no `switchMap` follows, a state written
-    // before anything subscribes): the update is the value alone, and opening
-    // one would cost more than storing it.
-    if (this.setNextIfUnobserved(nextValue)) {
-      return;
-    }
-
+  /** Opens the update for `nextValue`, runs it and closes it. */
+  #propagate(nextValue: A): void {
     const updateToken = openUpdate(this.depth);
 
     beginPropagation(updateToken);
@@ -49,6 +43,26 @@ export class ManagerObservableClass<
       closeUpdate(updateToken);
 
       endPropagation();
+    }
+  }
+  /** Emits `nextValue` and propagates it to the descendants. */
+  protected startUpdate(nextValue: A): void {
+    // Nothing to propagate to (a branch no `switchMap` follows, a state written
+    // before anything subscribes): the update is the value alone, and opening
+    // one would cost more than storing it.
+    if (this.setNextIfUnobserved(nextValue)) {
+      return;
+    }
+
+    // An update runs in no scope, whichever one is running when it starts: what
+    // a subscriber or projection subscribes or creates belongs to whoever owns
+    // that code, not to a component that happened to write the value.
+    if (getCurrentScopeInternals() === undefined) {
+      this.#propagate(nextValue);
+    } else {
+      runWithScope(undefined, () => {
+        this.#propagate(nextValue);
+      });
     }
   }
 }

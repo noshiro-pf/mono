@@ -1,5 +1,5 @@
 import { onScopeDispose, type Observable } from 'synstate';
-import { createAfterUpdate, subscribeInScope } from 'synstate-dom';
+import { createAfterUpdate } from 'synstate-dom';
 import type { StrictPick } from 'ts-type-forge';
 import { closeOnBackdropClick } from './close-on-backdrop-click.mjs';
 
@@ -33,7 +33,7 @@ export const followModal = <A,>(
 
   const mut_wanted: { open: boolean } = { open: false };
 
-  subscribeInScope(source, (value) => {
+  source.subscribe((value) => {
     mut_wanted.open = isOpen(value);
 
     afterUpdate(() => {

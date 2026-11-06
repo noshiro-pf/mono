@@ -23,7 +23,7 @@ import {
 
 type Options = readonly [];
 
-type MessageIds = 'observableInHandler';
+type MessageIds = 'observableInHandler' | 'subscriptionInHandler';
 
 /**
  * An event handler runs outside every scope: by the time it is called, no `run`
@@ -36,18 +36,30 @@ type MessageIds = 'observableInHandler';
  * Only observables that keep working while they live are reported: a root
  * state, `just(…)` or a `timer` computes nothing more, or completes by itself,
  * and is collected once nothing refers to it.
+ *
+ * A `subscribe` there is reported for the same reason: a subscription made
+ * while a scope runs ends with the scope, and one made in a handler has none,
+ * so nothing ends it. The receiver has to be known to be a synstate observable:
+ * written as one (a call of a synstate export, a `.pipe` with a synstate
+ * operator, a `const` bound to either, or the first element destructured from
+ * such a call, as `createState` returns), or typed as one when type information
+ * is available. One that completes by itself (`timer(…)`, `just(…)`, a
+ * `counter` with `times`, a `.pipe` of one of those or with `take`) ends its
+ * subscriptions, and is not reported.
  */
 export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
   meta: {
     type: 'problem',
     docs: {
       description:
-        'Disallow deriving a synstate observable in an event handler, where it belongs to no scope and is never disposed.',
+        'Disallow deriving or subscribing to a synstate observable in an event handler, where it belongs to no scope and is never disposed or unsubscribed.',
     },
     schema: [],
     messages: {
       observableInHandler:
         'This observable is created in an event handler, which runs outside every scope, so it belongs to none and keeps being computed after the row or branch it was made for is gone. Have the handler write to a state and derive from that state at mount time, or take the scope with `getCurrentScope()` at mount time and create the observable inside its `run`.',
+      subscriptionInHandler:
+        'This subscription is made in an event handler, which runs outside every scope, so no scope ends it and it lasts after the row or branch it was made for is gone. Subscribe at mount time, take the scope with `getCurrentScope()` at mount time and subscribe inside its `run`, or keep the subscription on purpose inside `untracked`.',
     },
     defaultOptions: [],
   },
@@ -92,6 +104,8 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
     const mut_handlers = new Set<FunctionNode>();
 
     const mut_creations = new Set<TSESTree.CallExpression>();
+
+    const mut_subscriptions = new Set<TSESTree.CallExpression>();
 
     /** Calls of a function of this file, which a handler may reach. */
     const mut_localCalls: (readonly [TSESTree.CallExpression, FunctionNode])[] =
@@ -239,26 +253,22 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
     };
 
     /**
-     * Whether `arg` of a `.pipe` is a synstate operator: a call of a synstate
-     * export, written there or bound to a `const` of this file.
+     * The declarator of the `const` of this file that `identifier` names, and
+     * its initializer, or `undefined` for any other binding.
      */
-    const isSynstateOperator = (
+    const constDeclarationOf = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      arg: TSESTree.CallExpressionArgument,
-    ): boolean => {
-      const operator = skipTypeWrappers(arg);
-
-      if (operator.type === AST_NODE_TYPES.CallExpression) {
-        return synstateExportOf(operator.callee) !== undefined;
-      }
-
-      if (operator.type !== AST_NODE_TYPES.Identifier) {
-        return false;
-      }
-
+      identifier: TSESTree.Identifier,
+    ):
+      | Readonly<{
+          declarator: TSESTree.VariableDeclarator;
+          init: TSESTree.Expression;
+          name: TSESTree.Node;
+        }>
+      | undefined => {
       const variable = ASTUtils.findVariable(
-        sourceCode.getScope(operator),
-        operator.name,
+        sourceCode.getScope(identifier),
+        identifier.name,
       );
 
       const def = variable?.defs.length === 1 ? variable.defs[0] : undefined;
@@ -269,15 +279,42 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
         def.parent.kind !== 'const' ||
         def.node.init === null
       ) {
-        return false;
+        return undefined;
       }
 
-      const init = skipTypeWrappers(def.node.init);
+      return { declarator: def.node, init: def.node.init, name: def.name };
+    };
 
-      return (
-        init.type === AST_NODE_TYPES.CallExpression &&
-        synstateExportOf(init.callee) !== undefined
-      );
+    /**
+     * The synstate export `arg` of a `.pipe` calls, if it is a synstate
+     * operator: a call of a synstate export, written there or bound to a
+     * `const` of this file.
+     */
+    const synstateOperatorNameOf = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      arg: TSESTree.CallExpressionArgument,
+    ): string | undefined => {
+      const operator = skipTypeWrappers(arg);
+
+      if (operator.type === AST_NODE_TYPES.CallExpression) {
+        return synstateExportOf(operator.callee);
+      }
+
+      if (operator.type !== AST_NODE_TYPES.Identifier) {
+        return undefined;
+      }
+
+      const declaration = constDeclarationOf(operator);
+
+      if (declaration === undefined) {
+        return undefined;
+      }
+
+      const init = skipTypeWrappers(declaration.init);
+
+      return init.type === AST_NODE_TYPES.CallExpression
+        ? synstateExportOf(init.callee)
+        : undefined;
     };
 
     const createsObservable = (
@@ -302,8 +339,162 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
       return (
         callee.type === AST_NODE_TYPES.MemberExpression &&
         isPropertyNamed(callee, 'pipe') &&
-        call.arguments.some(isSynstateOperator)
+        call.arguments.some((arg) => synstateOperatorNameOf(arg) !== undefined)
       );
+    };
+
+    /**
+     * Whether `expression` is typed as a synstate observable: a type with the
+     * members only an observable carries together. `false` without type
+     * information.
+     */
+    const isTypedObservable = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      expression: TSESTree.Expression,
+    ): boolean => {
+      const services = sourceCode.parserServices;
+
+      const checker = services?.program?.getTypeChecker();
+
+      const tsNode = services?.esTreeNodeToTSNodeMap?.get(expression);
+
+      if (checker === undefined || tsNode === undefined) {
+        return false;
+      }
+
+      const type = checker.getTypeAtLocation(tsNode);
+
+      return OBSERVABLE_MEMBERS.every(
+        (name) => type.getProperty(name) !== undefined,
+      );
+    };
+
+    /**
+     * What `expression` is written as: `'lasting'`, a call of a synstate export
+     * or a creation whose observable keeps working; `'self-completing'`, one
+     * that completes by itself (`timer`, `just`, a `counter` with `times`, …)
+     * and so ends its subscriptions; `'unknown'` otherwise, which only its type
+     * can tell.
+     */
+    const observableCallKindOf = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      expression: TSESTree.Expression,
+      pipeDepth: number,
+    ): 'lasting' | 'self-completing' | 'unknown' => {
+      const call = skipTypeWrappers(expression);
+
+      if (call.type !== AST_NODE_TYPES.CallExpression) {
+        return 'unknown';
+      }
+
+      const name = synstateExportOf(call.callee);
+
+      if (name === undefined) {
+        if (!createsObservable(call, domExportOf(call.callee))) {
+          return 'unknown';
+        }
+
+        const callee = skipTypeWrappers(call.callee);
+
+        // A `.pipe` completes once its source does, or once `take` ends it.
+        // The depth bounds a chain of `const`s that pipes back into itself,
+        // which half-written code can have.
+        if (
+          callee.type === AST_NODE_TYPES.MemberExpression &&
+          isPropertyNamed(callee, 'pipe') &&
+          pipeDepth < MAX_PIPE_DEPTH
+        ) {
+          const ends = call.arguments.some((arg) => {
+            const operator = synstateOperatorNameOf(arg);
+
+            return (
+              operator !== undefined && SYNSTATE_ENDING_OPERATORS.has(operator)
+            );
+          });
+
+          const source = writtenFormOf(callee.object);
+
+          return ends ||
+            (source !== undefined &&
+              observableCallKindOf(source, pipeDepth + 1) === 'self-completing')
+            ? 'self-completing'
+            : 'lasting';
+        }
+
+        return 'lasting';
+      }
+
+      const completesByItself =
+        name === 'counter'
+          ? mayStopByItself(call.arguments)
+          : SYNSTATE_SELF_COMPLETING_FACTORIES.has(name);
+
+      return completesByItself ? 'self-completing' : 'lasting';
+    };
+
+    /**
+     * Where the receiver of a `.subscribe` was written: the call itself, the
+     * initializer of the `const` it names, or, for the first element
+     * destructured from a call (`const [count$] = createState(0)`), that call.
+     */
+    const writtenFormOf = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      receiver: TSESTree.Expression,
+    ): TSESTree.Expression | undefined => {
+      const node = skipTypeWrappers(receiver);
+
+      if (node.type === AST_NODE_TYPES.CallExpression) {
+        return node;
+      }
+
+      if (node.type !== AST_NODE_TYPES.Identifier) {
+        return undefined;
+      }
+
+      const declaration = constDeclarationOf(node);
+
+      if (declaration === undefined) {
+        return undefined;
+      }
+
+      const id = declaration.declarator.id;
+
+      if (id.type === AST_NODE_TYPES.Identifier) {
+        return declaration.init;
+      }
+
+      if (
+        id.type === AST_NODE_TYPES.ArrayPattern &&
+        id.elements[0] === declaration.name
+      ) {
+        const init = skipTypeWrappers(declaration.init);
+
+        return init.type === AST_NODE_TYPES.CallExpression &&
+          synstateExportOf(init.callee) !== undefined
+          ? init
+          : undefined;
+      }
+
+      return undefined;
+    };
+
+    /**
+     * Whether the receiver of a `.subscribe` is a synstate observable that does
+     * not complete by itself (see the rule's description). What is written
+     * decides when it can; the type is read only when it cannot.
+     */
+    const isLastingSynstateObservable = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      receiver: TSESTree.Expression,
+    ): boolean => {
+      const written = writtenFormOf(receiver);
+
+      const kind =
+        written === undefined ? 'unknown' : observableCallKindOf(written, 0);
+
+      return kind === 'unknown'
+        ? isTypedObservable(receiver)
+        : kind === 'lasting';
     };
 
     /**
@@ -364,6 +555,15 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
           mut_creations.add(node);
         }
 
+        // Classified at the end, and only once found in a handler: the type of
+        // the receiver is the costly part.
+        if (
+          callee.type === AST_NODE_TYPES.MemberExpression &&
+          isPropertyNamed(callee, 'subscribe')
+        ) {
+          mut_subscriptions.add(node);
+        }
+
         if (callee.type === AST_NODE_TYPES.Identifier) {
           const fn = localFunctionOf(sourceCode, callee);
 
@@ -374,7 +574,10 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
       },
 
       'Program:exit': () => {
-        if (mut_handlers.size === 0 || mut_creations.size === 0) {
+        if (
+          mut_handlers.size === 0 ||
+          (mut_creations.size === 0 && mut_subscriptions.size === 0)
+        ) {
           return;
         }
 
@@ -388,12 +591,57 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
             });
           }
         }
+
+        for (const subscription of mut_subscriptions) {
+          const callee = skipTypeWrappers(subscription.callee);
+
+          if (
+            callee.type === AST_NODE_TYPES.MemberExpression &&
+            placeOf(subscription) === 'handler' &&
+            isLastingSynstateObservable(callee.object)
+          ) {
+            context.report({
+              node: subscription,
+              messageId: 'subscriptionInHandler',
+            });
+          }
+        }
       },
     };
   },
 } as const;
 
 const SYNSTATE_DOM_MODULE = 'synstate-dom';
+
+/**
+ * synstate's factories whose observable completes by itself, which ends the
+ * subscriptions to it: subscribing to one in a handler leaves nothing behind.
+ */
+const SYNSTATE_SELF_COMPLETING_FACTORIES: ReadonlySet<string> = new Set<string>(
+  ['empty', 'fromAbortablePromise', 'fromPromise', 'just', 'timer'],
+);
+
+/**
+ * synstate operators that end the observable they make after a bounded number
+ * of values, and so the subscriptions to it. `takeUntil` and `takeWhile` end it
+ * only if their notifier emits or their predicate fails, which may never
+ * happen.
+ */
+const SYNSTATE_ENDING_OPERATORS: ReadonlySet<string> = new Set<string>([
+  'take',
+]);
+
+/** How many `.pipe` sources deep a receiver is followed. */
+const MAX_PIPE_DEPTH = 16;
+
+/** Members that only a synstate observable carries together. */
+const OBSERVABLE_MEMBERS: readonly string[] = [
+  'getSnapshot',
+  'isCompleted',
+  'pipe',
+  'subscribe',
+  'updateToken',
+] as const;
 
 /** `onClick`, `onInput`: a prop whose value JSX treats as an event handler. */
 const HANDLER_PROP = /^on[A-Z]/u;

@@ -10,7 +10,6 @@ import {
   For,
   If,
   listenInScope,
-  subscribeInScope,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -83,7 +82,7 @@ export const WorkspacePicker = ({
 
   // Switching is the one action that leaves the popover about something else,
   // so it closes it; the rest are edits to the workspace it is open on.
-  subscribeInScope(activeId, () => {
+  activeId.subscribe(() => {
     afterUpdate(stopEditing);
   });
 

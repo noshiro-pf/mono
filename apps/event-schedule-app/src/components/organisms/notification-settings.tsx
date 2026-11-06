@@ -5,7 +5,6 @@ import {
   createAfterUpdate,
   deriveBindable,
   mapBindable,
-  subscribeInScope,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -108,7 +107,7 @@ export const NotificationSettingsComponent = ({
             autoFocus
             disabled={disabled}
             inputRef={(input) => {
-              subscribeInScope(focusEmailInput$, () => {
+              focusEmailInput$.subscribe(() => {
                 afterUpdate(() => {
                   input.focus();
                 });

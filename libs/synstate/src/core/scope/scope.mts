@@ -11,12 +11,17 @@ import {
   runWithScope,
   type ScopeInternals,
   type ScopeMember,
+  type ScopeSubscription,
 } from '../utils/index.mjs';
 
 /**
  * Creates a {@link Scope}. Observables created synchronously inside
  * `scope.run(body)` belong to it, and `scope.dispose()` disposes them without
- * completing the shared observables they were derived from.
+ * completing the shared observables they were derived from. A `subscribe` made
+ * there belongs to it too, and `dispose()` unsubscribes it first, before the
+ * child scopes, the cleanups and the owned observables. An update or a
+ * completion runs in no scope, whichever scope wrote the value or completed the
+ * observable, so a subscriber that subscribes on hearing it does so in none.
  *
  * With `parent`, the new scope is disposed together with it; without one it
  * stands alone and lives until its own `dispose()`. A parent that is already
@@ -50,8 +55,8 @@ export const getCurrentScope = (): Scope | undefined =>
 
 /**
  * Registers `cleanup` to be called when the current scope is disposed. Cleanups
- * run after the child scopes are disposed and before the owned observables are,
- * newest first.
+ * run after the scope's subscriptions have ended and the child scopes are
+ * disposed, and before the owned observables are disposed, newest first.
  *
  * Outside every scope it warns and registers nothing.
  *
@@ -73,7 +78,8 @@ export const onScopeDispose = (cleanup: () => void): void => {
 
 /**
  * Calls `body` with no current scope and returns what it returns, so that the
- * observables it creates belong to no scope and outlive the surrounding one.
+ * observables it creates and the subscriptions it makes belong to no scope and
+ * outlive the surrounding one.
  *
  * @param body - The function to call
  * @returns What `body` returns
@@ -107,6 +113,9 @@ class ScopeClass implements ScopeInternals {
   // @sumi-expect-error readonly/require-readonly-type
   #mut_nodes: ScopeMember[] | undefined;
   #mut_goneNodes: number;
+  // @sumi-expect-error readonly/require-readonly-type
+  #mut_subscriptions: ScopeSubscription[] | undefined;
+  #mut_goneSubscriptions: number;
   #mut_isDisposed: boolean;
 
   constructor(parent: ScopeClass | undefined) {
@@ -121,6 +130,10 @@ class ScopeClass implements ScopeInternals {
     this.#mut_nodes = undefined;
 
     this.#mut_goneNodes = 0;
+
+    this.#mut_subscriptions = undefined;
+
+    this.#mut_goneSubscriptions = 0;
 
     this.#mut_isDisposed = false;
 
@@ -175,10 +188,27 @@ class ScopeClass implements ScopeInternals {
       return;
     }
 
-    // Set first: the children, cleanups and nodes below call back into this
-    // scope (`childGone`, `release`), which has nothing to do once it is
+    // Set first: the subscriptions, children and nodes below call back into
+    // this scope (`childGone`, `release`), which has nothing to do once it is
     // disposing everything anyway.
     this.#mut_isDisposed = true;
+
+    // First, so that what the children and the cleanups do on the way out (a
+    // value a cleanup writes, an owned observable completing) is not heard by
+    // the subscriptions this scope is ending.
+    const subscriptions = this.#mut_subscriptions;
+
+    if (subscriptions !== undefined) {
+      this.#mut_subscriptions = undefined;
+
+      for (let mut_i = subscriptions.length - 1; mut_i >= 0; mut_i -= 1) {
+        const subscription = subscriptions[mut_i];
+
+        if (subscription !== undefined && !subscription.isEnded) {
+          subscription.end();
+        }
+      }
+    }
 
     const children = this.#mut_children;
 
@@ -239,6 +269,38 @@ class ScopeClass implements ScopeInternals {
     this.#mut_nodes = nodes.filter((n) => !n.isCompleted);
 
     this.#mut_goneNodes = 0;
+  }
+
+  adoptSubscription(subscription: ScopeSubscription): void {
+    if (this.#mut_isDisposed) {
+      subscription.end();
+
+      return;
+    }
+
+    if (this.#mut_subscriptions === undefined) {
+      this.#mut_subscriptions = [subscription];
+    } else {
+      this.#mut_subscriptions.push(subscription);
+    }
+  }
+
+  subscriptionGone(): void {
+    const subscriptions = this.#mut_subscriptions;
+
+    if (subscriptions === undefined) {
+      return;
+    }
+
+    this.#mut_goneSubscriptions += 1;
+
+    if (!isMostlyGone(this.#mut_goneSubscriptions, subscriptions.length)) {
+      return;
+    }
+
+    this.#mut_subscriptions = subscriptions.filter((s) => !s.isEnded);
+
+    this.#mut_goneSubscriptions = 0;
   }
 
   addCleanup(cleanup: () => void): void {

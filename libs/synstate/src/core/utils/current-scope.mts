@@ -7,6 +7,21 @@ export type ScopeMember = Readonly<{
 }>;
 
 /**
+ * What a scope holds of a subscription made while it ran: enough to end it on
+ * disposal, and to tell whether it has already ended on its own.
+ */
+export type ScopeSubscription = Readonly<{
+  /** Whether it has ended, by `unsubscribe`, completion or the scope. */
+  isEnded: boolean;
+
+  /**
+   * Ends it. The scope calls it once, on disposal (or at once, when adopted by
+   * a disposed scope), and only while it has not ended.
+   */
+  end: () => void;
+}>;
+
+/**
  * The side of a scope the rest of the core talks to, on top of its public face
  * {@link Scope}. Kept out of the public API (`core/utils/**` is excluded from
  * index generation), so that only `createScope` and its siblings decide what a
@@ -25,6 +40,19 @@ export type ScopeInternals = Scope &
     release: () => void;
 
     addCleanup: (cleanup: () => void) => void;
+
+    /**
+     * Takes `subscription` into the scope, which ends it when disposed. A scope
+     * already disposed ends it at once.
+     */
+    adoptSubscription: (subscription: ScopeSubscription) => void;
+
+    /**
+     * Tells the scope that one of its subscriptions ended on its own
+     * (`unsubscribe`, completion), so that the scope can drop it. It is ended
+     * (`isEnded`) by the time it calls this.
+     */
+    subscriptionGone: () => void;
   }>;
 
 /**

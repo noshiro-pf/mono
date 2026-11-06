@@ -1,12 +1,5 @@
 import { createState, derive, map, onScopeDispose } from 'synstate';
-import {
-  constant,
-  For,
-  If,
-  listenInScope,
-  subscribeInScope,
-  type JSX,
-} from 'synstate-dom';
+import { constant, For, If, listenInScope, type JSX } from 'synstate-dom';
 import { Arr, fastDeepEqual, Num, unknownToString } from 'ts-data-forge';
 import {
   PaneDropIndicator,
@@ -793,32 +786,29 @@ export const App = (): JSX.Element => {
   // told apart in the tab strip. Worked out first and applied only when it
   // changes: the view changes on every pointer move of a splitter drag, and the
   // favicon is drawn on a canvas.
-  subscribeInScope(
-    derive(
-      [registry$, session$],
-      (registry, { workspaceId: shown, state: shownState }) => {
-        if (shown === undefined) {
-          return undefined;
-        }
-
-        const entry = workspaceEntryOf(registry, shown);
-
-        const position = workspacePositionOf(registry, shown);
-
-        return entry === undefined || position === undefined
-          ? undefined
-          : { position, label: tabLabelOf(shownState, entry.name) };
-      },
-      {
-        equals: (a, b) => a?.position === b?.position && a?.label === b?.label,
-      },
-    ),
-    (tabIdentity) => {
-      if (tabIdentity !== undefined) {
-        applyTabIdentity(tabIdentity.position, tabIdentity.label);
+  derive(
+    [registry$, session$],
+    (registry, { workspaceId: shown, state: shownState }) => {
+      if (shown === undefined) {
+        return undefined;
       }
+
+      const entry = workspaceEntryOf(registry, shown);
+
+      const position = workspacePositionOf(registry, shown);
+
+      return entry === undefined || position === undefined
+        ? undefined
+        : { position, label: tabLabelOf(shownState, entry.name) };
     },
-  );
+    {
+      equals: (a, b) => a?.position === b?.position && a?.label === b?.label,
+    },
+  ).subscribe((tabIdentity) => {
+    if (tabIdentity !== undefined) {
+      applyTabIdentity(tabIdentity.position, tabIdentity.label);
+    }
+  });
 
   /**
    * When the tab's own notes are taken.
@@ -837,7 +827,7 @@ export const App = (): JSX.Element => {
     noteThisTab().catch(console.error);
   };
 
-  subscribeInScope(session$.pipe(map((session) => session.workspaceId)), note);
+  session$.pipe(map((session) => session.workspaceId)).subscribe(note);
 
   listenInScope(globalThis, 'visibilitychange', note);
 
@@ -875,7 +865,7 @@ export const App = (): JSX.Element => {
   // The URL is written at the same moment as storage, and only then: it is the
   // same snapshot, so a reload finds the two in agreement, and the browser
   // throttles a page that rewrites its history entry on every pointer move.
-  subscribeInScope(session$, ({ workspaceId: saveTo, state: toSave }) => {
+  session$.subscribe(({ workspaceId: saveTo, state: toSave }) => {
     clearTimeout(mut_timers.save);
 
     mut_timers.save =

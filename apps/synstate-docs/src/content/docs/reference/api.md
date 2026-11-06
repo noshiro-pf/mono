@@ -97,12 +97,12 @@ For complex scenarios, SynState provides observable-based APIs:
 
 For libraries built on SynState, such as a UI binding that mounts and unmounts parts of a page. Application state defined at module level belongs to no scope and needs none of this.
 
-- `createScope(parent?)`: Create a scope. Observables created synchronously inside `scope.run(body)` belong to it, and `scope.dispose()` disposes them without completing the shared observables they were derived from. With `parent`, it is disposed together with the parent.
+- `createScope(parent?)`: Create a scope. Observables created synchronously inside `scope.run(body)` belong to it, and `scope.dispose()` disposes them without completing the shared observables they were derived from. A `subscribe` made there belongs to it too, and `dispose()` unsubscribes it. With `parent`, it is disposed together with the parent.
 - `getCurrentScope()`: The scope whose `run` is executing, if any. Take it while still synchronous and wrap work after an `await` in its `run`, since only what is created synchronously joins a scope.
 - `onScopeDispose(cleanup)`: Call `cleanup` when the current scope is disposed.
-- `untracked(body)`: Call `body` with no current scope, so that what it creates outlives the surrounding scope.
+- `untracked(body)`: Call `body` with no current scope, so that what it creates, and what it subscribes, outlives the surrounding scope.
 
-`dispose()` disposes the child scopes, then calls the `onScopeDispose` functions, then disposes the owned observables, each newest first. `run` on a disposed scope warns and owns nothing it creates.
+`dispose()` ends the subscriptions, then disposes the child scopes, then calls the `onScopeDispose` functions, then disposes the owned observables, each newest first. A subscription made in the scope therefore hears neither a value an `onScopeDispose` function writes nor the completion of the observables the scope or its children dispose. An update or a completion runs in no scope, whichever scope wrote the value or completed the observable, so what a subscriber subscribes or creates on hearing it belongs to no scope unless the subscriber runs one. `run` on a disposed scope warns and owns nothing it creates.
 
 ### Utilities
 

@@ -1,10 +1,5 @@
 import { createState, onScopeDispose } from 'synstate';
-import {
-  constant,
-  createAfterUpdate,
-  subscribeInScope,
-  type JSX,
-} from 'synstate-dom';
+import { constant, createAfterUpdate, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { Rect } from 'ts-utils-additional';
 import { roomPage } from '../constants/index.mjs';
@@ -43,7 +38,7 @@ export const Root = (): JSX.Element => {
 
   // The creator is already a player of the room, by the name they gave, so they
   // open it as that player rather than on its join form.
-  subscribeInScope(roomStore.createRoom.response, ({ room, myName }) => {
+  roomStore.createRoom.response.subscribe(({ room, myName }) => {
     afterUpdate(() => {
       router.push(roomPage(room.id, myName));
     });

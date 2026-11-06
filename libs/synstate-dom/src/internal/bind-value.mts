@@ -1,6 +1,5 @@
 import { isObservable } from 'synstate';
 import type { Bindable } from '../constant/index.mjs';
-import { subscribeInScope } from '../scope/index.mjs';
 
 /**
  * Writes the value of a {@link Bindable} with `write`, and again on every update
@@ -8,8 +7,8 @@ import { subscribeInScope } from '../scope/index.mjs';
  *
  * - A constant is written once.
  * - A completed observable has its current value written once.
- * - Any other observable is subscribed to, and the subscription is released
- *   when the current scope is disposed.
+ * - Any other observable is subscribed to in the current scope, whose disposal
+ *   ends the subscription.
  *
  * `subscribe` delivers the current value before it adds the subscriber, so a
  * value written by the first `write` itself (a `For` row or a switch branch
@@ -34,7 +33,7 @@ export const bindValue = <T,>(
 
   const { updateToken } = bindable;
 
-  subscribeInScope(bindable, write);
+  bindable.subscribe(write);
 
   if (bindable.updateToken !== updateToken) {
     write(bindable.getSnapshot().value);

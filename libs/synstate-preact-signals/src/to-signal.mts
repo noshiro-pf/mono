@@ -10,7 +10,8 @@ import { Optional } from 'ts-data-forge';
  * value of type `A`.
  *
  * The subscription lives for the lifetime of the observable (until it
- * completes).
+ * completes), or, when made while a synstate scope runs, until that scope is
+ * disposed.
  *
  * @example
  * ```ts

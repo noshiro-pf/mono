@@ -16,7 +16,6 @@ import {
   isImeKeyDown,
   listenInScope,
   Portal,
-  subscribeInScope,
   toObservable,
   type Bindable,
   type ClassObject,
@@ -143,7 +142,7 @@ export const Overlay = ({
   // written after the update that changed `isOpen`, never during it.
   const mut_target = { showing: false, hasOpened: !lazy };
 
-  subscribeInScope(isOpen$, (open) => {
+  isOpen$.subscribe((open) => {
     const { first } = mut_mounted;
 
     mut_mounted.first = false;
@@ -488,7 +487,7 @@ const OverlayBody = ({
 
   // As it opens, and as it is opened again during its exit: on the next frame,
   // once it is laid out, unless one opened over it by then has taken focus.
-  subscribeInScope(isOpen$, (open) => {
+  isOpen$.subscribe((open) => {
     cancelAnimationFrame(mut_frame.id);
 
     if (open && autoFocus) {
