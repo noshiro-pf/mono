@@ -10,7 +10,8 @@
     // edited rather than against the last build. See
     // docs/workspace-package-linking.md.
     "paths": {
-      "synstate-next": ["./src/index.mts"]
+      "synstate-next": ["./src/index.mts"],
+      "synstate-next/internal": ["./src/internal.mts"]
     }
   },
   "include": ["./src", "./test", "./scripts", "./configs"]

@@ -7,6 +7,10 @@ import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 export default defineViteConfig({
   packageRoot: workspaceRootPath,
   alias: {
+    'synstate-next/internal': path.resolve(
+      workspaceRootPath,
+      './src/internal.mts',
+    ),
     'synstate-next': path.resolve(workspaceRootPath, './src/index.mts'),
   },
   coverage: {

@@ -29,6 +29,9 @@ synstate や synstate-dom に入れたバグ修正・セキュリティ修正・
 
 - `state`, `source`, `batch`, owners (`createOwner`, `onCleanup`, `untracked`).
 - `pipe` with the operators `map`, `filter`, `scan`, `withInitialValue`,
-  `debounce` and `switchMap`, and `derive`, `combine` and `merge`.
+  `skipIfNoChange`, `keepEqualParts`, `pairwise`, `take`, `skip`, `takeWhile`,
+  `skipWhile`, `takeUntil`, `skipUntil`, `withCurrentValueFrom`,
+  `withBufferedFrom`, `debounce` and `switchMap`, and `derive`, `combine`,
+  `merge` and `zip`.
 - `synstate-next/internal`: the node and effect classes, for synstate-dom-next
   only.

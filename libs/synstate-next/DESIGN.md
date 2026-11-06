@@ -25,6 +25,18 @@ no longer holds.
 - **Queues keep their length in a counter.** `length = 0` drops an array's
   backing store and the next push reallocates it; in the prototype that cost
   more than a one-effect update itself (278 ns against 53 ns).
+- **A node sees the emissions made after it was created.** Each emission is
+  numbered, and a node records the number current at its creation; an earlier
+  emission reaches it only as the value its parent holds, whether its round has
+  propagated yet or not. A subscriber or a `take` made in the batch that wrote
+  its source does not count the written value twice. A derived node emits when
+  its round recomputes it, so one made in that batch below it sees that
+  emission: it read the derived node's value from before the write. A node with
+  several parents asks `emittedNow(parent)` for the same reason.
+- **A node that is done leaves its parents.** A `take`, `takeWhile` or
+  `takeUntil` that will pass nothing more takes itself out of its parents'
+  children, keeping its value, so that they neither visit it nor keep it alive.
+  It leaves them as a disposed child does, through the same lazy compaction.
 - **Equality cut-off by default.** A node that recomputes to an `Object.is`
   equal value does not emit, and nothing below it is visited. `equals` replaces
   the comparison; `combine` and the event operators pass `() => false`.
@@ -117,10 +129,25 @@ from the prototype; the packages are to be measured again in
 - Observables from two copies of the package cannot be combined.
 - A `For` row reads its new element one round after the list changed (see
   synstate-dom-next).
+- `take(n)` and `skip(n)` count the value the source holds at the start, so
+  `state(0).pipe(take(1))` holds `0` and passes nothing more. synstate counted
+  only the values after it.
+- `takeUntil` and `skipUntil` react to the notifier's emissions after they were
+  created; a value the notifier already holds is not one. synstate stopped (or
+  started) at once for a notifier that held a value. A value the source emits in
+  the update the notifier emits in is dropped by `takeUntil` and passed by
+  `skipUntil`.
+- `withBufferedFrom` buffers what the other observable emits after it was
+  created; synstate put the value it held into the first buffer.
+- The operators that are one `map` are gone: `mapTo`, `pluck`, `attachIndex` (a
+  `scan`), `mapOptional`, `unwrapOptional`, `mapResultOk`, `mapResultErr`,
+  `unwrapResultOk`, `unwrapResultErr`. So are the aliases `withLatestFrom` and
+  `withBuffered`. Each name is one more thing to learn for no capability; a
+  `map` with `equals: () => false` replaces `mapTo` on an event.
 
 ## Not yet built
 
-The operators beyond `map`, `filter`, `scan`, `withInitialValue`, `derive`,
-`combine`, `merge`, `debounce` and `switchMap`; the remaining sources (timers,
-promises, `fromEvent`); and the port of synstate's tests. Each lands in a pull
-request of the rebuild.
+The asynchronous operators beyond `debounce` and `switchMap` (`throttle`,
+`audit`, `mergeMap`); the remaining sources (timers, promises,
+`fromSubscribable`); the helpers built on states (`createReducer` and the like);
+and the port of synstate's tests. Each lands in a pull request of the rebuild.
