@@ -6,7 +6,6 @@
  * it merged from under, off that layer's commits and nothing more.
  */
 
-import * as os from 'node:os';
 import * as path from 'node:path';
 import {
   isSafeRefName,
@@ -17,6 +16,8 @@ import {
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import { git, log, removeLabel, sh, type ApiContext } from '../lib/index.mjs';
+import { WORKTREE_ROOT } from './auto-fix.mjs';
+import type { RegenerateConfig } from './config.mjs';
 import {
   armAutoMerge,
   mergedHeadOf,
@@ -28,10 +29,8 @@ import {
 } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
 import { outOfSyncVerdict } from './out-of-sync.mjs';
-import {
-  describeCommandFailure,
-  describeConflict,
-} from './set-aside-detail.mjs';
+import { resolveByRegenerating } from './regenerate.mjs';
+import { describeCommandFailure } from './set-aside-detail.mjs';
 import { withSkip } from './skips.mjs';
 import {
   autoRebaseTargets,
@@ -71,6 +70,11 @@ type RebaseTarget = Readonly<{
   /** Refspecs to fetch from `origin` besides the branch itself. */
   fetch: readonly string[];
   upstream: Readonly<{ sha: string; required: boolean }> | undefined;
+  /**
+   * How a conflict only in generated files is resolved (`regenerate.mts`);
+   * every conflict is set aside when `undefined`.
+   */
+  regenerate: RegenerateConfig | undefined;
 }>;
 
 /**
@@ -196,6 +200,7 @@ export const advance = async (
       merged === undefined
         ? undefined
         : { sha: merged.headSha, required: false },
+    regenerate: plan.regenerate,
   });
 
   if (Result.isErr(rebased)) {
@@ -305,6 +310,8 @@ export const restackBehind = async (
     owners: ReadonlyMap<number, QueueOwner>;
     dryRun: boolean;
     nowEpochMs: number;
+    /** How a conflict only in generated files is resolved, when it is. */
+    regenerate: RegenerateConfig | undefined;
   }>,
 ): Promise<
   Readonly<{ skipped: SkipRecords; outOfSync: OutOfSync; moved: boolean }>
@@ -370,6 +377,9 @@ export const restackBehind = async (
       onto: `origin/${defaultBranch}`,
       fetch: [defaultBranch],
       upstream: undefined,
+      // Only once the author has queued it: generating means running the
+      // branch's own install and scripts, as the auto-fix does.
+      regenerate: isMergeQueued(pr) ? context.regenerate : undefined,
     });
 
     if (Result.isErr(rebased)) {
@@ -483,6 +493,7 @@ export const restack = async (
       onto: below.to,
       fetch: [],
       upstream: { sha: below.from, required: true },
+      regenerate: undefined,
     });
 
     if (Result.isErr(moved)) {
@@ -653,22 +664,21 @@ const rebaseInWorktree = async (
   );
 
   if (Result.isErr(rebased)) {
-    const unmerged = await git(
-      'git diff --name-only --diff-filter=U',
+    const regenerated = await resolveByRegenerating(
       worktreeDir,
+      target.regenerate,
+      target.onto,
+      rebased.value,
     );
 
-    await git('git rebase --abort', worktreeDir);
+    if (Result.isErr(regenerated)) {
+      return regenerated.value.ofPullRequest
+        ? conflicted(regenerated.value.detail, rebased.value)
+        : rebaseFailed(regenerated.value.detail, rebased.value);
+    }
 
-    return conflicted(
-      describeConflict(
-        Result.isOk(unmerged)
-          ? unmerged.value.split('\n').filter((line) => line !== '')
-          : [],
-        lastLines(rebased.value, 5),
-        target.onto,
-      ),
-      rebased.value,
+    log(
+      `#${pr.number}: conflicted with ${target.onto} only in generated files; took ${target.onto}'s side of ${regenerated.value.join(', ')} and generated them again.`,
     );
   }
 
@@ -734,7 +744,8 @@ const rebaseAndPush = async (
 ): Promise<Result<Rebased, RebaseFailure>> => {
   const branch = pr.headRefName;
 
-  const worktreeDir = path.join(os.tmpdir(), 'unblock-prs', `pr-${pr.number}`);
+  // Where an install works, for a conflict the generators resolve.
+  const worktreeDir = path.join(WORKTREE_ROOT, `rebase-pr-${pr.number}`);
 
   const rebaseFailed = (detail: string): Result<Rebased, RebaseFailure> =>
     Result.err({ reason: 'rebase-failed', detail });
@@ -998,6 +1009,7 @@ const restackOffMerged = async (
     onto: mergeCommit,
     fetch: [],
     upstream: { sha: headSha, required: true },
+    regenerate: undefined,
   });
 
   if (Result.isErr(rebased)) {

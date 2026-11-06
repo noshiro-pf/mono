@@ -14,6 +14,7 @@ import type {
 } from 'pr-report-core';
 import * as t from 'ts-fortress';
 import type { StrictPick } from 'ts-type-forge';
+import type { RegenerateConfig } from './config.mjs';
 import type { Unread, UnreadStreaks } from './unread.mjs';
 
 /** The fields read of each pull request (`github.mts`'s `listPullRequests`). */
@@ -415,4 +416,9 @@ export type AdvancePlan = Readonly<{
   bypassAt: (head: string) => Promise<string | undefined>;
   /** Every open layer above it, each after the one it is on. */
   descendants: readonly PullRequest[];
+  /**
+   * How a conflict only in generated files is resolved (`regenerate.mts`);
+   * every conflict is set aside when `undefined`.
+   */
+  regenerate: RegenerateConfig | undefined;
 }>;

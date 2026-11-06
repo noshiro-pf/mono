@@ -14,6 +14,7 @@ export * from './out-of-sync.mjs';
 export * from './owner.mjs';
 export * from './quiet.mjs';
 export * from './rebase.mjs';
+export * from './regenerate.mjs';
 export * from './release-failure.mjs';
 export * from './release.mjs';
 export * from './set-aside-comment.mjs';

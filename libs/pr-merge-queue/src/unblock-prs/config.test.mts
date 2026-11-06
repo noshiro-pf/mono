@@ -117,6 +117,58 @@ describe(configOf, () => {
     assert.isUndefined(config.value.translation);
   });
 
+  test('reads the regenerators, and names a pattern that is not one', () => {
+    const config = configOf(
+      {
+        $schema: undefined,
+        autoFix: undefined,
+        regenerate: {
+          before: ['pnpm install --frozen-lockfile'],
+          generators: [
+            {
+              path: String.raw`^docs/package-dependencies\.md$`,
+              run: 'pnpm run gen:deps-graph',
+            },
+          ],
+        },
+      },
+      'x',
+    );
+
+    assert.isTrue(Result.isOk(config));
+
+    assert.deepStrictEqual(config.value.regenerate?.before, [
+      'pnpm install --frozen-lockfile',
+    ]);
+
+    assert.isTrue(
+      config.value.regenerate?.generators[0]?.path.test(
+        'docs/package-dependencies.md',
+      ) === true,
+    );
+
+    const invalid = configOf(
+      {
+        $schema: undefined,
+        autoFix: undefined,
+        regenerate: { before: [], generators: [{ path: '(', run: 'x' }] },
+      },
+      'x',
+    );
+
+    assert.isTrue(Result.isErr(invalid));
+
+    expect(invalid.value).toContain('regenerate.generators[0].path');
+  });
+
+  test('regenerates nothing when the file names no regenerators', () => {
+    const config = configOf({ $schema: undefined, autoFix: undefined }, 'x');
+
+    assert.isTrue(Result.isOk(config));
+
+    assert.isUndefined(config.value.regenerate);
+  });
+
   test('leaves the auto-fix off when the file has none', () => {
     const config = configOf({ $schema: undefined, autoFix: undefined }, 'x');
 

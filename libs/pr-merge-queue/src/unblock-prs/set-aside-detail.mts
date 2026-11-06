@@ -67,15 +67,22 @@ export const describeNotStarted = (
 
 /**
  * The files a rebase stopped on, or when git named none — a rebase can fail
- * before it reaches a merge — the end of what it printed.
+ * before it reaches a merge — the end of what it printed. When some of the
+ * files could have been generated again (`regenerate.mts`) and the rest not,
+ * which ones, so that whoever resolves it by hand knows which to regenerate.
  */
 export const describeConflict = (
   conflicted: readonly string[],
   output: string,
   onto: string,
+  wouldRegenerate: readonly string[] = [],
 ): string =>
   Arr.isNonEmpty(conflicted)
-    ? (`conflicts with ${onto} in ${conflicted.join(', ')}` as const)
+    ? (`conflicts with ${onto} in ${conflicted.join(', ')}${
+        Arr.isNonEmpty(wouldRegenerate)
+          ? `; only ${wouldRegenerate.join(', ')} could be generated again`
+          : ''
+      }` as const)
     : (`rebase onto ${onto} failed: ${output.replaceAll(/\s+/gu, ' ').trim()}` as const);
 
 /**

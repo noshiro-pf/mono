@@ -189,13 +189,30 @@ export type AutoFixPlan = Readonly<{
 }>;
 
 /**
- * Not the OS temp directory the rebase uses: an install is a `node_modules`
- * tree, which the pnpm store hard-links only within one filesystem, and the
- * temp directory is often a tmpfs. Not the git directory or `~/.cache` either:
+ * `run` with `$1` to `$9` replaced by `groups`, each shell-quoted: a fixer's
+ * command from the failed context's name, a regenerator's from the conflicted
+ * path, both whatever a job or a pull request chose.
+ */
+export const withCaptures = (
+  run: string,
+  groups: readonly (string | undefined)[],
+): string =>
+  run.replaceAll(/\$([1-9])/gu, (_, index) =>
+    sh(
+      groups[Result.unwrapOkOr(Num.safeParseInt(index ?? ''), Number.NaN)] ??
+        '',
+    ),
+  );
+
+/**
+ * Not the OS temp directory: an install is a `node_modules` tree, which the
+ * pnpm store hard-links only within one filesystem, and the temp directory is
+ * often a tmpfs. Not the git directory or `~/.cache` either:
  * `fix:fmt:diff` skips every file with a `.git`, `.cache`, `dist`, `build` or
  * `out` segment anywhere in its absolute path, so a worktree under one is
  * formatted by nothing. `run-unblock-prs-skill` puts its sessions' worktrees
- * here too, for the same reasons.
+ * here too, for the same reasons, and the rebase puts its own here, where the
+ * generators that resolve a conflict in generated files can be installed.
  */
 export const WORKTREE_ROOT = path.join(
   os.homedir(),
@@ -221,19 +238,9 @@ const fixerFor = (
 
   const groups = matched?.groups ?? undefined;
 
-  if (fixer === undefined || groups === undefined) {
-    return undefined;
-  }
-
-  return {
-    command: fixer.run.replaceAll(/\$([1-9])/gu, (_, index) =>
-      sh(
-        groups[Result.unwrapOkOr(Num.safeParseInt(index ?? ''), Number.NaN)] ??
-          '',
-      ),
-    ),
-    stage: fixer.stage,
-  };
+  return fixer === undefined || groups === undefined
+    ? undefined
+    : { command: withCaptures(fixer.run, groups), stage: fixer.stage };
 };
 
 const declined = (detail: string): AutoFixed =>
