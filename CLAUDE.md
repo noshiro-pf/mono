@@ -248,10 +248,10 @@ English review alone (`docs/code-review-loop.md`).
 - Pushing the session's own branch and opening its pull request is the work.
   **Without explicit instruction, never**: push to any other branch (`main`
   refuses direct pushes anyway); force-push or rebase a branch whose pull
-  request is open, save for amending the session's own one commit (see
-  "Commits and pull requests"); merge or add `merge-queued`; run the `gh` CLI
-  (it is a person's account; use the GitHub API); access `~/.ssh` or other
-  sensitive directories.
+  request is open, save for amending the session's own one commit (see "Commits
+  and pull requests"); merge or add `merge-queued` (save putting it back by
+  `rework-pr done --requeue`); run the `gh` CLI (it is a person's account; use
+  the GitHub API); access `~/.ssh` or other sensitive directories.
 - **An issue is filed by the `file-issue` skill**: one `priority:<tier>`
   (`docs/issue-priority.md`), checked against the open issues for a duplicate.
 - **Work on an issue starts with `pnpm run start-issue -- <N> --by <session>`**;
@@ -338,8 +338,8 @@ ingest the feed). Outside reports come through private vulnerability reporting
   Subscribe to its activity (`subscribe_pr_activity` where available) and end
   the turn to wait — do not poll. A small in-scope fix is amended onto the
   branch's one commit between **`pnpm run rework-pr -- start`**, before the
-  first edit (`skip-ci` on, `merge-queued` off, auto-merge off, a draft), and
-  **`-- done`** (push, ready; `merge-queued` stays the author's); without
+  first edit, and **`-- done --requeue`**, which puts back the `merge-queued`
+  `start` took off, or **`--review`** when the description must change; without
   GraphQL, go on after its labels unless disarming failed: then it is the
   author's. Anything larger is a question. Claim one `unblock-prs` set aside
   instead (`pnpm run claim-pr -- <n> --by <session URL>`); refused, leave it.

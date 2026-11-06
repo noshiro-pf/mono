@@ -3,8 +3,14 @@ import { Result } from 'ts-data-forge';
 import {
   applyRework,
   doneSteps,
+  isUntouchedSince,
   parseReworkArgs,
+  readOwnDequeueEvent,
   startSteps,
+  type QueueEvent,
+  type QueueRecord,
+  type ReworkArgs,
+  type ReworkHandBack,
   type ReworkIo,
   type ReworkState,
   type ReworkStep,
@@ -18,9 +24,28 @@ describe(parseReworkArgs, () => {
     );
 
     assert.deepStrictEqual(
-      parseReworkArgs(['--', 'done', '--dry-run']),
-      Result.ok({ phase: 'done', dryRun: true }),
+      parseReworkArgs(['--', 'done', '--requeue', '--dry-run']),
+      Result.ok({ phase: 'done', handBack: 'requeue', dryRun: true }),
     );
+
+    assert.deepStrictEqual(
+      parseReworkArgs(['done', '--review']),
+      Result.ok({ phase: 'done', handBack: 'review', dryRun: false }),
+    );
+  });
+
+  test('done: refuses neither and both of --requeue and --review', () => {
+    assert.isTrue(Result.isErr(parseReworkArgs(['done'])));
+
+    assert.isTrue(
+      Result.isErr(parseReworkArgs(['done', '--requeue', '--review'])),
+    );
+  });
+
+  test('start: refuses --requeue and --review', () => {
+    assert.isTrue(Result.isErr(parseReworkArgs(['start', '--requeue'])));
+
+    assert.isTrue(Result.isErr(parseReworkArgs(['start', '--review'])));
   });
 
   test('answers help', () => {
@@ -59,15 +84,63 @@ describe(startSteps, () => {
 describe(doneSteps, () => {
   test('pushes, then marks a draft ready', () => {
     assert.deepStrictEqual(
-      doneSteps(state({ labels: [SKIP_CI_LABEL], isDraft: true })),
+      doneSteps(
+        state({ labels: [SKIP_CI_LABEL], isDraft: true }),
+        'review',
+        'none',
+      ),
       Result.ok(['push', 'ready']),
     );
   });
 
   test('pushes alone when it could not be made a draft', () => {
     assert.deepStrictEqual(
-      doneSteps(state({ labels: [SKIP_CI_LABEL] })),
+      doneSteps(state({ labels: [SKIP_CI_LABEL] }), 'review', 'none'),
       Result.ok(['push']),
+    );
+  });
+
+  test('requeue: puts merge-queued back last, when start took it off', () => {
+    assert.deepStrictEqual(
+      doneSteps(
+        state({ labels: [SKIP_CI_LABEL], isDraft: true }),
+        'requeue',
+        'untouched',
+      ),
+      Result.ok(['push', 'ready', 'requeue', 'forget']),
+    );
+  });
+
+  test('requeue: leaves it off when start found it off', () => {
+    assert.deepStrictEqual(
+      doneSteps(
+        state({ labels: [SKIP_CI_LABEL], isDraft: true }),
+        'requeue',
+        'none',
+      ),
+      Result.ok(['push', 'ready']),
+    );
+  });
+
+  test('requeue: leaves it off once the label has moved, and forgets the record', () => {
+    assert.deepStrictEqual(
+      doneSteps(
+        state({ labels: [SKIP_CI_LABEL], isDraft: true }),
+        'requeue',
+        'moved',
+      ),
+      Result.ok(['push', 'ready', 'forget']),
+    );
+  });
+
+  test('review: leaves it off, and forgets that start took it off', () => {
+    assert.deepStrictEqual(
+      doneSteps(
+        state({ labels: [SKIP_CI_LABEL], isDraft: true }),
+        'review',
+        'untouched',
+      ),
+      Result.ok(['push', 'ready', 'forget']),
     );
   });
 
@@ -76,6 +149,8 @@ describe(doneSteps, () => {
       Result.isErr(
         doneSteps(
           state({ labels: [SKIP_CI_LABEL, MERGE_QUEUED_LABEL], isDraft: true }),
+          'requeue',
+          'untouched',
         ),
       ),
     );
@@ -84,11 +159,102 @@ describe(doneSteps, () => {
       Result.isErr(
         doneSteps(
           state({ labels: [SKIP_CI_LABEL], isDraft: true, isArmed: true }),
+          'review',
+          'none',
         ),
       ),
     );
 
-    assert.isTrue(Result.isErr(doneSteps(state({ isDraft: true }))));
+    assert.isTrue(
+      Result.isErr(doneSteps(state({ isDraft: true }), 'review', 'none')),
+    );
+  });
+});
+
+describe(isUntouchedSince, () => {
+  test('true while the event start wrote down is the last', () => {
+    assert.isTrue(
+      isUntouchedSince(
+        [
+          { id: 1, event: 'labeled' },
+          { id: 2, event: 'unlabeled' },
+        ],
+        2,
+      ),
+    );
+  });
+
+  test('false once anyone has put the label on or taken it off since', () => {
+    assert.isFalse(
+      isUntouchedSince(
+        [
+          { id: 2, event: 'unlabeled' },
+          { id: 3, event: 'labeled' },
+        ],
+        2,
+      ),
+    );
+
+    assert.isFalse(
+      isUntouchedSince(
+        [
+          { id: 2, event: 'unlabeled' },
+          { id: 3, event: 'labeled' },
+          { id: 4, event: 'unlabeled' },
+        ],
+        2,
+      ),
+    );
+  });
+
+  test('false with no events, or a different one recorded', () => {
+    assert.isFalse(isUntouchedSince([], 2));
+
+    assert.isFalse(isUntouchedSince([{ id: 5, event: 'unlabeled' }], 2));
+  });
+});
+
+describe(readOwnDequeueEvent, () => {
+  test('reads again until GitHub lists the label taken off', async () => {
+    const { read, waits } = fakeEvents([
+      [{ id: 1, event: 'labeled' }],
+      [{ id: 1, event: 'labeled' }],
+      [
+        { id: 1, event: 'labeled' },
+        { id: 2, event: 'unlabeled' },
+      ],
+    ]);
+
+    assert.deepStrictEqual(
+      await readOwnDequeueEvent(read, waits.wait, 4),
+      Result.ok(2),
+    );
+
+    assert.strictEqual(waits.count(), 2);
+  });
+
+  test('gives up after the reads it is given, waiting only between them', async () => {
+    const { read, waits } = fakeEvents([[{ id: 1, event: 'labeled' }]]);
+
+    assert.isTrue(Result.isErr(await readOwnDequeueEvent(read, waits.wait, 3)));
+
+    assert.strictEqual(waits.count(), 2);
+  });
+
+  test('stops at a read that fails', async () => {
+    const { waits } = fakeEvents([]);
+
+    assert.isTrue(
+      Result.isErr(
+        await readOwnDequeueEvent(
+          () => Promise.resolve(Result.err('500')),
+          waits.wait,
+          3,
+        ),
+      ),
+    );
+
+    assert.strictEqual(waits.count(), 0);
   });
 });
 
@@ -99,7 +265,10 @@ describe(applyRework, () => {
       state({ labels: [SKIP_CI_LABEL], isArmed: true }),
     ]);
 
-    assert.deepStrictEqual(await applyRework('start', io), Result.ok(3456));
+    assert.deepStrictEqual(
+      await applyRework(START, io),
+      Result.ok({ number: 3456, steps: ['dequeue', 'disarm', 'draft'] }),
+    );
 
     assert.deepStrictEqual(ran, ['dequeue', 'disarm', 'draft']);
   });
@@ -113,7 +282,7 @@ describe(applyRework, () => {
       'disarm',
     );
 
-    assert.isTrue(Result.isErr(await applyRework('start', io)));
+    assert.isTrue(Result.isErr(await applyRework(START, io)));
 
     assert.deepStrictEqual(ran, ['hold', 'dequeue', 'disarm']);
   });
@@ -127,7 +296,10 @@ describe(applyRework, () => {
       'draft',
     );
 
-    assert.deepStrictEqual(await applyRework('start', io), Result.ok(3456));
+    assert.deepStrictEqual(
+      await applyRework(START, io),
+      Result.ok({ number: 3456, steps: ['hold', 'dequeue'] }),
+    );
 
     assert.deepStrictEqual(ran, ['hold', 'dequeue', 'draft']);
   });
@@ -135,7 +307,10 @@ describe(applyRework, () => {
   test('start: reads once when no label changes', async () => {
     const { io, ran } = fakeIo([state({ labels: [SKIP_CI_LABEL] })]);
 
-    assert.deepStrictEqual(await applyRework('start', io), Result.ok(3456));
+    assert.deepStrictEqual(
+      await applyRework(START, io),
+      Result.ok({ number: 3456, steps: ['draft'] }),
+    );
 
     assert.deepStrictEqual(ran, ['draft']);
   });
@@ -146,7 +321,7 @@ describe(applyRework, () => {
       undefined,
     ]);
 
-    const applied = await applyRework('start', io);
+    const applied = await applyRework(START, io);
 
     assert.isTrue(Result.isErr(applied));
 
@@ -160,32 +335,101 @@ describe(applyRework, () => {
       state({ labels: [SKIP_CI_LABEL], isDraft: true, isArmed: true }),
     ]);
 
-    assert.isTrue(Result.isErr(await applyRework('done', io)));
+    assert.isTrue(Result.isErr(await applyRework(done('requeue'), io)));
 
     assert.deepStrictEqual(ran, []);
   });
 
-  test('done: pushes, then marks it ready', async () => {
+  test('done --review: pushes, then marks it ready', async () => {
     const { io, ran } = fakeIo([
       state({ labels: [SKIP_CI_LABEL], isDraft: true }),
     ]);
 
-    assert.deepStrictEqual(await applyRework('done', io), Result.ok(3456));
+    assert.deepStrictEqual(
+      await applyRework(done('review'), io),
+      Result.ok({ number: 3456, steps: ['push', 'ready'] }),
+    );
 
     assert.deepStrictEqual(ran, ['push', 'ready']);
+  });
+
+  test('done --requeue: queues it again when start took merge-queued off', async () => {
+    const { io, ran } = fakeIo(
+      [state({ labels: [SKIP_CI_LABEL], isDraft: true })],
+      undefined,
+      'untouched',
+    );
+
+    assert.deepStrictEqual(
+      await applyRework(done('requeue'), io),
+      Result.ok({
+        number: 3456,
+        steps: ['push', 'ready', 'requeue', 'forget'],
+      }),
+    );
+
+    assert.deepStrictEqual(ran, ['push', 'ready', 'requeue', 'forget']);
+  });
+
+  test('done --review: goes on when what start wrote down cannot be read', async () => {
+    const { io, ran } = fakeIo(
+      [state({ labels: [SKIP_CI_LABEL], isDraft: true })],
+      undefined,
+      Result.err('no git'),
+    );
+
+    assert.deepStrictEqual(
+      await applyRework(done('review'), io),
+      Result.ok({ number: 3456, steps: ['push', 'ready'] }),
+    );
+
+    assert.deepStrictEqual(ran, ['push', 'ready']);
+  });
+
+  test('done --requeue: stops when what start wrote down cannot be read', async () => {
+    const { io, ran } = fakeIo(
+      [state({ labels: [SKIP_CI_LABEL], isDraft: true })],
+      undefined,
+      Result.err('no git'),
+    );
+
+    assert.isTrue(Result.isErr(await applyRework(done('requeue'), io)));
+
+    assert.deepStrictEqual(ran, []);
+  });
+
+  test('done --requeue: a push refused queues nothing', async () => {
+    const { io, ran } = fakeIo(
+      [state({ labels: [SKIP_CI_LABEL], isDraft: true })],
+      'push',
+      'untouched',
+    );
+
+    assert.isTrue(Result.isErr(await applyRework(done('requeue'), io)));
+
+    assert.deepStrictEqual(ran, ['push']);
   });
 
   test('either: refuses a branch with no open pull request', async () => {
     const { io } = fakeIo([undefined]);
 
-    assert.isTrue(Result.isErr(await applyRework('start', io)));
+    assert.isTrue(Result.isErr(await applyRework(START, io)));
   });
 });
 
-/** Answers each read with the next of `reads`, and fails `failing`. */
+const START = { phase: 'start', dryRun: false } as const satisfies ReworkArgs;
+
+const done = (handBack: ReworkHandBack): ReworkArgs =>
+  ({ phase: 'done', handBack, dryRun: false }) as const;
+
+/**
+ * Answers each read with the next of `reads`, fails `failing`, and answers
+ * `record` for what `start` wrote down.
+ */
 const fakeIo = (
   reads: readonly (ReworkState | undefined)[],
   failing?: ReworkStep,
+  record: QueueRecord | Result<QueueRecord, string> = 'none',
 ): Readonly<{ io: ReworkIo; ran: readonly ReworkStep[] }> => {
   const mut_ran: ReworkStep[] = [];
 
@@ -206,6 +450,8 @@ const fakeIo = (
         step === failing ? Result.err('refused') : Result.ok(undefined),
       );
     },
+    queueRecord: () =>
+      Promise.resolve(typeof record === 'string' ? Result.ok(record) : record),
     log: () => {},
   } as const;
 
@@ -222,3 +468,33 @@ const state = ({
   isArmed?: boolean;
 }>): ReworkState =>
   ({ number: 3456, nodeId: 'PR_x', labels, isDraft, isArmed }) as const;
+
+/** Answers each read with the next of `pages`, the last one over and over. */
+const fakeEvents = (
+  pages: readonly (readonly QueueEvent[])[],
+): Readonly<{
+  read: () => Promise<Result<readonly QueueEvent[], string>>;
+  waits: Readonly<{ wait: () => Promise<void>; count: () => number }>;
+}> => {
+  let mut_reads = 0;
+
+  let mut_waits = 0;
+
+  return {
+    read: () => {
+      const page = pages[Math.min(mut_reads, pages.length - 1)] ?? [];
+
+      mut_reads += 1;
+
+      return Promise.resolve(Result.ok(page));
+    },
+    waits: {
+      wait: () => {
+        mut_waits += 1;
+
+        return Promise.resolve();
+      },
+      count: () => mut_waits,
+    },
+  } as const;
+};
