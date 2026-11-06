@@ -1,0 +1,22 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "libReplacement": true,
+
+    "jsx": "react-jsx",
+    "jsxImportSource": "synstate-dom-next",
+    // `jsxImportSource` names this package itself, and the tests import it by
+    // name the way a consumer does. Mapped to the source so that they are
+    // checked against the code being edited rather than against the last
+    // build. See docs/workspace-package-linking.md.
+    "paths": {
+      "synstate-dom-next": ["./src/index.mts"],
+      "synstate-dom-next/jsx-runtime": ["./src/jsx-runtime.mts"],
+      "synstate-dom-next/jsx-dev-runtime": ["./src/jsx-dev-runtime.mts"]
+    }
+  },
+  "include": ["./src", "./test", "./scripts", "./configs"]
+}

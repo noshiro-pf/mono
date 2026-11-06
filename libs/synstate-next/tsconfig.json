@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "libReplacement": true,
+    // The tests import this package by its own name, the way a consumer does.
+    // Mapped to the source so that they are checked against the code being
+    // edited rather than against the last build. See
+    // docs/workspace-package-linking.md.
+    "paths": {
+      "synstate-next": ["./src/index.mts"]
+    }
+  },
+  "include": ["./src", "./test", "./scripts", "./configs"]
+}

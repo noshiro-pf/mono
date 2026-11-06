@@ -1,0 +1,92 @@
+{
+  "name": "synstate-dom-next",
+  "version": "0.0.0",
+  "private": true,
+  "description": "From-scratch rebuild of synstate-dom on synstate-next: bindings as effects, mount as a batch (not published)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "libs/synstate-dom-next"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    },
+    "./jsx-runtime": {
+      "import": {
+        "types": "./dist/jsx-runtime.d.mts",
+        "default": "./dist/jsx-runtime.mjs"
+      }
+    },
+    "./jsx-dev-runtime": {
+      "import": {
+        "types": "./dist/jsx-dev-runtime.d.mts",
+        "default": "./dist/jsx-dev-runtime.mjs"
+      }
+    }
+  },
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "src",
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
+    "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
+    "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
+    "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest:node run",
+    "check:test:browser": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest --project='Browser' run",
+    "check:test:cov": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest:node run --coverage",
+    "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "check-all": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-all.mts",
+    "fix:codemod": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer convert-to-readonly '{src,test}/**/*.{mts,tsx}'",
+    "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
+    "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
+    "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
+    "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
+    "fmt": "pnpm run fix:fmt",
+    "gen": "run-s gen:index",
+    "gen:index": "run-s gen:index:src fix:fmt",
+    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --preserve index.mts --exclude jsx-runtime.mts --exclude jsx-dev-runtime.mts",
+    "test": "pnpm run check:test",
+    "test:cov:ui": "vite preview --outDir ./coverage",
+    "test:ui": "pnpm run z:vitest:node --ui",
+    "watch:test": "pnpm run z:vitest:node watch",
+    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+  },
+  "dependencies": {
+    "ts-data-forge": "workspace:^",
+    "ts-type-forge": "workspace:^"
+  },
+  "devDependencies": {
+    "@vitest/browser-playwright": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-fortress": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "playwright": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "synstate-next": "workspace:*",
+    "ts-repo-utils": "workspace:*"
+  },
+  "peerDependencies": {
+    "synstate-next": "workspace:^"
+  },
+  "engines": {
+    "node": ">=22.23.4",
+    "pnpm": ">=9.0.0"
+  }
+}
