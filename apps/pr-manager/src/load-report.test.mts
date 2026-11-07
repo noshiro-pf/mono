@@ -9,6 +9,7 @@ import {
   loadReport,
   type IssueList,
   type LoadedReport,
+  type ReadGroup,
   type ReferencedItem,
 } from './load-report.mjs';
 import {
@@ -1284,6 +1285,127 @@ describe(loadReport, () => {
         [10, []],
       ],
     );
+  });
+
+  test('reads only the groups it is asked for, and the rest from what the page holds', async () => {
+    const { fetchImpl: first } = answering(
+      report([pullRequest({ number: 7 })], [merged(1, '2026-09-20T00:00:00Z')]),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const whole = await load(first);
+
+    const { fetchImpl, sent } = answering(
+      report([], [merged(2, '2026-09-21T00:00:00Z')]),
+    );
+
+    const heldFailure = { message: 'timed out', kept: true } as const;
+
+    const { result } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl,
+      groups: ['merged'],
+      previous: whole.parts,
+      held: () => ({
+        known: whole.parts,
+        failed: { checks: heldFailure, merged: heldFailure },
+        reading: new Set<ReadGroup>(),
+      }),
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.deepStrictEqual(
+      sent.map(({ operation }) => operation),
+      ['MergedPullRequests'],
+    );
+
+    assert.deepStrictEqual(
+      result.value.merged.map(({ number }) => number),
+      [2],
+    );
+
+    // The pull requests are what the page holds, failures and all; what merged
+    // is this read's, which answered.
+    assert.deepStrictEqual(result.value.entries, whole.entries);
+
+    assert.deepStrictEqual(result.value.failed, { checks: heldFailure });
+
+    assert.deepStrictEqual(result.value.reading, []);
+  });
+
+  test('says a section another read has is still coming', async () => {
+    const { fetchImpl, sent } = answering(
+      report([pullRequest({ number: 7 })]),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const { result } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl,
+      groups: ['pulls'],
+      held: () => ({
+        known: {},
+        failed: {},
+        reading: new Set<ReadGroup>(['merged', 'issues']),
+      }),
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.deepStrictEqual(named(sent, 'MergedPullRequests'), []);
+
+    assert.deepStrictEqual(named(sent, 'OpenIssues'), []);
+
+    assert.deepStrictEqual(result.value.reading, ['merged', 'issues']);
+
+    assert.isDefined(result.value.queue);
+  });
+
+  test('a read of some groups that fails in every part says so part by part', async () => {
+    const { fetchImpl } = answering({
+      MergedPullRequests: [
+        { data: null, errors: [{ message: 'Something went wrong' }] },
+      ],
+    });
+
+    const { result } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl,
+      groups: ['merged'],
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.include(result.value.failed.merged?.message, 'Something went wrong');
+  });
+
+  test('a read of the pull requests in which every part fails fails as a whole', async () => {
+    const { fetchImpl } = answering(() => ({}), {
+      PullRequests: [{ data: null, errors: [{ message: 'Bad credentials' }] }],
+      Checks: [{ data: null, errors: [{ message: 'Bad credentials' }] }],
+      PullRequestDetails: [
+        { data: null, errors: [{ message: 'Bad credentials' }] },
+      ],
+    });
+
+    const { result } = await loadReport(SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl,
+      groups: ['pulls'],
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'Bad credentials');
   });
 
   test('keeps what merged in the last week, newest first', async () => {

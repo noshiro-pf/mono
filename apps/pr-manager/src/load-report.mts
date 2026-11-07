@@ -51,7 +51,7 @@ import {
   type SetAside,
 } from 'pr-report-core';
 import type { ClaudeSession } from 'split-view-link';
-import { Arr, isRecord, Result } from 'ts-data-forge';
+import { Arr, isRecord, Obj, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import { loadBranchRules } from './branch-rules.mjs';
@@ -201,6 +201,38 @@ export type RepoFeatures = Readonly<{
 export type SectionPart = 'merged' | 'issues';
 
 /**
+ * What a read can be asked for on its own: the pull requests with everything
+ * read of them, which the merge order and the queue are both drawn from, or one
+ * of the sections. A read of a group asks for no other.
+ */
+export type ReadGroup = 'pulls' | SectionPart;
+
+/** Every group, in the order a read of the page asks for them. */
+export const READ_GROUPS = [
+  'pulls',
+  'merged',
+  'issues',
+] as const satisfies readonly ReadGroup[];
+
+/** The parts each group is read in. */
+export const PARTS_OF_GROUP = {
+  pulls: ['pulls', 'rules', 'checks', 'details', 'comparisons'],
+  merged: ['merged'],
+  issues: ['issues'],
+} as const satisfies ReadonlyRecord<ReadGroup, readonly ReadPart[]>;
+
+/**
+ * What the page holds now ({@link LoadRequest.held}): what it has of each part,
+ * which of them failed on the read that last asked for it, and which groups are
+ * being read, or are about to be, by a read other than this one.
+ */
+export type HeldParts = Readonly<{
+  known: KnownParts;
+  failed: PartFailures;
+  reading: ReadonlySet<ReadGroup>;
+}>;
+
+/**
  * The parts a read asks for, each by a query, or a REST request, of its own,
  * and each able to fail on its own.
  */
@@ -329,6 +361,19 @@ export type LoadRequest = Readonly<{
    * cannot read keeps what that one had, and says it failed.
    */
   previous?: KnownParts;
+  /**
+   * The groups to read; all of them when absent. A read without the pull
+   * requests never fails as a whole: each part it asks for that fails is said in
+   * {@link LoadedReport.failed}, and the parts it does not ask for are taken
+   * from {@link held}.
+   */
+  groups?: readonly ReadGroup[];
+  /**
+   * What the page holds now, asked each time the report is assembled rather
+   * than once, so that a read of one group answering after a read of another
+   * draws that other's answer rather than what it replaced.
+   */
+  held?: () => HeldParts;
   /** GraphQL's and REST's both: the default branch's rules are REST's. */
   fetchImpl?: Fetch & RestFetch;
 }>;
@@ -338,7 +383,8 @@ export type LoadRequest = Readonly<{
  *
  * Seven parts, all asked for at once: the pull requests, their check results,
  * their details, how far each head is from its base, what the default branch
- * requires of them, what merged lately, and the open issues.
+ * requires of them, what merged lately, and the open issues — or the parts of
+ * the groups {@link LoadRequest.groups} names, and no others.
  * Only the comparison and the rules wait, for the pull requests' heads and the
  * default branch's name.
  * Some parts may need one more query — the rest of a list that did not fit in
@@ -362,10 +408,14 @@ export const loadReport = async (
     issueCount = ISSUES_LIMIT,
     onProgress,
     previous = {},
+    groups,
+    held = (): HeldParts => NOTHING_HELD,
     fetchImpl,
   } = request;
 
   const repo: RepoRef = { owner: source.owner, name: source.repo } as const;
+
+  const reads: ReadonlySet<ReadGroup> = new Set(groups ?? READ_GROUPS);
 
   const ask: Ask = async (query, bound = {}) =>
     askGraphql({
@@ -375,64 +425,53 @@ export const loadReport = async (
       ...(fetchImpl === undefined ? {} : { fetchImpl }),
     });
 
-  const pulls = readPullRequests(ask, repo);
+  // Each asked for only when its group is: a part left out costs nothing.
+  const pullParts = reads.has('pulls')
+    ? readPullParts({ ask, source, repo, token, previous, fetchImpl })
+    : undefined;
 
-  // What the rules and the comparisons are asked from: the pull requests this
-  // read found, or where it could not, the ones the last read had, so that one
-  // query timing out does not take three parts back to the last read.
-  const pullsOrKept = orKept(pulls, previous.pulls);
+  const merged = reads.has('merged') ? readMerged(ask, repo, nowMs) : undefined;
 
-  const rules = pullsOrKept.then(async ({ result }) =>
-    Result.isOk(result)
-      ? {
-          rateLimit: undefined,
-          result: await loadBranchRules(source, result.value.defaultBranch, {
+  const issues = reads.has('issues')
+    ? readIssues({
+        count: issueCount,
+        ask: async (after, pageSize) =>
+          loadIssuePage(source, {
             token,
+            after,
+            first: pageSize,
             ...(fetchImpl === undefined ? {} : { fetchImpl }),
           }),
-        }
-      : // The pull requests' own failure is the one the read reports.
-        { rateLimit: undefined, result },
-  );
-
-  const parts = {
-    pulls,
-    rules,
-    checks: readChecks(ask),
-    // The details follow the changed files where the rules ask for a code
-    // owner, which the last read's rules still say where these fail.
-    details: readDetails(
-      ask,
-      repo,
-      orKept(rules, previous.rules),
-      pullsOrKept.then(({ result }) =>
-        Result.isOk(result) ? result.value.codeOwnersEnforcedBy : undefined,
-      ),
-    ),
-    comparisons: pullsOrKept.then(async ({ result }) =>
-      Result.isOk(result)
-        ? readComparisons(ask, result.value.pulls)
-        : // The pull requests' own failure is the one the read reports.
-          { rateLimit: undefined, result },
-    ),
-    merged: readMerged(ask, repo, nowMs),
-    issues: readIssues({
-      count: issueCount,
-      ask: async (after, pageSize) =>
-        loadIssuePage(source, {
-          token,
-          after,
-          first: pageSize,
-          ...(fetchImpl === undefined ? {} : { fetchImpl }),
-        }),
-    }),
-  } as const;
+      })
+    : undefined;
 
   let mut_known: Known = {};
 
   let mut_failed: PartFailures = {};
 
-  let mut_outstanding = Object.keys(parts).length;
+  let mut_outstanding = Arr.sum(
+    Array.from(reads, (group) => PARTS_OF_GROUP[group].length),
+  );
+
+  // What the page holds of the groups this read does not ask for, as it is at
+  // the moment of asking.
+  const heldElsewhere = (): HeldParts => {
+    const now = held();
+
+    const keys = READ_GROUPS.filter((group) => !reads.has(group)).flatMap(
+      (group) => PARTS_OF_GROUP[group],
+    );
+
+    // A part another read is asking for again is coming, whatever the read
+    // before said of it.
+    const settledKeys = keys.filter((part) => !now.reading.has(groupOf(part)));
+
+    return {
+      known: Obj.pick(now.known, keys),
+      failed: Obj.pick(now.failed, settledKeys),
+      reading: now.reading,
+    };
+  };
 
   const track = async <K extends keyof Known>(
     key: K,
@@ -457,38 +496,40 @@ export const loadReport = async (
       }
     }
 
-    const soFar = mut_known;
-
     // Drawn once the pull requests have answered, or have failed: the merge
     // order first, and never a page that says there are none while they are
     // still being read.
     if (
       onProgress !== undefined &&
       mut_outstanding > 0 &&
-      (soFar.pulls !== undefined || mut_failed.pulls !== undefined)
+      (mut_known.pulls !== undefined || mut_failed.pulls !== undefined)
     ) {
-      onProgress(
-        assemble({
-          repo,
-          nowMs,
-          known: soFar,
-          failed: mut_failed,
-          settled: false,
-        }),
-      );
+      onProgress(assembleNow(false));
     }
 
     return answered;
   };
 
+  const assembleNow = (settled: boolean): LoadedReport => {
+    const elsewhere = heldElsewhere();
+
+    return assemble({
+      repo,
+      nowMs,
+      known: { ...elsewhere.known, ...mut_known },
+      failed: { ...elsewhere.failed, ...mut_failed },
+      settled,
+      reads,
+      readingElsewhere: elsewhere.reading,
+    });
+  };
+
   const answers = await Promise.all([
-    track('pulls', parts.pulls),
-    track('rules', parts.rules),
-    track('checks', parts.checks),
-    track('details', parts.details),
-    track('comparisons', parts.comparisons),
-    track('merged', parts.merged),
-    track('issues', parts.issues),
+    ...(pullParts === undefined
+      ? []
+      : PARTS_OF_GROUP.pulls.map(async (part) => track(part, pullParts[part]))),
+    ...(merged === undefined ? [] : [track('merged', merged)]),
+    ...(issues === undefined ? [] : [track('issues', issues)]),
   ]);
 
   const rateLimit = answers
@@ -498,24 +539,15 @@ export const loadReport = async (
   const [first] = answers;
 
   if (
+    first !== undefined &&
+    reads.has('pulls') &&
     Result.isErr(first.result) &&
     answers.every(({ result }) => Result.isErr(result))
   ) {
     return { rateLimit, result: Result.err(first.result.value) };
   }
 
-  return {
-    rateLimit,
-    result: Result.ok(
-      assemble({
-        repo,
-        nowMs,
-        known: mut_known,
-        failed: mut_failed,
-        settled: true,
-      }),
-    ),
-  };
+  return { rateLimit, result: Result.ok(assembleNow(true)) };
 };
 
 /**
@@ -643,6 +675,31 @@ type Known = Readonly<{
   merged?: readonly Merged[];
   issues?: IssueList;
 }>;
+
+/** The answers of the pull requests' group, part by part. */
+type PullParts = Readonly<{
+  [K in (typeof PARTS_OF_GROUP)['pulls'][number]]: Promise<
+    Answered<NonNullable<Known[K]>>
+  >;
+}>;
+
+/** The group each part is read in, as {@link PARTS_OF_GROUP} lists them. */
+const GROUP_OF_PART = {
+  pulls: 'pulls',
+  rules: 'pulls',
+  checks: 'pulls',
+  details: 'pulls',
+  comparisons: 'pulls',
+  merged: 'merged',
+  issues: 'issues',
+} as const satisfies ReadonlyRecord<ReadPart, ReadGroup>;
+
+/** What a read that is not handed what the page holds falls back to. */
+const NOTHING_HELD: HeldParts = {
+  known: {},
+  failed: {},
+  reading: new Set<ReadGroup>(),
+} as const;
 
 /** The pull requests' query, and what the repository says of their owners. */
 type PullsPart = Readonly<{
@@ -1466,6 +1523,65 @@ const mergedOf = (
     linkedIssues: linkedIssuesOf(repo, pr, described),
   }) as const;
 
+/** The five parts of the pull requests' group, asked for together. */
+const readPullParts = ({
+  ask,
+  source,
+  repo,
+  token,
+  previous,
+  fetchImpl,
+}: Readonly<{
+  ask: Ask;
+  source: ReportSource;
+  repo: RepoRef;
+  token: string;
+  previous: KnownParts;
+  fetchImpl: (Fetch & RestFetch) | undefined;
+}>): PullParts => {
+  const pulls = readPullRequests(ask, repo);
+
+  // What the rules and the comparisons are asked from: the pull requests this
+  // read found, or where it could not, the ones the last read had, so that one
+  // query timing out does not take three parts back to the last read.
+  const pullsOrKept = orKept(pulls, previous.pulls);
+
+  const rules = pullsOrKept.then(async ({ result }) =>
+    Result.isOk(result)
+      ? {
+          rateLimit: undefined,
+          result: await loadBranchRules(source, result.value.defaultBranch, {
+            token,
+            ...(fetchImpl === undefined ? {} : { fetchImpl }),
+          }),
+        }
+      : // The pull requests' own failure is the one the read reports.
+        { rateLimit: undefined, result },
+  );
+
+  return {
+    pulls,
+    rules,
+    checks: readChecks(ask),
+    // The details follow the changed files where the rules ask for a code
+    // owner, which the last read's rules still say where these fail.
+    details: readDetails(
+      ask,
+      repo,
+      orKept(rules, previous.rules),
+      pullsOrKept.then(({ result }) =>
+        Result.isOk(result) ? result.value.codeOwnersEnforcedBy : undefined,
+      ),
+    ),
+    comparisons: pullsOrKept.then(async ({ result }) =>
+      Result.isOk(result)
+        ? readComparisons(ask, result.value.pulls)
+        : // The pull requests' own failure is the one the read reports.
+          { rateLimit: undefined, result },
+    ),
+  } as const;
+};
+
 /** What merged within {@link MERGED_WITHIN_DAYS}, newest first. */
 const readMerged = async (
   ask: Ask,
@@ -1959,6 +2075,8 @@ const checksFailure = (failed: PartFailures): string | undefined => {
       : `The check results could not be read. ${failure.message}`;
 };
 
+const groupOf = (part: ReadPart): ReadGroup => GROUP_OF_PART[part];
+
 /** Everything read so far, arranged into what the page shows. */
 const assemble = ({
   repo,
@@ -1966,6 +2084,8 @@ const assemble = ({
   known,
   failed,
   settled,
+  reads,
+  readingElsewhere,
 }: Readonly<{
   repo: RepoRef;
   nowMs: number;
@@ -1976,6 +2096,10 @@ const assemble = ({
    * still coming on this read.
    */
   settled: boolean;
+  /** The groups this read asks for. */
+  reads: ReadonlySet<ReadGroup>;
+  /** The groups being read, or about to be, by another read. */
+  readingElsewhere: ReadonlySet<ReadGroup>;
 }>): LoadedReport => {
   // Without the pull requests, the page is the sections that do not need them.
   const {
@@ -1989,8 +2113,10 @@ const assemble = ({
   // A part that failed is not being read any more, nor is anything once the
   // read is over: what a card lacks then — a part kept from the last read has
   // nothing of a pull request opened since — is said, not waited for.
+  // A part of a group another read has is still coming while that read is out.
   const doneWith = (part: ReadPart): boolean =>
-    settled || failed[part] !== undefined;
+    failed[part] !== undefined ||
+    (reads.has(groupOf(part)) ? settled : !readingElsewhere.has(groupOf(part)));
 
   const requirements = known.rules;
 
