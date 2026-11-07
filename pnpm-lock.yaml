@@ -1042,6 +1042,9 @@ importers:
       ts-fortress:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
+      ts-utils-additional:
+        specifier: workspace:*
+        version: link:../ts-utils-additional
     devDependencies:
       '@playwright/test':
         specifier: 'catalog:'
@@ -1317,6 +1320,9 @@ importers:
       ts-fortress:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
+      ts-utils-additional:
+        specifier: workspace:*
+        version: link:../ts-utils-additional
     devDependencies:
       '@firebase/rules-unit-testing':
         specifier: ^5.0.2

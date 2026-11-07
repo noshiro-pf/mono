@@ -1,6 +1,6 @@
 import { Num, asPositiveFiniteNumber, type SafeUint } from 'ts-data-forge';
+import { annuityFactor } from 'ts-utils-additional';
 import type { PercentFloat } from '../../types/index.mjs';
-import { annuityFactor } from './annuity-factor.mjs';
 
 /**
  * 元利均等返済におけるi回支払い後の残高：残りの支払いの現在価値．金利 0 では
