@@ -758,3 +758,427 @@ describe('no-observable-in-handler through type wrappers', () => {
     ],
   });
 });
+
+describe('no-observable-in-handler after an await', () => {
+  ruleTester.run('no-observable-in-handler', noObservableInHandler, {
+    valid: [
+      {
+        name: 'code before the first `await`, which still runs in the scope',
+        filename: tsx,
+        code: dedent`
+          import { createState, map } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            void (async () => {
+              const doubled$ = count$.pipe(map((n) => n * 2));
+              doubled$.subscribe(log);
+              await ready;
+            })();
+            return <span />;
+          };
+        `,
+      },
+      {
+        name: 'work after the `await` in the run of a scope taken before it',
+        filename: tsx,
+        code: dedent`
+          import { createState, getCurrentScope, map } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            const scope = getCurrentScope();
+            void (async () => {
+              await ready;
+              scope?.run(() => {
+                keep(count$.pipe(map((n) => n * 2)));
+                count$.subscribe(log);
+              });
+            })();
+            return <span />;
+          };
+        `,
+      },
+      {
+        name: 'work after the `await` under `untracked`, which belongs to no scope on purpose',
+        filename: tsx,
+        code: dedent`
+          import { createState, untracked } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            void (async () => {
+              await ready;
+              untracked(() => count$.subscribe(log));
+            })();
+            return <span />;
+          };
+        `,
+      },
+      {
+        name: 'an async function in a file with no JSX, which no component starts here',
+        filename: tsx,
+        code: dedent`
+          import { createState, map } from 'synstate';
+          const [count$] = createState(0);
+          export const load = async () => {
+            await ready;
+            keep(count$.pipe(map((n) => n * 2)));
+            count$.subscribe(log);
+          };
+        `,
+      },
+      {
+        name: 'an `await` of a nested function, which the outer code does not wait for',
+        filename: tsx,
+        code: dedent`
+          import { map } from 'synstate';
+          const Row = () => {
+            const save = async () => { await post(); };
+            keep(count$.pipe(map((n) => n * 2)));
+            return <button onClick={save} />;
+          };
+        `,
+      },
+      {
+        name: 'a module-level async bootstrap, whose only JSX is the app it renders',
+        filename: tsx,
+        code: dedent`
+          import { createState } from 'synstate';
+          import { render } from 'synstate-dom';
+          const [count$] = createState(0);
+          const main = async () => {
+            await init();
+            count$.subscribe(persist);
+            render(() => <App />, root);
+          };
+        `,
+      },
+      {
+        name: 'work under `untracked` in a type wrapper, after the `await`',
+        filename: tsx,
+        code: dedent`
+          import { createState, untracked } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            void (async () => {
+              await ready;
+              untracked((() => count$.subscribe(log)) satisfies () => unknown);
+            })();
+            return <span />;
+          };
+        `,
+      },
+      {
+        name: 'a React bootstrap, whose only JSX is the app it renders',
+        filename: tsx,
+        code: dedent`
+          import { createState } from 'synstate';
+          const [count$] = createState(0);
+          const start = () => {
+            void (async () => {
+              await init();
+              count$.subscribe(persist);
+              root.render(<App />);
+            })();
+          };
+        `,
+      },
+      {
+        name: 'the iterated expression of a `for await`, read before the first pass',
+        filename: tsx,
+        code: dedent`
+          import { map } from 'synstate';
+          const Row = () => {
+            void (async () => {
+              for await (const n of toIterable(count$.pipe(map((n) => n * 2)))) {
+                log(n);
+              }
+            })();
+            return <span />;
+          };
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a subscription after an `await` in an async function a component starts',
+        filename: tsx,
+        code: dedent`
+          import { createState } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            void (async () => {
+              await ready;
+              count$.subscribe(log);
+            })();
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'subscriptionAfterAwait', line: 6, column: 5 }],
+      },
+      {
+        name: 'a `.pipe` with a synstate operator after an `await`',
+        filename: tsx,
+        code: dedent`
+          import { map } from 'synstate';
+          const Row = () => {
+            void (async () => {
+              const config = await load();
+              keep(count$.pipe(map((n) => n * config.scale)));
+            })();
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'observableAfterAwait', line: 5, column: 10 }],
+      },
+      {
+        name: 'in a loop that awaits, from the second pass on',
+        filename: tsx,
+        code: dedent`
+          import { map } from 'synstate';
+          const Row = () => {
+            void (async () => {
+              for (const id of ids) {
+                keep(item$(id).pipe(map((x) => x)));
+                await tick();
+              }
+            })();
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'observableAfterAwait', line: 5 }],
+      },
+      {
+        name: 'in the body of a `for await`',
+        filename: tsx,
+        code: dedent`
+          import { createState } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            void (async () => {
+              for await (const n of numbers) {
+                count$.subscribe(log);
+              }
+            })();
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'subscriptionAfterAwait', line: 6 }],
+      },
+      {
+        name: 'after an `await` in an async callback of `run`, which is in the scope only until then',
+        filename: tsx,
+        code: dedent`
+          import { getCurrentScope, map } from 'synstate';
+          const Row = () => {
+            const scope = getCurrentScope();
+            void scope?.run(async () => {
+              await ready;
+              keep(count$.pipe(map((n) => n * 2)));
+            });
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'observableAfterAwait', line: 6 }],
+      },
+      {
+        name: 'in a function of the file that code after an `await` calls by name',
+        filename: tsx,
+        code: dedent`
+          import { derive } from 'synstate';
+          const build = () => keep(derive([a$, b$], (a, b) => a + b));
+          const Row = () => {
+            useEffectLike(async () => {
+              await ready;
+              build();
+            });
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'observableAfterAwait', line: 2 }],
+      },
+      {
+        name: 'an `await` in the call’s own callee or arguments',
+        filename: tsx,
+        code: dedent`
+          import { createState, map } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            void (async () => {
+              keep((await loadStore()).count$.pipe(map((n) => n * 2)));
+              count$.subscribe(await makeLogger());
+            })();
+            return <span />;
+          };
+        `,
+        errors: [
+          { messageId: 'observableAfterAwait', line: 5 },
+          { messageId: 'subscriptionAfterAwait', line: 6 },
+        ],
+      },
+      {
+        name: 'in a `do … while` whose test awaits, from the second pass on',
+        filename: tsx,
+        code: dedent`
+          import { createState } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            void (async () => {
+              do { count$.subscribe(log); } while (await more());
+            })();
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'subscriptionAfterAwait', line: 5 }],
+      },
+      {
+        name: 'a function declaration called after the `await`',
+        filename: tsx,
+        code: dedent`
+          import { createState } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            void (async () => {
+              await ready;
+              init();
+              function init() { count$.subscribe(log); }
+            })();
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'subscriptionAfterAwait', line: 7 }],
+      },
+      {
+        name: 'an async callback of `run` in a type wrapper, after its `await`',
+        filename: tsx,
+        code: dedent`
+          import { getCurrentScope, map } from 'synstate';
+          const Row = () => {
+            const scope = getCurrentScope();
+            void scope?.run((async () => {
+              await ready;
+              keep(count$.pipe(map((n) => n * 2)));
+            }) as () => Promise<void>);
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'observableAfterAwait', line: 6 }],
+      },
+      {
+        name: 'a component whose JSX is only in the async function or in a callback',
+        filename: tsx,
+        code: dedent`
+          import { createState } from 'synstate';
+          const [count$] = createState(0);
+          const Lazy = () => {
+            void (async () => {
+              await ready;
+              count$.subscribe(log);
+              view.set(<div />);
+            })();
+            return view;
+          };
+          const List = ({ items }) => {
+            void (async () => {
+              await ready;
+              count$.subscribe(log);
+            })();
+            return items.map((i) => <li>{i}</li>);
+          };
+        `,
+        errors: [
+          { messageId: 'subscriptionAfterAwait', line: 6 },
+          { messageId: 'subscriptionAfterAwait', line: 14 },
+        ],
+      },
+      {
+        name: 'a function declaration first passed by reference after the `await`',
+        filename: tsx,
+        code: dedent`
+          import { createState } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            void (async () => {
+              await ready;
+              function attach() { count$.subscribe(log); }
+              items.forEach(attach);
+            })();
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'subscriptionAfterAwait', line: 6 }],
+      },
+      {
+        name: 'an `await` on a branch of the arguments, which may run first',
+        filename: tsx,
+        code: dedent`
+          import { createState } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            void (async () => {
+              count$.subscribe(flag ? log : await makeLogger());
+            })();
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'subscriptionAfterAwait', line: 5 }],
+      },
+      {
+        name: 'a function declaration written after the `await`, judged by where it is written',
+        filename: tsx,
+        code: dedent`
+          import { createState } from 'synstate';
+          const [count$] = createState(0);
+          const Row = () => {
+            void (async () => {
+              init();
+              await ready;
+              function init() { count$.subscribe(log); }
+            })();
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'subscriptionAfterAwait', line: 7 }],
+      },
+      {
+        name: 'an async component, whose own JSX makes it one',
+        filename: tsx,
+        code: dedent`
+          import { createState } from 'synstate';
+          const [count$] = createState(0);
+          export const Lazy = async () => {
+            await ready;
+            count$.subscribe(log);
+            return <div />;
+          };
+        `,
+        errors: [{ messageId: 'subscriptionAfterAwait', line: 5 }],
+      },
+      {
+        name: 'in the test of a loop whose body awaits, from the second pass on',
+        filename: tsx,
+        code: dedent`
+          import { map } from 'synstate';
+          const Row = () => {
+            void (async () => {
+              while (keep(count$.pipe(map((n) => n > 0))).getSnapshot().value) {
+                await tick();
+              }
+            })();
+            return <span />;
+          };
+        `,
+        errors: [{ messageId: 'observableAfterAwait', line: 4 }],
+      },
+      {
+        name: 'an async handler is reported as a handler',
+        filename: tsx,
+        code: dedent`
+          import { map } from 'synstate';
+          const Row = () => (
+            <button onClick={async () => { await save(); keep(count$.pipe(map((n) => n))); }} />
+          );
+        `,
+        errors: [{ messageId: 'observableInHandler', line: 3 }],
+      },
+    ],
+  });
+});
