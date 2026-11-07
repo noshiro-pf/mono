@@ -7,13 +7,31 @@ import {
   react,
   solid,
   synstateDom,
+  synstateDomNext,
   vanjs,
 } from './frameworks/index.mjs';
 import {
   loanScenario,
   measureScenario,
   scheduleScenario,
+  solidLoan,
+  solidSchedule,
+  solidZoom,
+  synstateDomDeriveLoan,
+  synstateDomDeriveSchedule,
+  synstateDomDeriveZoom,
+  synstateDomLoan,
+  synstateDomLoanChangedOnly,
+  synstateDomNextLoan,
+  synstateDomNextSchedule,
+  synstateDomNextZoom,
+  synstateDomSchedule,
+  synstateDomScheduleChangedOnly,
+  synstateDomZoom,
+  synstateDomZoomChangedOnly,
   zoomScenario,
+  type Scenario,
+  type ScenarioAppBase,
   type ScenarioResult,
 } from './scenarios/index.mjs';
 import { mapInSequence, median, rotated, settle, warmups } from './timing.mjs';
@@ -121,14 +139,56 @@ const cases: readonly Case[] = [
   },
 ] as const;
 
-const frameworks: readonly Framework[] = [
-  synstateDom,
-  solid,
-  preactSignals,
-  preact,
-  react,
-  vanjs,
-] as const;
+/**
+ * `next` (`pnpm run benchmark:next`) compares synstate-dom with
+ * synstate-dom-next, the rebuild that is to replace it, and Solid; otherwise
+ * every library but synstate-dom-next is measured. The config names the file
+ * the results go to, its title and the script, from
+ * `scripts/benchmark-sets.mts`.
+ */
+const isNextSet = process.env['BENCHMARK_SET'] === 'next';
+
+const output = {
+  results: process.env['BENCHMARK_RESULTS'] ?? 'RESULTS.md',
+  title: process.env['BENCHMARK_TITLE'] ?? '# Results',
+  script: process.env['BENCHMARK_SCRIPT'] ?? 'benchmark',
+} as const;
+
+const frameworks: readonly Framework[] = isNextSet
+  ? ([synstateDom, synstateDomNext, solid] as const)
+  : ([synstateDom, solid, preactSignals, preact, react, vanjs] as const);
+
+/** `scenario` measured with `frameworks` only. */
+const withFrameworks = <App extends ScenarioAppBase>(
+  scenario: Scenario<App>,
+  scenarioFrameworks: Scenario<App>['frameworks'],
+): Scenario<App> => ({ ...scenario, frameworks: scenarioFrameworks }) as const;
+
+const scenarios = isNextSet
+  ? ([
+      withFrameworks(loanScenario, [
+        synstateDomLoan,
+        synstateDomLoanChangedOnly,
+        synstateDomDeriveLoan,
+        synstateDomNextLoan,
+        solidLoan,
+      ]),
+      withFrameworks(scheduleScenario, [
+        synstateDomSchedule,
+        synstateDomScheduleChangedOnly,
+        synstateDomDeriveSchedule,
+        synstateDomNextSchedule,
+        solidSchedule,
+      ]),
+      withFrameworks(zoomScenario, [
+        synstateDomZoom,
+        synstateDomZoomChangedOnly,
+        synstateDomDeriveZoom,
+        synstateDomNextZoom,
+        solidZoom,
+      ]),
+    ] as const)
+  : ([loanScenario, scheduleScenario, zoomScenario] as const);
 
 type Result = Readonly<{ caseName: string; framework: string; ms: number }>;
 
@@ -171,10 +231,12 @@ test('js-framework-benchmark operations', async () => {
 
   const table = toMarkdown(results);
 
+  const [loan, schedule, zoom] = scenarios;
+
   const scenarioResults = [
-    ...(await measureScenario(loanScenario)),
-    ...(await measureScenario(scheduleScenario)),
-    ...(await measureScenario(zoomScenario)),
+    ...(await measureScenario(loan)),
+    ...(await measureScenario(schedule)),
+    ...(await measureScenario(zoom)),
   ] as const;
 
   const scenarioTable = scenariosToMarkdown(scenarioResults);
@@ -182,11 +244,11 @@ test('js-framework-benchmark operations', async () => {
   console.info(`${table}\n\n${scenarioTable}`);
 
   await commands.writeFile(
-    'RESULTS.md',
+    output.results,
     [
-      '# Results',
+      output.title,
       '',
-      '<!-- Written by `pnpm run benchmark`; edits here are overwritten. -->',
+      `<!-- Written by \`pnpm run ${output.script}\`; edits here are overwritten. -->`,
       '',
       `Measured in \`${navigator.userAgent}\` with ${navigator.hardwareConcurrency} logical cores. Each figure is the median of the timed runs after ${warmups} warm-up runs; see README.md for what is timed.`,
       '',
@@ -311,9 +373,11 @@ const scenariosToMarkdown = (results: readonly ScenarioResult[]): string => {
     return ms === undefined ? 'wrong' : ms.toFixed(2);
   };
 
+  const [loan, schedule, zoom] = scenarios;
+
   const columns = Arr.uniq(
-    [loanScenario, scheduleScenario, zoomScenario].flatMap((scenario) =>
-      scenario.frameworks.map((f) => f.name),
+    [...loan.frameworks, ...schedule.frameworks, ...zoom.frameworks].map(
+      (f) => f.name,
     ),
   );
 
