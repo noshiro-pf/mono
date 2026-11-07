@@ -122,15 +122,19 @@ const [userState, setUserState] = createState({
     email: '',
 });
 
-const UserProfile = (): React.JSX.Element => {
-    const user = React.useSyncExternalStore(
-        (onStoreChange: () => void) => {
-            const { unsubscribe } = userState.subscribe(onStoreChange);
+// Defined once: `useSyncExternalStore` subscribes again whenever `subscribe` is
+// a new function.
+const subscribeUser = (onStoreChange: () => void): (() => void) => {
+    const { unsubscribe } = userState.subscribe(onStoreChange);
 
-            return unsubscribe;
-        },
-        () => userState.getSnapshot().value,
-    );
+    return unsubscribe;
+};
+
+const getUser = (): Readonly<{ name: string; email: string }> =>
+    userState.getSnapshot().value;
+
+const UserProfile = (): React.JSX.Element => {
+    const user = React.useSyncExternalStore(subscribeUser, getUser);
 
     return (
         <div>

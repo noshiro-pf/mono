@@ -71,4 +71,73 @@ describe(useObservableValue, () => {
 
     assert.strictEqual(result.current, 0);
   });
+
+  test('stays subscribed across renders with the same observable (#3144)', async () => {
+    const count$ = source<number>(0);
+
+    const mut_subscriptions = { current: 0 };
+
+    // Counts the calls of `subscribe`; the methods run on `count$` itself,
+    // whose private fields a proxy does not have.
+    const counted$ = new Proxy(count$, {
+      get: (target, key) => {
+        if (key === 'subscribe') {
+          return (onNext: (v: number) => void) => {
+            mut_subscriptions.current += 1;
+
+            return target.subscribe(onNext);
+          };
+        }
+
+        const value: unknown = Reflect.get(target, key, target);
+
+        return typeof value === 'function' ? value.bind(target) : value;
+      },
+    });
+
+    const { result, rerender } = renderHook(() => useObservableValue(counted$));
+
+    rerender();
+
+    rerender();
+
+    assert.strictEqual(mut_subscriptions.current, 1);
+
+    await act(() => {
+      count$.next(1);
+    });
+
+    assert.strictEqual(result.current, 1);
+
+    assert.strictEqual(mut_subscriptions.current, 1);
+  });
+
+  test('moves to a different observable passed on a later render', async () => {
+    const a$ = source<number>(1);
+
+    const b$ = source<number>(2);
+
+    const { result, rerender } = renderHook(
+      ({ observable$ }) => useObservableValue(observable$),
+      { initialProps: { observable$: a$ } },
+    );
+
+    assert.strictEqual(result.current, 1);
+
+    rerender({ observable$: b$ });
+
+    assert.strictEqual(result.current, 2);
+
+    await act(() => {
+      b$.next(3);
+    });
+
+    assert.strictEqual(result.current, 3);
+
+    await act(() => {
+      a$.next(4);
+    });
+
+    assert.strictEqual(result.current, 3);
+  });
 });
