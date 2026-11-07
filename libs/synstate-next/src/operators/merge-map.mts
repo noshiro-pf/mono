@@ -116,21 +116,9 @@ class MergeMapClass<A, B> extends DerivedClass<B> {
       }
     }
 
-    if (v === noValue) {
-      return false;
-    }
-
-    if (awaitsEffects(this)) {
-      // An inner's value from the last round's effects, not yet seen by this
-      // round's: it is not overwritten, and `v` follows it.
-      this.publishEvent(v);
-
-      return false;
-    }
-
-    this.current = v;
-
-    return true;
+    // An inner's value from the last round's effects, not yet seen by this
+    // round's, is not overwritten: `v` follows it.
+    return v !== noValue && this.passOnInRound(v);
   }
 
   /** Runs the projection of `value` in `owner`, which is disposed if it throws. */

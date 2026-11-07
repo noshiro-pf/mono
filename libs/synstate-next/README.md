@@ -38,5 +38,7 @@ synstate や synstate-dom に入れたバグ修正・セキュリティ修正・
   `mergeMap`, and `derive`, `combine`, `merge` and `zip`.
 - The helpers `createState`, `createReducer`, `createBooleanState`,
   `createEventEmitter` and `createValueEmitter`.
+- `createDerived` and `createSource`, for writing an operator or a source
+  outside the package.
 - `synstate-next/internal`: the node and effect classes, for synstate-dom-next
   only.
