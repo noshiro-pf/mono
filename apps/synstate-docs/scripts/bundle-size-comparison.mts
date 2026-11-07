@@ -1,15 +1,12 @@
 import { build as esbuild, version as esbuildVersion } from 'esbuild';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import * as zlib from 'node:zlib';
 import { Arr, Num, isRecord, isString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import ts from 'typescript';
-import {
-  build as vite,
-  version as viteVersion,
-  type Plugin as VitePlugin,
-} from 'vite';
+import { version as viteVersion } from 'vite';
+// eslint-disable-next-line import-x/no-relative-packages -- shared with synstate-dom-benchmark's measurement (#3066)
+import * as bundleSize from '../../../tools/scripts/lib/bundle-size.mjs';
 import { comparisonLibraries } from './benchmark/environment.mjs';
 import { scenarioDir } from './benchmark/paths.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
@@ -39,41 +36,50 @@ export const measureBundleSizeComparison =
     const measureWith = async (bundler: Bundler): Promise<BundlerResult> => {
       const mut_breakdown: (readonly [string, number])[] = [];
 
-      const rows = await mapInSequence(scenarios, async (scenario) => ({
-        scenario: scenario.name.en,
-        cells: await mapInSequence(libraries, async (library) => {
-          const source = sources.get(sourceKey(scenario, library));
+      const rows = await bundleSize.mapInSequence(
+        scenarios,
+        async (scenario) => ({
+          scenario: scenario.name.en,
+          cells: await bundleSize.mapInSequence(libraries, async (library) => {
+            const source = sources.get(sourceKey(scenario, library));
 
-          if (source === undefined) {
-            return null;
-          }
+            if (source === undefined) {
+              return null;
+            }
 
-          const { sizes, bytesByPackage } = await sizeOfBundle(
+            const { sizes, bytesByPackage } = await sizeOfBundle(
+              bundler,
+              await entryFromImports(source),
+            );
+
+            if (
+              scenario === singleStateScenario &&
+              library === synstateLibrary
+            ) {
+              mut_breakdown.push(...bytesByPackage);
+            }
+
+            return sizes;
+          }),
+        }),
+      );
+
+      const everything = await bundleSize.mapInSequence(
+        libraries,
+        async (library) => {
+          const { sizes } = await sizeOfBundle(
             bundler,
-            await entryFromImports(source),
+            keepAlive(
+              library.entryPoints.map((entryPoint) => ({
+                specifier: entryPoint,
+                names: ['*'],
+              })),
+            ),
           );
 
-          if (scenario === singleStateScenario && library === synstateLibrary) {
-            mut_breakdown.push(...bytesByPackage);
-          }
-
           return sizes;
-        }),
-      }));
-
-      const everything = await mapInSequence(libraries, async (library) => {
-        const { sizes } = await sizeOfBundle(
-          bundler,
-          keepAlive(
-            library.entryPoints.map((entryPoint) => ({
-              specifier: entryPoint,
-              names: ['*'],
-            })),
-          ),
-        );
-
-        return sizes;
-      });
+        },
+      );
 
       return {
         rows,
@@ -116,11 +122,11 @@ export const renderBundleSizeTable = (
   return [
     `| ${language === 'en' ? 'Scenario' : 'シナリオ'} (kB) | ${libraries.map(({ name }) => (name === synstateLibrary.name ? `**${name}**` : name)).join(' | ')} |`,
     `| :-- | ${libraries.map(() => '--:').join(' | ')} |`,
-    `| ${language === 'en' ? everythingRowName : 'すべてのエクスポート'} | ${everything.map((sizes) => formatKb(sizes[key])).join(' | ')} |`,
+    `| ${language === 'en' ? everythingRowName : 'すべてのエクスポート'} | ${everything.map((sizes) => bundleSize.formatKb(sizes[key])).join(' | ')} |`,
     ...scenarios.map((scenario, i) => {
       const cells = rows[i]?.cells ?? [];
 
-      return `| [${scenario.name[language]}](${benchmarkPagePath(language)}#${scenario.anchor[language]}) | ${cells.map((sizes) => (sizes === null ? '—' : formatKb(sizes[key]))).join(' | ')} |`;
+      return `| [${scenario.name[language]}](${benchmarkPagePath(language)}#${scenario.anchor[language]}) | ${cells.map((sizes) => (sizes === null ? '—' : bundleSize.formatKb(sizes[key]))).join(' | ')} |`;
     }),
   ].join('\n');
 };
@@ -185,7 +191,7 @@ export const renderBundleSizeBreakdown = (
       (packageName) =>
         `| \`${packageName}\` | ${Math.round(share(0, packageName)).toString()}% | ${Math.round(share(1, packageName)).toString()}% |`,
     ),
-    `| ${language === 'en' ? 'Bundle, minified and gzipped (kB)' : 'バンドル全体、minify ＋ gzip (kB)'} | ${columns.map(({ gzip }) => formatKb(gzip)).join(' | ')} |`,
+    `| ${language === 'en' ? 'Bundle, minified and gzipped (kB)' : 'バンドル全体、minify ＋ gzip (kB)'} | ${columns.map(({ gzip }) => bundleSize.formatKb(gzip)).join(' | ')} |`,
   ].join('\n');
 };
 
@@ -257,7 +263,7 @@ export const measureSynstateAloneKb = async (): Promise<string> => {
     );
   }
 
-  return formatKb(sizes.gzip);
+  return bundleSize.formatKb(sizes.gzip);
 };
 
 /**
@@ -306,7 +312,7 @@ export const shownSizeOf = (
 
   return sizes === undefined || sizes === null
     ? undefined
-    : tenthsOfKb(sizes[compression]);
+    : bundleSize.tenthsOfKb(sizes[compression]);
 };
 
 /**
@@ -413,7 +419,7 @@ type Bundler = Readonly<{
   build: (source: string) => Promise<BundleOutput>;
 }>;
 
-type Sizes = Readonly<{ minified: number; gzip: number; brotli: number }>;
+type Sizes = bundleSize.CompressedSizes;
 
 type Library = Readonly<{
   name: string;
@@ -966,78 +972,18 @@ const esbuildBundler: Bundler = {
  */
 const viteBundler: Bundler = {
   build: async (source) => {
-    const entryId = '\0bundle-size-entry.js';
-
-    const entryPlugin: VitePlugin = {
-      name: 'bundle-size-entry',
-      resolveId: (id) => (id === entryId ? entryId : undefined),
-      load: (id) => (id === entryId ? source : undefined),
-    } as const;
-
-    // Read as `unknown`: typescript-eslint does not resolve Rolldown's output
-    // types.
-    const output: unknown = await vite({
-      configFile: false,
+    const chunks = await bundleSize.bundleWithVite(source, () => ({
+      ...bundleSize.productionBuildConfig(),
       // The virtual entry resolves bare imports from here.
       root: scenarioDir,
       logLevel: 'error',
-      mode: 'production',
-      define: {
-        'process.env.NODE_ENV': JSON.stringify('production'),
-      },
-      resolve: {
-        conditions: ['module', 'browser', 'production'],
-      },
-      build: {
-        write: false,
-        minify: true,
-        modulePreload: { polyfill: false },
-        reportCompressedSize: false,
-        rolldownOptions: { input: entryId, plugins: [entryPlugin] },
-      },
-    });
+    }));
 
-    const mut_code: string[] = [];
-
-    const mut_modules: (readonly [string, number])[] = [];
-
-    for (const result of Arr.isArray(output) ? output : [output]) {
-      const files = isRecord(result) ? result['output'] : undefined;
-
-      if (!Arr.isArray(files)) {
-        throw new TypeError('the build returned no output');
-      }
-
-      for (const file of files) {
-        if (
-          !isRecord(file) ||
-          file['type'] !== 'chunk' ||
-          !isString(file['code'])
-        ) {
-          continue;
-        }
-
-        mut_code.push(file['code']);
-
-        const modules = file['modules'];
-
-        if (!isRecord(modules)) {
-          throw new TypeError('a chunk has no module list');
-        }
-
-        for (const [id, info] of Object.entries(modules)) {
-          const length = isRecord(info) ? info['renderedLength'] : undefined;
-
-          if (typeof length !== 'number') {
-            throw new TypeError(`${id} has no rendered length`);
-          }
-
-          mut_modules.push([id, length]);
-        }
-      }
-    }
-
-    return checked(mut_code.join(''), bytesPerPackage(mut_modules), source);
+    return checked(
+      chunks.map(({ code }) => code).join(''),
+      bytesPerPackage(chunks.flatMap(({ modules }) => modules)),
+      source,
+    );
   },
 } as const;
 
@@ -1054,40 +1000,15 @@ const sizeOfBundle = async (
 > => {
   const { code, bytesByPackage } = await bundler.build(source);
 
-  const bytes = Buffer.byteLength(code, 'utf8');
-
-  const sizes = {
-    minified: bytes,
-    gzip: zlib.gzipSync(code, { level: zlib.constants.Z_BEST_COMPRESSION })
-      .byteLength,
-    brotli: zlib.brotliCompressSync(code, {
-      params: {
-        [zlib.constants.BROTLI_PARAM_QUALITY]:
-          zlib.constants.BROTLI_MAX_QUALITY,
-        [zlib.constants.BROTLI_PARAM_SIZE_HINT]: bytes,
-      },
-    }).byteLength,
-  } as const;
-
-  return { sizes, bytesByPackage };
+  return { sizes: bundleSize.compressedSizesOf(code), bytesByPackage };
 };
-
-/**
- * `bytes` in tenths of a kB, rounded half up: what {@link formatKb} prints and
- * what the claims of the page are checked against. (`toFixed` alone would round
- * a binary fraction such as 11.95 down.)
- */
-const tenthsOfKb = (bytes: number): number => Math.round(bytes / 100);
-
-/** One kB is 1,000 bytes, as on synstate-dom's bundle-size page. */
-const formatKb = (bytes: number): string => (tenthsOfKb(bytes) / 10).toFixed(1);
 
 /**
  * The version of `packageName` as the scenarios resolve it. A workspace package
  * is read from `libs/`, the others from the scenarios' `node_modules`.
  */
-const versionOf = async (packageName: string): Promise<string> => {
-  const candidates = [
+const versionOf = async (packageName: string): Promise<string> =>
+  bundleSize.installedVersionOf(packageName, [
     path.resolve(scenarioDir, '../../../package.json'),
     path.resolve(
       scenarioDir,
@@ -1095,25 +1016,7 @@ const versionOf = async (packageName: string): Promise<string> => {
       packageName,
       'package.json',
     ),
-  ] as const;
-
-  for (const candidate of candidates) {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const text = await fs.readFile(candidate, 'utf8').catch(() => undefined);
-
-    const manifest: unknown = text === undefined ? undefined : JSON.parse(text);
-
-    if (
-      isRecord(manifest) &&
-      manifest['name'] === packageName &&
-      isString(manifest['version'])
-    ) {
-      return manifest['version'];
-    }
-  }
-
-  throw new Error(`cannot find the version of ${packageName}`);
-};
+  ]);
 
 /**
  * The packages `synstate`'s manifest names as dependencies of any kind, read
@@ -1140,18 +1043,4 @@ const dependenciesOfSynstate = async (): Promise<readonly string[]> => {
 
     return isRecord(dependencies) ? Object.keys(dependencies) : [];
   });
-};
-
-/** One bundle at a time: esbuild already uses every core for each. */
-const mapInSequence = async <A, B>(
-  values: readonly A[],
-  fn: (value: A) => Promise<B>,
-): Promise<readonly B[]> => {
-  const mut_results: B[] = [];
-
-  for (const value of values) {
-    mut_results.push(await fn(value));
-  }
-
-  return mut_results;
 };
