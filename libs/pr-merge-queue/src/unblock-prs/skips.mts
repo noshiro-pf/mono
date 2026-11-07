@@ -30,7 +30,8 @@ import type {
  * still through cycle after cycle of "Nothing to do". One that sat green goes
  * back in the running last, not first — `demotions.mts`. A rebase or push
  * failure is tied to the base for the older reason: the commit it conflicted
- * with may have gone with it.
+ * with may have gone with it. A `rebase-failed` whose conflict is still there is
+ * the exception, and is kept: {@link settleSkips}, from `conflict-persists.mts`.
  *
  * `checks-failed` is deliberately not tied to the base. Rebasing it would put
  * the same failing matrix through again, and fixing the failure is the skill's
@@ -131,6 +132,12 @@ export const unannouncedSkips = (
  * - **Standing, and this run does not know it**: a record an earlier run
  *   reached, which is taken up as it stands rather than tried again — a
  *   rebase that conflicted would conflict the same way.
+ * - **Still conflicted** (`stillConflicted`, `conflict-persists.mts`): a
+ *   `rebase-failed` comment whose base has moved, but whose conflict has not
+ *   gone, is not ended by the move. Its record moves to the new base, and it is
+ *   returned in `rebased` for its comment to say so too: every other reader goes
+ *   on reading the pull request as a skill's. A retry a person asked for still
+ *   ends it.
  *
  * A record this run holds is left as it is otherwise: the comment says what the
  * record said when it was written.
@@ -140,7 +147,15 @@ export const settleSkips = (
   comments: ReadonlyMap<number, OwnSetAsideComment>,
   pullRequests: readonly PullRequest[],
   baseSha: string,
-): Readonly<{ skipped: SkipRecords; resolved: readonly Resolution[] }> => {
+  stillConflicted: ReadonlyMap<number, readonly string[]> = new Map<
+    number,
+    readonly string[]
+  >(),
+): Readonly<{
+  skipped: SkipRecords;
+  resolved: readonly Resolution[];
+  rebased: readonly Rebased[];
+}> => {
   const judged = Array.from(comments).flatMap(([number, comment]) => {
     const pr = pullRequests.find((p) => p.number === number);
 
@@ -150,10 +165,18 @@ export const settleSkips = (
 
     const { setAside, retry } = comment.says;
 
+    // A record says the base it stands at, so one kept moves along with it.
+    const isKept =
+      !retry &&
+      setAside.reason === 'rebase-failed' &&
+      setAside.headSha === pr.headRefOid &&
+      setAside.baseSha !== baseSha &&
+      stillConflicted.has(number);
+
     const resolvedBy: ResolvedBy | undefined =
       setAside.headSha !== pr.headRefOid
         ? 'pushed'
-        : !setAsideStillApplies(setAside, baseSha)
+        : !isKept && !setAsideStillApplies(setAside, baseSha)
           ? 'base-moved'
           : retry
             ? 'retry'
@@ -164,8 +187,9 @@ export const settleSkips = (
         number,
         databaseId: comment.databaseId,
         body: comment.body,
-        setAside,
+        setAside: isKept ? { ...setAside, baseSha } : setAside,
         resolvedBy,
+        isKept,
       } as const,
     ];
   });
@@ -181,10 +205,10 @@ export const settleSkips = (
   );
 
   const taken = Arr.generate(function* () {
-    for (const { number, setAside, resolvedBy } of judged) {
+    for (const { number, setAside, resolvedBy, isKept } of judged) {
       if (
         resolvedBy === undefined &&
-        !skipped.has(number) &&
+        (isKept || !skipped.has(number)) &&
         isSetAsideReason(setAside.reason)
       ) {
         yield {
@@ -210,8 +234,34 @@ export const settleSkips = (
         }
       }
     }),
+    rebased: Arr.generate(function* () {
+      for (const { number, databaseId, body, setAside, isKept } of judged) {
+        if (isKept) {
+          yield {
+            number,
+            databaseId,
+            body,
+            setAside,
+            files: stillConflicted.get(number) ?? [],
+          };
+        }
+      }
+    }),
   };
 };
+
+/**
+ * A `rebase-failed` comment kept across a move of the base: `setAside` names the
+ * new base, and `files` what it still conflicts in.
+ */
+export type Rebased = Readonly<{
+  number: number;
+  databaseId: number;
+  /** The comment as it is, of which only the record line changes. */
+  body: string;
+  setAside: SetAside;
+  files: readonly string[];
+}>;
 
 /** A set-aside comment to rewrite as resolved, and why. */
 export type Resolution = Readonly<{

@@ -1,4 +1,5 @@
 import {
+  moveSetAsideBase,
   parseSetAsideComment,
   setAsideApplies,
   setAsideStillApplies,
@@ -181,5 +182,37 @@ describe(setAsideStillApplies, () => {
         'b'.repeat(40),
       ),
     );
+  });
+});
+
+describe(moveSetAsideBase, () => {
+  test('changes the base it records, and nothing else', () => {
+    const moved = 'b'.repeat(40);
+
+    const body = writeSetAsideComment(
+      { reason: 'rebase-failed', headSha: HEAD, baseSha: BASE },
+      'It conflicts.',
+    ).replace('- [ ]', '- [x]');
+
+    const after = moveSetAsideBase(body, moved);
+
+    assert.deepStrictEqual(parseSetAsideComment(after), {
+      kind: 'standing',
+      setAside: { reason: 'rebase-failed', headSha: HEAD, baseSha: moved },
+      retry: true,
+    });
+
+    assert.strictEqual(
+      after.slice(after.indexOf('\n')),
+      body.slice(body.indexOf('\n')),
+    );
+  });
+
+  test('leaves a comment that records nothing as it is', () => {
+    const resolved = writeResolvedComment('Resolved.');
+
+    assert.strictEqual(moveSetAsideBase(resolved, BASE), resolved);
+
+    assert.strictEqual(moveSetAsideBase('not ours', BASE), 'not ours');
   });
 });

@@ -2,6 +2,7 @@
 
 import {
   MERGE_QUEUED_LABEL,
+  moveSetAsideBase,
   SKIP_CI_LABEL,
   stackDescendants,
   type Claim,
@@ -17,6 +18,7 @@ import {
   type AutoFixConfig,
   type RegenerateConfig,
 } from './config.mjs';
+import { stillConflicted } from './conflict-persists.mjs';
 import {
   STALE_STATE_PAUSE_MS,
   UNREAD_SURVEYS_BEFORE_SETTING_ASIDE,
@@ -417,6 +419,7 @@ const settleWithComments = async (
   pullRequests: readonly PullRequest[],
   baseSha: string,
   defaultBranch: string,
+  regenerate: RegenerateConfig | undefined,
   dryRun: boolean,
 ): Promise<
   Readonly<{ skipped: SkipRecords; claimed: ReadonlyMap<number, Claim> }>
@@ -439,7 +442,38 @@ const settleWithComments = async (
     read.value.setAside,
     pullRequests,
     baseSha,
+    await stillConflicted({
+      comments: read.value.setAside,
+      pullRequests,
+      baseSha,
+      defaultBranch,
+      regenerate,
+      log,
+    }),
   );
+
+  for (const { number, databaseId, body, setAside, files } of settled.rebased) {
+    log(
+      `#${number}: still conflicts with ${defaultBranch} at ${setAside.baseSha.slice(0, 10)} in ${files.join(', ')}; it stays set aside.`,
+    );
+
+    if (dryRun) {
+      continue;
+    }
+
+    const written = await writeSetAsideCommentOn(
+      api,
+      number,
+      databaseId,
+      moveSetAsideBase(body, setAside.baseSha),
+    );
+
+    if (Result.isErr(written)) {
+      log(
+        `#${number}: could not record the new base in its comment: ${written.value}`,
+      );
+    }
+  }
 
   for (const {
     number,
@@ -873,6 +907,7 @@ const runCycle = async (
     pullRequests,
     baseSha,
     defaultBranch,
+    regenerateConfig,
     options.dryRun,
   );
 

@@ -2,6 +2,7 @@ export * from './auto-fix.mjs';
 export * from './checks.mjs';
 export * from './claims.mjs';
 export * from './config.mjs';
+export * from './conflict-persists.mjs';
 export * from './constants.mjs';
 export * from './demotions.mjs';
 export * from './github.mjs';

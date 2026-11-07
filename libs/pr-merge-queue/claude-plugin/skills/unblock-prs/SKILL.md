@@ -105,12 +105,12 @@ claim-pr <number> --by <claimant>
 up once for this run; the same one throughout. It is refused unless the
 owner is a skill and no one else holds it: take the next one.
 
-The claim is what keeps the worker from retrying the pull request while you
-work — it would when the default branch moves or the box is ticked — and
-keeps the session that opened it from fixing the same thing. It ends by
-itself when the branch is pushed, or after two hours. Run the same command
-again to renew it during long work, and with `--release` when you give up
-without pushing.
+The claim is what keeps the worker from retrying the pull request while you work
+— it would when the default branch moves and takes the conflict away, or the box
+is ticked — and keeps the session that opened it from fixing the same thing. It
+ends by itself when the branch is pushed, or after two hours. Run the same
+command again to renew it during long work, and with `--release` when you give
+up without pushing.
 
 ## 3. Fix it, in a throwaway worktree
 

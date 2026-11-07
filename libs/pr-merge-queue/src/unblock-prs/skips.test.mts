@@ -109,6 +109,7 @@ describe(settleSkips, () => {
             resolvedBy: 'pushed',
           },
         ],
+        rebased: [],
       },
     );
   });
@@ -136,6 +137,105 @@ describe(settleSkips, () => {
 
     // The failed checks stand, and are taken up.
     assert.strictEqual(settled.skipped.get(8)?.reason, 'checks-failed');
+  });
+
+  test('keeps a rebase-failed comment that still conflicts, on the new base', () => {
+    const settled = settleSkips(
+      none,
+      comments([7, standingComment()], [8, standingComment()]),
+      [pullRequest(7), pullRequest(8)],
+      MOVED,
+      new Map<number, readonly string[]>([[7, ['a.txt']]]),
+    );
+
+    // The one whose conflict is gone is resolved as ever.
+    assert.deepStrictEqual(
+      settled.resolved.map(({ number, resolvedBy }) => [number, resolvedBy]),
+      [[8, 'base-moved']],
+    );
+
+    assert.deepStrictEqual(
+      settled.rebased.map(({ number, setAside, files }) => [
+        number,
+        setAside.baseSha,
+        files,
+      ]),
+      [[7, MOVED, ['a.txt']]],
+    );
+
+    assert.strictEqual(settled.skipped.get(7)?.baseSha, MOVED);
+
+    assert.isFalse(settled.skipped.has(8));
+
+    // Nothing the cycle acted from reads as new, so nothing is written again.
+    assert.deepStrictEqual(newSkips(settled.skipped, settled.skipped), []);
+
+    assert.deepStrictEqual(
+      unannouncedSkips(settled.skipped, comments([7, standingComment()])),
+      [],
+    );
+  });
+
+  test('moves a record this run still holds along with its comment', () => {
+    const settled = settleSkips(
+      withSkip(none, skip({ headSha: HEAD, baseSha: BASE })),
+      comments([7, standingComment()]),
+      [pullRequest(7)],
+      MOVED,
+      new Map<number, readonly string[]>([[7, ['a.txt']]]),
+    );
+
+    assert.strictEqual(settled.skipped.get(7)?.baseSha, MOVED);
+  });
+
+  test('a push or a retry still ends what still conflicts', () => {
+    const pushed = settleSkips(
+      none,
+      comments([7, standingComment()]),
+      [pullRequest(7, { headRefOid: PUSHED })],
+      MOVED,
+      new Map<number, readonly string[]>([[7, ['a.txt']]]),
+    );
+
+    assert.deepStrictEqual(
+      pushed.resolved.map(({ resolvedBy }) => resolvedBy),
+      ['pushed'],
+    );
+
+    assert.deepStrictEqual(pushed.rebased, []);
+
+    const retried = settleSkips(
+      none,
+      comments([7, standingComment({ retry: true })]),
+      [pullRequest(7)],
+      MOVED,
+      new Map<number, readonly string[]>([[7, ['a.txt']]]),
+    );
+
+    assert.deepStrictEqual(
+      retried.resolved.map(({ resolvedBy }) => resolvedBy),
+      ['base-moved'],
+    );
+
+    assert.deepStrictEqual(retried.rebased, []);
+  });
+
+  test('only rebase-failed is kept', () => {
+    const settled = settleSkips(
+      none,
+      comments([
+        7,
+        standingComment({ setAside: { ...SET_ASIDE, reason: 'push-failed' } }),
+      ]),
+      [pullRequest(7)],
+      MOVED,
+      new Map<number, readonly string[]>([[7, ['a.txt']]]),
+    );
+
+    assert.deepStrictEqual(
+      settled.resolved.map(({ resolvedBy }) => resolvedBy),
+      ['base-moved'],
+    );
   });
 
   test('drops the record of a pull request a person asked to retry', () => {
@@ -188,7 +288,7 @@ describe(settleSkips, () => {
         [pullRequest(7)],
         BASE,
       ),
-      { skipped: held, resolved: [] },
+      { skipped: held, resolved: [], rebased: [] },
     );
   });
 
@@ -207,7 +307,7 @@ describe(settleSkips, () => {
         [pullRequest(7), pullRequest(9)],
         BASE,
       ),
-      { skipped: none, resolved: [] },
+      { skipped: none, resolved: [], rebased: [] },
     );
   });
 });
