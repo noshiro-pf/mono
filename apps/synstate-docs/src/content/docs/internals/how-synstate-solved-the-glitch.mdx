@@ -214,7 +214,7 @@ SynState's key insight is that a node's place in the update order is known when 
 When an observable is created via `.pipe()` or a combinator (`combine`, `derive`, `merge`, `zip`), SynState computes its **depth** — the length of the longest path from any root source:
 
 - **Root observables**: `depth = 0`.
-- **Child observables**: `depth = 1 + max(parent depths)`.
+- **Child observables**: `depth = 1 + max(parent depths)`, raised to the scope's floor when the child is created in a scope made with `createScope(parent, { after })`, so that it updates after `after`.
 
 An update starts at a **manager observable** (see below), which opens a queue for the update with one bucket per depth below it. Every node that emits in the update, the manager first, puts each of its children into the bucket of the child's depth, once per update however many of the child's parents emit. The manager then takes the buckets in ascending depth and calls `tryUpdate` on each node in them; a node that emits puts its own children into deeper buckets as it goes, and the update ends when the last bucket is empty:
 

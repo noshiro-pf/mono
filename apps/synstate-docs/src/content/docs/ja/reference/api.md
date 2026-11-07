@@ -97,7 +97,7 @@ SynStateはアプリケーションの状態を管理するためのシンプル
 
 ページの一部をマウント・破棄する UI 束縛のような、SynState の上に載るライブラリのための API。モジュールのトップレベルで定義したアプリの状態はどのスコープにも属さず、これを使う必要はない。
 
-- `createScope(parent?)`: スコープを作る。`scope.run(body)` の中で同期的に作られた Observable はそのスコープに属し、`scope.dispose()` は派生元の共有された Observable を complete せずにそれらを dispose する。そこで行った `subscribe` もそのスコープに属し、`dispose()` で購読が解除される。`parent` を渡すと親と一緒に dispose される。
+- `createScope(parent?, { after? })`: スコープを作る。`scope.run(body)` の中で同期的に作られた Observable はそのスコープに属し、`scope.dispose()` は派生元の共有された Observable を complete せずにそれらを dispose する。そこで行った `subscribe` もそのスコープに属し、`dispose()` で購読が解除される。`parent` を渡すと親と一緒に dispose される。`after` を渡すと、そのスコープと子スコープの中で派生した Observable は、ソースから何段目であっても `after` より後に更新される。分岐をそのスコープにマウントする切り替えが、切り替えの元になる値を渡すと、次の値で外れる分岐を、分岐がその値を計算する前に破棄できる。
 - `getCurrentScope()`: `run` を実行中のスコープ（無ければ `undefined`）。スコープに入るのは同期的に作られたものだけなので、`await` の後の処理は同期部分で取っておいたスコープの `run` で包む。
 - `onScopeDispose(cleanup)`: 現在のスコープが dispose されるときに `cleanup` を呼ぶ。
 - `untracked(body)`: 現在のスコープ無しで `body` を呼び、その中で作られたものと購読を、囲むスコープより長く生かす。

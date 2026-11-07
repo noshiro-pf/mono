@@ -31,6 +31,8 @@ export const mountSwitch = <V, K>(
     initialNodes: readonly ChildNode[];
   } = { current: undefined, initialNodes: [] };
 
+  const branchScopeOptions = { after: value } as const;
+
   value.subscribe((v) => {
     const key = keyOf(v);
 
@@ -42,7 +44,9 @@ export const mountSwitch = <V, K>(
       mut_state.current.scope.dispose();
     }
 
-    const scope = createScope(parent);
+    // What a branch derives updates after `value`, so that a branch the next
+    // value rules out is disposed before it computes that value (#3605).
+    const scope = createScope(parent, branchScopeOptions);
 
     const nodes = scope.run(() => {
       const mounted = toNodes(branch(key, v)?.mount() ?? []);

@@ -40,6 +40,36 @@ const tracked = (
   return { Component, calls: mut_calls };
 };
 
+type User = Readonly<{ name: string }>;
+
+/**
+ * A branch that reads `user$` narrowed by the switch above it, as the user
+ * would write it, and records every value its derived node computes.
+ */
+const narrowingBranch = (
+  user$: InitializedObservable<User | undefined>,
+): Readonly<{
+  Branch: () => JSX.Element;
+  seen: readonly (string | undefined)[];
+}> => {
+  const mut_seen: (string | undefined)[] = [];
+
+  const Branch = (): JSX.Element => (
+    <b>
+      {user$.pipe(
+        map((u) => {
+          mut_seen.push(u?.name);
+
+          // The switch rules `undefined` out; reaching it here is the bug.
+          return u === undefined ? 'unreachable' : u.name;
+        }),
+      )}
+    </b>
+  );
+
+  return { Branch, seen: mut_seen };
+};
+
 describe(If, () => {
   test('mounts only the branch chosen', () => {
     const [cond$, setCond] = createState(false);
@@ -177,6 +207,29 @@ describe(If, () => {
     assert.strictEqual(container.getHTML(), '<div><!----></div>');
   });
 
+  test('disposes a branch before it computes a value that cond rules out, however deep cond is (#3605)', () => {
+    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
+
+    const { Branch, seen } = narrowingBranch(user$);
+
+    // Two steps from the source, so that cond is deeper than the branch's node.
+    const cond$ = user$.pipe(map((u) => u)).pipe(map((u) => u !== undefined));
+
+    const { container } = mountInto(() => (
+      <p>
+        <If cond={cond$} then={<Branch />} />
+      </p>
+    ));
+
+    setUser({ name: 'b' });
+
+    setUser(undefined);
+
+    assert.strictEqual(container.textContent, '');
+
+    assert.deepStrictEqual(seen, ['a', 'b']);
+  });
+
   test('a constant cond mounts one branch', () => {
     const { container } = mountInto(() => (
       <If cond={constant(false)} then={<b />} else={<i />} />
@@ -225,6 +278,30 @@ describe(MatchOptional, () => {
     assert.strictEqual(container.textContent, 'login');
   });
 
+  test('disposes the some branch before it computes a value that value rules out (#3605)', () => {
+    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
+
+    const { Branch, seen } = narrowingBranch(user$);
+
+    const value$ = user$
+      .pipe(map((u) => u))
+      .pipe(map((u) => (u === undefined ? Optional.none : Optional.some(u))));
+
+    const { container } = mountInto(() => (
+      <MatchOptional
+        value={value$}
+        some={() => <Branch />}
+        none={<i>{constant('login')}</i>}
+      />
+    ));
+
+    setUser(undefined);
+
+    assert.strictEqual(container.textContent, 'login');
+
+    assert.deepStrictEqual(seen, ['a']);
+  });
+
   test('takes a constant', () => {
     const { container } = mountInto(() => (
       <MatchOptional
@@ -260,5 +337,33 @@ describe(MatchResult, () => {
     setResult(Result.err('oops'));
 
     assert.strictEqual(container.getHTML(), '<i>oops</i><!---->');
+  });
+
+  test('disposes the ok branch before it computes a value that value rules out (#3605)', () => {
+    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
+
+    const { Branch, seen } = narrowingBranch(user$);
+
+    const value$ = user$
+      .pipe(map((u) => u))
+      .pipe(
+        map((u): Result<User, string> =>
+          u === undefined ? Result.err('gone') : Result.ok(u),
+        ),
+      );
+
+    const { container } = mountInto(() => (
+      <MatchResult
+        value={value$}
+        ok={() => <Branch />}
+        err={(e$) => <i>{e$}</i>}
+      />
+    ));
+
+    setUser(undefined);
+
+    assert.strictEqual(container.textContent, 'gone');
+
+    assert.deepStrictEqual(seen, ['a']);
   });
 });
