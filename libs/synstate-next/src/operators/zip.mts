@@ -1,5 +1,6 @@
 import {
   DerivedClass,
+  isPending,
   noValue,
   toNode,
   view,
@@ -70,6 +71,34 @@ class ZipClass extends DerivedClass<readonly unknown[]> {
     }
 
     return mut_row;
+  }
+
+  /**
+   * Settled also once a settled parent has nothing waiting: no row can be
+   * completed without it.
+   */
+  override get settled(): boolean {
+    if (super.settled) {
+      return true;
+    }
+
+    if (isPending(this)) {
+      return false;
+    }
+
+    for (const [i, parent] of this.parents.entries()) {
+      const queue = this.#queues[i];
+
+      if (
+        queue !== undefined &&
+        queue.head >= queue.values.length &&
+        parent.settled
+      ) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   override recompute(): boolean {

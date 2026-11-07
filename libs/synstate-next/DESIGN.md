@@ -155,11 +155,21 @@ from the prototype; the packages are to be measured again in
   `skipUntil`.
 - `withBufferedFrom` buffers what the other observable emits after it was
   created; synstate put the value it held into the first buffer.
-- The operators that are one `map` are gone: `mapTo`, `pluck`, `attachIndex` (a
-  `scan`), `mapOptional`, `unwrapOptional`, `mapResultOk`, `mapResultErr`,
-  `unwrapResultOk`, `unwrapResultErr`. So are the aliases `withLatestFrom` and
-  `withBuffered`. Each name is one more thing to learn for no capability; a
-  `map` with `equals: () => false` replaces `mapTo` on an event.
+- The operators that are one `map` are gone: `mapTo`, `pluck` and its alias
+  `getKey`, `attachIndex` and its alias `withIndex` (a `scan`), `mapOptional`,
+  `unwrapOptional`, `mapResultOk`, `mapResultErr`, `unwrapResultOk`,
+  `unwrapResultErr`. So are the aliases `withLatestFrom`, `withBuffered`,
+  `combineLatest` (`combine`), `distinctUntilChanged` (`skipIfNoChange`) and
+  `flatMap` (`mergeMap`). Each name is one more thing to learn for no
+  capability; a `map` with `equals: () => false` replaces `mapTo` on an event.
+- The predicates of `filter` and `skipWhile` are given the value alone, not its
+  index; a `scan` counts.
+- A scope is an `Owner`: `createScope` is `createOwner`, `getCurrentScope` is
+  `getOwner`, `onScopeDispose` is `onCleanup`.
+- Circular dependencies are not detected: a node's parents exist before it, so
+  no cycle can be built through the API.
+- A node made from a disposed one is settled at once and is not registered with
+  it; it holds the value it computed from the last value.
 - `timer` and `counter` start when they are created; `startManually` and
   `start()` are gone. Create one where it should start, inside the owner that
   should stop it.
@@ -177,4 +187,11 @@ from the prototype; the packages are to be measured again in
 
 ## Not yet built
 
-The port of synstate's tests. It lands in a pull request of the rebuild.
+- The API for writing an operator outside the package, which replaces synstate's
+  `createSyncChildObservable`, `createAsyncChildObservable`,
+  `createRootObservable`, `createInitializedSyncChildObservable` and the
+  `is*Observable` guards.
+- The port of synstate-dom's tests.
+
+synstate's tests are ported under `test/ported/`; its README lists each file and
+where it went.

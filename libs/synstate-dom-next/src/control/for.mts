@@ -7,6 +7,7 @@ import {
 } from 'synstate-next';
 import {
   EffectClass,
+  disposeAll,
   noValue,
   toNode,
   type ObservableClass,
@@ -253,13 +254,12 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
       range.deleteContents();
     }
 
-    for (const row of rows) {
-      row.owner.dispose();
-    }
-
     this.#mut_byKey.clear();
 
     this.#mut_rows = [];
+
+    // Every row is disposed even when one's cleanup throws.
+    disposeAll(rows.map((row) => row.owner));
   }
 
   mountInto(out: MountedNodes): void {

@@ -140,7 +140,8 @@ export class ObservableClass<A> implements DerivedNode {
    * observable go once it is settled. A state is never settled.
    */
   get settled(): boolean {
-    return this.disposed;
+    // A write made before it was disposed may still wait for its round.
+    return this.disposed && !isPending(this);
   }
 
   /** Whether anything would be reached by an emission. */
@@ -148,7 +149,15 @@ export class ObservableClass<A> implements DerivedNode {
     return this.children !== undefined && this.children.length > this.#mut_dead;
   }
 
+  /**
+   * Registers `child` to be visited when this node emits. A disposed node never
+   * emits again, so it does not keep a child made after it was disposed.
+   */
   addChild(child: QueuedNode): void {
+    if (this.disposed) {
+      return;
+    }
+
     if (this.children === undefined) {
       this.children = [child];
     } else {
@@ -163,6 +172,7 @@ export class ObservableClass<A> implements DerivedNode {
   childGone(): void {
     const mut_children = this.children;
 
+    // A disposed node keeps no children; see `dispose`.
     if (mut_children === undefined) {
       return;
     }
@@ -206,9 +216,23 @@ export class ObservableClass<A> implements DerivedNode {
       this.leaveParents();
     }
 
+    // It never emits again, so its children are let go, and one made from now
+    // on is not kept (see `addChild`). A write made before it was disposed and
+    // waiting for its round still reaches them; the round lets them go.
+    if (!isPending(this)) {
+      this.forgetChildren();
+    }
+
     this.#mut_events?.drop();
 
     this.teardown();
+  }
+
+  /** See `DerivedNode.forgetChildren`. */
+  forgetChildren(): void {
+    this.children = undefined;
+
+    this.#mut_dead = 0;
   }
 
   /** Tells the parents this node is gone; see `DerivedClass`. */
@@ -284,6 +308,11 @@ export class ObservableClass<A> implements DerivedNode {
  * `reads` are nodes it reads without following (`withCurrentValueFrom`): they
  * do not wake it, but it is placed below them too, so that it reads the value
  * they settle on in the same update.
+ *
+ * `emitters` are the parents whose emissions can make it emit, all of them
+ * unless a subclass says otherwise; the others only wake it (the notifier of
+ * `takeUntil`, the observable `withBufferedFrom` buffers). It is settled once
+ * they are.
  */
 export class DerivedClass<A> extends ObservableClass<A> {
   readonly parents: readonly ObservableClass<unknown>[];
@@ -325,14 +354,22 @@ export class DerivedClass<A> extends ObservableClass<A> {
 
   /**
    * Settled once it is gone (disposed, or detached for good), or when every
-   * parent is, since it emits only when one of them does, and no emission of its
-   * own waits for a round.
+   * parent that can make it emit is, since it emits only when one of them does,
+   * and no emission of its own waits for a round.
    */
   override get settled(): boolean {
     return (
-      this.gone ||
-      (!isPending(this) && this.parents.every((parent) => parent.settled))
+      !isPending(this) &&
+      (this.gone || this.emitters.every((parent) => parent.settled))
     );
+  }
+
+  /**
+   * The parents whose emissions can make it emit; see the class comment. A
+   * getter, so that a node of the usual kind carries no field for it.
+   */
+  protected get emitters(): readonly ObservableClass<unknown>[] {
+    return this.parents;
   }
 
   /**

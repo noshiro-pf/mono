@@ -46,6 +46,11 @@ export type DerivedNode = {
   readonly children: readonly QueuedNode[] | undefined;
   /** Recomputes; returns whether the value changed. */
   recompute: () => boolean;
+  /**
+   * Lets the children go: called on a node disposed while an emission of it was
+   * pending, once that emission has reached them or been dropped.
+   */
+  forgetChildren: () => void;
 };
 
 // transformer-ignore-next-line convert-to-readonly
@@ -430,6 +435,15 @@ const clearQueues = (): void => {
 
   mut_state.effectsLength = 0;
 
+  // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
+  for (let mut_i = 0; mut_i < mut_state.pendingLength; mut_i += 1) {
+    const node = mut_pending[mut_i];
+
+    if (node?.disposed === true) {
+      node.forgetChildren();
+    }
+  }
+
   mut_pending.fill(undefined, 0, mut_state.pendingLength);
 
   mut_state.pendingLength = 0;
@@ -561,6 +575,10 @@ const flushRounds = (): void => {
           node.changedAt = epoch;
 
           enqueueChildren(node);
+
+          if (node.disposed) {
+            node.forgetChildren();
+          }
         }
 
         drain();

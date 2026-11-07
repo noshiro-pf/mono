@@ -1,8 +1,10 @@
 /**
  * Ownership. Everything created while an owner's `run` executes belongs to it,
  * and `dispose()` disposes it: the child owners first, then the cleanups, then
- * the nodes, each newest first. This is the only lifetime a node has; there is
- * no reference counting and no completion travelling down the graph.
+ * the nodes, each newest first. A cleanup or a disposal that throws does not
+ * stop the rest: the first exception is thrown once everything is disposed.
+ * This is the only lifetime a node has; there is no reference counting and no
+ * completion travelling down the graph.
  */
 
 /** What an owner disposes. */
@@ -91,24 +93,12 @@ export class Owner {
 
     this.#mut_late = undefined;
 
-    for (let mut_i = late.length - 1; mut_i >= 0; mut_i -= 1) {
-      const node = late[mut_i];
+    const failure = disposeNewestFirst(late, undefined);
 
-      if (node === undefined) {
-        continue;
-      }
-
-      if (!fnThrew) {
-        node.dispose();
-
-        continue;
-      }
-
-      try {
-        node.dispose();
-      } catch (error) {
-        console.error(error);
-      }
+    if (!fnThrew) {
+      throwFailure(failure);
+    } else if (failure !== undefined) {
+      console.error(failure.error);
     }
   }
 
@@ -257,24 +247,23 @@ export class Owner {
     }
 
     // Newest first, by index: the lists are this owner's no longer, and a
-    // reversed copy would allocate one per row of a list.
-    if (children !== undefined) {
-      for (let mut_i = children.length - 1; mut_i >= 0; mut_i -= 1) {
-        children[mut_i]?.dispose();
-      }
-    }
+    // reversed copy would allocate one per row of a list. Everything is
+    // disposed even when something throws; see `disposeAll`.
+    let mut_failure = disposeNewestFirst(children, undefined);
 
     if (cleanups !== undefined) {
       for (let mut_i = cleanups.length - 1; mut_i >= 0; mut_i -= 1) {
-        cleanups[mut_i]?.();
+        try {
+          cleanups[mut_i]?.();
+        } catch (error) {
+          mut_failure = keepFirst(mut_failure, error);
+        }
       }
     }
 
-    if (nodes !== undefined) {
-      for (let mut_i = nodes.length - 1; mut_i >= 0; mut_i -= 1) {
-        nodes[mut_i]?.dispose();
-      }
-    }
+    mut_failure = disposeNewestFirst(nodes, mut_failure);
+
+    throwFailure(mut_failure);
   }
 }
 
@@ -323,7 +312,77 @@ export const untracked = <R,>(fn: () => R): R => {
   }
 };
 
+/**
+ * Disposes `disposable`, reporting an exception from the disposal rather than
+ * throwing it. For a disposal on the way out of a failure, so that it does not
+ * replace the exception being thrown, and for one nobody asked for (an inner
+ * observable let go of), which has no caller to throw to: thrown, it would
+ * abandon the update under way.
+ */
+export const disposeReporting = (
+  disposable: Readonly<{ dispose: () => void }>,
+): void => {
+  try {
+    disposable.dispose();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 /** Takes `node` into the current owner, if any. */
 export const adoptIntoCurrentOwner = (node: OwnedNode): void => {
   mut_current.owner?.adopt(node);
+};
+
+/**
+ * Disposes each of `items`, newest first: every one of them even when one
+ * throws. The first exception is thrown once they are all disposed; a later one
+ * is reported, so that it does not replace the first.
+ */
+export const disposeAll = (
+  items: readonly (Readonly<{ dispose: () => void }> | undefined)[],
+): void => {
+  throwFailure(disposeNewestFirst(items, undefined));
+};
+
+/** The first exception of a disposal, held while the rest of it runs. */
+type Failure = Readonly<{ error: unknown }> | undefined;
+
+/** Keeps the first exception, and reports `error` if it is a later one. */
+const keepFirst = (failure: Failure, error: unknown): Failure => {
+  if (failure === undefined) {
+    return { error };
+  }
+
+  console.error(error);
+
+  return failure;
+};
+
+const disposeNewestFirst = (
+  items: readonly (Readonly<{ dispose: () => void }> | undefined)[] | undefined,
+  failure: Failure,
+): Failure => {
+  if (items === undefined) {
+    return failure;
+  }
+
+  let mut_failure = failure;
+
+  for (let mut_i = items.length - 1; mut_i >= 0; mut_i -= 1) {
+    try {
+      items[mut_i]?.dispose();
+    } catch (error) {
+      mut_failure = keepFirst(mut_failure, error);
+    }
+  }
+
+  return mut_failure;
+};
+
+const throwFailure = (failure: Failure): void => {
+  if (failure !== undefined) {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- what a cleanup or a disposal threw, passed on unchanged
+    throw failure.error;
+  }
 };

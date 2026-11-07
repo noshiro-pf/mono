@@ -2,6 +2,7 @@ import {
   DerivedClass,
   InnerFollower,
   Owner,
+  disposeReporting,
   noValue,
   toNode,
   view,
@@ -53,12 +54,26 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
     const v = parent.current;
 
     if (v !== noValue) {
-      this.#switchTo(v);
+      try {
+        this.#switchTo(v);
+      } catch (error) {
+        // Nothing of a node that was never returned stays on its parent.
+        disposeReporting(this);
+
+        throw error;
+      }
     }
   }
 
+  /**
+   * Follows the projection of `value`. A projection that throws has what it
+   * made disposed at once, and leaves this node following nothing.
+   */
   #switchTo(value: A): void {
-    this.#mut_inner?.dispose();
+    // Switching away is nobody's call to dispose: see `disposeReporting`.
+    if (this.#mut_inner !== undefined) {
+      disposeReporting(this.#mut_inner);
+    }
 
     // Not a child of the current owner: the inner lives as long as this node
     // follows it, and this node disposes it.
@@ -66,21 +81,44 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
 
     this.#mut_inner = owner;
 
-    owner.run(() => {
-      const inner = toNode(this.#project(value));
+    this.#mut_innerNode = undefined;
 
-      this.#mut_innerNode = inner;
+    try {
+      owner.run(() => {
+        const inner = toNode(this.#project(value));
 
-      // The constructor makes it the inner's child and gives it to `owner`.
-      // oxlint-disable-next-line eslint/no-new
-      new InnerFollower(inner, this, undefined);
+        // A write made by the projection may have switched to a newer value,
+        // disposing `owner`: what this projection made is not followed.
+        if (this.#mut_inner === owner) {
+          this.#follow(inner);
+        }
+      });
+    } catch (error) {
+      disposeReporting(owner);
 
-      const v = inner.current;
+      if (this.#mut_inner === owner) {
+        this.#mut_inner = undefined;
 
-      if (v !== noValue) {
-        this.current = v;
+        this.#mut_innerNode = undefined;
       }
-    });
+
+      throw error;
+    }
+  }
+
+  /** Follows `inner`, made in the current owner, and takes its value. */
+  #follow(inner: ObservableClass<B>): void {
+    this.#mut_innerNode = inner;
+
+    // The constructor makes it the inner's child and gives it to the owner.
+    // oxlint-disable-next-line eslint/no-new
+    new InnerFollower(inner, this, undefined);
+
+    const v = inner.current;
+
+    if (v !== noValue) {
+      this.current = v;
+    }
   }
 
   override get settled(): boolean {
@@ -107,11 +145,13 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
   }
 
   protected override teardown(): void {
-    this.#mut_inner?.dispose();
+    const inner = this.#mut_inner;
 
     this.#mut_inner = undefined;
 
     this.#mut_innerNode = undefined;
+
+    inner?.dispose();
 
     super.teardown();
   }

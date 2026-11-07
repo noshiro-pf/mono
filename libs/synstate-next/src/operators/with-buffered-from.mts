@@ -27,6 +27,8 @@ class WithBufferedFromClass<A, B> extends DerivedClass<
 
   readonly #other: ObservableClass<B>;
 
+  readonly #emitters: readonly [ObservableClass<A>];
+
   #mut_buffer: B[];
 
   constructor(parent: ObservableClass<A>, other: ObservableClass<B>) {
@@ -38,7 +40,14 @@ class WithBufferedFromClass<A, B> extends DerivedClass<
 
     this.#other = other;
 
+    this.#emitters = [parent];
+
     this.#mut_buffer = [];
+  }
+
+  /** What `other` emits alone passes nothing on. */
+  protected override get emitters(): readonly ObservableClass<unknown>[] {
+    return this.#emitters;
   }
 
   override recompute(): boolean {

@@ -4,6 +4,8 @@ import {
   Owner,
   awaitsEffects,
   deferWrite,
+  disposeAll,
+  disposeReporting,
   isPropagating,
   noValue,
   toNode,
@@ -74,24 +76,26 @@ class MergeMapClass<A, B> extends DerivedClass<B> {
     const v = parent.current;
 
     if (v !== noValue) {
-      this.#add(v);
+      try {
+        this.#add(v);
+      } catch (error) {
+        // Nothing of a node that was never returned stays on its parent.
+        disposeReporting(this);
+
+        throw error;
+      }
     }
   }
 
-  /** Follows the projection of `value`; returns whether the value changed. */
+  /**
+   * Follows the projection of `value`; returns whether the value changed. A
+   * projection that throws has what it made disposed at once.
+   */
   #add(value: A): boolean {
     // Not a child of the current owner: this node disposes it.
     const owner = new Owner(undefined);
 
-    const inner = owner.run(() => {
-      const node = toNode(this.#project(value));
-
-      // The constructor makes it the inner's child and gives it to `owner`.
-      // oxlint-disable-next-line eslint/no-new
-      new InnerFollower(node, this, owner);
-
-      return node;
-    });
+    const inner = this.#follow(owner, value);
 
     this.#inners.set(owner, inner);
 
@@ -129,6 +133,25 @@ class MergeMapClass<A, B> extends DerivedClass<B> {
     return true;
   }
 
+  /** Runs the projection of `value` in `owner`, which is disposed if it throws. */
+  #follow(owner: Owner, value: A): ObservableClass<B> {
+    try {
+      return owner.run(() => {
+        const node = toNode(this.#project(value));
+
+        // The constructor makes it the inner's child and gives it to `owner`.
+        // oxlint-disable-next-line eslint/no-new
+        new InnerFollower(node, this, owner);
+
+        return node;
+      });
+    } catch (error) {
+      disposeReporting(owner);
+
+      throw error;
+    }
+  }
+
   /** Releases the inner observables that are done; see `#mut_sweepAt`. */
   #sweep(): void {
     for (const [owner, inner] of this.#inners) {
@@ -140,10 +163,11 @@ class MergeMapClass<A, B> extends DerivedClass<B> {
     this.#mut_sweepAt = Math.max(minSweepSize, this.#inners.size * 2);
   }
 
+  /** Lets an inner go; what its disposal throws is reported, see `disposeReporting`. */
   #release(owner: Owner): void {
     this.#inners.delete(owner);
 
-    owner.dispose();
+    disposeReporting(owner);
   }
 
   override get settled(): boolean {
@@ -179,11 +203,13 @@ class MergeMapClass<A, B> extends DerivedClass<B> {
   }
 
   protected override teardown(): void {
-    for (const owner of this.#inners.keys()) {
-      owner.dispose();
-    }
+    const owners = Array.from(this.#inners.keys());
 
     this.#inners.clear();
+
+    // Newest first, as an owner disposes its children; all of them even when
+    // one throws.
+    disposeAll(owners);
 
     super.teardown();
   }

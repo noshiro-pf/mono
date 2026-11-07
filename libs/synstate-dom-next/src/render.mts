@@ -28,9 +28,12 @@ export const render = (
   const out = new MountedNodes();
 
   const unmount = (): void => {
-    owner.dispose();
-
-    removeMounted(out);
+    try {
+      owner.dispose();
+    } finally {
+      // Removed even when a cleanup throws: the tree is disposed all the same.
+      removeMounted(out);
+    }
   };
 
   try {
