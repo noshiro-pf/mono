@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, type JSX } from 'synstate-dom';
+import { Num } from 'ts-data-forge';
 import { BLOCK_NAMES, type BlockId, type Pane } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
 import { tabIdOf, tabPanelIdOf } from './block-tab-ids.mjs';
@@ -92,12 +93,16 @@ const targetIndex = (
   index: number,
   count: number,
 ): number | undefined => {
+  if (!Num.isNonZero(count)) {
+    return undefined;
+  }
+
   switch (key) {
     case 'ArrowLeft':
-      return (index - 1 + count) % count;
+      return Num.rem(index - 1 + count, count);
 
     case 'ArrowRight':
-      return (index + 1) % count;
+      return Num.rem(index + 1, count);
 
     case 'Home':
       return 0;

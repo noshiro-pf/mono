@@ -14,7 +14,7 @@ import {
   isImeKeyDown,
   type JSX,
 } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Num } from 'ts-data-forge';
 import { withLabelsAdded } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
 import {
@@ -237,7 +237,9 @@ export const LabelInput = ({
               ? step === 1
                 ? 0
                 : count - 1
-              : (at + step + count) % count
+              : Num.isNonZero(count)
+                ? Num.rem(at + step + count, count)
+                : 0
           ],
         );
 

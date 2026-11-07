@@ -49,13 +49,13 @@ export const initialGridPositions = (
     nodes.map((node, index) => {
       const column =
         direction === 'right'
-          ? index % columns
+          ? remainderOf(index, columns)
           : Math.floor(ratio(index, rows));
 
       const row =
         direction === 'right'
           ? Math.floor(ratio(index, columns))
-          : index % rows;
+          : remainderOf(index, rows);
 
       return [
         node.id,
@@ -142,3 +142,7 @@ const GRID_GAP = 32;
 /** `a / b`, or `whenZero` for a zero `b`. */
 const ratio = (a: number, b: number, whenZero: number = 0): number =>
   Num.isNonZero(b) ? Num.div(a, b) : whenZero;
+
+/** `a % b`, `0` when `b` is. */
+const remainderOf = (a: number, b: number): number =>
+  Num.isNonZero(b) ? Num.rem(a, b) : 0;

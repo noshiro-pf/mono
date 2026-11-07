@@ -297,6 +297,7 @@ const createConstraintsPredicate =
             value: multipleOf.toString(),
           } as const);
         }
+        // eslint-disable-next-line total-functions/no-partial-division -- the zero divisor is the branch above; no type says a bigint is not zero
       } else if (value % multipleOf !== 0n) {
         return Result.err({
           constraint: 'multipleOf',
@@ -313,6 +314,7 @@ const createConstraintsPredicate =
             value: step.toString(),
           } as const);
         }
+        // eslint-disable-next-line total-functions/no-partial-division -- the zero divisor is the branch above; no type says a bigint is not zero
       } else if (value % step !== 0n) {
         return Result.err({
           constraint: 'step',

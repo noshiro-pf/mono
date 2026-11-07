@@ -7,7 +7,7 @@ import {
   type JSX,
 } from 'synstate-dom-next';
 import { batch, map, state, type InitializedObservable } from 'synstate-next';
-import { Arr } from 'ts-data-forge';
+import { Arr, Num } from 'ts-data-forge';
 
 type Item = Readonly<{ id: number; v: number }>;
 
@@ -220,7 +220,7 @@ const random = (seed: number): ((n: number) => number) => {
 
     mut_seed ^= mut_seed << 5;
 
-    return (mut_seed >>> 0) % n;
+    return Num.isNonZero(n) ? Num.rem(mut_seed >>> 0, n) : 0;
   };
 };
 

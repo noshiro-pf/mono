@@ -1,5 +1,5 @@
 import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
-import { arrowDirection, classObject } from '../internal/index.mjs';
+import { arrowDirection, classObject, stepAround } from '../internal/index.mjs';
 import { Button } from './button.js';
 import type { IconName } from './icon.js';
 import type { Intent, Size } from './intent.mjs';
@@ -87,8 +87,7 @@ export const SegmentedControl = <T extends string>({
 
       event.preventDefault();
 
-      const next =
-        enabled[(index + direction + enabled.length) % enabled.length];
+      const next = enabled[stepAround(index, direction, enabled.length)];
 
       next?.click();
 

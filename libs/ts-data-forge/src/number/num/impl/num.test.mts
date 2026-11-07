@@ -370,6 +370,29 @@ describe('Num test', () => {
     });
   });
 
+  describe('rem', () => {
+    test('is `a % b`, with the sign of the dividend', () => {
+      expect(Num.rem(7, 3)).toBe(1);
+
+      expect(Num.rem(-7, 3)).toBe(-1);
+
+      expect(Num.rem(7, -3)).toBe(1);
+
+      expect(Num.rem(7.5, 2)).toBe(1.5);
+    });
+
+    test('takes a divisor narrowed by `isNonZero`, and no other number', () => {
+      const count: number = 4;
+
+      if (Num.isNonZero(count)) {
+        expect(Num.rem(9, count)).toBe(1);
+      }
+
+      // @ts-expect-error a divisor that may be zero
+      expect(Num.rem(9, count)).toBe(1);
+    });
+  });
+
   describe('roundAt', () => {
     test('rounds to specified decimal places', () => {
       expect(Num.roundAt(1.234_56, 2)).toBe(1.23);

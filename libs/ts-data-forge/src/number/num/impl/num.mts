@@ -613,6 +613,23 @@ export const divInt = <
 };
 
 /**
+ * The remainder of `a / b`, `a % b`, with the sign of the dividend.
+ *
+ * Like `div`, the divisor must be typed as `NonZeroNumber` (as `isNonZero`
+ * narrows it) or a non-zero numeric literal: `a % 0` is `NaN`.
+ *
+ * @param a - The dividend
+ * @param b - The divisor (must be non-zero, enforced by types)
+ * @returns `a % b`
+ */
+export const rem = <B extends NonZeroNumber | SmallInt<'!=0'>>(
+  a: number,
+  b: B,
+): number =>
+  // eslint-disable-next-line total-functions/no-partial-division
+  a % b;
+
+/**
  * Rounds a number to a specified number of decimal places.
  *
  * Uses the standard rounding algorithm (round half up) to round the number to

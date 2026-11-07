@@ -380,6 +380,10 @@ export const levelColumn = (
 const rowOf = (index: number, columns: number): number =>
   Num.isNonZero(columns) ? Math.floor(Num.div(index, columns)) : index;
 
+/** Which column of a grid `columns` wide the `index`th cell is in. */
+const gridColumnOf = (index: number, columns: number): number =>
+  Num.isNonZero(columns) ? Num.rem(index, columns) : 0;
+
 /**
  * How many rows of the grid fit to the right of the connected parts, under a
  * label level with their top, and ending above where they end.
@@ -432,7 +436,7 @@ const gridOf = (
       return {
         label: labelAt(PADDING, parts.top),
         slotAt: (index) => ({
-          x: PADDING + (index % perRow) * COLUMN_PITCH,
+          x: PADDING + gridColumnOf(index, perRow) * COLUMN_PITCH,
           y: parts.top + LABEL_HEIGHT + rowOf(index, perRow) * rowStep,
         }),
       };
@@ -443,7 +447,7 @@ const gridOf = (
       return {
         label: labelAt(left, PADDING),
         slotAt: (index) => ({
-          x: left + (index % perRow) * COLUMN_PITCH,
+          x: left + gridColumnOf(index, perRow) * COLUMN_PITCH,
           y: PADDING + LABEL_HEIGHT + rowOf(index, perRow) * rowStep,
         }),
       };
@@ -459,7 +463,7 @@ const gridOf = (
         slotAt: (index) => {
           if (index < besideCount) {
             return {
-              x: PADDING + (taken + (index % right)) * COLUMN_PITCH,
+              x: PADDING + (taken + gridColumnOf(index, right)) * COLUMN_PITCH,
               y: PADDING + LABEL_HEIGHT + rowOf(index, right) * rowStep,
             };
           }
@@ -467,7 +471,7 @@ const gridOf = (
           const under = index - besideCount;
 
           return {
-            x: PADDING + (under % perRow) * COLUMN_PITCH,
+            x: PADDING + gridColumnOf(under, perRow) * COLUMN_PITCH,
             y: parts.top + rowOf(under, perRow) * rowStep,
           };
         },

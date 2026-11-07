@@ -221,9 +221,15 @@ const offsetPolygon = (
   };
 
   return points.map((point, index) => {
-    const before = points[(index + points.length - 1) % points.length];
+    const { length } = points;
 
-    const after = points[(index + 1) % points.length];
+    const before = Num.isNonZero(length)
+      ? points[Num.rem(index + length - 1, length)]
+      : undefined;
+
+    const after = Num.isNonZero(length)
+      ? points[Num.rem(index + 1, length)]
+      : undefined;
 
     if (before === undefined || after === undefined) {
       return point;

@@ -1,4 +1,4 @@
-import { Arr, type PositiveFiniteNumber } from 'ts-data-forge';
+import { Arr, Num, type PositiveFiniteNumber } from 'ts-data-forge';
 import type { NonEmptyArray, Percent } from 'ts-type-forge';
 import { contrastRatioHsl, type Hue } from 'ts-utils-additional';
 
@@ -10,6 +10,12 @@ export const hueListToContrastRatioList = (
   Arr.map(hueList, (h, idx) =>
     contrastRatioHsl(
       [h, saturation, lightness],
-      [hueList[(idx + 1) % hueList.length] ?? 0, saturation, lightness],
+      [
+        (Num.isNonZero(hueList.length)
+          ? hueList[Num.rem(idx + 1, hueList.length)]
+          : undefined) ?? 0,
+        saturation,
+        lightness,
+      ],
     ),
   );

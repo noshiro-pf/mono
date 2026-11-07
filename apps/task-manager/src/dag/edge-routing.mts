@@ -331,6 +331,10 @@ const controlLength = ({
 const fraction = (part: number, whole: number): number =>
   Num.isNonZero(whole) ? Num.div(part, whole) : 0;
 
+/** `part % whole`, `0` when `whole` is. */
+const remainderOf = (part: number, whole: number): number =>
+  Num.isNonZero(whole) ? Num.rem(part, whole) : 0;
+
 /** How many pieces to sample `segment` in, for samples `step` apart. */
 const sampleCount = (segment: CubicSegment, step: number): number =>
   Math.max(2, Math.ceil(fraction(controlLength(segment), step)));
@@ -751,7 +755,7 @@ const searchAmong = (
 
   // The ends exactly, rather than their lines, which are snapped.
   const pointAt = (vertex: number): AxisPoint => {
-    const m = vertex % width;
+    const m = remainderOf(vertex, width);
 
     const c = Math.round(fraction(vertex - m, width));
 
@@ -791,7 +795,7 @@ const searchAmong = (
       return known;
     }
 
-    const m = vertex % width;
+    const m = remainderOf(vertex, width);
 
     const c = Math.round(fraction(vertex - m, width));
 
@@ -849,7 +853,7 @@ const searchAmong = (
       return simplify(mut_vertices.toReversed());
     }
 
-    const m = vertex % width;
+    const m = remainderOf(vertex, width);
 
     const c = Math.round(fraction(vertex - m, width));
 
@@ -886,7 +890,7 @@ const searchAmong = (
 
       const across = onward % 2 === 1;
 
-      const nextM = next % width;
+      const nextM = remainderOf(next, width);
 
       const nextC = Math.round(fraction(next - nextM, width));
 

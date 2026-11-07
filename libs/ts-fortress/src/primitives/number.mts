@@ -1,4 +1,4 @@
-import { Arr, expectType, Int, isNumber, Result } from 'ts-data-forge';
+import { Arr, expectType, Int, isNumber, Num, Result } from 'ts-data-forge';
 import { panic } from 'ts-std-forge';
 import type {
   ArrayElement,
@@ -478,14 +478,14 @@ const createConstraintsPredicate =
     // `value % 0` throws a RangeError, so the zero divisor is handled
     // separately: it only admits zero.
     if (multipleOf !== undefined) {
-      if (multipleOf === 0) {
+      if (!Num.isNonZero(multipleOf)) {
         if (value !== 0) {
           return Result.err({
             constraint: 'multipleOf',
             value: multipleOf.toString(),
           } as const);
         }
-      } else if (value % multipleOf !== 0) {
+      } else if (Num.rem(value, multipleOf) !== 0) {
         return Result.err({
           constraint: 'multipleOf',
           value: multipleOf.toString(),
@@ -494,14 +494,14 @@ const createConstraintsPredicate =
     }
 
     if (step !== undefined) {
-      if (step === 0) {
+      if (!Num.isNonZero(step)) {
         if (value !== 0) {
           return Result.err({
             constraint: 'step',
             value: step.toString(),
           } as const);
         }
-      } else if (value % step !== 0) {
+      } else if (Num.rem(value, step) !== 0) {
         return Result.err({
           constraint: 'step',
           value: step.toString(),

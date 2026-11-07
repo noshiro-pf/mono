@@ -1,6 +1,12 @@
 import { Optional } from '../functional/index.mjs';
 import { range } from '../iterator/index.mjs';
-import { asSafeUint, asUint32 } from '../number/index.mjs';
+import {
+  asPositiveUint32,
+  asSafeUint,
+  asUint32,
+  type PositiveUint32,
+} from '../number/index.mjs';
+import * as Num from '../number/num/impl/index.mjs';
 import type { SizeType } from '../types.mjs';
 
 /**
@@ -221,7 +227,8 @@ class QueueClass<T> implements Queue<T> {
   #mut_size: number;
 
   /** @internal Current capacity of the buffer. */
-  #mut_capacity: number;
+  // Never `0`: the indices wrap around it.
+  #mut_capacity: PositiveUint32;
 
   /**
    * Constructs a new QueueClass instance.
@@ -229,7 +236,7 @@ class QueueClass<T> implements Queue<T> {
    * @param initialValues Optional initial values to populate the queue.
    */
   constructor(initialValues: readonly T[] = []) {
-    const initialCapacity = asUint32(
+    const initialCapacity = asPositiveUint32(
       Math.max(QueueClass.#INITIAL_CAPACITY, initialValues.length * 2),
     );
 
@@ -258,7 +265,7 @@ class QueueClass<T> implements Queue<T> {
    * Doubles the capacity and reorganizes elements to maintain queue order.
    */
   #resize(): void {
-    const newCapacity = asUint32(this.#mut_capacity * 2);
+    const newCapacity = asPositiveUint32(this.#mut_capacity * 2);
 
     const newBuffer = Array.from<unknown, T | undefined>(
       { length: newCapacity },
@@ -267,7 +274,7 @@ class QueueClass<T> implements Queue<T> {
 
     // Copy elements in order from head to tail
     for (const i of range(asSafeUint(this.#mut_size))) {
-      const sourceIndex = (this.#mut_head + i) % this.#mut_capacity;
+      const sourceIndex = Num.rem(this.#mut_head + i, this.#mut_capacity);
 
       newBuffer[i] = this.#mut_buffer[sourceIndex];
     }
@@ -315,7 +322,7 @@ class QueueClass<T> implements Queue<T> {
 
     this.#mut_buffer[this.#mut_head] = undefined; // Clear reference for garbage collection
 
-    this.#mut_head = (this.#mut_head + 1) % this.#mut_capacity;
+    this.#mut_head = Num.rem(this.#mut_head + 1, this.#mut_capacity);
 
     this.#mut_size -= 1;
 
@@ -347,7 +354,7 @@ class QueueClass<T> implements Queue<T> {
 
     this.#mut_buffer[this.#mut_tail] = value;
 
-    this.#mut_tail = (this.#mut_tail + 1) % this.#mut_capacity;
+    this.#mut_tail = Num.rem(this.#mut_tail + 1, this.#mut_capacity);
 
     this.#mut_size += 1;
   }
