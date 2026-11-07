@@ -860,8 +860,10 @@ describe(readHeadChecks, () => {
   test('sends one request for a head whose checks fit on a page', async () => {
     const sent = stubRollupPages([
       [
-        checkRun('a', 'COMPLETED', 'SUCCESS'),
-        checkRun('b', 'IN_PROGRESS', null),
+        [
+          checkRun('a', 'COMPLETED', 'SUCCESS'),
+          checkRun('b', 'IN_PROGRESS', null),
+        ],
       ],
     ]);
 
@@ -884,21 +886,67 @@ describe(readHeadChecks, () => {
     }
   });
 
-  test('reads each page once and takes both lists from all of them', async () => {
+  test('reads a head of several pages twice, and takes both lists from the later read', async () => {
     const sent = stubRollupPages([
-      [checkRun('a', 'COMPLETED', 'SUCCESS')],
-      [checkRun('b', 'IN_PROGRESS', null)],
+      [
+        [checkRun('a', 'COMPLETED', 'SUCCESS')],
+        [checkRun('b', 'IN_PROGRESS', null)],
+      ],
+      [
+        [checkRun('a', 'COMPLETED', 'SUCCESS')],
+        [checkRun('b', 'COMPLETED', 'SUCCESS')],
+      ],
     ]);
 
     try {
       const checks = Result.unwrapThrow(await readHeadChecks(api, 1));
 
-      assert.deepStrictEqual(sent, [undefined, 'cursor-1']);
+      assert.deepStrictEqual(sent, [
+        undefined,
+        'cursor-1',
+        undefined,
+        'cursor-1',
+      ]);
 
       assert.deepStrictEqual(
         checks.required.map(({ name }) => name),
         ['a', 'b'],
       );
+
+      // The later read's state, its list being the same.
+      assert.deepStrictEqual(checks.running, []);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  test('reads again when the list moved under the cursor, until it holds still', async () => {
+    const sent = stubRollupPages([
+      // `b` skipped at the boundary.
+      [
+        [checkRun('a', 'COMPLETED', 'SUCCESS')],
+        [checkRun('c', 'COMPLETED', 'SUCCESS')],
+      ],
+      [
+        [
+          checkRun('a', 'COMPLETED', 'SUCCESS'),
+          checkRun('b', 'IN_PROGRESS', null),
+        ],
+        [checkRun('c', 'COMPLETED', 'SUCCESS')],
+      ],
+      [
+        [
+          checkRun('a', 'COMPLETED', 'SUCCESS'),
+          checkRun('b', 'IN_PROGRESS', null),
+        ],
+        [checkRun('c', 'COMPLETED', 'SUCCESS')],
+      ],
+    ]);
+
+    try {
+      const checks = Result.unwrapThrow(await readHeadChecks(api, 1));
+
+      assert.lengthOf(sent, 6);
 
       assert.deepStrictEqual(
         checks.running.map(({ name }) => name),
@@ -908,16 +956,72 @@ describe(readHeadChecks, () => {
       vi.unstubAllGlobals();
     }
   });
+
+  test('takes a context read twice at the boundary for a list that moved', async () => {
+    const sent = stubRollupPages([
+      [
+        [checkRun('a', 'COMPLETED', 'SUCCESS')],
+        [
+          checkRun('a', 'COMPLETED', 'SUCCESS'),
+          checkRun('b', 'COMPLETED', 'SUCCESS'),
+        ],
+      ],
+      [
+        [checkRun('a', 'COMPLETED', 'SUCCESS')],
+        [checkRun('b', 'COMPLETED', 'SUCCESS')],
+      ],
+      [
+        [checkRun('a', 'COMPLETED', 'SUCCESS')],
+        [checkRun('b', 'COMPLETED', 'SUCCESS')],
+      ],
+    ]);
+
+    try {
+      assert.isTrue(Result.isOk(await readHeadChecks(api, 1)));
+
+      assert.lengthOf(sent, 6);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  test('fails on a list that never holds still, after a bounded number of reads', async () => {
+    const sent = stubRollupPages(
+      [1, 2, 3, 4, 5, 6, 7, 8].map((id) => [
+        [checkRun('a', 'COMPLETED', 'SUCCESS')],
+        [checkRun(`b${id}`, 'IN_PROGRESS', null)],
+      ]),
+    );
+
+    try {
+      const read = await readHeadChecks(api, 1);
+
+      assert.isTrue(Result.isErr(read));
+
+      assert.include(read.value, 'kept changing');
+
+      assert.lengthOf(sent, 8);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });
 
 /**
- * Stubs `fetch` to answer the rollup query with `pages` in turn, each but the
- * last pointing at the next by the cursor `cursor-<n>`, and returns the `after`
- * each request asked from, as it is sent.
+ * Stubs `fetch` to answer the rollup query with `reads` in turn, each a read of
+ * its pages, each page but a read's last pointing at the next by the cursor
+ * `cursor-<n>`, and returns the `after` each request asked from, as it is sent.
  */
 const stubRollupPages = (
-  pages: readonly (readonly CheckContextNode[])[],
+  reads: readonly (readonly (readonly CheckContextNode[])[])[],
 ): readonly (string | undefined)[] => {
+  const pages = reads.flatMap((read) =>
+    read.map((nodes, at) => ({
+      nodes,
+      next: at + 1 < read.length ? `cursor-${at + 1}` : null,
+    })),
+  );
+
   const mut_sent: (string | undefined)[] = [];
 
   vi.stubGlobal(
@@ -937,7 +1041,9 @@ const stubRollupPages = (
 
       mut_sent.push(variables.after);
 
-      const hasNextPage = index + 1 < pages.length;
+      const page = pages[index];
+
+      const endCursor = page?.next ?? null;
 
       return Promise.resolve(
         new Response(
@@ -952,12 +1058,10 @@ const stubRollupPages = (
                           statusCheckRollup: {
                             contexts: {
                               pageInfo: {
-                                hasNextPage,
-                                endCursor: hasNextPage
-                                  ? `cursor-${index + 1}`
-                                  : null,
+                                hasNextPage: endCursor !== null,
+                                endCursor,
                               },
-                              nodes: pages[index] ?? [],
+                              nodes: page?.nodes ?? [],
                             },
                           },
                         },

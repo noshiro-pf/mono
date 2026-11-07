@@ -63,10 +63,11 @@ export type RunningCheck = Readonly<{
 }>;
 
 /**
- * The head commit's checks, read once: the ones that gate the merge, and every
- * one that has not finished. Both lists come from the one answer, so they cost
- * the requests of one read, and on a head whose checks fit on one page they
- * speak of the same moment.
+ * The head commit's checks: the ones that gate the merge, and every one that has
+ * not finished. Both lists come from one answer, so that on a head whose checks
+ * fit on one page they cost one request and speak of the same moment. A head with
+ * more is read until two reads list the same checks (`readCheckContexts`), or
+ * fails.
  */
 export const readHeadChecks = async (
   api: ApiContext,
@@ -306,14 +307,31 @@ const readRollupPage = async (
         ?.contexts ?? null,
   );
 
+/** Which contexts a read lists, however it ordered them, twice over if twice. */
+const listedIn = (contexts: readonly CheckContextNode[]): string =>
+  contexts
+    .map((context) =>
+      context.__typename === 'StatusContext'
+        ? `status:${context.context}`
+        : `run:${context.databaseId ?? context.name}`,
+    )
+    .toSorted()
+    .join('\n');
+
 /**
- * Every context of the pull request's head commit, page by page. A head with
- * none reported yet — right after a push — is an empty list.
+ * One read of the head commit's contexts, page by page, and whether it took more
+ * than one page. A head with none reported yet — right after a push — is an empty
+ * list.
  */
-const readCheckContexts = async (
+const readRollupPages = async (
   api: ApiContext,
   prNumber: number,
-): Promise<Result<readonly CheckContextNode[], string>> => {
+): Promise<
+  Result<
+    Readonly<{ contexts: readonly CheckContextNode[]; paged: boolean }>,
+    string
+  >
+> => {
   const mut_contexts: CheckContextNode[] = [];
 
   let mut_after: string | undefined = undefined;
@@ -326,7 +344,10 @@ const readCheckContexts = async (
     }
 
     if (rollup.value === null) {
-      return Result.ok(mut_contexts);
+      return Result.ok({
+        contexts: mut_contexts,
+        paged: mut_after !== undefined,
+      });
     }
 
     mut_contexts.push(...rollup.value.nodes);
@@ -334,7 +355,10 @@ const readCheckContexts = async (
     const { hasNextPage, endCursor } = rollup.value.pageInfo;
 
     if (!hasNextPage || endCursor === null) {
-      return Result.ok(mut_contexts);
+      return Result.ok({
+        contexts: mut_contexts,
+        paged: mut_after !== undefined,
+      });
     }
 
     mut_after = endCursor;
@@ -342,6 +366,52 @@ const readCheckContexts = async (
 
   return Result.err(
     `#${prNumber} has more than ${MAX_PAGES * PAGE_SIZE} checks on its head`,
+  );
+};
+
+/**
+ * Every context of the pull request's head commit.
+ *
+ * One page is one answer from one moment. Pages are read at several, and a run
+ * added or finishing between them can move the list under the cursor, so that a
+ * context is skipped at the boundary or read twice; a pending one skipped makes
+ * the round look over. So a head with several pages is read again, until two
+ * reads in a row list the same contexts, and the later read is the answer.
+ * Their states may differ: a job finishing takes nothing out of the list, and
+ * what matters is that nothing was missed. A list that does not settle is a
+ * failed read, as one that cannot be read is, rather than a part taken for the
+ * whole.
+ */
+const readCheckContexts = async (
+  api: ApiContext,
+  prNumber: number,
+): Promise<Result<readonly CheckContextNode[], string>> => {
+  const first = await readRollupPages(api, prNumber);
+
+  if (Result.isErr(first) || !first.value.paged) {
+    return Result.map(first, ({ contexts }) => contexts);
+  }
+
+  let mut_previous = listedIn(first.value.contexts);
+
+  for (const _read of Arr.seq(MAX_REREADS)) {
+    const again = await readRollupPages(api, prNumber);
+
+    if (Result.isErr(again)) {
+      return again;
+    }
+
+    const listed = listedIn(again.value.contexts);
+
+    if (listed === mut_previous) {
+      return Result.ok(again.value.contexts);
+    }
+
+    mut_previous = listed;
+  }
+
+  return Result.err(
+    `#${prNumber}: the checks on its head kept changing across ${MAX_REREADS + 1} reads of several pages`,
   );
 };
 
@@ -353,6 +423,9 @@ type RollupPage = Readonly<{
 const PAGE_SIZE = 100;
 
 const MAX_PAGES = 10;
+
+/** How many times a head of several pages is read after the first. */
+const MAX_REREADS = 3;
 
 const CHECKS_QUERY = [
   'query($owner: String!, $name: String!, $number: Int!, $after: String) {',
