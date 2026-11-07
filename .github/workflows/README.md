@@ -111,6 +111,10 @@ on:
   named `queue/*`, because a dispatch's concurrency group is its ref — a second
   dispatch on one branch cancels the first — and because only there is such a
   run's verdict reusable: elsewhere nothing says the parent was ever checked.
+  The gate reads `github.ref`, so a tag of that name does not count, and the
+  prefix is reserved for the queue by
+  `repo-settings/rulesets/queue-branches.json` (and kept free of tags by
+  `queue-tags.json`).
   Unset, as from the Actions tab, the run diffs as it always has — on `main` it
   runs everything, elsewhere against `origin/main`.
 - **No `paths` filter.** A workflow a path filter skips reports no status at

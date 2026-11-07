@@ -18,6 +18,11 @@
 `backup` が消すのは各ディレクトリ直下の `*.json` だけなので、この README は
 残る（ CLI の `clear-json-files.mts` ）。
 
+新しい ruleset の宣言は `"id": 0` で書き、**マージする前に**、 `main` に
+追いついたその pull request のブランチから `pnpm run repo-settings:apply rulesets`
+を実行して、 GitHub が付けた id を同じ pull request に入れる。 `apply` は既存の id に無いものを作成してファイルを書き戻すので、
+`id: 0` のまま `main` に入ると、次の `apply` がもう一度作ろうとする。
+
 ## environments
 
 **environment は、それを名指すワークフローをマージする前に宣言して `apply`
@@ -64,3 +69,34 @@
 
 `archive/**` の削除を禁じる。 bypass_actors は空なので、admin も
 `GITHUB_TOKEN` も消せない。
+
+## rulesets/queue-branches.json
+
+`refs/heads/queue/**/*` の作成・更新・削除を、 admin ロール（ actor_id 5 ）以外に
+禁じる。
+`unblock-prs` は先回りの検査層を `queue/pr-<番号>` に積み、 `check-gates.yml`
+は `diff-parent` の判定を `queue/*` ブランチの上でだけ使い回す。その判定を
+信用してよいのは、この接頭辞を書けるのが queue だけだからで、接頭辞を変える
+ときは `queue-tags.json`、 `check-gates.yml`、 `speculate-plan.mts` の
+`LAYER_BRANCH_PREFIX` も揃えて変える。
+
+- **bypass を admin ロールにしているのは、 worker が作者のチェックアウトから
+  作者の git 認証で `git push` するから。** API 呼び出しに使うトークン
+  （ `GH_TOKEN` → `GITHUB_TOKEN` → `gh auth token` ）ではない。個人リポジトリの
+  ruleset はユーザー個人を bypass に挙げられないので、 admin として push する
+  ものはすべて通る。止まるのはワークフローの `GITHUB_TOKEN`、 bot の App token、
+  admin でない共同作業者。 queue を専用の GitHub App で動かすようになったら、
+  bypass をその `Integration` に替える。
+- **admin でない git 認証で worker を動かすと、層の push も削除も拒否される。**
+  worker はそれをログに一行出すだけで（ push は「この巡回では積まなかった」、
+  削除は `Cannot delete` ）、一件ずつの検査に戻る。先回りの検査が始まらない
+  とき、古い `queue/pr-*` が残り続けるときは、まず push の認証を疑う。
+- **`bypass_mode` は `always`。** `pull_request` にすると、 queue の
+  force-push そのものが拒否される。
+
+## rulesets/queue-tags.json
+
+`refs/tags/queue/**/*` のタグを、誰にも作らせない（ bypass_actors は空）。
+worker は層の検査を `queue/pr-<番号>` という短い名前で dispatch するので、
+同じ名前のタグがあると、ブランチではなくそちらが選ばれうる。止めるのは作成
+だけで、適用前からあったタグは消せる。

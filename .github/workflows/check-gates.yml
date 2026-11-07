@@ -99,8 +99,12 @@ jobs:
       # README.md.
       # A run that diffed a commit against its parent (`diff-parent`) is reusable
       # only as a queue layer, on a `queue/*` branch: elsewhere nothing says the
-      # parent was ever checked. README.md, "Reusing a verdict".
-      - name: "Verdict reusable by tree: ${{ (github.event_name != 'pull_request' && (github.event.inputs.diff-parent != 'true' || startsWith(github.ref_name, 'queue/'))) || github.event.pull_request.base.ref == case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main') }}"
+      # parent was ever checked. README.md, "Triggers" and "Reusing a verdict".
+      # The prefix is trusted because `repo-settings/rulesets/queue-branches.json`
+      # lets only the queue write it; a prefix change also changes that file,
+      # `queue-tags.json` and `LAYER_BRANCH_PREFIX` in `libs/pr-merge-queue`. `github.ref`, not
+      # `ref_name`, so that a tag named `queue/...` is not taken for a branch.
+      - name: "Verdict reusable by tree: ${{ (github.event_name != 'pull_request' && (github.event.inputs.diff-parent != 'true' || startsWith(github.ref, 'refs/heads/queue/'))) || github.event.pull_request.base.ref == case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main') }}"
         run: echo 'Recorded in the step name above, for the reuse lookup of later runs.'
 
       - name: Check whether the branch is behind the base branch
