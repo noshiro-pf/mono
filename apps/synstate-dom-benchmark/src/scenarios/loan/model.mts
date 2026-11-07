@@ -53,13 +53,12 @@ export const monthlyRateOf = (annualRate: number): number => annualRate / 1200;
 
 /** The fixed monthly payment that repays `principal` in {@link months}. */
 export const paymentOf = (principal: number, monthlyRate: number): number => {
-  const denominator = 1 - (1 + monthlyRate) ** -months;
+  // What one yen a month for `months` months is worth; at a rate of 0 it is
+  // `months`, so the principal is simply split evenly. It is 0 only at a rate
+  // of -100% a month or below, which no input here reaches.
+  const factor = annuityFactorOf(monthlyRate);
 
-  // The denominator is 0 only when the rate is: then the principal is simply
-  // split evenly.
-  return Num.isNonZero(denominator)
-    ? Num.div(principal * monthlyRate, denominator)
-    : principal / months;
+  return Num.isNonZero(factor) ? Num.div(principal, factor) : 0;
 };
 
 export const interestOf = (balance: number, monthlyRate: number): number =>
@@ -166,3 +165,14 @@ export const computeLoan = (inputs: LoanInputs): Cells => {
 /** The months of a year (from 0), as indices into the monthly figures. */
 export const monthsOfYear = (year: number): readonly number[] =>
   Array.from({ length: 12 }, (_, i) => year * 12 + i);
+
+/**
+ * `(1 - (1 + rate) ** -months) / rate`, through `log1p` and `expm1`: written as
+ * it reads it cancels at tiny rates, and is 0 once `1 + rate` rounds to 1
+ * (#3077). The same as `annuityFactor` in `ts-utils-additional`, kept here so
+ * that the scenario bundles hold only the libraries they compare.
+ */
+const annuityFactorOf = (rate: number): number =>
+  Num.isNonZero(rate)
+    ? Num.div(-Math.expm1(-months * Math.log1p(rate)), rate)
+    : months;

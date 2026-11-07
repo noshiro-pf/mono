@@ -78,4 +78,16 @@ describe(toMonthlyRate, () => {
   test('12 か月で年率になること', () => {
     assert.closeTo((1 + toMonthlyRate(0.04)) ** 12, 1.04, 1e-12);
   });
+
+  // `1 + rate` を経由すると、1e-16 前後の利回りは丸めで 0 や 2 割以上ずれた値になる。
+  test.each([1e-17, 1.7e-16, 4e-16])(
+    'ごく小さい年率 %s でも 12 で割った値になること',
+    (rate) => {
+      assert.closeTo(toMonthlyRate(rate) * 12, rate, rate * 1e-9);
+    },
+  );
+
+  test('年率 0 なら 0 であること', () => {
+    assert.strictEqual(toMonthlyRate(0), 0);
+  });
 });
