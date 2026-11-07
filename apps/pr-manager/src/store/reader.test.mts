@@ -7,13 +7,19 @@ import type {
   KnownParts,
   LoadedReport,
   Merged,
+  ReadGroup,
 } from '../load-report.mjs';
 import { LOADING, READY, type LoadStatus } from '../load-state.mjs';
 import type { RateLimit } from '../rate-limit.mjs';
 import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from '../report-query.mjs';
 import type { StoredToken } from '../token.mjs';
 import type { WorkflowRunList } from '../workflow-runs.mjs';
-import { createReader, type Reader } from './reader.mjs';
+import {
+  createReader,
+  type GroupRead,
+  type PaneRead,
+  type Reader,
+} from './reader.mjs';
 
 describe(createReader, () => {
   test('reads nothing without a token', () => {
@@ -93,6 +99,8 @@ describe(createReader, () => {
 
     timers.fire(POLL_INTERVAL_MS);
 
+    await answer(loads, 1, Result.ok(readAt(2_000)), LIMIT);
+
     reader.refresh();
 
     assert.deepStrictEqual(
@@ -118,7 +126,13 @@ describe(createReader, () => {
       refreshing: false,
     });
 
-    assert.deepStrictEqual(reader.reading.getSnapshot().value, ['merged']);
+    // Nothing it asked for is coming any more.
+    assert.deepStrictEqual(reader.reading.getSnapshot().value, []);
+
+    assert.deepStrictEqual(reader.failed.getSnapshot().value.merged, {
+      message: 'refused',
+      kept: false,
+    });
   });
 
   test('drops the parts of a read for a token since forgotten', () => {
@@ -147,18 +161,47 @@ describe(createReader, () => {
     assert.deepStrictEqual(reader.rateLimit.getSnapshot().value, LIMIT);
   });
 
-  test('polls while the tab is visible', () => {
+  test('polls while the tab is visible', async () => {
     const { reader, loads, timers } = setup(TOKEN_A);
 
     reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
 
     timers.fire(POLL_INTERVAL_MS);
 
     assert.strictEqual(loads.length, 2);
 
+    await answer(loads, 1, Result.ok(readAt(2_000)), LIMIT);
+
     timers.fire(POLL_INTERVAL_MS);
 
     assert.strictEqual(loads.length, 3);
+  });
+
+  // A poll that went out while the read before it was still out would pay for
+  // the same answer twice.
+  test('a read asks for nothing a read still out is reading', async () => {
+    const { reader, loads, runsLoads, timers } = setup(TOKEN_A);
+
+    reader.start();
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    reader.refresh();
+
+    assert.strictEqual(loads.length, 1);
+
+    assert.strictEqual(runsLoads.length, 1);
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
+    // The runs are still out; the report is read again without them.
+    timers.fire(POLL_INTERVAL_MS);
+
+    assert.deepStrictEqual(loads[1]?.groups, ['pulls', 'merged', 'issues']);
+
+    assert.strictEqual(runsLoads.length, 1);
   });
 
   test('reads less often when a read costs more than a quarter of the budget allows', async () => {
@@ -203,10 +246,12 @@ describe(createReader, () => {
     assert.strictEqual(loads.length, 1);
   });
 
-  test('reads, and moves the clock, when a hidden tab comes back', () => {
+  test('reads, and moves the clock, when a hidden tab comes back', async () => {
     const { reader, loads, clock, visibility } = setup(TOKEN_A);
 
     reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(0)), LIMIT);
 
     visibility.hide();
 
@@ -224,10 +269,12 @@ describe(createReader, () => {
   // Each read costs the whole report's points, and a reader going back and forth
   // between this tab and GitHub showed it dozens of times an hour, every one a
   // read the poll interval never counted.
-  test('a tab shown again within an interval of the last read waits out the rest of it', () => {
+  test('a tab shown again within an interval of the last read waits out the rest of it', async () => {
     const { reader, loads, clock, timers, visibility } = setup(TOKEN_A);
 
     reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(0)), LIMIT);
 
     visibility.hide();
 
@@ -253,6 +300,8 @@ describe(createReader, () => {
     assert.strictEqual(timers.running(10_000), 0);
 
     assert.strictEqual(timers.running(POLL_INTERVAL_MS), 1);
+
+    await answer(loads, 1, Result.ok(readAt(15_000)), LIMIT);
 
     timers.fire(POLL_INTERVAL_MS);
 
@@ -308,12 +357,14 @@ describe(createReader, () => {
     assert.strictEqual(timers.running(10_000), 1);
   });
 
-  test('a tab shown again waits at most an interval, for a clock put back', () => {
+  test('a tab shown again waits at most an interval, for a clock put back', async () => {
     const { reader, loads, clock, timers, visibility } = setup(TOKEN_A);
 
     clock.set(10_000);
 
     reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(0)), LIMIT);
 
     visibility.hide();
 
@@ -353,10 +404,12 @@ describe(createReader, () => {
   // The failure this is here to prevent: a tab that came back was read at once
   // and then again at whatever point the old period had reached, which could be
   // a second later.
-  test('a tab that comes back polls from the read it came back to', () => {
+  test('a tab that comes back polls from the read it came back to', async () => {
     const { reader, loads, clock, timers, visibility } = setup(TOKEN_A);
 
     reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(0)), LIMIT);
 
     visibility.hide();
 
@@ -370,17 +423,21 @@ describe(createReader, () => {
 
     assert.strictEqual(loads.length, 2);
 
+    await answer(loads, 1, Result.ok(readAt(POLL_INTERVAL_MS)), LIMIT);
+
     timers.fire(POLL_INTERVAL_MS);
 
     assert.strictEqual(loads.length, 3);
   });
 
-  test('a tab opened hidden reads once, and polls only once it is shown', () => {
+  test('a tab opened hidden reads once, and polls only once it is shown', async () => {
     const { reader, loads, clock, timers, visibility } = setup(TOKEN_A);
 
     visibility.set(false);
 
     reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(0)), LIMIT);
 
     assert.strictEqual(loads.length, 1);
 
@@ -576,12 +633,12 @@ describe(createReader, () => {
 
     reader.start();
 
-    assert.isUndefined(loads[0]?.previous);
+    assert.deepStrictEqual(loads[0]?.previous, {});
 
-    const parts: KnownParts = { merged: [MERGED] } as const;
+    const parts: KnownParts = { pulls: PULLS, merged: [MERGED] } as const;
 
     const failed = {
-      issues: { message: 'timed out', kept: false },
+      checks: { message: 'timed out', kept: false },
     } as const;
 
     await answer(
@@ -600,11 +657,17 @@ describe(createReader, () => {
 
     reader.refresh();
 
-    assert.strictEqual(loads[1]?.previous, parts);
+    assert.deepStrictEqual(loads[1]?.previous, parts);
+
+    assert.deepStrictEqual(loads[1]?.held(), {
+      known: parts,
+      failed,
+      reading: new Set<ReadGroup>(['pulls', 'merged', 'issues']),
+    });
 
     setToken(TOKEN_B);
 
-    assert.isUndefined(loads[2]?.previous);
+    assert.deepStrictEqual(loads[2]?.previous, {});
   });
 
   test('refresh marks the report as refreshing and reads at once', async () => {
@@ -628,6 +691,122 @@ describe(createReader, () => {
     await answer(loads, 1, Result.ok(readAt(2_000)), LIMIT);
 
     assert.deepStrictEqual(shown(reader), { status: READY, readAt: 2_000 });
+  });
+
+  test('reads one pane on its own, once the page shows a report', async () => {
+    const { reader, loads, sectionLoads, runsLoads, clock, timers } =
+      setup(TOKEN_A);
+
+    clock.set(1_000);
+
+    reader.start();
+
+    reader.refreshPane('merged');
+
+    assert.deepStrictEqual(sectionLoads, []);
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
+    await answerRuns(runsLoads, 0, Result.ok(RUNS));
+
+    clock.set(5_000);
+
+    reader.refreshPane('merged');
+
+    // Shut while it is out.
+    reader.refreshPane('merged');
+
+    assert.deepStrictEqual(
+      reader.paneReading.getSnapshot().value,
+      new Set<PaneRead>(['merged']),
+    );
+
+    assert.deepStrictEqual(
+      sectionLoads.map(({ groups }) => groups),
+      [['merged']],
+    );
+
+    // A poll meanwhile leaves it to the read out.
+    timers.fire(POLL_INTERVAL_MS);
+
+    assert.deepStrictEqual(loads[1]?.groups, ['pulls', 'issues']);
+
+    await answer(loads, 1, Result.ok(readAt(5_000)), LIMIT);
+
+    clock.set(6_000);
+
+    await answer(
+      sectionLoads,
+      0,
+      Result.ok({ ...readAt(6_000), merged: [MERGED] }),
+      undefined,
+    );
+
+    assert.deepStrictEqual(reader.merged.getSnapshot().value, [MERGED]);
+
+    // The page is said to be read when its pull requests were.
+    assert.strictEqual(reader.readAt.getSnapshot().value, 5_000);
+
+    reader.refreshPane('pulls');
+
+    assert.deepStrictEqual(loads[2]?.groups, ['pulls']);
+
+    // The poll's read of the runs is still out.
+    reader.refreshPane('runs');
+
+    assert.strictEqual(runsLoads.length, 2);
+
+    await answerRuns(runsLoads, 1, Result.ok(RUNS));
+
+    reader.refreshPane('runs');
+
+    assert.strictEqual(runsLoads.length, 3);
+  });
+
+  test('a Refresh beside a pane read out settles when the rest answers', async () => {
+    const { reader, loads, sectionLoads, clock } = setup(TOKEN_A);
+
+    reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
+    reader.refreshPane('merged');
+
+    clock.set(2_000);
+
+    reader.refresh();
+
+    assert.deepStrictEqual(loads[1]?.groups, ['pulls', 'issues']);
+
+    await answer(loads, 1, Result.ok(readAt(2_000)), LIMIT);
+
+    assert.deepStrictEqual(shown(reader), { status: READY, readAt: 2_000 });
+
+    // A pane's read that could not be made at all is said as a poll's is, until
+    // the next read of the page.
+    await answer(sectionLoads, 0, Result.err('timed out'), undefined);
+
+    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+      type: 'ready',
+      pollError: 'timed out',
+      refreshing: false,
+    });
+  });
+
+  test('drops a read for a token pasted again, which a newer read answers', async () => {
+    const { reader, loads, setToken } = setup(TOKEN_A);
+
+    reader.start();
+
+    setToken(undefined);
+
+    setToken(TOKEN_A);
+
+    await answer(loads, 1, Result.ok(readAt(2_000)), LIMIT);
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
+    assert.strictEqual(reader.readAt.getSnapshot().value, 2_000);
   });
 
   test('reads again when the token changes, and not when only where it is kept does', () => {
@@ -701,6 +880,8 @@ describe(createReader, () => {
       error: undefined,
     });
 
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
     timers.fire(POLL_INTERVAL_MS);
 
     assert.strictEqual(loads.length, 2);
@@ -713,6 +894,8 @@ describe(createReader, () => {
 
     reader.start();
 
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
     await answerRuns(runsLoads, 0, Result.err('refused'));
 
     assert.deepStrictEqual(reader.runs.getSnapshot().value, {
@@ -720,19 +903,21 @@ describe(createReader, () => {
       message: 'refused',
     });
 
-    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
-
     assert.deepStrictEqual(shown(reader), { status: READY, readAt: 1_000 });
 
     clock.set(2_000);
 
     timers.fire(POLL_INTERVAL_MS);
 
+    await answer(loads, 1, Result.ok(readAt(1_000)), LIMIT);
+
     await answerRuns(runsLoads, 1, Result.ok(RUNS));
 
     clock.set(3_000);
 
     timers.fire(POLL_INTERVAL_MS);
+
+    await answer(loads, 2, Result.ok(readAt(1_000)), LIMIT);
 
     await answerRuns(runsLoads, 2, Result.err('spent'));
 
@@ -745,8 +930,30 @@ describe(createReader, () => {
     assert.deepStrictEqual(shown(reader), { status: READY, readAt: 1_000 });
   });
 
+  test('a read of the runs out is not asked for again', async () => {
+    const { reader, loads, runsLoads, timers } = setup(TOKEN_A);
+
+    reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
+    reader.refreshPane('runs');
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    await answer(loads, 1, Result.ok(readAt(2_000)), LIMIT);
+
+    assert.strictEqual(runsLoads.length, 1);
+
+    await answerRuns(runsLoads, 0, Result.ok(NO_RUNS));
+
+    reader.refreshPane('runs');
+
+    assert.strictEqual(runsLoads.length, 2);
+  });
+
   test('an older read of the runs never replaces a newer one', async () => {
-    const { reader, runsLoads, timers, clock } = setup(TOKEN_A);
+    const { reader, runsLoads, setToken, clock } = setup(TOKEN_A);
 
     clock.set(1_000);
 
@@ -754,7 +961,11 @@ describe(createReader, () => {
 
     clock.set(2_000);
 
-    timers.fire(POLL_INTERVAL_MS);
+    // The same token pasted again, which reads the runs again while the first
+    // read of them is out.
+    setToken(undefined);
+
+    setToken(TOKEN_A);
 
     await answerRuns(runsLoads, 1, Result.ok(NO_RUNS));
 
@@ -768,9 +979,11 @@ describe(createReader, () => {
   });
 
   test('forgetting the token puts the runs back to reading, and drops a read still out', async () => {
-    const { reader, runsLoads, setToken } = setup(TOKEN_A);
+    const { reader, loads, runsLoads, setToken } = setup(TOKEN_A);
 
     reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
 
     await answerRuns(runsLoads, 0, Result.ok(RUNS));
 
@@ -782,6 +995,8 @@ describe(createReader, () => {
 
     setToken(TOKEN_B);
 
+    await answer(loads, 1, Result.ok(readAt(1_000)), LIMIT);
+
     setToken(undefined);
 
     await answerRuns(runsLoads, 1, Result.ok(RUNS));
@@ -792,9 +1007,11 @@ describe(createReader, () => {
   });
 
   test('a read of the runs that throws is a failure, not an unhandled rejection', async () => {
-    const { reader, runsLoads } = setup(TOKEN_A);
+    const { reader, loads, runsLoads } = setup(TOKEN_A);
 
     reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
 
     runsLoads[0]?.reject(new Error('boom'));
 
@@ -894,7 +1111,7 @@ describe(createReader, () => {
       timers.fire(POLL_INTERVAL_MS);
 
       assert.deepStrictEqual(
-        loads[1]?.previous?.issues?.items.map(({ number }) => number),
+        loads[1]?.previous.issues?.items.map(({ number }) => number),
         [1, 2],
       );
     });
@@ -1087,15 +1304,11 @@ const LIMIT: RateLimit = {
   resetEpochMs: 0,
 } as const;
 
-type PendingLoad = Readonly<{
-  token: string;
-  nowMs: number;
-  issueCount: number;
-  previous: KnownParts | undefined;
-  onProgress: ((report: LoadedReport) => void) | undefined;
-  resolve: (answered: Answered<LoadedReport>) => void;
-  reject: (error: unknown) => void;
-}>;
+type PendingLoad = GroupRead &
+  Readonly<{
+    resolve: (answered: Answered<LoadedReport>) => void;
+    reject: (error: unknown) => void;
+  }>;
 
 type PendingRunsLoad = Readonly<{
   token: string;
@@ -1112,7 +1325,10 @@ type PendingIssueLoad = Readonly<{
 
 type Setup = Readonly<{
   reader: Reader;
+  /** The reads of the pull requests, each of them alone. */
   loads: readonly PendingLoad[];
+  /** The reads of the merged pull requests and of the open issues. */
+  sectionLoads: readonly PendingLoad[];
   runsLoads: readonly PendingRunsLoad[];
   issueLoads: readonly PendingIssueLoad[];
   clock: Readonly<{ set: (nowMs: number) => void }>;
@@ -1145,6 +1361,8 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
   const [token, setToken] = createState<StoredToken | undefined>(initialToken);
 
   const mut_loads: PendingLoad[] = [];
+
+  const mut_sectionLoads: PendingLoad[] = [];
 
   const mut_runsLoads: PendingRunsLoad[] = [];
 
@@ -1182,17 +1400,13 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
 
   const reader = createReader({
     token,
-    load: (tokenValue, nowMs, issueCount, previous, onProgress) =>
+    load: (request) =>
       new Promise((resolve, reject) => {
-        mut_loads.push({
-          token: tokenValue,
-          nowMs,
-          issueCount,
-          previous,
-          onProgress,
-          resolve,
-          reject,
-        });
+        if (request.groups.includes('pulls')) {
+          mut_loads.push({ ...request, resolve, reject });
+        } else {
+          mut_sectionLoads.push({ ...request, resolve, reject });
+        }
       }),
     loadRuns: (tokenValue) =>
       new Promise((resolve, reject) => {
@@ -1217,6 +1431,7 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
   return {
     reader,
     loads: mut_loads,
+    sectionLoads: mut_sectionLoads,
     runsLoads: mut_runsLoads,
     issueLoads: mut_issueLoads,
     clock: {
@@ -1332,6 +1547,14 @@ const RUNS: WorkflowRunList = {
 } as const;
 
 const NO_RUNS: WorkflowRunList = { runs: [], totalCount: 0 } as const;
+
+const PULLS: NonNullable<KnownParts['pulls']> = {
+  defaultBranch: 'main',
+  queue: true,
+  codeOwners: [],
+  codeOwnersEnforcedBy: undefined,
+  pulls: [],
+} as const;
 
 const MERGED: Merged = {
   number: 7,

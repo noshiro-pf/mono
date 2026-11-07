@@ -36,6 +36,7 @@ export * from './merge-order-filters.js';
 export * from './merge-order.js';
 export * from './merged-section.js';
 export * from './notice.js';
+export * from './pane-refresh.js';
 export * from './part-failure-notes.js';
 export * from './pull-request-card.js';
 export * from './queue-map.js';

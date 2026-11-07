@@ -24,6 +24,7 @@ import {
 import type { QueueSlot, QueueView } from '../queue-view.mjs';
 import { reader, reportSource } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
+import { PaneRefresh } from './pane-refresh.js';
 import { PartFailureNotes } from './part-failure-notes.js';
 import { QueueMap } from './queue-map.js';
 import { QueueOutsideBox } from './queue-outside-box.js';
@@ -87,6 +88,7 @@ export const QueueSection = (): JSX.Element => {
           )}
           value={queue}
         />
+        <PaneRefresh pane={'pulls'} what={'the open pull requests'} />
       </h2>
 
       <PartFailureNotes parts={OPEN_PARTS} />
@@ -126,12 +128,13 @@ const queuedOf = (entries: readonly Entry[]): readonly Entry[] =>
 const QueueUnordered = (): JSX.Element => {
   const queued = reader.entries.pipe(map(queuedOf));
 
-  // Whether the parts the order needs may still come: a read is out, and none
-  // of them has failed with nothing kept.
+  // Whether the parts the order needs may still come: a read of the pull
+  // requests is out, and none of them has failed with nothing kept.
   const coming = deriveBindable(
-    [reader.fetching, reader.failed],
-    (isFetching, failed) =>
-      isFetching && OPEN_PARTS.every((part) => !isUnread(failed, part)),
+    [reader.paneReading, reader.failed],
+    (reading, failed) =>
+      reading.has('pulls') &&
+      OPEN_PARTS.every((part) => !isUnread(failed, part)),
   );
 
   return (

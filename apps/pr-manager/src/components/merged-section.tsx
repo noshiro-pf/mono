@@ -10,6 +10,7 @@ import { Age } from './age.js';
 import { ExternalLink } from './external-link.js';
 import { LabelChip } from './label-chip.js';
 import { LinkedIssues } from './linked-issues.js';
+import { PaneRefresh } from './pane-refresh.js';
 import { PartFailureNotes } from './part-failure-notes.js';
 
 /**
@@ -32,6 +33,7 @@ export const MergedSection = (): JSX.Element => (
       >
         {constant('on GitHub')}
       </ExternalLink>
+      <PaneRefresh pane={'merged'} what={'what merged'} />
     </h2>
 
     <PartFailureNotes parts={PARTS} />
