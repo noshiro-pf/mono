@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import { panic } from 'ts-std-forge';
 import { toNode } from '../class/index.mjs';
 import { just, source } from '../create/index.mjs';
@@ -572,5 +573,189 @@ describe('mergeMap releases an inner observable as soon as it completes (#2769)'
     assert.deepStrictEqual(mut_disposed, [1]);
 
     assert.isFalse(toNode(inner$).hasSubscriber);
+  });
+});
+
+describe('a source write or completion during a projection (#3550)', () => {
+  test('switchMap: a write from the projection switches to its value, and the outer projection subscribes to nothing', () => {
+    const user$ = source<number>();
+
+    const a$ = source<string>();
+
+    const b$ = source<string>();
+
+    const current$ = user$.pipe(
+      switchMap((u) => {
+        if (u === 1) {
+          user$.next(2);
+
+          return a$;
+        }
+
+        return b$;
+      }),
+    );
+
+    const mut_current: string[] = [];
+
+    current$.subscribe((v) => {
+      mut_current.push(v);
+    });
+
+    user$.next(1);
+
+    a$.next('a');
+
+    b$.next('b');
+
+    assert.deepStrictEqual(mut_current, ['b']);
+
+    assert.isFalse(toNode(a$).hasSubscriber);
+
+    current$.complete();
+
+    assert.isFalse(toNode(b$).hasSubscriber);
+  });
+
+  test('switchMap: what the switched-away projection makes after the write is disposed', () => {
+    const user$ = source<number>();
+
+    const store$ = source<number>();
+
+    const mut_made: { isCompleted: boolean }[] = [];
+
+    const current$ = user$.pipe(
+      switchMap((u) => {
+        if (u === 1) {
+          user$.next(2);
+        }
+
+        const made$ = store$.pipe(map((x) => x));
+
+        mut_made.push(made$);
+
+        return made$;
+      }),
+    );
+
+    current$.subscribe(() => {});
+
+    user$.next(1);
+
+    // The inner projection (2) ran first, inside the outer one (1).
+    assert.deepStrictEqual(
+      mut_made.map((made) => made.isCompleted),
+      [false, true],
+    );
+  });
+
+  test('switchMap: completing during the projection subscribes to nothing, and disposes what it made', () => {
+    const user$ = source<number>();
+
+    const shared$ = source<string>('shared');
+
+    const store$ = source<number>();
+
+    const mut_made: { isCompleted: boolean }[] = [];
+
+    const mut_current: string[] = [];
+
+    const current$ = user$.pipe(
+      switchMap(() => {
+        current$.complete();
+
+        mut_made.push(store$.pipe(map((x) => x)));
+
+        return shared$;
+      }),
+    );
+
+    current$.subscribe((v) => {
+      mut_current.push(v);
+    });
+
+    user$.next(1);
+
+    assert.isTrue(current$.isCompleted);
+
+    assert.isFalse(toNode(shared$).hasSubscriber);
+
+    assert.deepStrictEqual(
+      mut_made.map((made) => made.isCompleted),
+      [true],
+    );
+
+    shared$.next('later');
+
+    assert.deepStrictEqual(mut_current, []);
+
+    assert.isTrue(Optional.isNone(current$.getSnapshot()));
+  });
+
+  test('switchMap: completing while subscribing to the inner releases it', () => {
+    const user$ = source<number>();
+
+    const inner$ = source<string>('first');
+
+    const mut_disposed: number[] = [];
+
+    const current$ = user$.pipe(
+      switchMap((u) => {
+        onScopeDispose(() => {
+          mut_disposed.push(u);
+        });
+
+        return inner$;
+      }),
+    );
+
+    current$.subscribe((v) => {
+      if (v === 'first') {
+        current$.complete();
+      }
+    });
+
+    user$.next(1);
+
+    assert.isTrue(current$.isCompleted);
+
+    assert.deepStrictEqual(mut_disposed, [1]);
+
+    assert.isFalse(toNode(inner$).hasSubscriber);
+  });
+
+  test('mergeMap: completing during the projection subscribes to nothing, and disposes what it made', () => {
+    const click$ = source<number>();
+
+    const shared$ = source<string>('shared');
+
+    const store$ = source<number>();
+
+    const mut_made: { isCompleted: boolean }[] = [];
+
+    const merged$ = click$.pipe(
+      mergeMap(() => {
+        merged$.complete();
+
+        mut_made.push(store$.pipe(map((x) => x)));
+
+        return shared$;
+      }),
+    );
+
+    merged$.subscribe(() => {});
+
+    click$.next(1);
+
+    assert.isTrue(merged$.isCompleted);
+
+    assert.isFalse(toNode(shared$).hasSubscriber);
+
+    assert.deepStrictEqual(
+      mut_made.map((made) => made.isCompleted),
+      [true],
+    );
+
+    assert.isTrue(Optional.isNone(merged$.getSnapshot()));
   });
 });
