@@ -1,10 +1,7 @@
 import { onCleanup } from 'synstate-next';
 import {
+  appendChildTo,
   ControlDescription,
-  MountedNodes,
-  mountChild,
-  mountInNamespace,
-  namespaceInside,
   type Child,
   type Description,
 } from '../jsx/index.mjs';
@@ -24,15 +21,7 @@ export const Portal = ({
   children: Child;
 }>): Description =>
   new ControlDescription(() => {
-    const parent = target ?? document.body;
-
-    const out = new MountedNodes();
-
-    mountInNamespace(namespaceInside(parent), () => {
-      mountChild(children, out);
-    });
-
-    out.appendTo(parent);
+    const out = appendChildTo(children, target ?? document.body);
 
     onCleanup(() => {
       removeMounted(out);

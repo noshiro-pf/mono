@@ -13,45 +13,61 @@ import {
   type ObservableClass,
 } from 'synstate-next/internal';
 import type { Bindable } from '../constant.mjs';
-import type { Description, MountedNodes } from '../jsx/index.mjs';
+import {
+  ControlDescription,
+  type Description,
+  type MountedNodes,
+} from '../jsx/index.mjs';
 import { MountSite, removeRange } from './branch.mjs';
 
 /**
- * Mounts the branch `branch(key, current)` for the key of `value`, appending
- * its nodes to `out`, and switches to another when the key changes: after the
- * update that changed it has settled, the previous branch's owner is disposed
- * and its nodes removed. While the key stays, the branch stays and follows
- * `value` through what it was given. A constant `value` mounts one branch once.
- * `If`, `MatchOptional` and `MatchResult` are this.
+ * Mounts `children(key, value)` for the key of `value`, and replaces it when the
+ * key changes: after the update that changed it has settled, the previous
+ * branch's owner is disposed and its nodes removed. While the key stays, the
+ * branch stays; one that follows the value does so through what it makes from
+ * it (`toObservable(value)`). `children` returns `undefined` for a key with
+ * nothing to show. A constant `value` mounts one branch once. `If`,
+ * `MatchOptional` and `MatchResult` are this.
  *
- * No node made in a branch computes from a value whose key rules it out: the
- * key is checked in the drain, above the branch's nodes, and a branch that goes
- * is retired there (see `DrainCheck`). An observable the branch is given rather
+ * Keys are compared with `Object.is`, so a key is a primitive (or an object
+ * kept as it is): a key made afresh for each value (`[p.kind, p.id]`) mounts
+ * the branch again on every value.
+ *
+ * No node made in a branch computes from a value whose key rules it out: `key`
+ * is called in the drain, above the branch's nodes, and a branch that goes is
+ * retired there (see `DrainCheck`). An observable the branch is given rather
  * than makes (one created where the description is written) is not the
  * branch's: it computes from every value, mounted or not.
  *
- * A cleanup of the branch that goes that throws does not stop the switch: the
- * exception is thrown once the new branch is in place. A branch that throws
- * while mounting leaves the switch empty, and the next value mounts its branch,
- * whatever its key.
+ * A `key` that throws in an update drops the branch and leaves the switch empty
+ * until the next value; the exception is thrown as the switch's own. A cleanup
+ * of the branch that goes that throws does not stop the switch: the exception
+ * is thrown once the new branch is in place. A branch that throws while
+ * mounting leaves the switch empty, and the next value mounts its branch,
+ * whatever its key. A `key` or branch that throws while the switch first mounts
+ * fails that mount.
  */
-export const mountSwitch = <V, K>(
-  value: Bindable<V>,
-  keyOf: (current: V) => K,
-  branch: (key: K, current: V) => Description | undefined,
-  out: MountedNodes,
-): void => {
-  if (!isObservable(value)) {
-    // The constant's own value: a `Constant<V>` is `V` at run time.
-    branch(keyOf(value), value)?.mount(out);
+export const Switch = <V, K>({
+  value,
+  key,
+  children,
+}: Readonly<{
+  value: Bindable<V>;
+  key: (current: V) => K;
+  children: (currentKey: K, current: V) => Description | undefined;
+}>): Description =>
+  new ControlDescription((out) => {
+    if (!isObservable(value)) {
+      // The constant's own value: a `Constant<V>` is `V` at run time.
+      children(key(value), value)?.mount(out);
 
-    return;
-  }
+      return;
+    }
 
-  const binding = new SwitchBinding(toNode(value), keyOf, branch);
+    const binding = new SwitchBinding(toNode(value), key, children);
 
-  binding.mountInto(out);
-};
+    binding.mountInto(out);
+  });
 
 class SwitchBinding<V, K> extends EffectClass<V> {
   /** The branch's nodes are between `#start` and `#end`. */
@@ -67,6 +83,15 @@ class SwitchBinding<V, K> extends EffectClass<V> {
 
   /** `noKey` before the first mount, and after a branch threw while mounting. */
   #mut_key: K | typeof noKey;
+
+  /**
+   * The value the drain took the key of, and the key, which `run` does not
+   * compute again; the key is `noKey` when the drain took none. Two fields
+   * rather than an object, so that an update allocates nothing.
+   */
+  #mut_checkedValue: V | undefined;
+
+  #mut_checkedKey: K | typeof noKey;
 
   #mut_owner: Owner | undefined;
 
@@ -94,6 +119,10 @@ class SwitchBinding<V, K> extends EffectClass<V> {
 
     this.#mut_key = noKey;
 
+    this.#mut_checkedValue = undefined;
+
+    this.#mut_checkedKey = noKey;
+
     this.#mut_owner = undefined;
 
     this.#mut_retired = false;
@@ -114,11 +143,21 @@ class SwitchBinding<V, K> extends EffectClass<V> {
    * value's key is not the branch's, before the drain reaches the branch.
    */
   #retireIfRuledOut(): void {
-    if (
-      this.#mut_owner !== undefined &&
-      !this.#mut_retired &&
-      !Object.is(this.#keyOf(currentOf(this.source)), this.#mut_key)
-    ) {
+    this.#mut_checkedKey = noKey;
+
+    if (this.#mut_owner === undefined || this.#mut_retired) {
+      return;
+    }
+
+    const current = currentOf(this.source);
+
+    const key = this.#keyOf(current);
+
+    this.#mut_checkedValue = current;
+
+    this.#mut_checkedKey = key;
+
+    if (!Object.is(key, this.#mut_key)) {
       this.#retireBranch();
     }
   }
@@ -167,6 +206,9 @@ class SwitchBinding<V, K> extends EffectClass<V> {
 
     this.#mut_key = key;
 
+    // A throw fails the mount, and whoever mounted the switch (`render`, a
+    // branch, a row, `mountChild`) disposes the owner it is in, the switch with
+    // it.
     this.#mut_owner = this.#site.mount(
       () => this.#branch(key, current),
       out,
@@ -191,7 +233,16 @@ class SwitchBinding<V, K> extends EffectClass<V> {
 
     const current = currentOf(this.source);
 
-    const key = this.#keyOf(current);
+    const checkedKey = this.#mut_checkedKey;
+
+    const key =
+      checkedKey !== noKey && Object.is(this.#mut_checkedValue, current)
+        ? checkedKey
+        : this.#keyOf(current);
+
+    this.#mut_checkedValue = undefined;
+
+    this.#mut_checkedKey = noKey;
 
     // A retired branch is replaced even when the key came back to its own: its
     // nodes no longer follow anything.

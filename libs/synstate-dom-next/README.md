@@ -31,9 +31,11 @@ fixes made to synstate-dom are not ported here. The rule and its reason are in
 - **Event handlers are `on…` properties** where the element has one, and a
   listener otherwise; neither is removed, since the element goes with its owner.
 
-- **`If`, `MatchOptional` and `MatchResult` are one keyed switch.** A branch is
-  mounted for the key of the value (the condition, `isSome`, `isOk`) and kept
-  while the key stays; what the branch is given follows the value meanwhile.
+- **`If`, `MatchOptional` and `MatchResult` are one keyed switch,** which is
+  public as `Switch`: a branch is mounted for the key of the value (the
+  condition, `isSome`, `isOk`, or a `key` function of the application's) and
+  kept while the key stays; what the branch is given follows the value
+  meanwhile.
 
 The data slots keep synstate-dom's rule: they take a `Bindable` (an
 `InitializedObservable` or a `constant(…)`), never a plain value.
@@ -58,6 +60,15 @@ The data slots keep synstate-dom's rule: they take a `Bindable` (an
   switch empty until the next value. A binding that throws does not stop the
   other bindings of its update either (synstate-next's DESIGN.md,
   "Propagation").
+- The low-level API is smaller. `mountable(mount)` takes a function that returns
+  the nodes (one, or an array) and gives a `JSX.Element`; `mountChild(child,
+parent?)` returns a child's nodes, appended to `parent` in its namespace when
+  given; `isChild` is kept, one level deep as before: any array counts.
+  `toNodes`, `createMountable` (the factory is `jsx` from
+  `synstate-dom-next/jsx-runtime`) and the types `Mountable` and `MountedNodes`
+  (a description is a `JSX.Element`) are gone.
+  `Switch` is public, so a router need not copy the switch it mounts its pages
+  with.
 - A controlled `checked` or `indeterminate` is restored in the next animation
   frame or a task after the `change`, whichever comes first, so it is restored
   in a hidden page too.

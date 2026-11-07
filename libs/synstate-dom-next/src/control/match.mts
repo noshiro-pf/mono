@@ -2,8 +2,8 @@ import { map, type InitializedObservable } from 'synstate-next';
 import { Optional, Result } from 'ts-std-forge';
 import { toObservable } from '../bindable.mjs';
 import type { Bindable } from '../constant.mjs';
-import { ControlDescription, type Description } from '../jsx/index.mjs';
-import { mountSwitch } from './switch.mjs';
+import type { Description } from '../jsx/index.mjs';
+import { Switch } from './switch.mjs';
 
 /**
  * Mounts `some` while `value` holds a value, and `none` (or nothing) while it
@@ -19,16 +19,13 @@ export const MatchOptional = <T,>({
   some: (inner: InitializedObservable<T>) => Description;
   none?: Description;
 }>): Description =>
-  new ControlDescription((out) => {
-    mountSwitch(
-      value,
-      Optional.isSome,
-      (_isSome, current) =>
-        Optional.isSome(current)
-          ? some(innerOf(value, current.value, someValueOr))
-          : none,
-      out,
-    );
+  Switch({
+    value,
+    key: Optional.isSome,
+    children: (_isSome, current) =>
+      Optional.isSome(current)
+        ? some(innerOf(value, current.value, someValueOr))
+        : none,
   });
 
 /**
@@ -45,23 +42,20 @@ export const MatchResult = <S, E>({
   ok: (inner: InitializedObservable<S>) => Description;
   err: (error: InitializedObservable<E>) => Description;
 }>): Description =>
-  new ControlDescription((out) => {
-    mountSwitch(
-      value,
-      Result.isOk,
-      (_isOk, current) =>
-        Result.isOk(current)
-          ? ok(innerOf(value, current.value, okValueOr))
-          : err(innerOf(value, current.value, errValueOr)),
-      out,
-    );
+  Switch({
+    value,
+    key: Result.isOk,
+    children: (_isOk, current) =>
+      Result.isOk(current)
+        ? ok(innerOf(value, current.value, okValueOr))
+        : err(innerOf(value, current.value, errValueOr)),
   });
 
 /**
  * The inner value of `value` while it stays on the branch's side, starting from
  * `initial`. When `value` leaves the side, the switch retires the branch in the
- * drain before this map is reached (see `mountSwitch`), so it never computes
- * the fallback.
+ * drain before this map is reached (see `Switch`), so it never computes the
+ * fallback.
  */
 const innerOf = <V, T>(
   value: Bindable<V>,
