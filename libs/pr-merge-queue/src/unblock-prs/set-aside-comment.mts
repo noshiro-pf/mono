@@ -57,7 +57,7 @@ export const setAsideCommentBody = (
       ...(skip.reason === 'awaiting-bypass'
         ? [
             '',
-            "Nothing but a ruleset bypass merges it, which is a person's to do; auto-merge was left off.",
+            "Nothing but a ruleset bypass merges it, which is a person's to do; auto-merge will not merge it.",
           ]
         : []),
       '',

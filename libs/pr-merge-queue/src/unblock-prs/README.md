@@ -573,23 +573,30 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
 `--poll-interval`（既定60秒）待ってから、マージするか「しない」と確定するまで
 ポーリングします。各回で次の順に判定し、該当した時点で抜けます。
 
-| 条件                                | 結果                          |
-| :---------------------------------- | :---------------------------- |
-| PR の再取得に失敗                   | 連続5回で `error`、未満は継続 |
-| `MERGED`                            | `merged`                      |
-| `OPEN` でない                       | `closed`                      |
-| auto-merge が外れた（※）            | `auto-merge-disabled`         |
-| `skip-ci` が再付与された            | `skip-ci-labelled`            |
-| head が push したものと違う         | `head-moved`                  |
-| `BEHIND` / `DIRTY`                  | `behind-again`                |
-| 必須チェックが fail / cancel        | `checks-failed`               |
-| 全 green（bypass merge 待ちの PR）  | `awaiting-bypass`             |
-| 全 green が規定回数続く             | `not-merging`                 |
-| 未報告の必須があり5分間何も動かない | `checks-not-started`          |
-| `--watch-timeout`（既定90分）超過   | `timeout`                     |
-| SIGINT / SIGTERM                    | `stopped`                     |
+| 条件                                                      | 結果                          |
+| :-------------------------------------------------------- | :---------------------------- |
+| PR の再取得に失敗                                         | 連続5回で `error`、未満は継続 |
+| `MERGED`                                                  | `merged`                      |
+| `OPEN` でない                                             | `closed`                      |
+| auto-merge が外れた（※）                                  | `auto-merge-disabled`         |
+| `skip-ci` が再付与された                                  | `skip-ci-labelled`            |
+| head が push したものと違う                               | `head-moved`                  |
+| `BEHIND` / `DIRTY`                                        | `behind-again`                |
+| 必須チェックが fail / cancel                              | `checks-failed`               |
+| 全 green（bypass merge 待ちの PR）                        | `awaiting-bypass`             |
+| 全 green が規定回数続き、`BLOCKED` でレビューが止めている | `review-held`（見送らない）   |
+| 全 green が規定回数続き、bypass でしかマージできない      | `awaiting-bypass`             |
+| 全 green が規定回数続き、読み取りが別の head              | `head-moved`                  |
+| 全 green が規定回数続く                                   | `not-merging`                 |
+| 未報告の必須があり5分間何も動かない                       | `checks-not-started`          |
+| `--watch-timeout`（既定90分）超過                         | `timeout`                     |
+| SIGINT / SIGTERM                                          | `stopped`                     |
 
-※ bypass merge 待ちの PR（「2」の8）は arm していないので、この行は見ません。
+※ triage が bypass merge 待ちと判断した PR（「2」の8）は arm していないので、この行は見ません。
+
+規定回数の終わりに、watch した head でレビューを読み直します。watch の間に所有者の
+承認が取り消された、または会話が開かれたときは `review-held` で、記録も降格もしま
+せん。push なしでレビューが解消するからで、triage が止めておき、変わればすぐ解放します。
 
 順序には意味があります。ラベルの再付与やブランチの移動をチェック結果より先に
 見るのは、その状態の PR のチェックを読んでも意味がないからです。
@@ -1606,24 +1613,32 @@ After one `--poll-interval` (60s by default), poll until it merges or until
 something says it will not. Each poll tests these in order and leaves on the
 first that matches:
 
-| Condition                          | Outcome                              |
-| :--------------------------------- | :----------------------------------- |
-| re-reading the pull request failed | `error` after 5 in a row, else retry |
-| `MERGED`                           | `merged`                             |
-| not `OPEN`                         | `closed`                             |
-| auto-merge switched off (\*)       | `auto-merge-disabled`                |
-| `skip-ci` went back on             | `skip-ci-labelled`                   |
-| head is not the commit pushed      | `head-moved`                         |
-| `BEHIND` / `DIRTY`                 | `behind-again`                       |
-| a required check failed            | `checks-failed`                      |
-| green, and only a bypass merges it | `awaiting-bypass`                    |
-| green for the whole budget         | `not-merging`                        |
-| a required one unreported, 5m idle | `checks-not-started`                 |
-| past `--watch-timeout` (90m)       | `timeout`                            |
-| SIGINT / SIGTERM                   | `stopped`                            |
+| Condition                                           | Outcome                              |
+| :-------------------------------------------------- | :----------------------------------- |
+| re-reading the pull request failed                  | `error` after 5 in a row, else retry |
+| `MERGED`                                            | `merged`                             |
+| not `OPEN`                                          | `closed`                             |
+| auto-merge switched off (\*)                        | `auto-merge-disabled`                |
+| `skip-ci` went back on                              | `skip-ci-labelled`                   |
+| head is not the commit pushed                       | `head-moved`                         |
+| `BEHIND` / `DIRTY`                                  | `behind-again`                       |
+| a required check failed                             | `checks-failed`                      |
+| green, and only a bypass merges it                  | `awaiting-bypass`                    |
+| green for the budget, `BLOCKED` and review holds it | `review-held` (not set aside)        |
+| green for the budget, only a bypass merges it       | `awaiting-bypass`                    |
+| green for the budget, review read at another head   | `head-moved`                         |
+| green for the budget otherwise                      | `not-merging`                        |
+| a required one unreported, 5m idle                  | `checks-not-started`                 |
+| past `--watch-timeout` (90m)                        | `timeout`                            |
+| SIGINT / SIGTERM                                    | `stopped`                            |
 
-(\*) Not read for one only a bypass merges (step 2, item 8), which is never
-armed.
+(\*) Not read for one triage found only a bypass merges (step 2, item 8), which
+is not armed.
+
+At the end of the budget the review is read again at the watched head. An
+owner's approval dismissed, or a conversation opened, during the watch is
+`review-held`: no record and no demotion, because a review clears it without a
+push, and triage holds it and lets it go as soon as it does.
 
 The order matters: a pull request whose label went back on, or whose branch
 moved, is one whose check results say nothing.

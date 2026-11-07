@@ -5,10 +5,11 @@
  * `pr-report-core`'s `review-hold.mts` keeps the causes it can read — an
  * owner's approval, an unresolved conversation — from being picked at all. What
  * is left is a pull request whose checks all passed and which did not merge,
- * for a reason triage did not see before the release: one of those arriving
- * during the watch, which the set-aside names but which is demoted all the
- * same, or something nothing here reads. The likeliest thing about it is that
- * it will not merge next time either. A `not-merging` skip record already keeps it
+ * for a reason triage did not see before the release and will not see after:
+ * something nothing here reads, or one of those on a pull request GitHub does
+ * not call `BLOCKED`. One of those on a `BLOCKED` one is left to triage
+ * (`endOfGreenWatch` in `watch.mts`). The likeliest thing about it is that it
+ * will not merge next time either. A `not-merging` skip record already keeps it
  * from being picked until the base moves; the base moving is what makes it
  * `BEHIND` again, and without this it would then be rebased first, run a full
  * matrix, and sit green once more ahead of everything behind it.

@@ -565,20 +565,33 @@ export const bypassOfRead = (
 /**
  * What holds `prNumber`'s review at `head`, read once: when a green pull
  * request has not merged, which is long after GitHub has read the head it
- * watched. `holdOfRead` says what the read means.
+ * watched. `holdOfRead` says what the read means; `otherHead` is an answer for
+ * another head, which says the branch moved rather than that the read failed.
  */
 export const readHoldAt = async (
   api: ApiContext,
   prNumber: number,
   head: string,
   context: ReviewContext,
-): Promise<Result<ReviewHold | undefined, string>> => {
+): Promise<Result<ReviewHold | undefined, HoldUnread>> => {
   const read = await readReviews(api, [prNumber], context);
 
-  return Result.isErr(read)
-    ? Result.err(lastLines(read.value, 2).replaceAll(/\s+/gu, ' '))
-    : holdOfRead(read.value.reads.get(prNumber), head);
+  if (Result.isErr(read)) {
+    return Result.err({
+      otherHead: false,
+      message: lastLines(read.value, 2).replaceAll(/\s+/gu, ' '),
+    });
+  }
+
+  const hold = holdOfRead(read.value.reads.get(prNumber), head);
+
+  return Result.isErr(hold)
+    ? Result.err({ otherHead: true, message: hold.value })
+    : hold;
 };
+
+/** Why {@link readHoldAt} has no answer. */
+export type HoldUnread = Readonly<{ otherHead: boolean; message: string }>;
 
 /**
  * What one read of a pull request's review holds it for at `head`. No read at

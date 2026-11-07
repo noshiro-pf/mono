@@ -71,7 +71,7 @@ describe(setAsideCommentBody, () => {
 
     assert.include(
       body,
-      "Nothing but a ruleset bypass merges it, which is a person's to do; auto-merge was left off.",
+      "Nothing but a ruleset bypass merges it, which is a person's to do; auto-merge will not merge it.",
     );
 
     assert.include(
