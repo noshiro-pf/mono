@@ -390,8 +390,12 @@ pick も「3a」の rebase もしません。
     ruleset が `require_code_owner_review` を求めず、代わりに `CODEOWNERS`
     の `# enforced-by: <context>` 行が名指す必須チェックがこのファイルを強制
     しているとき（`pr-report-core` の `codeOwnerGate`）は、そのチェックと同じ
-    く作者を自分の所有パスの承認者に数えます。所有者自身の PR は何も待たず、
-    bypass も要りません。待つのは所有者以外の PR だけで、所有者が承認するまで
+    く作者を自分の所有パスの承認者に数えます。ただしブランチに push した全員
+    がそのパスの所有者であるときだけで（`pr-report-core` の `pushersOf`、
+    リポジトリの activity から読みます）、他の人が push した所有者の PR は、
+    唯一の所有者が作者なら bypass でしかマージできず、再実行しても赤のままな
+    ので、`checks-failed` で見送って人に知らせます。所
+    有者自身の PR は何も待たず、bypass も要りません。待つのは所有者以外の PR だけで、所有者が承認するまで
     held です。そのチェックは承認を運ぶイベントでは走らない（ PR 自身の
     workflow で走ってしまう `pull_request_review` は使えない）ので、承認より
     前に赤になったままです。そこで、**failing** のうち赤がそのチェックだけの
@@ -1421,8 +1425,13 @@ merge-base` says whether the branch was built on the current tip of the
     Where the ruleset does not ask for `require_code_owner_review` and a
     required check that `CODEOWNERS` names on a `# enforced-by: <context>` line
     enforces the file instead (`codeOwnerGate` in `pr-report-core`), the author
-    counts as approving the paths they own, as that check counts them. An
-    owner's own pull request then waits for nobody and needs no bypass; only
+    counts as approving the paths they own, as that check counts them — only
+    where everyone who pushed to the branch owns them too (`pushersOf` in
+    `pr-report-core`, read from the repository's activity); an owner's pull
+    request someone else pushed to, whose only owner is its author, merges by a
+    bypass alone and stays red however often it is re-run, so it is set aside
+    `checks-failed`, which tells a person. An owner's own pull request then waits for
+    nobody and needs no bypass; only
     someone else's waits, held until an owner approves. The check does not run
     on the event that carries an approval (`pull_request_review` would run the
     pull request's own copy of the workflow), so it stays red from before the

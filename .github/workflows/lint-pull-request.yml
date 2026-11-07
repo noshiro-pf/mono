@@ -207,7 +207,8 @@ jobs:
 
   # `.github/CODEOWNERS`, enforced here rather than by the ruleset's
   # `require_code_owner_review`: every changed path it gives owners needs its
-  # author to be one of them, or one of them to have approved the head. The
+  # author, and everyone who pushed to its branch, to be among them, or one of
+  # them to have approved the head. The
   # ruleset's rule cannot tell the author apart — GitHub does not let an author
   # approve their own pull request — so under it the owner's own pull requests
   # merged only by a ruleset bypass, while what the file guards against is
@@ -239,7 +240,12 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           AUTHOR: ${{ github.event.pull_request.user.login }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+          # How long to wait before reading the branch's pushes again.
+          PUSHES_RETRY_SECONDS: '6'
         run: |
           fail() {
             echo "::error::${1}"
@@ -346,23 +352,104 @@ jobs:
           done <reviews.txt
 
           author="$(printf '%s' "${AUTHOR}" | tr '[:upper:]' '[:lower:]')"
+
+          # Who wrote the head: the author and everyone who pushed to the
+          # branch. The author stands for a path they own only where every
+          # writer owns it too; otherwise a commit another writer pushed to the
+          # owner's branch would pass as the owner's — and one pushed and then
+          # rewritten away still counts, since nothing here can tell what the
+          # rewrite kept. Read from the repository's activity, which names each
+          # push's actor (the timeline does not): every push since the branch
+          # was last created, chained `before` to `after`, ending at the head.
+          # One page is read, newest first, and replayed oldest first from the
+          # last creation in it, as `readPushers` in `unblock-prs` reads it for
+          # `pushersOf` in `pr-report-core`. Anything short of that leaves the
+          # writers untold, and the author stands for nothing: a gap, an actor
+          # missing, a creation older than that page or than the activity
+          # GitHub keeps, or a fork's branch, whose pushes are not this
+          # repository's. A push is recorded as it
+          # lands, which can trail this event, so a chain short of the head is
+          # read again a few times. Read once, and only for a path the author
+          # owns that no owner has approved: nothing else depends on it.
+          writers=''
+          writers_read=false
+          read_writers() {
+            writers_read=true
+            [ "${HEAD_REPO}" = "${GITHUB_REPOSITORY}" ] || return 0
+            local attempt type before after actor chain pushers
+            for attempt in 1 2 3 4 5; do
+              if gh api -X GET "repos/${GITHUB_REPOSITORY}/activity" \
+                -f ref="refs/heads/${HEAD_REF}" -f direction=desc -f per_page=100 \
+                --jq 'reverse | .[] | [.activity_type, .before, .after, ((.actor.login // "") | ascii_downcase)] | @tsv' \
+                </dev/null >activity.txt; then
+                chain=''
+                pushers=''
+                while IFS=$'\t' read -r type before after actor; do
+                  case "${type}" in
+                    branch_creation)
+                      if [ -n "${actor}" ]; then
+                        chain="${after}" pushers="${actor}"
+                      else
+                        chain='untold' pushers=''
+                      fi
+                      ;;
+                    branch_deletion) chain='' pushers='' ;;
+                    push | force_push)
+                      if [ -n "${chain}" ] && [ "${before}" = "${chain}" ] && [ -n "${actor}" ]; then
+                        chain="${after}" pushers="${pushers} ${actor}"
+                      else
+                        chain='untold'
+                      fi
+                      ;;
+                  esac
+                done <activity.txt
+                if [ -n "${pushers}" ] && [ "${chain}" = "${HEAD_SHA}" ]; then
+                  writers="$(printf '%s %s' "${author}" "${pushers}" | tr -s ' ' '\n' | sort -u | tr '\n' ' ')"
+                  writers="${writers# }"
+                  return 0
+                fi
+              fi
+              if [ "${attempt}" -lt 5 ]; then
+                sleep "${PUSHES_RETRY_SECONDS}"
+              fi
+            done
+          }
+
           waiting=''
           while IFS=$'\t' read -r name old_name; do
             for file in "${name}" "${old_name}"; do
               [ -n "${file}" ] || continue
               file_owners="$(owners_of "${file}")"
               [ -n "${file_owners}" ] || continue
-              case " ${file_owners} " in *" ${author} "*) continue ;; esac
               for owner in ${file_owners}; do
                 case "${approved}" in *" ${owner} "*) continue 2 ;; esac
               done
+              case " ${file_owners} " in
+                *" ${author} "*)
+                  [ "${writers_read}" = true ] || read_writers
+                  if [ -n "${writers}" ]; then
+                    every_writer_owns=true
+                    for writer in ${writers}; do
+                      case " ${file_owners} " in *" ${writer} "*) ;; *) every_writer_owns=false ;; esac
+                    done
+                    [ "${every_writer_owns}" = false ] || continue
+                  fi
+                  ;;
+              esac
               waiting="${waiting}${file} (@${file_owners// / @})"$'\n'
             done
           done <changed-files.txt
 
           if [ -z "${waiting}" ]; then
-            echo "Every owned path ${AUTHOR} changed is theirs or approved by an owner."
+            echo "Every owned path is approved by an owner, or owned by ${AUTHOR} and everyone who pushed to the branch."
             exit 0
           fi
 
-          fail "${AUTHOR} owns none of these and no owner has approved them. An owner's approval, then a re-run of this job, lets it merge:" "$(printf '%s' "${waiting}" | sort -u)"$'\n'
+          if [ "${writers_read}" = false ]; then
+            pushed_by=''
+          elif [ -n "${writers}" ]; then
+            pushed_by=" ${AUTHOR} stands for a path they own only where everyone who pushed to the branch owns it too: it was written by ${writers% } (a push counts even once rewritten away)."
+          else
+            pushed_by=" ${AUTHOR} stands for a path they own only where everyone who pushed to the branch owns it too, and who did cannot be told."
+          fi
+          fail "No owner has approved these.${pushed_by} An owner's approval, then a re-run of this job, lets it merge:" "$(printf '%s' "${waiting}" | sort -u)"$'\n'

@@ -2,9 +2,35 @@ import { RE_RUN_GRACE_MS } from 'pr-report-core';
 import {
   latestMergedHead,
   pullRequestOfNode,
+  pushersOfPage,
   rerunOf,
   RUN_TIMEOUT_MS,
 } from './github.mjs';
+
+describe(pushersOfPage, () => {
+  // Newest first, as `readPushers` asks for it.
+  test('replays a page oldest first from its last creation', () => {
+    assert.deepStrictEqual(
+      pushersOfPage(
+        [
+          entry('push', 'b', 'c', 'helper'),
+          entry('force_push', 'a', 'b', 'owner'),
+          entry('branch_creation', '0', 'a', 'owner'),
+          entry('branch_deletion', 'x', '0', 'stranger'),
+        ],
+        'c',
+      ),
+      ['owner', 'helper'],
+    );
+  });
+
+  test('cannot tell from a page without the creation', () => {
+    assert.strictEqual(
+      pushersOfPage([entry('push', 'b', 'c', 'owner')], 'c'),
+      'unknown',
+    );
+  });
+});
 
 describe(pullRequestOfNode, () => {
   const node = {
@@ -143,3 +169,16 @@ describe('RUN_TIMEOUT_MS', () => {
     assert.strictEqual(RUN_TIMEOUT_MS, RE_RUN_GRACE_MS);
   });
 });
+
+const entry = (
+  activityType: string,
+  before: string,
+  after: string,
+  login: string,
+): Parameters<typeof pushersOfPage>[0][number] =>
+  ({
+    activity_type: activityType,
+    before,
+    after,
+    actor: { login },
+  }) as const;

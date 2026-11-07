@@ -17,7 +17,7 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as util from 'node:util';
-import { codeOwnerReview, parseCodeOwners } from 'pr-report-core';
+import { codeOwnerReview, parseCodeOwners, pushersOf } from 'pr-report-core';
 import { isRecord, isString } from 'ts-data-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -35,6 +35,8 @@ describe('the code-owners job of lint-pull-request.yml', () => {
     files: readonly string[];
     author: string;
     approvers?: readonly string[];
+    /** Who pushed to the branch, `[author]` unless given. */
+    pushers?: readonly string[] | 'unknown';
   }>[] = [
     { files: ['libs/a/src/x.mts'], author: 'bot' },
     { files: ['.github/workflows/release.yml'], author: 'bot' },
@@ -50,11 +52,45 @@ describe('the code-owners job of lint-pull-request.yml', () => {
     { files: ['tools/configs/gate-ignore-lists.json'], author: 'bot' },
     { files: ['tools/configs/gate-ignore-lists.json.bak'], author: 'bot' },
     { files: ['.github/workflowsX/a.yml'], author: 'bot' },
+    // Another writer on the owner's branch: the owner no longer stands alone.
+    {
+      files: ['.github/workflows/release.yml'],
+      author: 'owner',
+      pushers: ['owner', 'helper'],
+    },
+    {
+      files: ['.github/workflows/release.yml'],
+      author: 'owner',
+      pushers: ['Owner'],
+    },
+    {
+      files: ['repo-settings/rulesets/main.json'],
+      author: 'owner',
+      pushers: ['owner', 'other'],
+    },
+    {
+      files: ['repo-settings/rulesets/main.json'],
+      author: 'owner',
+      pushers: ['owner', 'helper'],
+      approvers: ['other'],
+    },
+    { files: ['libs/a/src/x.mts'], author: 'owner', pushers: 'unknown' },
+    // A creator whose account is gone (`''`, sent as `null`).
+    {
+      files: ['.github/workflows/release.yml'],
+      author: 'owner',
+      pushers: ['', 'owner'],
+    },
+    {
+      files: ['.github/workflows/release.yml'],
+      author: 'owner',
+      pushers: 'unknown',
+    },
   ] as const;
 
   test.each(cases)(
-    'agrees with pr-report-core on $files by $author',
-    async ({ files, author, approvers = [] }) => {
+    'agrees with pr-report-core on $files by $author, pushed by $pushers',
+    async ({ files, author, approvers = [], pushers = [author] }) => {
       const review = codeOwnerReview({
         required: true,
         rules: parseCodeOwners(codeOwners),
@@ -63,9 +99,28 @@ describe('the code-owners job of lint-pull-request.yml', () => {
         approvers,
         author,
         authorApproves: true,
+        // Who pushed as `pr-report-core` reads the same activity, so that the
+        // two readings of the chain are compared too.
+        pushers: pushersOf(
+          activityOf(pushers === 'unknown' ? [author] : pushers).map(
+            ({ activity_type: activityType, before, after, actor }) => ({
+              activityType,
+              before,
+              after,
+              actor: actor?.login,
+            }),
+          ),
+          headOf(pushers),
+        ),
       });
 
-      const ran = await runJob({ codeOwners, files, author, approvers });
+      const ran = await runJob({
+        codeOwners,
+        files,
+        author,
+        approvers,
+        pushers,
+      });
 
       // The output in the comparison, so that a disagreement shows why.
       assert.deepStrictEqual(
@@ -160,6 +215,106 @@ describe('the code-owners job of lint-pull-request.yml', () => {
     assert.isFalse(alone.passed);
   });
 
+  // A fork's pushes are not this repository's activity, and a chain that does
+  // not reach the head (a push not recorded yet, or a gap) says nothing about
+  // who wrote it: the author stands for nothing either way.
+  test('tells no writers for a fork, or a chain short of the head', async () => {
+    const forked = await runJob({
+      codeOwners,
+      files: ['.github/workflows/release.yml'],
+      author: 'owner',
+      approvers: [],
+      headRepo: 'owner/fork',
+    });
+
+    assert.isFalse(forked.passed);
+
+    assert.include(forked.output, 'cannot be told');
+
+    const short = await runJob({
+      codeOwners,
+      files: ['.github/workflows/release.yml'],
+      author: 'owner',
+      approvers: [],
+      pushers: 'unknown',
+    });
+
+    assert.isFalse(short.passed);
+  });
+
+  // As `pushersOf` reads it: a creator with no account left is a writer who
+  // cannot be told, not one who can be left out.
+  test('tells no writers when the branch’s creator is gone', async () => {
+    const ran = await runJob({
+      codeOwners,
+      files: ['.github/workflows/release.yml'],
+      author: 'owner',
+      approvers: [],
+      pushers: ['', 'owner'],
+    });
+
+    assert.isFalse(ran.passed);
+
+    assert.include(ran.output, 'cannot be told');
+  });
+
+  // Who pushed matters only to a path the author owns that no owner approved;
+  // anything else costs no read of the activity, and no wait for it.
+  test('reads who pushed only where it decides', async () => {
+    const bot = await runJob({
+      codeOwners,
+      files: ['.github/workflows/release.yml'],
+      author: 'bot',
+      approvers: [],
+    });
+
+    assert.isFalse(bot.passed);
+
+    assert.notInclude(bot.output, 'stands for');
+
+    const approved = await runJob({
+      codeOwners,
+      files: ['.github/workflows/release.yml'],
+      author: 'owner',
+      approvers: ['owner'],
+      pushers: ['owner', 'helper'],
+    });
+
+    assert.isTrue(approved.passed);
+
+    for (const ran of [bot, approved]) {
+      assert.isFalse(ran.calls.some((call) => call.endsWith('/activity')));
+    }
+
+    const owned = await runJob({
+      codeOwners,
+      files: ['.github/workflows/release.yml', '.github/workflows/ci.yml'],
+      author: 'owner',
+      approvers: [],
+    });
+
+    assert.isTrue(owned.passed);
+
+    assert.strictEqual(
+      owned.calls.filter((call) => call.endsWith('/activity')).length,
+      1,
+    );
+  });
+
+  test('names who wrote what it holds', async () => {
+    const ran = await runJob({
+      codeOwners,
+      files: ['.github/workflows/release.yml'],
+      author: 'owner',
+      approvers: [],
+      pushers: ['owner', 'Helper'],
+    });
+
+    assert.isFalse(ran.passed);
+
+    assert.include(ran.output, 'written by helper owner');
+  });
+
   test('fails on a line it cannot read', async () => {
     const ran = await runJob({
       codeOwners: '/docs/ @owner\n*.md @owner\n',
@@ -218,6 +373,46 @@ const writeText = async (
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   fs.writeFile(path.join(dir, name), text, { mode });
 
+const push = (
+  activityType: string,
+  before: string,
+  after: string,
+  login: string,
+): Activity =>
+  ({
+    activity_type: activityType,
+    before,
+    after,
+    ref: 'refs/heads/feature',
+    // `''` stands for a deleted account, which GitHub sends as `null`.
+    actor: login === '' ? null : ({ login } as const),
+  }) as const;
+
+/**
+ * The branch's activity as the API lists it, oldest first: an unrelated push to
+ * another life of the branch, its deletion, then its creation by the first of
+ * `actors` and a push by each of the rest, chained `before` to `after`.
+ */
+const activityOf = (actors: readonly string[]): readonly Activity[] =>
+  [
+    push('push', 'old-1', 'old-2', 'stranger'),
+    push('branch_deletion', 'old-2', '0'.repeat(40), 'stranger'),
+    ...actors.map((actor, index) =>
+      push(
+        index === 0 ? 'branch_creation' : 'force_push',
+        index === 0 ? '0'.repeat(40) : `sha-${index - 1}`,
+        `sha-${index}`,
+        actor,
+      ),
+    ),
+  ] as const;
+
+/** The head the chain of `actors` ends at; `'unknown'` is one it misses. */
+const headOf = (actors: readonly string[] | 'unknown'): string =>
+  actors === 'unknown'
+    ? 'not-recorded-yet'
+    : (`sha-${actors.length - 1}` as const);
+
 /**
  * Runs the job's script with `gh` answered from these, in a temp directory.
  * `changedFiles` is the event's count, `files.length` unless given; `reviews`
@@ -230,6 +425,8 @@ const runJob = async ({
   author,
   approvers,
   reviews = approvers.map((login) => ({ user: { login }, state: 'APPROVED' })),
+  pushers = [author],
+  headRepo = 'owner/repo',
 }: Readonly<{
   codeOwners: string;
   files: readonly (
@@ -242,7 +439,20 @@ const runJob = async ({
     user: Readonly<{ login: string }> | null;
     state: string;
   }>[];
-}>): Promise<Readonly<{ passed: boolean; output: string }>> => {
+  /**
+   * Who pushed, in order, the first creating the branch; `'unknown'` is a chain
+   * that stops short of the head.
+   */
+  pushers?: readonly string[] | 'unknown';
+  headRepo?: string;
+}>): Promise<
+  Readonly<{
+    passed: boolean;
+    output: string;
+    /** The API paths `gh` was asked for, in order. */
+    calls: readonly string[];
+  }>
+> => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'code-owners-job-'));
 
   try {
@@ -258,6 +468,15 @@ const runJob = async ({
 
     await writeText(dir, 'reviews.json', JSON.stringify(reviews));
 
+    await writeText(
+      dir,
+      'activity.json',
+      // Newest first, as the job asks for it.
+      JSON.stringify(
+        activityOf(pushers === 'unknown' ? [author] : pushers).toReversed(),
+      ),
+    );
+
     await writeText(dir, 'gh', FAKE_GH, 0o755);
 
     await writeText(dir, 'run.sh', await jobScript());
@@ -272,6 +491,10 @@ const runJob = async ({
           PR_NUMBER: '1',
           AUTHOR: author,
           BASE_SHA: 'base',
+          HEAD_SHA: headOf(pushers),
+          HEAD_REF: 'feature',
+          HEAD_REPO: headRepo,
+          PUSHES_RETRY_SECONDS: '0',
           CHANGED_FILES: changedFiles.toString(),
           GITHUB_REPOSITORY: 'owner/repo',
           GITHUB_STEP_SUMMARY: path.join(dir, 'summary.md'),
@@ -289,11 +512,26 @@ const runJob = async ({
           : 'the command could not be run',
       }));
 
-    return result;
+    const calls = await readText(path.join(dir, 'calls.log')).catch(() => '');
+
+    return {
+      ...result,
+      calls: calls.split('\n').filter((line) => line !== ''),
+    };
   } finally {
     await fs.rm(dir, { recursive: true, force: true });
   }
 };
+
+/** One entry of `GET /repos/{owner}/{repo}/activity`, as far as it is read. */
+type Activity = Readonly<{
+  activity_type: string;
+  before: string;
+  after: string;
+  ref: string;
+  /** `null` for a deleted account, as GitHub sends it. */
+  actor: Readonly<{ login: string }> | null;
+}>;
 
 /** `gh api <path> --jq <filter>`, answered from the files in `$FIXTURES`. */
 const FAKE_GH = [
@@ -307,10 +545,12 @@ const FAKE_GH = [
   '  esac',
   '  shift',
   'done',
+  'echo "$url" >>"$FIXTURES/calls.log"',
   'case "$url" in',
   '  */contents/*) jq -n --arg c "$(base64 -w0 "$FIXTURES/CODEOWNERS")" \'{content: $c}\' | jq -r "$filter" ;;',
   '  */files*) jq -r "$filter" "$FIXTURES/files.json" ;;',
   '  */reviews*) jq -r "$filter" "$FIXTURES/reviews.json" ;;',
+  '  */activity*) jq -r "$filter" "$FIXTURES/activity.json" ;;',
   '  *) exit 1 ;;',
   'esac',
   '',

@@ -48,8 +48,8 @@
   bypass を広げないこと。直接 push を検査するものは無い。
 - **`require_code_owner_review` は `false` のままにする。** `.github/CODEOWNERS`
   をマージゲートにしているのは ruleset ではなく、必須チェック
-  `Validate code owners`（`lint-pull-request.yml` の `code-owners` ジョブ）。挙がったパスを触る pull request は、作り手が
-  所有者であるか、所有者が head を approve していなければ赤になる。ruleset の
+  `Validate code owners`（`lint-pull-request.yml` の `code-owners` ジョブ）。挙がったパスを触る pull request は、作り手と
+  ブランチに push した全員が所有者であるか、所有者が head を approve していなければ赤になる。ruleset の
   規則は作り手を区別できず、作者は自分の pull request を approve できないので、
   `true` にすると owner 自身の pull request がそのパスでは毎回 ruleset bypass
   でしかマージできなくなる。守りたい相手は bot（ `pnpm-update` の App token は

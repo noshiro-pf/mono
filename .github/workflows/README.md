@@ -939,8 +939,9 @@ Nothing checks this; a review does.
   `.github/CODEOWNERS`**, which `lint-pull-request.yml`'s `code-owners` job
   enforces in the ruleset's place: a change there by anyone but the owner waits
   for the owner's approval, so a bot's pull request that touches either does not
-  auto-merge, while the owner's own needs no bypass. The action pins are the one
-  thing a bot writes there.
+  auto-merge, while the owner's own needs no bypass — unless someone else pushed
+  to its branch, which the job reads from the repository's activity. The action
+  pins are the one thing a bot writes there.
 - **Action pins are SHAs with a version comment**, moved by `update-actions`
   within their major; a major waits for a human (see "Dependencies" in
   `CLAUDE.md`). A pin the setup action already carries belongs there, not in

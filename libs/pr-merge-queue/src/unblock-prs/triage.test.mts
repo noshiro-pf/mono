@@ -10,6 +10,7 @@ import {
   orderCandidates,
   outOfSyncAtSurvey,
   priorityPhrase,
+  pushersMatter,
 } from './triage.mjs';
 import type {
   ChecksSummary,
@@ -420,6 +421,41 @@ describe(failingReviewsToRead, () => {
   });
 });
 
+describe(pushersMatter, () => {
+  const byCheck = {
+    requireCodeOwnerReview: false,
+    requireConversationResolution: false,
+    codeOwners: parseCodeOwners('/.github/workflows/ @owner @other\n'),
+    codeOwnerGate: 'check',
+  } as const;
+
+  test('matters to a path the author owns and nobody approved', () => {
+    assert.isTrue(pushersMatter(reviewState({}), byCheck));
+  });
+
+  // A read short of every changed path may hide one the author owns.
+  test('matters to a read that stops short', () => {
+    assert.isTrue(
+      pushersMatter(
+        reviewState({ files: ['docs/a.md'], filesComplete: false }),
+        byCheck,
+      ),
+    );
+  });
+
+  test('does not matter once an owner approved, or to someone else’s', () => {
+    assert.isFalse(
+      pushersMatter(reviewState({ approvers: ['other'] }), byCheck),
+    );
+
+    assert.isFalse(pushersMatter(reviewState({ author: 'bot' }), byCheck));
+
+    assert.isFalse(
+      pushersMatter(reviewState({ files: ['docs/a.md'] }), byCheck),
+    );
+  });
+});
+
 describe(codeOwnersClassification, () => {
   const check = 'Validate code owners';
 
@@ -452,6 +488,18 @@ describe(codeOwnersClassification, () => {
         kind: 'held',
         reason: 'waiting for @owner to approve .github/workflows/a.yml',
       },
+    );
+  });
+
+  // Someone else pushed to an owner's pull request whose only owner is its
+  // author: no approval can come, so re-running would only fail again, and
+  // holding it would tell nobody. The rest of triage sets it aside.
+  test('leaves one only a bypass merges to be set aside', () => {
+    assert.isUndefined(
+      codeOwnersClassification(failing([check]), check, {
+        hold: { kind: 'bypass', reason: '@owner is the only owner' },
+        codeOwners: 'required',
+      }),
     );
   });
 
@@ -525,3 +573,15 @@ describe(codeOwnersClassification, () => {
     assert.isUndefined(codeOwnersClassification(undefined, check, undefined));
   });
 });
+
+const reviewState = (
+  overrides: Partial<Parameters<typeof pushersMatter>[0]>,
+): Parameters<typeof pushersMatter>[0] =>
+  ({
+    author: 'owner',
+    approvers: [],
+    files: ['.github/workflows/ci.yml'],
+    filesComplete: true,
+    unresolvedConversations: 0,
+    ...overrides,
+  }) as const;

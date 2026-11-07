@@ -22,6 +22,8 @@ import {
   type QueueReads,
   type QueueStanding,
   type ReviewHold,
+  type ReviewRules,
+  type ReviewState,
   type RulesetRequirements,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
@@ -39,6 +41,7 @@ import {
   listPullRequests,
   readBranchRules,
   readNativeStack,
+  readPushers,
   readReviewStates,
   remoteBranchTips,
   remoteSha,
@@ -54,6 +57,7 @@ import type {
   OutOfSync,
   OutOfSyncSighting,
   PullRequest,
+  ReviewStateAt,
   Survey,
   Triage,
   TriageBase,
@@ -655,6 +659,15 @@ export const codeOwnersClassification = (
     return { kind: 'held', reason: review.hold.reason };
   }
 
+  // Under the check, a bypass is an owner's pull request someone else pushed
+  // to, whose only owner may not approve it. Re-running changes nothing, and
+  // holding it would hold it for ever, with nobody told: it is left to the rest
+  // of triage, which sets it aside `checks-failed` with a comment linking the
+  // check that names who wrote it.
+  if (review?.hold?.kind === 'bypass') {
+    return undefined;
+  }
+
   if (review?.codeOwners === 'unknown') {
     return {
       kind: 'held',
@@ -689,6 +702,20 @@ export const failingReviewsToRead = (
   !Arr.isNonEmpty(requirements.requiredContexts)
     ? ([] as const)
     : failing.filter((prNumber) => !numbers.includes(prNumber));
+
+/**
+ * Whether who pushed could change where `state` stands with the code owners:
+ * whether the answer with them untold differs from the author's alone. Only
+ * then is the branch's activity read — as the check reads it only for a path
+ * the author owns that no owner has approved — and a read that stops short of
+ * every changed path counts too, since the answer is then about the rules.
+ */
+export const pushersMatter = (
+  state: ReviewState,
+  rules: ReviewRules,
+): boolean =>
+  codeOwnerReviewOf({ ...state, pushers: 'unknown' }, rules).state !==
+  codeOwnerReviewOf({ ...state, pushers: [state.author] }, rules).state;
 
 /**
  * What the rules on the default branch require, as GitHub applies them.
@@ -930,6 +957,37 @@ const classification = (
 };
 
 /**
+ * Who pushed to the branch `state` was read at, as `ReviewState.pushers`:
+ * `'unknown'` for a fork's branch, whose pushes are not this repository's, and
+ * nothing for a read that fails, which is logged.
+ */
+const pushersOfState = async (
+  api: ApiContext,
+  prNumber: number,
+  state: ReviewStateAt,
+): Promise<Readonly<{ pushers?: readonly string[] | 'unknown' }>> => {
+  if (state.branch === undefined) {
+    return { pushers: 'unknown' };
+  }
+
+  const read = await readPushers(api, state.branch, state.head);
+
+  // A read that failed says nothing about who pushed; taken as untold, it would
+  // make a bypass of an owner's pull request and set it aside over one failed
+  // request. Judged by its author alone, it is re-run, and the check, which
+  // reads the activity itself, decides.
+  if (Result.isErr(read)) {
+    log(
+      `#${prNumber}: cannot read who pushed to it; judging it by its author alone. (${lastLines(read.value, 2)})`,
+    );
+
+    return {};
+  }
+
+  return { pushers: read.value };
+};
+
+/**
  * Each pull request's {@link ReviewRead}, by number, and the required check
  * that enforces `CODEOWNERS` if one does; empty, and nothing asked, when the
  * ruleset asks no review and requires no check.
@@ -1009,25 +1067,44 @@ const readReviews = async (
     codeOwnerGate: gate,
   } as const;
 
+  // A failing one is read to tell whether that check is waiting on an owner,
+  // and the check counts who pushed to the branch (`pushersOf` in
+  // `pr-report-core`), so the model reads them too: otherwise another writer's
+  // push to the owner's branch would look approved, and be re-run.
+  const failingStates = await Promise.all(
+    failingRead !== undefined && Result.isOk(failingRead)
+      ? Array.from(
+          failingRead.value.states,
+          async ([prNumber, state]) =>
+            [
+              prNumber,
+              {
+                ...state,
+                ...(pushersMatter(state, rules)
+                  ? await pushersOfState(api, prNumber, state)
+                  : {}),
+              },
+            ] as const,
+        )
+      : [],
+  );
+
   return Result.ok({
     reads: new Map(
-      [
-        ...Array.from(read.value.states),
-        ...(failingRead !== undefined && Result.isOk(failingRead)
-          ? Array.from(failingRead.value.states)
-          : []),
-      ].map(([prNumber, state]) => {
-        const codeOwners = codeOwnerReviewOf(state, rules);
+      [...Array.from(read.value.states), ...failingStates].map(
+        ([prNumber, state]) => {
+          const codeOwners = codeOwnerReviewOf(state, rules);
 
-        return [
-          prNumber,
-          {
-            head: state.head,
-            hold: reviewHold(state, rules, codeOwners),
-            codeOwners: codeOwners.state,
-          },
-        ] as const;
-      }),
+          return [
+            prNumber,
+            {
+              head: state.head,
+              hold: reviewHold(state, rules, codeOwners),
+              codeOwners: codeOwners.state,
+            },
+          ] as const;
+        },
+      ),
     ),
     codeOwnersCheck: gate === 'check' ? enforcedBy : undefined,
   });
