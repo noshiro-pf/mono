@@ -1,5 +1,15 @@
 # synstate-dom-sample-app
 
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [f66e35d]
+- Updated dependencies [931ba22]
+    - synstate-dom@0.9.0
+    - ts-data-forge@14.13.0
+    - synstate@7.0.2
+
 ## 0.0.14
 
 ### Patch Changes

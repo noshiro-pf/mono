@@ -1,5 +1,0 @@
----
-'eslint-config-typed': minor
----
-
-`eslintTsDataForgeRules` and its types `EslintTsDataForgeRules` / `EslintTsDataForgeRulesOption` follow `eslint-plugin-ts-data-forge` again: they are generated from the plugin by `gen:rule-types` rather than kept by hand. The preset no longer names `prefer-arr-is-min-length-array`, `prefer-arr-is-max-length-array`, `prefer-arr-is-bounded-length-array`, `prefer-arr-is-fixed-length-array` and `prefer-arr-is-non-empty`, which the plugin replaced with `prefer-canonical-length-guard` and which ESLint refused as unknown rules, and turns on at `error` the rules it had not listed: `prefer-canonical-length-guard`, `prefer-canonical-length-cast`, `prefer-arr-generate`, `prefer-arr-scan`, `prefer-arr-uniq`, `no-side-effect-import`, `prefer-obj-over-entries-round-trip` and `prefer-pipe-map-nullable`, as the plugin's `recommended` config does. A rule entry with options is typed `readonly [severity, options]`, and a rule that offers suggestions says so in its JSDoc table.

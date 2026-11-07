@@ -1,5 +1,15 @@
 # event-schedule-app-functions
 
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [931ba22]
+    - ts-data-forge@14.13.0
+    - event-schedule-app-shared@0.0.22
+    - ts-fortress-types@0.0.23
+    - ts-fortress@12.4.6
+
 ## 0.0.13
 
 ### Patch Changes

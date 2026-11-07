@@ -1,5 +1,19 @@
 # algo-app
 
+## 0.0.30
+
+### Patch Changes
+
+- Updated dependencies [f66e35d]
+- Updated dependencies [931ba22]
+    - synstate-dom@0.9.0
+    - synstate-router-dom@0.2.0
+    - ts-data-forge@14.13.0
+    - ts-utils-additional@0.0.14
+    - synstate@7.0.2
+    - synstate-router@0.1.0
+    - ts-fortress@12.4.6
+
 ## 0.0.29
 
 ### Patch Changes

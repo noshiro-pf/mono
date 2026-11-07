@@ -1,5 +1,19 @@
 # pr-report-core
 
+## 0.5.0
+
+### Minor Changes
+
+- 9e92857: Support a `CODEOWNERS` file enforced by a required check instead of the ruleset's `require_code_owner_review`. `codeOwnersEnforcedBy` reads the `# enforced-by: <context>` line, `codeOwnerGate` says which of the two enforces the file, and `codeOwnerReview`'s `authorApproves` and `ReviewRules.codeOwnerGate` count the author as approving the paths they own there. `unblock-prs` holds someone else's pull request until an owner approves it, re-runs the failed check after the approval, and its auto-fix no longer pushes a fix that changes a path `CODEOWNERS` owns.
+- beff847: `unblock-prs` keeps a `rebase-failed` set-aside across a move of the default branch while the branch still conflicts, updating only the base its comment records, so that the owner stays `skill` and `claim-pr` succeeds. It clears the set-aside only once the conflict is gone. `pr-report-core` gains `moveSetAsideBase`.
+- eeaeeda: `pr-report-core` exports `REVIEW_SECTION_HEADING`, `CLAUDE_SESSION_LINE` and `isDeclarationLine`, so that `pr-description` guards a body with the patterns its parsers read it by rather than copies of them.
+
+### Patch Changes
+
+- Updated dependencies [931ba22]
+    - ts-data-forge@14.13.0
+    - ts-fortress@12.4.6
+
 ## 0.4.1
 
 ### Patch Changes

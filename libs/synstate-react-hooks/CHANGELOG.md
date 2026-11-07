@@ -1,5 +1,14 @@
 # synstate-react-hooks
 
+## 7.0.3
+
+### Patch Changes
+
+- bf0970d: `useObservableValue` stays subscribed across renders with the same observable, instead of unsubscribing and subscribing again on every render.
+- Updated dependencies [931ba22]
+    - ts-data-forge@14.13.0
+    - synstate@7.0.2
+
 ## 7.0.2
 
 ### Patch Changes
