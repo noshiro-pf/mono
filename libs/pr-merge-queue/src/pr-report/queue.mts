@@ -62,10 +62,18 @@ export type QueueState = Readonly<{
  * Reads the open pull requests, this account's comments on them and the owner
  * of each, for a command that acts on the queue. It needs a token whose account
  * is the one `unblock-prs` writes as: without one no comment is trusted, and
- * there is no owner to read.
+ * there is no owner to read. `token` is for a command that resolved its own
+ * (`gh auth token` included); otherwise it comes from the environment.
+ * `checks: false` leaves out every pull request's comparison and check states,
+ * which no owner reads, for a command that must not wait for them: its entries
+ * then say nothing of either.
  */
 export const readQueueState = async (
   repoOption?: string,
+  {
+    token = tokenFromEnv(),
+    checks = true,
+  }: Readonly<{ token?: string | undefined; checks?: boolean }> = {},
 ): Promise<Result<QueueState, string>> => {
   const repo = await resolveRepo(repoOption);
 
@@ -73,7 +81,7 @@ export const readQueueState = async (
     return repo;
   }
 
-  const client = createClient(tokenFromEnv());
+  const client = createClient(token);
 
   if (!client.authenticated) {
     return Result.err(
@@ -97,7 +105,7 @@ export const readQueueState = async (
     return required;
   }
 
-  const facts = await client.facts(repo.value);
+  const facts = await client.facts(repo.value, { checks });
 
   if (Result.isErr(facts)) {
     return facts;

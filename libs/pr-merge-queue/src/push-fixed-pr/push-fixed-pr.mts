@@ -1,6 +1,5 @@
 import {
   SKIP_CI_LABEL,
-  stackDescendants,
   type QueueComments,
   type QueueOwner,
   type ReportEntry,
@@ -15,6 +14,8 @@ import {
 } from '../lib/index.mjs';
 import { readQueueState } from '../pr-report/index.mjs';
 import {
+  branchOfEntry,
+  layersAbove,
   pushLeased,
   readConfig,
   restack,
@@ -211,24 +212,12 @@ export const decidePush = ({
     };
   }
 
-  const parents: ReadonlyMap<number, number> = new Map(
-    Arr.generate(function* () {
-      for (const e of entries) {
-        if (e.stackedOn !== undefined) {
-          yield [e.number, e.stackedOn] as const;
-        }
-      }
-    }),
-  );
-
   return {
     kind: 'push',
-    pr: branchOf(entry),
+    pr: branchOfEntry(entry),
     head,
     addSkipCi: entry.labels.every(({ name }) => name !== SKIP_CI_LABEL),
-    layers: stackDescendants(parents, number).flatMap((n) =>
-      entries.filter((e) => e.number === n).map(branchOf),
-    ),
+    layers: layersAbove(entries, number),
   };
 };
 
@@ -280,14 +269,3 @@ export const parsePushArgs = (args: readonly string[]): PushArgs | string => {
 };
 
 export type PushArgs = Readonly<{ number: number; by: string; head: string }>;
-
-const branchOf = (entry: ReportEntry): BranchOf =>
-  ({
-    number: entry.number,
-    // Every entry is an open pull request.
-    state: 'OPEN',
-    headRefName: entry.headRef,
-    headRefOid: entry.headSha,
-    baseRefName: entry.baseRef,
-    isCrossRepository: entry.fromFork,
-  }) as const;

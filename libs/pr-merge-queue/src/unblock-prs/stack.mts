@@ -46,9 +46,13 @@
 import {
   findStackParents,
   isSafeRefName,
+  stackDescendants,
   type NativeStackEntry,
   type QueueOwner,
+  type ReportEntry,
 } from 'pr-report-core';
+import { Arr } from 'ts-data-forge';
+import type { StrictPick } from 'ts-type-forge';
 import { isMergeQueued, isSkipCiLabelled, wantsAutoRebase } from './labels.mjs';
 import type {
   BaseChange,
@@ -103,6 +107,47 @@ export const nativeStackNote = (
     kind: 'note',
     note: `#${pr.number}: layer ${entry.position} of ${entry.size} of GitHub's native stack #${entry.stack}, on which GitHub refuses auto-merge; merge it by hand (a stack made by the base alone needs no native stack)`,
   }) as const;
+
+/** What {@link branchOfEntry} and {@link layersAbove} read of a report's entry. */
+export type StackEntry = StrictPick<
+  ReportEntry,
+  'baseRef' | 'fromFork' | 'headRef' | 'headSha' | 'number' | 'stackedOn'
+>;
+
+/** A report's entry, as `restack` and `pushLeased` take a branch. */
+export const branchOfEntry = (entry: StackEntry): BranchOf =>
+  ({
+    number: entry.number,
+    // Every entry is an open pull request.
+    state: 'OPEN',
+    headRefName: entry.headRef,
+    headRefOid: entry.headSha,
+    baseRefName: entry.baseRef,
+    isCrossRepository: entry.fromFork,
+  }) as const;
+
+/**
+ * The open pull requests stacked on pull request `number`, however high, lowest
+ * first: what `restack` carries along when it moves.
+ */
+export const layersAbove = (
+  entries: readonly StackEntry[],
+  number: number,
+): readonly BranchOf[] => {
+  const parents: ReadonlyMap<number, number> = new Map(
+    Arr.generate(function* () {
+      for (const e of entries) {
+        if (e.stackedOn !== undefined) {
+          yield [e.number, e.stackedOn] as const;
+        }
+      }
+    }),
+  );
+
+  return stackDescendants(parents, number).flatMap((n) =>
+    entries.filter((e) => e.number === n).map(branchOfEntry),
+  );
+};
 
 /**
  * Why a layer cannot be carried along when the one below it moves, or

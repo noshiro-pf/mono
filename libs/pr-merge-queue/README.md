@@ -114,11 +114,15 @@ repository keeps its rulesets as code.
 
 More work on a pull request already open goes between **`rework-pr start`**,
 before the first change — `skip-ci` on, `merge-queued` off, auto-merge disarmed,
-a draft, so nothing merges half of it — and **`rework-pr done`**, which pushes
-it with `--force-with-lease --force-if-includes`, so that a push someone else
-made meanwhile is refused even after a fetch, and marks it ready for review
-again. `done` takes one of two flags, by whether the work changes what the
-description says:
+a draft, so nothing merges half of it — and **`rework-pr done`**, which refuses
+uncommitted changes and untracked files that are not ignored, pushes it with
+`--force-with-lease --force-if-includes`, so that a push someone else made
+meanwhile is refused even after a fetch, carries along the pull requests stacked
+on it, as `push-fixed-pr` does, save one someone has claimed, and marks it ready
+for review again. Both refuse a pull request someone has claimed, or that the
+worker set aside for a skill to fix: that goes through `claim-pr` and
+`push-fixed-pr` (step 4). `done` takes one of two flags, by whether the work
+changes what the description says:
 
 - **`--requeue`** — it does not, so nothing the author queued needs reading
   again: `done` puts `merge-queued` back last, and the queue takes it from
@@ -133,7 +137,9 @@ description says:
 
 Drafts and auto-merge are GraphQL only, so where GraphQL is refused `start`
 holds it by the labels alone and says so, unless it was armed, when it fails:
-disarming it is then the author's.
+disarming it is then the author's. A draft that fails in any other way, such as
+a 502, fails `start` too, with the pull request held; running it again finishes
+it.
 
 ### Running the worker
 
