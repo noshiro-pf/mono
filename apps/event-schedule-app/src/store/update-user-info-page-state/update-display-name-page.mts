@@ -21,6 +21,11 @@ import type {
   AccountAuthApi,
   AccountUser,
 } from './account-deps.mjs';
+import {
+  describeAuthError,
+  runSubmitSteps,
+  settleAuthStep,
+} from './auth-step.mjs';
 import type { UpdateUserInfoDialog } from './update-user-info-dialog-state.mjs';
 
 export type UpdateDisplayNamePageDeps<User> = Readonly<{
@@ -34,7 +39,7 @@ export type UpdateDisplayNamePageDeps<User> = Readonly<{
   /** Which dialog is open; this one closes itself when done. */
   dialog: StrictPick<
     UpdateUserInfoDialog,
-    'closeDialog' | 'openingDialogType$'
+    'closeDialog' | 'openingDialogType$' | 'trackSession'
   >;
   /** Where the dialog says whether it went through. */
   toast: Promise<Toaster>;
@@ -106,21 +111,40 @@ export const createUpdateDisplayNamePageStore = <User extends AccountUser>(
       return;
     }
 
-    const res = await deps.api.auth.update.displayName(
-      user,
-      s.displayName.inputValue,
+    // A submit whose dialog was closed meanwhile closes no dialog opened since.
+    await runSubmitSteps(
+      deps.dialog.trackSession,
+      (isCurrent) => submitSteps(user, s, isCurrent),
+      () => {
+        dispatch({ type: 'done' });
+      },
     );
+  };
+
+  /**
+   * The step of `submit`, ending its wait as an `Err` when it rejects, so that
+   * a rejection is reported as the step's own error is.
+   */
+  const submitSteps = async (
+    user: User,
+    s: UpdateDisplayNamePageState,
+    isCurrent: () => boolean,
+  ): Promise<void> => {
+    const res = await settleAuthStep(
+      deps.api.auth.update.displayName(user, s.displayName.inputValue),
+    );
+
+    // The name is changed or not by now, so the toast says which even when the
+    // dialog was closed meanwhile; only the dialog it started from is closed.
+    if (isCurrent()) {
+      deps.dialog.closeDialog();
+    }
 
     if (Result.isErr(res)) {
       console.error(
         'error occurred on updateDisplayName:',
-        res.value.code,
-        res.value.message,
+        ...describeAuthError(res.value),
       );
-
-      dispatch({ type: 'done' });
-
-      deps.dialog.closeDialog();
 
       showToast({
         toast: deps.toast,
@@ -132,10 +156,6 @@ export const createUpdateDisplayNamePageStore = <User extends AccountUser>(
     }
 
     deps.auth.emitAuthStateChange(); // added because onAuthStateChanged doesn't fire on updateProfile
-
-    dispatch({ type: 'done' });
-
-    deps.dialog.closeDialog();
 
     showToast({
       toast: deps.toast,
@@ -153,7 +173,7 @@ export const createUpdateDisplayNamePageStore = <User extends AccountUser>(
       return;
     }
 
-    // TODO: use toast
+    // `submit` reports the steps' failures; this only logs what reporting threw.
     submit(fireAuthUser).catch(console.error);
   };
 

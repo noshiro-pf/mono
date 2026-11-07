@@ -4,9 +4,8 @@ import {
   type InitializedObservable,
   map,
   mapTo,
-  scan,
 } from 'synstate';
-import { hasKey, isRecord, isString, Result } from 'ts-data-forge';
+import { Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import {
@@ -22,6 +21,12 @@ import type {
   AccountAuthApi,
   AccountUser,
 } from './account-deps.mjs';
+import {
+  authErrorCodeOf,
+  describeAuthError,
+  runSubmitSteps,
+  settleAuthStep,
+} from './auth-step.mjs';
 import type { UpdateUserInfoDialog } from './update-user-info-dialog-state.mjs';
 
 export type DeleteAccountCreatedWithGoogleDeps<User> = Readonly<{
@@ -38,7 +43,7 @@ export type DeleteAccountCreatedWithGoogleDeps<User> = Readonly<{
   /** Which dialog is open; this one closes itself when done. */
   dialog: StrictPick<
     UpdateUserInfoDialog,
-    'closeDialog' | 'openingDialogType$'
+    'closeDialog' | 'openingDialogType$' | 'trackSession'
   >;
   /** Where the dialog says whether it went through. */
   toast: Promise<Toaster>;
@@ -115,14 +120,6 @@ export const createDeleteAccountCreatedWithGoogleStore = <
     ),
   );
 
-  // Counts every opening and closing of a dialog, so that a submit can tell
-  // whether the dialog it started from is still the one on screen.
-  const dialogSession$ = deps.dialog.openingDialogType$.pipe(
-    scan((session: number) => session + 1, 0),
-  );
-
-  const getDialogSession = (): number => dialogSession$.getSnapshot().value;
-
   const submit = async (user: User): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
@@ -130,23 +127,15 @@ export const createDeleteAccountCreatedWithGoogleStore = <
       return;
     }
 
-    const session = getDialogSession();
-
-    // A submit whose dialog was closed (or closed and opened again) since it
-    // started stops at its next step, so it never asks to delete the user after
-    // a close. Closing has already reset the waiting state, which now belongs
-    // to the dialog on screen.
-    const isCurrent = (): boolean => getDialogSession() === session;
-
     setTrueIsWaitingResponse();
 
-    try {
-      await submitSteps(user, isCurrent);
-    } finally {
-      if (isCurrent()) {
-        setFalseIsWaitingResponse();
-      }
-    }
+    // A submit whose dialog was closed stops at its next step, so it never asks
+    // to delete the user after a close.
+    await runSubmitSteps(
+      deps.dialog.trackSession,
+      (isCurrent) => submitSteps(user, isCurrent),
+      setFalseIsWaitingResponse,
+    );
   };
 
   /**
@@ -157,7 +146,7 @@ export const createDeleteAccountCreatedWithGoogleStore = <
     user: User,
     isCurrent: () => boolean,
   ): Promise<void> => {
-    const res1 = await settle(
+    const res1 = await settleAuthStep(
       deps.api.auth.reauthenticateWithGooglePopup(user),
     );
 
@@ -166,7 +155,7 @@ export const createDeleteAccountCreatedWithGoogleStore = <
     if (!dismissed && Result.isErr(res1)) {
       console.error(
         'error occurred on reauthenticateWithGooglePopup:',
-        ...describeError(res1.value),
+        ...describeAuthError(res1.value),
       );
     }
 
@@ -189,7 +178,7 @@ export const createDeleteAccountCreatedWithGoogleStore = <
       return;
     }
 
-    const res2 = await settle(deps.api.auth.deleteUser(user));
+    const res2 = await settleAuthStep(deps.api.auth.deleteUser(user));
 
     // The user is deleted or not by now, so the toast says which even when the
     // dialog was closed meanwhile; only the dialog it started from is closed.
@@ -200,7 +189,7 @@ export const createDeleteAccountCreatedWithGoogleStore = <
     if (Result.isErr(res2)) {
       console.error(
         'error occurred on deleteUser:',
-        ...describeError(res2.value),
+        ...describeAuthError(res2.value),
       );
 
       showToast({
@@ -271,29 +260,8 @@ export type DeleteAccountCreatedWithGoogle = Readonly<{
 }>;
 
 /** Whether `error` is one of {@link POPUP_DISMISSED_CODES}. */
-const isPopupDismissed = (error: unknown): boolean =>
-  isRecord(error) &&
-  hasKey(error, 'code') &&
-  isString(error.code) &&
-  POPUP_DISMISSED_CODES.has(error.code);
+const isPopupDismissed = (error: unknown): boolean => {
+  const code = authErrorCodeOf(error);
 
-/**
- * What to log for a step's error: its code and message, as for every
- * `AuthError`, or what it rejected with.
- */
-const describeError = (error: unknown): readonly unknown[] =>
-  isRecord(error) && hasKey(error, 'code')
-    ? ([
-        error.code,
-        hasKey(error, 'message') ? error.message : undefined,
-      ] as const)
-    : ([error] as const);
-
-/** `promise`, with a rejection turned into an `Err` of what it rejected with. */
-const settle = async <T, E>(
-  promise: Promise<Result<T, E>>,
-): Promise<Result<T, unknown>> => {
-  const result = await Result.fromPromise(promise);
-
-  return Result.isOk(result) ? result.value : result;
+  return code !== undefined && POPUP_DISMISSED_CODES.has(code);
 };

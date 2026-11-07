@@ -19,6 +19,12 @@ import type {
   AccountAuthApi,
   AccountUser,
 } from './account-deps.mjs';
+import {
+  authErrorCodeOf,
+  describeAuthError,
+  runSubmitSteps,
+  settleAuthStep,
+} from './auth-step.mjs';
 import type { UpdateUserInfoDialog } from './update-user-info-dialog-state.mjs';
 
 export type DeleteAccountPageDeps<User, ReauthCredential> = Readonly<{
@@ -32,7 +38,7 @@ export type DeleteAccountPageDeps<User, ReauthCredential> = Readonly<{
   /** Which dialog is open; this one closes itself when done. */
   dialog: StrictPick<
     UpdateUserInfoDialog,
-    'closeDialog' | 'openingDialogType$'
+    'closeDialog' | 'openingDialogType$' | 'trackSession'
   >;
   /** Where the dialog says whether it went through. */
   toast: Promise<Toaster>;
@@ -106,32 +112,55 @@ export const createDeleteAccountPageStore = <
       return;
     }
 
+    // A submit whose dialog was closed stops at its next step, so it never asks
+    // to delete the user after a close.
+    await runSubmitSteps(
+      deps.dialog.trackSession,
+      (isCurrent) => submitSteps(user, s, isCurrent),
+      () => {
+        dispatch({ type: 'done' });
+      },
+    );
+  };
+
+  /**
+   * The steps of `submit`, each ending its wait as an `Err` when it rejects, so
+   * that a rejection is reported as the step's own error is.
+   */
+  const submitSteps = async (
+    user: User,
+    s: DeleteAccountPageState,
+    isCurrent: () => boolean,
+  ): Promise<void> => {
     const credential: ReauthCredential = deps.api.auth.emailCredential(
       s.email.inputValue,
       s.password.inputValue,
     );
 
-    const res1 = await deps.api.auth.reauthenticateWithCredential(
-      user,
-      credential,
+    const res1 = await settleAuthStep(
+      deps.api.auth.reauthenticateWithCredential(user, credential),
     );
 
     if (Result.isErr(res1)) {
-      switch (credentialErrorOf(res1.value.code)) {
+      switch (credentialErrorOf(authErrorCodeOf(res1.value))) {
         case 'wrongPassword':
-          dispatch({
-            type: 'setPasswordError',
-            payload: dc.reauthenticate.message.wrongPassword,
-          });
+          if (isCurrent()) {
+            dispatch({
+              type: 'setPasswordError',
+              payload: dc.reauthenticate.message.wrongPassword,
+            });
+          }
 
           break;
 
         // The email is typed here too, so either of the two may be wrong.
         case 'wrongEmailOrPassword':
-          dispatch({
-            type: 'setPasswordError',
-            payload: dc.reauthenticate.message.wrongEmailOrPassword,
-          });
+          if (isCurrent()) {
+            dispatch({
+              type: 'setPasswordError',
+              payload: dc.reauthenticate.message.wrongEmailOrPassword,
+            });
+          }
 
           break;
 
@@ -141,19 +170,18 @@ export const createDeleteAccountPageStore = <
         case undefined:
           console.error(
             'error occurred on reauthenticateWithCredential:',
-            res1.value.code,
-            res1.value.message,
+            ...describeAuthError(res1.value),
           );
 
-          dispatch({ type: 'done' });
+          if (isCurrent()) {
+            deps.dialog.closeDialog();
 
-          deps.dialog.closeDialog();
-
-          showToast({
-            toast: deps.toast,
-            message: dc.reauthenticate.message.error,
-            intent: 'danger',
-          });
+            showToast({
+              toast: deps.toast,
+              message: dc.reauthenticate.message.error,
+              intent: 'danger',
+            });
+          }
 
           break;
       }
@@ -161,18 +189,23 @@ export const createDeleteAccountPageStore = <
       return;
     }
 
-    const res2 = await deps.api.auth.deleteUser(user);
+    if (!isCurrent()) {
+      return;
+    }
+
+    const res2 = await settleAuthStep(deps.api.auth.deleteUser(user));
+
+    // The user is deleted or not by now, so the toast says which even when the
+    // dialog was closed meanwhile; only the dialog it started from is closed.
+    if (isCurrent()) {
+      deps.dialog.closeDialog();
+    }
 
     if (Result.isErr(res2)) {
       console.error(
         'error occurred on deleteUser:',
-        res2.value.code,
-        res2.value.message,
+        ...describeAuthError(res2.value),
       );
-
-      dispatch({ type: 'done' });
-
-      deps.dialog.closeDialog();
 
       showToast({
         toast: deps.toast,
@@ -182,10 +215,6 @@ export const createDeleteAccountPageStore = <
 
       return;
     }
-
-    dispatch({ type: 'done' });
-
-    deps.dialog.closeDialog();
 
     showToast({
       toast: deps.toast,
@@ -203,7 +232,7 @@ export const createDeleteAccountPageStore = <
       return;
     }
 
-    // TODO: use toast
+    // `submit` reports the steps' failures; this only logs what reporting threw.
     submit(fireAuthUser).catch(console.error);
   };
 
