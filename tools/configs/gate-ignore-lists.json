@@ -14,6 +14,21 @@
     "**.txt",
     "!apps/*/src/"
   ],
+  "runtime": [
+    "experimental/",
+    "docs/",
+    "LICENSE",
+    ".editorconfig",
+    ".gitignore",
+    ".prettierrc",
+    ".prettierignore",
+    ".cspell.config.yaml",
+    "**/cspell.config.yaml",
+    ".markdownlint-cli2.mjs",
+    "**.md",
+    "**.txt",
+    "!apps/synstate-docs/src/data/"
+  ],
   "style": ["experimental/"],
   "strict-lib": [
     "experimental/",

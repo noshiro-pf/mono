@@ -312,7 +312,7 @@ gates:
         contents: read
         pull-requests: read
     with:
-        diff-scope: code # or style, strict-lib, none
+        diff-scope: code # or runtime, style, strict-lib, none
         result-job: code-check-result / result
 
 the-work:
@@ -393,8 +393,8 @@ condition of its own.
 
 #### The ignore lists
 
-The three lists are JSON (`tools/configs/gate-ignore-lists.json`) and can carry
-no comment of their own, so what they mean is here:
+The lists are JSON (`tools/configs/gate-ignore-lists.json`) and can carry no
+comment of their own, so what they mean is here:
 
 - **A path goes on a list only when no command that workflow runs reads it.**
   `articles/` is not on the style list because Prettier formats it; `**.md`
@@ -404,12 +404,21 @@ no comment of their own, so what they mean is here:
 - **An entry after a `!` is an exception**: a file it matches counts, whatever
   other entry of the same list matches it, and wherever in the list it stands.
   Unlike a `.gitignore`, order means nothing.
-- **`code`** (`code-check.yml`, `node-version-compatibility.yml`,
-  `synstate-benchmark.yml`) drops `experimental/`, `docs/`, `**.md`, `**.txt`
-  and the style tools' configuration, except under `apps/*/src/`
+- **`code`** (`code-check.yml`) drops `experimental/`, `docs/`, `**.md`,
+  `**.txt` and the style tools' configuration, except under `apps/*/src/`
   (`!apps/*/src/`). A page there is what an app builds, and its e2e checks (that
   a Japanese table fits as its English one does, say) run in `code-check.yml`
   alone, so a diff touching only that page is the one they judge.
+- **`runtime`** (`node-version-compatibility.yml`, `synstate-benchmark.yml`)
+  ignores what `code` does, with exceptions of its own. Those workflows run the
+  packages' code on each Node.js and measure it. An app's page goes through that
+  app's build, which `ws:build` runs there too, but nothing in it depends on the
+  Node.js version and `code-check.yml` builds it, so `runtime` does not take
+  `apps/*/src/` back. It takes back `apps/synstate-docs/src/data/` alone:
+  the benchmark judges the tables there against its baseline, so a diff of the
+  tables alone is one it has to see. The ignore entries are written out in both
+  lists, and `workflow-steps.test.mts` fails when they differ, so an entry added
+  to one goes in the other.
 - **`style`** (`style-check.yml`) drops `experimental/` and nothing else: its
   matrix checks markdown, `ws:doc` regenerates the package READMEs, and
   `ws:check:ext` globs every file under the directories it is given, so `code`

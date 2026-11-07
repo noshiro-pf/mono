@@ -9,9 +9,11 @@ name: SynState Benchmark
 # The check workflow shape — triggers, concurrency, `permissions: {}`, the
 # gate, the aggregate — is in README.md. What is particular to this one:
 #
-# - It gates on code-check.yml's ignore list (`diff-scope: code`): the build
-#   it runs reads every workspace package SynState is built from, and a
-#   hand-kept list of those would miss the next one.
+# - It gates on the `runtime` list (`diff-scope: runtime`): the build it runs
+#   reads every workspace package SynState is built from, and a hand-kept
+#   list of those would miss the next one, while a docs page changes no
+#   number it measures. The list takes back apps/synstate-docs/src/data, so
+#   that a diff of the committed tables alone is judged too.
 # - On `main` the job runs even when the verdict is reused, because that run
 #   is what stores the baseline the next pull request is compared with. The
 #   aggregate still reports the reused verdict. What it stores is the
@@ -67,7 +69,7 @@ jobs:
       contents: read
       pull-requests: read
     with:
-      diff-scope: code
+      diff-scope: runtime
       # A reused verdict does not skip `benchmark` on `main`, so the diff
       # question is answered there all the same.
       diff-when-reused: ${{ github.event_name == 'push' }}

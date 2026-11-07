@@ -320,7 +320,7 @@ describe('check-diff', () => {
       {
         ok: false,
         message:
-          'Input diff-scope is "none"; expected one of code, style, strict-lib.',
+          'Input diff-scope is "none"; expected one of code, runtime, style, strict-lib.',
       },
     );
   });
@@ -329,14 +329,24 @@ describe('check-diff', () => {
 const lists = (value: unknown): string => JSON.stringify(value);
 
 describe('the ignore lists', () => {
-  test('reads the three lists', () => {
+  test('reads the four lists', () => {
     assert.deepStrictEqual(
       parseGateLists(
-        lists({ code: ['docs/', '**.md'], style: [], 'strict-lib': ['apps/'] }),
+        lists({
+          code: ['docs/', '**.md'],
+          runtime: ['docs/'],
+          style: [],
+          'strict-lib': ['apps/'],
+        }),
       ),
       {
         ok: true,
-        value: { code: ['docs/', '**.md'], style: [], 'strict-lib': ['apps/'] },
+        value: {
+          code: ['docs/', '**.md'],
+          runtime: ['docs/'],
+          style: [],
+          'strict-lib': ['apps/'],
+        },
       },
     );
   });
@@ -349,14 +359,21 @@ describe('the ignore lists', () => {
     });
   });
 
-  test('refuses a file that is not exactly the three lists of strings', () => {
+  test('refuses a file that is not exactly the four lists of strings', () => {
     for (const text of [
       'not json',
       lists(['docs/']),
-      lists({ code: [], style: [] }),
-      lists({ code: [], style: [], 'strict-lib': [], extra: [] }),
-      lists({ code: 'docs/', style: [], 'strict-lib': [] }),
-      lists({ code: [1], style: [], 'strict-lib': [] }),
+      lists({ code: [], runtime: [], style: [] }),
+      lists({ code: [], style: [], 'strict-lib': [] }),
+      lists({
+        code: [],
+        runtime: [],
+        style: [],
+        'strict-lib': [],
+        extra: [],
+      }),
+      lists({ code: 'docs/', runtime: [], style: [], 'strict-lib': [] }),
+      lists({ code: [1], runtime: [], style: [], 'strict-lib': [] }),
     ]) {
       assert.isFalse(parseGateLists(text).ok);
     }
@@ -365,7 +382,12 @@ describe('the ignore lists', () => {
   test('refuses a pattern of a shape it does not match', () => {
     assert.deepStrictEqual(
       parseGateLists(
-        lists({ code: ['src/*/x.ts'], style: [], 'strict-lib': [] }),
+        lists({
+          code: ['src/*/x.ts'],
+          runtime: [],
+          style: [],
+          'strict-lib': [],
+        }),
       ),
       {
         ok: false,
@@ -419,8 +441,9 @@ describe('the ignore lists', () => {
     '!src/*/x.ts',
   ])('refuses %s', (pattern) => {
     assert.isFalse(
-      parseGateLists(lists({ code: [pattern], style: [], 'strict-lib': [] }))
-        .ok,
+      parseGateLists(
+        lists({ code: [pattern], runtime: [], style: [], 'strict-lib': [] }),
+      ).ok,
     );
   });
 
@@ -485,6 +508,57 @@ describe('the ignore lists', () => {
         ['**.md', '!apps/*/src/'],
       ),
       'apps/a/src/x.md',
+    );
+  });
+
+  // `runtime` is what node-version-compatibility.yml and
+  // synstate-benchmark.yml gate on: what `code` ignores, with exceptions of its
+  // own rather than `code`'s (#3332). Kept as a list of its own, which a list
+  // file can state and a reader can see, and held to that here so that an entry
+  // added to one and not the other fails.
+  test("the repository's runtime list ignores what its code list does", () => {
+    const code = readGateList('code', projectRoot);
+
+    const runtime = readGateList('runtime', projectRoot);
+
+    expect(
+      runtime.ok
+        ? runtime.value.filter((pattern) => !pattern.startsWith('!'))
+        : runtime.message,
+      'Give tools/configs/gate-ignore-lists.json the same entries in `code` and `runtime`, but for the `!` exceptions, which are each list\'s own (see "The ignore lists" in .github/workflows/README.md).',
+    ).toStrictEqual(
+      code.ok
+        ? code.value.filter((pattern) => !pattern.startsWith('!'))
+        : code.message,
+    );
+  });
+
+  test("an app's page runs code-check.yml and neither the Node.js matrix nor the benchmark", () => {
+    const page =
+      'apps/synstate-docs/src/content/docs/ja/getting-started/installation.md';
+
+    const code = readGateList('code', projectRoot);
+
+    const runtime = readGateList('runtime', projectRoot);
+
+    assert.isTrue(code.ok && runtime.ok);
+
+    assert.isFalse(ignoredBy(code.value)(page));
+
+    assert.isTrue(ignoredBy(runtime.value)(page));
+  });
+
+  // The benchmark judges the committed tables against its baseline, so a diff
+  // of the tables alone is one it has to see.
+  test('a benchmark table runs the benchmark', () => {
+    const runtime = readGateList('runtime', projectRoot);
+
+    assert.isTrue(runtime.ok);
+
+    assert.isFalse(
+      ignoredBy(runtime.value)(
+        'apps/synstate-docs/src/data/results-diamond.md',
+      ),
     );
   });
 
@@ -611,7 +685,12 @@ const makeBinDir = (): string => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   fs.writeFileSync(
     path.join(dir, 'tools/configs/gate-ignore-lists.json'),
-    JSON.stringify({ code: ['docs/', '**.md'], style: [], 'strict-lib': [] }),
+    JSON.stringify({
+      code: ['docs/', '**.md'],
+      runtime: ['docs/', '**.md'],
+      style: [],
+      'strict-lib': [],
+    }),
   );
 
   return dir;
@@ -967,7 +1046,7 @@ describe('the script, run the way the workflows run it', () => {
       code: 1,
       stdout: [
         'fake git: fetch --depth=1 origin +refs/heads/main:refs/remotes/origin/main',
-        '::error::tools/configs/gate-ignore-lists.json holds the lists code, style and strict-lib and nothing else, each an array of strings.',
+        '::error::tools/configs/gate-ignore-lists.json holds the lists code, runtime, style and strict-lib and nothing else, each an array of strings.',
         '',
       ].join('\n'),
     });
