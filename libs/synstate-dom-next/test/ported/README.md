@@ -31,7 +31,12 @@ synstate-dom".
 - `render`: a completed observable is a disposed one.
 - `pre-attach`: the error for an update that never settles is the scheduler's.
 - `reflected-keys`: `reflected-keys.generated.mts` is written by this package's
-  `gen:reflected-keys`, from its own props types.
+  `gen:reflected-keys`, from its own props types, as the union of the keys under
+  the repository's strict library and under the official `lib.dom.d.ts` of every
+  TypeScript version `strict-lib/` has a harness for (synstate-dom #3665).
+- `svg-attribute-names` (synstate-dom #3643): a case for each name of this
+  package's longer list; `side`, which Chromium does not implement, is asserted
+  to read nothing, so that the test fails once it does.
 - `samples`: the README samples are written into the test, since this package's
   README has none yet.
 
