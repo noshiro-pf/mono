@@ -9,7 +9,6 @@ import {
 import {
   constant,
   createAfterUpdate,
-  subscribeInScope,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -58,16 +57,14 @@ export const SetTimesPopoverContent = ({
 
   // The time range starts from the list's each time the popover opens, as the
   // content Blueprint mounted on each opening did; the days stay as they were.
-  subscribeInScope(
-    combine([isOpen, initialValue])
-      .pipe(filter(([open]) => open))
-      .pipe(map(([, value]) => value)),
-    (value) => {
+  combine([isOpen, initialValue])
+    .pipe(filter(([open]) => open))
+    .pipe(map(([, value]) => value))
+    .subscribe((value) => {
       afterUpdate(() => {
         setTimeRange(value);
       });
-    },
-  );
+    });
 
   return (
     <div class={constant(styles.popover)}>

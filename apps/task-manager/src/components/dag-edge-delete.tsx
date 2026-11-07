@@ -3,7 +3,6 @@ import {
   constant,
   createAfterUpdate,
   isImeKeyDown,
-  subscribeInScope,
   type JSX,
 } from 'synstate-dom';
 import { Num } from 'ts-data-forge';
@@ -43,7 +42,7 @@ export const DagEdgeDelete = ({
         };
 
         // Again for every click, which may be on the edge already selected.
-        subscribeInScope(button, ({ at }) => {
+        button.subscribe(({ at }) => {
           if (mut_focused.at === at) {
             return;
           }

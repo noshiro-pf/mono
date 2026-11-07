@@ -321,7 +321,7 @@ const App = (): JSX.Element => (
 ### 6.1 `Routes`
 
 - `cases` の必須キーは React 版と同じ。
-- 各 case はそのルートに絞られた `InitializedObservable<{ params; search; withSearch }>` を受け取る（`withSearch` は React 版と同じ）。内部は synstate-dom の `mountSwitch` と同じ方式で、**ルート id が変わったときだけ分岐を作り直す**。`mountSwitch` は synstate-dom の公開 API にないので、同じ処理を公開されている部品（`subscribeInScope`・`toNodes`）で持つ。`/products/1` から `/products/2` では分岐を保ったまま Observable に新しい params が流れ、`MatchOptional` と同じ細粒度の更新になる。
+- 各 case はそのルートに絞られた `InitializedObservable<{ params; search; withSearch }>` を受け取る（`withSearch` は React 版と同じ）。内部は synstate-dom の `mountSwitch` と同じ方式で、**ルート id が変わったときだけ分岐を作り直す**。`mountSwitch` は synstate-dom の公開 API にないので、同じ処理を公開されている部品（`subscribe`・`toNodes`）で持つ。`/products/1` から `/products/2` では分岐を保ったまま Observable に新しい params が流れ、`MatchOptional` と同じ細粒度の更新になる。
 - レイアウトは `under` と `prefix` で入れ子にする。`<Routes prefix cases={...}>` は直下の子の prefix 一致で分岐し、その中で `<Routes under={routes.products} cases={...}>` が `products` 以下のページを完全一致で分岐する。`under` を付けたときの必須キーはその枝のルート id だけ。
 - キーは常に完全なルート id（`'products.item'`）。枝の中でも略さないので、`grep` で定義と描画を結べる。
 

@@ -231,9 +231,10 @@ type MountedNodes = Node | readonly Node[];
 
 コンポーネントは 1 回しか評価されず、寿命は必ずそれを含む分岐・行・ルートと一致するので、コンポーネント単位のスコープは作らない。スコープの数と破棄の手間が減る。context は提供しない（決定事項 11）。
 
-コンポーネントの中で effect の代わりに使う補助関数を `scope/` から公開する。どれも現在のスコープの `onScopeDispose` に後始末を登録する。
+コンポーネントの中で Observable を購読するには、synstate の `subscribe` をそのまま使う。スコープの `run` の中で行った購読はそのスコープに属し、スコープの破棄で解除される（Observable の生成がスコープに入るのと同じ）。束縛（「7.1」）が完了していない Observable を購読するのもこれで行う。購読をスコープより長く続けるときは `untracked` の中で行う。ハンドラや `await` の後はどのスコープの中でもないので、そこで行った購読は誰も解除しない（eslint-plugin-synstate の `no-observable-in-handler` が報告する）。
 
-- `subscribeInScope(source, next)`: 購読し、スコープの破棄で解除する。束縛（「7.1」）が完了していない Observable を購読するのもこれで行う。
+effect の代わりに使うそのほかの補助関数を `scope/` から公開する。どれも現在のスコープの `onScopeDispose` に後始末を登録する。
+
 - `listenInScope(target, type, listener, options)`: `window` などコンポーネントが描く要素以外のイベントを、スコープの破棄まで聞く。要素のイベントの束縛（「7.2」）もこれで行う。
 - `createAfterUpdate()`: 処理を microtask で実行する関数を返す。進行中の更新が終わり、DOM が書かれた後に実行されるので、状態に書き込める。最初のマウントの後に実行したい処理にも使う。それまでにスコープが破棄されていれば捨てる。
 
@@ -560,7 +561,7 @@ libs/synstate-dom/
 │   ├── jsx/           # Mountable、jsx、Fragment、JSX 名前空間、IntrinsicElements
 │   ├── bind/          # 属性・プロパティ・テキスト・class・style・イベント
 │   ├── control/       # If、MatchOptional、MatchResult、For、Portal
-│   ├── scope/         # subscribeInScope、listenInScope、createAfterUpdate
+│   ├── scope/         # listenInScope、createAfterUpdate
 │   ├── keyboard/      # isImeKeyDown（入力メソッドのキー入力の判定）
 │   ├── internal/      # export しない実装（asConstant、属性とプロパティの定数表など）
 │   └── render.mts

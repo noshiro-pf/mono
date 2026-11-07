@@ -576,23 +576,27 @@ export const createRouter = <R extends AnyRoutes>(
 
     const mut_follow = { active: true, subscribing: true };
 
-    const subscription = href$.subscribe((href) => {
-      // An initialized observable delivers the value it holds during
-      // `subscribe`: a state, not a move.
-      if (
-        mut_follow.subscribing &&
-        Optional.isSome(held) &&
-        held.value === href
-      ) {
-        return;
-      }
-
-      queueMicrotask(() => {
-        if (mut_follow.active) {
-          navigate(href, navigateOptions?.replace ?? false, true);
+    // Outside any scope: following lasts until `stop` or the router's disposal,
+    // not until whichever scope happens to be running.
+    const subscription = untracked(() =>
+      href$.subscribe((href) => {
+        // An initialized observable delivers the value it holds during
+        // `subscribe`: a state, not a move.
+        if (
+          mut_follow.subscribing &&
+          Optional.isSome(held) &&
+          held.value === href
+        ) {
+          return;
         }
-      });
-    });
+
+        queueMicrotask(() => {
+          if (mut_follow.active) {
+            navigate(href, navigateOptions?.replace ?? false, true);
+          }
+        });
+      }),
+    );
 
     mut_follow.subscribing = false;
 

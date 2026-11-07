@@ -156,14 +156,18 @@ describe(createScope, () => {
       });
     });
 
+    // The nodes are subscribed outside the scope: a subscription made in it
+    // ends with the cleanups, before the nodes complete.
     parent.run(() => {
       const first$ = store$.pipe(map((x) => x));
 
-      first$.subscribe(
-        () => {},
-        () => {
-          mut_order.push('node first');
-        },
+      untracked(() =>
+        first$.subscribe(
+          () => {},
+          () => {
+            mut_order.push('node first');
+          },
+        ),
       );
 
       onScopeDispose(() => {
@@ -172,11 +176,13 @@ describe(createScope, () => {
 
       const second$ = store$.pipe(map((x) => x));
 
-      second$.subscribe(
-        () => {},
-        () => {
-          mut_order.push('node second');
-        },
+      untracked(() =>
+        second$.subscribe(
+          () => {},
+          () => {
+            mut_order.push('node second');
+          },
+        ),
       );
 
       onScopeDispose(() => {
@@ -305,11 +311,15 @@ describe(createScope, () => {
       Array.from({ length: 100 }, (_, i) => {
         const node$ = store$.pipe(map((x) => x + i));
 
-        node$.subscribe(
-          () => {},
-          () => {
-            mut_completions.push(i);
-          },
+        // Outside the scope: a subscription made in it would end before the
+        // scope disposes the node, and never hear of its completion.
+        untracked(() =>
+          node$.subscribe(
+            () => {},
+            () => {
+              mut_completions.push(i);
+            },
+          ),
         );
 
         return node$;

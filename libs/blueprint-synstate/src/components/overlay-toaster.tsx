@@ -13,7 +13,6 @@ import {
   isImeKeyDown,
   listenInScope,
   render,
-  subscribeInScope,
   type Child,
   type JSX,
 } from 'synstate-dom';
@@ -413,7 +412,7 @@ const ToastView = ({
     }
   };
 
-  subscribeInScope(row$, (row) => {
+  row$.subscribe((row) => {
     if (row.leaving) {
       stopTimeout();
 
@@ -549,7 +548,7 @@ const ToastContainer = ({
 
   // In Blueprint's overlay stack while a toast is shown, so that Escape is the
   // toaster's only while no overlay opened after it is open.
-  subscribeInScope(isOpen$, (open) => {
+  isOpen$.subscribe((open) => {
     if (open) {
       enterStack(self);
     } else {

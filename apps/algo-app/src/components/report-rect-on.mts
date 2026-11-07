@@ -1,5 +1,4 @@
 import { onScopeDispose, type InitializedObservable } from 'synstate';
-import { subscribeInScope } from 'synstate-dom';
 import type { Rect } from 'ts-utils-additional';
 
 /**
@@ -53,7 +52,7 @@ export const reportRectOn = (
   };
 
   // Several values in one update are measured once.
-  subscribeInScope(measureOn, () => {
+  measureOn.subscribe(() => {
     if (mut_state.scheduled) {
       return;
     }

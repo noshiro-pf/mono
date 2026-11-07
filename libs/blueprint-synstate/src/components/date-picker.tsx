@@ -2,7 +2,6 @@ import { createState, map } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  subscribeInScope,
   toObservable,
   type Bindable,
   type JSX,
@@ -181,7 +180,7 @@ export const DatePicker = ({
   // The month shown follows the value. Written once the update that brought the
   // value has finished, since a state is not written while another is
   // propagating.
-  subscribeInScope(value$, (current) => {
+  value$.subscribe((current) => {
     if (Optional.isSome(current)) {
       afterUpdate(() => {
         mut_memory.selectedDay = current.value.day;

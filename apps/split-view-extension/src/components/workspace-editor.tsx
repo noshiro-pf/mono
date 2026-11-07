@@ -10,7 +10,6 @@ import {
   For,
   If,
   mapBindable,
-  subscribeInScope,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -66,12 +65,11 @@ export const WorkspaceEditor = ({
   /** The name, written into the field whenever it changes: the draft goes. */
   const name$ = entry$.pipe(map((entry) => entry?.name ?? ''));
 
-  subscribeInScope(
-    entry$.pipe(map((entry) => `${entry?.id ?? ''}\u{0}${entry?.name ?? ''}`)),
-    () => {
+  entry$
+    .pipe(map((entry) => `${entry?.id ?? ''}\u{0}${entry?.name ?? ''}`))
+    .subscribe(() => {
       afterUpdate(stopConfirming);
-    },
-  );
+    });
 
   /** Runs `act` on the entry shown, if there still is one. */
   const withEntry =
