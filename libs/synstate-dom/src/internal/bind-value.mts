@@ -10,10 +10,9 @@ import type { Bindable } from '../constant/index.mjs';
  * - Any other observable is subscribed to in the current scope, whose disposal
  *   ends the subscription.
  *
- * `subscribe` delivers the current value before it adds the subscriber, so a
- * value written by the first `write` itself (a `For` row or a switch branch
- * mounted then writes what chose it, #3141) reaches no subscriber; it is
- * written once the subscription is in place.
+ * A value written by the first `write` itself (a `For` row or a switch branch
+ * mounted then writes what chose it, #3141) is written again by `subscribe`,
+ * once the first call has returned.
  */
 export const bindValue = <T,>(
   bindable: Bindable<T>,
@@ -31,11 +30,5 @@ export const bindValue = <T,>(
     return;
   }
 
-  const { updateToken } = bindable;
-
   bindable.subscribe(write);
-
-  if (bindable.updateToken !== updateToken) {
-    write(bindable.getSnapshot().value);
-  }
 };

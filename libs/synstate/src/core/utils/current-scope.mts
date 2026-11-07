@@ -29,6 +29,9 @@ export type ScopeSubscription = Readonly<{
  */
 export type ScopeInternals = Scope &
   Readonly<{
+    /** Whether `dispose()` has run, or the scope was born disposed. */
+    isDisposed: boolean;
+
     /** Takes `node` into the scope. */
     adopt: (node: ScopeMember) => void;
 
