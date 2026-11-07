@@ -777,6 +777,46 @@ a:focus-visible {
 }
 
 /*
+ * A pane's own Refresh: the arrows alone, after the link to GitHub, in the
+ * link's colour until pointed at. Shut, it is dimmed, and while its read is out
+ * the arrows turn, as the header's ring does.
+ */
+.pane-refresh {
+  align-items: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.8125rem;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.2rem;
+  vertical-align: -0.1em;
+}
+
+.pane-refresh:hover:not(:disabled) {
+  border-color: var(--baseline);
+  color: var(--accent);
+}
+
+.pane-refresh:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.pane-refresh[data-busy='true'] {
+  color: var(--accent);
+  cursor: progress;
+  opacity: 1;
+}
+
+.pane-refresh[data-busy='true'] .badge-icon {
+  animation: run-state-turn 1s linear infinite;
+}
+
+/*
  * A link in a section's title that does something on GitHub, drawn as a
  * button at the end of the row: the title is a flex row only where it holds
  * one, so the others keep their text flow.

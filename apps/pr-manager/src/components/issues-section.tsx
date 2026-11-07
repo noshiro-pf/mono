@@ -30,6 +30,7 @@ import { IssuesSummary } from './issues-summary.js';
 import { IssuesViewSwitch } from './issues-view-switch.js';
 import { LabelChip } from './label-chip.js';
 import { LoadMoreIssues } from './load-more-issues.js';
+import { PaneRefresh } from './pane-refresh.js';
 import { PartFailureNotes } from './part-failure-notes.js';
 import { Timestamp } from './timestamp.js';
 
@@ -101,6 +102,7 @@ export const IssuesSection = (): JSX.Element => {
         >
           {constant('on GitHub')}
         </ExternalLink>
+        <PaneRefresh pane={'issues'} what={'the open issues'} />
         <ExternalLink
           href={constant(newIssueUrl(reportSource))}
           variant={'section-action'}

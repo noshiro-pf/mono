@@ -14,6 +14,7 @@ import { IssuesSection } from './issues-section.js';
 import { MergeOrderFilters } from './merge-order-filters.js';
 import { MergeOrder } from './merge-order.js';
 import { MergedSection } from './merged-section.js';
+import { PaneRefresh } from './pane-refresh.js';
 import { PartFailureNotes } from './part-failure-notes.js';
 import { QueueSection } from './queue-section.js';
 import { WorkflowRunsSection } from './workflow-runs-section.js';
@@ -54,6 +55,7 @@ const blocks: ReadonlyRecord<BlockId, JSX.Element> = {
             >
               {constant('on GitHub')}
             </ExternalLink>
+            <PaneRefresh pane={'pulls'} what={'the open pull requests'} />
           </h2>
           <If
             // Counts of pull requests that were not read would all be 0.
