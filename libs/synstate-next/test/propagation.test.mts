@@ -1,3 +1,4 @@
+// cspell:ignore unstub
 import {
   batch,
   combine,
@@ -198,6 +199,171 @@ describe('propagation', () => {
     c.set(1);
 
     assert.deepStrictEqual(mut_seen, [0, 1]);
+  });
+
+  test('what the other subscribers write still propagates when one throws', () => {
+    const a = state(0);
+
+    const b = state(0);
+
+    a.subscribe((x) => {
+      if (x === 1) {
+        b.set(10);
+      }
+    });
+
+    a.subscribe((x) => {
+      if (x === 1) {
+        throw new Error('boom');
+      }
+    });
+
+    const mut_seen: number[] = [];
+
+    b.subscribe((x) => {
+      mut_seen.push(x);
+    });
+
+    assert.throws(() => {
+      a.set(1);
+    }, /boom/u);
+
+    assert.deepStrictEqual(mut_seen, [0, 10]);
+  });
+
+  test('a subscriber that writes and throws runs twice, not until the round limit', () => {
+    const a = state(0);
+
+    const mut_runs = { current: 0 };
+
+    a.subscribe((x) => {
+      if (x === 0) {
+        return;
+      }
+
+      mut_runs.current += 1;
+
+      a.set(x + 1);
+
+      throw new Error(`failure ${x.toString()}`);
+    });
+
+    const error = vi.fn();
+
+    vi.stubGlobal('console', { ...console, error });
+
+    onTestFinished(() => {
+      vi.unstubAllGlobals();
+    });
+
+    assert.throws(() => {
+      a.set(1);
+    }, 'failure 1');
+
+    assert.strictEqual(mut_runs.current, 2);
+
+    expect(error).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ message: 'failure 2' }),
+    );
+
+    // The second run's write reached the state; its propagation was dropped
+    // with the queues.
+    assert.strictEqual(a.value, 3);
+  });
+
+  test("a node's exception after a subscriber's is reported, and the subscriber's thrown", () => {
+    const a = state(0);
+
+    const b = state(0);
+
+    a.subscribe((x) => {
+      if (x !== 1) {
+        return;
+      }
+
+      b.set(1);
+
+      throw new Error('subscriber');
+    });
+
+    b.pipe(
+      map((x) => {
+        if (x === 1) {
+          throw new Error('node');
+        }
+
+        return x;
+      }),
+    ).subscribe(() => {});
+
+    const error = vi.fn();
+
+    vi.stubGlobal('console', { ...console, error });
+
+    onTestFinished(() => {
+      vi.unstubAllGlobals();
+    });
+
+    assert.throws(() => {
+      a.set(1);
+    }, 'subscriber');
+
+    expect(error).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ message: 'node' }),
+    );
+  });
+
+  test('a subscriber that throws does not stop the others of its round', () => {
+    const a = state(0);
+
+    const mut_seen: string[] = [];
+
+    a.subscribe((x) => {
+      mut_seen.push(`first ${x}`);
+    });
+
+    a.subscribe((x) => {
+      if (x === 1) {
+        throw new Error('first failure');
+      }
+    });
+
+    a.subscribe((x) => {
+      if (x === 1) {
+        throw new Error('second failure');
+      }
+    });
+
+    a.subscribe((x) => {
+      mut_seen.push(`last ${x}`);
+    });
+
+    const error = vi.fn();
+
+    vi.stubGlobal('console', { ...console, error });
+
+    onTestFinished(() => {
+      vi.unstubAllGlobals();
+    });
+
+    assert.throws(() => {
+      a.set(1);
+    }, /first failure/u);
+
+    expect(error).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ message: 'second failure' }),
+    );
+
+    assert.deepStrictEqual(mut_seen, [
+      'first 0',
+      'last 0',
+      'first 1',
+      'last 1',
+    ]);
+
+    a.set(2);
+
+    assert.deepStrictEqual(Arr.takeLast(mut_seen, 2), ['first 2', 'last 2']);
   });
 
   test('an exception in a projection leaves nothing queued', () => {
@@ -476,7 +642,7 @@ describe('events', () => {
     assert.strictEqual(count.value, 150);
   });
 
-  test('values queued when an exception struck are dropped, and later ones arrive', () => {
+  test('values queued when a subscriber threw still arrive, and later ones too', () => {
     const events = source<number>();
 
     const mut_seen: number[] = [];
@@ -503,7 +669,7 @@ describe('events', () => {
 
     events.next(5);
 
-    assert.deepStrictEqual(mut_seen, [4, 5]);
+    assert.deepStrictEqual(mut_seen, [2, 3, 4, 5]);
   });
 
   test('every next propagates, in order, however many arrive before a round', () => {

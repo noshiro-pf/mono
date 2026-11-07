@@ -74,11 +74,20 @@ dispose inside an effect without being inside a propagation.
   effect before the round's other effects have read the previous value waits
   until they have. A round that delivers a queued value starts the count of the
   limit again, since each one consumes a value written before it. An exception
-  drops the queued values with the rest of the queues.
+  from a node drops the queued values with the rest of the queues; one from an
+  effect does not.
 - Effects and recomputes run with no owner current, so what they create does not
   belong to whichever owner was current when the write was made.
-- An exception thrown by a node or an effect empties the queues before it
-  propagates, so the next write starts from a clean state.
+- An effect that throws stops neither the other effects of its round nor the
+  rounds after it, so what they write still propagates and one failing binding
+  does not leave the rest of the page behind the state. Its exception propagates
+  once the flush is done. An exception from a node, the round limit, or an
+  effect that throws in a later round as well (one that writes and throws would
+  otherwise run until the limit) ends the flush at once. Either way the first
+  exception propagates, an effect's held from an earlier round included, and a
+  later one is reported.
+- An exception thrown by a node empties the queues before it propagates, so the
+  next write starts from a clean state.
 
 ## Ownership
 
@@ -197,9 +206,7 @@ from the prototype; the packages are to be measured again in
   `fromSubscribable` whose subscribable completed) is settled, not completed:
   it keeps its value and its subscribers until its owner disposes it.
 
-## Not yet built
+## Tests
 
-The port of synstate-dom's tests.
-
-synstate's tests are ported under `test/ported/`; its README lists each file and
-where it went.
+synstate's tests are ported under `test/ported/`, and synstate-dom's under
+synstate-dom-next's; each README lists each file and where it went.

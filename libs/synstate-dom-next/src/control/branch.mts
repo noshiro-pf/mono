@@ -1,4 +1,5 @@
 import { getOwner, Owner } from 'synstate-next';
+import { disposeReporting } from 'synstate-next/internal';
 import {
   currentNamespace,
   MountedNodes,
@@ -30,12 +31,20 @@ export class MountSite {
 
   /**
    * Runs `mount` in `owner`, made by `newOwner`, and in the site's namespace.
-   * The caller disposes the owner when what was mounted goes.
+   * The caller disposes the owner when what was mounted goes. If `mount`
+   * throws, the owner is disposed before the exception propagates, so that what
+   * it made before does not outlive it.
    */
   run<R>(owner: Owner, mount: () => R): R {
-    return this.#namespace === currentNamespace()
-      ? owner.run(mount)
-      : mountInNamespace(this.#namespace, () => owner.run(mount));
+    try {
+      return this.#namespace === currentNamespace()
+        ? owner.run(mount)
+        : mountInNamespace(this.#namespace, () => owner.run(mount));
+    } catch (error) {
+      disposeReporting(owner);
+
+      throw error;
+    }
   }
 
   /**

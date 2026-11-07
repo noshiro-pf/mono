@@ -755,7 +755,7 @@ describe('source written by its own subscriber', () => {
     assert.deepStrictEqual(seen, ['start', 'A', 'B']);
   });
 
-  test('an exception drops the waiting values and leaves the source working', () => {
+  test('a subscriber that throws keeps the waiting values and leaves the source working', () => {
     const s = source<number>();
 
     s.subscribe((v) => {
@@ -780,8 +780,8 @@ describe('source written by its own subscriber', () => {
 
     s.next(4);
 
-    // 1 is the value held; 2 waited and was dropped.
-    assert.deepStrictEqual(seen, [1, 3, 4]);
+    // 2 waited, and was delivered after the exception: it is the value held.
+    assert.deepStrictEqual(seen, [2, 3, 4]);
   });
 });
 

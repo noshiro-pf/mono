@@ -5,8 +5,13 @@ export {
   EffectClass,
   ObservableClass,
   disposeAll,
+  disposeEach,
+  disposeReporting,
+  keepFirst,
   noValue,
+  throwFailure,
   toNode,
   view,
+  type Failure,
   type NoValue,
 } from './core/index.mjs';

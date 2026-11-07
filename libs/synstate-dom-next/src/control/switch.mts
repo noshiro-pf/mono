@@ -1,7 +1,10 @@
 import { isObservable, type Owner } from 'synstate-next';
 import {
   EffectClass,
+  disposeEach,
+  keepFirst,
   noValue,
+  throwFailure,
   toNode,
   type ObservableClass,
 } from 'synstate-next/internal';
@@ -16,6 +19,11 @@ import { MountSite, removeRange } from './branch.mjs';
  * and its nodes removed. While the key stays, the branch stays and follows
  * `value` through what it was given. A constant `value` mounts one branch once.
  * `If`, `MatchOptional` and `MatchResult` are this.
+ *
+ * A cleanup of the branch that goes that throws does not stop the switch: the
+ * exception is thrown once the new branch is in place. A branch that throws
+ * while mounting leaves the switch empty, and the next value mounts its branch,
+ * whatever its key.
  */
 export const mountSwitch = <V, K>(
   value: Bindable<V>,
@@ -47,7 +55,8 @@ class SwitchBinding<V, K> extends EffectClass<V> {
 
   readonly #site: MountSite;
 
-  #mut_key: K;
+  /** `noKey` before the first mount, and after a branch threw while mounting. */
+  #mut_key: K | typeof noKey;
 
   #mut_owner: Owner | undefined;
 
@@ -68,7 +77,7 @@ class SwitchBinding<V, K> extends EffectClass<V> {
 
     this.#site = new MountSite();
 
-    this.#mut_key = keyOf(currentOf(value));
+    this.#mut_key = noKey;
 
     this.#mut_owner = undefined;
   }
@@ -76,9 +85,11 @@ class SwitchBinding<V, K> extends EffectClass<V> {
   mountInto(out: MountedNodes): void {
     out.push(this.#start);
 
-    const key = this.#mut_key;
-
     const current = currentOf(this.source);
+
+    const key = this.#keyOf(current);
+
+    this.#mut_key = key;
 
     this.#mut_owner = this.#site.mount(() => this.#branch(key, current), out);
 
@@ -96,25 +107,43 @@ class SwitchBinding<V, K> extends EffectClass<V> {
 
     this.#mut_key = key;
 
-    this.#mut_owner?.dispose();
-
     const first = this.#start.nextSibling;
 
     const last = this.#end.previousSibling;
 
+    // The branch's nodes go before its cleanups run, as a `For` row's do.
     if (first !== null && last !== null && first !== this.#end) {
       removeRange(first, last);
     }
 
-    const [owner, nodes] = this.#site.mountDetached(() =>
-      this.#branch(key, current),
-    );
+    // A cleanup of the branch that goes that throws does not stop the switch:
+    // the exception is thrown once the new branch is in place.
+    const failure = disposeEach([this.#mut_owner]);
 
-    this.#mut_owner = owner;
+    this.#mut_owner = undefined;
 
-    nodes.insertBefore(this.#end);
+    try {
+      const [owner, nodes] = this.#site.mountDetached(() =>
+        this.#branch(key, current),
+      );
+
+      this.#mut_owner = owner;
+
+      nodes.insertBefore(this.#end);
+    } catch (error) {
+      // A branch that throws while mounting leaves the switch empty, on no key,
+      // so that the next value mounts its branch even when its key is the same.
+      this.#mut_key = noKey;
+
+      throwFailure(keepFirst(failure, error));
+    }
+
+    throwFailure(failure);
   }
 }
+
+/** The key of a switch that holds no branch: equal to no key. */
+const noKey: unique symbol = Symbol('noKey');
 
 /** The value of a `Bindable`'s observable, which always holds one. */
 const currentOf = <V,>(node: ObservableClass<V>): V => {
