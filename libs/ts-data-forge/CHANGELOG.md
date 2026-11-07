@@ -1,5 +1,11 @@
 # ts-data-forge
 
+## 14.13.0
+
+### Minor Changes
+
+- 931ba22: New `Num.rem(a, b)`: `a % b`, with the divisor typed as `NonZeroNumber` (as `Num.isNonZero` narrows it) or a non-zero numeric literal, as `Num.div` takes it, since `a % 0` is `NaN`.
+
 ## 14.12.1
 
 ### Patch Changes

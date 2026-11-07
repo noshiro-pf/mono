@@ -1,5 +1,34 @@
 # pr-merge-queue
 
+## 0.10.0
+
+### Minor Changes
+
+- 9e92857: Support a `CODEOWNERS` file enforced by a required check instead of the ruleset's `require_code_owner_review`. `codeOwnersEnforcedBy` reads the `# enforced-by: <context>` line, `codeOwnerGate` says which of the two enforces the file, and `codeOwnerReview`'s `authorApproves` and `ReviewRules.codeOwnerGate` count the author as approving the paths they own there. `unblock-prs` holds someone else's pull request until an owner approves it, re-runs the failed check after the approval, and its auto-fix no longer pushes a fix that changes a path `CODEOWNERS` owns.
+- a972aed: `unblock-prs` declines an auto-fix at planning, naming the job, when the failed job's check run carries the annotation `autoFix.notFixableAnnotation` names: a job says so when its command failed rather than only leaving a diff. Without the setting, every failed context matching a fixer is tried as before.
+- 33653c5: `pr-description` and `open-pr --body-file` refuse a `## Review` section whose items under a `**Deferred**` line do not each open with why the finding is out of scope: `(predates)`, `(another change)` or `(too large)`. `deferralReasonOf` and `DEFERRAL_REASONS` read and list those tags. `pr-description` problems are now headed "the description cannot be posted as it is", since not all of them are about the layout.
+- beff847: `unblock-prs` keeps a `rebase-failed` set-aside across a move of the default branch while the branch still conflicts, updating only the base its comment records, so that the owner stays `skill` and `claim-pr` succeeds. It clears the set-aside only once the conflict is gone. `pr-report-core` gains `moveSetAsideBase`.
+- 8c7e3ea: `rework-pr` refuses a pull request someone has claimed or that `unblock-prs` set aside for a skill to fix. `done` carries along the pull requests stacked on the branch and refuses untracked files that are not ignored. `start` now fails on a draft error other than a refusal. A refused push hints at a fetch only when the lease refused it.
+- 1adc954: `rework-pr done` takes one of `--requeue` or `--review`, and refuses neither. `--requeue`, for work that changes nothing the description says, puts `merge-queued` back on last, but only where `rework-pr start` took it off and nobody has put it on or taken it off since: `start` now writes down GitHub's event of taking the label off under the clone's common git directory, and `done` requeues only while that event is still the label's last. `--review`, for work that does, leaves it off for the author as `done` did before. `applyRework` takes the parsed `ReworkArgs` and resolves to the pull request's number and the steps that ran; `doneSteps` takes what `done` hands back and the `QueueRecord` `start` left; `ReworkIo` gains `queueRecord`; `isUntouchedSince`, `readOwnDequeueEvent`, `QueueEvent` and `QueueRecord` are new, and `takeLabelOff` is `removeLabel` saying whether this call took the label off or it was off already.
+- ec419fa: `run-issue-resolver` keeps its sessions out of each other's themes, and out of a `/resolve-issues` run's: an issue below `priority:S` whose primary themes (its title's scope, with the package that scope lives in) are those of a started issue, whoever claimed it, or of an issue started beside it, waits until they are free, and the log says which. The theme reading moved from `startable-issues` to `run-issue-resolver`, which both read it from.
+- 246626c: `unblock-prs` resolves the rebase of a `merge-queued` pull request that conflicts only in generated files instead of setting it aside (it runs the branch's install and generators, so a pull request labelled only `auto-rebase` is set aside as before). `.github/unblock-prs.json` declares them under `regenerate`: `before` (an install) and `generators`, each a `path` pattern and the `run` that writes it (`$1` to `$9` being the path's capture groups). The worker takes the base's side of each conflicted file, finishes the rebase, runs the generators, amends what they wrote onto the pull request's one commit and pushes; a generator that gives the base's version back, or a conflict that also takes in a hand-written file, is set aside as before, the comment naming which files could have been generated again; a failed install ends the cycle, as any failure the network may cause does. `--no-auto-fix` turns it off too. The rebase's worktree moves from the OS temp directory to the auto-fix's, where an install works.
+- fe3c368: A set-aside comment `unblock-prs` rewrites as resolved keeps what it said (the conflicted files, the failed checks with their runs, the output) under a fold, rather than shrinking to one line. A `rebase-failed` one names the merged pull requests that changed the conflicted files on the base since the branch's own base: the other side of the conflict.
+- 2153d8e: `unblock-prs` can check queued pull requests ahead of their turn. With `speculate` in `.github/unblock-prs.json`, it stacks up to `depth` of the leading candidates on the default branch, one commit each on a `queue/pr-<number>` branch, dispatches the listed workflows on each with the `diff-parent` input, and releases the first candidate once its layer is green, so that the gate reuses that verdict. A red first layer sets its pull request aside, unless only jobs a configured fixer settles failed, when it is released for the fixer to run; a red layer above the first waits until it is first, and the layers above a red one are dropped.
+
+### Patch Changes
+
+- 03f79b4: `pr-description` words a closing keyword found in a half so that it names both readings: as a pull request's description, where GitHub acts on it wherever it is, and as an issue's, where it is prose and stays. An issue draft checked without `--issue` is no longer sent toward rewording its prose, and a pull request draft is not sent toward `--issue`.
+- 34522df: `unblock-prs` ends a watch by what the review read at its end says: a hold a review clears is left to triage with no record or demotion, one only a bypass clears ends `awaiting-bypass`, and a read of another head ends `head-moved`, rather than all of them setting the pull request aside `not-merging`.
+- 556b2d6: `unblock-prs` reads a head whose checks take more than one page until two reads list the same checks, and fails the read if they never do, so that a pending check skipped between two pages no longer makes a round look over.
+- eeaeeda: `pr-report-core` exports `REVIEW_SECTION_HEADING`, `CLAUDE_SESSION_LINE` and `isDeclarationLine`, so that `pr-description` guards a body with the patterns its parsers read it by rather than copies of them.
+- Updated dependencies [9e92857]
+- Updated dependencies [beff847]
+- Updated dependencies [931ba22]
+- Updated dependencies [eeaeeda]
+    - pr-report-core@0.5.0
+    - ts-data-forge@14.13.0
+    - ts-fortress@12.4.6
+
 ## 0.9.0
 
 ### Minor Changes
