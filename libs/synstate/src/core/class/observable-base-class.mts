@@ -26,8 +26,10 @@ import {
   issueUnqueuedToken,
   notUpdatedYet,
   observableBrand,
+  runWithScope,
   toSubscriber,
   type ScopeInternals,
+  type ScopeSubscription,
 } from '../utils/index.mjs';
 import type { ChildNode } from './observable-node.mjs';
 import { enqueueChildren } from './propagation-state.mjs';
@@ -99,6 +101,12 @@ export class ObservableBaseClass<
     this[observableBrand] = true;
   }
 
+  /** Adds `subscriber`, making the set on the first one. */
+  #addSubscriber(subscriber: Subscriber<A>): void {
+    this.#mut_subscribers ??= new Set<Subscriber<A>>();
+
+    this.#mut_subscribers.add(subscriber);
+  }
   getSnapshot(): Optional<A> {
     return this.#mut_snapshot;
   }
@@ -153,6 +161,10 @@ export class ObservableBaseClass<
 
   deleteChild(child: ChildNode): void {
     this.#mut_children?.delete(child);
+  }
+
+  deleteSubscriber(subscriber: Subscriber<A>): void {
+    this.#mut_subscribers?.delete(subscriber);
   }
 
   /**
@@ -227,6 +239,8 @@ export class ObservableBaseClass<
       return;
     }
 
+    // `flush` emits through `startUpdate` and `dispose` notifies, and each
+    // leaves the current scope itself.
     this.flush();
 
     this.dispose();
@@ -240,6 +254,17 @@ export class ObservableBaseClass<
     // A completed node is reached again through every parent that completes
     // after it; running again would repeat the teardown and the unregistering.
     if (this.#mut_isCompleted) {
+      return;
+    }
+
+    // Completing is not part of the scope that happens to be running, as an
+    // update is not (`startUpdate`): what a subscriber or a child does on
+    // hearing it must not join that scope.
+    if (getCurrentScopeInternals() !== undefined) {
+      runWithScope(undefined, () => {
+        this.dispose();
+      });
+
       return;
     }
 
@@ -325,6 +350,15 @@ export class ObservableBaseClass<
     );
   }
 
+  /**
+   * Calls `onNext` with the current value, if any, and with every later one,
+   * and `onComplete` once the observable completes.
+   *
+   * A subscription made while a scope runs (`createScope`) belongs to it, as an
+   * observable created there does: disposing the scope unsubscribes it.
+   * Outside every scope, and inside `untracked`, it lasts until `unsubscribe`
+   * or completion.
+   */
   subscribe(onNext: (v: A) => void, onComplete?: () => void): Subscription {
     // first emit
     if (Optional.isSome(this.#mut_snapshot)) {
@@ -337,17 +371,105 @@ export class ObservableBaseClass<
       return noopSubscription;
     }
 
-    const subscriber = toSubscriber(onNext, onComplete);
+    const scope = getCurrentScopeInternals();
 
-    this.#mut_subscribers ??= new Set<Subscriber<A>>();
+    if (scope === undefined) {
+      const unscoped = toSubscriber(onNext, onComplete);
 
-    this.#mut_subscribers.add(subscriber);
+      this.#addSubscriber(unscoped);
+
+      return {
+        unsubscribe: () => {
+          this.#mut_subscribers?.delete(unscoped);
+        },
+      };
+    }
+
+    const scoped = new ScopedSubscriber(this, scope, onNext, onComplete);
+
+    this.#addSubscriber(scoped);
+
+    scope.adoptSubscription(scoped);
 
     return {
       unsubscribe: () => {
-        this.#mut_subscribers?.delete(subscriber);
+        scoped.unsubscribe();
       },
     };
+  }
+}
+
+/**
+ * A subscription made while a scope runs: one object that is the subscriber,
+ * the scope's entry for it and what `unsubscribe` ends, so that a subscription
+ * costs a scope one entry. The scope ends it when disposed, and is told once it
+ * ends on its own (`unsubscribe`, completion), so that a long-lived scope does
+ * not keep every subscription it ever saw.
+ */
+class ScopedSubscriber<A> implements Subscriber<A>, ScopeSubscription {
+  // Cleared once it ends, so that an entry its scope still lists until the next
+  // compaction holds neither the observable nor the callbacks.
+  #mut_observable: ObservableBaseClass<A, ObservableKind, number> | undefined;
+  #mut_onNext: ((v: A) => void) | undefined;
+  #mut_onComplete: (() => void) | undefined;
+  readonly #scope: ScopeInternals;
+
+  constructor(
+    observable: ObservableBaseClass<A, ObservableKind, number>,
+    scope: ScopeInternals,
+    onNext: (v: A) => void,
+    onComplete: (() => void) | undefined,
+  ) {
+    this.#mut_observable = observable;
+
+    this.#mut_onNext = onNext;
+
+    this.#mut_onComplete = onComplete;
+
+    this.#scope = scope;
+  }
+
+  /** Drops what an ended subscription no longer needs. */
+  #forget(): void {
+    this.#mut_observable = undefined;
+
+    this.#mut_onNext = undefined;
+
+    this.#mut_onComplete = undefined;
+  }
+
+  get isEnded(): boolean {
+    return this.#mut_observable === undefined;
+  }
+
+  onNext(v: A): void {
+    this.#mut_onNext?.(v);
+  }
+
+  onComplete(): void {
+    const onComplete = this.#mut_onComplete;
+
+    this.#forget();
+
+    this.#scope.subscriptionGone();
+
+    onComplete?.();
+  }
+
+  end(): void {
+    this.#mut_observable?.deleteSubscriber(this);
+
+    this.#forget();
+  }
+
+  unsubscribe(): void {
+    if (this.#mut_observable === undefined) {
+      return;
+    }
+
+    this.end();
+
+    this.#scope.subscriptionGone();
   }
 }
 

@@ -3,7 +3,6 @@ import {
   constant,
   createAfterUpdate,
   listenInScope,
-  subscribeInScope,
   type JSX,
 } from 'synstate-dom';
 
@@ -13,9 +12,9 @@ export const SearchBox = (): JSX.Element => {
     sessionStorage.getItem('search') ?? '',
   );
 
-  // Saves the query whenever it changes, until the component's scope is
-  // disposed: what an effect would do.
-  subscribeInScope(query$, (query) => {
+  // Saves the query whenever it changes. Subscribed while the component mounts,
+  // so the component's scope unsubscribes it: what an effect would do.
+  query$.subscribe((query) => {
     sessionStorage.setItem('search', query);
   });
 

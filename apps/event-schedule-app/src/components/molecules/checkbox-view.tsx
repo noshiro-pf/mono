@@ -1,7 +1,6 @@
 import {
   constant,
   mapBindable,
-  subscribeInScope,
   toObservable,
   type Bindable,
   type JSX,
@@ -27,7 +26,7 @@ export const CheckboxView = ({
   <label class={constant(styles.root)}>
     <input
       ref={(mut_input) => {
-        subscribeInScope(toObservable(state), (s) => {
+        toObservable(state).subscribe((s) => {
           mut_input.indeterminate = s === 'indeterminate';
         });
       }}

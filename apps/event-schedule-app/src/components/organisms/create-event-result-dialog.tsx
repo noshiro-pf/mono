@@ -12,7 +12,6 @@ import {
   deriveBindable,
   If,
   mapBindable,
-  subscribeInScope,
   toObservable,
   type Bindable,
   type JSX,
@@ -43,9 +42,11 @@ export const CreateEventResultDialog = ({
 
   const afterUpdate = createAfterUpdate();
 
-  subscribeInScope(toObservable(isOpen).pipe(filter((open) => !open)), () => {
-    afterUpdate(resetLinkIsUsed);
-  });
+  toObservable(isOpen)
+    .pipe(filter((open) => !open))
+    .subscribe(() => {
+      afterUpdate(resetLinkIsUsed);
+    });
 
   const backIsDisabled = deriveBindable(
     [isLoading, linkIsUsed$],

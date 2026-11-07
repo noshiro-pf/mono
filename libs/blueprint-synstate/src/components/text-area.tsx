@@ -2,7 +2,6 @@ import { onScopeDispose } from 'synstate';
 import {
   constant,
   createAfterUpdate,
-  subscribeInScope,
   toObservable,
   type Bindable,
   type JSX,
@@ -145,7 +144,7 @@ const fitToText = (
 
   const mut_state = { mounted: false };
 
-  subscribeInScope(value$, () => {
+  value$.subscribe(() => {
     if (!mut_state.mounted) {
       mut_state.mounted = true;
 

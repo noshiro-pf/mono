@@ -11,7 +11,6 @@ import {
   For,
   If,
   listenInScope,
-  subscribeInScope,
   type JSX,
 } from 'synstate-dom';
 import { Arr, fastDeepEqual } from 'ts-data-forge';
@@ -385,9 +384,9 @@ export const PaneFrame = ({
 
   // Nothing at all for long enough is said out loud, rather than left as a
   // blank pane. Only while no document has answered for this load.
-  subscribeInScope(
-    model$.pipe(map((model) => (model.agentSeen ? undefined : model.loadKey))),
-    (waitingFor) => {
+  model$
+    .pipe(map((model) => (model.agentSeen ? undefined : model.loadKey)))
+    .subscribe((waitingFor) => {
       clearTimeout(mut_state.noAnswerTimer);
 
       mut_state.noAnswerTimer =
@@ -396,12 +395,11 @@ export const PaneFrame = ({
           : setTimeout(() => {
               patchLoad({ waitedFor: waitingFor });
             }, noAnswerTimeoutMs);
-    },
-  );
+    });
 
   // A new address, or a reload, starts all of that over — including a clear
   // still waiting on its helper frame, which was for the document before.
-  subscribeInScope(model$.pipe(map((model) => model.loadKey)), (loadKey) => {
+  model$.pipe(map((model) => model.loadKey)).subscribe((loadKey) => {
     mut_state.loadKey = loadKey;
 
     mut_state.reportsSinceLoad = 0;
@@ -441,7 +439,7 @@ export const PaneFrame = ({
   // asked: the worker is removed and the pane reloaded, once per load. While
   // such a pane is loading fine, the content script in it keeps the worker away
   // by itself; see `keepServiceWorkersAway` in `frame-agent.mts`.
-  subscribeInScope(model$, () => {
+  model$.subscribe(() => {
     afterUpdate(() => {
       const { alwaysReset, blockedBySite, loadKey, siteOrigin } =
         model$.getSnapshot().value;
@@ -473,7 +471,7 @@ export const PaneFrame = ({
   // says it did not load instead of waiting on it for good. Nothing else ends
   // the wait: the button to clear again would set the address the helper
   // already has.
-  subscribeInScope(load$.pipe(map((load) => load.resetUrl)), (resetUrl) => {
+  load$.pipe(map((load) => load.resetUrl)).subscribe((resetUrl) => {
     clearTimeout(mut_state.resetTimer);
 
     mut_state.resetTimer =
@@ -486,7 +484,7 @@ export const PaneFrame = ({
 
   // A pane that grows out of being compact should not leave a menu open over
   // the controls that have just come back into the toolbar.
-  subscribeInScope(compact$, () => {
+  compact$.subscribe(() => {
     afterUpdate(() => {
       patchLoad({ menuOpen: false });
     });
@@ -494,7 +492,7 @@ export const PaneFrame = ({
 
   // A menu whose items have all gone is unmounted with it; closed too, so that
   // it does not come back open when the pane has items again.
-  subscribeInScope(menuItems$, (menuItems) => {
+  menuItems$.subscribe((menuItems) => {
     if (!Arr.isNonEmpty(menuItems)) {
       afterUpdate(() => {
         patchLoad({ menuOpen: false });

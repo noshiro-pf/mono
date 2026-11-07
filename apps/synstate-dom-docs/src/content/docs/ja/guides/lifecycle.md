@@ -76,15 +76,15 @@ const Stats = (): JSX.Element => {
 
 ## イベントハンドラ
 
-ハンドラは、どのスコープの外でも実行されます。ハンドラが呼ばれる時点では、どの `run` も動いていません。そのため、ハンドラの中で作った Observable（`a$.pipe(map(...))` など）はどのスコープにも属さず、行や分岐が消えた後も計算され続けてしまいます。synstate-dom は実行時には warning を出しません。代わりに [eslint-plugin-synstate](https://www.npmjs.com/package/eslint-plugin-synstate) の `no-observable-in-handler` ルールが、そうした Observable を報告します。対象は、`onClick` などの props や、`listenInScope`・`addEventListener` に渡したリスナー、その中に書いたコールバック、そこから名前で呼ぶ同じファイルの関数の中で派生させた Observable です。マウント時に取ったスコープの `run` の中は対象外です。ルールが追う範囲と見逃す場合は、[プラグインの README](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-plugin-synstate#no-observable-in-handler) にあります。
+ハンドラは、どのスコープの外でも実行されます。ハンドラが呼ばれる時点では、どの `run` も動いていません。そのため、ハンドラの中で作った Observable（`a$.pipe(map(...))` など）はどのスコープにも属さず、行や分岐が消えた後も計算され続けてしまいます。そこで行った `subscribe` も解除されません。synstate-dom は実行時には warning を出しません。代わりに [eslint-plugin-synstate](https://www.npmjs.com/package/eslint-plugin-synstate) の `no-observable-in-handler` ルールが、そうした Observable と `subscribe` を報告します。対象は、`onClick` などの props や、`listenInScope`・`addEventListener` に渡したリスナー、その中に書いたコールバック、そこから名前で呼ぶ同じファイルの関数の中で派生させた Observable と、そこで行った `subscribe` です。マウント時に取ったスコープの `run` の中は対象外です。ルールが追う範囲と見逃す場合は、[プラグインの README](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-plugin-synstate#no-observable-in-handler) にあります。
 
 ハンドラでは状態に書き込むだけにして、その状態からの派生はマウント時に作っておきましょう。`await` の後など、後から実行する処理でどうしても Observable を作る必要があるなら、コンポーネントのマウント中に `getCurrentScope()` でスコープを取っておき、後の処理をそのスコープの `run` で包んでください。
 
 ## コンポーネントと同じだけ続く副作用
 
-コンポーネントは 1 回しか呼ばれません。ほかのライブラリなら effect で実行する処理は、コンポーネントの本体で始めて、そのスコープが破棄されるときに止めます。そのための補助関数が 3 つあります。
+コンポーネントは 1 回しか呼ばれません。ほかのライブラリなら effect で実行する処理は、コンポーネントの本体で始めて、そのスコープが破棄されるときに止めます。
 
-- `subscribeInScope(source, next)` は、`source` の値を今の値から順に `next` に渡し、スコープが破棄されると購読を解除します。
+- synstate の `source.subscribe(next)` は、`source` の値を今の値から順に `next` に渡します。コンポーネントのマウント中に行った購読はコンポーネントのスコープに属し、そこで作った Observable と同じく、スコープが破棄されると解除されます。スコープより長く続けるときは `untracked` の中で購読します。
 - `listenInScope(target, type, listener, options)` は、`window` や `document` のように、コンポーネントが描く要素ではないものにイベントリスナーを登録し、スコープが破棄されると外します。コンポーネントが描く要素には `onClick` などの props を使ってください。
 - `createAfterUpdate()` は、処理を microtask で実行する関数を返します。実行されるのは、進行中の更新が終わった後です。その時点で、その更新に束縛された DOM は書き込み済みです。伝播も終わっているので、この処理からは状態に書き込めます。synstate が warning を出すのは、別の状態の伝播が終わる前に書き込んだときです。最初のマウントの後に処理を実行するのにも使えます。コンポーネントのノードが document に入るのは、それを含む記述全体がマウントされた後だからです。それまでにスコープが破棄されていた場合、その処理は捨てられます。
 
@@ -94,7 +94,6 @@ import {
     constant,
     createAfterUpdate,
     listenInScope,
-    subscribeInScope,
     type JSX,
 } from 'synstate-dom';
 
@@ -104,9 +103,9 @@ export const SearchBox = (): JSX.Element => {
         sessionStorage.getItem('search') ?? '',
     );
 
-    // Saves the query whenever it changes, until the component's scope is
-    // disposed: what an effect would do.
-    subscribeInScope(query$, (query) => {
+    // Saves the query whenever it changes. Subscribed while the component mounts,
+    // so the component's scope unsubscribes it: what an effect would do.
+    query$.subscribe((query) => {
         sessionStorage.setItem('search', query);
     });
 

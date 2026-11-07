@@ -19,9 +19,10 @@ export type Scope = Readonly<{
   run: <R>(body: () => R) => R;
 
   /**
-   * Disposes the child scopes (newest first), calls the functions registered
-   * with `onScopeDispose` (newest first), disposes the owned observables
-   * (newest first) and leaves the parent scope. Calling it again does nothing.
+   * Ends the subscriptions made in `run`, disposes the child scopes, calls the
+   * functions registered with `onScopeDispose`, disposes the owned observables
+   * (each newest first) and leaves the parent scope. Calling it again does
+   * nothing.
    */
   dispose: () => void;
 }>;

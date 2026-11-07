@@ -3,7 +3,6 @@ import {
   constant,
   createAfterUpdate,
   deriveBindable,
-  subscribeInScope,
   type JSX,
 } from 'synstate-dom';
 import { dict } from '../../../constants/index.mjs';
@@ -43,7 +42,7 @@ export const EditEventScheduleEmailVerified = (): JSX.Element => {
   // read anew or the confirmed email changes.
   const afterUpdate = createAfterUpdate();
 
-  subscribeInScope(combine([eventSchedule$, emailVerified$]), () => {
+  combine([eventSchedule$, emailVerified$]).subscribe(() => {
     afterUpdate(resetState);
   });
 

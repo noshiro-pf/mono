@@ -27,7 +27,6 @@ import {
   deriveBindable,
   isImeKeyDown,
   mapBindable,
-  subscribeInScope,
   toObservable,
   type Bindable,
   type Child,
@@ -159,7 +158,7 @@ export const PopoverCore = ({
     clearTimeout(mut_timers.leaving);
   });
 
-  subscribeInScope(disabled$, (isDisabled) => {
+  disabled$.subscribe((isDisabled) => {
     if (!isDisabled) {
       return;
     }
@@ -393,7 +392,7 @@ export const PopoverCore = ({
     }
   });
 
-  subscribeInScope(open$, decorateTarget);
+  open$.subscribe(decorateTarget);
 
   const basePlacement$ = placement$.pipe(map(basePlacementOf));
 
