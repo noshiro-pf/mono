@@ -251,15 +251,7 @@ export class Owner {
     // disposed even when something throws; see `disposeAll`.
     let mut_failure = disposeNewestFirst(children, undefined);
 
-    if (cleanups !== undefined) {
-      for (let mut_i = cleanups.length - 1; mut_i >= 0; mut_i -= 1) {
-        try {
-          cleanups[mut_i]?.();
-        } catch (error) {
-          mut_failure = keepFirst(mut_failure, error);
-        }
-      }
-    }
+    mut_failure = runNewestFirst(cleanups, mut_failure);
 
     mut_failure = disposeNewestFirst(nodes, mut_failure);
 
@@ -372,6 +364,27 @@ const disposeNewestFirst = (
   for (let mut_i = items.length - 1; mut_i >= 0; mut_i -= 1) {
     try {
       items[mut_i]?.dispose();
+    } catch (error) {
+      mut_failure = keepFirst(mut_failure, error);
+    }
+  }
+
+  return mut_failure;
+};
+
+const runNewestFirst = (
+  fns: readonly (() => void)[] | undefined,
+  failure: Failure,
+): Failure => {
+  if (fns === undefined) {
+    return failure;
+  }
+
+  let mut_failure = failure;
+
+  for (let mut_i = fns.length - 1; mut_i >= 0; mut_i -= 1) {
+    try {
+      fns[mut_i]?.();
     } catch (error) {
       mut_failure = keepFirst(mut_failure, error);
     }
