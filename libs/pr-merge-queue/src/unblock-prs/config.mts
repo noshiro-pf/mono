@@ -205,7 +205,7 @@ export const ConfigFileSchema = t.annotate(
         }),
         {
           description:
-            "How to fix a failure that is only a fixer's diff: a job that runs a command and then asserts a clean tree. Absent: a failure is never fixed, only reported.",
+            "How to fix a failure that is only a fixer's diff: a job whose clean-tree check fails once its command has run. Absent: a failure is never fixed, only reported.",
         },
       ),
     ),

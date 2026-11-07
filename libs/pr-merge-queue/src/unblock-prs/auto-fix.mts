@@ -4,21 +4,23 @@
  * Fixing a failure that is only a fixer's diff: running the fixer, amending
  * what it wrote onto the pull request's one commit, and pushing it.
  *
- * Every check job ends with `z:assert-repo-is-clean`, so a `fix:` or `gen:`
- * entry of the check matrices fails by _changing_ files rather than by
- * reporting anything, and the fix is to run the same command and commit what it
- * wrote. That much is mechanical; everything else a failing check asks for is
- * the skill's, or a person's, and is left to them. Which jobs are shaped like
- * that, and what reproduces each, is the repository's to say (`config.mts`).
+ * Every check job runs through `z:ci-job`, whose clean-tree check fails a job
+ * that changed files, so a `fix:` or `gen:` entry of the check matrices fails
+ * by _changing_ files rather than by reporting anything, and the fix is to run
+ * the same command and commit what it wrote. A job whose build or command
+ * itself failed says so in an annotation ({@link contextsNotFixable}). That
+ * much is mechanical; everything else a failing check asks for is the skill's,
+ * or a person's, and is left to them. Which jobs are shaped like that, and what
+ * reproduces each, is the repository's to say (`config.mts`).
  */
 
 import * as os from 'node:os';
 import * as path from 'node:path';
 import {
-  outranks,
   ownersOf,
   parseCodeOwners,
   statesFromCheckRuns,
+  winningRuns,
   type CheckRunReport,
   type ContextState,
 } from 'pr-report-core';
@@ -67,20 +69,21 @@ export const autoFix = async (
 
   const states = statesFromCheckRuns(runs.value);
 
-  const named = planAutoFix(states, config);
-
-  if (Result.isErr(named)) {
-    return declined(named.value);
-  }
-
-  const plan = planAutoFix(
-    states,
-    config,
-    await contextsNotFixable(api, runs.value, states, config),
-  );
+  const plan = planAutoFix(states, config);
 
   if (Result.isErr(plan)) {
     return declined(plan.value);
+  }
+
+  const refused = await contextsNotFixable(
+    runs.value,
+    config === undefined ? [] : failedContexts(states, config),
+    config?.notFixableAnnotation,
+    async (id) => readAnnotationTitles(api, id),
+  );
+
+  if (Arr.isNonEmpty(refused)) {
+    return declined(notFixableReason(refused));
   }
 
   const worktreeDir = path.join(WORKTREE_ROOT, `auto-fix-pr-${pr.number}`);
@@ -140,15 +143,12 @@ export const autoFix = async (
  * configuration ignores (an aggregate, only the echo of a job that failed under
  * it) is not read; every other failure has to match one of its fixers, whose
  * command is the whole of what reproduces the job — a job that runs a command
- * and then asserts a clean tree. `config` is the repository's (`config.mts`);
- * without one nothing is fixed. `notFixable` names the contexts whose job said
- * its command failed ({@link contextsNotFixable}): nothing a fixer writes can
- * fix that, so it is declined here, before anything is installed.
+ * and whose clean-tree check fails the job. `config` is the repository's
+ * (`config.mts`); without one nothing is fixed.
  */
 export const planAutoFix = (
   states: ReadonlyMap<string, ContextState>,
   config: AutoFixConfig | undefined,
-  notFixable: readonly string[] = [],
 ): Result<AutoFixPlan, string> => {
   if (config === undefined) {
     return Result.err(`the repository has no autoFix in ${CONFIG_PATH}`);
@@ -158,14 +158,6 @@ export const planAutoFix = (
 
   if (!Arr.isNonEmpty(failed)) {
     return Result.err('no job failed apart from the ignored ones');
-  }
-
-  const refused = failed.filter((name) => notFixable.includes(name));
-
-  if (Arr.isNonEmpty(refused)) {
-    return Result.err(
-      `${refused.join(', ')} failed in its command, not only in a diff, and nothing a fixer writes fixes that`,
-    );
   }
 
   const entries = failed.map((name) => ({
@@ -304,38 +296,34 @@ export const firstFixerOf = (
   config.fixers.find((fixer) => fixer.context.test(name));
 
 /**
- * Of the failed contexts, those whose check run carries the annotation the
- * configuration names, read on the run GitHub answers for each name. One whose
- * annotations cannot be read is left out, and the fixer finds out for itself.
+ * Of the failed contexts `names`, those whose check run carries the annotation
+ * `title`, read on the run GitHub answers for each name. Nothing a fixer writes
+ * can fix a command that exited non-zero, so `autoFix` declines those before
+ * anything is installed. One whose annotations cannot be read is left out, and
+ * the fixer finds out for itself.
  */
-const contextsNotFixable = async (
-  api: ApiContext,
+export const contextsNotFixable = async (
   runs: readonly CheckRunReport[],
-  states: ReadonlyMap<string, ContextState>,
-  config: AutoFixConfig | undefined,
+  names: readonly string[],
+  title: string | undefined,
+  readTitles: (id: number) => Promise<Result<readonly string[], string>>,
 ): Promise<readonly string[]> => {
-  const title = config?.notFixableAnnotation;
-
-  if (config === undefined || title === undefined) {
+  if (title === undefined) {
     return [];
   }
 
+  const winners = winningRuns(runs);
+
   const mut_found: string[] = [];
 
-  for (const name of failedContexts(states, config)) {
-    const run = runs
-      .filter((candidate) => candidate.name === name)
-      .reduce<CheckRunReport | undefined>(
-        (kept, candidate) =>
-          kept === undefined || outranks(candidate, kept) ? candidate : kept,
-        undefined,
-      );
+  for (const name of names) {
+    const run = winners.get(name);
 
     if (run === undefined) {
       continue;
     }
 
-    const titles = await readAnnotationTitles(api, run.id);
+    const titles = await readTitles(run.id);
 
     if (Result.isErr(titles)) {
       log(`Cannot read the annotations on ${name}: ${titles.value}`);
@@ -346,6 +334,10 @@ const contextsNotFixable = async (
 
   return mut_found;
 };
+
+/** What a decline by {@link contextsNotFixable} says, naming the jobs. */
+export const notFixableReason = (names: readonly string[]): string =>
+  `${names.join(', ')}: more than a diff failed (a build or a command exited non-zero, or the setup changed the tree), and nothing a fixer writes fixes that` as const;
 
 export type AutoFixPlan = Readonly<{
   /** What runs first, always. */
