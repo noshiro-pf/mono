@@ -32,6 +32,13 @@ on:
       - unlabeled
 
   workflow_dispatch:
+    # See "Triggers" in README.md: a queue judges each layer it stacks on its
+    # own commit, against the layer below.
+    inputs:
+      diff-parent:
+        description: Diff the commit against its parent, as a queue layer is judged.
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.event_name == 'push', github.sha, github.ref) }}
@@ -92,13 +99,18 @@ jobs:
         id: pins
         env:
           BEFORE: ${{ github.event.before }}
+          DIFF_PARENT: ${{ inputs.diff-parent }}
         run: |
           if [ "${GITHUB_EVENT_NAME}" = 'workflow_dispatch' ]; then
-            echo 'changed=true' >>"${GITHUB_OUTPUT}"
-            exit 0
-          fi
+            # A manual run verifies; a queue layer compares with its parent,
+            # the layer below, as a pull request compares with its base.
+            if [ "${DIFF_PARENT}" != 'true' ]; then
+              echo 'changed=true' >>"${GITHUB_OUTPUT}"
+              exit 0
+            fi
 
-          if [ "${GITHUB_EVENT_NAME}" = 'push' ]; then
+            base='HEAD^'
+          elif [ "${GITHUB_EVENT_NAME}" = 'push' ]; then
             # On main the merge base below is HEAD itself, so the diff would
             # always be empty: every push would read "unchanged" and a bypass
             # merge that moved the pins would never be verified. Compare with

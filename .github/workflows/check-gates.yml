@@ -97,7 +97,10 @@ jobs:
       # made while behind has no verdict to read. First, so that it is in the
       # list whatever the steps after it do. See "Reusing a verdict" in
       # README.md.
-      - name: "Verdict reusable by tree: ${{ github.event_name != 'pull_request' || github.event.pull_request.base.ref == case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main') }}"
+      # A run that diffed a commit against its parent (`diff-parent`) is reusable
+      # only as a queue layer, on a `queue/*` branch: elsewhere nothing says the
+      # parent was ever checked. README.md, "Reusing a verdict".
+      - name: "Verdict reusable by tree: ${{ (github.event_name != 'pull_request' && (github.event.inputs.diff-parent != 'true' || startsWith(github.ref_name, 'queue/'))) || github.event.pull_request.base.ref == case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main') }}"
         run: echo 'Recorded in the step name above, for the reuse lookup of later runs.'
 
       - name: Check whether the branch is behind the base branch
@@ -315,8 +318,9 @@ jobs:
           install: 'false'
 
       # Which base the diff is taken against — the pull request's own base,
-      # or on a push to main what main pointed at before it — the one-commit
-      # fetch of it, and the check of `diff-scope` are in the script,
+      # on a push to main what main pointed at before it, or a queue layer's
+      # parent (`diff-parent`) — the shallow fetch of it, and the check of
+      # `diff-scope` are in the script,
       # `planDiffCheck`, which writes `should_run=` to `GITHUB_OUTPUT`.
       - name: Check diff
         id: check_diff
@@ -324,5 +328,8 @@ jobs:
         env:
           BEFORE: ${{ github.event.before }}
           BASE_REF: ${{ github.event.pull_request.base.ref }}
+          # The calling workflow's `workflow_dispatch` input, read off the event
+          # because a called workflow has no `inputs` of the caller's.
+          DIFF_PARENT: ${{ github.event.inputs.diff-parent }}
           DIFF_SCOPE: ${{ inputs.diff-scope }}
         run: node ./tools/scripts/cmd/workflow-steps.mts check-diff

@@ -98,9 +98,21 @@ on:
   produced"). On `main` the aggregate holds no merge; it is what a later run on
   the same tree reuses, and a red one is the signal that a bypass merge landed
   something broken.
-- **`workflow_dispatch`** is how the checks are asked for from the Actions
-  tab. Such a run is exempt from every gate: there is no pull request to be
-  behind anything, and no verdict is reused.
+- **`workflow_dispatch`** is how the checks are asked for from the Actions tab.
+  Such a run is exempt from every gate: there is no pull request to be behind
+  anything, and no verdict is reused. Its one input, `diff-parent`, is for a
+  queue that checks pull requests ahead of their turn: it stacks them on `main`,
+  one commit each, each layer on a branch of its own, and dispatches the check
+  workflows on each layer with `diff-parent` set. The gate, the codemod, the
+  `check:prose` guards and the published pins then diff the layer against its
+  parent, the layer below, so that each layer is judged on its own commit as a
+  stacked pull request is, and its verdict is reused by the pull request whose
+  rebased head has the same tree (see "Reusing a verdict"). A branch per layer,
+  named `queue/*`, because a dispatch's concurrency group is its ref — a second
+  dispatch on one branch cancels the first — and because only there is such a
+  run's verdict reusable: elsewhere nothing says the parent was ever checked.
+  Unset, as from the Actions tab, the run diffs as it always has — on `main` it
+  runs everything, elsewhere against `origin/main`.
 - **No `paths` filter.** A workflow a path filter skips reports no status at
   all, and a required context that never arrives blocks the merge forever.
   The diff question is answered by the gate, after the workflow has started.
@@ -439,12 +451,23 @@ content does not. Such runs are common:
 
 The lookup happens on a `pull_request` onto the default branch whose branch is
 up to date with it (an earlier run made while the branch was behind has a
-skipped aggregate and is not a verdict), and on a `push` to the default
-branch. The candidates are runs of every event, since a pull request's verdict
-is what a push to `main` reuses: the calling workflow's latest 100 completed
-runs, a few days here, matched on the runs API's `head_commit.tree_id`. A
-matching run further back is not found and the checks simply run, as they do
-the first time a tree is seen.
+skipped aggregate and is not a verdict), and on a `push` to the default branch.
+The candidates are runs of every event, since a pull request's verdict is what a
+push to `main` reuses, and a dispatched queue layer's is what the pull request
+rebased onto `main` reuses: the calling workflow's latest 100 completed runs, a
+few days here, matched on the runs API's `head_commit.tree_id`. A matching run
+further back is not found and the checks simply run, as they do the first time a
+tree is seen.
+
+A layer diffed against the layer below assumes that layer is green, as a pull
+request diffed against `main` assumes `main` is. A workflow its commit does not
+reach leaves no verdict (its aggregate is skipped); what does depend on the base
+is a check inside a workflow that runs and reads only the diff —
+`fix:codemod:affected`, and the `check:prose` guards that read a change
+(`markdown-wrap`, `next-major`) — whose green says nothing of the layers below.
+So the queue that dispatches layers has to delete the runs above one that went
+red before any pull request could reuse them; that queue is #3585, and until it
+exists nothing dispatches on a `queue/*` branch.
 
 **A verdict has to be a function of the tree.** That is what makes reusing it
 by tree sound, and it is why a job whose result also depends on what it was
@@ -881,7 +904,8 @@ Nothing checks this; a review does.
   conclude (see "Reusing a verdict").
 - **Local guards that read this directory**: `check:root:actionlint`,
   `check:root:ci-commands`, `check:root:workflow-event-name`,
-  `check:root:node-support`, `check:root:restart-unblock-prs-paths`. `fmt` and `check:cspell` read it too; CI itself
+  `check:root:node-support`, `check:root:restart-unblock-prs-paths`,
+  `check:root:dispatch-inputs`. `fmt` and `check:cspell` read it too; CI itself
   runs nothing on a workflow change until the pull request runs.
   `check:root:actionlint` also lints the composite actions' steps, which
   actionlint does not read on its own. It downloads the actionlint and
