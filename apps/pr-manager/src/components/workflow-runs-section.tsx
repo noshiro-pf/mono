@@ -19,6 +19,7 @@ import {
   type WorkflowRunList,
 } from '../workflow-runs.mjs';
 import { ExternalLink } from './external-link.js';
+import { PaneRefresh } from './pane-refresh.js';
 import { RunStateIcon } from './run-state-icon.js';
 import { Timestamp } from './timestamp.js';
 
@@ -39,6 +40,7 @@ export const WorkflowRunsSection = (): JSX.Element => (
       <ExternalLink href={constant(ACTIONS_URL)} variant={'section-link'}>
         {constant('on GitHub')}
       </ExternalLink>
+      <PaneRefresh pane={'runs'} what={'the workflow runs'} />
     </h2>
 
     <MatchOptional

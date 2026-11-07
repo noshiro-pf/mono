@@ -27,6 +27,7 @@ import {
   fastDeepEqual,
   hasKey,
   isRecord,
+  Obj,
   replaceEqualDeep,
   Result,
   unknownToString,
@@ -36,17 +37,21 @@ import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
 import type { Answered } from '../graphql.mjs';
 import {
   appendIssues,
+  PARTS_OF_GROUP,
   type Entry,
+  type HeldParts,
   type IssueList,
   type KnownParts,
   type LoadedReport,
   type PageSummary,
   type PartFailures,
+  type ReadGroup,
   type SectionPart,
 } from '../load-report.mjs';
 import {
   asRefreshing,
   LOADING,
+  READY,
   settle,
   type LoadStatus,
 } from '../load-state.mjs';
@@ -61,19 +66,8 @@ import type { WorkflowRunList } from '../workflow-runs.mjs';
 
 export type ReaderDeps = Readonly<{
   token: InitializedObservable<StoredToken | undefined>;
-  /**
-   * A read of the report, listing the first `issueCount` open issues, and
-   * keeping what `previous` had of a part it cannot read. When `onProgress` is
-   * given, it is handed the report as it stands each time a part of it answers
-   * before the last.
-   */
-  load: (
-    token: string,
-    nowMs: number,
-    issueCount: number,
-    previous: KnownParts | undefined,
-    onProgress: ((report: LoadedReport) => void) | undefined,
-  ) => Promise<Answered<LoadedReport>>;
+  /** A read of some groups of the report (`loadReport`). */
+  load: (request: GroupRead) => Promise<Answered<LoadedReport>>;
   /**
    * The workflow runs still going (`workflow-runs.mts`), read beside the report
    * on every read rather than as a part of it: a different API, with its own
@@ -96,6 +90,30 @@ export type ReaderDeps = Readonly<{
   /** Emits whenever the tab is shown or hidden. */
   visibilityChange: SynstateObservable<unknown>;
 }>;
+
+/** What the reader asks `load` for. */
+export type GroupRead = Readonly<{
+  token: string;
+  nowMs: number;
+  groups: readonly ReadGroup[];
+  /** How many open issues to list, where the issues are read. */
+  issueCount: number;
+  /** What the page had when the read was sent, for a part it cannot read. */
+  previous: KnownParts;
+  /** What the page holds now, for the groups it does not read. */
+  held: () => HeldParts;
+  /**
+   * Handed the report as it stands each time a part answers before the last;
+   * only for a read of a page with nothing on it yet.
+   */
+  onProgress: ((report: LoadedReport) => void) | undefined;
+}>;
+
+/**
+ * What a pane reads on its own: a group of the report, or the workflow runs.
+ * The merge order and the queue are both drawn from `pulls`.
+ */
+export type PaneRead = ReadGroup | 'runs';
 
 export type Reader = Readonly<{
   /** How the reading went, which changes only when that does. */
@@ -141,6 +159,11 @@ export type Reader = Readonly<{
    * hidden — and this is what says a newer one is on its way.
    */
   fetching: InitializedObservable<boolean>;
+  /**
+   * What is being read, pane by pane. A pane's Refresh is shut while its own
+   * read is out: one more would pay for the same answer twice.
+   */
+  paneReading: InitializedObservable<ReadonlySet<PaneRead>>;
   /** The workflow runs still going, as the last read of them left them. */
   runs: InitializedObservable<RunsStatus>;
   /** How the last {@link loadMoreIssues} went. */
@@ -167,8 +190,17 @@ export type Reader = Readonly<{
    * whether the timer or the reader asks for it, and a reader who presses it
    * wants now. The button is shut only while a read it started is still out, so
    * a double click is one read.
+   *
+   * Every pane is asked for at once, and the first read draws each as it
+   * answers, the merge order as soon as the pull requests have. A pane already
+   * being read is not asked for again: the read out brings it.
    */
   refresh: () => void;
+  /**
+   * Reads what one pane is drawn from, and nothing else, unless it is being
+   * read already. Nothing until the page has shown a report.
+   */
+  refreshPane: (pane: PaneRead) => void;
   /**
    * Lists the next {@link ISSUES_PAGE_SIZE} open issues, and every read after
    * it lists them too, until the token changes. The page is read on its own
@@ -352,33 +384,90 @@ export const createReader = (deps: ReaderDeps): Reader => {
     tokenChanged.pipe(mapTo(MORE_ISSUES_IDLE)),
   ]);
 
-  // What the report on screen had of each part, which the next read keeps of a
-  // part it cannot read. Put back when the token changes: another token's
-  // report is not one to fall back to.
-  let mut_parts: KnownParts | undefined = undefined;
+  // What the page holds of each part, and which failed on the read that last
+  // asked for it, which the next read keeps of a part it cannot read. Put back
+  // when the token changes: another token's report is not one to fall back to.
+  let mut_held: Readonly<{ known: KnownParts; failed: PartFailures }> =
+    NOTHING_KNOWN;
 
   // How many open issues each read lists. Raised by `loadMoreIssues`, and put
   // back when the token changes. Nothing draws it, so it is a variable rather
   // than a state.
   let mut_issueCount = ISSUES_LIMIT;
 
-  // How many reads of the report are out.
-  const [outstanding, , { updateState: updateOutstanding }] = createState(0);
+  // What is being read, pane by pane, each by the read it was claimed for: a
+  // read that answers for a token since replaced, whose claim was put back with
+  // the token, releases nothing of the next token's.
+  let mut_claims: ReadonlyMap<PaneRead, Claim> = new Map<PaneRead, Claim>();
 
-  const fetching = outstanding
-    .pipe(map((count) => count > 0))
+  const [paneReading, setPaneReading] = createState<ReadonlySet<PaneRead>>(
+    new Set<PaneRead>(),
+    { equals: sameMembers },
+  );
+
+  const publishClaims = (): void => {
+    setPaneReading(new Set(mut_claims.keys()));
+  };
+
+  /** A claim on `pane`, or `undefined` where a read of it is out already. */
+  const claim = (pane: PaneRead): Claim | undefined => {
+    if (mut_claims.has(pane)) {
+      return undefined;
+    }
+
+    const claimed: Claim = { pane } as const;
+
+    const mut_more = new Map<PaneRead, Claim>(mut_claims);
+
+    mut_more.set(pane, claimed);
+
+    mut_claims = mut_more;
+
+    publishClaims();
+
+    return claimed;
+  };
+
+  const release = (claimed: Claim): void => {
+    if (mut_claims.get(claimed.pane) !== claimed) {
+      return;
+    }
+
+    const mut_rest = new Map<PaneRead, Claim>(mut_claims);
+
+    mut_rest.delete(claimed.pane);
+
+    mut_claims = mut_rest;
+
+    publishClaims();
+  };
+
+  const isClaimed = (claimed: Claim): boolean =>
+    mut_claims.get(claimed.pane) === claimed;
+
+  const fetching = paneReading
+    .pipe(map((panes) => Array.from(panes).some(isReadGroup)))
     .pipe(skipIfNoChange());
-
-  const getReadAt = (): number => getReport().readAtEpochMs;
 
   const getIssues = (): ReportParts['issues'] => getReport().issues;
 
-  const writeReport = (next: LoadedReport, withIssues: boolean): void => {
+  /**
+   * Writes a report a read of `groups` answered with. Of the issues, only where
+   * it asked for them; of the time of reading, only where it read the pull
+   * requests, which is what the page says it was read at: a section read on its
+   * own leaves the merge order as old as it was.
+   */
+  const writeReport = (
+    next: LoadedReport,
+    groups: readonly ReadGroup[],
+  ): void => {
     updateReport((held) =>
       replaceEqualDeep(
         held,
         {
-          readAtEpochMs: next.readAtEpochMs,
+          readAtEpochMs: groups.includes('pulls')
+            ? next.readAtEpochMs
+            : held.readAtEpochMs,
           summary: next.summary,
           entries: next.entries,
           roots: next.roots,
@@ -386,7 +475,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
           merged: next.merged,
           queue: next.queue,
           features: next.features,
-          issues: withIssues ? next.issues : held.issues,
+          issues: groups.includes('issues') ? next.issues : held.issues,
           reading: next.reading,
           failed: next.failed,
         },
@@ -395,38 +484,77 @@ export const createReader = (deps: ReaderDeps): Reader => {
     );
   };
 
+  /** Keeps what a read of `groups` answered of them. */
+  const hold = (next: LoadedReport, groups: readonly ReadGroup[]): void => {
+    const keys = groups.flatMap((group) => PARTS_OF_GROUP[group]);
+
+    mut_held = {
+      known: {
+        ...Obj.omit(mut_held.known, keys),
+        ...Obj.pick(next.parts, keys),
+      },
+      failed: {
+        ...Obj.omit(mut_held.failed, keys),
+        ...Obj.pick(next.failed, keys),
+      },
+    };
+  };
+
+  const heldNow = (): HeldParts =>
+    ({
+      ...mut_held,
+      reading: new Set<ReadGroup>(
+        Array.from(mut_claims.keys()).filter(isReadGroup),
+      ),
+    }) as const;
+
   const currentToken = (): string | undefined =>
     token.getSnapshot().value?.value;
 
-  // When the last read of the report was sent, for a tab shown again to tell
+  // When the last read of the page was sent, for a tab shown again to tell
   // whether the next is due yet.
   let mut_lastReadAtMs: number | undefined = undefined;
 
-  const read = (): void => {
-    const tokenValue = currentToken();
+  /** What a read that could not be read at all makes of the status. */
+  const failStatus = (message: string): void => {
+    updateLoadStatus((current) =>
+      current.type === 'ready'
+        ? { ...current, refreshing: false, pollError: message }
+        : { type: 'failed', message },
+    );
+  };
 
-    if (tokenValue === undefined) {
-      return;
-    }
-
+  /**
+   * Reads `groups`, which `claimed` holds, for `tokenValue`: for the page, a
+   * poll's or Refresh's — every group no other read has out — or for a pane.
+   */
+  const readGroups = async (
+    tokenValue: string,
+    groups: readonly ReadGroup[],
+    claimed: readonly Claim[],
+    ofPage: boolean,
+  ): Promise<void> => {
     const startedAtMs = now();
-
-    mut_lastReadAtMs = startedAtMs;
 
     const issueCount = mut_issueCount;
 
     // A page with nothing on it yet is drawn as the parts of the first read
     // answer, the merge order first; once it shows a report, a read replaces it
     // whole, so that a poll never puts a placeholder where data was.
-    const progressive = getLoadStatus().type !== 'ready';
+    const progressive =
+      groups.includes('pulls') && getLoadStatus().type !== 'ready';
 
-    // An answer for a token the reader has since forgotten or replaced is
-    // dropped: it would put back a report they asked to take away.
+    // An answer whose claims were put back — the token forgotten or replaced,
+    // even by the same one pasted again — is dropped: a newer read holds them,
+    // or the reader asked for the page to be taken away.
+    const isCurrent = (): boolean =>
+      currentToken() === tokenValue && claimed.every(isClaimed);
+
     const apply = (
       result: Result<LoadedReport, string>,
       answeredLimit: RateLimit | undefined,
     ): void => {
-      if (currentToken() !== tokenValue) {
+      if (!isCurrent()) {
         return;
       }
 
@@ -434,52 +562,103 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
       updateRateLimit((current) => answeredLimit ?? current);
 
-      measureBudget(answeredLimit);
-
-      const settled = settle(getLoadStatus(), getReadAt(), result, startedAtMs);
-
-      // The report before the status, so that a page shown for the first time
-      // is shown with its parts already in place. Its issues are left out when
-      // it was asked for before `loadMoreIssues` added a page: it lists fewer
-      // than the page now shows, and would take that page away.
-      if (settled.report !== undefined) {
-        // Its issues are what is on screen where the page kept those, so that a
-        // later read whose issues fail keeps the page `loadMoreIssues` added.
-        mut_parts =
-          issueCount >= mut_issueCount
-            ? settled.report.parts
-            : { ...settled.report.parts, issues: getIssues() };
-
-        writeReport(settled.report, issueCount >= mut_issueCount);
+      // A pane's read, moments after a read of the page, would be taken for a
+      // whole read's cost spent in that moment.
+      if (ofPage) {
+        measureBudget(answeredLimit);
       }
 
-      setLoadStatus(settled.status);
+      if (Result.isOk(result)) {
+        // Its issues are left out when it was asked for before `loadMoreIssues`
+        // added a page: it lists fewer than the page now shows, and would take
+        // that page away.
+        const taken =
+          issueCount >= mut_issueCount
+            ? groups
+            : groups.filter((group) => group !== 'issues');
+
+        // The report before the status, so that a page shown for the first time
+        // is shown with its parts already in place.
+        hold(result.value, taken);
+
+        writeReport(result.value, taken);
+      }
+
+      if (Result.isErr(result)) {
+        // Nothing the read asked for is coming any more, and each part of it
+        // says why, beside what is kept of it.
+        const failures: PartFailures = Object.fromEntries(
+          groups
+            .flatMap((group) => PARTS_OF_GROUP[group])
+            .map((part) => [
+              part,
+              {
+                message: result.value,
+                kept: mut_held.known[part] !== undefined,
+              },
+            ]),
+        );
+
+        updateReport((held) => ({
+          ...held,
+          reading: held.reading.filter((section) => !groups.includes(section)),
+          failed: { ...held.failed, ...failures },
+        }));
+      }
+
+      // What the page says of its reading is a read of the page's: a pane's
+      // answer leaves a Refresh or a failed poll as they were, unless it could
+      // not be read at all.
+      if (ofPage) {
+        // Two reads of a group are never out at once, so none is older than
+        // what is shown of it.
+        setLoadStatus(settle(getLoadStatus(), 0, result, startedAtMs).status);
+      } else if (Result.isErr(result)) {
+        failStatus(result.value);
+      }
     };
 
     const onProgress = progressive
       ? (partial: LoadedReport): void => {
-          if (currentToken() !== tokenValue) {
-            return;
-          }
-
-          const settled = settle(
-            getLoadStatus(),
-            getReadAt(),
-            Result.ok(partial),
-            startedAtMs,
-          );
-
-          if (settled.report === undefined) {
+          if (!isCurrent()) {
             return;
           }
 
           setNowMs(now());
 
-          writeReport(settled.report, issueCount >= mut_issueCount);
+          writeReport(partial, groups);
 
-          setLoadStatus(settled.status);
+          setLoadStatus(READY);
         }
       : undefined;
+
+    try {
+      const { result, rateLimit: answeredLimit } = await load({
+        token: tokenValue,
+        nowMs: startedAtMs,
+        groups,
+        issueCount,
+        previous: mut_held.known,
+        held: heldNow,
+        onProgress,
+      });
+
+      apply(result, answeredLimit);
+    } catch (error: unknown) {
+      apply(Result.err(unknownToString(error)), undefined);
+    } finally {
+      for (const each of claimed) {
+        release(each);
+      }
+    }
+  };
+
+  /** Reads the workflow runs, which `claimed` holds. */
+  const readRuns = async (
+    tokenValue: string,
+    claimed: Claim,
+  ): Promise<void> => {
+    const startedAtMs = now();
 
     const applyRuns = (result: Result<WorkflowRunList, string>): void => {
       if (currentToken() !== tokenValue || startedAtMs < mut_runsShownFromMs) {
@@ -493,35 +672,91 @@ export const createReader = (deps: ReaderDeps): Reader => {
       updateRuns((held) => settleRuns(held, result));
     };
 
-    loadRuns(tokenValue)
-      .then(applyRuns)
-      .catch((error: unknown) => {
-        applyRuns(Result.err(unknownToString(error)));
-      });
+    try {
+      applyRuns(await loadRuns(tokenValue));
+    } catch (error: unknown) {
+      applyRuns(Result.err(unknownToString(error)));
+    } finally {
+      release(claimed);
+    }
+  };
 
-    updateOutstanding((count) => count + 1);
+  /**
+   * Reads each of `panes` that is not being read already, all at once: the
+   * report's groups in one read, and the workflow runs beside it. Answers what
+   * it asked for.
+   */
+  const readPanes = (
+    panes: readonly PaneRead[],
+    ofPage: boolean,
+  ): readonly PaneRead[] => {
+    const tokenValue = currentToken();
 
-    // Called by an async function, so that a `load` that throws rather than
-    // rejects still settles it, and the count still goes down.
-    const loading = async (): Promise<Answered<LoadedReport>> =>
-      load(tokenValue, startedAtMs, issueCount, mut_parts, onProgress);
+    if (tokenValue === undefined) {
+      return [];
+    }
 
-    loading()
-      .then(({ result, rateLimit: answeredLimit }) => {
-        apply(result, answeredLimit);
-      })
-      .catch((error: unknown) => {
-        apply(Result.err(unknownToString(error)), undefined);
-      })
-      .finally(() => {
-        updateOutstanding((count) => count - 1);
-      });
+    const claimed = Arr.generate(function* () {
+      for (const pane of panes) {
+        const each = claim(pane);
+
+        if (each !== undefined) {
+          yield each;
+        }
+      }
+    });
+
+    const groupClaims = claimed.filter(
+      (each): each is Claim & Readonly<{ pane: ReadGroup }> =>
+        isReadGroup(each.pane),
+    );
+
+    if (Arr.isNonEmpty(groupClaims)) {
+      readGroups(
+        tokenValue,
+        groupClaims.map(({ pane }) => pane),
+        groupClaims,
+        ofPage,
+      ).catch(() => undefined);
+    }
+
+    const runsClaim = claimed.find(({ pane }) => pane === 'runs');
+
+    if (runsClaim !== undefined) {
+      readRuns(tokenValue, runsClaim).catch(() => undefined);
+    }
+
+    return claimed.map(({ pane }) => pane);
+  };
+
+  /** Reads the page, and answers whether it asked for any of the report. */
+  const read = (): boolean => {
+    const asked = readPanes(ALL_PANES, true);
+
+    // Not a read when every pane is being read already: the one out is.
+    if (Arr.isNonEmpty(asked)) {
+      mut_lastReadAtMs = now();
+    }
+
+    return asked.some(isReadGroup);
   };
 
   const refresh = (): void => {
     updateLoadStatus(asRefreshing);
 
-    read();
+    // Every group being read already, by a pane: no read of the page is out to
+    // settle it.
+    if (!read()) {
+      updateLoadStatus(settledRefresh);
+    }
+  };
+
+  const refreshPane = (pane: PaneRead): void => {
+    // The runs are read apart from the report, and are there to read again
+    // whatever became of it.
+    if (pane === 'runs' || getLoadStatus().type === 'ready') {
+      readPanes([pane], false);
+    }
   };
 
   const loadMoreIssues = (): void => {
@@ -569,9 +804,10 @@ export const createReader = (deps: ReaderDeps): Reader => {
         updateReport((held) => ({ ...held, issues: appended }));
 
         // So that a read whose issues fail keeps the page too.
-        if (mut_parts !== undefined) {
-          mut_parts = { ...mut_parts, issues: appended };
-        }
+        mut_held = {
+          ...mut_held,
+          known: { ...mut_held.known, issues: appended },
+        };
       }
 
       setMoreIssues(MORE_ISSUES_IDLE);
@@ -592,7 +828,13 @@ export const createReader = (deps: ReaderDeps): Reader => {
     const tokenSubscription = tokenChanged.subscribe((tokenValue) => {
       mut_issueCount = ISSUES_LIMIT;
 
-      mut_parts = undefined;
+      mut_held = NOTHING_KNOWN;
+
+      // A read still out for the last token answers to nothing, and holds
+      // nothing back from this one.
+      mut_claims = new Map<PaneRead, Claim>();
+
+      publishClaims();
 
       if (tokenValue === undefined) {
         mut_runsShownFromMs = 0;
@@ -723,16 +965,42 @@ export const createReader = (deps: ReaderDeps): Reader => {
     reading,
     failed,
     fetching,
+    paneReading,
     runs,
     moreIssues,
     rateLimit,
     pollIntervalMs,
     nowMs,
     refresh,
+    refreshPane,
     loadMoreIssues,
     start,
   };
 };
+
+/** A read's hold on a pane, which only it can release. */
+type Claim = Readonly<{ pane: PaneRead }>;
+
+/** What a read of the page reads, all at once. */
+const ALL_PANES = [
+  'pulls',
+  'merged',
+  'issues',
+  'runs',
+] as const satisfies readonly PaneRead[];
+
+const NOTHING_KNOWN = { known: {}, failed: {} } as const;
+
+const isReadGroup = (pane: PaneRead): pane is ReadGroup => pane !== 'runs';
+
+/** A Refresh with nothing of its own to wait for. */
+const settledRefresh = (current: LoadStatus): LoadStatus =>
+  current.type === 'ready'
+    ? ({ ...current, refreshing: false } as const)
+    : current;
+
+const sameMembers = <T,>(a: ReadonlySet<T>, b: ReadonlySet<T>): boolean =>
+  a.size === b.size && a.isSubsetOf(b);
 
 /** What of a report the page draws. */
 type ReportParts = StrictPick<
