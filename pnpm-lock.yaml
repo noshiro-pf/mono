@@ -820,6 +820,9 @@ importers:
         specifier: workspace:*
         version: link:../ts-fortress-types
     devDependencies:
+      '@firebase/rules-unit-testing':
+        specifier: ^5.0.2
+        version: 5.0.2(firebase@12.19.0)
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.64.1

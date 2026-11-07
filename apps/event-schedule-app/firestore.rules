@@ -1,8 +1,7 @@
-// Firestore rules of event-schedule-app. Deployed by hand with
-// `pnpm exec firebase deploy --only firestore:rules` from this directory.
-// CI's `@emulators` e2e test runs against them, but only as an anonymous user
-// creating, answering and editing an event; nothing tests what they deny or
-// what they let a signed-in user do, so check a change here by hand first.
+// Firestore rules of event-schedule-app. Deployed with the site and the
+// functions by `deploy-event-schedule-app.yml` once they reach `main`.
+// `test/firestore-rules.test.mts` (`check:test:rules`) checks each claim below,
+// what they deny included, against the emulator; a change here changes it too.
 //
 // Who may do what (the Cloud Functions use the Admin SDK and bypass this):
 //
