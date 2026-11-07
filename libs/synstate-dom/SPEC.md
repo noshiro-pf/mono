@@ -173,7 +173,7 @@ type ElementProps<E extends Element> = Readonly<
 >;
 ```
 
-- **属性とプロパティを区別する。** `value`・`checked`・`selected`・`indeterminate` など、ユーザー操作で属性と実体がずれるものはプロパティとして書く（`el[key] = v`）。それ以外は `setAttribute`。区別の一覧は 1 つの定数表に置き、型と実行時の両方がそれを読む。HTML の要素が属性として受け付けるキーは、どれも束縛するとプロパティに効くことをブラウザのテストで確かめる（SVG の属性は下の「SVG」で別に確かめる。`aria-*`・`data-*` は対象外）。キーの一覧は `gen:reflected-keys` が型から書き出し、TypeScript の更新で増えたキーもテストに入る。
+- **属性とプロパティを区別する。** `value`・`checked`・`selected`・`indeterminate` など、ユーザー操作で属性と実体がずれるものはプロパティとして書く（`el[key] = v`）。それ以外は `setAttribute`。区別の一覧は 1 つの定数表に置き、型と実行時の両方がそれを読む。HTML の要素が属性として受け付けるキーは、どれも束縛するとプロパティに効くことをブラウザのテストで確かめる（SVG の属性は下の「SVG」で別に確かめる。`aria-*`・`data-*` は対象外）。キーの一覧は `gen:reflected-keys` が型から書き出し、TypeScript の更新で増えたキーもテストに入る。props は利用者のコンパイラが利用者の `lib.dom.d.ts` で評価するので、一覧はリポジトリの strict ライブラリと、`strict-lib/` にハーネスのある TypeScript の各バージョン（5.0〜7.0）の公式の `lib.dom.d.ts` のそれぞれで得たキーの和集合である。
 - **イベント** は `on` + `HTMLElementEventMap` のキーを PascalCase にしたもの（`onClick`）。引数は `ev: HTMLElementEventMap[K] & Readonly<{ currentTarget: E }>`。値は関数のみで Observable は受け付けない（決定事項 4 の例外）。
 - **`ref`** は要素を作った直後、子をマウントする前に 1 回呼ぶ。属性・プロパティの束縛もイベントの登録もまだ行われていない（「6.3」）。
 - 真偽属性（`disabled` など）は `Bindable<boolean>` で受け、`false` で属性を外す。
