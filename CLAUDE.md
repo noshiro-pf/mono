@@ -449,10 +449,7 @@ cannot decide:
   (`strict-ts-lib-v7.0`) linked into `node_modules/@typescript/` by the root
   `prepare`. Do not reintroduce `@typescript/lib-*` in `paths`,
   `blockExoticSubdeps: false` or `publicHoistPattern`. Unlink
-  (`strict-ts-lib-v7.0-link --unlink`) before running TypeScript 5.0–5.7. A
-  package that opts in carries a `@ts-expect-error` probe
-  (`libs/octokit-safe-types/test/strict-lib-active.mts`), because a
-  replacement that stops happening fails nothing on its own.
+  (`strict-ts-lib-v7.0-link --unlink`) before running TypeScript 5.0–5.7.
 
 ## Build
 
