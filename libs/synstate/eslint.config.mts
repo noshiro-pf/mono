@@ -162,9 +162,9 @@ export default [
 
   // src/ is what `pnpm run check:sumi` checks (tsconfig.sumi.json), so the
   // ESLint rules Sumi covers are turned off there and a diagnostic is
-  // answered by its `@sumi-expect-error` marker alone (D-46). After every
-  // other src/ block but the import allow-list below, which has to come after
-  // this one (test/eslint-config.test.mts checks that it is in effect).
+  // answered by its `@sumi-expect-error` marker alone (D-46). It leaves
+  // `no-restricted-imports` on, so the import allow-list below holds wherever
+  // it stands (test/eslint-config.test.mts checks that it is in effect).
   {
     ...eslintConfigOffForSumiCheck,
     files: ['src/**'],
@@ -180,10 +180,9 @@ export default [
   // is built on anyway (this relies on ts-data-forge's branded-number `is*` /
   // `as*` being standalone, #3092). Add a standalone function to the list,
   // never an object. Tests are bundled by nobody; the entry point is not
-  // exempt, since a re-export from it would reach every bundle. This block comes after the Sumi block, which turns
-  // `no-restricted-imports` off because Sumi checks the index-file imports
-  // itself. It turns the rule back on with these paths only, so the
-  // index-file pattern stays Sumi's. The ts-data-forge rules' fixes still
+  // exempt, since a re-export from it would reach every bundle. The paths are
+  // merged with eslint-config-typed's index-file pattern, which a block that
+  // sets the rule would otherwise drop. The ts-data-forge rules' fixes still
   // import from the package root (#3093), so a fix that adds `Arr` or an
   // object is reported here; move that import to the subpath by hand.
   {
@@ -192,7 +191,7 @@ export default [
     rules: defineKnownRules({
       'no-restricted-imports': [
         'error',
-        {
+        mergeRestrictedImportsOptions(restrictedImportsOptions, {
           paths: [
             {
               name: 'ts-data-forge',
@@ -228,7 +227,7 @@ export default [
                 'synstate src/ imports only standalone functions from ts-std-forge, which tree-shake; see the comment in eslint.config.mts.',
             },
           ],
-        },
+        }),
       ],
     }),
   },

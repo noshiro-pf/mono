@@ -7,6 +7,7 @@ import * as path from 'node:path';
 import {
   eslintConfigOffForSumiCheck,
   eslintRulesByRuleId,
+  keptOnRules,
 } from '../src/index.mjs';
 
 const projectRootPath = path.resolve(import.meta.dirname, '..');
@@ -19,8 +20,11 @@ describe('the ESLint off block', () => {
     );
   });
 
-  test('turns off every listed rule and nothing else', () => {
-    const listed = Array.from(eslintRulesByRuleId.values()).flat().toSorted();
+  test('turns off every listed rule but those kept on, and nothing else', () => {
+    const listed = Array.from(eslintRulesByRuleId.values())
+      .flat()
+      .filter((rule) => !keptOnRules.has(rule))
+      .toSorted();
 
     assert.deepStrictEqual(
       Object.keys(eslintConfigOffForSumiCheck.rules),
@@ -31,6 +35,18 @@ describe('the ESLint off block', () => {
       new Set(Object.values(eslintConfigOffForSumiCheck.rules)),
       new Set<string>(['off']),
     );
+  });
+
+  test('leaves no-restricted-imports on, which also carries the restrictions of a package (#3068)', () => {
+    assert.isFalse(
+      Object.hasOwn(eslintConfigOffForSumiCheck.rules, 'no-restricted-imports'),
+    );
+
+    for (const rule of keptOnRules) {
+      assert.isTrue(
+        eslintRulesByRuleId.values().some((rules) => rules.includes(rule)),
+      );
+    }
   });
 
   test('every listed rule is one eslint-config-typed configures', () => {
