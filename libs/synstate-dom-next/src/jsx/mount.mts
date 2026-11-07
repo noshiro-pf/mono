@@ -6,7 +6,12 @@ import { isObservable } from 'synstate-next';
 import { toNode } from 'synstate-next/internal';
 import * as Arr from 'ts-data-forge/array';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { bindProps, TextBinding } from '../bind/index.mjs';
+import {
+  bindProps,
+  isSvgOnlyTag,
+  svgNamespace,
+  TextBinding,
+} from '../bind/index.mjs';
 import type { Bindable } from '../constant.mjs';
 
 /**
@@ -114,6 +119,44 @@ export const mountChild = (child: Child, out: MountedNodes): void => {
   out.push(document.createTextNode(constantText(child)));
 };
 
+/**
+ * The namespace the elements mounted now are created in: what is mounted inside
+ * an SVG element, down to a `<foreignObject>`, is SVG. An SVG-only tag
+ * (`<circle>`) is SVG wherever it is mounted; `<a>`, `<title>`, `<script>` and
+ * `<style>`, which are both, follow where they are mounted.
+ */
+export const currentNamespace = (): Namespace => mut_mounting.namespace;
+
+/** The namespace of what is mounted into `parent`. */
+export const namespaceInside = (parent: Element): Namespace =>
+  parent.namespaceURI === svgNamespace && parent.localName !== 'foreignObject'
+    ? 'svg'
+    : 'html';
+
+/**
+ * Runs `mount` with `namespace` as the current one. A binding that mounts later
+ * (an `If`'s branch, a `For`'s rows) keeps the namespace it was made in, through
+ * `MountSite`, and mounts with this.
+ */
+export const mountInNamespace = <R,>(
+  namespace: Namespace,
+  mount: () => R,
+): R => {
+  const saved = mut_mounting.namespace;
+
+  if (namespace === saved) {
+    return mount();
+  }
+
+  mut_mounting.namespace = namespace;
+
+  try {
+    return mount();
+  } finally {
+    mut_mounting.namespace = saved;
+  }
+};
+
 /** A description that mounts with a function of its own: `If`, `For`. */
 export class ControlDescription extends Description {
   readonly #mount: (out: MountedNodes) => void;
@@ -146,7 +189,13 @@ class ElementDescription extends Description {
   mount(out: MountedNodes): void {
     const props = this.#props;
 
-    const element = document.createElement(this.#tag);
+    const tag = this.#tag;
+
+    const isSvg = mut_mounting.namespace === 'svg' || isSvgOnlyTag(tag);
+
+    const element = isSvg
+      ? document.createElementNS(svgNamespace, tag)
+      : document.createElement(tag);
 
     // `ref` first: before the children are mounted or anything is bound.
     const { ref, children } = props;
@@ -158,7 +207,11 @@ class ElementDescription extends Description {
     // The children before the props: a `<select>`'s `value` selects one of the
     // `<option>`s, which have to be there.
     if (children !== undefined) {
-      mountChildren(element, children);
+      mountChildren(
+        element,
+        children,
+        isSvg && tag !== 'foreignObject' ? 'svg' : 'html',
+      );
     }
 
     bindProps(element, props);
@@ -217,7 +270,12 @@ export const Fragment = ({
     }
   });
 
+/** The namespace an element is created in. */
+export type Namespace = 'html' | 'svg';
+
 type Props = ReadonlyRecord<string, unknown>;
+
+const mut_mounting: { namespace: Namespace } = { namespace: 'html' };
 
 /** A constant child: a string or a number, by the types. */
 const constantText = (child: unknown): string =>
@@ -236,7 +294,11 @@ const isChild = (value: unknown): value is Child =>
   typeof value === 'number';
 
 /** Mounts the children of `element` into it. */
-const mountChildren = (mut_element: Element, children: unknown): void => {
+const mountChildren = (
+  mut_element: Element,
+  children: unknown,
+  namespace: Namespace,
+): void => {
   if (typeof children === 'string' || typeof children === 'number') {
     // One constant text child: no text node of our own to create.
     mut_element.textContent = constantText(children);
@@ -250,7 +312,13 @@ const mountChildren = (mut_element: Element, children: unknown): void => {
 
   const out = new MountedNodes();
 
-  mountChild(children, out);
+  if (namespace === mut_mounting.namespace) {
+    mountChild(children, out);
+  } else {
+    mountInNamespace(namespace, () => {
+      mountChild(children, out);
+    });
+  }
 
   out.appendTo(mut_element);
 };

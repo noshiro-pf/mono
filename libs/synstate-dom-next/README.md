@@ -31,11 +31,27 @@ fixes made to synstate-dom are not ported here. The rule and its reason are in
 - **Event handlers are `on…` properties** where the element has one, and a
   listener otherwise; neither is removed, since the element goes with its owner.
 
+- **`If`, `MatchOptional` and `MatchResult` are one keyed switch.** A branch is
+  mounted for the key of the value (the condition, `isSome`, `isOk`) and kept
+  while the key stays; what the branch is given follows the value meanwhile.
+
 The data slots keep synstate-dom's rule: they take a `Bindable` (an
 `InitializedObservable` or a `constant(…)`), never a plain value.
 
+## Changes from synstate-dom
+
+- `subscribeInScope` is gone: a `subscribe` made while an owner runs belongs to
+  that owner already, and is disposed with it.
+- `inlineMap` is not rebuilt; synstate-dom is removing it.
+- An element's namespace follows where it is mounted, not its tag: inside an
+  `<svg>`, down to a `<foreignObject>`, `<a>` and `<title>` are SVG elements.
+  synstate-dom makes them HTML wherever they are. Their props are still typed as
+  HTML's, a `ref` included, since a JSX element's type cannot depend on where it
+  stands.
+- A controlled `checked` or `indeterminate` is restored in the next animation
+  frame or a task after the `change`, whichever comes first, so it is restored
+  in a hidden page too.
+
 ## Not yet built
 
-SVG elements, `Portal`, `Match`, the controlled `checked` and `indeterminate` of
-synstate-dom, and the port of synstate-dom's tests. Each lands in a pull request
-of the rebuild.
+The port of synstate-dom's tests. It lands in a pull request of the rebuild.

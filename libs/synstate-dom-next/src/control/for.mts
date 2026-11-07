@@ -1,9 +1,8 @@
 import {
-  getOwner,
   isObservable,
-  Owner,
   state,
   type InitializedObservable,
+  type Owner,
   type State,
 } from 'synstate-next';
 import {
@@ -20,7 +19,7 @@ import {
   MountedNodes,
   type Description,
 } from '../jsx/index.mjs';
-import { removeRange } from './branch.mjs';
+import { MountSite, removeRange } from './branch.mjs';
 import { longestIncreasingRun } from './longest-increasing-run.mjs';
 
 /**
@@ -107,7 +106,7 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
 
   readonly #usesIndex: boolean;
 
-  readonly #parent: Owner | undefined;
+  readonly #site: MountSite;
 
   readonly #mut_byKey: Map<unknown, Row<T>>;
 
@@ -136,7 +135,7 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
 
     this.#usesIndex = children.length >= 2;
 
-    this.#parent = getOwner();
+    this.#site = new MountSite();
 
     this.#mut_byKey = new Map<unknown, Row<T>>();
 
@@ -169,11 +168,11 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
   #createRow(item: T, i: number, out: MountedNodes): Row<T> {
     const key = this.#key(item, i);
 
-    const owner = new Owner(this.#parent);
-
     const start = out.list.length;
 
-    const [itemState, indexState] = owner.run(() => {
+    const owner = this.#site.newOwner();
+
+    const [itemState, indexState] = this.#site.run(owner, () => {
       const itemInRow = state(item);
 
       const indexInRow = this.#usesIndex ? state(i) : undefined;

@@ -1,6 +1,11 @@
 import { batch, createRootOwner } from 'synstate-next';
-import { removeRange } from './control/index.mjs';
-import { MountedNodes, type Description } from './jsx/index.mjs';
+import { removeMounted } from './control/index.mjs';
+import {
+  MountedNodes,
+  mountInNamespace,
+  namespaceInside,
+  type Description,
+} from './jsx/index.mjs';
 
 /**
  * Mounts `app` into `container` and returns the function that unmounts it.
@@ -22,25 +27,18 @@ export const render = (
 
   const out = new MountedNodes();
 
-  // Everything between the first and the last node mounted, which takes in what
-  // an `If` or a `For` at the top inserted since: their markers are the first
-  // and last nodes they mount, and stay.
   const unmount = (): void => {
     owner.dispose();
 
-    const first = out.list.at(0);
-
-    const last = out.list.at(-1);
-
-    if (first !== undefined && last !== undefined) {
-      removeRange(first, last);
-    }
+    removeMounted(out);
   };
 
   try {
     batch(() => {
-      owner.run(() => {
-        app().mount(out);
+      mountInNamespace(namespaceInside(container), () => {
+        owner.run(() => {
+          app().mount(out);
+        });
       });
 
       out.appendTo(container);
