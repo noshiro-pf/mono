@@ -22,7 +22,7 @@ import {
   type InitializedObservable,
   type Observable,
 } from 'synstate-next';
-import { expectType } from 'ts-data-forge';
+import { expectType, isNotUndefined } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 
 describe('types', () => {
@@ -139,5 +139,19 @@ describe('types', () => {
     );
 
     assert.isTrue(taken.hasValue);
+  });
+
+  test('filter narrows the values by a type guard', () => {
+    const s = state<number | undefined>(0);
+
+    const narrowed = s.pipe(filter(isNotUndefined));
+
+    expectType<typeof narrowed, Observable<number>>('=');
+
+    assert.strictEqual(narrowed.peek(), 0);
+
+    const _kept = s.pipe(filter((x) => x !== 0));
+
+    expectType<typeof _kept, Observable<number | undefined>>('=');
   });
 });
