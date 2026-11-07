@@ -5,7 +5,7 @@ import {
   DEFAULT_ISSUES_LIST_VIEW,
   isIssueShown,
   issuesListViewFromSearch,
-  matchesIssueTitle,
+  matchesIssueSearch,
   searchWithIssuesListView,
   toggleIssueInProgress,
   toggleIssueInProgressOnly,
@@ -107,34 +107,82 @@ describe(isIssueShown, () => {
   });
 });
 
-describe(matchesIssueTitle, () => {
+describe(matchesIssueSearch, () => {
   test('nothing typed, or only spaces, matches every issue', () => {
-    assert.isTrue(matchesIssueTitle(titled(1, 'Anything'), ''));
+    assert.isTrue(matchesIssueSearch(titled(1, 'Anything'), ''));
 
-    assert.isTrue(matchesIssueTitle(titled(1, 'Anything'), ' '.repeat(3)));
+    assert.isTrue(matchesIssueSearch(titled(1, 'Anything'), ' '.repeat(3)));
   });
 
   test('matches a part of the title, whatever its case', () => {
     const each = titled(1, 'Show the DAG zoom in the toolbar');
 
-    assert.isTrue(matchesIssueTitle(each, 'dag'));
+    assert.isTrue(matchesIssueSearch(each, 'dag'));
 
-    assert.isTrue(matchesIssueTitle(each, 'ZOOM IN'));
+    assert.isTrue(matchesIssueSearch(each, 'ZOOM IN'));
 
-    assert.isTrue(matchesIssueTitle(each, '  toolbar '));
+    assert.isTrue(matchesIssueSearch(each, '  toolbar '));
 
-    assert.isFalse(matchesIssueTitle(each, 'zoom out'));
+    assert.isFalse(matchesIssueSearch(each, 'zoom out'));
   });
 
-  test('reads the title only, not the number or the labels', () => {
+  test('a number, with or without "#", matches the issue of that number', () => {
+    const each = titled(123, 'Fix the header');
+
+    assert.isTrue(matchesIssueSearch(each, '123'));
+
+    assert.isTrue(matchesIssueSearch(each, '#123'));
+
+    assert.isTrue(matchesIssueSearch(each, ' #123 '));
+
+    assert.isFalse(matchesIssueSearch(each, '12'));
+
+    assert.isFalse(matchesIssueSearch(each, '#1234'));
+
+    assert.isFalse(matchesIssueSearch(each, '# 123'));
+
+    assert.isFalse(matchesIssueSearch(each, '0123'));
+  });
+
+  test('a number or a word typed full-width, as an IME does, matches too', () => {
+    const each = titled(123, 'Fix the header');
+
+    assert.isTrue(matchesIssueSearch(each, '＃１２３'));
+
+    assert.isTrue(matchesIssueSearch(each, '１２３'));
+
+    assert.isTrue(
+      matchesIssueSearch(titled(1, 'Follow up #123 in the DAG'), '＃１２３'),
+    );
+
+    assert.isTrue(matchesIssueSearch(titled(1, 'Zoom the DAG'), 'ＤＡＧ'));
+
+    assert.isTrue(matchesIssueSearch(titled(1, 'Zoom the ＤＡＧ'), 'dag'));
+  });
+
+  test('folds full-width ASCII only, not what NFKC folds besides', () => {
+    assert.isFalse(matchesIssueSearch(titled(1, 'Allow 10³ rows'), '103'));
+  });
+
+  test('a number also matches a title holding it', () => {
+    assert.isTrue(matchesIssueSearch(titled(1, 'Support Node 22'), '22'));
+
+    assert.isTrue(
+      matchesIssueSearch(titled(1, 'Follow up #123 in the DAG'), '#123'),
+    );
+
+    assert.isFalse(matchesIssueSearch(titled(1, 'Follow up 123'), '#123'));
+  });
+
+  test('reads the title and the number, not the labels', () => {
     const each = {
       ...titled(12, 'Fix the header'),
       labels: [label('bug')],
     } as const;
 
-    assert.isFalse(matchesIssueTitle(each, '12'));
+    assert.isTrue(matchesIssueSearch(each, '12'));
 
-    assert.isFalse(matchesIssueTitle(each, 'bug'));
+    assert.isFalse(matchesIssueSearch(each, 'bug'));
   });
 });
 

@@ -36,10 +36,10 @@
  * `free`.
  *
  * **The search** is what the reader types: an issue is shown only when its
- * title holds it, whatever the case, and still not when its priority or its
- * labels leave it out. It narrows the list there and then, so it is not kept in
- * the URL as the rest of the view is: it is held beside the view
- * (`issues-list-store.mts`) rather than in it.
+ * title holds it, whatever the case, or its number is it (`123` or `#123`), and
+ * still not when its priority or its labels leave it out. It narrows the list
+ * there and then, so it is not kept in the URL as the rest of the view is: it
+ * is held beside the view (`issues-list-store.mts`) rather than in it.
  *
  * Sorted by priority, by tier: S first, "none" between C and D, then hold and
  * close, the most recently updated first within each; sorted by start state,
@@ -190,7 +190,7 @@ export const isIssueShown = (
     (start === 'in-progress' || !view.hiddenStarts.includes(start)) &&
     (!Arr.isNonEmpty(view.onlyLabels) ||
       issue.labels.some((label) => view.onlyLabels.includes(label.name))) &&
-    matchesIssueTitle(issue, query)
+    matchesIssueSearch(issue, query)
   );
 };
 
@@ -260,13 +260,24 @@ export const countIssueFilter = <T,>(
 };
 
 /**
- * Whether the title holds what was typed, whatever the case; the spaces around
- * it are not read, and nothing typed matches everything.
+ * Whether the issue is what was typed: its title holds it, whatever the case,
+ * or it is the issue's number, `#` before it or not. Both sides have their
+ * full-width ASCII read as the usual one, so that the `＃１２３` or `ＤＡＧ` an
+ * IME types is `#123` or `DAG` too; nothing else is folded, as NFKC would `³`
+ * into `3`. The spaces around it are not read, and nothing typed matches
+ * everything.
  */
-export const matchesIssueTitle = (issue: IssueItem, query: string): boolean => {
-  const typed = query.trim().toLowerCase();
+export const matchesIssueSearch = (
+  issue: IssueItem,
+  query: string,
+): boolean => {
+  const typed = narrowed(query).trim().toLowerCase();
 
-  return typed === '' || issue.title.toLowerCase().includes(typed);
+  return (
+    typed === '' ||
+    narrowed(issue.title).toLowerCase().includes(typed) ||
+    typed.replace(/^#/u, '') === issue.number.toString()
+  );
 };
 
 /** The list as the view and the search show it. */
@@ -617,7 +628,19 @@ const OLDER_PENDING = {
   dagHide: 'dag.hidePending',
 } as const;
 
+/** The full-width forms of the printable ASCII characters but space. */
+const FULL_WIDTH_ASCII = /[！-～]/gu;
+
+/** How far each of {@link FULL_WIDTH_ASCII} is from its ASCII character. */
+const FULL_WIDTH_OFFSET = 0xfe_e0;
+
 const NO_STARTS: IssueStarts = new Map<number, IssueStartState>();
 
 const startOf = (starts: IssueStarts, issue: IssueItem): IssueStartState =>
   starts.get(issue.number) ?? 'free';
+
+/** `text` with its full-width ASCII read as the usual characters. */
+const narrowed = (text: string): string =>
+  text.replaceAll(FULL_WIDTH_ASCII, (wide) =>
+    String.fromCodePoint((wide.codePointAt(0) ?? 0) - FULL_WIDTH_OFFSET),
+  );

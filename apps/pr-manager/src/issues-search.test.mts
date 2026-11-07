@@ -68,7 +68,7 @@ describe(githubIssuesSearchOf, () => {
     );
   });
 
-  test('in progress, the start states and the title search are left to the page, and said to be', () => {
+  test('in progress, the start states and the search are left to the page, and said to be', () => {
     assert.deepStrictEqual(
       githubIssuesSearchOf(
         {
@@ -81,7 +81,11 @@ describe(githubIssuesSearchOf, () => {
       ),
       {
         qualifiers: [],
-        unsearchable: ['in progress', 'start state', 'the title search'],
+        unsearchable: [
+          'in progress',
+          'start state',
+          'the search by title or number',
+        ],
         isPrerequisiteLeftOut: false,
       },
     );

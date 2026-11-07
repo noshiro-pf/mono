@@ -13,12 +13,12 @@
  *
  * `in progress` and the start states are read off the issue graph and the open
  * pull requests (`issue-start.mts`), which GitHub's search knows nothing of,
- * and the title search matches any part of a title, where GitHub's matches
- * whole words, so they are left out and said to be, as where GitHub lists more.
- * The DAG reads the tiers and `in progress` alone, as it does on the page, and
- * also draws what a drawn issue waits on, whatever its tier and even closed
- * unfinished, which the search can leave out. GitHub has no order by tier or by
- * start state.
+ * and the search matches any part of a title, or a number, where GitHub's
+ * matches whole words, so they are left out and said to be, as where GitHub
+ * lists more. The DAG reads the tiers and `in progress` alone, as it does on
+ * the page, and also draws what a drawn issue waits on, whatever its tier and
+ * even closed unfinished, which the search can leave out. GitHub has no order
+ * by tier or by start state.
  */
 
 import {
@@ -71,7 +71,9 @@ export const githubIssuesSearchOf = (
       ...(isNonePicked && Arr.isNonEmpty(picked) ? ['the tiers picked'] : []),
       ...(view.hideInProgress || view.onlyInProgress ? ['in progress'] : []),
       ...(isList && Arr.isNonEmpty(view.hiddenStarts) ? ['start state'] : []),
-      ...(isList && query.trim() !== '' ? ['the title search'] : []),
+      ...(isList && query.trim() !== ''
+        ? ['the search by title or number']
+        : []),
     ],
     isPrerequisiteLeftOut: !isList,
   } as const;
