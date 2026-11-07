@@ -1,4 +1,5 @@
 import {
+  createScope,
   createState,
   keepEqualParts,
   map,
@@ -169,7 +170,9 @@ export type Router<R extends AnyRoutes> = Readonly<{
    * (in a microtask): the way to navigate from an observable, such as a
    * debounced search box. The value an initialized observable already holds
    * when following starts is a state, not a move, and is skipped. Returns the
-   * function that stops it; after `dispose`, it follows nothing.
+   * function that stops it; following also ends when `href$` completes (a move
+   * it queued just before still happens) or the router is disposed, and after
+   * `dispose` it follows nothing.
    */
   follow: (href$: Observable<Href>, options?: NavigateOptions) => () => void;
 
@@ -559,8 +562,9 @@ export const createRouter = <R extends AnyRoutes>(
         );
   };
 
-  /** What `dispose` stops: the `follow` subscriptions. */
-  const mut_stops = new Set<() => void>();
+  // Owns the `follow` subscriptions, so that `dispose` ends them and one whose
+  // observable completed is forgotten.
+  const follows = createScope();
 
   const mut_router = { disposed: false };
 
@@ -576,9 +580,8 @@ export const createRouter = <R extends AnyRoutes>(
 
     const mut_follow = { active: true, subscribing: true };
 
-    // Outside any scope: following lasts until `stop` or the router's disposal,
-    // not until whichever scope happens to be running.
-    const subscription = untracked(() =>
+    // In the router's own scope, not whichever one happens to be running.
+    const subscription = follows.run(() =>
       href$.subscribe((href) => {
         // An initialized observable delivers the value it holds during
         // `subscribe`: a state, not a move.
@@ -591,7 +594,7 @@ export const createRouter = <R extends AnyRoutes>(
         }
 
         queueMicrotask(() => {
-          if (mut_follow.active) {
+          if (mut_follow.active && !mut_router.disposed) {
             navigate(href, navigateOptions?.replace ?? false, true);
           }
         });
@@ -604,11 +607,7 @@ export const createRouter = <R extends AnyRoutes>(
       mut_follow.active = false;
 
       subscription.unsubscribe();
-
-      mut_stops.delete(stop);
     };
-
-    mut_stops.add(stop);
 
     return stop;
   };
@@ -702,9 +701,7 @@ export const createRouter = <R extends AnyRoutes>(
 
       browser.removeEventListener('popstate', update);
 
-      for (const stop of mut_stops) {
-        stop();
-      }
+      follows.dispose();
 
       mut_scroll.pending = Optional.none;
 
