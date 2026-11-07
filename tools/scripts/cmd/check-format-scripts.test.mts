@@ -1,6 +1,8 @@
+import dedent from 'dedent';
 import {
   expectedFixFmtFull,
   findFormatScriptProblems,
+  findPrettierInSource,
 } from './check-format-scripts.mjs';
 
 describe(expectedFixFmtFull, () => {
@@ -120,6 +122,57 @@ describe(findFormatScriptProblems, () => {
         c: 'tsx ./scripts/run-prettier.mts',
         d: 'pnpm run z:prettier-free',
       }),
+      [],
+    );
+  });
+});
+
+describe(findPrettierInSource, () => {
+  test('finds an import of Prettier, static or dynamic', () => {
+    assert.deepStrictEqual(
+      findPrettierInSource(
+        'gen.mts',
+        dedent`
+          import { format } from 'prettier';
+          const p = await import('prettier/standalone');
+        `,
+      ),
+      [
+        'gen.mts:1: imports `prettier`',
+        'gen.mts:2: imports `prettier/standalone`',
+      ],
+    );
+  });
+
+  test('finds the command in a string or a template', () => {
+    assert.deepStrictEqual(
+      findPrettierInSource(
+        'gen.mts',
+        dedent`
+          await $('pnpm exec prettier --write src');
+          spawnSync('node', ['node_modules/prettier/bin/prettier.cjs', file]);
+          await $(\`prettier --write \${file}\`);
+        `,
+      ),
+      [
+        'gen.mts:1: runs `prettier`',
+        'gen.mts:2: runs `prettier`',
+        'gen.mts:3: runs `prettier`',
+      ],
+    );
+  });
+
+  test('passes a comment, a plugin name and the shared helper', () => {
+    assert.deepStrictEqual(
+      findPrettierInSource(
+        'gen.mts',
+        dedent`
+          // \`prettier --write\` on the generated file
+          import { formatPackage } from '../../tools/configs/format-package.mjs';
+          const plugins = ['prettier-plugin-organize-imports'];
+          formatPackage({ cwd, patterns: [file] });
+        `,
+      ),
       [],
     );
   });

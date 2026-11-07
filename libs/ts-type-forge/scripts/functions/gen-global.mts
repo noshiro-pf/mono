@@ -1,7 +1,8 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { format } from 'prettier';
 import { glob, Result } from 'ts-repo-utils';
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how packages reach its shared scripts
+import { formatPackage } from '../../../../tools/configs/format-package.mjs';
 import {
   extractTypeExports,
   type NamespaceExport,
@@ -101,21 +102,27 @@ export const genGlobal = async (
     typesForGlobal.length +
     mut_allNamespaces.reduce((sum, ns) => sum + ns.types.length, 0);
 
-  const formatted = await format(mut_lines.join('\n'), {
-    parser: 'typescript',
-    singleQuote: true,
-    trailingComma: 'all',
-  });
-
   try {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.writeFile(globalFilePath, formatted, 'utf8');
+    await fs.writeFile(globalFilePath, mut_lines.join('\n'), 'utf8');
 
     console.info(
       `Successfully generated ${globalFilePath} with ${totalAliases} global type aliases (${mut_allNamespaces.length} namespaces).`,
     );
   } catch (error) {
     console.error(`Error writing to ${globalFilePath}:`, error);
+  }
+
+  // Prettier with the root config and ignore files, as every member formats
+  // (`check:root:format-scripts`). Outside the `try` above, so that a failure
+  // fails the run.
+  if (
+    formatPackage({
+      cwd: path.resolve(srcDir, '..'),
+      patterns: [globalFilePath],
+    }) !== 0
+  ) {
+    throw new Error(`Prettier failed on ${globalFilePath}; see above.`);
   }
 };
 
