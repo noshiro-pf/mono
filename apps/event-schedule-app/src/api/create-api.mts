@@ -12,8 +12,8 @@ import {
   signIn,
   signOut,
   updateDisplayName,
-  updateEmail,
   updatePassword,
+  verifyBeforeUpdateEmail,
 } from './auth/index.mjs';
 import {
   addAnswer,
@@ -55,9 +55,9 @@ export const createApi = (firebase: FirebaseHandles) =>
       emailCredential,
       update: {
         displayName: updateDisplayName,
-        email: updateEmail,
         password: updatePassword,
       },
+      verifyBeforeUpdateEmail,
     },
     event: {
       add: addEventSchedule(firebase),

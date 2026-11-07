@@ -275,9 +275,9 @@ const setup = (code: string): Setup => {
           deleteUser: () => recorded('deleteUser'),
           update: {
             displayName: () => recorded('update.displayName'),
-            email: () => recorded('update.email'),
             password: () => recorded('update.password'),
           },
+          verifyBeforeUpdateEmail: () => recorded('verifyBeforeUpdateEmail'),
         },
       },
       auth: {
