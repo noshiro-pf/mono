@@ -710,16 +710,15 @@ matrix が作るどのチェックも受け持たないと `check:root:auto-fix-
 `style-check (X)` で、`X` が `fix:` か `gen:` のコマンド（`ws:` /
 `strict-lib:` 付きも含む）か、style-check のまとめた entry
 （`z:ci:style-check:checks-and-generators` と
-`z:ci:style-check:format-and-doc`）なら直します。どの job も最後に `z:assert-repo-is-clean` を実行するので、それはコマンドが
-ファイルを書き換えただけの失敗だからです。
+`z:ci:style-check:format-and-doc`）なら直します。どの job も `z:ci-job` を通り、その clean-tree の確認はコマンドが
+ファイルを書き換えた job を失敗させます。
 `z:ci:style-check:checks-and-generators` はフォーマッタや生成器と一緒にチェックも
-含むので、丸ごと再実行します。中のチェックが失敗していれ
-ば再実行も失敗し、それで修正を見送ります。これは他のどの fixer よりも先に
+含むので、丸ごと再実行します。これは他のどの fixer よりも先に
 （stage -1）、コミットされたままのツリーで実行します。中の `check:prose` はツ
 リーを base と比べるので、他の fixer の書き換えを変更の一部として読んでしまうか
 らです。もう1つのまとめた entry、`z:ci:style-check:format-and-doc`（Prettier
 と `ws:doc`）は、tracked なファイルを書くのが Prettier だけなので
-`fix:fmt:full` を実行します。`ws:doc` が落ちていれば差分は出ず、それで修正を
+`fix:fmt:full` を実行します。`ws:doc` が落ちていればコマンドの失敗で、それで修正を
 見送ります。その場合に限り、次のことをします。
 
 1. 使い捨ての worktree で `pnpm install --frozen-lockfile` し、CI がビルドする
@@ -740,6 +739,11 @@ matrix が作るどのチェックも受け持たないと `check:root:auto-fix-
 ます。
 
 - リポジトリに `autoFix` の設定が無い。
+- job のコマンド自体が失敗したと、その check run の annotation
+  （設定の `notFixableAnnotation`）が言っている。fixer が何を書いても、0 以外で
+  終わったコマンドは直らないので、job の名前を出して計画の時点で断り、何もインス
+  トールしません。build、コマンド、clean-tree の確認が1ステップなので、どれが失敗
+  したかはステップからは読めません。
 - 失敗した job に1つでも fixer 以外がある（型、テスト、`ws:doc`、
   `Validate commit count` など）。push しても落ちるマトリクスを1回走らせるだけ
   なので、全体を skill に任せます。
@@ -1763,15 +1767,19 @@ This repository's configuration fixes a failure when **every** job that failed
 is a `code-check (X)` or `style-check (X)` entry whose `X` is a `fix:` or `gen:`
 command (under `ws:` or `strict-lib:` too), or one of style-check's bundles,
 `z:ci:style-check:checks-and-generators` and `z:ci:style-check:format-and-doc`:
-every job ends with `z:assert-repo-is-clean`, so the failure is the command
-having rewritten files.
+every job runs through `z:ci-job`, whose clean-tree check fails a job whose
+command rewrote files. A job whose command itself failed says so in an
+annotation on its check run, `notFixableAnnotation` in the configuration, and is
+declined when the plan is made, naming the job and installing nothing: nothing a
+fixer writes fixes a command that exited non-zero, and with one step holding the
+build, the command and the clean-tree check, the steps cannot say which failed.
+Where the annotation cannot be read, the fixer finds out for itself.
 The first holds checks beside its formatters and generators, so it is rerun
-whole: a check in it that failed fails the rerun, and that declines the fix. It
-runs before every other fixer (stage -1), on the tree as committed, because its
-`check:prose` diffs the tree against the base and would read another fixer's
-rewrite as part of the change. The other bundle, Prettier and `ws:doc`, runs
-`fix:fmt:full`, since Prettier is the only part of it that writes tracked files;
-a failed `ws:doc` leaves nothing changed, and that declines the fix.
+whole. It runs before every other fixer (stage -1), on the tree as committed,
+because its `check:prose` diffs the tree against the base and would read another
+fixer's rewrite as part of the change. The other bundle, Prettier and `ws:doc`,
+runs `fix:fmt:full`, since Prettier is the only part of it that writes tracked
+files; a failed `ws:doc` is its command failing, which declines the fix.
 Then, and only then:
 
 1. In a throwaway worktree, `pnpm install --frozen-lockfile`, and `ws:build`

@@ -1,10 +1,42 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { projectRootPath } from '../project-root-path.mjs';
 import {
+  COMMAND_FAILED_ANNOTATION,
+  commandFailedAnnotation,
   diffInvocations,
   dirtyStartFailures,
   jobFailures,
   jobSteps,
   writesToShow,
 } from './ci-job.mjs';
+
+describe('commandFailedAnnotation', () => {
+  test('is one workflow command, titled what unblock-prs declines by', () => {
+    assert.strictEqual(
+      commandFailedAnnotation('check:cspell exited with 1.\nand more'),
+      '::error title=command failed::check:cspell exited with 1.',
+    );
+
+    assert.strictEqual(
+      commandFailedAnnotation('100% of it\r'),
+      '::error title=command failed::100%25 of it%0D',
+    );
+  });
+
+  test('.github/unblock-prs.json names the same title', async () => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a fixed file under the repository root.
+    const config = await fs.readFile(
+      path.join(projectRootPath, '.github/unblock-prs.json'),
+      'utf8',
+    );
+
+    assert.include(
+      config,
+      `"notFixableAnnotation": "${COMMAND_FAILED_ANNOTATION}"`,
+    );
+  });
+});
 
 describe('jobSteps', () => {
   test('the build, then the command', () => {

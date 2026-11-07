@@ -88,9 +88,30 @@ export const runJob = async ({
     ],
     buildFailed:
       build !== undefined && (mut_results.at(0)?.exitCode ?? 1) !== 0,
+    commandFailed:
+      mut_results.some(({ exitCode }) => exitCode !== 0) ||
+      (requireCleanStart && initial.size > 0),
     wrote,
   };
 };
+
+/**
+ * The annotation a job that failed for more than a diff leaves on its check run:
+ * nothing a fixer writes can fix a command that exited non-zero. `unblock-prs`
+ * declines an auto-fix by it (`notFixableAnnotation` in
+ * `.github/unblock-prs.json`, which has to say the same; `ci-job.test.mts` holds
+ * them equal), since one step runs the build, the command and the clean-tree
+ * check, and which of them failed cannot be read from the steps. `failure` is
+ * one line of what went wrong, in the workflow command's own escaping.
+ */
+export const commandFailedAnnotation = (failure: string): string =>
+  `::error title=${COMMAND_FAILED_ANNOTATION}::${(
+    failure.split('\n', 1)[0] ?? ''
+  )
+    .replaceAll('%', '%25')
+    .replaceAll('\r', '%0D')}` as const;
+
+export const COMMAND_FAILED_ANNOTATION = 'command failed';
 
 /**
  * Of the files the steps wrote, those whose diff is the steps' alone, and those
@@ -198,6 +219,8 @@ export type JobOutcome = Readonly<{
   failures: readonly string[];
   /** Whether the build ran and failed, so that the entry never ran. */
   buildFailed: boolean;
+  /** Whether a step failed or setup changed the tree: more than a diff. */
+  commandFailed: boolean;
   /** The paths the steps changed, together. */
   wrote: readonly string[];
 }>;
@@ -356,6 +379,10 @@ if (isDirectlyExecuted(import.meta.url)) {
 
     if (Arr.isNonEmpty(outcome.failures)) {
       console.error(`\n❌ ${outcome.failures.join('\n\n❌ ')}`);
+
+      if (outcome.commandFailed && process.env['GITHUB_ACTIONS'] === 'true') {
+        console.info(commandFailedAnnotation(outcome.failures[0]));
+      }
     }
 
     // For the report step after it, which explains the entry, not a build.

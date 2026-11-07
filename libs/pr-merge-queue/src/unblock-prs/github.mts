@@ -850,6 +850,25 @@ export const listCheckRuns = async (
   );
 };
 
+/**
+ * The titles of the annotations on check run `id`. A job holds at most 50, on
+ * one page of a hundred.
+ */
+export const readAnnotationTitles = async (
+  api: ApiContext,
+  id: number,
+): Promise<Result<readonly string[], string>> =>
+  Result.map(
+    await rest(
+      api,
+      'GET',
+      `/check-runs/${id}/annotations`,
+      t.array(t.record({ title: t.union([t.string(), t.nullType]) })),
+      { query: { per_page: '100' } },
+    ),
+    (annotations) => annotations.flatMap(({ title }) => title ?? []),
+  );
+
 export const removeWorktree = async (worktreeDir: string): Promise<void> => {
   // Both fail harmlessly when there is nothing to remove.
   await git(`git worktree remove --force ${sh(worktreeDir)}`);

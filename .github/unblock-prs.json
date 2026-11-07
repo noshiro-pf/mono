@@ -37,7 +37,8 @@
         "stage": 2
       }
     ],
-    "after": ["pnpm run fix:fmt:diff"]
+    "after": ["pnpm run fix:fmt:diff"],
+    "notFixableAnnotation": "command failed"
   },
   "regenerate": {
     "before": ["pnpm install --frozen-lockfile"],
