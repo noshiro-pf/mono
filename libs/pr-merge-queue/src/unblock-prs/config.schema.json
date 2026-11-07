@@ -60,6 +60,10 @@
           "description": "Commands run last, always: settling what the fixers wrote (a formatter).",
           "type": "array",
           "items": { "type": "string" }
+        },
+        "notFixableAnnotation": {
+          "description": "The title of an annotation a job leaves on its check run when its command failed, rather than only leaving a diff: such a context is declined at planning, without an install. For a job that runs its command and its clean-tree check in one step, whose steps cannot say which failed. Absent: every failed context matching a fixer is tried.",
+          "type": "string"
         }
       },
       "required": ["ignore", "before", "prepare", "fixers", "after"],

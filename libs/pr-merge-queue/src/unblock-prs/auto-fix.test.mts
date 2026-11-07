@@ -16,6 +16,40 @@ const states = (
 ): ReadonlyMap<string, ContextState> => new Map(entries);
 
 describe(planAutoFix, () => {
+  test('declines a context whose job said its command failed, naming it', () => {
+    const job = 'style-check (z:ci:style-check:checks-and-generators)';
+
+    const plan = planAutoFix(states([[job, 'failed']]), config, [job]);
+
+    assert.isTrue(Result.isErr(plan));
+
+    assert.include(plan.value, job);
+
+    assert.include(plan.value, 'in its command');
+
+    // The same failure leaving only a diff is still fixed.
+    assert.isTrue(Result.isOk(planAutoFix(states([[job, 'failed']]), config)));
+  });
+
+  test('one of several declined declines them all', () => {
+    const job = 'style-check (z:ci:style-check:checks-and-generators)';
+
+    const other = 'code-check (fix:codemod:full)';
+
+    assert.isTrue(
+      Result.isErr(
+        planAutoFix(
+          states([
+            [job, 'failed'],
+            [other, 'failed'],
+          ]),
+          config,
+          [other],
+        ),
+      ),
+    );
+  });
+
   test('runs the command a failed matrix entry names, with the build CI gave it', () => {
     const plan = planAutoFix(
       states([

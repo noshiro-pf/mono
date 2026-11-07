@@ -112,7 +112,8 @@ export const configOf = (
     });
   }
 
-  const { ignore, before, prepare, fixers, after } = file.autoFix;
+  const { ignore, before, prepare, fixers, after, notFixableAnnotation } =
+    file.autoFix;
 
   return Result.ok({
     autoFix: {
@@ -128,6 +129,7 @@ export const configOf = (
         stage,
       })),
       after,
+      notFixableAnnotation,
     },
     generatedBranches,
     translation,
@@ -194,6 +196,12 @@ export const ConfigFileSchema = t.annotate(
             description:
               'Commands run last, always: settling what the fixers wrote (a formatter).',
           }),
+          notFixableAnnotation: t.optional(
+            t.annotate(t.string(), {
+              description:
+                'The title of an annotation a job leaves on its check run when its command failed, rather than only leaving a diff: such a context is declined at planning, without an install. For a job that runs its command and its clean-tree check in one step, whose steps cannot say which failed. Absent: every failed context matching a fixer is tried.',
+            }),
+          ),
         }),
         {
           description:
@@ -325,6 +333,8 @@ export type AutoFixConfig = Readonly<{
   prepare: readonly Readonly<{ context: RegExp; run: string }>[];
   fixers: readonly Readonly<{ context: RegExp; run: string; stage: number }>[];
   after: readonly string[];
+  /** Absent in a repository whose jobs leave no such annotation. */
+  notFixableAnnotation: string | undefined;
 }>;
 
 const exists = async (file: string): Promise<boolean> =>

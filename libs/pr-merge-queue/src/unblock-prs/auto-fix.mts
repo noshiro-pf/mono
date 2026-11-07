@@ -15,9 +15,11 @@
 import * as os from 'node:os';
 import * as path from 'node:path';
 import {
+  outranks,
   ownersOf,
   parseCodeOwners,
   statesFromCheckRuns,
+  type CheckRunReport,
   type ContextState,
 } from 'pr-report-core';
 import { Arr, Num, Result } from 'ts-data-forge';
@@ -26,6 +28,7 @@ import { CONFIG_PATH, type AutoFixConfig } from './config.mjs';
 import {
   CODE_OWNERS_PATH,
   listCheckRuns,
+  readAnnotationTitles,
   remoteSha,
   removeWorktree,
 } from './github.mjs';
@@ -62,7 +65,19 @@ export const autoFix = async (
     return declined(`cannot read the check runs: ${runs.value}`);
   }
 
-  const plan = planAutoFix(statesFromCheckRuns(runs.value), config);
+  const states = statesFromCheckRuns(runs.value);
+
+  const named = planAutoFix(states, config);
+
+  if (Result.isErr(named)) {
+    return declined(named.value);
+  }
+
+  const plan = planAutoFix(
+    states,
+    config,
+    await contextsNotFixable(api, runs.value, states, config),
+  );
 
   if (Result.isErr(plan)) {
     return declined(plan.value);
@@ -126,26 +141,31 @@ export const autoFix = async (
  * it) is not read; every other failure has to match one of its fixers, whose
  * command is the whole of what reproduces the job — a job that runs a command
  * and then asserts a clean tree. `config` is the repository's (`config.mts`);
- * without one nothing is fixed.
+ * without one nothing is fixed. `notFixable` names the contexts whose job said
+ * its command failed ({@link contextsNotFixable}): nothing a fixer writes can
+ * fix that, so it is declined here, before anything is installed.
  */
 export const planAutoFix = (
   states: ReadonlyMap<string, ContextState>,
   config: AutoFixConfig | undefined,
+  notFixable: readonly string[] = [],
 ): Result<AutoFixPlan, string> => {
   if (config === undefined) {
     return Result.err(`the repository has no autoFix in ${CONFIG_PATH}`);
   }
 
-  const failed = Array.from(states)
-    .filter(
-      ([name, state]) =>
-        state === 'failed' &&
-        config.ignore.every((pattern) => !pattern.test(name)),
-    )
-    .map(([name]) => name);
+  const failed = failedContexts(states, config);
 
   if (!Arr.isNonEmpty(failed)) {
     return Result.err('no job failed apart from the ignored ones');
+  }
+
+  const refused = failed.filter((name) => notFixable.includes(name));
+
+  if (Arr.isNonEmpty(refused)) {
+    return Result.err(
+      `${refused.join(', ')} failed in its command, not only in a diff, and nothing a fixer writes fixes that`,
+    );
   }
 
   const entries = failed.map((name) => ({
@@ -187,17 +207,6 @@ export const planAutoFix = (
   });
 };
 
-export type AutoFixPlan = Readonly<{
-  /** What runs first, always. */
-  before: readonly string[];
-  /** What the failed jobs were given before they ran, each once. */
-  prepare: readonly string[];
-  /** The fixers, by stage. */
-  commands: readonly string[];
-  /** What settles their output. */
-  after: readonly string[];
-}>;
-
 /**
  * `run` with `$1` to `$9` replaced by `groups`, each shell-quoted: a fixer's
  * command from the failed context's name, a regenerator's from the conflicted
@@ -213,23 +222,6 @@ export const withCaptures = (
         '',
     ),
   );
-
-/**
- * Not the OS temp directory: an install is a `node_modules` tree, which the
- * pnpm store hard-links only within one filesystem, and the temp directory is
- * often a tmpfs. Not the git directory or `~/.cache` either:
- * `fix:fmt:diff` skips every file with a `.git`, `.cache`, `dist`, `build` or
- * `out` segment anywhere in its absolute path, so a worktree under one is
- * formatted by nothing. `run-unblock-prs-skill` puts its sessions' worktrees
- * here too, for the same reasons, and the rebase puts its own here, where the
- * generators that resolve a conflict in generated files can be installed.
- */
-export const WORKTREE_ROOT = path.join(
-  os.homedir(),
-  '.local',
-  'state',
-  'unblock-prs',
-);
 
 /**
  * Which of `files` a `CODEOWNERS` text gives owners. A fixer runs the
@@ -290,6 +282,91 @@ export const readCodeOwnersAt = async (
       )
     : read;
 };
+
+/** The failed contexts the configuration does not ignore. */
+const failedContexts = (
+  states: ReadonlyMap<string, ContextState>,
+  config: AutoFixConfig,
+): readonly string[] =>
+  Array.from(states)
+    .filter(
+      ([name, state]) =>
+        state === 'failed' &&
+        config.ignore.every((pattern) => !pattern.test(name)),
+    )
+    .map(([name]) => name);
+
+/**
+ * Of the failed contexts, those whose check run carries the annotation the
+ * configuration names, read on the run GitHub answers for each name. One whose
+ * annotations cannot be read is left out, and the fixer finds out for itself.
+ */
+const contextsNotFixable = async (
+  api: ApiContext,
+  runs: readonly CheckRunReport[],
+  states: ReadonlyMap<string, ContextState>,
+  config: AutoFixConfig | undefined,
+): Promise<readonly string[]> => {
+  const title = config?.notFixableAnnotation;
+
+  if (config === undefined || title === undefined) {
+    return [];
+  }
+
+  const mut_found: string[] = [];
+
+  for (const name of failedContexts(states, config)) {
+    const run = runs
+      .filter((candidate) => candidate.name === name)
+      .reduce<CheckRunReport | undefined>(
+        (kept, candidate) =>
+          kept === undefined || outranks(candidate, kept) ? candidate : kept,
+        undefined,
+      );
+
+    if (run === undefined) {
+      continue;
+    }
+
+    const titles = await readAnnotationTitles(api, run.id);
+
+    if (Result.isErr(titles)) {
+      log(`Cannot read the annotations on ${name}: ${titles.value}`);
+    } else if (titles.value.includes(title)) {
+      mut_found.push(name);
+    }
+  }
+
+  return mut_found;
+};
+
+export type AutoFixPlan = Readonly<{
+  /** What runs first, always. */
+  before: readonly string[];
+  /** What the failed jobs were given before they ran, each once. */
+  prepare: readonly string[];
+  /** The fixers, by stage. */
+  commands: readonly string[];
+  /** What settles their output. */
+  after: readonly string[];
+}>;
+
+/**
+ * Not the OS temp directory: an install is a `node_modules` tree, which the
+ * pnpm store hard-links only within one filesystem, and the temp directory is
+ * often a tmpfs. Not the git directory or `~/.cache` either:
+ * `fix:fmt:diff` skips every file with a `.git`, `.cache`, `dist`, `build` or
+ * `out` segment anywhere in its absolute path, so a worktree under one is
+ * formatted by nothing. `run-unblock-prs-skill` puts its sessions' worktrees
+ * here too, for the same reasons, and the rebase puts its own here, where the
+ * generators that resolve a conflict in generated files can be installed.
+ */
+export const WORKTREE_ROOT = path.join(
+  os.homedir(),
+  '.local',
+  'state',
+  'unblock-prs',
+);
 
 /**
  * The first fixer `name` matches, with its command: `$1` to `$9` replaced by
