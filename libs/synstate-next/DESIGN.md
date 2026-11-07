@@ -65,7 +65,10 @@ dispose inside an effect without being inside a propagation.
   naming the cause, instead of looping forever.
 - `batch(fn)` makes the writes inside `fn` one update. Mounting a UI is a batch,
   so a write made while mounting propagates once the nodes are in place.
-- A state written twice before its round propagates once, with the last value.
+- A state written twice before its round propagates once, with the last value,
+  even when that is the value the round starts from: its subscribers see it
+  again, and a derived node's equality cut-off stops it. Telling the two apart
+  would need the value each subscriber last saw.
   An event source is not (`source`, the asynchronous sources and `mergeMap`):
   each value is delivered in a round of its own, in order, and one written by an
   effect before the round's other effects have read the previous value waits
@@ -163,11 +166,15 @@ from the prototype; the packages are to be measured again in
 - `fromSubscribable` subscribes with an observer object (`next`, `error`,
   `complete`), the form RxJS recommends and a TC39 `Observable` takes, not with
   three functions.
+- The setters of `createState`, `createReducer` and `createBooleanState` return
+  nothing. A write made while an update propagates is applied once it ends, so
+  the state it would return is not known yet; `getSnapshot` reads it.
+- `collectToArray` is gone: it resolved on completion, which no longer exists.
+  A node that is done is settled, which is asked rather than announced.
 - A source that is done (a `timer` that fired, a `fromPromise` that resolved, a
   `fromSubscribable` whose subscribable completed) is settled, not completed:
   it keeps its value and its subscribers until its owner disposes it.
 
 ## Not yet built
 
-The helpers built on states (`createReducer` and the like), and the port of
-synstate's tests. Each lands in a pull request of the rebuild.
+The port of synstate's tests. It lands in a pull request of the rebuild.
