@@ -7,5 +7,5 @@
   "compilerOptions": {
     "libReplacement": true
   },
-  "include": ["./src", "./scripts", "./configs"]
+  "include": ["./src", "./test", "./scripts", "./configs"]
 }

@@ -775,6 +775,7 @@ per-lib パッケージのうち名前で引かれていたのは約 15 個だ�
    付けてあるので、**置き換えが起きなくなった瞬間に型チェックが落ちる**
    （`libReplacement: false` にすると `TS2578: Unused '@ts-expect-error' directive`
    で落ちることを確認済み）。opt-in するパッケージごとに 1 つ置く
+   （`check:root:tsconfig-lib-replacement` が求める）
 
 ### 残っていること
 
@@ -1061,9 +1062,10 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 - **`paths` が実体に届いているか。** `node_modules/strict-ts-lib-v7.0/libs/*` が
   workspace のシンボリックリンク越しに解決すること。`--traceResolution` で
   `was successfully resolved` を数える（v7.0 なら 88/88）
-- **probe が生きているか。** opt-in 済みパッケージの `strict-lib-active.mts` が
-  `libReplacement: false` で `TS2578` になること。`tsconfig.json` の `include` に
-  `test/` が入っていない罠がある（`ts-type-forge` で踏んだ）
+- **probe が生きているか。** `check:root:tsconfig-lib-replacement` が確かめる。
+  `libReplacement: true` のパッケージに strict lib でだけエラーになる式の probe
+  があり、その `tsconfig.json` のプログラムが probe を読むこと（`include` に
+  `test/` が入っていない罠は `ts-type-forge` で踏んだ）
 - **ビルド順。** strict lib のパッケージが `ts-type-forge` を `workspace:^` で
   参照するので、`ws:build` のステージがそこに依存する。`dependencies` に入れる
 - **`check:root:lockfile` が 0 件のままか。** URL 依存が戻っていないこと
