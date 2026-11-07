@@ -56,8 +56,11 @@ export const readWorkflowJobs = (
 
       const jobDirectory = defaultDirectory(record) ?? workflowDirectory;
 
+      const displayName = record['name'];
+
       return {
         name,
+        displayName: isString(displayName) ? displayName : undefined,
         matrix: isRecord(strategy) ? strategy['matrix'] : undefined,
         env: { ...workflowEnv, ...readEnv(record['env']) },
         steps: Arr.isArray(steps)
@@ -185,6 +188,8 @@ export const expandVariable = (
 
 export type WorkflowJob = Readonly<{
   name: string;
+  /** The job's `name:` as written, expressions and all; absent when unnamed. */
+  displayName: string | undefined;
   /** `strategy.matrix` as written: a mapping, an expression, or absent. */
   matrix: unknown;
   /** The workflow's `env:` and the job's, the job's taking precedence. */
