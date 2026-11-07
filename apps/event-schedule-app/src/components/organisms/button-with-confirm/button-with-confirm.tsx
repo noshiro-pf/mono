@@ -1,8 +1,7 @@
 import { Button, type IconName, type IconName20 } from 'blueprint-synstate';
 import { createState, onScopeDispose } from 'synstate';
 import { constant, type Bindable, type JSX } from 'synstate-dom';
-import { hasKey, isRecord } from 'ts-data-forge';
-import { showToast } from '../../../functions/index.mjs';
+import { isPromiseLike, showToast } from '../../../functions/index.mjs';
 import { toaster } from '../../../store/index.mjs';
 import { nowrapClass } from '../../styled/index.mjs';
 import { ConfirmDialog } from './confirm-dialog.js';
@@ -70,17 +69,20 @@ export const ButtonWithConfirm = ({
     if (isPromiseLike(p)) {
       setLoadingLocal(true);
 
+      // A rejection leaves the dialog open, no longer loading, so that it can
+      // be confirmed again or cancelled.
       Promise.resolve(p)
         .then(() => {
-          if (!mut_alive) {
-            return;
+          if (mut_alive) {
+            afterConfirm();
           }
-
-          afterConfirm();
-
-          setLoadingLocal(false);
         })
-        .catch(console.error);
+        .catch(console.error)
+        .finally(() => {
+          if (mut_alive) {
+            setLoadingLocal(false);
+          }
+        });
     } else {
       afterConfirm();
     }
@@ -120,6 +122,3 @@ export const ButtonWithConfirm = ({
     </>
   );
 };
-
-const isPromiseLike = (value: unknown): value is PromiseLike<unknown> =>
-  isRecord(value) && hasKey(value, 'then') && typeof value.then === 'function';

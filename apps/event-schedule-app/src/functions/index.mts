@@ -4,6 +4,7 @@ export * from './date-input-text.mjs';
 export * from './event-settings-page-diff.mjs';
 export * from './fetch-holidays.mjs';
 export * from './is-after-deadline.mjs';
+export * from './is-promise-like.mjs';
 export * from './local-storage.mjs';
 export * from './map-key/index.mjs';
 export * from './multiple-date-picker/index.mjs';
