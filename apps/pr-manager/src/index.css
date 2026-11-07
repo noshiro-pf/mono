@@ -874,8 +874,50 @@ a:focus-visible {
 }
 
 /* A block reaches the line under it, which keeps the gap. */
-.block-body > .section:last-child {
+.block-tab-panel > .section:last-child {
   margin-bottom: 0;
+}
+
+/*
+ * A group of tabs: the tabs above the body, which does not scroll them away.
+ * Every block is in a panel of its own (`block-tab-panels.tsx`), a tab of a
+ * group or not, so the rules below reach the sections through one.
+ */
+.block-tabs {
+  border-bottom: 1px solid var(--hairline);
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.9rem;
+}
+
+.block-tab {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin-bottom: -1px;
+  padding: 0.35rem 0.75rem;
+}
+
+.block-tab:hover {
+  color: var(--ink-primary);
+}
+
+.block-tab[aria-selected='true'] {
+  border-bottom-color: var(--accent);
+  color: var(--ink-primary);
+}
+
+.block-tab:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 /*
@@ -1012,7 +1054,9 @@ a:focus-visible {
  * scroll a box inside a box. A block too short for a usable box scrolls as a
  * whole.
  */
-.block-body[data-sized='true']:has(> .section > .issue-dag) {
+.block-body[data-sized='true']:has(
+    > .block-tab-panel:not([hidden]) > .section > .issue-dag
+  ) {
   display: flex;
   flex-direction: column;
   /*
@@ -1023,13 +1067,15 @@ a:focus-visible {
   scrollbar-gutter: auto;
 }
 
-.block-body[data-sized='true'] > .section:has(> .issue-dag) {
+.block-body[data-sized='true']
+  > .block-tab-panel:not([hidden]):has(> .section > .issue-dag),
+.block-body[data-sized='true'] > .block-tab-panel > .section:has(> .issue-dag) {
   display: flex;
   flex: 1 0 auto;
   flex-direction: column;
 }
 
-.block-body[data-sized='true'] > .section > .issue-dag {
+.block-body[data-sized='true'] > .block-tab-panel > .section > .issue-dag {
   display: flex;
   flex: 1 1 0;
   flex-direction: column;
@@ -1100,6 +1146,13 @@ a:focus-visible {
 .view-settings-name {
   display: inline-block;
   min-width: 7.5rem;
+}
+
+/* A tab of the block above it: marked, within the name's width. */
+.view-settings-block[data-tabbed='true'] .view-settings-name {
+  border-left: 2px solid var(--accent);
+  box-sizing: border-box;
+  padding-left: 0.5rem;
 }
 
 .view-settings-block[data-hidden='true'] .view-settings-name {

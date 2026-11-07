@@ -1,16 +1,22 @@
+import { Arr } from 'ts-data-forge';
 import {
   absentBlocks,
   BLOCK_IDS,
+  canStep,
   columnsOf,
   columnWidths,
   DEFAULT_LAYOUT,
   DEFAULT_SHARE,
   layoutFromSearch,
   moveBlock,
+  panesOf,
   searchWithLayout,
+  selectedTabOf,
   sharePercents,
   shownOf,
+  shownPanesOf,
   splitAt,
+  stepBlock,
   withBoundaryAt,
   withColumns,
   withEvenLine,
@@ -19,8 +25,10 @@ import {
   withHidden,
   withLineAt,
   withMode,
+  withSelectedTab,
   withShare,
   withSplit,
+  withTabbed,
   type BoundaryDrag,
   type Layout,
 } from './layout.mjs';
@@ -48,6 +56,8 @@ describe(layoutFromSearch, () => {
         mode: 'natural',
         shares: {},
         hidden: [],
+        tabbed: [],
+        selected: [],
       },
     );
   });
@@ -229,6 +239,8 @@ describe(searchWithLayout, () => {
       mode: 'fill',
       shares: { merged: 60, open: 140.5 },
       hidden: ['runs', 'issues'],
+      tabbed: ['queue'],
+      selected: ['queue'],
     } as const;
 
     assert.deepStrictEqual(
@@ -723,5 +735,330 @@ describe(absentBlocks, () => {
     assert.deepStrictEqual(absentBlocks({ queue: false }), ['queue']);
 
     assert.deepStrictEqual(absentBlocks({ queue: true }), []);
+  });
+});
+
+describe('tabs', () => {
+  /** One column: the merge order, then the queue and the runs as tabs. */
+  const tabbed: Layout = {
+    ...DEFAULT_LAYOUT,
+    tabbed: ['queue', 'runs'],
+  } as const;
+
+  test('reads and writes a group of tabs and the tab shown', () => {
+    const search = '?left=open.queue_runs.merged.issues&tab=runs';
+
+    const read = layoutFromSearch(search);
+
+    assert.deepStrictEqual(read, {
+      ...DEFAULT_LAYOUT,
+      tabbed: ['runs'],
+      selected: ['runs'],
+    });
+
+    assert.strictEqual(searchWithLayout('', read), search);
+
+    assert.deepStrictEqual(
+      layoutFromSearch(searchWithLayout('', tabbed)),
+      tabbed,
+    );
+  });
+
+  test('a first block of a column, or a tab not of a group, is read as no tab', () => {
+    assert.deepStrictEqual(
+      layoutFromSearch(
+        '?cols=2&left=open_queue&right=runs.merged_issues&tab=runs.queue',
+      ),
+      {
+        ...layoutFromSearch('?cols=2&left=open_queue&right=runs.merged.issues'),
+        tabbed: ['queue', 'issues'],
+        selected: ['queue'],
+      },
+    );
+
+    assert.deepStrictEqual(
+      layoutFromSearch('?cols=2&left=_open.queue&right=runs.merged.issues'),
+      layoutFromSearch('?cols=2&left=open.queue&right=runs.merged.issues'),
+    );
+  });
+
+  test('a column is drawn as its panes, without what is not drawn', () => {
+    assert.deepStrictEqual(panesOf(tabbed, tabbed.left), [
+      ['open', 'queue', 'runs'],
+      ['merged'],
+      ['issues'],
+    ]);
+
+    const hidden = withHidden(withHidden(tabbed, 'open', true), 'merged', true);
+
+    // A place keeps the first block of its group as its key, drawn or not.
+    assert.deepStrictEqual(shownPanesOf(hidden, hidden.left, ['queue']), [
+      { key: 'open', ids: ['runs'] },
+      { key: 'issues', ids: ['issues'] },
+    ]);
+  });
+
+  test('a group shows the tab chosen, or its first drawn', () => {
+    assert.strictEqual(
+      selectedTabOf(tabbed, ['open', 'queue', 'runs']),
+      'open',
+    );
+
+    const chosen = withSelectedTab(tabbed, 'runs');
+
+    assert.deepStrictEqual(chosen.selected, ['runs']);
+
+    assert.strictEqual(
+      selectedTabOf(chosen, ['open', 'queue', 'runs']),
+      'runs',
+    );
+
+    assert.strictEqual(selectedTabOf(chosen, ['open', 'queue']), 'open');
+
+    assert.deepStrictEqual(withSelectedTab(chosen, 'queue').selected, [
+      'queue',
+    ]);
+
+    // The first is shown when none is chosen, so choosing it writes nothing.
+    assert.deepStrictEqual(withSelectedTab(chosen, 'open').selected, []);
+  });
+
+  test('makes a block a tab of the one above, and takes it out', () => {
+    assert.deepStrictEqual(withTabbed(DEFAULT_LAYOUT, 'runs', true).tabbed, [
+      'runs',
+    ]);
+
+    assert.deepStrictEqual(
+      withTabbed(DEFAULT_LAYOUT, 'open', true),
+      DEFAULT_LAYOUT,
+    );
+
+    const split = withTabbed(withSelectedTab(tabbed, 'runs'), 'queue', false);
+
+    assert.deepStrictEqual(panesOf(split, split.left), [
+      ['open'],
+      ['queue', 'runs'],
+      ['merged'],
+      ['issues'],
+    ]);
+
+    assert.deepStrictEqual(split.selected, ['runs']);
+  });
+
+  test('steps a tab among its tabs, and out of them at either end', () => {
+    const down = stepBlock(tabbed, 'queue', 'down');
+
+    assert.deepStrictEqual(down.left, [
+      'open',
+      'runs',
+      'queue',
+      'merged',
+      'issues',
+    ]);
+
+    assert.deepStrictEqual(panesOf(down, down.left)[0], [
+      'open',
+      'runs',
+      'queue',
+    ]);
+
+    const out = stepBlock(down, 'queue', 'down');
+
+    assert.deepStrictEqual(panesOf(out, out.left), [
+      ['open', 'runs'],
+      ['queue'],
+      ['merged'],
+      ['issues'],
+    ]);
+
+    const above = stepBlock(tabbed, 'open', 'up');
+
+    assert.deepStrictEqual(panesOf(above, above.left), [
+      ['open'],
+      ['queue', 'runs'],
+      ['merged'],
+      ['issues'],
+    ]);
+  });
+
+  test('steps a block on its own past a whole group, and nowhere past the end', () => {
+    const up = stepBlock(tabbed, 'merged', 'up');
+
+    assert.deepStrictEqual(panesOf(up, up.left), [
+      ['merged'],
+      ['open', 'queue', 'runs'],
+      ['issues'],
+    ]);
+
+    assert.strictEqual(stepBlock(up, 'merged', 'up'), up);
+
+    assert.strictEqual(stepBlock(tabbed, 'issues', 'down'), tabbed);
+  });
+
+  test('a group keeps its size when its first tab changes', () => {
+    const sized = withShare(withHeight(tabbed, 'open', 500), 'open', 300);
+
+    const swapped = stepBlock(sized, 'queue', 'up');
+
+    assert.deepStrictEqual(Arr.take(swapped.left, 3), [
+      'queue',
+      'open',
+      'runs',
+    ]);
+
+    assert.deepStrictEqual(swapped.heights, { queue: 500 });
+
+    assert.deepStrictEqual(swapped.shares, { queue: 300, open: 50 });
+
+    // The first leaving the group, up or to another column, hands it the size.
+    const left = stepBlock(sized, 'open', 'up');
+
+    assert.deepStrictEqual(panesOf(left, left.left)[1], ['queue', 'runs']);
+
+    assert.deepStrictEqual(left.heights, { queue: 500 });
+
+    const moved = moveBlock(withColumns(sized, 2), 'open', {
+      column: 1,
+      index: 0,
+    });
+
+    assert.deepStrictEqual(moved.heights, { queue: 500 });
+  });
+
+  test('a group goes on showing its tab when the tabs are reordered', () => {
+    const merged = layoutFromSearch('?left=open.queue.runs.merged_issues');
+
+    const down = stepBlock(merged, 'merged', 'down');
+
+    assert.deepStrictEqual(panesOf(down, down.left).at(-1), [
+      'issues',
+      'merged',
+    ]);
+
+    assert.strictEqual(selectedTabOf(down, ['issues', 'merged']), 'merged');
+
+    // There and back again is the URL it started from.
+    assert.strictEqual(
+      searchWithLayout('', stepBlock(down, 'merged', 'up')),
+      '?left=open.queue.runs.merged_issues',
+    );
+  });
+
+  test('shares swapped back to their defaults are written as none', () => {
+    const queued = layoutFromSearch('?left=open_queue.runs.merged.issues');
+
+    const twice = stepBlock(stepBlock(queued, 'queue', 'up'), 'open', 'up');
+
+    assert.deepStrictEqual(twice.shares, {});
+  });
+
+  test('a duplicate the URL drops takes its tab with it', () => {
+    const read = layoutFromSearch('?cols=2&left=open.runs&right=merged_runs');
+
+    assert.deepStrictEqual(read.tabbed, []);
+
+    // Nor is a block joined to a block dropped.
+    assert.deepStrictEqual(
+      layoutFromSearch('?left=open.issues.open_runs.merged').tabbed,
+      [],
+    );
+
+    assert.deepStrictEqual(
+      layoutFromSearch('?left=open.bogus_runs').tabbed,
+      [],
+    );
+  });
+
+  test('a group with its first hidden goes on showing its tab', () => {
+    const read = layoutFromSearch(
+      '?left=open.queue.runs_merged_issues&hide=runs',
+    );
+
+    const up = stepBlock(read, 'issues', 'up');
+
+    assert.strictEqual(selectedTabOf(up, ['issues', 'merged']), 'merged');
+  });
+
+  test('says where a block can step', () => {
+    assert.isTrue(canStep(tabbed, 'open', 'up'));
+
+    assert.isFalse(canStep(DEFAULT_LAYOUT, 'open', 'up'));
+
+    assert.isFalse(canStep(tabbed, 'issues', 'down'));
+
+    assert.isTrue(canStep(tabbed, 'merged', 'up'));
+  });
+
+  test('a tab of the block drawn above takes in the blocks not drawn between', () => {
+    const viaAbsent = withTabbed(DEFAULT_LAYOUT, 'runs', true, ['queue']);
+
+    assert.deepStrictEqual(panesOf(viaAbsent, viaAbsent.left)[0], [
+      'open',
+      'queue',
+      'runs',
+    ]);
+
+    const hidden = withHidden(DEFAULT_LAYOUT, 'merged', true);
+
+    const viaHidden = withTabbed(hidden, 'issues', true);
+
+    assert.deepStrictEqual(panesOf(viaHidden, viaHidden.left), [
+      ['open'],
+      ['queue'],
+      ['runs', 'merged', 'issues'],
+    ]);
+  });
+
+  test('a queue the URL leaves out joins the group the merge order leads', () => {
+    const read = layoutFromSearch('?left=open_runs.merged.issues');
+
+    assert.deepStrictEqual(read.left, DEFAULT_LAYOUT.left);
+
+    assert.deepStrictEqual(panesOf(read, read.left)[0], [
+      'open',
+      'queue',
+      'runs',
+    ]);
+
+    // Named, it stays where the URL puts it.
+    const named = layoutFromSearch('?left=open.queue_runs.merged.issues');
+
+    assert.deepStrictEqual(panesOf(named, named.left)[0], ['open']);
+  });
+
+  test('moving a block takes it out of its group, which the next tab leads', () => {
+    const moved = moveBlock(withColumns(tabbed, 2), 'open', {
+      column: 1,
+      index: 0,
+    });
+
+    assert.deepStrictEqual(panesOf(moved, moved.left), [['queue', 'runs']]);
+
+    assert.deepStrictEqual(panesOf(moved, moved.right)[0], ['open']);
+
+    const between = moveBlock(tabbed, 'issues', { column: 0, index: 2 });
+
+    assert.deepStrictEqual(panesOf(between, between.left)[0], [
+      'open',
+      'queue',
+      'issues',
+      'runs',
+    ]);
+  });
+
+  test('columns are split by panes, a group going whole', () => {
+    const two = withColumns(tabbed, 2);
+
+    assert.deepStrictEqual(two.left, ['open', 'queue', 'runs']);
+
+    assert.deepStrictEqual(two.tabbed, ['queue', 'runs']);
+
+    const lastGroup = withTabbed(DEFAULT_LAYOUT, 'issues', true);
+
+    const three = withColumns(lastGroup, 3);
+
+    assert.deepStrictEqual(three.right, ['merged', 'issues']);
+
+    assert.deepStrictEqual(three.tabbed, ['issues']);
   });
 });

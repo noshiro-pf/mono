@@ -1,3 +1,4 @@
+// cspell:ignore Untab
 import { combine, map, type InitializedObservable } from 'synstate';
 import {
   constant,
@@ -11,9 +12,12 @@ import {
 import {
   absentBlocks,
   BLOCK_NAMES,
+  canStep,
   defaultShareOf,
+  paneOf,
   sharePercents,
   shownOf,
+  shownPanesOf,
   type BlockId,
   type ColumnIndex,
   type Layout,
@@ -39,6 +43,11 @@ type Props = Readonly<{
  * that it comes back where it is wanted, but its size is not offered until it
  * is shown. A button that could do nothing is left out rather than disabled, so
  * tabbing along the row stops only where something can happen.
+ *
+ * But for the first of a column, a block can be made a tab of the one above it
+ * ("Tab"), or taken out of the tabs it is in ("Untab"); up and down then move
+ * it among them, and out past the first or the last. A group of tabs is drawn
+ * at the size of its first tab drawn, so only that row offers the size.
  */
 export const ViewSettingsRow = ({
   id,
@@ -75,17 +84,18 @@ export const ViewSettingsRow = ({
     <li
       class={constant('view-settings-block')}
       data-hidden={inlineMap(row$, ({ hidden }) => hidden.toString())}
+      data-tabbed={inlineMap(row$, ({ tabbed }) => tabbed.toString())}
     >
       <span class={constant('view-settings-name')}>{constant(blockName)}</span>
 
       <If
-        cond={row$.pipe(map(({ index }) => index > 0))}
+        cond={row$.pipe(map(({ up }) => up))}
         then={
           <MoveButton
             label={constant(`Move ${blockName} up`)}
             title={constant('Up')}
             onClick={() => {
-              layoutStore.move(id, { column, index: current().index - 1 });
+              layoutStore.step(id, 'up');
             }}
           >
             {constant('↑')}
@@ -94,13 +104,13 @@ export const ViewSettingsRow = ({
       />
 
       <If
-        cond={row$.pipe(map(({ index, count }) => index < count - 1))}
+        cond={row$.pipe(map(({ down }) => down))}
         then={
           <MoveButton
             label={constant(`Move ${blockName} down`)}
             title={constant('Down')}
             onClick={() => {
-              layoutStore.move(id, { column, index: current().index + 1 });
+              layoutStore.step(id, 'down');
             }}
           >
             {constant('↓')}
@@ -145,6 +155,35 @@ export const ViewSettingsRow = ({
       />
 
       <If
+        cond={row$.pipe(map(({ canTab }) => canTab))}
+        then={
+          <button
+            aria-label={inlineMap(row$, ({ tabbed }) =>
+              tabbed
+                ? `Take ${blockName} out of the tabs above it`
+                : `Show ${blockName} as a tab of the block above it`,
+            )}
+            class={constant('view-settings-small')}
+            title={inlineMap(row$, ({ tabbed }) =>
+              tabbed
+                ? 'Draw it on its own again'
+                : 'Draw it in the place of the block above, one tab each',
+            )}
+            type={constant('button')}
+            onClick={() => {
+              layoutStore.setTabbed(
+                id,
+                !current().tabbed,
+                absentBlocks(reader.features.getSnapshot().value),
+              );
+            }}
+          >
+            {inlineMap(row$, ({ tabbed }) => (tabbed ? 'Untab' : 'Tab'))}
+          </button>
+        }
+      />
+
+      <If
         cond={row$.pipe(map(({ absent }) => absent))}
         then={
           <span
@@ -167,12 +206,25 @@ export const ViewSettingsRow = ({
               }
               else={
                 <If
-                  cond={row$.pipe(map(({ mode }) => mode === 'fill'))}
+                  cond={row$.pipe(map(({ sized }) => sized))}
                   then={
-                    <ShareControls blockName={blockName} id={id} row$={row$} />
+                    <If
+                      cond={row$.pipe(map(({ mode }) => mode === 'fill'))}
+                      then={<ShareControls blockName={blockName} row$={row$} />}
+                      else={
+                        <HeightControls blockName={blockName} row$={row$} />
+                      }
+                    />
                   }
                   else={
-                    <HeightControls blockName={blockName} id={id} row$={row$} />
+                    <span
+                      class={constant('view-settings-height')}
+                      title={constant(
+                        'A group of tabs is drawn at one size, set on its first tab drawn',
+                      )}
+                    >
+                      {constant('a tab')}
+                    </span>
                   }
                 />
               }
@@ -199,9 +251,20 @@ export const ViewSettingsRow = ({
 };
 
 type Row = Readonly<{
-  /** Its place in its column, and how many the column holds. */
+  /** Its place in its column. */
   index: number;
-  count: number;
+  /** Whether it can move up, and down; see `stepBlock`. */
+  up: boolean;
+  down: boolean;
+  /** A tab of the block above it. */
+  tabbed: boolean;
+  /**
+   * Whose height and share its place is drawn at: its own, or the first block's
+   * of its group of tabs, drawn or not.
+   */
+  sizeKey: BlockId;
+  /** The size of its place is offered here: it is the place's first drawn. */
+  sized: boolean;
   columns: Layout['columns'];
   mode: Layout['mode'];
   /** Read in the `natural` mode only. */
@@ -219,10 +282,14 @@ type Row = Readonly<{
    * can still be moved, for a repository that has it.
    */
   absent: boolean;
+  /**
+   * A block is drawn above it in its column for "Tab" to join it to, or it is a
+   * tab already, for "Untab".
+   */
+  canTab: boolean;
 }>;
 
 type ControlsProps = Readonly<{
-  id: BlockId;
   blockName: string;
   row$: InitializedObservable<Row>;
 }>;
@@ -250,9 +317,10 @@ const MoveButton = ({
 );
 
 /** Its part of the column, in the `fill` mode. */
-const ShareControls = ({ id, blockName, row$ }: ControlsProps): JSX.Element => {
+const ShareControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
   const shareNow = (): number =>
-    row$.getSnapshot().value.share ?? defaultShareOf(id);
+    row$.getSnapshot().value.share ??
+    defaultShareOf(row$.getSnapshot().value.sizeKey);
 
   return (
     <>
@@ -267,7 +335,10 @@ const ShareControls = ({ id, blockName, row$ }: ControlsProps): JSX.Element => {
         label={constant(`Give ${blockName} less of the column`)}
         title={constant('Less')}
         onClick={() => {
-          layoutStore.setShare(id, shareNow() - SHARE_STEP);
+          layoutStore.setShare(
+            row$.getSnapshot().value.sizeKey,
+            shareNow() - SHARE_STEP,
+          );
         }}
       >
         {constant('−')}
@@ -277,7 +348,10 @@ const ShareControls = ({ id, blockName, row$ }: ControlsProps): JSX.Element => {
         label={constant(`Give ${blockName} more of the column`)}
         title={constant('More')}
         onClick={() => {
-          layoutStore.setShare(id, shareNow() + SHARE_STEP);
+          layoutStore.setShare(
+            row$.getSnapshot().value.sizeKey,
+            shareNow() + SHARE_STEP,
+          );
         }}
       >
         {constant('+')}
@@ -293,7 +367,7 @@ const ShareControls = ({ id, blockName, row$ }: ControlsProps): JSX.Element => {
             class={constant('view-settings-small')}
             type={constant('button')}
             onClick={() => {
-              layoutStore.setShare(id, undefined);
+              layoutStore.setShare(row$.getSnapshot().value.sizeKey, undefined);
             }}
           >
             {constant('Usual')}
@@ -305,16 +379,12 @@ const ShareControls = ({ id, blockName, row$ }: ControlsProps): JSX.Element => {
 };
 
 /** Its height, in the `natural` mode: its own, or what it holds. */
-const HeightControls = ({
-  id,
-  blockName,
-  row$,
-}: ControlsProps): JSX.Element => {
+const HeightControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
   const taller = (): void => {
     const { height } = row$.getSnapshot().value;
 
     layoutStore.setHeight(
-      id,
+      row$.getSnapshot().value.sizeKey,
       height === undefined ? FIRST_HEIGHT : height + HEIGHT_STEP,
     );
   };
@@ -351,7 +421,7 @@ const HeightControls = ({
             title={constant('Shorter')}
             onClick={() => {
               layoutStore.setHeight(
-                id,
+                row$.getSnapshot().value.sizeKey,
                 (row$.getSnapshot().value.height ?? FIRST_HEIGHT) - HEIGHT_STEP,
               );
             }}
@@ -372,7 +442,10 @@ const HeightControls = ({
             class={constant('view-settings-small')}
             type={constant('button')}
             onClick={() => {
-              layoutStore.setHeight(id, undefined);
+              layoutStore.setHeight(
+                row$.getSnapshot().value.sizeKey,
+                undefined,
+              );
             }}
           >
             {constant('Natural')}
@@ -390,18 +463,34 @@ const rowOf = (
   id: BlockId,
   absent: readonly BlockId[],
 ): Row => {
-  const shown = shownOf(layout, ids, absent);
+  // The places drawn in the column, each at the size of its first block.
+  const keys = shownPanesOf(layout, ids, absent).map(({ key }) => key);
+
+  const pane = paneOf(layout, id);
+
+  const [sizeKey = id] = pane;
 
   return {
     index,
-    count: ids.length,
+    up: canStep(layout, id, 'up'),
+    down: canStep(layout, id, 'down'),
+    tabbed: layout.tabbed.includes(id),
+    sizeKey,
+    sized: shownOf(layout, pane, absent)[0] === id,
     columns: layout.columns,
     mode: layout.mode,
-    height: layout.heights[id],
-    share: layout.shares[id],
-    percent: sharePercents(layout, shown)[shown.indexOf(id)] ?? 0,
+    height: layout.heights[sizeKey],
+    share: layout.shares[sizeKey],
+    percent: sharePercents(layout, keys)[keys.indexOf(sizeKey)] ?? 0,
     hidden: layout.hidden.includes(id),
     absent: absent.includes(id),
+    canTab:
+      layout.tabbed.includes(id) ||
+      ids
+        .slice(0, index)
+        .some(
+          (above) => !layout.hidden.includes(above) && !absent.includes(above),
+        ),
   };
 };
 

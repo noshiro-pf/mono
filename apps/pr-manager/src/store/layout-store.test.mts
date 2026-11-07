@@ -157,6 +157,24 @@ describe(createLayoutStore, () => {
     assert.deepStrictEqual(store.layout.getSnapshot().value.lines, [40, 80]);
   });
 
+  test('makes tabs, shows one, and steps a block among them', () => {
+    const { store } = setup(DEFAULT_LAYOUT);
+
+    store.setTabbed('runs', true);
+
+    store.selectTab('runs');
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value.tabbed, ['runs']);
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value.selected, ['runs']);
+
+    store.step('runs', 'down');
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value.tabbed, []);
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value.selected, []);
+  });
+
   test('stop ends the saving, a change still waiting included', async () => {
     const { store, saved } = setup(DEFAULT_LAYOUT);
 

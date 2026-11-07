@@ -9,6 +9,13 @@
  * puts it back where it was, and the blocks around it share out the column as
  * if it were not there.
  *
+ * **Tabs**: a block can be drawn as a tab of the block above it, so that the
+ * two take one place in the column and show one at a time; any number of blocks
+ * one under another make one group of tabs that way. A group is drawn with the
+ * height and the share of its first tab, drawn or not, which a change of its
+ * first tab hands on, and remembers which of its tabs is shown. A hidden tab is left out of its group, as a hidden block is of its
+ * column, and a group left with one tab is drawn as a plain block.
+ *
  * **Their heights** are one of two modes. In `natural`, the page is as tall as
  * its blocks: each can be given a height, and then scrolls on its own, and
  * without one it is as tall as what it holds. In `fill`, the page is as tall as
@@ -30,6 +37,10 @@
  *   column, top down, joined with `.`, which `URLSearchParams` does not
  *   escape. With one column only `left` is written, and only when it is not
  *   the usual order; `middle` only with three.
+ * - `left=open_queue.runs`: within a column, `_` makes the blocks it joins one
+ *   group of tabs, in that order; also unescaped.
+ * - `tab=queue`: of each group of tabs, the one shown, when it is not the
+ *   first.
  * - `split=40`: with two columns, the left one's share of the width, in
  *   percent.
  * - `lines=25-70`: with three columns, where the two lines between them are,
@@ -49,6 +60,7 @@
 import { Arr, asPositiveInt, Num, Obj, Result } from 'ts-data-forge';
 import type {
   FixedLengthTuple,
+  NonEmptyTuple,
   ReadonlyRecord,
   StrictPick,
 } from 'ts-type-forge';
@@ -79,6 +91,23 @@ export const BLOCK_NAMES = {
   merged: 'Merged',
   issues: 'Open issues',
 } as const satisfies ReadonlyRecord<BlockId, string>;
+
+/**
+ * What takes one place in a column: a block, or the blocks of a group of tabs,
+ * in order.
+ */
+export type Pane = NonEmptyTuple<BlockId>;
+
+/** A pane as drawn (`shownPanesOf`). */
+export type ShownPane = Readonly<{
+  /**
+   * The first block of the pane, drawn or not: whose height and share it is
+   * drawn with, and what tells it from the other panes.
+   */
+  key: BlockId;
+  /** Its blocks drawn, in order. */
+  ids: Pane;
+}>;
 
 /** See the top of this file. */
 export type HeightMode = 'natural' | 'fill';
@@ -128,6 +157,17 @@ export type Layout = Readonly<{
    * `left`, `middle` or `right`, which is where showing it puts it back.
    */
   hidden: readonly BlockId[];
+  /**
+   * The blocks drawn as a tab of the block above them in their column, in the
+   * order of {@link BLOCK_IDS}; never the first of a column. See
+   * {@link panesOf}.
+   */
+  tabbed: readonly BlockId[];
+  /**
+   * Of each group of tabs, the one shown, when it is not the group's first; in
+   * the order of {@link BLOCK_IDS}. See {@link selectedTabOf}.
+   */
+  selected: readonly BlockId[];
 }>;
 
 /**
@@ -159,6 +199,8 @@ export const DEFAULT_LAYOUT: Layout = {
   mode: 'natural',
   shares: {},
   hidden: [],
+  tabbed: [],
+  selected: [],
 } as const;
 
 export const MIN_HEIGHT = 120;
@@ -224,7 +266,7 @@ export const layoutFromSearch = (search: string): Layout => {
     }),
   );
 
-  const read: Layout = {
+  const parsed: Layout = {
     ...arrange(
       columns,
       blockList(params.get(PARAM.left)),
@@ -239,8 +281,18 @@ export const layoutFromSearch = (search: string): Layout => {
         ? ('fill' as const)
         : ('natural' as const),
     shares,
-    hidden: hiddenInOrder(blockList(params.get(PARAM.hidden))),
+    hidden: inUsualOrder(blockList(params.get(PARAM.hidden))),
+    tabbed: tabbedList(
+      [PARAM.left, PARAM.middle, PARAM.right].map((param) => params.get(param)),
+    ),
+    selected: blockList(params.get(PARAM.selected)),
   } as const;
+
+  const read = [PARAM.left, PARAM.middle, PARAM.right].some((param) =>
+    blockList(params.get(param)).includes('queue'),
+  )
+    ? parsed
+    : queueInGroup(parsed);
 
   // `?cols=2` or `?cols=3` alone, as typed by hand, splits the columns the way
   // the settings would rather than leaving the others empty.
@@ -249,7 +301,7 @@ export const layoutFromSearch = (search: string): Layout => {
     !params.has(PARAM.middle) &&
     !params.has(PARAM.right)
     ? withColumns({ ...read, columns: 1 }, columns)
-    : read;
+    : normalized(read);
 };
 
 /** The query string with the layout written into it, the rest as it was. */
@@ -265,26 +317,35 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
     PARAM.lines,
     PARAM.mode,
     PARAM.hidden,
+    PARAM.selected,
     ...BLOCK_IDS.map(heightParam),
     ...BLOCK_IDS.map(shareParam),
   ]) {
     params.delete(param);
   }
 
+  const written = (ids: readonly BlockId[]): string =>
+    panesOf(layout, ids)
+      .map((pane) => pane.join(TAB_SEPARATOR))
+      .join(SEPARATOR);
+
   if (layout.columns === 1) {
-    if (!Arr.eq(layout.left, DEFAULT_LAYOUT.left)) {
-      params.set(PARAM.left, layout.left.join(SEPARATOR));
+    if (
+      !Arr.eq(layout.left, DEFAULT_LAYOUT.left) ||
+      Arr.isNonEmpty(layout.tabbed)
+    ) {
+      params.set(PARAM.left, written(layout.left));
     }
   } else {
     params.set(PARAM.columns, layout.columns.toString());
 
-    params.set(PARAM.left, layout.left.join(SEPARATOR));
+    params.set(PARAM.left, written(layout.left));
 
     if (layout.columns === 3) {
-      params.set(PARAM.middle, layout.middle.join(SEPARATOR));
+      params.set(PARAM.middle, written(layout.middle));
     }
 
-    params.set(PARAM.right, layout.right.join(SEPARATOR));
+    params.set(PARAM.right, written(layout.right));
   }
 
   if (layout.split !== DEFAULT_LAYOUT.split) {
@@ -319,6 +380,10 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
     params.set(PARAM.hidden, layout.hidden.join(SEPARATOR));
   }
 
+  if (Arr.isNonEmpty(layout.selected)) {
+    params.set(PARAM.selected, layout.selected.join(SEPARATOR));
+  }
+
   return searchOf(params);
 };
 
@@ -340,35 +405,11 @@ export const saveLayout = (layout: Layout): void => {
  * Columns that already hold something are kept: three from two keep the left
  * column and split the right one's last block off it, and two from three put
  * the middle column at the top of the right one. Fewer from more otherwise keep
- * the order left to right, and the same number is left as it is.
+ * the order left to right, and the same number is left as it is. A group of
+ * tabs is split off as a whole, as one block is.
  */
-export const withColumns = (layout: Layout, columns: ColumnCount): Layout => {
-  const { left, middle, right } = layout;
-
-  if (columns === 1) {
-    return { ...layout, ...arrange(1, left, middle, right) };
-  }
-
-  if (Arr.isNonEmpty(left)) {
-    if (layout.columns === columns) {
-      return layout;
-    }
-
-    if (layout.columns === 3) {
-      return { ...layout, ...arrange(2, left, [], [...middle, ...right]) };
-    }
-
-    if (layout.columns === 2) {
-      return { ...layout, ...arrange(3, left, ...lastApart(right)) };
-    }
-  }
-
-  const [lead, rest] = leadApart([...left, ...middle, ...right]);
-
-  return columns === 2
-    ? { ...layout, ...arrange(2, lead, [], rest) }
-    : { ...layout, ...arrange(3, lead, ...lastApart(rest)) };
-};
+export const withColumns = (layout: Layout, columns: ColumnCount): Layout =>
+  normalized(withColumnsAsGiven(layout, columns));
 
 /** The blocks of each column drawn, left to right. */
 export const columnsOf = (layout: Layout): readonly (readonly BlockId[])[] => {
@@ -404,6 +445,211 @@ export const absentBlocks = (
   features.queue ? ([] as const) : (['queue'] as const);
 
 /**
+ * The blocks of a column, `ids`, top down, as they are drawn: each group of
+ * tabs one pane, and each block on its own another.
+ */
+export const panesOf = (
+  layout: Readonly<{ tabbed: readonly BlockId[] }>,
+  ids: readonly BlockId[],
+): readonly (readonly BlockId[])[] => {
+  const starts = Arr.generate(function* () {
+    for (const [index, id] of ids.entries()) {
+      if (index === 0 || !layout.tabbed.includes(id)) {
+        yield index;
+      }
+    }
+  });
+
+  return starts.map((start, index) => ids.slice(start, starts[index + 1]));
+};
+
+/**
+ * {@link panesOf} the blocks drawn: each pane without what {@link shownOf}
+ * leaves out, and a pane left with nothing left out too.
+ */
+export const shownPanesOf = (
+  layout: Layout,
+  ids: readonly BlockId[],
+  absent: readonly BlockId[],
+): readonly ShownPane[] =>
+  Arr.generate(function* () {
+    for (const pane of panesOf(layout, ids)) {
+      const [key] = pane;
+
+      const shown = shownOf(layout, pane, absent);
+
+      if (key !== undefined && Arr.isNonEmpty(shown)) {
+        yield { key, ids: shown } as const;
+      }
+    }
+  });
+
+/** The pane `block` is in, all its blocks drawn or not. */
+export const paneOf = (layout: Layout, block: BlockId): readonly BlockId[] =>
+  columnsOf(layout)
+    .flatMap((ids) => panesOf(layout, ids))
+    .find((pane) => pane.includes(block)) ?? [block];
+
+/**
+ * Whether {@link stepBlock} would move `block`: everything can, but a block on
+ * its own at the end of its column it would go past.
+ */
+export const canStep = (
+  layout: Layout,
+  block: BlockId,
+  direction: 'up' | 'down',
+): boolean => {
+  const ids = columnsOf(layout).find((each) => each.includes(block)) ?? [];
+
+  const panes = panesOf(layout, ids);
+
+  const at = panes.findIndex((pane) => pane.includes(block));
+
+  return (
+    (panes[at]?.length ?? 0) > 1 ||
+    (direction === 'up' ? at > 0 : at < panes.length - 1)
+  );
+};
+
+/**
+ * The tab shown of a pane, which is the blocks of a group drawn: the one chosen,
+ * or the first when that is not drawn or none was.
+ */
+export const selectedTabOf = (
+  layout: Layout,
+  pane: readonly BlockId[],
+): BlockId | undefined =>
+  pane.find((id) => layout.selected.includes(id)) ?? pane[0];
+
+/** Shows `block` among the tabs of its group. */
+export const withSelectedTab = (layout: Layout, block: BlockId): Layout => {
+  const pane = paneOf(layout, block);
+
+  return normalized({
+    ...layout,
+    selected: Arr.toPushed(
+      layout.selected.filter((id) => !pane.includes(id)),
+      block,
+    ),
+  });
+};
+
+/**
+ * Makes `block` a tab of the block drawn above it — the blocks not drawn
+ * between them, hidden or `absent`, joining the group too, so that they come
+ * back in it — or takes it out of the group it is in: then it and the tabs
+ * under it make a group of their own. Nothing happens to the first block of a
+ * column, which has nothing above it.
+ */
+export const withTabbed = (
+  layout: Layout,
+  block: BlockId,
+  tabbed: boolean,
+  absent: readonly BlockId[] = [],
+): Layout => {
+  if (!tabbed) {
+    return normalized({
+      ...layout,
+      tabbed: layout.tabbed.filter((id) => id !== block),
+    });
+  }
+
+  const ids = columnsOf(layout).find((each) => each.includes(block)) ?? [];
+
+  const above = ids.slice(0, ids.indexOf(block));
+
+  const drawn = above.findLastIndex(
+    (id) => !layout.hidden.includes(id) && !absent.includes(id),
+  );
+
+  // With nothing drawn above, every block above joins.
+  const joining = above.slice(Math.max(1, drawn + 1));
+
+  return normalized({
+    ...layout,
+    tabbed: [...layout.tabbed, ...joining, block],
+  });
+};
+
+/**
+ * Moves `block` one place up or down its column, as the layout settings do: a
+ * tab among the tabs of its group, and out of it past the first or the last; a
+ * block on its own past the pane next to it, which may be a group of tabs. The
+ * layout as it was when there is nowhere to go, so that `!==` says whether it
+ * moved. A group keeps its size when its first tab changes, and the block that
+ * was its first takes the size of the one that is now.
+ */
+export const stepBlock = (
+  layout: Layout,
+  block: BlockId,
+  direction: 'up' | 'down',
+): Layout => {
+  const columns = columnsOf(layout);
+
+  const column = columns.findIndex((ids) => ids.includes(block));
+
+  const panes = panesOf(layout, columns[column] ?? []);
+
+  const at = panes.findIndex((each) => each.includes(block));
+
+  const pane = panes[at];
+
+  if (pane === undefined) {
+    return layout;
+  }
+
+  const step = direction === 'up' ? -1 : 1;
+
+  if (pane.length > 1) {
+    const index = pane.indexOf(block);
+
+    const other = pane[index + step];
+
+    if (other !== undefined) {
+      const swapped = pane.map((id) =>
+        id === block ? other : id === other ? block : id,
+      );
+
+      return withPanes(
+        index === 0 || index + step === 0
+          ? withSizesSwapped(layout, block, other)
+          : layout,
+        column,
+        panes.map((each, i) => (i === at ? swapped : each)),
+      );
+    }
+
+    const rest = pane.filter((id) => id !== block);
+
+    const [next] = rest;
+
+    return withPanes(
+      index === 0 && next !== undefined
+        ? withSizesSwapped(layout, block, next)
+        : layout,
+      column,
+      [
+        ...panes.slice(0, at),
+        ...(direction === 'up' ? [[block], rest] : [rest, [block]]),
+        ...panes.slice(at + 1),
+      ],
+    );
+  }
+
+  const adjacent = panes[at + step];
+
+  return adjacent === undefined
+    ? layout
+    : withPanes(
+        layout,
+        column,
+        panes.map((each, i) =>
+          i === at ? adjacent : i === at + step ? pane : each,
+        ),
+      );
+};
+
+/**
  * Hides `block`, or shows it again where it was. Its place, height and share
  * are left as they were.
  */
@@ -414,7 +660,7 @@ export const withHidden = (
 ): Layout =>
   ({
     ...layout,
-    hidden: hiddenInOrder(
+    hidden: inUsualOrder(
       hidden
         ? Arr.toPushed(layout.hidden, block)
         : layout.hidden.filter((id) => id !== block),
@@ -443,29 +689,54 @@ export const columnWidths = (layout: Layout): readonly number[] => {
  * counts the blocks already there without it. A column past the last drawn is
  * the last: with one column there is only the left, and with two `1` and `2`
  * are both the right.
+ *
+ * It leaves its group of tabs, if it was in one, which the tab under it then
+ * leads at the group's size; and it joins one only when put between two of its
+ * tabs.
  */
 export const moveBlock = (
   layout: Layout,
   block: BlockId,
   target: BlockPlace,
 ): Layout => {
+  const from = columnsOf(layout).find((ids) => ids.includes(block)) ?? [];
+
+  const under = from[from.indexOf(block) + 1];
+
+  // The first of a group leaving it hands the group its size.
+  const leads =
+    under !== undefined &&
+    layout.tabbed.includes(under) &&
+    !layout.tabbed.includes(block);
+
+  const resized = leads ? withSizesSwapped(layout, block, under) : layout;
+
+  const leaving = layout.tabbed.filter(
+    (id) => id !== block && (id !== under || !leads),
+  );
+
   const without = columnsOf(layout).map((ids) =>
     ids.filter((id) => id !== block),
   );
 
   const column = Math.min(target.column, without.length - 1);
 
-  const placed = without.map((ids, index) => {
-    if (index !== column) {
-      return ids;
-    }
+  const at = Math.max(0, Math.min(target.index, without[column]?.length ?? 0));
 
-    const at = Math.max(0, Math.min(target.index, ids.length));
+  const placed = without.map((ids, index) =>
+    index === column ? [...ids.slice(0, at), block, ...ids.slice(at)] : ids,
+  );
 
-    return [...ids.slice(0, at), block, ...ids.slice(at)] as const;
+  const below = placed[column]?.[at + 1];
+
+  return normalized({
+    ...resized,
+    ...placedColumns(layout.columns, placed),
+    tabbed:
+      below !== undefined && leaving.includes(below)
+        ? Arr.toPushed(leaving, block)
+        : leaving,
   });
-
-  return { ...layout, ...placedColumns(layout.columns, placed) };
 };
 
 /** `undefined` gives the block back its natural height. */
@@ -642,6 +913,8 @@ export const splitAt = (
 ): number | undefined =>
   Num.isNonZero(box.width) ? Num.div(x - box.left, box.width) * 100 : undefined;
 
+type Columns = StrictPick<Layout, 'columns' | 'left' | 'middle' | 'right'>;
+
 const PARAM = {
   columns: 'cols',
   left: 'left',
@@ -651,9 +924,13 @@ const PARAM = {
   lines: 'lines',
   mode: 'mode',
   hidden: 'hide',
+  selected: 'tab',
 } as const;
 
 const SEPARATOR = '.';
+
+/** Between the tabs of one group, within a column's list. */
+const TAB_SEPARATOR = '_';
 
 const LINE_SEPARATOR = '-';
 
@@ -694,13 +971,169 @@ const isBlockId = (value: string): value is BlockId =>
   (BLOCK_IDS as readonly string[]).includes(value);
 
 const blockList = (raw: string | null): readonly BlockId[] =>
-  raw === null ? ([] as const) : raw.split(SEPARATOR).filter(isBlockId);
+  raw === null
+    ? ([] as const)
+    : raw
+        .split(SEPARATOR)
+        .flatMap((piece) => piece.split(TAB_SEPARATOR))
+        .filter(isBlockId);
+
+/**
+ * Of the columns' lists, the blocks joined by `_` to a block before them, each
+ * where it is first mentioned only, and only to a block kept: `arrange` drops
+ * unknown and repeated blocks, and with them what they were joined to.
+ */
+const tabbedList = (raws: readonly (string | null)[]): readonly BlockId[] => {
+  const mut_seen = new Set<BlockId>();
+
+  return Arr.generate(function* () {
+    for (const raw of raws) {
+      for (const piece of raw?.split(SEPARATOR) ?? []) {
+        // Joined only to a block kept before it in the same piece.
+        const [, ...joined] = Arr.generate(function* () {
+          for (const id of piece.split(TAB_SEPARATOR)) {
+            if (!isBlockId(id) || mut_seen.has(id)) {
+              continue;
+            }
+
+            mut_seen.add(id);
+
+            yield id;
+          }
+        });
+
+        yield* joined;
+      }
+    }
+  });
+};
 
 /** Each once, in the order of {@link BLOCK_IDS}, so a URL has one spelling. */
-const hiddenInOrder = (ids: readonly BlockId[]): readonly BlockId[] =>
+const inUsualOrder = (ids: readonly BlockId[]): readonly BlockId[] =>
   BLOCK_IDS.filter((id) => ids.includes(id));
 
-type Columns = StrictPick<Layout, 'columns' | 'left' | 'middle' | 'right'>;
+/**
+ * The tabs as a layout can have them: no first block of a column a tab, and of
+ * each group the tab chosen only when it is one of the group's and not its
+ * first, each once and in the usual order.
+ */
+const normalized = (layout: Layout): Layout => {
+  const columns = columnsOf(layout);
+
+  const firsts = new Set(columns.flatMap(Arr.take(1)));
+
+  const tabbed = inUsualOrder(layout.tabbed.filter((id) => !firsts.has(id)));
+
+  const selected = Arr.generate(function* () {
+    for (const pane of columns.flatMap((ids) => panesOf({ tabbed }, ids))) {
+      const chosen = pane.find((id) => layout.selected.includes(id));
+
+      if (chosen !== undefined && chosen !== pane[0]) {
+        yield chosen;
+      }
+    }
+  });
+
+  const inOrder = inUsualOrder(selected);
+
+  // The same layout when nothing changed, so that a change that does nothing is
+  // not one.
+  return Arr.eq(tabbed, layout.tabbed) && Arr.eq(inOrder, layout.selected)
+    ? layout
+    : { ...layout, tabbed, selected: inOrder };
+};
+
+/** The columns {@link columnsOf} gave, with their blocks changed. */
+const placedColumns = (
+  columns: ColumnCount,
+  placed: readonly (readonly BlockId[])[],
+): Columns => {
+  const [left = [], second = [], third = []] = placed;
+
+  switch (columns) {
+    case 1:
+      return { columns, left, middle: [], right: [] };
+
+    case 2:
+      return { columns, left, middle: [], right: second };
+
+    case 3:
+      return { columns, left, middle: second, right: third };
+  }
+};
+
+/** The column at `column` made of `panes`, top down. */
+const withPanes = (
+  layout: Layout,
+  column: number,
+  panes: readonly (readonly BlockId[])[],
+): Layout => {
+  const ids = panes.flat();
+
+  // Each group goes on showing the tab it showed, which a change of its first
+  // would otherwise change when that was the one shown.
+  const shown = Arr.generate(function* () {
+    for (const pane of columnsOf(layout).flatMap((each) =>
+      panesOf(layout, each),
+    )) {
+      // Of the tabs not hidden, as the group is drawn.
+      const tab = selectedTabOf(
+        layout,
+        pane.filter((id) => !layout.hidden.includes(id)),
+      );
+
+      if (tab !== undefined && pane.length > 1) {
+        yield tab;
+      }
+    }
+  });
+
+  return normalized({
+    ...layout,
+    selected: shown,
+    ...placedColumns(
+      layout.columns,
+      columnsOf(layout).map((each, index) => (index === column ? ids : each)),
+    ),
+    tabbed: [
+      ...layout.tabbed.filter((id) => !ids.includes(id)),
+      ...panes.flatMap(([, ...tabs]) => tabs),
+    ],
+  });
+};
+
+/**
+ * The two blocks' heights and shares, each given the other's: what keeps a
+ * group its size when its first tab changes.
+ */
+const withSizesSwapped = (layout: Layout, a: BlockId, b: BlockId): Layout => {
+  const heightOfA = layout.heights[a];
+
+  const heightOfB = layout.heights[b];
+
+  const shareOfA = shareOf(layout, a);
+
+  const shareOfB = shareOf(layout, b);
+
+  const heightsSwapped = withHeight(
+    withHeight(layout, a, heightOfB),
+    b,
+    heightOfA,
+  );
+
+  // A share that comes to the block's default is written as none, so that the
+  // URL keeps its one spelling.
+  const shareFor = (block: BlockId, share: number): number | undefined =>
+    share === defaultShareOf(block) ? undefined : share;
+
+  return shareOfA === shareOfB
+    ? heightsSwapped
+    : withShare(
+        withShare(heightsSwapped, a, shareFor(a, shareOfB)),
+        b,
+        shareFor(b, shareOfA),
+      );
+};
 
 const queueUnderOpen = (ids: readonly BlockId[]): readonly BlockId[] =>
   ids.flatMap((id) => (id === 'open' ? (['open', 'queue'] as const) : [id]));
@@ -782,52 +1215,86 @@ const arrange = (
 };
 
 /**
- * The first block, with the queue when it comes right after the merge order,
- * and the rest.
+ * The first pane — a block, or a group of tabs — with the queue when the two
+ * are each on their own, one after the other, and the rest.
  */
 const leadApart = (
+  layout: Layout,
   ids: readonly BlockId[],
 ): FixedLengthTuple<2, readonly BlockId[]> => {
-  const [first, second] = ids;
+  const [first, second] = panesOf(layout, ids);
 
   const lead =
     first === undefined
       ? ([] as const)
-      : first === 'open' && second === 'queue'
-        ? ([first, second] as const)
-        : ([first] as const);
+      : second !== undefined &&
+          Arr.eq(first, ['open']) &&
+          Arr.eq(second, ['queue'])
+        ? (['open', 'queue'] as const)
+        : first;
 
   return [lead, ids.slice(lead.length)];
 };
 
-/** The blocks but the last, and the last on its own. */
+/** The blocks but the last pane, and the last pane on its own. */
 const lastApart = (
+  layout: Layout,
   ids: readonly BlockId[],
 ): FixedLengthTuple<2, readonly BlockId[]> => {
-  const last = ids.at(-1);
+  const panes = panesOf(layout, ids);
 
-  return last === undefined
-    ? [[], []]
-    : [ids.filter((id) => id !== last), [last]];
+  const last = panes.at(-1);
+
+  return last === undefined ? [[], []] : [Arr.butLast(panes).flat(), last];
 };
 
-/** The columns {@link columnsOf} gave, with their blocks changed. */
-const placedColumns = (
-  columns: ColumnCount,
-  placed: readonly (readonly BlockId[])[],
-): Columns => {
-  const [left = [], second = [], third = []] = placed;
+const withColumnsAsGiven = (layout: Layout, columns: ColumnCount): Layout => {
+  const { left, middle, right } = layout;
 
-  switch (columns) {
-    case 1:
-      return { columns, left, middle: [], right: [] };
-
-    case 2:
-      return { columns, left, middle: [], right: second };
-
-    case 3:
-      return { columns, left, middle: second, right: third };
+  if (columns === 1) {
+    return { ...layout, ...arrange(1, left, middle, right) };
   }
+
+  if (Arr.isNonEmpty(left)) {
+    if (layout.columns === columns) {
+      return layout;
+    }
+
+    if (layout.columns === 3) {
+      return { ...layout, ...arrange(2, left, [], [...middle, ...right]) };
+    }
+
+    if (layout.columns === 2) {
+      return {
+        ...layout,
+        ...arrange(3, left, ...lastApart(layout, right)),
+      };
+    }
+  }
+
+  const [lead, rest] = leadApart(layout, [...left, ...middle, ...right]);
+
+  return columns === 2
+    ? { ...layout, ...arrange(2, lead, [], rest) }
+    : { ...layout, ...arrange(3, lead, ...lastApart(layout, rest)) };
+};
+
+/**
+ * A URL that does not name the queue has it put under the merge order
+ * (`arrange`); when the merge order leads a group of tabs, the queue is one of
+ * them, rather than a block splitting the group in two.
+ */
+const queueInGroup = (layout: Layout): Layout => {
+  const ids = columnsOf(layout).find((each) => each.includes('queue')) ?? [];
+
+  const under = ids[ids.indexOf('queue') + 1];
+
+  return under !== undefined &&
+    ids[ids.indexOf('queue') - 1] === 'open' &&
+    layout.tabbed.includes(under) &&
+    !layout.tabbed.includes('queue')
+    ? { ...layout, tabbed: Arr.toPushed(layout.tabbed, 'queue') }
+    : layout;
 };
 
 const clampHeight = (height: number): number =>

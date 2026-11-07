@@ -4,9 +4,10 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   absentBlocks,
   columnWidths,
-  shownOf,
+  shownPanesOf,
   type BlockId,
   type Layout,
+  type ShownPane,
 } from '../layout.mjs';
 import { layoutStore, reader } from '../store/index.mjs';
 import { BlockColumn } from './block-column.js';
@@ -31,6 +32,9 @@ type Props = Readonly<{
  * (`absentBlocks`), without being hidden: the queue, on a repository that does
  * not run `unblock-prs`.
  *
+ * A group of tabs takes one place in its column, as one block does
+ * (`block-column.tsx`).
+ *
  * In the `fill` mode the layout takes the height the page leaves it, and each
  * column shares that out among its blocks (`index.css`).
  *
@@ -45,9 +49,9 @@ export const BlockLayout = ({ blocks }: Props): JSX.Element => {
 
   const shownIn = (
     column: (layout: Layout) => readonly BlockId[],
-  ): InitializedObservable<readonly BlockId[]> =>
+  ): InitializedObservable<readonly ShownPane[]> =>
     combine([layout$, absent$]).pipe(
-      map(([layout, absent]) => shownOf(layout, column(layout), absent)),
+      map(([layout, absent]) => shownPanesOf(layout, column(layout), absent)),
     );
 
   return (
@@ -57,7 +61,7 @@ export const BlockLayout = ({ blocks }: Props): JSX.Element => {
       data-mode={inlineMap(layout$, ({ mode }) => mode)}
       style={inlineMap(layout$, gridOf)}
     >
-      <BlockColumn blocks={blocks} ids$={shownIn(({ left }) => left)} />
+      <BlockColumn blocks={blocks} panes$={shownIn(({ left }) => left)} />
 
       <If
         cond={layout$.pipe(map(({ columns }) => columns === 3))}
@@ -67,7 +71,7 @@ export const BlockLayout = ({ blocks }: Props): JSX.Element => {
 
             <BlockColumn
               blocks={blocks}
-              ids$={shownIn(({ middle }) => middle)}
+              panes$={shownIn(({ middle }) => middle)}
             />
           </>
         }
@@ -79,7 +83,10 @@ export const BlockLayout = ({ blocks }: Props): JSX.Element => {
           <>
             <ColumnDivider position={'last'} />
 
-            <BlockColumn blocks={blocks} ids$={shownIn(({ right }) => right)} />
+            <BlockColumn
+              blocks={blocks}
+              panes$={shownIn(({ right }) => right)}
+            />
           </>
         }
       />
