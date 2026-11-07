@@ -21,7 +21,7 @@ import {
   type Observable,
 } from 'synstate-next';
 import { toNode } from 'synstate-next/internal';
-import { expectType, Result } from 'ts-data-forge';
+import { expectType, Result } from 'ts-std-forge';
 
 describe(switchMap, () => {
   test('follows the latest inner observable and disposes the previous one', () => {

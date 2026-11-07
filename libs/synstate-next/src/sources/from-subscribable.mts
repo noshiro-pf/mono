@@ -1,4 +1,4 @@
-import { Result } from 'ts-data-forge';
+import { Result } from 'ts-std-forge';
 import { noValue, view, type Observable } from '../core/index.mjs';
 import { AsyncSourceClass } from './async-source-class.mjs';
 

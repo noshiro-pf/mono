@@ -1,5 +1,9 @@
 import type { ReadonlyRecord, StrictPick, TypeEq } from 'ts-type-forge';
-import type { propertyNames } from '../bind/index.mjs';
+import type {
+  propertyNames,
+  svgAttributeNames,
+  SvgTagName,
+} from '../bind/index.mjs';
 import type { Bindable } from '../constant.mjs';
 import type { EventPropNames } from './event-prop-names.mjs';
 import type { Child } from './mount.mjs';
@@ -65,11 +69,27 @@ export type EventProps<E extends Element, M> = Readonly<{
   ) => void;
 }>;
 
+/**
+ * The props of an SVG element: the common ones, the attributes of
+ * `svgAttributeNames`, and one handler per event of `SVGElementEventMap`. SVG
+ * properties are animated values (`SVGAnimatedLength`), so unlike HTML they
+ * cannot be read off the element types.
+ */
+export type SvgElementProps<E extends SVGElement> = CommonElementProps<E> &
+  Partial<
+    ReadonlyRecord<
+      (typeof svgAttributeNames)[number],
+      Bindable<number | string | undefined>
+    >
+  > &
+  EventProps<E, SVGElementEventMap>;
+
 export type GeneratedIntrinsicElements = Readonly<{
   [K in keyof HTMLElementTagNameMap]: HtmlElementProps<
     HTMLElementTagNameMap[K]
   >;
-}>;
+}> &
+  Readonly<{ [K in SvgTagName]: SvgElementProps<SVGElementTagNameMap[K]> }>;
 
 type ReflectedProps<E> = Readonly<{
   [K in keyof E as ReflectedKey<E, K>]?: Bindable<
