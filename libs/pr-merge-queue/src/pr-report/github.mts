@@ -238,8 +238,14 @@ export type Client = Readonly<{
     repo: RepoRef,
     branch: string,
   ) => Promise<Result<readonly string[], string>>;
+  /**
+   * The open pull requests. With `{ checks: false }`, one list and one GraphQL
+   * query rather than about three requests per pull request: no comparison and
+   * no check is read, for a caller that wants only who owns what.
+   */
   facts: (
     repo: RepoRef,
+    options?: Readonly<{ checks: boolean }>,
   ) => Promise<Result<readonly PullRequestFacts[], string>>;
   /**
    * The pull requests that landed in the last `withinDays` days, newest first.
@@ -857,7 +863,9 @@ export const createClient = (
       );
     },
 
-    facts: async (repo) => {
+    facts: async (repo, options) => {
+      const readsChecks = options?.checks ?? true;
+
       const listed = await getJson(
         `/repos/${repo.owner}/${repo.name}/pulls?state=open&per_page=${PAGE_SIZE}&sort=created&direction=asc`,
         PullRequestListSchema,
@@ -885,9 +893,16 @@ export const createClient = (
       for (const pr of listed.value) {
         const body = pr.body ?? '';
 
-        const compared = await comparison(repo, pr.base.ref, pr.head.sha);
+        const compared = readsChecks
+          ? await comparison(repo, pr.base.ref, pr.head.sha)
+          : ({ headCommittedAt: undefined, comparison: undefined } as const);
 
-        const read = await contextStates(repo, pr.head.sha);
+        const read = readsChecks
+          ? await contextStates(repo, pr.head.sha)
+          : Result.ok({
+              reported: new Map<string, ContextState>(),
+              running: false,
+            } as const);
 
         if (Result.isErr(read)) {
           mut_unreadable.push({ number: pr.number, error: read.value });

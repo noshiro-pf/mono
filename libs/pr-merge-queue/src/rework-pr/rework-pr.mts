@@ -2,7 +2,12 @@ import dedent from 'dedent';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
-import { MERGE_QUEUED_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
+import {
+  MERGE_QUEUED_LABEL,
+  SKIP_CI_LABEL,
+  type QueueComments,
+  type QueueOwner,
+} from 'pr-report-core';
 import {
   Arr,
   asUint32,
@@ -28,6 +33,14 @@ import {
   type ApiContext,
 } from '../lib/index.mjs';
 import { markReady, preflight } from '../open-pr/index.mjs';
+import { readQueueState } from '../pr-report/index.mjs';
+import {
+  branchOfEntry,
+  layersAbove,
+  restack,
+  type BranchOf,
+  type StackEntry,
+} from '../unblock-prs/index.mjs';
 
 /** What `rework-pr --help` prints. */
 export const REWORK_PR_HELP = [
@@ -40,9 +53,9 @@ export const REWORK_PR_HELP = [
   `  start  put ${SKIP_CI_LABEL} on, take ${MERGE_QUEUED_LABEL} off, disarm auto-merge,`,
   '         and make it a draft; a draft refused is said, and is not a',
   '         failure, since the labels hold it without one',
-  '  done   refuse uncommitted changes, push the branch with',
-  '         --force-with-lease --force-if-includes, then mark it ready for',
-  '         review, and then:',
+  '  done   refuse uncommitted changes and untracked files, push the branch',
+  '         with --force-with-lease --force-if-includes, carry along the pull',
+  '         requests stacked on it, then mark it ready for review, and then:',
   '           --requeue  the work changes nothing the description says: put',
   `                      ${MERGE_QUEUED_LABEL} back, if start took it off, and the queue`,
   '                      takes it from there',
@@ -51,6 +64,9 @@ export const REWORK_PR_HELP = [
   '',
   'Each step is skipped when it is already done, so a run that failed part way',
   'through is finished by running it again.',
+  '',
+  'Both refuse a pull request someone has claimed, or that unblock-prs set aside',
+  'for a skill to fix: that is claim-pr and push-fixed-pr.',
   '',
   'Options:',
   '  --dry-run   say what would be done, and touch nothing',
@@ -82,7 +98,10 @@ export const reworkPr = async (
 
   const io: ReworkIo = {
     read: async () => readOpenPullRequest(api, branch),
-    run: async (state, step) => runStep(api, branch, state, step),
+    standing: async (number) => readStanding(api, number),
+    uncommitted: async () => git('git status --porcelain'),
+    run: async (state, step, standing) =>
+      runStep(api, branch, state, step, standing),
     queueRecord: async (number, handBack) =>
       readQueueRecord(api, number, handBack),
     log,
@@ -115,6 +134,9 @@ export const reworkPr = async (
  * Runs `args.phase` on the pull request `io` reads, and resolves to its number
  * and the steps that ran.
  *
+ * Either phase first refuses a pull request {@link decideStanding} does, before
+ * it changes anything.
+ *
  * `start`, each step skipped when already so:
  *
  * 1. **`skip-ci` on**, so that the pushes to come run no checks, and so that
@@ -136,21 +158,25 @@ export const reworkPr = async (
  * that one the worker armed, or took `skip-ci` off, after the first read is
  * disarmed too. That narrows the race with the worker rather than closing it;
  * what closes it is `done` refusing a pull request still armed. A draft refused
- * is said and is not a failure: the pull request is held without it.
+ * ({@link isGraphqlRefusal}) is said and is not a failure: the pull request is
+ * held without it. A draft that failed for any other reason may pass when tried
+ * again, so `start` fails, and running it again finishes it.
  *
  * `done` refuses a pull request that is not held — `skip-ci` on, `merge-queued`
  * off, not armed — since a push to one queued or armed is a push into the
- * merge. It also refuses uncommitted changes to tracked files, which are work
- * not yet amended in. Then it pushes the branch with
+ * merge. It also refuses uncommitted changes and untracked files that are not
+ * ignored, which are work not yet amended in. Then it pushes the branch with
  * `--force-with-lease --force-if-includes`, so that a push someone else made
- * meanwhile is refused even after a fetch, and marks a draft ready for review.
+ * meanwhile is refused even after a fetch, carries along the pull requests
+ * stacked on the branch, with `unblock-prs`'s `restack`, as `push-fixed-pr` does
+ * (one that cannot be moved is said and left where it is), and marks a draft
+ * ready for review.
  * Last, with `--requeue` — the work changes nothing the description says, so
  * nothing the author queued needs reviewing again — it puts `merge-queued`
  * back, but only where `start` took it off and nobody has put it on or taken it
  * off since: queueing one the author had not queued, or has decided about
  * again, is theirs. With `--review` it stays off, for the author to put back
- * once they have read the change. It does not carry along the pull requests
- * stacked on the branch.
+ * once they have read the change.
  */
 export const applyRework = async (
   args: ReworkArgs,
@@ -162,24 +188,46 @@ export const applyRework = async (
     return first;
   }
 
-  if (args.phase === 'done') {
-    const toDo = await doneStepsFor(io, first.value, args.handBack);
+  const clean = await refuseUncommitted(io, args, first.value);
 
-    return Result.isErr(toDo) ? toDo : runSteps(io, first.value, toDo.value);
+  if (Result.isErr(clean)) {
+    return clean;
+  }
+
+  const standing = await standingOf(io, first.value);
+
+  if (Result.isErr(standing)) {
+    return standing;
+  }
+
+  if (args.phase === 'done') {
+    const toDo = await doneStepsFor(
+      io,
+      first.value,
+      args.handBack,
+      standing.value,
+    );
+
+    return Result.isErr(toDo)
+      ? toDo
+      : runSteps(io, first.value, toDo.value, standing.value);
   }
 
   const labelSteps = startSteps(first.value).filter((step) =>
     LABEL_STEPS.has(step),
   );
 
-  const labelled = await runSteps(io, first.value, labelSteps);
+  const labelled = await runSteps(io, first.value, labelSteps, standing.value);
 
   if (Result.isErr(labelled)) {
     return labelled;
   }
 
   const current = Arr.isNonEmpty(labelSteps)
-    ? await readAgain(io, first.value.number)
+    ? await readPullRequest(io, {
+        unreadable: 'cannot read its pull request again',
+        absent: `#${first.value.number} is no longer open: merged or closed meanwhile?`,
+      })
     : first;
 
   if (Result.isErr(current)) {
@@ -192,6 +240,7 @@ export const applyRework = async (
     io,
     current.value,
     steps.filter((step) => step !== 'draft'),
+    standing.value,
   );
 
   if (Result.isErr(held)) {
@@ -204,19 +253,132 @@ export const applyRework = async (
     return Result.ok({ number: current.value.number, steps: ran });
   }
 
-  const drafted = await runSteps(io, current.value, ['draft']);
+  const { number } = current.value;
 
-  if (Result.isErr(drafted)) {
-    io.log(
-      `${drafted.value}. It is held all the same, so the work can go on; it is just not marked as a draft.`,
+  const drafted = await io.run(current.value, 'draft', standing.value);
+
+  if (Result.isOk(drafted)) {
+    io.log(`#${number}: ${STEP_DESCRIPTIONS.draft}`);
+
+    return Result.ok({ number, steps: Arr.toPushed(ran, 'draft') });
+  }
+
+  const failed =
+    `#${number}: cannot ${STEP_DESCRIPTIONS.draft}: ${drafted.value}` as const;
+
+  if (!isGraphqlRefusal(drafted.value)) {
+    return Result.err(
+      `${failed}. It is held all the same; run rework-pr start again to make it one.`,
     );
   }
 
+  io.log(
+    `${failed}. It is held all the same, so the work can go on; it is just not marked as a draft.`,
+  );
+
+  return Result.ok({ number, steps: ran });
+};
+
+/**
+ * Whether a pull request can be reworked at all, read from the queue: its
+ * branch and the layers stacked on it, or why not. `owner` and `comments` are
+ * what `pr-report/queue.mts` reads for it.
+ *
+ * One a skill is to fix, or someone has claimed, is taken up with `claim-pr` and
+ * handed back with `push-fixed-pr`: the claim is what keeps everyone else off
+ * it, and a push from here would end it. The claim is asked about as well as the
+ * owner, because a claim on a pull request the queue does not cover has no owner
+ * to report it. What cannot be read is refused, as `push-fixed-pr` refuses it:
+ * nothing is known of a claim on it.
+ *
+ * A layer above with a claim that holds is not carried along either, for the
+ * same reason, and so nothing above it is: `restack` leaves what sits on a layer
+ * that did not move. Whoever holds the claim is on that layer's old base until
+ * the worker restacks it.
+ */
+export const decideStanding = ({
+  number,
+  entries,
+  owner,
+  queue,
+}: Readonly<{
+  number: number;
+  entries: readonly StackEntry[];
+  owner: QueueOwner | undefined;
+  queue: ReadonlyMap<number, QueueComments>;
+}>): Result<ReworkStanding, string> => {
+  const entry = entries.find((e) => e.number === number);
+
+  if (entry === undefined) {
+    return Result.err('it is not among the open pull requests the queue reads');
+  }
+
+  const comments = queue.get(number);
+
+  if (comments === undefined) {
+    return Result.err(
+      'its queue comments could not be read, so whether someone has claimed it is not known',
+    );
+  }
+
+  const { claim } = comments;
+
+  if (claim?.applies === true && claim.says.kind === 'standing') {
+    return Result.err(
+      `${claim.says.claim.by} claimed it at ${claim.says.claim.at}. A fix under a claim goes through push-fixed-pr; otherwise wait for the claim to end`,
+    );
+  }
+
+  if (owner?.owner === 'skill') {
+    return Result.err(
+      `it is a skill's (${owner.reason}). Claim it with claim-pr and hand it back with push-fixed-pr`,
+    );
+  }
+
+  const layers = layersAbove(entries, number);
+
+  // A layer whose comments could not be read is not known to be free either.
+  const isHeld = (layer: BranchOf): boolean => {
+    const read = queue.get(layer.number);
+
+    return read === undefined || read.claim?.applies === true;
+  };
+
   return Result.ok({
-    number: current.value.number,
-    steps: Result.isErr(drafted) ? ran : Arr.toPushed(ran, 'draft'),
+    pr: branchOfEntry(entry),
+    layers: layers.filter((layer) => !isHeld(layer)),
+    claimedLayers: layers.filter(isHeld).map(({ number: n }) => n),
   });
 };
+
+/** Why `done` must not push, given what `git status --porcelain` says. */
+export const uncommittedRefusal = (porcelain: string): string | undefined =>
+  porcelain.trim() === ''
+    ? undefined
+    : (`the working tree has uncommitted changes or untracked files; amend them into the commit, or remove them:\n${porcelain.trimEnd()}` as const);
+
+/**
+ * What to say about a refused push of `branch`. The hint is for the lease alone:
+ * after a 403 or a hook declining the push, a fetch would fix nothing.
+ */
+export const pushFailure = (output: string, branch: string): string =>
+  LEASE_REJECTION.test(output)
+    ? (`${output}\nThe lease refused it — the branch moved, or there is no origin/${branch} here: git fetch origin ${branch}, put the amend on it, and run rework-pr done again.` as const)
+    : output;
+
+/**
+ * Whether a GraphQL failure, as `graphql` words it, is GraphQL being refused and
+ * so will go on being refused — a Claude Code session's proxy, a token without
+ * the permission — rather than something that may pass when tried again: a
+ * server error, a rate limit, a dropped connection, or anything else it does not
+ * recognize.
+ */
+export const isGraphqlRefusal = (message: string): boolean =>
+  !/^(?:5\d\d |request failed:)|rate limit|abuse/iu.test(message) &&
+  (/^4(?!08|29)\d\d /u.test(message) ||
+    /resource not accessible|permission|forbidden|not authorized/iu.test(
+      message,
+    ));
 
 /**
  * Whether the `merge-queued` event `recorded` — `start` taking the label off —
@@ -251,12 +413,14 @@ export const startSteps = (state: ReworkState): readonly ReworkStep[] =>
 
 /**
  * What `done` has left to do to the pull request, or why it must not.
- * `record` is what `start` wrote down about taking `merge-queued` off it.
+ * `record` is what `start` wrote down about taking `merge-queued` off it, and
+ * `hasLayers` whether any open pull request is stacked on it.
  */
 export const doneSteps = (
   state: ReworkState,
   handBack: ReworkHandBack,
   record: QueueRecord,
+  hasLayers: boolean,
 ): Result<readonly ReworkStep[], string> => {
   const isHeld = state.labels.includes(SKIP_CI_LABEL);
 
@@ -284,6 +448,7 @@ export const doneSteps = (
       )
     : Result.ok([
         'push',
+        ...(hasLayers ? (['restack'] as const) : ([] as const)),
         ...(state.isDraft ? (['ready'] as const) : ([] as const)),
         // Last: a pull request queued is the worker's, and one it picks before
         // the push is pushed into the merge.
@@ -417,12 +582,23 @@ export type ReworkState = Readonly<{
   isArmed: boolean;
 }>;
 
+/**
+ * The branch of a pull request that may be reworked, those stacked on it to carry
+ * along, lowest first, and the numbers of those not to touch.
+ */
+export type ReworkStanding = Readonly<{
+  pr: BranchOf;
+  layers: readonly BranchOf[];
+  claimedLayers: readonly number[];
+}>;
+
 export type ReworkStep =
   | 'hold'
   | 'dequeue'
   | 'disarm'
   | 'draft'
   | 'push'
+  | 'restack'
   | 'ready'
   | 'requeue'
   | 'forget';
@@ -431,9 +607,14 @@ export type ReworkStep =
 export type ReworkIo = Readonly<{
   /** The open pull request for the branch, or `undefined`. */
   read: () => Promise<Result<ReworkState | undefined, string>>;
+  /** {@link decideStanding} for pull request `number`, as the queue reads now. */
+  standing: (number: number) => Promise<Result<ReworkStanding, string>>;
+  /** What `git status --porcelain` says of the working tree. */
+  uncommitted: () => Promise<Result<string, string>>;
   run: (
     state: ReworkState,
     step: ReworkStep,
+    standing: ReworkStanding,
   ) => Promise<Result<unknown, string>>;
   /**
    * What `start` wrote down about taking `merge-queued` off pull request
@@ -448,6 +629,9 @@ export type ReworkIo = Readonly<{
 
 const PHASES: ReadonlySet<string> = new Set<ReworkPhase>(['start', 'done']);
 
+/** How git says the lease, or `--force-if-includes`, refused a push. */
+const LEASE_REJECTION = /stale info|remote ref updated since checkout/u;
+
 /** The steps that are REST calls, run before the pull request is read again. */
 const LABEL_STEPS: ReadonlySet<ReworkStep> = new Set<ReworkStep>([
   'hold',
@@ -460,6 +644,7 @@ const STEP_DESCRIPTIONS = {
   disarm: 'disarm auto-merge',
   draft: 'make it a draft',
   push: 'push the branch with --force-with-lease --force-if-includes',
+  restack: 'carry along the pull requests stacked on it',
   ready: 'mark it ready for review',
   requeue: `put ${MERGE_QUEUED_LABEL} back on`,
   forget: `forget what rework-pr start wrote down about ${MERGE_QUEUED_LABEL}`,
@@ -521,27 +706,63 @@ export const readOwnDequeueEvent = async (
 
 const isReworkPhase = (arg: string): arg is ReworkPhase => PHASES.has(arg);
 
-const readAgain = async (
+const readPullRequest = async (
   io: ReworkIo,
-  number: number,
+  says: Readonly<{ unreadable: string; absent: string }>,
 ): Promise<Result<ReworkState, string>> => {
   const read = await io.read();
 
   return Result.isErr(read)
-    ? Result.err(`cannot read its pull request again: ${read.value}`)
+    ? Result.err(`${says.unreadable}: ${read.value}`)
     : read.value === undefined
-      ? Result.err(`#${number} is no longer open: merged or closed meanwhile?`)
+      ? Result.err(says.absent)
       : Result.ok(read.value);
 };
 
-const readOpen = async (io: ReworkIo): Promise<Result<ReworkState, string>> => {
-  const read = await io.read();
+const readOpen = async (io: ReworkIo): Promise<Result<ReworkState, string>> =>
+  readPullRequest(io, {
+    unreadable: 'cannot read its pull request',
+    absent: 'the branch has no open pull request; open-pr opens one',
+  });
 
-  return Result.isErr(read)
-    ? Result.err(`cannot read its pull request: ${read.value}`)
-    : read.value === undefined
-      ? Result.err('the branch has no open pull request; open-pr opens one')
-      : Result.ok(read.value);
+/** {@link decideStanding} for `state`, its number on what it answers. */
+const standingOf = async (
+  io: ReworkIo,
+  state: ReworkState,
+): Promise<Result<ReworkStanding, string>> => {
+  const standing = await io.standing(state.number);
+
+  return Result.isErr(standing)
+    ? Result.err(`#${state.number}: ${standing.value}.`)
+    : standing;
+};
+
+/**
+ * For `done`, why the working tree stops it: what the push would leave behind.
+ * Asked before the queue is read, being the cheaper of the two.
+ */
+const refuseUncommitted = async (
+  io: ReworkIo,
+  args: ReworkArgs,
+  state: ReworkState,
+): Promise<Result<undefined, string>> => {
+  if (args.phase !== 'done') {
+    return Result.ok(undefined);
+  }
+
+  const uncommitted = await io.uncommitted();
+
+  if (Result.isErr(uncommitted)) {
+    return Result.err(
+      `#${state.number}: cannot read the working tree: ${uncommitted.value}`,
+    );
+  }
+
+  const refusal = uncommittedRefusal(uncommitted.value);
+
+  return refusal === undefined
+    ? Result.ok(undefined)
+    : Result.err(`#${state.number}: ${refusal}`);
 };
 
 /** `doneSteps` for the pull request, with what `start` wrote down about it. */
@@ -549,7 +770,14 @@ const doneStepsFor = async (
   io: ReworkIo,
   state: ReworkState,
   handBack: ReworkHandBack,
+  standing: ReworkStanding,
 ): Promise<Result<readonly ReworkStep[], string>> => {
+  for (const claimed of standing.claimedLayers) {
+    io.log(
+      `#${claimed}: not carried along: someone holds a claim on it, or its comments could not be read.`,
+    );
+  }
+
   const read = await io.queueRecord(state.number, handBack);
 
   if (Result.isErr(read)) {
@@ -568,6 +796,7 @@ const doneStepsFor = async (
     state,
     handBack,
     Result.isOk(read) ? read.value : 'none',
+    Arr.isNonEmpty(standing.layers),
   );
 
   return Result.isErr(steps)
@@ -580,9 +809,10 @@ const runSteps = async (
   io: ReworkIo,
   state: ReworkState,
   steps: readonly ReworkStep[],
+  standing: ReworkStanding,
 ): Promise<Result<ReworkOutcome, string>> => {
   for (const step of steps) {
-    const done = await io.run(state, step);
+    const done = await io.run(state, step, standing);
 
     if (Result.isErr(done)) {
       return Result.err(
@@ -590,7 +820,10 @@ const runSteps = async (
       );
     }
 
-    io.log(`#${state.number}: ${STEP_DESCRIPTIONS[step]}`);
+    // `restack` says of each layer whether it moved.
+    if (step !== 'restack') {
+      io.log(`#${state.number}: ${STEP_DESCRIPTIONS[step]}`);
+    }
   }
 
   return Result.ok({ number: state.number, steps });
@@ -606,12 +839,24 @@ const dryRun = async (
     return state;
   }
 
+  const clean = await refuseUncommitted(io, args, state.value);
+
+  if (Result.isErr(clean)) {
+    return clean;
+  }
+
+  const standing = await standingOf(io, state.value);
+
+  if (Result.isErr(standing)) {
+    return standing;
+  }
+
   const { number } = state.value;
 
   const steps =
     args.phase === 'start'
       ? Result.ok(startSteps(state.value))
-      : await doneStepsFor(io, state.value, args.handBack);
+      : await doneStepsFor(io, state.value, args.handBack, standing.value);
 
   return Result.isErr(steps)
     ? steps
@@ -770,11 +1015,36 @@ const forgetQueued = async (
     : Result.ok(undefined);
 };
 
+/**
+ * {@link decideStanding} as the queue reads now, without its check states: the
+ * read comes before `skip-ci` goes on, and a pull request whose checks are
+ * running can merge while it lasts.
+ */
+const readStanding = async (
+  api: ApiContext,
+  number: number,
+): Promise<Result<ReworkStanding, string>> => {
+  const queue = await readQueueState(`${api.repo.owner}/${api.repo.name}`, {
+    token: api.token,
+    checks: false,
+  });
+
+  return Result.isErr(queue)
+    ? Result.err(`cannot read the queue: ${queue.value}`)
+    : decideStanding({
+        number,
+        entries: queue.value.decided.entries,
+        owner: queue.value.owners.get(number),
+        queue: queue.value.queue,
+      });
+};
+
 const runStep = async (
   api: ApiContext,
   branch: string,
   state: ReworkState,
   step: ReworkStep,
+  standing: ReworkStanding,
 ): Promise<Result<unknown, string>> => {
   switch (step) {
     case 'hold':
@@ -811,27 +1081,35 @@ const runStep = async (
       return convertToDraft(api, state.nodeId);
 
     case 'push': {
-      const status = await git('git status --porcelain --untracked-files=no');
-
-      if (Result.isErr(status)) {
-        return status;
-      }
-
-      if (status.value.trim() !== '') {
-        return Result.err(
-          'the working tree has uncommitted changes; amend them into the commit first',
-        );
-      }
-
       const pushed = await git(
         `git push --force-with-lease --force-if-includes origin ${sh(branch)}`,
       );
 
       return Result.isErr(pushed)
-        ? Result.err(
-            `${pushed.value}\nIf the lease refused it — the branch moved, or there is no origin/${branch} here — git fetch origin ${branch}, put the amend on it, and run rework-pr done again.`,
-          )
+        ? Result.err(pushFailure(pushed.value, branch))
         : pushed;
+    }
+
+    case 'restack': {
+      const head = await git('git rev-parse HEAD');
+
+      if (Result.isErr(head)) {
+        return head;
+      }
+
+      const to = head.value.trim();
+
+      if (to === standing.pr.headRefOid) {
+        log(
+          `#${state.number}: its head had not moved when this run read it, so nothing is carried along. A layer still on an older head, because the amend was pushed by hand or by a run that stopped, is replayed with git rebase --onto.`,
+        );
+
+        return Result.ok(undefined);
+      }
+
+      await restack(standing.pr, to, standing.layers);
+
+      return Result.ok(undefined);
     }
 
     case 'ready':
