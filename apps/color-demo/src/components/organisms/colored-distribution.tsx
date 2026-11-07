@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { huesDefault } from '../../constants/index.mjs';
 import * as styles from './colored-distribution.module.css';
 
@@ -17,10 +17,9 @@ export const ColoredDistribution = ({ bars }: Props): JSX.Element => (
           class={constant(styles.bar)}
           data-e2e={constant('distribution-bar')}
           style={{
-            height: inlineMap(bars, (all) => all[index]?.height ?? '0%'),
-            'background-color': inlineMap(
-              bars,
-              (all) => all[index]?.color ?? 'transparent',
+            height: bars.pipe(map((all) => all[index]?.height ?? '0%')),
+            'background-color': bars.pipe(
+              map((all) => all[index]?.color ?? 'transparent'),
             ),
           }}
         />

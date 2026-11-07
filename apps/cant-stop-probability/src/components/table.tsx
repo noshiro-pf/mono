@@ -1,5 +1,6 @@
 import { Button, HtmlTable, InputGroup } from 'blueprint-synstate';
-import { constant, For, inlineMap, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, For, type JSX } from 'synstate-dom';
 import { denom, separator } from '../constants/index.mjs';
 import { toPercentString } from '../functions/index.mjs';
 import {
@@ -83,17 +84,17 @@ export const ProbabilityTable = (): JSX.Element => (
       <For items={filtered$} key={(row) => row.id}>
         {(row$) => (
           <tr>
-            <td class={cell}>{inlineMap(row$, (r) => r.selected[0])}</td>
-            <td class={cell}>{inlineMap(row$, (r) => r.selected[1])}</td>
-            <td class={cell}>{inlineMap(row$, (r) => r.selected[2])}</td>
+            <td class={cell}>{row$.pipe(map((r) => r.selected[0]))}</td>
+            <td class={cell}>{row$.pipe(map((r) => r.selected[1]))}</td>
+            <td class={cell}>{row$.pipe(map((r) => r.selected[2]))}</td>
             <td class={cell}>
-              <b>{inlineMap(row$, (r) => toPercentString(r.probability))}</b>
-              {inlineMap(row$, (r) => `  (${r.countSum}/${denom})`)}
+              <b>{row$.pipe(map((r) => toPercentString(r.probability)))}</b>
+              {row$.pipe(map((r) => `  (${r.countSum}/${denom})`))}
             </td>
-            <td class={cell}>{inlineMap(row$, (r) => r.count.twoLine)}</td>
-            <td class={cell}>{inlineMap(row$, (r) => r.count.oneLine)}</td>
-            <td class={cell}>{inlineMap(row$, (r) => r.count.noLine)}</td>
-            <td class={cell}>{inlineMap(row$, (r) => r.expected)}</td>
+            <td class={cell}>{row$.pipe(map((r) => r.count.twoLine))}</td>
+            <td class={cell}>{row$.pipe(map((r) => r.count.oneLine))}</td>
+            <td class={cell}>{row$.pipe(map((r) => r.count.noLine))}</td>
+            <td class={cell}>{row$.pipe(map((r) => r.expected))}</td>
           </tr>
         )}
       </For>

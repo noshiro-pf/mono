@@ -3,7 +3,6 @@ import {
   constant,
   For,
   If,
-  inlineMap,
   mapBindable,
   type Bindable,
   type JSX,
@@ -20,7 +19,7 @@ export const AnswerPageNotes = ({ notes }: Props): JSX.Element => (
         cond={word$.pipe(map(isHttpUrl))}
         then={
           <a
-            href={inlineMap(word$, linkHref)}
+            href={word$.pipe(map(linkHref))}
             rel={constant('noopener noreferrer')}
             target={constant('_blank')}
           >

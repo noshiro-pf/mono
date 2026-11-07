@@ -1,5 +1,5 @@
 import { type InitializedObservable, map } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import { editorStore } from '../store/index.mjs';
 import {
   formatEstimate,
@@ -22,8 +22,8 @@ type Props = Readonly<{
  */
 export const TaskTableRow = ({ row }: Props): JSX.Element => (
   <tr
-    class={inlineMap(row, ({ status }) =>
-      status === 'done' ? 'task-row done' : 'task-row',
+    class={row.pipe(
+      map(({ status }) => (status === 'done' ? 'task-row done' : 'task-row')),
     )}
   >
     <td>
@@ -47,13 +47,12 @@ export const TaskTableRow = ({ row }: Props): JSX.Element => (
           });
         }}
       >
-        {inlineMap(row, ({ task }) => task.title)}
+        {row.pipe(map(({ task }) => task.title))}
       </button>
     </td>
     <td>
-      {inlineMap(
-        row,
-        ({ task }) => `${task.priority} ${priorityLabels[task.priority]}`,
+      {row.pipe(
+        map(({ task }) => `${task.priority} ${priorityLabels[task.priority]}`),
       )}
     </td>
     <td>
@@ -65,6 +64,6 @@ export const TaskTableRow = ({ row }: Props): JSX.Element => (
     <td>
       <LabelChips labels={row.pipe(map(({ task }) => task.labels))} />
     </td>
-    <td>{inlineMap(row, ({ task }) => formatEstimate(task.estimateHours))}</td>
+    <td>{row.pipe(map(({ task }) => formatEstimate(task.estimateHours)))}</td>
   </tr>
 );

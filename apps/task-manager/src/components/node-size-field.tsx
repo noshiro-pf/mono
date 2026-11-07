@@ -1,4 +1,5 @@
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { nodeSizeStore } from '../store/index.mjs';
 import { nodeSizeLabels, nodeSizes } from '../view-model/index.mjs';
@@ -20,14 +21,13 @@ export const NodeSizeField = (): JSX.Element => (
     <div class={constant('bp6-button-group')}>
       {nodeSizes.map((size) => (
         <button
-          aria-pressed={inlineMap(nodeSizeStore.size, (current) =>
-            (current === size).toString(),
+          aria-pressed={nodeSizeStore.size.pipe(
+            map((current) => (current === size).toString()),
           )}
           class={{
             'bp6-button': constant(true),
-            'bp6-active': inlineMap(
-              nodeSizeStore.size,
-              (current) => current === size,
+            'bp6-active': nodeSizeStore.size.pipe(
+              map((current) => current === size),
             ),
           }}
           data-e2e={constant(`dag-node-size-${size}`)}

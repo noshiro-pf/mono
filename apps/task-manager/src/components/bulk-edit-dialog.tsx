@@ -1,13 +1,6 @@
 import { HtmlSelect } from 'blueprint-synstate';
 import { combine, map, type InitializedObservable } from 'synstate';
-import {
-  constant,
-  For,
-  If,
-  inlineMap,
-  MatchOptional,
-  type JSX,
-} from 'synstate-dom';
+import { constant, For, If, MatchOptional, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import type { RelaxedExclude } from 'ts-type-forge';
 import {
@@ -143,19 +136,23 @@ const BulkEditForm = ({
           class={constant('bp6-text-muted')}
           data-e2e={constant('bulk-edit-summary')}
         >
-          {inlineMap(counts$, ({ tasks, milestones }) =>
-            [
-              tasks > 0 ? m.bulkEdit.tasks(tasks) : undefined,
-              milestones > 0 ? m.bulkEdit.milestones(milestones) : undefined,
-            ]
-              .filter((part) => part !== undefined)
-              .join(m.common.listSeparator),
+          {counts$.pipe(
+            map(({ tasks, milestones }) =>
+              [
+                tasks > 0 ? m.bulkEdit.tasks(tasks) : undefined,
+                milestones > 0 ? m.bulkEdit.milestones(milestones) : undefined,
+              ]
+                .filter((part) => part !== undefined)
+                .join(m.common.listSeparator),
+            ),
           )}
           {constant(m.bulkEdit.lead)}
-          {inlineMap(counts$, ({ tasks, milestones }) =>
-            milestones > 0 && tasks > 0
-              ? m.bulkEdit.milestonesHaveNoProgress
-              : '',
+          {counts$.pipe(
+            map(({ tasks, milestones }) =>
+              milestones > 0 && tasks > 0
+                ? m.bulkEdit.milestonesHaveNoProgress
+                : '',
+            ),
           )}
         </p>
         <div class={constant('form-grid')}>
@@ -270,10 +267,8 @@ const BulkEditForm = ({
               <option value={constant(NONE)}>{constant(m.common.none)}</option>
               <For items={dataStore.groups} key={(group) => group.id}>
                 {(group$) => (
-                  <option
-                    value={inlineMap(group$, ({ id }) => `${GROUP}${id}`)}
-                  >
-                    {inlineMap(group$, ({ title }) => title)}
+                  <option value={group$.pipe(map(({ id }) => `${GROUP}${id}`))}>
+                    {group$.pipe(map(({ title }) => title))}
                   </option>
                 )}
               </For>

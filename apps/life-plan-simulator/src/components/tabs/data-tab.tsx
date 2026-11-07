@@ -1,6 +1,6 @@
 import { Button, Card, FileInput } from 'blueprint-synstate';
 import { createState, type InitializedObservable } from 'synstate';
-import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { planFileSchemaUrl } from '../../repository/index.mjs';
 import {
@@ -118,7 +118,7 @@ export const DataTab = (): JSX.Element => {
           )}
         </div>
         <div role={constant('status')}>
-          <p>{inlineMap(message$, (m) => m)}</p>
+          <p>{message$}</p>
           <WarningList warnings$={warnings$} />
         </div>
       </Card>
@@ -173,7 +173,7 @@ const WarningList = ({
 }>): JSX.Element => (
   <ul data-e2e={constant('plan-import-warnings')}>
     <For items={warnings$} key={(_, i) => i}>
-      {(w$) => <li>{inlineMap(w$, (w) => w)}</li>}
+      {(w$) => <li>{w$}</li>}
     </For>
   </ul>
 );

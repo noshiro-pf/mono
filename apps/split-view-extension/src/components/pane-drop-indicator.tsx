@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import type { PaneDropTarget } from '../layout/index.mjs';
 
 /**
@@ -21,15 +21,15 @@ export const PaneDropIndicator = ({
   <div
     class={constant('pane-drop')}
     style={{
-      left: inlineMap(target$, (target) => pixels(target?.indicator.left)),
-      top: inlineMap(target$, (target) => pixels(target?.indicator.top)),
-      width: inlineMap(target$, (target) => pixels(target?.indicator.width)),
-      height: inlineMap(target$, (target) => pixels(target?.indicator.height)),
+      left: target$.pipe(map((target) => pixels(target?.indicator.left))),
+      top: target$.pipe(map((target) => pixels(target?.indicator.top))),
+      width: target$.pipe(map((target) => pixels(target?.indicator.width))),
+      height: target$.pipe(map((target) => pixels(target?.indicator.height))),
     }}
   >
     <span class={constant('pane-drop__label')}>
-      {inlineMap(target$, (target) =>
-        target?.zone === 'center' ? 'Swap' : 'Move here',
+      {target$.pipe(
+        map((target) => (target?.zone === 'center' ? 'Swap' : 'Move here')),
       )}
     </span>
   </div>

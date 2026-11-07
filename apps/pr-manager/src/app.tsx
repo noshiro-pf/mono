@@ -3,7 +3,6 @@ import {
   constant,
   deriveBindable,
   If,
-  inlineMap,
   mapBindable,
   MatchOptional,
   type JSX,
@@ -87,11 +86,11 @@ export const App = (): JSX.Element => {
   return (
     <main
       class={constant('page')}
-      data-header={inlineMap(folded, (isFolded) =>
-        isFolded ? 'folded' : 'full',
+      data-header={folded.pipe(
+        map((isFolded) => (isFolded ? 'folded' : 'full')),
       )}
       data-mode={layoutStore.mode}
-      style={{ '--header-height': inlineMap(headerHeight, (h) => `${h}px`) }}
+      style={{ '--header-height': headerHeight.pipe(map((h) => `${h}px`)) }}
     >
       <header
         ref={observeHeight(setHeaderHeight)}

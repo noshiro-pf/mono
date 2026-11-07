@@ -4,7 +4,7 @@ import {
   onScopeDispose,
   type InitializedObservable,
 } from 'synstate';
-import { constant, For, inlineMap, type JSX } from 'synstate-dom';
+import { constant, For, type JSX } from 'synstate-dom';
 import { Num } from 'ts-data-forge';
 import { inWindow, windowOf, type QueueStrip } from '../queue-strip.mjs';
 import type { QueueSlot } from '../queue-view.mjs';
@@ -74,7 +74,7 @@ export const QueueMap = ({
     <div
       aria-hidden={constant('true')}
       class={constant('queue-map')}
-      data-grabbed={inlineMap(grabbed$, (grabbed) => grabbed.toString())}
+      data-grabbed={grabbed$.pipe(map((grabbed) => grabbed.toString()))}
       title={constant(
         'The whole queue; drag the frame, or click to scroll there',
       )}
@@ -154,8 +154,8 @@ export const QueueMap = ({
         {(slot$) => (
           <span
             class={constant('queue-map-mark')}
-            data-kind={inlineMap(slot$, (slot) => slot.kind)}
-            data-priority={inlineMap(slot$, (slot) => slot.priority)}
+            data-kind={slot$.pipe(map((slot) => slot.kind))}
+            data-priority={slot$.pipe(map((slot) => slot.priority))}
           />
         )}
       </For>
@@ -163,8 +163,8 @@ export const QueueMap = ({
       <span
         class={constant('queue-map-window')}
         style={{
-          left: inlineMap(window$, ({ start }) => percent(start)),
-          width: inlineMap(window$, ({ size }) => percent(size)),
+          left: window$.pipe(map(({ start }) => percent(start))),
+          width: window$.pipe(map(({ size }) => percent(size))),
         }}
       />
     </div>

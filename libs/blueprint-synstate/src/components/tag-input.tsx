@@ -3,7 +3,6 @@ import {
   constant,
   deriveBindable,
   For,
-  inlineMap,
   isImeKeyDown,
   mapBindable,
   toObservable,
@@ -300,7 +299,7 @@ export const TagInput = ({
           placeholder={
             placeholder === undefined
               ? undefined
-              : inlineMap(hasTag$, (has) => (has ? undefined : placeholder))
+              : hasTag$.pipe(map((has) => (has ? undefined : placeholder)))
           }
           onFocus={() => {
             setIsInputFocused(true);

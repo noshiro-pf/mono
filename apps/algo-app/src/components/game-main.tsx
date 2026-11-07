@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, inlineMap, MatchOptional, type JSX } from 'synstate-dom';
+import { constant, MatchOptional, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 import type { Rect } from 'ts-utils-additional';
 import { dictionary } from '../constants/index.mjs';
@@ -36,7 +36,7 @@ export const GameMain = ({ windowSize }: Props): JSX.Element => {
       <div
         class={constant(styles.header)}
         style={{
-          'flex-basis': inlineMap(layout, (l) => `${l.headerHeight}px`),
+          'flex-basis': layout.pipe(map((l) => `${l.headerHeight}px`)),
         }}
       >
         <GameMessage message={displayValues.pipe(map((v) => v.gameMessage))} />
@@ -55,7 +55,7 @@ export const GameMain = ({ windowSize }: Props): JSX.Element => {
       <div
         class={constant(styles.footer)}
         style={{
-          'flex-basis': inlineMap(layout, (l) => `${l.footerHeight}px`),
+          'flex-basis': layout.pipe(map((l) => `${l.footerHeight}px`)),
         }}
       >
         <MyCards
@@ -67,7 +67,7 @@ export const GameMain = ({ windowSize }: Props): JSX.Element => {
       <div class={constant(styles.endTurnButtonWrapper)}>
         <button
           class={constant(styles.endTurnButton)}
-          disabled={inlineMap(displayValues, (v) => v.endTurnButtonDisabled)}
+          disabled={displayValues.pipe(map((v) => v.endTurnButtonDisabled))}
           type={constant('button')}
           onClick={gameStateStore.onTurnEndClick}
         >

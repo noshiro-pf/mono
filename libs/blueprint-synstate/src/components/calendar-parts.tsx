@@ -14,7 +14,6 @@ import {
   constant,
   createAfterUpdate,
   For,
-  inlineMap,
   mapBindable,
   subscribeInScope,
   type Bindable,
@@ -231,8 +230,8 @@ export const Calendar = ({
           disabled={constant(disabled)}
           name={constant('day')}
           role={constant('gridcell')}
-          tabIndex={inlineMap(focusTarget$, (target) =>
-            !outside && target === key ? 0 : -1,
+          tabIndex={focusTarget$.pipe(
+            map((target) => (!outside && target === key ? 0 : -1)),
           )}
           type={constant('button')}
           onClick={() => {
@@ -274,11 +273,13 @@ export const Calendar = ({
             id={constant(captionId)}
             role={constant('presentation')}
           >
-            {inlineMap(display$, (index) => {
-              const { year, month } = monthOfIndex(index);
+            {display$.pipe(
+              map((index) => {
+                const { year, month } = monthOfIndex(index);
 
-              return names.caption(year, month);
-            })}
+                return names.caption(year, month);
+              }),
+            )}
           </div>
         </div>
         <div>
@@ -331,9 +332,9 @@ export const Calendar = ({
             <For items={monthOptions$} key={(option) => option.value}>
               {(option$) => (
                 <option
-                  value={inlineMap(option$, (o) => (o.value - 1).toString())}
+                  value={option$.pipe(map((o) => (o.value - 1).toString()))}
                 >
-                  {inlineMap(option$, (o) => o.label)}
+                  {option$.pipe(map((o) => o.label))}
                 </option>
               )}
             </For>
@@ -364,10 +365,10 @@ export const Calendar = ({
             <For items={yearOptions$} key={(option) => option.year}>
               {(option$) => (
                 <option
-                  disabled={inlineMap(option$, (o) => o.disabled)}
-                  value={inlineMap(option$, (o) => o.year.toString())}
+                  disabled={option$.pipe(map((o) => o.disabled))}
+                  value={option$.pipe(map((o) => o.year.toString()))}
                 >
-                  {inlineMap(option$, (o) => o.year.toString())}
+                  {option$.pipe(map((o) => o.year.toString()))}
                 </option>
               )}
             </For>
@@ -380,7 +381,7 @@ export const Calendar = ({
           class={constant(
             'bp6-button bp6-minimal bp6-datepicker-nav-button bp6-datepicker-nav-button-previous',
           )}
-          disabled={inlineMap(display$, (index) => index <= minIndex)}
+          disabled={display$.pipe(map((index) => index <= minIndex))}
           name={constant('previous-month')}
           type={constant('button')}
           onClick={() => {
@@ -394,7 +395,7 @@ export const Calendar = ({
           class={constant(
             'bp6-button bp6-minimal bp6-datepicker-nav-button bp6-datepicker-nav-button-next',
           )}
-          disabled={inlineMap(display$, (index) => index >= maxIndex)}
+          disabled={display$.pipe(map((index) => index >= maxIndex))}
           name={constant('next-month')}
           type={constant('button')}
           onClick={() => {

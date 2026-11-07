@@ -3,7 +3,6 @@ import {
   constant,
   deriveBindable,
   If,
-  inlineMap,
   mapBindable,
   type Bindable,
   type JSX,
@@ -67,9 +66,6 @@ export const CardComponent = ({
       c.showOutline === 'always' || (c.showOutline === 'onHover' && over),
   );
 
-  // The values above feed several slots each, so they are nodes of their own;
-  // a value that feeds one slot is an `inlineMap`.
-
   // Shared by both sides' rectangles.
   const rectStyle = {
     stroke: deriveBindable([card, showOutline], (c, show) =>
@@ -93,8 +89,8 @@ export const CardComponent = ({
       <div
         class={constant(styles.wrapper)}
         style={{
-          cursor: inlineMap(card, (c) =>
-            c.isClickable ? 'pointer' : 'default',
+          cursor: card.pipe(
+            map((c) => (c.isClickable ? 'pointer' : 'default')),
           ),
           transform: deriveBindable(
             [card, isMouseOver],

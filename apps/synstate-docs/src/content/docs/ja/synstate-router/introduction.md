@@ -30,7 +30,7 @@ npm install react react-dom synstate synstate-router synstate-router-react ts-da
 npm install synstate synstate-dom synstate-router synstate-router-dom ts-data-forge # synstate-dom
 ```
 
-以下の例は import を省いています。ルートツリー・codec・ルーターは `synstate-router` から、コンポーネントはバインディングから、`render`・`constant`・`inlineMap` は `synstate-dom` から、`renderToStaticMarkup` は `react-dom/server` から、`switchMap` などの operator は `synstate` から、`asSafeInt`・`Optional`・`Result` は `ts-data-forge` から import します。`fetchProductName` はアプリケーション自身のリクエスト関数の代わりです。
+以下の例は import を省いています。ルートツリー・codec・ルーターは `synstate-router` から、コンポーネントはバインディングから、`render`・`constant` は `synstate-dom` から、`renderToStaticMarkup` は `react-dom/server` から、`switchMap` などの operator は `synstate` から、`asSafeInt`・`Optional`・`Result` は `ts-data-forge` から import します。`fetchProductName` はアプリケーション自身のリクエスト関数の代わりです。
 
 ## ルートの定義
 
@@ -201,7 +201,7 @@ assert.strictEqual(
 
 ```tsx
 import { map } from 'synstate';
-import { constant, inlineMap, render } from 'synstate-dom';
+import { constant, render } from 'synstate-dom';
 import {
     createMemoryBrowser,
     createRouter,
@@ -262,9 +262,11 @@ const unmount = render(
                     ),
                     'products.item': (item$) => (
                         <h1>
-                            {inlineMap(
-                                item$,
-                                (item) => `Product ${item.params.productId}`,
+                            {item$.pipe(
+                                map(
+                                    (item) =>
+                                        `Product ${item.params.productId}`,
+                                ),
                             )}
                         </h1>
                     ),

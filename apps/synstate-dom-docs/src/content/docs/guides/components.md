@@ -162,7 +162,7 @@ In Solid, each of these comes with a rule. Props are an object of getters, so re
 
 That freedom comes from props being bindables rather than values, and it cuts the other way too. In Solid, a derived value is an expression, such as `{props.maxLength - props.value.length}` in JSX, and the compiler keeps it up to date. In synstate-dom you cannot write that expression inline. You pass the computation to a function that builds the derivation as a new bindable:
 
-- from one input: `mapBindable` (or, when you hold an observable, `pipe(map(...))`, or `inlineMap` where bindings are many, for an element's slot only);
+- from one input: `mapBindable` (or, when you hold an observable, `pipe(map(...))`);
 - from several inputs: `deriveBindable([a, b], fn)`;
 - anything that waits, filters or debounces: synstate's operators, reached through `toObservable`, with `withInitialValue` before the result is bound;
 - an element shown depending on an updating value: `If` given a `Bindable<boolean>` (or `MatchOptional` / `MatchResult`), not `&&` or `? :` around JSX.

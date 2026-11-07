@@ -1,11 +1,5 @@
 import { map } from 'synstate';
-import {
-  constant,
-  inlineMap,
-  mapBindable,
-  type Bindable,
-  type JSX,
-} from 'synstate-dom';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { IssueFilterCounts } from '../issues-list-view.mjs';
@@ -32,8 +26,8 @@ export const IssueTierGroup = ({ row, counts$ }: Props): JSX.Element => {
     <div
       aria-label={constant(GROUP_NAMES[row])}
       class={constant(`stat-group tiers-${row}`)}
-      data-picking={inlineMap(view$, ({ onlyPriorities }) =>
-        Arr.isNonEmpty(onlyPriorities).toString(),
+      data-picking={view$.pipe(
+        map(({ onlyPriorities }) => Arr.isNonEmpty(onlyPriorities).toString()),
       )}
       role={constant('group')}
     >

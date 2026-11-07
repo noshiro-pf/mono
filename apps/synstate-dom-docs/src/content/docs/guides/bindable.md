@@ -1,6 +1,6 @@
 ---
 title: Bindable values
-description: constant, inlineMap, and what a slot that takes data accepts.
+description: constant, pipe(map), and what a slot that takes data accepts.
 ---
 
 Every place in JSX that takes data (an attribute, a DOM property, a text child, or a prop of a component the library provides) accepts a `Bindable<T>`:
@@ -11,8 +11,6 @@ Every place in JSX that takes data (an attribute, a DOM property, a text child, 
 | `Constant<T>`              | written once; nothing is subscribed                                |
 
 An observable that has already completed, such as `just(...)`, is treated like a constant: written once and never subscribed to.
-
-A slot of an intrinsic element (an attribute, a DOM property, a text child, a value of the `class` or `style` object) also takes an `inlineMap(...)`, the optimization described below. Its type is `ElementBindable<T>`. A prop typed `Bindable`, and the helpers that receive one, never see it. A prop that a component passes to an element unchanged, such as a `Child` or the `<a>` attributes that `Link` spreads onto its anchor, may hold one.
 
 ## `constant`
 
@@ -48,13 +46,13 @@ Things that are not data take plain values: event handlers, `ref`, the `key` fun
 - `constant(obs$)` is a type error too.
 - If `constant` is too long to type, rename it on import: `import { constant as c } from 'synstate-dom'`.
 
-## Transforming an observable: `pipe(map)`, and `inlineMap` where bindings are many
+## Transforming an observable: `pipe(map)`
 
-To show an observable transformed, write `source$.pipe(map(fn))`. Created inside a component, the `map` node belongs to the component's scope and is disposed with it. In a `For` row, where every row adds its bindings, `inlineMap(source$, fn)` given straight to a slot of an element does the same without the node:
+To show an observable transformed, write `source$.pipe(map(fn))`. There is no separate form for bindings: a slot takes the `map` node like any other observable. Created inside a component, or inside a row of `For`, the node belongs to that scope and is disposed with it:
 
 ```tsx
 import { createState, map } from 'synstate';
-import { constant, For, inlineMap, type JSX } from 'synstate-dom';
+import { constant, For, type JSX } from 'synstate-dom';
 
 const [count$, setCount] = createState(0);
 
@@ -84,20 +82,16 @@ const [items$] = createState<readonly Item[]>([
 export const PriceList = (): JSX.Element => (
     <ul>
         <For items={items$} key={(item) => item.id}>
-            {/* A binding in every row: `inlineMap` saves a node in each. */}
+            {/* One `map` node per row, disposed with the row. */}
             {(item$) => (
-                <li>{inlineMap(item$, (item) => `${item.price} yen`)}</li>
+                <li>{item$.pipe(map((item) => `${item.price} yen`))}</li>
             )}
         </For>
     </ul>
 );
 ```
 
-`inlineMap` is an optimization of `pipe(map)`, and the name says so. It adds no node to the synstate graph: the binding subscribes to `source$` itself, runs each value through `fn`, and writes the result unless it is `Object.is` the one it wrote last, which is what a `map` node passes on. In a `For` of 1,000 rows with four such bindings each, mounting is about 5% faster, updating every row about 15%, and disposing about 35%; with a few bindings the difference is too small to measure.
-
-What it gives up is sharing, and being an observable. An inline map is not an observable: it has no `pipe` or `subscribe`, and only a slot of an element takes it, directly or through a prop passed to one unchanged, such as a `Child`. A prop typed `Bindable` (`If`'s `cond` and `For`'s `items` included) does not. A `map` node computes `fn` once per update and holds the result, which every binding, `getSnapshot()` and operator then reads. An inline map holds nothing: passed to two places, `fn` runs twice, and nothing else can read the result. For a heavy transformation, or one whose result several bindings use, keep the node.
-
-Only `map` has such a form. Several sources (`deriveBindable`) need the node to see all of them after the update: subscribers are called while it propagates, so a subscriber of one would see the others before they update. An operator with state (`scan`) would keep it per binding.
+A `map` node computes `fn` once per update and passes on a result only when it is not `Object.is` the last one, so a binding writes to the DOM only when what it shows changed. The result is an observable like any other: several bindings, `getSnapshot()` and further operators can all read it.
 
 ## Receiving a `Bindable`: `mapBindable`, `deriveBindable`, `toObservable`
 

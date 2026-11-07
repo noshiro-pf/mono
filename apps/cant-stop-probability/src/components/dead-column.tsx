@@ -1,6 +1,6 @@
 import { Button, ButtonGroup } from 'blueprint-synstate';
 import { map } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import {
   columnIds,
   columnsAlive$,
@@ -42,7 +42,7 @@ export const DeadColumn = (): JSX.Element => (
       data-e2e={constant('hit-probability')}
     >
       {constant('確率： ')}
-      {inlineMap(hitSomeAliveColumnProbability$, String)}
+      {hitSomeAliveColumnProbability$.pipe(map(String))}
     </div>
   </div>
 );

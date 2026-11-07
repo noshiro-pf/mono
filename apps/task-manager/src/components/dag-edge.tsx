@@ -1,5 +1,5 @@
 import { type InitializedObservable, map } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import type { DagEdgeRecord } from './dag-canvas-scene.mjs';
 import { DagEdgeLabel } from './dag-edge-label.js';
 
@@ -29,12 +29,12 @@ export const DagEdge = ({ record }: Props): JSX.Element => {
     <g
       class={constant('dag-edge')}
       data-e2e={constant('dag-edge')}
-      data-edge-id={inlineMap(record, ({ edge }) => edge.id)}
-      data-from={inlineMap(record, ({ edge }) => edge.from)}
-      data-implied={inlineMap(record, ({ edge }) => edge.implied.toString())}
-      data-routed={inlineMap(record, ({ edge }) => edge.routed.toString())}
-      data-selected={inlineMap(record, ({ selected }) => selected.toString())}
-      data-to={inlineMap(record, ({ edge }) => edge.to)}
+      data-edge-id={record.pipe(map(({ edge }) => edge.id))}
+      data-from={record.pipe(map(({ edge }) => edge.from))}
+      data-implied={record.pipe(map(({ edge }) => edge.implied.toString()))}
+      data-routed={record.pipe(map(({ edge }) => edge.routed.toString()))}
+      data-selected={record.pipe(map(({ selected }) => selected.toString()))}
+      data-to={record.pipe(map(({ edge }) => edge.to))}
     >
       <path
         class={constant('dag-edge-line')}

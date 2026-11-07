@@ -1,6 +1,6 @@
 import { Button, Callout } from 'blueprint-synstate';
 import { map } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import { planStore, sessionStore } from '../../store/index.mjs';
 
 /**
@@ -48,7 +48,7 @@ export const WriteErrorBar = (): JSX.Element => (
     then={
       <Callout class={'notice-bar'} intent={'danger'} role={'alert'}>
         <span>
-          {inlineMap(planStore.writeError, (message) => message ?? '')}
+          {planStore.writeError.pipe(map((message) => message ?? ''))}
         </span>
         <Button
           icon={'cross'}

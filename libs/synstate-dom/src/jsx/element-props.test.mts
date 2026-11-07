@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import type { ElementBindable } from '../constant/index.mjs';
+import type { Bindable } from '../constant/index.mjs';
 import type { CommonElementProps } from './element-props.mjs';
 import type { EventPropNames } from './event-prop-names.mjs';
 
@@ -33,12 +33,12 @@ describe('CommonElementProps', () => {
   test('an aria-* attribute takes a boolean and a number, a data-* one neither (#3165)', () => {
     expectType<
       CommonElementProps<HTMLElement>['aria-busy'],
-      ElementBindable<boolean | number | string | undefined> | undefined
+      Bindable<boolean | number | string | undefined> | undefined
     >('=');
 
     expectType<
       CommonElementProps<HTMLElement>['data-row'],
-      ElementBindable<string | undefined> | undefined
+      Bindable<string | undefined> | undefined
     >('=');
 
     assert.isTrue(true);

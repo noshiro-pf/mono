@@ -1,6 +1,5 @@
 import { createState, isObservable } from 'synstate';
 import { expectType } from 'ts-data-forge';
-import { isInlineMap } from '../internal/index.mjs';
 import type { Bindable } from './bindable.mjs';
 import { constant } from './constant.mjs';
 import { mapBindable } from './map-bindable.mjs';
@@ -15,8 +14,6 @@ describe(mapBindable, () => {
     expectType<typeof result, Bindable<number>>('=');
 
     assert.isFalse(isObservable(result));
-
-    assert.isFalse(isInlineMap(result));
 
     assert.strictEqual<unknown>(result, 6);
 

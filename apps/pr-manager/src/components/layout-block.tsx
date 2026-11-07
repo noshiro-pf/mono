@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, If, inlineMap, type Child, type JSX } from 'synstate-dom';
+import { constant, If, type Child, type JSX } from 'synstate-dom';
 import type { BlockId } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
 
@@ -139,7 +139,7 @@ export const LayoutBlock = ({
       class={constant('layout-block')}
       data-block={constant(id)}
       style={{
-        'flex-grow': inlineMap(placement$, ({ share }) => share?.toString()),
+        'flex-grow': placement$.pipe(map(({ share }) => share?.toString())),
       }}
     >
       {head ?? <></>}
@@ -149,12 +149,16 @@ export const LayoutBlock = ({
           mut_elements.body = element;
         }}
         class={constant('block-body')}
-        data-sized={inlineMap(placement$, ({ height, share }) =>
-          (height !== undefined || share !== undefined).toString(),
+        data-sized={placement$.pipe(
+          map(({ height, share }) =>
+            (height !== undefined || share !== undefined).toString(),
+          ),
         )}
         style={{
-          height: inlineMap(placement$, ({ height }) =>
-            height === undefined ? undefined : `${height}px`,
+          height: placement$.pipe(
+            map(({ height }) =>
+              height === undefined ? undefined : `${height}px`,
+            ),
           ),
         }}
       >
@@ -171,10 +175,12 @@ export const LayoutBlock = ({
           <div
             aria-hidden={constant('true')}
             class={constant('row-divider')}
-            title={inlineMap(placement$, ({ share }) =>
-              share === undefined
-                ? 'Drag to set the height; double-click for the natural height'
-                : 'Drag to share the height with the block below; double-click to even them',
+            title={placement$.pipe(
+              map(({ share }) =>
+                share === undefined
+                  ? 'Drag to set the height; double-click for the natural height'
+                  : 'Drag to share the height with the block below; double-click to even them',
+              ),
             )}
             onDblClick={onDividerDoubleClick}
             onLostPointerCapture={onDividerUp}

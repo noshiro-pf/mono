@@ -1,9 +1,14 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
-import { formatFiles, isDirectlyExecuted } from 'ts-repo-utils';
-import type { ReadonlyRecord } from 'ts-type-forge';
-import { embedInto, type Embedded } from './embed-markers.mjs';
+import { Result, unknownToString } from 'ts-data-forge';
+import { isDirectlyExecuted } from 'ts-repo-utils';
+import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how apps reach its shared scripts
+import { formatPackage } from '../../../tools/configs/format-package.mjs';
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how apps reach its shared scripts
+import * as markers from '../../../tools/scripts/lib/embed-markers.mjs';
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how apps reach its shared scripts
+import * as domResults from '../../../tools/scripts/lib/synstate-dom-benchmark-results.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
@@ -18,41 +23,65 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  * The table is parsed rather than copied, so that the Japanese page can name
  * the operations in Japanese. An operation this script has no name for is an
  * error, not a row left in English.
+ *
+ * The introduction and the landing page quote synstate-dom's place among the
+ * libraries too, beside SynState's own benchmark; the SynState site's
+ * `gen:benchmark-doc` fills both kinds of figure there, so that each page has
+ * one writer, and `check:prose:synstate-dom-placement` checks them.
  */
 export const embedBenchmark = async (): Promise<Result<undefined, string>> => {
   try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const resultsMd = await fs.readFile(resultsPath, 'utf8');
+    const results = await domResults.readResults();
 
-    const parsed = parseResults(resultsMd);
-
-    if (Result.isErr(parsed)) {
-      return Result.err(`❌ ${resultsPath}: ${parsed.value}`);
+    if (Result.isErr(results)) {
+      return Result.err(`❌ ${results.value}`);
     }
+
+    const placed = domResults.checkPlacement(results.value.operations);
+
+    if (Result.isErr(placed)) {
+      return Result.err(`❌ ${placed.value}`);
+    }
+
+    // Every page is embedded before any is written, so that a failure to embed
+    // writes none of them. The tables go in unaligned, so both pages are
+    // written and then formatted back on every run; a Prettier failure leaves
+    // them unformatted, which the next run or `fix:fmt` repairs.
+    const mut_embedded: FixedLengthTuple<2, string>[] = [];
 
     for (const [locale, pagePath] of pages) {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const page = await fs.readFile(pagePath, 'utf8');
 
-      const embedded = embedInto(
+      const embedded = markers.embedInto(
         page,
         'benchmark',
-        render(parsed.value, locale),
+        render(results.value, locale),
       );
 
       if (Result.isErr(embedded)) {
         return Result.err(`❌ ${pagePath}: ${embedded.value}`);
       }
 
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(pagePath, embedded.value, 'utf8');
-
-      await formatFiles([pagePath]);
-
-      console.info(
-        `✓ Embedded RESULTS.md into ${path.relative(workspaceRootPath, pagePath)}`,
-      );
+      mut_embedded.push([pagePath, embedded.value]);
     }
+
+    for (const [pagePath, content] of mut_embedded) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(pagePath, content, 'utf8');
+    }
+
+    const written = mut_embedded.map(([pagePath]) =>
+      path.relative(workspaceRootPath, pagePath),
+    );
+
+    const status = formatPackage({ cwd: workspaceRootPath, patterns: written });
+
+    if (status !== 0) {
+      return Result.err(`❌ Prettier failed on ${written.join(', ')}`);
+    }
+
+    console.info(`✓ Embedded RESULTS.md into ${written.join(', ')}`);
 
     return Result.ok(undefined);
   } catch (error) {
@@ -60,54 +89,10 @@ export const embedBenchmark = async (): Promise<Result<undefined, string>> => {
   }
 };
 
-type Locale = 'en' | 'ja';
-
-const resultsPath = path.resolve(
-  workspaceRootPath,
-  '../synstate-dom-benchmark/RESULTS.md',
-);
-
-const pages: readonly (readonly [Locale, string])[] = [
-  [
-    'en',
-    path.resolve(workspaceRootPath, 'src/content/docs/background/benchmark.md'),
-  ],
-  [
-    'ja',
-    path.resolve(
-      workspaceRootPath,
-      'src/content/docs/ja/background/benchmark.md',
-    ),
-  ],
-] as const;
-
-type Results = Readonly<{
-  userAgent: string;
-  runs: number;
-  operations: Table;
-  scenarios: Table;
-}>;
-
-/**
- * One of RESULTS.md's tables of medians. A scenario's median is `NaN` where the
- * library rendered the wrong figures, which RESULTS.md writes `wrong`.
- */
-type Table = Readonly<{
-  libraries: readonly string[];
-  rows: readonly Readonly<{
-    operation: string;
-    medians: readonly number[];
-  }>[];
-}>;
-
-/**
- * The library every ratio on the page is measured against, as RESULTS.md's own
- * second table does.
- */
-const subject = 'synstate-dom';
-
-/** The library the page's summary sentence compares {@link subject} with. */
-const reference = 'Solid';
+const pages: readonly (readonly [domResults.Locale, string])[] =
+  domResults.benchmarkPages.map(
+    (page) => [domResults.pageLocale(page), page] as const,
+  );
 
 const operationNamesJa: ReadonlyRecord<string, string> = {
   'create 1,000 rows': '1,000 行を作る',
@@ -133,150 +118,17 @@ const operationNamesJa: ReadonlyRecord<string, string> = {
   'zoom: zoom to the next level': 'ズーム：次の段階までズームする',
 } as const;
 
-/** What RESULTS.md writes in place of a time for the wrong figures. */
-const wrong = 'wrong';
-
-const cells = (line: string): readonly string[] =>
-  line
-    .replace(/^\|/u, '')
-    .replace(/\|$/u, '')
-    .split('|')
-    .map((cell) => cell.trim());
-
-/**
- * Reads the first table at or after line `from`. Where `wrongAllowed`, a
- * `wrong` cell is read as `NaN`; any other cell must be a positive number.
- */
-const parseTable = (
-  lines: readonly string[],
-  from: number,
-  wrongAllowed: boolean,
-): Result<Table, string> => {
-  const tableStart = lines.findIndex(
-    (line, i) => i >= from && line.startsWith('|'),
-  );
-
-  const tableEnd = lines.findIndex(
-    (line, i) => i > tableStart && !line.startsWith('|'),
-  );
-
-  const tableLines =
-    tableStart === -1
-      ? ([] as const)
-      : lines.slice(tableStart, tableEnd === -1 ? undefined : tableEnd);
-
-  const [header, _separator, ...body] = tableLines;
-
-  if (header === undefined || !Arr.isNonEmpty(body)) {
-    return Result.err('no result table was found');
-  }
-
-  const libraries = Arr.tail(cells(header));
-
-  const mut_rows: Table['rows'][number][] = [];
-
-  for (const line of body) {
-    const [operation, ...values] = cells(line);
-
-    const medians = values.map((value) =>
-      wrongAllowed && value === wrong
-        ? Number.NaN
-        : Result.unwrapOkOr(Num.safeParseFloat(value), Number.NaN),
-    );
-
-    if (
-      operation === undefined ||
-      medians.length !== libraries.length ||
-      medians.some(
-        (m, i) =>
-          !(Number.isFinite(m) && m > 0) &&
-          !(wrongAllowed && values[i] === wrong),
-      )
-    ) {
-      return Result.err(`a row could not be read: ${line}`);
-    }
-
-    mut_rows.push({ operation, medians });
-  }
-
-  return Result.ok({ libraries, rows: mut_rows });
-};
-
-const parseResults = (markdown: string): Result<Results, string> => {
-  const environment =
-    /Measured in `(?<userAgent>[^`]+)`\. Each figure is the median of (?<runs>\d+) runs of `pnpm run benchmark`/u.exec(
-      markdown,
-    );
-
-  const userAgent = environment?.groups?.['userAgent'];
-
-  const runs = environment?.groups?.['runs'];
-
-  if (userAgent === undefined || runs === undefined) {
-    return Result.err(
-      'the "Measured in …. Each figure is the median of N runs" sentence was not found; update parseResults to its new wording',
-    );
-  }
-
-  // The medians of the operations, the first table, and those of the scenarios,
-  // the first table after their heading. RESULTS.md's ratio tables are
-  // recomputed below, so that the Japanese page can head them in
-  // Japanese.
-  const lines = markdown.split('\n').map((line) => line.trim());
-
-  const operations = parseTable(lines, 0, false);
-
-  if (Result.isErr(operations)) {
-    return operations;
-  }
-
-  const scenariosHeading = lines.indexOf('## Scenarios');
-
-  if (scenariosHeading === -1) {
-    return Result.err('the "## Scenarios" section was not found');
-  }
-
-  const scenarios = parseTable(lines, scenariosHeading, true);
-
-  if (Result.isErr(scenarios)) {
-    return scenarios;
-  }
-
-  const { libraries } = operations.value;
-
-  if (
-    !libraries.includes(subject) ||
-    !libraries.includes(reference) ||
-    !scenarios.value.libraries.includes(subject)
-  ) {
-    return Result.err(
-      `a table has no "${subject}" column, or the first no "${reference}" column`,
-    );
-  }
-
-  return Result.ok({
-    userAgent,
-    runs: Result.unwrapOkOr(Num.safeParseFloat(runs), Number.NaN),
-    operations: operations.value,
-    scenarios: scenarios.value,
-  });
-};
-
-/** `parseResults` has already rejected a median that is not positive. */
-const ratioOf = (value: number, base: number): number =>
-  Num.isNonZero(base) ? Num.div(value, base) : Number.NaN;
-
 /** A dash where either time is missing (`wrong`). */
 const ratio = (value: number, base: number): string =>
   Number.isNaN(value) || Number.isNaN(base)
     ? '–'
-    : (`${ratioOf(value, base).toFixed(2)}×` as const);
+    : (`${domResults.ratioOf(value, base).toFixed(2)}×` as const);
 
 /** What each marker on a page is replaced with. */
 const render = (
-  results: Results,
-  locale: Locale,
-): ReadonlyRecord<string, Embedded> => {
+  results: domResults.Results,
+  locale: domResults.Locale,
+): ReadonlyRecord<string, markers.Embedded> => {
   const operationName = (operation: string): string => {
     if (locale === 'en') {
       return operation;
@@ -295,7 +147,7 @@ const render = (
 
   const wrongCell = locale === 'en' ? 'wrong' : '誤り';
 
-  const medians = (table: Table): string =>
+  const medians = (table: domResults.Table): string =>
     [
       `| ${locale === 'en' ? 'operation (median ms)' : '操作（中央値 ms）'} | ${table.libraries.join(' | ')} |`,
       `| :-- | ${table.libraries.map(() => '--:').join(' | ')} |`,
@@ -305,10 +157,12 @@ const render = (
       ),
     ].join('\n');
 
-  const ratios = (table: Table): string => {
-    const subjectIndex = table.libraries.indexOf(subject);
+  const ratios = (table: domResults.Table): string => {
+    const subjectIndex = table.libraries.indexOf(domResults.subject);
 
-    const others = table.libraries.filter((library) => library !== subject);
+    const others = table.libraries.filter(
+      (library) => library !== domResults.subject,
+    );
 
     return [
       `| ${locale === 'en' ? 'operation' : '操作'} | ${others.join(' | ')} |`,
@@ -327,13 +181,29 @@ const render = (
 
   const { operations } = results;
 
-  const subjectColumn = operations.libraries.indexOf(subject);
+  const subjectColumn = operations.libraries.indexOf(domResults.subject);
 
-  const referenceColumn = operations.libraries.indexOf(reference);
+  const referenceColumn = operations.libraries.indexOf(domResults.reference);
 
   const toReference = operations.rows.map(({ medians: ms }) =>
-    ratioOf(ms[subjectColumn] ?? Number.NaN, ms[referenceColumn] ?? Number.NaN),
+    domResults.ratioOf(
+      ms[subjectColumn] ?? Number.NaN,
+      ms[referenceColumn] ?? Number.NaN,
+    ),
   );
+
+  const cases = domResults.worstCases(operations);
+
+  const worstTable = [
+    locale === 'en'
+      ? '| library | slowest operation | × the fastest library |'
+      : '| ライブラリ | 最も遅い操作 | 最速のライブラリに対する倍率 |',
+    '| :-- | :-- | --: |',
+    ...cases.map(
+      ({ library, operation, overFastest }) =>
+        `| ${library} | ${operationName(operation)} | ${overFastest.toFixed(2)}× |`,
+    ),
+  ].join('\n');
 
   const environment =
     locale === 'en'
@@ -346,6 +216,8 @@ const render = (
     ratios: { text: ratios(operations), block: true },
     'scenario-medians': { text: medians(results.scenarios), block: true },
     'scenario-ratios': { text: ratios(results.scenarios), block: true },
+    'worst-cases': { text: worstTable, block: true },
+    ...domResults.placementFigures(operations, locale),
     'reference-min': {
       text: Math.min(...toReference).toFixed(2),
       block: false,

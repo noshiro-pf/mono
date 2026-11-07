@@ -1,6 +1,6 @@
 import { Card } from 'blueprint-synstate';
 import { map } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import {
   ageAt,
@@ -24,16 +24,16 @@ export const OverviewTab = (): JSX.Element => {
         <h2 class={constant('bp6-heading')}>{constant('判定')}</h2>
         <ul class={constant('checks')} data-e2e={constant('checks')}>
           {checkItems.map(({ label, pick }) => (
-            <li
-              class={{ ng: inlineMap(result$, (r) => pick(r) !== undefined) }}
-            >
-              {inlineMap(result$, (r) => {
-                const failed = pick(r);
+            <li class={{ ng: result$.pipe(map((r) => pick(r) !== undefined)) }}>
+              {result$.pipe(
+                map((r) => {
+                  const failed = pick(r);
 
-                return failed === undefined
-                  ? `OK: ${label}`
-                  : `NG: ${label}（${failureLabel(failed, r.birth)} から）`;
-              })}
+                  return failed === undefined
+                    ? `OK: ${label}`
+                    : `NG: ${label}（${failureLabel(failed, r.birth)} から）`;
+                }),
+              )}
             </li>
           ))}
         </ul>
