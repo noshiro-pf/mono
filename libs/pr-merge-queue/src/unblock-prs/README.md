@@ -401,7 +401,12 @@ pick も「3a」の rebase もしません。
     ほかの **failing** と同じく `checks-failed` で見送ります。解放済みの PR の
     チェックが再実行されている間は、他を解放しません（「in flight の PR が
     あれば、他を pick しない」）。`RUN_TIMEOUT_MS` のうちに終わらない run も
-    `checks-failed` で見送ります。
+    `checks-failed` で見送ります。ただし読んだレビューで判定できないとき
+    （`unknown`）は再実行せず held にして、所有者の承認後に人が手で再実行す
+    るのを待ちます。チェックは rename を新旧両方のパスで数えますが GraphQL の
+    変更ファイルは新しいパスしか持たず（rename を含む PR は変更ファイルを読
+    み切れていない扱いにします）、読めた分を超える変更ファイルやチーム所有者
+    の承認も判定できないので、再実行しても赤のまま回数を使い切るためです。
 
     triage が読む変更ファイルは rebase 前の head のもので、rebase で変わり得
     ます。所有者付きのパスを触った下の層の commit を抱えたままの stacked PR
@@ -1425,7 +1430,13 @@ merge-base` says whether the branch was built on the current tip of the
     `checks-failed` like any other **failing** one, as is one whose run has
     not finished within `RUN_TIMEOUT_MS`. While a released one's check runs
     again, nothing else is released (see "Pick nothing while one is in
-    flight").
+    flight"). One the review read cannot judge (`unknown`) is not re-run but
+    held, for a person to re-run by hand once an owner has approved: the
+    check counts a rename from both ends where GraphQL's changed files have
+    only the new path (so a pull request with a rename counts as one whose
+    files were not all read), and changed files past those read or a team
+    owner's approval cannot be told either, so a re-run would stay red until
+    the re-runs ran out.
 
     The changed files triage reads are the head before the rebase, and a
     rebase can change them: a stacked pull request still carrying the commit

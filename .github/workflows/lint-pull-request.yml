@@ -310,9 +310,12 @@ jobs:
           }
 
           # One line per changed file: its name, then a tab and its old name if
-          # it was renamed.
+          # it was renamed. `@tsv` escapes a tab, a newline or a backslash in a
+          # name, so that a line is exactly one file and the count below cannot
+          # be padded by a name holding newlines. An escaped name still matches
+          # what it did: no pattern this reads holds any of the three.
           gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/files?per_page=100" \
-            --jq '.[] | [.filename, (.previous_filename // empty)] | join("\t")' >changed-files.txt
+            --jq '.[] | [.filename, (.previous_filename // empty)] | @tsv' >changed-files.txt
 
           # The endpoint lists at most 3,000 files. Fewer than the pull request
           # changed would leave the rest unread, so that fails rather than

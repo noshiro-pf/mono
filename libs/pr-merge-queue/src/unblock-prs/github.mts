@@ -8,6 +8,7 @@
 
 import {
   isSafeRefName,
+  namesEveryChangedPath,
   parseClaimComment,
   parseSetAsideComment,
   readBranchRequirements,
@@ -228,7 +229,7 @@ export const readBranchRules = async (
  * three places GitHub looks that this repository uses.
  *
  * Every number goes in as a variable, and each pull request comes back under
- * its own alias.
+ * its own alias. With no numbers it reads the file alone.
  */
 export const readReviewStates = async (
   api: ApiContext,
@@ -252,16 +253,21 @@ export const readReviewStates = async (
     ),
     '  }',
     '}',
-    'fragment ReviewState on PullRequest {',
-    '  author { login }',
-    '  headRefOid',
-    '  latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
-    `  files(first: ${PAGE_SIZE}) { pageInfo { hasNextPage } nodes { path } }`,
-    // A pull request with more conversations than one page is counted from the
-    // first page. Undercounting only ever holds less, and holding less is what
-    // happened before this was read at all.
-    `  reviewThreads(first: ${PAGE_SIZE}) { nodes { isResolved } }`,
-    '}',
+    // GraphQL refuses a fragment nothing spreads.
+    ...(Arr.isNonEmpty(numbers)
+      ? ([
+          'fragment ReviewState on PullRequest {',
+          '  author { login }',
+          '  headRefOid',
+          '  latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
+          `  files(first: ${PAGE_SIZE}) { pageInfo { hasNextPage } nodes { path changeType } }`,
+          // A pull request with more conversations than one page is counted
+          // from the first page. Undercounting only ever holds less, and
+          // holding less is what happened before this was read at all.
+          `  reviewThreads(first: ${PAGE_SIZE}) { nodes { isResolved } }`,
+          '}',
+        ] as const)
+      : ([] as const)),
   ].join('\n');
 
   const answered = await askRepositoryOf(
@@ -1009,7 +1015,7 @@ const ReviewStateNodeSchema = t.record({
   }),
   files: t.record({
     pageInfo: t.record({ hasNextPage: t.boolean() }),
-    nodes: t.array(t.record({ path: t.string() })),
+    nodes: t.array(t.record({ path: t.string(), changeType: t.string() })),
   }),
   reviewThreads: t.record({
     nodes: t.array(t.record({ isResolved: t.boolean() })),
@@ -1030,7 +1036,9 @@ const reviewStateOf = (
       }
     }),
     files: node.files.nodes.map(({ path }) => path),
-    filesComplete: !node.files.pageInfo.hasNextPage,
+    filesComplete:
+      !node.files.pageInfo.hasNextPage &&
+      namesEveryChangedPath(node.files.nodes),
     unresolvedConversations: node.reviewThreads.nodes.filter(
       ({ isResolved }) => !isResolved,
     ).length,

@@ -29,7 +29,7 @@ import {
 } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
 import { outOfSyncVerdict } from './out-of-sync.mjs';
-import { resolveByRegenerating } from './regenerate.mjs';
+import { resolveByRegenerating, type Regeneration } from './regenerate.mjs';
 import { describeCommandFailure } from './set-aside-detail.mjs';
 import { withSkip } from './skips.mjs';
 import {
@@ -79,7 +79,7 @@ type RebaseTarget = Readonly<{
    * How a conflict only in generated files is resolved (`regenerate.mts`);
    * every conflict is set aside when `undefined`.
    */
-  regenerate: RegenerateConfig | undefined;
+  regenerate: Regeneration | undefined;
 }>;
 
 /**
@@ -205,7 +205,7 @@ export const advance = async (
       merged === undefined
         ? undefined
         : { sha: merged.headSha, required: false, number: merged.number },
-    regenerate: plan.regenerate,
+    regenerate: regenerationOf(plan.regenerate, defaultBranch),
   });
 
   if (Result.isErr(rebased)) {
@@ -384,7 +384,9 @@ export const restackBehind = async (
       upstream: undefined,
       // Only once the author has queued it: generating means running the
       // branch's own install and scripts, as the auto-fix does.
-      regenerate: isMergeQueued(pr) ? context.regenerate : undefined,
+      regenerate: isMergeQueued(pr)
+        ? regenerationOf(context.regenerate, defaultBranch)
+        : undefined,
     });
 
     if (Result.isErr(rebased)) {
@@ -607,6 +609,18 @@ export const armOnPick = async (
 
   return Result.ok('armed');
 };
+
+/**
+ * What a rebase regenerates with: `config`, with what it writes judged by the
+ * default branch's `CODEOWNERS`, the copy a merge is judged by.
+ */
+const regenerationOf = (
+  config: RegenerateConfig | undefined,
+  defaultBranch: string,
+): Regeneration | undefined =>
+  config === undefined
+    ? undefined
+    : ({ config, codeOwnersAt: `origin/${defaultBranch}` } as const);
 
 /**
  * The part that happens inside the worktree, so that removing it afterwards is

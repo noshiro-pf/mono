@@ -93,6 +93,73 @@ describe('the code-owners job of lint-pull-request.yml', () => {
     );
   });
 
+  // GraphQL's `files` has only the new name, so `unblock-prs` counts a pull
+  // request with a rename as one whose files it has not all read, and holds the
+  // red check rather than re-running it (`reviewStateOf` in
+  // `unblock-prs/github.mts`, `codeOwnersClassification` in `triage.mts`).
+  test('counts a rename from both ends', async () => {
+    const ran = await runJob({
+      codeOwners,
+      files: [
+        {
+          filename: 'libs/a/release.yml',
+          previous_filename: '.github/workflows/release.yml',
+        },
+      ],
+      author: 'bot',
+      approvers: [],
+    });
+
+    assert.isFalse(ran.passed);
+
+    assert.include(ran.output, '.github/workflows/release.yml (@owner)');
+  });
+
+  // Counted by lines, a name holding a newline would make two files read as
+  // three and cover for one past the endpoint's cap.
+  test('counts a name holding a newline as one file', async () => {
+    const ran = await runJob({
+      codeOwners,
+      files: ['libs/a\nb.mts', 'libs/c.mts'],
+      changedFiles: 3,
+      author: 'bot',
+      approvers: [],
+    });
+
+    assert.isFalse(ran.passed);
+
+    assert.include(ran.output, 'the API listed 2');
+  });
+
+  // A deleted account's review has no user; it approves nobody's path.
+  test('reads a review whose reviewer is gone', async () => {
+    const ran = await runJob({
+      codeOwners,
+      files: ['.github/workflows/release.yml'],
+      author: 'bot',
+      approvers: [],
+      reviews: [
+        { user: null, state: 'APPROVED' },
+        { user: { login: 'owner' }, state: 'APPROVED' },
+      ],
+    });
+
+    assert.deepStrictEqual(
+      { passed: ran.passed, output: ran.output },
+      { passed: true, output: ran.output },
+    );
+
+    const alone = await runJob({
+      codeOwners,
+      files: ['.github/workflows/release.yml'],
+      author: 'bot',
+      approvers: [],
+      reviews: [{ user: null, state: 'APPROVED' }],
+    });
+
+    assert.isFalse(alone.passed);
+  });
+
   test('fails on a line it cannot read', async () => {
     const ran = await runJob({
       codeOwners: '/docs/ @owner\n*.md @owner\n',
@@ -151,17 +218,30 @@ const writeText = async (
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   fs.writeFile(path.join(dir, name), text, { mode });
 
-/** Runs the job's script with `gh` answered from these, in a temp directory. */
+/**
+ * Runs the job's script with `gh` answered from these, in a temp directory.
+ * `changedFiles` is the event's count, `files.length` unless given; `reviews`
+ * replaces the approvals `approvers` makes.
+ */
 const runJob = async ({
   codeOwners,
   files,
+  changedFiles = files.length,
   author,
   approvers,
+  reviews = approvers.map((login) => ({ user: { login }, state: 'APPROVED' })),
 }: Readonly<{
   codeOwners: string;
-  files: readonly string[];
+  files: readonly (
+    string | Readonly<{ filename: string; previous_filename: string }>
+  )[];
+  changedFiles?: number;
   author: string;
   approvers: readonly string[];
+  reviews?: readonly Readonly<{
+    user: Readonly<{ login: string }> | null;
+    state: string;
+  }>[];
 }>): Promise<Readonly<{ passed: boolean; output: string }>> => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'code-owners-job-'));
 
@@ -171,16 +251,12 @@ const runJob = async ({
     await writeText(
       dir,
       'files.json',
-      JSON.stringify(files.map((filename) => ({ filename }))),
-    );
-
-    await writeText(
-      dir,
-      'reviews.json',
       JSON.stringify(
-        approvers.map((login) => ({ user: { login }, state: 'APPROVED' })),
+        files.map((file) => (isString(file) ? { filename: file } : file)),
       ),
     );
+
+    await writeText(dir, 'reviews.json', JSON.stringify(reviews));
 
     await writeText(dir, 'gh', FAKE_GH, 0o755);
 
@@ -196,7 +272,7 @@ const runJob = async ({
           PR_NUMBER: '1',
           AUTHOR: author,
           BASE_SHA: 'base',
-          CHANGED_FILES: files.length.toString(),
+          CHANGED_FILES: changedFiles.toString(),
           GITHUB_REPOSITORY: 'owner/repo',
           GITHUB_STEP_SUMMARY: path.join(dir, 'summary.md'),
         },

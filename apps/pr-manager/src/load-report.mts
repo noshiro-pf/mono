@@ -24,6 +24,7 @@ import {
   codeOwnerReview,
   codeOwnersEnforcedBy,
   epochMsOf,
+  namesEveryChangedPath,
   parseCodeOwners,
   parseMergeAfter,
   parseSetAsideComment,
@@ -732,7 +733,12 @@ type DetailsState = Readonly<{
   files: readonly string[];
   /** Where the next page of changed files starts, if it is wanted. */
   filesAfter: string | undefined;
-  /** Whether the files were read to the end. */
+  /**
+   * Whether the pages read so far name every path they change: a rename's old
+   * one they do not (`namesEveryChangedPath`).
+   */
+  everyPathNamed: boolean;
+  /** Whether the files were read to the end, and name every changed path. */
   filesComplete: boolean;
 }>;
 
@@ -1136,11 +1142,15 @@ const applyFiles = (
 
   const filesAfter = nextCursor(files.pageInfo);
 
+  const everyPathNamed =
+    state.everyPathNamed && namesEveryChangedPath(files.nodes);
+
   return Result.ok({
     ...state,
     files: [...state.files, ...files.nodes.map(({ path }) => path)],
     filesAfter,
-    filesComplete: filesAfter === undefined,
+    everyPathNamed,
+    filesComplete: filesAfter === undefined && everyPathNamed,
   });
 };
 
@@ -1325,7 +1335,9 @@ const readDetails = async (
 
   const { result: ruled } = await rules;
 
-  // The pull requests' read only when the rules alone do not decide it.
+  // The pull requests' read only when the rules alone do not decide it. That
+  // costs no wait of its own: `CODEOWNERS` comes with the pull requests' read,
+  // and the rules are asked for only once it has named the default branch.
   const wantFiles =
     Result.isOk(ruled) &&
     (ruled.value.requireCodeOwnerReview ||
@@ -1333,13 +1345,18 @@ const readDetails = async (
 
   const followedUp = await followUpRounds({
     operationName: 'MoreFiles',
-    states: openNodesOf(answered.result.value).map((node): DetailsState => ({
-      number: node.number,
-      node,
-      files: node.files.nodes.map(({ path }) => path),
-      filesAfter: wantFiles ? nextCursor(node.files.pageInfo) : undefined,
-      filesComplete: !node.files.pageInfo.hasNextPage,
-    })),
+    states: openNodesOf(answered.result.value).map((node): DetailsState => {
+      const everyPathNamed = namesEveryChangedPath(node.files.nodes);
+
+      return {
+        number: node.number,
+        node,
+        files: node.files.nodes.map(({ path }) => path),
+        filesAfter: wantFiles ? nextCursor(node.files.pageInfo) : undefined,
+        everyPathNamed,
+        filesComplete: !node.files.pageInfo.hasNextPage && everyPathNamed,
+      };
+    }),
     followUpsOf: ({ number, filesAfter }) =>
       filesAfter === undefined
         ? []

@@ -47,7 +47,9 @@ export const parseCodeOwners = (text: string): readonly CodeOwnersRule[] =>
 
 /**
  * The required check a `CODEOWNERS` file says enforces it, from a comment line
- * `# enforced-by: <context>`; `undefined` when it names none.
+ * `# enforced-by: <context>` in the file's head — the comments before its first
+ * rule — or `undefined` when the head names none. A comment further down
+ * explains a rule and declares nothing.
  *
  * A ruleset's `require_code_owner_review` cannot tell an author from anyone
  * else, and GitHub does not let an author approve their own pull request, so a
@@ -57,11 +59,15 @@ export const parseCodeOwners = (text: string): readonly CodeOwnersRule[] =>
  * says so, in the file the check reads. It is believed only where the ruleset
  * really requires that check ({@link codeOwnerGate}).
  */
-export const codeOwnersEnforcedBy = (text: string): string | undefined =>
-  text
-    .split('\n')
+export const codeOwnersEnforcedBy = (text: string): string | undefined => {
+  const lines = text.split('\n');
+
+  const firstRule = lines.findIndex((line) => stripComment(line).trim() !== '');
+
+  return (firstRule === -1 ? lines : lines.slice(0, firstRule))
     .map(enforcedByOfLine)
     .find((context) => context !== undefined);
+};
 
 /**
  * What enforces code-owner review on the default branch: the ruleset's own
@@ -82,6 +88,20 @@ export const codeOwnerGate = (
         requirements.requiredContexts.includes(enforcedBy)
       ? 'check'
       : undefined;
+
+/**
+ * Whether GraphQL's changed files name every path a pull request changes, as
+ * far as `nodes` go: a renamed or copied file's old path is a changed path too
+ * — REST's `previous_filename`, which a check that enforces `CODEOWNERS` counts
+ * — and `files` names only the new one. A reader passes `false` for
+ * `filesComplete` where this is.
+ */
+export const namesEveryChangedPath = (
+  nodes: readonly Readonly<{ changeType: string }>[],
+): boolean =>
+  nodes.every(
+    ({ changeType }) => changeType !== 'RENAMED' && changeType !== 'COPIED',
+  );
 
 /**
  * The owners of one path: those of the **last** pattern that matches it, which
@@ -180,7 +200,22 @@ export const codeOwnerReview = ({
     };
   }
 
-  if (!filesComplete) {
+  // A path past those read waits only on a rule nobody has satisfied, so where
+  // every rule is satisfied already the unread paths change nothing.
+  if (
+    !filesComplete &&
+    rules.some(
+      ({ owners }) =>
+        Arr.isNonEmpty(owners) &&
+        owners.every(
+          (owner) =>
+            !(
+              (!isTeam(owner) && approved.has(owner.toLowerCase())) ||
+              (authorApproves && owner.toLowerCase() === authorLogin)
+            ),
+        ),
+    )
+  ) {
     return { state: 'unknown' };
   }
 

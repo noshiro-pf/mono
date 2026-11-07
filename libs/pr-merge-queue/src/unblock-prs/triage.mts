@@ -3,6 +3,7 @@
 import {
   asksReview,
   codeOwnerGate,
+  codeOwnerReviewOf,
   codeOwnersEnforcedBy,
   MERGE_QUEUED_LABEL,
   orderCandidates as orderQueueCandidates,
@@ -15,6 +16,7 @@ import {
   SKIP_CI_LABEL,
   stackDescendants,
   withReviewHold,
+  type CodeOwnerReview,
   type QueueFacts,
   type QueueOwner,
   type QueueReads,
@@ -232,15 +234,20 @@ export const triage = async (
     sorted.map(async (pr) => ({ pr, ...(await settle(api, pr, context)) })),
   );
 
-  // A failing one too: where a required check enforces `CODEOWNERS`, the check
-  // is red until an owner approves, and its review says which.
-  const { holds, codeOwnersCheck } = await readReviewHolds(
+  // A failing one too, but only where a required check enforces `CODEOWNERS`:
+  // the check is red until an owner approves, and its review says which.
+  const { holds, codeOwnerStates, codeOwnersCheck } = await readReviewHolds(
     api,
-    beforeReview.filter(
-      ({ pr, standing }) =>
-        asksReview(standing, pr.mergeStateStatus) ||
-        standing.kind === 'failing',
-    ),
+    beforeReview
+      .filter(({ pr, standing }) => asksReview(standing, pr.mergeStateStatus))
+      .map(({ pr }) => pr.number),
+    // Only one red context can be that check alone (`codeOwnersClassification`).
+    beforeReview
+      .filter(
+        ({ standing, summary }) =>
+          standing.kind === 'failing' && summary?.failed.length === 1,
+      )
+      .map(({ pr }) => pr.number),
     context,
   );
 
@@ -251,7 +258,7 @@ export const triage = async (
       codeOwnersClassification(
         summary,
         codeOwnersCheck,
-        holds.get(pr.number),
+        reviewOf(pr.number, holds, codeOwnerStates),
       ) ??
       classification(
         pr,
@@ -550,7 +557,7 @@ export const readBypassAt = async (
  * bypass, and is what the watch's green-but-not-merging budget is for.
  */
 export const bypassOfRead = (
-  read: ReviewRead | undefined,
+  read: HoldRead | undefined,
   head: string,
 ): Readonly<{ reason: string | undefined }> | undefined => {
   const hold = holdOfRead(read, head);
@@ -599,7 +606,7 @@ export type HoldUnread = Readonly<{ otherHead: boolean; message: string }>;
  * head is not an answer, since its files are not this one's.
  */
 export const holdOfRead = (
-  read: ReviewRead | undefined,
+  read: HoldRead | undefined,
   head: string,
 ): Result<ReviewHold | undefined, string> =>
   read === undefined
@@ -617,11 +624,23 @@ export const holdOfRead = (
  * waiting for an owner's approval, it is held by its review, as under the
  * ruleset's own rule. Approved since, it is re-run: no event the check takes
  * carries a review, so it stays red over an approval until it runs again.
+ *
+ * Not one the read cannot judge (`unknown`): the check counts a renamed path
+ * from both ends where the read's file list names only the new one, reads every
+ * changed file where the read may stop short, and cannot tell a team owner's
+ * approval either. Each time the check fails closed, so it would fail again on
+ * each re-run until the re-runs ran out and it was set aside as if broken. It
+ * is held instead, for a person to re-run by hand once an owner has approved.
  */
 export const codeOwnersClassification = (
   summary: ChecksSummary | undefined,
   codeOwnersCheck: string | undefined,
-  hold: ReviewHold | undefined,
+  review:
+    | Readonly<{
+        hold: ReviewHold | undefined;
+        codeOwners: CodeOwnerReview['state'];
+      }>
+    | undefined,
 ): Classification | undefined => {
   if (
     summary === undefined ||
@@ -632,8 +651,15 @@ export const codeOwnersClassification = (
     return undefined;
   }
 
-  if (hold?.kind === 'held') {
-    return { kind: 'held', reason: hold.reason };
+  if (review?.hold?.kind === 'held') {
+    return { kind: 'held', reason: review.hold.reason };
+  }
+
+  if (review?.codeOwners === 'unknown') {
+    return {
+      kind: 'held',
+      reason: `\`${codeOwnersCheck}\` failed, and whether an owner has approved what it holds cannot be told from what was read (a renamed path, changed files past those read, or a team owner): re-run it by hand once one has`,
+    };
   }
 
   const failed = summary.failedRuns.find(
@@ -644,6 +670,25 @@ export const codeOwnersClassification = (
     ? undefined
     : { kind: 'rerun', link: failed.link, summary };
 };
+
+/**
+ * Which `failing` pull requests {@link readReviews} reads besides `numbers`:
+ * none under the ruleset's own rule, or where the ruleset requires no check,
+ * since only a required check enforcing `CODEOWNERS` makes a failing one's
+ * review worth reading (`codeOwnerGate`).
+ */
+export const failingReviewsToRead = (
+  requirements: StrictPick<
+    RulesetRequirements,
+    'requireCodeOwnerReview' | 'requiredContexts'
+  >,
+  numbers: readonly number[],
+  failing: readonly number[],
+): readonly number[] =>
+  requirements.requireCodeOwnerReview ||
+  !Arr.isNonEmpty(requirements.requiredContexts)
+    ? ([] as const)
+    : failing.filter((prNumber) => !numbers.includes(prNumber));
 
 /**
  * What the rules on the default branch require, as GitHub applies them.
@@ -885,14 +930,21 @@ const classification = (
 };
 
 /**
- * Each pull request's {@link ReviewRead}, by number, in one request, and the
- * required check that enforces `CODEOWNERS` if one does; empty, and nothing
- * asked, when the ruleset asks no review and requires no check.
+ * Each pull request's {@link ReviewRead}, by number, and the required check
+ * that enforces `CODEOWNERS` if one does; empty, and nothing asked, when the
+ * ruleset asks no review and requires no check.
+ *
+ * `numbers` and `CODEOWNERS` are read in one request. `failing` are read only
+ * where that file names a required check that enforces it, which is all a
+ * failing pull request's review is read for, in a second request — so a survey
+ * with nothing failing, or a repository whose file names no check, pays for
+ * one.
  */
 const readReviews = async (
   api: ApiContext,
   numbers: readonly number[],
   context: ReviewContext,
+  failing: readonly number[] = [],
 ): Promise<Result<Reviews, string>> => {
   const {
     requireCodeOwnerReview,
@@ -900,10 +952,16 @@ const readReviews = async (
     requiredContexts,
   } = context.reviewRequirements;
 
+  const failingToRead = failingReviewsToRead(
+    context.reviewRequirements,
+    numbers,
+    failing,
+  );
+
   // A required check may enforce `CODEOWNERS` in the ruleset's place, which
   // only the file can say, so any required check is reason enough to read it.
   if (
-    !Arr.isNonEmpty(numbers) ||
+    (!Arr.isNonEmpty(numbers) && !Arr.isNonEmpty(failingToRead)) ||
     (!requireCodeOwnerReview &&
       !requireConversationResolution &&
       !Arr.isNonEmpty(requiredContexts))
@@ -927,9 +985,23 @@ const readReviews = async (
     enforcedBy,
   );
 
+  const failingRead =
+    gate === 'check' && Arr.isNonEmpty(failingToRead)
+      ? await readReviewStates(api, failingToRead, context.defaultBranch)
+      : undefined;
+
+  // What the first request read stands; the failing pull requests go unread,
+  // which `codeOwnersClassification` treats as before they were read at all.
+  if (failingRead !== undefined && Result.isErr(failingRead)) {
+    log(
+      `Cannot read the failing pull requests' reviews; re-running their code-owner check as if unread. (${lastLines(failingRead.value, 2)})`,
+    );
+  }
+
   const rules = {
     requireCodeOwnerReview,
     requireConversationResolution,
+    // The first request's copy judges both, so that one survey reads one file.
     codeOwners:
       read.value.codeOwners === undefined
         ? ([] as const)
@@ -939,14 +1011,23 @@ const readReviews = async (
 
   return Result.ok({
     reads: new Map(
-      Array.from(
-        read.value.states,
-        ([prNumber, state]) =>
-          [
-            prNumber,
-            { head: state.head, hold: reviewHold(state, rules) },
-          ] as const,
-      ),
+      [
+        ...Array.from(read.value.states),
+        ...(failingRead !== undefined && Result.isOk(failingRead)
+          ? Array.from(failingRead.value.states)
+          : []),
+      ].map(([prNumber, state]) => {
+        const codeOwners = codeOwnerReviewOf(state, rules);
+
+        return [
+          prNumber,
+          {
+            head: state.head,
+            hold: reviewHold(state, rules, codeOwners),
+            codeOwners: codeOwners.state,
+          },
+        ] as const;
+      }),
     ),
     codeOwnersCheck: gate === 'check' ? enforcedBy : undefined,
   });
@@ -968,24 +1049,25 @@ const NO_REVIEWS: Reviews = {
  * What each pull request's review does to it, by number, for those it does
  * anything to — `review-hold.mts` in `pr-report-core` says what is asked and
  * why — and the required check that enforces `CODEOWNERS`, if one does. One
- * request covers all of them. A request that fails holds nothing and names no
- * such check, which is how this script behaved before it asked.
+ * request covers `numbers`, and a second the `failing` ones where that check
+ * makes them worth reading ({@link readReviews}). A first request that fails
+ * holds nothing and names no such check, which is how this script behaved
+ * before it asked; a second that fails leaves only the failing ones unread.
  */
 const readReviewHolds = async (
   api: ApiContext,
-  entries: readonly Readonly<{ pr: PullRequest }>[],
+  numbers: readonly number[],
+  failing: readonly number[],
   context: ReviewContext,
 ): Promise<
   Readonly<{
     holds: ReadonlyMap<number, ReviewHold>;
+    /** Where each pull request read stands with the code owners. */
+    codeOwnerStates: ReadonlyMap<number, CodeOwnerReview['state']>;
     codeOwnersCheck: string | undefined;
   }>
 > => {
-  const read = await readReviews(
-    api,
-    entries.map(({ pr }) => pr.number),
-    context,
-  );
+  const read = await readReviews(api, numbers, context, failing);
 
   if (Result.isErr(read)) {
     log(
@@ -994,6 +1076,7 @@ const readReviewHolds = async (
 
     return {
       holds: new Map<number, ReviewHold>(),
+      codeOwnerStates: new Map<number, CodeOwnerReview['state']>(),
       codeOwnersCheck: undefined,
     };
   }
@@ -1008,8 +1091,27 @@ const readReviewHolds = async (
         }
       }),
     ),
+    codeOwnerStates: new Map(
+      Array.from(
+        read.value.reads,
+        ([prNumber, { codeOwners }]) => [prNumber, codeOwners] as const,
+      ),
+    ),
     codeOwnersCheck: read.value.codeOwnersCheck,
   };
+};
+
+/** One pull request's part of {@link readReviewHolds}, if it was read. */
+const reviewOf = (
+  prNumber: number,
+  holds: ReadonlyMap<number, ReviewHold>,
+  codeOwnerStates: ReadonlyMap<number, CodeOwnerReview['state']>,
+): Parameters<typeof codeOwnersClassification>[2] => {
+  const codeOwners = codeOwnerStates.get(prNumber);
+
+  return codeOwners === undefined
+    ? undefined
+    : { hold: holds.get(prNumber), codeOwners };
 };
 
 /** What the ruleset asks of a review, and where `CODEOWNERS` is read from. */
@@ -1019,7 +1121,10 @@ export type ReviewContext = StrictPick<
 >;
 
 /** One pull request's review hold, and the head GitHub read it at. */
-type ReviewRead = Readonly<{ head: string; hold: ReviewHold | undefined }>;
+type HoldRead = Readonly<{ head: string; hold: ReviewHold | undefined }>;
+
+/** A {@link HoldRead}, and where the pull request stands with the owners. */
+type ReviewRead = HoldRead & Readonly<{ codeOwners: CodeOwnerReview['state'] }>;
 
 /**
  * Whether GitHub says merging this pull request into the base conflicts. It is
