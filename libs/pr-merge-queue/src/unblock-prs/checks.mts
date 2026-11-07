@@ -6,14 +6,22 @@
 import {
   combineContextStates,
   epochMsOf,
+  isOfEarlierAttempt,
   outranks,
+  readWorkflowRound,
   summarizeChecks as summarizeContexts,
   type CheckRunRank,
   type ContextState,
+  type WorkflowRound,
 } from 'pr-report-core';
 import { Arr, Num, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { graphqlQuery, type ApiContext } from '../lib/index.mjs';
+import {
+  currentEpochMs,
+  graphqlQuery,
+  rest,
+  type ApiContext,
+} from '../lib/index.mjs';
 import type { ChecksSummary } from './types.mjs';
 
 /**
@@ -38,11 +46,12 @@ export type ReportedCheck = Readonly<{
   /** The workflow the job belongs to; empty for a commit status. */
   workflow: string;
   /**
-   * Whether a job of the check run's own workflow run was re-run after it was
-   * created, and the workflow run has not finished: "Re-run failed jobs" queues
-   * the failed jobs again, and the aggregate that needs them gets a new run only
-   * once they are done, so until then the aggregate's red is the attempt
-   * before's. Always `false` for a commit status.
+   * Whether the check run is of an attempt of its workflow run before the one
+   * still going (`pr-report-core`'s `isOfEarlierAttempt`): "Re-run failed jobs"
+   * queues the failed jobs again, and the aggregate that needs them gets a new
+   * run only once they are done, so until then the aggregate's red is the
+   * attempt before's. Always `false` for a commit status, and wherever the
+   * workflow runs were not read.
    */
   reRunAfter: boolean;
 }>;
@@ -72,8 +81,35 @@ export type RunningCheck = Readonly<{
 export const readHeadChecks = async (
   api: ApiContext,
   prNumber: number,
-): Promise<Result<HeadChecks, string>> =>
-  Result.map(await readCheckContexts(api, prNumber), headChecksOf);
+): Promise<Result<HeadChecks, string>> => {
+  const read = await readCheckContexts(api, prNumber);
+
+  if (Result.isErr(read)) {
+    return read;
+  }
+
+  const contexts = read.value;
+
+  const plain = headChecksOf(contexts);
+
+  // Only a red can be one a re-run will replace, so only a red costs a read:
+  // one of each workflow run a required red is a job of.
+  const runIds = Arr.uniq(
+    plain.required
+      .filter(isFailure)
+      .map(({ link }) => workflowRunId(link))
+      .filter((id) => id !== undefined),
+  );
+
+  if (!Arr.isNonEmpty(runIds)) {
+    return Result.ok(plain);
+  }
+
+  const rounds = await readRedRounds(api, runIds);
+
+  // Failed as the rollup read would: a poll error, not a red let through.
+  return Result.map(rounds, (read_) => headChecksOf(contexts, read_));
+};
 
 /**
  * Whether GitHub answers a check rollup read at all, asked of `sha` — the tip
@@ -95,11 +131,16 @@ export const probeCheckReads = async (
     () => undefined,
   );
 
-/** The two lists of {@link HeadChecks}, from the contexts of one read. */
+/**
+ * The two lists of {@link HeadChecks}, from the contexts of one read and the
+ * workflow runs on the commit, read at `nowMs`.
+ */
 export const headChecksOf = (
   contexts: readonly CheckContextNode[],
+  rounds: ReadonlyMap<number, WorkflowRound> = NO_ROUNDS,
+  nowMs: number = currentEpochMs(),
 ): HeadChecks => {
-  const latest = latestChecksOf(contexts);
+  const latest = latestChecksOf(contexts, rounds, nowMs);
 
   return {
     required: latest
@@ -134,13 +175,12 @@ export const headChecksOf = (
 export const reportedChecksOf = (
   contexts: readonly CheckContextNode[],
   which: 'all' | 'required',
+  rounds: ReadonlyMap<number, WorkflowRound> = NO_ROUNDS,
+  nowMs: number = currentEpochMs(),
 ): readonly ReportedCheck[] =>
-  latestChecksOf(contexts)
+  latestChecksOf(contexts, rounds, nowMs)
     .filter(([context]) => which === 'all' || context.isRequired)
     .map(([, check]) => check);
-
-/** A context of the head commit's status check rollup, as read. */
-export type CheckContextNode = t.TypeOf<typeof CheckContextNodeSchema>;
 
 /**
  * `checks` and `running` are what {@link readHeadChecks} read of the head
@@ -250,6 +290,18 @@ export const describeWaitingOn = (summary: ChecksSummary): string => {
   return Arr.isNonEmpty(waiting) ? waiting.join(', ') : 'checks to be reported';
 };
 
+/** The run id in a job's link (`…/actions/runs/<id>/job/<id>`). */
+export const workflowRunId = (link: string): number | undefined => {
+  const id = /\/actions\/runs\/(\d+)\//u.exec(link)?.[1];
+
+  return id === undefined
+    ? undefined
+    : Result.unwrapOkOr(Num.safeParseInt(id), undefined);
+};
+
+/** A context of the head commit's status check rollup, as read. */
+export type CheckContextNode = t.TypeOf<typeof CheckContextNodeSchema>;
+
 /** What {@link readHeadChecks} reads. */
 export type HeadChecks = Readonly<{
   /**
@@ -272,13 +324,36 @@ export type HeadChecks = Readonly<{
   running: readonly RunningCheck[];
 }>;
 
-/** The run id in a job's link (`…/actions/runs/<id>/job/<id>`). */
-export const workflowRunId = (link: string): number | undefined => {
-  const id = /\/actions\/runs\/(\d+)\//u.exec(link)?.[1];
+/**
+ * The workflow runs `runIds` by check suite (`pr-report-core`'s
+ * `readWorkflowRound`), the REST answer that says a re-run is going on, or why
+ * one could not be read.
+ */
+const readRedRounds = async (
+  api: ApiContext,
+  runIds: readonly number[],
+): Promise<Result<ReadonlyMap<number, WorkflowRound>, string>> => {
+  const reads = await Promise.all(
+    runIds.map((runId) =>
+      readWorkflowRound(runId, async (path, schema) =>
+        rest(api, 'GET', path, schema),
+      ),
+    ),
+  );
 
-  return id === undefined
-    ? undefined
-    : Result.unwrapOkOr(Num.safeParseInt(id), undefined);
+  const mut_rounds = new Map<number, WorkflowRound>();
+
+  for (const read of reads) {
+    if (Result.isErr(read)) {
+      return Result.err(
+        `could not read the workflow run of a red: ${read.value}`,
+      );
+    }
+
+    mut_rounds.set(...read.value);
+  }
+
+  return Result.ok(mut_rounds);
 };
 
 /**
@@ -590,46 +665,6 @@ const supersedes = (
     : kept.__typename === 'CheckRun' && outranks(rankOf(context), rankOf(kept));
 
 /**
- * Of each unfinished check suite that has a re-run in it — a job with an
- * earlier run in the same suite — the greatest id of such a re-run.
- */
-const latestReRunBySuite = (
-  contexts: readonly CheckContextNode[],
-): ReadonlyMap<number, number> => {
-  const mut_firstIdByJob = new Map<string, number>();
-
-  const mut_latestReRun = new Map<number, number>();
-
-  const runs = contexts.filter(
-    (context): context is CheckRunNode =>
-      context.__typename === 'CheckRun' &&
-      context.checkSuite !== null &&
-      context.checkSuite.status !== 'COMPLETED',
-  );
-
-  for (const run of runs) {
-    const { checkSuiteId, id } = rankOf(run);
-
-    const job = `${checkSuiteId}:${run.name}` as const;
-
-    mut_firstIdByJob.set(job, Math.min(id, mut_firstIdByJob.get(job) ?? id));
-  }
-
-  for (const run of runs) {
-    const { checkSuiteId, id } = rankOf(run);
-
-    if (id > (mut_firstIdByJob.get(`${checkSuiteId}:${run.name}`) ?? id)) {
-      mut_latestReRun.set(
-        checkSuiteId,
-        Math.max(id, mut_latestReRun.get(checkSuiteId) ?? id),
-      );
-    }
-  }
-
-  return mut_latestReRun;
-};
-
-/**
  * Of the runs of each {@link keyOf}, the latest, in the order GitHub listed
  * them.
  */
@@ -685,16 +720,21 @@ const bucketOf = (state: string): string => {
 /** {@link ReportedCheck}'s `reRunAfter`, of a check run. */
 const isBeforeReRun = (
   run: CheckRunNode,
-  latestReRun: ReadonlyMap<number, number>,
-): boolean => {
-  const { checkSuiteId, id } = rankOf(run);
-
-  return (latestReRun.get(checkSuiteId) ?? 0) > id;
-};
+  rounds: ReadonlyMap<number, WorkflowRound>,
+  nowMs: number,
+): boolean =>
+  run.status === 'COMPLETED' &&
+  run.completedAt !== null &&
+  isOfEarlierAttempt(
+    run.completedAt,
+    rounds.get(rankOf(run).checkSuiteId),
+    nowMs,
+  );
 
 const reportedCheckOf = (
   context: CheckContextNode,
-  latestReRun: ReadonlyMap<number, number>,
+  rounds: ReadonlyMap<number, WorkflowRound>,
+  nowMs: number,
 ): ReportedCheck =>
   context.__typename === 'StatusContext'
     ? ({
@@ -717,7 +757,7 @@ const reportedCheckOf = (
         startedAt: context.startedAt ?? undefined,
         completedAt: context.completedAt ?? undefined,
         workflow: context.checkSuite?.workflowRun?.workflow.name ?? '',
-        reRunAfter: isBeforeReRun(context, latestReRun),
+        reRunAfter: isBeforeReRun(context, rounds, nowMs),
       } as const);
 
 /**
@@ -726,13 +766,17 @@ const reportedCheckOf = (
  */
 const latestChecksOf = (
   contexts: readonly CheckContextNode[],
-): readonly (readonly [CheckContextNode, ReportedCheck])[] => {
-  const reRuns = latestReRunBySuite(contexts);
-
-  return latestOf(contexts).map(
-    (context) => [context, reportedCheckOf(context, reRuns)] as const,
+  rounds: ReadonlyMap<number, WorkflowRound>,
+  nowMs: number,
+): readonly (readonly [CheckContextNode, ReportedCheck])[] =>
+  latestOf(contexts).map(
+    (context) => [context, reportedCheckOf(context, rounds, nowMs)] as const,
   );
-};
+
+const NO_ROUNDS: ReadonlyMap<number, WorkflowRound> = new Map<
+  number,
+  WorkflowRound
+>();
 
 const isFailure = (check: ReportedCheck): boolean =>
   check.bucket === 'fail' || check.bucket === 'cancel';

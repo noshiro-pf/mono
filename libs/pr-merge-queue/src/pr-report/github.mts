@@ -7,6 +7,7 @@ import {
   parseMergeAfter,
   readBranchRequirements,
   readQueueComments,
+  readWorkflowRounds,
   referenceStatusOf,
   reportedContexts,
   waitsFor,
@@ -21,6 +22,7 @@ import {
   type QueueComments,
   type ReferenceStatus,
   type RepoRef,
+  type WorkflowRound,
 } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
@@ -110,6 +112,7 @@ const CheckRunsSchema = t.record({
       name: t.string(),
       status: t.string(),
       conclusion: t.union([t.string(), t.nullType]),
+      completed_at: t.union([t.string(), t.nullType]),
     }),
   ),
 });
@@ -167,17 +170,6 @@ const ReferenceSchema = t.record({
   state_reason: t.optional(t.union([t.string(), t.nullType])),
   pull_request: t.optional(
     t.record({ merged_at: t.union([t.string(), t.nullType]) }),
-  ),
-});
-
-const WorkflowRunsSchema = t.record({
-  total_count: t.number(),
-  workflow_runs: t.array(
-    t.record({
-      check_suite_id: t.union([t.number(), t.nullType]),
-      workflow_id: t.number(),
-      status: t.union([t.string(), t.nullType]),
-    }),
   ),
 });
 
@@ -411,7 +403,7 @@ export const createClient = (
    */
   const checkRuns = async (
     prefix: string,
-    rounds: ReadonlyMap<number, CheckRunReport['round']>,
+    rounds: ReadonlyMap<number, WorkflowRound>,
   ): Promise<Result<readonly CheckRunReport[], string>> => {
     const mut_collected: CheckRunReport[] = [];
 
@@ -432,6 +424,7 @@ export const createClient = (
           name: run.name,
           status: run.status,
           conclusion: run.conclusion ?? undefined,
+          completedAt: run.completed_at ?? undefined,
           round: rounds.get(run.check_suite.id),
         });
       }
@@ -450,46 +443,23 @@ export const createClient = (
   };
 
   /**
-   * Which workflow each check suite on one commit is a run of, and whether that
-   * run has finished — what the check runs do not say, and what tells a newer
-   * round still going from an unrelated suite. Empty when it cannot be read,
-   * which leaves the verdict as it was before rounds were read.
+   * Which workflow each check suite on one commit is a run of, whether that run
+   * has finished, and when its latest attempt began (`pr-report-core`'s
+   * `readWorkflowRounds`) — what the check runs do not say, and what tells a
+   * newer round still going from an unrelated suite, and a re-run going on in a
+   * suite from a finished one. Empty when it cannot be read, which leaves the
+   * verdict as it was before rounds were read.
    */
   const workflowRounds = async (
     repo: RepoRef,
     sha: string,
-  ): Promise<ReadonlyMap<number, CheckRunReport['round']>> => {
-    const mut_rounds = new Map<number, CheckRunReport['round']>();
-
-    for (const page of Arr.seq(MAX_CHECK_RUN_PAGES)) {
-      const answered = await getJson(
-        `/repos/${repo.owner}/${repo.name}/actions/runs?head_sha=${sha}&per_page=${PAGE_SIZE}&page=${page + 1}`,
-        WorkflowRunsSchema,
-      );
-
-      if (Result.isErr(answered)) {
-        return new Map<number, CheckRunReport['round']>();
-      }
-
-      for (const run of answered.value.workflow_runs) {
-        if (run.check_suite_id !== null) {
-          mut_rounds.set(run.check_suite_id, {
-            workflowId: run.workflow_id,
-            completed: run.status === 'completed',
-          });
-        }
-      }
-
-      if (
-        Arr.isEmpty(answered.value.workflow_runs) ||
-        (page + 1) * PAGE_SIZE >= answered.value.total_count
-      ) {
-        return mut_rounds;
-      }
-    }
-
-    return new Map<number, CheckRunReport['round']>();
-  };
+  ): Promise<ReadonlyMap<number, WorkflowRound>> =>
+    Result.unwrapOkOr(
+      await readWorkflowRounds(sha, async (path, schema) =>
+        getJson(`/repos/${repo.owner}/${repo.name}${path}`, schema),
+      ),
+      new Map<number, WorkflowRound>(),
+    );
 
   /**
    * What every context has reported on one commit, from both places GitHub
