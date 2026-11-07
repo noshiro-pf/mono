@@ -26,6 +26,7 @@ import {
   issueUnqueuedToken,
   notUpdatedYet,
   observableBrand,
+  runUndoingOnThrow,
   runWithScope,
   toSubscriber,
   type ScopeInternals,
@@ -107,6 +108,49 @@ export class ObservableBaseClass<
 
     this.#mut_subscribers.add(subscriber);
   }
+
+  /**
+   * Adds `onNext` and `onComplete` as a subscriber, to the current scope's
+   * subscriptions if a scope runs, or calls `onComplete` at once if the
+   * observable has completed.
+   */
+  #register(
+    onNext: (v: A) => void,
+    onComplete: (() => void) | undefined,
+  ): Subscription {
+    if (this.#mut_isCompleted) {
+      onComplete?.();
+
+      return noopSubscription;
+    }
+
+    const scope = getCurrentScopeInternals();
+
+    if (scope === undefined) {
+      const unscoped = toSubscriber(onNext, onComplete);
+
+      this.#addSubscriber(unscoped);
+
+      return {
+        unsubscribe: () => {
+          this.#mut_subscribers?.delete(unscoped);
+        },
+      };
+    }
+
+    const scoped = new ScopedSubscriber(this, scope, onNext, onComplete);
+
+    this.#addSubscriber(scoped);
+
+    scope.adoptSubscription(scoped);
+
+    return {
+      unsubscribe: () => {
+        scoped.unsubscribe();
+      },
+    };
+  }
+
   getSnapshot(): Optional<A> {
     return this.#mut_snapshot;
   }
@@ -358,44 +402,56 @@ export class ObservableBaseClass<
    * observable created there does: disposing the scope unsubscribes it.
    * Outside every scope, and inside `untracked`, it lasts until `unsubscribe`
    * or completion.
+   *
+   * A value the first call writes to the observable itself (a clamp, a default)
+   * is passed to `onNext` as well, once, after the first call has returned,
+   * unless that call disposed the scope the subscription is made in. If passing
+   * it on throws, the subscription is ended before the exception goes on.
    */
   subscribe(onNext: (v: A) => void, onComplete?: () => void): Subscription {
+    if (Optional.isNone(this.#mut_snapshot)) {
+      return this.#register(onNext, onComplete);
+    }
+
+    const updateToken = this.#mut_updateToken;
+
     // first emit
-    if (Optional.isSome(this.#mut_snapshot)) {
-      onNext(this.#mut_snapshot.value);
+    onNext(this.#mut_snapshot.value);
+
+    // `onNext` is not a subscriber while its first call runs, so what that call
+    // wrote to this observable has reached no one (#3280). Unless the call
+    // disposed the scope it subscribes in, the latest value is passed on once
+    // more, now that the call has returned.
+    if (
+      this.#mut_updateToken === updateToken ||
+      getCurrentScopeInternals()?.isDisposed === true
+    ) {
+      return this.#register(onNext, onComplete);
     }
 
+    const latest = this.#mut_snapshot.value;
+
+    // Before a completion that followed the write.
     if (this.#mut_isCompleted) {
-      onComplete?.();
+      onNext(latest);
 
-      return noopSubscription;
+      return this.#register(onNext, onComplete);
     }
 
-    const scope = getCurrentScopeInternals();
+    const subscription = this.#register(onNext, onComplete);
 
-    if (scope === undefined) {
-      const unscoped = toSubscriber(onNext, onComplete);
-
-      this.#addSubscriber(unscoped);
-
-      return {
-        unsubscribe: () => {
-          this.#mut_subscribers?.delete(unscoped);
-        },
-      };
-    }
-
-    const scoped = new ScopedSubscriber(this, scope, onNext, onComplete);
-
-    this.#addSubscriber(scoped);
-
-    scope.adoptSubscription(scoped);
-
-    return {
-      unsubscribe: () => {
-        scoped.unsubscribe();
+    // The caller never receives a subscription whose pass-on threw, so it is
+    // ended here.
+    runUndoingOnThrow(
+      () => {
+        onNext(latest);
       },
-    };
+      () => {
+        subscription.unsubscribe();
+      },
+    );
+
+    return subscription;
   }
 }
 

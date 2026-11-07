@@ -171,6 +171,10 @@ class ScopeClass implements ScopeInternals {
     this.#mut_goneChildren = 0;
   }
 
+  get isDisposed(): boolean {
+    return this.#mut_isDisposed;
+  }
+
   run<R>(body: () => R): R {
     if (this.#mut_isDisposed) {
       console.warn(
