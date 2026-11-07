@@ -21,7 +21,7 @@
  * marked by `queuedAt === -pendingGeneration` (a drain mark is a positive
  * epoch), so writing a state twice before the round queues it once.
  */
-import { untracked } from './owner.mjs';
+import { keepFirst, throwFailure, untracked, type Failure } from './owner.mjs';
 
 /** What the scheduler needs of a node it queues: a derived node or an effect. */
 export type QueuedNode = DerivedNode | EffectNode;
@@ -107,7 +107,8 @@ const mut_deferred: ((() => void) | QueuedEmitter | undefined)[] = [];
 
 /**
  * What waits for the next round to have propagated; see `afterNextRound`.
- * `drop` is called instead of `emitNext` when an exception empties the queues.
+ * `drop` is called instead of `emitNext` when an exception from a node empties
+ * the queues.
  */
 export type QueuedEmitter = Readonly<{
   emitNext: () => void;
@@ -196,7 +197,8 @@ export const deferWrite = (write: () => void): void => {
 /**
  * Calls `emitter.emitNext` where a deferred write made now would apply: once
  * the drain and the effects of the round under way have run, in order with the
- * writes deferred before it. An exception calls `drop` instead.
+ * writes deferred before it. An exception from a node calls `drop` instead;
+ * one from an effect does not.
  */
 export const deferEmission = (emitter: QueuedEmitter): void => {
   mut_deferred[mut_state.deferredLength] = emitter;
@@ -392,10 +394,16 @@ const drain = (): void => {
   mut_state.maxDepth = -1;
 };
 
-const runEffects = (): void => {
+/**
+ * Runs the round's effects, and returns the first exception one of them threw
+ * (a later one is reported). One that throws does not stop the others.
+ */
+const runEffects = (): Failure => {
   // An effect's write goes to `pending`, so nothing joins this queue while it
-  // runs, and an exception leaves the rest of it for `clearQueues`.
+  // runs.
   const length = mut_state.effectsLength;
+
+  let mut_failure: Failure = undefined;
 
   // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
   for (let mut_i = 0; mut_i < length; mut_i += 1) {
@@ -404,12 +412,20 @@ const runEffects = (): void => {
 
     mut_effects[mut_i] = undefined;
 
-    if (!effect.gone) {
+    if (effect.gone) {
+      continue;
+    }
+
+    try {
       effect.run();
+    } catch (error) {
+      mut_failure = keepFirst(mut_failure, error);
     }
   }
 
   mut_state.effectsLength = 0;
+
+  return mut_failure;
 };
 
 /** Empties every queue, after an exception. */
@@ -516,8 +532,19 @@ const runAfterRound = (count: number): void => {
   mut_state.afterNextRoundLength = length - count;
 };
 
+/**
+ * Runs rounds until nothing is pending. An effect that throws stops neither the
+ * other effects nor the rounds after it, so that what they write still
+ * propagates and one failing binding does not leave the rest of the page behind
+ * the state: its exception is thrown once the flush is done. An exception from
+ * a node, the round limit, or an effect that throws in a later round as well
+ * ends the flush at once and empties the queues. The first exception is thrown,
+ * an effect's held from an earlier round included; a later one is reported.
+ */
 const flushRounds = (): void => {
   let mut_rounds = 0;
+
+  let mut_failure: Failure = undefined;
 
   let mut_all = 0;
 
@@ -585,7 +612,17 @@ const flushRounds = (): void => {
 
         mut_state.phase = 'effects';
 
-        runEffects();
+        const thrown = runEffects();
+
+        if (thrown !== undefined) {
+          if (mut_failure !== undefined) {
+            // An effect threw in an earlier round too: what keeps throwing may
+            // keep writing, so the flush ends here.
+            throwFailure(thrown);
+          }
+
+          mut_failure = thrown;
+        }
       }
 
       mut_state.phase = 'settle';
@@ -613,10 +650,13 @@ const flushRounds = (): void => {
   } catch (error) {
     clearQueues();
 
-    throw error;
+    // An effect's exception held from before comes first.
+    mut_failure = keepFirst(mut_failure, error);
   } finally {
     mut_state.phase = 'idle';
   }
+
+  throwFailure(mut_failure);
 };
 
 /** Runs rounds until nothing is pending. */

@@ -334,14 +334,23 @@ export const adoptIntoCurrentOwner = (node: OwnedNode): void => {
 export const disposeAll = (
   items: readonly (Readonly<{ dispose: () => void }> | undefined)[],
 ): void => {
-  throwFailure(disposeNewestFirst(items, undefined));
+  throwFailure(disposeEach(items));
 };
 
+/**
+ * Disposes each of `items` as `disposeAll` does, and returns the first
+ * exception rather than throwing it: for a caller that has work to finish
+ * before it throws the exception with `throwFailure`.
+ */
+export const disposeEach = (
+  items: readonly (Readonly<{ dispose: () => void }> | undefined)[],
+): Failure => disposeNewestFirst(items, undefined);
+
 /** The first exception of a disposal, held while the rest of it runs. */
-type Failure = Readonly<{ error: unknown }> | undefined;
+export type Failure = Readonly<{ error: unknown }> | undefined;
 
 /** Keeps the first exception, and reports `error` if it is a later one. */
-const keepFirst = (failure: Failure, error: unknown): Failure => {
+export const keepFirst = (failure: Failure, error: unknown): Failure => {
   if (failure === undefined) {
     return { error };
   }
@@ -349,6 +358,14 @@ const keepFirst = (failure: Failure, error: unknown): Failure => {
   console.error(error);
 
   return failure;
+};
+
+/** Throws the exception `failure` holds, if any. */
+export const throwFailure = (failure: Failure): void => {
+  if (failure !== undefined) {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- what a cleanup or a disposal threw, passed on unchanged
+    throw failure.error;
+  }
 };
 
 const disposeNewestFirst = (
@@ -391,11 +408,4 @@ const runNewestFirst = (
   }
 
   return mut_failure;
-};
-
-const throwFailure = (failure: Failure): void => {
-  if (failure !== undefined) {
-    // eslint-disable-next-line @typescript-eslint/only-throw-error -- what a cleanup or a disposal threw, passed on unchanged
-    throw failure.error;
-  }
 };

@@ -670,4 +670,278 @@ describe('a cleanup that throws', () => {
 
     unmount();
   });
+
+  test('For: an update that removes rows still disposes them all, and the kept rows follow', () => {
+    const items = state<readonly number[]>([0, 1, 2, 3]);
+
+    const mut_disposed: number[] = [];
+
+    const [container, unmount] = mount(() => (
+      <div>
+        <For
+          items={items}
+          key={(n) => n}
+          children={(item, index) => {
+            const n = item.value;
+
+            onCleanup(() => {
+              mut_disposed.push(n);
+
+              if (n === 1 || n === 2) {
+                throw new RangeError(`cleanup ${n.toString()}`);
+              }
+            });
+
+            return (
+              <p>
+                {mapBindable(index, (i) => i.toString())}
+                {constant(':')}
+                {mapBindable(item, (v) => v.toString())}
+              </p>
+            );
+          }}
+        />
+      </div>
+    ));
+
+    stubConsoleError();
+
+    // The rows are disposed newest first: the second row's exception is thrown,
+    // and the first row's reported.
+    assert.throws(() => {
+      items.set([3, 4, 0]);
+    }, 'cleanup 2');
+
+    expect(console.error).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ message: 'cleanup 1' }),
+    );
+
+    assert.deepStrictEqual(
+      mut_disposed.toSorted((a, b) => a - b),
+      [1, 2],
+    );
+
+    // The kept rows' indices were written in the update that threw.
+    assert.deepStrictEqual(textsOf(container), ['0:3', '1:4', '2:0']);
+
+    items.set([0, 3]);
+
+    assert.deepStrictEqual(textsOf(container), ['0:0', '1:3']);
+
+    unmount();
+  });
+
+  test('For: a cleanup that threw comes first, and a row that throws while mounting is reported', () => {
+    const items = state<readonly number[]>([0]);
+
+    const [, unmount] = mount(() => (
+      <div>
+        <For
+          items={items}
+          key={(n) => n}
+          children={(item) => {
+            if (item.value === 1) {
+              throw new TypeError('mount');
+            }
+
+            onCleanup(() => {
+              throw new RangeError('cleanup');
+            });
+
+            return <p>{constant('row')}</p>;
+          }}
+        />
+      </div>
+    ));
+
+    stubConsoleError();
+
+    assert.throws(() => {
+      items.set([1]);
+    }, RangeError);
+
+    expect(console.error).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ message: 'mount' }),
+    );
+
+    unmount();
+  });
+
+  test.each([
+    { name: 'a new key', from: [0, 1], to: [0, 2, 3], kept: ['0'] },
+    { name: 'a repeated key', from: [0], to: [0, 0, 3], kept: ['0'] },
+  ])(
+    'For: a row that throws while mounting takes out the rows made, after $name, and keeps the others',
+    ({ from, to, kept }) => {
+      const items = state<readonly number[]>(from);
+
+      const mut_live: number[] = [];
+
+      const [container, unmount] = mount(() => (
+        <div>
+          <For
+            items={items}
+            key={(n) => n}
+            children={(item) => {
+              const n = item.value;
+
+              if (n === 3) {
+                throw new TypeError('mount');
+              }
+
+              mut_live.push(n);
+
+              onCleanup(() => {
+                mut_live.splice(mut_live.indexOf(n), 1);
+              });
+
+              return <p>{constant(n.toString())}</p>;
+            }}
+          />
+        </div>
+      ));
+
+      // A repeated key is reported.
+      stubConsoleError();
+
+      // A row before 3 mounts, and 3 throws.
+      assert.throws(() => {
+        items.set(to);
+      }, TypeError);
+
+      assert.deepStrictEqual(textsOf(container), kept);
+
+      assert.deepStrictEqual(mut_live.map(String), kept);
+
+      items.set([0, 1]);
+
+      assert.deepStrictEqual(textsOf(container), ['0', '1']);
+
+      unmount();
+
+      assert.deepStrictEqual(mut_live, []);
+    },
+  );
+
+  test('MatchOptional: after a branch threw while mounting, the next value mounts it again', () => {
+    const value = state<Optional<number>>(Optional.some(0));
+
+    const [container, unmount] = mount(() => (
+      <div>
+        <MatchOptional
+          value={value}
+          some={(n) => {
+            if (n.value === 1) {
+              throw new TypeError('mount');
+            }
+
+            return <b>{mapBindable(n, (v) => v.toString())}</b>;
+          }}
+        />
+      </div>
+    ));
+
+    value.set(Optional.none);
+
+    assert.throws(() => {
+      value.set(Optional.some(1));
+    }, TypeError);
+
+    assert.strictEqual(textOf(container), '');
+
+    // The same key as the branch that threw.
+    value.set(Optional.some(2));
+
+    assert.strictEqual(textOf(container), '2');
+
+    unmount();
+  });
+
+  test('If: a cleanup that threw comes first, and a branch that throws while mounting is reported', () => {
+    const shown = state(true);
+
+    const [container, unmount] = mount(() => (
+      <div>
+        <If cond={shown} then={<Leaving />} else={<Failing />} />
+      </div>
+    ));
+
+    stubConsoleError();
+
+    assert.throws(() => {
+      shown.set(false);
+    }, RangeError);
+
+    expect(console.error).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ message: 'mount' }),
+    );
+
+    assert.strictEqual(textOf(container), '');
+
+    // The switch follows the next key.
+    shown.set(true);
+
+    assert.strictEqual(textOf(container), 'then');
+
+    assert.throws(unmount, RangeError);
+  });
+
+  test('If: a branch whose cleanup throws still gives way to the other', () => {
+    const shown = state(true);
+
+    const Throwing = (): JSX.Element => {
+      onCleanup(() => {
+        throw new RangeError('cleanup');
+      });
+
+      return <b>{constant('then')}</b>;
+    };
+
+    const [container, unmount] = mount(() => (
+      <div>
+        <If cond={shown} then={<Throwing />} else={<i>{constant('else')}</i>} />
+      </div>
+    ));
+
+    assert.throws(() => {
+      shown.set(false);
+    }, RangeError);
+
+    assert.strictEqual(textOf(container), 'else');
+
+    shown.set(true);
+
+    assert.strictEqual(textOf(container), 'then');
+
+    // The branch mounted again throws as well.
+    assert.throws(unmount, RangeError);
+  });
 });
+
+const textOf = (container: HTMLElement): string => container.textContent;
+
+const textsOf = (container: HTMLElement): readonly string[] =>
+  Array.from(container.querySelectorAll('p'), (p) => p.textContent);
+
+/** A branch whose cleanup throws. */
+const Leaving = (): JSX.Element => {
+  onCleanup(() => {
+    throw new RangeError('cleanup');
+  });
+
+  return <b>{constant('then')}</b>;
+};
+
+/** A branch that throws while mounting. */
+const Failing = (): JSX.Element => {
+  throw new TypeError('mount');
+};
+
+/** Replaces `console.error` with a mock until the test ends. */
+const stubConsoleError = (): void => {
+  vi.stubGlobal('console', { ...console, error: vi.fn() });
+
+  onTestFinished(() => {
+    vi.unstubAllGlobals();
+  });
+};
