@@ -14,6 +14,7 @@ Each list is one directory of synstate, named by the files' base names.
 
 `libs/synstate/test/`:
 
+- `authoring`: `authoring.test.mts`.
 - `graph-structure`: `propagation.test.mts`.
 - `take-complete`, `zip-complete`, `complete-after-last-value`, `is-observable`:
   `settled.test.mts`.
@@ -22,6 +23,7 @@ Each list is one directory of synstate, named by the files' base names.
 
 `libs/synstate/src/core/class/`:
 
+- The type tests of `observable-base`: `authoring.test.mts`.
 - `propagation-order`, `unobserved-write`, `update-loop`,
   `write-during-propagation`, the valid graphs of `circular-dependency`, and the
   `dispose` cases of `complete-propagation` and `remove-completed`:
@@ -52,7 +54,8 @@ the helpers.
 
 ## Not ported
 
-- `map-to`, `pluck` (`libs/synstate/test/cases/`): the operators are gone; each is one `map`.
+- `map-to`, `pluck` (`libs/synstate/test/cases/`): the operators are gone; each
+  is one `map`.
 - `circular-dependency` (the cycles), `circular-dependency-comparison` and
   `circular-dependency-check-off`: a node's parents exist before it, so no cycle
   can be built through the API, and there is no detection to compare or turn
@@ -61,6 +64,3 @@ the helpers.
   the cases of `create-*` about a completed state: completion is gone.
 - `is-development-build`: synstate-next has no checks that run only in a
   development build.
-- `observable-base` and `authoring`: the API for writing an operator outside the
-  package (`createSyncChildObservable` and the rest) is not built yet; its pull
-  request ports them.

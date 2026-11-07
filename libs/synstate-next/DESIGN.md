@@ -181,17 +181,25 @@ from the prototype; the packages are to be measured again in
   the state it would return is not known yet; `getSnapshot` reads it.
 - `collectToArray` is gone: it resolved on completion, which no longer exists.
   A node that is done is settled, which is asked rather than announced.
+- An operator written outside the package is one `createDerived` (synstate's
+  `createSyncChildObservable`, `createAsyncChildObservable` and
+  `createInitializedSyncChildObservable`), and a source is one `createSource`
+  (`createRootObservable`). They take no update token: `ctx.emitted(parent)`
+  says which parent woke the update, `ctx.set` passes a value on in it and
+  `ctx.emit` in an update of its own. A `settled` handler replaces
+  `canEmitNoMore`, and `flush` is gone with completion. The setup runs with the
+  observable as its owner: what it creates belongs to the observable, and its
+  cleanups run newest first, before what it created is disposed, as an owner's
+  do; synstate ran them in the order registered. The `isChildObservable`,
+  `isManagerObservable` and `isRootObservable` guards are gone: the kinds they
+  told apart are not in the public types.
 - A source that is done (a `timer` that fired, a `fromPromise` that resolved, a
   `fromSubscribable` whose subscribable completed) is settled, not completed:
   it keeps its value and its subscribers until its owner disposes it.
 
 ## Not yet built
 
-- The API for writing an operator outside the package, which replaces synstate's
-  `createSyncChildObservable`, `createAsyncChildObservable`,
-  `createRootObservable`, `createInitializedSyncChildObservable` and the
-  `is*Observable` guards.
-- The port of synstate-dom's tests.
+The port of synstate-dom's tests.
 
 synstate's tests are ported under `test/ported/`; its README lists each file and
 where it went.

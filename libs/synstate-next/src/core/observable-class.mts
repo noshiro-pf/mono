@@ -9,6 +9,7 @@
 import { canPublishNow, EventQueue } from './event-queue.mjs';
 import { adoptIntoCurrentOwner } from './owner.mjs';
 import {
+  awaitsEffects,
   currentEpoch,
   emit,
   isPending,
@@ -252,6 +253,24 @@ export class ObservableClass<A> implements DerivedNode {
     this.current = value;
 
     emit(this, this.hasObserver);
+  }
+
+  /**
+   * Takes `value` as what a recompute passes on in the update under way, and
+   * returns whether it did: what `recompute` returns. A value emitted before
+   * and not yet seen by this round's effects, or events still queued, are not
+   * overwritten or overtaken: `value` follows them, as an event.
+   */
+  protected passOnInRound(value: A): boolean {
+    if (awaitsEffects(this) || this.eventsWaiting) {
+      this.publishEvent(value);
+
+      return false;
+    }
+
+    this.current = value;
+
+    return true;
   }
 
   /**
