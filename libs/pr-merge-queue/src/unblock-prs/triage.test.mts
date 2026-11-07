@@ -5,6 +5,7 @@ import {
   bypassOfRead,
   codeOwnersClassification,
   describeAction,
+  failingReviewsToRead,
   holdOfRead,
   orderCandidates,
   outOfSyncAtSurvey,
@@ -392,6 +393,33 @@ const unknownPullRequest = (
   fields: Partial<PullRequest> & Readonly<{ number: number }>,
 ): PullRequest => pullRequest({ mergeStateStatus: 'UNKNOWN', ...fields });
 
+describe(failingReviewsToRead, () => {
+  const byCheck = {
+    requireCodeOwnerReview: false,
+    requiredContexts: ['Validate code owners'],
+  } as const;
+
+  test('reads the failing ones not read already, where a check may enforce', () => {
+    assert.deepStrictEqual(failingReviewsToRead(byCheck, [1, 2], [2, 3]), [3]);
+  });
+
+  test('reads none under the ruleset’s own rule, or with no required check', () => {
+    assert.deepStrictEqual(
+      failingReviewsToRead(
+        { ...byCheck, requireCodeOwnerReview: true },
+        [],
+        [3],
+      ),
+      [],
+    );
+
+    assert.deepStrictEqual(
+      failingReviewsToRead({ ...byCheck, requiredContexts: [] }, [], [3]),
+      [],
+    );
+  });
+});
+
 describe(codeOwnersClassification, () => {
   const check = 'Validate code owners';
 
@@ -414,8 +442,11 @@ describe(codeOwnersClassification, () => {
   test('holds one still waiting for an owner to approve', () => {
     assert.deepStrictEqual(
       codeOwnersClassification(failing([check]), check, {
-        kind: 'held',
-        reason: 'waiting for @owner to approve .github/workflows/a.yml',
+        hold: {
+          kind: 'held',
+          reason: 'waiting for @owner to approve .github/workflows/a.yml',
+        },
+        codeOwners: 'required',
       }),
       {
         kind: 'held',
@@ -427,7 +458,40 @@ describe(codeOwnersClassification, () => {
   // The check cannot see an approval given after it ran, so it is run again.
   test('re-runs one approved since, at the failed check', () => {
     assert.deepStrictEqual(
-      codeOwnersClassification(failing([check]), check, undefined),
+      codeOwnersClassification(failing([check]), check, {
+        hold: undefined,
+        codeOwners: 'approved',
+      }),
+      { kind: 'rerun', link, summary: failing([check]) },
+    );
+  });
+
+  // The check counts a rename's old path, which the read's file list does not
+  // have; it reads every changed file, which the read may not; and a team
+  // owner's approval cannot be told. Re-running would fail again until the
+  // re-runs ran out, so where the read cannot judge it, it is held.
+  test('holds one red over what the read cannot judge', () => {
+    const classified = codeOwnersClassification(failing([check]), check, {
+      hold: undefined,
+      codeOwners: 'unknown',
+    });
+
+    assert.strictEqual(classified?.kind, 'held');
+
+    assert.include(
+      classified?.kind === 'held' ? classified.reason : '',
+      'by hand',
+    );
+  });
+
+  // A red check over no owned path is a check that failed on its own; it is
+  // re-run, and set aside once the re-runs run out, like any failure.
+  test.each([
+    { review: { hold: undefined, codeOwners: 'not-required' } as const },
+    { review: undefined },
+  ])('re-runs one the read sees nothing waiting in ($review)', ({ review }) => {
+    assert.deepStrictEqual(
+      codeOwnersClassification(failing([check]), check, review),
       { kind: 'rerun', link, summary: failing([check]) },
     );
   });

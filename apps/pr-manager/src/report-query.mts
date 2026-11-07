@@ -211,7 +211,7 @@ export const DETAILS_QUERY = [
   '        number bodyHTML',
   `        ${OPEN_CLOSING_ISSUES}`,
   '        latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
-  `        files(first: ${PAGE_SIZE}) { ${PAGE_INFO} nodes { path } }`,
+  `        files(first: ${PAGE_SIZE}) { ${PAGE_INFO} nodes { path changeType } }`,
   `        comments(last: ${SET_ASIDE_COMMENT_SCAN}) { nodes { url body viewerDidAuthor } }`,
   '        mergeable stackEntry { position stack { number size } }',
   `        reviewThreads(first: ${PAGE_SIZE}) { nodes { isResolved } }`,
@@ -449,7 +449,7 @@ const followUpPart = (
     case 'files':
       return {
         declarations: [`$${alias}_number: Int!`, `$${alias}_after: String!`],
-        field: `${alias}: pullRequest(number: $${alias}_number) { files(first: ${PAGE_SIZE}, after: $${alias}_after) { ${PAGE_INFO} nodes { path } } }`,
+        field: `${alias}: pullRequest(number: $${alias}_number) { files(first: ${PAGE_SIZE}, after: $${alias}_after) { ${PAGE_INFO} nodes { path changeType } } }`,
         variables: {
           [`${alias}_number`]: followUp.number,
           [`${alias}_after`]: followUp.after,
@@ -561,7 +561,7 @@ const ContextsPageSchema = t.record({
 
 const FilesPageSchema = t.record({
   pageInfo: PageInfoSchema,
-  nodes: t.array(t.record({ path: t.string() })),
+  nodes: t.array(t.record({ path: t.string(), changeType: t.string() })),
 });
 
 /** A commit nobody has reported anything on has no rollup at all. */

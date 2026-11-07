@@ -1,6 +1,7 @@
 import dedent from 'dedent';
 import { parseCodeOwners } from './code-owners.mjs';
 import {
+  codeOwnerReviewOf,
   reviewHold,
   type ReviewHold,
   type ReviewRules,
@@ -175,6 +176,42 @@ describe(reviewHold, () => {
         state({ files: ['docs/a.md'], filesComplete: false }),
         rules(),
       ),
+    );
+  });
+});
+
+describe(codeOwnerReviewOf, () => {
+  // What holds nothing is not always known: `unblock-prs` holds a red check it
+  // cannot judge rather than re-running it, and has to tell the two apart.
+  test('tells an approval from what holds nothing', () => {
+    assert.deepStrictEqual(
+      codeOwnerReviewOf(state({ approvers: ['owner'] }), byCheck()),
+      { state: 'approved' },
+    );
+
+    assert.deepStrictEqual(
+      codeOwnerReviewOf(state({ author: 'owner' }), byCheck()),
+      { state: 'approved' },
+    );
+
+    assert.deepStrictEqual(
+      codeOwnerReviewOf(state({ files: ['docs/a.md'] }), byCheck()),
+      { state: 'not-required' },
+    );
+
+    assert.deepStrictEqual(
+      codeOwnerReviewOf(
+        state({ files: ['docs/a.md'], filesComplete: false }),
+        byCheck(),
+      ),
+      { state: 'unknown' },
+    );
+  });
+
+  test('requires nothing where nothing enforces the file', () => {
+    assert.deepStrictEqual(
+      codeOwnerReviewOf(state(), rules({ requireCodeOwnerReview: false })),
+      { state: 'not-required' },
     );
   });
 });

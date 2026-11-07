@@ -52,6 +52,16 @@ export const planRegeneration = (
 };
 
 /**
+ * How a conflict only in generated files is resolved, and where the
+ * `CODEOWNERS` that judges what the generators write is read: the default
+ * branch, whatever the rebase is onto.
+ */
+export type Regeneration = Readonly<{
+  config: RegenerateConfig;
+  codeOwnersAt: string;
+}>;
+
+/**
  * Finishes a rebase in `worktreeDir` that stopped on a conflict, when `config`
  * regenerates every file it conflicted in, at every commit it stops at: takes
  * `onto`'s side of each, continues, then installs (`before`), runs the
@@ -69,7 +79,7 @@ export const planRegeneration = (
  */
 export const resolveByRegenerating = async (
   worktreeDir: string,
-  config: RegenerateConfig | undefined,
+  regeneration: Regeneration | undefined,
   onto: string,
   output: string,
   carried: readonly number[] = [],
@@ -82,7 +92,7 @@ export const resolveByRegenerating = async (
 
   const resolved = await takeBaseSides(
     worktreeDir,
-    config,
+    regeneration?.config,
     { onto, carried },
     output,
     [],
@@ -116,10 +126,22 @@ export const resolveByRegenerating = async (
     );
   }
 
+  // `takeBaseSides` has already refused without a config; this tells the
+  // compiler so.
+  if (regeneration === undefined) {
+    return refused(`conflicts with ${onto} in ${files.join(', ')}`);
+  }
+
   // As auto-fix does: what the steps write is amended and pushed in the queue's
   // name, and a path `CODEOWNERS` lists would merge on the author's standing
-  // with nobody having read it. Read before any step runs.
-  const codeOwners = await readCodeOwnersAt(onto, worktreeDir);
+  // with nobody having read it. Read before any step runs, as the default
+  // branch has it — the copy a merge is judged by. Named apart from `onto`:
+  // today only rebases onto the default branch regenerate, but one onto a lower
+  // layer of a stack would otherwise read that layer's copy.
+  const codeOwners = await readCodeOwnersAt(
+    regeneration.codeOwnersAt,
+    worktreeDir,
+  );
 
   if (Result.isErr(codeOwners)) {
     return refused(codeOwners.value, false);
@@ -133,7 +155,7 @@ export const resolveByRegenerating = async (
     return refused(`cannot read the head: ${headBefore.value}`, false);
   }
 
-  const before = config?.before ?? [];
+  const { before } = regeneration.config;
 
   for (const step of [...before, ...commands]) {
     if (stopRequested()) {

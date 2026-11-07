@@ -37,6 +37,7 @@
 import {
   codeOwnerReview,
   type CodeOwnerGate,
+  type CodeOwnerReview,
   type CodeOwnersRule,
 } from './code-owners.mjs';
 import type { RulesetRequirements } from './ruleset.mjs';
@@ -76,21 +77,9 @@ export type ReviewHold = Readonly<{ kind: 'bypass' | 'held'; reason: string }>;
 export const reviewHold = (
   state: ReviewState,
   rules: ReviewRules,
+  /** {@link codeOwnerReviewOf} of the same two, when already worked out. */
+  codeOwners: CodeOwnerReview = codeOwnerReviewOf(state, rules),
 ): ReviewHold | undefined => {
-  const gate =
-    rules.codeOwnerGate ??
-    (rules.requireCodeOwnerReview ? ('ruleset' as const) : undefined);
-
-  const codeOwners = codeOwnerReview({
-    required: gate !== undefined,
-    rules: rules.codeOwners,
-    files: state.files,
-    filesComplete: state.filesComplete,
-    approvers: state.approvers,
-    author: state.author,
-    authorApproves: gate === 'check',
-  });
-
   const conversations =
     rules.requireConversationResolution && state.unresolvedConversations > 0
       ? (`${state.unresolvedConversations} unresolved review ${state.unresolvedConversations === 1 ? 'conversation' : 'conversations'}` as const)
@@ -123,6 +112,31 @@ export const reviewHold = (
       conversations === undefined ? '' : `; ${conversations}`,
     ].join(''),
   };
+};
+
+/**
+ * The code-owner half of {@link reviewHold}: where the pull request stands with
+ * the owners under whatever enforces `CODEOWNERS`. Apart, for a reader that has
+ * to tell a wait it cannot see from no wait — `unblock-prs` holds a red check
+ * that enforces the file on `unknown` rather than re-running it.
+ */
+export const codeOwnerReviewOf = (
+  state: ReviewState,
+  rules: ReviewRules,
+): CodeOwnerReview => {
+  const gate =
+    rules.codeOwnerGate ??
+    (rules.requireCodeOwnerReview ? ('ruleset' as const) : undefined);
+
+  return codeOwnerReview({
+    required: gate !== undefined,
+    rules: rules.codeOwners,
+    files: state.files,
+    filesComplete: state.filesComplete,
+    approvers: state.approvers,
+    author: state.author,
+    authorApproves: gate === 'check',
+  });
 };
 
 /** How many waiting paths are named before the rest are counted. */

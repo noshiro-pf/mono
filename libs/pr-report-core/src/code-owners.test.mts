@@ -3,6 +3,7 @@ import {
   codeOwnerGate,
   codeOwnerReview,
   codeOwnersEnforcedBy,
+  namesEveryChangedPath,
   ownersOf,
   parseCodeOwners,
 } from './code-owners.mjs';
@@ -216,6 +217,39 @@ describe(codeOwnerReview, () => {
     );
   });
 
+  // Whatever the unread paths are, no owner could still be waiting on them.
+  test('settles a partial list when every owner the file names is satisfied', () => {
+    assert.deepStrictEqual(
+      review({
+        filesComplete: false,
+        approvers: ['noshiro-pf'],
+        rules: parseCodeOwners('/.github/workflows/ @noshiro-pf\n'),
+      }),
+      { state: 'approved' },
+    );
+
+    assert.deepStrictEqual(
+      review({
+        files: ['libs/x/src/a.mts'],
+        filesComplete: false,
+        author: 'noshiro-pf',
+        authorApproves: true,
+        rules: parseCodeOwners('/.github/workflows/ @noshiro-pf\n'),
+      }),
+      { state: 'not-required' },
+    );
+
+    // `@other` alone owns a rule nobody has satisfied.
+    assert.deepStrictEqual(
+      review({
+        filesComplete: false,
+        approvers: ['noshiro-pf'],
+        rules: parseCodeOwners('/.github/workflows/ @noshiro-pf\n/x/ @other\n'),
+      }),
+      { state: 'unknown' },
+    );
+  });
+
   test('still reports a wait it has already found in a partial list', () => {
     assert.strictEqual(review({ filesComplete: false }).state, 'required');
   });
@@ -281,6 +315,27 @@ describe(codeOwnerReview, () => {
 const owners = (text: string, path: string): readonly string[] =>
   ownersOf(path, parseCodeOwners(text));
 
+describe(namesEveryChangedPath, () => {
+  test('is false where a rename leaves its old path unnamed', () => {
+    assert.isTrue(
+      namesEveryChangedPath([
+        { changeType: 'MODIFIED' },
+        { changeType: 'ADDED' },
+        { changeType: 'DELETED' },
+      ]),
+    );
+
+    assert.isFalse(
+      namesEveryChangedPath([
+        { changeType: 'MODIFIED' },
+        { changeType: 'RENAMED' },
+      ]),
+    );
+
+    assert.isFalse(namesEveryChangedPath([{ changeType: 'COPIED' }]));
+  });
+});
+
 describe(codeOwnersEnforcedBy, () => {
   test('reads the context a comment line names', () => {
     assert.strictEqual(
@@ -303,6 +358,25 @@ describe(codeOwnersEnforcedBy, () => {
   test('takes the first of several', () => {
     assert.strictEqual(
       codeOwnersEnforcedBy('# enforced-by: a\n# enforced-by: b\n'),
+      'a',
+    );
+  });
+
+  // The declaration is the file's head, as the file and the job describe it: a
+  // comment further down, say one explaining a rule, declares nothing.
+  test('reads only the comments before the first rule', () => {
+    assert.isUndefined(
+      codeOwnersEnforcedBy(dedent`
+        # Owners.
+        /.github/ @owner
+
+        # enforced-by: a
+        /docs/ @owner
+      `),
+    );
+
+    assert.strictEqual(
+      codeOwnersEnforcedBy('\n# Owners.\n\n# enforced-by: a\n/.github/ @o\n'),
       'a',
     );
   });

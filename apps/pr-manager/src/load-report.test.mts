@@ -2879,7 +2879,7 @@ const pullRequest = ({
     latestOpinionatedReviews: { nodes: [] },
     files: {
       pageInfo: { hasNextPage: false, endCursor: null },
-      nodes: files.map((path) => ({ path })),
+      nodes: files.map((path) => ({ path, changeType: 'MODIFIED' })),
     },
     commits: {
       nodes: [

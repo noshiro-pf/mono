@@ -1,10 +1,16 @@
+// cspell:ignore mktree
+
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
 import { git } from '../lib/index.mjs';
 import type { RegenerateConfig } from './config.mjs';
-import { planRegeneration, resolveByRegenerating } from './regenerate.mjs';
+import {
+  planRegeneration,
+  resolveByRegenerating,
+  type Regeneration,
+} from './regenerate.mjs';
 
 const CONFIG: RegenerateConfig = {
   before: ['pnpm install --frozen-lockfile'],
@@ -138,7 +144,13 @@ describe(resolveByRegenerating, () => {
 
     const resolved = await resolveByRegenerating(
       dir,
-      { ...generating('cat a.txt b.txt > gen.txt'), before: ['false'] },
+      {
+        config: {
+          ...generating('cat a.txt b.txt > gen.txt').config,
+          before: ['false'],
+        },
+        codeOwnersAt: 'main',
+      },
       'main',
       output,
     );
@@ -212,6 +224,43 @@ describe(resolveByRegenerating, () => {
     assert.isTrue(Result.isErr(resolved));
 
     expect(resolved.value.detail).toContain('leaves it empty');
+
+    await fs.rm(dir, { recursive: true });
+  });
+
+  // `onto` is the layer below for a stacked pull request; the copy a merge is
+  // judged by is the default branch's, which is what the caller names.
+  test('judges what it writes by the CODEOWNERS it is given, not onto’s', async () => {
+    const { dir, output } = await conflictedRebase(false);
+
+    // A branch `owners`, `main` with a `CODEOWNERS` owning `gen.txt`, written
+    // without a checkout, since the rebase holds the working tree.
+    assert.isTrue(
+      Result.isOk(
+        await git(
+          [
+            String.raw`file="$(printf '/gen.txt @owner\n' | git hash-object -w --stdin)"`,
+            String.raw`github="$(printf '100644 blob %s\tCODEOWNERS\n' "$file" | git mktree)"`,
+            String.raw`root="$( (git ls-tree main; printf '040000 tree %s\t.github\n' "$github") | git mktree)"`,
+            'git branch owners "$(git commit-tree "$root" -p main -m owners)"',
+          ].join(' && '),
+          dir,
+        ),
+      ),
+    );
+
+    const resolved = await resolveByRegenerating(
+      dir,
+      generating('cat a.txt b.txt > gen.txt', 'owners'),
+      'main',
+      output,
+    );
+
+    assert.isTrue(Result.isErr(resolved));
+
+    expect(resolved.value.detail).toContain(
+      'changes gen.txt, which .github/CODEOWNERS gives owners',
+    );
 
     await fs.rm(dir, { recursive: true });
   });
@@ -304,8 +353,11 @@ const read = async (dir: string, file: string): Promise<string> =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   fs.readFile(path.join(dir, file), 'utf8');
 
-const generating = (run: string): RegenerateConfig =>
+const generating = (run: string, codeOwnersAt = 'main'): Regeneration =>
   ({
-    before: [],
-    generators: [{ path: /^gen\.txt$/u, run }],
+    config: {
+      before: [],
+      generators: [{ path: /^gen\.txt$/u, run }],
+    },
+    codeOwnersAt,
   }) as const;
