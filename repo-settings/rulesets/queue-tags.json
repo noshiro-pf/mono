@@ -1,0 +1,18 @@
+{
+  "id": 26765156,
+  "name": "queue-tags",
+  "target": "tag",
+  "enforcement": "active",
+  "bypass_actors": [],
+  "conditions": {
+    "ref_name": {
+      "exclude": [],
+      "include": ["refs/tags/queue/**/*"]
+    }
+  },
+  "rules": [
+    {
+      "type": "creation"
+    }
+  ]
+}
