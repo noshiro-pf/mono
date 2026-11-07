@@ -289,6 +289,7 @@ export type WatchOutcome =
   | 'head-moved'
   | 'merged'
   | 'not-merging'
+  | 'review-held'
   | 'stopped'
   | 'timeout'
   | 'skip-ci-labelled';

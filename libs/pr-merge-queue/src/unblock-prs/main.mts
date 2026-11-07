@@ -762,6 +762,13 @@ const applyWatchOutcome = (
         detail: ended.detail ?? 'every required check is green',
       });
 
+    case 'review-held':
+      log(
+        `#${pr.number}: green, but ${ended.detail ?? 'its review holds it'}; left to triage, which holds it until that changes.`,
+      );
+
+      return skipped;
+
     case 'not-merging':
       log(
         `#${pr.number}: ${ended.detail ?? 'green but not merged'}. It goes last from now on, until someone pushes to it.`,

@@ -4,6 +4,7 @@ import {
   isMergeableState,
   MERGE_QUEUED_LABEL,
   SKIP_CI_LABEL,
+  type ReviewHold,
 } from 'pr-report-core';
 import { isRecord, Result } from 'ts-data-forge';
 import { log, removeLabel, type ApiContext } from '../lib/index.mjs';
@@ -28,7 +29,7 @@ import {
   describeNotStarted,
   describeTimeout,
 } from './set-aside-detail.mjs';
-import { readHoldAt, type ReviewContext } from './triage.mjs';
+import { readHoldAt, type HoldUnread, type ReviewContext } from './triage.mjs';
 import type { PullRequest, Watched } from './types.mjs';
 import { pause, stopRequested } from './util.mjs';
 
@@ -222,13 +223,10 @@ export const watch = async (
       );
 
       if (mut_greenPolls >= budget) {
-        return {
-          outcome: 'not-merging',
-          detail: describeHold(
-            current.mergeStateStatus,
-            await readHoldAt(api, pr.number, expectedHead, reviewContext),
-          ),
-        };
+        return endOfGreenWatch(
+          current.mergeStateStatus,
+          await readHoldAt(api, pr.number, expectedHead, reviewContext),
+        );
       }
     }
 
@@ -245,6 +243,51 @@ export const watch = async (
   }
 
   return { outcome: 'stopped' };
+};
+
+/**
+ * How a watch ends on a pull request green for its whole budget and not merged,
+ * from what its review reads at the end.
+ *
+ * - **Held**: an owner's approval dismissed or a conversation opened during the
+ *   watch. A review clears that without a push, so nothing is recorded: triage
+ *   holds it, and lets it go as soon as the review changes. A `not-merging`
+ *   record would keep it unpicked until the base moves, and last until a push.
+ *   Only while GitHub says `BLOCKED`, the one state whose review triage reads
+ *   on a pull request in flight: on any other it would be watched again, and
+ *   again, with the queue behind it, so it is `not-merging`.
+ * - **Only a bypass merges it**: what triage would have said, had its read not
+ *   failed or been of another head.
+ * - **Read at another head**: a push between the last poll and this read.
+ * - **Otherwise** nothing here can say why, and it is `not-merging`.
+ */
+export const endOfGreenWatch = (
+  mergeStateStatus: string,
+  review: Result<ReviewHold | undefined, HoldUnread>,
+): Watched => {
+  if (Result.isErr(review)) {
+    return review.value.otherHead
+      ? { outcome: 'head-moved' }
+      : {
+          outcome: 'not-merging',
+          detail: describeHold(
+            mergeStateStatus,
+            Result.err(review.value.message),
+          ),
+        };
+  }
+
+  return mergeStateStatus === 'BLOCKED' && review.value?.kind === 'held'
+    ? { outcome: 'review-held', detail: review.value.reason }
+    : review.value?.kind === 'bypass'
+      ? {
+          outcome: 'awaiting-bypass',
+          detail: `every required check is green; ${review.value.reason}`,
+        }
+      : {
+          outcome: 'not-merging',
+          detail: describeHold(mergeStateStatus, review),
+        };
 };
 
 /**
