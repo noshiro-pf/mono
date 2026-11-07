@@ -54,9 +54,10 @@
     "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
     "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
-    "gen": "run-s gen:index",
+    "gen": "run-s gen:index gen:reflected-keys",
     "gen:index": "run-s gen:index:src fix:fmt",
     "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --preserve index.mts --exclude jsx-runtime.mts --exclude jsx-dev-runtime.mts",
+    "gen:reflected-keys": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-reflected-keys.mts",
     "test": "pnpm run check:test",
     "test:cov:ui": "vite preview --outDir ./coverage",
     "test:ui": "pnpm run z:vitest:node --ui",
@@ -72,6 +73,7 @@
   },
   "devDependencies": {
     "@vitest/browser-playwright": "catalog:",
+    "dedent": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
@@ -82,7 +84,8 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "synstate-next": "workspace:*",
-    "ts-repo-utils": "workspace:*"
+    "ts-repo-utils": "workspace:*",
+    "typescript": "catalog:"
   },
   "peerDependencies": {
     "synstate-next": "workspace:^"

@@ -7,9 +7,12 @@ import {
 } from 'synstate-next';
 import {
   EffectClass,
-  disposeAll,
+  disposeEach,
+  keepFirst,
   noValue,
+  throwFailure,
   toNode,
+  type Failure,
   type ObservableClass,
 } from 'synstate-next/internal';
 import * as Arr from 'ts-data-forge/array';
@@ -30,7 +33,7 @@ import { longestIncreasingRun } from './longest-increasing-run.mjs';
  * observable of the element and one of its index. The index is a node of its
  * own in every row, so it is made only for a `children` that declares a second
  * parameter, as `Function.length` counts it: one that reads it through a
- * default value or a rest parameter is given `undefined`.
+ * default value or a rest parameter is given none.
  *
  * After an update of `items` has settled, a row whose key stays is not rebuilt:
  * the state behind its `item` is set to the new element, which wakes only what
@@ -45,6 +48,11 @@ import { longestIncreasingRun } from './longest-increasing-run.mjs';
  *
  * `key` is required; `(_, i) => i` matches rows by position. A key that appears
  * twice is reported with `console.error`.
+ *
+ * A row's cleanup that throws stops neither the other disposals nor the update:
+ * the exception is thrown once the rows are in place. A row that throws while
+ * mounting takes out the rows the update made and keeps the others, in the
+ * order they are in; the next update puts them right.
  */
 export const For = <T,>({
   items,
@@ -178,7 +186,12 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
 
       const indexInRow = this.#usesIndex ? state(i) : undefined;
 
-      this.#children(itemInRow, indexInRow).mount(out);
+      // Called with one argument when it declares one, so that a rest parameter
+      // sees no index.
+      (indexInRow === undefined
+        ? this.#children(itemInRow)
+        : this.#children(itemInRow, indexInRow)
+      ).mount(out);
 
       return [itemInRow, indexInRow] as const;
     });
@@ -210,25 +223,17 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
     return row;
   }
 
-  #removeRow(row: Row<T>): void {
-    row.owner.dispose();
-
-    removeRange(row.first, row.last);
-
-    if (this.#mut_byKey.get(row.key) === row) {
-      this.#mut_byKey.delete(row.key);
-    }
-  }
-
   /**
-   * Removes every row. When the markers and the rows are all the parent holds,
-   * `textContent` empties it in one step; otherwise a range does.
+   * Takes every row out, then disposes them, as a row's own removal comes
+   * before its cleanups. When the markers and the rows are all the parent
+   * holds, `textContent` empties it in one step; otherwise a range does.
+   * Returns what a cleanup threw; see `disposeEach`.
    */
-  #clear(): void {
+  #removeAll(): Failure {
     const rows = this.#mut_rows;
 
     if (Arr.isEmpty(rows)) {
-      return;
+      return undefined;
     }
 
     const parent = this.#end.parentNode;
@@ -258,8 +263,155 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
 
     this.#mut_rows = [];
 
-    // Every row is disposed even when one's cleanup throws.
-    disposeAll(rows.map((row) => row.owner));
+    return disposeEach(rows.map((row) => row.owner));
+  }
+
+  /**
+   * Takes out the rows of `previous` that `generation` did not keep, then
+   * disposes them. Returns what a cleanup threw; see `disposeEach`.
+   */
+  #removeGone(previous: readonly Row<T>[], generation: number): Failure {
+    const gone = previous.filter((row) => row.keptIn !== generation);
+
+    if (gone.length === previous.length) {
+      return this.#removeAll();
+    }
+
+    for (const row of gone) {
+      removeRange(row.first, row.last);
+
+      if (this.#mut_byKey.get(row.key) === row) {
+        this.#mut_byKey.delete(row.key);
+      }
+    }
+
+    return disposeEach(gone.map((row) => row.owner));
+  }
+
+  /**
+   * Puts the rows of `list` in order: `next` holds the kept ones at their new
+   * positions, and the others are mounted. Returns the rows.
+   */
+  #place(
+    list: readonly T[],
+    next: readonly (Row<T> | undefined)[],
+    generation: number,
+  ): readonly Row<T>[] {
+    // The kept rows on a longest increasing run of old positions stay put; the
+    // others move, from the end, before the row after them.
+    const stay = longestIncreasingRun(
+      next.map((row) => (row === undefined ? -1 : row.position)),
+    );
+
+    const mut_rows: Row<T>[] = Array.from({ length: list.length });
+
+    try {
+      let mut_before: ChildNode = this.#end;
+
+      let mut_i = list.length - 1;
+
+      while (mut_i >= 0) {
+        const kept = next[mut_i];
+
+        if (kept !== undefined) {
+          if (!stay.has(mut_i)) {
+            moveRange(kept.first, kept.last, mut_before);
+          }
+
+          kept.position = mut_i;
+
+          mut_rows[mut_i] = kept;
+
+          mut_before = kept.first;
+
+          mut_i -= 1;
+
+          continue;
+        }
+
+        // A run of new rows, mounted in order and inserted in one step.
+        let mut_start = mut_i;
+
+        while (mut_start > 0 && next[mut_start - 1] === undefined) {
+          mut_start -= 1;
+        }
+
+        const out = new MountedNodes();
+
+        for (let mut_j = mut_start; mut_j <= mut_i; mut_j += 1) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- in range
+          const row = this.#createRow(list[mut_j]!, mut_j, out);
+
+          row.keptIn = generation;
+
+          mut_rows[mut_j] = row;
+        }
+
+        out.insertBefore(mut_before);
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- made above
+        mut_before = mut_rows[mut_start]!.first;
+
+        mut_i = mut_start - 1;
+      }
+    } catch (error) {
+      // A row that threw while mounting: the rows made in this update go, and
+      // the kept ones stay, in the order they are in now.
+      const removal = this.#keepOnly(next, mut_rows);
+
+      if (removal !== undefined) {
+        console.error(removal.error);
+      }
+
+      throw error;
+    }
+
+    return mut_rows;
+  }
+
+  /**
+   * After a row threw while mounting, takes out and disposes the rows `placed`
+   * holds that `next` does not, the rows made in this update, and keeps the
+   * rows of `next`, in the order their nodes are in. Returns what a cleanup
+   * threw; see `disposeEach`.
+   */
+  #keepOnly(
+    next: readonly (Row<T> | undefined)[],
+    placed: readonly (Row<T> | undefined)[],
+  ): Failure {
+    // `filter` skips the holes of `placed`: the positions not reached.
+    const made = placed.filter(
+      (row, i): row is Row<T> => row !== undefined && next[i] === undefined,
+    );
+
+    for (const row of made) {
+      removeRange(row.first, row.last);
+
+      if (this.#mut_byKey.get(row.key) === row) {
+        this.#mut_byKey.delete(row.key);
+      }
+    }
+
+    const kept = next
+      .filter((row) => row !== undefined)
+      .toSorted((a, b) =>
+        (a.first.compareDocumentPosition(b.first) &
+          Node.DOCUMENT_POSITION_FOLLOWING) ===
+        0
+          ? 1
+          : -1,
+      );
+
+    for (const [i, row] of kept.entries()) {
+      row.position = i;
+
+      // A made row with a repeated key took the kept row's place in the map.
+      this.#mut_byKey.set(row.key, row);
+    }
+
+    this.#mut_rows = kept;
+
+    return disposeEach(made.map((row) => row.owner));
   }
 
   mountInto(out: MountedNodes): void {
@@ -287,7 +439,8 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
     }
 
     if (Arr.isEmpty(list)) {
-      this.#clear();
+      // Every row is disposed even when one's cleanup throws.
+      throwFailure(this.#removeAll());
 
       return;
     }
@@ -313,74 +466,18 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
       return row;
     });
 
-    if (previous.every((row) => row.keptIn !== generation)) {
-      this.#clear();
-    } else {
-      for (const row of previous) {
-        if (row.keptIn !== generation) {
-          this.#removeRow(row);
-        }
-      }
+    // The rows that went are disposed before the new ones mount. A cleanup that
+    // throws stops neither the other disposals nor the rest of the update: the
+    // exception is thrown once the rows are in place.
+    const failure = this.#removeGone(previous, generation);
+
+    try {
+      this.#mut_rows = this.#place(list, next, generation);
+    } catch (error) {
+      throwFailure(keepFirst(failure, error));
     }
 
-    // The kept rows on a longest increasing run of old positions stay put; the
-    // others move, from the end, before the row after them.
-    const stay = longestIncreasingRun(
-      next.map((row) => (row === undefined ? -1 : row.position)),
-    );
-
-    const mut_rows: Row<T>[] = Array.from({ length: list.length });
-
-    let mut_before: ChildNode = this.#end;
-
-    let mut_i = list.length - 1;
-
-    while (mut_i >= 0) {
-      const kept = next[mut_i];
-
-      if (kept !== undefined) {
-        if (!stay.has(mut_i)) {
-          moveRange(kept.first, kept.last, mut_before);
-        }
-
-        kept.position = mut_i;
-
-        mut_rows[mut_i] = kept;
-
-        mut_before = kept.first;
-
-        mut_i -= 1;
-
-        continue;
-      }
-
-      // A run of new rows, mounted in order and inserted in one step.
-      let mut_start = mut_i;
-
-      while (mut_start > 0 && next[mut_start - 1] === undefined) {
-        mut_start -= 1;
-      }
-
-      const out = new MountedNodes();
-
-      for (let mut_j = mut_start; mut_j <= mut_i; mut_j += 1) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- in range
-        const row = this.#createRow(list[mut_j]!, mut_j, out);
-
-        row.keptIn = generation;
-
-        mut_rows[mut_j] = row;
-      }
-
-      out.insertBefore(mut_before);
-
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- made above
-      mut_before = mut_rows[mut_start]!.first;
-
-      mut_i = mut_start - 1;
-    }
-
-    this.#mut_rows = mut_rows;
+    throwFailure(failure);
   }
 }
 
