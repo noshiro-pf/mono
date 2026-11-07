@@ -1,6 +1,7 @@
 import {
   createScope,
   getCurrentScope,
+  isObservable,
   onScopeDispose,
   type Scope,
 } from 'synstate';
@@ -48,9 +49,15 @@ export const mountSwitch = <V, K>(
     initialNodes: readonly ChildNode[];
   } = { current: undefined, initialNodes: [] };
 
+  // What a branch derives updates after `value`, so that a branch the next
+  // value rules out is disposed before it computes that value (#3605).
+  const branchScopeOptions = isObservable(value)
+    ? ({ after: value } as const)
+    : undefined;
+
   /** Mounts the branch for `v` in a scope of its own and returns its nodes. */
   const mountBranch = (key: K, v: V): readonly ChildNode[] => {
-    const scope = createScope(parent);
+    const scope = createScope(parent, branchScopeOptions);
 
     const nodes = scope.run(() => {
       const mounted = toNodes(branch(key, v)?.mount() ?? []);

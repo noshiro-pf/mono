@@ -93,6 +93,7 @@ class WithCurrentValueFromObservableClass<A, B>
   constructor(parentObservable: Observable<A>, observable: Observable<B>) {
     super({
       parents: [parentObservable],
+      // Raised to the scope's floor by the constructor.
       depth: 1 + maxDepth([parentObservable, observable]),
       initialValue: pipe({
         par: parentObservable.getSnapshot(),

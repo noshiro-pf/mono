@@ -98,6 +98,7 @@ class WithBufferedFromObservableClass<A, B>
 
     super({
       parents: [parentObservable],
+      // Raised to the scope's floor by the constructor.
       depth: 1 + maxDepth([parentObservable, observable]),
       initialValue: pipe({
         par: parentSnapshot,

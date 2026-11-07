@@ -46,7 +46,7 @@ With more than one parent, compare each parent's token: `combine` emits when any
 
 ### Depth, and reading an observable that is not a parent
 
-An update reaches observables in ascending `depth`, which is how SynState avoids glitches: every parent has emitted before its child reads it. A child's `depth` defaults to one more than its deepest parent. `withCurrentValueFrom` also reads a second observable with `getSnapshot` without being derived from it; such an observable has to be shallower too, or your observable reads its value from before the update. Pass `depth` yourself then.
+An update reaches observables in ascending `depth`, which is how SynState avoids glitches: every parent has emitted before its child reads it. A child's `depth` defaults to one more than its deepest parent. Whether defaulted or passed, it is raised to the floor of a scope made with `createScope(parent, { after })` when the child is created in one. `withCurrentValueFrom` also reads a second observable with `getSnapshot` without being derived from it; such an observable has to be shallower too, or your observable reads its value from before the update. Pass `depth` yourself then.
 
 ```ts
 createSyncChildObservable(
@@ -64,11 +64,11 @@ createSyncChildObservable(
 
 ### Config
 
-| Field          | Meaning                                                                                                                      |
-| :------------- | :--------------------------------------------------------------------------------------------------------------------------- |
-| `parents`      | The observables this one is derived from                                                                                     |
-| `initialValue` | `Optional.some(v)` or `Optional.none`                                                                                        |
-| `depth`        | Defaults to one more than the deepest parent's; must also be greater than that of any observable read without being a parent |
+| Field          | Meaning                                                                                                                                                                                                           |
+| :------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parents`      | The observables this one is derived from                                                                                                                                                                          |
+| `initialValue` | `Optional.some(v)` or `Optional.none`                                                                                                                                                                             |
+| `depth`        | Defaults to one more than the deepest parent's; must also be greater than that of any observable read without being a parent. Either is raised to the floor of a scope made with `createScope(parent, { after })` |
 
 ### Tools
 
