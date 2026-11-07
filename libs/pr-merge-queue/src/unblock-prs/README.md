@@ -385,6 +385,19 @@ pick も「3a」の rebase もしません。
     green になったら `awaiting-bypass` で見送り、bypass merge を人に頼む
     comment を書きます。
 
+    ruleset が `require_code_owner_review` を求めず、代わりに `CODEOWNERS`
+    の `# enforced-by: <context>` 行が名指す必須チェックがこのファイルを強制
+    しているとき（`pr-report-core` の `codeOwnerGate`）は、そのチェックと同じ
+    く作者を自分の所有パスの承認者に数えます。所有者自身の PR は何も待たず、
+    bypass も要りません。待つのは所有者以外の PR だけで、所有者が承認するまで
+    held です。そのチェックは承認を運ぶイベントでは走らない（ PR 自身の
+    workflow で走ってしまう `pull_request_review` は使えない）ので、承認より
+    前に赤になったままです。そこで、**failing** のうち赤がそのチェックだけの
+    PR もレビューを読み、まだ承認待ちなら held に、承認済みならそのチェックの
+    run の失敗したジョブを再実行します（`rerunFailedJobs`）。人が承認前に手で
+    再実行していることもあるので、run あたり2回まで再実行し、それでも赤なら
+    ほかの **failing** と同じく `checks-failed` で見送ります。
+
     triage が読む変更ファイルは rebase 前の head のもので、rebase で変わり得
     ます。所有者付きのパスを触った下の層の commit を抱えたままの stacked PR
     は、squash merge の上に rebase するとそのパスが diff から消えますし、逆に
@@ -1329,6 +1342,21 @@ merge-base` says whether the branch was built on the current tip of the
     armed** — auto-merge would wait for the same approval — and once its
     checks are green it is set aside `awaiting-bypass`, with a comment asking
     a person for the bypass merge.
+
+    Where the ruleset does not ask for `require_code_owner_review` and a
+    required check that `CODEOWNERS` names on a `# enforced-by: <context>` line
+    enforces the file instead (`codeOwnerGate` in `pr-report-core`), the author
+    counts as approving the paths they own, as that check counts them. An
+    owner's own pull request then waits for nobody and needs no bypass; only
+    someone else's waits, held until an owner approves. The check does not run
+    on the event that carries an approval (`pull_request_review` would run the
+    pull request's own copy of the workflow), so it stays red from before the
+    approval. A **failing** pull request whose only red is that check therefore
+    has its review read as well: still waiting for an approval, it is held;
+    approved since, the failed jobs of that check's run are re-run
+    (`rerunFailedJobs`). Up to twice a run, since a person may have re-run it
+    by hand before the approval; still red after that, it is set aside
+    `checks-failed` like any other **failing** one.
 
     The changed files triage reads are the head before the rebase, and a
     rebase can change them: a stacked pull request still carrying the commit

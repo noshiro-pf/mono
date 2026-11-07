@@ -127,7 +127,9 @@ export type OutOfSyncSighting = Readonly<{
  */
 export type ReviewRequirements = StrictPick<
   RulesetRequirements,
-  'requireCodeOwnerReview' | 'requireConversationResolution'
+  | 'requireCodeOwnerReview'
+  | 'requireConversationResolution'
+  | 'requiredContexts'
 >;
 
 /**
@@ -203,6 +205,7 @@ export type TriageContext = TriageBase & QueueContext;
 export type Classification = Readonly<
   | { kind: 'candidate' }
   | { kind: 'failing'; summary: ChecksSummary }
+  | { kind: 'rerun'; link: string; summary: ChecksSummary }
   | { kind: 'held'; reason: string }
   | { kind: 'ignore' }
   | { kind: 'in-flight' }
@@ -244,6 +247,14 @@ export type Triage = Readonly<{
   unreadReleased: readonly Unread[];
   /** Up to date, but a required check has failed. */
   failing: readonly Failing[];
+  /**
+   * Up to date, failing only the check that enforces `CODEOWNERS`
+   * (`codeOwnerGate` in `pr-report-core`), and approved by an owner since: the
+   * check cannot see the approval until it runs again, so its failed jobs are
+   * re-run — `link` is the failed check's page, in that run — rather than the
+   * pull request set aside.
+   */
+  rerun: readonly (Failing & Readonly<{ link: string }>)[];
   /**
    * Queued pull requests that would have been picked or watched but for their
    * review — an owner's approval or a conversation still open — each as a note

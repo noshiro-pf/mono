@@ -1,6 +1,6 @@
 import type { ContextState } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
-import { planAutoFix } from './auto-fix.mjs';
+import { ownedPaths, planAutoFix } from './auto-fix.mjs';
 import { readConfig } from './config.mjs';
 
 // The repository's own `.github/unblock-prs.json`: these tests are what its
@@ -222,5 +222,34 @@ describe(planAutoFix, () => {
     assert.isTrue(Result.isErr(plan));
 
     expect(plan.value).toContain('.github/unblock-prs.json');
+  });
+});
+
+describe(ownedPaths, () => {
+  const codeOwners = [
+    '# enforced-by: Validate code owners',
+    '/.github/workflows/ @owner',
+    '/tools/configs/gate-ignore-lists.json @owner',
+    '',
+  ].join('\n');
+
+  test('names the changed files CODEOWNERS gives owners', () => {
+    assert.deepStrictEqual(
+      ownedPaths(
+        [
+          'libs/a/src/x.mts',
+          '.github/workflows/release.yml',
+          'tools/configs/gate-ignore-lists.json',
+        ],
+        codeOwners,
+      ),
+      ['.github/workflows/release.yml', 'tools/configs/gate-ignore-lists.json'],
+    );
+  });
+
+  test('names none when nothing changed is owned, or there is no file', () => {
+    assert.deepStrictEqual(ownedPaths(['libs/a/src/x.mts'], codeOwners), []);
+
+    assert.deepStrictEqual(ownedPaths(['.github/workflows/a.yml'], ''), []);
   });
 });

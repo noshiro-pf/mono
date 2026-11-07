@@ -60,6 +60,7 @@ const context = (
     reviewRequirements: {
       requireCodeOwnerReview: false,
       requireConversationResolution: false,
+      requiredContexts: [],
     },
     openNumbers: new Set<number>(),
     dependencies: new Map<number, readonly number[]>(),

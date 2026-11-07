@@ -20,6 +20,11 @@
  * auto-merge left off — it could never fire — until its checks report, and
  * then left for that person (`awaiting-bypass`).
  *
+ * Not where a required check enforces `CODEOWNERS` instead of the ruleset
+ * (`codeOwnerGate` is `'check'`): the check counts the author as approving what
+ * they own, so such a pull request waits for nobody, and only someone else's
+ * waits for an owner's approval.
+ *
  * GitHub will not say this itself: `reviewDecision` describes branch
  * protection, not a ruleset, and is `null` for every pull request here. The
  * code-owner half is {@link codeOwnerReview}, worked out from `CODEOWNERS`.
@@ -29,7 +34,11 @@
  * in the running there either (`queue-order.mts`).
  */
 
-import { codeOwnerReview, type CodeOwnersRule } from './code-owners.mjs';
+import {
+  codeOwnerReview,
+  type CodeOwnerGate,
+  type CodeOwnersRule,
+} from './code-owners.mjs';
 import type { RulesetRequirements } from './ruleset.mjs';
 
 /** What is read about one pull request to decide. */
@@ -47,6 +56,11 @@ export type ReviewRules = Readonly<{
   requireCodeOwnerReview: RulesetRequirements['requireCodeOwnerReview'];
   requireConversationResolution: RulesetRequirements['requireConversationResolution'];
   codeOwners: readonly CodeOwnersRule[];
+  /**
+   * What enforces `CODEOWNERS` (`codeOwnerGate`). Absent, it is the ruleset
+   * where `requireCodeOwnerReview` says so, and nothing otherwise.
+   */
+  codeOwnerGate?: CodeOwnerGate;
 }>;
 
 /**
@@ -63,13 +77,18 @@ export const reviewHold = (
   state: ReviewState,
   rules: ReviewRules,
 ): ReviewHold | undefined => {
+  const gate =
+    rules.codeOwnerGate ??
+    (rules.requireCodeOwnerReview ? ('ruleset' as const) : undefined);
+
   const codeOwners = codeOwnerReview({
-    required: rules.requireCodeOwnerReview,
+    required: gate !== undefined,
     rules: rules.codeOwners,
     files: state.files,
     filesComplete: state.filesComplete,
     approvers: state.approvers,
     author: state.author,
+    authorApproves: gate === 'check',
   });
 
   const conversations =

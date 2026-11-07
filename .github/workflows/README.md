@@ -24,7 +24,7 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `check-gates.yml`                | `workflow_call`, from the six above    | none; it is the gate the six share             |
 | `check-result.yml`               | `workflow_call`, from the six above    | the six above; it is their aggregate           |
 | `skip-ci-label.yml`              | `pull_request_target`                  | the `no-skip-ci-label` commit status           |
-| `lint-pull-request.yml`          | `pull_request_target`                  | its three jobs, by name                        |
+| `lint-pull-request.yml`          | `pull_request_target`                  | its four jobs, by name                         |
 | `release.yml`                    | `push` to `main`                       | none                                           |
 | `pnpm-update.yml`                | schedule                               | none; opens/closes `chore/pnpm-update`         |
 | `node-support-update.yml`        | schedule                               | none; opens/closes `chore/node-support-update` |
@@ -681,13 +681,13 @@ on each Node version is the check itself.
 ## `skip-ci` and `no-skip-ci-label`
 
 `skip-ci` on a pull request skips the six check workflows; every gated job
-carries the label condition and boots no runner. The three
+carries the label condition and boots no runner. The four
 `lint-pull-request.yml` jobs run regardless (see "A label event under
-`skip-ci`"). GitHub has no label-based merge block, so on its own the
-label would leave a pull request that nothing checked looking exactly like one
-that passed. The block is `skip-ci-label.yml`: it writes a required commit
-status, `no-skip-ci-label`, on every head commit, `pending` while the label is
-on and `success` without it.
+`skip-ci`"). GitHub has no label-based merge block, so on its own the label
+would leave a pull request that nothing checked looking exactly like one that
+passed. The block is `skip-ci-label.yml`: it writes a required commit status,
+`no-skip-ci-label`, on every head commit, `pending` while the label is on and
+`success` without it.
 
 - **It is what holds a labelled pull request.** The aggregates report
   `skipped` on a commit pushed while the label is on (a pull request nobody
@@ -742,10 +742,10 @@ cancels it now stays until the label comes off, where the `labeled` run used
 to replace it with `skipped`. `pr-report` reads both the same way: `paused`,
 its red marked stale.
 
-`lint-pull-request.yml`'s three jobs are their own required contexts, with no
+`lint-pull-request.yml`'s four jobs are their own required contexts, with no
 caller to skip, so they carry no `skip-ci` condition and run on every event.
-They read the API for seconds, and a job still queued or running is
-`pending`, which holds the merge as well.
+They read the API for seconds, and a job still queued or running is `pending`,
+which holds the merge as well.
 
 ## `pull_request_target`
 
@@ -887,9 +887,11 @@ Nothing checks this; a review does.
   shellcheck that `tools/configs/release-binaries.json` pins, so it needs
   nothing installed; `pnpm-update.yml` moves those pins.
 - **`.github/workflows/` and `.github/actions/` are owned in
-  `.github/CODEOWNERS`**, so a change there waits for the owner's review, and
-  a bot's pull request that touches either does not auto-merge. The action
-  pins are the one thing a bot writes there.
+  `.github/CODEOWNERS`**, which `lint-pull-request.yml`'s `code-owners` job
+  enforces in the ruleset's place: a change there by anyone but the owner waits
+  for the owner's approval, so a bot's pull request that touches either does not
+  auto-merge, while the owner's own needs no bypass. The action pins are the one
+  thing a bot writes there.
 - **Action pins are SHAs with a version comment**, moved by `update-actions`
   within their major; a major waits for a human (see "Dependencies" in
   `CLAUDE.md`). A pin the setup action already carries belongs there, not in

@@ -1,9 +1,10 @@
 /**
  * Who `.github/CODEOWNERS` says owns a path.
  *
- * Read because GitHub will not say. `main`'s ruleset has
- * `require_code_owner_review` on, so a pull request touching an owned path
- * waits for an owner to approve it — and nothing on a pull request reports that
+ * Read because GitHub will not say. A pull request touching an owned path waits
+ * for an owner to approve it — under a ruleset's `require_code_owner_review`,
+ * or under a required check that enforces the file instead
+ * ({@link codeOwnersEnforcedBy}) — and nothing on a pull request reports that
  * wait: `reviewDecision` answers `null` for every pull request here, owned
  * paths or not, because it describes branch protection rather than a ruleset.
  * So it is worked out the way GitHub does, from the file — by the
@@ -45,6 +46,44 @@ export const parseCodeOwners = (text: string): readonly CodeOwnersRule[] =>
   });
 
 /**
+ * The required check a `CODEOWNERS` file says enforces it, from a comment line
+ * `# enforced-by: <context>`; `undefined` when it names none.
+ *
+ * A ruleset's `require_code_owner_review` cannot tell an author from anyone
+ * else, and GitHub does not let an author approve their own pull request, so a
+ * path its only owner changes merges by a ruleset bypass or not at all. A
+ * repository can turn that rule off and have a required check enforce the file
+ * instead, counting the author as approving what they own; this line is how it
+ * says so, in the file the check reads. It is believed only where the ruleset
+ * really requires that check ({@link codeOwnerGate}).
+ */
+export const codeOwnersEnforcedBy = (text: string): string | undefined =>
+  text
+    .split('\n')
+    .map(enforcedByOfLine)
+    .find((context) => context !== undefined);
+
+/**
+ * What enforces code-owner review on the default branch: the ruleset's own
+ * rule, a required check that `CODEOWNERS` names ({@link codeOwnersEnforcedBy}),
+ * or nothing. The ruleset's rule wins when both are there, since the check
+ * cannot satisfy it for an author.
+ */
+export const codeOwnerGate = (
+  requirements: Readonly<{
+    requireCodeOwnerReview: boolean;
+    requiredContexts: readonly string[];
+  }>,
+  enforcedBy: string | undefined,
+): CodeOwnerGate =>
+  requirements.requireCodeOwnerReview
+    ? 'ruleset'
+    : enforcedBy !== undefined &&
+        requirements.requiredContexts.includes(enforcedBy)
+      ? 'check'
+      : undefined;
+
+/**
  * The owners of one path: those of the **last** pattern that matches it, which
  * is how GitHub reads the file — a later line overrides an earlier one rather
  * than adding to it.
@@ -77,8 +116,9 @@ export const codeOwnerReview = ({
   filesComplete,
   approvers,
   author,
+  authorApproves = false,
 }: Readonly<{
-  /** Whether the ruleset asks for code-owner review at all. */
+  /** Whether code-owner review is asked for at all. */
   required: boolean;
   rules: readonly CodeOwnersRule[];
   files: readonly string[];
@@ -87,6 +127,12 @@ export const codeOwnerReview = ({
   /** Logins whose latest review approves. */
   approvers: readonly string[];
   author: string;
+  /**
+   * Whether the author counts as approving the paths they own: so where a check
+   * enforces the file ({@link codeOwnerGate} is `'check'`), and not under the
+   * ruleset's rule.
+   */
+  authorApproves?: boolean;
 }>): CodeOwnerReview => {
   if (!required) {
     return { state: 'not-required' };
@@ -94,13 +140,22 @@ export const codeOwnerReview = ({
 
   const approved = new Set(approvers.map((login) => login.toLowerCase()));
 
+  const authorLogin = author.toLowerCase();
+
+  // The author is applied path by path rather than added to `approved`: an
+  // approver there is someone a team might count, and the author has approved
+  // nothing.
   const unapproved = Arr.generate(function* () {
     for (const path of files) {
       const owners = ownersOf(path, rules);
 
       if (
         Arr.isNonEmpty(owners) &&
-        owners.every((owner) => !approved.has(owner.toLowerCase()))
+        owners.every((owner) => !approved.has(owner.toLowerCase())) &&
+        !(
+          authorApproves &&
+          owners.some((owner) => owner.toLowerCase() === authorLogin)
+        )
       ) {
         yield { path, owners };
       }
@@ -141,6 +196,28 @@ export const codeOwnerReview = ({
   const owned = files.some((path) => Arr.isNonEmpty(ownersOf(path, rules)));
 
   return owned ? { state: 'approved' } : { state: 'not-required' };
+};
+
+const ENFORCED_BY = 'enforced-by:';
+
+export type CodeOwnerGate = 'check' | 'ruleset' | undefined;
+
+const enforcedByOfLine = (line: string): string | undefined => {
+  const trimmed = line.trim();
+
+  if (!trimmed.startsWith('#')) {
+    return undefined;
+  }
+
+  const comment = trimmed.slice(1).trimStart();
+
+  if (!comment.startsWith(ENFORCED_BY)) {
+    return undefined;
+  }
+
+  const context = comment.slice(ENFORCED_BY.length).trim();
+
+  return context === '' ? undefined : context;
 };
 
 const stripComment = (line: string): string => {

@@ -1,5 +1,11 @@
 import dedent from 'dedent';
-import { codeOwnerReview, ownersOf, parseCodeOwners } from './code-owners.mjs';
+import {
+  codeOwnerGate,
+  codeOwnerReview,
+  codeOwnersEnforcedBy,
+  ownersOf,
+  parseCodeOwners,
+} from './code-owners.mjs';
 
 describe(parseCodeOwners, () => {
   test('reads a pattern and its owners, skipping comments and blank lines', () => {
@@ -158,6 +164,45 @@ describe(codeOwnerReview, () => {
     );
   });
 
+  test('counts the author as approving what they own when asked to', () => {
+    assert.deepStrictEqual(
+      review({ author: 'NoShiro-PF', authorApproves: true }),
+      { state: 'approved' },
+    );
+
+    assert.deepStrictEqual(
+      review({ author: 'renovate-bot', authorApproves: true }),
+      {
+        state: 'required',
+        paths: ['.github/workflows/release.yml'],
+        owners: ['noshiro-pf'],
+        authorOwns: false,
+      },
+    );
+  });
+
+  // An approval by someone else might be a team member's; the author's own
+  // standing is no approval at all, so a team path still waits for one.
+  test('counts the author only on the paths they own, not as an approver', () => {
+    assert.deepStrictEqual(
+      codeOwnerReview({
+        required: true,
+        rules: parseCodeOwners('/infra/ @org/team\n/docs/ @bot\n'),
+        files: ['infra/x.tf', 'docs/a.md'],
+        filesComplete: true,
+        approvers: [],
+        author: 'bot',
+        authorApproves: true,
+      }),
+      {
+        state: 'required',
+        paths: ['infra/x.tf'],
+        owners: ['org/team'],
+        authorOwns: false,
+      },
+    );
+  });
+
   test('says when the author is an owner, since they cannot approve it', () => {
     const answered = review({ author: 'noshiro-pf' });
 
@@ -235,3 +280,71 @@ describe(codeOwnerReview, () => {
 
 const owners = (text: string, path: string): readonly string[] =>
   ownersOf(path, parseCodeOwners(text));
+
+describe(codeOwnersEnforcedBy, () => {
+  test('reads the context a comment line names', () => {
+    assert.strictEqual(
+      codeOwnersEnforcedBy(dedent`
+        # Owners.
+        #
+        #   enforced-by:   Validate code owners  
+        /.github/ @owner
+      `),
+      'Validate code owners',
+    );
+  });
+
+  test('is undefined for a file that names none', () => {
+    assert.isUndefined(codeOwnersEnforcedBy('/.github/ @owner\n'));
+
+    assert.isUndefined(codeOwnersEnforcedBy('# enforced-by:\n'));
+  });
+
+  test('takes the first of several', () => {
+    assert.strictEqual(
+      codeOwnersEnforcedBy('# enforced-by: a\n# enforced-by: b\n'),
+      'a',
+    );
+  });
+
+  // Only a comment line is a declaration; a pattern is never mistaken for one.
+  test('ignores the words after a pattern', () => {
+    assert.isUndefined(
+      codeOwnersEnforcedBy('/docs/ @owner # enforced-by: a\n'),
+    );
+  });
+});
+
+describe(codeOwnerGate, () => {
+  test('is the ruleset when the ruleset asks, whatever the file says', () => {
+    assert.strictEqual(
+      codeOwnerGate(requirements(true, ['a']), 'a'),
+      'ruleset',
+    );
+
+    assert.strictEqual(
+      codeOwnerGate(requirements(true, []), undefined),
+      'ruleset',
+    );
+  });
+
+  test('is the check the file names when the ruleset requires it', () => {
+    assert.strictEqual(
+      codeOwnerGate(requirements(false, ['x', 'a']), 'a'),
+      'check',
+    );
+  });
+
+  // A file can say anything; only a check the ruleset requires holds a merge.
+  test('is nothing when the named check is not required', () => {
+    assert.isUndefined(codeOwnerGate(requirements(false, ['x']), 'a'));
+
+    assert.isUndefined(codeOwnerGate(requirements(false, ['a']), undefined));
+  });
+});
+
+const requirements = (
+  requireCodeOwnerReview: boolean,
+  requiredContexts: readonly string[],
+): Parameters<typeof codeOwnerGate>[0] =>
+  ({ requireCodeOwnerReview, requiredContexts }) as const;

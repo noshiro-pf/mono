@@ -39,17 +39,18 @@ and three generators, and `z:ci:style-check:format-and-doc` through Prettier.
 These checks do not follow that rule (`check:prose:unblock-prs-guide` holds the
 table to the check workflows):
 
-| Check                                      | What to run                                                                                                                                   |
-| :----------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
-| `test-node-versions (<target>, <command>)` | `pnpm run ws:build` then `pnpm run <command>` on that Node                                                                                    |
-| `verify-published`                         | `pnpm run verify:npm-packages:published`                                                                                                      |
-| `strict-lib-gen`                           | `pnpm run strict-lib:gen:with-codemod-fixed` then `pnpm run strict-lib:gen:version-diff`, then look for a dirty tree                          |
-| `strict-lib-types`                         | `pnpm run ws:build:deps` then `pnpm run ws:check:types:strict-lib`                                                                            |
-| `benchmark`                                | Read its failure: drifted tables are replaced by the files of the run's `synstate-benchmark-to-commit-<run id>` artifact, as its message says |
-| `coverage-main`                            | Runs on `main` alone, never on a pull request                                                                                                 |
-| `Validate PR title`                        | The PR title is not Conventional Commits — `PATCH /pulls/{n}`                                                                                 |
-| `Validate commit messages`                 | A commit message is not English — amend it                                                                                                    |
-| `Validate commit count`                    | The branch is more than one commit — squash it, see below                                                                                     |
+| Check                                      | What to run                                                                                                                                         |
+| :----------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test-node-versions (<target>, <command>)` | `pnpm run ws:build` then `pnpm run <command>` on that Node                                                                                          |
+| `verify-published`                         | `pnpm run verify:npm-packages:published`                                                                                                            |
+| `strict-lib-gen`                           | `pnpm run strict-lib:gen:with-codemod-fixed` then `pnpm run strict-lib:gen:version-diff`, then look for a dirty tree                                |
+| `strict-lib-types`                         | `pnpm run ws:build:deps` then `pnpm run ws:check:types:strict-lib`                                                                                  |
+| `benchmark`                                | Read its failure: drifted tables are replaced by the files of the run's `synstate-benchmark-to-commit-<run id>` artifact, as its message says       |
+| `coverage-main`                            | Runs on `main` alone, never on a pull request                                                                                                       |
+| `Validate PR title`                        | The PR title is not Conventional Commits — `PATCH /pulls/{n}`                                                                                       |
+| `Validate commit messages`                 | A commit message is not English — amend it                                                                                                          |
+| `Validate commit count`                    | The branch is more than one commit — squash it, see below                                                                                           |
+| `Validate code owners`                     | Someone other than an owner changed a path `.github/CODEOWNERS` lists — not yours to fix: an owner reads and approves it, and the worker re-runs it |
 
 `Validate PR title` is required because a squash merge takes the PR title as
 the commit title (`squash_merge_commit_title: PR_TITLE`), so the fix is the

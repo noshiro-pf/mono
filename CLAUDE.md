@@ -189,11 +189,11 @@ workflow has to be wired to. A workflow's own comments say only what is
 particular to it. Here is only what a session has to act on.
 
 - **The required contexts** (`repo-settings/rulesets/main.json`) are the six
-  `*-result / result` aggregates, the `no-skip-ci-label` status and the three
-  `lint-pull-request.yml` jobs. None does work, because a skipped job
-  satisfies a required check. A new matrix entry needs nothing; a new job or
-  workflow needs its aggregate context added there, or it runs and blocks
-  nothing. A red aggregate names the jobs that did not pass; open the run.
+  `*-result / result` aggregates, the `no-skip-ci-label` status and the four
+  `lint-pull-request.yml` jobs. None does work, because a skipped job satisfies
+  a required check. A new matrix entry needs nothing; a new job or workflow
+  needs its aggregate context added there, or it runs and blocks nothing. A red
+  aggregate names the jobs that did not pass; open the run.
 - **A push to `main` runs the check workflows too.** A merged tree that
   already has a verdict costs one gate job; one that has none, as a bypass
   merge can land, is checked in full. Nothing needs running by hand.
@@ -293,15 +293,14 @@ ingest the feed). Outside reports come through private vulnerability reporting
   stack means replaying the layers above onto it
   (`git rebase --onto <new> <old>`) and force-pushing them too.
 - **`pnpm run open-pr` opens it**: push, create it ready for review (never a
-  draft), add `skip-ci` and `auto-rebase` — and never arm auto-merge.
-  **Nothing is armed until the queue picks it**: the ruleset asks for
-  `required_approving_review_count: 0`, so outside `.github/CODEOWNERS` paths
-  an armed green branch merges with nothing else to clear, and a stacked one,
-  onto a branch no ruleset covers, merges into the layer below at once.
-  `unblock-prs` arms a `merge-queued` pull request whenever it picks it; to
-  hold one back, take `merge-queued` off. Run the local checks first and
-  say in the description which ones — while the label is on they are the only
-  checks the branch gets. Details in `libs/pr-merge-queue/src/open-pr/README.md`.
+  draft), add `skip-ci` and `auto-rebase` — and never arm auto-merge. **Nothing
+  is armed until the queue picks it**: armed, a session's branch merges once
+  green, with no review, on `.github/CODEOWNERS` paths too, its author being
+  their owner, and a stacked one can merge into the layer below. `unblock-prs`
+  arms a `merge-queued` pull request when it picks it; to hold one back, take
+  `merge-queued` off. Run the local checks first and name them in the
+  description: while the label is on they are the only checks the branch gets.
+  Details in `libs/pr-merge-queue/src/open-pr/README.md`.
 - **A pull request that changes what a page draws shows it, before and
   after**, in screenshots in its description: light and dark, and a phone
   width where the layout changes. Pushing them to `main` of the public
