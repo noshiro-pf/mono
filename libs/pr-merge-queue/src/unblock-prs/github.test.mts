@@ -1,4 +1,9 @@
-import { latestMergedHead, pullRequestOfNode } from './github.mjs';
+import {
+  latestMergedHead,
+  pullRequestOfNode,
+  rerunOf,
+  RUN_TIMEOUT_MS,
+} from './github.mjs';
 
 describe(pullRequestOfNode, () => {
   const node = {
@@ -82,3 +87,50 @@ const pull = (
     merge_commit_sha: mergeCommit,
     merged_at: mergedAt,
   }) as const;
+
+describe(rerunOf, () => {
+  const run = {
+    run_attempt: 1,
+    status: 'completed',
+    run_started_at: '2026-11-01T00:00:00Z',
+  } as const;
+
+  const startedMs = Date.parse(run.run_started_at);
+
+  test('re-runs a completed run with re-runs left', () => {
+    assert.strictEqual(rerunOf(run, startedMs), 'rerun');
+
+    assert.strictEqual(rerunOf({ ...run, run_attempt: 2 }, startedMs), 'rerun');
+  });
+
+  test('re-runs nothing once the budget is spent', () => {
+    assert.strictEqual(
+      rerunOf({ ...run, run_attempt: 3 }, startedMs),
+      'already',
+    );
+  });
+
+  test('waits for a run that has not completed, within the timeout', () => {
+    assert.strictEqual(
+      rerunOf({ ...run, status: 'in_progress' }, startedMs + RUN_TIMEOUT_MS),
+      'running',
+    );
+  });
+
+  test('stops waiting for a run past the timeout', () => {
+    assert.strictEqual(
+      rerunOf({ ...run, status: 'queued' }, startedMs + RUN_TIMEOUT_MS + 1),
+      'stuck',
+    );
+  });
+
+  test('waits for a run whose start GitHub does not give', () => {
+    assert.strictEqual(
+      rerunOf(
+        { ...run, status: null, run_started_at: null },
+        startedMs + RUN_TIMEOUT_MS * 2,
+      ),
+      'running',
+    );
+  });
+});

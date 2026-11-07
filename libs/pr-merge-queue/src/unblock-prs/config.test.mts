@@ -169,6 +169,26 @@ describe(configOf, () => {
     assert.isUndefined(config.value.regenerate);
   });
 
+  test('reads the workflows to speculate with, and refuses one not a workflow file named once', () => {
+    const config = speculateWith(['code-check.yml', 'style-check.yaml']);
+
+    assert.isTrue(Result.isOk(config));
+
+    assert.deepStrictEqual(config.value.speculate, {
+      workflows: ['code-check.yml', 'style-check.yaml'],
+      depth: 2,
+    });
+
+    for (const workflows of [
+      [],
+      ['code-check'],
+      ['.github/workflows/code-check.yml'],
+      ['code-check.yml', 'code-check.yml'],
+    ]) {
+      assert.isTrue(Result.isErr(speculateWith(workflows)));
+    }
+  });
+
   test('leaves the auto-fix off when the file has none', () => {
     const config = configOf({ $schema: undefined, autoFix: undefined }, 'x');
 
@@ -236,3 +256,15 @@ const autoFixFile = (
       ...autoFix,
     },
   }) as const;
+
+const speculateWith = (
+  workflows: readonly string[],
+): ReturnType<typeof configOf> =>
+  configOf(
+    {
+      $schema: undefined,
+      autoFix: undefined,
+      speculate: { workflows, depth: 2 },
+    },
+    'x',
+  );

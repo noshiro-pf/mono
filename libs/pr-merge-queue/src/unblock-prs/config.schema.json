@@ -117,6 +117,23 @@
         "additionalProperties": false
       }
     },
+    "speculate": {
+      "description": "Check queued pull requests ahead of their turn: the leading ones are stacked on the default branch, one commit each, each on a `queue/pr-<number>` branch, and the workflows are dispatched on each with `diff-parent`. A pull request is released once its layer is green, and the gate reuses that verdict. Absent: one pull request is checked at a time.",
+      "type": "object",
+      "properties": {
+        "workflows": {
+          "description": "The file names of the check workflows to dispatch on each layer, such as `code-check.yml`: every workflow that reports a required context. Each takes the `diff-parent` input.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "depth": {
+          "description": "How many queued pull requests are stacked and checked ahead at most, the first included.",
+          "type": "number"
+        }
+      },
+      "required": ["workflows", "depth"],
+      "additionalProperties": false
+    },
     "translation": {
       "description": "Pull request and issue descriptions are written twice: the original, which tools and sessions read, then its translation under one `## <heading>`, its headings one level down, ending at the first `---` rule. Present: `open-pr --body-file` and `pr-description push` / `create` refuse a body whose halves do not mirror each other, and `pr-description read` leaves the translation out. Absent: descriptions are taken as they are.",
       "type": "object",

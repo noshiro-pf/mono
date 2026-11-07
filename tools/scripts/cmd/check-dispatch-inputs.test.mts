@@ -5,6 +5,7 @@ import {
   checkDispatchInputs,
   dispatchInputViolations,
   findDispatchInputViolations,
+  speculateWorkflowViolations,
 } from './check-dispatch-inputs.mjs';
 
 describe(dispatchInputViolations, () => {
@@ -114,6 +115,28 @@ describe(findDispatchInputViolations, () => {
     ]);
 
     assert.isTrue(Result.isErr(found) && found.value.includes('broken.yml'));
+  });
+});
+
+describe(speculateWorkflowViolations, () => {
+  test('holds speculate.workflows to the callers of the gate, both ways', () => {
+    assert.deepStrictEqual(
+      speculateWorkflowViolations(['a.yml', 'b.yml'], ['b.yml', 'a.yml']),
+      [],
+    );
+
+    assert.strictEqual(
+      speculateWorkflowViolations(['a.yml', 'b.yml'], ['a.yml', 'c.yml'])
+        .length,
+      2,
+    );
+  });
+
+  test('asks nothing of a repository that does not check ahead', () => {
+    assert.deepStrictEqual(
+      speculateWorkflowViolations(['a.yml'], undefined),
+      [],
+    );
   });
 });
 

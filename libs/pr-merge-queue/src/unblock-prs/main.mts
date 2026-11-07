@@ -17,6 +17,7 @@ import {
   readConfig,
   type AutoFixConfig,
   type RegenerateConfig,
+  type SpeculateConfig,
 } from './config.mjs';
 import { stillConflicted } from './conflict-persists.mjs';
 import {
@@ -30,6 +31,7 @@ import {
   readOwnComments,
   readSetAsideComments,
   rerunFailedJobs,
+  RUN_TIMEOUT_MS,
   viewPullRequest,
   writeSetAsideCommentOn,
 } from './github.mjs';
@@ -63,10 +65,12 @@ import { describeFailedChecks } from './set-aside-detail.mjs';
 import {
   newSkips,
   pruneSkips,
+  setAsideFailing,
   settleSkips,
   unannouncedSkips,
   withSkip,
 } from './skips.mjs';
+import { dropAllLayers, speculate } from './speculate.mjs';
 import { stackedOnAfter, stackParentsOf } from './stack.mjs';
 import {
   bypassPhrase,
@@ -339,6 +343,7 @@ export const unblockPrs = async (
       options,
       autoFixConfig,
       regenerateConfig,
+      config.value?.speculate,
     );
 
     if (!options.dryRun) {
@@ -849,6 +854,7 @@ const runCycle = async (
   options: Options,
   autoFixConfig: AutoFixConfig | undefined,
   regenerateConfig: RegenerateConfig | undefined,
+  speculateConfig: SpeculateConfig | undefined,
 ): Promise<CycleResult> => {
   const listed = await survey(api, defaultBranch, before.outOfSync);
 
@@ -970,6 +976,14 @@ const runCycle = async (
       stackedOn,
     }) as const;
 
+  // Waiting for runs, which the survey does not see move: kept at the active
+  // interval rather than drifting to the idle one.
+  const waitingForRuns = (nextSkipped: SkipRecords): LoopState =>
+    ({
+      ...state(nextSkipped),
+      quiet: { ...quiet, unchanged: 0 },
+    }) as const;
+
   // A pull request that is up to date and already failing gets remembered now,
   // so that it is not rebased the moment `main` moves and put through the same
   // failing matrix again.
@@ -987,22 +1001,43 @@ const runCycle = async (
 
   // Failing only the check that enforces `CODEOWNERS`, and approved since: the
   // check runs again and reads the approval. A run re-run as often as
-  // `rerunFailedJobs` allows and still red is failing like any other.
-  for (const { pr, link, summary } of triaged.rerun) {
-    const rerun = await rerunFailedJobs(api, link);
+  // `rerunFailedJobs` allows and still red is failing like any other, as is one
+  // whose run has stalled. One released and running again holds the queue as
+  // one in flight does, since it merges once the check turns.
+  let mut_rerunning: readonly number[] = [];
 
-    if (Result.isOk(rerun) && rerun.value === 'rerun') {
+  for (const { pr, link, summary } of triaged.rerun) {
+    const rerun = await rerunFailedJobs(api, link, options.dryRun);
+
+    if (
+      Result.isOk(rerun) &&
+      (rerun.value === 'rerun' || rerun.value === 'running')
+    ) {
       log(
-        `#${pr.number}: approved since its code-owner check failed; re-running that check's failed jobs.`,
+        rerun.value === 'running'
+          ? `#${pr.number}: the run of its code-owner check has not finished yet.`
+          : options.dryRun
+            ? `Would re-run #${pr.number}'s code-owner check, approved since.`
+            : `#${pr.number}: approved since its code-owner check failed; re-running that check's failed jobs.`,
       );
+
+      if (!isSkipCiLabelled(pr)) {
+        mut_rerunning = Arr.toPushed(mut_rerunning, pr.number);
+      }
 
       continue;
     }
 
+    const failed = describeFailedChecks(summary);
+
+    const why = Result.isErr(rerun)
+      ? (`cannot re-run it: ${lastLines(rerun.value, 2).replaceAll(/\s+/gu, ' ')}` as const)
+      : rerun.value === 'stuck'
+        ? (`its run has not finished in ${RUN_TIMEOUT_MS / 60_000} minutes` as const)
+        : undefined;
+
     log(
-      Result.isErr(rerun)
-        ? `#${pr.number}: cannot re-run its code-owner check (${lastLines(rerun.value, 2)}); setting it aside as failing.`
-        : `#${pr.number}: its code-owner check has been re-run and is still red; setting it aside as failing.`,
+      `#${pr.number}: ${why ?? 'its code-owner check has been re-run and is still red'}; ${options.dryRun ? 'would set' : 'setting'} it aside as failing.`,
     );
 
     mut_skipped = withSkip(mut_skipped, {
@@ -1010,7 +1045,8 @@ const runCycle = async (
       headSha: pr.headRefOid,
       baseSha,
       reason: 'checks-failed',
-      ...describeFailedChecks(summary),
+      ...failed,
+      ...(why === undefined ? {} : { detail: `${failed.detail}; ${why}` }),
     });
   }
 
@@ -1128,13 +1164,35 @@ const runCycle = async (
       );
     }
 
-    return { state: state(mut_skipped), next: 'idle', settled: skipped };
+    return {
+      state: Arr.isNonEmpty(mut_rerunning)
+        ? waitingForRuns(mut_skipped)
+        : state(mut_skipped),
+      next: 'idle',
+      settled: skipped,
+    };
+  }
+
+  if (Arr.isNonEmpty(mut_rerunning)) {
+    log(
+      `${mut_rerunning.map((n) => `#${n}`).join(', ')}: released, and the code-owner check runs again; releasing nothing else beside it.`,
+    );
+
+    return {
+      state: waitingForRuns(mut_skipped),
+      next: options.dryRun ? 'stop' : 'idle',
+      settled: skipped,
+    };
   }
 
   // Only when the queue has nothing to do: `main` is about to move again
   // otherwise, and a push now would be undone by the next merge. With no
   // candidate, nothing below has anything to do either.
   if (Arr.isEmpty(triaged.candidates)) {
+    if (speculateConfig !== undefined && !options.dryRun) {
+      await dropAllLayers(api, baseSha, setAsideFailing(mut_skipped));
+    }
+
     const behind = await restackBehind(pullRequests, defaultBranch, {
       baseSha,
       skipped: mut_skipped,
@@ -1170,7 +1228,44 @@ const runCycle = async (
     pullRequests.filter(isSkipCiLabelled).map((pr) => pr.number),
   );
 
-  for (const target of triaged.candidates) {
+  // Checking the leading candidates ahead of their turn, when the repository
+  // turns it on (`speculate.mts`): the first is released only once its layer is
+  // green, and alone, since the layers above carry it.
+  let mut_releasing = triaged.candidates;
+
+  if (speculateConfig !== undefined) {
+    const speculation = await speculate(api, {
+      candidates: triaged.candidates,
+      defaultBranch,
+      baseSha,
+      bypass: triaged.bypass,
+      config: speculateConfig,
+      autoFix: autoFixConfig,
+      failing: setAsideFailing(mut_skipped),
+    });
+
+    if (speculation.setAside !== undefined) {
+      log(`#${speculation.setAside.number}: ${speculation.setAside.detail}`);
+
+      mut_skipped = withSkip(mut_skipped, speculation.setAside);
+    }
+
+    if (!speculation.release) {
+      return {
+        state: waitingForRuns(mut_skipped),
+        next: speculation.setAside === undefined ? 'idle' : 'survey',
+        settled: skipped,
+      };
+    }
+
+    if (speculation.stacked) {
+      mut_releasing = Arr.take(triaged.candidates, 1).filter(
+        (pr) => pr.number !== speculation.setAside?.number,
+      );
+    }
+  }
+
+  for (const target of mut_releasing) {
     if (stopRequested()) {
       return { state: state(mut_skipped), next: 'stop', settled: skipped };
     }

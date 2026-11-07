@@ -465,9 +465,10 @@ reach leaves no verdict (its aggregate is skipped); what does depend on the base
 is a check inside a workflow that runs and reads only the diff —
 `fix:codemod:affected`, and the `check:prose` guards that read a change
 (`markdown-wrap`, `next-major`) — whose green says nothing of the layers below.
-So the queue that dispatches layers has to delete the runs above one that went
-red before any pull request could reuse them; that queue is #3585, and until it
-exists nothing dispatches on a `queue/*` branch.
+So the queue that dispatches layers deletes the runs above one that went red,
+and those of a layer no longer standing, before any pull request could reuse
+them (`unblock-prs`, step 3b in
+`libs/pr-merge-queue/src/unblock-prs/README.md`).
 
 **A verdict has to be a function of the tree.** That is what makes reusing it
 by tree sound, and it is why a job whose result also depends on what it was
@@ -648,11 +649,13 @@ each caller passes it as `result-job: <name>-result / result`.
   node-version-compatibility's three, strict-lib-gen's two; the benchmark's job,
   about a minute when its baseline hits, is one more), and each takes about six
   to six and a half minutes from start to end. Pull requests merge one at a
-  time, so a pull request's longest job is what the queue waits on: a short
-  check rides along with a longer one rather than taking a runner of its own,
-  and a job that outgrows the others is split. A new entry joins an existing one
-  unless the count is rethought; the matrix comment in `code-check.yml` has the
-  arithmetic.
+  time, so a pull request's longest job is what the queue waits on (with
+  `speculate` in `.github/unblock-prs.json` the queue checks the next pull
+  requests ahead of their turn on top of the first, so the runners carry more
+  than one pull request's jobs; "Triggers" says how): a short check rides along
+  with a longer one rather than taking a runner of its own, and a job that
+  outgrows the others is split. A new entry joins an existing one unless the
+  count is rethought; the matrix comment in `code-check.yml` has the arithmetic.
 
 ### When a check fails
 
