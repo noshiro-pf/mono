@@ -1,0 +1,59 @@
+---
+title: synstate-dom-next
+description: The rebuild of synstate-dom on synstate-next. A compiler-free, fine-grained UI library that binds observables directly to the DOM.
+template: splash
+hero:
+    tagline: synstate-dom rebuilt from scratch on synstate-next. Pass observables straight into JSX. Your component runs once; after an update has settled, each attribute, property and text you bound is written by one small effect. No compiler, no virtual DOM.
+    actions:
+        - text: Get Started
+          link: /mono/synstate-dom-next/getting-started/introduction/
+          icon: right-arrow
+          variant: primary
+        - text: How it works
+          link: /mono/synstate-dom-next/background/how-it-works/
+          variant: minimal
+---
+
+import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+<Aside type="caution">
+    synstate-dom-next is a private package in the repository and is not
+    published. It will be released as the next major version of synstate-dom,
+    and its API may change until then.
+</Aside>
+
+## Features
+
+<CardGrid>
+    <Card title="Made for SynState" icon="star">
+
+The graph you build with synstate-next's operators ends in the DOM: each binding is a leaf of that graph, with nothing converted on the way. On the operations of js-framework-benchmark it takes {/* benchmark:next-over-dom-min */}0.78{/* /benchmark */}× to {/* benchmark:next-over-dom-max */}1.00{/* /benchmark */}× synstate-dom's time.
+
+    </Card>
+    <Card title="Bindings run on a settled graph" icon="approve-check">
+        An update propagates through the whole graph first, and only then are
+        the bindings it reached run, each once. A binding never sees a
+        half-updated graph, and `If` and `For` mount and unmount outside any
+        propagation.
+    </Card>
+    <Card title="Fine-grained, called once" icon="rocket">
+        Your component function is called once, when it mounts. After that, an
+        update writes straight to the DOM leaves bound to what changed: an
+        attribute, a property or a text node. Nothing is diffed.
+    </Card>
+    <Card title="No compiler" icon="setting">
+        All you need is TypeScript's standard `"jsx": "react-jsx"` and
+        `jsxImportSource`. There is no Babel or Vite plugin to configure.
+    </Card>
+    <Card title="Reactivity in the types" icon="pencil">
+        Wherever JSX takes data, you pass an observable or a `constant(...)`,
+        never a plain value. If you read a snapshot by mistake, you get a type
+        error instead of a view that silently stops updating.
+    </Card>
+    <Card title="No leaks by construction" icon="random">
+        Everything made while a component mounts belongs to the owner it mounts
+        in. Close a branch or remove a row, and every derivation, binding and
+        subscription made inside it goes with it.
+    </Card>
+
+</CardGrid>

@@ -1,0 +1,23 @@
+import { constant, MatchOptional, type JSX } from 'synstate-dom-next';
+import { createState, map, type InitializedObservable } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
+
+type User = Readonly<{ name: string }>;
+
+const [currentUser$] = createState<Optional<User>>(Optional.none);
+
+// `some` is called once per change from empty to present. While a user stays
+// signed in, a new value flows through `u$` and the branch is kept.
+export const Account = (): JSX.Element => (
+  <MatchOptional
+    value={currentUser$}
+    some={(u$) => <Profile user$={u$} />}
+    none={<p>{constant('Not signed in')}</p>}
+  />
+);
+
+const Profile = ({
+  user$,
+}: Readonly<{ user$: InitializedObservable<User> }>): JSX.Element => (
+  <p>{user$.pipe(map((u) => `Signed in as ${u.name}`))}</p>
+);

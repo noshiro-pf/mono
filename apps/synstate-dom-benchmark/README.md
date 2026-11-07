@@ -65,3 +65,5 @@ synstate-dom is measured twice. As written, each figure is `combine` + `map`, wh
 - **js-framework-benchmark table** (`src/frameworks/`) and the **loan**, **schedule** and **zoom scenarios** (`src/scenarios/`), as timed. synstate-dom's scenarios are measured as written, without `skipIfNoChange`.
 
 The code the implementations share, the row factory and the scenario models, is in every column. One run is enough: the sizes depend only on the sources and the installed versions.
+
+`pnpm run bundle-size -- --next` bundles the libraries `benchmark:next` times, synstate-dom, synstate-dom-next and Solid, and writes [`BUNDLE-SIZE-NEXT.md`](./BUNDLE-SIZE-NEXT.md), which synstate-dom-next's documentation site embeds.
