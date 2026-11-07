@@ -1,11 +1,11 @@
 import { Arr } from 'ts-data-forge';
 import {
-  buildableLayers,
   cancelledTooOften,
   decideSpeculation,
   desiredLayers,
-  dropActionOf,
+  DROPPED_RUN_QUIET_MS,
   isStuck,
+  LAYER_QUEUED_TIMEOUT_MS,
   LAYER_TIMEOUT_MS,
   layerBranch,
   layerMessage,
@@ -15,7 +15,9 @@ import {
   MAX_DISPATCHES,
   mayBuildAbove,
   numberOfLayerBranch,
+  planDrop,
   type BuiltLayer,
+  type DropRun,
   type LayerStatus,
 } from './speculate-plan.mjs';
 import type { PullRequest } from './types.mjs';
@@ -264,28 +266,6 @@ describe(mayBuildAbove, () => {
   });
 });
 
-describe(buildableLayers, () => {
-  test('stops before the first layer whose old runs are still on its branch', () => {
-    const toBuild = [layer(5), layer(3), layer(9)] as const;
-
-    assert.deepStrictEqual(
-      buildableLayers(toBuild, new Set<number>()),
-      toBuild,
-    );
-
-    assert.deepStrictEqual(buildableLayers(toBuild, new Set<number>([3])), [
-      layer(5),
-    ]);
-
-    assert.deepStrictEqual(buildableLayers(toBuild, new Set<number>([5])), []);
-
-    assert.deepStrictEqual(
-      buildableLayers(toBuild, new Set<number>([7])),
-      toBuild,
-    );
-  });
-});
-
 describe(cancelledTooOften, () => {
   test('is a workflow cancelled as often as it may be dispatched', () => {
     const cancelled: readonly string[] = Array.from(
@@ -303,41 +283,115 @@ describe(cancelledTooOften, () => {
   });
 });
 
-describe(dropActionOf, () => {
-  const red = { status: 'completed', conclusion: 'failure' } as const;
+describe(planDrop, () => {
+  const updatedMs = Date.parse('2026-11-01T00:00:00Z');
 
-  const green = { status: 'completed', conclusion: 'success' } as const;
+  const run = (id: number, status: string): DropRun =>
+    ({ id, status, updated_at: '2026-11-01T00:00:00Z' }) as const;
 
-  test('cancels a run still going, whatever it is', () => {
-    const going = { status: 'in_progress', conclusion: null } as const;
+  const runs = [run(1, 'completed'), run(2, 'in_progress')] as const;
 
-    assert.strictEqual(dropActionOf(going, false), 'cancel');
-
-    assert.strictEqual(dropActionOf(going, true), 'cancel');
+  // Their verdicts will not be used, and they hold runners; nothing of them has
+  // to be deleted, since a layer's run diffs against `main`.
+  test('cancels the runs still going of a layer no longer valid, and drops its branch', () => {
+    assert.deepStrictEqual(planDrop(false, runs, updatedMs), {
+      cancel: [2],
+      deleteBranch: true,
+    });
   });
 
-  test('deletes a finished run, so that no verdict of the layer is reused', () => {
-    assert.strictEqual(dropActionOf(red, false), 'delete');
+  // The comment links to a finished run, whoever fixes it sees every failure at
+  // once, and a job still to start finds its commit.
+  test('leaves the runs of a set-aside layer to finish, and drops its branch once they have', () => {
+    assert.deepStrictEqual(planDrop(true, runs, updatedMs), {
+      cancel: [],
+      deleteBranch: false,
+    });
 
-    assert.strictEqual(dropActionOf(green, false), 'delete');
+    assert.isTrue(planDrop(true, Arr.take(runs, 1), updatedMs).deleteBranch);
   });
 
-  test('keeps only what did not pass, for a pull request set aside for it', () => {
-    assert.strictEqual(dropActionOf(red, true), 'keep');
+  test('drops the branch of a set-aside layer once a run has gone quiet past the bound', () => {
+    assert.isFalse(
+      planDrop(true, runs, updatedMs + DROPPED_RUN_QUIET_MS).deleteBranch,
+    );
 
-    assert.strictEqual(dropActionOf(green, true), 'delete');
+    assert.isTrue(
+      planDrop(true, runs, updatedMs + DROPPED_RUN_QUIET_MS + 1).deleteBranch,
+    );
   });
 });
 
 describe(isStuck, () => {
-  test('is a first layer running past the limit, from its oldest run still going', () => {
-    assert.isTrue(isStuck(RUNNING, 0, LAYER_TIMEOUT_MS + 1));
+  test('is a job running past the limit from its own start', () => {
+    assert.isTrue(
+      isStuck(
+        RUNNING,
+        { dispatched: 0, oldestJobRunning: 0 },
+        LAYER_TIMEOUT_MS + 1,
+      ),
+    );
 
-    assert.isFalse(isStuck(RUNNING, 0, LAYER_TIMEOUT_MS));
+    assert.isFalse(
+      isStuck(
+        RUNNING,
+        { dispatched: 0, oldestJobRunning: 0 },
+        LAYER_TIMEOUT_MS,
+      ),
+    );
 
-    assert.isFalse(isStuck(RUNNING, undefined, LAYER_TIMEOUT_MS * 2));
+    assert.isFalse(
+      isStuck(GREEN, { oldestJobRunning: 0 }, LAYER_TIMEOUT_MS * 2),
+    );
+  });
 
-    assert.isFalse(isStuck(GREEN, 0, LAYER_TIMEOUT_MS * 2));
+  // A busy account is no reason to give up as soon as a run of its own would.
+  test('measures a wait for runners from the dispatch of the run waiting, further out', () => {
+    assert.isFalse(isStuck(RUNNING, { waiting: 0 }, LAYER_TIMEOUT_MS + 1));
+
+    assert.isFalse(isStuck(RUNNING, { waiting: 0 }, LAYER_QUEUED_TIMEOUT_MS));
+
+    assert.isTrue(
+      isStuck(RUNNING, { waiting: 0 }, LAYER_QUEUED_TIMEOUT_MS + 1),
+    );
+  });
+
+  // Each clock is its own: an old run's dispatch is no measure of a run
+  // dispatched again later, and the time spent waiting stops counting once the
+  // jobs have started.
+  test('measures each run from its own clock', () => {
+    assert.isFalse(
+      isStuck(
+        RUNNING,
+        {
+          dispatched: 0,
+          waiting: LAYER_QUEUED_TIMEOUT_MS,
+          oldestJobRunning: LAYER_QUEUED_TIMEOUT_MS,
+        },
+        LAYER_QUEUED_TIMEOUT_MS + LAYER_TIMEOUT_MS,
+      ),
+    );
+  });
+
+  test('counts a job running past the limit while another run still waits', () => {
+    assert.isTrue(
+      isStuck(
+        RUNNING,
+        { waiting: 0, oldestJobRunning: 0 },
+        LAYER_TIMEOUT_MS + 1,
+      ),
+    );
+  });
+
+  // Every job finished, and the run never completes: nothing else says so.
+  test('falls back on the dispatch when no run waits and no job runs', () => {
+    assert.isFalse(
+      isStuck(RUNNING, { dispatched: 0 }, LAYER_QUEUED_TIMEOUT_MS),
+    );
+
+    assert.isTrue(
+      isStuck(RUNNING, { dispatched: 0 }, LAYER_QUEUED_TIMEOUT_MS + 1),
+    );
   });
 });
 
@@ -398,7 +452,11 @@ const built = (
   number: number,
   trees: Readonly<{ parentTree: string; tree: string }>,
 ): BuiltLayer =>
-  ({ ...layer(number), tip: `tip-${number}`, ...trees }) as const;
+  ({
+    ...layer(number),
+    tip: `tip-${number}`,
+    ...trees,
+  }) as const;
 
 const pr = (
   number: number,

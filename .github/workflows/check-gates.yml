@@ -97,14 +97,10 @@ jobs:
       # made while behind has no verdict to read. First, so that it is in the
       # list whatever the steps after it do. See "Reusing a verdict" in
       # README.md.
-      # A run that diffed a commit against its parent (`diff-parent`) is reusable
-      # only as a queue layer, on a `queue/*` branch: elsewhere nothing says the
-      # parent was ever checked. README.md, "Triggers" and "Reusing a verdict".
-      # The prefix is trusted because `repo-settings/rulesets/queue-branches.json`
-      # lets only the queue write it; a prefix change also changes that file,
-      # `queue-tags.json` and `LAYER_BRANCH_PREFIX` in `libs/pr-merge-queue`. `github.ref`, not
-      # `ref_name`, so that a tag named `queue/...` is not taken for a branch.
-      - name: "Verdict reusable by tree: ${{ (github.event_name != 'pull_request' && (github.event.inputs.diff-parent != 'true' || startsWith(github.ref, 'refs/heads/queue/'))) || github.event.pull_request.base.ref == case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main') }}"
+      # A run that diffed a commit against its parent (`diff-parent`) is never
+      # reusable: nothing says the parent was ever checked. The queue does not
+      # set it. README.md, "Reusing a verdict".
+      - name: "Verdict reusable by tree: ${{ (github.event_name != 'pull_request' && github.event.inputs.diff-parent != 'true') || github.event.pull_request.base.ref == case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main') }}"
         run: echo 'Recorded in the step name above, for the reuse lookup of later runs.'
 
       - name: Check whether the branch is behind the base branch
@@ -322,10 +318,10 @@ jobs:
           install: 'false'
 
       # Which base the diff is taken against — the pull request's own base,
-      # on a push to main what main pointed at before it, or a queue layer's
-      # parent (`diff-parent`) — the shallow fetch of it, and the check of
-      # `diff-scope` are in the script,
-      # `planDiffCheck`, which writes `should_run=` to `GITHUB_OUTPUT`.
+      # on a push to main what main pointed at before it, the parent of a run
+      # asked for it (`diff-parent`), or else `origin/main` — the shallow fetch
+      # of it, and the check of `diff-scope` are in the script, `planDiffCheck`,
+      # which writes `should_run=` to `GITHUB_OUTPUT`.
       - name: Check diff
         id: check_diff
         if: steps.checkout.outcome == 'success'

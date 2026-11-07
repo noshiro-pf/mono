@@ -5,11 +5,12 @@ import { Arr, Num, Result } from 'ts-data-forge';
  *
  * The leading candidates are stacked on `main`, one commit each, every layer on
  * a branch of its own (`queue/pr-<number>`), and the check workflows are
- * dispatched on each layer with `diff-parent`, so that each is judged on its
- * own commit against the layer below. When the first candidate's turn comes,
- * its layer has a verdict, and the pull request rebased onto `main` has the
- * same tree as the layer, so the gate reuses that verdict instead of running
- * the matrix again (`.github/workflows/README.md`, "Reusing a verdict").
+ * dispatched on each layer, which diff it against `main` as a pull request's
+ * run does, so that its verdict is a whole one about its tree, whatever becomes
+ * of the layers below. When the first candidate's turn comes, its layer has a
+ * verdict, and the pull request rebased onto `main` has the same tree as the
+ * layer, so the gate reuses that verdict instead of running the matrix again
+ * (`.github/workflows/README.md`, "Reusing a verdict").
  *
  * Nothing is remembered between surveys: the branches say what was built, by
  * the trees they sit on, and the runs on their tips say how far each got.
@@ -89,8 +90,8 @@ export const matchLayers = ({
  *   merged and may not, and it is judged once it is first, on `main`'s tree or
  *   rebuilt on it. It holds the release of nothing below it.
  * - **Every layer above a red one over green ones**, which carries it, is
- *   dropped ({@link dropActionOf}), so that no verdict reached on top of it is
- *   reused. A red layer over one still running says nothing yet.
+ *   cleaned up ({@link planDrop}), its runs cancelled to free their runners. A
+ *   red layer over one still running says nothing yet.
  * - **The next layer is dispatched** only once the layers below are green, or
  *   have finished their gate and started every job, so that the first finishes
  *   as fast as it would alone, and never on top of a red layer.
@@ -165,21 +166,6 @@ export const mayBuildAbove = (statuses: readonly LayerStatus[]): boolean =>
   firstRedOverGreen(statuses) === undefined;
 
 /**
- * The layers of `toBuild` that may be built this survey: up to the first in
- * `held`, whose old branch still has runs that could not be dropped. A force
- * push would leave them on a commit no later survey reads, their verdicts still
- * reusable by tree.
- */
-export const buildableLayers = (
-  toBuild: readonly Layer[],
-  held: ReadonlySet<number>,
-): readonly Layer[] => {
-  const stop = toBuild.findIndex(({ number }) => held.has(number));
-
-  return stop === -1 ? toBuild : toBuild.slice(0, stop);
-};
-
-/**
  * Whether a workflow's runs on a layer, by their conclusions, have been
  * cancelled as often as it may be dispatched. A cancelled run is dispatched
  * again, and something that keeps cancelling them would otherwise hold the first
@@ -194,36 +180,79 @@ export const cancelledTooOften = (
   );
 
 /**
- * What dropping a layer does with one of its runs: cancels it while it is going,
- * and deletes it once finished, so that the gate's lookup by tree finds no
- * verdict of a layer that no longer stands. With `keepRed`, for a pull request
- * set aside for its layer, a run that did not pass stays: a set-aside comment
- * links to it, and it is the failure that comment is about.
+ * What cleaning up an invalid layer does with its runs and its branch. A layer's
+ * runs diff against `main`, as a pull request's do, so a verdict they leave is
+ * as true as that pull request's own run would be, and none has to be deleted:
+ * cleaning up is about runners and about which branches stand.
+ *
+ * - One whose pull request is `setAside` for a failure at the head it was built
+ *   at keeps its runs going, so that the set-aside comment links to a finished
+ *   run and whoever fixes it sees every failure at once, and loses its branch
+ *   once they have finished, so that a job not yet started still finds its
+ *   commit; but not once a run has gone {@link DROPPED_RUN_QUIET_MS} without an
+ *   update, in case GitHub never ends it. A retry before then finds the layer
+ *   still standing and its failure with it.
+ * - Any other has its runs still going cancelled, since their verdicts will not
+ *   be used and they hold runners, and loses its branch: the cancels are asked
+ *   for first, so that no job still to start looks for a commit already gone.
  */
-export const dropActionOf = (
-  run: Readonly<{ status: string; conclusion: string | null }>,
-  keepRed: boolean,
-): 'cancel' | 'delete' | 'keep' =>
-  run.status !== 'completed'
-    ? 'cancel'
-    : keepRed && run.conclusion !== 'success'
-      ? 'keep'
-      : 'delete';
+export const planDrop = (
+  setAside: boolean,
+  runs: readonly DropRun[],
+  nowMs: number,
+): LayerDrop => {
+  const going = runs.filter((run) => run.status !== 'completed');
+
+  return setAside
+    ? {
+        cancel: [],
+        deleteBranch: going.every(
+          (run) => nowMs - Date.parse(run.updated_at) > DROPPED_RUN_QUIET_MS,
+        ),
+      }
+    : { cancel: going.map(({ id }) => id), deleteBranch: true };
+};
 
 /**
- * Whether the first layer has been running too long to wait for: a runner that
- * never came, a job that never ends. Then the first candidate is released as it
- * would be without checking ahead. Twice the longest job's `timeout-minutes`,
- * and the queueing besides, counted from the earliest of its runs still going.
+ * Whether the first layer has been running too long to wait for, so that the
+ * first candidate is released as it would be without checking ahead. Each clock
+ * is its own, so that a layer that waited long for its runners is not called
+ * stuck the moment its jobs start, nor one run's wait charged to another's
+ * start:
+ *
+ * - a runner that never came: {@link LAYER_QUEUED_TIMEOUT_MS} from the dispatch
+ *   of the earliest run still waiting for one, generous because a busy account
+ *   is no reason to give up;
+ * - a job that never ends: {@link LAYER_TIMEOUT_MS} from the start of the
+ *   oldest job still running, twice the longest job's `timeout-minutes`;
+ * - a run that says neither, such as one whose jobs have all finished but that
+ *   never completes: {@link LAYER_QUEUED_TIMEOUT_MS} from the dispatch of the
+ *   earliest run still going.
  */
 export const isStuck = (
   status: LayerStatus,
-  runningSince: number | undefined,
+  since: Readonly<{
+    dispatched?: number;
+    waiting?: number;
+    oldestJobRunning?: number;
+  }>,
   nowMs: number,
-): boolean =>
-  status.kind === 'running' &&
-  runningSince !== undefined &&
-  nowMs - runningSince > LAYER_TIMEOUT_MS;
+): boolean => {
+  if (status.kind !== 'running') {
+    return false;
+  }
+
+  const past = (from: number | undefined, limit: number): boolean =>
+    from !== undefined && nowMs - from > limit;
+
+  return (
+    past(since.waiting, LAYER_QUEUED_TIMEOUT_MS) ||
+    past(since.oldestJobRunning, LAYER_TIMEOUT_MS) ||
+    (since.waiting === undefined &&
+      since.oldestJobRunning === undefined &&
+      past(since.dispatched, LAYER_QUEUED_TIMEOUT_MS))
+  );
+};
 
 /** The branch a layer is built on. */
 export const layerBranch = (number: number): string =>
@@ -293,6 +322,19 @@ export type BuiltLayer = Layer &
     parentTree: string;
   }>;
 
+/** A run on a layer, as much as {@link planDrop} reads. */
+export type DropRun = Readonly<{
+  id: number;
+  status: string;
+  updated_at: string;
+}>;
+
+/** What {@link planDrop} asks of a layer: the runs to cancel, and its branch. */
+export type LayerDrop = Readonly<{
+  cancel: readonly number[];
+  deleteBranch: boolean;
+}>;
+
 /** How far the check workflows got on a layer. */
 export type LayerStatus = Readonly<
   | { kind: 'not-dispatched' }
@@ -302,13 +344,26 @@ export type LayerStatus = Readonly<
 >;
 
 /**
- * `queue/`, which `check-gates.yml` reads to call a `diff-parent` run's verdict
- * reusable.
+ * The prefix of the layer branches, on which the check workflows diff a layer
+ * against `origin/main` (`code-check.yml`, `style-check.yml`).
  */
 export const LAYER_BRANCH_PREFIX = 'queue/pr-';
 
-/** How long the first layer may run before it is taken to be stuck. */
+/** How long a job of the first layer may run, from its own start. */
 export const LAYER_TIMEOUT_MS = 40 * 60_000;
+
+/**
+ * How long the first layer may run, from its dispatch, before it is taken to be
+ * stuck however busy the runners are.
+ */
+export const LAYER_QUEUED_TIMEOUT_MS = 90 * 60_000;
+
+/**
+ * How long a run of a set-aside layer may go without an update before its branch
+ * goes anyway, in case GitHub never ends it: as long as a run may wait for a
+ * runner ({@link LAYER_QUEUED_TIMEOUT_MS}), which it does without an update.
+ */
+export const DROPPED_RUN_QUIET_MS = 90 * 60_000;
 
 /** How many runs of a workflow a layer may see cancelled. */
 export const MAX_DISPATCHES = 3;

@@ -262,9 +262,8 @@ describe('check-diff', () => {
     }
   });
 
-  // A queue stacks the queued pull requests on `main`, one commit each, and
-  // judges each layer on its own commit against the layer below, as a stacked
-  // pull request is: the commit and its parent, wherever the run is.
+  // A run asked to diff against its parent is judged on its own commit, as a
+  // stacked pull request is: the commit and its parent, wherever the run is.
   test('diffs a run asked to against its parent', () => {
     for (const ref of ['queue/2', 'main']) {
       assert.deepStrictEqual(

@@ -122,11 +122,11 @@
       }
     },
     "speculate": {
-      "description": "Check queued pull requests ahead of their turn: the leading ones are stacked on the default branch, one commit each, each on a `queue/pr-<number>` branch, and the workflows are dispatched on each with `diff-parent`. A pull request is released once its layer is green, and the gate reuses that verdict. Absent: one pull request is checked at a time.",
+      "description": "Check queued pull requests ahead of their turn: the leading ones are stacked on the default branch, one commit each, each on a `queue/pr-<number>` branch, and the workflows are dispatched on each, judging it against the default branch as a pull request is. A pull request is released once its layer is green, and the gate reuses that verdict. Absent: one pull request is checked at a time.",
       "type": "object",
       "properties": {
         "workflows": {
-          "description": "The file names of the check workflows to dispatch on each layer, such as `code-check.yml`: every workflow that reports a required context. Each takes the `diff-parent` input.",
+          "description": "The file names of the check workflows to dispatch on each layer, such as `code-check.yml`: every workflow that reports a required context, each a caller of the gate.",
           "type": "array",
           "items": { "type": "string" }
         },

@@ -65,7 +65,7 @@ import { describeFailedChecks } from './set-aside-detail.mjs';
 import {
   newSkips,
   pruneSkips,
-  setAsideFailing,
+  setAsideHeads,
   settleSkips,
   unannouncedSkips,
   withSkip,
@@ -1197,7 +1197,7 @@ const runCycle = async (
   // candidate, nothing below has anything to do either.
   if (Arr.isEmpty(triaged.candidates)) {
     if (speculateConfig !== undefined && !options.dryRun) {
-      await dropAllLayers(api, baseSha, setAsideFailing(mut_skipped));
+      await dropAllLayers(api, baseSha, setAsideHeads(mut_skipped));
     }
 
     const behind = await restackBehind(pullRequests, defaultBranch, {
@@ -1248,7 +1248,7 @@ const runCycle = async (
       bypass: triaged.bypass,
       config: speculateConfig,
       autoFix: autoFixConfig,
-      failing: setAsideFailing(mut_skipped),
+      setAside: setAsideHeads(mut_skipped),
     });
 
     if (speculation.setAside !== undefined) {

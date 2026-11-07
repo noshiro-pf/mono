@@ -2,8 +2,8 @@
 
 /**
  * Checking queued pull requests ahead of their turn: reading the layer branches
- * and the runs on them, building and dispatching layers, and dropping the ones
- * a red layer below has spoiled. What is decided is `speculate-plan.mts`'s;
+ * and the runs on them, building and dispatching layers, and cleaning up the
+ * ones no longer valid. What is decided is `speculate-plan.mts`'s;
  * this is the reading and the moving.
  *
  * Every survey starts from what GitHub holds, so a worker restarted mid-stack
@@ -29,11 +29,9 @@ import { planAutoFix, WORKTREE_ROOT } from './auto-fix.mjs';
 import type { AutoFixConfig, SpeculateConfig } from './config.mjs';
 import { listCheckRuns, removeWorktree } from './github.mjs';
 import {
-  buildableLayers,
   cancelledTooOften,
   decideSpeculation,
   desiredLayers,
-  dropActionOf,
   isStuck,
   LAYER_BRANCH_PREFIX,
   layerBranch,
@@ -43,6 +41,7 @@ import {
   MAX_DISPATCHES,
   mayBuildAbove,
   numberOfLayerBranch,
+  planDrop,
   type BuiltLayer,
   type Layer,
   type LayerStatus,
@@ -64,8 +63,11 @@ export const speculate = async (
     config: SpeculateConfig;
     /** `undefined` under `--no-auto-fix`, or when the repository has none. */
     autoFix: AutoFixConfig | undefined;
-    /** Those set aside for a failure, whose layer's red run is kept. */
-    failing: ReadonlySet<number>;
+    /**
+     * The head each pull request set aside for a failure was set aside at,
+     * whose layer at that head is left to finish (`planDrop`).
+     */
+    setAside: ReadonlyMap<number, string>;
   }>,
 ): Promise<Speculation> => {
   const { candidates, defaultBranch, baseSha, config } = context;
@@ -88,12 +90,7 @@ export const speculate = async (
     baseTree: branches.value.baseTree,
   });
 
-  const held = await dropLayers(
-    api,
-    stale,
-    branches.value.baseTree,
-    context.failing,
-  );
+  await dropLayers(api, stale, context.setAside);
 
   const keptStatuses = await readStatusesOf(api, kept, config.workflows);
 
@@ -104,7 +101,7 @@ export const speculate = async (
   const buildable = mayBuildAbove(
     keptStatuses.value.map(({ status }) => status),
   )
-    ? buildableLayers(toBuild, held)
+    ? toBuild
     : ([] as const);
 
   const builtNow = Arr.isNonEmpty(buildable)
@@ -137,18 +134,16 @@ export const speculate = async (
         `#${layer.number}: dropping its layer, which carries a red one below it.`,
       );
 
-      if (await dropRuns(api, read[index]?.runs ?? [], false)) {
-        await deleteBranch(layer.number);
-      }
+      await dropLayer(api, layer.number, false, read[index]?.runs ?? []);
     }
   }
 
   // A failure the configured fixers can settle is left to the release, as it
   // always has been: `watchAndFix` reads the jobs on the pull request's own
-  // head, so the layer's runs go, or the gate reuses their verdict and leaves no
-  // job there to read. Should they not all go, or the jobs not be read, the
-  // release is still the way on: at worst it is set aside there, for what its own
-  // checks say, where waiting here for GitHub to agree could hold the queue.
+  // head, so the layer's runs are deleted, or the gate reuses their verdict and
+  // leaves no job there to read. Should a delete be refused, or the jobs not be
+  // read, the release is still the way on: at worst it is set aside there, for
+  // what its own checks say, where waiting here could hold the queue.
   if (decided.setAside !== undefined && layers[0] !== undefined) {
     const fixersOwn = await isFixersOwn(api, layers[0].tip, context.autoFix);
 
@@ -161,7 +156,9 @@ export const speculate = async (
         `#${decided.setAside.number}: only fixers' diffs failed on its layer; releasing it, for the release's own run to fix.`,
       );
 
-      if (await dropRuns(api, read[0]?.runs ?? [], false)) {
+      // The branch stays while a run could not be cancelled, as `dropLayer`
+      // keeps it.
+      if (await deleteRuns(api, decided.setAside.number, read[0]?.runs ?? [])) {
         await deleteBranch(decided.setAside.number);
       }
 
@@ -176,7 +173,7 @@ export const speculate = async (
   if (
     firstStatus !== undefined &&
     !decided.release &&
-    isStuck(firstStatus.status, firstStatus.runningSince, currentEpochMs())
+    isStuck(firstStatus.status, firstStatus.since, currentEpochMs())
   ) {
     return fallBack(
       `${layerBranch(layers[0]?.number ?? 0)} has been running for too long`,
@@ -222,6 +219,12 @@ export const speculate = async (
     }
   }
 
+  // Its runs stay, those still going left to finish, and its branch goes once
+  // they have (`planDrop`).
+  if (decided.setAside !== undefined) {
+    await dropLayer(api, decided.setAside.number, true, read[0]?.runs ?? []);
+  }
+
   if (!decided.release && candidates[0] !== undefined) {
     log(
       `#${candidates[0].number}: waiting for its layer's checks before releasing it.`,
@@ -255,7 +258,7 @@ export const speculate = async (
 export const dropAllLayers = async (
   api: ApiContext,
   baseSha: string,
-  failing: ReadonlySet<number>,
+  setAside: ReadonlyMap<number, string>,
 ): Promise<void> => {
   const branches = await readBuiltLayers(baseSha);
 
@@ -265,7 +268,7 @@ export const dropAllLayers = async (
     return;
   }
 
-  await dropLayers(api, branches.value.built, branches.value.baseTree, failing);
+  await dropLayers(api, branches.value.built, setAside);
 };
 
 /**
@@ -287,8 +290,16 @@ type LayerReading = Readonly<{
   status: LayerStatus;
   missing: readonly string[];
   runs: readonly LayerRun[];
-  /** When the earliest of its latest runs still going started. */
-  runningSince: number | undefined;
+  /**
+   * When the earliest of its latest runs still going was dispatched, the
+   * earliest of those still waiting for a runner, and when the oldest of their
+   * jobs still running started.
+   */
+  since: Readonly<{
+    dispatched?: number;
+    waiting?: number;
+    oldestJobRunning?: number;
+  }>;
   /** A workflow's runs have been cancelled too often to dispatch it again. */
   cancelledTooOften: boolean;
 }>;
@@ -300,7 +311,9 @@ type LayerRun = Readonly<{
   status: string;
   conclusion: string | null;
   html_url: string;
-  run_started_at: string | null;
+  /** When it was dispatched, which is when GitHub says it started. */
+  run_started_at: string;
+  updated_at: string;
 }>;
 
 const RunsSchema = t.record({
@@ -311,13 +324,21 @@ const RunsSchema = t.record({
       status: t.string(),
       conclusion: t.union([t.string(), t.nullType]),
       html_url: t.string(),
-      run_started_at: t.union([t.string(), t.nullType]),
+      run_started_at: t.optional(t.union([t.string(), t.nullType])),
+      created_at: t.string(),
+      updated_at: t.string(),
     }),
   ),
 });
 
 const JobsSchema = t.record({
-  jobs: t.array(t.record({ name: t.string(), status: t.string() })),
+  jobs: t.array(
+    t.record({
+      name: t.string(),
+      status: t.string(),
+      started_at: t.optional(t.union([t.string(), t.nullType])),
+    }),
+  ),
 });
 
 /** A job's statuses before a runner has taken it. */
@@ -328,9 +349,6 @@ const JOB_NOT_STARTED: ReadonlySet<string> = new Set<string>([
   'requested',
 ]);
 
-/** What every check workflow's gate job is named with (`gates / check`). */
-const GATE_JOB = 'gates';
-
 /** A run's conclusions that make its layer red. */
 const FAILED: ReadonlySet<string> = new Set<string>([
   'failure',
@@ -338,6 +356,9 @@ const FAILED: ReadonlySet<string> = new Set<string>([
   'startup_failure',
   'action_required',
 ]);
+
+/** What every check workflow's gate job is named with (`gates / check`). */
+const GATE_JOB = 'gates';
 
 const deleteBranch = async (number: number): Promise<void> => {
   const deleted = await git(
@@ -358,87 +379,132 @@ const runsOn = async (
     await rest(api, 'GET', '/actions/runs', RunsSchema, {
       query: { head_sha: sha, event: 'workflow_dispatch', per_page: '100' },
     }),
-    (answered) => answered.workflow_runs,
+    (answered) =>
+      answered.workflow_runs.map(
+        ({ run_started_at, created_at, ...run }) =>
+          ({ ...run, run_started_at: run_started_at ?? created_at }) as const,
+      ),
   );
 
-/** Carries out {@link dropActionOf} on each run. Whether all of it was done. */
-const dropRuns = async (
-  api: ApiContext,
-  runs: readonly LayerRun[],
-  keepRed: boolean,
-): Promise<boolean> => {
-  const results = await Promise.all(
-    runs.map(async (run) => {
-      switch (dropActionOf(run, keepRed)) {
-        case 'cancel':
-          return rest(
-            api,
-            'POST',
-            `/actions/runs/${run.id}/cancel`,
-            t.unknown(),
-          );
-
-        case 'delete':
-          return rest(api, 'DELETE', `/actions/runs/${run.id}`, t.unknown());
-
-        case 'keep':
-          return Result.ok(undefined);
-      }
-    }),
+/**
+ * Fetches, in one go, those of `shas` this clone lacks. Whether it could; a sha
+ * still missing afterwards is for the caller to find.
+ */
+const fetchMissing = async (
+  shas: readonly string[],
+): Promise<Result<unknown, string>> => {
+  const present = await Promise.all(
+    shas.map(async (sha) =>
+      Result.isOk(await git(`git cat-file -e ${sh(sha)}`)),
+    ),
   );
 
-  const failed = results.filter(Result.isErr);
+  const absent = shas.filter((_, index) => present[index] !== true);
 
-  for (const each of failed) {
-    log(`Cannot drop a layer's run: ${each.value}`);
-  }
-
-  return !Arr.isNonEmpty(failed);
+  return Arr.isNonEmpty(absent)
+    ? git(`git fetch --quiet origin ${absent.map(sh).join(' ')}`)
+    : Result.ok(undefined);
 };
 
 /**
- * Drops layers no longer standing, and says which could not be, whose branches
- * stay so that a later survey still finds their runs. Such a layer was judged
- * against a base that may never go green, so its verdicts go with its branch,
- * save the red run of a pull request set aside for it ({@link dropActionOf}).
- * Not one whose tree is `main`'s: its pull request merged, and the push to
- * `main` reads that run's artifacts.
+ * Carries out {@link planDrop} for one layer: cancels what it asks, then deletes
+ * the branch when it may and every cancel went through. A cancel refused is
+ * logged, and the branch stays for the next survey to cancel it again, unless
+ * that survey builds the layer anew over it: the run is then left to finish,
+ * holding a runner, its verdict a true one.
+ */
+const dropLayer = async (
+  api: ApiContext,
+  number: number,
+  setAside: boolean,
+  runs: readonly LayerRun[],
+): Promise<void> => {
+  const plan = planDrop(setAside, runs, currentEpochMs());
+
+  const cancelled = await Promise.all(
+    plan.cancel.map(async (id) =>
+      rest(api, 'POST', `/actions/runs/${id}/cancel`, t.unknown()),
+    ),
+  );
+
+  for (const each of cancelled) {
+    if (Result.isErr(each)) {
+      log(`#${number}: cannot cancel a run of its layer: ${each.value}`);
+    }
+  }
+
+  // Not while a run it could not cancel may still start a job, which would look
+  // for the branch's commit: the next survey cancels it again.
+  if (plan.deleteBranch && !cancelled.some(Result.isErr)) {
+    await deleteBranch(number);
+  }
+};
+
+/**
+ * Cleans up the layers no longer valid: their runs read together, and each
+ * cleaned up in turn, since each deletes a branch with a `git push` from one
+ * clone. One whose runs cannot be read keeps its branch for a later survey,
+ * unless this survey builds it anew: its runs are then left to finish, holding
+ * runners, their verdicts true ones.
  */
 const dropLayers = async (
   api: ApiContext,
   stale: readonly BuiltLayer[],
-  baseTree: string,
-  failing: ReadonlySet<number>,
-): Promise<ReadonlySet<number>> => {
-  const mut_held = new Set<number>();
+  setAside: ReadonlyMap<number, string>,
+): Promise<void> => {
+  const read = await Promise.all(
+    stale.map(async (layer) => [layer, await runsOn(api, layer.tip)] as const),
+  );
 
-  for (const layer of stale) {
-    if (layer.tree === baseTree) {
-      await deleteBranch(layer.number);
-
-      continue;
-    }
-
-    const runs = await runsOn(api, layer.tip);
-
-    const dropped =
-      Result.isOk(runs) &&
-      (await dropRuns(api, runs.value, failing.has(layer.number)));
-
-    if (!dropped) {
-      log(
-        `#${layer.number}: its stale layer is kept until its runs are dropped.`,
-      );
-
-      mut_held.add(layer.number);
+  for (const [layer, runs] of read) {
+    if (Result.isErr(runs)) {
+      log(`#${layer.number}: cannot read the runs of its old layer.`);
 
       continue;
     }
 
-    await deleteBranch(layer.number);
+    await dropLayer(
+      api,
+      layer.number,
+      setAside.get(layer.number) === layer.head,
+      runs.value,
+    );
+  }
+};
+
+/**
+ * Deletes a layer's runs, so that the gate reuses no verdict of them: for a
+ * failure left to the release, whose own run has to fail where `watchAndFix`
+ * can read the jobs, its runs still going cancelled. A refusal is logged; the
+ * release then may find the old verdict, and is set aside there as before.
+ * Whether every run was dealt with.
+ */
+const deleteRuns = async (
+  api: ApiContext,
+  number: number,
+  runs: readonly LayerRun[],
+): Promise<boolean> => {
+  const done = await Promise.all(
+    runs.map(async ({ id, status }) =>
+      status === 'completed'
+        ? ([
+            'delete',
+            await rest(api, 'DELETE', `/actions/runs/${id}`, t.unknown()),
+          ] as const)
+        : ([
+            'cancel',
+            await rest(api, 'POST', `/actions/runs/${id}/cancel`, t.unknown()),
+          ] as const),
+    ),
+  );
+
+  for (const [action, each] of done) {
+    if (Result.isErr(each)) {
+      log(`#${number}: cannot ${action} a run of its layer: ${each.value}`);
+    }
   }
 
-  return mut_held;
+  return done.every(([, each]) => Result.isOk(each));
 };
 
 const fallBack = (why: string): Speculation => {
@@ -480,22 +546,10 @@ const readBuiltLayers = async (
   // Only what the clone lacks, since this runs every survey.
   const wanted = Arr.toUnshifted(baseSha)(tips.map(({ sha }) => sha));
 
-  const present = await Promise.all(
-    wanted.map(async (sha) =>
-      Result.isOk(await git(`git cat-file -e ${sh(sha)}`)),
-    ),
-  );
+  const fetched = await fetchMissing(wanted);
 
-  const absent = wanted.filter((_, index) => present[index] !== true);
-
-  if (Arr.isNonEmpty(absent)) {
-    const fetched = await git(
-      `git fetch --quiet origin ${absent.map(sh).join(' ')}`,
-    );
-
-    if (Result.isErr(fetched)) {
-      return fetched;
-    }
+  if (Result.isErr(fetched)) {
+    return fetched;
   }
 
   const baseTree = await git(`git log -1 --format=%T ${sh(baseSha)}`);
@@ -508,23 +562,25 @@ const readBuiltLayers = async (
     tips.map(async ({ sha, number }) => {
       const shown = await git(`git log -1 --format=%T%x00%B ${sh(sha)}`);
 
-      const parentTree = await git(`git log -1 --format=%T ${sh(`${sha}^`)}`);
+      const below = await git(`git log -1 --format=%T ${sh(`${sha}^`)}`);
 
-      if (Result.isErr(shown) || Result.isErr(parentTree)) {
+      if (Result.isErr(shown) || Result.isErr(below)) {
         return undefined;
       }
 
       const [tree, message] = shown.value.split('\0', 2);
 
+      const parentTree = below.value.trim();
+
       const layer = layerOfMessage(message ?? '');
 
-      return tree === undefined || layer?.number !== number
+      return tree === undefined || parentTree === '' || layer?.number !== number
         ? undefined
         : ({
             ...layer,
             tip: sha,
             tree: tree.trim(),
-            parentTree: parentTree.value.trim(),
+            parentTree,
           } as const);
     }),
   );
@@ -553,15 +609,17 @@ const buildLayer = async (
     return Result.err(`cannot fetch its head: ${fetched.value}`);
   }
 
-  const parentTree = await run('git log -1 --format=%T HEAD');
+  const below = await run('git log -1 --format=%T HEAD');
 
   const mergeBase = await run(
     `git merge-base ${sh(`origin/${defaultBranch}`)} ${sh(layer.head)}`,
   );
 
-  if (Result.isErr(parentTree) || Result.isErr(mergeBase)) {
+  if (Result.isErr(below) || Result.isErr(mergeBase)) {
     return Result.err('cannot read its commits');
   }
+
+  const parentTree = below.value.trim();
 
   // Its own commits, oldest first and merges left out, as the release's
   // `git rebase` replays them, so that the layer's tree is the one its head
@@ -636,7 +694,7 @@ const buildLayer = async (
     ...layer,
     tip: tip.value.trim(),
     tree: tree.value.trim(),
-    parentTree: parentTree.value.trim(),
+    parentTree,
   });
 };
 
@@ -688,40 +746,61 @@ const buildLayers = async (
   return mut_built;
 };
 
-const hasJobToStart = async (
+/**
+ * Whether a run still has jobs to start: not yet in progress, its gate not yet
+ * finished (the jobs that follow it do not exist until it does), or a job
+ * queued; and when the oldest of its jobs still running started. Unread, it is taken as
+ * still starting: dispatching more on a guess would crowd the runners the layer
+ * below is waiting for.
+ */
+const startingOf = async (
   api: ApiContext,
-  runId: number,
-): Promise<boolean> => {
+  run: LayerRun,
+): Promise<
+  Readonly<{ starting: boolean; forRunner: boolean; oldestRunning?: number }>
+> => {
+  if (run.status !== 'in_progress') {
+    return { starting: true, forRunner: true };
+  }
+
   const answered = await rest(
     api,
     'GET',
-    `/actions/runs/${runId}/jobs`,
+    `/actions/runs/${run.id}/jobs`,
     JobsSchema,
     { query: { filter: 'latest', per_page: '100' } },
   );
 
-  // Unread is taken as still starting: dispatching more on a guess would crowd
-  // the runners the layer below is waiting for.
-  return (
-    Result.isErr(answered) ||
-    answered.value.jobs.some(
+  if (Result.isErr(answered)) {
+    return { starting: true, forRunner: true };
+  }
+
+  const { jobs } = answered.value;
+
+  const starts = Arr.generate(function* () {
+    for (const { status, started_at } of jobs) {
+      if (
+        status === 'in_progress' &&
+        started_at !== null &&
+        started_at !== undefined
+      ) {
+        yield Date.parse(started_at);
+      }
+    }
+  });
+
+  return {
+    starting: jobs.some(
       ({ name, status }) =>
         JOB_NOT_STARTED.has(status) ||
         (name.startsWith(GATE_JOB) && status !== 'completed'),
-    )
-  );
+    ),
+    // Only `queued` waits for a runner: `waiting` and `pending` wait for the
+    // jobs they need, such as an aggregate for its matrix.
+    forRunner: jobs.some(({ status }) => status === 'queued'),
+    ...(Arr.isNonEmpty(starts) ? { oldestRunning: Math.min(...starts) } : {}),
+  };
 };
-
-/**
- * Whether a run still has jobs to start: not yet in progress, its gate not yet
- * finished (the jobs that follow it do not exist until it does), or a job
- * queued.
- */
-const isStillStarting = async (
-  api: ApiContext,
-  run: LayerRun | undefined,
-): Promise<boolean> =>
-  run?.status !== 'in_progress' || hasJobToStart(api, run.id);
 
 /**
  * Where the configured workflows stand on a layer: the latest dispatched run of
@@ -748,19 +827,21 @@ const readStatus = async (
       .toSorted((a, b) => b.id - a.id)[0],
   }));
 
-  const starts = Arr.generate(function* () {
+  const going = Arr.generate(function* () {
     for (const { run } of latest) {
-      if (
-        run !== undefined &&
-        run.status !== 'completed' &&
-        run.run_started_at !== null
-      ) {
-        yield Date.parse(run.run_started_at);
+      if (run !== undefined && run.status !== 'completed') {
+        yield run;
       }
     }
   });
 
-  const runningSince = Arr.isNonEmpty(starts) ? Math.min(...starts) : undefined;
+  const dispatches = going.map(({ run_started_at }) =>
+    Date.parse(run_started_at),
+  );
+
+  const dispatched = Arr.isNonEmpty(dispatches)
+    ? Math.min(...dispatches)
+    : undefined;
 
   const missing = latest
     .filter(({ run }) => run === undefined || run.conclusion === 'cancelled')
@@ -777,7 +858,7 @@ const readStatus = async (
   const reading = {
     missing,
     runs,
-    runningSince,
+    since: dispatched === undefined ? ({} as const) : ({ dispatched } as const),
     cancelledTooOften: spent,
   } as const;
 
@@ -794,19 +875,47 @@ const readStatus = async (
     return Result.ok({ ...reading, status: { kind: 'not-dispatched' } });
   }
 
-  const running = latest.filter(({ run }) => run?.status !== 'completed');
-
-  if (!Arr.isNonEmpty(running)) {
+  if (!Arr.isNonEmpty(going)) {
     return Result.ok({ ...reading, status: { kind: 'green' } });
   }
 
-  const queued = await Promise.all(
-    running.map(async ({ run }) => isStillStarting(api, run)),
+  const starting = await Promise.all(
+    going.map(async (run) => startingOf(api, run)),
   );
+
+  const runningStarts = Arr.generate(function* () {
+    for (const { oldestRunning } of starting) {
+      if (oldestRunning !== undefined) {
+        yield oldestRunning;
+      }
+    }
+  });
+
+  // The dispatches of the runs still waiting for a runner, apart from those of
+  // the others, so that one run's wait is not charged to another's start.
+  const waitingDispatches = Arr.generate(function* () {
+    for (const [index, run] of going.entries()) {
+      if (starting[index]?.forRunner === true) {
+        yield Date.parse(run.run_started_at);
+      }
+    }
+  });
 
   return Result.ok({
     ...reading,
-    status: { kind: 'running', queued: queued.includes(true) },
+    since: {
+      ...reading.since,
+      ...(Arr.isNonEmpty(waitingDispatches)
+        ? { waiting: Math.min(...waitingDispatches) }
+        : {}),
+      ...(Arr.isNonEmpty(runningStarts)
+        ? { oldestJobRunning: Math.min(...runningStarts) }
+        : {}),
+    },
+    status: {
+      kind: 'running',
+      queued: starting.some((each) => each.starting),
+    },
   });
 };
 
@@ -851,5 +960,7 @@ const dispatch = async (
 ): Promise<Result<unknown, string>> =>
   // A path segment as it stands: `configOf` holds it to a file name.
   rest(api, 'POST', `/actions/workflows/${workflow}/dispatches`, t.unknown(), {
-    body: { ref: layerBranch(number), inputs: { 'diff-parent': 'true' } },
+    // No `diff-parent`: the run diffs against `main`, as a pull request's does,
+    // so that its verdict is a whole one about the tree.
+    body: { ref: layerBranch(number) },
   });
