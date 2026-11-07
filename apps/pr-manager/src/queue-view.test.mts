@@ -11,6 +11,7 @@ import {
   type ContextState,
   type ReportEntry,
 } from 'pr-report-core';
+import { Arr } from 'ts-data-forge';
 import { queueViewOf, type QueuePull, type QueueView } from './queue-view.mjs';
 
 describe(queueViewOf, () => {
@@ -77,6 +78,249 @@ describe(queueViewOf, () => {
       [1, 'next', undefined],
       [2, 'waiting', 'after #1'],
       [3, 'waiting', 'after #1'],
+    ]);
+  });
+
+  test('puts one whose wait ends when the ones ahead of it merge where it would then be picked', () => {
+    const view = queueViewOf(
+      input([
+        pull(1, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+        pull(2, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+        pull(3, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL, PRIORITY_HIGH_LABEL],
+          body: 'Merge-After: #1',
+        }),
+        pull(4, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          baseRef: 'branch-1',
+        }),
+        pull(5, { labels: [MERGE_QUEUED_LABEL], verdict: 'failing' }),
+        pull(6, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL, PRIORITY_HIGH_LABEL],
+          body: 'Merge-After: #5',
+        }),
+        pull(7, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL, PRIORITY_HIGH_LABEL],
+          body: 'Merge-After: #3',
+        }),
+      ]),
+    );
+
+    assert.deepStrictEqual(shape(view).slots, [
+      [1, 'next', undefined],
+      [3, 'waiting', 'after #1'],
+      [7, 'waiting', 'after #3'],
+      [2, 'next', undefined],
+      [4, 'waiting', 'after #1'],
+      [5, 'failing', 'failing'],
+      [6, 'waiting', 'after #5'],
+    ]);
+  });
+
+  test('counts the running one as merged first', () => {
+    const view = queueViewOf(
+      input([
+        pull(1, { labels: [MERGE_QUEUED_LABEL], verdict: 'pending' }),
+        pull(2, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+        pull(3, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL, PRIORITY_HIGH_LABEL],
+          body: 'Merge-After: #1',
+        }),
+        pull(4, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #9',
+        }),
+      ]),
+    );
+
+    assert.deepStrictEqual(shape(view).slots, [
+      [1, 'running', undefined],
+      [3, 'waiting', 'after #1'],
+      [2, 'next', undefined],
+      [4, 'next', undefined],
+    ]);
+  });
+
+  test('puts the release after what blocks it once that would have merged', () => {
+    const view = queueViewOf(
+      input([
+        pull(1, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          headRef: 'changeset-release/main',
+        }),
+        pull(2, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL, BLOCKS_RELEASE_LABEL],
+        }),
+        pull(3, { labels: [MERGE_QUEUED_LABEL], verdict: 'failing' }),
+      ]),
+    );
+
+    assert.deepStrictEqual(shape(view).slots, [
+      [2, 'next', undefined],
+      [1, 'waiting', 'after #2'],
+      [3, 'failing', 'failing'],
+    ]);
+  });
+
+  test('moves each layer of a stack onto the default branch as the one below it would merge', () => {
+    const view = queueViewOf(
+      input([
+        pull(1, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+        pull(2, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+        pull(3, {
+          labels: [MERGE_QUEUED_LABEL, PRIORITY_HIGH_LABEL],
+          baseRef: 'branch-1',
+        }),
+        pull(4, {
+          labels: [MERGE_QUEUED_LABEL, PRIORITY_HIGH_LABEL],
+          baseRef: 'branch-3',
+        }),
+      ]),
+    );
+
+    assert.deepStrictEqual(shape(view).slots, [
+      [1, 'next', undefined],
+      [3, 'waiting', 'after #1'],
+      [4, 'waiting', 'after #3'],
+      [2, 'next', undefined],
+    ]);
+  });
+
+  test('leaves waiting what waits for one only a bypass merges, or that its review would hold', () => {
+    const view = queueViewOf(
+      input(
+        [
+          pull(1, {
+            labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+            files: ['.github/workflows/ci.yml'],
+          }),
+          pull(2, {
+            labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+            body: 'Merge-After: #1',
+          }),
+          pull(3, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+          pull(4, {
+            labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+            body: 'Merge-After: #3',
+            unresolvedConversations: 1,
+          }),
+        ],
+        {
+          requireCodeOwnerReview: true,
+          requireConversationResolution: true,
+          codeOwners: [{ pattern: '/.github/workflows/', owners: ['someone'] }],
+        },
+      ),
+    );
+
+    assert.deepStrictEqual(shape(view).slots, [
+      [3, 'next', undefined],
+      [1, 'next', undefined],
+      [2, 'waiting', 'after #1'],
+      [4, 'waiting', 'after #3'],
+    ]);
+  });
+
+  test('leaves waiting a layer its set-aside would hand to someone else once it lands', () => {
+    const view = queueViewOf(
+      input([
+        pull(1, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+        pull(2, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL, PRIORITY_HIGH_LABEL],
+          baseRef: 'branch-1',
+          comments: [
+            writeSetAsideComment(
+              { reason: 'checks-failed', headSha: sha(2), baseSha: BASE_TIP },
+              'Red.',
+            ),
+          ],
+        }),
+        pull(3, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+      ]),
+    );
+
+    assert.deepStrictEqual(shape(view).slots, [
+      [1, 'next', undefined],
+      [3, 'next', undefined],
+      [2, 'waiting', 'after #1'],
+    ]);
+  });
+
+  test('puts a release built before the tip after the first merge, which rebuilds it', () => {
+    const release = pull(4, {
+      labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+      headRef: 'changeset-release/main',
+      behindBy: 1,
+    });
+
+    assert.deepStrictEqual(
+      shape(
+        queueViewOf(
+          input([
+            release,
+            pull(2, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+            pull(3, { labels: [MERGE_QUEUED_LABEL], verdict: 'failing' }),
+          ]),
+        ),
+      ).slots,
+      [
+        [2, 'next', undefined],
+        [4, 'waiting', 'rebuilding'],
+        [3, 'failing', 'failing'],
+      ],
+    );
+  });
+
+  test('puts a release not yet compared with the tip after the first merge, which rebuilds it', () => {
+    const release = queuePull(
+      pull(4, {
+        labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+        headRef: 'changeset-release/main',
+      }),
+    );
+
+    const others = input([
+      pull(2, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+      pull(3, { labels: [MERGE_QUEUED_LABEL], verdict: 'failing' }),
+    ]);
+
+    const view = queueViewOf({
+      ...others,
+      pulls: Arr.toPushed(others.pulls, {
+        ...release,
+        entry: { ...release.entry, comparison: undefined },
+      }),
+    });
+
+    assert.deepStrictEqual(shape(view).slots, [
+      [2, 'next', undefined],
+      [4, 'waiting', 'unknown'],
+      [3, 'failing', 'failing'],
+    ]);
+  });
+
+  test('takes a layer back that a moved base clears the set-aside of once it lands', () => {
+    const view = queueViewOf(
+      input([
+        pull(1, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+        pull(2, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL, PRIORITY_HIGH_LABEL],
+          baseRef: 'branch-1',
+          comments: [
+            writeSetAsideComment(
+              { reason: 'rebase-failed', headSha: sha(2), baseSha: BASE_TIP },
+              'Conflicts.',
+            ),
+          ],
+        }),
+        pull(3, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+      ]),
+    );
+
+    assert.deepStrictEqual(shape(view).slots, [
+      [1, 'next', undefined],
+      [2, 'waiting', 'after #1'],
+      [3, 'next', undefined],
     ]);
   });
 

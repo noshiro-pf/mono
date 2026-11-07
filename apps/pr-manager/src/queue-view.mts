@@ -2,9 +2,10 @@
 
 /**
  * `unblock-prs`'s queue as the Queue block draws it: the pull request it is
- * running, the ones it would pick next in the order it would pick them, the
- * ones whose turn has not come, and — outside the queue — the ones set aside,
- * claimed or otherwise left to someone else.
+ * running, the ones it would pick next in the order it would pick them if each
+ * merged — one whose turn comes only once those ahead of it merge among them —
+ * the ones whose turn would still not come, and — outside the queue — the ones
+ * set aside, claimed or otherwise left to someone else.
  *
  * Decided by `pr-report-core`'s `queue-order.mts`, the code the worker decides
  * with, from what the page has read. Two things the worker reads differently
@@ -35,6 +36,7 @@ import {
   type QueueOwner,
   type QueueStanding,
   type ReportEntry,
+  type ReviewHold,
   type ReviewRules,
   type ReviewState,
   type SetAsideReason,
@@ -104,7 +106,10 @@ export type OutsideNode = Readonly<{
 export type QueueView = Readonly<{
   /** The branch the head of the queue merges into. */
   base: string;
-  /** Running first, then the candidates in order, then the rest. */
+  /**
+   * Running first, then the candidates in the order they would be picked if
+   * each merged, with what waits only for those among them, then the rest.
+   */
   slots: readonly QueueSlot[];
   outside: readonly OutsideNode[];
 }>;
@@ -134,45 +139,33 @@ export const queueViewOf = ({
   );
 
   const owned = pulls.map((pull) => {
-    const comments = readQueueComments(
-      pull.ownComments.map((body, index) => ({ id: index, body })),
-      {
-        headSha: pull.entry.headSha,
-        baseTip: pull.baseTip,
-        nowEpochMs,
-      },
-    );
-
-    // The set-aside as the worker holds it: one recorded against a base that
-    // has moved, for a reason the move may clear, is taken back and tried again
-    // (`setAsideApplies`).
-    const setAside =
-      comments.setAside?.applies === true ? comments.setAside.says : undefined;
-
-    const claim = comments.claim?.applies === true ? comments.claim : undefined;
-
-    const owner = queueOwner({
-      number: pull.entry.number,
-      labels: labelNamesOf(pull.entry),
-      isDraft: pull.entry.isDraft,
-      fromFork: pull.entry.fromFork,
-      headRef: pull.entry.headRef,
-      headSha: pull.entry.headSha,
-      baseRef: pull.entry.baseRef,
+    const read = readOwner(pull, {
       defaultBranch,
+      nowEpochMs,
+      baseRef: pull.entry.baseRef,
+      baseTip: pull.baseTip,
       stackedOn: graph.stackParents.get(pull.entry.number),
       inCycle: graph.cyclic.has(pull.entry.number),
-      setAside,
-      claim: claim?.says,
-      nowEpochMs,
     });
 
     return {
       pull,
-      owner,
-      claimed: claim !== undefined,
-      setAsideReason:
-        setAside?.kind === 'standing' ? setAside.setAside.reason : undefined,
+      owner: read.owner,
+      // A layer is the worker's whatever its comments say (`queueOwner`). Once
+      // the layer below it merges they are read as for any other, against a
+      // base that has moved, which clears the set-asides a moved base clears.
+      ownerOnceLanded: graph.stackParents.has(pull.entry.number)
+        ? readOwner(pull, {
+            defaultBranch,
+            nowEpochMs,
+            baseRef: defaultBranch,
+            baseTip: MOVED_BASE_TIP,
+            stackedOn: undefined,
+            inCycle: graph.cyclic.has(pull.entry.number),
+          }).owner
+        : read.owner,
+      claimed: read.claimed,
+      setAsideReason: read.setAsideReason,
     };
   });
 
@@ -199,6 +192,7 @@ export const queueViewOf = ({
       ...each,
       facts,
       bypass: hold?.kind === 'bypass',
+      hold,
       standing: withReviewHold(
         queueStanding(facts, context, readsOf(each.pull)),
         facts.mergeState,
@@ -213,20 +207,23 @@ export const queueViewOf = ({
     ({ standing }) => standing.kind === 'in-flight',
   );
 
-  const candidates = orderCandidates(
-    byNumber.filter(({ standing }) => standing.kind === 'candidate'),
-    ({ facts }) => facts,
-    // What a run of the worker has demoted is not known here.
-    { defaultBranch, demoted: () => false, bypass: ({ bypass }) => bypass },
-  );
+  const picked = pickOrder({
+    running,
+    queued: byNumber,
+    context,
+  });
 
-  const rest = byNumber.filter(({ standing }) => isWaiting(standing));
+  const pickedNumbers = new Set(picked.map(({ facts }) => facts.number));
+
+  const rest = byNumber.filter(
+    ({ standing, facts }) =>
+      waitOf(standing) !== 'none' && !pickedNumbers.has(facts.number),
+  );
 
   return {
     base: defaultBranch,
-    slots: [...running, ...candidates, ...rest].map(
-      ({ pull, facts, standing }) =>
-        slotOf(pull, facts, standing, defaultBranch),
+    slots: [...running, ...picked, ...rest].map(({ pull, facts, standing }) =>
+      slotOf(pull, facts, standing, defaultBranch),
     ),
     outside: Arr.generate(function* () {
       for (const {
@@ -258,8 +255,283 @@ export const queueViewOf = ({
   };
 };
 
+/** A base tip no set-aside was recorded against: the base has moved. */
+const MOVED_BASE_TIP = '';
+
 const labelNamesOf = (entry: ReportEntry): readonly string[] =>
   entry.labels.map((label) => label.name);
+
+/**
+ * Who moves `pull` next as its comments say against the base given, whether a
+ * claim says it, and the reason a standing set-aside gives.
+ */
+const readOwner = (
+  pull: QueuePull,
+  base: Readonly<{
+    defaultBranch: string;
+    nowEpochMs: number;
+    baseRef: string;
+    baseTip: string;
+    stackedOn: number | undefined;
+    inCycle: boolean;
+  }>,
+): Readonly<{
+  owner: QueueOwner | undefined;
+  claimed: boolean;
+  setAsideReason: string | undefined;
+}> => {
+  const comments = readQueueComments(
+    pull.ownComments.map((body, index) => ({ id: index, body })),
+    {
+      headSha: pull.entry.headSha,
+      baseTip: base.baseTip,
+      nowEpochMs: base.nowEpochMs,
+    },
+  );
+
+  // The set-aside as the worker holds it: one recorded against a base that has
+  // moved, for a reason the move may clear, is taken back and tried again
+  // (`setAsideApplies`).
+  const setAside =
+    comments.setAside?.applies === true ? comments.setAside.says : undefined;
+
+  const claim = comments.claim?.applies === true ? comments.claim : undefined;
+
+  return {
+    claimed: claim !== undefined,
+    setAsideReason:
+      setAside?.kind === 'standing' ? setAside.setAside.reason : undefined,
+    owner: queueOwner({
+      number: pull.entry.number,
+      labels: labelNamesOf(pull.entry),
+      isDraft: pull.entry.isDraft,
+      fromFork: pull.entry.fromFork,
+      headRef: pull.entry.headRef,
+      headSha: pull.entry.headSha,
+      baseRef: base.baseRef,
+      defaultBranch: base.defaultBranch,
+      stackedOn: base.stackedOn,
+      inCycle: base.inCycle,
+      setAside,
+      claim: claim?.says,
+      nowEpochMs: base.nowEpochMs,
+    }),
+  } as const;
+};
+
+/** One open pull request with where it stands, as {@link queueViewOf} has it. */
+type Decided = Readonly<{
+  pull: QueuePull;
+  facts: QueueFacts;
+  bypass: boolean;
+  hold: ReviewHold | undefined;
+  /** Who moves it once the layer below it has merged, for a layer. */
+  ownerOnceLanded: QueueOwner | undefined;
+  standing: QueueStanding;
+}>;
+
+/**
+ * How a pull request in the queue waits: `none` for one running, a candidate or
+ * not in the queue at all; `merges` for one whose wait other pull requests
+ * merging may end — what it is stacked on, declared or inherited an order on,
+ * or holds the release, and a version pull request built before the tip or not
+ * yet compared with it, which the release workflow rebuilds on every push — and
+ * `other` for the rest.
+ */
+const waitOf = (standing: QueueStanding): 'none' | 'merges' | 'other' => {
+  switch (standing.kind) {
+    case 'ignore':
+    case 'unactionable':
+    case 'owned':
+    case 'candidate':
+    case 'in-flight':
+      return 'none';
+
+    case 'stacked':
+    case 'waiting':
+    case 'release-blocked':
+    case 'release-stale':
+      return 'merges';
+
+    case 'needs':
+      return standing.read === 'rebuiltOnTip' ? 'merges' : 'other';
+
+    case 'native-stack':
+    case 'merge-state':
+    case 'failing':
+    case 'held':
+      return 'other';
+  }
+};
+
+/** Everything `queueStanding` may ask for, read already. */
+const readsOf = ({
+  entry,
+  nativeStack,
+}: QueuePull): Parameters<typeof queueStanding>[2] =>
+  ({
+    nativeStack: nativeStack ?? 'none',
+    // A branch whose head has every commit of its base was built on the tip.
+    ...(entry.comparison === undefined
+      ? {}
+      : { rebuiltOnTip: entry.comparison.behindBy === 0 }),
+    checksFailed: entry.checks.verdict === 'failing',
+  }) as const;
+
+/**
+ * The queue once `merged` had merged: the layers stacked on them moved onto the
+ * default branch, each with the owner its comments give it there
+ * (`ownerOnceLanded`), and what they held no longer open.
+ */
+const contextOnceMerged = (
+  context: QueueContext,
+  merged: ReadonlySet<number>,
+  queued: readonly Decided[],
+): QueueContext =>
+  ({
+    ...context,
+    owners: new Map(
+      Arr.generate(function* () {
+        for (const { facts, ownerOnceLanded } of queued) {
+          const parent = context.stackParents.get(facts.number);
+
+          const owner =
+            parent !== undefined && merged.has(parent)
+              ? ownerOnceLanded
+              : context.owners.get(facts.number);
+
+          if (owner !== undefined) {
+            yield [facts.number, owner] as const;
+          }
+        }
+      }),
+    ),
+    stackParents: new Map(
+      Array.from(context.stackParents).filter(([, on]) => !merged.has(on)),
+    ),
+    openNumbers: new Set(
+      Array.from(context.openNumbers).filter((n) => !merged.has(n)),
+    ),
+    releaseBlockers: context.releaseBlockers.filter(
+      ({ number }) => !merged.has(number),
+    ),
+  }) as const;
+
+/**
+ * What one that waits would stand as in `after` (`contextOnceMerged`), once at
+ * least one pull request has merged: moved onto the default branch, and behind
+ * it, if the layer below it has merged, and the version pull request rebuilt on
+ * the moved tip, as the release workflow does on every push.
+ */
+const standingOnceMerged = (
+  { pull, facts, hold }: Decided,
+  context: QueueContext,
+  after: QueueContext,
+): QueueStanding['kind'] => {
+  const landed =
+    context.stackParents.has(facts.number) &&
+    !after.stackParents.has(facts.number);
+
+  const moved: QueueFacts = landed
+    ? ({
+        ...facts,
+        baseRef: context.defaultBranch,
+        mergeState:
+          facts.mergeState === 'DIRTY'
+            ? ('DIRTY' as const)
+            : ('BEHIND' as const),
+      } as const)
+    : facts;
+
+  return withReviewHold(
+    queueStanding(moved, after, { ...readsOf(pull), rebuiltOnTip: true }),
+    moved.mergeState,
+    hold,
+  ).kind;
+};
+
+/**
+ * The order the worker would pick the candidates in if every one it picked
+ * merged: the running ones first, then, one pick at a time, the first of the
+ * candidates by `orderCandidates`, among which each pull request whose wait the
+ * merges so far have ended takes its place. So one that waits only for what is
+ * ahead of it is drawn where it would be picked — a `priority:high` one right
+ * after what it waits for — rather than after every candidate. What waits on
+ * something that does not merge on the way, or is failing or held, is left out,
+ * for the caller to put after. One only a ruleset bypass merges is picked and
+ * not merged — the worker sets it aside for a person once it is green — so what
+ * waits for it is left waiting.
+ */
+const pickOrder = ({
+  running,
+  queued,
+  context,
+}: Readonly<{
+  running: readonly Decided[];
+  queued: readonly Decided[];
+  context: QueueContext;
+}>): readonly Decided[] => {
+  const mut_merged = new Set<number>(
+    running.filter(({ bypass }) => !bypass).map(({ facts }) => facts.number),
+  );
+
+  let mut_pool: readonly Decided[] = queued.filter(
+    ({ standing }) => standing.kind === 'candidate',
+  );
+
+  let mut_pending: readonly Decided[] = queued.filter(
+    ({ standing }) => waitOf(standing) === 'merges',
+  );
+
+  const mut_picked: Decided[] = [];
+
+  // What another merge ends the wait of joins the candidates. Asked only when
+  // one has merged: nothing changes for the rest until then.
+  const promote = (): void => {
+    const after = contextOnceMerged(context, mut_merged, queued);
+
+    const promoted = mut_pending.filter(
+      (each) => standingOnceMerged(each, context, after) === 'candidate',
+    );
+
+    mut_pool = [...mut_pool, ...promoted];
+
+    mut_pending = mut_pending.filter((each) => !promoted.includes(each));
+  };
+
+  if (mut_merged.size > 0) {
+    promote();
+  }
+
+  for (;;) {
+    const [next] = orderCandidates(
+      mut_pool,
+      ({ facts }) => facts,
+      // What a run of the worker has demoted is not known here.
+      {
+        defaultBranch: context.defaultBranch,
+        demoted: () => false,
+        bypass: ({ bypass }) => bypass,
+      },
+    );
+
+    if (next === undefined) {
+      return mut_picked;
+    }
+
+    mut_picked.push(next);
+
+    mut_pool = mut_pool.filter((each) => each !== next);
+
+    if (next.bypass) {
+      continue;
+    }
+
+    mut_merged.add(next.facts.number);
+
+    promote();
+  }
+};
 
 /** What `queueStanding` decides from, as the page read it. */
 const factsOf = ({ entry, mergeable }: QueuePull): QueueFacts =>
@@ -280,43 +552,6 @@ const factsOf = ({ entry, mergeable }: QueuePull): QueueFacts =>
             : ('BLOCKED' as const),
     autoMerge: entry.autoMerge,
   }) as const;
-
-/** Everything `queueStanding` may ask for, read already. */
-const readsOf = ({
-  entry,
-  nativeStack,
-}: QueuePull): Parameters<typeof queueStanding>[2] =>
-  ({
-    nativeStack: nativeStack ?? 'none',
-    // A branch whose head has every commit of its base was built on the tip.
-    ...(entry.comparison === undefined
-      ? {}
-      : { rebuiltOnTip: entry.comparison.behindBy === 0 }),
-    checksFailed: entry.checks.verdict === 'failing',
-  }) as const;
-
-/** What is in the queue without being running or a candidate. */
-const isWaiting = (standing: QueueStanding): boolean => {
-  switch (standing.kind) {
-    case 'ignore':
-    case 'unactionable':
-    case 'owned':
-    case 'candidate':
-    case 'in-flight':
-      return false;
-
-    case 'stacked':
-    case 'native-stack':
-    case 'waiting':
-    case 'release-blocked':
-    case 'release-stale':
-    case 'merge-state':
-    case 'failing':
-    case 'held':
-    case 'needs':
-      return true;
-  }
-};
 
 /** `after #1`, or `after #1 +2` for one waiting on three. */
 const afterWord = (numbers: readonly number[]): string =>
