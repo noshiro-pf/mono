@@ -1,5 +1,7 @@
 import type { UserConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
+// eslint-disable-next-line import-x/no-relative-packages -- shared with synstate-docs' measurement (#3066)
+import { productionBuildConfig } from '../../../tools/scripts/lib/bundle-size.mjs';
 
 /**
  * How every library is compiled, shared by the timed run
@@ -9,15 +11,8 @@ import solidPlugin from 'vite-plugin-solid';
  */
 export const createProductionConfig = (): UserConfig =>
   ({
-    // Production builds of every library, as an application would ship them:
-    // Solid and Preact carry development-only checks behind these.
-    mode: 'production',
-    define: {
-      'process.env.NODE_ENV': JSON.stringify('production'),
-    },
-    resolve: {
-      conditions: ['module', 'browser', 'production'],
-    },
+    // Production builds of every library, as an application would ship them.
+    ...productionBuildConfig(),
     // The production JSX runtimes (`jsx`, not `jsxDEV`) for the same reason.
     oxc: {
       jsx: { development: false },

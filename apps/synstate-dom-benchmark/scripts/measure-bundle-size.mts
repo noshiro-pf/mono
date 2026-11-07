@@ -1,9 +1,9 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import * as zlib from 'node:zlib';
-import { Arr, isRecord, isString, unknownToString } from 'ts-data-forge';
-import { build, version as viteVersion, type Plugin as VitePlugin } from 'vite';
-import { mapInSequence } from './map-in-sequence.mjs';
+import { Arr } from 'ts-data-forge';
+import { version as viteVersion } from 'vite';
+// eslint-disable-next-line import-x/no-relative-packages -- shared with synstate-docs' measurement (#3066)
+import * as bundleSize from '../../../tools/scripts/lib/bundle-size.mjs';
 import { createProductionConfig } from './production-config.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
@@ -26,16 +26,20 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  * like `pnpm run benchmark`.
  */
 const main = async (): Promise<void> => {
-  const sizes = await mapInSequence(applications, async (application) =>
-    mapInSequence(libraries, async (library) => {
-      const measured = sizesOf(await bundle(entryOf(application, library)));
+  const sizes = await bundleSize.mapInSequence(
+    applications,
+    async (application) =>
+      bundleSize.mapInSequence(libraries, async (library) => {
+        const measured = bundleSize.compressedSizesOf(
+          await bundle(entryOf(application, library)),
+        );
 
-      console.info(
-        `${application.name} / ${library.name}: ${formatKb(measured.gzip)} kB gzipped`,
-      );
+        console.info(
+          `${application.name} / ${library.name}: ${bundleSize.formatKb(measured.gzip)} kB gzipped`,
+        );
 
-      return measured;
-    }),
+        return measured;
+      }),
   );
 
   const versions = await Promise.all(
@@ -81,7 +85,7 @@ type Application = Readonly<{
   source: Readonly<{ directory: string; key: ApplicationKey }> | undefined;
 }>;
 
-type Sizes = Readonly<{ minified: number; gzip: number; brotli: number }>;
+type Sizes = bundleSize.CompressedSizes;
 
 const libraries: readonly Library[] = [
   {
@@ -219,96 +223,32 @@ const entryOf = (application: Application, library: Library): string => {
   ].join('\n');
 };
 
-const entryId = '\0bundle-size-entry.js';
-
 /** Builds `source` as the only entry and returns the code of every chunk. */
 const bundle = async (source: string): Promise<string> => {
-  const entryPlugin: VitePlugin = {
-    name: 'bundle-size-entry',
-    resolveId: (id) => (id === entryId ? entryId : undefined),
-    load: (id) => (id === entryId ? source : undefined),
-  } as const;
-
-  // Read as `unknown`: typescript-eslint does not resolve Rolldown's output
-  // types.
-  const output: unknown = await build({
+  const chunks = await bundleSize.bundleWithVite(source, () => ({
     ...createProductionConfig(),
-    configFile: false,
     root: workspaceRootPath,
     logLevel: 'warn',
-    build: {
-      write: false,
-      minify: true,
-      modulePreload: { polyfill: false },
-      reportCompressedSize: false,
-      rolldownOptions: { input: entryId, plugins: [entryPlugin] },
-    },
-  });
+  }));
 
-  const mut_code: string[] = [];
-
-  for (const result of Arr.isArray(output) ? output : [output]) {
-    const files = isRecord(result) ? result['output'] : undefined;
-
-    if (!Arr.isArray(files)) {
-      throw new TypeError('the build returned no output');
-    }
-
-    for (const file of files) {
-      if (
-        isRecord(file) &&
-        file['type'] === 'chunk' &&
-        isString(file['code'])
-      ) {
-        mut_code.push(file['code']);
-      }
-    }
-  }
-
-  return mut_code.join('');
+  return chunks.map(({ code }) => code).join('');
 };
 
-const sizesOf = (code: string): Sizes => {
-  const buffer = Buffer.from(code, 'utf8');
-
-  return {
-    minified: buffer.byteLength,
-    gzip: zlib.gzipSync(buffer, { level: zlib.constants.Z_BEST_COMPRESSION })
-      .byteLength,
-    brotli: zlib.brotliCompressSync(buffer, {
-      params: {
-        [zlib.constants.BROTLI_PARAM_QUALITY]:
-          zlib.constants.BROTLI_MAX_QUALITY,
-        [zlib.constants.BROTLI_PARAM_SIZE_HINT]: buffer.byteLength,
-      },
-    }).byteLength,
-  };
-};
-
-const versionOf = async (packageName: string): Promise<string> => {
-  const manifest: unknown = JSON.parse(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.readFile(
-      path.resolve(
-        workspaceRootPath,
-        'node_modules',
-        packageName,
-        'package.json',
-      ),
-      'utf8',
+const versionOf = async (packageName: string): Promise<string> =>
+  `${packageName} ${await bundleSize.installedVersionOf(packageName, [
+    path.resolve(
+      workspaceRootPath,
+      'node_modules',
+      packageName,
+      'package.json',
     ),
-  );
-
-  return `${packageName} ${isRecord(manifest) ? unknownToString(manifest['version']) : '?'}`;
-};
+  ])}` as const;
 
 const sections = [
   ['Minified and gzipped', 'gzip'],
   ['Minified and Brotli-compressed', 'brotli'],
   ['Minified', 'minified'],
 ] as const;
-
-const formatKb = (bytes: number): string => (bytes / 1000).toFixed(1);
 
 const render = (
   sizes: readonly (readonly Sizes[])[],
@@ -328,7 +268,7 @@ const render = (
       `| :-- | ${libraries.map(() => '--:').join(' | ')} |`,
       ...applications.map(
         ({ name }, i) =>
-          `| ${name} | ${(sizes[i] ?? []).map((s) => formatKb(s[key])).join(' | ')} |`,
+          `| ${name} | ${(sizes[i] ?? []).map((s) => bundleSize.formatKb(s[key])).join(' | ')} |`,
       ),
       '',
     ]),
