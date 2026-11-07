@@ -1,4 +1,4 @@
-import { MERGE_QUEUED_LABEL } from 'pr-report-core';
+import { MERGE_QUEUED_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
 import { createState, map, type InitializedObservable } from 'synstate';
 import {
   constant,
@@ -10,6 +10,10 @@ import {
   type JSX,
 } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
+import {
+  pickedPullRequestsUrl,
+  queuedPullRequestsUrl,
+} from '../github-links.mjs';
 import type { Entry } from '../load-report.mjs';
 import { isUnread, OPEN_PARTS } from '../part-failures.mjs';
 import {
@@ -19,7 +23,7 @@ import {
   type QueueStrip,
 } from '../queue-strip.mjs';
 import type { QueueSlot, QueueView } from '../queue-view.mjs';
-import { reader } from '../store/index.mjs';
+import { reader, reportSource } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
 import { PartFailureNotes } from './part-failure-notes.js';
 import { QueueMap } from './queue-map.js';
@@ -50,7 +54,27 @@ export const QueueSection = (): JSX.Element => {
   return (
     <section class={constant('section queue-section')}>
       <h2 class={constant('section-title')}>
-        {constant('Queue')}
+        {constant('Queue ')}
+        <ExternalLink
+          href={constant(QUEUED_URL)}
+          title={constant(QUEUED_TITLE)}
+          variant={'section-link'}
+        >
+          {constant('on GitHub')}
+        </ExternalLink>
+        <span
+          aria-hidden={constant('true')}
+          class={constant('section-link-separator')}
+        >
+          {constant(' · ')}
+        </span>
+        <ExternalLink
+          href={constant(PICKED_URL)}
+          title={constant(PICKED_TITLE)}
+          variant={'section-link'}
+        >
+          {constant('picked on GitHub')}
+        </ExternalLink>
         <MatchOptional
           some={(queue$) => (
             <span
@@ -76,6 +100,16 @@ export const QueueSection = (): JSX.Element => {
     </section>
   );
 };
+
+const QUEUED_URL = queuedPullRequestsUrl(reportSource);
+
+const PICKED_URL = pickedPullRequestsUrl(reportSource);
+
+const QUEUED_TITLE =
+  `Every open pull request labelled ${MERGE_QUEUED_LABEL}, set-aside ones included, by number: GitHub cannot order them as unblock-prs picks them.` as const;
+
+const PICKED_TITLE =
+  `The queued pull requests without ${SKIP_CI_LABEL}: the one unblock-prs is running and those it picked before, but also any whose ${SKIP_CI_LABEL} came off another way. GitHub cannot tell them apart; the boxes below can.` as const;
 
 const queuedOf = (entries: readonly Entry[]): readonly Entry[] =>
   entries
