@@ -6,7 +6,14 @@ import {
   render,
   type JSX,
 } from 'synstate-dom-next';
-import { createState, map, type InitializedObservable } from 'synstate-next';
+import {
+  createState,
+  map,
+  mergeMap,
+  switchMap,
+  withInitialValue,
+  type InitializedObservable,
+} from 'synstate-next';
 import { Optional, Result } from 'ts-data-forge';
 
 // A switch bound to an observable is marked by a comment at each end, where
@@ -268,5 +275,238 @@ describe(MatchResult, () => {
     setResult(Result.err('oops'));
 
     assert.strictEqual(container.getHTML(), '<!----><i>oops</i><!---->');
+  });
+});
+
+type User = Readonly<{ name: string }>;
+
+/**
+ * A branch that reads `user$` narrowed by the switch above it, as the user
+ * would write it, and records every value its derived node computes.
+ */
+const narrowingBranch = (
+  user$: InitializedObservable<User | undefined>,
+): Readonly<{
+  Branch: () => JSX.Element;
+  seen: readonly (string | undefined)[];
+}> => {
+  const mut_seen: (string | undefined)[] = [];
+
+  const Branch = (): JSX.Element => (
+    <b>
+      {user$.pipe(
+        map((u) => {
+          mut_seen.push(u?.name);
+
+          // The switch rules `undefined` out; reaching it here is the bug.
+          return u === undefined ? 'unreachable' : u.name;
+        }),
+      )}
+    </b>
+  );
+
+  return { Branch, seen: mut_seen };
+};
+
+// synstate-dom #3630 (issue #3605). Here the switch's effect runs after the
+// drain, so without the check in the drain a branch would compute from the
+// ruled-out value however shallow `cond` is.
+describe('a branch the value rules out computes nothing from it (#3605)', () => {
+  test('If, cond read straight from the source', () => {
+    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
+
+    const { Branch, seen } = narrowingBranch(user$);
+
+    const cond$ = user$.pipe(map((u) => u !== undefined));
+
+    const { container } = mountInto(() => (
+      <p>
+        <If cond={cond$} then={<Branch />} />
+      </p>
+    ));
+
+    setUser({ name: 'b' });
+
+    setUser(undefined);
+
+    assert.strictEqual(container.textContent, '');
+
+    assert.deepStrictEqual(seen, ['a', 'b']);
+  });
+
+  test('If, cond two steps from the source', () => {
+    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
+
+    const { Branch, seen } = narrowingBranch(user$);
+
+    const cond$ = user$.pipe(map((u) => u)).pipe(map((u) => u !== undefined));
+
+    const { container } = mountInto(() => (
+      <p>
+        <If cond={cond$} then={<Branch />} />
+      </p>
+    ));
+
+    setUser({ name: 'b' });
+
+    setUser(undefined);
+
+    assert.strictEqual(container.textContent, '');
+
+    assert.deepStrictEqual(seen, ['a', 'b']);
+  });
+
+  test('If, the branch mounted again when cond comes back', () => {
+    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
+
+    const { Branch, seen } = narrowingBranch(user$);
+
+    const cond$ = user$.pipe(map((u) => u !== undefined));
+
+    const { container } = mountInto(() => (
+      <p>
+        <If cond={cond$} then={<Branch />} />
+      </p>
+    ));
+
+    setUser(undefined);
+
+    setUser({ name: 'c' });
+
+    assert.strictEqual(container.textContent, 'c');
+
+    assert.deepStrictEqual(seen, ['a', 'c']);
+  });
+
+  test('MatchOptional', () => {
+    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
+
+    const { Branch, seen } = narrowingBranch(user$);
+
+    const value$ = user$
+      .pipe(map((u) => u))
+      .pipe(map((u) => (u === undefined ? Optional.none : Optional.some(u))));
+
+    const { container } = mountInto(() => (
+      <MatchOptional
+        value={value$}
+        some={() => <Branch />}
+        none={<i>{constant('login')}</i>}
+      />
+    ));
+
+    setUser(undefined);
+
+    assert.strictEqual(container.textContent, 'login');
+
+    assert.deepStrictEqual(seen, ['a']);
+  });
+
+  test('MatchResult', () => {
+    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
+
+    const { Branch, seen } = narrowingBranch(user$);
+
+    const value$ = user$
+      .pipe(map((u) => u))
+      .pipe(
+        map((u): Result<User, string> =>
+          u === undefined ? Result.err('gone') : Result.ok(u),
+        ),
+      );
+
+    const { container } = mountInto(() => (
+      <MatchResult
+        value={value$}
+        ok={() => <Branch />}
+        err={(e$) => <i>{e$}</i>}
+      />
+    ));
+
+    setUser(undefined);
+
+    assert.strictEqual(container.textContent, 'gone');
+
+    assert.deepStrictEqual(seen, ['a']);
+  });
+
+  test('a nested switch', () => {
+    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
+
+    const { Branch, seen } = narrowingBranch(user$);
+
+    const [shown$, setShown] = createState(true);
+
+    const cond$ = user$.pipe(map((u) => u !== undefined));
+
+    const { container } = mountInto(() => (
+      <If
+        cond={shown$}
+        then={
+          <p>
+            <If cond={cond$} then={<Branch />} />
+          </p>
+        }
+      />
+    ));
+
+    setUser(undefined);
+
+    setShown(false);
+
+    setShown(true);
+
+    setUser({ name: 'd' });
+
+    assert.strictEqual(container.textContent, 'd');
+
+    assert.deepStrictEqual(seen, ['a', 'd']);
+  });
+
+  test.each([
+    ['switchMap', switchMap],
+    ['mergeMap', mergeMap],
+  ] as const)('what a %s made in the branch projects', (_name, flatten) => {
+    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
+
+    const mut_seen: (string | undefined)[] = [];
+
+    const [trigger$] = createState(0);
+
+    // The projection's nodes belong to the operator's own owner, not to the
+    // branch's.
+    const Branch = (): JSX.Element => (
+      <b>
+        {trigger$
+          .pipe(
+            flatten(() =>
+              user$.pipe(
+                map((u) => {
+                  mut_seen.push(u?.name);
+
+                  return u === undefined ? 'unreachable' : u.name;
+                }),
+              ),
+            ),
+          )
+          .pipe(withInitialValue(''))}
+      </b>
+    );
+
+    const cond$ = user$.pipe(map((u) => u !== undefined));
+
+    const { container } = mountInto(() => (
+      <p>
+        <If cond={cond$} then={<Branch />} />
+      </p>
+    ));
+
+    setUser({ name: 'b' });
+
+    setUser(undefined);
+
+    assert.strictEqual(container.textContent, '');
+
+    assert.deepStrictEqual(mut_seen, ['a', 'b']);
   });
 });

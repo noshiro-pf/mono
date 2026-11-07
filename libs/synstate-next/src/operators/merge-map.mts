@@ -1,18 +1,21 @@
 import {
   DerivedClass,
   InnerFollower,
-  Owner,
   awaitsEffects,
+  currentDepthFloor,
   deferWrite,
   disposeAll,
   disposeReporting,
   isPropagating,
   noValue,
+  ownerBelow,
+  retireOwner,
   toNode,
   view,
   type Observable,
   type ObservableClass,
   type Operator,
+  type Owner,
 } from '../core/index.mjs';
 
 /**
@@ -47,6 +50,9 @@ class MergeMapClass<A, B> extends DerivedClass<B> {
 
   readonly #project: (value: A) => Observable<B>;
 
+  /** The depth floor this node was made at, for the nodes of its projections. */
+  readonly #depthFloor: number;
+
   /** The inner observables still followed, by their owners. */
   // transformer-ignore-next-line convert-to-readonly
   readonly #inners: Map<Owner, ObservableClass<B>>;
@@ -68,6 +74,8 @@ class MergeMapClass<A, B> extends DerivedClass<B> {
     this.#parent = parent;
 
     this.#project = project;
+
+    this.#depthFloor = currentDepthFloor();
 
     this.#inners = new Map<Owner, ObservableClass<B>>();
 
@@ -92,10 +100,20 @@ class MergeMapClass<A, B> extends DerivedClass<B> {
    * projection that throws has what it made disposed at once.
    */
   #add(value: A): boolean {
-    // Not a child of the current owner: this node disposes it.
-    const owner = new Owner(undefined);
+    // Not a child of the current owner: this node disposes it. Its nodes are as
+    // deep as this node's own floor, so that a switch above retires them in
+    // time.
+    const owner = ownerBelow(undefined, this.#depthFloor);
 
     const inner = this.#follow(owner, value);
+
+    // Disposed by its projection (which disposed an owner of it): its teardown
+    // has run, so what this projection made is let go here.
+    if (this.disposed) {
+      disposeReporting(owner);
+
+      return false;
+    }
 
     this.#inners.set(owner, inner);
 
@@ -188,6 +206,12 @@ class MergeMapClass<A, B> extends DerivedClass<B> {
     const v = this.#parent.current;
 
     return v !== noValue && this.#add(v);
+  }
+
+  protected override retireHeld(): void {
+    for (const owner of this.#inners.keys()) {
+      retireOwner(owner);
+    }
   }
 
   protected override teardown(): void {

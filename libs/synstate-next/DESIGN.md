@@ -55,6 +55,25 @@ source emits and run after the drain, against a graph that has settled. An
 effect never sees a half-propagated graph, and the DOM layer can mount and
 dispose inside an effect without being inside a propagation.
 
+A switch (synstate-dom-next's `If`, `Match*`, `For`) disposes a branch in its
+effect, after the drain, so the drain would otherwise recompute the branch's
+nodes from the value that rules the branch out. It decides in the drain instead:
+a node below what it switches on checks the key, and retires the branches that
+go (`retireOwner`), which takes their nodes and effects out of the updates
+without running any code of the application. The branches are made in an owner
+with a depth floor (`ownerBelow`), so that every node of theirs is deeper than
+that check and the drain reaches the check first. An owner a node makes for
+itself (a `switchMap`'s projection, a `createDerived` setup) takes the floor the
+node was made at and is retired with the node. An exception from the check is
+not let out into the drain: the switch retires what it could not keep, and its
+effect drops it and throws the exception, or the exception is reported when the
+update ends if the update ends before the effect runs. An observable a branch is
+given rather than makes is not the branch's, and computes from every value.
+
+`subscribe` calls its function once at once, in a batch: a write that call makes
+propagates when it returns, as a write by an effect does, rather than calling
+the function again from inside itself.
+
 ## Writes
 
 - A write made during the drain (inside a `map`, say) is deferred until the

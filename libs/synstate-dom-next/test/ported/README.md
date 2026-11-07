@@ -24,7 +24,10 @@ synstate-dom".
 - `bindings`: an event handler stays on its element after unmounting, which goes
   with its owner.
 - `control`, `for`: a switch bound to an observable has a comment at each end;
-  one given a constant has none.
+  one given a constant has none. The cases synstate-dom added for a branch or a
+  row that computes from a value ruling it out (#3630) are there with more:
+  a switch here acts after the update has settled, so the case arises however
+  shallow the condition is.
 - `render`: a completed observable is a disposed one.
 - `pre-attach`: the error for an update that never settles is the scheduler's.
 - `reflected-keys`: `reflected-keys.generated.mts` is written by this package's

@@ -88,6 +88,7 @@ const mut_state = {
   effectsLength: 0,
   deferredLength: 0,
   afterNextRoundLength: 0,
+  holdersLength: 0,
   /** Whether a write made since the last round counts toward `maxRounds`. */
   countsRound: false,
   /** Set while the callbacks of `afterNextRound` run. */
@@ -123,6 +124,9 @@ const mut_buckets: (DerivedNode | undefined)[][] = [];
 const mut_bucketLengths: number[] = [];
 
 const mut_effects: (EffectNode | undefined)[] = [];
+
+/** What `holdUntilUpdateEnds` was given in the flush under way. */
+const mut_holders: (HoldsFailure | undefined)[] = [];
 
 /**
  * How many rounds one flush may run. A round starts when an effect writes; an
@@ -185,6 +189,22 @@ export const afterNextRound = (emitter: QueuedEmitter): void => {
   mut_afterNextRound[mut_state.afterNextRoundLength] = emitter;
 
   mut_state.afterNextRoundLength += 1;
+};
+
+/** A node holding an exception for an effect to take; see `holdUntilUpdateEnds`. */
+export type HoldsFailure = Readonly<{
+  /** Reports the exception, if no effect took it, and lets it go. */
+  reportUnclaimed: () => void;
+}>;
+
+/**
+ * Has `holder` report its exception once the flush under way ends, if no effect
+ * took it by then: one that the update ended before running (`DrainCheck`).
+ */
+export const holdUntilUpdateEnds = (holder: HoldsFailure): void => {
+  mut_holders[mut_state.holdersLength] = holder;
+
+  mut_state.holdersLength += 1;
 };
 
 /** Applies `write` once the drain ends. */
@@ -654,6 +674,15 @@ const flushRounds = (): void => {
     mut_failure = keepFirst(mut_failure, error);
   } finally {
     mut_state.phase = 'idle';
+
+    // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
+    for (let mut_i = 0; mut_i < mut_state.holdersLength; mut_i += 1) {
+      mut_holders[mut_i]?.reportUnclaimed();
+    }
+
+    mut_holders.fill(undefined, 0, mut_state.holdersLength);
+
+    mut_state.holdersLength = 0;
   }
 
   throwFailure(mut_failure);

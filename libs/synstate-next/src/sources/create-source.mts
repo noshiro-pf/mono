@@ -1,7 +1,9 @@
 import {
-  createRootOwner,
+  currentDepthFloor,
   disposeReporting,
   noValue,
+  ownerBelow,
+  retireOwner,
   view,
   type InitializedObservable,
   type NoValue,
@@ -76,8 +78,10 @@ class CustomSourceClass<A> extends AsyncSourceClass<A> {
   constructor(setup: (ctx: SourceContext<A>) => void, initial: A | NoValue) {
     super(initial);
 
-    // Not a child of the current owner: this source disposes it.
-    this.#owner = createRootOwner();
+    // Not a child of the current owner: this source disposes it. What it makes
+    // is as deep as this source's own floor, so that a switch above retires it
+    // in time.
+    this.#owner = ownerBelow(undefined, currentDepthFloor());
 
     try {
       this.#owner.run(() => {
@@ -101,6 +105,10 @@ class CustomSourceClass<A> extends AsyncSourceClass<A> {
 
       throw error;
     }
+  }
+
+  protected override retireHeld(): void {
+    retireOwner(this.#owner);
   }
 
   protected override teardown(): void {

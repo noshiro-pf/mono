@@ -766,3 +766,153 @@ const collect = <A,>(observable: Observable<A>): readonly A[] => {
 
   return mut_seen;
 };
+
+// synstate's `inner-ownership` cases of #3666 (issue #3550). A write made
+// during the projection is deferred until the drain ends here, so the
+// projection that wrote finishes first and the write then switches; what synstate
+// asked of completion during the projection is asked of disposal.
+describe('a source write or disposal during a projection', () => {
+  test('switchMap: a write from the projection switches to its value, and the first inner is let go', () => {
+    const user$ = source<number>();
+
+    const a$ = source<string>();
+
+    const b$ = source<string>();
+
+    const current$ = user$.pipe(
+      switchMap((u) => {
+        if (u === 1) {
+          user$.next(2);
+
+          return a$;
+        }
+
+        return b$;
+      }),
+    );
+
+    const mut_current: string[] = [];
+
+    current$.subscribe((v) => {
+      mut_current.push(v);
+    });
+
+    user$.next(1);
+
+    a$.next('a');
+
+    b$.next('b');
+
+    assert.deepStrictEqual(mut_current, ['b']);
+
+    assert.isFalse(toNode(a$).hasObserver);
+
+    toNode(current$).dispose();
+
+    assert.isFalse(toNode(b$).hasObserver);
+  });
+
+  test('switchMap: what the projection that wrote made is disposed when the write switches', () => {
+    const user$ = source<number>();
+
+    const store$ = source<number>();
+
+    const mut_made: Observable<number>[] = [];
+
+    const current$ = user$.pipe(
+      switchMap((u) => {
+        if (u === 1) {
+          user$.next(2);
+        }
+
+        const made$ = store$.pipe(map((x) => x));
+
+        mut_made.push(made$);
+
+        return made$;
+      }),
+    );
+
+    current$.subscribe(() => {});
+
+    user$.next(1);
+
+    // The projection that wrote (1) ran first, then the one its write made (2).
+    assert.deepStrictEqual(
+      mut_made.map((made) => toNode(made).disposed),
+      [true, false],
+    );
+  });
+
+  test('switchMap: disposing the operator during the projection subscribes to nothing, and disposes what it made', () => {
+    const user$ = source<number>();
+
+    const shared$ = state('shared');
+
+    const store$ = source<number>();
+
+    const mut_made: Observable<number>[] = [];
+
+    const owner = createOwner();
+
+    const current$ = owner.run(() =>
+      user$.pipe(
+        switchMap(() => {
+          owner.dispose();
+
+          const made$ = store$.pipe(map((x) => x));
+
+          mut_made.push(made$);
+
+          return shared$;
+        }),
+      ),
+    );
+
+    current$.subscribe(() => {});
+
+    user$.next(1);
+
+    assert.isFalse(toNode(shared$).hasObserver);
+
+    assert.isTrue(mut_made.every((made) => toNode(made).disposed));
+
+    assert.isFalse(toNode(store$).hasObserver);
+  });
+
+  test('mergeMap: disposing the operator during the projection subscribes to nothing, and disposes what it made', () => {
+    const user$ = source<number>();
+
+    const shared$ = state('shared');
+
+    const store$ = source<number>();
+
+    const mut_made: Observable<number>[] = [];
+
+    const owner = createOwner();
+
+    const current$ = owner.run(() =>
+      user$.pipe(
+        mergeMap(() => {
+          owner.dispose();
+
+          const made$ = store$.pipe(map((x) => x));
+
+          mut_made.push(made$);
+
+          return shared$;
+        }),
+      ),
+    );
+
+    current$.subscribe(() => {});
+
+    user$.next(1);
+
+    assert.isFalse(toNode(shared$).hasObserver);
+
+    assert.isTrue(mut_made.every((made) => toNode(made).disposed));
+
+    assert.isFalse(toNode(store$).hasObserver);
+  });
+});

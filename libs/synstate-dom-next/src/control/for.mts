@@ -6,10 +6,13 @@ import {
   type State,
 } from 'synstate-next';
 import {
+  DrainCheck,
   EffectClass,
   disposeEach,
   keepFirst,
+  keepFirstOf,
   noValue,
+  retireOwner,
   throwFailure,
   toNode,
   type Failure,
@@ -46,6 +49,10 @@ import { longestIncreasingRun } from './longest-increasing-run.mjs';
  * that changed `items`: a row reads its new element one round later than
  * `items` changed, and before anything is painted.
  *
+ * A row whose key goes never computes from the list that drops it: the keys are
+ * checked in the drain, above the rows' nodes, and the rows that go are retired
+ * there (see `DrainCheck`).
+ *
  * `key` is required; `(_, i) => i` matches rows by position. A key that appears
  * twice is reported with `console.error`.
  *
@@ -67,12 +74,11 @@ export const For = <T,>({
   ) => Description;
 }>): Description =>
   new ControlDescription((out) => {
-    const source = isObservable(items)
-      ? toNode(items)
-      : // A list that never changes: a node of its own that is never written.
-        toNode(state(items));
-
-    const binding = new ForBinding(source, key, children);
+    const binding = isObservable(items)
+      ? new ForBinding(toNode(items), key, children, true)
+      : // A list that never changes: a node of its own that is never written,
+        // with nothing to check.
+        new ForBinding(toNode(state(items)), key, children, false);
 
     binding.mountInto(out);
   });
@@ -91,6 +97,10 @@ type Row<T> = {
   position: number;
   /** The last update that kept the row. */
   keptIn: number;
+  /** The last check (see `#retireDropped`) that found the row's key. */
+  seenIn: number;
+  /** Whether the row was retired; it goes in the next update, whatever comes. */
+  retired: boolean;
 };
 
 class ForBinding<T> extends EffectClass<readonly T[]> {
@@ -124,6 +134,27 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
   /** Counts the updates that changed the keys. */
   #mut_generation: number;
 
+  /** Counts the calls of `#retireDropped`. */
+  #mut_checks: number;
+
+  /** How many rows are retired; they all go in the next update. */
+  #mut_retiredRows: number;
+
+  /** The list the drain checked, whose keys the effect does not compute again. */
+  #mut_checkedList: readonly T[] | undefined;
+
+  /**
+   * The keys of `#mut_checkedList`, or `undefined` when they are the rows'
+   * keys, in order. Written with it, by `#setChecked`.
+   */
+  #mut_checkedKeys: readonly unknown[] | undefined;
+
+  /** Undefined for a list that never changes. */
+  readonly #check: DrainCheck | undefined;
+
+  /** The least depth of a row's nodes; see `DrainCheck`. */
+  readonly #rowDepth: number;
+
   constructor(
     source: ObservableClass<readonly T[]>,
     key: (item: T, index: number) => unknown,
@@ -131,6 +162,7 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
       item: InitializedObservable<T>,
       index: InitializedObservable<number>,
     ) => Description,
+    changes: boolean,
   ) {
     super(source);
 
@@ -151,6 +183,89 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
     this.#mut_rows = [];
 
     this.#mut_generation = 0;
+
+    this.#mut_checks = 0;
+
+    this.#mut_retiredRows = 0;
+
+    this.#mut_checkedList = undefined;
+
+    this.#mut_checkedKeys = undefined;
+
+    this.#check = changes ? this.#checkInDrain(source) : undefined;
+
+    this.#rowDepth = this.#check?.branchDepth ?? 0;
+  }
+
+  /** Makes the check of `#retireDropped`. */
+  #checkInDrain(source: ObservableClass<readonly T[]>): DrainCheck {
+    return new DrainCheck(
+      source,
+      () => {
+        this.#retireDropped();
+      },
+      () => {
+        // A list whose keys cannot be told keeps no row; `run` removes them.
+        this.#retireRows(-1);
+      },
+    );
+  }
+
+  #setChecked(
+    list: readonly T[] | undefined,
+    keys: readonly unknown[] | undefined,
+  ): void {
+    this.#mut_checkedList = list;
+
+    this.#mut_checkedKeys = keys;
+  }
+
+  /**
+   * Called in the drain when the list emits: retires the rows whose key the new
+   * list does not have, before the drain reaches them.
+   */
+  #retireDropped(): void {
+    const list = this.#list();
+
+    // Cleared first: `key` may throw.
+    this.#setChecked(undefined, undefined);
+
+    const keys = this.#keysUnlessSame(list, this.#mut_rows);
+
+    this.#setChecked(list, keys);
+
+    if (keys === undefined) {
+      return;
+    }
+
+    this.#mut_checks += 1;
+
+    const check = this.#mut_checks;
+
+    for (const key of keys) {
+      const row = this.#mut_byKey.get(key);
+
+      if (row !== undefined) {
+        row.seenIn = check;
+      }
+    }
+
+    this.#retireRows(check);
+  }
+
+  /** Retires the rows not seen in the check numbered `check`. */
+  #retireRows(check: number): void {
+    for (const row of this.#mut_rows) {
+      if (row.seenIn === check || row.retired) {
+        continue;
+      }
+
+      row.retired = true;
+
+      this.#mut_retiredRows += 1;
+
+      retireOwner(row.owner);
+    }
   }
 
   #list(): readonly T[] {
@@ -159,27 +274,42 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
     return list === noValue ? [] : list;
   }
 
-  #sameKeys(list: readonly T[], rows: readonly Row<T>[]): boolean {
-    if (list.length !== rows.length) {
-      return false;
+  /**
+   * The keys of `list`, or `undefined` when they are those of `rows`, in order,
+   * and no row is retired. Calls `key` once per item.
+   */
+  #keysUnlessSame(
+    list: readonly T[],
+    rows: readonly Row<T>[],
+  ): readonly unknown[] | undefined {
+    if (this.#mut_retiredRows > 0 || list.length !== rows.length) {
+      return list.map((item, i) => this.#key(item, i));
     }
 
     for (const [i, row] of rows.entries()) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- the lengths are equal
-      if (row.key !== this.#key(list[i]!, i)) {
-        return false;
+      const key = this.#key(list[i]!, i);
+
+      if (row.key !== key) {
+        // The keys before `i` are the rows'.
+        return list.map((item, j) =>
+          j < i
+            ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- the lengths are equal
+              rows[j]!.key
+            : j === i
+              ? key
+              : this.#key(item, j),
+        );
       }
     }
 
-    return true;
+    return undefined;
   }
 
-  #createRow(item: T, i: number, out: MountedNodes): Row<T> {
-    const key = this.#key(item, i);
-
+  #createRow(item: T, i: number, key: unknown, out: MountedNodes): Row<T> {
     const start = out.list.length;
 
-    const owner = this.#site.newOwner();
+    const owner = this.#site.newOwner(this.#rowDepth);
 
     const [itemState, indexState] = this.#site.run(owner, () => {
       const itemInRow = state(item);
@@ -212,6 +342,8 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
       last: out.list.at(-1)!,
       position: i,
       keptIn: this.#mut_generation,
+      seenIn: this.#mut_checks,
+      retired: false,
     } as const;
 
     if (this.#mut_byKey.has(key)) {
@@ -263,6 +395,8 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
 
     this.#mut_rows = [];
 
+    this.#mut_retiredRows = 0;
+
     return disposeEach(rows.map((row) => row.owner));
   }
 
@@ -285,6 +419,9 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
       }
     }
 
+    // A retired row is never kept, so none is left.
+    this.#mut_retiredRows = 0;
+
     return disposeEach(gone.map((row) => row.owner));
   }
 
@@ -294,6 +431,7 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
    */
   #place(
     list: readonly T[],
+    keys: readonly unknown[],
     next: readonly (Row<T> | undefined)[],
     generation: number,
   ): readonly Row<T>[] {
@@ -340,7 +478,7 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
 
         for (let mut_j = mut_start; mut_j <= mut_i; mut_j += 1) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- in range
-          const row = this.#createRow(list[mut_j]!, mut_j, out);
+          const row = this.#createRow(list[mut_j]!, mut_j, keys[mut_j], out);
 
           row.keptIn = generation;
 
@@ -419,7 +557,9 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
 
     out.push(this.#start);
 
-    this.#mut_rows = list.map((item, i) => this.#createRow(item, i, out));
+    this.#mut_rows = list.map((item, i) =>
+      this.#createRow(item, i, this.#key(item, i), out),
+    );
 
     out.push(this.#end);
   }
@@ -429,7 +569,27 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
 
     const previous = this.#mut_rows;
 
-    if (this.#sameKeys(list, previous)) {
+    const keyFailure = this.#check?.takeFailure();
+
+    if (keyFailure !== undefined) {
+      // `key` threw in the drain, which retired every row: they go, and the
+      // exception is this effect's.
+      this.#setChecked(undefined, undefined);
+
+      throwFailure(keepFirstOf(keyFailure, this.#removeAll()));
+
+      return;
+    }
+
+    const checked = this.#mut_checkedList === list;
+
+    const checkedKeys = this.#mut_checkedKeys;
+
+    this.#setChecked(undefined, undefined);
+
+    const keys = checked ? checkedKeys : this.#keysUnlessSame(list, previous);
+
+    if (keys === undefined) {
       for (const [i, row] of previous.entries()) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- the lengths are equal
         row.item.set(list[i]!);
@@ -451,9 +611,10 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
 
     // The rows kept, at their new positions.
     const next = list.map((item, i): Row<T> | undefined => {
-      const row = this.#mut_byKey.get(this.#key(item, i));
+      const row = this.#mut_byKey.get(keys[i]);
 
-      if (row === undefined || row.keptIn === generation) {
+      // A retired row computes nothing more: a new row takes its key.
+      if (row === undefined || row.keptIn === generation || row.retired) {
         return undefined;
       }
 
@@ -472,7 +633,7 @@ class ForBinding<T> extends EffectClass<readonly T[]> {
     const failure = this.#removeGone(previous, generation);
 
     try {
-      this.#mut_rows = this.#place(list, next, generation);
+      this.#mut_rows = this.#place(list, keys, next, generation);
     } catch (error) {
       throwFailure(keepFirst(failure, error));
     }

@@ -1,5 +1,10 @@
 import { constant, For, If, Portal, render, type JSX } from 'synstate-dom-next';
-import { createState, map, type InitializedObservable } from 'synstate-next';
+import {
+  batch,
+  createState,
+  map,
+  type InitializedObservable,
+} from 'synstate-next';
 
 type Item = Readonly<{ id: string; name: string }>;
 
@@ -408,5 +413,158 @@ describe(Portal, () => {
     setOpen(false);
 
     assert.strictEqual(target.getHTML(), '');
+  });
+});
+
+/**
+ * Mounts a `For` over `shown$` whose rows read `items$` by id, and records
+ * every name a row finds.
+ */
+const mountRows = (
+  items$: InitializedObservable<readonly Item[]>,
+  shown$: InitializedObservable<readonly Item[]>,
+): Readonly<{
+  container: HTMLDivElement;
+  seen: readonly (string | undefined)[];
+}> => {
+  const mut_seen: (string | undefined)[] = [];
+
+  // Reads the list by id, as a row may: the row of a removed id would find
+  // nothing.
+  const Row = ({ id }: Readonly<{ id: string }>): JSX.Element => (
+    <b>
+      {items$.pipe(
+        map((xs) => {
+          const name = xs.find((x) => x.id === id)?.name;
+
+          mut_seen.push(name);
+
+          return name ?? 'unreachable';
+        }),
+      )}
+    </b>
+  );
+
+  const container = document.createElement('div');
+
+  render(
+    () => (
+      <For items={shown$} key={(i) => i.id}>
+        {(item$) => <Row id={item$.value.id} />}
+      </For>
+    ),
+    container,
+  );
+
+  return { container, seen: mut_seen };
+};
+
+// synstate-dom #3630 (issue #3605): a row computes nothing from the list that
+// drops it, however the list reaches `For`.
+describe('a row whose key goes computes nothing from the list that drops it (#3605)', () => {
+  test('a list read straight', () => {
+    const [items$, setItems] = createState<readonly Item[]>([
+      item('a', 'A'),
+      item('b', 'B'),
+    ]);
+
+    const { container, seen } = mountRows(items$, items$);
+
+    setItems([item('a', 'A')]);
+
+    assert.strictEqual(container.textContent, 'A');
+
+    assert.notInclude(seen, undefined);
+  });
+
+  test('a derived list, deeper than the rows', () => {
+    const [items$, setItems] = createState<readonly Item[]>([
+      item('a', 'A'),
+      item('b', 'B'),
+    ]);
+
+    const { container, seen } = mountRows(items$, items$.pipe(map((xs) => xs)));
+
+    setItems([item('a', 'A')]);
+
+    assert.strictEqual(container.textContent, 'A');
+
+    assert.notInclude(seen, undefined);
+  });
+
+  test('a key that goes and comes back mounts a new row', () => {
+    const [items$, setItems] = createState<readonly Item[]>([
+      item('a', 'A'),
+      item('b', 'B'),
+    ]);
+
+    const { container, seen } = mountRows(items$, items$);
+
+    setItems([item('a', 'A')]);
+
+    setItems([item('a', 'A'), item('b', 'B2')]);
+
+    assert.strictEqual(container.textContent, 'AB2');
+
+    assert.notInclude(seen, undefined);
+  });
+
+  test('a key that throws drops the rows and fails the For alone, as an effect', () => {
+    const [items$, setItems] = createState<readonly (Item | undefined)[]>([
+      item('a', 'A'),
+    ]);
+
+    const [label$, setLabel] = createState('x');
+
+    const mut_seen: (readonly (Item | undefined)[])[] = [];
+
+    const { container } = mountInto(() => (
+      <p>
+        {label$}
+        <For
+          items={items$}
+          key={(i) => {
+            if (i === undefined) {
+              throw new Error('no key');
+            }
+
+            return i.id;
+          }}
+        >
+          {(item$) => (
+            <b>
+              {/* Reads the list, so that a row left live computes from it. */}
+              {items$.pipe(
+                map((xs) => {
+                  mut_seen.push(xs);
+
+                  return item$.value?.name ?? '';
+                }),
+              )}
+            </b>
+          )}
+        </For>
+      </p>
+    ));
+
+    const bad = [undefined] as const;
+
+    assert.throws(() => {
+      batch(() => {
+        setLabel('y');
+
+        setItems(bad);
+      });
+    }, 'no key');
+
+    assert.notInclude(mut_seen, bad);
+
+    // The other effects of the update ran, and the rows the check could not
+    // keep went.
+    assert.strictEqual(container.textContent, 'y');
+
+    setItems([item('b', 'B')]);
+
+    assert.strictEqual(container.textContent, 'yB');
   });
 });
