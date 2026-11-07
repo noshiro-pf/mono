@@ -1206,6 +1206,58 @@ describe('follow', () => {
     stopFollowing();
   });
 
+  test('a move queued just before the followed observable completed still happens', async () => {
+    const { router } = setup();
+
+    const [href$, setHref] = createState<Href>(routes.home.href());
+
+    router.follow(href$);
+
+    setHref(routes.settings.href());
+
+    href$.complete();
+
+    await Promise.resolve();
+
+    assert.strictEqual(current(router.match).route, 'settings');
+  });
+
+  test('dispose cancels a move queued just before the followed observable completed', async () => {
+    const { router, browser } = setup();
+
+    const [href$, setHref] = createState<Href>(routes.home.href());
+
+    router.follow(href$);
+
+    setHref(routes.settings.href());
+
+    href$.complete();
+
+    router.dispose();
+
+    await nextTask();
+
+    assert.strictEqual(browser.url().pathname, '/');
+  });
+
+  test('following an observable that has already completed navigates nowhere', async () => {
+    const { router, browser } = setup();
+
+    const [href$] = createState<Href>(routes.settings.href());
+
+    href$.complete();
+
+    const stopFollowing = router.follow(href$);
+
+    await nextTask();
+
+    assert.strictEqual(browser.url().pathname, '/');
+
+    stopFollowing();
+
+    router.dispose();
+  });
+
   test('dispose stops following and drops a pending scroll', async () => {
     const { router, browser } = setup();
 
