@@ -60,6 +60,14 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
    * `debounce` or `audit` drops its pending value instead of emitting it.
    */
   dispose: () => void;
+
+  /**
+   * Calls `onNext` with the current value, if any, and with every later one,
+   * and `onComplete` once the observable completes. A value the first call
+   * writes to the observable itself is passed on once more, after that call has
+   * returned, unless the call disposed the scope the subscription is made in.
+   * A subscription made while a scope runs ends with the scope.
+   */
   subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;
 
   pipe: PipeMethod<A>;
