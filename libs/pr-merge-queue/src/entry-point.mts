@@ -9,3 +9,12 @@ export {
   reviewOpeningRounds,
   type DeferralReason,
 } from './pr-description/index.mjs';
+
+export {
+  ConfigFileSchema,
+  configOf,
+  failedContexts,
+  firstFixerOf,
+  planAutoFix,
+  type AutoFixConfig,
+} from './unblock-prs/index.mjs';

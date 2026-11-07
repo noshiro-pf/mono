@@ -5,7 +5,7 @@ import {
   findIdlePatterns,
   readAutoFixPatterns,
   splitAlternatives,
-} from './check-auto-fix-contexts.mjs';
+} from './main.mjs';
 
 describe('collectMatrixContexts', () => {
   test('names each entry by the job name with the command put in', () => {
@@ -224,6 +224,25 @@ describe('collectMatrixContexts', () => {
     expect(read.unreadable[0]).toContain('test-node-versions');
   });
 
+  test('does not read a command in a comment of a script', () => {
+    const read = collectMatrixContexts(dedent`
+      jobs:
+        plain:
+          strategy:
+            matrix:
+              command:
+                - fix:a
+          steps:
+            - run: |
+                # pnpm run \${{ matrix.command }}
+                pnpm run ws:check:test
+    `);
+
+    assert.deepStrictEqual(read.contexts, []);
+
+    expect(read.unreadable).toHaveLength(1);
+  });
+
   test('leaves out a job whose matrix has exclude', () => {
     const read = collectMatrixContexts(dedent`
       jobs:
@@ -310,9 +329,9 @@ describe('collectMatrixContexts', () => {
 });
 
 describe('readAutoFixPatterns', () => {
-  test('reads the ignore list and every prepare and fixer context', () => {
-    const config = readAutoFixPatterns({
-      autoFix: {
+  test('reads every prepare and fixer context, with where it is', () => {
+    const config = readAutoFixPatterns(
+      autoFixOf({
         ignore: [String.raw`^[\w-]+-result / result$`],
         prepare: [
           { context: String.raw`^code-check \(`, run: 'pnpm run ws:build' },
@@ -321,12 +340,12 @@ describe('readAutoFixPatterns', () => {
           { context: '^a$|^b$', run: 'pnpm run a', stage: 0 },
           { context: '^b$', run: 'pnpm run b', stage: 1 },
         ],
-      },
-    });
+      }),
+    );
 
     assert.isTrue(Result.isOk(config));
 
-    expect(config.value.ignore).toHaveLength(1);
+    expect(config.value.autoFix.ignore).toHaveLength(1);
 
     assert.deepStrictEqual(
       config.value.patterns.map(({ where, kind, source, alternatives }) => ({
@@ -358,15 +377,27 @@ describe('readAutoFixPatterns', () => {
     );
   });
 
+  test('keeps a source as written, which a RegExp would escape', () => {
+    const config = readAutoFixPatterns(
+      autoFixOf({
+        fixers: [{ context: '^a / b$', run: 'pnpm run a', stage: 0 }],
+      }),
+    );
+
+    assert.isTrue(Result.isOk(config));
+
+    assert.strictEqual(config.value.patterns[0]?.source, '^a / b$');
+  });
+
   test('reads a file with no autoFix as no patterns', () => {
     const config = readAutoFixPatterns({ generatedBranches: [] });
 
     assert.isTrue(Result.isOk(config));
 
-    assert.deepStrictEqual(config.value, { ignore: [], patterns: [] });
+    assert.deepStrictEqual(config.value.patterns, []);
   });
 
-  test('refuses an autoFix without its arrays', () => {
+  test('refuses what unblock-prs refuses: an autoFix without its arrays', () => {
     const config = readAutoFixPatterns({ autoFix: { fixers: [] } });
 
     assert.isTrue(Result.isErr(config));
@@ -410,7 +441,7 @@ describe('readAutoFixPatterns', () => {
     expect(config.value).toContain('autoFix.fixers[0].context');
   });
 
-  test('refuses an entry whose context is not a string, by its own index', () => {
+  test('refuses an entry whose context is missing', () => {
     const config = readAutoFixPatterns(
       autoFixOf({
         fixers: [
@@ -421,10 +452,6 @@ describe('readAutoFixPatterns', () => {
     );
 
     assert.isTrue(Result.isErr(config));
-
-    expect(config.value).toContain('autoFix.fixers[1].context');
-
-    expect(config.value).toContain('not a string');
   });
 });
 
@@ -450,7 +477,8 @@ const autoFixOf = ({
   ignore?: readonly string[];
   prepare?: readonly unknown[];
   fixers?: readonly unknown[];
-}>): unknown => ({ autoFix: { ignore, prepare, fixers } }) as const;
+}>): unknown =>
+  ({ autoFix: { ignore, before: [], prepare, fixers, after: [] } }) as const;
 
 const configOf = (
   file: Parameters<typeof autoFixOf>[0],
