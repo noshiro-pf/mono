@@ -22,8 +22,11 @@ export type BlockPlacement = Readonly<{
 }>;
 
 type Props = Readonly<{
+  /** The block, or the first of a group of tabs. */
   id: BlockId;
   placement$: InitializedObservable<BlockPlacement>;
+  /** Drawn above the body, and not scrolled with it: a group's tabs. */
+  head?: Child;
   children: Child;
 }>;
 
@@ -47,6 +50,7 @@ type Props = Readonly<{
 export const LayoutBlock = ({
   id,
   placement$,
+  head,
   children,
 }: Props): JSX.Element => {
   const mut_elements: {
@@ -138,6 +142,8 @@ export const LayoutBlock = ({
         'flex-grow': inlineMap(placement$, ({ share }) => share?.toString()),
       }}
     >
+      {head ?? <></>}
+
       <div
         ref={(element) => {
           mut_elements.body = element;

@@ -18,6 +18,7 @@ import {
 import {
   DEFAULT_LAYOUT,
   moveBlock,
+  stepBlock,
   withBoundaryAt,
   withColumns,
   withEvenLine,
@@ -26,8 +27,10 @@ import {
   withHidden,
   withLineAt,
   withMode,
+  withSelectedTab,
   withShare,
   withSplit,
+  withTabbed,
   type BlockId,
   type BlockPlace,
   type BoundaryDrag,
@@ -78,6 +81,16 @@ export type LayoutStore = Readonly<{
   /** Hides a block, or shows it again where it was; see `withHidden`. */
   setHidden: (block: BlockId, hidden: boolean) => void;
   move: (block: BlockId, target: BlockPlace) => void;
+  /** One place up or down its column; see `stepBlock`. */
+  step: (block: BlockId, direction: 'up' | 'down') => void;
+  /** Makes a block a tab of the one above it, or not; see `withTabbed`. */
+  setTabbed: (
+    block: BlockId,
+    tabbed: boolean,
+    absent?: readonly BlockId[],
+  ) => void;
+  /** Shows a block among the tabs of its group. */
+  selectTab: (block: BlockId) => void;
   reset: () => void;
   /** `height` is the block's as drawn when the drag starts. */
   startResize: (block: BlockId, y: number, height: number) => void;
@@ -166,6 +179,15 @@ export const createLayoutStore = (deps: LayoutDeps): LayoutStore => {
     },
     move: (block, target) => {
       updateLayout((current) => moveBlock(current, block, target));
+    },
+    step: (block, direction) => {
+      updateLayout((current) => stepBlock(current, block, direction));
+    },
+    setTabbed: (block, tabbed, absent) => {
+      updateLayout((current) => withTabbed(current, block, tabbed, absent));
+    },
+    selectTab: (block) => {
+      updateLayout((current) => withSelectedTab(current, block));
     },
     reset: () => {
       setLayout(DEFAULT_LAYOUT);

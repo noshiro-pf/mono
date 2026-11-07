@@ -239,7 +239,7 @@ export const ViewSettings = (): JSX.Element => {
 
         <p class={constant('section-note')}>
           {constant(
-            'A hidden block keeps its place and its size, and comes back there when shown. On the page: drag the line under a block to set its height — a double click there gives the natural height back, or, when the blocks fill the window, evens it with the block below. With two or three columns, drag the lines between them. The layout is kept in the URL.',
+            'A hidden block keeps its place and its size, and comes back there when shown. “Tab” draws a block as a tab of the block above it, in one place, shown one at a time and at the size of the first. On the page: drag the line under a block to set its height — a double click there gives the natural height back, or, when the blocks fill the window, evens it with the block below. With two or three columns, drag the lines between them. The layout is kept in the URL.',
           )}
         </p>
 
