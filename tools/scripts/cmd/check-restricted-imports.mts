@@ -1,17 +1,13 @@
 import { restrictedImportsOptions } from 'eslint-config-typed';
-import * as path from 'node:path';
 import { Arr, hasKey, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import {
-  createPackageEslint,
   forEachLintedFile,
   importPackageEslintConfigs,
   listLintedPackages,
-  resolveRules,
   severityNumber,
 } from '../lib/eslint-package-configs.mjs';
 import { listTrackedFiles } from '../lib/repo-files.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Fails when a file ESLint lints has `no-restricted-imports` on without the
@@ -22,9 +18,9 @@ import { projectRootPath } from '../project-root-path.mjs';
  * package that adds a restriction with a bare options object drops the pattern
  * from those files, and nothing fails: the import it refuses is simply allowed.
  * The fix is to merge, `mergeRestrictedImportsOptions(restrictedImportsOptions,
- * mine)`. A file `sumi check` checks is exempt, because Sumi refuses that
- * import itself (`modules/no-index-file-import`) and its off-config turns the
- * rule off there; a package may turn it back on for paths of its own.
+ * mine)`. A file `sumi check` checks is no exception: Sumi's off-config leaves
+ * the rule on (`keptOnRules` in `@sumi-lang/cli`), because it carries a
+ * package's own restrictions too (#3068).
  *
  * Reading each package's configuration needs the workspace built, as
  * `eslint.config.mts` imports the plugins by name.
@@ -70,36 +66,7 @@ export const checkRestrictedImports = async (): Promise<
 export const lacksIndexFilePattern = (entry: unknown): boolean =>
   isOn(entry) && !hasIndexFilePattern(entry);
 
-/**
- * The block for a second resolution that asks which files `sumi check` reads:
- * its rules emptied, or, for the Sumi off-config where it does turn
- * `no-restricted-imports` off, replaced by the rule set to the base options.
- * `rules` stays as a key, since a block of `ignores` alone is a global ignore,
- * and every other key is kept, so which files a block matches does not change.
- * An off-config that stops turning the rule off exempts nothing.
- */
-export const toSumiProbe = (config: unknown): unknown => {
-  if (!isRecord(config) || !hasKey(config, 'rules')) {
-    return config;
-  }
-
-  const isSumiOff =
-    hasKey(config, 'name') &&
-    config.name === sumiOffConfigName &&
-    isRecord(config.rules) &&
-    hasKey(config.rules, ruleId) &&
-    !isOn(config.rules[ruleId]);
-
-  return {
-    ...config,
-    rules: isSumiOff ? { [ruleId]: ['error', restrictedImportsOptions] } : {},
-  };
-};
-
 const [{ regex: indexFilePatternRegex }] = restrictedImportsOptions.patterns;
-
-/** The `name` of `eslintConfigOffForSumiCheck` in `@sumi-lang/cli`. */
-const sumiOffConfigName = 'sumi/off-for-sumi-check';
 
 const ruleId = 'no-restricted-imports';
 
@@ -151,36 +118,7 @@ const checkPackage = async (
     }
   });
 
-  if (!Arr.isNonEmpty(mut_lacking)) {
-    return [];
-  }
-
-  // Only the files found lacking are resolved again, against the Sumi blocks
-  // alone, which set the rule to the base options there: a file that keeps the
-  // pattern this time is one `sumi check` reads.
-  // Flattened first, since a nested array is a block that `toSumiProbe` would
-  // otherwise pass over with its rules.
-  const sumiProbe = createPackageEslint(
-    dir,
-    configs.flat(Number.POSITIVE_INFINITY).map(toSumiProbe),
-  );
-
-  const perFile = await Promise.all(
-    mut_lacking.map(async (repoRelative) => {
-      const probed = await resolveRules(
-        sumiProbe,
-        path.join(projectRootPath, repoRelative),
-      );
-
-      return probed !== undefined &&
-        isOn(probed[ruleId]) &&
-        hasIndexFilePattern(probed[ruleId])
-        ? []
-        : [repoRelative];
-    }),
-  );
-
-  return perFile.flat();
+  return mut_lacking;
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
