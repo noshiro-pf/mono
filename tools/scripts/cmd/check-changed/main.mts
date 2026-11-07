@@ -6,6 +6,7 @@ import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { isChangesetPath, listChangesetBumps } from '../../lib/changesets.mjs';
+import { isChromeExtension } from '../../lib/chrome-extensions.mjs';
 import { formatLineRanges, parseAddedLines } from '../../lib/diff-lines.mjs';
 import {
   diffSnapshots,
@@ -559,13 +560,7 @@ const checkChangesets = async (
     packages.map(async (pkg) => {
       const isLibrary = pkg.dir.startsWith('libs/') && !pkg.isPrivate;
 
-      // An extension is published to the Chrome Web Store, which refuses an
-      // upload whose version is not newer.
-      const extensionManifest = await filterExisting([
-        `${pkg.dir}/public/manifest.json`,
-      ]);
-
-      return isLibrary || Arr.isNonEmpty(extensionManifest);
+      return isLibrary || (await isChromeExtension(pkg.dir));
     }),
   );
 
