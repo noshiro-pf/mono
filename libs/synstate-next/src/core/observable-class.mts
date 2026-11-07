@@ -6,10 +6,12 @@
  * public types (`Observable`, `InitializedObservable`) are views of these
  * classes; `toNode` turns a public observable back into its class.
  */
+import { canPublishNow, EventQueue } from './event-queue.mjs';
 import { adoptIntoCurrentOwner } from './owner.mjs';
 import {
   currentEpoch,
   emit,
+  isPending,
   writeCount,
   type DerivedNode,
   type EffectNode,
@@ -29,6 +31,12 @@ export type NoValue = typeof noValue;
 export class ObservableClass<A> implements DerivedNode {
   /** Disposed entries left in `children`. */
   #mut_dead: number;
+
+  /**
+   * The values of `publishEvent` that wait; made on the first one. Typed by
+   * what the node uses, in method syntax, so that `A` stays covariant.
+   */
+  #mut_events: EventSink<A> | undefined;
 
   /** The value held, or {@link noValue}. Written only by the node itself. */
   // transformer-ignore-next-line convert-to-readonly
@@ -78,6 +86,8 @@ export class ObservableClass<A> implements DerivedNode {
 
     this.gone = false;
 
+    this.#mut_events = undefined;
+
     this.#mut_dead = 0;
 
     adoptIntoCurrentOwner(this);
@@ -122,6 +132,15 @@ export class ObservableClass<A> implements DerivedNode {
     }
 
     return v;
+  }
+
+  /**
+   * Whether it will never emit again: disposed, or a source that is done (a
+   * `timer` that fired, a settled promise). A `mergeMap` lets an inner
+   * observable go once it is settled. A state is never settled.
+   */
+  get settled(): boolean {
+    return this.disposed;
   }
 
   /** Whether anything would be reached by an emission. */
@@ -187,6 +206,8 @@ export class ObservableClass<A> implements DerivedNode {
       this.leaveParents();
     }
 
+    this.#mut_events?.drop();
+
     this.teardown();
   }
 
@@ -207,6 +228,32 @@ export class ObservableClass<A> implements DerivedNode {
     this.current = value;
 
     emit(this, this.hasObserver);
+  }
+
+  /**
+   * Emits `value` as an event: every value is delivered, each in an update of
+   * its own and in order, where `publish` keeps the last of those written
+   * before their update. May be called while the graph drains.
+   */
+  protected publishEvent(value: A): void {
+    if (this.#mut_events === undefined) {
+      if (canPublishNow(this)) {
+        this.publish(value);
+
+        return;
+      }
+
+      this.#mut_events = new EventQueue(this, (v) => {
+        this.publish(v);
+      });
+    }
+
+    this.#mut_events.push(value);
+  }
+
+  /** Whether a value of `publishEvent` waits to be delivered. */
+  protected get eventsWaiting(): boolean {
+    return this.#mut_events?.waiting ?? false;
   }
 
   pipe(
@@ -274,6 +321,18 @@ export class DerivedClass<A> extends ObservableClass<A> {
     this.gone = true;
 
     this.leaveParents();
+  }
+
+  /**
+   * Settled once it is gone (disposed, or detached for good), or when every
+   * parent is, since it emits only when one of them does, and no emission of its
+   * own waits for a round.
+   */
+  override get settled(): boolean {
+    return (
+      this.gone ||
+      (!isPending(this) && this.parents.every((parent) => parent.settled))
+    );
   }
 
   /**
@@ -416,3 +475,12 @@ export const toNode = <A,>(observable: Observable<A>): ObservableClass<A> => {
 export const view = <V,>(node: ObservableClass<unknown>): V =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   node as unknown as V;
+
+type EventSink<A> = Readonly<{
+  // A method, whose parameter TypeScript checks in both directions: a property
+  // would make `ObservableClass` invariant in `A`.
+  // eslint-disable-next-line @typescript-eslint/method-signature-style, functional/prefer-property-signatures
+  push(value: A): void;
+  waiting: boolean;
+  drop: () => void;
+}>;

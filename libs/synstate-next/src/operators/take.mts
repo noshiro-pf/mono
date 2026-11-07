@@ -1,5 +1,6 @@
 import {
   DerivedClass,
+  assertCount,
   noValue,
   toNode,
   view,
@@ -26,14 +27,6 @@ export const skip = <A,>(count: number): Operator<A, A, 'drop'> => {
   assertCount(count, 0);
 
   return (source) => view(new SkipClass(toNode(source), count));
-};
-
-const assertCount = (count: number, minimum: number): void => {
-  if (!Number.isSafeInteger(count) || count < minimum) {
-    throw new RangeError(
-      `synstate-next: the count must be an integer of at least ${minimum}, but was ${count}.`,
-    );
-  }
 };
 
 class TakeClass<A> extends DerivedClass<A> {

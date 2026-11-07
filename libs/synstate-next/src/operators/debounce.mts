@@ -9,11 +9,11 @@ import {
 
 /**
  * Emits the latest value once `milliseconds` have passed without another, in an
- * update of its own. Holds no value until then; disposing it drops a value
- * still waiting.
+ * update of its own. Holds the value the source holds at the start; disposing
+ * it drops a value still waiting.
  */
 export const debounce =
-  <A,>(milliseconds: number): Operator<A, A, 'drop'> =>
+  <A,>(milliseconds: number): Operator<A, A, 'keep'> =>
   (source) =>
     view(new DebounceClass(toNode(source), milliseconds));
 
@@ -25,7 +25,7 @@ class DebounceClass<A> extends DerivedClass<A> {
   #mut_timer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(parent: ObservableClass<A>, milliseconds: number) {
-    super([parent], noValue);
+    super([parent], parent.current);
 
     this.#parent = parent;
 
@@ -52,6 +52,10 @@ class DebounceClass<A> extends DerivedClass<A> {
     }, this.#milliseconds);
 
     return false;
+  }
+
+  override get settled(): boolean {
+    return super.settled && this.#mut_timer === undefined;
   }
 
   protected override teardown(): void {

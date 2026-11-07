@@ -66,10 +66,12 @@ dispose inside an effect without being inside a propagation.
 - `batch(fn)` makes the writes inside `fn` one update. Mounting a UI is a batch,
   so a write made while mounting propagates once the nodes are in place.
 - A state written twice before its round propagates once, with the last value.
-  An event source is not: each `next` is delivered in a round of its own, in
-  order. A round that delivers a queued value starts the count of the limit
-  again, since each one consumes a value written before it. An exception drops
-  the queued values with the rest of the queues.
+  An event source is not (`source`, the asynchronous sources and `mergeMap`):
+  each value is delivered in a round of its own, in order, and one written by an
+  effect before the round's other effects have read the previous value waits
+  until they have. A round that delivers a queued value starts the count of the
+  limit again, since each one consumes a value written before it. An exception
+  drops the queued values with the rest of the queues.
 - Effects and recomputes run with no owner current, so what they create does not
   belong to whichever owner was current when the write was made.
 - An exception thrown by a node or an effect empties the queues before it
@@ -88,6 +90,17 @@ and spliced out: it is skipped, and the list is compacted once half of it is
 dead. A list of rows that come and go costs no search per row. An owner's own
 list of nodes is swept of disposed ones each time it doubles, so a long-lived
 owner that subscribes and unsubscribes stays bounded.
+
+Without completion, an operator that follows inner observables still has to know
+when one can emit no more. Each node answers `settled`: a source once it is
+disposed or its timer, promise or subscription is over, a derived node once it
+is gone or every parent is settled and it waits on nothing of its own (a
+`debounce` timer, an inner observable). A node whose emission still waits for
+its round is not settled. Nothing is pushed down the graph; the question is
+asked where the answer is used. `mergeMap` asks when an inner observable is
+projected or emits, and lets it go once it is settled and its follower has read
+what it emitted. One that settles without emitting is swept once the number
+followed doubles, after the round that reached that number has run its effects.
 
 ## One copy per program
 
@@ -144,10 +157,17 @@ from the prototype; the packages are to be measured again in
   `unwrapResultOk`, `unwrapResultErr`. So are the aliases `withLatestFrom` and
   `withBuffered`. Each name is one more thing to learn for no capability; a
   `map` with `equals: () => false` replaces `mapTo` on an event.
+- `timer` and `counter` start when they are created; `startManually` and
+  `start()` are gone. Create one where it should start, inside the owner that
+  should stop it.
+- `fromSubscribable` subscribes with an observer object (`next`, `error`,
+  `complete`), the form RxJS recommends and a TC39 `Observable` takes, not with
+  three functions.
+- A source that is done (a `timer` that fired, a `fromPromise` that resolved, a
+  `fromSubscribable` whose subscribable completed) is settled, not completed:
+  it keeps its value and its subscribers until its owner disposes it.
 
 ## Not yet built
 
-The asynchronous operators beyond `debounce` and `switchMap` (`throttle`,
-`audit`, `mergeMap`); the remaining sources (timers, promises,
-`fromSubscribable`); the helpers built on states (`createReducer` and the like);
-and the port of synstate's tests. Each lands in a pull request of the rebuild.
+The helpers built on states (`createReducer` and the like), and the port of
+synstate's tests. Each lands in a pull request of the rebuild.
