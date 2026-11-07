@@ -1,4 +1,6 @@
 import dedent from 'dedent';
+import { CLAUDE_SESSION_LINE } from 'pr-report-core';
+import { trailerLinePattern } from 'split-view-link';
 import { parseClaudeSessions } from './claude-session.mjs';
 
 describe(parseClaudeSessions, () => {
@@ -26,5 +28,18 @@ describe(parseClaudeSessions, () => {
     `;
 
     assert.deepStrictEqual(parseClaudeSessions(body), []);
+  });
+});
+
+describe('the trailer pr-description guards', () => {
+  test('is the line claudeSessionTrailersOf reads, up to its value', () => {
+    assert.strictEqual(
+      trailerLinePattern.source,
+      `${CLAUDE_SESSION_LINE.source}(?<value>[^\\n]*)$`,
+    );
+
+    assert.isTrue(trailerLinePattern.ignoreCase);
+
+    assert.isTrue(CLAUDE_SESSION_LINE.ignoreCase);
   });
 });

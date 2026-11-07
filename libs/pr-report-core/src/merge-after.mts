@@ -27,6 +27,16 @@ const DECLARATION_LINE = {
 const FENCE_LINE = /^[^\S\n]*(?<marker>`{3,}|~{3,})(?<rest>[^\n]*)$/u;
 
 /**
+ * Whether `line` is one {@link parseMergeAfter} or {@link parseStartAfter} reads
+ * as a declaration, whatever it names: the one pattern, for a check that guards
+ * what they will read.
+ */
+export const isDeclarationLine = (
+  line: string,
+  key: 'merge-after' | 'start-after',
+): boolean => Arr.isNonEmpty(Array.from(line.matchAll(DECLARATION_LINE[key])));
+
+/**
  * The pull request numbers a body declares this one must merge after.
  *
  * Duplicates are dropped and the order within the declaration is not kept:

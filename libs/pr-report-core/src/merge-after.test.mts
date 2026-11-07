@@ -1,8 +1,33 @@
 import {
   findMergeAfterCycles,
+  isDeclarationLine,
   parseMergeAfter,
   parseStartAfter,
 } from './merge-after.mjs';
+
+describe(isDeclarationLine, () => {
+  test('reads a line as the parsers do, in any case, and as often as asked', () => {
+    for (const line of [
+      'Merge-After: #1',
+      '  merge-after : #1',
+      'MERGE-AFTER:',
+    ]) {
+      assert.isTrue(isDeclarationLine(line, 'merge-after'));
+
+      assert.isTrue(isDeclarationLine(line, 'merge-after'));
+
+      assert.isFalse(isDeclarationLine(line, 'start-after'));
+    }
+
+    assert.isTrue(isDeclarationLine('Start-After: #1', 'start-after'));
+  });
+
+  test('takes prose for prose', () => {
+    assert.isFalse(isDeclarationLine('see Merge-After: #1', 'merge-after'));
+
+    assert.isFalse(isDeclarationLine('Merge After: #1', 'merge-after'));
+  });
+});
 
 describe(parseMergeAfter, () => {
   test('reads one reference from a trailer', () => {

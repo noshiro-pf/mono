@@ -3,6 +3,7 @@ export * from './checks.mjs';
 export * from './claim.mjs';
 export * from './closing-issues.mjs';
 export * from './code-owners.mjs';
+export * from './description-lines.mjs';
 export * from './issue-claim.mjs';
 export * from './issue-priority.mjs';
 export * from './labels.mjs';
