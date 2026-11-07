@@ -1,9 +1,8 @@
-import type { InitializedObservable } from 'synstate';
+import { map, type InitializedObservable } from 'synstate';
 import {
   constant,
   deriveBindable,
   For,
-  inlineMap,
   mapBindable,
   type JSX,
 } from 'synstate-dom';
@@ -95,7 +94,7 @@ export const DetailedFilterIconOfSpecifiedRespondent = (): JSX.Element => (
           return (
             <div class={constant(styles.respondentRow)}>
               <div class={constant(styles.respondentName)}>
-                {inlineMap(respondent$, (r) => r.username)}
+                {respondent$.pipe(map((r) => r.username))}
               </div>
               <HorizontalCheckboxesWrapper>
                 {(['good', 'fair', 'poor'] as const).map((icon) => (

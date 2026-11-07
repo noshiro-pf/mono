@@ -3,7 +3,6 @@ import {
   constant,
   deriveBindable,
   For,
-  inlineMap,
   MatchOptional,
   type Bindable,
   type JSX,
@@ -48,7 +47,7 @@ export const WeeklyActivity = (): JSX.Element => {
     <>
       <button
         class={constant('header-button')}
-        disabled={inlineMap(tokenStore.token, (token) => token === undefined)}
+        disabled={tokenStore.token.pipe(map((token) => token === undefined))}
         title={constant(
           `Pull requests merged and issues closed today and on each of the last ${WEEK_LENGTH} days`,
         )}
@@ -208,15 +207,19 @@ const WeekTable = ({
         <th scope={constant('row')}>{constant('Total')}</th>
         <td class={constant('weekly-activity-total')}>
           <span class={constant('weekly-activity-count')}>
-            {inlineMap(activity$, ({ days: all }) =>
-              all.reduce((sum, day) => sum + day.merged, 0),
+            {activity$.pipe(
+              map(({ days: all }) =>
+                all.reduce((sum, day) => sum + day.merged, 0),
+              ),
             )}
           </span>
         </td>
         <td class={constant('weekly-activity-total')}>
           <span class={constant('weekly-activity-count')}>
-            {inlineMap(activity$, ({ days: all }) =>
-              all.reduce((sum, day) => sum + day.closed, 0),
+            {activity$.pipe(
+              map(({ days: all }) =>
+                all.reduce((sum, day) => sum + day.closed, 0),
+              ),
             )}
           </span>
         </td>
@@ -255,10 +258,11 @@ const ActivitySections = ({
         <h3 class={constant('weekly-activity-heading')} id={constant(TODAY_ID)}>
           {constant('Today ')}
           <span class={constant('weekly-activity-as-of')}>
-            {inlineMap(
-              activity$,
-              (activity) =>
-                `so far, as of ${TIME_LABEL.format(activity.countedAtMs)}`,
+            {activity$.pipe(
+              map(
+                (activity) =>
+                  `so far, as of ${TIME_LABEL.format(activity.countedAtMs)}`,
+              ),
             )}
           </span>
         </h3>

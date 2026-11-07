@@ -3,7 +3,6 @@ import {
   constant,
   For,
   If,
-  inlineMap,
   mapBindable,
   MatchOptional,
   type Bindable,
@@ -32,8 +31,10 @@ import { Timestamp } from './timestamp.js';
 export const WorkflowRunsSection = (): JSX.Element => (
   <section class={constant('section')}>
     <h2 class={constant('section-title')}>
-      {inlineMap(reader.runs, (runs) =>
-        runs.type === 'ready' ? titleOf(runs.list) : 'Running workflows',
+      {reader.runs.pipe(
+        map((runs) =>
+          runs.type === 'ready' ? titleOf(runs.list) : 'Running workflows',
+        ),
       )}
       {constant(' ')}
       <ExternalLink href={constant(ACTIONS_URL)} variant={'section-link'}>
@@ -123,10 +124,11 @@ const RunList = ({
       value={ready$.pipe(map(({ error }) => Optional.fromNullable(error)))}
       some={(error$) => (
         <p class={constant('section-note')} data-status={constant('critical')}>
-          {inlineMap(
-            error$,
-            (error) =>
-              `The last read failed, so this is the one before it: ${error}`,
+          {error$.pipe(
+            map(
+              (error) =>
+                `The last read failed, so this is the one before it: ${error}`,
+            ),
           )}
         </p>
       )}
@@ -154,19 +156,18 @@ const RunList = ({
                     href={run$.pipe(map((run) => run.url))}
                     variant={'pull-request-title'}
                   >
-                    {inlineMap(run$, (run) => run.title)}
+                    {run$.pipe(map((run) => run.title))}
                   </ExternalLink>
                 </div>
 
                 <div class={constant('pull-request-row')}>
                   <span>
-                    {inlineMap(
-                      run$,
-                      (run) => `${run.workflow} #${run.runNumber}`,
+                    {run$.pipe(
+                      map((run) => `${run.workflow} #${run.runNumber}`),
                     )}
                   </span>
 
-                  <span>{inlineMap(run$, (run) => run.event)}</span>
+                  <span>{run$.pipe(map((run) => run.event))}</span>
 
                   <MatchOptional
                     value={run$.pipe(
@@ -187,7 +188,7 @@ const RunList = ({
                     label={'started'}
                   />
 
-                  <span>{inlineMap(run$, (run) => `by ${run.actor}`)}</span>
+                  <span>{run$.pipe(map((run) => `by ${run.actor}`))}</span>
                 </div>
               </li>
             )}

@@ -1,4 +1,5 @@
-import { constant, inlineMap, type Constant } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, type Constant } from 'synstate-dom';
 import { asSafeInt, expectType, type SafeInt } from 'ts-data-forge';
 import { afterUpdate, mountInto, routes, setup } from './fixture.js';
 
@@ -29,10 +30,11 @@ describe('Routes', () => {
 
             return (
               <p>
-                {inlineMap(
-                  item$,
-                  (item) =>
-                    `item ${item.params.productId} ${item.search.q ?? ''} ${item.search.page}`,
+                {item$.pipe(
+                  map(
+                    (item) =>
+                      `item ${item.params.productId} ${item.search.q ?? ''} ${item.search.page}`,
+                  ),
                 )}
               </p>
             );
@@ -95,7 +97,7 @@ describe('Routes', () => {
           products: () => <p>{page('products')}</p>,
           'products.new': () => <p>{page('new')}</p>,
           'products.item': (item$) => (
-            <p>{inlineMap(item$, (item) => `item ${item.params.productId}`)}</p>
+            <p>{item$.pipe(map((item) => `item ${item.params.productId}`))}</p>
           ),
           settings: () => <p>{page('settings')}</p>,
           drafts: undefined,
@@ -131,8 +133,8 @@ describe('Routes', () => {
           home: undefined,
           products: (list$) => (
             <p>
-              {inlineMap(list$, (list) =>
-                list.withSearch({ page: asSafeInt(1) }),
+              {list$.pipe(
+                map((list) => list.withSearch({ page: asSafeInt(1) })),
               )}
             </p>
           ),
@@ -162,10 +164,7 @@ describe('Routes', () => {
           home: () => <p>{page('home')}</p>,
           products: (layout$) => (
             <section>
-              {inlineMap(
-                layout$,
-                (layout) => `layout ${layout.search.page} / `,
-              )}
+              {layout$.pipe(map((layout) => `layout ${layout.search.page} / `))}
               <Routes
                 under={routes.products}
                 cases={{
@@ -173,9 +172,8 @@ describe('Routes', () => {
                   'products.new': () => <>{page('new')}</>,
                   'products.item': (item$) => (
                     <>
-                      {inlineMap(
-                        item$,
-                        (item) => `item ${item.params.productId}`,
+                      {item$.pipe(
+                        map((item) => `item ${item.params.productId}`),
                       )}
                     </>
                   ),
@@ -224,9 +222,7 @@ describe('Routes', () => {
         cases={{
           home: undefined,
           products: (layout$) => (
-            <p>
-              {inlineMap(layout$, (layout) => `page ${layout.search.page}`)}
-            </p>
+            <p>{layout$.pipe(map((layout) => `page ${layout.search.page}`))}</p>
           ),
           settings: () => <p>{page('settings')}</p>,
           drafts: undefined,

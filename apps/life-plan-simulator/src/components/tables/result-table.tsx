@@ -1,9 +1,9 @@
 import { HtmlTable } from 'blueprint-synstate';
+import { map } from 'synstate';
 import {
   constant,
   deriveBindable,
   For,
-  inlineMap,
   mapBindable,
   type Bindable,
   type JSX,
@@ -69,10 +69,10 @@ export const ResultTable = <R,>({
             {(row$) => (
               <tr>
                 <th scope={constant('row')}>
-                  {inlineMap(row$, (r) => r.label)}
+                  {row$.pipe(map((r) => r.label))}
                 </th>
                 {columns.map((_, j) => (
-                  <td>{inlineMap(row$, (r) => r.cells[j] ?? '')}</td>
+                  <td>{row$.pipe(map((r) => r.cells[j] ?? ''))}</td>
                 ))}
               </tr>
             )}

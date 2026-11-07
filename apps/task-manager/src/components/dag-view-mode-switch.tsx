@@ -1,4 +1,5 @@
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { dagViewModeStore } from '../store/index.mjs';
 import { dagViewModeLabels, dagViewModes } from '../view-model/index.mjs';
@@ -15,14 +16,13 @@ export const DagViewModeSwitch = (): JSX.Element => (
   >
     {dagViewModes.map((mode) => (
       <button
-        aria-pressed={inlineMap(dagViewModeStore.mode, (current) =>
-          (current === mode).toString(),
+        aria-pressed={dagViewModeStore.mode.pipe(
+          map((current) => (current === mode).toString()),
         )}
         class={{
           'bp6-button': constant(true),
-          'bp6-active': inlineMap(
-            dagViewModeStore.mode,
-            (current) => current === mode,
+          'bp6-active': dagViewModeStore.mode.pipe(
+            map((current) => current === mode),
           ),
         }}
         data-e2e={constant(`dag-mode-${mode}`)}

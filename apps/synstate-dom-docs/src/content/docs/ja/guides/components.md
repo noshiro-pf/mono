@@ -162,7 +162,7 @@ Solid では、これらのどれにもルールが付いてきます。props �
 
 この自由さは props が値ではなく Bindable であることから来ていて、裏返すと制約にもなります。Solid では、派生した値は `{props.maxLength - props.value.length}` のような JSX の中の式で、コンパイラが最新に保ってくれます。synstate-dom では、その式を JSX にそのまま書くことはできません。計算を関数に渡して、派生を新しい Bindable として組み立てます。
 
-- 入力が 1 つなら `mapBindable`（Observable を持っているなら `pipe(map(...))`、束縛が多い所では要素のスロットに限り `inlineMap` でも）
+- 入力が 1 つなら `mapBindable`（Observable を持っているなら `pipe(map(...))`）
 - 入力が複数なら `deriveBindable([a, b], fn)`
 - 待つ・絞り込む・debounce するといった処理は、`toObservable` を通して synstate のオペレーターで（束縛する前に `withInitialValue` で初期値を付けます）
 - 更新される値によって要素を出し分けるなら、JSX を `&&` や `? :` で囲むのではなく、`Bindable<boolean>` を渡した `If`（か `MatchOptional`・`MatchResult`）で

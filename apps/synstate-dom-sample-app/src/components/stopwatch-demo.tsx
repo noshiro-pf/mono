@@ -1,5 +1,5 @@
-import { counter, createBooleanState, withInitialValue } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { counter, createBooleanState, map, withInitialValue } from 'synstate';
+import { constant, If, type JSX } from 'synstate-dom';
 
 export const StopwatchDemo = (): JSX.Element => {
   const [shown$, { toggle }] = createBooleanState(true);
@@ -19,7 +19,7 @@ export const StopwatchDemo = (): JSX.Element => {
           toggle();
         }}
       >
-        {inlineMap(shown$, (shown) => (shown ? 'Hide' : 'Show'))}
+        {shown$.pipe(map((shown) => (shown ? 'Hide' : 'Show')))}
       </button>
       <If cond={shown$} then={<Stopwatch />} />
     </section>
@@ -35,7 +35,7 @@ const Stopwatch = (): JSX.Element => {
 
   return (
     <p data-e2e={constant('stopwatch')}>
-      {inlineMap(tenths$, (n) => `${(n / 10).toFixed(1)} s`)}
+      {tenths$.pipe(map((n) => `${(n / 10).toFixed(1)} s`))}
     </p>
   );
 };

@@ -4,7 +4,6 @@ import {
   deriveBindable,
   For,
   If,
-  inlineMap,
   mapBindable,
   type JSX,
 } from 'synstate-dom';
@@ -171,10 +170,12 @@ const IssueList = (): JSX.Element => (
         cond={issuesListStore.items.pipe(map(Arr.isEmpty))}
         then={
           <p class={constant('section-note')}>
-            {inlineMap(issuesListStore.query, (query) =>
-              query.trim() === ''
-                ? 'No open issue has the priorities and labels picked.'
-                : 'No loaded open issue the filters leave matches the search by title or number.',
+            {issuesListStore.query.pipe(
+              map((query) =>
+                query.trim() === ''
+                  ? 'No open issue has the priorities and labels picked.'
+                  : 'No loaded open issue the filters leave matches the search by title or number.',
+              ),
             )}
           </p>
         }
@@ -185,13 +186,13 @@ const IssueList = (): JSX.Element => (
                 <li class={constant('issue-item')}>
                   <div class={constant('pull-request-heading')}>
                     <span class={constant('pull-request-number')}>
-                      {inlineMap(issue$, (issue) => `#${issue.number}`)}
+                      {issue$.pipe(map((issue) => `#${issue.number}`))}
                     </span>
                     <ExternalLink
                       href={issue$.pipe(map((issue) => issue.url))}
                       variant={'pull-request-title'}
                     >
-                      {inlineMap(issue$, (issue) => issue.title)}
+                      {issue$.pipe(map((issue) => issue.title))}
                     </ExternalLink>
                   </div>
 
@@ -210,17 +211,18 @@ const IssueList = (): JSX.Element => (
                     />
 
                     <span>
-                      {inlineMap(issue$, (issue) => `by ${issue.author}`)}
+                      {issue$.pipe(map((issue) => `by ${issue.author}`))}
                     </span>
 
                     <If
                       cond={issue$.pipe(map((issue) => issue.comments > 0))}
                       then={
                         <span>
-                          {inlineMap(
-                            issue$,
-                            ({ comments }) =>
-                              `${comments} comment${comments === 1 ? '' : 's'}`,
+                          {issue$.pipe(
+                            map(
+                              ({ comments }) =>
+                                `${comments} comment${comments === 1 ? '' : 's'}`,
+                            ),
                           )}
                         </span>
                       }

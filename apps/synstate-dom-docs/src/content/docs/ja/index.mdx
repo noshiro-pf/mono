@@ -1,9 +1,9 @@
 ---
 title: synstate-dom
-description: synstate の Observable を DOM に直接束縛する、コンパイラ不要の細粒度 UI ライブラリです。
+description: SynState のための UI ライブラリ。SynState の Observable を DOM に直接束縛する、コンパイラ不要の細粒度 UI ライブラリです。
 template: splash
 hero:
-    tagline: synstate の Observable を JSX にそのまま渡すだけ。コンポーネントは 1 回しか呼ばれず、その後は Observable に束縛した属性・プロパティ・テキストだけが書き換わります。コンパイラも仮想 DOM も使いません。
+    tagline: SynState のための UI ライブラリ。SynState の Observable を JSX にそのまま渡すだけ。コンポーネントは 1 回しか呼ばれず、その後は Observable に束縛した属性・プロパティ・テキストだけが書き換わります。コンパイラも仮想 DOM も使いません。
     actions:
         - text: はじめる
           link: /mono/synstate-dom/ja/getting-started/introduction/
@@ -24,6 +24,16 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
 ## 特長
 
 <CardGrid>
+    <Card title="SynState のために" icon="star">
+
+synstate-dom は SynState のランタイムに最も直接つながる UI ライブラリです。グラフは途中で何も変換されずに DOM で終わります。[SynState のベンチマークの概要](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)では、SynState はどのシナリオでも最速のライブラリの {/* bench:summary/synstate-worst-over-fastest */}2.7{/* /bench */} 倍以内に収まります。{/* bench:summary/synstate-alone-in-single-digits */}すべてのシナリオで計測したライブラリのうち、最悪のケースでも1桁倍に収まるのは SynState だけです{/* /bench */}。
+
+    </Card>
+    <Card title="シンプルで、遅くなりにくい" icon="pencil">
+
+1 つのことに 1 つの書き方を保ち、ベンチマークの 1 行だけで勝つための書き方は増やしません。js-framework-benchmark の操作では、最も遅い操作でも最速のライブラリの {/* benchmark:worst/synstate-dom */}1.56{/* /benchmark */} 倍で、{/* benchmark:placement/behind */}Solid・Preact・Preact + Signals には及びません{/* /benchmark */}が、React の {/* benchmark:worst/react */}3.79{/* /benchmark */} 倍を大きく下回ります。
+
+    </Card>
     <Card title="細粒度、呼ぶのは 1 回だけ" icon="rocket">
         コンポーネント関数が呼ばれるのはマウント時の 1 回だけです。更新は
         synstate のグラフを伝わって、束縛された DOM
@@ -43,4 +53,5 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
         `If`・`Match`・`For`
         は、表示するものをそれぞれのスコープでマウントします。分岐を閉じたり行を消したりすると、その中で作った派生と購読はすべて破棄されます。
     </Card>
+
 </CardGrid>

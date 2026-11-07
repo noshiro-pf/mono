@@ -3,7 +3,6 @@ import {
   constant,
   For,
   If,
-  inlineMap,
   MatchOptional,
   render,
   type JSX,
@@ -49,10 +48,7 @@ describe('mount and unmount leave nothing running', () => {
                 <For items={items$} key={(item) => item.id}>
                   {(item$, index$) => (
                     <li>
-                      {inlineMap(
-                        index$,
-                        counted((i) => `${i + 1}. `),
-                      )}
+                      {index$.pipe(map(counted((i) => `${i + 1}. `)))}
                       {combine([item$, taxRate$]).pipe(
                         map(counted(([item, rate]) => item.price * (1 + rate))),
                       )}
@@ -65,14 +61,7 @@ describe('mount and unmount leave nothing running', () => {
           />
           <MatchOptional
             value={selected$}
-            some={(id$) => (
-              <b>
-                {inlineMap(
-                  id$,
-                  counted((id) => id),
-                )}
-              </b>
-            )}
+            some={(id$) => <b>{id$.pipe(map(counted((id) => id)))}</b>}
           />
         </div>
       );

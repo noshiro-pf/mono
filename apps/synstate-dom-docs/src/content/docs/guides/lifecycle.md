@@ -43,7 +43,7 @@ export const CartTotal = (): JSX.Element => {
 };
 ```
 
-**Create what a branch shows inside the branch** (the `then` of `If`, the function you give `MatchOptional`), rather than creating both up front and then choosing between them.
+**Create what a branch shows inside the branch**, in a component the `then` of `If` mounts or in the function you give `MatchOptional`, rather than creating both up front and then choosing between them.
 
 ```tsx
 import { createBooleanState, createState, map } from 'synstate';
@@ -69,6 +69,8 @@ const Stats = (): JSX.Element => {
     return <p>{total$.pipe(map((t) => `Total: ${t}`))}</p>;
 };
 ```
+
+"Inside the branch" means inside a component the branch mounts, as `Stats` above. JSX written straight into `then` is evaluated where it is written, before `If` chooses, so a `pipe(map(...))` in it is created in the enclosing component's scope and keeps computing while the branch is hidden. That is fine for a few light bindings; move a branch with many bindings, or ones that update often, into a component of its own.
 
 That leaves one case: a heavy derivation defined globally and read only rarely. synstate-dom does not put such a derivation to sleep while nothing reads it. If that turns out to matter in a real application, it will be revisited.
 

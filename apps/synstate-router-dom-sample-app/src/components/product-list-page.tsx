@@ -3,7 +3,6 @@ import {
   constant,
   For,
   If,
-  inlineMap,
   mapBindable,
   MatchOptional,
   type JSX,
@@ -46,7 +45,7 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
 
   return (
     <section
-      aria-busy={inlineMap(data$, AsyncData.isPending)}
+      aria-busy={data$.pipe(map(AsyncData.isPending))}
       data-e2e={constant('products')}
     >
       <h1>{constant('Products')}</h1>
@@ -55,7 +54,7 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
         <input
           data-e2e={constant('search')}
           type={constant('search')}
-          value={inlineMap(search$, (search) => search.q ?? '')}
+          value={search$.pipe(map((search) => search.q ?? ''))}
           onInput={(inputEvent) => {
             searchProducts(inputEvent.currentTarget.value);
           }}
@@ -99,7 +98,7 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
                           ),
                         )}
                       >
-                        {inlineMap(p$, (p) => `${p.name} — ¥${p.price}`)}
+                        {p$.pipe(map((p) => `${p.name} — ¥${p.price}`))}
                       </Link>
                     </li>
                   )}
@@ -120,7 +119,7 @@ export const ProductListPage = ({ list$ }: Props): JSX.Element => {
           }
         />
         <span data-e2e={constant('page')}>
-          {inlineMap(search$, (search) => ` Page ${search.page} `)}
+          {search$.pipe(map((search) => ` Page ${search.page} `))}
         </span>
         <If
           cond={derive(

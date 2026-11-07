@@ -1,12 +1,5 @@
 import { map } from 'synstate';
-import {
-  constant,
-  For,
-  If,
-  inlineMap,
-  type Bindable,
-  type JSX,
-} from 'synstate-dom';
+import { constant, For, If, type Bindable, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import {
   columnsOf,
@@ -87,13 +80,13 @@ export const ViewSettings = (): JSX.Element => {
                 class={constant('view-settings-choice')}
                 htmlFor={constant(SPLIT_ID)}
               >
-                {inlineMap(layout$, ({ split }) => `Left column ${split}%`)}
+                {layout$.pipe(map(({ split }) => `Left column ${split}%`))}
                 <input
                   id={constant(SPLIT_ID)}
                   max={constant(MAX_SPLIT.toString())}
                   min={constant(MIN_SPLIT.toString())}
                   type={constant('range')}
-                  value={inlineMap(layout$, ({ split }) => split.toString())}
+                  value={layout$.pipe(map(({ split }) => split.toString()))}
                   onInput={(changed) => {
                     layoutStore.setSplit(changed.currentTarget.valueAsNumber);
                   }}
@@ -110,19 +103,23 @@ export const ViewSettings = (): JSX.Element => {
                   class={constant('view-settings-choice')}
                   htmlFor={constant(FIRST_LINE_ID)}
                 >
-                  {inlineMap(
-                    layout$,
-                    (layout) => `Left column ${columnWidths(layout)[0] ?? 0}%`,
+                  {layout$.pipe(
+                    map(
+                      (layout) =>
+                        `Left column ${columnWidths(layout)[0] ?? 0}%`,
+                    ),
                   )}
                   <input
                     id={constant(FIRST_LINE_ID)}
-                    max={inlineMap(layout$, ({ lines }) =>
-                      (lines[1] - MIN_THIRD_WIDTH).toString(),
+                    max={layout$.pipe(
+                      map(({ lines }) =>
+                        (lines[1] - MIN_THIRD_WIDTH).toString(),
+                      ),
                     )}
                     min={constant(MIN_THIRD_WIDTH.toString())}
                     type={constant('range')}
-                    value={inlineMap(layout$, ({ lines }) =>
-                      lines[0].toString(),
+                    value={layout$.pipe(
+                      map(({ lines }) => lines[0].toString()),
                     )}
                     onInput={(changed) => {
                       layoutStore.setLine(
@@ -137,19 +134,23 @@ export const ViewSettings = (): JSX.Element => {
                   class={constant('view-settings-choice')}
                   htmlFor={constant(SECOND_LINE_ID)}
                 >
-                  {inlineMap(
-                    layout$,
-                    (layout) => `Right column ${columnWidths(layout)[2] ?? 0}%`,
+                  {layout$.pipe(
+                    map(
+                      (layout) =>
+                        `Right column ${columnWidths(layout)[2] ?? 0}%`,
+                    ),
                   )}
                   <input
                     id={constant(SECOND_LINE_ID)}
-                    max={inlineMap(layout$, ({ lines }) =>
-                      (100 - lines[0] - MIN_THIRD_WIDTH).toString(),
+                    max={layout$.pipe(
+                      map(({ lines }) =>
+                        (100 - lines[0] - MIN_THIRD_WIDTH).toString(),
+                      ),
                     )}
                     min={constant(MIN_THIRD_WIDTH.toString())}
                     type={constant('range')}
-                    value={inlineMap(layout$, ({ lines }) =>
-                      (100 - lines[1]).toString(),
+                    value={layout$.pipe(
+                      map(({ lines }) => (100 - lines[1]).toString()),
                     )}
                     // The right column's slider counts from the right, so that
                     // more is wider for both: the line it moves is 100 less its
@@ -164,10 +165,11 @@ export const ViewSettings = (): JSX.Element => {
                 </label>
 
                 <p class={constant('section-note')}>
-                  {inlineMap(
-                    layout$,
-                    (layout) =>
-                      `The middle column has the rest, ${columnWidths(layout)[1] ?? 0}%.`,
+                  {layout$.pipe(
+                    map(
+                      (layout) =>
+                        `The middle column has the rest, ${columnWidths(layout)[1] ?? 0}%.`,
+                    ),
                   )}
                 </p>
               </>
@@ -209,7 +211,7 @@ export const ViewSettings = (): JSX.Element => {
             return (
               <fieldset class={constant('view-settings-group')}>
                 <legend>
-                  {inlineMap(layout$, (layout) => columnName(layout, column))}
+                  {layout$.pipe(map((layout) => columnName(layout, column)))}
                 </legend>
 
                 <If

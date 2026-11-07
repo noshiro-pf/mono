@@ -1,4 +1,5 @@
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { uiStore } from '../store/index.mjs';
 import type { View } from '../view-model/index.mjs';
@@ -16,10 +17,10 @@ export const ViewSwitch = (): JSX.Element => (
 
 const viewButton = (shows: View, label: string): JSX.Element => (
   <button
-    aria-pressed={inlineMap(uiStore.view, (v) => (v === shows).toString())}
+    aria-pressed={uiStore.view.pipe(map((v) => (v === shows).toString()))}
     class={{
       'bp6-button': constant(true),
-      'bp6-active': inlineMap(uiStore.view, (v) => v === shows),
+      'bp6-active': uiStore.view.pipe(map((v) => v === shows)),
     }}
     data-e2e={constant(`view-${shows}`)}
     type={constant('button')}

@@ -9,6 +9,13 @@ synstate-dom is a UI library that binds [synstate](https://noshiro-pf.github.io/
 synstate-dom is still at version 0.x, so its API may change in a minor release. The design lives in [`SPEC.md`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-dom/SPEC.md) (in Japanese), and this site fills in as it catches up with the implementation.
 :::
 
+## Why synstate-dom
+
+synstate-dom is the UI library for SynState. It is built to connect to SynState's runtime as directly as a UI can: the graph you build with SynState's operators ends in the DOM node bound to it, with no value converted into another library's model on the way and no component re-run to read it.
+
+- **SynState's speed reaches the screen.** In [SynState's benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page), SynState stays within <!-- bench:summary/synstate-worst-over-fastest -->2.7<!-- /bench -->× of the fastest library in every scenario: <!-- bench:summary/synstate-alone-in-single-digits -->the only library measured in all of them whose worst case stays in single digits<!-- /bench -->. synstate-dom puts nothing between that graph and the page.
+- **A simple API that is rarely slow.** synstate-dom keeps one way to write each thing rather than adding forms that only win a row of a benchmark: a transformed value is `source$.pipe(map(fn))` wherever it is bound. On the operations of js-framework-benchmark, its slowest operation takes <!-- benchmark:worst/synstate-dom -->1.56<!-- /benchmark -->× the fastest library's time: <!-- benchmark:placement/behind -->behind Solid, Preact and Preact + Signals<!-- /benchmark -->, and well ahead of React, whose slowest takes <!-- benchmark:worst/react -->3.79<!-- /benchmark -->×. See [Benchmark](/mono/synstate-dom/background/benchmark/#reading-the-results).
+
 ## The model
 
 - **A component is called once.** It runs when it mounts, returns a description of the DOM, and is never called again. From then on, the only thing that changes is the DOM bound to the observables you gave it.

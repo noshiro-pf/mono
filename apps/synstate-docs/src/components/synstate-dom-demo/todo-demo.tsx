@@ -1,14 +1,7 @@
 /** @jsxImportSource synstate-dom */
 // embed-sample-code-ignore-above
 import { createState, map } from 'synstate';
-import {
-  constant,
-  For,
-  If,
-  inlineMap,
-  isImeKeyDown,
-  type JSX,
-} from 'synstate-dom';
+import { constant, For, If, isImeKeyDown, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -57,16 +50,16 @@ export const TodoDemo = (): JSX.Element => (
               mut_rowsCreated.count += 1;
 
               return (
-                <li class={{ done: inlineMap(todo$, (t) => t.done) }}>
+                <li class={{ done: todo$.pipe(map((t) => t.done)) }}>
                   <label>
                     <input
                       type={constant('checkbox')}
-                      checked={inlineMap(todo$, (t) => t.done)}
+                      checked={todo$.pipe(map((t) => t.done))}
                       onChange={() => {
                         toggle(todo$.getSnapshot().value.id);
                       }}
                     />
-                    {inlineMap(todo$, (t) => ` ${t.title}`)}
+                    {todo$.pipe(map((t) => ` ${t.title}`))}
                   </label>
                   <span class={constant('note')}>
                     {constant(`row #${mut_rowsCreated.count}`)}

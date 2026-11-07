@@ -1,4 +1,5 @@
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { formatLocalTime } from '../format.mjs';
 import { reader } from '../store/index.mjs';
 import { Age } from './age.js';
@@ -15,7 +16,7 @@ import { FetchingIndicator } from './fetching-indicator.js';
 export const ReadFromGitHubFolded = (): JSX.Element => (
   <span
     class={constant('toolbar-read')}
-    title={inlineMap(reader.readAt, formatLocalTime)}
+    title={reader.readAt.pipe(map(formatLocalTime))}
   >
     {constant('Read ')}
     <Age epochMs={reader.readAt} />
@@ -29,7 +30,7 @@ export const ReadFromGitHub = (): JSX.Element => (
     {constant('Read from GitHub ')}
     <Age epochMs={reader.readAt} />
     {constant(' · ')}
-    {inlineMap(reader.readAt, formatLocalTime)}
+    {reader.readAt.pipe(map(formatLocalTime))}
     <FetchingIndicator compact={false} />
   </p>
 );

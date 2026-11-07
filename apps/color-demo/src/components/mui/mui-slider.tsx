@@ -1,5 +1,5 @@
 import { createState, type InitializedObservable, map } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import { Arr, asUint32, Num } from 'ts-data-forge';
 import * as styles from './mui-slider.module.css';
 
@@ -121,7 +121,7 @@ export const MuiSlider = ({
           <span
             class={{
               [styles.mark]: constant(true),
-              [styles.markActive]: inlineMap(value, (v) => v >= markValue),
+              [styles.markActive]: value.pipe(map((v) => v >= markValue)),
             }}
             data-index={constant(index.toString())}
             style={{ left: constant(`${toPercent(markValue, min, max)}%`) }}

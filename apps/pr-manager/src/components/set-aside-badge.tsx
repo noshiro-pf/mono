@@ -1,6 +1,6 @@
+import { map } from 'synstate';
 import {
   constant,
-  inlineMap,
   mapBindable,
   MatchOptional,
   type Bindable,
@@ -30,17 +30,19 @@ export const SetAsideBadge = ({ entry }: Props): JSX.Element => (
     some={(shown$) => (
       <span
         class={constant('badge')}
-        data-status={inlineMap(shown$, ({ setAside }) =>
-          setAside.current ? 'critical' : 'neutral',
+        data-status={shown$.pipe(
+          map(({ setAside }) => (setAside.current ? 'critical' : 'neutral')),
         )}
-        title={inlineMap(shown$, titleOf)}
+        title={shown$.pipe(map(titleOf))}
       >
         <BadgeIcon path={constant(SET_ASIDE_ICON)} />
 
-        {inlineMap(shown$, ({ setAside: { current, reason } }) =>
-          current
-            ? `set aside: ${reason.replaceAll('-', ' ')}`
-            : `was set aside: ${reason.replaceAll('-', ' ')}`,
+        {shown$.pipe(
+          map(({ setAside: { current, reason } }) =>
+            current
+              ? `set aside: ${reason.replaceAll('-', ' ')}`
+              : `was set aside: ${reason.replaceAll('-', ' ')}`,
+          ),
         )}
       </span>
     )}

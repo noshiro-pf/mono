@@ -1,9 +1,9 @@
 import { HtmlSelect } from 'blueprint-synstate';
+import { map } from 'synstate';
 import {
   constant,
   deriveBindable,
   For,
-  inlineMap,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
@@ -35,8 +35,8 @@ export const GroupField = ({ value, onChange }: Props): JSX.Element => (
       <option value={constant('')}>{constant(m.common.none)}</option>
       <For items={dataStore.groups} key={(group) => group.id}>
         {(group$) => (
-          <option value={inlineMap(group$, ({ id }) => id)}>
-            {inlineMap(group$, ({ title }) => title)}
+          <option value={group$.pipe(map(({ id }) => id))}>
+            {group$.pipe(map(({ title }) => title))}
           </option>
         )}
       </For>

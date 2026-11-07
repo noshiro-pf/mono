@@ -1,5 +1,5 @@
-import { createState } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { createState, map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { expectType } from 'ts-data-forge';
 
 describe('JSX types', () => {
@@ -65,7 +65,7 @@ describe('element props types', () => {
 
     const ok = (
       <input
-        value={inlineMap(count$, (n) => n.toString())}
+        value={count$.pipe(map((n) => n.toString()))}
         disabled={constant(false)}
         tabIndex={count$}
       />
@@ -149,7 +149,7 @@ describe('optional attributes', () => {
         <svg>
           <g
             role={constant('img')}
-            opacity={inlineMap(label$, () => undefined)}
+            opacity={label$.pipe(map(() => undefined))}
           />
         </svg>
       </>

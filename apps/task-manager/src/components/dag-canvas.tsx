@@ -10,7 +10,6 @@ import {
   createAfterUpdate,
   For,
   If,
-  inlineMap,
   isImeKeyDown,
   listenInScope,
   MatchOptional,
@@ -1002,7 +1001,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
       class={constant('dag-canvas')}
     >
       <figcaption class={constant('visually-hidden')}>
-        {inlineMap(mode, (current) => captions[current])}
+        {mode.pipe(map((current) => captions[current]))}
       </figcaption>
       <svg
         ref={(svg) => {
@@ -1023,32 +1022,37 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
             { capture: true },
           );
         }}
-        aria-label={inlineMap(mode, (current) =>
-          current === 'tile' ? captions.tile : undefined,
+        aria-label={mode.pipe(
+          map((current) => (current === 'tile' ? captions.tile : undefined)),
         )}
         class={constant('dag-svg')}
-        data-animating={inlineMap(animated, (moved) =>
-          (moved !== undefined).toString(),
+        data-animating={animated.pipe(
+          map((moved) => (moved !== undefined).toString()),
         )}
-        data-connect={inlineMap(
-          combine([handle$, connecting$]),
-          ([handle, arrow]) =>
+        data-connect={combine([handle$, connecting$]).pipe(
+          map(([handle, arrow]) =>
             (handle !== undefined || arrow !== undefined).toString(),
+          ),
         )}
         data-e2e={constant('dag-canvas')}
-        data-lasso={inlineMap(
-          combine([arrangeable, lassoTool$]),
-          ([canArrange, tool]) => (canArrange && tool !== undefined).toString(),
+        data-lasso={combine([arrangeable, lassoTool$]).pipe(
+          map(([canArrange, tool]) =>
+            (canArrange && tool !== undefined).toString(),
+          ),
         )}
-        data-mode={inlineMap(mode, (current) => current)}
-        data-motion={inlineMap(
-          combine([animationSettingStore.setting, reducedMotionStore.matches]),
-          ([setting, reduced]) => shouldAnimate(setting, reduced).toString(),
+        data-mode={mode}
+        data-motion={combine([
+          animationSettingStore.setting,
+          reducedMotionStore.matches,
+        ]).pipe(
+          map(([setting, reduced]) =>
+            shouldAnimate(setting, reduced).toString(),
+          ),
         )}
         // In 「タイル」, focusable — by Tab, or by a press on it — as a
         // scrolled box is, so that its keys work with no task focused.
-        tabindex={inlineMap(mode, (current) =>
-          current === 'tile' ? 0 : undefined,
+        tabindex={mode.pipe(
+          map((current) => (current === 'tile' ? 0 : undefined)),
         )}
         onClick={onClick}
         onFocusIn={onFocusIn}
@@ -1085,21 +1089,22 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
                   height={constant('100%')}
                   width={constant('100%')}
                   x={constant(0)}
-                  y={inlineMap(clipTop, (top) => top ?? 0)}
+                  y={clipTop.pipe(map((top) => top ?? 0))}
                 />
               </clipPath>
             }
           />
         </defs>
         <g
-          clip-path={inlineMap(clipTop, (top) =>
-            top === undefined ? undefined : 'url(#dag-tile-clip)',
+          clip-path={clipTop.pipe(
+            map((top) =>
+              top === undefined ? undefined : 'url(#dag-tile-clip)',
+            ),
           )}
         >
           <g
-            transform={inlineMap(
-              scene.drawnTransform,
-              ({ x, y, scale }) => `translate(${x} ${y}) scale(${scale})`,
+            transform={scene.drawnTransform.pipe(
+              map(({ x, y, scale }) => `translate(${x} ${y}) scale(${scale})`),
             )}
           >
             <For items={scene.frames} key={({ frame }) => frame.id}>
@@ -1150,7 +1155,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
               then={
                 <path
                   class={constant('dag-lasso')}
-                  d={inlineMap(lasso$, (points) => lassoPathData(points ?? []))}
+                  d={lasso$.pipe(map((points) => lassoPathData(points ?? [])))}
                   data-e2e={constant('dag-lasso')}
                 />
               }
@@ -1170,8 +1175,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
             class={constant('dag-scroll-thumb')}
             data-e2e={constant('dag-scroll-thumb')}
             style={{
-              top: inlineMap(thumb, (at) => `${at?.top ?? 0}px`),
-              height: inlineMap(thumb, (at) => `${at?.height ?? 0}px`),
+              top: thumb.pipe(map((at) => `${at?.top ?? 0}px`)),
+              height: thumb.pipe(map((at) => `${at?.height ?? 0}px`)),
             }}
           />
         }
@@ -1187,14 +1192,13 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           then={
             <>
               <button
-                aria-pressed={inlineMap(lassoTool$, (tool) =>
-                  (tool === 'freehand').toString(),
+                aria-pressed={lassoTool$.pipe(
+                  map((tool) => (tool === 'freehand').toString()),
                 )}
                 class={{
                   'bp6-button': constant(true),
-                  'bp6-active': inlineMap(
-                    lassoTool$,
-                    (tool) => tool === 'freehand',
+                  'bp6-active': lassoTool$.pipe(
+                    map((tool) => tool === 'freehand'),
                   ),
                 }}
                 data-e2e={constant('dag-lasso-tool')}
@@ -1209,14 +1213,13 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
                 {constant(m.dag.lasso)}
               </button>
               <button
-                aria-pressed={inlineMap(lassoTool$, (tool) =>
-                  (tool === 'rectangle').toString(),
+                aria-pressed={lassoTool$.pipe(
+                  map((tool) => (tool === 'rectangle').toString()),
                 )}
                 class={{
                   'bp6-button': constant(true),
-                  'bp6-active': inlineMap(
-                    lassoTool$,
-                    (tool) => tool === 'rectangle',
+                  'bp6-active': lassoTool$.pipe(
+                    map((tool) => tool === 'rectangle'),
                   ),
                 }}
                 data-e2e={constant('dag-rectangle-tool')}
@@ -1268,10 +1271,12 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           type={constant('button')}
           onClick={pressFit}
         >
-          {inlineMap(combine([mode, arcZoom$]), ([current, zoom]) =>
-            current === 'arc' && zoom === 'whole'
-              ? m.dag.actualSize
-              : m.dag.fitAll,
+          {combine([mode, arcZoom$]).pipe(
+            map(([current, zoom]) =>
+              current === 'arc' && zoom === 'whole'
+                ? m.dag.actualSize
+                : m.dag.fitAll,
+            ),
           )}
         </button>
       </div>

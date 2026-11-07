@@ -5,7 +5,6 @@ import {
   deriveBindable,
   For,
   If,
-  inlineMap,
   mapBindable,
   type Bindable,
   type JSX,
@@ -139,7 +138,7 @@ export const AnswerTable = ({
                       }}
                     />
                   }
-                  then={<>{inlineMap(answer$, (a) => a.user.name)}</>}
+                  then={<>{answer$.pipe(map((a) => a.user.name))}</>}
                 />
                 <If
                   cond={answer$.pipe(map((a) => a.isRequiredParticipants))}
@@ -163,7 +162,7 @@ export const AnswerTable = ({
               <tr
                 data-e2e={constant('answer-table-row')}
                 style={{
-                  'background-color': inlineMap(row$, (r) => r.backgroundColor),
+                  'background-color': row$.pipe(map((r) => r.backgroundColor)),
                 }}
               >
                 <td class={constant('sticky horizontal')}>
@@ -176,7 +175,7 @@ export const AnswerTable = ({
                 </td>
                 <td data-e2e={constant('score')}>
                   <span>
-                    {inlineMap(row$, (r) => Num.roundAt(r.score, 2).toString())}
+                    {row$.pipe(map((r) => Num.roundAt(r.score, 2).toString()))}
                   </span>
                 </td>
                 <If
@@ -189,7 +188,7 @@ export const AnswerTable = ({
                       {(count$) => (
                         <td>
                           <div class={constant(styles.summaryCell)}>
-                            <span>{inlineMap(count$, String)}</span>
+                            <span>{count$.pipe(map(String))}</span>
                             <span class={constant(styles.xSmall)}>
                               {constant(dc.numAnswersUnit)}
                             </span>
@@ -273,10 +272,11 @@ const AnswerCell = ({
             cond={cell.pipe(map((c) => c.showPoint))}
             then={
               <span class={constant(styles.annotation)}>
-                {inlineMap(
-                  cell,
-                  (c) =>
-                    `${dict.common.brace.start}${c.point}${dict.common.brace.end}`,
+                {cell.pipe(
+                  map(
+                    (c) =>
+                      `${dict.common.brace.start}${c.point}${dict.common.brace.end}`,
+                  ),
                 )}
               </span>
             }
@@ -291,7 +291,7 @@ const AnswerCell = ({
                 <span class={constant(styles.weightTimes)}>
                   {constant(dc.times)}
                 </span>
-                <div>{inlineMap(cell, (c) => c.weight.toString())}</div>
+                <div>{cell.pipe(map((c) => c.weight.toString()))}</div>
               </span>
             }
           />

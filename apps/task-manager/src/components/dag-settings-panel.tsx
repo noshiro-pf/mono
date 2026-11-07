@@ -1,12 +1,5 @@
-import { map } from 'synstate';
-import {
-  constant,
-  If,
-  inlineMap,
-  listenInScope,
-  type InlineMap,
-  type JSX,
-} from 'synstate-dom';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, If, listenInScope, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { dagViewModeStore, uiStore } from '../store/index.mjs';
 import { AnimationSettingField } from './animation-setting-field.js';
@@ -42,9 +35,11 @@ import { NodeSizeField } from './node-size-field.js';
 export const DagSettingsPanel = (): JSX.Element => {
   const popoverStyle = (
     property: 'top' | 'right' | 'maxHeight',
-  ): InlineMap<string | undefined> =>
-    inlineMap(uiStore.settingsPanel, (placement) =>
-      placement?.kind === 'popover' ? `${placement[property]}px` : undefined,
+  ): InitializedObservable<string | undefined> =>
+    uiStore.settingsPanel.pipe(
+      map((placement) =>
+        placement?.kind === 'popover' ? `${placement[property]}px` : undefined,
+      ),
     );
 
   return (
@@ -76,9 +71,8 @@ export const DagSettingsPanel = (): JSX.Element => {
       aria-labelledby={constant(TITLE_ID)}
       class={constant('bp6-card settings-panel')}
       data-e2e={constant('dag-settings-panel')}
-      data-placement={inlineMap(
-        uiStore.settingsPanel,
-        (placement) => placement?.kind,
+      data-placement={uiStore.settingsPanel.pipe(
+        map((placement) => placement?.kind),
       )}
       // A popover at its place; a sheet where the style sheet puts it.
       style={{

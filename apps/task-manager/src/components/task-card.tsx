@@ -1,5 +1,5 @@
 import { type InitializedObservable, map } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
 import {
@@ -20,8 +20,10 @@ type Props = Readonly<{
 export const TaskCard = ({ row }: Props): JSX.Element => (
   <li>
     <button
-      class={inlineMap(row, ({ status }) =>
-        status === 'done' ? 'bp6-card task-card done' : 'bp6-card task-card',
+      class={row.pipe(
+        map(({ status }) =>
+          status === 'done' ? 'bp6-card task-card done' : 'bp6-card task-card',
+        ),
       )}
       data-e2e={constant('task-row')}
       type={constant('button')}
@@ -36,13 +38,13 @@ export const TaskCard = ({ row }: Props): JSX.Element => (
           then={<WarningBadge />}
         />
         <span class={constant('task-card-priority')}>
-          {inlineMap(row, ({ task }) =>
-            m.list.priority(priorityLabels[task.priority]),
+          {row.pipe(
+            map(({ task }) => m.list.priority(priorityLabels[task.priority])),
           )}
         </span>
       </span>
       <span class={constant('task-card-title')}>
-        {inlineMap(row, ({ task }) => task.title)}
+        {row.pipe(map(({ task }) => task.title))}
       </span>
       <span class={constant('task-card-meta')}>
         <DueDate
@@ -55,8 +57,10 @@ export const TaskCard = ({ row }: Props): JSX.Element => (
           )}
           then={
             <span>
-              {inlineMap(row, ({ task }) =>
-                m.list.estimate(formatEstimate(task.estimateHours)),
+              {row.pipe(
+                map(({ task }) =>
+                  m.list.estimate(formatEstimate(task.estimateHours)),
+                ),
               )}
             </span>
           }
