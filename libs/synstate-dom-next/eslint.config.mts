@@ -4,6 +4,8 @@ import {
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
+  mergeRestrictedImportsOptions,
+  restrictedImportsOptions,
   typescriptEslintRules,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -104,6 +106,45 @@ export default [
       'import-x/no-unassigned-import': 'off',
       'import-x/no-internal-modules': 'off',
       'import-x/no-default-export': 'off',
+    }),
+  },
+
+  // What src/ imports from ts-data-forge and ts-std-forge at run time is in
+  // every bundle that uses synstate-dom-next. esbuild keeps an object such as `Arr`,
+  // `Num` or `SafeUint` whole once a module uses any member of it, when the
+  // object comes from the package root. So src/ imports `Arr` as
+  // `import * as Arr from 'ts-data-forge/array'`, which esbuild tree-shakes,
+  // and from the roots only the names below. Add a standalone function to a
+  // list, never an object. `Optional` and `Result` are the exception: objects,
+  // but what src/ is built on, so every bundle that uses it has them anyway.
+  // Tests are bundled by nobody. The ts-data-forge rules' fixes still import
+  // from the package root, so a fix that adds `Arr` or an object is reported
+  // here; move that import to the subpath by hand.
+  {
+    files: ['src/**'],
+    ignores: ['src/**/*.test.mts'],
+    rules: defineKnownRules({
+      'no-restricted-imports': [
+        'error',
+        mergeRestrictedImportsOptions(restrictedImportsOptions, {
+          paths: [
+            {
+              name: 'ts-data-forge',
+              allowImportNames: ['isNonNullObject'],
+              allowTypeImports: true,
+              message:
+                "synstate-dom-next src/ imports only standalone functions from the ts-data-forge root, and `Arr` from 'ts-data-forge/array'; see the comment in eslint.config.mts.",
+            },
+            {
+              name: 'ts-std-forge',
+              allowImportNames: ['Optional', 'Result'],
+              allowTypeImports: true,
+              message:
+                'synstate-dom-next src/ imports only `Optional`, `Result` and standalone functions from ts-std-forge; see the comment in eslint.config.mts.',
+            },
+          ],
+        }),
+      ],
     }),
   },
 

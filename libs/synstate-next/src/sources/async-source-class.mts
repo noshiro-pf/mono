@@ -14,11 +14,18 @@ export class AsyncSourceClass<A> extends ObservableClass<A> {
     this.#mut_done = false;
   }
 
-  /** Settled once done and its last value no longer waits to be delivered. */
+  /** Whether it can emit no more: its last value or its end was given. */
+  protected get done(): boolean {
+    return this.#mut_done;
+  }
+
+  /**
+   * Settled once disposed or done, and no value of it waits to be delivered.
+   */
   override get settled(): boolean {
     return (
-      this.disposed ||
-      (this.#mut_done && !this.eventsWaiting && !isPending(this))
+      !isPending(this) &&
+      (this.disposed || (this.#mut_done && !this.eventsWaiting))
     );
   }
 
