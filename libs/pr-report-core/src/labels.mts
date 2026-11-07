@@ -85,8 +85,9 @@ export const PENDING_LABEL = 'pending';
  * carries it unclaimed, so that two sessions do not pick up the same one; the
  * Pull Requests Manager page and `pr-report` show a startable issue carrying it
  * as in progress, as they show one an open pull request closes
- * (`start-after.mts`'s `progressOf`). Nothing takes it off when the work
- * merges: the issue closes, and the label with it stops mattering.
+ * (`start-after.mts`'s `progressOf`). When the issue closes,
+ * `.github/workflows/issue-closed-labels.yml` takes it off and releases the
+ * claim, so that a reopened issue is free.
  */
 export const IN_PROGRESS_LABEL = 'in-progress';
 
@@ -96,5 +97,6 @@ export const IN_PROGRESS_LABEL = 'in-progress';
  * and only tells whoever is choosing what to start that this one is spoken for;
  * `start-issue --plan` puts it on with a claim comment saying by whom;
  * the page and `pr-report` show a startable issue carrying it as planned.
+ * `issue-closed-labels.yml` takes it off a closing issue too, with its claim.
  */
 export const PLANNED_LABEL = 'planned';

@@ -1,0 +1,78 @@
+name: Issue closed labels
+
+# Releases an issue's start when it closes: takes `in-progress` and `planned`
+# off, and rewrites the claim comment beside them as released, as
+# `start-issue --release` does. `start-issue` puts both on
+# (`libs/pr-report-core/src/labels.mts`, `issue-claim.mts`), and they say
+# someone is on the issue or means to be; on a closed issue that is no longer
+# true. Leaving the claim would make a reopened issue read as free on the page
+# (which reads the label) while `start-issue` refused it over that claim.
+#
+# Holds `issues: write` and runs nothing from the tree: no checkout, only the
+# event payload and `gh`. Anyone who opened an issue can close it, so this runs
+# for outside authors too; what it reads from the payload is passed through
+# `env`, never interpolated into the script, and only comments the repository
+# owner wrote are taken for claims, as `start-issue` reads only its own
+# account's.
+#
+# A close made with a workflow's `GITHUB_TOKEN` starts no workflow, this one
+# included; the pull request merges here are armed by a person's token, so
+# their closes do.
+
+on:
+  issues:
+    types:
+      - closed
+
+permissions: {}
+
+# No `concurrency`: each run touches only the issue whose close started it, and
+# a shared group would let GitHub replace a waiting run, leaving its issue
+# labelled.
+
+jobs:
+  release:
+    name: Release the start
+    # Most issues close without either label; those cost no runner.
+    if: >-
+      contains(github.event.issue.labels.*.name, 'in-progress') ||
+      contains(github.event.issue.labels.*.name, 'planned')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      issues: write
+
+    steps:
+      - name: Take the labels off and release the claim
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ github.event.issue.number }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          issue="repos/${GITHUB_REPOSITORY}/issues/${NUMBER}"
+
+          # The labels as the issue carries them now, not as the event saw
+          # them: one taken off by hand in the meantime would answer 404.
+          labels="$(gh api --paginate "${issue}/labels" --jq '.[].name')"
+          for label in in-progress planned; do
+            if grep -qxF -- "${label}" <<<"${labels}"; then
+              gh api --method DELETE "${issue}/labels/${label}" >/dev/null
+              echo "Took ${label} off #${NUMBER}."
+            fi
+          done
+
+          # The first lines are the ones `issue-claim.mts` writes and reads;
+          # its test holds these two strings to it.
+          gh api --paginate "${issue}/comments" |
+            jq -r --arg owner "${OWNER}" '
+              .[]
+              | select(.user.login == $owner and (.body | startswith("<!-- start-issue:claim state=")))
+              | [.id, (.body | capture("by=(?<by>[^ >]+)").by // "someone")]
+              | @tsv' |
+            while IFS=$'\t' read -r id by; do
+              body="$(printf '%s\n\n%s' '<!-- start-issue:claim released -->' "The issue closed, which released the claim ${by} held; anyone may start it if it is reopened.")"
+              gh api --method PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${id}" --raw-field body="${body}" >/dev/null
+              echo "Released the claim ${by} held on #${NUMBER}."
+            done

@@ -1,3 +1,5 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import {
   issueClaimApplies,
   parseIssueClaimComment,
@@ -145,5 +147,37 @@ describe(readIssueClaim, () => {
 
   test('is undefined with no claim comment', () => {
     assert.isUndefined(readIssueClaim([{ id: 1, body: 'LGTM' }], AT));
+  });
+});
+
+describe('issue-closed-labels.yml', () => {
+  // The workflow rewrites a standing claim as released when its issue closes,
+  // in shell, so it spells both first lines out instead of importing them.
+  test('finds and writes the claim comments as this module reads them', async () => {
+    const workflow = await fs.readFile(
+      path.join(
+        import.meta.dirname,
+        '../../../.github/workflows/issue-closed-labels.yml',
+      ),
+      'utf8',
+    );
+
+    const released = writeReleasedIssueClaimComment('Released.').split(
+      '\n',
+      1,
+    )[0];
+
+    const standing = writeIssueClaimComment(STARTED, 'Started.')
+      .split('\n', 1)[0]
+      ?.split(' by=', 1)[0]
+      ?.replace(/started$/u, '');
+
+    assert.isDefined(released);
+
+    assert.isDefined(standing);
+
+    assert.include(workflow, `'${released}'`);
+
+    assert.include(workflow, `startswith("${standing}")`);
   });
 });
