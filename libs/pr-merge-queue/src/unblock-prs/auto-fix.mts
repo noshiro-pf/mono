@@ -284,7 +284,7 @@ export const readCodeOwnersAt = async (
 };
 
 /** The failed contexts the configuration does not ignore. */
-const failedContexts = (
+export const failedContexts = (
   states: ReadonlyMap<string, ContextState>,
   config: AutoFixConfig,
 ): readonly string[] =>
@@ -295,6 +295,13 @@ const failedContexts = (
         config.ignore.every((pattern) => !pattern.test(name)),
     )
     .map(([name]) => name);
+
+/** The fixer that takes the failed context `name`: the first it matches. */
+export const firstFixerOf = (
+  name: string,
+  config: AutoFixConfig,
+): AutoFixConfig['fixers'][number] | undefined =>
+  config.fixers.find((fixer) => fixer.context.test(name));
 
 /**
  * Of the failed contexts, those whose check run carries the annotation the
@@ -377,13 +384,9 @@ const fixerFor = (
   name: string,
   config: AutoFixConfig,
 ): Readonly<{ command: string; stage: number }> | undefined => {
-  const matched = config.fixers
-    .map((candidate) => ({ candidate, groups: candidate.context.exec(name) }))
-    .find((entry) => entry.groups !== null);
+  const fixer = firstFixerOf(name, config);
 
-  const fixer = matched?.candidate;
-
-  const groups = matched?.groups ?? undefined;
+  const groups = fixer?.context.exec(name) ?? undefined;
 
   return fixer === undefined || groups === undefined
     ? undefined
