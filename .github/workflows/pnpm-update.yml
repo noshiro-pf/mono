@@ -195,14 +195,15 @@ jobs:
         continue-on-error: true
         run: pnpm run verify:npm-packages:published:update
 
-      # Reading the manifests and writing a changeset needs no key and no
-      # network, so it belongs here rather than next to the one that has both.
+      # Reading the manifests and the lockfile and writing a changeset needs
+      # no key and no network, so it belongs here rather than next to the one
+      # that has both.
       # Being its own step is also what lets it be a file with a test rather
       # than a `node` heredoc.
       #
       # `HEAD` is still the pre-update commit: nothing is committed in this
       # job at all.
-      - name: Add a changeset if a published package's runtime deps moved
+      - name: Add a changeset if a package's runtime deps or bundle moved
         run: pnpm run update-changeset
 
       # What crosses to `commit`: the update as a patch, and the commit it
