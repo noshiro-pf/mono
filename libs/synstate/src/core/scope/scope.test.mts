@@ -1,8 +1,9 @@
 // cspell:ignore unstub
 import { expectType } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import type { Mock } from 'vitest';
 import { toNode } from '../class/index.mjs';
-import { source } from '../create/index.mjs';
+import { source, timer } from '../create/index.mjs';
 import { map } from '../operators/index.mjs';
 import type { Scope } from '../types/index.mjs';
 import {
@@ -450,6 +451,191 @@ describe(createScope, () => {
     parent.dispose();
 
     assert.isTrue(owned$.isCompleted);
+  });
+});
+
+describe('a scope disposed while its run is still executing (#3550)', () => {
+  test('disposes a node created after the disposal once the run returns', () => {
+    const store$ = source<number>();
+
+    const scope = createScope();
+
+    const created = scope.run(() => {
+      const before$ = store$.pipe(map((x) => x));
+
+      scope.dispose();
+
+      const after$ = store$.pipe(map((x) => x));
+
+      const afterThat$ = after$.pipe(map((x) => x));
+
+      return { before$, after$, afterThat$ } as const;
+    });
+
+    assert.isTrue(created.before$.isCompleted);
+
+    assert.isTrue(created.after$.isCompleted);
+
+    assert.isTrue(created.afterThat$.isCompleted);
+
+    assert.isFalse(toNode(store$).hasChild);
+  });
+
+  test('disposes a root created after the disposal once the run returns, after its constructor has finished', () => {
+    const scope = createScope();
+
+    const created = scope.run(() => {
+      scope.dispose();
+
+      const timer$ = timer(1000);
+
+      assert.isFalse(timer$.isCompleted);
+
+      return timer$;
+    });
+
+    assert.isTrue(created.isCompleted);
+  });
+
+  test('disposes what was created after the disposal even when the run throws', () => {
+    const store$ = source<number>();
+
+    const scope = createScope();
+
+    const mut_made: { isCompleted: boolean }[] = [];
+
+    expect(() => {
+      scope.run(() => {
+        scope.dispose();
+
+        mut_made.push(store$.pipe(map((x) => x)));
+
+        panic('run failed');
+      });
+    }).toThrow('run failed');
+
+    assert.deepStrictEqual(
+      mut_made.map((made) => made.isCompleted),
+      [true],
+    );
+  });
+
+  test('runs at once a cleanup registered after the disposal', () => {
+    const scope = createScope();
+
+    const mut_log: string[] = [];
+
+    scope.run(() => {
+      onScopeDispose(() => {
+        mut_log.push('before');
+      });
+
+      scope.dispose();
+
+      onScopeDispose(() => {
+        mut_log.push('after');
+      });
+
+      mut_log.push('end of run');
+    });
+
+    assert.deepStrictEqual(mut_log, ['before', 'after', 'end of run']);
+
+    scope.dispose();
+
+    assert.deepStrictEqual(mut_log, ['before', 'after', 'end of run']);
+  });
+});
+
+describe('dispose when a cleanup throws (#3550)', () => {
+  test('runs every other cleanup and disposes the nodes, then rethrows', () => {
+    const store$ = source<number>();
+
+    const scope = createScope();
+
+    const child = createScope(scope);
+
+    const mut_log: string[] = [];
+
+    const owned$ = scope.run(() => {
+      onScopeDispose(() => {
+        mut_log.push('first');
+      });
+
+      onScopeDispose(() => {
+        panic('cleanup failed');
+      });
+
+      onScopeDispose(() => {
+        mut_log.push('third');
+      });
+
+      return store$.pipe(map((x) => x));
+    });
+
+    const childOwned$ = child.run(() => store$.pipe(map((x) => x)));
+
+    expect(() => {
+      scope.dispose();
+    }).toThrow('cleanup failed');
+
+    assert.deepStrictEqual(mut_log, ['third', 'first']);
+
+    assert.isTrue(owned$.isCompleted);
+
+    assert.isTrue(childOwned$.isCompleted);
+  });
+
+  test('rethrows the first error when several cleanups throw, and disposes everything', () => {
+    const scope = createScope();
+
+    const mut_log: string[] = [];
+
+    scope.run(() => {
+      onScopeDispose(() => {
+        panic('older');
+      });
+
+      onScopeDispose(() => {
+        mut_log.push('middle');
+      });
+
+      onScopeDispose(() => {
+        panic('newer');
+      });
+    });
+
+    expect(() => {
+      scope.dispose();
+    }).toThrow('newer');
+
+    assert.deepStrictEqual(mut_log, ['middle']);
+  });
+
+  test('a cleanup that throws in a child scope does not stop the parent', () => {
+    const parent = createScope();
+
+    const child = createScope(parent);
+
+    const mut_log: string[] = [];
+
+    child.run(() => {
+      onScopeDispose(() => {
+        panic('child cleanup failed');
+      });
+    });
+
+    parent.run(() => {
+      onScopeDispose(() => {
+        mut_log.push('parent');
+      });
+    });
+
+    expect(() => {
+      parent.dispose();
+    }).toThrow('child cleanup failed');
+
+    assert.deepStrictEqual(mut_log, ['parent']);
   });
 });
 

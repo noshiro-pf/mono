@@ -107,6 +107,10 @@ class ScopeClass implements ScopeInternals {
   // @sumi-expect-error readonly/require-readonly-type
   #mut_nodes: ScopeMember[] | undefined;
   #mut_goneNodes: number;
+  // Nodes adopted after `dispose`, while a `run` was still executing; disposed
+  // when that `run` returns (`adopt`).
+  // @sumi-expect-error readonly/require-readonly-type
+  #mut_lateNodes: ScopeMember[] | undefined;
   #mut_isDisposed: boolean;
 
   constructor(parent: ScopeClass | undefined) {
@@ -121,6 +125,8 @@ class ScopeClass implements ScopeInternals {
     this.#mut_nodes = undefined;
 
     this.#mut_goneNodes = 0;
+
+    this.#mut_lateNodes = undefined;
 
     this.#mut_isDisposed = false;
 
@@ -158,6 +164,21 @@ class ScopeClass implements ScopeInternals {
     this.#mut_goneChildren = 0;
   }
 
+  /** Disposes what `adopt` took after this scope was disposed. */
+  #disposeLateNodes(): void {
+    const nodes = this.#mut_lateNodes;
+
+    if (nodes === undefined) {
+      return;
+    }
+
+    this.#mut_lateNodes = undefined;
+
+    for (let mut_i = nodes.length - 1; mut_i >= 0; mut_i -= 1) {
+      nodes[mut_i]?.dispose();
+    }
+  }
+
   run<R>(body: () => R): R {
     if (this.#mut_isDisposed) {
       console.warn(
@@ -167,9 +188,20 @@ class ScopeClass implements ScopeInternals {
       return runWithScope(undefined, body);
     }
 
-    return runWithScope(this, body);
+    // @sumi-expect-error exceptions/no-try
+    try {
+      return runWithScope(this, body);
+    } finally {
+      this.#disposeLateNodes();
+    }
   }
 
+  /**
+   * Disposes the child scopes, then runs the cleanups, then disposes the owned
+   * nodes, each newest first. One that throws does not stop the rest (#3550):
+   * the first error is rethrown once everything has been disposed, since the
+   * scope is marked disposed and a second call would do nothing.
+   */
   dispose(): void {
     if (this.#mut_isDisposed) {
       return;
@@ -180,13 +212,17 @@ class ScopeClass implements ScopeInternals {
     // disposing everything anyway.
     this.#mut_isDisposed = true;
 
+    let mut_thrown: Thrown | undefined = undefined;
+
     const children = this.#mut_children;
 
     if (children !== undefined) {
       this.#mut_children = undefined;
 
       for (let mut_i = children.length - 1; mut_i >= 0; mut_i -= 1) {
-        children[mut_i]?.dispose();
+        const thrown = attempt(() => children[mut_i]?.dispose());
+
+        mut_thrown ??= thrown;
       }
     }
 
@@ -196,7 +232,9 @@ class ScopeClass implements ScopeInternals {
       this.#mut_cleanups = undefined;
 
       for (let mut_i = cleanups.length - 1; mut_i >= 0; mut_i -= 1) {
-        cleanups[mut_i]?.();
+        const thrown = attempt(() => cleanups[mut_i]?.());
+
+        mut_thrown ??= thrown;
       }
     }
 
@@ -206,16 +244,42 @@ class ScopeClass implements ScopeInternals {
       this.#mut_nodes = undefined;
 
       for (let mut_i = nodes.length - 1; mut_i >= 0; mut_i -= 1) {
-        nodes[mut_i]?.dispose();
+        const thrown = attempt(() => nodes[mut_i]?.dispose());
+
+        mut_thrown ??= thrown;
       }
     }
 
     if (this.#parent !== undefined) {
       this.#parent.#childGone();
     }
+
+    if (mut_thrown !== undefined) {
+      // What the member threw, passed on unchanged.
+      // @sumi-expect-error exceptions/no-throw
+      // eslint-disable-next-line @typescript-eslint/only-throw-error -- what the member threw, passed on unchanged
+      throw mut_thrown.error;
+    }
   }
 
+  /**
+   * Takes `node` to dispose with this scope. A scope disposed while its `run`
+   * is still executing (a `switchMap` that switched away during the projection)
+   * disposes it when that `run` returns instead (#3550): a node is adopted from
+   * its constructor, and a root's subclass has not set its own fields yet,
+   * which its teardown reads.
+   */
   adopt(node: ScopeMember): void {
+    if (this.#mut_isDisposed) {
+      if (this.#mut_lateNodes === undefined) {
+        this.#mut_lateNodes = [node];
+      } else {
+        this.#mut_lateNodes.push(node);
+      }
+
+      return;
+    }
+
     if (this.#mut_nodes === undefined) {
       this.#mut_nodes = [node];
     } else {
@@ -241,7 +305,14 @@ class ScopeClass implements ScopeInternals {
     this.#mut_goneNodes = 0;
   }
 
+  /** Runs `cleanup` at once on a scope already disposed, as `adopt` does. */
   addCleanup(cleanup: () => void): void {
+    if (this.#mut_isDisposed) {
+      cleanup();
+
+      return;
+    }
+
     if (this.#mut_cleanups === undefined) {
       this.#mut_cleanups = [cleanup];
     } else {
@@ -258,3 +329,18 @@ const isMostlyGone = (gone: number, length: number): boolean =>
   gone >= minGoneToCompact && gone * 2 >= length;
 
 const minGoneToCompact = 16;
+
+/** What a member of a scope threw while the scope was being disposed. */
+type Thrown = Readonly<{ error: unknown }>;
+
+/** Calls `body`, and returns what it throws instead of throwing it. */
+const attempt = (body: () => void): Thrown | undefined => {
+  // @sumi-expect-error exceptions/no-try
+  try {
+    body();
+
+    return undefined;
+  } catch (error) {
+    return { error };
+  }
+};

@@ -198,6 +198,11 @@ class MergeMapObservableClass<A, B>
       () => {
         const observable = innerScope.run(() => this.#mapToObservable(value));
 
+        // Released during the projection: `mergeMap` completed (#3550).
+        if (!this.#mut_liveInners.has(innerScope)) {
+          return;
+        }
+
         const subscription = this.subscribeInner(
           observable,
           updateToken,
