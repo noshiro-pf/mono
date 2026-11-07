@@ -275,10 +275,16 @@ describe(checkDescription, () => {
   });
 
   const TRAILER_RULE =
-    'Start-After: and Claude-Session: lines and closing keywords are read wherever they are, so each appears once, after the "---" rule that ends the translation';
+    'Start-After: and Claude-Session: lines are read wherever they are, so each appears once, after the "---" rule that ends the translation';
+
+  /** Says both readings, and that a flag is not the fix: `--issue` passes a pull request's that GitHub would still act on. */
+  const closingKeywordProblem = (
+    half: 'original' | 'translation',
+    line: string,
+  ): string =>
+    `the ${half} has the closing keyword "${line}"; read as a pull request's description, as this is, GitHub acts on one wherever it is, so it appears once, after the "---" rule that ends the translation. In an issue's description one is prose and stays where it is` as const;
 
   test.each([
-    'Closes #2',
     'Start-After: #3',
     'Claude-Session: https://claude.ai/code/session_1',
   ])('keeps the trailer %s out of either half', (trailer) => {
@@ -307,26 +313,55 @@ describe(checkDescription, () => {
   });
 
   test.each([
+    'Closes #2',
     'Closes noshiro-pf/mono#2',
     'Fixes https://github.com/noshiro-pf/mono/issues/2',
     'Fixes:#2',
     'Closes : #2',
-  ])('reads %s as a trailer', (trailer) => {
-    assert.deepStrictEqual(
-      checkDescription(
-        split(dedent`
-          A.
+  ])(
+    'reads %s as a closing keyword, and says what each reading asks',
+    (line) => {
+      assert.deepStrictEqual(
+        checkDescription(
+          split(dedent`
+            A.
 
-          ${trailer}
+            ${line}
 
-          ## 日本語
+            ## 日本語
 
-          あ。
-        `),
-        'pull-request',
-      ),
-      [`the original has the trailer "${trailer}"; ${TRAILER_RULE}`],
+            あ。
+
+            ${line}
+          `),
+          'pull-request',
+        ),
+        [
+          closingKeywordProblem('original', line),
+          closingKeywordProblem('translation', line),
+        ],
+      );
+    },
+  );
+
+  test('never sends a pull request toward --issue, nor an issue draft toward rewording', () => {
+    const problems = checkDescription(
+      split(dedent`
+        The workaround in #5 resolves #10 only partly.
+
+        ## 日本語
+
+        #5 の回避策は #10 を一部しか解決しない。
+      `),
+      'pull-request',
     );
+
+    // One problem, the keyword's: not also that the original lacks #10.
+    assert.lengthOf(problems, 1);
+
+    assert.notInclude(problems[0], '--issue');
+
+    assert.include(problems[0], "In an issue's description one is prose");
   });
 
   test('reads a closing keyword in an issue as prose, not as a trailer', () => {
