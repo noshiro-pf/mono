@@ -43,7 +43,10 @@ describe(descriptionProblems, () => {
 
     assert.include(problems, 'the description cannot be posted as it is:');
 
-    assert.include(problems, 'the original has the trailer "Closes #1"');
+    assert.include(
+      problems,
+      'the original has the closing keyword "Closes #1"',
+    );
   });
 
   test('reads a closing keyword in an issue as prose', () => {

@@ -166,9 +166,17 @@ export const checkDescription = (
 
   const translationRefs = referencesIn(translation, kind);
 
-  const missingFromTranslation = onlyIn(originalRefs, translationRefs);
+  // A number the other half has only in a closing keyword is not called missing:
+  // that keyword is refused by itself, and moving it brings this up if it is so.
+  const missingFromTranslation = onlyIn(
+    originalRefs,
+    referencesIn(translation, 'issue'),
+  );
 
-  const missingFromOriginal = onlyIn(translationRefs, originalRefs);
+  const missingFromOriginal = onlyIn(
+    translationRefs,
+    referencesIn(original, 'issue'),
+  );
 
   const fenced = parts.translation.split('\n').some((line) => FENCE.test(line));
 
@@ -377,7 +385,11 @@ const trailerProblem = (
 
   return trailer === undefined
     ? undefined
-    : `the ${half} has the trailer "${trailer.trim()}"; Start-After: and Claude-Session: lines${kind === 'pull-request' ? ' and closing keywords' : ''} are read wherever they are, so each appears once, after the "---" rule that ends the translation`;
+    : isTrailerLine(trailer)
+      ? `the ${half} has the trailer "${trailer.trim()}"; Start-After: and Claude-Session: lines are read wherever they are, so each appears once, after the "---" rule that ends the translation`
+      : // Both readings and no flag: a file does not say which it is, and
+        // `--issue` passes a pull request's that GitHub would still act on.
+        `the ${half} has the closing keyword "${trailer.trim()}"; read as a pull request's description, as this is, GitHub acts on one wherever it is, so it appears once, after the "---" rule that ends the translation. In an issue's description one is prose and stays where it is`;
 };
 
 const headingOf = (line: string): readonly Heading[] => {
