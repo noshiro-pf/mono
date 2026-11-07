@@ -32,6 +32,13 @@ import { runUndoingOnThrow } from '../utils/index.mjs';
  * the projection and shared with others — is unsubscribed and left running.
  *
  * If the projection or the subscription to it throws, its scope is disposed.
+ * A value the inner observable emitted while being subscribed, before the
+ * subscription threw, stays the current value: it has already been passed on.
+ *
+ * A projection that writes to the source switches to the value written.
+ * Nothing subscribes to what that projection returns.
+ * What it makes after the write is disposed.
+ * A projection that completes `switchMap` is treated the same way.
  *
  * @template A - The type of values from the source
  * @template B - The type of values from the projected observable
@@ -187,7 +194,21 @@ class SwitchMapObservableClass<A, B>
       () => {
         const observable = innerScope.run(() => this.#mapToObservable(value));
 
-        this.#mut_subscription = this.subscribeInner(observable, updateToken);
+        // A write from inside the projection may have switched again, and
+        // released this scope, or `switchMap` may have completed (#3550):
+        // the observable is then subscribed to by nobody.
+        if (!this.#isCurrent(innerScope)) {
+          return;
+        }
+
+        const subscription = this.subscribeInner(observable, updateToken);
+
+        // The same, while it was being subscribed.
+        if (this.#isCurrent(innerScope)) {
+          this.#mut_subscription = subscription;
+        } else {
+          subscription.unsubscribe();
+        }
       },
       () => {
         // A write from inside the projection may have switched again already.
@@ -200,6 +221,11 @@ class SwitchMapObservableClass<A, B>
         innerScope.dispose();
       },
     );
+  }
+
+  /** Whether `innerScope` is still the one switched to, and in use. */
+  #isCurrent(innerScope: Scope): boolean {
+    return this.#mut_innerScope === innerScope && !this.isCompleted;
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
