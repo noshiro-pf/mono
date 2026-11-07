@@ -10,7 +10,6 @@ import {
   createAfterUpdate,
   For,
   If,
-  inlineMap,
   listenInScope,
   subscribeInScope,
   type JSX,
@@ -642,15 +641,15 @@ export const PaneFrame = ({
           { capture: true },
         );
       }}
-      class={inlineMap(view$, (paneView) =>
-        paneClassName(paneView.active, paneView.moving),
+      class={view$.pipe(
+        map((paneView) => paneClassName(paneView.active, paneView.moving)),
       )}
       data-e2e={constant('pane')}
       style={{
-        left: inlineMap(rect$, (rect) => `${rect.left}px`),
-        top: inlineMap(rect$, (rect) => `${rect.top}px`),
-        width: inlineMap(rect$, (rect) => `${rect.width}px`),
-        height: inlineMap(rect$, (rect) => `${rect.height}px`),
+        left: rect$.pipe(map((rect) => `${rect.left}px`)),
+        top: rect$.pipe(map((rect) => `${rect.top}px`)),
+        width: rect$.pipe(map((rect) => `${rect.width}px`)),
+        height: rect$.pipe(map((rect) => `${rect.height}px`)),
       }}
     >
       <header class={constant('pane__bar')}>
@@ -674,9 +673,11 @@ export const PaneFrame = ({
         <button
           aria-label={constant('Back')}
           class={constant('pane__button')}
-          disabled={inlineMap(
-            pane$,
-            (pane) => pane.currentUrl === undefined || pane.historyLength <= 1,
+          disabled={pane$.pipe(
+            map(
+              (pane) =>
+                pane.currentUrl === undefined || pane.historyLength <= 1,
+            ),
           )}
           title={constant('Back')}
           type={constant('button')}
@@ -689,7 +690,7 @@ export const PaneFrame = ({
         <button
           aria-label={constant('Forward')}
           class={constant('pane__button')}
-          disabled={inlineMap(pane$, (pane) => pane.currentUrl === undefined)}
+          disabled={pane$.pipe(map((pane) => pane.currentUrl === undefined))}
           title={constant('Forward')}
           type={constant('button')}
           onClick={() => {
@@ -701,7 +702,7 @@ export const PaneFrame = ({
         <button
           aria-label={constant('Reload')}
           class={constant('pane__button')}
-          disabled={inlineMap(pane$, (pane) => pane.url === '')}
+          disabled={pane$.pipe(map((pane) => pane.url === ''))}
           title={constant('Reload')}
           type={constant('button')}
           onClick={handleReload}
@@ -726,7 +727,7 @@ export const PaneFrame = ({
               <img
                 alt={constant('')}
                 class={constant('pane__favicon')}
-                src={inlineMap(address$, faviconUrlOf)}
+                src={address$.pipe(map(faviconUrlOf))}
               />
             }
           />
@@ -759,9 +760,11 @@ export const PaneFrame = ({
               class={constant('pane__warning')}
               title={constant('Service workers removed')}
             >
-              {inlineMap(
-                load$,
-                (load) => `SW-${load.serviceWorkersRemoved?.toString() ?? ''}`,
+              {load$.pipe(
+                map(
+                  (load) =>
+                    `SW-${load.serviceWorkersRemoved?.toString() ?? ''}`,
+                ),
               )}
             </span>
           }
@@ -788,7 +791,7 @@ export const PaneFrame = ({
               <button
                 aria-label={constant('Open in a new tab')}
                 class={constant('pane__button')}
-                disabled={inlineMap(address$, (address) => address === '')}
+                disabled={address$.pipe(map((address) => address === ''))}
                 title={constant('Open in a new tab')}
                 type={constant('button')}
                 onClick={handleOpenExternally}
@@ -797,10 +800,12 @@ export const PaneFrame = ({
               </button>
               <button
                 aria-label={sandboxTitle}
-                class={inlineMap(pane$, (pane) =>
-                  pane.sandboxed
-                    ? 'pane__button'
-                    : 'pane__button pane__button--warn',
+                class={pane$.pipe(
+                  map((pane) =>
+                    pane.sandboxed
+                      ? 'pane__button'
+                      : 'pane__button pane__button--warn',
+                  ),
                 )}
                 title={sandboxTitle}
                 type={constant('button')}
@@ -844,8 +849,8 @@ export const PaneFrame = ({
               class={constant('pane__menu')}
             >
               <button
-                aria-expanded={inlineMap(load$, (load) =>
-                  load.menuOpen ? 'true' : 'false',
+                aria-expanded={load$.pipe(
+                  map((load) => (load.menuOpen ? 'true' : 'false')),
                 )}
                 aria-label={constant('More for this pane')}
                 class={constant('pane__button')}
@@ -897,7 +902,7 @@ export const PaneFrame = ({
         <button
           aria-label={constant('Close this pane')}
           class={constant('pane__button')}
-          disabled={inlineMap(view$, (paneView) => !paneView.canClose)}
+          disabled={view$.pipe(map((paneView) => !paneView.canClose))}
           title={constant('Close this pane')}
           type={constant('button')}
           onClick={() => {
@@ -972,9 +977,9 @@ export const PaneFrame = ({
                   // navigation.
                   src={shown$.pipe(map((pane) => pane.url))}
                   style={{
-                    zoom: inlineMap(shown$, (pane) => zoomStyleOf(pane.zoom)),
+                    zoom: shown$.pipe(map((pane) => zoomStyleOf(pane.zoom))),
                   }}
-                  title={inlineMap(shown$, labelOf)}
+                  title={shown$.pipe(map(labelOf))}
                   onLoad={handleFrameLoad}
                 />
               )}

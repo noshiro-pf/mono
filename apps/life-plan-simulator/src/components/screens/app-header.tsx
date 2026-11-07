@@ -10,7 +10,6 @@ import {
   constant,
   For,
   If,
-  inlineMap,
   mapBindable,
   type Bindable,
   type JSX,
@@ -78,8 +77,8 @@ export const AppHeader = ({ userName }: Props): JSX.Element => {
           >
             <For items={plans$} key={(plan) => plan.id}>
               {(plan$) => (
-                <option value={inlineMap(plan$, (p) => p.id)}>
-                  {inlineMap(plan$, (p) => p.name)}
+                <option value={plan$.pipe(map((p) => p.id))}>
+                  {plan$.pipe(map((p) => p.name))}
                 </option>
               )}
             </For>
@@ -122,9 +121,8 @@ export const AppHeader = ({ userName }: Props): JSX.Element => {
             cond={confirmingDelete$}
             then={
               <span class={constant('actions')}>
-                {inlineMap(
-                  planStore.currentPlan,
-                  (p) => `「${p?.name ?? ''}」を削除しますか？`,
+                {planStore.currentPlan.pipe(
+                  map((p) => `「${p?.name ?? ''}」を削除しますか？`),
                 )}
                 <Button
                   icon={'trash'}

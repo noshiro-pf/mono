@@ -1,7 +1,12 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import { pathExists } from 'ts-repo-utils';
+import type { FixedLengthTuple } from 'ts-type-forge';
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how apps reach its shared scripts
+import * as markers from '../../../tools/scripts/lib/embed-markers.mjs';
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how apps reach its shared scripts
+import * as domResults from '../../../tools/scripts/lib/synstate-dom-benchmark-results.mjs';
 import { benchmarkNumbers } from './benchmark-numbers.mjs';
 import { assertEveryLibraryHasAColour } from './measurement-checks.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
@@ -19,6 +24,19 @@ const tablePages: readonly string[] = [
     'src/content/docs/ja/guides/library-comparison/benchmark.mdx',
   ),
 ] as const;
+
+/**
+ * The quoting pages that also place synstate-dom among the libraries of
+ * js-framework-benchmark, through `benchmark:` markers (synstate-dom-docs'
+ * spelling, as its benchmark page uses them).
+ *
+ * synstate-dom's own site pitches it as the UI library for SynState's runtime,
+ * quoting SynState's worst case, and has no copy of these results, so its pages
+ * are filled from here; this script fills their `benchmark:` markers too, so
+ * that each of these pages has one writer; `check:prose:synstate-dom-placement`
+ * fails when one is not current.
+ */
+const placementPages: readonly string[] = domResults.placementPages;
 
 /**
  * Pages that may quote a benchmark figure without showing a table.
@@ -55,6 +73,7 @@ const quotingPages: readonly string[] = [
     workspaceRootPath,
     'src/content/docs/ja/guides/library-comparison/library-comparison.md',
   ),
+  ...placementPages,
 ] as const;
 
 type EmbedTarget = Readonly<{
@@ -154,17 +173,6 @@ const embedOneTarget = async (
 };
 
 /**
- * The language a page is written in, by where it sits: Starlight keeps every
- * translation under a directory named after its locale.
- */
-const pageLanguage = (markdownFile: string): 'en' | 'ja' =>
-  path
-    .relative(path.resolve(workspaceRootPath, 'src/content/docs'), markdownFile)
-    .split(path.sep)[0] === 'ja'
-    ? 'ja'
-    : 'en';
-
-/**
  * Rewrites every `{/* bench:<key> *\/}…{/* /bench *\/}` span from
  * `benchmarkNumbers`.
  *
@@ -189,7 +197,7 @@ const embedInlineNumbers = (
         const value =
           entry === undefined || typeof entry === 'string'
             ? entry
-            : entry[pageLanguage(targetMarkdownFile)];
+            : entry[domResults.pageLocale(targetMarkdownFile)];
 
         if (key === undefined || value === undefined) {
           throw new Error(
@@ -246,7 +254,12 @@ const assertEveryRatioMarked = (
   const unmarked = /\d[\d.,]*(?:\s*(?:×|倍|\\times)|(?<=\d)x\b)/u.exec(
     inlineMarkers.reduce(
       (mut_content, { pattern }) => mut_content.replaceAll(pattern, ''),
-      markdown,
+      // The `benchmark:` markers this script filled on a placement page count
+      // as marked; on any other page they are not this script's, and a ratio in
+      // one is reported like any other.
+      placementPages.includes(targetMarkdownFile)
+        ? markers.stripMarkers(markdown, 'benchmark')
+        : markdown,
     ),
   );
 
@@ -282,13 +295,67 @@ const assertNoEscapedEmphasis = (
   }
 };
 
+/**
+ * synstate-dom's js-framework-benchmark operations, once
+ * `checkPlacement` has found that they bear out the sentences on
+ * {@link placementPages}.
+ */
+const readSynstateDomOperations = async (): Promise<domResults.Table> => {
+  const results = await domResults.readResults();
+
+  if (Result.isErr(results)) {
+    throw new Error(`❌ ${results.value}`);
+  }
+
+  const placed = domResults.checkPlacement(results.value.operations);
+
+  if (Result.isErr(placed)) {
+    throw new Error(`❌ ${placed.value}`);
+  }
+
+  return results.value.operations;
+};
+
+/** {@link domResults.embedPlacement}, failing with the page's name. */
+const embedPlacement = (
+  markdown: string,
+  targetMarkdownFile: string,
+  operations: domResults.Table,
+): string => {
+  const placed = domResults.embedPlacement(
+    markdown,
+    operations,
+    domResults.pageLocale(targetMarkdownFile),
+  );
+
+  if (Result.isErr(placed)) {
+    throw new Error(
+      `❌ ${path.relative(workspaceRootPath, targetMarkdownFile)}: ${placed.value}`,
+    );
+  }
+
+  return placed.value;
+};
+
 const embedBenchmark = async (): Promise<void> => {
   assertEveryLibraryHasAColour();
 
+  const synstateDomOperations = await readSynstateDomOperations();
+
   const mut_usedKeys = new Set<string>();
+
+  // Every page is embedded before any is written, so that a failure on one
+  // writes none of them.
+  const mut_updates: FixedLengthTuple<2, string>[] = [];
 
   for (const targetMarkdownFile of tablePages.concat(quotingPages)) {
     const fileExists = await pathExists(targetMarkdownFile);
+
+    if (!fileExists && placementPages.includes(targetMarkdownFile)) {
+      throw new Error(
+        `❌ ${targetMarkdownFile} not found; update placementPages in tools/scripts/lib/synstate-dom-benchmark-results.mts`,
+      );
+    }
 
     if (!fileExists) {
       console.info(`⚠ ${targetMarkdownFile} not found. Skipping.`);
@@ -297,9 +364,11 @@ const embedBenchmark = async (): Promise<void> => {
     }
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    let mut_markdown = await fs.readFile(targetMarkdownFile, 'utf8');
+    const original = await fs.readFile(targetMarkdownFile, 'utf8');
 
-    assertNoEscapedEmphasis(mut_markdown, targetMarkdownFile);
+    let mut_markdown = original;
+
+    assertNoEscapedEmphasis(original, targetMarkdownFile);
 
     for (const target of tablePages.includes(targetMarkdownFile)
       ? targets
@@ -317,12 +386,23 @@ const embedBenchmark = async (): Promise<void> => {
       mut_usedKeys,
     );
 
+    if (placementPages.includes(targetMarkdownFile)) {
+      mut_markdown = embedPlacement(
+        mut_markdown,
+        targetMarkdownFile,
+        synstateDomOperations,
+      );
+    }
+
     if (quotingPages.includes(targetMarkdownFile)) {
       assertEveryRatioMarked(mut_markdown, targetMarkdownFile);
     }
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.writeFile(targetMarkdownFile, mut_markdown, 'utf8');
+    // Only a page whose figures moved is written, so that a run with nothing to
+    // change leaves even the other site's pages untouched.
+    if (mut_markdown !== original) {
+      mut_updates.push([targetMarkdownFile, mut_markdown]);
+    }
   }
 
   // A key nothing uses is a number the prose stopped quoting, and the entry
@@ -336,6 +416,11 @@ const embedBenchmark = async (): Promise<void> => {
     throw new Error(
       `❌ benchmark numbers named by no marker: ${unused.join(', ')}`,
     );
+  }
+
+  for (const [targetMarkdownFile, content] of mut_updates) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.writeFile(targetMarkdownFile, content, 'utf8');
   }
 
   console.info(`✓ Embedded ${mut_usedKeys.size.toString()} inline numbers`);

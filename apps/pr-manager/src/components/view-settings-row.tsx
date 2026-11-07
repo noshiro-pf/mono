@@ -3,7 +3,6 @@ import { combine, map, type InitializedObservable } from 'synstate';
 import {
   constant,
   If,
-  inlineMap,
   mapBindable,
   type Bindable,
   type Child,
@@ -83,8 +82,8 @@ export const ViewSettingsRow = ({
   return (
     <li
       class={constant('view-settings-block')}
-      data-hidden={inlineMap(row$, ({ hidden }) => hidden.toString())}
-      data-tabbed={inlineMap(row$, ({ tabbed }) => tabbed.toString())}
+      data-hidden={row$.pipe(map(({ hidden }) => hidden.toString()))}
+      data-tabbed={row$.pipe(map(({ tabbed }) => tabbed.toString()))}
     >
       <span class={constant('view-settings-name')}>{constant(blockName)}</span>
 
@@ -158,16 +157,20 @@ export const ViewSettingsRow = ({
         cond={row$.pipe(map(({ canTab }) => canTab))}
         then={
           <button
-            aria-label={inlineMap(row$, ({ tabbed }) =>
-              tabbed
-                ? `Take ${blockName} out of the tabs above it`
-                : `Show ${blockName} as a tab of the block above it`,
+            aria-label={row$.pipe(
+              map(({ tabbed }) =>
+                tabbed
+                  ? `Take ${blockName} out of the tabs above it`
+                  : `Show ${blockName} as a tab of the block above it`,
+              ),
             )}
             class={constant('view-settings-small')}
-            title={inlineMap(row$, ({ tabbed }) =>
-              tabbed
-                ? 'Draw it on its own again'
-                : 'Draw it in the place of the block above, one tab each',
+            title={row$.pipe(
+              map(({ tabbed }) =>
+                tabbed
+                  ? 'Draw it on its own again'
+                  : 'Draw it in the place of the block above, one tab each',
+              ),
             )}
             type={constant('button')}
             onClick={() => {
@@ -178,7 +181,7 @@ export const ViewSettingsRow = ({
               );
             }}
           >
-            {inlineMap(row$, ({ tabbed }) => (tabbed ? 'Untab' : 'Tab'))}
+            {row$.pipe(map(({ tabbed }) => (tabbed ? 'Untab' : 'Tab')))}
           </button>
         }
       />
@@ -231,9 +234,8 @@ export const ViewSettingsRow = ({
             />
 
             <button
-              aria-label={inlineMap(
-                row$,
-                ({ hidden }) => `${hidden ? 'Show' : 'Hide'} ${blockName}`,
+              aria-label={row$.pipe(
+                map(({ hidden }) => `${hidden ? 'Show' : 'Hide'} ${blockName}`),
               )}
               class={constant('view-settings-small')}
               type={constant('button')}
@@ -241,7 +243,7 @@ export const ViewSettingsRow = ({
                 layoutStore.setHidden(id, !current().hidden);
               }}
             >
-              {inlineMap(row$, ({ hidden }) => (hidden ? 'Show' : 'Hide'))}
+              {row$.pipe(map(({ hidden }) => (hidden ? 'Show' : 'Hide')))}
             </button>
           </>
         }
@@ -328,7 +330,7 @@ const ShareControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
         class={constant('view-settings-height')}
         title={constant('Its part of the column')}
       >
-        {inlineMap(row$, ({ percent }) => `${percent}%`)}
+        {row$.pipe(map(({ percent }) => `${percent}%`))}
       </span>
 
       <MoveButton
@@ -413,7 +415,7 @@ const HeightControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
       else={
         <>
           <span class={constant('view-settings-height')}>
-            {inlineMap(row$, ({ height }) => `${height ?? 0}px`)}
+            {row$.pipe(map(({ height }) => `${height ?? 0}px`))}
           </span>
 
           <MoveButton

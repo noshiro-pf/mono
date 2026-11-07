@@ -1,4 +1,5 @@
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { map } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import { reader } from '../store/index.mjs';
 import { svgAttributes } from './svg-elements.js';
 
@@ -22,7 +23,7 @@ type Props = Readonly<{
 export const FetchingIndicator = ({ compact }: Props): JSX.Element => (
   <span
     class={constant('fetching-indicator')}
-    data-active={inlineMap(reader.fetching, (out) => (out ? 'true' : 'false'))}
+    data-active={reader.fetching.pipe(map((out) => (out ? 'true' : 'false')))}
     title={constant(LABEL)}
   >
     <svg

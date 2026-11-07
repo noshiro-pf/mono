@@ -1,5 +1,5 @@
 import { type InitializedObservable, map } from 'synstate';
-import { constant, inlineMap, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import type { DagArcRecord } from './dag-canvas-scene.mjs';
 import { DagEdgeLabel } from './dag-edge-label.js';
 import { SvgTitle } from './svg-title.js';
@@ -24,17 +24,21 @@ export const DagArcEdge = ({ record }: Props): JSX.Element => {
       aria-label={name}
       class={constant('dag-edge dag-arc')}
       data-e2e={constant('dag-arc')}
-      data-from={inlineMap(record, ({ arc }) => arc.from)}
-      data-highlight={inlineMap(record, ({ highlight }) => highlight)}
-      data-to={inlineMap(record, ({ arc }) => arc.to)}
+      data-from={record.pipe(map(({ arc }) => arc.from))}
+      data-highlight={record.pipe(map(({ highlight }) => highlight))}
+      data-to={record.pipe(map(({ arc }) => arc.to))}
       role={constant('img')}
     >
       <SvgTitle>{name}</SvgTitle>
       <path
         class={constant('dag-edge-line')}
-        d={inlineMap(record, ({ arc }) => arc.path)}
-        marker-end={inlineMap(record, ({ highlight }) =>
-          highlight === 'on' ? 'url(#dag-arrow-highlight)' : 'url(#dag-arrow)',
+        d={record.pipe(map(({ arc }) => arc.path))}
+        marker-end={record.pipe(
+          map(({ highlight }) =>
+            highlight === 'on'
+              ? 'url(#dag-arrow-highlight)'
+              : 'url(#dag-arrow)',
+          ),
         )}
       />
       <DagEdgeLabel pick={({ arc }) => arc} source={record} />

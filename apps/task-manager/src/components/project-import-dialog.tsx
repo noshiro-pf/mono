@@ -1,5 +1,5 @@
 import { map } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { projectFileStore, type ProjectImport } from '../store/index.mjs';
 import { followModal } from './follow-modal.mjs';
@@ -36,7 +36,7 @@ export const ProjectImportDialog = (): JSX.Element => (
     </div>
     <div class={constant('bp6-dialog-body node-dialog-body')}>
       <p data-e2e={constant('project-import-message')}>
-        {inlineMap(projectFileStore.importState, message)}
+        {projectFileStore.importState.pipe(map(message))}
       </p>
       <If
         cond={projectFileStore.importState.pipe(
@@ -51,8 +51,10 @@ export const ProjectImportDialog = (): JSX.Element => (
             data-e2e={constant('project-import-problem')}
             role={constant('alert')}
           >
-            {inlineMap(projectFileStore.importState, (state) =>
-              state.type === 'confirming' ? (state.problem ?? '') : '',
+            {projectFileStore.importState.pipe(
+              map((state) =>
+                state.type === 'confirming' ? (state.problem ?? '') : '',
+              ),
             )}
           </p>
         }
@@ -64,8 +66,10 @@ export const ProjectImportDialog = (): JSX.Element => (
             class={constant('project-import-errors')}
             data-e2e={constant('project-import-errors')}
           >
-            {inlineMap(projectFileStore.importState, (state) =>
-              state.type === 'refused' ? state.errors.join('\n') : '',
+            {projectFileStore.importState.pipe(
+              map((state) =>
+                state.type === 'refused' ? state.errors.join('\n') : '',
+              ),
             )}
           </p>
         }

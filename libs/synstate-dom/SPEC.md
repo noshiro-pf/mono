@@ -39,7 +39,7 @@ issue #2131 とライフサイクル仕様で決まったもの。実装はこ�
 1. **コンポーネント関数はマウント時に 1 回だけ呼ぶ。** 仮想 DOM も差分計算も持たない。
 2. **コンパイラを使わない。** `jsx: react-jsx` と `jsxImportSource: "synstate-dom"` を使う。
 3. **リアクティビティは型で表す。** 依存は synstate のグラフ（`pipe`・`combine`）で明示し、自動追跡はしない。実行時に持つのは「今どのスコープの中にいるか」だけである。
-4. **データを受け取るスロットは `Bindable<T>`（`InitializedObservable<T> | Constant<T>`）だけを受け付け、素の `T` は受け付けない。** 組み込み要素のスロットだけは、最適化の `InlineMap<T>`（「7.3」）も加えた `ElementBindable<T>` を受け付ける。定数は `constant()` で包む。対象は DOM の属性・プロパティ、テキストの子要素、ライブラリが提供するコンポーネントの props。`{count$.getSnapshot().value}` のような「一度だけ読まれて更新されない」誤りを型エラーにするためである。
+4. **データを受け取るスロットは `Bindable<T>`（`InitializedObservable<T> | Constant<T>`）だけを受け付け、素の `T` は受け付けない。** 定数は `constant()` で包む。対象は DOM の属性・プロパティ、テキストの子要素、ライブラリが提供するコンポーネントの props。`{count$.getSnapshot().value}` のような「一度だけ読まれて更新されない」誤りを型エラーにするためである。
     - 例外（データではないもの）: イベントハンドラ、`ref`、`For` の `key` 関数、子要素を返す関数。
 5. **束縛先に Observable を渡すなら初期値ありのもの（`InitializedObservable`）を要求する。** マウント時点で DOM に書く値が要るため。
 6. **条件分岐とリストには専用のコンポーネント（`If`、`Match` 系、`For`）を使う。** 本体の `if` や早期 return はリアクティブにならないため。条件分岐は `<If cond then else />` とし、2 つの分岐を対等な props として書く。
@@ -99,9 +99,6 @@ export type Constant<T> = Brand<T, 'synstate-dom/Constant'>;
 
 export type Bindable<T> = InitializedObservable<T> | Constant<T>;
 
-// 組み込み要素のスロットだけが受け付ける。InlineMap は「7.3」
-export type ElementBindable<T> = Bindable<T> | InlineMap<T>;
-
 // Observable と InitializedObservable は synstate から、asConstant は下のブロックから import する
 export const constant = <const T>(
     value: T extends Observable<unknown> | null | undefined ? never : T,
@@ -123,7 +120,7 @@ export const asConstant = <T>(value: T): Constant<T> => value as Constant<T>;
 - 自作コンポーネントが「初期値として一度だけ読む」props は `Constant<T>` で受ける（例: `initial: Constant<number>`）。呼び出し側は `initial={constant(0)}` と書くことになり、Observable も素の値も型エラーになるので、「一度だけ読む」ことが変数名の慣習ではなく型で表れる。受け取った側は `Constant<T>` をそのまま `T` として使える。
 - `constant` の短い別名は公式には用意しない。短く書きたい利用者は `import { constant as c } from 'synstate-dom'` のように import 時に名前を変える。
 
-**実行時の判定**: 実行時の `Constant` はただの値なので、束縛処理は「Observable でも `InlineMap` でもなければ定数として一度だけ書く」（`InlineMap` は組み込み要素のスロットだけ）と判定する。`subscribe` メソッドの有無で判定すると、`subscribe` を持つ定数オブジェクトを取り違えるので、synstate が Observable に付ける symbol の目印（「3」）で判定する。判定関数 `isObservable` は synstate から import し、synstate-dom では定義しない。
+**実行時の判定**: 実行時の `Constant` はただの値なので、束縛処理は「Observable でなければ定数として一度だけ書く」と判定する。`subscribe` メソッドの有無で判定すると、`subscribe` を持つ定数オブジェクトを取り違えるので、synstate が Observable に付ける symbol の目印（「3」）で判定する。判定関数 `isObservable` は synstate から import し、synstate-dom では定義しない。
 
 ### 4.2 `Bindable` を受け取る側の補助関数
 
@@ -330,40 +327,19 @@ export const render = (
 - 1 つの要素では文字列形式とオブジェクト形式の一方だけを使う。文字列の `className` への書き込みはトグルしたクラスを消してしまうためで、Solid が `class` と `classList` を別の props に分けているのも同じ理由である。1 つの props の中でどちらかを選ぶ形にすれば、両方を同時に書けない。
 - キーに空白を含む文字列（`'a b'`）は `classList.toggle` が例外を投げるので、開発ビルドで `console.error` を出す。
 
-### 7.3 その場変換（`inlineMap`）
+### 7.3 変換は `pipe(map)` だけで書く
 
-`inlineMap(obs, fn)` は `obs.pipe(map(fn))` の最適化で、グラフのノードを作らずに束縛の購読者の中で変換する。名前は、`map` のノードを束縛の中に展開する（インライン化する）ことから取った。既定は `pipe(map(fn))` で、`inlineMap` は `For` の行のセルのように束縛が多い所で使う。返すのは「Observable と変換関数の組」を表すオブジェクトで、組み込み要素のスロット（属性・プロパティ・テキストの子・`class` と `style` のオブジェクト形式の値）にだけ渡せる。型は `ElementBindable<T>` で、`Bindable<T>` には含めない。`Bindable` 型のコンポーネントの props（ライブラリの `If`・`For` なども含む）と、「4.2」の補助関数は `InlineMap` を扱わない。ライブラリがそのままマウントする `Child` と、コンポーネントが要素にそのまま展開する props（`Link` の `<a>` の属性など）は `ElementBindable` を含む。
+束縛のための変換の別の書き方（旧 `view` / `View`、改名後の `inlineMap`）は持たない。Observable を変換して束縛するときは `obs.pipe(map(fn))` と書き、スロットはそれをほかの Observable と同じように受け取る。`For` の行の中で作った `map` のノードは行のスコープに属し、行と一緒に破棄される。
 
 ```tsx
 <For items={items$} key={(item) => item.id}>
-    {(item$) => <li>{inlineMap(item$, (item) => `${item.price} 円`)}</li>}
+    {(item$) => <li>{item$.pipe(map((item) => `${item.price} 円`))}</li>}
 </For>
 ```
 
-```ts
-declare const inlineMapTag: unique symbol;
-
-export type InlineMap<T> = Readonly<{
-    [inlineMapTag]: true;
-    open: <R>(
-        use: <A>(source: InitializedObservable<A>, fn: (value: A) => T) => R,
-    ) => R;
-}>;
-
-export declare const inlineMap: <A, T>(
-    source: InitializedObservable<A>,
-    fn: (value: A) => T,
-) => InlineMap<T>;
-```
-
-- 入力が 1 つなら購読者の中で変換しても不整合は起きず、ノード生成のコストを省ける。Chromium で 1 行に 4 つずつ束縛がある 1,000 行の `For` を測ると、マウントが約 5%、全行の更新が約 15%、破棄が約 35% 速かった（2026-11-05）。束縛が数十個なら差は誤差なので、既定にはしない。
-- `Bindable` に含めないのは、受け取る側の分岐を増やさないためである。`Bindable` に入っていた間は、`mapBindable`・`deriveBindable`・`toObservable` と、`Bindable` を受け取るすべてのコンポーネントが `InlineMap` を扱う必要があった。最適化が効くのは要素のスロットに直接渡す場合なので、そこだけで受け付ける（2026-11-05 に変更）。
-- 束縛処理は `open` で `source` と `fn` を取り出し、`source` を購読して、値が来るたびに `fn` を通してから書き込む。直前に書いた結果と `Object.is` で等しければ書かない。`map` のノードが下流に流す値と同じにするためである。購読は束縛と同じくスコープに属する。
-- `source` と `fn` をプロパティとして持たせると、`source` の値の型を消すために `fn` の引数を `never` にするしかなく、呼ぶ側で `as never` が要る。`open` に渡すコールバックを値の型について総称的にすれば、`source` と `fn` の型が対応したまま取り出せるので、型アサーションが要らない。
-- `fn` は値が来るたびに、束縛ごとに呼ばれる。同じ `InlineMap` を 2 か所に渡すと 2 回呼ばれ、結果を他から読む手段もない（ノードを作らないので結果を共有しない）。重い変換や複数の束縛先で共有する値は `pipe(map(...))` でノードにする。
-- この形を持つのは `map` だけである。購読者は伝播の途中で `setNext` から同期的に呼ばれるので、入力が複数の変換（`derive`、`combine`、`zip`）を購読者の中で行うと、1 つの入力の購読者からは他の入力がまだ更新前に見え、1 回の更新で複数回書くことになる。状態を持つ operator（`scan`、`pairwise`）は状態が束縛ごとにでき、マウントの時点から数え始めるので、ノードと結果が変わる。時間が絡む operator（`debounce`、`switchMap`）はタイマーや内側の Observable の持ち主としてノードが要る。`filter` は初期値が条件を満たさないと `InitializedObservable` にならない。
-- 名前は最適化用だと分かるものにする。既定の書き方と並ぶ必須の API に見えないようにするためである（2026-11-05 に `view` から改名）。
-- `[obs, fn]` のタプルを直接渡す形は採らない（型検査を保てる方法がないことを確認して決定）。props の型は要素ごとに固定なので、タプルの第 0 要素の型から第 1 要素の引数の型を推論させられない。引数を `unknown` にすると `(n: number) => …` が代入できず、`never` にすると誤った型の関数も通ってしまう（TypeScript で確認済み）。関数 `inlineMap` なら型引数 `A` で 2 つを結び付けられる。
+- ノードを作らずに購読者の中で変換する形は、Chromium で 1 行に 4 つずつ束縛がある 1,000 行の `For` を測ると、マウントが約 5%、全行の更新が約 15%、破棄が約 35% 速かった（2026-11-05）。それでも持たない（2026-11-06 に削除）。synstate-dom はベンチマークの数字を詰めるために API を増やすより、シンプルな API でそこそこ速く、遅くなる場面が少ないことを優先するためである。
+- その形を持つと、`Bindable` とは別に「要素のスロットだけが受け付ける型」（`ElementBindable`）が要り、`Child` や要素に展開する props と、`Bindable` 型の props とで受け付けるものが分かれる。同じ値を 2 か所に渡すと変換が 2 回走り、結果を他から読めないという、ノードにはない注意点も増える。
+- 入力が複数の変換（`derive`、`combine`）や状態を持つ operator（`scan`）はもともとノードが要る（購読者は伝播の途中で同期的に呼ばれるので、他の入力が更新前に見える）。`map` だけを特別扱いする理由は速度しかなかった。
 
 ### 7.4 キーボードの補助関数
 
@@ -542,7 +518,7 @@ synstate の派生は遅延評価ではなく、親が更新されるたびに�
 これを避けるため、次の 2 つをガイドラインとし、README の書き方の指針に載せる。守れば、表示されていないビューの派生はそもそも存在しない。
 
 1. **ビュー専用の派生は、ストアではなくコンポーネントの中で作る。** 作った時点で束縛という読み手がいるので、遅延でも即時でも計算回数は変わらない。
-2. **分岐の中身は、`If` / `Match` の分岐や switchMap の射影の中で作る。** 使われている側だけが存在する。
+2. **分岐の中身は、`If` / `Match` の分岐や switchMap の射影の中で作る。** 使われている側だけが存在する。`If` の `then` / `else` に直接書いた JSX は `If` が選ぶ前に外側のコンポーネントで評価されるので、ここでいう「分岐の中」は、分岐がマウントするコンポーネントの中である。
 
 それでも残るのは「グローバルで重い派生を、たまにしか見ない」場合である。読み手のいない派生の計算を止める「休眠」は、親の現在値だけで値が決まる派生に限れば入れられるが、このガイドラインで避けられるので入れない。実際のアプリで問題になったら再検討する。
 
@@ -580,7 +556,7 @@ libs/synstate-dom/
 │   ├── index.mts
 │   ├── jsx-runtime.mts
 │   ├── jsx-dev-runtime.mts
-│   ├── constant/      # Constant、Bindable、inlineMap、mapBindable、deriveBindable、toObservable
+│   ├── constant/      # Constant、Bindable、mapBindable、deriveBindable、toObservable
 │   ├── jsx/           # Mountable、jsx、Fragment、JSX 名前空間、IntrinsicElements
 │   ├── bind/          # 属性・プロパティ・テキスト・class・style・イベント
 │   ├── control/       # If、MatchOptional、MatchResult、For、Portal

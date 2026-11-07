@@ -1,5 +1,5 @@
 import { map } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { nodeRefOf } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
@@ -30,8 +30,8 @@ export const DagSelectionBar = (): JSX.Element => (
           then={
             <>
               <output data-e2e={constant('dag-bulk-delete-question')}>
-                {inlineMap(dagSelectionStore.selected, (ids) =>
-                  m.dag.confirmDeleteSelected(ids.length),
+                {dagSelectionStore.selected.pipe(
+                  map((ids) => m.dag.confirmDeleteSelected(ids.length)),
                 )}
               </output>
               <button
@@ -54,8 +54,8 @@ export const DagSelectionBar = (): JSX.Element => (
           else={
             <>
               <output data-e2e={constant('dag-selection-count')}>
-                {inlineMap(dagSelectionStore.selected, (ids) =>
-                  m.dag.selected(ids.length),
+                {dagSelectionStore.selected.pipe(
+                  map((ids) => m.dag.selected(ids.length)),
                 )}
               </output>
               <button

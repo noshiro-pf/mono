@@ -1,5 +1,5 @@
-import type { InitializedObservable } from 'synstate';
-import { inlineMap, type JSX } from 'synstate-dom';
+import { type InitializedObservable, map } from 'synstate';
+import type { JSX } from 'synstate-dom';
 import type { SplitterRect } from '../layout/index.mjs';
 
 /**
@@ -16,15 +16,15 @@ export const Splitter = ({
   onDragStart: (dragged: SplitterRect) => void;
 }>): JSX.Element => (
   <hr
-    aria-orientation={inlineMap(splitter$, ({ axis }) =>
-      axis === 'row' ? 'vertical' : 'horizontal',
+    aria-orientation={splitter$.pipe(
+      map(({ axis }) => (axis === 'row' ? 'vertical' : 'horizontal')),
     )}
-    class={inlineMap(splitter$, ({ axis }) => `splitter splitter--${axis}`)}
+    class={splitter$.pipe(map(({ axis }) => `splitter splitter--${axis}`))}
     style={{
-      left: inlineMap(splitter$, (splitter) => `${splitter.rect.left}px`),
-      top: inlineMap(splitter$, (splitter) => `${splitter.rect.top}px`),
-      width: inlineMap(splitter$, (splitter) => `${splitter.rect.width}px`),
-      height: inlineMap(splitter$, (splitter) => `${splitter.rect.height}px`),
+      left: splitter$.pipe(map((splitter) => `${splitter.rect.left}px`)),
+      top: splitter$.pipe(map((splitter) => `${splitter.rect.top}px`)),
+      width: splitter$.pipe(map((splitter) => `${splitter.rect.width}px`)),
+      height: splitter$.pipe(map((splitter) => `${splitter.rect.height}px`)),
     }}
     onPointerDown={(pointerEvent) => {
       // Without this, the press starts a text selection that follows the

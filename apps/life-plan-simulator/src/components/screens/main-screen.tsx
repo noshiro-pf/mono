@@ -1,6 +1,6 @@
 import { Card } from 'blueprint-synstate';
 import { map } from 'synstate';
-import { constant, If, inlineMap, type Bindable, type JSX } from 'synstate-dom';
+import { constant, If, type Bindable, type JSX } from 'synstate-dom';
 import { planStore } from '../../store/index.mjs';
 import { AppHeader } from './app-header.js';
 import { UnsentWritesBar, WriteErrorBar } from './notice-bars.js';
@@ -30,16 +30,18 @@ export const MainScreen = ({ userName }: Props): JSX.Element => {
           >
             <p
               data-e2e={constant('plans-status')}
-              role={inlineMap(plans, (s) =>
-                s.type === 'error' ? 'alert' : 'status',
+              role={plans.pipe(
+                map((s) => (s.type === 'error' ? 'alert' : 'status')),
               )}
             >
-              {inlineMap(plans, (s) =>
-                s.type === 'loading'
-                  ? '読み込み中…'
-                  : s.type === 'error'
-                    ? s.message
-                    : 'プランがありません。「新しいプラン」から作成してください。',
+              {plans.pipe(
+                map((s) =>
+                  s.type === 'loading'
+                    ? '読み込み中…'
+                    : s.type === 'error'
+                      ? s.message
+                      : 'プランがありません。「新しいプラン」から作成してください。',
+                ),
               )}
             </p>
           </Card>

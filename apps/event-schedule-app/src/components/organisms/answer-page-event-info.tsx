@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, If, inlineMap, mapBindable, type JSX } from 'synstate-dom';
+import { constant, If, mapBindable, type JSX } from 'synstate-dom';
 import { dict, ymdhm2strWithDay } from '../../constants/index.mjs';
 import { eventIsAfterDeadline } from '../../functions/index.mjs';
 import { Description } from '../atoms/index.mjs';
@@ -23,7 +23,7 @@ export const AnswerPageEventInfo = ({ eventSchedule }: Props): JSX.Element => {
         class={constant(value(styles.value1))}
         data-e2e={constant('event-title')}
       >
-        {inlineMap(eventSchedule, (e) => e.title)}
+        {eventSchedule.pipe(map((e) => e.title))}
       </div>
       <div class={constant(label(styles.label2))}>
         {constant(dc.eventInfo.notes)}
@@ -43,10 +43,12 @@ export const AnswerPageEventInfo = ({ eventSchedule }: Props): JSX.Element => {
           else={
             <>
               <div>
-                {inlineMap(eventSchedule, (e) =>
-                  e.answerDeadline === 'none'
-                    ? ''
-                    : ymdhm2strWithDay(e.answerDeadline),
+                {eventSchedule.pipe(
+                  map((e) =>
+                    e.answerDeadline === 'none'
+                      ? ''
+                      : ymdhm2strWithDay(e.answerDeadline),
+                  ),
                 )}
               </div>
               <Description

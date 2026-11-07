@@ -1,5 +1,5 @@
 import { map } from 'synstate';
-import { constant, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, If, type JSX } from 'synstate-dom';
 import { m } from '../i18n/index.mjs';
 import { uiStore } from '../store/index.mjs';
 
@@ -12,7 +12,7 @@ export const NoticeBar = (): JSX.Element => (
         class={constant('bp6-callout bp6-intent-danger notice-bar')}
         role={constant('alert')}
       >
-        <span>{inlineMap(uiStore.notice, (notice) => notice ?? '')}</span>
+        <span>{uiStore.notice.pipe(map((notice) => notice ?? ''))}</span>
         <button
           class={constant('bp6-button bp6-minimal')}
           type={constant('button')}

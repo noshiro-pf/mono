@@ -1,5 +1,5 @@
 import { createState, map } from 'synstate';
-import { constant, For, If, inlineMap, render, type JSX } from 'synstate-dom';
+import { constant, For, If, render, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
@@ -58,17 +58,17 @@ const TodoApp = (): JSX.Element => {
           <ul>
             <For items={todos$} key={(todo) => todo.id}>
               {(todo$, index$) => (
-                <li class={{ done: inlineMap(todo$, (todo) => todo.done) }}>
+                <li class={{ done: todo$.pipe(map((todo) => todo.done)) }}>
                   <label>
                     <input
                       type={constant('checkbox')}
-                      checked={inlineMap(todo$, (todo) => todo.done)}
+                      checked={todo$.pipe(map((todo) => todo.done))}
                       onChange={() => {
                         toggle(todo$.getSnapshot().value.id);
                       }}
                     />
-                    {inlineMap(index$, (i) => `${i + 1}. `)}
-                    {inlineMap(todo$, (todo) => todo.title)}
+                    {index$.pipe(map((i) => `${i + 1}. `))}
+                    {todo$.pipe(map((todo) => todo.title))}
                   </label>
                 </li>
               )}

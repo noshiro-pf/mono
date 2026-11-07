@@ -1,5 +1,5 @@
 import type { ReadonlyRecord, StrictPick, TypeEq } from 'ts-type-forge';
-import type { ElementBindable } from '../constant/index.mjs';
+import type { Bindable } from '../constant/index.mjs';
 import type {
   propertyNames,
   svgAttributeNames,
@@ -13,7 +13,7 @@ import type { EventPropNames } from './event-prop-names.mjs';
  *
  * - `ref` is called once with the element, right after it is created and
  *   before its children are mounted or anything is bound.
- * - `class` is either a string or an object of `ElementBindable<boolean>`s, one per
+ * - `class` is either a string or an object of `Bindable<boolean>`s, one per
  *   class name, never both (SPEC.md 7.2).
  * - `style` is either a `cssText` string or an object of CSS properties, each
  *   bound with `style.setProperty`, so the keys are the hyphenated names
@@ -24,33 +24,28 @@ import type { EventPropNames } from './event-prop-names.mjs';
 export type CommonElementProps<E extends Element> = Readonly<{
   ref?: (element: E) => void;
   children?: Child;
-  class?: ElementBindable<string> | ClassObject;
-  style?: ElementBindable<string> | StyleObject;
+  class?: Bindable<string> | ClassObject;
+  style?: Bindable<string> | StyleObject;
 }> &
   Partial<
     ReadonlyRecord<
       `aria-${string}`,
-      ElementBindable<boolean | number | string | undefined>
+      Bindable<boolean | number | string | undefined>
     >
   > &
-  Partial<
-    ReadonlyRecord<`data-${string}`, ElementBindable<string | undefined>>
-  >;
+  Partial<ReadonlyRecord<`data-${string}`, Bindable<string | undefined>>>;
 
-/** `class` as one `ElementBindable<boolean>` per class name. */
-export type ClassObject = ReadonlyRecord<string, ElementBindable<boolean>>;
+/** `class` as one `Bindable<boolean>` per class name. */
+export type ClassObject = ReadonlyRecord<string, Bindable<boolean>>;
 
 /**
- * `style` as one `ElementBindable<string | undefined>` per hyphenated CSS property
+ * `style` as one `Bindable<string | undefined>` per hyphenated CSS property
  * name; `undefined` removes the property.
  */
-export type StyleObject = ReadonlyRecord<
-  string,
-  ElementBindable<string | undefined>
->;
+export type StyleObject = ReadonlyRecord<string, Bindable<string | undefined>>;
 
 /**
- * The props of an HTML element: the common ones, one `ElementBindable` per writable
+ * The props of an HTML element: the common ones, one `Bindable` per writable
  * primitive DOM property of `E` (`id`, `disabled`, `value`, `tabIndex`, …), and
  * one handler per event of `HTMLElementEventMap`.
  *
@@ -71,7 +66,7 @@ export type SvgElementProps<E extends SVGElement> = CommonElementProps<E> &
   Partial<
     ReadonlyRecord<
       (typeof svgAttributeNames)[number],
-      ElementBindable<number | string | undefined>
+      Bindable<number | string | undefined>
     >
   > &
   EventProps<E, SVGElementEventMap>;
@@ -95,7 +90,7 @@ export type GeneratedIntrinsicElements = Readonly<{
   Readonly<{ [K in SvgTagName]: SvgElementProps<SVGElementTagNameMap[K]> }>;
 
 type ReflectedProps<E> = Readonly<{
-  [K in keyof E as ReflectedKey<E, K>]?: ElementBindable<
+  [K in keyof E as ReflectedKey<E, K>]?: Bindable<
     K extends PropertyName ? NonNullable<E[K]> : NonNullable<E[K]> | undefined
   >;
 }>;

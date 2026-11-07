@@ -2,7 +2,6 @@ import { map } from 'synstate';
 import {
   constant,
   deriveBindable,
-  inlineMap,
   MatchOptional,
   type JSX,
 } from 'synstate-dom';
@@ -27,22 +26,23 @@ import { ExternalLink } from './external-link.js';
 export const TokenPanel = (): JSX.Element => {
   const { token } = tokenStore;
 
-  const noToken = inlineMap(token, (held) => held === undefined);
+  const noToken = token.pipe(map((held) => held === undefined));
 
   // Said in the sentence as well as shown in the colour: the reserved status
   // steps are not allowed to carry a meaning on their own here, and a reader
   // who cannot tell the two greys apart still has to learn that the page is
   // about to stop being able to look.
-  const low = inlineMap(
-    reader.rateLimit,
-    (rateLimit) => rateLimit !== undefined && isRunningLow(rateLimit),
+  const low = reader.rateLimit.pipe(
+    map((rateLimit) => rateLimit !== undefined && isRunningLow(rateLimit)),
   );
 
   return (
     <details class={constant('token-panel')} open={noToken}>
       <summary class={constant('token-summary')}>
-        {inlineMap(token, (held) =>
-          held === undefined ? 'A token is needed' : 'Reading with a token',
+        {token.pipe(
+          map((held) =>
+            held === undefined ? 'A token is needed' : 'Reading with a token',
+          ),
         )}
       </summary>
 
@@ -73,8 +73,10 @@ export const TokenPanel = (): JSX.Element => {
             autocomplete={constant('off')}
             class={constant('token-input')}
             id={constant(INPUT_ID)}
-            placeholder={inlineMap(token, (held) =>
-              held === undefined ? 'ghp_… or github_pat_…' : '••••••••',
+            placeholder={token.pipe(
+              map((held) =>
+                held === undefined ? 'ghp_… or github_pat_…' : '••••••••',
+              ),
             )}
             type={constant('password')}
             value={tokenStore.typed}

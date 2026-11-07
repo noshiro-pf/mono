@@ -14,7 +14,6 @@ import {
   constant,
   createAfterUpdate,
   deriveBindable,
-  inlineMap,
   mapBindable,
   subscribeInScope,
   type Bindable,
@@ -356,9 +355,8 @@ const AnswerPageOk = ({
               </div>
 
               <button
-                aria-expanded={inlineMap(
-                  AnswerTableStore.detailedFilterIsOpen$,
-                  (open) => (open ? 'true' : 'false'),
+                aria-expanded={AnswerTableStore.detailedFilterIsOpen$.pipe(
+                  map((open) => (open ? 'true' : 'false')),
                 )}
                 class={constant(styles.toggleDetailedFilterSettingsLabel)}
                 data-e2e={constant('toggle-detailed-filter')}

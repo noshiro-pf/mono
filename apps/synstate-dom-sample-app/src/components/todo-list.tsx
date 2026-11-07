@@ -1,10 +1,9 @@
-import { createState } from 'synstate';
+import { createState, map } from 'synstate';
 import {
   constant,
   deriveBindable,
   For,
   If,
-  inlineMap,
   mapBindable,
   type JSX,
 } from 'synstate-dom';
@@ -75,23 +74,22 @@ export const TodoList = (): JSX.Element => {
           <ul data-e2e={constant('todo-items')}>
             <For items={visibleTodos} key={(todo) => todo.id}>
               {(todo$, index$) => (
-                <li class={{ done: inlineMap(todo$, (todo) => todo.done) }}>
+                <li class={{ done: todo$.pipe(map((todo) => todo.done)) }}>
                   <label>
                     <input
                       type={constant('checkbox')}
-                      checked={inlineMap(todo$, (todo) => todo.done)}
+                      checked={todo$.pipe(map((todo) => todo.done))}
                       onChange={() => {
                         toggleTodo(todo$.getSnapshot().value.id);
                       }}
                     />
-                    {inlineMap(index$, (i) => `${i + 1}. `)}
-                    {inlineMap(todo$, (todo) => todo.title)}
+                    {index$.pipe(map((i) => `${i + 1}. `))}
+                    {todo$.pipe(map((todo) => todo.title))}
                   </label>
                   <button
                     type={constant('button')}
-                    aria-label={inlineMap(
-                      todo$,
-                      (todo) => `Remove ${todo.title}`,
+                    aria-label={todo$.pipe(
+                      map((todo) => `Remove ${todo.title}`),
                     )}
                     onClick={() => {
                       removeTodo(todo$.getSnapshot().value.id);
@@ -107,15 +105,17 @@ export const TodoList = (): JSX.Element => {
         else={<p>{constant('Nothing to show.')}</p>}
       />
       <p data-e2e={constant('todo-remaining')}>
-        {inlineMap(todos$, (todos) => {
-          const n = todos.filter((t) => !t.done).length;
+        {todos$.pipe(
+          map((todos) => {
+            const n = todos.filter((t) => !t.done).length;
 
-          return `${n} item${n === 1 ? '' : 's'} left`;
-        })}
+            return `${n} item${n === 1 ? '' : 's'} left`;
+          }),
+        )}
       </p>
       <button
         type={constant('button')}
-        disabled={inlineMap(todos$, (todos) => todos.every((t) => !t.done))}
+        disabled={todos$.pipe(map((todos) => todos.every((t) => !t.done)))}
         onClick={clearDone}
       >
         {constant('Clear done')}
@@ -127,7 +127,7 @@ export const TodoList = (): JSX.Element => {
 const filterButton = (filter: TodoFilter, label: string): JSX.Element => (
   <button
     type={constant('button')}
-    class={{ selected: inlineMap(filter$, (f) => f === filter) }}
+    class={{ selected: filter$.pipe(map((f) => f === filter)) }}
     onClick={() => {
       setFilter(filter);
     }}

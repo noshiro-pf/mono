@@ -1,13 +1,5 @@
-import { createState, type InitializedObservable } from 'synstate';
-import {
-  constant,
-  For,
-  If,
-  inlineMap,
-  Portal,
-  render,
-  type JSX,
-} from 'synstate-dom';
+import { createState, map, type InitializedObservable } from 'synstate';
+import { constant, For, If, Portal, render, type JSX } from 'synstate-dom';
 
 type Item = Readonly<{ id: string; name: string }>;
 
@@ -53,8 +45,8 @@ const setup = (
 
     return (
       <li>
-        {inlineMap(index$, (i) => `${i}:`)}
-        {inlineMap(item$, (i) => i.name)}
+        {index$.pipe(map((i) => `${i}:`))}
+        {item$.pipe(map((i) => i.name))}
       </li>
     );
   };
@@ -194,11 +186,13 @@ describe(For, () => {
       <For items={items$} key={(s) => s}>
         {(item$) => (
           <b>
-            {inlineMap(suffix$, (s) => {
-              mut_runs.current += 1;
+            {suffix$.pipe(
+              map((s) => {
+                mut_runs.current += 1;
 
-              return `${item$.getSnapshot().value}${s}`;
-            })}
+                return `${item$.getSnapshot().value}${s}`;
+              }),
+            )}
           </b>
         )}
       </For>
@@ -339,11 +333,13 @@ describe(For, () => {
         <For items={items$} key={(s) => s}>
           {(item$) => (
             <li>
-              {inlineMap(suffix$, (s) => {
-                mut_runs.current += 1;
+              {suffix$.pipe(
+                map((s) => {
+                  mut_runs.current += 1;
 
-                return `${item$.getSnapshot().value}${s}`;
-              })}
+                  return `${item$.getSnapshot().value}${s}`;
+                }),
+              )}
             </li>
           )}
         </For>

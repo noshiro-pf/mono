@@ -4,7 +4,6 @@ import {
   createAfterUpdate,
   deriveBindable,
   If,
-  inlineMap,
   subscribeInScope,
   toObservable,
   type Bindable,
@@ -167,8 +166,8 @@ export const Collapse = ({
       ref={(element) => {
         mut_state.body = element;
       }}
-      aria-hidden={inlineMap(phase$, (phase) =>
-        phase === 'closed' ? 'true' : 'false',
+      aria-hidden={phase$.pipe(
+        map((phase) => (phase === 'closed' ? 'true' : 'false')),
       )}
       class={constant('bp6-collapse-body')}
       style={{
@@ -177,8 +176,8 @@ export const Collapse = ({
             ? `translateY(-${bodyHeight.toString()}px)`
             : 'translateY(0)',
         ),
-        transition: inlineMap(phase$, (phase) =>
-          phase === 'open' ? 'none' : undefined,
+        transition: phase$.pipe(
+          map((phase) => (phase === 'open' ? 'none' : undefined)),
         ),
       }}
     >
@@ -197,11 +196,11 @@ export const Collapse = ({
         height: deriveBindable([phase$, height$], (phase, height) =>
           phase === 'closed' ? undefined : phase === 'open' ? 'auto' : height,
         ),
-        'overflow-y': inlineMap(phase$, (phase) =>
-          phase === 'open' ? 'visible' : undefined,
+        'overflow-y': phase$.pipe(
+          map((phase) => (phase === 'open' ? 'visible' : undefined)),
         ),
-        transition: inlineMap(phase$, (phase) =>
-          phase === 'open' ? 'none' : undefined,
+        transition: phase$.pipe(
+          map((phase) => (phase === 'open' ? 'none' : undefined)),
         ),
       }}
     >

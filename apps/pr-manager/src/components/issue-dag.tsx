@@ -4,7 +4,6 @@ import {
   deriveBindable,
   For,
   If,
-  inlineMap,
   MatchOptional,
   type JSX,
 } from 'synstate-dom';
@@ -93,9 +92,8 @@ const Dag = (): JSX.Element => {
           height={deriveBindable([layout$, scale$], (layout, scale) =>
             Math.floor(layout.height * scale),
           )}
-          viewBox={inlineMap(
-            layout$,
-            ({ width, height }) => `0 0 ${width} ${height}`,
+          viewBox={layout$.pipe(
+            map(({ width, height }) => `0 0 ${width} ${height}`),
           )}
           width={deriveBindable([layout$, scale$], (layout, scale) =>
             Math.floor(layout.width * scale),
@@ -126,8 +124,8 @@ const Dag = (): JSX.Element => {
               {(edge$) => (
                 <path
                   class={constant('issue-dag-edge')}
-                  d={inlineMap(edge$, ({ path }) => path)}
-                  data-kind={inlineMap(edge$, ({ kind }) => kind)}
+                  d={edge$.pipe(map(({ path }) => path))}
+                  data-kind={edge$.pipe(map(({ kind }) => kind))}
                   // The kind is in the key, so it is the one the row was made
                   // with.
                   marker-end={
@@ -149,8 +147,8 @@ const Dag = (): JSX.Element => {
             some={(at$) => (
               <text
                 class={constant('issue-dag-group-label')}
-                x={inlineMap(at$, ({ x }) => x)}
-                y={inlineMap(at$, ({ y }) => y)}
+                x={at$.pipe(map(({ x }) => x))}
+                y={at$.pipe(map(({ y }) => y))}
               >
                 {constant('No dependencies drawn either way')}
               </text>

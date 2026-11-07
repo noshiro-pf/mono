@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, If, inlineMap, MatchOptional, type JSX } from 'synstate-dom';
+import { constant, If, MatchOptional, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 import type { RelaxedExclude } from 'ts-type-forge';
 import { m } from '../i18n/index.mjs';
@@ -63,8 +63,8 @@ const GroupForm = ({
   >
     <div class={constant('bp6-dialog-header')}>
       <h2 class={constant('bp6-heading')} id={constant(TITLE_ID)}>
-        {inlineMap(editor, ({ isNew }) =>
-          isNew ? m.groups.newGroup : m.nodeKinds.group,
+        {editor.pipe(
+          map(({ isNew }) => (isNew ? m.groups.newGroup : m.nodeKinds.group)),
         )}
       </h2>
       <button
@@ -84,7 +84,7 @@ const GroupForm = ({
             class={constant('bp6-callout bp6-intent-danger')}
             role={constant('alert')}
           >
-            {inlineMap(editor, ({ error }) => error ?? '')}
+            {editor.pipe(map(({ error }) => error ?? ''))}
           </p>
         }
       />
@@ -95,7 +95,7 @@ const GroupForm = ({
           data-e2e={constant('group-title-input')}
           required={constant(true)}
           type={constant('text')}
-          value={inlineMap(editor, ({ title }) => title)}
+          value={editor.pipe(map(({ title }) => title))}
           onInput={(input) => {
             groupEditorStore.setTitle(input.currentTarget.value);
           }}

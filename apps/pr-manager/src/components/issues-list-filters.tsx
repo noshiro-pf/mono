@@ -1,5 +1,5 @@
 import { type InitializedObservable, map } from 'synstate';
-import { constant, For, If, inlineMap, type JSX } from 'synstate-dom';
+import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import {
   ISSUE_START_SWITCHES,
@@ -48,8 +48,8 @@ export const IssuesListFilters = (): JSX.Element => {
           class={constant('theme-switch')}
         >
           <button
-            aria-pressed={inlineMap(view$, ({ sort }) =>
-              (sort === 'updated').toString(),
+            aria-pressed={view$.pipe(
+              map(({ sort }) => (sort === 'updated').toString()),
             )}
             class={constant('theme-switch-option')}
             title={constant('The most recently updated first.')}
@@ -59,8 +59,8 @@ export const IssuesListFilters = (): JSX.Element => {
             {constant('updated')}
           </button>
           <button
-            aria-pressed={inlineMap(view$, ({ sort }) =>
-              (sort === 'priority').toString(),
+            aria-pressed={view$.pipe(
+              map(({ sort }) => (sort === 'priority').toString()),
             )}
             class={constant('theme-switch-option')}
             title={constant(
@@ -72,8 +72,8 @@ export const IssuesListFilters = (): JSX.Element => {
             {constant('priority')}
           </button>
           <button
-            aria-pressed={inlineMap(view$, ({ sort }) =>
-              (sort === 'start').toString(),
+            aria-pressed={view$.pipe(
+              map(({ sort }) => (sort === 'start').toString()),
             )}
             class={constant('theme-switch-option')}
             title={constant(
@@ -93,8 +93,10 @@ export const IssuesListFilters = (): JSX.Element => {
           <span class={constant('filter-group-name')}>{constant('start')}</span>
           {ISSUE_START_SWITCHES.map((start) => (
             <button
-              aria-pressed={inlineMap(view$, ({ hiddenStarts }) =>
-                (!hiddenStarts.includes(start)).toString(),
+              aria-pressed={view$.pipe(
+                map(({ hiddenStarts }) =>
+                  (!hiddenStarts.includes(start)).toString(),
+                ),
               )}
               class={constant('filter-chip')}
               title={constant(
@@ -107,7 +109,7 @@ export const IssuesListFilters = (): JSX.Element => {
             >
               {constant(stateLabels[start])}
               <span class={constant('filter-chip-count')}>
-                {inlineMap(counts$, ({ starts }) => starts[start].shown)}
+                {counts$.pipe(map(({ starts }) => starts[start].shown))}
                 <OfTotal
                   count={counts$.pipe(map(({ starts }) => starts[start]))}
                 />
@@ -155,12 +157,14 @@ const LabelPick = ({
 
   return (
     <button
-      aria-pressed={inlineMap(label$, ({ picked }) => picked.toString())}
+      aria-pressed={label$.pipe(map(({ picked }) => picked.toString()))}
       class={constant('filter-chip label-pick')}
-      title={inlineMap(label$, ({ picked }) =>
-        picked
-          ? `Picked. Click to stop showing only the issues labelled ${labelName}.`
-          : `Click to show only the issues labelled ${labelName}, and any others picked.`,
+      title={label$.pipe(
+        map(({ picked }) =>
+          picked
+            ? `Picked. Click to stop showing only the issues labelled ${labelName}.`
+            : `Click to show only the issues labelled ${labelName}, and any others picked.`,
+        ),
       )}
       type={constant('button')}
       onClick={() => {
@@ -174,8 +178,12 @@ const LabelPick = ({
             aria-hidden={constant('true')}
             class={constant('label-pick-dot')}
             style={{
-              'background-color': inlineMap(label$, ({ color }) =>
-                color === undefined ? undefined : chipColors(color).background,
+              'background-color': label$.pipe(
+                map(({ color }) =>
+                  color === undefined
+                    ? undefined
+                    : chipColors(color).background,
+                ),
               ),
             }}
           />
@@ -183,7 +191,7 @@ const LabelPick = ({
       />
       {constant(labelName)}
       <span class={constant('filter-chip-count')}>
-        {inlineMap(label$, ({ count }) => count.shown)}
+        {label$.pipe(map(({ count }) => count.shown))}
         <OfTotal count={label$.pipe(map(({ count }) => count))} />
       </span>
     </button>
