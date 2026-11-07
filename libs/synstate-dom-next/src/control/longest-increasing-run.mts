@@ -77,5 +77,27 @@ if (import.meta.vitest !== undefined) {
     test('an empty list', () => {
       assert.strictEqual(longestIncreasingRun([]).size, 0);
     });
+
+    // synstate-dom's `longest-increasing-subsequence` cases.
+    test.each([
+      { values: [0, 1, 2], length: 3 },
+      { values: [2, 1, 0], length: 1 },
+      { values: [1, 2, 0], length: 2 },
+      { values: [3, 0, 1, 2], length: 3 },
+      { values: [0, 8, 4, 12, 2, 10, 6, 14, 1, 9], length: 4 },
+    ])('$values', ({ values, length }) => {
+      const picked = Array.from(longestIncreasingRun(values)).toSorted(
+        (a, b) => a - b,
+      );
+
+      assert.strictEqual(picked.length, length);
+
+      assert.isTrue(
+        picked.every(
+          (index, k) =>
+            k === 0 || (values[index] ?? 0) > (values[picked[k - 1] ?? 0] ?? 0),
+        ),
+      );
+    });
   });
 }

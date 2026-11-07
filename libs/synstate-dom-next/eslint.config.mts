@@ -97,6 +97,23 @@ export default [
     }),
   },
 
+  {
+    files: ['test/**'],
+    rules: defineKnownRules({
+      // A published entry point, which a test that makes an element of a tag
+      // known only at run time calls.
+      'import-x/no-internal-modules': [
+        'error',
+        {
+          allow: [
+            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+            'synstate-dom-next/jsx-runtime',
+          ],
+        },
+      ],
+    }),
+  },
+
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {
     files: ['scripts/**', 'configs/**'],

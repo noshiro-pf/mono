@@ -48,10 +48,22 @@ The data slots keep synstate-dom's rule: they take a `Bindable` (an
   synstate-dom makes them HTML wherever they are. Their props are still typed as
   HTML's, a `ref` included, since a JSX element's type cannot depend on where it
   stands.
+- A switch (`If`, `MatchOptional`, `MatchResult`) bound to an observable is
+  marked by a comment at each end, where synstate-dom puts one after it. One
+  given a constant mounts its branch with no comment.
+- A `For` row's or a branch's cleanup that throws stops neither the update nor
+  the other disposals: the rows and branches are replaced, and the exception is
+  thrown once they are in place. A row that throws while mounting takes out the
+  rows its update made and keeps the others; a branch that throws leaves its
+  switch empty until the next value. A binding that throws does not stop the
+  other bindings of its update either (synstate-next's DESIGN.md,
+  "Propagation").
 - A controlled `checked` or `indeterminate` is restored in the next animation
   frame or a task after the `change`, whichever comes first, so it is restored
   in a hidden page too.
 
-## Not yet built
+## Tests
 
-The port of synstate-dom's tests. It lands in a pull request of the rebuild.
+synstate-dom's tests are ported under `test/ported/` and `test/browser/ported/`;
+[test/ported/README.md](test/ported/README.md) lists each file and where it
+went.
