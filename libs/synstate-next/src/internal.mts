@@ -4,6 +4,7 @@
 export {
   EffectClass,
   ObservableClass,
+  disposeAll,
   noValue,
   toNode,
   view,

@@ -7,11 +7,26 @@ import {
   type Operator,
 } from '../core/index.mjs';
 
-/** Passes on the values that satisfy `predicate`. */
-export const filter =
-  <A,>(predicate: (value: A) => boolean): Operator<A, A, 'drop'> =>
-  (source) =>
-    view(new FilterClass(toNode(source), predicate));
+/**
+ * Passes on the values that satisfy `predicate`. A type guard narrows the
+ * values passed on.
+ */
+export function filter<A, B extends A>(
+  predicate: (value: A) => value is B,
+): Operator<A, B, 'drop'>;
+
+// A type guard and a boolean predicate are the same function at run time, so
+// the first signature only narrows the result. One signature with a union
+// parameter would infer `unknown` for a generic guard such as `isNotUndefined`.
+export function filter<A>(
+  predicate: (value: A) => boolean,
+): Operator<A, A, 'drop'>;
+
+export function filter<A>(
+  predicate: (value: A) => boolean,
+): Operator<A, A, 'drop'> {
+  return (source) => view(new FilterClass(toNode(source), predicate));
+}
 
 class FilterClass<A> extends DerivedClass<A> {
   readonly #parent: ObservableClass<A>;

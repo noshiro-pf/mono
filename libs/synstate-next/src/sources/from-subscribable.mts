@@ -19,8 +19,8 @@ export type Subscribable<A> = Readonly<{
 /**
  * Follows `subscribable`, emitting each of its values as `Result.ok(value)` and
  * an error as `Result.err(error)`. It settles on the error or on completion,
- * and unsubscribes when disposed. A value given while it subscribes is held
- * from the start rather than emitted.
+ * and unsubscribes when disposed, unless the subscribable ended first. A value
+ * given while it subscribes is held from the start rather than emitted.
  */
 export const fromSubscribable = <A, E = unknown>(
   subscribable: Subscribable<A>,
@@ -56,6 +56,11 @@ class FromSubscribableClass<A, E> extends AsyncSourceClass<Result<A, E>> {
 
     this.#subscribing = false;
 
+    if (this.done) {
+      // Ended while it was subscribed: there is nothing to unsubscribe from.
+      return;
+    }
+
     if (this.disposed) {
       subscription.unsubscribe();
     } else {
@@ -80,8 +85,13 @@ class FromSubscribableClass<A, E> extends AsyncSourceClass<Result<A, E>> {
   }
 
   protected override teardown(): void {
-    this.#mut_subscription?.unsubscribe();
+    const subscription = this.#mut_subscription;
 
     this.#mut_subscription = undefined;
+
+    // A subscribable that ended has let its observer go already.
+    if (!this.done) {
+      subscription?.unsubscribe();
+    }
   }
 }

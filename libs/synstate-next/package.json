@@ -65,6 +65,7 @@
   },
   "devDependencies": {
     "@vitest/browser-playwright": "catalog:",
+    "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",

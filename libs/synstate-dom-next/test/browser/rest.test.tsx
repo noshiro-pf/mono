@@ -602,3 +602,72 @@ describe(createAfterUpdate, () => {
     assert.deepStrictEqual(mut_ran, ['first']);
   });
 });
+
+describe('a cleanup that throws', () => {
+  test('unmounting still removes what render mounted, and throws the exception', () => {
+    const container = document.createElement('div');
+
+    document.body.append(container);
+
+    onTestFinished(() => {
+      container.remove();
+    });
+
+    const unmount = render(() => {
+      onCleanup(() => {
+        throw new RangeError('cleanup');
+      });
+
+      return <p>{constant('x')}</p>;
+    }, container);
+
+    assert.throws(unmount, RangeError);
+
+    assert.strictEqual(container.childNodes.length, 0);
+  });
+
+  test('For: emptying the list disposes every row, one cleanup throwing or not', () => {
+    const items = state<readonly number[]>([0, 1, 2]);
+
+    const mut_disposed: number[] = [];
+
+    const [container, unmount] = mount(() => (
+      <div>
+        <For
+          items={items}
+          key={(n) => n}
+          children={(item) => {
+            const n = item.value;
+
+            onCleanup(() => {
+              mut_disposed.push(n);
+
+              if (n === 2) {
+                throw new RangeError('cleanup');
+              }
+            });
+
+            return <p>{constant(n.toString())}</p>;
+          }}
+        />
+      </div>
+    ));
+
+    assert.throws(() => {
+      items.set([]);
+    }, RangeError);
+
+    assert.deepStrictEqual(
+      mut_disposed.toSorted((a, b) => a - b),
+      [0, 1, 2],
+    );
+
+    assert.strictEqual(container.querySelectorAll('p').length, 0);
+
+    items.set([3]);
+
+    assert.strictEqual(container.querySelectorAll('p').length, 1);
+
+    unmount();
+  });
+});
