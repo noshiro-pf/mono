@@ -34,6 +34,7 @@
     "README.md"
   ],
   "scripts": {
+    "benchmark": "node ./scripts/cmd/benchmark.mts",
     "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
     "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
@@ -74,6 +75,7 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
+    "synstate": "workspace:*",
     "ts-repo-utils": "workspace:*",
     "vitest": "catalog:"
   },

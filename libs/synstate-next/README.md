@@ -42,3 +42,13 @@ synstate や synstate-dom に入れたバグ修正・セキュリティ修正・
   outside the package.
 - `synstate-next/internal`: the node and effect classes, for synstate-dom-next
   only.
+
+## Benchmark
+
+`pnpm run benchmark` compares synstate-next with synstate on the graphs a state
+library spends its time in and writes [BENCHMARK.md](BENCHMARK.md); both are
+imported from `dist/`, so `pnpm run ws:build` comes first, and `pnpm run fmt`
+aligns its tables before it is committed. The comparison of synstate-dom-next
+with synstate-dom is `apps/synstate-dom-benchmark`'s `pnpm run benchmark:next`,
+written to its
+[RESULTS-NEXT.md](../../apps/synstate-dom-benchmark/RESULTS-NEXT.md).

@@ -1,9 +1,12 @@
 import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
+import { benchmarkSetOf, benchmarkSets } from '../scripts/benchmark-sets.mjs';
 import { createProductionConfig } from '../scripts/production-config.mjs';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 
 const productionConfig = createProductionConfig();
+
+const set = benchmarkSetOf(process.env['BENCHMARK_SET']);
 
 /**
  * Runs `src/run.bench-browser.mts` in Chromium. Not a test suite: nothing here
@@ -20,6 +23,12 @@ export default defineConfig({
     'process.env.BENCHMARK_ROTATE': JSON.stringify(
       process.env['BENCHMARK_ROTATE'] ?? '0',
     ),
+    // Which libraries the run measures (see `scripts/benchmark-sets.mts`), and
+    // where and under which title it writes their results.
+    'process.env.BENCHMARK_SET': JSON.stringify(set),
+    'process.env.BENCHMARK_RESULTS': JSON.stringify(benchmarkSets[set].results),
+    'process.env.BENCHMARK_TITLE': JSON.stringify(benchmarkSets[set].title),
+    'process.env.BENCHMARK_SCRIPT': JSON.stringify(benchmarkSets[set].script),
   },
   optimizeDeps: {
     // Named up front so that Vite does not discover them mid-run and reload the
