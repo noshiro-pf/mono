@@ -212,12 +212,12 @@ to be the diff the checks then run against. On a `push` or
   uses: ./.github/actions/setup
 ```
 
-Every job that runs repository code starts with these two steps. The second
-is the composite action `.github/actions/setup/action.yml`:
+Every job that runs repository code starts with these two steps. The second is
+the composite action `.github/actions/setup/action.yml`:
 `pnpm/action-setup`, `actions/setup-node` with
-`node-version-file: 'package.json'` and `cache: 'pnpm'`, and
-`pnpm install --frozen-lockfile`. It is the one place those action pins are
-written, rather than every job that takes the steps.
+`node-version-file: 'package.json'` and `cache: 'pnpm'` (unless the caller
+passes `cache: false`), and `pnpm install --frozen-lockfile`. It is the one
+place those action pins are written, rather than every job that takes the steps.
 
 - **The Node version is `volta.node`**, which `check:root:node-support` holds
   equal to `targets.current` in `tools/configs/node-support.json`. The two
@@ -227,12 +227,12 @@ written, rather than every job that takes the steps.
   workflow.
 - **The inputs are the callers' real differences, and each caller says why**:
   `engine-strict` in `node-version-compatibility.yml` and deliberately not in
-  `node-support-update.yml`'s canary, `ignore-scripts` in `release.yml`'s
-  publishing job, `install: false` in `pnpm-update.yml`, which changes pnpm
-  before it installs anything, and in `deploy-firestore.yml`'s deploy job,
-  `deploy-event-schedule-app.yml`'s deploy job and `e2e-production.yml`, which
-  install one app rather than the workspace, and `pnpm: false` in
-  `check-gates.yml`, whose diff check runs on Node.js alone.
+  `node-support-update.yml`'s canary, `ignore-scripts` and `cache: false` in
+  `release.yml`'s publishing job, `install: false` in `pnpm-update.yml`, which
+  changes pnpm before it installs anything, and in `deploy-firestore.yml`'s
+  deploy job, `deploy-event-schedule-app.yml`'s deploy job and
+  `e2e-production.yml`, which install one app rather than the workspace, and
+  `pnpm: false` in `check-gates.yml`, whose diff check runs on Node.js alone.
 - **The checkout stays in the caller.** A local action is read from the
   workspace, so it cannot be resolved before something has checked it out.
 - **A composite action is a file in the tree**, read when its step starts
@@ -251,8 +251,9 @@ written, rather than every job that takes the steps.
   which steps may move there, and on which Node it has to run.
 - **The install reuses pnpm's lockfile verification.** pnpm verifies the
   lockfile against the supply-chain policies of `pnpm-workspace.yaml` and
-  records the result on the machine; the action caches that record, keyed on the
-  pnpm version, the lockfile and `pnpm-workspace.yaml`. A job skips the
+  records the result on the machine; the action caches that record (unless the
+  caller passes `cache: false`, which skips it and the warning below), keyed on
+  the pnpm version, the lockfile and `pnpm-workspace.yaml`. A job skips the
   verification only when a job that finished before it started saved the record
   under that key; jobs that start together, such as the matrix entries of the
   check workflows, each verify. `gates` installs nothing (`pnpm: false`). A
@@ -784,6 +785,13 @@ of them:
 - **`git config core.hooksPath /dev/null` before committing on a runner.** An
   install script can leave a `.git/hooks/pre-commit` behind, and `git commit`
   would run it with the token already in the step's environment.
+
+The Actions cache is shared by every workflow on a branch, and a key is saved by
+whichever job misses it first, which is usually one that has just run the
+dependency tree. What a job restores from it is that job's output, crossing the
+job boundary as files rather than as an artifact the receiving job only unpacks.
+So `release.yml`'s publishing job, which installs the packages it then runs with
+`id-token: write`, sets up with `cache: false`.
 
 ### The job split
 

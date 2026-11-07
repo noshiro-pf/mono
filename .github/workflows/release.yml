@@ -171,9 +171,14 @@ jobs:
       #
       # ここにステップを足すときは、install script が走っていることを前提に
       # しないこと。前提にしなければならないものは `build` job の側にある。
+      #
+      # `cache: false` の理由は README.md の "Jobs that hold a key" の、
+      # キャッシュの段落。この job での代償は、root の install が入れる
+      # ワークスペース全体の依存を毎回 registry から取り直すこと。
       - name: Set up pnpm, Node.js and the dependencies
         uses: ./.github/actions/setup
         with:
+          cache: false
           ignore-scripts: true
 
       # `build` job が出したもの。この job はビルドしない — それがこの分割の

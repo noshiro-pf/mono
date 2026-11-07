@@ -138,6 +138,14 @@ export const installArgs = (
     return install;
   }
 
+  // Checked here with the others, so that a misspelt one fails the step
+  // whatever `install` says; `runInstall` reads its value.
+  const cache = readBoolean(env, 'cache');
+
+  if (!cache.ok) {
+    return cache;
+  }
+
   const engineStrict = readBoolean(env, 'engine-strict');
 
   if (!engineStrict.ok) {
@@ -646,9 +654,13 @@ const runInstall = (env: Env): void => {
     return;
   }
 
+  // The record path matters only to the cache of it, which `cache: false`
+  // leaves out.
+  const cache = orExit(readBoolean(env, 'cache'));
+
   const record = env['LOCKFILE_RECORD'] ?? '';
 
-  if (record === '') {
+  if (cache && record === '') {
     exitWithError('LOCKFILE_RECORD is not set.');
   }
 
@@ -658,8 +670,11 @@ const runInstall = (env: Env): void => {
 
   // The record is what lets the jobs after the first skip pnpm's lockfile
   // verification. Missing, the cache step saves nothing, and only this says so.
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  if (!fs.existsSync(record)) {
+  if (
+    cache &&
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    !fs.existsSync(record)
+  ) {
     console.log(
       `::warning::pnpm left no lockfile verification record at ${record}, so the setup action's cache of it saves nothing and every job verifies the lockfile again. Point the "Locate pnpm's lockfile verification record" step of .github/actions/setup/action.yml at the file this pnpm writes.`,
     );

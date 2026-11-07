@@ -97,6 +97,7 @@ const inputs = (
   ({
     PNPM: 'true',
     INSTALL: 'true',
+    CACHE: 'true',
     ENGINE_STRICT: 'false',
     IGNORE_SCRIPTS: 'false',
     ...overrides,
@@ -132,6 +133,18 @@ describe('install', () => {
     });
   });
 
+  test('`cache: false` installs the same way', () => {
+    // What it changes is which steps of the action run before this one; the
+    // install itself is the lockfile as it is either way.
+    assert.deepStrictEqual(
+      installArgs(inputs({ CACHE: 'false', IGNORE_SCRIPTS: 'true' })),
+      {
+        ok: true,
+        value: ['install', '--frozen-lockfile', '--ignore-scripts'],
+      },
+    );
+  });
+
   test('every input is read, whichever of them is misspelt', () => {
     assert.deepStrictEqual(installArgs(inputs({ INSTALL: 'flase' })), {
       ok: false,
@@ -147,6 +160,16 @@ describe('install', () => {
       ok: false,
       message: 'Input pnpm is "no"; expected one of true, false.',
     });
+
+    // The action restores the caches only for exactly `true`, so a misspelt
+    // `false` already restored nothing; this is what says it was misspelt.
+    assert.deepStrictEqual(
+      installArgs(inputs({ CACHE: 'flase', INSTALL: 'false' })),
+      {
+        ok: false,
+        message: 'Input cache is "flase"; expected one of true, false.',
+      },
+    );
   });
 
   test('`pnpm: false` installs nothing, and refuses an install it cannot run', () => {
@@ -667,6 +690,7 @@ describe('the script, run the way the workflows run it', () => {
     const result = await run(['install'], {
       PNPM: 'true',
       INSTALL: 'true',
+      CACHE: 'true',
       ENGINE_STRICT: 'true',
       IGNORE_SCRIPTS: 'false',
       LOCKFILE_RECORD: makeRecord(),
@@ -692,6 +716,7 @@ describe('the script, run the way the workflows run it', () => {
     const result = await run(['install'], {
       PNPM: 'true',
       INSTALL: 'true',
+      CACHE: 'true',
       ENGINE_STRICT: 'false',
       IGNORE_SCRIPTS: 'false',
       LOCKFILE_RECORD: record,
@@ -708,6 +733,39 @@ describe('the script, run the way the workflows run it', () => {
     });
   });
 
+  test('`install` with `cache: false` has no cache of the record to warn about', async () => {
+    const record = path.join(
+      fs.mkdtempSync(path.join(os.tmpdir(), 'workflow-steps-record-')),
+      'lockfile-verified.jsonl',
+    );
+
+    const result = await run(['install'], {
+      PNPM: 'true',
+      INSTALL: 'true',
+      CACHE: 'false',
+      ENGINE_STRICT: 'false',
+      IGNORE_SCRIPTS: 'true',
+      LOCKFILE_RECORD: record,
+    });
+
+    // Nor does it need the record's path, which only the cache step reads.
+    const unset = await run(['install'], {
+      PNPM: 'true',
+      INSTALL: 'true',
+      CACHE: 'false',
+      ENGINE_STRICT: 'false',
+      IGNORE_SCRIPTS: 'true',
+    });
+
+    assert.deepStrictEqual(unset, result);
+
+    assert.deepStrictEqual(result, {
+      code: 0,
+      stdout:
+        'pnpm install --frozen-lockfile --ignore-scripts\nfake pnpm: install --frozen-lockfile --ignore-scripts\n',
+    });
+  });
+
   test('`install` without a record path stops before installing', async () => {
     // Empty is what a skipped step's output reads as.
     const unset: readonly ReadonlyRecord<string, string>[] = [
@@ -720,6 +778,7 @@ describe('the script, run the way the workflows run it', () => {
         run(['install'], {
           PNPM: 'true',
           INSTALL: 'true',
+          CACHE: 'true',
           ENGINE_STRICT: 'false',
           IGNORE_SCRIPTS: 'false',
           ...record,
@@ -739,6 +798,7 @@ describe('the script, run the way the workflows run it', () => {
     const result = await run(['install'], {
       PNPM: 'true',
       INSTALL: 'true',
+      CACHE: 'true',
       ENGINE_STRICT: 'ture',
       IGNORE_SCRIPTS: 'false',
     });
