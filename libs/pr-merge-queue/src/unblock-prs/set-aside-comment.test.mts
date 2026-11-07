@@ -27,7 +27,7 @@ describe(setAsideCommentBody, () => {
 
     assert.include(
       body,
-      'It stays aside until the branch is pushed again or `main` moves.',
+      'It stays aside until the branch is pushed again, or until `main` moves and it no longer conflicts.',
     );
 
     assert.notInclude(body, '<details>');

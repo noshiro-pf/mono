@@ -17,8 +17,9 @@
  * The set-aside comment is the hand-off: it stands until the worker rewrites it
  * as resolved — when the head moves, when a retry is asked for, or, for a
  * reason tied to the base, when the base moves and the worker takes the pull
- * request back to try again. Until then it is the skill's or a person's, and a
- * worker that has stopped running leaves it so rather than nobody's.
+ * request back to try again, which for a conflict it does only once the
+ * conflict is gone. Until then it is the skill's or a person's, and a worker
+ * that has stopped running leaves it so rather than nobody's.
  *
  * **Every reason the worker sets aside for has an owner**
  * ({@link setAsideOwner}, exhaustive over {@link SET_ASIDE_REASONS}), so `none`

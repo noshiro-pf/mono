@@ -86,6 +86,22 @@ export const writeSetAsideComment = (
     `- [ ] ${RETRY_LABEL} tick this box and the next survey tries this pull request again.`,
   ].join('\n');
 
+/**
+ * A standing comment `body` with `baseSha` as the base it records, and every
+ * other line, the retry box included, as it was; anything else as it is.
+ */
+export const moveSetAsideBase = (body: string, baseSha: string): string => {
+  const end = body.indexOf('\n');
+
+  const first = end === -1 ? body : body.slice(0, end);
+
+  const groups = STANDING_LINE.exec(first.trim())?.groups;
+
+  return groups === undefined
+    ? body
+    : `${MARKER} reason=${groups['reason'] ?? ''} head=${groups['headSha'] ?? ''} base=${baseSha} -->${end === -1 ? '' : body.slice(end)}`;
+};
+
 /** The record line saying it is over, and `prose`, one line saying why. */
 export const writeResolvedComment = (prose: string): string =>
   [`${MARKER} resolved -->`, '', prose.trim()].join('\n');
@@ -149,7 +165,8 @@ export const setAsideApplies = (
  *
  * Every reason clears when the base moves, because a moved base is the one
  * thing the script knows how to act on — a rebase that conflicted may not any
- * more — except two whose head a rebase would only put through the same matrix
+ * more; when it still does, the script keeps the set-aside by moving the base
+ * the comment records ({@link moveSetAsideBase}) — except two whose head a rebase would only put through the same matrix
  * again: `checks-failed`, which the push that carries the fix clears, and
  * `awaiting-bypass`, green and waiting for a ruleset bypass merge, which does
  * not wait for the base. Nor does `head-out-of-sync`: GitHub not having taken

@@ -89,8 +89,8 @@ export type Candidate = Readonly<{
    * The pull request, its head and the reason it was set aside, as one string:
    * a round that leaves it unfixed leaves all three as they were, and a push or
    * a new reason changes one. Not the base the set-aside was written at: the
-   * worker writes a `rebase-failed` one again each time the default branch
-   * moves and the rebase still conflicts, and that is the same conflict, not a
+   * worker moves the base a `rebase-failed` one records each time the default
+   * branch moves and it still conflicts, and that is the same conflict, not a
    * new one to pay for.
    */
   key: string;

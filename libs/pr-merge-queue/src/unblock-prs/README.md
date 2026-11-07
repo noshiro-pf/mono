@@ -307,8 +307,8 @@ GraphQL 1回でまとめて読み、記録と突き合わせます（`skips.mts`
 `settleSkips`）。
 
 - comment が見送った head から branch が動いた、または見送った base から
-  `main` が動いた（`checks-failed` と `awaiting-bypass` を除く）なら、comment
-  を1行の「解消済み」に書き換えます。
+  `main` が動いた（`checks-failed` と `awaiting-bypass`、衝突がまだある
+  `rebase-failed` を除く）なら、comment を1行の「解消済み」に書き換えます。
 - 「再試行」のチェックボックスに人がチェックを入れていたら、comment を
   「解消済み」に書き換え、その PR の見送りの記録を捨てます。今回の triage は
   見送られていなかったものとしてその PR を扱います。また失敗すれば、また
@@ -709,24 +709,29 @@ matrix が作るどのチェックも受け持たないと `check:root:auto-fix-
 
 判定は **その head かつその base のまま** の間だけ有効です。
 
-| 記録される理由                    | push で解除 | `main` の移動で解除 |
-| :-------------------------------- | :---------: | :-----------------: |
-| `rebase-failed`（実際に衝突した） |      ✓      |          ✓          |
-| `push-failed`                     |      ✓      |          ✓          |
-| `read-failed`                     |      ✓      |          ✓          |
-| `unlabel-failed`                  |      ✓      |          ✓          |
-| `arm-failed`                      |      ✓      |          ✓          |
-| `already-in-base`                 |      ✓      |          ✓          |
-| `not-merging`                     |      ✓      |          ✓          |
-| `watch-timeout`                   |      ✓      |          ✓          |
-| `checks-not-started`              |      ✓      |          ✓          |
-| `checks-failed`                   |      ✓      |   **✗（意図的）**   |
-| `awaiting-bypass`                 |      ✓      |   **✗（意図的）**   |
-| `head-out-of-sync`                |      ✓      |   **✗（意図的）**   |
+| 記録される理由                    | push で解除 | `main` の移動で解除  |
+| :-------------------------------- | :---------: | :------------------: |
+| `rebase-failed`（実際に衝突した） |      ✓      | 衝突が消えたときだけ |
+| `push-failed`                     |      ✓      |          ✓           |
+| `read-failed`                     |      ✓      |          ✓           |
+| `unlabel-failed`                  |      ✓      |          ✓           |
+| `arm-failed`                      |      ✓      |          ✓           |
+| `already-in-base`                 |      ✓      |          ✓           |
+| `not-merging`                     |      ✓      |          ✓           |
+| `watch-timeout`                   |      ✓      |          ✓           |
+| `checks-not-started`              |      ✓      |          ✓           |
+| `checks-failed`                   |      ✓      |   **✗（意図的）**    |
+| `awaiting-bypass`                 |      ✓      |   **✗（意図的）**    |
+| `head-out-of-sync`                |      ✓      |   **✗（意図的）**    |
 
-衝突の判定がキャッシュされないのはこのためです。衝突していた相手のコミットが
-base の移動と一緒に消えたかもしれないので、`main` が動けば記録は捨てられ、次の
-サイクルで再試行されます。`checks-failed` は base に紐付いていません —
+`rebase-failed` は、`main` が動くたびに衝突がまだあるかを確かめます（`conflict-persists.mts`）。
+衝突していた相手のコミットが base の移動と一緒に消えたかもしれないからです。
+worktree を使わず `git merge-tree` で rebase と同じようにブランチのコミットを順に
+載せ直し、衝突が残っていれば見送りを保ち、comment が記録する base だけを更新します。
+担当は `skill` のままなので claim できます。衝突が消えた（または衝突が再生成できる
+ファイルだけになった）ときに記録は捨てられ、次のサイクルで再試行されます。確かめ
+られなかったときも同じです。数えるのはその PR 自身のコミットだけです。上に積まれた
+層は動いたときに一緒に運ばれ、運べなくても見送りにはなりません。`checks-failed` は base に紐付いていません —
 rebase しても同じマトリクスが同じように落ちるだけで、直すのは人間の仕事だから
 です。`awaiting-bypass` も同じく base に紐付けません。待っている bypass merge
 は base の移動を待たないので、他の PR がマージされるたびに rebase してマトリク
@@ -812,8 +817,9 @@ auto-merge、draft、本文）、レビュー待ちの理由、`main` の tip �
   このスクリプトがするのは rebase だからです（`DIRTY` を信用しない理由と同じ）。
 - **解けたら1行の「解消済み」に書き換えます。** head か base が動いた（
   `checks-failed` と `awaiting-bypass` は head だけ — `skips.mts` と同じ規則を
-  `pr-report-core` の `setAsideApplies` で共有しています）、または再試行を頼ま
-  れたときです。消さないのは、timeline で経緯を追えるようにするためです。ペー
+  `pr-report-core` の `setAsideApplies` で共有しています。衝突が残る
+  `rebase-failed` は、comment が記録する base を動かして保ちます）、または再試行
+  を頼まれたときです。消さないのは、timeline で経緯を追えるようにするためです。ペー
   ジは、head が動いた comment は表示せず、base が動いたものは灰色の古い記録と
   して表示します。
 - マージは止めません。
@@ -873,7 +879,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 
 - **読むのは comment と PR だけで、base の先端は読みません。** 見送りの
   comment が受け渡しの印です。このスクリプトが「解消済み」に書き換える（head
-  が動いた、再試行を頼まれた、base に紐付く理由で `main` が動いた）までは
+  が動いた、再試行を頼まれた、base に紐付く理由で `main` が動いて衝突も消えた）までは
   skill か人の担当です。このスクリプトが止まっていても、担当者が誰でもなくなる
   ことはありません。
 - 見送りの理由ごとの担当者は `setAsideOwner` が網羅します。理由の一覧
@@ -1260,8 +1266,8 @@ request shows") in one GraphQL request, and settle the records with them
 (`settleSkips` in `skips.mts`):
 
 - A comment set aside at a head the branch has moved from, or against a base
-  `main` has moved from (except `checks-failed` and `awaiting-bypass`), is
-  rewritten as one resolved line.
+  `main` has moved from (except `checks-failed`, `awaiting-bypass` and a
+  `rebase-failed` that still conflicts), is rewritten as one resolved line.
 - A comment whose "Retry" box a person ticked is rewritten as resolved, and
   that pull request's record is dropped: this cycle's triage treats it as if
   it had never been set aside. One that fails again is set aside again, and
@@ -1699,7 +1705,7 @@ A verdict lasts as long as the state it was reached in.
 
 | Recorded reason                   | Cleared by a push | Cleared when `main` moves |
 | :-------------------------------- | :---------------: | :-----------------------: |
-| `rebase-failed` (a real conflict) |         ✓         |             ✓             |
+| `rebase-failed` (a real conflict) |         ✓         | once the conflict is gone |
 | `push-failed`                     |         ✓         |             ✓             |
 | `read-failed`                     |         ✓         |             ✓             |
 | `unlabel-failed`                  |         ✓         |             ✓             |
@@ -1712,10 +1718,18 @@ A verdict lasts as long as the state it was reached in.
 | `awaiting-bypass`                 |         ✓         |    **✗ (deliberate)**     |
 | `head-out-of-sync`                |         ✓         |    **✗ (deliberate)**     |
 
-So a conflict verdict is never cached across a base that moved: the commit it
-conflicted with may have gone with it. `checks-failed` is the exception —
-rebasing would put the same failing matrix through again, and fixing the failure
-is a person's job, so the push that carries the fix is what clears it.
+A `rebase-failed` is asked again each time `main` moves
+(`conflict-persists.mts`), because the commit it conflicted with may have gone
+with it. With `git merge-tree` and no worktree, the branch's commits are
+replayed as a rebase would; if a conflict remains, the set-aside is kept and
+only the base its comment records is updated, so the owner stays `skill` and a
+claim succeeds.
+It is cleared, and the rebase tried again, once the conflict is gone or only in
+files the worker writes again by itself, and when that cannot be told. Only the
+pull request's own commits count: a layer above is carried along once it moves,
+and one that cannot be is not set aside. `checks-failed` is not tied to the base
+— rebasing would put the same failing matrix through again, and fixing the
+failure is a person's job, so the push that carries the fix is what clears it.
 `awaiting-bypass` is not tied to the base either: the bypass merge it waits for
 does not wait for the base, and rebasing it each time anything else merged would
 run the matrix again for nothing. Its comment's retry box is how a person asks
@@ -1801,12 +1815,13 @@ the terminal the script ran in.
 - **This rather than GitHub's `mergeable`**, because that answers whether a
   merge conflicts and this script rebases — the same reason it does not take
   `DIRTY` at its word.
-- **Once it no longer applies it is rewritten as one resolved line**: the
-  head or the base moved (the head alone for `checks-failed` and
-  `awaiting-bypass`, by the rule `skips.mts` uses too, shared as
-  `setAsideApplies` in `pr-report-core`), or a retry was asked for. It is kept rather than deleted, so the timeline
-  keeps what happened. The page shows nothing for a comment whose head has
-  moved, and a moved base as a grey, older record.
+- **Once it no longer applies it is rewritten as one resolved line**: the head
+  or the base moved (the head alone for `checks-failed` and `awaiting-bypass`,
+  by the rule `skips.mts` uses too, shared as `setAsideApplies` in
+  `pr-report-core`; a `rebase-failed` that still conflicts is kept by moving the
+  base its comment records), or a retry was asked for. It is kept rather than
+  deleted, so the timeline keeps what happened. The page shows nothing for a
+  comment whose head has moved, and a moved base as a grey, older record.
 - It holds no merge.
 - It is written when a pull request is newly set aside, not again on every
   survey that finds the same record standing; not at all under `--dry-run`;
@@ -1872,8 +1887,8 @@ the pull request the other's and nobody moved it (#2267).
 - **It reads the comments and the pull request, never the tip of the base.**
   The set-aside comment is the hand-off: until this script rewrites it as
   resolved — the head moved, a retry was asked for, or `main` moved under a
-  reason tied to the base — the pull request is a skill's or a person's. A
-  stopped script leaves it so, rather than nobody's.
+  reason tied to the base, and a conflict is gone too — the pull request is a
+  skill's or a person's. A stopped script leaves it so, rather than nobody's.
 - `setAsideOwner` gives every reason an owner. The list of reasons
   (`SET_ASIDE_REASONS`) is beside it and this script writes from it, so a
   reason with no owner does not compile. `none` is a reason in a comment that
