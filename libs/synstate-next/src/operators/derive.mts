@@ -1,6 +1,5 @@
 import {
   DerivedClass,
-  currentEpoch,
   noValue,
   toNode,
   view,
@@ -163,10 +162,8 @@ class MergeClass extends DerivedClass<unknown> {
   }
 
   override recompute(): boolean {
-    const epoch = currentEpoch();
-
     for (const parent of this.parents) {
-      if (parent.changedAt === epoch && parent.current !== noValue) {
+      if (this.emittedNow(parent) && parent.current !== noValue) {
         this.current = parent.current;
 
         return true;

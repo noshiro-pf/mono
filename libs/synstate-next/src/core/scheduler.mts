@@ -32,8 +32,17 @@ export type DerivedNode = {
   readonly isEffect: false;
   queuedAt: number;
   readonly disposed: boolean;
+  /**
+   * Whether its parents may forget it: disposed, or detached (a `take` that is
+   * done). The queue skips it and `childGone` compacts it away.
+   */
+  readonly gone: boolean;
   readonly depth: number;
   changedAt: number;
+  /** The `writeCount` at its creation; see `enqueueChildren`. */
+  readonly bornAt: number;
+  /** The `writeCount` at its latest emission; see `enqueueChildren`. */
+  emittedAt: number;
   readonly children: readonly QueuedNode[] | undefined;
   /** Recomputes; returns whether the value changed. */
   recompute: () => boolean;
@@ -44,6 +53,10 @@ export type EffectNode = {
   readonly isEffect: true;
   queuedAt: number;
   readonly disposed: boolean;
+  /** Whether it is disposed; see `DerivedNode.gone`. */
+  readonly gone: boolean;
+  /** The `writeCount` at its creation; see `enqueueChildren`. */
+  readonly bornAt: number;
   run: () => void;
 };
 
@@ -55,6 +68,8 @@ type Phase = 'drain' | 'effects' | 'idle';
 // more than the update itself.
 const mut_state = {
   epoch: 1,
+  /** Counts the emissions; see `enqueueChildren`. */
+  writeCount: 0,
   /** Counts the rounds that took `pending`; see `isPending`. */
   pendingGeneration: 1,
   phase: 'idle' as Phase,
@@ -118,6 +133,12 @@ const sourceLoopMessage =
 /** The current epoch. A node that emitted in this update has it as `changedAt`. */
 export const currentEpoch = (): number => mut_state.epoch;
 
+/**
+ * The number of emissions so far. A node records it when it is created
+ * (`bornAt`), and again whenever it emits (`emittedAt`).
+ */
+export const writeCount = (): number => mut_state.writeCount;
+
 /** Whether the drain is running: a write now has to wait for it to end. */
 export const isDraining = (): boolean => mut_state.phase === 'drain';
 
@@ -144,7 +165,16 @@ export const deferWrite = (write: () => void): void => {
   mut_state.deferredLength += 1;
 };
 
-/** Puts `node`'s children in the queue of the current epoch. */
+/**
+ * Puts `node`'s children in the queue of the current epoch.
+ *
+ * A child created after `node`'s latest emission is skipped: a node sees the
+ * emissions made after it was created, and what came before only as the value
+ * its parent holds, whether the round has propagated yet or not. A `take`, a
+ * `zip` or a subscriber made in the batch that wrote its source would otherwise
+ * count that value twice, and a `merge` or `debounce` made there would see an
+ * emission that one made after the batch does not.
+ */
 export const enqueueChildren = (node: DerivedNode): void => {
   const { children } = node;
 
@@ -154,8 +184,10 @@ export const enqueueChildren = (node: DerivedNode): void => {
 
   const { epoch } = mut_state;
 
+  const emittedAt = node.emittedAt;
+
   for (const child of children) {
-    if (child.queuedAt === epoch || child.disposed) {
+    if (child.queuedAt === epoch || child.gone || child.bornAt >= emittedAt) {
       continue;
     }
 
@@ -186,6 +218,8 @@ export const emit = (node: DerivedNode, hasObserver: boolean): void => {
 
     return;
   }
+
+  stampEmission(node);
 
   if (!mut_state.inQueuedEmission) {
     mut_state.countsRound = true;
@@ -226,6 +260,14 @@ export const batch = <R,>(fn: () => R): R => {
       flush();
     }
   }
+};
+
+/** Numbers an emission of `node`; see `enqueueChildren`. */
+const stampEmission = (node: DerivedNode): void => {
+  mut_state.writeCount += 1;
+
+  // eslint-disable-next-line functional/immutable-data
+  node.emittedAt = mut_state.writeCount;
 };
 
 const pushToBucket = (node: DerivedNode): void => {
@@ -289,12 +331,16 @@ const drain = (): void => {
 
       mut_bucket[mut_i] = undefined;
 
-      if (node.disposed || !node.recompute()) {
+      // `gone`: a node detached in this drain (a `take` that finished) is not
+      // recomputed again.
+      if (node.gone || !node.recompute()) {
         continue;
       }
 
       // eslint-disable-next-line functional/immutable-data
       node.changedAt = epoch;
+
+      stampEmission(node);
 
       enqueueChildren(node);
     }
@@ -319,7 +365,7 @@ const runEffects = (): void => {
 
     mut_effects[mut_i] = undefined;
 
-    if (!effect.disposed) {
+    if (!effect.gone) {
       effect.run();
     }
   }

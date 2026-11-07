@@ -2,11 +2,23 @@ import {
   combine,
   derive,
   filter,
+  keepEqualParts,
   map,
+  pairwise,
   scan,
+  skip,
+  skipIfNoChange,
+  skipUntil,
+  skipWhile,
   source,
   state,
+  take,
+  takeUntil,
+  takeWhile,
+  withBufferedFrom,
+  withCurrentValueFrom,
   withInitialValue,
+  zip,
   type InitializedObservable,
   type Observable,
 } from 'synstate-next';
@@ -65,5 +77,67 @@ describe('types', () => {
     assert.isFalse(notYet.hasValue);
 
     assert.isUndefined(notYet.peek());
+  });
+
+  test('the synchronous operators keep or drop the initial value', () => {
+    const s = state(0);
+
+    const e = source<string>();
+
+    const taken = s.pipe(
+      take(2),
+      takeUntil(e),
+      skipIfNoChange(),
+      keepEqualParts(),
+    );
+
+    expectType<typeof taken, InitializedObservable<number>>('=');
+
+    const _skipped = s.pipe(skip(1));
+
+    expectType<typeof _skipped, Observable<number>>('=');
+
+    const _whiles = s.pipe(
+      takeWhile((x) => x > 0),
+      skipWhile((x) => x > 0),
+    );
+
+    expectType<typeof _whiles, Observable<number>>('=');
+
+    const _untilGo = s.pipe(skipUntil(e));
+
+    expectType<typeof _untilGo, Observable<number>>('=');
+
+    const _pairs = s.pipe(pairwise());
+
+    expectType<typeof _pairs, Observable<FixedLengthTuple<2, number>>>('=');
+
+    const _withCurrent = s.pipe(withCurrentValueFrom(s));
+
+    expectType<typeof _withCurrent, Observable<FixedLengthTuple<2, number>>>(
+      '=',
+    );
+
+    const _buffered = s.pipe(withBufferedFrom(e));
+
+    expectType<
+      typeof _buffered,
+      InitializedObservable<readonly [number, readonly string[]]>
+    >('=');
+
+    const _zipped = zip([s, s.pipe(map(String))]);
+
+    expectType<
+      typeof _zipped,
+      InitializedObservable<readonly [number, string]>
+    >('=');
+
+    const _zippedEvents = zip([s, e]);
+
+    expectType<typeof _zippedEvents, Observable<readonly [number, string]>>(
+      '=',
+    );
+
+    assert.isTrue(taken.hasValue);
   });
 });

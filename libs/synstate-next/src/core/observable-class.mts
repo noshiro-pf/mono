@@ -8,7 +8,9 @@
  */
 import { adoptIntoCurrentOwner } from './owner.mjs';
 import {
+  currentEpoch,
   emit,
+  writeCount,
   type DerivedNode,
   type EffectNode,
   type QueuedNode,
@@ -46,8 +48,16 @@ export class ObservableClass<A> implements DerivedNode {
   // transformer-ignore-next-line convert-to-readonly
   changedAt: number;
 
+  readonly bornAt: number;
+
+  // transformer-ignore-next-line convert-to-readonly
+  emittedAt: number;
+
   // transformer-ignore-next-line convert-to-readonly
   disposed: boolean;
+
+  // transformer-ignore-next-line convert-to-readonly
+  gone: boolean;
 
   constructor(initial: A | NoValue, depth: number) {
     this.current = initial;
@@ -60,7 +70,13 @@ export class ObservableClass<A> implements DerivedNode {
 
     this.changedAt = 0;
 
+    this.bornAt = writeCount();
+
+    this.emittedAt = 0;
+
     this.disposed = false;
+
+    this.gone = false;
 
     this.#mut_dead = 0;
 
@@ -122,8 +138,8 @@ export class ObservableClass<A> implements DerivedNode {
   }
 
   /**
-   * Called by a child that was disposed. The child stays in `children` until
-   * half of them are gone; the queue skips disposed entries meanwhile.
+   * Called by a child that was disposed or detached. The child stays in
+   * `children` until half of them are gone; the queue skips it meanwhile.
    */
   childGone(): void {
     const mut_children = this.children;
@@ -141,7 +157,7 @@ export class ObservableClass<A> implements DerivedNode {
     let mut_kept = 0;
 
     for (const child of mut_children) {
-      if (child.disposed) {
+      if (child.gone) {
         continue;
       }
 
@@ -163,10 +179,22 @@ export class ObservableClass<A> implements DerivedNode {
 
     this.disposed = true;
 
+    // A node that left its parents already (see `DerivedClass.detach`) does not
+    // tell them again.
+    if (!this.gone) {
+      this.gone = true;
+
+      this.leaveParents();
+    }
+
     this.teardown();
   }
 
-  /** Releases what the node holds: its parents, timers, inner nodes. */
+  /** Tells the parents this node is gone; see `DerivedClass`. */
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+  protected leaveParents(): void {}
+
+  /** Releases what the node holds besides its parents: timers, inner nodes. */
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   protected teardown(): void {}
 
@@ -205,6 +233,10 @@ export class ObservableClass<A> implements DerivedNode {
 /**
  * A node with parents. The depth is one more than the deepest parent's, and the
  * node registers with each parent once constructed.
+ *
+ * `reads` are nodes it reads without following (`withCurrentValueFrom`): they
+ * do not wake it, but it is placed below them too, so that it reads the value
+ * they settle on in the same update.
  */
 export class DerivedClass<A> extends ObservableClass<A> {
   readonly parents: readonly ObservableClass<unknown>[];
@@ -212,8 +244,14 @@ export class DerivedClass<A> extends ObservableClass<A> {
   constructor(
     parents: readonly ObservableClass<unknown>[],
     initial: A | NoValue,
+    reads?: readonly ObservableClass<unknown>[],
   ) {
-    super(initial, depthBelow(parents));
+    super(
+      initial,
+      reads === undefined
+        ? depthBelow(parents)
+        : Math.max(depthBelow(parents), depthBelow(reads)),
+    );
 
     this.parents = parents;
 
@@ -222,7 +260,34 @@ export class DerivedClass<A> extends ObservableClass<A> {
     }
   }
 
-  protected override teardown(): void {
+  /**
+   * Stops following the parents for good, keeping the value held: for a node
+   * that will never emit again (a `take` that is done), so that its parents no
+   * longer visit it or keep it alive. It leaves them as a disposed child does,
+   * at no cost per sibling.
+   */
+  protected detach(): void {
+    if (this.gone) {
+      return;
+    }
+
+    this.gone = true;
+
+    this.leaveParents();
+  }
+
+  /**
+   * Whether `parent` emitted in this update, after this node was created. A
+   * node with several parents asks this to tell which of them woke it; one
+   * created in the update a parent emitted in read that value already.
+   */
+  protected emittedNow(parent: ObservableClass<unknown>): boolean {
+    return (
+      parent.changedAt === currentEpoch() && parent.emittedAt > this.bornAt
+    );
+  }
+
+  protected override leaveParents(): void {
     for (const parent of this.parents) {
       parent.childGone();
     }
@@ -257,10 +322,14 @@ export abstract class EffectClass<A> implements EffectNode {
   // transformer-ignore-next-line convert-to-readonly
   disposed: boolean;
 
+  readonly bornAt: number;
+
   constructor(source: ObservableClass<A>) {
     this.source = source;
 
     this.queuedAt = 0;
+
+    this.bornAt = writeCount();
 
     this.disposed = false;
 
@@ -276,6 +345,11 @@ export abstract class EffectClass<A> implements EffectNode {
     return true;
   }
   /* oxlint-enable typescript/class-literal-property-style */
+
+  /** An effect is gone once disposed; see `DerivedNode.gone`. */
+  get gone(): boolean {
+    return this.disposed;
+  }
 
   abstract run(): void;
 

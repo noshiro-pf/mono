@@ -1,0 +1,51 @@
+import {
+  DerivedClass,
+  noValue,
+  toNode,
+  view,
+  type Observable,
+  type ObservableClass,
+  type Operator,
+} from '../core/index.mjs';
+
+/**
+ * Pairs each value of the source with the value `other` holds, settled for the
+ * same update. `other` does not wake it: a change of `other` alone emits
+ * nothing. Emits nothing while `other` holds no value.
+ */
+export const withCurrentValueFrom =
+  <A, B>(other: Observable<B>): Operator<A, readonly [A, B], 'drop'> =>
+  (source) =>
+    view(new WithCurrentValueFromClass(toNode(source), toNode(other)));
+
+class WithCurrentValueFromClass<A, B> extends DerivedClass<readonly [A, B]> {
+  readonly #parent: ObservableClass<A>;
+
+  readonly #other: ObservableClass<B>;
+
+  constructor(parent: ObservableClass<A>, other: ObservableClass<B>) {
+    const v = parent.current;
+
+    const o = other.current;
+
+    super([parent], v === noValue || o === noValue ? noValue : [v, o], [other]);
+
+    this.#parent = parent;
+
+    this.#other = other;
+  }
+
+  override recompute(): boolean {
+    const v = this.#parent.current;
+
+    const o = this.#other.current;
+
+    if (v === noValue || o === noValue) {
+      return false;
+    }
+
+    this.current = [v, o];
+
+    return true;
+  }
+}

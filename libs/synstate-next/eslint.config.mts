@@ -3,6 +3,7 @@ import {
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  eslintImportsRules,
   typescriptEslintRules,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -23,6 +24,22 @@ export default [
   eslintPluginTsFortress.configs.recommended,
 
   eslintConfigForVitest(),
+
+  {
+    files: ['test/**'],
+    rules: defineKnownRules({
+      // A test reads a node's state that the public types leave out.
+      'import-x/no-internal-modules': [
+        'error',
+        {
+          allow: [
+            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+            'synstate-next/internal',
+          ],
+        },
+      ],
+    }),
+  },
 
   {
     files: ['src/**'],

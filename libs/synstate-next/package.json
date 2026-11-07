@@ -59,7 +59,8 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "ts-data-forge": "workspace:^"
+    "ts-data-forge": "workspace:^",
+    "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
     "@vitest/browser-playwright": "catalog:",
@@ -72,7 +73,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "ts-repo-utils": "workspace:*",
-    "ts-type-forge": "workspace:*",
     "vitest": "catalog:"
   },
   "engines": {
