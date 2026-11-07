@@ -24,7 +24,7 @@ namespace NoIdentityMap {
 }
 
 /**
- * @description Disallow deriving or subscribing to a synstate observable in an event handler, where it belongs to no scope and is never disposed or unsubscribed.
+ * @description Disallow deriving or subscribing to a synstate observable in an event handler or after an `await` in a component, where it belongs to no scope and is never disposed or unsubscribed.
  *
  *  ```md
  *  | key        | value   |

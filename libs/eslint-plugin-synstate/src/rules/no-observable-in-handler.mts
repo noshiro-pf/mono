@@ -15,6 +15,7 @@ import { SYNSTATE_AND_WRAPPER_MODULES } from './constants.mjs';
 import { mayStopByItself } from './counter-options.mjs';
 import {
   callTakingAsArgument,
+  enclosingFunctionOf,
   isFunctionNode,
   isPropertyNamed,
   localFunctionOf,
@@ -23,7 +24,11 @@ import {
 
 type Options = readonly [];
 
-type MessageIds = 'observableInHandler' | 'subscriptionInHandler';
+type MessageIds =
+  | 'observableAfterAwait'
+  | 'observableInHandler'
+  | 'subscriptionAfterAwait'
+  | 'subscriptionInHandler';
 
 /**
  * An event handler runs outside every scope: by the time it is called, no `run`
@@ -46,16 +51,27 @@ type MessageIds = 'observableInHandler' | 'subscriptionInHandler';
  * is available. One that completes by itself (`timer(…)`, `just(…)`, a
  * `counter` with `times`, a `.pipe` of one of those or with `take`) ends its
  * subscriptions, and is not reported.
+ *
+ * Code after an `await` in a component runs outside every scope too: a
+ * component runs in its scope only until it returns, and an `async` function it
+ * starts is resumed later by the microtask queue. So the same calls are
+ * reported after an `await` (or in the body of a `for await`) in an `async`
+ * function that contains JSX or is written inside a function that does, and in
+ * a loop that awaits, on every pass.
  */
 export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
   meta: {
     type: 'problem',
     docs: {
       description:
-        'Disallow deriving or subscribing to a synstate observable in an event handler, where it belongs to no scope and is never disposed or unsubscribed.',
+        'Disallow deriving or subscribing to a synstate observable in an event handler or after an `await` in a component, where it belongs to no scope and is never disposed or unsubscribed.',
     },
     schema: [],
     messages: {
+      observableAfterAwait:
+        "This observable is created after an `await` in a component, when the component's scope is no longer current, so it belongs to none and keeps being computed after the row or branch it was made for is gone. Derive it at mount time from a state the async work writes to, or take the scope with `getCurrentScope()` before the `await` and create the observable inside its `run`.",
+      subscriptionAfterAwait:
+        "This subscription is made after an `await` in a component, when the component's scope is no longer current, so no scope ends it and it lasts after the row or branch it was made for is gone. Subscribe at mount time, take the scope with `getCurrentScope()` before the `await` and subscribe inside its `run`, or keep the subscription on purpose inside `untracked`.",
       observableInHandler:
         'This observable is created in an event handler, which runs outside every scope, so it belongs to none and keeps being computed after the row or branch it was made for is gone. Have the handler write to a state and derive from that state at mount time, or take the scope with `getCurrentScope()` at mount time and create the observable inside its `run`.',
       subscriptionInHandler:
@@ -102,6 +118,27 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
     };
 
     const mut_handlers = new Set<FunctionNode>();
+
+    /** Functions of this file that code after an `await` calls by name. */
+    const mut_lateFunctions = new Set<FunctionNode>();
+
+    /**
+     * The `await`s of each function, outside the functions nested in it: an
+     * `await` expression, or a `for await`, whose body runs after one.
+     */
+    const mut_awaits = new Map<
+      FunctionNode,
+      (TSESTree.AwaitExpression | TSESTree.ForOfStatement)[]
+    >();
+
+    /**
+     * Functions that contain JSX, directly or in a function nested in them,
+     * short of the app passed to `render`.
+     */
+    const mut_jsxFunctions = new Set<FunctionNode>();
+
+    /** What {@link isInComponent} found for each function it was asked about. */
+    const mut_inComponent = new Map<FunctionNode, boolean>();
 
     const mut_creations = new Set<TSESTree.CallExpression>();
 
@@ -174,9 +211,9 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
     /**
      * Whether `call` runs its argument `fn` in a scope chosen for it: the
      * callback of `scope.run(…)` (any but the `run` of a scope made on the spot
-     * with no parent, which nothing disposes), the body of synstate's
-     * `untracked(…)`, which puts it in no scope on purpose, or the app that
-     * synstate-dom's `render(…)` mounts in a root scope.
+     * with no parent, which nothing disposes), or the app that synstate-dom's
+     * `render(…)` mounts in a root scope. The body of synstate's `untracked(…)`,
+     * which puts it in no scope on purpose, is accepted by `placeOf` itself.
      */
     const runsInChosenScope = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -184,10 +221,6 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       fn: FunctionNode,
     ): boolean => {
-      if (synstateExportOf(call.callee) === 'untracked') {
-        return true;
-      }
-
       if (domExportOf(call.callee) === 'render') {
         return (
           call.arguments[0] !== undefined &&
@@ -214,15 +247,67 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
     };
 
     /**
-     * Where `node` runs: `'handler'` in a handler, outside any scope chosen
-     * between them, `'nested'` in the arguments of a creation that is itself in
-     * a handler, so that the outer one alone is reported, and `'outside'`
-     * otherwise.
+     * Whether `origin`, inside `fn`, may run after an `await` of `fn`: one that
+     * ends before it, one in its own callee or arguments, or one in a loop of
+     * `fn` whose repeated part holds `origin`.
+     */
+    const runsAfterAwait = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      fn: FunctionNode,
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      origin: TSESTree.Node,
+    ): boolean =>
+      mut_awaits
+        .get(fn)
+        ?.some(
+          (point) =>
+            resumesAt(point) <= origin.range[0] ||
+            contains(origin, point) ||
+            sharesLoop(point, origin, fn),
+        ) ?? false;
+
+    /**
+     * Whether `fn` contains JSX, nested functions included, or is written
+     * inside a function that does: a component. What is passed to a `render`
+     * call does not count for the functions around it, so a module-level
+     * `async` bootstrap that renders the app is not one.
+     */
+    const isInComponent = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      fn: FunctionNode,
+    ): boolean => {
+      const known = mut_inComponent.get(fn);
+
+      if (known !== undefined) {
+        return known;
+      }
+
+      const enclosing = enclosingFunctionOf(fn);
+
+      const result =
+        mut_jsxFunctions.has(fn) ||
+        (enclosing !== undefined && isInComponent(enclosing));
+
+      mut_inComponent.set(fn, result);
+
+      return result;
+    };
+
+    /**
+     * Where `node` runs: `'handler'` in a handler, `'afterAwait'` after an
+     * `await` in a component, either outside any scope chosen between them,
+     * `'nested'` in the arguments of a creation that is itself reported, so
+     * that the outer one alone is, and `'outside'` otherwise. `origin` is the
+     * node whose place is asked, which an `await` has to precede. A function is
+     * judged by where it is written, a function declaration too, although it is
+     * hoisted.
      */
     const placeOf = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       node: TSESTree.Node,
-    ): 'handler' | 'nested' | 'outside' => {
+
+      origin: TSESTree.Node = node,
+    ): 'afterAwait' | 'handler' | 'nested' | 'outside' => {
       // The program's `parent` is `null` at run time, whatever its type says.
       if (node.type === AST_NODE_TYPES.Program) {
         return 'outside';
@@ -234,7 +319,7 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
         parent.type === AST_NODE_TYPES.CallExpression &&
         mut_creations.has(parent)
       ) {
-        return placeOf(parent) === 'handler' ? 'nested' : 'outside';
+        return placeOf(parent) === 'outside' ? 'outside' : 'nested';
       }
 
       if (isFunctionNode(parent)) {
@@ -244,12 +329,30 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 
         const call = callTakingAsArgument(parent);
 
+        if (
+          call !== undefined &&
+          synstateExportOf(call.callee) === 'untracked'
+        ) {
+          return 'outside';
+        }
+
+        // Checked before `run`: an `async` callback of `run` is in the scope
+        // only until its first `await`.
+        if (
+          (parent.async &&
+            isInComponent(parent) &&
+            runsAfterAwait(parent, origin)) ||
+          mut_lateFunctions.has(parent)
+        ) {
+          return 'afterAwait';
+        }
+
         if (call !== undefined && runsInChosenScope(call, parent)) {
           return 'outside';
         }
       }
 
-      return placeOf(parent);
+      return placeOf(parent, origin);
     };
 
     /**
@@ -499,7 +602,8 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 
     /**
      * Adds to the handlers every function of this file that a handler calls by
-     * name, outside a chosen scope, until no more are added. A call in the
+     * name, outside a chosen scope, and to the late functions every one that
+     * code after an `await` calls so, until no more are added. A call in the
      * arguments of a creation is left to that creation's report.
      */
     const addReachedFunctions = (): void => {
@@ -509,18 +613,74 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
         mut_added = false;
 
         for (const [call, fn] of mut_localCalls) {
-          if (mut_handlers.has(fn) || placeOf(call) !== 'handler') {
+          if (mut_handlers.has(fn)) {
             continue;
           }
 
-          mut_handlers.add(fn);
+          const place = placeOf(call);
 
-          mut_added = true;
+          if (place === 'handler') {
+            mut_handlers.add(fn);
+
+            mut_added = true;
+          } else if (place === 'afterAwait' && !mut_lateFunctions.has(fn)) {
+            mut_lateFunctions.add(fn);
+
+            mut_added = true;
+          }
+        }
+      }
+    };
+
+    const addAwait = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      point: TSESTree.AwaitExpression | TSESTree.ForOfStatement,
+    ): void => {
+      const fn = enclosingFunctionOf(point);
+
+      if (fn?.async !== true) {
+        return;
+      }
+
+      const mut_points = mut_awaits.get(fn);
+
+      if (mut_points === undefined) {
+        mut_awaits.set(fn, [point]);
+      } else {
+        mut_points.push(point);
+      }
+    };
+
+    const addJsx = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      node: TSESTree.JSXElement | TSESTree.JSXFragment,
+    ): void => {
+      if (isRenderArgument(node)) {
+        return;
+      }
+
+      for (
+        let mut_fn = enclosingFunctionOf(node);
+        mut_fn !== undefined && !mut_jsxFunctions.has(mut_fn);
+        mut_fn = enclosingFunctionOf(mut_fn)
+      ) {
+        mut_jsxFunctions.add(mut_fn);
+
+        if (isRenderArgument(mut_fn)) {
+          return;
         }
       }
     };
 
     return {
+      AwaitExpression: addAwait,
+
+      'ForOfStatement[await=true]': addAwait,
+
+      JSXElement: addJsx,
+
+      JSXFragment: addJsx,
+
       JSXAttribute: (node) => {
         if (
           node.name.type !== AST_NODE_TYPES.JSXIdentifier ||
@@ -575,7 +735,8 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 
       'Program:exit': () => {
         if (
-          mut_handlers.size === 0 ||
+          (mut_handlers.size === 0 &&
+            (mut_awaits.size === 0 || mut_jsxFunctions.size === 0)) ||
           (mut_creations.size === 0 && mut_subscriptions.size === 0)
         ) {
           return;
@@ -584,10 +745,15 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
         addReachedFunctions();
 
         for (const creation of mut_creations) {
-          if (placeOf(creation) === 'handler') {
+          const place = placeOf(creation);
+
+          if (place === 'handler' || place === 'afterAwait') {
             context.report({
               node: creation,
-              messageId: 'observableInHandler',
+              messageId:
+                place === 'handler'
+                  ? 'observableInHandler'
+                  : 'observableAfterAwait',
             });
           }
         }
@@ -595,14 +761,22 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
         for (const subscription of mut_subscriptions) {
           const callee = skipTypeWrappers(subscription.callee);
 
+          if (callee.type !== AST_NODE_TYPES.MemberExpression) {
+            continue;
+          }
+
+          const place = placeOf(subscription);
+
           if (
-            callee.type === AST_NODE_TYPES.MemberExpression &&
-            placeOf(subscription) === 'handler' &&
+            (place === 'handler' || place === 'afterAwait') &&
             isLastingSynstateObservable(callee.object)
           ) {
             context.report({
               node: subscription,
-              messageId: 'subscriptionInHandler',
+              messageId:
+                place === 'handler'
+                  ? 'subscriptionInHandler'
+                  : 'subscriptionAfterAwait',
             });
           }
         }
@@ -668,3 +842,97 @@ const DOM_DERIVING_FACTORIES: ReadonlySet<string> = new Set<string>([
   'mapBindable',
   'toObservable',
 ]);
+
+/**
+ * Where code runs once `point` has resumed: after an `await` expression, or,
+ * for a `for await`, from its body on.
+ */
+const resumesAt = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  point: TSESTree.AwaitExpression | TSESTree.ForOfStatement,
+): number =>
+  point.type === AST_NODE_TYPES.AwaitExpression
+    ? point.range[1]
+    : point.body.range[0];
+
+const contains = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  outer: TSESTree.Node,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  inner: TSESTree.Node,
+): boolean =>
+  outer.range[0] <= inner.range[0] && inner.range[1] <= outer.range[1];
+
+/**
+ * The parts of `node`, if it is a loop, that run again on every pass: its body,
+ * and the test and update that run between passes. A `for … of` reads its
+ * iterable and a `for` its initializer once, before the first pass.
+ */
+const repeatedPartsOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): readonly (TSESTree.Node | null)[] =>
+  node.type === AST_NODE_TYPES.DoWhileStatement ||
+  node.type === AST_NODE_TYPES.WhileStatement
+    ? ([node.body, node.test] as const)
+    : node.type === AST_NODE_TYPES.ForStatement
+      ? ([node.body, node.test, node.update] as const)
+      : node.type === AST_NODE_TYPES.ForInStatement ||
+          node.type === AST_NODE_TYPES.ForOfStatement
+        ? ([node.body] as const)
+        : ([] as const);
+
+/**
+ * Whether a loop of `fn` that holds `point` anywhere (`point` itself as a
+ * `for await` included) has `origin` in a part that runs again after `point`
+ * resumed.
+ */
+const sharesLoop = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  point: TSESTree.AwaitExpression | TSESTree.ForOfStatement,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  origin: TSESTree.Node,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  fn: FunctionNode,
+): boolean => {
+  for (
+    let mut_node: TSESTree.Node = point;
+    mut_node !== fn && mut_node.type !== AST_NODE_TYPES.Program;
+    mut_node = mut_node.parent
+  ) {
+    if (
+      repeatedPartsOf(mut_node).some(
+        (part) => part !== null && contains(part, origin),
+      )
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+/**
+ * Whether `node` is an argument of a `render` call, a function or a method
+ * (synstate-dom's `render(() => <App />, root)`, React's
+ * `root.render(<App />)`): the app it mounts, which is not a component's own
+ * markup.
+ */
+const isRenderArgument = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): boolean => {
+  const call = callTakingAsArgument(node);
+
+  if (call === undefined) {
+    return false;
+  }
+
+  const callee = skipTypeWrappers(call.callee);
+
+  return (
+    (callee.type === AST_NODE_TYPES.Identifier && callee.name === 'render') ||
+    (callee.type === AST_NODE_TYPES.MemberExpression &&
+      isPropertyNamed(callee, 'render'))
+  );
+};
