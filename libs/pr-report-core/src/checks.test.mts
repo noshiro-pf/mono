@@ -4,7 +4,9 @@ import {
   classifyCheckRun,
   classifyCommitStatus,
   combineContextStates,
+  isOfEarlierAttempt,
   outranks,
+  RE_RUN_GRACE_MS,
   reportedContexts,
   statesFromCheckRuns,
   summarizeChecks,
@@ -784,5 +786,161 @@ describe('a required context whose workflow has a newer round running', () => {
     ]);
 
     assert.strictEqual(states.get('code-check-result / result'), 'failed');
+  });
+});
+
+// #3474: "Re-run failed jobs" keeps the workflow run, and so its check suite,
+// and starts a new attempt of it. The aggregate of the attempt before stays red
+// until the re-run jobs it needs are done and it runs again.
+describe('a required context whose own workflow run is being re-run', () => {
+  const codeCheck = 359_266_435;
+
+  const attemptStartedAt = '2026-11-07T10:30:00Z';
+
+  const nowMs = Date.parse('2026-11-07T10:40:00Z');
+
+  const reRunning = {
+    workflowId: codeCheck,
+    completed: false,
+    attemptStartedAt,
+  } as const;
+
+  const red = {
+    id: 11,
+    checkSuiteId: 1,
+    name: 'code-check-result / result',
+    status: 'completed',
+    conclusion: 'failure',
+    completedAt: '2026-11-07T10:00:00Z',
+    round: reRunning,
+  } as const;
+
+  const queuedJob = {
+    id: 12,
+    checkSuiteId: 1,
+    name: 'code-check (ws:fix:lint)',
+    status: 'queued',
+    conclusion: undefined,
+    round: reRunning,
+  } as const;
+
+  test('reads the red of the attempt before as pending', () => {
+    const states = statesFromCheckRuns([red, queuedJob], nowMs);
+
+    assert.strictEqual(states.get('code-check-result / result'), 'pending');
+  });
+
+  test('does not call the pull request failing', () => {
+    const summary = summarizeChecks({
+      required: ['code-check-result / result'],
+      reported: statesFromCheckRuns([red, queuedJob], nowMs),
+      paused: false,
+      running: anyRunInProgress([red, queuedJob]),
+      baseCovered: true,
+    });
+
+    assert.strictEqual(summary.verdict, 'pending');
+  });
+
+  test('holds the red in the gap after the re-run jobs finish, before the aggregate runs again', () => {
+    const states = statesFromCheckRuns(
+      [
+        red,
+        {
+          ...queuedJob,
+          status: 'completed',
+          conclusion: 'success',
+          completedAt: '2026-11-07T10:38:00Z',
+        },
+      ],
+      nowMs,
+    );
+
+    assert.strictEqual(states.get('code-check-result / result'), 'pending');
+  });
+
+  test('a green of the attempt before stands for its context', () => {
+    const states = statesFromCheckRuns(
+      [{ ...red, name: 'lint', conclusion: 'success' }],
+      nowMs,
+    );
+
+    assert.strictEqual(states.get('lint'), 'passed');
+  });
+
+  test('a red reached in the attempt still running fails at once', () => {
+    const states = statesFromCheckRuns(
+      [{ ...red, completedAt: '2026-11-07T10:35:00Z' }],
+      nowMs,
+    );
+
+    assert.strictEqual(states.get('code-check-result / result'), 'failed');
+  });
+
+  test('the red stands once the workflow run has finished', () => {
+    const states = statesFromCheckRuns(
+      [{ ...red, round: { ...reRunning, completed: true } }],
+      nowMs,
+    );
+
+    assert.strictEqual(states.get('code-check-result / result'), 'failed');
+  });
+
+  test('the red stands when the attempt has gone on past the grace period', () => {
+    const states = statesFromCheckRuns(
+      [red],
+      Date.parse(attemptStartedAt) + RE_RUN_GRACE_MS + 1,
+    );
+
+    assert.strictEqual(states.get('code-check-result / result'), 'failed');
+  });
+
+  test('the red stands when the start of the attempt was not read', () => {
+    const states = statesFromCheckRuns(
+      [{ ...red, round: { workflowId: codeCheck, completed: false } }],
+      nowMs,
+    );
+
+    assert.strictEqual(states.get('code-check-result / result'), 'failed');
+  });
+
+  test('the red stands when when it finished was not read', () => {
+    const { completedAt: _, ...withoutCompletedAt } = red;
+
+    const states = statesFromCheckRuns([withoutCompletedAt], nowMs);
+
+    assert.strictEqual(states.get('code-check-result / result'), 'failed');
+  });
+});
+
+describe(isOfEarlierAttempt, () => {
+  const round = {
+    workflowId: 1,
+    completed: false,
+    attemptStartedAt: '2026-11-07T10:30:00Z',
+  } as const;
+
+  const nowMs = Date.parse('2026-11-07T10:40:00Z');
+
+  test('is true of a run that finished before the attempt still going began', () => {
+    assert.isTrue(isOfEarlierAttempt('2026-11-07T10:00:00Z', round, nowMs));
+  });
+
+  test('is false of a run of the attempt itself', () => {
+    assert.isFalse(isOfEarlierAttempt('2026-11-07T10:31:00Z', round, nowMs));
+  });
+
+  test('is false with no round, or a finished one', () => {
+    assert.isFalse(
+      isOfEarlierAttempt('2026-11-07T10:00:00Z', undefined, nowMs),
+    );
+
+    assert.isFalse(
+      isOfEarlierAttempt(
+        '2026-11-07T10:00:00Z',
+        { ...round, completed: true },
+        nowMs,
+      ),
+    );
   });
 });

@@ -1,3 +1,4 @@
+import { RE_RUN_GRACE_MS } from 'pr-report-core';
 import {
   latestMergedHead,
   pullRequestOfNode,
@@ -132,5 +133,13 @@ describe(rerunOf, () => {
       ),
       'running',
     );
+  });
+});
+
+// A red held back for a re-run, and a re-run waited for before it is called
+// stuck, are one wait: two numbers would let the two verdicts drift apart.
+describe('RUN_TIMEOUT_MS', () => {
+  test('is the grace pr-report-core gives a re-run', () => {
+    assert.strictEqual(RUN_TIMEOUT_MS, RE_RUN_GRACE_MS);
   });
 });

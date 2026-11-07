@@ -1,4 +1,5 @@
 // cspell:ignore unstub
+import { RE_RUN_GRACE_MS, type WorkflowRound } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { parseJson, type ApiContext } from '../lib/index.mjs';
@@ -634,11 +635,30 @@ describe('headChecksOf, then summarizeChecks', () => {
 
   const summarize = (
     contexts: readonly CheckContextNode[],
+    rounds: ReadonlyMap<number, WorkflowRound> = new Map<
+      number,
+      WorkflowRound
+    >(),
   ): ReturnType<typeof summarizeChecks> => {
-    const head = headChecksOf(contexts);
+    const head = headChecksOf(contexts, rounds, NOW_MS);
 
     return summarizeChecks(head.required, required, head.running);
   };
+
+  /** Suite 1's workflow run, re-run at 09:30, after its red of 09:00. */
+  const reRunning: ReadonlyMap<number, WorkflowRound> = new Map<
+    number,
+    WorkflowRound
+  >([
+    [
+      1,
+      {
+        workflowId: 7,
+        completed: false,
+        attemptStartedAt: '2026-10-25T09:30:00Z',
+      },
+    ],
+  ]);
 
   // #3334: the queued re-run counted as the oldest run of its job, so the
   // attempt it re-runs spoke for it.
@@ -667,31 +687,133 @@ describe('headChecksOf, then summarizeChecks', () => {
   // aggregate's own re-run is created only once that job is done, so until then
   // the aggregate's red from the attempt before is all its context has.
   test('waits on a red aggregate while a re-run of a job it needs is queued', () => {
-    const summary = summarize([
-      checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
-        isRequired: false,
-        checkSuiteId: 1,
-        id: 10,
-        runId: 100,
-      }),
-      checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
-        completedAt: '2026-10-25T09:00:00Z',
-        checkSuiteId: 1,
-        id: 11,
-        runId: 100,
-      }),
-      checkRun('code-check (ws:fix:lint)', 'QUEUED', null, null, {
-        isRequired: false,
-        checkSuiteId: 1,
-        id: 12,
-        runId: 100,
-      }),
-      statusContext('no-skip-ci-label', 'SUCCESS'),
-    ]);
+    const summary = summarize(
+      [
+        checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
+          isRequired: false,
+          checkSuiteId: 1,
+          id: 10,
+          runId: 100,
+        }),
+        checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
+          completedAt: '2026-10-25T09:00:00Z',
+          checkSuiteId: 1,
+          id: 11,
+          runId: 100,
+        }),
+        checkRun('code-check (ws:fix:lint)', 'QUEUED', null, null, {
+          isRequired: false,
+          checkSuiteId: 1,
+          id: 12,
+          runId: 100,
+        }),
+        statusContext('no-skip-ci-label', 'SUCCESS'),
+      ],
+      reRunning,
+    );
 
     assert.strictEqual(summary.verdict, 'pending');
 
     assert.deepStrictEqual(summary.failedRuns, []);
+  });
+
+  // #3474: whether the rollup lists every attempt of a job was never checked
+  // against a live answer. The rule reads the workflow run instead, so it holds
+  // when only the latest attempt is listed too.
+  test('waits on a red aggregate under a re-run when the rollup lists only the latest attempt', () => {
+    const summary = summarize(
+      [
+        checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
+          completedAt: '2026-10-25T09:00:00Z',
+          checkSuiteId: 1,
+          id: 11,
+          runId: 100,
+        }),
+        checkRun('code-check (ws:fix:lint)', 'QUEUED', null, null, {
+          isRequired: false,
+          checkSuiteId: 1,
+          id: 12,
+          runId: 100,
+        }),
+        statusContext('no-skip-ci-label', 'SUCCESS'),
+      ],
+      reRunning,
+    );
+
+    assert.strictEqual(summary.verdict, 'pending');
+  });
+
+  // #3474: two jobs sharing a display name read as a re-run under the old rule.
+  test('fails on a red aggregate beside two jobs of one name when nothing is re-run', () => {
+    const summary = summarize(
+      [
+        checkRun('code-check (shard)', 'COMPLETED', 'SUCCESS', null, {
+          isRequired: false,
+          checkSuiteId: 1,
+          id: 10,
+          runId: 100,
+        }),
+        checkRun(
+          'code-check (shard)',
+          'IN_PROGRESS',
+          null,
+          '2026-10-25T08:50:00Z',
+          {
+            isRequired: false,
+            checkSuiteId: 1,
+            id: 12,
+            runId: 100,
+          },
+        ),
+        checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
+          completedAt: '2026-10-25T09:00:00Z',
+          checkSuiteId: 1,
+          id: 11,
+          runId: 100,
+        }),
+        statusContext('no-skip-ci-label', 'SUCCESS'),
+      ],
+      new Map<number, WorkflowRound>([
+        [
+          1,
+          {
+            workflowId: 7,
+            completed: false,
+            attemptStartedAt: '2026-10-25T08:00:00Z',
+          },
+        ],
+      ]),
+    );
+
+    assert.strictEqual(summary.verdict, 'failing');
+  });
+
+  // #3474: a re-run GitHub never settles holds the red back no longer than the
+  // grace period.
+  test('fails on a red aggregate once its re-run has gone on past the grace period', () => {
+    const red = checkRun(
+      'code-check-result / result',
+      'COMPLETED',
+      'FAILURE',
+      null,
+      {
+        completedAt: '2026-10-25T09:00:00Z',
+        checkSuiteId: 1,
+        id: 11,
+        runId: 100,
+      },
+    );
+
+    const head = headChecksOf(
+      [red, statusContext('no-skip-ci-label', 'SUCCESS')],
+      reRunning,
+      Date.parse('2026-10-25T09:30:00Z') + RE_RUN_GRACE_MS + 1,
+    );
+
+    assert.strictEqual(
+      summarizeChecks(head.required, required, head.running).verdict,
+      'failing',
+    );
   });
 
   // #3334: the new round's aggregate, queued, lost to the red the cancelled
@@ -745,56 +867,71 @@ describe('headChecksOf, then summarizeChecks', () => {
   // being created again: nothing in the workflow run is pending, but the run
   // has not finished.
   test('waits on a red aggregate after a re-run of a job it needs passed, while its workflow run goes on', () => {
-    const summary = summarize([
-      checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
-        isRequired: false,
-        checkSuiteId: 1,
-        id: 10,
-        runId: 100,
-      }),
-      checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
-        completedAt: '2026-10-25T09:00:00Z',
-        checkSuiteId: 1,
-        id: 11,
-        runId: 100,
-      }),
-      checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'SUCCESS', null, {
-        isRequired: false,
-        checkSuiteId: 1,
-        id: 12,
-        runId: 100,
-      }),
-      statusContext('no-skip-ci-label', 'SUCCESS'),
-    ]);
+    const summary = summarize(
+      [
+        checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
+          isRequired: false,
+          checkSuiteId: 1,
+          id: 10,
+          runId: 100,
+        }),
+        checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
+          completedAt: '2026-10-25T09:00:00Z',
+          checkSuiteId: 1,
+          id: 11,
+          runId: 100,
+        }),
+        checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'SUCCESS', null, {
+          isRequired: false,
+          checkSuiteId: 1,
+          id: 12,
+          runId: 100,
+        }),
+        statusContext('no-skip-ci-label', 'SUCCESS'),
+      ],
+      reRunning,
+    );
 
     assert.strictEqual(summary.verdict, 'pending');
   });
 
   test('fails on a red aggregate once the workflow run of a re-run has finished without a new one', () => {
-    const summary = summarize([
-      checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
-        isRequired: false,
-        checkSuiteId: 1,
-        id: 10,
-        runId: 100,
-        suiteStatus: 'COMPLETED',
-      }),
-      checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
-        completedAt: '2026-10-25T09:00:00Z',
-        checkSuiteId: 1,
-        id: 11,
-        runId: 100,
-        suiteStatus: 'COMPLETED',
-      }),
-      checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
-        isRequired: false,
-        checkSuiteId: 1,
-        id: 12,
-        runId: 100,
-        suiteStatus: 'COMPLETED',
-      }),
-      statusContext('no-skip-ci-label', 'SUCCESS'),
-    ]);
+    const summary = summarize(
+      [
+        checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
+          isRequired: false,
+          checkSuiteId: 1,
+          id: 10,
+          runId: 100,
+          suiteStatus: 'COMPLETED',
+        }),
+        checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
+          completedAt: '2026-10-25T09:00:00Z',
+          checkSuiteId: 1,
+          id: 11,
+          runId: 100,
+          suiteStatus: 'COMPLETED',
+        }),
+        checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'FAILURE', null, {
+          isRequired: false,
+          checkSuiteId: 1,
+          id: 12,
+          runId: 100,
+          suiteStatus: 'COMPLETED',
+        }),
+        statusContext('no-skip-ci-label', 'SUCCESS'),
+      ],
+      new Map<number, WorkflowRound>([
+        [
+          1,
+          {
+            workflowId: 7,
+            completed: true,
+            attemptStartedAt: '2026-10-25T09:30:00Z',
+          },
+        ],
+      ]),
+    );
 
     assert.strictEqual(summary.verdict, 'failing');
   });
@@ -880,6 +1017,129 @@ describe(readHeadChecks, () => {
       assert.deepStrictEqual(
         checks.running.map(({ name }) => name),
         ['b'],
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  test('fails the poll, not lets a red through, when the run of the red cannot be read', async () => {
+    const red = checkRun(
+      'code-check-result / result',
+      'COMPLETED',
+      'FAILURE',
+      null,
+      { completedAt: minutesAgo(20), checkSuiteId: 1, id: 11, runId: 100 },
+    );
+
+    vi.stubGlobal('fetch', (url: string): Promise<Response> =>
+      Promise.resolve(
+        url.includes('/graphql')
+          ? new Response(
+              JSON.stringify({
+                data: {
+                  repository: {
+                    pullRequest: {
+                      commits: {
+                        nodes: [
+                          {
+                            commit: {
+                              statusCheckRollup: {
+                                contexts: {
+                                  pageInfo: {
+                                    hasNextPage: false,
+                                    endCursor: null,
+                                  },
+                                  nodes: [red],
+                                },
+                              },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+              }),
+              { status: 200 },
+            )
+          : new Response('{}', { status: 404 }),
+      ),
+    );
+
+    try {
+      assert.isTrue(Result.isErr(await readHeadChecks(api, 1)));
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  // #3474: the rule reads the workflow run over REST, and only for a red.
+  test('reads the workflow run of a red, and holds the red of the attempt before', async () => {
+    const mut_urls: string[] = [];
+
+    const red = checkRun(
+      'code-check-result / result',
+      'COMPLETED',
+      'FAILURE',
+      null,
+      {
+        // Within the grace of the attempt below, whenever the test runs.
+        completedAt: minutesAgo(20),
+        checkSuiteId: 1,
+        id: 11,
+        runId: 100,
+      },
+    );
+
+    vi.stubGlobal('fetch', (url: string): Promise<Response> => {
+      mut_urls.push(url);
+
+      const body = url.includes('/graphql')
+        ? ({
+            data: {
+              repository: {
+                pullRequest: {
+                  commits: {
+                    nodes: [
+                      {
+                        commit: {
+                          statusCheckRollup: {
+                            contexts: {
+                              pageInfo: { hasNextPage: false, endCursor: null },
+                              nodes: [red],
+                            },
+                          },
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          } as const)
+        : ({
+            check_suite_id: 1,
+            workflow_id: 7,
+            status: 'in_progress',
+            run_started_at: minutesAgo(10),
+          } as const);
+
+      return Promise.resolve(
+        new Response(JSON.stringify(body), { status: 200 }),
+      );
+    });
+
+    try {
+      const checks = Result.unwrapThrow(await readHeadChecks(api, 1));
+
+      assert.lengthOf(mut_urls, 2);
+
+      assert.include(mut_urls[1], '/actions/runs/100');
+
+      assert.deepStrictEqual(
+        checks.required.map(({ reRunAfter }) => reRunAfter),
+        [true],
       );
     } finally {
       vi.unstubAllGlobals();
@@ -1143,3 +1403,13 @@ const statusContext = (
     createdAt,
     isRequired,
   }) as const;
+
+/** When the fixtures are read: after every time in them, within the grace. */
+const NOW_MS = Date.parse('2026-10-25T09:40:00Z');
+
+/** An ISO 8601 time `minutes` before the test runs. */
+const minutesAgo = (minutes: number): string => {
+  const at = new Date(Date.now() - minutes * 60 * 1000);
+
+  return at.toISOString();
+};

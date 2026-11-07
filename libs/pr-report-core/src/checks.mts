@@ -1,6 +1,7 @@
 /** What the checks on a head commit add up to. */
 
 import { Arr } from 'ts-data-forge';
+import { epochMsOf } from './timestamp.mjs';
 import type { ChecksSummary, ContextState } from './types.mjs';
 
 /**
@@ -36,9 +37,16 @@ import type { ChecksSummary, ContextState } from './types.mjs';
  * newer round is in the suite with the greater id, and its aggregate will be
  * the newest run of the name. Where the newer round has finished without one,
  * the older run stands, as it does on GitHub.
+ *
+ * **So is a run of an earlier attempt of its own round, while a re-run of that
+ * round goes on** ({@link isOfEarlierAttempt}). "Re-run failed jobs" keeps the
+ * workflow run, and with it the check suite, and starts a new attempt: the
+ * aggregate of the attempt before stays the newest run of its name, red, until
+ * the jobs it needs are done and it runs again (#3474). Read at `nowMs`.
  */
 export const statesFromCheckRuns = (
   runs: readonly CheckRunReport[],
+  nowMs: number = Date.now(),
 ): ReadonlyMap<string, ContextState> => {
   const mut_winner = new Map<string, CheckRunReport>();
 
@@ -76,13 +84,20 @@ export const statesFromCheckRuns = (
         ? undefined
         : mut_latestRound.get(run.round.workflowId);
 
+    const state = classifyCheckRun(run.status, run.conclusion);
+
     mut_states.set(
       name,
-      latest !== undefined &&
+      (latest !== undefined &&
         latest.checkSuiteId !== run.checkSuiteId &&
-        !latest.completed
+        !latest.completed) ||
+        // Only a red: "Re-run failed jobs" leaves a green of the attempt before
+        // standing, and it stands for its context.
+        (state === 'failed' &&
+          run.completedAt !== undefined &&
+          isOfEarlierAttempt(run.completedAt, run.round, nowMs))
         ? 'pending'
-        : classifyCheckRun(run.status, run.conclusion),
+        : state,
     );
   }
 
@@ -98,6 +113,8 @@ export type CheckRunReport = Readonly<{
   checkSuiteId: number;
   /** Ascending, so it orders two runs of one name inside one suite. */
   id: number;
+  /** ISO 8601, once it has finished, where it was read. */
+  completedAt?: string | undefined;
   /**
    * The workflow run its suite is, where it is one: the workflow, so that a
    * newer round of it can be told from an unrelated suite, and whether the
@@ -105,8 +122,64 @@ export type CheckRunReport = Readonly<{
    * created only once every job before it has completed. `undefined` for a run
    * no workflow made, or where the workflow runs could not be read.
    */
-  round: Readonly<{ workflowId: number; completed: boolean }> | undefined;
+  round: WorkflowRound | undefined;
 }>;
+
+/**
+ * A workflow run, as {@link CheckRunReport}'s `round`. `attemptStartedAt` is
+ * REST's `run_started_at`, which a re-run sets anew; GraphQL has no such field,
+ * so a reader of GraphQL alone leaves it out.
+ */
+export type WorkflowRound = Readonly<{
+  workflowId: number;
+  completed: boolean;
+  attemptStartedAt?: string | undefined;
+}>;
+
+/**
+ * Whether a run that finished at `completedAt` is of an attempt of `round`
+ * before the one still going: the round has not finished, and its latest
+ * attempt began after the run finished. Read at `nowMs`, and only for
+ * {@link RE_RUN_GRACE_MS} after the attempt began, so that a workflow run GitHub
+ * never settles does not hold a red back for good.
+ *
+ * Not "a job in the suite has an earlier run of its name", which is what the
+ * worker read until #3474: that rests on GraphQL listing every attempt of a job,
+ * which nothing confirmed, and also fires on two jobs sharing a display name.
+ */
+export const isOfEarlierAttempt = (
+  completedAt: string,
+  round: WorkflowRound | undefined,
+  nowMs: number,
+): boolean => {
+  if (
+    round === undefined ||
+    round.completed ||
+    round.attemptStartedAt === undefined
+  ) {
+    return false;
+  }
+
+  const attemptMs = epochMsOf(round.attemptStartedAt);
+
+  const completedMs = epochMsOf(completedAt);
+
+  return (
+    attemptMs !== undefined &&
+    completedMs !== undefined &&
+    completedMs < attemptMs &&
+    nowMs - attemptMs <= RE_RUN_GRACE_MS
+  );
+};
+
+/**
+ * How long a re-run may hold back the red of the attempt before: as long as
+ * `unblock-prs` waits on a re-run it asked for before calling it stuck
+ * (`RUN_TIMEOUT_MS`, which a test holds this to). The longest job timeout in
+ * the workflows is 20 minutes, and the jobs re-run plus the aggregate after
+ * them, with a wait for a runner, fit inside it.
+ */
+export const RE_RUN_GRACE_MS = 40 * 60 * 1000;
 
 /**
  * What one check run has reported.
@@ -164,11 +237,14 @@ export const anyRunInProgress = (runs: readonly CheckRunReport[]): boolean =>
 export const reportedContexts = (
   runs: readonly CheckRunReport[],
   statuses: readonly Readonly<{ context: string; state: string }>[],
+  nowMs: number = Date.now(),
 ): ReadonlyMap<string, ContextState> => {
   // A commit status and a check run of the same name are two requirements, not
   // one reported twice: GitHub asks both to pass. So the stricter of the two is
   // kept rather than whichever was read second.
-  const mut_states = new Map<string, ContextState>(statesFromCheckRuns(runs));
+  const mut_states = new Map<string, ContextState>(
+    statesFromCheckRuns(runs, nowMs),
+  );
 
   for (const { context, state } of statuses) {
     const fromStatus = classifyCommitStatus(state);

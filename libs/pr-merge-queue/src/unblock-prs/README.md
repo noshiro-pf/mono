@@ -627,10 +627,13 @@ round のものとして、round が終わるまで待ちます。`open-pr` が�
 るときに読むのは、最後に始まったものではなく、`pr-report` と同じく check suite、
 次にその中の check run で最も新しいものです。キューで待っている再実行や新しい
 round の集約はまだ開始時刻を持たず、開始時刻で順位を付けると置き換えるはずの赤に
-負けていました（#3334）。また、fail の後にその中の job が再実行された自分の
-workflow run が終わっていない間も、その fail は待ちます。「Re-run failed jobs」は
-失敗した job をもう一度キューに入れ、それを待つ集約はその job が終わるまで作り直
-されないからです。同じ名前の前の run がその run の中にある job を再実行と数え、それより前に作られた fail は、どの job の再実行であっても待ちます。一度しか実行されていない job は何も止めません。また
+負けていました（#3334）。また、自分の workflow run が再実行中で、その最新の
+attempt が始まる前に終わった fail も待ちます。「Re-run failed jobs」は失敗した
+job をもう一度キューに入れ、それを待つ集約はその job が終わるまで作り直されない
+からです。attempt の開始は REST の `run_started_at`（再実行で更新される）で読み、
+必須の赤があるときだけ読みます（`pr-report-core` の `isOfEarlierAttempt`、
+`pr-report` も同じ規則）。待つのは attempt が始まってから40分
+（`RE_RUN_GRACE_MS`）までです。また
 commit status は round の開始に数えません。ずっと前から pending のものがあると、
 開始が前の round の赤より前になってしまいます。
 
@@ -1681,14 +1684,15 @@ was set aside `checks-failed` so). Of several runs of one job in one workflow
 and event, the one read is the latest by check suite, then by check run in it,
 as `pr-report` ranks them — not the one that started last: a queued re-run, or
 the new round's queued aggregate, has no start yet, and ranked so it lost to the
-red it replaces (#3334). So does a failure wait while its own workflow run, with
-a job in it re-run after the failure, has not finished: "Re-run failed jobs"
-queues the failed job again, and the aggregate that needs it is not created
-again until that job is done. A job counts as re-run when the run holds an
-earlier run of the same name, and a failure created before one waits whichever
-job was re-run; a job that has run only once holds nothing back. Nor does a
-commit status count as the round's start: one pending since long ago would put
-it before the round before's reds.
+red it replaces (#3334). So does a failure that finished before the latest
+attempt of its own workflow run began, while that run has not finished: "Re-run
+failed jobs" queues the failed job again, and the aggregate that needs it is not
+created again until that job is done. When the attempt began is REST's
+`run_started_at`, which a re-run sets anew, read only when a required context is
+red (`pr-report-core`'s `isOfEarlierAttempt`, which `pr-report` applies too),
+and the failure waits no longer than 40 minutes after it (`RE_RUN_GRACE_MS`).
+Nor does a commit status count as the round's start: one pending since long ago
+would put it before the round before's reds.
 
 **A head with a required context unreported and nothing running on it for five
 minutes is given one more label event, and set aside as `checks-not-started`
