@@ -2,6 +2,9 @@
 // `ws:gen` rewrites it after a TypeScript update that changes them.
 // cspell:disable -- property names as lib.dom.d.ts spells them
 
+// The union of the keys under the repository's strict library and under the
+// official lib.dom.d.ts of TypeScript 5.0, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6.0, 7.0.
+
 /** The keys the props of every HTML element admit as attributes. */
 export const commonReflectedKeys = [
   'accessKey',
