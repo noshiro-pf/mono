@@ -65,6 +65,22 @@ export default [
 
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
 
+  {
+    files: ['scripts/**'],
+    rules: defineKnownRules({
+      'import-x/no-internal-modules': [
+        'error',
+        {
+          allow: [
+            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+            // The bundle-size measurement shared with synstate-docs (#3066).
+            '**/tools/scripts/lib/bundle-size.mjs',
+          ],
+        },
+      ],
+    }),
+  },
+
   // Last, so that nothing above turns these back on.
   eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];
