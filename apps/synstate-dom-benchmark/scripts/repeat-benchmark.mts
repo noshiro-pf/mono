@@ -14,7 +14,8 @@ import {
   unknownToString,
 } from 'ts-data-forge';
 import { benchmarkSets, type BenchmarkSet } from './benchmark-sets.mjs';
-import { mapInSequence } from './map-in-sequence.mjs';
+// eslint-disable-next-line import-x/no-relative-packages -- shared with synstate-docs' measurement (#3066)
+import { mapInSequence } from '../../../tools/scripts/lib/bundle-size.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
