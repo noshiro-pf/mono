@@ -14,6 +14,11 @@
   // `pr-merge-queue` reach `pr-report-core`, and the tools that share their
   // GitHub client reach `pr-merge-queue`.
   //
+  // The long-running `unblock-prs` and `run-unblock-prs-skill` rely on it too:
+  // their restart TODO (`restart-unblock-prs.yml`) asks for no build, because
+  // every workspace import they reach is mapped here.
+  // `check:root:restart-unblock-prs-paths` fails on one that is not.
+  //
   // Passed explicitly: `tsx --tsconfig ../../tools/configs/tsconfig.tsx.json`.
   // Only affects that process; type-checking uses each package's own tsconfig.
   "compilerOptions": {

@@ -52,17 +52,20 @@ jobs:
           # ways; a file one starts reading at startup is added here by hand,
           # since nothing would notice.
           # - Both run `libs/pr-merge-queue/src` through `tsx`, as the root
-          #   `package.json`'s script of the same name says, and import
-          #   `pr-report-core` from its `dist/`.
+          #   `package.json`'s script of the same name says. Its
+          #   `--tsconfig tools/configs/tsconfig.tsx.json` maps the workspace
+          #   libraries they import, `pr-report-core` included, to their
+          #   `src/` (the guard fails on one it does not map), so a restart
+          #   loads them from source and nothing needs building first.
           # - The worker imports `unblock-prs/` and `lib/`, and reads
           #   `.github/unblock-prs.json` (`readConfig`) before the first survey.
           # - `run-unblock-prs-skill` imports `run-unblock-prs-skill/`,
           #   `claim-pr/`, `pr-report/`, `report-unowned-prs/`, `unblock-prs/`
           #   and `lib/`. The sessions it starts read the skill afresh.
-          # The other workspace libraries they import from `dist/`
-          # (`ts-data-forge`, …) are left out: they change often and the
-          # queue's behavior rarely waits on them, so a TODO for each would be
-          # noise; the guard's `LEFT_OUT` lists them.
+          # The other workspace libraries they import (`ts-data-forge`, …)
+          # are left out: they change often and the queue's behavior rarely
+          # waits on them, so a TODO for each would be noise; the guard's
+          # `LEFT_OUT` lists them.
           src='libs/pr-merge-queue/src'
           core='libs/pr-report-core/src/'
           worker_re="^(${src}/(unblock-prs/|lib/|cmd/unblock-prs\.mts$)|${core})"
@@ -82,11 +85,13 @@ jobs:
           fi
 
           # What changed for one command: its sources, the config only the
-          # worker reads, and its own script.
+          # worker reads, the map tsx resolves the workspace libraries by, and
+          # its own script.
           changed_for() {
             {
               grep -E "$1" <<<"$sources"
               [[ "$2" == unblock-prs ]] && grep -Fx '.github/unblock-prs.json' <<<"$files"
+              grep -Fx 'tools/configs/tsconfig.tsx.json' <<<"$files"
               grep -qFx "$2" <<<"$scripts" && echo 'package.json'
             } || true
           }
@@ -114,9 +119,9 @@ jobs:
             jq -r '.commits[] | "- \(.message | split("\n")[0])"' "$GITHUB_EVENT_PATH"
             echo
             echo "Restart ${restart[0]}${restart[1]:+ and ${restart[1]}}."
-            if printf '%s\n' "${changed_files[@]}" | grep -q "^${core}"; then
+            if grep -qFx 'pnpm-lock.yaml' <<<"$files"; then
               # shellcheck disable=SC2016 # Markdown code spans, not expansions
-              echo 'Build `pr-report-core` first.'
+              echo 'Run `pnpm install` after the pull: this push changed `pnpm-lock.yaml`.'
             fi
             echo
             echo '<details><summary>Files</summary>'
@@ -146,9 +151,8 @@ jobs:
             cat <<'EOF'
           Changes that the running `unblock-prs` worker or `run-unblock-prs-skill` loads only at startup have landed on `main`. The entry below and each comment after it is one push, and names which of the two to restart. Close this issue once everything the entries name runs the current `main`; the next such push opens a new one.
 
-          1. `git pull` in the checkout they run from.
-          2. Where an entry says so, `pnpm --filter pr-report-core run build`: both import it from `dist/`.
-          3. Ctrl+C each one an entry names (it finishes the current step), then start it again: `pnpm run unblock-prs`, `pnpm run run-unblock-prs-skill -- <its options>`.
+          1. `git pull` in the checkout they run from, then `pnpm install` where an entry says so. Nothing needs building: both load the workspace libraries they import from `src/`.
+          2. Ctrl+C each one an entry names (it finishes the current step), then start it again: `pnpm run unblock-prs`, `pnpm run run-unblock-prs-skill -- <its options>`.
 
           EOF
             cat "$entry_file"
@@ -158,9 +162,8 @@ jobs:
 
           起動中の `unblock-prs` worker か `run-unblock-prs-skill` が起動時にしか読まない変更が `main` に入った。上のエントリと以降のコメントがそれぞれ 1 回の push で、どちらを再起動するかを書いてある。エントリが挙げたものがすべて現在の `main` で動いたらこの issue を閉じる。次にそういう push があれば新しい issue が立つ。
 
-          1. それらを動かしているチェックアウトで `git pull`。
-          2. エントリにあれば `pnpm --filter pr-report-core run build`（どちらもこれを `dist/` から読む）。
-          3. エントリが挙げたものを Ctrl+C（今のステップを終えて止まる）してから起動し直す：`pnpm run unblock-prs`、`pnpm run run-unblock-prs-skill -- <オプション>`。
+          1. それらを動かしているチェックアウトで `git pull`。エントリにあれば続けて `pnpm install`。build は要らない（どちらも import するワークスペースのライブラリを `src/` から読む）。
+          2. エントリが挙げたものを Ctrl+C（今のステップを終えて止まる）してから起動し直す：`pnpm run unblock-prs`、`pnpm run run-unblock-prs-skill -- <オプション>`。
 
           EOF
             echo "$marker"

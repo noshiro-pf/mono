@@ -3,6 +3,7 @@ import { Arr, Result } from 'ts-data-forge';
 import {
   findViolations,
   parsePatterns,
+  parseSourceMapped,
   walkImports,
   type Closure,
 } from './check-restart-unblock-prs-paths.mjs';
@@ -134,6 +135,29 @@ describe('walkImports', () => {
     assert.deepStrictEqual(closure?.unfollowed, ['ts-data-forge']);
   });
 
+  test('lists every workspace import as written, followed or not', () => {
+    const closure = Result.unwrapOk(
+      walkImports('libs/q/src/cmd/sub.mts', {
+        readSource: (relativePath) =>
+          relativePath === 'libs/q/src/cmd/sub.mts'
+            ? dedent`
+              import { Arr } from 'ts-data-forge/array';
+              import { report } from 'core';
+              import dedent from 'dedent';
+            `
+            : sources.get(relativePath),
+        workspacePackages,
+        follows: (directory) => directory === 'libs/core',
+      }),
+    );
+
+    assert.deepStrictEqual(closure?.workspaceImports, [
+      'core',
+      'ts-data-forge',
+      'ts-data-forge/array',
+    ]);
+  });
+
   test('does not enter a workspace package it is not told to follow', () => {
     const closure = Result.unwrapOk(walk(() => false));
 
@@ -170,6 +194,7 @@ describe('findViolations', () => {
       'libs/q/src/worker/main.mts',
     ],
     unfollowed: ['ts-data-forge'],
+    workspaceImports: ['core', 'ts-data-forge'],
   } as const;
 
   const check = (
@@ -185,6 +210,7 @@ describe('findViolations', () => {
         'libs/q/src/worker/main.test.mts',
       ),
       leftOut: ['ts-data-forge'],
+      sourceMapped: ['core', 'ts-data-forge'],
       ...overrides,
     });
 
@@ -230,6 +256,27 @@ describe('findViolations', () => {
     assert.include(violations[0], 'ts-fortress');
   });
 
+  test('reports a workspace import that tsx would load from dist/', () => {
+    const violations = check({
+      closure: {
+        ...closure,
+        workspaceImports: Arr.toPushed(
+          closure.workspaceImports,
+          'ts-data-forge/array',
+        ),
+      },
+      sourceMapped: ['ts-data-forge'],
+    });
+
+    assert.strictEqual(violations.length, 2);
+
+    assert.include(violations[0], 'core');
+
+    assert.include(violations[0], 'tsconfig.tsx.json');
+
+    assert.include(violations[1], 'ts-data-forge/array');
+  });
+
   test('reports a tracked file the pattern names but the entry no longer reaches', () => {
     const violations = check({
       trackedFiles: Arr.toPushed(closure.files, 'libs/q/src/worker/stale.mts'),
@@ -252,5 +299,54 @@ describe('findViolations', () => {
       }),
       [],
     );
+  });
+});
+
+describe('parseSourceMapped', () => {
+  const files: ReadonlySet<string> = new Set<string>([
+    'libs/core/src/entry-point.mts',
+  ]);
+
+  const isSource = (relativePath: string): boolean => files.has(relativePath);
+
+  test('reads the exact names of a JSONC file that map to a source file', () => {
+    const mapped = parseSourceMapped(
+      dedent`
+        {
+          // A comment, as the real file has.
+          "compilerOptions": {
+            "baseUrl": "../..",
+            "paths": {
+              "core": ["libs/core/src/entry-point.mts"],
+              "gone": ["libs/gone/src/entry-point.mts"],
+              "second": ["libs/second/src/x.mts", "libs/core/src/entry-point.mts"],
+              "core/*": ["libs/core/src/*"],
+            },
+          },
+        }
+      `,
+      isSource,
+    );
+
+    assert.deepStrictEqual(Result.unwrapOk(mapped), ['core', 'second']);
+  });
+
+  test('says where the file does not parse', () => {
+    const mapped = parseSourceMapped('{ "compilerOptions": { ', isSource);
+
+    assert.isTrue(Result.isErr(mapped));
+
+    assert.include(Result.unwrapErr(mapped), 'could not be parsed');
+  });
+
+  test('fails on a file with no paths', () => {
+    const mapped = parseSourceMapped(
+      '{ "compilerOptions": { "baseUrl": "../.." } }',
+      isSource,
+    );
+
+    assert.isTrue(Result.isErr(mapped));
+
+    assert.include(Result.unwrapErr(mapped), 'paths');
   });
 });

@@ -5,9 +5,11 @@ import {
   hasKey,
   isNonNullObject,
   isRecord,
+  memoizeFunction,
   Result,
   unknownToString,
 } from 'ts-data-forge';
+import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import * as ts from 'typescript';
 import {
@@ -34,7 +36,12 @@ import { projectRootPath } from '../project-root-path.mjs';
  *   asking for restarts over code the command no longer loads;
  * - every workspace package reached is either followed into its `src/` — the
  *   pattern names `libs/<dir>/src/` — or listed in `LEFT_OUT`, so a new one is
- *   a decision rather than an omission.
+ *   a decision rather than an omission;
+ * - every workspace import reached, as written — inside the packages left
+ *   out too — is mapped by `tools/configs/tsconfig.tsx.json`'s `paths` to a
+ *   file that exists, which is what makes `tsx` load it from `src/`: the
+ *   restart TODO asks for no build, and an import resolved through
+ *   `node_modules` would load a `dist/` that a pull leaves stale.
  */
 export const checkRestartUnblockPrsPaths = (): Promise<
   Result<CheckSummary, string>
@@ -57,6 +64,20 @@ export const checkRestartUnblockPrsPaths = (): Promise<
 
     const trackedFiles = yield* Result.safeUnwrap(await listTrackedFiles());
 
+    // A tracked file under a package's `src/`: neither a `dist/` a build left
+    // nor an untracked file the checkout happens to have.
+    const tracked: ReadonlySet<string> = new Set<string>(trackedFiles);
+
+    const sourceMapped = yield* Result.safeUnwrap(
+      parseSourceMapped(
+        yield* Result.safeUnwrap(await readRepositoryFile(TSX_TSCONFIG_PATH)),
+        (file) => tracked.has(file) && /^libs\/[^/]+\/src\//u.test(file),
+      ),
+    );
+
+    // Each command is walked twice, and the two share most of their files.
+    const readCached = memoizeFunction(readSource, (file: string) => file);
+
     const reports = COMMANDS.map(({ variable, entry }) => {
       const pattern = patterns.get(variable);
 
@@ -64,24 +85,41 @@ export const checkRestartUnblockPrsPaths = (): Promise<
         return Result.err(`${WORKFLOW_PATH} assigns no ${variable}.`);
       }
 
-      return Result.map(
-        walkImports(entry, {
-          readSource,
-          workspacePackages,
-          follows: (directory) => pattern.test(`${directory}/src/`),
-        }),
-        (closure) => ({
+      return Result.safeTry(function* () {
+        const closure = yield* Result.safeUnwrap(
+          walkImports(entry, {
+            readSource: readCached,
+            workspacePackages,
+            follows: (directory) => pattern.test(`${directory}/src/`),
+          }),
+        );
+
+        // Into every package, the ones left out included: tsx loads what they
+        // import at startup as well.
+        const everything = yield* Result.safeUnwrap(
+          walkImports(entry, {
+            readSource: readCached,
+            workspacePackages,
+            follows: () => true,
+          }),
+        );
+
+        return Result.ok({
           reached: closure.files.length,
           violations: findViolations({
             variable,
             entry,
             pattern,
-            closure,
+            closure: {
+              ...closure,
+              workspaceImports: everything.workspaceImports,
+            },
             trackedFiles,
             leftOut: LEFT_OUT,
+            sourceMapped,
           }),
-        }),
-      );
+        });
+      });
     });
 
     const firstError = reports.find(Result.isErr);
@@ -191,7 +229,8 @@ export const parsePatterns = (
  * A relative specifier is resolved as the repository writes them, `.mjs` for
  * the `.mts` beside it. A bare one naming a workspace package is entered at its
  * `src/` entry when `follows` says so, and otherwise listed in `unfollowed`;
- * anything else (`node:*`, a third-party package) is not ours to restart for.
+ * either way it is listed, as written, in `workspaceImports`. Anything else
+ * (`node:*`, a third-party package) is not ours to restart for.
  */
 export const walkImports = (
   entry: string,
@@ -208,6 +247,8 @@ export const walkImports = (
   const mut_files = new Set<string>();
 
   const mut_unfollowed = new Set<string>();
+
+  const mut_workspaceImports = new Set<string>();
 
   const mut_queue: string[] = [entry];
 
@@ -250,6 +291,8 @@ export const walkImports = (
         continue;
       }
 
+      mut_workspaceImports.add(specifier);
+
       if (!follows(directory)) {
         mut_unfollowed.add(packageName);
 
@@ -273,6 +316,7 @@ export const walkImports = (
   return Result.ok({
     files: Array.from(mut_files).toSorted(),
     unfollowed: Array.from(mut_unfollowed).toSorted(),
+    workspaceImports: Array.from(mut_workspaceImports).toSorted(),
   });
 };
 
@@ -284,6 +328,7 @@ export const findViolations = ({
   closure,
   trackedFiles,
   leftOut,
+  sourceMapped,
 }: Readonly<{
   variable: string;
   entry: string;
@@ -291,12 +336,19 @@ export const findViolations = ({
   closure: Closure;
   trackedFiles: readonly string[];
   leftOut: readonly string[];
+  /**
+   * The module names `tools/configs/tsconfig.tsx.json` maps to a source file
+   * ({@link parseSourceMapped}).
+   */
+  sourceMapped: readonly string[];
 }>): readonly string[] => {
   const reached = new Set(closure.files);
 
   // A `Set` rather than `includes`: under the strict standard library
   // `includes` narrows when it is false too, so the name would read as `never`.
   const leftOutNames: ReadonlySet<string> = new Set(leftOut);
+
+  const mapped: ReadonlySet<string> = new Set<string>(sourceMapped);
 
   return [
     ...closure.files
@@ -312,6 +364,12 @@ export const findViolations = ({
         (packageName) =>
           `${entry} imports the workspace package ${packageName}, which ${variable} does not name and LEFT_OUT does not list.`,
       ),
+    ...closure.workspaceImports
+      .filter((specifier) => !mapped.has(specifier))
+      .map(
+        (specifier) =>
+          `${entry} imports ${specifier}, which ${TSX_TSCONFIG_PATH} does not map to a source file that exists: tsx loads it from dist/, which a restart without a build leaves stale.`,
+      ),
     ...trackedFiles
       .filter(
         (file) => isModule(file) && pattern.test(file) && !reached.has(file),
@@ -326,7 +384,67 @@ export const findViolations = ({
 export type Closure = Readonly<{
   files: readonly string[];
   unfollowed: readonly string[];
+  /** Every bare specifier naming a workspace package, as written. */
+  workspaceImports: readonly string[];
 }>;
+
+/**
+ * The module names `tsconfig.tsx.json` maps, read as `tsc` reads the file
+ * (JSONC), each to a tracked file under a `src/` (`isSource`) — what makes tsx
+ * load it from source. A name none of whose targets is one is left out:
+ * tsx then falls back to `node_modules` without a word, and that is the `dist/`
+ * this guard is about. Only exact names count; a subpath import needs its own
+ * entry, as no `*` pattern is read.
+ */
+export const parseSourceMapped = (
+  text: string,
+  isSource: (relativePath: string) => boolean,
+): Result<readonly string[], string> => {
+  const parsed = ts.parseConfigFileTextToJson(TSX_TSCONFIG_PATH, text);
+
+  const config: unknown = parsed.config;
+
+  const { error } = parsed;
+
+  if (error !== undefined) {
+    return Result.err(
+      `${TSX_TSCONFIG_PATH} could not be parsed: ${ts.flattenDiagnosticMessageText(error.messageText, '\n')}`,
+    );
+  }
+
+  const validated = TsxTsconfigSchema.validate(config);
+
+  if (Result.isErr(validated)) {
+    return Result.err(
+      Arr.toUnshifted(`${TSX_TSCONFIG_PATH} has no usable compilerOptions:`)(
+        t.validationErrorsToMessages(validated.value),
+      ).join('\n'),
+    );
+  }
+
+  const { baseUrl = '.', paths } = validated.value.compilerOptions;
+
+  const base = path.posix.join(path.posix.dirname(TSX_TSCONFIG_PATH), baseUrl);
+
+  return Result.ok(
+    Object.entries(paths)
+      .filter(
+        ([key, targets]) =>
+          !key.includes('*') &&
+          targets.some((target) =>
+            isSource(path.posix.normalize(path.posix.join(base, target))),
+          ),
+      )
+      .map(([key]) => key),
+  );
+};
+
+const TsxTsconfigSchema = t.record({
+  compilerOptions: t.record({
+    baseUrl: t.optional(t.string()),
+    paths: t.keyValueRecord(t.string(), t.array(t.string())),
+  }),
+});
 
 type CheckSummary = Readonly<{
   commands: number;
@@ -334,6 +452,8 @@ type CheckSummary = Readonly<{
 }>;
 
 const WORKFLOW_PATH = '.github/workflows/restart-unblock-prs.yml';
+
+const TSX_TSCONFIG_PATH = 'tools/configs/tsconfig.tsx.json';
 
 /** Each long-running command, by the pattern that stands for it. */
 const COMMANDS = [
@@ -348,9 +468,10 @@ const COMMANDS = [
 ] as const;
 
 /**
- * Workspace packages the commands import from `dist/` that the workflow leaves
- * out on purpose: they change often and the queue rarely waits on them (see the
- * comment above the patterns). A package that joins them is added here.
+ * Workspace packages the commands import (from `src/`, through
+ * `tools/configs/tsconfig.tsx.json`) that the workflow leaves out on purpose:
+ * they change often and the queue rarely waits on them (see the comment above
+ * the patterns). A package that joins them is added here.
  */
 const LEFT_OUT = [
   'ts-data-forge',
@@ -428,6 +549,7 @@ const formatViolations = (violations: readonly string[]): string =>
     'Edit the pattern (and the comment above it) so that it names exactly the',
     'directories the command reaches; a workspace package left out on purpose',
     'goes in LEFT_OUT in tools/scripts/cmd/check-restart-unblock-prs-paths.mts.',
+    `A workspace import tsx would load from dist/ gets a paths entry in ${TSX_TSCONFIG_PATH}.`,
   ].join('\n');
 
 if (isDirectlyExecuted(import.meta.url)) {
