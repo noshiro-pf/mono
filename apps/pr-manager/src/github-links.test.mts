@@ -4,6 +4,8 @@ import {
   newIssueUrl,
   openIssuesUrl,
   openPullRequestsUrl,
+  pickedPullRequestsUrl,
+  queuedPullRequestsUrl,
 } from './github-links.mjs';
 
 // The repository the fixtures were taken from.
@@ -63,6 +65,38 @@ describe(openIssuesUrl, () => {
     assert.strictEqual(
       openIssuesUrl(SOURCE, ['label:"bug"']),
       'https://github.com/noshiro-pf/mono/issues?q=is%3Aissue+is%3Aopen+label%3A%22bug%22+sort%3Aupdated-desc',
+    );
+  });
+});
+
+describe(queuedPullRequestsUrl, () => {
+  test('is the open pull requests labelled merge-queued, oldest first', () => {
+    assert.strictEqual(
+      queuedPullRequestsUrl(SOURCE),
+      'https://github.com/noshiro-pf/mono/pulls?q=is%3Apr+is%3Aopen+label%3A%22merge-queued%22+sort%3Acreated-asc',
+    );
+  });
+
+  test('follows the repository the page reads', () => {
+    assert.strictEqual(
+      queuedPullRequestsUrl(OTHER_SOURCE),
+      'https://github.com/someone/elsewhere/pulls?q=is%3Apr+is%3Aopen+label%3A%22merge-queued%22+sort%3Acreated-asc',
+    );
+  });
+});
+
+describe(pickedPullRequestsUrl, () => {
+  test('is the queued pull requests without skip-ci', () => {
+    assert.strictEqual(
+      pickedPullRequestsUrl(SOURCE),
+      'https://github.com/noshiro-pf/mono/pulls?q=is%3Apr+is%3Aopen+label%3A%22merge-queued%22+-label%3A%22skip-ci%22+sort%3Acreated-asc',
+    );
+  });
+
+  test('follows the repository the page reads', () => {
+    assert.strictEqual(
+      pickedPullRequestsUrl(OTHER_SOURCE),
+      'https://github.com/someone/elsewhere/pulls?q=is%3Apr+is%3Aopen+label%3A%22merge-queued%22+-label%3A%22skip-ci%22+sort%3Acreated-asc',
     );
   });
 });

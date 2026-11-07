@@ -770,8 +770,17 @@ a:focus-visible {
   color: var(--status-critical);
 }
 
-/* A link in a section's title, to the same list on GitHub. */
+/*
+ * A link in a section's title, to the same list on GitHub, and the dot between
+ * two of them.
+ */
 .section-link {
+  font-size: 0.8125rem;
+  font-weight: 400;
+}
+
+.section-link-separator {
+  color: var(--ink-secondary);
   font-size: 0.8125rem;
   font-weight: 400;
 }
@@ -1410,8 +1419,10 @@ a:focus-visible {
   --queue-fade: 2.5rem;
 }
 
+/* Wraps as a whole after the title's links rather than inside a count. */
 .queue-counts {
   color: var(--ink-secondary);
+  display: inline-block;
   font-size: 0.8125rem;
   font-weight: 400;
   margin-left: 0.75rem;
