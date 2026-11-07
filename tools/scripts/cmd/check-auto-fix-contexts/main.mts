@@ -1,17 +1,34 @@
 import * as path from 'node:path';
 import {
+  ConfigFileSchema,
+  configOf,
+  failedContexts,
+  firstFixerOf,
+  planAutoFix,
+  type AutoFixConfig as UnblockAutoFixConfig,
+} from 'pr-merge-queue';
+import {
   Arr,
-  hasKey,
   isRecord,
   isString,
   Json,
   Result,
   unknownToString,
 } from 'ts-data-forge';
+import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { listWorkflowFiles, readRepositoryFile } from '../lib/repo-files.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
-import { parseWorkflowTriggers } from './check-workflow-event-name.mjs';
+import {
+  listWorkflowFiles,
+  readRepositoryFile,
+} from '../../lib/repo-files.mjs';
+import {
+  matrixValues,
+  readMatrix,
+  readWorkflowJobs,
+  type WorkflowJob,
+} from '../../lib/workflow-jobs.mjs';
+import { projectRootPath } from '../../project-root-path.mjs';
+import { parseWorkflowTriggers } from '../check-workflow-event-name.mjs';
 
 /**
  * Fails when a `context` pattern in `.github/unblock-prs.json` takes no check
@@ -28,11 +45,11 @@ import { parseWorkflowTriggers } from './check-workflow-event-name.mjs';
  *
  * The contexts are those of every job, in a workflow a pull request runs, that
  * hands a matrix entry to `pnpm run` — the jobs a fixer can name, since a fixer
- * reruns the command — and a fixer takes a context only when it is the first to
- * match it, as `unblock-prs` reads them. Each top-level alternative of a
- * pattern (`a|b`) is asked on its own, since one that went stale beside a live
- * one is as silent. A pattern idle on purpose is listed in {@link KEPT_IDLE}
- * with its reason.
+ * reruns the command. What a pattern takes is asked of `unblock-prs`'s own
+ * reader and planner, so that this cannot keep checking rules it has changed.
+ * Each top-level alternative of a pattern (`a|b`) is asked on its own, since
+ * one that went stale beside a live one is as silent. A pattern idle on purpose
+ * is listed in {@link KEPT_IDLE} with its reason.
  */
 export const checkAutoFixContexts = (): Promise<Result<CheckSummary, string>> =>
   Result.safeTry(async function* () {
@@ -74,19 +91,22 @@ export const checkAutoFixContexts = (): Promise<Result<CheckSummary, string>> =>
  * `pnpm run ${{ matrix.<key> }}`, one per entry of `<key>`, named as GitHub
  * names them: the job's `name:` with the entry put in, or `<job> (<entry>)`.
  *
- * Read with a line scanner, not yet through the YAML parser of
- * `tools/scripts/lib/workflow-jobs.mts` as the command guards read workflows. A
- * job whose checks it cannot name exactly is left out, with why, rather than
- * guessed at:
- * entries that are an expression, a matrix with `exclude:`, a `name:` that
- * reads another property, a job with no matrix expression in its name whose
- * entries carry other properties (GitHub names those by all of them), and a
- * matrix job that runs none of its properties as `pnpm run ${{ matrix.<key> }}`.
- * Leaving a job out can only make a pattern fail, never pass, and the reasons
- * are printed with the failure.
+ * A job whose checks it cannot name exactly is left out, with why, rather than
+ * guessed at: entries that are an expression, a matrix with `exclude:`, a
+ * `name:` that reads another property, a job with no matrix expression in its
+ * name whose entries carry other properties (GitHub names those by all of
+ * them), and a matrix job that runs none of its properties as
+ * `pnpm run ${{ matrix.<key> }}`. Leaving a job out can only make a pattern
+ * fail, never pass, and the reasons are printed with the failure.
  */
 export const collectMatrixContexts = (workflowFile: string): MatrixContexts => {
-  const results = splitJobs(workflowFile).map(collectJobContexts);
+  const jobs = readWorkflowJobs(workflowFile);
+
+  if (Result.isErr(jobs)) {
+    return { contexts: [], unreadable: [jobs.value] };
+  }
+
+  const results = jobs.value.map(collectJobContexts);
 
   return {
     contexts: results.flatMap(Result.unwrapOkOr([])),
@@ -101,107 +121,51 @@ export const collectMatrixContexts = (workflowFile: string): MatrixContexts => {
 };
 
 /**
- * `autoFix.ignore`, and every `context` of `autoFix.prepare` and
- * `autoFix.fixers` in order, with where it is in the file, compiled as
- * `unblock-prs` compiles it. A file without `autoFix` fixes nothing and has
- * nothing to ask; a malformed `autoFix` is refused rather than read around.
+ * The file read by `unblock-prs`'s own reader, and every `context` of
+ * `autoFix.prepare` and `autoFix.fixers` in order, with where it is in the file.
+ * A file without `autoFix` fixes nothing and has nothing to ask; a malformed one
+ * is refused, as `unblock-prs` refuses it.
  */
 export const readAutoFixPatterns = (
   file: unknown,
 ): Result<AutoFixConfig, string> => {
-  if (!isRecord(file)) {
-    return Result.err('not an object');
+  const validated = ConfigFileSchema.validate(file);
+
+  if (Result.isErr(validated)) {
+    return Result.err(t.validationErrorsToMessages(validated.value).join('\n'));
   }
 
-  if (!hasKey(file, 'autoFix')) {
-    return Result.ok({ ignore: [], patterns: [] });
+  const config = configOf(validated.value, CONFIG_PATH);
+
+  if (Result.isErr(config)) {
+    return config;
   }
 
-  const { autoFix } = file;
+  const autoFix = config.value.autoFix ?? NO_AUTO_FIX;
 
-  if (
-    !isRecord(autoFix) ||
-    !Arr.isArray(autoFix['ignore']) ||
-    !Arr.isArray(autoFix['prepare']) ||
-    !Arr.isArray(autoFix['fixers'])
-  ) {
-    return Result.err(
-      '`autoFix` needs the arrays `ignore`, `prepare` and `fixers`.',
-    );
-  }
-
-  const sources = [
-    ...autoFix['ignore'].map(
-      (entry: unknown, i) =>
-        ({ where: `autoFix.ignore[${i}]`, kind: 'ignore', entry }) as const,
-    ),
-    ...autoFix['prepare'].map(
-      (entry: unknown, i) =>
-        ({
-          where: `autoFix.prepare[${i}].context`,
-          kind: 'prepare',
-          entry: isRecord(entry) ? entry['context'] : undefined,
-        }) as const,
-    ),
-    ...autoFix['fixers'].map(
-      (entry: unknown, i) =>
-        ({
-          where: `autoFix.fixers[${i}].context`,
-          kind: 'fixer',
-          entry: isRecord(entry) ? entry['context'] : undefined,
-        }) as const,
-    ),
-  ] as const;
-
-  const notStrings = sources
-    .filter(({ entry }) => !isString(entry))
-    .map(({ where }) => where);
-
-  if (Arr.isNonEmpty(notStrings)) {
-    return Result.err(`not a string: ${notStrings.join(', ')}`);
-  }
-
-  const compiled = Arr.generate(function* () {
-    for (const { where, kind, entry } of sources) {
-      if (isString(entry)) {
-        yield { where, kind, source: entry, regex: compile(entry) };
-      }
-    }
-  });
-
-  const invalid = compiled
-    .filter(({ regex }) => Result.isErr(regex))
-    .map(({ where }) => where);
-
-  if (Arr.isNonEmpty(invalid)) {
-    return Result.err(`not a regular expression: ${invalid.join(', ')}`);
-  }
-
-  const read = Arr.generate(function* () {
-    for (const { where, kind, source, regex } of compiled) {
-      if (Result.isOk(regex)) {
-        yield { where, kind, source, regex: regex.value };
-      }
-    }
-  });
+  // The sources as written, which `KEPT_IDLE` names: a `RegExp` escapes a `/`.
+  const written = validated.value.autoFix;
 
   return Result.ok({
-    ignore: read
-      .filter(({ kind }) => kind === 'ignore')
-      .map(({ regex }) => regex),
-    patterns: Arr.generate(function* () {
-      for (const { where, kind, source, regex } of read) {
-        if (kind !== 'ignore') {
-          yield {
-            where,
-            kind,
-            source,
-            regex,
-            alternatives: alternativesOf(source, regex),
-          };
-        }
-      }
-    }),
+    autoFix,
+    patterns: [
+      ...autoFix.prepare.map(({ context }, i) =>
+        patternOf(
+          `autoFix.prepare[${i}].context`,
+          'prepare',
+          written?.prepare[i]?.context ?? context.source,
+          context,
+        ),
+      ),
+      ...autoFix.fixers.map(({ context }, i) =>
+        patternOf(
+          `autoFix.fixers[${i}].context`,
+          'fixer',
+          written?.fixers[i]?.context ?? context.source,
+          context,
+        ),
+      ),
+    ],
   });
 };
 
@@ -209,31 +173,28 @@ export const readAutoFixPatterns = (
  * One message per pattern, or top-level alternative of one, that takes no
  * context and is not kept idle, and per {@link KEPT_IDLE} entry that is stale.
  *
- * A context `autoFix.ignore` matches is never read, so nothing takes it. A
- * fixer takes the contexts it is the first fixer to match, since the first
- * decides. A prepare entry takes the contexts it matches that some fixer takes,
- * since a failure no fixer takes declines the whole fix before any prepare
- * runs.
+ * `unblock-prs` decides what is read and what takes it: a context it reads
+ * (`failedContexts`) goes to the fixer it says is first (`firstFixerOf`), and a
+ * prepare entry takes what it matches where a plan for that context comes out
+ * (`planAutoFix`), since a failure no fixer takes declines the whole fix before
+ * any prepare runs.
  */
 export const findIdlePatterns = (
   config: AutoFixConfig,
   contexts: readonly string[],
   keptIdle: readonly KeptIdle[],
 ): readonly string[] => {
-  const { ignore, patterns } = config;
+  const { autoFix, patterns } = config;
 
   const read = contexts.filter((context) =>
-    ignore.every((regex) => !regex.test(context)),
+    Arr.isNonEmpty(failedContexts(failing(context), autoFix)),
   );
 
-  const fixers = patterns.filter(({ kind }) => kind === 'fixer');
+  const firstOf = (context: string): AutoFixPattern | undefined => {
+    const fixer = firstFixerOf(context, autoFix);
 
-  const firstFixerOf = new Map(
-    read.map(
-      (context) =>
-        [context, fixers.find(({ regex }) => regex.test(context))] as const,
-    ),
-  );
+    return patterns.find(({ regex }) => regex === fixer?.context);
+  };
 
   // Only the first entry with a kept source is exempt, so a copy of it is still
   // asked.
@@ -248,8 +209,8 @@ export const findIdlePatterns = (
 
     const taken = matched.filter((context) =>
       pattern.kind === 'prepare'
-        ? firstFixerOf.get(context) !== undefined
-        : firstFixerOf.get(context) === pattern,
+        ? Result.isOk(planAutoFix(failing(context), autoFix))
+        : firstOf(context) === pattern,
     );
 
     const name = `${pattern.where} \`${pattern.source}\`` as const;
@@ -281,9 +242,7 @@ export const findIdlePatterns = (
       }
 
       const takers = Arr.uniq(
-        matched
-          .map((context) => firstFixerOf.get(context)?.where)
-          .filter(isString),
+        matched.map((context) => firstOf(context)?.where).filter(isString),
       );
 
       return [
@@ -338,7 +297,8 @@ export const splitAlternatives = (source: string): readonly string[] => {
 };
 
 export type AutoFixConfig = Readonly<{
-  ignore: readonly RegExp[];
+  /** As `unblock-prs` reads it, which is what decides what a pattern takes. */
+  autoFix: UnblockAutoFixConfig;
   patterns: readonly AutoFixPattern[];
 }>;
 
@@ -392,17 +352,22 @@ type CheckSummary = Readonly<{
   contexts: number;
 }>;
 
-type Job = Readonly<{
-  id: string;
-  lines: readonly string[];
-}>;
-
 type MatrixEntries = Readonly<{
   values: readonly string[];
   /** Whether the matrix has properties other than the command's key. */
   hasOtherProperties: boolean;
   hasExclude: boolean;
 }>;
+
+/** What a file without `autoFix` gives the planner to read: nothing. */
+const NO_AUTO_FIX: UnblockAutoFixConfig = {
+  ignore: [],
+  before: [],
+  prepare: [],
+  fixers: [],
+  after: [],
+  notFixableAnnotation: undefined,
+} as const;
 
 const CONFIG_PATH = '.github/unblock-prs.json';
 
@@ -418,19 +383,7 @@ const MATRIX_COMMAND =
 
 const MATRIX_PROPERTY = /^\$\{\{ *matrix\.(?<key>[\w-]+) *\}\}$/u;
 
-/** A job's key, once a trailing comment is dropped. */
-const JOB_HEADER = /^ {2}(?<id>[\w-]+):$/u;
-
-const JOB_NAME = /^ {4}name:\s*(?<name>.+)$/u;
-
 const EXPRESSION = /\$\{\{.*?\}\}/gu;
-
-const LIST_ITEM = '- ';
-
-const MATRIX_SETS: ReadonlySet<string> = new Set<string>([
-  'include',
-  'exclude',
-]);
 
 const DEPTH_DELTA: ReadonlyMap<string, number> = new Map<string, number>([
   ['(', 1],
@@ -490,265 +443,102 @@ const alternativesOf = (
   });
 };
 
-const indentOf = (line: string): number =>
-  line.length - line.trimStart().length;
-
-const isBlankOrComment = (line: string): boolean => {
-  const trimmed = line.trim();
-
-  return trimmed === '' || trimmed.startsWith('#');
-};
-
-/**
- * The inside of a quoted scalar, its opening quote already read: `''` is a
- * quote inside single quotes, and a backslash takes the next character inside
- * double quotes (`\n` and the other named escapes are not decoded).
- */
-const readQuoted = (chars: readonly string[], quote: string): string => {
-  const out = Arr.generate(function* () {
-    let mut_index = 0;
-
-    while (mut_index < chars.length) {
-      const char = chars[mut_index];
-
-      const next = chars[mut_index + 1];
-
-      if (quote === '"' && char === '\\') {
-        yield next ?? '';
-
-        mut_index += 2;
-      } else if (char === quote && quote === "'" && next === "'") {
-        yield "'";
-
-        mut_index += 2;
-      } else if (char === quote) {
-        return;
-      } else {
-        yield char ?? '';
-
-        mut_index += 1;
-      }
-    }
-  });
-
-  return out.join('');
-};
-
-/**
- * A scalar as written: the inside of its quotes when it is quoted, else the
- * text before a trailing comment.
- */
-const scalarOf = (text: string): string => {
-  const trimmed = text.trim();
-
-  const [quote] = trimmed;
-
-  return quote !== '"' && quote !== "'"
-    ? trimmed.replace(/\s+#.*$/u, '')
-    : readQuoted(Array.from(trimmed.slice(1)), quote);
-};
-
-/** The lines under `key:` that are indented deeper than it, comments kept. */
-const blockAfter = (
-  lines: readonly string[],
-  startIndex: number,
-): readonly string[] => {
-  const indent = indentOf(lines[startIndex] ?? '');
-
-  const rest = lines.slice(startIndex + 1);
-
-  const endIndex = rest.findIndex(
-    (line) => !isBlankOrComment(line) && indentOf(line) <= indent,
-  );
-
-  return endIndex === -1 ? rest : rest.slice(0, endIndex);
-};
-
-const splitJobs = (workflowFile: string): readonly Job[] => {
-  const lines = workflowFile.split('\n');
-
-  const jobsIndex = lines.findIndex((line) => line.trimEnd() === 'jobs:');
-
-  if (jobsIndex === -1) {
-    return [];
-  }
-
-  const block = blockAfter(lines, jobsIndex);
-
-  const headers = Arr.generate(function* () {
-    for (const [index, line] of block.entries()) {
-      const id = JOB_HEADER.exec(line.replace(/\s+#.*$/u, '').trimEnd())
-        ?.groups?.['id'];
-
-      if (id !== undefined) {
-        yield { id, index };
-      }
-    }
-  });
-
-  return headers.map(({ id, index }, i) => ({
-    id,
-    lines: block.slice(index + 1, headers[i + 1]?.index ?? block.length),
-  }));
-};
+const patternOf = (
+  where: string,
+  kind: AutoFixPattern['kind'],
+  source: string,
+  regex: RegExp,
+): AutoFixPattern =>
+  ({
+    where,
+    kind,
+    source,
+    regex,
+    alternatives: alternativesOf(source, regex),
+  }) as const;
 
 const withEntries = (
-  job: Job,
+  job: WorkflowJob,
   key: string,
   entries: MatrixEntries,
   contextOf: (value: string) => string,
 ): Result<readonly string[], string> => {
   if (entries.hasExclude) {
     return Result.err(
-      `job \`${job.id}\`'s matrix has \`exclude:\`, which this guard does not apply.`,
+      `job \`${job.name}\`'s matrix has \`exclude:\`, which this guard does not apply.`,
     );
   }
 
   return Arr.isNonEmpty(entries.values)
     ? Result.ok(entries.values.map(contextOf))
     : Result.err(
-        `job \`${job.id}\` is named by \`matrix.${key}\`, but no entry of it could be read from its matrix.`,
+        `job \`${job.name}\` is named by \`matrix.${key}\`, but no entry of it could be read from its matrix.`,
       );
 };
 
 /**
- * The items of a YAML list, each as the text after `- ` and the lines that
- * continue it.
- */
-const listItemsOf = (
-  block: readonly string[],
-): readonly Readonly<{ head: string; rest: readonly string[] }>[] => {
-  // The list's own items only, not those of a list nested in one of them.
-  const itemIndent = Math.min(
-    ...block.filter((line) => !isBlankOrComment(line)).map(indentOf),
-  );
-
-  return Arr.generate(function* () {
-    for (const [index, line] of block.entries()) {
-      const trimmed = line.trim();
-
-      if (indentOf(line) === itemIndent && trimmed.startsWith(LIST_ITEM)) {
-        yield {
-          head: trimmed.slice(LIST_ITEM.length),
-          rest: blockAfter(block, index),
-        };
-      }
-    }
-  });
-};
-
-const readIncludeEntry = ({
-  head,
-  rest,
-}: Readonly<{
-  head: string;
-  rest: readonly string[];
-}>): ReadonlyMap<string, string> =>
-  new Map(
-    Arr.generate(function* () {
-      for (const line of Arr.toUnshifted(head)(
-        rest.filter((restLine) => !isBlankOrComment(restLine)),
-      )) {
-        const matched = /^(?<name>[\w-]+):\s*(?<value>.*)$/u.exec(line.trim());
-
-        const name = matched?.groups?.['name'];
-
-        if (name !== undefined) {
-          yield [name, scalarOf(matched?.groups?.['value'] ?? '')] as const;
-        }
-      }
-    }),
-  );
-
-/**
- * The values of `key` in a job's `matrix:`, whether listed under `key:` or as
- * the `key:` property of each `include:` entry.
+ * What {@link withEntries} needs of a job's matrix, by the shared reader. Whether
+ * it has other properties is read off the matrix as written, since the reader
+ * keeps an entry's scalars alone, and GitHub names a check by the rest too.
  */
 const readMatrixEntries = (
-  jobLines: readonly string[],
+  job: WorkflowJob,
   key: string,
-): MatrixEntries => {
-  const matrixIndex = jobLines.findIndex((line) => line.trim() === 'matrix:');
+): Result<MatrixEntries, string> => {
+  const read = readMatrix(job.matrix);
 
-  if (matrixIndex === -1) {
-    return { values: [], hasOtherProperties: false, hasExclude: false };
+  if (Result.isErr(read)) {
+    return Result.err(`job \`${job.name}\`'s matrix has ${read.value}.`);
   }
 
-  const matrix = blockAfter(jobLines, matrixIndex);
+  const written = isRecord(job.matrix) ? job.matrix : ({} as const);
 
-  const propertyIndent = Math.min(
-    ...matrix.filter((line) => !isBlankOrComment(line)).map(indentOf),
-  );
+  const include = written['include'];
 
-  const properties = Arr.generate(function* () {
-    for (const [index, line] of matrix.entries()) {
-      if (isBlankOrComment(line) || indentOf(line) !== propertyIndent) {
-        continue;
-      }
-
-      const name = /^(?<name>[\w-]+):/u.exec(line.trim())?.groups?.['name'];
-
-      if (name !== undefined) {
-        yield { name, block: blockAfter(matrix, index) };
-      }
-    }
-  });
-
-  const listed = properties
-    .filter(({ name }) => name === key)
-    .flatMap(({ block }) =>
-      listItemsOf(block).map(({ head }) => scalarOf(head)),
-    );
-
-  const included = properties
-    .filter(({ name }) => name === 'include')
-    .flatMap(({ block }) => listItemsOf(block).map(readIncludeEntry));
-
-  return {
-    values: [
-      ...listed,
-      ...Arr.generate(function* () {
-        for (const entry of included) {
-          const value = entry.get(key);
-
-          if (value !== undefined) {
-            yield value;
-          }
-        }
-      }),
-    ],
+  return Result.ok({
+    values: matrixValues(read.value, key),
     hasOtherProperties:
-      properties.some(({ name }) => name !== key && !MATRIX_SETS.has(name)) ||
-      included.some((entry) => entry.keys().some((k) => k !== key)),
-    hasExclude: properties.some(({ name }) => name === 'exclude'),
-  };
+      Object.keys(read.value.lists).some((name) => name !== key) ||
+      (Arr.isArray(include) &&
+        include.some(
+          (entry: unknown) =>
+            isRecord(entry) && Object.keys(entry).some((name) => name !== key),
+        )),
+    hasExclude: written['exclude'] !== undefined,
+  });
 };
+
+/** The one failed context, as `unblock-prs` reads a check rollup. */
+const failing = (context: string): ReadonlyMap<string, 'failed'> =>
+  new Map<string, 'failed'>([[context, 'failed']]);
 
 const quoteList = (items: readonly string[]): string =>
   items.map((item) => `\`${item}\``).join(', ');
 
-const collectJobContexts = (job: Job): Result<readonly string[], string> => {
-  const code = job.lines.filter((line) => !isBlankOrComment(line));
-
+const collectJobContexts = (
+  job: WorkflowJob,
+): Result<readonly string[], string> => {
   const runKeys = Arr.uniq(
-    Array.from(code.join('\n').matchAll(MATRIX_COMMAND)).flatMap(
-      (matched) => matched.groups?.['key'] ?? [],
+    job.steps.flatMap(({ run }) =>
+      Array.from(
+        (run ?? '')
+          .split('\n')
+          .filter((line) => !line.trimStart().startsWith('#'))
+          .join('\n')
+          .matchAll(MATRIX_COMMAND),
+      ).flatMap((matched) => matched.groups?.['key'] ?? []),
     ),
   );
 
   if (!Arr.isNonEmpty(runKeys)) {
-    return code.some((line) => line.trim() === 'matrix:')
-      ? Result.err(
-          `job \`${job.id}\` has a matrix but runs none of its properties as \`pnpm run \${{ matrix.<key> }}\` or \`--command \${{ matrix.<key> }}\`.`,
-        )
-      : Result.ok([]);
+    return job.matrix === undefined
+      ? Result.ok([])
+      : Result.err(
+          `job \`${job.name}\` has a matrix but runs none of its properties as \`pnpm run \${{ matrix.<key> }}\` or \`--command \${{ matrix.<key> }}\`.`,
+        );
   }
 
-  const nameLine = code
-    .map((line) => JOB_NAME.exec(line)?.groups?.['name'])
-    .find(isString);
-
-  const name = nameLine === undefined ? undefined : scalarOf(nameLine);
+  const name = job.displayName;
 
   const expressions =
     name === undefined
@@ -757,19 +547,28 @@ const collectJobContexts = (job: Job): Result<readonly string[], string> => {
 
   if (name === undefined || !Arr.isNonEmpty(expressions)) {
     // GitHub appends every value of the entry to a name that reads none.
-    const base = name ?? job.id;
+    const base = name ?? job.name;
 
     const [runKey] = runKeys;
 
-    const entries = readMatrixEntries(code, runKey);
+    const runKeyEntries = readMatrixEntries(job, runKey);
 
-    if (runKeys.length > 1 || entries.hasOtherProperties) {
+    if (Result.isErr(runKeyEntries)) {
+      return runKeyEntries;
+    }
+
+    if (runKeys.length > 1 || runKeyEntries.value.hasOtherProperties) {
       return Result.err(
-        `job \`${job.id}\` has no matrix property in its name and its matrix has properties beside \`${runKey}\`, so GitHub names its checks by all of them, in an order this guard does not reproduce; a job a fixer names needs a \`name:\` that reads the property of the command (it runs ${quoteList(runKeys.map((property) => `matrix.${property}`))}) and keeps its checks' names apart.`,
+        `job \`${job.name}\` has no matrix property in its name and its matrix has properties beside \`${runKey}\`, so GitHub names its checks by all of them, in an order this guard does not reproduce; a job a fixer names needs a \`name:\` that reads the property of the command (it runs ${quoteList(runKeys.map((property) => `matrix.${property}`))}) and keeps its checks' names apart.`,
       );
     }
 
-    return withEntries(job, runKey, entries, (value) => `${base} (${value})`);
+    return withEntries(
+      job,
+      runKey,
+      runKeyEntries.value,
+      (value) => `${base} (${value})`,
+    );
   }
 
   const expression = Arr.isFixedLengthArray(1, expressions)
@@ -783,13 +582,17 @@ const collectJobContexts = (job: Job): Result<readonly string[], string> => {
 
   if (expression === undefined || key === undefined) {
     return Result.err(
-      `job \`${job.id}\`'s name reads ${quoteList(expressions)}, which this guard cannot put in; name it by the matrix property of the command alone (it runs ${quoteList(runKeys.map((property) => `matrix.${property}`))}).`,
+      `job \`${job.name}\`'s name reads ${quoteList(expressions)}, which this guard cannot put in; name it by the matrix property of the command alone (it runs ${quoteList(runKeys.map((property) => `matrix.${property}`))}).`,
     );
   }
 
-  return withEntries(job, key, readMatrixEntries(code, key), (value) =>
-    name.replaceAll(expression, () => value),
-  );
+  const entries = readMatrixEntries(job, key);
+
+  return Result.isErr(entries)
+    ? entries
+    : withEntries(job, key, entries.value, (value) =>
+        name.replaceAll(expression, () => value),
+      );
 };
 
 const readCheckContexts = async (): Promise<Result<MatrixContexts, string>> => {
@@ -860,7 +663,7 @@ const formatViolations = (
     'the pattern to the new check name (the job `name:` with the entry put in,',
     'or `<job> (<entry>)`); if the pattern is no longer needed, remove it; if it',
     'is kept for an entry to come, list it in KEPT_IDLE in',
-    'tools/scripts/cmd/check-auto-fix-contexts.mts with the reason.',
+    'tools/scripts/cmd/check-auto-fix-contexts/main.mts with the reason.',
     ...(Arr.isNonEmpty(unreadable)
       ? [
           '',
