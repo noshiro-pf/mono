@@ -15,6 +15,12 @@ One run differs from the next by 10–30% on the same machine, so figures worth 
 
 Nothing here runs in CI: timings from a shared runner say little, and a benchmark that asserts would only be flaky.
 
+### synstate-dom-next
+
+`pnpm run benchmark:next` measures synstate-dom, [synstate-dom-next](../../libs/synstate-dom-next) (the rebuild that is to replace it) and Solid only, on the same operations and scenarios, and writes [`RESULTS-NEXT.md`](./RESULTS-NEXT.md); `pnpm run benchmark:repeat -- --next` writes the median of 5 runs there. RESULTS.md is left as it is: the rebuild is private until it replaces synstate-dom.
+
+In the scenarios, that set adds **synstate-dom (derive)**: synstate-dom-next's code written with synstate and synstate-dom, every figure one `derive` or `map`, so that the gap between it and synstate-dom-next is the libraries' and not the difference between `combine` + `map` and `derive`.
+
 ## What is timed
 
 Each implementation in `src/frameworks/` mounts the same table, one row per item, with the item's id and label in two cells and a `danger` class on the selected row. Before timing, `src/run.bench-browser.mts` checks that every implementation renders the same rows after the same operations.
@@ -27,7 +33,8 @@ Libraries run as production builds (`mode: 'production'` and the `production` ex
 
 Each follows the way its own documentation or its js-framework-benchmark entry writes such a table.
 
-- **synstate-dom**: the rows are one immutable array in a `createState`, and `For` derives each row's value from it. The selection is a state each row binds with `view`. This is the form SPEC.md recommends, not a tuned one.
+- **synstate-dom**: the rows are one immutable array in a `createState`, and `For` derives each row's value from it. The selection is a state each row binds with `.pipe(map(...))`. This is the form SPEC.md recommends, not a tuned one.
+- **synstate-dom-next**: the rows are one immutable array in a `state`, `For` keeps a state per row, and `selector` writes only the two rows whose selection changed. In the scenarios each figure is one `derive` or `map`, and both pass on only a value that changed, so it needs no `skipIfNoChange` variant. A cell formats its figure with `.pipe(map(f))`, as synstate-dom does.
 - **Solid**: a signal per label, `For` over the row objects, and `createSelector` for the selection, so that selecting touches two rows. Compiled by `vite-plugin-solid`.
 - **Preact + Signals**: a signal per label and a `useComputed` class per row, both bound to the DOM as signals; the list is re-rendered with keys.
 - **Preact** and **React**: the rows and the selection are one immutable state in a `useState` at the top, and each row is a `memo` component given its label and whether it is selected, so that a change re-renders the rows whose props changed. Each change is rendered with `flushSync` in React; Preact renders it in a microtask.

@@ -2343,6 +2343,12 @@ importers:
       synstate-dom:
         specifier: workspace:*
         version: link:../../libs/synstate-dom
+      synstate-dom-next:
+        specifier: workspace:*
+        version: link:../../libs/synstate-dom-next
+      synstate-next:
+        specifier: workspace:*
+        version: link:../../libs/synstate-next
       vanjs-core:
         specifier: 1.6.1
         version: 1.6.1
@@ -4261,6 +4267,9 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.10)
+      synstate:
+        specifier: workspace:*
+        version: link:../synstate
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils

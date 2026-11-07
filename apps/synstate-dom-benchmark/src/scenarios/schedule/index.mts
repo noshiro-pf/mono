@@ -5,5 +5,7 @@ export * from './react.js';
 export * from './schedule-operations.mjs';
 export * from './schedule-scenario.mjs';
 export * from './solid.js';
+export * from './synstate-dom-derive.js';
+export * from './synstate-dom-next.js';
 export * from './synstate-dom.js';
 export * from './vanjs.mjs';

@@ -42,7 +42,7 @@ The data slots keep synstate-dom's rule: they take a `Bindable` (an
 
 - `subscribeInScope` is gone: a `subscribe` made while an owner runs belongs to
   that owner already, and is disposed with it.
-- `inlineMap` is not rebuilt; synstate-dom is removing it.
+- `inlineMap` is not rebuilt; synstate-dom has removed it too.
 - An element's namespace follows where it is mounted, not its tag: inside an
   `<svg>`, down to a `<foreignObject>`, `<a>` and `<title>` are SVG elements.
   synstate-dom makes them HTML wherever they are. Their props are still typed as
@@ -61,6 +61,12 @@ The data slots keep synstate-dom's rule: they take a `Bindable` (an
 - A controlled `checked` or `indeterminate` is restored in the next animation
   frame or a task after the `change`, whichever comes first, so it is restored
   in a hidden page too.
+
+## Benchmark
+
+`apps/synstate-dom-benchmark`'s `pnpm run benchmark:next` compares this package
+with synstate-dom and Solid, and writes
+[RESULTS-NEXT.md](../../apps/synstate-dom-benchmark/RESULTS-NEXT.md).
 
 ## Tests
 
