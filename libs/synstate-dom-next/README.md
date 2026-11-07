@@ -62,6 +62,12 @@ The data slots keep synstate-dom's rule: they take a `Bindable` (an
   frame or a task after the `change`, whichever comes first, so it is restored
   in a hidden page too.
 
+## Benchmark
+
+`apps/synstate-dom-benchmark`'s `pnpm run benchmark:next` compares this package
+with synstate-dom and Solid, and writes
+[RESULTS-NEXT.md](../../apps/synstate-dom-benchmark/RESULTS-NEXT.md).
+
 ## Tests
 
 synstate-dom's tests are ported under `test/ported/` and `test/browser/ported/`;

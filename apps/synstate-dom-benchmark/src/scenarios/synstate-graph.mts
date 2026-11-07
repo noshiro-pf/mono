@@ -1,10 +1,12 @@
 import {
   combine,
+  derive,
   map,
   skipIfNoChange,
   type InitializedObservable,
 } from 'synstate';
 import { Arr } from 'ts-data-forge';
+import type { NonEmptyTuple } from 'ts-type-forge';
 
 /**
  * What each figure's node passes on: every value `map` computes, as a
@@ -36,4 +38,22 @@ export const combineAll = <R,>(
   }
 
   return output(combine(parents).pipe(map(fn)));
+};
+
+/**
+ * One `derive` over any number of others, which passes on only a value that
+ * changed: the form `synstate-dom (derive)` writes synstate-dom-next's
+ * scenarios in.
+ */
+export const deriveAll = <R,>(
+  parents: readonly InitializedObservable<number>[],
+  fn: (values: readonly number[]) => R,
+): InitializedObservable<R> => {
+  if (!Arr.isNonEmpty(parents)) {
+    throw new Error('deriveAll needs at least one parent');
+  }
+
+  const tuple: NonEmptyTuple<InitializedObservable<number>> = parents;
+
+  return derive(tuple, (...values) => fn(values));
 };
