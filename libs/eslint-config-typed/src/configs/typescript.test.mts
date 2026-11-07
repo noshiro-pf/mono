@@ -86,6 +86,24 @@ describe(eslintConfigForTypeScript, () => {
 
     // Still reported, with a suggestion an editor applies only when asked.
     expect(ruleIds).toContain('unicorn/prefer-then-catch');
+
+    expect(ruleIds).toContain('ts-restrictions/prefer-catch');
+  });
+
+  test('`.then(null, onRejected)` on any thenable is reported, its rewrite only suggested', async () => {
+    // `unicorn/prefer-then-catch` reads only a receiver typed as the standard
+    // `Promise`; `ts-restrictions/prefer-catch` reads the call's shape.
+    const code = dedent`
+      export const recovered = (
+        promise: Readonly<Promise<number>>,
+      ): Promise<number> => promise.then(null, () => 0);
+    `;
+
+    const { output, ruleIds } = await fix(code);
+
+    expect(output).not.toContain('.catch(');
+
+    expect(ruleIds).toContain('ts-restrictions/prefer-catch');
   });
 
   test('a spread array is not rewritten to `Iterator.concat`', async () => {

@@ -452,6 +452,22 @@ namespace NoUnnecessaryCoalesceUndefined {
 }
 
 /**
+ * @description `promise/prefer-catch`, its fix offered only as a suggestion: Prefer `catch` to `then(a, b)`/`then(null, b)` for handling errors.
+ * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-catch.md
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace PreferCatch {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Replace a redundant arrow wrapper with the function itself (`(a) => f(a)` → `f`) or, when the callee has a curried version, its curried form (`(a) => f(a, ...rest)` → `f(...rest)`).
  *
  *  ```md
@@ -667,6 +683,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/no-string-spread': NoStringSpread.RuleEntry;
   'ts-restrictions/no-unnecessary-array-from': NoUnnecessaryArrayFrom.RuleEntry;
   'ts-restrictions/no-unnecessary-coalesce-undefined': NoUnnecessaryCoalesceUndefined.RuleEntry;
+  'ts-restrictions/prefer-catch': PreferCatch.RuleEntry;
   'ts-restrictions/prefer-curried-call': PreferCurriedCall.RuleEntry;
   'ts-restrictions/prefer-dedent': PreferDedent.RuleEntry;
   'ts-restrictions/prefer-global-this': PreferGlobalThis.RuleEntry;
