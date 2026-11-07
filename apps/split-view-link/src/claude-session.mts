@@ -38,6 +38,16 @@ export const claudeSessionTrailersOf = (
   return sessions.filter(({ url }, index) => firstIndexOf.get(url) === index);
 };
 
+/**
+ * A `Claude-Session:` line. `pr-description` guards what this will read through
+ * `pr-report-core`'s `CLAUDE_SESSION_LINE`, and neither can import the other's: a
+ * published package cannot depend on this private one, and the extension runs
+ * this in Chrome from 116, where that package's iterator helpers do not exist.
+ * `pr-manager`, which has both, tests that the two agree.
+ */
+export const trailerLinePattern =
+  /^[^\S\n]*claude-session[^\S\n]*:(?<value>[^\n]*)$/gimu;
+
 export type ClaudeSession = Readonly<{
   /** The session's title as it read when the pull request was opened. */
   title: string;
@@ -46,9 +56,6 @@ export type ClaudeSession = Readonly<{
 
 const claudeSessionUrlPattern =
   /^https:\/\/claude\.ai\/code\/session_[0-9A-Za-z]+$/u;
-
-const trailerLinePattern =
-  /^[^\S\n]*claude-session[^\S\n]*:(?<value>[^\n]*)$/gimu;
 
 /** `[<title>](<url>)` */
 const linkedPattern = /^\[(?<title>.*)\]\((?<url>[^()\s]*)\)$/u;

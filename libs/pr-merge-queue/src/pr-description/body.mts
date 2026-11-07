@@ -12,7 +12,12 @@
  * whether both halves changed.
  */
 
-import { outsideCodeFences } from 'pr-report-core';
+import {
+  CLAUDE_SESSION_LINE,
+  isDeclarationLine,
+  outsideCodeFences,
+  REVIEW_SECTION_HEADING,
+} from 'pr-report-core';
 import { Arr, Num, Result } from 'ts-data-forge';
 import { deferralProblemsIn } from './review-section.mjs';
 
@@ -167,7 +172,9 @@ export const checkDescription = (
 
   const fenced = parts.translation.split('\n').some((line) => FENCE.test(line));
 
-  const reviews = original.filter((line) => REVIEW_HEADING.test(line)).length;
+  const reviews = original.filter((line) =>
+    REVIEW_SECTION_HEADING.test(line),
+  ).length;
 
   const reviewSection = reviewSectionIn(original);
 
@@ -209,7 +216,7 @@ export const checkDescription = (
     reviews > 1
       ? `the original has a "## Review" section ${reviews} times; the tools read the first, so the findings go under one`
       : undefined,
-    translation.some((line) => REVIEW_HEADING.test(line))
+    translation.some((line) => REVIEW_SECTION_HEADING.test(line))
       ? 'the translation has a "## Review" heading; the tools read the first in the body, so the findings go under the original\'s and the translation titles its own section "### <translated heading>"'
       : undefined,
     reviewOpening === undefined ||
@@ -317,16 +324,13 @@ const IMAGE = /!\[[^\]]*\]\(/u;
 
 const MERGE_AFTER = /^[^\S\n]*merge-after[^\S\n]*:/iu;
 
-const DECLARATION = /^[^\S\n]*(?:merge|start)-after[^\S\n]*:/iu;
+const isDeclaration = (line: string): boolean =>
+  isDeclarationLine(line, 'merge-after') ||
+  isDeclarationLine(line, 'start-after');
 
 /** A trailer line other than a closing keyword (`Start-After:`, `Claude-Session:`). */
-const TRAILER_LINE = /^[^\S\n]*(?:start-after|claude-session)[^\S\n]*:/iu;
-
-/**
- * A heading `review-findings-digest` reads as the `## Review` section, suffix
- * and all (`## Review (/code-review high)`): its `parse.mts` pattern, as is.
- */
-const REVIEW_HEADING = /^##\s+Review\b/u;
+const isTrailerLine = (line: string): boolean =>
+  isDeclarationLine(line, 'start-after') || CLAUDE_SESSION_LINE.test(line);
 
 /** What {@link reviewOpeningRounds} reads. */
 const REVIEW_OPENING =
@@ -360,7 +364,7 @@ const stripInlineCode = (line: string): string =>
 
 /** A closing keyword is a trailer in a pull request's description only. */
 const isTrailer = (line: string, kind: DescriptionKind): boolean =>
-  TRAILER_LINE.test(line) ||
+  isTrailerLine(line) ||
   (kind === 'pull-request' && CLOSING_KEYWORD.test(stripInlineCode(line)));
 
 /** The first trailer `half` holds, as a problem; `undefined` when none. */
@@ -403,7 +407,7 @@ const opensWithProse = (lines: readonly string[]): boolean => {
   return (first === -1 ? lines : lines.slice(0, first)).some(
     (line) =>
       line.trim() !== '' &&
-      !DECLARATION.test(line) &&
+      !isDeclaration(line) &&
       !MERGE_BEFORE_NOTE.test(line),
   );
 };
@@ -424,7 +428,7 @@ const onlyIn = (
 const reviewSectionIn = (
   lines: readonly string[],
 ): readonly string[] | undefined => {
-  const start = lines.findIndex((line) => REVIEW_HEADING.test(line));
+  const start = lines.findIndex((line) => REVIEW_SECTION_HEADING.test(line));
 
   if (start === -1) {
     return undefined;
@@ -456,7 +460,7 @@ const referencesIn = (
       .filter(
         (line) =>
           !TABLE_ROW.test(line) &&
-          !DECLARATION.test(line) &&
+          !isDeclaration(line) &&
           !MERGE_BEFORE_NOTE.test(line),
       )
       .map(stripInlineCode)
