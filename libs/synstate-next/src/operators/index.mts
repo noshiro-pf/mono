@@ -1,4 +1,5 @@
 export * from './audit.mjs';
+export * from './create-derived.mjs';
 export * from './debounce.mjs';
 export * from './derive.mjs';
 export * from './filter.mjs';
