@@ -1,6 +1,6 @@
 {
   "name": "pr-merge-queue",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": false,
   "description": "A merge queue for GitHub driven by labels and `Merge-After:` trailers: unblock-prs lands the queued pull requests one at a time, open-pr opens one the way the queue wants it, pr-description reads and writes a description kept in two languages, pr-report, claim-pr, push-fixed-pr and report-unowned-prs read and hand over the queue, rework-pr takes a pull request out of it for more work and back, start-issue marks an issue as started and startable-issues lists the ones to start next, run-unblock-prs-skill runs the skill that fixes what it set aside on the Claude API, and run-issue-resolver starts the open issues nobody has started there",
   "keywords": [
