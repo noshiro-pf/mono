@@ -13,11 +13,10 @@ import {
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change.mjs';
 import { onUserDelete } from './on-user-delete.mjs';
 import { createMailBudget } from './send-report-budget.mjs';
-import { sendReportImpl } from './send-report-impl.mjs';
+import { handleSendReport, sendReportImpl } from './send-report-impl.mjs';
 import {
   fillAnswerWithCheck,
   isFetchEventListOfUserPayload,
-  isSendReportPayload,
   isVerifyEmailPayload,
   toStringWithCheck,
 } from './types/index.mjs';
@@ -183,7 +182,9 @@ export const verifyEmail = regionSelected.https.onCall(
 /**
  * Error reports are mailed from the same account as the notifications, so they
  * get a budget of their own; a report over it goes to the function's log
- * instead. The budget is per instance, hence `maxInstances: 1`.
+ * instead, and the client is told it was not mailed. The budget is per
+ * instance, hence `maxInstances: 1`, which also means a report arriving while
+ * another is being mailed may be refused.
  */
 const sendReportMailBudget = createMailBudget({
   limit: 10,
@@ -195,19 +196,9 @@ export const sendReport = regionSelected
     secrets: [runtimeConfig],
     maxInstances: 1,
   })
-  .https.onCall((payload: unknown, _context) => {
-    if (!isSendReportPayload(payload)) {
-      throw new https.HttpsError(
-        'invalid-argument',
-        'The payload type is invalid.',
-      );
-    }
-
-    if (!sendReportMailBudget(Date.now())) {
-      logger.error('Error report (mail budget used up):', payload.error);
-
-      return;
-    }
-
-    return sendReportImpl(payload).catch(logger.error);
-  });
+  .https.onCall((payload: unknown, _context) =>
+    handleSendReport(payload, {
+      withinBudget: () => sendReportMailBudget(Date.now()),
+      send: sendReportImpl,
+    }),
+  );

@@ -36,7 +36,8 @@ export const sendEmail = async (mailOptions: MailOptions): Promise<void> => {
     },
   });
 
-  await mailTransport.sendMail(mailOptions).catch(logger.error);
+  // A failure rejects, so that the caller can say the mail did not go out.
+  await mailTransport.sendMail(mailOptions);
 
   logger.log(
     `email has successfully sent from ${gmail.email} to ${mailOptions.to}.`,
